@@ -18,22 +18,35 @@ Stage-E/owner-fork suggestions, not filings.
 - "Excludes sagas" is dead as a categorical rule; replaced by a per-preset capability declaration
   `sagas: supported | externalized | rejected`, **never task substitution** (synthesis §2;
   `sagas-constraint.md` Verdict + Board consequence 1–3; `drift-ledger.md` D-05).
-- v1 board plans **four runtime cells**: `deno_server`, `deno_deploy`, one Node server preset, one
-  isolate/serverless preset (synthesis "Preset cell set"; `nitro-v3.md` Board input 2).
+- v1 board plans **three runtime cells** (Stage-F F1): `deno_server`, one Node server preset
+  (`node_server`), one isolate/serverless preset (`cloudflare_module`). `deno_deploy` is **withdrawn
+  pending DD-RESEARCH** (see §1 banner) — the original "four cells" framing predates the Deno Deploy
+  Classic/`deployctl` sunset.
 
-## 1. The four v1 runtime cells
+## 1. The v1 runtime cells
+
+> **STAGE-F REWORK BANNER (F1).** The v1 cell set is **THREE cells**: `deno_server` (C1),
+> `node_server` (C3), `cloudflare_module` (C4). **`deno_deploy` (C2) is WITHDRAWN from the v1 set and
+> every C2 claim in this pack is `withdrawn-pending-research`.** The corpus validated Deno Deploy
+> **Classic** + `deployctl`, both of which **sunset 2026-07-20**; the surviving platform uses
+> `deno deploy`, has a different build/runtime model, and does **not** support Deno queues. No corpus
+> artifact proves a Nitro v3 output (or queue/database bindings) on the new platform. C2 is deferred
+> to the **DD-RESEARCH** successor card (`design/canonical/DD-RESEARCH.md`, ms `0.0.1-stable`) and may
+> re-enter the matrix only after a real new-platform probe passes. New owner fork **F-2**: 3-cell v1
+> vs re-proven C2 later. The C2 rows/columns below are **retained for provenance only** and carry no
+> v1 capability claim.
 
 Each cell is a **capability-matrix column, not a global promise** (synthesis §3). The isolate cell
 is fixed to `cloudflare_module` as the representative non-Deno isolate/serverless output because its
 provider page names the preset and adds scheduled/queue/tail/email hooks that exercise the hardest
-mapping questions (`nitro-v3.md` Cloud deploy presets table, Cloudflare row). `deno_deploy` covers
-the Deno-based isolate/edge case; the two are **separate conformance cells**, not one
-(`nitro-v3.md` Deno-preset table row 2, Board input 2).
+mapping questions (`nitro-v3.md` Cloud deploy presets table, Cloudflare row). *(The Deno-based
+isolate/edge case — `deno_deploy` — is WITHDRAWN from v1 per the §1 banner and handled by
+DD-RESEARCH; it is not a v1 conformance cell.)*
 
 | Cell | Nitro preset | Execution model | Long-lived process? | Build caveats |
 | --- | --- | --- | --- | --- |
 | **C1 deno_server** | `deno_server` | Bare-metal / container, long-lived | Yes | Node-built output; launched `deno run --unstable --allow-net --allow-read --allow-env`; broad perms to audit (`nitro-v3.md` Deno-preset table row 2; `drift-ledger.md` D-04) |
-| **C2 deno_deploy** | `deno_deploy` | Provider isolate/edge, bounded window | No (per-invocation) | Separate linked-repo / token+deployctl flow; `waitUntil` runtime-dependent (`nitro-v3.md` Deno-preset table row 3, Tasks/schedules row) |
+| ~~**C2 deno_deploy**~~ **WITHDRAWN (F1)** | `deno_deploy` | *(pending DD-RESEARCH)* | *n/a* | **Corpus targeted Deno Deploy Classic + `deployctl`, sunset 2026-07-20; new platform lacks Deno queues. All C2 claims withdrawn-pending-research → `design/canonical/DD-RESEARCH.md`** |
 | **C3 node_server** | `node_server` (Nitro default) | Long-lived Node process | Yes | Default production output; no `--unstable`; no Deno-KV-native adapter (use Redis/AMQP/PostgreSQL backings) (`nitro-v3.md` Deno-preset table row 4; `adapter-mapping.md` Queue row) |
 | **C4 cloudflare_module** | `cloudflare_module` | Provider isolate/serverless, bounded window | No (per-invocation) | Module preset recommended; platform adds scheduled/email/queue/tail/trace hooks (`nitro-v3.md` Cloudflare row) |
 
@@ -171,7 +184,10 @@ expected concurrency (`adapter-mapping.md` One-off-task row).
 
 `L`=lossless · `P`=partial · `U`=unsupported-in-cell · saga = declaration.
 
-| Capability | C1 deno_server | C2 deno_deploy | C3 node_server | C4 cloudflare_module |
+> **C2 column = WITHDRAWN (F1), provenance only — no v1 claim.** The v1 matrix is the three columns
+> C1/C3/C4; the C2 column below is retained struck-through and must not be filed as a v1 capability.
+
+| Capability | C1 deno_server | ~~C2 deno_deploy~~ (WITHDRAWN) | C3 node_server | C4 cloudflare_module |
 | --- | --- | --- | --- | --- |
 | Sagas | supported | externalized/reject | supported | externalized/reject |
 | KV CRUD/TTL | L | L | L | P |
@@ -210,7 +226,7 @@ mappings"; `sagas-constraint.md` Board consequence 2 "reject at build time"). Me
    One-off-task row).
 
 Rejection is the honest realization of synthesis §3: logical graph identity is preserved for all
-four cells, while physical/one-process guarantees (sagas, held locks, long-running consumers) are
+the three v1 cells, while physical/one-process guarantees (sagas, held locks, long-running consumers) are
 gated per cell rather than globally promised.
 
 ## 5. Cross-pack seams (not owned here)

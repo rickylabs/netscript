@@ -5,14 +5,14 @@ owner ratifies the decision brief in-turn at Stage H and the supervisor files on
 (seed-run.md Stage H). Bodies use `Part of #823` (reference only) and **never** a closing keyword —
 epics/umbrellas close by hand (netscript-pr SKILL).
 
-Milestone suggestions below are **provisional** — the synthesis anchors epic #823 to beta.12+ but
-records the exact milestone split as a Stage-E owner fork (synthesis §"Resolutions"). Treat every
-milestone cell as an owner-confirmable suggestion, not a decision. Where the live milestone set only
-exposes `0.0.1-beta.1` / `0.0.1-stable` / `Backlog / Triage`, the mapping to a `beta.12` train
-milestone is itself an owner fork (see open-questions.md #4).
+Milestone suggestions below are resolved by the Stage-F rework to the **one milestone train**: all
+UR-0…UR-12 land at `0.0.1-beta.13` (F-9). Live milestones `0.0.1-beta.13`/`0.0.1-beta.14` exist
+(verified 2026-07-18 in D3). The old "beta.12 train mapping is an owner fork" note is superseded.
 
-Common labels for every card below: `type:feat`, `epic:deployment`, one `status:` (`status:triage`
-at filing), a `priority:`, a `wave:`, plus per-card `area:` and `gate:`.
+Common labels for every card below: `type:feat`, `epic:unified-runtime`, `epic:deployment`, exactly
+one `status:` (`status:plan` at filing — seed board is pre-impl), a `priority:`, a `wave:`, plus
+per-card `area:` and `gate:`. The **authoritative** per-slot label sets are in
+`design/canonical/UR-<n>.md`.
 
 ---
 
@@ -21,7 +21,7 @@ at filing), a `priority:`, a `wave:`, plus per-card `area:` and `gate:`.
 - **Title:** Unified runtime: single logical composition root with no application-created loopback
 - **Labels:** `type:feat`, `area:service`, `area:deploy`, `epic:deployment`, `priority:p1`,
   `wave:v1`
-- **Milestone (suggested):** unified-runtime train (beta.12+) — owner fork #4
+- **Milestone (suggested):** `0.0.1-beta.13` (one-train, Stage-F F9/F-9)
 - **Body:**
   > Part of #823
   >
@@ -43,7 +43,7 @@ at filing), a `priority:`, a `wave:`, plus per-card `area:` and `gate:`.
 
 - **Title:** Unified runtime: Nitro owns listener/lifecycle; single-shot `close` disposal registry
 - **Labels:** `type:feat`, `area:deploy`, `epic:deployment`, `priority:p1`, `wave:v1`
-- **Milestone (suggested):** unified-runtime train (beta.12+) — owner fork #4
+- **Milestone (suggested):** `0.0.1-beta.13` (one-train, Stage-F F9/F-9)
 - **Body:**
   > Part of #823
   >
@@ -67,7 +67,7 @@ at filing), a `priority:`, a `wave:`, plus per-card `area:` and `gate:`.
 - **Title:** Unified runtime: mount Fresh via `app.handler()` with declared route/static ownership
 - **Labels:** `type:feat`, `area:fresh`, `area:deploy`, `epic:deployment`, `priority:p1`,
   `wave:v1`
-- **Milestone (suggested):** unified-runtime train (beta.12+) — owner fork #4
+- **Milestone (suggested):** `0.0.1-beta.13` (one-train, Stage-F F9/F-9)
 - **Body:**
   > Part of #823
   >
@@ -90,7 +90,7 @@ at filing), a `priority:`, a `wave:`, plus per-card `area:` and `gate:`.
 
 - **Title:** Unified runtime: in-process oRPC bridge over `ServiceApp.fetch` — context, abort, error semantics
 - **Labels:** `type:feat`, `area:service`, `epic:deployment`, `priority:p1`, `wave:v1`
-- **Milestone (suggested):** unified-runtime train (beta.12+) — owner fork #4
+- **Milestone (suggested):** `0.0.1-beta.13` (one-train, Stage-F F9/F-9)
 - **Body:**
   > Part of #823
   >
@@ -98,7 +98,9 @@ at filing), a `priority:`, a `wave:`, plus per-card `area:` and `gate:`.
   > / oRPC `RPCHandler` (`packages/service/src/primitives/handlers.ts:115-143`,
   > `packages/service/src/types.ts:13-20`). Transport is **invocation placement over a stable
   > Fetch/RPC contract** — "no socket loopback" is the requirement; a second codec is not (supersedes
-  > the two-codec framing; folds in #451). The host consumes `fetch` and does not reach into the Hono
+  > the two-codec framing). **Host-side bridge ONLY — a subset of #451's public SDK transport surface;
+  > #451 stays OPEN/KEEP; this card carries NO `Closes #451` (Stage-F F2; see `design/canonical/UR-4.md`).**
+  > The host consumes `fetch` and does not reach into the Hono
   > implementation. Carry one canonical RPC prefix into both H3 matching and
   > `handler.handle(..., { prefix })`; pass request-scoped auth/telemetry context (single
   > `toServiceContext` seam) and the abort signal. RPC-domain errors serialize as typed responses and
@@ -117,7 +119,7 @@ at filing), a `priority:`, a `wave:`, plus per-card `area:` and `gate:`.
 - **Title:** Unified runtime: pin Nitro version/compatibility-date + oRPC generation; H3-bridge conformance gate
 - **Labels:** `type:feat`, `area:deploy`, `area:service`, `epic:deployment`, `priority:p1`,
   `wave:v1`, `gate:e2e`
-- **Milestone (suggested):** unified-runtime train (beta.12+) — owner fork #4
+- **Milestone (suggested):** `0.0.1-beta.13` (one-train, Stage-F F9/F-9)
 - **Body:**
   > Part of #823
   >
@@ -145,9 +147,12 @@ at filing), a `priority:`, a `wave:`, plus per-card `area:` and `gate:`.
 | D1-1 | composition root / no-loopback invariant | epic #823 |
 | D1-2 | Nitro host bridge / close registry | epic #823 |
 | D1-3 | Fresh mount + route/static ownership | epic #823 |
-| D1-4 | in-process oRPC bridge | epic #823, folds #451 |
+| D1-4 | in-process oRPC bridge (host-side subset of #451; #451 KEEP, no close) | epic #823 |
 | D1-5 | version pins + H3 conformance gate | epic #823 |
 
-Cross-pack note for D3: D1-4 is the fold-in home for **#451** (in-process oRPC `RPCLink` over
-`ServiceApp.fetch`); the supersession disposition of #451/#454 belongs to D3's supersession map
-(synthesis §D3). D1 does not file or close anything.
+Cross-pack note for D3: D1-4 realizes the **host-side** in-process oRPC bridge, which is a **subset**
+of **#451**'s public SDK transport surface — it does **not** fold or close #451. Per Stage-F rework,
+#451 stays **OPEN/KEEP** as its own SDK slice; the SDK↔service dependency direction (#451 O-1) is
+owner fork **F-7**. The full supersession map (all KEEP, zero filing-time closes) lives in
+`design/canonical/slot-map.md` + `design/D3-board-mechanics/filing-manifest.md`. D1 does not file or
+close anything.

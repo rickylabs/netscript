@@ -22,8 +22,9 @@ train (beta.12+, synthesis "Milestone anchor") and are owner forks at Stage-E.
 
 Part of #823.
 
-Define the machine-readable **capability manifest** each of the four v1 runtime cells ships
-(`deno_server`, `deno_deploy`, one Node server preset, one isolate/serverless preset), and the
+Define the machine-readable **capability manifest** each of the **three** v1 runtime cells ships
+(`deno_server`, `node_server`, `cloudflare_module`; `deno_deploy` withdrawn → DD-RESEARCH, Stage-F
+F1), and the
 **composition compiler** that cross-checks the app's logical graph requirements against the selected
 preset's manifest, failing the **build** (never runtime, never a silent downgrade) on an
 unsupported combination.
@@ -43,10 +44,10 @@ KV-atomics + One-off-task rows.
 **Labels:** `type:feat` · `area:cli` · `area:config` · `epic:unified-runtime` · `priority:p1` ·
 `wave:v1` · `status:triage`
 
-**Milestone (suggested):** `0.0.1-beta.12`
+**Milestone (suggested):** `0.0.1-beta.13` (one-train, Stage-F F9/F-9)
 
 **Acceptance / gates:**
-- [ ] gate: each of the four cells ships a capability manifest matching proposal.md §3.
+- [ ] gate: each of the three v1 cells ships a capability manifest matching proposal.md §3.
 - [ ] gate: an app mounting a saga runtime under a `deno_deploy`/`cloudflare_module` build **fails
       the build** with a diagnostic naming the externalize path (no runtime fallthrough).
 - [ ] gate: a `partial` mapping (e.g. polling KV watch) emits a build warning naming the degraded
@@ -79,7 +80,7 @@ Evidence: `sagas-constraint.md` Verdict + Board consequence 1–3; `drift-ledger
 **Labels:** `type:feat` · `area:plugins` · `epic:unified-runtime` · `priority:p1` · `wave:v1` ·
 `status:triage`
 
-**Milestone (suggested):** `0.0.1-beta.12`
+**Milestone (suggested):** `0.0.1-beta.13` (one-train, Stage-F F9/F-9)
 
 **Acceptance / gates:**
 - [ ] gate: supported cells run the shipped saga runtime in-process and drain on Nitro `close`
@@ -117,7 +118,7 @@ D-03/D-06/D-12; `nitro-v3.md` KV-storage/SQL/Cache rows.
 **Labels:** `type:feat` · `area:kv` · `area:database` · `area:service` · `epic:unified-runtime` ·
 `priority:p1` · `wave:v1` · `status:triage`
 
-**Milestone (suggested):** `0.0.1-beta.12`
+**Milestone (suggested):** `0.0.1-beta.13` (one-train, Stage-F F9/F-9)
 
 **Acceptance / gates:**
 - [ ] gate: each cell's KV/queue/database mapping matches proposal.md §3 (L/P/U per row).
@@ -143,7 +144,7 @@ Evidence: `drift-ledger.md` D-08 (+ RFC §3 "locks earn a graph edge"); `proposa
 **Labels:** `type:feat` · `area:database` · `epic:unified-runtime` · `priority:p2` · `wave:v1-min` ·
 `status:triage`
 
-**Milestone (suggested):** `0.0.1-beta.12`
+**Milestone (suggested):** `0.0.1-beta.13` (one-train, Stage-F F9/F-9)
 
 **Acceptance / gates:**
 - [ ] gate: exclusive-lock single-writer requirement builds on C1/C3 and build-rejects (or
@@ -174,23 +175,25 @@ Tasks/schedules + Cloudflare rows; `proposal.md` §2.7.
 **Milestone (suggested):** `0.0.1-beta.13`
 
 **Acceptance / gates:**
-- [ ] gate: cron activation dispatches into NetScript definitions on all four cells per proposal.md
+- [ ] gate: cron activation dispatches into NetScript definitions on all three v1 cells per proposal.md
       §2.7 (L/P as declared).
 - [ ] gate: Nitro same-name coalescing that would alter declared worker concurrency raises a build
       diagnostic, not silent acceptance.
 
 ---
 
-## D2-S6 — Four-cell capability conformance gate suite
+## D2-S6 — Three-cell (v1) capability conformance gate suite
 
-**Title:** `[unified-runtime S?] Four-cell capability conformance gate suite`
+**Title:** `[unified-runtime S?] Three-cell (v1) capability conformance gate suite`
 
 **Body:**
 
-Part of #823. Author the conformance suite that proves each cell's manifest against real behavior:
-`deno_server` (Node-built + `--unstable` launch, perms audited), `deno_deploy` (separate flow),
-`node_server`, `cloudflare_module`. Treats `deno_server` and `deno_deploy` as **separate** cells.
-Includes the Nitro-version / compatibility-date pin and an upgrade-conformance gate (beta maturity).
+Part of #823. Author the conformance suite that proves each **v1** cell's manifest against real
+behavior — the **three** v1 cells (Stage-F F1): `deno_server` (Node-built + `--unstable` launch, perms
+audited), `node_server`, `cloudflare_module`. **`deno_deploy` is WITHDRAWN from v1** (Deno Deploy
+Classic/`deployctl` sunset 2026-07-20; no queues on the new platform) and deferred to the
+DD-RESEARCH successor card — it makes no v1 claim. Includes the Nitro-version / compatibility-date
+pin and an upgrade-conformance gate (beta maturity).
 
 Evidence: `nitro-v3.md` Board inputs 1–2 + Deno-preset table; `proposal.md` §1, §4.
 
@@ -200,10 +203,9 @@ Evidence: `nitro-v3.md` Board inputs 1–2 + Deno-preset table; `proposal.md` §
 **Milestone (suggested):** `0.0.1-beta.13`
 
 **Acceptance / gates:**
-- [ ] gate: each cell's declared L/P/U/saga manifest is asserted by an executed conformance case.
+- [ ] gate: each of the **three** v1 cells' declared L/P/U/saga manifest is asserted by an executed conformance case.
 - [ ] gate: an exact Nitro v3 version + compatibility-date is pinned and an upgrade drift check runs.
-- [ ] gate: `deno_server` and `deno_deploy` are exercised as distinct cells (no shared-behavior
-      assumption).
+- [ ] gate: `deno_deploy` produces no v1 capability claim (withdrawn-pending-research; gated behind DD-RESEARCH).
 
 ---
 

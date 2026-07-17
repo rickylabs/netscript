@@ -15,9 +15,9 @@ implementation TODOs — those live in the issue drafts.
    `epic-and-issues.md` titles and labels match the filed epic. (D3 board-mechanics owns final
    decomposition; D2 defers.)
 
-3. **Milestone train split.** Suggested milestones are `0.0.1-beta.12` (S1–S4) and `0.0.1-beta.13`
-   (S5–S6), S7 deferred. Synthesis leaves the exact milestone split as a Stage-E output. Owner
-   fork: ratify the beta.12/beta.13 split, or compress/expand the train?
+3. **Milestone train split.** *(RESOLVED by Stage-F rework → fork F-9: one train.)* All UR-0…UR-12
+   land at `0.0.1-beta.13`; deferred cells/impl (DD-RESEARCH, #455 offline-sync impl) split into
+   separately-milestoned successors at `0.0.1-stable`. The prior beta.12/beta.13 split is withdrawn.
 
 4. **`deno_deploy` / `cloudflare_module` sagas: default to `externalized` or `rejected`?** Both
    bounded-window cells can either auto-externalize to a macro-service (needs a configured target)
@@ -31,4 +31,11 @@ implementation TODOs — those live in the issue drafts.
 
 6. **Offline-sync scheduling (S7).** Modeled as a `wave:defer` database-target profile consumed by
    the D-04 desktop adapter. Owner fork: keep offline sync track-only for v1, or pull it into the
-   beta.12/13 train alongside the desktop wave?
+   beta.13 train alongside the desktop wave?
+
+7. **(Stage-F F1) v1 cell set — 3-cell vs re-proven `deno_deploy`.** `deno_deploy` (C2) is withdrawn
+   from v1: the corpus validated Deno Deploy **Classic** + `deployctl`, both sunset **2026-07-20**;
+   the surviving `deno deploy` platform has a different model and no Deno queues. Owner fork
+   (**F-2**): ship the **3-cell** v1 (`deno_server`, `node_server`, `cloudflare_module`) with C2
+   deferred to the DD-RESEARCH successor card, or gate v1 on re-proving `deno_deploy` on the new
+   platform first. Default: 3-cell v1; DD-RESEARCH at `0.0.1-stable`.

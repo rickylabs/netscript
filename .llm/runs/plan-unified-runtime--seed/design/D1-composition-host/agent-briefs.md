@@ -10,16 +10,16 @@ a model here. Framework source under `packages/` is a WSL Codex daemon-attached 
 
 ---
 
-## Verbatim stop-lines (paste into EVERY brief below)
+## Verbatim stop-lines (the exact block materialized in EVERY brief below)
 
-> ### Stop-lines (HARD)
-> 1. Merge requires CI green + opposite-family eval PASS on the PR. Owner granted standing beta-11
->    merge authorization once that bar is met.
-> 2. HARD STOP before any release publish (`release:cut`, JSR publish, tag push, canary or stable) —
->    owner sign-off in-turn only; a stale or relayed approval does not count.
-> 3. HARD STOP before closing milestone 13 — owner sign-off only.
-> 4. These stop-lines are repeated verbatim in every sub-agent brief.
-> 5. The #824 seed run is drafts-only until owner ratification; board filing needs the owner in-turn.
+```
+## Stop-lines (HARD — read twice)
+1. Merge requires CI green + opposite-family eval PASS on the PR. Owner granted standing beta-11 merge authorization (2026-07-17 in-turn) once that bar is met.
+2. HARD STOP before any release publish (`release:cut`, JSR publish, tag push, canary or stable) — owner sign-off in-turn only; a stale or relayed approval does not count.
+3. HARD STOP before closing milestone 13 — owner sign-off only.
+4. These stop-lines are repeated verbatim in EVERY sub-agent brief. A sub-brief without the stop-lines section is invalid.
+5. The #824 seed run is drafts-only until owner ratification; its board filing needs the owner in-turn.
+```
 
 ---
 
@@ -40,7 +40,12 @@ surface via `deno doc @netscript/service`. Frame: design pack `design/D1-composi
 - **Gates:** G-ROOT (proposal.md §6); `deno task check`, targeted unit test, `gate:e2e` boot.
 - **Defers to D2:** the per-preset `process` capability column — do not decide it here.
 
-[paste stop-lines]
+## Stop-lines (HARD — read twice)
+1. Merge requires CI green + opposite-family eval PASS on the PR. Owner granted standing beta-11 merge authorization (2026-07-17 in-turn) once that bar is met.
+2. HARD STOP before any release publish (`release:cut`, JSR publish, tag push, canary or stable) — owner sign-off in-turn only; a stale or relayed approval does not count.
+3. HARD STOP before closing milestone 13 — owner sign-off only.
+4. These stop-lines are repeated verbatim in EVERY sub-agent brief. A sub-brief without the stop-lines section is invalid.
+5. The #824 seed run is drafts-only until owner ratification; its board filing needs the owner in-turn.
 
 ## Brief D1-2 — Nitro host bridge (listener/lifecycle/close)
 
@@ -56,7 +61,12 @@ Read: `netscript-harness`, `netscript-doctrine`, `aspire`/`deno-fresh` as applic
   before synchronous plugin registration.
 - **Gates:** G-LISTEN, G-CLOSE (proposal.md §6) — include an idempotent double-close test.
 
-[paste stop-lines]
+## Stop-lines (HARD — read twice)
+1. Merge requires CI green + opposite-family eval PASS on the PR. Owner granted standing beta-11 merge authorization (2026-07-17 in-turn) once that bar is met.
+2. HARD STOP before any release publish (`release:cut`, JSR publish, tag push, canary or stable) — owner sign-off in-turn only; a stale or relayed approval does not count.
+3. HARD STOP before closing milestone 13 — owner sign-off only.
+4. These stop-lines are repeated verbatim in EVERY sub-agent brief. A sub-brief without the stop-lines section is invalid.
+5. The #824 seed run is drafts-only until owner ratification; its board filing needs the owner in-turn.
 
 ## Brief D1-3 — Fresh mount + route/static ownership
 
@@ -72,7 +82,12 @@ rows. Frame: proposal.md §3.
   edit unless a `*Namespace` export gap forces a WSL Codex slice).
 - **Gates:** G-ROUTE, G-STATIC, no-nested-listen assertion.
 
-[paste stop-lines]
+## Stop-lines (HARD — read twice)
+1. Merge requires CI green + opposite-family eval PASS on the PR. Owner granted standing beta-11 merge authorization (2026-07-17 in-turn) once that bar is met.
+2. HARD STOP before any release publish (`release:cut`, JSR publish, tag push, canary or stable) — owner sign-off in-turn only; a stale or relayed approval does not count.
+3. HARD STOP before closing milestone 13 — owner sign-off only.
+4. These stop-lines are repeated verbatim in EVERY sub-agent brief. A sub-brief without the stop-lines section is invalid.
+5. The #824 seed run is drafts-only until owner ratification; its board filing needs the owner in-turn.
 
 ## Brief D1-4 — In-process oRPC bridge
 
@@ -87,10 +102,17 @@ proposal.md §4.
   second codec; single canonical prefix into H3 match + `handler.handle`; `toServiceContext` seam +
   abort signal; RPC-domain errors as typed responses; streamed + WS-upgrade conformance cases.
 - **Reuse, do not reinvent:** `packages/service/src/primitives/handlers.ts:115-143`.
-- **Folds in:** #451 (in-process oRPC over `ServiceApp.fetch`).
-- **Gates:** G-RPC, G-ERR, G-STREAM.
+- **Scope boundary:** host-side bridge ONLY — this is a **subset** of #451's public SDK transport
+  surface. #451 stays **OPEN and KEEP**; this PR carries **NO `Closes #451`**. The SDK↔service
+  dependency direction (#451 O-1) is decided by fork **F-7** before the separate #451 SDK slice starts.
+- **Gates:** G-RPC, G-ERR, G-STREAM (WebSocket-upgrade case per fork F-4).
 
-[paste stop-lines]
+## Stop-lines (HARD — read twice)
+1. Merge requires CI green + opposite-family eval PASS on the PR. Owner granted standing beta-11 merge authorization (2026-07-17 in-turn) once that bar is met.
+2. HARD STOP before any release publish (`release:cut`, JSR publish, tag push, canary or stable) — owner sign-off in-turn only; a stale or relayed approval does not count.
+3. HARD STOP before closing milestone 13 — owner sign-off only.
+4. These stop-lines are repeated verbatim in EVERY sub-agent brief. A sub-brief without the stop-lines section is invalid.
+5. The #824 seed run is drafts-only until owner ratification; its board filing needs the owner in-turn.
 
 ## Brief D1-5 — Version pins + H3-bridge conformance gate
 
@@ -105,4 +127,60 @@ wrappers, `research/drift-ledger.md` D-11 + `research/nitro-v3.md` board input 1
 - **Toolbelt:** decide "latest" via `deno task deps:latest`, never `deno outdated --latest`.
 - **Gates:** G-PIN, `gate:e2e` composed build on pinned versions.
 
-[paste stop-lines]
+## Stop-lines (HARD — read twice)
+1. Merge requires CI green + opposite-family eval PASS on the PR. Owner granted standing beta-11 merge authorization (2026-07-17 in-turn) once that bar is met.
+2. HARD STOP before any release publish (`release:cut`, JSR publish, tag push, canary or stable) — owner sign-off in-turn only; a stale or relayed approval does not count.
+3. HARD STOP before closing milestone 13 — owner sign-off only.
+4. These stop-lines are repeated verbatim in EVERY sub-agent brief. A sub-brief without the stop-lines section is invalid.
+5. The #824 seed run is drafts-only until owner ratification; its board filing needs the owner in-turn.
+
+## Brief UR-0 — Hostable-service lifecycle contract (NEW prerequisite, precedes UR-2)
+
+**use harness**
+
+### SKILL
+Read: `netscript-harness`, `netscript-doctrine` (service archetype, ports/adapters),
+`netscript-deno-toolchain` (`deno doc @netscript/service`). Frame: `design/canonical/UR-0.md` +
+proposal.md §2.3–§2.4.
+
+- **Goal:** export a build/start/stop (or `[Symbol.asyncDispose]`) surface that preserves
+  `onStartup`/`onShutdown` behavior when a host (Nitro/desktop/tests) drives the service **without**
+  owning a listener; startup-failure rollback preserved.
+- **Reuse, do not reinvent:** wrap the shipped `ServiceShutdownCoordinator` policy
+  (`packages/service/src/builder/service-shutdown.ts:1-135` — idempotency, bounded drain budget, LIFO
+  order, structured report). Do NOT invent a second "exactly once" lifecycle.
+- **Contract first:** the exported lifecycle surface type; package/export ownership recorded against
+  UR-11. Framework source under `packages/service` → WSL Codex daemon-attached slice (CLAUDE.md).
+- **Gates:** per `design/canonical/UR-0.md` acceptance; scoped `deno check`, unit tests incl.
+  double-stop idempotency + parity with `serve()` lifecycle.
+
+## Stop-lines (HARD — read twice)
+1. Merge requires CI green + opposite-family eval PASS on the PR. Owner granted standing beta-11 merge authorization (2026-07-17 in-turn) once that bar is met.
+2. HARD STOP before any release publish (`release:cut`, JSR publish, tag push, canary or stable) — owner sign-off in-turn only; a stale or relayed approval does not count.
+3. HARD STOP before closing milestone 13 — owner sign-off only.
+4. These stop-lines are repeated verbatim in EVERY sub-agent brief. A sub-brief without the stop-lines section is invalid.
+5. The #824 seed run is drafts-only until owner ratification; its board filing needs the owner in-turn.
+
+## Brief UR-11 — Architecture contracts (NEW prerequisite, precedes UR-1/UR-4/UR-5)
+
+**use harness**
+
+### SKILL
+Read: `netscript-harness`, `netscript-doctrine` (archetype selection, layering, public-surface rules
+under `docs/architecture/doctrine/`), `netscript-deno-toolchain` (JSR export surface, `deno doc`),
+`netscript-pr` (labels/milestones). Frame: `design/canonical/UR-11.md`.
+
+- **Goal:** name the unified-runtime host package (path/`deno.json`/export map), select the doctrine
+  archetype(s) + per-package fitness/JSR/E2E gate matrix, define the composition-compiler requirement
+  schema + build/CLI seam (consumed by UR-5), reconcile the F-7 import direction, and normalize board
+  + code language to `@netscript/database` (retire `@netscript/data`; facade only if F-8 selects it).
+- **Contract first:** this is the architecture-decision card the other lanes consume — settle it
+  before UR-1/UR-4/UR-5 start. Split any oversized contract into its own prerequisite card.
+- **Gates:** per `design/canonical/UR-11.md` acceptance.
+
+## Stop-lines (HARD — read twice)
+1. Merge requires CI green + opposite-family eval PASS on the PR. Owner granted standing beta-11 merge authorization (2026-07-17 in-turn) once that bar is met.
+2. HARD STOP before any release publish (`release:cut`, JSR publish, tag push, canary or stable) — owner sign-off in-turn only; a stale or relayed approval does not count.
+3. HARD STOP before closing milestone 13 — owner sign-off only.
+4. These stop-lines are repeated verbatim in EVERY sub-agent brief. A sub-brief without the stop-lines section is invalid.
+5. The #824 seed run is drafts-only until owner ratification; its board filing needs the owner in-turn.

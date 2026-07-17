@@ -23,11 +23,10 @@ corpus-forced answer.
    `^1.14.6` for the unified-runtime v1 and treat v2 as a separate tracked migration, or authorize a
    v2-beta spike inside this epic.
 
-4. **Milestone train binding for the D1 cards.** Synthesis anchors epic #823 to "beta.12+" and
-   records the exact milestone split as a Stage-E output/owner fork. The live milestone set exposed
-   to filing is `0.0.1-beta.1` / `0.0.1-stable` / `Backlog / Triage` (netscript-pr). **Owner fork:**
-   which concrete milestone the D1-1…D1-5 cards land in (a new `beta.12` train milestone to be
-   created at filing, or mapping onto an existing milestone). D3 needs this to finalize the manifest.
+4. **Milestone train binding for the D1 cards.** *(RESOLVED by Stage-F rework → fork F-9: one
+   train.)* All UR cards (incl. the D1 cards UR-0…UR-4, UR-10) land at `0.0.1-beta.13`, which exists
+   live (verified 2026-07-18). No new milestone is created (F-15). The prior "beta.12 vs existing
+   milestone" fork is withdrawn.
 
 5. **`@netscript/data` facade vs shipped `@netscript/database`.** D1 normalizes board language to the
    shipped `@netscript/database` name (drift-ledger D-12, synthesis §6). If the owner actually wants
