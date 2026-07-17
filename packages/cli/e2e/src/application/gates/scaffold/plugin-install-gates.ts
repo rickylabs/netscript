@@ -10,9 +10,11 @@ import type { PluginSuiteState } from '../../builders/scaffold/plugin-suite-stat
 import { cli, commandGate } from './gate-factory.ts';
 import { NETSCRIPT_RELEASE_VERSION } from '../../../../../src/kernel/constants/jsr-specifiers.ts';
 
-function publishedPluginCliSpecifier(cliEntrypoint: string, packageName: string): string {
+function publishedPluginCliUrl(cliEntrypoint: string, packageName: string): string {
   const publishedVersion = /^jsr:@netscript\/cli@([^/]+)(?:\/.*)?$/.exec(cliEntrypoint)?.[1];
-  return `jsr:@netscript/${packageName}@${publishedVersion ?? NETSCRIPT_RELEASE_VERSION}/cli`;
+  return `https://jsr.io/@netscript/${packageName}/${
+    publishedVersion ?? NETSCRIPT_RELEASE_VERSION
+  }/cli.ts`;
 }
 
 function pluginName(kind: PluginKind): string {
@@ -115,10 +117,10 @@ export function createPluginInstallGates(
         context.request.options.packageSource === PACKAGE_SOURCE.JSR
           ? [
             'deno',
-            'x',
+            'run',
             '-A',
             '--minimum-dependency-age=0',
-            publishedPluginCliSpecifier(context.project.cliEntrypoint, 'plugin-ai'),
+            publishedPluginCliUrl(context.project.cliEntrypoint, 'plugin-ai'),
             'add',
             'tool',
             'e2e-tool',
