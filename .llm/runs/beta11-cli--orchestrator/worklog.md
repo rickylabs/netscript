@@ -104,3 +104,8 @@ group launch; this section fixes the supervisor's surface.
 - 2026-07-18 · G9 #804 MERGED to main (5e5cea3d), #804 closed. Wave-1 independent lanes fully
   shipped: #826, #802, #804 closed. Integration branch carries #452 + #841. Active: G3 plan, G6
   plan, G8 stage-B. Queued: G5, G11, G12.
+- 2026-07-18 · G8 stage B complete (6 cited topic files; standout: sagas-constraint verdict —
+  #327 D1 STALE as categorical exclusion, replaced by per-preset capability rule; 12-entry drift
+  ledger vs RFC #822). Stage C synthesis written + committed by supervisor (verdicts ratified,
+  Stage-D fan-out: composition-host / capability-matrix / board-mechanics packs). Next: Stage-D
+  pack agents (Opus 4.8 · medium, Tier B) when slots allow.
