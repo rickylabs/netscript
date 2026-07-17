@@ -67,6 +67,9 @@ Add or change one readiness rule as a named evidence-producing check with a seed
 | 2026-07-17 | 1 | research/design | Re-baselined at `a5adb706`; existing release suite 29/29 green; implementation blocked on PLAN-EVAL. |
 | 2026-07-17 | 1 | PLAN-EVAL retry | First Qwen evaluator attempted prohibited closed-model delegation and was interrupted; no verdict accepted. Fresh direct-only Qwen retry required. |
 | 2026-07-17 | 1 | PLAN-EVAL | PASS from a fresh OpenRouter/Qwen 3.7-max session; all 8 Plan-Gate items passed. Implementation unblocked. |
+| 2026-07-17 | 2 | shared preparation | Factored stable/canary bump, residue, canonical preflight, dry-run, and prod-install gates into `prepare-release.ts`; stable cut now consumes it. |
+| 2026-07-17 | 2 | canary cut | Added stable-target parsing, workspace-wide JSR/tag N discovery, ephemeral branch plus provenance tag, task wiring, and 404/malformed metadata negative tests. |
+| 2026-07-17 | 2 | opposite-family review | Fable route was unavailable; canonical Opus 4.8 medium fallback returned `SLICE_REVIEW_PASS`. |
 
 ## Decisions
 
@@ -81,6 +84,7 @@ Add or change one readiness rule as a named evidence-producing check with a seed
 | Drift | Severity | Logged in drift.md |
 | --- | --- | --- |
 | Invalid evaluator delegation attempt | moderate | `drift.md` |
+| Fable slice-review route unavailable | minor | `drift.md` |
 
 ## Gate Results
 
@@ -90,13 +94,18 @@ Add or change one readiness rule as a named evidence-producing check with a seed
 | --- | --- | --- | --- |
 | release baseline tests | `deno test --allow-all .llm/tools/release/` | PASS | 29 passed, 0 failed before implementation |
 | PLAN-EVAL | `.llm/runs/feat-811-release-canary--canary-readiness/plan-eval.md` | PASS | Separate direct-only OpenRouter/Qwen session; no delegation |
-| implementation gates | planned commands in `plan.md` | NOT_RUN | Plan-Gate hard stop |
+| slice 2 check | `deno check --unstable-kv` on cut/canary/preparation TS | PASS | 5 implementation/test entry points checked |
+| slice 2 tests | focused cut/canary/preparation test command | PASS | 15 passed, 0 failed |
+| slice 2 review | `slice-2-review.md` | PASS | Separate Claude Opus 4.8 medium fallback; no blocking findings |
+| implementation gates | remaining commands in `plan.md` | NOT_RUN | Later slices/final gate |
 
 ### Fitness Gates
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| F-5/F-6/F-7/F-9/F-10/F-19 | NOT_RUN | `plan.md` | Awaiting PLAN-EVAL |
+| F-9 permissions | PASS | `deno.json` | Registry lookup scoped to `jsr.io`; subprocess/read/write permissions explicit |
+| F-10 test shape | PASS | focused slice 2 tests | Injected registry/Git transport, residue failure, and exact ref sequence |
+| F-5/F-6/F-7/F-19 | NOT_RUN | `plan.md` | Final/affected-slice gates pending |
 
 ### Runtime Gates
 
@@ -108,7 +117,7 @@ Add or change one readiness rule as a named evidence-producing check with a seed
 
 | Consumer | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| stable release operator | NOT_RUN | planned task/docs tests | Awaiting implementation |
+| stable release operator | PASS (slice 2) | existing cut tests + shared-preparation test | Stable cut consumes same ordered preparation helper |
 
 ## Handoff Notes
 

@@ -1,6 +1,5 @@
 import { join } from 'jsr:@std/path@^1.0.0';
 import {
-  type BumpResult,
   coordinateVersionBump,
   findVersionResidue,
   validateNewerVersion,
@@ -12,18 +11,12 @@ import {
   type GitHubResponse,
   resolveGithubToken,
 } from '../agentic/lib/agentic-lib.ts';
-import { runReleasePreflight } from './preflight-release.ts';
+import { mustRun, prepareRelease } from './prepare-release.ts';
 
 export interface ReleaseCutOptions {
   version: string;
   dryRun: boolean;
   root: string;
-}
-
-interface CommandResult {
-  code: number;
-  stdout: string;
-  stderr: string;
 }
 
 export interface ReleasePrDependencies {
@@ -90,30 +83,6 @@ Options:
   --dry-run      Run bump, residue check, and gates without branch/commit/push/PR.
   --root <path>  Repository root. Defaults to the current directory.
   --help         Show this help.`);
-}
-
-async function runCommand(command: string, args: string[], cwd: string): Promise<CommandResult> {
-  const output = await new Deno.Command(command, {
-    args,
-    cwd,
-    stdout: 'piped',
-    stderr: 'piped',
-  }).output();
-  return {
-    code: output.code,
-    stdout: new TextDecoder().decode(output.stdout),
-    stderr: new TextDecoder().decode(output.stderr),
-  };
-}
-
-async function runGate(name: string, command: string, args: string[], cwd: string): Promise<void> {
-  console.log(`release:cut gate: ${name}`);
-  const result = await runCommand(command, args, cwd);
-  if (result.stdout.trim()) console.log(result.stdout.trim());
-  if (result.stderr.trim()) console.error(result.stderr.trim());
-  if (result.code !== 0) {
-    throw new Error(`${name} failed with exit ${result.code}.`);
-  }
 }
 
 /** Open a release PR through the shared GitHub API token path. */
@@ -183,7 +152,11 @@ Create and publish GitHub Release \`v${version}\`; \`publish.yml\` will publish 
   return bodyFile;
 }
 
-async function createReleasePr(root: string, version: string, files: readonly string[]): Promise<void> {
+async function createReleasePr(
+  root: string,
+  version: string,
+  files: readonly string[],
+): Promise<void> {
   const branch = `release/cut-${version}`;
   await mustRun('git', ['checkout', '-b', branch], root);
   await mustRun('git', ['add', ...files], root);
@@ -195,34 +168,9 @@ async function createReleasePr(root: string, version: string, files: readonly st
   await createReleasePullRequest(version, body);
 }
 
-async function mustRun(command: string, args: string[], cwd: string): Promise<void> {
-  const result = await runCommand(command, args, cwd);
-  if (result.stdout.trim()) console.log(result.stdout.trim());
-  if (result.stderr.trim()) console.error(result.stderr.trim());
-  if (result.code !== 0) {
-    throw new Error(`${command} ${args.join(' ')} failed with exit ${result.code}.`);
-  }
-}
-
 async function main(): Promise<void> {
   const options = parseArgs(Deno.args);
-  const bump = await coordinateVersionBump(options.root, options.version);
-  console.log(`release:cut bumped ${bump.oldVersion} -> ${bump.newVersion}`);
-
-  const residue = await findVersionResidue(options.root, bump.oldVersion);
-  if (residue.length > 0) {
-    throw new Error(
-      `Version residue remains for ${bump.oldVersion}:\n${
-        residue.map((file) => `- ${file}`).join('\n')
-      }`,
-    );
-  }
-
-  await runReleasePreflight(options.root, options.version);
-
-  await runGate('release:preflight', 'deno', ['task', 'release:preflight'], options.root);
-  await runGate('publish:dry-run', 'deno', ['task', 'publish:dry-run'], options.root);
-  await runGate('deno ci --prod', 'deno', ['ci', '--prod'], options.root);
+  const bump = await prepareRelease(options.root, options.version, 'release:cut');
 
   if (options.dryRun) {
     console.log('release:cut dry-run complete; branch/commit/push/PR skipped.');
