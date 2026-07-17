@@ -159,6 +159,21 @@ export const APP_WITH_REFS: AppEntry = {
   ServiceReferences: ['users'],
 };
 
+/** Desktop app fixture that exercises the public Aspire consumer contract. */
+export const DESKTOP_APP: AppEntry = {
+  Enabled: true,
+  Runtime: 'deno',
+  Type: 'desktop',
+  WatchMode: false,
+  Prebuild: 'build',
+  TaskName: 'desktop:predev',
+  PackageTaskName: 'desktop:package',
+  RequiresKv: false,
+  Port: 8999,
+  ServiceReferences: ['users'],
+  PluginReferences: ['workers-api'],
+};
+
 // --- Tool Fixtures ---
 
 export const MINIMAL_TOOL: ToolEntry = {
