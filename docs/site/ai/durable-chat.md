@@ -19,7 +19,7 @@ URL resolution, server-side auth headers, and the projection law below. It does 
 import `@netscript/ai`, so it composes with the [AI engine](/ai/engine/) but installs
 independently — you can adopt durable chat without pulling in the engine.
 
-This subpath is published on JSR as part of `@netscript/fresh@0.0.1-beta.7` and is usable
+This subpath is published on JSR as part of `@netscript/fresh{{ releaseSpecifier }}` and is usable
 now.
 
 ## The primitives at a glance

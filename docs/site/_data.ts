@@ -31,17 +31,19 @@ export interface NavSection {
 }
 
 /**
- * Reference units (31). The href is the section-root URL; `url` Lume filter
+ * Reference units (33). The href is the section-root URL; `url` Lume filter
  * applies the /netscript/ base path at render time.
  */
 const referenceUnits: NavItem[] = [
   { href: "/reference/ai/", label: "ai", icon: "A" },
+  { href: "/reference/ai/skills/", label: "ai skills", icon: "A" },
   { href: "/reference/auth/", label: "auth", icon: "A" },
   { href: "/reference/auth-better-auth/", label: "auth-better-auth", icon: "A" },
   { href: "/reference/auth-kv-oauth/", label: "auth-kv-oauth", icon: "A" },
   { href: "/reference/auth-workos/", label: "auth-workos", icon: "A" },
   { href: "/reference/aspire/", label: "aspire", icon: "A" },
   { href: "/reference/cli/", label: "cli", icon: "C" },
+  { href: "/reference/cli/commands/", label: "cli commands", icon: "C" },
   { href: "/reference/config/", label: "config", icon: "C" },
   { href: "/reference/contracts/", label: "contracts", icon: "C" },
   { href: "/reference/cron/", label: "cron", icon: "C" },
@@ -153,6 +155,7 @@ export const navSections: NavSection[] = [
       { href: "/ai/chat-ui/", label: "Guide: chat UI", icon: "G" },
       { href: "/ai/engine/", label: "Reference: AI engine", icon: "R" },
       { href: "/reference/ai/", label: "Reference: ai", icon: "R" },
+      { href: "/reference/ai/skills/", label: "Reference: AI skills", icon: "R" },
       { href: "/reference/plugin-ai/", label: "Reference: plugin-ai", icon: "R" },
       { href: "/reference/plugin-ai-core/", label: "Reference: plugin-ai-core", icon: "R" },
     ],
@@ -203,6 +206,7 @@ export const navSections: NavSection[] = [
       { href: "/reference/runtime-config/", label: "Reference: runtime-config", icon: "R" },
       { href: "/reference/plugin/", label: "Reference: plugin", icon: "R" },
       { href: "/reference/cli/", label: "Reference: cli", icon: "R" },
+      { href: "/reference/cli/commands/", label: "Reference: CLI commands", icon: "R" },
     ],
   },
   {
