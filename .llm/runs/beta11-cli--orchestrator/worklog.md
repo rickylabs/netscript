@@ -99,3 +99,5 @@ group launch; this section fixes the supervisor's surface.
   doctrine: #841's e2e box belongs to #457; wave PR carries the close). G9+G10 IMPL-EVAL PASS;
   merge loops running on #852/#851. Wave 2 opened: G6 #456 launched (Sol·high, plan-first, base
   contains #452 hook + #841 seam; Refs-only keyword by design). G5 held for a free slot.
+- 2026-07-18 · G10 #802 MERGED to main (8cc6b21a), #802 closed. #852 merge loop still waiting on
+  re-triggered required checks (same-head green already proven).

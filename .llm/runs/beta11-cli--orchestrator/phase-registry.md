@@ -14,7 +14,7 @@ Live status of milestone-13 phase groups. Statuses: `pending` → `active` → `
 | G7 | #457 | `feat/desktop-frontend-457-e2e` | 3 | pending | after G2+G6; Windows legs on owner host |
 | G8 | #824 | `plan/unified-runtime` | 1 | active | stage A done; run dir plan-unified-runtime--seed; drafts-only until owner stage-H |
 | G9 | #804 | `fix/804-dry-run-writes` | 1 | eval-pass | PR #852 merge loop running |
-| G10 | #802 | `fix/802-plugin-cli-help` | 1 | eval-pass | option (b); PR #851 CI monitor |
+| G10 | #802 | `fix/802-plugin-cli-help` | 1 | merged | squash 8cc6b21a; #802 closed |
 | G11 | #818 | `fix/818-min-dep-age-lockstep` | 2 | pending | direction (a)+docs |
 | G12 | #814 | `docs/814-mcp-readme` | 2 | pending | doc-audit pipeline |
 | G13 | #815 | `docs/815-package-readmes` | 3 | pending | after G12 |
