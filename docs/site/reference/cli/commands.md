@@ -54,7 +54,7 @@ the [quickstart](/quickstart/); every flag is:
 
 | Command | Description |
 | --- | --- |
-| `netscript agent init` | Install NetScript MCP and skills for detected agent hosts — writes `.mcp.json` (Claude Code) and/or `.vscode/mcp.json` (VS Code), installs the `netscript` / `netscript-build` / `netscript-operate` skills, and updates the marked NetScript section in `AGENTS.md`. Flag: `--host <host>` (`claude`, `vscode`, or `all`). |
+| `netscript agent init` | Install NetScript MCP and skills for detected agent hosts. The Claude Code host path writes `.mcp.json`, installs the `netscript` / `netscript-build` / `netscript-operate` skills under `.claude/skills/`, and updates the marked NetScript section in `AGENTS.md`; the VS Code host path writes `.vscode/mcp.json` only. Flag: `--host <host>` (`claude`, `vscode`, or `all` — `all` runs both host paths). |
 | `netscript agent mcp` | Start the NetScript MCP server over standard input/output. Flags: `--endpoint <url>` (telemetry endpoint), `--project-root <path>`, `--docs-root <path>` (public documentation root). |
 
 ## `config` — inspect and mutate configuration
@@ -103,8 +103,8 @@ helper layer.
 | Command | Description |
 | --- | --- |
 | `netscript generate aspire` | Regenerate Aspire AppHost helpers from `appsettings.json`. Flag: `--project-root <path>`. |
-| `netscript generate runtime-schemas` | Generate JSON Schema files for runtime config topics. |
-| `netscript generate plugins` | Generate plugin registries from project source. |
+| `netscript generate runtime-schemas` | Generate JSON Schema files for runtime config topics. Flags: `--project-root <path>`, `--dry-run`, `--force`, `--verbose`. |
+| `netscript generate plugins` | Generate plugin registries from project source. Flags: `--project-root <path>`, `--dry-run`, `--verbose`. |
 
 ## `plugin` — extended verbs
 
@@ -126,12 +126,12 @@ the [CLI reference](/cli-reference/#plugins). The full group also carries:
 
 | Command | Description |
 | --- | --- |
-| `netscript plugin auth backend set <backend>` | Select the active auth backend. |
-| `netscript plugin auth backend show` | Show the currently selected auth backend. |
-| `netscript plugin auth provider set` | Configure an auth provider. |
+| `netscript plugin auth backend set <backend>` | Select the active auth backend. Flag: `--project-root <path>`. |
+| `netscript plugin auth backend show` | Show the currently selected auth backend. Flag: `--project-root <path>`. |
+| `netscript plugin auth provider set` | Configure an auth provider. Flags: `--preset <preset>`, `--client-id <id>`, `--client-secret <secret>`, `--redirect-uri <uri>`, `--issuer <issuer>`, `--api-key <key>`, `--cookie-password <password>`, `--secret <secret>`, `--kv-oauth-key <key>`, `--project-root <path>`. |
 | `netscript plugin auth secret generate [kind]` | Generate auth secret material. |
-| `netscript plugin auth session list` | List auth sessions. |
-| `netscript plugin auth session revoke <id>` | Revoke an auth session by id. |
+| `netscript plugin auth session list` | List auth sessions. Flag: `--stream-url <url>`. |
+| `netscript plugin auth session revoke <id>` | Revoke an auth session by id. Flag: `--auth-url <url>`. |
 
 The backends selectable here are the same ones read at runtime by
 `NETSCRIPT_AUTH_BACKEND` — see [add authentication](/how-to/add-authentication/).
@@ -148,7 +148,7 @@ The common `service add`, `service list`, and `service generate` verbs are in th
 | `netscript service remove <name>` | Remove a service workspace and reverse its registrations. Flags: `--keep-contract` (retain paired contract files), `--project-root <path>`. |
 | `netscript service add-handler <service> <procedure>` | Bind a contract procedure with a compiling service handler stub. Flags: `--version <version>` (default `v1`), `--project-root <path>`. |
 | `netscript service ref add <caller> <callee>` | Add a service reference from `<caller>` to `<callee>`. Flag: `--project-root <path>`. |
-| `netscript service ref remove <caller> <callee>` | Remove a service reference. |
+| `netscript service ref remove <caller> <callee>` | Remove a service reference. Flag: `--project-root <path>`. |
 
 ## `contract` — extended verbs
 
@@ -173,7 +173,7 @@ engine. The full group also carries the target-management and migration-history 
 | Command | Description |
 | --- | --- |
 | `netscript db add <engine>` | Add a database workspace to an existing project. `<engine>` is `postgres`, `mysql`, `mssql`, or `sqlite`. Flags: `--name <key>` (config key), `--project-root <path>`, `--force`. |
-| `netscript db list` | List registered database targets. |
+| `netscript db list` | List registered database targets. Flags: `--project-root <path>`, `--json`. |
 | `netscript db remove <configKey>` | Deregister a database target. Flags: `--project-root <path>`, `--purge` (delete the workspace when no target still uses it). |
 | `netscript db deploy` | Apply pending migrations without creating one. Flags: `--db <target>` (config key, database name, or `all`), `--project-root <path>`. |
 | `netscript db validate` | Validate database schemas. Flags: `--db <target>`, `--project-root <path>`. |
