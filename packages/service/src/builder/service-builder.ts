@@ -29,7 +29,7 @@
 
 import type { LoggerMiddlewareOptions } from '@netscript/logger/middleware';
 import type { AuthnOptions, AuthzOptions } from '../auth/options.ts';
-import type { HealthCheck } from '../primitives/health.ts';
+import type { HealthCheck, HealthCheckAdapterOptions } from '../primitives/health.ts';
 import type {
   ContextFactory,
   CorsOptions,
@@ -67,7 +67,11 @@ export interface ServiceBuilder<TRouter extends ServiceRouter> {
   withLogger(options?: LoggerMiddlewareOptions): ServiceBuilder<TRouter>;
 
   /** Adds database context, health, and readiness wiring. */
-  withDatabase(db: DbContext, healthCheckDb?: Database): ServiceBuilder<TRouter>;
+  withDatabase(
+    db: DbContext,
+    healthCheckDb?: Database,
+    healthCheckOptions?: HealthCheckAdapterOptions,
+  ): ServiceBuilder<TRouter>;
 
   /** Adds a custom health check. */
   withHealthCheck(check: HealthCheck): ServiceBuilder<TRouter>;

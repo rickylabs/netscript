@@ -37,8 +37,18 @@ const LIVENESS_STATUS_OK = 'ok';
 export interface HealthCheck {
   /** Name of the health check (e.g., 'database', 'redis') */
   name: string;
+  /** Whether this check belongs to the running app's active configuration. Defaults to `true`. */
+  configured?: boolean;
   /** Function that performs the health check */
   check: () => Promise<{ healthy: boolean; message?: string; latency?: number }>;
+}
+
+/** Options shared by pre-built dependency health checks. */
+export interface HealthCheckAdapterOptions {
+  /** Override the check name reported in health details. */
+  name?: string;
+  /** Whether the adapter belongs to the running app's active configuration. */
+  configured?: boolean;
 }
 
 /**
@@ -85,10 +95,11 @@ export interface HealthHandlerOptions {
  */
 export function createHealthHandler(options?: HealthHandlerOptions): ServiceHandler {
   const { checks = [], version, includeDetails = true } = options ?? {};
+  const configuredChecks = checks.filter((check) => check.configured !== false);
 
   return async (c): Promise<Response> => {
     const results = await Promise.allSettled(
-      checks.map(async (check) => {
+      configuredChecks.map(async (check) => {
         const start = performance.now();
         try {
           const result = await check.check();
@@ -148,8 +159,10 @@ export const healthChecks = {
    */
   database: (
     db: { $queryRaw: (query: TemplateStringsArray) => Promise<unknown> },
+    options: HealthCheckAdapterOptions = {},
   ): HealthCheck => ({
-    name: 'database',
+    name: options.name ?? 'database',
+    configured: options.configured,
     check: async () => {
       await db.$queryRaw`SELECT 1`;
       return { healthy: true };
@@ -164,8 +177,9 @@ export const healthChecks = {
    * healthChecks.kv()
    * ```
    */
-  kv: (): HealthCheck => ({
-    name: 'kv',
+  kv: (options: HealthCheckAdapterOptions = {}): HealthCheck => ({
+    name: options.name ?? 'kv',
+    configured: options.configured,
     check: async () => {
       const kv = await Deno.openKv();
       await kv.get(['health_check']);
@@ -181,8 +195,13 @@ export const healthChecks = {
    * healthChecks.service('users', 'http://localhost:3000')
    * ```
    */
-  service: (name: string, baseUrl: string): HealthCheck => ({
-    name: `service:${name}`,
+  service: (
+    name: string,
+    baseUrl: string,
+    options: HealthCheckAdapterOptions = {},
+  ): HealthCheck => ({
+    name: options.name ?? `service:${name}`,
+    configured: options.configured,
     check: async () => {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 5000);
@@ -205,8 +224,13 @@ export const healthChecks = {
    * })
    * ```
    */
-  custom: (name: string, fn: () => Promise<boolean>): HealthCheck => ({
-    name,
+  custom: (
+    name: string,
+    fn: () => Promise<boolean>,
+    options: HealthCheckAdapterOptions = {},
+  ): HealthCheck => ({
+    name: options.name ?? name,
+    configured: options.configured,
     check: async () => ({ healthy: await fn() }),
   }),
 };

@@ -21,6 +21,7 @@ import {
   createLivenessHandler,
   createReadinessHandler,
   type HealthCheck,
+  type HealthCheckAdapterOptions,
   healthChecks,
 } from '../primitives/health.ts';
 import { createOpenAPISpec, createScalarDocs, createScalarJs } from '../primitives/openapi.ts';
@@ -134,14 +135,18 @@ export class ServiceBuilderImpl<TRouter extends ServiceRouter> implements Servic
    * });
    * ```
    */
-  withDatabase(db: DbContext, healthCheckDb?: Database): ServiceBuilder<TRouter> {
+  withDatabase(
+    db: DbContext,
+    healthCheckDb?: Database,
+    healthCheckOptions?: HealthCheckAdapterOptions,
+  ): ServiceBuilder<TRouter> {
     // Store database reference for context injection
     this.database = db;
 
     // Wire up health + readiness checks only when a $queryRaw-capable client is supplied.
     // For single-db usage pass `db` directly; for multi-db pass the primary client separately.
     if (healthCheckDb) {
-      this.healthChecks.push(healthChecks.database(healthCheckDb));
+      this.healthChecks.push(healthChecks.database(healthCheckDb, healthCheckOptions));
 
       this.readinessChecks.push(async () => {
         try {

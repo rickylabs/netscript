@@ -27,6 +27,7 @@
 import { createService, type ServiceConfig } from '../builder/service-builder.ts';
 import type { AuthnOptions, AuthzOptions } from '../auth/options.ts';
 import { createDatabaseConnectivityStartupHook } from '../diagnostics/database-connectivity.ts';
+import { healthChecks } from '../primitives/health.ts';
 import type {
   Database,
   DbContext,
@@ -39,20 +40,60 @@ interface DisconnectCapableDatabase extends Database {
   $disconnect(): Promise<void>;
 }
 
+interface DatabaseHealthCandidate {
+  readonly name: string;
+  readonly database: Database;
+  readonly configured: boolean;
+}
+
+const DATABASE_PROVIDER_ALIASES: readonly (readonly [string, string])[] = [
+  ['postgres', 'postgresql'],
+  ['mssql', 'sqlserver'],
+];
+
 /**
  * Extract a `$queryRaw`-capable client from a db context object.
  *
  * - Single-db: `db` itself has `$queryRaw` → return it directly
- * - Multi-db:  first value in `db` that has `$queryRaw` → use as primary
+ * - Multi-db: every `$queryRaw` client becomes a named candidate; the key matching
+ *   `DB_PROVIDER` / `DATABASE_PROVIDER` is configured and the others are excluded
  *
- * Returns `undefined` if no such client is found (health check is skipped).
+ * Returns an empty array if no such client is found (health checks are skipped).
  */
-function findHealthCheckDb(db: DbContext): Database | undefined {
-  if (isDatabase(db)) return db;
-  for (const value of Object.values(db)) {
-    if (isDatabase(value)) return value;
+function findDatabaseHealthCandidates(db: DbContext): readonly DatabaseHealthCandidate[] {
+  if (isDatabase(db)) {
+    return [{ name: 'database', database: db, configured: true }];
   }
-  return undefined;
+
+  const candidates = Object.entries(db)
+    .filter((entry): entry is [string, Database] => isDatabase(entry[1]));
+  if (candidates.length === 0) return [];
+
+  const provider = readConfiguredProvider();
+  const configuredIndex = provider === undefined
+    ? 0
+    : candidates.findIndex(([name]) => databaseNamesMatch(name, provider));
+  const selectedIndex = configuredIndex >= 0 ? configuredIndex : 0;
+
+  return candidates.map(([name, database], index) => ({
+    name: `database:${name}`,
+    database,
+    configured: index === selectedIndex,
+  }));
+}
+
+function readConfiguredProvider(): string | undefined {
+  return Deno.env.get('DB_PROVIDER') ?? Deno.env.get('DATABASE_PROVIDER') ?? undefined;
+}
+
+function databaseNamesMatch(name: string, provider: string): boolean {
+  const normalizedName = name.toLowerCase().replaceAll(/[^a-z0-9]/g, '');
+  const normalizedProvider = provider.toLowerCase().replaceAll(/[^a-z0-9]/g, '');
+  if (normalizedName === normalizedProvider) return true;
+  return DATABASE_PROVIDER_ALIASES.some(([left, right]) =>
+    (normalizedName === left && normalizedProvider === right) ||
+    (normalizedName === right && normalizedProvider === left)
+  );
 }
 
 function isDatabase(value: unknown): value is Database {
@@ -189,8 +230,24 @@ export async function defineService<T extends ServiceRouter>(
     .withServiceInfo();
 
   if (options.db) {
-    const healthCheckDb = findHealthCheckDb(options.db);
-    builder.withDatabase(options.db, healthCheckDb);
+    const databaseCandidates = findDatabaseHealthCandidates(options.db);
+    const healthCheckDb = databaseCandidates.find((candidate) => candidate.configured)?.database;
+    const configuredCandidate = databaseCandidates.find((candidate) => candidate.configured);
+    builder.withDatabase(
+      options.db,
+      configuredCandidate?.database,
+      configuredCandidate === undefined ? undefined : { name: configuredCandidate.name },
+    );
+
+    for (const candidate of databaseCandidates) {
+      if (candidate.configured) continue;
+      builder.withHealthCheck(
+        healthChecks.database(candidate.database, {
+          name: candidate.name,
+          configured: candidate.configured,
+        }),
+      );
+    }
 
     if (healthCheckDb) {
       builder.onStartup(
