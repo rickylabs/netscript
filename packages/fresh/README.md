@@ -86,6 +86,31 @@ export const ordersPage = definePage()
 Type-checking entrypoints should include `--unstable-kv`, since the streaming server helpers expose
 KV-aware types.
 
+### Desktop RPC composition
+
+Deno Desktop composition roots can bind an existing oRPC router to one native window. Browser and
+Aspire processes return an explicit disabled lifecycle without registering a binding:
+
+```typescript
+import { bindDesktopRpcWindow } from '@netscript/fresh/desktop';
+
+const desktopRpc = bindDesktopRpcWindow({
+  window: desktopWindow,
+  router: ordersRouter,
+  context: {},
+});
+
+// Safe for both active and disabled lifecycles.
+await desktopRpc.close();
+```
+
+Each call owns isolated per-window transport state. The adapter upgrades a real `MessagePort` with
+oRPC before registering the promise-based native handler, and unbinds exactly once during cleanup.
+It does not create windows, declare ambient webview bindings, or enable transfer-list serialization.
+Pair this runtime binding with `createDesktopServiceClient({ contract })` from
+`@netscript/sdk/desktop` in the webview; both sides reuse the same oRPC contract instead of a
+hand-maintained `bindings.d.ts`.
+
 ---
 
 ## 📦 Key Capabilities
@@ -101,6 +126,8 @@ KV-aware types.
   hooks wire cache-first and durable-stream data into client islands.
 - **Streaming and defer**: `defineFreshApp` bootstraps the app, `renderToStream` powers Suspense
   SSR, and `DeferPage`/`Deferred` defer regions under a resolvable freshness policy.
+- **Desktop RPC**: `@netscript/fresh/desktop` binds an existing oRPC router to one Deno Desktop
+  window while remaining inert in browser and Aspire processes.
 
 ---
 
@@ -117,5 +144,5 @@ KV-aware types.
 
 ## 📝 License
 
-Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to JSR with
-cryptographically verified provenance.
+Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to
+JSR with cryptographically verified provenance.

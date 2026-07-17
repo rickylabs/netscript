@@ -88,11 +88,33 @@ if (update.status === 'disabled') {
 ```
 
 The app-pinned release and manual-installer URLs must use HTTPS. The native Deno Desktop runtime
-owns manifest fetching, Ed25519 verification, patch staging, and writable-install checks; using
-this API therefore permits network access and native application-file updates. Under plain
-`deno run` the seam returns `disabled` without network access. Windows currently reports a staged
-update through the manual-installer event because upstream cannot apply it automatically; macOS
-and Linux apply on relaunch. Real packaged apply/rollback proof is tracked by #457.
+owns manifest fetching, Ed25519 verification, patch staging, and writable-install checks; using this
+API therefore permits network access and native application-file updates. Under plain `deno run` the
+seam returns `disabled` without network access. Windows currently reports a staged update through
+the manual-installer event because upstream cannot apply it automatically; macOS and Linux apply on
+relaunch. Real packaged apply/rollback proof is tracked by #457.
+
+### Desktop RPC bindings
+
+Inside a Deno Desktop webview, reuse the same contract as the runtime router without declaring a
+parallel `bindings.d.ts` surface:
+
+```ts
+import { createDesktopServiceClient } from '@netscript/sdk/desktop';
+import { ordersContract } from './contracts/orders.ts';
+
+const orders = createDesktopServiceClient({ contract: ordersContract });
+const order = await orders.get({ id: 'ord_123' });
+```
+
+The SDK resolves the default `__netscript_rpc__` webview binding lazily, adapts it to oRPC's
+MessagePort link, and preserves oRPC's default string/binary serialization. `Uint8Array` is the only
+native binary payload; transfer lists, `ArrayBuffer`, and other typed arrays are intentionally not
+advertised because Deno's bind channel does not preserve them. Bind handlers execute with the Deno
+process's permissions, so runtime routers must validate inputs and authorization at the same trust
+boundary as any other privileged service entrypoint. The matching runtime composition is
+`bindDesktopRpcWindow({ window, router, context })` from `@netscript/fresh/desktop`; browser and
+Aspire processes receive an inert disabled lifecycle rather than a native binding side effect.
 
 ---
 
@@ -116,6 +138,9 @@ and Linux apply on relaunch. Real packaged apply/rollback proof is tracked by #4
 - **Native auto-update configuration**: `@netscript/sdk/auto-update` validates the app-pinned
   release endpoint and Ed25519 key, resolves the current Deno Desktop `os-arch` release URL, and
   exposes typed staged/manual and rollback events without leaking moving runtime globals.
+- **Type-safe Desktop RPC**: `@netscript/sdk/desktop` adapts a per-window Deno bind channel to a
+  real MessagePort and oRPC `RPCLink`, preserving the existing service contract without ambient
+  webview declarations.
 
 ---
 

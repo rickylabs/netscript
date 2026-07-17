@@ -6,6 +6,7 @@
   "exports": {
     ".": "./mod.ts",
     "./auto-update": "./src/auto-update/mod.ts",
+    "./desktop": "./src/desktop/mod.ts",
     "./cache": "./src/cache/mod.ts",
     "./client": "./src/client/mod.ts",
     "./collections": "./src/collections/mod.ts",
@@ -17,7 +18,7 @@
     "./telemetry": "./src/telemetry/mod.ts"
   },
   "tasks": {
-    "check": "deno check --unstable-kv ./mod.ts ./src/auto-update/mod.ts ./src/cache/mod.ts ./src/client/mod.ts ./src/collections/mod.ts ./src/discovery/mod.ts ./src/ports/mod.ts ./src/query/mod.ts ./src/query-client/mod.ts ./src/streams.ts ./src/telemetry/mod.ts",
+    "check": "deno check --unstable-kv ./mod.ts ./src/auto-update/mod.ts ./src/desktop/mod.ts ./src/cache/mod.ts ./src/client/mod.ts ./src/collections/mod.ts ./src/discovery/mod.ts ./src/ports/mod.ts ./src/query/mod.ts ./src/query-client/mod.ts ./src/streams.ts ./src/telemetry/mod.ts",
     "test": "deno test --allow-all ./tests/",
     "lint": "deno lint",
     "fmt": "deno fmt --check",
