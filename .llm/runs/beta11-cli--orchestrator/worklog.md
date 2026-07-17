@@ -129,3 +129,8 @@ group launch; this section fixes the supervisor's surface.
   Stage-H: owner must ratify F-1…F-17 + SC-1…SC-6 in-turn before any board mutation. Full
   adversarial cycle closed (17→13 RESOLVED + residuals supervisor-fixed + recheck). G3 #842:
   IMPL-EVAL PASS, boxes checked, merge-when-green loop running. G6: S3 signed off, S4 final.
+- 2026-07-18 · G6 IMPL-EVAL PASS (scope discipline verified: no snapshot machinery, no
+  Deno.autoUpdate, exact lock delta). G3+G6 merge-when-green loops armed. Wave tail launched:
+  G5 #843 (Sol·medium, plan-first) + G11 #818 (Sol·medium, direction (a)+docs). Remaining after:
+  G7 #457 e2e (needs G6 merged + owner Windows host), wave-close PR, docs track G12–G14,
+  release-cut PR (owner merges).
