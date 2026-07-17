@@ -54,6 +54,10 @@ Update the source README/schema/package metadata, run the publish-assets generat
 | --- | --- | --- | --- |
 | 2026-07-17 | 1 | research/design | Re-baselined at `a5adb706`; implementation remains blocked on PLAN-EVAL. |
 | 2026-07-17 | 1 | PLAN-EVAL | Separate local Qwen session `f03ae1dd-da69-406a-b725-f3bf391255a8` returned `PASS`. |
+| 2026-07-17 | 2 | implement | Added deterministic publish-asset generation; MCP, CLI, and six plugin surfaces consume generated constants instead of publishable import attributes. |
+| 2026-07-17 | 2 | negative proof | Seeded stale plugin metadata made `check:publish-assets` exit 1; regeneration restored a green exit 0. |
+| 2026-07-17 | 2 | review | Supervisor reviewed generated source fidelity, consumer import paths, publish include coverage, and excluded test/verifier attributes; no scope gap found. |
+| 2026-07-17 | 2 | reconcile | #808 is closed and remains a non-closing `Refs #808`; PR #810 is draft with `status:impl`; no new reviewer comments required adjustment. |
 
 ## Decisions
 
@@ -69,8 +73,22 @@ Update the source README/schema/package metadata, run the publish-assets generat
 
 ## Gate Results
 
-No implementation gates run before PLAN-EVAL.
+### Slice 2 — generated publish assets and sweep
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| MCP check | PASS | `packages/mcp: deno task check` exit 0; wrapper-parsed log has 0 diagnostics |
+| MCP tests | PASS | 45 passed, 0 failed |
+| CLI check | PASS | `packages/cli: deno task check` exit 0 |
+| plugin checks | PASS | `deno task check` exit 0 for ai/auth/sagas/streams/triggers/workers |
+| freshness | PASS | `deno task check:publish-assets` exit 0 |
+| freshness negative proof | PASS | seeded `PLUGIN_PACKAGE_VERSION = "seeded-stale-value"` produced exit 1 naming the stale generated file; regenerated tree returned green |
+| changed source fmt/lint wrappers | PASS | 20 selected files, 0 failed batches/findings; generated output separately `deno fmt --check` clean |
+| changed-file quality scan | PASS | 19 scanned files, 0 findings, 0 allowances |
+| JSR audit | PASS with baseline tool note | MCP dry-run OK; helper reported only its known banner false-positive for “Checking for slow types” |
+| MCP publish dry-run | PASS | `@netscript/mcp@0.0.1-beta.10` dry-run complete; generated README asset included |
+| architecture | PASS | `deno task arch:check` exit 0; baseline warnings only, no failures |
 
 ## Handoff Notes
 
-- PLAN-EVAL should spot-check `packages/mcp/cli.ts:18`, the existing generator pattern, and publish-rule filtering in `scanPublishSurface`.
+- Evaluator should compare `MCP_PACKAGE_README` to `packages/mcp/README.md`, inspect generator check mode, and confirm remaining raw attributes are excluded tests/verifiers rather than publishable files.

@@ -12,23 +12,25 @@
 
 ## Current State
 
-The branch is based on `origin/main` at `a5adb706`. Research and a four-slice design are locked. Separate-session PLAN-EVAL passed; implementation may begin.
+Separate-session PLAN-EVAL passed. Slice 2 is implemented and reviewed: generated constants now carry MCP README, CLI schema/version, and affected plugin versions; publishable consumers no longer use import attributes.
 
 ## Completed
 
 - Named skills, harness routing, relevant doctrine, release gates, existing generator, publish surface, and preflight implementation were inspected.
 - Research, plan, design checkpoint, supervisor identity, and drift log were created.
 - PLAN-EVAL passed in local Qwen session `f03ae1dd-da69-406a-b725-f3bf391255a8`.
+- Generated publish assets, all affected consumers, and the regeneration/freshness tasks are implemented.
+- MCP (45 tests), CLI, and six plugin checks pass; freshness is witnessed green and red; MCP publish dry-run and changed-file quality scan pass.
 
 ## In Progress
 
-- Slice 2 generated publish assets and publish-surface sweep.
+- Slice 3 release-preflight and release-guidance correction.
 
 ## Next Steps
 
-1. Implement generated assets and the publish-surface sweep.
-2. Run freshness green/red and focused package gates.
-3. Commit, push, and comment slice 2.
+1. Commit, push, and comment slice 2.
+2. Finish and review the release-preflight/guidance slice.
+3. Run full fixed-tree and seeded-red release evidence.
 
 ## Key Decisions
 
@@ -42,14 +44,16 @@ The branch is based on `origin/main` at `a5adb706`. Research and a four-slice de
 | Path | Status | Notes |
 | --- | --- | --- |
 | `.llm/runs/fix-mcp-readme-text-import--beta10-jsr-hotfix/` | new | Harness planning artifacts only. |
+| `.llm/tools/generate-publish-assets.ts`, `deno.json` | new/changed | Deterministic generation and freshness task. |
+| `packages/mcp`, `packages/cli`, `plugins/{ai,auth,sagas,streams,triggers,workers}` | changed | Generated assets and registry-safe consumers. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
 | Plan | PASS | `plan-eval.md`; session `f03ae1dd-da69-406a-b725-f3bf391255a8` |
-| Static | not run | blocked by Plan-Gate |
-| Fitness | not run | blocked by Plan-Gate |
+| Static | PASS for slice 2 | package checks, focused MCP tests, wrapper fmt/lint evidence |
+| Fitness | PASS for slice 2 | freshness green/red, quality scan, MCP dry-run/audit, arch check |
 | Runtime | N/A | no runtime protocol change planned |
 | Consumer | not run | blocked by Plan-Gate |
 

@@ -2,7 +2,7 @@
  * JSR package specifiers used by public CLI scaffolding.
  */
 
-import cliPackageJson from '../../../deno.json' with { type: 'json' };
+import { CLI_PACKAGE_VERSION } from '../assets/publish-assets.generated.ts';
 
 /** NetScript package names that public scaffolds may import from JSR. */
 export type NetscriptPackage =
@@ -32,7 +32,7 @@ export type NetscriptPackage =
   | 'workers';
 
 /** Release train version sourced from the CLI package manifest. */
-export const NETSCRIPT_RELEASE_VERSION: string = cliPackageJson.version;
+export const NETSCRIPT_RELEASE_VERSION: string = CLI_PACKAGE_VERSION;
 
 /** Exact JSR version suffix for NetScript prerelease package pins. */
 export const NETSCRIPT_RELEASE_TAG = `@${NETSCRIPT_RELEASE_VERSION}`;

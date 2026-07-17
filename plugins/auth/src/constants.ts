@@ -1,10 +1,10 @@
-import denoJson from '../deno.json' with { type: 'json' };
+import { PLUGIN_PACKAGE_VERSION } from './package-metadata.generated.ts';
 
 /** Stable plugin identifier used by manifests and runtime ownership checks. */
 export const AUTH_PLUGIN_ID = 'auth' as const;
 
 /** Plugin manifest version advertised to the NetScript host, single-sourced from `deno.json`. */
-export const AUTH_PLUGIN_VERSION: string = denoJson.version;
+export const AUTH_PLUGIN_VERSION: string = PLUGIN_PACKAGE_VERSION;
 
 /** Service contribution name for the auth API process. */
 export const AUTH_API_SERVICE_NAME = 'auth-api' as const;

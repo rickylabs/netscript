@@ -6,10 +6,11 @@
  * immediately usable in the chosen editor without repo-specific assumptions.
  */
 
-import denoConfigSchema from '../../../../assets/schema/config-file.v1.json' with { type: 'json' };
+import { DENO_CONFIG_SCHEMA_JSON } from '../../assets/publish-assets.generated.ts';
 import type { EditorChoice } from '../../domain/scaffold/workspace-config.ts';
 
 const DENO_CONFIG_SCHEMA_TARGET = '.netscript/schema/config-file.v1.json';
+const denoConfigSchema: unknown = JSON.parse(DENO_CONFIG_SCHEMA_JSON);
 
 /** A single editor config file to be written relative to the workspace root. */
 export interface EditorConfigFile {

@@ -15,7 +15,7 @@ import { runNewlineStdio } from './src/infrastructure/stdio-transport.ts';
 import { FilesystemDocsCorpus } from './src/infrastructure/filesystem-docs-corpus.ts';
 import { EmbeddedDocsCorpus } from './src/infrastructure/embedded-docs-corpus.ts';
 import { resolve } from '@std/path';
-import packageReadme from './README.md' with { type: 'text' };
+import { MCP_PACKAGE_README } from './src/publish-assets.generated.ts';
 import { createGetAppStatusFlow } from './src/application/flows/get-app-status-flow.ts';
 import { createGetRecentErrorsFlow } from './src/application/flows/get-recent-errors-flow.ts';
 import { createGetRunFlow } from './src/application/flows/get-run-flow.ts';
@@ -92,7 +92,7 @@ export function createMcpCliServer(options: McpCliOptions = {}): McpServer {
   const docsCorpus = configuredDocsRoot
     ? new FilesystemDocsCorpus({ root: configuredDocsRoot })
     : new EmbeddedDocsCorpus({
-      documents: [{ slug: 'mcp', source: packageReadme }],
+      documents: [{ slug: 'mcp', source: MCP_PACKAGE_README }],
     });
   const probe = new FetchTelemetryProbe((endpoint) =>
     createAspireDashboardFetch(endpoint, {}) ?? fetch
