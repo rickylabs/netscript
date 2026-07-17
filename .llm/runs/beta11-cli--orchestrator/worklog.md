@@ -27,3 +27,11 @@ group launch; this section fixes the supervisor's surface.
   supervisor, seed-run); live milestone 13 verified via API (15 open / 5 closed; strays #818,
   #814–#816, #804, #802 folded into plan); `supervisor.md` written; issue bodies archived to
   `issue-bodies.md`; research.md + plan.md written. Next: plan PR + PLAN-EVAL (hard stop).
+- 2026-07-17 · PLAN-EVAL PASS (open-model Qwen, session f4666eee, separate session) — recorded on
+  PR #846. Wave 1 launched via `agentic:launch-codex-slice` (daemon-attached, route verdicts
+  `matched`): G1 #826 Sol·low (thread 019f720b-8290…, wt-g1-826), G2 #841 Sol·high (thread
+  019f720b-8d75…, wt-g2-841, plan-first), G4 #452 Sol·medium (thread 019f720b-9692…, wt-g4-452,
+  plan-first). Integration branch `feat/desktop-frontend` pushed @ ca72db14. Gotchas hit + handled:
+  inherited origin/main upstream (unset; explicit-refspec push rule), narrow fetch refspec
+  (explicit fetch of the integration branch). G2/G4 stop at their group Plan & Design for the
+  nested Plan-Gate; G1 is a single-scope fix on run-loop directly.

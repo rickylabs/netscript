@@ -5,7 +5,7 @@ Resume point for the beta-11 shipping-wave supervisor (session
 
 - **Mission**: ship milestone 13 (`0.0.1-beta.11`) — Desktop Frontend wave #840 (#841/#842/#843,
   #452/#456/#457), #826, seed run #824, docs track #814/#815/#816, CLI fixes #804/#802/#818.
-- **State**: Bootstrap + Research + Plan written (this run dir). Phase groups G1–G14 defined in
+- **State**: PLAN-EVAL PASS (f4666eee). Wave 1 ACTIVE: G1 #826, G2 #841, G4 #452 daemon-attached Codex threads (ids in phase-registry.md). Plan PR #846. Next: G2/G4 group plan-gates on their READY-FOR-REVIEW signal; G1 slice review on landing; then G3/G9/G10 + seed-run G8 kickoff.
   `plan.md` + `phase-registry.md`. Awaiting: plan draft PR + PLAN-EVAL PASS (hard stop before any
   implementation slice).
 - **Branch topology**: integration `feat/desktop-frontend` for the wave; direct-to-main branches
