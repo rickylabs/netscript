@@ -12,7 +12,7 @@ Live status of milestone-13 phase groups. Statuses: `pending` → `active` → `
 | G5 | #843 | `feat/desktop-frontend-843-ui` | 2 | pending | after G2 |
 | G6 | #456 | `feat/desktop-frontend-456-packaging` | 2 | pending | after G2+G4 |
 | G7 | #457 | `feat/desktop-frontend-457-e2e` | 3 | pending | after G2+G6; Windows legs on owner host |
-| G8 | #824 | `plan/unified-runtime` | 1 | pending | seed run; drafts-only until owner stage-H |
+| G8 | #824 | `plan/unified-runtime` | 1 | active | stage A done; run dir plan-unified-runtime--seed; drafts-only until owner stage-H |
 | G9 | #804 | `fix/804-dry-run-writes` | 1 | pending | |
 | G10 | #802 | `fix/802-plugin-cli-help` | 1 | pending | option decided at group plan-gate |
 | G11 | #818 | `fix/818-min-dep-age-lockstep` | 2 | pending | direction (a)+docs |

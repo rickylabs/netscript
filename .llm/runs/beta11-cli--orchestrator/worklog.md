@@ -81,3 +81,6 @@ group launch; this section fixes the supervisor's surface.
   schema fix; IMPL-EVAL PASS). #452/#375 stay open by design — their Closes keywords fire at the
   wave→main PR. Integration branch synced with main (G1 fix folded in, b2248058, clean merge).
   Free slot → launching G10 #802.
+- 2026-07-18 · G2 S2 sign-off (35f3b726) — resumed for final slice (consumer fixture + JSR
+  evidence; IMPL-EVAL on completion). G8 seed run stage A complete: worktree wt-g8-seed, branch
+  plan/unified-runtime @ 56cf84b5, supervisor.md with seed boundaries, draft PR opened.
