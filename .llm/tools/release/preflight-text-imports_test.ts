@@ -10,6 +10,8 @@ Deno.test('preflight rejects import attributes in publishable source', () => {
   assertEquals(findings[0].check, 'import-attributes');
   assertEquals(findings[0].line, 1);
   assertStringIncludes(findings[0].message, 'generated TypeScript constant');
+  assertStringIncludes(findings[0].message, 'https://github.com/denoland/deno/issues/35546');
+  assertStringIncludes(findings[0].message, 'authenticated canary publish');
 });
 
 Deno.test('preflight ignores import-attribute text in inert source regions', () => {

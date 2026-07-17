@@ -84,6 +84,9 @@ export function scanSource(source: string, path: string): PreflightFinding[] {
 function findImportAttributes(source: string, path: string): ImportAttributeFinding[] {
   const findings: ImportAttributeFinding[] = [];
   const code = blankStringsAndComments(source);
+  // This conditional registry guard preserves the release lineage: #138/#142 exposed the alpha.6
+  // half-publish, #143 recovered with generated string constants, and beta.10 reproduced a partial
+  // publish tracked upstream as https://github.com/denoland/deno/issues/35546.
   for (const match of code.matchAll(/\bwith\s*\{\s*type\s*:/g)) {
     if (match.index === undefined) continue;
     findings.push({
@@ -91,7 +94,7 @@ function findImportAttributes(source: string, path: string): ImportAttributeFind
       path,
       line: lineAt(source, match.index),
       message:
-        'Import attributes are not JSR registry-safe in publishable source; embed the asset as a generated TypeScript constant.',
+        'Import attributes are conditionally banned in publishable source; embed the asset as a generated TypeScript constant. Lift this ban only when https://github.com/denoland/deno/issues/35546 is fixed, merged, and released, and an authenticated canary publish of a text-import probe is green.',
     });
   }
   return findings;

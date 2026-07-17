@@ -16,6 +16,12 @@ semantics and `netscript-pr` for branch, PR, and comment mechanics.
   asset rule: publishable source must use generated TypeScript string constants. Import attributes
   (`with { type: ... }`) and `Deno.readTextFile(new URL(..., import.meta.url))`-style runtime reads
   are rejected because the JSR registry can reject them even when local dry-run passes.
+- This import-attribute ban is conditional and carries its incident lineage: #138/#142 recorded the
+  alpha.6 half-publish, #143 recovered with string constants, and beta.10 partially published before
+  the same registry-side failure was tracked as
+  [denoland/deno#35546](https://github.com/denoland/deno/issues/35546). Lift the ban only after that
+  upstream issue is fixed, merged, and released **and** an authenticated canary publish of a
+  text-import probe is green.
 - Do not delete `deno.lock`, delete caches, or run `deno cache --reload`.
 - Do not publish from a local machine. Publishing stays in GitHub Actions through OIDC.
 - Use `gh ... --body-file` for release PR creation and comments.
@@ -51,12 +57,14 @@ gate.
 1. Version validation refuses invalid semver and equal or older versions.
 2. Workspace bump sets the root version, every package/plugin `deno.json`, nested workspace
    `deno.json` files, and `deno.lock` `@netscript/*` ranges to the new version.
-3. Residue check aborts if the old version remains in JSON files or `deno.lock`.
-4. `release:preflight` blocks JSR-unsafe import attributes and import-meta-relative runtime reads.
-5. `publish:dry-run` proves the package publish surface builds before the real publish.
-6. `deno ci --prod` proves the production dependency graph installs from the locked graph.
-7. Non-dry-run creates `release/cut-<version>`, stages only bumped files, commits
-   `chore(release): cut <version>`, pushes, and opens the release PR.
+3. `gen:publish-assets` regenerates the registry-safe TypeScript constants from the bumped manifests
+   and source assets; CI independently enforces `check:publish-assets` freshness.
+4. Residue check aborts if the old version remains in JSON files or `deno.lock`.
+5. `release:preflight` blocks JSR-unsafe import attributes and import-meta-relative runtime reads.
+6. `publish:dry-run` proves the package publish surface builds before the real publish.
+7. `deno ci --prod` proves the production dependency graph installs from the locked graph.
+8. Non-dry-run creates `release/cut-<version>`, stages the bumped manifests and regenerated publish
+   assets, commits `chore(release): cut <version>`, pushes, and opens the release PR.
 
 ## Merge And Publish Flow
 

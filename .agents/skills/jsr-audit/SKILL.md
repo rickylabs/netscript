@@ -570,7 +570,12 @@ preflight plus `e2e-cli-prod` against the published package.
   `https:`/`jsr:` graph where `Deno.readTextFile(...)` /
   `fromFileUrl(new URL(..., import.meta.url))` have no package filesystem. Generate checked-in
   `*.generated.ts` constants and protect them with a regeneration-plus-diff freshness gate. Guard:
-  `release:preflight` + `e2e-cli-prod`.
+  `release:preflight` + `e2e-cli-prod`. This import-attribute ban is conditional and preserves the
+  incident lineage: #138/#142 captured the alpha.6 half-publish, #143 recovered with string
+  constants, and beta.10 partially published before the registry-side failure was tracked as
+  [denoland/deno#35546](https://github.com/denoland/deno/issues/35546). Lift the ban only after that
+  issue is fixed, merged, and released **and** an authenticated canary publish of a text-import
+  probe is green.
 - **Top-level `import.meta`/`fromFileUrl` crashes over https.** Same root cause as above but even
   for path resolution: a top-level `fromFileUrl(new URL("...", import.meta.url))` throws when the
   module is imported over `https:`/`jsr:`. Make it lazy (resolve inside the function that needs it)
