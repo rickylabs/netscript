@@ -70,6 +70,7 @@ export {
   createReadinessHandler,
   HEALTH_STATUS,
   type HealthCheck,
+  type HealthCheckAdapterOptions,
   healthChecks,
   type HealthHandlerOptions,
   type HealthResponse,
