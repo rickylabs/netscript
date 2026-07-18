@@ -90,6 +90,7 @@ exception.
 | 2026-07-18T02:03:59+02:00 | Plan | Research + Design checkpoint | Re-baselined #818/#817, verified Deno 2.9 config key/parser, inventoried product call sites, locked three implementation slices. |
 | 2026-07-18T02:20:00+02:00 | S1 | Implement + validate | Added the finite release-train inventory and generated JSR-only `P1D` policy with exact exclusions; local mode remains policy-free. |
 | 2026-07-18T02:30:00+02:00 | S2 | Implement + validate | Routed only effective lockstep first-party plugin CLIs through direct JSR URLs with the project config; preserved protected `deno x` argv for third-party and old-version inputs. |
+| 2026-07-18T02:45:00+02:00 | S3 | Implement + merge-readiness | Added explicit root config to both MCP host argv arrays, aligned CLI/site docs, and completed package plus 60-gate runtime validation. |
 
 ## Decisions
 
@@ -122,10 +123,21 @@ exception.
 | S2 scoped check/lint/fmt wrappers | PASS | 4 files selected; zero failures/findings. |
 | S2 `quality:scan` | PASS | Repository scan `ok: true`, zero findings; seven existing allowances reported. |
 | S2 `arch:check` | PASS | Exit 0; existing dependency/doctrine warnings only, no new failure. |
+| Tier-A S2 review | PASS | Supervisor accepted the S2 command-array and full-directory evidence. |
+| Focused + full agent-init directory | PASS | 3 tests passed, 0 failed in each invocation. |
+| Full CLI package | PASS | 379 tests / 410 steps passed, 0 failed. |
+| S3 scoped check/lint/fmt wrappers | PASS | 2 source files selected; zero failures/findings. |
+| Documentation links | PASS | 98 docs; zero broken links, anchors, or orphans. |
+| README standard | BASELINE FAIL | 35/36 repository READMEs fail existing section-vocabulary rules; CLI was already among them. No new class introduced. |
+| CLI doc lint | PASS | 3 exported entrypoints; zero private refs, missing JSDoc, or other findings. |
+| Workspace publish dry-run | PASS | `Success Dry run complete`; existing dynamic-import warnings only. |
+| S3 `quality:scan` | PASS | Repository scan `ok: true`, zero findings; seven existing allowances. |
+| S3 `arch:check` | PASS | Exit 0; existing dependency/doctrine warnings only. |
+| Full `scaffold.runtime` | PASS | 60 passed, 0 failed; cleanup gate passed. |
 
 ## Handoff Notes
 
-- S2 is ready for Tier-A review. Unversioned first-party specs become release-matched; explicitly
-  matching specs also use direct `jsr.io` `cli.ts`; explicitly different versions and third-party
-  specs retain the exact existing `deno x -A jsr:.../cli` shape.
-- S3 agent-init and documentation scope is untouched.
+- Implementation is complete and ready for supervisor-dispatched IMPL-EVAL.
+- Claude and VS Code MCP argv arrays both select the absolute project `deno.json` before `-A`.
+- Documentation consistently states the 24-hour window, exact lockstep exception, and unchanged
+  third-party policy.

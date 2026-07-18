@@ -83,8 +83,10 @@ definitions this package exports, so it never drifts from the binary you install
   formatting for a binary edge.
 - **Plugin verb dispatch**: `dispatchPluginVerb` and `FRAMEWORK_VERBS` route the framework-owned verbs
   (`install`, `remove`, `enable`, `disable`, `sync`, `setup`, `update`, `doctor`, `info`) into a
-  plugin's own published CLI via `deno x -A jsr:<pkg>/cli` — so a plugin implements its verbs once
-  and inherits the command surface.
+  plugin's own published CLI. Release-matched `@netscript/*` plugins run through their direct JSR
+  `cli.ts` target with the project configuration; third-party and explicitly different-version
+  plugins retain `deno x -A jsr:<pkg>/cli`. A plugin implements its verbs once and inherits the
+  command surface.
 - **Plugin host loading**: `createPluginHostLoader` and `resolvePluginManifest` resolve configured
   plugin specs, walk the project, and aggregate runtime contributions through structural ports.
 - **Plugin scaffolding**: `scaffoldPluginPackage` and the `@netscript/cli/scaffolding` engine render
@@ -116,6 +118,13 @@ Claude Code receives `.mcp.json`, the NetScript skill bundle under `.claude/skil
 section in `AGENTS.md`; VS Code receives `.vscode/mcp.json`. Hosts are auto-detected, or select them
 with `--host claude|vscode|all`. Re-running preserves other host configuration and leaves unchanged
 files alone.
+
+Deno 2.9 protects new registry releases with a 24-hour minimum dependency age. Generated JSR-mode
+workspaces keep that `P1D` policy for third-party packages and exclude only exact-version
+`jsr:@netscript/*` packages from the matching NetScript release train. This lets a fresh scaffold,
+first-party plugin command, or `agent init` MCP server start immediately after a NetScript release
+without weakening the policy for other dependencies. Local-source workspaces do not emit this
+registry policy.
 
 The installed server entry runs `netscript agent mcp` ([`@netscript/mcp`](https://jsr.io/@netscript/mcp)).
 Prefer ordinary CLI verbs for direct, repeatable operations — an agent that can run `netscript db

@@ -56,6 +56,11 @@ first-party `deno x` paths with one explicit `deno run` resolver. No product imp
 | `packages/cli/src/public/features/plugins/dispatch/dispatch-plugin-verb_test.ts` | modified | Full argv tests for unversioned/exact lockstep, third-party, and old-version inputs. |
 | `packages/cli/src/public/features/plugins/ai/ai-plugin-command.ts` | modified | Direct published `cli.ts` execution with explicit project config. |
 | `packages/cli/src/public/features/plugins/ai/ai-plugin-command_test.ts` | modified | Exact AI command-array regression. |
+| `packages/cli/src/public/features/agent/init/init-agent.ts` | modified | Explicit absolute root config in generated MCP argv. |
+| `packages/cli/src/public/features/agent/init/init-agent_test.ts` | modified | Complete Claude and VS Code argv regressions. |
+| `packages/cli/README.md` | modified | Release-day resolver policy and updated plugin-dispatch mechanics. |
+| `docs/site/orchestration-runtime/cli-scaffold.md` | modified | Scaffold/plugin 24-hour-window note. |
+| `docs/site/capabilities/agent-tooling.md` | modified | Agent host explicit-config and scoped-policy note. |
 | `.llm/runs/beta11-cli--orchestrator/slices/g11-818-minage/*` | modified | S1 evidence and handoff. |
 
 ## Gates
@@ -63,15 +68,15 @@ first-party `deno x` paths with one explicit `deno run` resolver. No product imp
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
 | Plan | PASS | Supervisor Tier-A verdict approved D1–D6. |
-| Static | PASS (S1–S2) | Latest scoped check/lint/fmt wrappers: 4 files, zero findings. |
-| Fitness | PASS (S1–S2) | Latest `quality:scan` and `arch:check` exited 0. |
-| Runtime | PASS (S1–S2) | Full public plugins directory: 22 tests / 54 nested steps; S1 parser remains `config-ok`. |
-| Consumer | DEFERRED | Full scaffold runtime remains the S3 merge-readiness gate. |
+| Static | PASS | S3 scoped wrappers clean; full CLI package 379 tests / 410 steps. |
+| Fitness | PASS | Latest `quality:scan` and `arch:check` exited 0. |
+| Runtime | PASS | `scaffold.runtime`: 60 passed, 0 failed, cleanup passed. |
+| Consumer | PASS | Generated config parser, plugin behavior paths, MCP stdio/package tests, and full runtime smoke passed. |
+| Docs | PASS with baseline | Links and CLI doc lint pass; repository README-standard retains its pre-existing 35/36 failure. |
 
 ## Open Questions
 
-- None blocking the S2 Tier-A review. Fresh canary proof remains behind the in-turn owner publish
-  stop-line.
+- None blocking IMPL-EVAL. Fresh canary proof remains behind the in-turn owner publish stop-line.
 
 ## Drift and Debt
 
@@ -82,4 +87,5 @@ first-party `deno x` paths with one explicit `deno run` resolver. No product imp
 
 - `260c5eea` — Plan/Design bootstrap.
 - `af9e0181` — S1 generated-project minimum-age policy.
-- S2 commit — populated after commit; see draft PR #856 and its S2 evidence comment.
+- `5ad34dee` — S2 lockstep plugin/AI direct execution.
+- S3 commit — populated after commit; see draft PR #856 and its implementation-complete comment.
