@@ -199,3 +199,44 @@ request.
   zero blockers; all AMEND and MISSING-add dispositions applied
 
 This discovery session does not issue PLAN-EVAL or implementation verdicts.
+
+## Board filed (2026-07-18)
+
+Supervisor-authorized filing of the ratified drafts (source commit `ef2065bc`,
+Fable 5 adversarial review PASS, amendments applied). Filed to `rickylabs/netscript`.
+
+- Epic: **#871** — Epic: Enterprise auth
+  (labels `type:umbrella`, `area:auth`, `priority:p1`, `epic:enterprise-auth`,
+  `status:triage`; milestone `Backlog / Triage`). Children checklist appended.
+- Created label `epic:enterprise-auth` (color `5319e7`) — was absent from
+  `.github/labels.yml`; created during this authorized filing pass.
+
+Sub-issues (draft order EA-00…EA-15 → S1…S16), all `Part of #871`, all milestone
+`Backlog / Triage` except EA-00:
+
+| Draft | Issue | Title |
+|---|---|---|
+| EA-00 (S1)  | #872 | Make auth capability discovery backend-truthful |
+| EA-01 (S2)  | #873 | Add a first-class Microsoft Entra ID OAuth/OIDC profile |
+| EA-02 (S3)  | #874 | Compose multiple auth backends with tenant-aware routing |
+| EA-03 (S4)  | #875 | Complete the WorkOS AuthKit and enterprise SSO interactive adapter |
+| EA-04 (S5)  | #876 | Normalize per-tenant enterprise connection setup |
+| EA-05 (S6)  | #877 | Integrate WorkOS Directory Sync and SCIM lifecycle |
+| EA-06 (S7)  | #878 | Define enterprise auth audit events and bridge WorkOS Audit Logs |
+| EA-07 (S8)  | #879 | Add WorkOS RBAC/FGA authorization providers |
+| EA-08 (S9)  | #880 | Introduce an enterprise auth secret-reference and rotation lifecycle |
+| EA-09 (S10) | #881 | Generate Better Auth plugin schema and migrations |
+| EA-10 (S11) | #882 | Mount Better Auth interactive handlers and client integration |
+| EA-11 (S12) | #883 | Ship curated Better Auth capability profiles |
+| EA-12 (S13) | #884 | Define organization-aware identity and authorization policy contracts |
+| EA-13 (S14) | #885 | Build an auth conformance, mocking, and scaffold test kit |
+| EA-14 (S15) | #886 | Authenticate machines, agents, CLIs, and MCP clients |
+| EA-15 (S16) | #887 | Define outbound NetScript-as-IdP support |
+
+Filing exceptions:
+
+- EA-00 draft milestone `0.0.1-beta.1` does not exist in the repo (milestones are
+  `0.0.1-stable`, `Backlog / Triage`, `0.0.1-beta.10`…`0.0.1-beta.14`). Per
+  procedure, #872 was filed **without a milestone** and flagged for owner triage.
+- No closing keywords used anywhere; no PR created or modified; milestone 13
+  (`0.0.1-beta.11`) untouched.
