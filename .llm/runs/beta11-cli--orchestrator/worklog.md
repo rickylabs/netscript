@@ -175,3 +175,6 @@ group launch; this section fixes the supervisor's surface.
   resolved as a union; auto-merge loop armed. G13/B1 complete (PR #861, 6 flagship READMEs,
   executed evidence; 2 recorded drifts incl. issue-#815 item-6 inaccuracy on the pre-release
   line). Owner briefed with grouped status table; asked to confirm #816 slip + #815 continuation.
+- 2026-07-18 · #858 MERGED (a87570a6) → #814 closed; epic #840 closed. Milestone-13 remaining:
+  #815 (B1 audit in flight, B2–B5 pending), #816 (slip decision pending owner), #824 (HYBRID
+  ratification pending owner), run-record PRs. Release-cut prep next once docs decisions land.
