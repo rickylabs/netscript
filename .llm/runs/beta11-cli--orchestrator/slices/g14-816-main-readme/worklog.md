@@ -329,3 +329,19 @@ verified intact, incl. 56bab8ff wording.
 README: fmt --check clean · tagline gate over=0 · mermaid re-parse MERMAID_PARSE_OK flowchart-v2 ·
 wording grep zero. Site: build 531 files green · docs:links 98 docs / 0 broken · index.vto wording
 grep zero.
+
+## Wording fixes — 2026-07-18 (Lane 4, final Sol check FAIL → 3 findings, minimal surgery)
+
+1. MAJOR "every layer at once" universal → honest optional-axes phrasing in both artifacts: "One
+   manifest can contribute across every layer … and the host materializes whatever it declares";
+   install example reframed to what it proves: "One command, four plugin files scaffolded and
+   twelve Aspire helpers regenerated" (was "watch one install touch every layer").
+2. MINOR "destructive verbs stay in human hands" → exact deny-list truth in README agent section,
+   homepage agent intro, and homepage who-for card: "high-risk operations like deploy, init, and
+   db reset stay behind an explicit deny list; deny beats allow; unmatched commands are denied"
+   (command-policy.ts:24-49).
+3. MINOR "typed diffs" → "type-checked changes" (README agent section; homepage had no instance).
+
+Everything else byte-identical (verified via targeted greps: zero residual instances of the three
+flagged phrasings). Gates: README fmt --check clean · tagline over=0 · site build 531 files ·
+docs:links 0 broken · internal-wording grep zero. Mermaid untouched this pass.

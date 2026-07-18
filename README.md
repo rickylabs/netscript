@@ -126,9 +126,10 @@ SvelteKit, or Angular leave you to assemble around the frontend.
 
 NetScript does not try to be everything. It aims to be the right tool for the right job — and the
 way it gets there is the plugin system. A plugin is, at its core, a manifest: plain, validated data
-declaring what it contributes, inspected by hosts without executing plugin code. And a plugin
-contributes to **every layer at once** — CLI verbs, scaffolded code, runtime services, storage,
-stream topics, telemetry, and Aspire resources. Watch one install touch all of them:
+declaring what it contributes, inspected by hosts without executing plugin code. One manifest can
+contribute across **every layer** — CLI verbs, scaffolded code, runtime services, storage, stream
+topics, telemetry, Aspire resources — and the host materializes whatever it declares. One command,
+four plugin files scaffolded and twelve Aspire helpers regenerated:
 
 ```bash
 netscript plugin install worker --name workers
@@ -301,11 +302,12 @@ the release it runs.
   `marketplace`, `db reset`, `plugin remove`, `ui:remove`), deny beats allow, anything unmatched is
   denied.
 
-You review the agent's work the way you review a colleague's: typed diffs, one correlated trace per
-execution, and a command gate that keeps destructive verbs in human hands. The server runs on Deno
-2.9+ with a minimal stdio JSON-RPC transport — no npm MCP SDK in the dependency graph — and
-complements Aspire's own MCP server rather than replacing it: Aspire speaks resources and
-containers; this server speaks your app.
+You review the agent's work the way you review a colleague's: type-checked changes, one correlated
+trace per execution, and a command gate where high-risk operations like `deploy`, `init`, and
+`db reset` sit behind an explicit deny list — deny beats allow, unmatched commands are denied. The
+server runs on Deno 2.9+ with a minimal stdio JSON-RPC transport — no npm MCP SDK in the dependency
+graph — and complements Aspire's own MCP server rather than replacing it: Aspire speaks resources
+and containers; this server speaks your app.
 
 ---
 

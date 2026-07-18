@@ -66,10 +66,11 @@ in-process AI surface — first-party plugins, in the box, not an integration pr
 
 <p>
 NetScript does not try to be everything: right tool for the right job, reached through the plugin
-system. A plugin is a validated manifest that contributes to every layer at once — CLI verbs,
-scaffolded code, runtime services, storage, stream topics, telemetry, and Aspire resources — and
-the mechanism behind the six first-party plugins is the same one a team uses to extend the
-framework for its own needs, on the same rails. Watch one install touch every layer:
+system. A plugin is a validated manifest that can contribute across every layer — CLI verbs,
+scaffolded code, runtime services, storage, stream topics, telemetry, Aspire resources — and the
+host materializes whatever it declares. The mechanism behind the six first-party plugins is the
+same one a team uses to extend the framework for its own needs, on the same rails. One command,
+four plugin files scaffolded and twelve Aspire helpers regenerated:
 </p>
 
 {{ comp.tabbedCode({ tabs: [
@@ -121,8 +122,9 @@ frontend</a>.
 Not a framework for agents instead of developers — a framework for developers who work with one.
 The properties that make NetScript easy for you to adopt, review, and debug — one unified API,
 typed end to end, reference docs generated from source — are exactly what make it legible to a
-coding agent, and destructive verbs stay in human hands. The CLI is the hands, the skills are the
-playbook, MCP is the eyes; one command wires all three in:
+coding agent — and high-risk operations like deploy, init, and db reset stay behind an explicit
+deny list (deny beats allow; unmatched commands are denied). The CLI is the hands, the skills are
+the playbook, MCP is the eyes; one command wires all three in:
 </p>
 
 {{ comp.tabbedCode({ tabs: [
@@ -155,7 +157,7 @@ playbook, MCP is the eyes; one command wires all three in:
   { title: "Full-stack TypeScript engineers", body: "Stay in TypeScript from the database to the UI, with contracts that catch integration breaks before they ship." },
   { title: "Platform engineers", body: "Standardize internal services on one coherent Deno baseline — multi-resource wiring, a real dashboard, pluggable auth, and tracing already in place." },
   { title: "Plugin authors", body: "Extend the framework by registering workers, sagas, triggers, auth backends, and streams. No host edits, no forks." },
-  { title: "Devs working with agents", body: "netscript agent init gives your agent MCP eyes, a skills playbook, and a policy-gated CLI — while destructive verbs stay in your hands." }
+  { title: "Devs working with agents", body: "netscript agent init gives your agent MCP eyes, a skills playbook, and a policy-gated CLI — high-risk operations like deploy, init, and db reset stay behind an explicit deny list." }
 ] }) }}
 
 <h2>Start the learning path</h2>
