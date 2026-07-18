@@ -69,7 +69,6 @@ const referenceUnits: NavItem[] = [
   { href: "/reference/watchers/", label: "watchers", icon: "W" },
   { href: "/reference/workers/", label: "workers", icon: "W" },
 ];
-
 export const navSections: NavSection[] = [
   {
     label: "Start",
@@ -252,4 +251,3 @@ export const navSections: NavSection[] = [
     ],
   },
 ];
-
