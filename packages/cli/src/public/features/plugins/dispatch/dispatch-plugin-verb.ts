@@ -1,6 +1,7 @@
 import { RemoteError } from '../../../../kernel/domain/errors/cli-exit-error.ts';
 import { NETSCRIPT_RELEASE_VERSION } from '../../../../kernel/constants/jsr-specifiers.ts';
 import type { ProcessPort } from '../../../../kernel/ports/process-port.ts';
+import { join } from '@std/path';
 import type { ScaffoldResult } from '@netscript/plugin/protocol';
 import { EXIT_CODES } from '../host/plugin-loader.ts';
 import type { ValidatedPluginDescriptor } from '../install/jsr-plugin-validator-port.ts';
@@ -90,16 +91,28 @@ export function resolvePluginScaffoldTarget(
   return `${source.path.replace(/\/+$/, '')}/${localSuffix}`;
 }
 
-/** Dispatch a framework plugin verb through `deno x -A jsr:<pkg>/cli`. */
+/** Dispatch a framework plugin verb through its protected or lockstep CLI resolver. */
 export async function dispatchPluginVerb(
   verb: FrameworkVerb,
   pkg: string,
   args: readonly string[],
   options: DispatchPluginVerbOptions,
 ): Promise<PluginDispatchResult> {
+  const lockstepTarget = resolveLockstepPluginCliUrl(pkg);
+  const commandArgs = lockstepTarget
+    ? [
+      'run',
+      '--config',
+      join(options.projectRoot, 'deno.json'),
+      '-A',
+      lockstepTarget,
+      verb,
+      ...args,
+    ]
+    : ['x', '-A', resolvePluginCliSpecifier(pkg), verb, ...args];
   const result = await options.processRunner.exec(
     'deno',
-    ['x', '-A', resolvePluginCliSpecifier(pkg), verb, ...args],
+    commandArgs,
     { cwd: options.projectRoot },
   );
 
@@ -112,6 +125,14 @@ export async function dispatchPluginVerb(
   }
 
   return result;
+}
+
+function resolveLockstepPluginCliUrl(pkg: string): string | undefined {
+  const match = /^(?:jsr:)?@netscript\/([^/@]+)(?:@([^/]+))?(?:\/cli)?$/.exec(pkg);
+  if (!match) return undefined;
+  const version = match[2] ?? NETSCRIPT_RELEASE_VERSION;
+  if (version !== NETSCRIPT_RELEASE_VERSION) return undefined;
+  return `https://jsr.io/@netscript/${match[1]}/${version}/cli.ts`;
 }
 
 /** Dispatch a plugin-owned scaffold entrypoint and parse its JSON result. */

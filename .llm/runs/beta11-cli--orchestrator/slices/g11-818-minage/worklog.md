@@ -89,6 +89,7 @@ exception.
 | --- | --- | --- | --- |
 | 2026-07-18T02:03:59+02:00 | Plan | Research + Design checkpoint | Re-baselined #818/#817, verified Deno 2.9 config key/parser, inventoried product call sites, locked three implementation slices. |
 | 2026-07-18T02:20:00+02:00 | S1 | Implement + validate | Added the finite release-train inventory and generated JSR-only `P1D` policy with exact exclusions; local mode remains policy-free. |
+| 2026-07-18T02:30:00+02:00 | S2 | Implement + validate | Routed only effective lockstep first-party plugin CLIs through direct JSR URLs with the project config; preserved protected `deno x` argv for third-party and old-version inputs. |
 
 ## Decisions
 
@@ -115,10 +116,16 @@ exception.
 | Scoped check/lint/fmt wrappers | PASS | 3 files selected; zero failures/findings. |
 | `quality:scan` | PASS | Repository scan `ok: true`, zero findings; seven existing allowances reported. |
 | `arch:check` | PASS | Exit 0; existing dependency/doctrine warnings only, no new failure. |
+| Tier-A S1 review | PASS | Supervisor sign-off confirmed D1/D3/D4 and both-mode generator coverage. |
+| Focused S2 dispatch tests | PASS | Dispatch + AI test files: 4 tests / 11 nested steps passed, 0 failed. |
+| Full public plugins feature directory | PASS | 22 tests / 54 nested steps passed, 0 failed. |
+| S2 scoped check/lint/fmt wrappers | PASS | 4 files selected; zero failures/findings. |
+| S2 `quality:scan` | PASS | Repository scan `ok: true`, zero findings; seven existing allowances reported. |
+| S2 `arch:check` | PASS | Exit 0; existing dependency/doctrine warnings only, no new failure. |
 
 ## Handoff Notes
 
-- S1 is ready for Tier-A review. The finite list contains scaffold packages, engine packages, and
-  the six published connector packages; every emitted constraint is pinned to
-  `NETSCRIPT_RELEASE_VERSION`.
-- Product changes are limited to the S1 files named in `plan.md`; S2/S3 are untouched.
+- S2 is ready for Tier-A review. Unversioned first-party specs become release-matched; explicitly
+  matching specs also use direct `jsr.io` `cli.ts`; explicitly different versions and third-party
+  specs retain the exact existing `deno x -A jsr:.../cli` shape.
+- S3 agent-init and documentation scope is untouched.

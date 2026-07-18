@@ -52,6 +52,10 @@ first-party `deno x` paths with one explicit `deno run` resolver. No product imp
 | `packages/cli/src/kernel/constants/scaffold/scaffold-workspace-packages.ts` | modified | Finite scaffold, engine, and connector release-train inventory. |
 | `packages/cli/src/kernel/templates/workspace/deno-json.ts` | modified | JSR-only scoped `minimumDependencyAge` policy. |
 | `packages/cli/src/kernel/templates/workspace/generators_test.ts` | modified | Exact exclusions, uniqueness, third-party scope, and local-mode regressions. |
+| `packages/cli/src/public/features/plugins/dispatch/dispatch-plugin-verb.ts` | modified | Direct lockstep resolver with protected fallback. |
+| `packages/cli/src/public/features/plugins/dispatch/dispatch-plugin-verb_test.ts` | modified | Full argv tests for unversioned/exact lockstep, third-party, and old-version inputs. |
+| `packages/cli/src/public/features/plugins/ai/ai-plugin-command.ts` | modified | Direct published `cli.ts` execution with explicit project config. |
+| `packages/cli/src/public/features/plugins/ai/ai-plugin-command_test.ts` | modified | Exact AI command-array regression. |
 | `.llm/runs/beta11-cli--orchestrator/slices/g11-818-minage/*` | modified | S1 evidence and handoff. |
 
 ## Gates
@@ -59,14 +63,14 @@ first-party `deno x` paths with one explicit `deno run` resolver. No product imp
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
 | Plan | PASS | Supervisor Tier-A verdict approved D1–D6. |
-| Static | PASS (S1) | Scoped check/lint/fmt wrappers: zero findings. |
-| Fitness | PASS (S1) | `quality:scan` and `arch:check` exited 0. |
-| Runtime | PASS (S1) | Full workspace-template tests: 15/15; generated config parser: `config-ok`. |
+| Static | PASS (S1–S2) | Latest scoped check/lint/fmt wrappers: 4 files, zero findings. |
+| Fitness | PASS (S1–S2) | Latest `quality:scan` and `arch:check` exited 0. |
+| Runtime | PASS (S1–S2) | Full public plugins directory: 22 tests / 54 nested steps; S1 parser remains `config-ok`. |
 | Consumer | DEFERRED | Full scaffold runtime remains the S3 merge-readiness gate. |
 
 ## Open Questions
 
-- None blocking the S1 Tier-A review. Fresh canary proof remains behind the in-turn owner publish
+- None blocking the S2 Tier-A review. Fresh canary proof remains behind the in-turn owner publish
   stop-line.
 
 ## Drift and Debt
@@ -77,4 +81,5 @@ first-party `deno x` paths with one explicit `deno run` resolver. No product imp
 ## Commits
 
 - `260c5eea` — Plan/Design bootstrap.
-- S1 commit — populated after commit; see draft PR #856 and its S1 evidence comment.
+- `af9e0181` — S1 generated-project minimum-age policy.
+- S2 commit — populated after commit; see draft PR #856 and its S2 evidence comment.
