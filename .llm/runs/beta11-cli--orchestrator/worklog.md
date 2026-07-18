@@ -189,3 +189,8 @@ group launch; this section fixes the supervisor's surface.
   family, 13 READMEs) launched with the baseline-drift trap called out. Seed run: adversarial
   round 3 (3B/3M/1m all accepted) + synthesis committed; owner fork N1 posted on #850;
   ratification package = F-1…F-17 + SC-1…SC-6 + N1.
+- 2026-07-18 · #861 MERGED (fbb32119) → #815 CLOSED. Full pipeline trail: B1 (3-pass, supervisor
+  escalation fix), B2 (2-pass), B3B4 (2-pass, supervisor tagline fix), B5+whole-set (first-pass
+  PASS), 36-page consistency pass, zero-edit polish. #816 pipeline FIRED: lane-1 criteria author
+  (Fable·high) running in wt-g14-816 off post-#861 main. Milestone-13 remaining: #816 (running),
+  #824 (owner ratification), run-record PRs.
