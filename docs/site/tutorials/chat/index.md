@@ -4,6 +4,7 @@ title: AI Chat
 templateEngine: [vento, md]
 prev: { label: "Tutorials", href: "/tutorials/" }
 next: { label: "1 · Scaffold", href: "/tutorials/chat/01-scaffold/" }
+order: 2
 ---
 
 # AI Chat
@@ -114,3 +115,5 @@ its transcript, how a tool call (yours or a remote MCP server's) lands as a dura
 and how MCP `ui://` widgets render themed and sandboxed inside the chat.
 
 {{ comp.nextPrev({ prev: { label: "Tutorials", href: "/tutorials/" }, next: { label: "1 · Scaffold", href: "/tutorials/chat/01-scaffold/" } }) }}
+
+After this track, keep building in **Build › [AI & Agents](/ai/)** — the guides and recipes there pick up where these chapters stop.

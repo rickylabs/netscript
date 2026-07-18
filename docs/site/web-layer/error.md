@@ -2,6 +2,7 @@
 layout: layouts/base.vto
 title: Error handling and diagnostics
 templateEngine: [vento, md]
+order: 9
 ---
 
 # Error handling and diagnostics

@@ -4,6 +4,7 @@ title: The plugin system
 templateEngine: [vento, md]
 prev: { label: "Contracts & type flow", href: "/explanation/contracts/" }
 next: { label: "Auth model", href: "/explanation/auth-model/" }
+order: 3
 ---
 
 # The plugin system
@@ -269,7 +270,7 @@ and topics through the same vocabulary — each running as its own isolated reso
 ## Where to go next
 
 {{ comp.featureGrid({ items: [
-  { title: "Add a first-party plugin", body: "The task-oriented recipe: scaffold, register, regenerate, verify.", href: "/how-to/add-a-plugin/", icon: "🔌" },
+  { title: "Add a first-party plugin", body: "The task-oriented recipe: scaffold, register, regenerate, verify.", href: "/orchestration-runtime/how-to/add-a-plugin/", icon: "🔌" },
   { title: "The auth model", body: "The five-unit core/adapter/plugin split — the model at its richest.", href: "/explanation/auth-model/", icon: "🔐" },
   { title: "Orchestration with Aspire", body: "How the AppHost turns manifests into running API and background resources.", href: "/explanation/aspire/", icon: "🧩" },
   { title: "Plugin authoring contract", body: "definePlugin(), the contribution axes, and the registry emitter.", href: "/reference/plugin/", icon: "📐" }

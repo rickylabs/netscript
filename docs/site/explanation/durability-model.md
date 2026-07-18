@@ -4,9 +4,12 @@ title: Durability model
 templateEngine: [vento, md]
 prev: { label: "Auth model", href: "/explanation/auth-model/" }
 next: { label: "Observability", href: "/explanation/observability/" }
+order: 5
 ---
 
 # Durability model
+
+*This essay is the **why** — the model and its trade-offs. The day-to-day *how* (guides, recipes, API) lives in **Build › [Durable workflows](/durable-workflows/)**.*
 
 This essay is **understanding-oriented**. It answers one question: *how does NetScript make
 long-running, message-driven work survive a process restart?* It builds the mental model — what a

@@ -125,9 +125,9 @@ documented in the sections above.
 
 ## See it live
 
-- **How-to:** [Queue / KV / cron](/how-to/queue-kv-cron/) — enqueue, consume, and schedule against
+- **How-to:** [Queue / KV / cron](/data-persistence/how-to/queue-kv-cron/) — enqueue, consume, and schedule against
   these symbols end to end.
-- **How-to:** [Choose a queue provider](/how-to/choose-a-queue-provider/) — pick and pin a backend
+- **How-to:** [Choose a queue provider](/data-persistence/how-to/choose-a-queue-provider/) — pick and pin a backend
   from the `QueueProvider` enum above.
 - **Concept:** [KV, queues & cron](/data-persistence/kv-queues-cron/) — why a queue is
   provider-agnostic and how Aspire wires the four backends.

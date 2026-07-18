@@ -2,6 +2,7 @@
 layout: layouts/base.vto
 title: Deferred and streaming UI
 templateEngine: [vento, md]
+order: 6
 ---
 
 # Deferred and streaming UI

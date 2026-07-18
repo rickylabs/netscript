@@ -152,7 +152,7 @@ observable, correctly-wired stack on <strong>one machine</strong>. The Postgres 
 are throwaway Docker containers for dev convenience — <strong>not</strong> your production database or
 cache, and the <code>kv-oauth</code> session store and auth credentials here are local-dev values. For
 a remote target you point processes at managed infrastructure and let your platform own lifecycle;
-that is the <a href="/how-to/deploy/">Deploy</a> recipe.
+that is the <a href="/orchestration-runtime/how-to/deploy/">Deploy</a> recipe.
 {{ /comp }}
 
 {{ comp callout { type: "warning", title: "Footguns when aspire start will not boot" } }}
@@ -181,7 +181,7 @@ gets a `401`; the engineer you paged gets provisioned without anyone waiting on 
 
 ## Where to go next
 
-- **Ship it remotely** → [Deploy](/how-to/deploy/) — the production companion: deployable units,
+- **Ship it remotely** → [Deploy](/orchestration-runtime/how-to/deploy/) — the production companion: deployable units,
   managed backing services, and the `--no-aspire` path.
 - **Go deeper on auth** → [Authentication capability](/capabilities/auth/) and
   [The authentication model](/explanation/auth-model/).

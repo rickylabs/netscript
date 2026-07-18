@@ -4,6 +4,7 @@ title: Orchestration with Aspire
 templateEngine: [vento, md]
 prev: { label: "Observability", href: "/explanation/observability/" }
 next: { label: "Capabilities", href: "/capabilities/" }
+order: 7
 ---
 
 # Orchestration with Aspire

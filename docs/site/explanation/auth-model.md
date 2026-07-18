@@ -4,9 +4,12 @@ title: The pure-backend auth model
 templateEngine: [vento, md]
 prev: { label: "The plugin system", href: "/explanation/plugin-system/" }
 next: { label: "Durability model", href: "/explanation/durability-model/" }
+order: 4
 ---
 
 # The pure-backend auth model
+
+*This essay is the **why** — the model and its trade-offs. The day-to-day *how* (guides, recipes, API) lives in **Build › [Identity & Access](/identity-access/)**.*
 
 This page explains *what* NetScript authentication actually is, *why* it is designed as a
 **pure-backend seam** rather than a built-in identity provider, and *how* a single typed port lets
@@ -14,7 +17,7 @@ you swap GitHub OAuth for WorkOS or better-auth without touching one line of app
 understanding-oriented — read it to build the mental model before you wire authentication into a
 project. When you want the headline API and endpoints, see the
 [auth capability](/capabilities/auth/); when you want to do the task, follow
-[Add authentication](/how-to/add-authentication/); when you want exact exported symbols, follow
+[Add authentication](/identity-access/how-to/add-authentication/); when you want exact exported symbols, follow
 [`reference/service/`](/reference/service/) and the auth adapter references it links to.
 
 {{ comp callout { type: "important", title: "Alpha status" } }}
@@ -248,7 +251,7 @@ boundary, you own the logic) — authentication is just the identity-shaped inst
 
 - **The capability:** [Authentication](/capabilities/auth/) — the headline API, the `auth-api`
   service on :8094, the five endpoints, and the backend matrix at a glance.
-- **Do it:** [Add authentication](/how-to/add-authentication/) — add the `auth` plugin, choose a
+- **Do it:** [Add authentication](/identity-access/how-to/add-authentication/) — add the `auth` plugin, choose a
   backend with `NETSCRIPT_AUTH_BACKEND`, run the migration, and wire provider env.
 - **Related model:** [The plugin system](/explanation/plugin-system/) — why a thin plugin composes a
   pure capability, the same shape this auth seam follows.

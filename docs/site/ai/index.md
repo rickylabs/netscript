@@ -148,3 +148,12 @@ seams those products are made of.
   { eyebrow: "API Reference", title: "@netscript/plugin-ai", body: "Generated symbols for the thin AI plugin delivery shell.", href: "/reference/plugin-ai/", icon: "R" },
   { eyebrow: "API Reference", title: "@netscript/plugin-ai-core", body: "Generated symbols for the AI plugin's reusable contract and composition core.", href: "/reference/plugin-ai-core/", icon: "R" }
 ] }) }}
+
+## Learn, do, look up
+
+{{ comp.cardsGrid({ columns: 4, cards: [
+  { eyebrow: "Learn", title: "AI chat tutorial", body: "A durable, tool-calling chat with MCP and live streaming.", href: resolveXref("tut:chat").href },
+  { eyebrow: "Do", title: "Recipes", body: "Task-oriented recipes for this area, one problem each.", href: "/ai/how-to/" },
+  { eyebrow: "Look up", title: "`@netscript/ai` reference", body: "Generated API reference. Related units: `plugin-ai`, `mcp`.", href: resolveXref("ref:ai").href },
+  { eyebrow: "Understand", title: "The plugin system", body: "The design rationale behind this pillar.", href: resolveXref("explain:plugin-system").href },
+] }) }}

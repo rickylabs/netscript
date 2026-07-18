@@ -180,11 +180,11 @@ That progression — **one agreed message shape → durable delivery → live st
 NetScript real-time surface is built from; you just built it in its AI-chat form. Where to go next:
 
 - Reach for the durable-chat seams directly with the
-  [Build a durable chat](/how-to/build-a-durable-chat/) recipe.
+  [Build a durable chat](/ai/how-to/build-a-durable-chat/) recipe.
 - Restyle any chat or widget component — you own the copied source:
-  [Customize Fresh UI](/how-to/customize-fresh-ui/).
+  [Customize Fresh UI](/web-layer/how-to/customize-fresh-ui/).
 - Model live list/board/table data (the other real-time plane) with
-  [Publish a durable stream](/how-to/publish-a-durable-stream/).
+  [Publish a durable stream](/durable-workflows/how-to/publish-a-durable-stream/).
 - Compose the provider-neutral engine — model registry, agent loop, tool registry, MCP
   transports: [AI engine](/ai/engine/).
 - Look up exact signatures in the [fresh reference](/reference/fresh/).

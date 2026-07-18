@@ -4,6 +4,7 @@ title: Telemetry & logging
 templateEngine: [vento, md]
 prev: { label: "KV, queues & cron", href: "/data-persistence/kv-queues-cron/" }
 next: { label: "Fresh UI & design", href: "/web-layer/fresh-ui/" }
+order: 1
 ---
 
 # Telemetry & logging
@@ -44,7 +45,7 @@ orchestrator — they are not separate processes you start by hand. Run
 command (Aspire provisions Postgres and Redis first), then open the dashboard URL printed in
 the console (<code>https://localhost:18888</code>, with a one-time auth token). Until Aspire is
 running there is no <code>:18888</code> surface to view traces or logs on. See
-<a href="/how-to/database-migration/">Database &amp; migration</a> for the full startup order.
+<a href="/data-persistence/how-to/database-migration/">Database &amp; migration</a> for the full startup order.
 {{ /comp }}
 
 ## The story: one grouped trace, end to end
@@ -100,7 +101,7 @@ NetScript-owned keys under the single proprietary root `netscript.*` — correla
   {
     title: "Do — Add OpenTelemetry",
     body: "Task-oriented recipe: lean on the automatic job spans, add custom spans via @netscript/telemetry withChildSpan, propagate traceparent across services and subprocesses, and point the OTLP export (:4318) at the dashboard.",
-    href: "/how-to/add-opentelemetry/",
+    href: "/observability/how-to/add-opentelemetry/",
     icon: "◆"
   },
   {
@@ -485,7 +486,7 @@ This hub is intentionally thin — the full generated API lives in the reference
   {
     title: "Do — Add OpenTelemetry",
     body: "Task-oriented recipe: lean on the automatic job spans, add custom spans via @netscript/telemetry withChildSpan, propagate traceparent across services and subprocesses, and point the OTLP export (:4318) at the dashboard.",
-    href: "/how-to/add-opentelemetry/",
+    href: "/observability/how-to/add-opentelemetry/",
     icon: "◆"
   },
   {

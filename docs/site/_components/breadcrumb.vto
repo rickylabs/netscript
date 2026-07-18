@@ -1,38 +1,52 @@
-{{# breadcrumb.vto — derives a Home / Section / Page trail from the current page
-   url matched against navSections. Both pageUrl and the candidate hrefs are
-   base-prefixed via the `url` filter so they compare on equal footing (same
-   rule as the sidebar active-highlight). On the home page the trail collapses
-   to just "Home" (rendered as plain text, no link). All colors key off the
-   existing fresh-ui --ns-* tokens. #}}
+{{# breadcrumb.vto — lane-prefixed trail derived from nav.breadcrumb(url)
+   (root→page order), prefixed with the owning navLanes lane label so
+   /web-layer/query/ reads Home / Build / Web Layer / Data loading & cache.
+   Node/page urls are SOURCE urls (source==source); emitted hrefs are
+   base-prefixed via the `url` filter. Pages outside the nav tree (nav_hide,
+   redirect shims, the how-to catalog) fall back to Home / <title>. #}}
 {{ set homeUrl = "/" |> url }}
-{{ set pageUrl = url |> url }}
 
-{{# Build the trail: always start with Home. Then, unless we ARE home, find the
-   nav section + item this page belongs to and append section label + page. #}}
-{{ set crumbSection = null }}
-{{ set crumbItem = null }}
-{{ for section of navSections }}
-  {{ for item of section.items }}
-    {{ set itemUrl = item.href |> url }}
-    {{ if itemUrl !== homeUrl && pageUrl.startsWith(itemUrl) }}
-      {{ set crumbSection = section }}
-      {{ set crumbItem = item }}
-    {{ /if }}
-  {{ /for }}
+{{ set laneLabel = null }}
+{{ for lane of navLanes }}
+  {{ if lane.kind === "flat" }}
+    {{ for item of lane.items }}
+      {{ if url === item.href }}{{ set laneLabel = lane.label }}{{ /if }}
+    {{ /for }}
+  {{ else }}
+    {{ for root of lane.roots }}
+      {{ if url.startsWith(root) }}{{ set laneLabel = lane.label }}{{ /if }}
+    {{ /for }}
+  {{ /if }}
 {{ /for }}
+
+{{ set crumbs = nav.breadcrumb(url, navQuery, navSort) }}
 
 <nav class="ns-breadcrumb" aria-label="Breadcrumb">
   <ol class="ns-breadcrumb__list">
-    {{ if pageUrl === homeUrl }}
+    {{ if url === "/" }}
       <li class="ns-breadcrumb__item" aria-current="page">Home</li>
     {{ else }}
       <li class="ns-breadcrumb__item"><a href="{{ homeUrl }}">Home</a></li>
-      {{ if crumbSection }}
+      {{ if laneLabel }}
         <li class="ns-breadcrumb__sep" aria-hidden="true">/</li>
-        <li class="ns-breadcrumb__item">{{ crumbSection.label }}</li>
+        <li class="ns-breadcrumb__item">{{ laneLabel }}</li>
       {{ /if }}
-      <li class="ns-breadcrumb__sep" aria-hidden="true">/</li>
-      <li class="ns-breadcrumb__item" aria-current="page">{{ if crumbItem }}{{ crumbItem.label }}{{ else }}{{ title }}{{ /if }}</li>
+      {{ set rendered = 0 }}
+      {{ for crumb of crumbs }}
+        {{ if crumb.data && crumb.data.url !== "/" }}
+          <li class="ns-breadcrumb__sep" aria-hidden="true">/</li>
+          {{ if crumb.data.url === url }}
+            <li class="ns-breadcrumb__item" aria-current="page">{{ crumb.data.nav_title || crumb.data.title }}</li>
+          {{ else }}
+            <li class="ns-breadcrumb__item"><a href="{{ crumb.data.url |> url }}">{{ crumb.data.nav_title || crumb.data.title }}</a></li>
+          {{ /if }}
+          {{ set rendered = rendered + 1 }}
+        {{ /if }}
+      {{ /for }}
+      {{ if rendered === 0 }}
+        <li class="ns-breadcrumb__sep" aria-hidden="true">/</li>
+        <li class="ns-breadcrumb__item" aria-current="page">{{ title }}</li>
+      {{ /if }}
     {{ /if }}
   </ol>
 </nav>
