@@ -15,8 +15,8 @@ Define your API once as an oRPC contract. The typed Hono service and the typed S
 derive from it — server and callers cannot drift apart. Background jobs, sagas, triggers, event
 streams, auth, and AI install as first-party plugins behind the same unified API. .NET Aspire brings
 the whole graph up locally with one command. And it ships: from a single compiled binary to a
-multi-cloud distributed infrastructure, observability on by default, a coding agent able to operate
-the whole workspace.
+multi-cloud distributed infrastructure, observability on by default — one toolchain shared by you
+and the coding agent you work with.
 
 NetScript is a framework and workspace generator, not a hosted service — you run it on Deno and own
 all the generated code.
@@ -91,7 +91,7 @@ plugins, and the Aspire-provisioned platform.
 
 ```mermaid
 flowchart TD
-  AGENT["Coding agent / developer<br/>netscript CLI · skills · MCP server"]
+  AGENT["Developer + coding agent<br/>netscript CLI · skills · MCP server"]
   UI["Fresh UI + @netscript/sdk<br/>islands · typed oRPC clients · cached queries"]
   CONTRACT["@netscript/contracts<br/>one oRPC contract — the single source of truth"]
   SVC["@netscript/service<br/>Hono + oRPC · health probes · OpenAPI · tracing · graceful shutdown"]
@@ -124,10 +124,21 @@ Durable jobs, compensating sagas, trigger ingress, replayable streams, pluggable
 AI surface — first-party plugins, in the box. Not the integration project that Next.js, Nuxt,
 SvelteKit, or Angular leave you to assemble around the frontend.
 
-A plugin is, at its core, a manifest: plain, validated data hosts inspect without executing plugin
-code. One install — `netscript plugin install worker --name workers` — scaffolds the workspace,
-registers the API service, provisions storage, and adds the plugin's resources to the Aspire AppHost
-so everything starts with the app.
+NetScript does not try to be everything. It aims to be the right tool for the right job — and the
+way it gets there is the plugin system. A plugin is, at its core, a manifest: plain, validated data
+declaring what it contributes, inspected by hosts without executing plugin code. And a plugin
+contributes to **every layer at once** — CLI verbs, scaffolded code, runtime services, storage,
+stream topics, telemetry, and Aspire resources. Watch one install touch all of them:
+
+```bash
+netscript plugin install worker --name workers
+# Installed worker plugin "workers" on port 8091.
+# Created 4 plugin files.
+# Regenerated 12 Aspire helper files.
+```
+
+The same mechanism that ships the six first-party plugins below is how a team extends the framework
+for its own needs — no host edits, no forks.
 
 | Plugin                                     | What it gives you                                                                                                                           |
 | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -262,9 +273,12 @@ verified `manualUpdateUrl` instead of replacing themselves in place.
 
 ---
 
-## 🤖 Operable by coding agents
+## 🤖 Built for devs working with agents
 
-The agent story is deliberate, not bolted on. One command wires the whole triple into your project:
+Not a framework for agents instead of developers — a framework for developers who work with one. The
+properties that make NetScript easy for you to adopt, review, and debug — one unified API, typed end
+to end, reference docs generated from source — are exactly what make it legible to a coding agent.
+So the agent tooling ships first-party, with you in control. One command wires it in:
 
 ```bash
 netscript agent init
@@ -287,9 +301,11 @@ the release it runs.
   `marketplace`, `db reset`, `plugin remove`, `ui:remove`), deny beats allow, anything unmatched is
   denied.
 
-The server runs on Deno 2.9+ with a minimal stdio JSON-RPC transport — no npm MCP SDK in the
-dependency graph. It complements Aspire's own MCP server rather than replacing it: Aspire speaks
-resources and containers; this server speaks your app.
+You review the agent's work the way you review a colleague's: typed diffs, one correlated trace per
+execution, and a command gate that keeps destructive verbs in human hands. The server runs on Deno
+2.9+ with a minimal stdio JSON-RPC transport — no npm MCP SDK in the dependency graph — and
+complements Aspire's own MCP server rather than replacing it: Aspire speaks resources and
+containers; this server speaks your app.
 
 ---
 

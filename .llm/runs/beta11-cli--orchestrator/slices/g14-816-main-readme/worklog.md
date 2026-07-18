@@ -288,3 +288,44 @@ compact-prose style rule)
   MERMAID_PARSE_OK flowchart-v2; internal-wording grep zero hits.
 - Site: `deno task build` → 531 files, 6.75 s; `docs:links` → 98 docs, 0 broken;
   index.vto wording grep zero hits.
+
+## Narrative pass — 2026-07-18 (Lane 4, three owner directives; final refinement)
+
+Base: 36183138 (supervisor claim-precision surgery 56bab8ff preserved untouched — narrowed
+derivation guarantee and reframed frontend contrast kept verbatim).
+
+1. **"Built for devs working with agents."** Agent chapter retitled and reframed in BOTH artifacts:
+   the causality is explicit — the properties that make NetScript human-adoptable (one unified
+   API, typed end to end, reference docs generated from source) are exactly what make it legible
+   to an agent; the developer stays in control ("destructive verbs stay in human hands", grounded
+   in the 6-deny command gate, command-policy.ts:24-49; "typed diffs, one correlated trace per
+   execution" grounded in contracts/telemetry citations). README hero line and homepage subhead
+   now say "one toolchain shared by you and the coding agent you work with"; homepage who-for
+   card retitled "Devs working with agents"; mermaid AGENT node relabeled "Developer + coding
+   agent" (re-parsed OK). All "built for agents"/"first-class user (agent)" phrasing that implied
+   humans secondary removed.
+2. **Plugin-system philosophy elevated.** Both artifacts now state: NetScript does not try to be
+   everything — right tool for the right job via the plugin system; a plugin contributes to EVERY
+   layer at once (CLI verbs, scaffolded code, runtime services, storage, stream topics, telemetry,
+   Aspire resources) and the same mechanism serves team/enterprise extension. Every-layer claim
+   citations: manifest contribution axes (packages/plugin/README.md:12-14,24-26), CLI-verb routing
+   `dispatchPluginVerb` (packages/cli/README.md:27-31), `./aspire` subpath contribution
+   (plugins/workers/README.md:36-37), and the EXECUTED install output (scaffold files + API
+   service on 8091 + 12 regenerated Aspire helpers) shown verbatim as the proof element. README
+   moves the real install output into this section as the jaw-drop example; homepage keeps it as
+   the section's tab.
+3. **Storyline discipline.** Both artifacts read top-to-bottom as one arc: promise (hero) → proof
+   in 5 minutes (quickstart / four-tab flow) → model (four moves) → scope philosophy (batteries +
+   plugins-every-layer) → reach (ship anywhere) → partnership (devs with agents) → docs → honest
+   status. Deduplicated "No host edits, no forks" (kept once per artifact), no filler transitions
+   or hollow superlatives added; strongest examples remain the four-tab contract flow and the
+   verbatim plugin-install output.
+
+No commands changed; no new claims beyond the two owner-directive framings (cited to the
+directive) and the every-layer claim (cited above). All accuracy fixes from every prior cycle
+verified intact, incl. 56bab8ff wording.
+
+### Gates (re-run)
+README: fmt --check clean · tagline gate over=0 · mermaid re-parse MERMAID_PARSE_OK flowchart-v2 ·
+wording grep zero. Site: build 531 files green · docs:links 98 docs / 0 broken · index.vto wording
+grep zero.
