@@ -143,3 +143,7 @@ group launch; this section fixes the supervisor's surface.
   feat/desktop-frontend normalizes all three (config/fresh-ui/sdk) + lock entries; arch:check
   exit 0 verified. G5 steered to sync base + continue S2. G7 plan-gate PASS (D1–D19; honest
   NOT_RUN platform-leg evidence). G11 S2 signed off; S3 in flight.
+- 2026-07-18 · G11 #818 MERGED to main (23183153), #818 closed — six milestone-13 issues shipped
+  (#826/#802/#804/#818 + wave sub-issues pending wave PR). G7 S2 signed off (real RPC round-trip
+  in fixture; honest EXPECTED_FAIL preflight); S3 = real Linux native apply/rollback leg. G5 on
+  final slice.
