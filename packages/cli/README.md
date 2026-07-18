@@ -147,22 +147,46 @@ manual hook between `deploy build` and `deploy install`.
 ### Native desktop packaging
 
 An enabled app with `Type: "desktop"` in the workspace config packages through its configured task
-hook — the task owns the desktop entrypoint and permissions, and NetScript appends the native Deno
-flags:
+hook:
+
+```json
+{
+  "Type": "desktop",
+  "Enabled": true,
+  "Workdir": "apps/storefront",
+  "PackageTaskName": "desktop:package"
+}
+```
+
+The task owns the desktop entrypoint and permissions; NetScript appends the native Deno flags:
 
 ```bash
+netscript deploy desktop package --app storefront --all-targets \
+  --format app --format appimage --format deb --format rpm --format msi
 netscript deploy desktop package --app storefront \
   --target x86_64-unknown-linux-gnu --format appimage --format deb
 ```
 
-Omitted formats produce all formats for the selected OS: `.app`/`.dmg` on macOS,
-`.AppImage`/`.deb`/`.rpm` on Linux, and `.msi` on Windows. The `.dmg` format requires a macOS host,
-so run an unfiltered `--all-targets` matrix on macOS. Native installers are unsigned at this stage;
-Authenticode, codesign/notarization, and distribution signing are external CI steps, and the CLI
-intentionally accepts no certificate credentials.
+Every invocation uses an explicit target and output path. Omitted formats produce all formats for
+the selected OS: `.app`/`.dmg` on macOS, `.AppImage`/`.deb`/`.rpm` on Linux, and `.msi` on Windows.
+Runtime compression defaults to `xz`; select `--compression none|lzma|zstd` explicitly when needed
+(`zstd` requires the external `zstd` executable). The `.dmg` format requires a macOS host, and an
+unfiltered `--all-targets` includes `.dmg` — run that complete matrix on macOS, or use repeatable
+`--format` filters elsewhere while still cross-compiling the remaining targets.
 
-Prepare and host signed native updates once CI has retained the current and previous runtime
-libraries:
+Native installers are unsigned at this stage. Platform signing is separate from the Ed25519
+update-manifest signature and stays an external CI step between packaging and release preparation:
+
+- **Windows** — Authenticode-sign the `.msi` with `signtool` (SHA-256 timestamp authority), then
+  verify on a clean Windows runner.
+- **macOS** — codesign the `.app` and nested code with a Developer ID identity, sign or create the
+  `.dmg`, notarize with Apple's notary service, and staple/validate the ticket.
+- **Linux** — apply your repository/distribution signing policy to `.deb` and `.rpm`; AppImage
+  signing is likewise an external release-policy step.
+
+The CLI intentionally accepts no certificate credentials and never invokes those platform tools.
+
+Prepare a native update once CI has retained the current and previous runtime libraries:
 
 ```bash
 netscript deploy desktop release prepare \
@@ -171,17 +195,63 @@ netscript deploy desktop release prepare \
   --current-runtime dist/1.2.0/libdenort.so \
   --from 1.1.0=dist/1.1.0/libdenort.so \
   --private-key-file .secrets/update-ed25519.pem
+```
 
+Preparation needs read access to the runtime libraries and the PKCS#8 Ed25519 private key, write
+access to `.deploy/desktop/releases`, and run access to an external bsdiff 4.x-compatible
+executable; the key never leaves the authoring process. Each channel/target route keeps private,
+strictly monotonic sequence state — a failed final manifest replacement burns that sequence, so
+retry with a higher number. Immutable patches are written first, the private high-water second, and
+`latest.json` last.
+
+Serve the prepared tree at the same pathname the SDK release base URL composes:
+
+```bash
 netscript deploy desktop release serve \
   --release-dir .deploy/desktop/releases \
   --hostname 127.0.0.1 --port 8787 --base-path /application
 ```
 
-`prepare` writes Ed25519-signed `latest.json` manifests and bsdiff patches under
-`.deploy/desktop/releases`; the private key never leaves the authoring process. `serve` is a
-GET/HEAD allowlist server for manifests, patches, and installers, intended behind a trusted
-HTTPS-terminating proxy — it never serves private state, dot paths, or traversal escapes.
-Applications consume the hosted tree through `startAutoUpdate` from `@netscript/sdk/auto-update`.
+For `baseUrl: "https://releases.example.com/application"`, the native manifest resolves to
+`/application/<channel>/<os>-<arch>/latest.json`. Terminate public HTTPS at a trusted reverse
+proxy; the built-in listener is transport-neutral and intended for a protected origin. It serves
+only GET/HEAD allowlisted manifests, patches, and installers — private high-water files, dot paths,
+traversal, encoded separators, and symlink escapes are never served.
+
+Windows native apply remains unsupported upstream, so applications handle the SDK seam's
+`applyMode: "manual"` update-ready event and present its trusted `manualUpdateUrl` (this server may
+host the installer, but it does not claim automatic Windows replacement):
+
+```ts
+import { startAutoUpdate } from '@netscript/sdk/auto-update';
+
+startAutoUpdate({
+  release: {
+    baseUrl: 'https://releases.example.com/application',
+    publicKey: 'base64-ed25519-public-key',
+    manualUpdateUrl: 'https://releases.example.com/application/windows-installer',
+  },
+  policy: { checkOnLaunch: true },
+  onUpdateReady(event) {
+    if (event.applyMode === 'manual') showInstallerPrompt(event.manualUpdateUrl);
+  },
+});
+
+declare function showInstallerPrompt(url: string): void;
+```
+
+### Deploy permissions
+
+A host binary embedding the deploy surface must grant:
+
+| Permission      | Why                                                                                                     |
+| --------------- | ------------------------------------------------------------------------------------------------------- |
+| `--allow-run`   | Invoke desktop package tasks, bsdiff/zstd, and deploy tools such as `servy`, Aspire, Docker, or gcloud. |
+| `--allow-read`  | Read the workspace config, entrypoints, and release/secret files.                                       |
+| `--allow-write` | Emit compiled binaries, native artifacts, private high-water state, release files, and env files.       |
+| `--allow-net`   | Listen for release HTTP requests and health-probe activated services.                                   |
+| `--allow-sys`   | Resolve the host OS/triple to select the Servy vs. systemd adapter and compile target.                  |
+| `--allow-env`   | Read the deploy owner principal for the Windows secret-file ACL; provider CLIs read their auth tokens.  |
 
 ## Library surface
 
