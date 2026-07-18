@@ -136,3 +136,72 @@ it did not list or preview every file as claimed.
 
 No README edits, merge, release action, milestone close, seed-run filing, or self-dispatched
 evaluation was performed.
+
+---
+
+## Re-check — fix cycle 1 (`e9e3821b`)
+
+**Final verdict: FAIL — second-FAIL escalation**
+
+Six of the seven original findings are closed, and the quickstart remediation is accepted without
+another full run because its executable sequence did not otherwise change. One revised deploy claim
+remains false under direct beta.10 execution.
+
+### MAJOR — `deploy list` is still described as authoritative even though its operations are false
+
+The revised deploy section correctly removes `emit` from its canonical lifecycle and its grouped
+table covers all ten beta.10 target keys. It then says `netscript deploy list` “prints exactly what
+your installed version supports.” A new clean install of `0.0.1-beta.10` disproves that sentence:
+
+- `netscript deploy list --json` lists all ten expected targets, but advertises `emit` for nine of
+  them (all except `deno-deploy`).
+- `netscript deploy kubernetes --help` exposes only `plan`, `up`, and `down`.
+- The prior direct execution of `netscript deploy kubernetes emit` exited 2 as an unknown command.
+
+The README no longer contains `emit`, which is correct, but it cannot direct users to the known
+false operation inventory as an exact statement of installed support. This is the second FAIL and
+therefore escalates the lane rather than returning it for another silent redaction cycle.
+
+### Closed findings
+
+1. **Desktop/beta.10 scoping — PASS.** `rg 'netscript deploy desktop' README.md` returns no match.
+   The only `deploy desktop package` reference sits under the unambiguous heading “New in
+   `0.0.1-beta.11`: native desktop lane” and immediately says it is “not yet available” in the
+   pinned beta.10 packages. The SDK map likewise says the seam arrives in beta.11.
+2. **Quickstart honesty — PASS.** The heading is now plain “Quickstart”; grep finds no five-minute
+   promise. It tells users to wait for the Postgres resource to report healthy, conditions the
+   database commands and payoff on readiness, and prints the observed recovery step: `aspire stop`
+   followed by `aspire start` after database initialization. No full rerun was required because no
+   other printed quickstart command changed.
+3. **Plugin command — PASS.** In a newly scaffolded beta.10 workspace, exact
+   `netscript plugin install worker --name workers` exited 0, installed the worker plugin, created
+   four plugin files, and regenerated twelve Aspire helper files.
+4. **`emit` wording — PASS.** Case-insensitive whole-word grep of the README returns no match. The
+   canonical lifecycle now names only `plan`, `up`, and `down`, with conditional `status`/`logs`.
+5. **Deno floor — PASS.** The quickstart prerequisite now states Deno 2.9+ and agrees with the
+   limitations section.
+6. **Counts/bench — PASS.** The README now says 29 published packages plus 6 published first-party
+   plugins, explicitly excludes the internal unpublished `@netscript/bench`, and labels the
+   disclosure “Published package map.”
+7. **Dry-run wording — PASS.** It now claims only file/directory counts and no writes, matching the
+   observed beta.10 output.
+
+### Re-check gate log
+
+| Gate                          | Evidence                                                               | Result   |
+| ----------------------------- | ---------------------------------------------------------------------- | -------- |
+| Desktop scoping               | Context grep for beta.10 and desktop; exact-command grep               | PASS     |
+| Quickstart remediation        | Re-read complete section; timing-promise and readiness/recovery greps  | PASS     |
+| Plugin syntax                 | Clean beta.10 install, fresh scaffold, exact install command           | PASS     |
+| Deploy truth                  | Clean beta.10 `deploy list --json`; Kubernetes help; README grep/table | **FAIL** |
+| Prerequisite, counts, dry-run | Exact text assertions and context review                               | PASS     |
+
+### Remaining required fix
+
+Remove or qualify the sentence claiming `netscript deploy list` exactly reflects supported
+operations. Until the CLI's advertised operation arrays match executable verbs, the README should
+use the command only as a target inventory and direct users to `<target> --help` for executable
+operations.
+
+No README edits, merge, release action, milestone close, seed-run filing, or self-dispatched
+evaluation was performed during the re-check.
