@@ -152,3 +152,9 @@ group launch; this section fixes the supervisor's surface.
   Recovery: both threads resumed via the sanctioned agentic:codex-resume path with reconcile
   instructions. Lesson for drift.md: driving long Codex turns as raw `codex exec` children of
   supervisor background tasks couples their lifetimes; prefer the suite resume tool.
+- 2026-07-18 · G7 S3 real Linux leg: HONEST FAIL — packaged binary lacks
+  `op_desktop_verify_ed25519`; install/TLS/manifest-fetch green, staging blocked. G7 fail-closed
+  correctly (structured evidence retained; no green claim). Load-bearing product question routed
+  to G6's thread as a findings-first investigation (in-tree packaging fix vs upstream gap vs e2e
+  invocation error). Wave-close posture decided AFTER the verdict. G5 complete; IMPL-EVAL
+  running.
