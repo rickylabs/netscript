@@ -1,11 +1,11 @@
 ---
 layout: layouts/base.vto
-title: NetScript — type-safe services and durable workflows in one workspace
+title: NetScript — the enterprise-grade meta-framework for Deno
 ---
 
 {{ comp.hero({
-  tagline: "From `netscript init` to a running, type-checked, OpenTelemetry-traced backend — services, durable workflows, authentication, and a design-system UI in one workspace.",
-  subhead: "A Deno-native backend framework where the contract is the product: type-safe services and durable workflows, observable by default, orchestrated with Aspire.",
+  tagline: "One contract. A whole production backend.",
+  subhead: "NetScript is the enterprise-grade meta-framework for Deno: contract-first, end-to-end typed, cloud-agnostic. One unified API from typed services and durable workflows to orchestration, observability, and deploy — one toolchain shared by you and the coding agent you work with.",
   ctas: [
     { label: "Quickstart", href: "/quickstart/", primary: true },
     { label: "Browse the reference", href: "/reference/" },
@@ -13,19 +13,119 @@ title: NetScript — type-safe services and durable workflows in one workspace
   ]
 }) }}
 
-{{ comp callout { type: "note", title: "Beta — API subject to change" } }}
-NetScript is a backend framework and workspace generator, not a hosted service — you run it on
-Deno and own all the generated code. NetScript is in <code>0.0.1</code> beta, shipping
-incrementally, and the API is still moving. Every <code>@netscript/*</code> package shares one aligned version
-(<code>{{ releaseVersion }}</code>) and releases move in lockstep. Scaffolded JSR imports use exact
-<code>{{ releaseSpecifier }}</code> pins for the beta train, so keep package versions aligned when
-you upgrade.
+{{ comp callout { type: "note", title: "Beta" } }}
+NetScript is in beta (<code>{{ releaseVersion }}</code>) and moving quickly — pin your versions.
 {{ /comp }}
 
+<h2>The contract is the product</h2>
+
+<p>
+Define it once; the typed service and every typed client derive from it — server and callers cannot drift apart.
+The tabs below come straight from a workspace scaffolded by
+<code>netscript init my-app --db postgres --service</code> (abridged).
+</p>
+
 {{ comp.tabbedCode({ tabs: [
-  { label: "Define a service", lang: "ts", code: "// One preset wires CORS, request logging, OpenAPI JSON, Scalar docs,\n// RPC (served at /api/rpc/*), service info, and health endpoints —\n// instead of ~40 lines of Hono setup.\nimport { defineService } from '@netscript/service';\nimport { router } from './router.ts';\n\nconst service = await defineService(router, {\n  name: 'users',\n  port: 3000,\n});\n\nawait service.stop();" },
-  { label: "Install & scaffold", lang: "sh", code: "# Install the netscript command from JSR\ndeno install --global --allow-all --name netscript jsr:@netscript/cli" + releaseSpecifier + "\n\n# Scaffold a complete, type-checked workspace.\n# Postgres is the recommended engine; pass --db postgres (mysql, mssql, sqlite also supported).\nnetscript init my-app --db postgres\n\n# Prefer to keep .NET Aspire out of the loop? Opt out:\nnetscript init my-app --db postgres --no-aspire" },
-  { label: "Bring it up", lang: "sh", code: "# Aspire is step 2: it brings up Postgres and Redis first\ncd my-app/aspire && aspire start\n\n# Then, in the workspace root, initialize the database\nnetscript db init\n\n# Open the Aspire dashboard at https://localhost:18888 to see\n# every resource, service, trace, and log in one place." }
+  { label: "1 · The contract", lang: "ts", code: "// contracts/versions/v1/users.contract.ts — scaffolded for you.\n// One entity schema fans out into a whole CRUD contract.\n// (@database/zod is emitted by `netscript db generate` in tab 4.)\nimport { createCrudContract } from '@netscript/contracts/crud';\nimport { UserCreateInput, UserSchema, UserUpdateInput } from '@database/zod';\n\nexport const UsersCrudContractV1 = createCrudContract({\n  resource: 'users',\n  entitySchema: UserSchema,\n  createSchema: UserCreateInput,\n  updateSchema: UserUpdateInput,\n});" },
+  { label: "2 · The service", lang: "ts", code: "// Runnable once the database types exist (`netscript db generate`, tab 4).\n// One preset wires CORS, request logging, OpenAPI JSON, Scalar docs,\n// RPC (served at /api/rpc/*), service info, and health endpoints —\n// instead of ~40 lines of Hono setup.\nimport { defineService } from '@netscript/service';\nimport { router } from './router.ts';\n\nconst service = await defineService(router, {\n  name: 'users',\n  port: 3000,\n});\n\nawait service.stop();" },
+  { label: "3 · Scaffold", lang: "sh", code: "# Install the netscript command from JSR (Deno 2.9+)\ndeno install --global --allow-all --name netscript jsr:@netscript/cli" + releaseSpecifier + "\n\n# Scaffold the workspace shown in tabs 1-2: contracts + the typed\n# users service + Postgres + Aspire orchestration.\n# Postgres is the recommended engine (mysql, mssql, sqlite also supported).\nnetscript init my-app --db postgres --service\n\n# Prefer to keep .NET Aspire out of the loop? Opt out:\nnetscript init my-app --db postgres --service --no-aspire" },
+  { label: "4 · Bring it up", lang: "sh", code: "# Aspire is step 2: it brings up Postgres and the cache first\ncd my-app/aspire\naspire restore   # one-time: downloads the AppHost SDK modules\naspire start     # starts everything and prints the dashboard URL\n\n# Open the dashboard; once postgres reports healthy, initialize it\n# from the workspace root:\ncd ..\nnetscript db init --name init\nnetscript db generate   # emits @database/zod, used by tabs 1-2\nnetscript db seed" }
+] }) }}
+
+<h2>One contract, four moves</h2>
+
+<p>
+<strong>Contract → service → plugins → platform.</strong> You author the contract;
+<code>defineService</code> turns it into a running Hono + oRPC app; plugins add durable
+capabilities behind the same contract style; <code>@netscript/aspire</code> provisions and connects
+the infrastructure — Aspire SDK behind an adapter, no .NET type in any public signature. Service
+locations resolve at call time from orchestrator-injected environment variables: the same client
+code runs against local processes, containers, and deployed endpoints. No registry, no config
+file.
+</p>
+
+{{ comp.diagram({ src: "/assets/diagrams/architecture-overview.svg", alt: "A NetScript workspace: contracts define services; services, workers, sagas, triggers, streams, and auth plugins register against a host; the AppHost materializes each as an Aspire resource alongside Postgres, Redis, and the dashboard.", caption: "The whole system in one picture: contracts at the center, plugins contributing to a host, and the AppHost bringing every resource up together." }) }}
+
+<p>
+Observability is not an add-on: telemetry stitches scheduler → queue → worker → RPC → SSE spans
+into one distributed trace using Deno's built-in OTLP exporter — zero OpenTelemetry SDK dependency
+by default — and the Aspire dashboard shows every resource, trace, and log in one place.
+</p>
+
+<h2>Batteries no frontend framework ships</h2>
+
+<p>
+Durable jobs, compensating sagas, trigger ingress, replayable streams, pluggable auth, an
+in-process AI surface — first-party plugins, in the box, not an integration project.
+</p>
+
+<p>
+NetScript does not try to be everything: right tool for the right job, reached through the plugin
+system. A plugin is a validated manifest that can contribute across every layer — CLI verbs,
+scaffolded code, runtime services, storage, stream topics, telemetry, Aspire resources — and the
+host materializes whatever it declares. The mechanism behind the six first-party plugins is
+how a team extends the framework for its own needs, on the same rails. One command,
+four plugin files scaffolded and twelve Aspire helpers regenerated:
+</p>
+
+{{ comp.tabbedCode({ tabs: [
+  { label: "Install a plugin", lang: "sh", code: "netscript plugin install worker --name workers\n# Installed worker plugin \"workers\" on port 8091.\n# Created 4 plugin files.\n# Regenerated 12 Aspire helper files." }
+] }) }}
+
+{{ comp.featureGrid({ items: [
+  { title: "workers", body: "Durable jobs and workflows; tasks in 4 runtimes (Deno, PowerShell, Python, shell) with at-least-once delivery keyed on idempotencyKey.", href: "/background-processing/" },
+  { title: "sagas", body: "Durable multi-step workflows with compensation — saga state persists, so a crash mid-flow resumes instead of stranding half-applied effects.", href: "/durable-workflows/" },
+  { title: "triggers", body: "Webhook, scheduled, and file-watch ingress with ack-then-process semantics, idempotency, retry, and dead-lettering.", href: "/durable-workflows/" },
+  { title: "streams", body: "Durable, replayable typed topics with no database required — the common pipe the other plugins publish to.", href: "/durable-workflows/" },
+  { title: "auth", body: "One auth API with swappable backends (kv-oauth, workos, better-auth), auth schema, and durable session streams.", href: "/identity-access/" },
+  { title: "ai", body: "An app-owned, in-process chat/tool/agent surface — the agent loop runs inside your server process, no AI gateway, no extra network hop.", href: "/ai/" }
+] }) }}
+
+<h2>Ship anywhere</h2>
+
+<p>
+One app model, the whole spectrum: a single compiled binary on one machine, or a multi-cloud
+distributed infrastructure — and, coming next, a native desktop app on a consumer machine.
+Cloud-agnostic by design.
+</p>
+
+<p>
+<code>netscript deploy &lt;target&gt; &lt;op&gt;</code> is one thin router over target adapters
+sharing a canonical lifecycle (<code>plan</code>, <code>up</code>, <code>down</code>, with
+<code>status</code>/<code>logs</code> on the targets that honour them —
+<code>netscript deploy list</code> inventories the installed targets; check
+<code>netscript deploy &lt;target&gt; --help</code> for the exact operations each one ships). Shipped
+lanes today: Docker and Compose, Linux and Windows OS services from a single compiled binary,
+Deno Deploy with a preflight guard, Kubernetes and Azure (Container Apps, App Service, AKS)
+delegating to Aspire, and Cloud Run. Cloud auth stays operator-owned — NetScript mints no
+credentials and hand-authors no Helm/Bicep/Kubernetes manifests.
+</p>
+
+{{ comp callout { type: "note", title: "Coming next — native desktop lane" } }}
+A native desktop deploy target is landing: native installers per OS, Ed25519-signed update
+manifests, and update-ready events surfaced through an SDK seam. See
+<a href="{{ '/how-to/build-a-desktop-frontend/' |> url }}">Build a desktop frontend</a>.
+{{ /comp }}
+
+<h2>Built for devs working with agents</h2>
+
+<p>
+Not a framework for agents instead of developers — a framework for developers who work with one.
+The properties that make NetScript easy for you to adopt, review, and debug — one unified API,
+typed end to end, reference docs generated from source — are exactly what make it legible to a
+coding agent. High-risk operations like deploy, init, and db reset stay behind an explicit deny
+list (deny beats allow; unmatched commands are denied). The CLI is the hands, the skills are the
+playbook, MCP is the eyes; one command wires all three in:
+</p>
+
+{{ comp.tabbedCode({ tabs: [
+  { label: "Equip your agent", lang: "sh", code: "# Auto-detects the agent host, writes the MCP config (.mcp.json for\n# Claude Code, .vscode/mcp.json for VS Code), and installs the skill\n# bundle — all pinned to the installed CLI version.\nnetscript agent init" }
+] }) }}
+
+{{ comp.featureGrid({ items: [
+  { title: "MCP is the eyes", body: "13 token-bounded tools over stdio: app status, run inspection, recent errors, performance analysis, doctor, and docs search. Every result is capped server-side (50 items, 2,000 characters per string) so telemetry never floods the context window.", href: "/ai/mcp/" },
+  { title: "Skills are the playbook", body: "agent init installs three content-hashed skills shipped with the same release as the CLI, so the playbook always matches the binary.", href: "/reference/ai/skills/" },
+  { title: "The CLI is the hands", body: "The MCP execute_command tool shells the real CLI through a default-deny policy gate: 17 allowed command prefixes, 6 explicit denies, deny beats allow, anything unmatched is denied.", href: "/ai/" }
 ] }) }}
 
 <h2>Build real systems, not just CRUD</h2>
@@ -38,7 +138,8 @@ you upgrade.
   { title: "Data & Persistence", body: "Database setup, migrations, multiple datasources, KV, and adapters.", href: "/data-persistence/" },
   { title: "Identity & Access", body: "Principals, sessions, auth backends, roles, scopes, and claims.", href: "/identity-access/" },
   { title: "Orchestration & Runtime", body: "Aspire AppHost, plugin resources, runtime config, deployment, and lifecycle.", href: "/orchestration-runtime/" },
-  { title: "Observability", body: "OpenTelemetry trace context, structured logs, and the Aspire dashboard.", href: "/observability/" }
+  { title: "Observability", body: "OpenTelemetry trace context, structured logs, and the Aspire dashboard.", href: "/observability/" },
+  { title: "AI & Agents", body: "MCP server, agent skills, the in-process AI engine, and durable chat.", href: "/ai/" }
 ] }) }}
 
 <h2>Who it is for</h2>
@@ -46,7 +147,8 @@ you upgrade.
 {{ comp.featureGrid({ items: [
   { title: "Full-stack TypeScript engineers", body: "Stay in TypeScript from the database to the UI, with contracts that catch integration breaks before they ship." },
   { title: "Platform engineers", body: "Standardize internal services on one coherent Deno baseline — multi-resource wiring, a real dashboard, pluggable auth, and tracing already in place." },
-  { title: "Plugin authors", body: "Extend the framework by registering workers, sagas, triggers, auth backends, and streams. No host edits, no forks." }
+  { title: "Plugin authors", body: "Extend the framework by registering workers, sagas, triggers, auth backends, and streams. No host edits, no forks." },
+  { title: "Devs working with agents", body: "netscript agent init gives your agent MCP eyes, a skills playbook, and a policy-gated CLI — high-risk operations like deploy, init, and db reset stay behind an explicit deny list." }
 ] }) }}
 
 <h2>Start the learning path</h2>
