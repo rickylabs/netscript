@@ -194,3 +194,10 @@ group launch; this section fixes the supervisor's surface.
   PASS), 36-page consistency pass, zero-edit polish. #816 pipeline FIRED: lane-1 criteria author
   (Fable·high) running in wt-g14-816 off post-#861 main. Milestone-13 remaining: #816 (running),
   #824 (owner ratification), run-record PRs.
+- 2026-07-18 · #862 MERGED (owner-approved; squash 5f0adeea) → #816 CLOSED. Full pipeline: 4-lane
+  generation, 4 adversarial cycles + 2 supervisor escalation fixes, owner repositioning
+  (enterprise meta-framework) + narrative + de-internalization passes, Kimi K3 zero-edit close.
+  Homepage revamp included. Bugs found en route: #863, #864. Merge mechanics lesson: rerun storm
+  burned the ci workflow to attempt-50 startup_failure (empty-commit reset + rerun cap 2 adopted);
+  close-gate/box-edit race handled. Release-cut gate now = PR #865 (owner-directed; watcher
+  armed) → then AUTOMATIC release-cut prep → HARD STOP at ready-to-merge cut.
