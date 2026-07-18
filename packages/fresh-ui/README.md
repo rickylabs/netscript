@@ -34,6 +34,9 @@ tokens; the components never know.
 - **AI surface collection** — `netscript ui:add ai` installs the chat seams: message thread,
   composer, model picker, tool-call disclosure, and the widget island that renders MCP `ui://`
   resources.
+- **Native desktop chrome** — `createDesktopChrome` on `./desktop` activates application menus,
+  tray, dialogs, notifications, and window actions around an existing Deno Desktop window, and
+  returns an inert browser-safe lifecycle everywhere else.
 
 ## Architecture
 
@@ -109,6 +112,7 @@ type Session = { name: string; tokens: number; status: string };
 | `./interactive`  | `Accordion`, `Combobox`, `Dialog`, `Drawer`, `Popover`, `Sheet`, `Tabs`, `Tooltip` |
 | `./primitives`   | `Icon`, `Show`, `SrOnly`, `VisuallyHidden` — headless platform primitives          |
 | `./ai/render-ui` | `RenderUiSurface`, `renderUiPayload` — the safe generative-UI renderer             |
+| `./desktop`      | `createDesktopChrome` — menus, tray, dialogs, notifications, window actions        |
 | `./registry`     | The registry manifest and content map the CLI copies from                          |
 
 The always-current symbol list is

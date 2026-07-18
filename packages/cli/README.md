@@ -34,6 +34,20 @@ NetScript owns the verbs and you own the process boundary.
   subprocesses.
 - **Agent tooling in one command** — `netscript agent init` installs the MCP server configuration
   and the matching skills into Claude Code and VS Code.
+- **Native desktop packaging** — `deploy desktop package` builds Deno Desktop installers per OS,
+  and `deploy desktop release prepare`/`serve` sign and host native update manifests and patches.
+
+## Architecture
+
+```mermaid
+flowchart LR
+    V["netscript verbs<br/>init · contract · service · db · plugin · ui:* · agent"] --> W["Workspace<br/>(your source of truth)"]
+    W --> G["generate<br/>(derived wiring)"]
+    G --> D1["AppHost helpers"]
+    G --> D2["Plugin registries"]
+    G --> D3["Contract aggregates"]
+    V2["deploy &lt;target&gt; &lt;op&gt;"] --> T["Target adapters<br/>bare metal · deno-deploy · Aspire clouds · cloud-run · desktop"]
+```
 
 ## Install
 
@@ -58,9 +72,9 @@ One command lays down a complete, running backend workspace:
 netscript init my-app --db postgres --service --yes
 cd my-app
 
-netscript db migrate              # evolve the schema
-netscript service add             # add another service + its v1 contract
-netscript plugin install workers  # durable background processing
+netscript db migrate                            # evolve the schema
+netscript service add --name orders             # add another service + its v1 contract
+netscript plugin install worker --name workers  # durable background processing
 ```
 
 Prefer to see the plan first? `--dry-run` prints it and writes nothing:
@@ -90,7 +104,7 @@ $ netscript init my-app --db postgres --service --yes --dry-run
 | `generate`    | `aspire`, `plugins`, `runtime-schemas` — regenerate derived artifacts on demand.                                                        |
 | `config`      | `inspect`, `get`, `set`, `override`, `runtime` — resolved configuration and runtime overrides.                                          |
 | `agent`       | `init`, `mcp` — install and run the agent tooling.                                                                                      |
-| `deploy`      | Bare-metal, Deno Deploy, Kubernetes, Azure, and Cloud Run targets (see below).                                                          |
+| `deploy`      | Bare-metal, Deno Deploy, Kubernetes, Azure, Cloud Run, and native desktop targets (see below).                                          |
 | `marketplace` | `search`, `publish` — plugin discovery and distribution.                                                                                |
 
 `netscript <group> --help` prints the live tree for any group; it is generated from the same
@@ -124,10 +138,50 @@ cannot honour.
 | `deno-deploy`                                               | `deno deploy [--prod]`, with a guard that refuses a `--prod` push when the project uses APIs Deno Deploy rejects.                |
 | `kubernetes`, `azure-aca`, `azure-app-service`, `azure-aks` | Validates the generated AppHost declares the matching hosting integration, then delegates to `aspire publish` / `deploy`.        |
 | `cloud-run`                                                 | Docker-image lane: `docker build` → `docker push` → `gcloud run deploy`.                                                          |
+| `desktop`                                                   | `package` builds native Deno Desktop installers; `release prepare`/`serve` sign and host native updates (see below).             |
 
 Cloud authentication and RBAC stay operator-owned: NetScript mints no credentials and hand-authors
 no Helm, Bicep, or Kubernetes manifests. Compiled binaries are unsigned — signing is a deliberate
 manual hook between `deploy build` and `deploy install`.
+
+### Native desktop packaging
+
+An enabled app with `Type: "desktop"` in the workspace config packages through its configured task
+hook — the task owns the desktop entrypoint and permissions, and NetScript appends the native Deno
+flags:
+
+```bash
+netscript deploy desktop package --app storefront \
+  --target x86_64-unknown-linux-gnu --format appimage --format deb
+```
+
+Omitted formats produce all formats for the selected OS: `.app`/`.dmg` on macOS,
+`.AppImage`/`.deb`/`.rpm` on Linux, and `.msi` on Windows. The `.dmg` format requires a macOS host,
+so run an unfiltered `--all-targets` matrix on macOS. Native installers are unsigned at this stage;
+Authenticode, codesign/notarization, and distribution signing are external CI steps, and the CLI
+intentionally accepts no certificate credentials.
+
+Prepare and host signed native updates once CI has retained the current and previous runtime
+libraries:
+
+```bash
+netscript deploy desktop release prepare \
+  --channel stable --target linux-x86_64 \
+  --version 1.2.0 --sequence 42 \
+  --current-runtime dist/1.2.0/libdenort.so \
+  --from 1.1.0=dist/1.1.0/libdenort.so \
+  --private-key-file .secrets/update-ed25519.pem
+
+netscript deploy desktop release serve \
+  --release-dir .deploy/desktop/releases \
+  --hostname 127.0.0.1 --port 8787 --base-path /application
+```
+
+`prepare` writes Ed25519-signed `latest.json` manifests and bsdiff patches under
+`.deploy/desktop/releases`; the private key never leaves the authoring process. `serve` is a
+GET/HEAD allowlist server for manifests, patches, and installers, intended behind a trusted
+HTTPS-terminating proxy — it never serves private state, dot paths, or traversal escapes.
+Applications consume the hosted tree through `startAutoUpdate` from `@netscript/sdk/auto-update`.
 
 ## Library surface
 

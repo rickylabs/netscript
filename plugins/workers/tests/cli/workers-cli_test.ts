@@ -61,6 +61,26 @@ Deno.test('workersCli composition root provides the default CLI instance', () =>
   assertEquals(workersCli.commands().map((command) => command.name), [...WORKERS_CLI_COMMANDS]);
 });
 
+Deno.test('WorkersCli usage metadata uses the runnable versioned JSR entrypoint', async () => {
+  const backend = new RecordingWorkersBackend();
+  const cli = new WorkersCli(backend);
+
+  for (const command of cli.commands()) {
+    await command.run({ command: command.name });
+  }
+
+  assertEquals(backend.handled.length, WORKERS_CLI_COMMANDS.length);
+  for (const definition of backend.handled) {
+    assertEquals(
+      definition.usage.startsWith(
+        'deno x -A jsr:@netscript/plugin-workers@<version>/cli ',
+      ),
+      true,
+      `Unexpected workers usage for ${definition.name}: ${definition.usage}`,
+    );
+  }
+});
+
 async function runWorkersCommand(
   cli: WorkersCli,
   args: PluginCliArgs,

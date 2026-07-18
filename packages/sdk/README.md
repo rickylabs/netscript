@@ -33,6 +33,12 @@ and deployed endpoints without a registry or a config file.
   browser and island code server-first defaults, invalidation bridging, and KV-backed persistence.
 - **Distributed tracing built in** — every client call is wrapped in an outbound span and carries
   the W3C `traceparent` header, so client and server spans join one distributed trace.
+- **Native auto-update configuration** — `./auto-update` validates the app-pinned release endpoint
+  and Ed25519 key, resolves the current Deno Desktop `os-arch` release URL, and exposes typed
+  staged/manual and rollback events.
+- **Type-safe Desktop RPC** — `./desktop` adapts a per-window Deno bind channel to a real
+  MessagePort and oRPC link, preserving the existing service contract without ambient webview
+  declarations.
 
 ## Architecture
 
@@ -52,7 +58,15 @@ deno add jsr:@netscript/sdk@<version>
 ```
 
 Pin `<version>` (for example `0.0.1-beta.10`): bare `jsr:@netscript/*` specifiers do not resolve on
-the pre-release line. Scaffolded NetScript workspaces carry the pinned entry in their import map.
+the pre-release line. Scaffolded NetScript workspaces carry the pinned entry in their import map:
+
+```json
+{
+  "imports": {
+    "@netscript/sdk": "jsr:@netscript/sdk@0.0.1-beta.10"
+  }
+}
+```
 
 ## Quick example
 
@@ -79,6 +93,61 @@ const ordersQueryUtils = queryUtils.orders;
 Drop to a focused subpath when an app only needs part of the surface — `./client`, `./query`, and
 `./query-client` carry the three pieces individually.
 
+### Desktop RPC bindings
+
+Inside a Deno Desktop webview, reuse the same contract as the runtime router without declaring a
+parallel bindings surface:
+
+```ts
+import { createDesktopServiceClient } from '@netscript/sdk/desktop';
+import { ordersContract } from './contracts/orders.ts';
+
+const orders = createDesktopServiceClient({ contract: ordersContract });
+const order = await orders.get({ id: 'ord_123' });
+```
+
+The SDK resolves the default `__netscript_rpc__` webview binding lazily, adapts it to oRPC's
+MessagePort link, and preserves oRPC's default string/binary serialization (`Uint8Array` is the only
+native binary payload). Bind handlers execute with the Deno process's permissions, so runtime
+routers must validate inputs and authorization like any other privileged entrypoint. The matching
+runtime composition is `bindDesktopRpcWindow({ window, router, context })` from
+`@netscript/fresh/desktop`; browser and Aspire processes receive an inert disabled lifecycle.
+
+### Desktop auto-update
+
+Window-only applications can start signed native update checks through the stable SDK seam:
+
+```ts
+import { startAutoUpdate } from '@netscript/sdk/auto-update';
+
+const update = startAutoUpdate({
+  release: {
+    baseUrl: 'https://releases.example.com/my-app',
+    publicKey: 'base64-ed25519-public-key',
+    manualUpdateUrl: 'https://example.com/downloads/my-app',
+  },
+  policy: { checkOnLaunch: true, intervalMs: 60 * 60 * 1_000 },
+  onUpdateReady(event) {
+    if (event.applyMode === 'manual') {
+      console.error(`Install the staged update from ${event.manualUpdateUrl}`);
+    }
+  },
+  onRollback(event) {
+    console.error(`Update rolled back: ${event.reason}`);
+  },
+});
+
+if (update.status === 'disabled') {
+  console.error(`Native updates unavailable: ${update.reason}`);
+}
+```
+
+The release and manual-installer URLs must use HTTPS. The native Deno Desktop runtime owns manifest
+fetching, Ed25519 verification, patch staging, and writable-install checks; under plain `deno run`
+the seam returns `disabled` without network access. Windows currently reports a staged update
+through the manual-installer event because the runtime cannot apply it automatically there; macOS
+and Linux apply on relaunch.
+
 ## API at a glance
 
 | Entry            | What it gives you                                                                 |
@@ -92,6 +161,8 @@ Drop to a focused subpath when an app only needs part of the surface — `./clie
 | `./collections`  | `createQueryCollection` — live client-side collections                            |
 | `./streams`      | `createStreamProducer`, `defineStreamSchema`, durable-stream helpers              |
 | `./telemetry`    | `otelMiddleware` — the outbound-tracing middleware type surface                   |
+| `./auto-update`  | `startAutoUpdate`, `createReleaseClient` — signed native Deno Desktop updates     |
+| `./desktop`      | `createDesktopServiceClient`, `createDesktopRpcLink` — contract-true webview RPC  |
 
 The always-current symbol list is
 [`deno doc jsr:@netscript/sdk@<version>`](https://jsr.io/@netscript/sdk/doc).

@@ -32,9 +32,9 @@ config before start, and composition logic run under test with an in-memory buil
   emits AppHost resources, plus environment-source resolution.
 - **First-class test surface** — `./testing` ships `MemoryAspireBuilder`, an example contribution,
   and deterministic fixtures for plugin authors writing composition tests.
-- **Environment-aware cache provisioning** — one shared cache entry provisions Garnet, Redis, or
-  Deno KV as a container, a local executable, or an external connection, with an `Auto` mode that
-  probes for Docker at start time.
+- **Flexible cache provisioning** — one shared cache entry provisions Redis, Garnet, or Deno KV as a
+  container, a local executable, or an external connection, with an opt-in `Auto` mode that probes
+  for Docker at start time.
 
 ## Architecture
 
@@ -59,14 +59,15 @@ the pre-release line. Scaffolded NetScript workspaces already carry the pinned e
 
 ## Quick example
 
-Validate an `appsettings.json` before composition:
+From the root of a scaffolded NetScript workspace (where `appsettings.json` lives and the TypeScript
+AppHost sits under `aspire/`), validate the config before composition:
 
 ```typescript
 import { parseAppSettings } from '@netscript/aspire/config';
 
-const { config, warnings } = await parseAppSettings('dotnet/AppHost/appsettings.json');
+const { config, warnings } = await parseAppSettings('appsettings.json');
 
-console.log(config.Name); // "test-app"
+console.log(config.Name); // "my-app"
 for (const warning of warnings) console.warn(warning);
 ```
 
@@ -75,7 +76,7 @@ Inspect an AppHost target and render a JSON-stable diagnostic report:
 ```typescript
 import { inspectAspire } from '@netscript/aspire';
 
-const report = inspectAspire('./dotnet/AppHost');
+const report = inspectAspire('./aspire');
 console.log(report.summary);
 ```
 
@@ -86,20 +87,21 @@ limiters. The `CacheEntry` config picks a backend with two axes — **`Engine`**
 protocol) and **`Mode`** (how it is hosted) — and the generated AppHost injects the connection
 environment into every consumer that declares `RequiresKv`.
 
-| Engine × Mode                    | Provisioned as                                     | Wire protocol      |
-| -------------------------------- | -------------------------------------------------- | ------------------ |
-| `Garnet` / `Redis` + `Container` | Container (Garnet or `redis:7`), tcp:6379          | Redis              |
-| `Garnet` + `Executable`          | `dotnet tool run garnet-server` — no Docker needed | Redis              |
-| `DenoKv` + `Container`           | Container (`ghcr.io/denoland/denokv`), http:4512   | Deno KV Connect    |
-| `DenoKv` + `Local`               | In-process `Deno.openKv()` — no resource           | Deno KV (embedded) |
-| any + `External`                 | Connection string to a URL you supply              | As configured      |
-| `Garnet` / `DenoKv` + `Auto`     | Decided at `aspire start` by a Docker probe        | Matches the arm    |
+Each engine supports a specific set of modes:
 
-The scaffold default is `Engine: 'Garnet', Mode: 'Auto'`: with Docker present the container arm
-runs; without it, the Garnet dotnet-tool executable self-provisions — so the same generated project
-runs on a Docker host and on Docker-less bare metal without regeneration. Both Garnet arms speak the
-Redis wire protocol, so selection is transparent to consumers. Set `NETSCRIPT_CACHE_MODE` to
-`Container` or `Executable` in the AppHost environment to override the probe.
+| Engine   | Modes                                         | Provisioned as                                                                                   | Wire protocol                |
+| -------- | --------------------------------------------- | ------------------------------------------------------------------------------------------------ | ---------------------------- |
+| `Redis`  | `Container`, `External`, `Auto`               | `redis:7` container (tcp:6379), or a connection string you supply                                | Redis                        |
+| `Garnet` | `Container`, `Executable`, `External`, `Auto` | Garnet container (tcp:6379), `dotnet tool run garnet-server` (no Docker), or a connection string | Redis                        |
+| `DenoKv` | `Local`, `Container`, `Auto`                  | In-process `Deno.openKv()` (no resource), or a `ghcr.io/denoland/denokv` container (http:4512)   | Deno KV (embedded / Connect) |
+
+Two defaults exist, and they differ: a hand-written `CacheEntry` that omits fields validates to the
+schema default `Engine: 'Garnet', Mode: 'Container'`, while `netscript init` scaffolds a workspace
+with `Engine: 'Redis', Mode: 'Container'`. `Auto` is opt-in: it defers the hosting choice to AppHost
+start, where a Docker probe picks the container arm when Docker is present and falls back to the
+Garnet dotnet-tool executable otherwise — Redis and Garnet arms all speak the Redis wire protocol,
+so the selection is transparent to consumers. Set `NETSCRIPT_CACHE_MODE` to `Container` or
+`Executable` in the AppHost environment to override the probe.
 
 ## API at a glance
 

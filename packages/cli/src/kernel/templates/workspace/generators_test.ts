@@ -6,7 +6,13 @@
 
 import { assert, assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
 import { DEFAULT_TEMPLATE_REGISTRY } from '../../application/registries/template-registry.ts';
-import { netscriptJsrSpecifier } from '../../constants/jsr-specifiers.ts';
+import {
+  SCAFFOLD_JSR_RELEASE_PACKAGES,
+} from '../../constants/scaffold/scaffold-workspace-packages.ts';
+import {
+  NETSCRIPT_RELEASE_VERSION,
+  netscriptJsrSpecifier,
+} from '../../constants/jsr-specifiers.ts';
 import { generateDenoJson } from './deno-json.ts';
 import { generateNetScriptConfig } from './netscript-config.ts';
 import { generateReadme } from './generate-readme.ts';
@@ -30,6 +36,12 @@ Deno.test('generateDenoJson emits the expected root workspace shape in JSR mode'
     '@netscript/contracts': netscriptJsrSpecifier('contracts'),
     '@netscript/kv': netscriptJsrSpecifier('kv'),
     '@netscript/plugin': netscriptJsrSpecifier('plugin'),
+  });
+  assertEquals(result.minimumDependencyAge, {
+    age: 'P1D',
+    exclude: SCAFFOLD_JSR_RELEASE_PACKAGES.map((packageName) =>
+      netscriptJsrSpecifier(packageName)
+    ),
   });
   assertEquals(result.nodeModulesDir, 'auto');
   assertEquals(result.unstable, ['raw-imports', 'kv']);
@@ -61,6 +73,26 @@ Deno.test('generateDenoJson emits the expected root workspace shape in JSR mode'
     'semiColons',
     'singleQuote',
   ]);
+});
+
+Deno.test('generateDenoJson scopes the minimum dependency age exception to exact NetScript releases', () => {
+  const result = JSON.parse(generateDenoJson({
+    name: 'test-project',
+    appName: 'dashboard',
+    workspaceMembers: ['contracts', 'plugins'],
+    importMode: 'jsr',
+  }));
+  const exclusions = result.minimumDependencyAge.exclude as string[];
+
+  assertEquals(exclusions, [
+    ...SCAFFOLD_JSR_RELEASE_PACKAGES.map((packageName) =>
+      `jsr:@netscript/${packageName}@${NETSCRIPT_RELEASE_VERSION}`
+    ),
+  ]);
+  assertEquals(new Set(exclusions).size, exclusions.length);
+  assert(exclusions.every((specifier) => specifier.startsWith('jsr:@netscript/')));
+  assert(exclusions.every((specifier) => specifier.endsWith(`@${NETSCRIPT_RELEASE_VERSION}`)));
+  assert(!exclusions.some((specifier) => specifier.includes('@std/')));
 });
 
 Deno.test('generateDenoJson emits shared plugin service-context imports in JSR mode', () => {
@@ -120,6 +152,10 @@ Deno.test('generateDenoJson keeps the same root-only shape in local mode', () =>
   assertEquals(result.workspace, ['./contracts', './plugins']);
   assertEquals(result.tasks.dev, 'deno run --allow-all apps/dashboard/main.ts');
   assert(!('imports' in result), 'root deno.json must not carry import maps');
+  assert(
+    !('minimumDependencyAge' in result),
+    'local root deno.json must not carry registry age policy',
+  );
 });
 
 Deno.test('generateDenoJson omits imports in local mode', () => {

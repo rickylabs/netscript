@@ -108,7 +108,35 @@ await running.stop();
 ```
 
 The `defineService()` preset accepts the same ports through its `auth` option, so generated
-entrypoints opt in without leaving the one-call surface.
+entrypoints opt in without leaving the one-call surface:
+
+```ts
+import { defineService } from '@netscript/service';
+import { createScopeAuthorizer, createTrustedHeaderAuthenticator } from '@netscript/service/auth';
+
+const running = await defineService(router, {
+  name: 'orders',
+  port: 3001,
+  auth: {
+    authn: {
+      authenticator: createTrustedHeaderAuthenticator({
+        subjectHeader: 'x-authenticated-user',
+        scopesHeader: 'x-authenticated-scopes',
+      }),
+    },
+    authz: {
+      authorizer: createScopeAuthorizer({
+        rules: [{
+          match: (request) => request.path.startsWith('/api/orders'),
+          requireScopes: ['orders:read'],
+        }],
+      }),
+    },
+  },
+});
+
+await running.stop();
+```
 
 ## API at a glance
 

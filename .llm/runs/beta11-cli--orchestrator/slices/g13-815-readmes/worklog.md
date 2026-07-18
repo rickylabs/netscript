@@ -65,3 +65,62 @@ verified to include `defineService` + `createService`.
 
 Baseline note: no path arguments beyond the six were gated; repo-wide `docs:readme:check` still has
 pre-existing failures in untouched packages (out of B1 scope; later batches).
+
+## Fix cycle 1 (post Sol audit FAIL — audit-b1.md), 2026-07-18
+
+Same generator session resumed per doc-audit profile. All fixes executed in this worktree/branch.
+
+### F1 — re-baseline + desktop/auto-update union
+- `git merge origin/main` (a87570a6, Desktop Frontend wave). Three README conflicts
+  (cli/fresh/sdk) resolved by UNION: restructured B1 pages kept as base, ALL main-side desktop
+  content folded in (none of the stale side kept).
+- Re-ran `deno doc` on the merged tree: `@netscript/fresh/desktop` (bindDesktopRpcWindow …),
+  `@netscript/fresh-ui/desktop` (createDesktopChrome …), `@netscript/sdk/auto-update`
+  (startAutoUpdate, createReleaseClient …), `@netscript/sdk/desktop` (createDesktopServiceClient,
+  createDesktopRpcLink …); export maps re-read from merged deno.json files.
+- Coverage added: fresh (Why bullet + Desktop RPC composition example + ./desktop row), fresh-ui
+  (Why bullet + ./desktop row — fresh-ui/desktop was absent even from main's README), sdk (2 Why
+  bullets + Desktop RPC bindings + Desktop auto-update sections + ./auto-update and ./desktop rows),
+  cli (Why bullet + desktop row in command map/deploy table + Native desktop packaging section with
+  package/release prepare/serve). `netscript deploy desktop --help` and `deploy desktop release
+  --help` executed on the merged tree (both exit 0, subcommands observed). Internal refs from
+  main-side prose (issue numbers) NOT carried over.
+
+### F2 — CLI quick-start re-executed end-to-end (fresh scaffold, exit 0 each)
+- `init my-app --db postgres --service --yes` → 183 files; `db migrate` → "completed successfully";
+  `service add --name orders` → service on port 3001; `plugin install worker --name workers` →
+  worker plugin on port 8091. README commands corrected to the executed forms
+  (`service add --name orders`, `plugin install worker --name workers`).
+
+### F3 — Aspire examples re-run from the fresh scaffold root
+- `parseAppSettings('appsettings.json')` → Name "my-app", 0 warnings; `inspectAspire('./aspire')`
+  → summary rendered. README paths updated to workspace-root appsettings.json + `aspire/` AppHost.
+
+### F4 — cache claims corrected from source + scaffold output
+- Observed scaffold default: `Engine: "Redis", Mode: "Container"` (generated appsettings.json).
+- Schema default `Garnet`/`Container` (packages/aspire/config.ts CacheEntryZod defaults).
+- Engine×Mode matrix rewritten per CACHE_ENGINE_MODE_MATRIX (config.ts): Redis
+  Container/External/Auto; Garnet Container/Executable/External/Auto; DenoKv Local/Container/Auto.
+  "any + External" and "Garnet/Auto scaffold default" claims removed. NETSCRIPT_CACHE_MODE
+  verified in shouldUseContainerCache (generated apphost helper source).
+
+### F5 — README doctests green
+- Re-added the defineService `auth: { … }` preset fence (service) and a JSON import-map fence (sdk).
+- Executed: `packages/sdk deno test tests/readme-doctest_test.ts` → 2 passed 0 failed (all ts fences
+  typecheck under the doctest prelude, incl. the new desktop/auto-update fences; JSON fences parse);
+  `packages/service deno test tests/_fixtures/readme-examples_test.ts` → 2 passed 0 failed.
+
+### F6 — CLI Architecture diagram added
+- Compact verbs → workspace → derived-wiring regeneration + deploy-router → target-adapters
+  flowchart; parsed with @mermaid-js/mermaid-cli@10.9.1 (exit 0).
+
+### Fix-cycle gate log (all re-run after fixes)
+| Gate | Result |
+| --- | --- |
+| check-readme-standard (6 files) | PASS 6/6 |
+| check-jsr-tagline-length (6 files) | PASS checked=6 over=0 |
+| deno task docs:links | PASS docs=98, 0 broken |
+| README doctests (sdk + service) | PASS 2+2, 0 failed |
+| Mermaid parse (6 diagrams incl. new CLI) | PASS 6/6 (mermaid-cli 10.9.1) |
+| Internal-wording grep (6 files) | PASS 0 hits |
+| deno fmt (6 files) | clean |

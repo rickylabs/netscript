@@ -36,6 +36,8 @@ never imports the streaming runtime.
   client islands.
 - **Streaming and defer** — `defineFreshApp` bootstraps the app, `renderToStream` powers Suspense
   SSR, and `DeferPage`/`Deferred` defer page regions under a resolvable freshness policy.
+- **Desktop RPC** — `bindDesktopRpcWindow` on `./desktop` binds an existing oRPC router to one Deno
+  Desktop window while remaining inert in browser and Aspire processes.
 
 ## Architecture
 
@@ -112,6 +114,28 @@ export const ordersPage = definePage()
 The built page exposes the Fresh route pieces (`page`, `handler`, `route`, `nav`, `hooks`), and the
 bound route carries typed `href`, `safeParseSearch`, and a contract-aware `Link` component.
 
+### Desktop RPC composition
+
+Deno Desktop composition roots can bind an existing oRPC router to one native window. Browser and
+Aspire processes return an explicit disabled lifecycle without registering a binding:
+
+```typescript
+import { bindDesktopRpcWindow } from '@netscript/fresh/desktop';
+
+const desktopRpc = bindDesktopRpcWindow({
+  window: desktopWindow,
+  router: ordersRouter,
+  context: {},
+});
+
+// Safe for both active and disabled lifecycles.
+await desktopRpc.close();
+```
+
+Each call owns isolated per-window transport state and unbinds exactly once during cleanup. Pair it
+with `createDesktopServiceClient({ contract })` from `@netscript/sdk/desktop` in the webview; both
+sides reuse the same oRPC contract instead of a hand-maintained bindings declaration file.
+
 ## Subpaths at a glance
 
 | Subpath         | What it gives you                                                                     |
@@ -123,6 +147,7 @@ bound route carries typed `href`, `safeParseSearch`, and a contract-aware `Link`
 | `./defer`       | `DeferPage`, `Deferred`, defer policies and decision helpers                          |
 | `./query`       | `QueryIsland`, hydration helpers, TanStack Query island hooks                         |
 | `./server`      | `defineFreshApp`, `renderToStream`, `createStreamingResponse`                         |
+| `./desktop`     | `bindDesktopRpcWindow` — oRPC over one Deno Desktop window, inert elsewhere           |
 | `./streams`     | `createNetScriptStreamDB`, `useLiveQuery`, `useLiveSuspenseQuery`                     |
 | `./ai`          | Chat connection and stream-proxy helpers for AI-backed pages                          |
 | `./interactive` | `usePromise` and promise helpers for interactive islands                              |
