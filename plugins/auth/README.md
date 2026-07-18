@@ -4,50 +4,89 @@
 [![CI](https://github.com/rickylabs/netscript/actions/workflows/ci.yml/badge.svg)](https://github.com/rickylabs/netscript/actions/workflows/ci.yml)
 [![Docs](https://img.shields.io/badge/docs-rickylabs.github.io-blue)](https://rickylabs.github.io/netscript/)
 
-**The deployable auth plugin for NetScript. It binds the host plugin system to a unified auth API
-service, single-active-backend selection, the auth database schema, and durable session-stream
-projections through a single declarative manifest.**
+**The authentication plugin for NetScript: one install wires a unified auth API, pluggable backends,
+the auth database schema, and durable session streams into your app.**
 
----
+Authentication is the feature every app needs and no team wants to rebuild — providers, sessions,
+cookies, schema, and the operational glue around all four. `@netscript/plugin-auth` ships it as one
+declarative manifest: `netscript plugin install auth` scaffolds the auth workspace, registers the
+`auth-api` service, provisions the auth schema and session storage, and adds everything to your
+Aspire AppHost. Your app talks to one versioned auth API; which identity backend answers is a
+configuration choice, not a rewrite.
 
-## 🚀 Quick Start
+The manifest is plain data. Hosts read it to generate files and wiring; nothing executes until your
+app boots. The domain schemas, backend port, and v1 contract live in
+[`@netscript/plugin-auth-core`](https://jsr.io/@netscript/plugin-auth-core) — this package binds
+them to a NetScript host.
 
-### Add it to a NetScript app
+## Why teams use it
 
-From the root of a generated NetScript project:
+- **One auth API, swappable backends** — the `auth-api` service (default port `8094`) exposes
+  `signin`, `callback`, `signout`, `session`, and `me` over a versioned v1 contract, backed by a
+  single active backend selected via `NETSCRIPT_AUTH_BACKEND`: `kv-oauth` (interactive OAuth/OIDC),
+  `workos`, or `better-auth`.
+- **Capability differences surface, not crash** — operations a backend does not support return typed
+  auth-provider errors at the API boundary instead of failing deep in a handler.
+- **Schema included** — the plugin ships the auth-owned Prisma schema, so generated workspaces
+  provision auth tables alongside the rest of the database.
+- **Durable session streams** — the browser-safe `./streams` subpath builds a durable-stream
+  projection for the `authSession` entity, with server-side emit helpers on `./streams/server`.
+- **Provisioning recorded up front** — auth requires Postgres (schema) and Deno KV (sessions); the
+  install records both from the manifest so `netscript db` and Aspire provision them for you.
 
-```bash
-netscript plugin install auth
+## Architecture
+
+```mermaid
+flowchart LR
+    M["authPlugin manifest"] --> H["NetScript host<br/>(plugin install + sync)"]
+    H --> A["auth-api :8094<br/>signin · callback · session · me · signout"]
+    A --> B["Active backend<br/>(NETSCRIPT_AUTH_BACKEND)"]
+    B --> K["kv-oauth"]
+    B --> W["workos"]
+    B --> BA["better-auth"]
+    A --> S["Durable streams<br/>authSession projection"]
+    A --> D["Auth schema<br/>(Postgres) + sessions (KV)"]
 ```
 
-`plugin install` resolves `@netscript/plugin-auth` from JSR and runs the plugin's own scaffolder — the
-plugin owns its setup, so the CLI ships no embedded templates. The scaffolder wires the auth API
+## Install
+
+From the root of a NetScript project:
+
+```bash
+netscript plugin install auth --name auth
+```
+
+The plugin owns its setup — the CLI ships no embedded templates. The scaffolder wires the auth API
 service, the auth database schema, session streams, and Aspire resources into your workspace, then
 pins the matching `@netscript/*` versions.
 
-> **Provisioning:** auth requires both Postgres (for the auth schema) and Deno KV (for sessions).
-> `plugin install` records these requirements from the manifest so `netscript db` and Aspire
-> orchestration provision them for you.
-
-### Use it as a library
-
-To consume the plugin programmatically (custom hosts, tests, tooling):
+To consume the plugin programmatically (custom hosts, tests, tooling), add it as a library:
 
 ```bash
-# Deno
-deno add jsr:@netscript/plugin-auth
-
-# Node.js / Bun
-npx jsr add @netscript/plugin-auth
-bunx jsr add @netscript/plugin-auth
+deno add jsr:@netscript/plugin-auth@<version>
 ```
+
+Pin `<version>` to match your installed CLI; bare `jsr:@netscript/*` specifiers do not resolve on
+the pre-release line.
+
+## Quick example
+
+Install the plugin:
+
+```bash
+$ netscript plugin install auth --name auth
+Installed auth plugin "auth" on port 8094.
+Created 1 plugin files.
+Regenerated 12 Aspire helper files.
+```
+
+As a library, the manifest is inspectable data — verify the contributions it brings before the app
+boots its services:
 
 ```typescript
 import { inspectPlugin } from '@netscript/plugin';
 import { authPlugin } from '@netscript/plugin-auth';
 
-// Register the auth plugin manifest with a NetScript app, then verify
-// the contribution groups it brings before the app boots its services.
 const inspection = inspectPlugin(authPlugin);
 
 if (inspection.details.contributionGroups === 0) {
@@ -61,62 +100,39 @@ console.log(
 );
 ```
 
----
+## Public surface
 
-## 📦 Key Capabilities
+| Entry              | What it gives you                                                    |
+| ------------------ | -------------------------------------------------------------------- |
+| `.`                | `authPlugin` plus the `AUTH_*` identity and service constants        |
+| `./services`       | The auth API service composition (`auth-api`, port `8094`)           |
+| `./streams`        | Browser-safe durable-stream projection for the `authSession` entity  |
+| `./streams/server` | Server-side session-stream emit helpers                              |
+| `./contracts`      | The versioned auth API contract generated registries bind against    |
+| `./scaffold`       | The plugin-owned scaffolder `netscript plugin install auth` executes |
 
-- **Unified auth service**: contributes the `auth-api` oRPC service (default port `8094`) exposing
-  `signin`, `callback`, `signout`, `session`, and `me` procedures over a versioned v1 contract.
-- **Single-active backend**: selects one backend per app via `NETSCRIPT_AUTH_BACKEND` across
-  `kv-oauth` (interactive OAuth/OIDC), `workos`, and `better-auth`. Operations a backend does not
-  support return typed auth-provider errors, so capability differences surface explicitly at the API
-  boundary.
-- **Schema contribution**: ships the auth-owned Prisma schema so generated workspaces provision auth
-  tables alongside the rest of the database.
-- **Durable session streams**: the browser-safe `./streams` subpath builds a `StreamDB` for the
-  `authSession` entity projection, with server-side emit helpers on `./streams/server`.
-- **Scaffold-native**: registers as an official `auth` plugin through `scaffold.plugin.json`, wiring
-  database and KV requirements into the NetScript CLI and Aspire orchestration.
+The always-current symbol list is
+[`deno doc jsr:@netscript/plugin-auth@<version>`](https://jsr.io/@netscript/plugin-auth/doc) (pin
+`<version>` on the pre-release line, as above).
 
-The domain schemas, `AuthBackendPort` seam, oRPC v1 contract, and Zod config live in
-`@netscript/plugin-auth-core`; this package binds them to the host.
+## Docs
 
----
-
-## 🧩 Install manifest
-
-The plugin root ships `scaffold.plugin.json` — the declarative contract `plugin install` reads to
-install the plugin. It is editor-validated through a bundled JSON Schema (`$schema`), so the
-manifest gives you IntelliSense and validation in any schema-aware editor.
-
-```jsonc
-{
-  "$schema": "...", // @netscript/plugin scaffold.plugin.schema.json
-  "name": "@netscript/plugin-auth",
-  "provider": { "kind": "auth", "category": "plugin" },
-  "capabilities": {
-    "hasDatabaseMigrations": true,
-    "hasRoutes": true,
-    "hasBackgroundWorkers": false
-  },
-  "scaffolder": { "export": "./scaffold" }
-}
-```
-
----
-
-## 📖 Documentation
-
-- **Reference**:
+- **Auth plugin reference — service, backends, and contract**:
   [rickylabs.github.io/netscript/reference/plugin-auth/](https://rickylabs.github.io/netscript/reference/plugin-auth/)
-- **Identity & Access**:
+- **Identity & Access — the full authentication story**:
   [rickylabs.github.io/netscript/identity-access/](https://rickylabs.github.io/netscript/identity-access/)
-- **How-to — Add authentication**:
+- **How-to — add authentication to an app**:
   [rickylabs.github.io/netscript/how-to/add-authentication/](https://rickylabs.github.io/netscript/how-to/add-authentication/)
+- **API docs on JSR**:
+  [jsr.io/@netscript/plugin-auth/doc](https://jsr.io/@netscript/plugin-auth/doc)
 
----
+## Compatibility
 
-## 📝 License
+The auth API service requires Deno 2.9+ and needs Postgres for the auth schema and Deno KV for
+sessions (both provisioned through `netscript db` and Aspire). The manifest and the browser-safe
+`./streams` subpath are importable in any TypeScript environment.
 
-Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to JSR with
-cryptographically verified provenance.
+## License
+
+Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to
+JSR with cryptographically verified provenance.

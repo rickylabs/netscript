@@ -4,31 +4,68 @@
 [![CI](https://github.com/rickylabs/netscript/actions/workflows/ci.yml/badge.svg)](https://github.com/rickylabs/netscript/actions/workflows/ci.yml)
 [![Docs](https://img.shields.io/badge/docs-rickylabs.github.io-blue)](https://rickylabs.github.io/netscript/)
 
-**The design-system layer for NetScript's Fresh web surface: a copy-source component registry, a
-semantic `--ns-*` token vocabulary, and a small package-owned runtime of accessible interactive
-primitives and helpers.**
+**The design system for NetScript's Fresh web surface: a copy-source component registry, a semantic
+`--ns-*` token vocabulary, and a small package-owned runtime of accessible interactive primitives
+and helpers.**
 
----
+Component libraries force a choice: import a black box you cannot restyle, or copy code that drifts
+the moment it lands. This package splits the difference. Components, pages, and theme CSS live in a
+registry that the NetScript CLI copies **into your app** — from that point the code is yours to own
+and evolve — while the genuinely shared parts (class merging, toast plumbing, icons, accessible
+interaction state machines) stay in the package and update with it.
 
-## 🚀 Quick Start
+Everything copied and everything imported speaks one visual language: a theme-driven `--ns-*`
+custom-property vocabulary that keeps components and themes decoupled. Restyle the app by swapping
+tokens; the components never know.
 
-### Installation
+## Why teams use it
 
-```bash
-# Deno (recommended)
-deno add jsr:@netscript/fresh-ui
+- **Copy-source registry** — `netscript ui:init` installs the foundation, `netscript ui:add <item>`
+  copies themed components, pages, and collections into your app; once copied, the code is yours.
+- **Semantic token vocabulary** — registry CSS targets `--ns-*` custom properties, so themes and
+  components stay decoupled and a token swap restyles the whole surface.
+- **Accessible interactive primitives** — `Accordion`, `Combobox`, `Dialog`, `Drawer`, `Popover`,
+  `Sheet`, `Tabs`, and `Tooltip` compound namespaces emit `data-part`, `data-state`, and ARIA
+  attributes for styleable, accessible behavior.
+- **Runtime helpers** — `cn` for class merging and the redirect-flash `withToast` / `getToast` /
+  `stripToastFromUrl` cycle for carrying notifications across server redirects.
+- **Generative-UI renderer** — `./ai/render-ui` safely renders AI `render_ui` tool payloads through
+  a curated block whitelist, a recursion depth guard, and named fallbacks instead of throws.
+- **AI surface collection** — `netscript ui:add ai` installs the chat seams: message thread,
+  composer, model picker, tool-call disclosure, and the widget island that renders MCP `ui://`
+  resources.
+- **Native desktop chrome** — `createDesktopChrome` on `./desktop` activates application menus,
+  tray, dialogs, notifications, and window actions around an existing Deno Desktop window, and
+  returns an inert browser-safe lifecycle everywhere else.
 
-# Node.js / Bun
-npx jsr add @netscript/fresh-ui
-bunx jsr add @netscript/fresh-ui
+## Architecture
+
+```mermaid
+flowchart LR
+    R["Registry<br/>(components, pages, theme CSS)"] -- "netscript ui:add" --> A["Your app<br/>(copied source, yours to edit)"]
+    P["@netscript/fresh-ui<br/>(runtime imports)"] --> A
+    T["--ns-* tokens<br/>(theme CSS)"] --> A
+    P --> I["./interactive<br/>./primitives"]
 ```
 
-### Usage
+## Install
+
+```bash
+deno add jsr:@netscript/fresh-ui@<version>
+```
+
+Pin `<version>` to match your installed CLI; bare `jsr:@netscript/*` specifiers do not resolve on
+the pre-release line. In a scaffolded NetScript workspace, `netscript ui:init` wires the pinned
+entry and the theme foundation for you.
+
+## Quick example
+
+The runtime helpers work anywhere Preact renders:
 
 ```typescript
-import { cn, getToast, Icon, stripToastFromUrl, withToast } from '@netscript/fresh-ui';
+import { cn, getToast, stripToastFromUrl, withToast } from '@netscript/fresh-ui';
 
-// Merge class names safely (clsx + tailwind-merge).
+// Merge class names safely (clsx + tailwind-merge semantics).
 const buttonClass = cn('ns-button', 'ns-button--primary');
 
 // Carry a redirect-flash toast across a server redirect.
@@ -41,17 +78,16 @@ const redirectTo = withToast('/dashboard/deployments', {
 // Read the toast back on the destination route, then clean the URL.
 const url = new URL(`https://app.example${redirectTo}`);
 const toast = getToast(url); // RegistryToast | undefined
-const cleanPath = stripToastFromUrl(url);
-
-// Render a package-owned stroke SVG icon.
-const checkIcon = <Icon name='check' size={18} title='Complete' />;
+const cleanPath = stripToastFromUrl(url); // '/dashboard/deployments'
 ```
 
-Typed package components are available from the root entrypoint. `DataGrid` emits semantic
-`ns-data-grid*` classes for the package token CSS.
+Typed components come from the root entrypoint; stateful interactive components live on
+`./interactive`, and headless layout primitives on `./primitives`:
 
 ```tsx
 import { DataGrid } from '@netscript/fresh-ui';
+import { Dialog } from '@netscript/fresh-ui/interactive';
+import { Icon, Show, VisuallyHidden } from '@netscript/fresh-ui/primitives';
 
 type Session = { name: string; tokens: number; status: string };
 
@@ -68,52 +104,36 @@ type Session = { name: string; tokens: number; status: string };
 />;
 ```
 
-Stateful interactive components live on the `./interactive` sub-path, and headless layout primitives
-on `./primitives`:
+## API at a glance
 
-```typescript
-import { Dialog } from '@netscript/fresh-ui/interactive';
-import { Icon, Show, VisuallyHidden } from '@netscript/fresh-ui/primitives';
-```
+| Entry            | What it gives you                                                                  |
+| ---------------- | ---------------------------------------------------------------------------------- |
+| `.`              | `cn`, `withToast` / `getToast` / `stripToastFromUrl`, `DataGrid`, `Icon`           |
+| `./interactive`  | `Accordion`, `Combobox`, `Dialog`, `Drawer`, `Popover`, `Sheet`, `Tabs`, `Tooltip` |
+| `./primitives`   | `Icon`, `Show`, `SrOnly`, `VisuallyHidden` — headless platform primitives          |
+| `./ai/render-ui` | `RenderUiSurface`, `renderUiPayload` — the safe generative-UI renderer             |
+| `./desktop`      | `createDesktopChrome` — menus, tray, dialogs, notifications, window actions        |
+| `./registry`     | The registry manifest and content map the CLI copies from                          |
 
----
+The always-current symbol list is
+[`deno doc jsr:@netscript/fresh-ui@<version>`](https://jsr.io/@netscript/fresh-ui/doc).
 
-## 📦 Key Capabilities
+## Docs
 
-- **Copy-source registry**: install themed components and design tokens with the NetScript CLI
-  (`netscript ui:init`, `netscript ui:add <item>`); once copied, the code is yours to own and
-  evolve.
-- **Runtime helpers**: `cn` for class merging and the redirect-flash `withToast` / `getToast` /
-  `stripToastFromUrl` cycle for carrying notifications across server redirects.
-- **Interactive primitives**: `Accordion`, `Dialog`, `Drawer`, `Popover`, `Sheet`, `Tabs`, and
-  `Tooltip` compound namespaces emit `data-part`, `data-state`, and ARIA attributes for accessible,
-  styleable behavior.
-- **L0 platform primitives**: `Icon`, `Show`, `VisuallyHidden`, and `SrOnly` cover token-driven
-  stroke icons, conditional rendering, and assistive-technology output without extra DOM wrappers.
-- **Semantic token vocabulary**: a theme-driven `--ns-*` custom-property surface that registry CSS
-  targets, so themes and components stay decoupled.
-- **Generative-UI renderer**: `@netscript/fresh-ui/ai/render-ui` safely renders `render_ui` tool
-  payloads (`RenderUiToolInput` from `@netscript/ai/tools`) — a curated block whitelist (`stack`,
-  `grid`, `section`, `chart`, `metric`, `table`, `list`, `card`), a recursion depth guard
-  (`RENDER_UI_MAX_DEPTH = 6`), and named fallbacks for unknown or invalid nodes instead of throwing.
-- **AI registry collection**: `netscript ui:add ai` installs the AI/chat surface seams — message
-  thread, composer, model picker, tool-call disclosure, `render-ui`, and the `McpUiWidget` island
-  that renders MCP `ui://` resources surfaced by the `@netscript/ai/mcp` client transport pool.
-
----
-
-## 📖 Documentation
-
+- **Web layer — the design system in context**:
+  [rickylabs.github.io/netscript/web-layer/](https://rickylabs.github.io/netscript/web-layer/)
 - **Reference**:
   [rickylabs.github.io/netscript/reference/fresh-ui/](https://rickylabs.github.io/netscript/reference/fresh-ui/)
-- **Web Layer**:
-  [rickylabs.github.io/netscript/web-layer/](https://rickylabs.github.io/netscript/web-layer/)
-- **How-to — Customize Fresh UI**:
+- **How-to — customize Fresh UI**:
   [rickylabs.github.io/netscript/how-to/customize-fresh-ui/](https://rickylabs.github.io/netscript/how-to/customize-fresh-ui/)
+- **API docs on JSR**: [jsr.io/@netscript/fresh-ui/doc](https://jsr.io/@netscript/fresh-ui/doc)
 
----
+## Compatibility
 
-## 📝 License
+Runs on Deno 2.x with Preact; the runtime helpers are pure functions and render in any modern
+browser. Registry copy commands (`netscript ui:*`) require the NetScript CLI.
+
+## License
 
 Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to
 JSR with cryptographically verified provenance.

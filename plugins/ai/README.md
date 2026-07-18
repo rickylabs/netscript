@@ -1,107 +1,137 @@
 # @netscript/plugin-ai
 
-**The thin NetScript AI plugin: scaffold an app-owned, in-process chat, tool, and agent surface from
-a manifest, connector, and typesafe userland generators.**
+[![JSR](https://jsr.io/badges/@netscript/plugin-ai)](https://jsr.io/@netscript/plugin-ai)
+[![CI](https://github.com/rickylabs/netscript/actions/workflows/ci.yml/badge.svg)](https://github.com/rickylabs/netscript/actions/workflows/ci.yml)
+[![Docs](https://img.shields.io/badge/docs-rickylabs.github.io-blue)](https://rickylabs.github.io/netscript/)
 
-Here _thin_ names a layering choice, not a reduced quality bar: convention-bearing AI logic lives in
-the core packages. The plugin is held to the same reference-plugin parity checklist as `workers` and
-`sagas` (verify harness, scaffolder golden tests, `plugin doctor` coverage, a `scaffold.runtime` e2e
-case, and an in-repo-exercised contract). It ships no runtime AI logic: the engine lives in
-[`@netscript/ai`](jsr:@netscript/ai) and the durable-chat runtime in
-[`@netscript/fresh/ai`](jsr:@netscript/fresh). Its scaffolders emit typesafe userland glue that
-imports those installed dependencies directly.
+**The AI plugin for NetScript: one install scaffolds an app-owned, in-process chat, tool, and agent
+surface — typed userland files that call the AI engine directly, with no gateway in between.**
 
-## What it is
+Most AI integrations bolt a proxy service onto your app and hide the interesting code behind it.
+`@netscript/plugin-ai` takes the opposite stance: `netscript plugin install ai` emits a small set of
+typed files under `ai/` — a composition root, a model registry, a streaming chat route, a chat
+island, and starter tool and agent stubs — and every one of them is yours to edit. The generated
+route calls the AI engine inside your app's own server process; no AI gateway or extra network hop
+is scaffolded.
 
-- **Manifest** (`@netscript/plugin-ai`): declares the plugin's `ai` runtime-config topic and its
-  `/v1/ai` contract version.
-- **Connector**: the `NetScriptPlugin` adapter consumed by the CLI to install, add resources, and
-  inspect the plugin.
-- **Scaffolders**: emit app-owned files under `ai/` — a composition-root barrel, a provider/model
-  registry, an in-process chat stream route, a chat island, and starter tool/agent stubs. Thread
-  persistence is opt-in.
+The plugin itself ships no runtime AI logic. The engine lives in
+[`@netscript/ai`](https://jsr.io/@netscript/ai) and the durable-chat runtime in
+[`@netscript/fresh`](https://jsr.io/@netscript/fresh); the scaffolded files import those installed
+dependencies directly, so upgrading the engine never means regenerating your code.
 
-The default topology is **fully in-process**: the generated stream route calls `@netscript/ai`
-directly inside your app's server. No AI gateway or network hop is scaffolded.
+## Why teams use it
+
+- **App-owned output** — every scaffolded file is a typed wrapper importing the installed
+  dependency, never a copy of framework source; edit them like any other file in your repo.
+- **Fully in-process by default** — the generated chat stream route runs the agent loop inside your
+  server, keeping latency, secrets, and observability in one place.
+- **Streaming with cancellation** — the chat route threads the request's `AbortSignal` into the
+  agent loop and the chat connection exposes `stop()`, so clients can cancel a generation
+  mid-stream.
+- **Typed model registry** — `ai/models.ts` centralizes provider ids and `provider:model-id` refs;
+  change models by editing data, not routes.
+- **MCP client-side, where it belongs** — the scaffolded tool registry (`ai/mcp/registry.ts`)
+  bridges MCP client transports from `@netscript/ai/mcp` into your tools; the plugin scaffolds no
+  MCP server.
+- **Opt-in persistence** — thread persistence is a flag away, backed by a Deno KV thread store.
+
+## Architecture
+
+```mermaid
+flowchart LR
+    M["aiPlugin manifest"] --> C["netscript plugin install ai"]
+    C --> F["Scaffolded ai/ workspace<br/>(app-owned typed files)"]
+    F --> R["chat-stream route<br/>(in-process agent loop)"]
+    R --> E["@netscript/ai engine<br/>providers · tools · agents"]
+    F --> U["chat.tsx island<br/>(streams chunks, stop())"]
+```
 
 ## Install
 
-```ts
-// The manifest a host registers to expose the AI plugin.
-import { aiPlugin } from '@netscript/plugin-ai';
-
-console.log(aiPlugin.name); // "@netscript/plugin-ai"
-console.log(aiPlugin.contributions.runtimeConfigTopics); // includes the "ai" topic
-```
-
-From a scaffolded NetScript app:
+From the root of a NetScript project:
 
 ```bash
-netscript plugin add ai
-netscript plugin add ai --persist-threads   # also scaffold a Deno.Kv thread store
+netscript plugin install ai --name ai
 ```
 
-### Advanced: inspect the connector before wiring a host
+To consume the plugin programmatically (custom hosts, tests, tooling), add it as a library:
 
-The adapter connector exposes the install seams and add-only resources a host drives. Read them to
-preview what `plugin add ai` will emit:
-
-```ts
-import { aiAdapterPlugin } from '@netscript/plugin-ai/adapter';
-import { collectInstallArtifacts } from '@netscript/plugin/adapter';
-
-// Paths emitted by the default (in-process) install topology.
-for (const artifact of collectInstallArtifacts(aiAdapterPlugin)) {
-  console.log(artifact.path); // e.g. "ai/ai.ts", "ai/routes/chat-stream.ts"
-}
-
-// Add-only resources you can scaffold incrementally (tool, agent, thread-store).
-console.log(aiAdapterPlugin.resources?.map((resource) => resource.name));
+```bash
+deno add jsr:@netscript/plugin-ai@<version>
 ```
 
-## What gets scaffolded
+Pin `<version>` to match your installed CLI; bare `jsr:@netscript/*` specifiers do not resolve on
+the pre-release line.
 
-`netscript plugin add ai` emits the following app-owned files (all under `ai/`):
+## Quick example
+
+Install the plugin and inspect what it emitted:
+
+```bash
+$ netscript plugin install ai --name ai
+Installed ai plugin "ai" on port 8095.
+Created 7 plugin files.
+Regenerated 12 Aspire helper files.
+```
 
 | File                       | Purpose                                                  |
 | -------------------------- | -------------------------------------------------------- |
 | `ai/ai.ts`                 | Composition root: wires `@netscript/ai` once.            |
 | `ai/models.ts`             | Provider ids + `provider:model-id` refs (edit freely).   |
 | `ai/routes/chat-stream.ts` | In-process POST route: runs the agent loop directly.     |
-| `ai/routes/chat.tsx`       | TanStack-backed chat island rendering assistant parts.   |
+| `ai/routes/chat.tsx`       | Chat island rendering streamed assistant parts.          |
 | `ai/tools/echo.ts`         | Starter Standard-Schema tool over `@netscript/ai/tools`. |
 | `ai/agents/assistant.ts`   | Starter bounded agent loop over `@netscript/ai/agent`.   |
+| `ai/mcp/registry.ts`       | Tool registry bridging MCP client transports.            |
 
-Add more resources incrementally:
+As a library, the manifest is inspectable data, and the adapter connector previews exactly what an
+install will emit:
 
-```bash
-netscript plugin ai add tool  summarize
-netscript plugin ai add agent researcher
+```typescript
+import { aiPlugin } from '@netscript/plugin-ai';
+import { aiAdapterPlugin } from '@netscript/plugin-ai/adapter';
+import { collectInstallArtifacts } from '@netscript/plugin/adapter';
+
+console.log(aiPlugin.name); // "@netscript/plugin-ai"
+
+// Paths emitted by the default (in-process) install topology.
+for (const artifact of collectInstallArtifacts(aiAdapterPlugin)) {
+  console.log(artifact.path); // e.g. "ai/ai.ts", "ai/routes/chat-stream.ts"
+}
+
+// Add-only resources hosts can scaffold incrementally (tool, agent, thread-store).
+console.log(aiAdapterPlugin.resources?.map((resource) => resource.name));
 ```
 
-Each emitted file is **yours**: the scaffolder writes a typed wrapper importing the installed
-dependency, never a copy of framework source.
+## Public surface
 
-## Cancellation (streaming)
+| Entry         | What it gives you                                                  |
+| ------------- | ------------------------------------------------------------------ |
+| `.`           | `aiPlugin` plus the `AI_PLUGIN_ID` / `AI_WORKSPACE_NAME` constants |
+| `./adapter`   | The adapter connector hosts drive to install and add resources     |
+| `./contracts` | The versioned `/v1/ai` contract from `@netscript/plugin-ai-core`   |
+| `./scaffold`  | The plugin-owned scaffolder `netscript plugin install ai` executes |
 
-The generated chat stream route threads the request's `AbortSignal` into the agent loop and exposes
-a `stop()` on the chat connection, so a client can cancel an in-flight generation mid-stream.
+The always-current symbol list is
+[`deno doc jsr:@netscript/plugin-ai@<version>`](https://jsr.io/@netscript/plugin-ai/doc) (pin
+`<version>` on the pre-release line, as above).
 
-## Telemetry
+## Docs
 
-The scaffolded surface runs on `@netscript/ai`, whose agent loop records per-run and per-turn spans
-through an injected telemetry port when the app supplies one (e.g. the `@netscript/telemetry`
-adapter), following the #402 telemetry convention (`gen_ai.*` semconv keys, `netscript.*` for
-NetScript-owned attributes). This plugin scaffolds no telemetry wiring of its own.
+- **AI plugin reference — scaffold surface and resources**:
+  [rickylabs.github.io/netscript/reference/plugin-ai/](https://rickylabs.github.io/netscript/reference/plugin-ai/)
+- **AI engine reference — providers, tools, agents, MCP client**:
+  [rickylabs.github.io/netscript/reference/ai/](https://rickylabs.github.io/netscript/reference/ai/)
+- **API docs on JSR**: [jsr.io/@netscript/plugin-ai/doc](https://jsr.io/@netscript/plugin-ai/doc)
 
-## MCP
+## Compatibility
 
-The MCP surface is **client-side**: `@netscript/ai/mcp` ships the MCP client transport pool
-(streamable-HTTP and stdio transports plus tool-registry bridging), which apps can wire into their
-scaffolded tool registry directly. This plugin does not scaffold any MCP server, and `--mcp` /
-skill-loader scaffolding is intentionally **not** included in this version (tracked in #290); it
-depends on a deferred core `SkillLoaderPort`.
+The scaffolded surface runs wherever your NetScript app runs (Deno 2.9+); thread persistence uses
+Deno KV. The manifest and contracts are plain data and types, importable in any TypeScript
+environment. Provider API keys are read by your app's own configuration — the plugin stores no
+credentials.
 
 ## License
 
-Apache-2.0
+Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to
+JSR with cryptographically verified provenance.

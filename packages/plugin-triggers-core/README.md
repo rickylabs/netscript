@@ -7,29 +7,57 @@
 **The reusable trigger core for NetScript: a handler-first DSL for webhook, scheduled, and
 file-watch triggers, with ack-then-process ingress and durable processing.**
 
-The processor drains triggers through explicit runtime ports; the deployable
-`@netscript/plugin-triggers` plugin binds this core to the host.
+The hard part of triggers is not receiving them — it is surviving them: duplicate webhooks, senders
+that retry on slow responses, crashes between the acknowledgement and the work. This package encodes
+the discipline. `defineWebhook`, `defineScheduledTrigger`, and `defineFileWatch` take the handler
+first and a frozen spec second; ingress verifies and persists an event before responding `202`; and
+the processor applies idempotency, retry policy, bounded concurrency, dead-lettering, and
+circuit-breaking around every dispatch — all through explicit ports you can swap.
 
----
+This is the core the deployable
+[`@netscript/plugin-triggers`](https://jsr.io/@netscript/plugin-triggers) plugin binds to a
+NetScript host; use it directly for custom hosts, libraries, and tests.
 
-## 🚀 Quick Start
+## Why teams use it
 
-### Installation
+- **Handler-first authoring** — the handler is the first argument and the immutable spec the second;
+  definitions are frozen and type-safe, and handlers emit actions such as `enqueueJob` to hand work
+  to the worker pool.
+- **Ack-then-process ingress** — `createTriggerIngress` verifies the signature and persists the
+  event through its `TriggerEventStorePort` before returning `202`, so a slow handler never blocks
+  the sender and a crash after the acknowledgement replays from the stored event.
+- **A durable processor runtime** — `createTriggerProcessor` applies idempotency, retry, bounded
+  concurrency, DLQ, and circuit-breaking around handler dispatch.
+- **Cron you can preview** — `computeNextFireTimes` renders upcoming fire times for a scheduled spec
+  without a running scheduler.
+- **Every boundary is a port** — ingress, processor, scheduler, event store, idempotency, DLQ,
+  clock, file-watcher, and webhook-verifier seams (`TriggerIngressPort`, `TriggerProcessorPort`, and
+  siblings) are injected, so adapters stay swappable and tests stay deterministic.
 
-```bash
-# Deno (recommended)
-deno add jsr:@netscript/plugin-triggers-core
+## Architecture
 
-# Node.js / Bun
-npx jsr add @netscript/plugin-triggers-core
-bunx jsr add @netscript/plugin-triggers-core
+```mermaid
+flowchart LR
+    W["Inbound webhook"] --> I["createTriggerIngress<br/>verify → persist → 202"]
+    I --> E["TriggerEventStorePort"]
+    E --> P["createTriggerProcessor<br/>idempotency · retry · DLQ<br/>concurrency · circuit-breaker"]
+    C["Scheduled spec<br/>(cron + timezone)"] --> P
+    F["File-watch spec"] --> P
+    P --> A["Actions<br/>enqueueJob → worker pool"]
 ```
 
-### Usage
+## Install
 
-Trigger definitions are handler-first: the handler is the first argument, the immutable spec is the
-second. Handlers return actions (such as `enqueueJob`) that the processor dispatches after the
-ingress has acknowledged the request.
+```bash
+deno add jsr:@netscript/plugin-triggers-core@<version>
+```
+
+Pin `<version>` to match your installed CLI; bare `jsr:@netscript/*` specifiers do not resolve on
+the pre-release line.
+
+## Quick example
+
+Define a webhook whose handler enqueues a job, then wire ingress and processor:
 
 ```typescript
 import {
@@ -38,10 +66,27 @@ import {
   defineWebhook,
   enqueueJob,
 } from '@netscript/plugin-triggers-core';
-import { sendReceiptJob } from './jobs/send-receipt.ts';
+import type {
+  LoggerPort,
+  TriggerDlqPort,
+  TriggerEventStorePort,
+  TriggerIdempotencyPort,
+  TriggerProcessorOptions,
+  WebhookVerifierPort,
+} from '@netscript/plugin-triggers-core';
+import type { JobDefinition } from '@netscript/plugin-workers-core';
 
-export const stripePayments = defineWebhook(
-  (event) => [
+// Your app supplies the job definition and the port adapters.
+declare const sendReceiptJob: JobDefinition<'send-receipt'>;
+declare const idempotency: TriggerIdempotencyPort;
+declare const dlq: TriggerDlqPort;
+declare const logger: LoggerPort;
+declare const dispatchAction: TriggerProcessorOptions['dispatchAction'];
+declare const eventStore: TriggerEventStorePort;
+declare const verifier: WebhookVerifierPort;
+
+const stripePayments = defineWebhook(
+  async (event) => [
     enqueueJob(sendReceiptJob, {
       payload: event.payload.body,
       idempotencyKey: event.idempotencyKey,
@@ -65,16 +110,7 @@ const ingress = createTriggerIngress({
 });
 ```
 
-Webhook ingress is **ack-then-process**: `createTriggerIngress` verifies the signature and persists
-the event through its `TriggerEventStorePort` before returning the `202` acknowledgement, then hands
-the handler's actions to the `TriggerProcessorPort` for dispatch. The two phases are separated so a
-slow handler never blocks the acknowledgement and a crash after `202` is recoverable from the
-persisted event.
-
-### Scheduled triggers and fire-time preview
-
-`defineScheduledTrigger` takes the handler first and a static cron spec second;
-`computeNextFireTimes` previews upcoming fire times for a spec without a running scheduler:
+Scheduled triggers preview their fire times without a running scheduler:
 
 ```typescript
 import { computeNextFireTimes, defineScheduledTrigger } from '@netscript/plugin-triggers-core';
@@ -99,39 +135,42 @@ const upcoming = computeNextFireTimes(
 console.log(upcoming);
 ```
 
----
+## Public surface
 
-## 📦 Key Capabilities
+| Entry            | What it gives you                                                                                                                     |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `.`              | `defineWebhook` / `defineScheduledTrigger` / `defineFileWatch`, `enqueueJob`, ingress and processor factories, `computeNextFireTimes` |
+| `./builders`     | The definition builders on their own                                                                                                  |
+| `./runtime`      | Processor and ingress runtime composition                                                                                             |
+| `./ports`        | The full port vocabulary (`TriggerIngressPort`, `TriggerProcessorPort`, `TriggerEventStorePort`, `WebhookVerifierPort`, …)            |
+| `./adapters`     | KV-backed and in-process adapters for the ports                                                                                       |
+| `./stores`       | Event-store implementations behind a stable subpath                                                                                   |
+| `./domain`       | Branded ids, statuses, trigger kinds, and payload types                                                                               |
+| `./config`       | Configuration schemas                                                                                                                 |
+| `./contracts/v1` | The versioned triggers API contract                                                                                                   |
+| `./telemetry`    | Trigger telemetry names and instrumentation seams                                                                                     |
+| `./testing`      | Deterministic in-memory fixtures                                                                                                      |
 
-- **Handler-first authoring DSL**: `defineWebhook`, `defineScheduledTrigger`, and `defineFileWatch`
-  produce frozen, type-safe trigger definitions; handlers emit actions such as `enqueueJob` to hand
-  work to the worker pool.
-- **Ack-then-process ingress**: `createTriggerIngress` verifies and persists inbound webhook events
-  before responding `202`, then dispatches handler work to the processor.
-- **Durable processor runtime**: `createTriggerProcessor` and the `TriggerProcessor` class apply
-  idempotency, retry policy, bounded concurrency, dead-letter queueing, and circuit-breaking around
-  handler dispatch.
-- **Explicit runtime ports**: ingress, processor, scheduler, event store, idempotency, DLQ, clock,
-  file-watcher, and webhook-verifier boundaries (`TriggerIngressPort`, `TriggerProcessorPort`,
-  `TriggerEventStorePort`, `TriggerSchedulerPort`, `WebhookVerifierPort`, and siblings) are
-  injected, so adapters stay swappable.
-- **Curated sub-path surface**: `./builders`, `./adapters`, `./config`, `./contracts/v1`,
-  `./domain`, `./ports`, `./runtime`, `./telemetry`, and `./testing` expose the schemas, branded
-  ids, telemetry, and deterministic in-memory test fixtures that back the public
-  `@netscript/plugin-triggers` plugin.
+The always-current symbol list is
+[`deno doc jsr:@netscript/plugin-triggers-core@<version>`](https://jsr.io/@netscript/plugin-triggers-core/doc)
+(pin `<version>` on the pre-release line, as above).
 
----
+## Docs
 
-## 📖 Documentation
-
-- **Reference**:
+- **Triggers reference — the triggers family surface**:
   [rickylabs.github.io/netscript/reference/triggers/](https://rickylabs.github.io/netscript/reference/triggers/)
-- **Durable Workflows**:
+- **Durable Workflows — durability, retries, and DLQ behavior**:
   [rickylabs.github.io/netscript/durable-workflows/](https://rickylabs.github.io/netscript/durable-workflows/)
+- **API docs on JSR**:
+  [jsr.io/@netscript/plugin-triggers-core/doc](https://jsr.io/@netscript/plugin-triggers-core/doc)
 
----
+## Compatibility
 
-## 📝 License
+Definitions and ports are plain TypeScript, importable anywhere. The KV-backed adapters (event
+store, enabled-state store) target Deno 2.9+ (Deno KV); the in-memory fixtures run with zero
+permissions.
+
+## License
 
 Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to
 JSR with cryptographically verified provenance.

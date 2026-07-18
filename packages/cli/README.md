@@ -4,155 +4,150 @@
 [![CI](https://github.com/rickylabs/netscript/actions/workflows/ci.yml/badge.svg)](https://github.com/rickylabs/netscript/actions/workflows/ci.yml)
 [![Docs](https://img.shields.io/badge/docs-rickylabs.github.io-blue)](https://rickylabs.github.io/netscript/)
 
-**The NetScript command surface: scaffold a workspace, then grow it — contracts, services, databases,
-plugins, Fresh UI, deployment — with verbs that regenerate the Aspire host and the plugin registries
-for you.**
+**The NetScript command surface: scaffold a workspace, then grow it — contracts, services,
+databases, plugins, Fresh UI, deployment — with verbs that regenerate the derived wiring for you.**
 
-Ships as the `netscript` binary, and as an embeddable command tree you can mount inside your own CLI.
+Most scaffolds hand you a starting point and walk away; from then on, every added service or plugin
+means hand-editing orchestration files. The `netscript` binary works the other way around. `init`
+lays down a complete, running backend workspace — contracts, an example oRPC service, a
+Prisma-backed database, the Fresh app, and the Aspire orchestration host — and every later verb
+that changes the workspace's shape regenerates what is derived from it: the AppHost helpers, the
+plugin registries, the contract version aggregates. You never hand-maintain the wiring.
 
----
+The same command tree is also a library: mount the full public surface inside your own binary while
+NetScript owns the verbs and you own the process boundary.
 
-## 🚀 Quick Start
+## Why teams use it
 
-### Installation
+- **Scaffold-and-grow, not scaffold-and-diverge** — `init` writes the workspace, and every later
+  verb keeps the derived wiring in sync; the generated project is meant to be re-generated, not
+  forked.
+- **See the blast radius first** — `netscript init my-app --dry-run` prints every file it would
+  write (183 files for a full postgres + service workspace) without touching the disk.
+- **Embeddable command tree** — `createPublicCli(host)` returns the full public surface against a
+  host port, so your binary owns argv, exit codes, and permissions while NetScript owns the verbs.
+- **Plugin verbs by dispatch** — `dispatchPluginVerb` routes the framework-owned verbs (`install`,
+  `sync`, `doctor`, …) into a plugin's own published CLI, so a plugin implements its verbs once and
+  inherits the command surface.
+- **Deterministic testing surface** — `./testing` supplies in-memory filesystem, process, prompt,
+  and logger ports plus fixture builders, so CLI and scaffold flows are tested without disk or
+  subprocesses.
+- **Agent tooling in one command** — `netscript agent init` installs the MCP server configuration
+  and the matching skills into Claude Code and VS Code.
+- **Native desktop packaging** — `deploy desktop package` builds Deno Desktop installers per OS,
+  and `deploy desktop release prepare`/`serve` sign and host native update manifests and patches.
 
-```bash
-# The `netscript` binary (what most people want)
-deno install --global --allow-all --name netscript jsr:@netscript/cli
+## Architecture
 
-# The embeddable command tree, as a library
-deno add jsr:@netscript/cli
-
-# Node.js / Bun
-npx jsr add @netscript/cli
-bunx jsr add @netscript/cli
+```mermaid
+flowchart LR
+    V["netscript verbs<br/>init · contract · service · db · plugin · ui:* · agent"] --> W["Workspace<br/>(your source of truth)"]
+    W --> G["generate<br/>(derived wiring)"]
+    G --> D1["AppHost helpers"]
+    G --> D2["Plugin registries"]
+    G --> D3["Contract aggregates"]
+    V2["deploy &lt;target&gt; &lt;op&gt;"] --> T["Target adapters<br/>bare metal · deno-deploy · Aspire clouds · cloud-run · desktop"]
 ```
 
-### Usage
+## Install
 
-One command lays down a complete, running backend workspace — contracts, an example oRPC service, a
-Prisma-backed database, the Fresh app, the plugin registry, and the Aspire orchestration layer:
+```bash
+deno install --global --allow-all --name netscript jsr:@netscript/cli@<version>
+```
+
+Or as a library, for the embeddable command tree:
+
+```bash
+deno add jsr:@netscript/cli@<version>
+```
+
+Pin `<version>` to the release you want to install; bare `jsr:@netscript/*` specifiers do not resolve on
+the pre-release line.
+
+## Quick example
+
+One command lays down a complete, running backend workspace:
 
 ```bash
 netscript init my-app --db postgres --service --yes
 cd my-app
 
-netscript db migrate           # evolve the schema
-netscript service add          # add another service + its v1 contract
-netscript plugin install workers  # durable background processing
+netscript db migrate                            # evolve the schema
+netscript service add --name orders             # add another service + its v1 contract
+netscript plugin install worker --name workers  # durable background processing
 ```
 
-Every verb that changes the shape of the workspace **regenerates what is derived from it** — the
-Aspire AppHost helpers, the plugin registries, the contract version aggregates. You do not
-hand-maintain the wiring.
+Prefer to see the plan first? `--dry-run` prints it and writes nothing:
 
-Prefer to see the blast radius first? `netscript init my-app --dry-run` prints every file it would
-write without touching the disk.
+```console
+$ netscript init my-app --db postgres --service --yes --dry-run
+   ✓ Project root (deno.json, netscript.config.ts, .gitignore, README.md)
+   ✓ Aspire orchestration (TypeScript AppHost, .helpers/, package.json)
+   ✓ Database workspace (postgres)
+   ✓ Frontend app "dashboard" (Fresh framework)
+   ✓ Contracts (v1 with users stub)
+   ✓ Example service "users" (oRPC handler on port 3000)
+   ✓ Plugins (empty registry)
+  [dry-run] Would create 183 files, 44 directories
+```
 
----
+## Command map
 
-## 🗺 Command map
+| Group         | What it owns                                                                                                                            |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `init`        | Scaffold a new workspace (`--db`, `--service`, `--no-aspire`, `--dry-run`).                                                             |
+| `contract`    | `add`, `add-route`, `version`, `inspect`, `list`, `remove` — the typed oRPC contract surface.                                           |
+| `service`     | `add`, `add-handler`, `ref`, `set`, `list`, `remove`, `generate` — service workspaces and their orchestration registration.             |
+| `db`          | `add`, `init`, `migrate`, `generate`, `seed`, `status`, `studio`, `introspect`, `reset`, `deploy` — Prisma lifecycle.                   |
+| `plugin`      | `new`, `scaffold`, `install`, `remove`, `sync`, `update`, `doctor`, `list`, `info`, `ai`, `auth` — first- and third-party plugins.      |
+| `ui:*`        | `ui:init`, `ui:add`, `ui:list`, `ui:update`, `ui:remove` — the Fresh UI registry (pages, islands, collections).                         |
+| `generate`    | `aspire`, `plugins`, `runtime-schemas` — regenerate derived artifacts on demand.                                                        |
+| `config`      | `inspect`, `get`, `set`, `override`, `runtime` — resolved configuration and runtime overrides.                                          |
+| `agent`       | `init`, `mcp` — install and run the agent tooling.                                                                                      |
+| `deploy`      | Bare-metal, Deno Deploy, Kubernetes, Azure, Cloud Run, and native desktop targets (see below).                                          |
+| `marketplace` | `search`, `publish` — plugin discovery and distribution.                                                                                |
 
-| Group         | What it owns                                                                                                                          |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| `init`        | Scaffold a new workspace (`--db`, `--service`, `--no-aspire`, `--dry-run`).                                                           |
-| `contract`    | `add`, `add-route`, `version`, `inspect`, `list`, `remove` — the typed oRPC contract surface.                                         |
-| `service`     | `add`, `add-handler`, `ref`, `set`, `list`, `remove`, `generate` — service workspaces and their Aspire registration.                  |
-| `db`          | `add`, `init`, `migrate`, `generate`, `seed`, `status`, `studio`, `introspect`, `reset`, `deploy` — Prisma lifecycle.                 |
-| `plugin`      | `new`, `scaffold`, `install`, `remove`, `sync`, `update`, `doctor`, `list`, `info`, `ai`, `auth` — first-party and third-party plugins. |
-| `ui:*`        | `ui:init`, `ui:add`, `ui:list`, `ui:update`, `ui:remove` — the Fresh UI registry (pages, islands, collections).                       |
-| `generate`    | `aspire`, `plugins`, `runtime-schemas` — regenerate derived artifacts on demand.                                                      |
-| `config`      | `inspect`, `get`, `set`, `override`, `runtime` — resolved configuration and runtime overrides.                                        |
-| `agent`       | `init`, `mcp` — install and run the agent tooling (see below).                                                                        |
-| `deploy`      | Bare-metal, Deno Deploy, and Aspire cloud targets (see below).                                                                        |
-| `marketplace` | `search`, `publish` — plugin discovery and distribution.                                                                              |
+`netscript <group> --help` prints the live tree for any group; it is generated from the same
+command definitions this package exports, so it never drifts from the binary you installed.
 
-`netscript <group> --help` prints the live tree for any group; it is generated from the same command
-definitions this package exports, so it never drifts from the binary you installed.
+## Agent tooling
 
----
-
-## 📦 Key capabilities
-
-- **Scaffold-and-grow, not scaffold-and-diverge**: `init` writes the workspace, and every later verb
-  keeps the derived layers (Aspire helpers, plugin registries, contract aggregates) in sync. The
-  generated project is meant to be re-generated, not forked.
-- **Embeddable command tree**: `createPublicCli(host)` returns the full public `netscript` surface
-  against a `PublicCliHost`, so a host binary owns the process boundary — argv, exit codes,
-  permissions — while NetScript owns the verbs. `runPublicCli()` adds the standard NetScript error
-  formatting for a binary edge.
-- **Plugin verb dispatch**: `dispatchPluginVerb` and `FRAMEWORK_VERBS` route the framework-owned verbs
-  (`install`, `remove`, `enable`, `disable`, `sync`, `setup`, `update`, `doctor`, `info`) into a
-  plugin's own published CLI. Release-matched `@netscript/*` plugins run through their direct JSR
-  `cli.ts` target with the project configuration; third-party and explicitly different-version
-  plugins retain `deno x -A jsr:<pkg>/cli`. A plugin implements its verbs once and inherits the
-  command surface.
-- **Plugin host loading**: `createPluginHostLoader` and `resolvePluginManifest` resolve configured
-  plugin specs, walk the project, and aggregate runtime contributions through structural ports.
-- **Plugin scaffolding**: `scaffoldPluginPackage` and the `@netscript/cli/scaffolding` engine render
-  `{{var | pipe}}` skeleton templates into a fully-formed plugin package.
-- **Deterministic testing**: `@netscript/cli/testing` supplies in-memory filesystem, process, prompt,
-  and logger ports plus fixture builders, so scaffold and CLI flows are exercised without touching
-  the disk or spawning processes.
-
-### Subpaths
-
-| Subpath                      | Purpose                                                                          |
-| ---------------------------- | -------------------------------------------------------------------------------- |
-| `@netscript/cli`             | The embeddable command tree (`createPublicCli`, `runPublicCli`, plugin dispatch) |
-| `@netscript/cli/scaffolding` | Template-rendering engine for plugin package scaffolds                           |
-| `@netscript/cli/testing`     | In-memory ports + fixture builders for deterministic CLI tests                   |
-
----
-
-## 🤖 Agent tooling
-
-NetScript's agentic surface is one triple: the **CLI** is the hands, the **skills** are the doctrine,
-and **MCP** is the eyes. Install all three into a project root:
+NetScript's agentic surface is one triple: the **CLI** is the hands, the **skills** are the
+playbook, and **MCP** is the eyes. Install all three into a project root:
 
 ```bash
 netscript agent init
 ```
 
-Claude Code receives `.mcp.json`, the NetScript skill bundle under `.claude/skills/`, and a marked
-section in `AGENTS.md`; VS Code receives `.vscode/mcp.json`. Hosts are auto-detected, or select them
-with `--host claude|vscode|all`. Re-running preserves other host configuration and leaves unchanged
-files alone.
+Claude Code receives `.mcp.json`, the NetScript skill bundle, and a marked section in `AGENTS.md`;
+VS Code receives `.vscode/mcp.json`. Hosts are auto-detected, or select them with
+`--host claude|vscode|all`. The installed server entry runs `netscript agent mcp`
+([`@netscript/mcp`](https://jsr.io/@netscript/mcp)); its data boundary covers telemetry, project
+metadata, generated registries, and public docs — never project source, environment values,
+credentials, or secrets.
 
-Deno 2.9 protects new registry releases with a 24-hour minimum dependency age. Generated JSR-mode
-workspaces keep that `P1D` policy for third-party packages and exclude only exact-version
-`jsr:@netscript/*` packages from the matching NetScript release train. This lets a fresh scaffold,
-first-party plugin command, or `agent init` MCP server start immediately after a NetScript release
-without weakening the policy for other dependencies. Local-source workspaces do not emit this
-registry policy.
+## Deployment
 
-The installed server entry runs `netscript agent mcp` ([`@netscript/mcp`](https://jsr.io/@netscript/mcp)).
-Prefer ordinary CLI verbs for direct, repeatable operations — an agent that can run `netscript db
-migrate` should just run it. Reach for MCP for what a shell cannot cheaply give an agent: bounded
-telemetry aggregation, cross-domain diagnostics, and documentation search. The MCP data boundary
-covers telemetry, project metadata, generated registries, and public docs — never project source,
-environment values, credentials, or secrets.
+`netscript deploy <target> <op>` is a thin router over target adapters implementing the canonical
+`plan` / `emit` / `up` / `down` / `status` / `logs` operations; a target never advertises a verb it
+cannot honour.
 
----
+| Target                                                      | Mechanism                                                                                                                        |
+| ----------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| **bare metal**                                              | `deno compile` → single binary managed as an OS service: Servy on Windows, systemd on Linux.                                     |
+| `deno-deploy`                                               | `deno deploy [--prod]`, with a guard that refuses a `--prod` push when the project uses APIs Deno Deploy rejects.                |
+| `kubernetes`, `azure-aca`, `azure-app-service`, `azure-aks` | Validates the generated AppHost declares the matching hosting integration, then delegates to `aspire publish` / `deploy`.        |
+| `cloud-run`                                                 | Docker-image lane: `docker build` → `docker push` → `gcloud run deploy`.                                                          |
+| `desktop`                                                   | `package` builds native Deno Desktop installers; `release prepare`/`serve` sign and host native updates (see below).             |
 
-## 🚢 Deployment
-
-`netscript deploy <target> <op>` is a thin router over target adapters. Targets implement the
-canonical `plan` / `emit` / `up` / `down` / `status` / `logs` operations; a target wired with the
-shared deploy-core conventions additionally advertises `rollback` and `secrets`. An unwired
-descriptor advertises only the subset it can actually perform, so the router never exposes a verb the
-target cannot honour.
-
-| Target                                                      | Mechanism                                                                                                                                                                                                                         | Prerequisites                                                                                       |
-| ----------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| **bare metal**                                              | `deno compile` → single binary, managed as an OS service through one `OsServicePort` seam: Servy on Windows, systemd on Linux.                                                                                                    | Configure `deploy.targets.{windows,linux}`.                                                         |
-| `deno-deploy`                                               | `deno deploy [--prod]`, with an unstable-API guard that **refuses** a `--prod` push when the project uses APIs Deno Deploy rejects (`Deno.openKv`, `Deno.cron`, `BroadcastChannel`, `Temporal`). Preview pushes warn and proceed. | The `deno deploy` CLI owns auth; this surface mints no credentials.                                 |
-| `kubernetes`, `azure-aca`, `azure-app-service`, `azure-aks` | Validates the generated TypeScript AppHost declares the matching hosting integration, then delegates to `aspire publish` / `deploy` / `destroy`.                                                                                  | `aspire add <target>`, a configured cluster/subscription context, and Helm 4.2+ for Kubernetes/AKS. |
-| `cloud-run`                                                 | Docker-image lane: `docker build` → `docker push` → `gcloud run deploy`.                                                                                                                                                          | Docker, Google Cloud CLI auth, and a reachable registry.                                            |
+Cloud authentication and RBAC stay operator-owned: NetScript mints no credentials and hand-authors
+no Helm, Bicep, or Kubernetes manifests. Compiled binaries are unsigned — signing is a deliberate
+manual hook between `deploy build` and `deploy install`.
 
 ### Native desktop packaging
 
-An enabled Aspire app with `Type: "desktop"` can package through its configured task hook:
+An enabled app with `Type: "desktop"` in the workspace config packages through its configured task
+hook:
 
 ```json
 {
@@ -163,7 +158,7 @@ An enabled Aspire app with `Type: "desktop"` can package through its configured 
 }
 ```
 
-The task owns the desktop entrypoint and permissions. NetScript appends the native Deno flags:
+The task owns the desktop entrypoint and permissions; NetScript appends the native Deno flags:
 
 ```bash
 netscript deploy desktop package --app storefront --all-targets \
@@ -174,25 +169,24 @@ netscript deploy desktop package --app storefront \
 
 Every invocation uses an explicit target and output path. Omitted formats produce all formats for
 the selected OS: `.app`/`.dmg` on macOS, `.AppImage`/`.deb`/`.rpm` on Linux, and `.msi` on Windows.
-Runtime compression defaults to `xz`; select `--compression none|lzma|zstd` explicitly when needed.
-The `.dmg` format requires a macOS host, and `zstd` requires the external `zstd` executable.
-An unfiltered `--all-targets` includes `.dmg`, so run that complete matrix on macOS; other hosts can
-use repeatable `--format` filters to omit it while still cross-compiling the remaining targets.
-Native installers are unsigned at this stage; signing and notarization remain external CI steps.
+Runtime compression defaults to `xz`; select `--compression none|lzma|zstd` explicitly when needed
+(`zstd` requires the external `zstd` executable). The `.dmg` format requires a macOS host, and an
+unfiltered `--all-targets` includes `.dmg` — run that complete matrix on macOS, or use repeatable
+`--format` filters elsewhere while still cross-compiling the remaining targets.
 
-Platform signing is separate from the Ed25519 update-manifest signature. CI should sign the native
-artifacts after packaging and before release preparation or hosting:
+Native installers are unsigned at this stage. Platform signing is separate from the Ed25519
+update-manifest signature and stays an external CI step between packaging and release preparation:
 
-- Windows: Authenticode-sign the generated `.msi` with `signtool`, including the organization's
-  SHA-256 timestamp authority, then verify the signature on a clean Windows runner.
-- macOS: codesign the `.app` and nested code with the appropriate Developer ID identity, create or
-  sign the `.dmg`, submit it to Apple's notary service, and staple/validate the notarization ticket.
-- Linux: apply the repository/distribution signing policy to `.deb` and `.rpm`; AppImage signing is
-  likewise an external release-policy step.
+- **Windows** — Authenticode-sign the `.msi` with `signtool` (SHA-256 timestamp authority), then
+  verify on a clean Windows runner.
+- **macOS** — codesign the `.app` and nested code with a Developer ID identity, sign or create the
+  `.dmg`, notarize with Apple's notary service, and staple/validate the ticket.
+- **Linux** — apply your repository/distribution signing policy to `.deb` and `.rpm`; AppImage
+  signing is likewise an external release-policy step.
 
-The CLI intentionally does not accept certificate credentials or invoke those platform tools.
+The CLI intentionally accepts no certificate credentials and never invokes those platform tools.
 
-Prepare a native update after CI has retained the current and previous runtime libraries:
+Prepare a native update once CI has retained the current and previous runtime libraries:
 
 ```bash
 netscript deploy desktop release prepare \
@@ -203,13 +197,14 @@ netscript deploy desktop release prepare \
   --private-key-file .secrets/update-ed25519.pem
 ```
 
-Preparation requires read access to the runtime libraries and PKCS#8 Ed25519 private key, write
+Preparation needs read access to the runtime libraries and the PKCS#8 Ed25519 private key, write
 access to `.deploy/desktop/releases`, and run access to an external bsdiff 4.x-compatible
-executable. The key stays local to the authoring process. Each route keeps private strict-monotonic
-sequence state; a failed final manifest replacement burns that sequence, so retry with a higher
-number. Immutable patches are written first, private high-water second, and `latest.json` last.
+executable; the key never leaves the authoring process. Each channel/target route keeps private,
+strictly monotonic sequence state — a failed final manifest replacement burns that sequence, so
+retry with a higher number. Immutable patches are written first, the private high-water second, and
+`latest.json` last.
 
-Serve the prepared tree at the same pathname used by the SDK release base URL:
+Serve the prepared tree at the same pathname the SDK release base URL composes:
 
 ```bash
 netscript deploy desktop release serve \
@@ -217,15 +212,15 @@ netscript deploy desktop release serve \
   --hostname 127.0.0.1 --port 8787 --base-path /application
 ```
 
-For `baseUrl: "https://releases.example.com/application"`, the native manifest is
-`/application/<channel>/<os>-<arch>/latest.json`. Terminate public HTTPS at a trusted reverse proxy;
-the built-in listener is transport-neutral and intended for a protected origin. It serves only
-GET/HEAD allowlisted manifests, patches, and installers. Private high-water files, dot paths,
+For `baseUrl: "https://releases.example.com/application"`, the native manifest resolves to
+`/application/<channel>/<os>-<arch>/latest.json`. Terminate public HTTPS at a trusted reverse
+proxy; the built-in listener is transport-neutral and intended for a protected origin. It serves
+only GET/HEAD allowlisted manifests, patches, and installers — private high-water files, dot paths,
 traversal, encoded separators, and symlink escapes are never served.
 
-Windows native apply remains unsupported upstream. Applications must handle the public SDK seam's
-`applyMode: "manual"` update-ready event and present its trusted `manualUpdateUrl`; this server may
-host the installer, but it does not claim or emulate automatic Windows replacement.
+Windows native apply remains unsupported upstream, so applications handle the SDK seam's
+`applyMode: "manual"` update-ready event and present its trusted `manualUpdateUrl` (this server may
+host the installer, but it does not claim automatic Windows replacement):
 
 ```ts
 import { startAutoUpdate } from '@netscript/sdk/auto-update';
@@ -245,45 +240,52 @@ startAutoUpdate({
 declare function showInstallerPrompt(url: string): void;
 ```
 
-Cloud authentication and RBAC are deliberately **operator-owned**. NetScript does not mint cloud
-credentials, assign RBAC, or hand-author Helm, Bicep, Kubernetes, or Azure manifests: AppHost-backed
-targets delegate to Aspire after validation, and Cloud Run owns only the image build/push/apply seam.
-
-`deno compile` produces **unsigned** binaries. Signing is a deliberate manual hook — run it between
-`deploy build` and `deploy install` with your own certificate and timestamp authority
-(`signtool sign /fd SHA256 /tr <url> /td SHA256 <binary>.exe` on Windows; `gpg --detach-sign` or your
-distro's package-signing flow on Linux).
-
-### Permissions
+### Deploy permissions
 
 A host binary embedding the deploy surface must grant:
 
-| Permission      | Why                                                                                                    |
-| --------------- | ------------------------------------------------------------------------------------------------------ |
+| Permission      | Why                                                                                                     |
+| --------------- | ------------------------------------------------------------------------------------------------------- |
 | `--allow-run`   | Invoke desktop package tasks, bsdiff/zstd, and deploy tools such as `servy`, Aspire, Docker, or gcloud. |
-| `--allow-read`  | Read the workspace config, entrypoints, and release/secret files.                                      |
-| `--allow-write` | Emit compiled binaries, native artifacts, private high-water state, release files, and env files.     |
-| `--allow-net`   | Listen for release HTTP requests and health-probe activated services.                                 |
-| `--allow-sys`   | Resolve the host OS/triple to select the Servy vs. systemd adapter and compile target.                 |
-| `--allow-env`   | Read the deploy owner principal for the Windows secret-file ACL; provider CLIs read their auth tokens. |
+| `--allow-read`  | Read the workspace config, entrypoints, and release/secret files.                                       |
+| `--allow-write` | Emit compiled binaries, native artifacts, private high-water state, release files, and env files.       |
+| `--allow-net`   | Listen for release HTTP requests and health-probe activated services.                                   |
+| `--allow-sys`   | Resolve the host OS/triple to select the Servy vs. systemd adapter and compile target.                  |
+| `--allow-env`   | Read the deploy owner principal for the Windows secret-file ACL; provider CLIs read their auth tokens.  |
 
----
+## Library surface
 
-## 📖 Documentation
+| Subpath         | What it gives you                                                                    |
+| --------------- | ------------------------------------------------------------------------------------- |
+| `.`             | `createPublicCli`, `runPublicCli`, `dispatchPluginVerb`, `createPluginHostLoader`, `scaffoldPluginPackage` |
+| `./scaffolding` | The `Scaffolder` template-rendering engine for plugin package scaffolds              |
+| `./testing`     | In-memory ports (`createInMemoryFileSystem`, `createInMemoryProcess`, …) + fixture builders |
 
+The always-current symbol list is
+[`deno doc jsr:@netscript/cli@<version>`](https://jsr.io/@netscript/cli/doc).
+
+## Docs
+
+- **CLI & scaffold — the full command walkthrough**:
+  [rickylabs.github.io/netscript/orchestration-runtime/cli-scaffold/](https://rickylabs.github.io/netscript/orchestration-runtime/cli-scaffold/)
 - **Reference**:
   [rickylabs.github.io/netscript/reference/cli/](https://rickylabs.github.io/netscript/reference/cli/)
-- **CLI & scaffold**:
-  [rickylabs.github.io/netscript/orchestration-runtime/cli-scaffold/](https://rickylabs.github.io/netscript/orchestration-runtime/cli-scaffold/)
-- **How-to: Author a plugin**:
+- **How-to — author a plugin**:
   [rickylabs.github.io/netscript/how-to/author-a-plugin/](https://rickylabs.github.io/netscript/how-to/author-a-plugin/)
-- **How-to: Deploy**: [rickylabs.github.io/netscript/how-to/deploy/](https://rickylabs.github.io/netscript/how-to/deploy/)
+- **How-to — deploy**:
+  [rickylabs.github.io/netscript/how-to/deploy/](https://rickylabs.github.io/netscript/how-to/deploy/)
 - **Agent tooling**:
   [rickylabs.github.io/netscript/capabilities/agent-tooling/](https://rickylabs.github.io/netscript/capabilities/agent-tooling/)
+- **API docs on JSR**: [jsr.io/@netscript/cli/doc](https://jsr.io/@netscript/cli/doc)
 
----
+## Compatibility
 
-## 📝 License
+Requires Deno 2.x; the binary is installed with `--allow-all` because scaffolding, database, and
+deployment verbs read and write the workspace, spawn tools (`prisma`, `aspire`, `docker`,
+`gcloud`), and probe local services. Generated workspaces additionally use the .NET SDK for the
+Aspire orchestration host.
+
+## License
 
 Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to
 JSR with cryptographically verified provenance.

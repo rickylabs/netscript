@@ -4,32 +4,68 @@
 [![CI](https://github.com/rickylabs/netscript/actions/workflows/ci.yml/badge.svg)](https://github.com/rickylabs/netscript/actions/workflows/ci.yml)
 [![Docs](https://img.shields.io/badge/docs-rickylabs.github.io-blue)](https://rickylabs.github.io/netscript/)
 
-**A reactive key-value primitive for NetScript that exposes one `WatchableKv` contract over Deno KV,
-Redis, and in-memory backends, with a shared lifecycle that auto-detects the active provider from
+**A reactive key-value primitive for NetScript: one `WatchableKv` contract over Deno KV, Redis, and
+in-memory backends, with a shared per-process lifecycle that auto-detects the active provider from
 the environment.**
 
----
+Key-value storage shows up everywhere in a backend — sessions, caches, coordination state, queue
+plumbing — and every consumer wants the same three things: typed reads and writes, atomic updates,
+and a way to react when a key changes. `@netscript/kv` provides exactly that surface once. `getKv()`
+resolves a single shared adapter per process — Redis when the environment advertises one, Deno KV
+otherwise — and every backend speaks the same `WatchableKv` contract, so code written against the
+in-memory adapter in tests runs unchanged against Redis in production.
 
-## 🚀 Quick Start
+The watch capability is the differentiator: `watch` and `watchPrefix` turn the store into an event
+source, streaming typed change events as keys are written — the primitive NetScript's own reactive
+features build on.
 
-### Installation
+## Why teams use it
 
-```bash
-# Deno (recommended)
-deno add jsr:@netscript/kv
+- **One contract, interchangeable backends** — `KvStore` and `WatchableKv` give every adapter the
+  same `get` / `set` / `delete` / `list` / `atomic` surface, so swapping providers never touches
+  call sites.
+- **Shared lifecycle** — `getKv`, `getActiveProvider`, `resetKv`, and `closeKv` resolve one adapter
+  per process and let tests reset it deterministically.
+- **Reactive reads** — `WatchableKv.watch` and `watchPrefix` stream typed `WatchEvent`s when
+  observed keys change, on backends that support it.
+- **Opt-in Redis** — `RedisKvAdapter` lives behind `@netscript/kv/redis` and self-registers the
+  `'redis'` provider on import; the root entrypoint keeps the Redis driver out of your module graph.
+- **kvdex bridge** — `@netscript/kv/kvdex` exposes `createNetscriptDb` to run a typed
+  [kvdex](https://jsr.io/@olli/kvdex) document database over whichever provider is active.
 
-# Node.js / Bun
-npx jsr add @netscript/kv
-bunx jsr add @netscript/kv
+## Architecture
+
+```mermaid
+flowchart LR
+    C["Your code"] --> G["getKv()<br/>shared lifecycle"]
+    G -- "env auto-detect" --> P{"provider"}
+    P --> D["DenoKvAdapter"]
+    P --> R["RedisKvAdapter<br/>(import @netscript/kv/redis)"]
+    P --> M["MemoryKvAdapter<br/>(tests)"]
+    D & R & M --> W["WatchableKv<br/>get · set · atomic · watch"]
 ```
 
-### Usage
+Provider detection reads the environment: a discovered Redis/Garnet connection selects Redis (if the
+Redis entrypoint has been imported), otherwise Deno KV. Force a choice with
+`getKv({ provider: 'deno-kv' })` or the `CACHE_PROVIDER` environment variable. A `'nitro'` provider
+id is reserved for a future adapter and is not implemented yet.
+
+## Install
+
+```bash
+deno add jsr:@netscript/kv@<version>
+```
+
+Pin `<version>` to match your installed CLI; bare `jsr:@netscript/*` specifiers do not resolve on
+the pre-release line.
+
+## Quick example
 
 ```typescript
 import { getKv } from '@netscript/kv';
 
-// Resolve the shared adapter — auto-detects Redis, Deno KV, or in-memory
-// from the environment and initializes once for the process.
+// Resolve the shared adapter — auto-detects Redis or Deno KV from the
+// environment and initializes once for the process.
 const kv = await getKv();
 
 await kv.set(['users', 'alice'], { name: 'Alice', role: 'admin' });
@@ -45,36 +81,36 @@ for await (const events of kv.watch([['users', 'alice']])) {
 }
 ```
 
-The Redis adapter ships as a sub-path export. Import `@netscript/kv/redis` only when you need it —
-the root entrypoint keeps the Redis driver out of your module graph.
+## Public surface
 
----
+| Entry       | What it gives you                                                                                |
+| ----------- | ------------------------------------------------------------------------------------------------ |
+| `.`         | Shared lifecycle (`getKv`, `resetKv`, `closeKv`), contract types, Deno KV and in-memory adapters |
+| `./redis`   | `RedisKvAdapter`; importing it registers the `'redis'` provider                                  |
+| `./kvdex`   | `createNetscriptDb` — typed kvdex database over the active provider                              |
+| `./testing` | Test helpers for KV-backed code                                                                  |
 
-## 📦 Key Capabilities
+The always-current symbol list is
+[`deno doc jsr:@netscript/kv@<version>`](https://jsr.io/@netscript/kv/doc) (pin `<version>` on the
+pre-release line, as above).
 
-- **Unified store contract**: `KvStore` and `WatchableKv` give every backend the same `get` / `set`
-  / `delete` / `list` / `atomic` surface, so adapters are interchangeable behind one type.
-- **Shared lifecycle**: `getKv`, `getActiveProvider`, `resetKv`, and `closeKv` resolve a single
-  adapter per process and let tests reset it deterministically.
-- **Reactive reads**: `WatchableKv.watch` and `watchPrefix` stream `WatchEvent`s when observed keys
-  change, on backends that support it.
-- **Bundled adapters**: `DenoKvAdapter` and `MemoryKvAdapter` ship at the root; `RedisKvAdapter`
-  (`@netscript/kv/redis`) self-registers the `'redis'` provider on import.
-- **kvdex bridge**: `@netscript/kv/kvdex` exposes `createNetscriptDb` to run a typed
-  [kvdex](https://jsr.io/@olli/kvdex) database over the active provider.
+## Docs
 
----
-
-## 📖 Documentation
-
-- **Reference**:
+- **Reference — lifecycle, adapters, and exports**:
   [rickylabs.github.io/netscript/reference/kv/](https://rickylabs.github.io/netscript/reference/kv/)
-- **Data & Persistence**:
+- **Data & Persistence — where KV fits in the data layer**:
   [rickylabs.github.io/netscript/data-persistence/](https://rickylabs.github.io/netscript/data-persistence/)
+- **How-to: queue, KV, and cron together**:
+  [rickylabs.github.io/netscript/how-to/queue-kv-cron/](https://rickylabs.github.io/netscript/how-to/queue-kv-cron/)
+- **API docs on JSR**: [jsr.io/@netscript/kv/doc](https://jsr.io/@netscript/kv/doc)
 
----
+## Compatibility
 
-## 📝 License
+Requires Deno with the `kv` unstable feature (`--unstable-kv` or `"unstable": ["kv"]` in
+`deno.json`) for the Deno KV backend. The Redis adapter needs `--allow-net` and `--allow-env`; the
+in-memory adapter needs nothing.
 
-Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to JSR with
-cryptographically verified provenance.
+## License
+
+Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to
+JSR with cryptographically verified provenance.
