@@ -4,27 +4,57 @@
 [![CI](https://github.com/rickylabs/netscript/actions/workflows/ci.yml/badge.svg)](https://github.com/rickylabs/netscript/actions/workflows/ci.yml)
 [![Docs](https://img.shields.io/badge/docs-rickylabs.github.io-blue)](https://rickylabs.github.io/netscript/)
 
-**The service runtime for NetScript: turn an oRPC router into a Hono service with health probes,
-OpenAPI, Scalar docs, and graceful shutdown.**
+**The service runtime for NetScript: turn an oRPC router into a running Hono service with health
+probes, OpenAPI, Scalar docs, request tracing, and graceful shutdown — in one call.**
 
-`defineService()` wires the full surface in one call; `createService()` composes it step by step.
+A production service is never just its handlers. It needs CORS, request logging, an OpenAPI
+document, live/ready health probes an orchestrator can poll, tracing on every request, and a
+shutdown path that drains in-flight work. This package materializes all of it from the oRPC router
+you already have: `defineService()` stands up the full runtime in one call, and `createService()`
+composes the same stages explicitly when a service needs a bespoke stack.
 
----
+Authentication and authorization ship as an opt-in subpath with provider-agnostic ports, so a
+service that needs guarding adds it without dragging auth machinery into every service that does
+not.
 
-## 🚀 Quick Start
+## Why it stands out
 
-### Installation
+- **One-call preset** — `defineService(router, options)` wires CORS, logging, OpenAPI JSON, Scalar
+  docs, RPC, service info, and health, then starts the listener and returns a `RunningService`
+  handle with `addr` and an idempotent `stop()`.
+- **Fluent builder** — `createService(router, config)` composes the same stages step by step, then
+  `serve()` starts a listener or `build()` returns a mountable app.
+- **Health probes** — `withHealth()` adds `/health`, `/health/live`, and `/health/ready`;
+  `healthChecks.database`, `.kv`, `.service`, and `.custom` cover common dependencies.
+- **Graceful lifecycle** — `onShutdown()` registers LIFO teardown hooks; `serve()` drains in-flight
+  requests, installs `SIGINT`/`SIGTERM` handlers, and accepts an external `AbortSignal`.
+- **Tracing on every request** — the builder registers tracing middleware as the outermost layer on
+  every service, so each request gets a server span with W3C propagation and the service name
+  recorded, with no per-service wiring.
+- **Opt-in auth** — `./auth` ships authentication and authorization ports plus static-credential,
+  trusted-header, and scope-authorizer factories, kept off the import graph until used.
 
-```bash
-# Deno (recommended)
-deno add jsr:@netscript/service
+## Architecture
 
-# Node.js / Bun
-npx jsr add @netscript/service
-bunx jsr add @netscript/service
+```mermaid
+flowchart LR
+    R["oRPC router"] --> D["defineService()<br/>or createService()"]
+    D --> M["Middleware stack<br/>tracing · CORS · logging · auth"]
+    M --> E["Endpoints<br/>/rpc · /api · OpenAPI · Scalar docs"]
+    M --> H["Health<br/>/health · /health/live · /health/ready"]
+    D --> G["Graceful shutdown<br/>drain · LIFO hooks · signals"]
 ```
 
-### Usage
+## Install
+
+```bash
+deno add jsr:@netscript/service@<version>
+```
+
+Pin `<version>` (for example `0.0.1-beta.10`): bare `jsr:@netscript/*` specifiers do not resolve on
+the pre-release line. Generated NetScript service entrypoints already import the pinned entry.
+
+## Quick example
 
 ```typescript
 import { defineService } from '@netscript/service';
@@ -44,35 +74,8 @@ console.log(`listening on :${service.addr.port}`);
 await service.stop();
 ```
 
----
-
-## 📦 Key Capabilities
-
-- **Fluent builder**: `createService(router, config)` composes CORS, logging, OpenAPI, Scalar docs,
-  RPC, health, custom routes, and auth stages, then `serve()` (start a listener) or `build()`
-  (return a mountable `ServiceApp`).
-- **One-call preset**: `defineService(router, options)` stands up the full runtime that generated
-  NetScript service entrypoints use, with health-aware shutdown when the database client exposes
-  `$disconnect()`.
-- **Health probes**: `withHealth()` adds `/health`, `/health/live`, and `/health/ready`;
-  `healthChecks.database`, `.kv`, `.service`, and `.custom` cover common dependencies.
-- **Graceful lifecycle**: `onShutdown()` registers LIFO teardown hooks; `serve()` drains in-flight
-  requests through `Deno.serve`'s shutdown, installs `SIGINT`/`SIGTERM` handlers, and accepts an
-  external `AbortSignal`.
-- **First-party tracing**: the builder registers the `@netscript/telemetry/hono` tracing middleware
-  (wrapping Hono's first-party `@hono/otel` instrumentation) as the outermost middleware on every
-  service, so each request gets a server span with W3C propagation and the service name recorded —
-  no per-service wiring.
-- **Opt-in auth**: `@netscript/service/auth` ships provider-agnostic authentication and
-  authorization ports plus static-credential, trusted-header, and scope-authorizer factories, kept
-  off the import graph until a service uses it.
-
----
-
-## ⚙️ Builder & auth
-
 Reach for `createService()` when a service needs explicit, stage-by-stage composition — and pull in
-`@netscript/service/auth` to guard it with authentication and authorization:
+`./auth` to guard it:
 
 ```ts
 import { createService } from '@netscript/service';
@@ -104,51 +107,36 @@ const running = await createService(router, { name: 'orders', version: '1.0.0' }
 await running.stop();
 ```
 
-Generated entrypoints stay on the `defineService()` preset and opt in by passing `auth`, so the same
-authn/authz ports apply without leaving the one-call surface:
+The `defineService()` preset accepts the same ports through its `auth` option, so generated
+entrypoints opt in without leaving the one-call surface.
 
-```ts
-import { defineService } from '@netscript/service';
-import { createScopeAuthorizer, createTrustedHeaderAuthenticator } from '@netscript/service/auth';
+## API at a glance
 
-const running = await defineService(router, {
-  name: 'orders',
-  port: 3001,
-  auth: {
-    authn: {
-      authenticator: createTrustedHeaderAuthenticator({
-        subjectHeader: 'x-authenticated-user',
-        scopesHeader: 'x-authenticated-scopes',
-      }),
-    },
-    authz: {
-      authorizer: createScopeAuthorizer({
-        rules: [{
-          match: (request) => request.path.startsWith('/api/orders'),
-          requireScopes: ['orders:read'],
-        }],
-      }),
-    },
-  },
-});
+| Entry    | What it gives you                                                                                                                                     |
+| -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `.`      | `defineService`, `createService`, `healthChecks`, `HEALTH_STATUS`, handler factories (`createRPCHandler`, `createOpenAPISpec`, `createScalarDocs`, …) |
+| `./auth` | `createStaticCredentialAuthenticator`, `createTrustedHeaderAuthenticator`, `createScopeAuthorizer`, and the authn/authz port types                    |
 
-await running.stop();
-```
+The always-current symbol list is
+[`deno doc jsr:@netscript/service@<version>`](https://jsr.io/@netscript/service/doc).
 
----
+## Docs
 
-## 📖 Documentation
-
+- **Services & SDK — the pillar this package implements**:
+  [rickylabs.github.io/netscript/services-sdk/](https://rickylabs.github.io/netscript/services-sdk/)
 - **Reference**:
   [rickylabs.github.io/netscript/reference/service/](https://rickylabs.github.io/netscript/reference/service/)
-- **Services & SDK pillar**:
-  [rickylabs.github.io/netscript/services-sdk/](https://rickylabs.github.io/netscript/services-sdk/)
-- **How-to: Add a service**:
+- **How-to — add a service**:
   [rickylabs.github.io/netscript/how-to/add-a-service/](https://rickylabs.github.io/netscript/how-to/add-a-service/)
+- **API docs on JSR**: [jsr.io/@netscript/service/doc](https://jsr.io/@netscript/service/doc)
 
----
+## Compatibility
 
-## 📝 License
+Requires Deno 2.x — the runtime listens through `Deno.serve` and installs `Deno.addSignalListener`
+handlers. Services need `--allow-net` (listener and health probes) and `--allow-env`; database and
+KV health checks add the permissions of the client they probe.
+
+## License
 
 Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to
 JSR with cryptographically verified provenance.
