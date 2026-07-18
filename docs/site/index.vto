@@ -13,13 +13,8 @@ title: NetScript — the enterprise-grade meta-framework for Deno
   ]
 }) }}
 
-{{ comp callout { type: "note", title: "Beta — API subject to change" } }}
-NetScript is a backend framework and workspace generator, not a hosted service — you run it on
-Deno and own all the generated code. It is in <code>0.0.1</code> beta, shipping
-incrementally, and the API is still moving. Every <code>@netscript/*</code> package shares one aligned version
-(<code>{{ releaseVersion }}</code>) and releases move in lockstep. Scaffolded JSR imports use exact
-<code>{{ releaseSpecifier }}</code> pins for the beta train, so keep package versions aligned when
-you upgrade.
+{{ comp callout { type: "note", title: "Beta" } }}
+NetScript is in beta (<code>{{ releaseVersion }}</code>) and moving quickly — pin your versions.
 {{ /comp }}
 
 <h2>The contract is the product</h2>
@@ -34,7 +29,7 @@ The tabs below come straight from a workspace scaffolded by
   { label: "1 · The contract", lang: "ts", code: "// contracts/versions/v1/users.contract.ts — scaffolded for you.\n// One entity schema fans out into a whole CRUD contract.\n// (@database/zod is emitted by `netscript db generate` in tab 4.)\nimport { createCrudContract } from '@netscript/contracts/crud';\nimport { UserCreateInput, UserSchema, UserUpdateInput } from '@database/zod';\n\nexport const UsersCrudContractV1 = createCrudContract({\n  resource: 'users',\n  entitySchema: UserSchema,\n  createSchema: UserCreateInput,\n  updateSchema: UserUpdateInput,\n});" },
   { label: "2 · The service", lang: "ts", code: "// Runnable once the database types exist (`netscript db generate`, tab 4).\n// One preset wires CORS, request logging, OpenAPI JSON, Scalar docs,\n// RPC (served at /api/rpc/*), service info, and health endpoints —\n// instead of ~40 lines of Hono setup.\nimport { defineService } from '@netscript/service';\nimport { router } from './router.ts';\n\nconst service = await defineService(router, {\n  name: 'users',\n  port: 3000,\n});\n\nawait service.stop();" },
   { label: "3 · Scaffold", lang: "sh", code: "# Install the netscript command from JSR (Deno 2.9+)\ndeno install --global --allow-all --name netscript jsr:@netscript/cli" + releaseSpecifier + "\n\n# Scaffold the workspace shown in tabs 1-2: contracts + the typed\n# users service + Postgres + Aspire orchestration.\n# Postgres is the recommended engine (mysql, mssql, sqlite also supported).\nnetscript init my-app --db postgres --service\n\n# Prefer to keep .NET Aspire out of the loop? Opt out:\nnetscript init my-app --db postgres --service --no-aspire" },
-  { label: "4 · Bring it up", lang: "sh", code: "# Aspire is step 2: it brings up Postgres and the cache first\ncd my-app/aspire\naspire restore   # one-time: downloads the AppHost SDK modules\naspire start     # starts everything and prints the dashboard URL\n\n# Open the dashboard and wait until the postgres resource reports\n# healthy — services deliberately wait on the database — then\n# initialize it from the workspace root:\ncd ..\nnetscript db init --name init\nnetscript db generate   # emits @database/zod, used by tabs 1-2\nnetscript db seed\n\n# If the users service is still shown as waiting after Postgres looks\n# ready, restart the orchestrator (from my-app/aspire: aspire stop,\n# then aspire start) — with the database initialized, the whole stack\n# reports healthy in seconds." }
+  { label: "4 · Bring it up", lang: "sh", code: "# Aspire is step 2: it brings up Postgres and the cache first\ncd my-app/aspire\naspire restore   # one-time: downloads the AppHost SDK modules\naspire start     # starts everything and prints the dashboard URL\n\n# Open the dashboard; once postgres reports healthy, initialize it\n# from the workspace root:\ncd ..\nnetscript db init --name init\nnetscript db generate   # emits @database/zod, used by tabs 1-2\nnetscript db seed" }
 ] }) }}
 
 <h2>One contract, four moves</h2>
@@ -90,8 +85,8 @@ four plugin files scaffolded and twelve Aspire helpers regenerated:
 
 <p>
 One app model, the whole spectrum: a single compiled binary on one machine, or a multi-cloud
-distributed infrastructure — and, from <code>0.0.1-beta.11</code>, a native desktop app on a
-consumer machine. Cloud-agnostic by design.
+distributed infrastructure — and, coming next, a native desktop app on a consumer machine.
+Cloud-agnostic by design.
 </p>
 
 <p>
@@ -106,14 +101,10 @@ delegating to Aspire, and Cloud Run. Cloud auth stays operator-owned — NetScri
 credentials and hand-authors no Helm/Bicep/Kubernetes manifests.
 </p>
 
-{{ comp callout { type: "note", title: "New in 0.0.1-beta.11 — native desktop lane" } }}
-The next release adds a native desktop deploy target — not yet available in the published
-<code>{{ releaseVersion }}</code> packages. It builds native installers per OS, prepares
-Ed25519-signed update manifests, and surfaces update-ready events through an SDK seam. Its honest
-edges: installers are unsigned at this stage (platform code-signing is a deliberate external CI
-step), and Windows native update apply is a manual installer-download path, not in-place
-auto-apply. See <a href="{{ '/how-to/build-a-desktop-frontend/' |> url }}">Build a desktop
-frontend</a>.
+{{ comp callout { type: "note", title: "Coming next — native desktop lane" } }}
+A native desktop deploy target is landing: native installers per OS, Ed25519-signed update
+manifests, and update-ready events surfaced through an SDK seam. See
+<a href="{{ '/how-to/build-a-desktop-frontend/' |> url }}">Build a desktop frontend</a>.
 {{ /comp }}
 
 <h2>Built for devs working with agents</h2>

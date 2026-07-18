@@ -345,3 +345,39 @@ grep zero.
 Everything else byte-identical (verified via targeted greps: zero residual instances of the three
 flagged phrasings). Gates: README fmt --check clean · tagline over=0 · site build 531 files ·
 docs:links 0 broken · internal-wording grep zero. Mermaid untouched this pass.
+
+## De-internalization pass — 2026-07-18 (Lane 4, owner directive from rendered-page review)
+
+1. **Caveat prose removed everywhere.** README beta note is now one line ("in beta and moving
+   quickly — pin your versions"); Status section reduced to a confident 4-line paragraph
+   (limitation list, roadmap/process explanation, and pinning rationale all deleted);
+   unsigned-installer / Windows-manual-apply prose deleted from the desktop sections in both
+   artifacts; quickstart readiness prose reduced to one neutral instruction and the recovery
+   paragraph deleted (README + homepage tab 4); bench parenthetical removed from Packages
+   (count stays 29+6, accurate without explanation).
+2. **Version literals eliminated.** README: install command now `jsr:@netscript/cli@<version>`
+   placeholder; sdk-row beta.11 annotation dropped; "New in 0.0.1-beta.11" → "### Coming next:
+   native desktop lane"; spectrum line "from 0.0.1-beta.11" → "coming next"; Status literal
+   removed. Homepage: hardcoded 0.0.1-beta.11 literals removed (spectrum line + callout title →
+   "Coming next — native desktop lane"); versions render ONLY through the existing
+   `releaseVersion`/`releaseSpecifier` variables (beta callout + scaffold tab). Residual grep for
+   `0.0.1|beta.` (excluding the variables) → zero in both artifacts.
+3. **Stale Windows-SIGTERM bullet deleted** (supervisor source verification:
+   `packages/service/src/builder/service-listener.ts:33-34` handles POSIX SIGINT/SIGTERM and
+   Windows SIGINT/SIGBREAK); homepage checked — no similar platform-trivia line existed. Lesson
+   recorded: always check source before asserting platform behavior.
+4. **Outward-facing read-through** of both pages as a first-time enterprise evaluator: process
+   explanations, hedges, and changelog-style lines cut; precision wordings from the final Sol
+   check (optional plugin axes, deny-list semantics, type-checked changes) preserved untouched.
+   Note: homepage "Standardize internal services" is product copy (company-internal backends),
+   not process vocabulary.
+
+Owner directive explicitly overrides earlier caveat-related instructions (incl. previously frozen
+caveat wordings); precision wordings retained, caveat content removed not reworded. Quickstart
+install command is now the placeholder form by owner instruction (no longer directly executable
+as printed; all other commands unchanged and previously executed).
+
+### Gates
+README fmt --check clean · tagline over=0 · mermaid MERMAID_PARSE_OK flowchart-v2 · site build
+531 files · docs:links 98 docs / 0 broken · internal-wording grep clean (single hit =
+"internal services" product copy, not process vocabulary) · residual version/caveat grep zero.

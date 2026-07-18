@@ -21,9 +21,7 @@ you and the coding agent you work with.
 NetScript is a framework and workspace generator, not a hosted service — you run it on Deno and own
 all the generated code.
 
-> **Beta (`0.0.1-beta.x`).** Every `@netscript/*` package shares one aligned version and releases
-> move in lockstep. The API is subject to change — build with us, but pin your versions. See
-> [Status and limitations](#-status-and-limitations).
+> **Beta.** NetScript is in beta and moving quickly — pin your versions.
 
 ---
 
@@ -35,7 +33,7 @@ You need [Deno 2.9+](https://docs.deno.com/runtime/getting_started/installation/
 
 ```bash
 # 1. Install the NetScript CLI on your PATH
-deno install --global --allow-all --name netscript jsr:@netscript/cli@0.0.1-beta.10
+deno install --global --allow-all --name netscript jsr:@netscript/cli@<version>
 
 # 2. Scaffold a workspace: contracts + a typed example service + Postgres + Aspire orchestration
 netscript init my-app --db postgres --service --yes
@@ -51,9 +49,8 @@ aspire restore   # one-time: downloads the AppHost SDK modules
 aspire start     # starts everything and prints the dashboard URL
 ```
 
-Open the dashboard URL and **wait until the `postgres` resource reports healthy** — on a cold
-machine the first container pull and health probe can take a few minutes, and the scaffolded
-services deliberately wait on the database before they start. Then initialize the database:
+Open the dashboard, wait until the `postgres` resource reports healthy, then initialize the
+database:
 
 ```bash
 # 4. Initialize the database (from the workspace root)
@@ -63,18 +60,13 @@ netscript db generate
 netscript db seed
 ```
 
-The payoff: the Aspire dashboard shows every resource, trace, and log in one place, and — once
-Postgres is healthy and the `users` service has started — your typed service answers on its health
-probe:
+The payoff: the Aspire dashboard shows every resource, trace, and log in one place, and your typed
+service answers on its health probe:
 
 ```bash
 curl http://localhost:3000/health
 # {"status":"healthy","timestamp":"…","checks":[{"name":"database","healthy":true,"latency":2}],…}
 ```
-
-If the service is still shown as waiting after Postgres looks ready, restart the orchestrator
-(`aspire stop`, then `aspire start` from `my-app/aspire`) — with the database already initialized,
-the whole stack reports healthy in seconds.
 
 Want to check the blast radius before anything touches disk? `netscript init my-app --dry-run`
 reports the file and directory counts it would create and writes nothing. Run `netscript --help` or
@@ -155,24 +147,22 @@ for its own needs — no host edits, no forks.
 ## 📦 Packages
 
 The monorepo publishes **29 packages and 6 first-party plugins** to JSR as small, single-purpose
-`@netscript/*` packages — adopt only the layers you need. (One further workspace package,
-`@netscript/bench`, is an internal benchmarking instrument and is not published.) Add any published
-package with `deno add jsr:@netscript/<name>@<version>` (pin the version; see
-[Status and limitations](#-status-and-limitations)).
+`@netscript/*` packages — adopt only the layers you need. Add any of them with
+`deno add jsr:@netscript/<name>@<version>`.
 
 <details>
 <summary><strong>Published package map</strong> (name → README → JSR)</summary>
 
 ### Foundation core
 
-| Package                                                          | JSR                                                                                                 | Capability                                                                                                                |
-| ---------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| [`@netscript/contracts`](packages/contracts/README.md)           | [![JSR](https://jsr.io/badges/@netscript/contracts)](https://jsr.io/@netscript/contracts)           | Contract primitives, shared error map, CRUD generators, query/transform helpers                                           |
-| [`@netscript/config`](packages/config/README.md)                 | [![JSR](https://jsr.io/badges/@netscript/config)](https://jsr.io/@netscript/config)                 | Typed project config schemas, loaders, env helpers, scaffold constants                                                    |
-| [`@netscript/logger`](packages/logger/README.md)                 | [![JSR](https://jsr.io/badges/@netscript/logger)](https://jsr.io/@netscript/logger)                 | Structured logging for services, packages, workers, and Hono + oRPC                                                       |
-| [`@netscript/sdk`](packages/sdk/README.md)                       | [![JSR](https://jsr.io/badges/@netscript/sdk)](https://jsr.io/@netscript/sdk)                       | Service discovery, typed oRPC clients, cache-backed query factories (desktop auto-update seam arrives in `0.0.1-beta.11`) |
-| [`@netscript/runtime-config`](packages/runtime-config/README.md) | [![JSR](https://jsr.io/badges/@netscript/runtime-config)](https://jsr.io/@netscript/runtime-config) | Hot-reloadable runtime override types, loaders, watchers, diagnostics                                                     |
-| [`@netscript/telemetry`](packages/telemetry/README.md)           | [![JSR](https://jsr.io/badges/@netscript/telemetry)](https://jsr.io/@netscript/telemetry)           | One distributed trace across scheduler, queue, worker, RPC, and SSE                                                       |
+| Package                                                          | JSR                                                                                                 | Capability                                                                      |
+| ---------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| [`@netscript/contracts`](packages/contracts/README.md)           | [![JSR](https://jsr.io/badges/@netscript/contracts)](https://jsr.io/@netscript/contracts)           | Contract primitives, shared error map, CRUD generators, query/transform helpers |
+| [`@netscript/config`](packages/config/README.md)                 | [![JSR](https://jsr.io/badges/@netscript/config)](https://jsr.io/@netscript/config)                 | Typed project config schemas, loaders, env helpers, scaffold constants          |
+| [`@netscript/logger`](packages/logger/README.md)                 | [![JSR](https://jsr.io/badges/@netscript/logger)](https://jsr.io/@netscript/logger)                 | Structured logging for services, packages, workers, and Hono + oRPC             |
+| [`@netscript/sdk`](packages/sdk/README.md)                       | [![JSR](https://jsr.io/badges/@netscript/sdk)](https://jsr.io/@netscript/sdk)                       | Service discovery, typed oRPC clients, cache-backed query factories             |
+| [`@netscript/runtime-config`](packages/runtime-config/README.md) | [![JSR](https://jsr.io/badges/@netscript/runtime-config)](https://jsr.io/@netscript/runtime-config) | Hot-reloadable runtime override types, loaders, watchers, diagnostics           |
+| [`@netscript/telemetry`](packages/telemetry/README.md)           | [![JSR](https://jsr.io/badges/@netscript/telemetry)](https://jsr.io/@netscript/telemetry)           | One distributed trace across scheduler, queue, worker, RPC, and SSE             |
 
 ### Data, messaging & scheduling
 
@@ -240,8 +230,8 @@ package with `deno add jsr:@netscript/<name>@<version>` (pin the version; see
 ## 🚢 Ship anywhere
 
 The same app model spans the whole spectrum: a single compiled binary on one machine today, a
-multi-cloud distributed infrastructure tomorrow — and, from `0.0.1-beta.11`, a native desktop app on
-a consumer machine. Cloud-agnostic by design: every target is an adapter behind one router, and more
+multi-cloud distributed infrastructure tomorrow — and, coming next, a native desktop app on a
+consumer machine. Cloud-agnostic by design: every target is an adapter behind one router, and more
 lanes follow the same contract as the framework grows.
 
 `netscript deploy <target> <op>` is one thin router over target adapters sharing a canonical
@@ -258,19 +248,12 @@ credentials and hand-authors no Helm/Bicep/Kubernetes manifests.
 | **Kubernetes / Azure (ACA, App Service, AKS)** | Validates the generated AppHost declares the matching hosting integration, then delegates to Aspire publish/deploy |
 | **Cloud Run**                                  | Docker-image lane: build → push → `gcloud run deploy`                                                              |
 
-### New in `0.0.1-beta.11`: native desktop lane
+### Coming next: native desktop lane
 
-The next release adds a **native desktop** deploy target — not yet available in the published
-`0.0.1-beta.10` packages this README pins. On the main branch, `deploy desktop package` builds
-native installers per OS (`.app`/`.dmg`, `.AppImage`/`.deb`/`.rpm`, `.msi`), an Ed25519-signed
-update-manifest release server prepares and serves updates, and an SDK auto-update seam surfaces
-update-ready events in the app.
-
-Its honest edges, stated up front: native installers and compiled binaries are **unsigned** at this
-stage — platform code-signing (Authenticode, Developer ID + notarization) is a deliberate external
-CI step, and the CLI accepts no certificate credentials. And Windows native update apply is
-unsupported upstream, so apps handle an `applyMode: "manual"` update-ready event and present its
-verified `manualUpdateUrl` instead of replacing themselves in place.
+A **native desktop** deploy target is landing: `deploy desktop package` builds native installers per
+OS (`.app`/`.dmg`, `.AppImage`/`.deb`/`.rpm`, `.msi`), an Ed25519-signed update-manifest release
+server prepares and serves updates, and an SDK auto-update seam surfaces update-ready events in the
+app.
 
 ---
 
@@ -342,31 +325,13 @@ from [adding a plugin](https://rickylabs.github.io/netscript/how-to/add-a-plugin
 
 ---
 
-## 🧭 Status and limitations
+## 🧭 Status
 
-NetScript is in **`0.0.1` beta** (current release train: `0.0.1-beta.10`), shipping incrementally —
-there is no big-bang jump from beta to stable. The API is subject to change; the published package
-surface is the contract: what you import from `jsr:@netscript/*` is what's documented and
-type-checked. `0.0.1-stable` is the terminal milestone carrying the project's falsifiable
-positioning verdict, reached incrementally through the beta train. Follow the
-[milestones](https://github.com/rickylabs/netscript/milestones),
+NetScript is in beta and moving quickly. The published package surface is the contract: what you
+import from `jsr:@netscript/*` is what's documented and type-checked. Follow what's landing next via
+the [milestones](https://github.com/rickylabs/netscript/milestones),
 [issues](https://github.com/rickylabs/netscript/issues), and
 [discussions](https://github.com/rickylabs/netscript/discussions).
-
-Known limitations, stated plainly:
-
-- **Pin your versions.** Bare `jsr:@netscript/*` specifiers do not resolve on the beta train — every
-  install pins an exact `@<version>`, and releases move in lockstep, so keep package versions
-  aligned when you upgrade.
-- **Auth is one active backend at a time.** Only `kv-oauth` is fully interactive today — on WorkOS
-  and better-auth the `signin`/`callback` endpoints return a typed unsupported-operation error by
-  design. No multi-active routing, cross-backend linking, or global logout yet.
-- **Windows.** Deno does not deliver `SIGTERM` on Windows (the service listener handles this), and
-  in the upcoming `0.0.1-beta.11` desktop lane, native updates on Windows follow a manual
-  installer-download path rather than in-place auto-apply.
-- **Deno 2.9+ everywhere.** Plugin runtimes, API services, and the MCP server require Deno 2.9+;
-  only the manifests and contracts are plain data importable anywhere TypeScript runs. Multi-runtime
-  worker tasks require the target interpreter (PowerShell, Python, POSIX shell) on the machine.
 
 ---
 
