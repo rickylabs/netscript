@@ -201,3 +201,10 @@ group launch; this section fixes the supervisor's surface.
   burned the ci workflow to attempt-50 startup_failure (empty-commit reset + rerun cap 2 adopted);
   close-gate/box-edit race handled. Release-cut gate now = PR #865 (owner-directed; watcher
   armed) → then AUTOMATIC release-cut prep → HARD STOP at ready-to-merge cut.
+
+## 2026-07-18 release cut
+- #862 merged 5f0adeea (#816 closed); nav PR #865 merged 1a9919cb (owner gate cleared).
+- release:cut run 1 FAIL: markdown-pins gate — stale `@netscript/sdk@0.0.1-beta.10` pin in packages/sdk/README.md.
+- Fix PR #867 (restore `<version>` placeholder) merged c9098c70 on CI green.
+- release:cut run 2 PASS (all gates: publish-set 35/35, lockstep, versionless, import-attr preflight, dry-run, ci --prod). Branch release/cut-0.0.1-beta.11 @ 3cdc4484; tool PR creation failed on token — PR #868 opened via MCP.
+- HARD STOP holds: owner merges #868, dispatches canary pair, release:publish, closes milestone 13.
