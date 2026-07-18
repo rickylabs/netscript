@@ -319,7 +319,7 @@ reframed) — saves 14 inbound + the `cli:reference` xref. Reference: 0 moves.
 2. **xref retarget:** repoint the 25 existing recipe `howto:` keys; **add 2 new keys**
    (`howto:build-a-durable-chat`, `howto:deploy-deno-deploy`) so the build link-checker covers them
    (they currently ride on nothing — a gap all three source proposals missed); add
-   `howto:agent-tooling → /ai/agent-tooling/` (currently unkeyed, 6 hardcoded inbound). = ~28 xref
+   `cap:agent-tooling → /ai/agent-tooling/` (currently unkeyed, 6 hardcoded inbound). = ~28 xref
    edits.
 3. **Hardcoded sweep (kill double-hops):** repoint the 61 `](/how-to/<slug>)` + 6 agent-tooling
    markdown links to canonical new URLs — grep-scriptable (`/how-to/<slug>/` →
