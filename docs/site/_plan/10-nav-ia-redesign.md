@@ -41,9 +41,9 @@ re-home from Background Processing to Data & Persistence (better semantic fit ne
 **Cost of that graft, stated honestly:** 28 URL moves (27 recipes + `capabilities/agent-tooling`).
 This is a deliberate reader-value-over-migration-minimalism decision. The cost is bounded and
 build-gated: `check-internal-links.ts` (deno.json task) scans every href in built HTML, so no broken
-link can merge; the Lume `redirects` plugin reduces 28 shims to 28 front-matter lines with
-auto-`unlisted`. Reference (crown jewels), tutorials, explanation, and all nine pillar-guide URLs
-stay byte-stable.
+link can merge; the Lume `redirects` plugin reduces 28 shims to 28 `oldUrl` front-matter lines
+(generated pages are flagged `isRedirect: true` and sit outside every nav.menu root). Reference
+(crown jewels), tutorials, explanation, and all nine pillar-guide URLs stay byte-stable.
 
 **Reference stays a single flat locked lane** (universal SOTA pattern; 32 units, `mcp` now
 registered) — never scattered into pillars. **Cross-listing dies entirely** (37 duplicate nav

@@ -32,7 +32,7 @@ export interface XrefTarget {
   label: string;
 }
 
-/** The 31 generated reference units (mirrors `referenceUnits` in `_data.ts`). */
+/** The 32 generated reference units (mirrors `referenceUnits` in `_data.ts`). */
 const REFERENCE_UNITS = [
   "ai",
   "auth",
@@ -49,6 +49,7 @@ const REFERENCE_UNITS = [
   "fresh-ui",
   "kv",
   "logger",
+  "mcp",
   "plugin",
   "plugin-ai",
   "plugin-ai-core",
@@ -119,6 +120,8 @@ export const xref: Record<string, XrefTarget> = {
   "howto:roll-out-runtime-overrides": { href: "/how-to/roll-out-runtime-overrides/", label: "Roll out runtime overrides" },
   "howto:add-a-task-runtime-adapter": { href: "/how-to/add-a-task-runtime-adapter/", label: "Add a task runtime adapter" },
   "howto:build-a-server-validated-form": { href: "/how-to/build-a-server-validated-form/", label: "Build a server-validated form" },
+  "howto:build-a-durable-chat": { href: "/how-to/build-a-durable-chat/", label: "Build a durable chat" },
+  "howto:deploy-deno-deploy": { href: "/how-to/deploy-deno-deploy/", label: "Deploy to Deno Deploy" },
   "howto:build-a-validated-ingestion-queue": { href: "/how-to/build-a-validated-ingestion-queue/", label: "Build a validated ingestion queue" },
   "howto:publish-a-durable-stream": { href: "/how-to/publish-a-durable-stream/", label: "Publish a durable stream" },
   "howto:restrict-worker-task-permissions": { href: "/how-to/restrict-worker-task-permissions/", label: "Restrict worker task permissions" },

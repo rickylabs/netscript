@@ -31,7 +31,7 @@ export interface NavSection {
 }
 
 /**
- * Reference units (33). The href is the section-root URL; `url` Lume filter
+* Reference units (34 rows: 32 unit dirs + the cli/commands and ai/skills subpages). The href is the section-root URL; `url` Lume filter
  * applies the /netscript/ base path at render time.
  */
 const referenceUnits: NavItem[] = [
@@ -52,6 +52,7 @@ const referenceUnits: NavItem[] = [
   { href: "/reference/fresh-ui/", label: "fresh-ui", icon: "F" },
   { href: "/reference/kv/", label: "kv", icon: "K" },
   { href: "/reference/logger/", label: "logger", icon: "L" },
+  { href: "/reference/mcp/", label: "mcp", icon: "M" },
   { href: "/reference/plugin/", label: "plugin", icon: "P" },
   { href: "/reference/plugin-ai/", label: "plugin-ai", icon: "P" },
   { href: "/reference/plugin-ai-core/", label: "plugin-ai-core", icon: "P" },
