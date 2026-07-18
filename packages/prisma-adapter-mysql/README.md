@@ -5,29 +5,52 @@
 [![Docs](https://img.shields.io/badge/docs-rickylabs.github.io-blue)](https://rickylabs.github.io/netscript/)
 
 **A Prisma driver adapter that connects Prisma Client to MySQL and MariaDB through Deno's native
-MySQL driver, so NetScript's data layer runs on Deno without the Node socket internals that break
-`@prisma/adapter-mariadb`.**
+MySQL driver — no Node socket internals, no `@prisma/adapter-mariadb` breakage under Deno.**
 
----
+Prisma's official MariaDB adapter rides on the npm `mariadb` package, which reaches into Node socket
+internals that Deno's compatibility layer does not provide — the run dies on
+`Symbol(Deno.internal.rid)` before the first query. `@netscript/prisma-adapter-mysql` replaces that
+foundation: one `PrismaMySql` factory wraps the Deno-native MySQL client, opens a connection pool
+when Prisma connects, and serves MySQL and MariaDB through the standard Prisma v7 driver-adapter
+interface. It is the engine behind `@netscript/database`'s MySQL support and works standalone with
+any Prisma Client on Deno.
 
-## 🚀 Quick Start
+## Why teams use it
 
-### Installation
+- **Deno-native driver** — wraps the Deno MySQL client instead of the npm `mariadb` package,
+  avoiding the `Symbol(Deno.internal.rid)` failure that `@prisma/adapter-mariadb` hits under Deno's
+  Node compatibility layer.
+- **MySQL and MariaDB from one factory** — `PrismaMySql` serves both engines; `inferCapabilities`
+  reads the server version to report whether relation joins are supported.
+- **Pooled connections** — a connection config with `poolSize` opens a pool when Prisma connects,
+  and `connect()` returns a `PrismaMySqlConnectedAdapter` exposing `queryRaw`, `executeRaw`,
+  transactions, and `dispose`.
+- **Fully typed surface** — configuration, query, result, and isolation-level types
+  (`MySqlConnectionConfig`, `PrismaMySqlQuery`, `PrismaMySqlResultSet`, `PrismaMySqlIsolationLevel`)
+  are exported from the package root.
+
+## Install
 
 ```bash
-# Deno (recommended)
-deno add jsr:@netscript/prisma-adapter-mysql
-
-# Node.js / Bun
-npx jsr add @netscript/prisma-adapter-mysql
-bunx jsr add @netscript/prisma-adapter-mysql
+deno add jsr:@netscript/prisma-adapter-mysql@<version>
 ```
 
-### Usage
+Pin `<version>` to match your installed CLI; bare `jsr:@netscript/*` specifiers do not resolve on
+the pre-release line.
+
+## Quick example
+
+Prerequisites: a running MySQL or MariaDB server and a generated Prisma client for your schema.
 
 ```typescript
-import { PrismaClient } from '@prisma/client';
 import { PrismaMySql } from '@netscript/prisma-adapter-mysql';
+
+// In your app this is the generated client:
+//   import { PrismaClient } from './generated/client/mod.ts';
+declare const PrismaClient: new (options: { adapter: PrismaMySql }) => {
+  user: { findMany(): Promise<unknown[]> };
+  $disconnect(): Promise<void>;
+};
 
 // Construct the adapter factory from a MySQL/MariaDB connection config.
 const adapter = new PrismaMySql({
@@ -47,34 +70,36 @@ const users = await prisma.user.findMany();
 await prisma.$disconnect();
 ```
 
----
+## Public surface
 
-## 📦 Key Capabilities
+| Symbol                                        | What it gives you                                 |
+| --------------------------------------------- | ------------------------------------------------- |
+| `PrismaMySql`                                 | The driver-adapter factory Prisma Client consumes |
+| `PrismaMySqlConnectedAdapter`                 | The connected adapter: raw queries, transactions  |
+| `inferCapabilities`                           | Server-version capability probe (relation joins)  |
+| `MySqlConnectionConfig`, `PrismaMySqlOptions` | Connection and adapter configuration types        |
+| `PrismaMySqlQuery`, `PrismaMySqlResultSet`    | Query and result-set shapes                       |
+| `PrismaMySqlIsolationLevel`                   | Supported transaction isolation levels            |
 
-- **Deno-native driver**: Wraps the Deno MySQL client instead of the npm `mariadb` package, avoiding
-  the `Symbol(Deno.internal.rid)` failure that `@prisma/adapter-mariadb` hits under Deno's Node
-  compatibility layer.
-- **MySQL and MariaDB**: One `PrismaMySql` factory serves both engines; `inferCapabilities` reads
-  the server version to report whether relation joins are supported.
-- **Pooled connections**: A connection config with `poolSize` opens a pool when Prisma connects, and
-  `connect()` returns a `PrismaMySqlConnectedAdapter` that exposes `queryRaw`, `executeRaw`,
-  transactions, and `dispose`.
-- **Typed surface**: Configuration, query, result, and isolation-level types
-  (`MySqlConnectionConfig`, `PrismaMySqlQuery`, `PrismaMySqlResultSet`, `PrismaMySqlIsolationLevel`)
-  are exported from the package root.
+The always-current symbol list is
+[`deno doc jsr:@netscript/prisma-adapter-mysql@<version>`](https://jsr.io/@netscript/prisma-adapter-mysql/doc)
+(pin `<version>` on the pre-release line, as above).
 
----
+## Docs
 
-## 📖 Documentation
-
-- **Reference**:
+- **Reference — adapter options and exports**:
   [rickylabs.github.io/netscript/reference/prisma-adapter-mysql/](https://rickylabs.github.io/netscript/reference/prisma-adapter-mysql/)
-- **Data & Persistence**:
+- **Data & Persistence — the NetScript data layer around it**:
   [rickylabs.github.io/netscript/data-persistence/](https://rickylabs.github.io/netscript/data-persistence/)
+- **API docs on JSR**:
+  [jsr.io/@netscript/prisma-adapter-mysql/doc](https://jsr.io/@netscript/prisma-adapter-mysql/doc)
 
----
+## Compatibility
 
-## 📝 License
+Designed for Deno with Prisma v7 driver adapters enabled; database connections need `--allow-net`.
+Works against MySQL 8.x and MariaDB servers.
+
+## License
 
 Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to
 JSR with cryptographically verified provenance.

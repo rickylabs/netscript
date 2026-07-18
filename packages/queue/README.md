@@ -4,29 +4,62 @@
 [![CI](https://github.com/rickylabs/netscript/actions/workflows/ci.yml/badge.svg)](https://github.com/rickylabs/netscript/actions/workflows/ci.yml)
 [![Docs](https://img.shields.io/badge/docs-rickylabs.github.io-blue)](https://rickylabs.github.io/netscript/)
 
-**A provider-agnostic message-queue primitive for NetScript that enqueues and drains background jobs
-through one `MessageQueue` contract, auto-discovering a Deno KV, Redis, RabbitMQ, or PostgreSQL
-backend from the Aspire environment.**
+**A provider-agnostic message queue for NetScript: enqueue and drain background jobs through one
+`MessageQueue` contract, auto-discovering a RabbitMQ, Redis, Deno KV, or PostgreSQL backend from the
+Aspire environment.**
 
----
+Queue code has a habit of marrying its broker: the day you move from Deno KV to RabbitMQ, every
+`enqueue` and every consumer changes. `@netscript/queue` keeps the contract and the broker separate.
+`createQueue('emails')` inspects the Aspire environment, picks the best available backend, and
+returns a `MessageQueue<T>` whose call sites are identical from an in-memory test run to a
+production broker. Validation, dead-lettering, and error taxonomy are part of the contract, not
+afterthoughts bolted onto one adapter.
 
-## 🚀 Quick Start
+## Why teams use it
 
-### Installation
+- **One contract, four backends** — every adapter implements the same `MessageQueue<T>` interface,
+  so `enqueue` and `listen` never change when the broker does.
+- **Backend auto-discovery** — `createQueue` resolves RabbitMQ, then Redis, then Deno KV from Aspire
+  service URLs and environment variables; pin one explicitly with `QueueProvider` plus
+  `QueueConnectionOptions`.
+- **Typed queues** — `createTypedQueue` adds schema validation on enqueue and dequeue, routing
+  invalid messages to discard, throw, or the dead-letter store.
+- **Durable dead letters** — terminal failures are recorded through the `DeadLetterStorePort`
+  contract, with KV, PostgreSQL, and Redis stores published under dedicated sub-path exports.
+- **Lazy adapter graph** — the root export carries only factories, ports, errors, and validation
+  helpers; Redis and RabbitMQ drivers load on first use, so common imports stay light.
+- **Structured failure taxonomy** — `QueueError` subclasses (`QueueConnectionError`,
+  `QueueValidationError`, `QueueHandlerError`, …) and `QueueErrorCode` make failures matchable
+  instead of string-parsed.
 
-```bash
-# Deno (recommended)
-deno add jsr:@netscript/queue
+## Architecture
 
-# Node.js / Bun
-npx jsr add @netscript/queue
-bunx jsr add @netscript/queue
+```mermaid
+flowchart LR
+    P["createQueue('emails')"] -- "Aspire env<br/>auto-discovery" --> B{"backend"}
+    B --> RMQ["RabbitMQ"]
+    B --> R["Redis"]
+    B --> K["Deno KV"]
+    B --> PG["PostgreSQL"]
+    RMQ & R & K & PG --> L["listen(handler)"]
+    L -- "terminal failure" --> DLQ["Dead-letter store<br/>(KV · Postgres · Redis)"]
 ```
 
-### Usage
+## Install
+
+```bash
+deno add jsr:@netscript/queue@<version>
+```
+
+Pin `<version>` to match your installed CLI; bare `jsr:@netscript/*` specifiers do not resolve on
+the pre-release line.
+
+## Quick example
 
 ```typescript
 import { createQueue } from '@netscript/queue';
+
+declare function sendWelcomeEmail(to: string, body: string): Promise<void>;
 
 // Auto-discovers a backend (RabbitMQ → Redis → Deno KV) from the Aspire environment.
 const queue = createQueue<{ to: string; body: string }>('emails');
@@ -56,36 +89,42 @@ const queue = createTypedQueue('notifications', NotificationSchema, {
 });
 ```
 
----
+## Public surface
 
-## 📦 Key Capabilities
+| Entry                                   | What it gives you                                                                                    |
+| --------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `.`                                     | `createQueue`, `createTypedQueue`, `createParallelQueue`, validation helpers, errors, contract types |
+| `./ports`                               | Contract types only (`MessageQueue`, `DeadLetterStorePort`, options)                                 |
+| `./adapters/deno-kv`                    | Deno KV adapter (native queue operations)                                                            |
+| `./adapters/kv-polling`                 | Deno KV polling adapter for hosts without native queue support                                       |
+| `./adapters/redis`                      | Redis adapter                                                                                        |
+| `./adapters/amqp`                       | RabbitMQ (AMQP) adapter                                                                              |
+| `./adapters/postgres`                   | PostgreSQL adapter                                                                                   |
+| `./adapters/*-dead-letter-store`        | Durable dead-letter stores for KV, PostgreSQL, and Redis                                             |
+| `./validation`, `./errors`, `./testing` | Validation helpers, error taxonomy, test utilities                                                   |
 
-- **Unified contract**: Every backend implements the same `MessageQueue<T>` interface, so `enqueue`
-  and `listen` call sites stay identical from an in-memory test adapter to a production broker.
-- **Backend auto-discovery**: `createQueue` resolves RabbitMQ, Redis, Deno KV, or PostgreSQL from
-  Aspire service URLs and environment variables, or pin one explicitly with `QueueProvider` plus
-  `QueueConnectionOptions`.
-- **Typed queues**: `createTypedQueue` adds Zod-backed validation on enqueue and dequeue, routing
-  invalid messages to discard, throw, or the dead-letter store.
-- **Durable dead letters**: Terminal failures are recorded through the `DeadLetterStorePort`
-  contract, with KV, PostgreSQL, and Redis stores published under dedicated sub-path exports.
-- **Lazy adapter graph**: The root export carries only factories, ports, errors, and validation
-  helpers — Redis and RabbitMQ adapters resolve on first use, so common imports stay light.
+The always-current symbol list is
+[`deno doc jsr:@netscript/queue@<version>`](https://jsr.io/@netscript/queue/doc) (pin `<version>` on
+the pre-release line, as above).
 
----
+## Docs
 
-## 📖 Documentation
-
-- **Reference**:
+- **Reference — factories, adapters, and exports**:
   [rickylabs.github.io/netscript/reference/queue/](https://rickylabs.github.io/netscript/reference/queue/)
-- **Background Processing**:
+- **Background Processing — how queues fit the background stack**:
   [rickylabs.github.io/netscript/background-processing/](https://rickylabs.github.io/netscript/background-processing/)
-- **Choose a queue provider**:
+- **How-to: choose a queue provider**:
   [rickylabs.github.io/netscript/how-to/choose-a-queue-provider/](https://rickylabs.github.io/netscript/how-to/choose-a-queue-provider/)
+- **API docs on JSR**: [jsr.io/@netscript/queue/doc](https://jsr.io/@netscript/queue/doc)
 
----
+## Compatibility
 
-## 📝 License
+Designed for Deno. The Deno KV backend needs the `kv` unstable feature (`--unstable-kv`); Redis,
+RabbitMQ, and PostgreSQL backends need `--allow-net` plus `--allow-env` for discovery. Backend
+auto-discovery reads Aspire-style service environment variables and falls back to Deno KV when no
+broker is advertised.
 
-Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to JSR with
-cryptographically verified provenance.
+## License
+
+Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to
+JSR with cryptographically verified provenance.
