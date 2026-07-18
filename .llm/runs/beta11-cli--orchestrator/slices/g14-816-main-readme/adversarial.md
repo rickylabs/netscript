@@ -232,6 +232,86 @@ evaluation was performed during this targeted final check.
 
 ---
 
+## Final targeted narrative check (`ab049204`)
+
+**Final verdict: FAIL**
+
+The narrative pass preserves the previously approved claim-precision wording and changes no command
+semantics. It nevertheless introduces one MAJOR plugin overclaim and two MINOR control/ review
+overclaims.
+
+### MAJOR — “Every layer at once” is not the plugin contract and is not proven by the install
+
+Both artifacts now say a plugin contributes to **every layer at once**: CLI verbs, scaffolded code,
+runtime services, storage, stream topics, telemetry, and Aspire resources. The audited plugin API
+does not impose that invariant. `@netscript/plugin` documents a rich vocabulary of optional
+contribution axes; its own quick example declares only a service. A valid plugin need not contribute
+every listed axis.
+
+The exact worker install output also cannot support “Watch one install touch every layer.” It proves
+only:
+
+- `Installed worker plugin "workers" on port 8091.`
+- four created plugin files; and
+- twelve regenerated Aspire helper files.
+
+Inspection of those four created files found job/task/runtime code. The printed evidence does not
+demonstrate a new CLI verb, storage, a stream topic, or telemetry output. The honest philosophy is
+that one manifest _can_ contribute across layers and host tooling materializes its declared axes;
+“every layer” is a false universal.
+
+### MINOR — “Destructive verbs stay in human hands” overstates the six-rule deny policy
+
+The unchanged detailed README policy statement remains accurate: 17 allowed prefixes, six explicit
+denies (`deploy`, `init`, `marketplace`, `db reset`, `plugin remove`, `ui:remove`), deny beats
+allow, and unmatched commands are denied. The new narrative generalizes this to all “destructive
+verbs” staying human-only.
+
+That category is not what the policy encodes. Several denied prefixes are broad rather than
+intrinsically destructive, while allowed commands such as database migration/seed, plugin install,
+UI update, and generators mutate state. State the exact six blocked command families or call them
+high-risk operations; do not claim exhaustive destructive-action classification.
+
+### MINOR — “Typed diffs” is presented as a shipped review surface without one
+
+The new README says developers review agent work through “typed diffs.” The facts establish typed
+contracts, generated typed clients, Deno checks, and ordinary source changes, but no product surface
+that produces or validates a special typed diff. “Type-checked changes” would match the evidence;
+“typed diffs” reads as an invented capability.
+
+### PASS notes
+
+- The trace half of the new control sentence is supported: MCP trace intelligence correlates whole
+  executions by id across worker/saga/trigger/stream/service domains.
+- The developer-with-agent framing is otherwise consistent with the shipped MCP/skills/CLI triple
+  and preserves the developer as owner/operator.
+- Exact `56bab8ff` F1 wording survives in both artifacts: typed service + typed clients derive from
+  the contract, and server/callers cannot drift apart. No Fresh UI/orchestration derivation wording
+  returned.
+- Exact F2 precision survives: the rejected “stop at the HTTP boundary” absolute is absent, while
+  both artifacts retain the first-party/in-box plugin comparison.
+- Diff inspection found no executable command semantic change. The worker install example moved from
+  inline prose to a fenced/tabbed example but remains exact, including its previously verified
+  output.
+- Both artifacts were read top-to-bottom. No other factual regression was found; beta.11 desktop
+  labeling, beta.10 limitations, deploy authority, quickstart readiness/recovery, package counts,
+  and navigation claims remain consistent.
+- Spot gate: `deno task docs:links` passes with 98 docs and zero broken links, broken anchors, or
+  orphans.
+
+### Required fixes
+
+1. Replace “contributes to/touches every layer” with “can contribute across layers” and tie the
+   install output only to what it actually reports.
+2. Replace the destructive-verbs universal with the exact six blocked command families or a
+   qualified “selected high-risk operations” statement.
+3. Replace “typed diffs” with the evidenced “type-checked changes.”
+
+No README/homepage edit, merge, release action, milestone close, seed-run filing, or self-dispatched
+evaluation was performed during this narrative check.
+
+---
+
 ## Homepage adversarial
 
 **Target:** rendered docs-site homepage from `docs/site/index.vto` at `60586af9`\
