@@ -204,7 +204,7 @@ When an island or route needs server data, prefer the runtime's typed query laye
 (<code>@netscript/fresh/query</code>) over hand-rolled <code>fetch</code> calls — it
 carries the oRPC contract types through to the client so a renamed service field
 surfaces as a type error. See <a href="/reference/fresh/"><code>@netscript/fresh</code></a>
-for the query builders, and <a href="/how-to/add-a-service/">Add a service</a> for
+for the query builders, and <a href="/services-sdk/how-to/add-a-service/">Add a service</a> for
 the backend half of that contract.
 {{ /comp }}
 
@@ -389,9 +389,9 @@ type.
   [`@netscript/fresh`](/reference/fresh/). These are the authority for every export
   (the `/server`, `/query`, and sibling subpaths included); this guide never
   duplicates them.
-- Related recipes: [Add a service](/how-to/add-a-service/) to give your UI a typed
-  oRPC backend, and [Add OpenTelemetry](/how-to/add-opentelemetry/) to trace it.
+- Related recipes: [Add a service](/services-sdk/how-to/add-a-service/) to give your UI a typed
+  oRPC backend, and [Add OpenTelemetry](/observability/how-to/add-opentelemetry/) to trace it.
 - Concepts: the [contracts](/explanation/contracts/) explanation shows how a typed
   contract flows from service to client to island.
 
-{{ comp.nextPrev({ prev: { label: "Add OpenTelemetry", href: "/how-to/add-opentelemetry/" }, next: { label: "Build a durable chat", href: "/how-to/build-a-durable-chat/" } }) }}
+{{ comp.nextPrev({ prev: { label: "Add OpenTelemetry", href: "/observability/how-to/add-opentelemetry/" }, next: { label: "Build a durable chat", href: "/ai/how-to/build-a-durable-chat/" } }) }}

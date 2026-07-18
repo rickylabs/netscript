@@ -23,7 +23,7 @@ config-to-argv wiring, nothing more.
 <code>netscript deploy deno-deploy</code> is fully wired and runnable. The Docker, Compose, and
 Linux/systemd targets are <strong>config schema only</strong> — there is no runnable
 <code>netscript deploy docker|compose|linux</code> verb yet. For those targets you assemble the
-deployment yourself from the primitives in the <a href="/how-to/deploy/">Deploy</a> recipe.
+deployment yourself from the primitives in the <a href="/orchestration-runtime/how-to/deploy/">Deploy</a> recipe.
 {{ /comp }}
 
 ## Before you start
@@ -185,7 +185,7 @@ Many NetScript runtime plugins (workers, sagas, triggers) require Deno KV and th
 `--unstable-kv`. Those background processors are not a fit for a single Deno Deploy isolate — deploy a
 KV-free entrypoint (for example a Fresh app or a stateless oRPC service) here, and run the KV-backed
 processors on infrastructure that permits `--unstable-kv`, as covered in the
-[Deploy](/how-to/deploy/) recipe.
+[Deploy](/orchestration-runtime/how-to/deploy/) recipe.
 
 ## Troubleshooting
 
@@ -207,19 +207,19 @@ processors on infrastructure that permits `--unstable-kv`, as covered in the
   {
     title: "Deploy (containers & bare metal)",
     body: "The manual path: deployable units from appsettings.json, backing services, per-process deno run commands, and the --no-aspire escape hatch.",
-    href: "/how-to/deploy/",
+    href: "/orchestration-runtime/how-to/deploy/",
     icon: "◆"
   },
   {
     title: "Deploy locally with Aspire",
     body: "Run the whole graph on one machine under the Aspire AppHost before you ship anything remote.",
-    href: "/how-to/deploy-local-aspire/",
+    href: "/orchestration-runtime/how-to/deploy-local-aspire/",
     icon: "◎"
   },
   {
     title: "Add OpenTelemetry",
     body: "Wire spans and traceparent propagation to your OTLP collector so a deployed process is observable.",
-    href: "/how-to/add-opentelemetry/",
+    href: "/observability/how-to/add-opentelemetry/",
     icon: "≋"
   }
 ] }) }}

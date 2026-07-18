@@ -102,6 +102,6 @@ Deno.test('contact page registers the route pattern', () => {
 - Look up the builder surface in [fresh reference](/reference/fresh/).
 
 {{ comp.nextPrev({
-  prev: { label: "Add a task runtime adapter", href: "/how-to/add-a-task-runtime-adapter/" },
-  next: { label: "Build a validated ingestion queue", href: "/how-to/build-a-validated-ingestion-queue/" }
+  prev: { label: "Add a task runtime adapter", href: "/background-processing/how-to/add-a-task-runtime-adapter/" },
+  next: { label: "Build a validated ingestion queue", href: "/durable-workflows/how-to/build-a-validated-ingestion-queue/" }
 }) }}

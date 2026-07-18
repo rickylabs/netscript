@@ -27,7 +27,7 @@ engine, or <code>mysql</code> / <code>mssql</code> / <code>sqlite</code> when yo
 step 2 of the everyday flow: <code>cd aspire &amp;&amp; aspire start</code> brings up Postgres and Redis via Docker and
 opens the dashboard at <a href="https://localhost:18888">:18888</a> — <strong>before</strong> any <code>db init</code>,
 <code>db generate</code>, <code>db seed</code>, or <code>db status</code>. Run a <code>db</code> command with Aspire down and it fails to
-find the database. See the <a href="/how-to/database-migration/">database &amp; migration how-to</a>.
+find the database. See the <a href="/data-persistence/how-to/database-migration/">database &amp; migration how-to</a>.
 {{ /comp }}
 
 ## Install
@@ -155,8 +155,8 @@ regenerate the registry so the project picks them up.
   rows: [
     { name: "netscript plugin install", type: "netscript plugin install <kind-or-package> --name <name> [--project-root <path>]", desc: "Install a plugin dependency, emit the workspace glue that imports it, and register it with Aspire. The positional value accepts official bare aliases such as <code>workers</code> or <code>auth</code>, scoped package specs such as <code>@netscript/plugin-workers</code>, and <code>jsr:</code> package specs." },
     { name: "netscript plugin install workers", type: "netscript plugin install workers --name workers", desc: "Install the official workers plugin via its verified bare alias. The equivalent package-spec form is <code>netscript plugin install @netscript/plugin-workers --name workers</code>." },
-    { name: "netscript plugin install auth", type: "netscript plugin install auth --name auth", desc: "Install the official auth plugin — the <code>auth-api</code> oRPC service on port 8094 exposing <code>/api/v1/auth/{signin,callback,signout,session,me}</code>. Pulls in <code>auth.prisma</code> and a single active backend selected by <code>NETSCRIPT_AUTH_BACKEND</code> (default <code>kv-oauth</code>). See <a href=\"/how-to/add-authentication/\">add authentication</a>." },
-    { name: "netscript plugin new", type: "netscript plugin new billing", desc: "Scaffold a brand-new first-party plugin as a two-tier pair: a JSR-publishable core engine package under <code>packages/plugin-&lt;name&gt;-core/</code> (domain, ports, application, contracts, testing doubles) and a thin connector under <code>plugins/&lt;name&gt;/</code> (manifest, adapter, aspire, cli, scaffold, services) that re-exports the core contract. Scaffolds a proxy connector by default; pass <code>--feature</code> for a route-backed feature connector, and <code>--force</code> to overwrite existing files. See <a href=\"/how-to/author-a-plugin/\">author a plugin</a>." },
+    { name: "netscript plugin install auth", type: "netscript plugin install auth --name auth", desc: "Install the official auth plugin — the <code>auth-api</code> oRPC service on port 8094 exposing <code>/api/v1/auth/{signin,callback,signout,session,me}</code>. Pulls in <code>auth.prisma</code> and a single active backend selected by <code>NETSCRIPT_AUTH_BACKEND</code> (default <code>kv-oauth</code>). See <a href=\"/identity-access/how-to/add-authentication/\">add authentication</a>." },
+    { name: "netscript plugin new", type: "netscript plugin new billing", desc: "Scaffold a brand-new first-party plugin as a two-tier pair: a JSR-publishable core engine package under <code>packages/plugin-&lt;name&gt;-core/</code> (domain, ports, application, contracts, testing doubles) and a thin connector under <code>plugins/&lt;name&gt;/</code> (manifest, adapter, aspire, cli, scaffold, services) that re-exports the core contract. Scaffolds a proxy connector by default; pass <code>--feature</code> for a route-backed feature connector, and <code>--force</code> to overwrite existing files. See <a href=\"/orchestration-runtime/how-to/author-a-plugin/\">author a plugin</a>." },
     { name: "netscript plugin list", type: "netscript plugin list", desc: "List the plugins registered in the current workspace." },
     { name: "netscript plugin doctor", type: "netscript plugin doctor", desc: "Check the health of installed NetScript plugins — a fast wiring sanity check." },
     { name: "netscript plugin info", type: "netscript plugin info workers", desc: "Run a plugin's published info command for details about a single plugin." },
@@ -180,7 +180,7 @@ A public <code>plugin install</code> runs the plugin package's scaffolder and em
 such as <code>workers/mod.ts</code>, <code>workers/runtime.ts</code>, or <code>auth/mod.ts</code>.
 The plugin's service, runtime, contract, and schema internals stay in the installed dependency.
 Contributor workflows can still materialize full local source from a NetScript checkout. See the
-<a href="/how-to/add-a-plugin/">add-a-plugin how-to</a>.
+<a href="/orchestration-runtime/how-to/add-a-plugin/">add-a-plugin how-to</a>.
 {{ /comp }}
 
 ### Authentication plugin
@@ -207,7 +207,7 @@ After <code>netscript plugin install auth</code>, run the normal database workfl
 (the better-auth-shaped <code>auth_users</code>, <code>auth_sessions</code>, <code>auth_accounts</code>, <code>auth_verifications</code>
 tables) exactly like the other plugins. Only the <code>better-auth</code> backend reads these tables —
 <code>kv-oauth</code> stores sessions in KV and <code>workos</code> is stateless. Full env table and happy-path setup
-are in <a href="/how-to/add-authentication/">add authentication</a>; the architecture is in
+are in <a href="/identity-access/how-to/add-authentication/">add authentication</a>; the architecture is in
 <a href="/explanation/auth-model/">the auth model</a>.
 {{ /comp }}
 
@@ -237,7 +237,7 @@ file-backed and has no Aspire container**. **All of the container-backed engines
 Aspire to be running** — Aspire provisions the database, so start it first with
 `cd aspire && aspire start`. Plugin schemas (`workers`, `sagas`, `triggers`, **`auth`**)
 are picked up by the same `generate` / `migrate` pass. The full task walkthrough is in the
-[database & migration how-to](/how-to/database-migration/).
+[database & migration how-to](/data-persistence/how-to/database-migration/).
 
 {{ comp.apiTable({
   caption: "Database workflow (Aspire must be running)",
@@ -286,7 +286,7 @@ registry and runtime schemas stay in sync.
 
 The frontend is copy-source: components are copied into your repo under
 `apps/dashboard`, and the code is yours to own and edit. See
-[customize Fresh UI](/how-to/customize-fresh-ui/).
+[customize Fresh UI](/web-layer/how-to/customize-fresh-ui/).
 
 {{ comp.apiTable({
   caption: "UI workspace tasks",
@@ -316,7 +316,7 @@ the scaffold exists. Use `--cwd <member>` to target a specific workspace member.
 ## Deploy
 
 Two deploy paths are wired today: the **Deno Deploy** cloud target and the pre-existing
-**Windows Service** (Servy) path. See [deploy](/how-to/deploy/) for the portability story,
+**Windows Service** (Servy) path. See [deploy](/orchestration-runtime/how-to/deploy/) for the portability story,
 including the `--no-aspire` escape hatch and bare-`deno task` targets.
 
 ### Deno Deploy (cloud target)
@@ -392,13 +392,13 @@ flag, see the command reference:
   {
     title: "Database & migration",
     body: "The full db workflow, with the Aspire-up dependency spelled out step by step.",
-    href: "/how-to/database-migration/",
+    href: "/data-persistence/how-to/database-migration/",
     icon: "▤"
   },
   {
     title: "Add authentication",
     body: "Add the auth plugin, pick a backend via NETSCRIPT_AUTH_BACKEND, migrate auth.prisma, and wire the kv-oauth happy path.",
-    href: "/how-to/add-authentication/",
+    href: "/identity-access/how-to/add-authentication/",
     icon: "🔑"
   }
 ] }) }}

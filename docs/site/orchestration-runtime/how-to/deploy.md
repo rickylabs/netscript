@@ -51,7 +51,7 @@ The scaffolded workflows cover the deploy surfaces that ship today:
 (<code>netscript deploy build</code>). They are intentionally starter pipelines: fill in repository
 secrets, GitHub environment protection, host credentials, and target-specific configuration before
 you treat them as production release jobs. See
-<a href="/how-to/deploy-deno-deploy/">Deploy to Deno Deploy</a> for the managed-platform command
+<a href="/orchestration-runtime/how-to/deploy-deno-deploy/">Deploy to Deno Deploy</a> for the managed-platform command
 reference.
 {{ /comp }}
 
@@ -63,7 +63,7 @@ There is now a first-class, runnable managed-platform path:
 preflight guard and <code>deploy.targets['deno-deploy']</code> config. Aspire-backed targets are
 also routed: <code>netscript deploy docker|compose|kubernetes|azure-aca|azure-app-service|azure-aks|cloud-run &lt;op&gt;</code>
 delegates to the target adapter. See
-<a href="/how-to/deploy-deno-deploy/">Deploy to Deno Deploy</a> for Deno Deploy details.
+<a href="/orchestration-runtime/how-to/deploy-deno-deploy/">Deploy to Deno Deploy</a> for Deno Deploy details.
 {{ /comp }}
 
 ## Before you start
@@ -181,7 +181,7 @@ Postgres is provisioned <strong>by Aspire</strong>. So the order is always:
 <code>db seed</code>. Running a DB command with no Postgres reachable — for example in an
 isolated CI container — fails fast. In production, point the same commands at your managed
 Postgres via <code>POSTGRES_URI</code> or <code>DATABASE_URL</code> instead of relying on
-Aspire. See <a href="/how-to/database-migration/">Database migration</a> for the full sequence.
+Aspire. See <a href="/data-persistence/how-to/database-migration/">Database migration</a> for the full sequence.
 {{ /comp }}
 
 ## Step 3 — Provision backing services
@@ -419,7 +419,7 @@ deployment is live.
   {
     title: "Deploy to Deno Deploy",
     body: "The one runnable managed-platform path: netscript deploy deno-deploy plan/up/status/logs/down, the unstable-API guard, and deploy.targets['deno-deploy'] config.",
-    href: "/how-to/deploy-deno-deploy/",
+    href: "/orchestration-runtime/how-to/deploy-deno-deploy/",
     icon: "◆"
   },
   {
@@ -431,13 +431,13 @@ deployment is live.
   {
     title: "Database migration",
     body: "Run db init → generate → seed → status against Postgres — and why aspire start comes first.",
-    href: "/how-to/database-migration/",
+    href: "/data-persistence/how-to/database-migration/",
     icon: "▣"
   },
   {
     title: "Add OpenTelemetry",
     body: "Wire spans and traceparent propagation to your OTLP collector in production.",
-    href: "/how-to/add-opentelemetry/",
+    href: "/observability/how-to/add-opentelemetry/",
     icon: "≋"
   }
 ] }) }}

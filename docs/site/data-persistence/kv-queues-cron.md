@@ -73,7 +73,7 @@ for you with no manual instrumentation.
   {
     title: "Do — Choose a queue provider",
     body: "Recipe: pick between Deno KV, Redis, RabbitMQ, and PostgreSQL — and wire the Aspire-provisioned, local-fallback, and explicit-provider paths.",
-    href: "/how-to/choose-a-queue-provider/",
+    href: "/data-persistence/how-to/choose-a-queue-provider/",
     icon: "→"
   },
   {
@@ -354,7 +354,7 @@ for business-hours schedules. <strong>(5)</strong> always <code>await scheduler.
   {
     title: "Do — Choose a queue provider",
     body: "Task recipe: stand up each primitive in an existing workspace, with the Aspire-provisioned, local-fallback, and explicit-PostgreSQL paths spelled out.",
-    href: "/how-to/choose-a-queue-provider/",
+    href: "/data-persistence/how-to/choose-a-queue-provider/",
     icon: "◆"
   },
   {

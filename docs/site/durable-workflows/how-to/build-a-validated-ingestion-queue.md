@@ -84,11 +84,11 @@ await queue.listen(async (message, context) => {
 
 ## Next steps
 
-- Compare providers in [Choose a queue provider](/how-to/choose-a-queue-provider/).
-- Use queues with KV and cron in [Queue / KV / cron](/how-to/queue-kv-cron/).
+- Compare providers in [Choose a queue provider](/data-persistence/how-to/choose-a-queue-provider/).
+- Use queues with KV and cron in [Queue / KV / cron](/data-persistence/how-to/queue-kv-cron/).
 - Look up the full API in [queue reference](/reference/queue/).
 
 {{ comp.nextPrev({
-  prev: { label: "Build a server-validated form", href: "/how-to/build-a-server-validated-form/" },
-  next: { label: "Publish a durable stream", href: "/how-to/publish-a-durable-stream/" }
+  prev: { label: "Build a server-validated form", href: "/web-layer/how-to/build-a-server-validated-form/" },
+  next: { label: "Publish a durable stream", href: "/durable-workflows/how-to/publish-a-durable-stream/" }
 }) }}

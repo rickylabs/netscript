@@ -41,8 +41,8 @@ stitch a file drop to its job execution.
 observable, correctly-wired stack on <strong>one machine</strong>. The Postgres and Redis it starts
 are throwaway Docker containers for dev convenience — <strong>not</strong> your production database or
 cache. Shipping to a remote target (managed infrastructure, your own process lifecycle) is the
-<a href="/how-to/deploy/">Deploy</a> recipe; this chapter is the local companion. The full local
-walkthrough lives in <a href="/how-to/deploy-local-aspire/">Deploy locally with Aspire</a>.
+<a href="/orchestration-runtime/how-to/deploy/">Deploy</a> recipe; this chapter is the local companion. The full local
+walkthrough lives in <a href="/orchestration-runtime/how-to/deploy-local-aspire/">Deploy locally with Aspire</a>.
 {{ /comp }}
 
 ## Before you begin
@@ -212,12 +212,12 @@ and you know exactly where the local story ends and a production deployment begi
 
 You have finished the ERP Sync track. From here, branch into task-oriented and reference docs:
 
-- **Ship it remotely** → [Deploy](/how-to/deploy/) — the production companion to this local run:
+- **Ship it remotely** → [Deploy](/orchestration-runtime/how-to/deploy/) — the production companion to this local run:
   deployable units, managed backing services, and the `--no-aspire` path.
-- **Take the transform polyglot** → [Run a polyglot task](/how-to/run-a-polyglot-task/) — swap
+- **Take the transform polyglot** → [Run a polyglot task](/background-processing/how-to/run-a-polyglot-task/) — swap
   Chapter 3's Deno transform for a Python or shell step on your own host.
-- **Tune throughput** → [Choose a queue provider](/how-to/choose-a-queue-provider/) and
-  [Tune the worker runtime](/how-to/tune-worker-runtime/).
+- **Tune throughput** → [Choose a queue provider](/data-persistence/how-to/choose-a-queue-provider/) and
+  [Tune the worker runtime](/background-processing/how-to/tune-worker-runtime/).
 - **Understand the orchestrator** → [Orchestration with Aspire](/explanation/aspire/) and the full
   [How-to guides](/how-to/).
 

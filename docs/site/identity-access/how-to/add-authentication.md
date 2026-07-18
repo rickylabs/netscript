@@ -157,7 +157,7 @@ netscript db seed                # optional seed data
 netscript db status              # confirm the migration is applied
 ```
 
-See [Run a database migration](/how-to/database-migration/) for the full DB workflow and the
+See [Run a database migration](/data-persistence/how-to/database-migration/) for the full DB workflow and the
 Aspire-up dependency.
 
 ## Step 4 — Configure the provider and secrets
@@ -354,7 +354,7 @@ aspire start</code> first.</li>
 {{ comp.card({
   title: "Run a database migration",
   body: "The full db init / generate / seed / status workflow that applies auth.prisma.",
-  href: "/how-to/database-migration/",
+  href: "/data-persistence/how-to/database-migration/",
   icon: "+"
 }) }}
 

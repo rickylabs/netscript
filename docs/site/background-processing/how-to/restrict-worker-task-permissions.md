@@ -80,11 +80,11 @@ permissions unless the adapter adds its own sandbox.
 
 ## Next steps
 
-- Tune process isolation with [Tune the worker runtime](/how-to/tune-worker-runtime/).
-- Add a custom adapter with [Add a task runtime adapter](/how-to/add-a-task-runtime-adapter/).
+- Tune process isolation with [Tune the worker runtime](/background-processing/how-to/tune-worker-runtime/).
+- Add a custom adapter with [Add a task runtime adapter](/background-processing/how-to/add-a-task-runtime-adapter/).
 - Look up worker symbols in [workers reference](/reference/workers/).
 
 {{ comp.nextPrev({
-  prev: { label: "Publish a durable stream", href: "/how-to/publish-a-durable-stream/" },
+  prev: { label: "Publish a durable stream", href: "/durable-workflows/how-to/publish-a-durable-stream/" },
   next: { label: "How-to guides", href: "/how-to/" }
 }) }}

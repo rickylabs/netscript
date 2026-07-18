@@ -3,7 +3,7 @@ layout: layouts/base.vto
 title: How-to guides
 templateEngine: [vento, md]
 prev: null
-next: { label: "Add a plugin", href: "/how-to/add-a-plugin/" }
+next: { label: "Add a plugin", href: "/orchestration-runtime/how-to/add-a-plugin/" }
 nav_hide: true
 ---
 
@@ -36,10 +36,10 @@ Each emits the relevant workspace-owned glue, samples, or service files and ends
 command you can run to confirm it works.
 
 {{ comp.featureGrid({ items: [
-  { title: "Add a plugin", body: "Install a first-party plugin through the public package flow, or use the local netscript-dev path for contributor-source samples. Emits user-owned glue, regenerates the registry, and verifies the service answers on its port.", href: "/how-to/add-a-plugin/" },
-  { title: "Add a service", body: "Stand up a new typed oRPC service: define an @orpc/contract + zod contract, implement() the handlers, serve it with defineService(...) one-shot or createService(...).serve() fluent, and confirm it answers on /api/rpc/*.", href: "/how-to/add-a-service/" },
-  { title: "Add authentication", body: "Add the official auth plugin (auth-api on :8094, five endpoints under /api/v1/auth/*). Pick one active backend via NETSCRIPT_AUTH_BACKEND — kv-oauth (interactive, default), WorkOS, or better-auth — run the auth.prisma migration, and sign in.", href: "/how-to/add-authentication/" },
-  { title: "Database & migration", body: "Initialize, generate, seed, and inspect the Postgres schema: netscript db init --name init → db generate → db seed → db status. Requires aspire start first so Postgres is provisioned.", href: "/how-to/database-migration/" }
+  { title: "Add a plugin", body: "Install a first-party plugin through the public package flow, or use the local netscript-dev path for contributor-source samples. Emits user-owned glue, regenerates the registry, and verifies the service answers on its port.", href: "/orchestration-runtime/how-to/add-a-plugin/" },
+  { title: "Add a service", body: "Stand up a new typed oRPC service: define an @orpc/contract + zod contract, implement() the handlers, serve it with defineService(...) one-shot or createService(...).serve() fluent, and confirm it answers on /api/rpc/*.", href: "/services-sdk/how-to/add-a-service/" },
+  { title: "Add authentication", body: "Add the official auth plugin (auth-api on :8094, five endpoints under /api/v1/auth/*). Pick one active backend via NETSCRIPT_AUTH_BACKEND — kv-oauth (interactive, default), WorkOS, or better-auth — run the auth.prisma migration, and sign in.", href: "/identity-access/how-to/add-authentication/" },
+  { title: "Database & migration", body: "Initialize, generate, seed, and inspect the Postgres schema: netscript db init --name init → db generate → db seed → db status. Requires aspire start first so Postgres is provisioned.", href: "/data-persistence/how-to/database-migration/" }
 ] }) }}
 
 ## Set up the developer environment
@@ -48,8 +48,8 @@ Recipes for the toolchain around a NetScript workspace: editor intelligence, orc
 runtime setup that should behave the same on every device.
 
 {{ comp.featureGrid({ items: [
-  { title: "Deno LSP code intelligence", body: "Install the Claude Code Deno LSP plugin, enable the LSP tool globally, and keep go-to-definition, hover, references, symbols, and diagnostics aligned across CLI, VS Code, and Zed.", href: "/how-to/deno-lsp-code-intelligence/" },
-  { title: "Deploy locally with Aspire", body: "Run the full local resource graph from the generated Aspire AppHost: dashboard, infrastructure, services, plugin APIs, and background processors.", href: "/how-to/deploy-local-aspire/" }
+  { title: "Deno LSP code intelligence", body: "Install the Claude Code Deno LSP plugin, enable the LSP tool globally, and keep go-to-definition, hover, references, symbols, and diagnostics aligned across CLI, VS Code, and Zed.", href: "/orchestration-runtime/how-to/deno-lsp-code-intelligence/" },
+  { title: "Deploy locally with Aspire", body: "Run the full local resource graph from the generated Aspire AppHost: dashboard, infrastructure, services, plugin APIs, and background processors.", href: "/orchestration-runtime/how-to/deploy-local-aspire/" }
 ] }) }}
 
 ## Wire primitives & observability
@@ -58,8 +58,8 @@ Recipes for the shared building blocks every plugin leans on — queues, KV, cro
 and the OpenTelemetry traces that make them visible in the Aspire dashboard.
 
 {{ comp.featureGrid({ items: [
-  { title: "Queue / KV / cron", body: "Use the reactive KV store, the durable queue (four backends — RabbitMQ, Redis, Deno KV, and explicit-provider PostgreSQL), and cron schedules. Covers --unstable-kv and the auto-discovery order vs. an explicit provider:'postgres'.", href: "/how-to/queue-kv-cron/" },
-  { title: "Add OpenTelemetry", body: "Emit custom spans and structured logs with @netscript/telemetry helpers, propagate traceparent across services, and read the traces that land in the Aspire dashboard. Worker job dispatch/execution traces are already real and automatic.", href: "/how-to/add-opentelemetry/" }
+  { title: "Queue / KV / cron", body: "Use the reactive KV store, the durable queue (four backends — RabbitMQ, Redis, Deno KV, and explicit-provider PostgreSQL), and cron schedules. Covers --unstable-kv and the auto-discovery order vs. an explicit provider:'postgres'.", href: "/data-persistence/how-to/queue-kv-cron/" },
+  { title: "Add OpenTelemetry", body: "Emit custom spans and structured logs with @netscript/telemetry helpers, propagate traceparent across services, and read the traces that land in the Aspire dashboard. Worker job dispatch/execution traces are already real and automatic.", href: "/observability/how-to/add-opentelemetry/" }
 ] }) }}
 
 ## Ship the UI & deploy
@@ -68,11 +68,11 @@ Recipes for the front end and for taking a workspace to production — including
 the Aspire-free portability path.
 
 {{ comp.featureGrid({ items: [
-  { title: "Customize the Fresh UI", body: "Bring in and own the dashboard UI with the ui:init / ui:add tasks. The scaffold uses copy-source ownership — the components land in your workspace, so you edit them directly rather than depending on a hidden package.", href: "/how-to/customize-fresh-ui/" },
-  { title: "Build a durable chat", body: "Wire an AI chat onto a Fresh route whose transcript survives reload and reconnect via a durable session stream; hydrate the fresh-ui chat components; and add one server-side tool.", href: "/how-to/build-a-durable-chat/" },
-  { title: "Deploy", body: "The portability and config story: the raw deno task entry points behind each service, plus the --no-aspire escape hatch when you provision Postgres and Redis (or Garnet) yourself. Docker, Compose, and Linux targets are config-only scaffolding today, not runnable deploy verbs — for a first-class hosted path, see Deploy to Deno Deploy.", href: "/how-to/deploy/" },
-  { title: "Deploy to Deno Deploy", body: "Push a workspace to Deno Deploy with the first-class netscript deploy deno-deploy plan | up | down | status | logs command: preflight the unstable-API guard, push a preview, promote to prod, and read status and logs.", href: "/how-to/deploy-deno-deploy/" },
-  { title: "Author a plugin", body: "Advanced: build a custom plugin from scratch. Defines the scaffold.plugin.json provider kind, the manifest exports, and the mod.ts contract the host discovers — the same shape the first-party plugins use.", href: "/how-to/author-a-plugin/" }
+  { title: "Customize the Fresh UI", body: "Bring in and own the dashboard UI with the ui:init / ui:add tasks. The scaffold uses copy-source ownership — the components land in your workspace, so you edit them directly rather than depending on a hidden package.", href: "/web-layer/how-to/customize-fresh-ui/" },
+  { title: "Build a durable chat", body: "Wire an AI chat onto a Fresh route whose transcript survives reload and reconnect via a durable session stream; hydrate the fresh-ui chat components; and add one server-side tool.", href: "/ai/how-to/build-a-durable-chat/" },
+  { title: "Deploy", body: "The portability and config story: the raw deno task entry points behind each service, plus the --no-aspire escape hatch when you provision Postgres and Redis (or Garnet) yourself. Docker, Compose, and Linux targets are config-only scaffolding today, not runnable deploy verbs — for a first-class hosted path, see Deploy to Deno Deploy.", href: "/orchestration-runtime/how-to/deploy/" },
+  { title: "Deploy to Deno Deploy", body: "Push a workspace to Deno Deploy with the first-class netscript deploy deno-deploy plan | up | down | status | logs command: preflight the unstable-API guard, push a preview, promote to prod, and read status and logs.", href: "/orchestration-runtime/how-to/deploy-deno-deploy/" },
+  { title: "Author a plugin", body: "Advanced: build a custom plugin from scratch. Defines the scaffold.plugin.json provider kind, the manifest exports, and the mod.ts contract the host discovers — the same shape the first-party plugins use.", href: "/orchestration-runtime/how-to/author-a-plugin/" }
 ] }) }}
 
 ## How a recipe is shaped
@@ -91,10 +91,10 @@ Every how-to page follows the same contract so you always know where to look:
 
 {{ comp callout { tone: "note", title: "Pick by intent, not by feature name" } }}
 If you are not sure which recipe you want, name the outcome first. <em>"Users
-must sign in"</em> → <a href="/how-to/add-authentication/">Add authentication</a>.
+must sign in"</em> → <a href="/identity-access/how-to/add-authentication/">Add authentication</a>.
 <em>"This event should fan out to a background job"</em> →
-<a href="/how-to/add-a-plugin/">Add a plugin</a> (triggers + workers).
+<a href="/orchestration-runtime/how-to/add-a-plugin/">Add a plugin</a> (triggers + workers).
 <em>"It has to run where there is no Aspire"</em> →
-<a href="/how-to/deploy/">Deploy</a>. The recipes are deliberately small and
+<a href="/orchestration-runtime/how-to/deploy/">Deploy</a>. The recipes are deliberately small and
 composable; most real features chain two or three of them.
 {{ /comp }}

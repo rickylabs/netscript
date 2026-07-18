@@ -74,7 +74,7 @@ processor/ingress runtime (`@netscript/plugin-triggers-core/runtime`).
   {
     title: "Do — Add a plugin",
     body: "The how-to recipe for public plugin package install and the local netscript-dev contributor path for source-backed trigger samples.",
-    href: "/how-to/add-a-plugin/",
+    href: "/orchestration-runtime/how-to/add-a-plugin/",
     icon: "◆"
   }
 ] }) }}

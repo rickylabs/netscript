@@ -275,7 +275,7 @@ var) or the client cannot find the service.</li>
 ## See also
 
 {{ comp.featureGrid({ items: [
-  { title: "Do — Add a service", body: "Create the callee first: contract → defineService → an oRPC service answering on its own port.", href: "/how-to/add-a-service/", icon: "◆" },
+  { title: "Do — Add a service", body: "Create the callee first: contract → defineService → an oRPC service answering on its own port.", href: "/services-sdk/how-to/add-a-service/", icon: "◆" },
   { title: "Capability — Services & contracts", body: "Why the shared contract object is the single source of truth, and how a typed client cannot drift from the service.", href: "/capabilities/services/", icon: "▣" },
   { title: "Look up — @netscript/sdk", body: "The full SDK surface: createServiceClient, defineServices, the discovery readers, query factories, and TanStack utils.", href: "/reference/sdk/", icon: "≡" },
   { title: "Understand — Orchestration with Aspire", body: "How Aspire wires resources, resolves endpoints, and injects the services__ env vars discovery reads.", href: "/explanation/aspire/", icon: "◎" }
@@ -285,4 +285,4 @@ For the concepts behind the typed-client surface see {{ comp.xref({ key: "cap:sd
 the sibling recipe that builds the callee is {{ comp.xref({ key: "howto:add-a-service" }) }};
 and the orchestration that injects the URLs is explained in {{ comp.xref({ key: "explain:aspire" }) }}.
 
-{{ comp.nextPrev({ prev: { label: "How-to guides", href: "/how-to/" }, next: { label: "Expose OpenAPI & Scalar", href: "/how-to/expose-openapi-scalar/" } }) }}
+{{ comp.nextPrev({ prev: { label: "How-to guides", href: "/how-to/" }, next: { label: "Expose OpenAPI & Scalar", href: "/services-sdk/how-to/expose-openapi-scalar/" } }) }}

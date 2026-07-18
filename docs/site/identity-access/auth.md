@@ -43,7 +43,7 @@ or OIDC provider</strong> — a typed <code>/api/v1/auth/*</code> surface your s
 UI can call to sign users in, resolve the current session, and sign out. The default
 <code>kv-oauth</code> backend gives you a complete interactive redirect flow with KV-stored
 sessions and an opaque HMAC-signed session token. To wire it into a workspace step by step, see
-<a href="/how-to/add-authentication/">Add authentication</a>; to understand the pure-backend
+<a href="/identity-access/how-to/add-authentication/">Add authentication</a>; to understand the pure-backend
 port model and why only one backend is active, see
 <a href="/explanation/auth-model/">The authentication model</a>.
 {{ /comp }}
@@ -107,7 +107,7 @@ and how `InteractiveFlowPort` gates the redirect flow — is in
   {
     title: "Do — Add authentication",
     body: "Task recipe: add the auth plugin, set NETSCRIPT_AUTH_BACKEND, run the auth.prisma migration, and wire kv-oauth with a provider preset.",
-    href: "/how-to/add-authentication/",
+    href: "/identity-access/how-to/add-authentication/",
     icon: "◆"
   },
   {
@@ -297,7 +297,7 @@ better-auth-shaped models — `User` → `auth_users`, `Session` → `auth_sessi
 `Account` → `auth_accounts`, `Verification` → `auth_verifications`. These tables back the
 better-auth adapter; `kv-oauth` keeps its sessions in Deno KV, and WorkOS is stateless. As with
 every plugin schema, you bring the tables to life by running the database workflow **after Aspire
-is up** — see [Database migrations](/how-to/database-migration/).
+is up** — see [Database migrations](/data-persistence/how-to/database-migration/).
 
 The plugin also emits five durable `auth.*` runtime events through the durable-streams runtime —
 the `AUTH_STREAM_EVENT_TYPES`: `auth.signin.started`, `auth.signin.failed`,
@@ -376,7 +376,7 @@ adapters now have dedicated generated reference pages.
   {
     title: "Do — Add authentication",
     body: "Task recipe: add the auth plugin, set NETSCRIPT_AUTH_BACKEND, run the auth.prisma migration, and wire kv-oauth with a provider preset.",
-    href: "/how-to/add-authentication/",
+    href: "/identity-access/how-to/add-authentication/",
     icon: "◆"
   },
   {

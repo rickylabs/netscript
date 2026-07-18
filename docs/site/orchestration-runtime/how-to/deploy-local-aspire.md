@@ -11,7 +11,7 @@ oldUrl: /how-to/deploy-local-aspire/
 **Goal:** run your whole NetScript workspace on one machine under .NET Aspire — scaffold the
 AppHost, bring up the resource graph (Postgres, Redis, every service and background processor),
 and watch it from the Aspire dashboard. This is the **local** orchestration companion to the
-[Deploy](/how-to/deploy/) recipe (which covers shipping to a remote target); for *why* the
+[Deploy](/orchestration-runtime/how-to/deploy/) recipe (which covers shipping to a remote target); for *why* the
 AppHost works the way it does, read [Orchestration with Aspire](/explanation/aspire/).
 
 {{ comp callout { type: "important", title: "The order is: scaffold → orchestrate → database" } }}
@@ -198,4 +198,4 @@ a Deno workspace problem.</li>
 - **Exact symbols + full port map:** {{ comp.xref({ key: "ref:aspire", text: "the Aspire reference" }) }}
   and the {{ comp.xref({ key: "cli:reference", text: "CLI reference" }) }}.
 
-{{ comp.nextPrev({ prev: { label: "Graceful shutdown", href: "/how-to/graceful-shutdown/" }, next: { label: "How-to guides", href: "/how-to/" } }) }}
+{{ comp.nextPrev({ prev: { label: "Graceful shutdown", href: "/orchestration-runtime/how-to/graceful-shutdown/" }, next: { label: "How-to guides", href: "/how-to/" } }) }}

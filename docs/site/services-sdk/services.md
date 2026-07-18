@@ -86,13 +86,13 @@ type story is in [Contracts](/explanation/contracts/).
   {
     title: "Do — Expose OpenAPI & Scalar",
     body: "Recipe: turn on the generated OpenAPI spec and the Scalar docs UI for an existing service.",
-    href: "/how-to/expose-openapi-scalar/",
+    href: "/services-sdk/how-to/expose-openapi-scalar/",
     icon: "◆"
   },
   {
     title: "Do — Graceful shutdown",
     body: "Recipe: drain in-flight requests and run teardown hooks on SIGINT/SIGTERM before the process exits.",
-    href: "/how-to/graceful-shutdown/",
+    href: "/orchestration-runtime/how-to/graceful-shutdown/",
     icon: "◆"
   }
 ] }) }}

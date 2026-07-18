@@ -89,7 +89,7 @@ as a <a href="/durable-workflows/sagas/">durable saga</a>; jobs and sagas compos
   {
     title: "Do — Tune the worker runtime",
     body: "Recipe: pick the in-process / web-worker / subprocess runner, set WORKERS_CONCURRENCY, and choose a queue provider for your deployment.",
-    href: "/how-to/tune-worker-runtime/",
+    href: "/background-processing/how-to/tune-worker-runtime/",
     icon: "◆"
   },
   {
@@ -246,7 +246,7 @@ that matches your isolation, memory, and parallelism needs.
 {{ comp callout { type: "note", title: "Tune it without touching code" } }}
 The runner mode and pool size are deployment settings, not handler concerns — the same
 <code>process-payment</code> handler runs unchanged under any
-<a href="/how-to/tune-worker-runtime/"><code>WORKER_RUNTIMES</code> mode</a>. Start on the
+<a href="/background-processing/how-to/tune-worker-runtime/"><code>WORKER_RUNTIMES</code> mode</a>. Start on the
 <code>web-worker</code> default with a small <code>WORKERS_CONCURRENCY</code>, move to
 <code>subprocess</code> when you need hard isolation, and drop to <code>in-process</code> for
 tests and compiled single-binary deployments. Resolution precedence (schema default → config
@@ -428,7 +428,7 @@ the API enqueues, the runner executes. A missing generated registry is tolerated
 so a fresh workspace boots before you author any job. Set <code>WORKERS_CONCURRENCY</code> on the
 worker background process when you need a specific process pool size. Current Aspire metadata also
 emits <code>WORKER_CONCURRENCY</code>, but the runtime entrypoint does not consume it; use
-<a href="/how-to/tune-worker-runtime/">Tune the worker runtime</a> for the mismatch details.
+<a href="/background-processing/how-to/tune-worker-runtime/">Tune the worker runtime</a> for the mismatch details.
 {{ /comp }}
 
 ## Observability: real job traces out of the box
@@ -450,7 +450,7 @@ appear in the [Aspire dashboard](/explanation/aspire/) automatically once Aspire
 For spans you author *inside* a handler, import directly from **`@netscript/telemetry`**
 (e.g. `@netscript/telemetry/instrumentation` for `withChildSpan`). These nest correctly under
 the automatic dispatch span. See [Observability](/explanation/observability/) for the model and
-[Add OpenTelemetry](/how-to/add-opentelemetry/) for the recipe.
+[Add OpenTelemetry](/observability/how-to/add-opentelemetry/) for the recipe.
 
 ## How it compares
 
@@ -483,7 +483,7 @@ so bring orchestration up before you exercise it. Step&nbsp;1 is the database se
 step&nbsp;2 is Aspire: <code>cd aspire &amp;&amp; aspire start</code> provisions Postgres and
 Redis, then <code>netscript db init --name init</code> / <code>netscript db generate</code>
 wire the schema. Only after Aspire is up will <code>:8091</code> resolve jobs and record
-executions. See <a href="/how-to/database-migration/">Database &amp; migration</a>.
+executions. See <a href="/data-persistence/how-to/database-migration/">Database &amp; migration</a>.
 {{ /comp }}
 
 {{ comp callout { type: "warning", title: "Drain on redeploy, or lose in-flight runs" } }}
@@ -492,7 +492,7 @@ A runner that exits without draining abandons jobs mid-execution. Wire a
 <code>timeoutMs</code>, and check <code>report.timedOut</code> in your logs. Pair the drain
 with an <code>idempotencyKey</code> on enqueue so a retried delivery after a forced exit does
 not double-charge. For the full recipe see
-<a href="/how-to/tune-worker-runtime/">Tune the worker runtime</a>.
+<a href="/background-processing/how-to/tune-worker-runtime/">Tune the worker runtime</a>.
 {{ /comp }}
 
 {{ comp.badge({ status: "partial" }) }}
@@ -529,7 +529,7 @@ exported type and subpath) lives in the reference.
   {
     title: "Do — Tune the worker runtime",
     body: "Pick the runner mode, set WORKERS_CONCURRENCY, choose a queue provider, and wire graceful shutdown.",
-    href: "/how-to/tune-worker-runtime/",
+    href: "/background-processing/how-to/tune-worker-runtime/",
     icon: "◆"
   },
   {

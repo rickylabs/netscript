@@ -66,7 +66,7 @@ spawn entirely.
   {
     title: "Do — Run a polyglot task",
     body: "Task recipe: define a python (or shell) task, wire its entrypoint and permissions, and execute it through the runtime.",
-    href: "/how-to/run-a-polyglot-task/",
+    href: "/background-processing/how-to/run-a-polyglot-task/",
     icon: "◆"
   },
   {
@@ -231,7 +231,7 @@ in the workers reference.
   {
     title: "Do — Run a polyglot task",
     body: "Step-by-step recipe for a python and a shell task with explicit permissions and result capture.",
-    href: "/how-to/run-a-polyglot-task/",
+    href: "/background-processing/how-to/run-a-polyglot-task/",
     icon: "◆"
   },
   {

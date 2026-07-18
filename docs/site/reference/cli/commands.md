@@ -49,7 +49,7 @@ the [quickstart](/quickstart/); every flag is:
 ## `agent` — install and run agent tooling
 
 `netscript agent` installs and runs the shared CLI × skills × MCP tooling. See
-[Agent tooling](/capabilities/agent-tooling/) for the mental model and the
+[Agent tooling](/ai/agent-tooling/) for the mental model and the
 [`@netscript/mcp` reference](/reference/mcp/) for the server's tool surface.
 
 | Command | Description |
@@ -134,7 +134,7 @@ the [CLI reference](/cli-reference/#plugins). The full group also carries:
 | `netscript plugin auth session revoke <id>` | Revoke an auth session by id. Flag: `--auth-url <url>`. |
 
 The backends selectable here are the same ones read at runtime by
-`NETSCRIPT_AUTH_BACKEND` — see [add authentication](/how-to/add-authentication/).
+`NETSCRIPT_AUTH_BACKEND` — see [add authentication](/identity-access/how-to/add-authentication/).
 
 ## `service` — extended verbs
 
@@ -192,7 +192,7 @@ also lists, updates, and removes copied registry items:
 
 Because Fresh UI is copy-source, `ui:update` only touches registry files you have not
 modified — your edits are never overwritten. See
-[customize Fresh UI](/how-to/customize-fresh-ui/).
+[customize Fresh UI](/web-layer/how-to/customize-fresh-ui/).
 
 ## `deploy` — cloud and container targets
 

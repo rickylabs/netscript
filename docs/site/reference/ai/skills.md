@@ -26,7 +26,7 @@ of three ready-made skills that teach an agent the NetScript vocabulary.
 `netscript agent init` installs three first-party skills on the **Claude Code host path**
 (under `.claude/skills/`, alongside `.mcp.json` and the marked `AGENTS.md` section); the
 VS Code host path writes `.vscode/mcp.json` only, with no skills. They share one vocabulary with the
-`netscript` CLI and the [NetScript MCP tools](/capabilities/agent-tooling/#tool-catalog),
+`netscript` CLI and the [NetScript MCP tools](/ai/agent-tooling/#tool-catalog),
 so an agent routes to a workflow and then reaches for the matching CLI verb or MCP tool.
 
 | Skill | Role |
@@ -37,7 +37,7 @@ so an agent routes to a workflow and then reaches for the matching CLI verb or M
 
 These are the skills named in the bundle manifest and installed as an atomic set;
 re-running `netscript agent init` is idempotent. See
-[Agent tooling](/capabilities/agent-tooling/) for the CLI × skills × MCP combo.
+[Agent tooling](/ai/agent-tooling/) for the CLI × skills × MCP combo.
 
 ```ts
 import {

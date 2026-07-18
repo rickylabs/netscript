@@ -181,11 +181,11 @@ adapter, which spawns `node ./tasks/render-invoice.mjs --invoice inv_123`, strea
 
 ## Next steps
 
-- Restrict Deno task permissions with [Restrict worker task permissions](/how-to/restrict-worker-task-permissions/).
-- See built-in runtime behavior in [Run a polyglot task](/how-to/run-a-polyglot-task/).
+- Restrict Deno task permissions with [Restrict worker task permissions](/background-processing/how-to/restrict-worker-task-permissions/).
+- See built-in runtime behavior in [Run a polyglot task](/background-processing/how-to/run-a-polyglot-task/).
 - Look up the executor surface in [workers reference](/reference/workers/).
 
 {{ comp.nextPrev({
-  prev: { label: "Roll out runtime overrides", href: "/how-to/roll-out-runtime-overrides/" },
-  next: { label: "Build a server-validated form", href: "/how-to/build-a-server-validated-form/" }
+  prev: { label: "Roll out runtime overrides", href: "/orchestration-runtime/how-to/roll-out-runtime-overrides/" },
+  next: { label: "Build a server-validated form", href: "/web-layer/how-to/build-a-server-validated-form/" }
 }) }}

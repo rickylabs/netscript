@@ -182,4 +182,4 @@ NetScript is in alpha; the polyglot task API can still shift. Treat the import s
 
 {{ comp.xref({ key: "ref:workers" }) }}
 
-{{ comp.nextPrev({ prev: { label: "Tune the worker runtime", href: "/how-to/tune-worker-runtime/" }, next: { label: "Graceful shutdown", href: "/how-to/graceful-shutdown/" } }) }}
+{{ comp.nextPrev({ prev: { label: "Tune the worker runtime", href: "/background-processing/how-to/tune-worker-runtime/" }, next: { label: "Graceful shutdown", href: "/orchestration-runtime/how-to/graceful-shutdown/" } }) }}

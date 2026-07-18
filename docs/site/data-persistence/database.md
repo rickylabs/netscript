@@ -56,7 +56,7 @@ href="/data-persistence/kv-queues-cron/">the Postgres queue backend</a> below.
 
 - **Learn** — the [Team Workspace tutorial, step 03](/tutorials/workspace/03-workspace-data/)
   wires workspace data through the database from scratch.
-- **Do** — the [Use a second database](/how-to/use-a-second-database/) recipe adds a second
+- **Do** — the [Use a second database](/data-persistence/how-to/use-a-second-database/) recipe adds a second
   adapter-backed datasource (MSSQL or MySQL) beside the primary Postgres.
 
 ## How persistence is wired
@@ -316,7 +316,7 @@ A second engine is a separate Prisma schema workspace (for example
 <code>database/mysql/schema/</code>) with its own <code>generate</code> output and its own
 migrations — it does <em>not</em> merge into the Postgres aggregation above. Generate and
 migrate each datasource independently. The full step-by-step lives in the
-<a href="/how-to/use-a-second-database/">Use a second database</a> recipe.
+<a href="/data-persistence/how-to/use-a-second-database/">Use a second database</a> recipe.
 {{ /comp }}
 
 ## Endpoints & ports
@@ -390,13 +390,13 @@ lane that matches what you're doing.
   {
     title: "Do — Use a second database",
     body: "Task recipe: add an MSSQL or MySQL datasource beside Postgres with a driver adapter.",
-    href: "/how-to/use-a-second-database/",
+    href: "/data-persistence/how-to/use-a-second-database/",
     icon: "◆"
   },
   {
     title: "Do — Database & migration",
     body: "Task recipe: bring up Postgres with Aspire, then run db init → generate → seed → status → migrate.",
-    href: "/how-to/database-migration/",
+    href: "/data-persistence/how-to/database-migration/",
     icon: "◆"
   },
   {

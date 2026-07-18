@@ -98,7 +98,7 @@ dependency, emits a user-owned <code>auth/mod.ts</code> glue barrel, registers t
 <code>auth-api</code> service on port <strong>8094</strong>, and contributes its package-provided
 Prisma models. The active backend is selected at runtime with
 <code>NETSCRIPT_AUTH_BACKEND</code> (default <code>kv-oauth</code>). See
-<a href="/how-to/add-authentication/">Configure authentication</a> for the backend setup.
+<a href="/identity-access/how-to/add-authentication/">Configure authentication</a> for the backend setup.
 {{ /comp }}
 
 ## Step 2 — Add the plugin
@@ -254,8 +254,8 @@ Run `netscript plugin --help` for the complete, version-accurate command set.
 ### Where to go next
 
 - **Build on the plugin you just added.** Next up:
-  [Add a service](/how-to/add-a-service/) to give the plugin something to call, or
-  [Configure authentication](/how-to/add-authentication/) if you added the auth plugin.
+  [Add a service](/services-sdk/how-to/add-a-service/) to give the plugin something to call, or
+  [Configure authentication](/identity-access/how-to/add-authentication/) if you added the auth plugin.
 - **Understand the model.** Read [Plugin architecture](/explanation/plugin-system/) for
   the design behind installable capabilities, ports, and runtime registration.
 - **Browse capabilities.** The [capabilities](/capabilities/) section maps each plugin to the

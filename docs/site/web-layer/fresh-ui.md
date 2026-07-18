@@ -48,7 +48,7 @@ drift from your oRPC contracts. Use <strong><code>@netscript/fresh</code></stron
 meta-framework) to build pages/islands in any Fresh app; use <strong><code>apps/dashboard</code></strong>
 (the scaffolded app) as the worked reference to copy patterns from. For the data boundary the UI
 renders see <a href="/services-sdk/services/">Services &amp; contracts</a>; to add or regenerate UI
-pieces see <a href="/how-to/customize-fresh-ui/">Customize the Fresh UI</a>.
+pieces see <a href="/web-layer/how-to/customize-fresh-ui/">Customize the Fresh UI</a>.
 {{ /comp }}
 
 ## Two layers, one design grammar
@@ -288,7 +288,7 @@ matches what you're doing.
   {
     title: "Do — Customize the Fresh UI",
     body: "Task recipe: ui:init / ui:add, the copy-source ownership model, and editing the design tokens.",
-    href: "/how-to/customize-fresh-ui/",
+    href: "/web-layer/how-to/customize-fresh-ui/",
     icon: "◆"
   },
   {

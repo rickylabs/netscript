@@ -241,7 +241,7 @@ entrypoint by hand.
   {
     title: "Do — Tune the worker runtime",
     body: "Recipe: concurrency, retry, and the runtime knobs that decide how much in-flight work a drain has to wait on.",
-    href: "/how-to/tune-worker-runtime/",
+    href: "/background-processing/how-to/tune-worker-runtime/",
     icon: "◆"
   },
   {
@@ -252,4 +252,4 @@ entrypoint by hand.
   }
 ] }) }}
 
-{{ comp.nextPrev({ prev: { label: "Run a polyglot task", href: "/how-to/run-a-polyglot-task/" }, next: { label: "Deploy locally with Aspire", href: "/how-to/deploy-local-aspire/" } }) }}
+{{ comp.nextPrev({ prev: { label: "Run a polyglot task", href: "/background-processing/how-to/run-a-polyglot-task/" }, next: { label: "Deploy locally with Aspire", href: "/orchestration-runtime/how-to/deploy-local-aspire/" } }) }}

@@ -12,7 +12,7 @@ oldUrl: /how-to/choose-a-queue-provider/
 adapter, the zero-config Deno KV default, Redis, RabbitMQ (AMQP), and PostgreSQL — and how
 to either let auto-discovery select one or pin one explicitly with `provider` +
 `connection`. This is the *decision* recipe; for the enqueue/consume/cron mechanics see
-[Queue / KV / cron](/how-to/queue-kv-cron/).
+[Queue / KV / cron](/data-persistence/how-to/queue-kv-cron/).
 
 A NetScript queue is provider-agnostic by design: the same `createQueue("jobs")` runs on an
 in-memory adapter in a unit test, on Deno KV on your laptop, and on a real broker under
@@ -177,7 +177,7 @@ await queue.listen(async (message) => {
 ```
 
 For CPU-bound work, prefer Web Workers over queue concurrency — see
-[Tune the worker runtime](/how-to/tune-worker-runtime/).
+[Tune the worker runtime](/background-processing/how-to/tune-worker-runtime/).
 
 ## Prove it end to end — same call site, two backends
 
@@ -256,4 +256,4 @@ For the full `QueueProvider` enum, the `QueueConnectionOptions` shape, `createPa
 / `ParallelQueueOptions`, the `MessageQueue` interface, and the `QueueError` hierarchy, see
 {{ comp.xref({ key: "ref:queue" }) }}.
 
-{{ comp.nextPrev({ prev: { label: "Use a second database", href: "/how-to/use-a-second-database/" }, next: { label: "Tune the worker runtime", href: "/how-to/tune-worker-runtime/" } }) }}
+{{ comp.nextPrev({ prev: { label: "Use a second database", href: "/data-persistence/how-to/use-a-second-database/" }, next: { label: "Tune the worker runtime", href: "/background-processing/how-to/tune-worker-runtime/" } }) }}

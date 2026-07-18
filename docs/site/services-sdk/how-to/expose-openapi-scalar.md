@@ -181,13 +181,13 @@ no zod input/output yields an empty operation schema in the spec. Add schemas (a
   {
     title: "Do — Discover services",
     body: "Recipe: enumerate the services in a workspace and the endpoints each one exposes.",
-    href: "/how-to/discover-services/",
+    href: "/services-sdk/how-to/discover-services/",
     icon: "◆"
   },
   {
     title: "Do — Graceful shutdown",
     body: "Recipe: drain in-flight requests and run teardown hooks before the service process exits.",
-    href: "/how-to/graceful-shutdown/",
+    href: "/orchestration-runtime/how-to/graceful-shutdown/",
     icon: "◆"
   },
   {
@@ -198,4 +198,4 @@ no zod input/output yields an empty operation schema in the spec. Add schemas (a
   }
 ] }) }}
 
-{{ comp.nextPrev({ prev: { label: "Discover services", href: "/how-to/discover-services/" }, next: { label: "Use a second database", href: "/how-to/use-a-second-database/" } }) }}
+{{ comp.nextPrev({ prev: { label: "Discover services", href: "/services-sdk/how-to/discover-services/" }, next: { label: "Use a second database", href: "/data-persistence/how-to/use-a-second-database/" } }) }}

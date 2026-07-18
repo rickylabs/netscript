@@ -106,11 +106,11 @@ The next watcher reload sees the previous version and calls `onChange` again.
 
 ## Next steps
 
-- Tune worker behavior with [Tune the worker runtime](/how-to/tune-worker-runtime/).
-- Deploy the process with [Deploy](/how-to/deploy/).
+- Tune worker behavior with [Tune the worker runtime](/background-processing/how-to/tune-worker-runtime/).
+- Deploy the process with [Deploy](/orchestration-runtime/how-to/deploy/).
 - Look up the package surface in [runtime-config reference](/reference/runtime-config/).
 
 {{ comp.nextPrev({
-  prev: { label: "Deploy locally with Aspire", href: "/how-to/deploy-local-aspire/" },
-  next: { label: "Add a task runtime adapter", href: "/how-to/add-a-task-runtime-adapter/" }
+  prev: { label: "Deploy locally with Aspire", href: "/orchestration-runtime/how-to/deploy-local-aspire/" },
+  next: { label: "Add a task runtime adapter", href: "/background-processing/how-to/add-a-task-runtime-adapter/" }
 }) }}

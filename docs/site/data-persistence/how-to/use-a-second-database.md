@@ -19,7 +19,7 @@ file-backed SQLite primary instead. Everything below applies regardless of which
 primary uses; the examples simply show the common Postgres-primary case.
 
 NetScript's default scaffold gives you **one primary datasource** that every plugin
-aggregates its `.prisma` models into (see [Database & migration](/how-to/database-migration/)).
+aggregates its `.prisma` models into (see [Database & migration](/data-persistence/how-to/database-migration/)).
 A second database is the opposite shape: a **separate** Prisma schema workspace with its own
 `generate` output and its own migration history. It never merges into the primary aggregation.
 
@@ -265,4 +265,4 @@ The order is always: build the adapter, call <code>getDriverAdapter()</code>, pa
 {{ comp.xref({ key: "explain:aspire", text: "Orchestration with Aspire" }) }} ·
 {{ comp.xref({ key: "cap:kv-queues-cron", text: "KV, queues & cron — the Postgres queue backend" }) }}
 
-{{ comp.nextPrev({ prev: { label: "Expose OpenAPI & Scalar", href: "/how-to/expose-openapi-scalar/" }, next: { label: "Choose a queue provider", href: "/how-to/choose-a-queue-provider/" } }) }}
+{{ comp.nextPrev({ prev: { label: "Expose OpenAPI & Scalar", href: "/services-sdk/how-to/expose-openapi-scalar/" }, next: { label: "Choose a queue provider", href: "/data-persistence/how-to/choose-a-queue-provider/" } }) }}

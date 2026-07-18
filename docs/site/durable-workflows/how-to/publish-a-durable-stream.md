@@ -107,6 +107,6 @@ addEventListener('unload', async () => {
 - Look up the API in [streams reference](/reference/streams/).
 
 {{ comp.nextPrev({
-  prev: { label: "Build a validated ingestion queue", href: "/how-to/build-a-validated-ingestion-queue/" },
-  next: { label: "Restrict worker task permissions", href: "/how-to/restrict-worker-task-permissions/" }
+  prev: { label: "Build a validated ingestion queue", href: "/durable-workflows/how-to/build-a-validated-ingestion-queue/" },
+  next: { label: "Restrict worker task permissions", href: "/background-processing/how-to/restrict-worker-task-permissions/" }
 }) }}

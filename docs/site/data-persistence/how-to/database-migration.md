@@ -64,7 +64,7 @@ Aspire is keeping alive in a second terminal.
 ] }) }}
 
 If you scaffolded with `--no-aspire`, you are responsible for pointing the workspace at
-your own Postgres via `POSTGRES_URI` / `DATABASE_URL` (see [Deploy](/how-to/deploy/));
+your own Postgres via `POSTGRES_URI` / `DATABASE_URL` (see [Deploy](/orchestration-runtime/how-to/deploy/));
 there is no AppHost to start, so you skip Step 2, but the migration commands in Step 3
 are otherwise identical and talk to whatever database those variables resolve to.
 
@@ -238,7 +238,7 @@ import the generated client in a service or worker and read the rows the seed wr
 
 Once the schema is live, the generated client is what every other capability reads and
 writes through. Queue jobs persist their `message_queue` rows (the
-[PostgreSQL queue backend](/how-to/queue-kv-cron/) shares this same datasource), durable
+[PostgreSQL queue backend](/data-persistence/how-to/queue-kv-cron/) shares this same datasource), durable
 sagas persist runtime state when configured with the Prisma store backend, and your
 services query their models directly. The migration loop you just ran is the foundation the
 rest of the workspace stands on.
@@ -251,8 +251,8 @@ rest of the workspace stands on.
 
 {{ comp.card({ title: "Orchestration with Aspire", body: "Why the AppHost (aspire/apphost.mts) provisions Postgres and Redis, and how the resource graph fits together.", href: "/explanation/aspire/", icon: "◆" }) }}
 
-{{ comp.card({ title: "Queue / KV / cron", body: "The next recipe: use the KV and queue backends — including the PostgreSQL queue provider that shares this datasource.", href: "/how-to/queue-kv-cron/", icon: "→" }) }}
+{{ comp.card({ title: "Queue / KV / cron", body: "The next recipe: use the KV and queue backends — including the PostgreSQL queue provider that shares this datasource.", href: "/data-persistence/how-to/queue-kv-cron/", icon: "→" }) }}
 
-{{ comp.card({ title: "Deploy without Aspire", body: "Point the workspace at your own Postgres via POSTGRES_URI / DATABASE_URL using the --no-aspire escape hatch.", href: "/how-to/deploy/", icon: "→" }) }}
+{{ comp.card({ title: "Deploy without Aspire", body: "Point the workspace at your own Postgres via POSTGRES_URI / DATABASE_URL using the --no-aspire escape hatch.", href: "/orchestration-runtime/how-to/deploy/", icon: "→" }) }}
 
 For the MySQL adapter surface, see [`prisma-adapter-mysql`](/reference/prisma-adapter-mysql/).

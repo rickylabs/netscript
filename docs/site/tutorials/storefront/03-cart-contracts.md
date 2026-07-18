@@ -57,7 +57,7 @@ it.
 ## Step 1 — Scaffold the cart contract
 
 Let the CLI lay down the contract file and wire it into the version aggregate for you, exactly as the
-[Add a service](/how-to/add-a-service/) recipe does. From the workspace root:
+[Add a service](/services-sdk/how-to/add-a-service/) recipe does. From the workspace root:
 
 ```sh
 netscript contract add cart

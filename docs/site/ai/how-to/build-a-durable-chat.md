@@ -152,7 +152,7 @@ const snapshot = await resolveChatSnapshot({ target: { sessionId } });
 Pass `snapshot` into the island as its initial state. `renderParts` here is the
 **transport** shape (`text` | `tool`) — the minimal reducer output. The rich presentation
 parts (charts, tables) come from `parseBlocks` in the UI layer; see
-[Customize Fresh UI](/how-to/customize-fresh-ui/) and the chat tutorial.
+[Customize Fresh UI](/web-layer/how-to/customize-fresh-ui/) and the chat tutorial.
 
 ## 4. The client island
 
@@ -220,13 +220,13 @@ Two <code>RenderPart</code> types exist and must not be conflated. <code>@netscr
 ## Next steps
 
 - Walk it end to end in the [AI Chat tutorial](/tutorials/chat/).
-- Render rich blocks and citation chips: [Customize Fresh UI](/how-to/customize-fresh-ui/).
+- Render rich blocks and citation chips: [Customize Fresh UI](/web-layer/how-to/customize-fresh-ui/).
 - The list/board/table live-data plane is different — see
-  [Publish a durable stream](/how-to/publish-a-durable-stream/) and
+  [Publish a durable stream](/durable-workflows/how-to/publish-a-durable-stream/) and
   [Live Dashboard, chapter 05](/tutorials/live-dashboard/05-live-stream/).
 - Look up exact signatures in the [fresh reference](/reference/fresh/).
 
 {{ comp.nextPrev({
-  prev: { label: "Customize Fresh UI", href: "/how-to/customize-fresh-ui/" },
-  next: { label: "Deploy", href: "/how-to/deploy/" }
+  prev: { label: "Customize Fresh UI", href: "/web-layer/how-to/customize-fresh-ui/" },
+  next: { label: "Deploy", href: "/orchestration-runtime/how-to/deploy/" }
 }) }}

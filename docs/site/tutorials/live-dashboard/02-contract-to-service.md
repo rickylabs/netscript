@@ -208,7 +208,7 @@ netscript db seed               # seed development data (orders, users, products
 
 These talk to the Postgres container Aspire provisioned. Run them with no Aspire up and they fail —
 there is no database to reach. The full sequence is in
-[Database & migration](/how-to/database-migration/).
+[Database & migration](/data-persistence/how-to/database-migration/).
 
 ## Verify your progress
 

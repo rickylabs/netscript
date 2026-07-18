@@ -271,7 +271,7 @@ slot for up to ~15&nbsp;minutes of wall time before it gives up, and each retry 
 <code>timeout</code> to the work, keep <code>maxRetries</code> small for slow tasks, and pair
 retries with an <code>idempotencyKey</code> on enqueue so a re-delivery after a forced restart
 does not double-charge. See
-<a href="/how-to/choose-a-queue-provider/">Choose a queue provider</a> for delivery semantics.
+<a href="/data-persistence/how-to/choose-a-queue-provider/">Choose a queue provider</a> for delivery semantics.
 {{ /comp }}
 
 ## See also
@@ -287,6 +287,6 @@ does not double-charge. See
 {{ comp.xref({ key: "ref:workers" }) }}
 
 {{ comp.nextPrev({
-  prev: { label: "Choose a queue provider", href: "/how-to/choose-a-queue-provider/" },
-  next: { label: "Run a polyglot task", href: "/how-to/run-a-polyglot-task/" }
+  prev: { label: "Choose a queue provider", href: "/data-persistence/how-to/choose-a-queue-provider/" },
+  next: { label: "Run a polyglot task", href: "/background-processing/how-to/run-a-polyglot-task/" }
 }) }}

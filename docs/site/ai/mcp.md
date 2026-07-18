@@ -23,7 +23,7 @@ coding agents that you run with <code>netscript agent mcp</code> and install wit
 <code>netscript agent init</code>. The server exposes framework-aware diagnostics,
 telemetry summaries, and doc search <em>about</em> your project; the client library on
 this page wires <em>remote</em> MCP servers <em>into</em> your product's agent loop. See
-<a href="/capabilities/agent-tooling/">Agent tooling</a> and the
+<a href="/ai/agent-tooling/">Agent tooling</a> and the
 <a href="/reference/mcp/"><code>@netscript/mcp</code> reference</a> for the server.
 {{ /comp }}
 
@@ -144,7 +144,7 @@ Encore's MCP story points **inward**: it ships an MCP server that exposes a runn
 Encore backend's introspection surface to coding agents, so an agent can inspect
 and verify the backend it is editing. NetScript ships **both halves**. The inward
 half is the `netscript agent mcp` server (documented under
-[Agent tooling](/capabilities/agent-tooling/) and the
+[Agent tooling](/ai/agent-tooling/) and the
 [`@netscript/mcp` reference](/reference/mcp/)): a stdio server that gives a coding
 agent framework-aware diagnostics, telemetry summaries, and doc search over the
 project it is editing. The outward half — this page — is the `@netscript/ai/mcp`

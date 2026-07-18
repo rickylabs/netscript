@@ -37,7 +37,7 @@ netscript ui:add ai
 This copies component files into `apps/dashboard/components/ui/`, the `chat-render` parser
 into `apps/dashboard/lib/chat/parse-blocks.ts`, and their CSS into `apps/dashboard/assets/ui/`,
 then wires the styles and merges any required imports. After the copy, that code is yours to
-edit — see [Customize Fresh UI](/how-to/customize-fresh-ui/) for the ownership model.
+edit — see [Customize Fresh UI](/web-layer/how-to/customize-fresh-ui/) for the ownership model.
 
 {{ comp.apiTable({
   caption: "The ai collection — the pieces this track uses",
@@ -67,7 +67,7 @@ const seed = await resolveChatSnapshot({ target: { sessionId } });
 ```
 
 Wire `seed` into your page with the scaffold's page builder the same way the dashboard
-passes data to a view — see [Customize Fresh UI](/how-to/customize-fresh-ui/) for the
+passes data to a view — see [Customize Fresh UI](/web-layer/how-to/customize-fresh-ui/) for the
 `definePage` pattern. The important part is that the island receives `seed` as a prop.
 
 {{ comp callout { type: "note", title: "The one-projection law, in one sentence" } }}

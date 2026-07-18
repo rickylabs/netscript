@@ -57,7 +57,7 @@ deliberately distinct: `@netscript/config` owns the build-time contract, and
   {
     title: "Do — Choose a queue provider",
     body: "A config-driven decision recipe: pick and wire a queue backend through project config.",
-    href: "/how-to/choose-a-queue-provider/",
+    href: "/data-persistence/how-to/choose-a-queue-provider/",
     icon: "◆"
   }
 ] }) }}

@@ -153,7 +153,7 @@ packaged-runtime check. {{ /comp }}
 
 ## See also
 
-- [Customize Fresh UI](/how-to/customize-fresh-ui/)
+- [Customize Fresh UI](/web-layer/how-to/customize-fresh-ui/)
 - [`@netscript/fresh` reference](/reference/fresh/)
 - [`@netscript/sdk` reference](/reference/sdk/)
 - [`@netscript/fresh-ui` reference](/reference/fresh-ui/)

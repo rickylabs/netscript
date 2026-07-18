@@ -11,7 +11,7 @@ oldUrl: /how-to/author-a-plugin/
 **Scope.** This recipe shows how to author a *new* custom plugin from scratch — its canonical
 location, the manifest it exports through `definePlugin(...)`, the contribution shape the kernel
 reads, and the generated registry that makes those contributions discoverable at runtime. It is the
-advanced companion to [Add a first-party plugin](/how-to/add-a-plugin/), which only *installs* one
+advanced companion to [Add a first-party plugin](/orchestration-runtime/how-to/add-a-plugin/), which only *installs* one
 of the four official plugins (`workers`, `sagas`, `triggers`, `streams`). If you just want a worker
 or a saga, install it there. Come here when you need a capability NetScript does not ship.
 
@@ -346,7 +346,7 @@ When your plugin grows beyond a single package — a core seam plus swappable ad
 The pattern to copy: a **core package owns the port** (`AuthBackendPort`), each **adapter is pure**
 (implements the port, declares no service), and the **plugin under `plugins/<name>/`** composes one
 active adapter into a single service and registry. That keeps adapters swappable and the kernel-facing
-manifest small. Build the full thing in [Add authentication](/how-to/add-authentication/) — that page
+manifest small. Build the full thing in [Add authentication](/identity-access/how-to/add-authentication/) — that page
 is the concrete walkthrough for the auth plugin specifically.
 
 {{ comp callout { type: "note", title: "Alpha package pins" } }}
@@ -390,14 +390,14 @@ declare it with <code>.withDependencies({...})</code> on the manifest and in
 {{ comp.card({
   title: "Add a first-party plugin",
   body: "Install one of the four official plugins instead of writing your own.",
-  href: "/how-to/add-a-plugin/",
+  href: "/orchestration-runtime/how-to/add-a-plugin/",
   icon: "+"
 }) }}
 
 {{ comp.card({
   title: "Add authentication",
   body: "Build the multi-package auth plugin — the production exemplar for a core seam plus swappable backends.",
-  href: "/how-to/add-authentication/",
+  href: "/identity-access/how-to/add-authentication/",
   icon: "→"
 }) }}
 

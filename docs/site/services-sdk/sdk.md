@@ -82,7 +82,7 @@ up on the client already typed. The mechanics of each layer are below; the type-
   {
     title: "Do — Discover a service",
     body: "Task recipe: resolve a service URL from Aspire env and stand up a typed client for it.",
-    href: "/how-to/discover-services/",
+    href: "/services-sdk/how-to/discover-services/",
     icon: "◆"
   }
 ] }) }}

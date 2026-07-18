@@ -350,9 +350,9 @@ adapter classes are documented in [`@netscript/cron`](/reference/cron/).
   {
     title: "Database & migration",
     body: "The previous recipe — provision Postgres under Aspire and run the db init → generate → seed flow.",
-    href: "/how-to/database-migration/",
+    href: "/data-persistence/how-to/database-migration/",
     icon: "→"
   }
 ] }) }}
 
-{{ comp.nextPrev({ prev: { label: "Database & migration", href: "/how-to/database-migration/" }, next: { label: "Add OpenTelemetry", href: "/how-to/add-opentelemetry/" } }) }}
+{{ comp.nextPrev({ prev: { label: "Database & migration", href: "/data-persistence/how-to/database-migration/" }, next: { label: "Add OpenTelemetry", href: "/observability/how-to/add-opentelemetry/" } }) }}

@@ -66,7 +66,7 @@ export const ordersClient = createServiceClient<typeof ordersContract>({
 reading a field the output does not have, is a compile error.
 
 {{ comp callout { type: "note", title: "How serviceName resolves to a URL" } }}
-You never hardcode <code>http://localhost:3002</code>. <code>serviceName: 'orders'</code> is resolved at call time from an Aspire-injected env var — server-side <code>services__orders__http__0</code>, and the browser mirror <code>VITE_services__orders__http__0</code> — via <code>getServiceUrl</code> in <code>@netscript/sdk/discovery</code>. Aspire sets those when you list <code>orders</code> as a reference; the client just reads them. Full mechanics in <a href="/how-to/discover-services/">Discover services</a>.
+You never hardcode <code>http://localhost:3002</code>. <code>serviceName: 'orders'</code> is resolved at call time from an Aspire-injected env var — server-side <code>services__orders__http__0</code>, and the browser mirror <code>VITE_services__orders__http__0</code> — via <code>getServiceUrl</code> in <code>@netscript/sdk/discovery</code>. Aspire sets those when you list <code>orders</code> as a reference; the client just reads them. Full mechanics in <a href="/services-sdk/how-to/discover-services/">Discover services</a>.
 {{ /comp }}
 
 ## Step 2 — Add the cache-first query factory
