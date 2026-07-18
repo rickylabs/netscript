@@ -205,3 +205,27 @@ operations.
 
 No README edits, merge, release action, milestone close, seed-run filing, or self-dispatched
 evaluation was performed during the re-check.
+
+---
+
+## Targeted final check — supervisor escalation resolution (`7ee36d05`)
+
+**Final verdict: PASS**
+
+The residual deploy-truth MAJOR is closed.
+
+The revised Deploy targets sentence now says that `netscript deploy list` “inventories the installed
+targets” and directs users to `netscript deploy <target> --help` “for the exact operations each one
+ships.” That disposition matches the independently executed beta.10 evidence: the list is reliable
+for the ten target keys, while per-target help—not the list's stale operation arrays—is the
+authority for executable verbs.
+
+A full-README context grep found only this one `deploy list` reference. No other sentence describes
+the list as exact, authoritative, or reliable for operations, and the prior false wording (“prints
+exactly what your installed version supports”) is absent.
+
+All seven original findings and the fix-cycle residual are therefore closed. The Lane 5 adversarial
+gate passes at `7ee36d05`.
+
+No README edits, merge, release action, milestone close, seed-run filing, or self-dispatched
+evaluation was performed during this targeted final check.
