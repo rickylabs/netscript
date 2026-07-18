@@ -4,7 +4,7 @@
  * Exposes the cross-cutting page-loader cache helpers. Every other capability
  * lives on an explicit subpath: `./builders`, `./route`, `./form`, `./defer`,
  * `./query`, `./server`, `./streams`, `./interactive`, `./vite`, `./error`,
- * and `./testing`.
+ * `./desktop`, and `./testing`.
  *
  * @module
  */

@@ -1,6 +1,8 @@
 import { assertEquals, assertExists, assertRejects } from '@std/assert';
 import {
+  AppEntrySchema,
   AppSettingsSchema,
+  AppTypeSchema,
   CacheEntrySchema,
   CacheModeSchema,
   NetScriptConfigSchema,
@@ -55,6 +57,27 @@ Deno.test('config', async (t) => {
     assertEquals(playground.RequiresKv, true);
     assertExists(playground.ServiceReferences);
     assertExists(playground.PluginReferences);
+  });
+
+  await t.step('AppTypeSchema: accepts desktop as the fourth app type', () => {
+    for (const type of ['app', 'tauri', 'task', 'desktop']) {
+      assertEquals(AppTypeSchema.safeParse(type).success, true);
+    }
+    assertEquals(AppTypeSchema.safeParse('native').success, false);
+  });
+
+  await t.step('AppEntrySchema: preserves optional desktop enablement', () => {
+    assertEquals(AppEntrySchema.parse({ Type: 'desktop' }).Enabled, undefined);
+    assertEquals(AppEntrySchema.parse({ Type: 'desktop', Enabled: true }).Enabled, true);
+  });
+
+  await t.step('AppEntrySchema: preserves the desktop packaging task hook', () => {
+    const desktop = AppEntrySchema.parse({
+      Type: 'desktop',
+      PackageTaskName: 'desktop:package:native',
+    });
+
+    assertEquals(desktop.PackageTaskName, 'desktop:package:native');
   });
 
   await t.step('parseAppSettings: parses plugins correctly', async () => {

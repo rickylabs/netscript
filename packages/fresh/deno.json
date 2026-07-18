@@ -6,6 +6,7 @@
   "exports": {
     ".": "./mod.ts",
     "./server": "./src/runtime/server/mod.ts",
+    "./desktop": "./src/runtime/desktop/mod.ts",
     "./builders": "./src/application/builders/mod.ts",
     "./route": "./src/application/route/mod.ts",
     "./defer": "./src/application/defer/mod.ts",
@@ -21,8 +22,8 @@
   },
   "tasks": {
     "test": "deno test --allow-all ./src ./tests",
-    "check": "deno check --unstable-kv ./mod.ts ./src/runtime/server/mod.ts ./src/application/builders/mod.ts ./src/application/route/mod.ts ./src/application/query/mod.ts ./src/application/vite/vite.ts ./src/runtime/interactive/mod.ts ./src/application/defer/mod.ts ./src/application/form/mod.ts ./src/diagnostics/error/mod.ts ./src/runtime/streams/mod.ts ./src/runtime/ai/mod.ts ./src/runtime/ai/sandbox.ts ./src/testing/mod.ts",
-    "doc-lint": "deno doc --lint ./mod.ts ./src/runtime/server/mod.ts ./src/application/builders/mod.ts ./src/application/route/mod.ts ./src/application/defer/mod.ts ./src/application/form/mod.ts ./src/diagnostics/error/mod.ts ./src/runtime/streams/mod.ts ./src/runtime/ai/mod.ts ./src/runtime/ai/sandbox.ts ./src/application/query/mod.ts ./src/runtime/interactive/mod.ts ./src/application/vite/vite.ts ./src/testing/mod.ts",
+    "check": "deno check --unstable-kv ./mod.ts ./src/runtime/server/mod.ts ./src/runtime/desktop/mod.ts ./src/application/builders/mod.ts ./src/application/route/mod.ts ./src/application/query/mod.ts ./src/application/vite/vite.ts ./src/runtime/interactive/mod.ts ./src/application/defer/mod.ts ./src/application/form/mod.ts ./src/diagnostics/error/mod.ts ./src/runtime/streams/mod.ts ./src/runtime/ai/mod.ts ./src/runtime/ai/sandbox.ts ./src/testing/mod.ts ./tests/type-fixtures/desktop-consumer_type.ts",
+    "doc-lint": "deno doc --lint ./mod.ts ./src/runtime/server/mod.ts ./src/runtime/desktop/mod.ts ./src/application/builders/mod.ts ./src/application/route/mod.ts ./src/application/defer/mod.ts ./src/application/form/mod.ts ./src/diagnostics/error/mod.ts ./src/runtime/streams/mod.ts ./src/runtime/ai/mod.ts ./src/runtime/ai/sandbox.ts ./src/application/query/mod.ts ./src/runtime/interactive/mod.ts ./src/application/vite/vite.ts ./src/testing/mod.ts",
     "fmt": "deno fmt ./mod.ts ./src ./tests/_fixtures",
     "fmt:check": "deno fmt --check ./mod.ts ./src ./tests/_fixtures",
     "lint": "deno lint --rules-exclude=no-slow-types ./mod.ts ./src ./tests/_fixtures",
@@ -41,6 +42,8 @@
     "@durable-streams/tanstack-ai-transport": "npm:@durable-streams/tanstack-ai-transport@^0.0.8",
     "@netscript/ai": "jsr:@netscript/ai@0.0.1-beta.10",
     "@netscript/telemetry": "jsr:@netscript/telemetry@0.0.1-beta.10",
+    "@netscript/sdk/desktop": "jsr:@netscript/sdk@0.0.1-beta.10/desktop",
+    "@orpc/server": "npm:@orpc/server@^1.14.6",
     "@tanstack/ai": "npm:@tanstack/ai@^0.39.0",
     "@tanstack/ai-preact": "npm:@tanstack/ai-preact@^0.10.1"
   },
@@ -52,6 +55,7 @@
       "README.md"
     ],
     "exclude": [
+      "tests/type-fixtures/",
       "**/*_test.ts",
       "**/*_test.tsx",
       "**/*.test.ts",

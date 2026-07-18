@@ -1,7 +1,7 @@
 import { assertEquals, assertExists } from '@std/assert';
 import { z } from 'zod';
 import { NetScriptConfigSchema, ServiceEntrySchema } from '../config.ts';
-import type { KnownDatabases, KnownServices, ServiceEntry } from '../types.ts';
+import type { AppEntry, AppType, KnownDatabases, KnownServices, ServiceEntry } from '../types.ts';
 
 Deno.test('types', async (t) => {
   await t.step('z.infer shapes match expected structure', () => {
@@ -90,6 +90,21 @@ Deno.test('types', async (t) => {
 
     assertEquals(entry.Port, 3000);
     assertEquals(entry.Runtime, 'deno');
+  });
+
+  await t.step('AppType and AppEntry expose the desktop contract', () => {
+    const type: AppType = 'desktop';
+    const entry: AppEntry = {
+      Enabled: false,
+      Runtime: 'deno',
+      Type: type,
+      WatchMode: false,
+      PackageTaskName: 'desktop:package',
+      RequiresKv: false,
+    };
+
+    assertEquals(entry.Type, 'desktop');
+    assertEquals(entry.PackageTaskName, 'desktop:package');
   });
 
   await t.step('generic utilities resolve correctly at type level', () => {

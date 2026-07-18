@@ -7,6 +7,7 @@ import {
   scaffoldCapabilitySuites,
 } from '../../../../suites/scaffold/capability-suites.ts';
 import { createDeployTargetsSuite } from '../../../../suites/deploy/deploy-targets-suite.ts';
+import { createDesktopNativeDeploySuite } from '../../../../suites/deploy/desktop-native-suite.ts';
 import { createTrueUserlandInstallSuite } from '../../../../suites/scaffold/true-userland-install-suite.ts';
 
 /** Built-in suite descriptor. */
@@ -36,6 +37,11 @@ export const builtInSuites: readonly BuiltInSuite[] = [
     id: DEPLOY.TARGETS,
     title: DEPLOY_TITLE.TARGETS,
     create: createDeployTargetsSuite,
+  },
+  {
+    id: DEPLOY.DESKTOP_NATIVE,
+    title: DEPLOY_TITLE.DESKTOP_NATIVE,
+    create: createDesktopNativeDeploySuite,
   },
 ];
 

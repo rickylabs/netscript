@@ -150,6 +150,101 @@ target cannot honour.
 | `kubernetes`, `azure-aca`, `azure-app-service`, `azure-aks` | Validates the generated TypeScript AppHost declares the matching hosting integration, then delegates to `aspire publish` / `deploy` / `destroy`.                                                                                  | `aspire add <target>`, a configured cluster/subscription context, and Helm 4.2+ for Kubernetes/AKS. |
 | `cloud-run`                                                 | Docker-image lane: `docker build` → `docker push` → `gcloud run deploy`.                                                                                                                                                          | Docker, Google Cloud CLI auth, and a reachable registry.                                            |
 
+### Native desktop packaging
+
+An enabled Aspire app with `Type: "desktop"` can package through its configured task hook:
+
+```json
+{
+  "Type": "desktop",
+  "Enabled": true,
+  "Workdir": "apps/storefront",
+  "PackageTaskName": "desktop:package"
+}
+```
+
+The task owns the desktop entrypoint and permissions. NetScript appends the native Deno flags:
+
+```bash
+netscript deploy desktop package --app storefront --all-targets \
+  --format app --format appimage --format deb --format rpm --format msi
+netscript deploy desktop package --app storefront \
+  --target x86_64-unknown-linux-gnu --format appimage --format deb
+```
+
+Every invocation uses an explicit target and output path. Omitted formats produce all formats for
+the selected OS: `.app`/`.dmg` on macOS, `.AppImage`/`.deb`/`.rpm` on Linux, and `.msi` on Windows.
+Runtime compression defaults to `xz`; select `--compression none|lzma|zstd` explicitly when needed.
+The `.dmg` format requires a macOS host, and `zstd` requires the external `zstd` executable.
+An unfiltered `--all-targets` includes `.dmg`, so run that complete matrix on macOS; other hosts can
+use repeatable `--format` filters to omit it while still cross-compiling the remaining targets.
+Native installers are unsigned at this stage; signing and notarization remain external CI steps.
+
+Platform signing is separate from the Ed25519 update-manifest signature. CI should sign the native
+artifacts after packaging and before release preparation or hosting:
+
+- Windows: Authenticode-sign the generated `.msi` with `signtool`, including the organization's
+  SHA-256 timestamp authority, then verify the signature on a clean Windows runner.
+- macOS: codesign the `.app` and nested code with the appropriate Developer ID identity, create or
+  sign the `.dmg`, submit it to Apple's notary service, and staple/validate the notarization ticket.
+- Linux: apply the repository/distribution signing policy to `.deb` and `.rpm`; AppImage signing is
+  likewise an external release-policy step.
+
+The CLI intentionally does not accept certificate credentials or invoke those platform tools.
+
+Prepare a native update after CI has retained the current and previous runtime libraries:
+
+```bash
+netscript deploy desktop release prepare \
+  --channel stable --target linux-x86_64 \
+  --version 1.2.0 --sequence 42 \
+  --current-runtime dist/1.2.0/libdenort.so \
+  --from 1.1.0=dist/1.1.0/libdenort.so \
+  --private-key-file .secrets/update-ed25519.pem
+```
+
+Preparation requires read access to the runtime libraries and PKCS#8 Ed25519 private key, write
+access to `.deploy/desktop/releases`, and run access to an external bsdiff 4.x-compatible
+executable. The key stays local to the authoring process. Each route keeps private strict-monotonic
+sequence state; a failed final manifest replacement burns that sequence, so retry with a higher
+number. Immutable patches are written first, private high-water second, and `latest.json` last.
+
+Serve the prepared tree at the same pathname used by the SDK release base URL:
+
+```bash
+netscript deploy desktop release serve \
+  --release-dir .deploy/desktop/releases \
+  --hostname 127.0.0.1 --port 8787 --base-path /application
+```
+
+For `baseUrl: "https://releases.example.com/application"`, the native manifest is
+`/application/<channel>/<os>-<arch>/latest.json`. Terminate public HTTPS at a trusted reverse proxy;
+the built-in listener is transport-neutral and intended for a protected origin. It serves only
+GET/HEAD allowlisted manifests, patches, and installers. Private high-water files, dot paths,
+traversal, encoded separators, and symlink escapes are never served.
+
+Windows native apply remains unsupported upstream. Applications must handle the public SDK seam's
+`applyMode: "manual"` update-ready event and present its trusted `manualUpdateUrl`; this server may
+host the installer, but it does not claim or emulate automatic Windows replacement.
+
+```ts
+import { startAutoUpdate } from '@netscript/sdk/auto-update';
+
+startAutoUpdate({
+  release: {
+    baseUrl: 'https://releases.example.com/application',
+    publicKey: 'base64-ed25519-public-key',
+    manualUpdateUrl: 'https://releases.example.com/application/windows-installer',
+  },
+  policy: { checkOnLaunch: true },
+  onUpdateReady(event) {
+    if (event.applyMode === 'manual') showInstallerPrompt(event.manualUpdateUrl);
+  },
+});
+
+declare function showInstallerPrompt(url: string): void;
+```
+
 Cloud authentication and RBAC are deliberately **operator-owned**. NetScript does not mint cloud
 credentials, assign RBAC, or hand-author Helm, Bicep, Kubernetes, or Azure manifests: AppHost-backed
 targets delegate to Aspire after validation, and Cloud Run owns only the image build/push/apply seam.
@@ -165,10 +260,10 @@ A host binary embedding the deploy surface must grant:
 
 | Permission      | Why                                                                                                    |
 | --------------- | ------------------------------------------------------------------------------------------------------ |
-| `--allow-run`   | `deno compile` the service binaries; invoke `servy` / `systemctl` / `aspire` / `docker` / `gcloud`.    |
+| `--allow-run`   | Invoke desktop package tasks, bsdiff/zstd, and deploy tools such as `servy`, Aspire, Docker, or gcloud. |
 | `--allow-read`  | Read the workspace config, entrypoints, and release/secret files.                                      |
-| `--allow-write` | Emit compiled binaries, release directories, the `current` link, and env files.                        |
-| `--allow-net`   | Health-probe the activated service (`FetchHealthProbe`).                                               |
+| `--allow-write` | Emit compiled binaries, native artifacts, private high-water state, release files, and env files.     |
+| `--allow-net`   | Listen for release HTTP requests and health-probe activated services.                                 |
 | `--allow-sys`   | Resolve the host OS/triple to select the Servy vs. systemd adapter and compile target.                 |
 | `--allow-env`   | Read the deploy owner principal for the Windows secret-file ACL; provider CLIs read their auth tokens. |
 

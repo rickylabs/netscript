@@ -2,6 +2,7 @@ import type { Evidence } from './evidence.ts';
 import type { RunContext } from './run-context.ts';
 import type { GateId, GatePhase } from './cli-surface.ts';
 import type { CommandOutputMode } from '../ports/command-executor.ts';
+import type { ExecutionPlatform } from './platform.ts';
 
 /** Gate verdicts emitted by the runner. */
 export type GateVerdict = 'passed' | 'failed' | 'skipped';
@@ -31,6 +32,7 @@ export interface BaseGateDefinition {
   readonly title: string;
   readonly phase: GatePhase;
   readonly critical: boolean;
+  readonly platforms?: readonly ExecutionPlatform[];
 }
 
 /** Semantic gate backed by a CLI command. */
