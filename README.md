@@ -1,28 +1,25 @@
 # NetScript
 
-**The contract-first backend framework for Deno that coding agents can operate: one oRPC contract
-becomes a typed Hono service, typed SDK clients, and a Fresh UI — orchestrated by .NET Aspire, with
-MCP, skills, and an agent-aware CLI built in.**
+**The enterprise-grade meta-framework for Deno: contract-first, end-to-end typed, cloud-agnostic —
+one unified API from typed services and durable workflows to orchestration, observability, and
+deploy.**
 
 [![JSR](https://jsr.io/badges/@netscript)](https://jsr.io/@netscript)
 [![CI](https://github.com/rickylabs/netscript/actions/workflows/ci.yml/badge.svg)](https://github.com/rickylabs/netscript/actions/workflows/ci.yml)
 [![Docs](https://img.shields.io/badge/docs-rickylabs.github.io-blue)](https://rickylabs.github.io/netscript/)
 
-NetScript is a backend framework and workspace generator, not a hosted service — you run it on Deno
-and own all the generated code. You define your API once as an oRPC contract; NetScript turns it
-into a running Hono service (health probes, OpenAPI, Scalar docs, request tracing, graceful shutdown
-— one `defineService` call), generates typed clients that stay in sync because they share that same
-contract, and wires a Fresh UI and .NET Aspire orchestration around it. Durable capabilities —
-background jobs, sagas, triggers, event streams, auth, AI — install as first-party plugins that
-register themselves with the orchestrator.
+What Laravel is to PHP, NetScript aims to be for the TypeScript backend: one coherent framework
+where today you assemble a stack.
 
-It exists because a typed backend today is still assembled by hand: a router here, a client
-generator there, a queue, a scheduler, an auth service, an orchestrator config — each with its own
-config surface, none aware of the others, and none of it legible to the coding agents that
-increasingly do the assembling. NetScript collapses that into one contract-first workspace where
-`netscript init` scaffolds every layer pre-wired, every later command regenerates the derived wiring
-instead of letting it drift, and the same tooling that serves you serves your agent: the CLI is the
-hands, the skills are the playbook, MCP is the eyes.
+Define your API once as an oRPC contract. The typed Hono service, the typed SDK clients, and the
+Fresh UI all derive from it — they cannot drift. Background jobs, sagas, triggers, event streams,
+auth, and AI install as first-party plugins behind the same unified API. .NET Aspire brings the
+whole graph up locally with one command. And it ships: from a single compiled binary to a
+multi-cloud distributed infrastructure, observability on by default, a coding agent able to operate
+the whole workspace.
+
+NetScript is a framework and workspace generator, not a hosted service — you run it on Deno and own
+all the generated code.
 
 > **Beta (`0.0.1-beta.x`).** Every `@netscript/*` package shares one aligned version and releases
 > move in lockstep. The API is subject to change — build with us, but pin your versions. See
@@ -87,43 +84,10 @@ command groups (`init`, `db`, `generate`, `plugin`, `service`, `deploy`, `agent`
 
 ---
 
-## 🤖 Built to be operated by coding agents
-
-NetScript treats your coding agent as a first-class user. One command wires the whole agentic triple
-into your project:
-
-```bash
-netscript agent init
-```
-
-It auto-detects your agent host, writes the MCP config (`.mcp.json` for Claude Code,
-`.vscode/mcp.json` for VS Code) pointing at `netscript agent mcp`, and installs the NetScript skill
-bundle — all pinned to the installed CLI version, so the tool catalog the agent sees always matches
-the release it runs.
-
-- **MCP is the eyes.** [`@netscript/mcp`](packages/mcp/README.md) exposes **13 token-bounded tools**
-  — app status, run inspection, recent errors, service/database performance analysis, doctor, docs
-  search, and command execution — over stdio. Every result is capped server-side (50 items, 2,000
-  characters per string) so telemetry never floods the context window, and tools classify traces
-  into worker/saga/trigger/stream/service domains and correlate whole executions by id.
-- **Skills are the playbook.** `agent init` installs three content-hashed skills (`netscript`,
-  `netscript-operate`, `netscript-build`) shipped with the same release as the CLI.
-- **The CLI is the hands.** The MCP `execute_command` tool shells the real CLI through a
-  default-deny policy gate: 17 allowed command prefixes, 6 explicit denies (`deploy`, `init`,
-  `marketplace`, `db reset`, `plugin remove`, `ui:remove`), deny beats allow, anything unmatched is
-  denied.
-
-The server runs on Deno 2.9+ with a minimal stdio JSON-RPC transport — no npm MCP SDK in the
-dependency graph. It complements Aspire's own MCP server rather than replacing it: Aspire speaks
-resources and containers; this server speaks your app.
-
----
-
-## 🗺️ Architecture
+## 🗺️ One contract, four moves
 
 One contract flows outward: up into typed clients and the UI, down into the service runtime, the
-plugins, and the Aspire-provisioned platform — while the agent tooling observes and operates the
-whole workspace from the side.
+plugins, and the Aspire-provisioned platform.
 
 ```mermaid
 flowchart TD
@@ -154,14 +118,16 @@ trace using Deno's built-in OTLP exporter — zero OpenTelemetry SDK dependency 
 
 ---
 
-## 🔌 First-party plugins
+## 🔋 Batteries no frontend framework ships
 
-A NetScript plugin is, at its core, a manifest: plain, validated data declaring what it contributes
-— services, background processors, stream topics, DB schema, telemetry. Hosts inspect manifests
-without executing plugin code. One install — for example
-`netscript plugin install worker --name workers` — scaffolds the workspace, registers the API
-service, provisions storage, and adds the plugin's resources to the Aspire AppHost so everything
-starts with the app.
+Next.js, Nuxt, SvelteKit, Angular — the frontend meta-frameworks stop at the HTTP boundary.
+NetScript keeps going: durable jobs, compensating sagas, trigger ingress, replayable streams,
+pluggable auth, and an in-process AI surface are first-party plugins, not integrations you assemble.
+
+A plugin is, at its core, a manifest: plain, validated data hosts inspect without executing plugin
+code. One install — `netscript plugin install worker --name workers` — scaffolds the workspace,
+registers the API service, provisions storage, and adds the plugin's resources to the Aspire AppHost
+so everything starts with the app.
 
 | Plugin                                     | What it gives you                                                                                                                           |
 | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -259,7 +225,12 @@ package with `deno add jsr:@netscript/<name>@<version>` (pin the version; see
 
 ---
 
-## 🚢 Deploy targets
+## 🚢 Ship anywhere
+
+The same app model spans the whole spectrum: a single compiled binary on one machine today, a
+multi-cloud distributed infrastructure tomorrow — and, from `0.0.1-beta.11`, a native desktop app on
+a consumer machine. Cloud-agnostic by design: every target is an adapter behind one router, and more
+lanes follow the same contract as the framework grows.
 
 `netscript deploy <target> <op>` is one thin router over target adapters sharing a canonical
 lifecycle (`plan`, `up`, `down`, with `status`/`logs` on the targets that honour them —
@@ -288,6 +259,37 @@ stage — platform code-signing (Authenticode, Developer ID + notarization) is a
 CI step, and the CLI accepts no certificate credentials. And Windows native update apply is
 unsupported upstream, so apps handle an `applyMode: "manual"` update-ready event and present its
 verified `manualUpdateUrl` instead of replacing themselves in place.
+
+---
+
+## 🤖 Operable by coding agents
+
+The agent story is deliberate, not bolted on. One command wires the whole triple into your project:
+
+```bash
+netscript agent init
+```
+
+It auto-detects your agent host, writes the MCP config (`.mcp.json` for Claude Code,
+`.vscode/mcp.json` for VS Code) pointing at `netscript agent mcp`, and installs the NetScript skill
+bundle — all pinned to the installed CLI version, so the tool catalog the agent sees always matches
+the release it runs.
+
+- **MCP is the eyes.** [`@netscript/mcp`](packages/mcp/README.md) exposes **13 token-bounded tools**
+  — app status, run inspection, recent errors, service/database performance analysis, doctor, docs
+  search, and command execution — over stdio. Every result is capped server-side (50 items, 2,000
+  characters per string) so telemetry never floods the context window, and tools classify traces
+  into worker/saga/trigger/stream/service domains and correlate whole executions by id.
+- **Skills are the playbook.** `agent init` installs three content-hashed skills (`netscript`,
+  `netscript-operate`, `netscript-build`) shipped with the same release as the CLI.
+- **The CLI is the hands.** The MCP `execute_command` tool shells the real CLI through a
+  default-deny policy gate: 17 allowed command prefixes, 6 explicit denies (`deploy`, `init`,
+  `marketplace`, `db reset`, `plugin remove`, `ui:remove`), deny beats allow, anything unmatched is
+  denied.
+
+The server runs on Deno 2.9+ with a minimal stdio JSON-RPC transport — no npm MCP SDK in the
+dependency graph. It complements Aspire's own MCP server rather than replacing it: Aspire speaks
+resources and containers; this server speaks your app.
 
 ---
 

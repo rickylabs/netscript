@@ -235,3 +235,56 @@ deploy lanes + "New in 0.0.1-beta.11 — native desktop lane" callout) → pilla
 - `deno task docs:links` → 98 docs, 0 broken links/anchors.
 - Internal-wording grep on index.vto → zero hits.
 - No `_data.ts` change needed (nav untouched; drift fixed on the page side).
+
+## Homepage fix cycle 1 + owner repositioning — 2026-07-18 (Lane 4)
+
+### Homepage adversarial fixes (all 4)
+1. Deploy-list sentence replaced with the README's passed disposition verbatim-adjacent
+   ("inventories the installed targets; check `netscript deploy <target> --help` for the exact
+   operations each one ships"); site-wide grep for "installed version supports" → only index.vto
+   had it, now zero.
+2. Scaffold tab now `netscript init my-app --db postgres --service` (and `--service` on the
+   --no-aspire alternative). Full four-tab flow RE-EXECUTED end-to-end in a fresh dir (qs3):
+   init → "Example service users (oRPC handler on port 3000)", 183 files/44 dirs, 5.5 s;
+   aspire restore/start (dashboard printed); `cd ..`; db init/generate/seed all exit 0;
+   contract snippet `deno check --unstable-kv` clean post-generate; users.contract.ts +
+   services/users/src/main.ts exist as the tabs claim.
+3. Generation prerequisite explicit: tab 1 comment "(@database/zod is emitted by `netscript db
+   generate` in tab 4)", tab 2 comment "Runnable once the database types exist", tab 4 annotates
+   `db generate # emits @database/zod, used by tabs 1-2`.
+4. Tab 4 now prints `cd ..` and carries the README's aspire stop/start recovery note verbatim-
+   adjacent.
+
+### Owner repositioning (both artifacts, one brief: directive + advantage-inventory method +
+compact-prose style rule)
+- `competitive-advantages.md` written in this slice dir: 14 advantages each with fact-sheet proof
+  point, ranked by enterprise appeal; ranking drives both artifacts' section order.
+- README: new tagline (enterprise-grade meta-framework; 250B gate OK) + compact hero
+  ("What Laravel is to PHP, NetScript aims to be for the TypeScript backend" + derive-cannot-
+  drift + ships-anywhere line + not-a-hosted-service line). Section order now: Quickstart →
+  One contract, four moves (architecture) → Batteries no frontend framework ships (differentiation
+  + plugin table; names Next.js/Nuxt/SvelteKit/Angular as scope contrast per owner) → Packages →
+  Ship anywhere (spectrum line: "single compiled binary … multi-cloud distributed infrastructure
+  — and, from 0.0.1-beta.11, a native desktop app on a consumer machine"; cloud-agnostic adapter
+  framing; no specific unshipped target named) → Operable by coding agents (DEMOTED chapter,
+  substance intact) → Documentation → Status → Contributing → License.
+- Homepage: hero re-led ("One contract. A whole production backend." + enterprise subhead with
+  the spectrum line); agent section moved BELOW Ship anywhere with substance intact; plugin
+  section retitled "Batteries no frontend framework ships"; "Ship anywhere" gains the compact
+  spectrum paragraph (desktop half version-marked beta.11); prose tightened per style rule.
+- Version truth: spectrum's desktop clause is beta.11-marked in both artifacts; shipped deploy
+  table/prose unchanged from the corrected beta.10 truth; owner's Cloudflare mention rendered as
+  the cloud-agnostic/adapter direction without asserting an unshipped target (owner directive is
+  the source for the direction framing; no shipped-claim added).
+- Claim→citation deltas: "What Laravel is to PHP… aims to be" + "THE default…"-derived framing →
+  owner repositioning directive (2026-07-18, in-run), phrased as aim, not fact; spectrum line →
+  owner directive + FAD D2 (OS-service single binary shipped; desktop = beta.11); frontend-
+  framework contrast → scope statement grounded in FRP D2 (first-party plugin batteries); all
+  other claims retain their existing citations. Accuracy fixes from all prior cycles verified
+  intact (deploy-list wording, --service tabs, prerequisites, recovery posture, counts, Deno 2.9+).
+
+### Gates (re-run after repositioning)
+- README: `deno fmt --check` clean; tagline gate OK (checked=1 over=0); mermaid re-parse
+  MERMAID_PARSE_OK flowchart-v2; internal-wording grep zero hits.
+- Site: `deno task build` → 531 files, 6.75 s; `docs:links` → 98 docs, 0 broken;
+  index.vto wording grep zero hits.

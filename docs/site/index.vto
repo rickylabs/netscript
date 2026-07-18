@@ -1,11 +1,11 @@
 ---
 layout: layouts/base.vto
-title: NetScript — the contract-first Deno meta-framework, operable by coding agents
+title: NetScript — the enterprise-grade meta-framework for Deno
 ---
 
 {{ comp.hero({
-  tagline: "Define the contract. NetScript runs the backend — and your coding agent can operate it.",
-  subhead: "A contract-first meta-framework for Deno: one oRPC contract becomes a typed Hono service, typed SDK clients, and a Fresh UI — durable workflows install as plugins, .NET Aspire orchestrates every process, and MCP, skills, and an agent-aware CLI make the whole workspace legible to coding agents.",
+  tagline: "One contract. A whole production backend.",
+  subhead: "NetScript is the enterprise-grade meta-framework for Deno: contract-first, end-to-end typed, cloud-agnostic. One unified API from typed services and durable workflows to orchestration, observability, and deploy — from a single compiled binary to a multi-cloud distributed infrastructure.",
   ctas: [
     { label: "Quickstart", href: "/quickstart/", primary: true },
     { label: "Browse the reference", href: "/reference/" },
@@ -25,46 +25,28 @@ you upgrade.
 <h2>The contract is the product</h2>
 
 <p>
+Define it once; everything derives from it — typed service, typed clients, OpenAPI, orchestration.
 The shapes below come straight from a workspace scaffolded by
-<code>netscript init my-app --db postgres --service</code> (abridged): the contract is the single
-source of truth, the service implements it in one call, and the same definition drives the typed
-clients, the OpenAPI surface, and the orchestration wiring.
+<code>netscript init my-app --db postgres --service</code> (abridged).
 </p>
 
 {{ comp.tabbedCode({ tabs: [
-  { label: "1 · The contract", lang: "ts", code: "// contracts/versions/v1/users.contract.ts — scaffolded for you.\n// One entity schema fans out into a whole CRUD contract.\nimport { createCrudContract } from '@netscript/contracts/crud';\nimport { UserCreateInput, UserSchema, UserUpdateInput } from '@database/zod';\n\nexport const UsersCrudContractV1 = createCrudContract({\n  resource: 'users',\n  entitySchema: UserSchema,\n  createSchema: UserCreateInput,\n  updateSchema: UserUpdateInput,\n});" },
-  { label: "2 · The service", lang: "ts", code: "// One preset wires CORS, request logging, OpenAPI JSON, Scalar docs,\n// RPC (served at /api/rpc/*), service info, and health endpoints —\n// instead of ~40 lines of Hono setup.\nimport { defineService } from '@netscript/service';\nimport { router } from './router.ts';\n\nconst service = await defineService(router, {\n  name: 'users',\n  port: 3000,\n});\n\nawait service.stop();" },
-  { label: "3 · Scaffold", lang: "sh", code: "# Install the netscript command from JSR (Deno 2.9+)\ndeno install --global --allow-all --name netscript jsr:@netscript/cli" + releaseSpecifier + "\n\n# Scaffold a complete, type-checked workspace.\n# Postgres is the recommended engine; pass --db postgres (mysql, mssql, sqlite also supported).\nnetscript init my-app --db postgres\n\n# Prefer to keep .NET Aspire out of the loop? Opt out:\nnetscript init my-app --db postgres --no-aspire" },
-  { label: "4 · Bring it up", lang: "sh", code: "# Aspire is step 2: it brings up Postgres and the cache first\ncd my-app/aspire\naspire restore   # one-time: downloads the AppHost SDK modules\naspire start     # starts everything and prints the dashboard URL\n\n# Open the dashboard and wait until the postgres resource reports\n# healthy — services deliberately wait on the database — then, from\n# the workspace root, initialize it:\nnetscript db init --name init\nnetscript db generate\nnetscript db seed" }
-] }) }}
-
-<h2>Built for humans and coding agents</h2>
-
-<p>
-NetScript treats your coding agent as a first-class user. One command wires the whole agentic
-triple into a project — the CLI is the hands, the skills are the playbook, MCP is the eyes:
-</p>
-
-{{ comp.tabbedCode({ tabs: [
-  { label: "Equip your agent", lang: "sh", code: "# Auto-detects the agent host, writes the MCP config (.mcp.json for\n# Claude Code, .vscode/mcp.json for VS Code), and installs the skill\n# bundle — all pinned to the installed CLI version.\nnetscript agent init" }
-] }) }}
-
-{{ comp.featureGrid({ items: [
-  { title: "MCP is the eyes", body: "13 token-bounded tools over stdio: app status, run inspection, recent errors, performance analysis, doctor, and docs search. Every result is capped server-side (50 items, 2,000 characters per string) so telemetry never floods the context window.", href: "/ai/mcp/" },
-  { title: "Skills are the playbook", body: "agent init installs three content-hashed skills shipped with the same release as the CLI, so the playbook always matches the binary.", href: "/reference/ai/skills/" },
-  { title: "The CLI is the hands", body: "The MCP execute_command tool shells the real CLI through a default-deny policy gate: 17 allowed command prefixes, 6 explicit denies, deny beats allow, anything unmatched is denied.", href: "/ai/" }
+  { label: "1 · The contract", lang: "ts", code: "// contracts/versions/v1/users.contract.ts — scaffolded for you.\n// One entity schema fans out into a whole CRUD contract.\n// (@database/zod is emitted by `netscript db generate` in tab 4.)\nimport { createCrudContract } from '@netscript/contracts/crud';\nimport { UserCreateInput, UserSchema, UserUpdateInput } from '@database/zod';\n\nexport const UsersCrudContractV1 = createCrudContract({\n  resource: 'users',\n  entitySchema: UserSchema,\n  createSchema: UserCreateInput,\n  updateSchema: UserUpdateInput,\n});" },
+  { label: "2 · The service", lang: "ts", code: "// Runnable once the database types exist (`netscript db generate`, tab 4).\n// One preset wires CORS, request logging, OpenAPI JSON, Scalar docs,\n// RPC (served at /api/rpc/*), service info, and health endpoints —\n// instead of ~40 lines of Hono setup.\nimport { defineService } from '@netscript/service';\nimport { router } from './router.ts';\n\nconst service = await defineService(router, {\n  name: 'users',\n  port: 3000,\n});\n\nawait service.stop();" },
+  { label: "3 · Scaffold", lang: "sh", code: "# Install the netscript command from JSR (Deno 2.9+)\ndeno install --global --allow-all --name netscript jsr:@netscript/cli" + releaseSpecifier + "\n\n# Scaffold the workspace shown in tabs 1-2: contracts + the typed\n# users service + Postgres + Aspire orchestration.\n# Postgres is the recommended engine (mysql, mssql, sqlite also supported).\nnetscript init my-app --db postgres --service\n\n# Prefer to keep .NET Aspire out of the loop? Opt out:\nnetscript init my-app --db postgres --service --no-aspire" },
+  { label: "4 · Bring it up", lang: "sh", code: "# Aspire is step 2: it brings up Postgres and the cache first\ncd my-app/aspire\naspire restore   # one-time: downloads the AppHost SDK modules\naspire start     # starts everything and prints the dashboard URL\n\n# Open the dashboard and wait until the postgres resource reports\n# healthy — services deliberately wait on the database — then\n# initialize it from the workspace root:\ncd ..\nnetscript db init --name init\nnetscript db generate   # emits @database/zod, used by tabs 1-2\nnetscript db seed\n\n# If the users service is still shown as waiting after Postgres looks\n# ready, restart the orchestrator (from my-app/aspire: aspire stop,\n# then aspire start) — with the database initialized, the whole stack\n# reports healthy in seconds." }
 ] }) }}
 
 <h2>One contract, four moves</h2>
 
 <p>
-The mental model is <strong>contract → service → plugins → platform</strong>. You author the
-contract; <code>defineService</code> turns it into a running Hono + oRPC app; plugins add durable
+<strong>Contract → service → plugins → platform.</strong> You author the contract;
+<code>defineService</code> turns it into a running Hono + oRPC app; plugins add durable
 capabilities behind the same contract style; <code>@netscript/aspire</code> provisions and connects
-the infrastructure — keeping the Aspire SDK behind an adapter, so no .NET type ever appears in a
-public signature. Where a service lives is resolved at call time from orchestrator-injected
-environment variables, so the same client code runs against local processes, containers, and
-deployed endpoints with no registry or config file.
+the infrastructure — Aspire SDK behind an adapter, no .NET type in any public signature. Service
+locations resolve at call time from orchestrator-injected environment variables: the same client
+code runs against local processes, containers, and deployed endpoints. No registry, no config
+file.
 </p>
 
 {{ comp.diagram({ src: "/assets/diagrams/architecture-overview.svg", alt: "A NetScript workspace: contracts define services; services, workers, sagas, triggers, streams, and auth plugins register against a host; the AppHost materializes each as an Aspire resource alongside Postgres, Redis, and the dashboard.", caption: "The whole system in one picture: contracts at the center, plugins contributing to a host, and the AppHost bringing every resource up together." }) }}
@@ -75,13 +57,13 @@ into one distributed trace using Deno's built-in OTLP exporter — zero OpenTele
 by default — and the Aspire dashboard shows every resource, trace, and log in one place.
 </p>
 
-<h2>Durable capabilities install as plugins</h2>
+<h2>Batteries no frontend framework ships</h2>
 
 <p>
-A NetScript plugin is, at its core, a manifest: plain, validated data declaring what it contributes.
-Hosts inspect manifests without executing plugin code, and one install scaffolds the workspace,
-registers the API service, provisions storage, and adds the plugin's resources to the Aspire
-AppHost so everything starts with the app:
+Frontend meta-frameworks stop at the HTTP boundary. NetScript keeps going: durable jobs,
+compensating sagas, trigger ingress, replayable streams, pluggable auth, and an in-process AI
+surface are first-party plugins — one install scaffolds the workspace, registers the API service,
+provisions storage, and adds the plugin's resources to the Aspire AppHost:
 </p>
 
 {{ comp.tabbedCode({ tabs: [
@@ -97,13 +79,20 @@ AppHost so everything starts with the app:
   { title: "ai", body: "An app-owned, in-process chat/tool/agent surface — the agent loop runs inside your server process, no AI gateway, no extra network hop.", href: "/ai/" }
 ] }) }}
 
-<h2>Run it anywhere</h2>
+<h2>Ship anywhere</h2>
+
+<p>
+One app model, the whole spectrum: a single compiled binary on one machine, or a multi-cloud
+distributed infrastructure — and, from <code>0.0.1-beta.11</code>, a native desktop app on a
+consumer machine. Cloud-agnostic by design.
+</p>
 
 <p>
 <code>netscript deploy &lt;target&gt; &lt;op&gt;</code> is one thin router over target adapters
 sharing a canonical lifecycle (<code>plan</code>, <code>up</code>, <code>down</code>, with
 <code>status</code>/<code>logs</code> on the targets that honour them —
-<code>netscript deploy list</code> prints exactly what your installed version supports). Shipped
+<code>netscript deploy list</code> inventories the installed targets; check
+<code>netscript deploy &lt;target&gt; --help</code> for the exact operations each one ships). Shipped
 lanes today: Docker and Compose, Linux and Windows OS services from a single compiled binary,
 Deno Deploy with a preflight guard, Kubernetes and Azure (Container Apps, App Service, AKS)
 delegating to Aspire, and Cloud Run. Cloud auth stays operator-owned — NetScript mints no
@@ -119,6 +108,23 @@ step), and Windows native update apply is a manual installer-download path, not 
 auto-apply. See <a href="{{ '/how-to/build-a-desktop-frontend/' |> url }}">Build a desktop
 frontend</a>.
 {{ /comp }}
+
+<h2>Operable by coding agents</h2>
+
+<p>
+The agent story is deliberate, not bolted on — the CLI is the hands, the skills are the playbook,
+MCP is the eyes. One command wires all three into a project:
+</p>
+
+{{ comp.tabbedCode({ tabs: [
+  { label: "Equip your agent", lang: "sh", code: "# Auto-detects the agent host, writes the MCP config (.mcp.json for\n# Claude Code, .vscode/mcp.json for VS Code), and installs the skill\n# bundle — all pinned to the installed CLI version.\nnetscript agent init" }
+] }) }}
+
+{{ comp.featureGrid({ items: [
+  { title: "MCP is the eyes", body: "13 token-bounded tools over stdio: app status, run inspection, recent errors, performance analysis, doctor, and docs search. Every result is capped server-side (50 items, 2,000 characters per string) so telemetry never floods the context window.", href: "/ai/mcp/" },
+  { title: "Skills are the playbook", body: "agent init installs three content-hashed skills shipped with the same release as the CLI, so the playbook always matches the binary.", href: "/reference/ai/skills/" },
+  { title: "The CLI is the hands", body: "The MCP execute_command tool shells the real CLI through a default-deny policy gate: 17 allowed command prefixes, 6 explicit denies, deny beats allow, anything unmatched is denied.", href: "/ai/" }
+] }) }}
 
 <h2>Build real systems, not just CRUD</h2>
 
