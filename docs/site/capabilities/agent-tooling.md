@@ -34,6 +34,12 @@ The generated MCP configuration runs `netscript agent mcp` for the current proje
 `agent init` is idempotent: unchanged files are left alone, and existing host configuration is
 preserved alongside the `netscript` server entry.
 
+The host command includes the absolute project `deno.json` path. Deno 2.9 normally holds newly
+published registry versions behind a 24-hour minimum dependency age; the generated JSR workspace
+keeps that policy while excluding only exact-version packages in the matching NetScript release
+train. Loading the project configuration explicitly lets a newly released `@netscript/cli` MCP
+server start immediately without changing the age policy for third-party dependencies.
+
 ## Tool catalog
 
 Every tool returns a bounded structured result. A CLI twin is listed where a direct command covers

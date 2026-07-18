@@ -118,6 +118,8 @@ async function writeHostConfig(
             command: "deno",
             args: [
               "run",
+              "--config",
+              join(projectRoot, "deno.json"),
               "-A",
               netscriptJsrSpecifier("cli"),
               "agent",

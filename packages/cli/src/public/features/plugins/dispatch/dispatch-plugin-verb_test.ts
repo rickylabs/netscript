@@ -98,7 +98,7 @@ describe('plugin verb dispatch', () => {
     );
   });
 
-  it('never shells out to a version-less first-party plugin CLI', async () => {
+  it('runs an unversioned first-party plugin through the lockstep config and direct JSR target', async () => {
     const processRunner = new RecordingProcess(0);
 
     await dispatchPluginVerb('doctor', '@netscript/plugin-ai', [], {
@@ -106,10 +106,58 @@ describe('plugin verb dispatch', () => {
       processRunner,
     });
 
-    assertEquals(
-      processRunner.commands[0].args[2],
-      `jsr:@netscript/plugin-ai@${NETSCRIPT_RELEASE_VERSION}/cli`,
+    assertEquals(processRunner.commands, [{
+      command: 'deno',
+      args: [
+        'run',
+        '--config',
+        '/workspace/app/deno.json',
+        '-A',
+        `https://jsr.io/@netscript/plugin-ai/${NETSCRIPT_RELEASE_VERSION}/cli.ts`,
+        'doctor',
+      ],
+      cwd: '/workspace/app',
+    }]);
+  });
+
+  it('runs an explicitly lockstep first-party plugin through the direct JSR target', async () => {
+    const processRunner = new RecordingProcess(0);
+
+    await dispatchPluginVerb(
+      'sync',
+      `jsr:@netscript/plugin-workers@${NETSCRIPT_RELEASE_VERSION}/cli`,
+      ['--json'],
+      { projectRoot: '/workspace/app', processRunner },
     );
+
+    assertEquals(processRunner.commands, [{
+      command: 'deno',
+      args: [
+        'run',
+        '--config',
+        '/workspace/app/deno.json',
+        '-A',
+        `https://jsr.io/@netscript/plugin-workers/${NETSCRIPT_RELEASE_VERSION}/cli.ts`,
+        'sync',
+        '--json',
+      ],
+      cwd: '/workspace/app',
+    }]);
+  });
+
+  it('keeps an explicitly non-lockstep first-party plugin on protected deno x dispatch', async () => {
+    const processRunner = new RecordingProcess(0);
+
+    await dispatchPluginVerb('doctor', '@netscript/plugin-ai@1.2.3', [], {
+      projectRoot: '/workspace/app',
+      processRunner,
+    });
+
+    assertEquals(processRunner.commands, [{
+      command: 'deno',
+      args: ['x', '-A', 'jsr:@netscript/plugin-ai@1.2.3/cli', 'doctor'],
+      cwd: '/workspace/app',
+    }]);
   });
 });
 
