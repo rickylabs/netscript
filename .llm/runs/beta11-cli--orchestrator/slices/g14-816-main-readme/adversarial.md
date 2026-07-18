@@ -555,3 +555,40 @@ PASS at `56bab8ff`.
 
 No README/homepage edit, merge, release action, milestone close, seed-run filing, or self-dispatched
 evaluation was performed during this targeted final check.
+
+---
+
+## Targeted wording-fix re-check (`67c1d0db`)
+
+**Final verdict: PASS**
+
+All three narrative findings are closed.
+
+1. **Optional plugin axes — PASS.** “Every layer at once” and “touch every layer” are absent from
+   README source, homepage source, and rendered homepage HTML. The replacement says a manifest _can_
+   contribute across the listed axes and that the host materializes whatever it declares. The worker
+   example is limited to its verified output: four plugin files scaffolded and twelve Aspire helpers
+   regenerated.
+2. **Exact deny-list truth — PASS.** “Destructive verbs” is absent from all three inspected
+   surfaces. The README retains the exact policy evidence—17 allowed prefixes, six explicit deny
+   families, deny precedence, and default-deny—and the new narrative calls `deploy`, `init`, and
+   `db reset` examples of high-risk operations behind that explicit list. The homepage intro states
+   deny precedence and unmatched-command denial; its CLI card preserves the full 17/6 semantics; its
+   audience card uses the same accurate high-risk examples without claiming exhaustiveness.
+3. **Type-checked review language — PASS.** “Typed diffs” is absent. The only affected claim now
+   says “type-checked changes,” matching the repository's actual Deno/type-checking surface.
+
+### Scope and gate evidence
+
+- Commit `67c1d0db` changes only `README.md`, `docs/site/index.vto`, and the slice worklog.
+- Diff inspection found no shell/code example change. A prose card containing `netscript agent init`
+  changed only its policy description; the command itself is unchanged.
+- The homepage rebuilt successfully: 531 files in 6.60 seconds.
+- Rejected-phrase grep was run against `README.md`, `docs/site/index.vto`, and the rendered
+  `docs/site/_site/index.html`, with zero matches.
+- No other wording regression was found in the targeted diff.
+
+The final Lane 5 verdict is PASS at `67c1d0db`.
+
+No README/homepage edit, merge, release action, milestone close, seed-run filing, or self-dispatched
+evaluation was performed during this targeted re-check.
