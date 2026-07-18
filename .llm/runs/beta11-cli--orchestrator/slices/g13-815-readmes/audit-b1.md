@@ -270,3 +270,37 @@ published page must retain the reader-relevant current-main content.
 
 The audit lane changed no README. Per the two-failure rule, this verdict is escalated to the Fable 5
 supervisor rather than silently starting another fix cycle.
+
+---
+
+# Third-pass targeted supervisor-resolution check
+
+**Final verdict: PASS.**
+
+- Verified supervisor fix commit: `6b71983cf12c540f2fb7051e2eb24bcc6c1c6572`.
+- Targeted scope: B2-F1 in `packages/cli/README.md` only, compared directly with
+  `a87570a6:packages/cli/README.md`; no other accuracy gates were reopened.
+- Content preservation: PASS. The restructured page now retains every B2-F1 reader contract: the
+  enabled desktop-app config; `--all-targets`, compression, and `zstd` constraints; per-OS signing;
+  prepare permissions, bsdiff, strict sequence/high-water ordering and retry semantics; release URL
+  mapping; Windows manual apply with SDK example; and the six-row deploy permission table under
+  `### Deploy permissions`.
+
+## Gate log — third pass
+
+| Gate                             | Command(s)                                                                                                                                                           | Scope                                            | Result | Findings / observed                                                                                                      | Proceeded                                                  |
+| -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ | ------ | ------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------- |
+| B2-F1 current-main content union | `git diff --unified=3 4c434168..6b71983c -- packages/cli/README.md`; `git show a87570a6:packages/cli/README.md`; side-by-side focused reads of both desktop sections | Every bullet in second-pass B2-F1                | PASS   | All seven requested operational/safety content groups are preserved in the restructured voice; no B2-F1 omission remains | Closed the escalated finding; no README edit by audit lane |
+| README standard                  | `deno run --no-lock --allow-read .llm/tools/validation/check-readme-standard.ts packages/cli/README.md --pretty`                                                     | CLI README only                                  | PASS   | `1 README(s) conform`                                                                                                    | Continued                                                  |
+| Tagline cap                      | `deno run --no-lock --allow-read .llm/tools/validation/check-jsr-tagline-length.ts packages/cli/README.md --pretty`                                                  | CLI tagline only                                 | PASS   | `checked=1 over=0`                                                                                                       | Continued                                                  |
+| Internal documentation links     | `deno task docs:links`                                                                                                                                               | Whole link graph required by the mechanical gate | PASS   | 98 docs; 0 broken links; 0 broken anchors; 0 orphans                                                                     | Final PASS                                                 |
+
+## Stop-lines honored — third pass
+
+- No merge was performed.
+- No release cut, JSR publish, tag push, canary, or stable publish was performed.
+- Milestone 13 was not closed.
+- No sub-agent brief or self-dispatched evaluator was created.
+- No #824 seed-board filing or ratification action was performed.
+
+The targeted supervisor resolution closes B2-F1. The audit lane changed no README.
