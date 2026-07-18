@@ -5,40 +5,82 @@
 [![Docs](https://img.shields.io/badge/docs-rickylabs.github.io-blue)](https://rickylabs.github.io/netscript/)
 
 **OpenTelemetry tracing for NetScript: connect scheduler, queue, worker, RPC, and SSE spans into one
-distributed trace through explicit ports and adapters.**
+distributed trace through explicit ports and adapters — with W3C propagation, fan-in span links, and
+a telemetry query read model.**
 
-Includes domain tracers, W3C context propagation across job subprocesses, fan-in span links,
-first-party oRPC and Hono instrumentation, and a telemetry query read model.
+A background job in NetScript may cross a scheduler tick, a queue message, a worker, and a spawned
+subprocess before it answers an RPC call — and the trace should survive the whole journey. This
+package makes that a first-party concern: domain tracers name spans by subsystem, context
+propagation carries the trace across message headers and `Deno.Command` boundaries, fan-in span
+links group many producer traces into one consumer span, and first-party oRPC and Hono
+instrumentation follows upstream semantic conventions. A query subpath reads the same telemetry back
+for diagnostics and agent tooling.
 
----
+## Why teams use it
 
-## 🚀 Quick Start
+- **Domain tracers** — `getJobTracer`, `getQueueTracer`, `getWorkerTracer`, `getSchedulerTracer`,
+  `getSagaTracer`, `getSSETracer`, and `getKVTracer` return cached, canonically named tracers so
+  spans group by NetScript subsystem.
+- **Span helpers, no raw SDK** — `withSpan`, `withSpanSync`, `createSpan`, and `addSpanEvent` wrap
+  OpenTelemetry-compatible `Span` and `Context` types so callers never touch the SDK directly.
+- **W3C propagation everywhere** — `injectContext` / `extractContext` carry trace context through
+  message headers; `createJobTraceEnv` / `extractJobTraceContext` and `initJobTracing` thread it
+  across `Deno.Command` job subprocesses.
+- **Fan-in span links** — `createFanInLinks` turns upstream `traceparent` / `tracestate` headers
+  into span links, so many producer traces link into one consumer span instead of being re-parented.
+- **First-party integrations** — `./orpc` ships a `TracingPlugin` backed by the upstream
+  `@orpc/otel` instrumentation; `./hono` wraps Hono's own `@hono/otel` middleware and layers
+  NetScript service naming on top; `./instrumentation` covers queue, worker, scheduler, and job
+  execution plus worker metrics.
+- **Query read model** — `./query` publishes the `TelemetryQueryPort` contract, Standard Schema
+  query-filter validators, and the Aspire-backed reader (`createAspireTelemetryQuery`), so tools can
+  read traces, logs, and metrics back out.
+- **Testable by construction** — `./testing` ships `InMemorySpanRecorder`, a `Tracer` that records
+  spans in memory for unit assertions.
 
-### Installation
+## Architecture
 
-```bash
-# Deno (recommended)
-deno add jsr:@netscript/telemetry
-
-# Node.js / Bun
-npx jsr add @netscript/telemetry
-bunx jsr add @netscript/telemetry
+```mermaid
+flowchart LR
+    A["NetScript code<br/>(withSpan, domain tracers)"] --> P["Ports<br/>TracerProviderPort · MeterPort<br/>PropagatorPort · SpanLinkPort"]
+    P --> D["OtelDenoTracerProvider<br/>(default: OTEL_DENO=true)"]
+    P --> S["OtelSdkTracerProvider<br/>(opt-in: OpenTelemetry JS SDK)"]
+    D & S --> O["OTLP endpoint<br/>(Aspire dashboard, collector)"]
+    O --> Q["TelemetryQueryPort<br/>(./query read model)"]
 ```
 
-### Usage
+The package separates **ports** (what NetScript code programs against) from **adapters** (what
+actually emits telemetry). `createTelemetryProvider` selects a provider adapter — Deno's built-in
+OTLP exporter by default, so tracing works with zero SDK dependencies, or an SDK-backed binding that
+also unlocks attribute-preserving span links. Application code only ever sees the port types.
+
+## Install
+
+```bash
+deno add jsr:@netscript/telemetry@<version>
+```
+
+Pin `<version>` to match your installed CLI; bare `jsr:@netscript/*` specifiers do not resolve on
+the pre-release line.
+
+## Quick example
 
 ```typescript
-import { getJobTracer, withSpan } from '@netscript/telemetry/tracer';
+import { withSpan } from '@netscript/telemetry/tracer';
+import { createInMemorySpanRecorder } from '@netscript/telemetry/testing';
 
-// Run async work inside a span on the job-domain tracer.
-const records = await withSpan(
-  getJobTracer(),
-  'job.import',
-  async (span) => {
-    span.setAttribute('netscript.job.source', 'erp-sync');
-    return await importRecords();
-  },
-);
+// Any Tracer works here — a domain tracer like getJobTracer() in an app;
+// the in-memory recorder makes the span observable without an OTLP endpoint.
+const tracer = createInMemorySpanRecorder();
+
+const total = await withSpan(tracer, 'job.import', async (span) => {
+  span.setAttribute('netscript.job.source', 'erp-sync');
+  return 42;
+});
+
+const [snapshot] = tracer.snapshots();
+console.log(total, snapshot?.name, snapshot?.attributes['netscript.job.source']);
+// 42 "job.import" "erp-sync"
 ```
 
 To continue a worker's trace inside a spawned job subprocess, extract the propagated context at the
@@ -53,7 +95,7 @@ const parentContext = initJobTracing();
 await withSpan(
   getJobTracer(),
   'job.main',
-  async (span) => {
+  (span) => {
     span.setAttribute('netscript.job.step', 'processing');
     // ... job logic
   },
@@ -61,128 +103,67 @@ await withSpan(
 );
 ```
 
----
+## Attribute convention
 
-## 🧭 Architecture: telemetry port/adapters
-
-The package separates **ports** (what NetScript code programs against) from **adapters** (what
-actually emits telemetry). `@netscript/telemetry/otel` exposes the port contracts —
-`TracerProviderPort`, `MeterPort`, `PropagatorPort`, `SpanLinkPort`, `TelemetryQueryPort` — plus two
-provider adapters:
-
-- `OtelDenoTracerProvider` (default) — binds to Deno's built-in OTLP exporter (`OTEL_DENO=true`), so
-  tracing works with zero SDK dependencies.
-- `OtelSdkTracerProvider` — an opt-in binding for apps that bring the OpenTelemetry JS SDK
-  (`SdkBinding`), which also unlocks attribute-preserving span links.
-
-`createTelemetryProvider` selects a provider adapter (Deno-native by default, SDK-backed when
-requested); application code only ever sees the port types.
-
----
-
-## 📦 Key Capabilities
-
-- **Domain tracers**: `getQueueTracer`, `getWorkerTracer`, `getSchedulerTracer`, `getJobTracer`,
-  `getSagaTracer`, `getSSETracer`, and `getKVTracer` return cached, canonically named tracers so
-  spans group by NetScript subsystem.
-- **W3C context propagation**: `injectContext`/`extractContext` carry trace context through message
-  headers, and `createJobTraceEnv`/`extractJobTraceContext` thread it across `Deno.Command` job
-  subprocesses.
-- **Fan-in span links**: `createFanInLinks` turns upstream message `traceparent`/`tracestate`
-  headers into span links through the active provider's `SpanLinkPort`, so many producer traces link
-  into one consumer span (the Flow-B grouped trace shape) instead of being re-parented.
-- **Span helpers**: `withSpan`, `withSpanSync`, `createSpan`, and `addSpanEvent` wrap
-  OpenTelemetry-compatible `Span` and `Context` types so callers never touch the raw SDK.
-- **First-party oRPC instrumentation**: `@netscript/telemetry/orpc` ships a `TracingPlugin` backed
-  by the upstream `@orpc/otel` `ORPCInstrumentation` (plus `registerORPCInstrumentation` and an
-  `ErrorHandlingPlugin`), so RPC server spans follow upstream semconv `rpc.*` conventions.
-- **First-party Hono instrumentation**: `@netscript/telemetry/hono` exposes
-  `createHonoTracingMiddleware`, which wraps Hono's first-party `@hono/otel`
-  `httpInstrumentationMiddleware` and layers NetScript service naming and W3C propagation on top.
-- **Worker/job/queue instrumentation**: `@netscript/telemetry/instrumentation` provides
-  `traceJobExecution`, `traceQueue`, scheduler tick/dispatch spans, and worker metric helpers —
-  including `recordSharedWorkerMetrics`, the shared metric recorder the workers plugin dispatches
-  through.
-- **Query read model**: `@netscript/telemetry/query` publishes the `TelemetryQueryPort` contract,
-  read-side trace/span/log/resource/metric types, Standard Schema query-filter validators
-  (`validateTraceQueryFilter`, `validateMetricQueryFilter`, `validateResourceQueryFilter`), and the
-  Aspire-backed `AspireTelemetryQuery` reader (`createAspireTelemetryQuery` /
-  `createTelemetryQuery`).
-- **Instrumentation registry**: `InstrumentationRegistry` registers lifecycle hooks with
-  `setupAll`/`teardownAll`, and `inspectTelemetry` returns a JSON-stable `InspectionReport` for
-  diagnostics.
-- **Config validation**: `getTelemetryConfig` validates the resolved configuration with a Standard
-  Schema, failing fast with `TelemetryConfigError` on a malformed OTLP endpoint.
-- **Test double**: `@netscript/telemetry/testing` provides `InMemorySpanRecorder`, a `Tracer`
-  implementation that records spans in memory for unit assertions.
-
-### Subpaths
-
-| Subpath                                | Purpose                                               |
-| -------------------------------------- | ----------------------------------------------------- |
-| `@netscript/telemetry`                 | Primary tracing surface + registry + diagnostics      |
-| `@netscript/telemetry/tracer`          | Domain tracers, span helpers, fan-in span links       |
-| `@netscript/telemetry/config`          | Env-driven configuration + Standard Schema            |
-| `@netscript/telemetry/context`         | W3C context propagation                               |
-| `@netscript/telemetry/attributes`      | `netscript.*`/semconv attribute builders, `SpanNames` |
-| `@netscript/telemetry/instrumentation` | Queue/worker/scheduler/job instrumentation + metrics  |
-| `@netscript/telemetry/registry`        | Instrumentation registry facade                       |
-| `@netscript/telemetry/orpc`            | oRPC tracing/error plugins (`@orpc/otel`-backed)      |
-| `@netscript/telemetry/hono`            | Hono tracing middleware (`@hono/otel`-backed)         |
-| `@netscript/telemetry/otel`            | Provider ports + OpenTelemetry adapters               |
-| `@netscript/telemetry/query`           | Read-model contracts + Aspire telemetry reader        |
-| `@netscript/telemetry/testing`         | In-memory span recorder for tests                     |
-
-### Attribute Convention (#402)
-
-The #402 telemetry convention (netscript.* vs semconv) splits attribute ownership in two:
+The NetScript telemetry convention splits attribute ownership in two:
 
 - **Upstream semconv keys** are used wherever OpenTelemetry defines them — `rpc.*` for RPC spans,
-  `gen_ai.*` for AI/agent spans, `server.*`/`messaging.*` for HTTP and messaging — including
-  `messaging.operation.name`, `messaging.operation.type`, and `messaging.message.conversation_id`.
-- **NetScript-owned attributes** live under the single proprietary root `netscript.*`. Queue-only
-  concepts such as delivery count, priority, delay, DLQ, and requeue live under
-  `netscript.messaging.*`; correlated spans use the shared floor `netscript.correlation.id`.
+  `gen_ai.*` for AI/agent spans, `server.*` / `messaging.*` for HTTP and messaging.
+- **NetScript-owned attributes** live under the single proprietary root `netscript.*` — queue-only
+  concepts such as delivery count, priority, delay, and DLQ live under `netscript.messaging.*`, and
+  correlated spans share `netscript.correlation.id`.
 
-Attribute builders under `@netscript/telemetry/attributes` (`createJobAttributes`,
-`createMessagingAttributes`, `createSagaAttributes`, `createTriggerAttributes`,
-`createGenAiAttributes`, …) apply the split for job, messaging, saga, trigger, execution, and GenAI
-spans, and `SpanNames` fixes the canonical span-name vocabulary. During the beta.5 `dup` window the
-builders also emit deprecated bare aliases where an old key already shipped. The convention rules
-(TC-1..TC-14) additionally define span naming, SpanKind, status, W3C propagation, and the required
-`OTEL_SEMCONV_STABILITY_OPT_IN=messaging,rpc,gen_ai_latest_experimental` value.
+Attribute builders under `./attributes` (`createJobAttributes`, `createMessagingAttributes`,
+`createSagaAttributes`, `createGenAiAttributes`, …) apply the split, and `SpanNames` fixes the
+canonical span-name vocabulary. The full convention — span naming, SpanKind, status, propagation,
+and the required `OTEL_SEMCONV_STABILITY_OPT_IN` value — is on the
+[convention page](https://rickylabs.github.io/netscript/reference/telemetry/convention/).
 
-### AI telemetry adapter
+## Public surface
 
-Inject the OpenTelemetry adapter into the AI runtime without adding an OTel dependency to
-`@netscript/ai`:
+| Entry               | What it gives you                                       |
+| ------------------- | ------------------------------------------------------- |
+| `.`                 | Primary tracing surface, registry, `inspectTelemetry`   |
+| `./tracer`          | Domain tracers, span helpers, fan-in span links         |
+| `./config`          | Env-driven configuration + Standard Schema validation   |
+| `./context`         | W3C context propagation                                 |
+| `./attributes`      | `netscript.*` / semconv attribute builders, `SpanNames` |
+| `./instrumentation` | Queue/worker/scheduler/job instrumentation + metrics    |
+| `./registry`        | Instrumentation registry facade                         |
+| `./orpc`            | oRPC tracing/error plugins (`@orpc/otel`-backed)        |
+| `./hono`            | Hono tracing middleware (`@hono/otel`-backed)           |
+| `./ai`              | OpenTelemetry adapter for the `@netscript/ai` runtime   |
+| `./otel`            | Provider ports + OpenTelemetry adapters                 |
+| `./query`           | Read-model contracts + Aspire telemetry reader          |
+| `./testing`         | In-memory span recorder for tests                       |
 
-```ts
-import { createAiRuntime } from '@netscript/ai';
-import { createOtelAiTelemetryPort } from '@netscript/telemetry/ai';
+The `./ai` subpath injects GenAI telemetry into the AI runtime without adding an OTel dependency to
+`@netscript/ai`: `createAiRuntime({ telemetry: createOtelAiTelemetryPort() })` turns agent-loop chat
+operations into `gen_ai.chat` spans with provider-reported token usage.
 
-const ai = createAiRuntime({ telemetry: createOtelAiTelemetryPort() });
-```
+The always-current symbol list is
+[`deno doc jsr:@netscript/telemetry@<version>`](https://jsr.io/@netscript/telemetry/doc) (pin
+`<version>` on the pre-release line, as above).
 
-Agent-loop chat operations become GenAI client spans, provider-reported usage is recorded as
-`gen_ai.usage.input_tokens` and `gen_ai.usage.output_tokens`, and tool-call signals become
-`execute_tool` spans. The adapter uses the global OTel tracer by default; tests and custom
-composition roots may inject a tracer.
+## Docs
 
----
-
-## 📖 Documentation
-
-- **Reference**:
+- **Reference — tracers, propagation, instrumentation, and query**:
   [rickylabs.github.io/netscript/reference/telemetry/](https://rickylabs.github.io/netscript/reference/telemetry/)
-- **Convention**:
-  [docs/site/reference/telemetry/convention.md](../../docs/site/reference/telemetry/convention.md)
-- **Observability**:
+- **Telemetry convention — attribute ownership and span naming rules**:
+  [rickylabs.github.io/netscript/reference/telemetry/convention/](https://rickylabs.github.io/netscript/reference/telemetry/convention/)
+- **Observability — how traces surface in the Aspire dashboard**:
   [rickylabs.github.io/netscript/observability/](https://rickylabs.github.io/netscript/observability/)
+- **API docs on JSR**: [jsr.io/@netscript/telemetry/doc](https://jsr.io/@netscript/telemetry/doc)
 
----
+## Compatibility
 
-## 📝 License
+Requires Deno 2+. The default provider binds to Deno's built-in OTLP exporter — set `OTEL_DENO=true`
+and point `OTEL_EXPORTER_OTLP_ENDPOINT` at a collector (the NetScript scaffold wires the Aspire
+dashboard for you); no OpenTelemetry SDK dependency is needed. Apps that bring the OpenTelemetry JS
+SDK can opt into the SDK-backed provider for attribute-preserving span links. Reading
+environment-driven configuration needs `--allow-env`.
+
+## License
 
 Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to
 JSR with cryptographically verified provenance.
