@@ -14,6 +14,7 @@ import { NdjsonReporter } from './adapters/reporting/ndjson-reporter.ts';
 import { PrettyReporter } from './adapters/reporting/pretty-reporter.ts';
 import { ReportFileReporter } from './adapters/reporting/report-file-reporter.ts';
 import { SystemClock } from './adapters/time/system-clock.ts';
+import { DenoPlatform } from './adapters/platform/deno-platform.ts';
 import { defaultCliEntrypoint } from './application/builders/workspace/workspace-options.ts';
 
 function timestampName(date = new Date()): string {
@@ -31,6 +32,7 @@ export function createDefaultRunner(options: RunOptions): SuiteRunner {
     httpClient: new FetchHttpAdapter(),
     dockerCleaner: new DockerCliResourceCleaner(),
     reporter: createReporter(options),
+    platform: new DenoPlatform(),
   });
 }
 

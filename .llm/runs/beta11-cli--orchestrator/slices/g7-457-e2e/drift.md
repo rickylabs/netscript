@@ -9,8 +9,8 @@ Drift is append-only.
   authoritative for the window-only thin-client tier and limits Windows to staged/manual proof.
 - **Source:** live issue #457 final amendment; landed G2/G6 drift records.
 - **Expected:** Implement graph/snapshot or cross-platform apply semantics.
-- **Actual:** Implement native formats, Linux/macOS apply+rollback, Windows staged/manual, and remote
-  service discovery; defer graph mode to SD-8/beta.14.
+- **Actual:** Implement native formats, Linux/macOS apply+rollback, Windows staged/manual, and
+  remote service discovery; defer graph mode to SD-8/beta.14.
 - **Severity:** significant
 - **Action:** rescope
 - **Evidence:** `research.md` findings 1, 8–12; `plan.md` D7, D14–D19.
