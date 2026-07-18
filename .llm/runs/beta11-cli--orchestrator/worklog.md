@@ -178,3 +178,8 @@ group launch; this section fixes the supervisor's surface.
 - 2026-07-18 · #858 MERGED (a87570a6) → #814 closed; epic #840 closed. Milestone-13 remaining:
   #815 (B1 audit in flight, B2–B5 pending), #816 (slip decision pending owner), #824 (HYBRID
   ratification pending owner), run-record PRs. Release-cut prep next once docs decisions land.
+- 2026-07-18 · OWNER DECISIONS: #816 STAYS in beta.11, starts when #815 lands; supervisor leads
+  the whole remaining table to the release cut autonomously. HYBRID conditional steer relayed
+  verbatim to the corpus thread (rev2 in flight); owner-mandated Sol·max adversarial queued on
+  rev2 completion. Task tracker instantiated (4 tasks: #815 tail, #816 pipeline, #824 chain,
+  release-cut prep).

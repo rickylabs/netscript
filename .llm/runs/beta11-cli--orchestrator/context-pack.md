@@ -5,7 +5,7 @@ Resume point for the beta-11 shipping-wave supervisor (session
 
 - **Mission**: ship milestone 13 (`0.0.1-beta.11`) — Desktop Frontend wave #840 (#841/#842/#843,
   #452/#456/#457), #826, seed run #824, docs track #814/#815/#816, CLI fixes #804/#802/#818.
-- **State**: Wave CODE-COMPLETE (7 groups merged into feat/desktop-frontend). 4 issues closed on main (#826 #802 #804 #818). BLOCKED ON OWNER: decision 1 (upstream-gap option A/B — upstream-op-verify-decision.md + -history.md) gates the wave→main PR; seed-run Stage-H ratification (PR #850) gates the #824 board. Docs: #858 in Sol audit; G13/G14 queued. Then release-cut prep (owner merges).
+- **State**: Wave SHIPPED (e193e018) + #858 merged. Remaining to cut: #815 B2–B5 (task 1), #816 in-cycle after #815 (task 2), #824 rev2→Sol·max adversarial→re-lock→owner ratify→file (task 3), then release-cut prep + HARD STOP (task 4). Autonomous lead authorized.
 - **Branch topology**: integration `feat/desktop-frontend` for the wave; direct-to-main branches
   for independent groups; `plan/unified-runtime` for the #824 seed run; supervisor run-dir commits
   on `plan/beta11-shipping-wave`. Baseline `origin/main` @ ca72db14.
