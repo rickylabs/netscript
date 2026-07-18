@@ -183,3 +183,9 @@ group launch; this section fixes the supervisor's surface.
   verbatim to the corpus thread (rev2 in flight); owner-mandated Sol·max adversarial queued on
   rev2 completion. Task tracker instantiated (4 tasks: #815 tail, #816 pipeline, #824 chain,
   release-cut prep).
+- 2026-07-18 · G13/B1 closed: audit FAIL (baseline-drift + real command breakage) → generator fix
+  cycle → second-pass FAIL (confined B2-F1 union gap, escalated) → SUPERVISOR-authored surgical
+  restore of the CLI desktop operational/safety contracts → targeted third-pass PASS. B2 (plugin
+  family, 13 READMEs) launched with the baseline-drift trap called out. Seed run: adversarial
+  round 3 (3B/3M/1m all accepted) + synthesis committed; owner fork N1 posted on #850;
+  ratification package = F-1…F-17 + SC-1…SC-6 + N1.
