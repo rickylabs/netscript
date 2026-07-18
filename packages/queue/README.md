@@ -5,8 +5,8 @@
 [![Docs](https://img.shields.io/badge/docs-rickylabs.github.io-blue)](https://rickylabs.github.io/netscript/)
 
 **A provider-agnostic message queue for NetScript: enqueue and drain background jobs through one
-`MessageQueue` contract, auto-discovering a RabbitMQ, Redis, Deno KV, or PostgreSQL backend from the
-Aspire environment.**
+`MessageQueue` contract, auto-discovering a RabbitMQ, Redis, or Deno KV backend from the Aspire
+environment.**
 
 Queue code has a habit of marrying its broker: the day you move from Deno KV to RabbitMQ, every
 `enqueue` and every consumer changes. `@netscript/queue` keeps the contract and the broker separate.
