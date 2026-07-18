@@ -423,3 +423,55 @@ explicit aspiration would fit the evidence; the current definite article does no
 
 No README/homepage edit, merge, release action, milestone close, seed-run filing, or self-dispatched
 evaluation was performed during this combined re-check.
+
+---
+
+## Targeted final check — supervisor claim dispositions (`56bab8ff`)
+
+**Final verdict: PASS**
+
+The combined-cycle escalation findings are resolved under the recorded owner/supervisor
+dispositions.
+
+### F1 — Contract derivation narrowed — PASS
+
+Both artifacts now limit derivation to the audited contract surfaces: the typed service and typed
+SDK clients derive from the same oRPC definition, so server and callers share input/output types and
+cannot drift apart at that boundary. Neither artifact says Fresh UI or orchestration derives from
+the contract. This matches `@netscript/contracts` and `@netscript/sdk`; the app-owned copy-source
+Fresh UI and CLI-regenerated Aspire wiring are described separately.
+
+### F2 — Competitive contrast narrowed — PASS
+
+The homepage makes only the evidenced in-box claim: durable jobs, compensating sagas, trigger
+ingress, replayable streams, pluggable auth, and in-process AI are first-party NetScript plugins,
+not an integration project. The README adds the owner-approved positioning that these are the
+integration project assembled around the named frontend frameworks; it no longer says those
+frameworks “stop at the HTTP boundary” or purports to inventory their features. The positive
+NetScript half is directly supported by the audited plugin READMEs and executed worker install.
+
+### F3 — Owner-retained “enterprise-grade” positioning — PASS by authority disposition
+
+The owner explicitly retained this positioning and overrode the prior MINOR. Its qualification is
+adjacent and conspicuous in both artifacts:
+
+- In the README lead, the enterprise-grade tagline is followed in the same opening block by the
+  `Beta (0.0.1-beta.x)` callout, “API is subject to change,” and pinning guidance.
+- On the homepage, the enterprise-grade hero is immediately followed by the “Beta — API subject to
+  change” callout stating that version 0.0.1 is beta, the API is still moving, and exact aligned
+  pins must be kept.
+
+This targeted evaluator accepts the explicit owner-authority disposition; it does not silently
+reinterpret the retained phrase as independently proven maturity evidence.
+
+### Spot gate
+
+The README tagline gate was re-executed at `56bab8ff`: one tagline checked, zero over the 250-byte
+cap. The supervisor-recorded build/link results remain applicable because this commit changes only
+claim prose and the targeted spot check found no structural regression.
+
+All previously required README and homepage fixes are closed. Lane 5's combined final verdict is
+PASS at `56bab8ff`.
+
+No README/homepage edit, merge, release action, milestone close, seed-run filing, or self-dispatched
+evaluation was performed during this targeted final check.
