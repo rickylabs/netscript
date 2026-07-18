@@ -1,100 +1,136 @@
 ---
 layout: layouts/base.vto
-title: How-to guides
+title: All recipes
 templateEngine: [vento, md]
 prev: null
 next: { label: "Add a plugin", href: "/orchestration-runtime/how-to/add-a-plugin/" }
 nav_hide: true
 ---
 
-How-to guides are **goal-first recipes**: each one starts from a concrete
-intent — *"I need to add a service,"* *"I need auth,"* *"I need this to deploy
-without Aspire"* — and gives you the shortest reliable path from that intent to a
-working, verified change. They assume you already have a NetScript workspace and
-know the basics; they do **not** re-teach the framework.
+# All recipes
 
-If NetScript is new to you, start with the [tutorials](/tutorials/) — they build
-one continuous application from zero. For exact API signatures, use the
-[reference](/reference/). For the concepts *behind* a task — why services are
-contracts-first, what "durable" means, how Aspire wires dependencies — read the
-[explanation](/explanation/) pages. Each recipe links back to the capability hub
-and reference that go deeper.
+Recipes live inside their pillar in the sidebar — each area's **Recipes** section
+sits below the guides that teach the basics it assumes. This page is the
+cross-area index: every recipe in the docs, grouped by pillar, so you can scan
+the whole catalog in one place. Each one is goal-first — it starts from a
+concrete intent and ends with a command that proves the change works.
 
 {{ comp callout { tone: "info", title: "One prerequisite spans almost every recipe" } }}
 Anything that touches Postgres, Redis/Garnet, or a plugin service expects Aspire
 to be running first. From your workspace: <code>cd aspire &amp;&amp; aspire start</code>
 brings up the dependencies and the dashboard on <a href="https://localhost:18888"><code>https://localhost:18888</code></a>
-<strong>before</strong> any <code>netscript db</code> command or service call. The
-recipes call this out where it matters, but it is the single most common missing
-step.
+<strong>before</strong> any <code>netscript db</code> command or service call.
+The recipes call this out where it matters, but it is the single most common
+missing step.
 {{ /comp }}
 
-## Build & extend a workspace
+## Web Layer
 
-These recipes add capabilities to an existing workspace and verify the wiring.
-Each emits the relevant workspace-owned glue, samples, or service files and ends with a
-command you can run to confirm it works.
+- [Customize the Fresh UI]({{ "howto:customize-fresh-ui" |> xref |> url }}) —
+  bring the dashboard components into your workspace with `ui:init` / `ui:add`
+  and edit them directly.
+- [Build a server-validated form]({{ "howto:build-a-server-validated-form" |> xref |> url }}) —
+  route-bound form state, server validation, mutation, and success handling in
+  one typed page definition with `definePage().withForm()`.
+- [Build a desktop frontend]({{ "howto:build-a-desktop-frontend" |> xref |> url }}) —
+  one Fresh frontend that runs as an ordinary browser app and gains native
+  capabilities on the desktop.
 
-{{ comp.featureGrid({ items: [
-  { title: "Add a plugin", body: "Install a first-party plugin through the public package flow, or use the local netscript-dev path for contributor-source samples. Emits user-owned glue, regenerates the registry, and verifies the service answers on its port.", href: "/orchestration-runtime/how-to/add-a-plugin/" },
-  { title: "Add a service", body: "Stand up a new typed oRPC service: define an @orpc/contract + zod contract, implement() the handlers, serve it with defineService(...) one-shot or createService(...).serve() fluent, and confirm it answers on /api/rpc/*.", href: "/services-sdk/how-to/add-a-service/" },
-  { title: "Add authentication", body: "Add the official auth plugin (auth-api on :8094, five endpoints under /api/v1/auth/*). Pick one active backend via NETSCRIPT_AUTH_BACKEND — kv-oauth (interactive, default), WorkOS, or better-auth — run the auth.prisma migration, and sign in.", href: "/identity-access/how-to/add-authentication/" },
-  { title: "Database & migration", body: "Initialize, generate, seed, and inspect the Postgres schema: netscript db init --name init → db generate → db seed → db status. Requires aspire start first so Postgres is provisioned.", href: "/data-persistence/how-to/database-migration/" }
-] }) }}
+## Services & SDK
 
-## Set up the developer environment
+- [Add a service]({{ "howto:add-a-service" |> xref |> url }}) — define a typed
+  contract, implement the handlers, and confirm the service answers on
+  `/api/rpc/*`.
+- [Discover services]({{ "howto:discover-services" |> xref |> url }}) — call
+  another plugin's or workspace member's typed service without hardcoding its
+  address.
+- [Expose OpenAPI & Scalar]({{ "howto:expose-openapi-scalar" |> xref |> url }}) —
+  publish an OpenAPI document and browsable Scalar docs for a service.
 
-Recipes for the toolchain around a NetScript workspace: editor intelligence, orchestration, and
-runtime setup that should behave the same on every device.
+## Background jobs
 
-{{ comp.featureGrid({ items: [
-  { title: "Deno LSP code intelligence", body: "Install the Claude Code Deno LSP plugin, enable the LSP tool globally, and keep go-to-definition, hover, references, symbols, and diagnostics aligned across CLI, VS Code, and Zed.", href: "/orchestration-runtime/how-to/deno-lsp-code-intelligence/" },
-  { title: "Deploy locally with Aspire", body: "Run the full local resource graph from the generated Aspire AppHost: dashboard, infrastructure, services, plugin APIs, and background processors.", href: "/orchestration-runtime/how-to/deploy-local-aspire/" }
-] }) }}
+- [Run a polyglot task]({{ "howto:run-a-polyglot-task" |> xref |> url }}) —
+  define a non-TypeScript script (Python, shell, .NET, any executable) as a
+  task with a permission sandbox and run it through the executor.
+- [Tune the worker runtime]({{ "howto:tune-worker-runtime" |> xref |> url }}) —
+  trade throughput against isolation with concurrency, runner mode, per-task
+  permissions, and timeouts/retries.
+- [Restrict worker task permissions]({{ "howto:restrict-worker-task-permissions" |> xref |> url }}) —
+  give every Deno task explicit permissions; an omitted permission object
+  compiles to `--allow-all`.
+- [Add a task runtime adapter]({{ "howto:add-a-task-runtime-adapter" |> xref |> url }}) —
+  advanced: add a custom runtime adapter to the built-in task executor.
 
-## Wire primitives & observability
+## Durable workflows
 
-Recipes for the shared building blocks every plugin leans on — queues, KV, cron,
-and the OpenTelemetry traces that make them visible in the Aspire dashboard.
+- [Build a validated ingestion queue]({{ "howto:build-a-validated-ingestion-queue" |> xref |> url }}) —
+  a typed queue whose messages are schema-checked before they enter the queue
+  and again before a consumer handles them.
+- [Publish a durable stream]({{ "howto:publish-a-durable-stream" |> xref |> url }}) —
+  let server-side state be subscribed to by browsers and other consumers
+  through a durable stream service.
 
-{{ comp.featureGrid({ items: [
-  { title: "Queue / KV / cron", body: "Use the reactive KV store, the durable queue (four backends — RabbitMQ, Redis, Deno KV, and explicit-provider PostgreSQL), and cron schedules. Covers --unstable-kv and the auto-discovery order vs. an explicit provider:'postgres'.", href: "/data-persistence/how-to/queue-kv-cron/" },
-  { title: "Add OpenTelemetry", body: "Emit custom spans and structured logs with @netscript/telemetry helpers, propagate traceparent across services, and read the traces that land in the Aspire dashboard. Worker job dispatch/execution traces are already real and automatic.", href: "/observability/how-to/add-opentelemetry/" }
-] }) }}
+## AI & Agents
 
-## Ship the UI & deploy
+- [Build a durable chat]({{ "howto:build-a-durable-chat" |> xref |> url }}) —
+  an AI chat on a Fresh route whose transcript survives reload and reconnect,
+  with one server-side tool.
 
-Recipes for the front end and for taking a workspace to production — including
-the Aspire-free portability path.
+## Data & Persistence
 
-{{ comp.featureGrid({ items: [
-  { title: "Customize the Fresh UI", body: "Bring in and own the dashboard UI with the ui:init / ui:add tasks. The scaffold uses copy-source ownership — the components land in your workspace, so you edit them directly rather than depending on a hidden package.", href: "/web-layer/how-to/customize-fresh-ui/" },
-  { title: "Build a durable chat", body: "Wire an AI chat onto a Fresh route whose transcript survives reload and reconnect via a durable session stream; hydrate the fresh-ui chat components; and add one server-side tool.", href: "/ai/how-to/build-a-durable-chat/" },
-  { title: "Deploy", body: "The portability and config story: the raw deno task entry points behind each service, plus the --no-aspire escape hatch when you provision Postgres and Redis (or Garnet) yourself. Docker, Compose, and Linux targets are config-only scaffolding today, not runnable deploy verbs — for a first-class hosted path, see Deploy to Deno Deploy.", href: "/orchestration-runtime/how-to/deploy/" },
-  { title: "Deploy to Deno Deploy", body: "Push a workspace to Deno Deploy with the first-class netscript deploy deno-deploy plan | up | down | status | logs command: preflight the unstable-API guard, push a preview, promote to prod, and read status and logs.", href: "/orchestration-runtime/how-to/deploy-deno-deploy/" },
-  { title: "Author a plugin", body: "Advanced: build a custom plugin from scratch. Defines the scaffold.plugin.json provider kind, the manifest exports, and the mod.ts contract the host discovers — the same shape the first-party plugins use.", href: "/orchestration-runtime/how-to/author-a-plugin/" }
-] }) }}
+- [Database & migration]({{ "howto:database-migration" |> xref |> url }}) —
+  initialize, generate, seed, and inspect the Postgres schema with the
+  `netscript db` commands.
+- [Queue / KV / cron]({{ "howto:queue-kv-cron" |> xref |> url }}) — the reactive
+  KV store, the durable queue, and cron schedules, including `--unstable-kv`.
+- [Choose a queue provider]({{ "howto:choose-a-queue-provider" |> xref |> url }}) —
+  pick the right queue backend, and either let auto-discovery select one or pin
+  one explicitly.
+- [Use a second database]({{ "howto:use-a-second-database" |> xref |> url }}) —
+  add a second Postgres, or a MySQL/SQL Server instance, alongside the default
+  database.
 
-## How a recipe is shaped
+## Identity & Access
 
-Every how-to page follows the same contract so you always know where to look:
+- [Add authentication]({{ "howto:add-authentication" |> xref |> url }}) — install
+  the official auth plugin, pick one active backend via
+  `NETSCRIPT_AUTH_BACKEND`, migrate, and sign in.
 
-- **Goal** — one sentence stating exactly what you will have when you finish.
-- **Prerequisites** — the workspace state and running dependencies the recipe
-  assumes (almost always including a live `aspire start`).
-- **Steps** — added-lines code blocks, annotated with the file path they belong
-  in, using the public `netscript <cmd>` command form throughout.
-- **Production pitfalls** — the caveats that bite in real deployments, stated
-  plainly rather than glossed over.
-- **See also** — the capability hub, reference page, and related recipes that
-  take the topic further.
+## Orchestration & Runtime
 
-{{ comp callout { tone: "note", title: "Pick by intent, not by feature name" } }}
-If you are not sure which recipe you want, name the outcome first. <em>"Users
-must sign in"</em> → <a href="/identity-access/how-to/add-authentication/">Add authentication</a>.
-<em>"This event should fan out to a background job"</em> →
-<a href="/orchestration-runtime/how-to/add-a-plugin/">Add a plugin</a> (triggers + workers).
-<em>"It has to run where there is no Aspire"</em> →
-<a href="/orchestration-runtime/how-to/deploy/">Deploy</a>. The recipes are deliberately small and
-composable; most real features chain two or three of them.
-{{ /comp }}
+- [Add a plugin]({{ "howto:add-a-plugin" |> xref |> url }}) — install a
+  first-party plugin, regenerate the registry, and verify the service answers.
+- [Deploy locally with Aspire]({{ "howto:deploy-local-aspire" |> xref |> url }}) —
+  run the full local resource graph from the generated Aspire AppHost.
+- [Deploy]({{ "howto:deploy" |> xref |> url }}) — the portability story: raw
+  `deno task` entry points and the `--no-aspire` escape hatch when you provision
+  dependencies yourself.
+- [Deploy to Deno Deploy]({{ "howto:deploy-deno-deploy" |> xref |> url }}) —
+  push a preview, promote to prod, and read status and logs with the
+  first-class deploy command.
+- [Graceful shutdown]({{ "howto:graceful-shutdown" |> xref |> url }}) — drain
+  in-flight requests and jobs, run teardown hooks, and close connections on
+  `SIGINT`/`SIGTERM`.
+- [Roll out runtime overrides]({{ "howto:roll-out-runtime-overrides" |> xref |> url }}) —
+  change a deployed behavior without rebuilding the workspace.
+- [Author a plugin]({{ "howto:author-a-plugin" |> xref |> url }}) — advanced:
+  build a custom plugin with the same manifest and `mod.ts` contract the
+  first-party plugins use.
+- [Deno LSP code intelligence]({{ "howto:deno-lsp-code-intelligence" |> xref |> url }}) —
+  keep go-to-definition, hover, and diagnostics aligned across CLI and editors.
+
+## Observability
+
+- [Add OpenTelemetry]({{ "howto:add-opentelemetry" |> xref |> url }}) — emit
+  custom spans and structured logs, propagate `traceparent`, and read the
+  traces in the Aspire dashboard.
+
+---
+
+Not sure which recipe you want? Name the outcome first. *"Users must sign in"* →
+[Add authentication]({{ "howto:add-authentication" |> xref |> url }}).
+*"This event should fan out to a background job"* →
+[Add a plugin]({{ "howto:add-a-plugin" |> xref |> url }}).
+*"It has to run where there is no Aspire"* →
+[Deploy]({{ "howto:deploy" |> xref |> url }}). The recipes are deliberately
+small and composable; most real features chain two or three of them.

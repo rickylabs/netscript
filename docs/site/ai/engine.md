@@ -9,11 +9,14 @@ order: 4
 
 # AI engine
 
-`@netscript/ai` is the provider-agnostic AI engine at the design center of the stack: a
-zero-`@netscript/*`-dependency, ports-and-adapters core that owns the domain
-vocabulary, the capability seams, the model registries, the tool system, the agent
-loop, MCP transports, and opt-in provider adapters. It wraps `@tanstack/ai*` and
-`@standard-schema/spec` and adds no schema DSL of its own.
+This is the **engine guide** — how the pieces of `@netscript/ai` fit together and
+when to reach for each one. `@netscript/ai` is the provider-agnostic AI engine at
+the design center of the stack: a zero-`@netscript/*`-dependency, ports-and-adapters
+core that owns the domain vocabulary, the capability seams, the model registries,
+the tool system, the agent loop, MCP transports, and opt-in provider adapters. It
+wraps `@tanstack/ai*` and `@standard-schema/spec` and adds no schema DSL of its own.
+We keep this page at the "which piece, and why" altitude; the exact symbol tables
+live in the generated reference, linked at the end.
 
 {{ comp callout { type: "note", title: "Published in " + releaseVersion } }}
 <code>@netscript/ai</code> is <strong>published on JSR</strong> and installs today:
@@ -24,13 +27,13 @@ published <strong>{{ releaseVersion }}</strong> surface. The engine carries zero
 each stand alone and neither requires it.
 {{ /comp }}
 
-## The export map
+## The map: which subpath answers which question
 
 {{ comp.apiTable({
   caption: "@netscript/ai — subpath exports",
   columns: ["Subpath", "Purpose"],
   rows: [
-    ["<code>.</code>", "Composition root + model / embedding / vision registries."],
+    ["<code>.</code>", "Runtime wiring + the model / embedding / vision registries."],
     ["<code>./contracts</code>", "Domain vocabulary — pure types and the error hierarchy."],
     ["<code>./ports</code>", "Capability seams (hexagonal) plus default port / registry factories."],
     ["<code>./tools</code>", "Tool definition / validation / registry, plus the built-in <code>render_ui</code> contract."],
@@ -45,156 +48,112 @@ each stand alone and neither requires it.
   ]
 }) }}
 
+A useful way to read that table: the top half is the engine (vocabulary, seams,
+tools, loop), the bottom half is what you opt into (providers) and how you test
+without them (fakes).
+
 ## The runtime and registries
 
-`createAiRuntime(config)` is a **pure wiring** function: it resolves every capability
-port, defaulting each to a no-op or throwing implementation, with no IO and no global
-mutation. `getAiRuntime(config?)` is the process singleton (shaped like `getKv()`), with
-`resetAiRuntime()` and `isAiRuntimeInitialized()` alongside. The resolved `AiRuntime`
-exposes `telemetry`, `tools`, `embeddings`, `vision`, `mcp`, `skills`, `agentLoop`, and
-`memory`, plus `getModelProvider()` / `getModel()`. `AiRuntimeConfig` is the same field
-set, all optional, so you inject only the ports you have real implementations for.
+`createAiRuntime(config)` is a **pure wiring** function: it resolves every
+capability port, defaulting each to a no-op or throwing implementation, with no IO
+and no global mutation. `getAiRuntime(config?)` is the process singleton (shaped
+like `getKv()`), with `resetAiRuntime()` and `isAiRuntimeInitialized()` alongside.
+Use `createAiRuntime` when you want an isolated instance (tests, one runtime per
+tenant); use `getAiRuntime` when the process should share one. `AiRuntimeConfig`
+mirrors the resolved runtime field-for-field, all optional, so you inject only the
+ports you have real implementations for — everything else stays a safe default
+until you need it.
 
-Three registries sit at the root, each with the same register / get / list / reset
-shape:
+Three registries sit at the root — models, embeddings, and vision — each with the
+same register / get / list / reset shape. Models are addressed by reference: a
+`ModelRef` is `string | ModelSelector`, and the string form is
+`"<provider>:<model>"`, e.g. `"anthropic:claude-sonnet-4-5"`. Errors are a small
+hierarchy rooted at `AiError`; the two you will actually catch are
+`AiNotConfiguredError` (you called a capability whose port was never injected) and
+`ModelProviderNotFoundError` (the reference names a provider that never
+registered).
 
-{{ comp.apiTable({
-  caption: "Model, embedding, and vision registries",
-  rows: [
-    { name: "registerModelProvider / getModelProvider / getModel / listModelProviders / resetModelRegistry", type: "model", desc: "`getModel(ref, config?)` resolves a `ModelHandle {descriptor, providerId}` from a `ModelRef`." },
-    { name: "registerEmbeddingProvider / getEmbeddingProvider / listEmbeddingProviders / resetEmbeddingRegistry", type: "embedding", desc: "The embedding provider seam." },
-    { name: "registerVisionProvider / getVisionProvider / listVisionProviders / resetVisionRegistry", type: "vision", desc: "The vision provider seam." }
-  ]
-}) }}
+## Contracts — the shared vocabulary
 
-Models are addressed by reference. A `ModelRef` is `string | ModelSelector`; the string
-form is `"<provider>:<model>"`, e.g. `"anthropic:claude-sonnet-4-5"`. Errors are a small
-hierarchy rooted at `AiError`: `AiNotConfiguredError` (`.capability`) and
-`ModelProviderNotFoundError` (`.providerId`, `.availableProviders`).
+`@netscript/ai/contracts` is pure types with no IO — the vocabulary every layer
+above the engine speaks. It carries the `Message` / `MessageRole` conversation
+model, the multimodal `ContentPart` union (text, image, audio, video, document,
+each backed by a base64 or URL `ContentSource`), the model descriptors and
+capability flags, and the tool-call shapes.
 
-## Contracts — the domain vocabulary
-
-`@netscript/ai/contracts` is pure types with no IO — the vocabulary every layer above
-the engine speaks.
-
-- **Messages.** `Message { role, content, name?, toolCallId?, toolCalls? }` with
-  `MessageRole = "system" | "user" | "assistant" | "tool"` and
-  `MessageContent = string | readonly ContentPart[]`.
-- **Multimodal content.** `ContentPart` is a `Text | Image | Audio | Video | Document`
-  union; a `ContentSource` is either a base64 `DataContentSource` (with `mimeType`) or a
-  `UrlContentSource`; `ContentModality = "text" | "image" | "audio" | "video" |
-  "document"`.
-- **Models.** `ModelDescriptor`, `ModelCapabilities` (`streaming?`, `tools?`, `vision?`,
-  `embeddings?`, `inputModalities?`, token maxima), and `ModelSelector { provider,
-  model }`.
-- **Tools.** `ToolDescriptor`, `ToolParameters`, `ToolCall` (with a raw-JSON `arguments`
-  string and a `ToolCallState`), and `ToolResult`.
-
-The wire vocabulary the whole stack streams is the **`AgentChunk` union**:
-
-{{ comp.apiTable({
-  caption: "AgentChunk — the streaming chunk union (7 discriminants)",
-  rows: [
-    { name: "TextChunk", type: "text", desc: "A span of assistant text." },
-    { name: "ToolCallChunk", type: "tool-call", desc: "A tool invocation (streamed input)." },
-    { name: "ToolResultChunk", type: "tool-result", desc: "A tool result." },
-    { name: "MessageChunk", type: "message", desc: "A completed message boundary." },
-    { name: "UsageChunk", type: "usage", desc: "Token / cost usage (`Usage`, with prompt / completion detail and optional cost breakdown)." },
-    { name: "ErrorChunk", type: "error", desc: "A terminal error before the final done." },
-    { name: "DoneChunk", type: "done", desc: "The final chunk of a run." }
-  ]
-}) }}
+The one contract worth internalizing before anything else is the **`AgentChunk`
+union** — the wire vocabulary the whole stack streams. A run yields text spans,
+tool calls, tool results, message boundaries, usage, and errors as discriminated
+chunks, always terminating in a final `done` chunk. The durable-chat runtime
+persists these chunks and the chat UI renders them, which is why the layers compose
+without adapters: they all speak `AgentChunk`.
 
 The vocabulary also carries the generative-UI contract: `RENDER_UI_TOOL_NAME =
 "render_ui"`, `RenderUiResult`, and a `UiResource` whose `uri` is a `ui://` string
 (mirroring the MCP resource shape).
 
-## Ports — the hexagonal seams
+## Ports — the seams you wire
 
-`@netscript/ai/ports` exposes the capability interfaces plus their registry and default
-factories: `TelemetryPort`, `ToolRegistryPort`, `EmbeddingProviderPort`,
-`VisionProviderPort`, `McpTransportPort`, `SkillLoaderPort`, `AgentLoopPort`,
-`AgentMemoryPort`, `ChatClientPort`, `ChatModelProviderPort`, and `ModelProviderPort`.
-Two are worth calling out:
+`@netscript/ai/ports` exposes the capability interfaces — telemetry, tool
+registry, embeddings, vision, MCP transport, skill loading, the agent loop,
+memory, and the chat/model provider seams — plus their registry and default
+factories. Two are worth calling out because they shape how you wire things:
 
-- **`ModelProviderPort`** — `{ id, listModels(), getModel(), supports(),
-  createChatClient?() }`. `createChatClient` is optional on the base, so discovery-only
-  providers can omit it; `ChatModelProviderPort { id, createChatClient(modelId) }` is
-  the narrow seam the agent loop injects.
-- **`AgentMemoryPort`** — `append(threadId, message)` and `load(threadId)` are the base;
-  **`recall?(threadId, query)` is optional and `undefined` by default**. There is no
-  built-in semantic recall — callers must guard `recall` and fall back to `load`.
-
-`ChatClientPort.stream()` yields `ChatClientEvent`s
-(`ChatTextEvent | ChatToolCallEvent | ChatFinishEvent | ChatErrorEvent`) with a
-`ChatFinishReason` of `stop | length | tool-calls | content-filter | error | unknown`.
+- **`ModelProviderPort`** covers discovery (`listModels()`, `getModel()`,
+  `supports()`), and `createChatClient?()` is optional on it — so a discovery-only
+  provider can omit chat entirely. The agent loop injects the narrower
+  `ChatModelProviderPort`, which requires `createChatClient(modelId)`.
+- **`AgentMemoryPort`** — `append(threadId, message)` and `load(threadId)` are the
+  base; **`recall?(threadId, query)` is optional and `undefined` by default**.
+  There is no built-in semantic recall — guard `recall` and fall back to `load`.
 
 ## Tools — Standard Schema, no DSL
 
 The tool system validates with **Standard Schema**, so you bring any conforming
-validator (zod, valibot, arktype, or hand-rolled) — the core adds no schema language.
+validator (zod, valibot, arktype, or hand-rolled) — the core adds no schema
+language.
 
-- **`defineAiTool(name)`** returns a builder: `.describe()`, `.parameters(jsonSchema)`,
-  `.input(schema)`, terminating in either `.server(handler)` or `.client()` (a deferred
-  tool, e.g. `render_ui`).
-- **`createToolRegistry(defs?)`** implements `ToolRegistryPort`: `.define()`,
-  `.getDefinition()`, `.listDefinitions()`, and `.dispatch(name, input, ctx?)`, which
-  validates input and throws `ToolNotFoundError` / `ToolInputValidationError`.
+- **`defineAiTool(name)`** returns a builder: `.describe()`,
+  `.parameters(jsonSchema)`, `.input(schema)`, terminating in either
+  `.server(handler)` or `.client()` (a deferred tool, e.g. `render_ui`).
+- **`createToolRegistry(defs?)`** implements `ToolRegistryPort`; its
+  `.dispatch(name, input, ctx?)` validates input before your handler runs and
+  throws `ToolNotFoundError` / `ToolInputValidationError` when it should.
 - **`renderUiTool`** is the built-in `render_ui` wire contract: schema-only and
-  **client-deferred** (`result.deferred === true`). The engine runs **no renderer** —
-  rendering is the [chat UI's](/ai/chat-ui/) job. `AiToolExecutionKind` is
-  `"server" | "client"`.
+  **client-deferred** (`result.deferred === true`). The engine runs **no
+  renderer** — rendering is the [chat UI's](/ai/chat-ui/) job.
 
 ## The agent loop
 
 `createAgentLoop(deps)` builds the loop from injected collaborators: a required
 `modelProvider: ChatModelProviderPort`, plus optional `tools`, `history`, and
-`defaultMaxSteps`. `loop.run(input, options?)` returns an `AsyncIterable<AgentChunk>`;
-`input` is `{ model, messages, tools?, system? }` and `options` is `{ signal?,
-maxSteps? }`. The loop exposes `loop.state` and `loop.stop()`.
+`defaultMaxSteps`. `loop.run(input, options?)` returns an
+`AsyncIterable<AgentChunk>`; the loop exposes `loop.state` and `loop.stop()`.
 
-{{ comp.apiTable({
-  caption: "Agent loop — states and defaults",
-  rows: [
-    { name: "AgentLoopState", type: "\"idle\" | \"running\" | \"awaiting-tool\" | \"done\" | \"aborted\" | \"errored\"", desc: "`isTerminalState()` narrows to `TerminalAgentLoopState`." },
-    { name: "slidingWindowHistory({ maxMessages?, preserveSystem? })", type: "HistoryStrategy", desc: "The built-in history strategy; `DEFAULT_HISTORY_WINDOW = 20`." },
-    { name: "DEFAULT_MAX_STEPS", type: "8", desc: "Tool-calling steps before the loop must settle." },
-    { name: "AgentMaxStepsExceededError", type: "error (.maxSteps)", desc: "Thrown when `maxSteps` is hit without a final answer; the run settles `errored`, yields an `error` chunk, then a final `done`." }
-  ]
-}) }}
+The defaults are deliberately conservative: the built-in
+`slidingWindowHistory` strategy keeps `DEFAULT_HISTORY_WINDOW = 20` messages, and
+`DEFAULT_MAX_STEPS = 8` bounds how many tool-calling steps a run may take before
+it must settle. Hitting that bound throws `AgentMaxStepsExceededError` inside the
+run — the loop settles `errored`, yields an `error` chunk, then the final `done`,
+so a consumer never hangs on an unterminated stream.
 
 ## MCP transports
 
-`@netscript/ai/mcp` adapts remote Model Context Protocol servers.
-`createMcpTransport(config)` takes a discriminated config —
-`{ kind: "stdio" } & StdioMcpTransportConfig` or `{ kind: "streamable-http" } &
-StreamableHttpMcpTransportConfig` — and returns an `McpTransportPort`.
-`registerMcpTools(registry, transport)` surfaces the remote tools into a registry and
-returns a registration whose `.stop()` detaches. The Streamable-HTTP transport is
-reconnectable with backoff (`McpConnectionState = disconnected | connecting | connected
-| reconnecting | closed`).
-
-Auth is injected by the app composition root — `McpAuthConfig` is
-`{ mode: "none" }`, `{ mode: "api-token", token, headerName?, scheme? }`, or
-`{ mode: "oauth", accessToken, tokenType? }`.
+`@netscript/ai/mcp` adapts remote Model Context Protocol servers into the same
+tool registry the loop dispatches. `createMcpTransport(config)` takes a
+discriminated config (`kind: "stdio"` or `kind: "streamable-http"`) and returns an
+`McpTransportPort`; `registerMcpTools(registry, transport)` surfaces the remote
+tools and returns a registration whose `.stop()` detaches. The Streamable-HTTP
+transport reconnects with backoff, and auth (`none` / `api-token` / `oauth`) is
+injected by your app's startup wiring rather than hardcoded. The full client
+story — pooling multiple servers, auth modes, rendering `ui://` resources — is
+the [MCP guide](/ai/mcp/).
 
 ## Provider adapters — opt-in side-effect imports
 
-Providers self-register on import, mirroring `@netscript/kv/redis`. The base engine
-pulls **no** provider SDK; you opt in per provider.
-
-{{ comp.apiTable({
-  caption: "Provider adapters (import to self-register)",
-  rows: [
-    { name: "@netscript/ai/anthropic", type: "chat", desc: "Registers `\"anthropic\"` + `AnthropicModelProvider`; catalog taken verbatim from `@tanstack/ai-anthropic`. Config `{ apiKey? (→ ANTHROPIC_API_KEY), baseURL? }`; cancellation via `stream(_, { signal })`." },
-    { name: "@netscript/ai/openai-compatible", type: "chat", desc: "Registers `\"openai-compatible\"` + `OpenAiCompatibleModelProvider`. No fixed catalog — optimistic `supports()` when `models` is unset (the remote endpoint owns its catalog); throws `AiNotConfiguredError` if `baseURL` / `apiKey` are missing. Config `{ baseURL?, apiKey?, models?, api?, name? }`, `api = \"chat-completions\" | \"responses\"`." },
-    { name: "@netscript/ai/openrouter", type: "chat", desc: "Registers `\"openrouter\"` + `OpenRouterModelProvider` over the OpenAI-compatible base (reuses `@tanstack/ai-openai`, no new dependency). Config `{ apiKey? (→ OPENROUTER_API_KEY), baseURL?, models?, reasoningEffort? }`; `reasoningEffort` is `\"low\" | \"medium\" | \"high\"`, normalized to the OpenRouter `{ reasoning: { effort } }` wire option via `openRouterReasoningModelOptions`." },
-    { name: "@netscript/ai/ollama", type: "chat", desc: "Registers `\"ollama\"` + `OllamaModelProvider` over the OpenAI-compatible base for a local endpoint. Config `{ host? (→ DEFAULT_OLLAMA_HOST), models?, reachability?, fetch? }`; runs a `ReachabilityPort` preflight against the local host — ships `createHttpReachabilityPort` / `HttpReachabilityAdapter` (or `createAssumeReachablePort` to skip)." },
-    { name: "@netscript/ai/openai-embeddings", type: "embedding + vision", desc: "Registers `\"openai-embeddings\"` for both seams: `.embed()` (`/embeddings`) and `.analyze()` (`/chat/completions`). Defaults `text-embedding-3-small` / `gpt-4o-mini`." }
-  ]
-}) }}
-
-An import is all it takes — the provider is then discoverable by its id:
+Providers self-register on import, mirroring `@netscript/kv/redis`. The base
+engine pulls **no** provider SDK; you opt in per provider, and an import is all it
+takes:
 
 ```ts
 import "@netscript/ai/anthropic"; // self-registers the "anthropic" provider
@@ -202,22 +161,41 @@ import "@netscript/ai/anthropic"; // self-registers the "anthropic" provider
 const model = await getModel("anthropic:claude-sonnet-4-5");
 ```
 
+Choosing between them is mostly a question of where your models live:
+
+- **`./anthropic`** talks to Anthropic directly, catalog taken verbatim from
+  `@tanstack/ai-anthropic`, `apiKey` defaulting to `ANTHROPIC_API_KEY`.
+- **`./openai-compatible`** is the workhorse for any endpoint that speaks the
+  OpenAI API: no fixed catalog (the remote endpoint owns its model list), and it
+  throws `AiNotConfiguredError` rather than guessing when `baseURL` / `apiKey`
+  are missing.
+- **`./openrouter`** builds on the OpenAI-compatible base for OpenRouter (key
+  from `OPENROUTER_API_KEY`) and adds a `reasoningEffort` option
+  (`"low" | "medium" | "high"`) normalized to OpenRouter's wire format.
+- **`./ollama`** builds on the same base for a local endpoint and runs a
+  reachability preflight against the host first — so a missing local daemon fails
+  fast instead of at the first token.
+- **`./openai-embeddings`** registers for the embedding and vision seams, not
+  chat: `.embed()` and `.analyze()`.
+
+Per-provider config fields and defaults are enumerated in the
+[generated reference]({{ "ref:ai" |> xref |> url }}).
+
 ## Testing — deterministic fakes
 
-`@netscript/ai/testing` supplies port fakes so an agent or tool can be exercised without
-a network: `createFakeChatModelProvider(id, turns)`, `createFakeAgentLoop(chunks)`,
-`createFakeAgentMemory({ recall? })`, `createFakeModelProvider`,
-`createFakeEmbeddingProvider(vector)`, `createFakeVisionProvider(text)`,
-`createInMemoryToolRegistry()`, and `createFakeTelemetryPort()` (whose `.records` capture
-emitted telemetry).
+`@netscript/ai/testing` supplies port fakes so an agent or tool can be exercised
+without a network: fake chat model providers and agent loops that replay scripted
+turns and chunks, fake memory, embedding, and vision ports, an in-memory tool
+registry, and `createFakeTelemetryPort()` (whose `.records` capture emitted
+telemetry). The full factory list lives in the generated reference.
 
 ## Wiring tool and agent registries
 
-Today you wire the engine's registries **directly** in your composition root:
+Today you wire the engine's registries **directly** at app startup:
 `createToolRegistry(defs?)` from `@netscript/ai/tools` for tools and
-`createAgentLoop(deps)` from `@netscript/ai/agent` for agent loops (both documented
-above). No codegen step sits between your files and the runtime — you register against
-the engine factories yourself.
+`createAgentLoop(deps)` from `@netscript/ai/agent` for agent loops. No codegen
+step sits between your files and the runtime — you register against the engine
+factories yourself.
 
 {{ comp callout { type: "note", title: "Not in this release: netscript generate ai" } }}
 A <code>netscript generate ai</code> codegen — compiling app-owned tool and agent files
@@ -227,31 +205,19 @@ the CLI today</strong>. The shipped <code>netscript generate</code> targets are
 target lands, register tools and agent loops against the engine factories directly.
 {{ /comp }}
 
-## Reference
+## Where the exact tables live
 
-{{ comp.featureGrid({ items: [
-  {
-    title: "Look up — @netscript/ai",
-    body: "The generated reference for the engine package: runtime, contracts, ports, tools, agent loop, MCP transports, and provider adapters.",
-    href: "/reference/ai/",
-    icon: "≡"
-  },
-  {
-    title: "Back — the AI overview",
-    body: "The stack story, the two planes, and the plugin thinness laws the engine anchors.",
-    href: "/ai/",
-    icon: "←"
-  },
-  {
-    title: "Durable chat",
-    body: "The self-contained Fresh runtime for a durable AI chat — composes with this engine but does not require it.",
-    href: "/ai/durable-chat/",
-    icon: "◆"
-  },
-  {
-    title: "Chat UI",
-    body: "The copy-registry components that render an agent transcript, including render_ui targets.",
-    href: "/ai/chat-ui/",
-    icon: "◆"
-  }
-] }) }}
+This guide stops at the altitude of "which piece, and why". For the complete,
+generated symbol tables — every export, signature, and config field — use:
+
+- [`@netscript/ai`]({{ "ref:ai" |> xref |> url }}) — the engine itself: runtime,
+  contracts, ports, tools, agent loop, MCP transports, provider adapters.
+- [`@netscript/plugin-ai`]({{ "ref:plugin-ai" |> xref |> url }}) — the thin AI
+  plugin delivery shell.
+- [`@netscript/plugin-ai-core`]({{ "ref:plugin-ai-core" |> xref |> url }}) — the
+  plugin's reusable `/v1/ai` contract core.
+
+And for the rest of the stack: the [AI overview](/ai/) tells the layering story,
+[durable chat](/ai/durable-chat/) covers the Fresh runtime, and the
+[chat UI](/ai/chat-ui/) covers the components that render what this engine
+streams.

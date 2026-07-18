@@ -62,6 +62,7 @@ export const navLanes: NavLane[] = [
     items: [
       { href: "/why/", label: "Why NetScript" },
       { href: "/quickstart/", label: "Quickstart" },
+      { href: "/quickstart/aspire/", label: "Aspire quickstart" },
       { href: "/concepts/", label: "Core concepts" },
       { href: "/cli-reference/", label: "CLI reference" },
       { href: "/glossary/", label: "Glossary" },
