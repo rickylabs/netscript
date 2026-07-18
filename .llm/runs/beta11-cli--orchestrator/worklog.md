@@ -137,3 +137,9 @@ group launch; this section fixes the supervisor's surface.
 - 2026-07-18 · G3 #842 MERGED into integration (637c3915). NOTE: G5's worktree was cut before
   this merge — its base lacks the #842 surfaces the brief references; steer at G5's Plan-Gate:
   rebase onto updated origin/feat/desktop-frontend before implementation.
+- 2026-07-18 · Integration-base defect found by G5's root arch:check (good gate discipline): CLI
+  carried caret @netscript ranges (deno-add default) vs the 21-pin exact lockstep convention;
+  deps:check flagged sdk divergence vs Fresh's exact pin. Supervisor chore commit on
+  feat/desktop-frontend normalizes all three (config/fresh-ui/sdk) + lock entries; arch:check
+  exit 0 verified. G5 steered to sync base + continue S2. G7 plan-gate PASS (D1–D19; honest
+  NOT_RUN platform-leg evidence). G11 S2 signed off; S3 in flight.
