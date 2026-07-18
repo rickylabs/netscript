@@ -181,3 +181,57 @@ Claim→citation deltas: beta.10 deploy target set + lifecycle → executed `net
 `deploy kubernetes --help` (2026-07-18); plugin install → executed command above; beta.11 marker
 statements → adversarial.md shipped-truth findings (deploy desktop absent from beta.10 CLI; no
 `./auto-update` export in jsr @netscript/sdk@0.0.1-beta.10); all other citations unchanged.
+
+## Homepage — 2026-07-18 (Lane 4, owner scope extension)
+
+Revamped `docs/site/index.vto` into a meta-framework landing page per
+`homepage-research.md` (lessons applied: #1 lead-with-command+code, #3 agent-operability
+first-class à la Encore, #4 contract-first visual story à la tRPC, #8 pain-point positioning;
+outline §§1-7 adapted to the existing Lume machinery — hero, callout, tabbedCode, featureGrid,
+diagram, learningPath components only; no visual redesign). One-entry-point rule held: message,
+readiness-step quickstart posture, beta.11 desktop labeling, and limitation lines all mirror the
+root README (fix-cycle-1 state).
+
+### Structure shipped
+hero (new message) → beta callout (unchanged, renders releaseVersion) → "The contract is the
+product" 4-tab lead example (contract → service → scaffold → bring-up incl. readiness wait) →
+"Built for humans and coding agents" (agent init tab + eyes/playbook/hands grid) → "One contract,
+four moves" (existing architecture-overview.svg via comp.diagram + telemetry line) → "Durable
+capabilities install as plugins" (plugin install tab + 6-plugin grid) → "Run it anywhere" (shipped
+deploy lanes + "New in 0.0.1-beta.11 — native desktop lane" callout) → pillars grid now NINE cards
+(added AI & Agents → fixes the _data.ts:5-6 drift noted in facts-docs-status §1.2) → Who it is for
+(+ Coding agents card) → learning path + closing grid (unchanged).
+
+### Executed examples (all on 2026-07-18)
+- Tab "1 · The contract": abridged from scaffolded
+  `contracts/versions/v1/users.contract.ts`; the abridged form written into the scaffold and
+  `deno check --unstable-kv` → clean against published beta.10 packages.
+- Tab "2 · The service": the defineService snippet covered by
+  `packages/service/tests/_fixtures/readme-examples_test.ts` → `deno test` 2 passed / 0 failed.
+- Tabs "3 · Scaffold" / "4 · Bring it up": identical commands executed in the fix-cycle-1 clean
+  run (install/init/restore/start/db trio; timings recorded above). Hardcoded dashboard URL
+  `:18888` from the old homepage REMOVED — the dashboard port is dynamic; text now says "prints
+  the dashboard URL" (matches observed 42809/41997/42787).
+- "Equip your agent" tab: `netscript agent init` executed (fix-cycle scaffold; .mcp.json + 3
+  skills).
+- "Install a plugin" tab: `netscript plugin install worker --name workers` executed → the three
+  output lines shown are the verbatim command output.
+
+### Claim → citation deltas (homepage-specific; the README map covers shared claims)
+- Hero subhead composition → same citations as README hero (contracts/service/sdk READMEs,
+  mcp README:57).
+- "instead of ~40 lines of Hono setup" comment → carried unchanged from the previous homepage tab
+  (covered by readme-examples fixture test).
+- Eyes/playbook/hands grid numbers (13 tools, 50/2000 caps, 17 allow/6 deny) →
+  facts-cli-agentic (tool-types.ts:4-19, truncation.ts:10, command-policy.ts:24-49).
+- Deploy lanes prose → executed beta.10 `netscript deploy list`; desktop callout → adversarial.md
+  shipped-truth findings + facts-aspire-deploy honest-maturity lines; how-to link
+  `/how-to/build-a-desktop-frontend/` → facts-docs-status §1.5.
+- Plugin grid rows → same per-plugin README citations as the README plugin table.
+- AI & Agents pillar card → facts-docs-status §1.2 (nav pillar `_data.ts:141-157`).
+
+### Gates
+- `cd docs/site && deno task build` → 531 files generated in 6.67 s, green.
+- `deno task docs:links` → 98 docs, 0 broken links/anchors.
+- Internal-wording grep on index.vto → zero hits.
+- No `_data.ts` change needed (nav untouched; drift fixed on the page side).
