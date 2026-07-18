@@ -300,7 +300,7 @@ is `netscript service generate` — it rewrites only the Aspire helper files, ne
     { name: "Handler / service / app code", type: "hot or restart resource", desc: "Apps and background processors scaffold with Deno watch mode, so they reload on save. A plain service restarts from the dashboard. No regenerate, no AppHost restart." },
     { name: "Env / Permissions / Port / Workdir on a resource", type: "generate + restart AppHost", desc: "Edit the resource's section in netscript.config.ts, run `netscript service generate` to rewrite the register-*.mts layer, then restart `aspire start`." },
     { name: "A reference: ServiceReferences / pluginReferences / dependsOn", type: "generate + restart AppHost", desc: "Same flow. Pass 2 only re-resolves and re-injects services__<name>__http__0 on the next `aspire start` — a declared-but-not-generated reference does nothing." },
-    { name: "Add / remove a plugin, or a new appsettings resource", type: "generate + restart AppHost", desc: "`netscript plugin add`/`remove` (or a hand-added resource) changes the graph; the resource only joins on the next generate + `aspire start`." },
+    { name: "Add / remove a plugin, or a new appsettings resource", type: "generate + restart AppHost", desc: "`netscript plugin install`/`remove` (or a hand-added resource) changes the graph; the resource only joins on the next generate + `aspire start`." },
     { name: "An injected env value Aspire owns (OTEL_*, a connection string)", type: "restart the resource", desc: "Environment is read once at process start, so bounce the affected resource for the new value to take effect." }
   ]
 }) }}

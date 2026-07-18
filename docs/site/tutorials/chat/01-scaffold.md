@@ -71,7 +71,7 @@ A durable chat session is one append-only stream, addressed through the streams 
 the `streams` plugin so `@netscript/fresh/ai` has a runtime to resolve session URLs against:
 
 ```sh
-netscript plugin add streams
+netscript plugin install stream --name streams --samples
 ```
 
 {{ comp callout { type: "note", title: "Why streams, for a chat app?" } }}

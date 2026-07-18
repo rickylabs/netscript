@@ -31,7 +31,7 @@ The chat surface is built from four seams, each a single function:
 
 - A NetScript workspace with a scaffolded `apps/dashboard/` Fresh app (`netscript init`).
 - The **streams runtime** reachable — durable sessions are addressed through the
-  `@netscript/plugin-streams-core` seam. Add it with `netscript plugin add streams` and
+  `@netscript/plugin-streams-core` seam. Add it with `netscript plugin install stream --name streams` and
   bring it up under Aspire.
 - A model provider key. This recipe calls Anthropic directly through
   [`@tanstack/ai`](https://tanstack.com/ai); export `ANTHROPIC_API_KEY` before you start
@@ -213,7 +213,7 @@ Two <code>RenderPart</code> types exist and must not be conflated. <code>@netscr
   session stream; `createNetScriptChatConnection` re-polls with backoff and returns an
   empty stream rather than a terminal error. A hard `401` / `403` propagates immediately.
 - **Streams runtime unreachable:** the durable stream URL does not resolve. Confirm
-  `netscript plugin add streams` ran and the streams service is up under Aspire.
+  `netscript plugin install stream --name streams` ran and the streams service is up under Aspire.
 - **Model call fails:** `ANTHROPIC_API_KEY` is unset or invalid — `chat()` surfaces the
   provider error into the assistant stream.
 
