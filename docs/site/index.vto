@@ -15,7 +15,7 @@ title: NetScript — the enterprise-grade meta-framework for Deno
 
 {{ comp callout { type: "note", title: "Beta — API subject to change" } }}
 NetScript is a backend framework and workspace generator, not a hosted service — you run it on
-Deno and own all the generated code. NetScript is in <code>0.0.1</code> beta, shipping
+Deno and own all the generated code. It is in <code>0.0.1</code> beta, shipping
 incrementally, and the API is still moving. Every <code>@netscript/*</code> package shares one aligned version
 (<code>{{ releaseVersion }}</code>) and releases move in lockstep. Scaffolded JSR imports use exact
 <code>{{ releaseSpecifier }}</code> pins for the beta train, so keep package versions aligned when
@@ -26,7 +26,7 @@ you upgrade.
 
 <p>
 Define it once; the typed service and every typed client derive from it — server and callers cannot drift apart.
-The shapes below come straight from a workspace scaffolded by
+The tabs below come straight from a workspace scaffolded by
 <code>netscript init my-app --db postgres --service</code> (abridged).
 </p>
 
@@ -68,8 +68,8 @@ in-process AI surface — first-party plugins, in the box, not an integration pr
 NetScript does not try to be everything: right tool for the right job, reached through the plugin
 system. A plugin is a validated manifest that can contribute across every layer — CLI verbs,
 scaffolded code, runtime services, storage, stream topics, telemetry, Aspire resources — and the
-host materializes whatever it declares. The mechanism behind the six first-party plugins is the
-same one a team uses to extend the framework for its own needs, on the same rails. One command,
+host materializes whatever it declares. The mechanism behind the six first-party plugins is
+how a team extends the framework for its own needs, on the same rails. One command,
 four plugin files scaffolded and twelve Aspire helpers regenerated:
 </p>
 
@@ -122,9 +122,9 @@ frontend</a>.
 Not a framework for agents instead of developers — a framework for developers who work with one.
 The properties that make NetScript easy for you to adopt, review, and debug — one unified API,
 typed end to end, reference docs generated from source — are exactly what make it legible to a
-coding agent — and high-risk operations like deploy, init, and db reset stay behind an explicit
-deny list (deny beats allow; unmatched commands are denied). The CLI is the hands, the skills are
-the playbook, MCP is the eyes; one command wires all three in:
+coding agent. High-risk operations like deploy, init, and db reset stay behind an explicit deny
+list (deny beats allow; unmatched commands are denied). The CLI is the hands, the skills are the
+playbook, MCP is the eyes; one command wires all three in:
 </p>
 
 {{ comp.tabbedCode({ tabs: [

@@ -15,8 +15,8 @@ Define your API once as an oRPC contract. The typed Hono service and the typed S
 derive from it — server and callers cannot drift apart. Background jobs, sagas, triggers, event
 streams, auth, and AI install as first-party plugins behind the same unified API. .NET Aspire brings
 the whole graph up locally with one command. And it ships: from a single compiled binary to a
-multi-cloud distributed infrastructure, observability on by default — one toolchain shared by you
-and the coding agent you work with.
+multi-cloud distributed infrastructure, with observability on by default — one toolchain shared by
+you and the coding agent you work with.
 
 NetScript is a framework and workspace generator, not a hosted service — you run it on Deno and own
 all the generated code.
@@ -31,7 +31,7 @@ all the generated code.
 
 You need [Deno 2.9+](https://docs.deno.com/runtime/getting_started/installation/) and the
 [.NET Aspire CLI](https://learn.microsoft.com/dotnet/aspire/) (or skip orchestration with
-`--no-aspire`). Docker is used to provision Postgres and the cache.
+`--no-aspire`). Docker provisions Postgres and the cache.
 
 ```bash
 # 1. Install the NetScript CLI on your PATH
@@ -107,14 +107,14 @@ flowchart TD
   SVC --> PLATFORM
 ```
 
-The mental model is four moves: **contract → service → plugins → platform.** You author the
-contract; `defineService` turns it into a running Hono + oRPC app; plugins add durable capabilities
-behind the same contract style; `@netscript/aspire` provisions and connects the infrastructure —
-keeping the Aspire SDK behind an adapter so no .NET type ever appears in a public signature. Where a
-service lives is resolved at call time from orchestrator-injected environment variables, so the same
-client code runs against local processes, containers, and deployed endpoints with no registry or
-config file. Telemetry stitches scheduler → queue → worker → RPC → SSE spans into one distributed
-trace using Deno's built-in OTLP exporter — zero OpenTelemetry SDK dependency by default.
+The mental model: **contract → service → plugins → platform.** You author the contract;
+`defineService` turns it into a running Hono + oRPC app; plugins add durable capabilities behind the
+same contract style; `@netscript/aspire` provisions and connects the infrastructure — keeping the
+Aspire SDK behind an adapter so no .NET type ever appears in a public signature. Where a service
+lives is resolved at call time from orchestrator-injected environment variables, so the same client
+code runs against local processes, containers, and deployed endpoints with no registry or config
+file. Telemetry stitches scheduler → queue → worker → RPC → SSE spans into one distributed trace
+using Deno's built-in OTLP exporter — zero OpenTelemetry SDK dependency by default.
 
 ---
 
@@ -124,8 +124,8 @@ Durable jobs, compensating sagas, trigger ingress, replayable streams, pluggable
 AI surface — first-party plugins, in the box. Not the integration project that Next.js, Nuxt,
 SvelteKit, or Angular leave you to assemble around the frontend.
 
-NetScript does not try to be everything. It aims to be the right tool for the right job — and the
-way it gets there is the plugin system. A plugin is, at its core, a manifest: plain, validated data
+NetScript does not try to be everything. It aims to be the right tool for the right job — and it
+gets there through the plugin system. A plugin is, at its core, a manifest: plain, validated data
 declaring what it contributes, inspected by hosts without executing plugin code. One manifest can
 contribute across **every layer** — CLI verbs, scaffolded code, runtime services, storage, stream
 topics, telemetry, Aspire resources — and the host materializes whatever it declares. One command,
