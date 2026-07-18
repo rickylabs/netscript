@@ -544,6 +544,10 @@ jobs:
         run: |
           uv pip install --system "openhands-sdk @ git+https://github.com/OpenHands/software-agent-sdk.git@main#subdirectory=openhands-sdk"
           uv pip install --system "openhands-tools @ git+https://github.com/OpenHands/software-agent-sdk.git@main#subdirectory=openhands-tools"
+          # litellm's completion path imports litellm.proxy (-> fastapi) even outside
+          # proxy mode; fastapi is only in litellm's [proxy] extra, so install it
+          # explicitly or every agent run dies with ModuleNotFoundError on step 1.
+          uv pip install --system fastapi
 
       - name: Resolve provider credentials
         env:
