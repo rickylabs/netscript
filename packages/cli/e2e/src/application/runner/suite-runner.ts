@@ -9,6 +9,7 @@ import type { CommandExecutor } from '../../ports/command-executor.ts';
 import type { DockerResourceCleaner } from '../../ports/docker-resource-cleaner.ts';
 import type { HttpClient } from '../../ports/http-client.ts';
 import type { Reporter } from '../../ports/reporter.ts';
+import type { PlatformPort } from '../../ports/platform.ts';
 import { createSmokeProject } from '../builders/workspace/smoke-project-factory.ts';
 import { buildExecutionPlan } from './execution-plan-builder.ts';
 import { runGate } from './gate-runner.ts';
@@ -43,6 +44,7 @@ export interface SuiteRunnerOptions {
   readonly httpClient: HttpClient;
   readonly dockerCleaner?: DockerResourceCleaner;
   readonly reporter: Reporter;
+  readonly platform: PlatformPort;
 }
 
 /** Executable suite runner. */

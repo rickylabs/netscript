@@ -11,6 +11,7 @@ import type {
 } from '../../../src/ports/docker-resource-cleaner.ts';
 import type { HttpClient, HttpRequest, HttpResult } from '../../../src/ports/http-client.ts';
 import type { Reporter } from '../../../src/ports/reporter.ts';
+import type { PlatformPort } from '../../../src/ports/platform.ts';
 import { createSuiteRunner } from '../../../src/application/runner/suite-runner.ts';
 import { GATE, SCAFFOLD } from '../../../src/domain/cli-surface.ts';
 import type { RunOptions } from '../../../src/domain/run-context.ts';
@@ -52,6 +53,7 @@ Deno.test('suite runner emits a failed report and prunes only created Docker res
     httpClient: new FakeHttpClient(),
     dockerCleaner: cleaner,
     reporter: new NullReporter(),
+    platform: new FakePlatform(),
   }).run(suite, { suiteId: suite.id, options });
 
   assertEquals(report.ok, false);
@@ -88,6 +90,7 @@ Deno.test('suite runner skips cleanup phase when cleanup is disabled', async () 
     httpClient: new FakeHttpClient(),
     dockerCleaner: cleaner,
     reporter: new NullReporter(),
+    platform: new FakePlatform(),
   }).run(suite, { suiteId: suite.id, options });
 
   assertEquals(report.ok, true);
@@ -125,6 +128,7 @@ Deno.test('suite runner cleans up after a targeted non-cleanup gate when cleanup
     httpClient: new FakeHttpClient(),
     dockerCleaner: cleaner,
     reporter: new NullReporter(),
+    platform: new FakePlatform(),
   }).run(suite, { suiteId: suite.id, gateId: GATE.SCAFFOLD_INIT, options });
 
   assertEquals(cleaner.snapshots, 1);
@@ -162,6 +166,7 @@ Deno.test('suite runner can target cleanup gate without suite cleanup enabled', 
     httpClient: new FakeHttpClient(),
     dockerCleaner: cleaner,
     reporter: new NullReporter(),
+    platform: new FakePlatform(),
   }).run(suite, { suiteId: suite.id, gateId: GATE.CLEANUP_ASPIRE_STOP, options });
 
   assertEquals(cleaner.snapshots, 0);
@@ -177,6 +182,12 @@ class FakeClock implements Clock {
   monotonicMs(): number {
     this.#time += 1;
     return this.#time;
+  }
+}
+
+class FakePlatform implements PlatformPort {
+  current(): 'linux' {
+    return 'linux';
   }
 }
 

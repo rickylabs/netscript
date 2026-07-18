@@ -1,0 +1,88 @@
+.ns-desktop-window-chrome {
+  display: flex;
+  min-block-size: var(--ns-space-10);
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ns-space-4);
+  border-block-end: 1px solid var(--ns-border);
+  padding-inline-start: var(--ns-space-4);
+  background: color-mix(in srgb, var(--ns-surface) 94%, transparent);
+  color: var(--ns-fg);
+  user-select: none;
+}
+
+.ns-desktop-window-chrome[data-state='disabled'] {
+  color: var(--ns-muted-fg);
+}
+
+.ns-desktop-window-chrome__identity,
+.ns-desktop-window-chrome__actions {
+  display: flex;
+  min-inline-size: 0;
+  align-items: center;
+}
+
+.ns-desktop-window-chrome__identity {
+  gap: var(--ns-space-2);
+}
+
+.ns-desktop-window-chrome__leading {
+  display: inline-flex;
+  color: var(--ns-primary);
+}
+
+.ns-desktop-window-chrome__title {
+  overflow: hidden;
+  font-family: var(--ns-font-sans);
+  font-size: var(--ns-text-sm);
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ns-desktop-window-chrome__actions {
+  align-self: stretch;
+}
+
+.ns-desktop-window-chrome__action {
+  display: inline-grid;
+  min-inline-size: var(--ns-space-10);
+  block-size: 100%;
+  place-items: center;
+  border: 0;
+  border-inline-start: 1px solid color-mix(in srgb, var(--ns-border) 72%, transparent);
+  padding: 0 var(--ns-space-3);
+  background: transparent;
+  color: var(--ns-muted-fg);
+  cursor: pointer;
+  transition:
+    background var(--ns-ease-fast),
+    color var(--ns-ease-fast);
+}
+
+.ns-desktop-window-chrome__action:hover {
+  background: color-mix(in srgb, var(--ns-fg) 7%, transparent);
+  color: var(--ns-fg);
+}
+
+.ns-desktop-window-chrome__action:focus-visible {
+  outline: 2px solid var(--ns-ring);
+  outline-offset: -3px;
+}
+
+.ns-desktop-window-chrome__action--close:hover {
+  background: var(--ns-destructive);
+  color: var(--ns-destructive-fg);
+}
+
+.ns-desktop-window-chrome__action:disabled {
+  color: var(--ns-muted-fg);
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ns-desktop-window-chrome__action {
+    transition: none;
+  }
+}

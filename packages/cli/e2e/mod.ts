@@ -22,13 +22,18 @@ export type { CommandExecutor } from './src/ports/command-executor.ts';
 export type { DockerResourceCleaner } from './src/ports/docker-resource-cleaner.ts';
 export type { HttpClient } from './src/ports/http-client.ts';
 export type { Reporter } from './src/ports/reporter.ts';
+export type { PlatformPort } from './src/ports/platform.ts';
 export {
   ASPIRE_RESOURCE,
+  DEPLOY,
+  DEPLOY_TITLE,
   GATE,
   GATE_PHASE,
   SCAFFOLD,
   SCAFFOLD_TITLE,
 } from './src/domain/cli-surface.ts';
+export { EXECUTION_PLATFORMS, NATIVE_DESKTOP_SUITE_STATUSES } from './src/domain/platform.ts';
+export type { ExecutionPlatform, NativeDesktopSuiteStatus } from './src/domain/platform.ts';
 export {
   DATABASE,
   DEPLOY_TARGET,

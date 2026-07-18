@@ -13,12 +13,16 @@ Deno.test("agent init writes Claude config, skills, and marked AGENTS section id
     });
     const config = JSON.parse(await Deno.readTextFile(join(root, ".mcp.json")));
     assertEquals(config.mcpServers.netscript.command, "deno");
-    assertEquals(config.mcpServers.netscript.args.slice(0, 5), [
+    assertEquals(config.mcpServers.netscript.args, [
       "run",
+      "--config",
+      join(root, "deno.json"),
       "-A",
       `jsr:@netscript/cli@${NETSCRIPT_RELEASE_VERSION}`,
       "agent",
       "mcp",
+      "--project-root",
+      root,
     ]);
     assertStringIncludes(
       await Deno.readTextFile(join(root, ".claude/skills/netscript/SKILL.md")),
@@ -48,12 +52,16 @@ Deno.test("agent init selects VS Code and detect-or-all host table", async () =>
       await Deno.readTextFile(join(root, ".vscode/mcp.json")),
     );
     assertEquals(vscode.servers.netscript.command, "deno");
-    assertEquals(vscode.servers.netscript.args.slice(0, 5), [
+    assertEquals(vscode.servers.netscript.args, [
       "run",
+      "--config",
+      join(root, "deno.json"),
       "-A",
       `jsr:@netscript/cli@${NETSCRIPT_RELEASE_VERSION}`,
       "agent",
       "mcp",
+      "--project-root",
+      root,
     ]);
     const only = await Deno.makeTempDir();
     try {

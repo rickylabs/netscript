@@ -41,9 +41,11 @@ Deno.test("plugin ai shells out to the lockstep-versioned plugin CLI", async () 
   assertEquals(calls, [{
     command: "deno",
     args: [
-      "x",
+      "run",
+      "--config",
+      "/workspace/app/deno.json",
       "-A",
-      `jsr:@netscript/plugin-ai@${NETSCRIPT_RELEASE_VERSION}/cli`,
+      `https://jsr.io/@netscript/plugin-ai/${NETSCRIPT_RELEASE_VERSION}/cli.ts`,
       "doctor",
     ],
     cwd: "/workspace/app",

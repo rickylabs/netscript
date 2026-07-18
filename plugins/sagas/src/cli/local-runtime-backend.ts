@@ -1,7 +1,7 @@
 import type { PluginCliArgs, PluginCliResult } from '@netscript/plugin/cli';
 import { artifactText, type ScaffoldArtifact } from '@netscript/plugin/adapter';
 import { parseSagaInput, sagaScaffolder } from '../adapter/resources/mod.ts';
-import { LocalProjectFiles, type ProjectFiles } from '@netscript/plugin/cli';
+import { applyScaffoldPlan, LocalProjectFiles, type ProjectFiles } from '@netscript/plugin/cli';
 import { codemodSagaImports } from './codemod.ts';
 import {
   FetchSagasRuntimeApiClient,
@@ -188,11 +188,23 @@ export class LocalSagasRuntimeBackend implements SagasCliBackend {
     artifacts: readonly ScaffoldArtifact[],
     args: PluginCliArgs,
   ): Promise<PluginCliResult> {
-    for (const artifact of artifacts) {
-      await this.#files.writeTextFile(artifact.path, artifactText(artifact));
-    }
-    const registry = await this.generate(args);
-    return ok(message, { files: artifacts.map((artifact) => artifact.path), registry });
+    const registryPath = flag(args, 'out') ?? '.netscript/generated/plugin-sagas/sagas.registry.ts';
+    const plan = await applyScaffoldPlan({
+      args,
+      artifacts,
+      generatedPaths: [registryPath],
+      apply: async () => {
+        for (const artifact of artifacts) {
+          await this.#files.writeTextFile(artifact.path, artifactText(artifact));
+        }
+        return await this.generate(args);
+      },
+    });
+    return ok(message, {
+      files: plan.files,
+      dryRun: plan.dryRun,
+      ...(plan.applied === undefined ? {} : { registry: plan.applied }),
+    });
   }
 
   /** Generate the static saga registry using command root/output overrides. */

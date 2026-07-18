@@ -30,6 +30,9 @@ declare function createServiceClient(config: unknown): {
   readonly get: (input: unknown) => Promise<unknown>;
   readonly getById: (input: unknown) => Promise<unknown>;
 };
+declare function createDesktopServiceClient(config: unknown): {
+  readonly get: (input: unknown) => Promise<unknown>;
+};
 declare function safe<T>(value: Promise<T>): Promise<[unknown, T | undefined]>;
 declare function isDefinedError(error: unknown): error is { readonly code: string; readonly data: unknown };
 declare function createQueryFactories(config: unknown): typeof queries;
@@ -60,6 +63,26 @@ declare function createOpenAPIGenerator(): unknown;
 declare function generateOpenAPISpec(router: unknown, generator: unknown, options: unknown): Promise<unknown>;
 declare function otelMiddleware(): unknown;
 declare const createStreamProducer: (config: unknown) => unknown;
+declare function startAutoUpdate(options: {
+  readonly release: {
+    readonly baseUrl: string;
+    readonly publicKey: string;
+    readonly manualUpdateUrl: string;
+  };
+  readonly policy: { readonly checkOnLaunch: true; readonly intervalMs?: number };
+  readonly onUpdateReady?: (event: {
+    readonly applyMode: 'automatic';
+    readonly version: string;
+  } | {
+    readonly applyMode: 'manual';
+    readonly version: string;
+    readonly manualUpdateUrl: string;
+  }) => void;
+  readonly onRollback?: (event: { readonly reason: string; readonly currentVersion: string }) => void;
+}):
+  | { readonly status: 'started'; readonly updateUrl: string }
+  | { readonly status: 'scheduled'; readonly updateUrl: string; readonly firstCheckInMs: number }
+  | { readonly status: 'disabled'; readonly reason: string };
 type QueryClientPort = unknown;
 type QueryFactory<T> = unknown;
 type ServiceClient<T> = unknown;

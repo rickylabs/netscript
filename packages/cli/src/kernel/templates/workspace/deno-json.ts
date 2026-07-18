@@ -12,6 +12,7 @@ import { SCAFFOLD_DEFAULTS } from '../../constants/scaffold/scaffold-defaults.ts
 import { SCAFFOLD_DIRS } from '../../constants/scaffold/scaffold-dirs.ts';
 import {
   SCAFFOLD_ENGINE_WORKSPACE_PACKAGES,
+  SCAFFOLD_JSR_RELEASE_PACKAGES,
   SCAFFOLD_WORKSPACE_PACKAGES,
 } from '../../constants/scaffold/scaffold-workspace-packages.ts';
 import { netscriptJsrSpecifier } from '../../constants/jsr-specifiers.ts';
@@ -54,10 +55,19 @@ export function generateDenoJson(options: WorkspaceDenoJsonOptions): string {
     }
     : {};
   const imports = { ...jsrImports, ...generatedImports };
+  const minimumDependencyAge = options.importMode === 'jsr'
+    ? {
+      age: 'P1D',
+      exclude: SCAFFOLD_JSR_RELEASE_PACKAGES.map((packageName) =>
+        netscriptJsrSpecifier(packageName)
+      ),
+    }
+    : undefined;
 
   const config: Record<string, unknown> = {
     workspace: [...userMembers, ...packageMembers],
     ...(Object.keys(imports).length > 0 ? { imports } : {}),
+    ...(minimumDependencyAge ? { minimumDependencyAge } : {}),
     // Single workspace-root node_modules shared across all members.
     nodeModulesDir: 'auto',
     // Deno unstable features used by generated NetScript workspaces:

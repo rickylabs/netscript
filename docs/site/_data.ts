@@ -69,7 +69,6 @@ const referenceUnits: NavItem[] = [
   { href: "/reference/watchers/", label: "watchers", icon: "W" },
   { href: "/reference/workers/", label: "workers", icon: "W" },
 ];
-
 export const navSections: NavSection[] = [
   {
     label: "Start",
@@ -86,6 +85,7 @@ export const navSections: NavSection[] = [
       { href: "/web-layer/", label: "Overview & Concepts", icon: "O" },
       { href: "/tutorials/live-dashboard/", label: "Quickstart: live dashboard", icon: "Q" },
       { href: "/how-to/customize-fresh-ui/", label: "How-To: customize Fresh UI", icon: "H" },
+      { href: "/how-to/build-a-desktop-frontend/", label: "How-To: desktop frontend", icon: "H" },
       { href: "/how-to/build-a-server-validated-form/", label: "How-To: server-validated form", icon: "H" },
       { href: "/web-layer/server/", label: "API: server & islands", icon: "R" },
       { href: "/web-layer/builders/", label: "API: pages & builders", icon: "R" },

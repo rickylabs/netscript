@@ -1,4 +1,4 @@
-import { PluginCli } from '@netscript/plugin/cli';
+import { applyScaffoldPlan, PluginCli } from '@netscript/plugin/cli';
 import type { PluginCliArgs, PluginCliCommand, PluginCliResult } from '@netscript/plugin/cli';
 import type { DiscoveredStreamTopic, StreamsCliServices } from './streams-types.ts';
 import {
@@ -64,11 +64,15 @@ async function runStreamsCommand(
       : command === 'add-producer'
       ? streamProducerScaffolder.emit(parseStreamProducerInput({ ...args, command: 'legacy' }))
       : streamConsumerScaffolder.emit({ topic: requiredValue(args) });
-    const createdFiles = await services.writeArtifacts(root, artifacts);
+    const plan = await applyScaffoldPlan({
+      args,
+      artifacts,
+      apply: () => services.writeArtifacts(root, artifacts),
+    });
     return {
       code: 0,
-      message: `${createdFiles.length} stream artifact(s) created.`,
-      data: { createdFiles },
+      message: `${plan.files.length} stream artifact(s) ${plan.dryRun ? 'planned' : 'created'}.`,
+      data: { createdFiles: plan.files, dryRun: plan.dryRun },
     };
   }
   const topics = await services.discoverTopics(root);

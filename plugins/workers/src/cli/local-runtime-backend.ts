@@ -4,7 +4,7 @@ import {
   type PluginCliResult,
   type ScaffoldArtifact,
 } from '@netscript/plugin/adapter';
-import { LocalProjectFiles, type ProjectFiles } from '@netscript/plugin/cli';
+import { applyScaffoldPlan, LocalProjectFiles, type ProjectFiles } from '@netscript/plugin/cli';
 import {
   createDefaultTaskExecutor,
   type TaskDefinition,
@@ -82,12 +82,14 @@ export class LocalWorkersRuntimeBackend implements WorkersCliBackend {
         return await this.writeArtifactsAndCompile(
           'Worker job created.',
           jobScaffolder.emit(parseJobInput(args)),
+          args,
         );
       case 'add-task': {
         const input = parseTaskInput(args);
         return await this.writeArtifactsAndCompile(
           'Worker task created.',
           taskScaffolder.emit(input),
+          args,
           { runtime: input.runtime },
         );
       }
@@ -95,6 +97,7 @@ export class LocalWorkersRuntimeBackend implements WorkersCliBackend {
         return await this.writeArtifactsAndCompile(
           'Worker workflow created.',
           workflowScaffolder.emit(parseWorkflowInput(args)),
+          args,
         );
       case 'list-jobs':
         return await this.listResources('job', args);
@@ -137,16 +140,25 @@ export class LocalWorkersRuntimeBackend implements WorkersCliBackend {
   private async writeArtifactsAndCompile(
     message: string,
     artifacts: readonly ScaffoldArtifact[],
+    args: PluginCliArgs,
     extra: Readonly<Record<string, unknown>> = {},
   ): Promise<PluginCliResult> {
-    for (const artifact of artifacts) {
-      await this.#files.writeTextFile(artifact.path, artifactText(artifact));
-    }
-    const registry = await compileWorkersRegistry(this.#files);
+    const plan = await applyScaffoldPlan({
+      args,
+      artifacts,
+      generatedPaths: ['.netscript/generated/plugin-workers/job-registry.ts'],
+      apply: async () => {
+        for (const artifact of artifacts) {
+          await this.#files.writeTextFile(artifact.path, artifactText(artifact));
+        }
+        return await compileWorkersRegistry(this.#files);
+      },
+    });
     return ok(message, {
-      files: artifacts.map((artifact) => artifact.path),
+      files: plan.files,
+      dryRun: plan.dryRun,
       ...extra,
-      registry,
+      ...(plan.applied === undefined ? {} : { registry: plan.applied }),
     });
   }
 

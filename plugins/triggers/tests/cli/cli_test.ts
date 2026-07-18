@@ -50,7 +50,8 @@ Deno.test('TriggersCli exposes the triggers command registry', async () => {
   assertEquals(addWebhook.data, {
     command: 'add-webhook',
     category: 'scaffolding',
-    usage: 'ns-triggers add webhook <id> --path=<path> [--secret-env=<name> --job=<id>]',
+    usage:
+      'deno x -A jsr:@netscript/plugin-triggers@<version>/cli add webhook <id> --path=<path> [--secret-env=<name> --job=<id>]',
     values: ['order-created'],
     flags: { path: '/webhooks/order-created', 'secret-env': 'ORDER_WEBHOOK_SECRET' },
   });
@@ -58,6 +59,26 @@ Deno.test('TriggersCli exposes the triggers command registry', async () => {
 
   const missing = await runTriggersCommand(cli, { command: 'missing-command' });
   assertEquals(missing.code, 1);
+});
+
+Deno.test('TriggersCli usage metadata uses the runnable versioned JSR entrypoint', async () => {
+  const backend = new RecordingTriggersBackend();
+  const cli = new TriggersCli(backend);
+
+  for (const command of cli.commands()) {
+    await command.run({ command: command.name });
+  }
+
+  assertEquals(backend.handled.length, TRIGGERS_CLI_COMMANDS.length);
+  for (const definition of backend.handled) {
+    assertEquals(
+      definition.usage.startsWith(
+        'deno x -A jsr:@netscript/plugin-triggers@<version>/cli ',
+      ),
+      true,
+      `Unexpected triggers usage for ${definition.name}: ${definition.usage}`,
+    );
+  }
 });
 
 Deno.test('triggersCli composition root provides the default CLI instance', () => {
@@ -71,7 +92,8 @@ Deno.test('StaticTriggersCliBackend returns command metadata without runtime dep
     name: 'preview',
     category: 'schedule',
     description: 'Preview scheduled trigger fire times.',
-    usage: 'ns-triggers preview <trigger-id> [--count=<n>]',
+    usage:
+      'deno x -A jsr:@netscript/plugin-triggers@<version>/cli preview <trigger-id> [--count=<n>]',
     flags: [{ name: 'count', description: 'Number of fire times to preview.' }],
   }, {
     command: 'preview',
@@ -83,7 +105,8 @@ Deno.test('StaticTriggersCliBackend returns command metadata without runtime dep
   assertEquals(preview.data, {
     command: 'preview',
     category: 'schedule',
-    usage: 'ns-triggers preview <trigger-id> [--count=<n>]',
+    usage:
+      'deno x -A jsr:@netscript/plugin-triggers@<version>/cli preview <trigger-id> [--count=<n>]',
     flags: { count: '3' },
     values: ['nightly-export'],
   });
