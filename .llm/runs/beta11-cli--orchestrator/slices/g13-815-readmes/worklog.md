@@ -221,3 +221,76 @@ Fix-cycle gate log (all re-run after fixes):
 | versionless-specifier scan (13 files) | PASS 0 bare |
 | internal-wording grep (13 files) | PASS 0 hits |
 | deno fmt --check (13) | PASS |
+
+## Batch B3B4
+
+Generator: Claude · Fable 5 (refresh class), 2026-07-18. Scope: data/state family
+(`packages/{database,kv,queue,cron,prisma-adapter-mysql,watchers}`) + auth family
+(`packages/{auth-better-auth,auth-kv-oauth,auth-workos}`) — 9 READMEs reworked from the old
+emoji-sectioned Quick Start shape to the B1/B2 flagship standard (tagline → intro → "Why teams use
+it" → Architecture where warranted → pinned Install + note → Quick example → Public surface table →
+Docs → Compatibility → License). First action: `git fetch origin main && git merge origin/main` —
+already up to date (no baseline drift).
+
+### Authoring decisions
+- Mermaid only for real moving parts: kv (provider auto-detect → adapters → WatchableKv), queue
+  (auto-discovery → backends → DLQ), watchers (strategy → filter pipeline), auth-kv-oauth (PKCE
+  flow → crypto → KV store). database/cron/prisma-adapter-mysql/auth-better-auth/auth-workos:
+  no diagram (contract/adapter packages). All 4 diagrams parse under mermaid-cli 11.16.0.
+- Install forms pinned to `deno add jsr:@netscript/<pkg>@<version>` + the B1/MCP pinning note;
+  npm/bun `npx jsr add` forms dropped per the exemplar. 0 bare pinnable specifiers (scan below).
+- Public-surface tables sourced from `deno doc --unstable-kv <pkg>/mod.ts` + each `deno.json`
+  exports map, not memory.
+
+### API accuracy — corrections over the inherited text
+- **auth-workos (inherited fence never typechecked):** the old example passed a raw
+  `new WorkOS(...)` to `createWorkosBackend`, which fails TS2322 — `WorkosBackendOptions.workos`
+  is the structural `WorkosSessionClient` port, and the repo's own wiring
+  (`plugins/auth/services/src/backend-registry.ts:164-179`) adapts the SDK via
+  `createWorkosCookieSession`. Fence rewritten to declare `WorkosSessionClient` + `ServiceRouter`;
+  Compatibility prose corrected (package consumes the port; the auth plugin adapts
+  `@workos-inc/node`).
+- **kv:** documented `CACHE_PROVIDER` forcing and the reserved-not-implemented `'nitro'` provider
+  id (source: `packages/kv/application/shared.ts:238-241`, `auto-detect.ts:124`).
+- **cron:** documented that `node`/`temporal` provider ids are reserved and throw
+  (`packages/cron/mod.ts:114-125`); Compatibility states `Deno.cron` sits behind `--unstable-cron`
+  (verified: `deno eval "typeof Deno.cron"` → undefined without flag, function with it) and that
+  auto-detection then falls back to the memory adapter.
+- **queue:** auto-discovery order verified in source (`factory/create-queue.ts detectProvider`):
+  RabbitMQ → Redis → Deno KV; PostgreSQL is explicit-pin only (kept as a backend, not in the
+  discovery sentence).
+- **database:** `./adapters/mysql` documented as riding `@netscript/prisma-adapter-mysql`
+  (verified in `adapters/mysql.adapter.ts:17`); generated-client import in the example replaced
+  with a structural `declare` (the `./generated/client/mod.ts` path is app-owned and cannot
+  typecheck in-repo; `@prisma/client` exports no generated `PrismaClient` type).
+- Free-identifier fences from the old READMEs (`sendWelcomeEmail`, `generateDailyReport`,
+  `prisma`, `request`, `router`) made self-contained with one-line `declare`s.
+
+### Executed examples
+- Fences requiring no external infra were **run**, not just typechecked, from each package dir:
+  - kv: set/get printed `Alice`; `watch` yielded `set ["users","alice"] {...}`; exit 0
+    (watch-terminating run variant; declares stubbed).
+  - cron: memory-adapter path printed `report generated` twice (runOnInit + trigger); exit 0.
+  - watchers: fence run **verbatim**; creating `incoming/test.csv` yielded
+    `create: .../incoming/test.csv`; exit 0.
+  - queue: Deno KV fallback enqueue→listen printed `sent to user@example.com : Welcome to
+    NetScript.`; exit 0.
+- DB/auth fences need real backends (Postgres/MySQL, better-auth schema, OAuth app, WorkOS
+  account): prerequisites stated explicitly above each fence; fences typecheck.
+
+### Gate log (Batch B3B4)
+| Gate | Command | Result |
+| --- | --- | --- |
+| readme-standard (9 files) | `check-readme-standard.ts <9> --pretty` | PASS 9/9 conform |
+| tagline cap | `check-jsr-tagline-length.ts <9> --pretty` | PASS checked=9 over=0 |
+| docs:links | `deno task docs:links` | PASS docs=98, 0 broken |
+| ts-fence typecheck | per-package extract + `deno check --unstable-kv` | PASS 9/9 (10 fences) |
+| executed examples | kv/cron/watchers/queue run transcripts above | PASS 4/4 exit 0 |
+| Mermaid parse | mermaid-cli 11.16.0 over 4 diagrams | PASS 4/4 |
+| Links curl-verified | 18 docs-site + 9 JSR /doc + 3 external URLs | PASS all 200 (better-auth.com 307→200 fixed to apex) |
+| Internal-wording grep | issue-number/process-vocab patterns over 9 files | PASS 0 hits |
+| versionless-specifier scan | bare `jsr:@netscript/*` over 9 files | PASS 0 bare |
+| deno fmt --check (9) | after `deno fmt` | PASS |
+| check:publish-assets | `deno task check:publish-assets` | PASS exit 0 |
+
+Commits: 4d4babe8 (B3 data/state), 4f98aadf (B4 auth).
