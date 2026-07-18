@@ -147,3 +147,8 @@ group launch; this section fixes the supervisor's surface.
   (#826/#802/#804/#818 + wave sub-issues pending wave PR). G7 S2 signed off (real RPC round-trip
   in fixture; honest EXPECTED_FAIL preflight); S3 = real Linux native apply/rollback leg. G5 on
   final slice.
+- 2026-07-18 · Incident: the earlier task kills at ~02:52 also killed the codex exec turn drivers
+  mid-flight — G5/G7 turns aborted leaving uncommitted worktree state; rollouts stale 2h.
+  Recovery: both threads resumed via the sanctioned agentic:codex-resume path with reconcile
+  instructions. Lesson for drift.md: driving long Codex turns as raw `codex exec` children of
+  supervisor background tasks couples their lifetimes; prefer the suite resume tool.

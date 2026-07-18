@@ -12,3 +12,7 @@
   close. (2) No mandatory extra cloud eval: local adversarial/evaluator passes per harness docs
   suffice; an extra OpenHands cloud eval is permitted when the supervisor judges it useful, never
   required; docs PRs are already auto-gated (docs-openhands-eval workflow) — do not duplicate.
+- 2026-07-18 · `significant` · Turn-driver coupling: `codex exec resume` children die with their
+  supervisor background task (observed 02:52 kills aborting G5/G7 turns mid-slice). Mitigation
+  adopted: steer via `.llm/tools/agentic/codex/codex-resume.ts` (suite path). Candidate harness
+  lesson if it recurs.
