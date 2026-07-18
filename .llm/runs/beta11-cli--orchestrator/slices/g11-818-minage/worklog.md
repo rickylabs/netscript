@@ -88,6 +88,7 @@ exception.
 | Time | Slice | Step | Notes |
 | --- | --- | --- | --- |
 | 2026-07-18T02:03:59+02:00 | Plan | Research + Design checkpoint | Re-baselined #818/#817, verified Deno 2.9 config key/parser, inventoried product call sites, locked three implementation slices. |
+| 2026-07-18T02:20:00+02:00 | S1 | Implement + validate | Added the finite release-train inventory and generated JSR-only `P1D` policy with exact exclusions; local mode remains policy-free. |
 
 ## Decisions
 
@@ -105,11 +106,19 @@ exception.
 
 ## Gate Results
 
-No implementation gates have run. PLAN-EVAL is the next hard gate and is owned by a separate,
-supervisor-dispatched session.
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| Tier-A PLAN-EVAL | PASS | Supervisor verdict approved D1–D6 as locked. |
+| Focused generator regression | PASS | `deno test -A --unstable-kv .../generators_test.ts`: 15 passed, 0 failed. |
+| Full touched template directory | PASS | `deno test -A --unstable-kv packages/cli/src/kernel/templates/workspace`: 15 passed, 0 failed. |
+| Generated-config parser smoke | PASS | Deno 2.9.3 subprocess parsed generated JSR config and returned `config-ok`; temporary file removed. |
+| Scoped check/lint/fmt wrappers | PASS | 3 files selected; zero failures/findings. |
+| `quality:scan` | PASS | Repository scan `ok: true`, zero findings; seven existing allowances reported. |
+| `arch:check` | PASS | Exit 0; existing dependency/doctrine warnings only, no new failure. |
 
 ## Handoff Notes
 
-- Plan evaluator should inspect D1–D7, the protected explicit-version case, and S1's exact exclusion
-  inventory first.
-- No product code has been modified.
+- S1 is ready for Tier-A review. The finite list contains scaffold packages, engine packages, and
+  the six published connector packages; every emitted constraint is pinned to
+  `NETSCRIPT_RELEASE_VERSION`.
+- Product changes are limited to the S1 files named in `plan.md`; S2/S3 are untouched.

@@ -49,21 +49,25 @@ first-party `deno x` paths with one explicit `deno run` resolver. No product imp
 
 | Path | Status | Notes |
 | --- | --- | --- |
-| `.llm/runs/beta11-cli--orchestrator/slices/g11-818-minage/*` | new | Plan/Design bootstrap only. |
+| `packages/cli/src/kernel/constants/scaffold/scaffold-workspace-packages.ts` | modified | Finite scaffold, engine, and connector release-train inventory. |
+| `packages/cli/src/kernel/templates/workspace/deno-json.ts` | modified | JSR-only scoped `minimumDependencyAge` policy. |
+| `packages/cli/src/kernel/templates/workspace/generators_test.ts` | modified | Exact exclusions, uniqueness, third-party scope, and local-mode regressions. |
+| `.llm/runs/beta11-cli--orchestrator/slices/g11-818-minage/*` | modified | S1 evidence and handoff. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Plan | READY FOR REVIEW | `research.md`, `plan.md`, `worklog.md#Design` |
-| Static | NOT_RUN | Implementation has not started. |
-| Fitness | NOT_RUN | Selected in plan. |
-| Runtime | NOT_RUN | Selected in plan. |
-| Consumer | NOT_RUN | Selected in plan. |
+| Plan | PASS | Supervisor Tier-A verdict approved D1–D6. |
+| Static | PASS (S1) | Scoped check/lint/fmt wrappers: zero findings. |
+| Fitness | PASS (S1) | `quality:scan` and `arch:check` exited 0. |
+| Runtime | PASS (S1) | Full workspace-template tests: 15/15; generated config parser: `config-ok`. |
+| Consumer | DEFERRED | Full scaffold runtime remains the S3 merge-readiness gate. |
 
 ## Open Questions
 
-- None blocking PLAN-EVAL. Fresh canary proof remains behind the in-turn owner publish stop-line.
+- None blocking the S1 Tier-A review. Fresh canary proof remains behind the in-turn owner publish
+  stop-line.
 
 ## Drift and Debt
 
@@ -72,4 +76,5 @@ first-party `deno x` paths with one explicit `deno run` resolver. No product imp
 
 ## Commits
 
-- See the draft PR's commit list + per-slice PR comments after the plan bootstrap is pushed.
+- `260c5eea` — Plan/Design bootstrap.
+- S1 commit — populated after commit; see draft PR #856 and its S1 evidence comment.
