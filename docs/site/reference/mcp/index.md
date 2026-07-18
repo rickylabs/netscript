@@ -47,9 +47,36 @@ Two entrypoints carry the surface:
 | `ToolFlow`            | type      | The function a tool executes; depends only on ports.       |
 | `ToolName`            | type      | Union of the 13 tool names.                                |
 
-The tools are `get_app_status`, `list_runs`, `get_run`, `get_recent_errors`, `get_last_job_result`,
-`analyze_service_performance`, `analyze_db_bottlenecks`, `doctor`, `search_docs`, `list_docs`,
-`get_doc`, `list_commands`, and `execute_command`.
+### Per-tool contracts
+
+Inputs and result fields below are taken from the published Standard Schema contracts
+(`TOOL_INPUT_SCHEMAS` / `TOOL_OUTPUT_SCHEMAS`), as returned by the live `tools/list`. **Bold**
+inputs are required; every other input is optional. Every `limit` input caps the result count
+server-side before truncation applies.
+
+| Tool                          | Inputs                                                | Result fields                                                                                                                                                     |
+| ----------------------------- | ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `get_app_status`              | `service`, `limit`                                    | `status`, `counts`, `domains`                                                                                                                                     |
+| `list_runs`                   | `domain`, `status`, `service`, `sinceUnixMs`, `limit` | `count`, `runs`                                                                                                                                                   |
+| `get_run`                     | **`id`**                                              | `id`, `summary`, `traceId`, `outcome`, `errorMessage`, `spans`, `logs`                                                                                            |
+| `get_recent_errors`           | `service`, `domain`, `sinceUnixMs`, `limit`           | `count`, `groups`                                                                                                                                                 |
+| `get_last_job_result`         | `jobId`, `jobName`, `service`, `sinceUnixMs`          | `found`, `jobName`, `jobId`, `status`, `outcome`, `exitCode`, `startUnixMs`, `completedUnixMs`, `durationMs`, `errorMessage`, `traceId`                           |
+| `analyze_service_performance` | **`service`**, `sinceUnixMs`, `limit`                 | `service`, `sinceUnixMs`, `sampleCount`, `errorCount`, `errorRate`, `averageDurationMs`, `p50DurationMs`, `p95DurationMs`, `throughputPerMinute`, `topOperations` |
+| `analyze_db_bottlenecks`      | `service`, `sinceUnixMs`, `limit`                     | `sinceUnixMs`, `sampleCount`, `operations`                                                                                                                        |
+| `doctor`                      | `endpoint`                                            | `status`, `endpoint`, `counts`, `checks`, `families`                                                                                                              |
+| `search_docs`                 | **`query`**, `limit`                                  | `count`, `matches`                                                                                                                                                |
+| `list_docs`                   | `limit`                                               | `count`, `docs`                                                                                                                                                   |
+| `get_doc`                     | **`slug`**, `section`                                 | `slug`, `title`, `section`, `content`                                                                                                                             |
+| `list_commands`               | `filter`, `limit`                                     | `count`, `commands`                                                                                                                                               |
+| `execute_command`             | **`command`**, `args`                                 | `exitCode`, `durationMs`, `outputTail`, `truncated`, `timedOut`                                                                                                   |
+
+**Truncation semantics.** After a flow succeeds, `truncateResult` recursively bounds the result
+using `DEFAULT_TRUNCATION_POLICY` — arrays are capped at 50 elements and strings at 2,000 UTF-16
+code units — before the runner serializes it. The analytics tools (`analyze_service_performance`,
+`analyze_db_bottlenecks`) additionally never return raw spans: their results are computed
+aggregates. `execute_command` returns only a bounded combined output tail (4,096 bytes by default)
+and flags `truncated` when output was cut. A failed flow returns a structured tool error (a stable
+`code` plus a message), not a truncated success.
 
 ## Output bounds
 
@@ -75,8 +102,9 @@ deny rule. Deny beats allow; anything unmatched is denied.
 | `CommandPolicyDecision`  | type      | The decision returned for a command path.                        |
 
 The default policy **allows** `db init|generate|migrate|seed|status|introspect`, `generate`,
-`contract`, `service list|status`, `plugin add|list|sync|doctor`, and the `ui` verbs; it **denies**
-`deploy`, `init`, `marketplace`, `db reset`, and `plugin remove`.
+`contract`, `service list`, `plugin install|list|sync|doctor`, and
+`ui:add|ui:init|ui:list|ui:update`; it **denies** `deploy`, `init`, `marketplace`, `db reset`,
+`plugin remove`, and `ui:remove`.
 
 ## Ports
 
