@@ -1,4 +1,7 @@
-import { os } from '@orpc/server';
+// This fixture is copied into generated local-source workspaces whose root
+// import map does not own CLI-E2E-only dependencies. Keep the fixture portable
+// instead of leaking its bare specifier into scaffold type checks.
+import { os } from 'npm:@orpc/server@^1.14.6';
 import { FIXTURE_VERSION, REMOTE_SERVICE_ENV, RENDERER_EVIDENCE_ENV } from './constants.ts';
 
 /** Response crossing remote HTTP, native RPC, and the renderer acknowledgement. */

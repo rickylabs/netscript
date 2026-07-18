@@ -14,6 +14,9 @@ Drift is append-only.
 - **Action:** fail closed and retain evidence; runtime/SDK reconciliation is product scope and was
   not silently patched in this E2E slice.
 - **Evidence:** `.llm/tmp/desktop-native-e2e/evidence.json`; exact one-pass suite exit 1.
+- **CI policy:** the Linux job is temporarily `continue-on-error` while the suite remains
+  fail-closed and uploads/prints its structured `FAIL`. Restore blocking status when the packaged
+  runtime exposes the #841 verification op and the unchanged native gate runs green.
 
 ## 2026-07-18 — Option A supersedes the older single-artifact/graph authority for beta.11 windows
 
