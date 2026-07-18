@@ -25,7 +25,7 @@ you upgrade.
 <h2>The contract is the product</h2>
 
 <p>
-Define it once; everything derives from it — typed service, typed clients, OpenAPI, orchestration.
+Define it once; the typed service and every typed client derive from it — server and callers cannot drift apart.
 The shapes below come straight from a workspace scaffolded by
 <code>netscript init my-app --db postgres --service</code> (abridged).
 </p>
@@ -60,10 +60,10 @@ by default — and the Aspire dashboard shows every resource, trace, and log in 
 <h2>Batteries no frontend framework ships</h2>
 
 <p>
-Frontend meta-frameworks stop at the HTTP boundary. NetScript keeps going: durable jobs,
-compensating sagas, trigger ingress, replayable streams, pluggable auth, and an in-process AI
-surface are first-party plugins — one install scaffolds the workspace, registers the API service,
-provisions storage, and adds the plugin's resources to the Aspire AppHost:
+Durable jobs, compensating sagas, trigger ingress, replayable streams, pluggable auth, an
+in-process AI surface — first-party plugins, in the box, not an integration project. One install
+scaffolds the workspace, registers the API service, provisions storage, and adds the plugin's
+resources to the Aspire AppHost:
 </p>
 
 {{ comp.tabbedCode({ tabs: [

@@ -11,10 +11,10 @@ deploy.**
 What Laravel is to PHP, NetScript aims to be for the TypeScript backend: one coherent framework
 where today you assemble a stack.
 
-Define your API once as an oRPC contract. The typed Hono service, the typed SDK clients, and the
-Fresh UI all derive from it — they cannot drift. Background jobs, sagas, triggers, event streams,
-auth, and AI install as first-party plugins behind the same unified API. .NET Aspire brings the
-whole graph up locally with one command. And it ships: from a single compiled binary to a
+Define your API once as an oRPC contract. The typed Hono service and the typed SDK clients both
+derive from it — server and callers cannot drift apart. Background jobs, sagas, triggers, event
+streams, auth, and AI install as first-party plugins behind the same unified API. .NET Aspire brings
+the whole graph up locally with one command. And it ships: from a single compiled binary to a
 multi-cloud distributed infrastructure, observability on by default, a coding agent able to operate
 the whole workspace.
 
@@ -120,9 +120,9 @@ trace using Deno's built-in OTLP exporter — zero OpenTelemetry SDK dependency 
 
 ## 🔋 Batteries no frontend framework ships
 
-Next.js, Nuxt, SvelteKit, Angular — the frontend meta-frameworks stop at the HTTP boundary.
-NetScript keeps going: durable jobs, compensating sagas, trigger ingress, replayable streams,
-pluggable auth, and an in-process AI surface are first-party plugins, not integrations you assemble.
+Durable jobs, compensating sagas, trigger ingress, replayable streams, pluggable auth, an in-process
+AI surface — first-party plugins, in the box. Not the integration project that Next.js, Nuxt,
+SvelteKit, or Angular leave you to assemble around the frontend.
 
 A plugin is, at its core, a manifest: plain, validated data hosts inspect without executing plugin
 code. One install — `netscript plugin install worker --name workers` — scaffolds the workspace,
