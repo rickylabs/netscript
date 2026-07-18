@@ -4,6 +4,56 @@ import { FRESH_UI_REGISTRY_CONTENT } from '../../../../registry.generated.ts';
 import { freshUiRegistryManifest } from '../../../../registry.manifest.ts';
 import { DesktopUpdatePrompt } from '../../../../registry/components/ui/desktop-update-prompt.tsx';
 import { DesktopWindowChrome } from '../../../../registry/components/ui/desktop-window-chrome.tsx';
+import { DesktopTrayMenu } from '../../../../registry/components/ui/desktop-tray-menu.tsx';
+import { DesktopDialog } from '../../../../registry/components/ui/desktop-dialog.tsx';
+import { DesktopNotification } from '../../../../registry/components/ui/desktop-notification.tsx';
+
+Deno.test('DesktopTrayMenu renders the D3 declaration union and stable action IDs', () => {
+  const html = render(
+    DesktopTrayMenu({
+      source: 'application-menu',
+      items: [
+        { type: 'action', id: 'open-settings', label: 'Settings', accelerator: 'CmdOrCtrl+,' },
+        { type: 'separator' },
+        {
+          type: 'submenu',
+          label: 'Edit',
+          items: [{ type: 'role', role: 'copy' }],
+        },
+      ],
+    }),
+  );
+
+  assertStringIncludes(html, 'data-source="application-menu"');
+  assertStringIncludes(html, 'data-action-id="open-settings"');
+  assertStringIncludes(html, 'CmdOrCtrl+,');
+  assertStringIncludes(html, 'role="separator"');
+  assertStringIncludes(html, 'copy');
+});
+
+Deno.test('DesktopDialog renders explicit alert/confirm/prompt intents without native side effects', () => {
+  const html = render(DesktopDialog({ message: 'Continue?', defaultValue: 'yes' }));
+
+  assertStringIncludes(html, 'data-dialog-kind="alert"');
+  assertStringIncludes(html, 'data-dialog-kind="confirm"');
+  assertStringIncludes(html, 'data-dialog-kind="prompt"');
+  assertStringIncludes(html, 'Continue?');
+});
+
+Deno.test('DesktopNotification renders a request preview without requesting permission', () => {
+  const html = render(
+    DesktopNotification({
+      notification: { title: 'Build complete', body: 'Ready for review.' },
+      disabled: true,
+    }),
+  );
+
+  assertStringIncludes(html, 'data-part="desktop-notification"');
+  assertStringIncludes(html, 'data-state="disabled"');
+  assertStringIncludes(html, 'Build complete');
+  assertStringIncludes(html, 'Ready for review.');
+  assertStringIncludes(html, 'disabled');
+});
 
 Deno.test('DesktopWindowChrome renders only declared documented actions and state', () => {
   const html = render(
@@ -61,18 +111,20 @@ Deno.test('DesktopUpdatePrompt renders the manual Windows installer branch from 
 
 Deno.test('desktop registry items obey the L2 authority chain and form a desktop collection', async () => {
   const itemNames = [
+    'desktop-tray-menu',
+    'desktop-dialog',
+    'desktop-notification',
     'desktop-window-chrome',
     'desktop-update-prompt',
     'desktop-only',
   ];
   const items = freshUiRegistryManifest.items.filter((item) => itemNames.includes(item.name));
   assertEquals(items.map((item) => item.name), itemNames);
-  assertEquals(items.map((item) => item.layer), [2, 2, 2]);
-  assertEquals(items.map((item) => item.copyOwnership), [
-    'app-owned-after-copy',
-    'app-owned-after-copy',
-    'app-owned-after-copy',
-  ]);
+  assertEquals(items.map((item) => item.layer), itemNames.map(() => 2 as const));
+  assertEquals(
+    items.map((item) => item.copyOwnership),
+    itemNames.map(() => 'app-owned-after-copy'),
+  );
 
   const desktopCollection = freshUiRegistryManifest.collections.find((item) =>
     item.name === 'desktop'

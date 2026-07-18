@@ -1176,6 +1176,70 @@ export const freshUiRegistryManifest: RegistryManifest = {
       registryDependencies: ['chart-block', 'donut', 'data-table', 'stats-grid'],
     },
     {
+      name: 'desktop-tray-menu',
+      kind: 'component',
+      layer: 2,
+      description: 'Declarative tray and application-menu preview that emits stable action IDs.',
+      copyOwnership: 'app-owned-after-copy',
+      author: 'NetScript',
+      tags: ['desktop', 'tray', 'menu', 'actions'],
+      files: [
+        {
+          source: 'registry/components/ui/desktop-tray-menu.tsx',
+          target: '@ui/desktop-tray-menu.tsx',
+        },
+        {
+          source: 'registry/components/ui/desktop-tray-menu.css',
+          target: '@assets/ui/desktop-tray-menu.css',
+        },
+      ],
+      registryDependencies: ['theme-seed'],
+      css: [{ layer: 'components', content: "@import './ui/desktop-tray-menu.css';" }],
+    },
+    {
+      name: 'desktop-dialog',
+      kind: 'component',
+      layer: 2,
+      description: 'Side-effect-free alert, confirm, and prompt intents for a desktop controller.',
+      copyOwnership: 'app-owned-after-copy',
+      author: 'NetScript',
+      tags: ['desktop', 'dialog', 'actions'],
+      files: [
+        {
+          source: 'registry/components/ui/desktop-dialog.tsx',
+          target: '@ui/desktop-dialog.tsx',
+        },
+        {
+          source: 'registry/components/ui/desktop-dialog.css',
+          target: '@assets/ui/desktop-dialog.css',
+        },
+      ],
+      registryDependencies: ['theme-seed'],
+      css: [{ layer: 'components', content: "@import './ui/desktop-dialog.css';" }],
+    },
+    {
+      name: 'desktop-notification',
+      kind: 'component',
+      layer: 2,
+      description:
+        'Side-effect-free native notification preview and explicit host request control.',
+      copyOwnership: 'app-owned-after-copy',
+      author: 'NetScript',
+      tags: ['desktop', 'notification', 'feedback'],
+      files: [
+        {
+          source: 'registry/components/ui/desktop-notification.tsx',
+          target: '@ui/desktop-notification.tsx',
+        },
+        {
+          source: 'registry/components/ui/desktop-notification.css',
+          target: '@assets/ui/desktop-notification.css',
+        },
+      ],
+      registryDependencies: ['theme-seed'],
+      css: [{ layer: 'components', content: "@import './ui/desktop-notification.css';" }],
+    },
+    {
       name: 'desktop-window-chrome',
       kind: 'component',
       layer: 2,
@@ -1331,6 +1395,12 @@ export const freshUiRegistryManifest: RegistryManifest = {
         'chart-block',
         'donut',
         'dropzone',
+        'desktop-tray-menu',
+        'desktop-dialog',
+        'desktop-notification',
+        'desktop-window-chrome',
+        'desktop-update-prompt',
+        'desktop-only',
       ],
     },
     {
@@ -1425,6 +1495,9 @@ export const freshUiRegistryManifest: RegistryManifest = {
         'Desktop-gated window chrome and update-ready surfaces for NetScript Fresh applications.',
       items: [
         'theme-seed',
+        'desktop-tray-menu',
+        'desktop-dialog',
+        'desktop-notification',
         'desktop-window-chrome',
         'desktop-update-prompt',
         'desktop-only',

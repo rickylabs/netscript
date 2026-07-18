@@ -72,6 +72,11 @@ the scaffold gallery example and validate it in a real browser.
 | 2026-07-18 | slice 2  | re-baseline     | Rebased (rather than merged) onto `origin/feat/desktop-frontend` @ `46e50cf2`; reviewed slice-1 SHA rewrote from `542c1e98` to `bde4fe50`. Root `arch:check` then passed.         |
 | 2026-07-18 | slice 2  | implementation  | Added L2 window chrome and update prompt components, the hydration-safe desktop-only island, token CSS, desktop manifest collection, generated embeds, and full-dir tests.        |
 | 2026-07-18 | slice 2  | gates           | Full Fresh UI and focused registry dirs, scoped static checks, DS fitness, JSR docs/dry-run, `quality:scan`, and root `arch:check` passed.                                        |
+| 2026-07-18 | slice 2  | Tier-A          | PASS. Supervisor verified the L2 authority chain, D6/D7/D9 behavior, generated-copy parity, and authoritative full test directories.                                              |
+| 2026-07-18 | slice 3  | implementation  | Added self-contained tray/menu, dialog, and notification controls; installed all desktop items in the scaffold foundation/gallery; added the desktop frontend how-to/navigation.  |
+| 2026-07-18 | slice 3  | browser proof   | Generated a real local-source scaffold and exercised `/design/components`: six items, DesktopOnly no-op, zero console errors, theme computed-style change, and 390px no overflow. |
+| 2026-07-18 | slice 3  | gates           | 154 full Fresh UI tests, 69 registry tests, docs verify, scoped static/DS/JSR/quality/architecture gates, and canonical `scaffold.runtime` (60/60) passed.                        |
+| 2026-07-18 | slice 3  | reconcile       | Issue #843 and PR #855 re-read; PR remains draft with `Refs #843`, milestone 13, one `status:impl`, and native smoke still owned by #457.                                         |
 
 ## Decisions
 
@@ -106,6 +111,11 @@ the scaffold gallery example and validate it in a real browser.
 | Desktop export doc lint       | `deno doc --lint packages/fresh-ui/desktop.ts`         | PASS   | Zero diagnostics after the slice-2 dependency additions.            |
 | Package publish dry-run       | `deno publish --dry-run --allow-dirty`                 | PASS   | New registry surface included; no slow-type error.                  |
 | Slice-2 forbidden constructs  | focused source scan                                    | PASS   | No `any`, ambient augmentation, or text/JSON import attributes.     |
+| Slice-3 scoped check          | repo wrapper over Fresh UI + CLI app templates         | PASS   | 145 TS/TSX files; zero diagnostics.                                 |
+| Slice-3 scoped lint/fmt       | repo wrappers over changed source / owned roots        | PASS   | 10 lint files and 147 format files; zero findings.                  |
+| Slice-3 JSR rubric            | doc lint + raw publish dry-run                         | PASS   | `./desktop` clean; package simulation succeeds without slow types.  |
+| Generated assets              | owning generator + post-commit clean-diff gate         | PASS   | Registry and CLI embedded assets are deterministic and current.     |
+| Documentation                 | `deno task --cwd docs/site verify`                     | PASS   | Site builds; 25,189 internal links and all caveat refs resolve.     |
 
 ### Fitness Gates
 
@@ -119,27 +129,33 @@ the scaffold gallery example and validate it in a real browser.
 | L2 authority chain     | PASS          | manifest, generated-copy, DS scans  | Self-contained TSX/CSS pairs, token-only styling, and exact generated copies.                                                                              |
 | Slice-2 `quality:scan` | PASS          | root task                           | Zero findings.                                                                                                                                             |
 | Slice-2 `arch:check`   | PASS          | root task                           | Exit 0 after the integration normalization and slice-2 changes.                                                                                            |
+| Slice-3 L2 authority   | PASS          | DS scans + generated-copy tests     | 158 raw-color and 159 utility files clean; all six desktop items are self-contained.                                                                       |
+| Slice-3 `quality:scan` | PASS          | root task                           | Zero findings.                                                                                                                                             |
+| Slice-3 `arch:check`   | PASS          | root task                           | Exit 0.                                                                                                                                                    |
 
 ### Runtime Gates
 
-| Gate                        | Result  | Evidence                                       | Notes                                                         |
-| --------------------------- | ------- | ---------------------------------------------- | ------------------------------------------------------------- |
-| Browser/Aspire no-op        | PASS    | `tests/desktop/desktop-chrome.test.ts`         | Explicit null and auto-detected non-desktop paths are inert.  |
-| Desktop-gated island        | PASS    | `tests/registry/islands/desktop-only.test.tsx` | SSR/browser default is empty; optional fallback is supported. |
-| Native desktop smoke (#457) | NOT_RUN | issue #843                                     | Explicitly outside this PR's claim.                           |
+| Gate                        | Result  | Evidence                                       | Notes                                                                          |
+| --------------------------- | ------- | ---------------------------------------------- | ------------------------------------------------------------------------------ |
+| Browser/Aspire no-op        | PASS    | `tests/desktop/desktop-chrome.test.ts`         | Explicit null and auto-detected non-desktop paths are inert.                   |
+| Desktop-gated island        | PASS    | `tests/registry/islands/desktop-only.test.tsx` | SSR/browser default is empty; optional fallback is supported.                  |
+| Real browser/Aspire gallery | PASS    | Playwright on generated `/design/components`   | Six items, zero native-only nodes/errors, token theme flip, 390px no overflow. |
+| Native desktop smoke (#457) | NOT_RUN | issue #843                                     | Explicitly outside this PR's claim.                                            |
 
 ### Consumer Gates
 
-| Consumer                    | Result  | Evidence                                                              | Notes                                                                                           |
-| --------------------------- | ------- | --------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| Full Fresh UI tests         | PASS    | `deno test -A --lock=deno.lock --unstable-kv packages/fresh-ui/tests` | 144 passed, 0 failed; `.llm/tmp` scratch directory required by existing Markdown build fixture. |
-| Slice-2 full Fresh UI tests | PASS    | same full-directory command                                           | 151 passed, 0 failed.                                                                           |
-| Full registry test dirs     | PASS    | component UI + island directories                                     | 66 passed, 0 failed; generated content equals source exactly.                                   |
-| Scaffold design gallery     | NOT_RUN | —                                                                     | Planned for slice 3.                                                                            |
+| Consumer                    | Result | Evidence                                                              | Notes                                                                                           |
+| --------------------------- | ------ | --------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| Full Fresh UI tests         | PASS   | `deno test -A --lock=deno.lock --unstable-kv packages/fresh-ui/tests` | 144 passed, 0 failed; `.llm/tmp` scratch directory required by existing Markdown build fixture. |
+| Slice-2 full Fresh UI tests | PASS   | same full-directory command                                           | 151 passed, 0 failed.                                                                           |
+| Full registry test dirs     | PASS   | component UI + island directories                                     | 66 passed, 0 failed; generated content equals source exactly.                                   |
+| Slice-3 full Fresh UI tests | PASS   | full package directory                                                | 154 passed, 0 failed.                                                                           |
+| Slice-3 registry test dirs  | PASS   | component UI + island directories                                     | 69 passed, 0 failed.                                                                            |
+| Scaffold design gallery     | PASS   | generated local-source app + Playwright                               | Real copied controls render and desktop gating no-ops in browser mode.                          |
+| Full scaffold runtime       | PASS   | canonical one-pass command                                            | 60 passed, 0 failed; cleanup completed.                                                         |
 
 ## Handoff Notes
 
-- Tier-A slice-2 review should inspect the exhaustive `AutoUpdateReadyEvent` rendering, absence of
-  fake window semantics, hydration-safe browser no-op, L2 self-containment, and generated-copy
-  proof.
+- Implementation is complete and ready for the supervisor-dispatched IMPL-EVAL.
+- Native desktop smoke remains NOT_RUN and owned by #457; no claim is made here.
 - Do not dispatch evaluation/review from this G5 session; the Fable supervisor owns that action.

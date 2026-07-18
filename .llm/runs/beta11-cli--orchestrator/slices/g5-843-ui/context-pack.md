@@ -6,14 +6,14 @@
 | -------------- | ------------------------------------------- |
 | Run ID         | `beta11-cli--orchestrator/slices/g5-843-ui` |
 | Branch         | `feat/desktop-frontend-843-ui`              |
-| Current phase  | `gate`                                      |
+| Current phase  | `evaluate`                                  |
 | Archetype      | `4 - Public DSL / Builder`                  |
 | Scope overlays | `frontend`                                  |
 
 ## Current State
 
-Group Plan-Gate passed with D1–D9 locked. Slices 1 and 2 are implemented; slice 2 is stopped at its
-Tier-A review boundary. Slice 3 has not started.
+Group Plan-Gate and Tier-A reviews for slices 1 and 2 passed. All three implementation slices are
+complete and the run is stopped for supervisor-dispatched IMPL-EVAL.
 
 ## Completed
 
@@ -33,15 +33,22 @@ Tier-A review boundary. Slice 3 has not started.
   island, token CSS, desktop registry collection/generated embeds, and full-dir tests.
 - Passed 151 full Fresh UI tests, 66 focused registry tests, DS fitness, JSR checks, scoped static
   checks, `quality:scan`, and root `arch:check`.
+- Received Tier-A PASS for slice 2.
+- Added the self-contained D3/D4 tray/menu, dialog, and notification controls; extended the desktop
+  and scaffold foundation collections; regenerated registry and CLI embeds.
+- Added the real design-gallery examples and “Building a desktop frontend the NetScript way” docs
+  page with navigation/xref entries.
+- Passed 154 full Fresh UI tests, 69 focused registry tests, docs verification, real-browser desktop
+  gallery proof, all static/DS/JSR/quality/architecture gates, and `scaffold.runtime` 60/60.
 
 ## In Progress
 
-- Tier-A review of implementation slice 2 by the Fable 5 orchestrator.
+- Supervisor-dispatched IMPL-EVAL; this implementation session will not dispatch it.
 
 ## Next Steps
 
-1. Wait for explicit slice-2 Tier-A PASS or address requested changes.
-2. Only after PASS, begin slice 3 scaffold design-gallery and documentation work.
+1. Run opposite-family IMPL-EVAL from the supervisor-owned evaluator session.
+2. Address only an explicit evaluator or supervisor finding; do not merge or release from G5.
 
 ## Key Decisions
 
@@ -67,19 +74,23 @@ Tier-A review boundary. Slice 3 has not started.
 | `packages/fresh-ui/registry.generated.ts`              | changed | Deterministically regenerated embedded copies.        |
 | `packages/fresh-ui/tests/registry/`                    | changed | Full component and island behavior/copy tests.        |
 | `deno.lock`                                            | changed | Exact SDK subpath dependency resolution.              |
+| `packages/cli/src/kernel/assets/app/`                  | changed | Desktop copies exposed in the real scaffold gallery.  |
+| `packages/cli/src/kernel/assets/embedded.generated.ts` | changed | Regenerated CLI template embeds.                      |
+| `docs/site/how-to/build-a-desktop-frontend.md`         | new     | Desktop frontend composition recipe.                  |
+| `docs/site/_data.ts`, `_data/xref.ts`                  | changed | Docs navigation and cross-reference.                  |
 
 ## Gates
 
-| Gate family | Current status | Evidence                                                                               |
-| ----------- | -------------- | -------------------------------------------------------------------------------------- |
-| Static      | PASS           | Scoped check/lint/fmt, new-export doc lint, package dry-run.                           |
-| Fitness     | PASS           | DS scans, `quality:scan`, and root `arch:check` pass.                                  |
-| Runtime     | PASS           | Full 151-test Fresh UI directory and 66 focused registry tests; #457 remains external. |
-| Consumer    | PARTIAL        | Generated-copy fidelity passes; real scaffold gallery belongs to slice 3.              |
+| Gate family | Current status | Evidence                                                                      |
+| ----------- | -------------- | ----------------------------------------------------------------------------- |
+| Static      | PASS           | Scoped check/lint/fmt, new-export doc lint, package dry-run.                  |
+| Fitness     | PASS           | DS scans, `quality:scan`, and root `arch:check` pass.                         |
+| Runtime     | PASS           | 154 full Fresh UI tests and 69 focused registry tests; #457 remains external. |
+| Consumer    | PASS           | Real browser gallery proof and full scaffold runtime 60/60.                   |
 
 ## Open Questions
 
-- Tier-A disposition of slice 2.
+- IMPL-EVAL verdict, owned by the supervisor-dispatched evaluator.
 
 ## Drift and Debt
 
