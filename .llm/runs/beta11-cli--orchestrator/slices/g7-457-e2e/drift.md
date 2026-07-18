@@ -2,6 +2,19 @@
 
 Drift is append-only.
 
+## 2026-07-18 — Packaged runtime lacks the #841 verification op
+
+- **What:** The real Linux package/install/TLS run fetched the signed v2 manifest, then
+  `Deno.autoUpdate` reported `op_desktop_verify_ed25519 is not a function`.
+- **Expected:** The packaged runtime exposes the native verifier consumed by the #841 SDK seam,
+  allowing v2 staging/apply and bad-v3 failed-launch rollback.
+- **Actual:** Linux remains a structured `FAIL`; Windows and macOS remain `NOT_RUN`. Portable
+  fixture/RPC gates are green but do not substitute for native update success.
+- **Severity:** significant
+- **Action:** fail closed and retain evidence; runtime/SDK reconciliation is product scope and was
+  not silently patched in this E2E slice.
+- **Evidence:** `.llm/tmp/desktop-native-e2e/evidence.json`; exact one-pass suite exit 1.
+
 ## 2026-07-18 — Option A supersedes the older single-artifact/graph authority for beta.11 windows
 
 - **What:** Earlier issue/RFC material described a single-artifact or snapshot/graph updater and

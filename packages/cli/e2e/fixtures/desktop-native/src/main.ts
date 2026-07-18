@@ -1,5 +1,10 @@
 import { bindDesktopRpcWindow } from '@netscript/fresh/desktop';
 import { startAutoUpdate } from '@netscript/sdk/auto-update';
+import {
+  EXPECTED_UPDATE_EVENT_ENV,
+  RENDERER_EVIDENCE_ENV,
+  UPDATE_EVIDENCE_ENV,
+} from './constants.ts';
 import { desktopFixtureRouter } from './router.ts';
 
 interface NativeFixtureWindow extends EventTarget {
@@ -8,6 +13,7 @@ interface NativeFixtureWindow extends EventTarget {
     handler: (operation: unknown, payload?: unknown) => Promise<unknown>,
   ): void;
   unbind(name: string): void;
+  close(): void;
 }
 
 const browserWindow = Reflect.get(Deno, 'BrowserWindow');
@@ -29,17 +35,34 @@ if (binding.status !== 'bound') {
 const releaseBaseUrl = Deno.env.get('NETSCRIPT_DESKTOP_E2E_RELEASE_URL');
 const publicKey = Deno.env.get('NETSCRIPT_DESKTOP_E2E_PUBLIC_KEY');
 const manualUpdateUrl = Deno.env.get('NETSCRIPT_DESKTOP_E2E_MANUAL_URL');
+const expectedUpdateEvent = Deno.env.get(EXPECTED_UPDATE_EVENT_ENV) ?? 'none';
+let resolveUpdateEvent: (() => void) | undefined;
+const updateEvent = expectedUpdateEvent === 'none'
+  ? Promise.resolve()
+  : new Promise<void>((resolve) => resolveUpdateEvent = resolve);
+
+async function recordUpdateEvent(kind: 'ready' | 'rollback', event: unknown): Promise<void> {
+  const path = Deno.env.get(UPDATE_EVIDENCE_ENV);
+  if (!path) throw new Error(`${UPDATE_EVIDENCE_ENV} is required for ${kind} evidence.`);
+  await Deno.writeTextFile(path, `${JSON.stringify({ kind, event })}\n`);
+  if (expectedUpdateEvent === kind) resolveUpdateEvent?.();
+}
+
 if (releaseBaseUrl && publicKey && manualUpdateUrl) {
   startAutoUpdate({
     release: { baseUrl: releaseBaseUrl, publicKey, manualUpdateUrl },
     policy: { checkOnLaunch: true },
-    onUpdateReady(event) {
+    onUpdateReady(event): void {
       console.log(`NETSCRIPT_DESKTOP_UPDATE_READY ${JSON.stringify(event)}`);
+      void recordUpdateEvent('ready', event);
     },
-    onRollback(event) {
+    onRollback(event): void {
       console.log(`NETSCRIPT_DESKTOP_ROLLBACK ${JSON.stringify(event)}`);
+      void recordUpdateEvent('rollback', event);
     },
   });
+} else if (expectedUpdateEvent !== 'none') {
+  throw new Error('Expected updater evidence but release configuration is incomplete.');
 }
 
 const renderer = await Deno.readTextFile(
@@ -56,7 +79,23 @@ const server = Deno.serve(() =>
   })
 );
 
-window.addEventListener('close', async () => {
-  await binding.close();
-  await server.shutdown();
-});
+async function waitForFile(path: string, timeoutMs = 30_000): Promise<void> {
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    try {
+      await Deno.stat(path);
+      return;
+    } catch (error) {
+      if (!(error instanceof Deno.errors.NotFound)) throw error;
+    }
+    await new Promise((resolve) => setTimeout(resolve, 50));
+  }
+  throw new Error(`Timed out waiting for renderer evidence at ${path}.`);
+}
+
+const rendererEvidence = Deno.env.get(RENDERER_EVIDENCE_ENV);
+if (!rendererEvidence) throw new Error(`${RENDERER_EVIDENCE_ENV} is required.`);
+await Promise.all([waitForFile(rendererEvidence), updateEvent]);
+await binding.close();
+await server.shutdown();
+window.close();

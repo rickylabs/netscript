@@ -114,6 +114,10 @@ documenting whether the leg is blocking or `NOT_RUN`. Do not add shell logic to 
 | 2026-07-18            | 1         | Tier-A review     | User supplied substantive `PASS` and sign-off for commit `4ccfac47`; authorized proceeding to S2.                                                                                                          |
 | 2026-07-18            | 2         | implementation    | Added the versioned native fixture, typed runtime/renderer RPC path, exact remote discovery key, renderer evidence acknowledgement, browser bundle proof, and #456-compatible ephemeral signing material.  |
 | 2026-07-18            | 2         | reconcile         | Portable fixture/consumer proof is green, but is not called a native-window run. Linux native install/update/rollback remains `NOT_RUN` until S3 executes it on this host.                                 |
+| 2026-07-18            | 2         | Tier-A review     | User supplied `PASS` for `097327b1`, authorized S3, and required the real Linux outcome even if failing.                                                                                                    |
+| 2026-07-18            | 3         | implementation    | Added CLI `.deb` packaging, alternate-root `dpkg`, ephemeral CA/server TLS, #456 signed release serving, native launches, apply/rollback assertions, fail-closed platform legs, blocking CI, and owner invocations. |
+| 2026-07-18            | 3         | real Linux gate   | Exact one-pass suite exited 1: preflight and fixture passed; installed v1 fetched the signed v2 manifest, then #841 verification failed because packaged runtime op `op_desktop_verify_ed25519` was unavailable. Structured `FAIL` retained in `.llm/tmp/desktop-native-e2e/evidence.json`. |
+| 2026-07-18            | 3         | platform honesty  | Windows MSI/manual and macOS best-effort legs are `NOT_RUN`; host-applicable pending legs fail closed and README records native owner invocations. No green claim was made.                               |
 
 ## Decisions
 
@@ -151,6 +155,9 @@ documenting whether the leg is blocking or `NOT_RUN`. Do not add shell logic to 
 | S2 scoped check         | `run-deno-check.ts --root packages/cli/e2e --ext ts,tsx` | PASS    | 100 files; 0 findings.                                                                  |
 | S2 scoped lint          | `run-deno-lint.ts --root packages/cli/e2e --ext ts,tsx`  | PASS    | 100 files; 0 findings.                                                                  |
 | S2 scoped format        | `run-deno-fmt.ts --root packages/cli/e2e --ext ts,tsx`   | PASS    | 100 files; 0 findings.                                                                  |
+| S3 full CLI-E2E tests   | `deno test --allow-all packages/cli/e2e/tests/`          | PASS    | 47 passed, 0 failed.                                                                    |
+| S3 fixture tests        | fixture `deno task test`                                 | PASS    | 4 passed, 0 failed.                                                                     |
+| S3 scoped check/lint/fmt| scoped wrappers                                           | PASS    | 104 files; 0 findings after reconciliation.                                              |
 
 ### Fitness Gates
 
@@ -163,6 +170,8 @@ documenting whether the leg is blocking or `NOT_RUN`. Do not add shell logic to 
 | Doc lint                | BASELINE_FAIL      | `deno task doc:lint --root packages/cli/e2e --pretty`   | 83 existing surface errors. Added `PlatformPort.current()` JSDoc; no new missing-doc error remains.                                          |
 | S2 quality scan         | PASS               | root `quality:scan` + focused `--root packages/cli/e2e` | No findings; focused allow count 0.                                                                                                          |
 | S2 architecture         | BASELINE_FAIL      | `deno task arch:check`                                  | Stops at pre-existing CLI/Fresh `@netscript/sdk` range divergence; focused doctrine is FAIL=0, WARN=8, INFO=1 with pre-existing findings.    |
+| S3 quality scan         | PASS               | root + focused scan                                     | No findings; focused allow count 0.                                                                                                          |
+| S3 architecture         | BASELINE_FAIL      | `deno task arch:check`                                  | Same pre-existing CLI/Fresh `@netscript/sdk` range divergence. Focused doctrine: FAIL=0.                                                       |
 
 ### Runtime Gates
 
@@ -173,6 +182,7 @@ documenting whether the leg is blocking or `NOT_RUN`. Do not add shell logic to 
 | S2 fixture suite            | PASS          | same one-pass suite command                                             | Exit 0; preflight and portable fixture contract passed 2/2. Native Linux gates do not exist until S3.               |
 | Windows MSI staged/manual   | NOT_RUN       | owner-hosted                                                            | Code/docs only in this environment.                                                                                 |
 | macOS native apply/rollback | NOT_RUN       | no macOS host                                                           | Best effort.                                                                                                        |
+| S3 Linux native suite       | FAIL          | exact one-pass suite; structured evidence                               | Package/dpkg/TLS fetch succeeded; missing `op_desktop_verify_ed25519` stopped staging, so apply/rollback did not run.                         |
 
 ### Consumer Gates
 

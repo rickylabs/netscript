@@ -5,6 +5,7 @@ import { PACKAGE_SOURCE, REPORT_FORMAT } from '../../src/domain/extension-axes.t
 import type { RunOptions } from '../../src/domain/run-context.ts';
 import type { SuiteDefinition } from '../../src/domain/suite-definition.ts';
 import { commandGate } from '../../src/application/gates/scaffold/gate-factory.ts';
+import { EXECUTION_PLATFORMS } from '../../src/domain/platform.ts';
 
 /** Build the native desktop deployment acceptance suite contract. */
 export function createDesktopNativeDeploySuite(
@@ -28,8 +29,69 @@ export function createDesktopNativeDeploySuite(
     gates: Object.freeze([
       createFixturePreflightGate(repoRoot),
       createFixtureContractGate(repoRoot),
+      createLinuxNativeGate(repoRoot),
+      createUnavailableNativeGate(repoRoot, EXECUTION_PLATFORMS.WINDOWS),
+      createUnavailableNativeGate(repoRoot, EXECUTION_PLATFORMS.DARWIN),
     ]),
   });
+}
+
+function createUnavailableNativeGate(
+  repoRoot: string,
+  platform: typeof EXECUTION_PLATFORMS.WINDOWS | typeof EXECUTION_PLATFORMS.DARWIN,
+) {
+  const gateId = platform === EXECUTION_PLATFORMS.WINDOWS
+    ? GATE.DEPLOY_DESKTOP_WINDOWS_NATIVE
+    : GATE.DEPLOY_DESKTOP_DARWIN_NATIVE;
+  const gate = commandGate(
+    gateId,
+    `Record the ${platform} native owner-host leg as NOT_RUN`,
+    GATE_PHASE.BEHAVIOR,
+    () => [
+      'deno',
+      'run',
+      '--allow-env',
+      join(
+        repoRoot,
+        'packages',
+        'cli',
+        'e2e',
+        'src',
+        'adapters',
+        'native-desktop',
+        'unavailable-platform-driver.ts',
+      ),
+      '--platform',
+      platform,
+    ],
+  );
+  return { ...gate, platforms: [platform] } as const;
+}
+
+function createLinuxNativeGate(repoRoot: string) {
+  const gate = commandGate(
+    GATE.DEPLOY_DESKTOP_LINUX_NATIVE,
+    'Install and prove Linux native apply and failed-launch rollback',
+    GATE_PHASE.BEHAVIOR,
+    () => [
+      'deno',
+      'run',
+      '--allow-all',
+      join(
+        repoRoot,
+        'packages',
+        'cli',
+        'e2e',
+        'src',
+        'adapters',
+        'native-desktop',
+        'linux-native-driver.ts',
+      ),
+      '--repo-root',
+      repoRoot,
+    ],
+  );
+  return { ...gate, platforms: [EXECUTION_PLATFORMS.LINUX] } as const;
 }
 
 function createFixtureContractGate(repoRoot: string) {
