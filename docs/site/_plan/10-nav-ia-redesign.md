@@ -10,7 +10,7 @@ from P1 (capability-native) and P3 (Diátaxis-separation).
 
 The problem being solved: today's sidebar is a hand-rolled flat `navSections` array in `_data.ts` —
 13 sections, ~120 always-visible links, 37 duplicate listings (the same page in 2–3 sections),
-13 pillar guide pages orphaned from nav, and no hierarchy/collapse. The Lume nav plugin derives the
+14 pillar guide pages unlisted in nav (counting agent-tooling), and no hierarchy/collapse. The Lume nav plugin derives the
 tree from page URLs, so the folder layout must become the IA.
 
 ## 1. Decision summary
@@ -160,13 +160,15 @@ depth below a lane: L1 pillar/track/unit → L2 leaf/how-to-node → L3 recipe/c
       durability-model/ observability/ aspire/                                  [KEEP]  L2 (7 essays)
 
 ━━ (not in any nav lane) ━━
-  /capabilities/*.md  (16 existing shims → pillar dirs)                         [KEEP as shims]  nav_hide
+  /capabilities/*.md  (16 non-index shims + index.md → pillar dirs)             [KEEP as shims]  nav_hide
   + 28 NEW redirect entries at every [MOVE] source (27 recipes + agent-tooling) [NEW]            auto-unlisted via redirects plugin
 ```
 
 **Verified totals:** 28 pages MOVE · 2 NEW pages (`/quickstart/aspire/`, optional — §8) ·
-9 NEW `how-to/index.md` · 15 pages surface in nav for the first time (13 orphan guides +
-`telemetry/convention` + `mcp`) · **37 duplicate listings removed** · **0 reference URLs changed**.
+9 NEW `how-to/index.md` · 16 pages surface in nav for the first time (14 pillar guides currently
+unlisted — counting `agent-tooling`, which re-homes to `/ai/` — + `telemetry/convention` + `mcp`) ·
+**37 duplicate listings removed** (today's sidebar: 147 entries, 110 unique hrefs) · **0 reference
+URLs changed**.
 
 ## 3. Sidebar & nav plugin implementation
 
@@ -212,16 +214,19 @@ with `order` front matter.
   Pillar/track/how-to **index pages get `order: 0`** so the hub sorts first. Tutorial chapters need
   no `order` — their `NN-` basename sorts under the `basename` tiebreak. Recipes get an
   `order: 100+` band so they always cluster after guides inside a pillar.
-- `nav_hide: true` filtered out via the `"nav_hide!=true"` query (verified: negation valid,
-  undefined passes). The Lume `redirects` plugin auto-sets `unlisted: true` on moved-from URLs,
-  which also excludes them — so the 28 new shims need no manual flag; only the 5
-  `tutorials/eis-chat/*` shims (which live under a rendered root) and the retired `/how-to/`
-  catalog need explicit `nav_hide`.
+- `nav_hide: true` filtered out via the `"nav_hide!=true isRedirect!=true"` query (verified:
+  negation valid, undefined passes). The Lume `redirects` plugin flags its generated pages
+  `isRedirect: true` (redirects.ts:126 — it does **not** set `unlisted`), and every moved-from URL
+  lives under `/how-to/` or `/capabilities/`, outside all nav.menu roots; the `isRedirect!=true`
+  term is belt-and-braces. Only the 5 `tutorials/eis-chat/*` shims (which live under a rendered
+  root) and the retired `/how-to/` catalog need explicit `nav_hide`.
 - `nav_title: <str>` only where the sidebar label must differ from the page H1 (today's curated
   labels like "The Fresh page model" diverge from H1s). Template reads
   `node.data.nav_title || node.data.title`.
-- Every folder already has `index.md` (verified) → every section node carries `data`, so every
-  `<summary>` is clickable and `order`-sort is hazard-free (no page-less intermediate nodes).
+- Every **nav-rendered content root and its subfolders** (tutorials/*, the nine pillar dirs,
+  reference/*, explanation/) already has `index.md` (verified; scope excludes non-content dirs like
+  `_components`/`assets`/`styles`) → every section node carries `data`, so every `<summary>` is
+  clickable and `order`-sort is hazard-free (no page-less intermediate nodes).
 
 **`base.vto` (replace lines 47–72).** Loop `navLanes`:
 
@@ -248,9 +253,9 @@ Behavior change accepted: one deterministic trail replaces "last matching sectio
 
 **Next/prev (`nextPrev.vto`).** Keep front-matter-driven for tutorials (per-chapter editorial
 control; it never touched `navSections`, cannot break). For Reference (32 units, unmaintainable by
-hand) auto-derive with the **correct** signature (all three source proposals misused it; verified:
-`nav.nextPage(url, basePath, query, sort)`, 2nd arg is basePath):
-`nav.nextPage(url, "/reference/", "", "order basename")` / `nav.previousPage(...)`.
+hand) auto-derive with the verified v2.5.4 signature — `nav.nextPage(url, query?, sort?)` /
+`nav.previousPage(url, query?, sort?)` (there is **no** basePath argument; nav.ts:85/111). Scope to
+the reference lane via the query: `nav.nextPage(url, "url^=/reference/", "order basename")`.
 
 **Untouched chrome (verified nav-agnostic):** `<aside data-sidebar>` shell, brand header, mobile
 toggle/backdrop JS, theme toggle, TOC/scroll-spy, code-copy, tabbed-code, edit-this-page footer,
@@ -292,8 +297,9 @@ once (Concepts-second alternatives were penalized for inverting do-before-unders
 
 ## 5. Cross-reference & migration plan
 
-**Verified counts (re-checked in-repo 2026-07-18):** 32 reference dirs on disk (`mcp` present,
-unregistered) · 27 recipes (flat `.md`) · 26 `howto:` keys incl. `howto:index` → 25 recipe keys;
+**Verified counts (re-checked in-repo 2026-07-18):** 32 reference unit dirs on disk (`mcp` present,
+unregistered; today's `referenceUnits` nav array has 33 entries because `cli/commands` and
+`ai/skills` ride as extra rows) · 27 recipes (flat `.md`, excluding `index.md`) · 26 `howto:` keys incl. `howto:index` → 25 recipe keys;
 exactly 2 recipes UNKEYED: `build-a-durable-chat`, `deploy-deno-deploy` · ~517 hardcoded absolute
 markdown links (`](/…)` form; 533 in the broader sweep incl. anchored/mixed forms) + 25 relative
 links · 61 hardcoded inbound to `/how-to/<slug>` (markdown form) · 6 inbound to `agent-tooling` ·
@@ -393,7 +399,7 @@ changes; 1 registration.
 - `/quickstart/aspire/` (if authored): new thin page framed as TS AppHost inspection, never .NET.
 - `/why/` + `/`: verify Aspire hero framing, alpha framing, no banned superlative claims.
 
-The 13 formerly nav-orphan pillar guides need **no prose change** — they only gain nav homes.
+The 13 formerly nav-orphan pillar guides already in their pillar dirs need **no prose change** — they only gain nav homes.
 
 ## 7. Rejected alternatives
 
