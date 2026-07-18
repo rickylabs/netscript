@@ -6,12 +6,15 @@ import type { HttpClient } from '../../ports/http-client.ts';
 import type { StepResult } from '../../domain/report.ts';
 import { CommandGate } from '../gates/command-gate.ts';
 import { HttpGate } from '../gates/http-gate.ts';
+import { NATIVE_DESKTOP_SUITE_STATUSES } from '../../domain/platform.ts';
+import type { PlatformPort } from '../../ports/platform.ts';
 
 /** Ports required to execute semantic gates. */
 export interface GateRunnerOptions {
   readonly clock: Clock;
   readonly commandExecutor: CommandExecutor;
   readonly httpClient: HttpClient;
+  readonly platform: PlatformPort;
 }
 
 /** Execute one gate and convert it to a report step. */
@@ -23,7 +26,8 @@ export async function runGate(
   const started = options.clock.monotonicMs();
   let result: GateResult;
   try {
-    result = await executeGate(gate, context, options);
+    result = skipUnsupportedPlatform(gate, options.platform) ??
+      await executeGate(gate, context, options);
   } catch (error) {
     result = {
       id: gate.id,
@@ -37,6 +41,32 @@ export async function runGate(
   return {
     ...result,
     durationMs: Math.round(options.clock.monotonicMs() - started),
+  };
+}
+
+function skipUnsupportedPlatform(
+  gate: GateDefinition,
+  platformPort: PlatformPort,
+): GateResult | undefined {
+  if (!gate.platforms) return undefined;
+  const platform = platformPort.current();
+  if (gate.platforms.includes(platform)) return undefined;
+  const supportedPlatforms = [...gate.platforms];
+  return {
+    id: gate.id,
+    title: gate.title,
+    critical: gate.critical,
+    verdict: 'skipped',
+    evidence: [{
+      kind: 'summary',
+      label: 'platform applicability',
+      data: {
+        status: NATIVE_DESKTOP_SUITE_STATUSES.NOT_RUN,
+        platform,
+        supportedPlatforms,
+        reason: `Gate requires one of: ${supportedPlatforms.join(', ')}.`,
+      },
+    }],
   };
 }
 

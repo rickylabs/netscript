@@ -243,9 +243,74 @@ jobs:
             **/e2e-report*.json
           if-no-files-found: ignore
 
+  desktop-native-linux:
+    name: desktop-native-linux (deb + signed updater)
+    needs: classify
+    if: ${{ !cancelled() && needs.classify.result != 'skipped' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: "2.9.0"
+
+      - name: Install native packaging and desktop prerequisites
+        run: >-
+          sudo apt-get update && sudo apt-get install --yes
+          bsdiff libgtk-3-0 libwebkit2gtk-4.1-0
+
+      - name: Install workspace dependencies
+        run: deno install
+
+      - name: Native desktop package, install, update, and rollback (one pass)
+        id: native_suite
+        # TEMPORARY NON-BLOCKING POLICY: remove step tolerance when the packaged
+        # runtime ships the #841 verification op. See the G7 drift entry
+        # "Packaged runtime lacks the #841 verification op" for fail-closed evidence.
+        continue-on-error: true
+        run: deno task e2e:cli run deploy.desktop-native --cleanup --format pretty
+
+      - name: Summarize native desktop upstream gap (LOUD, never masks suite evidence)
+        if: always()
+        env:
+          EVIDENCE: .llm/tmp/desktop-native-e2e/evidence.json
+          NATIVE_SUITE_OUTCOME: ${{ steps.native_suite.outcome }}
+          DRIFT_URL: >-
+            ${{ github.server_url }}/${{ github.repository }}/blob/${{ github.sha }}/.llm/runs/beta11-cli--orchestrator/slices/g7-457-e2e/drift.md#2026-07-18--packaged-runtime-lacks-the-841-verification-op
+        run: |
+          echo '::warning title=DESKTOP NATIVE E2E IS NON-BLOCKING PENDING UPSTREAM OP::The suite remains fail-closed; inspect the structured evidence and linked drift investigation.'
+          {
+            printf '# ⚠️ DESKTOP NATIVE LINUX: NON-BLOCKING UPSTREAM GAP — step outcome: `%s` (failure tolerated)\n' "$NATIVE_SUITE_OUTCOME"
+            echo
+            echo 'The native suite ran unchanged. Its failure is retained as evidence; CI policy alone is temporarily non-blocking pending the owner rescope decision.'
+            echo
+            printf '[Upstream-gap investigation and flip-back condition](%s)\n' "$DRIFT_URL"
+            echo
+            echo '## Structured suite evidence'
+            echo '```json'
+            if [ -f "$EVIDENCE" ]; then
+              sed -n '1,240p' "$EVIDENCE"
+            else
+              echo '{"status":"FAIL","reason":"structured evidence file was not produced"}'
+            fi
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload native desktop evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-cli-desktop-native-linux-report
+          path: .llm/tmp/desktop-native-e2e/evidence.json
+          if-no-files-found: warn
+
   lane-visibility:
     name: scaffold CI lane visibility
-    needs: [classify, scaffold-static, scaffold-runtime]
+    needs: [classify, scaffold-static, scaffold-runtime, desktop-native-linux]
     if: ${{ always() && github.event_name == 'pull_request' }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -257,6 +322,7 @@ jobs:
           RUN_RUNTIME: ${{ needs.classify.outputs.run_runtime }}
           STATIC_RESULT: ${{ needs.scaffold-static.result }}
           RUNTIME_RESULT: ${{ needs.scaffold-runtime.result }}
+          DESKTOP_NATIVE_LINUX_RESULT: ${{ needs.desktop-native-linux.result }}
         run: |
           describe_scaffold_lane() {
             selected="$1"

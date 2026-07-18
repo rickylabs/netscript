@@ -23,11 +23,13 @@ export const SCAFFOLD_TITLE = {
 /** Built-in deploy suites. */
 export const DEPLOY = {
   TARGETS: 'deploy.targets',
+  DESKTOP_NATIVE: 'deploy.desktop-native',
 } as const;
 
 /** Stable titles for deploy suites. */
 export const DEPLOY_TITLE = {
   TARGETS: 'Deploy target acceptance smoke',
+  DESKTOP_NATIVE: 'Native desktop deployment acceptance',
 } as const;
 
 /** Gate phases in suite execution order. */
@@ -107,6 +109,11 @@ export const GATE = {
   BEHAVIOR_PLUGINS_HEALTH: 'behavior.plugins-health',
   DEPLOY_DENO_DEPLOY_PLAN: 'deploy.deno-deploy.plan',
   DEPLOY_COMPOSE_RESOLUTION: 'deploy.compose-resolution',
+  DEPLOY_DESKTOP_PREFLIGHT: 'deploy.desktop.preflight',
+  DEPLOY_DESKTOP_FIXTURE: 'deploy.desktop.fixture',
+  DEPLOY_DESKTOP_LINUX_NATIVE: 'deploy.desktop.linux-native',
+  DEPLOY_DESKTOP_WINDOWS_NATIVE: 'deploy.desktop.windows-native',
+  DEPLOY_DESKTOP_DARWIN_NATIVE: 'deploy.desktop.darwin-native',
   USERLAND_INSTALL_ASSERTIONS: 'userland-install.assertions',
   BEHAVIOR_OTEL_WEBHOOK: 'behavior.otel.webhook',
   BEHAVIOR_OTEL_STREAM_CONSUMER: 'behavior.otel.stream-consumer',
