@@ -1,6 +1,6 @@
 {
   "name": "@netscript/contracts",
-  "version": "0.0.1-beta.10",
+  "version": "0.0.1-beta.11",
   "description": "NetScript contract primitives, common schemas, CRUD generators, query helpers, and transform helpers.",
   "license": "Apache-2.0",
   "exports": {

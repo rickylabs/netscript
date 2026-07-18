@@ -1,6 +1,6 @@
 {
   "name": "@netscript/mcp",
-  "version": "0.0.1-beta.10",
+  "version": "0.0.1-beta.11",
   "description": "Token-bounded MCP tools for NetScript diagnostics, telemetry insights, docs, and CLI actions.",
   "license": "Apache-2.0",
   "exports": {
@@ -8,9 +8,9 @@
     "./cli": "./cli.ts"
   },
   "imports": {
-    "@netscript/aspire": "jsr:@netscript/aspire@0.0.1-beta.10",
-    "@netscript/telemetry/attributes": "jsr:@netscript/telemetry@0.0.1-beta.10/attributes",
-    "@netscript/telemetry/query": "jsr:@netscript/telemetry@0.0.1-beta.10/query",
+    "@netscript/aspire": "jsr:@netscript/aspire@0.0.1-beta.11",
+    "@netscript/telemetry/attributes": "jsr:@netscript/telemetry@0.0.1-beta.11/attributes",
+    "@netscript/telemetry/query": "jsr:@netscript/telemetry@0.0.1-beta.11/query",
     "@standard-schema/spec": "jsr:@standard-schema/spec@1.1.0",
     "@std/assert": "jsr:@std/assert@^1",
     "@std/path": "jsr:@std/path@^1"

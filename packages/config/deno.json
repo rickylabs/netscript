@@ -1,6 +1,6 @@
 {
   "name": "@netscript/config",
-  "version": "0.0.1-beta.10",
+  "version": "0.0.1-beta.11",
   "license": "Apache-2.0",
   "description": "Typed NetScript project configuration schemas, loaders, environment helpers, and scaffold constants.",
   "exports": {
