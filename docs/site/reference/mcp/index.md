@@ -1,14 +1,15 @@
 ---
 layout: layouts/base.vto
 title: '@netscript/mcp'
+templateEngine: [vento, md]
 ---
 
 # `@netscript/mcp`
 
 The Model Context Protocol server for NetScript workspaces. This page describes the package's public
 surface and is maintained by hand; the authoritative, always-current symbol list is
-[`deno doc jsr:@netscript/mcp`](https://jsr.io/@netscript/mcp/doc). For the full index of packages
-and plugins return to the [reference overview](/reference/).
+[`deno doc jsr:@netscript/mcp{{ releaseSpecifier }}`](https://jsr.io/@netscript/mcp/doc). For the
+full index of packages and plugins return to the [reference overview](/reference/).
 
 `@netscript/mcp` publishes 13 token-bounded MCP tools that let a coding agent monitor a running app,
 debug a correlated execution, read framework-semantic telemetry, run the doctor, search the public
@@ -47,12 +48,14 @@ Two entrypoints carry the surface:
 | `ToolFlow`            | type      | The function a tool executes; depends only on ports.       |
 | `ToolName`            | type      | Union of the 13 tool names.                                |
 
-### Per-tool contracts
+### Per-tool field overview
 
-Inputs and result fields below are taken from the published Standard Schema contracts
-(`TOOL_INPUT_SCHEMAS` / `TOOL_OUTPUT_SCHEMAS`), as returned by the live `tools/list`. **Bold**
-inputs are required; every other input is optional. Every `limit` input caps the result count
-server-side before truncation applies.
+The table below is a **top-level field overview** — input names and result field names per tool,
+taken from the live `tools/list`. It is not the complete contract: types, enum values, numeric
+bounds, array maxima, nested shapes, and required-vs-optional result fields live in the published
+Standard Schema contracts (`TOOL_INPUT_SCHEMAS` / `TOOL_OUTPUT_SCHEMAS`), which every `tools/list`
+response returns in full. **Bold** inputs are required; every other input is optional. Every `limit`
+input caps the result count server-side before truncation applies.
 
 | Tool                          | Inputs                                                | Result fields                                                                                                                                                     |
 | ----------------------------- | ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |

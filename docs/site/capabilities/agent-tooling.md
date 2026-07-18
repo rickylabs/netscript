@@ -100,14 +100,16 @@ with a structured denial before a process is started.
 ## Troubleshooting
 
 Start with the `doctor` tool: it aggregates four check families — `telemetry`, `aspire`, `project`,
-and `plugins` — into one verdict, and each check carries a `pass`, `warn`, or `fail` status with a
-suggested fix. Reading the result:
+and `plugins` — into one verdict. Each check carries a `pass`, `warn`, or `fail` status, and
+warnings and failures may include a suggested fix. Reading the result:
 
 - **`telemetry` warns or fails** — no reachable telemetry endpoint. Verify the app is running, then
   check the discovery chain: `--endpoint`, `NETSCRIPT_TELEMETRY_ENDPOINT`, `ASPIRE_DASHBOARD_PORT`,
   and the local default `http://localhost:18888`. Telemetry tools still respond while the endpoint
-  is down — they return a structured `warn`/`fail` result (for example `get_app_status` with
-  `status: "warn"` and zero counts), never a crash.
+  is down — nothing crashes: `get_app_status` reports `status: "warn"` with zero counts, the list
+  and analytics tools (`list_runs`, `get_recent_errors`, `analyze_service_performance`,
+  `analyze_db_bottlenecks`, …) return their ordinary empty or zero-valued results, and `get_run`
+  returns a structured `run_not_found` error.
 - **`aspire` or `project` warns** — the project root is wrong or the workspace is missing expected
   markers. Confirm the `--project-root` written into your host configuration points at the project
   (re-run `netscript agent init` after moving a project).
