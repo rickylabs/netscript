@@ -20,5 +20,4 @@ Live status of milestone-13 phase groups. Statuses: `pending` → `active` → `
 | G13 | #815 | `docs/815-package-readmes` | 3 | pending | after G12 |
 | G14 | #816 | `docs/816-main-readme` | 4 | pending | may slip to beta.12 (owner note) |
 
-Integration branch `feat/desktop-frontend` (G2–G7 sub-PRs target it); everything else PRs to
-`main`. Concurrency cap: ≤3 active Codex groups.
+Integration branch `feat/desktop-frontend` — WAVE MERGED TO MAIN e193e018 (#860); epic #840 closed. Everything else PRs to `main`. Concurrency cap: ≤3 active Codex groups.

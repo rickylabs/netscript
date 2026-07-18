@@ -169,3 +169,9 @@ group launch; this section fixes the supervisor's surface.
   Wave→main PR gated ONLY on owner decision 1 (Option A/B; history verdict OVERSIGHT —
   denoland#33441 keep-list omission). G12 #814 impl complete (PR #858; caught a factually wrong
   docs-site command-policy listing); Sol changeset audit dispatched.
+- 2026-07-18 · WAVE MERGED TO MAIN (squash e193e018 — repo forbids merge commits; sub-PR history
+  preserved on the integration branch): #452/#375/#841/#842/#843/#456/#457 closed; epic #840
+  closed with completion comment. #858 conflict vs main (G11's #856 note in agent-tooling.md)
+  resolved as a union; auto-merge loop armed. G13/B1 complete (PR #861, 6 flagship READMEs,
+  executed evidence; 2 recorded drifts incl. issue-#815 item-6 inaccuracy on the pre-release
+  line). Owner briefed with grouped status table; asked to confirm #816 slip + #815 continuation.
