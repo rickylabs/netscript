@@ -19,7 +19,7 @@ Suspense-powered streaming SSR with deferred regions, and an error vocabulary sh
 handlers and client displays. Each capability lives on its own subpath, so a page that never streams
 never imports the streaming runtime.
 
-## Why it stands out
+## Why teams use it
 
 - **Typed route contracts** — `defineRouteContract`, `paginationSearchSchema`, and
   `bindRoutePattern` give path and search params one typed source consumed by pages, links, and
@@ -58,7 +58,7 @@ flowchart LR
 deno add jsr:@netscript/fresh@<version>
 ```
 
-Pin `<version>` (for example `0.0.1-beta.10`): bare `jsr:@netscript/*` specifiers do not resolve on
+Pin `<version>` to match your installed CLI; bare `jsr:@netscript/*` specifiers do not resolve on
 the pre-release line. Inside a scaffolded NetScript workspace the import map already carries the
 correct pinned entry.
 

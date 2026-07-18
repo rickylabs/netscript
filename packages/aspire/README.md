@@ -18,7 +18,7 @@ That contract is what lets NetScript plugins contribute Aspire resources, worksp
 config before start, and composition logic run under test with an in-memory builder — all without a
 .NET toolchain in the loop.
 
-## Why it stands out
+## Why teams use it
 
 - **SDK-neutral by contract** — no Aspire SDK type appears in any public signature, so diagnostics
   and composition stay portable and testable.
@@ -54,7 +54,7 @@ flowchart LR
 deno add jsr:@netscript/aspire@<version>
 ```
 
-Pin `<version>` (for example `0.0.1-beta.10`): bare `jsr:@netscript/*` specifiers do not resolve on
+Pin `<version>` to match your installed CLI; bare `jsr:@netscript/*` specifiers do not resolve on
 the pre-release line. Scaffolded NetScript workspaces already carry the pinned entry.
 
 ## Quick example

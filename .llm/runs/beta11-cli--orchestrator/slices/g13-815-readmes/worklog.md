@@ -294,3 +294,121 @@ already up to date (no baseline drift).
 | check:publish-assets | `deno task check:publish-assets` | PASS exit 0 |
 
 Commits: 4d4babe8 (B3 data/state), 4f98aadf (B4 auth).
+
+## Batch B5
+
+Generator: Claude · Fable 5 (refresh class), 2026-07-18. Scope: platform/core family
+(`packages/{config,contracts,runtime-config,logger,telemetry,ai,bench}`) — 7 READMEs brought to the
+B1/MCP flagship standard — plus the closing cross-README consistency pass over the full set. First
+action: `git fetch origin main && git merge origin/main` — already up to date (no baseline drift).
+
+### Authoring decisions
+- Section order locked to the exemplar: tagline → intro → Why teams use it → Architecture (moving
+  parts only) → pinned Install + note → Quick example → Public surface → Docs → Compatibility →
+  License.
+- Mermaid only for real moving parts: runtime-config (versioned dir → loader → snapshot →
+  watchFs reload loop), telemetry (ports → Deno-native/SDK adapters → OTLP → query read model),
+  ai (composition root → registries ← self-registering provider subpaths; MCP pool → tool
+  registry). config/contracts/logger: no diagram (loader/contract/utility packages, matching the
+  B3 database/cron precedent). bench keeps its plain-text src/ tree.
+- **bench is internal-only** (`"publish": false` in `packages/bench/deno.json`): standard applied
+  minus JSR-specific items — no JSR/CI badges, no `deno add jsr:` install form or pinning note, no
+  JSR doc links; kept H1 + tagline + Why + Quick example + Docs + Compatibility + License.
+  Consequently bench is EXCLUDED from the readme-standard gate (a publishable-unit gate whose
+  Install check requires the literal `deno add jsr:@netscript/`) and INCLUDED in the tagline,
+  internal-wording, versionless-specifier, and fmt sweeps. Its old README carried internal
+  vocabulary (issue number, slice/OQ decision labels, model pricing provenance) — rewritten out
+  while preserving the substance (gating decision, rubric reserve, pinned-manifest confound).
+- Install fences pinned `deno add jsr:@netscript/<pkg>@<version>` + canonical pinning note.
+  contracts/ai quick examples import Zod via the resolvable pinned form `jsr:@zod/zod@4` (a bare
+  `zod` specifier would not resolve in a consumer project; noted under contracts' Install).
+- telemetry: removed the internal issue-number label from the attribute-convention section and the
+  repo-relative `docs/site/...` convention link (dead on JSR); both now point at the public
+  convention page. The Deno-version claim states Deno 2+ with `OTEL_DENO=true` for the default
+  provider.
+- ai: restructured from a 465-line feature tour to the standard shape (~250 lines) with badges,
+  Why, Architecture, pinned install, executed quick example, provider/agent-loop/MCP sections, and
+  a full subpath table. Corrected over the inherited text: the agent-loop fence imported `Message`
+  from `./agent`, which does not export it — now imported from `@netscript/ai/contracts`; the
+  provider fence called `provider.createChatClient(...)` directly, which fails strict TS (TS2722,
+  the port method is optional) — now `createChatClient?.(...)`.
+- runtime-config: `watchRuntimeConfig` callback must return `Promise<void>` (TS2345 with a sync
+  callback) — fence uses an async callback.
+
+### Executed examples (all run in-session, exit 0, output observed)
+- config: defineConfig fence run — printed `orders postgres 3000`; `inspectConfig` variant printed
+  the report summary. (`initConfig()` itself needs a project `netscript.config.ts`; the loader
+  fence typechecks and its claims match the executed defineConfig output.)
+- contracts: fence run verbatim — `OffsetPaginationQuerySchema.parse({ limit: '25' })` printed
+  `{ limit: 25, offset: 0 }` (coercion + defaults claim observed).
+- runtime-config: loader run with no runtime dir — `isFeatureEnabled(...,true)` → `true`, missing
+  job override → undefined, `summarizeRuntimeConfig` printed the loaded-from message
+  (empty-default startup claim observed).
+- logger: fence run verbatim — printed `INF netscript·services·users Service starting` and the
+  `withContext` record (category-hierarchy claim quoted in README from this output).
+- telemetry: fence run — `withSpan` over `createInMemorySpanRecorder()` printed
+  `42 job.import erp-sync` (comment in fence quotes this output).
+- ai: fence run verbatim — `registry.dispatch('add', { a: 2, b: 3 })` printed `{ sum: 5 }`.
+- bench: `deno task cli self --fake` run from packages/bench — scored summary table for both tasks
+  (composite 0.793, fake-driver flag) — exit 0, matching the Quick example's description.
+
+### Gate log (Batch B5)
+| Gate | Command | Result |
+| --- | --- | --- |
+| readme-standard (6 publishable) | `check-readme-standard.ts <6> --pretty` | PASS 6/6 conform (bench excluded: publish:false) |
+| tagline cap | `check-jsr-tagline-length.ts <7> --pretty` | PASS checked=7 over=0 (telemetry trimmed from 255 B) |
+| docs:links | `deno task docs:links` | PASS docs=98, 0 broken |
+| ts-fence typecheck | per-package extract + `deno check --unstable-kv` (consumer-context config for config/contracts app-code fences, which are exempt from the workspace isolatedDeclarations flag) | PASS 11/11 fences |
+| executed examples | 7/7 transcripts above | PASS exit 0 |
+| Mermaid parse | mermaid-cli 11.16.0 over 3 new diagrams | PASS 3/3 |
+| Links curl-verified | 12 docs-site + 6 JSR /doc + 4 external URLs | PASS all 200 |
+| Internal-wording grep | issue-number/process-vocab patterns over 7 files | PASS 0 hits |
+| versionless-specifier scan | bare `jsr:@netscript/*` over 7 files | PASS 0 bare |
+| deno fmt --check (7) | after `deno fmt` | PASS |
+| check:publish-assets | `deno task check:publish-assets` | PASS exit 0 |
+
+### Cross-README consistency pass (all 36 pages: 35 published + bench)
+
+**Method.** Scripted structural sweep (`.llm/tmp/readme-g13-b5/sweep.ts`) over every
+`packages/*/README.md` + `plugins/*/README.md`: H1/badges/tagline presence, required-section
+presence and order (Install < Quick example < Docs < Compatibility < License), canonical
+pinning-note wording, pinned install form, license/provenance line wording. Plus targeted greps
+for contradicting sibling claims: backend discovery orders, provider lists and self-registration
+claims, Deno-version statements, `## Why` heading variants, `always-current symbol list` and
+`API docs on JSR` coverage. Full-set gates re-run at the end.
+
+**Findings and fixes:**
+1. **Pinning-note drift (6 B1 pages)** — aspire/cli/fresh/fresh-ui/sdk/service used
+   ``Pin `<version>` (for example `0.0.1-beta.10`): …`` while the other 29 used the canonical
+   B1-fix/MCP wording. Normalized the 5 library pages to
+   ``Pin `<version>` to match your installed CLI; …``; the CLI page gets the semantically correct
+   variant ``Pin `<version>` to the release you want to install; …`` (the CLI cannot pin to
+   itself) — deliberate, recorded here. Page-specific trailing sentences preserved.
+2. **`## Why` heading variants** — 6 B1 pages used "Why it stands out" vs 27 "Why teams use it".
+   Normalized the 6 to "Why teams use it" (now 33). Kept the audience-fit variants: mcp
+   "Why agents like it" (locked exemplar), packages/plugin "Why authors use it", bench
+   "Why it exists" (internal instrument).
+3. **cli Docs section** — only published page without an "API docs on JSR" line; added
+   (jsr.io/@netscript/cli/doc curl-verified 200).
+4. **No contradictions found** in: queue discovery order (RabbitMQ → Redis → Deno KV stated only
+   on the queue page; no sibling restates it), kv redis self-registration (ai README's mirror
+   claim matches kv's), provider lists, license/provenance lines (uniform), install forms
+   (0 bare specifiers across 36). Observed, judged non-contradictory: example model ids differ
+   across ai pages (`anthropic:claude-sonnet-4-5` vs plugin-ai-core's `anthropic:claude-sonnet-4`)
+   — both are illustrative registry ids, left as authored (changing an executed B2 fence for
+   cosmetics was not worth the re-verification cost); Deno-version phrasing varies with each
+   package's real constraint (2+, 2.x, 2.9+ for mcp, unstable-kv for kv) — accurate per package,
+   not normalized.
+
+**Full-set gate log (after fixes):**
+| Gate | Result |
+| --- | --- |
+| readme-standard (35 published) | PASS 35/35 conform |
+| tagline cap (36) | PASS checked=36 over=0 |
+| internal-wording grep (36) | PASS 0 hits |
+| versionless-specifier scan (36) | PASS 0 bare |
+| deno fmt --check (36) | PASS (cli README is in the repo fmt exclude list, as before) |
+| docs:links | PASS docs=98, 0 broken |
+| check:publish-assets | PASS exit 0 |
+
+Commits: per-package ×7 (433fe781…9cc4c325) + consistency-pass commit.

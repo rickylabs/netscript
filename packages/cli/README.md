@@ -17,7 +17,7 @@ plugin registries, the contract version aggregates. You never hand-maintain the 
 The same command tree is also a library: mount the full public surface inside your own binary while
 NetScript owns the verbs and you own the process boundary.
 
-## Why it stands out
+## Why teams use it
 
 - **Scaffold-and-grow, not scaffold-and-diverge** — `init` writes the workspace, and every later
   verb keeps the derived wiring in sync; the generated project is meant to be re-generated, not
@@ -61,7 +61,7 @@ Or as a library, for the embeddable command tree:
 deno add jsr:@netscript/cli@<version>
 ```
 
-Pin `<version>` (for example `0.0.1-beta.10`): bare `jsr:@netscript/*` specifiers do not resolve on
+Pin `<version>` to the release you want to install; bare `jsr:@netscript/*` specifiers do not resolve on
 the pre-release line.
 
 ## Quick example
@@ -276,6 +276,7 @@ The always-current symbol list is
   [rickylabs.github.io/netscript/how-to/deploy/](https://rickylabs.github.io/netscript/how-to/deploy/)
 - **Agent tooling**:
   [rickylabs.github.io/netscript/capabilities/agent-tooling/](https://rickylabs.github.io/netscript/capabilities/agent-tooling/)
+- **API docs on JSR**: [jsr.io/@netscript/cli/doc](https://jsr.io/@netscript/cli/doc)
 
 ## Compatibility
 

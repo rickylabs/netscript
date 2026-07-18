@@ -18,7 +18,7 @@ Where a service lives is not your problem either. Clients resolve URLs lazily th
 environment your orchestrator injects, so the same code runs against local processes, containers,
 and deployed endpoints without a registry or a config file.
 
-## Why it stands out
+## Why teams use it
 
 - **One contract map, three surfaces** — `defineServices` assembles typed clients, query factories,
   and query utils from a single service map; each entry defaults its service name and query path to
@@ -57,7 +57,7 @@ flowchart LR
 deno add jsr:@netscript/sdk@<version>
 ```
 
-Pin `<version>` (for example `0.0.1-beta.10`): bare `jsr:@netscript/*` specifiers do not resolve on
+Pin `<version>` to match your installed CLI; bare `jsr:@netscript/*` specifiers do not resolve on
 the pre-release line. Scaffolded NetScript workspaces carry the pinned entry in their import map:
 
 ```json

@@ -17,7 +17,7 @@ Authentication and authorization ship as an opt-in subpath with provider-agnosti
 service that needs guarding adds it without dragging auth machinery into every service that does
 not.
 
-## Why it stands out
+## Why teams use it
 
 - **One-call preset** — `defineService(router, options)` wires CORS, logging, OpenAPI JSON, Scalar
   docs, RPC, service info, and health, then starts the listener and returns a `RunningService`
@@ -51,7 +51,7 @@ flowchart LR
 deno add jsr:@netscript/service@<version>
 ```
 
-Pin `<version>` (for example `0.0.1-beta.10`): bare `jsr:@netscript/*` specifiers do not resolve on
+Pin `<version>` to match your installed CLI; bare `jsr:@netscript/*` specifiers do not resolve on
 the pre-release line. Generated NetScript service entrypoints already import the pinned entry.
 
 ## Quick example

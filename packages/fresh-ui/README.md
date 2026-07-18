@@ -18,7 +18,7 @@ Everything copied and everything imported speaks one visual language: a theme-dr
 custom-property vocabulary that keeps components and themes decoupled. Restyle the app by swapping
 tokens; the components never know.
 
-## Why it stands out
+## Why teams use it
 
 - **Copy-source registry** — `netscript ui:init` installs the foundation, `netscript ui:add <item>`
   copies themed components, pages, and collections into your app; once copied, the code is yours.
@@ -54,7 +54,7 @@ flowchart LR
 deno add jsr:@netscript/fresh-ui@<version>
 ```
 
-Pin `<version>` (for example `0.0.1-beta.10`): bare `jsr:@netscript/*` specifiers do not resolve on
+Pin `<version>` to match your installed CLI; bare `jsr:@netscript/*` specifiers do not resolve on
 the pre-release line. In a scaffolded NetScript workspace, `netscript ui:init` wires the pinned
 entry and the theme foundation for you.
 
