@@ -4,6 +4,7 @@ title: CLI and Scaffold
 templateEngine: [vento, md]
 prev: { label: "Orchestration & Runtime", href: "/orchestration-runtime/" }
 next: { label: "Runtime configuration", href: "/orchestration-runtime/runtime-config/" }
+order: 1
 ---
 
 # CLI & scaffold

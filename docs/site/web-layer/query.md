@@ -2,6 +2,7 @@
 layout: layouts/base.vto
 title: Data loading and the query cache
 templateEngine: [vento, md]
+order: 4
 ---
 
 # Data loading and the query cache

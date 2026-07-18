@@ -39,7 +39,7 @@ infrastructure, services, plugin APIs, and background processors — then gives 
 whole thing. You will read the live port map from the dashboard and confirm every resource is healthy.
 
 {{ comp callout { type: "warning", title: "This is the LOCAL story — not a production deployer" } }}
-<code>aspire start</code> exists to make one command produce a complete, correctly-wired stack on <strong>one machine</strong>. The Postgres and Redis it starts are throwaway Docker containers for dev convenience — <strong>not</strong> your production database or cache. NetScript does not ship a cloud deployer for your app; for a remote target you point processes at managed infrastructure yourself. This chapter teaches the local topology. See the <a href="/how-to/deploy/">Deploy</a> and <a href="/how-to/deploy-local-aspire/">Deploy locally with Aspire</a> how-to guides for the production-vs-local split.
+<code>aspire start</code> exists to make one command produce a complete, correctly-wired stack on <strong>one machine</strong>. The Postgres and Redis it starts are throwaway Docker containers for dev convenience — <strong>not</strong> your production database or cache. NetScript does not ship a cloud deployer for your app; for a remote target you point processes at managed infrastructure yourself. This chapter teaches the local topology. See the <a href="/orchestration-runtime/how-to/deploy/">Deploy</a> and <a href="/orchestration-runtime/how-to/deploy-local-aspire/">Deploy locally with Aspire</a> how-to guides for the production-vs-local split.
 {{ /comp }}
 
 ## Before you begin
@@ -185,9 +185,9 @@ where it counts, and verified at its edges.
 
 ## Where to go next
 
-- **Ship it somewhere real** → the [Deploy](/how-to/deploy/) how-to (production targets) and
-  [Deploy locally with Aspire](/how-to/deploy-local-aspire/) (the full local recipe with every flag).
-- **Add observability** → [Add OpenTelemetry](/how-to/add-opentelemetry/) and the
+- **Ship it somewhere real** → the [Deploy](/orchestration-runtime/how-to/deploy/) how-to (production targets) and
+  [Deploy locally with Aspire](/orchestration-runtime/how-to/deploy-local-aspire/) (the full local recipe with every flag).
+- **Add observability** → [Add OpenTelemetry](/observability/how-to/add-opentelemetry/) and the
   [Observability explanation](/explanation/observability/).
 - **Go deeper on the ideas** → [Durability model](/explanation/durability-model/),
   [Contracts & type flow](/explanation/contracts/), and [The plugin system](/explanation/plugin-system/).

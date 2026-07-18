@@ -4,6 +4,7 @@ title: Durable streams
 templateEngine: [vento, md]
 prev: { label: "Triggers & ingress", href: "/durable-workflows/triggers/" }
 next: { label: "Database & Prisma", href: "/data-persistence/database/" }
+order: 2
 ---
 
 # Durable streams
@@ -92,7 +93,7 @@ report, which is as useful to a CLI doctor or a coding agent as it is to a test.
   {
     title: "Do — add the streams plugin",
     body: "Public package install adds the stream plugin dependency and user-owned glue; local netscript-dev scaffolding supports contributor-source samples.",
-    href: "/how-to/add-a-plugin/",
+    href: "/orchestration-runtime/how-to/add-a-plugin/",
     icon: "◆"
   },
   {

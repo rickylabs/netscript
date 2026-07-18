@@ -4,6 +4,7 @@ title: Contracts & type flow
 templateEngine: [vento, md]
 prev: { label: "Architecture", href: "/explanation/architecture/" }
 next: { label: "The plugin system", href: "/explanation/plugin-system/" }
+order: 2
 ---
 
 # Contracts & type flow

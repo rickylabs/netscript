@@ -63,7 +63,7 @@ the pre-release line. Scaffolded NetScript workspaces carry the pinned entry in 
 ```json
 {
   "imports": {
-    "@netscript/sdk": "jsr:@netscript/sdk@0.0.1-beta.10"
+    "@netscript/sdk": "jsr:@netscript/sdk@<version>"
   }
 }
 ```

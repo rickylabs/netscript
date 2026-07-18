@@ -1,20 +1,38 @@
-{{# nextPrev.vto — prev/next pager rendered at the foot of the article. Pages
-   opt in by setting `prev` and/or `next` front-matter vars, each shaped
-   { label, href }. If neither is present nothing renders. Hrefs are authored
-   root-relative (e.g. /quickstart/) and base-prefixed here via the `url`
-   filter. Colors key off the existing fresh-ui --ns-* tokens. #}}
-{{ if prev || next }}
+{{# nextPrev.vto — prev/next pager rendered at the foot of the article.
+   Two sources, front matter first:
+   1. Pages may set `prev`/`next` front-matter vars ({ label, href }) — the
+      tutorial tracks keep per-chapter editorial control this way.
+   2. Reference pages (32 generated units — unmaintainable by hand) auto-derive
+      neighbours from the nav tree via nav.nextPage/previousPage(url, query,
+      sort) — the verified v2.5.4 signature has NO basePath argument; the
+      `url^=/reference/` query term scopes the walk to the reference lane.
+   Hrefs are source urls, base-prefixed via the `url` filter. #}}
+{{ set prevLink = null }}
+{{ set nextLink = null }}
+{{ if prev }}{{ set prevLink = { label: prev.label, href: prev.href } }}{{ /if }}
+{{ if next }}{{ set nextLink = { label: next.label, href: next.href } }}{{ /if }}
+{{ if url && url.startsWith("/reference/") }}
+  {{ if !prevLink }}
+    {{ set autoPrev = nav.previousPage(url, "url^=/reference/ " + navQuery, navSort) }}
+    {{ if autoPrev }}{{ set prevLink = { label: autoPrev.nav_title || autoPrev.title, href: autoPrev.url } }}{{ /if }}
+  {{ /if }}
+  {{ if !nextLink }}
+    {{ set autoNext = nav.nextPage(url, "url^=/reference/ " + navQuery, navSort) }}
+    {{ if autoNext }}{{ set nextLink = { label: autoNext.nav_title || autoNext.title, href: autoNext.url } }}{{ /if }}
+  {{ /if }}
+{{ /if }}
+{{ if prevLink || nextLink }}
 <nav class="ns-nextprev" aria-label="Pagination">
-  {{ if prev }}
-    <a class="ns-nextprev__link ns-nextprev__link--prev" href="{{ prev.href |> url }}" rel="prev">
+  {{ if prevLink }}
+    <a class="ns-nextprev__link ns-nextprev__link--prev" href="{{ prevLink.href |> url }}" rel="prev">
       <span class="ns-nextprev__dir" aria-hidden="true">← Previous</span>
-      <span class="ns-nextprev__label">{{ prev.label }}</span>
+      <span class="ns-nextprev__label">{{ prevLink.label }}</span>
     </a>
   {{ /if }}
-  {{ if next }}
-    <a class="ns-nextprev__link ns-nextprev__link--next" href="{{ next.href |> url }}" rel="next">
+  {{ if nextLink }}
+    <a class="ns-nextprev__link ns-nextprev__link--next" href="{{ nextLink.href |> url }}" rel="next">
       <span class="ns-nextprev__dir" aria-hidden="true">Next →</span>
-      <span class="ns-nextprev__label">{{ next.label }}</span>
+      <span class="ns-nextprev__label">{{ nextLink.label }}</span>
     </a>
   {{ /if }}
 </nav>

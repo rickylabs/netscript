@@ -17,7 +17,7 @@ documentation, and trigger allowlisted CLI commands — over newline-delimited J
 no npm MCP SDK on the dependency graph.
 
 Most consumers never import this package: `netscript agent init` installs it as an MCP server and
-`netscript agent mcp` runs it. See [Agent tooling](/capabilities/agent-tooling/) for the CLI ×
+`netscript agent mcp` runs it. See [Agent tooling](/ai/agent-tooling/) for the CLI ×
 skills × MCP combo, and the package README for the mental model and recipes.
 
 Two entrypoints carry the surface:

@@ -544,9 +544,9 @@ jobs:
         run: |
           uv pip install --system "openhands-sdk @ git+https://github.com/OpenHands/software-agent-sdk.git@main#subdirectory=openhands-sdk"
           uv pip install --system "openhands-tools @ git+https://github.com/OpenHands/software-agent-sdk.git@main#subdirectory=openhands-tools"
-          # LiteLLM 1.92 imports its MCP proxy handler on the normal completion path. The SDK's
-          # current dependency set omits FastAPI, causing every agent turn to fail before the model
-          # is called (`ModuleNotFoundError: No module named 'fastapi'`).
+          # litellm's completion path imports litellm.proxy (-> fastapi) even outside
+          # proxy mode; fastapi is only in litellm's [proxy] extra, so install it
+          # explicitly or every agent run dies with ModuleNotFoundError on step 1.
           uv pip install --system fastapi
 
       - name: Resolve provider credentials

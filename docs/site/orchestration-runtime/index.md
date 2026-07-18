@@ -26,9 +26,9 @@ workspace up, change runtime overrides, or understand how plugin contributions b
   { eyebrow: "Story", title: "CLI & scaffold", body: "One command to a complete workspace — and why generated conventions save agent turns.", href: "/orchestration-runtime/cli-scaffold/", icon: "S" },
   { eyebrow: "Story", title: "Runtime configuration", body: "Typed project config plus hot-reloadable operator overrides.", href: "/orchestration-runtime/runtime-config/", icon: "S" },
   { eyebrow: "Quickstart", title: "Run the workspace", body: "Scaffold and start a workspace from the quickstart.", href: "/quickstart/", icon: "Q" },
-  { eyebrow: "How-To", title: "Deploy locally with Aspire", body: "Use Aspire to bring up local resources.", href: "/how-to/deploy-local-aspire/", icon: "H" },
-  { eyebrow: "How-To", title: "Runtime overrides", body: "Roll out configuration overrides across resources.", href: "/how-to/roll-out-runtime-overrides/", icon: "H" },
-  { eyebrow: "How-To", title: "Plugins", body: "Add or author a plugin contribution.", href: "/how-to/add-a-plugin/", icon: "H" },
+  { eyebrow: "How-To", title: "Deploy locally with Aspire", body: "Use Aspire to bring up local resources.", href: "/orchestration-runtime/how-to/deploy-local-aspire/", icon: "H" },
+  { eyebrow: "How-To", title: "Runtime overrides", body: "Roll out configuration overrides across resources.", href: "/orchestration-runtime/how-to/roll-out-runtime-overrides/", icon: "H" },
+  { eyebrow: "How-To", title: "Plugins", body: "Add or author a plugin contribution.", href: "/orchestration-runtime/how-to/add-a-plugin/", icon: "H" },
   { eyebrow: "API Reference", title: "aspire and runtime config", body: "Generated symbols for AppHost, config, runtime-config, plugin, and CLI units.", href: "/reference/aspire/", icon: "R" }
 ] }) }}
 
@@ -50,3 +50,12 @@ New here, start with the concept, then the practical wiring, then the reference:
   dashboard side of the same graph — the spans and logs `aspire start` collects.
 - **Look up exact symbols:** {{ comp.xref({ key: "ref:aspire", text: "the Aspire reference" }) }} and
   the {{ comp.xref({ key: "cli:reference", text: "CLI reference" }) }}.
+
+## Learn, do, look up
+
+{{ comp.cardsGrid({ columns: 4, cards: [
+  { eyebrow: "Learn", title: "Quickstart", body: "From `netscript init` to a running, orchestrated workspace.", href: resolveXref("concept:quickstart").href },
+  { eyebrow: "Do", title: "Recipes", body: "Task-oriented recipes for this area, one problem each.", href: "/orchestration-runtime/how-to/" },
+  { eyebrow: "Look up", title: "`@netscript/aspire` reference", body: "Generated API reference. Related units: `cli`, `config`, `runtime-config`, `plugin`.", href: resolveXref("ref:aspire").href },
+  { eyebrow: "Understand", title: "Orchestration with Aspire", body: "The design rationale behind this pillar.", href: resolveXref("explain:aspire").href },
+] }) }}

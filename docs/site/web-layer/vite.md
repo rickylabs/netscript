@@ -2,6 +2,7 @@
 layout: layouts/base.vto
 title: Build and Vite integration
 templateEngine: [vento, md]
+order: 8
 ---
 
 # Build and Vite integration

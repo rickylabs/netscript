@@ -139,7 +139,7 @@ A reusable contract harness for adapter authors. Re-exports the shared `KvStore`
 
 ## See it live
 
-- **How-to:** [Queue / KV / cron](/how-to/queue-kv-cron/) — read, write, and watch a KV store with
+- **How-to:** [Queue / KV / cron](/data-persistence/how-to/queue-kv-cron/) — read, write, and watch a KV store with
   these symbols in a running workspace.
 - **Concept:** [KV, queues & cron](/data-persistence/kv-queues-cron/) — the durable-by-default KV
   model and how it backs queues and cron.

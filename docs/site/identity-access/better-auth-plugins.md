@@ -2,6 +2,7 @@
 layout: layouts/base.vto
 title: better-auth plugins
 templateEngine: [vento, md]
+order: 2
 ---
 
 # better-auth plugins

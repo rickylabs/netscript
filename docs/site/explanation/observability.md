@@ -4,16 +4,19 @@ title: Observability
 templateEngine: [vento, md]
 prev: { label: "Durability model", href: "/explanation/durability-model/" }
 next: { label: "Orchestration with Aspire", href: "/explanation/aspire/" }
+order: 6
 ---
 
 # Observability
+
+*This essay is the **why** — the model and its trade-offs. The day-to-day *how* (guides, recipes, API) lives in **Build › [Observability](/observability/)**.*
 
 This essay answers one question: how does NetScript make a *distributed, multi-process*
 application observable, so that one logical operation reads as one story even though it crosses
 HTTP, a queue, a saga, and a worker subprocess? The answer is a single idea applied everywhere —
 **the trace context travels with the work** — wired into the framework boundaries so you inherit
 it for free. Read this to build the mental model; to wire spans yourself, follow the
-[how-to: add OpenTelemetry](/how-to/add-opentelemetry/); for the headline API and ports, see the
+[how-to: add OpenTelemetry](/observability/how-to/add-opentelemetry/); for the headline API and ports, see the
 {{ comp.xref({ key: "cap:telemetry" }) }} hub; for exact exported symbols, see
 {{ comp.xref({ key: "ref:telemetry" }) }}.
 
@@ -272,7 +275,7 @@ the same span model.
 
 ## Where to go next
 
-- **Do it:** the [how-to: add OpenTelemetry](/how-to/add-opentelemetry/) walks adding a custom span,
+- **Do it:** the [how-to: add OpenTelemetry](/observability/how-to/add-opentelemetry/) walks adding a custom span,
   structured logs, and `traceparent` propagation against a running service.
 - **Hub:** the {{ comp.xref({ key: "cap:telemetry" }) }} hub covers the headline API and the
   OTel-wired-into-boundaries model with the real endpoints; {{ comp.xref({ key: "cap:auth" }) }}
