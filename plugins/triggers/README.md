@@ -4,61 +4,96 @@
 [![CI](https://github.com/rickylabs/netscript/actions/workflows/ci.yml/badge.svg)](https://github.com/rickylabs/netscript/actions/workflows/ci.yml)
 [![Docs](https://img.shields.io/badge/docs-rickylabs.github.io-blue)](https://rickylabs.github.io/netscript/)
 
-**The deployable trigger-processing plugin for NetScript: bind webhook ingress, durable processing,
-a Triggers API service, CLI commands, and Aspire wiring through one manifest.**
+**The trigger-processing plugin for NetScript: one install wires webhook ingress, scheduled and
+file-watch triggers, durable processing, a Triggers API service, CLI commands, and Aspire
+orchestration into your app.**
 
-The declarative manifest also carries durable-stream contributions and trigger runtime metadata.
+Webhooks are easy until one arrives twice, one arrives during a deploy, or a slow handler makes the
+sender time out and retry. `@netscript/plugin-triggers` ships trigger processing as one declarative
+manifest: `netscript plugin install trigger` scaffolds a triggers workspace, registers the Triggers
+API service, provisions the event store, and adds the processor runtime to your Aspire AppHost.
+Ingress acknowledges and persists first, then processes — so a crash after the `202` is recoverable
+and duplicates are absorbed by idempotency.
 
----
+The manifest is plain data. Hosts read it to generate files and wiring; nothing executes until your
+app boots. The handler-first trigger DSL and runtime ports live in
+[`@netscript/plugin-triggers-core`](https://jsr.io/@netscript/plugin-triggers-core) — this package
+binds them to a NetScript host.
 
-## 🚀 Quick Start
+## Why teams use it
 
-### Add it to a NetScript app
+- **One manifest, whole capability** — `triggersPlugin` declares the Triggers API service, the
+  trigger processor, stream topics, database schema, runtime-config topics, contract versions, and
+  Aspire resources as typed contribution axes the host turns into running processes.
+- **Three trigger kinds, one runtime** — webhook, scheduled, and file-watch triggers drain through
+  the same processor with at-least-once delivery, idempotency, and dead-lettering.
+- **Ack-then-process ingress** — inbound webhooks are verified and persisted before the `202`
+  acknowledgement, so slow handlers never block the sender and crashes replay from the stored event.
+- **Concurrent by default** — the processor fans out with a default concurrency of 10
+  (`TRIGGER_CONCURRENCY`) for bursty workloads.
+- **Triggers API included** — the `triggers-api` service (default port `8093`) backs trigger and
+  event introspection over a versioned contract.
+- **An operations CLI** — `list`, `add-webhook`, `add-scheduled`, `add-file-watch`, `fire`,
+  `preview`, `test`, `events`, and `enable`/`disable` cover authoring and operating triggers.
 
-From the root of a generated NetScript project:
+## Architecture
+
+```mermaid
+flowchart LR
+    W["Webhook / cron / file event"] --> I["Ingress<br/>verify + persist, then 202"]
+    I --> E["Event store"]
+    E --> P["Processor<br/>idempotency · retry · DLQ"]
+    P --> J["Handler actions<br/>(enqueue jobs, …)"]
+    M["triggersPlugin manifest"] --> H["NetScript host"]
+    H --> A["triggers-api<br/>:8093"]
+```
+
+## Install
+
+From the root of a NetScript project:
 
 ```bash
-netscript plugin add trigger
+netscript plugin install trigger --name triggers
 ```
 
-`plugin add` resolves `@netscript/plugin-triggers` from JSR and runs the plugin's own scaffolder —
-the plugin owns its setup, so the CLI ships no embedded templates. The scaffolder wires the Triggers
-API service, the trigger processor runtime, stream topics, database schema, and Aspire resources
-into your workspace, then pins the matching `@netscript/*` versions.
+The plugin owns its setup — the CLI ships no embedded templates. The scaffolder wires the Triggers
+API service, the processor runtime, stream topics, database schema, and Aspire resources into your
+workspace, then pins the matching `@netscript/*` versions. Triggers require Deno KV and optionally
+Postgres; the install records both so `netscript db` and Aspire provision them for you.
 
-> **Provisioning:** triggers require Deno KV and optionally Postgres. `plugin add` records these
-> requirements from the manifest so `netscript db` and Aspire orchestration provision them for you.
-
-### Use it as a library
-
-To consume the plugin programmatically (custom hosts, tests, tooling):
+To consume the plugin programmatically (custom hosts, tests, tooling), add it as a library:
 
 ```bash
-# Deno
-deno add jsr:@netscript/plugin-triggers
-
-# Node.js / Bun
-npx jsr add @netscript/plugin-triggers
-bunx jsr add @netscript/plugin-triggers
+deno add jsr:@netscript/plugin-triggers@<version>
 ```
 
-```typescript
-import { inspectPlugin } from '@netscript/plugin';
-import { triggersPlugin } from '@netscript/plugin-triggers';
+The standalone plugin CLI is also directly runnable:
 
-// Hand the manifest to the host plugin loader.
-export const plugins = [triggersPlugin];
-
-// Inspect declared contribution groups without invoking lifecycle hooks.
-const summary = inspectPlugin(triggersPlugin);
-console.log(summary.target); // "@netscript/plugin-triggers"
-console.log(summary.details.contributionGroups); // 5
+```bash
+deno x -A jsr:@netscript/plugin-triggers@<version>/cli list
 ```
 
-### Identity and service constants
+Pin `<version>` to match your installed CLI; bare `jsr:@netscript/*` specifiers do not resolve on
+the pre-release line.
 
-The plugin re-exports its stable identity and API-service constants so hosts, scaffolding, and
-Aspire wiring can reference them without hard-coding literals:
+## Quick example
+
+Install the plugin, then list the trigger definitions it manages:
+
+```bash
+$ netscript plugin install trigger --name triggers
+Installed trigger plugin "triggers" on port 8093.
+Created 5 plugin files.
+Regenerated 12 Aspire helper files.
+
+$ deno x -A jsr:@netscript/plugin-triggers@<version>/cli list
+Found 0 trigger definitions.
+{
+  "triggers": []
+}
+```
+
+As a library, the manifest and identity constants are inspectable data:
 
 ```typescript
 import {
@@ -74,65 +109,38 @@ console.log(TRIGGERS_API_DEFAULT_PORT); // 8093
 console.log(triggersPlugin.name); // "@netscript/plugin-triggers"
 ```
 
----
+## Public surface
 
-## 📦 Key Capabilities
+| Entry        | What it gives you                                                                                                         |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------- |
+| `.`          | `triggersPlugin` plus the `TRIGGERS_*` identity and service constants                                                     |
+| `./cli`      | The trigger command group (`list`, `add-webhook`, `fire`, `events`, …)                                                    |
+| `./runtime`  | The processor runtime (`createRuntimeTriggerProcessor`) with KV-backed event store, idempotency, and dead-letter adapters |
+| `./public`   | The typed trigger surface hosts re-export                                                                                 |
+| `./services` | The Triggers API service composition (`triggers-api`, port `8093`)                                                        |
+| `./streams`  | Durable-stream factory for trigger entities                                                                               |
+| `./aspire`   | The trigger Aspire contribution for the AppHost                                                                           |
+| `./scaffold` | The plugin-owned scaffolder `netscript plugin install trigger` executes                                                   |
 
-- **Declarative manifest**: `triggersPlugin` declares services, the trigger processor, stream
-  topics, database schema, runtime-config topics, contract versions, E2E gates, and Aspire resources
-  as typed contribution axes.
-- **Webhook ingress + processor runtime**: the `./runtime` subpath exposes the trigger processor
-  (`createRuntimeTriggerProcessor`) plus KV-backed event store, idempotency, and dead-letter
-  adapters; webhook, scheduled, and file-watch are the runtime trigger kinds it drains and
-  dispatches with at-least-once delivery.
-- **High concurrency**: the processor defaults to a concurrency of 10 (`TRIGGER_CONCURRENCY`) for
-  fan-out workloads.
-- **Triggers API service**: `./services` exposes the Triggers API service (`triggers-api`, port
-  `8093`) backing trigger and event introspection over the versioned contract.
-- **CLI surface**: `./cli` mounts the trigger command group into the host CLI walker; `./public` and
-  `./plugin` expose the typed trigger surface and host binding.
-- **Durable streams + Aspire**: `./streams` exposes a StreamDB factory for trigger entities;
-  `./aspire` contributes the trigger Aspire resource to the AppHost.
+The always-current symbol list is
+[`deno doc jsr:@netscript/plugin-triggers@<version>`](https://jsr.io/@netscript/plugin-triggers/doc)
+(pin `<version>` on the pre-release line, as above).
 
-The reusable trigger definition builders and runtime composition live in
-`@netscript/plugin-triggers-core`, which defines the handler-first DSL and runtime ports
-(`TriggerIngressPort`, `TriggerProcessorPort`, `TriggerEventStorePort`, and siblings); this package
-binds them to the host.
+## Docs
 
----
-
-## 🧩 Install manifest
-
-The plugin root ships `scaffold.plugin.json` — the declarative contract `plugin add` reads to
-install the plugin. It is editor-validated through a bundled JSON Schema (`$schema`), so the
-manifest gives you IntelliSense and validation in any schema-aware editor.
-
-```jsonc
-{
-  "$schema": "...", // @netscript/plugin scaffold.plugin.schema.json
-  "name": "@netscript/plugin-triggers",
-  "provider": { "kind": "trigger", "category": "background-processor" },
-  "capabilities": {
-    "hasDatabaseMigrations": true,
-    "hasRoutes": true,
-    "hasBackgroundWorkers": true
-  },
-  "scaffolder": { "export": "./scaffold" }
-}
-```
-
----
-
-## 📖 Documentation
-
-- **Reference**:
+- **Triggers reference — commands, service, and contract**:
   [rickylabs.github.io/netscript/reference/triggers/](https://rickylabs.github.io/netscript/reference/triggers/)
-- **Background Processing**:
+- **Background Processing — triggers alongside jobs and sagas**:
   [rickylabs.github.io/netscript/background-processing/](https://rickylabs.github.io/netscript/background-processing/)
+- **API docs on JSR**:
+  [jsr.io/@netscript/plugin-triggers/doc](https://jsr.io/@netscript/plugin-triggers/doc)
 
----
+## Compatibility
 
-## 📝 License
+The processor runtime, CLI, and Triggers API service require Deno 2.9+ (they use `Deno.*` and Deno
+KV APIs). The manifest itself is plain data and can be imported anywhere TypeScript runs.
+
+## License
 
 Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to
 JSR with cryptographically verified provenance.

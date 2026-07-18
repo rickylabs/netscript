@@ -1,5 +1,7 @@
 import lume from "lume/mod.ts";
 import basePath from "lume/plugins/base_path.ts";
+import nav from "lume/plugins/nav.ts";
+import redirects from "lume/plugins/redirects.ts";
 import pagefind from "lume/plugins/pagefind.ts";
 import codeHighlight from "lume/plugins/code_highlight.ts";
 import anchor from "npm:markdown-it-anchor@9.2.0";
@@ -88,6 +90,15 @@ site.filter(
 // Expose the resolver + raw map as global data for `comp.xref` (so the component
 // resolves without an in-template import). Throws on unknown key inside the build.
 site.data("resolveXref", resolveXref);
+
+// Multilevel sidebar (docs-v5 IA): nav.menu()/nav.breadcrumb() derive the tree
+// from page URLs; the sidebar lanes are curated in `_data.ts` `navLanes`.
+site.use(nav());
+
+// Moved-URL shims: pages declare `oldUrl` front matter and the plugin emits a
+// meta-refresh page at the old URL (GitHub Pages cannot 301). Registered before
+// base_path so the generated pages get base-prefixed hrefs like everything else.
+site.use(redirects());
 
 // Syntax highlighting for fenced code blocks (TD-6).
 site.use(codeHighlight({

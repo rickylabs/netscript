@@ -37,8 +37,17 @@ via ALPN automatically. See <a href="/capabilities/services/#tls-http-2-opt-in">
 {{ comp.cardsGrid({ columns: 3, cards: [
   { eyebrow: "Overview & Concepts", title: "Contracts to service to client", body: "The shared model for service handlers, OpenAPI, RPC, and typed clients.", href: "/explanation/contracts/", icon: "O" },
   { eyebrow: "Quickstart", title: "Catalog service", body: "Create the first service in the Storefront tutorial.", href: "/tutorials/storefront/02-catalog-service/", icon: "Q" },
-  { eyebrow: "How-To", title: "Add a service", body: "Add a new service to a workspace.", href: "/how-to/add-a-service/", icon: "H" },
-  { eyebrow: "How-To", title: "Discover services", body: "Resolve service URLs and clients from the generated workspace.", href: "/how-to/discover-services/", icon: "H" },
-  { eyebrow: "How-To", title: "OpenAPI and Scalar", body: "Expose the generated OpenAPI document and Scalar UI.", href: "/how-to/expose-openapi-scalar/", icon: "H" },
+  { eyebrow: "How-To", title: "Add a service", body: "Add a new service to a workspace.", href: "/services-sdk/how-to/add-a-service/", icon: "H" },
+  { eyebrow: "How-To", title: "Discover services", body: "Resolve service URLs and clients from the generated workspace.", href: "/services-sdk/how-to/discover-services/", icon: "H" },
+  { eyebrow: "How-To", title: "OpenAPI and Scalar", body: "Expose the generated OpenAPI document and Scalar UI.", href: "/services-sdk/how-to/expose-openapi-scalar/", icon: "H" },
   { eyebrow: "API Reference", title: "service and sdk", body: "Generated service, SDK, and contract package symbols.", href: "/reference/service/", icon: "R" }
+] }) }}
+
+## Learn, do, look up
+
+{{ comp.cardsGrid({ columns: 4, cards: [
+  { eyebrow: "Learn", title: "Storefront tutorial", body: "Define contracts and services, then consume them through the typed SDK.", href: resolveXref("tut:storefront").href },
+  { eyebrow: "Do", title: "Recipes", body: "Task-oriented recipes for this area, one problem each.", href: "/services-sdk/how-to/" },
+  { eyebrow: "Look up", title: "`@netscript/service` reference", body: "Generated API reference. Related units: `sdk`, `contracts`.", href: resolveXref("ref:service").href },
+  { eyebrow: "Understand", title: "Contracts & type flow", body: "The design rationale behind this pillar.", href: resolveXref("explain:contracts").href },
 ] }) }}

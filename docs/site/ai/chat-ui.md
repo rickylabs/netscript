@@ -4,6 +4,7 @@ title: Chat UI
 templateEngine: [vento, md]
 prev: { label: "Durable chat", href: "/ai/durable-chat/" }
 next: { label: "AI engine", href: "/ai/engine/" }
+order: 3
 ---
 
 # Chat UI
@@ -17,7 +18,7 @@ exports (`.`, `./primitives`, `./interactive`, `./registry`) carry no chat symbo
 chat surface is a set of files the NetScript CLI **copies into your app**, where you own
 and edit them like any other source file. This is the same copy-source model as the rest
 of the Fresh UI — see [Fresh UI & design](/capabilities/fresh-ui/) and
-[Customize Fresh UI](/how-to/customize-fresh-ui/).
+[Customize Fresh UI](/web-layer/how-to/customize-fresh-ui/).
 
 {{ comp callout { type: "important", title: "Copy-registry, not a dependency" } }}
 The chat components are delivered through the <code>ai</code> collection in the fresh-ui
@@ -133,7 +134,7 @@ package boundary to work around.
   {
     title: "Do — customize Fresh UI",
     body: "How the CLI copies components into your app and how you own them afterward.",
-    href: "/how-to/customize-fresh-ui/",
+    href: "/web-layer/how-to/customize-fresh-ui/",
     icon: "◆"
   },
   {

@@ -8,118 +8,135 @@
 NetScript. It turns plain config data into validated resource graphs without leaking any Aspire SDK
 type into your signatures.**
 
----
+Orchestrating a polyglot workspace with .NET Aspire usually means writing against the Aspire SDK
+directly — and then every plugin, test, and diagnostic tool inherits that dependency. This package
+inverts the relationship: every function takes plain data and returns plain data. Config is parsed
+and validated with Zod schemas, resource graphs are composed through a builder port, and the Aspire
+SDK appears only behind an adapter at the very edge.
 
-## 🚀 Quick Start
+That contract is what lets NetScript plugins contribute Aspire resources, workspaces validate their
+config before start, and composition logic run under test with an in-memory builder — all without a
+.NET toolchain in the loop.
 
-### Installation
+## Why teams use it
+
+- **SDK-neutral by contract** — no Aspire SDK type appears in any public signature, so diagnostics
+  and composition stay portable and testable.
+- **Validated config parsing** — `parseAppSettings` reads `appsettings.json`, validates it against
+  the Zod schemas on `./config`, resolves key-dependent defaults, and reports cross-reference issues
+  as warnings instead of crashes.
+- **AppHost composition ports** — `./application` exposes `composeAppHost`, the
+  `ContributionRegistry`, deterministic port allocation, and resolver helpers that turn config
+  entries into Aspire resources.
+- **Pluggable builder adapter** — `./adapters` provides the `AspireTypeScriptBuilder` port that
+  emits AppHost resources, plus environment-source resolution.
+- **First-class test surface** — `./testing` ships `MemoryAspireBuilder`, an example contribution,
+  and deterministic fixtures for plugin authors writing composition tests.
+- **Flexible cache provisioning** — one shared cache entry provisions Redis, Garnet, or Deno KV as a
+  container, a local executable, or an external connection, with an opt-in `Auto` mode that probes
+  for Docker at start time.
+
+## Architecture
+
+```mermaid
+flowchart LR
+    J["appsettings.json"] --> P["parseAppSettings<br/>(Zod validation + defaults)"]
+    P --> G["composeAppHost<br/>+ ContributionRegistry"]
+    K["Plugin contributions"] --> G
+    G --> B["Builder port"]
+    B --> A["AspireTypeScriptBuilder<br/>(real AppHost)"]
+    B --> M["MemoryAspireBuilder<br/>(tests)"]
+```
+
+## Install
 
 ```bash
-# Deno (recommended)
-deno add jsr:@netscript/aspire
-
-# Node.js / Bun
-npx jsr add @netscript/aspire
-bunx jsr add @netscript/aspire
+deno add jsr:@netscript/aspire@<version>
 ```
 
-### Usage
+Pin `<version>` to match your installed CLI; bare `jsr:@netscript/*` specifiers do not resolve on
+the pre-release line. Scaffolded NetScript workspaces already carry the pinned entry.
 
-```typescript
-import { inspectAspire } from '@netscript/aspire';
+## Quick example
 
-// Inspect an AppHost target and render a JSON-stable diagnostic report.
-const report = inspectAspire('./dotnet/AppHost');
-
-console.log(report.summary);
-console.log(report.details);
-```
-
-Validating an `appsettings.json` file before composition uses the `config` subpath:
+From the root of a scaffolded NetScript workspace (where `appsettings.json` lives and the TypeScript
+AppHost sits under `aspire/`), validate the config before composition:
 
 ```typescript
 import { parseAppSettings } from '@netscript/aspire/config';
 
-const { config, warnings } = await parseAppSettings('dotnet/AppHost/appsettings.json');
+const { config, warnings } = await parseAppSettings('appsettings.json');
 
-console.log(config.Name); // "test-app"
+console.log(config.Name); // "my-app"
 for (const warning of warnings) console.warn(warning);
 ```
 
----
+Inspect an AppHost target and render a JSON-stable diagnostic report:
 
-## 📦 Key Capabilities
+```typescript
+import { inspectAspire } from '@netscript/aspire';
 
-- **SDK-neutral by contract**: Every function takes plain data and returns plain data. No Aspire SDK
-  type appears in any public signature, so diagnostics and composition stay testable.
-- **Validated config parsing**: `parseAppSettings` reads `appsettings.json`, validates it against
-  Zod schemas (`@netscript/aspire/schema`), resolves key-dependent defaults, and reports
-  cross-reference issues.
-- **AppHost composition ports**: `@netscript/aspire/application` exposes `composeAppHost`, the
-  `ContributionRegistry`, deterministic port allocation, and resolver helpers that turn config
-  entries into Aspire resources.
-- **Pluggable builder adapter**: `@netscript/aspire/adapters` provides the `AspireTypeScriptBuilder`
-  port that emits AppHost resources, plus environment-source resolution.
-- **First-class test surface**: `@netscript/aspire/testing` ships an in-memory builder, the
-  `AspireNSPluginContribution` base class, and deterministic fixtures for plugin authors writing
-  composition tests.
+const report = inspectAspire('./aspire');
+console.log(report.summary);
+```
 
----
-
-## 🗄️ Shared cache provisioning
+## Shared cache provisioning
 
 A NetScript workspace provisions **one shared cache** for KV-backed queues, session stores, and rate
 limiters. The `CacheEntry` config picks a backend with two axes — **`Engine`** (what speaks the
-protocol) and **`Mode`** (how it is hosted). The generated AppHost turns that entry into an Aspire
-resource and injects the connection env into every consumer that declares `RequiresKv`.
+protocol) and **`Mode`** (how it is hosted) — and the generated AppHost injects the connection
+environment into every consumer that declares `RequiresKv`.
 
-### Engine × Mode matrix
+Each engine supports a specific set of modes:
 
-| Engine × Mode                    | Provisioned as                                                                | Wire protocol       | Injected env                                                             |
-| -------------------------------- | ----------------------------------------------------------------------------- | ------------------- | ------------------------------------------------------------------------ |
-| `Garnet` / `Redis` + `Container` | `addContainer` (Garnet `ghcr.io/microsoft/garnet`, Redis `redis:7`), tcp:6379 | Redis               | `GARNET_URI` / `REDIS_URI` (host:port), `CACHE_PROVIDER=garnet`\|`redis` |
-| `Garnet` + `Executable`          | `addExecutable('dotnet', ['tool','run','garnet-server',…])` — no Docker       | Redis               | `GARNET_URI` (host:port), `CACHE_PROVIDER=garnet`                        |
-| `DenoKv` + `Container`           | `addContainer` (`ghcr.io/denoland/denokv`), http:4512                         | Deno KV Connect     | `DENO_KV_URL`, `DENO_KV_ACCESS_TOKEN`, `CACHE_PROVIDER=denokv`           |
-| `DenoKv` + `Local`               | in-process `Deno.openKv()` — no resource                                      | Deno KV (embedded)  | _(none — in-process)_                                                    |
-| any + `External`                 | `addConnectionString` to a URL you supply                                     | as configured       | connection string                                                        |
-| `Garnet` / `DenoKv` + `Auto`     | **decided at `aspire start`** (see below)                                     | Redis or KV Connect | matches the resolved arm                                                 |
+| Engine   | Modes                                         | Provisioned as                                                                                   | Wire protocol                |
+| -------- | --------------------------------------------- | ------------------------------------------------------------------------------------------------ | ---------------------------- |
+| `Redis`  | `Container`, `External`, `Auto`               | `redis:7` container (tcp:6379), or a connection string you supply                                | Redis                        |
+| `Garnet` | `Container`, `Executable`, `External`, `Auto` | Garnet container (tcp:6379), `dotnet tool run garnet-server` (no Docker), or a connection string | Redis                        |
+| `DenoKv` | `Local`, `Container`, `Auto`                  | In-process `Deno.openKv()` (no resource), or a `ghcr.io/denoland/denokv` container (http:4512)   | Deno KV (embedded / Connect) |
 
-### `Auto` — environment-aware selection (default)
+Two defaults exist, and they differ: a hand-written `CacheEntry` that omits fields validates to the
+schema default `Engine: 'Garnet', Mode: 'Container'`, while `netscript init` scaffolds a workspace
+with `Engine: 'Redis', Mode: 'Container'`. `Auto` is opt-in: it defers the hosting choice to AppHost
+start, where a Docker probe picks the container arm when Docker is present and falls back to the
+Garnet dotnet-tool executable otherwise — Redis and Garnet arms all speak the Redis wire protocol,
+so the selection is transparent to consumers. Set `NETSCRIPT_CACHE_MODE` to `Container` or
+`Executable` in the AppHost environment to override the probe.
 
-The scaffold default is `Engine: 'Garnet', Mode: 'Auto'`. `Auto` defers the hosting choice to
-**AppHost start time** so the same generated project runs on a Docker host and on Docker-less bare
-metal without regeneration:
+## API at a glance
 
-- **Docker present** → the configured container backend (`Garnet` → Garnet container, `DenoKv` →
-  Deno KV Connect container).
-- **Docker absent** → the **Garnet dotnet-tool executable** (`garnet-server`, self-provisioned into
-  `.config/dotnet-tools.json` and `dotnet tool restore`d), so bare metal needs only the .NET SDK.
+| Entry           | What it gives you                                                                 |
+| --------------- | --------------------------------------------------------------------------------- |
+| `.`             | `inspectAspire` — the diagnostic contract                                         |
+| `./config`      | `parseAppSettings` and the `NetScriptConfigSchema` Zod schema family              |
+| `./schema`      | `generateAppSettingsJsonSchema` — JSON Schema for editor validation               |
+| `./types`       | The plain-data type vocabulary shared by all subpaths                             |
+| `./constants`   | `CONFIG_KEYS`, `OTEL_DEFAULTS`, `DEFAULT_PERMISSIONS`, and friends                |
+| `./application` | `composeAppHost`, `ContributionRegistry`, `createPortAllocator`, resolvers        |
+| `./adapters`    | `AspireTypeScriptBuilder`, `resolveEnvSource`                                     |
+| `./testing`     | `MemoryAspireBuilder`, `ExampleAspireContribution`, contribution-context fixtures |
+| `./public`      | The whole surface re-exported from one entry                                      |
 
-Because both Garnet arms speak the Redis wire protocol, KV consumers connect identically either way
-— selection is transparent to userland.
+The always-current symbol list is
+[`deno doc jsr:@netscript/aspire@<version>`](https://jsr.io/@netscript/aspire/doc).
 
-Override the probe with **`NETSCRIPT_CACHE_MODE`** in the AppHost environment: `Container` forces
-the container arm, `Executable` forces the dotnet-tool arm. Unset (or any other value) uses the
-runtime `docker info` probe.
+## Docs
 
-The Garnet tool version is pinned (via `CacheEntry.ToolVersion`, defaulting to the CLI's
-`SCAFFOLD_VERSIONS.GARNET_TOOL`); the executable arm additionally needs the .NET SDK and, for the
-Deno KV path, the `--unstable-kv` flag on the consuming Deno process.
-
----
-
-## 📖 Documentation
-
+- **Orchestration & runtime — Aspire in the NetScript workspace**:
+  [rickylabs.github.io/netscript/orchestration-runtime/](https://rickylabs.github.io/netscript/orchestration-runtime/)
 - **Reference**:
   [rickylabs.github.io/netscript/reference/aspire/](https://rickylabs.github.io/netscript/reference/aspire/)
-- **Orchestration & Runtime**:
-  [rickylabs.github.io/netscript/orchestration-runtime/](https://rickylabs.github.io/netscript/orchestration-runtime/)
-- **Deploy locally with Aspire**:
+- **How-to — deploy locally with Aspire**:
   [rickylabs.github.io/netscript/how-to/deploy-local-aspire/](https://rickylabs.github.io/netscript/how-to/deploy-local-aspire/)
+- **API docs on JSR**: [jsr.io/@netscript/aspire/doc](https://jsr.io/@netscript/aspire/doc)
 
----
+## Compatibility
 
-## 📝 License
+Runs on Deno 2.x with no .NET dependency of its own — the package handles plain data; running the
+composed AppHost requires the .NET SDK and the Aspire CLI, and the Deno KV cache arms need
+`--unstable-kv` on the consuming process.
 
-Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to JSR with
-cryptographically verified provenance.
+## License
+
+Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to
+JSR with cryptographically verified provenance.

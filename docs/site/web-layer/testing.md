@@ -2,6 +2,7 @@
 layout: layouts/base.vto
 title: Testing Fresh pages
 templateEngine: [vento, md]
+order: 10
 ---
 
 # Testing Fresh pages

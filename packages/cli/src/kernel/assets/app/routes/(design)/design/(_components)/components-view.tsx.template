@@ -9,6 +9,11 @@ import {
   Checkbox,
   DataTable,
   DetailLayout,
+  DesktopDialog,
+  DesktopNotification,
+  DesktopTrayMenu,
+  DesktopUpdatePrompt,
+  DesktopWindowChrome,
   EmptyState,
   FilterForm,
   FormField,
@@ -39,6 +44,7 @@ import {
 } from '../(_shared)/registry.ts';
 import { tokenManifestMeta } from '../(_shared)/tokens.ts';
 import { FloatingSurfaceDemo } from '../(_islands)/FloatingSurfaceDemo.tsx';
+import DesktopOnly from '@app/islands/ui/DesktopOnly.tsx';
 
 const SECTIONS = [
   {
@@ -583,6 +589,62 @@ function renderDemo(name: string): VNode | null {
         <div class='ns-gallery-stack ns-gallery-stack--wide'>
           <SectionDivider label='Configuration' />
           <SectionDivider label='Danger zone' />
+        </div>
+      );
+    case 'desktop-tray-menu':
+      return (
+        <DesktopTrayMenu
+          source='tray'
+          items={[
+            { type: 'action', id: 'show-window', label: 'Show window' },
+            { type: 'separator' },
+            {
+              type: 'submenu',
+              label: 'Workspace',
+              items: [{ type: 'action', id: 'open-settings', label: 'Settings', accelerator: 'CmdOrCtrl+,' }],
+            },
+            { type: 'role', role: 'quit' },
+          ]}
+        />
+      );
+    case 'desktop-dialog':
+      return (
+        <DesktopDialog
+          message='This browser gallery emits host intents without opening native dialogs.'
+          defaultValue='NetScript Studio'
+        />
+      );
+    case 'desktop-notification':
+      return (
+        <DesktopNotification
+          notification={{
+            title: 'Build complete',
+            body: 'The desktop frontend is ready for review.',
+          }}
+        />
+      );
+    case 'desktop-window-chrome':
+      return (
+        <DesktopWindowChrome
+          title='NetScript Studio'
+          actions={['focus', 'reload', 'hide', 'close']}
+        />
+      );
+    case 'desktop-update-prompt':
+      return (
+        <DesktopUpdatePrompt
+          event={{ applyMode: 'automatic', version: '0.0.1-beta.11' }}
+        />
+      );
+    case 'desktop-only':
+      return (
+        <div class='ns-gallery-stack'>
+          <DesktopOnly>
+            <span data-desktop-only-content>Native desktop binding detected.</span>
+          </DesktopOnly>
+          <InlineNotice title='Desktop-gated island'>
+            The copied DesktopOnly island renders no desktop content in this browser/Aspire gallery.
+          </InlineNotice>
         </div>
       );
     case 'theme-toggle':

@@ -4,6 +4,7 @@ title: Build a storefront backend
 templateEngine: [vento, md]
 prev: { label: "Tutorials", href: "/tutorials/" }
 next: { label: "1 · Scaffold", href: "/tutorials/storefront/01-scaffold/" }
+order: 4
 ---
 
 # Build a storefront backend
@@ -121,3 +122,5 @@ This is a tutorial track: state compounds. The <code>my-shop/</code> workspace y
 ## Start the build
 
 {{ comp.nextPrev({ prev: { label: "Tutorials", href: "/tutorials/" }, next: { label: "1 · Scaffold", href: "/tutorials/storefront/01-scaffold/" } }) }}
+
+After this track, keep building in **Build › [Services & SDK](/services-sdk/)** — the guides and recipes there pick up where these chapters stop.

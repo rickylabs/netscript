@@ -1176,6 +1176,134 @@ export const freshUiRegistryManifest: RegistryManifest = {
       registryDependencies: ['chart-block', 'donut', 'data-table', 'stats-grid'],
     },
     {
+      name: 'desktop-tray-menu',
+      kind: 'component',
+      layer: 2,
+      description: 'Declarative tray and application-menu preview that emits stable action IDs.',
+      copyOwnership: 'app-owned-after-copy',
+      author: 'NetScript',
+      tags: ['desktop', 'tray', 'menu', 'actions'],
+      files: [
+        {
+          source: 'registry/components/ui/desktop-tray-menu.tsx',
+          target: '@ui/desktop-tray-menu.tsx',
+        },
+        {
+          source: 'registry/components/ui/desktop-tray-menu.css',
+          target: '@assets/ui/desktop-tray-menu.css',
+        },
+      ],
+      registryDependencies: ['theme-seed'],
+      css: [{ layer: 'components', content: "@import './ui/desktop-tray-menu.css';" }],
+    },
+    {
+      name: 'desktop-dialog',
+      kind: 'component',
+      layer: 2,
+      description: 'Side-effect-free alert, confirm, and prompt intents for a desktop controller.',
+      copyOwnership: 'app-owned-after-copy',
+      author: 'NetScript',
+      tags: ['desktop', 'dialog', 'actions'],
+      files: [
+        {
+          source: 'registry/components/ui/desktop-dialog.tsx',
+          target: '@ui/desktop-dialog.tsx',
+        },
+        {
+          source: 'registry/components/ui/desktop-dialog.css',
+          target: '@assets/ui/desktop-dialog.css',
+        },
+      ],
+      registryDependencies: ['theme-seed'],
+      css: [{ layer: 'components', content: "@import './ui/desktop-dialog.css';" }],
+    },
+    {
+      name: 'desktop-notification',
+      kind: 'component',
+      layer: 2,
+      description:
+        'Side-effect-free native notification preview and explicit host request control.',
+      copyOwnership: 'app-owned-after-copy',
+      author: 'NetScript',
+      tags: ['desktop', 'notification', 'feedback'],
+      files: [
+        {
+          source: 'registry/components/ui/desktop-notification.tsx',
+          target: '@ui/desktop-notification.tsx',
+        },
+        {
+          source: 'registry/components/ui/desktop-notification.css',
+          target: '@assets/ui/desktop-notification.css',
+        },
+      ],
+      registryDependencies: ['theme-seed'],
+      css: [{ layer: 'components', content: "@import './ui/desktop-notification.css';" }],
+    },
+    {
+      name: 'desktop-window-chrome',
+      kind: 'component',
+      layer: 2,
+      description:
+        'Accessible title-bar actions limited to documented Deno Desktop window operations.',
+      copyOwnership: 'app-owned-after-copy',
+      author: 'NetScript',
+      tags: ['desktop', 'window', 'chrome', 'actions'],
+      files: [
+        {
+          source: 'registry/components/ui/desktop-window-chrome.tsx',
+          target: '@ui/desktop-window-chrome.tsx',
+        },
+        {
+          source: 'registry/components/ui/desktop-window-chrome.css',
+          target: '@assets/ui/desktop-window-chrome.css',
+        },
+      ],
+      registryDependencies: ['theme-seed'],
+      css: [{ layer: 'components', content: "@import './ui/desktop-window-chrome.css';" }],
+    },
+    {
+      name: 'desktop-update-prompt',
+      kind: 'component',
+      layer: 2,
+      description:
+        'Exhaustive update-ready UX for automatic restart and Windows manual installer paths.',
+      copyOwnership: 'app-owned-after-copy',
+      author: 'NetScript',
+      tags: ['desktop', 'updates', 'feedback'],
+      files: [
+        {
+          source: 'registry/components/ui/desktop-update-prompt.tsx',
+          target: '@ui/desktop-update-prompt.tsx',
+        },
+        {
+          source: 'registry/components/ui/desktop-update-prompt.css',
+          target: '@assets/ui/desktop-update-prompt.css',
+        },
+      ],
+      registryDependencies: ['theme-seed'],
+      dependencies: ['jsr:@netscript/sdk@0.0.1-beta.10/auto-update'],
+      css: [{ layer: 'components', content: "@import './ui/desktop-update-prompt.css';" }],
+    },
+    {
+      name: 'desktop-only',
+      kind: 'island',
+      layer: 2,
+      description:
+        'Hydration-safe content gate that no-ops without the NetScript Deno Desktop RPC binding.',
+      copyOwnership: 'app-owned-after-copy',
+      author: 'NetScript',
+      tags: ['desktop', 'island', 'feature-detection'],
+      files: [{
+        source: 'registry/islands/DesktopOnly.tsx',
+        target: '@islands/DesktopOnly.tsx',
+      }],
+      registryDependencies: ['theme-seed'],
+      dependencies: [
+        'jsr:@netscript/sdk@0.0.1-beta.10/desktop',
+        'npm:preact@^10.29.2',
+      ],
+    },
+    {
       name: 'mcp-ui-widget',
       kind: 'island',
       layer: 3,
@@ -1267,6 +1395,12 @@ export const freshUiRegistryManifest: RegistryManifest = {
         'chart-block',
         'donut',
         'dropzone',
+        'desktop-tray-menu',
+        'desktop-dialog',
+        'desktop-notification',
+        'desktop-window-chrome',
+        'desktop-update-prompt',
+        'desktop-only',
       ],
     },
     {
@@ -1353,6 +1487,20 @@ export const freshUiRegistryManifest: RegistryManifest = {
         'pagination',
         'empty-state',
         'section-divider',
+      ],
+    },
+    {
+      name: 'desktop',
+      description:
+        'Desktop-gated window chrome and update-ready surfaces for NetScript Fresh applications.',
+      items: [
+        'theme-seed',
+        'desktop-tray-menu',
+        'desktop-dialog',
+        'desktop-notification',
+        'desktop-window-chrome',
+        'desktop-update-prompt',
+        'desktop-only',
       ],
     },
   ],

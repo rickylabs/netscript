@@ -1,0 +1,46 @@
+{{# nav/menu-item.vto — one node of the folder-derived sidebar tree, included
+   recursively for children (the Lume nav plugin's documented pattern). Props:
+   `item` (nav.menu node: { slug, data?, children? }) and `currentUrl` (the
+   page's SOURCE url; node urls are source urls too, so comparisons are
+   source==source — base_path prefixes emitted hrefs at build time).
+   A node with children renders as <details>, auto-opened on the active path;
+   clicking the label navigates, the chevron toggles. Every content folder has
+   an index.md so `item.data` is always present; the guard keeps a page-less
+   node from crashing the build. #}}
+{{ if item.data }}
+  {{ set nodeUrl = item.data.url }}
+  {{ set isCurrent = nodeUrl === currentUrl }}
+  {{ if item.children && item.children.length }}
+    <details class="ns-nav-branch"{{ if currentUrl.startsWith(nodeUrl) }} open{{ /if }}>
+      <summary class="ns-nav-branch__summary">
+        <a
+          href="{{ nodeUrl |> url }}"
+          class="ns-dashboard__nav-item{{ if isCurrent }} is-active{{ /if }}"
+          {{ if isCurrent }}aria-current="page"{{ /if }}
+        >
+          <span class="ns-dashboard__nav-label">{{ item.data.nav_title || item.data.title }}</span>
+        </a>
+        <span class="ns-nav-branch__chevron" aria-hidden="true">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
+        </span>
+      </summary>
+      <div class="ns-nav-branch__children" role="list">
+        {{ for child of item.children }}
+          {{ include "nav/menu-item.vto" { item: child, currentUrl: currentUrl } }}
+        {{ /for }}
+      </div>
+    </details>
+  {{ else }}
+    <a
+      href="{{ nodeUrl |> url }}"
+      role="listitem"
+      class="ns-dashboard__nav-item{{ if isCurrent }} is-active{{ /if }}"
+      {{ if isCurrent }}aria-current="page"{{ /if }}
+    >
+      <span class="ns-dashboard__nav-label">{{ item.data.nav_title || item.data.title }}</span>
+    </a>
+  {{ /if }}
+{{ /if }}

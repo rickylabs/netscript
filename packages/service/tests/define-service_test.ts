@@ -91,6 +91,85 @@ Deno.test('defineService exposes a friendly service landing response', async () 
   }
 });
 
+Deno.test('defineService aggregate health selects sqlite and excludes unused mysql', async () => {
+  const previousProvider = Deno.env.get('DB_PROVIDER');
+  Deno.env.set('DB_PROVIDER', 'sqlite');
+  let mysqlQueries = 0;
+  let sqliteQueries = 0;
+
+  const running = await defineService({}, {
+    name: 'define-service-provider-health',
+    port: 0,
+    db: {
+      mysql: {
+        $queryRaw(): Promise<unknown> {
+          mysqlQueries += 1;
+          return Promise.reject(new Error('unused mysql queried'));
+        },
+      },
+      sqlite: {
+        $queryRaw(): Promise<unknown> {
+          sqliteQueries += 1;
+          return Promise.resolve(1);
+        },
+      },
+    },
+  });
+
+  try {
+    const response = await running.app.request('/health');
+    const body = await response.json();
+
+    assertEquals(response.status, 200);
+    assertEquals(body.status, 'healthy');
+    assertEquals(body.checks.map((check: { name: string }) => check.name), ['database:sqlite']);
+    assertEquals(mysqlQueries, 0);
+    assertEquals(sqliteQueries, 1);
+  } finally {
+    await running.stop();
+    restoreEnv('DB_PROVIDER', previousProvider);
+  }
+});
+
+Deno.test('defineService preserves readiness for the configured database', async () => {
+  const previousProvider = Deno.env.get('DB_PROVIDER');
+  Deno.env.set('DB_PROVIDER', 'sqlite');
+  let rejectQuery = false;
+
+  const running = await defineService({}, {
+    name: 'define-service-provider-readiness',
+    port: 0,
+    db: {
+      mysql: {
+        $queryRaw(): Promise<unknown> {
+          return Promise.reject(new Error('unused mysql queried'));
+        },
+      },
+      sqlite: {
+        $queryRaw(): Promise<unknown> {
+          return rejectQuery
+            ? Promise.reject(new Error('configured sqlite unavailable'))
+            : Promise.resolve(1);
+        },
+      },
+    },
+  });
+
+  try {
+    const readyResponse = await running.app.request('/health/ready');
+    assertEquals(readyResponse.status, 200);
+    assertEquals(await readyResponse.json(), { ready: true });
+
+    rejectQuery = true;
+    const notReadyResponse = await running.app.request('/health/ready');
+    assertEquals(notReadyResponse.status, 503);
+    assertEquals(await notReadyResponse.json(), { ready: false });
+  } finally {
+    await running.stop();
+    restoreEnv('DB_PROVIDER', previousProvider);
+  }
+});
+
 Deno.test('defineService skips disconnect hook for non-capable database client', async () => {
   await withReachableDatabaseEndpoint(async () => {
     let queryCount = 0;

@@ -148,7 +148,7 @@ Both should return healthy responses, and the dashboard at `:18888` should list 
 - [ ] Creating an order is visible in the dashboard traces and the live monitor.
 
 {{ comp callout { type: "warning", title: "Aspire is the LOCAL story — not a production deployer" } }}
-<code>aspire start</code> exists to make one command produce a complete, observable, correctly-wired stack on <strong>one machine</strong>. The Postgres and Redis it starts are throwaway Docker containers for dev convenience — <strong>not</strong> your production database or cache. For a remote target you point processes at managed infrastructure and let your platform own lifecycle; that is the <a href="/how-to/deploy/">Deploy</a> recipe, and the <code>--no-aspire</code> path in <a href="/explanation/aspire/">Orchestration with Aspire</a>.
+<code>aspire start</code> exists to make one command produce a complete, observable, correctly-wired stack on <strong>one machine</strong>. The Postgres and Redis it starts are throwaway Docker containers for dev convenience — <strong>not</strong> your production database or cache. For a remote target you point processes at managed infrastructure and let your platform own lifecycle; that is the <a href="/orchestration-runtime/how-to/deploy/">Deploy</a> recipe, and the <code>--no-aspire</code> path in <a href="/explanation/aspire/">Orchestration with Aspire</a>.
 {{ /comp }}
 
 {{ comp callout { type: "warning", title: "Footguns when aspire start will not boot" } }}
@@ -172,7 +172,7 @@ NetScript spine.
 
 - **Task recipes** → the [how-to guides](/how-to/) cover what the tutorials don't: adding plugins,
   database migrations, queue backends, and production pitfalls.
-- **Ship it remotely** → [Deploy](/how-to/deploy/) is the production companion to local Aspire.
+- **Ship it remotely** → [Deploy](/orchestration-runtime/how-to/deploy/) is the production companion to local Aspire.
 - **Go deeper** → [Orchestration with Aspire](/explanation/aspire/) explains the AppHost, plugin
   contributions, and two-pass reference resolution; {{ comp.xref({ key: "cap:streams" }) }} and
   {{ comp.xref({ key: "cap:fresh-framework", text: "the Fresh meta-framework" }) }} back chapters 4

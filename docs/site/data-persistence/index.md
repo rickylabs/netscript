@@ -28,8 +28,17 @@ workspace resolves a second database.
 {{ comp.cardsGrid({ columns: 3, cards: [
   { eyebrow: "Overview & Concepts", title: "Database and KV", body: "The persistence layer behind services, queues, and workflow state.", href: "/data-persistence/database/", icon: "O" },
   { eyebrow: "Quickstart", title: "Data contracts", body: "Follow the Storefront data step before service and saga work expand it.", href: "/tutorials/storefront/03-cart-contracts/", icon: "Q" },
-  { eyebrow: "How-To", title: "Database and migration", body: "Initialize and migrate the primary datasource.", href: "/how-to/database-migration/", icon: "H" },
-  { eyebrow: "How-To", title: "Second database", body: "Add and address another datasource from the workspace.", href: "/how-to/use-a-second-database/", icon: "H" },
+  { eyebrow: "How-To", title: "Database and migration", body: "Initialize and migrate the primary datasource.", href: "/data-persistence/how-to/database-migration/", icon: "H" },
+  { eyebrow: "How-To", title: "Second database", body: "Add and address another datasource from the workspace.", href: "/data-persistence/how-to/use-a-second-database/", icon: "H" },
   { eyebrow: "API Reference", title: "database", body: "Generated database package symbols.", href: "/reference/database/", icon: "R" },
   { eyebrow: "API Reference", title: "kv and Prisma adapter", body: "Generated KV and adapter package symbols.", href: "/reference/kv/", icon: "R" }
+] }) }}
+
+## Learn, do, look up
+
+{{ comp.cardsGrid({ columns: 4, cards: [
+  { eyebrow: "Learn", title: "Storefront tutorial", body: "Cart contracts back a real database schema from chapter 3 on.", href: resolveXref("tut:storefront").href },
+  { eyebrow: "Do", title: "Recipes", body: "Task-oriented recipes for this area, one problem each.", href: "/data-persistence/how-to/" },
+  { eyebrow: "Look up", title: "`@netscript/database` reference", body: "Generated API reference. Related units: `kv`, `prisma-adapter-mysql`.", href: resolveXref("ref:database").href },
+  { eyebrow: "Understand", title: "Architecture", body: "The design rationale behind this pillar.", href: resolveXref("explain:architecture").href },
 ] }) }}

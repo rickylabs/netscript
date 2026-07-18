@@ -1703,3 +1703,68 @@ a.ns-cards-grid__card:focus-visible {
   color: var(--ns-fg);
   border-color: var(--ns-border-hover, var(--ns-accent, #5b8def));
 }
+
+/* ── docs-v5 multilevel nav tree (nav plugin, _includes/nav/menu-item.vto) ── */
+
+.ns-nav-lane {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+}
+
+.ns-nav-lane__sub {
+  font-family: var(--ns-font-sans);
+  font-size: 0.6875rem;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: normal;
+  color: var(--ns-muted-fg);
+  opacity: 0.8;
+}
+
+.ns-nav-branch__summary {
+  display: flex;
+  align-items: center;
+  list-style: none;
+  cursor: pointer;
+}
+
+.ns-nav-branch__summary::-webkit-details-marker {
+  display: none;
+}
+
+.ns-nav-branch__summary .ns-dashboard__nav-item {
+  flex: 1;
+  min-width: 0;
+}
+
+.ns-nav-branch__chevron {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  margin-right: var(--ns-space-1-5);
+  border-radius: var(--ns-radius-sm, 4px);
+  color: var(--ns-muted-fg);
+  transition: transform 140ms ease, background-color 140ms ease;
+}
+
+.ns-nav-branch__chevron:hover {
+  background: color-mix(in srgb, var(--ns-surface-raised) 60%, transparent);
+  color: var(--ns-fg);
+}
+
+.ns-nav-branch[open] > .ns-nav-branch__summary .ns-nav-branch__chevron {
+  transform: rotate(90deg);
+}
+
+.ns-nav-branch__children {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-left: var(--ns-space-3);
+  padding-left: var(--ns-space-2);
+  border-left: 1px solid var(--ns-border);
+}

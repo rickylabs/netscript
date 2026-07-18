@@ -75,7 +75,8 @@ export class AddWebhookCommand extends TriggersCliCommand {
       name: 'add-webhook',
       category: 'scaffolding',
       description: 'Create a webhook trigger definition.',
-      usage: 'ns-triggers add webhook <id> --path=<path> [--secret-env=<name> --job=<id>]',
+      usage:
+        'deno x -A jsr:@netscript/plugin-triggers@<version>/cli add webhook <id> --path=<path> [--secret-env=<name> --job=<id>]',
       flags: [
         { name: 'path', description: 'Webhook route path.', required: true },
         { name: 'verifier', description: 'Webhook verifier id.' },
@@ -97,7 +98,8 @@ export class AddFileWatchCommand extends TriggersCliCommand {
       name: 'add-file-watch',
       category: 'scaffolding',
       description: 'Create a file-watch trigger definition.',
-      usage: 'ns-triggers add file-watch <id> --path=<dir> [--pattern=<glob> --ignored=<glob>]',
+      usage:
+        'deno x -A jsr:@netscript/plugin-triggers@<version>/cli add file-watch <id> --path=<dir> [--pattern=<glob> --ignored=<glob>]',
       flags: [
         { name: 'path', description: 'Directory path to watch.', required: true },
         { name: 'pattern', description: 'Glob pattern for files to include.' },
@@ -116,7 +118,8 @@ export class AddScheduledCommand extends TriggersCliCommand {
       name: 'add-scheduled',
       category: 'scaffolding',
       description: 'Create a scheduled trigger definition.',
-      usage: 'ns-triggers add scheduled <id> --cron=<expr> [--timezone=<iana> --job=<id>]',
+      usage:
+        'deno x -A jsr:@netscript/plugin-triggers@<version>/cli add scheduled <id> --cron=<expr> [--timezone=<iana> --job=<id>]',
       flags: [
         { name: 'cron', description: 'Five-field cron expression.', required: true },
         { name: 'timezone', description: 'IANA timezone for schedule interpretation.' },
@@ -137,7 +140,8 @@ export class ListTriggersCommand extends TriggersCliCommand {
       name: 'list',
       category: 'inspection',
       description: 'List trigger definitions discovered for the current project.',
-      usage: 'ns-triggers list [--kind=<kind> --enabled-only]',
+      usage:
+        'deno x -A jsr:@netscript/plugin-triggers@<version>/cli list [--kind=<kind> --enabled-only]',
       flags: [
         { name: 'kind', description: 'Filter by trigger kind.' },
         { name: 'enabled-only', description: 'Only include enabled triggers.' },
@@ -154,7 +158,8 @@ export class TestTriggerCommand extends TriggersCliCommand {
       name: 'test',
       category: 'runtime',
       description: 'Test a trigger handler with an inline event.',
-      usage: 'ns-triggers test <trigger-id> [--payload=<json>]',
+      usage:
+        'deno x -A jsr:@netscript/plugin-triggers@<version>/cli test <trigger-id> [--payload=<json>]',
       flags: [{ name: 'payload', description: 'JSON payload passed to the trigger.' }],
     }, backend);
   }
@@ -168,7 +173,8 @@ export class FireTriggerCommand extends TriggersCliCommand {
       name: 'fire',
       category: 'runtime',
       description: 'Fire a trigger by identifier.',
-      usage: 'ns-triggers fire <trigger-id> [--payload=<json> --idempotency-key=<key>]',
+      usage:
+        'deno x -A jsr:@netscript/plugin-triggers@<version>/cli fire <trigger-id> [--payload=<json> --idempotency-key=<key>]',
       flags: [
         { name: 'payload', description: 'JSON payload passed to the trigger.' },
         { name: 'idempotency-key', description: 'Caller-supplied idempotency key.' },
@@ -185,7 +191,8 @@ export class PreviewScheduleCommand extends TriggersCliCommand {
       name: 'preview',
       category: 'schedule',
       description: 'Preview scheduled trigger fire times.',
-      usage: 'ns-triggers preview <trigger-id> [--count=<n>]',
+      usage:
+        'deno x -A jsr:@netscript/plugin-triggers@<version>/cli preview <trigger-id> [--count=<n>]',
       flags: [{ name: 'count', description: 'Number of fire times to preview.' }],
     }, backend);
   }
@@ -199,7 +206,7 @@ export class EnableTriggerCommand extends TriggersCliCommand {
       name: 'enable',
       category: 'runtime',
       description: 'Enable a trigger by identifier.',
-      usage: 'ns-triggers enable <trigger-id>',
+      usage: 'deno x -A jsr:@netscript/plugin-triggers@<version>/cli enable <trigger-id>',
     }, backend);
   }
 }
@@ -212,7 +219,7 @@ export class DisableTriggerCommand extends TriggersCliCommand {
       name: 'disable',
       category: 'runtime',
       description: 'Disable a trigger by identifier.',
-      usage: 'ns-triggers disable <trigger-id>',
+      usage: 'deno x -A jsr:@netscript/plugin-triggers@<version>/cli disable <trigger-id>',
     }, backend);
   }
 }

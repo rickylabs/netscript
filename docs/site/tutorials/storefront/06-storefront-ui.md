@@ -156,7 +156,7 @@ You never write <code>http://localhost:3001</code>. <code>serviceName: 'products
 call time from an Aspire-injected env var — server-side <code>services__products__http__0</code> and
 its browser mirror — so the same client works in a page loader and in a hydrated island. Aspire sets
 those when the app lists <code>products</code> as a reference; the client just reads them. Full
-mechanics in <a href="/how-to/discover-services/">Discover services</a>.
+mechanics in <a href="/services-sdk/how-to/discover-services/">Discover services</a>.
 {{ /comp }}
 
 ## Step 3 — Read and mutate in the island

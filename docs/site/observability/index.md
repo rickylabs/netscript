@@ -17,7 +17,7 @@ or connect package-level telemetry to the running system.
 {{ comp.cardsGrid({ columns: 3, cards: [
   { eyebrow: "Overview & Concepts", title: "Telemetry model", body: "Trace context and logging across services, workers, sagas, and orchestration.", href: "/explanation/observability/", icon: "O" },
   { eyebrow: "Quickstart", title: "Turn on tracing", body: "Run aspire start, trigger a job, and watch the runtime's automatic spans land in the dashboard — the lowest-effort path to a first trace.", href: "/observability/telemetry/", icon: "Q" },
-  { eyebrow: "How-To", title: "Add OpenTelemetry", body: "Wire OTel into a workspace.", href: "/how-to/add-opentelemetry/", icon: "H" },
+  { eyebrow: "How-To", title: "Add OpenTelemetry", body: "Wire OTel into a workspace.", href: "/observability/how-to/add-opentelemetry/", icon: "H" },
   { eyebrow: "API Reference", title: "telemetry", body: "Generated telemetry package symbols.", href: "/reference/telemetry/", icon: "R" },
   { eyebrow: "API Reference", title: "logger", body: "Generated logger package symbols.", href: "/reference/logger/", icon: "R" }
 ] }) }}
@@ -44,3 +44,12 @@ learn the model:
   {{ comp.xref({ key: "ref:logger", text: "logger" }) }} references, and the
   [telemetry convention](/reference/telemetry/convention/) (span naming, SpanKind, the `netscript.*`
   attribute rules).
+
+## Learn, do, look up
+
+{{ comp.cardsGrid({ columns: 4, cards: [
+  { eyebrow: "Learn", title: "Trace the request model", body: "Follow one request through services, jobs, and streams in the core-concepts tour.", href: resolveXref("concept:concepts").href },
+  { eyebrow: "Do", title: "Recipes", body: "Task-oriented recipes for this area, one problem each.", href: "/observability/how-to/" },
+  { eyebrow: "Look up", title: "`@netscript/telemetry` reference", body: "Generated API reference. Related units: `logger`.", href: resolveXref("ref:telemetry").href },
+  { eyebrow: "Understand", title: "Observability", body: "The design rationale behind this pillar.", href: resolveXref("explain:observability").href },
+] }) }}

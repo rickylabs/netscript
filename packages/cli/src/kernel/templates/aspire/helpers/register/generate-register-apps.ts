@@ -2,15 +2,16 @@
  * @module
  *
  * Generator for `.helpers/register-apps.mts` — registers application resources
- * (web apps, Tauri desktop apps, and task-based apps) with the Aspire SDK
+ * (web apps, Tauri apps, Deno Desktop apps, and task-based apps) with the Aspire SDK
  * builder.
  *
- * Three registration modes are supported:
+ * Four registration modes are supported:
  *
  * | Type    | Method             | VITE Injection |
  * |---------|-------------------|----------------|
  * | `app`   | `addExecutable()`  | ✅ Yes          |
  * | `tauri` | `addExecutable()`  | ❌ No           |
+ * | `desktop` | `addExecutable()` | ❌ No          |
  * | `task`  | `addExecutable()`  | ❌ No           |
  *
  * The `app` type uses the Aspire SDK's `addExecutable()` and
@@ -50,12 +51,15 @@ export function generateRegisterApps(options: RegisterAppsOptions): string {
     lines.push(`  // --- ${name} (${type}) ---`);
 
     // Skip disabled entries
-    lines.push(`  if (config.Apps['${name}']?.Enabled !== false) {`);
+    const enabledCondition = type === 'desktop' ? '=== true' : '!== false';
+    lines.push(`  if (config.Apps['${name}']?.Enabled ${enabledCondition}) {`);
 
     if (type === 'app') {
       buildAppBlock(lines, id, name, entry, workdir);
     } else if (type === 'tauri') {
       buildTauriBlock(lines, id, name, entry, workdir);
+    } else if (type === 'desktop') {
+      buildDesktopBlock(lines, id, name, entry, workdir);
     } else {
       // task
       buildTaskBlock(lines, id, name, entry, workdir);
@@ -75,10 +79,43 @@ export function generateRegisterApps(options: RegisterAppsOptions): string {
     );
 
     // --- Common: HTTP endpoint ---
-    if (entry.Port) {
+    if (type !== 'desktop' && entry.Port) {
       lines.push(``);
       lines.push(`    // HTTP endpoint`);
       lines.push(`    await ${id}.withHttpEndpoint({ port: ${entry.Port}, env: 'PORT' });`);
+    }
+
+    // --- desktop type: server-side discovery only ---
+    if (type === 'desktop') {
+      const serviceRefs = entry.ServiceReferences ?? [];
+      const pluginRefs = entry.PluginReferences ?? [];
+
+      if (serviceRefs.length > 0 || pluginRefs.length > 0) {
+        lines.push(``);
+        lines.push(`    // Server-side service-discovery injection`);
+      }
+
+      for (const ref of serviceRefs) {
+        lines.push(`    {`);
+        lines.push(
+          `      const endpoint = await getResourceEndpoint(services.get('${ref}'), 'http');`,
+        );
+        lines.push(`      if (endpoint) {`);
+        lines.push(`        await ${id}.withEnvironment('services__${ref}__http__0', endpoint);`);
+        lines.push(`      }`);
+        lines.push(`    }`);
+      }
+
+      for (const ref of pluginRefs) {
+        lines.push(`    {`);
+        lines.push(
+          `      const endpoint = await getResourceEndpoint(plugins.get('${ref}'), 'http');`,
+        );
+        lines.push(`      if (endpoint) {`);
+        lines.push(`        await ${id}.withEnvironment('services__${ref}__http__0', endpoint);`);
+        lines.push(`      }`);
+        lines.push(`    }`);
+      }
     }
 
     // --- Common: KV cache dependency ---
@@ -213,6 +250,30 @@ function buildTauriBlock(
   lines.push(
     `    const ${id} = builder.addExecutable('${name}', 'deno', ${id}_workdir, ['task', '${taskName}']);`,
   );
+}
+
+/**
+ * Builds registration lines for a `desktop` type entry.
+ * The window waits for a successful Fresh build before Aspire launches it.
+ */
+function buildDesktopBlock(
+  lines: string[],
+  id: string,
+  name: string,
+  entry: { readonly Prebuild?: string; readonly TaskName?: string },
+  workdir: string,
+): void {
+  const buildTaskName = entry.Prebuild ?? 'build';
+  const taskName = entry.TaskName ?? 'desktop:predev';
+
+  lines.push(`    const ${id}_workdir = resolveWorkspacePath(appHostDir, '${workdir}');`);
+  lines.push(
+    `    const ${id}_build = builder.addExecutable('${name}-build', 'deno', ${id}_workdir, ['task', '${buildTaskName}']);`,
+  );
+  lines.push(
+    `    const ${id} = builder.addExecutable('${name}', 'deno', ${id}_workdir, ['task', '${taskName}', '--backend', 'cef']);`,
+  );
+  lines.push(`    await ${id}.waitForCompletion(${id}_build);`);
 }
 
 /**

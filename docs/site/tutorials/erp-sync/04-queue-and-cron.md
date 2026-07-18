@@ -67,7 +67,7 @@ Auto-discovery probes <strong>RabbitMQ → Redis → Deno KV only</strong>. It w
 fall through to PostgreSQL, even when a Postgres connection is present. The SQL-durable queue is
 opt-in — you must pass <code>provider: QueueProvider.Postgres</code> or you will quietly land on the
 Deno KV adapter. The full decision guide is in
-<a href="/how-to/choose-a-queue-provider/">Choose a queue provider</a>.
+<a href="/data-persistence/how-to/choose-a-queue-provider/">Choose a queue provider</a>.
 {{ /comp }}
 
 ## Step 2 — Size worker concurrency in config
@@ -105,7 +105,7 @@ export const workers = defineWorkers({
 
 For per-topic control — a hot `imports` topic at concurrency 10 while a heavy `reports` topic stays
 at 1 — use a `WorkerGroup` with its own `scaling: { mode, concurrency }`. The full per-topic and
-runner-mode knobs are in [Tune the worker runtime](/how-to/tune-worker-runtime/).
+runner-mode knobs are in [Tune the worker runtime](/background-processing/how-to/tune-worker-runtime/).
 
 {{ comp callout { type: "warning", title: "Set scaling.concurrency in config — the Aspire env var is silently ignored" } }}
 There are <strong>two</strong> concurrency env names in play and they are <em>not</em> the same
@@ -229,7 +229,7 @@ schedule, not a file event, enqueued it. Set the cron back to `0 6 * * *` when y
 Raising <code>concurrency</code> means more jobs run at once, and every queue backend can redeliver a
 message on retry. An idempotent import — keyed on the file's content hash or name — can re-run without
 double-importing. Pair retries with an <code>idempotencyKey</code> on enqueue so a redelivery after a
-restart does not duplicate rows. See <a href="/how-to/choose-a-queue-provider/">Choose a queue
+restart does not duplicate rows. See <a href="/data-persistence/how-to/choose-a-queue-provider/">Choose a queue
 provider</a> for each backend's delivery semantics.
 {{ /comp }}
 

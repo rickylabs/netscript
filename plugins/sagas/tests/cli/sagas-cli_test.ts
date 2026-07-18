@@ -4,8 +4,22 @@ import {
   type PluginCliResult,
   SAGAS_CLI_COMMANDS,
   SagasCli,
+  type SagasCliBackend,
+  type SagasCliCommandDefinition,
   StaticSagasCliBackend,
 } from '../../src/cli/mod.ts';
+
+class RecordingSagasBackend implements SagasCliBackend {
+  readonly handled: SagasCliCommandDefinition[] = [];
+
+  handle(
+    definition: SagasCliCommandDefinition,
+    _args: PluginCliArgs,
+  ): PluginCliResult {
+    this.handled.push(definition);
+    return { code: 0 };
+  }
+}
 
 Deno.test('SagasCli exposes the sagas command registry', async () => {
   const cli = new SagasCli(new StaticSagasCliBackend());
@@ -24,13 +38,33 @@ Deno.test('SagasCli exposes the sagas command registry', async () => {
   assertEquals(inspect.data, {
     command: 'inspect',
     category: 'inspection',
-    usage: 'ns-sagas inspect [id] [--root=sagas --json]',
+    usage: 'deno x -A jsr:@netscript/plugin-sagas@<version>/cli inspect [id] [--root=sagas --json]',
     flags: { root: 'sagas,services' },
     values: ['project/sagas'],
   });
 
   const missing = await runSagasCommand(cli, { command: 'missing-command' });
   assertEquals(missing.code, 1);
+});
+
+Deno.test('SagasCli usage metadata uses the runnable versioned JSR entrypoint', async () => {
+  const backend = new RecordingSagasBackend();
+  const cli = new SagasCli(backend);
+
+  for (const command of cli.commands()) {
+    await command.run({ command: command.name });
+  }
+
+  assertEquals(backend.handled.length, SAGAS_CLI_COMMANDS.length);
+  for (const definition of backend.handled) {
+    assertEquals(
+      definition.usage.startsWith(
+        'deno x -A jsr:@netscript/plugin-sagas@<version>/cli ',
+      ),
+      true,
+      `Unexpected sagas usage for ${definition.name}: ${definition.usage}`,
+    );
+  }
 });
 
 Deno.test('SagasCli exposes command metadata with categories and flags', () => {

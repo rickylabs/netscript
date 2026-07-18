@@ -76,7 +76,8 @@ export class AddSagaCommand extends SagasCliCommand {
       name: 'add-saga',
       category: 'scaffolding',
       description: 'Create a saga definition and config entry.',
-      usage: 'ns-sagas add saga <id> [--topic=<topic> --durability=t1]',
+      usage:
+        'deno x -A jsr:@netscript/plugin-sagas@<version>/cli add saga <id> [--topic=<topic> --durability=t1]',
       flags: [
         { name: 'topic', description: 'Queue or stream topic for the generated config.' },
         { name: 'durability', description: 'Saga durability tier.' },
@@ -97,7 +98,7 @@ export class GenerateRegistryCommand extends SagasCliCommand {
       category: 'registry',
       description: 'Generate the static saga registry for compiled runtimes.',
       usage:
-        'ns-sagas generate registry [--root=sagas --out=.netscript/generated/plugin-sagas/sagas.registry.ts]',
+        'deno x -A jsr:@netscript/plugin-sagas@<version>/cli generate registry [--root=sagas --out=.netscript/generated/plugin-sagas/sagas.registry.ts]',
       flags: [
         { name: 'root', description: 'Comma-separated project roots to scan.' },
         { name: 'out', description: 'Project-relative registry output path.' },
@@ -114,7 +115,8 @@ export class PublishCommand extends SagasCliCommand {
       name: 'publish',
       category: 'runtime',
       description: 'Publish a message to the durable saga bus.',
-      usage: 'ns-sagas publish <type> --payload=<json> [--correlation-key --idempotency-key]',
+      usage:
+        'deno x -A jsr:@netscript/plugin-sagas@<version>/cli publish <type> --payload=<json> [--correlation-key --idempotency-key]',
       flags: [
         { name: 'payload', description: 'JSON object delivered with the message.', required: true },
         { name: 'correlation-key', description: 'Saga correlation key.' },
@@ -133,7 +135,8 @@ export class ListSagasCommand extends SagasCliCommand {
       name: 'list',
       category: 'runtime',
       description: 'List registered sagas or durable saga instances.',
-      usage: 'ns-sagas list [--registered|--instances --status --saga --json]',
+      usage:
+        'deno x -A jsr:@netscript/plugin-sagas@<version>/cli list [--registered|--instances --status --saga --json]',
       flags: [
         { name: 'registered', description: 'List registered saga definitions.' },
         { name: 'instances', description: 'List durable saga instances.' },
@@ -153,7 +156,8 @@ export class InspectCommand extends SagasCliCommand {
       name: 'inspect',
       category: 'inspection',
       description: 'Inspect saga metadata from the runtime, with local source fallback.',
-      usage: 'ns-sagas inspect [id] [--root=sagas --json]',
+      usage:
+        'deno x -A jsr:@netscript/plugin-sagas@<version>/cli inspect [id] [--root=sagas --json]',
       flags: [
         { name: 'root', description: 'Comma-separated project roots to scan.' },
         { name: 'json', description: 'Render structured JSON output.' },
@@ -170,7 +174,8 @@ export class UpdateSagaCommand extends SagasCliCommand {
       name: 'update-saga',
       category: 'scaffolding',
       description: 'Update a generated saga definition and config.',
-      usage: 'ns-sagas update saga <id> [--durability --topic --tags --description]',
+      usage:
+        'deno x -A jsr:@netscript/plugin-sagas@<version>/cli update saga <id> [--durability --topic --tags --description]',
       flags: [
         { name: 'durability', description: 'Saga durability tier.' },
         { name: 'topic', description: 'Message routing topic.' },
@@ -189,7 +194,7 @@ export class RemoveSagaCommand extends SagasCliCommand {
       name: 'remove-saga',
       category: 'scaffolding',
       description: 'Remove a generated saga definition and config.',
-      usage: 'ns-sagas remove saga <id>',
+      usage: 'deno x -A jsr:@netscript/plugin-sagas@<version>/cli remove saga <id>',
     }, backend);
   }
 }
@@ -202,7 +207,8 @@ export class CodemodCommand extends SagasCliCommand {
       name: 'codemod',
       category: 'migration',
       description: 'Rewrite legacy sagas imports to plugin package specifiers.',
-      usage: 'ns-sagas codemod [--root=sagas,services,workers --write]',
+      usage:
+        'deno x -A jsr:@netscript/plugin-sagas@<version>/cli codemod [--root=sagas,services,workers --write]',
       flags: [
         { name: 'root', description: 'Comma-separated project roots to scan.' },
         { name: 'write', description: 'Apply changes instead of returning a dry-run plan.' },

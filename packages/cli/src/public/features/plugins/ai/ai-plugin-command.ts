@@ -5,11 +5,13 @@ import { Command } from "@cliffy/command";
 import { CliCommand } from "../../../../kernel/application/abstracts/cli-command.ts";
 import type { ProcessPort } from "../../../../kernel/ports/process-port.ts";
 import { outputText } from "../../../../kernel/presentation/output/default-output.ts";
-import { netscriptJsrSpecifier } from "../../../../kernel/constants/jsr-specifiers.ts";
+import { NETSCRIPT_RELEASE_VERSION } from "../../../../kernel/constants/jsr-specifiers.ts";
 import type { ProjectRootResolver } from "../../../presentation/support.ts";
 import { requireProjectRoot } from "../../../presentation/support.ts";
+import { join } from "@std/path";
 
-const AI_CLI_SPECIFIER = netscriptJsrSpecifier("plugin-ai", "/cli");
+const AI_CLI_URL =
+  `https://jsr.io/@netscript/plugin-ai/${NETSCRIPT_RELEASE_VERSION}/cli.ts`;
 
 /** Dependencies for the AI plugin-owned command group. */
 export interface AiPluginCommandDependencies {
@@ -98,7 +100,14 @@ export async function dispatchAiPluginCommand(
 > {
   return await options.processRunner.exec(
     "deno",
-    ["x", "-A", AI_CLI_SPECIFIER, ...args],
+    [
+      "run",
+      "--config",
+      join(options.projectRoot, "deno.json"),
+      "-A",
+      AI_CLI_URL,
+      ...args,
+    ],
     { cwd: options.projectRoot },
   );
 }

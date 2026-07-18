@@ -2,6 +2,7 @@
 layout: layouts/base.vto
 title: The Fresh page model
 templateEngine: [vento, md]
+order: 1
 ---
 
 # The Fresh page model

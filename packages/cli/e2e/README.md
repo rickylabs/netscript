@@ -45,6 +45,39 @@ workflow, generated type checks, Aspire runtime boot, HTTP behavior checks, OTEL
 cleanup. The narrower `scaffold.plugins` suite stops after plugin scaffold and host-diagnostic
 checks.
 
+## Native desktop deployment
+
+`deploy.desktop-native` packages the checked-in thin-client fixture through
+`netscript deploy desktop package`, installs the generated Debian package with a real `dpkg`
+transaction in a suite-owned alternate root, and launches the installed native runtime against
+suite-owned remote-service and ephemeral-CA HTTPS release servers. The Linux leg is fail-closed:
+update apply and failed-launch rollback must both complete for a `PASS` report.
+
+Linux prerequisites are `dpkg`, `openssl`, `bsdiff`, and the native desktop GTK/WebKit libraries.
+Run the exact one-pass gate from a native Linux filesystem (WSL paths under `/home`, never
+`/mnt/c`):
+
+```bash
+deno task e2e:cli run deploy.desktop-native --cleanup --format pretty
+```
+
+The structured native report is written to
+`.llm/tmp/desktop-native-e2e/evidence.json`. A host-inapplicable gate is `NOT_RUN`, not a pass.
+The current WSL execution reached the signed manifest through ephemeral-CA TLS but failed in the
+packaged runtime because `op_desktop_verify_ed25519` was unavailable; that recorded `FAIL` is the
+Linux verdict until the consumed runtime/SDK seam is reconciled and the complete gate reruns green.
+
+Owner-hosted Windows invocation (from an elevated Developer PowerShell in a native Windows clone):
+
+```powershell
+deno task e2e:cli run deploy.desktop-native --cleanup --format pretty
+```
+
+The Windows MSI/manual-update leg remains `NOT_RUN` until that owner-hosted command produces its
+report. On macOS, use the same command from a native checkout with Xcode command-line tools and
+`hdiutil`; the DMG leg is best effort and likewise remains `NOT_RUN` without a host report. Never
+translate either unavailable host into a green checkbox.
+
 `deno task e2e:cli:prod` runs the same `scaffold.runtime` suite in prod-local mode: the CLI
 entrypoint is the local public binary (`packages/cli/bin/netscript.ts`), while generated workspaces
 resolve `@netscript/*` dependencies from JSR via `--source jsr`. This mode requires no JSR publish

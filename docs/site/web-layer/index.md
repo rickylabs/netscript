@@ -72,8 +72,17 @@ scaffolded dashboard app — is [Fresh UI & design](/web-layer/fresh-ui/), which
   { eyebrow: "Overview & Concepts", title: "Fresh page model", body: "Server rendering, islands, route contracts, layers, partials, and shared query cache.", href: "/web-layer/server/", icon: "O" },
   { eyebrow: "Overview & Concepts", title: "Fresh UI & design", body: "The copy-source component registry, design tokens, and the scaffolded dashboard app.", href: "/web-layer/fresh-ui/", icon: "O" },
   { eyebrow: "Quickstart", title: "Live dashboard", body: "Build a Fresh page backed by a typed SDK client and a cache-first QueryIsland.", href: "/tutorials/live-dashboard/", icon: "Q" },
-  { eyebrow: "How-To", title: "Customize Fresh UI", body: "Adjust the generated UI layer and design-system surface.", href: "/how-to/customize-fresh-ui/", icon: "H" },
-  { eyebrow: "How-To", title: "Server-validated form", body: "Build a form that validates and mutates on the server.", href: "/how-to/build-a-server-validated-form/", icon: "H" },
+  { eyebrow: "How-To", title: "Customize Fresh UI", body: "Adjust the generated UI layer and design-system surface.", href: "/web-layer/how-to/customize-fresh-ui/", icon: "H" },
+  { eyebrow: "How-To", title: "Server-validated form", body: "Build a form that validates and mutates on the server.", href: "/web-layer/how-to/build-a-server-validated-form/", icon: "H" },
   { eyebrow: "API Reference", title: "@netscript/fresh", body: "Generated symbols for the Fresh framework package.", href: "/reference/fresh/", icon: "R" },
   { eyebrow: "API Reference", title: "@netscript/fresh-ui", body: "Generated symbols for the companion UI package.", href: "/reference/fresh-ui/", icon: "R" }
+] }) }}
+
+## Learn, do, look up
+
+{{ comp.cardsGrid({ columns: 4, cards: [
+  { eyebrow: "Learn", title: "Live dashboard tutorial", body: "Contract to page to live stream — the web layer end to end.", href: resolveXref("tut:live-dashboard").href },
+  { eyebrow: "Do", title: "Recipes", body: "Task-oriented recipes for this area, one problem each.", href: "/web-layer/how-to/" },
+  { eyebrow: "Look up", title: "`@netscript/fresh` reference", body: "Generated API reference. Related units: `fresh-ui`.", href: resolveXref("ref:fresh").href },
+  { eyebrow: "Understand", title: "Contracts & type flow", body: "The design rationale behind this pillar.", href: resolveXref("explain:contracts").href },
 ] }) }}

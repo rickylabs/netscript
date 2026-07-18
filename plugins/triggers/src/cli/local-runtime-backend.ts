@@ -11,7 +11,7 @@ import {
   scheduledScaffolder,
   webhookScaffolder,
 } from '../adapter/resources/mod.ts';
-import { LocalProjectFiles, type ProjectFiles } from '@netscript/plugin/cli';
+import { applyScaffoldPlan, LocalProjectFiles, type ProjectFiles } from '@netscript/plugin/cli';
 import type { TriggersCliBackend, TriggersCliCommandDefinition } from './command-types.ts';
 import { HttpTriggersService, type TriggersServiceClient } from './http-triggers-service.ts';
 import { compileTriggerRegistry } from './trigger-registry-compiler.ts';
@@ -69,15 +69,15 @@ export class LocalTriggersRuntimeBackend implements TriggersCliBackend {
     switch (definition.name) {
       case 'add-webhook': {
         const input = parseWebhookInput(args);
-        return await this.addTrigger(webhookScaffolder.emit(input), input.force ?? false);
+        return await this.addTrigger(webhookScaffolder.emit(input), input.force ?? false, args);
       }
       case 'add-file-watch': {
         const input = parseFileWatchInput(args);
-        return await this.addTrigger(fileWatchScaffolder.emit(input), input.force ?? false);
+        return await this.addTrigger(fileWatchScaffolder.emit(input), input.force ?? false, args);
       }
       case 'add-scheduled': {
         const input = parseScheduledInput(args);
-        return await this.addTrigger(scheduledScaffolder.emit(input), input.force ?? false);
+        return await this.addTrigger(scheduledScaffolder.emit(input), input.force ?? false, args);
       }
       case 'list':
         return await this.listTriggers(args);
@@ -156,6 +156,7 @@ export class LocalTriggersRuntimeBackend implements TriggersCliBackend {
   private async addTrigger(
     artifacts: readonly ScaffoldArtifact[],
     force: boolean,
+    args: PluginCliArgs,
   ): Promise<PluginCliResult> {
     const [artifact] = artifacts;
     if (artifact === undefined) {
@@ -166,11 +167,19 @@ export class LocalTriggersRuntimeBackend implements TriggersCliBackend {
     if (existing !== undefined && !force) {
       return fail(`Trigger file already exists: ${path}. Pass --force to overwrite.`);
     }
-    await this.files.writeTextFile(path, artifactText(artifact));
-    const registry = await compileTriggerRegistry(this.files);
+    const plan = await applyScaffoldPlan({
+      args,
+      artifacts,
+      generatedPaths: ['.netscript/generated/plugin-triggers/triggers.registry.ts'],
+      apply: async () => {
+        await this.files.writeTextFile(path, artifactText(artifact));
+        return await compileTriggerRegistry(this.files);
+      },
+    });
     return ok('Trigger definition created.', {
-      files: [path, registry.registryPath],
-      registry,
+      files: plan.files,
+      dryRun: plan.dryRun,
+      ...(plan.applied === undefined ? {} : { registry: plan.applied }),
     });
   }
 

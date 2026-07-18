@@ -13,6 +13,8 @@ export { renderRegistryModule, toRegistryImportSpecifier } from './application/r
 export type { RegistryEmitItem, RegistryModuleSpec } from './application/registry-emitter.ts';
 export { normalizePluginArgv, parsePluginCliArgs } from './application/argv.ts';
 export type { NormalizedPluginArgv } from './application/argv.ts';
+export { applyScaffoldPlan } from './application/scaffold-plan.ts';
+export type { ScaffoldPlanResult } from './application/scaffold-plan.ts';
 export { createBaseMetaCommands } from './application/base-meta-commands.ts';
 export type { PluginBaseMeta } from './application/base-meta-commands.ts';
 export {

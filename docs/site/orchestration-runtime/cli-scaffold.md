@@ -4,6 +4,7 @@ title: CLI and Scaffold
 templateEngine: [vento, md]
 prev: { label: "Orchestration & Runtime", href: "/orchestration-runtime/" }
 next: { label: "Runtime configuration", href: "/orchestration-runtime/runtime-config/" }
+order: 1
 ---
 
 # CLI & scaffold
@@ -91,6 +92,15 @@ netscript init my-app --db postgres --service --service-name users --yes
 netscript plugin install workers --name workers
 netscript generate plugins
 ```
+
+{{ comp callout { type: "note", title: "Fresh NetScript releases and Deno's 24-hour window" } }}
+Deno 2.9 applies a 24-hour minimum dependency age to newly published registry versions. A generated
+JSR-mode workspace preserves that policy for third-party dependencies and exempts only exact
+`jsr:@netscript/*` versions from its matching NetScript release train. First-party plugin commands
+load the workspace policy explicitly, so scaffolding and plugin verbs work immediately after a
+NetScript release. Third-party plugins and explicitly different NetScript versions keep the normal
+age check; local-source workspaces do not add registry policy.
+{{ /comp }}
 
 This page is the story; the mechanism lives elsewhere and is linked, not duplicated:
 the curated command tour is the {{ comp.xref({ key: "cli:reference" }) }}, the

@@ -4,6 +4,7 @@ title: Team Workspace
 templateEngine: [vento, md]
 prev: { label: "Tutorials", href: "/tutorials/" }
 next: { label: "1 · Scaffold", href: "/tutorials/workspace/01-scaffold/" }
+order: 3
 ---
 
 # Team Workspace
@@ -134,3 +135,5 @@ chapter 1 and keep the same `my-workspace/` through to deploy.
 {{ comp.nextPrev({ prev: { label: "Tutorials", href: "/tutorials/" }, next: { label: "1 · Scaffold", href: "/tutorials/workspace/01-scaffold/" } }) }}
 </content>
 </invoke>
+
+After this track, keep building in **Build › [Identity & Access](/identity-access/)** — the guides and recipes there pick up where these chapters stop.

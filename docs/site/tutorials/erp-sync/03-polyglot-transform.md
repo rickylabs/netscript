@@ -147,7 +147,7 @@ Calling <code>.build()</code> on a <code>deno</code> task <em>without</em>
 Always pass an explicit, least-privilege set. The framework also ships named
 <code>permissions</code> presets (<code>minimal</code>, <code>readOnly</code>,
 <code>network</code>, …) so you do not hand-roll the object for common cases — see
-<a href="/how-to/tune-worker-runtime/">Tune the worker runtime</a>.
+<a href="/background-processing/how-to/tune-worker-runtime/">Tune the worker runtime</a>.
 {{ /comp }}
 
 ## Step 3 — Run it through the executor
@@ -261,7 +261,7 @@ A missing interpreter surfaces as a <em>failed task</em>, not a thrown error: ex
 <code>127</code> is reported as <em>command not found</em> and <code>126</code> as <em>command not
 executable</em>. Confirm <code>python3 --version</code> / <code>pwsh --version</code> /
 <code>dotnet --version</code> on the actual worker host before you ship a task that depends on it.
-When yours is ready, <a href="/how-to/run-a-polyglot-task/">Run a polyglot task</a> walks the
+When yours is ready, <a href="/background-processing/how-to/run-a-polyglot-task/">Run a polyglot task</a> walks the
 Python and shell variants end to end, including interpreter pinning.
 {{ /comp }}
 
@@ -312,11 +312,11 @@ on a schedule.
 
 ## Where to go deeper
 
-- **Run the Python/shell variants for real** → [Run a polyglot task](/how-to/run-a-polyglot-task/)
+- **Run the Python/shell variants for real** → [Run a polyglot task](/background-processing/how-to/run-a-polyglot-task/)
   — the hands-on recipe: define, write the script, pin the interpreter, read the result.
 - **The capability** → [Polyglot tasks](/background-processing/polyglot-tasks/) — the WHY: what a
   task is, the subprocess seam, the full `TaskResult` shape.
-- **Tune the runtime** → [Tune the worker runtime](/how-to/tune-worker-runtime/) — concurrency,
+- **Tune the runtime** → [Tune the worker runtime](/background-processing/how-to/tune-worker-runtime/) — concurrency,
   the permission presets, and the per-task timeout/retry knobs.
 
 {{ comp.nextPrev({ prev: { label: "2 · Import job", href: "/tutorials/erp-sync/02-import-job/" }, next: { label: "4 · Queue & cron", href: "/tutorials/erp-sync/04-queue-and-cron/" } }) }}

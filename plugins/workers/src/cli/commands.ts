@@ -71,7 +71,8 @@ export class AddJobCommand extends WorkersCliCommand {
       name: 'add-job',
       category: 'jobs',
       description: 'Create a worker job definition.',
-      usage: 'ns-workers add job <id> [--topic --schedule --timeout --max-retries --tags]',
+      usage:
+        'deno x -A jsr:@netscript/plugin-workers@<version>/cli add job <id> [--topic --schedule --timeout --max-retries --tags]',
       flags: [
         { name: 'topic', description: 'Stream topic emitted by the job.' },
         { name: 'schedule', description: 'Cron schedule for the job.' },
@@ -91,7 +92,8 @@ export class AddTaskCommand extends WorkersCliCommand {
       name: 'add-task',
       category: 'tasks',
       description: 'Create a worker task definition.',
-      usage: 'ns-workers add task <id> --runtime=<runtime> [--entrypoint --timeout]',
+      usage:
+        'deno x -A jsr:@netscript/plugin-workers@<version>/cli add task <id> --runtime=<runtime> [--entrypoint --timeout]',
       flags: [
         { name: 'runtime', description: 'Task runtime kind.', required: true },
         { name: 'entrypoint', description: 'Task entrypoint path.' },
@@ -109,7 +111,7 @@ export class AddWorkflowCommand extends WorkersCliCommand {
       name: 'add-workflow',
       category: 'runtime',
       description: 'Create a worker workflow definition.',
-      usage: 'ns-workers add workflow <id>',
+      usage: 'deno x -A jsr:@netscript/plugin-workers@<version>/cli add workflow <id>',
     }, backend);
   }
 }
@@ -122,7 +124,8 @@ export class ListJobsCommand extends WorkersCliCommand {
       name: 'list-jobs',
       category: 'jobs',
       description: 'List worker jobs discovered for the current project.',
-      usage: 'ns-workers list-jobs [--topic --enabled-only]',
+      usage:
+        'deno x -A jsr:@netscript/plugin-workers@<version>/cli list-jobs [--topic --enabled-only]',
       flags: [
         { name: 'topic', description: 'Filter jobs by stream topic.' },
         { name: 'enabled-only', description: 'Only include enabled jobs.' },
@@ -140,7 +143,7 @@ export class ListTasksCommand extends WorkersCliCommand {
       name: 'list-tasks',
       category: 'tasks',
       description: 'List worker tasks discovered for the current project.',
-      usage: 'ns-workers list-tasks [--type --json]',
+      usage: 'deno x -A jsr:@netscript/plugin-workers@<version>/cli list-tasks [--type --json]',
       flags: [
         { name: 'type', description: 'Filter tasks by runtime type.' },
         { name: 'json', description: 'Render structured JSON output.' },
@@ -157,7 +160,7 @@ export class ShowJobCommand extends WorkersCliCommand {
       name: 'show-job',
       category: 'jobs',
       description: 'Show worker job metadata.',
-      usage: 'ns-workers show-job <id> [--json]',
+      usage: 'deno x -A jsr:@netscript/plugin-workers@<version>/cli show-job <id> [--json]',
       flags: [{ name: 'json', description: 'Render structured JSON output.' }],
     }, backend);
   }
@@ -171,7 +174,7 @@ export class ShowTaskCommand extends WorkersCliCommand {
       name: 'show-task',
       category: 'tasks',
       description: 'Show worker task metadata.',
-      usage: 'ns-workers show-task <id> [--json]',
+      usage: 'deno x -A jsr:@netscript/plugin-workers@<version>/cli show-task <id> [--json]',
       flags: [{ name: 'json', description: 'Render structured JSON output.' }],
     }, backend);
   }
@@ -185,7 +188,8 @@ export class ExecutionsCommand extends WorkersCliCommand {
       name: 'executions',
       category: 'runtime',
       description: 'List durable worker executions.',
-      usage: 'ns-workers executions [--limit --status --json]',
+      usage:
+        'deno x -A jsr:@netscript/plugin-workers@<version>/cli executions [--limit --status --json]',
       flags: [{ name: 'limit', description: 'Maximum execution count.' }, {
         name: 'status',
         description: 'Filter by execution status.',
@@ -202,7 +206,8 @@ export class TriggerJobCommand extends WorkersCliCommand {
       name: 'trigger',
       category: 'runtime',
       description: 'Enqueue a worker job through the durable runtime.',
-      usage: 'ns-workers trigger <job-id> [--payload=<json>]',
+      usage:
+        'deno x -A jsr:@netscript/plugin-workers@<version>/cli trigger <job-id> [--payload=<json>]',
       flags: [{ name: 'payload', description: 'JSON payload passed to the job.' }],
     }, backend);
   }
@@ -216,7 +221,8 @@ export class RunJobCommand extends WorkersCliCommand {
       name: 'run',
       category: 'runtime',
       description: 'Enqueue a worker job by identifier (compatibility alias for trigger).',
-      usage: 'ns-workers run <job-id> [--payload=<json>]',
+      usage:
+        'deno x -A jsr:@netscript/plugin-workers@<version>/cli run <job-id> [--payload=<json>]',
       flags: [{ name: 'payload', description: 'JSON payload passed to the job.' }],
     }, backend);
   }
@@ -230,7 +236,8 @@ export class RunTaskCommand extends WorkersCliCommand {
       name: 'run-task',
       category: 'runtime',
       description: 'Execute a polyglot worker task.',
-      usage: 'ns-workers run-task <id> [--args=<json> --env=<json> --timeout=<ms>]',
+      usage:
+        'deno x -A jsr:@netscript/plugin-workers@<version>/cli run-task <id> [--args=<json> --env=<json> --timeout=<ms>]',
       flags: [
         { name: 'args', description: 'JSON array of argv values.' },
         { name: 'env', description: 'JSON object of environment values.' },
@@ -250,7 +257,7 @@ export class UpdateJobCommand extends WorkersCliCommand {
       category: 'jobs',
       description: 'Update worker job metadata.',
       usage:
-        'ns-workers update-job <id> [--topic --schedule --timeout --max-retries --tags --enabled]',
+        'deno x -A jsr:@netscript/plugin-workers@<version>/cli update-job <id> [--topic --schedule --timeout --max-retries --tags --enabled]',
       flags: resourceUpdateFlags(false),
     }, backend);
   }
@@ -264,7 +271,8 @@ export class UpdateTaskCommand extends WorkersCliCommand {
       name: 'update-task',
       category: 'tasks',
       description: 'Update worker task metadata.',
-      usage: 'ns-workers update-task <id> [--runtime --entrypoint --timeout --enabled]',
+      usage:
+        'deno x -A jsr:@netscript/plugin-workers@<version>/cli update-task <id> [--runtime --entrypoint --timeout --enabled]',
       flags: resourceUpdateFlags(true),
     }, backend);
   }
@@ -278,7 +286,7 @@ export class RemoveJobCommand extends WorkersCliCommand {
       name: 'remove-job',
       category: 'jobs',
       description: 'Remove a worker job.',
-      usage: 'ns-workers remove-job <id>',
+      usage: 'deno x -A jsr:@netscript/plugin-workers@<version>/cli remove-job <id>',
     }, backend);
   }
 }
@@ -291,7 +299,7 @@ export class RemoveTaskCommand extends WorkersCliCommand {
       name: 'remove-task',
       category: 'tasks',
       description: 'Remove a worker task.',
-      usage: 'ns-workers remove-task <id>',
+      usage: 'deno x -A jsr:@netscript/plugin-workers@<version>/cli remove-task <id>',
     }, backend);
   }
 }
@@ -304,7 +312,7 @@ export class LogsCommand extends WorkersCliCommand {
       name: 'logs',
       category: 'runtime',
       description: 'Show logs for a worker execution.',
-      usage: 'ns-workers logs <execution-id>',
+      usage: 'deno x -A jsr:@netscript/plugin-workers@<version>/cli logs <execution-id>',
     }, backend);
   }
 }
@@ -317,7 +325,7 @@ export class ConfigEditCommand extends WorkersCliCommand {
       name: 'config-edit',
       category: 'config',
       description: 'Edit a worker runtime configuration topic.',
-      usage: 'ns-workers config edit <topic>',
+      usage: 'deno x -A jsr:@netscript/plugin-workers@<version>/cli config edit <topic>',
     }, backend);
   }
 }
@@ -330,7 +338,7 @@ export class ConfigPublishCommand extends WorkersCliCommand {
       name: 'config-publish',
       category: 'config',
       description: 'Publish a worker runtime configuration topic.',
-      usage: 'ns-workers config publish <topic>',
+      usage: 'deno x -A jsr:@netscript/plugin-workers@<version>/cli config publish <topic>',
     }, backend);
   }
 }
@@ -343,7 +351,7 @@ export class EnableCommand extends WorkersCliCommand {
       name: 'enable',
       category: 'jobs',
       description: 'Enable a worker job.',
-      usage: 'ns-workers enable <job-id>',
+      usage: 'deno x -A jsr:@netscript/plugin-workers@<version>/cli enable <job-id>',
     }, backend);
   }
 }
@@ -356,7 +364,7 @@ export class DisableCommand extends WorkersCliCommand {
       name: 'disable',
       category: 'jobs',
       description: 'Disable a worker job.',
-      usage: 'ns-workers disable <job-id>',
+      usage: 'deno x -A jsr:@netscript/plugin-workers@<version>/cli disable <job-id>',
     }, backend);
   }
 }
@@ -369,7 +377,7 @@ export class CompileRegistryCommand extends WorkersCliCommand {
       name: 'compile-registry',
       category: 'registry',
       description: 'Compile the static worker registry.',
-      usage: 'ns-workers compile-registry',
+      usage: 'deno x -A jsr:@netscript/plugin-workers@<version>/cli compile-registry',
     }, backend);
   }
 }

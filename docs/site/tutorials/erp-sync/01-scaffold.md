@@ -168,7 +168,7 @@ your control plane for the rest of the track.
 The Postgres container only exists while <code>aspire start</code> is up. So
 <code>netscript db init</code>, <code>db generate</code>, and <code>db seed</code> must run
 <strong>after</strong> Aspire has started — never before. There is more on the database sequence in
-<a href="/how-to/deploy-local-aspire/">Deploy locally with Aspire</a>.
+<a href="/orchestration-runtime/how-to/deploy-local-aspire/">Deploy locally with Aspire</a>.
 {{ /comp }}
 
 ## Verify your progress

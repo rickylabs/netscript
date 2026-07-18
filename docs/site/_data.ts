@@ -1,17 +1,30 @@
 /**
  * Site-wide data shared by every page (Lume merges `_data.*` into page data).
  *
- * `navSections` drives the SidebarShell navigation rendered in
- * `_includes/layouts/base.vto`. Docs-v4 uses the locked Capability-Hub IA:
- * shallow START entries, eight product-area pillars with uniform
- * Overview/Quickstart/How-To/Reference leaves, then Tutorials, Explanation,
- * and a thin global Reference index.
+ * `navLanes` is the docs-v5 sidebar spine (see `_plan/10-nav-ia-redesign.md`):
+ * five curated lanes — Start · Learn · Build · Reference · Concepts — rendered
+ * in `_includes/layouts/base.vto`. Lane order, the Start links, and the
+ * nine-pillar Build sequence are the ONLY hand-maintained nav data; everything
+ * below a lane is folder-derived via the Lume nav plugin (`nav.menu()`), sorted
+ * by `order` front matter with `basename` as the tiebreak and filtered by
+ * `nav_hide!=true isRedirect!=true`.
  *
- * Reference URLs stay stable. The four `*-core` internal packages remain folded
- * inside reference prose unless they already have generated reference units.
+ * Reference URLs stay stable and are folder-derived from `reference/` — there
+ * is no hand-maintained unit list anymore (the xref `ref:` keys live in
+ * `_data/xref.ts`).
  */
 
 import cliPackageJson from "../../packages/cli/deno.json" with { type: "json" };
+
+/**
+ * Default nav sort weight, cascaded to every page (front matter overrides).
+ * A defined numeric `order` everywhere keeps the `"order url"` nav sort
+ * comparator consistent — with undefined values the multi-field sort is
+ * unstable and lanes render in load order (observed on /reference/).
+ * Pages without an explicit order (reference units, tutorial chapters) sort
+ * by their url tiebreak alone (index pages share basename "index", so url is the reliable per-segment tiebreak).
+ */
+export const order = 0;
 
 /** Current aligned NetScript release train version. */
 export const releaseVersion: string = cliPackageJson.version;
@@ -19,235 +32,84 @@ export const releaseVersion: string = cliPackageJson.version;
 /** Exact JSR suffix for current NetScript release train examples. */
 export const releaseSpecifier: string = `@${releaseVersion}`;
 
-export interface NavItem {
+export interface NavLaneLink {
   href: string;
   label: string;
-  icon: string;
 }
 
-export interface NavSection {
+export interface NavLane {
   label: string;
-  items: NavItem[];
+  /** One-line intent gloss rendered under the lane header. */
+  subtitle: string;
+  kind: "flat" | "menu";
+  /** kind "flat": curated links rendered as-is (Start lane). */
+  items?: NavLaneLink[];
+  /** kind "menu": nav.menu() roots rendered as subtrees, in curated order. */
+  roots?: string[];
+  /**
+   * kind "menu" only: render the root as a plain link followed by its children
+   * at lane level (Learn/Reference/Concepts) instead of one collapsible branch
+   * per root (Build, where each pillar root IS the branch).
+   */
+  expandRoot?: boolean;
 }
 
-/**
- * Reference units (33). The href is the section-root URL; `url` Lume filter
- * applies the /netscript/ base path at render time.
- */
-const referenceUnits: NavItem[] = [
-  { href: "/reference/ai/", label: "ai", icon: "A" },
-  { href: "/reference/ai/skills/", label: "ai skills", icon: "A" },
-  { href: "/reference/auth/", label: "auth", icon: "A" },
-  { href: "/reference/auth-better-auth/", label: "auth-better-auth", icon: "A" },
-  { href: "/reference/auth-kv-oauth/", label: "auth-kv-oauth", icon: "A" },
-  { href: "/reference/auth-workos/", label: "auth-workos", icon: "A" },
-  { href: "/reference/aspire/", label: "aspire", icon: "A" },
-  { href: "/reference/cli/", label: "cli", icon: "C" },
-  { href: "/reference/cli/commands/", label: "cli commands", icon: "C" },
-  { href: "/reference/config/", label: "config", icon: "C" },
-  { href: "/reference/contracts/", label: "contracts", icon: "C" },
-  { href: "/reference/cron/", label: "cron", icon: "C" },
-  { href: "/reference/database/", label: "database", icon: "D" },
-  { href: "/reference/fresh/", label: "fresh", icon: "F" },
-  { href: "/reference/fresh-ui/", label: "fresh-ui", icon: "F" },
-  { href: "/reference/kv/", label: "kv", icon: "K" },
-  { href: "/reference/logger/", label: "logger", icon: "L" },
-  { href: "/reference/plugin/", label: "plugin", icon: "P" },
-  { href: "/reference/plugin-ai/", label: "plugin-ai", icon: "P" },
-  { href: "/reference/plugin-ai-core/", label: "plugin-ai-core", icon: "P" },
-  { href: "/reference/plugin-auth/", label: "plugin-auth", icon: "P" },
-  { href: "/reference/plugin-auth-core/", label: "plugin-auth-core", icon: "P" },
-  { href: "/reference/prisma-adapter-mysql/", label: "prisma-adapter-mysql", icon: "P" },
-  { href: "/reference/queue/", label: "queue", icon: "Q" },
-  { href: "/reference/runtime-config/", label: "runtime-config", icon: "R" },
-  { href: "/reference/sagas/", label: "sagas", icon: "S" },
-  { href: "/reference/sdk/", label: "sdk", icon: "S" },
-  { href: "/reference/service/", label: "service", icon: "S" },
-  { href: "/reference/streams/", label: "streams", icon: "S" },
-  { href: "/reference/telemetry/", label: "telemetry", icon: "T" },
-  { href: "/reference/triggers/", label: "triggers", icon: "T" },
-  { href: "/reference/watchers/", label: "watchers", icon: "W" },
-  { href: "/reference/workers/", label: "workers", icon: "W" },
-];
-
-export const navSections: NavSection[] = [
+export const navLanes: NavLane[] = [
   {
     label: "Start",
+    subtitle: "Get running in minutes",
+    kind: "flat",
     items: [
-      { href: "/why/", label: "Why NetScript", icon: "?" },
-      { href: "/quickstart/", label: "Quickstart", icon: ">" },
-      { href: "/concepts/", label: "Architecture overview", icon: "A" },
-      { href: "/glossary/", label: "Glossary", icon: "G" },
+      { href: "/why/", label: "Why NetScript" },
+      { href: "/quickstart/", label: "Quickstart" },
+      { href: "/quickstart/aspire/", label: "Aspire quickstart" },
+      { href: "/concepts/", label: "Core concepts" },
+      { href: "/cli-reference/", label: "CLI reference" },
+      { href: "/glossary/", label: "Glossary" },
+      { href: "/how-to/", label: "All recipes" },
     ],
   },
   {
-    label: "Web Layer",
-    items: [
-      { href: "/web-layer/", label: "Overview & Concepts", icon: "O" },
-      { href: "/tutorials/live-dashboard/", label: "Quickstart: live dashboard", icon: "Q" },
-      { href: "/how-to/customize-fresh-ui/", label: "How-To: customize Fresh UI", icon: "H" },
-      { href: "/how-to/build-a-server-validated-form/", label: "How-To: server-validated form", icon: "H" },
-      { href: "/web-layer/server/", label: "API: server & islands", icon: "R" },
-      { href: "/web-layer/builders/", label: "API: pages & builders", icon: "R" },
-      { href: "/web-layer/route/", label: "API: route contracts", icon: "R" },
-      { href: "/web-layer/query/", label: "API: data loading & cache", icon: "R" },
-      { href: "/web-layer/form/", label: "API: forms & validation", icon: "R" },
-      { href: "/web-layer/defer-streaming-ui/", label: "API: defer & streaming UI", icon: "R" },
-      { href: "/web-layer/interactive/", label: "API: interactive islands", icon: "R" },
-      { href: "/web-layer/vite/", label: "API: build & Vite", icon: "R" },
-      { href: "/web-layer/error/", label: "API: errors & diagnostics", icon: "R" },
-      { href: "/web-layer/testing/", label: "API: testing pages & islands", icon: "R" },
-      { href: "/web-layer/examples/", label: "Examples / sandbox", icon: "E" },
-      { href: "/reference/fresh/", label: "Reference: fresh", icon: "R" },
-      { href: "/reference/fresh-ui/", label: "Reference: fresh-ui", icon: "R" },
-    ],
+    label: "Learn",
+    subtitle: "Build one thing end to end",
+    kind: "menu",
+    roots: ["/tutorials/"],
+    expandRoot: true,
   },
   {
-    label: "Services & SDK",
-    items: [
-      { href: "/services-sdk/", label: "Overview & Concepts", icon: "O" },
-      { href: "/tutorials/storefront/02-catalog-service/", label: "Quickstart: define a service", icon: "Q" },
-      { href: "/how-to/add-a-service/", label: "How-To: add a service", icon: "H" },
-      { href: "/how-to/discover-services/", label: "How-To: discover services", icon: "H" },
-      { href: "/how-to/expose-openapi-scalar/", label: "How-To: OpenAPI & Scalar", icon: "H" },
-      { href: "/reference/service/", label: "Reference: service", icon: "R" },
-      { href: "/reference/sdk/", label: "Reference: sdk", icon: "R" },
-      { href: "/reference/contracts/", label: "Reference: contracts", icon: "R" },
-    ],
-  },
-  {
-    label: "Background Processing",
-    items: [
-      { href: "/background-processing/", label: "Overview & Concepts", icon: "O" },
-      { href: "/tutorials/erp-sync/03-polyglot-transform/", label: "Quickstart: polyglot task", icon: "Q" },
-      { href: "/how-to/queue-kv-cron/", label: "How-To: queue / KV / cron", icon: "H" },
-      { href: "/how-to/choose-a-queue-provider/", label: "How-To: choose a queue provider", icon: "H" },
-      { href: "/how-to/tune-worker-runtime/", label: "How-To: tune worker runtime", icon: "H" },
-      { href: "/how-to/run-a-polyglot-task/", label: "How-To: run a polyglot task", icon: "H" },
-      { href: "/how-to/add-a-task-runtime-adapter/", label: "How-To: add a task adapter", icon: "H" },
-      { href: "/how-to/restrict-worker-task-permissions/", label: "How-To: restrict task permissions", icon: "H" },
-      { href: "/reference/workers/", label: "Reference: workers", icon: "R" },
-      { href: "/reference/queue/", label: "Reference: queue", icon: "R" },
-      { href: "/reference/cron/", label: "Reference: cron", icon: "R" },
-      { href: "/reference/watchers/", label: "Reference: watchers", icon: "R" },
-    ],
-  },
-  {
-    label: "Durable Workflows",
-    items: [
-      { href: "/durable-workflows/", label: "Overview & Concepts", icon: "O" },
-      { href: "/tutorials/storefront/04-checkout-saga/", label: "Quickstart: checkout saga", icon: "Q" },
-      { href: "/how-to/build-a-validated-ingestion-queue/", label: "How-To: validated ingestion queue", icon: "H" },
-      { href: "/how-to/publish-a-durable-stream/", label: "How-To: publish a durable stream", icon: "H" },
-      { href: "/reference/sagas/", label: "Reference: sagas", icon: "R" },
-      { href: "/reference/triggers/", label: "Reference: triggers", icon: "R" },
-      { href: "/reference/streams/", label: "Reference: streams", icon: "R" },
-    ],
-  },
-  {
-    label: "AI & Agents",
-    items: [
-      { href: "/ai/", label: "Overview & Concepts", icon: "O" },
-      { href: "/ai/mcp/", label: "Guide: MCP", icon: "G" },
-      { href: "/tutorials/chat/", label: "Quickstart: AI chat", icon: "Q" },
-      { href: "/how-to/build-a-durable-chat/", label: "How-To: build a durable chat", icon: "H" },
-      { href: "/ai/durable-chat/", label: "Guide: durable chat", icon: "G" },
-      { href: "/ai/chat-ui/", label: "Guide: chat UI", icon: "G" },
-      { href: "/ai/engine/", label: "Reference: AI engine", icon: "R" },
-      { href: "/reference/ai/", label: "Reference: ai", icon: "R" },
-      { href: "/reference/ai/skills/", label: "Reference: AI skills", icon: "R" },
-      { href: "/reference/plugin-ai/", label: "Reference: plugin-ai", icon: "R" },
-      { href: "/reference/plugin-ai-core/", label: "Reference: plugin-ai-core", icon: "R" },
-    ],
-  },
-  {
-    label: "Data & Persistence",
-    items: [
-      { href: "/data-persistence/", label: "Overview & Concepts", icon: "O" },
-      { href: "/tutorials/storefront/03-cart-contracts/", label: "Quickstart: data contracts", icon: "Q" },
-      { href: "/how-to/database-migration/", label: "How-To: database & migration", icon: "H" },
-      { href: "/how-to/use-a-second-database/", label: "How-To: second database", icon: "H" },
-      { href: "/reference/database/", label: "Reference: database", icon: "R" },
-      { href: "/reference/kv/", label: "Reference: kv", icon: "R" },
-      { href: "/reference/prisma-adapter-mysql/", label: "Reference: prisma-adapter-mysql", icon: "R" },
-    ],
-  },
-  {
-    label: "Identity & Access",
-    items: [
-      { href: "/identity-access/", label: "Overview & Concepts", icon: "O" },
-      { href: "/tutorials/workspace/02-auth/", label: "Quickstart: workspace auth", icon: "Q" },
-      { href: "/how-to/add-authentication/", label: "How-To: add authentication", icon: "H" },
-      { href: "/identity-access/better-auth-plugins/", label: "How-To: better-auth plugins", icon: "H" },
-      { href: "/reference/auth/", label: "Reference: auth", icon: "R" },
-      { href: "/reference/auth-better-auth/", label: "Reference: auth-better-auth", icon: "R" },
-      { href: "/reference/auth-kv-oauth/", label: "Reference: auth-kv-oauth", icon: "R" },
-      { href: "/reference/auth-workos/", label: "Reference: auth-workos", icon: "R" },
-      { href: "/reference/plugin-auth/", label: "Reference: plugin-auth", icon: "R" },
-      { href: "/reference/plugin-auth-core/", label: "Reference: plugin-auth-core", icon: "R" },
-    ],
-  },
-  {
-    label: "Orchestration & Runtime",
-    items: [
-      { href: "/orchestration-runtime/", label: "Overview & Concepts", icon: "O" },
-      { href: "/orchestration-runtime/cli-scaffold/", label: "Guide: CLI & scaffold", icon: "G" },
-      { href: "/quickstart/", label: "Quickstart: run the workspace", icon: "Q" },
-      { href: "/how-to/deno-lsp-code-intelligence/", label: "How-To: Deno LSP intelligence", icon: "H" },
-      { href: "/how-to/deploy-local-aspire/", label: "How-To: deploy locally with Aspire", icon: "H" },
-      { href: "/how-to/deploy/", label: "How-To: deploy", icon: "H" },
-      { href: "/how-to/deploy-deno-deploy/", label: "How-To: deploy to Deno Deploy", icon: "H" },
-      { href: "/how-to/roll-out-runtime-overrides/", label: "How-To: runtime overrides", icon: "H" },
-      { href: "/how-to/graceful-shutdown/", label: "How-To: graceful shutdown", icon: "H" },
-      { href: "/how-to/add-a-plugin/", label: "How-To: add a plugin", icon: "H" },
-      { href: "/how-to/author-a-plugin/", label: "How-To: author a plugin", icon: "H" },
-      { href: "/reference/aspire/", label: "Reference: aspire", icon: "R" },
-      { href: "/reference/config/", label: "Reference: config", icon: "R" },
-      { href: "/reference/runtime-config/", label: "Reference: runtime-config", icon: "R" },
-      { href: "/reference/plugin/", label: "Reference: plugin", icon: "R" },
-      { href: "/reference/cli/", label: "Reference: cli", icon: "R" },
-      { href: "/reference/cli/commands/", label: "Reference: CLI commands", icon: "R" },
-    ],
-  },
-  {
-    label: "Observability",
-    items: [
-      { href: "/observability/", label: "Overview & Concepts", icon: "O" },
-      { href: "/concepts/", label: "Quickstart: trace the model", icon: "Q" },
-      { href: "/how-to/add-opentelemetry/", label: "How-To: add OpenTelemetry", icon: "H" },
-      { href: "/reference/telemetry/", label: "Reference: telemetry", icon: "R" },
-      { href: "/reference/logger/", label: "Reference: logger", icon: "R" },
-    ],
-  },
-  {
-    label: "Tutorials",
-    items: [
-      { href: "/tutorials/", label: "Tutorials index", icon: "T" },
-      { href: "/tutorials/live-dashboard/", label: "Live dashboard", icon: "T" },
-      { href: "/tutorials/chat/", label: "AI Chat", icon: "T" },
-      { href: "/tutorials/workspace/", label: "Workspace", icon: "T" },
-      { href: "/tutorials/storefront/", label: "Storefront", icon: "T" },
-      { href: "/tutorials/erp-sync/", label: "ERP sync", icon: "T" },
-    ],
-  },
-  {
-    label: "Explanation",
-    items: [
-      { href: "/explanation/", label: "Explanation index", icon: "E" },
-      { href: "/explanation/architecture/", label: "Architecture", icon: "E" },
-      { href: "/explanation/contracts/", label: "Contracts & type flow", icon: "E" },
-      { href: "/explanation/plugin-system/", label: "The plugin system", icon: "E" },
-      { href: "/explanation/auth-model/", label: "Auth model", icon: "E" },
-      { href: "/explanation/durability-model/", label: "Durability model", icon: "E" },
-      { href: "/explanation/observability/", label: "Observability", icon: "E" },
-      { href: "/explanation/aspire/", label: "Orchestration with Aspire", icon: "E" },
+    label: "Build",
+    subtitle: "Add a capability to your app",
+    kind: "menu",
+    roots: [
+      "/web-layer/",
+      "/services-sdk/",
+      "/background-processing/",
+      "/durable-workflows/",
+      "/ai/",
+      "/data-persistence/",
+      "/identity-access/",
+      "/orchestration-runtime/",
+      "/observability/",
     ],
   },
   {
     label: "Reference",
-    items: [
-      { href: "/reference/", label: "Reference index", icon: "R" },
-      ...referenceUnits,
-    ],
+    subtitle: "Every symbol, generated",
+    kind: "menu",
+    roots: ["/reference/"],
+    expandRoot: true,
+  },
+  {
+    label: "Concepts",
+    subtitle: "How and why it works",
+    kind: "menu",
+    roots: ["/explanation/"],
+    expandRoot: true,
   },
 ];
+
+/** nav.menu()/nav.breadcrumb() query — one definition so templates agree. */
+export const navQuery = "nav_hide!=true isRedirect!=true";
+
+/** nav.menu() sort — `order` front matter first, url as tiebreak. */
+export const navSort = "order url";
