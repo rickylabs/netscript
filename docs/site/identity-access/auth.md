@@ -4,6 +4,7 @@ title: Authentication
 templateEngine: [vento, md]
 prev: { label: "Fresh UI & design", href: "/web-layer/fresh-ui/" }
 next: null
+order: 1
 ---
 
 # Authentication

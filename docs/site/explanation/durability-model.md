@@ -4,6 +4,7 @@ title: Durability model
 templateEngine: [vento, md]
 prev: { label: "Auth model", href: "/explanation/auth-model/" }
 next: { label: "Observability", href: "/explanation/observability/" }
+order: 5
 ---
 
 # Durability model

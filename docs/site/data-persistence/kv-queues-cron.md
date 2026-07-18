@@ -4,6 +4,7 @@ title: KV, queues & cron
 templateEngine: [vento, md]
 prev: { label: "Database & Prisma", href: "/data-persistence/database/" }
 next: { label: "Telemetry & logging", href: "/observability/telemetry/" }
+order: 2
 ---
 
 # KV, queues & cron

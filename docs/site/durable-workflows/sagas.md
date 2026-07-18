@@ -4,6 +4,7 @@ title: Durable sagas
 templateEngine: [vento, md]
 prev: { label: "Background jobs", href: "/background-processing/workers/" }
 next: { label: "Triggers & ingress", href: "/durable-workflows/triggers/" }
+order: 1
 ---
 
 # Durable sagas

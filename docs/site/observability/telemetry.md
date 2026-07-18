@@ -4,6 +4,7 @@ title: Telemetry & logging
 templateEngine: [vento, md]
 prev: { label: "KV, queues & cron", href: "/data-persistence/kv-queues-cron/" }
 next: { label: "Fresh UI & design", href: "/web-layer/fresh-ui/" }
+order: 1
 ---
 
 # Telemetry & logging

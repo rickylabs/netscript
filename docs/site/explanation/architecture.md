@@ -4,6 +4,7 @@ title: Architecture
 templateEngine: [vento, md]
 prev: { label: "Explanation", href: "/explanation/" }
 next: { label: "Contracts & type flow", href: "/explanation/contracts/" }
+order: 1
 ---
 
 # The NetScript architecture

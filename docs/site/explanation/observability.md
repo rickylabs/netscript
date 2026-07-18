@@ -4,6 +4,7 @@ title: Observability
 templateEngine: [vento, md]
 prev: { label: "Durability model", href: "/explanation/durability-model/" }
 next: { label: "Orchestration with Aspire", href: "/explanation/aspire/" }
+order: 6
 ---
 
 # Observability

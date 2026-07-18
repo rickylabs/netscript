@@ -4,6 +4,7 @@ title: The plugin system
 templateEngine: [vento, md]
 prev: { label: "Contracts & type flow", href: "/explanation/contracts/" }
 next: { label: "Auth model", href: "/explanation/auth-model/" }
+order: 3
 ---
 
 # The plugin system

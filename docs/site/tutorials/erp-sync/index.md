@@ -4,6 +4,7 @@ title: ERP Sync
 templateEngine: [vento, md]
 prev: { label: "Tutorials", href: "/tutorials/" }
 next: { label: "1 · Scaffold", href: "/tutorials/erp-sync/01-scaffold/" }
+order: 5
 ---
 
 # ERP Sync

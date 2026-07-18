@@ -4,6 +4,7 @@ title: Live Dashboard
 templateEngine: [vento, md]
 prev: { label: "Tutorials", href: "/tutorials/" }
 next: { label: "1 · Scaffold", href: "/tutorials/live-dashboard/01-scaffold/" }
+order: 1
 ---
 
 # Live Dashboard

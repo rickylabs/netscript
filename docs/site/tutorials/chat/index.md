@@ -4,6 +4,7 @@ title: AI Chat
 templateEngine: [vento, md]
 prev: { label: "Tutorials", href: "/tutorials/" }
 next: { label: "1 · Scaffold", href: "/tutorials/chat/01-scaffold/" }
+order: 2
 ---
 
 # AI Chat

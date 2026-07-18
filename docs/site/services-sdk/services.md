@@ -4,6 +4,7 @@ title: Services & contracts
 templateEngine: [vento, md]
 prev: { label: "Capabilities", href: "/capabilities/" }
 next: { label: "Background jobs", href: "/background-processing/workers/" }
+order: 1
 ---
 
 # Services & contracts

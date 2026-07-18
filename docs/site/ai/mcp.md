@@ -4,6 +4,7 @@ title: MCP
 templateEngine: [vento, md]
 prev: { label: "AI", href: "/ai/" }
 next: { label: "Durable chat", href: "/ai/durable-chat/" }
+order: 1
 ---
 
 # MCP

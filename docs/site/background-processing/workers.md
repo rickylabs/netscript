@@ -4,6 +4,7 @@ title: Background jobs
 templateEngine: [vento, md]
 prev: { label: "Services & contracts", href: "/services-sdk/services/" }
 next: { label: "Durable sagas", href: "/durable-workflows/sagas/" }
+order: 1
 ---
 
 # Background jobs

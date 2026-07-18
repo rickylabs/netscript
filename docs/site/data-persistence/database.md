@@ -4,6 +4,7 @@ title: Database & Prisma
 templateEngine: [vento, md]
 prev: { label: "Durable streams", href: "/durable-workflows/streams/" }
 next: { label: "KV, queues & cron", href: "/data-persistence/kv-queues-cron/" }
+order: 1
 ---
 
 # Database & Prisma

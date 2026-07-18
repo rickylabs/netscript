@@ -4,6 +4,7 @@ title: The pure-backend auth model
 templateEngine: [vento, md]
 prev: { label: "The plugin system", href: "/explanation/plugin-system/" }
 next: { label: "Durability model", href: "/explanation/durability-model/" }
+order: 4
 ---
 
 # The pure-backend auth model

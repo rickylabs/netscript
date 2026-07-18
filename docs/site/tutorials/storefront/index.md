@@ -4,6 +4,7 @@ title: Build a storefront backend
 templateEngine: [vento, md]
 prev: { label: "Tutorials", href: "/tutorials/" }
 next: { label: "1 · Scaffold", href: "/tutorials/storefront/01-scaffold/" }
+order: 4
 ---
 
 # Build a storefront backend

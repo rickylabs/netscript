@@ -4,6 +4,7 @@ title: Team Workspace
 templateEngine: [vento, md]
 prev: { label: "Tutorials", href: "/tutorials/" }
 next: { label: "1 · Scaffold", href: "/tutorials/workspace/01-scaffold/" }
+order: 3
 ---
 
 # Team Workspace

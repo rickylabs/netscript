@@ -4,6 +4,7 @@ title: How-to guides
 templateEngine: [vento, md]
 prev: null
 next: { label: "Add a plugin", href: "/how-to/add-a-plugin/" }
+nav_hide: true
 ---
 
 How-to guides are **goal-first recipes**: each one starts from a concrete

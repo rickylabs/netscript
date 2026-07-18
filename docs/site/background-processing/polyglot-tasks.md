@@ -4,6 +4,7 @@ title: Polyglot tasks
 templateEngine: [vento, md]
 prev: { label: "Typed SDK & client", href: "/services-sdk/sdk/" }
 next: { label: "Runtime configuration", href: "/orchestration-runtime/runtime-config/" }
+order: 2
 ---
 
 # Polyglot tasks

@@ -2,6 +2,7 @@
 layout: layouts/base.vto
 title: Pages and the define-page builder
 templateEngine: [vento, md]
+order: 2
 ---
 
 # Pages and the define-page builder
