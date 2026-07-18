@@ -3736,6 +3736,7 @@
       },
       "packages/fresh-ui": {
         "dependencies": [
+          "jsr:@netscript/sdk@0.0.1-beta.10",
           "jsr:@std/assert@1",
           "npm:preact@^10.29.2"
         ],

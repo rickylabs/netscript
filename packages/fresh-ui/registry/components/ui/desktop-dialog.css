@@ -1,0 +1,54 @@
+.ns-desktop-dialog {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ns-space-4);
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--ns-space-4);
+  color: var(--ns-fg);
+  background: color-mix(in srgb, var(--ns-surface) 92%, var(--ns-accent));
+  border: 1px solid var(--ns-border);
+  border-radius: var(--ns-radius-lg);
+}
+
+.ns-desktop-dialog__copy {
+  display: grid;
+  gap: var(--ns-space-1);
+}
+
+.ns-desktop-dialog__copy span {
+  color: var(--ns-muted-fg);
+  font-size: var(--ns-text-sm);
+}
+
+.ns-desktop-dialog__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ns-space-2);
+}
+
+.ns-desktop-dialog__action {
+  padding: var(--ns-space-2) var(--ns-space-3);
+  color: var(--ns-accent-fg);
+  font: inherit;
+  text-transform: capitalize;
+  background: var(--ns-accent);
+  border: 1px solid var(--ns-accent);
+  border-radius: var(--ns-radius-md);
+  transition: opacity var(--ns-ease-fast);
+}
+
+.ns-desktop-dialog__action:hover:not(:disabled) {
+  opacity: 0.82;
+}
+
+.ns-desktop-dialog__action:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ns-desktop-dialog__action {
+    transition-duration: 0.01ms;
+  }
+}

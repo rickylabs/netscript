@@ -25,7 +25,7 @@ export const registryMeta = {
   name: 'fresh-ui-foundation',
   version: '0.1.0',
   packageName: '@netscript/fresh-ui',
-  total: 44,
+  total: 50,
 } as const;
 
 export const registryCatalog: readonly RegistryCatalogItem[] = [
@@ -305,5 +305,41 @@ export const registryCatalog: readonly RegistryCatalogItem[] = [
     kind: 'island',
     layer: 2,
     description: 'Global notification island for redirect-flash feedback.',
+  },
+  {
+    name: 'desktop-tray-menu',
+    kind: 'component',
+    layer: 2,
+    description: 'Declarative tray and application-menu preview that emits stable action IDs.',
+  },
+  {
+    name: 'desktop-dialog',
+    kind: 'component',
+    layer: 2,
+    description: 'Side-effect-free alert, confirm, and prompt intents for a desktop controller.',
+  },
+  {
+    name: 'desktop-notification',
+    kind: 'component',
+    layer: 2,
+    description: 'Side-effect-free native notification preview and explicit host request control.',
+  },
+  {
+    name: 'desktop-window-chrome',
+    kind: 'component',
+    layer: 2,
+    description: 'Accessible title-bar actions limited to documented Deno Desktop window operations.',
+  },
+  {
+    name: 'desktop-update-prompt',
+    kind: 'component',
+    layer: 2,
+    description: 'Exhaustive update-ready UX for automatic restart and Windows manual installer paths.',
+  },
+  {
+    name: 'desktop-only',
+    kind: 'island',
+    layer: 2,
+    description: 'Hydration-safe content gate that no-ops without the NetScript Deno Desktop RPC binding.',
   },
 ];
