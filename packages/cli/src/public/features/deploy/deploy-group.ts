@@ -15,6 +15,7 @@ import { createDeployUninstallCommand } from './uninstall/uninstall-deploy-comma
 import { upgradeCommand } from './upgrade/upgrade-deploy-command.ts';
 import { createTargetDeployCommand } from './target/target-deploy-command.ts';
 import { createListDeployTargetsCommand } from './list/list-deploy-targets-command.ts';
+import { createDesktopDeployCommand } from './target/desktop/desktop-group.ts';
 import type { PublicCommandDependencies } from '../root/public-command-dependencies.ts';
 
 /** Create the public deploy command group. */
@@ -28,6 +29,14 @@ export function createDeployCommand(
       this.showHelp();
     })
     .command('list', createListDeployTargetsCommand(dependencies))
+    .command(
+      'desktop',
+      createDesktopDeployCommand({
+        process: dependencies.process,
+        fileSystem: dependencies.fs,
+        resolveProjectRoot: dependencies.resolveProjectRoot,
+      }),
+    )
     .command(
       'build',
       createDeployBuildCommand({
