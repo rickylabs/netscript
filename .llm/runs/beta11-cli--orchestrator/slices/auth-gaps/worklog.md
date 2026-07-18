@@ -121,13 +121,53 @@ testing/mocking/scaffold conformance. Proposed the ownership model:
 - Epic: `Epic: Enterprise auth`
 - Draft grouping label: `epic:enterprise-auth` (not present in the inspected label
   catalog; it must be created only during an owner-ratified filing pass).
-- Fourteen sub-issues, EA-00 through EA-13.
+- Sixteen sub-issues, EA-00 through EA-15. EA-14 owns machine/agent/CLI/MCP
+  authentication; EA-15 deliberately isolates outbound NetScript-as-IdP scope.
 - Every sub-issue includes `Part of #<epic-placeholder>`, `area:auth`, exactly one
   `status:triage`, a suggested milestone, dependencies, delivery shape, and
   acceptance boxes prefixed `gate:`.
 - EA-00 capability truthfulness is the only proposed `0.0.1-beta.1` item. All
   other work is suggested for `Backlog / Triage` pending owner triage.
 - No issue body uses an automatic issue-closing instruction.
+
+## Fable adversarial amendments
+
+The supervisor committed the separate Fable 5 medium review as `a8c006e6` in
+`adversarial-findings.md`. Verdict: **PASS**, zero blockers, with mandatory
+AMEND/MISSING-add dispositions before filing. This Codex session did not arrange
+or repeat an evaluation; it applied the committed reviewer findings.
+
+Applied amendments:
+
+- added EA-14 for service/machine/agent/CLI/MCP authentication spanning Entra
+  client credentials; WorkOS M2M, API Keys, device flow, Agent Auth, and MCP;
+  Better Auth API Key, JWT/Bearer, device grant, Agent Auth, MCP, and OAuth
+  Provider; and the shipped `@netscript/mcp` surface;
+- added backlog-grade EA-15 for outbound NetScript-as-IdP, deliberately separate
+  from inbound enterprise SSO;
+- expanded EA-01/research with multitenant issuer-`tid` validation, administrator
+  consent and service-principal creation, deliberate `prompt=consent`, B2B guest
+  normalization, group caps, Conditional Access P1/P2 licensing, later CAE/
+  claims-challenge phasing, and the AD FS `domain_hint` evidence guard;
+- assigned WorkOS AuthKit TOTP ownership to EA-03 for non-SSO AuthKit users,
+  enterprise-IdP MFA ownership for SSO, and kept standalone WorkOS MFA challenge/
+  SMS behind a distinct future adapter;
+- generalized EA-04 to one per-tenant connection-setup record across WorkOS,
+  direct Entra, and Better Auth, including the hosted-only Better Auth dashboard
+  caveat;
+- made EA-05 and EA-06 co-own one idempotent event-sync/webhook consumer and
+  guarded Directory Sync language as “automatic,” never “real-time”;
+- moved stale `seamless-auth-roadmap` reconciliation from a late EA-11 gate to
+  filing readiness; and
+- updated epic acceptance, child checklist, dependencies, phasing, config-first
+  mapping, research tables, and stop-lines to match the expanded scope.
+
+Stop-lines retained verbatim:
+
+1. no GitHub board objects created or changed by you — the supervisor files;
+2. HARD STOP before any release publish (`release:cut`, JSR publish, tag push,
+   canary or stable) — owner sign-off in-turn only;
+3. HARD STOP before closing milestone 13 — owner only.
 
 ## Orchestrator recovery requested during the slice
 
@@ -150,11 +190,12 @@ request.
 - [x] each deliverable H1 says `DRAFT ONLY`
 - [x] sub-issues use colon-label taxonomy and `Part of #<epic-placeholder>`
 - [x] no product code or GitHub board object was changed
-- [x] mechanical Markdown/draft invariants checked: 14 titles, 14 epic links,
+- [x] mechanical Markdown/draft invariants checked: 16 titles, 16 epic links,
   one `status:` and milestone per issue, valid catalog labels except the explicitly
-  proposed epic label, 98 issue acceptance gates, and no automatic issue-closing
+  proposed epic label, 121 issue acceptance gates, and no automatic issue-closing
   instruction
 - [x] branch committed and pushed to `origin/plan/auth-gaps`
-- [ ] supervisor dispatches separate Fable adversarial review
+- [x] supervisor-dispatched separate Fable adversarial review returned PASS with
+  zero blockers; all AMEND and MISSING-add dispositions applied
 
 This discovery session does not issue PLAN-EVAL or implementation verdicts.

@@ -29,6 +29,12 @@ kernel while assigning clear responsibilities:
 - NetScript provides truthful capability discovery, multi-backend routing,
   normalization, authorization policy ports, secret references, CLI/scaffold
   configuration, and conformance testing.
+- Machine, agent, CLI, and MCP authentication is a first-class lane spanning
+  Entra client credentials, WorkOS API Keys/M2M/device/Agent Auth, Better Auth
+  machine-auth plugins, and the shipped `@netscript/mcp` protected-resource
+  surface.
+- NetScript-as-IdP is deliberately separate backlog scope, using WorkOS Connect
+  or Better Auth OAuth Provider only behind an outbound issuer contract.
 
 This epic deliberately separates config-first leverage from new adapter work.
 Every capability must have one lifecycle owner per tenant, especially where
@@ -42,6 +48,8 @@ WorkOS and Better Auth overlap in organizations, SSO, or SCIM.
 - [ ] gate: WorkOS and Better Auth capabilities are exposed through configuration/adapters without copying upstream implementations
 - [ ] gate: secrets, audit events, and administrative operations meet redaction and lifecycle requirements
 - [ ] gate: generated projects can select, configure, mock, and smoke-test supported auth profiles
+- [ ] gate: service, machine, CLI, and delegated-agent identities have explicit organization, scope, actor, credential, revocation, audit, and MCP ownership
+- [ ] gate: inbound enterprise SSO and outbound NetScript-as-IdP are separate security contracts and delivery slices
 - [ ] gate: all implementation PRs satisfy CI and the required opposite-family evaluation before merge
 
 #### Proposed child checklist
@@ -50,7 +58,7 @@ WorkOS and Better Auth overlap in organizations, SSO, or SCIM.
 - [ ] #<S2-placeholder> — direct Microsoft Entra OAuth/OIDC profile
 - [ ] #<S3-placeholder> — tenant-aware multi-backend composition
 - [ ] #<S4-placeholder> — WorkOS AuthKit/SSO interactive adapter
-- [ ] #<S5-placeholder> — WorkOS Organizations/Admin Portal onboarding
+- [ ] #<S5-placeholder> — per-tenant connection setup across all auth lanes
 - [ ] #<S6-placeholder> — WorkOS Directory Sync/SCIM lifecycle
 - [ ] #<S7-placeholder> — enterprise auth audit and WorkOS bridge
 - [ ] #<S8-placeholder> — WorkOS RBAC/FGA authorization providers
@@ -60,6 +68,8 @@ WorkOS and Better Auth overlap in organizations, SSO, or SCIM.
 - [ ] #<S12-placeholder> — curated Better Auth capability profiles
 - [ ] #<S13-placeholder> — organization-aware identity/policy contracts
 - [ ] #<S14-placeholder> — auth conformance/mocking/scaffold kit
+- [ ] #<S15-placeholder> — machine, agent, CLI, and MCP authentication
+- [ ] #<S16-placeholder> — outbound NetScript-as-IdP contract
 
 ### Draft metadata
 
@@ -69,6 +79,10 @@ WorkOS and Better Auth overlap in organizations, SSO, or SCIM.
 - Filing note: `epic:enterprise-auth` is not present in the inspected
   `.github/labels.yml`; create/apply it only as part of an owner-ratified filing
   pass. Do not substitute a non-namespaced label.
+- Filing-readiness amendment: reconcile the stale `seamless-auth-roadmap`
+  nine-plugin/undocumented-escape-hatch wording with shipped R0 passthrough and
+  the live 50+ catalog before filing any child, so no implementation brief treats
+  the old debt sentence as current truth.
 
 ## Proposed sub-issues
 
@@ -120,18 +134,26 @@ Part of #<epic-placeholder>
 Turn the existing KV OAuth `azureAd` preset and authorization-code/PKCE flow into
 an explicit enterprise Entra profile. Cover tenant authority, supported cloud/
 issuer choices, claims and app-role/group mapping, logout, refresh, and
-Conditional Access claims-challenge continuation. Document that direct OAuth is
-not MSAL parity; add an explicit seam for confidential-client/OBO/downstream API
-token acquisition rather than hiding those needs in generic sessions.
+Conditional Access compatibility. Include multi-tenant `/common` versus
+`/organizations` policy, per-tenant issuer/`tid` validation, administrator
+consent and service-principal creation, consent URL/runbook behavior, and B2B
+guest normalization. Document that direct OAuth is not MSAL parity; add an
+explicit seam for confidential-client/OBO/downstream API token acquisition
+rather than hiding those needs in generic sessions.
 
 #### Acceptance
 
 - [ ] gate: CLI and scaffold select a typed Entra profile without hand-copying a generic issuer configuration
-- [ ] gate: tenant, `common`/organization policy, issuer, audience, and supported cloud behavior are validated and documented
+- [ ] gate: tenant, `common`/`organizations` policy, issuer template, token `tid`, audience, allow-list, and supported cloud behavior are validated and documented
+- [ ] gate: administrator-consent and deliberate `prompt=consent` URLs record customer-tenant consent, service-principal/application identifiers, requested permissions, and revocation/re-consent behavior
+- [ ] gate: app-only permissions are documented as administrator-consent-only and consent failures produce actionable diagnostics
+- [ ] gate: B2B guests, including `#EXT#` UPNs and external identity-provider claims, normalize to tenant-qualified immutable `tid` + `oid` identities rather than display/login strings
 - [ ] gate: authorization code uses PKCE/state/nonce and negative callback cases remain covered
-- [ ] gate: app roles, groups, group-overage, and stable principal mapping have explicit fail-closed behavior
-- [ ] gate: Conditional Access claims challenges produce a structured continuation/reauthentication result without loops
+- [ ] gate: app roles, groups, the verified 150-SAML/200-JWT group caps, overage lookup, and stable principal mapping have explicit fail-closed behavior
+- [ ] gate: Conditional Access documentation distinguishes baseline P1 from P2 risk-based policy/Identity Protection and never markets risk enforcement as a P1 capability
+- [ ] gate: basic Conditional Access compatibility ships with the Entra profile; claims-challenge/continuous-access continuation for long-lived tokens is explicitly phased as later P2/differentiator work and produces a structured reauthentication result without loops when implemented
 - [ ] gate: confidential-client, OBO, Graph/downstream-token, and cache ownership are either implemented behind a dedicated port or explicitly reported unsupported
+- [ ] gate: documentation does not claim unverified transparent AD FS discovery through `domain_hint`
 - [ ] gate: no documentation describes generic KV OAuth as full MSAL equivalence
 
 #### Draft metadata
@@ -139,7 +161,8 @@ token acquisition rather than hiding those needs in generic sessions.
 - Labels: `type:feat`, `area:auth`, `area:cli`, `priority:p1`,
   `epic:enterprise-auth`, `status:triage`
 - Milestone: `Backlog / Triage`
-- Dependencies: EA-00; policy mapping also feeds EA-12.
+- Dependencies: EA-00; connection installation feeds EA-04, policy/B2B mapping
+  feeds EA-12, and client-credentials machine identity feeds EA-14.
 - Delivery shape: configuration-first Entra preset, followed by Microsoft-specific
   challenge/token adapter work where required.
 
@@ -191,6 +214,10 @@ Extend the WorkOS backend beyond request-session verification. Provide
 authorization URL, callback, sealed-session issuance/refresh, logout/revocation,
 and connection/organization mapping so WorkOS SAML and OIDC SSO are reachable
 through the normalized auth service. Do not reproduce SAML parsing in NetScript.
+This issue owns AuthKit TOTP enrollment/list/authentication state for non-SSO
+AuthKit users. The enterprise IdP owns MFA for SSO users. WorkOS challenge
+create/verify and SMS are part of the separate standalone MFA API, not a merged
+AuthKit MFA surface, and require a separately selected adapter if later needed.
 
 #### Acceptance
 
@@ -200,6 +227,8 @@ through the normalized auth service. Do not reproduce SAML parsing in NetScript.
 - [ ] gate: IdP- and service-provider-initiated behavior is documented where supported
 - [ ] gate: unsupported WorkOS lifecycle operations are not advertised
 - [ ] gate: direct Entra KV OAuth versus WorkOS-brokered Microsoft SSO selection is documented
+- [ ] gate: AuthKit TOTP enrollment/list/authentication is modeled only for non-SSO AuthKit users, while SSO MFA ownership remains with the enterprise IdP
+- [ ] gate: standalone WorkOS MFA challenge/SMS APIs are neither advertised nor implemented as AuthKit unless a separate adapter is explicitly configured and tested
 
 #### Draft metadata
 
@@ -213,22 +242,26 @@ through the normalized auth service. Do not reproduce SAML parsing in NetScript.
 
 #### Title
 
-[enterprise-auth S5] Expose WorkOS Organizations and Admin Portal onboarding
+[enterprise-auth S5] Normalize per-tenant enterprise connection setup
 
 #### Body
 
 Part of #<epic-placeholder>
 
-Use WorkOS Organizations and Admin Portal for enterprise customer onboarding,
-domain/connection setup, and administrator-managed configuration. Normalize the
-result into NetScript organization and connection records rather than building a
-parallel setup UI first.
+Define one normalized per-tenant connection-setup record and lifecycle across all
+three lanes. WorkOS Organizations and Admin Portal supply the hosted WorkOS path;
+direct Entra supplies consent URLs, issuer/claim/permission status, and a SCIM
+runbook; Better Auth supplies plugin configuration while OSS deployments provide
+their own tenant-registration UX. Normalize results rather than pretending every
+lane has the same hosted dashboard.
 
 #### Acceptance
 
 - [ ] gate: an authorized tenant administrator can launch a scoped Admin Portal session
-- [ ] gate: organization, domain, connection, and onboarding state are normalized and queryable
+- [ ] gate: organization, domain, connection, lane/backend, issuer, consent, provisioning, and onboarding state are normalized and queryable
 - [ ] gate: portal session creation is tenant-bound, short-lived, authorized, and audited
+- [ ] gate: direct Entra setup records tenant consent/service-principal state and links an actionable claims/provisioning runbook
+- [ ] gate: Better Auth setup distinguishes OSS self-managed registration UX from hosted Better Auth Infrastructure dashboard capability
 - [ ] gate: connection/domain changes invalidate or refresh routing data safely
 - [ ] gate: CLI/scaffold configuration uses references and environment inputs without exposing WorkOS secrets
 - [ ] gate: ownership boundaries with Better Auth organizations are explicit
@@ -239,7 +272,8 @@ parallel setup UI first.
   `epic:enterprise-auth`, `status:triage`
 - Milestone: `Backlog / Triage`
 - Dependencies: EA-12 organization contract; EA-02 for routing integration.
-- Delivery shape: config-first WorkOS API integration plus a small organization adapter.
+- Delivery shape: vendor-neutral connection-setup record plus config-first WorkOS
+  Admin Portal, direct-Entra consent/runbook, and Better Auth registration adapters.
 
 ### EA-05
 
@@ -253,12 +287,15 @@ Part of #<epic-placeholder>
 
 Use WorkOS Directory Sync as the primary normalized SCIM/directory integration
 for enterprise tenants. Project users, groups, memberships, and deprovisioning
-events into NetScript with verified, idempotent webhook handling and a
-reconciliation path.
+events into NetScript through the same shared event-sync/webhook consumer used by
+EA-06 audit emission and role synchronization. The product promise is
+**automatic**, never “real-time”: provider delivery has latency, retries, and
+reconciliation boundaries.
 
 #### Acceptance
 
-- [ ] gate: webhook authenticity, timestamp/replay protection, idempotency, ordering, and retry behavior are tested
+- [ ] gate: EA-05 and EA-06 use one provider-neutral event-sync/webhook consumer contract for authenticity, timestamp/replay protection, idempotency, ordering, cursors, retry, and reconciliation
+- [ ] gate: Directory Sync product/docs language says “automatic” and never promises “real-time” propagation
 - [ ] gate: directory users, groups, memberships, and organization ownership have stable normalized identifiers
 - [ ] gate: deprovisioning disables access and revokes or marks affected sessions according to explicit policy
 - [ ] gate: reconciliation detects missed/out-of-order events without creating duplicate identities
@@ -271,8 +308,9 @@ reconciliation path.
 - Labels: `type:feat`, `area:auth`, `area:database`, `priority:p1`,
   `epic:enterprise-auth`, `status:triage`
 - Milestone: `Backlog / Triage`
-- Dependencies: EA-02, EA-12, EA-13; emits through EA-06.
-- Delivery shape: new WorkOS Directory Sync adapter, projection storage, and webhook service.
+- Dependencies: EA-02, EA-12, EA-13; co-owns the shared event seam with EA-06.
+- Delivery shape: one shared event-sync consumer plus a WorkOS Directory Sync
+  provider adapter and directory projection storage.
 
 ### EA-06
 
@@ -287,7 +325,9 @@ Part of #<epic-placeholder>
 Build on the existing auth spans and five durable events to create a stable
 enterprise audit envelope. Cover authentication, administration, impersonation,
 provisioning, policy decisions, secret rotation, and session lifecycle, then
-provide an optional WorkOS Audit Logs/Log Streams bridge.
+provide an optional WorkOS Audit Logs/Log Streams bridge. Consume provisioning,
+role-sync, and audit-provider events through the same event-sync/webhook seam as
+EA-05 rather than creating a second delivery runtime.
 
 #### Acceptance
 
@@ -296,6 +336,7 @@ provide an optional WorkOS Audit Logs/Log Streams bridge.
 - [ ] gate: authentication, admin, impersonation, provisioning, policy, secret, and revocation events have versioned contracts
 - [ ] gate: retention, query, export, delivery retry, duplicate, and failure semantics are documented
 - [ ] gate: WorkOS Audit Logs mapping and Log Streams configuration have integration tests
+- [ ] gate: inbound provider events and outbound audit delivery share the EA-05 event-sync envelope, dedupe/cursor/retry vocabulary, fixtures, and diagnostics while retaining direction-specific adapters
 - [ ] gate: core operation success does not silently depend on audit-provider availability, while audit delivery failures remain observable
 
 #### Draft metadata
@@ -303,8 +344,11 @@ provide an optional WorkOS Audit Logs/Log Streams bridge.
 - Labels: `type:feat`, `area:auth`, `area:telemetry`, `priority:p1`,
   `epic:enterprise-auth`, `status:triage`
 - Milestone: `Backlog / Triage`
-- Dependencies: EA-12 decision envelope; consumed by EA-04, EA-05, EA-07, and EA-08.
-- Delivery shape: core schema plus optional WorkOS adapter; reuses existing telemetry/streams.
+- Dependencies: EA-12 decision envelope; co-owns the event-sync seam with EA-05
+  and is consumed by EA-04, EA-07, EA-08, and EA-14.
+- Delivery shape: core audit schema plus the shared event-sync consumer and
+  optional WorkOS Audit Logs/Log Streams direction adapter; reuses existing
+  telemetry/streams.
 
 ### EA-07
 
@@ -450,7 +494,11 @@ Turn Better Auth's broad plugin ecosystem into supported, testable NetScript
 profiles rather than copying each feature. Initial profiles should cover 2FA,
 passkeys, magic link, organizations, admin, API keys/multi-session where selected,
 and rate-limit/session hardening. Enterprise SSO/SCIM plugins may be offered as an
-alternative lane only with explicit ownership relative to WorkOS.
+alternative lane only with explicit ownership relative to WorkOS. Better Auth's
+self-service SSO registration dashboard belongs to hosted Better Auth
+Infrastructure; an OSS SSO deployment must provide its own per-tenant
+registration UX. Better Auth 2FA remains upstream-owned and must not be conflated
+with either WorkOS AuthKit TOTP or WorkOS's standalone MFA challenge/SMS API.
 
 #### Acceptance
 
@@ -460,7 +508,8 @@ alternative lane only with explicit ownership relative to WorkOS.
 - [ ] gate: upstream plugins remain the implementation source; NetScript code is configuration, adapters, mappings, and diagnostics
 - [ ] gate: plugin compatibility/version diagnostics identify unsupported combinations before runtime
 - [ ] gate: WorkOS overlap for SSO, SCIM, organizations, and admin has an explicit per-tenant owner and no dual writes
-- [ ] gate: the stale nine-plugin/R0 wording in `seamless-auth-roadmap` is reconciled with shipped passthrough and the live catalog
+- [ ] gate: Better Auth SSO diagnostics state whether self-service onboarding is hosted Infrastructure or an application-owned OSS registration UX
+- [ ] gate: Better Auth 2FA, WorkOS AuthKit TOTP, enterprise-IdP MFA, and standalone WorkOS MFA challenge/SMS have explicit non-overlapping owners
 
 #### Draft metadata
 
@@ -494,6 +543,8 @@ not the ceiling of the authorization model.
 - [ ] gate: decision includes allow/deny, safe reason, provider, policy/model version, and audit correlation
 - [ ] gate: unknown tenants, memberships, claims, policy providers, and timeouts fail closed
 - [ ] gate: claim normalization covers Entra app roles/groups, WorkOS roles/permissions, and Better Auth organization roles without conflating sources
+- [ ] gate: Entra B2B guests use tenant-qualified immutable `tid` + `oid` identity and preserve external identity-provider context without keying authorization by `#EXT#` UPN text
+- [ ] gate: subject vocabulary distinguishes human users, service principals, autonomous machines, CLIs, and user-delegated agents with an explicit actor/delegation chain
 - [ ] gate: existing path scope/role guards adapt to the new port without breaking simple applications
 - [ ] gate: tenant isolation has model/property tests across storage, cache, routing, and authorization
 
@@ -502,7 +553,7 @@ not the ceiling of the authorization model.
 - Labels: `type:feat`, `area:auth`, `area:service`, `priority:p1`,
   `epic:enterprise-auth`, `status:triage`
 - Milestone: `Backlog / Triage`
-- Dependencies: none; foundational for EA-04 through EA-07 and EA-11.
+- Dependencies: none; foundational for EA-04 through EA-07, EA-11, EA-14, and EA-15.
 - Delivery shape: new vendor-neutral core/service contracts and adapters.
 
 ### EA-13
@@ -539,21 +590,107 @@ cases.
 - Dependencies: initial contract follows EA-00 and EA-12; expands alongside every adapter.
 - Delivery shape: new shared testing package/fixtures and scaffold E2E profiles.
 
+### EA-14
+
+#### Title
+
+[enterprise-auth S15] Authenticate machines, agents, CLIs, and MCP clients
+
+#### Body
+
+Part of #<epic-placeholder>
+
+Define a first-class non-browser identity lane for services, automation, CLIs,
+AI agents, and MCP clients. NetScript already ships `@netscript/mcp` and agent
+CLI tooling, but auth does not normalize machine principals, user-delegated
+agents, device authorization, client credentials, API keys, credential exchange,
+or protected-resource discovery.
+
+Leverage Entra client credentials; WorkOS M2M Applications, API Keys, CLI device
+flow, Agent Auth/Agent Registration, and MCP/Connect surfaces; and Better Auth
+API Key, JWT/Bearer, Device Authorization Grant, Agent Auth, MCP, and OAuth 2.1
+Provider plugins. Keep the NetScript contract vendor-neutral and distinguish an
+autonomous machine from an agent acting for a user. A service principal placed in
+a group holding an Entra app role does not receive the `roles` claim, so machine
+authorization must use direct app permissions/role assignments rather than
+transitive group assumptions.
+
+#### Acceptance
+
+- [ ] gate: subject contract distinguishes service principal, autonomous machine, interactive CLI user, and delegated agent, including tenant/organization, credential source, scopes, assurance, and actor/delegation chain
+- [ ] gate: Entra client-credentials tokens validate issuer/`tid`, audience, client/service-principal identity, app permissions, expiry, and direct app-role assignment without assuming group-transitive `roles`
+- [ ] gate: WorkOS M2M and API Keys map organization, permissions, owner, rotation/revocation, expiry, audit, and introspection/validation semantics without exposing raw keys
+- [ ] gate: WorkOS CLI device authorization and Agent Auth claim ceremonies cover pending/slow-down/expiry/denial, pre-claim versus post-claim trust, user delegation, credential exchange, refresh, and revocation
+- [ ] gate: Better Auth API-key, device-authorization, JWT/Bearer, Agent Auth, MCP, and OAuth Provider profiles declare schema, routes, client plugins, discovery, and lifecycle ownership
+- [ ] gate: `@netscript/mcp` protected-resource and authorization-server discovery integrate with the shared auth contract and retain the shipped default-deny CLI command policy
+- [ ] gate: API keys, client secrets, device codes, assertions, and tokens follow EA-08 secret/redaction rules and EA-06 audit/event rules
+- [ ] gate: conformance tests cover replay, stolen/expired/revoked credentials, wrong tenant/audience/org, excessive device polling, agent claim substitution, confused deputy, and provider outage
+- [ ] gate: capability discovery distinguishes user-interactive, machine-to-machine, device, delegated-agent, API-key, and MCP authorization operations
+
+#### Draft metadata
+
+- Labels: `type:feat`, `area:auth`, `area:cli`, `area:service`,
+  `area:ai-core`, `priority:p1`, `epic:enterprise-auth`, `status:triage`
+- Milestone: `Backlog / Triage`
+- Dependencies: EA-00, EA-02, EA-06, EA-08, EA-10, EA-12, and EA-13;
+  Entra-specific machine validation also depends on EA-01.
+- Delivery shape: vendor-neutral machine/delegated-agent contracts plus discrete
+  Entra, WorkOS, Better Auth, CLI, and MCP adapters; upstream protocols and
+  credential products remain the implementation source.
+
+### EA-15
+
+#### Title
+
+[enterprise-auth S16] Define outbound NetScript-as-IdP support
+
+#### Body
+
+Part of #<epic-placeholder>
+
+Track the deliberately deferred “being the IdP” capability separately from
+inbound enterprise SSO. Evaluate WorkOS Connect and Better Auth OAuth 2.1
+Provider as carriers for authorization-server behavior, including OAuth/OIDC
+discovery, client registration, consent, authorization code/PKCE, client
+credentials, token/introspection/revocation, signing-key rotation, resource
+indicators, and MCP protected-resource integration. NetScript should normalize
+configuration and policy, not implement another authorization server.
+
+#### Acceptance
+
+- [ ] gate: RFC/threat model separates authorization-server, resource-server, inbound-SSO, and application-session trust boundaries
+- [ ] gate: WorkOS Connect and Better Auth OAuth 2.1 Provider are compared for deployment, protocol, tenant, key, consent, client-registration, token, revocation, and MCP requirements
+- [ ] gate: issuer, audience/resource, client, scope, grant, consent, organization, actor, and signing-key contracts are vendor-neutral and versioned
+- [ ] gate: authorization code uses PKCE and mix-up defenses; machine grants, dynamic registration, refresh, introspection, and revocation have explicit enablement and policy
+- [ ] gate: signing keys and client credentials use EA-08 secret/rotation contracts and all issuance/consent/admin activity uses EA-06 audit events
+- [ ] gate: no inbound SSO issue implicitly promises NetScript-as-IdP before this child is implemented and conformance-tested
+- [ ] gate: generated examples prove one browser client, one machine client, and one MCP protected resource without embedding secrets
+
+#### Draft metadata
+
+- Labels: `type:feat`, `area:auth`, `area:service`, `priority:p2`,
+  `epic:enterprise-auth`, `status:triage`
+- Milestone: `Backlog / Triage`
+- Dependencies: EA-08, EA-10, EA-12, EA-13, and EA-14.
+- Delivery shape: backlog-grade RFC and vendor-adapter comparison first; no
+  custom authorization-server implementation.
+
 ## Dependency map and proposed phasing
 
 | Phase | Outcome | Issues | Why this order |
 |---|---|---|---|
 | 0 — truthful beta baseline | Stop promising unsupported auth paths. | EA-00 | Independent, security-relevant, and required before adding capabilities. |
-| 1 — shared contracts and config-first reach | Define tenant/policy semantics; expose first-class Entra config; generate Better Auth schema; establish the conformance harness. | EA-01 (configuration portion), EA-09, EA-12, EA-13 (kernel) | Creates the contracts and tests adapters must satisfy while immediately leveraging code already shipped upstream. |
+| 1 — shared contracts and config-first reach | Define tenant/policy semantics; expose first-class Entra config/consent/B2B setup; generate Better Auth schema; establish the conformance harness. | EA-01 (configuration/consent portion), EA-04 (record/runbook kernel), EA-09, EA-12, EA-13 (kernel) | Creates the contracts and tests adapters must satisfy while immediately leveraging code already shipped upstream. |
 | 2 — interactive and composition | Make multiple lanes reachable: multi-backend routing, WorkOS AuthKit/SSO, Better Auth handler/client. | EA-02, EA-03, EA-10 | Converts today's isolated/authentication-read adapters into usable coexistence paths. |
-| 3 — enterprise control plane | Onboarding, provisioning, audit, authorization, and secrets. | EA-04, EA-05, EA-06, EA-07, EA-08 | Builds lifecycle features on stable org/routing/policy/audit contracts. |
-| 4 — capability breadth and hardening | Curated Better Auth profiles and expanded live/generated-project matrices. | EA-11, EA-13 expansion, EA-01 Microsoft token/challenge expansion | Broadens upstream leverage after schema, handler, policy, and conformance foundations are real. |
+| 3 — enterprise control plane | Finish connection onboarding, provisioning, shared event sync, audit, authorization, and secrets. | EA-04, EA-05, EA-06, EA-07, EA-08 | Builds lifecycle features on stable org/routing/policy/audit contracts and uses one event consumer rather than parallel webhook runtimes. |
+| 4 — capability breadth and machine identity | Curated Better Auth profiles, machine/agent/CLI/MCP authentication, and expanded live/generated-project matrices. | EA-11, EA-13 expansion, EA-14, EA-01 Microsoft claims-challenge/continuous-access expansion | Broadens upstream leverage after schema, handler, policy, secrets, audit, and conformance foundations are real; CA challenge continuation is deliberately later than basic Entra compatibility. |
+| 5 — deliberately deferred outbound identity | Decide whether and how NetScript acts as an authorization server/IdP. | EA-15 | Keeps outbound issuance from expanding or weakening the inbound enterprise-auth implementation. |
 
 ### Config-first leverage versus new adapter code
 
 | Mostly configuration/upstream composition first | Requires a new NetScript adapter or core contract |
 |---|---|
-| Entra preset exposed through CLI/scaffold; Better Auth `plugins`/options profiles; Better Auth production rate-limit/session options; WorkOS Admin Portal launch/config; upstream MFA/passkey/magic-link/admin plugin selection | Backend-derived capability model; Microsoft claims-challenge/OBO/token seam; multi-backend router/linking; WorkOS interactive flow; Directory Sync projection/webhooks; audit envelope/bridge; policy/FGA provider; secret-reference port; Better Auth schema generator/handler mount; shared org/policy model; conformance kit |
+| Entra preset/consent URLs exposed through CLI/scaffold; Better Auth `plugins`/options and machine-auth profiles; Better Auth production rate-limit/session options; WorkOS Admin Portal/API Keys/M2M/device/Agent Auth configuration; upstream MFA/passkey/magic-link/admin plugin selection | Backend-derived capability model; Microsoft issuer-`tid`/B2B/claims-challenge/OBO/token seams; machine/delegated-agent principal; multi-backend router/linking; WorkOS interactive flow; one Directory Sync/audit event consumer; audit envelope/bridge; policy/FGA provider; secret-reference port; Better Auth schema generator/handler mount; MCP protected-resource integration; shared org/policy model; conformance kit; outbound issuer contract |
 
 Config-first does not mean “documentation only”: every profile still needs schema,
 secret, route, client, claim, and test declarations. New adapters should translate
@@ -564,14 +701,13 @@ upstream provider.
 
 These are planning constraints, not draft issue acceptance:
 
-1. Merge requires CI green plus opposite-family evaluation PASS on the PR. The
-   standing beta-11 merge authorization applies only after that bar is met.
-2. Stop before any `release:cut`, JSR publish, tag push, canary, or stable publish;
-   release requires fresh owner sign-off in-turn.
-3. Stop before closing milestone 13; that requires owner sign-off.
-4. Any later sub-agent brief must repeat these stop-lines verbatim to be valid.
-5. The #824 seed run remains drafts-only until owner ratification, and board
-   filing requires the owner in-turn.
+1. no GitHub board objects created or changed by you — the supervisor files;
+2. HARD STOP before any release publish (`release:cut`, JSR publish, tag push,
+   canary or stable) — owner sign-off in-turn only;
+3. HARD STOP before closing milestone 13 — owner only.
+
+Do not self-arrange evals. The #824 seed run and this board remain drafts-only
+until the applicable owner-ratification boundary is satisfied.
 
 No GitHub issue, epic, label, milestone, PR, or release action is authorized by
 this draft.
