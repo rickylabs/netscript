@@ -158,3 +158,9 @@ group launch; this section fixes the supervisor's surface.
   to G6's thread as a findings-first investigation (in-tree packaging fix vs upstream gap vs e2e
   invocation error). Wave-close posture decided AFTER the verdict. G5 complete; IMPL-EVAL
   running.
+- 2026-07-18 · G5 MERGED into integration (49f4f0f6) — all five feature groups on
+  feat/desktop-frontend. Investigation verdict: UPSTREAM GAP (Deno 2.9.3 bootstrap deletes
+  op_desktop_verify_ed25519; NOT_IMPORTED_OPS omission). Owner decision package written
+  (upstream-op-verify-decision.md): recommended option A = amendment re-scope moving the
+  apply-proof to a beta.12 successor pending the owner-filed denoland issue. Wave PR held until
+  the owner picks. G7 IMPL-EVAL (honesty-focused) running.
