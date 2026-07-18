@@ -70,7 +70,7 @@ depth below a lane: L1 pillar/track/unit → L2 leaf/how-to-node → L3 recipe/c
   /glossary/                           Glossary                                 [KEEP]
   /how-to/                             All how-to recipes (catalog)             [RETIRE→catalog]  children moved out; nav_hide; linked from Start + pillar hubs
 
-━━ LEARN ━━  nav.menu("/tutorials/", "nav_hide!=true", "order basename")
+━━ LEARN ━━  nav.menu("/tutorials/", "nav_hide!=true", "order url")
   /tutorials/                          Tutorials (index)                        [KEEP]  L1
     /tutorials/live-dashboard/  01–06  Live dashboard                           [KEEP]  L2 → chapters L3   (drop Web "Quickstart→index" dup)
     /tutorials/chat/            01–06  Durable chat                             [KEEP]  L2 → L3            (drop AI dup)
@@ -142,7 +142,7 @@ depth below a lane: L1 pillar/track/unit → L2 leaf/how-to-node → L3 recipe/c
     /observability/how-to/             [NEW] L2
       …/add-opentelemetry/             [MOVE from /how-to/add-opentelemetry/]            L3
 
-━━ REFERENCE ━━  nav.menu("/reference/", "", "order basename")  — 32 units, URLs LOCKED byte-stable
+━━ REFERENCE ━━  nav.menu("/reference/", "", "order url")  — 32 units, URLs LOCKED byte-stable
   /reference/                          Reference (index)                        [KEEP][LOCKED] L1
     …31 registered units (ai, aspire, auth, auth-better-auth, auth-kv-oauth, auth-workos,
       cli, config, contracts, cron, database, fresh, fresh-ui, kv, logger, plugin,
@@ -154,7 +154,7 @@ depth below a lane: L1 pillar/track/unit → L2 leaf/how-to-node → L3 recipe/c
     /reference/ai/skills/              AI skills                                [KEEP][LOCKED] L3
     /reference/telemetry/convention/   Telemetry convention                     [KEEP][LOCKED] L3  (was orphan → auto-surfaces via nav.menu)
 
-━━ CONCEPTS ━━  nav.menu("/explanation/", "nav_hide!=true", "order basename")  — plain-English label (Diátaxis demoted)
+━━ CONCEPTS ━━  nav.menu("/explanation/", "nav_hide!=true", "order url")  — plain-English label (Diátaxis demoted)
   /explanation/                        How NetScript works (index)              [KEEP]  L1
     /explanation/architecture/ contracts/ plugin-system/ auth-model/
       durability-model/ observability/ aspire/                                  [KEEP]  L2 (7 essays)
@@ -210,9 +210,9 @@ with `order` front matter.
 **Front-matter conventions (the real content sweep):**
 
 - `order: <n>` on every index + leaf a `nav.menu` root touches (~113 non-shim pages; none exist
-  today). Sort string everywhere: `"order basename"` (verified valid multi-field grammar).
+  today). Sort string everywhere: `"order url"` (verified valid multi-field grammar).
   Pillar/track/how-to **index pages get `order: 0`** so the hub sorts first. Tutorial chapters need
-  no `order` — their `NN-` basename sorts under the `basename` tiebreak. Recipes get an
+  no `order` — their `NN-` prefix sorts under the `url` tiebreak (index pages share basename "index", which is why the tiebreak is url, not basename). Recipes get an
   `order: 100+` band so they always cluster after guides inside a pillar.
 - `nav_hide: true` filtered out via the `"nav_hide!=true isRedirect!=true"` query (verified:
   negation valid, undefined passes). The Lume `redirects` plugin flags its generated pages
@@ -235,7 +235,7 @@ with `order` front matter.
   (subtitles are a kept SOTA affordance — Stripe/Lume pattern).
 - `kind:"flat"` → curated `<a>`s; active check `page.data.url == href` (drop today's double
   `|> url` dance — source==source, since base_path rewrites the emitted href).
-- `kind:"menu"` → for each root, feed `nav.menu(root, "nav_hide!=true", "order basename").children`
+- `kind:"menu"` → for each root, feed `nav.menu(root, "nav_hide!=true", "order url").children`
   to a recursive **`_includes/menu_item.vto`** partial (the plugin's documented recursion — required
   because Build reaches depth 3 at pillar→how-to→recipe and Reference/Learn reach
   unit/track→subpage). Each folder node is `<details {{ if url.startsWith(node.data.url) }}open{{ /if }}>`;
@@ -255,7 +255,7 @@ Behavior change accepted: one deterministic trail replaces "last matching sectio
 control; it never touched `navSections`, cannot break). For Reference (32 units, unmaintainable by
 hand) auto-derive with the verified v2.5.4 signature — `nav.nextPage(url, query?, sort?)` /
 `nav.previousPage(url, query?, sort?)` (there is **no** basePath argument; nav.ts:85/111). Scope to
-the reference lane via the query: `nav.nextPage(url, "url^=/reference/", "order basename")`.
+the reference lane via the query: `nav.nextPage(url, "url^=/reference/", "order url")`.
 
 **Untouched chrome (verified nav-agnostic):** `<aside data-sidebar>` shell, brand header, mobile
 toggle/backdrop JS, theme toggle, TOC/scroll-spy, code-copy, tabbed-code, edit-this-page footer,
