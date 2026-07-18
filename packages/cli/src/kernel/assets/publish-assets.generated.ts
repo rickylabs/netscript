@@ -2,7 +2,7 @@
 // Do not edit by hand. Run `deno task gen:publish-assets`.
 
 /** Version of the published CLI package. */
-export const CLI_PACKAGE_VERSION: string = '0.0.1-beta.10';
+export const CLI_PACKAGE_VERSION: string = '0.0.1-beta.11';
 
 /** Serialized Deno configuration schema copied into generated workspaces. */
 export const DENO_CONFIG_SCHEMA_JSON: string =
