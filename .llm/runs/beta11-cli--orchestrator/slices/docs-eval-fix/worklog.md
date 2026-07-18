@@ -77,4 +77,13 @@
 
 - No evaluator was dispatched; supervisor owns opposite-family review and formal evaluation.
 - No merge, release operation, milestone closure, or #824 board action was performed.
-- Draft PR creation and gate-evidence comment follow after the final local gate rerun and commit.
+- Implementation commit `e0a22d36` was pushed with the explicit refspec
+  `git push origin HEAD:fix/docs-eval-loop`.
+- Draft PR [#869](https://github.com/rickylabs/netscript/pull/869) targets `main`, titled
+  `fix(ci): docs OpenHands eval — single trigger per ready PR head`, and references #840 / #806
+  without a closing keyword.
+- PR taxonomy: `type:fix`, `area:tooling`, `gate:ci`, `wave:v1`, `priority:p1`, exactly one
+  `status:impl`; milestone `0.0.1-beta.11` (#13). `docs-eval:skip` is unnecessary because the PR
+  carries neither docs label and the repaired workflow does not listen to label events.
+- Gate evidence posted in the
+  [IMPL phase comment](https://github.com/rickylabs/netscript/pull/869#issuecomment-5012615474).
