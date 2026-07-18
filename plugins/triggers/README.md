@@ -64,7 +64,7 @@ Postgres; the install records both so `netscript db` and Aspire provision them f
 To consume the plugin programmatically (custom hosts, tests, tooling), add it as a library:
 
 ```bash
-deno add jsr:@netscript/plugin-triggers
+deno add jsr:@netscript/plugin-triggers@<version>
 ```
 
 The standalone plugin CLI is also directly runnable:

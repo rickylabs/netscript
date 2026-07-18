@@ -59,7 +59,7 @@ versions. No database is provisioned: streams is a self-contained utility.
 To consume the plugin programmatically (custom hosts, tests, tooling), add it as a library:
 
 ```bash
-deno add jsr:@netscript/plugin-streams
+deno add jsr:@netscript/plugin-streams@<version>
 ```
 
 The standalone plugin CLI is also directly runnable:
@@ -73,7 +73,8 @@ the pre-release line.
 
 ## Quick example
 
-Install the plugin, then list the topics it serves:
+Install the plugin, then list the topics it serves — the install scaffolds a default notifications
+stream, so discovery finds it immediately:
 
 ```bash
 $ netscript plugin install stream --name streams
@@ -82,9 +83,17 @@ Created 2 plugin files.
 Regenerated 12 Aspire helper files.
 
 $ deno x -A jsr:@netscript/plugin-streams@<version>/cli list-topics
-0 stream topic(s) discovered.
+1 stream topic(s) discovered.
 {
-  "topics": []
+  "topics": [
+    {
+      "name": "/v1/streams/notifications/events",
+      "streamPath": "/v1/streams/notifications/events",
+      "producerId": "notifications-producer",
+      "producerFile": "streams/notifications-stream.ts",
+      "collections": []
+    }
+  ]
 }
 ```
 

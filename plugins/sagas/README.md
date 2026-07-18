@@ -63,7 +63,7 @@ durable state (`--saga-store-backend kv|prisma`); the install records these requ
 To consume the plugin programmatically (custom hosts, tests, tooling), add it as a library:
 
 ```bash
-deno add jsr:@netscript/plugin-sagas
+deno add jsr:@netscript/plugin-sagas@<version>
 ```
 
 The standalone plugin CLI is also directly runnable:

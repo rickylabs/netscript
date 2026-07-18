@@ -46,11 +46,11 @@ flowchart LR
 ## Install
 
 ```bash
-deno add jsr:@netscript/plugin
+deno add jsr:@netscript/plugin@<version>
 ```
 
-For version pins in configuration, use the `@<version>` placeholder pinned to your installed CLI;
-bare `jsr:@netscript/*` specifiers do not resolve on the pre-release line.
+Pin `<version>` to match your installed CLI; bare `jsr:@netscript/*` specifiers do not resolve on
+the pre-release line.
 
 ## Quick example
 

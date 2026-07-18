@@ -191,3 +191,33 @@ Compatibility → License.
 | deno fmt | `deno fmt --check <13>` | PASS (clean after fmt) |
 | check:publish-assets | `deno task check:publish-assets` | PASS exit 0 (no embedded-README drift) |
 | check:assets-barrel | `deno task check:assets-barrel` | PASS exit 0 |
+
+### B2 fix cycle 1 (post Sol audit FAIL — audit-b2.md), 2026-07-18
+
+Same generator session resumed per doc-audit profile.
+
+- **F1 (Streams transcript):** root cause — my original `list-topics` execution ran from the
+  scratch parent dir, not the scaffold root; the audit is right that the install scaffolds a
+  default notifications stream. Re-executed
+  `deno run -A --minimum-dependency-age=0 jsr:@netscript/plugin-streams@0.0.1-beta.10/cli
+  list-topics` from the SAME installed scaffold root (b2app): observed
+  `1 stream topic(s) discovered.` with `/v1/streams/notifications/events`
+  (`notifications-producer`, `streams/notifications-stream.ts`). Transcript replaced with that
+  verbatim output and the intro sentence updated ("the install scaffolds a default notifications
+  stream, so discovery finds it immediately").
+- **F2 (bare deno add):** all 13 library install fences pinned to
+  `deno add jsr:@netscript/<pkg>@<version>` (B1/MCP approved deviation); the adjacent pinning note
+  normalized to the B1/MCP wording ("Pin `<version>` to match your installed CLI; …"). Corrected
+  versionless scan (version checked in the token suffix after `jsr:@netscript/`): 0 bare pinnable
+  specifiers remain across the 13 files.
+
+Fix-cycle gate log (all re-run after fixes):
+| Gate | Result |
+| --- | --- |
+| readme-standard (13) | PASS 13/13 |
+| tagline cap | PASS checked=13 over=0 |
+| deno task docs:links | PASS docs=98, 0 broken |
+| ts-fence typecheck (touched file: plugins/streams) | PASS |
+| versionless-specifier scan (13 files) | PASS 0 bare |
+| internal-wording grep (13 files) | PASS 0 hits |
+| deno fmt --check (13) | PASS |

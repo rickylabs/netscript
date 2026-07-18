@@ -57,11 +57,11 @@ netscript plugin install ai --name ai
 To consume the plugin programmatically (custom hosts, tests, tooling), add it as a library:
 
 ```bash
-deno add jsr:@netscript/plugin-ai
+deno add jsr:@netscript/plugin-ai@<version>
 ```
 
-For version pins in configuration, use the `@<version>` placeholder pinned to your installed CLI;
-bare `jsr:@netscript/*` specifiers do not resolve on the pre-release line.
+Pin `<version>` to match your installed CLI; bare `jsr:@netscript/*` specifiers do not resolve on
+the pre-release line.
 
 ## Quick example
 

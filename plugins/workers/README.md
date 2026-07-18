@@ -64,7 +64,7 @@ you.
 To consume the plugin programmatically (custom hosts, tests, tooling), add it as a library:
 
 ```bash
-deno add jsr:@netscript/plugin-workers
+deno add jsr:@netscript/plugin-workers@<version>
 ```
 
 The standalone plugin CLI is also directly runnable:

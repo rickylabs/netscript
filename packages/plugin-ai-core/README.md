@@ -48,11 +48,11 @@ Route paths are relative; the `/v1/ai` prefix is applied where the service host 
 ## Install
 
 ```bash
-deno add jsr:@netscript/plugin-ai-core
+deno add jsr:@netscript/plugin-ai-core@<version>
 ```
 
-For version pins in configuration, use the `@<version>` placeholder pinned to your installed CLI;
-bare `jsr:@netscript/*` specifiers do not resolve on the pre-release line.
+Pin `<version>` to match your installed CLI; bare `jsr:@netscript/*` specifiers do not resolve on
+the pre-release line.
 
 ## Quick example
 
