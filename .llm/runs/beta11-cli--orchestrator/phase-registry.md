@@ -11,12 +11,12 @@ Live status of milestone-13 phase groups. Statuses: `pending` → `active` → `
 | G4 | #452 | `feat/desktop-frontend-452-generator` | 1 | merged | into integration f86a9191; #452/#375 close at wave PR · thread 019f720b-9692-7bd2-bd66-e43066365b88 · wt-g4-452 · Sol·medium · plan-first |
 | G5 | #843 | `feat/desktop-frontend-843-ui` | 2 | merged | into integration 49f4f0f6; #843 closes per owner rescope decision |
 | G6 | #456 | `feat/desktop-frontend-456-packaging` | 2 | merged | into integration 1709dcba; #456 closes at wave PR |
-| G7 | #457 | `feat/desktop-frontend-457-e2e` | 3 | impl-done | honest Linux FAIL (upstream op gap); IMPL-EVAL running; posture = owner decision |
+| G7 | #457 | `feat/desktop-frontend-457-e2e` | 3 | merged | into integration dc76274a; IMPL-EVAL PASS; native suite non-blocking-with-evidence pending upstream fix |
 | G8 | #824 | `plan/unified-runtime` | 1 | eval-pass | stages A–G done (PLAN-EVAL PASS after full adversarial cycle); PARKED at Stage-H owner ratification |
 | G9 | #804 | `fix/804-dry-run-writes` | 1 | merged | squash 5e5cea3d; #804 closed |
 | G10 | #802 | `fix/802-plugin-cli-help` | 1 | merged | squash 8cc6b21a; #802 closed |
 | G11 | #818 | `fix/818-min-dep-age-lockstep` | 2 | merged | squash 23183153; #818 closed |
-| G12 | #814 | `docs/814-mcp-readme` | 2 | pending | doc-audit pipeline |
+| G12 | #814 | `docs/814-mcp-readme` | 2 | active | PR #858 impl complete (Fable lane); Sol changeset audit running |
 | G13 | #815 | `docs/815-package-readmes` | 3 | pending | after G12 |
 | G14 | #816 | `docs/816-main-readme` | 4 | pending | may slip to beta.12 (owner note) |
 

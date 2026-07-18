@@ -164,3 +164,8 @@ group launch; this section fixes the supervisor's surface.
   (upstream-op-verify-decision.md): recommended option A = amendment re-scope moving the
   apply-proof to a beta.12 successor pending the owner-filed denoland issue. Wave PR held until
   the owner picks. G7 IMPL-EVAL (honesty-focused) running.
+- 2026-07-18 · G7 MERGED into integration (dc76274a) after the step-level CI tolerance fix —
+  ALL SEVEN wave groups merged (#452/#841/#842/#456/#843/#457-suite + range-normalization).
+  Wave→main PR gated ONLY on owner decision 1 (Option A/B; history verdict OVERSIGHT —
+  denoland#33441 keep-list omission). G12 #814 impl complete (PR #858; caught a factually wrong
+  docs-site command-policy listing); Sol changeset audit dispatched.
