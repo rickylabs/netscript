@@ -124,3 +124,70 @@ Same generator session resumed per doc-audit profile. All fixes executed in this
 | Mermaid parse (6 diagrams incl. new CLI) | PASS 6/6 (mermaid-cli 10.9.1) |
 | Internal-wording grep (6 files) | PASS 0 hits |
 | deno fmt (6 files) | clean |
+
+## Batch B2 — plugin family (13 READMEs), 2026-07-18
+
+Generator: Claude · Fable 5 (refresh class per #815 lane rule). Worktree
+`/home/codex/repos/wt-g13-815`, branch `docs/815-package-readmes`, re-baselined first:
+`git fetch origin main && git merge origin/main` → "Already up to date" (base 20758eb6).
+
+Scope: `plugins/{ai,auth,sagas,streams,triggers,workers}`, `packages/plugin`,
+`packages/plugin-{ai,auth,sagas,streams,triggers,workers}-core`. All 13 rewritten to the B1/#815
+flagship shape (exemplar `packages/mcp/README.md`): tagline ≤250B → intro → Why bullets →
+Architecture (mermaid where warranted) → Install → Quick example → Public surface → Docs →
+Compatibility → License.
+
+### Executed-command evidence (accuracy law)
+- Fresh scaffold from published beta.10: `jsr:@netscript/cli@0.0.1-beta.10 init b2app --db postgres
+  --yes` → exit 0. Then ALL SIX installs executed in it (each exit 0, output quoted in READMEs):
+  `plugin install worker --name workers` (port 8091, 4 files), `saga --name sagas` (8092, 4),
+  `trigger --name triggers` (8093, 5), `stream --name streams` (4437, 2), `auth --name auth`
+  (8094, 1), `ai --name ai` (8095, 7 files incl. `ai/mcp/registry.ts` — README table updated to the
+  observed 7-file set). Confirmed `plugin add` does NOT exist on the beta.10 CLI (`plugin --help`:
+  the verb is `install <kind>` with required `--name`) — all B2 READMEs corrected from the stale
+  `plugin add` forms (truthful-usage rule from #802).
+- Standalone plugin CLI verbs executed against published beta.10 packages: workers `list-jobs`
+  ("Found 0 worker jobs."), triggers `list` ("Found 0 trigger definitions."), streams `list-topics`
+  ("0 stream topic(s) discovered."), sagas `inspect` (graceful offline degradation:
+  `runtimeError: "fetch failed"`, local source scan) — outputs quoted verbatim in the Quick
+  examples.
+- DRIFT NOTE (transient env): `deno x` could not run the freshly REPUBLISHED beta.10 packages —
+  the 24h minimum-dependency-age wall blocks them and `deno x` does not honor
+  `--minimum-dependency-age` (the deno-x child-process limitation already tracked from the release
+  fixes). Verbs were executed via the identical entrypoint with
+  `deno run -A --minimum-dependency-age=0 jsr:@netscript/plugin-<x>@0.0.1-beta.10/cli <verb>`;
+  READMEs print the canonical `deno x -A jsr:@netscript/plugin-<x>@<version>/cli <verb>` form,
+  which is what users get once the wall lapses (<24h). Same wall blocked `netscript plugin ai
+  --help` (child `deno x`), so no `plugin ai add …` command is printed anywhere — add-only
+  resources are described via the typechecked `collectInstallArtifacts`/`resources` library
+  snippet instead.
+- Link fix: `durable-streams/` (linked from the old streams READMEs) is 404 on the live site;
+  replaced with `capabilities/streams/` (200). All 24 docs-site URLs used across the 13 READMEs
+  curl-verified 200.
+
+### API accuracy
+- `deno doc <pkg>/mod.ts` run for all 13 packages; Public-surface tables and symbol claims sourced
+  from those lists + each `deno.json` exports map. Stale claims removed: plugins/ai "`--mcp` not
+  included" (the beta.10 CLI ships `--mcp` and scaffolds `ai/mcp/registry.ts` by default);
+  internal process vocabulary stripped (parity-checklist/verify-harness prose, issue-number refs,
+  tier labels).
+- Every `ts` fence typechecked in-package (extract → `deno check --unstable-kv`): 13/13 PASS.
+  Four inherited fences were broken against the current tree and were fixed: streams topic
+  validator (Standard Schema `Result` shape), sagas-core runtime registration (mirrors the repo's
+  own `as SagaDefinition` widening; typed-DSL fence split from runtime fence), triggers-core
+  webhook (async handler + declared port adapters; was relying on undeclared free identifiers),
+  ai-core router (partial `router.router({chat})` never typechecked — replaced with the canonical
+  full `createAiRouter` implementation from the package's own module doc).
+
+### Gate log (Batch B2)
+| Gate | Command | Result |
+| --- | --- | --- |
+| readme-standard (13 files) | `.llm/tools/validation/check-readme-standard.ts <13> --pretty` | PASS 13/13 conform |
+| tagline cap | `.llm/tools/validation/check-jsr-tagline-length.ts <13> --pretty` | PASS checked=13 over=0 |
+| docs:links | `deno task docs:links` | PASS docs=98, 0 broken |
+| ts-fence typecheck | per-package extract + `deno check --unstable-kv` | PASS 13/13 |
+| Mermaid parse | mermaid-cli 10.9.1 over all 11 diagrams | PASS 11/11 (streams-core, ai-core: no diagram — contract/utility) |
+| Internal-wording grep | issue-number/process-vocab patterns over 13 files | PASS 0 hits |
+| deno fmt | `deno fmt --check <13>` | PASS (clean after fmt) |
+| check:publish-assets | `deno task check:publish-assets` | PASS exit 0 (no embedded-README drift) |
+| check:assets-barrel | `deno task check:assets-barrel` | PASS exit 0 |

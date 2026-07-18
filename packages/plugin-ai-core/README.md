@@ -4,58 +4,89 @@
 [![CI](https://github.com/rickylabs/netscript/actions/workflows/ci.yml/badge.svg)](https://github.com/rickylabs/netscript/actions/workflows/ci.yml)
 [![Docs](https://img.shields.io/badge/docs-rickylabs.github.io-blue)](https://rickylabs.github.io/netscript/)
 
-**The contract-only core for the NetScript AI plugin: typed oRPC routes for streaming chat, models,
+**The contract-only core for the NetScript AI plugin: typed API routes for streaming chat, models,
 tools, embeddings, and transcription, derived from the AI engine vocabulary.**
 
-The `/v1/ai` surface includes an SSE-framed `chat` stream plus `models`, `tools/:name`, `embed`, and
-`transcribe`. It ships no service implementation: a connector implements the routes and typed
-clients call them, while the shared `@netscript/ai` vocabulary keeps plugin IO aligned with domain
-contracts.
+An AI API contract has one job: keep the service that implements it and the clients that call it
+from ever disagreeing — especially about streaming. This package is that contract and nothing else.
+The `/v1/ai` surface defines an SSE-framed `chat` stream plus `models`, `tools/{name}`, `embed`, and
+`transcribe`; every route's IO is a named Zod schema mirroring the
+[`@netscript/ai`](https://jsr.io/@netscript/ai) engine vocabulary, with compile-time drift guards
+asserting each schema stays assignable to the engine type it mirrors. It ships no service
+implementation: a connector implements the routes, and typed clients call them.
 
----
+## Why teams use it
 
-## 🚀 Quick Start
+- **Streaming enforced by types** — the `chat` route's output is an event-iterator of `ChatChunk`
+  frames (`text`, `tool-call`, `tool-result`, `message`, `usage`, `error`, `done`); a buffered
+  single-response implementation does not type-check, so every implementation streams.
+- **Errors stay in-stream** — recoverable and terminal chat errors surface as the `error` chunk
+  rather than as a transport error, matching the engine's streaming model; non-streaming routes
+  converge onto the shared plugin error vocabulary (`NOT_FOUND`, `VALIDATION_ERROR`, `INTERNAL`).
+- **Engine-derived IO that cannot drift** — route schemas re-export and mirror the engine types
+  (`Message`, `ContentPart`, `ToolCall`, `ToolResult`, `Usage`, `ModelDescriptor`, `AgentChunk`),
+  and compile-time guards fail the build if a schema diverges.
+- **Discoverable by design** — the contract extends the base plugin contract from
+  [`@netscript/plugin`](https://jsr.io/@netscript/plugin), carrying the mandatory `describe` route
+  that returns an `AiCapabilities` document tooling can introspect without parsing source.
+- **Small root, full depth on a subpath** — the root export carries the two contract handles and
+  route IO types; the full Zod validator surface lives on `./contracts/v1`.
 
-### Installation
+## The `/v1/ai` route surface
+
+Route paths are relative; the `/v1/ai` prefix is applied where the service host mounts the router.
+
+| Route        | Method | Path            | IO                                               |
+| ------------ | ------ | --------------- | ------------------------------------------------ |
+| `chat`       | POST   | `/chat`         | `ChatInput` → **SSE** `eventIterator<ChatChunk>` |
+| `models`     | GET    | `/models`       | `ModelsInput?` → `ModelsResponse`                |
+| `invokeTool` | POST   | `/tools/{name}` | `ToolInvokeInput` → `ToolInvokeResponse`         |
+| `embed`      | POST   | `/embed`        | `EmbedInput` → `EmbedResponse`                   |
+| `transcribe` | POST   | `/transcribe`   | `TranscribeInput` → `TranscribeResponse`         |
+| `describe`   | GET    | `/describe`     | → `AiCapabilities` (inherited base route)        |
+
+## Install
 
 ```bash
-# Deno (recommended)
 deno add jsr:@netscript/plugin-ai-core
-
-# Node.js / Bun
-npx jsr add @netscript/plugin-ai-core
-bunx jsr add @netscript/plugin-ai-core
 ```
 
-### Usage
+For version pins in configuration, use the `@<version>` placeholder pinned to your installed CLI;
+bare `jsr:@netscript/*` specifiers do not resolve on the pre-release line.
 
-The root export gives you the two contract handles — `aiContract` (for client generation) and
-`aiContractV1` (the context-bindable implementer) — plus every route IO type.
+## Quick example
+
+The root export gives you the contract handles (`aiContract` for client generation, `aiContractV1`
+for context binding), every route IO type, and `createAiRouter` — the one-call way to bind a
+complete implementation. The `chat` handler is an async generator: the contract output is an
+event-iterator of chunks, so it must stream frames:
 
 ```typescript
-import { aiContractV1 } from '@netscript/plugin-ai-core';
-import type { AiRouter, ChatChunk } from '@netscript/plugin-ai-core';
+import { createAiRouter } from '@netscript/plugin-ai-core';
 
-// A connector (P2) binds the contract to its request context, then implements
-// each route's handler. The `chat` handler is an async generator: the contract
-// output is an event-iterator of chunks, so it MUST stream frames.
-const router = aiContractV1.$context<{ requestId: string }>();
-
-const impl: AiRouter = router.router({
-  chat: router.chat.handler(async function* ({ input }): AsyncGenerator<ChatChunk> {
+const router = createAiRouter({
+  describe: () => ({
+    pluginName: '@netscript/plugin-ai',
+    contractVersions: ['v1'],
+    routeGroups: ['ai'],
+    capabilities: ['chat'],
+  }),
+  async *chat({ input }) {
     for (const message of input.messages) {
       yield { type: 'text', delta: `echo: ${JSON.stringify(message.content)}` };
     }
     yield { type: 'done' };
-  }),
-  // models / invokeTool / embed / transcribe / describe handlers follow.
+  },
+  models: () => ({ models: [] }),
+  invokeTool: () => ({ content: 'No tools registered.', state: 'error' }),
+  embed: () => ({ embeddings: [] }),
+  transcribe: () => ({ text: '' }),
 });
+
+console.log(Object.keys(router)); // the six bound route handlers
 ```
 
-### Advanced: validating a streamed chunk on the `./contracts/v1` subpath
-
-The full IO surface — the Zod `*Schema` validators and the engine-derived vocabulary types — lives
-on the `./contracts/v1` subpath, keeping the root export budget small.
+Validate route IO with the Zod schemas on the `./contracts/v1` subpath:
 
 ```typescript
 import { ChatChunkSchema, ChatInputSchema } from '@netscript/plugin-ai-core/contracts/v1';
@@ -72,76 +103,36 @@ const chunk: ChatChunk = ChatChunkSchema.parse({ type: 'text', delta: 'silent...
 console.log(request.model, chunk.type);
 ```
 
----
+## Public surface
 
-## 📦 The `/v1/ai` route surface
+| Entry            | What it gives you                                                         |
+| ---------------- | ------------------------------------------------------------------------- |
+| `.`              | `aiContract`, `aiContractV1`, `createAiRouter`, and every route IO type   |
+| `./contracts/v1` | The full Zod `*Schema` validators and the engine-derived vocabulary types |
 
-Route paths are relative; the `/v1/ai` prefix is applied where the service host mounts the router.
+How the stack consumes it: a service connector binds `aiContractV1` to its request context and
+implements each handler against a provider adapter; the NetScript frontend client generates a typed
+caller from `aiContract`, so islands stream `chat` chunks with full inference; and tooling reads
+`describe` to introspect a running AI plugin. The always-current symbol list is
+[`deno doc jsr:@netscript/plugin-ai-core@<version>`](https://jsr.io/@netscript/plugin-ai-core/doc)
+(pin `<version>` on the pre-release line, as above).
 
-| Route        | Method | Path            | IO                                               |
-| ------------ | ------ | --------------- | ------------------------------------------------ |
-| `chat`       | POST   | `/chat`         | `ChatInput` → **SSE** `eventIterator<ChatChunk>` |
-| `models`     | GET    | `/models`       | `ModelsInput?` → `ModelsResponse`                |
-| `invokeTool` | POST   | `/tools/{name}` | `ToolInvokeInput` → `ToolInvokeResponse`         |
-| `embed`      | POST   | `/embed`        | `EmbedInput` → `EmbedResponse`                   |
-| `transcribe` | POST   | `/transcribe`   | `TranscribeInput` → `TranscribeResponse`         |
-| `describe`   | GET    | `/describe`     | → `AiCapabilities` (base-seam route, unchanged)  |
+## Docs
 
-### SSE framing (durable-CHAT)
-
-`chat` is the streaming centerpiece. Its output is not a request/response pair but an
-**`eventIterator`** whose element type is `ChatChunk` — an alias of the `@netscript/ai` engine's
-`AgentChunk` union (`text`, `tool-call`, `tool-result`, `message`, `usage`, `error`, `done` frames).
-Because the contract output type is an async event-iterator, a connector's `chat` handler must yield
-frames; a buffered single-response implementation does not type-check. Recoverable and terminal
-errors surface in-stream as the `error` chunk rather than as an oRPC error, matching the engine's
-streaming model.
-
-### Base-contract extension
-
-`aiContract` `extends BasePluginContract` and spreads `BASE_PLUGIN_CONTRACT_ROUTES` from
-[`@netscript/plugin/contract-base`](https://jsr.io/@netscript/plugin) verbatim, so it carries the
-mandatory `describe` route (GET `/describe`) that returns a marketplace-discoverable
-`AiCapabilities` (= `PluginCapabilities`) document — its shape is inherited unchanged. Non-streaming
-routes converge onto the shared plugin error vocabulary (`NOT_FOUND`, `VALIDATION_ERROR`,
-`INTERNAL`).
-
-### Engine-derived IO
-
-Every route schema is a **named, explicitly-annotated** Zod schema mirroring the
-`@netscript/ai/contracts` vocabulary (`Message`, `ContentPart`, `ToolCall`, `ToolResult`, `Usage`,
-`ModelDescriptor`, `AgentChunk`, …). Those engine types are re-exported from the `./contracts/v1`
-subpath, and compile-time drift guards assert each schema stays assignable to the engine type it
-mirrors — so the plugin IO can never diverge from the domain contract.
-
----
-
-## 🔌 How the stack consumes this contract
-
-- **Connector (P2)** — imports `aiContractV1`, binds its host request context via
-  `aiContractV1.$context<Ctx>()`, and implements each route handler against a provider adapter. The
-  contract's precise per-route IO types check every handler.
-- **`@netscript/fresh/ai` client** — imports `aiContract` and generates a typed caller, so a Fresh
-  island streams `chat` chunks and calls `models` / `embed` / `transcribe` with full type inference
-  and no hand-written request types.
-- **Marketplace tooling** — reads the `describe` route's `AiCapabilities` document to introspect a
-  running AI plugin without parsing source.
-
-This package carries no telemetry or MCP surface of its own: the AI runtime records spans and events
-through the telemetry port injected into `@netscript/ai` (per the #402 telemetry convention), and
-the MCP surface is **client-side** — the MCP client transport pool lives on `@netscript/ai/mcp`; no
-MCP server is part of this contract.
-
----
-
-## 📖 Documentation
-
-- **Reference**:
+- **AI core reference — routes, schemas, and vocabulary**:
   [rickylabs.github.io/netscript/reference/plugin-ai-core/](https://rickylabs.github.io/netscript/reference/plugin-ai-core/)
+- **AI engine reference — providers, tools, agents, MCP client**:
+  [rickylabs.github.io/netscript/reference/ai/](https://rickylabs.github.io/netscript/reference/ai/)
+- **API docs on JSR**:
+  [jsr.io/@netscript/plugin-ai-core/doc](https://jsr.io/@netscript/plugin-ai-core/doc)
 
----
+## Compatibility
 
-## 📝 License
+Contracts, schemas, and types are plain TypeScript — importable in any TypeScript environment,
+including Node.js and Bun via JSR's npm compatibility. This package carries no runtime AI logic, no
+telemetry, and no MCP server surface; those live in the engine and the deployable plugin.
+
+## License
 
 Apache-2.0 — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to
 JSR with cryptographically verified provenance.
