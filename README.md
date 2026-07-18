@@ -263,8 +263,9 @@ package with `deno add jsr:@netscript/<name>@<version>` (pin the version; see
 
 `netscript deploy <target> <op>` is one thin router over target adapters sharing a canonical
 lifecycle (`plan`, `up`, `down`, with `status`/`logs` on the targets that honour them —
-`netscript deploy list` prints exactly what your installed version supports). Cloud auth stays
-operator-owned: NetScript mints no credentials and hand-authors no Helm/Bicep/Kubernetes manifests.
+`netscript deploy list` inventories the installed targets; check `netscript deploy <target> --help`
+for the exact operations each one ships). Cloud auth stays operator-owned: NetScript mints no
+credentials and hand-authors no Helm/Bicep/Kubernetes manifests.
 
 | Target                                         | Lane                                                                                                               |
 | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
