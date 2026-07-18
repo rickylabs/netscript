@@ -1,0 +1,86 @@
+.ns-desktop-update-prompt {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ns-space-4);
+  border: 1px solid var(--ns-border);
+  border-inline-start: var(--ns-space-1) solid var(--ns-primary);
+  border-radius: var(--ns-radius-md);
+  padding: var(--ns-space-3) var(--ns-space-4);
+  background: color-mix(in srgb, var(--ns-primary) 7%, var(--ns-surface));
+  color: var(--ns-fg);
+}
+
+.ns-desktop-update-prompt[data-state='manual'] {
+  border-inline-start-color: var(--ns-warning);
+  background: color-mix(in srgb, var(--ns-warning) 8%, var(--ns-surface));
+}
+
+.ns-desktop-update-prompt__copy {
+  display: grid;
+  min-inline-size: 0;
+  gap: var(--ns-space-1);
+}
+
+.ns-desktop-update-prompt__title,
+.ns-desktop-update-prompt__description,
+.ns-desktop-update-prompt__action {
+  font-family: var(--ns-font-sans);
+}
+
+.ns-desktop-update-prompt__title {
+  font-size: var(--ns-text-sm);
+  line-height: var(--ns-leading-tight);
+}
+
+.ns-desktop-update-prompt__description {
+  color: var(--ns-muted-fg);
+  font-size: var(--ns-text-xs);
+  line-height: var(--ns-leading-normal);
+}
+
+.ns-desktop-update-prompt__action {
+  flex: none;
+  border: 1px solid var(--ns-primary);
+  border-radius: var(--ns-radius-sm);
+  padding: var(--ns-space-2) var(--ns-space-3);
+  background: var(--ns-primary);
+  color: var(--ns-primary-fg);
+  cursor: pointer;
+  font-size: var(--ns-text-xs);
+  font-weight: 600;
+  line-height: 1;
+  text-decoration: none;
+  transition:
+    background var(--ns-ease-fast),
+    box-shadow var(--ns-ease-fast),
+    transform var(--ns-ease-fast);
+}
+
+.ns-desktop-update-prompt__action:hover {
+  background: var(--ns-primary-hover);
+  box-shadow: 2px 2px 0 color-mix(in srgb, var(--ns-primary) 55%, var(--ns-gray-12));
+  transform: translate(1px, 1px);
+}
+
+.ns-desktop-update-prompt__action:focus-visible {
+  outline: 2px solid var(--ns-ring);
+  outline-offset: 2px;
+}
+
+@media (max-width: 36rem) {
+  .ns-desktop-update-prompt {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .ns-desktop-update-prompt__action {
+    text-align: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ns-desktop-update-prompt__action {
+    transition: none;
+  }
+}

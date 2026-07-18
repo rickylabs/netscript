@@ -2,16 +2,16 @@
 
 Written at run start per `workflow/lane-policy.md` § Supervisor identity.
 
-| Field    | Value                                                                               |
-| -------- | ----------------------------------------------------------------------------------- |
-| Model    | Claude Fable 5                                                                      |
-| Session  | `86d308d5-c761-4e5d-a41f-8be959bc46d2`                                              |
-| Host     | Linux / Codex workspace                                                             |
-| Checkout | `/home/codex/repos/wt-g5-843`                                                       |
-| Worktree | `/home/codex/repos/wt-g5-843`                                                       |
-| Branch   | `feat/desktop-frontend-843-ui`                                                      |
-| Baseline | `1709dcbabb689edd8e5c659ca91774600272597c` from `feat/desktop-frontend`, 2026-07-18 |
-| Run ID   | `beta11-cli--orchestrator/slices/g5-843-ui`                                         |
+| Field    | Value                                               |
+| -------- | --------------------------------------------------- |
+| Model    | Claude Fable 5                                      |
+| Session  | `86d308d5-c761-4e5d-a41f-8be959bc46d2`              |
+| Host     | Linux / Codex workspace                             |
+| Checkout | `/home/codex/repos/wt-g5-843`                       |
+| Worktree | `/home/codex/repos/wt-g5-843`                       |
+| Branch   | `feat/desktop-frontend-843-ui`                      |
+| Baseline | `46e50cf2` from `feat/desktop-frontend`, 2026-07-18 |
+| Run ID   | `beta11-cli--orchestrator/slices/g5-843-ui`         |
 
 ## Routes in force
 

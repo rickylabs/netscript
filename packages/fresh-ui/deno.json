@@ -13,6 +13,8 @@
     "./registry": "./registry.ts"
   },
   "imports": {
+    "@netscript/sdk/auto-update": "jsr:@netscript/sdk@0.0.1-beta.10/auto-update",
+    "@netscript/sdk/desktop": "jsr:@netscript/sdk@0.0.1-beta.10/desktop",
     "@std/assert": "jsr:@std/assert@^1",
     "preact": "npm:preact@^10.29.2"
   },

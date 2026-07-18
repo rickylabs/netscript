@@ -12,8 +12,8 @@
 
 ## Current State
 
-Group Plan-Gate passed with D1–D9 locked. Slice 1 implements the public desktop runtime contract and
-is stopped at its Tier-A review boundary; slices 2 and 3 have not started.
+Group Plan-Gate passed with D1–D9 locked. Slices 1 and 2 are implemented; slice 2 is stopped at its
+Tier-A review boundary. Slice 3 has not started.
 
 ## Completed
 
@@ -27,15 +27,21 @@ is stopped at its Tier-A review boundary; slices 2 and 3 have not started.
   deterministic tests.
 - Passed the full Fresh UI test directory (144 tests), scoped check/lint/fmt, new-export doc lint,
   package dry-run, and `quality:scan`.
+- Received Tier-A PASS for slice 1, rebased onto the supervisor's integration fix `46e50cf2`, and
+  confirmed root `arch:check` now passes.
+- Added the L2 desktop window chrome, exhaustive update-ready prompt, hydration-safe desktop-only
+  island, token CSS, desktop registry collection/generated embeds, and full-dir tests.
+- Passed 151 full Fresh UI tests, 66 focused registry tests, DS fitness, JSR checks, scoped static
+  checks, `quality:scan`, and root `arch:check`.
 
 ## In Progress
 
-- Tier-A review of implementation slice 1 by the Fable 5 orchestrator.
+- Tier-A review of implementation slice 2 by the Fable 5 orchestrator.
 
 ## Next Steps
 
-1. Wait for explicit slice-1 Tier-A PASS or address requested changes.
-2. Only after PASS, begin slice 2 L2 registry components and island work.
+1. Wait for explicit slice-2 Tier-A PASS or address requested changes.
+2. Only after PASS, begin slice 3 scaffold design-gallery and documentation work.
 
 ## Key Decisions
 
@@ -55,24 +61,30 @@ is stopped at its Tier-A review boundary; slices 2 and 3 have not started.
 | `packages/fresh-ui/desktop.ts`                         | new     | Documented public entrypoint.                         |
 | `packages/fresh-ui/src/desktop/`                       | new     | Contracts, constants, and structural runtime adapter. |
 | `packages/fresh-ui/tests/desktop/`                     | new     | Full slice-1 behavior and web/no-op tests.            |
+| `packages/fresh-ui/registry/components/ui/desktop-*`   | new     | L2 window chrome and update prompt TSX/CSS pairs.     |
+| `packages/fresh-ui/registry/islands/DesktopOnly.tsx`   | new     | Hydration-safe structural desktop gate.               |
+| `packages/fresh-ui/registry.manifest.ts`               | changed | Desktop items and collection.                         |
+| `packages/fresh-ui/registry.generated.ts`              | changed | Deterministically regenerated embedded copies.        |
+| `packages/fresh-ui/tests/registry/`                    | changed | Full component and island behavior/copy tests.        |
+| `deno.lock`                                            | changed | Exact SDK subpath dependency resolution.              |
 
 ## Gates
 
-| Gate family | Current status | Evidence                                                                                           |
-| ----------- | -------------- | -------------------------------------------------------------------------------------------------- |
-| Static      | PASS           | Scoped check/lint/fmt, new-export doc lint, package dry-run.                                       |
-| Fitness     | PARTIAL        | `quality:scan` passes; root `arch:check` stops on unchanged integration-base SDK range divergence. |
-| Runtime     | PASS           | Six desktop tests plus full 144-test Fresh UI directory; #457 remains external.                    |
-| Consumer    | NOT_RUN        | L2 gallery consumer belongs to slices 2–3.                                                         |
+| Gate family | Current status | Evidence                                                                               |
+| ----------- | -------------- | -------------------------------------------------------------------------------------- |
+| Static      | PASS           | Scoped check/lint/fmt, new-export doc lint, package dry-run.                           |
+| Fitness     | PASS           | DS scans, `quality:scan`, and root `arch:check` pass.                                  |
+| Runtime     | PASS           | Full 151-test Fresh UI directory and 66 focused registry tests; #457 remains external. |
+| Consumer    | PARTIAL        | Generated-copy fidelity passes; real scaffold gallery belongs to slice 3.              |
 
 ## Open Questions
 
-- Tier-A disposition of the unchanged root `arch:check` baseline failure.
+- Tier-A disposition of slice 2.
 
 ## Drift and Debt
 
-- Drift: integration-base corrections, JSR baseline, and root architecture-gate baseline failure are
-  recorded.
+- Drift: integration-base corrections, JSR baseline, architecture-gate resolution, and rebase SHA
+  rewrite are recorded.
 - Debt: none introduced; existing baseline is bounded and must not worsen.
 
 ## Commits

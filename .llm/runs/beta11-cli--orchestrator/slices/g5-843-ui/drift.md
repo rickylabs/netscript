@@ -56,3 +56,14 @@ documentation.
   `git diff origin/feat/desktop-frontend -- packages/cli/deno.json packages/fresh/deno.json` is
   empty, proving slice 1 did not introduce the violation. A focused Fresh UI doctrine scan has zero
   failures. Changing dependency policy is outside #843 and requires supervisor disposition.
+
+## 2026-07-18 — Integration dependency defect resolved; implementation commits rebased
+
+- **What:** The supervisor normalized the three SDK caret ranges on the integration branch.
+- **Source:** Tier-A slice-1 disposition and integration commit `46e50cf2`.
+- **Expected:** Root `arch:check` passes without an issue-843 dependency-policy exception.
+- **Actual:** This branch rebased rather than merged onto `46e50cf2`; reviewed slice-1 commit
+  `542c1e98` rewrote to `bde4fe50`, and root `arch:check` passed before and after slice 2.
+- **Severity:** significant
+- **Action:** fix
+- **Evidence:** Successful rebase and two root `arch:check` exit-0 verdicts.
