@@ -19,7 +19,10 @@ Deno.test('registry exposes scaffold capability suites from constants', () => {
 Deno.test('native desktop suite is registered with an honest fixture preflight', () => {
   const desktop = resolveSuite(DEPLOY.DESKTOP_NATIVE);
   assertEquals(desktop.id, DEPLOY.DESKTOP_NATIVE);
-  assertEquals(desktop.gates.map((gate) => gate.id), [GATE.DEPLOY_DESKTOP_PREFLIGHT]);
+  assertEquals(desktop.gates.map((gate) => gate.id), [
+    GATE.DEPLOY_DESKTOP_PREFLIGHT,
+    GATE.DEPLOY_DESKTOP_FIXTURE,
+  ]);
 });
 
 Deno.test('capability suites select only their scoped gates', () => {

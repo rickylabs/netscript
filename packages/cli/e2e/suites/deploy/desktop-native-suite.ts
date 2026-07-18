@@ -25,8 +25,29 @@ export function createDesktopNativeDeploySuite(
       samples: false,
       format: overrides.format ?? REPORT_FORMAT.NDJSON,
     }),
-    gates: Object.freeze([createFixturePreflightGate(repoRoot)]),
+    gates: Object.freeze([
+      createFixturePreflightGate(repoRoot),
+      createFixtureContractGate(repoRoot),
+    ]),
   });
+}
+
+function createFixtureContractGate(repoRoot: string) {
+  const fixtureRoot = join(
+    repoRoot,
+    'packages',
+    'cli',
+    'e2e',
+    'fixtures',
+    'desktop-native',
+  );
+  return commandGate(
+    GATE.DEPLOY_DESKTOP_FIXTURE,
+    'Prove signed fixture and renderer remote-service contract',
+    GATE_PHASE.BEHAVIOR,
+    () => ['deno', 'task', 'test'],
+    () => fixtureRoot,
+  );
 }
 
 function createFixturePreflightGate(repoRoot: string) {

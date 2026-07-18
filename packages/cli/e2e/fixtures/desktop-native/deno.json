@@ -1,0 +1,41 @@
+{
+  "name": "@netscript/desktop-native-e2e-fixture",
+  "version": "1.0.0",
+  "private": true,
+  "lock": false,
+  "exports": "./src/main.ts",
+  "tasks": {
+    "desktop:renderer": "deno bundle --platform browser --output dist/renderer.js src/renderer.ts",
+    "desktop:package": "deno run --allow-all src/package.ts",
+    "test": "deno test --allow-all tests/"
+  },
+  "imports": {
+    "@netscript/fresh/desktop": "../../../../fresh/src/runtime/desktop/mod.ts",
+    "@netscript/sdk/auto-update": "../../../../sdk/src/auto-update/mod.ts",
+    "@netscript/sdk/desktop": "../../../../sdk/src/desktop/mod.ts",
+    "@netscript/telemetry": "../../../../telemetry/mod.ts",
+    "@opentelemetry/api": "npm:@opentelemetry/api@^1.9.0",
+    "@orpc/server": "npm:@orpc/server@^1.14.6",
+    "@std/assert": "jsr:@std/assert@^1",
+    "@std/path": "jsr:@std/path@^1"
+  },
+  "desktop": {
+    "app": {
+      "name": "NetScript Desktop E2E",
+      "identifier": "dev.netscript.desktop-e2e"
+    },
+    "backend": "webview"
+  },
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "lib": ["deno.ns", "dom"]
+  },
+  "fmt": {
+    "lineWidth": 100,
+    "semiColons": true,
+    "singleQuote": true
+  },
+  "publish": false
+}

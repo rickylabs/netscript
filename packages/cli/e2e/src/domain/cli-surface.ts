@@ -110,6 +110,7 @@ export const GATE = {
   DEPLOY_DENO_DEPLOY_PLAN: 'deploy.deno-deploy.plan',
   DEPLOY_COMPOSE_RESOLUTION: 'deploy.compose-resolution',
   DEPLOY_DESKTOP_PREFLIGHT: 'deploy.desktop.preflight',
+  DEPLOY_DESKTOP_FIXTURE: 'deploy.desktop.fixture',
   USERLAND_INSTALL_ASSERTIONS: 'userland-install.assertions',
   BEHAVIOR_OTEL_WEBHOOK: 'behavior.otel.webhook',
   BEHAVIOR_OTEL_STREAM_CONSUMER: 'behavior.otel.stream-consumer',

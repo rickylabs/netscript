@@ -6,16 +6,17 @@
 | -------------- | --------------------------------------------------------------- |
 | Run ID         | `beta11-cli--orchestrator/slices/g7-457-e2e`                    |
 | Branch         | `feat/desktop-frontend-457-e2e`                                 |
-| Current phase  | `implement` — S1 complete locally, awaiting Tier-A slice review |
+| Current phase  | `implement` — S2 complete locally, awaiting Tier-A slice review |
 | Archetype      | `6 — CLI / Tooling`                                             |
 | Scope overlays | `none`                                                          |
 
 ## Current State
 
-The Tier-A group Plan-Gate passed with D1–D19 locked. S1 is implemented locally: platform-aware
-gates emit structured `NOT_RUN`, the platform source is injected, and `deploy.desktop-native` is
-registered with an honest preflight that fails until S2 creates the fixture. The full E2E test
-directory is green at 47/47. The slice is paused before commit/push/PR for Tier-A review.
+Tier-A passed S1 at commit `4ccfac47`. S2 now supplies the versioned desktop entrypoint, browser
+bundle, #841 update seam, #842 typed Fresh/SDK RPC bridge, exact `services__remote__http__0` lookup,
+renderer acknowledgement, and #456-compatible ephemeral Ed25519 signing material. The portable S2
+contract and suite gates are green; no native-window or Linux update verdict is claimed yet. The
+slice is paused after commit/push/PR evidence for Tier-A review.
 
 ## Completed
 
@@ -32,17 +33,21 @@ directory is green at 47/47. The slice is paused before commit/push/PR for Tier-
 - Recorded the supplied Plan-Gate `PASS` in `plan-eval.md` before implementation.
 - Implemented S1 platform applicability, `NOT_RUN` evidence, suite registration, and tests.
 - Ran scoped check/lint/fmt (93 files, zero findings) and full E2E unit tests (47/47).
+- Recorded the user-supplied Tier-A S1 `PASS` for commit `4ccfac47`.
+- Implemented S2 fixture/runtime/renderer/signing contracts and a real remote HTTP → RPC → renderer
+  acknowledgement test.
+- Proved the browser renderer bundles without ambient bindings and that the S2 suite passes 2/2.
 
 ## In Progress
 
-- Tier-A substantive S1 review. No implementation lane self-certification is claimed.
+- Tier-A substantive S2 review. No implementation lane self-certification is claimed.
 
 ## Next Steps
 
-1. Tier-A reviews the S1 diff and gate evidence.
-2. On approval, commit the sign-off slice, push with an explicit refspec, open the draft sub-PR
-   against `feat/desktop-frontend` with `Refs #457`, and post the gate-evidence comment.
-3. Pause again; do not begin S2 without the next Tier-A instruction.
+1. Tier-A reviews the S2 diff and gate evidence.
+2. On approval/instruction, begin S3 Linux native packaging, real install, remote window, apply,
+   failed-launch rollback, cleanup, and blocking CI.
+3. Record the actual Linux result, including a failure if that is what the real run produces.
 
 ## Key Decisions
 
@@ -77,16 +82,18 @@ directory is green at 47/47. The slice is paused before commit/push/PR for Tier-
 | `packages/cli/e2e/mod.ts`                                                          | modified     | Programmatic platform/deploy contract exports.    |
 | `packages/cli/e2e/tests/**`                                                        | modified/new | Skip non-execution and registry coverage.         |
 
-No fixture, workflow, dependency, or lock file has been changed. Product changes are confined to S1.
+S2 adds `packages/cli/e2e/fixtures/desktop-native/**`, one fixture gate/ID, its registry assertion,
+and the already-resolved `@orpc/server` dependency declaration plus matching workspace lock entry.
+No published package export changes.
 
 ## Gates
 
-| Gate family | Current status | Evidence                                                                                                          |
-| ----------- | -------------- | ----------------------------------------------------------------------------------------------------------------- |
-| Static      | PASS           | Full CLI-E2E tests 47/47; scoped check/lint/fmt 93 files with zero findings.                                      |
-| Fitness     | mixed baseline | Focused doctrine FAIL=0; repo arch gate has unrelated SDK-range baseline failure; doc lint retains baseline debt. |
-| Runtime     | EXPECTED_FAIL  | New suite exits 1 at the S2 fixture preflight, preventing a false green before native work exists.                |
-| Consumer    | NOT_RUN        | Plan-Gate hard stop.                                                                                              |
+| Gate family | Current status | Evidence                                                                                                       |
+| ----------- | -------------- | -------------------------------------------------------------------------------------------------------------- |
+| Static      | PASS           | Full CLI-E2E tests 47/47; fixture 4/4; scoped check/lint/fmt 100 files, zero findings.                         |
+| Fitness     | mixed baseline | Quality scans pass; focused doctrine FAIL=0; `arch:check` retains unrelated SDK-range baseline failure.        |
+| Runtime     | PASS S2 only   | Suite preflight + portable fixture contract pass 2/2; Linux native apply/rollback remains `NOT_RUN`.           |
+| Consumer    | PASS portable  | Real remote HTTP response crossed typed RPC and was renderer-acknowledged; native-window proof remains for S3. |
 
 ## Open Questions
 
@@ -102,5 +109,4 @@ No fixture, workflow, dependency, or lock file has been changed. Product changes
 
 ## Commits
 
-- See the draft PR’s commit list + per-slice PR comments. No commit existed when this context pack
-  was written.
+- Planning: `9a77ee55`; S1: `4ccfac47`; S2: recorded in the draft PR commit list and S2 comment.

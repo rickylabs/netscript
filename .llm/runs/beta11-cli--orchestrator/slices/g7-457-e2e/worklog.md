@@ -111,6 +111,9 @@ documenting whether the leg is blocking or `NOT_RUN`. Do not add shell logic to 
 | 2026-07-18            | plan-eval | PASS              | Tier-A group verdict approved D1–D19 as locked; `plan-eval.md` records the supplied verdict and stop lines.                                                                                                |
 | 2026-07-18            | 1         | implementation    | Added injected platform detection, gate applicability, structured `NOT_RUN`, the registered `deploy.desktop-native` contract, and an honest fixture preflight that remains red until S2 lands the fixture. |
 | 2026-07-18            | 1         | reconcile         | #457 remains partial/open; this slice uses `Refs #457`, does not claim `gate:e2e`, and makes no issue/milestone/status closure. No new owner/evaluator comment changed the locked scope.                   |
+| 2026-07-18            | 1         | Tier-A review     | User supplied substantive `PASS` and sign-off for commit `4ccfac47`; authorized proceeding to S2.                                                                                                          |
+| 2026-07-18            | 2         | implementation    | Added the versioned native fixture, typed runtime/renderer RPC path, exact remote discovery key, renderer evidence acknowledgement, browser bundle proof, and #456-compatible ephemeral signing material.  |
+| 2026-07-18            | 2         | reconcile         | Portable fixture/consumer proof is green, but is not called a native-window run. Linux native install/update/rollback remains `NOT_RUN` until S3 executes it on this host.                                 |
 
 ## Decisions
 
@@ -133,26 +136,33 @@ documenting whether the leg is blocking or `NOT_RUN`. Do not add shell logic to 
 
 ### Static Gates
 
-| Gate                    | Command or check                                         | Result  | Notes                                                                |
-| ----------------------- | -------------------------------------------------------- | ------- | -------------------------------------------------------------------- |
-| Branch baseline         | raw git SHA/merge-base/status                            | PASS    | HEAD = integration = merge-base `1709dcba`; clean.                   |
-| Full baseline E2E tests | `deno test --allow-all packages/cli/e2e/tests/`          | PASS    | 45 passed, 0 failed.                                                 |
-| Plan-Gate               | separate-session evaluator                               | NOT_RUN | Hard stop; supervisor must dispatch.                                 |
-| Plan-Gate               | Tier-A group evaluator                                   | PASS    | D1–D19 approved as locked; implementation authorized in slice order. |
-| Full CLI-E2E unit tests | `deno test --allow-all packages/cli/e2e/tests/`          | PASS    | 47 passed, 0 failed.                                                 |
-| Scoped check            | `run-deno-check.ts --root packages/cli/e2e --ext ts,tsx` | PASS    | 93 files; 0 findings.                                                |
-| Scoped lint             | `run-deno-lint.ts --root packages/cli/e2e --ext ts,tsx`  | PASS    | 93 files; 0 findings.                                                |
-| Scoped format           | `run-deno-fmt.ts --root packages/cli/e2e --ext ts,tsx`   | PASS    | 93 files; 0 findings.                                                |
+| Gate                    | Command or check                                         | Result  | Notes                                                                                   |
+| ----------------------- | -------------------------------------------------------- | ------- | --------------------------------------------------------------------------------------- |
+| Branch baseline         | raw git SHA/merge-base/status                            | PASS    | HEAD = integration = merge-base `1709dcba`; clean.                                      |
+| Full baseline E2E tests | `deno test --allow-all packages/cli/e2e/tests/`          | PASS    | 45 passed, 0 failed.                                                                    |
+| Plan-Gate               | separate-session evaluator                               | NOT_RUN | Hard stop; supervisor must dispatch.                                                    |
+| Plan-Gate               | Tier-A group evaluator                                   | PASS    | D1–D19 approved as locked; implementation authorized in slice order.                    |
+| Full CLI-E2E unit tests | `deno test --allow-all packages/cli/e2e/tests/`          | PASS    | 47 passed, 0 failed.                                                                    |
+| Scoped check            | `run-deno-check.ts --root packages/cli/e2e --ext ts,tsx` | PASS    | 93 files; 0 findings.                                                                   |
+| Scoped lint             | `run-deno-lint.ts --root packages/cli/e2e --ext ts,tsx`  | PASS    | 93 files; 0 findings.                                                                   |
+| Scoped format           | `run-deno-fmt.ts --root packages/cli/e2e --ext ts,tsx`   | PASS    | 93 files; 0 findings.                                                                   |
+| S2 full CLI-E2E tests   | `deno test --allow-all packages/cli/e2e/tests/`          | PASS    | 47 passed, 0 failed.                                                                    |
+| S2 fixture tests        | fixture `deno task test`                                 | PASS    | 4 passed, 0 failed; remote RPC, production signing, browser bundle, package forwarding. |
+| S2 scoped check         | `run-deno-check.ts --root packages/cli/e2e --ext ts,tsx` | PASS    | 100 files; 0 findings.                                                                  |
+| S2 scoped lint          | `run-deno-lint.ts --root packages/cli/e2e --ext ts,tsx`  | PASS    | 100 files; 0 findings.                                                                  |
+| S2 scoped format        | `run-deno-fmt.ts --root packages/cli/e2e --ext ts,tsx`   | PASS    | 100 files; 0 findings.                                                                  |
 
 ### Fitness Gates
 
-| Gate                    | Result             | Evidence                                              | Notes                                                                                                                                        |
-| ----------------------- | ------------------ | ----------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| JSR rubric              | N/A                | `publish:false`, `deno doc` scan                      | Rescope if published surface changes.                                                                                                        |
-| quality/architecture    | NOT_RUN            | planned commands in `plan.md`                         | Implementation gates, not plan-generation evidence.                                                                                          |
-| Repository quality gate | BASELINE_FAIL      | `deno task quality:gate`                              | `quality:scan` passed; `arch:check` stopped at pre-existing `@netscript/sdk` range divergence between CLI and Fresh. No slice-owned finding. |
-| Focused doctrine        | PASS_WITH_WARNINGS | `check-doctrine.ts --root packages/cli/e2e`           | FAIL=0, WARN=8, INFO=1; all warnings are pre-existing paths/README debt.                                                                     |
-| Doc lint                | BASELINE_FAIL      | `deno task doc:lint --root packages/cli/e2e --pretty` | 83 existing surface errors. Added `PlatformPort.current()` JSDoc; no new missing-doc error remains.                                          |
+| Gate                    | Result             | Evidence                                                | Notes                                                                                                                                        |
+| ----------------------- | ------------------ | ------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| JSR rubric              | N/A                | `publish:false`, `deno doc` scan                        | Rescope if published surface changes.                                                                                                        |
+| quality/architecture    | NOT_RUN            | planned commands in `plan.md`                           | Implementation gates, not plan-generation evidence.                                                                                          |
+| Repository quality gate | BASELINE_FAIL      | `deno task quality:gate`                                | `quality:scan` passed; `arch:check` stopped at pre-existing `@netscript/sdk` range divergence between CLI and Fresh. No slice-owned finding. |
+| Focused doctrine        | PASS_WITH_WARNINGS | `check-doctrine.ts --root packages/cli/e2e`             | FAIL=0, WARN=8, INFO=1; all warnings are pre-existing paths/README debt.                                                                     |
+| Doc lint                | BASELINE_FAIL      | `deno task doc:lint --root packages/cli/e2e --pretty`   | 83 existing surface errors. Added `PlatformPort.current()` JSDoc; no new missing-doc error remains.                                          |
+| S2 quality scan         | PASS               | root `quality:scan` + focused `--root packages/cli/e2e` | No findings; focused allow count 0.                                                                                                          |
+| S2 architecture         | BASELINE_FAIL      | `deno task arch:check`                                  | Stops at pre-existing CLI/Fresh `@netscript/sdk` range divergence; focused doctrine is FAIL=0, WARN=8, INFO=1 with pre-existing findings.    |
 
 ### Runtime Gates
 
@@ -160,18 +170,21 @@ documenting whether the leg is blocking or `NOT_RUN`. Do not add shell logic to 
 | --------------------------- | ------------- | ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
 | Linux native apply/rollback | NOT_RUN       | no implementation before Plan-Gate                                      | Expected to run on this native WSL host after PASS.                                                                 |
 | S1 suite preflight          | EXPECTED_FAIL | `deno task e2e:cli run deploy.desktop-native --cleanup --format pretty` | Exit 1 at `deploy.desktop.preflight`: S2 fixture is intentionally absent; the skeleton cannot report a false green. |
+| S2 fixture suite            | PASS          | same one-pass suite command                                             | Exit 0; preflight and portable fixture contract passed 2/2. Native Linux gates do not exist until S3.               |
 | Windows MSI staged/manual   | NOT_RUN       | owner-hosted                                                            | Code/docs only in this environment.                                                                                 |
 | macOS native apply/rollback | NOT_RUN       | no macOS host                                                           | Best effort.                                                                                                        |
 
 ### Consumer Gates
 
-| Consumer                              | Result  | Evidence                    | Notes                                                    |
-| ------------------------------------- | ------- | --------------------------- | -------------------------------------------------------- |
-| Desktop renderer remote-services path | NOT_RUN | planned real native fixture | Must use #842 typed binding and exact `services__*` key. |
+| Consumer                                   | Result  | Evidence                  | Notes                                                                                                          |
+| ------------------------------------------ | ------- | ------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| Portable renderer remote-services contract | PASS    | fixture test + suite gate | Real HTTP response crossed #842 Fresh/SDK RPC using `services__remote__http__0` and was renderer-acknowledged. |
+| Native window remote-services path         | NOT_RUN | S3 real host run          | Do not upgrade the portable contract result into a native-window claim.                                        |
 
 ## Handoff Notes
 
-- Group PLAN-EVAL should inspect research findings 4, 13–18 and locked decisions D2, D11–D18 first.
-- Verify that alternate-root `dpkg` is described honestly and that blocking Linux CI cannot be
-  softened by macOS `continue-on-error` or platform skips.
-- Verify no implementation file exists before `plan-eval.md` records `PASS`.
+- Tier-A should verify the fixture uses only the #841 updater seam and #842 public RPC surfaces, the
+  exact discovery key, a renderer acknowledgement rather than a server-only fetch, and the
+  production #456 PKCS8/signing functions.
+- S3 must replace the remaining native-window/Linux `NOT_RUN` with the actual host result, whether
+  PASS or FAIL; S2 evidence cannot satisfy that gate.
