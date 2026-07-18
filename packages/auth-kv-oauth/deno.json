@@ -1,6 +1,6 @@
 {
   "name": "@netscript/auth-kv-oauth",
-  "version": "0.0.1-beta.11",
+  "version": "0.0.1-canary.1",
   "description": "KV-backed OAuth2/OIDC AuthBackendPort backend for NetScript auth.",
   "license": "Apache-2.0",
   "exports": {

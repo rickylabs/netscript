@@ -1,6 +1,6 @@
 {
   "name": "@netscript/fresh-ui",
-  "version": "0.0.1-beta.11",
+  "version": "0.0.1-canary.1",
   "description": "Fresh UI registry seams and interactive foundations for NetScript.",
   "license": "Apache-2.0",
   "exclude": [],
@@ -13,8 +13,8 @@
     "./registry": "./registry.ts"
   },
   "imports": {
-    "@netscript/sdk/auto-update": "jsr:@netscript/sdk@0.0.1-beta.11/auto-update",
-    "@netscript/sdk/desktop": "jsr:@netscript/sdk@0.0.1-beta.11/desktop",
+    "@netscript/sdk/auto-update": "jsr:@netscript/sdk@0.0.1-canary.1/auto-update",
+    "@netscript/sdk/desktop": "jsr:@netscript/sdk@0.0.1-canary.1/desktop",
     "@std/assert": "jsr:@std/assert@^1",
     "preact": "npm:preact@^10.29.2"
   },
