@@ -30,9 +30,9 @@ hands, the skills are the playbook, MCP is the eyes.
 
 ---
 
-## 🚀 Quickstart — five minutes to a running stack
+## 🚀 Quickstart
 
-You need [Deno 2.x](https://docs.deno.com/runtime/getting_started/installation/) and the
+You need [Deno 2.9+](https://docs.deno.com/runtime/getting_started/installation/) and the
 [.NET Aspire CLI](https://learn.microsoft.com/dotnet/aspire/) (or skip orchestration with
 `--no-aspire`). Docker is used to provision Postgres and the cache.
 
@@ -52,7 +52,13 @@ them:
 cd my-app/aspire
 aspire restore   # one-time: downloads the AppHost SDK modules
 aspire start     # starts everything and prints the dashboard URL
+```
 
+Open the dashboard URL and **wait until the `postgres` resource reports healthy** — on a cold
+machine the first container pull and health probe can take a few minutes, and the scaffolded
+services deliberately wait on the database before they start. Then initialize the database:
+
+```bash
 # 4. Initialize the database (from the workspace root)
 cd ..
 netscript db init --name init
@@ -60,19 +66,24 @@ netscript db generate
 netscript db seed
 ```
 
-The payoff: the Aspire dashboard shows every resource, trace, and log in one place, and your typed
-`users` service answers on its health probe —
+The payoff: the Aspire dashboard shows every resource, trace, and log in one place, and — once
+Postgres is healthy and the `users` service has started — your typed service answers on its health
+probe:
 
 ```bash
 curl http://localhost:3000/health
 # {"status":"healthy","timestamp":"…","checks":[{"name":"database","healthy":true,"latency":2}],…}
 ```
 
-Want to see the plan before anything touches disk? `netscript init my-app --dry-run` previews every
-file it would write and writes nothing. Run `netscript --help` or read the
-**[CLI reference](https://rickylabs.github.io/netscript/cli-reference/)** for all 11 command groups
-(`init`, `db`, `generate`, `plugin`, `service`, `deploy`, `agent`, `contract`, `config`,
-`marketplace`, `ui:*`).
+If the service is still shown as waiting after Postgres looks ready, restart the orchestrator
+(`aspire stop`, then `aspire start` from `my-app/aspire`) — with the database already initialized,
+the whole stack reports healthy in seconds.
+
+Want to check the blast radius before anything touches disk? `netscript init my-app --dry-run`
+reports the file and directory counts it would create and writes nothing. Run `netscript --help` or
+read the **[CLI reference](https://rickylabs.github.io/netscript/cli-reference/)** for all 11
+command groups (`init`, `db`, `generate`, `plugin`, `service`, `deploy`, `agent`, `contract`,
+`config`, `marketplace`, `ui:*`).
 
 ---
 
@@ -147,9 +158,10 @@ trace using Deno's built-in OTLP exporter — zero OpenTelemetry SDK dependency 
 
 A NetScript plugin is, at its core, a manifest: plain, validated data declaring what it contributes
 — services, background processors, stream topics, DB schema, telemetry. Hosts inspect manifests
-without executing plugin code. One `netscript plugin install <kind>` scaffolds the workspace,
-registers the API service, provisions storage, and adds the plugin's resources to the Aspire AppHost
-so everything starts with the app.
+without executing plugin code. One install — for example
+`netscript plugin install worker --name workers` — scaffolds the workspace, registers the API
+service, provisions storage, and adds the plugin's resources to the Aspire AppHost so everything
+starts with the app.
 
 | Plugin                                     | What it gives you                                                                                                                           |
 | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -164,24 +176,25 @@ so everything starts with the app.
 
 ## 📦 Packages
 
-The workspace ships **30 packages and 6 first-party plugins**, published to JSR as small,
-single-purpose `@netscript/*` packages — adopt only the layers you need. Add any with
-`deno add jsr:@netscript/<name>@<version>` (pin the version; see
+The monorepo publishes **29 packages and 6 first-party plugins** to JSR as small, single-purpose
+`@netscript/*` packages — adopt only the layers you need. (One further workspace package,
+`@netscript/bench`, is an internal benchmarking instrument and is not published.) Add any published
+package with `deno add jsr:@netscript/<name>@<version>` (pin the version; see
 [Status and limitations](#-status-and-limitations)).
 
 <details>
-<summary><strong>Full package map</strong> (name → README → JSR)</summary>
+<summary><strong>Published package map</strong> (name → README → JSR)</summary>
 
 ### Foundation core
 
-| Package                                                          | JSR                                                                                                 | Capability                                                                            |
-| ---------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| [`@netscript/contracts`](packages/contracts/README.md)           | [![JSR](https://jsr.io/badges/@netscript/contracts)](https://jsr.io/@netscript/contracts)           | Contract primitives, shared error map, CRUD generators, query/transform helpers       |
-| [`@netscript/config`](packages/config/README.md)                 | [![JSR](https://jsr.io/badges/@netscript/config)](https://jsr.io/@netscript/config)                 | Typed project config schemas, loaders, env helpers, scaffold constants                |
-| [`@netscript/logger`](packages/logger/README.md)                 | [![JSR](https://jsr.io/badges/@netscript/logger)](https://jsr.io/@netscript/logger)                 | Structured logging for services, packages, workers, and Hono + oRPC                   |
-| [`@netscript/sdk`](packages/sdk/README.md)                       | [![JSR](https://jsr.io/badges/@netscript/sdk)](https://jsr.io/@netscript/sdk)                       | Service discovery, typed oRPC clients, cache-backed query factories, auto-update seam |
-| [`@netscript/runtime-config`](packages/runtime-config/README.md) | [![JSR](https://jsr.io/badges/@netscript/runtime-config)](https://jsr.io/@netscript/runtime-config) | Hot-reloadable runtime override types, loaders, watchers, diagnostics                 |
-| [`@netscript/telemetry`](packages/telemetry/README.md)           | [![JSR](https://jsr.io/badges/@netscript/telemetry)](https://jsr.io/@netscript/telemetry)           | One distributed trace across scheduler, queue, worker, RPC, and SSE                   |
+| Package                                                          | JSR                                                                                                 | Capability                                                                                                                |
+| ---------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| [`@netscript/contracts`](packages/contracts/README.md)           | [![JSR](https://jsr.io/badges/@netscript/contracts)](https://jsr.io/@netscript/contracts)           | Contract primitives, shared error map, CRUD generators, query/transform helpers                                           |
+| [`@netscript/config`](packages/config/README.md)                 | [![JSR](https://jsr.io/badges/@netscript/config)](https://jsr.io/@netscript/config)                 | Typed project config schemas, loaders, env helpers, scaffold constants                                                    |
+| [`@netscript/logger`](packages/logger/README.md)                 | [![JSR](https://jsr.io/badges/@netscript/logger)](https://jsr.io/@netscript/logger)                 | Structured logging for services, packages, workers, and Hono + oRPC                                                       |
+| [`@netscript/sdk`](packages/sdk/README.md)                       | [![JSR](https://jsr.io/badges/@netscript/sdk)](https://jsr.io/@netscript/sdk)                       | Service discovery, typed oRPC clients, cache-backed query factories (desktop auto-update seam arrives in `0.0.1-beta.11`) |
+| [`@netscript/runtime-config`](packages/runtime-config/README.md) | [![JSR](https://jsr.io/badges/@netscript/runtime-config)](https://jsr.io/@netscript/runtime-config) | Hot-reloadable runtime override types, loaders, watchers, diagnostics                                                     |
+| [`@netscript/telemetry`](packages/telemetry/README.md)           | [![JSR](https://jsr.io/badges/@netscript/telemetry)](https://jsr.io/@netscript/telemetry)           | One distributed trace across scheduler, queue, worker, RPC, and SSE                                                       |
 
 ### Data, messaging & scheduling
 
@@ -249,23 +262,31 @@ single-purpose `@netscript/*` packages — adopt only the layers you need. Add a
 ## 🚢 Deploy targets
 
 `netscript deploy <target> <op>` is one thin router over target adapters sharing a canonical
-lifecycle (`plan`, `emit`, `up`, `down`, `status`, `logs`). A target never advertises an operation
-it cannot honour, and cloud auth stays operator-owned — NetScript mints no credentials and
-hand-authors no Helm/Bicep/Kubernetes manifests.
+lifecycle (`plan`, `up`, `down`, with `status`/`logs` on the targets that honour them —
+`netscript deploy list` prints exactly what your installed version supports). Cloud auth stays
+operator-owned: NetScript mints no credentials and hand-authors no Helm/Bicep/Kubernetes manifests.
 
-| Target                                         | Lane                                                                                                                                                                                           |
-| ---------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Bare metal**                                 | `deno compile` → single binary managed as an OS service (systemd on Linux, Servy on Windows)                                                                                                   |
-| **Deno Deploy**                                | `deno deploy` with a preflight guard that refuses a `--prod` push using unsupported APIs                                                                                                       |
-| **Kubernetes / Azure (ACA, App Service, AKS)** | Validates the generated AppHost declares the matching hosting integration, then delegates to Aspire publish/deploy                                                                             |
-| **Cloud Run**                                  | Docker-image lane: build → push → `gcloud run deploy`                                                                                                                                          |
-| **Native desktop**                             | `deploy desktop package` builds native installers per OS (`.app`/`.dmg`, `.AppImage`/`.deb`/`.rpm`, `.msi`), plus an Ed25519-signed update-manifest release server and an SDK auto-update seam |
+| Target                                         | Lane                                                                                                               |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| **Docker / Compose**                           | Container image and multi-resource Compose lanes with `status`/`logs`                                              |
+| **OS services**                                | `deno compile` → single binary managed as a Linux or Windows service                                               |
+| **Deno Deploy**                                | `deno deploy` with a preflight guard that refuses a `--prod` push using unsupported APIs                           |
+| **Kubernetes / Azure (ACA, App Service, AKS)** | Validates the generated AppHost declares the matching hosting integration, then delegates to Aspire publish/deploy |
+| **Cloud Run**                                  | Docker-image lane: build → push → `gcloud run deploy`                                                              |
 
-Honest edges of the desktop lane, stated up front: native installers and compiled binaries are
-**unsigned** at this stage — platform code-signing (Authenticode, Developer ID + notarization) is a
-deliberate external CI step, and the CLI accepts no certificate credentials. And Windows native
-update apply is unsupported upstream, so apps handle an `applyMode: "manual"` update-ready event and
-present its verified `manualUpdateUrl` instead of replacing themselves in place.
+### New in `0.0.1-beta.11`: native desktop lane
+
+The next release adds a **native desktop** deploy target — not yet available in the published
+`0.0.1-beta.10` packages this README pins. On the main branch, `deploy desktop package` builds
+native installers per OS (`.app`/`.dmg`, `.AppImage`/`.deb`/`.rpm`, `.msi`), an Ed25519-signed
+update-manifest release server prepares and serves updates, and an SDK auto-update seam surfaces
+update-ready events in the app.
+
+Its honest edges, stated up front: native installers and compiled binaries are **unsigned** at this
+stage — platform code-signing (Authenticode, Developer ID + notarization) is a deliberate external
+CI step, and the CLI accepts no certificate credentials. And Windows native update apply is
+unsupported upstream, so apps handle an `applyMode: "manual"` update-ready event and present its
+verified `manualUpdateUrl` instead of replacing themselves in place.
 
 ---
 
@@ -320,8 +341,8 @@ Known limitations, stated plainly:
   and better-auth the `signin`/`callback` endpoints return a typed unsupported-operation error by
   design. No multi-active routing, cross-backend linking, or global logout yet.
 - **Windows.** Deno does not deliver `SIGTERM` on Windows (the service listener handles this), and
-  native desktop updates on Windows follow a manual installer-download path rather than in-place
-  auto-apply.
+  in the upcoming `0.0.1-beta.11` desktop lane, native updates on Windows follow a manual
+  installer-download path rather than in-place auto-apply.
 - **Deno 2.9+ everywhere.** Plugin runtimes, API services, and the MCP server require Deno 2.9+;
   only the manifests and contracts are plain data importable anywhere TypeScript runs. Multi-runtime
   worker tasks require the target interpreter (PowerShell, Python, POSIX shell) on the machine.

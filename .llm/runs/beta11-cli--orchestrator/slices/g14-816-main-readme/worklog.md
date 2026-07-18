@@ -133,3 +133,51 @@ All README commands executed on 2026-07-18, Deno 2.9.3, aspire CLI 13.4.6, Docke
    stop-lines section is invalid.
 5. The #824 seed run is drafts-only until owner ratification; its board filing needs the owner
    in-turn.
+
+## Lane 4 — 2026-07-18 fix cycle 1 (post-adversarial FAIL)
+
+All 7 required fixes from `adversarial.md` applied to README.md:
+
+1. **BLOCKER — desktop/auto-update unreleased in beta.10.** Native-desktop material moved out of
+   the shipped deploy table into a clearly labeled `### New in 0.0.1-beta.11: native desktop lane`
+   subsection, explicitly stated as "not yet available in the published 0.0.1-beta.10 packages this
+   README pins" and attributed to the main branch. No `netscript deploy desktop` command appears in
+   any beta.10-pinned context. `@netscript/sdk` map row annotated "(desktop auto-update seam
+   arrives in 0.0.1-beta.11)". Windows-update limitation bullet re-scoped to "in the upcoming
+   0.0.1-beta.11 desktop lane". Shipped deploy table rebuilt from executed beta.10
+   `netscript deploy list` (10 targets: docker, compose, linux-service, windows-service,
+   deno-deploy, kubernetes, azure-aca, azure-app-service, azure-aks, cloud-run).
+2. **Quickstart determinism/timing.** Reproduced the stall: the scaffolded `users` executable
+   `waitFor(primaryDatabase)` (generated `register-services.mts:77`) gates on Aspire's Postgres
+   health probe, whose first-boot latency is nondeterministic in this environment and on lane 5's
+   clean machine. Printed sequence could NOT be made deterministic within a fixed envelope →
+   per instruction, the "<5 minutes" promise is REMOVED (heading now plain "Quickstart"), a
+   readiness step is printed ("wait until the postgres resource reports healthy… services
+   deliberately wait on the database"), the payoff is conditioned on that state, and a recovery
+   line is printed (aspire stop/start once the db exists). Clean re-run true timings (2026-07-18,
+   fresh temp dir + isolated install root): install 1 s · init 4 s · restore 7 s · start→dashboard
+   ~15 s · db init 13 s · db generate 20 s · db seed 13 s · after `aspire stop` + `aspire start`
+   with the initialized db, `curl :3000/health` → 200 healthy JSON in 21 s. First-boot health-probe
+   wait remains environment-dependent (lane 5 observed >5 min); this is now stated, not promised
+   away.
+3. **Plugin install syntax.** Prose example is now the concrete
+   `netscript plugin install worker --name workers`; EXECUTED in the fresh scaffold → exit 0,
+   "Installed worker plugin \"workers\" on port 8091. Created 4 plugin files. Regenerated 12
+   Aspire helper files."
+4. **`emit` dropped.** Canonical lifecycle now reads `plan`, `up`, `down`, with `status`/`logs` on
+   the targets that honour them, and defers to executed `netscript deploy list` output. The
+   "never advertises an operation it cannot honour" sentence removed (falsified for beta.10 by
+   lane 5's `deploy kubernetes emit` → exit 2).
+5. **Prerequisite = Deno 2.9+** in the quickstart (was 2.x), consistent with the status section.
+6. **Count corrected.** "The monorepo publishes 29 packages and 6 first-party plugins to JSR",
+   `@netscript/bench` explicitly named as an internal, unpublished benchmarking instrument; map
+   heading now "Published package map".
+7. **Dry-run claim** now "reports the file and directory counts it would create and writes
+   nothing" (matches count-only output).
+
+Gate re-run: deno fmt --check clean · tagline ≤250 B OK · docs:links OK (98 docs, 0 broken) ·
+internal-wording grep zero hits · mermaid unchanged (parse-verified previously, `flowchart-v2`).
+Claim→citation deltas: beta.10 deploy target set + lifecycle → executed `netscript deploy list` /
+`deploy kubernetes --help` (2026-07-18); plugin install → executed command above; beta.11 marker
+statements → adversarial.md shipped-truth findings (deploy desktop absent from beta.10 CLI; no
+`./auto-update` export in jsr @netscript/sdk@0.0.1-beta.10); all other citations unchanged.
