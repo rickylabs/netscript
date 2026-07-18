@@ -31,3 +31,12 @@ failure modes the contract closes off — is on the
   { eyebrow: "API Reference", title: "auth backends", body: "Generated symbols for auth, better-auth, kv-oauth, and WorkOS packages.", href: "/reference/auth/", icon: "R" },
   { eyebrow: "API Reference", title: "plugin auth", body: "Generated plugin-auth package symbols.", href: "/reference/plugin-auth/", icon: "R" }
 ] }) }}
+
+## Learn, do, look up
+
+{{ comp.cardsGrid({ columns: 4, cards: [
+  { eyebrow: "Learn", title: "Workspace tutorial", body: "Auth, workspace data, and route authorization in one track.", href: resolveXref("tut:workspace").href },
+  { eyebrow: "Do", title: "Recipes", body: "Task-oriented recipes for this area, one problem each.", href: "/identity-access/how-to/" },
+  { eyebrow: "Look up", title: "`@netscript/auth` reference", body: "Generated API reference. Related units: `auth-better-auth`, `auth-kv-oauth`, `auth-workos`, `plugin-auth`.", href: resolveXref("ref:auth").href },
+  { eyebrow: "Understand", title: "The auth model", body: "The design rationale behind this pillar.", href: resolveXref("explain:auth-model").href },
+] }) }}

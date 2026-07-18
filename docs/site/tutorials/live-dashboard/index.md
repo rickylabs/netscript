@@ -112,3 +112,5 @@ contract to durable stream. Every hop is typed off the same contract, so the row
 the row the service wrote.
 
 {{ comp.nextPrev({ prev: { label: "Tutorials", href: "/tutorials/" }, next: { label: "1 · Scaffold", href: "/tutorials/live-dashboard/01-scaffold/" } }) }}
+
+After this track, keep building in **Build › [Web Layer](/web-layer/)** — the guides and recipes there pick up where these chapters stop.

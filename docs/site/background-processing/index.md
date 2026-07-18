@@ -32,3 +32,12 @@ durable saga state model — for that, see [durable workflows](/durable-workflow
   { eyebrow: "How-To", title: "Run a polyglot task", body: "Execute work in a non-TypeScript task runtime.", href: "/background-processing/how-to/run-a-polyglot-task/", icon: "H" },
   { eyebrow: "API Reference", title: "workers, queue, cron", body: "Generated symbols for task, queue, scheduler, and watcher packages.", href: "/reference/workers/", icon: "R" }
 ] }) }}
+
+## Learn, do, look up
+
+{{ comp.cardsGrid({ columns: 4, cards: [
+  { eyebrow: "Learn", title: "ERP sync tutorial", body: "An import job, a polyglot transform, and a queue-driven cron.", href: resolveXref("tut:erp-sync").href },
+  { eyebrow: "Do", title: "Recipes", body: "Task-oriented recipes for this area, one problem each.", href: "/background-processing/how-to/" },
+  { eyebrow: "Look up", title: "`@netscript/workers` reference", body: "Generated API reference. Related units: `queue`, `cron`, `watchers`.", href: resolveXref("ref:workers").href },
+  { eyebrow: "Understand", title: "The durability model", body: "The design rationale behind this pillar.", href: resolveXref("explain:durability-model").href },
+] }) }}

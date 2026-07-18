@@ -77,3 +77,12 @@ scaffolded dashboard app — is [Fresh UI & design](/web-layer/fresh-ui/), which
   { eyebrow: "API Reference", title: "@netscript/fresh", body: "Generated symbols for the Fresh framework package.", href: "/reference/fresh/", icon: "R" },
   { eyebrow: "API Reference", title: "@netscript/fresh-ui", body: "Generated symbols for the companion UI package.", href: "/reference/fresh-ui/", icon: "R" }
 ] }) }}
+
+## Learn, do, look up
+
+{{ comp.cardsGrid({ columns: 4, cards: [
+  { eyebrow: "Learn", title: "Live dashboard tutorial", body: "Contract to page to live stream — the web layer end to end.", href: resolveXref("tut:live-dashboard").href },
+  { eyebrow: "Do", title: "Recipes", body: "Task-oriented recipes for this area, one problem each.", href: "/web-layer/how-to/" },
+  { eyebrow: "Look up", title: "`@netscript/fresh` reference", body: "Generated API reference. Related units: `fresh-ui`.", href: resolveXref("ref:fresh").href },
+  { eyebrow: "Understand", title: "Contracts & type flow", body: "The design rationale behind this pillar.", href: resolveXref("explain:contracts").href },
+] }) }}

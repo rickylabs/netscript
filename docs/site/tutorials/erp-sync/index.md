@@ -123,3 +123,5 @@ instead of resetting between chapters. Follow them in order.
 {{ /comp }}
 
 {{ comp.nextPrev({ prev: { label: "Tutorials", href: "/tutorials/" }, next: { label: "1 · Scaffold", href: "/tutorials/erp-sync/01-scaffold/" } }) }}
+
+After this track, keep building in **Build › [Background jobs](/background-processing/)** — the guides and recipes there pick up where these chapters stop.

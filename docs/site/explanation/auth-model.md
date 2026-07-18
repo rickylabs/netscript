@@ -9,6 +9,8 @@ order: 4
 
 # The pure-backend auth model
 
+*This essay is the **why** — the model and its trade-offs. The day-to-day *how* (guides, recipes, API) lives in **Build › [Identity & Access](/identity-access/)**.*
+
 This page explains *what* NetScript authentication actually is, *why* it is designed as a
 **pure-backend seam** rather than a built-in identity provider, and *how* a single typed port lets
 you swap GitHub OAuth for WorkOS or better-auth without touching one line of application code. It is

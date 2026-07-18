@@ -9,6 +9,8 @@ order: 6
 
 # Observability
 
+*This essay is the **why** — the model and its trade-offs. The day-to-day *how* (guides, recipes, API) lives in **Build › [Observability](/observability/)**.*
+
 This essay answers one question: how does NetScript make a *distributed, multi-process*
 application observable, so that one logical operation reads as one story even though it crosses
 HTTP, a queue, a saga, and a worker subprocess? The answer is a single idea applied everywhere —

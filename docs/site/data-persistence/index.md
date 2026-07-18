@@ -33,3 +33,12 @@ workspace resolves a second database.
   { eyebrow: "API Reference", title: "database", body: "Generated database package symbols.", href: "/reference/database/", icon: "R" },
   { eyebrow: "API Reference", title: "kv and Prisma adapter", body: "Generated KV and adapter package symbols.", href: "/reference/kv/", icon: "R" }
 ] }) }}
+
+## Learn, do, look up
+
+{{ comp.cardsGrid({ columns: 4, cards: [
+  { eyebrow: "Learn", title: "Storefront tutorial", body: "Cart contracts back a real database schema from chapter 3 on.", href: resolveXref("tut:storefront").href },
+  { eyebrow: "Do", title: "Recipes", body: "Task-oriented recipes for this area, one problem each.", href: "/data-persistence/how-to/" },
+  { eyebrow: "Look up", title: "`@netscript/database` reference", body: "Generated API reference. Related units: `kv`, `prisma-adapter-mysql`.", href: resolveXref("ref:database").href },
+  { eyebrow: "Understand", title: "Architecture", body: "The design rationale behind this pillar.", href: resolveXref("explain:architecture").href },
+] }) }}

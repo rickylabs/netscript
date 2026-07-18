@@ -44,3 +44,12 @@ learn the model:
   {{ comp.xref({ key: "ref:logger", text: "logger" }) }} references, and the
   [telemetry convention](/reference/telemetry/convention/) (span naming, SpanKind, the `netscript.*`
   attribute rules).
+
+## Learn, do, look up
+
+{{ comp.cardsGrid({ columns: 4, cards: [
+  { eyebrow: "Learn", title: "Trace the request model", body: "Follow one request through services, jobs, and streams in the core-concepts tour.", href: resolveXref("concept:concepts").href },
+  { eyebrow: "Do", title: "Recipes", body: "Task-oriented recipes for this area, one problem each.", href: "/observability/how-to/" },
+  { eyebrow: "Look up", title: "`@netscript/telemetry` reference", body: "Generated API reference. Related units: `logger`.", href: resolveXref("ref:telemetry").href },
+  { eyebrow: "Understand", title: "Observability", body: "The design rationale behind this pillar.", href: resolveXref("explain:observability").href },
+] }) }}

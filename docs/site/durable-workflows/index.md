@@ -48,3 +48,12 @@ outcomes differ from a retry loop — read the
   { eyebrow: "API Reference", title: "sagas", body: "Generated saga API symbols.", href: "/reference/sagas/", icon: "R" },
   { eyebrow: "API Reference", title: "triggers and streams", body: "Generated trigger and stream package symbols.", href: "/reference/triggers/", icon: "R" }
 ] }) }}
+
+## Learn, do, look up
+
+{{ comp.cardsGrid({ columns: 4, cards: [
+  { eyebrow: "Learn", title: "Storefront tutorial", body: "The checkout saga chapter models a multi-step flow with compensation.", href: resolveXref("tut:storefront").href },
+  { eyebrow: "Do", title: "Recipes", body: "Task-oriented recipes for this area, one problem each.", href: "/durable-workflows/how-to/" },
+  { eyebrow: "Look up", title: "`@netscript/sagas` reference", body: "Generated API reference. Related units: `triggers`, `streams`.", href: resolveXref("ref:sagas").href },
+  { eyebrow: "Understand", title: "The durability model", body: "The design rationale behind this pillar.", href: resolveXref("explain:durability-model").href },
+] }) }}

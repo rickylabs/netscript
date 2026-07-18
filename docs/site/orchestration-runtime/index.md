@@ -50,3 +50,12 @@ New here, start with the concept, then the practical wiring, then the reference:
   dashboard side of the same graph — the spans and logs `aspire start` collects.
 - **Look up exact symbols:** {{ comp.xref({ key: "ref:aspire", text: "the Aspire reference" }) }} and
   the {{ comp.xref({ key: "cli:reference", text: "CLI reference" }) }}.
+
+## Learn, do, look up
+
+{{ comp.cardsGrid({ columns: 4, cards: [
+  { eyebrow: "Learn", title: "Quickstart", body: "From `netscript init` to a running, orchestrated workspace.", href: resolveXref("concept:quickstart").href },
+  { eyebrow: "Do", title: "Recipes", body: "Task-oriented recipes for this area, one problem each.", href: "/orchestration-runtime/how-to/" },
+  { eyebrow: "Look up", title: "`@netscript/aspire` reference", body: "Generated API reference. Related units: `cli`, `config`, `runtime-config`, `plugin`.", href: resolveXref("ref:aspire").href },
+  { eyebrow: "Understand", title: "Orchestration with Aspire", body: "The design rationale behind this pillar.", href: resolveXref("explain:aspire").href },
+] }) }}
