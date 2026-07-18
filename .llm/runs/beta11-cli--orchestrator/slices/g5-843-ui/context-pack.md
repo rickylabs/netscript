@@ -6,14 +6,14 @@
 | -------------- | ------------------------------------------- |
 | Run ID         | `beta11-cli--orchestrator/slices/g5-843-ui` |
 | Branch         | `feat/desktop-frontend-843-ui`              |
-| Current phase  | `plan`                                      |
+| Current phase  | `gate`                                      |
 | Archetype      | `4 - Public DSL / Builder`                  |
 | Scope overlays | `frontend`                                  |
 
 ## Current State
 
-Research and Design checkpoint are complete on the #841/#842 integration baseline. No product code
-has been created. The run is stopped for the group Plan-Gate.
+Group Plan-Gate passed with D1–D9 locked. Slice 1 implements the public desktop runtime contract and
+is stopped at its Tier-A review boundary; slices 2 and 3 have not started.
 
 ## Completed
 
@@ -22,15 +22,20 @@ has been created. The run is stopped for the group Plan-Gate.
 - Inspected live #843/#840, merged dependency surfaces, POC/RFC, Deno desktop APIs,
   registry/consumer topology, doctrine, and current JSR baseline.
 - Locked architecture, public vocabulary, three commit slices, and gate matrix.
+- Implemented the browser-safe `@netscript/fresh-ui/desktop` lifecycle, structural native capability
+  types, declarative tray/application menus, dialogs, notifications, documented window actions, and
+  deterministic tests.
+- Passed the full Fresh UI test directory (144 tests), scoped check/lint/fmt, new-export doc lint,
+  package dry-run, and `quality:scan`.
 
 ## In Progress
 
-- Group Plan-Gate review by the Fable 5 orchestrator.
+- Tier-A review of implementation slice 1 by the Fable 5 orchestrator.
 
 ## Next Steps
 
-1. Wait for explicit Plan-Gate PASS or revise plan artifacts on feedback.
-2. Only after PASS, implement slice 1 and pause for Tier-A review.
+1. Wait for explicit slice-1 Tier-A PASS or address requested changes.
+2. Only after PASS, begin slice 2 L2 registry components and island work.
 
 ## Key Decisions
 
@@ -43,26 +48,31 @@ has been created. The run is stopped for the group Plan-Gate.
 
 ## Files Changed
 
-| Path                                                   | Status | Notes                               |
-| ------------------------------------------------------ | ------ | ----------------------------------- |
-| `.llm/runs/beta11-cli--orchestrator/slices/g5-843-ui/` | new    | Harness plan/design artifacts only. |
+| Path                                                   | Status  | Notes                                                 |
+| ------------------------------------------------------ | ------- | ----------------------------------------------------- |
+| `.llm/runs/beta11-cli--orchestrator/slices/g5-843-ui/` | changed | Slice-1 gate evidence and drift.                      |
+| `packages/fresh-ui/deno.json`                          | changed | Adds explicit `./desktop` export.                     |
+| `packages/fresh-ui/desktop.ts`                         | new     | Documented public entrypoint.                         |
+| `packages/fresh-ui/src/desktop/`                       | new     | Contracts, constants, and structural runtime adapter. |
+| `packages/fresh-ui/tests/desktop/`                     | new     | Full slice-1 behavior and web/no-op tests.            |
 
 ## Gates
 
-| Gate family | Current status | Evidence                                              |
-| ----------- | -------------- | ----------------------------------------------------- |
-| Static      | baseline only  | Raw package JSR dry-run passed before implementation. |
-| Fitness     | NOT_RUN        | Plan-Gate stop.                                       |
-| Runtime     | NOT_RUN        | Plan-Gate stop; #457 remains external.                |
-| Consumer    | NOT_RUN        | Plan-Gate stop.                                       |
+| Gate family | Current status | Evidence                                                                                           |
+| ----------- | -------------- | -------------------------------------------------------------------------------------------------- |
+| Static      | PASS           | Scoped check/lint/fmt, new-export doc lint, package dry-run.                                       |
+| Fitness     | PARTIAL        | `quality:scan` passes; root `arch:check` stops on unchanged integration-base SDK range divergence. |
+| Runtime     | PASS           | Six desktop tests plus full 144-test Fresh UI directory; #457 remains external.                    |
+| Consumer    | NOT_RUN        | L2 gallery consumer belongs to slices 2–3.                                                         |
 
 ## Open Questions
 
-- None in the implementation contract; group Plan-Gate decision is pending.
+- Tier-A disposition of the unchanged root `arch:check` baseline failure.
 
 ## Drift and Debt
 
-- Drift: integration-base correction and current JSR-baseline mismatch are recorded.
+- Drift: integration-base corrections, JSR baseline, and root architecture-gate baseline failure are
+  recorded.
 - Debt: none introduced; existing baseline is bounded and must not worsen.
 
 ## Commits

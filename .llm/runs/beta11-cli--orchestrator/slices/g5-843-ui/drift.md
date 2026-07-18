@@ -42,3 +42,17 @@ documentation.
 - **Evidence:** The intervening diff changes desktop packaging/release CLI code and its run
   artifacts, not `packages/fresh-ui` or scaffold design-gallery templates. The plan commit was
   rebased and its baseline metadata updated; no design decision changed.
+
+## 2026-07-18 — Root architecture gate blocked by integration-base dependency ranges
+
+- **What:** Slice 1's required root `arch:check` stops in `deps:check` before doctrine checks.
+- **Source:** `rtk proxy deno task arch:check`.
+- **Expected:** Root architecture gate passes for the slice.
+- **Actual:** The scanner reports divergent `@netscript/sdk` JSR ranges: CLI uses `^0.0.1-beta.10`,
+  while Fresh uses `0.0.1-beta.10`.
+- **Severity:** significant
+- **Action:** defer
+- **Evidence:**
+  `git diff origin/feat/desktop-frontend -- packages/cli/deno.json packages/fresh/deno.json` is
+  empty, proving slice 1 did not introduce the violation. A focused Fresh UI doctrine scan has zero
+  failures. Changing dependency policy is outside #843 and requires supervisor disposition.
