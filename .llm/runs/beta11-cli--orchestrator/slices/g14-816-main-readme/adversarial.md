@@ -229,3 +229,95 @@ gate passes at `7ee36d05`.
 
 No README edits, merge, release action, milestone close, seed-run filing, or self-dispatched
 evaluation was performed during this targeted final check.
+
+---
+
+## Homepage adversarial
+
+**Target:** rendered docs-site homepage from `docs/site/index.vto` at `60586af9`\
+**Homepage verdict: FAIL**\
+**README verdict:** unchanged PASS at `7ee36d05`
+
+The site builds and its links resolve, but the homepage is not truthful as an executable beta.10
+entry point. It reintroduces the deploy-list claim already rejected from the README, and its
+four-tab lead example is not one coherent scaffold-to-service flow.
+
+### MAJOR — The homepage restores the false `deploy list` operation-authority claim
+
+The rendered Run it anywhere section says `netscript deploy list` “prints exactly what your
+installed version supports.” Independent beta.10 execution already disproves this: the JSON list
+advertises `emit` for nine targets, while `netscript deploy kubernetes --help` exposes only `plan`,
+`up`, and `down`, and direct `emit` execution is unknown.
+
+This also directly contradicts the passed README, which correctly limits `deploy list` to target
+inventory and makes per-target `--help` the operation authority.
+
+### MAJOR — The displayed scaffold command does not create the contract/service story shown
+
+The lead paragraph attributes the contract and service tabs to
+`netscript init my-app --db postgres --service`, but the displayed Scaffold tab tells users to run
+`netscript init my-app --db postgres` without `--service`. Executing that displayed command verbatim
+in a clean temp directory exited 0 but created 162 files / 31 directories, reported only a
+“Contracts (v1 stub),” and created no users service or shown users CRUD contract.
+
+The adjacent Bring it up tab therefore brings up a database, cache, and dashboard—not the typed
+users service the four-tab narrative promises. The `--no-aspire` alternative also executed
+successfully, but likewise created no service.
+
+### MINOR — The contract/service snippets have an unstated generation prerequisite
+
+The rendered TypeScript snippets were copied verbatim into a fresh beta.10 service scaffold. Before
+database generation, both failed because `@database/zod` resolved to the absent generated module
+`database/postgres/schema/.generated/zod/crud.ts`. After exact `netscript db generate`, the contract
+passed `deno check --unstable-kv` and the service example started and stopped cleanly.
+
+The code is valid after generation, but the page presents it before the later generation step and
+calls it straight from the scaffold. The prerequisite/order must be explicit.
+
+### MINOR — Homepage quickstart posture omits the proven recovery and workspace transition
+
+The rendered Bring it up tab correctly tells users to wait for Postgres health, but it does not
+include the README's recovery for the observed first-boot stall (`aspire stop`, then `aspire start`
+after initialization). It also says the database commands run “from the workspace root” without
+printing `cd ..` after entering `my-app/aspire`. The homepage should preserve the same
+readiness/recovery posture and runnable directory transitions as the passed README.
+
+### PASS notes
+
+- `cd docs/site && deno task build` succeeded: 531 files in 6.77 seconds.
+- The rendered homepage—not merely `index.vto`—was used for claim, example, limitation, CTA, and
+  link inspection.
+- The install command remains exactly pinned to `0.0.1-beta.10`. Both displayed scaffold variants
+  execute successfully on beta.10.
+- Exact `netscript agent init` succeeded in the fresh displayed scaffold.
+- Exact `netscript plugin install worker --name workers` succeeded, and its three output lines
+  exactly match the rendered claims: port 8091, four plugin files, and twelve regenerated Aspire
+  helper files.
+- The service lifecycle snippet works after its missing generation prerequisite. The repository's
+  service README fixture gate also passed 2/2.
+- The branch-only desktop callout is unambiguously titled “New in 0.0.1-beta.11,” explicitly says it
+  is unavailable in the rendered beta.10 packages, and includes unsigned-installer and Windows
+  manual-apply limitations.
+- Beta status, aligned exact pins, Deno 2.9+, and Postgres readiness are presented honestly.
+- All 115 unique built-site-local homepage links resolve to generated files. The external GitHub,
+  JSR, and edit CTAs returned HTTP 200 after redirects. `deno task docs:links` reports 98 docs, zero
+  broken links, zero broken anchors, and zero orphans.
+- No fabricated customer, adoption, download, star, or testimonial claim appears.
+- The nine homepage pillar cards match the nine real product-area navigation sections: Web Layer,
+  Services & SDK, Background Processing, Durable Workflows, AI & Agents, Data & Persistence,
+  Identity & Access, Orchestration & Runtime, and Observability.
+
+### Homepage fix list
+
+1. Copy the passed README disposition into the homepage: `deploy list` inventories targets;
+   `<target> --help` is the exact operation authority.
+2. Add `--service` to the displayed primary scaffold command so the example actually creates the
+   users service and CRUD contract being demonstrated (and keep the no-Aspire alternative
+   semantically equivalent if it is presented as the same flow).
+3. State that the contract/service snippets require `netscript db generate`, or reorder the flow so
+   generation precedes code that imports `@database/zod`.
+4. Print `cd ..` before workspace-root database commands and carry over the README's
+   readiness-recovery instruction.
+
+No homepage/README edit, merge, release action, milestone close, seed-run filing, or self-dispatched
+evaluation was performed during this scope extension.
