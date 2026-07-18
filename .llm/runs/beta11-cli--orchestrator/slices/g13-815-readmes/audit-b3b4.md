@@ -83,3 +83,36 @@ Keep the “one contract, four backends” claim: that claim is accurate.
 
 The audit lane changed no README. Return B3B4-F1 to the generator/supervisor, then re-audit the
 complete nine-README changeset or perform the explicitly requested targeted fix verification.
+
+---
+
+# Second-pass audit — supervisor resolution of B3B4-F1
+
+**Final verdict: PASS.**
+
+- Audited supervisor fix commit: `700a954c1a13df8ec715478522e494f6650aa588`.
+- Targeted scope: the queue tagline, its source authority, every PostgreSQL/discovery statement in
+  the full 28-page branch set, and the one-file README mechanical gates.
+- B3B4-F1 is closed: the tagline now says `createQueue` auto-discovers RabbitMQ, Redis, or Deno KV,
+  exactly matching `detectProvider()` and the page's other two auto-discovery descriptions.
+
+## Gate log — second pass
+
+| Gate                          | Command(s)                                                                                                                                                               | Scope                                     | Result | Findings / observed                                                                                                                                                                                                                                   | Proceeded  |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------- | ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
+| Re-baseline                   | Raw `git status`; fetch main and branch; `git rev-parse`; `git log`; `git diff 5b2e9079..HEAD`                                                                           | Supervisor fix identity and touched files | PASS   | Local and remote HEAD matched `700a954c`; the fix commit changes only two wrapped lines in `packages/queue/README.md` and removes PostgreSQL from the tagline's auto-discovered list                                                                  | Continued  |
+| B3B4-F1 source match          | Read the repaired tagline and `packages/queue/factory/create-queue.ts::detectProvider()`                                                                                 | Queue provider auto-selection order       | PASS   | Both state RabbitMQ → Redis → Deno KV; source checks RabbitMQ, then Redis, and otherwise returns `QueueProvider.DenoKv`                                                                                                                               | Continued  |
+| Branch-set contradiction scan | `rg` case-insensitively for auto-discover/detect near PostgreSQL and for ordered provider lists across the explicit 28-README set; inspect every PostgreSQL hit in queue | B1 six + B2 thirteen + B3B4 nine          | PASS   | 0 pages claim PostgreSQL provider auto-discovery. Queue's compatibility reference to PostgreSQL connection discovery is accurate and distinct: after explicit Postgres selection, `createPostgresQueue()` resolves its URL through `getPostgresUri()` | Continued  |
+| README standard               | `check-readme-standard.ts packages/queue/README.md --pretty`                                                                                                             | Repaired README                           | PASS   | `1 README(s) conform`                                                                                                                                                                                                                                 | Continued  |
+| Tagline cap                   | `check-jsr-tagline-length.ts packages/queue/README.md --pretty`                                                                                                          | Repaired tagline                          | PASS   | `checked=1 over=0`                                                                                                                                                                                                                                    | Continued  |
+| README formatting             | `deno fmt --check packages/queue/README.md`                                                                                                                              | Repaired README                           | PASS   | 1 file checked                                                                                                                                                                                                                                        | Final PASS |
+
+## Stop-lines honored — second pass
+
+- No merge was performed.
+- No release cut, JSR publish, tag push, canary, or stable publish was performed.
+- Milestone 13 was not closed.
+- No sub-agent brief or self-dispatched evaluator was created.
+- No #824 seed-board filing or ratification action was performed.
+
+The targeted supervisor resolution closes B3B4-F1. The audit lane changed no README.
