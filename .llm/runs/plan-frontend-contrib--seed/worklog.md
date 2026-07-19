@@ -98,3 +98,14 @@ STAGE-COMPLETE: adversarial-integration
 
 STAGE-COMPLETE: docs-story-integration — full kickoff pipeline done; awaiting owner review of
 plan.md forks (F1/F2/F3/F5/F7/F8/F9) and downstream filing decisions.
+
+## 2026-07-19 — Terminal deliverable: RFC draft PR
+
+- Owner directive (remote-control): open the lane's RFC draft PR modeled on #822; no issue
+  filing, no merge.
+- `rfc.md` committed (`5691c018`); **draft PR #890** opened against `main` —
+  https://github.com/rickylabs/netscript/pull/890 — RFC body (topic, decision+rationale, public
+  API, plan/waves, placeholder board FCL-EPIC/FCB-1..24, supersession map, forks F1–F9).
+  Labels: `rfc` `type:docs` `status:plan` `area:fresh` `area:plugins` `priority:p1`
+  `ci:skip-e2e` `ci:skip-scaffold`; milestone **Backlog / Triage**; Refs #427/#432/#400 (no
+  closing keywords). Epic/sub-issue filing remains the later supervisor-coordinated step.
