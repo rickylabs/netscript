@@ -55,3 +55,24 @@ this session (resumed with `context-pack.md`) integrates findings; then the Kimi
 pass. This session self-arranged no evals.
 
 STAGE-COMPLETE: generator
+
+## 2026-07-19 — Stage 2: adversarial pass dispatched + integrated
+
+- Owner authorized pipeline dispatch in-turn. Sol high launched via
+  `launch-codex-slice.ts` (Linux-local), thread `019f7883-ccf0-7820-aa36-3bd90b82ac05`;
+  findings committed by the reviewer as `adversarial-sol.md` (`4d2647c8`).
+- Review quality: high — 20 findings (7 blockers), upstream claims verified against jsr sources.
+  **All 20 accepted** (two harmless citation slips noted); dispositions in
+  `adversarial-triage.md`.
+- Integration (rev 2 across the design): envelope+family versioning model (S-7), identity
+  quartet (S-8), server/client context split (S-9), HostSurfaceDescriptor + discriminated nav
+  (S-10), runtime sugar relocated to `@netscript/fresh/plugins` (S-5), post-fsRoutes composition
+  phase + literal route loaders + normalizer (S-1/S-2), islands reclassified proof-gated (S-3),
+  honest SSR containment contract (S-4), wildcard proxy replaced by generated deny-by-default
+  gateway (S-6), transactional replace-set emissions + `plugin remove` semantics (S-11), CSS
+  layer-order prelude/portal roots/url() rule (S-12), examples corrected to real backend
+  surfaces (S-13/14/15), exports+`plugin dev` moved to phase 1 (S-16), i18n/a11y/CSP seams
+  (S-17), test kit + budgets (S-18), **Wave 0 five-proof phasing** (S-19), forks re-triaged
+  (S-20; F4/F6 resolved, F9 added).
+
+STAGE-COMPLETE: adversarial-integration

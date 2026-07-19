@@ -1,7 +1,14 @@
-# Worked example — AI surfaces (draft)
+# Worked example — AI surfaces (draft, rev 2)
 
-> **Draft — design document only.** Upgrades the one existing plugin→app frontend precedent
-> (scaffold-only chat route) into the two-model story, without new chat machinery.
+> **Draft — design document only.** Rev 2 integrates adversarial finding S-14: rev 1 pointed the
+> durable-chat runtime at a generic proxy path it cannot use — `createNetScriptChatConnection`
+> requires a durable-session target (`packages/fresh/src/runtime/ai/create-chat-connection.ts:378-424`)
+> and its transport is the specialized stream proxy, not the gateway. **v1 architecture (chosen):
+> the durable-session runtime.** The plugin's live chat route ships WITH its specialized proxy
+> route (a generated route contribution wired to `@netscript/fresh/ai`'s stream-proxy handler +
+> the host principal port for authorization). The gateway (`04 §4`) serves the plugin's ordinary
+> oRPC procedures (`ai.models`); it does not carry the chat stream. The oRPC event-iterator
+> client is the documented alternative for hosts that opt out of durable sessions.
 
 ## Today
 
@@ -50,8 +57,10 @@ export default defineFrontend({
 ```
 
 The live `Chat.tsx` island is the productionized `chat-route.stub.ts` content moved INTO the
-plugin: `createNetScriptChatConnection` against the plugin API proxy
-(`/api/plugins/ai/chat` — SSE passes through, `04-host-runtime.md §4`), fresh-ui token styling.
+plugin: `createNetScriptChatConnection` with a **durable-session target** served by the plugin's
+own contributed stream-proxy route (the `@netscript/fresh/ai` handler + host principal
+authorization — S-14), fresh-ui token styling. Session identity, reconnect, and cancel semantics
+are the durable-stream plane's, already shipped; the contribution layer only mounts it.
 
 ## The starter stays — repositioned, not removed
 
@@ -67,7 +76,7 @@ eject path is honest: the starter is the same component source, scaffolded once,
 | Axis-5 need | Where it lands |
 | --- | --- |
 | Reusable assist affordances in arbitrary app surfaces | `AssistLauncher` island — any app page or plugin zone component can import & render it (islands are package exports) |
-| Contextual "explain this / fix this" on other plugins' surfaces | those plugins import `@netscript/plugin-ai/frontend/islands/AssistLauncher` and pass context — plugin-to-plugin composition through **published exports**, the sanctioned path (`04-host-runtime.md §10`) |
+| Contextual "explain this / fix this" on other plugins' surfaces | those plugins declare a **capability requirement** on the ai plugin (`requires.ports: ['ai-assist']`) and render the launcher only when granted (`ctx.client.capabilities`) — the import of `AssistLauncher` is the published-export composition path, gated by the capability so a host without ai degrades cleanly (S-14) |
 | Procedures-as-agent-tools (`DashboardAiToolContribution`) | **dashboard family extension**, not this base layer — the dashboard host's tool registry consumes it (`../canonical/00-overview.md` out-of-scope table) |
 
 ## After `netscript plugin install @netscript/plugin-ai`

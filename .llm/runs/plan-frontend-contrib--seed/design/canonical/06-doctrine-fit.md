@@ -52,8 +52,11 @@ SCOPE-frontend browser/route/state gates for everything user-visible.
 | `--ns-*`-only CSS lint for plugin theme files | needs a lint rule; v1 is documentation + review |
 | Tailwind content-scan extension to plugin packages | vite/tailwind config reach; plain CSS suffices v1 |
 | DTCG token-file merge from plugins into `tokens:build` | owner fork F5 deferred |
-| Island props serializability static check | upstream Fresh constraint; no static gate exists |
+| Island props serializability *static* check | runtime round-trip check ships in the test kit (S-16); a static gate needs tooling |
 | Zone occupancy caps / conflicts UI | dashboard-run inspector covers observability first |
+| `AssetContribution` (hashed assets, cache headers, integrity) | S-12: v1 covers css with url() rewrite rules; full asset contract is its own slice |
+| SSR zone isolation protocol | S-4: containment contract is data-phase + client-side in v1; hard SSR isolation only as a designed protocol if ever demanded |
+| Plugin message catalogs (full i18n pipeline) | S-17: v1 ships MessageRef + locale/direction/timeZone seams; catalog loading/fallback is an implementation wave |
 
 ## 5. Precedence honored (what this design reuses rather than invents)
 

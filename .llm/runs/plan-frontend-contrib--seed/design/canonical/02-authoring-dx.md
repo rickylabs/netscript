@@ -1,7 +1,10 @@
-# Authoring DX — what a plugin author actually writes (draft)
+# Authoring DX — what a plugin author actually writes (draft, rev 2)
 
-> **Draft — design document only.** This document is the DX bar the implementation is held to.
-> If a mechanism choice would make any snippet below longer or stranger, the mechanism is wrong.
+> **Draft — design document only.** Rev 2 integrates adversarial findings S-5, S-16 (and the
+> rev-2 contract shapes from S-7/S-8/S-10). This document remains the DX bar the implementation
+> is held to: if a mechanism choice makes a snippet below longer or stranger, the mechanism is
+> wrong — but the bar now also refuses *hidden* work (S-16): every step the author must do is on
+> this page, none deferred to folklore.
 
 ## The pitch, in one screen
 
@@ -12,14 +15,9 @@ A plugin frontend is **that, in a `frontend/` folder**, plus one declaration fil
 plugins/crons/
   frontend/
     mod.ts
-    routes/
-      calendar.tsx
-      schedules/[id].tsx
-      _layout.tsx
-    islands/
-      CronCalendar.tsx
-    components/
-      NextFiresCard.tsx
+    routes/calendar.tsx        routes/schedules/[id].tsx
+    islands/CronCalendar.tsx
+    components/NextFiresCard.tsx
     theme.css
 ```
 
@@ -28,8 +26,8 @@ plugins/crons/
 import { defineFrontend } from '@netscript/plugin-frontend-core';
 
 export default defineFrontend({
-  contract: 'v1',
-  plugin: 'crons',
+  contract: { family: 'app', major: 1 },
+  pluginKind: 'crons',
   base: '/crons',
   routes: [
     {
@@ -37,7 +35,7 @@ export default defineFrontend({
       id: 'calendar',
       path: '/calendar',
       module: './routes/calendar.tsx',
-      nav: { label: 'Cron calendar', icon: 'calendar', group: 'main' },
+      nav: { label: { id: 'crons.nav.calendar', default: 'Cron calendar' }, icon: 'calendar', group: 'main' },
     },
     { kind: 'route', id: 'schedule-detail', path: '/schedules/:id', module: './routes/schedules/[id].tsx' },
   ],
@@ -50,111 +48,90 @@ export default defineFrontend({
 });
 ```
 
-Register the axis on the plugin (one builder call + one manifest block):
+`defineFrontend` validates and freezes; the keyed form compiles to the versioned envelope
+(`01-contracts.md`). Register the axis on the plugin (one builder call + one manifest block):
 
 ```ts
-// plugins/crons/src/public/mod.ts — existing definePlugin chain
-export const cronsPlugin = definePlugin('@acme/plugin-crons', VERSION)
-  .withType('utility')
-  .withService({ name: 'crons-api', entrypoint: './services/src/main.ts', port: 8093 })
-  .withFrontend({ export: './frontend', framework: 'fresh', contract: 'v1' })   // ← new
-  .build();
+// plugins/crons/src/public/mod.ts
+.withFrontend({ export: './frontend', framework: 'fresh', contract: [{ family: 'app', major: 1 }] })
 ```
 
 ```jsonc
-// plugins/crons/scaffold.plugin.json — additive block, parse-only discovery
-{ "frontend": { "export": "./frontend", "framework": "fresh", "contract": "v1" } }
+// plugins/crons/scaffold.plugin.json
+{ "frontend": { "export": "./frontend", "framework": "fresh", "contract": [{ "family": "app", "major": 1 }] } }
 ```
 
-That's the complete authoring surface. Everything else — registry, islands build wiring, nav,
-route refs, CSS aggregation, API proxy — is generated or host-side.
-
-## Writing the pages: it is just Fresh
+## Writing the pages: it is just Fresh (with one import that is honest about where it lives)
 
 ```tsx
-// plugins/crons/frontend/routes/calendar.tsx — an ordinary Fresh route module
-import { definePluginPage } from '@netscript/plugin-frontend-core';
+// plugins/crons/frontend/routes/calendar.tsx
+import { definePluginPage } from '@netscript/fresh/plugins';   // runtime sugar lives with the runtime (S-5)
 import { CronCalendar } from '../islands/CronCalendar.tsx';
 import { createCronsClient } from '@acme/plugin-crons/contracts/v1';
 
 export default definePluginPage(async (ctx) => {
-  // Server-side: typed client against the plugin's own service (base URL from host config).
+  // ctx is Fresh PageProps + typed ctx.host (PluginRequestContext, injected via app state).
   const crons = await createCronsClient(ctx.host.serviceUrl('crons-api')).crons.list();
   return (
     <section class='ns-stack ns-stack--lg'>
       <h1 class='ns-heading'>Cron calendar</h1>
-      <CronCalendar initial={crons} />
+      <CronCalendar initial={crons} client={ctx.client} />
     </section>
   );
 });
+// Sugar-free equivalent: plain `define.page`, reading props.state.pluginHost yourself.
 ```
 
 ```tsx
-// plugins/crons/frontend/islands/CronCalendar.tsx — an ordinary Fresh island
+// plugins/crons/frontend/islands/CronCalendar.tsx
 import { useSignal } from '@preact/signals';
-import { createCronsClient } from '@acme/plugin-crons/contracts/v1';
-import { pluginApi } from '@netscript/plugin-frontend-core/contracts/v1';
+import { pluginApi } from '@netscript/fresh/plugins';
+import type { PluginClientContext } from '@netscript/plugin-frontend-core/contracts/v1';
 
-export function CronCalendar(props: { initial: readonly CronEntry[] }) {
+export function CronCalendar(props: { initial: readonly CronEntry[]; client: PluginClientContext }) {
   const entries = useSignal(props.initial);
   async function refresh() {
-    // Client-side: same typed client, same-origin proxy (/api/plugins/crons/…).
-    entries.value = await createCronsClient(pluginApi('crons')).crons.list();
+    // Client-side calls go through the generated deny-by-default gateway (04 §4):
+    entries.value = await createCronsClient(pluginApi(props.client)).crons.list();
   }
-  return ( /* fresh-ui-token-styled markup, --ns-* vars only */ );
+  return ( /* --ns-* styled markup */ );
 }
 ```
 
-Key DX properties, each load-bearing:
+**The serialization rule (S-16, stated where authors will read it):** island props cross the
+server→client boundary and must be serializable data — no functions, no `Request`, no server
+context. Pass `ctx.client` (the serializable `PluginClientContext`), never `ctx.host`. The
+`./testing` kit fails a contribution whose island props don't round-trip.
 
-- **Islands are imported and rendered directly** — the registry feeds their specifiers to the
-  build (`islandSpecifiers`), so hydration Just Works. No island wrapper API, no registration
-  call in author code.
-- **Types flow end-to-end** — pages import the plugin's own `contracts/v1` client; the island
-  props are ordinary TypeScript. Breaking a contract breaks `deno check` in the generated
-  workspace at install time, not the user's browser at runtime.
-- **`definePluginPage`** is thin sugar over Fresh's `define.page` that types `ctx.host`
-  (`PluginHostState`: service URL resolution, session claims, base path) — the ONLY new concept a
-  page author meets. Plain `define.page` route modules also work; the sugar is optional.
-- **Styling uses the app's tokens.** Only `--ns-*` semantic vars
-  (`packages/fresh-ui/tokens/semantic.tokens.json`) — the plugin UI is automatically correct in
-  light/dark and under any app theme override. Compiled fresh-ui *components* are not importable
-  (copy-registry, app-owned); plugin markup uses tokens + its own CSS + the fresh-ui runtime
-  helpers that ARE package exports (`Icon`, `DataGrid`, toast, `cn`, interactive namespaces).
-
-## The dev loop
+## The dev loop — two modes, stated honestly (S-16)
 
 ```
-netscript plugin new crons --with frontend   # scaffolds the frontend/ skeleton above
-cd plugins/crons && deno task dev            # plugin dev = the HOST app runs with local-source
-                                             # plugin; vite watches plugins/** (watchPaths seam
-                                             # already exists in createNetScriptVitePlugin)
+netscript plugin new crons --with frontend   # scaffolds the tree above + manifest + exports
+netscript plugin dev                         # in the plugin dir: watches frontend/, maintains
+                                             # deno.json exports, regenerates the host registry
+                                             # atomically, signals vite (reload islands / HMR)
 ```
 
-- Local-source plugins are workspace members; editing `frontend/routes/calendar.tsx` hot-reloads
-  the host app like any app file (vite `watchPaths` already includes workspace packages —
-  `packages/fresh/src/application/vite/README.md`).
-- `netscript generate plugins` re-emits the registry; `plugin install`/`uninstall` runs it
-  automatically. Regeneration is idempotent (byte-identical skip — the `runtime-schemas`
-  precedent).
-- `netscript plugin doctor` gains a `frontend` check: contract handshake, zone validity, module
-  refs resolvable, deno.json exports present.
+- **Local-source mode** (plugin in the workspace): route/component edits hot-reload through
+  vite `watchPaths`; island-list changes and manifest edits are picked up by
+  `netscript plugin dev`'s regeneration + reload signal. This is the primary authoring loop.
+- **JSR-installed mode**: packages are immutable; the loop is publish → `plugin update`. Island
+  build behavior in this mode is Wave-0-gated ([P3], `04 §3`). Docs never pretend the two loops
+  are the same.
 
-## Convention generator (phase 2 sugar — the contract stays explicit)
+**Export-map maintenance is tooling-owned from phase 1** (S-16 — was phase 2): JSR resolves only
+published entrypoints, so `./frontend` and every route/island module need explicit `deno.json`
+exports; `plugin new --with frontend` seeds them and `plugin dev` / `generate frontend` keep
+them in sync. Authors never hand-maintain the export list (hand-written manifests are still
+fine — the generator only owns the export map + optional convention-derived lists).
 
-`netscript generate frontend` (run inside the plugin) derives the `routes:`/`islands:` lists from
-the file tree (Medusa's build-time convention, done the NetScript generated-file way) and
-maintains the plugin's `deno.json` exports for `./frontend` and each island/route module — JSR
-requires explicit exports, so the generator owns that bookkeeping, not the author. Authors who
-prefer to write the manifest by hand simply do; the generated form is the same contract.
+## What an author CANNOT do (guardrails as DX)
 
-## What an author CANNOT do (guardrails, stated as DX)
-
-- Import the app's copied `components/ui/*` — those are app-owned. Use tokens + package-safe
-  fresh-ui runtime exports. (The auth example shows the scaffolded-starter path when you *want*
-  the app to own and restyle a page — `../examples/auth.md`.)
-- Claim routes outside the mount base — base remap/collisions are host decisions
-  (`04-host-runtime.md §2`).
-- Mutate the registry at runtime — there is no API for it, by design.
-- Ship raw hex/oklch colors — theme CSS is `--ns-*` vocabulary (lint-gated later; debt entry
-  until then).
+- Pass non-serializable island props (checked by the test kit; explained above).
+- Import the app's copied `components/ui/*` (app-owned); use tokens + fresh-ui runtime exports.
+- Ship a plugin `_layout` in v1 (rejected at generate time — S-2; wrap pages in a shared
+  component instead).
+- Rely on SSR error boundaries for a crashing zone render — fetch in the resolver, keep render
+  pure (the containment contract, `04 §6`).
+- Claim routes outside the mount base; mutate the registry at runtime; ship raw hex colors
+  (`--ns-*` only).

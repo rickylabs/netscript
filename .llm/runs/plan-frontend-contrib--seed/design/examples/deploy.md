@@ -1,16 +1,18 @@
-# Worked example — Deploy plugin (draft)
+# Worked example — Deploy plugin (draft, rev 2)
 
-> **Draft — design document only.** The freshest consumer: branch `plan/deploy-plugin` (stage-A
-> bootstrap) redefines deploy as a plugin so it can "contribute to every layers (even frontend
-> soon)" — owner-ratified intent quoted in its kickoff. This example shows the two cloud seams
-> that intent implies, expressed against this layer's API. It is a design input to the deploy
-> seed run, not a commitment on its behalf.
+> **Draft — design document only.** Rev 2 integrates adversarial finding S-15: the uniform op
+> set is **seven** operations — `plan/emit`, `up`, `down`, `status`, `logs`, `rollback`,
+> `secrets` (`.llm/harness/archetypes/ARCHETYPE-7-deploy-target-adapter.md:50-63`) — and rev 1's
+> core-imports-adapter-islands composition reversed the adapter dependency direction. This
+> example is a design input to the deploy seed run, not a commitment on its behalf.
 
 ## Assumed shape (from ARCHETYPE-7 + the deploy-plugin direction)
 
-`plugin-deploy` (core) + per-target adapter packages (`deploy-cloudflare`, `deploy-aws`,
-`deploy-vercel`) behind the deploy-target port with the uniform op set
-`plan/emit/up/down/status/logs` (`.llm/harness/archetypes/ARCHETYPE-7-deploy-target-adapter.md`).
+`plugin-deploy` (core) + per-target adapter packages behind the deploy-target port with the
+uniform **seven-op** contract. The v1 console explicitly versions a **read-only surface**
+(`status`, `logs`, `plan` preview) plus confirm-gated `up`/`down`; `rollback` and `secrets`
+surface as capability-gated sections that adapters declare support for — an adapter without
+`rollback` renders the absent-capability state, preserving the parity law.
 
 ## Seam 1 — LIVE: the deploy console
 
@@ -49,12 +51,15 @@ equivalent** (`netscript deploy cloudflare up --env staging`) — the NetScript 
 from the dashboard family's action design; on the app surface this is a plugin-internal pattern,
 formalized as an `ActionContribution` kind only in the dashboard family.
 
-**Cloud-specific console surface** comes from the adapter packages as *published islands* the
-core console composes (plugin-to-plugin composition through explicit exports —
-`04-host-runtime.md §10`): `deploy-cloudflare` exports a `WorkersKvBrowser` island, `deploy-aws`
-a `QueueDepthPanel`. Core's console imports lazily per registered target; an absent adapter means
-an absent section. If adapters later become standalone plugins, each ships its own
-`frontend/mod.ts` and the composition moves to zones — both paths are supported by the layer.
+**Cloud-specific console surface — adapters contribute, core consumes (S-15).** Rev 1 had core
+lazily import adapter islands, which reverses the adapter boundary (core would know every
+target, and third-party targets would need a core change). Corrected composition: the deploy
+plugin's console publishes **deploy-family zones** (`deploy.console.target-panels`,
+`deploy.env.detail.sidebar`) in its `HostSurfaceDescriptor` extension, and each target adapter
+ships its own frontend manifest contributing panels into those zones (`deploy-cloudflare` → a
+`WorkersKvBrowser` panel; `deploy-aws` → a `QueueDepthPanel`). Core imports **no** target
+module; it renders its zone registry. A third-party target plugin gets console presence the
+same way — the exact dogfood of this layer's zone mechanism, one level down.
 
 ## Seam 2 — SCAFFOLDED STARTER: cloud-optimized frontend seams
 

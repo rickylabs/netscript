@@ -1,155 +1,156 @@
-# Host Runtime — mounting, SSR/hydration, data, nav, theming, isolation (draft)
+# Host Runtime — mounting, SSR/hydration, data, nav, theming, isolation (draft, rev 2)
 
-> **Draft — design document only.** All mount paths wrap verified upstream primitives
-> (research.md §3.1); the new code is glue in `@netscript/fresh` (new `./plugins` subpath).
+> **Draft — design document only.** Rev 2 integrates adversarial findings S-1, S-2, S-3, S-4,
+> S-6, S-9, S-12 (`../../adversarial-sol.md`; dispositions in `../../adversarial-triage.md`).
+> Mechanisms marked **[P#]** are Wave-0 proof gates (`../../plan.md`) — the design is not
+> considered verified until the proof passes.
 
 ## 1. The host entry — one option on `defineFreshApp`
 
 ```ts
-// app/main.ts (scaffold template, after)
-import { defineFreshApp } from '@netscript/fresh/server';
-import { frontendRegistry } from './.netscript/generated/frontend.registry.ts';
-
 export const app = defineFreshApp<State>({
   name: '{{appName}}',
-  frontend: frontendRegistry,   // ← the entire host-side integration
+  frontend: frontendRegistry,
 });
 ```
 
-`defineFreshApp` (`packages/fresh/src/runtime/server/define-fresh-app.ts`) already exposes
-`middleware[]` / `preConfigure` / `configure` seams; the `frontend` option is sugar that runs the
-mount sequence below inside `configure`. Apps that need control call the pieces directly from
-`@netscript/fresh/plugins`:
+**Composition-phase law (S-1).** Fresh compiles each route's middleware/layout chain at
+insertion time — later `use()` calls are not retroactive, and host fs layouts cannot wrap routes
+registered before them. `defineFreshApp` currently runs `configure()` *before* `fsRoutes`
+(`packages/fresh/src/runtime/server/define-fresh-app.ts:110-127`), so plugin mounting must NOT
+ride `configure`. The `frontend` option instead runs a dedicated **post-fsRoutes composition
+phase**: staticFiles → host middleware → host fs routes/layouts → **`mountPluginFrontends`**.
+Within each plugin sub-app the registration order is fixed: **middleware first, then routes**
+(plugin `_layout` is not supported in v1 — S-2). Contributed sub-apps may not carry `App`-level
+`notFound`/`onError`/`appWrapper` commands; the mount glue strips them and reports. The exact
+interleaving (host `_app` wrap, nested host layouts, host `config.basePath`, plugin middleware,
+plugin 404 behavior, two plugins mounted) is **[P1]** with integration fixtures — D6 stands only
+if P1 passes; the fallback mount mechanism is explicit `app.route()` registration of
+fully-prefixed paths without `mountApp`.
+
+## 2. Route mounting
 
 ```ts
-import { mountPluginFrontends, pluginApiProxy, pluginNavSections } from '@netscript/fresh/plugins';
+// inside mountPluginFrontends (sketch, per plugin)
+const sub = new App<State>();
+sub.use(pluginScopeMiddleware(identity));              // BEFORE routes — S-1
+for (const r of m.routes) sub.route(r.path, r.load);   // r.load: generated literal lazy loader
+app.mountApp(m.resolvedBase, sub);
 ```
 
-## 2. Route mounting — sub-app per plugin
-
-For each plugin with route contributions the glue builds an upstream sub-`App` and mounts it:
+**Route loaders are generated literals (S-2).** Upstream `App.route()` accepts
+`MaybeLazy<Route>` — an internal `{ component, handler, config, css }` shape, not a fs route
+module; only `fsRoutes` normalizes module namespaces. The registry therefore emits, per route:
 
 ```ts
-// inside mountPluginFrontends (sketch)
-for (const [pluginId, m] of registry.plugins) {
-  const sub = new App<State>();
-  if (m.layoutModule) sub.layout('*', lazy(m.specifierOf(m.layoutModule)));   // plugin _layout
-  for (const r of m.routes ?? []) sub.route(r.path, lazy(m.specifierOf(r.module)));
-  sub.use(pluginScopeMiddleware(pluginId));  // sets data-ns-plugin ctx + PluginHostState
-  app.mountApp(m.resolvedBase, sub);         // upstream App.mountApp (core src/app.ts:357)
-}
+() => import('@acme/plugin-crons/frontend/routes/calendar').then(normalizeFreshRouteModule)
 ```
 
-- **Base policy (locked, owner fork F2 records the alternative):** the plugin declares a
-  preferred `base` (default `/<pluginId>`); the **host** may remap per plugin in
-  `netscript.config` (`frontend: { basePaths: { crons: '/tools/crons' } }`); collisions are
-  generate-time errors. The dev-dashboard host auto-remaps everything under
-  `/plugins/<pluginId>/…` — same registry, different policy.
-- Plugin routes are lazy (`MaybeLazy<Route>` upstream) — code-splitting for free.
-- A plugin `_layout` wraps only that plugin's pages; the app's root layout still applies
-  (upstream layout nesting semantics).
+- literal specifier → real bundler edge (no computed `import()`);
+- `normalizeFreshRouteModule` (owned by `@netscript/fresh/plugins`, **[P2]**) maps
+  `default` / `handler`/`handlers` / `config` / `css` onto the pinned `Route` shape and throws a
+  structured error on unknown members.
 
-## 3. Islands — build-time registration, both build paths
+Base policy unchanged from rev 1 (plugin-preferred `base`, host remap, dashboard auto-remaps
+under `/plugins/<mountId>`), with collision rules hardened in `03 §3`.
 
-- **Vite (scaffold default):** `vite.config.ts` template passes the generated list —
-  `fresh({ islandSpecifiers: [...pluginIslandSpecifiers] })`
-  (`@fresh/plugin-vite@1.0.8 src/mod.ts:56-63,211-214`; scaffold template currently calls bare
-  `fresh()` — `packages/cli/src/kernel/assets/app/vite.config.ts.template:44`).
-- **Non-vite builder:** `withPluginIslands(builder, registry)` →
-  `builder.registerIsland(specifier)` (`@fresh/core@2.3.3 src/dev/builder.ts:157`).
+## 3. Islands — verified API, proof-gated behavior [P3]
 
-Because registration is by specifier, plugin code imports its islands like any component; SSR,
-hydration, and props serialization are stock Fresh behavior. **Boundary rule (documented, not
-new machinery):** island props must be serializable — the standard Fresh constraint.
+Registration is by module specifier on both build paths — `fresh({ islandSpecifiers })`
+(plugin-vite 1.0.8 `mod.ts:56-63,211-214`) and `Builder.registerIsland` (core
+`dev/builder.ts:157`). That much is verified. **Not yet verified (S-3):** clean-cache resolution
+(plugin-vite's Deno plugin runs `cachedOnly: true`), the Preact JSX transform's
+`node_modules`/npm-cache excludes vs JSR-served TSX, dependency CSS, HMR (the island watcher
+only watches local island dirs), published-JSR vs local-source parity, and `^1.0.8` range drift.
+[P3] runs the full matrix (clean env × {local-source, jsr} × {dev, prod build + SSR + hydrate} +
+single Preact identity + dependency CSS + edit-loop behavior) before the island contract is
+frozen; until then authors' islands are supported for local-source plugins and the JSR mode is
+gated on the proof. Known consequence either way: island edits in dependency mode may require a
+signaled full reload rather than HMR — `netscript plugin dev` (05) owns that signal.
 
-## 4. Data access — server direct, client via proxy
+## 4. Data access — a generated gateway, not a proxy (S-6)
 
-- **Server (route handlers, zone components):** typed clients from the plugin's own
-  `contracts/v1` against the plugin service URL, resolved from host runtime config / Aspire
-  service discovery via `ctx.host.serviceUrl('<service-name>')`. Services are an existing axis
-  (`ServiceContribution` — `packages/plugin/src/config/domain/service-contribution.ts`).
-- **Client (islands):** same typed clients pointed at a same-origin proxy:
-  `pluginApiProxy(registry)` middleware mounted at `/api/plugins/:pluginId/*`
-  (upstream `app.use(path, mw)`), forwarding to the plugin service base URL. Precedent: the AI
-  chat island already streams through an app-local proxy path
-  (`plugins/ai/.../chat-route.stub.ts` → `/api/ai/chat-stream`;
-  `packages/fresh/src/runtime/ai/stream-proxy.ts`). The proxy forwards session/auth headers
-  set by app middleware; `requires.procedures` is the audit surface for what flows (enforcement
-  = dashboard-run scope).
-- SSE/streaming passes through (the stream-proxy precedent covers eventIterator contracts).
+The rev-1 wildcard `/api/plugins/<id>/*` forwarding proxy is withdrawn — a header-forwarding
+generic proxy is a confused-deputy/request-smuggling surface, and the existing AI stream proxy
+(`packages/fresh/src/runtime/ai/stream-proxy.ts:55-211`) shows what a safe transport actually
+handles (server-side auth, constrained upstream, manual redirects, rebuilt header set, abort).
 
-## 5. Host state — `PluginHostState` (the SSR/hydration contract seam)
+Replacement: **`pluginGateway(registry)`** — a generated, deny-by-default route table:
 
-```ts
-// contracts/v1 (sketch) — what plugin server code may assume about the host
-export interface PluginHostState {
-  readonly plugin: string;                       // the mounted plugin id
-  readonly base: string;                         // resolvedBase, for building intra-plugin hrefs
-  readonly serviceUrl: (service: string) => string;
-  /** Session claims when the auth plugin is installed; null otherwise. Shape owned by plugin-auth-core. */
-  readonly session: SessionClaims | null;
-}
-```
+- One route per granted procedure, generated from `requires.procedures` × the plugin's own
+  versioned contract metadata (service owner, method, path template, request/response mode,
+  streaming policy). Nothing else is reachable — no wildcard forwarding, ever.
+- Server-side authentication/authorization via the host principal port; browser credentials are
+  never blind-forwarded; CSRF/origin checks; request/response size limits; timeouts; abort
+  propagation; `redirect: 'manual'`; response-header allowlist; structured audit log line per
+  invocation (mountId, procedure, subject).
+- Streaming: SSE/eventIterator procedures declare it in metadata; the gateway applies the
+  stream-proxy discipline. The AI durable-chat plane **stays on its specialized adapter** — the
+  gateway does not replace `@netscript/fresh/ai`.
+- Threat model + abort/reconnect semantics are **[P5]**, and the gateway is its own reviewed
+  implementation wave (`plan.md`).
 
-Populated by `pluginScopeMiddleware` from app state. Plugin pages must not reach past this seam
-into app-specific `State` — the seam is what keeps contributions portable across hosts (app,
-dashboard). `definePluginPage` types `ctx.host` so the constraint is ergonomic, not policed.
+Server-side plugin code doesn't need the gateway: route handlers/zone components call typed
+clients against `ctx.host.serviceUrl(...)` directly (unchanged).
 
-## 6. Zones — SSR injection with provenance
+## 5. Host context — the split seam (S-9)
 
-```tsx
-// app markup (scaffold templates place these; apps may add/remove freely)
-import { PluginZone } from '@netscript/fresh/plugins';
-<PluginZone id='app.dashboard.panels' />
-```
+`state.pluginHost: PluginRequestContext` (server-only: identity, base, serviceUrl, principal
+port, CSP nonce seam, abort signal) is injected by `pluginScopeMiddleware`;
+`PluginClientContext` (serializable: mountId, base, locale, direction, timeZone, subject
+summary, capabilities) is what may cross into islands. Shapes in `01-contracts.md`. Zone
+components receive both; pages read them from state via the `definePluginPage` helper — which
+lives in **`@netscript/fresh/plugins`** (S-5), typed over Fresh `PageProps` with the injected
+state; plain `define.page` + `props.state.pluginHost` is the sugar-free equivalent.
 
-`PluginZone` renders every `ZoneContribution` targeting that zone (deterministic order), each
-wrapped:
+## 6. Zones — SSR injection with honest containment (S-4)
 
-```html
-<div data-ns-plugin='crons' data-ns-contribution='crons/next-fires'> …component… </div>
-```
+`<PluginZone id>` renders zone contributions in deterministic order, each wrapped in
+`<div data-ns-plugin='<mountId>' data-ns-contribution='<mountId>/<id>'>`.
 
-- SSR-only by default; interactivity comes from islands the zone component imports.
-- A crashed zone component renders the quarantine card (fix CLI + provenance), never breaks the
-  page — the prior design's render-time rule applied at the component boundary
-  (Preact error boundary in `PluginZone`).
-- Zone occupancy is inspectable: dev-mode overlay listing zones + occupants is a dashboard-run
-  deliverable; the data (registry) already supports it.
+**Containment contract (downgraded from rev 1, which overclaimed):** Fresh renders with
+`preact-render-to-string` without its error-boundary mode, and async components run before the
+boundary exists — so a *render-time throw in SSR is not containable by a component boundary*.
+What the host actually guarantees:
 
-## 7. Nav — feeding the existing shell, typed
+1. **Data-phase containment**: zone data resolution runs host-side *before* render inside a
+   try/catch; a failed resolution renders the quarantine card. Zone components are told to keep
+   render pure — fetch in the resolver, not the component body.
+2. **Client containment**: hydrated islands sit under a client-side Preact boundary; post-
+   hydration crashes degrade to the quarantine card without killing the page.
+3. **Route-level `onError`**: a plugin route that throws fails that route, host-styled — never
+   the shell.
+4. An SSR render-time throw in a zone component **fails the page response** — documented, tested
+   ([P4] fixture), and the reason the resolver-not-render rule exists. If hard SSR zone isolation
+   is ever required, it is a designed isolated-render protocol (own wave), not a boundary claim.
 
-- `pluginNavSections(registry, { group })` → `readonly SidebarNavSection[]` — directly
-  spreadable into `SidebarShell.navigation`
-  (`packages/fresh-ui/registry/components/ui/sidebar-shell.tsx:24-36`) and the scaffolded topbar
-  (`_layout.tsx.template:33-74`), with `matchPrefix` set from the plugin base.
-- Typed hrefs everywhere: `routes.plugins.crons.calendar.href()` via the generated
-  `frontend.routes.ts` merged in `router.ts` — no string paths in app code.
+## 7. Nav — unchanged mechanics, validated data
 
-## 8. Theming & style isolation
+`pluginNavSections(registry, { group })` feeds `SidebarShell.navigation` / the topbar; targets
+are discriminated (`route`/`href`/`external` — S-10) with base-path composition and
+`rel="noopener noreferrer"` on external; labels are `MessageRef`s resolved through the host's
+message resolution (default text when no catalog). Typed route refs unchanged
+(`frontend.routes.ts`).
 
-- Plugin CSS is layered (`@layer ns-plugins`) below app CSS — apps always win specificity wars —
-  and scoped under `[data-ns-plugin='<id>']` (the wrapper from §6 and the plugin layout from §2).
-- Only `--ns-*` semantic vars (`packages/fresh-ui/tokens/semantic.tokens.json`,
-  `registry/theme/theme-bridge.css`): plugin UI inherits light/dark and any app theme override
-  with zero plugin-side work. `data-theme` switching (scaffold `_app.tsx` precedent) is free.
-- Tailwind utilities inside plugin modules: plugin files are NOT in the app's Tailwind content
-  scan; v1 rule is **plain CSS + tokens (+ inline `class` on fresh-ui runtime components)** for
-  plugin-served UI. (Extending the app's Tailwind `content` globs to plugin packages is a
-  possible phase-2 nicety — flagged, not promised.)
+## 8. Theming & style isolation (S-12)
 
-## 9. Isolation & failure containment (app surface = T0)
+- **Layer order is host-owned**: the generated CSS begins with a host prelude declaring
+  `@layer ns-app, ns-plugins;` (order, not names, decides priority) so plugin CSS loses to app
+  CSS by declaration, not by luck.
+- Scoping: `[data-ns-plugin='<mountId>']` wrappers (zones, plugin route trees). **Portals
+  escape wrappers**: the host provides a per-plugin portal root (`<div data-ns-plugin=…>` under
+  `document.body`) via the client context, and fresh-ui overlay primitives mount there;
+  arbitrary portals outside it are out of contract.
+- Copy-fallback caveat: copying dependency CSS into `.netscript/generated/` changes the base URL
+  for relative `url()` assets — the generator must rewrite `url()`s or inline; recorded as an
+  implementation requirement, with a full `AssetContribution` (hashing, cache headers)
+  registered as a debt candidate (06 §4), not silently equivalent bytes.
+- Tokens rule unchanged: `--ns-*` vocabulary only; light/dark/theme override inheritance for
+  free.
 
-- Installed plugins already run arbitrary server code — the app surface trusts them (research.md
-  §6.5). Containment here is about *blast radius of bugs*, not malice: lazy route mounting
-  (a broken page module fails on navigation, not boot), zone error boundaries, quarantined
-  contract drift, CSS layering.
-- The `requires` declaration + provenance wrappers are the audit surface the dashboard's T1/T2
-  tiers will later enforce (iframe + RPC bridge — dashboard run, [stable]).
+## 9. Isolation posture (unchanged) and 10. Non-goals (unchanged)
 
-## 10. What is explicitly NOT built
-
-No runtime registration API; no plugin-to-plugin frontend imports (composition happens through
-zones/nav, or through explicitly published packages); no client-side plugin router (Fresh
-partials/`f-client-nav` already cover SPA-feel navigation); no shadow-DOM/web-component wrapper
-(tokens + layers + scoping attributes suffice at T0).
+App surface = T0 trusted (installed plugins already run server code); the `requires` block +
+provenance wrappers are the audit surface; T1/T2 iframe tiers remain dashboard-run scope. No
+runtime registration API; no plugin-to-plugin imports outside published exports; no client-side
+plugin router; no shadow-DOM wrapper.

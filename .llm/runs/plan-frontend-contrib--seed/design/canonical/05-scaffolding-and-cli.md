@@ -11,8 +11,9 @@
 | `netscript plugin install <spec>` | unchanged UX; now also regenerates frontend emissions | existing post-install wiring (`install-plugin.ts:145-192`) |
 | `netscript generate plugins` | now also emits `frontend.*` | per-axis emitter (`registry-emitter.ts`) |
 | `netscript generate frontend-wiring` | idempotent adoption for EXISTING apps: vite `islandSpecifiers` feed, `router.ts` plugin-routes merge, `<PluginZone>` hints, css import | `ui:init` + `generate runtime-schemas` idempotency |
-| `netscript plugin new <name> --with frontend` | plugin-side skeleton (`frontend/` tree + manifest block + exports) | `generate-plugin-mod.ts` template |
-| `netscript generate frontend` (in plugin dir) | phase-2 convention generator: file tree → manifest lists + deno.json exports maintenance | `tokens:build` / assets-barrel generated-file idiom |
+| `netscript plugin new <name> --with frontend` | plugin-side skeleton (`frontend/` tree + manifest block + **seeded deno.json exports**) | `generate-plugin-mod.ts` template |
+| `netscript plugin dev` (in plugin dir) | **phase-1** (S-16): watches `frontend/`, maintains the export map, regenerates the host registry atomically, signals vite reload when island inputs change | `watch-run.ts` wake idiom |
+| `netscript generate frontend` (in plugin dir) | phase-2 convention generator: file tree → manifest contribution lists (export-map maintenance is already phase-1 via `plugin dev`) | `tokens:build` / assets-barrel generated-file idiom |
 | `netscript plugin resource add <plugin> <resource> --app <path>` | scaffolded-starter (copy-mode) resources into a chosen app | DDX-19 #432 one-generator-two-callers; `chatRouteScaffolder` |
 | `netscript plugin doctor` | + `frontend` check | `DoctorCheckSpec` seam |
 | `netscript ui *` | unchanged — fresh-ui copy-registry stays the app-owned component channel | `application/ui/registry.ts` |
@@ -73,10 +74,19 @@ my-app/
   netscript.config.*                      ← host overrides: basePaths, disabled contributions
 ```
 
-## 5. E2E surface (gate wiring, for the plan)
+## 5. Quality surface (gate wiring, for the plan — S-18)
 
-`scaffold.runtime` suite extension (design-time note, not run by this seed): install a
-frontend-contributing plugin → assert generated emissions exist and type-check → boot app →
-assert contributed route serves, nav entry present, zone renders, island hydrates (Playwright,
-SCOPE-frontend gates), uninstall → assert clean disappearance. This is the acceptance shape for
-phase 1 (`../plan.md` §Gates).
+Two layers, both specified in `../plan.md` §Gates:
+
+- **Per-plugin test kit** (`@netscript/plugin-frontend-core/testing`): a generated host fixture
+  that runs schema/resolution checks, island-props serialization round-trip, SSR render,
+  hydration, browser smoke (Playwright), a11y (axe + keyboard), base-path composition, and
+  local-source + JSR modes. A plugin frontend ships with this suite green — the analog of the
+  e2e axis plugins already declare.
+- **Budgets**: per-plugin production budgets recorded in the manifest and asserted by the kit —
+  initial JS bytes, async chunk count, CSS bytes, island count, zone SSR render deadline, data
+  resolver deadline. Exceptions are explicit host policy, not silent convention.
+- **`scaffold.runtime` extension** (merge-readiness only): install a frontend-contributing
+  plugin → generated set exists + type-checks → boot → contributed route serves, nav present,
+  zone renders, island hydrates → `plugin remove` → clean disappearance (empty emissions, no
+  dangling imports).

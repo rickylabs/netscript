@@ -1,102 +1,88 @@
-# Worked example — Auth UI (draft)
+# Worked example — Auth UI (draft, rev 2)
 
-> **Draft — design document only.** Demonstrates BOTH delivery models on one plugin.
+> **Draft — design document only.** Rev 2 integrates adversarial finding S-13: rev 1 designed an
+> org/member console against `auth.org.*` procedures that **do not exist** in the v1 auth
+> contract. The v1 example now uses only the real backend surface; org management is explicitly
+> a future capability with a named backend prerequisite.
 
 ## Today
 
-Mature backend, zero frontend: oRPC `signin/callback/signout/session/me`
-(`packages/plugin-auth-core/src/contracts/v1/auth.contract.ts:437-459`); better-auth adapter with
-`organization/admin` plugins (`packages/auth-better-auth/src/better-auth.ts:56,132-138`); workos
-(`organizationId`) and kv-oauth adapters. No `.tsx` in any auth package.
+Mature backend, zero frontend. The **complete** v1 auth contract is five procedures:
+`signin`, `callback`, `signout`, `session`, `me`
+(`packages/plugin-auth-core/src/contracts/v1/auth.contract.ts:410-459`). Session claims are a
+generic claims record (`:74-88`) — no typed `orgId`. Adapters: better-auth (org/admin as
+*backend* better-auth plugins — no NetScript contract surface yet), workos, kv-oauth. No `.tsx`
+anywhere.
 
-## Contribution declaration
+## Contribution declaration (v1 — real surface only)
 
 ```ts
 // plugins/auth/frontend/mod.ts
 import { defineFrontend } from '@netscript/plugin-frontend-core';
 
 export default defineFrontend({
-  contract: 'v1',
-  plugin: 'auth',
+  contract: { family: 'app', major: 1 },
+  pluginKind: 'auth',
   base: '/auth',
   routes: [
-    // LIVE: the plugin owns account/org management — ships and evolves with the package.
+    // LIVE: the signed-in account page — session + profile + sign-out. Driven entirely by
+    // session/me/signout.
     { kind: 'route', id: 'account', path: '/account', module: './routes/account.tsx' },
-    {
-      kind: 'route',
-      id: 'org',
-      path: '/org',
-      module: './routes/org.tsx',
-      nav: { label: 'Organization', icon: 'users', group: 'main' },
-    },
-    { kind: 'route', id: 'org-members', path: '/org/members', module: './routes/org/members.tsx' },
   ],
-  islands: [
-    { kind: 'island', id: 'session-menu', module: './islands/SessionMenu.tsx' },
-    { kind: 'island', id: 'member-table', module: './islands/MemberTable.tsx' },
-  ],
+  islands: [{ kind: 'island', id: 'session-menu', module: './islands/SessionMenu.tsx' }],
   zones: [
-    // Session widget appears in the app topbar the moment auth is installed.
+    // Session widget in the app topbar the moment auth is installed: SSRs signed-in/out state
+    // from the principal port; SessionMenu island provides the dropdown + sign-out action.
     { kind: 'zone', id: 'session', zone: 'app.topbar.end', module: './components/SessionWidget.tsx' },
   ],
-  requires: { procedures: ['auth.session', 'auth.me', 'auth.signout', 'auth.org.*'] },
+  requires: { procedures: ['auth.session', 'auth.me', 'auth.signout'] },
 });
 ```
 
-```ts
-// plugins/auth/src/public/mod.ts — one added builder call
-.withFrontend({ export: './frontend', framework: 'fresh', contract: 'v1' })
-```
+## The sign-in page is a SCAFFOLDED STARTER (unchanged from rev 1)
 
-## The sign-in page is a SCAFFOLDED STARTER, not a live route
-
-Sign-in is the page every product restyles — brand, copy, layout. Serving it live would fight the
-user; so auth ships it as a starter resource through the existing scaffolder engine
+Sign-in is the page every product restyles; auth ships it as a starter resource
 (`05-scaffolding-and-cli.md §3`):
 
 ```
 netscript plugin resource add auth signin --app .
-  → routes/auth/signin.tsx        (app-owned from now on; posts to the auth contract)
-  → routes/auth/callback.tsx      (provider redirect landing — kv-oauth handleCallback / better-auth)
+  → routes/auth/signin.tsx     (app-owned; drives signin → provider redirect)
+  → routes/auth/callback.tsx   (redirect landing → callback procedure)
 ```
 
-The generated `signin.tsx` is ordinary app code: fresh-ui-token styling, typed
-`createAuthClient(...)` calls against `signin`/`callback` — the user edits it freely; `plugin
-update` reports drift, never overwrites (`ui registry` posture).
+Both generated files call only the real contract (`signin`/`callback`); styling is app tokens;
+`plugin update` reports drift, never overwrites. **Starter scope law (S-13):** starters compose
+existing backend procedures — a starter never fabricates backend functionality.
 
-**Rule of thumb applied:** user-owned surface (sign-in) → scaffolded; plugin-owned surface
-(org/member console, session widget) → live.
-
-## What a page looks like (live org console)
+## What a live page looks like (account, v1)
 
 ```tsx
-// plugins/auth/frontend/routes/org/members.tsx
-import { definePluginPage } from '@netscript/plugin-frontend-core';
+// plugins/auth/frontend/routes/account.tsx
+import { definePluginPage } from '@netscript/fresh/plugins';
 import { createAuthClient } from '@netscript/plugin-auth/contracts/v1';
-import { MemberTable } from '../../islands/MemberTable.tsx';
 
 export default definePluginPage(async (ctx) => {
-  if (!ctx.host.session) return ctx.redirect('/auth/signin');   // starter page, if scaffolded
+  if (!ctx.host.principal) return ctx.redirect('/auth/signin');
   const client = createAuthClient(ctx.host.serviceUrl('auth-api'));
-  const members = await client.org.members({ org: ctx.host.session.orgId });
-  return <MemberTable initial={members} />;   // island refreshes via pluginApi('auth') proxy
+  const me = await client.me();
+  return ( /* profile card + session facts + <SessionMenu client={ctx.client}/> */ );
 });
 ```
 
-`SessionWidget` (zone component) SSRs the signed-in state from `ctx.host.session` (populated by
-the auth middleware the plugin's service wiring already provides) and imports `SessionMenu`
-island for the dropdown/sign-out action.
+## Org/member management — future capability, named prerequisite
 
-## What appears in the app after `netscript plugin install @netscript/plugin-auth`
+The org console rev 1 sketched requires backend surface that must ship first: an
+**`auth-org` capability** — versioned procedures (org get/list, members list/invite/remove,
+role set) defined in `plugin-auth-core/contracts` and implemented per adapter (better-auth
+`organization` plugin; workos organizations; kv-oauth: not supported → capability absent). Once
+that contract exists, the frontend story is the one rev 1 showed: live routes `/auth/org`,
+`/auth/org/members`, a `MemberTable` island, nav entry, **capability-degraded per adapter** via
+`ctx.client.capabilities` — one frontend across all adapters, no sniffing. The frontend
+contribution layer needs nothing new for it; it waits only on the backend contract. (This
+sequencing is recorded as consumer-roadmap input, not part of the v1 dogfood.)
 
-- `/auth/org`, `/auth/org/members`, `/auth/account` serve (typed refs:
-  `routes.plugins.auth.org.href()`).
-- "Organization" appears in the topbar nav; the session widget appears at `app.topbar.end`.
-- Nothing app-owned changed. Sign-in appears only when the user opts into the starter.
+## After `netscript plugin install @netscript/plugin-auth`
 
-## Adapter note
-
-Org/member management renders capability-degraded per backend: better-auth `organization` plugin
-and workos organizations expose management procedures; kv-oauth has none → the org routes render
-the empty-capability state (procedure presence is discoverable through the auth contract, not
-sniffed in UI code). This keeps one frontend across all three adapters — harmonized-ports law.
+`/auth/account` serves; the session widget appears at `app.topbar.end`; typed ref
+`routes.plugins.auth.account.href()`. Sign-in appears when the user opts into the starter.
+Nothing app-owned changed.

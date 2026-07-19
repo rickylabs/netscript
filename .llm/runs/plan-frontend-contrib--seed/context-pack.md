@@ -10,7 +10,17 @@ plugin. Drafts only: no PRs/issues, no product code. Custom pipeline: this gener
 GPT-5.6 Sol high adversarial pass → generator integrates → Kimi K3 public docs/API pass. All
 downstream stages are supervisor-dispatched.
 
-## State: GENERATOR STAGE COMPLETE
+## State: STAGE 2 (ADVERSARIAL) INTEGRATED — awaiting Kimi K3 docs pass
+
+Sol high review (thread `019f7883-ccf0-7820-aa36-3bd90b82ac05`) produced 20 findings
+(`adversarial-sol.md`); all accepted and integrated as **rev 2** of plan + canonical docs +
+examples (`adversarial-triage.md` has per-finding dispositions). Headline rev-2 changes:
+envelope+family versioning (no widened unions), identity quartet, request/client context split,
+HostSurfaceDescriptor, literal route loaders + post-fsRoutes composition, islands proof-gated
+[P3], honest SSR containment, deny-by-default procedure gateway (no wildcard proxy), Wave-0
+five-proof phasing, forks re-triaged (F9 new). Examples now compose only real backend surfaces.
+
+## Original generator state (stage 1)
 
 All deliverables written and committed on `plan/frontend-contrib`:
 

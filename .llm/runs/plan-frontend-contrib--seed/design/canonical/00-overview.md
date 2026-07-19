@@ -1,8 +1,10 @@
 # Frontend Contribution Layer — Overview (canonical design, v1 draft)
 
 > **Draft — design document only. No GitHub mutations, no product code.** Produced by
-> `plan-frontend-contrib--seed`; pending adversarial (GPT-5.6 Sol) and docs (Kimi K3) passes and
-> owner ratification.
+> `plan-frontend-contrib--seed`. Rev 2: the GPT-5.6 Sol adversarial pass is integrated (20/20
+> findings accepted — `../../adversarial-sol.md`, dispositions in `../../adversarial-triage.md`);
+> pending the Kimi K3 docs pass and owner ratification. Mechanisms marked [P1]–[P5] in the docs
+> are Wave-0 proof gates (`../../plan.md`) — verified-API-unproven-behavior is stated as such.
 
 ## The one-paragraph story
 
@@ -54,11 +56,12 @@ that Fresh, the plugin SDK, or the fresh-ui token system doesn't already provide
      (`plugins/ai/src/adapter/resources/chat-route/chat-route.ts:33`). For surfaces the user is
      *expected to customize* (a sign-in page, a cloud-optimized starter route).
    The rule of thumb: **if the user will edit it, scaffold it; if the plugin owns it, serve it.**
-6. **One base family, many hosts.** The user app and the dev dashboard are both hosts. The base
-   contract family (routes, islands, zones, nav, theme) is host-agnostic; the dashboard's richer
-   kinds (entity tabs, ⌘K actions, AI tools, home cards) are a *family extension* owned by the
-   future `plugin-dashboard-core`, not a sibling vocabulary. This generalizes — rather than
-   duplicates — the ratified dashboard architecture.
+6. **One envelope, many families, many hosts.** The user app and the dev dashboard are both
+   hosts. The `app` family (routes, islands, zones, nav, theme) and the dashboard's richer
+   family (entity tabs, ⌘K actions, AI tools, home cards — future `plugin-dashboard-core`) are
+   **sibling payload families on one shared envelope**, sharing discovery, identity, and
+   host-surface negotiation (rev 2, S-7: a widened union is not additively evolvable). This
+   generalizes — rather than duplicates — the ratified dashboard architecture.
 7. **Thinness preserved, axis first-class.** `@netscript/plugin` gains only a *pointer*
    (`frontend: { export, framework, contract }`) — the same shape as `scaffolder.export` in the
    installer manifest. The typed vocabulary lives in `plugin-frontend-core`. This resolves
