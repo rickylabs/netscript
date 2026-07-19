@@ -172,3 +172,14 @@ desired; owner ratification of OF-1…OF-8; then the owner-extended terminal del
 this branch + filed epic/sub-issues in Backlog/Triage + supersession closes).
 
 STAGE-COMPLETE: doc-story-integration
+
+## 2026-07-19 — Lane deliverable: RFC draft PR
+
+- Owner directive (in-turn, /remote-control): open the DRAFT RFC PR now; board filing stays a
+  later supervisor-coordinated step (drift D-6).
+- `rfc.md` committed (`9ceb4a94`) — #822-format consolidation of the r3 corpus.
+- **Draft PR #891 OPEN**: https://github.com/rickylabs/netscript/pull/891 —
+  `plan/deploy-plugin` → `main`, body = the RFC (Refs #820 #327 #823 #824 #825 #871, no closing
+  keywords); labels `rfc` `type:docs` `status:plan` `priority:p1` `area:deploy` `area:plugins`
+  `ci:skip-e2e` `ci:skip-scaffold`; milestone `Backlog / Triage`. Board numbers remain
+  DPB-placeholders; no epic/sub-issues filed; nothing merged.
