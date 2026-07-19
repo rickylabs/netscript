@@ -33,7 +33,18 @@ carry `schemaVersion`, adapter + upstream tool versions, probe date, and evidenc
   `azure-app-service`, `azure-aks`: plan/up/down (+status where `aspire` reports it). AppHost
   platform-marker validation preserved. `rollback`: convention-backed for compose (previous
   emitted dir + dir-swap); platform-native where Azure provides it — else absent from
-  `operations`.
+  `operations`. (r4, DP-9) **Delegation deepened:** `down` prefers **`aspire destroy`** (the
+  pipeline teardown command); `plan` surfaces `aspire deploy --list-steps` as its pipeline-step
+  section; per-env provisioning state delegates to Aspire's deployment state cache
+  (`~/.aspire/deployments/{AppHostSha}/{env}.json`, `--clear-cache` surfaced, plaintext-secret
+  CI caution kept); `secrets` rides the `Parameters__*` convention. Binding is **CLI +
+  application-level pipeline steps only** (the callback-annotation surface is mid-migration
+  upstream and C#-only — DP-9 §4).
+- **Radius watch (r4, DP-9 §3):** once microsoft/aspire#18759 (TS AppHost projection of the
+  merged #18696 `Aspire.Hosting.Radius`) ships in the pinned CLI, **`radius` joins this card as
+  a target key** — same `publish`(→`app.bicep`)/`deploy`(→`rad deploy`) verbs, control-plane
+  credentials (no cloud secrets in CI), capability rows from the environment's bound Recipes
+  (binding scope). Tracked in DPB-29; not claimed for v1.
 - **Manifest sketch (per variant: `compose`, `docker`, `kubernetes`, `azure-*`):**
   `process: long-lived`; sagas `supported` (long-lived containers). (r2, SF-7) Queue and
   exclusive-writer semantics are **`scope: 'binding'` verdicts composed from installed leaf

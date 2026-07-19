@@ -314,6 +314,43 @@ sugar (no story depends on it); deploy dashboard service; secrets rotation overl
 
 ---
 
+## Addendum A — Aspire pipeline composition (owner review pass, 2026-07-19; corpus r4)
+
+Per the PR review comment, every deployment-pipeline seam was re-examined against Aspire's
+shipped deployment stack (docs read on the TypeScript tab) — full analysis in
+`design/canonical/DP-9-aspire-composition.md`. The family architecture is unchanged; the
+Aspire-lane realization deepens its delegation:
+
+**Delegate (Aspire-managed targets):** `emit` mechanics → `aspire publish --output-path`;
+`up`/`down` → `aspire deploy`/`aspire destroy`; `plan`'s pipeline-step section →
+`aspire deploy --list-steps` (built-in no-execution dry-run); environment *selection* →
+`--environment` (+ default aligned to Aspire's `production`); per-env provisioning state →
+Aspire's deployment state cache (`--clear-cache` surfaced; plaintext-secret CI caution kept);
+`secrets` injection → the `addParameter({secret:true})` + `Parameters__*` convention.
+
+**Keep (Aspire lacks it, or it's C#-only today):** the capability/topology verdict; the
+`artifact-manifest.json` + `up --prebuilt` contract (Aspire states verbatim that
+"`aspire deploy` does not consume previously published assets" — our manifest formalizes the
+hand-off its CI example leaves to upload-artifact conventions); deploy-time
+`status`/`logs`/`rollback`; the **environments overlay file** (`appsettings.{env}.json` is
+C#-only — a documented TS gap we fill, not duplication); **workflow generation** (Aspire ships
+an example, not a generator — ours adopts its documented `aspire do push` → `aspire publish` →
+upload-artifact shape); and the **Deno OCI path** (`IResourceContainerImageBuilder` is C#-only
+and no generic-executable publish helper exists — `deploy-container` fills a real gap, with
+`aspire do build|push` named as the convergence backend).
+
+**New integration point:** the TS-available `builder.pipeline.addStep(...)` lets the generated
+NetScript AppHost register a `netscript-capability-check` step `requiredBy: ["deploy"]` — the
+capability compiler then gates even a raw `aspire deploy`. Binding is CLI + application-level
+pipeline steps only: the callback-annotation surface is mid-migration upstream (13.0 pipeline
+system) and C#-only; resource-level needs would route via the #825 NuGet vehicle (not v1).
+
+**Radius:** microsoft/aspire#18696 (merged — Radius as a first-class compute environment:
+`publish`→`app.bicep`, `deploy`→`rad deploy`, control-plane credentials) + #18759 (open — the
+full TypeScript AppHost projection) are tracked as a future **`radius` target key on
+`deploy-aspire`** — not a new adapter package — gated on #18759 shipping in the pinned CLI
+(DPB-29 scope; DP-9 §3).
+
 <sub>**Provenance.** This PR lands the full planning record under
 `.llm/runs/plan-deploy-plugin--seed/`: six-surface research corpus (`research/`), canonical
 design docs `DP-0…DP-8` (r3), `plan.md` (locked decisions LD-1…12, the 29-child board table,

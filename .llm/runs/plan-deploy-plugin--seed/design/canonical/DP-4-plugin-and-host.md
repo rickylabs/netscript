@@ -143,7 +143,11 @@ dependencies.
 - **Scaffolder**: emits the userland `deploy/` leaf — `deploy/targets.ts` (typed target + cell
   definitions the user owns and edits — the named inversion of auth's never-rewritten barrel)
   plus per-target assets on `target add` (wrangler.jsonc, fly.toml, workflows…;
-  scaffold-stories doc). Golden tests per emitter (R-PLUGIN-PARITY).
+  scaffold-stories doc). Golden tests per emitter (R-PLUGIN-PARITY). (r4, DP-9 §2) On
+  Aspire-managed projects the generated AppHost helpers register a
+  **`netscript-capability-check` pipeline step** (`builder.pipeline.addStep(...,
+  { requiredBy: ['deploy'] })` — TS-available) so the capability compiler also gates a raw
+  `aspire deploy` invoked without the NetScript CLI.
 - **Doctor** (`deploy-target` check, contributed as data — §5): validates each configured
   target: adapter peer installed, descriptor loader resolves, required tool on PATH
   (`wrangler`, `aspire`, `docker`…), credentials env present (names only, never values), config

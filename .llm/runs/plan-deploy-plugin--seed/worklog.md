@@ -183,3 +183,27 @@ STAGE-COMPLETE: doc-story-integration
   keywords); labels `rfc` `type:docs` `status:plan` `priority:p1` `area:deploy` `area:plugins`
   `ci:skip-e2e` `ci:skip-scaffold`; milestone `Backlog / Triage`. Board numbers remain
   DPB-placeholders; no epic/sub-issues filed; nothing merged.
+
+## 2026-07-19 — Owner review pass: Aspire pipeline composition (r4)
+
+- Owner review (via /remote-control + screenshot) transcribed as the structured PR #891 comment
+  (https://github.com/rickylabs/netscript/pull/891#issuecomment-5014908464): architecture stands;
+  one pass on the deployment-pipeline layer vs Aspire's shipped stack; Aspire-first doctrine
+  (non-Aspire fallback deferred); track Radius (microsoft/aspire#18696 merged, #18759 open).
+- Research: Opus agent harvested aspire.dev deployment docs (TypeScript tab — Deploy with
+  Aspire, Environments, Pipeline model + custom pipelines, Deployment state caching, CI/CD
+  lifecycle, JavaScript apps) + docs.radapp.io. Load-bearing facts: `aspire deploy` does NOT
+  consume published assets; 13.0 replaced callback annotations with the pipeline system (docs
+  internally inconsistent); TS gets application-level `builder.pipeline.addStep` only;
+  `appsettings.{env}.json` overlays are C#-only; state cache = prompted-values memory keyed
+  AppHostSha×env; no Deno/generic-executable publish helper; CI example = `aspire do push` +
+  `aspire publish` + upload-artifact with an external applier.
+- **DP-9-aspire-composition.md** (r4) written: per-seam keep-or-delegate table; the
+  `netscript-capability-check` pipeline-step integration; Radius position (`radius` target key
+  on deploy-aspire, gated on #18759); honest constraints (CLI-only binding, doc inconsistency,
+  plaintext-secret cache caution, production default alignment).
+- Amendments: DP-2 §6 (--env→--environment pass-through, secrets Parameters__ convention,
+  plan --list-steps, aspire destroy); DP-3 §1 (delegation deepened + Radius watch); DP-4 §4
+  (capability-check pipeline step in scaffolded AppHost); DP-5 (aspire row extended); plan.md
+  (DPB-8/DPB-29 scope, new pipeline-churn risk row); rfc.md Addendum A. Family architecture,
+  ports, and board shape unchanged.

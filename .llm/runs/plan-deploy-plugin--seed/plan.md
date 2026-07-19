@@ -94,7 +94,7 @@ semantics land inside DPB-16/DPB-17's bodies.
 | DPB-5 | Capability + topology contracts (`CapabilityRef`/verdicts/variants; `DeploymentCell`/`suggestedCells`) + rejection compiler + conformance harness | W1 | **p0** | core contract, backend-truthful | DPB-1 |
 | DPB-6 | Two-phase config loader + base schema re-home + frozen legacy union | W1 | **p0** | config bootstrap contract (unknown target ⇒ error) | DPB-1 |
 | DPB-7 | Extract `deploy-baremetal` (build behavior, Servy/systemd, `BaremetalCompatibilityCommands`, systemd live probe) | W2 | p1 | adapter over core port + compat handlers | DPB-2, DPB-3 |
-| DPB-8 | Extract `deploy-aspire` | W2 | p1 | adapter delegating to aspire CLI | DPB-2, DPB-3 |
+| DPB-8 | Extract `deploy-aspire` (r4: + `aspire destroy` for down, `--list-steps` in plan, state-cache delegation + `--clear-cache`, `Parameters__*` secrets convention, `netscript-capability-check` pipeline step; Radius watch per DP-9) | W2 | p1 | adapter delegating to the aspire CLI + TS pipeline steps | DPB-2, DPB-3 |
 | DPB-9 | Extract `deploy-deno` (+ honest manifest rows; transitive-scan follow-up) | W2 | p1 | adapter wrapping `deno deploy` | DPB-3, DPB-5 |
 | DPB-10 | Adapter-side config member schemas over the schema registry (config debt retirement) | W2 | p1 | config re-home | DPB-6, DPB-7–DPB-9 |
 | DPB-11 | Legacy/config compatibility gate: state-transition + help goldens + unknown-target error paths | W2 | p1 | first-class compat verification (SF-9/SF-10) | DPB-7, DPB-6 |
@@ -115,7 +115,7 @@ semantics land inside DPB-16/DPB-17's bodies.
 | DPB-26 | AWS-PROBE-HTTP (live LWA conformance) | W5 | p1 | probe card, findings-only | DPB-20 |
 | DPB-27 | `deploy-aws` (lambda variant, HTTP scope) + Story 2 | W5 | p1 | probe-gated adapter, HTTP-only | DPB-26 |
 | DPB-28 | Docs: target-matrix reference + per-target how-tos replace the alpha-minimal page | W3–W5 | p1 | docs consolidation (wave exits carry interim refreshes) | rolling |
-| DPB-29 | Deferred RFC: AWS-PROBE-EVENTS + leaf backing catalog graduation | backlog | p2 | RFC-first, leaf co-owned | DPB-27 |
+| DPB-29 | Deferred RFC: AWS-PROBE-EVENTS + leaf backing catalog graduation + **Radius target graduation** (`radius` key on `deploy-aspire`, gated on microsoft/aspire#18759 shipping in the pinned CLI — DP-9 §3) | backlog | p2 | RFC-first, leaf/upstream co-owned | DPB-27 |
 
 (Each future body: `Part of #EPIC` → scoping paragraph with anti-scope boundary →
 `- [ ] gate:` acceptance → `Dependencies:` + `Delivery shape:` — per board-parity conventions.)
@@ -129,6 +129,7 @@ semantics land inside DPB-16/DPB-17's bodies.
 | Host-axis creep (`cli-command` opens a contribution firehose) | med | Closed collision rules; one axis, typed registry; doctrine 11 promotion test governs future axes |
 | Probe failures strand W5 adapters | med | Probes are findings-first cards; adapters ship only behind passing probes (L-7); W1–W4 value is independent of W5 |
 | Provider surface drift (wrangler/Vercel/Deno Deploy move fast) | med | Wrap at CLI process boundaries; compatibility dates pinned in emitted configs; manifest notes carry dates; conformance suite re-run per upgrade |
+| Aspire pipeline-surface churn (13.0 callback→pipeline migration mid-flight; docs internally inconsistent) | med | (r4, DP-9 §4) Bind ONLY to the language-agnostic CLI (`publish/deploy/destroy/do`, `--list-steps`, `--environment`, `--clear-cache`) + the TS-available `builder.pipeline.addStep`; never the callback annotations or C#-only surfaces; resource-level needs route via the #825 NuGet vehicle if ever required |
 | Live-probe CI cost/credentials | med | Probe lanes are manually-triggered/secret-gated workflows, not default CI; in-memory suite covers default CI |
 | JSR surface growth (6+ new packages) | med | OF-2 subpath folding; F-5 export budgets; publish dry-run + jsr-audit per package before any release wave |
 | Leaf-backing dependency (catalog rows need leaf adapters that don't exist) | med | Catalog rows degrade to `external` honestly (DP-7 §2); leaf cards tracked separately (DPB-29) |

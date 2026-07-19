@@ -227,7 +227,13 @@ interpreted by deploy — with requirements now expressed as `BindingRequirement
   supplies entries (as resolved `DeployTargetContribution` descriptors, DP-4 §3). Multi-target
   by design, keyed `<targetKey>[@<environment>]` — (r3, KF-8) invoked as
   **`netscript deploy <target> <op> --env <name>`** (the flag maps to the qualified registry
-  key; the config `environments` overlay supplies the values).
+  key; the config `environments` overlay supplies the values). (r4, DP-9) On Aspire-managed
+  targets `--env` **passes through as `aspire --environment <name>`** (case-insensitive; deploy/
+  publish default aligned to Aspire's `production`); per-env provisioning state delegates to
+  Aspire's deployment state cache; the overlay file remains ours (`appsettings.{env}.json` is
+  C#-only — a documented TS gap, not duplication). Aspire-lane ops compose further per DP-9 §2:
+  `plan` surfaces `aspire deploy --list-steps`; `secrets` adopts the
+  `addParameter({secret:true})` + `Parameters__*` convention; `down` = `aspire destroy`.
 - **Config — two-phase loader** (**NEW**, SF-10). Today the full config parses `deploy` through
   a static schema *before* the plugin list is even available, and unknown target keys are
   silently stripped — so "adapters contribute schemas at load time" needs a real bootstrap
