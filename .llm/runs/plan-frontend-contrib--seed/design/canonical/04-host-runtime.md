@@ -100,8 +100,13 @@ port, CSP nonce seam, abort signal) is injected by `pluginScopeMiddleware`;
 `PluginClientContext` (serializable: mountId, base, locale, direction, timeZone, subject
 summary, capabilities) is what may cross into islands. Shapes in `01-contracts.md`. Zone
 components receive both; pages read them from state via the `definePluginPage` helper — which
-lives in **`@netscript/fresh/plugins`** (S-5), typed over Fresh `PageProps` with the injected
-state; plain `define.page` + `props.state.pluginHost` is the sugar-free equivalent.
+lives in **`@netscript/fresh/plugins`** (S-5), typed as **`PluginPageContext`** over Fresh
+`PageProps`: `ctx.host`, `ctx.client`, and a `redirect(path): Response` helper (K-4, K-15);
+plain `define.page` + `props.state.pluginHost` is the sugar-free equivalent.
+**`pluginApi` signature (pinned — K-2):** `pluginApi(client: PluginClientContext): string` —
+returns the plugin's gateway base (`/api/plugins/<mountId>`, the `GATEWAY_PREFIX` contract
+constant, K-13); islands hold the client context anyway, and a raw-id overload would invite
+hand-typed strings.
 
 ## 6. Zones — SSR injection with honest containment (S-4)
 

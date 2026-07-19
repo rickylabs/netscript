@@ -78,11 +78,12 @@ my-app/
 
 Two layers, both specified in `../plan.md` §Gates:
 
-- **Per-plugin test kit** (`@netscript/plugin-frontend-core/testing`): a generated host fixture
-  that runs schema/resolution checks, island-props serialization round-trip, SSR render,
-  hydration, browser smoke (Playwright), a11y (axe + keyboard), base-path composition, and
-  local-source + JSR modes. A plugin frontend ships with this suite green — the analog of the
-  e2e axis plugins already declare.
+- **Per-plugin test kit** (`@netscript/plugin-frontend-core/testing`, entrypoint
+  **`defineFrontendTestSuite(manifest, options)`** — K-9; `plugin new --with frontend` seeds a
+  `frontend_test.ts` calling it): a generated host fixture that runs schema/resolution checks,
+  island-props serialization round-trip, SSR render, hydration, browser smoke (Playwright),
+  a11y (axe + keyboard), base-path composition, and local-source + JSR modes. A plugin frontend
+  ships with this suite green — the analog of the e2e axis plugins already declare.
 - **Budgets**: per-plugin production budgets recorded in the manifest and asserted by the kit —
   initial JS bytes, async chunk count, CSS bytes, island count, zone SSR render deadline, data
   resolver deadline. Exceptions are explicit host policy, not silent convention.

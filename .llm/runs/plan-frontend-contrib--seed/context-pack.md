@@ -10,7 +10,17 @@ plugin. Drafts only: no PRs/issues, no product code. Custom pipeline: this gener
 GPT-5.6 Sol high adversarial pass → generator integrates → Kimi K3 public docs/API pass. All
 downstream stages are supervisor-dispatched.
 
-## State: STAGE 2 (ADVERSARIAL) INTEGRATED — awaiting Kimi K3 docs pass
+## State: PIPELINE COMPLETE (rev 3) — awaiting owner review
+
+All three kickoff stages done: generator → Sol high adversarial (20/20 findings integrated,
+rev 2) → Kimi K3 docs story (`design/docs-story/`, 17/17 K-notes integrated, rev 3:
+FrontendDefinition, MessageRef shorthand, contract default, ModuleRef, PluginPageContext +
+redirect, pinned pluginApi/GATEWAY_PREFIX, budgets + defineFrontendTestSuite, pointer
+de-duplication, doctor taxonomy). Triage records: `adversarial-triage.md`,
+`docs-story-triage.md`. Next: owner reviews plan.md forks (F1/F2/F3/F5/F7/F8/F9); board filing
+is a separate owner-gated step (nothing filed by this run).
+
+## Stage 2 state (superseded)
 
 Sol high review (thread `019f7883-ccf0-7820-aa36-3bd90b82ac05`) produced 20 findings
 (`adversarial-sol.md`); all accepted and integrated as **rev 2** of plan + canonical docs +

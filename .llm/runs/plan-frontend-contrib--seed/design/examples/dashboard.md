@@ -20,8 +20,8 @@ host needed:
 ```ts
 // plugins/workers/frontend/mod.ts
 export default defineFrontend({
-  contract: 'v1',
-  plugin: 'workers',
+  // contract defaults to { family: 'app', major: 1 }
+  pluginKind: 'workers',
   base: '/workers',
   routes: [{
     kind: 'route', id: 'console', path: '/', module: './routes/console.tsx',
@@ -42,12 +42,12 @@ import type { ZoneProps } from '@netscript/plugin-frontend-core/contracts/v1';
 import { createWorkersClient } from '@netscript/plugin-workers-core/contracts/v1';
 import { QueueLive } from '../islands/QueueLive.tsx';
 
-export default async function QueueHealthPanel({ host }: ZoneProps) {
+export default async function QueueHealthPanel({ host, client }: ZoneProps) {
   const stats = await createWorkersClient(host.serviceUrl('workers-api')).jobs.stats();
   return (
     <article class='nsw-panel'>{/* --ns-* styled card */}
       <h3>Job queues</h3>
-      <QueueLive initial={stats} />          {/* hydrates; polls via pluginApi('workers') */}
+      <QueueLive initial={stats} client={client} />  {/* hydrates; polls via pluginApi(client) — K-2 */}
       <a href={`${host.base}/`}>Open workers console →</a>
     </article>
   );

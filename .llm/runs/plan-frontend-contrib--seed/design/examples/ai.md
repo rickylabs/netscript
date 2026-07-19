@@ -30,8 +30,8 @@
 import { defineFrontend } from '@netscript/plugin-frontend-core';
 
 export default defineFrontend({
-  contract: 'v1',
-  plugin: 'ai',
+  // contract defaults to { family: 'app', major: 1 }
+  pluginKind: 'ai',
   base: '/ai',
   routes: [
     // LIVE: a ready-to-use chat console — durable sessions, model picker, tool calls.

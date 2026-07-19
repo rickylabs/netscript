@@ -70,6 +70,7 @@ Deterministic order everywhere (plugins by mountId, contributions by (`order`, m
 | duplicate contribution id within (plugin, family) | error |
 | `(family, major)` outside the host's declared window | **quarantine** entry (fix-CLI render state), never a host crash |
 | module ref absent from the package export map | error + `plugin dev`/`generate frontend` hint |
+| route `path` params ≠ module filename params (`:id` vs `[id].tsx` — K-11) | error naming both syntaxes |
 
 ## 4. Install / update / remove lifecycle (S-11)
 
@@ -88,7 +89,10 @@ Deterministic order everywhere (plugins by mountId, contributions by (`order`, m
 - **`netscript plugin doctor`** — `frontend` check: envelope/window handshake, zone validity vs
   the host descriptor, export-map presence, **orphan/stale generated-output detection** (a
   registry entry with no installed plugin, a css import with no file, a starter whose plugin is
-  gone).
+  gone). The doctor prints the **five-state diagnosis taxonomy verbatim** (unknown zone /
+  known-but-unmounted / capacity-rejected / window-mismatch quarantine / load-failure
+  quarantine), and every quarantine render card deep-links the doctor command — the taxonomy is
+  product surface, not internal vocabulary (K-17).
 - Generation is idempotent (byte-identical skip) and **transactional**: stage → check → swap or
   rollback; a failed generation leaves the previous set untouched.
 

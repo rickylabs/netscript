@@ -95,8 +95,8 @@ app/.netscript/generated/
 
             │  consumed by
             ▼
-app/main.ts        defineFreshApp({ name, frontend: fromGenerated(registry) })   ← mounts sub-apps,
-                                                                                   nav, zones, proxy
+app/main.ts        defineFreshApp({ name, frontend: frontendRegistry })          ← mounts sub-apps,
+                                                                                   nav, zones, gateway
 app/vite.config.ts fresh({ islandSpecifiers: pluginIslandSpecifiers })           ← island builds
 app/routes/…       <PluginZone id='app.dashboard.panels' />                      ← zone rendering
 ```

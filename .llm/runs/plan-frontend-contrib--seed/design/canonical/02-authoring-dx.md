@@ -26,7 +26,7 @@ plugins/crons/
 import { defineFrontend } from '@netscript/plugin-frontend-core';
 
 export default defineFrontend({
-  contract: { family: 'app', major: 1 },
+  // contract defaults to { family: 'app', major: 1 } — override only for other families (K-7)
   pluginKind: 'crons',
   base: '/crons',
   routes: [
@@ -35,7 +35,9 @@ export default defineFrontend({
       id: 'calendar',
       path: '/calendar',
       module: './routes/calendar.tsx',
-      nav: { label: { id: 'crons.nav.calendar', default: 'Cron calendar' }, icon: 'calendar', group: 'main' },
+      // string labels compile to MessageRefs with derived ids (K-8); pass { id, default } to
+      // control the catalog key
+      nav: { label: 'Cron calendar', icon: 'calendar', group: 'main' },
     },
     { kind: 'route', id: 'schedule-detail', path: '/schedules/:id', module: './routes/schedules/[id].tsx' },
   ],
@@ -43,7 +45,7 @@ export default defineFrontend({
   zones: [
     { kind: 'zone', id: 'next-fires', zone: 'app.dashboard.panels', module: './components/NextFiresCard.tsx' },
   ],
-  theme: [{ kind: 'theme', id: 'theme', css: ['./theme.css'] }],
+  theme: { kind: 'theme', id: 'theme', css: ['./theme.css'] },   // one overlay per plugin (K-6)
   requires: { procedures: ['crons.list', 'crons.nextFires'] },
 });
 ```
@@ -53,12 +55,12 @@ export default defineFrontend({
 
 ```ts
 // plugins/crons/src/public/mod.ts
-.withFrontend({ export: './frontend', framework: 'fresh', contract: [{ family: 'app', major: 1 }] })
+.withFrontend({ export: './frontend', framework: 'fresh' })   // family/major derived from the module (K-10)
 ```
 
 ```jsonc
 // plugins/crons/scaffold.plugin.json
-{ "frontend": { "export": "./frontend", "framework": "fresh", "contract": [{ "family": "app", "major": 1 }] } }
+{ "frontend": { "export": "./frontend", "framework": "fresh" } }
 ```
 
 ## Writing the pages: it is just Fresh (with one import that is honest about where it lives)

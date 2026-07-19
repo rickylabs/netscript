@@ -1,7 +1,8 @@
-# Contracts — `@netscript/plugin-frontend-core/contracts/v1` (draft, rev 2)
+# Contracts — `@netscript/plugin-frontend-core/contracts/v1` (draft, rev 3)
 
-> **Draft — design document only.** Rev 2 integrates adversarial findings S-2, S-5, S-7, S-8,
-> S-9, S-10, S-17 (`../../adversarial-sol.md`, dispositions in `../../adversarial-triage.md`).
+> **Draft — design document only.** Rev 2 integrated adversarial findings S-2, S-5, S-7, S-8,
+> S-9, S-10, S-17 (`../../adversarial-sol.md`); rev 3 integrates docs-story notes K-4 through
+> K-16 (`../docs-story/docs-story-notes.md`, dispositions in `../../docs-story-triage.md`).
 > Idiom follows `BasePluginContract`: typed seams, Standard-Schema (zod) validation, re-exported —
 > never redefined — by consumers.
 
@@ -53,6 +54,11 @@ Manifests declare `pluginKind`; the installer/registry assigns `installationId`/
 validates `packageName` against the owning plugin. All generated keys (base path, `data-ns-plugin`
 scope, gateway prefix, typed route ref namespace) derive from `mountId`, never from `packageName`.
 
+**Gateway prefix (pinned — K-13):** the generated gateway for a plugin is mounted at
+`/api/plugins/<mountId>/` — the single string that `pluginApi()`, the host descriptor's
+`reservedPaths` (`/api/plugins`), and the generated gateway route table all derive from. It is a
+contract constant (`GATEWAY_PREFIX`), not a convention.
+
 ## The envelope — versioning that can actually evolve (S-7)
 
 A discriminated-union member added to a strict schema is **not** additive: old validators reject
@@ -85,8 +91,27 @@ export interface FamilyRef { readonly family: string; readonly major: number }
   in their `HostSurfaceDescriptor` and quarantine outside the window. Old-host/new-plugin and
   new-host/old-plugin negotiation each get a contract test.
 
-A plugin's `./frontend` export is one envelope (or an array of envelopes, one per family — e.g. a
-plugin contributing to both the app surface and the dashboard).
+The envelope also carries the plugin's declared **budgets** (K-9) — asserted by the test kit,
+surfaced by the doctor:
+
+```ts
+export interface FrontendBudgets {
+  readonly initialJsKb?: number;
+  readonly asyncChunks?: number;
+  readonly cssKb?: number;
+  readonly islands?: number;
+  readonly zoneRenderMs?: number;
+  readonly resolverMs?: number;
+}
+// FrontendManifestEnvelope gains: readonly budgets?: FrontendBudgets;
+```
+
+**Multi-family export form (pinned — K-16):** a plugin's `./frontend` export is one envelope or
+a plain array of envelopes, one `defineFrontend` call each:
+
+```ts
+export default [defineFrontend(appDefinition), defineFrontend(dashboardDefinition)];
+```
 
 ## `app` family payload — the five kinds
 
@@ -94,13 +119,22 @@ Shared base:
 
 ```ts
 export interface AppContributionBase {
-  readonly id: string;               // unique within (plugin, family)
+  /**
+   * Unique within (plugin, family). The id's jobs (K-12): registry identity, duplicate
+   * rejection, doctor diagnostics, budget attribution, and — for routes — nav targets and
+   * typed route-ref names.
+   */
+  readonly id: string;
   /** Human title as a message ref: host-localizable, default text mandatory (S-17). */
   readonly title?: MessageRef;
   readonly icon?: string;            // fresh-ui IconName
 }
 export interface MessageRef { readonly id: string; readonly default: string }
 ```
+
+In the **authoring form** (below), every `MessageRef` position also accepts a plain string
+(K-8), compiled to a `MessageRef` with a derived id (`<pluginKind>.<kind>.<contributionId>`) —
+the object form is for plugins that ship catalogs.
 
 ### 1. `route`
 
@@ -117,8 +151,15 @@ export interface RouteContribution extends AppContributionBase {
    * by @netscript/fresh/plugins and maps default/handler(s)/config/css onto the Route shape.
    * Plugin `_layout` modules are NOT supported in v1 (explicitly rejected at generate time).
    */
-  readonly module: ComponentRef;
+  readonly module: ModuleRef;
   readonly nav?: NavSpec;            // convenience: emits a nav contribution targeting this route
+}
+/** Pinned (K-5). label accepts the string shorthand in the authoring form. */
+export interface NavSpec {
+  readonly label: MessageRef;
+  readonly icon?: string;
+  readonly group?: string;
+  readonly order?: number;
 }
 ```
 
@@ -127,7 +168,7 @@ export interface RouteContribution extends AppContributionBase {
 ```ts
 export interface IslandContribution extends AppContributionBase {
   readonly kind: 'island';
-  readonly module: ComponentRef;     // one island component per file (Fresh convention)
+  readonly module: ModuleRef;     // one island component per file (Fresh convention)
 }
 ```
 
@@ -142,7 +183,7 @@ host data is island-safe. Build-behavior proof status: Wave-0 gate P3 (`../../pl
 export interface ZoneContribution extends AppContributionBase {
   readonly kind: 'zone';
   readonly zone: string;             // validated against the HOST's published surface (below)
-  readonly module: ComponentRef;     // SSR component; may import the plugin's islands
+  readonly module: ModuleRef;     // SSR component; may import the plugin's islands
   readonly order?: number;
 }
 ```
@@ -167,12 +208,15 @@ export interface NavContribution extends AppContributionBase {
 ```ts
 export interface ThemeContribution extends AppContributionBase {
   readonly kind: 'theme';
-  readonly css: readonly ComponentRef[];  // --ns-* vocabulary only; scoping rules in 04 §8
+  readonly css: readonly ModuleRef[];  // --ns-* vocabulary only; scoping rules in 04 §8
 }
 ```
 
+**At most one theme contribution per plugin** (K-6): "the plugin's theme overlay" is one thing
+with several files, and the authoring form's `theme` key is correspondingly singular.
+
 ```ts
-export type ComponentRef = `./${string}`;
+export type ModuleRef = `./${string}`;
 export type AppContribution =
   | RouteContribution | IslandContribution | ZoneContribution
   | NavContribution | ThemeContribution;
@@ -247,6 +291,36 @@ export interface FrontendRequires {
 }
 ```
 
+## The authoring form — `FrontendDefinition` (K-15, K-5, K-6, K-7, K-8)
+
+`defineFrontend(definition: FrontendDefinition): FrontendManifestEnvelope` — the keyed input
+authors write, distinct from (and compiled to) the envelope:
+
+```ts
+export interface FrontendDefinition {
+  /** Defaults to { family: 'app', major: 1 } (K-7); override only for other families. */
+  readonly contract?: FamilyRef;
+  readonly pluginKind: string;
+  readonly base?: string;
+  readonly routes?: readonly RouteContribution[];      // NavSpec.label accepts string shorthand
+  readonly islands?: readonly IslandContribution[];
+  readonly zones?: readonly ZoneContribution[];
+  /** Standalone nav entries (external links, host-page hrefs) — first-class here (K-5). */
+  readonly nav?: readonly NavContribution[];
+  /** Singular (K-6): the plugin's one theme overlay, holding its css file list. */
+  readonly theme?: ThemeContribution;
+  readonly requires?: FrontendRequires;
+  readonly budgets?: FrontendBudgets;
+}
+```
+
+Two further exported names the ecosystem needs (K-15): **`FrontendContributionRegistry`** — the
+generated registry's type, owned by this package (hosts' `mountPluginFrontends` /
+`pluginNavSections` take it) — and **`PluginPageContext`** — the `definePluginPage` callback
+context, owned by `@netscript/fresh/plugins` since it extends Fresh's `PageProps` (typed
+`host: PluginRequestContext`, `client: PluginClientContext`, and a `redirect(path): Response`
+helper — K-4).
+
 ## Validation & cross-checks
 
 - `defineFrontend()` validates the envelope + `app` payload schema and freezes (posture of
@@ -259,10 +333,12 @@ export interface FrontendRequires {
 - Quarantine (render-time) is reserved for contract-window mismatch and load failure — never for
   known-but-unmounted surfaces.
 
-## The pointer — unchanged
+## The pointer — pure pointer, contract derived (K-10)
 
-`@netscript/plugin` learns only `FrontendContributionRef = { export, framework: 'fresh',
-contract: FamilyRef[] }` (builder `.withFrontend()`, installer-manifest `frontend` block,
-parse-only). `PLUGIN_MANIFEST_SCHEMA_VERSION` bumps additively; older CLIs ignore the block —
-and because the older *host* also lacks the frontend generate step, ignoring is safe (no
-half-wired state).
+`@netscript/plugin` learns only `FrontendContributionRef = { export, framework: 'fresh' }`
+(builder `.withFrontend()`, installer-manifest `frontend` block, parse-only). The family/major
+handshake lives **once**, in the `./frontend` module's envelope; the registry derives it at
+generate time, and `plugin doctor`'s frontend check prints both values if a cached/stale copy
+ever disagrees — no second source of truth to drift (K-10).
+`PLUGIN_MANIFEST_SCHEMA_VERSION` bumps additively; older CLIs ignore the block — and because the
+older *host* also lacks the frontend generate step, ignoring is safe (no half-wired state).

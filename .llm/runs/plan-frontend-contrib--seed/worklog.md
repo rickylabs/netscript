@@ -76,3 +76,25 @@ STAGE-COMPLETE: generator
   (S-20; F4/F6 resolved, F9 added).
 
 STAGE-COMPLETE: adversarial-integration
+
+## 2026-07-19 — Stage 3: Kimi K3 docs story dispatched + integrated
+
+- Dispatched on OpenCode · OpenRouter · `moonshotai/kimi-k3` · high (drift #5); brief
+  `briefs/kimi-docs-brief.md`. Kimi committed `73cbd48b` (local; pushed by supervisor):
+  `design/docs-story/` — as-if-shipped guide (318 lines), two API references (207+456),
+  README fragments (148), and `docs-story-notes.md` (17 K-notes + pending-proof ledger).
+- Quality: public-clean verified (zero harness/model/proof references in files 1–4); docs match
+  rev-2 contracts; the K-notes are precisely the doc-driven API critique the stage exists for.
+- **All 17 K-notes accepted** (`docs-story-triage.md`) and integrated as **rev 3**: contract
+  default (K-7), string MessageRef shorthand (K-8), `theme` singular (K-6), `FrontendDefinition`
+  named + standalone `nav` array + `NavSpec` pinned (K-5/K-15), `PluginPageContext` +
+  `redirect` (K-4), `pluginApi(client)` pinned (K-2), gateway prefix `GATEWAY_PREFIX` pinned
+  (K-13), pointer de-duplicated (K-10), `ModuleRef` rename (K-14), island-id purpose (K-12),
+  route-param cross-check (K-11), budgets on the envelope + `defineFrontendTestSuite` (K-9),
+  multi-family export pinned (K-16), doctor-taxonomy-as-product (K-17), examples re-aligned
+  (K-1), overview diagram fixed (K-3).
+- Docs-story refresh policy recorded in `docs-story-triage.md`: files 1–4 remain the pre-K-note
+  forecast; they get one refresh when contracts freeze at Wave 1.
+
+STAGE-COMPLETE: docs-story-integration — full kickoff pipeline done; awaiting owner review of
+plan.md forks (F1/F2/F3/F5/F7/F8/F9) and downstream filing decisions.
