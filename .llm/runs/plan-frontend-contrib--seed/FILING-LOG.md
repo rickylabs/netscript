@@ -12,7 +12,8 @@ FCB-n / FCL-EPIC tags are the planning record; on conflict, GitHub wins.
 - Milestone rationale: core waves (0/1/1b/2 + first-party panels) → **beta.13** — the layer is the
   dashboard epic's (#400) prerequisite in the same cut, mirroring the deploy lane's W1–W3→beta.13
   split (epic #892); consumer frontends + adoption → **beta.15** (parallel to deploy W4);
-  backend prerequisite + sugar → **Backlog / Triage**. No new milestone required.
+  completion wave → **beta.17** (milestone #19, created 2026-07-19 per owner re-scheduling: no
+  Backlog items — everything ships before stable).
 - Supersession map (RFC §6): #427 KEEP re-baseline · #432 KEEP re-baseline · #400 consumer ·
   ai chat-route repositioned — **zero closes at filing time** (folds happen via downstream PRs).
 
@@ -42,9 +43,11 @@ FCB-n / FCL-EPIC tags are the planning record; on conflict, GitHub wins.
 | FCB-20 | #942 | 0.0.1-beta.15 | p1 | Auth v1 frontend (account + session widget + signin starter) |
 | FCB-21 | #943 | 0.0.1-beta.15 | p1 | AI frontend (durable chat route + assist launcher) |
 | FCB-22 | #944 | 0.0.1-beta.13 | p2 | Sagas/triggers/streams dashboard-zone panels |
-| FCB-23 | #945 | Backlog / Triage | p2 | auth-org backend capability (org-console prerequisite) |
-| FCB-24 | #946 | Backlog / Triage | p3 | Convention generator (generate frontend) |
+| FCB-23 | #945 | 0.0.1-beta.17 | p2 | auth-org backend capability (org-console prerequisite) |
+| FCB-24 | #946 | 0.0.1-beta.17 | p3 | Convention generator (generate frontend) |
 
 Filing was one-shot from the committed manifest (`briefs`/tmp manifest mirrored here); every
 child carries `Part of #922`, `epic:frontend-contrib`, one `status:plan`, `type:`/`area:`/
 `priority:`, and its milestone. First pull: p0s #923–#931.
+
+**Amendment 2026-07-19 (owner):** milestone `0.0.1-beta.17` (#19) created; #945/#946 moved Backlog → beta.17. Final split: 18 → beta.13 · 4 → beta.15 · 2 → beta.17.
