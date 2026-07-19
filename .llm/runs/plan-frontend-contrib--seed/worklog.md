@@ -109,3 +109,14 @@ plan.md forks (F1/F2/F3/F5/F7/F8/F9) and downstream filing decisions.
   Labels: `rfc` `type:docs` `status:plan` `area:fresh` `area:plugins` `priority:p1`
   `ci:skip-e2e` `ci:skip-scaffold`; milestone **Backlog / Triage**; Refs #427/#432/#400 (no
   closing keywords). Epic/sub-issue filing remains the later supervisor-coordinated step.
+
+## 2026-07-19 — Board FILED (owner-authorized)
+
+- Owner authorized epic/sub-issue creation + milestone selection in-turn. Label
+  `epic:frontend-contrib` created (+ labels.yml parity, this branch). **Epic #922** (beta.13);
+  children **#923–#946** filed one-shot from the manifest: 18 → beta.13 (Waves 0/1/1b/2 +
+  first-party panels — the dashboard #400 prerequisite, mirroring deploy W1–W3→beta.13), 4 →
+  beta.15 (AppTarget, adoption verb, auth v1, ai), 2 → Backlog (auth-org prerequisite,
+  convention generator). No new milestone needed. Zero closes at filing (supersession map:
+  KEEP-re-baseline). `FILING-LOG.md` committed; rfc.md carries the authority banner; PR #890
+  body patched + phase comment posted. First pull: p0s #923–#931. GitHub is now board authority.

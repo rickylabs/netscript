@@ -1,9 +1,13 @@
 # RFC — NetScript Frontend Contribution Layer: plugins that ship UI
 
+> **AUTHORITY BANNER (2026-07-19): the board is FILED — GitHub wins on conflict.** Epic **#922**,
+> children **#923–#946** (FCB-1..24 mapping in `FILING-LOG.md`). The FCB-n / FCL-EPIC tags below
+> are the planning record, not the live board.
+
 | | |
 | --- | --- |
-| **Status** | **Proposed** — full pipeline complete (generator → GPT-5.6 Sol·high adversarial, 20/20 integrated → Kimi K3 docs story, 17/17 integrated → rev 3); awaiting owner ratification of the open forks (§9) |
-| **Tracking** | Refs #427 (dashboard panel seam) · #432 (add-to-app scaffold flow) · #400 (dev-dashboard epic, beta.13) · **Epic FCL-EPIC (placeholder — filed in a later supervisor-coordinated step)** · sibling RFC: deploy-plugin lane (`plan/deploy-plugin`) |
+| **Status** | **Proposed** — full pipeline complete (generator → GPT-5.6 Sol·high adversarial, 20/20 integrated → Kimi K3 docs story, 17/17 integrated → rev 3); board filed under owner authorization (2026-07-19); forks (§9) still open for arbitration |
+| **Tracking** | Refs #427 (dashboard panel seam) · #432 (add-to-app scaffold flow) · #400 (dev-dashboard epic, beta.13) · **Epic #922, children #923–#946** (`FILING-LOG.md`) · sibling RFC: deploy-plugin lane (#891, epic #892) |
 | **Run record** | `.llm/runs/plan-frontend-contrib--seed/` — research, plan (D1–D16 / forks), canonical design 00–06, 4 worked examples, docs-story forecast, both review-triage records |
 | **Evidence base** | Upstream verified in-source: `App.mountApp` (@fresh/core 2.3.3 app.ts:357), `Builder.registerIsland` (dev/builder.ts:157), `fresh({ islandSpecifiers })` (@fresh/plugin-vite 1.0.8 mod.ts:211-214); repo precedent: axis registry emitter, `scaffolder.export` pointer, fresh-ui copy-registry + `--ns-*` tokens, ai chat-route scaffolder; prior art: `dashboard-design--orchestrator/analysis/plugin-extension-architecture.md` |
 
