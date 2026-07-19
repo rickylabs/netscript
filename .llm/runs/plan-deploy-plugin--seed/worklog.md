@@ -229,3 +229,16 @@ STAGE-COMPLETE: doc-story-integration
   canonical changes deliberate); plan.md DPB-1/8/17/29 recut (step → DPB-17 with deps
   5/8/15); rfc.md r5 (status, abstract purity wording, §5/§6, Addendum A round-2 paragraph,
   provenance). Family topology, ports, and 29-child board count unchanged.
+
+## 2026-07-19 — PLAN-EVAL PASS + one-shot board filing
+
+- Formal PLAN-EVAL dispatched on PR #891 (OpenHands, `openrouter/qwen/qwen3.7-max`) →
+  **`[PHASE: PLAN-EVAL] [VERDICT: PASS]`** (verdict comment on the PR = record).
+- Filing executed from `filing-manifest.md` under the owner's in-turn directive: label
+  `epic:deploy-plugin`; milestones beta.15 (#17) + beta.16 (#18) created; **EPIC #892** +
+  children **#893–#921** (29/29, sequential, zero failures); epic children checklist updated;
+  supersession per RFC §6 (close #824; pointers #823/#327/#454). Details: `FILING-LOG.md`.
+- **GitHub is now the single source of truth for the board**; run docs carry tags under that
+  authority rule.
+
+STAGE-COMPLETE: filing
