@@ -66,14 +66,25 @@ interface DeployTargetPort {
   canonical surface is **`netscript deploy <target> <op>`** with the eight-op set. The
   build/deploy split is CI-real: a build job runs `plan` + `emit` and hands the
   `EmittedArtifactManifest` (artifact digest, source revision, target variant, emitter version,
-  provenance) to a later deploy job running `up --prebuilt`.
+  provenance) to a later deploy job running `up --prebuilt`. (r3, KF-6) The hand-off contract is
+  concrete: `emit` writes to **`.deploy/<target>[@<env>]/`** (the shipped output convention) with
+  the manifest at **`.deploy/<target>[@<env>]/artifact-manifest.json`**;
+  `up --prebuilt <path-to-manifest>` takes the manifest path and verifies artifact digests
+  against it before any push.
+- **CLI grammar sketch** (r3, KF-5 — locked at sketch depth; the full grammar is DPB-16
+  acceptance scope): global `--env <name>` (KF-8, §6); `emit [--output <dir>]` (defaults to the
+  contract path above); `secrets set|list|unset <NAME>` (env-variable names; values never in
+  argv — piped or prompted); `rollback [--to <revision>]` (defaults to the previous deployment);
+  `down [--yes]` (confirmation required in a TTY).
 - **Legacy flat verbs** (r2, SF-9 — semantics are NOT equivalent to `up`/`down`): `build`,
   `install`, `start`, `stop`, `copy`, `upgrade`, `package-cli`, `uninstall` remain **first-class
   compatibility handlers owned by `deploy-baremetal`** through the next semver-major release,
   behind a `BaremetalCompatibilityCommands` adapter that preserves their current flags and
   side-effect boundaries (shipped `start`/`stop` operate on registered services without
   install/uninstall; `copy` syncs prebuilt artifacts without registration; `upgrade` is a
-  five-step transaction). Only `build → plan + emit`, `status`, and `logs` are direct aliases.
+  five-step transaction). Only `build → plan + emit`, `status`, and `logs` are direct aliases —
+  (r3, KF-4) **pinned to the `baremetal` target**: `build` ≡ `deploy baremetal plan` + `deploy
+  baremetal emit`; `status`/`logs` ≡ `deploy baremetal status`/`logs`.
   Help output may deprecate; **no minor-release removal date is claimed** until an equivalent
   canonical workflow and migration telemetry exist. Golden help/exit-code tests plus
   state-transition tests prove `stop` never uninstalls and `start` never registers.
@@ -160,6 +171,10 @@ interface DeployCapabilityManifest {
   compiler** (UR-5): `unsupported` → build failure with the note; `partial` → warning that must
   be acknowledged in config; never a runtime surprise, never a silent downgrade (L-3). Sagas
   tri-state law unchanged.
+- **Verdict-surface precedence** (r3, KF-13): newer live evidence wins. `deploy doctor`'s live
+  run supersedes a stale (`probedAt`-old) manifest; `plan` recompiles from the **installed**
+  manifests at invocation time and is authoritative for the deploy decision;
+  `deploy capabilities` renders published/installed manifest data and is informational.
 
 ## 5. Topology: cells are declared, never silently partitioned (**NEW**, SF-8)
 
@@ -180,11 +195,17 @@ interface DeploymentTopologyPlan {
 }
 ```
 
-v1 rule: **cells are user-declared** in `deploy/targets.ts`. The compiler may return
-machine-readable `suggestedCells` when a single-cell verdict fails, but it **rejects rather than
-partitions silently**. Gates: single ownership of every service/consumer/schedule across cells;
-explicit cross-cell transport; deterministic plan output. Until the topology slice lands, the
-Cloudflare/AWS scaffold stories are narrowed to one compute variant per target (DP-8).
+v1 rule: **cells are user-declared** in `deploy/targets.ts` (the user-owned **target
+declarations** file — distinct from the config **target settings** member, r3 KF-2). The
+compiler may return machine-readable `suggestedCells` when a single-cell verdict fails, but it
+**rejects rather than partitions silently**. (r3, KF-11) The rejection is not a dead end: `plan`
+writes `suggested-cells.json`, and **`deploy cells apply [<file>]`** materializes it into
+`deploy/targets.ts` with the diff shown — an explicit command editing the user-owned file, never
+an implicit rewrite. **Selector vocabulary is the logical-graph unit naming**:
+`service:<name>` / `app:<name>` / `background:<kind>` (the appsettings unit categories). Gates:
+single ownership of every service/consumer/schedule across cells; explicit cross-cell transport;
+deterministic plan output. Until the topology slice lands, the Cloudflare/AWS scaffold stories
+are narrowed to one compute variant per target (DP-8).
 
 `ResourceBinding` is unchanged in spirit — declarative name+kind transport, leaf semantics never
 interpreted by deploy — with requirements now expressed as `BindingRequirement` (namespaced
@@ -204,7 +225,9 @@ interpreted by deploy — with requirements now expressed as `BindingRequirement
   `DEFAULT_DEPLOY_TARGETS` is **deleted as a core concept** (SF-1): during W1 its compatibility
   equivalent stays in the CLI composition root; from W3 the plugin/generated project registry
   supplies entries (as resolved `DeployTargetContribution` descriptors, DP-4 §3). Multi-target
-  by design, keyed `<targetKey>[@<environment>]`.
+  by design, keyed `<targetKey>[@<environment>]` — (r3, KF-8) invoked as
+  **`netscript deploy <target> <op> --env <name>`** (the flag maps to the qualified registry
+  key; the config `environments` overlay supplies the values).
 - **Config — two-phase loader** (**NEW**, SF-10). Today the full config parses `deploy` through
   a static schema *before* the plugin list is even available, and unknown target keys are
   silently stripped — so "adapters contribute schemas at load time" needs a real bootstrap
@@ -217,10 +240,12 @@ interpreted by deploy — with requirements now expressed as `BindingRequirement
      (a deliberate, documented behavior change from today's strip-by-design).
   `@netscript/config` keeps the project-loader seam and exports the legacy target types/schemas
   as a frozen delegating union for the compatibility window. Environments overlay
-  (`environments: Record<string, Partial<TargetConfig>>`) unchanged from r1. Key-mapping note
-  (quick win): config keys (`windows`, `linux`), registry keys (`windows-service`,
-  `linux-service`), and the CLI target (`baremetal`) are distinct vocabularies with one explicit
-  mapping table in `./config` — never treated as interchangeable.
+  (`environments: Record<string, Partial<TargetConfig>>`) unchanged from r1. (r3, KF-3 — the
+  variant mechanism resolves the r2 three-vocabulary note) The bare-metal lane has **one
+  user-facing name**: target **`baremetal`** with variants **`windows` | `linux`** — CLI,
+  registry, capabilities, and doctor all say `baremetal`; the legacy config keys `windows`/
+  `linux` remain valid target-settings members mapped in by the frozen compat union and
+  documented as the historical spelling.
 
 ## 7. Gates and proof
 

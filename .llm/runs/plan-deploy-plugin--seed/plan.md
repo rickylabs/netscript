@@ -1,10 +1,11 @@
 # Plan — plan-deploy-plugin--seed
 
-> **Draft — no GitHub mutation.** Generator-stage plan (Fable 5 · xhigh), **revision r2**: the
-> Sol-xhigh constructive adversarial pass (`adversarial-sol.md`, SF-1…SF-16) is integrated —
-> all sixteen findings accepted (`adversarial-sol-triage.md`). Pending: Kimi-K3 doc-driven story
-> pass, generator integration, then (supervisor decision) formal PLAN-EVAL and owner
-> ratification. Nothing below files, closes, or edits any issue/PR/milestone/label.
+> **Draft — no GitHub mutation.** Generator-stage plan (Fable 5 · xhigh), **revision r3**: both
+> downstream passes are integrated — Sol-xhigh adversarial (`adversarial-sol.md`, SF-1…SF-16,
+> all accepted, r2) and Kimi-K3 doc-story (`doc-story-kimi.md`, KF-1…KF-13, all accepted, r3 —
+> triage in `doc-story-kimi-triage.md`). Pending: (supervisor decision) formal PLAN-EVAL and
+> owner ratification of OF-1…OF-8. Nothing below files, closes, or edits any
+> issue/PR/milestone/label.
 
 ## 1. Scope statement
 
@@ -78,6 +79,10 @@ cross-references (distinct from the `DP-N` design-doc numbering), every child mi
 milestoned, consistent status, GitHub-native sub-issues. **29 children** (< 30); each body names
 files, an anti-scope boundary, and the smallest proof command; the expensive full runtime E2E
 remains a **wave exit gate**, not an intermediate loop.
+
+(r3, KF-5/10/11/12) The doc-story resolutions add acceptance scope, not children: the op-level
+CLI grammar, the capability **preview catalog**, `deploy cells apply`, and `target remove`
+semantics land inside DPB-16/DPB-17's bodies.
 
 | ID | Title (draft) | Wave | Pri | Delivery shape | Depends on |
 | --- | --- | --- | --- | --- | --- |
@@ -164,6 +169,11 @@ AWS event semantics (DPB-29).
 `adversarial-sol-triage.md`; every attack item from r1 §10 produced an adopted amendment
 (capability structure, mount-children CLI axis, plan/emit split, W1 recut, manifest honesty).
 
-**Kimi K3 doc-story — pending.** Write the public docs as if W3 shipped (install → `target add`
-→ `plan`/`emit`/`up` per story, capability output, doctor); surface every DX seam the docs
-cannot explain — those are design bugs to report back, not to fix in docs.
+**Kimi K3 doc-story — DONE (r3).** `doc-story-kimi.md`: docs IA + four forecast pages (kept
+verbatim as the stage snapshot) + KF-1…KF-13 — all accepted (`doc-story-kimi-triage.md`).
+Notable corpus corrections: the DP-6 default-target contradiction; `deno-deploy` declares no
+`emit` (getting-started flow = `plan → up`; the CI split is taught where emission is real);
+`baremetal` unified as one target with `windows|linux` variants; declarations/settings/
+descriptor vocabulary pinned; `--env` invocation grammar; `--prebuilt` manifest contract;
+`cells apply`, `target remove`, and the preview catalog specified. Forecast Page A's Step 3
+(emit on deno-deploy) is superseded by the KF-9 resolution — the corpus is authority.

@@ -55,8 +55,10 @@
    W3 and beyond; legacy flat verbs keep their exact current semantics as compatibility handlers
    until the next semver-major (M-11, r2).
 3. **Scaffolded projects**: existing projects keep working without the plugin (shim path);
-   `plugin install deploy` is additive. New scaffolds from W3 get the plugin preinstalled with
-   the `deno-deploy` default target (T1 default, DP-3 §3).
+   `plugin install deploy` is additive. (r3, KF-1 — contradiction resolved to the r2 answer)
+   New scaffolds from W3 get the plugin preinstalled with **no target preinstalled**; every
+   target is added explicitly (`deploy target add`), with `deno-deploy` documented as the
+   recommended first target (DP-3 §3, DP-8 Story 0).
 4. **Aspire keeps its place**: local dev loop (`aspire start`) and the compose/k8s/azure publish
    lanes are unchanged in behavior — they change owner (adapter package), not shape.
 5. **CI workflows**: previously scaffolded workflow files keep functioning (they call the same

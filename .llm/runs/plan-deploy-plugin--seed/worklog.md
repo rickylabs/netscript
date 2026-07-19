@@ -128,3 +128,47 @@ STAGE-COMPLETE: generator
   commit (this one). All pushed `HEAD:plan/deploy-plugin`.
 
 STAGE-COMPLETE: adversarial-integration
+
+## 2026-07-19 — Stage 3: Kimi K3 doc-driven story + integration (r3)
+
+- Dispatch: brief `kimi-doc-story-brief.md` (commit `3d086488`); launched on the OpenCode +
+  OpenRouter lane (`deno task agentic:opencode`, model `openrouter/moonshotai/kimi-k3` — slug
+  verified against the public OpenRouter model list, drift D-4 — variant high). First attempt
+  was killed by the 10-minute shell timeout mid-read; relaunched detached (nohup + pidfile +
+  file/exit monitor). Run completed `DONE` (~30 min), read the full r2 corpus + both docs-voice
+  reference pages, wrote and self-polished the single deliverable; no git actions (per brief).
+- Result: `doc-story-kimi.md` (887 lines) — docs IA outline (13-page tree), four fully-written
+  forecast pages (getting-started, Cloudflare Workers, capabilities/doctor reference,
+  migration), and 13 DX findings KF-1…KF-13.
+- Triage: `doc-story-kimi-triage.md` — **all 13 ACCEPTED**; two scoped (KF-5 grammar at sketch
+  depth; KF-9 resolved in the honest direction — `deploy-deno` declares no `emit`).
+- Integration (r3):
+  - DP-2: `--prebuilt` manifest contract (`.deploy/<target>[@<env>]/artifact-manifest.json`,
+    digest-verified); CLI grammar sketch (`secrets set|list|unset`, `rollback [--to]`,
+    `emit [--output]`, `down [--yes]`, global `--env`); legacy aliases pinned to `baremetal`;
+    verdict-surface precedence (live doctor > plan compile > capabilities render);
+    declarations/settings vocabulary; `suggested-cells.json` + `deploy cells apply` + selector
+    vocabulary (`service:|app:|background:`); `--env` invocation grammar; baremetal unified as
+    one target with `windows|linux` variants.
+  - DP-3: baremetal lane-naming bullet; `deploy-deno` `emit`-not-declared note (flagship
+    showcases declared subsets; CI split taught where emission is real).
+  - DP-4: descriptor home = generated registry module (`.netscript/generated/deploy-registry.*`);
+    capability preview catalog (`capabilities <key> --preview`, published-manifest data,
+    honestly labeled); `target remove` semantics (descriptor + settings member; assets only with
+    `--purge-assets`; never edits `deploy/targets.ts` — doctor flags orphans); `cells apply`
+    verb; doctor orphaned-declarations check.
+  - DP-6: §3 item 3 contradiction fixed (KF-1 — no preinstalled target).
+  - DP-8: stories re-headed on the locked `target add` flow (KF-7); Story-0 emit note.
+  - plan.md: r3 header; §5 preamble (KF scope into DPB-16/17 — board stays 29 children); §10
+    Kimi marked done with the correction list.
+- Commit trail this stage: `3d086488` brief → r3 integration commit (doc-story + triage +
+  amendments). All pushed `HEAD:plan/deploy-plugin`.
+
+## Pipeline status
+
+All three kickoff stages complete: generator → Sol adversarial (r2) → Kimi doc-story (r3).
+Remaining, supervisor/owner-coordinated (NOT this session, per stop-lines): formal PLAN-EVAL if
+desired; owner ratification of OF-1…OF-8; then the owner-extended terminal deliverable (PR on
+this branch + filed epic/sub-issues in Backlog/Triage + supersession closes).
+
+STAGE-COMPLETE: doc-story-integration

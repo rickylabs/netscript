@@ -48,8 +48,12 @@ carry `schemaVersion`, adapter + upstream tool versions, probe date, and evidenc
 
 ## 2. `deploy-baremetal` (W2 extraction) — T1
 
+- **Lane naming (r3, KF-3):** one target key **`baremetal`**, variants **`windows` | `linux`**
+  (the SF-7 variant mechanism); legacy config keys `windows`/`linux` map in via the compat
+  union.
 - **Wraps:** Servy (Windows) / systemd (Linux) via the shipped OS-service port; the
-  `deno compile` build pipeline consumed from core `./build`.
+  `deno compile` build pipeline (owned here from W2; the adapter-neutral emitter graduates to
+  core later — SF-2).
 - **Ops:** full eight-op set including convention-backed `rollback` (activation retain + symlink/
   dir-swap + health gate — already designed, `DEPLOY-BAREMETAL-PUBLIC-WIRING` debt closes by
   composing the ports in the plugin's composition root) and `secrets` (env-file reference,
@@ -73,7 +77,12 @@ carry `schemaVersion`, adapter + upstream tool versions, probe date, and evidenc
   scan is a named follow-up card). Target key stays `deno-deploy`.
 - **Ops:** plan (preflight + build config)/up/down/status/logs; `secrets` via
   `deno deploy env` (reference model — values never serialized into artifacts); `rollback` via
-  the platform's instant-rollback revision routing.
+  the platform's instant-rollback revision routing. (r3, KF-9) **`emit` is deliberately NOT
+  declared**: the platform builds from source (install/build → artifact → warmup), so there is
+  no meaningful local artifact materialization — the flagship target showcases the
+  declared-subset mechanism. Getting-started flow is `plan → up`; the CI build/deploy split
+  (`emit` + `up --prebuilt`) is demonstrated on targets where emission is real (container,
+  cloudflare, vercel).
 - **Manifest (the honesty showcase; r2, SF-7):** `tier: deno-native`;
   `process: bounded-window`; `@netscript/queue:consume → unsupported` at binding scope (the
   platform has no queues — note points to `externalized` MQ bindings);

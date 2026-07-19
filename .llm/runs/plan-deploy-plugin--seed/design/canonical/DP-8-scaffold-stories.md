@@ -4,6 +4,9 @@
 > Each story names: the command, what lands on disk, the leaf backings chosen (DP-7 §2), the dev
 > loop, the deploy path, and the honest caveats the capability manifest will render. App code is
 > identical across all four stories (L-4; DP-7 §3 invariant 1).
+> (r3, KF-7) Every story runs on the **locked flow** — `netscript init` + `netscript deploy
+> target add <key>`. An `init --deploy <provider>` shorthand remains an explicitly deferred
+> open decision (plan §3); no story depends on it.
 
 ## Story 0 — The Deno-native default (baseline every story diffs against)
 
@@ -20,10 +23,13 @@ netscript deploy target add deno-deploy   # the one flow — targets are always 
   cron → `Deno.cron()` lossless.
 - **Dev loop:** `aspire start` unchanged (M-13). **Deploy:** `netscript deploy deno-deploy plan`
   (preflight + capability verdict) → `up`. Rollback: platform instant revision routing.
+  (r3, KF-9) This target declares no `emit` (the platform builds from source — DP-3 §3); the
+  CI build/deploy split (`emit` + `up --prebuilt`) is taught on the container/cloudflare/vercel
+  stories where emission is real.
 - **Caveats rendered:** sagas `externalized`; queue `unsupported` in-platform; monorepo git
   integration gap (local-source deploys unaffected).
 
-## Story 1 — Cloudflare-optimized (`netscript init my-app --deploy cloudflare`)
+## Story 1 — Cloudflare-optimized (`netscript init my-app` + `deploy target add cloudflare`)
 
 - **Lands:** everything in Story 0's shape plus `wrangler.jsonc` (entry, `compatibility_date`,
   bindings blocks generated from the logical graph), a generated worker entry adapting
@@ -49,7 +55,7 @@ netscript deploy target add deno-deploy   # the one flow — targets are always 
   (`wrangler deploy`); rollback `wrangler versions rollback`; secrets `wrangler secret`
   references.
 
-## Story 2 — AWS-optimized (`--deploy aws`)
+## Story 2 — AWS-optimized (`deploy target add aws`)
 
 - **Lands:** Dockerfile emitted by `deploy-container` (denoland/deno base + Lambda Web Adapter
   layer/binary), `deploy/targets.ts` `aws` member (region, function/service names, or
@@ -67,7 +73,7 @@ netscript deploy target add deno-deploy   # the one flow — targets are always 
 - **Caveats rendered:** event/queue semantics not claimed until the leaf probe passes
   (adversarial F1 wording in the manifest note).
 
-## Story 3 — Container/PaaS (`--deploy fly` | `koyeb` | `sevalla` | `coolify` | `dokploy`)
+## Story 3 — Container/PaaS (`deploy target add fly|koyeb|sevalla|coolify|dokploy`)
 
 - **Lands:** generated Dockerfile (+ compose for local parity), `deploy/targets.ts` member with
   the platform client selection (self-hosted platforms: base URL + token env names), workflow
@@ -79,7 +85,7 @@ netscript deploy target add deno-deploy   # the one flow — targets are always 
 - **Deploy:** `plan` (image build) → `up` (push + platform API create/deploy); rollback via
   platform revision/machine swap where offered.
 
-## Story 4 — Vercel-optimized (`--deploy vercel`)
+## Story 4 — Vercel-optimized (`deploy target add vercel`)
 
 - **Lands:** `.vercel/output` emission wired into `plan` (config.json, `functions/*.func` with
   `.vc-config.json`, `static/`), `deploy/targets.ts` `vercel` member (`runtime: 'node' |
