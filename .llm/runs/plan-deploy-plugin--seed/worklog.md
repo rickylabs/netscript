@@ -82,3 +82,49 @@ pass forecasting public docs, then (3) this generator resumes to integrate. No d
 was dispatched from this session.
 
 STAGE-COMPLETE: generator
+
+## 2026-07-19 — Stage 2: Sol xhigh constructive adversarial + integration (r2)
+
+- Owner authorized stage dispatch (in-turn, 2026-07-19): Codex first, integrate valid findings,
+  then Kimi K3.
+- Dispatch: brief `adversarial-brief.md` (commit `7facbd05`); launched via
+  `agentic/codex/launch-codex-slice.ts` (route requested+observed: openai · `gpt-5.6-sol` ·
+  xhigh; fail-closed identity; upstream unset to pass push safety; daemon managed 0.144.6).
+  Thread id recorded in `codex-thread-ids.md`; turn 23 min.
+- Result: `adversarial-sol.md` (commit `9ed2eeab`) — 16 findings (5 BLOCKER-class seams:
+  default-target composition ownership, W1 extraction boundary, installer manifest validity,
+  CLI bootstrap path, config bootstrap cycle) + quick wins. Verdict: sound baseline, not safe to
+  implement unchanged.
+- Triage: `adversarial-sol-triage.md` — **all 16 ACCEPTED** (reviewer verified claims against
+  the shipped file graph with line citations; every amendment adoptable without breaking the
+  ratified concept).
+- Integration (r2) applied across the corpus:
+  - DP-1: R-GRAPH-1/2/3 revised (no leaf imports — structural contracts; no `deploy-*` →
+    `deploy-*` imports, `ContainerBuildPort` by injection; plugin composes descriptors, depends
+    only on core); W1/W2 recut (refactor-then-extract); OF-2 graduation rule expanded.
+  - DP-2: full r2 rewrite — eight-op lifecycle (`plan` pure / `emit` materializes +
+    provenance / `up --prebuilt`); structural capability contracts (`CapabilityRef` namespaced +
+    versioned, scoped `CapabilityVerdict` incl. `unverified`, per-variant manifests);
+    `DeploymentCell`/`DeploymentTopologyPlan` (user-declared cells, `suggestedCells`, never
+    silent partition); empty duplicate-rejecting registry (`DeployTargetCollisionError` = NEW;
+    no `DEFAULT_DEPLOY_TARGETS` in core); two-phase config loader (unknown target ⇒ error);
+    legacy verbs = compat handlers.
+  - DP-3: per-variant manifest cards (workers|containers, lambda|fargate); aspire queue/
+    exclusive-writer claims withdrawn to binding scope; baremetal rows enumerated; deno
+    kv-atomic corrected (adapter implements CAS; platform gaps are separate refs); injection
+    wording; Story-0 single flow.
+  - DP-4: full r2 rewrite — protocol-valid installer manifest + `sourceKind:'tooling'` variant;
+    mount-children CLI contributions + async bootstrap (host-owned reserved `deploy` shell, no
+    shadowing); doctor checks as data (`{id, loader}` registry); `contributionAxes` instead of
+    a deploy flag; descriptor-based adapter composition + per-target permission profiles.
+  - DP-6: M-2/M-3/M-4/M-5/M-11 corrected; conditional debt retirement; unknown-target error
+    documented as the one deliberate behavior change.
+  - DP-7/DP-8: profile-scoped zero-fork invariant; catalog depends on the two-phase loader;
+    stories narrowed to one compute variant (second variant = user-declared cell).
+  - plan.md: r2 header; LD-2/3/4/5/6/9/10 revised; OF-3/OF-5 re-resolved; board recut to **29
+    `DPB-n` children** with corrected dependencies; §10 Sol marked done.
+  - Naming reconciled: no "7-op" left outside the adversarial/triage records.
+- Commit trail this stage: `7facbd05` brief → `9ed2eeab` findings (Codex) → r2 integration
+  commit (this one). All pushed `HEAD:plan/deploy-plugin`.
+
+STAGE-COMPLETE: adversarial-integration

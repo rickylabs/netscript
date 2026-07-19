@@ -8,8 +8,8 @@
 ## Story 0 — The Deno-native default (baseline every story diffs against)
 
 ```
-netscript init my-app            # deploy plugin preinstalled from W3
-netscript deploy target add deno-deploy
+netscript init my-app            # deploy plugin preinstalled from W3; NO target preinstalled
+netscript deploy target add deno-deploy   # the one flow — targets are always added explicitly
 ```
 
 - **Lands:** `deploy/targets.ts` (user-owned leaf: `defineDeployTargets({ 'deno-deploy': {...} })`),
@@ -35,10 +35,13 @@ netscript deploy target add deno-deploy
   queue → CF Queues binding declared by name, consumption gated on the leaf probe card
   (`@netscript/queue-cf`); db → D1 or Hyperdrive→Postgres; static assets → Workers Static
   Assets (lossless).
-- **Compute split:** HTTP + stateless services → Workers; anything requiring
-  `long-running-process` (sagas `supported`, exclusive DB writer, owned queue `listen()` loops)
-  → **Containers lane** (same image as Story 3's container path) — the compiler proposes the
-  macro-service split rather than silently degrading (L-3, sagas law).
+- **Compute (r2, SF-8 — one variant per story until the topology slice lands):** this story
+  targets the **`workers` variant only**. An app whose requirements exceed the isolate profile
+  (sagas, exclusive DB writer, owned queue `listen()` loops) gets a **rejection with
+  machine-readable `suggestedCells`** proposing a second, user-declared cell on the
+  `containers` variant (`deploy/targets.ts` — DP-2 §5); the compiler never partitions silently
+  (L-3, sagas law). The Containers cell is documented as a manual second target sharing Story
+  3's image path.
 - **Dev loop:** `aspire start` for the graph + `wrangler dev` for worker-path fidelity, with the
   documented Miniflare caveat (simulator, not oracle — remote-binding smoke advised before
   first deploy; CF-PROBE evidence backs the wording).
@@ -55,9 +58,10 @@ netscript deploy target add deno-deploy
 - **Backings:** queue → SQS **by name** (consumption via `@netscript/queue-sqs` leaf card once
   proven — AWS-PROBE-EVENTS; until then `external` contract); kv → DynamoDB leaf card;
   cache → ElastiCache endpoint env; db → RDS/Aurora URL.
-- **Compute:** HTTP → Lambda (LWA container, Function URL/API GW); long-lived (sagas
-  `supported`) → Fargate service from the same image — the image portability is the point
-  (research §3).
+- **Compute (r2, SF-8):** this story targets the **`lambda` variant only** (LWA container,
+  Function URL/API GW). Long-lived requirements (sagas `supported`) are a **user-declared second
+  cell** on the `fargate` variant from the same image — proposed via `suggestedCells`, never
+  auto-partitioned; image portability is what makes the second cell cheap (research §3).
 - **Deploy:** `deploy aws plan` (image + optional Pulumi inline-program preview) → `up`;
   rollback via Lambda versions / service revisions; secrets via SSM/Secrets Manager references.
 - **Caveats rendered:** event/queue semantics not claimed until the leaf probe passes
@@ -90,11 +94,16 @@ netscript deploy target add deno-deploy
 
 ## Cross-story acceptance (feeds the board's scaffold issue)
 
-- gate: the same app source tree scaffolds and passes `deploy <target> plan` for every story
-  with zero app-code diffs (only `deploy/`, config, emitted artifacts, workflows differ).
-- gate: every story's first `plan` runs the capability compiler and renders the target's honest
-  caveats; an app requiring an `unsupported` capability fails scaffold-time selection with the
-  macro-service or external-binding proposal.
+- gate (r2, SF-16): the **canonical fixture, constrained to each story's declared runtime
+  profile**, scaffolds and passes `deploy <target> plan` for every story with the same
+  domain/service source — only generated entry modules, `deploy/`, config, bindings, emitted
+  artifacts, workflows, and backing packages differ. For arbitrary projects, `plan` performs
+  dependency/API compatibility analysis and rejects unsupported runtime touchpoints with
+  file-level diagnostics.
+- gate (r2, SF-8): every story's first `plan` runs the capability compiler and renders the
+  target variant's honest caveats; an app requiring an `unsupported` capability is **rejected
+  with `suggestedCells` / external-binding proposals** — the compiler never silently partitions
+  or degrades.
 - gate: golden tests cover every emitted artifact per story; emitted workflows reference only
   documented secrets/OIDC contracts.
 - gate: `scaffold.runtime` E2E covers Story 0 end-to-end; Stories 1–4 covered by emission golden

@@ -96,7 +96,7 @@ frontend axis lands) UI, at every layer, per provider.
    contract/versioning, install path — copy the auth pattern unless a deploy-specific inversion
    is named in `research/auth-composition-anatomy.md` §9 (multi-target registry, user-visible
    leaf config, no v1 HTTP service).
-2. **Extraction before invention.** The shipped CLI kernel already contains the 7-op port, the
+2. **Extraction before invention.** The shipped CLI kernel already contains the (already eight-op) target port, the
    registry, and the conventions (debt `DEPLOY-ARCHETYPE-7-CORE-SEED`). Wave 1 moves them; new
    capability lands in later waves.
 3. **No board mutation from this run.** Draft texts only; the filing manifest is produced for a

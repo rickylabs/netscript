@@ -1,68 +1,90 @@
 # DP-2 — `@netscript/plugin-deploy-core`: ports, registry, capabilities, conventions
 
 > **Draft — no GitHub mutation.** Canonical design doc of `plan-deploy-plugin--seed`.
+> **r2** — amended per Sol adversarial findings SF-1, SF-2, SF-5, SF-6, SF-7, SF-8, SF-9, SF-10,
+> SF-13 (`adversarial-sol.md`, triage in `adversarial-sol-triage.md`).
 
 Archetype 2 integration core. This is the extraction target of debt
-`DEPLOY-ARCHETYPE-7-CORE-SEED` (`arch-debt.md:2011-2063`): the primitives below *already exist*
-as target-agnostic modules in `packages/cli/src/kernel/domain/deploy/` and move here with their
-tests; net-new elements are marked **NEW**.
+`DEPLOY-ARCHETYPE-7-CORE-SEED` (`arch-debt.md:2011-2063`) — with the r2 correction (SF-2) that
+W1 is a **refactor-then-extract**, not a verbatim move: contracts and demonstrably pure
+conventions move first behind compatibility re-exports; the build engine is entangled with CLI
+config/output/Windows modules and moves to `deploy-baremetal` in W2, with an adapter-neutral
+compile emitter graduating to core only once filesystem/process/output/config ports exist.
+`runtime-overrides.ts` duplicates leaf job/saga/task vocabulary and describes `.deploy/windows` —
+it stays with its bare-metal/leaf owners and is **not** a shared deploy convention. Net-new
+elements are marked **NEW**.
 
 ## 1. Public surface (subpaths, layer-named per auth-core parity)
 
 | Subpath | Contents |
 | --- | --- |
-| `.` | Curated barrel: `createDeployRuntime`, the two ports, registry factory, manifest types |
-| `./domain` | `DeploymentPlan`, `DeployTargetDescriptor`, `ResourceBinding`, operation result types, error taxonomy |
-| `./ports` | `DeployTargetPort` (7-op), `ArtifactEmitterPort`, `ContainerBuildPort`, `OsServicePort` (moved), registry port |
-| `./capabilities` | `DeployCapabilityManifest`, capability IDs, `compileCapabilityVerdict` (the rejection compiler) — **NEW** (UR-5 reuse) |
-| `./conventions` | activation (health-gated symlink/dir-swap), secrets (env-file reference + redaction), rollback, observability/OTEL, health-gate — moved verbatim from the CLI kernel |
-| `./build` | The `deno compile` pipeline (compile-runner/targets/platform/bundler/config/format — moved) |
-| `./config` | `DeployTargetBaseSchema` (moved from `@netscript/config`), target schema registry — retires the deploy slice of `config-plugin-specific-schema-debt` |
-| `./registry` | `createDeployTargetRegistry` (closed-on-key), `DEFAULT_DEPLOY_TARGETS` relocation |
+| `.` | Curated barrel: `createDeployRuntime`, the ports, registry factory, manifest/topology types |
+| `./domain` | `DeploymentPlan`, `DeploymentCell` + `DeploymentTopologyPlan` (**NEW**, SF-8), `DeployTargetDescriptor`, `ResourceBinding`, operation result types, error taxonomy (incl. `DeployTargetCollisionError`, `DeployTargetAdapterMissingError`) |
+| `./ports` | `DeployTargetPort` (eight-op), `ArtifactEmitterPort`, `ContainerBuildPort`, `OsServicePort` (moved), registry port |
+| `./capabilities` | Structural capability contracts (`CapabilityRef`, `BindingRequirement`, `WorkloadConstraint`, `CapabilityVerdict`, `DeployCapabilityManifest`) + the runtime-trait vocabulary + `compileCapabilityVerdict` — **NEW** (UR-5 reuse, restructured per SF-6/SF-7) |
+| `./conventions` | activation (health-gated symlink/dir-swap), secrets (env-file reference + redaction), rollback, observability/OTEL, health-gate — the demonstrably pure policies moved *with their constants* (SF-2); `runtime-overrides.ts` excluded |
+| `./config` | `DeployTargetBaseSchema` (moved from `@netscript/config`), the target schema registry + **two-phase loader contract** (**NEW**, SF-10) |
+| `./registry` | `createDeployTargetRegistry()` — **empty**, duplicate-rejecting (SF-1/SF-13); key/error types; no default target set |
 | `./testing` | In-memory target adapter, fake convention ports, manifest fixture builders (A2 requirement) |
 
 Budget: ≤ 20 exports per subpath (F-5); no oRPC contract in core (the optional plugin contract
 lives with the plugin, DP-4), so **no `--allow-slow-types` exception is needed** — core must pass
 `deno doc --lint` clean.
 
-## 2. The 7-op target port (moved, then sharpened)
+## 2. The eight-op target port (r2 — SF-5/SF-9)
 
-The shipped `DeployTargetPort` (`packages/cli/src/kernel/domain/deploy/deploy-target-port.ts`)
-moves as-is in W1; W2 sharpens it in place:
+The shipped port (`packages/cli/src/kernel/domain/deploy/deploy-target-port.ts`) already carries
+**eight** canonical operations — `plan` and `emit` are distinct there, and shipped adapters
+already diverge on their semantics (Deno Deploy `plan` is non-mutating preflight; Aspire compose
+`plan` writes artifacts). r2 locks the eight-op lifecycle with **pure `plan`**:
 
 ```ts
-type DeployOperation = 'plan' | 'up' | 'down' | 'status' | 'logs' | 'rollback' | 'secrets';
+type DeployOperation =
+  | 'plan' | 'emit' | 'up' | 'down' | 'status' | 'logs' | 'rollback' | 'secrets';
 
 interface DeployTargetPort {
-  readonly key: DeployTargetKey;                    // 'deno-deploy' | 'compose' | … (open via registry)
+  readonly key: DeployTargetKey;
   readonly operations: readonly DeployOperation[];  // declared subset (F-DEPLOY-1)
   readonly capabilities: DeployCapabilityManifest;  // §4 — NEW field, backend-truthful
-  plan(ctx: DeployOperationContext): Promise<DeployPlanResult>;      // dry-run + artifact emission
-  up(ctx): Promise<DeployUpResult>;
+  plan(ctx): Promise<DeployPlanResult>;       // PURE wrt artifact dirs and providers: resolves
+                                              // topology, validates capabilities, returns a
+                                              // serializable DeploymentPlan (+ diagnostics)
+  emit(ctx): Promise<EmittedArtifactManifest>; // materializes content-addressed artifacts; does
+                                              // not deploy/push unless the format models a
+                                              // publish phase explicitly
+  up(ctx): Promise<DeployUpResult>;           // plain `up` = convenience plan → emit → up;
+                                              // `up --prebuilt <manifest>` consumes an artifact
   down(ctx): Promise<DeployDownResult>;
   status(ctx): Promise<DeployStatusResult>;
   logs(ctx): Promise<DeployLogsResult>;
-  rollback(ctx): Promise<DeployRollbackResult>;     // platform-native or convention-backed; never silent no-op
-  secrets(ctx): Promise<DeploySecretsResult>;       // reference/rotation over the secrets convention
+  rollback(ctx): Promise<DeployRollbackResult>; // platform-native or convention-backed; never a silent no-op
+  secrets(ctx): Promise<DeploySecretsResult>;   // reference/rotation over the secrets convention
 }
 ```
 
-- **Verb vocabulary locked** (resolves the deferred decision at
-  `06-archetypes.md:340-346` — plan-gate requires it): the canonical surface is
-  **`netscript deploy <target> <op>`** with the 7-op set. The legacy flat verbs
-  (`build/install/start/stop/upgrade/uninstall`) remain as **bare-metal-lane aliases** routed to
-  the `baremetal` target's ops, marked deprecated in help output for two minor releases before
-  removal (migration-map §4). `plan` subsumes "emit": artifact emission is `plan` with an
-  `--output-path` (the shipped compose adapter already behaves this way).
-- Unsupported ops: **declared subsets**, exactly as shipped. An op absent from `operations` is
-  never advertised (backend-truthful, auth-S1 lesson); calling it yields
-  `DeployOperationUnsupportedError` — the auth `AuthBackendOperationUnsupportedError` pattern
-  (`research/auth-composition-anatomy.md` §4).
+- **Verb vocabulary locked** (resolves the deferred decision at `06-archetypes.md:340-346`):
+  canonical surface is **`netscript deploy <target> <op>`** with the eight-op set. The
+  build/deploy split is CI-real: a build job runs `plan` + `emit` and hands the
+  `EmittedArtifactManifest` (artifact digest, source revision, target variant, emitter version,
+  provenance) to a later deploy job running `up --prebuilt`.
+- **Legacy flat verbs** (r2, SF-9 — semantics are NOT equivalent to `up`/`down`): `build`,
+  `install`, `start`, `stop`, `copy`, `upgrade`, `package-cli`, `uninstall` remain **first-class
+  compatibility handlers owned by `deploy-baremetal`** through the next semver-major release,
+  behind a `BaremetalCompatibilityCommands` adapter that preserves their current flags and
+  side-effect boundaries (shipped `start`/`stop` operate on registered services without
+  install/uninstall; `copy` syncs prebuilt artifacts without registration; `upgrade` is a
+  five-step transaction). Only `build → plan + emit`, `status`, and `logs` are direct aliases.
+  Help output may deprecate; **no minor-release removal date is claimed** until an equivalent
+  canonical workflow and migration telemetry exist. Golden help/exit-code tests plus
+  state-transition tests prove `stop` never uninstalls and `start` never registers.
+- Unsupported ops: **declared subsets**, exactly as shipped; an op absent from `operations` is
+  never advertised (backend-truthful); calling it yields `DeployOperationUnsupportedError` (the
+  auth `AuthBackendOperationUnsupportedError` pattern).
 - `rollback`/`secrets` graduate from "declared-unsupported everywhere" (#341) to
-  convention-backed implementations per adapter card (DP-3); the conventions module already
-  ships the target-agnostic halves (`DEPLOY-SECRETS-ROLLBACK-CORE` debt retires here).
+  convention-backed implementations per adapter card (DP-3); the target-agnostic halves ship in
+  `./conventions` (`DEPLOY-SECRETS-ROLLBACK-CORE` debt retires in W2).
 
-## 3. `ArtifactEmitterPort` (NEW) — separated so lifecycle ≠ build
+## 3. `ArtifactEmitterPort` — emission separated from lifecycle
 
 ```ts
 interface ArtifactEmitterPort {
@@ -73,96 +95,147 @@ interface ArtifactEmitterPort {
 ```
 
 Separating emission from lifecycle is what lets L-1 hold: *whatever emits, emits behind this
-port* — a provider-native emitter, the shared container builder, or (if ever demanded) an
-optional Nitro-driven emitter — all replaceable per target without touching `DeployTargetPort`
-consumers. `EmittedArtifactManifest` adopts the market lesson (self-describing artifact:
-entrypoints, assets, traced deps, migrations, durable resources, schedules, health/shutdown —
-`research/prior-run-distillation.md` §5 rule 3).
+port* — replaceable per target without touching `DeployTargetPort` consumers.
+`EmittedArtifactManifest` is self-describing (entrypoints, assets, traced deps, migrations,
+durable resources, schedules, health/shutdown — the market lesson) **plus provenance** (r2,
+SF-5): artifact digest, source revision, target variant, emitter version.
 
-`ContainerBuildPort` is the OCI specialization implemented by `deploy-container` and consumed by
-the cloudflare-containers and aws lanes (R-GRAPH-2's declared exception).
+`ContainerBuildPort` is the core-owned OCI specialization; `deploy-container` exports the
+implementation and composition roots **inject** it where needed (R-GRAPH-2 r2 — no
+adapter-to-adapter import, SF-11).
 
-## 4. Capability manifest + rejection compiler (NEW; the heart of honest agnosticism)
+## 4. Capability contracts (r2 — SF-6/SF-7: structural, scoped, variant-aware)
+
+The r1 design used one flat closed `DeployCapabilityId` union — which would have coupled core to
+every leaf (the union must import leaf IDs) and mixed three dimensions (runtime traits, leaf
+semantic guarantees, workload constraints). r2 replaces it with structural contracts owned by
+core, populated by leaves and adapters without core importing either:
 
 ```ts
+interface CapabilityRef {          // namespaced + versioned — leaf growth without manifest rot
+  readonly namespace: string;      // 'runtime' | '@netscript/kv' | '@netscript/queue' | …
+  readonly name: string;           // 'long-running-process' | 'atomic' | 'consume' | …
+  readonly major: number;
+}
+interface BindingRequirement {     // what the app needs of a named logical resource
+  readonly binding: string;        // logicalName from the project graph
+  readonly capability: CapabilityRef;
+}
+interface WorkloadConstraint {     // topology/workload dimension, distinct from capabilities
+  readonly kind: 'singleton' | 'long-running' | 'co-locate' | 'offline';
+}
+
+interface CapabilityVerdict {
+  readonly level: 'lossless' | 'partial' | 'unsupported' | 'unverified';
+  readonly scope: 'runtime' | 'adapter' | 'binding';   // WHAT the verdict describes
+  readonly evidence?: string;                           // conformance-suite cell / probe id
+  readonly note?: string;                               // honest caveat, surfaced by CLI
+}
+
 interface DeployCapabilityManifest {
+  readonly schemaVersion: number;
   readonly target: DeployTargetKey;
-  readonly tier: 'deno-native' | 'web-standard' | 'node-compat';        // DP-0 §3
+  readonly variant: string;            // 'workers' | 'containers' | 'lambda' | 'fargate' |
+                                       // 'compose' | 'kubernetes' | … (SF-7: no mode collapse)
+  readonly tier: 'deno-native' | 'web-standard' | 'node-compat';
   readonly process: 'long-lived' | 'bounded-window' | 'isolate';
-  readonly capabilities: Readonly<Record<DeployCapabilityId, 'lossless' | 'partial' | 'unsupported'>>;
+  readonly verdicts: ReadonlyMap<CapabilityRefKey, CapabilityVerdict>;
   readonly sagas: 'supported' | 'externalized' | 'rejected';
-  readonly notes?: Readonly<Record<DeployCapabilityId, string>>;        // honest caveats, surfaced by CLI
+  readonly toolVersions?: Readonly<Record<string, string>>;  // upstream tool/version range
+  readonly probedAt?: string;                                // evidence date
 }
 ```
 
-- `DeployCapabilityId` is a **closed vocabulary of deployment-relevant capability IDs**
-  (`http-serve`, `static-assets`, `websocket`, `queue-consume`, `kv-atomic`, `cron`,
-  `long-running-process`, `exclusive-db-writer`, `offline-sync`, …). IDs *reference* leaf
-  semantics; their **definitions and conformance tests live with the leaf packages**
-  (R-GRAPH-4). Core imports only the ID types — this is the exact cut that stops the
-  `ResourceBindingResolverPort` god-object failure (adversarial F5): core never interprets what
-  `kv-atomic` means; it only matches requirements against declarations.
-- `compileCapabilityVerdict(appRequirements, manifest)` is the **build-time rejection compiler**
-  (UR-5): `unsupported` → build failure with the manifest note; `partial` → warning that must be
-  acknowledged in config; never a runtime surprise, never a silent downgrade (L-3). App
-  requirements derive from the project's logical graph (`appsettings.json` resource/plugin
-  declarations) — the compiler is invoked by `deploy <target> plan` and by scaffold-time target
-  selection.
-- `sagas` tri-state is verbatim UR-5/sagas-constraint law: `externalized` means a macro-service
-  split of the same app model, never downgrade-to-tasks
-  (`research/prior-run-distillation.md` §6).
-- **Backend-truthful**: the manifest is authored next to the adapter and exercised by the shared
-  conformance suite (DP-3 §1); a manifest row the suite cannot demonstrate is a gate failure —
-  deploy's version of the auth board's p0 (#872).
+- **Core owns only the structures** plus the small well-known `runtime:*` trait vocabulary
+  (`http-serve`, `static-assets`, `websocket`, `cron`, `long-running-process`). Leaf packages
+  export their namespaced requirement/conformance descriptors; core never imports a leaf
+  (R-GRAPH-1 r2). Verdicts about leaf semantics carry `scope: 'binding'` and come from
+  **installed leaf backing manifests**, composed with the runtime manifest by the compiler —
+  a runtime manifest never claims queue/KV semantics by itself (SF-7).
+- **`unverified` is not `unsupported`**: unproven, not-installed, and credential-unavailable
+  states are distinguished in doctor/capability output; only a demonstrated impossibility is
+  `unsupported`. A `lossless` verdict requires a **live-platform** conformance cell — an
+  in-memory fake validates the harness, never certifies the provider.
+- `compileCapabilityVerdict(appRequirements, manifests…)` remains the **build-time rejection
+  compiler** (UR-5): `unsupported` → build failure with the note; `partial` → warning that must
+  be acknowledged in config; never a runtime surprise, never a silent downgrade (L-3). Sagas
+  tri-state law unchanged.
 
-## 5. Resource bindings (declarative, opaque to core)
+## 5. Topology: cells are declared, never silently partitioned (**NEW**, SF-8)
+
+The mixed-compute stories (Workers + Containers; Lambda + Fargate) need a contract the r1 corpus
+lacked:
 
 ```ts
-interface ResourceBinding {
-  readonly logicalName: string;      // from the project graph (appsettings)
-  readonly kind: LeafBindingKind;    // opaque leaf-owned discriminator: 'kv' | 'queue' | 'database' | …
-  readonly requirement: readonly DeployCapabilityId[];   // what the app needs of it
+interface DeploymentCell {
+  readonly id: string;
+  readonly selectors: readonly string[];   // which services/consumers/schedules it owns
+  readonly target: DeployTargetKey;
+  readonly variant: string;
+  readonly bindings: readonly string[];
+}
+interface DeploymentTopologyPlan {
+  readonly cells: readonly DeploymentCell[];
+  readonly transports: readonly CrossCellTransport[];  // explicit cross-cell communication
 }
 ```
 
-Deploy transports bindings **by name into artifacts and environment** (env vars, wrangler
-bindings blocks, aspire references) — it never resolves them to SDK objects and never validates
-leaf semantics (leaf cores do, at their own composition time). The concrete mapping table
-(logicalName → provider handle) is target config authored in `deploy.targets.<key>.bindings`,
-validated by the adapter's schema member. This replaces rev2's `ResourceBindingResolverPort` and
-`ActivationRouterPort` with a declaration + transport contract; event *activation* (queue →
-handler wiring on push-model providers) is leaf-adapter territory, gated by the leaf's own
-conformance (adversarial F3 honored).
+v1 rule: **cells are user-declared** in `deploy/targets.ts`. The compiler may return
+machine-readable `suggestedCells` when a single-cell verdict fails, but it **rejects rather than
+partitions silently**. Gates: single ownership of every service/consumer/schedule across cells;
+explicit cross-cell transport; deterministic plan output. Until the topology slice lands, the
+Cloudflare/AWS scaffold stories are narrowed to one compute variant per target (DP-8).
 
-## 6. Conventions, registry, config
+`ResourceBinding` is unchanged in spirit — declarative name+kind transport, leaf semantics never
+interpreted by deploy — with requirements now expressed as `BindingRequirement` (namespaced
+`CapabilityRef`s, §4).
 
-- **Conventions** move verbatim: `activation-convention.ts` (retain count, symlink/dir-swap,
-  health gate), `secrets-convention.ts` (env-file reference, 0o600, redaction),
-  `rollback-convention.ts`, `observability-convention.ts` (OTEL endpoint/protocol/prefix),
-  `health-gate.ts`, plus `servy-config.ts` → `deploy-baremetal` (target-specific). R-DEPLOY-3
-  stands: adapters delegate, never fork.
-- **Registry**: `createDeployTargetRegistry(entries, )` — closed-on-key, duplicate-guarded
-  (auth's `createAuthPresetRegistry` pattern), populated only at composition roots (plugin,
-  generated project registry, CLI shim). **Multi-target by design** — unlike auth's
-  single-active backend, a project registry may hold many targets keyed
-  `<targetKey>[@<environment>]` (the auth-inversion named in
-  `research/auth-composition-anatomy.md` §9).
-- **Config**: `DeployTargetBaseSchema` (the shipped Zod raw shape with
-  activation/secrets/otel/health/docker sub-blocks) moves to `./config`; each adapter exports its
-  member schema (spreading the base — R-DEPLOY-4); the **target schema registry** composes the
-  `deploy.targets` discriminated union at load time, so `@netscript/config` retains only the
-  project-loader seam and never names vendors. Environment dimension: `deploy.targets.<key>` gains
-  an optional `environments: Record<string, Partial<TargetConfig>>` overlay — the modeled
-  replacement for today's opaque `--environment` pass-through (inventory §4 gap).
+## 6. Conventions, registry, config (r2 — SF-1/SF-10/SF-13)
+
+- **Conventions**: the demonstrably pure policies (`activation`, `secrets`, `rollback`,
+  `observability`, `health-gate`) move *with their constants*; `servy-config.ts` and
+  `runtime-overrides.ts` go to `deploy-baremetal`/leaf owners (SF-2). R-DEPLOY-3 stands:
+  adapters delegate, never fork.
+- **Registry**: `createDeployTargetRegistry(entries = [])` — **empty by construction**; core owns
+  only the registry implementation, port, key/error types. **Duplicate rejection is NEW
+  behavior** (the shipped registry is register-or-replace — SF-13): `register` rejects with
+  `DeployTargetCollisionError { key, existingOwner, incomingOwner }`; a composition-root-only
+  `replaceForCompatibility` exists solely for the W1 shim and is removed with it.
+  `DEFAULT_DEPLOY_TARGETS` is **deleted as a core concept** (SF-1): during W1 its compatibility
+  equivalent stays in the CLI composition root; from W3 the plugin/generated project registry
+  supplies entries (as resolved `DeployTargetContribution` descriptors, DP-4 §3). Multi-target
+  by design, keyed `<targetKey>[@<environment>]`.
+- **Config — two-phase loader** (**NEW**, SF-10). Today the full config parses `deploy` through
+  a static schema *before* the plugin list is even available, and unknown target keys are
+  silently stripped — so "adapters contribute schemas at load time" needs a real bootstrap
+  contract:
+  1. Bootstrap-parse only project identity, `plugins`, and `deploy.targets` as
+     `Record<string, unknown>` — nothing stripped.
+  2. Resolve plugin + generated adapter descriptors (including `schemaLoader`s).
+  3. Compose the target schema registry; parse the full config.
+  4. An unrecognized target key ⇒ `DeployTargetAdapterMissingError` — **never silently dropped**
+     (a deliberate, documented behavior change from today's strip-by-design).
+  `@netscript/config` keeps the project-loader seam and exports the legacy target types/schemas
+  as a frozen delegating union for the compatibility window. Environments overlay
+  (`environments: Record<string, Partial<TargetConfig>>`) unchanged from r1. Key-mapping note
+  (quick win): config keys (`windows`, `linux`), registry keys (`windows-service`,
+  `linux-service`), and the CLI target (`baremetal`) are distinct vocabularies with one explicit
+  mapping table in `./config` — never treated as interchangeable.
 
 ## 7. Gates and proof
 
 - Full A2 gate set; **F-DEPLOY-1** (AST + registry scan: every registered adapter implements the
-  7-op contract or a declared subset) and **F-DEPLOY-2** (import graph + AST: no target-specific
-  business logic outside adapter packages; conventions imported from core) flip
-  `reviewed` → `gated` in W1 — extended with **R-GRAPH-1** (core imports leaf *types* only; no
-  provider SDK, no leaf implementation) as a new import-graph assertion.
+  eight-op contract or a declared subset) and **F-DEPLOY-2** (import graph + AST: no
+  target-specific business logic outside adapter packages; conventions imported from core) flip
+  `reviewed` → `gated` in W1 — extended with **R-GRAPH-1 r2** (core imports no leaf package, no
+  provider SDK) and the **no `deploy-*` → `deploy-*` import** assertion (SF-11) as import-graph
+  gates.
+- Registry tests: constructor duplicates, generated-registry duplicates, environment-qualified
+  keys, deterministic ordering (SF-13). Loader tests: installed custom target, missing adapter,
+  malformed adapter config, plugin-loader failure, all existing target keys (SF-10).
+- Secret-reference tests prove values never appear in plans, manifests, telemetry, events,
+  command argv, or thrown errors (quick win).
 - `./testing` ships the in-memory target + fixture builders so the plugin, CLI shim, and
   conformance kit test without live providers (A2 Concept of Done).
-- Quality bar: `deno task quality:scan` (no `any`/casts), `arch:check`, `deno doc --lint` clean,
-  jsr publish dry-run — per harness pitfall rules.
+- Quality bar: `deno task quality:scan`, `arch:check`, `deno doc --lint` clean, jsr publish
+  dry-run — per harness pitfall rules.

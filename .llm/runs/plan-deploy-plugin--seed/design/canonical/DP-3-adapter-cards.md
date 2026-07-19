@@ -5,17 +5,23 @@
 
 ## 0. The shared conformance suite (binds every card)
 
-One suite, run per target, is the family's acceptance instrument (the deploy analogue of the
-auth board's single test kit, S14): it exercises each declared `DeployCapabilityManifest` row —
-HTTP serve + static assets, graceful shutdown through `ServiceShutdownCoordinator` (L-5),
-health-gate + rollback behavior, secrets redaction, log retrieval, and (where declared) cron,
-queue-consume, kv-atomic — against the target's realization (in-memory fake in CI; live probe
-lane for the real platform). **A manifest row without a passing suite cell is a gate failure**
+One suite, run per **target variant**, is the family's acceptance instrument (the deploy
+analogue of the auth board's single test kit, S14): it exercises each declared
+`DeployCapabilityManifest` verdict — runtime traits (HTTP serve + static assets, graceful
+shutdown through `ServiceShutdownCoordinator` (L-5), cron), health-gate + rollback behavior,
+secrets redaction, log retrieval — against the variant's realization, and composes **installed
+leaf backing manifests** for `scope: 'binding'` semantics (queue-consume, kv-atomic) rather than
+letting a runtime manifest claim them (r2, SF-7). Verdict levels are
+`lossless | partial | unsupported | unverified`: a **`lossless` verdict requires a live-platform
+cell** (an in-memory fake validates the harness, never certifies the provider), and
+unproven/not-installed/credential-unavailable states report as `unverified`-family diagnostics,
+never as provider impossibility. **A verdict without its suite cell is a gate failure**
 (backend-truthful, DP-2 §4). The suite lives in `plugin-deploy-core/testing` + per-adapter live
-probes; CI matrix = target × capability × verdict (board-parity lesson 9).
+probes; CI matrix = target × variant × capability × verdict (board-parity lesson 9).
 
-Every card below states: tier (DP-0 §3), wrapped surface, ops subset, manifest sketch (only
-non-obvious rows), scaffold hooks, permissions, and probe gates.
+Every card below states: tier (DP-0 §3), wrapped surface, ops subset, manifest sketch per
+**variant** (only non-obvious rows), scaffold hooks, permissions, and probe gates. Manifests
+carry `schemaVersion`, adapter + upstream tool versions, probe date, and evidence ids (DP-2 §4).
 
 ## 1. `deploy-aspire` (W2 extraction) — T1
 
@@ -28,9 +34,13 @@ non-obvious rows), scaffold hooks, permissions, and probe gates.
   platform-marker validation preserved. `rollback`: convention-backed for compose (previous
   emitted dir + dir-swap); platform-native where Azure provides it — else absent from
   `operations`.
-- **Manifest sketch:** `process: long-lived`; sagas `supported` (long-lived containers);
-  `queue-consume: lossless` (in-process listeners); `exclusive-db-writer: lossless` on
-  single-replica compose, `partial` on k8s (replica-dependent, note required).
+- **Manifest sketch (per variant: `compose`, `docker`, `kubernetes`, `azure-*`):**
+  `process: long-lived`; sagas `supported` (long-lived containers). (r2, SF-7) Queue and
+  exclusive-writer semantics are **`scope: 'binding'` verdicts composed from installed leaf
+  backing manifests + workload constraints — withdrawn from this runtime card** until their
+  conformance cells exist: process liveness proves neither delivery/ack/redelivery semantics nor
+  single-writer topology. The k8s variant carries a `singleton` `WorkloadConstraint` interaction
+  note (replica-dependent) instead of a mode-collapsed verdict.
 - **Scaffold hooks:** owns the `deploy-compose-ghcr.yml` workflow template; keeps emitting
   nothing hand-authored (aspire publish output stays the artifact) until W4's container path
   offers generated Dockerfiles as an alternative.
@@ -40,15 +50,20 @@ non-obvious rows), scaffold hooks, permissions, and probe gates.
 
 - **Wraps:** Servy (Windows) / systemd (Linux) via the shipped OS-service port; the
   `deno compile` build pipeline consumed from core `./build`.
-- **Ops:** full 7-op including convention-backed `rollback` (activation retain + symlink/
+- **Ops:** full eight-op set including convention-backed `rollback` (activation retain + symlink/
   dir-swap + health gate — already designed, `DEPLOY-BAREMETAL-PUBLIC-WIRING` debt closes by
   composing the ports in the plugin's composition root) and `secrets` (env-file reference,
-  0o600). Legacy flat verbs (`build/install/start/stop/upgrade/uninstall`) alias here
-  (DP-2 §2).
-- **Manifest:** `process: long-lived`; everything `lossless` that the host machine provides;
-  sagas `supported`; `offline-sync: profile-dependent` note. The Linux systemd lane's
-  integration-test debt (`cli-deploy-linux-integration-untested`) becomes a live-probe card in
-  this adapter's suite.
+  0o600). Legacy flat verbs (`build/install/start/stop/copy/upgrade/package-cli/uninstall`)
+  live here as first-class compatibility handlers with their exact shipped semantics —
+  `BaremetalCompatibilityCommands`, DP-2 §2 (r2, SF-9).
+- **Manifest (r2, SF-7 — enumerated rows, no blanket claim):** `process: long-lived`; runtime
+  rows: `runtime:http-serve` lossless, `runtime:static-assets` lossless,
+  `runtime:long-running-process` lossless, `runtime:cron` via OS scheduler `partial` (note),
+  `runtime:websocket` lossless; sagas `supported`; binding-scope semantics come from whatever
+  leaf backings the project installs (host machine ≠ automatic `lossless`). The Linux systemd
+  lane's integration-test debt (`cli-deploy-linux-integration-untested`) becomes a live-probe
+  card in this adapter's suite. Owns the `BaremetalCompatibilityCommands` legacy-verb adapter
+  (DP-2 §2, SF-9).
 - **Permissions:** `--allow-run=servy,systemctl,deno`, filesystem on install base.
 
 ## 3. `deploy-deno` (W2 extraction; T1 flagship)
@@ -59,14 +74,19 @@ non-obvious rows), scaffold hooks, permissions, and probe gates.
 - **Ops:** plan (preflight + build config)/up/down/status/logs; `secrets` via
   `deno deploy env` (reference model — values never serialized into artifacts); `rollback` via
   the platform's instant-rollback revision routing.
-- **Manifest (the honesty showcase):** `tier: deno-native`; `process: bounded-window`;
-  `queue-consume: unsupported` (platform has no queues — note points to `externalized` MQ
-  bindings); `kv-atomic: partial` (Deno KV without queues/replication controls);
-  `cron: lossless` (`Deno.cron()` auto-discovered); sagas `externalized` (macro-service split or
-  external transport) — every row from `research/provider-deploy-surfaces.md` §5. Monorepo git
-  integration gap noted; local-source deploys (`--source local`) unaffected.
-- **Scaffold hooks:** default target of the plain scaffold (Deno-native-first default);
-  `deploy-deno-deploy.yml` workflow with `DENO_DEPLOY_TOKEN` (org tokens).
+- **Manifest (the honesty showcase; r2, SF-7):** `tier: deno-native`;
+  `process: bounded-window`; `@netscript/queue:consume → unsupported` at binding scope (the
+  platform has no queues — note points to `externalized` MQ bindings);
+  `@netscript/kv:atomic → judged by the leaf's atomic conformance suite` — NetScript's Deno KV
+  adapter implements version checks and atomic commit
+  (`packages/kv/adapters/deno-kv.adapter.ts:155-194`), so atomicity is NOT downgraded for the
+  platform's separate gaps; those gaps are their own refs (`kv:queues → unsupported`,
+  `kv:replication-controls → unsupported`); `runtime:cron → lossless` (`Deno.cron()`
+  auto-discovered); sagas `externalized` (macro-service split or external transport). Monorepo
+  git integration gap noted; local-source deploys (`--source local`) unaffected.
+- **Scaffold hooks:** the **recommended first target** (Deno-native-first default), added
+  explicitly via `deploy target add deno-deploy` — no target is preinstalled (Story 0 single
+  flow, r2 quick win); `deploy-deno-deploy.yml` workflow with `DENO_DEPLOY_TOKEN` (org tokens).
 - **Permissions:** `--allow-run=deno`, `--allow-net` (API), `--allow-read`.
 
 ## 4. `deploy-container` (W4, NEW) — T1; the L-6 shared path
@@ -81,9 +101,12 @@ non-obvious rows), scaffold hooks, permissions, and probe gates.
 - **Ops:** plan (emit Dockerfile/compose + image build)/up/down/status/logs; `secrets` = env-set
   via platform API (reference model); `rollback` = platform revision/machine-image swap where the
   API offers it, else declared absent.
-- **Manifest:** `process: long-lived` containers ⇒ sagas `supported`; capability rows otherwise
-  inherited from what the *image* runs (the leaf bindings selected at scaffold time) — the
-  manifest mechanism keeps this honest per project.
+- **Manifest (r2, SF-7 — composition rule made explicit):** `process: long-lived` containers ⇒
+  sagas `supported`; runtime rows from the image contract (`runtime:http-serve`,
+  `runtime:long-running-process` lossless). Binding-scope verdicts are **composed by the
+  compiler** from the *installed leaf backing manifests* the project selected at scaffold time —
+  the container runtime manifest itself claims nothing about queue/KV semantics; "inherited"
+  means that composition, not an implicit blanket.
 - **This retires** the container half of `cli-deploy-artifacts-missing`: NetScript finally emits
   a Dockerfile — but as adapter output, not scaffold hand-authoring.
 - **Permissions:** `--allow-run=docker,podman,flyctl`, `--allow-net` per platform API.
@@ -92,8 +115,10 @@ non-obvious rows), scaffold hooks, permissions, and probe gates.
 
 - **Wraps:** `wrangler` (npm, invoked as a tool): emits `wrangler.jsonc` (entry, compatibility
   date, bindings blocks) + a **worker entry adapting `ServiceApp.fetch`** (Web-standard, L-4:
-  in-process Fetch delegation), then `wrangler deploy` / `wrangler versions`. Containers lane
-  delegates image build to `deploy-container` + `@cloudflare/containers` wiring.
+  in-process Fetch delegation), then `wrangler deploy` / `wrangler versions`. The Containers
+  lane accepts a core-owned `ContainerBuildPort` **by injection** (`deploy-container` supplies
+  the implementation at composition time — no adapter-to-adapter import; r2, SF-11) +
+  `@cloudflare/containers` wiring.
 - **Probe gate (CF-PROBE, before adapter graduation):** build+deploy a NetScript service to a
   live Workers target; measure Miniflare-vs-production fidelity for the dev loop (Miniflare is
   a simulator, not an oracle — adversarial F2); demonstrate static-assets, `nodejs_compat`
@@ -101,13 +126,19 @@ non-obvious rows), scaffold hooks, permissions, and probe gates.
   yet — a real operational caveat).
 - **Ops:** plan (emit config + entry)/up/down (delete)/status/logs (`wrangler tail`); `secrets`
   via `wrangler secret` (reference model); `rollback` via `wrangler versions rollback`.
-- **Manifest:** `tier: web-standard`; `process: isolate`; `queue-consume: unsupported` **in this
-  adapter** (CF Queues push-consumer wiring is leaf territory — a future `@netscript/queue-cf`
-  card, R-GRAPH-4; the binding transport still declares the queue by name);
-  `kv-atomic: unsupported` (Workers KV no-CAS — capability rejection per L-2);
-  `long-running-process: unsupported` on Workers / `lossless` on Containers lane; sagas
-  `rejected` on Workers, `externalized`-or-`supported` via Containers. DO-backed saga/worker
-  stores are explicitly **probe cards owned by the saga/worker leaves**, not this adapter.
+- **Manifests (r2, SF-7 — two variants, no mode collapse):**
+  - `variant: workers` — `tier: web-standard`; `process: isolate`;
+    `runtime:long-running-process → unsupported`; sagas `rejected`;
+    `@netscript/queue:consume → unsupported` at binding scope in v1 (CF Queues push-consumer
+    wiring is leaf territory — a future `@netscript/queue-cf` card, R-GRAPH-4; the binding
+    transport still declares the queue by name); `@netscript/kv:atomic → unsupported` (Workers
+    KV no-CAS — capability rejection per L-2).
+  - `variant: containers` — `tier: deno-native`; `process: long-lived`;
+    `runtime:long-running-process → lossless`; sagas `supported`-or-`externalized` per the
+    project's leaf backings (container composition rule, §4).
+  DO-backed saga/worker stores are explicitly **probe cards owned by the saga/worker leaves**,
+  not this adapter. v1 scaffold story uses ONE variant per target (topology cells are
+  user-declared — DP-2 §5, SF-8); the second variant is added as a second declared cell/target.
 - **Scaffold hooks:** the cloudflare-optimized scaffold story (scaffold-stories §2).
 - **Permissions:** `--allow-run=wrangler,npx`, `--allow-net`.
 
@@ -130,9 +161,10 @@ non-obvious rows), scaffold hooks, permissions, and probe gates.
 ## 7. `deploy-aws` (W5; AWS-PROBE-gated, HTTP scope first) — T1 via containers
 
 - **Wraps (HTTP scope):** **AWS Lambda Web Adapter** as layer/binary in a `denoland/deno`
-  container image (built by `deploy-container`), fronted by Function URL/API GW/ALB;
-  Fargate/App Runner lanes via the container path. Adversarial F1 stands: **LWA is an HTTP
-  sidecar** — this adapter claims HTTP hosting only until the event-semantics probes pass.
+  container image (image build via an **injected** core-owned `ContainerBuildPort` — r2, SF-11),
+  fronted by Function URL/API GW/ALB; Fargate/App Runner lanes via the same injected container
+  path. Adversarial F1 stands: **LWA is an HTTP sidecar** — this adapter claims HTTP hosting
+  only until the event-semantics probes pass.
 - **IaC:** optional `./pulumi` subpath wrapping the **Pulumi Automation API** (Apache-2.0,
   inline programs, no Pulumi Cloud) for users who want provisioned infra; plain
   image+existing-infra deploys need no IaC dependency. Serverless Framework v4 excluded
@@ -140,11 +172,14 @@ non-obvious rows), scaffold hooks, permissions, and probe gates.
 - **Ops:** plan (emit image + optional IaC program)/up/down/status/logs (CloudWatch);
   `secrets` via SSM/Secrets Manager references; `rollback` via Lambda versions/App Runner
   revisions.
-- **Manifest:** HTTP rows only in v1; `queue-consume: unsupported` with note "SQS backing is
-  `@netscript/queue` leaf territory (`ReportBatchItemFailures`, per-record ack, visibility
-  timeout — see AWS-PROBE-EVENTS card)"; sagas `externalized` (or `supported` on Fargate
-  long-lived). CI auth: GitHub OIDC → `AssumeRoleWithWebIdentity` (no static keys) — scaffold
-  emits the role-trust snippet.
+- **Manifests (r2, SF-7 — two variants):**
+  - `variant: lambda` — `process: bounded-window`; HTTP rows only in v1; sagas `externalized`;
+    `@netscript/queue:consume → unverified` at binding scope with note "SQS backing is
+    `@netscript/queue` leaf territory (`ReportBatchItemFailures`, per-record ack, visibility
+    timeout — see AWS-PROBE-EVENTS card)".
+  - `variant: fargate` — `process: long-lived`; sagas `supported` per leaf backings; same image.
+  v1 story uses one variant; the second is a second declared cell (DP-2 §5). CI auth: GitHub
+  OIDC → `AssumeRoleWithWebIdentity` (no static keys) — scaffold emits the role-trust snippet.
 - **Probe gates:** AWS-PROBE-HTTP (live LWA conformance) before shipping; AWS-PROBE-EVENTS
   (SQS conformance design + live probe, leaf-owned) before any event claims.
 

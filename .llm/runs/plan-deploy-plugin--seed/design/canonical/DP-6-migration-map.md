@@ -11,16 +11,16 @@
 | # | Shipped item (owner today) | Destination | Wave | Kind |
 | --- | --- | --- | --- | --- |
 | M-1 | `DeployTargetPort` + `DeployOperation` (`packages/cli/src/kernel/domain/deploy/deploy-target-port.ts`) | `plugin-deploy-core/ports` | W1 | Move + sharpen (capability field) |
-| M-2 | Deploy target registry + `DEFAULT_DEPLOY_TARGETS` (`kernel/application/registries/deploy-target-registry.ts`, registry port) | `plugin-deploy-core/registry` | W1 | Move (closed-on-key preserved) |
-| M-3 | Conventions: `activation/secrets/observability/rollback-convention.ts`, `health-gate.ts`, `runtime-overrides.ts` | `plugin-deploy-core/conventions` | W1 | Move verbatim (R-DEPLOY-3) |
-| M-4 | Compile/build engine (`kernel/adapters/deploy/compile/*`, domain `compile-target.ts`, `build/build-deploy.ts` pipeline core) | `plugin-deploy-core/build` | W1 | Move; CLI keeps the presentation wrapper |
-| M-5 | `DeployTargetBaseSchema` + target-map (`packages/config/src/domain/schemas/deploy-schema.ts`, types `config-section-types.ts:357-592`) | Base + schema registry → `plugin-deploy-core/config`; per-target members → their adapter packages | W1 (base) / W2 (members) | Move; retires the deploy slice of `config-plugin-specific-schema-debt`; `@netscript/config` keeps the loader seam and a re-export for one deprecation window |
-| M-6 | Windows/Linux service targets, Servy/systemd adapters, `servy-config.ts`, OS-service factory | `@netscript/deploy-baremetal` | W2 | Move; compose ports publicly (closes `DEPLOY-BAREMETAL-PUBLIC-WIRING` — the 7-op set advertised at runtime) |
+| M-2 | Deploy target registry (`kernel/application/registries/deploy-target-registry.ts`, registry port) | `plugin-deploy-core/registry` — **empty registry + port + key/error types only** (r2, SF-1); adapters export target factories; `DEFAULT_DEPLOY_TARGETS` is deleted as a core concept — its compatibility equivalent stays in the CLI composition root in W1, replaced by descriptor composition from W3 | W1 | Extract + **NEW behavior**: duplicate rejection (`DeployTargetCollisionError`) — the shipped registry is register-or-replace (r2, SF-13); composition-root-only `replaceForCompatibility` for the W1 shim |
+| M-3 | Conventions: `activation/secrets/observability/rollback-convention.ts`, `health-gate.ts` | `plugin-deploy-core/conventions` — the demonstrably pure policies move *with their constants*; **`runtime-overrides.ts` stays with its bare-metal/leaf owners** (it duplicates leaf job/saga/task vocabulary and describes `.deploy/windows` — r2, SF-2) | W1 | Move (R-DEPLOY-3) |
+| M-4 | Compile/build engine (`kernel/adapters/deploy/compile/*`, domain `compile-target.ts`, `build/build-deploy.ts` pipeline) | (r2, SF-2) **Refactor then extract**: the pipeline imports CLI `ResolvedConfig`, CLI output, and Windows manifest/V8 modules — it is not a verbatim move. W2 moves the current Windows/Linux build behavior to `deploy-baremetal`; an adapter-neutral compile emitter graduates to `plugin-deploy-core/build` only after filesystem/process/output/config ports exist | W2 (behavior) / later (core emitter) | Refactor then extract |
+| M-5 | `DeployTargetBaseSchema` + target-map (`packages/config/src/domain/schemas/deploy-schema.ts`, types `config-section-types.ts:357-592`) | Base + schema registry → `plugin-deploy-core/config` over the **two-phase loader** (r2, SF-10: bootstrap-parse without stripping → resolve adapter `schemaLoader`s → compose → full parse; unknown target ⇒ `DeployTargetAdapterMissingError`, never silently dropped); per-target members → their adapter packages; `@netscript/config` keeps the loader seam + a frozen delegating legacy union for the compat window | W1 (base+loader) / W2 (members) | Move + **NEW loader phase**; retires the deploy slice of `config-plugin-specific-schema-debt` |
+| M-6 | Windows/Linux service targets, Servy/systemd adapters, `servy-config.ts`, OS-service factory | `@netscript/deploy-baremetal` | W2 | Move; compose ports publicly (closes `DEPLOY-BAREMETAL-PUBLIC-WIRING` — the full declared op set advertised at runtime) |
 | M-7 | `AspireComposeDeployTarget` + `AspireCloudDeployTarget` (`kernel/adapters/aspire/*`) | `@netscript/deploy-aspire` | W2 | Move; platform-marker validation intact |
 | M-8 | Deno Deploy target + CLI port + unstable-API guard (`domain/deploy/deno-deploy-*`, `kernel/adapters/deno-deploy/*`) | `@netscript/deploy-deno` | W2 | Move; transitive-scan improvement is a named follow-up card |
 | M-9 | cloud-run docker lane (inside aspire-cloud adapter) | `deploy-container` (+`./cloudrun` client) | W4 | Re-home (micro-decision at W4; until then stays in `deploy-aspire` unchanged) |
 | M-10 | `deploy` CLI group + all verbs (`public/features/deploy/**`) | W1–W2: same group re-wired over core/adapters; W3: plugin-contributed group + built-in shim (DP-4 §6) | W1→W3 | Rewire, then re-home |
-| M-11 | Legacy flat verbs `build/install/start/stop/status/logs/upgrade/uninstall/copy/package-cli` | Aliases onto `baremetal` target ops; deprecation notice two minor releases, then removal | W2 announce / W5 remove | Deprecate (resolves S12/#348 convergence; stale "Windows Service" group description fixed in W1) |
+| M-11 | Legacy flat verbs `build/install/start/stop/status/logs/upgrade/uninstall/copy/package-cli` | (r2, SF-9 — semantics are NOT `up`/`down`-equivalent: shipped `start`/`stop` act on registered services without install/uninstall; `copy` syncs artifacts without registration; `upgrade` is a five-step transaction; `package-cli` builds an operator binary) **First-class compatibility handlers owned by `deploy-baremetal`** (`BaremetalCompatibilityCommands`) preserving current flags and side-effect boundaries **through the next semver-major**. Only `build → plan+emit`, `status`, `logs` are direct aliases. Help deprecates; no minor-release removal date until an equivalent canonical workflow + migration telemetry exist. Golden help/exit-code + state-transition tests (`stop` never uninstalls; `start` never registers) | W2 (handlers) / next semver-major (removal) | Compat handlers (resolves S12/#348; stale "Windows Service" group description fixed in W1) |
 | M-12 | Scaffold deploy emission: 3 workflow templates, `netscript.config.ts` `deploy:{}`, appsettings model | Workflow templates move to their owning adapters' scaffold assets; `deploy:{}` gains the plugin-era schema (targets added via `deploy target add`); appsettings model unchanged (it is the logical graph — L-4) | W3 | Re-home + extend |
 | M-13 | Aspire scaffold bundle (`apphost.mts`, `.helpers`, aspire.config.json…) | Unchanged — `@netscript/aspire` substrate + CLI templates stay; the deploy plugin consumes, never owns, AppHost emission | — | Keep |
 | M-14 | `packages/aspire` | Unchanged (composer/diagnostics substrate) | — | Keep |
@@ -33,9 +33,9 @@
 
 | Debt entry | Effect |
 | --- | --- |
-| `DEPLOY-ARCHETYPE-7-CORE-SEED` | **Retired by W1** (core package exists, conventions+registry owned, F-DEPLOY-1/2 → `gated`) |
+| `DEPLOY-ARCHETYPE-7-CORE-SEED` | **Retired by W1, conditional** (r2, SF-1): core package exists, pure conventions + empty registry owned, F-DEPLOY-1/2 → `gated`, **and** the externalized composition root (defaults in the CLI root, not core) is in place — the retirement claim is not made on a verbatim `DEFAULT_DEPLOY_TARGETS` move |
 | `DEPLOY-SECRETS-ROLLBACK-CORE` | **Retired by W1/W2** (adapters delegate to core conventions) |
-| `DEPLOY-BAREMETAL-PUBLIC-WIRING` | **Retired by W2** (production composition root wires ports; 7-op advertised) |
+| `DEPLOY-BAREMETAL-PUBLIC-WIRING` | **Retired by W2** (production composition root wires ports; full declared op set advertised) |
 | `cli-deploy-artifacts-missing` | **Partially retired W4** (container lane emits Dockerfile/compose); Helm/K8s hand-artifacts remain delegated to `aspire publish` (unchanged claim) |
 | `DEPLOY-S7-APPHOST-COMPOSE-GEN` | Superseded-in-place: the shared compose-gen primitive becomes `deploy-container` emission; the Aspire `addExecutable` constraint documented in its card |
 | `cli-deploy-linux-integration-untested` | Converted into a live-probe suite cell of `deploy-baremetal` (W2) |
@@ -46,10 +46,14 @@
 ## 3. Compatibility contract (what users experience)
 
 1. **Config keys survive**: `deploy.targets.windows|linux|docker|compose|deno-deploy|kubernetes|
-   azure-*|cloud-run` parse identically through W1–W3 (schema re-home is transparent; one
-   deprecation window for import-path movers).
+   azure-*|cloud-run` parse identically through W1–W3 (schema re-home is transparent; legacy
+   types stay exported from `@netscript/config` as a frozen delegating union for the compat
+   window). One deliberate, documented behavior change (r2, SF-10): an **unknown** target key
+   becomes `DeployTargetAdapterMissingError` instead of today's silent strip — surfacing
+   misconfiguration is the point.
 2. **Verbs survive**: every documented `netscript deploy …` invocation works unchanged through
-   W3; legacy flat verbs warn from W2, removed after two minor releases (M-11).
+   W3 and beyond; legacy flat verbs keep their exact current semantics as compatibility handlers
+   until the next semver-major (M-11, r2).
 3. **Scaffolded projects**: existing projects keep working without the plugin (shim path);
    `plugin install deploy` is additive. New scaffolds from W3 get the plugin preinstalled with
    the `deno-deploy` default target (T1 default, DP-3 §3).

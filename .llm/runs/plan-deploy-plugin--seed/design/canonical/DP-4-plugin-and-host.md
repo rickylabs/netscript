@@ -1,6 +1,8 @@
 # DP-4 — `plugins/deploy` and the plugin-host extensions
 
 > **Draft — no GitHub mutation.** Canonical design doc of `plan-deploy-plugin--seed`.
+> **r2** — amended per Sol adversarial findings SF-3, SF-4, SF-12, SF-14 (+ quick wins);
+> triage in `adversarial-sol-triage.md`.
 
 ## 1. The plugin (`@netscript/plugin-deploy`, `plugins/deploy/`) — Archetype 5
 
@@ -10,38 +12,65 @@ Folder shape (doctrine 06:181-198; contribution folders sibling to `src/`):
 plugins/deploy/
   mod.ts                    # few lines: re-export public surface
   deno.json                 # subpaths: ./public ./plugin ./scaffold ./adapter-cli ./streams ./streams/server
-  README.md                 # permissions, target matrix, quick start
-  verify-plugin.ts          # asserts declared axes against the host loader
+  README.md                 # per-target permission profiles, target matrix, quick start
+  verify-plugin.ts          # asserts declared axes against the host loader (incl. cliCommands/doctorChecks)
   scaffold.plugin.json      # installer manifest (§3)
   cli.ts                    # createPluginAdapter(deployAdapterPlugin).toCli()
   scaffold.ts               # …​.toScaffold()
   src/
     public/mod.ts           # definePlugin(...) manifest (§2)
     adapter/plugin.ts       # NetScriptPlugin connector (install/doctor seams)
-    adapter/resources/      # starter resources: deploy.config barrel + target snippets
-    composition/            # composition root: registry assembly from installed adapters
+    adapter/resources/      # starter resources: deploy/targets.ts leaf + target snippets
+    composition/            # composition root: resolves DeployTargetContribution descriptors
   streams/                  # deploy event stream schema + server producer (§4)
 ```
 
-Thinness law: every convention lives in `plugin-deploy-core`; the plugin only **wires**
-(composition root builds the multi-target registry from the adapters the project installed),
-**declares** (manifest, installer JSON, connector), **contributes** (CLI mount, scaffolder,
-streams, telemetry, doctor), and **re-exports** (core types). `mod.ts` stays a few lines
-(R-PLUGIN-THIN).
+Thinness law: every convention lives in `plugin-deploy-core`; the plugin only **wires**,
+**declares**, **contributes**, and **re-exports**. (r2, SF-12) **The plugin depends only on
+core** — it never statically imports the official adapter set. Adapters reach the runtime as
+descriptors:
+
+```ts
+interface DeployTargetContribution {
+  readonly key: string;                    // registry key, e.g. 'deno-deploy'
+  readonly targetLoader: SafePackageExport;  // e.g. { pkg: '@netscript/deploy-deno', export: './target' }
+  readonly schemaLoader: SafePackageExport;  // the target's config member schema (two-phase loader)
+  readonly permissions: DeployPermissionProfile; // exact tool/net/fs profile for THIS target
+}
+```
+
+`deploy target add <key>` installs the adapter peer, writes one descriptor into the user-owned /
+generated target registry file, and emits the target's scaffold assets. The composition root
+resolves descriptors (validated safe loader subpaths), injects shared implementations (e.g.
+`deploy-container`'s `ContainerBuildPort`), and populates the duplicate-rejecting registry.
+Failure modes are first-class and tested: missing peer, invalid export, duplicate key,
+uninstall, stale registry entry.
 
 ## 2. Runtime manifest (`definePlugin`)
 
 ```ts
 definePlugin('@netscript/plugin-deploy', DEPLOY_PLUGIN_VERSION)
   .withDisplayName('Deploy').withType('utility')
-  .withPermissions(DEPLOY_PLUGIN_PERMISSIONS)          // --allow-run=<tool set>, net, read, write
-  .withCliCommands([{ group: 'deploy', loader: './adapter-cli' }])   // NEW axis (§5)
+  .withPermissions(DEPLOY_PLUGIN_BASE_PERMISSIONS)   // plugin's own baseline only (read/write
+                                                     // workspace, net for registries) — NOT the
+                                                     // union of all provider permissions (SF-12)
+  .withCliCommands([                                 // mount-children, NEVER top-level (§5, SF-4)
+    { mount: 'deploy', id: 'target', loader: './adapter-cli', export: 'targetGroup' },
+    { mount: 'deploy', id: 'capabilities', loader: './adapter-cli', export: 'capabilitiesCommand' },
+    // eight-op target router children attach under the host-owned 'deploy' shell
+  ])
+  .withDoctorChecks([{ id: 'deploy-target', loader: './src/doctor', export: 'deployTargetCheck' }])
   .withStreamTopics([{ name: 'deploy-events', subject: 'deploy' }])
   .withTelemetry([{ name: 'deploy', loader: './src/telemetry' }])
-  .withRuntimeConfigTopics([{ name: 'deploy' }])       // rollout flags (pause target, freeze)
+  .withRuntimeConfigTopics([{ name: 'deploy' }])     // rollout flags, checked at each CLI/CI
+                                                     // invocation (no resident process observes
+                                                     // changes mid-operation — r2 quick win)
   .withMetadata({ tier: 'official' }).build();
-// frozen with: contributions.cli.doctorChecks = ['deploy-target']    // NEW union member (§5)
 ```
+
+Per-target permissions are **not** aggregated here: each `DeployTargetContribution` carries its
+own `DeployPermissionProfile`; `deploy doctor` reports the exact installed set, and the CLI
+launcher computes/prints the required profile for the configured targets (SF-12).
 
 **No `withService` in v1** (owner fork OF-4): deploy is CLI/CI-shaped; there is no long-running
 HTTP surface, no port, `hasRoutes:false`. The machine-readable surface that replaces a `describe`
@@ -51,95 +80,133 @@ route is the **capability manifest**, exposed as `netscript deploy capabilities 
 (`...BASE_PLUGIN_CONTRACT_ROUTES` + `satisfies BasePluginContract`) — the seam cost is one
 follow-up card, so deferring is rework-safe (plan-gate open-decision sweep).
 
-## 3. Installer manifest (`scaffold.plugin.json`)
+## 3. Installer manifest (`scaffold.plugin.json`) — r2, SF-3: protocol-valid + tooling variant
 
-Re-derived, not copied from auth (`research/auth-composition-anatomy.md` §9 item 8):
+The r1 sketch was invalid under `PluginInstallerManifest` (missing required `version`,
+`displayName`, `description`, `peerDependencies`; boolean `requiredPermissions` where the
+protocol requires string arrays; service-shaped `provider`/`officialSource` requirements a
+tooling plugin cannot meet). r2 (a) writes the complete manifest and (b) **generalizes the
+protocol** for tooling-only plugins as part of the host-extension slices:
+
+```ts
+type PluginManifestOfficialSource =
+  | ExistingServiceOfficialSource                     // v1 shape, unchanged (auth et al.)
+  | { readonly sourceKind: 'tooling';
+      readonly canonicalName: string;
+      readonly pluginDir?: string };
+```
 
 ```jsonc
 {
   "schemaVersion": 1,
   "name": "@netscript/plugin-deploy",
-  "capabilities": { "hasDatabaseMigrations": false, "hasRoutes": false,
-                    "hasBackgroundWorkers": false, "contributesDeployTargets": true },  // NEW flag (§5)
-  "scaffolder": { "export": "./scaffold",
-                  "requiredPermissions": { "net": true, "read": true, "write": true } },
-  "provider": { "kind": "deploy", "pluginType": "utility", "infrastructureRequires": [] },
-  "officialSource": { "canonicalName": "deploy", "pluginDir": "deploy" }
+  "version": "<workspace version>",
+  "displayName": "Deploy",
+  "description": "Deploy targets, capability verdicts, and per-provider scaffolds for NetScript workspaces.",
+  "peerDependencies": { "@netscript/plugin-deploy-core": "<workspace version>" },
+  "capabilities": {
+    "hasDatabaseMigrations": false,
+    "hasRoutes": false,
+    "hasBackgroundWorkers": false,
+    "contributionAxes": ["cli-command", "doctor-check", "stream-topic", "telemetry", "runtime-config-topic"]
+  },
+  "scaffolder": {
+    "export": "./scaffold",
+    "requiredPermissions": { "net": ["jsr.io"], "read": ["<workspaceRoot>"], "write": ["<workspaceRoot>"] }
+  },
+  "officialSource": { "sourceKind": "tooling", "canonicalName": "deploy", "pluginDir": "deploy" }
 }
 ```
 
-No `.prisma`, no service port, no port-range key, no db/kv requirement — the deploy plugin runs
-at build/CI time and in the developer loop, not as a resident service.
-
-Peer model: **adapters are peerDependencies-style install choices.** `netscript plugin install
-deploy` installs plugin + core; `netscript deploy target add <key>` (new verb, §6) adds the
-adapter package import + its config member + scaffold assets for that target. This is the
-multi-target inversion of auth's single-active env selection: targets are *added*, not switched.
+(r2, SF-14) There is **no `contributesDeployTargets` boolean**: the installer infers deploy
+participation from the declared `contributionAxes` / adapter descriptors — no deploy-specific
+field enters the generic protocol. Schema-parse, official copy/install, and
+backward-compatibility fixtures (v1 service manifests keep parsing) ship with the protocol
+slice. Adapter packages are peer install choices driven by `target add` (§1), not manifest
+dependencies.
 
 ## 4. Contributions beyond CLI
 
 - **Streams**: `deploy-events` durable stream — versioned envelope
-  `deploy.started/succeeded/failed/rolled-back` with target key, environment, artifact digest,
-  actor, trace context (W3C propagation like auth's producer). Core deploy success **never
-  depends on the stream sink** (audit-provider independence — board-parity lesson 8).
-- **Telemetry**: span vocabulary for plan/up/rollback, redaction rules (secrets never in spans —
-  the secrets convention's redaction applied at the telemetry seam).
-- **Runtime-config topic `deploy`**: operational flags (freeze deploys, pause a target) readable
-  without redeploy via `@netscript/runtime-config` — deliberately tiny.
-- **Scaffolder**: emits the userland `deploy/` leaf — `deploy/targets.ts` (typed target
+  `deploy.started/succeeded/failed/rolled-back` with target key + variant, environment, artifact
+  digest, actor, trace context (W3C propagation like auth's producer). Core deploy success
+  **never depends on the stream sink** (audit-provider independence).
+- **Telemetry**: span vocabulary for plan/emit/up/rollback, redaction rules (secrets never in
+  spans — the secrets convention's redaction applied at the telemetry seam).
+- **Runtime-config topic `deploy`**: operational flags (freeze deploys, pause a target) read at
+  each CLI/CI invocation — deliberately tiny.
+- **Scaffolder**: emits the userland `deploy/` leaf — `deploy/targets.ts` (typed target + cell
   definitions the user owns and edits — the named inversion of auth's never-rewritten barrel)
-  plus per-target assets on `target add` (wrangler.jsonc, fly.toml, workflows…; scaffold-stories
-  doc). Golden tests per emitter (R-PLUGIN-PARITY).
-- **Doctor**: `deploy-target` check — validates each configured target: adapter installed,
-  required tool on PATH (`wrangler`, `aspire`, `docker`…), credentials env present (names only,
-  never values), config member parses, capability verdict for the project graph.
+  plus per-target assets on `target add` (wrangler.jsonc, fly.toml, workflows…;
+  scaffold-stories doc). Golden tests per emitter (R-PLUGIN-PARITY).
+- **Doctor** (`deploy-target` check, contributed as data — §5): validates each configured
+  target: adapter peer installed, descriptor loader resolves, required tool on PATH
+  (`wrangler`, `aspire`, `docker`…), credentials env present (names only, never values), config
+  member parses, capability verdict for the project graph. Output distinguishes
+  `unsupported | unverified | adapter-not-installed | credential-unavailable` (r2 quick win).
 
-## 5. Host extensions (`@netscript/plugin` — named, small, reviewed)
+## 5. Host extensions (`@netscript/plugin` + CLI bootstrap) — r2, SF-4/SF-14: generic, data-driven
 
-Three host changes, each its own slice (they precede W3):
+Three slices, each independently gated (they precede W3). The r1 shapes (a widened doctor
+literal-union, a deploy-specific capability boolean, a shadowing CLI axis) repeated the
+closed-host edit pattern and had no viable discovery-to-startup path; r2 replaces them:
 
-1. **CLI-command contribution axis** (NEW): `CONTRIBUTION_AXES` + `'cli-command'`,
-   `CliCommandContribution { group: string; loader: string }`, `PluginCliCommandContribution`
-   abstract, `withCliCommands` builder verb. The registry emitter renders a generated CLI mount
-   module; `packages/cli` mounts contributed groups after built-ins at startup (declarative
-   `CliRoot` composition preserved — R-A6-N5). Collision rule: a contributed group may not
-   shadow a built-in group name except the deploy back-compat shim (§6).
-2. **Doctor-check union widening**: `cli.doctorChecks` type from `readonly 'auth-backend'[]` to a
-   declared union `readonly ('auth-backend' | 'deploy-target')[]` — still closed (typed registry,
-   AP-24-safe), one PR whenever a plugin adds a check kind.
-3. **Capability flag**: `PluginManifestCapabilities.contributesDeployTargets?: boolean` so the
-   installer/registry can reason about deploy plugins statically (parallel to
-   `supportsMcpScaffold`).
+1. **CLI mount-children contribution + async bootstrap** (SF-4). Contribution type
+   `CliCommandContribution { mount: string; id: string; loader: string; export: string }` +
+   `withCliCommands` builder verb + `PluginCliCommandContribution` abstract. **Host-owned mount
+   points**: the built-in `deploy` shell stays reserved and owns `desktop`, the absent-plugin
+   install hint, and shared help; contributions attach as **children under a mount** and can
+   never shadow a top-level command — no plugin-specific exception exists. CLI bootstrap becomes
+   async: resolve plugin manifests (the **manifest loader**, not the AST source walker, feeds
+   this registry), validate safe loader subpaths, register built-ins, attach contributed
+   children, then `program()`. Duplicate `(mount, id)` pairs fail before parsing and report both
+   plugin owners; loader failures are isolated (one broken plugin cannot take down the CLI).
+   Slices: contribution contract/builder/merger/verifier; async bootstrap + collision rules;
+   help rendering + plugin-absent behavior.
+2. **Doctor-check contributions as data** (SF-14). Replace the hard-coded
+   `cli.doctorChecks: readonly 'auth-backend'[]` literal union with
+   `DoctorCheckContribution { id: string; loader: SafePackageExport }` resolved through a
+   duplicate-guarded registry (auth migrates to `{ id: 'auth-backend', … }` compatibly). Closed
+   unions remain reserved for host-executed protocols whose cases have genuinely different host
+   semantics — not plugin identities. Loader isolation, duplicate-id, and failure-reporting
+   tests.
+3. **Installer-protocol generalization** (SF-3/SF-14). The `sourceKind: 'tooling'`
+   `officialSource` variant + `capabilities.contributionAxes` (§3), accepting v1 service
+   manifests concurrently; parse/copy/compat fixtures.
 
 **Frontend axis is out of scope here** — the parallel seed run (`plan/frontend-contrib`) owns the
 `frontend` contribution axis design; this run only asserts the deploy plugin will *use* that axis
 when it lands (deploy status surfaces in the dev dashboard) and must not design it.
 
-## 6. CLI delivery and back-compat (owner fork OF-3)
+## 6. CLI delivery and back-compat (owner fork OF-3 — r2 resolution per SF-4)
 
 - **W1–W2 (pre-plugin):** `packages/cli` deploy group re-wired over `plugin-deploy-core` +
   extracted adapters. Zero verb changes; `deno task e2e:cli` is the invariant.
-- **W3 (plugin-mounted):** the deploy group ships as the plugin's `cli-command` contribution. In
-  a scaffolded project the group appears when the plugin is installed. **The framework CLI keeps
-  a thin built-in shim**: if the plugin is absent, `netscript deploy` prints the install hint;
-  if present, the shim defers to the contributed group. This preserves the documented
-  `netscript deploy …` UX for every existing project while making the plugin the owner
-  (recommended resolution of OF-3).
-- **New verbs** landing with the plugin: `deploy target add|remove <key>` (adapter + config +
-  scaffold assets), `deploy capabilities [<target>] --json`, `deploy doctor` (alias of
-  `plugin doctor` scoped to deploy). Legacy flat verbs alias to `baremetal` ops with a two-release
-  deprecation notice (DP-2 §2).
+- **W3 (plugin-mounted):** the host-owned `deploy` shell remains built-in (reserved mount,
+  `desktop`, help, install hint when the plugin is absent); the plugin contributes the
+  **children** — `target add/remove`, `capabilities`, the eight-op target router — under that
+  mount. Ownership is unambiguous: shell = host, behavior = plugin. This preserves the
+  documented `netscript deploy …` UX for every existing project while making the plugin the
+  behavior owner.
+- **Legacy flat verbs** (SF-9): first-class compatibility handlers owned by `deploy-baremetal`
+  through the next semver-major (DP-2 §2) — routed through the shell, not aliased onto
+  `up`/`down`.
+- **New verbs** landing with the plugin: `deploy target add|remove <key>` (peer install +
+  descriptor + config member + scaffold assets), `deploy capabilities [<target>] --json`,
+  `deploy doctor` (alias of `plugin doctor` scoped to deploy).
 
 ## 7. Acceptance (plugin Concept of Done, per doctrine 11 parity checklist)
 
-- `verify-plugin.ts` green (axes: cli-command group, stream topic, telemetry, runtime-config
-  topic, doctor check).
+- `verify-plugin.ts` green — backed by **new host `PluginExpectations.cliCommands` and
+  `PluginExpectations.doctorChecks` surfaces** (SF-4): axes verified = cli mount-children,
+  doctor check, stream topic, telemetry, runtime-config topic.
 - Golden test per scaffold emitter; `plugin doctor` covers required-config + tool-missing +
-  credential-missing paths; a registered `scaffold.runtime` e2e case exercising
-  `plugin install deploy` → `deploy target add deno-deploy` → `deploy deno-deploy plan` on the
-  generated workspace.
+  credential-missing + adapter-not-installed paths; a registered `scaffold.runtime` e2e case
+  exercising `plugin install deploy` → `deploy target add deno-deploy` → `deploy deno-deploy
+  plan` on the generated workspace (depends on the target-add CLI slice — board dependency
+  corrected per SF-15).
 - Contract-soundness: n/a in v1 (no service contract); the compensating check is a schema test
   that `deploy capabilities --json` output validates against the published
-  `DeployCapabilityManifest` schema.
+  `DeployCapabilityManifest` schema (incl. `schemaVersion`).
 - Quality: `quality:scan`, `arch:check`, `deno doc --lint`, publish dry-run, jsr-audit —
   "thin ≠ thin quality budget".
