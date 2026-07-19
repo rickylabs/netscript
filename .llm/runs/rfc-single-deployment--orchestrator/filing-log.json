@@ -1,0 +1,337 @@
+{
+ "U": 823,
+ "US": 824,
+ "PKG": 825,
+ "NSH1": 826,
+ "NSP1": 829,
+ "PMA": 827,
+ "PMB": 828,
+ "SDE": 830,
+ "SD1": 832,
+ "SD2": 831,
+ "SD3": 833,
+ "SD4": 834,
+ "SD5": 835,
+ "SD6": 836,
+ "SD7": 837,
+ "SD8": 838,
+ "SDH": 839,
+ "M14": 16,
+ "log": [
+  {
+   "milestone": "0.0.1-beta.14",
+   "number": 16
+  },
+  {
+   "label": "epic:unified-runtime"
+  },
+  {
+   "key": "U",
+   "number": 823,
+   "title": "epic: Unified Single-Runtime Deployment — Nitro v3 single deploy output (Next/Nuxt-class)",
+   "milestone": 15,
+   "labels": [
+    "type:umbrella",
+    "area:deploy",
+    "area:fresh",
+    "priority:p1",
+    "status:plan",
+    "epic:unified-runtime",
+    "wave:v1"
+   ]
+  },
+  {
+   "key": "US",
+   "number": 824,
+   "title": "plan: unified-runtime seed run — Nitro v3 validation + epic decomposition",
+   "milestone": 13,
+   "labels": [
+    "type:chore",
+    "area:deploy",
+    "priority:p1",
+    "status:plan",
+    "epic:unified-runtime"
+   ]
+  },
+  {
+   "key": "PKG",
+   "number": 825,
+   "title": "feat(deploy): NetScript.Aspire.Packaging — .NET Aspire hosting integration (ATS-exported) for installer authoring",
+   "milestone": 13,
+   "labels": [
+    "type:feat",
+    "area:deploy",
+    "area:aspire",
+    "priority:p1",
+    "status:plan",
+    "epic:deployment",
+    "wave:v1"
+   ]
+  },
+  {
+   "key": "NS-H1",
+   "number": 826,
+   "title": "fix(service): aggregate health must exclude unconfigured adapters",
+   "milestone": 13,
+   "labels": [
+    "type:fix",
+    "area:service",
+    "priority:p1",
+    "status:plan",
+    "wave:v1"
+   ]
+  },
+  {
+   "key": "PM-A",
+   "number": 827,
+   "title": "feat(pm): graph adoption & reconcile contract [PM-A]",
+   "milestone": 14,
+   "labels": [
+    "type:feat",
+    "area:plugins",
+    "priority:p1",
+    "status:plan",
+    "wave:v1",
+    "epic:process-manager"
+   ]
+  },
+  {
+   "key": "PM-B",
+   "number": 828,
+   "title": "feat(pm): supervised-child runtime helper — pipe-EOF liveness + descendant cleanup [PM-B]",
+   "milestone": 14,
+   "labels": [
+    "type:feat",
+    "area:plugins",
+    "priority:p1",
+    "status:plan",
+    "wave:v1",
+    "epic:process-manager"
+   ]
+  },
+  {
+   "key": "NS-P1",
+   "number": 829,
+   "title": "feat(plugins): official plugins ship compile-able ./services entrypoints",
+   "milestone": 14,
+   "labels": [
+    "type:feat",
+    "area:plugins",
+    "priority:p1",
+    "status:plan",
+    "wave:v1"
+   ]
+  },
+  {
+   "key": "SDE",
+   "number": 830,
+   "title": "epic: Desktop Singleton-Graph Deployment — install/update/supervise one artifact",
+   "milestone": 16,
+   "labels": [
+    "type:umbrella",
+    "area:deploy",
+    "priority:p2",
+    "status:plan",
+    "epic:deployment",
+    "wave:v1"
+   ]
+  },
+  {
+   "key": "SD-2",
+   "number": 831,
+   "title": "feat(deploy): PackagingModel + InstallGraphManifest compiler + Aspire publish step [SD-2]",
+   "milestone": 16,
+   "labels": [
+    "type:feat",
+    "area:cli",
+    "area:aspire",
+    "priority:p2",
+    "status:plan",
+    "epic:deployment",
+    "wave:v1"
+   ]
+  },
+  {
+   "key": "SD-1",
+   "number": 832,
+   "title": "feat(desktop): supervisor host — embedded PM engine (per-user) / client mode (per-machine) [SD-1]",
+   "milestone": 16,
+   "labels": [
+    "type:feat",
+    "area:plugins",
+    "area:service",
+    "priority:p2",
+    "status:plan",
+    "epic:deployment",
+    "wave:v1"
+   ]
+  },
+  {
+   "key": "SD-3",
+   "number": 833,
+   "title": "feat(deploy): installers — scopes, least-privilege ACLs, journaled operations, port registry [SD-3]",
+   "milestone": 16,
+   "labels": [
+    "type:feat",
+    "area:cli",
+    "area:deploy",
+    "priority:p2",
+    "status:plan",
+    "epic:deployment",
+    "wave:v1"
+   ]
+  },
+  {
+   "key": "SD-4",
+   "number": 834,
+   "title": "feat(deploy): graph update transaction — N-artifact snapshots, barriers, quiescence [SD-4]",
+   "milestone": 16,
+   "labels": [
+    "type:feat",
+    "area:cli",
+    "area:deploy",
+    "priority:p2",
+    "status:plan",
+    "epic:deployment",
+    "wave:v1"
+   ]
+  },
+  {
+   "key": "SD-5",
+   "number": 835,
+   "title": "feat(deploy): first-run provisioning phase [SD-5]",
+   "milestone": 16,
+   "labels": [
+    "type:feat",
+    "area:cli",
+    "priority:p2",
+    "status:plan",
+    "epic:deployment",
+    "wave:v1"
+   ]
+  },
+  {
+   "key": "SD-6",
+   "number": 836,
+   "title": "feat(sdk): end-user health surface widget over the control plane [SD-6]",
+   "milestone": 16,
+   "labels": [
+    "type:feat",
+    "area:sdk",
+    "area:fresh-ui",
+    "priority:p2",
+    "status:plan",
+    "epic:deployment",
+    "wave:v1"
+   ]
+  },
+  {
+   "key": "SD-7",
+   "number": 837,
+   "title": "docs/test(deploy): composition-modes doctrine + cross-mode conformance suite [SD-7]",
+   "milestone": 16,
+   "labels": [
+    "type:test",
+    "area:docs",
+    "area:deploy",
+    "priority:p2",
+    "status:plan",
+    "epic:deployment",
+    "wave:v1"
+   ]
+  },
+  {
+   "key": "SD-8",
+   "number": 838,
+   "title": "test(deploy): graph deploy e2e — both scopes + full fault suite [SD-8]",
+   "milestone": 16,
+   "labels": [
+    "type:test",
+    "gate:e2e",
+    "area:deploy",
+    "priority:p2",
+    "status:plan",
+    "epic:deployment",
+    "wave:v1"
+   ]
+  },
+  {
+   "key": "SD-H",
+   "number": 839,
+   "title": "feat(deploy): Linux OS-enforced containment backstop — PDEATHSIG/cgroup spike [SD-H]",
+   "milestone": 2,
+   "labels": [
+    "type:feat",
+    "area:deploy",
+    "priority:p3",
+    "status:plan",
+    "epic:deployment",
+    "wave:defer"
+   ]
+  },
+  {
+   "adjust": 830,
+   "action": "body-append"
+  },
+  {
+   "adjust": 456,
+   "action": "body-append"
+  },
+  {
+   "adjust": 457,
+   "action": "body-append"
+  },
+  {
+   "adjust": 452,
+   "action": "body-append"
+  },
+  {
+   "adjust": 451,
+   "action": "re-homed → unified epic"
+  },
+  {
+   "adjust": 453,
+   "action": "re-homed → unified epic"
+  },
+  {
+   "adjust": 454,
+   "action": "re-homed → unified epic"
+  },
+  {
+   "adjust": 455,
+   "action": "re-homed → unified epic"
+  },
+  {
+   "adjust": 512,
+   "action": "body-append"
+  },
+  {
+   "adjust": 516,
+   "action": "body-append"
+  },
+  {
+   "adjust": 526,
+   "action": "body-append"
+  },
+  {
+   "adjust": 543,
+   "action": "body-append"
+  },
+  {
+   "adjust": 458,
+   "action": "milestone → stable"
+  },
+  {
+   "adjust": 349,
+   "action": "closed — superseded by unified epic"
+  },
+  {
+   "adjust": 510,
+   "action": "body-append"
+  },
+  {
+   "adjust": 327,
+   "action": "body-append"
+  }
+ ]
+}

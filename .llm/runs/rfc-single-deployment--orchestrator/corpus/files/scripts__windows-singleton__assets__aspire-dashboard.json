@@ -1,0 +1,13 @@
+{
+  "Dashboard": {
+    "ApplicationName": "eis-chat Windows singleton",
+    "TelemetryLimits": {
+      "MaxLogCount": 25000,
+      "MaxTraceCount": 25000,
+      "MaxMetricsCount": 50000
+    },
+    "UI": {
+      "DisableResourceGraph": true
+    }
+  }
+}
