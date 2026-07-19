@@ -72,6 +72,56 @@ and one plugin note (AppHost pipeline-step registration) are added; the rest of 
 (deno/container/cloudflare/vercel/aws lanes) is untouched — those platforms are precisely where
 Aspire's pipeline does not reach.
 
+## 2a. r5 hardening of the composition boundary (Sol round-2, SG-1…SG-9 — all accepted)
+
+1. **Applier matrix — `up --prebuilt` is defined per variant or not at all (SG-1).** "The
+   platform applier" is no longer a placeholder. Each Aspire variant that declares
+   `up --prebuilt` carries a row: applier executable, accepted manifest entries, `ApplierPort`
+   implementation owner, required tools/permissions, idempotency key, and its status/log/
+   rollback pairing — with a digest-before-first-mutation conformance test.
+   - `compose` → `docker compose -f <emitted file> up -d` (pre-pushed immutable image tags)
+   - `kubernetes` → `kubectl apply -f <emitted manifest set>` (one explicitly selected path;
+     Helm alternative is a separate declared row if ever added)
+   - `azure-*` → a named Azure-native command/API consuming the emitted Bicep + pre-pushed tags
+     (row authored with the adapter; absent until proven)
+   **A variant without a row omits `up --prebuilt` from `operations` and must not advertise the
+   CI build/deploy split.**
+2. **Secrets never persist — by construction, not by warning (SG-2).** Secret parameters are
+   supplied only through process environment (`Parameters__<name>`) or an interactive prompt
+   whose value NetScript never persists. **Every NetScript-driven Aspire operation that can
+   resolve secret parameters runs in no-save/clear-cache mode**; Aspire state persistence is
+   allowed only for a filtered allow-list of non-secret provisioning answers. If the pinned CLI
+   cannot prove that separation, the adapter disables state persistence entirely — and `doctor`
+   **fails closed** when an existing cache contains keys mapped to secret parameters. Sentinel
+   tests prove a secret value is absent from the deployment cache, artifact tree, manifest,
+   argv, logs, telemetry, and errors.
+3. **One compiler, one snapshot (SG-4).** The capability compiler has a single pure entrypoint
+   over a versioned **`CapabilityCheckInput`** snapshot (graph digest, effective environment,
+   generated-registry digest, manifest ids/versions/probe dates). `plan` embeds the snapshot +
+   digest in its output; the `netscript-capability-check` pipeline step invokes the same
+   entrypoint and either **verifies** the supplied snapshot or **recompiles and reports that it
+   superseded it** — never a silently different verdict. Failure inside `aspire deploy` is one
+   concise summary + the exact recovery command (`netscript deploy <target> plan --env <env>`)
+   + a diagnostics path + a stable nonzero exit code. Parity tests assert identical verdict
+   JSON through the NetScript CLI and the raw Aspire entrypoint over the same snapshot.
+4. **One environment identity (SG-5).** `resolveDeploymentEnvironment(target, requestedEnv)`
+   normalizes BEFORE registry/config/artifact resolution: for Aspire targets an omitted `--env`
+   normalizes to `production`, and that one value keys everything — registry lookup, overlay
+   merge (base target settings → `environments.<env>` → CLI flags), artifact path, manifest
+   field, state-cache key, stream events, and the `--environment` pass-through. Registering
+   both bare `<target>` and `<target>@production` is rejected as aliases of one identity.
+   Non-Aspire adapters keep their own explicitly declared defaults.
+5. **Plan purity, precisely (SG-9).** Purity means **no workspace-owned deployment artifacts
+   and no provider mutation**. Documented toolchain cache/restore effects of inspecting the
+   AppHost (`--list-steps`) are permitted inside an isolated, non-interactive subprocess whose
+   stdout/stderr/exit status are captured to diagnostics; an inspection failure raises
+   `AspirePipelineInspectionError` and is never converted into a capability rejection.
+6. **Step delivery re-homed (SG-3).** The pipeline step ships with the **scaffolder card**
+   (DPB-17; deps DPB-5 + DPB-8 + DPB-15) — DPB-8 exposes only an adapter-neutral
+   `runCapabilityCheck` callable. The generated helper registers the step **conditionally**:
+   deploy plugin present AND ≥1 Aspire target descriptor resolved; otherwise it emits no import
+   and no step, so raw `aspire start/deploy` remains valid on any project.
+
 ## 3. Radius — the tracked convergence (enterprise CI/CD)
 
 - **microsoft/aspire#18696 (merged 2026-07-10):** `Aspire.Hosting.Radius` makes Radius a
@@ -87,13 +137,23 @@ Aspire's pipeline does not reach.
   executes recipes via the deployment engine; **credentials live in the Radius control plane**
   (`rad credential register azure|aws`), not the developer's shell.
 
-**Position:** Radius enters the family as a **`deploy-aspire` target key (`radius`)** — not a
-new adapter package — because upstream already routes it through the exact verbs the adapter
-wraps. Gate: #18759 merged + released in the pinned Aspire CLI + the TS surface stable. Its
-capability manifest rows come from what the bound Recipes provide (binding-scope, per L-2). The
-control-plane credential model is a **strength** for the enterprise story (no cloud secrets in
-CI at all) and slots into the `secrets`-op reference model unchanged. Tracking home: the
-DPB-29 deferred-RFC card (scope widened) + a watch item on the aspire-adapter card.
+**Position (r5, SG-8):** Radius enters the family **inside `deploy-aspire`** as a
+**descriptor-selected Aspire compute-environment variant** — not a new adapter package and not
+an unconditional static capability profile. The graduation gate is **machine-verifiable
+predicates**, not issue-state prose:
+
+1. the pinned Aspire CLI version is ≥ the first recorded release containing the Radius TS API;
+2. `deno check` of a minimal `addRadiusEnvironment` AppHost fixture passes;
+3. `aspire publish --environment <fixture>` emits `app.bicep`;
+4. `aspire deploy --list-steps` exposes the expected Radius deployment step;
+5. a fixture demonstrates recipe-derived binding verdicts.
+
+Only runtime/process traits are published statically; **Recipe/resource-group capabilities are
+discovered per environment and reported `unverified` until probed** (the capability law, DP-2
+§4, applied — a static provider-wide claim would lie). The control-plane credential model is a
+**strength** for the enterprise story (no cloud secrets in CI at all) and slots into the
+`secrets`-op reference model unchanged. Tracking home: the DPB-29 deferred-RFC card (scope
+widened) + a watch item on the aspire-adapter card.
 
 ## 4. Honest constraints (carried into docs and cards)
 

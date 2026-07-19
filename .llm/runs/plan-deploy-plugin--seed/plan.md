@@ -87,14 +87,14 @@ semantics land inside DPB-16/DPB-17's bodies.
 | ID | Title (draft) | Wave | Pri | Delivery shape | Depends on |
 | --- | --- | --- | --- | --- | --- |
 | EPIC | Epic: Deploy plugin family (`type:umbrella`, `epic:deploy-plugin`, `area:cli` `area:plugin`) | — | p1 | umbrella; epic-acceptance gates from DP-8 + conformance matrix; each wave exit includes its docs refresh | — |
-| DPB-1 | Move deploy port/result/error contracts to core behind compatibility re-exports | W1 | **p0** | contracts move, no behavior change | — |
+| DPB-1 | Move deploy port/result/error contracts to core behind compatibility re-exports (r5 quick win: fix the shipped "uniform 7-op" port comment → eight-op/declared-subset, incl. matching doctrine/gate wording, so the stale count is not copied forward) | W1 | **p0** | contracts move, no behavior change | — |
 | DPB-2 | Move pure conventions (activation/secrets/rollback/otel/health-gate) with their constants | W1 | p1 | conventions move; `runtime-overrides.ts` stays leaf-side | DPB-1 |
 | DPB-3 | Empty duplicate-rejecting core registry + CLI compatibility composition root | W1 | p0 | NEW rejection behavior + externalized defaults | DPB-1 |
 | DPB-4 | Host-owned `deploy` shell split (desktop preserved) + router rewired over contracts | W1 | p1 | thin-router refactor, no verb changes | DPB-1, DPB-3 |
 | DPB-5 | Capability + topology contracts (`CapabilityRef`/verdicts/variants; `DeploymentCell`/`suggestedCells`) + rejection compiler + conformance harness | W1 | **p0** | core contract, backend-truthful | DPB-1 |
 | DPB-6 | Two-phase config loader + base schema re-home + frozen legacy union | W1 | **p0** | config bootstrap contract (unknown target ⇒ error) | DPB-1 |
 | DPB-7 | Extract `deploy-baremetal` (build behavior, Servy/systemd, `BaremetalCompatibilityCommands`, systemd live probe) | W2 | p1 | adapter over core port + compat handlers | DPB-2, DPB-3 |
-| DPB-8 | Extract `deploy-aspire` (r4: + `aspire destroy` for down, `--list-steps` in plan, state-cache delegation + `--clear-cache`, `Parameters__*` secrets convention, `netscript-capability-check` pipeline step; Radius watch per DP-9) | W2 | p1 | adapter delegating to the aspire CLI + TS pipeline steps | DPB-2, DPB-3 |
+| DPB-8 | Extract `deploy-aspire` (r4/r5: `aspire destroy` for down, `--list-steps` in plan, state-cache delegation under the SG-2 no-save secret policy, `Parameters__*` convention, the target×op table as the generated `operations` source, the **applier matrix** for declared `--prebuilt` rows, adapter-neutral `runCapabilityCheck`; Radius watch per DP-9 §3) — the pipeline STEP itself ships with DPB-17 (SG-3) | W2 | p1 | adapter delegating to the aspire CLI | DPB-2, DPB-3 |
 | DPB-9 | Extract `deploy-deno` (+ honest manifest rows; transitive-scan follow-up) | W2 | p1 | adapter wrapping `deno deploy` | DPB-3, DPB-5 |
 | DPB-10 | Adapter-side config member schemas over the schema registry (config debt retirement) | W2 | p1 | config re-home | DPB-6, DPB-7–DPB-9 |
 | DPB-11 | Legacy/config compatibility gate: state-transition + help goldens + unknown-target error paths | W2 | p1 | first-class compat verification (SF-9/SF-10) | DPB-7, DPB-6 |
@@ -103,7 +103,7 @@ semantics land inside DPB-16/DPB-17's bodies.
 | DPB-14 | Host: doctor-check contributions as data + installer-protocol `tooling` variant + `contributionAxes` | pre-W3 | p1 | protocol generalization (auth migrates compatibly) | — |
 | DPB-15 | `plugins/deploy`: manifest triad, descriptor composition root, verify-plugin expectations | W3 | p1 | thin A5 plugin (depends on extracted adapters + schema loader) | DPB-5, DPB-9, DPB-10, DPB-12, DPB-14 |
 | DPB-16 | Plugin CLI children under the `deploy` mount: `target add/remove`, `capabilities --json`, eight-op router | W3 | p1 | plugin CLI contribution | DPB-13, DPB-15 |
-| DPB-17 | Scaffolder: `deploy/targets.ts` leaf + Story-0 assets + golden tests | W3 | p1 | plugin scaffold contribution | DPB-15 |
+| DPB-17 | Scaffolder: `deploy/targets.ts` leaf + Story-0 assets + golden tests + (r5, SG-3) the **conditional `netscript-capability-check` pipeline-step registration** in the generated AppHost helpers (snapshot-verified via the single compiler entrypoint, SG-4) | W3 | p1 | plugin scaffold contribution | DPB-5, DPB-8, DPB-15 |
 | DPB-18 | Story-0 `scaffold.runtime` E2E case (`install deploy` → `target add deno-deploy` → `plan`) | W3 | p1 | e2e registration | DPB-16, DPB-17 |
 | DPB-19 | `deploy-events` stream + telemetry + runtime-config topic | W3 | p2 | plugin contributions | DPB-15 |
 | DPB-20 | `deploy-container`: OCI build/push, `ContainerBuildPort` impl, Dockerfile emission | W4 | p1 | new adapter (injectable shared path) | DPB-5 |
@@ -115,7 +115,7 @@ semantics land inside DPB-16/DPB-17's bodies.
 | DPB-26 | AWS-PROBE-HTTP (live LWA conformance) | W5 | p1 | probe card, findings-only | DPB-20 |
 | DPB-27 | `deploy-aws` (lambda variant, HTTP scope) + Story 2 | W5 | p1 | probe-gated adapter, HTTP-only | DPB-26 |
 | DPB-28 | Docs: target-matrix reference + per-target how-tos replace the alpha-minimal page | W3–W5 | p1 | docs consolidation (wave exits carry interim refreshes) | rolling |
-| DPB-29 | Deferred RFC: AWS-PROBE-EVENTS + leaf backing catalog graduation + **Radius target graduation** (`radius` key on `deploy-aspire`, gated on microsoft/aspire#18759 shipping in the pinned CLI — DP-9 §3) | backlog | p2 | RFC-first, leaf/upstream co-owned | DPB-27 |
+| DPB-29 | Deferred RFC: AWS-PROBE-EVENTS + leaf backing catalog graduation + **Radius target graduation** (r5, SG-8: descriptor-selected Aspire compute-environment variant; gate = machine-verifiable predicates — pinned CLI ≥ first TS-API release, `deno check` fixture, `app.bicep` emission, Radius step in `--list-steps`, recipe-derived binding-verdict fixture; per-environment Recipe capabilities `unverified` until probed — DP-9 §3) | backlog | p2 | RFC-first, leaf/upstream co-owned | DPB-27 |
 
 (Each future body: `Part of #EPIC` → scoping paragraph with anti-scope boundary →
 `- [ ] gate:` acceptance → `Dependencies:` + `Delivery shape:` — per board-parity conventions.)

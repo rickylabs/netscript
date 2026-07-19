@@ -2,7 +2,7 @@
 
 | | |
 | --- | --- |
-| **Status** | **Adversarially hardened draft (r3)** — direction ratified by owner 2026-07-18; package/API design pending owner arbitration of forks OF-1…OF-8 (§8); board **not filed** (numbers are placeholders) |
+| **Status** | **Adversarially hardened draft (r5)** — direction ratified by owner 2026-07-18; Aspire-composition pass (Addendum A) + Sol round-2 verdicts (SG-1…SG-9, all accepted) integrated; package/API design pending owner arbitration of forks OF-1…OF-8 (§8); board **not filed** (numbers are placeholders) |
 | **Tracking** | Refs #820 (single-deployment charter) · #327 (Deployment epic) · #823 (Unified epic — re-scope proposal §7) · #824 (unified-runtime seed — **superseded by this RFC**, §7) · #825 (Aspire packaging NuGet — unaffected) · #871 (enterprise-auth board — the composition + board pattern this family mirrors) |
 | **Pipeline** | Fable 5 · xhigh generator → GPT-5.6 Sol · xhigh constructive adversarial (**16/16 findings accepted**, r2) → Kimi K3 doc-driven story (**13/13 DX findings accepted**, r3). Triage records in the run dir |
 | **Evidence base** | Prior seed run `plan-unified-runtime--seed` (nitro-vs-own analysis, both adversarial rounds); live provider surfaces 2026-07-18 (Cloudflare/Vercel/AWS/Fly/Deno Deploy/thin PaaS/Nitro v3, primary sources); shipped deploy layer inventory; auth-plugin composition anatomy; doctrine A7 + `DEPLOY-ARCHETYPE-7-CORE-SEED` debt; full corpus in `.llm/runs/plan-deploy-plugin--seed/` (this PR) |
@@ -25,7 +25,8 @@ packages/deploy-cloudflare | deploy-vercel | deploy-aws             (A2 adapters
 ```
 netscript plugin install deploy
 netscript deploy target add deno-deploy     # targets are explicit; several compose side by side
-netscript deploy deno-deploy plan           # pure: capability verdict, nothing mutated
+netscript deploy deno-deploy plan           # pure: capability verdict — no workspace deploy
+                                            # artifacts written, no provider mutation
 netscript deploy deno-deploy up             # ship
 ```
 
@@ -354,8 +355,7 @@ full TypeScript AppHost projection) are tracked as a future **`radius` target ke
 <sub>**Provenance.** This PR lands the full planning record under
 `.llm/runs/plan-deploy-plugin--seed/`: six-surface research corpus (`research/`), canonical
 design docs `DP-0…DP-8` (r3), `plan.md` (locked decisions LD-1…12, the 29-child board table,
-risk register, gates), the Sol adversarial trail (`adversarial-brief.md`, `adversarial-sol.md`,
-`adversarial-sol-triage.md` — 16/16 accepted), and the Kimi doc-story trail
+risk register, gates), the Sol adversarial trail (rounds 1+2: `adversarial-brief.md`, `adversarial-sol.md`, `adversarial-sol-triage.md` — 16/16; `adversarial-brief-r4.md`, `adversarial-sol-r4.md`, `adversarial-sol-r4-triage.md` — 9/9), and the Kimi doc-story trail
 (`kimi-doc-story-brief.md`, `doc-story-kimi.md` — docs IA + four forecast pages,
 `doc-story-kimi-triage.md` — 13/13 accepted; where a forecast page predates a correction, the
 corpus is authority). Board numbers here are placeholders — filing is a later

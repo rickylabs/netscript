@@ -29,17 +29,25 @@ carry `schemaVersion`, adapter + upstream tool versions, probe date, and evidenc
   `aspire-compose-deploy-target.ts` / `aspire-cloud-deploy-target.ts` unchanged; `docker compose`
   shelling for the self-host lane. `@netscript/aspire` (SDK-neutral composition) stays a separate
   substrate package — this adapter is the *executor*, that package is the *composer*.
-- **Targets/ops:** `compose`, `docker`: plan/up/down/status/logs; `kubernetes`, `azure-aca`,
-  `azure-app-service`, `azure-aks`: plan/up/down (+status where `aspire` reports it). AppHost
-  platform-marker validation preserved. `rollback`: convention-backed for compose (previous
-  emitted dir + dir-swap); platform-native where Azure provides it — else absent from
-  `operations`. (r4, DP-9) **Delegation deepened:** `down` prefers **`aspire destroy`** (the
-  pipeline teardown command); `plan` surfaces `aspire deploy --list-steps` as its pipeline-step
-  section; per-env provisioning state delegates to Aspire's deployment state cache
-  (`~/.aspire/deployments/{AppHostSha}/{env}.json`, `--clear-cache` surfaced, plaintext-secret
-  CI caution kept); `secrets` rides the `Parameters__*` convention. Binding is **CLI +
-  application-level pipeline steps only** (the callback-annotation surface is mid-migration
-  upstream and C#-only — DP-9 §4).
+- **Target × operation table (r5, SG-6 — `operations` and docs are GENERATED from this table;
+  a blank cell means the op is absent from `operations`):**
+
+  | Variant | plan | emit | up | up --prebuilt | down | status | logs | rollback | secrets |
+  | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+  | `compose` | pure + `--list-steps` | `aspire publish` | `aspire deploy` | applier: `docker compose -f … up -d` | `aspire destroy` (compat shim keeps `docker compose down`) | `docker compose ps` | `docker compose logs` | convention (retained emitted dir + dir-swap) | `Parameters__*` injection only — no set/list/unset ⇒ **not declared** until implemented |
+  | `docker` | pure + `--list-steps` | `aspire publish` | `aspire deploy` | — (no applier row yet) | `aspire destroy` | — | — | — | — |
+  | `kubernetes` | pure + `--list-steps` | `aspire publish` (manifests/Helm chart) | `aspire deploy` | applier: `kubectl apply -f …` | `aspire destroy` | — | — | — | — |
+  | `azure-aca` / `azure-app-service` / `azure-aks` | pure + `--list-steps` | `aspire publish` (Bicep) | `aspire deploy` | — (row absent until an Azure-native applier is proven — DP-9 §2a.1) | `aspire destroy` | — | — | platform-native where Azure provides it | — |
+
+  AppHost platform-marker validation preserved. (r5, SG-6/SG-7) **Extraction wording
+  corrected:** shipped behavior is *extracted behind compatibility behavior first* — legacy
+  invocations keep today's semantics (publish-on-plan, compose-down) through the compat shim;
+  the r4/r5 changes (pure plan, `aspire destroy`, env normalization, no-save secret policy)
+  activate **only behind the plugin-era canonical verbs**. Per-env state delegates to Aspire's
+  deployment state cache under the **SG-2 policy**: secret-resolving operations run
+  no-save/clear-cache; persistence only for the non-secret allow-list; doctor fails closed on a
+  cache containing secret-mapped keys. Binding is **CLI + application-level pipeline steps
+  only** (the callback-annotation surface is mid-migration upstream and C#-only — DP-9 §4).
 - **Radius watch (r4, DP-9 §3):** once microsoft/aspire#18759 (TS AppHost projection of the
   merged #18696 `Aspire.Hosting.Radius`) ships in the pinned CLI, **`radius` joins this card as
   a target key** — same `publish`(→`app.bicep`)/`deploy`(→`rad deploy`) verbs, control-plane
@@ -55,7 +63,11 @@ carry `schemaVersion`, adapter + upstream tool versions, probe date, and evidenc
 - **Scaffold hooks:** owns the `deploy-compose-ghcr.yml` workflow template; keeps emitting
   nothing hand-authored (aspire publish output stays the artifact) until W4's container path
   offers generated Dockerfiles as an alternative.
-- **Permissions:** `--allow-run=aspire,docker`, `--allow-read/write` on output dirs.
+- **Permissions / doctor matrix (r5 quick win):** `--allow-run=aspire,docker,kubectl` (applier
+  binaries per declared row), `--allow-read/write` on output dirs **and** the Aspire state path
+  (`~/.aspire/deployments/`) for the no-save/clear-cache policy; doctor checks `--environment`
+  normalization, `--clear-cache` availability, applier binaries for declared `--prebuilt` rows,
+  and the secret-state cache scan (SG-2).
 
 ## 2. `deploy-baremetal` (W2 extraction) — T1
 

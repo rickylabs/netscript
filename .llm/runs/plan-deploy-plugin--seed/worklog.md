@@ -207,3 +207,25 @@ STAGE-COMPLETE: doc-story-integration
   (capability-check pipeline step in scaffolded AppHost); DP-5 (aspire row extended); plan.md
   (DPB-8/DPB-29 scope, new pipeline-churn risk row); rfc.md Addendum A. Family architecture,
   ports, and board shape unchanged.
+
+## 2026-07-19 — Round 2 adversarial (Sol xhigh, same thread) + integration (r5)
+
+- Owner directive: adversarial/collaborative pass against r4 to confirm whole-architecture
+  soundness. Steered the existing Codex thread (one-sender rule; first steer killed by the
+  2-min shell cap — `codex exec resume` streams the turn in-process; re-issued detached
+  nohup+monitor, same fix as the Kimi run).
+- Result: `adversarial-sol-r4.md` (commit `38ccc2c5`) — verdict "strong architecture, not
+  fileable unchanged; defects cluster at the new composition boundary"; SG-1…SG-9
+  (3 BLOCKER / 5 MAJOR / 1 MINOR) + quick wins. Triage: `adversarial-sol-r4-triage.md` —
+  **all 9 ACCEPTED** (one quick win not reproducible at HEAD: the plan.md duplicate risk
+  header).
+- Integration (r5): DP-9 §2a hardening (per-variant `--prebuilt` applier matrix — no row, no
+  op; SG-2 no-save secret/state policy with fail-closed doctor; single compiler entrypoint +
+  `CapabilityCheckInput` snapshot with CLI/step parity; `resolveDeploymentEnvironment`
+  normalization; scoped plan purity + `AspirePipelineInspectionError`; step delivery re-homed)
+  + DP-9 §3 Radius predicates; DP-3 §1 target×op table (generated `operations` source) +
+  extraction wording + permission/doctor matrix; DP-2 §2/§4 purity + snapshot + normalization;
+  DP-4 §4 conditional step registration; DP-6 §3 honest compat enumeration (legacy via shim,
+  canonical changes deliberate); plan.md DPB-1/8/17/29 recut (step → DPB-17 with deps
+  5/8/15); rfc.md r5 (status, abstract purity wording, §5/§6, Addendum A round-2 paragraph,
+  provenance). Family topology, ports, and 29-child board count unchanged.

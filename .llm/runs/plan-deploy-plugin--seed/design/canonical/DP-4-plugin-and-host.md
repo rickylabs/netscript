@@ -143,11 +143,16 @@ dependencies.
 - **Scaffolder**: emits the userland `deploy/` leaf — `deploy/targets.ts` (typed target + cell
   definitions the user owns and edits — the named inversion of auth's never-rewritten barrel)
   plus per-target assets on `target add` (wrangler.jsonc, fly.toml, workflows…;
-  scaffold-stories doc). Golden tests per emitter (R-PLUGIN-PARITY). (r4, DP-9 §2) On
+  scaffold-stories doc). Golden tests per emitter (R-PLUGIN-PARITY). (r4/r5, DP-9 §2/§2a) On
   Aspire-managed projects the generated AppHost helpers register a
   **`netscript-capability-check` pipeline step** (`builder.pipeline.addStep(...,
   { requiredBy: ['deploy'] })` — TS-available) so the capability compiler also gates a raw
-  `aspire deploy` invoked without the NetScript CLI.
+  `aspire deploy` invoked without the NetScript CLI. Registration is **conditional** (SG-3):
+  only when the deploy plugin is present AND ≥1 Aspire target descriptor resolves — otherwise
+  no import, no step. The step calls the single compiler entrypoint over the
+  `CapabilityCheckInput` snapshot (SG-4) and reports failures with the recovery command +
+  diagnostics path. Delivery: DPB-17 (deps DPB-5/DPB-8/DPB-15) — DPB-8 exposes only the
+  adapter-neutral `runCapabilityCheck`.
 - **Doctor** (`deploy-target` check, contributed as data — §5): validates each configured
   target: adapter peer installed, descriptor loader resolves, required tool on PATH
   (`wrangler`, `aspire`, `docker`…), credentials env present (names only, never values), config

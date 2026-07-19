@@ -59,8 +59,14 @@
    New scaffolds from W3 get the plugin preinstalled with **no target preinstalled**; every
    target is added explicitly (`deploy target add`), with `deno-deploy` documented as the
    recommended first target (DP-3 §3, DP-8 Story 0).
-4. **Aspire keeps its place**: local dev loop (`aspire start`) and the compose/k8s/azure publish
-   lanes are unchanged in behavior — they change owner (adapter package), not shape.
+4. **Aspire: legacy paths unchanged, canonical paths deliberately changed** (r5, SG-7 — the
+   earlier "unchanged in behavior" claim was too strong): the local dev loop (`aspire start`)
+   is untouched, and **legacy invocations keep today's exact semantics through the compat
+   shim** (publish-on-plan for compose, `docker compose down` teardown). The plugin-era
+   **canonical** verbs change deliberately: `plan` is pure (artifacts move to `emit`), `down`
+   uses the variant's declared teardown executor (`aspire destroy`), omitted `--env` normalizes
+   to `production`, and the SG-2 no-save secret/state policy applies. Golden argv,
+   artifact-side-effect, and exit-code tests cover BOTH paths through the compatibility window.
 5. **CI workflows**: previously scaffolded workflow files keep functioning (they call the same
    verbs); new scaffolds get per-target workflows from the adapters (OIDC-first where the
    platform supports it — AWS role-assume, Deno Deploy org tokens; token-based where not —

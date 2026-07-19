@@ -46,9 +46,13 @@ interface DeployTargetPort {
   readonly key: DeployTargetKey;
   readonly operations: readonly DeployOperation[];  // declared subset (F-DEPLOY-1)
   readonly capabilities: DeployCapabilityManifest;  // §4 — NEW field, backend-truthful
-  plan(ctx): Promise<DeployPlanResult>;       // PURE wrt artifact dirs and providers: resolves
-                                              // topology, validates capabilities, returns a
-                                              // serializable DeploymentPlan (+ diagnostics)
+  plan(ctx): Promise<DeployPlanResult>;       // PURE (r5, SG-9): writes no workspace-owned
+                                              // deployment artifacts, mutates no provider;
+                                              // isolated toolchain-inspection subprocesses
+                                              // (e.g. --list-steps) are permitted and captured
+                                              // to diagnostics. Returns a serializable
+                                              // DeploymentPlan embedding its
+                                              // CapabilityCheckInput snapshot (SG-4)
   emit(ctx): Promise<EmittedArtifactManifest>; // materializes content-addressed artifacts; does
                                               // not deploy/push unless the format models a
                                               // publish phase explicitly
@@ -175,6 +179,19 @@ interface DeployCapabilityManifest {
   run supersedes a stale (`probedAt`-old) manifest; `plan` recompiles from the **installed**
   manifests at invocation time and is authoritative for the deploy decision;
   `deploy capabilities` renders published/installed manifest data and is informational.
+- **One compiler entrypoint, one snapshot** (r5, SG-4): `compileCapabilityVerdict` is a pure
+  function over a versioned `CapabilityCheckInput` snapshot (graph digest, effective
+  environment, generated-registry digest, manifest ids/versions/probe dates). Every consumer —
+  `plan`, scaffold-time selection, the `netscript-capability-check` Aspire pipeline step —
+  invokes this one entrypoint; a consumer holding a prior snapshot either verifies it or
+  recompiles and reports supersession. Parity tests assert identical verdict JSON across
+  consumers for the same snapshot.
+- **Environment normalization** (r5, SG-5): `resolveDeploymentEnvironment(target, requestedEnv)`
+  runs before registry/overlay/artifact resolution and yields ONE value used everywhere
+  (registry key, overlay merge order base → `environments.<env>` → flags, artifact path,
+  manifest field, cache key, events, provider pass-through). Aspire targets normalize omitted
+  env to `production`; bare and `@production` registrations are rejected as aliases; non-Aspire
+  adapters keep their own declared defaults.
 
 ## 5. Topology: cells are declared, never silently partitioned (**NEW**, SF-8)
 
