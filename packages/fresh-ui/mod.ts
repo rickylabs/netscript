@@ -30,6 +30,8 @@ export {
   type DataGridProps,
   type DataGridRenderable,
   type DataGridRow,
+  type DataGridRowActionContext,
+  type DataGridSelectionContext,
 } from './src/presentation/data-grid.tsx';
 export {
   getToast,

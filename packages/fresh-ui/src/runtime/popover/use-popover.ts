@@ -30,6 +30,11 @@ export function getPopoverDataState(open: boolean): 'open' | 'closed' {
   return open ? 'open' : 'closed';
 }
 
+/** Restores focus to a popover trigger after any dismissal path. */
+export function restorePopoverTriggerFocus(trigger: Pick<HTMLElement, 'focus'> | null): void {
+  trigger?.focus();
+}
+
 export function usePopover({
   closeOnEscape = true,
   closeOnInteractOutside = true,
@@ -57,9 +62,13 @@ export function usePopover({
         uncontrolledOpen.value = nextOpen;
       }
 
+      if (open && !nextOpen) {
+        queueMicrotask(() => restorePopoverTriggerFocus(triggerRef.current));
+      }
+
       onOpenChange?.(nextOpen, { reason });
     },
-    [controlledOpen, onOpenChange, uncontrolledOpen],
+    [controlledOpen, onOpenChange, open, uncontrolledOpen],
   );
 
   const getElements = useCallback(() => [triggerRef.current, contentRef.current], []);
