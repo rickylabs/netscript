@@ -178,7 +178,10 @@ export async function writeNormalizedAppFiles(
   );
   await write(
     join(appDir, SCAFFOLD_FILES.MAIN),
-    await context.templateAdapter.render(appMainTemplate, appTemplateVars),
+    emitSelectedBackendImports(
+      await context.templateAdapter.render(appMainTemplate, appTemplateVars),
+      options,
+    ),
   );
   await write(join(appDir, 'utils.ts'), appUtilsTemplate);
   await write(
@@ -287,4 +290,16 @@ export async function writeNormalizedAppFiles(
     join(appDir, 'vite.config.ts'),
     generateAppViteConfig({ appName: options.appName }),
   );
+}
+
+/** Carry infrastructure choices made by init into the runtime that consumes them. */
+export function emitSelectedBackendImports(
+  source: string,
+  options: Pick<ValidatedInitOptions, 'cache'>,
+): string {
+  const imports = options.cache ? ["import '@netscript/sdk/cache';"] : [];
+  if (imports.length === 0) return source;
+
+  const missing = imports.filter((specifier) => !source.includes(specifier));
+  return missing.length === 0 ? source : `${missing.join('\n')}\n\n${source}`;
 }

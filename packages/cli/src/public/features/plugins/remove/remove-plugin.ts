@@ -26,6 +26,8 @@ export interface RemovePluginResult {
   readonly removedAppsettings: RemovedPluginAppsettingsEntries;
   /** Generated directories removed. */
   readonly removedGeneratedDirs: readonly string[];
+  /** Whether the plugin module declaration was removed from `netscript.config.ts`. */
+  readonly removedNetScriptConfigPlugin: boolean;
   /** Optional plugin CLI dispatch result. */
   readonly dispatchResult?: PluginDispatchResult;
 }
@@ -56,6 +58,8 @@ export async function removePlugin(
     input.pluginName,
     dependencies.fs,
   );
+  const removedNetScriptConfigPlugin = await dependencies.workspaceMutator
+    .removeNetScriptConfigPlugin(input.projectRoot, input.pluginName);
   const dispatchResult = input.skipDispatch ? undefined : await dependencies.dispatchPort.dispatch({
     verb: 'remove',
     pkg: input.packageName ?? input.pluginName,
@@ -67,6 +71,7 @@ export async function removePlugin(
   return {
     removedAppsettings,
     removedGeneratedDirs,
+    removedNetScriptConfigPlugin,
     dispatchResult,
   };
 }

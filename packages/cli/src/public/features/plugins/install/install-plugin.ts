@@ -169,6 +169,8 @@ export async function installPlugin(
       serviceReferences: plan.serviceReferences,
       pluginReferences,
       sagaStoreBackend: plan.sagaStoreBackend,
+      packageSpecifier: resolvedPlugin.descriptor.package.packageSpecifier,
+      packageVersion: resolvedPlugin.descriptor.version,
     },
   );
   await dependencies.workspaceMutator.ensureNetScriptConfigPlugin(

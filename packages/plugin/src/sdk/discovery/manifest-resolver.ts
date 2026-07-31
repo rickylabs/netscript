@@ -27,7 +27,7 @@ export class ModuleManifestResolver implements ManifestResolverPort {
 
   /** Resolve a plugin manifest module by package or file specifier. */
   async resolve(spec: string): Promise<PluginManifest | undefined> {
-    const specifier = resolveManifestImportSpecifier(this.options.projectRoot, spec);
+    const specifier = await resolveManifestImportSpecifier(this.options.projectRoot, spec);
     let module: { readonly default?: PluginManifest };
     try {
       module = await import(specifier) as { readonly default?: PluginManifest };
@@ -47,13 +47,83 @@ function hasModuleExtension(path: string): boolean {
   return MODULE_EXTENSIONS.some((extension) => path.endsWith(extension));
 }
 
-function resolveManifestImportSpecifier(projectRoot: string, spec: string): string {
+async function resolveManifestImportSpecifier(projectRoot: string, spec: string): Promise<string> {
   if (spec.startsWith('.') || spec.startsWith('/')) {
     const resolved = resolve(projectRoot, spec);
     const modulePath = hasModuleExtension(resolved) ? resolved : join(resolved, 'mod.ts');
     return toFileUrl(modulePath).href;
   }
-  return spec;
+  return await resolveWorkspaceMemberSpecifier(projectRoot, spec) ?? spec;
+}
+
+interface DenoWorkspaceConfig {
+  readonly name?: string;
+  readonly exports?: string | Readonly<Record<string, string>>;
+  readonly workspace?: readonly string[] | { readonly members?: readonly string[] };
+}
+
+async function resolveWorkspaceMemberSpecifier(
+  projectRoot: string,
+  spec: string,
+): Promise<string | undefined> {
+  const rootConfig = await readDenoConfig(join(projectRoot, 'deno.json'));
+  if (!rootConfig) return undefined;
+
+  const packageName = packageNameFromSpecifier(spec);
+  const exportName = spec.slice(packageName.length) || '.';
+  const workspace = rootConfig.workspace;
+  const members = Array.isArray(workspace)
+    ? workspace
+    : workspace && 'members' in workspace
+    ? workspace.members ?? []
+    : [];
+
+  for (const memberDir of await expandWorkspaceMembers(projectRoot, members)) {
+    const memberConfig = await readDenoConfig(join(memberDir, 'deno.json'));
+    if (memberConfig?.name !== packageName) continue;
+    const target = typeof memberConfig.exports === 'string'
+      ? exportName === '.' ? memberConfig.exports : undefined
+      : memberConfig.exports?.[exportName];
+    if (!target) return undefined;
+    return toFileUrl(resolve(memberDir, target)).href;
+  }
+  return undefined;
+}
+
+function packageNameFromSpecifier(spec: string): string {
+  const segments = spec.split('/');
+  return spec.startsWith('@') ? segments.slice(0, 2).join('/') : segments[0];
+}
+
+async function expandWorkspaceMembers(
+  projectRoot: string,
+  members: readonly string[],
+): Promise<readonly string[]> {
+  const expanded: string[] = [];
+  for (const member of members) {
+    if (!member.endsWith('/*')) {
+      expanded.push(resolve(projectRoot, member));
+      continue;
+    }
+    const parent = resolve(projectRoot, member.slice(0, -2));
+    try {
+      for await (const entry of Deno.readDir(parent)) {
+        if (entry.isDirectory) expanded.push(join(parent, entry.name));
+      }
+    } catch (error) {
+      if (!(error instanceof Deno.errors.NotFound)) throw error;
+    }
+  }
+  return expanded;
+}
+
+async function readDenoConfig(path: string): Promise<DenoWorkspaceConfig | undefined> {
+  try {
+    return JSON.parse(await Deno.readTextFile(path)) as DenoWorkspaceConfig;
+  } catch (error) {
+    if (error instanceof Deno.errors.NotFound) return undefined;
+    throw error;
+  }
 }
 
 function isModuleNotFoundError(error: unknown): boolean {
