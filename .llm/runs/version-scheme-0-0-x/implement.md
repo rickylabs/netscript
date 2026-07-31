@@ -35,9 +35,38 @@ permanently. With the train in the core, the ordering is free and matches the ec
 `0.0.2` is also the **first non-prerelease version NetScript will ever publish** — plain `0.0.1` was
 never released; every version on JSR today is a `0.0.1-alpha.N` / `0.0.1-beta.N` / `0.0.1-canary.1`.
 
-## The core instruction: derive, do not find-and-replace
+## The core instruction: TRIAGE every reference into one of three tiers
 
 **A blind `0.0.1-beta.12` → `0.0.2` substitution is the wrong deliverable and will be rejected.**
+So is deriving all 325 of them. Most of these references should not exist at all.
+
+For **every** occurrence, decide which tier it is in — and expect the majority to land in tiers 1
+and 2:
+
+**Tier 1 — DELETE it.** The version adds no value here. A doc sentence that reads "as of
+0.0.1-beta.11 this command supports X" when the command simply supports X. A comment pinning a
+version that stopped being relevant. A stale compatibility note about a release nobody runs. This is
+**dead reference elimination**, and it is the most valuable outcome of this task: every reference
+removed is one that can never go stale, never mislead a reader, and never need bumping again.
+Where a reference guards genuinely dead code, remove the code too and say so.
+
+**Tier 2 — SAY THE STAGE, NOT THE NUMBER.** The text needs to convey "this is pre-1.0 / in beta",
+not a precise version. Write "beta" (or rephrase so the stage is implied) instead of naming a
+release. Nothing in prose should carry a version number just to signal instability.
+
+**Tier 3 — KEEP IT, AND MAKE IT AUTO-BUMP.** A genuine need for the exact version: install
+snippets, publishable specifiers, generated metadata, the CLI's own version output. These must be
+**derived from a single source AND registered in the release-cut bump path**, so
+`deno task release:cut` moves them automatically and they can never freeze again.
+
+If a tier-3 site cannot currently be reached by the bump pipeline, **extend the pipeline** — add it
+to the generated-asset flow or the bumper's file set. A tier-3 reference that the cut cannot bump is
+not finished work; it is the #991 bug waiting to recur.
+
+**The acceptance question for every surviving reference is: "will `release:cut` move this?"** If the
+answer is no, it must be tier 1 or tier 2.
+
+### Why this matters more than tidiness
 
 Hours ago the beta.12 release cut was blocked by exactly the bug that approach creates: two
 `jsr:@netscript/sdk@0.0.1-beta.11` string literals frozen inside
@@ -46,17 +75,15 @@ so it never saw them, and every release after beta.11 would have shipped a regis
 to install an SDK a release behind the framework. The fix (#991) was to use the
 `FRESH_UI_PACKAGE_VERSION` constant the file already imported.
 
-So for each occurrence, in order of preference:
+For tier 3 specifically, in order of preference:
 
 1. **Derive it.** If generated metadata or a constant already exists — `package-metadata.generated.ts`,
    `NETSCRIPT_RELEASE_VERSION`, `netscriptJsrSpecifier`, `gen:publish-assets` output — use it.
 2. **Make it derivable.** If a version literal must exist in publishable source and no constant
-   covers it, add it to the generated-asset pipeline rather than hardcoding a new literal.
-3. **Only then update the literal**, and only where it is genuinely a one-off (a changelog entry, a
-   historical reference, a doc example pinned on purpose).
+   covers it, add it to the generated-asset pipeline, and make sure `release:cut` regenerates it.
 
-This matters beyond tidiness: done right, the eventual `1.0.0` is **one command**. Done as
-find-and-replace, it is this entire task again.
+Done right, the eventual `1.0.0` is **one command** and the reference count is a fraction of 325.
+Done as find-and-replace, it is this entire task again next release — with more places to miss.
 
 ## Surfaces to cover
 
@@ -118,9 +145,16 @@ checklist. **325** occurrences of `0.0.1-beta*` outside `.git`/`node_modules`/`_
 ## Deliverable
 
 Branch `chore/version-scheme-0-0-x` in this worktree (no upstream by design). Commit as you go; push
-with the explicit refspec `git push origin HEAD:refs/heads/chore/version-scheme-0-0-x`. Open a PR
-against `main` describing what you derived versus what you had to leave literal, and why. Milestone
+with the explicit refspec `git push origin HEAD:refs/heads/chore/version-scheme-0-0-x`. Milestone
 `0.0.2`. Do not merge.
+
+The PR body must carry a **tier table** — how many references were deleted (tier 1), reduced to a
+stage word (tier 2), and kept as auto-bumping (tier 3) — plus the surviving tier-3 sites listed
+explicitly with the mechanism that bumps each one. That list is the thing a reviewer checks, because
+it is the complete set of places that can ever go stale again.
+
+State the before/after count. If 325 references do not fall substantially, explain why rather than
+quietly deriving them all.
 
 If any part of this brief turns out to be wrong — a constant that does not exist, a surface that is
 already derived, a gate that cannot run here — say so plainly in the PR and in `drift.md` rather than
