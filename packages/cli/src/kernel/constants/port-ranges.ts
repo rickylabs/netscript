@@ -25,6 +25,22 @@ export const PORT_RANGES = {
  */
 export const USER_PORT_RANGE: PortRange = { start: 1024, end: 65535 };
 
+/**
+ * Fallback port baked into a scaffolded Fresh app's own source, for running it
+ * **outside** the AppHost (`deno task dev` in `apps/<name>/`).
+ *
+ * Deliberately offset from `PORT_RANGES.APP.start` so it never collides with Vite's own
+ * default of 8000 when a contributor runs the app standalone. This is the app's *target*
+ * port — the one the process itself binds — and it is the exact counterpart of
+ * `PORT_RANGES.SERVICE` for services.
+ *
+ * It is **not** a host/proxy port: under Aspire the app publishes no fixed port (see
+ * `render-http-endpoint.ts`), so a second workspace on the same machine does not collide.
+ * Anything that needs to reach a *running* app must resolve the endpoint from the AppHost
+ * rather than assume this number — see `e2e/.../generated-app-endpoint.ts`.
+ */
+export const SCAFFOLD_APP_PORT: number = PORT_RANGES.APP.start + 10;
+
 export type RangedPortType = 'SERVICE' | 'APP' | 'PLUGIN_API' | 'INFRA_PLUGIN';
 export type FixedPortType = 'ASPIRE_DASHBOARD' | 'OTEL_COLLECTOR';
 export type PortType = RangedPortType | FixedPortType;

@@ -1,10 +1,23 @@
 #!/usr/bin/env -S deno run --allow-read
 /**
- * Reject version-less `jsr:@netscript/*` values emitted or executed by framework code.
+ * Reject `jsr:@netscript/*` values emitted or executed by framework code that a consumer workspace
+ * cannot resolve. Three rules, one scan:
+ *
+ * 1. **Versioned** — a version-less specifier resolves to whatever is latest at install time.
+ * 2. **Current** — an exact pin must name the version that workspace package actually ships. A
+ *    stale pin reaches users as an opaque bundler resolution error rather than a version mismatch
+ *    (#953: `fresh-ui@beta.11` shipped `jsr:@netscript/sdk@0.0.1-beta.10/desktop`, and beta.10 had
+ *    no `./desktop` export at all).
+ * 3. **Real** — an export subpath must exist in that package's `exports`.
+ *
+ * Rules 2 and 3 need a workspace to compare against; when the root `deno.json` declares no
+ * workspace, only rule 1 runs. Range pins (`^`, `~`, `>=`) and template placeholders are listed as
+ * notes, never failures — a range still resolves, so rewriting one is a release-policy decision.
  *
  * Tests, fixtures, examples, documentation, and comments are excluded because they do not become
- * runtime or generated-project specifiers. A deliberate version-less import-map alias may use an
- * inline `jsr-versionless-ok: <reason>` marker; an empty reason is itself a failure.
+ * runtime or generated-project specifiers. A deliberate exception may use an inline
+ * `jsr-versionless-ok: <reason>` marker, which exempts its line from all three rules; an empty
+ * reason is itself a failure.
  */
 import { walk } from 'jsr:@std/fs@^1/walk';
 import { relative } from 'jsr:@std/path@^1';
@@ -40,11 +53,50 @@ export interface SpecifierAllowance {
   readonly reason: string;
 }
 
+/** An exact `@netscript/*` pin naming a version the workspace package no longer ships. */
+export interface StaleVersionFinding {
+  readonly path: string;
+  readonly line: number;
+  readonly specifier: string;
+  readonly pinned: string;
+  readonly current: string;
+}
+
+/** A specifier whose export subpath is not declared by the workspace package. */
+export interface UnknownExportFinding {
+  readonly path: string;
+  readonly line: number;
+  readonly specifier: string;
+  readonly subpath: string;
+  readonly exports: readonly string[];
+}
+
+/** A range-pinned `@netscript/*` specifier: reported so the skew stays visible, never failed. */
+export interface RangeSpecifierNote {
+  readonly path: string;
+  readonly line: number;
+  readonly specifier: string;
+}
+
 export interface SpecifierScanResult {
   readonly scannedFiles: number;
   readonly findings: readonly SpecifierFinding[];
   readonly allowances: readonly SpecifierAllowance[];
+  readonly staleVersions: readonly StaleVersionFinding[];
+  readonly unknownExports: readonly UnknownExportFinding[];
+  readonly ranges: readonly RangeSpecifierNote[];
 }
+
+/** The release and export surface a workspace member declares in its `deno.json`. */
+export interface WorkspacePackage {
+  readonly version: string;
+  readonly exports: readonly string[];
+}
+
+const EXACT_VERSION = /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/;
+// A range starts with an operator followed by a version; `<version>` and `${…}` are placeholders.
+const RANGE_VERSION = /^(?:[\^~]|[<>]=?|=)\d/;
+const LITERAL_SUBPATH = /^[a-z0-9][a-z0-9./-]*$/;
 
 function normalized(path: string): string {
   return path.replaceAll('\\', '/');
@@ -164,6 +216,76 @@ function displayedSpecifier(source: string, offset: number): string {
   return tail.match(/^jsr:@netscript\/[^\s'"`),\]}]+/)?.[0] ?? 'jsr:@netscript/*';
 }
 
+/** Split a NetScript JSR specifier into the parts the currency and export rules compare. */
+export function parseNetscriptSpecifier(
+  specifier: string,
+): { readonly name: string; readonly version: string; readonly subpath: string } | undefined {
+  const body = specifier.slice('jsr:'.length);
+  const segments = body.split('/');
+  if (segments.length < 2 || !segments[1]) return undefined;
+  const at = segments[1].indexOf('@');
+  return {
+    name: at === -1
+      ? `${segments[0]}/${segments[1]}`
+      : `${segments[0]}/${segments[1].slice(0, at)}`,
+    version: at === -1 ? '' : segments[1].slice(at + 1),
+    subpath: segments.slice(2).join('/'),
+  };
+}
+
+/**
+ * Read every workspace member's declared version and export surface, keyed by package name.
+ *
+ * Returns an empty map when the root manifest declares no workspace — the shape rule still runs,
+ * the currency and export rules simply have nothing to compare against.
+ */
+export async function readWorkspacePackages(cwd: string): Promise<Map<string, WorkspacePackage>> {
+  const packages = new Map<string, WorkspacePackage>();
+  const root = await readJsonObject(`${cwd}/deno.json`);
+  const patterns = root?.workspace;
+  if (!Array.isArray(patterns)) return packages;
+
+  for (const pattern of patterns) {
+    if (typeof pattern !== 'string') continue;
+    for (const directory of await expandWorkspacePattern(cwd, pattern)) {
+      const manifest = await readJsonObject(`${directory}/deno.json`);
+      if (typeof manifest?.name !== 'string' || typeof manifest.version !== 'string') continue;
+      packages.set(manifest.name, {
+        version: manifest.version,
+        exports: typeof manifest.exports === 'object' && manifest.exports !== null
+          ? Object.keys(manifest.exports as Record<string, unknown>)
+          : ['.'],
+      });
+    }
+  }
+  return packages;
+}
+
+async function expandWorkspacePattern(cwd: string, pattern: string): Promise<string[]> {
+  if (!pattern.endsWith('/*')) return [`${cwd}/${pattern}`];
+  const parent = `${cwd}/${pattern.slice(0, -2)}`;
+  const directories: string[] = [];
+  try {
+    for await (const entry of Deno.readDir(parent)) {
+      if (entry.isDirectory) directories.push(`${parent}/${entry.name}`);
+    }
+  } catch (error) {
+    if (!(error instanceof Deno.errors.NotFound)) throw error;
+  }
+  return directories;
+}
+
+async function readJsonObject(path: string): Promise<Record<string, unknown> | undefined> {
+  try {
+    const parsed: unknown = JSON.parse(await Deno.readTextFile(path));
+    return typeof parsed === 'object' && parsed !== null && !Array.isArray(parsed)
+      ? parsed as Record<string, unknown>
+      : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 /** Scan repository source and emitted assets for unsafe NetScript JSR specifiers. */
 export async function scanNetscriptJsrSpecifiers(
   roots: readonly string[] = DEFAULT_ROOTS,
@@ -171,6 +293,10 @@ export async function scanNetscriptJsrSpecifiers(
 ): Promise<SpecifierScanResult> {
   const findings: SpecifierFinding[] = [];
   const allowances: SpecifierAllowance[] = [];
+  const staleVersions: StaleVersionFinding[] = [];
+  const unknownExports: UnknownExportFinding[] = [];
+  const ranges: RangeSpecifierNote[] = [];
+  const workspace = await readWorkspacePackages(cwd);
   let scannedFiles = 0;
 
   for (const root of roots) {
@@ -199,12 +325,23 @@ export async function scanNetscriptJsrSpecifiers(
       for (const match of masked.matchAll(NETSCRIPT_JSR_PREFIX)) {
         const offset = match.index!;
         const afterPackage = masked[offset + match[0].length];
-        if (afterPackage === '@') continue;
         const line = lineNumber(masked, offset);
         const text = sourceLine(source, line);
         const markerIndex = text.indexOf(ALLOW_MARKER);
+        const reason = markerIndex >= 0
+          ? text.slice(markerIndex + ALLOW_MARKER.length).trim()
+          : undefined;
+
+        if (afterPackage === '@') {
+          if (reason) continue;
+          inspectVersionedSpecifier(
+            { path, line, specifier: displayedSpecifier(source, offset) },
+            workspace,
+            { staleVersions, unknownExports, ranges },
+          );
+          continue;
+        }
         if (markerIndex >= 0) {
-          const reason = text.slice(markerIndex + ALLOW_MARKER.length).trim();
           if (reason) allowances.push({ path, line, reason });
           continue;
         }
@@ -219,16 +356,64 @@ export async function scanNetscriptJsrSpecifiers(
     }
   }
 
+  const byLocation = <T extends { path: string; line: number }>(a: T, b: T) =>
+    a.path.localeCompare(b.path) || a.line - b.line;
   return {
     scannedFiles,
-    findings: findings.sort((a, b) => a.path.localeCompare(b.path) || a.line - b.line),
-    allowances: allowances.sort((a, b) => a.path.localeCompare(b.path) || a.line - b.line),
+    findings: findings.sort(byLocation),
+    allowances: allowances.sort(byLocation),
+    staleVersions: staleVersions.sort(byLocation),
+    unknownExports: unknownExports.sort(byLocation),
+    ranges: ranges.sort(byLocation),
   };
+}
+
+/** Apply the currency and export rules to one already-versioned specifier occurrence. */
+function inspectVersionedSpecifier(
+  occurrence: { readonly path: string; readonly line: number; readonly specifier: string },
+  workspace: ReadonlyMap<string, WorkspacePackage>,
+  sink: {
+    readonly staleVersions: StaleVersionFinding[];
+    readonly unknownExports: UnknownExportFinding[];
+    readonly ranges: RangeSpecifierNote[];
+  },
+): void {
+  const parsed = parseNetscriptSpecifier(occurrence.specifier);
+  if (!parsed) return;
+  const target = workspace.get(parsed.name);
+  if (!target) return;
+
+  if (EXACT_VERSION.test(parsed.version)) {
+    if (parsed.version !== target.version) {
+      sink.staleVersions.push({
+        ...occurrence,
+        pinned: parsed.version,
+        current: target.version,
+      });
+    }
+  } else if (RANGE_VERSION.test(parsed.version)) {
+    sink.ranges.push(occurrence);
+  }
+
+  if (parsed.subpath && LITERAL_SUBPATH.test(parsed.subpath)) {
+    if (!target.exports.includes(`./${parsed.subpath}`)) {
+      sink.unknownExports.push({
+        ...occurrence,
+        subpath: parsed.subpath,
+        exports: target.exports,
+      });
+    }
+  }
+}
+
+/** Total failing occurrences across the three rules; range notes never count. */
+export function failureCount(result: SpecifierScanResult): number {
+  return result.findings.length + result.staleVersions.length + result.unknownExports.length;
 }
 
 function printResult(result: SpecifierScanResult, pretty: boolean): void {
   if (!pretty) {
-    console.log(JSON.stringify({ ok: result.findings.length === 0, ...result }));
+    console.log(JSON.stringify({ ok: failureCount(result) === 0, ...result }));
     return;
   }
   for (const finding of result.findings) {
@@ -236,19 +421,35 @@ function printResult(result: SpecifierScanResult, pretty: boolean): void {
       `FAIL JSR-NETSCRIPT-VERSION ${finding.path}:${finding.line} ${finding.specifier} — ${finding.message}`,
     );
   }
+  for (const stale of result.staleVersions) {
+    console.error(
+      `FAIL JSR-NETSCRIPT-CURRENT ${stale.path}:${stale.line} ${stale.specifier} — pinned ` +
+        `${stale.pinned}, this workspace ships ${stale.current}`,
+    );
+  }
+  for (const unknown of result.unknownExports) {
+    console.error(
+      `FAIL JSR-NETSCRIPT-EXPORT ${unknown.path}:${unknown.line} ${unknown.specifier} — ` +
+        `'./${unknown.subpath}' is not exported; available: ${unknown.exports.join(', ')}`,
+    );
+  }
   for (const allowance of result.allowances) {
     console.log(
       `ALLOW JSR-NETSCRIPT-VERSION ${allowance.path}:${allowance.line} — ${allowance.reason}`,
     );
   }
+  for (const range of result.ranges) {
+    console.log(`NOTE JSR-NETSCRIPT-RANGE ${range.path}:${range.line} ${range.specifier}`);
+  }
   console.log(
     `NetScript JSR emitted-specifier guard: scanned=${result.scannedFiles} ` +
-      `allowances=${result.allowances.length} failures=${result.findings.length}`,
+      `allowances=${result.allowances.length} ranges=${result.ranges.length} ` +
+      `failures=${failureCount(result)}`,
   );
 }
 
 if (import.meta.main) {
   const result = await scanNetscriptJsrSpecifiers();
   printResult(result, Deno.args.includes('--pretty'));
-  if (result.findings.length > 0) Deno.exit(1);
+  if (failureCount(result) > 0) Deno.exit(1);
 }

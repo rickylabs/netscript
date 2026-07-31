@@ -1,8 +1,11 @@
 /**
- * `/health` route — minimal liveness endpoint for the {{appName}} app.
+ * `/health` route — readiness endpoint for the {{appName}} app.
  *
- * Returns JSON when the `Accept` header prefers it (probes, Aspire
- * health-checks) and a tiny HTML page in the browser.
+ * The Aspire AppHost probes this route to decide whether the app is healthy, and its
+ * probe sends no `Accept` header — so it takes the server-rendered branch below and a
+ * broken SSR pipeline shows up as `Unhealthy` rather than as a green resource that
+ * returns 500 to every request. Keep SSR as the fall-through: only a caller that asks
+ * for JSON and not HTML gets the payload without rendering.
  */
 import HealthView from './(_components)/health-view.tsx';
 import { buildPayload, toHealthRouteData } from './(_shared)/health.ts';

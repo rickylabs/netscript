@@ -137,19 +137,25 @@ export async function collectPublishReadiness(
   await capture(checks, 'versionless-specifiers', async () => {
     const roots = publishSet ? publishRoots(publishSet) : ['packages', 'plugins'];
     const result = await dependencies.scanSpecifiers(roots, root);
-    if (result.findings.length > 0) {
-      throw new Error(
-        result.findings.map((finding) => `${finding.path}:${finding.line} ${finding.message}`).join(
-          '; ',
-        ),
-      );
-    }
+    // `lockstep-residue` reads the same JSON-only file set the bump rewrites, so a stale pin left
+    // in TypeScript reaches users instead (#953). This check is where that is caught.
+    const failures = [
+      ...result.findings.map((finding) => `${finding.path}:${finding.line} ${finding.message}`),
+      ...result.staleVersions.map((finding) =>
+        `${finding.path}:${finding.line} ${finding.specifier} pins ${finding.pinned} instead of ${finding.current}`
+      ),
+      ...result.unknownExports.map((finding) =>
+        `${finding.path}:${finding.line} ${finding.specifier} names unexported './${finding.subpath}'`
+      ),
+    ];
+    if (failures.length > 0) throw new Error(failures.join('; '));
     return {
       summary:
-        `${result.scannedFiles} framework source files contain no unsafe versionless NetScript JSR specifier`,
-      details: result.allowances.map((entry) =>
-        `${entry.path}:${entry.line} ALLOW ${entry.reason}`
-      ),
+        `${result.scannedFiles} framework source files carry only versioned, current NetScript JSR specifiers`,
+      details: [
+        ...result.allowances.map((entry) => `${entry.path}:${entry.line} ALLOW ${entry.reason}`),
+        ...result.ranges.map((entry) => `${entry.path}:${entry.line} RANGE ${entry.specifier}`),
+      ],
     };
   });
 

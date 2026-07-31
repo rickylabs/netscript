@@ -189,6 +189,11 @@ export interface AppEntry extends Omit<BaseEntry, 'Enabled'>, ReferenceEntry, Ho
   PackageTaskName?: string;
   /** Whether the app requires Deno KV access. */
   RequiresKv: boolean;
+  /**
+   * HTTP path Aspire probes to decide whether the app is healthy. Omit to use
+   * `RESOURCE_DEFAULTS.AppHealthCheckPath`; set `false` for an app that serves no health route.
+   */
+  HealthCheckPath?: string | false;
 }
 
 /** Plugin service resource entry. */
@@ -465,6 +470,7 @@ const AppEntryZod = z.object({
   TaskName: z.string().optional(),
   PackageTaskName: z.string().optional(),
   RequiresKv: z.boolean().default(false),
+  HealthCheckPath: z.union([z.string().min(1), z.literal(false)]).optional(),
 }).meta({
   title: 'AppEntry',
   description: 'Configuration for a frontend or desktop application resource',

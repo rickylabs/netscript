@@ -1,5 +1,4 @@
 import { dirname, join } from '@std/path';
-import { PORT_RANGES } from '../../constants/port-ranges.ts';
 import { SCAFFOLD_DIRS } from '../../constants/scaffold/scaffold-dirs.ts';
 import { SCAFFOLD_FILES } from '../../constants/scaffold/scaffold-files.ts';
 import type { ScaffoldResult } from '../../domain/core-types.ts';

@@ -14,8 +14,8 @@ export function createConfigCommand(
     .action(function () {
       this.showHelp();
     });
-  const [inspect, get, set] = createProjectConfigCommands(dependencies);
-  group.command('inspect', inspect).command('get', get).command('set', set);
+  const [inspect, list, get, set] = createProjectConfigCommands(dependencies);
+  group.command('inspect', inspect).command('list', list).command('get', get).command('set', set);
   group.command('override', createOverrideCommand(dependencies));
 
   const runtime = new Command().name('runtime')

@@ -5,6 +5,7 @@
 import { describe, it } from 'jsr:@std/testing@^1/bdd';
 import { assert, assertStringIncludes } from 'jsr:@std/assert@^1';
 import type { BackgroundProcessorEntry } from '@netscript/aspire/types';
+import { RESOURCE_DEFAULTS } from '@netscript/aspire/constants';
 import { generateRegisterBackground } from '../register/generate-register-background.ts';
 import { generateRegisterApps } from '../register/generate-register-apps.ts';
 import * as fixtures from './generators-test-support.ts';
@@ -369,6 +370,56 @@ describe('generateRegisterApps', () => {
       apps: { frontend: fixtures.MINIMAL_APP },
     });
     assertStringIncludes(output, '// --- frontend (app) ---');
+  });
+
+  // Regression guard for #954: without a registered health check Aspire treats a
+  // merely-running process as healthy, so an app failing every request during SSR
+  // still reported `Healthy`. The probe must be emitted, and must be emitted after
+  // the endpoint whose base address it resolves against.
+  it('should register an HTTP health probe for app resources', () => {
+    const output = generateRegisterApps({
+      ...emptyOptions,
+      apps: { frontend: fixtures.MINIMAL_APP },
+    });
+    assertStringIncludes(
+      output,
+      `await frontend.withHttpHealthCheck({ path: '${RESOURCE_DEFAULTS.AppHealthCheckPath}', endpointName: '${RESOURCE_DEFAULTS.HttpEndpointName}' });`,
+    );
+    assert(
+      output.indexOf('.withHttpEndpoint(') < output.indexOf('.withHttpHealthCheck('),
+      'health probe must be registered after the HTTP endpoint it derives its base address from',
+    );
+  });
+
+  it('should probe a custom path when HealthCheckPath is configured', () => {
+    const output = generateRegisterApps({
+      ...emptyOptions,
+      apps: {
+        frontend: { ...fixtures.MINIMAL_APP, HealthCheckPath: '/_status' },
+      },
+    });
+    assertStringIncludes(output, "path: '/_status'");
+    assert(!output.includes(`path: '${RESOURCE_DEFAULTS.AppHealthCheckPath}'`));
+  });
+
+  it('should omit the health probe when HealthCheckPath is false', () => {
+    const output = generateRegisterApps({
+      ...emptyOptions,
+      apps: { frontend: { ...fixtures.MINIMAL_APP, HealthCheckPath: false } },
+    });
+    assert(!output.includes('withHttpHealthCheck'));
+  });
+
+  it('should not register a health probe for non-app resource types', () => {
+    const output = generateRegisterApps({
+      ...emptyOptions,
+      apps: {
+        shell: fixtures.TAURI_APP,
+        desktop: fixtures.DESKTOP_APP,
+        chores: fixtures.TASK_APP,
+      },
+    });
+    assert(!output.includes('withHttpHealthCheck'));
   });
 
   it('should handle empty apps', () => {

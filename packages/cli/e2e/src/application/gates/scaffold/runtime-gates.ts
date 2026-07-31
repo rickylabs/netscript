@@ -12,7 +12,25 @@ const ASPIRE_RESOURCE_WAIT_TIMEOUT_SECONDS: Partial<
   Record<AspireResource, number>
 > = {
   [ASPIRE_RESOURCE.MSSQL]: 600,
+  // The app's health probe renders a real SSR route, so this wait covers the Vite dev
+  // server's cold start and first render — not just the process reaching `Running`.
+  [ASPIRE_RESOURCE.APP]: 300,
 };
+
+/**
+ * Why the probe takes a project root and an AppHost instead of a URL: since #952 the pristine
+ * scaffold pins **no** host port, so that two workspaces on one machine — and
+ * `aspire start --isolated` — do not collide. Aspire allocates the port at run time and no
+ * file on disk holds it, so the probe resolves it from the running AppHost through
+ * `aspire describe`, and only reads `appsettings.json` when a project explicitly pins one.
+ * A gate that hardcodes a port probes something nothing listens on, and a connection-refused
+ * loop is indistinguishable from an app that cannot render.
+ */
+const APP_HOME_FAILURE_HINT =
+  'The generated app did not serve its home page. The probe resolves the port from the ' +
+  "running AppHost (or the project's appsettings.json when one is pinned), so a failure " +
+  'here means the app itself is not rendering — check the app resource logs in the Aspire ' +
+  'dashboard.';
 
 function runtimeWaitGate(resource: AspireResource): GateDefinition {
   return commandGate(
@@ -235,6 +253,27 @@ export function createRuntimeGates(
       'http://127.0.0.1:8094/api/v1/auth/session',
     ),
     commandGate(
+      GATE.BEHAVIOR_APP_HOME,
+      'Generated app serves its home page',
+      GATE_PHASE.BEHAVIOR,
+      (context) => [
+        'deno',
+        'run',
+        '--allow-net=127.0.0.1',
+        '--allow-read',
+        // The pristine scaffold pins no host port, so the probe resolves the allocated one
+        // through `aspire describe` against the running AppHost.
+        '--allow-run=aspire',
+        `${context.project.repoRoot}/packages/cli/e2e/src/application/gates/scaffold/probe-app-home.ts`,
+        context.project.projectRoot,
+        ASPIRE_RESOURCE.APP,
+        context.project.appHost,
+      ],
+      undefined,
+      'capture',
+      APP_HOME_FAILURE_HINT,
+    ),
+    commandGate(
       GATE.BEHAVIOR_AI_CHAT_ROUTE,
       'Import generated AI chat route',
       GATE_PHASE.BEHAVIOR,
@@ -302,6 +341,8 @@ function runtimeResources(database: DatabaseEngine): readonly AspireResource[] {
     ASPIRE_RESOURCE.TRIGGERS,
     ASPIRE_RESOURCE.AUTH,
     ASPIRE_RESOURCE.STREAMS,
+    // Last: the app depends on everything above and is the slowest to first render.
+    ASPIRE_RESOURCE.APP,
   ];
 }
 

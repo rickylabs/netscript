@@ -221,6 +221,27 @@ export const DESKTOP_APP: AppEntry = {
   PluginReferences: ['workers-api'],
 };
 
+/** Tauri shell fixture — an HTTP-bound app type that owns no health route. */
+export const TAURI_APP: AppEntry = {
+  Enabled: true,
+  Runtime: 'deno',
+  Type: 'tauri',
+  WatchMode: false,
+  RequiresKv: false,
+  Port: 8998,
+  Remote: 'frontend',
+};
+
+/** Task fixture — a long-running command with an endpoint but no page contract. */
+export const TASK_APP: AppEntry = {
+  Enabled: true,
+  Runtime: 'deno',
+  Type: 'task',
+  WatchMode: false,
+  RequiresKv: false,
+  Port: 8997,
+};
+
 // --- Tool Fixtures ---
 
 export const MINIMAL_TOOL: ToolEntry = {
