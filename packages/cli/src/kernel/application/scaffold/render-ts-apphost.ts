@@ -85,6 +85,7 @@ export async function scaffoldTsAppHost(
         target: 'ES2022',
         module: 'NodeNext',
         moduleResolution: 'NodeNext',
+        allowImportingTsExtensions: true,
         esModuleInterop: true,
         forceConsistentCasingInFileNames: true,
         strict: true,

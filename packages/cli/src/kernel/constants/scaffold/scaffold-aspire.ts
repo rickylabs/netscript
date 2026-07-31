@@ -1,9 +1,9 @@
 export const SCAFFOLD_ASPIRE_MODULES = {
   SDK_FILE: 'aspire.mts',
-  SDK_IMPORT_FROM_HELPERS: '../.aspire/modules/aspire.mjs',
-  SDK_IMPORT_FROM_ROOT: './.aspire/modules/aspire.mjs',
-  HELPERS_IMPORT_FROM_ROOT: './.helpers/index.mjs',
-  ASPIRE_COMPAT_IMPORT: './_aspire-compat.mjs',
+  SDK_IMPORT_FROM_HELPERS: '../.aspire/modules/aspire.mts',
+  SDK_IMPORT_FROM_ROOT: './.aspire/modules/aspire.mts',
+  HELPERS_IMPORT_FROM_ROOT: './.helpers/index.mts',
+  ASPIRE_COMPAT_IMPORT: './_aspire-compat.mts',
 } as const;
 
 export const SCAFFOLD_COMMUNITY_TOOLKIT = {
