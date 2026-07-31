@@ -24,6 +24,26 @@ The recipes call this out where it matters, but it is the single most common
 missing step.
 {{ /comp }}
 
+## Preferred NetScript paths
+
+Start with the framework-owned path below. The lower-level alternatives remain useful when you
+need to integrate an existing host, but they should not be the first construction you copy into a
+NetScript workspace.
+
+| Task | Preferred path | Why this path comes first |
+| --- | --- | --- |
+| Load data for a typed page | [`definePage().withResource(...)`](/web-layer/builders/) | Keeps route data in the page builder instead of recreating an Express-style loader. |
+| Keep island data live | [`useLiveQuery`](/web-layer/query/) | Uses the package-owned query bridge, hydration, and cleanup rather than a hand-rolled polling loop. |
+| Add or customize UI | [`netscript ui:add`]({{ "howto:customize-fresh-ui" |> xref |> url }}) | Copies registry source and its token-driven styles into the app you own. |
+| Deploy to Google Cloud | [`netscript deploy cloud-run`]({{ "howto:deploy" |> xref |> url }}) | Uses the first-class target lifecycle (`plan`, `up`, `down`) instead of an unrelated deployment wrapper. |
+| Back TanStack DB with a service | [`@netscript/sdk/collections`](/reference/sdk/#collections-netscriptsdkcollections) | Builds the collection from the typed service/query surface. |
+| Connect a typed client to TanStack Query | [`@netscript/sdk/query-client`](/services-sdk/sdk/#browser-query-client) | Supplies NetScript query keys, invalidation, persistence, and service utilities. |
+| Add server-side stale-while-revalidate caching | [`CacheQuery` from `@netscript/sdk/cache`](/reference/sdk/) | Uses the SDK cache engine and its provider boundary rather than a parallel cache contract. |
+| Publish interactive API documentation | [Scalar/OpenAPI]({{ "howto:expose-openapi-scalar" |> xref |> url }}) | One service option exposes the contract-derived spec and the bundled Scalar UI. |
+
+The linked recipe or guide is the canonical sample. When it also shows a general-purpose
+construction, that alternative is an integration escape hatch, not the default NetScript route.
+
 ## Web Layer
 
 - [Customize the Fresh UI]({{ "howto:customize-fresh-ui" |> xref |> url }}) —
