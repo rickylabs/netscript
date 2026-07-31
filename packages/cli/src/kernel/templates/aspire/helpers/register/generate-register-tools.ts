@@ -54,9 +54,15 @@ export function generateRegisterTools(options: RegisterToolsOptions): string {
       lines.push(`    const ${id}_workdir = resolveWorkspacePath(appHostDir, '${workdir}');`);
     }
 
-    // Register via addExecutable — tools are deno task wrappers
     lines.push(
-      `    let ${id} = await builder.addExecutable('${name}', 'deno', ${id}_workdir, ['task', '${taskName}']);`,
+      `    const ${id}_errorFile = resolveToolErrorFile(${id}_workdir, '${name}');`,
+    );
+    lines.push(`    await rm(${id}_errorFile, { force: true });`);
+
+    // Register via the generated runner so the first stderr line remains
+    // available after a failed executable exits.
+    lines.push(
+      `    let ${id} = await builder.addExecutable('${name}', 'deno', ${id}_workdir, ['run', '--allow-run', '--allow-write', toolRunnerPath, ${id}_errorFile, '${taskName}']);`,
     );
     lines.push(`    ${id} = await maybeWithProcessCommand(${id}, '${name}', '${taskName}');`);
 
@@ -72,6 +78,9 @@ export function generateRegisterTools(options: RegisterToolsOptions): string {
       lines.push(`    // Primary database dependency (fallback)`);
       lines.push(`    ${id} = await attachToolDatabase(${id}, config, infrastructure);`);
     }
+
+    lines.push(``);
+    lines.push(`    monitorToolFailure(builder, ${id}, ${id}_errorFile);`);
 
     lines.push(`  }`);
 

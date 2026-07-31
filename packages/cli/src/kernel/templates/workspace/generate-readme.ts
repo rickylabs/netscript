@@ -61,13 +61,24 @@ export function generateReadme(options: ReadmeOptions): string {
       '# (run from the aspire/ subfolder so `aspire` sees apphost.mts + aspire.config.json)',
     );
     lines.push('cd aspire && aspire restore');
-    lines.push('aspire start');
+    lines.push('cd ..');
+    lines.push('deno task aspire:start');
   } else {
     lines.push('# Start the Fresh app directly (no Aspire orchestration)');
     lines.push(`deno task --cwd apps/${options.appName} dev`);
   }
   lines.push('```');
   lines.push('');
+
+  if (!options.noAspire) {
+    lines.push(
+      'The generated `aspire:start` task gives the first cold AppHost start 300 seconds by default. ' +
+        'Aspire reads `ASPIRE_CLI_START_TIMEOUT`; invoke `aspire start` directly with that environment ' +
+        'variable for a custom positive value. Use `deno task aspire:start:isolated` for isolated TypeScript ' +
+        'AppHost sessions so NetScript can apply session lifetime to configured-persistent containers.',
+    );
+    lines.push('');
+  }
 
   lines.push('## Project Structure');
   lines.push('');
@@ -122,7 +133,7 @@ export function generateReadme(options: ReadmeOptions): string {
   }
   if (!options.noAspire) {
     lines.push('| `cd aspire && aspire restore` | Restore Aspire SDK modules (run once) |');
-    lines.push('| `cd aspire && aspire start` | Start Aspire orchestration (TypeScript AppHost) |');
+    lines.push('| `deno task aspire:start` | Start Aspire orchestration with the configurable cold-start budget |');
   }
   lines.push('| `deno task check` | Type-check all workspace members |');
   lines.push('| `deno task lint`  | Run linter |');

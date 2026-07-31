@@ -41,6 +41,8 @@ export async function registerInfrastructure(
   const caches = new Map<string, CacheResource>();
   const cacheEndpoints = new Map<string, EndpointReference>();
   const cacheWiring = new Map<string, CacheWiring>();
+  const isolatedStart = (await builder.getConfiguration()
+    .getConfigValue('DcpPublisher:RandomizePorts'))?.toLowerCase() === 'true';
 
   // --- Databases ---
 {{__slot5__}}

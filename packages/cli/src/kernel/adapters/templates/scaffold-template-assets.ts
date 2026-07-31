@@ -72,6 +72,7 @@ const ASPIRE_HELPER_TEMPLATE_URLS: TemplateUrlMap = {
   apphostTemplate: TEMPLATE_KEYS.aspireHelpersApphost,
   aspireCompatTemplate: TEMPLATE_KEYS.aspireHelpersAspireCompat,
   configureDashboardTemplate: TEMPLATE_KEYS.aspireHelpersConfigureDashboard,
+  runToolTemplate: TEMPLATE_KEYS.aspireHelpersRunTool,
 } as const;
 
 type TemplateMap<T extends Record<string, TemplateKey>> = {

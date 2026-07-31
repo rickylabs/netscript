@@ -168,6 +168,9 @@ export interface WorkspaceDenoJsonOptions {
 
   /** Database engines selected for this scaffold. */
   readonly dbEngines?: readonly string[];
+
+  /** Whether the workspace omits Aspire orchestration. */
+  readonly noAspire?: boolean;
 }
 
 /** Options for the `netscript.config.ts` generator. */

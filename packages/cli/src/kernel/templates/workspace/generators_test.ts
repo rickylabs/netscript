@@ -61,6 +61,8 @@ Deno.test('generateDenoJson emits the expected root workspace shape in JSR mode'
   );
   assertEquals(Object.keys(result.tasks), [
     'dev',
+    'aspire:start',
+    'aspire:start:isolated',
     'check',
     'lint',
     'fmt',
@@ -73,6 +75,24 @@ Deno.test('generateDenoJson emits the expected root workspace shape in JSR mode'
     'semiColons',
     'singleQuote',
   ]);
+});
+
+Deno.test('generateDenoJson gives Aspire cold starts a configurable five-minute budget', () => {
+  const result = JSON.parse(generateDenoJson({
+    name: 'test-project',
+    appName: 'dashboard',
+    workspaceMembers: ['contracts', 'plugins'],
+    importMode: 'jsr',
+  }));
+
+  assertEquals(
+    result.tasks['aspire:start'],
+    'cd aspire && ASPIRE_CLI_START_TIMEOUT=300 aspire start',
+  );
+  assertEquals(
+    result.tasks['aspire:start:isolated'],
+    'cd aspire && ASPIRE_CLI_START_TIMEOUT=300 DcpPublisher__RandomizePorts=true aspire start --isolated',
+  );
 });
 
 Deno.test('generateDenoJson scopes the minimum dependency age exception to exact NetScript releases', () => {
@@ -253,6 +273,10 @@ Deno.test('generateReadme — TS AppHost with service + postgres', () => {
   assertStringIncludes(md, '# AlphaApp');
   assertStringIncludes(md, 'aspire restore');
   assertStringIncludes(md, 'aspire start');
+  assertStringIncludes(md, 'deno task aspire:start');
+  assertStringIncludes(md, 'ASPIRE_CLI_START_TIMEOUT');
+  assertStringIncludes(md, '300 seconds');
+  assertStringIncludes(md, 'deno task aspire:start:isolated');
   assertStringIncludes(md, 'apphost.mts');
   assertStringIncludes(md, 'services/users');
   assertStringIncludes(md, 'PostgreSQL');

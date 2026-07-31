@@ -85,6 +85,7 @@ export async function scaffoldRoot(
     // imports map accordingly.
     packagesAsWorkspaceMembers: plan.useWorkspacePackages,
     dbEngines: [...plan.dbEngines],
+    noAspire: options.noAspire,
   });
   const denoJsonPath = join(targetPath, SCAFFOLD_FILES.DENO_JSON);
   if (

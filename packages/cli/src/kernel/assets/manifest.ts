@@ -69,6 +69,7 @@ export const TEMPLATE_KEYS = {
   aspireHelpersAspireCompat: 'aspire/helpers/_aspire-compat.ts.template',
   aspireHelpersApphost: 'aspire/helpers/apphost.ts.template',
   aspireHelpersConfigureDashboard: 'aspire/helpers/configure-dashboard.ts.template',
+  aspireHelpersRunTool: 'aspire/helpers/run-tool.ts.template',
   databaseConnectionHelpers: 'database/connection-helpers.ts.template',
   databaseSchema: 'database/schema.prisma.template',
   databaseScriptsFixZodImports: 'database/scripts/fix-zod-imports.ts.template',

@@ -76,6 +76,13 @@ export function generateDenoJson(options: WorkspaceDenoJsonOptions): string {
     unstable: ['raw-imports', 'kv'],
     tasks: {
       dev: `deno run --allow-all ${SCAFFOLD_DIRS.APPS}/${options.appName}/main.ts`,
+      ...(!options.noAspire
+        ? {
+          'aspire:start': 'cd aspire && ASPIRE_CLI_START_TIMEOUT=300 aspire start',
+          'aspire:start:isolated':
+            'cd aspire && ASPIRE_CLI_START_TIMEOUT=300 DcpPublisher__RandomizePorts=true aspire start --isolated',
+        }
+        : {}),
       check: 'deno check apps/**/*.ts services/**/*.ts contracts/**/*.ts',
       lint: 'deno lint',
       fmt: 'deno fmt',

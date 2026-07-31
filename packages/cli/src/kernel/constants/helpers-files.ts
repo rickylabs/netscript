@@ -12,6 +12,7 @@ export const HELPERS_FILES = {
   REGISTER_TOOLS: 'register-tools.mts',
   DB_CLI_MODE: 'db-cli-mode.mts',
   CONFIGURE_DASHBOARD: 'configure-dashboard.mts',
+  RUN_TOOL: 'run-tool.mts',
 } as const;
 
 export type HelpersFileKey = keyof typeof HELPERS_FILES;

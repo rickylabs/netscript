@@ -100,9 +100,9 @@ export function initNextSteps(options: ValidatedInitOptions): string[] {
   if (!options.noAspire) {
     steps.push('cd aspire  # TS AppHost lives here, isolated from the Deno workspace');
     steps.push('aspire restore  # download TypeScript AppHost SDK modules (run once)');
-    steps.push('aspire start  # start TypeScript AppHost');
+    steps.push('cd ..');
+    steps.push('deno task aspire:start  # 300s cold-start budget; override ASPIRE_CLI_START_TIMEOUT if needed');
     if (options.dbEngine !== 'none') {
-      steps.push('cd ..');
       addDatabaseSteps(steps, dbCommand);
     }
   } else {
