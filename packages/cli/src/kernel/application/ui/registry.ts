@@ -3,7 +3,7 @@ import { normalize as posixNormalize } from '@std/path/posix';
 import { FRESH_UI_REGISTRY_CONTENT, freshUiRegistryManifest } from '@netscript/fresh-ui/registry';
 
 import type { FileSystemPort } from '../../ports/file-system-port.ts';
-import { mergeDenoJsonImports } from './registry-deno-json.ts';
+import { importEntryForDependency, mergeDenoJsonImports } from './registry-deno-json.ts';
 import { writeStylesAggregator } from './registry-styles.ts';
 
 export type UiRegistryFile = {
@@ -182,13 +182,18 @@ export async function removeUiRegistryItem(
   const denoJsonPath = resolve(projectRoot, 'deno.json');
   if (await fs.exists(denoJsonPath)) {
     const config = JSON.parse(await fs.readFile(denoJsonPath)) as { imports?: Record<string, string> };
+    const installed = (await listUiRegistryItems(projectRoot, fs)).items;
     for (const dependency of item.dependencies ?? []) {
-      const stillRequired = (await listUiRegistryItems(projectRoot, fs)).items.some((candidate) =>
-        candidate.name !== name && candidate.installed && candidate.dependencies?.includes(dependency)
+      // Prune by the entry `ui:add` actually wrote, not by the raw specifier: two items may
+      // depend on two subpaths of one package and share a single package-root import.
+      const entry = importEntryForDependency(dependency);
+      if (!entry) continue;
+      const stillRequired = installed.some((candidate) =>
+        candidate.name !== name && candidate.installed &&
+        candidate.dependencies?.some((other) => importEntryForDependency(other)?.key === entry.key)
       );
       if (stillRequired) continue;
-      const value = Object.entries(config.imports ?? {}).find(([, candidate]) => candidate === dependency);
-      if (value) delete config.imports![value[0]];
+      if (config.imports?.[entry.key] === entry.value) delete config.imports[entry.key];
     }
     await fs.writeFile(denoJsonPath, `${JSON.stringify(config, null, 2)}\n`);
   }

@@ -1,5 +1,5 @@
 import { assertEquals } from 'jsr:@std/assert@^1';
-import { scanNetscriptJsrSpecifiers } from './check-netscript-jsr-specifiers.ts';
+import { failureCount, scanNetscriptJsrSpecifiers } from './check-netscript-jsr-specifiers.ts';
 
 Deno.test('embedded MCP documentation is allowed without weakening MCP source checks', async () => {
   const root = await Deno.makeTempDir({ prefix: 'netscript-jsr-specifier-guard-' });
@@ -23,6 +23,121 @@ Deno.test('embedded MCP documentation is allowed without weakening MCP source ch
     assertEquals(result.findings[0].specifier, 'jsr:@netscript/cli');
     assertEquals(result.findings[1].path, 'packages/mcp/src/runtime.ts');
     assertEquals(result.findings[1].specifier, 'jsr:@netscript/mcp');
+    // Without a declared workspace there is nothing to compare a version against.
+    assertEquals(result.staleVersions, []);
+    assertEquals(result.unknownExports, []);
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+/** A temp workspace shipping `@netscript/sdk@0.0.1-beta.11` with a `./desktop` export. */
+async function workspaceWithSdk(source: string): Promise<string> {
+  const root = await Deno.makeTempDir({ prefix: 'netscript-jsr-specifier-guard-' });
+  await Deno.writeTextFile(
+    `${root}/deno.json`,
+    JSON.stringify({ version: '0.0.1-beta.11', workspace: ['packages/*'] }),
+  );
+  await Deno.mkdir(`${root}/packages/sdk`, { recursive: true });
+  await Deno.writeTextFile(
+    `${root}/packages/sdk/deno.json`,
+    JSON.stringify({
+      name: '@netscript/sdk',
+      version: '0.0.1-beta.11',
+      exports: { '.': './mod.ts', './desktop': './src/desktop/mod.ts' },
+    }),
+  );
+  await Deno.mkdir(`${root}/packages/fresh-ui`, { recursive: true });
+  await Deno.writeTextFile(
+    `${root}/packages/fresh-ui/deno.json`,
+    JSON.stringify({ name: '@netscript/fresh-ui', version: '0.0.1-beta.11' }),
+  );
+  await Deno.writeTextFile(`${root}/packages/fresh-ui/registry.manifest.ts`, source);
+  return root;
+}
+
+Deno.test('a pin from a previous release fails, naming the version the workspace ships', async () => {
+  const root = await workspaceWithSdk(
+    `export const deps = ['jsr:@netscript/sdk@0.0.1-beta.10/desktop'];\n`,
+  );
+  try {
+    const result = await scanNetscriptJsrSpecifiers(['packages'], root);
+
+    assertEquals(result.staleVersions.length, 1);
+    assertEquals(result.staleVersions[0].path, 'packages/fresh-ui/registry.manifest.ts');
+    assertEquals(result.staleVersions[0].pinned, '0.0.1-beta.10');
+    assertEquals(result.staleVersions[0].current, '0.0.1-beta.11');
+    assertEquals(failureCount(result), 1);
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+Deno.test('a current pin naming a real export passes', async () => {
+  const root = await workspaceWithSdk(
+    `export const deps = ['jsr:@netscript/sdk@0.0.1-beta.11/desktop'];\n`,
+  );
+  try {
+    const result = await scanNetscriptJsrSpecifiers(['packages'], root);
+    assertEquals(failureCount(result), 0);
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+Deno.test('a subpath the package does not export fails even when the version is current', async () => {
+  const root = await workspaceWithSdk(
+    `export const deps = ['jsr:@netscript/sdk@0.0.1-beta.11/auto-update'];\n`,
+  );
+  try {
+    const result = await scanNetscriptJsrSpecifiers(['packages'], root);
+
+    assertEquals(result.staleVersions, []);
+    assertEquals(result.unknownExports.length, 1);
+    assertEquals(result.unknownExports[0].subpath, 'auto-update');
+    assertEquals(result.unknownExports[0].exports, ['.', './desktop']);
+    assertEquals(failureCount(result), 1);
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+Deno.test('range pins and template placeholders are reported, never failed', async () => {
+  const root = await workspaceWithSdk(
+    `export const range = ['jsr:@netscript/sdk@^0.0.1-beta.5'];\n` +
+      `export const doc = 'deno add jsr:@netscript/sdk@<version>/desktop';\n`,
+  );
+  try {
+    const result = await scanNetscriptJsrSpecifiers(['packages'], root);
+
+    assertEquals(result.ranges.length, 1);
+    assertEquals(result.ranges[0].specifier, 'jsr:@netscript/sdk@^0.0.1-beta.5');
+    assertEquals(failureCount(result), 0);
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+Deno.test('an allowance marker exempts a versioned specifier from every rule', async () => {
+  const root = await workspaceWithSdk(
+    `export const pinned = ['jsr:@netscript/sdk@0.0.1-beta.10/nope']; ` +
+      `// jsr-versionless-ok: reproduces a historical specifier\n`,
+  );
+  try {
+    const result = await scanNetscriptJsrSpecifiers(['packages'], root);
+    assertEquals(failureCount(result), 0);
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+Deno.test('a package outside the workspace is skipped rather than guessed at', async () => {
+  const root = await workspaceWithSdk(
+    `export const deps = ['jsr:@netscript/not-a-member@0.0.1-beta.3/anything'];\n`,
+  );
+  try {
+    const result = await scanNetscriptJsrSpecifiers(['packages'], root);
+    assertEquals(failureCount(result), 0);
   } finally {
     await Deno.remove(root, { recursive: true });
   }

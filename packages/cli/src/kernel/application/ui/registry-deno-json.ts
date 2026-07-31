@@ -7,6 +7,12 @@ const PREACT_IMPORTS: Readonly<Record<string, string>> = {
   preact: 'npm:preact@^10.27.2',
 };
 
+/** The bare-specifier alias a registry dependency contributes, and the specifier it maps to. */
+export type ImportMapEntry = {
+  readonly key: string;
+  readonly value: string;
+};
+
 /** Merge UI dependency imports into the target app's deno.json. */
 export async function mergeDenoJsonImports(
   projectRoot: string,
@@ -20,8 +26,8 @@ export async function mergeDenoJsonImports(
   const candidates = new Map<string, string>(Object.entries(PREACT_IMPORTS));
   for (const item of items) {
     for (const dependency of item.dependencies ?? []) {
-      const key = importKeyForDependency(dependency);
-      if (key) candidates.set(key, dependency);
+      const entry = importEntryForDependency(dependency);
+      if (entry) candidates.set(entry.key, entry.value);
     }
   }
 
@@ -38,16 +44,24 @@ export async function mergeDenoJsonImports(
   return { path, added };
 }
 
-function importKeyForDependency(specifier: string): string | undefined {
+/**
+ * Resolve the import-map entry a registry dependency contributes, dropping any export subpath.
+ *
+ * The alias must address the package root: Deno appends the remainder of a bare specifier to the
+ * mapped value, so an alias pointing at `jsr:@netscript/sdk@<v>/desktop` resolves
+ * `@netscript/sdk/desktop` to `./desktop/desktop`. Mapping the root serves the package and every
+ * one of its subpaths with a single entry.
+ */
+export function importEntryForDependency(specifier: string): ImportMapEntry | undefined {
   if (!specifier.startsWith('npm:') && !specifier.startsWith('jsr:')) return undefined;
+  const protocol = specifier.slice(0, 4);
   const body = specifier.slice(4);
-  if (body.startsWith('@')) {
-    const parts = body.split('/');
-    if (parts.length < 2) return undefined;
-    const [scope, rest] = parts;
-    return `${scope}/${rest.replace(/@.+$/, '')}`;
-  }
-  return body.replace(/@.+$/, '');
+  const scoped = body.startsWith('@');
+  const segments = body.split('/');
+  if (scoped && segments.length < 2) return undefined;
+  const name = scoped ? `${segments[0]}/${segments[1]}` : segments[0];
+  if (!name || (scoped && !segments[1])) return undefined;
+  return { key: name.replace(/@[^@/]*$/, ''), value: `${protocol}${name}` };
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

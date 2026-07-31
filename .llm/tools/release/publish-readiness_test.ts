@@ -89,6 +89,27 @@ Deno.test('lockstep audit ignores seeded fixture scaffold versions outside the r
   }
 });
 
+Deno.test('publish readiness fails on a pin the release no longer ships', async () => {
+  // The bump rewrites JSON, so `lockstep-residue` never sees a pin left in TypeScript — this is
+  // the check that stops a fresh-ui-style stale pin from reaching a published registry (#953).
+  const root = await versionFixture();
+  try {
+    await Deno.mkdir(`${root}/plugins`, { recursive: true });
+    await Deno.writeTextFile(
+      `${root}/packages/new/registry.manifest.ts`,
+      "export const deps = ['jsr:@netscript/new@0.0.1-beta.10'];\n",
+    );
+    const report = await collectPublishReadiness(
+      root,
+      '0.0.2-canary.1',
+      dependencies({ scanSpecifiers: scanNetscriptJsrSpecifiers }),
+    );
+    assertFailed(report.checks, 'versionless-specifiers', 'pins 0.0.1-beta.10 instead of');
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
 Deno.test('publish readiness fails on a seeded versionless framework specifier', async () => {
   const root = await Deno.makeTempDir({ prefix: 'netscript-readiness-versionless-' });
   try {
@@ -249,7 +270,15 @@ function dependencies(
     auditPublishSet: () => Promise.resolve(publishSet()),
     auditMarkdownPins: () => Promise.resolve({ violations: [], deferred: [] }),
     auditVersions: () => Promise.resolve([]),
-    scanSpecifiers: () => Promise.resolve({ scannedFiles: 1, findings: [], allowances: [] }),
+    scanSpecifiers: () =>
+      Promise.resolve({
+        scannedFiles: 1,
+        findings: [],
+        allowances: [],
+        staleVersions: [],
+        unknownExports: [],
+        ranges: [],
+      }),
     readRegistryVersions: () => Promise.resolve([]),
     auditFirstPublish: () => Promise.resolve([]),
     runProvisioningDryCheck: () => Promise.resolve(),
