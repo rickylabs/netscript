@@ -26,13 +26,13 @@ authorized implementation to proceed. No PLAN-EVAL verdict is recorded or implie
 
 ## In Progress
 
-- The tracked-only fix exposed non-Git fixture semantics in CI. Dual-mode discovery and focused
-  regressions are green; the required final release rehearsal remains before push.
+- Dual-mode discovery, the three previously failing tests, scoped gates, and the final release
+  rehearsal are green. The supervisor may merge after verifying the push; this session must not.
 
 ## Next Steps
 
-1. Commit the dual-mode discovery fix, run the final release rehearsal, and restore its mutations.
-2. Commit evidence, push by explicit refspec, and hand off without merging.
+1. Commit final evidence and push by explicit refspec.
+2. Verify local, remote, and PR heads, then hand off without merging.
 
 ## Key Decisions
 
