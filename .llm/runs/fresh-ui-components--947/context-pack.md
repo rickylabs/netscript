@@ -69,4 +69,6 @@ demonstrating it across the three surfaces, with a regression guard per surface.
 - S1 ActionMenu composition implemented locally; focused/static/scoped evidence is recorded in
   `worklog.md`; landed as `339f049c3`.
 - S2 DataGrid controlled selection/actions implemented locally with G1/G2/G7 fails-before evidence;
-  awaits slice commit/push.
+  landed as `e392097c8`.
+- S3 PromptInput capability/submit policy implemented locally with G5/G6 fails-before evidence;
+  awaits slice commit/push and full package gate.

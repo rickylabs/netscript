@@ -68,3 +68,13 @@ source then runs the checked-in asset generator. Public consumers start at `mod.
 - Fails-before proof: simultaneously removed the legacy branch, mixed state, and propagation stops;
   the focused suite failed 6/8 tests including G1, G2, and G7. Restored the implementation and the
   suite passed 8/8.
+
+## S3 — PromptInput capability and submit policy
+
+- Capability-gated attach/screenshot/voice plus leading/trailing action slots; grounding/research
+  toggles now also require callbacks, leaving no inert minimal toolbar controls.
+- Added `busy`, Stop, send-disabled behavior and explicit `none | enter | mod-enter` policy with
+  matching `aria-keyshortcuts` and IME/keyCode-229 protection. Registry source documents the
+  re-add migration and generated content was refreshed through `gen:assets-barrel`.
+- Fails-before proof: forced attach to render without a capability and disabled the composition
+  guard; G5 and G6 both failed (2/8). Restored the implementation; suite passed 8/8.
