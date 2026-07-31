@@ -39,6 +39,7 @@
 | Scoped CLI format wrapper | PASS — 737 files / 4 batches |
 | `deno task quality:gate` | PASS — quality scan and architecture check |
 | Full `scaffold.runtime` smoke | NOT RUN — reserved for evaluator / merge-readiness |
+| Separate-session IMPL-EVAL | NOT RUN — local OpenRouter credential unavailable; supervisor handoff required |
 
 ## Reconcile
 

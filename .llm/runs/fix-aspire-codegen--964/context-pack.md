@@ -22,3 +22,5 @@ Assessed MECHANICAL: no plan document.
 - A semantic generator guard resolves every local relative import against the emitted file set.
 - Fails-before mutation and focused/package gate evidence are recorded in `worklog.md`.
 - Full `scaffold.runtime` smoke is deferred to evaluator / merge-readiness.
+- Separate-session IMPL-EVAL is pending supervisor launch because the implementation session lacks
+  the local OpenRouter credential and may not substitute a cloud evaluator.
