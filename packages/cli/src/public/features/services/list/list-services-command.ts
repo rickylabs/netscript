@@ -41,7 +41,7 @@ export const serviceListCommand: CliffyCommand = new Command()
     outputText('Name\tPort\tEnabled\tWorkdir\tReferences');
     for (const service of services) {
       outputText(
-        `${service.name}\t${service.port}\t${service.enabled}\t${service.workdir}\t${
+        `${service.name}\t${service.port ?? 'aspire'}\t${service.enabled}\t${service.workdir}\t${
           service.serviceReferences.join(',') || '-'
         }`,
       );

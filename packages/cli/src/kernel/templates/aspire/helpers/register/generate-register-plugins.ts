@@ -25,6 +25,7 @@ import { RESOURCE_DEFAULTS } from '@netscript/aspire/constants';
 import { TEMPLATE_KEYS } from '../../../../assets/manifest.ts';
 import { renderTemplateAssetSync } from '../../../../adapters/templates/template-asset.ts';
 import { netscriptJsrSpecifier } from '../../../../constants/jsr-specifiers.ts';
+import { renderHttpEndpointCall } from './render-http-endpoint.ts';
 
 const DENO_NO_LEGACY_ABORT_FLAG = '--unstable-no-legacy-abort';
 
@@ -75,9 +76,7 @@ export function generateRegisterPlugins(options: RegisterPluginsOptions): string
     lines.push(
       `    const resource = builder.addExecutable('${name}', 'deno', workdir, ['run', '--config', 'deno.json', '--minimum-dependency-age=0', '${DENO_NO_LEGACY_ABORT_FLAG}', '${RESOURCE_DEFAULTS.NodeModulesDirNoneFlag}', ...perms, '${entrypoint}'])`,
     );
-    lines.push(
-      `      .withHttpEndpoint({ port: ${entry.Port}, env: '${RESOURCE_DEFAULTS.PortEnvVar}' });`,
-    );
+    lines.push(`      .${renderHttpEndpointCall(entry)};`);
     lines.push(
       `    await resource.withEnvironment('NETSCRIPT_PLUGIN_SERVICE_BOOTSTRAP_MODULE', bootstrapModule);`,
     );

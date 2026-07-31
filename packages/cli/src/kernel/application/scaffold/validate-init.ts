@@ -1,5 +1,5 @@
 import { resolve } from '@std/path';
-import { PORT_RANGES } from '../../constants/port-ranges.ts';
+import { PORT_RANGES, USER_PORT_RANGE } from '../../constants/port-ranges.ts';
 import { SCAFFOLD_DEFAULTS } from '../../constants/scaffold/scaffold-defaults.ts';
 import { SCAFFOLD_VALIDATION } from '../../constants/scaffold/scaffold-validation.ts';
 import { ScaffoldDirExistsError, ScaffoldValidationError } from '../../domain/errors.ts';
@@ -95,6 +95,7 @@ export async function validateOptions(
   const includeExampleService = options.includeExampleService ?? false;
   let serviceName: string | undefined;
   let servicePort: number | undefined;
+  let serviceHostPort: number | undefined;
   if (includeExampleService) {
     serviceName = options.serviceName ?? SCAFFOLD_DEFAULTS.SERVICE_NAME;
     if (!SCAFFOLD_VALIDATION.NAME_PATTERN.test(serviceName)) {
@@ -104,18 +105,26 @@ export async function validateOptions(
         { serviceName, pattern: String(SCAFFOLD_VALIDATION.NAME_PATTERN) },
       );
     }
-    servicePort = options.servicePort ?? PORT_RANGES.SERVICE.start;
-    if (
-      !Number.isInteger(servicePort) ||
-      servicePort < PORT_RANGES.SERVICE.start ||
-      servicePort > PORT_RANGES.SERVICE.end
-    ) {
-      throw new ScaffoldValidationError(
-        `Service port ${servicePort} must be an integer in ` +
-          `[${PORT_RANGES.SERVICE.start}, ${PORT_RANGES.SERVICE.end}].`,
-        { servicePort },
-      );
+    // An explicitly requested port pins the Aspire host port; the default only
+    // supplies the source-literal fallback used when the service runs outside
+    // Aspire. Validated against the unprivileged TCP range rather than
+    // PORT_RANGES.SERVICE — confining every workspace to a 100-port window is
+    // what made host-port collisions near-certain (#952).
+    serviceHostPort = options.servicePort;
+    if (serviceHostPort !== undefined) {
+      if (
+        !Number.isInteger(serviceHostPort) ||
+        serviceHostPort < USER_PORT_RANGE.start ||
+        serviceHostPort > USER_PORT_RANGE.end
+      ) {
+        throw new ScaffoldValidationError(
+          `Service port ${serviceHostPort} must be an integer in ` +
+            `[${USER_PORT_RANGE.start}, ${USER_PORT_RANGE.end}].`,
+          { servicePort: serviceHostPort },
+        );
+      }
     }
+    servicePort = serviceHostPort ?? PORT_RANGES.SERVICE.start;
   }
   const modelName = options.modelName ?? toPascalName(singularize(
     serviceName ?? options.serviceName ?? SCAFFOLD_DEFAULTS.SERVICE_NAME,
@@ -146,5 +155,6 @@ export async function validateOptions(
     serviceName,
     modelName,
     servicePort,
+    serviceHostPort,
   };
 }

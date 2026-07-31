@@ -108,8 +108,14 @@ describe('generateAppsettings', () => {
         otelPort: 9001,
       }),
     )
-    assertEquals(config.NetScript.Apps.dashboard.Port, 9000)
+    assertEquals(config.NetScript.Apps.dashboard.HostPort, 9000)
     assertStringIncludes(config.NetScript.Otel.HttpEndpoint, '9001')
+  })
+
+  it('should pin no app host port by default', () => {
+    const config = JSON.parse(generateAppsettings({ appName: 'dashboard' }))
+    assertEquals(config.NetScript.Apps.dashboard.HostPort, undefined)
+    assertEquals(config.NetScript.Apps.dashboard.Port, undefined)
   })
 
   it('should omit Databases/PrimaryDatabase when dbEngine is none', () => {
@@ -185,16 +191,27 @@ describe('generateAppsettings', () => {
     assertEquals(config.NetScript.Databases.mssql.Persistent, true)
   })
 
-  it('should include example service when provided', () => {
+  it('should include example service when provided, pinning no host port', () => {
     const config = JSON.parse(
       generateAppsettings({
         name: 'alpha-app',
-        service: { name: 'users', port: 3000 },
+        service: { name: 'users' },
       }),
     )
-    assertEquals(config.NetScript.Services.users.Port, 3000)
+    assertEquals(config.NetScript.Services.users.HostPort, undefined)
+    assertEquals(config.NetScript.Services.users.Port, undefined)
     assertEquals(config.NetScript.Services.users.Runtime, 'deno')
     assertEquals(config.NetScript.Services.users.Entrypoint, 'src/main.ts')
+  })
+
+  it('should pin the host port a caller explicitly requests', () => {
+    const config = JSON.parse(
+      generateAppsettings({
+        name: 'alpha-app',
+        service: { name: 'users', hostPort: 3005 },
+      }),
+    )
+    assertEquals(config.NetScript.Services.users.HostPort, 3005)
   })
 
   it('should produce an empty Services block when no service provided', () => {
@@ -235,7 +252,7 @@ describe('generateAppsettings', () => {
     const config = JSON.parse(generateAppsettings({
       name: 'alpha-app',
       appName: 'dashboard',
-      service: { name: 'users', port: 3000 },
+      service: { name: 'users' },
       dbEngine: 'postgres',
     }))
 

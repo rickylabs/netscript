@@ -73,7 +73,10 @@ export function createInitCommand(
     .option('--service [enabled:boolean]', 'Scaffold an example oRPC service')
     .option('--service-name <name:string>', 'Example service name')
     .option('--model-name <name:string>', 'Prisma model name for the scaffolded CRUD surface')
-    .option('--service-port <port:number>', 'Example service port')
+    .option(
+      '--service-port <port:number>',
+      'Pin the example service to this Aspire host port (weakens `aspire start --isolated`). Omit to let Aspire assign one.',
+    )
     .option('--cache [enabled:boolean]', 'Scaffold a shared cache resource')
     .option(
       '--cache-backend <backend:string>',
