@@ -96,3 +96,86 @@ pass. Report that in the PR body. A guard that passes against the unfixed code i
 
 Process Manager work (moved to beta.13). Any change to non-isolated default behaviour beyond what
 (b) and (c) require. Merging or undrafting this PR — the supervisor does that.
+
+---
+
+# PLAN-EVAL resolution (supervisor, 2026-07-31)
+
+Codex re-derived the plan against `main@bd61d7ab3` and Aspire `13.4.6` and logged three drifts in
+`drift.md`, correctly refusing to implement against disproven premises. **Two of my premises were
+wrong and one was out of NetScript's ownership.** This section supersedes the conflicting parts of
+sections 2–4 above. Everything not contradicted here still stands.
+
+## Accepted corrections
+
+1. **Timeout configurability already exists upstream.** `ASPIRE_CLI_START_TIMEOUT` (Aspire 13.4.6,
+   `AppHostStartupTimeout.cs` / `CliConfigNames.cs`) already overrides the 120s detached-start
+   budget. Section 2(b)'s "make the timeout configurable" is **withdrawn** — it is already done,
+   by someone else.
+2. **Phase/elapsed reporting is upstream-owned.** The detached launcher and its status output live
+   in the Aspire CLI (`StartCommand.cs`, `AppHostLauncher.cs`), not in `@netscript/cli`. Section
+   2(b)'s "the start output must name the current phase" is **withdrawn from this slice** — NetScript
+   cannot implement it. It is upstream work, and #958 must be corrected to say so.
+3. **The prisma-studio absent-task hypothesis is false.** `db:studio` IS generated into every
+   database workspace (`generate-db-deno-json.ts`). Section 2(c)'s "validate at generation that the
+   referenced task exists" is **withdrawn** — it would guard a defect that does not exist. Guard 3
+   in section 4 is withdrawn with it.
+
+## Decisions on the three open questions
+
+**Q1 — persistent lifetime under randomized ports.** Proceed with the override. Codex's own
+finding 7 is the confirmation, not the objection: persistent containers are keyed by *resource name
+plus AppHost-path hash*. Two isolated starts of the same workspace share that key exactly, so they
+resolve to one container whose published port belongs to whichever started first — which is the
+reported symptom. Upstream supporting persistent+randomized ports in general does not make
+*two concurrent isolated instances of one AppHost path* work.
+
+- **Implement plan option (a)2:** when the AppHost sees `DcpPublisher__RandomizePorts=true`, a
+  configured-persistent container resolves to session lifetime instead. Emit the conditional into
+  the generated AppHost so the decision is visible in the source, with a comment naming the reason.
+- **Do NOT namespace by isolation id.** The container key is derived from the resource name, and
+  resource names are contract-bearing (connection-string keys, `withReference` targets). Renaming
+  them per instance is too large a blast radius for a stabilisation release.
+- **Non-isolated starts must be byte-identical to today.** This is unchanged and remains the hard
+  compatibility constraint.
+
+**Q2 — prisma-studio.** The absent-task theory is dead, so **reproduce before fixing**. Run the
+generated `deno task db:studio` resource and capture the actual failure. Then:
+- If a concrete cause is found, fix that cause and guard it.
+- If it does not reproduce in the harness, **do not invent a cause.** Scope this half to the
+  observability defect that is independently true and independently worth fixing: the resource
+  reports only `Finished` with no reason. Surface the failed command's first stderr line in the
+  resource state. Then say plainly, on #970 and in the PR body, that the exit-1 half was not
+  reproduced and what was shipped instead.
+- Do not convert Prisma Studio from an auto-started executable to an on-demand process command.
+  That is a behaviour change, it is not what either issue asked for, and it is not a stabilisation
+  change. Out of scope.
+
+**Q3 — #958's deliverable.** Scope it to what NetScript actually owns:
+- Ship a sane default for the already-supported `ASPIRE_CLI_START_TIMEOUT` in the generated
+  workspace (env/config), so the first cold start of a NetScript-generated AppHost does not fail on
+  a budget that was measured at ~67s of validation on an unloaded machine and is shared with
+  everything else the start does.
+- Make the generated workspace's own `aspire start` guidance say what that variable is and why it
+  is set, so a user on a slower machine knows the knob exists.
+- **Correct #958 on the issue**: state that timeout configurability already exists upstream, that
+  phase/elapsed reporting is an upstream Aspire change NetScript cannot make, and that what shipped
+  is the NetScript-side default plus guidance. The issue as filed asks NetScript for two things it
+  does not own; that correction belongs on the issue, not buried in a PR body.
+
+## Revised regression guards (supersedes section 4)
+
+1. `Persistent: true` + isolated (`DcpPublisher__RandomizePorts=true`) does not yield a persistent
+   container — asserted concretely on the emitted AppHost source.
+2. `Persistent: true` + non-isolated emits output identical to today. Pin it.
+3. *(withdrawn — the absent-task defect does not exist)*
+4. The generated workspace carries the start-timeout default, asserted where it is emitted.
+5. A tool resource that fails surfaces its first stderr line rather than only `Finished`.
+
+Fails-before evidence remains mandatory for every guard that ships.
+
+## Scope reduction is expected here
+
+This slice is now smaller than filed, on purpose. Two of the four asks turned out to be upstream's
+or nonexistent. Shipping the two that are real, and correcting both issues to say why the others
+are not NetScript's, is the correct outcome — not a failure to deliver.
