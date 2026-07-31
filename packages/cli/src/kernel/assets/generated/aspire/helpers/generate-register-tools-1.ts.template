@@ -2,7 +2,7 @@
 
 import type { DistributedApplicationBuilder } from '{{__slot1__}}';
 import type { NetScriptConfig } from '{{__slot2__}}';
-import type { InfrastructureContext } from './register-infrastructure.mjs';
+import type { InfrastructureContext } from './register-infrastructure.mts';
 import { buildDatabaseUriEnvKey, resolveWorkspacePath } from '{{__slot3__}}';
 
 type ToolResource = Awaited<ReturnType<DistributedApplicationBuilder['addExecutable']>>;

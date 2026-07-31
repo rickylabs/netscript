@@ -156,7 +156,7 @@ describe('generateRegisterBackground', () => {
     );
     assertStringIncludes(output, 'withCacheReference,');
     // EndpointProperty no longer imported — endpoint resolution moved to wiring.
-    assertStringIncludes(output, "import { OtlpProtocol } from '../.aspire/modules/aspire.mjs'");
+    assertStringIncludes(output, "import { OtlpProtocol } from '../.aspire/modules/aspire.mts'");
   });
 
   it('should pass saga store backend appsettings to background env', () => {
@@ -230,7 +230,7 @@ describe('generateRegisterApps', () => {
   it('should import buildViteEnvVarName from _aspire-compat', () => {
     const output = generateRegisterApps(emptyOptions);
     assertStringIncludes(output, 'buildViteEnvVarName,');
-    assertStringIncludes(output, "from './_aspire-compat.mjs'");
+    assertStringIncludes(output, "from './_aspire-compat.mts'");
   });
 
   it('should register app type with valid deno task argv', () => {

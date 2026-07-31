@@ -49,7 +49,7 @@ describe('generateRegisterServices', () => {
     assertStringIncludes(output, 'extractServiceReferences,');
     assertStringIncludes(output, 'resolvePermissions,');
     assertStringIncludes(output, 'resolveWorkspacePath,');
-    assertStringIncludes(output, "from './_aspire-compat.mjs'");
+    assertStringIncludes(output, "from './_aspire-compat.mts'");
   });
 
   it('should generate two-pass registration structure', () => {
@@ -290,7 +290,7 @@ describe('generateRegisterPlugins', () => {
     assertStringIncludes(output, 'withCacheReference,');
     // EndpointProperty is no longer imported — endpoint resolution moved to the
     // infrastructure wiring layer.
-    assertStringIncludes(output, "import { OtlpProtocol } from '../.aspire/modules/aspire.mjs'");
+    assertStringIncludes(output, "import { OtlpProtocol } from '../.aspire/modules/aspire.mts'");
   });
 
   it('should pass saga store backend appsettings to plugin env', () => {

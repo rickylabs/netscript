@@ -64,5 +64,5 @@ export function generateIndex(): string {
 }
 
 function helperRuntimeImport(fileName: string): string {
-  return `./${fileName.replace(/\.mts$/, '.mjs')}`;
+  return `./${fileName}`;
 }

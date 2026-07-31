@@ -14,3 +14,11 @@ independently. Fix once, at that seam, and add a regression guard that asserts e
 import specifier resolves to a file the generator actually wrote.
 
 Assessed MECHANICAL: no plan document.
+
+## Implementation result
+
+- Generated AppHost and helper imports now name the `.mts` files actually emitted.
+- Generated `tsconfig.apphost.json` enables TypeScript-extension imports under NodeNext.
+- A semantic generator guard resolves every local relative import against the emitted file set.
+- Fails-before mutation and focused/package gate evidence are recorded in `worklog.md`.
+- Full `scaffold.runtime` smoke is deferred to evaluator / merge-readiness.
