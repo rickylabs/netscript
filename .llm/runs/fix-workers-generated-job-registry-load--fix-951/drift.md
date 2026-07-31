@@ -23,8 +23,8 @@ wrong cwd and a malformed module — were observationally identical.
 `src/aspire/workers-contribution.ts` `declareEnv` returns `WORKERS_API_URL` as a literal
 string rather than an Aspire service reference. This is the likely mechanism behind Grok
 4.5's "workers missing `ServiceReferences`" report in the same issue. Different file,
-different fix, different blast radius — filed separately rather than folded into a registry
-fix. `WorkersAspireContribution` also registers `workers-combined` alongside both
+different fix, different blast radius — filed separately as **#977** rather than folded into a
+registry fix. `WorkersAspireContribution` also registers `workers-combined` alongside both
 `workers-scheduler` and `workers-worker`, so the scheduler and worker each run twice; noted,
 not changed.
 
