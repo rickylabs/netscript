@@ -27,3 +27,18 @@ documentation.
   non-manifest/non-generated remainder, without manipulating counts.
 - **Evidence:** `.llm/tools/deps/bump-version.ts`, `.llm/tools/generate-publish-assets.ts`,
   `.llm/tools/release/prepare-release.ts`, and `research.md`.
+
+## 2026-07-31 — Local formal evaluator credential unavailable
+
+- **What:** The canonical local PLAN-EVAL route could not launch because its isolated
+  `claude-openrouter` child environment has no OpenRouter credential.
+- **Source:** `deno task agentic:provider-canary --live --profile claude-openrouter --model
+  qwen/qwen3.7-max --effort high --worktree /home/codex/repos/b12-scheme`.
+- **Expected:** A separate Qwen evaluator session writes `plan-eval.md` before implementation.
+- **Actual:** Agentic canary returned `status=blocked`, `credential=absent`, and
+  `auth_required`; no evaluator process or session started.
+- **Severity:** significant
+- **Action:** block implementation pending an OpenRouter credential or explicit owner authorization
+  to change the local run's evaluator transport to cloud OpenHands. Closed-model substitution and
+  self-evaluation remain prohibited.
+- **Evidence:** PR #995 Plan-Gate status comment and the command result recorded in `worklog.md`.

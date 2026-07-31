@@ -63,6 +63,7 @@ version literal to publishable source.
 | Time | Slice | Step | Notes |
 | --- | --- | --- | --- |
 | 2026-07-31 | Plan | Research/design | Reproduced 325 baseline occurrences; corrected manifest/lock floor to 237 and cut-owned floor to 258. |
+| 2026-07-31 | Plan-Gate | Evaluator launch | Local Qwen canary BLOCKED: isolated `claude-openrouter` credential absent; no session launched. |
 
 ## Decisions
 
@@ -77,10 +78,18 @@ version literal to publishable source.
 | --- | --- | --- |
 | Owner-established run ID omits canonical suffix | minor | yes |
 | At least 258/325 occurrences are necessarily Tier 3 | significant | yes |
+| Local formal evaluator credential unavailable | significant | yes |
 
 ## Gate Results
 
 All implementation gates are `NOT_RUN` until PLAN-EVAL returns `PASS`.
+
+### Plan-Gate Transport
+
+| Gate | Command or check | Result | Notes |
+| --- | --- | --- | --- |
+| Local formal evaluator canary | `deno task agentic:provider-canary --live --profile claude-openrouter --model qwen/qwen3.7-max --effort high --worktree /home/codex/repos/b12-scheme` | BLOCKED | `credential=absent`, `auth_required`; no evaluator session started |
+| PLAN-EVAL | separate open-model session | NOT_RUN | Awaiting owner-authorized evaluator transport/authentication |
 
 ## Handoff Notes
 

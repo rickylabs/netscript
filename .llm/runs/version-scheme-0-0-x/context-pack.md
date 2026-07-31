@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `version-scheme-0-0-x` |
 | Branch | `chore/version-scheme-0-0-x` |
-| Current phase | `plan` |
+| Current phase | `plan-eval` |
 | Archetype | Multi-surface; Archetype 6 for CLI/tooling paths |
 | Scope overlays | `SCOPE-docs` |
 
@@ -14,7 +14,8 @@
 
 Owner brief is committed at `fbd57c3bf`. Research reproduces the 325-occurrence baseline and finds
 at least 258 are necessarily release-cut-owned Tier 3 sites (manifests, locks, scaffold manifests,
-generated constants). No implementation edits have begun. Plan/design await separate PLAN-EVAL.
+generated constants). No implementation edits have begun. The local Qwen PLAN-EVAL launch is
+blocked because the isolated `claude-openrouter` environment has no OpenRouter credential.
 
 ## Completed
 
@@ -25,14 +26,14 @@ generated constants). No implementation edits have begun. Plan/design await sepa
 
 ## In Progress
 
-- Bootstrap/plan commit, draft PR opening, and PLAN-EVAL handoff.
+- PLAN-EVAL authentication/transport authorization.
 
 ## Next Steps
 
-1. Commit these run artifacts without unrelated changes.
-2. Push explicit refspec and verify remote SHA.
-3. Open draft PR against `main`, set milestone `0.0.2`, labels, and phase comment.
-4. Launch separate local Qwen PLAN-EVAL; do not implement before `PASS`.
+1. Obtain OpenRouter credential availability for the isolated local profile, or explicit owner
+   authorization for cloud OpenHands open-model PLAN-EVAL.
+2. Launch the separate evaluator and require tracked `plan-eval.md`.
+3. If PASS, advance to Slice 1; otherwise repair the plan and repeat within the two-cycle limit.
 
 ## Key Decisions
 
@@ -52,16 +53,18 @@ generated constants). No implementation edits have begun. Plan/design await sepa
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Plan-Gate | pending | Separate evaluator not launched yet |
+| Plan-Gate | BLOCKED | Local canary: `credential=absent`, `auth_required`; no session launched |
 | Static/Fitness/Runtime/Consumer | NOT_RUN | Implementation prohibited before Plan-Gate PASS |
 
 ## Open Questions
 
-- None blocking the Plan-Gate; per-site Tier 1/2/3 choices execute the locked decision rules.
+- Which authorized evaluator transport should unblock PLAN-EVAL: credentialed local Qwen, or
+  owner-authorized cloud OpenHands open model?
 
 ## Drift and Debt
 
-- Drift: run-id naming; raw-majority expectation conflicts with cut-owned floor.
+- Drift: run-id naming; raw-majority expectation conflicts with cut-owned floor; local evaluator
+  credential unavailable.
 - Debt: none created; mutable Tier 3 without cut ownership is prohibited.
 
 ## Commits
