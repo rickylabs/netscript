@@ -1,4 +1,4 @@
-# Worklog: adopt the 0.0.x release scheme
+# Worklog: `0.0.x` release scheme
 
 ## Run Metadata
 
@@ -6,93 +6,117 @@
 | --- | --- |
 | Run ID | `version-scheme-0-0-x` |
 | Branch | `chore/version-scheme-0-0-x` |
-| Archetype | Multi-surface; Archetype 6 for CLI/tooling paths |
-| Scope overlays | `SCOPE-docs` |
+| Archetype | `6 — CLI / Tooling` |
+| Scope overlays | `docs` |
 
 ## Design
 
 ### Public Surface
 
-- Release version contract: normal `0.0.x` releases and `<release>-canary.N` candidates.
-- Existing `coordinateVersionBump` + `prepareRelease` pipeline; no new CLI command.
-- Existing generated package-version constants; no new public exports unless a package lacks an
-  internal generated metadata seam and the evaluator approves extending the generator.
+- `deno task release:cut -- <normal-version>` remains the stable cut entrypoint.
+- `deno task release:canary -- <normal-version>` derives `<normal-version>-canary.N`.
+- `coordinateVersionBump()` / `discoverVersionFiles()` own every coordinated manifest and tracked
+  workspace lock.
+- `auditMarkdownPins()` rejects stale exact/range NetScript pins across owned Markdown.
+- Runtime package identity remains internal metadata; no new package export is added.
 
 ### Domain Vocabulary
 
-- **Tier 1** — mutable reference removed because the exact version conveys no contract.
-- **Tier 2** — mutable prose retains only maturity stage (`beta` / `pre-1.0`).
-- **Tier 3** — exact version required and demonstrably moved by the cut pipeline.
-- **Historical** — immutable published-version evidence intentionally exempt from mutation.
-- **Cut-owned mechanism** — JSON/lock replacement, generated publish assets, or runtime derivation
-  from one of those assets.
+- `release version` — a normal `0.0.x` core version.
+- `canary version` — `<release-version>-canary.N`, ordered below its release.
+- `version file` — a coordinated manifest, scaffold manifest, root lock, or tracked member lock.
+- `generated package metadata` — publish-safe TypeScript string constants sourced from manifests.
+- `historical version` — an immutable shipped-version fact that is intentionally not auto-bumped.
+- `current pin` — a consumer/runtime reference that must follow the coordinated release version.
 
 ### Ports
 
-- Existing filesystem/process edges in release tooling only; no new port is justified.
+- No new ports. Existing filesystem/command seams in the release tools and generator are sufficient.
 
 ### Constants
 
-- Existing `CLI_PACKAGE_VERSION`, `NETSCRIPT_RELEASE_VERSION`, `FRESH_UI_PACKAGE_VERSION`,
-  `PLUGIN_PACKAGE_VERSION`, and `MCP_PACKAGE_VERSION` are preferred.
-- Any new version constant must be generated from the owning package manifest and included in
-  `PUBLISH_ASSET_OUTPUTS`.
+- `PUBLISH_ASSET_OUTPUTS` — complete generated-version output set.
+- `CANARY_PRERELEASE_LABEL` — `canary`.
+- Generic semver pin patterns — accept normal and prerelease semver without encoding a train name.
+- `releaseVersion` / `releaseSpecifier` — docs-site values derived from CLI `deno.json`.
 
 ### Commit Slices
 
 | # | Slice | Gate | Files |
-| - | - | - | - |
-| 1 | Release contract/process language | skill sync/check + release tests | skills, workflows, release tooling docs/tests |
-| 2 | Publishable exact-version derivation | scoped wrappers + package tests + quality gate | affected package/plugin source and generator |
-| 3 | Consumer fixtures/current docs | targeted tests + docs links | tests, docs, READMEs, resources/RFC templates |
-| 4 | Final census/release proof | release dry-run + raw git restoration | run artifacts and PR body |
+| --- | --- | --- | --- |
+| S1 | Release discovery + guard semantics | Focused release/CLI tests and scoped wrappers | Release/deps tools, workflow example, CLI guard, run artifacts |
+| S2 | Generated runtime versions + owned fixtures | Generator freshness, package/Fresh UI tests, quality gate | Generator/generated files, MCP/plugin cores, CLI/Fresh UI, nested lock, run artifacts |
+| S3 | Docs/process/resources/skills | Docs links, skill sync/check, targeted census | Docs/root/RFC/resources/skills/mirror, run artifacts |
+| S4 | Full release proof and final evidence | Complete validation + release dry-run + restore verification | Run artifacts and PR evidence |
 
 ### Deferred Scope
 
-- Actual `0.0.2` cut/publish, milestone mutation, history rewrite, unrelated refactors.
+- Published-version history normalization — immutable evidence remains untouched.
+- Public API/architecture remediation — no new API requires it.
+- Release publication/merge — explicitly owner-controlled after this PR.
 
 ### Contributor Path
 
-For a future exact version consumer: first consume an existing owning-package generated constant;
-if absent, extend `.llm/tools/generate-publish-assets.ts`, add the output to
-`PUBLISH_ASSET_OUTPUTS`, cover freshness, and verify `release:cut --dry-run`. Never add a standalone
-version literal to publishable source.
+To add a version-bearing publishable asset, extend `.llm/tools/generate-publish-assets.ts`, consume
+its generated constant, and prove `check:publish-assets`. To add a coordinated version file, extend
+`discoverVersionFiles()` and its tests. Documentation uses `releaseVersion`/`releaseSpecifier` or a
+version-neutral placeholder; historical literals must identify their historical context.
 
 ## Progress Log
 
 | Time | Slice | Step | Notes |
 | --- | --- | --- | --- |
-| 2026-07-31 | Plan | Research/design | Reproduced 325 baseline occurrences; corrected manifest/lock floor to 237 and cut-owned floor to 258. |
-| 2026-07-31 | Plan-Gate | Evaluator launch | Local Qwen canary BLOCKED: isolated `claude-openrouter` credential absent; no session launched. |
+| 2026-07-31 | Plan | Research | Reproduced 325 references; found 193 release-owned and 65 stale nested-lock occurrences. |
+| 2026-07-31 | Plan | Design | Locked four slices and the historical/current classification. |
 
 ## Decisions
 
 | Decision | Reason | Source |
 | --- | --- | --- |
-| Report all-occurrence and reducible-remainder counts | Brief expectation conflicts with cut-owned manifests/locks | `research.md` Findings 2–5 |
-| Single sequential run | Owner requires one branch/PR and slices share one release contract | `plan.md` D7 |
+| Single normal harness run | One owner-mandated branch/PR and one lockstep release contract | Harness + owner brief |
+| A6 + Docs overlay | Release command tooling plus public/process documentation | Archetype decision tree |
+| No manifest bump | Owner delegates it to the post-PR release cut | Owner brief |
 
 ## Drift
 
 | Drift | Severity | Logged in drift.md |
 | --- | --- | --- |
-| Owner-established run ID omits canonical suffix | minor | yes |
-| At least 258/325 occurrences are necessarily Tier 3 | significant | yes |
-| Local formal evaluator credential unavailable | significant | yes |
+| Launcher run-dir name lacks canonical branch/suffix shape | minor | yes |
+| Supervisor-refined brief expands current owner request | significant | yes |
+| Nested Fresh UI lock omitted from bump/residue | significant | yes |
+| Markdown gate cannot protect normal-core docs pins | significant | yes |
+| Runtime controller cannot prove current Codex mobile attachment | significant | yes |
 
 ## Gate Results
 
-All implementation gates are `NOT_RUN` until PLAN-EVAL returns `PASS`.
-
-### Plan-Gate Transport
+### Static Gates
 
 | Gate | Command or check | Result | Notes |
 | --- | --- | --- | --- |
-| Local formal evaluator canary | `deno task agentic:provider-canary --live --profile claude-openrouter --model qwen/qwen3.7-max --effort high --worktree /home/codex/repos/b12-scheme` | BLOCKED | `credential=absent`, `auth_required`; no evaluator session started |
-| PLAN-EVAL | separate open-model session | NOT_RUN | Awaiting owner-authorized evaluator transport/authentication |
+| Baseline census | focused `rg` survey | PASS | Exact 325 reproduced. |
+| Git baseline | raw `git status/log/rev-parse/ls-remote` | PASS | Base `8dca67985`; remote branch at `fbd57c3bf`; no PR yet. |
+
+### Fitness Gates
+
+| Gate | Result | Evidence | Notes |
+| --- | --- | --- | --- |
+| Plan-Gate | NOT_RUN | Pending separate Qwen session | Hard stop before S1. |
+| jsr-audit scan | PASS | `research.md`; `deno doc` on affected package surfaces | No planned export/type change. |
+
+### Runtime Gates
+
+| Gate | Result | Evidence | Notes |
+| --- | --- | --- | --- |
+| Agentic runtime | FAIL | `agentic:runtime status` reported degraded / mobile disconnected | Does not block local work; no mobile claim. |
+
+### Consumer Gates
+
+| Consumer | Result | Evidence | Notes |
+| --- | --- | --- | --- |
+| `release:cut -- 0.0.2 --dry-run` | NOT_RUN | Planned S4 | Must restore mutations after completion. |
 
 ## Handoff Notes
 
-- PLAN-EVAL should spot-check the 325 census and the 258 cut-owned floor.
-- It should reject any plan interpretation that rewrites historical beta releases or commits bumped
-  `deno.json` versions.
+- PLAN-EVAL should inspect D3 (nested lock), D5 (generic/blocking Markdown scanner), and the
+  historical allowlist first.
+- No implementation file has been edited before PLAN-EVAL.

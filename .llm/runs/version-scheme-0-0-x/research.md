@@ -2,62 +2,57 @@
 
 ## Re-baseline
 
-- Carried-in source: owner brief in `implement.md`, refined by commit `fbd57c3bf`.
-- Re-derived against `origin/main` at `8dca679855ab6b5f45d7e3d597432769cc3afaeb` on 2026-07-31.
-- The exact owner census reproduces: 325 matches of `0.0.1-beta*` in 84 files when `.git`,
-  `node_modules`, `_site`, and `.llm` are excluded.
-- The revised brief replaces “derive every reference” with a three-tier triage: delete, retain only
-  stage meaning, or keep exact and prove automatic release-cut movement.
+- Carried-in source: owner assignment plus `.llm/runs/version-scheme-0-0-x/implement.md`.
+- Re-derived against `origin/main` at
+  `8dca679855ab6b5f45d7e3d597432769cc3afaeb` on 2026-07-31.
+- The owner's baseline count reproduces exactly: 325 matches of
+  `0.0.1-beta(?:.<number>)?` outside `.git`, `node_modules`, `_site`, and `.llm`.
+- A supervisor refinement committed after launch adds a three-tier deletion/stage/auto-bump
+  mandate. The current owner prompt does not contain that expansion. This plan follows the current
+  owner hierarchy: derive, make derivable, then retain a literal only for a genuine one-off or
+  historical fact.
 
 ## Findings
 
 | # | Finding | How to verify |
-| - | - | - |
-| 1 | The baseline has exactly 325 occurrences in 84 files. | `rg --json --hidden` with the brief's exclusion set and regex `0\\.0\\.1-beta(?:\\.[0-9]+)?`. |
-| 2 | 131 occurrences are in two tracked lockfiles; 106 are in workspace `deno.json` manifests. These 237 occurrences must remain unchanged on this branch and are rewritten by `coordinateVersionBump`. | `deno.lock`, `packages/fresh-ui/deno.lock`, and `.llm/tools/deps/bump-version.ts::discoverVersionFiles`. |
-| 3 | Twelve more occurrences are in six `scaffold.plugin.json` files, which `discoverVersionFiles` walks and rewrites. | `.llm/tools/deps/bump-version.ts:discoverVersionFiles`. |
-| 4 | Nine generated TypeScript version constants are regenerated from bumped manifests by `gen:publish-assets`, which `prepareRelease` runs before readiness. | `.llm/tools/generate-publish-assets.ts` and `.llm/tools/release/prepare-release.ts`. |
-| 5 | Therefore at least 258/325 occurrences are necessarily Tier 3 before considering other exact consumers. “Most of all 325 in Tiers 1–2” cannot hold when counting raw occurrences. The intended reduction test is meaningful on the non-manifest/non-generated remainder. | Findings 2–4; recorded as significant drift. |
-| 6 | The release bumper intentionally scans JSON and locks; publish readiness separately scans publishable TypeScript pins and Markdown pins. This is the correct split to preserve. | `.llm/tools/release/publish-readiness.ts`. |
-| 7 | Current publishable-source exceptions include hardcoded telemetry instrumentation versions and MCP server metadata. These are candidates for Tier 3 derivation through generated package metadata, not literal updates. | `packages/plugin-sagas-core/src/telemetry/otel-saga-telemetry.ts`, `packages/plugin-streams-core/src/telemetry/instrumentation.ts`, `packages/plugin-triggers-core/src/telemetry/attributes.ts`, `packages/mcp/src/application/runner/mcp-server.ts`. |
-| 8 | CLI/fresh-ui tests contain scenario literals. They should use generic fixture versions when the number is only sample data, or a release constant when asserting current lockstep behavior. | `packages/cli/src/kernel/application/ui/registry-deno-json_test.ts`, `packages/cli/src/kernel/adapters/plugin/workspace-mutator_test.ts`, `packages/fresh-ui/tests/registry/components/ui/desktop.test.tsx`. |
-| 9 | The release skill still teaches the superseded prerelease-target canary doctrine. The PR/milestone skill still names obsolete prerelease milestones. The `.claude/skills` copies are generated and must not be edited directly. | `.agents/skills/netscript-release/SKILL.md`, `.agents/skills/netscript-pr/SKILL.md`, `deno task agentic:sync-claude`. |
-| 10 | `validateStableTarget` is already correct: canary targets are now normal versions, so no relaxation is needed. | `.llm/tools/release/canary.ts` and `canary_test.ts`. |
-| 11 | Historical release incident evidence (notably beta.10) is still semantically correct and must remain literal. | Release skill incident/recovery section; assignment non-scope. |
-| 12 | Package quality risk is limited to derivation wiring and fixture semantics; no public exports or `deno.json` versions are planned to change. | Planned slice map and manifest non-scope. |
+| --- | --- | --- |
+| 1 | 325 baseline matches are distributed across `packages` 158, root `deno.lock` 66, `plugins` 65, `.agents` 9, `.claude` 9, `docs` 8, `resources` 4, `rfcs` 2, and four one-off root/tool files. | `rg -o --hidden ... '0\\.0\\.1-beta(?:\\.[0-9]+)?'` grouped by top-level path. |
+| 2 | 193 occurrences in 54 files are already owned by `discoverVersionFiles()` plus `PUBLISH_ASSET_OUTPUTS`; the assignment correctly requires leaving these at beta.12 until `release:cut`. | Import `discoverVersionFiles` and `PUBLISH_ASSET_OUTPUTS`, count matches. |
+| 3 | `packages/fresh-ui/deno.lock` contains 65 beta.11 workspace dependency references. It is one release behind the beta.12 manifests and is invisible to both version-file discovery and residue checks. | `rg -n '0\\.0\\.1-beta\\.11' packages/fresh-ui/deno.lock`; inspect `.llm/tools/deps/bump-version.ts`. |
+| 4 | Site install examples already derive from `docs/site/_data.ts` via `releaseVersion` and `releaseSpecifier`; these need no duplicated literal. | `rg -n 'releaseVersion|releaseSpecifier' docs/site`. |
+| 5 | `plugins/ai` and Fresh UI already use generated package metadata. MCP has `MCP_PACKAGE_VERSION` but its server handshake hardcodes beta.9. Saga-core and streams-core instrumentation hardcode beta.5 and have no generated version constant. | `packages/mcp/src/application/runner/mcp-server.ts`; plugin-core telemetry files; `.llm/tools/generate-publish-assets.ts`. |
+| 6 | The CLI guard named `version-drift_test.ts` recognizes only `0.0.1-alpha.N`; stable `0.0.x`, beta, and canary pins evade it. The broader release scanner is generic, but this local regression test is false-green. | `packages/cli/src/kernel/constants/version-drift_test.ts`. |
+| 7 | Markdown preflight recognizes only `0.0.1-<label>.<N>` pins and defers all `docs/site` findings. It cannot catch stale normal-core pins such as `@0.0.2` during a `0.0.3` cut. | `MARKDOWN_PIN_PATTERN` and `DEFERRED_MARKDOWN_PREFIX` in `.llm/tools/release/preflight-release.ts`. |
+| 8 | `validateStableTarget()` is already correct: it accepts only a normal semver target, and canary tests already prove `0.0.2-canary.N`. No relaxation is needed. | `.llm/tools/release/canary.ts` and `canary_test.ts`. |
+| 9 | Live open milestones are `0.0.2` through `0.0.9` plus `Backlog / Triage`; `wave:*` labels span multiple milestones and no longer determine a unique milestone. | GitHub milestones and issue-search API queried 2026-07-31; results recorded in `drift.md`. |
+| 10 | Beta.5 telemetry alias-window prose, the beta.7 worker incident, beta.10 release incident notes, captured trace fixtures, public-surface baselines, and `.llm/runs/**` are historical facts and should remain. | Focused `rg -n -C 3 '\\bbeta\\b'` plus owner non-scope. |
+| 11 | Root and package READMEs contain no frozen NetScript install versions; the root uses `@<version>`. Root maturity prose still says “beta” and should become “pre-1.0.” | `rg` across `README.md`, `packages/*/README.md`, and `plugins/*/README.md`. |
+| 12 | `deno doc` succeeds for MCP, saga-core, streams-core, and CLI. Planned generated constants remain internal and do not add exports or alter public signatures. | `deno doc packages/{mcp,plugin-sagas-core,plugin-streams-core}/mod.ts`. |
 
-## Preliminary Tier Census
+## Reference classification
 
-This is a planning census, not the final PR table. Counts will be recomputed from the final tree and
-the diff after every slice.
+| Class | Treatment |
+| --- | --- |
+| Coordinated manifests, root lock, scaffold manifests, generated metadata | Leave beta.12 in this PR; prove `release:cut -- 0.0.2 --dry-run` moves them. |
+| Nested tracked lock | Add to bump/residue discovery; reconcile beta.11 to the current manifest graph once. |
+| Runtime-reported package versions | Import an existing generated constant or add a generated internal constant. |
+| Install snippets and current-release docs | Use existing derived site data or a version-neutral placeholder. |
+| Tests, visual mocks, workflow examples | Use `0.0.2` only where the literal is intentionally isolated test/example data. |
+| Historical incidents and compatibility windows | Preserve the shipped version verbatim and state why in the PR. |
+| Maturity prose | Say “pre-1.0,” not “beta,” because releases are now normal `0.0.x` versions. |
 
-| Surface | Occurrences | Preliminary tier | Mechanism / action |
-| --- | ---: | --- | --- |
-| `deno.lock` files | 131 | 3 | `coordinateVersionBump` |
-| workspace `deno.json` files | 106 | 3 | `coordinateVersionBump` |
-| `scaffold.plugin.json` files | 12 | 3 | `discoverVersionFiles` scaffold walk |
-| generated package-version constants | 9 | 3 | `gen:publish-assets` |
-| remaining source/tests/docs/skills/resources | 67 | 1/2/3/historical | site-by-site triage required |
+## jsr-audit surface scan
 
-Historical occurrences are reported separately from the mutable Tier 1–3 counts because the owner
-explicitly requires immutable published-version history to remain unchanged.
-
-## jsr-audit surface scan (package/plugin waves)
-
-- Surface scanned: current generated package metadata, exact JSR pins emitted by CLI/plugin
-  scaffolds, and runtime metadata literals in affected publishable source.
-- No export-map, `mod.ts`, or public type changes are planned.
-- Slow-type risk: none introduced by replacing string literals with imported/generated `string`
-  constants. Any newly generated constant must keep an explicit `: string` annotation.
-- Publish risk: a hardcoded exact version in publishable TypeScript can evade the JSON/lock residue
-  scan. `publish:readiness` plus the final `release:cut -- 0.0.2 --dry-run` is the authoritative
-  consumer proof.
-- Existing unrelated JSR debt is not expanded by this run.
+- Surfaces inspected with `deno doc`: `@netscript/mcp`, `@netscript/plugin-sagas-core`,
+  `@netscript/plugin-streams-core`, and `@netscript/cli`.
+- Planned product-code changes add internal generated string constants and replace runtime metadata
+  literals. No `mod.ts`, export-map, public type, dependency, or JSDoc surface changes.
+- Slow-type risk: none introduced. Full export-map doc lint remains a final gate for the three
+  affected publishable packages; publish dry-run/readiness is the release proof.
+- File-list risk: generated metadata must be included by the packages' existing `**/*.ts` publish
+  includes. `gen:publish-assets --check` and package dry-run will verify freshness/inclusion.
 
 ## Open questions
 
-- Resolved now: raw occurrence majority cannot be Tier 1/2 because 258 are already release-cut-owned
-  Tier 3. Final reporting will show both the all-occurrence census and the reducible remainder.
-- Safe to defer: whether future release tooling should emit a machine-readable permanent tier
-  inventory. This PR may add a narrowly targeted regression gate only if the existing gates cannot
-  prove a discovered Tier 3 path.
+- None that force implementation rework. Historical-versus-current classification is locked in the
+  table above; any newly discovered ambiguous occurrence is logged before editing.

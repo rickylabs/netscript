@@ -1,4 +1,4 @@
-# Plan: adopt the 0.0.x release scheme repo-wide
+# Plan: adopt the `0.0.x` release scheme repo-wide
 
 ## Run Metadata
 
@@ -7,172 +7,162 @@
 | Run ID | `version-scheme-0-0-x` |
 | Branch | `chore/version-scheme-0-0-x` |
 | Phase | `plan` |
-| Target | Cross-cutting release tooling, publishable metadata, docs, skills, workflows, and resources |
-| Archetype | Multi-surface: existing package archetypes; Archetype 6 for CLI/tooling paths |
-| Scope overlays | `SCOPE-docs` |
+| Target | Release tooling, publishable runtime metadata, docs/process surfaces |
+| Archetype | `6 — CLI / Tooling` |
+| Scope overlays | `docs` |
 
 ## Archetype
 
-This is one sequential cross-cutting run, not a package redesign. Existing touched packages retain
-their doctrine archetypes: integration/runtime metadata stays inside its current package boundary,
-plugin metadata stays Archetype 5, Fresh UI stays Archetype 4, and CLI/release tooling uses
-Archetype 6. The union gate set is used; no new folder shape, command, export, or abstraction is
-introduced.
-
-The owner requires one branch and one PR. Slices are sequential because the final census,
-generated-asset pipeline, release skill, and dry-run proof all share the same release contract; a
-supervisor/sub-PR split would add conflict and violate the requested deliverable shape.
+Archetype 6 is the smallest fit because the behavior being changed is the user-run release toolchain
+(`release:cut`, coordinated version bumping, and release preflight). The Docs overlay covers the
+root/site/package/process documentation. This is one interdependent lockstep release contract on the
+owner-mandated branch, not a supervisor/sub-PR program.
 
 ## Current Doctrine Verdict
 
-The doctrine records mixed existing verdicts: CLI is `Restructure`, Fresh UI is `Keep`, telemetry is
-`Refactor`, and plugin packages range from `Keep` to `Refactor`. This run does not claim to resolve
-those structural verdicts. It must not deepen them; it only removes stale version coupling or routes
-exact metadata through existing generated constants.
+The doctrine labels `@netscript/cli` **Restructure**, MCP is not listed in the older verdict table,
+and saga/streams core packages are public package surfaces. This run does not restructure any
+package or change a public export; it must not deepen the existing CLI debt. Fresh UI is **Keep**.
 
 ## Axioms in Play
 
 | Axiom | Why it matters |
 | --- | --- |
-| A1/A2 | Published exact-version behavior must be explicit and simple at the consumer boundary. |
-| A6 | Reuse existing release constants and generation instead of adding wrappers. |
-| A8 | Remove dead references rather than preserving stale commentary. |
-| A9 | Keep changes inside each package's current archetype boundary. |
-| A14 | `release:cut --dry-run`, publish readiness, scoped wrappers, tests, and docs links prove the result. |
+| A1 | Published version metadata and README/install contracts are public product behavior. |
+| A2 | One release version source is simpler than scattered literals. |
+| A6 | Generated constants are justified policy seams; duplicate version helpers are not. |
+| A8 | Version generation remains in the existing publish-asset concern. |
+| A14 | Release dry-run, residue, specifier, docs, and publish gates must enforce the scheme. |
 
 ## Goal
 
-Adopt the owner-ratified `0.0.x` release train so normal releases use `0.0.x`, canaries use
-`0.0.x-canary.N`, unnecessary exact references disappear, stage-only prose stops naming a release,
-and every remaining mutable exact version is moved by `release:cut`.
+Make every current NetScript version reference either release-derived, version-neutral, or an
+explicit historical/one-off fact, while keeping all manifests at `0.0.1-beta.12` until the owner
+runs `deno task release:cut -- 0.0.2`.
 
 ## Scope
 
-- Triage every baseline occurrence into Tier 1, Tier 2, Tier 3, or owner-exempt historical evidence.
-- Remove dead exact-version prose and fixtures; use stage words only where maturity is the point.
-- Derive exact runtime/publish metadata from the generated package-version pipeline.
-- Update release/process skills, regenerate `.claude/skills`, and update current roadmap/milestone
-  language for the already-renamed `0.0.2`…`0.0.9` milestones.
-- Update docs/site, root/package READMEs, workflows, and resources where the old scheme is current
-  product language rather than history.
-- Verify release tooling has no prerelease-train assumption while preserving stable-only target
-  validation.
-- Produce the exhaustive final Tier 3 mechanism list and before/after counts in the PR body.
+- Generalize coordinated version discovery/residue to tracked member lockfiles.
+- Generalize current-pin guards and markdown preflight to normal `0.0.x` and canary semver.
+- Derive MCP, saga-core, and streams-core runtime package versions from generated metadata.
+- Reconcile one-off tests/templates/mocks to the new scheme without introducing release literals in
+  publishable runtime source.
+- Rewrite roadmap, maturity, release, PR/milestone, RFC, workflow, and contributor prose.
+- Regenerate `.claude/skills/**`, publish assets, and CLI embedded assets through their owners.
+- Preserve shipped historical references and enumerate them in the PR.
 
 ## Non-Scope
 
-- No `deno.json` version bump; all manifests remain `0.0.1-beta.12` until release cut.
-- No milestone rename, history rewrite, tag move, publish, or merge.
-- No edits to immutable release history in CHANGELOGs, incident evidence, or `.llm/runs` history.
-- No publish-config edits under `packages/bench` or `packages/cli/e2e`.
-- No unrelated doctrine remediation.
+- No `deno.json` version changes; `release:cut` owns them.
+- No GitHub milestone renames, history rewrites, tag changes, publication, or merge.
+- No edits to `packages/bench/deno.json` or `packages/cli/e2e/deno.json` publish config.
+- No rewrite of CHANGELOG, release incident history, telemetry compatibility history, captured
+  fixtures, `.llm/runs/**` history outside this active run, or public-surface baselines.
+- No public API redesign or package architecture remediation.
 
 ## Hidden Scope
 
-- Generated `.claude/skills` mirror changes must come only from `agentic:sync-claude`.
-- Two lockfiles and scaffold plugin manifests are Tier 3 even though this branch intentionally leaves
-  their old version literals intact.
-- Generated assets may fail freshness gates until their intended diff is committed.
-- Tests that use version-shaped sample data need semantic triage, not mechanical replacement.
-- The final dry-run mutates release-owned files and generated assets; capture evidence, then restore
-  only that known dry-run diff without discarding owned changes.
+- `packages/fresh-ui/deno.lock` is a tracked whole-workspace lock used by Fresh UI tasks and must
+  join the coordinated bump/residue surface.
+- `packages/cli/src/kernel/assets/embedded.generated.ts` must be regenerated after its source
+  template changes and committed before `check:assets-barrel` can pass.
+- `.claude/skills/**` must only change through `agentic:sync-claude`.
+- Dry-run mutates manifests/locks/generated assets and must be restored to the pre-run commit,
+  preserving intended branch changes.
 
 ## Locked Decisions
 
 | ID | Decision | Rationale |
 | --- | --- | --- |
-| D1 | Count all 325 occurrences, but report the reducible remainder separately. | Raw majority reduction is impossible because 258 occurrences are already release-cut-owned Tier 3. |
-| D2 | Historical published-version evidence remains literal and is classified as owner-exempt history, not mutable Tier 3. | Rewriting it would falsify incidents/releases. |
-| D3 | Exact runtime/package metadata derives from existing generated metadata; extend `gen:publish-assets` only when no existing constant covers the package. | This is the #991 prevention boundary. |
-| D4 | Scenario-only test versions become neutral fixtures; lockstep tests use the release constant. | Tests should assert semantics, not freeze yesterday's train. |
-| D5 | Current maturity prose may say beta/pre-1.0 without an exact release. | Tier 2 carries the intended meaning without a maintenance burden. |
-| D6 | Keep `validateStableTarget` strict. | All future targets are normal `0.0.x` versions; strictness is now aligned. |
-| D7 | Use one branch/PR with ordered slices. | Owner deliverable and shared release contract make sub-PR fanout counterproductive. |
+| D1 | Normal releases are `0.0.x`; a canary is `<target>-canary.N`. | Owner decision and semver ordering. |
+| D2 | Keep `validateStableTarget()` strict. | The target is now always a normal version. |
+| D3 | Add tracked member `deno.lock` files to version discovery and residue checks. | Prevents nested locks from silently freezing. |
+| D4 | Reuse/add generated TypeScript package-version constants for runtime metadata. | Publish-safe and automatically regenerated by `release:cut`. |
+| D5 | Make docs-site stale JSR pins blocking and scan generic semver. | The new train cannot be protected by a beta-only deferred scanner. |
+| D6 | Use derived site values and placeholders in current docs; use literal `0.0.2` only in isolated tests/examples/mocks. | Avoids creating future bump work. |
+| D7 | Preserve historical shipped versions verbatim. | They are evidence, not current release configuration. |
+| D8 | Replace current “beta” maturity claims with “pre-1.0.” | Normal `0.0.x` releases are no longer beta prereleases but APIs remain unstable. |
+| D9 | Milestone assignment is explicit (`0.0.2`…`0.0.9`/Backlog), not a deterministic `wave:*` mapping. | Live repository state already spans waves across cuts. |
 
 ## Open-Decision Sweep
 
 | Decision | Status | Notes |
 | --- | --- | --- |
-| Add new generated metadata constants for packages without one | Must resolve now | Decide per exact source site during Slice 2; do not leave a hardcoded replacement. |
-| Preserve or remove each beta-numbered doc statement | Must resolve now | Classify from whether the number is current contract, stage signal, or historical fact. |
-| Permanent machine-readable tier inventory | Safe to defer | Final PR table is required; automation is added only if existing gates leave a recurring blind spot. |
-| Full CLI runtime E2E | Safe to defer unless generated output changes | The canonical release dry-run and targeted CLI tests are primary; scaffold.runtime is required if emitted scaffold behavior changes. |
+| Whether to delete historical beta references | Safe to defer | Locked D7 says preserve; no implementation ambiguity. |
+| Whether to restructure package internals | Safe to defer | Explicit non-scope and no new architecture debt. |
+| Whether to split into sub-PRs | Safe to defer | Rejected for this run: one branch/PR is owner-mandated and the edits are lockstep. |
 
 ## Risk Register
 
 | Risk | Mitigation |
 | --- | --- |
-| Blind replacement corrupts history or fixtures. | Site-by-site tier inventory; diff review; historical exclusions. |
-| A surviving exact source literal is not bumped. | Trace each Tier 3 site to `coordinateVersionBump`, `gen:publish-assets`, or a derived constant; prove with release dry-run. |
-| Root wrappers miss CLI files. | Run explicit scoped check/lint/fmt wrappers for every touched package root, especially `packages/cli`. |
-| Generated asset diff blocks freshness checks. | Commit generated outputs before rerunning freshness gates. |
-| Dry-run leaves manifests bumped. | Snapshot raw status/diff, run dry-run, capture readiness JSON, restore only files proven to be dry-run outputs, then recheck status. |
-| Docs claims diverge across roadmap, site, README, and skills. | One terminology sweep plus `docs:links` and opposite-family review. |
-| Existing architecture debt creates unrelated red gates. | Report real failures; distinguish baseline debt only with evidence, never suppress. |
+| Accidental manifest bump in the implementation PR | Raw Git diff checks exclude any version-value change; dry-run is restored and rechecked. |
+| Invalid nested lock manipulation | Use Deno lock generation/validation, inspect the exact diff, then run Fresh UI check/test. |
+| Generated assets fail freshness after source edits | Regenerate with checked-in tasks, commit outputs, rerun freshness gates after commit. |
+| Historical evidence is rewritten as current policy | Maintain an explicit historical allowlist and review every surviving beta reference. |
+| Docs claim an exact version that cannot bump | Use `_data.ts` derived values/placeholders; generalized markdown gate blocks stale pins. |
+| Huge repo-wide validation obscures scoped failures | Run scoped wrappers per touched root, then composed release dry-run last. |
+| Dry-run restoration loses an intended file | Record pre-run `git status` and commit SHA; restore only dry-run-mutated version files, then verify artifact diff and status. |
 
 ## Anti-Patterns to Resolve or Avoid
 
 | AP | Status | Plan |
 | --- | --- | --- |
-| AP-2/A6 | Risk | Reuse generated constants; do not invent a version helper. |
-| AP-5 | Existing risk | Remove dead/stage-only exact-version policy duplication. |
-| AP-18 | Existing risk | Replace brittle exact-version fixture assertions only when the number is not the behavior under test. |
-| AP-25 | Risk | Generation remains in existing tool edges; publishable runtime source only consumes constants. |
+| AP-1 | Risk | Keep release scanner/generator edits focused; no new monolith. |
+| AP-6 | N/A | No base classes or orchestration hierarchy changes. |
+| AP-9 | Risk | Extend existing generation/bump mechanisms instead of adding parallel helpers. |
+| AP-18 | Risk | Tests assert semantic bump/scanner behavior, not whole generated snapshots. |
+| AP-21–25 | Existing CLI debt | No command-surface, composition, registry, or effect-boundary changes; verify `quality:gate`/`arch:check`. |
 
 ## Fitness Gates
 
 | Gate | Required | Expected evidence |
 | --- | --- | --- |
-| F-5/F-6/F-7 | Yes for touched publishable roots | JSR audit, doc-lint where exports/docs change, publish readiness/dry-run |
-| F-19 | Yes | Scoped check/lint/fmt wrappers per touched root |
-| Universal/affected archetype gates | Yes | `deno task quality:gate` plus manual no-surface-change review |
-| Docs overlay | Yes | source alignment, terminology sweep, `deno task docs:links` |
-| Skills mirror | Yes | `agentic:sync-claude:check` and `agentic:check-claude` |
+| F-5 / F-7 | Yes for affected packages | `deno task doc:lint --root ... --pretty`; no new diagnostics. |
+| F-6 | Yes | Package/repo publish dry-run inside `release:cut -- 0.0.2 --dry-run`. |
+| F-10 | Yes | Focused release, generator, CLI, Fresh UI, MCP, saga-core, and streams-core tests. |
+| F-19 | Yes | Scoped check/lint/fmt wrappers for every touched TS root, including `packages/cli`. |
+| Universal + F-CLI | Yes where applicable | `deno task quality:gate`; manual review confirms no A6 boundary changes. |
+| Docs overlay | Yes | `deno task docs:links`, source-alignment sweep, terminology sweep. |
+
+## Commit Slices
+
+| # | Slice | Proving gate | Files |
+| --- | --- | --- | --- |
+| S1 | Make release discovery and stale-pin guards understand the `0.0.x` train and nested locks. | Focused Deno tests for bump, preflight, cut/canary; scoped check/lint/fmt on `.llm/tools`; CLI guard test. | `.llm/tools/deps/bump-version.ts`, release preflight/tests/examples, `packages/cli/src/kernel/constants/version-drift_test.ts`, `.github/workflows/release-canary.yml`, active run artifacts. |
+| S2 | Derive publishable runtime package versions and reconcile source-owned fixtures/templates. | `gen:publish-assets`, `check:publish-assets`, affected package tests, Fresh UI test/check, asset-barrel freshness, scoped wrappers, `quality:gate`. | Generator + generated outputs; MCP/saga-core/streams-core runtime files; CLI/Fresh UI tests and template/generated asset; nested Fresh UI lock; active run artifacts. |
+| S3 | Align docs, process, roadmap, RFC, resource, and skill surfaces without freezing a release literal. | `docs:links`, internal-doc links, skill sync/check, targeted searches, format checks. | Root/docs/RFC/resources/tool preview, `.agents/skills`, generated `.claude/skills`, active run artifacts. |
+| S4 | Prove the real release artifact and record final evidence. | All scoped wrappers/tests, `quality:gate`, docs/Claude gates, `deno task release:cut -- 0.0.2 --dry-run` reaching `publish-readiness ok:true`, post-restore Git/GitHub verification. | Active run artifacts and PR body/comments only; no product change unless a gate exposes a reviewed defect. |
 
 ## Arch-Debt Implications
 
 | Entry | Action | Notes |
 | --- | --- | --- |
-| Existing package verdicts | none | Do not deepen or claim closure. |
-| New version-coupling debt | none allowed | A mutable exact literal without cut ownership is a slice failure. |
-
-## Commit Slices
-
-| # | Slice | What it proves | Primary gates | Planned files |
-| --- | --- | --- | --- | --- |
-| 1 | Release contract and process language | Skills/workflows/tooling describe `0.0.x` + tied canaries without obsolete prerelease-train guidance | targeted tests; skill sync/check; scoped fmt/check | `.agents/skills/**`, generated `.claude/skills/**`, `.github/workflows/**`, `.llm/tools/release/**` tests/docs, root process docs |
-| 2 | Publishable exact-version derivation | Every mutable exact source/runtime metadata site is generated or constant-derived | package tests; scoped wrappers; `quality:gate`; publish-asset freshness | affected `packages/**`, `plugins/**`, `.llm/tools/generate-publish-assets.ts` if required |
-| 3 | Consumer fixtures and current docs | Tests use semantic fixtures; current README/site/roadmap/resource prose follows Tier 1/2/3 policy | affected tests; `docs:links`; scoped wrappers | tests, `README.md`, `docs/**`, package READMEs, `resources/**`, RFC/process templates |
-| 4 | Census and release-cut proof | Final tree has no unexplained survivor and `release:cut -- 0.0.2 --dry-run` reaches green publish readiness | full planned gates; dry-run; raw git restoration verification | run artifacts and PR body; no manifest version committed |
+| Existing CLI/Fresh UI/package debt | None | No public/architectural deepening planned. |
+| New debt | None expected | Any unfixable gate or surface mismatch becomes explicit drift/debt before handoff. |
 
 ## Validation Plan
 
 | Order | Gate | Command or check | Expected result |
 | --- | --- | --- | --- |
-| 1 | Census | exact `rg --json` inventory and survivor mechanism audit | Every match classified; counts reconcile |
-| 2 | Static | scoped `run-deno-check/lint/fmt.ts --root <touched-root> --ext ts,tsx` | PASS for every changed TS root |
-| 3 | Tests | targeted affected package/tool tests, then `deno task test` as required | PASS |
-| 4 | Doctrine | `deno task quality:gate` | PASS or explicitly evidenced baseline failure |
-| 5 | Docs | `deno task docs:links` | PASS |
-| 6 | Skills | `deno task agentic:sync-claude:check`; `deno task agentic:check-claude` | PASS |
-| 7 | Release | `deno task release:cut -- 0.0.2 --dry-run` | output contains `{"gate":"publish-readiness","ok":true}` and command completes |
-| 8 | Restoration | raw `git status`, `git diff`, manifest-version census | no dry-run bump remains; owned diff preserved |
+| 1 | Focused tests | `deno test` on changed release/generator/package/CLI/Fresh UI tests | PASS |
+| 2 | Scoped static | `run-deno-{check,lint,fmt}.ts --root <touched root> --ext ts,tsx` | PASS for every changed TS root |
+| 3 | Generated freshness | `check:publish-assets`, `check:assets-barrel`, skill mirror checks | PASS after generated outputs are committed |
+| 4 | Package fitness | `deno task quality:gate` plus affected full-export `doc:lint` | PASS or pre-existing debt precisely attributed |
+| 5 | Package tests | `deno task test` / focused affected package tasks | PASS |
+| 6 | Docs | `deno task docs:links` and internal-doc validation | PASS |
+| 7 | Release proof | `deno task release:cut -- 0.0.2 --dry-run` | Emits `{"gate":"publish-readiness","ok":true}` and completes |
+| 8 | Restore/verify | raw Git status/diff/log, remote ref, `gh pr view --repo ...` | Manifests remain beta.12; intended branch/PR artifacts exist |
 
 ## Dependencies
 
-- Existing `coordinateVersionBump`, `gen:publish-assets`, publish-readiness specifier/Markdown gates.
-- Agentic local evaluator route and opposite-family review route.
-- GitHub token and explicit-refspec push path.
-
-## Deferred Scope
-
-- Publishing `0.0.2`, canary dispatch, milestone changes, and merging the PR.
-- Historical release normalization.
-- Repo-wide architecture remediation unrelated to version coupling.
+- Deno 2.9 native lock/version tooling and checked-in `.llm/tools` wrappers.
+- Local Claude/OpenRouter formal evaluator route and Claude opposite-family review route.
+- GitHub token resolved by `agentic:gh-token`; milestone `0.0.2` already exists.
 
 ## Drift Watch
 
-- Any exact survivor that cannot be tied to a cut-owned mechanism.
-- Any generated asset not listed in `PUBLISH_ASSET_OUTPUTS`.
-- Any gate that cannot run locally or produces baseline failures.
-- Any count that fails to reconcile to the original 325 occurrences.
+- Any beta reference not covered by the locked historical allowlist.
+- Any generated constant not included in publish output or `PUBLISH_ASSET_OUTPUTS`.
+- Any changed manifest version before the final dry-run or any beta.12 residue after dry-run.
+- Any gate that still assumes prerelease-only versions or defers current docs-site pins.

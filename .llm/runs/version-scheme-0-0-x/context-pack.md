@@ -1,4 +1,4 @@
-# Context Pack: adopt the 0.0.x release scheme
+# Context Pack: `0.0.x` release scheme
 
 ## Run Metadata
 
@@ -6,67 +6,69 @@
 | --- | --- |
 | Run ID | `version-scheme-0-0-x` |
 | Branch | `chore/version-scheme-0-0-x` |
-| Current phase | `plan-eval` |
-| Archetype | Multi-surface; Archetype 6 for CLI/tooling paths |
-| Scope overlays | `SCOPE-docs` |
+| Current phase | `plan` |
+| Archetype | `6 — CLI / Tooling` |
+| Scope overlays | `docs` |
 
 ## Current State
 
-Owner brief is committed at `fbd57c3bf`. Research reproduces the 325-occurrence baseline and finds
-at least 258 are necessarily release-cut-owned Tier 3 sites (manifests, locks, scaffold manifests,
-generated constants). No implementation edits have begun. The local Qwen PLAN-EVAL launch is
-blocked because the isolated `claude-openrouter` environment has no OpenRouter credential.
+Research and Design are complete against `origin/main@8dca67985`. The branch contains only the
+launcher brief commits plus these run artifacts; no implementation change has started. The next
+hard stop is a separate Qwen PLAN-EVAL.
 
 ## Completed
 
-- Loaded requested skills, JSR audit, harness authorities, doctrine, and approved route policy.
-- Verified branch/base/remote artifact and GitHub authentication.
-- Reproduced baseline census and inspected bumper/generator/readiness ownership.
-- Locked four sequential slices and validation/restoration strategy.
+- Loaded all owner-named skills plus repo-required RTK, JSR audit, and Claude manager guidance.
+- Reproduced the 325-reference baseline and classified release-owned/current/historical surfaces.
+- Identified nested-lock, generic Markdown-pin, CLI guard, and runtime-version derivation gaps.
+- Selected Archetype 6 with Docs overlay and locked four sequential commit slices.
 
 ## In Progress
 
-- PLAN-EVAL authentication/transport authorization.
+- Commit/push the Plan & Design artifacts, open the draft PR, and dispatch PLAN-EVAL.
 
 ## Next Steps
 
-1. Obtain OpenRouter credential availability for the isolated local profile, or explicit owner
-   authorization for cloud OpenHands open-model PLAN-EVAL.
-2. Launch the separate evaluator and require tracked `plan-eval.md`.
-3. If PASS, advance to Slice 1; otherwise repair the plan and repeat within the two-cycle limit.
+1. Commit the run artifacts without unrelated product changes.
+2. Push explicit refspec and verify `git ls-remote`.
+3. Open and verify the draft PR with milestone `0.0.2` and lifecycle labels.
+4. Run separate-session PLAN-EVAL; do not implement before `PASS`.
 
 ## Key Decisions
 
 | Decision | Source | Notes |
 | --- | --- | --- |
-| Three-tier triage replaces derive-everything | owner refinement `fbd57c3bf` | Historical evidence remains exempt. |
-| Dual census reporting | research/plan | Prevents false majority claim caused by 258 cut-owned occurrences. |
-| No manifest bumps committed | owner non-scope | Final dry-run diff is restored after evidence capture. |
+| Derive/make-derivable/literal-only-last | Owner brief | Applies per occurrence. |
+| Preserve historical shipped refs | Owner non-scope | Beta.5/7/10 incidents and fixtures remain. |
+| Include tracked nested locks | Research + D3 | Fixes invisible Fresh UI beta.11 residue. |
+| Generic, blocking Markdown pins | Research + D5 | Protects `0.0.2` → `0.0.3` and docs/site. |
+| Pre-1.0 maturity terminology | Owner scheme + D8 | Normal `0.0.x` is no longer a beta prerelease. |
 
 ## Files Changed
 
 | Path | Status | Notes |
 | --- | --- | --- |
-| `.llm/runs/version-scheme-0-0-x/*` | new/updated | Harness bootstrap, research, plan, design, identity, drift |
+| `.llm/runs/version-scheme-0-0-x/{supervisor,research,plan,worklog,context-pack,drift}.md` | new | Harness bootstrap/plan artifacts |
+| `.llm/runs/version-scheme-0-0-x/codex-thread-ids.md` | new (launcher-owned) | Route/session provenance |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Plan-Gate | BLOCKED | Local canary: `credential=absent`, `auth_required`; no session launched |
-| Static/Fitness/Runtime/Consumer | NOT_RUN | Implementation prohibited before Plan-Gate PASS |
+| Static | Baseline PASS | Census and raw Git evidence in `worklog.md` |
+| Fitness | Plan pending | JSR surface scan recorded; PLAN-EVAL not run |
+| Runtime | Degraded | Runtime controller cannot prove mobile attachment |
+| Consumer | NOT_RUN | Release dry-run reserved for S4 |
 
 ## Open Questions
 
-- Which authorized evaluator transport should unblock PLAN-EVAL: credentialed local Qwen, or
-  owner-authorized cloud OpenHands open model?
+- None blocking PLAN-EVAL.
 
 ## Drift and Debt
 
-- Drift: run-id naming; raw-majority expectation conflicts with cut-owned floor; local evaluator
-  credential unavailable.
-- Debt: none created; mutable Tier 3 without cut ownership is prohibited.
+- Drift: five entries in `drift.md`, including significant brief/gate/runtime mismatches.
+- Debt: none created; existing package debt is not deepened by the plan.
 
 ## Commits
 
-- See the draft PR's commit list + per-slice PR comments.
+- See the draft PR's commit list + per-slice PR comments after the plan commit is pushed.
