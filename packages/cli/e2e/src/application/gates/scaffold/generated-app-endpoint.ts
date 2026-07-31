@@ -32,6 +32,14 @@ interface AppSettingsAppsShape {
   };
 }
 
+/** A live AppHost has not registered the requested resource endpoint yet. */
+export class AppEndpointPendingError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'AppEndpointPendingError';
+  }
+}
+
 /**
  * Reads the host port a generated project **pins** for `appName`, if it pins one.
  *
@@ -187,17 +195,20 @@ export function declaredHttpUrls(resource: Record<string, unknown>): string[] {
  *
  * @param describeOutput - Raw stdout of `aspire describe`.
  * @param appName - Aspire resource name of the app.
- * @throws If the resource is absent, or exposes no HTTP endpoint.
+ * @throws {@link AppEndpointPendingError} if the resource is absent or exposes no HTTP endpoint.
+ * Other parse errors are terminal and are reported unchanged.
  */
 export function appUrlsFromDescribeOutput(describeOutput: string, appName: string): string[] {
   const resource = findResource(JSON.parse(extractJson(describeOutput)), appName);
   if (!resource) {
-    throw new Error(`resource ${appName} was not present in aspire describe output`);
+    throw new AppEndpointPendingError(
+      `resource ${appName} was not present in aspire describe output`,
+    );
   }
   const urls = declaredHttpUrls(resource);
   if (urls.length === 0) {
-    throw new Error(
-      `resource ${appName} declared no HTTP endpoint in its aspire describe urls[]`,
+    throw new AppEndpointPendingError(
+      `resource ${appName} still declared no HTTP endpoint in its aspire describe urls[]`,
     );
   }
   return urls;
@@ -208,7 +219,8 @@ export function appUrlsFromDescribeOutput(describeOutput: string, appName: strin
  *
  * @param appHost - Path to the generated AppHost, as passed to `aspire --apphost`.
  * @param appName - Aspire resource name of the app.
- * @throws If `aspire describe` fails, or the resource exposes no HTTP endpoint.
+ * An AppHost that has not started yet and an endpoint that has not been registered are transient;
+ * both throw {@link AppEndpointPendingError}. Other command and parse failures are terminal.
  */
 export async function resolveAppUrlsFromAppHost(
   appHost: string,
@@ -222,6 +234,15 @@ export async function resolveAppUrlsFromAppHost(
   const stdout = new TextDecoder().decode(output.stdout);
   const stderr = new TextDecoder().decode(output.stderr);
   if (!output.success) {
+    const detail = stderr || stdout;
+    if (
+      /apphost[^\n]*(?:not running|not found)|no (?:running )?apphosts?|no apphost[^\n]*found/i
+        .test(detail)
+    ) {
+      throw new AppEndpointPendingError(
+        `running AppHost was not available to describe: ${detail.trim()}`,
+      );
+    }
     throw new Error(`aspire describe failed with code ${output.code}: ${stderr || stdout}`);
   }
   return appUrlsFromDescribeOutput(stdout, appName);
@@ -256,6 +277,14 @@ export async function generatedAppHomeUrls(
     );
   }
 
+  return await generatedAppHomeUrlsFromAppHost(appHost, appName);
+}
+
+/** Resolves and normalizes the current live AppHost URLs for an unpinned app. */
+export async function generatedAppHomeUrlsFromAppHost(
+  appHost: string,
+  appName: string,
+): Promise<string[]> {
   const candidates: string[] = [];
   for (const base of await resolveAppUrlsFromAppHost(appHost, appName)) {
     const home = new URL('/', base);

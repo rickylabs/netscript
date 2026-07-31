@@ -1,10 +1,12 @@
 import { assertEquals, assertNotEquals, assertRejects, assertThrows } from '@std/assert';
 
 import {
+  AppEndpointPendingError,
   appUrlsFromDescribeOutput,
   generatedAppHomeUrls,
   readPinnedAppPort,
 } from '../../../src/application/gates/scaffold/generated-app-endpoint.ts';
+import { probeAppHome } from '../../../src/application/gates/scaffold/probe-app-home.ts';
 import { generateAppsettings } from '../../../../src/kernel/templates/aspire/generate-appsettings.ts';
 import { PORT_RANGES, SCAFFOLD_APP_PORT } from '../../../../src/kernel/constants/port-ranges.ts';
 import { SCAFFOLD_FILES } from '../../../../src/kernel/constants/scaffold/scaffold-files.ts';
@@ -203,6 +205,92 @@ Deno.test('appUrlsFromDescribeOutput names what was missing', () => {
   assertThrows(
     () => appUrlsFromDescribeOutput(noEndpoint, 'dashboard'),
     Error,
-    'declared no HTTP endpoint',
+    'still declared no HTTP endpoint',
   );
+});
+
+Deno.test('app-home probe does not retry terminal endpoint resolution failures', async () => {
+  const root = await projectWithAppsettings(JSON.stringify({ NetScript: { Apps: {} } }));
+  let describeCalls = 0;
+  try {
+    await assertRejects(
+      () =>
+        probeAppHome(root, 'dashboard', '/tmp/apphost.ts', {
+          attempts: 3,
+          retryDelayMs: 0,
+          delay: () => Promise.resolve(),
+          log: () => {},
+          resolveLiveUrls: () => {
+            describeCalls++;
+            return Promise.reject(new SyntaxError('malformed aspire describe payload'));
+          },
+        }),
+      SyntaxError,
+      'malformed aspire describe payload',
+    );
+    assertEquals(describeCalls, 1);
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+Deno.test('app-home probe retries while aspire describe has not registered the endpoint', async () => {
+  const root = await projectWithAppsettings(JSON.stringify({ NetScript: { Apps: {} } }));
+  let describeCalls = 0;
+  let fetchCalls = 0;
+  try {
+    await probeAppHome(root, 'dashboard', '/tmp/apphost.ts', {
+      attempts: 3,
+      retryDelayMs: 0,
+      delay: () => Promise.resolve(),
+      log: () => {},
+      resolveLiveUrls: () => {
+        describeCalls++;
+        const output = describeCalls === 1
+          ? JSON.stringify({ resources: [{ displayName: 'dashboard', urls: [] }] })
+          : DESCRIBE_FIXTURE;
+        const urls = appUrlsFromDescribeOutput(output, 'dashboard');
+        return Promise.resolve(urls.map((url) => new URL('/', url).toString()));
+      },
+      fetchUrl: () => {
+        fetchCalls++;
+        return Promise.resolve(
+          new Response('<html>ready</html>', { headers: { 'content-type': 'text/html' } }),
+        );
+      },
+    });
+    assertEquals(describeCalls, 2);
+    assertEquals(fetchCalls, 1);
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+Deno.test('app-home probe bounds a resource endpoint that never appears', async () => {
+  const root = await projectWithAppsettings(JSON.stringify({ NetScript: { Apps: {} } }));
+  let describeCalls = 0;
+  try {
+    await assertRejects(
+      () =>
+        probeAppHome(root, 'dashboard', '/tmp/apphost.ts', {
+          attempts: 3,
+          retryDelayMs: 0,
+          delay: () => Promise.resolve(),
+          log: () => {},
+          resolveLiveUrls: () => {
+            describeCalls++;
+            return Promise.reject(
+              new AppEndpointPendingError(
+                'resource dashboard still declared no HTTP endpoint',
+              ),
+            );
+          },
+        }),
+      Error,
+      'resource dashboard still declared no HTTP endpoint after 3 attempts',
+    );
+    assertEquals(describeCalls, 3);
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
 });
