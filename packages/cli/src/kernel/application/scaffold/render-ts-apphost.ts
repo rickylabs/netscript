@@ -1,6 +1,6 @@
 import { join } from '@std/path';
 import type { NetScriptConfig } from '@netscript/aspire/types';
-import { PORT_RANGES, SCAFFOLD_APP_PORT } from '../../constants/port-ranges.ts';
+import { PORT_RANGES } from '../../constants/port-ranges.ts';
 import { SCAFFOLD_DEFAULTS } from '../../constants/scaffold/scaffold-defaults.ts';
 import { SCAFFOLD_DIRS } from '../../constants/scaffold/scaffold-dirs.ts';
 import { SCAFFOLD_FILES } from '../../constants/scaffold/scaffold-files.ts';
@@ -25,7 +25,6 @@ export async function scaffoldTsAppHost(
   const directoriesCreated: string[] = [];
   const filesSkipped: string[] = [];
   const targetPath = options.targetPath;
-  const appProxyPort = SCAFFOLD_APP_PORT;
 
   // All TS AppHost files live here — isolated from the Deno workspace root.
   const aspireDir = join(targetPath, SCAFFOLD_DIRS.ASPIRE_TS);
@@ -121,11 +120,13 @@ export async function scaffoldTsAppHost(
   // 5. Build NetScriptConfig for the helpers generator from validated options.
   //    Mirrors what appsettings.json contains after scaffoldRoot writes it.
   const services: NetScriptConfig['Services'] = {};
-  if (options.includeExampleService && options.serviceName && options.servicePort) {
+  if (options.includeExampleService && options.serviceName) {
     services[options.serviceName] = {
       Enabled: true,
       Runtime: 'deno',
-      Port: options.servicePort,
+      // No HostPort by default — Aspire allocates the host and target ports so
+      // `aspire start --isolated` can run two workspaces at once (#952).
+      ...(options.serviceHostPort ? { HostPort: options.serviceHostPort } : {}),
       Entrypoint: 'src/main.ts',
       Workdir: `${SCAFFOLD_DIRS.SERVICES}/${options.serviceName}`,
     };
@@ -220,7 +221,7 @@ export async function scaffoldTsAppHost(
         Runtime: 'deno',
         Type: 'app' as const,
         WatchMode: false,
-        Port: appProxyPort,
+        // No HostPort — see the Services block above (#952).
         RequiresKv: false,
         ...(options.includeExampleService && options.serviceName
           ? { ServiceReferences: [options.serviceName] }

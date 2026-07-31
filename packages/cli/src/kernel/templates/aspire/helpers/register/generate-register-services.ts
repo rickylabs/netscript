@@ -26,6 +26,7 @@ import { SCAFFOLD_DIRS } from '../../../../constants/scaffold/scaffold-dirs.ts';
 import { RESOURCE_DEFAULTS } from '@netscript/aspire/constants';
 import { TEMPLATE_KEYS } from '../../../../assets/manifest.ts';
 import { renderTemplateAssetSync } from '../../../../adapters/templates/template-asset.ts';
+import { renderHttpEndpointCall } from './render-http-endpoint.ts';
 
 /**
  * Generates the `register-services.mts` file content for a scaffolded Aspire
@@ -70,9 +71,7 @@ export function generateRegisterServices(options: RegisterServicesOptions): stri
     lines.push(
       `    const resource = builder.addExecutable('${name}', 'deno', workdir, ['run', '--minimum-dependency-age=0', '${RESOURCE_DEFAULTS.NodeModulesDirNoneFlag}', ...perms, '${entrypoint}'])`,
     );
-    lines.push(
-      `      .withHttpEndpoint({ port: ${entry.Port}, env: '${RESOURCE_DEFAULTS.PortEnvVar}' });`,
-    );
+    lines.push(`      .${renderHttpEndpointCall(entry)};`);
 
     // OTEL telemetry (full executable env set)
     lines.push(``);

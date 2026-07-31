@@ -80,6 +80,8 @@ export async function scaffoldServices(
   context: InitPipelineContext,
   options: ValidatedInitOptions,
 ): Promise<ScaffoldResult> {
+  // `servicePort` is the source-literal fallback and is always resolved for an
+  // example service, so this narrows types rather than gating behaviour.
   if (!options.includeExampleService || !options.serviceName || !options.servicePort) {
     return {
       filesCreated: [],

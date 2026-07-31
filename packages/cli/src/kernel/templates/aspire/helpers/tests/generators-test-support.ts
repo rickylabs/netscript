@@ -31,6 +31,25 @@ export const MINIMAL_SERVICE: ServiceEntry = {
   Entrypoint: 'src/main.ts',
 };
 
+/**
+ * What `netscript init` now scaffolds: no pinned host port, so Aspire allocates
+ * both ports and `aspire start --isolated` can place two workspaces on one
+ * machine.
+ */
+export const UNPINNED_SERVICE: ServiceEntry = {
+  Enabled: true,
+  Runtime: 'deno',
+  Entrypoint: 'src/main.ts',
+};
+
+/** A service that opts in to a pinned host port through `HostPort`. */
+export const HOST_PINNED_SERVICE: ServiceEntry = {
+  Enabled: true,
+  Runtime: 'deno',
+  HostPort: 3005,
+  Entrypoint: 'src/main.ts',
+};
+
 export const SERVICE_WITH_REFS: ServiceEntry = {
   Enabled: true,
   Runtime: 'deno',
@@ -55,6 +74,15 @@ export const MINIMAL_PLUGIN: PluginEntry = {
   Enabled: true,
   Runtime: 'deno',
   Port: 4400,
+  Entrypoint: 'src/main.ts',
+  RequiresKv: false,
+  RequiresDb: true,
+};
+
+/** A plugin resource that pins no host port. */
+export const UNPINNED_PLUGIN: PluginEntry = {
+  Enabled: true,
+  Runtime: 'deno',
   Entrypoint: 'src/main.ts',
   RequiresKv: false,
   RequiresDb: true,
@@ -147,6 +175,25 @@ export const MINIMAL_APP: AppEntry = {
   WatchMode: false,
   RequiresKv: false,
   Port: 8000,
+};
+
+/** What `netscript init` now scaffolds for the web app: no pinned host port. */
+export const UNPINNED_APP: AppEntry = {
+  Enabled: true,
+  Runtime: 'deno',
+  Type: 'app',
+  WatchMode: false,
+  RequiresKv: false,
+};
+
+/** A `task` app with no port — historically gets no HTTP endpoint at all. */
+export const UNPINNED_TASK_APP: AppEntry = {
+  Enabled: true,
+  Runtime: 'deno',
+  Type: 'task',
+  WatchMode: false,
+  RequiresKv: false,
+  TaskName: 'seed',
 };
 
 export const APP_WITH_REFS: AppEntry = {

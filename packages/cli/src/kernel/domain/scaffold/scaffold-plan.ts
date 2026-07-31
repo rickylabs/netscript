@@ -10,8 +10,17 @@ import type { ValidatedInitOptions } from './scaffold-options.ts';
 export interface ScaffoldServicePlan {
   /** Service workspace name. */
   readonly name: string;
-  /** Service HTTP port. */
+  /**
+   * Port baked into the service source as the non-Aspire fallback. Under
+   * Aspire the injected `PORT` wins, so this is only what `deno task dev`
+   * binds when the service runs standalone.
+   */
   readonly port: number;
+  /**
+   * Aspire host port to pin, set only when `--service-port` was passed.
+   * Undefined by default so `aspire start --isolated` can allocate (#952).
+   */
+  readonly hostPort?: number;
 }
 
 /** Public scaffold plan derived from validated init options. */
@@ -36,7 +45,11 @@ export function createScaffoldPlan(
   flags: { readonly useWorkspacePackages: boolean },
 ): ScaffoldPlan {
   const service = options.includeExampleService && options.serviceName && options.servicePort
-    ? { name: options.serviceName, port: options.servicePort }
+    ? {
+      name: options.serviceName,
+      port: options.servicePort,
+      ...(options.serviceHostPort ? { hostPort: options.serviceHostPort } : {}),
+    }
     : undefined;
   const dbEngines = options.dbEngine === 'none' ? [] : [options.dbEngine];
   const workspaceMembers = [

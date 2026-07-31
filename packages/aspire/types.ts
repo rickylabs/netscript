@@ -28,6 +28,7 @@ import type {
   DatabaseEngine as DatabaseEngineConfig,
   DatabaseEntry as DatabaseEntryConfig,
   DenoDefaults as DenoDefaultsConfig,
+  HostPortEntry as HostPortEntryConfig,
   NetScriptConfig as NetScriptConfigValue,
   OtelConfig as OtelConfigValue,
   PluginEntry as PluginEntryConfig,
@@ -45,6 +46,9 @@ export type AppSettings = AppSettingsConfig;
 
 /** Root `NetScript` configuration section. */
 export type NetScriptConfig = NetScriptConfigValue;
+
+/** Host-port fields shared by resources whose HTTP endpoint Aspire allocates. */
+export type HostPortEntry = HostPortEntryConfig;
 
 /** A service resource entry. */
 export type ServiceEntry = ServiceEntryConfig;
