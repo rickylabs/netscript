@@ -87,6 +87,8 @@ Deno.test('bump-version wrapper coordinates an exact version with zero residue',
         2,
       ) + '\n',
     );
+    await run('git', ['init'], temp);
+    await run('git', ['add', 'deno.lock', 'packages/example/deno.lock'], temp);
     const wrapped = await run(
       'deno',
       [
@@ -120,6 +122,39 @@ Deno.test('bump-version wrapper coordinates an exact version with zero residue',
     }
   } finally {
     await Deno.remove(temp, { recursive: true });
+  }
+});
+
+Deno.test('discoverVersionFiles includes tracked locks and excludes untracked adjacent locks', async () => {
+  const { discoverVersionFiles } = await import('./bump-version.ts');
+  const root = await Deno.makeTempDir({ prefix: 'ns-tracked-lock-discovery-' });
+  try {
+    await Deno.mkdir(`${root}/packages/tracked`, { recursive: true });
+    await Deno.mkdir(`${root}/packages/untracked`, { recursive: true });
+    await Deno.writeTextFile(
+      `${root}/deno.json`,
+      JSON.stringify({ version: '1.2.3', workspace: ['packages/*'] }),
+    );
+    for (const member of ['tracked', 'untracked']) {
+      await Deno.writeTextFile(
+        `${root}/packages/${member}/deno.json`,
+        JSON.stringify({ name: `@netscript/${member}`, version: '1.2.3' }),
+      );
+      await Deno.writeTextFile(`${root}/packages/${member}/deno.lock`, '{"version":"4"}\n');
+    }
+    await Deno.writeTextFile(`${root}/deno.lock`, '{"version":"4"}\n');
+    assertEquals((await run('git', ['init'], root)).code, 0);
+    assertEquals(
+      (await run('git', ['add', 'deno.lock', 'packages/tracked/deno.lock'], root)).code,
+      0,
+    );
+
+    const files = await discoverVersionFiles(root);
+    assertEquals(files.includes(`${root}/deno.lock`), true);
+    assertEquals(files.includes(`${root}/packages/tracked/deno.lock`), true);
+    assertEquals(files.includes(`${root}/packages/untracked/deno.lock`), false);
+  } finally {
+    await Deno.remove(root, { recursive: true });
   }
 });
 

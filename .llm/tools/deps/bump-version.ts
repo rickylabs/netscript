@@ -99,10 +99,13 @@ export async function discoverVersionFiles(root: string): Promise<string[]> {
     for (const member of await expandWorkspacePattern(root, pattern)) memberManifests.add(member);
   }
 
-  const files = new Set<string>([rootDenoJson, join(root, 'deno.lock'), ...memberManifests]);
+  const trackedFiles = await listTrackedFiles(root);
+  const rootLock = normalize(join(root, 'deno.lock'));
+  const files = new Set<string>([rootDenoJson, ...memberManifests]);
+  if (trackedFiles.has(rootLock)) files.add(rootLock);
   for (const manifest of memberManifests) {
-    const memberLock = join(dirname(manifest), 'deno.lock');
-    if (await exists(memberLock)) files.add(memberLock);
+    const memberLock = normalize(join(dirname(manifest), 'deno.lock'));
+    if (trackedFiles.has(memberLock)) files.add(memberLock);
     for await (
       const entry of walk(dirname(manifest), {
         includeDirs: false,
@@ -114,6 +117,21 @@ export async function discoverVersionFiles(root: string): Promise<string[]> {
     }
   }
   return [...files].map(normalize).sort();
+}
+
+async function listTrackedFiles(root: string): Promise<ReadonlySet<string>> {
+  const output = await new Deno.Command('git', {
+    args: ['ls-files', '-z'],
+    cwd: root,
+    stdout: 'piped',
+    stderr: 'piped',
+  }).output();
+  if (!output.success) {
+    const detail = new TextDecoder().decode(output.stderr).trim();
+    throw new Error(`Unable to discover tracked release files${detail ? `: ${detail}` : '.'}`);
+  }
+  const paths = new TextDecoder().decode(output.stdout).split('\0').filter(Boolean);
+  return new Set(paths.map((path) => normalize(join(root, path))));
 }
 
 async function expandWorkspacePattern(root: string, pattern: string): Promise<string[]> {

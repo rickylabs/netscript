@@ -165,3 +165,27 @@
 - **Action:** preserve reviewed in-scope work, reject no user-owned changes, and commit the S3 slice
   only after deterministic generators and scoped validation are green.
 - **Evidence:** S3 diff review and gate table in `worklog.md`.
+
+## 2026-07-31 — Augment found filesystem-dependent lock discovery
+
+- **What:** Adjacent member lock discovery used filesystem existence rather than Git ownership.
+- **Source:** Augment review of `bump-version.ts`; owner verified the finding as relevant.
+- **Expected:** Release-cut file discovery is deterministic across clean and developer checkouts.
+- **Actual:** A locally generated untracked member `deno.lock` could enter the bump result and then
+  be staged by `cut.ts`.
+- **Severity:** significant release-surface correctness defect.
+- **Action:** derive lockfile inclusion from `git ls-files`; preserve tracked root/member lock
+  behavior and add a regression proving an untracked adjacent lock is excluded.
+- **Evidence:** final-review commit and focused bump-version test in `worklog.md`.
+
+## 2026-07-31 — Automated MiniMax evaluation exhausted its iteration budget
+
+- **What:** Docs OpenHands evaluation run `30665250464` ended with verdict `NONE` and
+  `synthesized-after-iteration-limit` after exactly 100 iterations.
+- **Source:** owner evaluation of the MiniMax trace.
+- **Expected:** The automated evaluator has enough iterations to complete its review.
+- **Actual:** The workflow budget was 100 despite the shared runner supporting 50–3000.
+- **Severity:** significant evaluation-operability drift.
+- **Action:** raise `OPENHANDS_ITERATIONS` to the owner-directed value 400; leave env-derived
+  reporting unchanged.
+- **Evidence:** final-review workflow diff.

@@ -122,6 +122,9 @@ version-neutral placeholder; historical literals must identify their historical 
 | S4 generated assets | `deno task check:assets-barrel` after S3 commit | PASS | Native regeneration produced no diff. |
 | S4 release proof | `deno task release:cut -- 0.0.2 --dry-run` | PASS | Reached `{"gate":"publish-readiness","ok":true,"version":"0.0.2"}`; publish dry-run and `deno ci --prod` also completed. |
 | S4 restoration | explicit restore of dry-run-modified paths | PASS | Clean tree; all 38 root/member manifests remain `0.0.1-beta.12`; Fresh UI lock has 66 beta.12 pins. |
+| Final review — tracked lock discovery | focused test + repo discovery | PASS | 5 bump-version tests pass; release discovery includes tracked root/Fresh UI locks and excludes an untracked adjacent fixture; Git resolves all three tracked repository locks. |
+| Final review — scoped wrappers | check/lint/fmt on `.llm/tools/deps` | PASS | 13 TypeScript files; 0 diagnostics/findings. |
+| Final review — OpenHands budget | workflow inspection | PASS | Automated docs evaluator budget raised from 100 to 400; reporting remains env-derived. |
 
 ### Fitness Gates
 

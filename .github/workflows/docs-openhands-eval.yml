@@ -45,7 +45,7 @@ jobs:
     env:
       OPENHANDS_MODEL: openrouter/minimax/minimax-m3
       OPENHANDS_OUTPUT: pr-comment
-      OPENHANDS_ITERATIONS: '100'
+      OPENHANDS_ITERATIONS: '400'
       SKIP_REQUESTED: ${{ contains(github.event.pull_request.labels.*.name, 'docs-eval:skip') || contains(github.event.issue.labels.*.name, 'docs-eval:skip') }}
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:

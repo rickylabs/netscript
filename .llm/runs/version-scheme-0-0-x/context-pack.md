@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `version-scheme-0-0-x` |
 | Branch | `chore/version-scheme-0-0-x` |
-| Current phase | `implementation — owner-authorized plan evaluation` |
+| Current phase | `final review fixes — owner merge authorization granted after landing` |
 | Archetype | `6 — CLI / Tooling` |
 | Scope overlays | `docs` |
 
@@ -26,16 +26,14 @@ authorized implementation to proceed. No PLAN-EVAL verdict is recorded or implie
 
 ## In Progress
 
-- S1–S4 implementation and owned gates are complete. Separate-session IMPL-EVAL remains required;
-  the PR stays draft and no implementation verdict is self-recorded.
+- The owner completed his review of the MiniMax trace and authorized merge after two final fixes:
+  Git-tracked-only lock discovery and a 400-iteration automated OpenHands budget.
 
 ## Next Steps
 
-- Update the draft PR with the final tier table, `Closes #996`, and gate evidence.
-- Run the harness IMPL-EVAL in a separate evaluator session.
-
-1. Execute S1–S4 from the committed plan.
-2. Keep the PR draft until the required release dry-run proof and final evaluation are complete.
+1. Re-run `release:cut -- 0.0.2 --dry-run` after the tracked-lock discovery change and restore it.
+2. Commit, push by explicit refspec, reply to the Augment review with the verified commit SHA, and
+   hand off without merging.
 
 ## Key Decisions
 
@@ -69,7 +67,7 @@ authorized implementation to proceed. No PLAN-EVAL verdict is recorded or implie
 | Static | Baseline PASS | Census and raw Git evidence in `worklog.md` |
 | Fitness | Owner evaluation in progress | Automated PLAN-EVAL unavailable; no verdict recorded |
 | Runtime | Degraded | Runtime controller cannot prove mobile attachment |
-| Consumer | NOT_RUN | Release dry-run reserved for S4 |
+| Consumer | PASS; final rerun pending | S4 release dry-run passed; tracked-lock change requires one final rehearsal |
 
 ## Open Questions
 
