@@ -46,3 +46,27 @@ Drift is append-only.
 - **Action:** propose-update
 - **Evidence:** `research.md` findings 1–2.
 
+## 2026-07-31 — TypeScript AppHosts do not receive Aspire's isolation signal
+
+- **What:** The resolved plan assumes `aspire start --isolated` exposes
+  `DcpPublisher__RandomizePorts=true` to the generated TypeScript AppHost.
+- **Source:** Aspire 13.4.6 `GuestAppHostProject.cs` plus live generated-workspace reproduction.
+- **Expected:** Generated AppHost code can read the signal without a NetScript start wrapper.
+- **Actual:** Only the .NET AppHost path sets the key; a raw TypeScript isolated start retained
+  persistent lifetime. The generated `aspire:start` task now bridges the upstream key when passed
+  `--isolated`, without changing non-isolated starts or resource names.
+- **Severity:** significant
+- **Action:** rescope
+- **Evidence:** `research.md` finding 8 and live `aspire describe` evidence.
+
+## 2026-07-31 — Prisma Studio exit is environmental, not a missing task
+
+- **What:** The resolution requires reproducing the reported exit 1 before choosing validation or
+  observability.
+- **Source:** Generated workspace direct task and Aspire-managed runs.
+- **Expected:** The generated task itself is absent or invalid.
+- **Actual:** Direct execution exits because `DATABASE_URL` is absent; Aspire supplies that value
+  and Studio runs. The slice therefore implements only the authorised observability half.
+- **Severity:** significant
+- **Action:** rescope
+- **Evidence:** `research.md` finding 9 and live forced-failure resource-state proof.

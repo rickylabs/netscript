@@ -14,6 +14,34 @@ import { DEFAULT_TEMPLATE_REGISTRY } from '../../../../application/registries/te
 await DEFAULT_TEMPLATE_REGISTRY.hydrate()
 
 describe('generateRegisterInfrastructure', () => {
+  it('uses session lifetime for configured-persistent databases only under isolated starts', () => {
+    const output = generateRegisterInfrastructure({
+      databases: {
+        postgres: {
+          Enabled: true,
+          Engine: 'Postgres',
+          Mode: 'Container',
+          Persistent: true,
+        },
+      },
+      caches: {},
+      primaryDatabase: 'postgres',
+    })
+
+    assertStringIncludes(
+      output,
+      "getConfigValue('DcpPublisher:RandomizePorts')",
+    )
+    assertStringIncludes(
+      output,
+      'isolatedStart ? ContainerLifetime.Session : ContainerLifetime.Persistent',
+    )
+    assertStringIncludes(
+      output,
+      'Isolated starts randomize ports, so a configured-persistent container must remain session-scoped.',
+    )
+  })
+
   it('registers redis cache containers with endpoint wiring', () => {
     const output = generateRegisterInfrastructure({
       databases: {},

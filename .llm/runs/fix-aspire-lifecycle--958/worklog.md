@@ -11,8 +11,9 @@
 
 ## Design
 
-The carried-in plan has not passed PLAN-EVAL. The following checkpoint records the verified
-surface without authorizing implementation.
+Implementation is authorised by the supervisor's binding `# PLAN-EVAL resolution` in `plan.md`,
+committed before product changes. This checkpoint reflects that resolution and supersedes the
+pre-resolution stop recorded below.
 
 ### Public Surface
 
@@ -46,14 +47,24 @@ surface without authorizing implementation.
 
 ### Commit Slices
 
-No implementation slices are locked. PLAN-EVAL must resolve the significant drift in
-`drift.md` first.
+1. **Isolation-aware lifetime** — emit a generated AppHost conditional that maps configured
+   persistence to session lifetime only when `DcpPublisher__RandomizePorts=true`; prove generated
+   isolated and non-isolated source contracts with focused generator tests.
+2. **Cold-start budget and guidance** — emit a generated-workspace default for
+   `ASPIRE_CLI_START_TIMEOUT` and document the upstream knob in generated start guidance; prove the
+   emitted default and README contract.
+3. **Tool failure observability** — reproduce `db:studio` exit 1 first; if it does not reproduce,
+   surface the first stderr line for failed tool commands without changing auto-start behavior;
+   prove the generated resource contract with focused tests.
+4. **Merge-readiness evidence** — scoped check/lint/fmt, focused tests, `quality:gate`, doctrine
+   fitness, and the canonical one-pass `scaffold.runtime` gate; update both issues and PR #986.
 
 ### Deferred Scope
 
 - Upstream Aspire CLI phase/elapsed changes — NetScript does not own the detached launcher.
-- Aspire persistent-resource correctness under randomized ports — upstream documents this as
-  supported and has functional coverage.
+- Namespacing resource names by isolation id — connection-string and reference names are
+  contract-bearing and the stabilisation slice deliberately avoids that blast radius.
+- Generation-time validation of `db:studio` — the task exists, so the hypothesised defect is false.
 
 ### Contributor Path
 
@@ -66,12 +77,21 @@ Start at `generate-register-infrastructure.ts` for generated lifetime policy,
 | Time | Slice | Step | Notes |
 | ---- | ----- | ---- | ----- |
 | 2026-07-31 | pre-implementation | research | Verified the binding plan against NetScript and Aspire 13.4.6; no product code touched. |
+| 2026-07-31 | implementation bootstrap | plan resolution | Supervisor resolution accepted all three research corrections and authorised the four slices above. |
+| 2026-07-31 | isolation + timeout | implementation | Added generated `aspire:start` wrapper with a 300-second default and TypeScript isolation-key bridge; persistent databases now resolve to session lifetime only for isolated starts. |
+| 2026-07-31 | isolation + timeout | fails-before/pass-after | New generator guards failed against the old output, then passed after implementation. Live `aspire describe` showed raw TypeScript isolation remained persistent and the generated task produced `container.lifetime: Session`. |
+| 2026-07-31 | tool observability | reproduction | Direct `db:studio` reproduced exit 1 from missing `DATABASE_URL`; Aspire supplied the reference and Studio ran, disproving the filed absent-task/root-cause framing. |
+| 2026-07-31 | tool observability | fails-before/pass-after | Generator guard failed before the wrapper existed. Live forced failure then produced resource state `forced studio failure: regression proof`; an initial `.mjs` execution-path mistake was caught live and corrected to generated `.mts`. |
+| 2026-07-31 | implementation review | opposite-family review | Fable 5 returned `model_not_found`; canonical Claude Opus 4.8 low fallback passed the slice with three non-blocking teardown/style notes recorded in `impl-review.md`. |
 
 ## Decisions
 
 | Decision | Reason | Source |
 | -------- | ------ | ------ |
 | Stop before implementation | Binding plan leaves load-bearing decisions open and contains two disproven premises. | Harness Plan-Gate; `research.md`; `drift.md`. |
+| Resume implementation | The binding resolution in `plan.md` closes all open decisions and explicitly authorises implementation. | Commit `7ecd773f2`; owner assignment. |
+| Bridge isolated mode in the generated task | Aspire 13.4.6 does not propagate its .NET isolation environment seam through `GuestAppHostProject`; live TypeScript output otherwise stays persistent. | `research.md` finding 8; `drift.md`. |
+| Keep Prisma Studio auto-start and add diagnostics | The task exists and runs under Aspire; changing lifecycle would exceed the authorised observability scope. | `research.md` finding 9; binding plan resolution. |
 
 ## Drift
 
@@ -80,13 +100,14 @@ Start at `generate-register-infrastructure.ts` for generated lifetime policy,
 | Timeout configurability already exists upstream. | significant | yes |
 | `db:studio` absent-task hypothesis is false. | significant | yes |
 | Phase/elapsed reporting is upstream-owned. | architectural | yes |
+| TypeScript AppHost isolation signal requires a generated task bridge. | significant | yes |
+| Prisma Studio direct exit is missing environment, not a missing task. | significant | yes |
 
 ## Gate Results
 
-All implementation gates are `NOT_RUN`: implementation is blocked at PLAN-EVAL.
+Implementation gates are initially `NOT_RUN`; results will be appended per slice.
 
 ## Handoff Notes
 
-- PLAN-EVAL should inspect `research.md` and `drift.md` first.
-- No product source has been modified.
-
+- The resolution section at the end of `plan.md` is binding where earlier sections conflict.
+- Preserve non-isolated generated output and Prisma Studio auto-start behavior.

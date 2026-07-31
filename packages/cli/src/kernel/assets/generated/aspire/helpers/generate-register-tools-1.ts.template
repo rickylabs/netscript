@@ -1,5 +1,6 @@
 {{__slot0__}}
 
+import { readFile, rm } from 'node:fs/promises';
 import type { DistributedApplicationBuilder } from '{{__slot1__}}';
 import type { NetScriptConfig } from '{{__slot2__}}';
 import type { InfrastructureContext } from './register-infrastructure.mjs';
@@ -20,10 +21,11 @@ const PROCESS_COMMANDS_FLAG = 'NETSCRIPT_ASPIRE_PROCESS_COMMANDS';
  * Registers development tools (e.g., Prisma Studio) with the Aspire SDK
  * builder via `addExecutable()`.
  *
- * Tools are simple `deno task` wrappers and are NOT registered with
- * `addDenoApp()`. Each tool resolves to:
+ * Tools use a generated Deno runner that streams output and retains the first
+ * actionable stderr line for Aspire state reporting. They are NOT registered
+ * with `addDenoApp()`. Each tool resolves to:
  * ```ts
- * builder.addExecutable(name, 'deno', workdir, ['task', taskName]);
+ * builder.addExecutable(name, 'deno', workdir, ['run', runner, errorFile, taskName]);
  * ```
  *
  * Tools may depend on a specific named database or fall back to the
@@ -40,7 +42,33 @@ export async function registerTools(
   infrastructure: InfrastructureContext,
   appHostDir: string,
 ): Promise<void> {
+  const toolRunnerPath = resolveWorkspacePath(appHostDir, 'aspire/.helpers/run-tool.mts');
 {{__slot4__}}
+}
+
+function monitorToolFailure(
+  builder: DistributedApplicationBuilder,
+  resource: ToolResource,
+  errorFile: string,
+): void {
+  builder.subscribeAfterResourcesCreated(async (event) => {
+    const notifications = event.services().getResourceNotificationService();
+    void (async () => {
+      const resourceName = await resource.getResourceName();
+      await notifications.waitForResourceState(resourceName, { targetState: 'Finished' });
+      const detail = (await readFile(errorFile, 'utf8').catch(() => '')).trim();
+      if (detail) {
+        await notifications.publishResourceUpdate(resource, {
+          state: detail,
+          stateStyle: 'error',
+        });
+      }
+    })().catch(() => undefined);
+  });
+}
+
+function resolveToolErrorFile(workdir: string, name: string): string {
+  return resolveWorkspacePath(workdir, `.netscript-${name}.error`);
 }
 
 async function attachToolDatabase(

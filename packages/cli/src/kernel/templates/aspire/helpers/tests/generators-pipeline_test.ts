@@ -11,7 +11,7 @@ describe('HelpersGeneratorPipeline', () => {
   it('should generate all 12 files with apphost enabled (default)', async () => {
     const pipeline = new HelpersGeneratorPipeline();
     const files = await pipeline.execute({ config: fixtures.POPULATED_CONFIG });
-    assertEquals(files.length, 12);
+    assertEquals(files.length, 13);
   });
 
   it('should generate 11 files without apphost', async () => {
@@ -20,7 +20,7 @@ describe('HelpersGeneratorPipeline', () => {
       config: fixtures.POPULATED_CONFIG,
       generateAppHost: false,
     });
-    assertEquals(files.length, 11);
+    assertEquals(files.length, 12);
   });
 
   it('should produce files with non-empty paths and content', async () => {
@@ -234,7 +234,7 @@ describe('HelpersGeneratorPipeline', () => {
   it('should handle empty config producing valid no-op output', async () => {
     const pipeline = new HelpersGeneratorPipeline();
     const files = await pipeline.execute({ config: fixtures.EMPTY_CONFIG });
-    assertEquals(files.length, 12);
+    assertEquals(files.length, 13);
 
     const regServices = files.find(
       (f) => f.path === '.helpers/register-services.mts',
@@ -267,7 +267,7 @@ describe('HelpersGeneratorPipeline', () => {
 describe('generateHelpers', () => {
   it('should return the same file count as pipeline.execute()', async () => {
     const files = await generateHelpers({ config: fixtures.POPULATED_CONFIG });
-    assertEquals(files.length, 12);
+    assertEquals(files.length, 13);
   });
 
   it('should support generateAppHost: false', async () => {
@@ -275,7 +275,7 @@ describe('generateHelpers', () => {
       config: fixtures.POPULATED_CONFIG,
       generateAppHost: false,
     });
-    assertEquals(files.length, 11);
+    assertEquals(files.length, 12);
     const paths = files.map((f) => f.path);
     assert(!paths.includes('apphost.mts'));
   });

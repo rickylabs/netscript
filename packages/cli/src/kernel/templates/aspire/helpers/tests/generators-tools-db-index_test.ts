@@ -48,7 +48,7 @@ describe('generateRegisterTools', () => {
     });
     assertStringIncludes(
       output,
-      "builder.addExecutable('prisma-studio', 'deno', prisma_studio_workdir, ['task', 'studio'])",
+      "builder.addExecutable('prisma-studio', 'deno', prisma_studio_workdir, ['run', '--allow-run', '--allow-write', toolRunnerPath, prisma_studio_errorFile, 'studio'])",
     );
     assertStringIncludes(
       output,
@@ -56,6 +56,13 @@ describe('generateRegisterTools', () => {
     );
     assertStringIncludes(output, "const PROCESS_COMMANDS_FLAG = 'NETSCRIPT_ASPIRE_PROCESS_COMMANDS'");
     assertStringIncludes(output, 'Aspire 13.4 WithProcessCommand seam');
+    assertStringIncludes(output, "const prisma_studio_errorFile = resolveToolErrorFile(prisma_studio_workdir, 'prisma-studio');");
+    assertStringIncludes(output, "['run', '--allow-run', '--allow-write', toolRunnerPath, prisma_studio_errorFile, 'studio']");
+    assertStringIncludes(output, "aspire/.helpers/run-tool.mts");
+    assertStringIncludes(output, 'monitorToolFailure(builder, prisma_studio, prisma_studio_errorFile);');
+    assertStringIncludes(output, "targetState: 'Finished'");
+    assertStringIncludes(output, 'publishResourceUpdate(resource, {');
+    assertStringIncludes(output, 'catch(() => undefined)');
     assert(!output.includes('--minimum-dependency-age=0'));
   });
 
@@ -64,7 +71,7 @@ describe('generateRegisterTools', () => {
     const output = generateRegisterTools({
       tools: { migrate: toolNoTaskName },
     });
-    assertStringIncludes(output, "['task', 'migrate']");
+    assertStringIncludes(output, "migrate_errorFile, 'migrate']");
   });
 
   it('should convert hyphenated names to safe identifiers', () => {

@@ -28,6 +28,8 @@
 | 5 | `db:studio` is generated into each database workspace and invokes Prisma Studio on port 5555. | `packages/cli/src/kernel/templates/database/generate-db-deno-json.ts`. |
 | 6 | Prisma Studio is currently registered as an auto-started executable; `withProcessCommand` is a disabled optional seam and its default result handling can surface process output. | `packages/cli/src/kernel/templates/aspire/helpers/register/generate-register-tools.ts` and `packages/cli/src/kernel/assets/generated/aspire/helpers/generate-register-tools-1.ts.template`; Aspire 13.4 `ProcessCommandOptions`. |
 | 7 | Current Aspire documentation says meaningful configuration changes recreate a persistent resource and that persistent containers are keyed by resource name plus an AppHost-path hash. | `aspire docs get configure-resource-lifetimes-in-aspire`. |
+| 8 | Aspire 13.4.6 propagates `DcpPublisher__RandomizePorts=true` for .NET AppHosts, but `GuestAppHostProject` does not propagate the isolation signal to TypeScript AppHosts. The generated root `aspire:start` task must bridge the same configuration key when invoked with `--isolated`. | Upstream `GuestAppHostProject.cs`; live TypeScript `aspire start --isolated` described a persistent container before the task bridge and a session container after it. |
+| 9 | Direct `deno task db:studio` reproduces exit 1 only because `DATABASE_URL` is absent; under Aspire the database reference supplies it and Studio runs. The filed absent-task premise is false, while an intentionally failed generated tool proved the wrapper publishes its first actionable stderr line as resource state. | Generated repro `.llm/tmp/aspire-lifecycle-repro`; live `aspire describe --format Json`. |
 
 ## jsr-audit surface scan
 
@@ -45,4 +47,3 @@
 - For #958, is the deliverable limited to generated guidance/default environment configuration for
   the already-supported `ASPIRE_CLI_START_TIMEOUT`, or must phase/elapsed reporting wait for an
   upstream Aspire change?
-

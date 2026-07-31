@@ -56,7 +56,13 @@ export class HelpersGeneratorPipeline {
     // 1. Tier 2: Configure dashboard (always generated)
     files.push(await this.renderConfigureDashboard(templates));
 
-    // 2. Tier 1: Config schema (always generated)
+    // 2. Tier 2: tool runner with bounded failure detail capture
+    files.push({
+      path: `${SCAFFOLD_DIRS.HELPERS}/${HELPERS_FILES.RUN_TOOL}`,
+      content: templates.runToolTemplate,
+    });
+
+    // 3. Tier 1: Config schema (always generated)
     files.push(this.buildConfigSchema({
       services: config.Services,
       apps: config.Apps,

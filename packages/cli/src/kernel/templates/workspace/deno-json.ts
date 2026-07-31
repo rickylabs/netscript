@@ -18,6 +18,14 @@ import {
 import { netscriptJsrSpecifier } from '../../constants/jsr-specifiers.ts';
 import type { WorkspaceDenoJsonOptions } from '../../domain/scaffold/scaffold-options.ts';
 
+const ASPIRE_START_TASK =
+  `deno eval "const timeout=Deno.env.get('ASPIRE_CLI_START_TIMEOUT')??'300';` +
+  `const isolated=Deno.args.includes('--isolated');` +
+  `const child=new Deno.Command('aspire',{args:['start',...Deno.args],` +
+  `env:{ASPIRE_CLI_START_TIMEOUT:timeout,...(isolated?{DcpPublisher__RandomizePorts:'true'}:{})},` +
+  `stdin:'inherit',stdout:'inherit',stderr:'inherit'}).spawn();` +
+  `Deno.exit((await child.status).code)" --`;
+
 /**
  * Generates the root `deno.json` workspace configuration file.
  *
@@ -76,6 +84,12 @@ export function generateDenoJson(options: WorkspaceDenoJsonOptions): string {
     unstable: ['raw-imports', 'kv'],
     tasks: {
       dev: `deno run --allow-all ${SCAFFOLD_DIRS.APPS}/${options.appName}/main.ts`,
+      ...(!options.noAspire
+        ? {
+          'aspire:start':
+            `cd aspire && ${ASPIRE_START_TASK}`,
+        }
+        : {}),
       check: 'deno check apps/**/*.ts services/**/*.ts contracts/**/*.ts',
       lint: 'deno lint',
       fmt: 'deno fmt',

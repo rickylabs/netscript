@@ -106,7 +106,12 @@ export function generateRegisterInfrastructure(
     }
 
     if (entry.Persistent) {
-      lines.push(`    .withLifetime(ContainerLifetime.Persistent)`)
+      lines.push(
+        `    // Isolated starts randomize ports, so a configured-persistent container must remain session-scoped.`,
+      )
+      lines.push(
+        `    .withLifetime(isolatedStart ? ContainerLifetime.Session : ContainerLifetime.Persistent)`,
+      )
     }
     if (entry.DataPath) {
       lines.push(
