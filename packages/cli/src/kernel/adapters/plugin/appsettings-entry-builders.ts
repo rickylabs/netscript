@@ -16,6 +16,8 @@ interface PluginWorkspaceMutationOptions {
   readonly pluginReferences?: readonly string[];
   readonly description?: string;
   readonly sagaStoreBackend?: SagaStoreBackend;
+  readonly packageSpecifier?: string;
+  readonly packageVersion?: string;
 }
 
 /** Build an appsettings plugin resource entry for a scaffolded plugin. */
@@ -100,7 +102,7 @@ function buildBasePluginEntry(
     Enabled: options.enabled ?? true,
     Runtime: 'deno',
     Port: scaffoldResult.servicePort,
-    Entrypoint: resolveServiceEntrypoint(scaffoldResult, provider),
+    Entrypoint: resolveServiceEntrypoint(scaffoldResult, provider, options),
     Workdir: scaffoldResult.serviceWorkdir ?? PROJECT_ROOT_WORKDIR,
     RequiresKv: provider.defaultRequiresKv,
     RequiresDb: provider.defaultRequiresDb,
@@ -120,6 +122,7 @@ function buildBasePluginEntry(
 function resolveServiceEntrypoint(
   scaffoldResult: PluginScaffoldResult,
   provider: PluginKindProvider,
+  options: PluginWorkspaceMutationOptions,
 ): string {
   if (scaffoldResult.serviceWorkdir) {
     return provider.defaultServiceEntrypoint ?? provider.defaultEntrypoint;
@@ -130,10 +133,21 @@ function resolveServiceEntrypoint(
   ) {
     return provider.defaultServiceEntrypoint;
   }
-  return servicePackageEntrypoint(scaffoldResult.configKey);
+  return servicePackageEntrypoint(
+    scaffoldResult.configKey,
+    options.packageSpecifier,
+    options.packageVersion,
+  );
 }
 
-function servicePackageEntrypoint(configKey: string): string {
+function servicePackageEntrypoint(
+  configKey: string,
+  packageSpecifier?: string,
+  packageVersion?: string,
+): string {
+  if (packageSpecifier && packageVersion) {
+    return `jsr:${packageSpecifier}@${packageVersion}/services`;
+  }
   return netscriptJsrSpecifier(`plugin-${configKey}`, '/services');
 }
 

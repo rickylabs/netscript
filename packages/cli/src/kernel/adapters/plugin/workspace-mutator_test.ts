@@ -409,6 +409,45 @@ Deno.test('PluginWorkspaceMutator honors absolute local source service entrypoin
   );
 });
 
+Deno.test('PluginWorkspaceMutator keeps package id separate from the instance name', async () => {
+  const fs = new MemoryFileSystemAdapter();
+  await fs.writeFile(
+    '/project/appsettings.json',
+    JSON.stringify({ NetScript: {} }, null, 2) + '\n',
+  );
+
+  await new PluginWorkspaceMutator(fs).updateAppsettings(
+    '/project',
+    {
+      scaffoldResult: {
+        filesCreated: [],
+        directoriesCreated: [],
+        filesSkipped: [],
+        totalOperations: 0,
+        durationMs: 0,
+      },
+      pluginDir: '/project/plugins/rehearsal-worker',
+      kind: 'background',
+      port: 4400,
+      servicePort: 8091,
+      configSection: 'BackgroundProcessors',
+      configKey: 'rehearsal-worker',
+      serviceConfigKey: 'rehearsal-worker-api',
+    },
+    backgroundProvider,
+    {
+      packageSpecifier: '@netscript/plugin-workers',
+      packageVersion: '0.0.1-beta.12',
+    },
+  );
+
+  const config = JSON.parse(await fs.readFile('/project/appsettings.json'));
+  assertEquals(
+    config.NetScript.Plugins['rehearsal-worker-api'].Entrypoint,
+    'jsr:@netscript/plugin-workers@0.0.1-beta.12/services',
+  );
+});
+
 Deno.test('PluginWorkspaceMutator writes saga store backend appsettings for saga plugins', async () => {
   const fs = new MemoryFileSystemAdapter();
   await fs.writeFile(
@@ -572,6 +611,53 @@ Deno.test('PluginWorkspaceMutator registers generated plugin glue entrypoints', 
 
   const config = await fs.readFile('/project/netscript.config.ts');
   assertEquals(config.includes("'./workers/mod.ts'"), true);
+});
+
+Deno.test('PluginWorkspaceMutator removes exactly one plugin instance from netscript config', async () => {
+  const fs = new MemoryFileSystemAdapter();
+  await fs.writeFile(
+    '/project/netscript.config.ts',
+    [
+      "import { defineConfig } from '@netscript/config';",
+      '',
+      'export default defineConfig({',
+      "  plugins: ['./plugins/rehearsal-worker/mod.ts', './plugins/workers/mod.ts'],",
+      '});',
+      '',
+    ].join('\n'),
+  );
+
+  const mutator = new PluginWorkspaceMutator(fs);
+  assertEquals(
+    await mutator.removeNetScriptConfigPlugin('/project', 'rehearsal-worker'),
+    true,
+  );
+  assertEquals(
+    await mutator.removeNetScriptConfigPlugin('/project', 'rehearsal-worker'),
+    false,
+  );
+
+  const config = await fs.readFile('/project/netscript.config.ts');
+  assertEquals(config.includes('rehearsal-worker'), false);
+  assertEquals(config.includes("'./plugins/workers/mod.ts'"), true);
+});
+
+Deno.test('PluginWorkspaceMutator removes generated root-level plugin glue declarations', async () => {
+  const fs = new MemoryFileSystemAdapter();
+  await fs.writeFile(
+    '/project/netscript.config.ts',
+    "export default defineConfig({ plugins: ['./rehearsal-worker/mod.ts'] });\n",
+  );
+
+  const mutator = new PluginWorkspaceMutator(fs);
+  assertEquals(
+    await mutator.removeNetScriptConfigPlugin('/project', 'rehearsal-worker'),
+    true,
+  );
+  assertEquals(
+    (await fs.readFile('/project/netscript.config.ts')).includes('rehearsal-worker'),
+    false,
+  );
 });
 
 /**

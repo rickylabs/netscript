@@ -101,8 +101,7 @@ export function generatePluginProcessorEntrypoint(
   }
 
   const pascalName = toPascalCase(options.pluginName);
-
-  return renderTemplateAssetSync(TEMPLATE_KEYS.generatedPluginsGeneratePluginService3, {
+  const rendered = renderTemplateAssetSync(TEMPLATE_KEYS.generatedPluginsGeneratePluginService3, {
     __slot0__: String(pascalName),
     __slot1__: String(provider.concurrencyEnvVar),
     __slot2__: String(provider.defaultConcurrency ?? 1),
@@ -111,4 +110,7 @@ export function generatePluginProcessorEntrypoint(
     __slot5__: String(options.pluginName),
     __slot6__: String(options.pluginName),
   });
+  return provider.defaultRequiresKv
+    ? `import '@netscript/kv/redis';\n\n${rendered}`
+    : rendered;
 }

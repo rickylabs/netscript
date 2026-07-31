@@ -8,7 +8,10 @@ import { apiKindProvider } from '../../adapters/plugin/kinds/api.kind.ts';
 import type { PluginKindProvider } from '../../domain/plugin-kind.ts';
 import { DEFAULT_TEMPLATE_REGISTRY } from '../../application/registries/template-registry.ts';
 import { netscriptJsrSpecifier } from '../../constants/jsr-specifiers.ts';
-import { generatePluginService } from './generate-plugin-service.ts';
+import {
+  generatePluginProcessorEntrypoint,
+  generatePluginService,
+} from './generate-plugin-service.ts';
 import { generatePluginServiceContext } from './generate-plugin-service-context.ts';
 
 // `generatePluginService` reads templates synchronously, which requires a
@@ -56,6 +59,16 @@ Deno.test('generatePluginService does not add Redis adapter import for API-only 
 
   assert(output.length > 0);
   assertFalse(output.includes("import '@netscript/kv/redis';"));
+});
+
+Deno.test('generatePluginProcessorEntrypoint carries the selected KV adapter', () => {
+  const output = generatePluginProcessorEntrypoint(kvBackedProvider, {
+    pluginName: 'background',
+    kind: 'background',
+    servicePort: 8091,
+  });
+
+  assertStringIncludes(output, "import '@netscript/kv/redis';");
 });
 
 Deno.test('generatePluginServiceContext emits package-resident safe imports', () => {
