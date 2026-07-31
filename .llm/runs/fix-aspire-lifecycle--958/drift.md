@@ -70,3 +70,16 @@ Drift is append-only.
 - **Severity:** significant
 - **Action:** rescope
 - **Evidence:** `research.md` finding 9 and live forced-failure resource-state proof.
+
+## 2026-07-31 — A Deno subprocess wrapper changes detached-start ownership
+
+- **What:** The first generated timeout/isolation task wrapped `aspire start` in `Deno.Command` so
+  it could default one environment value and inspect `--isolated`.
+- **Source:** Live generated-workspace detached starts.
+- **Expected:** The wrapper would preserve the CLI's detached AppHost lifetime.
+- **Actual:** The AppHost remained coupled to the wrapper's terminal/process ancestry. The final
+  design emits direct cross-platform Deno task-shell commands: ordinary and isolated variants,
+  each with the 300-second default; only the isolated task exports the upstream isolation key.
+- **Severity:** significant
+- **Action:** rescope
+- **Evidence:** generated `aspire:start` / `aspire:start:isolated` contracts and focused tests.

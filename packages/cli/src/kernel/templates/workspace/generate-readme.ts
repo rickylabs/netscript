@@ -73,8 +73,8 @@ export function generateReadme(options: ReadmeOptions): string {
   if (!options.noAspire) {
     lines.push(
       'The generated `aspire:start` task gives the first cold AppHost start 300 seconds by default. ' +
-        'Aspire reads `ASPIRE_CLI_START_TIMEOUT`; set that environment variable to a larger positive ' +
-        'number on slower machines. Use `deno task aspire:start --isolated` for isolated TypeScript ' +
+        'Aspire reads `ASPIRE_CLI_START_TIMEOUT`; invoke `aspire start` directly with that environment ' +
+        'variable for a custom positive value. Use `deno task aspire:start:isolated` for isolated TypeScript ' +
         'AppHost sessions so NetScript can apply session lifetime to configured-persistent containers.',
     );
     lines.push('');

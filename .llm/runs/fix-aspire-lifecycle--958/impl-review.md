@@ -19,3 +19,10 @@ Non-blocking notes:
 
 The full structured transcript is machine-local at
 `.llm/tmp/aspire-lifecycle-review.jsonl` and is intentionally not committed.
+
+## Follow-up review
+
+The same independent session reviewed the post-commit removal of the `Deno.Command` wrapper and
+returned **PASS**. It verified Deno task-shell portability, isolation-only key propagation, the
+300-second defaults, updated guidance, exact regression guards, and absence of stale wrapper
+references. Transcript: `.llm/tmp/aspire-lifecycle-review-followup.jsonl` (machine-local only).

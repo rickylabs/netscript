@@ -83,6 +83,9 @@ Start at `generate-register-infrastructure.ts` for generated lifetime policy,
 | 2026-07-31 | tool observability | reproduction | Direct `db:studio` reproduced exit 1 from missing `DATABASE_URL`; Aspire supplied the reference and Studio ran, disproving the filed absent-task/root-cause framing. |
 | 2026-07-31 | tool observability | fails-before/pass-after | Generator guard failed before the wrapper existed. Live forced failure then produced resource state `forced studio failure: regression proof`; an initial `.mjs` execution-path mistake was caught live and corrected to generated `.mts`. |
 | 2026-07-31 | implementation review | opposite-family review | Fable 5 returned `model_not_found`; canonical Claude Opus 4.8 low fallback passed the slice with three non-blocking teardown/style notes recorded in `impl-review.md`. |
+| 2026-07-31 | timeout follow-up | runtime correction | A `Deno.Command` start wrapper altered detached-child ownership. Replaced it with direct cross-platform task-shell commands: `aspire:start` and `aspire:start:isolated`; the latter alone bridges `DcpPublisher__RandomizePorts=true`. |
+| 2026-07-31 | timeout follow-up | opposite-family review | Same Claude Opus 4.8 review session returned PASS for the direct task-shell correction; no actionable findings. |
+| 2026-07-31 | merge readiness | full E2E | `scaffold.runtime` ran twice: 44 gates passed and cleanup passed both times; `behavior.service-health` failed twice because the users service returned database-unhealthy from Prisma `$queryRaw`. Reported as FAIL, not a pass; the suite invokes Aspire directly and the failure is outside the changed lifecycle paths. |
 
 ## Decisions
 
@@ -102,10 +105,18 @@ Start at `generate-register-infrastructure.ts` for generated lifetime policy,
 | Phase/elapsed reporting is upstream-owned. | architectural | yes |
 | TypeScript AppHost isolation signal requires a generated task bridge. | significant | yes |
 | Prisma Studio direct exit is missing environment, not a missing task. | significant | yes |
+| Deno subprocess wrapper changes detached-start ownership. | significant | yes |
 
 ## Gate Results
 
-Implementation gates are initially `NOT_RUN`; results will be appended per slice.
+- Focused generator/orchestrator tests: PASS — 27 tests / 50 steps.
+- Scoped `packages/cli` check: PASS — 737 files, 0 findings.
+- Scoped `packages/cli` lint: PASS — 737 files, 0 findings.
+- Scoped `packages/cli` format: PASS — 737 files, 0 findings.
+- `check:assets-barrel`: PASS.
+- `quality:gate`: PASS (repository warnings unchanged; zero failures).
+- `scaffold.runtime`: **FAIL** twice — 44 passed / 1 failed; deterministic
+  `behavior.service-health` database-unhealthy Prisma query; cleanup passed.
 
 ## Handoff Notes
 
