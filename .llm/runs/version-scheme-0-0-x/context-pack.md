@@ -26,14 +26,13 @@ authorized implementation to proceed. No PLAN-EVAL verdict is recorded or implie
 
 ## In Progress
 
-- The owner completed his review of the MiniMax trace and authorized merge after two final fixes:
-  Git-tracked-only lock discovery and a 400-iteration automated OpenHands budget.
+- The owner-completed review fixes and their release rehearsal are complete. The supervisor may
+  merge after verifying the pushed commit and Augment reply; this session must not merge.
 
 ## Next Steps
 
-1. Re-run `release:cut -- 0.0.2 --dry-run` after the tracked-lock discovery change and restore it.
-2. Commit, push by explicit refspec, reply to the Augment review with the verified commit SHA, and
-   hand off without merging.
+1. Commit the final rehearsal evidence and push by explicit refspec.
+2. Reply to the Augment review with the verified fix commit SHA and hand off without merging.
 
 ## Key Decisions
 
@@ -67,7 +66,7 @@ authorized implementation to proceed. No PLAN-EVAL verdict is recorded or implie
 | Static | Baseline PASS | Census and raw Git evidence in `worklog.md` |
 | Fitness | Owner evaluation in progress | Automated PLAN-EVAL unavailable; no verdict recorded |
 | Runtime | Degraded | Runtime controller cannot prove mobile attachment |
-| Consumer | PASS; final rerun pending | S4 release dry-run passed; tracked-lock change requires one final rehearsal |
+| Consumer | PASS | Final tracked-lock rehearsal reached publish-readiness `ok:true`; dry-run mutations restored |
 
 ## Open Questions
 
