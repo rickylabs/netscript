@@ -1,5 +1,5 @@
 import { dirname, join } from '@std/path';
-import { PORT_RANGES } from '../../constants/port-ranges.ts';
+import { SCAFFOLD_APP_PORT } from '../../constants/port-ranges.ts';
 import { SCAFFOLD_DIRS } from '../../constants/scaffold/scaffold-dirs.ts';
 import { SCAFFOLD_FILES } from '../../constants/scaffold/scaffold-files.ts';
 import type { ScaffoldResult } from '../../domain/core-types.ts';
@@ -201,7 +201,7 @@ export async function scaffoldRoot(
     const appsettingsContent = generateAppsettings({
       name: options.name,
       appName: options.appName,
-      appPort: PORT_RANGES.APP.start + 10,
+      appPort: SCAFFOLD_APP_PORT,
       dbEngine: options.dbEngine,
       cache: options.cache,
       cacheBackend: options.cacheBackend,

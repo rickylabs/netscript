@@ -1,6 +1,6 @@
 import { join } from '@std/path';
 import type { NetScriptConfig } from '@netscript/aspire/types';
-import { PORT_RANGES } from '../../constants/port-ranges.ts';
+import { PORT_RANGES, SCAFFOLD_APP_PORT } from '../../constants/port-ranges.ts';
 import { SCAFFOLD_DEFAULTS } from '../../constants/scaffold/scaffold-defaults.ts';
 import { SCAFFOLD_DIRS } from '../../constants/scaffold/scaffold-dirs.ts';
 import { SCAFFOLD_FILES } from '../../constants/scaffold/scaffold-files.ts';
@@ -25,7 +25,7 @@ export async function scaffoldTsAppHost(
   const directoriesCreated: string[] = [];
   const filesSkipped: string[] = [];
   const targetPath = options.targetPath;
-  const appProxyPort = PORT_RANGES.APP.start + 10; // 8010 — differs from Vite default (8000)
+  const appProxyPort = SCAFFOLD_APP_PORT;
 
   // All TS AppHost files live here — isolated from the Deno workspace root.
   const aspireDir = join(targetPath, SCAFFOLD_DIRS.ASPIRE_TS);

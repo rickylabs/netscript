@@ -17,8 +17,19 @@ const ASPIRE_RESOURCE_WAIT_TIMEOUT_SECONDS: Partial<
   [ASPIRE_RESOURCE.APP]: 300,
 };
 
-/** Home page of the generated app, on `PORT_RANGES.APP.start`. */
-const APP_HOME_URL = 'http://127.0.0.1:8000/';
+/**
+ * Why the probe takes a project root instead of a URL: the scaffold publishes the app on
+ * `SCAFFOLD_APP_PORT`, deliberately offset from `PORT_RANGES.APP.start` so the Aspire proxy
+ * does not collide with Vite's own default of 8000. A gate that hardcodes the range start
+ * probes a port nothing listens on, and a connection-refused loop is indistinguishable from
+ * an app that cannot render. `probe-app-home.ts` reads the port out of the project's
+ * `appsettings.json` — the same file the AppHost helper generator reads when it emits
+ * `withHttpEndpoint({ port })`.
+ */
+const APP_HOME_FAILURE_HINT =
+  'The generated app did not serve its home page. The probe resolves the port from the ' +
+  "project's appsettings.json, so a failure here means the app itself is not rendering — " +
+  'check the app resource logs in the Aspire dashboard.';
 
 function runtimeWaitGate(resource: AspireResource): GateDefinition {
   return commandGate(
@@ -244,7 +255,18 @@ export function createRuntimeGates(
       GATE.BEHAVIOR_APP_HOME,
       'Generated app serves its home page',
       GATE_PHASE.BEHAVIOR,
-      () => ['deno', 'eval', PROBE_APP_HOME_SCRIPT, APP_HOME_URL],
+      (context) => [
+        'deno',
+        'run',
+        '--allow-net=127.0.0.1',
+        '--allow-read',
+        `${context.project.repoRoot}/packages/cli/e2e/src/application/gates/scaffold/probe-app-home.ts`,
+        context.project.projectRoot,
+        ASPIRE_RESOURCE.APP,
+      ],
+      undefined,
+      'capture',
+      APP_HOME_FAILURE_HINT,
     ),
     commandGate(
       GATE.BEHAVIOR_AI_CHAT_ROUTE,
@@ -318,37 +340,6 @@ function runtimeResources(database: DatabaseEngine): readonly AspireResource[] {
     ASPIRE_RESOURCE.APP,
   ];
 }
-
-// #954: `runtime.wait.dashboard` proves Aspire calls the app healthy. This gate proves the
-// claim is true — that a healthy app actually server-renders its home page. Before the app
-// health probe existed, the suite started the whole AppHost and never issued a single HTTP
-// request to any app route, so "Healthy while every request returns 500" passed the suite.
-const PROBE_APP_HOME_SCRIPT = [
-  'const url = Deno.args[0];',
-  'if (!url) throw new Error("app home url argument is required");',
-  'let lastStatus = 0;',
-  'let lastBody = "";',
-  'let lastContentType = "";',
-  'for (let attempt = 1; attempt <= 60; attempt++) {',
-  '  try {',
-  '    const response = await fetch(url, { headers: { accept: "text/html" } });',
-  '    lastStatus = response.status;',
-  '    lastContentType = response.headers.get("content-type") ?? "";',
-  '    lastBody = await response.text();',
-  '    if (response.ok && lastContentType.includes("text/html") && lastBody.includes("<html")) {',
-  '      console.info(`app home page rendered: HTTP ${response.status} (${lastBody.length} bytes)`);',
-  '      Deno.exit(0);',
-  '    }',
-  '  } catch (error) {',
-  '    lastStatus = 0;',
-  '    lastBody = error instanceof Error ? error.message : String(error);',
-  '  }',
-  '  await new Promise((resolve) => setTimeout(resolve, 1_000));',
-  '}',
-  'throw new Error(',
-  '  `app home page did not render: HTTP ${lastStatus} (${lastContentType}): ${lastBody.slice(0, 500)}`,',
-  ');',
-].join('\n');
 
 const VALIDATE_AI_CHAT_ROUTE_SCRIPT = [
   'const projectRoot = Deno.args[0];',
