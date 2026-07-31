@@ -160,6 +160,27 @@ describe('app route template rendering', () => {
     assertStringIncludes(shared, 'export function toHealthRouteData');
   });
 
+  // Regression guard for #954. The Aspire AppHost probes this route to decide whether
+  // the app is healthy, and its probe sends no `Accept` header. The route must therefore
+  // render through the page layer by default — a JSON short-circuit on an unspecific
+  // Accept would make the probe pass while every real page returns 500.
+  it('health route renders through SSR unless the caller asks for JSON only', async () => {
+    const adapter = makeAdapter();
+    const route = await adapter.render(appHealthRouteTemplate, SAMPLE_APP_VARS);
+
+    assertStringIncludes(route, ".withLayer('panel', HealthView,");
+    assertStringIncludes(route, '.withLayout((slots) => slots.panel())');
+    assertStringIncludes(
+      route,
+      "accept.includes('application/json') && !accept.includes('text/html')",
+    );
+    assertStringIncludes(route, 'return { data: { payload } };');
+    assert(
+      route.indexOf('if (accept.includes(') < route.indexOf('return { data: { payload } };'),
+      'the JSON branch must be the guarded exception; SSR is the fall-through the probe hits',
+    );
+  });
+
   it('layout template keeps define.layout and exposes the examples nav', async () => {
     const adapter = makeAdapter();
     const output = await adapter.render(appLayoutTemplate, SAMPLE_APP_VARS);
