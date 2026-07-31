@@ -63,12 +63,24 @@ Deno.test('resolveAppsettingsPath rejects a doubled root prefix', () => {
   assertEquals(resolved.status, 'unknown');
 });
 
-Deno.test('resolveAppsettingsPath reports an unknown top-level key at the top level', () => {
+// #975 changed this case deliberately: `Parameters` is now a declared top-level key, because
+// the scaffold writes one and the schema used to reject it. The assertion that mattered here is
+// the second one — a top-level key is not silently re-homed under `NetScript` — and it is
+// unchanged. Only the status moves, from `unknown` to `known`, which is the fix itself.
+Deno.test('resolveAppsettingsPath resolves a top-level key without re-homing it', () => {
   // Not silently re-homed under NetScript: the segments a forced write would
   // use must be the ones the user typed.
   const resolved = resolveAppsettingsPath('Parameters.postgres-password', DOCUMENT);
-  assertEquals(resolved.status, 'unknown');
+  assertEquals(resolved.status, 'known');
   assertEquals(resolved.segments, ['Parameters', 'postgres-password']);
+});
+
+// The original coverage — a genuinely undeclared top-level key — kept on a key the schema does
+// not declare, so widening the schema for #975 did not quietly delete this guard.
+Deno.test('resolveAppsettingsPath reports an undeclared top-level key at the top level', () => {
+  const resolved = resolveAppsettingsPath('Nonsense.postgres-password', DOCUMENT);
+  assertEquals(resolved.status, 'unknown');
+  assertEquals(resolved.segments, ['Nonsense', 'postgres-password']);
 });
 
 Deno.test('resolveAppsettingsPath will not descend into a scalar', () => {

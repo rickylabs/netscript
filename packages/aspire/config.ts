@@ -326,6 +326,8 @@ export interface AppSettings {
   $schema?: string;
   /** ASP.NET Core logging configuration. */
   Logging?: LoggingConfig;
+  /** Host-side Aspire parameters keyed by resource parameter name. */
+  Parameters?: Record<string, string>;
   /** NetScript AppHost configuration. */
   NetScript: NetScriptConfig;
 }
@@ -598,6 +600,7 @@ const LoggingSchema: z.ZodType<LoggingConfig | undefined> = z.object({
 const AppSettingsZod = z.object({
   $schema: z.string().optional(),
   Logging: LoggingSchema,
+  Parameters: z.record(z.string(), z.string()).optional(),
   NetScript: NetScriptConfigZod,
 }).meta({
   title: 'AppSettings',

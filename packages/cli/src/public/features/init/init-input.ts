@@ -17,6 +17,7 @@ export interface InitCommandInput {
   readonly git?: boolean;
   readonly force?: boolean;
   readonly ci?: boolean;
+  readonly nonInteractive?: boolean;
   readonly yes?: boolean;
   readonly path?: string;
   readonly dryRun?: boolean;

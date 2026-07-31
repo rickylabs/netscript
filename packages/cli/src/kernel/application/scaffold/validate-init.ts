@@ -1,4 +1,4 @@
-import { resolve } from '@std/path';
+import { basename, resolve } from '@std/path';
 import { PORT_RANGES, USER_PORT_RANGE } from '../../constants/port-ranges.ts';
 import { SCAFFOLD_DEFAULTS } from '../../constants/scaffold/scaffold-defaults.ts';
 import { SCAFFOLD_VALIDATION } from '../../constants/scaffold/scaffold-validation.ts';
@@ -63,9 +63,12 @@ export async function validateOptions(
   // When --path is provided it is treated as the *parent* directory; the
   // project name is always appended as a subdirectory so that
   // `--path scaffold/` with name `my-app` produces `scaffold/my-app/`.
+  const cwd = resolve(context.cwd());
   const targetPath = options.path
     ? resolve(options.path, options.name)
-    : resolve(context.cwd(), options.name);
+    : basename(cwd) === options.name
+    ? cwd
+    : resolve(cwd, options.name);
 
   // 5. Check existing directory
   if (!options.force && !options.dryRun) {

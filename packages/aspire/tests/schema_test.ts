@@ -34,6 +34,11 @@ Deno.test('schema', async (t) => {
     assertExists(generated.type || generated.properties || generated.$defs);
   });
 
+  await t.step('contains host-side Aspire parameters in generated schema', () => {
+    const schema = generateAppSettingsJsonSchema();
+    assertEquals(JSON.stringify(schema).includes('Parameters'), true);
+  });
+
   await t.step('enum schemas produce correct values', () => {
     const schema = generateAppSettingsJsonSchema();
     const json = JSON.stringify(schema);
