@@ -106,6 +106,19 @@ Deno.test('runtime suite includes full scaffold, database, runtime, and behavior
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_OTEL_TRACES), true);
 });
 
+// #954: the suite used to start the whole AppHost without ever waiting on the generated app
+// or requesting one of its routes, so "Aspire says Healthy while every request returns 500"
+// passed. These two gates are that missing assertion — keep them paired.
+Deno.test('runtime suite waits for the generated app and requests its home page', () => {
+  const runtime = resolveSuite(SCAFFOLD.RUNTIME);
+  assertEquals(runtime.gates.some((gate) => gate.id === GATE.RUNTIME_WAIT_APP), true);
+  assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_APP_HOME), true);
+
+  const waitIndex = runtime.gates.findIndex((gate) => gate.id === GATE.RUNTIME_WAIT_APP);
+  const homeIndex = runtime.gates.findIndex((gate) => gate.id === GATE.BEHAVIOR_APP_HOME);
+  assertEquals(waitIndex < homeIndex, true);
+});
+
 Deno.test('runtime suite omits database resource wait for sqlite', () => {
   const runtime = resolveSuite(SCAFFOLD.RUNTIME, { database: DATABASE.SQLITE });
   assertEquals(runtime.defaultOptions.database, DATABASE.SQLITE);

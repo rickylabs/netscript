@@ -12,7 +12,13 @@ const ASPIRE_RESOURCE_WAIT_TIMEOUT_SECONDS: Partial<
   Record<AspireResource, number>
 > = {
   [ASPIRE_RESOURCE.MSSQL]: 600,
+  // The app's health probe renders a real SSR route, so this wait covers the Vite dev
+  // server's cold start and first render — not just the process reaching `Running`.
+  [ASPIRE_RESOURCE.APP]: 300,
 };
+
+/** Home page of the generated app, on `PORT_RANGES.APP.start`. */
+const APP_HOME_URL = 'http://127.0.0.1:8000/';
 
 function runtimeWaitGate(resource: AspireResource): GateDefinition {
   return commandGate(
@@ -235,6 +241,12 @@ export function createRuntimeGates(
       'http://127.0.0.1:8094/api/v1/auth/session',
     ),
     commandGate(
+      GATE.BEHAVIOR_APP_HOME,
+      'Generated app serves its home page',
+      GATE_PHASE.BEHAVIOR,
+      () => ['deno', 'eval', PROBE_APP_HOME_SCRIPT, APP_HOME_URL],
+    ),
+    commandGate(
       GATE.BEHAVIOR_AI_CHAT_ROUTE,
       'Import generated AI chat route',
       GATE_PHASE.BEHAVIOR,
@@ -302,8 +314,41 @@ function runtimeResources(database: DatabaseEngine): readonly AspireResource[] {
     ASPIRE_RESOURCE.TRIGGERS,
     ASPIRE_RESOURCE.AUTH,
     ASPIRE_RESOURCE.STREAMS,
+    // Last: the app depends on everything above and is the slowest to first render.
+    ASPIRE_RESOURCE.APP,
   ];
 }
+
+// #954: `runtime.wait.dashboard` proves Aspire calls the app healthy. This gate proves the
+// claim is true — that a healthy app actually server-renders its home page. Before the app
+// health probe existed, the suite started the whole AppHost and never issued a single HTTP
+// request to any app route, so "Healthy while every request returns 500" passed the suite.
+const PROBE_APP_HOME_SCRIPT = [
+  'const url = Deno.args[0];',
+  'if (!url) throw new Error("app home url argument is required");',
+  'let lastStatus = 0;',
+  'let lastBody = "";',
+  'let lastContentType = "";',
+  'for (let attempt = 1; attempt <= 60; attempt++) {',
+  '  try {',
+  '    const response = await fetch(url, { headers: { accept: "text/html" } });',
+  '    lastStatus = response.status;',
+  '    lastContentType = response.headers.get("content-type") ?? "";',
+  '    lastBody = await response.text();',
+  '    if (response.ok && lastContentType.includes("text/html") && lastBody.includes("<html")) {',
+  '      console.info(`app home page rendered: HTTP ${response.status} (${lastBody.length} bytes)`);',
+  '      Deno.exit(0);',
+  '    }',
+  '  } catch (error) {',
+  '    lastStatus = 0;',
+  '    lastBody = error instanceof Error ? error.message : String(error);',
+  '  }',
+  '  await new Promise((resolve) => setTimeout(resolve, 1_000));',
+  '}',
+  'throw new Error(',
+  '  `app home page did not render: HTTP ${lastStatus} (${lastContentType}): ${lastBody.slice(0, 500)}`,',
+  ');',
+].join('\n');
 
 const VALIDATE_AI_CHAT_ROUTE_SCRIPT = [
   'const projectRoot = Deno.args[0];',
