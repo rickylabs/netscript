@@ -18,10 +18,31 @@ Milestone: 0.0.1-beta.12
 Both are `aspire start` under isolation: #958 the default 120s start timeout fails the FIRST cold AppHost start (triple-confirmed); #970 a persistent Postgres conflicts with isolated instances. Changing what a persistent resource means for an existing workspace is a semantics change, so this one plans.
 
 **The plan already exists and is binding: read `.llm/runs/fix-aspire-lifecycle--958/plan.md` before
-you touch code.** It states the shared cause, the three contract changes in dependency order, the
-compatibility constraint for existing workspaces, and the four regression guards required.
-`.llm/runs/fix-aspire-lifecycle--958/context-pack.md` has the recon touchpoints — treat those file
-and line references as leads to verify, not as facts.
+you touch code.** `.llm/runs/fix-aspire-lifecycle--958/context-pack.md` has the recon touchpoints —
+treat those file and line references as leads to verify, not as facts.
+
+### PLAN-EVAL is RESOLVED — implementation is authorised
+
+A previous turn on this branch correctly stopped at the plan gate and logged three drifts in
+`drift.md` (research in `research.md`). **That was the right call and the findings were accepted.**
+The supervisor has resolved them: `plan.md` now ends with a `# PLAN-EVAL resolution` section that
+supersedes the conflicting parts of the original plan and answers all three open questions.
+
+**Read the resolution section — it is the binding scope, not the sections above it.** In short:
+
+- Timeout configurability and phase/elapsed reporting are upstream Aspire, **withdrawn** from this
+  slice. #958 is scoped to a NetScript-side `ASPIRE_CLI_START_TIMEOUT` default in the generated
+  workspace plus guidance, and to **correcting #958 on the issue** to say why the rest is upstream.
+- The prisma-studio absent-task hypothesis is **false and withdrawn**. Reproduce the exit-1 before
+  fixing it; if it does not reproduce, ship the observability half (surface the failed command's
+  first stderr line instead of only `Finished`) and say so plainly on #970.
+- Persistent-vs-isolated **proceeds**: when the AppHost sees `DcpPublisher__RandomizePorts=true`, a
+  configured-persistent container resolves to session lifetime. Non-isolated output stays identical.
+  Do not namespace resource names by isolation id.
+
+The slice is smaller than filed, on purpose. Implement the two real fixes, correct both issues, and
+do not manufacture work for the withdrawn parts. Do not stop at the plan gate again — proceed.
+`research.md`, `drift.md` and `worklog.md` are already committed; continue them, do not restart them.
 
 ### The issues as filed
 
