@@ -107,6 +107,8 @@ export async function auditMarkdownPins(
       });
     }
   }
+  violations.sort(compareMarkdownFindings);
+  deferred.sort(compareMarkdownFindings);
   return { violations, deferred };
 }
 
@@ -169,6 +171,14 @@ function formatPublishSetDelta(result: PublishSetAuditResult): string {
 
 function formatMarkdownFinding(finding: MarkdownPinFinding): string {
   return `${finding.path}:${finding.line} ${finding.packageName}@${finding.pinnedVersion}; use a version-neutral snippet`;
+}
+
+function compareMarkdownFindings(
+  left: MarkdownPinFinding,
+  right: MarkdownPinFinding,
+): number {
+  if (left.path !== right.path) return left.path < right.path ? -1 : 1;
+  return left.line - right.line;
 }
 
 function lineNumberAt(source: string, index: number): number {

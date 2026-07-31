@@ -72,6 +72,7 @@ version-neutral placeholder; historical literals must identify their historical 
 | 2026-07-31 | Plan-Eval | Owner authorization | Owner waived the unavailable automated lane, is evaluating personally, and authorized implementation; no verdict recorded. |
 | 2026-07-31 | S1 | Release discovery and guards | Added nested member locks to coordinated bump/residue, generalized Markdown and CLI pin guards, and removed frozen CLI test pins. |
 | 2026-07-31 | S2 | Runtime derivation and lock reconciliation | Derived MCP/saga-core/streams-core runtime versions, regenerated Fresh UI's tracked lock through Deno, and extended scoped wrappers with explicit package configs. |
+| 2026-07-31 | S1 follow-up | CI determinism | Sorted Markdown pin findings by path then line and expanded the regression fixture across nested directories after CI exposed walk-order variance. |
 
 ## Decisions
 

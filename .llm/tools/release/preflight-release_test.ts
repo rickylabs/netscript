@@ -71,6 +71,7 @@ Deno.test('markdown preflight blocks stale normal and prerelease pins across doc
   const root = await fixtureRoot();
   try {
     await Deno.mkdir(`${root}/docs/site`, { recursive: true });
+    await Deno.mkdir(`${root}/docs/reference/nested`, { recursive: true });
     await Deno.writeTextFile(
       `${root}/README.md`,
       'stale: jsr:@netscript/ai@^0.0.2\nneutral: jsr:@netscript/ai\n',
@@ -79,9 +80,14 @@ Deno.test('markdown preflight blocks stale normal and prerelease pins across doc
       `${root}/docs/site/guide.md`,
       'stale: jsr:@netscript/plugin-ai-core@0.0.3-canary.1\n',
     );
+    await Deno.writeTextFile(
+      `${root}/docs/reference/nested/api.md`,
+      'current: jsr:@netscript/sdk@0.0.3\nstale: jsr:@netscript/sdk@0.0.1-alpha.4\n',
+    );
     const audit = await auditMarkdownPins(root, '0.0.3');
     assertEquals(audit.violations.map(({ path, line }) => ({ path, line })), [
       { path: 'README.md', line: 1 },
+      { path: 'docs/reference/nested/api.md', line: 2 },
       { path: 'docs/site/guide.md', line: 1 },
     ]);
     assertEquals(audit.deferred, []);
