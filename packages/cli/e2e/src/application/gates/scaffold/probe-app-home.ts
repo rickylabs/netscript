@@ -16,46 +16,98 @@
  * <projectRoot> <appName> [appHost]`
  */
 
-import { generatedAppHomeUrls } from './generated-app-endpoint.ts';
+import {
+  AppEndpointPendingError,
+  generatedAppHomeUrlsFromAppHost,
+  readPinnedAppPort,
+} from './generated-app-endpoint.ts';
 
 const ATTEMPTS = 60;
 const RETRY_DELAY_MS = 1_000;
 
-const projectRoot = Deno.args[0];
-const appName = Deno.args[1];
-const appHost = Deno.args[2];
-if (!projectRoot) throw new Error('project root argument is required');
-if (!appName) throw new Error('app name argument is required');
-
-// Resolved once, up front: a pinned port yields one URL, an Aspire-allocated one yields the
-// endpoint the AppHost reports plus its 127.0.0.1 twin. Each attempt tries them all, so a
-// candidate that is merely unreachable never masks one that works.
-const urls = await generatedAppHomeUrls(projectRoot, appName, appHost);
-console.info(`probing ${appName} home page at: ${urls.join(', ')}`);
-
-const lastFailure = new Map<string, string>();
-
-for (let attempt = 1; attempt <= ATTEMPTS; attempt++) {
-  for (const url of urls) {
-    try {
-      const response = await fetch(url, { headers: { accept: 'text/html' } });
-      const contentType = response.headers.get('content-type') ?? '';
-      const body = await response.text();
-      if (response.ok && contentType.includes('text/html') && body.includes('<html')) {
-        console.info(
-          `app home page rendered at ${url}: HTTP ${response.status} (${body.length} bytes)`,
-        );
-        Deno.exit(0);
-      }
-      lastFailure.set(url, `HTTP ${response.status} (${contentType}): ${body.slice(0, 200)}`);
-    } catch (error) {
-      lastFailure.set(url, error instanceof Error ? error.message : String(error));
-    }
-  }
-  await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS));
+export interface ProbeAppHomeOptions {
+  readonly attempts?: number;
+  readonly retryDelayMs?: number;
+  readonly fetchUrl?: typeof fetch;
+  readonly resolveLiveUrls?: (appHost: string, appName: string) => Promise<string[]>;
+  readonly delay?: (milliseconds: number) => Promise<void>;
+  readonly log?: (message: string) => void;
 }
 
-throw new Error(
-  `app home page did not render after ${ATTEMPTS} attempts:\n` +
-    [...lastFailure].map(([url, reason]) => `  ${url} -> ${reason}`).join('\n'),
-);
+/** Probes a generated app until it renders or its bounded retry budget is exhausted. */
+export async function probeAppHome(
+  projectRoot: string,
+  appName: string,
+  appHost?: string,
+  options: ProbeAppHomeOptions = {},
+): Promise<void> {
+  const attempts = options.attempts ?? ATTEMPTS;
+  const retryDelayMs = options.retryDelayMs ?? RETRY_DELAY_MS;
+  const fetchUrl = options.fetchUrl ?? fetch;
+  const resolveLiveUrls = options.resolveLiveUrls ?? generatedAppHomeUrlsFromAppHost;
+  const delay = options.delay ??
+    ((milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds)));
+  const log = options.log ?? console.info;
+  const pinned = readPinnedAppPort(projectRoot, appName);
+  const fixedUrls = pinned === undefined ? undefined : [`http://127.0.0.1:${pinned}/`];
+
+  if (!fixedUrls && !appHost) {
+    throw new Error(
+      `Cannot resolve the "${appName}" app URL: the project pins no host port (the pristine ` +
+        'scaffold lets Aspire allocate one), so the running AppHost must be queried — but no ' +
+        'apphost path was supplied.',
+    );
+  }
+
+  const lastFailure = new Map<string, string>();
+  let lastPending: string | undefined;
+  let lastUrls: string[] = fixedUrls ?? [];
+
+  for (let attempt = 1; attempt <= attempts; attempt++) {
+    if (!fixedUrls) {
+      try {
+        lastUrls = await resolveLiveUrls(appHost!, appName);
+        lastPending = undefined;
+      } catch (error) {
+        if (!(error instanceof AppEndpointPendingError)) throw error;
+        lastUrls = [];
+        lastPending = error.message;
+      }
+    }
+
+    if (lastUrls.length > 0) log(`probing ${appName} home page at: ${lastUrls.join(', ')}`);
+    for (const url of lastUrls) {
+      try {
+        const response = await fetchUrl(url, { headers: { accept: 'text/html' } });
+        const contentType = response.headers.get('content-type') ?? '';
+        const body = await response.text();
+        if (response.ok && contentType.includes('text/html') && body.includes('<html')) {
+          log(`app home page rendered at ${url}: HTTP ${response.status} (${body.length} bytes)`);
+          return;
+        }
+        lastFailure.set(url, `HTTP ${response.status} (${contentType}): ${body.slice(0, 200)}`);
+      } catch (error) {
+        lastFailure.set(url, error instanceof Error ? error.message : String(error));
+      }
+    }
+    if (attempt < attempts) await delay(retryDelayMs);
+  }
+
+  if (lastUrls.length === 0 && lastPending) {
+    throw new Error(`${lastPending} after ${attempts} attempts`);
+  }
+  throw new Error(
+    `app home page did not render after ${attempts} attempts; last resolved candidates: ` +
+      `${lastUrls.join(', ')}\n` +
+      [...lastFailure].map(([url, reason]) => `  ${url} -> ${reason}`).join('\n'),
+  );
+}
+
+if (import.meta.main) {
+  const projectRoot = Deno.args[0];
+  const appName = Deno.args[1];
+  const appHost = Deno.args[2];
+  if (!projectRoot) throw new Error('project root argument is required');
+  if (!appName) throw new Error('app name argument is required');
+  await probeAppHome(projectRoot, appName, appHost);
+}
