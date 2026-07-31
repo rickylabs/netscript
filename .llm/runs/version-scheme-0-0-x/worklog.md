@@ -126,6 +126,8 @@ version-neutral placeholder; historical literals must identify their historical 
 | Final review — scoped wrappers | check/lint/fmt on `.llm/tools/deps` | PASS | 13 TypeScript files; 0 diagnostics/findings. |
 | Final review — OpenHands budget | workflow inspection | PASS | Automated docs evaluator budget raised from 100 to 400; reporting remains env-derived. |
 | Final review — release proof | `deno task release:cut -- 0.0.2 --dry-run` | PASS | Tracked-lock implementation reached `{"gate":"publish-readiness","ok":true,"version":"0.0.2"}` and completed publish dry-run; `git checkout -- .` restored all 38 manifests and 66 Fresh UI pins. |
+| CI follow-up — dual-mode lock discovery | 6 bump tests + named cut test + 13 publish-readiness tests | PASS | Git fixtures prove tracked inclusion/untracked exclusion; non-Git fixtures use existing locks; unrelated Git failures remain fatal. |
+| CI follow-up — scoped wrappers | check/lint/fmt on `.llm/tools/deps` | PASS | 13 TypeScript files; 0 diagnostics/findings. |
 
 ### Fitness Gates
 

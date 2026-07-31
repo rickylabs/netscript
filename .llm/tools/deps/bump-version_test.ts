@@ -158,6 +158,30 @@ Deno.test('discoverVersionFiles includes tracked locks and excludes untracked ad
   }
 });
 
+Deno.test('discoverVersionFiles falls back to existing locks outside a Git worktree', async () => {
+  const { discoverVersionFiles } = await import('./bump-version.ts');
+  const root = await Deno.makeTempDir({ prefix: 'ns-non-git-lock-discovery-' });
+  try {
+    await Deno.mkdir(`${root}/packages/example`, { recursive: true });
+    await Deno.writeTextFile(
+      `${root}/deno.json`,
+      JSON.stringify({ version: '1.2.3', workspace: ['packages/*'] }),
+    );
+    await Deno.writeTextFile(
+      `${root}/packages/example/deno.json`,
+      JSON.stringify({ name: '@netscript/example', version: '1.2.3' }),
+    );
+    await Deno.writeTextFile(`${root}/deno.lock`, '{"version":"4"}\n');
+    await Deno.writeTextFile(`${root}/packages/example/deno.lock`, '{"version":"4"}\n');
+
+    const files = await discoverVersionFiles(root);
+    assertEquals(files.includes(`${root}/deno.lock`), true);
+    assertEquals(files.includes(`${root}/packages/example/deno.lock`), true);
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
 Deno.test('findVersionResidue reports a prior release retained in a nested member lock', async () => {
   const { findVersionResidue } = await import('./bump-version.ts');
   const root = await Deno.makeTempDir({ prefix: 'ns-nested-lock-residue-' });

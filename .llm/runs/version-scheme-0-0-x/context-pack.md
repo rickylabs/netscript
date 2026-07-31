@@ -26,13 +26,13 @@ authorized implementation to proceed. No PLAN-EVAL verdict is recorded or implie
 
 ## In Progress
 
-- The owner-completed review fixes and their release rehearsal are complete. The supervisor may
-  merge after verifying the pushed commit and Augment reply; this session must not merge.
+- The tracked-only fix exposed non-Git fixture semantics in CI. Dual-mode discovery and focused
+  regressions are green; the required final release rehearsal remains before push.
 
 ## Next Steps
 
-1. Commit the final rehearsal evidence and push by explicit refspec.
-2. Reply to the Augment review with the verified fix commit SHA and hand off without merging.
+1. Commit the dual-mode discovery fix, run the final release rehearsal, and restore its mutations.
+2. Commit evidence, push by explicit refspec, and hand off without merging.
 
 ## Key Decisions
 

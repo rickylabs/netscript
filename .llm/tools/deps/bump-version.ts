@@ -83,7 +83,12 @@ export function parseSemver(version: string): Semver {
   };
 }
 
-/** Discover the complete release-version surface from the root workspace declaration. */
+/**
+ * Discover the complete release-version surface from the root workspace declaration.
+ *
+ * Git worktrees include only tracked lockfiles so local generated locks cannot enter a release.
+ * Non-Git fixture roots have no tracked/untracked distinction and fall back to existing lockfiles.
+ */
 export async function discoverVersionFiles(root: string): Promise<string[]> {
   const rootDenoJson = join(root, 'deno.json');
   const rootConfig = parseJsonObject(await Deno.readTextFile(rootDenoJson), rootDenoJson);
@@ -102,10 +107,10 @@ export async function discoverVersionFiles(root: string): Promise<string[]> {
   const trackedFiles = await listTrackedFiles(root);
   const rootLock = normalize(join(root, 'deno.lock'));
   const files = new Set<string>([rootDenoJson, ...memberManifests]);
-  if (trackedFiles.has(rootLock)) files.add(rootLock);
+  if (await includesLock(rootLock, trackedFiles)) files.add(rootLock);
   for (const manifest of memberManifests) {
     const memberLock = normalize(join(dirname(manifest), 'deno.lock'));
-    if (trackedFiles.has(memberLock)) files.add(memberLock);
+    if (await includesLock(memberLock, trackedFiles)) files.add(memberLock);
     for await (
       const entry of walk(dirname(manifest), {
         includeDirs: false,
@@ -119,7 +124,22 @@ export async function discoverVersionFiles(root: string): Promise<string[]> {
   return [...files].map(normalize).sort();
 }
 
-async function listTrackedFiles(root: string): Promise<ReadonlySet<string>> {
+async function listTrackedFiles(root: string): Promise<ReadonlySet<string> | undefined> {
+  const worktree = await new Deno.Command('git', {
+    args: ['rev-parse', '--is-inside-work-tree'],
+    cwd: root,
+    stdout: 'piped',
+    stderr: 'piped',
+  }).output();
+  if (!worktree.success) {
+    const detail = new TextDecoder().decode(worktree.stderr).trim();
+    if (/not a git repository/i.test(detail)) return undefined;
+    throw new Error(`Unable to determine Git worktree status${detail ? `: ${detail}` : '.'}`);
+  }
+  if (new TextDecoder().decode(worktree.stdout).trim() !== 'true') {
+    throw new Error(`Unable to determine Git worktree status: unexpected rev-parse output.`);
+  }
+
   const output = await new Deno.Command('git', {
     args: ['ls-files', '-z'],
     cwd: root,
@@ -132,6 +152,13 @@ async function listTrackedFiles(root: string): Promise<ReadonlySet<string>> {
   }
   const paths = new TextDecoder().decode(output.stdout).split('\0').filter(Boolean);
   return new Set(paths.map((path) => normalize(join(root, path))));
+}
+
+async function includesLock(
+  path: string,
+  trackedFiles: ReadonlySet<string> | undefined,
+): Promise<boolean> {
+  return trackedFiles ? trackedFiles.has(path) : await exists(path);
 }
 
 async function expandWorkspacePattern(root: string, pattern: string): Promise<string[]> {

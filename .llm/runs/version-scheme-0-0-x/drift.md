@@ -189,3 +189,15 @@
 - **Action:** raise `OPENHANDS_ITERATIONS` to the owner-directed value 400; leave env-derived
   reporting unchanged.
 - **Evidence:** final-review workflow diff.
+
+## 2026-07-31 — Tracked-only discovery broke non-Git release fixtures
+
+- **What:** The first tracked-lock fix required every discovery root to be a Git worktree.
+- **Source:** CI failures in release cut and publish-readiness temp-directory fixtures.
+- **Expected:** Real checkouts exclude untracked locks; isolated non-Git fixtures retain their
+  prior existing-lock semantics.
+- **Actual:** `git ls-files` failed with `not a git repository` before fixture assertions ran.
+- **Severity:** significant validation regression.
+- **Action:** explicitly select two modes: tracked-only inside a verified Git worktree and
+  existence-based lock discovery outside Git. Continue to throw for all other Git failures.
+- **Evidence:** six bump-version tests, the named cut regression, and all 13 publish-readiness tests.
