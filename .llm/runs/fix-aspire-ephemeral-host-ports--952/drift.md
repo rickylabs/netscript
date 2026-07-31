@@ -45,3 +45,12 @@ resources — and, per D-2, applying it there would have been the wrong move any
 that changes scaffold output — which this run does. The gate needs Docker and the dotnet Aspire host,
 neither available here. **Declared not run**, in the PR body, rather than silently skipped. The
 release cut that picks this change up must run it.
+
+## D-6 — `packages/config` dropped from the change set
+
+`plan.md` slice 2 listed `packages/config/src/domain/schemas/service-schema.ts`. Verification during
+implementation showed that surface (`netscript.config.ts`, lowercase `port`) never reaches the
+generated apphost: the only `port` → `Port` bridge in the repo is the local `AppsettingsServiceOption`
+type inside `generate-appsettings.ts`. Widening `ServiceConfig.port` would have been a contract change
+with no consumer — and `config-root-types.ts` deliberately requires it in the override shape
+(`Pick<ServiceConfig, 'port'>`). Dropped.

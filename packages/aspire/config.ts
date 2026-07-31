@@ -112,6 +112,39 @@ export interface ReferenceEntry {
   PluginReferences?: string[];
 }
 
+/**
+ * Host-port fields for resources whose HTTP endpoint Aspire allocates.
+ *
+ * Aspire allocates both a host (proxy) port and a target port for every
+ * executable resource, and injects the target port into the process through
+ * `PORT`. Leaving both unset is what lets `aspire start --isolated` place two
+ * workspaces on one machine without colliding, so **not pinning is the
+ * default**.
+ */
+export interface HostPortEntry {
+  /**
+   * Pins the Aspire host (proxy) port instead of letting Aspire allocate one.
+   *
+   * A pinned port is a machine-global reservation: a second workspace running
+   * the same AppHost cannot start, and `aspire start --isolated` cannot
+   * randomise it away. Set it only when an external consumer (an OAuth callback
+   * URL, a bookmark, a fixed reverse proxy) needs a stable address.
+   */
+  HostPort?: number;
+  /**
+   * Deprecated alias for {@link HostPortEntry.HostPort}, read when `HostPort`
+   * is absent.
+   *
+   * The name predates the distinction between the host port and the port the
+   * process listens on, and reads as the latter while behaving as the former.
+   * Existing `appsettings.json` files keep working unchanged; prefer `HostPort`
+   * in new configuration.
+   *
+   * @deprecated Use {@link HostPortEntry.HostPort}.
+   */
+  Port?: number;
+}
+
 /** Saga durable store backend variants used by generated saga resources. */
 export type SagaStoreBackend = 'kv' | 'prisma';
 
@@ -125,11 +158,9 @@ export interface SagaResourceConfig {
 }
 
 /** Backend service resource entry. */
-export interface ServiceEntry extends BaseEntry, ReferenceEntry {
+export interface ServiceEntry extends BaseEntry, ReferenceEntry, HostPortEntry {
   /** Runtime used to launch the service. */
   Runtime: string;
-  /** TCP port exposed by the service. */
-  Port: number;
   /** Service entrypoint path. */
   Entrypoint: string;
   /** Service working directory. */
@@ -137,7 +168,7 @@ export interface ServiceEntry extends BaseEntry, ReferenceEntry {
 }
 
 /** Frontend, desktop, or task application entry. */
-export interface AppEntry extends Omit<BaseEntry, 'Enabled'>, ReferenceEntry {
+export interface AppEntry extends Omit<BaseEntry, 'Enabled'>, ReferenceEntry, HostPortEntry {
   /** Whether this app is enabled; desktop generators require an explicit `true`. */
   Enabled?: boolean;
   /** Runtime used to launch the app. */
@@ -152,8 +183,6 @@ export interface AppEntry extends Omit<BaseEntry, 'Enabled'>, ReferenceEntry {
   Workdir?: string;
   /** Optional remote URL for externally hosted apps. */
   Remote?: string;
-  /** TCP port exposed by the app. */
-  Port?: number;
   /** Deno task name for task apps. */
   TaskName?: string;
   /** Deno task that packages a desktop app into its native artifact. */
@@ -163,11 +192,9 @@ export interface AppEntry extends Omit<BaseEntry, 'Enabled'>, ReferenceEntry {
 }
 
 /** Plugin service resource entry. */
-export interface PluginEntry extends BaseEntry, ReferenceEntry {
+export interface PluginEntry extends BaseEntry, ReferenceEntry, HostPortEntry {
   /** Runtime used to launch the plugin. */
   Runtime: string;
-  /** TCP port exposed by the plugin. */
-  Port: number;
   /** Plugin entrypoint path. */
   Entrypoint: string;
   /** Plugin working directory. */
@@ -392,6 +419,16 @@ const ReferenceFields = {
   PluginReferences: z.array(z.string()).optional(),
 } as const satisfies z.ZodRawShape;
 
+/**
+ * Host-port fields shared by every resource whose HTTP endpoint Aspire
+ * allocates. Both are optional: omitting them is what keeps
+ * `aspire start --isolated` able to place two workspaces on one machine.
+ */
+const HostPortFields = {
+  HostPort: z.number().int().positive().optional(),
+  Port: z.number().int().positive().optional(),
+} as const satisfies z.ZodRawShape;
+
 const SagaResourceConfigZod = z.object({
   Store: z.object({
     Backend: z.enum(['kv', 'prisma']).optional(),
@@ -405,8 +442,8 @@ const SagaResourceConfigZod = z.object({
 const ServiceEntryZod = z.object({
   ...BaseEntryFields,
   ...ReferenceFields,
+  ...HostPortFields,
   Runtime: z.string().default('deno'),
-  Port: z.number().int().positive(),
   Entrypoint: z.string().default('src/main.ts'),
   Workdir: z.string().optional(),
 }).meta({ title: 'ServiceEntry', description: 'Configuration for a backend service resource' });
@@ -418,13 +455,13 @@ const AppEntryZod = z.object({
   ...BaseEntryFields,
   Enabled: z.boolean().optional(),
   ...ReferenceFields,
+  ...HostPortFields,
   Runtime: z.string().default('deno'),
   Type: AppTypeZod.default('app'),
   WatchMode: z.boolean().default(false),
   Prebuild: z.string().optional(),
   Workdir: z.string().optional(),
   Remote: z.string().optional(),
-  Port: z.number().int().positive().optional(),
   TaskName: z.string().optional(),
   PackageTaskName: z.string().optional(),
   RequiresKv: z.boolean().default(false),
@@ -439,8 +476,8 @@ export const AppEntrySchema: AspireSchema<AppEntry> = AppEntryZod;
 const PluginEntryZod = z.object({
   ...BaseEntryFields,
   ...ReferenceFields,
+  ...HostPortFields,
   Runtime: z.string().default('deno'),
-  Port: z.number().int().positive(),
   Entrypoint: z.string().default('src/main.ts'),
   Workdir: z.string().optional(),
   RequiresKv: z.boolean().default(false),

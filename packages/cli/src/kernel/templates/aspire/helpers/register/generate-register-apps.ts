@@ -30,6 +30,21 @@ import { SCAFFOLD_ASPIRE_MODULES } from '../../../../constants/scaffold/scaffold
 import { SCAFFOLD_DIRS } from '../../../../constants/scaffold/scaffold-dirs.ts';
 import { TEMPLATE_KEYS } from '../../../../assets/manifest.ts';
 import { renderTemplateAssetSync } from '../../../../adapters/templates/template-asset.ts';
+import { renderHttpEndpointCall, resolveHostPort } from './render-http-endpoint.ts';
+import type { AppEntry, HostPortEntry } from '@netscript/aspire/types';
+
+/**
+ * Whether an app entry should receive a `withHttpEndpoint(...)` registration.
+ *
+ * `app` entries are web servers and always need one. `tauri` and `task` entries
+ * may be neither, so they opt in by configuring a host port. `desktop` entries
+ * never expose an endpoint.
+ */
+function needsHttpEndpoint(type: AppEntry['Type'], entry: HostPortEntry): boolean {
+  if (type === 'desktop') return false;
+  if (type === 'app') return true;
+  return resolveHostPort(entry) !== undefined;
+}
 
 /**
  * Generates the register-apps.mts file content.
@@ -79,10 +94,15 @@ export function generateRegisterApps(options: RegisterAppsOptions): string {
     );
 
     // --- Common: HTTP endpoint ---
-    if (type !== 'desktop' && entry.Port) {
+    // A web `app` always serves HTTP, so it always gets an endpoint — Aspire
+    // allocates the ports unless the entry pins a host port. `tauri` and `task`
+    // entries are not necessarily HTTP servers, so they keep the historical
+    // behaviour of getting an endpoint only when one is configured. `desktop`
+    // entries never expose one.
+    if (needsHttpEndpoint(type, entry)) {
       lines.push(``);
       lines.push(`    // HTTP endpoint`);
-      lines.push(`    await ${id}.withHttpEndpoint({ port: ${entry.Port}, env: 'PORT' });`);
+      lines.push(`    await ${id}.${renderHttpEndpointCall(entry)};`);
     }
 
     // --- desktop type: server-side discovery only ---
