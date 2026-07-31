@@ -153,7 +153,7 @@ export function assemblePluginContractRouter<
         [config.namespace]: namespaced,
         ...implemented,
       }),
-    }) as unknown as ServiceRouter,
+    }),
   );
   return assembled;
 }
