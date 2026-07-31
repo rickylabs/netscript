@@ -217,6 +217,7 @@ export class ServiceBuilderImpl<TRouter extends ServiceRouter> implements Servic
    * @param options.apiPath - Path for OpenAPI endpoint (default: '/api')
    * @param options.debug - Enable debug mode for verbose oRPC logging (default: NETSCRIPT_DEBUG env var)
    * @param options.traceContext - Enable trace context propagation (default: true)
+   * @param options.rpcAliases - Deprecated RPC prefixes serving the same router
    */
   withRPC(
     options?: {
@@ -224,6 +225,12 @@ export class ServiceBuilderImpl<TRouter extends ServiceRouter> implements Servic
       apiPath?: string;
       debug?: boolean;
       traceContext?: boolean;
+      rpcAliases?: readonly string[];
+      deprecatedRpcRoutes?: readonly {
+        readonly pathPrefix: string;
+        readonly replacementPrefix: string;
+      }[];
+      rpcRouter?: ServiceRouter;
     },
   ): ServiceBuilder<TRouter> {
     if (this.rpcConfigured) return this;

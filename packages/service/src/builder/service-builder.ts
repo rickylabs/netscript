@@ -94,6 +94,12 @@ export interface ServiceBuilder<TRouter extends ServiceRouter> {
       apiPath?: string;
       debug?: boolean;
       traceContext?: boolean;
+      rpcAliases?: readonly string[];
+      deprecatedRpcRoutes?: readonly {
+        readonly pathPrefix: string;
+        readonly replacementPrefix: string;
+      }[];
+      rpcRouter?: ServiceRouter;
     },
   ): ServiceBuilder<TRouter>;
 

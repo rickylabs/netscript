@@ -47,3 +47,12 @@ test passes while production 404s. Treat this test as a probable false-green, no
 
 Neither reading has been verified against a live Aspire graph. Confirm the framing against the
 code (and, where possible, a running graph) before choosing the fix — see non-negotiable 4.
+
+## Resume state — 2026-07-31
+
+- Harness activated and separate Qwen PLAN-EVAL passed.
+- S1 implemented: service-owned canonical RPC path, real-factory SDK regression, and beta.12 legacy
+  alias. Fails-before is proven (`Not Found`, exit 1) and restored test passes.
+- S1 automated gates are green; opposite-family slice review is next, before its sign-off commit.
+- S2 remains: truthful workers Aspire resource set, resource-backed env, relocated health URL, and
+  explicit dependency edge.

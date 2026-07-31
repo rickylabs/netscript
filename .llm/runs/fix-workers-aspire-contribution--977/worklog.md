@@ -54,3 +54,73 @@ non-Aspire runtime fallback at the consumer edge.
 - Verdict: `PASS` — all eight Plan-Gate checks satisfied.
 - Invalid prior launch: rejected and terminated after it attempted closed-model delegation; see
   `drift.md`. It produced no accepted verdict.
+
+## S1 — shared RPC publication contract
+
+- Added service-owned `buildServiceRpcPath` through the lightweight `@netscript/service/rpc-path`
+  subpath; the SDK derives the canonical client prefix from it while the plugin factory mounts the
+  assembled router once at the shared RPC base.
+- `assemblePluginContractRouter` now owns the `version/routerName` tree and retains the beta.11
+  version-only branch for compatibility. A matched legacy route emits one process-local structured
+  deprecation warning.
+- Replaced the false-green SDK setup with the real `createPluginService` factory **and** the real
+  `assemblePluginContractRouter` production shape; added direct canonical + legacy assertions.
+- Dependency change used `deno add` from `packages/sdk`; `deno.lock` changed only by adding the SDK
+  workspace dependency edge to `@netscript/service@0.0.1-beta.11`.
+
+### Regression proof
+
+| State | Command | Result |
+|---|---|---|
+| old production binder temporarily restored | `deno test --allow-all packages/sdk/tests/integration/workers-trigger-rpc_test.ts` | FAIL, exit 1, `Error: Not Found` at the real client round trip |
+| fix restored | same command | PASS, 1 passed / 0 failed |
+
+### Gates
+
+| Gate | Result |
+|---|---|
+| focused service/plugin/SDK tests | PASS, 5 passed / 0 failed |
+| scoped check: service + plugin + SDK | PASS, 269 files, 0 diagnostics |
+| scoped lint: service + plugin + SDK | PASS, 269 files, 0 findings |
+| scoped fmt: service + plugin + SDK | PASS, 269 files, 0 findings |
+| `deno task quality:gate` | PASS; code-quality scan 0 findings, doctrine 0 FAIL (pre-existing WARN/INFO retained) |
+
+### Reconcile
+
+The first opposite-family review rejected the initial guard because its router was flat while every
+production plugin router is assembled. That finding was fixed before commit and the red/green proof
+was repeated against the assembled shape. PR #987 remains draft and carries both closing keywords.
+The issue correction for #977 is deferred until S2 proves the exact graph shape.
+
+## S2 — truthful workers Aspire graph
+
+- `WORKERS_API_URL` is resource-backed and `workers-combined` explicitly waits for `workers-api`;
+  the environment value and graph edge are separate contracts.
+- The default graph now registers the API plus combined runtime only, avoiding duplicate scheduler
+  and worker processes while leaving standalone manifest modes intact.
+- Listener and health URLs both use the contribution context's allocated port.
+- Corrected #977 on the issue itself: `issuecomment-5145179379`.
+
+### Regression proof
+
+| State | Command | Result |
+|---|---|---|
+| production contribution before fix | `deno test --allow-all plugins/workers/tests/aspire/workers-contribution_test.ts` | FAIL, exit 1, four resources observed instead of two |
+| fix restored | same command | PASS, 1 passed / 0 failed; port 9191, resource env, wait edge, and exact resource set asserted |
+
+### Current scoped gates
+
+| Gate | Result |
+|---|---|
+| focused RPC + Aspire tests | PASS, 4 passed / 0 failed |
+| scoped check: service/plugin/SDK/workers/triggers | PASS |
+| scoped lint: same roots | PASS, 440 files, 0 findings |
+| scoped fmt: same roots | PASS after formatting, 440 files, 0 findings |
+
+### S1 review
+
+Opposite-family reviewer `claude-opus-5`, session
+`91d34eb6-8829-4376-b1b1-de542c875872`, returned `SLICE_REVIEW_PASS` after two blocking
+compatibility findings were fixed: the production router false green and accidental REST/OpenAPI
+route movement. The final design uses a canonical OpenAPI router plus an RPC-only compatibility
+view, and gives service names that differ from router namespaces an explicit `routerName`.

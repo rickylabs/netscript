@@ -3907,6 +3907,7 @@
       },
       "packages/sdk": {
         "dependencies": [
+          "jsr:@netscript/service@0.0.1-beta.11",
           "jsr:@standard-schema/spec@1.1.0",
           "jsr:@std/assert@1",
           "npm:@orpc/client@^1.14.6"

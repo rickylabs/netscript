@@ -5,6 +5,7 @@
  */
 
 import { createORPCClient } from '@orpc/client';
+import { buildServiceRpcPath } from '@netscript/service/rpc-path';
 import { getTraceContext } from '@netscript/telemetry/context';
 import { createHttpClientLink } from './http-client-link.ts';
 import type {
@@ -47,13 +48,16 @@ export function createServiceClient<TContract extends ContractLike>({
   propagateTraceContext = true,
 }: CreateServiceClientOptions<TContract>): ServiceClient<TContract> {
   const pathSegment = routerName ?? serviceName;
+  const rpcPath = buildServiceRpcPath({
+    routerName: pathSegment,
+    apiPath,
+    apiVersion,
+  });
   const link = createHttpClientLink({
     contract,
     serviceName,
-    pathSegment,
     protocol,
-    apiPath,
-    apiVersion,
+    rpcPath,
     propagateTraceContext,
     getTraceHeaders,
   });

@@ -5,6 +5,14 @@
  */
 
 import { type AnyRouter, os } from '@orpc/server';
+import type { ServiceRouter } from '@netscript/service';
+
+const pluginRpcRouters = new WeakMap<object, ServiceRouter>();
+
+/** Resolve the RPC compatibility view for an assembled plugin router. */
+export function resolvePluginRpcRouter(router: ServiceRouter): ServiceRouter {
+  return pluginRpcRouters.get(router as object) ?? router;
+}
 
 /** Route implementer value returned by an oRPC contract's `$context<Ctx>()`. */
 export type PluginContractRouter = object;
@@ -124,8 +132,28 @@ export function assemblePluginContractRouter<
 ): { readonly [version: string]: AnyRouter } {
   const contractRouter = router as TRouter & PluginContractRouterMethod<TRouter, TRoute>;
   const implemented = contractRouter.router(config.handlers);
-  const prefixed = os
+  // Keep the version and namespace in the router tree. The service factory
+  // mounts that tree once at `/api/rpc`; the SDK derives the remaining
+  // `/version/namespace/procedure` path from the same contract coordinates.
+  //
+  // The flat procedures under the version node preserve beta.11's
+  // `/api/rpc/version/procedure` route for one compatibility window.
+  const namespaced = os
     .prefix(`/${config.version}/${config.namespace}`)
     .router(implemented);
-  return os.router({ [config.version]: prefixed });
+  const assembled = os.router({
+    [config.version]: os.router({
+      [config.namespace]: namespaced,
+    }),
+  });
+  pluginRpcRouters.set(
+    assembled,
+    os.router({
+      [config.version]: os.router({
+        [config.namespace]: namespaced,
+        ...implemented,
+      }),
+    }) as unknown as ServiceRouter,
+  );
+  return assembled;
 }

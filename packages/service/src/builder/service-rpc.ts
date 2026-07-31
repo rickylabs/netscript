@@ -9,6 +9,7 @@
  */
 
 import type { Context, Hono } from 'hono';
+import { createServiceLogger } from '@netscript/logger';
 import { createOpenAPIHandler, createRPCHandler } from '../primitives/handlers.ts';
 import type { ServiceRouter } from '../types.ts';
 
@@ -20,7 +21,18 @@ export interface RpcWiringOptions {
   apiPath?: string;
   /** Enables verbose oRPC logging. */
   debug?: boolean;
+  /** Deprecated RPC prefixes that continue to serve the same router. */
+  rpcAliases?: readonly string[];
+  /** Deprecated procedure prefixes already present inside the mounted router. */
+  deprecatedRpcRoutes?: readonly {
+    readonly pathPrefix: string;
+    readonly replacementPrefix: string;
+  }[];
+  /** Optional RPC-only router; the main router remains the OpenAPI source. */
+  rpcRouter?: ServiceRouter;
 }
+
+const warnedLegacyRpcPaths = new Set<string>();
 
 /**
  * Wires the oRPC RPC and OpenAPI handlers onto the Hono app.
@@ -42,22 +54,25 @@ export function wireRpc(
   const apiPath = options?.apiPath ?? '/api';
   const debug = options?.debug;
 
-  const rpcHandler = createRPCHandler(router, { serviceName, debug });
+  const rpcHandler = createRPCHandler(options?.rpcRouter ?? router, { serviceName, debug });
   const openApiHandler = createOpenAPIHandler(router, { serviceName, debug });
 
-  // oRPC RPC endpoint (for type-safe clients).
-  app.use(`${rpcPath}/*`, async (c: Context, next: () => Promise<void>) => {
-    const { matched, response } = await rpcHandler.handle(c.req.raw, {
-      prefix: rpcPath as `/${string}`,
-      context: buildContext(c),
-    });
-
-    if (matched) {
-      return c.newResponse(response.body, response);
+  registerRpcPath(app, rpcHandler, rpcPath, buildContext, (c) => {
+    for (const route of options?.deprecatedRpcRoutes ?? []) {
+      if (
+        c.req.path.startsWith(route.pathPrefix) &&
+        !c.req.path.startsWith(route.replacementPrefix)
+      ) {
+        warnLegacyRpcPathOnce(serviceName, route.pathPrefix, route.replacementPrefix);
+      }
     }
-
-    return await next();
   });
+  for (const alias of options?.rpcAliases ?? []) {
+    if (alias === rpcPath) continue;
+    registerRpcPath(app, rpcHandler, alias, buildContext, () => {
+      warnLegacyRpcPathOnce(serviceName, alias, rpcPath);
+    });
+  }
 
   // oRPC OpenAPI endpoint (for REST clients).
   app.use(`${apiPath}/*`, async (c: Context, next: () => Promise<void>) => {
@@ -71,5 +86,37 @@ export function wireRpc(
     }
 
     return await next();
+  });
+}
+
+function registerRpcPath(
+  app: Hono,
+  rpcHandler: ReturnType<typeof createRPCHandler>,
+  path: string,
+  buildContext: (c: Context) => Record<string, unknown>,
+  onMatched?: (context: Context) => void,
+): void {
+  app.use(`${path}/*`, async (c: Context, next: () => Promise<void>) => {
+    const { matched, response } = await rpcHandler.handle(c.req.raw, {
+      prefix: path as `/${string}`,
+      context: buildContext(c),
+    });
+
+    if (matched) {
+      onMatched?.(c);
+      return c.newResponse(response.body, response);
+    }
+
+    return await next();
+  });
+}
+
+function warnLegacyRpcPathOnce(serviceName: string, legacyPath: string, rpcPath: string): void {
+  const key = `${serviceName}:${legacyPath}`;
+  if (warnedLegacyRpcPaths.has(key)) return;
+  warnedLegacyRpcPaths.add(key);
+  createServiceLogger(serviceName).warn('Deprecated RPC route used', {
+    legacyPath,
+    replacementPath: rpcPath,
   });
 }
