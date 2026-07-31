@@ -2,4 +2,4 @@
 // Do not edit by hand. Run `deno task gen:publish-assets`.
 
 /** Version of the published core package. */
-export const CORE_PACKAGE_VERSION: string = '0.0.2';
+export const CORE_PACKAGE_VERSION: string = '0.0.2-canary.1';
