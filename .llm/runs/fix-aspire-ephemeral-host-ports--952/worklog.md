@@ -10,7 +10,7 @@ Recorded before any implementation file was created, per `run-loop.md` §3b.
 | ------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------- |
 | `@netscript/aspire` `ServiceEntry` / `PluginEntry` / `AppEntry`           | `Port` becomes optional (already optional on `AppEntry`); new optional `HostPort: number`   |
 | `@netscript/aspire` `ServiceEntrySchema` / `PluginEntrySchema` / `AppEntrySchema` | matching zod fields (widening only)                                               |
-| `@netscript/config` `ServiceConfigSchema`                                | `port` becomes optional; new optional `hostPort`                                           |
+| ~~`@netscript/config` `ServiceConfigSchema`~~                            | **dropped during implementation** — that surface never reaches the apphost (`drift.md` D-6) |
 | `netscript init --service-port <n>`                                      | unchanged flag; new meaning "pin the Aspire host port"; range widened to `[1024, 65535]`   |
 | `deno task check:aspire-host-ports`                                      | **new** repository validation task                                                         |
 | `render-http-endpoint.ts`                                                | internal to `@netscript/cli` — not exported from any barrel                                |
@@ -124,3 +124,63 @@ it is covered by three tests including the "task app still gets no endpoint" cas
 widening is bounded. No `any`, no lint-ignore, no plugin-name coupling introduced.
 
 **Reconcile note:** no new comments on #952. No related issue moved. Drift D-6 appended.
+
+### Slice 5 — the pristine scaffold stops pinning
+
+**What landed**
+
+- `validate-init.ts` — `--service-port` is now the only source of a pin. The
+  `[3000, 3099]` rejection is replaced by `USER_PORT_RANGE` `[1024, 65535]`; `servicePort`
+  (the source-literal fallback) and `serviceHostPort` (the Aspire pin) become two derived values
+  from one flag.
+- `constants/port-ranges.ts` — `USER_PORT_RANGE` added beside `PORT_RANGES`.
+- `render-ts-apphost.ts` / `generate-appsettings.ts` — neither writes a port for the example
+  service or the app; both emit `HostPort` only through a conditional spread. `appProxyPort`
+  (the 8010 literal) is gone.
+- `scaffold-plan.ts` / `scaffold-options.ts` — `hostPort` / `serviceHostPort` threaded through,
+  each documented as "pin" vs "source fallback" so the two never get conflated again.
+- `plugin/scaffolder.ts` — `collectPorts` now counts `HostPort` as well as `Port` when deciding
+  which ports are taken, so plugin allocation still avoids a pinned service port.
+- `service-shape.ts` / `list-services-command.ts` — `DiscoveredService.port` is optional;
+  `netscript service list` prints `aspire` rather than `undefined` for an unpinned service.
+- `init-orchestrator.ts` / `init-pipeline.ts` — the "next steps" output no longer promises
+  `http://localhost:3000/api/rpc`. It points at the dashboard when Aspire assigns the port, prints
+  the literal URL for `--no-aspire` or a pinned port, and warns that a pin defeats `--isolated`.
+- `init-command.ts` — `--service-port` help text states what the flag now means.
+
+Three existing tests encoded the old contract and were rewritten to the new one, each keeping a
+positive assertion for the compat path: `ServiceEntrySchema: rejects missing Port` →
+`accepts a service that pins no host port` + a new `HostPort`/alias/`0` case;
+`generateAppsettings should include example service` → asserts no pin, plus a new pinned case;
+`initNextSteps reports the ... oRPC endpoint` → three cases (dashboard / pinned / no-Aspire).
+
+### Slice 6 — the regression guard
+
+Two layers, because the defect crossed a seam that unit tests on either side both passed:
+
+1. **`pristine-scaffold-ports_test.ts`** (behavioural, primary) — runs the real
+   `generateAppsettings()` for a pristine init, feeds the parsed result into the real register
+   generators, and asserts the produced `register-services.mts` / `register-apps.mts` contain no
+   `withHttpEndpoint({ port:`. This is the assertion that would have caught #952: the appsettings
+   test and the generator test each passed while the composed output shipped a pin.
+2. **`deno task check:aspire-host-ports`** (static sweep, wired into `ci:quality`) — scans
+   `packages/cli/src` for a generated `withHttpEndpoint` with a literal port and for an
+   *unconditional* `Port:`/`HostPort:` write in the two files that compose scaffold entries.
+   An `aspire-host-port-ok: <reason>` marker allows a deliberate exception; an empty reason fails.
+
+The static rule was written twice. The first version matched only numeric literals — which would
+have looked straight past the four lines that actually shipped (`Port: appProxyPort`,
+`Port: options.servicePort`, `Port: options.service.port`, `Port: appPort`, all identifiers). Its
+test now asserts all four verbatim.
+
+### Slice 7 — docs corrected where this change makes them wrong
+
+- `packages/aspire/README.md` — new **Host ports** section: host vs target, why the default pins
+  nothing, how to opt in with `HostPort`, and the `Port` alias compatibility statement.
+- `docs/site/concepts.vto` — the "Your service :3000" row now says the dashboard is the authority.
+- `docs/site/tutorials/chat/{02,05}` — the `curl localhost:8010` examples take the app URL from the
+  dashboard into `$APP`.
+
+Deliberately **not** touched: the ~20 `:8091–:8094` plugin-API references, which stay correct
+because plugin resources still pin (`plan.md` D-5), and `services-sdk/how-to/add-a-service.md`,
+which documents `netscript service add` — a command this change does not alter.

@@ -20,8 +20,12 @@ const MSSQL_SA_PASSWORD = 'NetscriptE2e!Sql2026'
 export interface AppsettingsServiceOption {
   /** Service key in `NetScriptConfig.Services`. */
   readonly name: string
-  /** HTTP port. Must fall in `PORT_RANGES.SERVICE`. */
-  readonly port: number
+  /**
+   * Aspire host port to pin. Omit — the default — so Aspire allocates the host
+   * and target ports and `aspire start --isolated` can run two workspaces at
+   * once (#952).
+   */
+  readonly hostPort?: number
 }
 
 /** Options for generating `appsettings.json`. */
@@ -30,7 +34,10 @@ export interface AppsettingsOptions {
   readonly name?: string
   /** Application name. Defaults to SCAFFOLD_DEFAULTS.APP_NAME. */
   readonly appName?: string
-  /** Application port. Defaults to PORT_RANGES.APP start. */
+  /**
+   * Aspire host port to pin for the app. Omit — the default — so Aspire
+   * allocates it (#952).
+   */
   readonly appPort?: number
   /** OTEL collector endpoint port. Defaults to PORT_RANGES.OTEL_COLLECTOR. */
   readonly otelPort?: number
@@ -264,7 +271,7 @@ export function buildCacheBlock(
 export function generateAppsettings(options?: AppsettingsOptions): string {
   const name = options?.name ?? 'my-app'
   const appName = options?.appName ?? SCAFFOLD_DEFAULTS.APP_NAME
-  const appPort = options?.appPort ?? PORT_RANGES.APP.start
+  const appPort = options?.appPort
   const otelPort = options?.otelPort ?? PORT_RANGES.OTEL_COLLECTOR
   const dbEngine = options?.dbEngine ?? SCAFFOLD_DEFAULTS.DB_ENGINE
   const cacheEnabled = options?.cache ?? SCAFFOLD_DEFAULTS.CACHE_ENABLED
@@ -277,7 +284,7 @@ export function generateAppsettings(options?: AppsettingsOptions): string {
   if (options?.service) {
     services[options.service.name] = {
       Runtime: 'deno',
-      Port: options.service.port,
+      ...(options.service.hostPort ? { HostPort: options.service.hostPort } : {}),
       Entrypoint: 'src/main.ts',
     }
   }
@@ -308,7 +315,7 @@ export function generateAppsettings(options?: AppsettingsOptions): string {
       [appName]: {
         Runtime: 'deno',
         Type: 'app',
-        Port: appPort,
+        ...(appPort ? { HostPort: appPort } : {}),
         ...(options?.service
           ? { ServiceReferences: [options.service.name] }
           : {}),

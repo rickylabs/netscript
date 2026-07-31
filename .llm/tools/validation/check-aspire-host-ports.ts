@@ -1,0 +1,190 @@
+#!/usr/bin/env -S deno run --allow-read
+/**
+ * Reject a scaffold default that pins an Aspire **host** port.
+ *
+ * Aspire's `port` option is the host (proxy) port, not the port the process
+ * binds. A pinned host port is a machine-global reservation that
+ * `aspire start --isolated` cannot randomise away, so two workspaces scaffolded
+ * from the same template collide by construction and the dashboard can
+ * advertise a URL owned by another instance (#952).
+ *
+ * The generators are allowed to *emit* a pin — a config entry that carries
+ * `HostPort` opts into one deliberately. What is forbidden is a **scaffold
+ * default** that pins one without the developer asking: a literal `Port:` or
+ * `HostPort:` in the `appsettings.json` the scaffold writes, or a
+ * `withHttpEndpoint({ port: <literal> ... })` emitted from a source position
+ * that is not driven by config.
+ *
+ * A deliberate exception may carry an inline `aspire-host-port-ok: <reason>`
+ * marker; an empty reason is itself a failure.
+ */
+import { walk } from 'jsr:@std/fs@^1/walk';
+import { relative } from 'jsr:@std/path@^1';
+
+const DEFAULT_ROOTS = ['packages/cli/src'] as const;
+const SOURCE_EXTENSIONS = new Set(['.ts', '.tsx', '.mts', '.template']);
+const ALLOW_MARKER = 'aspire-host-port-ok:';
+
+/**
+ * `withHttpEndpoint({ port: 8010 ... })` — a numeric literal in the host-port
+ * slot. An interpolation (`${...}`) is config-driven and therefore fine.
+ */
+const LITERAL_HOST_PORT = /withHttpEndpoint\(\s*\{[^}]*\bport:\s*\d/;
+
+/**
+ * A scaffold writing a `Port:` / `HostPort:` key into a resource entry it
+ * composes for `appsettings.json`.
+ *
+ * The pre-fix defect was `Port: appProxyPort` and `Port: options.servicePort` —
+ * identifiers, not numeric literals — so matching only literals would look past
+ * exactly the shape that shipped. Any *unconditional* write of the key is the
+ * defect; a conditional opt-in
+ * (`...(opts.hostPort ? { HostPort: opts.hostPort } : {})`) is the fix, and is
+ * recognised by the ternary on the same line.
+ */
+const ENTRY_PORT_KEY = /\b(?:Host)?Port:\s*\S/;
+const CONDITIONAL_WRITE = /\?/;
+
+/** Files that compose resource entries for the scaffolded `appsettings.json`. */
+const SCAFFOLD_ENTRY_FILES = [
+  'packages/cli/src/kernel/application/scaffold/render-ts-apphost.ts',
+  'packages/cli/src/kernel/templates/aspire/generate-appsettings.ts',
+];
+
+/** One place a scaffold default pins a host port. */
+export interface HostPortFinding {
+  readonly path: string;
+  readonly line: number;
+  readonly text: string;
+  readonly message: string;
+}
+
+/** A pin that carries an explicit `aspire-host-port-ok:` justification. */
+export interface HostPortAllowance {
+  readonly path: string;
+  readonly line: number;
+  readonly reason: string;
+}
+
+/** Result of one scan over the configured roots. */
+export interface HostPortScanResult {
+  readonly scannedFiles: number;
+  readonly findings: readonly HostPortFinding[];
+  readonly allowances: readonly HostPortAllowance[];
+}
+
+function normalized(path: string): string {
+  return path.replaceAll('\\', '/');
+}
+
+function isTestPath(path: string): boolean {
+  const value = `/${normalized(path)}`;
+  return value.includes('/tests/') || value.includes('_test.') || value.includes('/fixtures/');
+}
+
+function allowanceReason(line: string): string | undefined {
+  const index = line.indexOf(ALLOW_MARKER);
+  if (index === -1) return undefined;
+  return line.slice(index + ALLOW_MARKER.length).trim();
+}
+
+/**
+ * Scans one file's content for scaffold defaults that pin an Aspire host port.
+ *
+ * @param path - Repo-relative path, used for reporting and rule selection
+ * @param content - Full file text
+ */
+export function scanContent(
+  path: string,
+  content: string,
+): { findings: HostPortFinding[]; allowances: HostPortAllowance[] } {
+  const findings: HostPortFinding[] = [];
+  const allowances: HostPortAllowance[] = [];
+  const checksEntryPorts = SCAFFOLD_ENTRY_FILES.includes(normalized(path));
+
+  content.split('\n').forEach((text, index) => {
+    const hitsEndpoint = LITERAL_HOST_PORT.test(text);
+    const hitsEntry = checksEntryPorts &&
+      ENTRY_PORT_KEY.test(text) &&
+      !CONDITIONAL_WRITE.test(text);
+    if (!hitsEndpoint && !hitsEntry) return;
+
+    const line = index + 1;
+    const reason = allowanceReason(text);
+    if (reason !== undefined) {
+      if (reason.length > 0) {
+        allowances.push({ path, line, reason });
+        return;
+      }
+      findings.push({
+        path,
+        line,
+        text: text.trim(),
+        message: `\`${ALLOW_MARKER}\` marker has an empty reason.`,
+      });
+      return;
+    }
+
+    findings.push({
+      path,
+      line,
+      text: text.trim(),
+      message: hitsEndpoint
+        ? 'Generated `withHttpEndpoint` pins a literal host port. Drive it from the ' +
+          'resource entry (`HostPort`) so `aspire start --isolated` can allocate.'
+        : 'Scaffold writes a literal host port into appsettings.json. Leave it unset so ' +
+          'Aspire allocates the host and target ports.',
+    });
+  });
+
+  return { findings, allowances };
+}
+
+/**
+ * Walks the given roots and reports every scaffold default that pins a host port.
+ *
+ * @param roots - Repo-relative directories to scan
+ */
+export async function scanHostPorts(
+  roots: readonly string[] = DEFAULT_ROOTS,
+): Promise<HostPortScanResult> {
+  const findings: HostPortFinding[] = [];
+  const allowances: HostPortAllowance[] = [];
+  let scannedFiles = 0;
+
+  for (const root of roots) {
+    for await (const entry of walk(root, { includeDirs: false })) {
+      const path = normalized(relative('.', entry.path));
+      if (![...SOURCE_EXTENSIONS].some((suffix) => path.endsWith(suffix))) continue;
+      if (path.includes('/node_modules/') || isTestPath(path)) continue;
+
+      scannedFiles += 1;
+      const result = scanContent(path, await Deno.readTextFile(entry.path));
+      findings.push(...result.findings);
+      allowances.push(...result.allowances);
+    }
+  }
+
+  return { scannedFiles, findings, allowances };
+}
+
+if (import.meta.main) {
+  const pretty = Deno.args.includes('--pretty');
+  const result = await scanHostPorts();
+
+  if (pretty) {
+    console.log(`Scanned ${result.scannedFiles} files.`);
+    for (const allowance of result.allowances) {
+      console.log(`  allowed  ${allowance.path}:${allowance.line} — ${allowance.reason}`);
+    }
+    for (const finding of result.findings) {
+      console.log(`  FAIL     ${finding.path}:${finding.line} — ${finding.message}`);
+      console.log(`           ${finding.text}`);
+    }
+    console.log(result.findings.length === 0 ? 'OK — no pinned host ports.' : 'FAILED');
+  } else {
+    console.log(JSON.stringify(result, null, 2));
+  }
+
+  if (result.findings.length > 0) Deno.exit(1);
+}

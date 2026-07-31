@@ -113,7 +113,17 @@ export function initNextSteps(options: ValidatedInitOptions): string[] {
     steps.push(`deno task --cwd apps/${options.appName} dev  # start Fresh dev server`);
   }
   if (options.includeExampleService && options.serviceName) {
-    steps.push(`# oRPC service "${options.serviceName}" at http://localhost:${options.servicePort}/api/rpc`);
+    // Under Aspire the service's URL is allocated at start-up unless the caller
+    // pinned a host port, so the dashboard is the address of record (#952).
+    const serviceLocation = options.noAspire || options.serviceHostPort
+      ? `http://localhost:${options.servicePort}/api/rpc`
+      : 'the URL shown for it in the Aspire dashboard, path /api/rpc';
+    steps.push(`# oRPC service "${options.serviceName}" at ${serviceLocation}`);
+    if (options.serviceHostPort && !options.noAspire) {
+      steps.push(
+        `# Host port ${options.serviceHostPort} is pinned — 'aspire start --isolated' cannot randomise it, so a second workspace will collide`,
+      );
+    }
   }
   if (options.dbEngine !== 'none') {
     const engineLabel = options.dbEngine.charAt(0).toUpperCase() + options.dbEngine.slice(1);

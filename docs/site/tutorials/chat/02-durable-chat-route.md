@@ -157,12 +157,17 @@ The proxy exists so the browser gets a durable stream <em>without</em> streams c
 
 With `aspire start` running, drive one turn against a fresh session id, then replay it:
 
+Aspire assigns the app's port at start-up so several workspaces can run side by side, so take
+the app URL from the Aspire dashboard and put it in a variable first:
+
 ```sh
+APP=http://localhost:<port shown for your app in the dashboard>
+
 # Run a turn (the assistant reply streams back and is persisted durably).
-curl -N -X POST http://localhost:8010/api/chat/demo-1
+curl -N -X POST "$APP/api/chat/demo-1"
 
 # Replay: read the same session again — the transcript is still there.
-curl -N http://localhost:8010/api/chat-stream/ai/chat/demo-1
+curl -N "$APP/api/chat-stream/ai/chat/demo-1"
 ```
 
 The first call streams a reply; the second shows the durable session already holds it —

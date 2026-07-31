@@ -103,6 +103,38 @@ Garnet dotnet-tool executable otherwise — Redis and Garnet arms all speak the 
 so the selection is transparent to consumers. Set `NETSCRIPT_CACHE_MODE` to `Container` or
 `Executable` in the AppHost environment to override the probe.
 
+## Host ports
+
+Aspire allocates two ports for every executable resource: a **host** (proxy) port that other
+processes and the dashboard connect to, and a **target** port that the process itself binds. The
+target port is injected into the process through `PORT`, which every scaffolded entrypoint reads.
+
+Service, plugin, and app entries pin **neither** by default. That is what lets
+`aspire start --isolated` place two NetScript workspaces on one machine: a port the AppHost pinned
+is a machine-global reservation that isolated mode cannot randomise away, so a pinned default made
+the second workspace fail and let the dashboard advertise a URL owned by another instance.
+
+To pin a host port deliberately — an OAuth callback URL, a fixed reverse proxy, a bookmark — set
+`HostPort` on the entry:
+
+```jsonc
+{
+  "NetScript": {
+    "Services": {
+      "users": { "Runtime": "deno", "HostPort": 3005, "Entrypoint": "src/main.ts" }
+    }
+  }
+}
+```
+
+`netscript init --service-port <n>` writes that field for the example service and warns that the pin
+weakens isolated mode.
+
+`Port` is a deprecated alias for `HostPort`, read when `HostPort` is absent. It has always meant the
+host port, and it keeps behaving exactly as before, so an `appsettings.json` written by an earlier
+release needs no migration. Prefer `HostPort` in new configuration — the old name reads as the port
+the process listens on, which is the misreading that made pinned defaults look harmless.
+
 ## API at a glance
 
 | Entry           | What it gives you                                                                 |

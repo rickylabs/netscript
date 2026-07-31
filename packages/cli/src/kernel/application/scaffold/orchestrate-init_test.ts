@@ -98,7 +98,7 @@ Deno.test('initNextSteps tells no-Aspire Postgres users to self-provision', () =
   ]);
 });
 
-Deno.test('initNextSteps reports the generated service oRPC endpoint under /api/rpc', () => {
+Deno.test('initNextSteps points at the dashboard when Aspire assigns the service port', () => {
   const steps = initNextSteps(baseOptions({
     includeExampleService: true,
     serviceName: 'users',
@@ -107,6 +107,32 @@ Deno.test('initNextSteps reports the generated service oRPC endpoint under /api/
 
   assertEquals(
     steps.at(-1),
-    '# oRPC service "users" at http://localhost:3001/api/rpc',
+    '# oRPC service "users" at the URL shown for it in the Aspire dashboard, path /api/rpc',
   );
+});
+
+Deno.test('initNextSteps prints a literal URL and an isolation warning for a pinned port', () => {
+  const steps = initNextSteps(baseOptions({
+    includeExampleService: true,
+    serviceName: 'users',
+    servicePort: 3001,
+    serviceHostPort: 3001,
+  }));
+
+  assertEquals(steps.at(-2), '# oRPC service "users" at http://localhost:3001/api/rpc');
+  assertEquals(
+    steps.at(-1),
+    "# Host port 3001 is pinned — 'aspire start --isolated' cannot randomise it, so a second workspace will collide",
+  );
+});
+
+Deno.test('initNextSteps prints a literal URL for a no-Aspire workspace', () => {
+  const steps = initNextSteps(baseOptions({
+    noAspire: true,
+    includeExampleService: true,
+    serviceName: 'users',
+    servicePort: 3001,
+  }));
+
+  assertEquals(steps.at(-1), '# oRPC service "users" at http://localhost:3001/api/rpc');
 });

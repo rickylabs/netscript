@@ -67,7 +67,9 @@ export async function runInitPipeline(
     if (validated.includeExampleService && validated.serviceName) {
       human(
         options.quiet,
-        `Example service "${validated.serviceName}" (oRPC handler on port ${validated.servicePort})`,
+        validated.serviceHostPort
+          ? `Example service "${validated.serviceName}" (oRPC handler, host port pinned to ${validated.serviceHostPort})`
+          : `Example service "${validated.serviceName}" (oRPC handler, Aspire assigns its port)`,
       );
     }
 

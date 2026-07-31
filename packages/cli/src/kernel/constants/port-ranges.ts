@@ -14,6 +14,17 @@ export const PORT_RANGES = {
   OTEL_COLLECTOR: 4318,
 } as const;
 
+/**
+ * Ports a user may pin for a resource: the unprivileged TCP range.
+ *
+ * Scaffolded resources let Aspire allocate their ports, so the narrower
+ * `PORT_RANGES` windows only shape default assignment inside one workspace.
+ * An explicitly requested port is validated against this range instead, so
+ * pinning is not confined to a 100-port window that every workspace on the
+ * machine would compete for.
+ */
+export const USER_PORT_RANGE: PortRange = { start: 1024, end: 65535 };
+
 export type RangedPortType = 'SERVICE' | 'APP' | 'PLUGIN_API' | 'INFRA_PLUGIN';
 export type FixedPortType = 'ASPIRE_DASHBOARD' | 'OTEL_COLLECTOR';
 export type PortType = RangedPortType | FixedPortType;
