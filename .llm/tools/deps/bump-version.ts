@@ -10,6 +10,8 @@ export interface BumpResult {
   readonly files: readonly string[];
 }
 
+export type VersionBumpMode = 'stable' | 'canary';
+
 interface Args {
   readonly json: boolean;
   readonly pretty: boolean;
@@ -28,10 +30,14 @@ const semverPattern =
   /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?$/;
 
 /** Apply an exact release version to root, every declared workspace member, scaffolds, and lock. */
-export async function coordinateVersionBump(root: string, newVersion: string): Promise<BumpResult> {
+export async function coordinateVersionBump(
+  root: string,
+  newVersion: string,
+  mode: VersionBumpMode = 'stable',
+): Promise<BumpResult> {
   const rootDenoJson = join(root, 'deno.json');
   const oldVersion = await readVersion(rootDenoJson);
-  validateNewerVersion(newVersion, oldVersion);
+  validateNewerVersion(newVersion, oldVersion, mode);
   const files = await discoverVersionFiles(root);
   await replaceVersionFiles(files, oldVersion, newVersion);
   return { oldVersion, newVersion, files };
@@ -58,18 +64,38 @@ export async function findVersionResidue(root: string, oldVersion: string): Prom
     })
   ) {
     if (!entry.path.endsWith('.json') && entry.name !== 'deno.lock') continue;
-    if ((await Deno.readTextFile(entry.path)).includes(oldVersion)) {
+    if (containsExactVersion(await Deno.readTextFile(entry.path), oldVersion)) {
       residue.push(normalize(entry.path));
     }
   }
   return residue.sort();
 }
 
-/** Validate that an exact version is newer than the current workspace version. */
-export function validateNewerVersion(next: string, current: string): void {
-  if (compareSemver(parseSemver(next), parseSemver(current)) <= 0) {
-    throw new Error(`Release version ${next} must be newer than current version ${current}.`);
-  }
+function containsExactVersion(text: string, version: string): boolean {
+  const escaped = version.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return new RegExp(`(?<![0-9A-Za-z.+-])${escaped}(?![0-9A-Za-z.+-])`).test(text);
+}
+
+/** Validate a stable forward bump or a same-core canary prerelease of the current stable version. */
+export function validateNewerVersion(
+  next: string,
+  current: string,
+  mode: VersionBumpMode = 'stable',
+): void {
+  const nextSemver = parseSemver(next);
+  const currentSemver = parseSemver(current);
+  if (compareSemver(nextSemver, currentSemver) > 0) return;
+  if (
+    mode === 'canary' &&
+    sameCore(nextSemver, currentSemver) &&
+    currentSemver.prerelease.length === 0 &&
+    nextSemver.prerelease[0] === 'canary'
+  ) return;
+  throw new Error(`Release version ${next} must be newer than current version ${current}.`);
+}
+
+function sameCore(left: Semver, right: Semver): boolean {
+  return left.major === right.major && left.minor === right.minor && left.patch === right.patch;
 }
 
 export function parseSemver(version: string): Semver {

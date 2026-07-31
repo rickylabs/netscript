@@ -183,6 +183,18 @@ Deno.test('release cut refuses equal or older versions', () => {
   validateNewerVersion('0.0.1-alpha.12', '0.0.1-alpha.11');
 });
 
+Deno.test('canary mode accepts only a same-core canary of the current stable version', () => {
+  validateNewerVersion('0.0.2-canary.1', '0.0.2', 'canary');
+  assertEquals(throws(() => validateNewerVersion('0.0.2-canary.1', '0.0.2')), 'throws');
+
+  for (const next of ['0.0.1', '0.0.2']) {
+    assertEquals(throws(() => validateNewerVersion(next, '0.0.2')), 'throws');
+    assertEquals(throws(() => validateNewerVersion(next, '0.0.2', 'canary')), 'throws');
+  }
+
+  validateNewerVersion('0.0.1-canary.1', '0.0.1-beta.11');
+});
+
 Deno.test('release cut parser ignores task separator', () => {
   const args = parseArgs(['--', '0.0.1-alpha.99', '--dry-run']);
   assertEquals(args.version, '0.0.1-alpha.99');

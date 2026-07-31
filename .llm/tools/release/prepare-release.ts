@@ -2,6 +2,7 @@ import {
   type BumpResult,
   coordinateVersionBump,
   findVersionResidue,
+  type VersionBumpMode,
 } from '../deps/bump-version.ts';
 import { PUBLISH_ASSET_OUTPUTS } from '../generate-publish-assets.ts';
 import { join } from 'jsr:@std/path@^1.0.0';
@@ -19,7 +20,7 @@ export type ReleaseCommandRunner = (
 ) => Promise<CommandResult>;
 
 export interface PrepareReleaseDependencies {
-  readonly bump: (root: string, version: string) => Promise<BumpResult>;
+  readonly bump: (root: string, version: string, mode: VersionBumpMode) => Promise<BumpResult>;
   readonly findResidue: (root: string, oldVersion: string) => Promise<readonly string[]>;
   readonly runCommand: ReleaseCommandRunner;
 }
@@ -38,9 +39,10 @@ export async function prepareRelease(
   root: string,
   version: string,
   label: string,
+  mode: VersionBumpMode,
   dependencies: PrepareReleaseDependencies = defaultDependencies,
 ): Promise<BumpResult> {
-  const bump = await dependencies.bump(root, version);
+  const bump = await dependencies.bump(root, version, mode);
   console.log(`${label} bumped ${bump.oldVersion} -> ${bump.newVersion}`);
 
   await runGate(

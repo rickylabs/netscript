@@ -172,7 +172,7 @@ async function main(): Promise<void> {
   const options = parseArgs(Deno.args);
   const version = await deriveCanaryVersion(options.root, options.targetVersion);
   console.log(`release:canary selected ${version}`);
-  const bump: BumpResult = await prepareRelease(options.root, version, 'release:canary');
+  const bump: BumpResult = await prepareRelease(options.root, version, 'release:canary', 'canary');
 
   if (options.dryRun) {
     console.log('release:canary dry-run complete; branch/commit/tag/push skipped.');

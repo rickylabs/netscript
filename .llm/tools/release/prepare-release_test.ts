@@ -5,8 +5,8 @@ import { prepareRelease, type PrepareReleaseDependencies } from './prepare-relea
 Deno.test('shared release preparation runs the stable gate sequence in order', async () => {
   const calls: string[] = [];
   const dependencies: PrepareReleaseDependencies = {
-    bump: (_root, version) => {
-      calls.push(`bump:${version}`);
+    bump: (_root, version, mode) => {
+      calls.push(`bump:${version}:${mode}`);
       return Promise.resolve({
         oldVersion: '0.0.1-beta.10',
         newVersion: version,
@@ -23,14 +23,20 @@ Deno.test('shared release preparation runs the stable gate sequence in order', a
     },
   };
 
-  const result = await prepareRelease('/repo', '0.0.1-canary.1', 'release:canary', dependencies);
+  const result = await prepareRelease(
+    '/repo',
+    '0.0.1-canary.1',
+    'release:canary',
+    'canary',
+    dependencies,
+  );
   assertEquals(result.newVersion, '0.0.1-canary.1');
   assertEquals(result.files, [
     '/repo/deno.json',
     ...PUBLISH_ASSET_OUTPUTS.map((path) => `/repo/${path}`),
   ]);
   assertEquals(calls, [
-    'bump:0.0.1-canary.1',
+    'bump:0.0.1-canary.1:canary',
     'deno task gen:publish-assets',
     'residue:0.0.1-beta.10',
     'deno task publish:readiness',
@@ -43,7 +49,7 @@ Deno.test('shared release preparation regenerates assets then stops when residue
   const calls: string[] = [];
   await assertRejects(
     () =>
-      prepareRelease('/repo', '0.0.1-canary.1', 'release:canary', {
+      prepareRelease('/repo', '0.0.1-canary.1', 'release:canary', 'canary', {
         bump: (_root, version) =>
           Promise.resolve({
             oldVersion: '0.0.1-beta.10',
