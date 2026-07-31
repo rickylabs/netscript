@@ -76,3 +76,33 @@
 - **Action:** accept for this already-open local session, make no mobile-visibility claim, and use
   separate approved local evaluator/reviewer transports.
 - **Evidence:** `.llm/runs/version-scheme-0-0-x/codex-thread-ids.md`; runtime status output.
+
+## 2026-07-31 — Required local PLAN-EVAL route has no credential
+
+- **What:** The mandatory independent PLAN-EVAL could not start through the lane-policy-selected
+  local Claude/OpenRouter route.
+- **Source:** Live provider canary for profile `claude-openrouter`, model `qwen/qwen3.7-max`, effort
+  `high`.
+- **Expected:** A separate local Claude Code session runs Qwen PLAN-EVAL and writes a verdict before
+  implementation.
+- **Actual:** The canary returned `status=blocked`, `credential=absent`, and `auth_required`; no
+  evaluator session was created.
+- **Severity:** blocking.
+- **Action:** stop before implementation. Resume only after the OpenRouter credential is available,
+  or after the owner explicitly authorizes the harness's cloud OpenHands open-model fallback.
+- **Evidence:** `deno task agentic:provider-canary --live --profile claude-openrouter --model
+  qwen/qwen3.7-max --effort high --worktree /home/codex/repos/b12-scheme`.
+
+## 2026-07-31 — Shared-worktree supervisor commits overlapped plan artifact updates
+
+- **What:** An already-running supervisor committed plan artifacts and the evaluator-route blocker
+  while this session was refining the same run directory.
+- **Source:** commits `f214a1d46` and `e481e3593` appearing on the active branch during the plan
+  phase.
+- **Expected:** One writer owns the run artifacts for a phase.
+- **Actual:** Both sessions touched harness documentation; product files were not edited.
+- **Severity:** significant.
+- **Action:** reconcile both evidence sets in `396639496` and the next harness-only commit, preserve
+  the evaluator blocker, and keep implementation stopped pending a formal PASS.
+- **Evidence:** `git log --oneline --parents 8dca67985..HEAD` and the clean worktree after
+  reconciliation.

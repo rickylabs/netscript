@@ -68,6 +68,7 @@ version-neutral placeholder; historical literals must identify their historical 
 | --- | --- | --- | --- |
 | 2026-07-31 | Plan | Research | Reproduced 325 references; found 193 release-owned and 65 stale nested-lock occurrences. |
 | 2026-07-31 | Plan | Design | Locked four slices and the historical/current classification. |
+| 2026-07-31 | Plan-Eval | Provider canary | BLOCKED: local Claude/OpenRouter profile has no OpenRouter credential; no evaluator session started. |
 
 ## Decisions
 
@@ -86,6 +87,8 @@ version-neutral placeholder; historical literals must identify their historical 
 | Nested Fresh UI lock omitted from bump/residue | significant | yes |
 | Markdown gate cannot protect normal-core docs pins | significant | yes |
 | Runtime controller cannot prove current Codex mobile attachment | significant | yes |
+| Required PLAN-EVAL provider credential is absent | blocking | yes |
+| Shared-worktree supervisor overlapped plan artifact updates | significant | yes |
 
 ## Gate Results
 
@@ -100,7 +103,7 @@ version-neutral placeholder; historical literals must identify their historical 
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| Plan-Gate | NOT_RUN | Pending separate Qwen session | Hard stop before S1. |
+| Plan-Gate | BLOCKED | Provider canary: `credential=absent`, `auth_required` | No evaluator session; hard stop before S1. |
 | jsr-audit scan | PASS | `research.md`; `deno doc` on affected package surfaces | No planned export/type change. |
 
 ### Runtime Gates
@@ -120,3 +123,5 @@ version-neutral placeholder; historical literals must identify their historical 
 - PLAN-EVAL should inspect D3 (nested lock), D5 (generic/blocking Markdown scanner), and the
   historical allowlist first.
 - No implementation file has been edited before PLAN-EVAL.
+- Resume only after local OpenRouter credentials are available or the owner explicitly authorizes
+  the cloud OpenHands open-model fallback.

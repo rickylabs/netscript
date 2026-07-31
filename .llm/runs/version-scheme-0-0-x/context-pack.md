@@ -6,15 +6,16 @@
 | --- | --- |
 | Run ID | `version-scheme-0-0-x` |
 | Branch | `chore/version-scheme-0-0-x` |
-| Current phase | `plan` |
+| Current phase | `plan-eval — blocked` |
 | Archetype | `6 — CLI / Tooling` |
 | Scope overlays | `docs` |
 
 ## Current State
 
 Research and Design are complete against `origin/main@8dca67985`. The branch contains only the
-launcher brief commits plus these run artifacts; no implementation change has started. The next
-hard stop is a separate Qwen PLAN-EVAL.
+launcher brief commits plus these run artifacts; no implementation change has started. The
+mandatory separate Qwen PLAN-EVAL is blocked because the selected local Claude/OpenRouter profile
+has no OpenRouter credential.
 
 ## Completed
 
@@ -23,16 +24,18 @@ hard stop is a separate Qwen PLAN-EVAL.
 - Identified nested-lock, generic Markdown-pin, CLI guard, and runtime-version derivation gaps.
 - Selected Archetype 6 with Docs overlay and locked four sequential commit slices.
 
-## In Progress
+## Blocked
 
-- Commit/push the Plan & Design artifacts, open the draft PR, and dispatch PLAN-EVAL.
+- The live evaluator-provider canary returned `credential=absent` / `auth_required`; no evaluator
+  session was created.
+- Harness policy forbids implementation before an independent PLAN-EVAL `PASS`.
 
 ## Next Steps
 
-1. Commit the run artifacts without unrelated product changes.
-2. Push explicit refspec and verify `git ls-remote`.
-3. Open and verify the draft PR with milestone `0.0.2` and lifecycle labels.
-4. Run separate-session PLAN-EVAL; do not implement before `PASS`.
+1. Obtain an OpenRouter credential for the selected local evaluator route, or receive explicit
+   owner authorization for the cloud OpenHands open-model fallback.
+2. Run separate-session PLAN-EVAL; do not implement before `PASS`.
+3. Execute S1–S4 only after the plan gate passes.
 
 ## Key Decisions
 
@@ -56,17 +59,18 @@ hard stop is a separate Qwen PLAN-EVAL.
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
 | Static | Baseline PASS | Census and raw Git evidence in `worklog.md` |
-| Fitness | Plan pending | JSR surface scan recorded; PLAN-EVAL not run |
+| Fitness | BLOCKED | JSR surface scan recorded; PLAN-EVAL provider credential absent |
 | Runtime | Degraded | Runtime controller cannot prove mobile attachment |
 | Consumer | NOT_RUN | Release dry-run reserved for S4 |
 
 ## Open Questions
 
-- None blocking PLAN-EVAL.
+- Will the owner provide the local OpenRouter credential, or explicitly authorize the cloud
+  OpenHands open-model evaluator fallback?
 
 ## Drift and Debt
 
-- Drift: five entries in `drift.md`, including significant brief/gate/runtime mismatches.
+- Drift: seven entries in `drift.md`, including the blocking evaluator-route failure.
 - Debt: none created; existing package debt is not deepened by the plan.
 
 ## Commits
