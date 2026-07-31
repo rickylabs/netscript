@@ -58,3 +58,13 @@ source then runs the checked-in asset generator. Public consumers start at `mod.
 - Fails-before proof: inserted a `document.addEventListener` regression sentinel in the new menu
   source; the static guard failed (1 failed / 1 passed). Restored the source; focused tests and
   scoped gates then passed.
+
+## S2 — DataGrid controlled collection actions
+
+- Added opt-in controlled selection using the existing row IDs, real mixed header checkbox state,
+  selection-count bulk toolbar, typed row-action slot, isolated nested controls, keyboard row
+  activation, real href fallback, and horizontal overflow for narrow layouts.
+- The no-selection/no-actions branch calls the legacy renderer unchanged (G7).
+- Fails-before proof: simultaneously removed the legacy branch, mixed state, and propagation stops;
+  the focused suite failed 6/8 tests including G1, G2, and G7. Restored the implementation and the
+  suite passed 8/8.

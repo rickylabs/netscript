@@ -69,6 +69,19 @@ export interface DataGridColumn<T> {
   readonly render?: (row: T) => DataGridRenderable;
 }
 
+/** Controlled selection context supplied to DataGrid action slots. */
+export interface DataGridSelectionContext {
+  readonly count: number;
+  readonly selectedIds: ReadonlySet<string>;
+  readonly clearSelection: () => void;
+}
+
+/** Typed context supplied to each DataGrid row-action slot. */
+export interface DataGridRowActionContext<T> {
+  readonly row: DataGridRow<T>;
+  readonly selected: boolean;
+}
+
 /**
  * Plain, button, or Fresh client-navigation row contract for {@link DataGrid}.
  */
@@ -148,6 +161,17 @@ export interface DataGridProps<T> {
    * Accessible label for the grid region.
    */
   readonly label?: string;
+  /** Controlled selected row identities. Supplying this enables selection chrome. */
+  readonly selectedIds?: ReadonlySet<string>;
+  /** Receives the complete next controlled selection set. */
+  readonly onSelectionChange?: (selectedIds: ReadonlySet<string>) => void;
+  /** Renders bulk actions when at least one row is selected. */
+  readonly renderBulkActions?: (selection: DataGridSelectionContext) => DataGridRenderable;
+  /** Renders isolated actions for a row, typically an ActionMenu. */
+  readonly renderRowActions?: (
+    row: T,
+    context: DataGridRowActionContext<T>,
+  ) => DataGridRenderable;
   /**
    * Additional native attributes forwarded to the grid root.
    */
@@ -162,10 +186,100 @@ interface FreshAnchorNavigationAttributes extends JSX.AnchorHTMLAttributes<HTMLA
  * Renders a generic, templated, token-styled data grid.
  */
 export function DataGrid<T>(
-  { columns, rows, class: className, label, ...props }: DataGridProps<T>,
+  {
+    columns,
+    rows,
+    class: className,
+    label,
+    selectedIds,
+    onSelectionChange,
+    renderBulkActions,
+    renderRowActions,
+    ...props
+  }: DataGridProps<T>,
 ): DataGridNode {
+  if (!selectedIds && !onSelectionChange && !renderBulkActions && !renderRowActions) {
+    return renderLegacyDataGrid({ columns, rows, class: className, label, ...props });
+  }
+
+  const selected = selectedIds ?? new Set<string>();
+  const selectableIds = rows.map((row) => row.id);
+  const selectedCount = selectableIds.filter((id) => selected.has(id)).length;
+  const allSelected = rows.length > 0 && selectedCount === rows.length;
+  const indeterminate = selectedCount > 0 && !allSelected;
+  const selectionEnabled = Boolean(selectedIds || onSelectionChange);
+  const selectionContext: DataGridSelectionContext = {
+    count: selectedCount,
+    selectedIds: selected,
+    clearSelection: () => onSelectionChange?.(new Set()),
+  };
   const templateColumns = columns.map((column) => column.width ?? 'minmax(0, 1fr)').join(' ');
-  const gridStyle: JSX.CSSProperties = { gridTemplateColumns: templateColumns };
+  const tracks = [selectionEnabled ? '2.5rem' : '', templateColumns, renderRowActions ? 'auto' : '']
+    .filter(Boolean).join(' ');
+  const gridStyle: JSX.CSSProperties = { gridTemplateColumns: tracks };
+
+  const headCells: DataGridNode[] = [];
+  if (selectionEnabled) {
+    headCells.push(renderSelectionCheckbox({
+      checked: allSelected,
+      indeterminate,
+      label: allSelected ? 'Clear selection' : 'Select all rows',
+      onChange: () => onSelectionChange?.(new Set(allSelected ? [] : selectableIds)),
+    }));
+  }
+  headCells.push(
+    ...columns.map((column) =>
+      h(
+        'span',
+        { key: column.key, role: 'columnheader', class: 'ns-data-grid__header-cell' },
+        column.header,
+      ) as DataGridNode
+    ),
+  );
+  if (renderRowActions) {
+    headCells.push(
+      h('span', { role: 'columnheader', 'aria-label': 'Row actions' }) as DataGridNode,
+    );
+  }
+
+  const children: DataGridNode[] = [];
+  if (selectedCount > 0 && renderBulkActions) {
+    children.push(h(
+      'div',
+      {
+        class: 'ns-data-grid__bulk-actions',
+        role: 'toolbar',
+        'aria-label': `${selectedCount} selected`,
+      },
+      renderBulkActions(selectionContext) as ComponentChildren,
+    ) as DataGridNode);
+  }
+  children.push(
+    h(
+      'div',
+      { role: 'rowgroup', class: 'ns-data-grid__head' },
+      h('div', {
+        role: 'row',
+        class: 'ns-data-grid__row ns-data-grid__row--header',
+        style: gridStyle,
+      }, headCells as ComponentChildren),
+    ) as DataGridNode,
+    h(
+      'div',
+      { role: 'rowgroup', class: 'ns-data-grid__body' },
+      rows.map((row) =>
+        renderEnhancedDataGridRow(
+          row,
+          columns,
+          gridStyle,
+          selected,
+          onSelectionChange,
+          selectionEnabled,
+          renderRowActions,
+        )
+      ),
+    ) as DataGridNode,
+  );
 
   return h(
     'div',
@@ -174,25 +288,31 @@ export function DataGrid<T>(
       role: 'grid',
       'aria-label': label,
       class: cn('ns-data-grid', className),
+      'data-responsive': '',
+      style: { overflowX: 'auto', ...(props.style as JSX.CSSProperties | undefined) },
     },
+    children as ComponentChildren,
+  ) as DataGridNode;
+}
+
+function renderLegacyDataGrid<T>(
+  { columns, rows, class: className, label, ...props }: DataGridProps<T>,
+): DataGridNode {
+  const templateColumns = columns.map((column) => column.width ?? 'minmax(0, 1fr)').join(' ');
+  const gridStyle: JSX.CSSProperties = { gridTemplateColumns: templateColumns };
+  return h(
+    'div',
+    { ...props, role: 'grid', 'aria-label': label, class: cn('ns-data-grid', className) },
     h(
       'div',
       { role: 'rowgroup', class: 'ns-data-grid__head' },
       h(
         'div',
-        {
-          role: 'row',
-          class: 'ns-data-grid__row ns-data-grid__row--header',
-          style: gridStyle,
-        },
+        { role: 'row', class: 'ns-data-grid__row ns-data-grid__row--header', style: gridStyle },
         columns.map((column) =>
           h(
             'span',
-            {
-              key: column.key,
-              role: 'columnheader',
-              class: 'ns-data-grid__header-cell',
-            },
+            { key: column.key, role: 'columnheader', class: 'ns-data-grid__header-cell' },
             column.header,
           )
         ),
@@ -203,6 +323,98 @@ export function DataGrid<T>(
       { role: 'rowgroup', class: 'ns-data-grid__body' },
       rows.map((row) => renderDataGridRow(row, columns, gridStyle)),
     ),
+  ) as DataGridNode;
+}
+
+interface SelectionCheckboxOptions {
+  checked: boolean;
+  indeterminate: boolean;
+  label: string;
+  onChange: () => void;
+}
+
+function renderSelectionCheckbox(options: SelectionCheckboxOptions): DataGridNode {
+  return h(
+    'span',
+    { role: 'gridcell', class: 'ns-data-grid__selection' },
+    h('input', {
+      type: 'checkbox',
+      checked: options.checked,
+      'aria-label': options.label,
+      'aria-checked': options.indeterminate ? 'mixed' : String(options.checked),
+      ref: (element: HTMLInputElement | null) => {
+        if (element) element.indeterminate = options.indeterminate;
+      },
+      onClick: (event: Event) => event.stopPropagation(),
+      onChange: options.onChange,
+    }),
+  ) as DataGridNode;
+}
+
+function renderEnhancedDataGridRow<T>(
+  row: DataGridRow<T>,
+  columns: readonly DataGridColumn<T>[],
+  gridStyle: JSX.CSSProperties,
+  selectedIds: ReadonlySet<string>,
+  onSelectionChange: DataGridProps<T>['onSelectionChange'],
+  selectionEnabled: boolean,
+  renderRowActions: DataGridProps<T>['renderRowActions'],
+): DataGridNode {
+  const selected = selectedIds.has(row.id);
+  const cells: DataGridNode[] = [];
+  if (selectionEnabled) {
+    cells.push(renderSelectionCheckbox({
+      checked: selected,
+      indeterminate: false,
+      label: `Select row ${row.id}`,
+      onChange: () => {
+        const next = new Set(selectedIds);
+        selected ? next.delete(row.id) : next.add(row.id);
+        onSelectionChange?.(next);
+      },
+    }));
+  }
+  cells.push(...columns.map((column) => renderDataGridCell(row.data, column)));
+  if (renderRowActions) {
+    cells.push(h('span', {
+      role: 'gridcell',
+      class: 'ns-data-grid__actions',
+      onClick: (event: Event) => event.stopPropagation(),
+    }, renderRowActions(row.data, { row, selected }) as ComponentChildren) as DataGridNode);
+  }
+  const activate = row.onSelect;
+  return h(
+    'div',
+    {
+      key: row.id,
+      role: 'row',
+      'aria-selected': selected ? 'true' : undefined,
+      class: cn(
+        'ns-data-grid__row',
+        selected && 'is-selected',
+        (row.onSelect || row.href) && 'ns-data-grid__row--interactive',
+      ),
+      style: gridStyle,
+      tabIndex: activate ? 0 : undefined,
+      onClick: activate,
+      onKeyDown: activate
+        ? (event: KeyboardEvent) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            activate();
+          }
+        }
+        : undefined,
+    },
+    cells as ComponentChildren,
+    row.href
+      ? h('a', {
+        href: row.href,
+        'f-client-nav': true,
+        class: 'ns-data-grid__row-link',
+        'aria-label': `Open row ${row.id}`,
+      })
+      : null,
   ) as DataGridNode;
 }
 

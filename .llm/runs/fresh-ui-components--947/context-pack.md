@@ -67,4 +67,6 @@ demonstrating it across the three surfaces, with a regression guard per surface.
 
 - PLAN-EVAL PASS: OpenHands commit `11639dea4`.
 - S1 ActionMenu composition implemented locally; focused/static/scoped evidence is recorded in
-  `worklog.md` and awaits slice commit/push.
+  `worklog.md`; landed as `339f049c3`.
+- S2 DataGrid controlled selection/actions implemented locally with G1/G2/G7 fails-before evidence;
+  awaits slice commit/push.

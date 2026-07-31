@@ -104,16 +104,40 @@ type Session = { name: string; tokens: number; status: string };
 />;
 ```
 
+Controlled collection actions are opt-in; omitting these props preserves the legacy grid markup:
+
+```tsx
+import { DataGrid } from '@netscript/fresh-ui';
+import { ActionMenu } from '@netscript/fresh-ui/interactive';
+
+<DataGrid<Session>
+  columns={columns}
+  rows={rows}
+  selectedIds={selectedIds}
+  onSelectionChange={setSelectedIds}
+  renderBulkActions={({ count }) => <button>Archive {count}</button>}
+  renderRowActions={(session) => (
+    <ActionMenu.Root>
+      <ActionMenu.Trigger aria-label={`Actions for ${session.name}`}>•••</ActionMenu.Trigger>
+      <ActionMenu.Content>
+        <ActionMenu.Item>Rename</ActionMenu.Item>
+        <ActionMenu.Item intent='destructive'>Delete</ActionMenu.Item>
+      </ActionMenu.Content>
+    </ActionMenu.Root>
+  )}
+/>;
+```
+
 ## API at a glance
 
-| Entry            | What it gives you                                                                  |
-| ---------------- | ---------------------------------------------------------------------------------- |
-| `.`              | `cn`, `withToast` / `getToast` / `stripToastFromUrl`, `DataGrid`, `Icon`           |
-| `./interactive`  | `Accordion`, `Combobox`, `Dialog`, `Drawer`, `Popover`, `Sheet`, `Tabs`, `Tooltip` |
-| `./primitives`   | `Icon`, `Show`, `SrOnly`, `VisuallyHidden` — headless platform primitives          |
-| `./ai/render-ui` | `RenderUiSurface`, `renderUiPayload` — the safe generative-UI renderer             |
-| `./desktop`      | `createDesktopChrome` — menus, tray, dialogs, notifications, window actions        |
-| `./registry`     | The registry manifest and content map the CLI copies from                          |
+| Entry            | What it gives you                                                                                |
+| ---------------- | ------------------------------------------------------------------------------------------------ |
+| `.`              | `cn`, `withToast` / `getToast` / `stripToastFromUrl`, `DataGrid`, `Icon`                         |
+| `./interactive`  | `ActionMenu`, `Accordion`, `Combobox`, `Dialog`, `Drawer`, `Popover`, `Sheet`, `Tabs`, `Tooltip` |
+| `./primitives`   | `Icon`, `Show`, `SrOnly`, `VisuallyHidden` — headless platform primitives                        |
+| `./ai/render-ui` | `RenderUiSurface`, `renderUiPayload` — the safe generative-UI renderer                           |
+| `./desktop`      | `createDesktopChrome` — menus, tray, dialogs, notifications, window actions                      |
+| `./registry`     | The registry manifest and content map the CLI copies from                                        |
 
 The always-current symbol list is
 [`deno doc jsr:@netscript/fresh-ui@<version>`](https://jsr.io/@netscript/fresh-ui/doc).
