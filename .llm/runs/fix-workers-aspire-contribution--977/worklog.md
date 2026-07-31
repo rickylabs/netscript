@@ -46,3 +46,11 @@
 Add or change an RPC route prefix in the service-owned convention, then consume it from both the
 server factory and SDK link. Add a workers Aspire dependency through `AspireBuilder`, and keep
 non-Aspire runtime fallback at the consumer edge.
+
+## PLAN-EVAL
+
+- Separate evaluator: Qwen 3.7 Max via Claude Code + OpenRouter, session
+  `12f40bb8-5391-475b-8b20-8a0dd0eec4a2`.
+- Verdict: `PASS` — all eight Plan-Gate checks satisfied.
+- Invalid prior launch: rejected and terminated after it attempted closed-model delegation; see
+  `drift.md`. It produced no accepted verdict.
