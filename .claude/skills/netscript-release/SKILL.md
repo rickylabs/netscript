@@ -61,6 +61,14 @@ gate.
 
 ## What The Command Proves
 
+### First-party JSR specifier policy
+
+Framework source under `packages/**` and `plugins/**` must emit exact `jsr:@netscript/*` pins for
+the current release train. Consumer-facing scaffolds do not use floor ranges: a generated project
+must resolve the same coordinated package set as the CLI that generated it. Derive emitted pins
+from generated package metadata, `NETSCRIPT_RELEASE_VERSION`, or `netscriptJsrSpecifier`; the
+`check:netscript-jsr-specifiers` gate rejects versionless, stale exact, and range-pinned values.
+
 `release:cut` is fail-fast and ordered:
 
 1. Version validation refuses invalid semver and equal or older versions.
@@ -84,15 +92,23 @@ prerelease version. For stable target `<next-version>`, the version is `<next-ve
 `N` is one greater than the highest matching version found across all workspace-member JSR metadata
 (including yanked versions), with existing git tags as a collision guard.
 
-**Canary versioning doctrine (owner decision, 2026-07-18, tracked as #888):** the canary version
-must encode the release it is tied to — `<target-version>-canary.N` for the ACTUAL target,
-including prereleases: the beta.12 cut publishes `0.0.1-beta.12-canary.1`, and only the real stable
-cut publishes `0.0.1-canary.N`. The beta.11 cut published `0.0.1-canary.1` because
-`validateStableTarget` in `.llm/tools/release/canary.ts` still refuses prerelease targets — that is
-accepted debt for beta.11 only, not a template. When dispatching `release-canary.yml` for a
-prerelease cut before #888 lands, the `target-version` input must be the eventual stable version
-(the tool derives `<stable>-canary.N` and binds the pair status to the content SHA, which is what
-authorizes the prerelease tag); after #888 lands, pass the real prerelease target instead.
+**Canary versioning doctrine (owner decision, 2026-07-18, #888 — implemented 2026-07-31):** the
+canary version encodes the release it is tied to. Pass the ACTUAL target to `target-version`,
+including a prerelease: the beta.12 cut publishes `0.0.1-beta.12.canary.1`, and only a real stable
+cut publishes `0.0.1-canary.N`.
+
+**The separator differs by target, and that is load-bearing.** A stable target joins with a hyphen
+(`0.0.1-canary.1`); a prerelease target joins with a **dot** (`0.0.1-beta.12.canary.1`). Semver
+compares prerelease identifiers pairwise and a numeric identifier always loses to a non-numeric
+one, so the hyphenated form `0.0.1-beta.12-canary.1` parses as `[beta, "12-canary", 1]` and sorts
+**above `0.0.1-beta.13`, `0.0.1-beta.20`, and every later beta permanently**. The dotted form parses
+as `[beta, 12, canary, 1]`, which sorts immediately above the release it proves and below everything
+after it. `canarySuffix()` owns this rule and `canary_test.ts` asserts the ordering against
+`@std/semver`; do not hand-assemble a canary version.
+
+The beta.11 cut published `0.0.1-canary.1` under the pre-#888 tool, which refused prerelease
+targets. That tag remains valid provenance, and stable targets still derive the same shape, so
+nothing about it needs revisiting — but it is not the pattern for a prerelease cut.
 
 The workflow invokes `deno task release:canary -- <next-version>` to perform the shared coordinated
 bump/gates and create the ephemeral branch plus provenance tag without a release PR. Operators may

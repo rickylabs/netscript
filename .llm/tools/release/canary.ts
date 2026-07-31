@@ -57,12 +57,55 @@ export function parseArgs(argv: string[]): CanaryOptions {
   return { targetVersion, dryRun, root };
 }
 
+const VERSION_CORE = /^(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)/;
+const PRERELEASE_IDENTIFIERS =
+  /^(?:0|[1-9]\d*|\d*[A-Za-z-][0-9A-Za-z-]*)(?:\.(?:0|[1-9]\d*|\d*[A-Za-z-][0-9A-Za-z-]*))*$/;
+
+/**
+ * Validate the release a canary is proving (#888).
+ *
+ * Accepts a stable target (`0.0.1`) and a prerelease target (`0.0.1-beta.12`), because a canary
+ * must encode the release it is tied to — a bare `0.0.1-canary.N` cut for beta.12 says nothing
+ * about which release it proved, which is the provenance loss #888 was opened to fix.
+ *
+ * Rejects build metadata, which JSR does not accept, and rejects a target that is already a
+ * canary, which would derive `...-canary.1-canary.1`.
+ */
 export function validateStableTarget(version: string): void {
-  if (!/^(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)$/.test(version)) {
-    throw new Error(
-      `Canary target must be a stable semantic version without a prerelease or build suffix: ${version}`,
-    );
+  const invalid = (reason: string): never => {
+    throw new Error(`Canary target ${reason}: ${version}`);
+  };
+  if (version.includes('+')) invalid('must not carry build metadata');
+
+  const core = VERSION_CORE.exec(version);
+  if (!core || (version.length > core[0].length && version[core[0].length] !== '-')) {
+    invalid('must be a semantic version');
   }
+  const prerelease = version.slice(core![0].length + 1);
+  if (version.length === core![0].length) return; // stable target
+
+  if (!prerelease || !PRERELEASE_IDENTIFIERS.test(prerelease)) {
+    invalid('has a malformed prerelease');
+  }
+  if (prerelease.split('.').includes(CANARY_PRERELEASE_LABEL)) {
+    invalid('is already a canary');
+  }
+}
+
+/**
+ * Join a canary label onto its target so the result stays correctly ordered.
+ *
+ * A stable target keeps the historical `0.0.1-canary.N` shape. A prerelease target appends
+ * `.canary.N` **with a dot, not a hyphen** — and that is not cosmetic. Semver compares
+ * prerelease identifiers pairwise, and a numeric identifier always loses to a non-numeric one,
+ * so `0.0.1-beta.12-canary.1` parses as `[beta, "12-canary", 1]` and sorts ABOVE `0.0.1-beta.13`,
+ * `0.0.1-beta.20`, and every later beta forever. The dotted form parses as
+ * `[beta, 12, canary, 1]`, which sorts above `0.0.1-beta.12` (the release it proves) and below
+ * everything after it. Verified with `@std/semver`.
+ */
+export function canarySuffix(targetVersion: string, ordinal: number): string {
+  const separator = targetVersion.includes('-') ? '.' : '-';
+  return `${targetVersion}${separator}${CANARY_PRERELEASE_LABEL}.${ordinal}`;
 }
 
 /** Derive the next immutable canary version across every effective publish member. */
@@ -86,15 +129,16 @@ export async function deriveCanaryVersion(
     observed.add(tag.startsWith('v') ? tag.slice(1) : tag);
   }
 
+  const separator = targetVersion.includes('-') ? '\\.' : '-';
   const pattern = new RegExp(
-    `^${escapeRegExp(targetVersion)}-${CANARY_PRERELEASE_LABEL}\\.(0|[1-9]\\d*)$`,
+    `^${escapeRegExp(targetVersion)}${separator}${CANARY_PRERELEASE_LABEL}\\.(0|[1-9]\\d*)$`,
   );
   let maximum = 0;
   for (const version of observed) {
     const match = pattern.exec(version);
     if (match) maximum = Math.max(maximum, Number(match[1]));
   }
-  return `${targetVersion}-${CANARY_PRERELEASE_LABEL}.${maximum + 1}`;
+  return canarySuffix(targetVersion, maximum + 1);
 }
 
 /** Create the ephemeral canary branch and immutable provenance tag; never open a PR. */
@@ -137,7 +181,7 @@ export async function readRegistryVersions(
 async function listTags(root: string, targetVersion: string): Promise<readonly string[]> {
   const result = await runCommand(
     'git',
-    ['tag', '--list', `v${targetVersion}-${CANARY_PRERELEASE_LABEL}.*`],
+    ['tag', '--list', `v${canarySuffix(targetVersion, 0).slice(0, -1)}*`],
     root,
   );
   if (result.code !== 0) throw new Error(`git tag --list failed with exit ${result.code}.`);
