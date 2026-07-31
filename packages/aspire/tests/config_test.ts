@@ -121,6 +121,15 @@ Deno.test('config', async (t) => {
     assertEquals(result.NetScript.BackgroundProcessors.sagas?.Sagas?.Store?.Backend, 'kv');
   });
 
+  await t.step('AppSettingsSchema: preserves host-side Aspire parameters', () => {
+    const result = AppSettingsSchema.parse({
+      Parameters: { 'mssql-password': 'secret' },
+      NetScript: { Name: 'parameterized-app' },
+    });
+
+    assertEquals(result.Parameters, { 'mssql-password': 'secret' });
+  });
+
   await t.step('parseAppSettings: parses background processors', async () => {
     const { config } = await parseAppSettings(REAL_CONFIG_PATH);
 

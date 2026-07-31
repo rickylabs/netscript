@@ -166,6 +166,20 @@ Deno.test('#955 setProjectConfigValue --force writes an off-schema key with no s
   });
 });
 
+Deno.test('#975 setProjectConfigValue writes a modelled Aspire parameter without --force', async () => {
+  await withProject(async ({ root, fs }) => {
+    const result = await setProjectConfigValue(
+      fs,
+      root,
+      'Parameters.postgres-password',
+      'pw',
+    );
+
+    assertEquals(result.forced, false);
+    assertEquals(result.canonicalPath, 'Parameters.postgres-password');
+  });
+});
+
 Deno.test('#955 readAppsettingsValue resolves the same spellings as set', async () => {
   await withProject(async ({ root, fs }) => {
     assertEquals(

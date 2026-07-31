@@ -84,6 +84,7 @@ export function createInitCommand(
     .option('--no-git', 'Skip git init after scaffolding')
     .option('--force', 'Overwrite existing target directory', { default: false })
     .option('--ci', 'Non-interactive mode', { default: false })
+    .option('--non-interactive', 'Run without prompting', { default: false })
     .option('-y, --yes', 'Accept defaults without prompting', { default: false })
     .option('--path <path:string>', 'Target directory for scaffold output')
     .option('--dry-run', 'Preview scaffold plan without writing files', { default: false })
@@ -100,9 +101,12 @@ export function createInitCommand(
           throw new Error(`preset "${options.from}" is not registered`);
         }
       }
+      const nonInteractiveOptions = options.nonInteractive === true
+        ? { ...options, ci: true }
+        : options;
       const resolved = await resolveInteractiveInitInput(
         dependencies.prompt,
-        options,
+        nonInteractiveOptions,
         nameArg,
         dependencies.defaultProjectName,
         Deno.stdin.isTerminal(),

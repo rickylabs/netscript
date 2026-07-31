@@ -22,6 +22,18 @@ verification: scaffold a project non-interactively, clone it clean, and start it
 
 Whether that is one root cause or two is for the implementation to determine and state in the PR.
 
+## Implementation result
+
+The four symptoms are two adjacent contract mismatches, not one shared code cause:
+
+1. Generated-artifact contract: `.gitignore` and `AppSettingsSchema` disagreed with what the
+   scaffold emits and later consumes.
+2. Invocation contract: init target resolution assumed a parent cwd, while non-TTY behavior lacked
+   the explicit `--non-interactive` spelling requested by scripted callers.
+
+Focused regression tests pass after the fix. See `worklog.md` for fails-before and gate evidence;
+see `drift.md` for the corrected #968 framing and the baseline Aspire JSR audit failure.
+
 ## Assessment
 
 MECHANICAL. No plan document; straight to implementation.

@@ -150,13 +150,47 @@ Deno.test('interactive init prompts for all missing scaffold choices', async () 
   ]);
 });
 
-function fakeInitContext(): InitPipelineContext {
+Deno.test('#968 non-terminal init uses defaults without invoking a prompt', async () => {
+  const prompt: PromptPort = {
+    input: () => Promise.reject(new Error('input prompt must not run')),
+    confirm: () => Promise.reject(new Error('confirm prompt must not run')),
+    select: () => Promise.reject(new Error('select prompt must not run')),
+  };
+
+  const resolved = await resolveInteractiveInitInput(
+    prompt,
+    {},
+    undefined,
+    () => 'ci-app',
+    false,
+  );
+
+  assertEquals(resolved.name, 'ci-app');
+  assertEquals(resolved.options, {});
+});
+
+Deno.test('#967 init uses a cwd whose basename already matches the project name', async () => {
+  const validated = await validateOptions(fakeInitContext('/workspace/my-app'), {
+    name: 'my-app',
+    importMode: 'jsr',
+    force: false,
+    ci: true,
+    yes: false,
+    dryRun: false,
+    noGit: true,
+    noAspire: false,
+  });
+
+  assertEquals(validated.targetPath, '/workspace/my-app');
+});
+
+function fakeInitContext(cwd = '/workspace'): InitPipelineContext {
   return {
     fs: {
       exists: () => Promise.resolve(false),
       readDir: () => Promise.resolve([]),
     },
-    cwd: () => '/workspace',
+    cwd: () => cwd,
     resolveModeFields: () => ({}),
   } as unknown as InitPipelineContext;
 }
