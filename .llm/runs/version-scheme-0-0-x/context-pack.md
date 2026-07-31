@@ -6,16 +6,16 @@
 | --- | --- |
 | Run ID | `version-scheme-0-0-x` |
 | Branch | `chore/version-scheme-0-0-x` |
-| Current phase | `plan-eval — blocked` |
+| Current phase | `implementation — owner-authorized plan evaluation` |
 | Archetype | `6 — CLI / Tooling` |
 | Scope overlays | `docs` |
 
 ## Current State
 
-Research and Design are complete against `origin/main@8dca67985`. The branch contains only the
-launcher brief commits plus these run artifacts; no implementation change has started. The
-mandatory separate Qwen PLAN-EVAL is blocked because the selected local Claude/OpenRouter profile
-has no OpenRouter credential.
+Research and Design are complete against `origin/main@8dca67985`. The selected local
+Claude/OpenRouter PLAN-EVAL route remains unavailable because it has no OpenRouter credential. The
+owner explicitly waived that automated lane, is evaluating the committed plan personally, and
+authorized implementation to proceed. No PLAN-EVAL verdict is recorded or implied.
 
 ## Completed
 
@@ -24,18 +24,14 @@ has no OpenRouter credential.
 - Identified nested-lock, generic Markdown-pin, CLI guard, and runtime-version derivation gaps.
 - Selected Archetype 6 with Docs overlay and locked four sequential commit slices.
 
-## Blocked
+## In Progress
 
-- The live evaluator-provider canary returned `credential=absent` / `auth_required`; no evaluator
-  session was created.
-- Harness policy forbids implementation before an independent PLAN-EVAL `PASS`.
+- S1 release discovery and stale-pin guard implementation under the owner-authorized override.
 
 ## Next Steps
 
-1. Obtain an OpenRouter credential for the selected local evaluator route, or receive explicit
-   owner authorization for the cloud OpenHands open-model fallback.
-2. Run separate-session PLAN-EVAL; do not implement before `PASS`.
-3. Execute S1–S4 only after the plan gate passes.
+1. Execute S1–S4 from the committed plan.
+2. Keep the PR draft until the required release dry-run proof and final evaluation are complete.
 
 ## Key Decisions
 
@@ -59,14 +55,13 @@ has no OpenRouter credential.
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
 | Static | Baseline PASS | Census and raw Git evidence in `worklog.md` |
-| Fitness | BLOCKED | JSR surface scan recorded; PLAN-EVAL provider credential absent |
+| Fitness | Owner evaluation in progress | Automated PLAN-EVAL unavailable; no verdict recorded |
 | Runtime | Degraded | Runtime controller cannot prove mobile attachment |
 | Consumer | NOT_RUN | Release dry-run reserved for S4 |
 
 ## Open Questions
 
-- Will the owner provide the local OpenRouter credential, or explicitly authorize the cloud
-  OpenHands open-model evaluator fallback?
+- None blocking implementation under the recorded owner authorization.
 
 ## Drift and Debt
 

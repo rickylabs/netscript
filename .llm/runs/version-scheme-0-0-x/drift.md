@@ -106,3 +106,19 @@
   the evaluator blocker, and keep implementation stopped pending a formal PASS.
 - **Evidence:** `git log --oneline --parents 8dca67985..HEAD` and the clean worktree after
   reconciliation.
+
+## 2026-07-31 — Owner authorized implementation while personally evaluating the plan
+
+- **What:** The automated PLAN-EVAL lane remains unavailable, and the owner explicitly authorized
+  implementation to proceed while conducting the plan evaluation personally.
+- **Source:** Owner instruction on 2026-07-31.
+- **Expected:** The lane-policy Qwen evaluator runs through the `claude-openrouter` profile before
+  implementation.
+- **Actual:** The lane-policy Qwen evaluator reported `credential=absent` and `auth_required`; the
+  owner explicitly waived the automated PLAN-EVAL lane and is performing the evaluation
+  personally. Implementation proceeded on that authority.
+- **Severity:** significant process override.
+- **Action:** proceed with the already-committed plan. Do not create `plan-eval.md`, self-record a
+  verdict, claim PLAN-EVAL passed, or describe the gate as skipped.
+- **Evidence:** owner authorization in the conversation and the previously recorded provider
+  canary result.

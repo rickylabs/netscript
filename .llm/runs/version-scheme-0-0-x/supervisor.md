@@ -26,3 +26,7 @@
   implementation continues in the already-open session and the mismatch is recorded in `drift.md`.
 - The run directory was created by the launcher without the branch prefix and required `--suffix`.
   It remains at the committed path to preserve provenance; this is recorded in `drift.md`.
+- The lane-policy Qwen evaluator (`claude-openrouter` profile) reported `credential=absent` and
+  `auth_required`. On 2026-07-31, the owner explicitly waived the automated PLAN-EVAL lane and is
+  performing the evaluation personally. Implementation proceeded on that owner authority. This is
+  not a self-certification, skipped gate, or recorded PLAN-EVAL verdict; no `PASS` is claimed.

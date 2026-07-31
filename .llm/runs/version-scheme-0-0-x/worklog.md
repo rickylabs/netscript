@@ -69,6 +69,7 @@ version-neutral placeholder; historical literals must identify their historical 
 | 2026-07-31 | Plan | Research | Reproduced 325 references; found 193 release-owned and 65 stale nested-lock occurrences. |
 | 2026-07-31 | Plan | Design | Locked four slices and the historical/current classification. |
 | 2026-07-31 | Plan-Eval | Provider canary | BLOCKED: local Claude/OpenRouter profile has no OpenRouter credential; no evaluator session started. |
+| 2026-07-31 | Plan-Eval | Owner authorization | Owner waived the unavailable automated lane, is evaluating personally, and authorized implementation; no verdict recorded. |
 
 ## Decisions
 
@@ -103,7 +104,7 @@ version-neutral placeholder; historical literals must identify their historical 
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| Plan-Gate | BLOCKED | Provider canary: `credential=absent`, `auth_required` | No evaluator session; hard stop before S1. |
+| Plan-Gate | OWNER EVALUATION IN PROGRESS | Owner authorization following `credential=absent` / `auth_required` | Implementation authorized; no PASS or self-verdict recorded. |
 | jsr-audit scan | PASS | `research.md`; `deno doc` on affected package surfaces | No planned export/type change. |
 
 ### Runtime Gates
@@ -123,5 +124,4 @@ version-neutral placeholder; historical literals must identify their historical 
 - PLAN-EVAL should inspect D3 (nested lock), D5 (generic/blocking Markdown scanner), and the
   historical allowlist first.
 - No implementation file has been edited before PLAN-EVAL.
-- Resume only after local OpenRouter credentials are available or the owner explicitly authorizes
-  the cloud OpenHands open-model fallback.
+- Implementation proceeds on explicit owner authority while the owner evaluates the committed plan.
