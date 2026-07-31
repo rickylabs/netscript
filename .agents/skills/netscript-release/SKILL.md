@@ -61,6 +61,14 @@ gate.
 
 ## What The Command Proves
 
+### First-party JSR specifier policy
+
+Framework source under `packages/**` and `plugins/**` must emit exact `jsr:@netscript/*` pins for
+the current release train. Consumer-facing scaffolds do not use floor ranges: a generated project
+must resolve the same coordinated package set as the CLI that generated it. Derive emitted pins
+from generated package metadata, `NETSCRIPT_RELEASE_VERSION`, or `netscriptJsrSpecifier`; the
+`check:netscript-jsr-specifiers` gate rejects versionless, stale exact, and range-pinned values.
+
 `release:cut` is fail-fast and ordered:
 
 1. Version validation refuses invalid semver and equal or older versions.

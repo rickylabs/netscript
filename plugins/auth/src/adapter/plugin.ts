@@ -4,6 +4,7 @@
  */
 
 import type { InstallStarterResource, NetScriptPlugin } from '@netscript/plugin/adapter';
+import { PLUGIN_PACKAGE_VERSION } from '../package-metadata.generated.ts';
 import { authBarrelScaffolder, DEFAULT_AUTH_BARREL_INPUT } from './resources/mod.ts';
 
 /** Starter resources emitted by the auth install command. */
@@ -17,7 +18,7 @@ export const authAdapterPlugin: NetScriptPlugin = {
   kind: 'auth',
   displayName: 'Auth',
   install: {
-    dependencySpecifier: 'jsr:@netscript/plugin-auth@^0.0.1-alpha.12',
+    dependencySpecifier: `jsr:@netscript/plugin-auth@${PLUGIN_PACKAGE_VERSION}`,
     starterResources: authStarterResources,
     configParams: ['NETSCRIPT_AUTH_BACKEND'],
     prismaContract: 'database/auth.prisma',
@@ -38,7 +39,7 @@ export const authAdapterPlugin: NetScriptPlugin = {
   },
   update: {
     strategy: 'dependency',
-    targetSpecifier: 'jsr:@netscript/plugin-auth@^0.0.1-alpha.12',
+    targetSpecifier: `jsr:@netscript/plugin-auth@${PLUGIN_PACKAGE_VERSION}`,
   },
   remove: {
     strategy: 'manifest-only',
