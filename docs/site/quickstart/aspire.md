@@ -12,8 +12,8 @@ background processors, a database, and a cache. Aspire is how we make that whole
 shortest path to seeing it; the [main Quickstart](/quickstart/) covers installing the CLI and the
 scaffold in more detail.
 
-{{ comp callout { type: "important", title: "Alpha" } }}
-NetScript is alpha software and the API is subject to change. Pin versions in real projects.
+{{ comp callout { type: "important", title: "0.0.x" } }}
+NetScript is in the 0.0.x series: the API is unfrozen until 0.1.0 and subject to change. Pin versions in real projects.
 {{ /comp }}
 
 ## What you get
