@@ -6,34 +6,34 @@
 | -------------- | ----------------------------------- |
 | Run ID         | `fix-freshui-registry-sdk-pin--953` |
 | Branch         | `fix/freshui-registry-sdk-pin`      |
-| Current phase  | `plan`                              |
+| Current phase  | `gate`                              |
 | Archetype      | `6 - CLI / Tooling`                 |
 | Scope overlays | `frontend`                          |
 
 ## Current State
 
-Research and plan are complete and the design checkpoint is recorded. The defect is understood and
-reproduced by execution: two compounding causes, not one. Implementation has not started.
+All five slices are landed and the full gate set is green. The PR (#957) sits at `status:impl`
+awaiting an IMPL-EVAL from a separate session; it is not eligible for `status:ready-merge` until
+that verdict exists.
 
 ## Completed
 
-- Research (`research.md`, F1–F12) — every claim in the owner's root-cause comment re-verified
-  against `main` @ `8e0bcef39`, plus the two findings that widen it.
-- Plan (`plan.md`) — archetype, locked decisions D1–D5, risk register, gate set.
-- Design checkpoint (`worklog.md` § Design) — public surface, vocabulary, five commit slices.
-- Drift (`drift.md`) — five entries.
+- Research, plan, design checkpoint, drift (S1).
+- `importEntryForDependency` + merge/prune symmetry + 5 unit tests (S2).
+- Manifest pins → `0.0.1-beta.11` + 2 manifest-coupled lifecycle tests (S3).
+- Guard rules — currency, export existence, range notes — + 6 guard tests (S4).
+- `publish:readiness` fails on stale pins and unexported subpaths + 1 release test (S4 reconcile).
+- Full gate set (S5).
 
 ## In Progress
 
-- Slice 1: run-dir bootstrap commit + draft PR.
+- Nothing. The run is handed off.
 
 ## Next Steps
 
-1. Commit the run dir, open the draft PR, apply labels.
-2. Slice 2 — `importEntryForDependency` + merge/prune symmetry + tests.
-3. Slice 3 — manifest pins → `0.0.1-beta.11`.
-4. Slice 4 — guard rules (currency, export existence, range reporting) + tests.
-5. Slice 5 — full gate set, PR finalisation, follow-up issue for range pins.
+1. IMPL-EVAL in a separate session; on `PASS`, move `status:impl` → `status:impl-eval` →
+   `status:ready-merge`.
+2. File the range-pin follow-up issue (drift entry 4) and link it from the PR.
 
 ## Key Decisions
 
@@ -43,26 +43,38 @@ reproduced by execution: two compounding causes, not one. Implementation has not
 | Extend `check-netscript-jsr-specifiers.ts` | plan D2 | Already a `ci:quality` dependency |
 | Currency vs. the workspace member's own version | plan D3 | Names the disagreeing package |
 | Range pins reported, not failed | plan D4 | Skew, not breakage |
+| Release-side gate lives in `publish-readiness.ts` | S4 reconcile | It already consumed the scan; a second `prepareRelease` gate was redundant |
 | Evaluator passes `NOT_RUN` | plan D5 | Single-session run cannot self-certify |
 
 ## Files Changed
 
 | Path | Status | Notes |
 | ---- | ------ | ----- |
+| `packages/cli/src/kernel/application/ui/registry-deno-json.ts` | changed | `ImportMapEntry` + `importEntryForDependency` |
+| `packages/cli/src/kernel/application/ui/registry.ts` | changed | prune uses the same entry helper |
+| `packages/cli/src/kernel/application/ui/registry-deno-json_test.ts` | new | 5 tests |
+| `packages/cli/src/kernel/application/ui/registry-lifecycle_test.ts` | changed | 2 manifest-coupled tests |
+| `packages/fresh-ui/registry.manifest.ts` | changed | 2 SDK pins → `0.0.1-beta.11` |
+| `.llm/tools/validation/check-netscript-jsr-specifiers.ts` | changed | currency + export rules, range notes |
+| `.llm/tools/validation/check-netscript-jsr-specifiers_test.ts` | changed | 6 new tests |
+| `.llm/tools/release/publish-readiness.ts` | changed | specifier check fails on stale / unexported |
+| `.llm/tools/release/publish-readiness_test.ts` | changed | stale-pin release test |
+| `.llm/tools/release/prepare-release.ts` | changed | comment naming the residue hole |
 | `.llm/runs/fix-freshui-registry-sdk-pin--953/**` | new | run artifacts |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
-| ----------- | -------------- | -------- |
-| Static      | `NOT_RUN`      | — |
-| Fitness     | `NOT_RUN`      | — |
+| ----------- | -------------- | ------------ |
+| Static      | `PASS`         | fmt 1869/0, lint 1724/0, check 2458/0, test 2243 passed |
+| Fitness     | `PASS`         | `arch:check` exit 0, `publish:dry-run` Success, `quality:scan` ok |
 | Runtime     | `N/A`          | not a release cut |
-| Consumer    | `PASS (probe)` | `/tmp/sdkprobe` three `deno check` runs |
+| Consumer    | `PASS`         | `/tmp/sdkprobe` `deno check` against published JSR |
+| Evaluator   | `NOT_RUN`      | PLAN-EVAL and IMPL-EVAL both need a separate session |
 
 ## Open Questions
 
-- None blocking. Q1 and Q2 resolved in `research.md`.
+- None blocking.
 
 ## Drift and Debt
 

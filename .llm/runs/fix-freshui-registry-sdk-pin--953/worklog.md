@@ -78,6 +78,27 @@ needed: `importEntryForDependency` already normalises any subpath to the package
 | 2026-07-31 | — | reproduce | `/tmp/sdkprobe`: map `@netscript/sdk` → `jsr:@netscript/sdk@0.0.1-beta.10/desktop`, import `@netscript/sdk/desktop` → `error: Unknown export './desktop/desktop' for '@netscript/sdk@0.0.1-beta.10'`; exports list contains neither `./desktop` nor `./auto-update`. |
 | 2026-07-31 | — | reproduce | Same probe at `@0.0.1-beta.11/desktop` → `error: Unknown export './desktop/desktop' for '@netscript/sdk@0.0.1-beta.11'` (exports list *does* contain `./desktop`). Version fix alone is insufficient. |
 | 2026-07-31 | — | reproduce | Same probe with value `jsr:@netscript/sdk@0.0.1-beta.11` (package root) → `Check main.ts`, clean. D1 confirmed. |
+| 2026-07-31 | 1 | commit | `447b9ff35` run-dir bootstrap; draft PR #957 opened, labels applied. |
+| 2026-07-31 | 2 | commit | `cf73024ef` `importEntryForDependency` + merge/prune symmetry. Gate: 12 passed / 0 failed. New test failed before the fix (`has no exported member 'importEntryForDependency'`). |
+| 2026-07-31 | 3 | commit | `ec7166488` manifest pins → beta.11 + two manifest-coupled lifecycle tests. Reverted the pins to prove the tests fail (`3 passed, 2 failed`), then restored (`14 passed, 0 failed`). |
+| 2026-07-31 | 4 | commit | `2fe7c4a14` guard rules. Reverting one pin makes the guard emit `FAIL JSR-NETSCRIPT-CURRENT … pinned 0.0.1-beta.10, this workspace ships 0.0.1-beta.11`, exit 1. |
+| 2026-07-31 | 4 | reconcile | The first draft added the guard as a separate `prepareRelease` gate. `deno task test` surfaced that `publish-readiness.ts` already consumes `scanNetscriptJsrSpecifiers` — the release gate has a home. Moved the strengthening there and dropped the duplicate. |
+| 2026-07-31 | 4 | commit | `a34f4db50` `publish:readiness` fails on stale pins and unexported subpaths; range pins land in the check's evidence details. |
+| 2026-07-31 | 5 | gate | Full gate set run — see Gate Results. |
+
+### Reconcile notes
+
+- **S1** — #953 and #956 confirmed open and unmilestoned; PR #957 carries `Closes` for both, which is
+  correct: this run resolves the whole of #953 and the fresh-ui/scaffold half of #956, and #956's
+  third observation (MCP at beta.9) does not reproduce on `main`, so nothing of it is left open.
+- **S2** — no new issue/PR comments. Discovered that `removeUiRegistryItem` matches imports by raw
+  specifier; folded pruning symmetry into the same slice rather than deferring it (plan § Hidden
+  Scope anticipated this).
+- **S3** — no new comments. No plan change.
+- **S4** — plan amended in place: the release-side gate moved from `prepare-release.ts` to
+  `publish-readiness.ts` (see the reconcile row above). Range-pin skew logged in `drift.md` and
+  carried to a follow-up issue rather than fixed here.
+- **S5** — no new comments. Gate results recorded below.
 
 ## Decisions
 
@@ -102,30 +123,43 @@ needed: `importEntryForDependency` already normalises any subpath to the package
 
 | Gate | Command or check | Result | Notes |
 | ---- | ---------------- | ------ | ----- |
-| format | `deno task fmt:check` | | |
-| lint | `deno task lint` | | |
-| type-check | `deno task check` | | |
-| type-check (fresh-ui) | `cd packages/fresh-ui && deno task check` | | root `check` excludes fresh-ui |
-| test | `deno task test` | | |
-| specifier guard | `deno task check:netscript-jsr-specifiers` | | |
+| format | `deno task fmt:check` | `PASS` | `filesSelected=1869 findings=0` |
+| lint | `deno task lint` | `PASS` | `filesSelected=1724 occurrences=0`. The root `lint.exclude` covers `packages/cli/` and `.llm/`, so this task lints neither of the two roots this run changed — a repo-wide policy, not a gap introduced here. |
+| type-check | `deno task check` | `PASS` | uncached wrapper run: `filesSelected=2458 batches=21 failedBatches=0 occurrences=0` |
+| type-check (fresh-ui) | `cd packages/fresh-ui && deno task check` | `PASS` | root `check` excludes fresh-ui |
+| test | `deno task test` | `PASS` | `2243 passed (507 steps) / 0 failed / 12 ignored` in 3m15s |
+| specifier guard | `deno task check:netscript-jsr-specifiers` | `PASS` | `scanned=2206 allowances=1 ranges=18 failures=0` |
+| scaffold pins | `deno task check:scaffold-versions` | `PASS` | `E-12 OK — 11 scaffold pin(s) are stable` |
+| code quality | `deno task quality:scan` | `PASS` | `ok:true findings:[] allowCount:7` (all pre-existing) |
 
 ### Fitness Gates
 
 | Gate | Result | Evidence | Notes |
 | ---- | ------ | -------- | ----- |
-| `deno task arch:check` | | | |
+| `deno task arch:check` | `PASS` | exit 0; every package reports `FAIL=0` | Pre-existing WARN/INFO rows only (e.g. `ai` README fences, `src/ports` cardinality); none introduced by this run. |
+| F-5 Public surface audit | `PASS` | `importEntryForDependency` is exported from a `kernel/application` module, reachable from `registry.ts` and its test; no published-surface change. |
+| F-6 JSR publishability | `PASS` | `deno task publish:dry-run` → `Success Dry run complete`, exit 0 |
+| F-10 Test-shape audit | `PASS` | 14 new behavioural assertions; no snapshots of generated strings. |
+| F-19 Scoped source gate runners | `PASS` | `run-deno-check` / `run-deno-fmt` / `run-deno-lint` over `packages/cli/src/kernel/application/ui` — 8 files, 0 findings each. |
 
 ### Runtime Gates
 
 | Gate | Result | Evidence | Notes |
 | ---- | ------ | -------- | ----- |
-| release-gate class | `N/A` | — | Not a release cut; no scaffold-output / DB / Aspire change. |
+| release-gate class | `N/A` | — | Not a release cut; no scaffold-output / DB wiring / Aspire helper change. `ui:add` is outside the `scaffold.runtime` suite. |
 
 ### Consumer Gates
 
 | Consumer | Result | Evidence | Notes |
 | -------- | ------ | -------- | ----- |
-| emitted import map vs published JSR | | `/tmp/sdkprobe` | |
+| emitted import map vs published JSR | `PASS` | `/tmp/sdkprobe` | `{"@netscript/sdk": "jsr:@netscript/sdk@0.0.1-beta.11"}` + `import … from '@netscript/sdk/desktop'` → `Check main.ts`. The two pre-fix shapes both error. |
+
+### Evaluator Gates
+
+| Gate | Result | Notes |
+| ---- | ------ | ----- |
+| PLAN-EVAL (`plan-eval.md`) | `NOT_RUN` | Requires a separate session (`run-loop.md` §4). Not self-certified. |
+| IMPL-EVAL (`evaluate.md`) | `NOT_RUN` | Requires a separate session (`run-loop.md` §7). PR stays at `status:impl`. |
 
 ## Handoff Notes
 
