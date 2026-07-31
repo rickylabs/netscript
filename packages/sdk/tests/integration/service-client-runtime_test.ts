@@ -40,13 +40,11 @@ function createRuntimeRouter() {
 
 function createLink(contract: Parameters<typeof createHttpClientLink>[0]['contract']) {
   return createHttpClientLink({
-    apiPath: '/api/rpc',
-    apiVersion: 'v1',
     contract,
     getTraceHeaders: () => ({}),
-    pathSegment: SERVICE_NAME,
     propagateTraceContext: false,
     protocol: 'http',
+    rpcPath: RPC_PATH,
     serviceName: SERVICE_NAME,
   });
 }

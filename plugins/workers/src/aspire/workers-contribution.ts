@@ -8,6 +8,9 @@ import {
 } from '@netscript/aspire/public';
 
 const WORKERS_PLUGIN_VERSION = '0.0.1-alpha.0';
+const WORKERS_API_RESOURCE = 'workers-api';
+const WORKERS_COMBINED_RESOURCE = 'workers-combined';
+const WORKERS_API_DEFAULT_PORT = 8091;
 
 const WORKERS_SERVICE_PERMISSIONS = [
   '--unstable-kv',
@@ -39,17 +42,17 @@ export class WorkersAspireContribution extends AspireNSPluginContribution {
     builder: AspireBuilder,
     ctx: ContributionContext,
   ): readonly AspireResource[] {
-    const api = builder.addDenoService('workers-api', {
+    const api = builder.addDenoService(WORKERS_API_RESOURCE, {
       workdir: ctx.projectRoot,
       entrypoint: 'plugins/workers/services/src/main.ts',
-      port: ctx.port('workers-api', 8091),
+      port: ctx.port(WORKERS_API_RESOURCE, WORKERS_API_DEFAULT_PORT),
       permissions: WORKERS_SERVICE_PERMISSIONS,
       env: {
         WORKERS_PLUGIN_VERSION,
       },
     });
 
-    const combined = builder.addDenoBackground('workers-combined', {
+    const combined = builder.addDenoBackground(WORKERS_COMBINED_RESOURCE, {
       workdir: ctx.projectRoot,
       entrypoint: 'plugins/workers/bin/combined.ts',
       permissions: WORKERS_BACKGROUND_PERMISSIONS,
@@ -57,37 +60,25 @@ export class WorkersAspireContribution extends AspireNSPluginContribution {
       watchMode: true,
     });
 
-    const scheduler = builder.addDenoBackground('workers-scheduler', {
-      workdir: ctx.projectRoot,
-      entrypoint: 'plugins/workers/bin/scheduler.ts',
-      permissions: WORKERS_BACKGROUND_PERMISSIONS,
-      watchMode: true,
-    });
+    builder.waitFor(combined.name, api.name);
 
-    const worker = builder.addDenoBackground('workers-worker', {
-      workdir: ctx.projectRoot,
-      entrypoint: 'plugins/workers/bin/worker.ts',
-      permissions: WORKERS_BACKGROUND_PERMISSIONS,
-      concurrencyEnvVar: 'WORKER_CONCURRENCY',
-      watchMode: true,
-    });
-
-    return [api, combined, scheduler, worker];
+    return [api, combined];
   }
 
   /** Declare environment values used by workers Aspire resources. */
   override declareEnv(_ctx: ContributionContext): Record<string, EnvSource | string> {
     return {
-      WORKERS_API_URL: 'http://localhost:8091',
+      WORKERS_API_URL: { kind: 'resource', resource: WORKERS_API_RESOURCE, key: 'url' },
       WORKER_CONCURRENCY: '2',
     };
   }
 
   /** Declare health checks used by plugin doctor commands. */
-  override declareHealthChecks(_ctx: ContributionContext): readonly HealthCheckSpec[] {
+  override declareHealthChecks(ctx: ContributionContext): readonly HealthCheckSpec[] {
+    const apiPort = ctx.port(WORKERS_API_RESOURCE, WORKERS_API_DEFAULT_PORT);
     return [{
-      resource: 'workers-api',
-      url: 'http://localhost:8091/health',
+      resource: WORKERS_API_RESOURCE,
+      url: `http://localhost:${apiPort}/health`,
       expect: 200,
       timeoutMs: 3000,
     }];

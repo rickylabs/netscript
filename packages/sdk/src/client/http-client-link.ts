@@ -49,14 +49,10 @@ export interface HttpClientLinkOptions<TContract extends ContractLike> {
   contract: TContract;
   /** Service name resolved through NetScript discovery. */
   serviceName: string;
-  /** URL path segment for the service router. */
-  pathSegment: string;
+  /** Canonical RPC path for the service router. */
+  rpcPath: string;
   /** Resolved protocol for service discovery. */
   protocol: 'http' | 'https';
-  /** Base API RPC path. */
-  apiPath: string;
-  /** API version segment. */
-  apiVersion: string;
   /** Whether trace headers should be attached automatically. */
   propagateTraceContext: boolean;
   /** Trace header provider used when propagation is enabled. */
@@ -67,10 +63,8 @@ export interface HttpClientLinkOptions<TContract extends ContractLike> {
 export function createHttpClientLink({
   contract,
   serviceName,
-  pathSegment,
+  rpcPath,
   protocol,
-  apiPath,
-  apiVersion,
   propagateTraceContext,
   getTraceHeaders,
 }: HttpClientLinkOptions<ContractLike>): ClientLinkPort<ServiceClientContext> {
@@ -83,7 +77,7 @@ export function createHttpClientLink({
     // data instead of touching Deno APIs at import time.
     url: () => {
       const baseUrl = getServiceUrl(serviceName, protocol);
-      return `${baseUrl}${apiPath}/${apiVersion}/${pathSegment}`;
+      return `${baseUrl}${rpcPath}`;
     },
     method: inferRPCMethodFromContractRouter(contract),
     headers: (options: ClientOptions<HttpRuntimeClientContext>) => {

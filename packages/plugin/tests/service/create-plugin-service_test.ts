@@ -1,6 +1,6 @@
 import { assertEquals } from '@std/assert';
 import { implement, os } from '@orpc/server';
-import { createPluginService } from '../../src/service/mod.ts';
+import { assemblePluginContractRouter, createPluginService } from '../../src/service/mod.ts';
 import {
   BASE_PLUGIN_CONTRACT_ROUTES,
   type BasePluginContract,
@@ -21,10 +21,14 @@ const capabilities: PluginCapabilities = {
 // deno-lint-ignore no-explicit-any
 const implemented = implement(sampleContract as any);
 // deno-lint-ignore no-explicit-any
-const router: any = os.router({
+const handlers: any = os.router({
   // deno-lint-ignore no-explicit-any
   describe: (implemented as any).describe.handler(() => capabilities),
 });
+const router = assemblePluginContractRouter(
+  { router: () => handlers },
+  { version: 'v1', namespace: 'sample', handlers },
+);
 
 Deno.test('createPluginService serves health, service info, and the describe oRPC route', async () => {
   const app = createPluginService(router, {
@@ -48,11 +52,17 @@ Deno.test('createPluginService serves health, service info, and the describe oRP
   assertEquals(infoBody.service, 'sample');
   assertEquals(infoBody.version, '9.9.9');
 
-  const describe = await app.request('/api/describe');
+  const describe = await app.request('/api/v1/sample/describe');
   assertEquals(describe.status, 200);
   const describeBody = await describe.json();
   assertEquals(describeBody.pluginName, '@netscript/plugin-sample');
   assertEquals(describeBody.contractVersions, ['v1']);
+
+  const canonicalDescribe = await app.request('/api/rpc/v1/sample/describe');
+  assertEquals(canonicalDescribe.status, 200);
+
+  const legacyDescribe = await app.request('/api/rpc/v1/describe');
+  assertEquals(legacyDescribe.status, 200);
 });
 
 Deno.test('createPluginService runs onStartup hooks on serve()', async () => {

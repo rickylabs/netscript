@@ -241,6 +241,7 @@ export function createTriggersService(
   };
   return createPluginService(router, {
     name: TRIGGERS_API_SERVICE_NAME,
+    routerName: 'triggers',
     version: VERSION,
     port,
     serveRpc: true,
