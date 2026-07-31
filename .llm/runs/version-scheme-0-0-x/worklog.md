@@ -71,6 +71,7 @@ version-neutral placeholder; historical literals must identify their historical 
 | 2026-07-31 | Plan-Eval | Provider canary | BLOCKED: local Claude/OpenRouter profile has no OpenRouter credential; no evaluator session started. |
 | 2026-07-31 | Plan-Eval | Owner authorization | Owner waived the unavailable automated lane, is evaluating personally, and authorized implementation; no verdict recorded. |
 | 2026-07-31 | S1 | Release discovery and guards | Added nested member locks to coordinated bump/residue, generalized Markdown and CLI pin guards, and removed frozen CLI test pins. |
+| 2026-07-31 | S2 | Runtime derivation and lock reconciliation | Derived MCP/saga-core/streams-core runtime versions, regenerated Fresh UI's tracked lock through Deno, and extended scoped wrappers with explicit package configs. |
 
 ## Decisions
 
@@ -103,6 +104,13 @@ version-neutral placeholder; historical literals must identify their historical 
 | S1 focused tests | 24 bump/preflight/readiness/CLI guard tests + 18 cut/canary tests | PASS | 42 passed, 0 failed. |
 | S1 scoped wrappers | check/lint/fmt on `.llm/tools/deps`, `.llm/tools/release`, and `packages/cli/src` | PASS | 0 diagnostics/findings; CLI check covered 623 files. |
 | S1 quality gate | `deno task quality:gate` | PASS | Quality scan had 0 findings; doctrine checks had no failures (existing warnings only). |
+| S2 publish assets | `deno task check:publish-assets` | PASS | Core package metadata outputs are generator-owned and fresh. |
+| S2 package tests | MCP 47; saga-core 53; streams-core 10 | PASS | 110 passed, 0 failed. |
+| Fresh UI package task | `deno task --config packages/fresh-ui/deno.json test` | FAIL | 164 passed; 2 existing temp-writing tests lacked task permission. |
+| Fresh UI explicit-permission rerun | complete 166-test selection with the same nested lock | PASS | 166 passed, 0 failed. |
+| S2 scoped wrappers | check/lint/fmt for MCP, saga-core, streams-core, Fresh UI | PASS after tooling fix | Initial lint/fmt runs failed to parse root workspace; explicit `--config` support added and tested. |
+| S2 quality gate | `deno task quality:gate` | PASS | 0 quality findings; no doctrine failures. |
+| S2 doc lint | MCP / saga-core / streams-core full exports | BASELINE | MCP 0 diagnostics; saga-core 8 and streams-core 5 private-type refs exactly match `origin/main`. |
 
 ### Fitness Gates
 

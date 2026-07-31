@@ -26,7 +26,7 @@ authorized implementation to proceed. No PLAN-EVAL verdict is recorded or implie
 
 ## In Progress
 
-- S1 is implemented and locally green; commit/push and PR slice evidence are next.
+- S2 is implemented and locally validated; commit/push and PR slice evidence are next.
 
 ## Next Steps
 
@@ -51,6 +51,10 @@ authorized implementation to proceed. No PLAN-EVAL verdict is recorded or implie
 | `.llm/runs/version-scheme-0-0-x/codex-thread-ids.md` | new (launcher-owned) | Route/session provenance |
 | `.llm/tools/deps`, `.llm/tools/release`, `.github/workflows/release-canary.yml` | modified | Nested-lock and generic release-pin policy |
 | `packages/cli/src/**` tests | modified | Generic guard plus derived/version-neutral fixtures |
+| `.llm/tools/generate-publish-assets.ts`, package generated metadata | modified/new | Runtime version derivation for core packages |
+| `packages/mcp`, `packages/plugin-{sagas,streams}-core` | modified | Generated runtime version consumers |
+| `packages/fresh-ui/deno.lock` | regenerated | Native Deno reconciliation; beta.11 removed |
+| `.llm/tools/run-deno-{lint,fmt}.ts` | modified | Explicit package-config passthrough for trustworthy scoped gates |
 
 ## Gates
 

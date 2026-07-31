@@ -1,4 +1,5 @@
 import { assertEquals } from '@std/assert';
+import { MCP_PACKAGE_VERSION } from '../src/publish-assets.generated.ts';
 
 Deno.test('stdio initialize, list, and unreachable doctor round trip', async () => {
   const command = new Deno.Command(Deno.execPath(), {
@@ -35,6 +36,7 @@ Deno.test('stdio initialize, list, and unreachable doctor round trip', async () 
     JSON.parse(line)
   );
   assertEquals(responses[0].result.serverInfo.name, '@netscript/mcp');
+  assertEquals(responses[0].result.serverInfo.version, MCP_PACKAGE_VERSION);
   assertEquals(responses[1].result.tools.length, 13);
   assertEquals(responses[2].result.structuredContent.status, 'warn');
 });

@@ -122,3 +122,32 @@
   verdict, claim PLAN-EVAL passed, or describe the gate as skipped.
 - **Evidence:** owner authorization in the conversation and the previously recorded provider
   canary result.
+
+## 2026-07-31 — Scoped lint/fmt wrappers needed explicit package config support
+
+- **What:** Scoped lint and format invocations for MCP and the core packages failed before reading
+  files because Deno resolved the root configuration and rejected its legacy workspace shape in
+  this command path.
+- **Source:** S2 scoped wrapper runs.
+- **Expected:** `run-deno-lint.ts --root <package>` and `run-deno-fmt.ts --root <package>` validate
+  the selected package.
+- **Actual:** Both wrappers reported a tooling failure: `Failed to parse "workspace"
+  configuration`; no lint or format finding was produced.
+- **Severity:** significant gate-tooling drift.
+- **Action:** add an optional `--config <package>/deno.json` passthrough to both existing wrappers,
+  test the wrapper behavior, and rerun every affected package successfully with its explicit config.
+- **Evidence:** initial failed wrapper output plus green explicit-config runs for MCP, saga-core,
+  streams-core, and Fresh UI.
+
+## 2026-07-31 — Fresh UI test task lacks permissions required by two owned tests
+
+- **What:** The checked-in Fresh UI `test` task grants only read permission, while two Markdown
+  renderer tests create temporary directories.
+- **Source:** `deno task --config packages/fresh-ui/deno.json test` during S2.
+- **Expected:** The package task runs its complete suite.
+- **Actual:** 164 tests passed and 2 failed with `NotCapable` before assertions. The same complete
+  166-test selection passed with `--allow-all` and the same lockfile.
+- **Severity:** minor pre-existing task drift.
+- **Action:** report the task failure honestly; use the explicit-permission rerun as S2 behavior
+  evidence without changing the unrelated task definition.
+- **Evidence:** S2 worklog gate table.
