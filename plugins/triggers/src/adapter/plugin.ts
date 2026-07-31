@@ -4,6 +4,7 @@
  */
 
 import type { InstallStarterResource, NetScriptPlugin } from '@netscript/plugin/adapter';
+import { PLUGIN_PACKAGE_VERSION } from '../package-metadata.generated.ts';
 import {
   barrelScaffolder,
   DEFAULT_BARREL_INPUT,
@@ -32,7 +33,7 @@ export const triggersAdapterPlugin: NetScriptPlugin = {
   kind: 'triggers',
   displayName: 'Trigger Processor',
   install: {
-    dependencySpecifier: 'jsr:@netscript/plugin-triggers@^0.0.1-alpha.12',
+    dependencySpecifier: `jsr:@netscript/plugin-triggers@${PLUGIN_PACKAGE_VERSION}`,
     starterResources: triggersStarterResources,
     configParams: ['TRIGGERS_API_URL', 'TRIGGER_CONCURRENCY'],
     wiringEntry: '@netscript/plugin-triggers-core/stores',
@@ -52,7 +53,7 @@ export const triggersAdapterPlugin: NetScriptPlugin = {
   },
   update: {
     strategy: 'dependency',
-    targetSpecifier: 'jsr:@netscript/plugin-triggers@^0.0.1-alpha.12',
+    targetSpecifier: `jsr:@netscript/plugin-triggers@${PLUGIN_PACKAGE_VERSION}`,
   },
   remove: {
     strategy: 'manifest-only',

@@ -102,7 +102,7 @@ Deno.test('a subpath the package does not export fails even when the version is 
   }
 });
 
-Deno.test('range pins and template placeholders are reported, never failed', async () => {
+Deno.test('range pins fail while template placeholders remain version-neutral', async () => {
   const root = await workspaceWithSdk(
     `export const range = ['jsr:@netscript/sdk@^0.0.1-beta.5'];\n` +
       `export const doc = 'deno add jsr:@netscript/sdk@<version>/desktop';\n`,
@@ -112,7 +112,7 @@ Deno.test('range pins and template placeholders are reported, never failed', asy
 
     assertEquals(result.ranges.length, 1);
     assertEquals(result.ranges[0].specifier, 'jsr:@netscript/sdk@^0.0.1-beta.5');
-    assertEquals(failureCount(result), 0);
+    assertEquals(failureCount(result), 1);
   } finally {
     await Deno.remove(root, { recursive: true });
   }

@@ -11,6 +11,7 @@ const stalePaths: string[] = [];
 export const PUBLISH_ASSET_OUTPUTS = [
   'packages/mcp/src/publish-assets.generated.ts',
   'packages/cli/src/kernel/assets/publish-assets.generated.ts',
+  'packages/fresh-ui/src/package-metadata.generated.ts',
   'plugins/ai/src/package-metadata.generated.ts',
   'plugins/auth/src/package-metadata.generated.ts',
   'plugins/sagas/src/package-metadata.generated.ts',
@@ -105,10 +106,25 @@ export const PLUGIN_PACKAGE_VERSION: string = ${JSON.stringify(version)};
   }
 }
 
+async function generateFreshUiMetadata(): Promise<void> {
+  const version = await readVersion('packages/fresh-ui/deno.json');
+  await write(
+    'packages/fresh-ui/src/package-metadata.generated.ts',
+    `/** Version of the published Fresh UI package. */
+export const FRESH_UI_PACKAGE_VERSION: string = ${JSON.stringify(version)};
+`,
+  );
+}
+
 if (import.meta.main) {
   const unknownArgs = Deno.args.filter((arg) => arg !== '--check');
   if (unknownArgs.length > 0) throw new Error(`Unknown argument: ${unknownArgs[0]}`);
-  await Promise.all([generateMcpAssets(), generateCliAssets(), generatePluginMetadata()]);
+  await Promise.all([
+    generateMcpAssets(),
+    generateCliAssets(),
+    generateFreshUiMetadata(),
+    generatePluginMetadata(),
+  ]);
   if (stalePaths.length > 0) {
     throw new Error(
       `publish assets are stale: ${

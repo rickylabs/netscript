@@ -4,6 +4,7 @@
  */
 
 import type { InstallStarterResource, NetScriptPlugin } from '@netscript/plugin/adapter';
+import { PLUGIN_PACKAGE_VERSION } from '../package-metadata.generated.ts';
 import {
   barrelScaffolder,
   DEFAULT_BARREL_INPUT,
@@ -26,7 +27,7 @@ export const streamsAdapterPlugin: NetScriptPlugin = {
   kind: 'streams',
   displayName: 'Durable Streams',
   install: {
-    dependencySpecifier: 'jsr:@netscript/plugin-streams@^0.0.1-alpha.12',
+    dependencySpecifier: `jsr:@netscript/plugin-streams@${PLUGIN_PACKAGE_VERSION}`,
     starterResources: streamsStarterResources,
     configParams: ['STREAMS_API_URL'],
     wiringEntry: '@netscript/plugin-streams/streams',
@@ -46,7 +47,7 @@ export const streamsAdapterPlugin: NetScriptPlugin = {
   },
   update: {
     strategy: 'dependency',
-    targetSpecifier: 'jsr:@netscript/plugin-streams@^0.0.1-alpha.12',
+    targetSpecifier: `jsr:@netscript/plugin-streams@${PLUGIN_PACKAGE_VERSION}`,
   },
   remove: {
     strategy: 'manifest-only',

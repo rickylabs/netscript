@@ -11,8 +11,8 @@
  * 3. **Real** — an export subpath must exist in that package's `exports`.
  *
  * Rules 2 and 3 need a workspace to compare against; when the root `deno.json` declares no
- * workspace, only rule 1 runs. Range pins (`^`, `~`, `>=`) and template placeholders are listed as
- * notes, never failures — a range still resolves, so rewriting one is a release-policy decision.
+ * workspace, only rule 1 runs. Range pins (`^`, `~`, `>=`) fail because first-party emitted
+ * specifiers must track the release train exactly. Template placeholders remain version-neutral.
  *
  * Tests, fixtures, examples, documentation, and comments are excluded because they do not become
  * runtime or generated-project specifiers. A deliberate exception may use an inline
@@ -71,7 +71,7 @@ export interface UnknownExportFinding {
   readonly exports: readonly string[];
 }
 
-/** A range-pinned `@netscript/*` specifier: reported so the skew stays visible, never failed. */
+/** A range-pinned `@netscript/*` specifier, forbidden by the exact release-train policy. */
 export interface RangeSpecifierNote {
   readonly path: string;
   readonly line: number;
@@ -406,9 +406,10 @@ function inspectVersionedSpecifier(
   }
 }
 
-/** Total failing occurrences across the three rules; range notes never count. */
+/** Total failing occurrences across the exact release-train and export rules. */
 export function failureCount(result: SpecifierScanResult): number {
-  return result.findings.length + result.staleVersions.length + result.unknownExports.length;
+  return result.findings.length + result.staleVersions.length + result.unknownExports.length +
+    result.ranges.length;
 }
 
 function printResult(result: SpecifierScanResult, pretty: boolean): void {
@@ -439,7 +440,10 @@ function printResult(result: SpecifierScanResult, pretty: boolean): void {
     );
   }
   for (const range of result.ranges) {
-    console.log(`NOTE JSR-NETSCRIPT-RANGE ${range.path}:${range.line} ${range.specifier}`);
+    console.error(
+      `FAIL JSR-NETSCRIPT-RANGE ${range.path}:${range.line} ${range.specifier} — ` +
+        'first-party emitted specifiers must use the exact workspace release version',
+    );
   }
   console.log(
     `NetScript JSR emitted-specifier guard: scanned=${result.scannedFiles} ` +

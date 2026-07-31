@@ -4,6 +4,7 @@
  */
 
 import type { InstallStarterResource, NetScriptPlugin } from '@netscript/plugin/adapter';
+import { PLUGIN_PACKAGE_VERSION } from '../package-metadata.generated.ts';
 import {
   agentResource,
   barrelScaffolder,
@@ -50,7 +51,7 @@ export const aiAdapterPlugin: NetScriptPlugin = {
   kind: 'ai',
   displayName: 'AI Chat',
   install: {
-    dependencySpecifier: 'jsr:@netscript/plugin-ai@^0.0.1-beta.1',
+    dependencySpecifier: `jsr:@netscript/plugin-ai@${PLUGIN_PACKAGE_VERSION}`,
     starterResources: aiStarterResources,
     configParams: ['AI_MODEL', 'ANTHROPIC_API_KEY'],
   },
@@ -86,7 +87,7 @@ export const aiAdapterPlugin: NetScriptPlugin = {
   },
   update: {
     strategy: 'dependency',
-    targetSpecifier: 'jsr:@netscript/plugin-ai@^0.0.1-beta.1',
+    targetSpecifier: `jsr:@netscript/plugin-ai@${PLUGIN_PACKAGE_VERSION}`,
   },
   remove: {
     strategy: 'manifest-only',
