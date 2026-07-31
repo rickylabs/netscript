@@ -72,6 +72,7 @@ version-neutral placeholder; historical literals must identify their historical 
 | 2026-07-31 | Plan-Eval | Owner authorization | Owner waived the unavailable automated lane, is evaluating personally, and authorized implementation; no verdict recorded. |
 | 2026-07-31 | S1 | Release discovery and guards | Added nested member locks to coordinated bump/residue, generalized Markdown and CLI pin guards, and removed frozen CLI test pins. |
 | 2026-07-31 | S2 | Runtime derivation and lock reconciliation | Derived MCP/saga-core/streams-core runtime versions, regenerated Fresh UI's tracked lock through Deno, and extended scoped wrappers with explicit package configs. |
+| 2026-07-31 | S3 | Docs, process, and fixtures | Replaced current beta-train policy with normal `0.0.x`/pre-1.0 language, regenerated skill and CLI mirrors, and preserved explicit history. |
 | 2026-07-31 | S1 follow-up | CI determinism | Sorted Markdown pin findings by path then line and expanded the regression fixture across nested directories after CI exposed walk-order variance. |
 
 ## Decisions
@@ -112,6 +113,11 @@ version-neutral placeholder; historical literals must identify their historical 
 | S2 scoped wrappers | check/lint/fmt for MCP, saga-core, streams-core, Fresh UI | PASS after tooling fix | Initial lint/fmt runs failed to parse root workspace; explicit `--config` support added and tested. |
 | S2 quality gate | `deno task quality:gate` | PASS | 0 quality findings; no doctrine failures. |
 | S2 doc lint | MCP / saga-core / streams-core full exports | BASELINE | MCP 0 diagnostics; saga-core 8 and streams-core 5 private-type refs exactly match `origin/main`. |
+| S3 docs links | `deno task docs:links` | PASS | 98 docs; 0 broken links, anchors, or enforced orphans. |
+| S3 skill mirrors | `agentic:sync-claude:check` + `agentic:check-claude` | PASS | 17 skills / 21 files synchronized; Claude surface valid; lock unchanged. |
+| S3 focused tests | Fresh UI desktop 7 + CLI E2E scaffold gate 5 | PASS | 12 passed, 0 failed. |
+| S3 scoped wrappers | CLI E2E and Fresh UI check/lint/fmt | PASS | 107 CLI E2E and 149 Fresh UI files covered. |
+| S3 release preflight | `deno task release:preflight` | PASS | Text imports, import attributes, file URLs, and self-imports clean. |
 
 ### Fitness Gates
 
@@ -138,3 +144,26 @@ version-neutral placeholder; historical literals must identify their historical 
   historical allowlist first.
 - No implementation file has been edited before PLAN-EVAL.
 - Implementation proceeds on explicit owner authority while the owner evaluates the committed plan.
+
+## Baseline Tier Census
+
+The 325 baseline occurrences map as follows; the final release proof will confirm the mechanisms.
+
+| Classification | Baseline count | Disposition |
+| --- | ---: | --- |
+| Tier 1 — exact literal deleted | 41 | Obsolete roadmap/process pins, frozen tests, and current doc examples removed or made version-neutral. |
+| Tier 2 — reduced to stage word | 7 | UI templates and design footers now say `pre-1.0`. |
+| Tier 3 — release-owned / auto-bumping | 264 | 193 already coordinated; 65-member-lock, 2 CLI test, and 4 runtime occurrences made derivable. |
+| Historical owner exemption | 13 | Immutable release incidents, telemetry compatibility evidence, captured telemetry, and worker incident. |
+| **Total** | **325** | **Complete** |
+
+The 132 occurrences outside the original 193 release-owned set landed as 41 Tier 1, 7 Tier 2,
+71 newly auto-bumping Tier 3, and 13 immutable historical occurrences.
+
+### Preserved historical exact references
+
+- Eight mirrored beta.10 release-incident references in the NetScript release skill.
+- Two beta.5 trigger telemetry migration references.
+- One beta.5 telemetry alias-window constant.
+- One beta.5 captured Aspire telemetry scope version.
+- One beta.7 worker scaffold incident reference.

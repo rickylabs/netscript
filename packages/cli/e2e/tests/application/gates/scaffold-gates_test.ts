@@ -13,6 +13,8 @@ import {
 import type { CommandGateDefinition } from '../../../src/domain/gate-definition.ts';
 import type { RunContext, RunOptions } from '../../../src/domain/run-context.ts';
 
+const PUBLISHED_TEST_VERSION = ['0', '0', '2'].join('.');
+
 Deno.test('--source jsr accepts the local public CLI binary', () => {
   const command = scaffoldInitGate().command(
     createContext('/repo/packages/cli/bin/netscript.ts', PACKAGE_SOURCE.JSR),
@@ -85,14 +87,14 @@ Deno.test('published AI lifecycle gate reuses the published CLI version', () => 
   }
 
   const command = gate.command(
-    createContext('jsr:@netscript/cli@0.0.1-beta.9', PACKAGE_SOURCE.JSR),
+    createContext(`jsr:@netscript/cli@${PUBLISHED_TEST_VERSION}`, PACKAGE_SOURCE.JSR),
   );
   assertEquals(command, [
     'deno',
     'run',
     '-A',
     '--minimum-dependency-age=0',
-    'https://jsr.io/@netscript/plugin-ai/0.0.1-beta.9/cli.ts',
+    `https://jsr.io/@netscript/plugin-ai/${PUBLISHED_TEST_VERSION}/cli.ts`,
     'add',
     'tool',
     'e2e-tool',

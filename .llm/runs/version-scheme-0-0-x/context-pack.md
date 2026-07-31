@@ -26,7 +26,7 @@ authorized implementation to proceed. No PLAN-EVAL verdict is recorded or implie
 
 ## In Progress
 
-- S2 is implemented and locally validated; commit/push and PR slice evidence are next.
+- S3 is implemented and locally validated; commit/push and PR slice evidence are next.
 
 ## Next Steps
 
@@ -55,6 +55,8 @@ authorized implementation to proceed. No PLAN-EVAL verdict is recorded or implie
 | `packages/mcp`, `packages/plugin-{sagas,streams}-core` | modified | Generated runtime version consumers |
 | `packages/fresh-ui/deno.lock` | regenerated | Native Deno reconciliation; beta.11 removed |
 | `.llm/tools/run-deno-{lint,fmt}.ts` | modified | Explicit package-config passthrough for trustworthy scoped gates |
+| Root/docs/RFC/resources/skills and mirrors | modified | Normal `0.0.x` policy and pre-1.0 maturity language |
+| CLI embedded assets and fixture tests | modified/generated | Frozen release literals deleted or derived |
 
 ## Gates
 

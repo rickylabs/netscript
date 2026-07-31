@@ -83,7 +83,8 @@ The connector declares:
 
 - `install.starterResources` — the six starter scaffolders emitted by a default install (see
   [scaffolded output](#scaffolded-output)).
-- `install.dependencySpecifier` / `update.targetSpecifier` — `jsr:@netscript/plugin-ai@^0.0.1-beta.1`.
+- `install.dependencySpecifier` / `update.targetSpecifier` — an exact
+  `jsr:@netscript/plugin-ai@<release>` specifier derived from package metadata.
 - `install.configParams` — `["AI_MODEL", "ANTHROPIC_API_KEY"]` (see [configuration](#configuration)).
 - `doctor.requiredConfigKeys` — `["ANTHROPIC_API_KEY"]` (see [doctor](#doctor)).
 - `resources` — the add-only resources `tool`, `agent`, and `thread-store`.
@@ -128,7 +129,7 @@ The AI plugin is designed around three install shapes. Their current, source-ver
 | `--persist-threads` | Also scaffold `ai/thread-store.ts` (a `Deno.Kv`-backed thread store). | Available at the adapter-resource layer, not yet a public install flag. |
 | `--mcp` | Scaffold MCP / skill-loader wiring. | Deferred (tracked in #290); depends on a later core `SkillLoaderPort`. |
 
-> **Callout — variant addressability (beta).** The public `netscript plugin install` command does
+> **Callout — variant addressability (pre-1.0).** The public `netscript plugin install` command does
 > not yet forward plugin-specific install flags, so `--persist-threads` is not currently a wired
 > CLI flag. The thread-store scaffolder ships as an **add-only adapter resource** rather than part
 > of the default install set, so an app that does not want durable threads never receives a bundled

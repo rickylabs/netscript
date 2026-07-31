@@ -5,7 +5,7 @@ status: Draft        # Draft | Discussion | FCP | Accepted | Rejected | Withdraw
 authors: ["@your-handle"]
 created: YYYY-MM-DD
 tracking-issue: <link to the rfc: tracking issue, once opened>
-target-milestone: <e.g. 0.0.1-beta.1 | 0.0.1-stable | backlog>
+target-milestone: <e.g. 0.0.3 | Backlog / Triage>
 ---
 
 # <RFC title>

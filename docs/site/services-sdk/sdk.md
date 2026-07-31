@@ -18,7 +18,7 @@ wraps each contract action in a **cache-first query factory** (KV-backed SWR), a
 those into [TanStack Query](https://tanstack.com/query) for islands. The contract object is
 the single source of truth — the *same* object the [service](/services-sdk/services/)
 implements is the one the client imports, so caller and server **cannot drift**.
-{{ comp.badge({ status: "beta" }) }}
+{{ comp.badge({ status: "pre-1.0" }) }}
 
 {{ comp.diagram({
   src: "/assets/diagrams/sdk-data-flow.svg",
@@ -216,7 +216,7 @@ island receives hydrated state and a <code>clientKey()</code> for invalidation o
 <strong>client</strong> TanStack key (prefix-matchable). Invalidate on the client with
 <code>clientKey()</code> / <code>toClientKeyPrefix(...)</code> — passing a server
 <code>key()</code> to <code>invalidateQueries</code> will silently match nothing. NetScript is in
-beta; subpath barrels are stable but signatures may still move.
+pre-1.0; subpath barrels are stable but signatures may still move.
 {{ /comp }}
 
 ## Reference →

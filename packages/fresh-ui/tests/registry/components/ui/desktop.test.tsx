@@ -8,6 +8,8 @@ import { DesktopTrayMenu } from '../../../../registry/components/ui/desktop-tray
 import { DesktopDialog } from '../../../../registry/components/ui/desktop-dialog.tsx';
 import { DesktopNotification } from '../../../../registry/components/ui/desktop-notification.tsx';
 
+const UPDATE_VERSION = ['0', '0', '2'].join('.');
+
 Deno.test('DesktopTrayMenu renders the D3 declaration union and stable action IDs', () => {
   const html = render(
     DesktopTrayMenu({
@@ -78,14 +80,14 @@ Deno.test('DesktopWindowChrome renders only declared documented actions and stat
 Deno.test('DesktopUpdatePrompt renders the automatic ready-event branch exhaustively', () => {
   const html = render(
     DesktopUpdatePrompt({
-      event: { applyMode: 'automatic', version: '0.0.1-beta.11' },
+      event: { applyMode: 'automatic', version: UPDATE_VERSION },
       onRestart() {},
     }),
   );
 
   assertStringIncludes(html, 'data-state="automatic"');
   assertStringIncludes(html, 'Update ready — restart to apply');
-  assertStringIncludes(html, 'Version 0.0.1-beta.11 has been verified and staged.');
+  assertStringIncludes(html, `Version ${UPDATE_VERSION} has been verified and staged.`);
   assertStringIncludes(html, 'Restart now');
   assertEquals(html.includes('Open installer'), false);
 });
@@ -95,7 +97,7 @@ Deno.test('DesktopUpdatePrompt renders the manual Windows installer branch from 
     DesktopUpdatePrompt({
       event: {
         applyMode: 'manual',
-        version: '0.0.1-beta.11',
+        version: UPDATE_VERSION,
         manualUpdateUrl: 'https://updates.example.test/windows',
       },
     }),

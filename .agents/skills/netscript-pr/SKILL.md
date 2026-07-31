@@ -293,25 +293,13 @@ exception path described in the close-gate section.
 > workflow per status) is deferred to the repo-process-automation umbrella. Until it lands, apply
 > labels manually per this taxonomy so the future automation has clean data.
 
-## Milestones (roadmap mapping)
+## Milestones (release mapping)
 
-Three milestones track the release roadmap. Assign one to every open issue:
-
-- **`0.0.1-beta.1`** — the next beta cut. Everything scheduled for the beta.
-- **`0.0.1-stable`** — the stable release. Deferred-but-committed work.
-- **`Backlog / Triage`** — accepted-but-unscheduled work and not-yet-triaged issues.
-
-Map from the `wave:` label:
-
-| Label | Milestone |
-| ----- | --------- |
-| `wave:v1`, `wave:v1-min` | `0.0.1-beta.1` |
-| `wave:defer` | `0.0.1-stable` (or `Backlog / Triage` when the body says "track only / no impl") |
-| epics + umbrellas (`epic:*`, `type:umbrella`) | the milestone of the cut they land in (usually `0.0.1-beta.1`) |
-| upstream / tracking issues with no wave | `0.0.1-beta.1` if the cut depends on them, else `Backlog / Triage` |
-
-Beta/stable acceptance criteria are owned by the Road-to-0.0.1-stable umbrella; keep milestone scope
-in sync with it rather than inventing criteria here.
+Assign every open issue and PR to the explicit release that owns it: `0.0.2` through `0.0.9`, or
+`Backlog / Triage` when it is accepted but unscheduled. The `wave:*` labels are scheduling bands and
+may span several releases; they do not determine a milestone. Epics and umbrellas use the cut in
+which their coordinated scope is expected to complete. Keep milestone scope in sync with the live
+roadmap and issue board rather than inferring it from a wave label.
 
 ## Issue and PR templates
 
