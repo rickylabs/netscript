@@ -174,12 +174,20 @@ describe('generateRegisterInfrastructure', () => {
     assertStringIncludes(output, '(Postgres, External)');
   });
 
-  it('should include withLifetime for persistent databases', () => {
+  // #970: a configured-persistent container must fall back to a session lifetime under
+  // `aspire start --isolated`, because an isolated start randomizes ports and a persistent
+  // container outlives the session that owns them. The emission is therefore a ternary now,
+  // not a literal — but "persistent means Persistent" still has to hold off the isolated path,
+  // which is what this asserts.
+  it('should include withLifetime for persistent databases, session-scoped when isolated', () => {
     const output = generateRegisterInfrastructure({
       databases: { main: fixtures.DATABASE_WITH_OPTIONS },
       caches: {},
     });
-    assertStringIncludes(output, '.withLifetime(ContainerLifetime.Persistent)');
+    assertStringIncludes(
+      output,
+      '.withLifetime(isolatedStart ? ContainerLifetime.Session : ContainerLifetime.Persistent)',
+    );
   });
 
   it('should include withDataBindMount for databases with DataPath', () => {
