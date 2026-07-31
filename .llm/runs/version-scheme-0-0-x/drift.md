@@ -151,3 +151,17 @@
 - **Action:** report the task failure honestly; use the explicit-permission rerun as S2 behavior
   evidence without changing the unrelated task definition.
 - **Evidence:** S2 worklog gate table.
+
+## 2026-07-31 — Shared-worktree writer populated the S3 documentation slice
+
+- **What:** A concurrent writer edited the planned documentation, process-skill, fixture, and
+  generated CLI-asset surfaces while this implementation session was active.
+- **Source:** Worktree changes appeared during S2/S3 without being authored by this session.
+- **Expected:** One implementation writer owns each slice.
+- **Actual:** The edits matched the locked S3 scope. This session reviewed the complete diff,
+  corrected remaining maturity-language and census issues, regenerated the Claude skill mirror and
+  embedded CLI asset through their native generators, and ran the owned gates before accepting it.
+- **Severity:** significant coordination drift; no scope expansion.
+- **Action:** preserve reviewed in-scope work, reject no user-owned changes, and commit the S3 slice
+  only after deterministic generators and scoped validation are green.
+- **Evidence:** S3 diff review and gate table in `worklog.md`.

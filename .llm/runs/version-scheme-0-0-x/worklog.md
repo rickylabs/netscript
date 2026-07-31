@@ -151,14 +151,28 @@ The 325 baseline occurrences map as follows; the final release proof will confir
 
 | Classification | Baseline count | Disposition |
 | --- | ---: | --- |
-| Tier 1 — exact literal deleted | 41 | Obsolete roadmap/process pins, frozen tests, and current doc examples removed or made version-neutral. |
+| Tier 1 — exact literal deleted | 43 | Obsolete roadmap/process pins, frozen tests, and current doc examples removed or made version-neutral. |
 | Tier 2 — reduced to stage word | 7 | UI templates and design footers now say `pre-1.0`. |
-| Tier 3 — release-owned / auto-bumping | 264 | 193 already coordinated; 65-member-lock, 2 CLI test, and 4 runtime occurrences made derivable. |
+| Tier 3 — release-owned / auto-bumping | 262 | 193 already coordinated; 65 member-lock and 4 runtime occurrences made derivable. |
 | Historical owner exemption | 13 | Immutable release incidents, telemetry compatibility evidence, captured telemetry, and worker incident. |
 | **Total** | **325** | **Complete** |
 
-The 132 occurrences outside the original 193 release-owned set landed as 41 Tier 1, 7 Tier 2,
-71 newly auto-bumping Tier 3, and 13 immutable historical occurrences.
+The 132 occurrences outside the original 193 release-owned set landed as 43 Tier 1, 7 Tier 2,
+69 newly auto-bumping Tier 3, and 13 immutable historical occurrences. The two CLI E2E literals
+that became a constructed semantic-version fixture are Tier 1: `release:cut` does not move that
+fixture, and the original exact pins no longer survive.
+
+### Every Tier 3 site and its bump mechanism
+
+| Baseline sites | Count | Why `release:cut` moves them |
+| --- | ---: | --- |
+| Root and member `deno.json` versions | 106 | `discoverVersionFiles()` walks the root manifest and every workspace-member manifest, then `coordinateVersionBump()` rewrites their exact version. |
+| Root `deno.lock` NetScript pins | 66 | The root lock is included in the coordinated file set and exact prior-release ranges are replaced. |
+| `packages/fresh-ui/deno.lock` NetScript pins | 65 | The new adjacent-member-lock discovery includes the tracked nested lock; the residue scan independently rejects any prior release left there. |
+| `scaffold.plugin.json` versions | 12 | Workspace-member scaffold manifests are discovered and rewritten by the coordinated bump. |
+| Existing generated publish metadata | 9 | `release:cut` runs `gen:publish-assets` after manifest bump, regenerating the seven package metadata files plus the CLI and MCP publish-asset constants. |
+| MCP, saga-core, and streams-core runtime version consumers | 4 | MCP consumes its existing generated constant; saga-core and streams-core consume new `package-metadata.generated.ts` constants emitted by `gen:publish-assets`. |
+| **Tier 3 total** | **262** | **Every site answers “yes” to “will `release:cut` move this?”** |
 
 ### Preserved historical exact references
 
