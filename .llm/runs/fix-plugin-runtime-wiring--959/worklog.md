@@ -26,3 +26,8 @@
 - Full `scaffold.runtime` E2E: NOT RUN during the implementation loop; reserved for the harness
   evaluator/merge-readiness pass per repository policy.
 
+## 2026-07-31 — IMPL-EVAL
+
+- Separate OpenHands/Qwen evaluator verdict: **PASS**.
+- Evidence: <https://github.com/rickylabs/netscript/pull/988#issuecomment-5145502439>
+- PR remains draft for supervisor verification; no merge or ready-for-review transition performed.
