@@ -1281,7 +1281,7 @@ export const freshUiRegistryManifest: RegistryManifest = {
         },
       ],
       registryDependencies: ['theme-seed'],
-      dependencies: ['jsr:@netscript/sdk@0.0.1-beta.10/auto-update'],
+      dependencies: ['jsr:@netscript/sdk@0.0.1-beta.11/auto-update'],
       css: [{ layer: 'components', content: "@import './ui/desktop-update-prompt.css';" }],
     },
     {
@@ -1299,7 +1299,7 @@ export const freshUiRegistryManifest: RegistryManifest = {
       }],
       registryDependencies: ['theme-seed'],
       dependencies: [
-        'jsr:@netscript/sdk@0.0.1-beta.10/desktop',
+        'jsr:@netscript/sdk@0.0.1-beta.11/desktop',
         'npm:preact@^10.29.2',
       ],
     },

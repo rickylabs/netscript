@@ -1,5 +1,29 @@
+import { assertEquals } from '@std/assert';
+
 import { MemoryFileSystemAdapter } from '../../adapters/scaffold/memory-fs.ts';
-import { listUiRegistryItems, removeUiRegistryItem, updateUiRegistryItems } from './registry.ts';
+import {
+  installUiRegistryItems,
+  listUiRegistryItems,
+  removeUiRegistryItem,
+  updateUiRegistryItems,
+} from './registry.ts';
+
+const SDK_DENO_JSON = new URL('../../../../../sdk/deno.json', import.meta.url);
+
+/** The `@netscript/sdk` release this workspace ships — the pin the manifest must carry. */
+async function sdkWorkspaceVersion(): Promise<string> {
+  const manifest = JSON.parse(await Deno.readTextFile(SDK_DENO_JSON)) as { version: string };
+  return manifest.version;
+}
+
+async function readImports(
+  fs: MemoryFileSystemAdapter,
+): Promise<Record<string, string>> {
+  const config = JSON.parse(await fs.readFile('/app/deno.json')) as {
+    imports?: Record<string, string>;
+  };
+  return config.imports ?? {};
+}
 
 Deno.test('registry list mirrors the manifest and flags installed items', async () => {
   const fs = new MemoryFileSystemAdapter();
@@ -27,4 +51,27 @@ Deno.test('registry remove deletes files and dependency imports', async () => {
   if (await fs.exists('/app/lib/cn.ts')) throw new Error('Removed file remains');
   const config = JSON.parse(await fs.readFile('/app/deno.json')) as { imports: Record<string, string> };
   if (config.imports.clsx || !config.imports.keep) throw new Error('Dependency pruning was not selective');
+});
+
+Deno.test('installing the desktop items pins the SDK release the workspace ships', async () => {
+  const fs = new MemoryFileSystemAdapter();
+  await installUiRegistryItems(
+    { projectRoot: '/app', names: ['desktop-only', 'desktop-update-prompt'], overwrite: false },
+    { fs },
+  );
+
+  const imports = await readImports(fs);
+  assertEquals(imports['@netscript/sdk'], `jsr:@netscript/sdk@${await sdkWorkspaceVersion()}`);
+});
+
+Deno.test('removing one desktop item keeps the SDK import the other still needs', async () => {
+  const fs = new MemoryFileSystemAdapter();
+  await installUiRegistryItems(
+    { projectRoot: '/app', names: ['desktop-only', 'desktop-update-prompt'], overwrite: false },
+    { fs },
+  );
+  await removeUiRegistryItem('/app', 'desktop-only', fs);
+
+  const imports = await readImports(fs);
+  assertEquals(imports['@netscript/sdk'], `jsr:@netscript/sdk@${await sdkWorkspaceVersion()}`);
 });
