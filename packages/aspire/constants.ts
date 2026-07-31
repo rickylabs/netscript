@@ -115,6 +115,15 @@ export const RESOURCE_DEFAULTS = {
   PortEnvVar: 'PORT',
   /** Default HTTP endpoint name for Aspire service discovery. */
   HttpEndpointName: 'http',
+  /**
+   * Default HTTP path Aspire probes to decide whether a generated app is healthy.
+   *
+   * The scaffolded Fresh app serves this route through its normal SSR pipeline, so a probe
+   * against it fails when the app cannot render. Without a registered health check Aspire
+   * treats a merely-running process as healthy, which is how an app that returns 500 to every
+   * request still shows green (#954).
+   */
+  AppHealthCheckPath: '/health',
 } as const;
 
 /**

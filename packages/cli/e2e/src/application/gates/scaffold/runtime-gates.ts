@@ -12,7 +12,24 @@ const ASPIRE_RESOURCE_WAIT_TIMEOUT_SECONDS: Partial<
   Record<AspireResource, number>
 > = {
   [ASPIRE_RESOURCE.MSSQL]: 600,
+  // The app's health probe renders a real SSR route, so this wait covers the Vite dev
+  // server's cold start and first render — not just the process reaching `Running`.
+  [ASPIRE_RESOURCE.APP]: 300,
 };
+
+/**
+ * Why the probe takes a project root instead of a URL: the scaffold publishes the app on
+ * `SCAFFOLD_APP_PORT`, deliberately offset from `PORT_RANGES.APP.start` so the Aspire proxy
+ * does not collide with Vite's own default of 8000. A gate that hardcodes the range start
+ * probes a port nothing listens on, and a connection-refused loop is indistinguishable from
+ * an app that cannot render. `probe-app-home.ts` reads the port out of the project's
+ * `appsettings.json` — the same file the AppHost helper generator reads when it emits
+ * `withHttpEndpoint({ port })`.
+ */
+const APP_HOME_FAILURE_HINT =
+  'The generated app did not serve its home page. The probe resolves the port from the ' +
+  "project's appsettings.json, so a failure here means the app itself is not rendering — " +
+  'check the app resource logs in the Aspire dashboard.';
 
 function runtimeWaitGate(resource: AspireResource): GateDefinition {
   return commandGate(
@@ -235,6 +252,23 @@ export function createRuntimeGates(
       'http://127.0.0.1:8094/api/v1/auth/session',
     ),
     commandGate(
+      GATE.BEHAVIOR_APP_HOME,
+      'Generated app serves its home page',
+      GATE_PHASE.BEHAVIOR,
+      (context) => [
+        'deno',
+        'run',
+        '--allow-net=127.0.0.1',
+        '--allow-read',
+        `${context.project.repoRoot}/packages/cli/e2e/src/application/gates/scaffold/probe-app-home.ts`,
+        context.project.projectRoot,
+        ASPIRE_RESOURCE.APP,
+      ],
+      undefined,
+      'capture',
+      APP_HOME_FAILURE_HINT,
+    ),
+    commandGate(
       GATE.BEHAVIOR_AI_CHAT_ROUTE,
       'Import generated AI chat route',
       GATE_PHASE.BEHAVIOR,
@@ -302,6 +336,8 @@ function runtimeResources(database: DatabaseEngine): readonly AspireResource[] {
     ASPIRE_RESOURCE.TRIGGERS,
     ASPIRE_RESOURCE.AUTH,
     ASPIRE_RESOURCE.STREAMS,
+    // Last: the app depends on everything above and is the slowest to first render.
+    ASPIRE_RESOURCE.APP,
   ];
 }
 

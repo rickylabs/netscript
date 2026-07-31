@@ -1,5 +1,5 @@
 import { join } from '@std/path';
-import { PORT_RANGES } from '../../../constants/port-ranges.ts';
+import { SCAFFOLD_APP_PORT } from '../../../constants/port-ranges.ts';
 import { SCAFFOLD_DEFAULTS } from '../../../constants/scaffold/scaffold-defaults.ts';
 import { SCAFFOLD_FILES } from '../../../constants/scaffold/scaffold-files.ts';
 import type { ValidatedInitOptions } from '../../../domain/scaffold/scaffold-options.ts';
@@ -25,7 +25,7 @@ export async function writeNormalizedAppFiles(
   filesSkipped: string[],
   directoriesCreated: string[],
 ): Promise<void> {
-  const appPort = PORT_RANGES.APP.start + 10;
+  const appPort = SCAFFOLD_APP_PORT;
   const plan = createScaffoldPlan(options, {
     useWorkspacePackages: context.packagesAsWorkspaceMembers(options),
   });
