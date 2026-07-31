@@ -33,7 +33,6 @@ Deno.test('shared release preparation runs the stable gate sequence in order', a
     'bump:0.0.1-canary.1',
     'deno task gen:publish-assets',
     'residue:0.0.1-beta.10',
-    'deno task check:netscript-jsr-specifiers',
     'deno task publish:readiness',
     'deno task publish:dry-run',
     'deno ci --prod',

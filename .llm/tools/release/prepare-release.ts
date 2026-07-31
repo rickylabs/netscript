@@ -61,17 +61,8 @@ export async function prepareRelease(
     );
   }
 
-  // `findResidue` only reads JSON + the lock, so a `@netscript/*` pin left behind in TypeScript
-  // is invisible to it — that is how beta.11 shipped a `sdk@0.0.1-beta.10` registry pin (#953).
-  await runGate(
-    label,
-    'check:netscript-jsr-specifiers',
-    'deno',
-    ['task', 'check:netscript-jsr-specifiers'],
-    root,
-    dependencies,
-  );
-
+  // `findResidue` only reads JSON + the lock, so a `@netscript/*` pin left behind in TypeScript is
+  // invisible to it — `publish:readiness`'s specifier check is what catches that class (#953).
   await runGate(
     label,
     'publish:readiness',
