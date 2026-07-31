@@ -66,6 +66,57 @@ A contributor adding a probe to another resource kind reads
 `helpers/tests/*_test.ts` case. The E2E counterpart is one `runtimeWaitGate(...)` entry plus one
 `httpGate(...)` in `runtime-gates.ts` and the id in `capability-suites.ts`.
 
-## Gate Results
+## Slice log
 
-Recorded after implementation — see § Gate Evidence below.
+| # | Slice                                                     | Commit      | Gate evidence                                                       |
+| - | ----------------------------------------------------------- | ----------- | --------------------------------------------------------------------- |
+| 1 | Run artifacts + Design checkpoint                          | `568ffe11d` | n/a                                                                   |
+| 2 | Probe path contract in `@netscript/aspire`                 | `d77932249` | `deno check` + doc-lint clean on `packages/aspire`                    |
+| 3 | Generator emits `withHttpHealthCheck` for app resources    | `446a47813` | `generators-background-app_test.ts` — 37 steps, 0 failed              |
+| 4 | Pin SSR fall-through of the scaffolded health route        | `37c295966` | `route-templates_test.ts` — 19 steps, 0 failed                        |
+| 5 | `scaffold.runtime` waits on the app + fetches its home page | `1780ffda7` | `suite-registry_test.ts` — 9 passed, 0 failed                         |
+
+## Gate Evidence
+
+| Gate                                        | Command                                                                     | Result                                                       |
+| ------------------------------------------- | ----------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| Format                                      | `deno task fmt:check`                                                       | **PASS** — 1869 files selected, 0 findings                     |
+| Lint                                        | `deno task lint`                                                            | **PASS** — 1724 files, 0 occurrences                           |
+| Lint (`packages/cli`, excluded from the task) | `deno lint packages/cli/{src/kernel/templates,e2e}`                         | **PASS** — 95 files                                            |
+| Typecheck                                   | `deno task check`                                                           | **PASS** — 2457 files, 21 batches, 0 failed batches            |
+| Test                                        | `deno task test`                                                            | **PASS** — 2230 passed, 0 failed, 12 ignored (3m22s)           |
+| Doctrine fitness                            | `deno task arch:check`                                                      | **PASS** — exit 0, no `FAIL=` rows; pre-existing WARN/INFO only |
+| Doc-lint (F-7)                              | `.llm/tools/run-deno-doc-lint.ts --root packages/aspire`                    | **PASS** — 0 errors, 0 missing JSDoc                           |
+| Runtime / Aspire (scope overlay `service`)  | `deno task e2e:cli run scaffold.runtime --cleanup`                          | **NOT RUN** — no database containers or full runtime available here; see `drift.md` D-4 |
+
+### Fail-before evidence (regression guard)
+
+With the generator change stashed, the new generator assertions fail:
+
+```
+should register an HTTP health probe for app resources ... FAILED
+should probe a custom path when HealthCheckPath is configured ... FAILED
+FAILED | 1 passed (35 steps) | 1 failed (2 steps)
+```
+
+### SDK verification
+
+`aspire restore` was run against a throwaway `apphost.mts` pinned to SDK `13.4.6`. The generated
+`.aspire/modules/aspire.mts` declares, on `ExecutableResource`:
+
+```ts
+withHttpHealthCheck(options?: WithHttpHealthCheckOptions): ExecutableResourcePromise;
+// interface WithHttpHealthCheckOptions { path?; statusCode?; endpointName? }
+```
+
+This is what fixed the emitted call shape (see `drift.md` D-2). The probe workspace was scratch only
+and is not committed.
+
+## Reconcile notes
+
+- **Slices 1–5.** Issue #954 stays `status:triage` until the PR merges (`Closes #954` in the body
+  wires the auto-close). #953 is referenced but deliberately untouched — it is the reproduction, not
+  the defect. No other open issue covers the app health probe.
+- No new arch-debt entries created or closed.
+- Follow-up identified and **not** filed from this session: health probes for generated services,
+  plugins, and background processors, with declared per-resource paths. Named in the PR body.
