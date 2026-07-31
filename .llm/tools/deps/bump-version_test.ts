@@ -75,6 +75,18 @@ Deno.test('bump-version wrapper coordinates an exact version with zero residue',
         2,
       ) + '\n',
     );
+    await Deno.writeTextFile(
+      `${temp}/packages/example/deno.lock`,
+      JSON.stringify(
+        {
+          workspace: {
+            members: { '.': { dependencies: ['jsr:@netscript/example@1.2.3'] } },
+          },
+        },
+        null,
+        2,
+      ) + '\n',
+    );
     const wrapped = await run(
       'deno',
       [
@@ -94,15 +106,38 @@ Deno.test('bump-version wrapper coordinates an exact version with zero residue',
     const result = JSON.parse(wrapped.stdout) as { ok: boolean; files: string[] };
     assertEquals(wrapped.code, 0);
     assertEquals(result.ok, true);
-    assertEquals(result.files.length, 3);
+    assertEquals(result.files.length, 4);
     for (
-      const path of [`${temp}/deno.json`, `${temp}/packages/example/deno.json`, `${temp}/deno.lock`]
+      const path of [
+        `${temp}/deno.json`,
+        `${temp}/packages/example/deno.json`,
+        `${temp}/deno.lock`,
+        `${temp}/packages/example/deno.lock`,
+      ]
     ) {
       assertStringIncludes(await Deno.readTextFile(path), '1.3.0');
       assertEquals((await Deno.readTextFile(path)).includes('1.2.3'), false);
     }
   } finally {
     await Deno.remove(temp, { recursive: true });
+  }
+});
+
+Deno.test('findVersionResidue reports a prior release retained in a nested member lock', async () => {
+  const { findVersionResidue } = await import('./bump-version.ts');
+  const root = await Deno.makeTempDir({ prefix: 'ns-nested-lock-residue-' });
+  try {
+    await Deno.mkdir(`${root}/packages/example`, { recursive: true });
+    await Deno.writeTextFile(`${root}/deno.json`, '{"version":"0.0.2"}\n');
+    await Deno.writeTextFile(
+      `${root}/packages/example/deno.lock`,
+      '{"workspace":{"dependencies":["jsr:@netscript/sdk@0.0.1-beta.12"]}}\n',
+    );
+    assertEquals(await findVersionResidue(root, '0.0.1-beta.12'), [
+      `${root}/packages/example/deno.lock`,
+    ]);
+  } finally {
+    await Deno.remove(root, { recursive: true });
   }
 });
 

@@ -9,7 +9,10 @@ import { join } from '@std/path';
 import { MemoryFileSystemAdapter } from '../scaffold/memory-fs.ts';
 import { PluginWorkspaceMutator } from './workspace-mutator.ts';
 import type { PluginKindProvider } from '../../domain/plugin-kind.ts';
-import { netscriptJsrSpecifier } from '../../constants/jsr-specifiers.ts';
+import {
+  netscriptJsrSpecifier,
+  NETSCRIPT_RELEASE_VERSION,
+} from '../../constants/jsr-specifiers.ts';
 import { SCAFFOLD_WORKSPACE_PACKAGES } from '../../constants/scaffold/scaffold-workspace-packages.ts';
 import { SCAFFOLD_PACKAGES } from '../../constants/scaffold/scaffold-packages.ts';
 import { resolveNetScriptImports } from '../scaffold/import-resolver.ts';
@@ -437,14 +440,14 @@ Deno.test('PluginWorkspaceMutator keeps package id separate from the instance na
     backgroundProvider,
     {
       packageSpecifier: '@netscript/plugin-workers',
-      packageVersion: '0.0.1-beta.12',
+      packageVersion: NETSCRIPT_RELEASE_VERSION,
     },
   );
 
   const config = JSON.parse(await fs.readFile('/project/appsettings.json'));
   assertEquals(
     config.NetScript.Plugins['rehearsal-worker-api'].Entrypoint,
-    'jsr:@netscript/plugin-workers@0.0.1-beta.12/services',
+    `jsr:@netscript/plugin-workers@${NETSCRIPT_RELEASE_VERSION}/services`,
   );
 });
 

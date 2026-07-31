@@ -26,7 +26,7 @@ authorized implementation to proceed. No PLAN-EVAL verdict is recorded or implie
 
 ## In Progress
 
-- S1 release discovery and stale-pin guard implementation under the owner-authorized override.
+- S1 is implemented and locally green; commit/push and PR slice evidence are next.
 
 ## Next Steps
 
@@ -49,6 +49,8 @@ authorized implementation to proceed. No PLAN-EVAL verdict is recorded or implie
 | --- | --- | --- |
 | `.llm/runs/version-scheme-0-0-x/{supervisor,research,plan,worklog,context-pack,drift}.md` | new | Harness bootstrap/plan artifacts |
 | `.llm/runs/version-scheme-0-0-x/codex-thread-ids.md` | new (launcher-owned) | Route/session provenance |
+| `.llm/tools/deps`, `.llm/tools/release`, `.github/workflows/release-canary.yml` | modified | Nested-lock and generic release-pin policy |
+| `packages/cli/src/**` tests | modified | Generic guard plus derived/version-neutral fixtures |
 
 ## Gates
 

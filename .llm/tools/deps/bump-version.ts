@@ -2,7 +2,7 @@
 /** Coordinate exact NetScript workspace versions around native `deno bump-version`. */
 
 import { walk } from 'jsr:@std/fs@^1.0.0/walk';
-import { dirname, join, normalize, relative } from 'jsr:@std/path@^1.0.0';
+import { dirname, join, normalize } from 'jsr:@std/path@^1.0.0';
 
 export interface BumpResult {
   readonly oldVersion: string;
@@ -57,8 +57,7 @@ export async function findVersionResidue(root: string, oldVersion: string): Prom
       ],
     })
   ) {
-    const relativePath = normalize(relative(root, entry.path));
-    if (!entry.path.endsWith('.json') && relativePath !== 'deno.lock') continue;
+    if (!entry.path.endsWith('.json') && entry.name !== 'deno.lock') continue;
     if ((await Deno.readTextFile(entry.path)).includes(oldVersion)) {
       residue.push(normalize(entry.path));
     }
@@ -102,6 +101,8 @@ export async function discoverVersionFiles(root: string): Promise<string[]> {
 
   const files = new Set<string>([rootDenoJson, join(root, 'deno.lock'), ...memberManifests]);
   for (const manifest of memberManifests) {
+    const memberLock = join(dirname(manifest), 'deno.lock');
+    if (await exists(memberLock)) files.add(memberLock);
     for await (
       const entry of walk(dirname(manifest), {
         includeDirs: false,

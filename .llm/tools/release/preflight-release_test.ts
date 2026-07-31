@@ -67,25 +67,24 @@ Deno.test('publish-set audit covers explicit nested workspace members and applie
   }
 });
 
-Deno.test('markdown preflight separates stale, neutral, and deferred snippets', async () => {
+Deno.test('markdown preflight blocks stale normal and prerelease pins across docs', async () => {
   const root = await fixtureRoot();
   try {
     await Deno.mkdir(`${root}/docs/site`, { recursive: true });
     await Deno.writeTextFile(
       `${root}/README.md`,
-      'stale: jsr:@netscript/ai@^0.0.1-beta.4\nneutral: jsr:@netscript/ai\n',
+      'stale: jsr:@netscript/ai@^0.0.2\nneutral: jsr:@netscript/ai\n',
     );
     await Deno.writeTextFile(
       `${root}/docs/site/guide.md`,
-      'deferred: jsr:@netscript/plugin-ai-core@0.0.1-alpha.0\n',
+      'stale: jsr:@netscript/plugin-ai-core@0.0.3-canary.1\n',
     );
-    const audit = await auditMarkdownPins(root, '0.0.1-beta.6');
+    const audit = await auditMarkdownPins(root, '0.0.3');
     assertEquals(audit.violations.map(({ path, line }) => ({ path, line })), [
       { path: 'README.md', line: 1 },
-    ]);
-    assertEquals(audit.deferred.map(({ path, line }) => ({ path, line })), [
       { path: 'docs/site/guide.md', line: 1 },
     ]);
+    assertEquals(audit.deferred, []);
   } finally {
     await Deno.remove(root, { recursive: true });
   }

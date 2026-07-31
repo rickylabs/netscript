@@ -70,6 +70,7 @@ version-neutral placeholder; historical literals must identify their historical 
 | 2026-07-31 | Plan | Design | Locked four slices and the historical/current classification. |
 | 2026-07-31 | Plan-Eval | Provider canary | BLOCKED: local Claude/OpenRouter profile has no OpenRouter credential; no evaluator session started. |
 | 2026-07-31 | Plan-Eval | Owner authorization | Owner waived the unavailable automated lane, is evaluating personally, and authorized implementation; no verdict recorded. |
+| 2026-07-31 | S1 | Release discovery and guards | Added nested member locks to coordinated bump/residue, generalized Markdown and CLI pin guards, and removed frozen CLI test pins. |
 
 ## Decisions
 
@@ -99,6 +100,9 @@ version-neutral placeholder; historical literals must identify their historical 
 | --- | --- | --- | --- |
 | Baseline census | focused `rg` survey | PASS | Exact 325 reproduced. |
 | Git baseline | raw `git status/log/rev-parse/ls-remote` | PASS | Base `8dca67985`; remote branch at `fbd57c3bf`; no PR yet. |
+| S1 focused tests | 24 bump/preflight/readiness/CLI guard tests + 18 cut/canary tests | PASS | 42 passed, 0 failed. |
+| S1 scoped wrappers | check/lint/fmt on `.llm/tools/deps`, `.llm/tools/release`, and `packages/cli/src` | PASS | 0 diagnostics/findings; CLI check covered 623 files. |
+| S1 quality gate | `deno task quality:gate` | PASS | Quality scan had 0 findings; doctrine checks had no failures (existing warnings only). |
 
 ### Fitness Gates
 

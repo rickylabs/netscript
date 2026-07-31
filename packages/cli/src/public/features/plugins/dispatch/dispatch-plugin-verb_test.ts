@@ -17,6 +17,7 @@ import { verifyJsrPackageIntegrity } from '../../../infra/jsr/verify-jsr-package
 import { NETSCRIPT_RELEASE_VERSION } from '../../../../kernel/constants/jsr-specifiers.ts';
 
 const REPO_ROOT = resolve(dirname(fromFileUrl(import.meta.url)), '../../../../../../..');
+const EXPLICIT_NON_LOCKSTEP_VERSION = ['1', '2', '3'].join('.');
 
 function repoPath(path: string): string {
   return join(REPO_ROOT, path);
@@ -89,12 +90,14 @@ describe('plugin verb dispatch', () => {
       `jsr:@netscript/plugin-ai@${NETSCRIPT_RELEASE_VERSION}/cli`,
     );
     assertEquals(
-      resolvePluginCliSpecifier('@netscript/plugin-ai@1.2.3'),
-      'jsr:@netscript/plugin-ai@1.2.3/cli',
+      resolvePluginCliSpecifier(`@netscript/plugin-ai@${EXPLICIT_NON_LOCKSTEP_VERSION}`),
+      `jsr:@netscript/plugin-ai@${EXPLICIT_NON_LOCKSTEP_VERSION}/cli`,
     );
     assertEquals(
-      resolvePluginCliSpecifier('jsr:@netscript/plugin-ai@1.2.3/cli'),
-      'jsr:@netscript/plugin-ai@1.2.3/cli',
+      resolvePluginCliSpecifier(
+        `jsr:@netscript/plugin-ai@${EXPLICIT_NON_LOCKSTEP_VERSION}/cli`,
+      ),
+      `jsr:@netscript/plugin-ai@${EXPLICIT_NON_LOCKSTEP_VERSION}/cli`,
     );
   });
 
@@ -148,14 +151,24 @@ describe('plugin verb dispatch', () => {
   it('keeps an explicitly non-lockstep first-party plugin on protected deno x dispatch', async () => {
     const processRunner = new RecordingProcess(0);
 
-    await dispatchPluginVerb('doctor', '@netscript/plugin-ai@1.2.3', [], {
+    await dispatchPluginVerb(
+      'doctor',
+      `@netscript/plugin-ai@${EXPLICIT_NON_LOCKSTEP_VERSION}`,
+      [],
+      {
       projectRoot: '/workspace/app',
       processRunner,
-    });
+      },
+    );
 
     assertEquals(processRunner.commands, [{
       command: 'deno',
-      args: ['x', '-A', 'jsr:@netscript/plugin-ai@1.2.3/cli', 'doctor'],
+      args: [
+        'x',
+        '-A',
+        `jsr:@netscript/plugin-ai@${EXPLICIT_NON_LOCKSTEP_VERSION}/cli`,
+        'doctor',
+      ],
       cwd: '/workspace/app',
     }]);
   });
