@@ -62,3 +62,9 @@ to be understated or misframed in the following ways:
 
 ONE pull request that closes all three, fixing the presentational/runtime seam once and
 demonstrating it across the three surfaces, with a regression guard per surface.
+
+## Implementation status
+
+- PLAN-EVAL PASS: OpenHands commit `11639dea4`.
+- S1 ActionMenu composition implemented locally; focused/static/scoped evidence is recorded in
+  `worklog.md` and awaits slice commit/push.

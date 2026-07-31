@@ -49,3 +49,12 @@ source then runs the checked-in asset generator. Public consumers start at `mod.
 - PLAN-EVAL: pending separate-session formal evaluation; implementation is stopped.
 - Baseline doc-lint: FAIL (123 pre-existing `interactive.ts` findings); delta gate selected.
 - Issue framing corrections: posted and verified on #947/#948/#949.
+
+## S1 — ActionMenu composition
+
+- Added the compound ActionMenu runtime over `usePopover` and collection navigation; no new global
+  event listener set. Item activation is isolated, disabled/loading/destructive state is semantic,
+  and dismissal restores trigger focus through the shared popover runtime.
+- Fails-before proof: inserted a `document.addEventListener` regression sentinel in the new menu
+  source; the static guard failed (1 failed / 1 passed). Restored the source; focused tests and
+  scoped gates then passed.

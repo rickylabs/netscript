@@ -17,6 +17,18 @@ export type {
   FreshUiStyle,
 } from './src/runtime/_internal/public-props.ts';
 
+export { ActionMenu } from './src/runtime/action-menu/ActionMenu.tsx';
+export type { ActionMenuNamespace } from './src/runtime/action-menu/ActionMenu.tsx';
+export {
+  ACTION_MENU_ITEM_INTENTS,
+  type ActionMenuContentProps,
+  type ActionMenuItemIntent,
+  type ActionMenuItemProps,
+  type ActionMenuRootProps,
+  type ActionMenuSeparatorProps,
+  type ActionMenuTriggerProps,
+} from './src/runtime/action-menu/action-menu.types.ts';
+
 export { Accordion } from './src/runtime/accordion/Accordion.tsx';
 export type { AccordionNamespace } from './src/runtime/accordion/Accordion.tsx';
 export type {
