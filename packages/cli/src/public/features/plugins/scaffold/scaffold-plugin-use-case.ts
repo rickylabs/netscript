@@ -12,6 +12,7 @@ import {
 } from '@netscript/plugin/templates';
 
 import { TEMPLATE_CONVENTIONS } from '../../../../kernel/constants/template-conventions.ts';
+import { NETSCRIPT_RELEASE_VERSION } from '../../../../kernel/constants/jsr-specifiers.ts';
 import { IoError, UsageError } from '../../../../kernel/domain/errors/cli-exit-error.ts';
 import type { FileSystemPort } from '../../../../kernel/ports/file-system-port.ts';
 import { EXIT_CODES } from '../host/plugin-loader.ts';
@@ -80,6 +81,7 @@ export function resolveTemplateVariables(pluginName: string): TemplateVariables 
     ClassName: className,
     pluginNameKebab: pluginBaseName,
     'plugin-name': packageSegment,
+    netscriptReleaseVersion: NETSCRIPT_RELEASE_VERSION,
   };
 }
 

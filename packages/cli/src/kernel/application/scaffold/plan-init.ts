@@ -1,5 +1,4 @@
 import { dirname, join } from '@std/path';
-import { SCAFFOLD_APP_PORT } from '../../constants/port-ranges.ts';
 import { SCAFFOLD_DIRS } from '../../constants/scaffold/scaffold-dirs.ts';
 import { SCAFFOLD_FILES } from '../../constants/scaffold/scaffold-files.ts';
 import type { ScaffoldResult } from '../../domain/core-types.ts';
@@ -193,16 +192,14 @@ export async function scaffoldRoot(
   // 7. appsettings.json (Tier 1 — NetScript infrastructure config)
   //    Always generated at project root — consumed by helpers generator
   //    regardless of C# vs TS AppHost mode.
-  //    TS AppHost uses port 8010 so the Aspire proxy port (8010) does not
-  //    overlap with Vite's own default (8000). With env: 'PORT' wired in
-  //    register-apps.ts, Aspire injects a random target port and proxies
-  //    the public port — but keeping them separate avoids any edge-case
-  //    binding races on the default 8000.
+  //    No host port is pinned for the app or the example service: `env: 'PORT'`
+  //    in register-apps/register-services lets Aspire allocate both the proxy
+  //    port and the target port, which is what `aspire start --isolated` needs
+  //    to place two workspaces on one machine (#952).
   if (!options.noAspire) {
     const appsettingsContent = generateAppsettings({
       name: options.name,
       appName: options.appName,
-      appPort: SCAFFOLD_APP_PORT,
       dbEngine: options.dbEngine,
       cache: options.cache,
       cacheBackend: options.cacheBackend,

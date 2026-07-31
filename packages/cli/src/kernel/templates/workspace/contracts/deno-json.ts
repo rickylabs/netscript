@@ -1,4 +1,5 @@
 import type { PackageDenoJsonOptions } from '../../../domain/scaffold/scaffold-options.ts';
+import { netscriptJsrSpecifier } from '../../../constants/jsr-specifiers.ts';
 
 /**
  * Direct third-party deps imported from the scaffolded contract files
@@ -11,7 +12,7 @@ import type { PackageDenoJsonOptions } from '../../../domain/scaffold/scaffold-o
 const CONTRACTS_DIRECT_DEPS: Readonly<Record<string, string>> = {
   '@orpc/contract': 'npm:@orpc/contract@^1.14.6',
   '@orpc/server': 'npm:@orpc/server@^1.14.6',
-  '@netscript/contracts': 'jsr:@netscript/contracts@^0.0.1-alpha.18',
+  '@netscript/contracts': netscriptJsrSpecifier('contracts'),
   'zod': 'npm:zod@^4.3.6',
 };
 

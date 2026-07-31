@@ -18,18 +18,19 @@ const ASPIRE_RESOURCE_WAIT_TIMEOUT_SECONDS: Partial<
 };
 
 /**
- * Why the probe takes a project root instead of a URL: the scaffold publishes the app on
- * `SCAFFOLD_APP_PORT`, deliberately offset from `PORT_RANGES.APP.start` so the Aspire proxy
- * does not collide with Vite's own default of 8000. A gate that hardcodes the range start
- * probes a port nothing listens on, and a connection-refused loop is indistinguishable from
- * an app that cannot render. `probe-app-home.ts` reads the port out of the project's
- * `appsettings.json` — the same file the AppHost helper generator reads when it emits
- * `withHttpEndpoint({ port })`.
+ * Why the probe takes a project root and an AppHost instead of a URL: since #952 the pristine
+ * scaffold pins **no** host port, so that two workspaces on one machine — and
+ * `aspire start --isolated` — do not collide. Aspire allocates the port at run time and no
+ * file on disk holds it, so the probe resolves it from the running AppHost through
+ * `aspire describe`, and only reads `appsettings.json` when a project explicitly pins one.
+ * A gate that hardcodes a port probes something nothing listens on, and a connection-refused
+ * loop is indistinguishable from an app that cannot render.
  */
 const APP_HOME_FAILURE_HINT =
   'The generated app did not serve its home page. The probe resolves the port from the ' +
-  "project's appsettings.json, so a failure here means the app itself is not rendering — " +
-  'check the app resource logs in the Aspire dashboard.';
+  "running AppHost (or the project's appsettings.json when one is pinned), so a failure " +
+  'here means the app itself is not rendering — check the app resource logs in the Aspire ' +
+  'dashboard.';
 
 function runtimeWaitGate(resource: AspireResource): GateDefinition {
   return commandGate(
@@ -258,11 +259,19 @@ export function createRuntimeGates(
       (context) => [
         'deno',
         'run',
-        '--allow-net=127.0.0.1',
+        // `localhost` as well as `127.0.0.1`: Deno's allowlist matches the host *string*, and
+        // `aspire describe` reports endpoints as `http://localhost:<port>`. Granting only
+        // 127.0.0.1 denies every fetch, which the retry loop then reports as if the app never
+        // rendered — the exact failure this gate is supposed to distinguish.
+        '--allow-net=127.0.0.1,localhost',
         '--allow-read',
+        // The pristine scaffold pins no host port, so the probe resolves the allocated one
+        // through `aspire describe` against the running AppHost.
+        '--allow-run=aspire',
         `${context.project.repoRoot}/packages/cli/e2e/src/application/gates/scaffold/probe-app-home.ts`,
         context.project.projectRoot,
         ASPIRE_RESOURCE.APP,
+        context.project.appHost,
       ],
       undefined,
       'capture',

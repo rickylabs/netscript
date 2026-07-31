@@ -12,8 +12,8 @@
     "./testing": "./src/testing/mod.ts"
   },
   "imports": {
-    "@netscript/plugin": "jsr:@netscript/plugin@^0.0.1-alpha.0",
-    "@netscript/aspire": "jsr:@netscript/aspire@^0.0.1-alpha.0",
+    "@netscript/plugin": "jsr:@netscript/plugin@{{netscriptReleaseVersion}}",
+    "@netscript/aspire": "jsr:@netscript/aspire@{{netscriptReleaseVersion}}",
     "@std/assert": "jsr:@std/assert@^1"
   },
   "compilerOptions": {

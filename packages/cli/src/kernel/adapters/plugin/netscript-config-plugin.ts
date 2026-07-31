@@ -27,3 +27,25 @@ export function insertPluginSpecifier(source: string, quotedSpecifier: string): 
 
   return source;
 }
+
+/** Remove exact plugin module specifiers from a generated `netscript.config.ts` source string. */
+export function removePluginSpecifiers(
+  source: string,
+  specifiers: readonly string[],
+): string {
+  const pluginsPattern = /(plugins:\s*\[)([\s\S]*?)(\])/;
+  const match = source.match(pluginsPattern);
+  if (!match) return source;
+
+  const targets = new Set(specifiers);
+  const entries = match[2].match(/(['"])(.*?)\1\s*,?/g) ?? [];
+  const retained = entries.filter((entry) => {
+    const value = entry.match(/^(['"])(.*?)\1/)?.[2];
+    return value === undefined || !targets.has(value);
+  }).map((entry) => entry.replace(/\s*,?$/, ''));
+
+  const body = retained.length === 0
+    ? ''
+    : `\n    ${retained.join(',\n    ')},\n  `;
+  return source.replace(pluginsPattern, `${match[1]}${body}${match[3]}`);
+}

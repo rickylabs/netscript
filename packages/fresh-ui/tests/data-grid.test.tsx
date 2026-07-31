@@ -11,6 +11,7 @@ type Session = {
 interface VNodeLike {
   type: unknown;
   props: Record<string, unknown>;
+  ref?: unknown;
 }
 
 function asVNode(value: unknown): VNodeLike {
@@ -105,4 +106,71 @@ Deno.test('DataGrid applies column widths as grid-template-columns', () => {
   const style = row.props.style as Record<string, unknown>;
 
   assertEquals(style.gridTemplateColumns, '2fr 8rem minmax(0, 1fr)');
+});
+
+Deno.test('DataGrid controlled selection emits row and select-all sets with mixed state', () => {
+  const changes: ReadonlySet<string>[] = [];
+  const grid = DataGrid<Session>({
+    columns: [{ key: 'name', header: 'Session' }],
+    rows: [
+      { id: 'one', data: { name: 'One', tokens: 1, status: 'active' } },
+      { id: 'two', data: { name: 'Two', tokens: 2, status: 'idle' } },
+    ],
+    selectedIds: new Set(['one']),
+    onSelectionChange: (ids) => changes.push(ids),
+  });
+  const [head, body] = childrenOf(grid).map(asVNode);
+  const headerCheckbox = asVNode(childrenOf(asVNode(childrenOf(head)[0]))[0]);
+  const headerInput = asVNode(headerCheckbox.props.children);
+  assertStrictEquals(headerInput.props['aria-checked'], 'mixed');
+  let indeterminate = false;
+  (headerInput.ref as (element: unknown) => void)({
+    set indeterminate(value: boolean) {
+      indeterminate = value;
+    },
+  });
+  assertStrictEquals(indeterminate, true);
+  (headerInput.props.onChange as () => void)();
+  assertEquals([...changes[0]], ['one', 'two']);
+
+  const secondRow = asVNode(childrenOf(body)[1]);
+  const rowInput = asVNode(asVNode(childrenOf(secondRow).flat()[0]).props.children);
+  (rowInput.props.onChange as () => void)();
+  assertEquals([...changes[1]], ['one', 'two']);
+});
+
+Deno.test('DataGrid checkbox and action cells isolate row activation', () => {
+  let selected = 0;
+  let stopped = 0;
+  const grid = DataGrid<Session>({
+    columns: [{ key: 'name', header: 'Session' }],
+    rows: [{
+      id: 'one',
+      data: { name: 'One', tokens: 1, status: 'active' },
+      onSelect: () => selected++,
+    }],
+    selectedIds: new Set(),
+    onSelectionChange: () => undefined,
+    renderRowActions: () => h('button', null, 'Actions'),
+  });
+  const body = asVNode(childrenOf(grid)[1]);
+  const row = asVNode(childrenOf(body)[0]);
+  const [selectionCell, , actionCell] = childrenOf(row).flat().filter(Boolean).map(asVNode);
+  const checkbox = asVNode(selectionCell.props.children);
+  (checkbox.props.onClick as (event: { stopPropagation(): void }) => void)({
+    stopPropagation: () => stopped++,
+  });
+  (actionCell.props.onClick as (event: { stopPropagation(): void }) => void)({
+    stopPropagation: () => stopped++,
+  });
+  assertStrictEquals(stopped, 2);
+  assertStrictEquals(selected, 0);
+  assertStrictEquals(row.type, 'div');
+});
+
+Deno.test('DataGrid legacy call shape retains the pre-selection DOM contract', () => {
+  const grid = renderGrid();
+  assertStrictEquals(childrenOf(grid).length, 2);
+  assertStrictEquals(rowGroupRows(grid)[1].type, 'button');
+  assertStrictEquals(rowGroupRows(grid)[2].type, 'a');
 });

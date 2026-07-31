@@ -19,7 +19,14 @@
   "tasks": {
     "ci": "deno ci && deno task ci:quality && deno task coverage:functions && deno task publish:dry-run && deno task audit:critical",
     "ci:quality": {
-      "dependencies": ["check", "lint", "fmt:check", "deps:check", "check:netscript-jsr-specifiers"]
+      "dependencies": [
+        "check",
+        "lint",
+        "fmt:check",
+        "deps:check",
+        "check:netscript-jsr-specifiers",
+        "check:aspire-host-ports"
+      ]
     },
     "check": {
       "command": "deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages --root plugins --ext ts,tsx --exclude \"^(packages/(fresh-ui)|.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\"",
@@ -62,7 +69,8 @@
     "agentic:rollout-canary": "deno run --no-lock --allow-read --allow-write --allow-run --allow-env .llm/tools/agentic/runtime/cli/rollout-canary-cli.ts",
     "design:sync": "deno run --no-lock --allow-read --allow-write --allow-run --allow-env tools/design-sync/mod.ts",
     "docs:links": "deno run --no-lock --allow-read .llm/tools/validation/check-internal-doc-links.ts --pretty",
-    "docs:maintenance": "deno task docs:links && deno task agentic:sync-claude:check && deno task agentic:check-claude",
+    "docs:accuracy": "deno run --no-lock --allow-read .llm/tools/docs/check-accuracy-and-discoverability.ts",
+    "docs:maintenance": "deno task docs:links && deno task docs:accuracy && deno task agentic:sync-claude:check && deno task agentic:check-claude",
     "agentic:smoke-claude-remote": "deno run --no-lock --allow-read --allow-run .llm/tools/agentic/claude/claude-remote-smoke.ts --env-aware --pretty",
     "agentic:codex-resume": "deno run --no-lock --allow-read --allow-run .llm/tools/agentic/codex/codex-resume.ts",
     "agentic:codex-status": "deno run --no-lock --allow-run .llm/tools/agentic/codex/codex-status.ts",
@@ -83,6 +91,7 @@
     "check:publish-assets": "deno task gen:publish-assets --check",
     "check:scaffold-versions": "deno run .llm/tools/validation/check-scaffold-versions.ts --pretty",
     "check:netscript-jsr-specifiers": "deno run --allow-read .llm/tools/validation/check-netscript-jsr-specifiers.ts --pretty",
+    "check:aspire-host-ports": "deno run --allow-read .llm/tools/validation/check-aspire-host-ports.ts --pretty",
     "release:preflight": "deno run --allow-read .llm/tools/release/preflight-text-imports.ts",
     "publish:readiness": "deno run --allow-read --allow-run --allow-net=jsr.io,api.jsr.io .llm/tools/release/publish-readiness.ts",
     "release:cut": "deno run --allow-read --allow-write --allow-run --allow-env .llm/tools/release/cut.ts",

@@ -30,12 +30,18 @@ import {
   generatePluginService,
 } from '../../templates/plugins/plugin-generators.ts';
 
+/** Either spelling of a pinned host port in a raw `appsettings.json` entry. */
+interface AppsettingsPortEntry {
+  readonly HostPort?: unknown;
+  readonly Port?: unknown;
+}
+
 interface AppsettingsPortShape {
   readonly NetScript?: {
-    readonly Services?: Record<string, { readonly Port?: unknown }>;
-    readonly Plugins?: Record<string, { readonly Port?: unknown }>;
-    readonly BackgroundProcessors?: Record<string, { readonly Port?: unknown }>;
-    readonly Apps?: Record<string, { readonly Port?: unknown }>;
+    readonly Services?: Record<string, AppsettingsPortEntry>;
+    readonly Plugins?: Record<string, AppsettingsPortEntry>;
+    readonly BackgroundProcessors?: Record<string, AppsettingsPortEntry>;
+    readonly Apps?: Record<string, AppsettingsPortEntry>;
   };
 }
 
@@ -239,13 +245,17 @@ export class PluginScaffolder {
   }
 
   private collectPorts(
-    section: Record<string, { readonly Port?: unknown }> | undefined,
+    section: Record<string, AppsettingsPortEntry> | undefined,
     usedPorts: Set<number>,
   ): void {
     if (!section) return;
     for (const entry of Object.values(section)) {
-      if (typeof entry.Port === 'number') {
-        usedPorts.add(entry.Port);
+      // Both spellings count as taken: `HostPort` is the current name and
+      // `Port` is the deprecated alias existing workspaces still carry.
+      for (const value of [entry.HostPort, entry.Port]) {
+        if (typeof value === 'number') {
+          usedPorts.add(value);
+        }
       }
     }
   }

@@ -129,8 +129,21 @@ export interface ValidatedInitOptions extends
   /** Resolved Prisma domain model name. */
   readonly modelName: string;
 
-  /** Resolved example service port. */
+  /**
+   * Port baked into the example service's source as the non-Aspire fallback
+   * (`Deno.env.get('PORT') || <servicePort>`). Always resolved when an example
+   * service is scaffolded; it never reaches `appsettings.json`.
+   */
   readonly servicePort?: number;
+
+  /**
+   * Aspire host port to pin for the example service, set only when the caller
+   * passed `--service-port` explicitly.
+   *
+   * Left undefined by default so the generated AppHost pins nothing and
+   * `aspire start --isolated` can place two workspaces on one machine.
+   */
+  readonly serviceHostPort?: number;
 }
 
 /** Options for the root workspace `deno.json` generator. */

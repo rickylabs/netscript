@@ -59,7 +59,7 @@ The flow is two commands — `cd aspire && aspire start` brings up your database
   caption: "What comes up when you run the workspace (ports are range-allocated conventions; the dashboard is the authority)",
   rows: [
     { name: "Aspire dashboard", type: ":18888", desc: "Every resource, trace, and log in one place — you don't stand up your own observability stack." },
-    { name: "Your service", type: ":3000", desc: "The oRPC API the contract drives, served at /api/rpc/* with OpenAPI and health wired in." },
+    { name: "Your service", type: "port assigned by Aspire", desc: "The oRPC API the contract drives, served at /api/rpc/* with OpenAPI and health wired in. The scaffold pins no host port so two workspaces can run side by side — the dashboard shows the URL. Pin one with netscript init --service-port if you need a stable address." },
     { name: "Plugin services", type: ":8091–:8094", desc: "Each plugin's API runs as its own resource — workers :8091, sagas :8092, triggers :8093, auth :8094." },
     { name: "Data stores", type: "Postgres · Redis", desc: "Brought up first, before migrations run; provisioned by the AppHost, not a hand-written compose file. Postgres is the recommended engine — pass --db postgres; mysql / mssql / sqlite / none are the other choices." }
   ]

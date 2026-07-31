@@ -18,7 +18,7 @@ import {
   buildPluginEntry,
   buildPluginServiceEntry,
 } from './appsettings-entry-builders.ts';
-import { insertPluginSpecifier } from './netscript-config-plugin.ts';
+import { insertPluginSpecifier, removePluginSpecifiers } from './netscript-config-plugin.ts';
 import { resolveNetScriptImports } from '../scaffold/import-resolver.ts';
 
 /** Optional overrides when mutating workspace plugin config. */
@@ -33,6 +33,10 @@ export interface PluginWorkspaceMutationOptions {
   readonly description?: string;
   /** Saga durable state backend for saga plugin appsettings. */
   readonly sagaStoreBackend?: SagaStoreBackend;
+  /** Immutable package id that owns this user-chosen plugin instance. */
+  readonly packageSpecifier?: string;
+  /** Resolved package version paired with {@link packageSpecifier}. */
+  readonly packageVersion?: string;
 }
 
 /** Summary of appsettings entries removed for a plugin. */
@@ -494,6 +498,25 @@ export class PluginWorkspaceMutator {
     if (updated === source) {
       return false;
     }
+
+    await this.fs.writeFile(configPath, updated);
+    return true;
+  }
+
+  /** Remove the module declaration written for one plugin instance. */
+  async removeNetScriptConfigPlugin(
+    projectRoot: string,
+    pluginName: string,
+  ): Promise<boolean> {
+    const configPath = join(projectRoot, 'netscript.config.ts');
+    if (!await this.fs.exists(configPath)) return false;
+
+    const source = await this.fs.readFile(configPath);
+    const updated = removePluginSpecifiers(source, [
+      `./${normalizePath(join(SCAFFOLD_DIRS.PLUGINS, pluginName, 'mod.ts'))}`,
+      `./${normalizePath(join(pluginName, 'mod.ts'))}`,
+    ]);
+    if (updated === source) return false;
 
     await this.fs.writeFile(configPath, updated);
     return true;

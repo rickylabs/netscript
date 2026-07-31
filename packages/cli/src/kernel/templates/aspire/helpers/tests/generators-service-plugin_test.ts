@@ -49,7 +49,7 @@ describe('generateRegisterServices', () => {
     assertStringIncludes(output, 'extractServiceReferences,');
     assertStringIncludes(output, 'resolvePermissions,');
     assertStringIncludes(output, 'resolveWorkspacePath,');
-    assertStringIncludes(output, "from './_aspire-compat.mjs'");
+    assertStringIncludes(output, "from './_aspire-compat.mts'");
   });
 
   it('should generate two-pass registration structure', () => {
@@ -68,7 +68,10 @@ describe('generateRegisterServices', () => {
     });
     assertStringIncludes(output, "builder.addExecutable('users', 'deno', workdir,");
     assertStringIncludes(output, "'--minimum-dependency-age=0'");
-    assertStringIncludes(output, '.withHttpEndpoint({ port: 3000');
+    // MINIMAL_SERVICE carries the deprecated `Port` alias, so the pin is
+    // expected here. The un-pinned default is covered in
+    // register-http-endpoint_test.ts.
+    assertStringIncludes(output, ".withHttpEndpoint({ port: 3000, env: 'PORT' });");
     assertStringIncludes(output, "services.set('users'");
   });
 
@@ -197,7 +200,7 @@ describe('generateRegisterPlugins', () => {
     assertStringIncludes(output, "builder.addExecutable('auth', 'deno', workdir,");
     assertStringIncludes(output, "'--minimum-dependency-age=0'");
     assertStringIncludes(output, "'--unstable-no-legacy-abort'");
-    assertStringIncludes(output, '.withHttpEndpoint({ port: 4400');
+    assertStringIncludes(output, ".withHttpEndpoint({ port: 4400, env: 'PORT' });");
     assertStringIncludes(output, "plugins.set('auth'");
   });
 
@@ -290,7 +293,7 @@ describe('generateRegisterPlugins', () => {
     assertStringIncludes(output, 'withCacheReference,');
     // EndpointProperty is no longer imported — endpoint resolution moved to the
     // infrastructure wiring layer.
-    assertStringIncludes(output, "import { OtlpProtocol } from '../.aspire/modules/aspire.mjs'");
+    assertStringIncludes(output, "import { OtlpProtocol } from '../.aspire/modules/aspire.mts'");
   });
 
   it('should pass saga store backend appsettings to plugin env', () => {

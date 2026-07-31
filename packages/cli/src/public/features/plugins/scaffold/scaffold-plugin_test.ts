@@ -6,6 +6,7 @@ import {
 } from '@netscript/plugin/templates';
 
 import { MemoryFileSystemAdapter } from '../../../../kernel/adapters/scaffold/memory-fs.ts';
+import { NETSCRIPT_RELEASE_VERSION } from '../../../../kernel/constants/jsr-specifiers.ts';
 import {
   resolvePluginScaffoldTarget,
   resolveTemplateVariables,
@@ -71,6 +72,7 @@ describe('plugin scaffold use case', () => {
     assertEquals(variables.pluginScope, '@acme');
     assertEquals(variables['plugin-name'], 'plugin-billing');
     assertEquals(variables.ClassName, 'Billing');
+    assertEquals(variables.netscriptReleaseVersion, NETSCRIPT_RELEASE_VERSION);
   });
 
   it('rejects templates with missing variables', () => {

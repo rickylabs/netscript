@@ -4,6 +4,7 @@
  */
 
 import type { InstallStarterResource, NetScriptPlugin } from '@netscript/plugin/adapter';
+import { PLUGIN_PACKAGE_VERSION } from '../package-metadata.generated.ts';
 import {
   barrelScaffolder,
   DEFAULT_BARREL_INPUT,
@@ -30,7 +31,7 @@ export const workersAdapterPlugin: NetScriptPlugin = {
   kind: 'workers',
   displayName: 'Background Workers',
   install: {
-    dependencySpecifier: 'jsr:@netscript/plugin-workers@^0.0.1-alpha.12',
+    dependencySpecifier: `jsr:@netscript/plugin-workers@${PLUGIN_PACKAGE_VERSION}`,
     starterResources: workersStarterResources,
     configParams: ['WORKERS_API_URL', 'WORKER_CONCURRENCY'],
     wiringEntry: '@netscript/plugin-workers/worker',
@@ -50,7 +51,7 @@ export const workersAdapterPlugin: NetScriptPlugin = {
   },
   update: {
     strategy: 'dependency',
-    targetSpecifier: 'jsr:@netscript/plugin-workers@^0.0.1-alpha.12',
+    targetSpecifier: `jsr:@netscript/plugin-workers@${PLUGIN_PACKAGE_VERSION}`,
   },
   remove: {
     strategy: 'manifest-only',

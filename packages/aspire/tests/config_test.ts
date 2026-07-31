@@ -121,6 +121,15 @@ Deno.test('config', async (t) => {
     assertEquals(result.NetScript.BackgroundProcessors.sagas?.Sagas?.Store?.Backend, 'kv');
   });
 
+  await t.step('AppSettingsSchema: preserves host-side Aspire parameters', () => {
+    const result = AppSettingsSchema.parse({
+      Parameters: { 'mssql-password': 'secret' },
+      NetScript: { Name: 'parameterized-app' },
+    });
+
+    assertEquals(result.Parameters, { 'mssql-password': 'secret' });
+  });
+
   await t.step('parseAppSettings: parses background processors', async () => {
     const { config } = await parseAppSettings(REAL_CONFIG_PATH);
 
@@ -262,12 +271,20 @@ Deno.test('config', async (t) => {
     assertEquals(result.success, false);
   });
 
-  await t.step('ServiceEntrySchema: rejects missing Port', () => {
+  await t.step('ServiceEntrySchema: accepts a service that pins no host port', () => {
+    // Pinning is opt-in since #952 — an entry with no port lets Aspire allocate
+    // one, which is what `aspire start --isolated` needs.
     const result = ServiceEntrySchema.safeParse({
       Runtime: 'deno',
       Entrypoint: 'src/main.ts',
     });
-    assertEquals(result.success, false);
+    assertEquals(result.success, true);
+  });
+
+  await t.step('ServiceEntrySchema: accepts HostPort and the deprecated Port alias', () => {
+    assertEquals(ServiceEntrySchema.safeParse({ HostPort: 3005 }).success, true);
+    assertEquals(ServiceEntrySchema.safeParse({ Port: 3000 }).success, true);
+    assertEquals(ServiceEntrySchema.safeParse({ HostPort: 0 }).success, false);
   });
 
   await t.step('ServiceEntrySchema: fills defaults', () => {

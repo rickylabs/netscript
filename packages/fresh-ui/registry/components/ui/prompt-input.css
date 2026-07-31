@@ -149,6 +149,12 @@
   background: var(--ns-primary-hover);
 }
 
+.ns-iconbtn:disabled,
+.ns-prompt-input__send:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
 .ns-prompt-input__send:focus-visible {
   outline: 2px solid var(--ns-ring);
   outline-offset: 2px;

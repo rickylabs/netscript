@@ -64,6 +64,7 @@ export function createMaintainerInitCommand(
     .option('--no-git', 'Skip git init after scaffolding')
     .option('--force', 'Overwrite existing target directory', { default: false })
     .option('--ci', 'Non-interactive mode', { default: false })
+    .option('--non-interactive', 'Run without prompting', { default: false })
     .option('-y, --yes', 'Accept defaults without prompting', { default: false })
     .option('--path <path:string>', 'Target directory for scaffold output')
     .option('--dry-run', 'Preview scaffold plan without writing files', { default: false })
@@ -88,7 +89,7 @@ export function createMaintainerInitCommand(
         path: options.path,
         editor: parseEditor(options.editor),
         force: options.force ?? false,
-        ci: options.ci ?? false,
+        ci: options.ci === true || options.nonInteractive === true,
         yes: options.yes ?? false,
         dryRun: options.dryRun ?? false,
         json: options.json ?? false,

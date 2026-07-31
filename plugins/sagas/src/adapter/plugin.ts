@@ -4,6 +4,7 @@
  */
 
 import type { InstallStarterResource, NetScriptPlugin } from '@netscript/plugin/adapter';
+import { PLUGIN_PACKAGE_VERSION } from '../package-metadata.generated.ts';
 import {
   barrelScaffolder,
   DEFAULT_BARREL_INPUT,
@@ -26,7 +27,7 @@ export const sagasAdapterPlugin: NetScriptPlugin = {
   kind: 'sagas',
   displayName: 'Saga Orchestrator',
   install: {
-    dependencySpecifier: 'jsr:@netscript/plugin-sagas@^0.0.1-alpha.12',
+    dependencySpecifier: `jsr:@netscript/plugin-sagas@${PLUGIN_PACKAGE_VERSION}`,
     starterResources: sagasStarterResources,
     configParams: ['SAGAS_API_URL', 'SAGA_CONCURRENCY'],
     wiringEntry: '@netscript/plugin-sagas-core/stores',
@@ -46,7 +47,7 @@ export const sagasAdapterPlugin: NetScriptPlugin = {
   },
   update: {
     strategy: 'dependency',
-    targetSpecifier: 'jsr:@netscript/plugin-sagas@^0.0.1-alpha.12',
+    targetSpecifier: `jsr:@netscript/plugin-sagas@${PLUGIN_PACKAGE_VERSION}`,
   },
   remove: {
     strategy: 'manifest-only',

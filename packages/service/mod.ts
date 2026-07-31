@@ -105,6 +105,13 @@ export {
   type RPCHandlerConfig,
 } from './src/primitives/handlers.ts';
 
+export {
+  buildServiceRpcPath,
+  DEFAULT_RPC_API_PATH,
+  DEFAULT_RPC_API_VERSION,
+  type ServiceRpcPathOptions,
+} from './src/primitives/rpc-path.ts';
+
 export type {
   ContextFactory,
   CorsOptions,

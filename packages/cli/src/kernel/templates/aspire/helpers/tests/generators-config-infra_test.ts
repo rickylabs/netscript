@@ -43,7 +43,7 @@ describe('generateConfigSchema', () => {
     const output = generateConfigSchema(emptyOptions);
     assertStringIncludes(output, "import { z } from 'zod'");
     assertStringIncludes(output, 'NetScriptConfigSchema,');
-    assertStringIncludes(output, "from './_aspire-compat.mjs'");
+    assertStringIncludes(output, "from './_aspire-compat.mts'");
   });
 
   it('should export ProjectConfigSchema and ProjectConfig type', () => {
@@ -147,11 +147,11 @@ describe('generateRegisterInfrastructure', () => {
     const output = generateRegisterInfrastructure(emptyOptions);
     assertStringIncludes(
       output,
-      "import { ContainerLifetime, EndpointProperty } from '../.aspire/modules/aspire.mjs'",
+      "import { ContainerLifetime, EndpointProperty } from '../.aspire/modules/aspire.mts'",
     );
     assertStringIncludes(
       output,
-      "import { type CacheWiring, ensureGarnetToolManifest, generateAccessToken, resolveDataPath, shouldUseContainerCache } from './_aspire-compat.mjs'",
+      "import { type CacheWiring, ensureGarnetToolManifest, generateAccessToken, resolveDataPath, shouldUseContainerCache } from './_aspire-compat.mts'",
     );
   });
 

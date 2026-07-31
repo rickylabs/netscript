@@ -184,7 +184,8 @@ With `aspire start` running and your MCP server reachable:
 3. Probe the sandbox route directly and check the isolation headers:
 
 ```sh
-curl -i 'http://localhost:8010/mcp/sandbox?uri=ui%3A%2F%2Fwidget%2Fdemo&theme=dark'
+# $APP is the app URL from the Aspire dashboard, as in chapter 2.
+curl -i "$APP/mcp/sandbox?uri=ui%3A%2F%2Fwidget%2Fdemo&theme=dark"
 ```
 
 You should see the resolved resource with `data-theme="dark"` and the dark `--ns-*` tokens,

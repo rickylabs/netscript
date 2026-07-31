@@ -39,7 +39,7 @@ describe('generateRegisterTools', () => {
     const output = generateRegisterTools({ tools: {} });
     assertStringIncludes(output, 'buildDatabaseUriEnvKey');
     assertStringIncludes(output, 'resolveWorkspacePath');
-    assertStringIncludes(output, "from './_aspire-compat.mjs'");
+    assertStringIncludes(output, "from './_aspire-compat.mts'");
   });
 
   it('should register tools via addExecutable with deno task', () => {
@@ -240,7 +240,7 @@ describe('generateIndex', () => {
     const output = generateIndex();
     assertStringIncludes(
       output,
-      "import { parseAppSettings } from './_aspire-compat.mjs'",
+      "import { parseAppSettings } from './_aspire-compat.mts'",
     );
   });
 
@@ -248,7 +248,7 @@ describe('generateIndex', () => {
     const output = generateIndex();
     assertStringIncludes(
       output,
-      "import type { DistributedApplicationBuilder } from '../.aspire/modules/aspire.mjs'",
+      "import type { DistributedApplicationBuilder } from '../.aspire/modules/aspire.mts'",
     );
   });
 
@@ -256,31 +256,31 @@ describe('generateIndex', () => {
     const output = generateIndex();
     assertStringIncludes(
       output,
-      "import { configureDashboard } from './configure-dashboard.mjs'",
+      "import { configureDashboard } from './configure-dashboard.mts'",
     );
     assertStringIncludes(
       output,
-      "import { registerInfrastructure } from './register-infrastructure.mjs'",
+      "import { registerInfrastructure } from './register-infrastructure.mts'",
     );
     assertStringIncludes(
       output,
-      "import { registerServices, wireServiceReferences } from './register-services.mjs'",
+      "import { registerServices, wireServiceReferences } from './register-services.mts'",
     );
     assertStringIncludes(
       output,
-      "import { registerPlugins } from './register-plugins.mjs'",
+      "import { registerPlugins } from './register-plugins.mts'",
     );
     assertStringIncludes(
       output,
-      "import { registerBackgroundProcessors } from './register-background.mjs'",
+      "import { registerBackgroundProcessors } from './register-background.mts'",
     );
     assertStringIncludes(
       output,
-      "import { registerApps } from './register-apps.mjs'",
+      "import { registerApps } from './register-apps.mts'",
     );
     assertStringIncludes(
       output,
-      "import { registerTools } from './register-tools.mjs'",
+      "import { registerTools } from './register-tools.mts'",
     );
   });
 

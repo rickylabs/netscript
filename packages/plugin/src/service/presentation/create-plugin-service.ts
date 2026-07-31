@@ -22,6 +22,7 @@ import {
   type ServiceRouteMethod,
   type ServiceRouter,
 } from '@netscript/service';
+import { resolvePluginRpcRouter } from './plugin-contract-binder.ts';
 
 /**
  * Options forwarded to `ServiceBuilder.withDatabase()`.
@@ -62,6 +63,12 @@ export interface PluginRawRoute {
 export interface PluginServiceConfig extends ServiceConfig {
   /** Forwarded to `withRPC({ traceContext })`; defaults to `true`. */
   readonly traceContext?: boolean;
+  /** API version used in the canonical RPC mount path; defaults to `v1`. */
+  readonly apiVersion?: string;
+  /** Router namespace used by generated clients; defaults to the service name. */
+  readonly routerName?: string;
+  /** Base API path shared with generated clients; defaults to `/api`. */
+  readonly apiPath?: string;
   /** Per-request oRPC context factory applied via `withContext()`. */
   readonly context?: ContextFactory;
   /** Database wiring applied via `withDatabase()`. */
@@ -156,7 +163,17 @@ export function createPluginService<TRouter extends ServiceRouter>(
   }
 
   if (config.serveRpc !== false) {
-    builder = builder.withRPC({ traceContext: config.traceContext ?? true });
+    builder = builder.withRPC({
+      rpcPath: `${config.apiPath ?? '/api'}/rpc`,
+      rpcRouter: resolvePluginRpcRouter(router),
+      deprecatedRpcRoutes: [{
+        pathPrefix: `${config.apiPath ?? '/api'}/rpc/${config.apiVersion ?? 'v1'}/`,
+        replacementPrefix: `${config.apiPath ?? '/api'}/rpc/${config.apiVersion ?? 'v1'}/${
+          config.routerName ?? config.name
+        }/`,
+      }],
+      traceContext: config.traceContext ?? true,
+    });
   }
 
   builder = builder.withHealth(

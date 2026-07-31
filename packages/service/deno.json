@@ -5,7 +5,8 @@
   "license": "Apache-2.0",
   "exports": {
     ".": "./mod.ts",
-    "./auth": "./src/auth/mod.ts"
+    "./auth": "./src/auth/mod.ts",
+    "./rpc-path": "./src/primitives/rpc-path.ts"
   },
   "tasks": {
     "check": "deno check --unstable-kv ./mod.ts",

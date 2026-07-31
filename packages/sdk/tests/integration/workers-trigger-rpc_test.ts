@@ -1,7 +1,7 @@
 import { assertEquals, assertRejects } from '@std/assert';
 import { ORPCError } from '@orpc/contract';
 import { os } from '@orpc/server';
-import { createService } from '../../../service/mod.ts';
+import { assemblePluginContractRouter, createPluginService } from '@netscript/plugin/service';
 import { createServiceClient } from '../../src/client/service-client.ts';
 import { createServerServiceEnvKey } from '../../src/discovery/service-url.ts';
 
@@ -15,7 +15,6 @@ import { createServerServiceEnvKey } from '../../src/discovery/service-url.ts';
 
 const SERVICE_NAME = 'workers';
 const ROUTER_NAME = 'workers';
-const RPC_PATH = `/api/rpc/v1/${ROUTER_NAME}`;
 
 interface TriggerJobInput {
   readonly id?: string;
@@ -25,7 +24,7 @@ interface TriggerJobInput {
 // (`POST /jobs/{id}/trigger`) with an optional body id, failing loudly when no
 // id resolves — exactly the shape the #279 fix gives the real handler.
 function createWorkersStyleRouter() {
-  return {
+  const contract = {
     triggerJob: os.route({ method: 'POST', path: '/jobs/{id}/trigger' }).handler(
       ({ input }: { input: unknown }) => {
         const id = (input as TriggerJobInput).id;
@@ -43,6 +42,13 @@ function createWorkersStyleRouter() {
       },
     ),
   };
+  return {
+    contract,
+    server: assemblePluginContractRouter(
+      { router: (value: typeof contract) => value },
+      { version: 'v1', namespace: ROUTER_NAME, handlers: contract },
+    ),
+  };
 }
 
 function clientOrigin(hostname: string, port: number): string {
@@ -52,16 +58,16 @@ function clientOrigin(hostname: string, port: number): string {
 
 Deno.test('createServiceClient RPC path reaches a plugin-workers triggerJob route', async () => {
   const router = createWorkersStyleRouter();
-  const running = await createService(router, { name: SERVICE_NAME })
-    .withRPC({ rpcPath: RPC_PATH })
-    .serve({ port: 0 });
+  const running = await createPluginService(router.server, { name: ROUTER_NAME }).serve({
+    port: 0,
+  });
   const envKey = createServerServiceEnvKey(SERVICE_NAME);
   const previous = Deno.env.get(envKey);
   Deno.env.set(envKey, clientOrigin(running.addr.hostname, running.addr.port));
 
   try {
     const client = createServiceClient({
-      contract: router,
+      contract: router.contract,
       serviceName: SERVICE_NAME,
       routerName: ROUTER_NAME,
     });

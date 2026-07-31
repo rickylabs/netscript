@@ -1,4 +1,5 @@
 import type { RegistryManifest } from './registry.schema.ts';
+import { FRESH_UI_PACKAGE_VERSION } from './src/package-metadata.generated.ts';
 
 /**
  * Copy-based registry manifest for the published `@netscript/fresh-ui` foundation package.
@@ -1346,7 +1347,10 @@ export const freshUiRegistryManifest: RegistryManifest = {
         'data-table',
         'card',
       ],
-      dependencies: ['jsr:@netscript/ai@^0.0.1-beta.5', 'npm:preact@^10.29.2'],
+      dependencies: [
+        `jsr:@netscript/ai@${FRESH_UI_PACKAGE_VERSION}`,
+        'npm:preact@^10.29.2',
+      ],
     },
   ],
   collections: [

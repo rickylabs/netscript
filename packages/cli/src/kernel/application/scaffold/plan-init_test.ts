@@ -183,6 +183,14 @@ Deno.test('scaffoldRoot emits CI/CD workflow templates for shipped deploy target
   assertEquals(scaffolder.directories.has('/workspace/deploy-app'), true);
 });
 
+Deno.test('#966 scaffoldRoot keeps source appsettings tracked by git', async () => {
+  const scaffolder = new InMemoryScaffolder();
+  await scaffoldRoot(context(scaffolder), options());
+
+  const gitignore = scaffolder.files.get('/workspace/deploy-app/.gitignore') ?? '';
+  assertEquals(gitignore.split(/\r?\n/).includes('appsettings.json'), false);
+});
+
 Deno.test('scaffoldRoot emits deploy workflow invocations accepted by the real deploy parser', async () => {
   const scaffolder = new InMemoryScaffolder();
   await scaffoldRoot(context(scaffolder), options());
