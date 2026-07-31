@@ -207,7 +207,14 @@ The guards make the defect fail at unit speed instead:
 held `127.0.0.1:8010`, so this run's app proxy could never bind. Those are not this repository's
 processes and were left alone. The suite aborts on the first critical failure, so
 `behavior.app-home` was not reached in-suite; it was verified directly against the running generated
-app instead (table above). A clean-host `scaffold.runtime` on CI is the remaining verdict.
+app instead (table above).
+
+**Clean-host CI verdict on `2835d7b76`: PASS.** `behavior.app-home: PASSED 225ms`,
+`runtime.wait.dashboard: PASSED 53239ms`, `Summary: passed=62 failed=0`
+([job 91191130059](https://github.com/rickylabs/netscript/actions/runs/30641131218/job/91191130059)).
+This is the first end-to-end execution of `scaffold.runtime` for this run — `D-4` and `D-7` are
+closed. #957's `scaffold-runtime` also passes on re-run, with no code change: the two PRs are green
+independently and were never coupled.
 
 ## Reconcile notes — S6
 
