@@ -22,9 +22,16 @@
  *
  * All types receive executable-mode OTEL telemetry and optional
  * KV cache dependency injection.
+ *
+ * `app` resources additionally get an HTTP health probe against their own
+ * server-rendered health route. Aspire falls back to "process is Running means ready"
+ * for a resource with no registered health check, which is how a Fresh app that fails
+ * during SSR could still report `Healthy` (#954). Set `HealthCheckPath: false` on the
+ * app entry to opt out, or to a path string to probe a different route.
  */
 
 import type { RegisterAppsOptions } from '../types.ts';
+import { RESOURCE_DEFAULTS } from '@netscript/aspire/constants';
 import { fileHeader, safeIdentifier } from '../_utils.ts';
 import { SCAFFOLD_ASPIRE_MODULES } from '../../../../constants/scaffold/scaffold-aspire.ts';
 import { SCAFFOLD_DIRS } from '../../../../constants/scaffold/scaffold-dirs.ts';
@@ -83,6 +90,13 @@ export function generateRegisterApps(options: RegisterAppsOptions): string {
       lines.push(``);
       lines.push(`    // HTTP endpoint`);
       lines.push(`    await ${id}.withHttpEndpoint({ port: ${entry.Port}, env: 'PORT' });`);
+    }
+
+    // --- app type: HTTP health probe ---
+    // Registered after the endpoint it derives its base address from. Only `app`
+    // resources serve routes we control; tauri/desktop/task expose no such contract.
+    if (type === 'app' && entry.Port) {
+      buildHealthProbeBlock(lines, id, entry);
     }
 
     // --- desktop type: server-side discovery only ---
@@ -210,6 +224,41 @@ export function generateRegisterApps(options: RegisterAppsOptions): string {
 // ---------------------------------------------------------------------------
 // Block builders — each appends lines for a specific app type
 // ---------------------------------------------------------------------------
+
+/**
+ * Appends the HTTP health probe registration for an `app` entry.
+ *
+ * Aspire only treats a resource as healthy once its registered health checks pass; a resource
+ * with no health check at all is considered ready as soon as its process reaches `Running`.
+ * That fallback is what let a generated Fresh app report `Healthy` while every request failed
+ * during SSR (#954). The probe targets the app's own server-rendered health route, so a broken
+ * render pipeline surfaces as `Unhealthy` instead of green-and-500.
+ */
+function buildHealthProbeBlock(
+  lines: string[],
+  id: string,
+  entry: { readonly HealthCheckPath?: string | false },
+): void {
+  const path = resolveHealthCheckPath(entry);
+  if (!path) return;
+
+  lines.push(``);
+  lines.push(`    // HTTP health probe — a listening socket alone is not "healthy".`);
+  lines.push(
+    `    await ${id}.withHttpHealthCheck({ path: '${path}', endpointName: '${RESOURCE_DEFAULTS.HttpEndpointName}' });`,
+  );
+}
+
+/**
+ * Resolves the health probe path for an app entry, or `undefined` when the app opted out
+ * with `HealthCheckPath: false`.
+ */
+function resolveHealthCheckPath(
+  entry: { readonly HealthCheckPath?: string | false },
+): string | undefined {
+  if (entry.HealthCheckPath === false) return undefined;
+  return entry.HealthCheckPath ?? RESOURCE_DEFAULTS.AppHealthCheckPath;
+}
 
 /**
  * Builds registration lines for an `app` type entry.
