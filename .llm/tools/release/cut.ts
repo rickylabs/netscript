@@ -174,7 +174,7 @@ async function createReleasePr(
 
 async function main(): Promise<void> {
   const options = parseArgs(Deno.args);
-  const bump = await prepareRelease(options.root, options.version, 'release:cut');
+  const bump = await prepareRelease(options.root, options.version, 'release:cut', 'stable');
 
   if (options.dryRun) {
     console.log('release:cut dry-run complete; branch/commit/push/PR skipped.');

@@ -200,6 +200,24 @@ Deno.test('findVersionResidue reports a prior release retained in a nested membe
   }
 });
 
+Deno.test('findVersionResidue ignores a same-core canary and reports an exact stable residue', async () => {
+  const { findVersionResidue } = await import('./bump-version.ts');
+  const root = await Deno.makeTempDir({ prefix: 'ns-same-core-canary-residue-' });
+  try {
+    await Deno.writeTextFile(`${root}/deno.json`, '{"version":"0.0.2-canary.1"}\n');
+    await Deno.writeTextFile(
+      `${root}/deno.lock`,
+      '{"specifier":"jsr:@netscript/sdk@0.0.2-canary.1"}\n',
+    );
+    assertEquals(await findVersionResidue(root, '0.0.2'), []);
+
+    await Deno.writeTextFile(`${root}/stale.json`, '{"specifier":"jsr:@netscript/sdk@^0.0.2"}\n');
+    assertEquals(await findVersionResidue(root, '0.0.2'), [`${root}/stale.json`]);
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
 Deno.test('findVersionResidue excludes captured public-surface baseline snapshots', async () => {
   const { findVersionResidue } = await import('./bump-version.ts');
   const root = await Deno.makeTempDir({ prefix: 'ns-residue-' });
