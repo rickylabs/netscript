@@ -11,8 +11,10 @@ export interface AspireDoctorDependencies {
 }
 
 const DEFAULT_ASPIRE_MARKERS = [
+  'aspire/apphost.mts',
   'aspire/apphost.ts',
   'aspire/apphost.cs',
+  'apphost.mts',
   'apphost.ts',
   'apphost.cs',
 ];

@@ -19,6 +19,12 @@ Working hypothesis: all three are the same defect class — MCP surfaces derive 
 from a second source rather than from the live/registry source, and no contract test pins
 the pass/fail semantics. The fix should be at that seam, plus a regression guard.
 
+## Re-baselined result
+
+- Confirmed defects: HTTP error responses were passed; generated `.mts` AppHost markers were omitted.
+- Stale issue premise: CLI-mode MCP already receives `PublicCliCommandCatalog` from `createPublicCommandRegistry`. Workers' detailed commands are owned by the separately published workers plugin CLI; the core registry truthfully exposes generic plugin dispatch verbs.
+- Implementation and focused tests are complete; final separate-session evaluation remains.
+
 ## Assessment
 
 MECHANICAL — no plan document. Straight to implementation.

@@ -5,10 +5,34 @@ import type { DoctorCheckFamily, DoctorResult } from '../mod.ts';
 import { createDoctorFlow } from '../src/application/flows/doctor-flow.ts';
 import { validateSchema } from '../src/domain/schema.ts';
 import { TOOL_OUTPUT_SCHEMAS } from '../src/domain/tool-contracts.ts';
+import { FetchTelemetryProbe } from '../src/infrastructure/fetch-telemetry-probe.ts';
 
 const unreachable: TelemetryProbePort = {
   probe: () => Promise.resolve({ reachable: false, message: 'connection refused' }),
 };
+
+Deno.test('telemetry probe only treats successful HTTP responses as reachable', async () => {
+  for (const [status, reachable] of [[204, true], [404, false], [500, false]] as const) {
+    const probe = new FetchTelemetryProbe(
+      () => () => Promise.resolve(new Response(null, { status })),
+    );
+    assertEquals((await probe.probe('http://telemetry.test')).reachable, reachable);
+  }
+});
+
+Deno.test('doctor fails an explicit telemetry endpoint that responds with HTTP 404', async () => {
+  const probe = new FetchTelemetryProbe(
+    () => () => Promise.resolve(new Response(null, { status: 404 })),
+  );
+  const result = await createDoctorFlow(probe, {}, [], '/fixture')({
+    endpoint: 'http://telemetry.test',
+  });
+  if (!result.ok) throw new Error(result.error.message);
+  const doctor = result.value as DoctorResult;
+  assertEquals(doctor.status, 'fail');
+  assertEquals(doctor.counts, { pass: 0, warn: 0, fail: 1 });
+  assertStringIncludes(doctor.families[0]?.checks[0]?.summary ?? '', 'HTTP 404');
+});
 
 Deno.test('doctor treats an unreachable explicit endpoint as a failure', async () => {
   const response = await createMcpServer({
