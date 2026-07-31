@@ -79,6 +79,37 @@ before any `db` command (step 3).**
   }
 ] }) }}
 
+## Mutation and regeneration map
+
+Use this map before a command that writes. “Source of truth” is the declaration the command owns;
+generated artifacts can be deleted and rebuilt from it unless the row says the command creates
+workspace-owned source. “Preview” is deliberately explicit: do not assume every mutating command
+accepts `--dry-run`.
+
+| Command | Source of truth mutated | Generated artifacts | Runtime consumers | Preview |
+| --- | --- | --- | --- | --- |
+| `netscript init` | New workspace choices and root configuration | Entire workspace, app/service/plugin/database skeletons, Aspire graph | Deno tasks, Fresh app, services, plugin runtimes, Aspire | `--dry-run` |
+| `netscript config set` | Generated `aspire/appsettings.json` value | None beyond the configuration write | AppHost generator and resources reading the setting | No |
+| `netscript contract add` / `netscript contract add-route` | Workspace-owned versioned contract source | Version aggregate exports | Service handlers, SDK clients, OpenAPI/RPC routers | No |
+| `netscript contract version add` / `netscript contract remove` | Versioned contract source | Version and root aggregate exports | Service and SDK imports | No |
+| `netscript service add` / `netscript service set` / `netscript service remove` | Service workspace plus `aspire/appsettings.json` | Contract aggregates and Aspire helper files | AppHost resource graph, typed callers | No |
+| `netscript service ref add` / `netscript service ref remove` | Caller `ServiceReferences` in `aspire/appsettings.json` | Aspire helper files | AppHost environment/reference injection | No |
+| `netscript db add` / `netscript db remove` | Database target configuration and workspace membership | Aspire configuration and AppHost helpers | Prisma tasks, services, Aspire resources | No |
+| `netscript db init` / `netscript db migrate` | Prisma schema and migration history | Migration directories and generated client inputs | Prisma engine and application repositories | No; database operation |
+| `netscript db generate` | Prisma schema, including plugin contributions | Prisma client and Zod output | Services, plugins, repositories | No |
+| `netscript plugin install` / `netscript plugin update` / `netscript plugin remove` | Plugin dependency and host registration | Workspace glue, plugin registries, Aspire helpers | AppHost and plugin service/runtime discovery | `install --dry-run`; others no |
+| `netscript generate plugins` | Installed plugin manifests and project source | `.netscript/generated` plugin registries | Plugin host and generated imports | `--dry-run` |
+| `netscript generate runtime-schemas` | Runtime topic declarations | Runtime-config JSON Schema files | Editors, validators, runtime override tooling | `--dry-run` |
+| `netscript generate aspire` | `aspire/appsettings.json` | AppHost helper files | Aspire AppHost | No |
+| `netscript ui:init` / `netscript ui:add` | Registry selection | Workspace-owned components, pages, islands, styles, and tokens | Fresh app and its Vite build | No |
+| `netscript ui:update` / `netscript ui:remove` | Installed registry inventory and unmodified copied files | Updated or removed copy-source UI files | Fresh app and its Vite build | No |
+| `netscript deploy build` / target `plan` | Deployment manifest plus project entrypoints | Target deployment artifacts or an emitted plan | Target runtime or service manager | `plan` is non-deploying |
+| `netscript deploy up` / `deploy install` / lifecycle verbs | Deployment target or service-manager state | Provider/service-manager state; target-dependent local artifacts | Deployed services | Target-dependent; check `--help` |
+
+Read commands (`list`, `get`, `inspect`, `status`, `logs`, `doctor`) are omitted because they do not
+mutate project or provider state. Commands that invoke an external database or cloud provider say
+so in the final column; a filesystem-only `--dry-run` would not safely model those effects.
+
 ## Scaffold a workspace
 
 {{ comp.apiTable({

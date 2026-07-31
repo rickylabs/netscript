@@ -31,3 +31,14 @@ generated command→artefact map — not three independent edits.
 
 Until these land, round two of the agent experiment measures the documentation a second time
 instead of measuring the framework.
+
+## Implementation state — 2026-07-31
+
+- Added a preferred-path table to the cross-area recipe index.
+- Added a compact CLI source-of-truth → generated-artifacts → runtime-consumers map with explicit
+  preview support.
+- Added `deno task docs:accuracy`, which checks the saga function contract, forbids the stale
+  object form in public saga pages, requires all eight first-class routes, and requires eighteen
+  mutating CLI families in the map.
+- Fails-before observed, then all focused gates passed.
+- Pending: separate-session IMPL-EVAL, commit/push verification, PR reconciliation.
