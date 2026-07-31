@@ -2,7 +2,7 @@
 // Do not edit by hand. Run `deno task gen:publish-assets`.
 
 /** Version of the published MCP package. */
-export const MCP_PACKAGE_VERSION: string = '0.0.2';
+export const MCP_PACKAGE_VERSION: string = '0.0.2-canary.2';
 
 /** Published MCP README embedded as the default documentation corpus. */
 export const MCP_PACKAGE_README: string =
