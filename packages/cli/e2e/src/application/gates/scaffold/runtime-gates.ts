@@ -259,7 +259,11 @@ export function createRuntimeGates(
       (context) => [
         'deno',
         'run',
-        '--allow-net=127.0.0.1',
+        // `localhost` as well as `127.0.0.1`: Deno's allowlist matches the host *string*, and
+        // `aspire describe` reports endpoints as `http://localhost:<port>`. Granting only
+        // 127.0.0.1 denies every fetch, which the retry loop then reports as if the app never
+        // rendered — the exact failure this gate is supposed to distinguish.
+        '--allow-net=127.0.0.1,localhost',
         '--allow-read',
         // The pristine scaffold pins no host port, so the probe resolves the allocated one
         // through `aspire describe` against the running AppHost.

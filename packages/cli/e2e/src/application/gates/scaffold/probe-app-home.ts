@@ -16,7 +16,7 @@
  * <projectRoot> <appName> [appHost]`
  */
 
-import { generatedAppHomeUrl } from './generated-app-endpoint.ts';
+import { generatedAppHomeUrls } from './generated-app-endpoint.ts';
 
 const ATTEMPTS = 60;
 const RETRY_DELAY_MS = 1_000;
@@ -27,33 +27,35 @@ const appHost = Deno.args[2];
 if (!projectRoot) throw new Error('project root argument is required');
 if (!appName) throw new Error('app name argument is required');
 
-const url = await generatedAppHomeUrl(projectRoot, appName, appHost);
+// Resolved once, up front: a pinned port yields one URL, an Aspire-allocated one yields the
+// endpoint the AppHost reports plus its 127.0.0.1 twin. Each attempt tries them all, so a
+// candidate that is merely unreachable never masks one that works.
+const urls = await generatedAppHomeUrls(projectRoot, appName, appHost);
+console.info(`probing ${appName} home page at: ${urls.join(', ')}`);
 
-let lastStatus = 0;
-let lastBody = '';
-let lastContentType = '';
+const lastFailure = new Map<string, string>();
 
 for (let attempt = 1; attempt <= ATTEMPTS; attempt++) {
-  try {
-    const response = await fetch(url, { headers: { accept: 'text/html' } });
-    lastStatus = response.status;
-    lastContentType = response.headers.get('content-type') ?? '';
-    lastBody = await response.text();
-    if (response.ok && lastContentType.includes('text/html') && lastBody.includes('<html')) {
-      console.info(
-        `app home page rendered at ${url}: HTTP ${response.status} (${lastBody.length} bytes)`,
-      );
-      Deno.exit(0);
+  for (const url of urls) {
+    try {
+      const response = await fetch(url, { headers: { accept: 'text/html' } });
+      const contentType = response.headers.get('content-type') ?? '';
+      const body = await response.text();
+      if (response.ok && contentType.includes('text/html') && body.includes('<html')) {
+        console.info(
+          `app home page rendered at ${url}: HTTP ${response.status} (${body.length} bytes)`,
+        );
+        Deno.exit(0);
+      }
+      lastFailure.set(url, `HTTP ${response.status} (${contentType}): ${body.slice(0, 200)}`);
+    } catch (error) {
+      lastFailure.set(url, error instanceof Error ? error.message : String(error));
     }
-  } catch (error) {
-    lastStatus = 0;
-    lastBody = error instanceof Error ? error.message : String(error);
   }
   await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS));
 }
 
 throw new Error(
-  `app home page did not render at ${url}: HTTP ${lastStatus} (${lastContentType}): ${
-    lastBody.slice(0, 500)
-  }`,
+  `app home page did not render after ${ATTEMPTS} attempts:\n` +
+    [...lastFailure].map(([url, reason]) => `  ${url} -> ${reason}`).join('\n'),
 );

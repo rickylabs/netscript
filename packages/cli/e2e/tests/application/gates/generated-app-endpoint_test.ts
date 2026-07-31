@@ -1,8 +1,8 @@
 import { assertEquals, assertNotEquals, assertRejects, assertThrows } from '@std/assert';
 
 import {
-  appUrlFromDescribeOutput,
-  generatedAppHomeUrl,
+  appUrlsFromDescribeOutput,
+  generatedAppHomeUrls,
   readPinnedAppPort,
 } from '../../../src/application/gates/scaffold/generated-app-endpoint.ts';
 import { generateAppsettings } from '../../../../src/kernel/templates/aspire/generate-appsettings.ts';
@@ -21,7 +21,7 @@ Deno.test('readPinnedAppPort returns the port the project declares, not a defaul
   );
   try {
     assertEquals(readPinnedAppPort(root, 'dashboard'), 9137);
-    assertEquals(await generatedAppHomeUrl(root, 'dashboard'), 'http://127.0.0.1:9137/');
+    assertEquals(await generatedAppHomeUrls(root, 'dashboard'), ['http://127.0.0.1:9137/']);
   } finally {
     await Deno.remove(root, { recursive: true });
   }
@@ -35,7 +35,7 @@ Deno.test('readPinnedAppPort still honours the legacy Port spelling', async () =
   );
   try {
     assertEquals(readPinnedAppPort(root, 'dashboard'), 9137);
-    assertEquals(await generatedAppHomeUrl(root, 'dashboard'), 'http://127.0.0.1:9137/');
+    assertEquals(await generatedAppHomeUrls(root, 'dashboard'), ['http://127.0.0.1:9137/']);
   } finally {
     await Deno.remove(root, { recursive: true });
   }
@@ -51,8 +51,8 @@ Deno.test('the app home URL follows a pinned port rather than a guessed one', as
   try {
     assertEquals(readPinnedAppPort(root, 'dashboard'), SCAFFOLD_APP_PORT);
     assertEquals(
-      await generatedAppHomeUrl(root, 'dashboard'),
-      `http://127.0.0.1:${SCAFFOLD_APP_PORT}/`,
+      await generatedAppHomeUrls(root, 'dashboard'),
+      [`http://127.0.0.1:${SCAFFOLD_APP_PORT}/`],
     );
     // The offset is the whole point: probing the range start reaches nothing.
     assertNotEquals(SCAFFOLD_APP_PORT, PORT_RANGES.APP.start);
@@ -74,7 +74,7 @@ Deno.test('a pristine scaffold pins no port, and that is not an error', async ()
     // Without a running AppHost there is nothing to ask, and the message has to say so
     // rather than blame a missing field.
     await assertRejects(
-      () => generatedAppHomeUrl(root, 'dashboard'),
+      () => generatedAppHomeUrls(root, 'dashboard'),
       Error,
       'pins no host port',
     );
@@ -121,38 +121,88 @@ Deno.test('readPinnedAppPort reports an unreadable appsettings rather than guess
   }
 });
 
-// The allocated-port path parses `aspire describe`, so the parse is tested without a running
-// AppHost. Shape mirrors the service-health gate's resolver, which is already green in CI.
-Deno.test('appUrlFromDescribeOutput finds the resource endpoint in describe output', () => {
-  const describe = JSON.stringify({
-    resources: [
-      { name: 'users', urls: [{ url: 'http://127.0.0.1:41001' }] },
-      { name: 'dashboard', urls: [{ url: 'http://127.0.0.1:41999' }] },
-    ],
-  });
-  assertEquals(appUrlFromDescribeOutput(describe, 'dashboard'), 'http://127.0.0.1:41999');
+// ---------------------------------------------------------------------------
+// The allocated-port path parses `aspire describe --format Json`, so the parse is tested
+// without a running AppHost. This fixture is not invented: it is the real shape captured from
+// a live NetScript AppHost (Aspire 13.4.6) — DCP-suffixed `name`, human `displayName`, a
+// `dashboardUrl` deep-link, a declared `urls[]`, `relationships[]` stubs, and an `environment`
+// block carrying sibling services' URLs.
+// ---------------------------------------------------------------------------
+const DESCRIBE_FIXTURE = JSON.stringify({
+  resources: [
+    {
+      name: 'users-abcdwxyz',
+      displayName: 'users',
+      resourceType: 'Executable',
+      urls: [{ name: 'http', url: 'http://localhost:34100' }],
+    },
+    {
+      name: 'dashboard-sayhwbds',
+      displayName: 'dashboard',
+      resourceType: 'Executable',
+      state: 'Running',
+      healthStatus: 'Healthy',
+      dashboardUrl: 'https://localhost:43699/?resource=dashboard-sayhwbds',
+      relationships: [{ type: 'Reference', resourceName: 'users-abcdwxyz' }],
+      urls: [{ name: 'http', url: 'http://localhost:34120' }],
+      environment: {
+        OTEL_EXPORTER_OTLP_ENDPOINT: 'http://localhost:42595',
+        services__users__http__0: 'http://localhost:34100',
+        VITE_USERS_URL: 'http://localhost:34100',
+        PORT: '42775',
+      },
+    },
+  ],
 });
 
-Deno.test('appUrlFromDescribeOutput tolerates a banner before the JSON', () => {
-  const describe = 'Scanning for running AppHosts...\n' +
-    JSON.stringify({
-      resources: [{ name: 'dashboard', urls: [{ url: 'http://127.0.0.1:41999' }] }],
-    });
-  assertEquals(appUrlFromDescribeOutput(describe, 'dashboard'), 'http://127.0.0.1:41999');
+Deno.test("the app endpoint comes from the resource's declared urls[]", () => {
+  assertEquals(appUrlsFromDescribeOutput(DESCRIBE_FIXTURE, 'dashboard'), [
+    'http://localhost:34120',
+  ]);
 });
 
-Deno.test('appUrlFromDescribeOutput names what was missing', () => {
-  const noResource = JSON.stringify({ resources: [{ name: 'users', urls: [] }] });
+// This is the sharp edge. A recursive scrape of the resource node also picks up the Aspire
+// dashboard deep-link and every sibling URL in `environment`. Probing one of those would not
+// just be wrong — a sibling app's page is `text/html` containing `<html` too, which is the
+// entire assertion probe-app-home makes, so the gate would report a FALSE PASS.
+Deno.test('resolution never returns the dashboard link or a sibling service URL', () => {
+  const resolved = appUrlsFromDescribeOutput(DESCRIBE_FIXTURE, 'dashboard');
+  assertEquals(resolved.some((url) => url.includes('43699')), false); // dashboard deep-link
+  assertEquals(resolved.some((url) => url.includes('34100')), false); // the users service
+  assertEquals(resolved.some((url) => url.includes('42595')), false); // OTLP exporter
+});
+
+// DCP suffixes the instance id; gates pass the AppHost-given name.
+Deno.test('a resource resolves by displayName even though name is suffixed', () => {
+  assertEquals(appUrlsFromDescribeOutput(DESCRIBE_FIXTURE, 'users'), ['http://localhost:34100']);
+});
+
+// `relationships[]` entries carry a matching `resourceName` but no endpoint. Matching one
+// would return a stub and report "declared no HTTP endpoint" for a healthy app.
+Deno.test('a relationship stub is never mistaken for the resource', () => {
+  assertEquals(appUrlsFromDescribeOutput(DESCRIBE_FIXTURE, 'users'), ['http://localhost:34100']);
+});
+
+Deno.test('appUrlsFromDescribeOutput tolerates a banner before the JSON', () => {
+  assertEquals(
+    appUrlsFromDescribeOutput(`Scanning for running AppHosts...\n${DESCRIBE_FIXTURE}`, 'dashboard'),
+    ['http://localhost:34120'],
+  );
+});
+
+Deno.test('appUrlsFromDescribeOutput names what was missing', () => {
   assertThrows(
-    () => appUrlFromDescribeOutput(noResource, 'dashboard'),
+    () => appUrlsFromDescribeOutput(DESCRIBE_FIXTURE, 'nope'),
     Error,
     'was not present in aspire describe output',
   );
 
-  const noEndpoint = JSON.stringify({ resources: [{ name: 'dashboard', state: 'Running' }] });
+  const noEndpoint = JSON.stringify({
+    resources: [{ name: 'dashboard', displayName: 'dashboard', state: 'Running' }],
+  });
   assertThrows(
-    () => appUrlFromDescribeOutput(noEndpoint, 'dashboard'),
+    () => appUrlsFromDescribeOutput(noEndpoint, 'dashboard'),
     Error,
-    'did not expose an HTTP endpoint',
+    'declared no HTTP endpoint',
   );
 });

@@ -55,7 +55,7 @@ Deno.test('app home gate hands the probe a project and an AppHost to resolve the
   assertEquals(command, [
     'deno',
     'run',
-    '--allow-net=127.0.0.1',
+    '--allow-net=127.0.0.1,localhost',
     '--allow-read',
     '--allow-run=aspire',
     '/repo/packages/cli/e2e/src/application/gates/scaffold/probe-app-home.ts',
@@ -64,6 +64,23 @@ Deno.test('app home gate hands the probe a project and an AppHost to resolve the
     '/workspace/app/aspire/apphost.mts',
   ]);
   assertEquals(command.some((argument) => argument.includes(String(PORT_RANGES.APP.start))), false);
+});
+
+// Regression for the CI failure this branch actually hit: `aspire describe` reports endpoints
+// as `http://localhost:<port>`, and Deno's --allow-net matches the host *string*. Granting only
+// 127.0.0.1 denied every fetch, and the retry loop reported it as if the app never rendered —
+// 60 attempts, 60 seconds, and a failure message that blamed the wrong thing.
+Deno.test('app home gate can reach a localhost endpoint, not only 127.0.0.1', () => {
+  const gate = createRuntimeGates().find((entry) => entry.id === GATE.BEHAVIOR_APP_HOME);
+  if (gate?.kind !== 'command') throw new Error('Expected app home gate to be a command gate.');
+
+  const command = gate.command({
+    project: { repoRoot: '/repo', projectRoot: '/workspace/app', appHost: '/workspace/app/a.mts' },
+  } as RunContext);
+
+  const net = command.find((argument) => argument.startsWith('--allow-net='));
+  assertEquals(net?.includes('localhost'), true);
+  assertEquals(net?.includes('127.0.0.1'), true);
 });
 
 Deno.test('runtime gates wait for postgres resource by default', () => {

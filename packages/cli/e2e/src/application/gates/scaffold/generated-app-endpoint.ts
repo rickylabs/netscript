@@ -93,9 +93,16 @@ function extractJson(text: string): string {
   return trimmed.slice(Math.min(...indexes));
 }
 
-/** Aspire spells the resource name differently across shapes; accept any of them. */
+/**
+ * Matches a resource entry by the two names it actually publishes.
+ *
+ * `name` is DCP's suffixed instance id (`dashboard-sayhwbds`); `displayName` is the name the
+ * AppHost gave it (`dashboard`). Gates pass the latter. `resourceName` is deliberately NOT
+ * accepted here — that is the spelling used inside `relationships[]` entries, and matching it
+ * would return a relationship stub that carries no `urls[]` at all.
+ */
 function resourceNameMatches(value: Record<string, unknown>, name: string): boolean {
-  for (const key of ['name', 'displayName', 'resourceName']) {
+  for (const key of ['displayName', 'name']) {
     const candidate = value[key];
     if (typeof candidate === 'string' && candidate.toLowerCase() === name.toLowerCase()) {
       return true;
@@ -104,9 +111,30 @@ function resourceNameMatches(value: Record<string, unknown>, name: string): bool
   return false;
 }
 
-/** Depth-first search for the resource node, whatever nesting `describe` emitted. */
+/**
+ * Finds the resource entry for `name`.
+ *
+ * Anchored to the top-level `resources[]` array that `aspire describe --format Json` emits,
+ * rather than a free depth-first walk: an unanchored search can surface a nested
+ * `relationships[]` stub whose `resourceName` matches but which holds no endpoint. The
+ * recursive fallback is kept only for an output shape that has no `resources[]` key.
+ */
 function findResource(value: unknown, name: string): Record<string, unknown> | undefined {
   if (!isRecord(value)) return undefined;
+
+  const resources = value['resources'];
+  if (Array.isArray(resources)) {
+    const exact = resources.filter(isRecord).find((entry) => resourceNameMatches(entry, name));
+    if (exact) return exact;
+    // DCP suffixes instance ids (`dashboard-sayhwbds`); accept that when nothing matched exactly.
+    return resources
+      .filter(isRecord)
+      .find((entry) =>
+        typeof entry['name'] === 'string' &&
+        (entry['name'] as string).toLowerCase().startsWith(`${name.toLowerCase()}-`)
+      );
+  }
+
   if (resourceNameMatches(value, name)) return value;
   for (const child of Object.values(value)) {
     if (Array.isArray(child)) {
@@ -122,60 +150,70 @@ function findResource(value: unknown, name: string): Record<string, unknown> | u
   return undefined;
 }
 
-/** Every absolute http(s) URL anywhere under the resource node. */
-export function collectHttpUrls(value: unknown): string[] {
-  const urls = new Set<string>();
-  const collect = (node: unknown): void => {
-    if (typeof node === 'string') {
-      if (/^https?:\/\//i.test(node)) urls.add(node);
-      return;
-    }
-    if (Array.isArray(node)) {
-      for (const item of node) collect(item);
-      return;
-    }
-    if (!isRecord(node)) return;
-    for (const child of Object.values(node)) collect(child);
-  };
-  collect(value);
-  return [...urls];
+/**
+ * The endpoints a resource *declares*, from its `urls[]` array — `http` before `https`.
+ *
+ * Deliberately **not** a recursive scrape of the resource node. A node carries far more than
+ * its own endpoint: a `dashboardUrl` deep-link into the Aspire dashboard, and an `environment`
+ * block holding every service it references (`services__pulse__http__0`, `VITE_PROBE_URL`, the
+ * OTLP exporter endpoint...). Probing one of those would not merely be wrong, it could
+ * **falsely pass** — a sibling service's page is `text/html` containing `<html` too, which is
+ * the entire assertion `probe-app-home.ts` makes. `urls[]` is the resource's own contract.
+ */
+export function declaredHttpUrls(resource: Record<string, unknown>): string[] {
+  const declared = resource['urls'];
+  if (!Array.isArray(declared)) return [];
+  const http: string[] = [];
+  const https: string[] = [];
+  for (const entry of declared) {
+    const url = isRecord(entry) ? entry['url'] : entry;
+    if (typeof url !== 'string') continue;
+    if (/^http:\/\//i.test(url)) http.push(url);
+    else if (/^https:\/\//i.test(url)) https.push(url);
+  }
+  return [...http, ...https];
 }
 
 /**
- * Extracts the app's base URL from `aspire describe --format Json` output.
+ * Extracts the app's candidate base URLs from `aspire describe --format Json` output.
  *
- * Split out from {@link resolveAppUrlFromAppHost} so the parse is testable without a
- * running AppHost.
+ * Returns **every** HTTP URL on the resource, not the first: a resource node can carry more
+ * than one (an endpoint plus a health or telemetry URL), and which one is listed first is not
+ * a contract. `PROBE_SERVICE_HEALTH_SCRIPT` — the resolver already green in CI — tries them in
+ * turn for exactly this reason, and this module follows it rather than inventing a shortcut.
+ *
+ * Split out from {@link resolveAppUrlsFromAppHost} so the parse is testable without a running
+ * AppHost.
  *
  * @param describeOutput - Raw stdout of `aspire describe`.
  * @param appName - Aspire resource name of the app.
  * @throws If the resource is absent, or exposes no HTTP endpoint.
  */
-export function appUrlFromDescribeOutput(describeOutput: string, appName: string): string {
+export function appUrlsFromDescribeOutput(describeOutput: string, appName: string): string[] {
   const resource = findResource(JSON.parse(extractJson(describeOutput)), appName);
   if (!resource) {
     throw new Error(`resource ${appName} was not present in aspire describe output`);
   }
-  const urls = collectHttpUrls(resource);
+  const urls = declaredHttpUrls(resource);
   if (urls.length === 0) {
     throw new Error(
-      `resource ${appName} did not expose an HTTP endpoint in aspire describe output`,
+      `resource ${appName} declared no HTTP endpoint in its aspire describe urls[]`,
     );
   }
-  return urls[0];
+  return urls;
 }
 
 /**
- * Asks the running AppHost which host port it allocated for `appName`.
+ * Asks the running AppHost which host port(s) it allocated for `appName`.
  *
  * @param appHost - Path to the generated AppHost, as passed to `aspire --apphost`.
  * @param appName - Aspire resource name of the app.
  * @throws If `aspire describe` fails, or the resource exposes no HTTP endpoint.
  */
-export async function resolveAppUrlFromAppHost(
+export async function resolveAppUrlsFromAppHost(
   appHost: string,
   appName: string,
-): Promise<string> {
+): Promise<string[]> {
   const output = await new Deno.Command('aspire', {
     args: ['describe', '--apphost', appHost, '--format', 'Json', '--non-interactive', '--nologo'],
     stdout: 'piped',
@@ -186,26 +224,29 @@ export async function resolveAppUrlFromAppHost(
   if (!output.success) {
     throw new Error(`aspire describe failed with code ${output.code}: ${stderr || stdout}`);
   }
-  return appUrlFromDescribeOutput(stdout, appName);
+  return appUrlsFromDescribeOutput(stdout, appName);
 }
 
 /**
- * Builds the home-page URL of a generated app.
+ * Every home-page URL worth trying for a generated app, most likely first.
  *
- * Prefers a port the project pins; falls back to asking the running AppHost when the
- * project lets Aspire allocate one.
+ * A pinned port yields exactly one. An unpinned one yields whatever the running AppHost
+ * reports — plus, for each, a `127.0.0.1` twin when Aspire named the loopback host
+ * `localhost`. That twin is not cosmetic: Deno's `--allow-net` allowlist matches on the host
+ * *string*, so a gate granted `127.0.0.1` cannot fetch `localhost` at all, and the failure
+ * surfaces as a permission error indistinguishable from a refused connection.
  *
  * @param projectRoot - Root of the generated project.
  * @param appName - App key under `NetScript.Apps`, and the Aspire resource name.
  * @param appHost - Path to the generated AppHost. Required to resolve an unpinned port.
  */
-export async function generatedAppHomeUrl(
+export async function generatedAppHomeUrls(
   projectRoot: string,
   appName: string,
   appHost?: string,
-): Promise<string> {
+): Promise<string[]> {
   const pinned = readPinnedAppPort(projectRoot, appName);
-  if (pinned !== undefined) return `http://127.0.0.1:${pinned}/`;
+  if (pinned !== undefined) return [`http://127.0.0.1:${pinned}/`];
 
   if (!appHost) {
     throw new Error(
@@ -214,5 +255,16 @@ export async function generatedAppHomeUrl(
         'apphost path was supplied.',
     );
   }
-  return new URL('/', await resolveAppUrlFromAppHost(appHost, appName)).toString();
+
+  const candidates: string[] = [];
+  for (const base of await resolveAppUrlsFromAppHost(appHost, appName)) {
+    const home = new URL('/', base);
+    candidates.push(home.toString());
+    if (home.hostname === 'localhost') {
+      const twin = new URL(home);
+      twin.hostname = '127.0.0.1';
+      candidates.push(twin.toString());
+    }
+  }
+  return [...new Set(candidates)];
 }
