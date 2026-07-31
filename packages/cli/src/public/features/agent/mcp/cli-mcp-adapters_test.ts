@@ -72,11 +72,14 @@ Deno.test("agent MCP adapters expose real verbs and non-stub plugin doctor resul
     jsonrpc: "2.0",
     id: 3,
     method: "tools/call",
-    params: { name: "list_commands", arguments: {} },
+    params: { name: "list_commands", arguments: { filter: "plugin" } },
   });
   const commandText = JSON.stringify(commands?.result);
-  assertStringIncludes(commandText, "db");
   assertStringIncludes(commandText, "plugin");
+  assertStringIncludes(commandText, "plugin enable");
+  if (commandText.includes("catalog not wired")) {
+    throw new Error("list_commands used the standalone MCP fallback instead of the public CLI registry");
+  }
   const allowed = await server.handle({
     jsonrpc: "2.0",
     id: 4,

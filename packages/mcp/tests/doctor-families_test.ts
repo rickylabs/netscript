@@ -33,18 +33,23 @@ Deno.test('project family fails invalid workspace and missing generated registry
 });
 
 Deno.test('Aspire family maps the upstream inspection report through injected fixture ports', async () => {
+  const inspected: string[] = [];
   const family = new AspireDoctorFamily({
-    exists: (path) => Promise.resolve(path.endsWith('/aspire/apphost.ts')),
-    inspect: (target) => ({
-      package: '@netscript/aspire',
-      target,
-      summary: 'fixture graph',
-      details: { kind: 'path' },
-    }),
+    exists: (path) => Promise.resolve(path.endsWith('/aspire/apphost.mts')),
+    inspect: (target) => {
+      inspected.push(target);
+      return {
+        package: '@netscript/aspire',
+        target,
+        summary: 'fixture graph',
+        details: { kind: 'path' },
+      };
+    },
   });
   const checks = await family.check(context('/fixture'));
   assertEquals(checks[0]?.status, 'pass');
   assertStringIncludes(checks[0]?.summary ?? '', 'fixture graph');
+  assertEquals(inspected, ['/fixture/aspire/apphost.mts']);
 });
 
 Deno.test('plugin family exposes the S7 injection seam as a warning', async () => {

@@ -20,7 +20,7 @@ export class FetchTelemetryProbe implements TelemetryProbePort {
         signal: controller.signal,
       });
       return {
-        reachable: true,
+        reachable: response.ok,
         status: response.status,
         message: `Telemetry endpoint responded with HTTP ${response.status}.`,
       };
