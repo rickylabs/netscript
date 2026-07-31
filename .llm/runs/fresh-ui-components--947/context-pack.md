@@ -71,4 +71,8 @@ demonstrating it across the three surfaces, with a regression guard per surface.
 - S2 DataGrid controlled selection/actions implemented locally with G1/G2/G7 fails-before evidence;
   landed as `e392097c8`.
 - S3 PromptInput capability/submit policy implemented locally with G5/G6 fails-before evidence;
-  awaits slice commit/push and full package gate.
+  landed as `bb8fc1793`.
+- S4 full gate complete locally: 164/164 tests pass with the permissions required by existing
+  temp-workspace tests; scoped wrappers, assets, quality/doctrine, DS color, doc-lint delta, and JSR
+  dry-run pass. Browser/Playwright is explicitly NOT RUN because no executable package fixture/route
+  exists. Final evidence commit/push and IMPL-EVAL remain.

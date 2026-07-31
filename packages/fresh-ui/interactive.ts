@@ -24,6 +24,7 @@ export {
   type ActionMenuContentProps,
   type ActionMenuItemIntent,
   type ActionMenuItemProps,
+  type ActionMenuOpenChangeReason,
   type ActionMenuRootProps,
   type ActionMenuSeparatorProps,
   type ActionMenuTriggerProps,

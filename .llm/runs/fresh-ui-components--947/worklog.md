@@ -78,3 +78,25 @@ source then runs the checked-in asset generator. Public consumers start at `mod.
   re-add migration and generated content was refreshed through `gen:assets-barrel`.
 - Fails-before proof: forced attach to render without a capability and disabled the composition
   guard; G5 and G6 both failed (2/8). Restored the implementation; suite passed 8/8.
+
+## S4 — package gate evidence
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| G1/G2/G7 DataGrid | PASS | 8 focused tests; fails-before mutation failed 6/8 |
+| G3/G4 ActionMenu | PASS | dismissal/focus/item helper + collection navigation tests; 4 menu + 3 popover tests |
+| Menu no-global-listener static guard | PASS | fails-before sentinel failed 1/2; restored source passes |
+| G5/G6 PromptInput | PASS | 8 focused tests; fails-before mutation failed 2/8 |
+| Full fresh-ui tests | PASS | 164 passed / 0 failed with required temp-workspace permissions |
+| Checked-in package `deno task test` | FAIL (tooling permission) | 162 passed / 2 existing Markdown tests failed because task omits `--allow-write`; rerun above proves tests |
+| Scoped check/lint/fmt | PASS | fresh-ui wrappers, 148 TS/TSX files |
+| Generated assets | PASS | `check:assets-barrel`, no generated diff |
+| Root code quality/doctrine | PASS | `quality:gate` exit 0 (configured roots do not include fresh-ui) |
+| Fresh-ui doctrine | PASS with baseline warnings | 0 FAIL; 5 existing folder/file-cardinality warnings |
+| Design-system color gates | PASS | 160/161 files clean |
+| Doc lint delta | PASS | baseline and final both 123 (96 private refs, 27 missing docs); new APIs add zero |
+| JSR publish dry-run | PASS | all six entrypoints checked; no slow types; intended file set |
+| Browser/Playwright | NOT RUN | package has no executable browser fixture/route for these library primitives; DOM behavior is covered by runtime contracts and focused event/navigation guards, but no visual-browser claim is made |
+
+No new architecture debt was introduced. Existing doctrine warnings and the package test-task
+permission omission were not widened or silently treated as product failures.

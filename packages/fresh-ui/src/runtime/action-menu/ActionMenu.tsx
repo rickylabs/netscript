@@ -1,10 +1,11 @@
 import { createContext } from 'preact';
-import type { ComponentChildren, VNode } from 'preact';
+import type { ComponentChildren, JSX, VNode } from 'preact';
 import { useContext, useEffect, useRef } from 'preact/hooks';
 import { composeEventHandlers } from '../_internal/compose-event-handlers.ts';
 import { composeRefs } from '../_internal/compose-refs.ts';
 import { requireFreshUiContext } from '../_internal/context-error.ts';
 import { getNextCollectionIndex } from '../_internal/collection-navigation.ts';
+import type { FreshUiChild } from '../_internal/public-props.ts';
 import type { UsePopoverReturn } from '../popover/popover.types.ts';
 import { usePopover } from '../popover/use-popover.ts';
 import type {
@@ -25,7 +26,10 @@ function useActionMenuContext(part: string): ActionMenuContextValue {
   return requireFreshUiContext(useContext(ActionMenuContext), part, 'ActionMenu.Root');
 }
 
-function ActionMenuRoot({ children, onOpenChange, ...options }: ActionMenuRootProps): VNode {
+/** Provides controlled or uncontrolled state for an action menu. */
+export function ActionMenuRoot(
+  { children, onOpenChange, ...options }: ActionMenuRootProps,
+): VNode {
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const popover = usePopover({
     ...options,
@@ -39,14 +43,18 @@ function ActionMenuRoot({ children, onOpenChange, ...options }: ActionMenuRootPr
   );
 }
 
-function ActionMenuTrigger({ children, onClick, ref, ...props }: ActionMenuTriggerProps): VNode {
+/** Renders the native button that opens the action menu. */
+export function ActionMenuTrigger(
+  { children, onClick, ...props }: ActionMenuTriggerProps,
+): VNode {
   const menu = useActionMenuContext('ActionMenu.Trigger');
+  const triggerProps = props as JSX.ButtonHTMLAttributes<HTMLButtonElement>;
   return (
     <button
       {...menu.getTriggerProps({
-        ...props,
+        ...triggerProps,
         onClick: composeEventHandlers(onClick, (event) => event.stopPropagation()),
-        ref: composeRefs(ref, menu.triggerRef),
+        ref: composeRefs(menu.triggerRef),
       })}
       aria-haspopup='menu'
     >
@@ -72,21 +80,34 @@ export function navigateActionMenu(event: KeyboardEvent, menu: HTMLElement): boo
   return true;
 }
 
-function ActionMenuContent({ children, onKeyDown, ref, ...props }: ActionMenuContentProps): VNode {
+/** Isolates item activation and closes the owning menu. */
+export function activateActionMenuItem(
+  event: Pick<Event, 'stopPropagation'>,
+  close: () => void,
+): void {
+  event.stopPropagation();
+  close();
+}
+
+/** Renders the positioned menu surface and owns collection keyboard navigation. */
+export function ActionMenuContent(
+  { children, onKeyDown, ...props }: ActionMenuContentProps,
+): VNode {
   const menu = useActionMenuContext('ActionMenu.Content');
   const contentRef = useRef<HTMLDivElement | null>(null);
+  const contentProps = props as JSX.HTMLAttributes<HTMLDivElement>;
   useEffect(() => {
     if (menu.open) enabledItems(contentRef.current as HTMLElement)[0]?.focus();
   }, [menu.open]);
   return (
     <div
       {...menu.getContentProps({
-        ...props,
-        'aria-label': props['aria-label'] ?? 'Actions',
+        ...contentProps,
+        'aria-label': contentProps['aria-label'] ?? 'Actions',
         onClick: composeEventHandlers(props.onClick, (event) => event.stopPropagation()),
         onKeyDown: composeEventHandlers(onKeyDown, (event) =>
           navigateActionMenu(event as KeyboardEvent, event.currentTarget as HTMLElement)),
-        ref: composeRefs(ref, contentRef),
+        ref: composeRefs(contentRef),
         role: 'menu',
       })}
     >
@@ -95,7 +116,8 @@ function ActionMenuContent({ children, onKeyDown, ref, ...props }: ActionMenuCon
   );
 }
 
-function ActionMenuItem(
+/** Renders an actionable menu item that closes its menu after activation. */
+export function ActionMenuItem(
   {
     children,
     disabled,
@@ -116,10 +138,8 @@ function ActionMenuItem(
       data-intent={intent}
       data-loading={loading ? '' : undefined}
       disabled={unavailable}
-      onClick={composeEventHandlers(onClick, (event) => {
-        event.stopPropagation();
-        menu.setOpen(false, 'close-button');
-      })}
+      onClick={composeEventHandlers(onClick, (event) =>
+        activateActionMenuItem(event, () => menu.setOpen(false, 'close-button')))}
       role='menuitem'
       tabIndex={props.tabIndex ?? -1}
       type={props.type ?? 'button'}
@@ -129,17 +149,23 @@ function ActionMenuItem(
   );
 }
 
-function ActionMenuSeparator(props: ActionMenuSeparatorProps): VNode {
+/** Renders a semantic separator between action groups. */
+export function ActionMenuSeparator(props: ActionMenuSeparatorProps): VNode {
   return <hr {...props} role='separator' />;
 }
 
 /** Public type of the compound ActionMenu namespace. */
 export interface ActionMenuNamespace {
-  readonly Content: typeof ActionMenuContent;
-  readonly Item: typeof ActionMenuItem;
-  readonly Root: typeof ActionMenuRoot;
-  readonly Separator: typeof ActionMenuSeparator;
-  readonly Trigger: typeof ActionMenuTrigger;
+  /** Positioned menu surface with collection keyboard navigation. */
+  readonly Content: (props: ActionMenuContentProps) => FreshUiChild;
+  /** Action that closes the menu after successful activation. */
+  readonly Item: (props: ActionMenuItemProps) => FreshUiChild;
+  /** Controlled or uncontrolled state provider. */
+  readonly Root: (props: ActionMenuRootProps) => FreshUiChild;
+  /** Semantic separator between action groups. */
+  readonly Separator: (props: ActionMenuSeparatorProps) => FreshUiChild;
+  /** Native button that opens the menu. */
+  readonly Trigger: (props: ActionMenuTriggerProps) => FreshUiChild;
 }
 
 /** Compound action-menu namespace built on the package popover runtime. */

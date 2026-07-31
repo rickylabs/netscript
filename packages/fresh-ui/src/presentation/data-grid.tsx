@@ -71,14 +71,19 @@ export interface DataGridColumn<T> {
 
 /** Controlled selection context supplied to DataGrid action slots. */
 export interface DataGridSelectionContext {
+  /** Number of selected rows present in this grid. */
   readonly count: number;
+  /** Controlled selected row identities. */
   readonly selectedIds: ReadonlySet<string>;
+  /** Requests an empty controlled selection. */
   readonly clearSelection: () => void;
 }
 
 /** Typed context supplied to each DataGrid row-action slot. */
 export interface DataGridRowActionContext<T> {
+  /** Complete row contract associated with the action slot. */
   readonly row: DataGridRow<T>;
+  /** Whether this row identity is in the controlled selection. */
   readonly selected: boolean;
 }
 
@@ -374,7 +379,13 @@ function renderEnhancedDataGridRow<T>(
       },
     }));
   }
-  cells.push(...columns.map((column) => renderDataGridCell(row.data, column)));
+  cells.push(
+    ...columns.map((column, index) =>
+      row.href && index === 0
+        ? renderDataGridLinkCell(row.data, column, row.href)
+        : renderDataGridCell(row.data, column)
+    ),
+  );
   if (renderRowActions) {
     cells.push(h('span', {
       role: 'gridcell',
@@ -407,14 +418,23 @@ function renderEnhancedDataGridRow<T>(
         : undefined,
     },
     cells as ComponentChildren,
-    row.href
-      ? h('a', {
-        href: row.href,
-        'f-client-nav': true,
-        class: 'ns-data-grid__row-link',
-        'aria-label': `Open row ${row.id}`,
-      })
-      : null,
+  ) as DataGridNode;
+}
+
+function renderDataGridLinkCell<T>(
+  row: T,
+  column: DataGridColumn<T>,
+  href: string,
+): DataGridNode {
+  const content = column.render ? column.render(row) : fallbackCellContent(row, column.key);
+  return h(
+    'span',
+    { key: column.key, role: 'gridcell', class: 'ns-data-grid__cell' },
+    h(
+      'a',
+      { href, 'f-client-nav': true, class: 'ns-data-grid__row-link' },
+      renderCellContent(content, column.cell) as ComponentChildren,
+    ),
   ) as DataGridNode;
 }
 
