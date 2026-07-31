@@ -12,7 +12,7 @@ independently re-derives, and the two derivations are not the same function.**
 
 | | plugin publishes | consumer derives | drifts when |
 |---|---|---|---|
-| #977 | `WORKERS_API_URL: 'http://localhost:8091'` (literal, `declareEnv`) | Aspire `ServiceReferences` edge to the `workers-api` resource | the port moves — `ctx.port('workers-api', 8091)` relocates the listener, the literal does not follow |
+| #977 | `WORKERS_API_URL: 'http://localhost:8091'` (literal, `declareEnv`) | Aspire resource endpoint plus an explicit builder dependency edge | the port moves — `ctx.port('workers-api', 8091)` relocates the listener, the literal does not follow |
 | #960 | RPC mounted at `withRPC` default `/api/rpc` (`create-plugin-service.ts:159` passes no `rpcPath`) | `${baseUrl}/api/rpc/v1/${routerName}` (`http-client-link.ts:86`) | always — the server never had a version or router segment to begin with |
 
 The literal in `declareEnv` and the missing `rpcPath` in `createPluginService` are the same
@@ -21,8 +21,9 @@ and the SDK path rule respectively, and in both places the plugin re-states it b
 asking.
 
 **Fix once, at the derivation, not at each literal.** Concretely that means: the workers
-contribution must obtain `WORKERS_API_URL` from the same builder handle that owns the
-`workers-api` resource (the `EnvSource` the signature already admits), and `createPluginService`
+contribution must publish `WORKERS_API_URL` as a reference to the same `workers-api` resource (the
+`EnvSource` the signature already admits) and separately record the real builder dependency edge;
+`createPluginService`
 must mount at the path the SDK's client-side rule produces for that plugin's router name and API
 version — one shared function consulted by both sides, not two constants that happen to match.
 
@@ -61,9 +62,9 @@ break silently on upgrade.
 - Any scaffolded template, fixture, or doc that spells either value literally is part of the
   change surface. Grep for `8091` and for `/api/rpc` across `packages/cli/src/kernel/assets`,
   `plugins/*`, and `docs/` before declaring the sweep complete.
-- **Every other plugin uses `createPluginService`** — auth, sagas, streams, triggers. A change
-  there moves all five plugins' route shapes at once. That blast radius must be stated in the PR
-  body, and the other four must at minimum be checked, not assumed.
+- **Every service already using `createPluginService` is affected**, including workers, auth, and
+  sagas; streams/triggers convergence remains separately tracked. The real caller set must be
+  checked from code rather than assumed from the intended five-plugin architecture.
 
 ## 4. Regression guard required
 
@@ -79,17 +80,54 @@ fix, watch it go red, restore, watch it go green, and report that as fails-befor
   `withRPC({ rpcPath: '/api/rpc/v1/workers' })` — the exact mount the real factory does not
   produce. Treat that test as a false green: fix it to go through the real factory, or replace it.
   Do not add a second test alongside it that repeats the same mistake.
-- **For #977**: an assertion over the generated Aspire graph — that the consuming resource carries
-  a `ServiceReferences` edge to `workers-api`, and that relocating `ctx.port('workers-api', ...)`
-  moves the value of `WORKERS_API_URL` with it. A test that only asserts the string
-  `http://localhost:8091` re-encodes the bug.
+- **For #977**: an assertion over the contribution graph — that the combined background resource
+  waits for `workers-api`, `WORKERS_API_URL` is a resource endpoint reference, and relocating
+  `ctx.port('workers-api', ...)` moves both the service port and health URL. A test that only
+  asserts the string `http://localhost:8091` re-encodes the bug.
 
-## 5. Open questions Codex must resolve, not skip
+## 5. Locked implementation decisions
 
-1. Is the `workers-combined` + `workers-scheduler` + `workers-worker` triple-registration
-   (#977, "also noticed") a real double-run, or intentional and configured off elsewhere?
-   Confirm against the graph. If it is a real duplicate it belongs in this fix; if it is
-   intentional, say so on the issue so the next reader does not re-file it.
-2. Does the version segment `v1` come from the plugin, the SDK default, or the service contract?
-   Whichever it is, it must be the *same* source on both sides — otherwise this fix reproduces the
-   original bug one release later.
+1. The triple registration is a real duplicate default runtime. The Aspire contribution will start
+   only `workers-combined`; the manifest retains standalone worker/scheduler entries as explicit
+   alternative modes.
+2. The service package owns a pure canonical RPC-prefix derivation with defaults `/api/rpc` and
+   `v1`. Both `createPluginService` and `createServiceClient` call it. Plugin config may override
+   `apiVersion` without changing existing callers.
+3. Plugin services mount the canonical prefix and retain `/api/rpc` as a beta.12 compatibility
+   alias with a once-per-process deprecation signal.
+4. Workers publishes a resource-shaped `WORKERS_API_URL`, derives the health URL from the allocated
+   port, and explicitly records background-to-API startup dependency. Existing non-Aspire consumer
+   fallbacks remain unchanged.
+
+## 6. Archetype, gates, risk, and scope
+
+- **Archetype:** 5 (Plugin Package). Shared convention changes also touch the service/plugin/SDK
+  public surfaces; thinness requires the convention in core rather than workers.
+- **Doctrine verdict:** SDK `Keep`; service `Refactor`; workers `Refactor`. No broad debt remediation.
+- **In-scope anti-patterns:** AP-9/AP-10 duplicated convention, AP-14 plugin redefinition,
+  AP-19 runtime declaration correctness, AP-23 registration wiring.
+- **Required gates:** focused semantic tests; scoped check/lint/fmt for every changed root;
+  `quality:gate`; affected doc-lint/publish dry-runs/JSR audit; plugin verification; runtime and
+  consumer round-trip; `arch:check`. The full scaffold runtime smoke is required only if generated
+  assets change.
+
+### Risk register
+
+| Risk | Mitigation |
+|---|---|
+| Legacy hand-written RPC callers break | Additive `/api/rpc` alias retained and directly tested |
+| All plugin factories move routes | Default from existing `config.name`; check every factory caller |
+| Resource env shape lacks graph edge | Explicit `waitFor` assertions over the in-memory graph |
+| Port relocation leaves probe stale | Test with a custom allocator and assert env indirection + moved health URL |
+| Duplicate workers continue | Assert exact default resource set and edge |
+
+### Open-decision sweep
+
+- No must-resolve implementation decisions remain.
+- Safe to defer: general AppHost consumption of all `declareEnv()` values; migration of analogous
+  sagas/triggers/streams literals; broad doctrine debt.
+
+### Deferred scope
+
+The slice does not redesign the Aspire contribution framework, change generated CLI assets, remove
+the beta.12 legacy RPC alias, or restructure existing package/plugin debt.
