@@ -1,21 +1,8 @@
-import type { StaticJobRegistry } from '@netscript/plugin-workers-core/runtime';
-import {
-  loadGeneratedJobRegistry,
-  startCombinedProcess,
-  type StaticJobDefinitionRegistry,
-  WORKERS_JOB_REGISTRY_PATH,
-} from './runtime.ts';
+import { startCombinedProcess } from './runtime.ts';
 
-const generated = await loadGeneratedJobs();
-
-await startCombinedProcess(generated);
-
-async function loadGeneratedJobs(): Promise<
-  Readonly<{
-    definitions?: StaticJobDefinitionRegistry;
-    registry?: StaticJobRegistry;
-  }>
-> {
-  const registryUrl = new URL(`../../${WORKERS_JOB_REGISTRY_PATH}`, import.meta.url);
-  return await loadGeneratedJobRegistry(registryUrl);
-}
+// The generated job registry is resolved and loaded by `startCombinedProcess`.
+// This entrypoint used to resolve it against its own module URL and landed one
+// directory short of the project root, so it silently ran with no user jobs.
+// Entrypoints do not resolve the registry path — `resolveGeneratedJobRegistryUrl`
+// is the only resolver.
+await startCombinedProcess();

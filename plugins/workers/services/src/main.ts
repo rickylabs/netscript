@@ -22,7 +22,7 @@ import { createPluginService } from '@netscript/plugin/service';
 import { router } from './router.ts';
 import { registerPluginJobs } from './init.ts';
 import { registerGeneratedJobDefinitions } from './generated-jobs.ts';
-import { projectFileUrl, WORKERS_JOB_REGISTRY_PATH } from '../../src/runtime/generated-jobs.ts';
+import { describeGeneratedJobRegistry } from '../../src/runtime/generated-jobs.ts';
 import { createStreamMutationHook } from '../../streams/server.ts';
 import { createWorkersServiceRuntime } from './service-runtime.ts';
 
@@ -48,7 +48,8 @@ export default async function createWorkersService(
   const port = parseInt(ctx.env.PORT ?? Deno.env.get('PORT') ?? '8091');
   const runtime = await createWorkersServiceRuntime();
   await registerPluginJobs(runtime);
-  await registerGeneratedJobDefinitions(runtime, projectFileUrl(WORKERS_JOB_REGISTRY_PATH));
+  const generated = await registerGeneratedJobDefinitions(runtime);
+  console.log(`[Workers Plugin] ${describeGeneratedJobRegistry(generated)}`);
 
   const running = await createPluginService(router, {
     name: 'workers',

@@ -9,18 +9,54 @@ import '@netscript/kv/redis';
 import { createDefaultTaskExecutor } from '@netscript/plugin-workers-core/executor';
 import type { StaticJobRegistry } from '@netscript/plugin-workers-core/runtime';
 export {
+  describeGeneratedJobRegistry,
+  GeneratedJobRegistryError,
+  type GeneratedWorkersJobRegistry,
   loadGeneratedJobRegistry,
   projectFileUrl,
+  registerGeneratedJobRegistry,
   registerStaticJobDefinitions,
+  resolveGeneratedJobRegistryUrl,
+  type StaticJobDefinitionRegistrar,
   type StaticJobDefinitionRegistry,
   WORKERS_JOB_REGISTRY_PATH,
 } from '../src/runtime/generated-jobs.ts';
 import {
+  describeGeneratedJobRegistry,
+  type GeneratedWorkersJobRegistry,
+  loadGeneratedJobRegistry,
+  registerGeneratedJobRegistry,
   registerStaticJobDefinitions,
+  type StaticJobDefinitionRegistrar,
   type StaticJobDefinitionRegistry,
 } from '../src/runtime/generated-jobs.ts';
 import { createWorkersServiceRuntime } from '../services/src/service-runtime.ts';
 import { Scheduler, Worker } from '../worker/mod.ts';
+
+/**
+ * Register the project's generated jobs into a runtime, failing loudly on a partial load.
+ *
+ * Called by every background entrypoint. When `definitions` is supplied (generated
+ * runtime glue already loaded the module) it is registered as-is; otherwise the
+ * registry is resolved and loaded from the project root. Skipping this step is what
+ * left `bin/worker.ts` and `bin/scheduler.ts` running with plugin jobs only.
+ */
+async function registerProjectJobs(
+  runtime: Readonly<{ jobRegistry: StaticJobDefinitionRegistrar }>,
+  definitions?: StaticJobDefinitionRegistry,
+): Promise<GeneratedWorkersJobRegistry | undefined> {
+  if (definitions) {
+    await registerStaticJobDefinitions(runtime.jobRegistry, definitions);
+    return undefined;
+  }
+
+  const loaded = await registerGeneratedJobRegistry(
+    runtime.jobRegistry,
+    await loadGeneratedJobRegistry(),
+  );
+  console.log(`[Workers Runtime] ${describeGeneratedJobRegistry(loaded)}`);
+  return loaded;
+}
 
 /** Options for starting only the workers job execution process. */
 export type StartWorkerProcessOptions = Readonly<{
@@ -52,7 +88,8 @@ export type StartCombinedProcessOptions = StartWorkerProcessOptions & StartSched
 /** Start the plugin worker process. */
 export async function startWorkerProcess(options: StartWorkerProcessOptions = {}): Promise<Worker> {
   const runtime = await createWorkersServiceRuntime();
-  await registerStaticJobDefinitions(runtime.jobRegistry, options.definitions);
+  const generated = await registerProjectJobs(runtime, options.definitions);
+  const poolRegistry = options.registry ?? generated?.registry;
   const worker = new Worker({
     workerId: options.workerId ?? Deno.env.get('WORKER_ID') ?? crypto.randomUUID(),
     queueName: options.queueName ?? Deno.env.get('WORKERS_QUEUE') ?? 'jobs',
@@ -63,7 +100,7 @@ export async function startWorkerProcess(options: StartWorkerProcessOptions = {}
     taskRegistry: runtime.taskRegistry,
     idempotency: runtime.idempotency,
     jobsDir: options.jobsDir ?? Deno.env.get('NETSCRIPT_JOBS_DIR') ?? './workers/jobs',
-    workerPoolOptions: options.registry ? { registry: options.registry } : undefined,
+    workerPoolOptions: poolRegistry ? { registry: poolRegistry } : undefined,
   });
   await worker.start();
   return worker;
@@ -74,7 +111,7 @@ export async function startSchedulerProcess(
   options: StartSchedulerProcessOptions = {},
 ): Promise<Scheduler> {
   const runtime = await createWorkersServiceRuntime();
-  await registerStaticJobDefinitions(runtime.jobRegistry, options.definitions);
+  await registerProjectJobs(runtime, options.definitions);
   const scheduler = new Scheduler({
     queueName: options.queueName ?? Deno.env.get('WORKERS_QUEUE') ?? 'jobs',
     registry: runtime.jobRegistry,
@@ -89,7 +126,8 @@ export async function startCombinedProcess(
   options: StartCombinedProcessOptions = {},
 ): Promise<Readonly<{ scheduler: Scheduler; worker: Worker }>> {
   const runtime = await createWorkersServiceRuntime();
-  await registerStaticJobDefinitions(runtime.jobRegistry, options.definitions);
+  const generated = await registerProjectJobs(runtime, options.definitions);
+  const poolRegistry = options.registry ?? generated?.registry;
   const taskExecutor = createDefaultTaskExecutor();
   const scheduler = new Scheduler({
     queueName: options.queueName ?? Deno.env.get('WORKERS_QUEUE') ?? 'jobs',
@@ -106,7 +144,7 @@ export async function startCombinedProcess(
     taskRegistry: runtime.taskRegistry,
     idempotency: runtime.idempotency,
     jobsDir: options.jobsDir ?? Deno.env.get('NETSCRIPT_JOBS_DIR') ?? './workers/jobs',
-    workerPoolOptions: options.registry ? { registry: options.registry } : undefined,
+    workerPoolOptions: poolRegistry ? { registry: poolRegistry } : undefined,
   });
   await scheduler.start();
   await worker.start();
