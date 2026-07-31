@@ -4,6 +4,88 @@ PR: rickylabs/netscript#989 (draft)
 Branch: `feat/fresh-ui-component-pass`
 Milestone: 0.0.1-beta.12
 
+## Harness profile and doctrine
+
+- **Archetype:** Archetype 3 (Runtime / Behavior), because the changed public surface owns
+  controlled/uncontrolled interaction state, dismissal, focus, and keyboard lifecycle. This is the
+  smallest doctrine archetype that covers stateful behavior; the component API itself is not a
+  builder/DSL.
+- **Overlay:** `SCOPE-frontend.md` for browser accessibility, responsive behavior, and real rendered
+  interaction checks.
+- **Current doctrine verdict:** `@netscript/fresh-ui` has no package-specific restructure verdict or
+  open debt row in doctrine file 10 / `arch-debt.md`; existing `interactive.ts` doc-lint debt is a
+  measured baseline (123 findings) and must not be deepened.
+- **In-scope anti-patterns:** AP-1 (monolith/file size), AP-3/AP-4/AP-5 (public contract and
+  composition), AP-8 (unnecessary abstraction), AP-11 (hidden globals), AP-13 (console), AP-16
+  (generic folders), AP-19/AP-20 (tests and public surface), AP-22 (sub-barrels), AP-25 (browser
+  side effects outside the established runtime edge).
+- **Required gates:** scoped check/lint/fmt; package tests; `doc:lint` delta; publish dry-run / JSR
+  audit; `quality:gate`; consumer import/render guard; generated-registry freshness; browser DOM
+  interaction tests; responsive CSS assertions/manual render evidence.
+
+## Locked decisions
+
+1. ActionMenu is a new package-owned compound runtime exported from `interactive.ts`; it composes
+   `usePopover`, `getNextCollectionIndex`, controllable state already inside Popover, and existing
+   event composition. It adds no document/global listener of its own.
+2. Focus restoration is not currently supplied by `useDismissableLayer` (contrary to the original
+   inventory). ActionMenu will restore focus through the trigger reference/popover composition
+   without duplicating global dismissal listeners.
+3. DataGrid selection is controlled and opt-in. Existing `DataGridRow<T>.id` + `selectedIds` +
+   `onSelectionChange` form the selection contract; no redundant `getRowId` callback is added and no
+   selection props means the legacy DOM stays unchanged. Bulk and row-action render slots receive
+   typed context rather than a package-owned action schema.
+4. PromptInput remains a copied registry component. Capability callbacks/slots are optional;
+   default attach/screenshot/voice markup disappears. Submission stays form-first and keyboard
+   policy augments native submit rather than owning transport state.
+5. Generated registry content is regenerated through `gen:assets-barrel`; generated files are not
+   hand-edited.
+
+## Open-decision sweep
+
+- **Resolved now:** ActionMenu follows every existing interactive namespace and renders its Trigger
+  as a native button. DataGrid rows with action controls render a non-interactive `role=row` wrapper
+  and preserve navigation through an inner real title link / isolated row-activation seam, avoiding
+  buttons inside anchors/buttons. Legacy rows without action controls retain their exact element.
+- **Resolved now:** `DataGridRow<T>` already requires a stable string `id`, so controlled selection
+  keys use it directly; adding `getRowId` would duplicate the live contract.
+- **Safe to defer:** typeahead menu navigation; issue acceptance requests directional/Home/End only.
+- **Safe to defer:** data sorting/filtering/virtualization and PromptInput attachment preview/OCR.
+- **Safe to defer:** broad remediation of the 123 pre-existing `interactive.ts` doc-lint findings;
+  this slice must add zero new findings.
+
+## Commit slices
+
+1. **S1 ActionMenu composition** — public types/runtime/CSS/export plus G3/G4 and no-global-listener
+   guard. Files: `src/runtime/action-menu/*`, `interactive.ts`, focused tests. Gate: focused runtime
+   tests + scoped static wrappers.
+2. **S2 DataGrid controlled collection actions** — additive selection/bulk/action slots, responsive
+   styles, reference example, G1/G2/G7. Files: presentation DataGrid, its CSS/docs/tests. Gate:
+   DataGrid tests + consumer render/type check.
+3. **S3 PromptInput capabilities** — optional actions, busy/stop/disabled and submit policy, generated
+   registry refresh, G5/G6. Files: registry source/CSS/tests plus generated assets. Gate: focused
+   registry tests + generation freshness.
+4. **S4 package gate and evidence** — fails-before mutations for G1-G7/static guard, full package
+   tests, scoped wrappers, quality/doctrine, doc-lint delta, JSR dry-run, browser/responsive evidence,
+   run/PR reconciliation. Files: tests/examples/run artifacts/PR metadata. Gate: complete matrix.
+
+## Risk register
+
+- **Native popover behavior differs in DOM shims:** keep pure prop/keyboard guards and browser DOM
+  tests; report any unavailable browser gate as NOT RUN.
+- **Controlled state stale closure:** derive every next selection from the controlled set supplied
+  for the render and assert emitted IDs exactly.
+- **Nested interactivity in href/button rows:** isolate controls and keep row activation on the
+  non-interactive wrapper/title-link seam; G2 covers propagation.
+- **Generated registry drift:** regenerate and assert `check:assets-barrel` clean.
+- **Public slow/private types:** explicit exported annotations/JSDoc and doc-lint delta comparison.
+- **Scope growth into a general table/chat transport:** hold deferred scope below.
+
+## Deferred scope
+
+Sorting, filtering, virtualization, column resizing, menu typeahead/submenus, attachment transport,
+OCR, chat streaming transport, and consumer migration in eis-chat are explicitly outside this PR.
+
 ## 1. The shared cause
 
 `@netscript/fresh-ui` is split into two layers that were never joined:
