@@ -46,7 +46,7 @@ packages/<pkg>/docs/
 │   └── adapters.md          # When package ships adapters
 └── advanced/
     ├── extending.md         # Extension axes (subclassing, custom adapters)
-    ├── migration.md         # alpha → beta upgrade notes (added at beta)
+    ├── migration.md         # breaking pre-1.0 upgrade notes (added when needed)
     ├── internals.md         # For contributors only
     └── benchmarks.md        # When perf-sensitive package
 ```
@@ -214,7 +214,7 @@ Optional during alpha but recommended for packages that ship extension axes:
   internal layout.
 - `benchmarks.md` — for perf-sensitive packages (kv, queue, streams,
   database) — methodology, results, reproduction steps.
-- `migration.md` — added at the first beta release.
+- `migration.md` — added when a release needs migration guidance.
 
 ---
 

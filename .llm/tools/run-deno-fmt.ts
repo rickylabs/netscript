@@ -16,6 +16,7 @@ interface Options {
   extensions: Set<string>;
   include?: RegExp;
   exclude?: RegExp;
+  config?: string;
   cwd: string;
   check: boolean;
   ignoreLineEndings: boolean;
@@ -73,6 +74,7 @@ function printHelp(): void {
     '  --ext <list>        Comma-separated extensions without dots. Repeatable.',
     '  --include <regex>   Include only matching normalized paths.',
     '  --exclude <regex>   Exclude matching normalized paths.',
+    '  --config <path>     Pass an explicit deno.json/jsonc to every fmt batch.',
     '  --cwd <path>        Working directory. Defaults to Deno.cwd().',
     '  --batch-size <n>    Files per deno fmt invocation. Defaults to 200.',
     '  --write             Run mutating deno fmt instead of non-mutating deno fmt --check.',
@@ -102,6 +104,7 @@ function parseArgs(args: string[]): Options | null {
   let extensions = new Set(DEFAULT_EXTENSIONS);
   let include: RegExp | undefined;
   let exclude: RegExp | undefined;
+  let config: string | undefined;
   let cwd = Deno.cwd();
   let check = true;
   let ignoreLineEndings = false;
@@ -143,6 +146,10 @@ function parseArgs(args: string[]): Options | null {
         cwd = requireValue(args, index, arg);
         index++;
         break;
+      case '--config':
+        config = requireValue(args, index, arg);
+        index++;
+        break;
       case '--batch-size':
         batchSize = Number(requireValue(args, index, arg));
         if (!Number.isInteger(batchSize) || batchSize < 1) {
@@ -176,6 +183,7 @@ function parseArgs(args: string[]): Options | null {
     extensions,
     include,
     exclude,
+    config,
     cwd,
     check,
     ignoreLineEndings,
@@ -280,7 +288,12 @@ function chunk<T>(items: T[], size: number): T[][] {
 }
 
 async function runBatch(files: string[], options: Options): Promise<BatchResult> {
-  const args = ['fmt', ...(options.check ? ['--check'] : []), ...files];
+  const args = [
+    'fmt',
+    ...(options.check ? ['--check'] : []),
+    ...(options.config ? ['--config', options.config] : []),
+    ...files,
+  ];
   const result = await new Deno.Command('deno', {
     args,
     cwd: options.cwd,

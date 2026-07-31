@@ -2,7 +2,7 @@
 /** Coordinate exact NetScript workspace versions around native `deno bump-version`. */
 
 import { walk } from 'jsr:@std/fs@^1.0.0/walk';
-import { dirname, join, normalize, relative } from 'jsr:@std/path@^1.0.0';
+import { dirname, join, normalize } from 'jsr:@std/path@^1.0.0';
 
 export interface BumpResult {
   readonly oldVersion: string;
@@ -57,8 +57,7 @@ export async function findVersionResidue(root: string, oldVersion: string): Prom
       ],
     })
   ) {
-    const relativePath = normalize(relative(root, entry.path));
-    if (!entry.path.endsWith('.json') && relativePath !== 'deno.lock') continue;
+    if (!entry.path.endsWith('.json') && entry.name !== 'deno.lock') continue;
     if ((await Deno.readTextFile(entry.path)).includes(oldVersion)) {
       residue.push(normalize(entry.path));
     }
@@ -84,7 +83,12 @@ export function parseSemver(version: string): Semver {
   };
 }
 
-/** Discover the complete release-version surface from the root workspace declaration. */
+/**
+ * Discover the complete release-version surface from the root workspace declaration.
+ *
+ * Git worktrees include only tracked lockfiles so local generated locks cannot enter a release.
+ * Non-Git fixture roots have no tracked/untracked distinction and fall back to existing lockfiles.
+ */
 export async function discoverVersionFiles(root: string): Promise<string[]> {
   const rootDenoJson = join(root, 'deno.json');
   const rootConfig = parseJsonObject(await Deno.readTextFile(rootDenoJson), rootDenoJson);
@@ -100,8 +104,13 @@ export async function discoverVersionFiles(root: string): Promise<string[]> {
     for (const member of await expandWorkspacePattern(root, pattern)) memberManifests.add(member);
   }
 
-  const files = new Set<string>([rootDenoJson, join(root, 'deno.lock'), ...memberManifests]);
+  const trackedFiles = await listTrackedFiles(root);
+  const rootLock = normalize(join(root, 'deno.lock'));
+  const files = new Set<string>([rootDenoJson, ...memberManifests]);
+  if (await includesLock(rootLock, trackedFiles)) files.add(rootLock);
   for (const manifest of memberManifests) {
+    const memberLock = normalize(join(dirname(manifest), 'deno.lock'));
+    if (await includesLock(memberLock, trackedFiles)) files.add(memberLock);
     for await (
       const entry of walk(dirname(manifest), {
         includeDirs: false,
@@ -113,6 +122,43 @@ export async function discoverVersionFiles(root: string): Promise<string[]> {
     }
   }
   return [...files].map(normalize).sort();
+}
+
+async function listTrackedFiles(root: string): Promise<ReadonlySet<string> | undefined> {
+  const worktree = await new Deno.Command('git', {
+    args: ['rev-parse', '--is-inside-work-tree'],
+    cwd: root,
+    stdout: 'piped',
+    stderr: 'piped',
+  }).output();
+  if (!worktree.success) {
+    const detail = new TextDecoder().decode(worktree.stderr).trim();
+    if (/not a git repository/i.test(detail)) return undefined;
+    throw new Error(`Unable to determine Git worktree status${detail ? `: ${detail}` : '.'}`);
+  }
+  if (new TextDecoder().decode(worktree.stdout).trim() !== 'true') {
+    throw new Error(`Unable to determine Git worktree status: unexpected rev-parse output.`);
+  }
+
+  const output = await new Deno.Command('git', {
+    args: ['ls-files', '-z'],
+    cwd: root,
+    stdout: 'piped',
+    stderr: 'piped',
+  }).output();
+  if (!output.success) {
+    const detail = new TextDecoder().decode(output.stderr).trim();
+    throw new Error(`Unable to discover tracked release files${detail ? `: ${detail}` : '.'}`);
+  }
+  const paths = new TextDecoder().decode(output.stdout).split('\0').filter(Boolean);
+  return new Set(paths.map((path) => normalize(join(root, path))));
+}
+
+async function includesLock(
+  path: string,
+  trackedFiles: ReadonlySet<string> | undefined,
+): Promise<boolean> {
+  return trackedFiles ? trackedFiles.has(path) : await exists(path);
 }
 
 async function expandWorkspacePattern(root: string, pattern: string): Promise<string[]> {

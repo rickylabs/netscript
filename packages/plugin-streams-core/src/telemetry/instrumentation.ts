@@ -15,6 +15,7 @@ import {
   StreamSpanNames,
   type StreamsTelemetryAttributes,
 } from './attributes.ts';
+import { CORE_PACKAGE_VERSION } from '../package-metadata.generated.ts';
 
 /** Message consumed by stream subscribe instrumentation. */
 export type StreamFanInMessage = Readonly<{
@@ -40,7 +41,7 @@ export class StreamsInstrumentation {
 
   /** Create stream instrumentation with optional tracer/link adapter overrides. */
   constructor(options: StreamsInstrumentationOptions = {}) {
-    this.#tracer = options.tracer ?? getTracer('netscript.streams', '0.0.1-beta.5');
+    this.#tracer = options.tracer ?? getTracer('netscript.streams', CORE_PACKAGE_VERSION);
     this.#spanLinks = options.spanLinks ?? createOtelSdkSpanLink();
   }
 

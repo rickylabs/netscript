@@ -12,6 +12,8 @@ export const PUBLISH_ASSET_OUTPUTS = [
   'packages/mcp/src/publish-assets.generated.ts',
   'packages/cli/src/kernel/assets/publish-assets.generated.ts',
   'packages/fresh-ui/src/package-metadata.generated.ts',
+  'packages/plugin-sagas-core/src/package-metadata.generated.ts',
+  'packages/plugin-streams-core/src/package-metadata.generated.ts',
   'plugins/ai/src/package-metadata.generated.ts',
   'plugins/auth/src/package-metadata.generated.ts',
   'plugins/sagas/src/package-metadata.generated.ts',
@@ -116,6 +118,18 @@ export const FRESH_UI_PACKAGE_VERSION: string = ${JSON.stringify(version)};
   );
 }
 
+async function generateCorePackageMetadata(): Promise<void> {
+  for (const packageName of ['plugin-sagas-core', 'plugin-streams-core']) {
+    const version = await readVersion(`packages/${packageName}/deno.json`);
+    await write(
+      `packages/${packageName}/src/package-metadata.generated.ts`,
+      `/** Version of the published core package. */
+export const CORE_PACKAGE_VERSION: string = ${JSON.stringify(version)};
+`,
+    );
+  }
+}
+
 if (import.meta.main) {
   const unknownArgs = Deno.args.filter((arg) => arg !== '--check');
   if (unknownArgs.length > 0) throw new Error(`Unknown argument: ${unknownArgs[0]}`);
@@ -123,6 +137,7 @@ if (import.meta.main) {
     generateMcpAssets(),
     generateCliAssets(),
     generateFreshUiMetadata(),
+    generateCorePackageMetadata(),
     generatePluginMetadata(),
   ]);
   if (stalePaths.length > 0) {

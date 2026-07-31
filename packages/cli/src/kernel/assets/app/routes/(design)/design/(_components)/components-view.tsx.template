@@ -633,7 +633,7 @@ function renderDemo(name: string): VNode | null {
     case 'desktop-update-prompt':
       return (
         <DesktopUpdatePrompt
-          event={{ applyMode: 'automatic', version: '0.0.1-beta.11' }}
+          event={{ applyMode: 'automatic', version: 'pre-1.0' }}
         />
       );
     case 'desktop-only':

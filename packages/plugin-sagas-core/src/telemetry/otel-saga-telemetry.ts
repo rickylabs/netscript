@@ -24,6 +24,7 @@ import {
   type SagaTelemetryStatus,
   type SagaTelemetryTracer,
 } from './instrumentation.ts';
+import { CORE_PACKAGE_VERSION } from '../package-metadata.generated.ts';
 
 /** Options for the OpenTelemetry-backed saga instrumentation factory. */
 export type OtelSagaTelemetryOptions = Readonly<{
@@ -39,7 +40,7 @@ export function createOtelSagaTracer(
   input: OtelSagaTelemetryInput = {},
 ): SagaTelemetryTracer {
   const options = normalizeOptions(input);
-  const tracer = options.tracer ?? getTracer('netscript.sagas', '0.0.1-beta.5');
+  const tracer = options.tracer ?? getTracer('netscript.sagas', CORE_PACKAGE_VERSION);
   const spanLinks = options.spanLinks ?? createOtelSdkSpanLink();
   return {
     startSpan(name, spanOptions): SagaTelemetrySpan {
@@ -83,7 +84,7 @@ function isTracer(input: OtelSagaTelemetryInput): input is Tracer {
 
 /** Create the seven shared saga metric instruments required by TC-11. */
 export function createSagaTelemetryMeter(meterPort: MeterPort): SagaTelemetryMeter {
-  const meter = meterPort.getMeter('netscript.sagas', '0.0.1-beta.5');
+  const meter = meterPort.getMeter('netscript.sagas', CORE_PACKAGE_VERSION);
   let activeInstances = 0;
   const activeGauge = meter.createObservableGauge(SagaMetricNames.INSTANCES_ACTIVE);
   activeGauge.addCallback((result: ObservableResult) => {

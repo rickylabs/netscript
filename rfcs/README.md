@@ -65,8 +65,9 @@ RFC numbers are assigned by a maintainer at acceptance (next free integer), not 
 
 ## Relationship to milestones and labels
 
-- An **accepted** RFC's tracking issue is placed on the milestone it targets (e.g. `0.0.1-beta.1`,
-  `0.0.1-stable`). This is how the roadmap and the RFC record stay linked.
+- An **accepted** RFC's tracking issue is placed on the normal `0.0.x` release milestone it targets
+  (for example `0.0.3`), or `Backlog / Triage` until scheduled. This is how the roadmap and RFC
+  record stay linked.
 - Labels: `rfc` on the tracking issue and the RFC PR; one `status:*` label reflecting the phase; and
   `breaking` if applicable.
 

@@ -37,8 +37,8 @@ export interface ReleasePreflightResult {
 }
 
 const JSR_SCOPE = '@netscript/';
-const DEFERRED_MARKDOWN_PREFIX = normalize('docs/site/');
-const MARKDOWN_PIN_PATTERN = /(@netscript\/[a-z0-9-]+)@\^?(0\.0\.1-[a-z]+\.\d+)/g;
+const MARKDOWN_PIN_PATTERN =
+  /(@netscript\/[a-z0-9-]+)@\^?((?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?)/g;
 
 // A release member may be omitted only here, with a durable explanation. The
 // intended set is deliberately discovered without consulting `publish:false`,
@@ -73,7 +73,7 @@ export async function auditPublishSet(
   return { intended, effective, excluded: exclusions, missing, extra };
 }
 
-/** Find stale NetScript prerelease pins in owned and deferred markdown. */
+/** Find stale NetScript release pins in owned markdown. */
 export async function auditMarkdownPins(
   root: string,
   targetVersion: string,
@@ -98,16 +98,17 @@ export async function auditMarkdownPins(
     for (const match of source.matchAll(MARKDOWN_PIN_PATTERN)) {
       const pinnedVersion = match[2];
       if (compareSemver(pinnedVersion, targetVersion) >= 0) continue;
-      const finding: MarkdownPinFinding = {
+      violations.push({
         path,
         line: lineNumberAt(source, match.index),
         packageName: match[1],
         pinnedVersion,
-        deferred: path.startsWith(DEFERRED_MARKDOWN_PREFIX),
-      };
-      (finding.deferred ? deferred : violations).push(finding);
+        deferred: false,
+      });
     }
   }
+  violations.sort(compareMarkdownFindings);
+  deferred.sort(compareMarkdownFindings);
   return { violations, deferred };
 }
 
@@ -128,11 +129,6 @@ export async function runReleasePreflight(
   console.log('release:preflight publish-set — PASS (0 unexplained deltas)');
 
   const markdown = await auditMarkdownPins(root, targetVersion);
-  for (const finding of markdown.deferred) {
-    console.warn(
-      `release:preflight markdown-pins — DEFERRED ${formatMarkdownFinding(finding)}`,
-    );
-  }
   if (markdown.violations.length) {
     throw new Error(
       `release:preflight markdown-pins — FAIL\n${
@@ -141,7 +137,7 @@ export async function runReleasePreflight(
     );
   }
   console.log(
-    `release:preflight markdown-pins — PASS (0 blocking, ${markdown.deferred.length} deferred docs/site findings)`,
+    'release:preflight markdown-pins — PASS (0 stale pins)',
   );
   return { publishSet, markdown };
 }
@@ -175,6 +171,14 @@ function formatPublishSetDelta(result: PublishSetAuditResult): string {
 
 function formatMarkdownFinding(finding: MarkdownPinFinding): string {
   return `${finding.path}:${finding.line} ${finding.packageName}@${finding.pinnedVersion}; use a version-neutral snippet`;
+}
+
+function compareMarkdownFindings(
+  left: MarkdownPinFinding,
+  right: MarkdownPinFinding,
+): number {
+  if (left.path !== right.path) return left.path < right.path ? -1 : 1;
+  return left.line - right.line;
 }
 
 function lineNumberAt(source: string, index: number): number {

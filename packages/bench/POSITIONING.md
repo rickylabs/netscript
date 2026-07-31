@@ -1,15 +1,15 @@
-# NetScript positioning thesis & beta/stable acceptance criteria
+# NetScript positioning thesis & pre-1.0 acceptance criteria
 
-> **Status: §4 framed for the incremental-beta cadence.** This document is the _synthesis half_ of
+> **Status: §4 framed for the incremental `0.0.x` cadence.** This document is the _synthesis half_ of
 > the S1 positioning deliverable (umbrella #301 / bench sub-epic #302). The **thesis** below is
 > falsifiable and grounded in the shipped `@netscript/bench` instrument. Per the user's strategy for
-> the 0.0.1 line — an **incremental beta cadence** (beta.1 → beta.2 → … → stable, mirroring the
-> alpha line) — **beta.1 is a minimal cuttable bar** (the current green state), and the
-> **falsifiable positioning verdict is a stable-line goal pursued incrementally across the betas**,
-> _not_ a beta.1 gate. The **empirical verdict** (an actual measured score on the thesis) remains
+> the pre-1.0 line — an **incremental release cadence** (`0.0.2` → `0.0.3` → …) — each cut carries
+> its own scoped bar, and the
+> **falsifiable positioning verdict is a long-term goal pursued incrementally across releases**,
+> _not_ a first-release gate. The **empirical verdict** (an actual measured score on the thesis) remains
 > gated on **D2** (competitor framework set), **D5** (agent model + build cadence), and **OQ2**
-> (live API keys + cost budget) — but those are **positioning-line inputs, not beta-cut blockers**,
-> and no number is asserted here. Milestone/issue structure (beta.1..N descriptions, re-tagging) is
+> (live API keys + cost budget) — but those are **positioning-line inputs, not release blockers**,
+> and no number is asserted here. Milestone/issue structure (`0.0.x` descriptions and scheduling) is
 > owned by the release/GitHub lane; this file owns the §4 prose only.
 
 ## 1. The thesis (falsifiable)
@@ -85,15 +85,15 @@ The instrument is ready; the _experiment design inputs_ are product decisions th
 Until these are set, the positioning verdict remains **thesis-only**. This is a feature, not a
 stall: the instrument refuses to fabricate a comparison.
 
-## 4. Acceptance criteria across the incremental-beta cadence
+## 4. Acceptance criteria across the incremental `0.0.x` cadence
 
-These convert the thesis into gates positioned along the 0.0.1 line. **Bold** items are the
-falsifiable core. The 0.0.1 line is an **incremental beta cadence** (beta.1 → beta.2 → … → stable):
-beta.1 is a **minimal cuttable bar**, and the positioning verdict is layered in across later betas.
+These convert the thesis into gates positioned along the pre-1.0 line. **Bold** items are the
+falsifiable core. The pre-1.0 line is an **incremental release cadence**: each `0.0.x` is a normal
+release, and the positioning verdict is layered in across later releases.
 
-### 0.0.1-beta.1 acceptance (minimal cuttable bar)
+### First normal release acceptance (minimal cuttable bar)
 
-beta.1 ships the **current green state** — it requires **no bench measurement**:
+The first normal release ships the **current green state** — it requires **no bench measurement**:
 
 1. **Instrument honesty.** Conformance gate green in CI (reference 10/10, real restart); no `fake`
    summary is ever presented as a result. _(Met.)_
@@ -104,25 +104,26 @@ beta.1 ships the **current green state** — it requires **no bench measurement*
 4. **CI + release machinery.** The `check` / `lint` / `fmt:check` trio is green and the release cut
    is a working one-command path. _(Met.)_
 
-> beta.1 does **not** require self-bench, a competitor-paired run, task breadth, or the full rubric.
-> Those are the positioning verdict, layered in below across later betas.
+> The first normal release does **not** require self-bench, a competitor-paired run, task breadth,
+> or the full rubric.
+> Those are the positioning verdict, layered in below across later releases.
 
-### The positioning verdict — a stable-line goal, reached incrementally
+### The positioning verdict — a long-term goal, reached incrementally
 
-The falsifiable verdict is pursued **across the beta cadence** and completed for stable. Each step
-is a later-beta bet; **none gates beta.1**:
+The falsifiable verdict is pursued **across the pre-1.0 cadence**. Each step is a later-release bet;
+**none gates the first normal release**:
 
-- **P1 — self-bench green (an early-beta goal).** Self-bench t1+t2 reach **`test_pass_rate` ≥ 0.90**
+- **P1 — self-bench green (an early-release goal).** Self-bench t1+t2 reach **`test_pass_rate` ≥ 0.90**
   median across N≥3 runs, with the regression detector wired to fire on drops. NetScript-only — no
   competitor lane — so it needs **D5/OQ2** but **not D2**.
-- **P2 — competitor-paired (a mid-beta goal).** At least **one** frozen-manifest paired run
+- **P2 — competitor-paired (a later-release goal).** At least **one** frozen-manifest paired run
   (NetScript vs ≥1 D2 alternative, same D5 model/caps): NetScript **not worse on `test_pass_rate`**
   and **strictly better on ≥1 efficiency axis** (`turns_to_green`, `cost`, or `wall_seconds`). Needs
   **D2/D5/OQ2**.
 - **P3 — breadth + full rubric (toward stable).** The lead holds across **≥2 tasks** and **N≥3
   repeats per lane** (variance reported), and the 0.20 rubric reserve is retired (bench Slice 5).
 
-### 0.0.1-stable acceptance (build-efficiency defensible)
+### 1.0 acceptance (build-efficiency defensible)
 
 1. **Positioning verdict complete.** P1–P3 above are all met and their scored summaries committed.
 2. **Reproducible verdict.** Every published score carries its full `RunManifest`; a third party can

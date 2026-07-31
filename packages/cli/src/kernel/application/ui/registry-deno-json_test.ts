@@ -3,6 +3,11 @@ import { assertEquals } from '@std/assert';
 import { MemoryFileSystemAdapter } from '../../adapters/scaffold/memory-fs.ts';
 import { importEntryForDependency, mergeDenoJsonImports } from './registry-deno-json.ts';
 import type { UiRegistryItem } from './registry.ts';
+import { NETSCRIPT_RELEASE_VERSION } from '../../constants/jsr-specifiers.ts';
+
+const PRIOR_RELEASE_VERSION = ['0', '0', '1-beta', '9'].join('.');
+const TEST_PRERELEASE_VERSION = ['0', '0', '1-alpha', '1'].join('.');
+const sdkSpecifier = `jsr:@netscript/sdk@${NETSCRIPT_RELEASE_VERSION}`;
 
 function item(name: string, dependencies: readonly string[]): UiRegistryItem {
   return { name, files: [], dependencies };
@@ -21,21 +26,21 @@ async function mergedImports(
 
 Deno.test('a subpath dependency maps the package root so the subpath import resolves', async () => {
   const imports = await mergedImports([
-    item('desktop-only', ['jsr:@netscript/sdk@0.0.1-beta.11/desktop']),
+    item('desktop-only', [`${sdkSpecifier}/desktop`]),
   ]);
 
   // Mapping the alias to a value that already carries `/desktop` makes Deno resolve
   // `@netscript/sdk/desktop` to `./desktop/desktop` — the #953 failure.
-  assertEquals(imports['@netscript/sdk'], 'jsr:@netscript/sdk@0.0.1-beta.11');
+  assertEquals(imports['@netscript/sdk'], sdkSpecifier);
 });
 
 Deno.test('two subpaths of one package collapse to a single package-root entry', async () => {
   const imports = await mergedImports([
-    item('desktop-only', ['jsr:@netscript/sdk@0.0.1-beta.11/desktop']),
-    item('desktop-update-prompt', ['jsr:@netscript/sdk@0.0.1-beta.11/auto-update']),
+    item('desktop-only', [`${sdkSpecifier}/desktop`]),
+    item('desktop-update-prompt', [`${sdkSpecifier}/auto-update`]),
   ]);
 
-  assertEquals(imports['@netscript/sdk'], 'jsr:@netscript/sdk@0.0.1-beta.11');
+  assertEquals(imports['@netscript/sdk'], sdkSpecifier);
   assertEquals(
     Object.keys(imports).filter((key) => key.startsWith('@netscript/')),
     ['@netscript/sdk'],
@@ -55,33 +60,36 @@ Deno.test('existing workspace imports are never overwritten', async () => {
   const fs = new MemoryFileSystemAdapter();
   await fs.writeFile(
     '/app/deno.json',
-    JSON.stringify({ imports: { '@netscript/sdk': 'jsr:@netscript/sdk@0.0.1-beta.9' } }),
+    JSON.stringify({ imports: { '@netscript/sdk': `jsr:@netscript/sdk@${PRIOR_RELEASE_VERSION}` } }),
   );
   await mergeDenoJsonImports(
     '/app',
-    [item('desktop-only', ['jsr:@netscript/sdk@0.0.1-beta.11/desktop'])],
+    [item('desktop-only', [`${sdkSpecifier}/desktop`])],
     fs,
   );
   const config = JSON.parse(await fs.readFile('/app/deno.json')) as {
     imports: Record<string, string>;
   };
 
-  assertEquals(config.imports['@netscript/sdk'], 'jsr:@netscript/sdk@0.0.1-beta.9');
+  assertEquals(config.imports['@netscript/sdk'], `jsr:@netscript/sdk@${PRIOR_RELEASE_VERSION}`);
 });
 
 Deno.test('importEntryForDependency normalises every specifier shape', () => {
   const cases: readonly (readonly [string, { key: string; value: string } | undefined])[] = [
     [
-      'jsr:@netscript/sdk@0.0.1-beta.11/desktop',
-      { key: '@netscript/sdk', value: 'jsr:@netscript/sdk@0.0.1-beta.11' },
+      `${sdkSpecifier}/desktop`,
+      { key: '@netscript/sdk', value: sdkSpecifier },
     ],
     [
-      'jsr:@netscript/telemetry@0.0.1-beta.11/query',
-      { key: '@netscript/telemetry', value: 'jsr:@netscript/telemetry@0.0.1-beta.11' },
+      `jsr:@netscript/telemetry@${NETSCRIPT_RELEASE_VERSION}/query`,
+      {
+        key: '@netscript/telemetry',
+        value: `jsr:@netscript/telemetry@${NETSCRIPT_RELEASE_VERSION}`,
+      },
     ],
     [
-      'jsr:@netscript/ai@^0.0.1-beta.5',
-      { key: '@netscript/ai', value: 'jsr:@netscript/ai@^0.0.1-beta.5' },
+      `jsr:@netscript/ai@^${TEST_PRERELEASE_VERSION}`,
+      { key: '@netscript/ai', value: `jsr:@netscript/ai@^${TEST_PRERELEASE_VERSION}` },
     ],
     // A version-less subpath still has to lose the subpath, or the alias doubles it.
     ['jsr:@netscript/sdk/desktop', { key: '@netscript/sdk', value: 'jsr:@netscript/sdk' }],

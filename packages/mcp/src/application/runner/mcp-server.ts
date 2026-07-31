@@ -5,6 +5,7 @@ import { validateSchema } from '../../domain/schema.ts';
 import type { ToolDefinition, ToolFlow, ToolName } from '../../domain/tool-types.ts';
 import { type JsonRpcResponse, parseJsonRpcRequest } from '../../domain/json-rpc.ts';
 import { DEFAULT_TRUNCATION_POLICY, truncateResult, type TruncationPolicy } from './truncation.ts';
+import { MCP_PACKAGE_VERSION } from '../../publish-assets.generated.ts';
 
 /** Current stable MCP protocol revision implemented by the runner. */
 export const MCP_PROTOCOL_VERSION = '2025-11-25';
@@ -57,7 +58,7 @@ export function createMcpServer(options: McpServerOptions): McpServer {
         return rpcResult(request.id, {
           protocolVersion: MCP_PROTOCOL_VERSION,
           capabilities: { tools: {} },
-          serverInfo: { name: '@netscript/mcp', version: '0.0.1-beta.9' },
+          serverInfo: { name: '@netscript/mcp', version: MCP_PACKAGE_VERSION },
         });
       }
       if (request.method === 'tools/list') {

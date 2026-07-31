@@ -31,7 +31,7 @@
           navigation: navigation,
           brand: 'NetScript',
           brandBadge: 'Dev',
-          footer: h('span', { class: 'ns-text-2xs ns-muted-fg' }, 'v0.0.1-beta.5'),
+          footer: h('span', { class: 'ns-text-2xs ns-muted-fg' }, 'pre-1.0'),
           topbarStart: h(NS.Breadcrumb, {
             items: [
               { label: 'Services', href: '/services' },

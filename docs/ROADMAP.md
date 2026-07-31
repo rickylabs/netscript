@@ -1,53 +1,41 @@
-# NetScript 0.0.1 Release Roadmap
+# NetScript `0.0.x` Release Roadmap
 
-NetScript ships on an **incremental-beta cadence**. Small bets land one at a time and each is
-published as its own prerelease — exactly how the alpha line ran (`v0.0.1-alpha.1` …
-`v0.0.1-alpha.19`, 19 prereleases cut over ~8 days via `deno task release:cut` +
-`deno task release:publish`). The beta line mirrors that shape:
+NetScript ships on an incremental **pre-1.0 release cadence**. Each coordinated release advances
+the patch component of the normal semantic version: `0.0.2`, `0.0.3`, and so on. A canary that
+proves a release uses that release's core version with a prerelease suffix:
 
+```text
+0.0.2-canary.1 < 0.0.2 < 0.0.3-canary.1 < 0.0.3
 ```
-0.0.1-beta.1 → 0.0.1-beta.2 → 0.0.1-beta.3 → … → 0.0.1-stable
-```
 
-There is **no big-bang jump** from the first beta to stable. Betas may run for many iterations over
-months; stable is reached incrementally.
+The repository never published plain `0.0.1`; its shipped history consists of immutable alpha,
+beta, and canary prereleases. The first normal NetScript version is `0.0.2`.
 
 ## How to read a milestone
 
-GitHub milestones hold the *bets* per beta; the *cadence* is the tag/release stream. A beta milestone
-is "done" when its scoped bets land green, at which point a `beta.N` prerelease is cut. New betas
-(`beta.4..N`) are inserted freely as further bets are scoped.
+GitHub milestones name the normal release that owns the work. Open release milestones currently
+run from `0.0.2` through `0.0.9`; `Backlog / Triage` holds accepted but unscheduled work. Assign the
+explicit cut milestone. A `wave:*` label supplies scheduling context but may span several releases
+and does not determine the milestone.
 
-## Current milestones
+Each release is cut when its scoped work and acceptance gates are green. Additional scope moves to
+a later `0.0.x` milestone rather than creating another prerelease train inside `0.0.1`.
 
-| Milestone | Role |
-| --- | --- |
-| `0.0.1-beta.1` | **Minimal cuttable release of the current green state.** Not a positioning gate. Cut bar = soundness floor (#332), bench `conformance` gate green, `scaffold.runtime` e2e green, CI trio green, release machinery proven. No feature blockers. |
-| `0.0.1-beta.2` | First incremental bets after the cut: nearest-term (wave:v1-min / p0-marquee) AI-stack + deployment deliverables, release-engineering gates, and the self-bench ≥0.90 regression bar (once bench decisions D5/OQ2 land). |
-| `0.0.1-beta.3` | wave:v1 depth: fuller AI stack, deployment feature lanes, Aspire Deno runtime dogfood. |
-| `0.0.1-stable` | **Terminal milestone carrying the falsifiable positioning verdict** — competitor-PAIRED run, multi-task breadth, full composite rubric (blocked on bench decisions D2/D5/OQ2). Extends all beta criteria. |
-| `Backlog / Triage` | Accepted-but-unscheduled + untriaged. Assign to a release milestone once scoped. |
+## Release maturity
 
-## What moved out of the first beta
-
-The prior beta.1 bar was a heavy *positioning* gate. Under the incremental model:
-
-- **self-bench t1+t2 test_pass_rate ≥0.90 median** → `beta.2` (regression detector; blocked on D5/OQ2).
-- **competitor-PAIRED run · multi-task breadth · full composite rubric** → `0.0.1-stable` (the
-  positioning verdict).
-
-The positioning thesis and acceptance criteria live in `packages/bench/POSITIONING.md` (owned by the
-road-to-stable lane, #301). This roadmap and that document must stay consistent: **positioning
-verdict = a stable-line goal reached incrementally**, never a first-beta gate.
+Normal `0.0.x` versions are still pre-1.0: public surfaces can change between releases and consumers
+should pin exact versions. “Normal version” describes semantic-version precedence and publication
+shape; it does not claim a frozen or 1.0-stable API.
 
 ## Cutting a release
 
-Release mechanics are one command each, and publishing stays in GitHub Actions via OIDC — never local.
-See `.agents/skills/netscript-release`:
+Release mechanics are one command each, and publishing stays in GitHub Actions via OIDC—never
+local. See `.agents/skills/netscript-release`:
 
-1. `deno task release:cut -- <version>` — bumps root + every workspace `deno.json` + `deno.lock`
-   `@netscript/*` ranges, runs preflight / `publish:dry-run` / `ci --prod`, opens the release PR.
-2. Merge the release PR.
-3. `deno task release:publish -- v<version> --notes-file <intro.md>` — creates the GitHub Release
-   (the publish trigger). `publish.yml` then publishes every `@netscript/*` member to JSR via OIDC;
-   `e2e-cli-prod.yml` runs the published-CLI smoke afterward.
+1. Prove the target with `deno task release:canary -- <version>` and the canary-pinned production
+   E2E workflow.
+2. Run `deno task release:cut -- <version>` to bump every coordinated manifest, tracked workspace
+   lock, and generated package-metadata asset; then run release readiness and open the release PR.
+3. Merge the release PR.
+4. Run `deno task release:publish -- v<version> --notes-file <intro.md>` to create the GitHub Release
+   that triggers JSR publication.

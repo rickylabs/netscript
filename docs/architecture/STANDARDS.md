@@ -2,7 +2,7 @@
 
 > Status: **MUST** for every `@netscript/*` package shipping in the v0.0.1-alpha
 > wave. Deviations require an entry in `arch-debt.md` plus a reason scoped to a
-> later beta iteration.
+> later pre-1.0 iteration.
 >
 > Authority: this file extends the Architecture Doctrine
 > (`docs/architecture/doctrine/`) for cross-package
@@ -103,8 +103,8 @@ Every package MUST satisfy the JSR audit fields and these repo-wide invariants:
 under cwd by default and that leaks tests + scratch files.
 
 Version cadence: every package marches in lockstep —
-`0.0.1-alpha.0 → alpha.1 → … → beta.0 → … → 0.1.0`. No package is allowed to
-fork its version line during alpha.
+`0.0.2 → 0.0.3 → … → 0.1.0`. Canary candidates use `<release>-canary.N`. No package is allowed to
+fork its version line during pre-1.0 development.
 
 ---
 
@@ -277,7 +277,7 @@ content (no "TODO"). Minimum length is 150 lines.
    tests against ports
 9. **Observability** — log fields, metric names, OTEL span names
 10. **Architecture** — link to `docs/architecture.md` plus archetype call-out
-11. **Stability & versioning** — alpha → beta → stable graduation criteria
+11. **Stability & versioning** — pre-1.0 → 1.0 graduation criteria
     aligned with the master `PLAN.md`
 12. **Compatibility matrix** — Deno version, Node compat, browser compat
 13. **Contributing** — link to monorepo CONTRIBUTING + how to run package tests
@@ -312,7 +312,7 @@ docs/
 │   └── errors.md
 └── advanced/
     ├── extending.md      # Extension axes
-    ├── migration.md      # alpha → beta upgrade notes (added later)
+    ├── migration.md      # breaking pre-1.0 upgrade notes (added when needed)
     └── internals.md      # For contributors only
 ```
 

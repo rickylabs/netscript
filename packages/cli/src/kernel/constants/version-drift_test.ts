@@ -2,7 +2,7 @@
  * @module kernel/constants/version-drift_test
  *
  * Guard test: fails if any CLI `src/**` file reintroduces a hardcoded pinned
- * NetScript JSR specifier (e.g. `jsr:@netscript/fresh@0.0.1-alpha.2`).
+ * NetScript JSR specifier (e.g. `jsr:@netscript/fresh@0.0.2`).
  *
  * Scaffold version specifiers must be derived from `NETSCRIPT_RELEASE_VERSION`
  * (see `./jsr-specifiers.ts`) so a `deno bump-version` rewrite of the manifest
@@ -14,8 +14,9 @@ import { assertEquals } from 'jsr:@std/assert@^1';
 import { walk } from '@std/fs';
 import { fromFileUrl } from 'jsr:@std/path@^1';
 
-/** Matches a hardcoded pinned NetScript JSR specifier (e.g. `@0.0.1-alpha.2`). */
-const PINNED_JSR_SPECIFIER = /jsr:@netscript\/[^@'"\s]+@0\.0\.1-alpha\.\d+/;
+/** Matches a hardcoded pinned NetScript JSR specifier with any valid semantic version. */
+const PINNED_JSR_SPECIFIER =
+  /jsr:@netscript\/[^@'"\s]+@\^?(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?/;
 
 const SRC_ROOT = fromFileUrl(new URL('../../', import.meta.url));
 const SELF_PATH = fromFileUrl(import.meta.url);

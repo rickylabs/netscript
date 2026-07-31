@@ -89,8 +89,9 @@ live in the `netscript-pr` agent skill.
 - `priority:*` — `p0` (release blocker) through `p3`.
 - Cross-cutting flags — `rfc`, `breaking`, `good first issue`, `help wanted`.
 
-**Milestones** map to the release roadmap: `0.0.1-beta.1`, `0.0.1-stable`, and `Backlog / Triage` for
-unscheduled work. New contributors should look for [`good first issue`](https://github.com/rickylabs/netscript/labels/good%20first%20issue)
+**Milestones** name the release that owns the work (`0.0.2`…`0.0.9`), with `Backlog / Triage` for
+unscheduled work. Assign the explicit cut milestone; `wave:*` labels are scheduling context, not a
+one-to-one milestone map. New contributors should look for [`good first issue`](https://github.com/rickylabs/netscript/labels/good%20first%20issue)
 and [`help wanted`](https://github.com/rickylabs/netscript/labels/help%20wanted).
 
 ## Releases

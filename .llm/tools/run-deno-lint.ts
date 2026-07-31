@@ -17,6 +17,7 @@ interface Options {
   extensions: Set<string>;
   include?: RegExp;
   exclude?: RegExp;
+  config?: string;
   cwd: string;
   batchSize: number;
   pretty: boolean;
@@ -108,6 +109,7 @@ function printHelp(): void {
     '  --ext <list>        Comma-separated extensions without dots. Repeatable.',
     '  --include <regex>   Include only matching normalized paths.',
     '  --exclude <regex>   Exclude matching normalized paths.',
+    '  --config <path>     Pass an explicit deno.json/jsonc to every lint batch.',
     '  --cwd <path>        Working directory. Defaults to Deno.cwd().',
     '  --batch-size <n>    Files per deno lint invocation. Defaults to 200.',
     '  --pretty           Pretty-print JSON output.',
@@ -134,6 +136,7 @@ function parseArgs(args: string[]): Options | null {
   let include: RegExp | undefined;
   let exclude: RegExp | undefined;
   let input: string | undefined;
+  let config: string | undefined;
   let cwd = Deno.cwd();
   let batchSize = 200;
   let pretty = false;
@@ -176,6 +179,10 @@ function parseArgs(args: string[]): Options | null {
         cwd = requireValue(args, index, arg);
         index++;
         break;
+      case '--config':
+        config = requireValue(args, index, arg);
+        index++;
+        break;
       case '--batch-size':
         batchSize = Number(requireValue(args, index, arg));
         if (!Number.isInteger(batchSize) || batchSize < 1) {
@@ -201,6 +208,7 @@ function parseArgs(args: string[]): Options | null {
     extensions,
     include,
     exclude,
+    config,
     cwd,
     batchSize,
     pretty,
@@ -303,11 +311,15 @@ export interface BatchResult {
   stderr: string;
 }
 
-export type BatchRunner = (files: string[], cwd: string) => Promise<BatchResult>;
+export type BatchRunner = (
+  files: string[],
+  cwd: string,
+  config?: string,
+) => Promise<BatchResult>;
 
-const denoLintRunner: BatchRunner = async (files, cwd) => {
+const denoLintRunner: BatchRunner = async (files, cwd, config) => {
   const result = await new Deno.Command('deno', {
-    args: ['lint', ...files],
+    args: ['lint', ...(config ? ['--config', config] : []), ...files],
     cwd,
     stdout: 'piped',
     stderr: 'piped',
@@ -337,7 +349,7 @@ export interface LintRunResult {
  */
 export async function runLint(
   files: string[],
-  options: Pick<Options, 'cwd' | 'batchSize'>,
+  options: Pick<Options, 'cwd' | 'batchSize' | 'config'>,
   runner: BatchRunner = denoLintRunner,
 ): Promise<LintRunResult> {
   let text = '';
@@ -347,7 +359,7 @@ export async function runLint(
 
   for (let batchIndex = 0; batchIndex < batches.length; batchIndex++) {
     const batch = batches[batchIndex];
-    const result = await runner(batch, options.cwd);
+    const result = await runner(batch, options.cwd, options.config);
     const output = result.stdout + result.stderr;
     text += output;
 

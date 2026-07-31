@@ -24,8 +24,8 @@ GitHub process. Two obligations are non-negotiable for any agent that opens issu
    put a closing keyword on an epic/umbrella.
    Close-gate rules for verified acceptance before issue closure live in `.agents/skills/netscript-pr`.
 2. **Taxonomy + milestones.** Apply the namespaced colon labels (`type:`/`area:`/`priority:`/`wave:`/
-   `epic:`/`gate:`/`status:`, exactly one `status:`) and assign a milestone (`0.0.1-beta.1`,
-   `0.0.1-stable`, or `Backlog / Triage`, mapped from `wave:`). The full taxonomy, milestone mapping,
+   `epic:`/`gate:`/`status:`, exactly one `status:`) and assign an explicit release milestone
+   (`0.0.2`…`0.0.9` or `Backlog / Triage`). The full taxonomy and milestone guidance,
    and templates live in the netscript-pr skill; the machine-readable label set is
    `.github/labels.yml`.
 

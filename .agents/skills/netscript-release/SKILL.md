@@ -46,8 +46,8 @@ Run the release cut from the repository root:
 deno task release:cut -- <version>
 ```
 
-Use a semver version newer than the root `deno.json` version, including prereleases such as
-`0.0.1-alpha.12`.
+Use the next normal `0.0.x` version. Canary candidates are derived separately from that target as
+`<version>-canary.N`.
 
 For rehearsal:
 
@@ -73,7 +73,8 @@ from generated package metadata, `NETSCRIPT_RELEASE_VERSION`, or `netscriptJsrSp
 
 1. Version validation refuses invalid semver and equal or older versions.
 2. Workspace bump sets the root version, every package/plugin `deno.json`, nested workspace
-   `deno.json` files, and `deno.lock` `@netscript/*` ranges to the new version.
+   `deno.json` file, and every tracked workspace/member `deno.lock` `@netscript/*` range to the new
+   version.
 3. `gen:publish-assets` regenerates the registry-safe TypeScript constants from the bumped manifests
    and source assets; CI independently enforces `check:publish-assets` freshness.
 4. Residue check aborts if the old version remains in JSON files or `deno.lock`.
@@ -92,15 +93,10 @@ prerelease version. For stable target `<next-version>`, the version is `<next-ve
 `N` is one greater than the highest matching version found across all workspace-member JSR metadata
 (including yanked versions), with existing git tags as a collision guard.
 
-**Canary versioning doctrine (owner decision, 2026-07-18, tracked as #888):** the canary version
-must encode the release it is tied to — `<target-version>-canary.N` for the ACTUAL target,
-including prereleases: the beta.12 cut publishes `0.0.1-beta.12-canary.1`, and only the real stable
-cut publishes `0.0.1-canary.N`. The beta.11 cut published `0.0.1-canary.1` because
-`validateStableTarget` in `.llm/tools/release/canary.ts` still refuses prerelease targets — that is
-accepted debt for beta.11 only, not a template. When dispatching `release-canary.yml` for a
-prerelease cut before #888 lands, the `target-version` input must be the eventual stable version
-(the tool derives `<stable>-canary.N` and binds the pair status to the content SHA, which is what
-authorizes the prerelease tag); after #888 lands, pass the real prerelease target instead.
+**Canary versioning doctrine (owner decision, 2026-07-31):** the release train lives in the version
+core. A canary for normal release `<target-version>` is `<target-version>-canary.N`, so semantic
+version ordering is always `target-canary.N < target`. Pass the actual upcoming `0.0.x` release to
+`release-canary.yml`; `validateStableTarget` intentionally refuses prerelease targets.
 
 The workflow invokes `deno task release:canary -- <next-version>` to perform the shared coordinated
 bump/gates and create the ephemeral branch plus provenance tag without a release PR. Operators may

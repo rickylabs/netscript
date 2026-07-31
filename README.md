@@ -21,7 +21,7 @@ you and the coding agent you work with.
 NetScript is a framework and workspace generator, not a hosted service — you run it on Deno and own
 all the generated code.
 
-> **Beta.** NetScript is in beta and moving quickly — pin your versions.
+> **Pre-1.0.** NetScript is moving quickly and its APIs can change — pin your versions.
 
 ---
 
@@ -327,7 +327,7 @@ from [adding a plugin](https://rickylabs.github.io/netscript/how-to/add-a-plugin
 
 ## 🧭 Status
 
-NetScript is in beta and moving quickly. The published package surface is the contract: what you
+NetScript is pre-1.0 and moving quickly. The published package surface is the contract: what you
 import from `jsr:@netscript/*` is what's documented and type-checked. Follow what's landing next via
 the [milestones](https://github.com/rickylabs/netscript/milestones),
 [issues](https://github.com/rickylabs/netscript/issues), and
