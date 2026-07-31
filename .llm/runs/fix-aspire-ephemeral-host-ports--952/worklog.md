@@ -184,3 +184,27 @@ test now asserts all four verbatim.
 Deliberately **not** touched: the ~20 `:8091–:8094` plugin-API references, which stay correct
 because plugin resources still pin (`plan.md` D-5), and `services-sdk/how-to/add-a-service.md`,
 which documents `netscript service add` — a command this change does not alter.
+
+### Slice 8 — gate sweep and close-out
+
+| Gate | Command | Result |
+| --- | --- | --- |
+| Repo tests | `deno test --allow-all` | **2245 passed, 0 failed, 12 ignored** (3m8s) |
+| Type-check | `run-deno-check.ts` — `packages/cli`, `packages/aspire` | 0 occurrences |
+| Lint | `run-deno-lint.ts` — 789 files | 0 occurrences |
+| Format | `run-deno-fmt.ts` — 969 files | 0 findings on touched files; 3 pre-existing elsewhere in `.llm/tools`, confirmed against a stashed tree |
+| Fitness | `deno task arch:check` | `FAIL=0` on every root |
+| Code quality | `deno task quality:scan` | `ok: true`, 0 findings, 7 pre-existing allowances |
+| JSR | `deno task publish:dry-run` | `Success Dry run complete` |
+| New guard | `deno task check:aspire-host-ports` | 590 files, 0 findings |
+| Runtime/Aspire | `deno task e2e:cli run scaffold.runtime` | **NOT RUN** — needs Docker + dotnet Aspire host (`drift.md` D-5) |
+
+**End-to-end proof.** `netscript init smoke952 --service --db none` + `netscript generate` produced
+`appsettings.json` with no `Port`/`HostPort` under `Services` or `Apps`, and
+`aspire/.helpers/register-services.mts:58` / `register-apps.mts:73` both emit
+`.withHttpEndpoint({ env: 'PORT' })`. Scratch workspace removed.
+
+**Reconcile note.** PR #978 opened with `Closes #952`, labels `type:fix` / `area:aspire` /
+`area:cli` / `status:impl-eval` / `priority:p1`, milestone `0.0.1-beta.12`; impl phase comment
+posted. Deferred scope filed as #979 (plugin API ports, blocked on E2E endpoint resolution) and #980
+(`netscript service add` still pins). #952 stays open until the merge auto-closes it.

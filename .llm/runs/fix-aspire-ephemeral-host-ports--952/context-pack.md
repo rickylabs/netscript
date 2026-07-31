@@ -50,3 +50,9 @@ isolation-safe default.
   resolving endpoints from the Aspire resource service. Follow-up issue.
 - `scaffold.runtime` was not runnable in this worktree (needs Docker + dotnet). The release cut that
   picks this change up must run it. → `drift.md` D-5.
+
+## Run outcome
+
+PR: https://github.com/rickylabs/netscript/pull/978 (`fix/aspire-ephemeral-host-ports`, 3 commits).
+Follow-ups filed: #979 (plugin API ports), #980 (`netscript service add`).
+All gates green except `scaffold.runtime`, declared not runnable here.
