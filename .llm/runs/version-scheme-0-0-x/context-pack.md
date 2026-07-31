@@ -26,9 +26,13 @@ authorized implementation to proceed. No PLAN-EVAL verdict is recorded or implie
 
 ## In Progress
 
-- S3 is implemented and locally validated; commit/push and PR slice evidence are next.
+- S1–S4 implementation and owned gates are complete. Separate-session IMPL-EVAL remains required;
+  the PR stays draft and no implementation verdict is self-recorded.
 
 ## Next Steps
+
+- Update the draft PR with the final tier table, `Closes #996`, and gate evidence.
+- Run the harness IMPL-EVAL in a separate evaluator session.
 
 1. Execute S1–S4 from the committed plan.
 2. Keep the PR draft until the required release dry-run proof and final evaluation are complete.

@@ -118,6 +118,10 @@ version-neutral placeholder; historical literals must identify their historical 
 | S3 focused tests | Fresh UI desktop 7 + CLI E2E scaffold gate 5 | PASS | 12 passed, 0 failed. |
 | S3 scoped wrappers | CLI E2E and Fresh UI check/lint/fmt | PASS | 107 CLI E2E and 149 Fresh UI files covered. |
 | S3 release preflight | `deno task release:preflight` | PASS | Text imports, import attributes, file URLs, and self-imports clean. |
+| S4 repo-wide tests | `deno task test` | PASS | Includes the deterministic Markdown-audit regression and nested-lock release tests. |
+| S4 generated assets | `deno task check:assets-barrel` after S3 commit | PASS | Native regeneration produced no diff. |
+| S4 release proof | `deno task release:cut -- 0.0.2 --dry-run` | PASS | Reached `{"gate":"publish-readiness","ok":true,"version":"0.0.2"}`; publish dry-run and `deno ci --prod` also completed. |
+| S4 restoration | explicit restore of dry-run-modified paths | PASS | Clean tree; 37 package/root manifests remain `0.0.1-beta.12`; Fresh UI lock has 66 beta.12 pins. |
 
 ### Fitness Gates
 
@@ -136,7 +140,7 @@ version-neutral placeholder; historical literals must identify their historical 
 
 | Consumer | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| `release:cut -- 0.0.2 --dry-run` | NOT_RUN | Planned S4 | Must restore mutations after completion. |
+| `release:cut -- 0.0.2 --dry-run` | PASS | Structured publish-readiness output | Reached `{"gate":"publish-readiness","ok":true,"version":"0.0.2"}` and completed every later dry-run gate; mutations restored. |
 
 ## Handoff Notes
 
