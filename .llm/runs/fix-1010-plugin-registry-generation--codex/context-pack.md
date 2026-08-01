@@ -2,7 +2,7 @@
 
 ## Status
 
-- Phase: Gate — implementation slices complete; evaluation pending.
+- Phase: Follow-up gate complete; supervisor-owned full E2E/evaluation pending.
 - Branch/worktree clean at baseline before run artifacts.
 - Published 0.0.2 reproduction captured once in `.llm/tmp/issue-1010-clean-room-repro.log`.
 - PLAN-EVAL passed in a separate Claude Code + OpenRouter Qwen session before implementation.
@@ -10,6 +10,10 @@
 - Slice 2 delegates sync and proves non-empty workers/sagas/triggers canonical registries with the real generators.
 - Scoped check/lint/test/format, quality, JSR audit, and publish dry-run gates pass.
 - Full runtime raw exit 1: 44 pass, only unrelated users-service health timeout; all registry-specific gates pass.
+- Follow-up commits resolve workspace manifests before JSR, exclude trigger runtime glue, and replace
+  hollow text checks with generated-module loading/rejection tests.
+- Follow-up broad check, `ci:quality`, focused tests, and publish dry-run all exit 0. Full E2E was
+  intentionally not rerun per supervisor instruction.
 
 ## Root Cause
 
@@ -18,6 +22,10 @@
   `scaffold.runtime.json` and are not invoked publicly.
 - `plugin sync` loads config correctly in a project-rooted child but then imports project plugin
   modules in the parent CLI process, losing project import-map context and failing on `zod`.
+- Canonical trigger registry generation exposed a separate latent manifest error: `runtime.ts` was
+  included as a trigger. The old missing-registry fallback had hidden this defect.
+- Local-source E2E still fetched the released manifest/generator, so an in-repo manifest correction
+  could not affect workspace scaffolds before publication.
 
 ## Locked Direction
 
@@ -29,6 +37,6 @@
 
 ## Next
 
-1. Commit validation artifacts locally.
+1. Supervisor runs the requested single full E2E pass.
 2. Run ordinary opposite-family slice review and separate open-model IMPL-EVAL.
-3. Apply evaluator fixes if any, final local commit; never push/open PR.
+3. Never push/open PR from this implementation session.

@@ -67,6 +67,9 @@ plugin-name registry.
 | 2026-08-01 | slice 1   | implemented    | Added manifest-driven generation, project-configured subprocess execution, canonical target reporting, dry-run behavior, and named empty-runtime failure. |
 | 2026-08-01 | slice 2   | implemented    | `plugin sync` delegates to authoritative generation; CLI reference/embedded build skill updated; real workers/sagas/triggers generators emit and assert canonical non-empty exports. |
 | 2026-08-01 | slice 3   | validation     | All scoped/static/quality/JSR gates exited 0. Full runtime passed 44 gates; unrelated `behavior.service-health` timed out and raw command exited 1 after all registry-specific gates passed. |
+| 2026-08-01 | follow-up | workspace resolver | Added workspace-first runtime manifest/generator resolution through `FileSystemPort`, with package-name-guarded upward discovery and the published HTTP fallback preserved. Commit `0e466f6a9`. |
+| 2026-08-01 | follow-up | trigger manifest | Excluded scaffold-only `triggers/runtime.ts` from the published trigger runtime registry manifest; retained the generator's invalid-definition throw. Commit `9e93f757f`. |
+| 2026-08-01 | follow-up | executable integration | Replaced text-only registry assertions with four tests: real generated-registry load, invalid-module rejection, workspace-first/no-fetch, and JSR-only published fallback. Commit `1ce434a4a`. |
 
 ## Decisions
 
@@ -97,6 +100,10 @@ plugin-name registry.
 | Required CLI lint | scoped wrapper, `--root packages/cli --ext ts,tsx` | PASS (exit 0) | 747 files, 4 batches, 0 findings. |
 | Required targeted tests | `deno test -A packages/cli/src/public/features/generate packages/cli/src/public/features/plugins` | PASS (exit 0) | 26 groups, 62 steps, 0 failed. |
 | CLI format | scoped format wrapper | PASS (exit 0) | 747 files, 4 batches, 0 findings. |
+| Follow-up workspace check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages --root plugins --ext ts,tsx` | PASS (exit 0) | 2635 files, 22 batches, 0 findings. |
+| Follow-up quality | `deno task ci:quality` | PASS (exit 0) | Check/lint/fmt/dependency and specifier/port guards completed; catalog warnings are pre-existing non-failing output. |
+| Follow-up focused tests | `deno test -A packages/cli/src/public/features/generate/plugins/` | PASS (exit 0) | 6 passed (4 steps); generated trigger module was imported in-process. |
+| Follow-up publish dry-run | `deno task publish:dry-run` | PASS (exit 0) | Workspace publish simulation included `plugins/triggers/scaffold.runtime.json`; terminal output ended `Success Dry run complete`. |
 
 ### Fitness Gates
 
@@ -153,4 +160,32 @@ behavior.service-health — FAILED 117796ms
 cleanup.aspire-stop — PASSED 378ms
 Summary: passed=44 failed=1
 RAW_EXIT_CODE=1
+
+FOLLOW-UP WORKSPACE CHECK
+{"source":{"mode":"selection","cwd":"/home/codex/repos/fix-1010"},"command":"deno check --quiet --unstable-kv <files>","selection":{"filesSelected":2635,"batches":22,"failedBatches":0},"summary":{"totalOccurrences":0,"uniqueOccurrences":0,"uniqueCodes":0,"uniquePaths":0},"groups":[]}
+RAW_EXIT_CODE=0
+
+FOLLOW-UP CI QUALITY (verdict-bearing raw lines; dependency scan also emitted existing WARN lines)
+[fmt:check] {"command":"deno fmt --check","cwd":"/home/codex/repos/fix-1010","mode":"check","summary":{"filesSelected":1883,"batches":10,"failedBatches":0,"findings":0,"ignoredFindings":0},"findings":[]}
+[lint] {"source":{"mode":"command","cwd":"/home/codex/repos/fix-1010","exitCode":0},"selection":{"filesSelected":1734,"batches":9},"summary":{"totalOccurrences":0,"uniqueOccurrences":0,"uniqueRules":0,"uniquePaths":0},"groups":[]}
+[check] {"source":{"mode":"selection","cwd":"/home/codex/repos/fix-1010"},"command":"deno check --quiet --unstable-kv <files>","selection":{"filesSelected":2486,"batches":21,"failedBatches":0},"summary":{"totalOccurrences":0,"uniqueOccurrences":0,"uniqueCodes":0,"uniquePaths":0},"groups":[]}
+Task ci:quality (no command)
+RAW_EXIT_CODE=0
+
+FOLLOW-UP FOCUSED TESTS
+running 1 test from ./packages/cli/src/public/features/generate/plugins/generate-plugin-registries-command_test.ts
+generate plugin registries command ... ok (3ms)
+running 1 test from ./packages/cli/src/public/features/generate/plugins/installed-runtime-registry-generator_test.ts
+installed runtime registry generator ... ok (5ms)
+running 4 tests from ./packages/cli/src/public/features/generate/plugins/installed-runtime-registry-integration_test.ts
+generated trigger registry loads valid definitions and excludes scaffold runtime glue ... ok (83ms)
+generated trigger registry rejects a non-definition module that is not excluded ... ok (67ms)
+workspace import resolves the on-disk trigger manifest without fetching JSR ... ok (4ms)
+JSR-only imports retain the published manifest and generator fallback ... ok (2ms)
+ok | 6 passed (4 steps) | 0 failed (356ms)
+RAW_EXIT_CODE=0
+
+FOLLOW-UP PUBLISH DRY RUN (2676-line file listing truncated by the terminal; exact final output)
+Success Dry run complete
+RAW_EXIT_CODE=0
 ```

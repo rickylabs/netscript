@@ -32,3 +32,19 @@ Only `behavior.service-health` failed after 117796ms; `cleanup.aspire-stop` pass
 health timeout is outside registry generation/sync context and occurred after every registry-specific
 gate had passed. Per the slice constraint, it is recorded without widening the diff or rerunning the
 expensive one-pass command.
+
+## 2026-08-01 — correction — canonical trigger registry exposed a latent manifest defect
+
+The prior implementation made the canonical trigger registry authoritative, exposing that the
+published manifest treated scaffold-only `triggers/runtime.ts` as a trigger. Before the PR, the
+canonical registry was absent and the runtime silently fell back to the `triggers/mod.ts` barrel,
+so webhook behavior passed accidentally. The fix keeps invalid trigger modules loud, excludes only
+the known scaffold glue, and makes local-source scaffolds consume the workspace manifest before the
+published fallback.
+
+## 2026-08-01 — tooling incident — duplicate broad checks terminated
+
+The broad check exceeded the command wrapper's first yield. Three recovery attempts unintentionally
+started identical read-only checks without retaining their process session ids. Those duplicates
+were terminated; one clean invocation was then run through its retained session to completion and
+exited 0. No source, cache, or lockfile mutation resulted.
