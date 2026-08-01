@@ -167,3 +167,25 @@ dropped orthogonal materialisation coverage are in scope.
 - Risk: making CI green by loosening the contract. Mitigation: preserve exact ordered full-list
   equality.
 - Deferred: AI sample classification (#1039), PR/issue edits, and all production implementation.
+
+## Follow-up plan: symmetric source-leak coverage (2026-08-02)
+
+The owner waived another PLAN-EVAL cycle for this assertion-only review follow-up.
+
+### Locked decisions
+
+1. Preserve every existing forbidden path and its order; append only the nine confirmed repository
+   paths for sagas, triggers, and streams.
+2. Do not invent counterparts for the workers-only `worker` directory.
+3. Treat any real userland leak as a product finding: retain the assertion, stop, and report it
+   rather than weakening coverage.
+
+### Slice, proof, and scope
+
+| Slice | Files | Proof |
+| --- | --- | --- |
+| Make the no-source-leak guarantee symmetric across the four installed plugins. | `true-userland-install-suite.ts`, run artifacts | real `scaffold.userland-install`; all CLI E2E tests; E2E lint; focused format check |
+
+Risk is limited to exposing an existing source-copy leak; the real gate is the decision point.
+Production code, AI behavior (#1039), suite-registry coverage, PR/issue metadata, and unrelated E2E
+README formatting remain deferred and untouched.

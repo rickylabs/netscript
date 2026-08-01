@@ -26,6 +26,11 @@ All four historical workers plugin-package materialisation paths were empiricall
 no-samples, so Task 2 was dropped. Focused and whole-CLI tests plus the scoped check and E2E lint
 pass; the requested broad E2E format check exposes only an unrelated pre-existing README reflow.
 
+Follow-up 2026-08-02 source-leak symmetry: the true-userland assertion now forbids each real
+`src`, `scaffold.ts`, and `tests` path for sagas, triggers, and streams in addition to the preserved
+workers paths. The real userland gate passed (`8/8`), proving none of those source surfaces leaks;
+all E2E tests (`73/73`), E2E lint, and focused format check are green.
+
 ## Completed
 
 - Required skill/doctrine/harness reads.

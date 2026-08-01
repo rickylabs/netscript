@@ -260,3 +260,83 @@ EXIT_CODE=0
 This follow-up keeps the existing PR and partial `Refs #1017` framing. No PR/issue mutation or push
 was performed. AI behavior remains deferred to #1039. The unrelated README formatting finding was
 recorded without widening this assertion-only slice.
+
+## Follow-up slice: symmetric plugin source-leak assertions (2026-08-02)
+
+### Design
+
+- Public surface: none; this only strengthens the embedded true-userland E2E assertion script.
+- Domain vocabulary: forbidden source-leak paths for each installed official plugin.
+- Ports/constants: no new ports; extend the existing ordered `forbiddenPaths` list.
+- Commit slice: append the nine verified saga/trigger/stream repository paths and prove they are
+  absent from a real generated userland project.
+- Deferred scope: production code, AI plugin behavior (#1039), suite registry, PR/issue metadata,
+  and the unrelated E2E README formatting debt.
+- Contributor path: when another plugin is added to this suite, mirror each real repository source
+  tree/entrypoint in `forbiddenPaths` and validate against the real userland gate.
+
+### Repository-path verification
+
+```text
+$ ls -1 plugins/{sagas,triggers,streams}
+Each contains: scaffold.ts, src, tests
+Only plugins/workers contains the additional worker directory.
+EXIT_CODE=0
+```
+
+### Outcome
+
+All nine symmetric assertions landed. The real userland gate found no saga, trigger, or stream
+source leak, so no product escalation or scope change was needed. Existing workers and `packages`
+entries remain unchanged and in their original order.
+
+### Raw gate output
+
+`deno task e2e:cli run scaffold.userland-install --cleanup`
+
+```text
+Task e2e:cli deno run --allow-all packages/cli/e2e/cli.ts 'run' 'scaffold.userland-install' '--cleanup'
+scratch project outside checkout: /tmp/netscript-userland-install-f0feed4d189832/plugin-smoke-20260802-002715
+present artifacts: deno.json, workers/mod.ts, workers/runtime.ts, sagas/mod.ts, sagas/runtime.ts, triggers/mod.ts, triggers/runtime.ts, streams/mod.ts
+type-checked structural outputs: workers/mod.ts, workers/runtime.ts, sagas/mod.ts, sagas/runtime.ts, triggers/mod.ts, triggers/runtime.ts, streams/mod.ts
+no copied packages/, plugin src tree, scaffold entrypoint, or monorepo path leaks found
+{"passed":8,"failed":0,"skipped":0}
+EXIT_CODE=0
+```
+
+`deno test --allow-all packages/cli/e2e`
+
+```text
+running 9 tests from ./packages/cli/e2e/tests/presentation/suite-registry_test.ts
+registry exposes scaffold capability suites from constants ... ok (1ms)
+native desktop suite is registered with an honest fixture preflight ... ok (1ms)
+capability suites select only their scoped gates ... ok (2ms)
+plugin suite includes all official plugin and generated-check gates ... ok (1ms)
+true userland suite runs init, four no-samples plugin installs, assertion, and cleanup ... ok (1ms)
+runtime suite includes full scaffold, database, runtime, and behavior gates ... ok (1ms)
+runtime suite waits for the generated app and requests its home page ... ok (1ms)
+runtime suite omits database resource wait for sqlite ... ok (1ms)
+runtime suite selects mssql database resource wait for mssql ... ok (620µs)
+
+ok | 73 passed | 0 failed (4s)
+EXIT_CODE=0
+```
+
+`deno lint packages/cli/e2e`
+
+```text
+Checked 107 files
+EXIT_CODE=0
+```
+
+`deno fmt --check packages/cli/e2e/suites/scaffold/true-userland-install-suite.ts`
+
+```text
+Checked 1 file
+EXIT_CODE=0
+```
+
+### Reconcile
+
+The existing PR #1028 and partial `Refs #1017` framing remain unchanged. No push or GitHub mutation
+was performed. AI behavior remains deferred to #1039, and the unrelated E2E README was untouched.
