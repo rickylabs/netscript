@@ -81,6 +81,9 @@ define `ASPIRE_GENERATED: '.aspire'`. Selected path:
 | 2026-08-01 | remediation S1 | implementation | Added injected file/fake lifecycle lock, atomic create, pid/time/token record, dead/expired recovery, full detached-lifecycle lease, and non-masking release warning. |
 | 2026-08-01 | remediation S1 | supervisor review | Focused tests passed 5 modules / 15 steps; corrected partial-write cleanup to close the handle before removal for Windows compatibility. |
 | 2026-08-01 | remediation S2/S3 | implementation | Extracted anchored absence classifier, added numeric probe/command exit diagnostics, and covered quoted-message ambiguity plus resident non-zero status without stop. |
+| 2026-08-01 | remediation S4 | implementation | Added `scaffold.runtime` resident lifecycle gate using existing `aspire-start.json`, original pid/dashboard identity, local `db status`, and post-command `aspire describe`; no second AppHost or dependency added. |
+| 2026-08-01 | remediation S4 | runtime attempt 1 | Full `scaffold.runtime` exited 1 before the proposed gate could execute: the gate was missing from the suite's explicit allowlist, then the pre-existing `behavior.service-health` gate failed after 117969ms with the generated users service reporting an unhealthy database. |
+| 2026-08-01 | remediation S4 | runtime attempt 2 / blocker | Added the missing allowlist entry and verified `e2e:cli gates scaffold.runtime` listed the lifecycle gate, but the rerun's Aspire subprocess tree entered suspended (`T`) state during `database.init` amid other active sessions in this shared worktree. The run was interrupted (exit 1), its project-specific AppHost was checked/stopped, and all S4 product changes were removed rather than claiming non-deterministic evidence. Acceptance box 3 remains unit/seam evidence only. |
 
 ## Gate Results
 
@@ -114,6 +117,19 @@ launch exited before evaluation with `Not logged in`; no verdict artifact exists
 | Ambiguous probe | PASS | `fails closed when ... ambiguous` | Exact commands: `describe`; never reaches `start`. |
 | Studio path | PASS | existing studio test | Zero detached output calls; interactive `run` spawn unchanged. |
 | Full scaffold runtime | N/A | user instruction | Not run; no scaffold/template/generated output changed. |
+
+### Review Remediation Final Gates — 2026-08-01
+
+| Gate | Result | Raw summary |
+| --- | --- | --- |
+| Database adapter tests | PASS, exit 0 | `ok | 7 passed (18 steps) | 0 failed (1s)` |
+| Scoped check | PASS, exit 0 | 745 files, 7 batches, 0 failed batches / findings; wrapper invoked `deno check --quiet --unstable-kv`. |
+| Scoped lint | PASS, exit 0 | 745 files, 4 batches, 0 findings. |
+| Scoped format | PASS, exit 0 | 745 files, 4 batches, 0 failed batches / findings. |
+| Code quality | PASS, exit 0 | `ok: true`, zero findings; seven repository-baseline allowances. |
+| Doctrine fitness | PASS, exit 0 | Zero FAIL findings; repository-baseline dependency/doctrine WARN/INFO diagnostics only. |
+| Full scaffold runtime attempt 1 | FAIL, exit 1 | `Summary: passed=44 failed=1`; proposed S4 gate was not registered, and existing `behavior.service-health` failed after 117969ms. |
+| Full scaffold runtime attempt 2 | INTERRUPTED, exit 1 | After verified S4 registration, Aspire subprocesses suspended during `database.init` in the shared worktree; no live acceptance claim made and S4 code removed. |
 
 ## Handoff Notes
 
