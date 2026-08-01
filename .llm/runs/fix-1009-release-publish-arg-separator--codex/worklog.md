@@ -71,6 +71,8 @@ subprocess test using the exact forwarded `--` argv.
 | 2026-08-01 | 2 | exact check note | The literal `--root .` + four `--file` command selected 2,843 repo files and failed only on 10 unrelated existing `docs/site` Lume/isolated-declaration diagnostics; the actual four-file wrapper selection passed with zero findings. |
 | 2026-08-01 | 2 | supervisor review | PASS: one-line sibling pattern, real entry-point test, no guard weakening, clean owned diff, and all owned gates green. |
 | 2026-08-01 | 2 | reconcile | No new issue/PR feedback changes scope; PR remains draft and is ready for the IMPL-EVAL handoff after this slice is pushed. |
+| 2026-08-01 | final | IMPL-EVAL | OpenHands Qwen PASS at `079e84360`; evaluator independently verified focused tests, format, the real probe, scope, and lock hygiene. |
+| 2026-08-01 | final | close reconcile | Acceptance evidence mapped for issue #1009; final lifecycle move is ready-for-review with `status:ready-merge`. |
 
 ## Decisions
 
@@ -123,3 +125,4 @@ subprocess test using the exact forwarded `--` argv.
 - Confirm non-task-wired scripts remain explicitly outside scope.
 - The evaluator-authored PLAN-EVAL artifact landed in `28f2a5aea` and superseded the temporary
   provenance-marked transcription.
+- The evaluator-authored IMPL-EVAL artifact landed in `079e84360` with verdict PASS.

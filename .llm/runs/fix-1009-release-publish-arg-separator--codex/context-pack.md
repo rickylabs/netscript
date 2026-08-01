@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `fix-1009-release-publish-arg-separator--codex` |
 | Branch | `fix/1009-release-publish-arg-separator` |
-| Current phase | `implement` |
+| Current phase | `close` |
 | Archetype | `6 — CLI / Tooling` (contract/gate subset) |
 | Scope overlays | `none` |
 
@@ -17,7 +17,8 @@ cause and AC4 sweep. The before probe fails at `github-release.ts` parsing the f
 separator. An unauthorized closed-model `plan-eval.md` was rejected and demoted to
 `supervisor-advisory-review.md`. The OpenHands Qwen evaluator posted a formal PASS; its missing
 artifact was initially transcribed, then superseded by the evaluator-authored `plan-eval.md` in
-`28f2a5aea`. Both implementation slices are complete and the scoped validation is green.
+`28f2a5aea`. Both implementation slices are complete, the scoped validation is green, and the
+evaluator-authored IMPL-EVAL at `079e84360` is PASS.
 
 ## Completed
 
@@ -29,17 +30,16 @@ artifact was initially transcribed, then superseded by the evaluator-authored `p
 - Slice 1 focused test passed 15/15 and independent `review_codex_light` review passed.
 - Slice 2 focused test and the complete requested suite passed 38/38.
 - The exact after probe reached the green-canary gate without `Unknown argument: --`.
+- Separate OpenHands Qwen IMPL-EVAL passed and committed `evaluate.md`.
 
 ## In Progress
 
-- Slice 2 independent and supervisor reviews passed. Commit/push/comment the slice, update the PR
-  body evidence, then run IMPL-EVAL.
+- Final acceptance-evidence mapping and PR lifecycle transition.
 
 ## Next Steps
 
-1. Commit/push/comment Slice 2.
-2. Obtain separate-session open-model IMPL-EVAL PASS.
-3. Finalize PR evidence and move from draft only when every acceptance box is evidenced.
+1. Add exact issue acceptance-evidence mapping to PR #1040.
+2. Check the completed DoD, set `status:ready-merge`, and make the PR ready for review.
 
 ## Key Decisions
 
@@ -66,6 +66,7 @@ artifact was initially transcribed, then superseded by the evaluator-authored `p
 | Fitness | plan PASS | OpenHands Qwen verdict comment and evaluator-authored `plan-eval.md`. |
 | Runtime | PASS | Exact after probe reached the canary gate, beyond argument parsing. |
 | Consumer | PASS | Document-derived parser test and task subprocess test. |
+| IMPL-EVAL | PASS | Evaluator-authored `evaluate.md` at `079e84360`. |
 
 ## Open Questions
 
