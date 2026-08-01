@@ -278,6 +278,30 @@ export class PluginBuilder<
     });
   }
 
+  /**
+   * Set the plugin adapter module that contributes doctor checks.
+   *
+   * @example
+   * ```ts
+   * definePlugin('@example/plugin', '1.0.0')
+   *   .withDoctor('./src/adapter/plugin.ts')
+   *   .build();
+   * ```
+   */
+  withDoctor(
+    doctor: ContributionInput<string, TDependencies>,
+  ): PluginBuilder<
+    TName,
+    TVersion,
+    TContributions & { readonly doctor: string },
+    TDependencies
+  > {
+    const value = this.#resolve(doctor);
+    return this.#clone<TName, TVersion, TContributions & { readonly doctor: string }>({
+      contributions: { ...this.#state.contributions, doctor: value },
+    });
+  }
+
   /** Build an immutable plugin manifest. */
   build(): TName extends never ? never : TVersion extends never ? never : PluginManifest {
     if (!this.#state.name) {

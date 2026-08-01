@@ -1,9 +1,15 @@
 import { resolve } from '@std/path';
+import { toFileUrl } from '@std/path/to-file-url';
 import type { NetScriptConfig } from '@netscript/config';
+import type {
+  DoctorReport,
+  NetScriptPlugin,
+  PluginCommandContext,
+} from '@netscript/plugin/adapter';
 
 import type { RegisteredPluginConfig } from '../../../../kernel/domain/resolved-config.ts';
 import type { FileSystemPort } from '../../../../kernel/ports/file-system-port.ts';
-import { loadRegisteredPluginMetadata } from '../../../../kernel/adapters/config/plugin-registry.ts';
+import { loadRegisteredPlugins } from '../../../../kernel/adapters/config/plugin-registry.ts';
 import { showAuthBackend } from '../auth/auth-config.ts';
 
 /** Health status for one plugin doctor check. */
@@ -59,7 +65,7 @@ export async function doctorPlugin(
   try {
     config = await dependencies.loadConfig({ cwd: input.projectRoot });
   } catch (error) {
-    return [workspaceErrorReport('config-load', 'Could not load netscript.config.ts.', error)];
+    return configErrorReports(error);
   }
 
   const pluginSpecs = resolvePluginSpecs(config);
@@ -67,7 +73,7 @@ export async function doctorPlugin(
 
   let plugins: Record<string, RegisteredPluginConfig>;
   try {
-    const loadPlugins = dependencies.loadRegisteredPlugins ?? loadRegisteredPluginMetadata;
+    const loadPlugins = dependencies.loadRegisteredPlugins ?? loadRegisteredPlugins;
     plugins = await loadPlugins(input.projectRoot, config);
   } catch (error) {
     return [workspaceErrorReport('manifest-resolution', 'Could not resolve plugin manifests.', error)];
@@ -92,8 +98,8 @@ async function diagnosePlugin(
     },
     await checkWorkdir(projectRoot, plugin, dependencies.fs),
     checkPermissions(plugin),
-    checkRuntimeConfig(plugin),
     ...await checkAuthBackend(projectRoot, plugin, dependencies.fs),
+    ...await checkPluginDoctor(projectRoot, plugin, dependencies.fs),
   ];
 
   return {
@@ -152,19 +158,64 @@ function checkPermissions(plugin: RegisteredPluginConfig): PluginDoctorCheck {
   };
 }
 
-function checkRuntimeConfig(plugin: RegisteredPluginConfig): PluginDoctorCheck {
-  return {
-    id: 'runtime-config',
-    title: 'Runtime config contribution',
-    status: plugin.runtimeConfig ? 'healthy' : 'healthy',
-    message: plugin.runtimeConfig ? 'Runtime config topic declared' : 'No runtime config topic',
-  };
-}
-
 function aggregateStatus(checks: readonly PluginDoctorCheck[]): PluginDoctorCheckStatus {
   if (checks.some((check) => check.status === 'error')) return 'error';
   if (checks.some((check) => check.status === 'warning')) return 'warning';
   return 'healthy';
+}
+
+async function checkPluginDoctor(
+  projectRoot: string,
+  plugin: RegisteredPluginConfig,
+  fs: FileSystemPort,
+): Promise<readonly PluginDoctorCheck[]> {
+  if (!plugin.doctor) return [];
+  try {
+    const moduleUrl = toFileUrl(resolve(plugin.rootDir, plugin.doctor)).href;
+    const module = await import(moduleUrl) as Record<string, unknown>;
+    const adapter = Object.values(module).find((value): value is NetScriptPlugin =>
+      isNetScriptPlugin(value) && value.name === plugin.name
+    );
+    if (!adapter) {
+      throw new Error(`Doctor module ${plugin.doctor} exports no matching NetScriptPlugin.`);
+    }
+
+    const context: PluginCommandContext = {
+      workspaceRoot: projectRoot,
+      options: {},
+      config: {},
+      dryRun: true,
+      fileSystem: {
+        readText: (path) => fs.readFile(resolve(projectRoot, path)),
+        writeText: () => Promise.reject(new Error('Doctor checks are read-only.')),
+        exists: (path) => fs.exists(resolve(projectRoot, path)),
+      },
+    };
+    const checks: DoctorReport['checks'][number][] = [];
+    for (const check of adapter.doctor?.extraChecks ?? []) {
+      checks.push(await check.run(context));
+    }
+    return checks.map((check, index) => ({
+      id: `plugin:${index}:${check.name}`,
+      title: check.name,
+      status: check.ok ? 'healthy' : 'error',
+      message: check.message,
+    }));
+  } catch (error) {
+    return [{
+      id: 'plugin-doctor-import',
+      title: 'Plugin doctor contribution',
+      status: 'error',
+      message: `${error instanceof Error ? error.message : String(error)} Run: netscript plugin sync`,
+    }];
+  }
+}
+
+function isNetScriptPlugin(value: unknown): value is NetScriptPlugin {
+  if (!value || typeof value !== 'object') return false;
+  return typeof Reflect.get(value, 'name') === 'string' &&
+    typeof Reflect.get(value, 'kind') === 'string' &&
+    typeof Reflect.get(value, 'displayName') === 'string';
 }
 
 function resolvePluginSpecs(config: NetScriptConfig): readonly string[] {
@@ -186,4 +237,36 @@ function workspaceErrorReport(
       message: error instanceof Error ? error.message : String(error),
     }],
   };
+}
+
+function configErrorReports(error: unknown): readonly PluginDoctorReport[] {
+  const issues = readValidationIssues(error);
+  if (issues.length === 0) {
+    return [workspaceErrorReport('config-load', 'Could not load netscript.config.ts.', error)];
+  }
+  return [{
+    pluginName: 'workspace',
+    status: 'error',
+    checks: issues.map((issue, index) => ({
+      id: `config:${index}:${issue.path}`,
+      title: `Config field ${issue.path || '<root>'}`,
+      status: 'error',
+      message: `${issue.message} Fix netscript.config.ts and rerun: netscript plugin doctor`,
+    })),
+  }];
+}
+
+function readValidationIssues(
+  error: unknown,
+): readonly { readonly path: string; readonly message: string }[] {
+  if (!error || typeof error !== 'object') return [];
+  const rawIssues = Reflect.get(error, 'issues');
+  if (!Array.isArray(rawIssues)) return [];
+  return rawIssues.flatMap((issue) => {
+    if (!issue || typeof issue !== 'object') return [];
+    const path = Reflect.get(issue, 'path');
+    const message = Reflect.get(issue, 'message');
+    if (!Array.isArray(path) || typeof message !== 'string') return [];
+    return [{ path: path.map(String).join('.'), message }];
+  });
 }

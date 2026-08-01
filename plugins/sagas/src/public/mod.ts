@@ -49,6 +49,7 @@ const sagasManifest: PluginManifest = definePlugin(
   .withContractVersions([{ version: 'v1', loader: './contracts/v1/mod.ts' }])
   .withRuntimeConfigTopics([{ name: SAGAS_PLUGIN_ID, schemaPath: './runtime/sagas.schema.json' }])
   .withAspire('./src/aspire/mod.ts')
+  .withDoctor('./src/adapter/plugin.ts')
   .withHooks({
     setup: (ctx): void => {
       ctx.logger.info('Sagas plugin loaded', {
