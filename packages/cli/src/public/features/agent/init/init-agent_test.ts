@@ -5,7 +5,7 @@ import {
   assertRejects,
   assertStringIncludes,
 } from "@std/assert";
-import { join } from "@std/path";
+import { dirname, join } from "@std/path";
 import { NETSCRIPT_RELEASE_VERSION } from "../../../../kernel/constants/jsr-specifiers.ts";
 import { EMBEDDED_SKILL_FILES } from "../../../../kernel/assets/skills.generated.ts";
 import { DenoAgentInitFileSystem } from "./agent-init-file-system.ts";
@@ -195,12 +195,26 @@ Deno.test("installed skill routing resolves to installed skills or help", async 
       const installedPath = join(root, ".claude/skills", skill, "SKILL.md");
       assert(await fs.exists(installedPath), `${skill} was not installed`);
       const text = await Deno.readTextFile(installedPath);
-      const routingText =
-        text.match(/## Routing\n([\s\S]*?)(?:\n## |$)/)?.[1] ?? "";
-      for (const line of routingText.split("\n")) {
-        const target = line.match(/^\|[^|]+\|\s*`([^` ]+)`\s*\|$/)?.[1];
-        if (target) {
+      for (
+        const section of text.matchAll(
+          /## (?:Routing|Hand-offs)\n([\s\S]*?)(?=\n## |$)/g,
+        )
+      ) {
+        for (const line of section[1].split("\n")) {
+          const route = line.match(
+            /^\|[^|]+\|\s*(?:`([^` ]+)`|\[(?:`([^` ]+)`|([^\]]+))\]\(([^)]+)\))\s*\|$/,
+          );
+          if (!route) continue;
+          const target = route[1] ?? route[2] ?? route[3];
+          const href = route[4];
           assert(installed.has(target), `${skill} routes to missing ${target}`);
+          if (href) {
+            const linkedPath = join(dirname(installedPath), href);
+            assert(
+              await fs.exists(linkedPath),
+              `${skill} route ${target} links to missing ${href}`,
+            );
+          }
         }
       }
       for (const match of text.matchAll(/`([^` ]+)` skill/g)) {

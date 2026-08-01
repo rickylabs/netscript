@@ -253,3 +253,135 @@ Per the post-rebase formatting instruction, `deno fmt --no-config` normalized
 `skills/{aspire,deno,netscript}/SKILL.md` and `skills/help.md`.
 `skills/netscript-build/SKILL.md` and `skills/netscript-operate/SKILL.md` were explicitly
 excluded because their formatting drift is owned by `main`.
+
+### Unit 3 seeded-defect proofs
+
+Unknown linked target, after source mutation and barrel regeneration:
+
+```text
+$ deno test -A packages/cli/src/public/features/agent/init/init-agent_test.ts --filter 'installed skill routing'
+Check packages/cli/src/public/features/agent/init/init-agent_test.ts
+running 1 test from ./packages/cli/src/public/features/agent/init/init-agent_test.ts
+installed skill routing resolves to installed skills or help ... FAILED (27ms)
+
+error: AssertionError: netscript routes to missing nope.md
+    at file:///home/codex/repos/fix-1026/packages/cli/src/public/features/agent/init/init-agent_test.ts:210:11
+
+FAILED | 0 passed | 1 failed | 8 filtered out (35ms)
+error: Test failed
+```
+
+Known target with a nonexistent relative href, again after regeneration:
+
+```text
+$ deno test -A packages/cli/src/public/features/agent/init/init-agent_test.ts --filter 'installed skill routing'
+Check packages/cli/src/public/features/agent/init/init-agent_test.ts
+running 1 test from ./packages/cli/src/public/features/agent/init/init-agent_test.ts
+installed skill routing resolves to installed skills or help ... FAILED (36ms)
+
+error: AssertionError: netscript route help.md links to missing ../wrong/help.md
+    at file:///home/codex/repos/fix-1026/packages/cli/src/public/features/agent/init/init-agent_test.ts:213:13
+
+FAILED | 0 passed | 1 failed | 8 filtered out (48ms)
+error: Test failed
+```
+
+Both mutations were removed from the source before final regeneration.
+
+Restored-content proof:
+
+```text
+$ deno test -A packages/cli/src/public/features/agent/init/init-agent_test.ts --filter 'installed skill routing'
+Check packages/cli/src/public/features/agent/init/init-agent_test.ts
+running 1 test from ./packages/cli/src/public/features/agent/init/init-agent_test.ts
+installed skill routing resolves to installed skills or help ... ok (31ms)
+
+ok | 1 passed | 0 failed | 8 filtered out (42ms)
+```
+
+### Fresh validation
+
+Scoped check (exit 0):
+
+```json
+{"source":{"mode":"selection","cwd":"/home/codex/repos/fix-1026"},"command":"deno check --quiet --unstable-kv <files>","selection":{"filesSelected":746,"batches":7,"failedBatches":0},"summary":{"totalOccurrences":0,"uniqueOccurrences":0,"uniqueCodes":0,"uniquePaths":0},"groups":[]}
+```
+
+Scoped lint (exit 0):
+
+```json
+{"source":{"mode":"command","cwd":"/home/codex/repos/fix-1026","exitCode":0},"selection":{"filesSelected":746,"batches":4},"summary":{"totalOccurrences":0,"uniqueOccurrences":0,"uniqueRules":0,"uniquePaths":0},"groups":[]}
+```
+
+Focused tests (exit 0):
+
+```text
+running 9 tests from ./packages/cli/src/public/features/agent/init/init-agent_test.ts
+agent init writes Claude config, skills, and marked AGENTS section idempotently ... ok (72ms)
+agent init selects VS Code and detect-or-all host table ... ok (52ms)
+VS Code-only agent init never delegates to the Claude skill tree ... ok (14ms)
+agent init rejects a bundle whose manifest hash does not match ... ok (3ms)
+installed skill routing resolves to installed skills or help ... ok (26ms)
+aspire delegation is skipped when Playwright CLI is already installed ... ok (34ms)
+aspire delegation timeout is swallowed after cancelling the fake ... ok (33ms)
+aspire delegation errors are swallowed with unconditional MCP config ... ok (13ms)
+agent init installs the complete diagnostic surface ... ok (39ms)
+
+ok | 9 passed | 0 failed (327ms)
+```
+
+Generated-barrel reproducibility (exit 0; the following `git status --porcelain` emitted nothing):
+
+```text
+Task gen:assets-barrel deno run --no-lock --allow-read --allow-write --allow-run=deno .llm/tools/generate-cli-assets-barrel.ts
+generator_exit=0
+<clean>
+```
+
+Root check (exit 0):
+
+```json
+{"source":{"mode":"selection","cwd":"/home/codex/repos/fix-1026"},"command":"deno check --quiet --unstable-kv <files>","selection":{"filesSelected":2490,"batches":21,"failedBatches":0},"summary":{"totalOccurrences":0,"uniqueOccurrences":0,"uniqueCodes":0,"uniquePaths":0},"groups":[]}
+```
+
+Root lint (exit 0):
+
+```text
+Task lint deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages --root plugins --ext ts,tsx --exclude "^(packages/(fresh-ui|cli)|packages/mcp/tests/fixtures/doctor/|.*(?:^|/)\.generated/|.*(?:^|/)node_modules/)"
+{"source":{"mode":"command","cwd":"/home/codex/repos/fix-1026","exitCode":0},"selection":{"filesSelected":1739,"batches":9},"summary":{"totalOccurrences":0,"uniqueOccurrences":0,"uniqueRules":0,"uniquePaths":0},"groups":[]}
+```
+
+Root format check (exit 0):
+
+```text
+Task fmt:check deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages --root plugins --ext ts,tsx --exclude "^(packages/(cli)|packages/mcp/tests/fixtures/doctor/|.*(?:^|/)\.generated/|.*(?:^|/)node_modules/)" --ignore-line-endings (cached, inputs unchanged)
+```
+
+Destructive-guidance grep emitted no matches:
+
+```text
+$ rg -n 'docker (rm|kill|prune)|xargs .*docker' skills/
+<no output>
+```
+
+### Teardown verification
+
+No AppHost was started in this slice. `aspire ps --format Json --non-interactive --nologo`
+returned:
+
+```json
+[]
+```
+
+`docker ps -a` showed three already-running PostgreSQL containers, which this slice did not create
+or touch:
+
+```text
+CONTAINER ID   IMAGE           STATUS          PORTS                       NAMES
+63c39926aa8a   postgres:18.3   Up 4 minutes    127.0.0.1:44660->5432/tcp   postgres-20037c3e
+1fad8c348cce   postgres:18.3   Up 14 minutes   127.0.0.1:44656->5432/tcp   postgres-dda83380
+d8ff61336f8b   postgres:18.3   Up 54 minutes   127.0.0.1:44621->5432/tcp   postgres-bc75ea00
+```
+
+They were left untouched because they belong to other concurrent work. No containers or AppHosts
+were created by this run.
