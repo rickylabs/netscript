@@ -59,6 +59,10 @@ subprocess test using the exact forwarded `--` argv.
 | 2026-08-01 | 0 | design | Scope, semantic test strategy, and two implementation slices locked. |
 | 2026-08-01 | 0 | PLAN-EVAL blocked | Local OpenRouter credentials are absent; the sole OpenHands Qwen dispatch has not landed a tracked `plan-eval.md`. Implementation remains stopped. |
 | 2026-08-01 | 0 | PLAN-EVAL PASS | OpenHands Qwen posted the authoritative PASS; missing artifact transcribed with URL/timestamp/run provenance. |
+| 2026-08-01 | 1 | implementation | Added the position-independent publish separator skip and non-vacuous source-derived Usage test. |
+| 2026-08-01 | 1 | gate | `github-release_test.ts`: 15 passed, 0 failed; the existing unknown-argument/missing-value guard remains green. |
+| 2026-08-01 | 1 | supervisor review | PASS: sibling pattern matched, final unknown-argument branch unchanged, and every matching Usage line is parsed after a non-zero count assertion. |
+| 2026-08-01 | 1 | reconcile | PR #1040 remains draft; issue scope, labels, milestone, and closing keyword still match with no rescope required. |
 
 ## Decisions
 
@@ -87,6 +91,7 @@ subprocess test using the exact forwarded `--` argv.
 | --- | --- | --- | --- |
 | CLI contract plan | NOT_RUN | PLAN-EVAL pending | No implementation before PASS. |
 | Formal Plan-Gate | PASS | OpenHands Qwen PR verdict + transcribed `plan-eval.md` | Separate open-model session; evaluator-authored file supersedes if later pushed. |
+| Publish parser focused test | PASS | `deno test --allow-all .llm/tools/release/github-release_test.ts` | 15 passed, 0 failed. |
 
 ### Runtime Gates
 

@@ -198,6 +198,20 @@ Deno.test('parseArgs: --no-latest overrides the default', () => {
   assertEquals(plan.prerelease, false);
 });
 
+Deno.test('parseArgs: every documented release:publish invocation is accepted', async () => {
+  const source = await Deno.readTextFile(new URL('./github-release.ts', import.meta.url));
+  const usageLines = [...source.matchAll(/^\s*\*\s+(deno task release:publish .+)$/gm)]
+    .map((match) => match[1]);
+
+  assertEquals(usageLines.length > 0, true, 'expected at least one documented usage invocation');
+  for (const usageLine of usageLines) {
+    const commandLine = usageLine.slice('deno task release:publish '.length);
+    const argv = [...commandLine.matchAll(/"([^"]*)"|'([^']*)'|(\S+)/g)]
+      .map((match) => match[1] ?? match[2] ?? match[3]);
+    parseArgs(argv);
+  }
+});
+
 Deno.test('parseArgs: intro is required (the deliberate manual step)', () => {
   const err = assertThrows(
     () => parseArgs(['v0.0.1-alpha.20']),
