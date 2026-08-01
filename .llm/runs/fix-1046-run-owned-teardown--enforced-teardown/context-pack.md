@@ -25,10 +25,11 @@ three-valued, path-segment-safe, identity-pair-safe, fail-closed, and guarded ag
 - Slice 4 bounded read-only probes with captured Aspire 13.4.6/Docker fixtures.
 - Slice 5 JSON/Markdown leak reporter; live host observation found only foreign `fix-1025` Postgres.
 - Slice 6 dry-run-default teardown, per-resource apply, immediate label re-verification, and forbidden-command guard.
+- Slice 7 `agentic:leak-check`/`agentic:teardown` tasks and tooling index entries.
 
 ## In Progress
 
-- Slice 7 Deno task and tooling index surface.
+- Slice 8 load-bearing DONE-contract enforcement and run-loop wiring.
 
 ## Next Steps
 

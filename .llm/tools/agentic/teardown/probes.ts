@@ -3,8 +3,7 @@ import type { CommandPort, FilePort } from './ports.ts';
 import { systemCommands, systemFiles } from './ports.ts';
 
 export const ASPIRE_CREATOR_PID = 'com.microsoft.developer.usvc-dev.creatorProcessId';
-export const ASPIRE_CREATOR_STARTED =
-  'com.microsoft.developer.usvc-dev.creatorProcessStartTime';
+export const ASPIRE_CREATOR_STARTED = 'com.microsoft.developer.usvc-dev.creatorProcessStartTime';
 export const ASPIRE_MOUNTS = 'com.microsoft.developer.usvc-dev.mountsLabel';
 export const DEFAULT_PROBE_TIMEOUT_MS = 10_000;
 
@@ -32,7 +31,10 @@ export function parseMountSource(label: string | undefined): string | undefined 
   return match?.[1]?.trim() || undefined;
 }
 
-async function resolvedPath(path: string | undefined, files: FilePort): Promise<string | undefined> {
+async function resolvedPath(
+  path: string | undefined,
+  files: FilePort,
+): Promise<string | undefined> {
   if (!path) return undefined;
   try {
     return await files.realPath(path);
@@ -43,7 +45,9 @@ async function resolvedPath(path: string | undefined, files: FilePort): Promise<
 
 async function probeAppHosts(commands: CommandPort, files: FilePort, timeoutMs: number) {
   const result = await commands.run(['aspire', 'ps', '--format', 'Json'], timeoutMs);
-  if (result.code !== 0) throw new Error(`aspire ps failed (${result.code}): ${result.stderr.trim()}`);
+  if (result.code !== 0) {
+    throw new Error(`aspire ps failed (${result.code}): ${result.stderr.trim()}`);
+  }
   const rows: unknown = JSON.parse(result.stdout);
   if (!Array.isArray(rows)) throw new Error('aspire ps JSON is not an array');
   const candidates: ResourceCandidate[] = [];

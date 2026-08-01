@@ -2,7 +2,8 @@ import { assertEquals } from '@std/assert';
 import type { CommandPort, FilePort } from './ports.ts';
 import { parseMountSource, probeResources } from './probes.ts';
 
-const fixture = (name: string) => Deno.readTextFile(new URL(`./__fixtures__/${name}`, import.meta.url));
+const fixture = (name: string) =>
+  Deno.readTextFile(new URL(`./__fixtures__/${name}`, import.meta.url));
 
 Deno.test('observed Aspire 13.4.6 shapes normalize behind ports', async () => {
   const aspire = await fixture('aspire-ps-13.4.6.json');
@@ -10,15 +11,20 @@ Deno.test('observed Aspire 13.4.6 shapes normalize behind ports', async () => {
   const commands: CommandPort = {
     run(command) {
       if (command[0] === 'aspire') return Promise.resolve({ code: 0, stdout: aspire, stderr: '' });
-      if (command[1] === 'ps') return Promise.resolve({ code: 0, stdout: '6bdea913\n', stderr: '' });
+      if (command[1] === 'ps') {
+        return Promise.resolve({ code: 0, stdout: '6bdea913\n', stderr: '' });
+      }
       return Promise.resolve({ code: 0, stdout: docker, stderr: '' });
     },
   };
   const files: FilePort = {
     realPath: (path) => Promise.resolve(path),
-    readText: (path) => Promise.resolve(path.endsWith('/stat')
-      ? '52220 (dotnet) S 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 4242'
-      : 'dotnet\0apphost'),
+    readText: (path) =>
+      Promise.resolve(
+        path.endsWith('/stat')
+          ? '52220 (dotnet) S 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 4242'
+          : 'dotnet\0apphost',
+      ),
   };
   const resources = await probeResources(commands, files, 50);
   assertEquals(resources[0], {

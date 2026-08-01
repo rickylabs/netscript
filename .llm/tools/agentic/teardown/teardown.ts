@@ -2,7 +2,7 @@ import { classify } from './ownership.ts';
 import type { CommandPort, FilePort } from './ports.ts';
 import { systemCommands, systemFiles } from './ports.ts';
 import { probeContainer } from './probes.ts';
-import { runLeakCheck, type LeakEntry, type LeakReport } from './leak-check.ts';
+import { type LeakEntry, type LeakReport, runLeakCheck } from './leak-check.ts';
 import { readRunResources, type RunResourceRegistry } from './run-resources.ts';
 
 export interface TeardownResult {
@@ -42,8 +42,10 @@ export async function runTeardown(
   for (const entry of report.survivors) {
     if (entry.ownership !== 'owned' || entry.resource.kind !== 'container') continue;
     const fresh = await probeContainer(entry.resource.id, commands, files);
-    if (!fresh || fresh.kind !== 'container' ||
-      classify(fresh, registry, report.worktreeRoot) !== 'owned') {
+    if (
+      !fresh || fresh.kind !== 'container' ||
+      classify(fresh, registry, report.worktreeRoot) !== 'owned'
+    ) {
       escalated.push(entry);
       continue;
     }
@@ -59,7 +61,8 @@ function parseArgs(args: string[]): { sliceDir: string; worktreeRoot: string; ap
   let worktreeRoot = Deno.cwd();
   let apply = false;
   for (let i = 0; i < args.length; i++) {
-    if (args[i] === '--slice-dir') sliceDir = args[++i] ?? '';
+    if (args[i] === '--') continue;
+    else if (args[i] === '--slice-dir') sliceDir = args[++i] ?? '';
     else if (args[i] === '--worktree') worktreeRoot = args[++i] ?? '';
     else if (args[i] === '--apply') apply = true;
     else if (args[i] === '--dry-run') apply = false;

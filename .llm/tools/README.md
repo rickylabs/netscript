@@ -118,6 +118,21 @@ of `deps:*` tasks lives in `deno.json`.
 
 ## Agentic tooling (`.llm/tools/agentic/`)
 
+### Run-owned teardown
+
+Start from the symptom: if a run failed and you do not know what is still running,
+`behavior.service-health` timed out, ports are already in use, or there is a `postgres-*` container
+you did not start, run:
+
+```text
+deno task agentic:leak-check -- --slice-dir <run-dir> --worktree <worktree>
+deno task agentic:teardown -- --slice-dir <run-dir> --worktree <worktree>
+```
+
+The first command is always read-only. The second is also non-mutating unless `--apply` is supplied.
+Even with apply, only positive path/identity-pair ownership proof authorizes a per-resource action;
+foreign and unknown-owner resources are reported and left alone.
+
 The agent-orchestration suite the supervisor uses to drive other agents. It is concern-grouped, not
 a flat folder: `runtime/` is the desired-state controller ("brain"); `runtime/cli/` are its entry
 points; `codex/`, `openhands/`, `github/`, `wsl/`, `claude/` are the execution lanes; `lib/` holds

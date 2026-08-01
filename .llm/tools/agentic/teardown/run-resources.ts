@@ -27,7 +27,12 @@ export interface RunResourceRegistry extends RegistryIdentityView {
 
 /** Creates an empty registry for one run/worktree. */
 export function emptyRunResources(worktreeRoot: string): RunResourceRegistry {
-  return { schemaVersion: RUN_RESOURCES_SCHEMA_VERSION, worktreeRoot, appHosts: [], containers: [] };
+  return {
+    schemaVersion: RUN_RESOURCES_SCHEMA_VERSION,
+    worktreeRoot,
+    appHosts: [],
+    containers: [],
+  };
 }
 
 function validRegistry(value: unknown): value is RunResourceRegistry {

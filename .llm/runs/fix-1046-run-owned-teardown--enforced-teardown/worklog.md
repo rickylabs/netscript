@@ -71,6 +71,7 @@ new resource shape. Terminal enforcement is isolated in `run-codex-slice-lib.ts`
 | 2026-08-02 | 4 | Read-only probes | Aspire 13.4.6 and Docker label fixtures normalize through bounded ports; malformed mounts expose no path proof. Reconcile: no scope changes. |
 | 2026-08-02 | 5 | Leak reporter | Read-only host run reported one foreign `fix-1025` Postgres container and performed no mutation. Reconcile: no review/scope changes. |
 | 2026-08-02 | 6 | Scoped teardown | Dry-run executes nothing; apply stops per AppHost path and re-inspects each single container before removal. Repo-wide forbidden-command test passes. Reconcile: no scope changes. |
+| 2026-08-02 | 7 | Task surface | Both `agentic:` tasks execute end-to-end; teardown remained dry-run and escalated a foreign `fix-1018` container. Reconcile: PR remains draft. |
 
 ## Decisions
 
@@ -98,6 +99,7 @@ this run changes no `packages/**` or `plugins/**` source.
 | 4 | scoped check + fixture probe tests | PASS | wrapper: 7 files, 0 findings; `deno test`: 2 passed, 0 failed |
 | 5 | scoped check + reporter tests + host read | PASS | wrapper: 9 files, 0 findings; tests 2/2; host report names foreign `postgres-bc75ea00` with exact user command |
 | 6 | scoped check + teardown/forbidden tests | PASS | wrapper: 12 files, 0 findings; `deno test`: 4 passed, 0 failed |
+| 7 | scoped format + task dogfood | PASS | wrapper: 12 TS files, 0 findings; both task entry points exited 0; supplemental docs/JSON format check passed |
 
 ## Handoff Notes
 

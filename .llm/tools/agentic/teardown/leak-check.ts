@@ -40,7 +40,10 @@ function ownerFrom(resource: ResourceCandidate): string {
   return match?.[1] ?? 'unknown';
 }
 
-function registeredStart(resource: ResourceCandidate, registry: RunResourceRegistry): string | undefined {
+function registeredStart(
+  resource: ResourceCandidate,
+  registry: RunResourceRegistry,
+): string | undefined {
   if (resource.kind === 'apphost') {
     return registry.appHosts.find((entry) =>
       entry.appHostPid === resource.appHostPid &&
@@ -94,7 +97,9 @@ export function renderLeakReport(report: LeakReport): string {
     `Worktree: \`${report.worktreeRoot}\``,
     '',
   ];
-  if (report.survivors.length === 0) return `${lines.join('\n')}No surviving Aspire resources found.\n`;
+  if (report.survivors.length === 0) {
+    return `${lines.join('\n')}No surviving Aspire resources found.\n`;
+  }
   for (const entry of report.survivors) {
     lines.push(
       `## ${entry.kind}: ${entry.identity}`,
@@ -117,28 +122,45 @@ export async function runLeakCheck(
   staleAfterMs: number = STALE_AFTER_MS,
 ): Promise<LeakReport> {
   const registry = await readRunResources(sliceDir, worktreeRoot);
-  const report = buildLeakReport(await probeResources(), registry, worktreeRoot, Date.now(), staleAfterMs);
+  const report = buildLeakReport(
+    await probeResources(),
+    registry,
+    worktreeRoot,
+    Date.now(),
+    staleAfterMs,
+  );
   await Deno.mkdir(sliceDir, { recursive: true });
   await Deno.writeTextFile(join(sliceDir, 'leak-report.md'), renderLeakReport(report));
   return report;
 }
 
-function parseArgs(args: string[]): { sliceDir: string; worktreeRoot: string; staleAfterMs: number } {
+function parseArgs(
+  args: string[],
+): { sliceDir: string; worktreeRoot: string; staleAfterMs: number } {
   let sliceDir = '';
   let worktreeRoot = Deno.cwd();
   let staleAfterMs = STALE_AFTER_MS;
   for (let i = 0; i < args.length; i++) {
-    if (args[i] === '--slice-dir') sliceDir = args[++i] ?? '';
+    if (args[i] === '--') continue;
+    else if (args[i] === '--slice-dir') sliceDir = args[++i] ?? '';
     else if (args[i] === '--worktree') worktreeRoot = args[++i] ?? '';
     else if (args[i] === '--stale-after') staleAfterMs = Number(args[++i]) * 1000;
     else throw new Error(`unknown argument: ${args[i]}`);
   }
   if (!sliceDir) throw new Error('--slice-dir is required');
-  if (!Number.isFinite(staleAfterMs) || staleAfterMs < 0) throw new Error('--stale-after must be seconds >= 0');
+  if (!Number.isFinite(staleAfterMs) || staleAfterMs < 0) {
+    throw new Error('--stale-after must be seconds >= 0');
+  }
   return { sliceDir, worktreeRoot, staleAfterMs };
 }
 
 if (import.meta.main) {
   const options = parseArgs(Deno.args);
-  console.log(JSON.stringify(await runLeakCheck(options.sliceDir, options.worktreeRoot, options.staleAfterMs), null, 2));
+  console.log(
+    JSON.stringify(
+      await runLeakCheck(options.sliceDir, options.worktreeRoot, options.staleAfterMs),
+      null,
+      2,
+    ),
+  );
 }
