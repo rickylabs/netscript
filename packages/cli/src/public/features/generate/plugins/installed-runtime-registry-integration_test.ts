@@ -1,133 +1,218 @@
-import { assert, assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
-import { dirname, join } from '@std/path';
+import { assert, assertEquals, assertRejects } from 'jsr:@std/assert@^1';
+import { dirname, fromFileUrl, join, toFileUrl } from '@std/path';
 
 import { DenoFileSystem } from '../../../../kernel/adapters/runtime/file-system/deno-file-system.ts';
 import { DenoProcess } from '../../../../kernel/adapters/runtime/process/deno-process.ts';
-import { netscriptJsrSpecifier } from '../../../../kernel/constants/jsr-specifiers.ts';
+import {
+  netscriptJsrSpecifier,
+  NETSCRIPT_RELEASE_VERSION,
+} from '../../../../kernel/constants/jsr-specifiers.ts';
 import type { ProcessPort, ProcessResult } from '../../../../kernel/ports/process-port.ts';
 import { createInstalledRuntimeRegistryGenerator } from './installed-runtime-registry-generator.ts';
 
-const REPOSITORY_ROOT = new URL('../../../../../../..', import.meta.url);
+const REPOSITORY_ROOT = fromFileUrl(new URL('../../../../../../..', import.meta.url));
+const TRIGGER_REGISTRY_PATH = '.netscript/generated/plugin-triggers/triggers.registry.ts';
+const TRIGGER_PACKAGE = '@netscript/plugin-triggers';
+const VALID_TRIGGER = `
+export default {
+  id: 'generic-inbound-webhook',
+  kind: 'webhook',
+  handler: async () => new Response(null, { status: 204 }),
+};
+`;
+const RUNTIME_GLUE = `
+import { startCombinedProcess } from '@netscript/plugin-triggers/runtime';
 
-Deno.test('clean installed workers, sagas, and triggers emit non-empty canonical registries', async () => {
-  const projectRoot = await Deno.makeTempDir({ prefix: 'netscript-registry-integration-' });
-  try {
-    await writeProject(projectRoot);
-    const fs = new DenoFileSystem();
+if (import.meta.main) {
+  await startCombinedProcess();
+}
+`;
+
+Deno.test('generated trigger registry loads valid definitions and excludes scaffold runtime glue', async () => {
+  await withTempProject(async (projectRoot) => {
+    await writeWorkspaceProject(projectRoot, {
+      'triggers/generic-inbound-webhook.ts': VALID_TRIGGER,
+      'triggers/runtime.ts': RUNTIME_GLUE,
+    });
     const generate = createInstalledRuntimeRegistryGenerator({
-      fs,
-      process: new LocalOfficialGeneratorProcess(),
-      fetchManifest: async (url) => {
-        const kind = packageKind(url);
-        const value = JSON.parse(
-          await Deno.readTextFile(new URL(`plugins/${kind}/scaffold.runtime.json`, REPOSITORY_ROOT)),
-        );
-        return { ok: true, status: 200, json: () => Promise.resolve(value) };
+      fs: new DenoFileSystem(),
+      process: new DenoProcess(),
+      fetchManifest: () => Promise.reject(new Error('workspace generation must not fetch')),
+    });
+
+    await generate({ dryRun: false, projectRoot });
+
+    const module = await import(`${toFileUrl(join(projectRoot, TRIGGER_REGISTRY_PATH)).href}?loading`);
+    assert(module.registry instanceof Map);
+    assertEquals(module.registry.has('generic-inbound-webhook'), true);
+    assertEquals(module.registry.size, 1);
+  });
+});
+
+Deno.test('generated trigger registry rejects a non-definition module that is not excluded', async () => {
+  await withTempProject(async (projectRoot) => {
+    await writeWorkspaceProject(projectRoot, {
+      'triggers/not-a-trigger.ts': 'export default { id: "missing-kind-and-handler" };\n',
+    });
+    const generate = createInstalledRuntimeRegistryGenerator({
+      fs: new DenoFileSystem(),
+      process: new DenoProcess(),
+      fetchManifest: () => Promise.reject(new Error('workspace generation must not fetch')),
+    });
+
+    await generate({ dryRun: false, projectRoot });
+
+    await assertRejects(
+      () => import(`${toFileUrl(join(projectRoot, TRIGGER_REGISTRY_PATH)).href}?invalid`),
+      Error,
+      'does not export a TriggerDefinition',
+    );
+  });
+});
+
+Deno.test('workspace import resolves the on-disk trigger manifest without fetching JSR', async () => {
+  await withTempProject(async (projectRoot) => {
+    await writeWorkspaceProject(projectRoot, { 'triggers/generic.ts': VALID_TRIGGER });
+    const process = new RecordingGeneratorProcess();
+    let fetchCalls = 0;
+    const generate = createInstalledRuntimeRegistryGenerator({
+      fs: new DenoFileSystem(),
+      process,
+      fetchManifest: () => {
+        fetchCalls++;
+        return Promise.reject(new Error('workspace manifest must win'));
       },
     });
 
-    const generated = await generate({ dryRun: false, projectRoot });
+    await generate({ dryRun: false, projectRoot });
 
-    assertEquals(generated.map((item) => item.path), [
-      '.netscript/generated/plugin-workers/job-registry.ts',
-      '.netscript/generated/plugin-sagas/sagas.registry.ts',
-      '.netscript/generated/plugin-triggers/triggers.registry.ts',
-    ]);
-    await assertRegistry(
-      projectRoot,
-      generated[0].path,
-      'workers/jobs/health-check.ts',
-      'export const registry = new Map',
+    assertEquals(fetchCalls, 0);
+    assertEquals(
+      process.generator,
+      join(REPOSITORY_ROOT, 'plugins/triggers/src/cli/generate-runtime-registries.ts'),
     );
-    await assertRegistry(
-      projectRoot,
-      generated[1].path,
-      'sagas/user-registration-saga.ts',
-      'export const sagaRegistry',
-    );
-    await assertRegistry(
-      projectRoot,
-      generated[2].path,
-      'triggers/generic.ts',
-      'export const registry:',
-    );
-  } finally {
-    await Deno.remove(projectRoot, { recursive: true });
-  }
+  });
 });
 
-class LocalOfficialGeneratorProcess implements ProcessPort {
-  private readonly process = new DenoProcess();
+Deno.test('JSR-only imports retain the published manifest and generator fallback', async () => {
+  await withTempProject(async (projectRoot) => {
+    await writePublishedProject(projectRoot);
+    const process = new RecordingGeneratorProcess();
+    const fetched: string[] = [];
+    const generate = createInstalledRuntimeRegistryGenerator({
+      fs: new DenoFileSystem(),
+      process,
+      fetchManifest: (url) => {
+        fetched.push(url);
+        return Promise.resolve({
+          ok: true,
+          status: 200,
+          json: () => Promise.resolve(testManifest()),
+        });
+      },
+    });
 
-  exec(
+    await generate({ dryRun: false, projectRoot });
+
+    const manifestUrl =
+      `https://jsr.io/@netscript/plugin-triggers/${NETSCRIPT_RELEASE_VERSION}/scaffold.runtime.json`;
+    assertEquals(fetched, [manifestUrl]);
+    assertEquals(
+      process.generator,
+      new URL('src/cli/generate-runtime-registries.ts', manifestUrl).href,
+    );
+  });
+});
+
+class RecordingGeneratorProcess implements ProcessPort {
+  generator?: string;
+
+  async exec(
     command: string,
     args: readonly string[],
     options?: { readonly cwd?: string; readonly env?: Readonly<Record<string, string>> },
   ): Promise<ProcessResult> {
-    const localArgs = args.map((arg) => {
-      if (!arg.startsWith('https://jsr.io/@netscript/plugin-')) return arg;
-      const kind = packageKind(arg);
-      return new URL(`plugins/${kind}/src/cli/generate-runtime-registries.ts`, REPOSITORY_ROOT).href;
-    });
-    return this.process.exec(command, localArgs, options);
+    assertEquals(command, 'deno');
+    assertEquals(options?.cwd !== undefined, true);
+    this.generator = args[args.indexOf('--allow-write') + 1];
+    const projectRoot = args[args.indexOf('--project-root') + 1];
+    await write(
+      join(projectRoot, TRIGGER_REGISTRY_PATH),
+      'export const registry = new Map();\n',
+    );
+    return { code: 0, stdout: '', stderr: '' };
   }
 }
 
-async function writeProject(projectRoot: string): Promise<void> {
-  const rootConfig = JSON.parse(await Deno.readTextFile(new URL('deno.json', REPOSITORY_ROOT))) as {
+async function writeWorkspaceProject(
+  projectRoot: string,
+  files: Readonly<Record<string, string>>,
+): Promise<void> {
+  const rootConfig = JSON.parse(await Deno.readTextFile(join(REPOSITORY_ROOT, 'deno.json'))) as {
     imports: Record<string, string>;
   };
-  await Deno.writeTextFile(
-    join(projectRoot, 'deno.json'),
-    `${JSON.stringify({
-      imports: {
-        ...rootConfig.imports,
-        '@netscript/plugin/cli': new URL(
-          'packages/plugin/src/cli/mod.ts',
-          REPOSITORY_ROOT,
-        ).href,
-      },
-    })}\n`,
-  );
-  await Deno.writeTextFile(
+  await writeProjectConfig(projectRoot, {
+    ...rootConfig.imports,
+    '@netscript/plugin/cli': toFileUrl(
+      join(REPOSITORY_ROOT, 'packages/plugin/src/cli/mod.ts'),
+    ).href,
+    '@netscript/plugin-triggers/runtime': toFileUrl(
+      join(REPOSITORY_ROOT, 'plugins/triggers/src/runtime/mod.ts'),
+    ).href,
+  });
+  await writeAppSettings(projectRoot);
+  for (const [path, source] of Object.entries(files)) await write(join(projectRoot, path), source);
+}
+
+async function writePublishedProject(projectRoot: string): Promise<void> {
+  await writeProjectConfig(projectRoot, {
+    '@netscript/plugin-triggers/runtime': netscriptJsrSpecifier('plugin-triggers', '/runtime'),
+  });
+  await writeAppSettings(projectRoot);
+  await write(join(projectRoot, 'triggers/generic.ts'), VALID_TRIGGER);
+}
+
+async function writeProjectConfig(
+  projectRoot: string,
+  imports: Readonly<Record<string, string>>,
+): Promise<void> {
+  await write(join(projectRoot, 'deno.json'), `${JSON.stringify({ imports })}\n`);
+}
+
+async function writeAppSettings(projectRoot: string): Promise<void> {
+  await write(
     join(projectRoot, 'appsettings.json'),
     `${JSON.stringify({
       NetScript: {
         Plugins: {
-          workers: { Entrypoint: netscriptJsrSpecifier('plugin-workers', '/services') },
-          sagas: { Entrypoint: netscriptJsrSpecifier('plugin-sagas', '/services') },
           triggers: { Entrypoint: netscriptJsrSpecifier('plugin-triggers', '/services') },
         },
       },
     })}\n`,
   );
-  await write(join(projectRoot, 'workers/jobs/health-check.ts'), 'export default { id: "health-check" };\n');
-  await write(
-    join(projectRoot, 'sagas/user-registration-saga.ts'),
-    'export default defineSaga("user-registration").build();\n',
-  );
-  await write(join(projectRoot, 'triggers/generic.ts'), 'export default { id: "generic" };\n');
+}
+
+function testManifest(): unknown {
+  return {
+    runtimeRegistryGenerator: { command: 'src/cli/generate-runtime-registries.ts' },
+    runtimeRegistries: [{
+      dir: 'triggers',
+      registryPath: TRIGGER_REGISTRY_PATH,
+      fileSuffixes: ['.ts'],
+    }],
+  };
+}
+
+async function withTempProject(run: (projectRoot: string) => Promise<void>): Promise<void> {
+  const projectRoot = await Deno.makeTempDir({ prefix: 'netscript-trigger-registry-' });
+  try {
+    await run(projectRoot);
+  } finally {
+    await Deno.remove(projectRoot, { recursive: true });
+  }
 }
 
 async function write(path: string, text: string): Promise<void> {
   await Deno.mkdir(dirname(path), { recursive: true });
   await Deno.writeTextFile(path, text);
-}
-
-async function assertRegistry(
-  projectRoot: string,
-  path: string,
-  sourcePath: string,
-  exportShape: string,
-): Promise<void> {
-  const source = await Deno.readTextFile(join(projectRoot, path));
-  assert(source.trim().length > 0, `${path} must be non-empty`);
-  assertStringIncludes(source, sourcePath);
-  assertStringIncludes(source, exportShape);
-}
-
-function packageKind(url: string): string {
-  const match = /\/plugin-([^/@]+)(?:@|\/)/.exec(url);
-  if (!match) throw new Error(`Cannot resolve official plugin kind from test URL: ${url}`);
-  return match[1];
 }
