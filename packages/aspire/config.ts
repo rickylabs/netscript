@@ -165,6 +165,11 @@ export interface ServiceEntry extends BaseEntry, ReferenceEntry, HostPortEntry {
   Entrypoint: string;
   /** Service working directory. */
   Workdir?: string;
+  /**
+   * HTTP path Aspire probes to decide whether the service is healthy. Omit to use
+   * `RESOURCE_DEFAULTS.AppHealthCheckPath`; set `false` for a custom entrypoint with no health route.
+   */
+  HealthCheckPath?: string | false;
 }
 
 /** Frontend, desktop, or task application entry. */
@@ -204,6 +209,11 @@ export interface PluginEntry extends BaseEntry, ReferenceEntry, HostPortEntry {
   Entrypoint: string;
   /** Plugin working directory. */
   Workdir?: string;
+  /**
+   * HTTP path Aspire probes to decide whether the plugin service is healthy. Omit to use
+   * `RESOURCE_DEFAULTS.AppHealthCheckPath`; set `false` for a custom entrypoint with no health route.
+   */
+  HealthCheckPath?: string | false;
   /** Whether the plugin requires Deno KV access. */
   RequiresKv: boolean;
   /** Whether the plugin requires database access. */
@@ -453,6 +463,7 @@ const ServiceEntryZod = z.object({
   Runtime: z.string().default('deno'),
   Entrypoint: z.string().default('src/main.ts'),
   Workdir: z.string().optional(),
+  HealthCheckPath: z.union([z.string().min(1), z.literal(false)]).optional(),
 }).meta({ title: 'ServiceEntry', description: 'Configuration for a backend service resource' });
 /** Service entry schema. */
 export const ServiceEntrySchema: AspireSchema<ServiceEntry> = ServiceEntryZod;
@@ -488,6 +499,7 @@ const PluginEntryZod = z.object({
   Runtime: z.string().default('deno'),
   Entrypoint: z.string().default('src/main.ts'),
   Workdir: z.string().optional(),
+  HealthCheckPath: z.union([z.string().min(1), z.literal(false)]).optional(),
   RequiresKv: z.boolean().default(false),
   RequiresDb: z.boolean().default(false),
   Environment: z.record(z.string(), z.string()).optional(),

@@ -379,7 +379,7 @@ describe('generateRegisterApps', () => {
   it('should register an HTTP health probe for app resources', () => {
     const output = generateRegisterApps({
       ...emptyOptions,
-      apps: { frontend: fixtures.MINIMAL_APP },
+      apps: { frontend: fixtures.UNPINNED_APP },
     });
     assertStringIncludes(
       output,

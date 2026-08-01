@@ -73,6 +73,15 @@ export function generateRegisterServices(options: RegisterServicesOptions): stri
     );
     lines.push(`      .${renderHttpEndpointCall(entry)};`);
 
+    if (entry.HealthCheckPath !== false) {
+      const healthCheckPath = entry.HealthCheckPath ?? RESOURCE_DEFAULTS.AppHealthCheckPath;
+      lines.push(``);
+      lines.push(`    // HTTP health probe — a listening socket alone is not "healthy".`);
+      lines.push(
+        `    await resource.withHttpHealthCheck({ path: '${healthCheckPath}', endpointName: '${RESOURCE_DEFAULTS.HttpEndpointName}' });`,
+      );
+    }
+
     // OTEL telemetry (full executable env set)
     lines.push(``);
     lines.push(`    // OTEL telemetry (full executable env set)`);

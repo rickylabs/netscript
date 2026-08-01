@@ -287,6 +287,18 @@ Deno.test('config', async (t) => {
     assertEquals(ServiceEntrySchema.safeParse({ HostPort: 0 }).success, false);
   });
 
+  await t.step('ServiceEntrySchema: preserves health probe configuration', () => {
+    assertEquals(ServiceEntrySchema.parse({ HealthCheckPath: '/ready' }).HealthCheckPath, '/ready');
+    assertEquals(ServiceEntrySchema.parse({ HealthCheckPath: false }).HealthCheckPath, false);
+    assertEquals(ServiceEntrySchema.safeParse({ HealthCheckPath: '' }).success, false);
+  });
+
+  await t.step('PluginEntrySchema: preserves health probe configuration', () => {
+    assertEquals(PluginEntrySchema.parse({ HealthCheckPath: '/ready' }).HealthCheckPath, '/ready');
+    assertEquals(PluginEntrySchema.parse({ HealthCheckPath: false }).HealthCheckPath, false);
+    assertEquals(PluginEntrySchema.safeParse({ HealthCheckPath: '' }).success, false);
+  });
+
   await t.step('ServiceEntrySchema: fills defaults', () => {
     const result = ServiceEntrySchema.parse({ Port: 3000 });
     assertEquals(result.Runtime, 'deno');
