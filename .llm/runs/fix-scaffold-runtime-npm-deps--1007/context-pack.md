@@ -12,7 +12,7 @@
 
 ## Current State
 
-Issue #1007 is open. Production artifact evidence confirms Vite could not load a transitive Fresh npm module absent from the generated app import map. No implementation source has been changed.
+Issue #1007 and draft PR #1008 are open. The scaffold catalog now emits the runtime subset and a focused three-way drift contract passes.
 
 ## Completed
 
@@ -22,13 +22,12 @@ Issue #1007 is open. Production artifact evidence confirms Vite could not load a
 
 ## In Progress
 
-- Bootstrap commit and draft PR, then implementation.
+- Scoped static gates, pristine consumer proof, and full runtime gate.
 
 ## Next Steps
 
-1. Commit/push bootstrap plan and open draft PR.
-2. Implement catalog and regression contract.
-3. Run static, consumer, full runtime, IMPL-EVAL, and opposite-family review gates.
+1. Commit/push implementation slice.
+2. Run static, consumer, full runtime, IMPL-EVAL, and opposite-family review gates.
 
 ## Key Decisions
 
@@ -43,13 +42,15 @@ Issue #1007 is open. Production artifact evidence confirms Vite could not load a
 | --- | --- | --- |
 | `.llm/runs/fix-scaffold-runtime-npm-deps--1007/*` | new | Harness activation and plan. |
 | `deno.lock` | changed | Carried in-progress #1006 manifest resolution; validate before commit. |
+| `packages/cli/src/kernel/constants/scaffold/*` | changed/new | Runtime imports and drift contract. |
+| `packages/fresh/tests/*runtime-catalog*` | changed/new | Shared existing test dependency list. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
 | Static | PLAN-EVAL passed | `plan-eval.md` |
-| Fitness | pending | |
+| Fitness | focused pass | 15 focused test steps passed |
 | Runtime | baseline failed | production run 30677734061 |
 | Consumer | baseline failed cold / passed warm | drift log |
 

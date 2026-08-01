@@ -52,6 +52,8 @@ When a published Fresh runtime begins importing another npm package, add it to t
 | 2026-08-01 04:00 CEST | 1 | research | Confirmed production artifact failure and local warm-cache masking behavior. |
 | 2026-08-01 04:10 CEST | 1 | issue | Opened #1007 with close-gate acceptance criteria. |
 | 2026-08-01 04:16 CEST | 1 | PLAN-EVAL | Qwen formal evaluator PASS, session `31d664ea-98e3-4bcc-9475-53005c9f5595`. |
+| 2026-08-01 04:20 CEST | 2 | implementation | Added four missing runtime imports, aligned signals to root catalog, and extracted the existing Fresh runtime list for a three-way drift test. |
+| 2026-08-01 04:21 CEST | 2 | focused gate | 15 focused test steps passed. |
 
 ## Decisions
 
@@ -75,12 +77,13 @@ When a published Fresh runtime begins importing another npm package, add it to t
 | Gate | Command or check | Result | Notes |
 | --- | --- | --- | --- |
 | PLAN-EVAL | separate formal evaluator | PASS | `.llm/runs/fix-scaffold-runtime-npm-deps--1007/plan-eval.md` |
+| focused tests | `deno test -A ...scaffold-app-catalog_test.ts ...generators-config_test.ts ...package-manifest_test.ts` | PASS | 4 tests / 15 steps |
 
 ### Fitness Gates
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| F-CLI-OUTPUT | PENDING_SCRIPT | planned drift test | |
+| F-CLI-OUTPUT | PASS | `scaffold-app-catalog_test.ts`; generator config test | Exact root/Fresh/scaffold imports asserted. |
 
 ### Runtime Gates
 
