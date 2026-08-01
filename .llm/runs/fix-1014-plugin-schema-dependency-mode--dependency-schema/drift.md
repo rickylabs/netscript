@@ -62,3 +62,15 @@ Drift is append-only.
 - **Severity:** significant
 - **Action:** fix plan/test evidence; retain stale-placeholder finding separately.
 - **Evidence:** supervisor `plan-eval.md` row 8 and corrected `plan.md` validation table.
+
+## 2026-08-01 — Broad format wrapper reports unrelated Markdown drift
+
+- **What:** The exact requested `run-deno-fmt.ts --root packages/cli` invocation reports one
+  formatting finding in `packages/cli/e2e/README.md`.
+- **Source:** Scoped wrapper output after implementation.
+- **Expected:** Source-quality formatting evidence for the owned TypeScript slice.
+- **Actual:** The TypeScript-only package verdict passes 742 files with zero findings; the broad
+  command fails only on unrelated pre-existing Markdown content.
+- **Severity:** minor
+- **Action:** defer/preserve user content; report both verdicts honestly.
+- **Evidence:** worklog static gate table.

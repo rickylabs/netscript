@@ -45,7 +45,11 @@ import {
   dispatchPluginScaffold,
   type PluginScaffoldDispatchSource,
 } from '../dispatch/dispatch-plugin-verb.ts';
-import type { JsrPackageFileFetcher } from '../../../infra/jsr/verify-jsr-package-integrity.ts';
+import {
+  fetchJsrPackageSchemaFragments,
+  type JsrPackageFileFetcher,
+  jsrPackageSchemaSearchPath,
+} from '../../../infra/jsr/verify-jsr-package-integrity.ts';
 
 export interface PluginOwnedScaffoldDependencies {
   /** Process runner used for plugin-owned scaffold and post-script dispatch. */
@@ -154,12 +158,27 @@ export async function installPlugin(
       resolvedPlugin.descriptor.manifest.officialSource?.pluginReferences ?? [],
     );
 
+  const packageSchemaFragments = resolvedPlugin.source.kind === 'jsr' &&
+      plan.dbDetection.requiresDb
+    ? await fetchJsrPackageSchemaFragments(
+      resolvedPlugin.descriptor,
+      dependencies.packageFileFetcher,
+    )
+    : [];
   const schemaCopies = await copyPluginSchemasToRootDb(
     plan.projectRoot,
     plan.pluginName,
     plan.dbDetection,
     { fs: dependencies.fs, scaffolder: dependencies.scaffolder },
-    { overwrite: plan.overwrite },
+    {
+      overwrite: plan.overwrite,
+      packageFragments: packageSchemaFragments,
+      schemaDeclared: resolvedPlugin.source.kind === 'jsr' &&
+        resolvedPlugin.descriptor.manifest.capabilities.hasDatabaseMigrations,
+      packageSearchPath: resolvedPlugin.source.kind === 'jsr'
+        ? jsrPackageSchemaSearchPath(resolvedPlugin.descriptor)
+        : undefined,
+    },
   );
   await dependencies.workspaceMutator.updateAppsettings(
     plan.projectRoot,

@@ -71,6 +71,9 @@ host-side plugin-name mapping.
 | 2026-08-01 | 1 | plan gate | Canonical Qwen PLAN-EVAL launch failed authentication before an agentic turn; implementation remains stopped. |
 | 2026-08-01 | 1 | owner waiver | Opus 5 supervisor retired the Qwen lane, supplied the independent PLAN-EVAL, and pre-approved the one-row replan. |
 | 2026-08-01 | 1 | replan | Acceptance box 4 moved from the structurally local-path-only userland suite to a semantic JSR-shaped `installPlugin` integration test. D1–D5 unchanged. |
+| 2026-08-01 | 1 | implementation | Added package metadata filtering/fetching at the public JSR edge and package-first copy/error policy in the kernel DB adapter. |
+| 2026-08-01 | 1 | tests | Added package-precedence, filename, fail-loudly, no-DB/no-schema, slash-normalization, and semantic JSR install coverage. |
+| 2026-08-01 | 1 | reconcile | Scope remains #1014 only; no manifest/export/dependency changes, no new debt, no PR/push actions. |
 
 ## Decisions
 
@@ -93,25 +96,28 @@ host-side plugin-name mapping.
 
 | Gate | Command or check | Result | Notes |
 | --- | --- | --- | --- |
-| Scoped check/lint/fmt | planned | NOT_RUN | After implementation. |
+| Scoped check | `run-deno-check.ts --root packages/cli --ext ts,tsx` | PASS | 742 files, 7 batches, 0 occurrences. |
+| Scoped lint | `run-deno-lint.ts --root packages/cli` | PASS | 742 files, 0 occurrences. |
+| Requested broad fmt | `run-deno-fmt.ts --root packages/cli` | FAIL | One unrelated existing Markdown finding in `packages/cli/e2e/README.md`; preserved. |
+| TS package fmt | `run-deno-fmt.ts --root packages/cli --ext ts,tsx` | PASS | 742 files, 0 findings. |
 
 ### Fitness Gates
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| F-1…F-19 / applicable F-CLI | NOT_RUN | planned quality gate/review | After implementation. |
+| Code quality / doctrine | PASS | `deno task quality:gate` exit 0 | No new quality findings; doctrine emitted existing WARN/INFO rows only. |
 
 ### Runtime Gates
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| Focused plugin install tests | NOT_RUN | planned | Before consumer E2E. |
+| Focused plugin install tests | PASS | `46 passed (56 steps), 0 failed` | Exact requested kernel plugin + public plugin feature command. |
 
 ### Consumer Gates
 
 | Consumer | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| Semantic JSR-shaped install integration | NOT_RUN | approved substitute for box 4 | Part of focused unit command. |
+| Semantic JSR-shaped install integration | PASS | `install-plugin_test.ts`: real Saga model written to root schema; exact normalized JSR URL asserted | Approved substitute for box 4. |
 | `scaffold.userland-install` | N/A | local-path hard-force in `plugin-install-gates.ts` | Cannot evidence dependency mode. |
 | Published `scaffold.runtime --source jsr` | NOT_RUN | requires published 0.0.3 CLI fix | Release-train follow-up evidence. |
 
@@ -120,3 +126,14 @@ host-side plugin-name mapping.
 - PLAN-EVAL should challenge D1–D5 and the userland suite's stale placeholder expectation first.
 - The Opus 5 owner waiver supersedes the retired-lane blocker. The one-row replan is pre-approved;
   implementation may proceed without a second PLAN-EVAL.
+- IMPL-EVAL should inspect package-first precedence, the JSR-only hard-failure boundary, and the
+  honest exclusion of `scaffold.userland-install` from dependency-mode evidence.
+
+## Acceptance Evidence
+
+| Box | Change | Evidence line |
+| --- | --- | --- |
+| 1 | Resolve published `database/*.prisma` paths from `versionMetadata.files` through the injected fetcher. | Semantic test asserts two exact normalized JSR fetch URLs and real content. |
+| 2 | Kernel writes resolved fragments to the unchanged engine/plugin target and preserves bare-schema naming. | `db-integration_test.ts`: named and bare filename tests PASS. |
+| 3 | JSR dependency installs throw `ScaffoldValidationError` for DB-required, declared, zero-fragment packages; no-DB/no-schema remain no-ops. | Kernel boundary test plus install-flow rejection test PASS with searched paths. |
+| 4 | Dependency-mode semantic install flow writes the real published fragment into root schema. | `install-plugin_test.ts` PASS; local-path-only userland suite explicitly excluded. |

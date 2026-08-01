@@ -57,6 +57,20 @@ export interface PluginDbProvisioningAdapters {
   readonly templateAdapter: TemplatePort;
 }
 
+/** Package-resolved Prisma schema content supplied by an external package adapter. */
+export interface ResolvedPluginSchemaFragment {
+  readonly path: string;
+  readonly content: string;
+}
+
+/** Schema source and validation options for plugin database integration. */
+export interface PluginSchemaCopyOptions {
+  readonly overwrite?: boolean;
+  readonly packageFragments?: readonly ResolvedPluginSchemaFragment[];
+  readonly schemaDeclared?: boolean;
+  readonly packageSearchPath?: string;
+}
+
 /** Detect whether a plugin needs a database and which database it should target. */
 export async function detectPluginDbRequirement(
   projectRoot: string,
@@ -158,7 +172,7 @@ export async function copyPluginSchemaToRootDb(
   pluginName: string,
   detection: PluginDbDetectionResult,
   adapters: Pick<PluginDbProvisioningAdapters, 'fs' | 'scaffolder'>,
-  options: { readonly overwrite?: boolean } = {},
+  options: PluginSchemaCopyOptions = {},
   registry: DbEngineRegistry = new DbEngineRegistry(),
 ): Promise<PluginSchemaCopyResult | null> {
   const results = await copyPluginSchemasToRootDb(
@@ -178,7 +192,7 @@ export async function copyPluginSchemasToRootDb(
   pluginName: string,
   detection: PluginDbDetectionResult,
   adapters: Pick<PluginDbProvisioningAdapters, 'fs' | 'scaffolder'>,
-  options: { readonly overwrite?: boolean } = {},
+  options: PluginSchemaCopyOptions = {},
   registry: DbEngineRegistry = new DbEngineRegistry(),
 ): Promise<readonly PluginSchemaCopyResult[]> {
   if (!detection.requiresDb || !detection.targetEngine) {
@@ -193,45 +207,72 @@ export async function copyPluginSchemasToRootDb(
     SCAFFOLD_DIRS.DATABASE,
   );
 
-  if (!await adapters.fs.exists(sourceRoot)) {
-    return [];
+  const results: PluginSchemaCopyResult[] = [];
+  const packageFragments = options.packageFragments ?? [];
+  if (packageFragments.length > 0) {
+    for (const fragment of packageFragments) {
+      results.push(await writeSchemaFragment(
+        projectRoot,
+        pluginName,
+        provider.dirName,
+        fragment.path,
+        fragment.content,
+        adapters.scaffolder,
+        options.overwrite ?? false,
+      ));
+    }
+  } else if (await adapters.fs.exists(sourceRoot)) {
+    for await (const entry of adapters.fs.walk(sourceRoot)) {
+      if (!entry.isFile || !entry.path.endsWith('.prisma')) continue;
+      results.push(await writeSchemaFragment(
+        projectRoot,
+        pluginName,
+        provider.dirName,
+        entry.path,
+        await adapters.fs.readFile(entry.path),
+        adapters.scaffolder,
+        options.overwrite ?? false,
+      ));
+    }
   }
 
-  const results: PluginSchemaCopyResult[] = [];
-  for await (const entry of adapters.fs.walk(sourceRoot)) {
-    if (!entry.isFile || !entry.path.endsWith('.prisma')) {
-      continue;
-    }
-
-    const sourcePath = entry.path;
-    const fileName = sourcePath.endsWith(`${SCAFFOLD_DIRS.DATABASE}\\schema.prisma`) ||
-        sourcePath.endsWith(`${SCAFFOLD_DIRS.DATABASE}/schema.prisma`)
-      ? `${pluginName}.prisma`
-      : sourcePath.split(/[\\/]/).at(-1) ?? `${pluginName}.prisma`;
-    const targetPath = join(
-      projectRoot,
-      SCAFFOLD_DIRS.DATABASE,
-      provider.dirName,
-      'schema',
-      SCAFFOLD_DIRS.PLUGINS,
-      pluginName,
-      fileName,
+  if (results.length === 0 && options.schemaDeclared === true) {
+    const searchedPaths = [sourceRoot, options.packageSearchPath].filter(
+      (path): path is string => path !== undefined,
     );
-    const content = await adapters.fs.readFile(sourcePath);
-    const written = await adapters.scaffolder.writeFile(
-      targetPath,
-      content,
-      options.overwrite ?? false,
+    throw new ScaffoldValidationError(
+      `Plugin "${pluginName}" declares database migrations, but no Prisma schema fragments resolved.`,
+      { pluginName, searchedPaths },
     );
-
-    results.push({
-      sourcePath,
-      targetPath,
-      written,
-    });
   }
 
   return results;
+}
+
+async function writeSchemaFragment(
+  projectRoot: string,
+  pluginName: string,
+  engineDirName: string,
+  sourcePath: string,
+  content: string,
+  scaffolder: ScaffolderPort,
+  overwrite: boolean,
+): Promise<PluginSchemaCopyResult> {
+  const normalizedSourcePath = sourcePath.replaceAll('\\', '/');
+  const fileName = normalizedSourcePath.endsWith(`${SCAFFOLD_DIRS.DATABASE}/schema.prisma`)
+    ? `${pluginName}.prisma`
+    : normalizedSourcePath.split('/').at(-1) ?? `${pluginName}.prisma`;
+  const targetPath = join(
+    projectRoot,
+    SCAFFOLD_DIRS.DATABASE,
+    engineDirName,
+    'schema',
+    SCAFFOLD_DIRS.PLUGINS,
+    pluginName,
+    fileName,
+  );
+  const written = await scaffolder.writeFile(targetPath, content, overwrite);
+  return { sourcePath, targetPath, written };
 }
 
 async function discoverDatabases(
