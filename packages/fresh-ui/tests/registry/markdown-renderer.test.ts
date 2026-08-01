@@ -1,3 +1,13 @@
+/**
+ * Capability contract for `deno task test` in this package.
+ *
+ * The task grants exactly `--allow-read`, `--allow-write`, and `--allow-run`: these tests create
+ * temporary workspaces (write) and spawn Deno child processes for scaffold/build (run).
+ * `--allow-env` and `--allow-net` are measured as unnecessary; do not widen without measuring.
+ *
+ * This rationale lives here rather than in `deno.json` because the repo's publish-asset generator
+ * parses that manifest as strict JSON, so a JSONC comment breaks `deno task check:publish-assets`.
+ */
 import { assert, assertEquals, assertFalse, assertStringIncludes } from '@std/assert';
 import { fromFileUrl, join } from 'jsr:@std/path@^1';
 
@@ -130,8 +140,10 @@ Deno.test('copied Markdown type-checks and renders directly through Preact', asy
 });
 
 Deno.test('generated Fresh Markdown island production-builds for hydration', async () => {
+  const tempRoot = join(REPO_ROOT, '.llm/tmp');
+  await Deno.mkdir(tempRoot, { recursive: true });
   const parent = await Deno.makeTempDir({
-    dir: join(REPO_ROOT, '.llm/tmp'),
+    dir: tempRoot,
     prefix: 'fresh-ui-markdown-browser-',
   });
   const projectName = 'markdown-browser';
