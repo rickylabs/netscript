@@ -170,3 +170,13 @@ directly and is synchronized.
   `/home/codex/repos/fix-1010/...`, which was left untouched. Docker returned to the same two
   pre-existing Postgres containers (`postgres-dda83380`, `postgres-bc75ea00`); no container created
   by this run remained.
+
+### Push verification
+
+- The requested default `--force-with-lease` push initially returned exit 1 with `stale info`
+  because this intentionally untracked branch had no remote-tracking lease record. A fresh
+  `ls-remote` had resolved the remote head as `b8edf03c50683444e452e5be511aba496faad72f`.
+- Retried with an explicit lease pinned to that object. Git reported `Everything up-to-date`; direct
+  artifact verification then showed local HEAD, the remote branch, and PR #1036's `headRefOid` all
+  at `384065f820545871231d705990a4ad5734db56cf`. PR #1036 remained a draft. A final evidence commit
+  follows this entry and will be verified the same way.
