@@ -1,10 +1,15 @@
 import { assertEquals, assertRejects, assertStringIncludes } from '@std/assert';
 import { fromFileUrl } from '@std/path/from-file-url';
+import { join } from '@std/path';
+import { LocalProjectFiles } from '@netscript/plugin/cli';
 
 import { MemoryFileSystemAdapter } from '../../../../kernel/adapters/scaffold/memory-fs.ts';
 import { RemoteError } from '../../../../kernel/domain/errors/cli-exit-error.ts';
 import { createDoctorPluginCommand } from './doctor-plugin-command.ts';
 import { doctorPlugin } from './doctor-plugin-use-case.ts';
+import { compileWorkersRegistry } from '../../../../../../../plugins/workers/src/cli/registry-compiler.ts';
+import { generateRuntimeRegistries } from '../../../../../../../plugins/workers/src/cli/runtime-registry-generator.ts';
+import { generateSagaRegistry } from '../../../../../../../plugins/sagas/src/cli/registry-generator.ts';
 
 Deno.test('plugin doctor exits non-zero when generated registries are absent', async () => {
   const projectRoot = '/workspace';
@@ -38,8 +43,61 @@ Deno.test('plugin doctor exits non-zero when generated registries are absent', a
   );
   assertEquals(error.exitCode, 1);
   assertStringIncludes(output.join('\n'), 'generated job registry exists');
-  assertStringIncludes(output.join('\n'), 'netscript plugin workers compile-registry');
+  assertStringIncludes(output.join('\n'), 'netscript generate plugins');
   assertStringIncludes(output.at(-1) ?? '', 'Plugin doctor failed: @netscript/plugin-workers');
+});
+
+Deno.test('plugin doctor accepts real compile-registry workers output and exits zero', async () => {
+  const generatedRoot = await Deno.makeTempDir();
+  try {
+    await Deno.mkdir(join(generatedRoot, 'workers/jobs'), { recursive: true });
+    await Deno.writeTextFile(join(generatedRoot, 'workers/jobs/welcome.ts'), 'export default () => {};\n');
+    await compileWorkersRegistry(new LocalProjectFiles(generatedRoot));
+    await assertWorkersCommandPasses(await Deno.readTextFile(
+      join(generatedRoot, '.netscript/generated/plugin-workers/job-registry.ts'),
+    ));
+  } finally {
+    await Deno.remove(generatedRoot, { recursive: true });
+  }
+});
+
+Deno.test('plugin doctor accepts real generate plugins workers output and exits zero', async () => {
+  const generatedRoot = await Deno.makeTempDir();
+  try {
+    await Deno.mkdir(join(generatedRoot, 'workers/jobs'), { recursive: true });
+    await Deno.writeTextFile(
+      join(generatedRoot, 'workers/jobs/example-job.ts'),
+      'export default { id: "example-job" };\n',
+    );
+    await generateRuntimeRegistries({
+      projectRoot: generatedRoot,
+      manifestPath: fromFileUrl(
+        new URL('../../../../../../../plugins/workers/scaffold.runtime.json', import.meta.url),
+      ),
+    });
+    await assertWorkersCommandPasses(await Deno.readTextFile(
+      join(generatedRoot, '.netscript/generated/plugin-workers/job-registry.ts'),
+    ));
+  } finally {
+    await Deno.remove(generatedRoot, { recursive: true });
+  }
+});
+
+Deno.test('plugin doctor accepts the real shared sagas generator output and exits zero', async () => {
+  const generatedRoot = await Deno.makeTempDir();
+  try {
+    await Deno.mkdir(join(generatedRoot, 'sagas'), { recursive: true });
+    await Deno.writeTextFile(
+      join(generatedRoot, 'sagas/checkout-saga.ts'),
+      "export default defineSaga('checkout');\n",
+    );
+    await generateSagaRegistry(new LocalProjectFiles(generatedRoot));
+    await assertSagaCommandPasses(await Deno.readTextFile(
+      join(generatedRoot, '.netscript/generated/plugin-sagas/sagas.registry.ts'),
+    ));
+  } finally {
+    await Deno.remove(generatedRoot, { recursive: true });
+  }
 });
 
 Deno.test('plugin doctor reports visible validation issues by field', async () => {
@@ -52,3 +110,75 @@ Deno.test('plugin doctor reports visible validation issues by field', async () =
   assertEquals(reports[0].checks[0].title, 'Config field services.api.port');
   assertStringIncludes(reports[0].checks[0].message ?? '', 'Expected number');
 });
+
+Deno.test('plugin manifest import failures degrade to an error report', async () => {
+  const reports = await doctorPlugin({ projectRoot: '/workspace' }, {
+    fs: new MemoryFileSystemAdapter(),
+    loadConfig: () => Promise.resolve({ plugins: ['./plugins/broken/mod.ts'] } as never),
+    loadRegisteredPlugins: () => Promise.reject(new Error('plugin import exploded')),
+  });
+  assertEquals(reports[0].status, 'error');
+  assertStringIncludes(reports[0].checks[0].message ?? '', 'plugin import exploded');
+});
+
+async function assertWorkersCommandPasses(registrySource: string): Promise<void> {
+  const projectRoot = '/workspace';
+  const fs = new MemoryFileSystemAdapter();
+  await fs.createDir(`${projectRoot}/plugins/workers`);
+  await fs.writeFile(
+    `${projectRoot}/.netscript/generated/plugin-workers/job-registry.ts`,
+    registrySource,
+  );
+  const workersRoot = fromFileUrl(
+    new URL('../../../../../../../plugins/workers/', import.meta.url),
+  );
+  const command = createDoctorPluginCommand({
+    resolveProjectRoot: () => Promise.resolve(projectRoot),
+    print: () => {},
+    doctor: (input) =>
+      doctorPlugin(input, {
+        fs,
+        loadConfig: () => Promise.resolve({ plugins: ['./plugins/workers/mod.ts'] } as never),
+        loadRegisteredPlugins: () => Promise.resolve({
+          workers: {
+            name: '@netscript/plugin-workers',
+            workdir: 'plugins/workers',
+            rootDir: workersRoot,
+            doctor: './src/adapter/plugin.ts',
+          },
+        }),
+      }),
+  });
+  await command.parse(['--project-root', projectRoot]);
+}
+
+async function assertSagaCommandPasses(registrySource: string): Promise<void> {
+  const projectRoot = '/workspace';
+  const fs = new MemoryFileSystemAdapter();
+  await fs.createDir(`${projectRoot}/plugins/sagas`);
+  await fs.writeFile(
+    `${projectRoot}/.netscript/generated/plugin-sagas/sagas.registry.ts`,
+    registrySource,
+  );
+  const sagasRoot = fromFileUrl(
+    new URL('../../../../../../../plugins/sagas/', import.meta.url),
+  );
+  const command = createDoctorPluginCommand({
+    resolveProjectRoot: () => Promise.resolve(projectRoot),
+    print: () => {},
+    doctor: (input) =>
+      doctorPlugin(input, {
+        fs,
+        loadConfig: () => Promise.resolve({ plugins: ['./plugins/sagas/mod.ts'] } as never),
+        loadRegisteredPlugins: () => Promise.resolve({
+          sagas: {
+            name: '@netscript/plugin-sagas',
+            workdir: 'plugins/sagas',
+            rootDir: sagasRoot,
+            doctor: './src/adapter/plugin.ts',
+          },
+        }),
+      }),
+  });
+  await command.parse(['--project-root', projectRoot]);
+}
