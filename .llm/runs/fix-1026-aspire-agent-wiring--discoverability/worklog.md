@@ -385,3 +385,117 @@ d8ff61336f8b   postgres:18.3   Up 54 minutes   127.0.0.1:44621->5432/tcp   postg
 
 They were left untouched because they belong to other concurrent work. No containers or AppHosts
 were created by this run.
+
+## Supervisor un-reflow correction (2026-08-02)
+
+### Plan
+
+- Restore `help.md`, the Aspire and Deno skills, and `manifest.json` to `origin/main` byte for
+  byte.
+- Rebuild `netscript/SKILL.md` from `main`, retaining only this PR's linked routing additions.
+- Regenerate the embedded asset twice, run the requested focused gates, and autosquash the
+  correction into the existing skill-touching implementation commit.
+
+The owner waiver remains active; no evaluator lane was dispatched.
+
+### Exact skill-surface proof
+
+```text
+$ git diff --stat origin/main -- skills/
+ skills/netscript/SKILL.md | 4 ++++
+ 1 file changed, 4 insertions(+)
+```
+
+The full diff contained only three added `## Routing` rows and one added `## Hand-offs` row.
+`skills/help.md`, `skills/aspire/SKILL.md`, `skills/deno/SKILL.md`, and
+`skills/manifest.json` are byte-identical to `origin/main`.
+
+```text
+$ deno fmt --check skills/manifest.json
+Checked 1 file
+fmt_manifest_exit=0
+```
+
+Two consecutive asset generations were stable:
+
+```text
+Task gen:assets-barrel deno run --no-lock --allow-read --allow-write --allow-run=deno .llm/tools/generate-cli-assets-barrel.ts
+cf84f58c976b72c23d43e43916dd400d417d407006e0387411a7db63d2363886  -
+Task gen:assets-barrel deno run --no-lock --allow-read --allow-write --allow-run=deno .llm/tools/generate-cli-assets-barrel.ts
+cf84f58c976b72c23d43e43916dd400d417d407006e0387411a7db63d2363886  -
+first_exit=0 second_exit=0
+```
+
+### Correction validation
+
+Focused tests (exit 0):
+
+```text
+Check packages/cli/src/public/features/agent/init/init-agent_test.ts
+running 9 tests from ./packages/cli/src/public/features/agent/init/init-agent_test.ts
+agent init writes Claude config, skills, and marked AGENTS section idempotently ... ok (29ms)
+agent init selects VS Code and detect-or-all host table ... ok (12ms)
+VS Code-only agent init never delegates to the Claude skill tree ... ok (6ms)
+agent init rejects a bundle whose manifest hash does not match ... ok (2ms)
+installed skill routing resolves to installed skills or help ... ok (11ms)
+aspire delegation is skipped when Playwright CLI is already installed ... ok (14ms)
+aspire delegation timeout is swallowed after cancelling the fake ... ok (13ms)
+aspire delegation errors are swallowed with unconditional MCP config ... ok (10ms)
+agent init installs the complete diagnostic surface ... ok (12ms)
+
+ok | 9 passed | 0 failed (128ms)
+```
+
+Scoped check (exit 0):
+
+```json
+{"source":{"mode":"selection","cwd":"/home/codex/repos/fix-1026"},"command":"deno check --quiet --unstable-kv <files>","selection":{"filesSelected":746,"batches":7,"failedBatches":0},"summary":{"totalOccurrences":0,"uniqueOccurrences":0,"uniqueCodes":0,"uniquePaths":0},"groups":[]}
+```
+
+Scoped lint (exit 0):
+
+```json
+{"source":{"mode":"command","cwd":"/home/codex/repos/fix-1026","exitCode":0},"selection":{"filesSelected":746,"batches":4},"summary":{"totalOccurrences":0,"uniqueOccurrences":0,"uniqueRules":0,"uniquePaths":0},"groups":[]}
+```
+
+Root format check (exit 0):
+
+```text
+Task fmt:check deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages --root plugins --ext ts,tsx --exclude "^(packages/(cli)|packages/mcp/tests/fixtures/doctor/|.*(?:^|/)\.generated/|.*(?:^|/)node_modules/)" --ignore-line-endings
+{"command":"deno fmt --check","cwd":"/home/codex/repos/fix-1026","mode":"check","summary":{"filesSelected":1888,"batches":10,"failedBatches":0,"findings":0,"ignoredFindings":0},"findings":[]}
+```
+
+Manifest format check and destructive-guidance grep:
+
+```text
+$ deno fmt --check skills/manifest.json
+Checked 1 file
+manifest_exit=0
+
+$ grep -rnE 'docker (rm|kill|prune)|xargs .*docker' skills/
+<no output>
+grep_exit=1
+```
+
+### Final history and teardown
+
+After autosquash, a further `deno task gen:assets-barrel` exited 0 and
+`git status --porcelain` emitted nothing. The final skill diff remained:
+
+```text
+ skills/netscript/SKILL.md | 4 ++++
+ 1 file changed, 4 insertions(+)
+```
+
+`aspire ps --format Json --non-interactive --nologo` returned `[]`. Of the three foreign
+PostgreSQL containers observed before this correction, two were still running:
+
+```text
+CONTAINER ID   IMAGE           STATUS             PORTS                       NAMES
+1fad8c348cce   postgres:18.3   Up 34 minutes      127.0.0.1:44656->5432/tcp   postgres-dda83380
+d8ff61336f8b   postgres:18.3   Up About an hour   127.0.0.1:44621->5432/tcp   postgres-bc75ea00
+```
+
+`postgres-20037c3e` was no longer present. This slice issued no Docker mutation and did not start
+or stop an AppHost, so its disappearance was concurrent external activity; the two surviving
+foreign containers were left untouched.
