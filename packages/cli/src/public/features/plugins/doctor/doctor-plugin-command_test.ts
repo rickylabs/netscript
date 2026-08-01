@@ -121,6 +121,35 @@ Deno.test('plugin manifest import failures degrade to an error report', async ()
   assertStringIncludes(reports[0].checks[0].message ?? '', 'plugin import exploded');
 });
 
+Deno.test('one unloadable plugin doctor does not suppress a healthy plugin report', async () => {
+  const fs = new MemoryFileSystemAdapter();
+  await fs.createDir('/workspace/plugins/broken');
+  await fs.createDir('/workspace/plugins/healthy');
+  const reports = await doctorPlugin({ projectRoot: '/workspace' }, {
+    fs,
+    loadConfig: () => Promise.resolve({ plugins: ['broken', 'healthy'] } as never),
+    loadRegisteredPlugins: () => Promise.resolve({
+      broken: {
+        name: 'broken',
+        workdir: 'plugins/broken',
+        rootDir: '/workspace/plugins/broken',
+        permissions: ['--allow-read'],
+        doctor: './missing-doctor.ts',
+      },
+      healthy: {
+        name: 'healthy',
+        workdir: 'plugins/healthy',
+        rootDir: '/workspace/plugins/healthy',
+        permissions: ['--allow-read'],
+      },
+    }),
+  });
+
+  assertEquals(reports.length, 2);
+  assertEquals(reports.find((report) => report.pluginName === 'broken')?.status, 'error');
+  assertEquals(reports.find((report) => report.pluginName === 'healthy')?.status, 'healthy');
+});
+
 async function assertWorkersCommandPasses(registrySource: string): Promise<void> {
   const projectRoot = '/workspace';
   const fs = new MemoryFileSystemAdapter();

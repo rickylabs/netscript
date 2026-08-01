@@ -9,7 +9,7 @@ import type {
 
 import type { RegisteredPluginConfig } from '../../../../kernel/domain/resolved-config.ts';
 import type { FileSystemPort } from '../../../../kernel/ports/file-system-port.ts';
-import { loadRegisteredPlugins } from '../../../../kernel/adapters/config/plugin-registry.ts';
+import { loadRegisteredPluginMetadata } from '../../../../kernel/adapters/config/plugin-registry.ts';
 import { showAuthBackend } from '../auth/auth-config.ts';
 
 /** Health status for one plugin doctor check. */
@@ -73,8 +73,9 @@ export async function doctorPlugin(
 
   let plugins: Record<string, RegisteredPluginConfig>;
   try {
-    const loadPlugins = dependencies.loadRegisteredPlugins ?? loadRegisteredPlugins;
-    plugins = await loadPlugins(input.projectRoot, config);
+    plugins = dependencies.loadRegisteredPlugins
+      ? await dependencies.loadRegisteredPlugins(input.projectRoot, config)
+      : await loadRegisteredPluginMetadata(input.projectRoot, config);
   } catch (error) {
     return [workspaceErrorReport('manifest-resolution', 'Could not resolve plugin manifests.', error)];
   }
@@ -89,6 +90,16 @@ async function diagnosePlugin(
   plugin: RegisteredPluginConfig,
   dependencies: PluginDoctorDependencies,
 ): Promise<PluginDoctorReport> {
+  if (plugin.manifestError) {
+    const checks: PluginDoctorCheck[] = [{
+      id: 'manifest-resolution',
+      title: 'Manifest resolved',
+      status: 'error',
+      message: `${plugin.manifestError} Run: netscript plugin sync`,
+    }];
+    return { pluginName: plugin.name, status: 'error', checks };
+  }
+
   const checks: PluginDoctorCheck[] = [
     {
       id: 'manifest',
@@ -171,10 +182,12 @@ async function checkPluginDoctor(
 ): Promise<readonly PluginDoctorCheck[]> {
   if (!plugin.doctor) return [];
   try {
-    const moduleUrl = toFileUrl(resolve(plugin.rootDir, plugin.doctor)).href;
+    const moduleUrl = isModuleSpecifier(plugin.doctor)
+      ? plugin.doctor
+      : toFileUrl(resolve(plugin.rootDir, plugin.doctor)).href;
     const module = await import(moduleUrl) as Record<string, unknown>;
     const adapter = Object.values(module).find((value): value is NetScriptPlugin =>
-      isNetScriptPlugin(value) && value.name === plugin.name
+      isNetScriptPlugin(value) && pluginLocalName(value.name) === pluginLocalName(plugin.name)
     );
     if (!adapter) {
       throw new Error(`Doctor module ${plugin.doctor} exports no matching NetScriptPlugin.`);
@@ -209,6 +222,15 @@ async function checkPluginDoctor(
       message: `${error instanceof Error ? error.message : String(error)} Run: netscript plugin sync`,
     }];
   }
+}
+
+function pluginLocalName(value: string): string {
+  const segment = value.split('/').at(-1) ?? value;
+  return segment.startsWith('plugin-') ? segment.slice('plugin-'.length) : segment;
+}
+
+function isModuleSpecifier(value: string): boolean {
+  return /^(?:file|jsr|https?):/.test(value);
 }
 
 function isNetScriptPlugin(value: unknown): value is NetScriptPlugin {

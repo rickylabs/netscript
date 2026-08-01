@@ -52,6 +52,7 @@
     "backgroundDir": "workers",
     "serviceEntrypoint": "services/src/main.ts",
     "backgroundEntrypoint": "workers/runtime.ts",
+    "doctorEntrypoint": "./doctor.ts",
     "serviceConfigKey": "workers-api",
     "servicePort": 8091,
     "backgroundPort": 8091,
