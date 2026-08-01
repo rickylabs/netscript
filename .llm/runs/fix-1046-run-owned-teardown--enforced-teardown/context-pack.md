@@ -13,17 +13,18 @@
 ## Current State
 
 Research F1–F10 and locked decisions D1–D8 are approved by the existing supervisor PLAN-EVAL PASS.
-The implementation thread is attached to this worktree. Slice 1 is being completed by restoring the
-mandatory Design and resumability artifacts omitted from the bootstrap commit.
+The implementation thread is attached to this worktree. Slice 2 now proves ownership is
+three-valued, path-segment-safe, identity-pair-safe, fail-closed, and guarded against MCP commands.
 
 ## Completed
 
 - Research, locked plan, supervisor identity, implementation brief, and PLAN-EVAL PASS.
 - Draft PR #1047 exists for the branch.
+- Slice 1 resumability artifacts and slice 2 ownership classifier/tests.
 
 ## In Progress
 
-- Slice 1 harness artifact completion, followed by slices 2–11 in the approved order.
+- Slice 3 schema-versioned atomic run registry.
 
 ## Next Steps
 
@@ -70,4 +71,3 @@ mandatory Design and resumability artifacts omitted from the bootstrap commit.
 ## Commits
 
 - See draft PR #1047 plus per-slice comments.
-

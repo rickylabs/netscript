@@ -66,6 +66,7 @@ new resource shape. Terminal enforcement is isolated in `run-codex-slice-lib.ts`
 | Date | Slice | Step | Notes |
 | --- | --- | --- | --- |
 | 2026-08-02 | 1 | Design checkpoint | PLAN-EVAL already passed under the explicit owner waiver; mandatory resumability artifacts completed before implementation. |
+| 2026-08-02 | 2 | Ownership proof | Red test first (missing module), then five fail-closed ownership tests passed with wrapper check. Reconcile: PR #1047 remains draft; no new review comments changed scope. |
 
 ## Decisions
 
@@ -86,8 +87,11 @@ new resource shape. Terminal enforcement is isolated in `run-codex-slice-lib.ts`
 Gate results are appended per slice. `quality:scan`, `arch:check`, and `jsr-audit` are N/A because
 this run changes no `packages/**` or `plugins/**` source.
 
+| Slice | Gate | Result | Evidence |
+| --- | --- | --- | --- |
+| 2 | scoped check + ownership tests | PASS | wrapper: 2 files, 0 findings; `deno test`: 5 passed, 0 failed |
+
 ## Handoff Notes
 
 - Review the fail-closed ownership tests and the DONE-to-BLOCKED enforcement test first.
 - Confirm no diff path under `skills/**` or `.claude/skills/**` is present.
-
