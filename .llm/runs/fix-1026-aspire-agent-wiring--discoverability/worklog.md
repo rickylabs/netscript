@@ -175,3 +175,81 @@ ok | 7 passed | 0 failed (192ms)
 ```
 
 No agent-init TypeScript, lockfile, or scaffold output changed. E2E was not run per supervisor instruction.
+
+## Rebase and Augment follow-up (2026-08-02)
+
+### Plan
+
+- Rebase onto `origin/main` and resolve the shared skill/agent-init surface as a semantic union,
+  regenerating the embedded barrel from source.
+- Add a VS Code-only red-before regression test, then gate Aspire delegation on the resolved Claude
+  host and commit that production fix.
+- Extend routing integrity coverage for linked targets, prove it red with unknown-target and
+  wrong-href seeds, restore the shipped content, and commit the test fix.
+- Run every requested scoped/root gate, verify generated reproducibility and destructive-guidance
+  absence, then inspect Aspire and container state without starting an AppHost.
+
+The owner waived the open-model evaluator lane; PLAN-EVAL and IMPL-EVAL remain supervisor-owned.
+No external evaluator was dispatched.
+
+### Rebase
+
+`git fetch origin && git rebase origin/main` completed. Conflict resolutions:
+
+- `skills/help.md`: retained `main` in full after confirming the old branch added no content that
+  `main` lacked.
+- `skills/manifest.json`: retained `main`'s version `0.2.0` manifest.
+- `skills/aspire/SKILL.md`: both sides became byte-identical after `deno fmt`; retained the
+  complete `main` content.
+- `skills/deno/SKILL.md`: retained all shared sections and `main`'s more specific routing-policy
+  description.
+- `skills/netscript/SKILL.md`: unioned every routing and hand-off row from the branch with
+  `main`'s explicit unclear-symptom prose and Deno-skill description.
+- `init-agent.ts`: retained this PR's Aspire MCP entry, result messages, bounded delegation, and
+  richer symptom-first `AGENTS_SECTION`.
+- `init-agent_test.ts`: retained delegation/MCP tests and `main`'s distinct complete-surface
+  referential-integrity coverage.
+- `skills.generated.ts`: discarded conflict content and regenerated from resolved sources.
+
+The rebase completed at `5b59015e9`.
+
+### Unit 2 red-before proof
+
+Command (production guard still unfixed):
+
+```text
+$ deno test -A packages/cli/src/public/features/agent/init/init-agent_test.ts --filter 'VS Code-only'
+Check packages/cli/src/public/features/agent/init/init-agent_test.ts
+running 1 test from ./packages/cli/src/public/features/agent/init/init-agent_test.ts
+VS Code-only agent init never delegates to the Claude skill tree ... FAILED (14ms)
+
+ERRORS
+
+error: AssertionError: Values are not equal.
+
+    [Diff] Actual / Expected
+
+-   1
++   0
+
+    at file:///home/codex/repos/fix-1026/packages/cli/src/public/features/agent/init/init-agent_test.ts:142:5
+
+FAILED | 0 passed | 1 failed | 8 filtered out (26ms)
+error: Test failed
+```
+
+After adding the Claude-host guard:
+
+```text
+$ deno test -A packages/cli/src/public/features/agent/init/init-agent_test.ts --filter 'VS Code-only'
+Check packages/cli/src/public/features/agent/init/init-agent_test.ts
+running 1 test from ./packages/cli/src/public/features/agent/init/init-agent_test.ts
+VS Code-only agent init never delegates to the Claude skill tree ... ok (43ms)
+
+ok | 1 passed | 0 failed | 8 filtered out (94ms)
+```
+
+Per the post-rebase formatting instruction, `deno fmt --no-config` normalized
+`skills/{aspire,deno,netscript}/SKILL.md` and `skills/help.md`.
+`skills/netscript-build/SKILL.md` and `skills/netscript-operate/SKILL.md` were explicitly
+excluded because their formatting drift is owned by `main`.

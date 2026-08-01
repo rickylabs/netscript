@@ -81,7 +81,12 @@ export async function initAgent(
       changedFiles,
     );
   }
-  if (!await dependencies.fs.exists(join(input.projectRoot, PLAYWRIGHT_SKILL_PATH))) {
+  if (
+    hosts.includes("claude") &&
+    !await dependencies.fs.exists(
+      join(input.projectRoot, PLAYWRIGHT_SKILL_PATH),
+    )
+  ) {
     const signal = AbortSignal.timeout(
       dependencies.aspireTimeoutMs ?? ASPIRE_INIT_TIMEOUT_MS,
     );

@@ -246,4 +246,3 @@ The durable fix is `"minimumDependencyAge"` in `deno.json`, not a flag on one co
 - All `deno check` / `deno info` / `deno test` / `deno doc` behaviours above were reproduced on a
   scratch project. The claim that the **editor** checks only open files is standard LSP behaviour
   and was *not* re-verified here — the CLI half of the comparison was.
-

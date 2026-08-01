@@ -1,6 +1,7 @@
 import {
   assert,
   assertEquals,
+  assertFalse,
   assertRejects,
   assertStringIncludes,
 } from "@std/assert";
@@ -121,6 +122,42 @@ Deno.test("agent init selects VS Code and detect-or-all host table", async () =>
   }
 });
 
+Deno.test("VS Code-only agent init never delegates to the Claude skill tree", async () => {
+  const explicitRoot = await Deno.makeTempDir();
+  const detectedRoot = await Deno.makeTempDir();
+  try {
+    const fs = new DenoAgentInitFileSystem();
+    let calls = 0;
+    const initializer: AspireAgentInitializer = {
+      initialize() {
+        calls++;
+        return Promise.resolve({ ok: true });
+      },
+    };
+
+    await initAgent({ projectRoot: explicitRoot, host: "vscode" }, {
+      fs,
+      aspireAgentInitializer: initializer,
+    });
+    assertEquals(calls, 0);
+    assertFalse(await fs.exists(join(explicitRoot, ".claude")));
+    assert(await fs.exists(join(explicitRoot, ".vscode/mcp.json")));
+
+    await Deno.mkdir(join(detectedRoot, ".vscode"));
+    const detected = await initAgent({ projectRoot: detectedRoot }, {
+      fs,
+      aspireAgentInitializer: initializer,
+    });
+    assertEquals(detected.hosts, ["vscode"]);
+    assertEquals(calls, 0);
+    assertFalse(await fs.exists(join(detectedRoot, ".claude")));
+    assert(await fs.exists(join(detectedRoot, ".vscode/mcp.json")));
+  } finally {
+    await Deno.remove(explicitRoot, { recursive: true });
+    await Deno.remove(detectedRoot, { recursive: true });
+  }
+});
+
 Deno.test("agent init rejects a bundle whose manifest hash does not match", async () => {
   const root = await Deno.makeTempDir();
   try {
@@ -158,7 +195,8 @@ Deno.test("installed skill routing resolves to installed skills or help", async 
       const installedPath = join(root, ".claude/skills", skill, "SKILL.md");
       assert(await fs.exists(installedPath), `${skill} was not installed`);
       const text = await Deno.readTextFile(installedPath);
-      const routingText = text.match(/## Routing\n([\s\S]*?)(?:\n## |$)/)?.[1] ?? "";
+      const routingText =
+        text.match(/## Routing\n([\s\S]*?)(?:\n## |$)/)?.[1] ?? "";
       for (const line of routingText.split("\n")) {
         const target = line.match(/^\|[^|]+\|\s*`([^` ]+)`\s*\|$/)?.[1];
         if (target) {
@@ -166,7 +204,10 @@ Deno.test("installed skill routing resolves to installed skills or help", async 
         }
       }
       for (const match of text.matchAll(/`([^` ]+)` skill/g)) {
-        assert(installed.has(match[1]), `${skill} routes to missing ${match[1]}`);
+        assert(
+          installed.has(match[1]),
+          `${skill} routes to missing ${match[1]}`,
+        );
       }
     }
   } finally {
@@ -271,9 +312,11 @@ Deno.test("agent init installs the complete diagnostic surface", async () => {
       "deno",
     ]);
     for (const path of ["aspire/SKILL.md", "deno/SKILL.md", "help.md"]) {
-      assert(await new DenoAgentInitFileSystem().exists(
-        join(root, ".claude", "skills", path),
-      ));
+      assert(
+        await new DenoAgentInitFileSystem().exists(
+          join(root, ".claude", "skills", path),
+        ),
+      );
     }
 
     const installed = new Set(manifest.skills);
