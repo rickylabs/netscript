@@ -10,7 +10,6 @@ import {
   SCAFFOLD_JSR_RELEASE_PACKAGES,
 } from '../../constants/scaffold/scaffold-workspace-packages.ts';
 import {
-  NETSCRIPT_RELEASE_VERSION,
   netscriptJsrSpecifier,
 } from '../../constants/jsr-specifiers.ts';
 import { generateDenoJson } from './deno-json.ts';
@@ -40,7 +39,7 @@ Deno.test('generateDenoJson emits the expected root workspace shape in JSR mode'
   assertEquals(result.minimumDependencyAge, {
     age: 'P1D',
     exclude: SCAFFOLD_JSR_RELEASE_PACKAGES.map((packageName) =>
-      netscriptJsrSpecifier(packageName)
+      `jsr:@netscript/${packageName}`
     ),
   });
   assertEquals(result.nodeModulesDir, 'auto');
@@ -95,7 +94,7 @@ Deno.test('generateDenoJson gives Aspire cold starts a configurable five-minute 
   );
 });
 
-Deno.test('generateDenoJson scopes the minimum dependency age exception to exact NetScript releases', () => {
+Deno.test('generateDenoJson scopes the minimum dependency age exception to NetScript packages', () => {
   const result = JSON.parse(generateDenoJson({
     name: 'test-project',
     appName: 'dashboard',
@@ -106,12 +105,14 @@ Deno.test('generateDenoJson scopes the minimum dependency age exception to exact
 
   assertEquals(exclusions, [
     ...SCAFFOLD_JSR_RELEASE_PACKAGES.map((packageName) =>
-      `jsr:@netscript/${packageName}@${NETSCRIPT_RELEASE_VERSION}`
+      `jsr:@netscript/${packageName}`
     ),
   ]);
   assertEquals(new Set(exclusions).size, exclusions.length);
   assert(exclusions.every((specifier) => specifier.startsWith('jsr:@netscript/')));
-  assert(exclusions.every((specifier) => specifier.endsWith(`@${NETSCRIPT_RELEASE_VERSION}`)));
+  // Do not append a version here. Deno's minimum-age matcher did not exempt exact specifiers,
+  // causing every freshly published scaffold to fail dependency resolution for about 24 hours.
+  assert(exclusions.every((specifier) => /^jsr:@netscript\/[^@]+$/.test(specifier)));
   assert(!exclusions.some((specifier) => specifier.includes('@std/')));
 });
 
