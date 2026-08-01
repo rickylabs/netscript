@@ -360,6 +360,49 @@ ok | 10 passed | 0 failed (17ms)
 RAW_EXIT_CODE=0
 ```
 
+### Workspace-member resolution slice
+
+The resolver now checks the project's declared Deno workspace members before its existing local
+import candidates. Literal and wildcard member paths are expanded through `FileSystemPort`; a
+candidate wins only when its `deno.json` or `deno.jsonc` `name` exactly equals the installed package
+name. JSR-only projects still reach the unchanged published fallback.
+
+The AI integration fixture now reproduces the scaffold shape: `workspace: ["./plugins/*"]`, a
+copied local `plugins/ai` member, and no local `@netscript/plugin-ai` import. It runs the real
+workspace generator, imports both emitted registries, asserts their resolved `Map` keys, proves
+`skill-loader.ts` is excluded, and proves `fetchManifest` was called zero times.
+
+```text
+$ deno test -A packages/cli/src/public/features/generate/plugins/
+running 1 test from ./packages/cli/src/public/features/generate/plugins/generate-plugin-registries-command_test.ts
+generate plugin registries command ... ok (26ms)
+running 1 test from ./packages/cli/src/public/features/generate/plugins/installed-runtime-registry-generator_test.ts
+installed runtime registry generator ... ok (38ms)
+running 7 tests from ./packages/cli/src/public/features/generate/plugins/installed-runtime-registry-integration_test.ts
+generated trigger registry loads valid definitions and excludes scaffold runtime glue ... ok (426ms)
+generated trigger registry rejects a non-definition module that is not excluded ... ok (277ms)
+workspace import resolves the on-disk trigger manifest without fetching JSR ... ok (44ms)
+generated workers registry loads jobs and excludes job tools ... ok (321ms)
+generated sagas registry loads saga definitions and ignores other TypeScript files ... ok (565ms)
+generated AI registries load resources and exclude the skill-loader factory ... ok (370ms)
+JSR-only imports retain the published manifest and generator fallback ... ok (23ms)
+
+ok | 9 passed (4 steps) | 0 failed (2s)
+RAW_EXIT_CODE=0
+
+$ deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/cli/src/public/features/generate/plugins --ext ts,tsx
+{"source":{"mode":"selection","cwd":"/home/codex/repos/fix-1010"},"command":"deno check --quiet --unstable-kv <files>","selection":{"filesSelected":6,"batches":1,"failedBatches":0},"summary":{"totalOccurrences":0,"uniqueOccurrences":0,"uniqueCodes":0,"uniquePaths":0},"groups":[]}
+RAW_EXIT_CODE=0
+
+$ deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/cli/src/public/features/generate/plugins --ext ts,tsx
+{"command":"deno fmt --check","cwd":"/home/codex/repos/fix-1010","mode":"check","summary":{"filesSelected":6,"batches":1,"failedBatches":0,"findings":0,"ignoredFindings":0},"findings":[]}
+RAW_EXIT_CODE=0
+```
+
+Reconcile note: no PR or issue mutation was performed because the supervisor owns both. The
+implementation changes no public export/config surface, so JSR audit impact is `none`; the existing
+published AI manifest asset remains unchanged by this slice.
+
 AI FINAL SCOPED LINT
 $ deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/cli --ext ts,tsx
 {"source":{"mode":"command","cwd":"/home/codex/repos/fix-1010","exitCode":0},"selection":{"filesSelected":747,"batches":4},"summary":{"totalOccurrences":0,"uniqueOccurrences":0,"uniqueRules":0,"uniquePaths":0},"groups":[]}

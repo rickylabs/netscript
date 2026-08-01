@@ -1,4 +1,5 @@
 import { assert, assertEquals, assertRejects } from 'jsr:@std/assert@^1';
+import { copy } from '@std/fs';
 import { dirname, fromFileUrl, join, toFileUrl } from '@std/path';
 
 import { DenoFileSystem } from '../../../../kernel/adapters/runtime/file-system/deno-file-system.ts';
@@ -166,7 +167,7 @@ export default defineSaga('${id}');
 
 Deno.test('generated AI registries load resources and exclude the skill-loader factory', async () => {
   await withTempProject(async (projectRoot) => {
-    await writeWorkspaceProject(projectRoot, ['plugin-ai'], {
+    await writeScaffoldWorkspaceAiProject(projectRoot, {
       'ai/tools/e2e-tool.ts': `
 export default {
   descriptor: { name: 'e2e-tool' },
@@ -181,10 +182,14 @@ export function createSkillLoaderTool(skills: unknown) {
 `,
       'ai/agents/assistant.ts': 'export default function assistant() { return {}; }\n',
     });
+    let fetchCalls = 0;
     const generate = createInstalledRuntimeRegistryGenerator({
       fs: new DenoFileSystem(),
       process: new DenoProcess(),
-      fetchManifest: () => Promise.reject(new Error('workspace generation must not fetch')),
+      fetchManifest: () => {
+        fetchCalls++;
+        return Promise.reject(new Error('scaffold workspace manifest must win'));
+      },
     });
 
     await generate({ dryRun: false, projectRoot });
@@ -202,6 +207,7 @@ export function createSkillLoaderTool(skills: unknown) {
     assert(agents.registry instanceof Map);
     assertEquals(agents.registry.has('assistant'), true);
     assertEquals(agents.registry.size, 1);
+    assertEquals(fetchCalls, 0);
   });
 });
 
@@ -278,6 +284,28 @@ async function writeWorkspaceProject(
   for (const [path, source] of Object.entries(files)) await write(join(projectRoot, path), source);
 }
 
+async function writeScaffoldWorkspaceAiProject(
+  projectRoot: string,
+  files: Readonly<Record<string, string>>,
+): Promise<void> {
+  const rootConfig = JSON.parse(await Deno.readTextFile(join(REPOSITORY_ROOT, 'deno.json'))) as {
+    imports: Record<string, string>;
+  };
+  await writeProjectConfig(
+    projectRoot,
+    {
+      ...rootConfig.imports,
+      '@netscript/plugin/cli': toFileUrl(
+        join(REPOSITORY_ROOT, 'packages/plugin/src/cli/mod.ts'),
+      ).href,
+    },
+    ['./plugins/*'],
+  );
+  await copy(join(REPOSITORY_ROOT, 'plugins/ai'), join(projectRoot, 'plugins/ai'));
+  await writeAppSettings(projectRoot, ['plugin-ai']);
+  for (const [path, source] of Object.entries(files)) await write(join(projectRoot, path), source);
+}
+
 async function writePublishedProject(projectRoot: string): Promise<void> {
   await writeProjectConfig(projectRoot, {
     '@netscript/plugin-triggers/runtime': netscriptJsrSpecifier('plugin-triggers', '/runtime'),
@@ -289,8 +317,9 @@ async function writePublishedProject(projectRoot: string): Promise<void> {
 async function writeProjectConfig(
   projectRoot: string,
   imports: Readonly<Record<string, string>>,
+  workspace?: readonly string[],
 ): Promise<void> {
-  await write(join(projectRoot, 'deno.json'), `${JSON.stringify({ imports })}\n`);
+  await write(join(projectRoot, 'deno.json'), `${JSON.stringify({ imports, workspace })}\n`);
 }
 
 async function writeAppSettings(

@@ -92,3 +92,18 @@ The broad check exceeded the command wrapper's first yield. Three recovery attem
 started identical read-only checks without retaining their process session ids. Those duplicates
 were terminated; one clean invocation was then run through its retained session to completion and
 exited 0. No source, cache, or lockfile mutation resulted.
+
+## 2026-08-02 — correction — workspace-first must include declared members
+
+The first workspace-first resolver considered only local import-map values. The retained scaffold
+proves that local plugin ownership is also expressed through `workspace: ["./plugins/*"]`: AI is a
+local member without an `@netscript/plugin-ai` import, whereas workers and triggers happen to have
+local runtime imports. Consequently the generic resolver is widened to declared workspace members,
+still requiring an exact package `name` and retaining the published fallback. This corrects the
+resolution model without adding an AI-specific identity or changing the loud registry validation.
+
+## 2026-08-02 — correction — AI diagnostic attached to wrong gate
+
+The prior diagnostic slice accidentally put the AI failure hint on durable CLI parity. Capture and
+the hint are moved to `behavior.ai-chat-route`, with a gate-definition regression guarding their
+placement. The behavior gate assertions themselves are unchanged.

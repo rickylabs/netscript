@@ -1,5 +1,5 @@
 import { parse as parseJsonc } from '@std/jsonc';
-import { basename, dirname, fromFileUrl, isAbsolute, join, resolve } from '@std/path';
+import { basename, dirname, fromFileUrl, isAbsolute, join, resolve, SEPARATOR } from '@std/path';
 
 import type { FileSystemPort } from '../../../../kernel/ports/file-system-port.ts';
 import type { ProcessPort } from '../../../../kernel/ports/process-port.ts';
@@ -151,6 +151,14 @@ async function findWorkspaceMemberRoot(
   const configPath = join(projectRoot, 'deno.json');
   if (!await fs.exists(configPath)) return undefined;
   const config = asRecord(parseJsonc(await fs.readFile(configPath)));
+  const workspaceMember = await findDeclaredWorkspaceMember(
+    projectRoot,
+    config.workspace,
+    packageName,
+    fs,
+  );
+  if (workspaceMember) return workspaceMember;
+
   const imports = asRecord(config.imports);
   const candidates = Object.entries(imports).filter(([key, value]) =>
     (key === packageName || key.startsWith(`${packageName}/`)) &&
@@ -171,6 +179,70 @@ async function findWorkspaceMemberRoot(
     }
   }
   return undefined;
+}
+
+async function findDeclaredWorkspaceMember(
+  projectRoot: string,
+  rawWorkspace: unknown,
+  packageName: string,
+  fs: FileSystemPort,
+): Promise<string | undefined> {
+  for (const entry of readStrings(rawWorkspace) ?? []) {
+    if (!isLocalImport(entry)) continue;
+    for (const candidate of await expandWorkspaceEntry(projectRoot, entry, fs)) {
+      for (const configName of ['deno.json', 'deno.jsonc']) {
+        const memberConfigPath = join(candidate, configName);
+        if (!await fs.exists(memberConfigPath)) continue;
+        const memberConfig = asRecord(parseJsonc(await fs.readFile(memberConfigPath)));
+        if (memberConfig.name === packageName) return candidate;
+      }
+    }
+  }
+  return undefined;
+}
+
+async function expandWorkspaceEntry(
+  projectRoot: string,
+  entry: string,
+  fs: FileSystemPort,
+): Promise<readonly string[]> {
+  const absolute = resolveLocalImport(projectRoot, entry);
+  const wildcardIndex = absolute.search(/[?*]/);
+  if (wildcardIndex === -1) return await fs.exists(absolute) ? [absolute] : [];
+
+  const separatorIndex = absolute.lastIndexOf(SEPARATOR, wildcardIndex);
+  const root = separatorIndex <= 0 ? SEPARATOR : absolute.slice(0, separatorIndex);
+  if (!await fs.exists(root)) return [];
+  const pattern = absolute.slice(separatorIndex + 1).split(SEPARATOR);
+  return await expandWorkspaceSegments(root, pattern, fs);
+}
+
+async function expandWorkspaceSegments(
+  current: string,
+  segments: readonly string[],
+  fs: FileSystemPort,
+): Promise<readonly string[]> {
+  if (segments.length === 0) return [current];
+  const [segment, ...rest] = segments;
+  if (!/[?*]/.test(segment)) {
+    const next = join(current, segment);
+    return await fs.exists(next) ? await expandWorkspaceSegments(next, rest, fs) : [];
+  }
+
+  const matches: string[] = [];
+  const expression = wildcardSegmentRegExp(segment);
+  for (const child of await fs.readDir(current)) {
+    if (!child.isDirectory || !expression.test(child.name)) continue;
+    matches.push(...await expandWorkspaceSegments(join(current, child.name), rest, fs));
+  }
+  return matches;
+}
+
+function wildcardSegmentRegExp(segment: string): RegExp {
+  const escaped = segment.replace(/[.+^${}()|[\]\\]/g, '\\$&')
+    .replaceAll('*', '.*')
+    .replaceAll('?', '.');
+  return new RegExp(`^${escaped}$`);
 }
 
 function isLocalImport(value: string): boolean {

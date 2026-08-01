@@ -2,7 +2,7 @@
 
 ## Status
 
-- Phase: scaffold workspace manifest-resolution follow-up implementation planned.
+- Phase: scaffold workspace manifest resolution implemented; final gates and push pending.
 - Branch/worktree clean at baseline before run artifacts.
 - Published 0.0.2 reproduction captured once in `.llm/tmp/issue-1010-clean-room-repro.log`.
 - PLAN-EVAL passed in a separate Claude Code + OpenRouter Qwen session before implementation.
@@ -37,6 +37,9 @@
 - AI manifest drift omitted `skill-loader.ts` from its tool exclusions even though the compiler's
   canonical target excluded it. Manifest-driven regeneration therefore imported a factory module
   as a concrete tool definition and threw before `e2e-tool` could be resolved.
+- The initial workspace resolver inspected only import-map values. Scaffold projects declare copied
+  plugins through `workspace: ["./plugins/*"]`; AI has no local package import, so it was missed and
+  the released manifest won despite the local member.
 
 ## Locked Direction
 
@@ -48,9 +51,6 @@
 
 ## Next
 
-1. Correct AI behavior-gate output capture placement.
-2. Resolve local plugins through Deno workspace members as well as local imports and prove the AI
-   scaffold shape with an imported-registry test.
-3. Run the requested static, quality, focused, and single full runtime gates; record scoped teardown.
-4. Push the branch as explicitly authorized and prove local/remote SHA equality. Do not edit the PR
+1. Run the requested static, quality, focused, and single full runtime gates; record scoped teardown.
+2. Push the branch as explicitly authorized and prove local/remote SHA equality. Do not edit the PR
    or issue; supervisor retains their lifecycle.
