@@ -286,4 +286,31 @@ generated .netscript/generated/plugin-ai/agents.registry.ts (1 ai-agents)
 $ deno eval <VALIDATE_AI_CHAT_ROUTE_SCRIPT> <project>
 AI chat route contract import smoke passed
 RAW_EXIT_CODE=0
+
+AI FINAL SCOPED CHECK
+$ deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/cli --ext ts,tsx
+{"source":{"mode":"selection","cwd":"/home/codex/repos/fix-1010"},"command":"deno check --quiet --unstable-kv <files>","selection":{"filesSelected":747,"batches":7,"failedBatches":0},"summary":{"totalOccurrences":0,"uniqueOccurrences":0,"uniqueCodes":0,"uniquePaths":0},"groups":[]}
+RAW_EXIT_CODE=0
+
+AI FINAL SCOPED LINT
+$ deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/cli --ext ts,tsx
+{"source":{"mode":"command","cwd":"/home/codex/repos/fix-1010","exitCode":0},"selection":{"filesSelected":747,"batches":4},"summary":{"totalOccurrences":0,"uniqueOccurrences":0,"uniqueRules":0,"uniquePaths":0},"groups":[]}
+RAW_EXIT_CODE=0
+
+AI FINAL SCOPED FORMAT
+$ deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/cli --ext ts,tsx
+{"command":"deno fmt --check","cwd":"/home/codex/repos/fix-1010","mode":"check","summary":{"filesSelected":747,"batches":4,"failedBatches":0,"findings":0,"ignoredFindings":0},"findings":[]}
+RAW_EXIT_CODE=0
+
+AI FINAL FOCUSED TESTS
+$ deno test -A packages/cli/src/public/features/generate/plugins/ plugins/ai/src/cli/
+generated AI registries load resources and exclude the skill-loader factory ... ok (229ms)
+ok | 15 passed (4 steps) | 0 failed (2s)
+RAW_EXIT_CODE=0
+
+AI FINAL QUALITY GATE
+$ deno task quality:gate
+{"ok":true,"mode":"repository","scanned":["packages/cli/src","plugins"],"findings":[],"allowCount":7}
+Doctrine checks: FAIL=0 for all configured roots; existing WARN/INFO retained.
+RAW_EXIT_CODE=0
 ```

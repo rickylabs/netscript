@@ -14,6 +14,10 @@ The leading hypothesis included the possibility that authoritative regeneration 
 factory, but manifest-driven generation correctly uses the manifest target, whose exclusion list
 had drifted. The fix aligns the published manifest with the existing canonical compiler target.
 
+No public TypeScript export or `deno.json` entry changed. JSR review therefore stayed scoped to the
+published `scaffold.runtime.json` asset; the plugin-specific publish dry-run included that asset and
+completed successfully.
+
 ## 2026-08-01 — minor — sync context mechanism narrowed
 
 The issue suspected that plugin sync loaded project configuration in the CLI context. Current source

@@ -2,7 +2,7 @@
 
 ## Status
 
-- Phase: Follow-up gate complete; supervisor-owned full E2E/evaluation pending.
+- Phase: AI chat-route follow-up gate complete; supervisor-owned full E2E/evaluation pending.
 - Branch/worktree clean at baseline before run artifacts.
 - Published 0.0.2 reproduction captured once in `.llm/tmp/issue-1010-clean-room-repro.log`.
 - PLAN-EVAL passed in a separate Claude Code + OpenRouter Qwen session before implementation.
@@ -17,6 +17,11 @@
 - Workers, sagas, and triggers now each have a generated-registry loading assertion with negative
   exclusion/suffix evidence; the focused suite passes 8 tests (4 steps), 0 failed.
 - Evaluator: Opus 5 supervisor (owner-waived open-model lane, 2026-08-01).
+- `behavior.ai-chat-route` reproduced from the retained failing scaffold with
+  `AI tool module ai/tools/skill-loader.ts does not export an AiToolDefinition.`
+- The AI manifest now excludes the scaffold-only skill-loader factory. Real registry generation and
+  import tests resolve `e2e-tool` and `assistant`; retained-scaffold behavior re-verification exits 0.
+- CLI check/lint/fmt, 15 focused tests, plugin AI publish dry-run, and `quality:gate` all exit 0.
 
 ## Root Cause
 
@@ -29,6 +34,9 @@
   included as a trigger. The old missing-registry fallback had hidden this defect.
 - Local-source E2E still fetched the released manifest/generator, so an in-repo manifest correction
   could not affect workspace scaffolds before publication.
+- AI manifest drift omitted `skill-loader.ts` from its tool exclusions even though the compiler's
+  canonical target excluded it. Manifest-driven regeneration therefore imported a factory module
+  as a concrete tool definition and threw before `e2e-tool` could be resolved.
 
 ## Locked Direction
 
@@ -40,6 +48,6 @@
 
 ## Next
 
-1. Supervisor runs the requested single full E2E pass.
+1. Supervisor runs the requested single full E2E pass and verifies `behavior.ai-chat-route` green.
 2. Supervisor completes PR lifecycle and any remaining review/evaluation activity.
 3. Never push/open PR from this implementation session.
