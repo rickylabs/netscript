@@ -85,6 +85,8 @@ plugin-name registry.
 | 2026-08-01 | follow-up | coverage restoration | Added real generated-module loading for workers and sagas. Workers asserts `example-job` is registered and excluded `job-tools.ts` is absent; sagas asserts `order-processing` is registered and a non-`-saga.ts` file is absent. Commit `e42696ae5`. |
 | 2026-08-01 | follow-up | fixture correction | First saga run failed 5 passed/1 failed because `not-a-saga.ts` does end in `-saga.ts`; renamed the negative fixture to `saga-tools.ts`, after which all six integration tests passed. |
 | 2026-08-02 | AI slice 1 | diagnostics | Made `behavior.ai-chat-route` explicitly capture subprocess output and added a registry/import-focused failure hint. Gate-definition tests: 5 passed, 0 failed; targeted check exit 0. |
+| 2026-08-02 | AI slice 2 | reproduced | Ran the exact behavior import script against retained scaffold `plugin-smoke-20260801-205015`; exit 1: `AI tool module ai/tools/skill-loader.ts does not export an AiToolDefinition.` Generated registry retained `e2e-tool.ts` but also imported scaffold factory `skill-loader.ts`. |
+| 2026-08-02 | AI slice 2 | root cause | Manifest-driven generation correctly passed `plugins/ai/scaffold.runtime.json`, but that manifest omitted the compiler's canonical `skill-loader.ts` exclusion. Added the exclusion to the published asset; invalid AI modules continue to throw. |
 
 ## Decisions
 
@@ -253,5 +255,20 @@ $ deno test -A packages/cli/e2e/tests/application/gates/scaffold-gates_test.ts
 ok | 5 passed | 0 failed (46ms)
 $ deno check packages/cli/e2e/src/application/gates/scaffold/runtime-gates.ts
 Check packages/cli/e2e/src/application/gates/scaffold/runtime-gates.ts
+RAW_EXIT_CODE=0
+
+AI CHAT ROUTE REPRODUCTION
+$ deno eval <VALIDATE_AI_CHAT_ROUTE_SCRIPT> /home/codex/repos/fix-1010/.llm/tmp/cli-e2e/plugin-smoke-20260801-205015
+error: Uncaught (in promise) Error: AI tool module ai/tools/skill-loader.ts does not export an AiToolDefinition.
+    at resolveAiToolDefinitions (.../.netscript/generated/plugin-ai/tools.registry.ts:34:11)
+    at .../.netscript/generated/plugin-ai/tools.registry.ts:17:6
+RAW_EXIT_CODE=1
+
+AI MANIFEST PUBLISH SURFACE
+$ deno task --cwd plugins/ai publish:dry-run
+Task publish:dry-run deno publish --dry-run --allow-dirty
+Simulating publish of @netscript/plugin-ai@0.0.2 with files:
+   file:///home/codex/repos/fix-1010/plugins/ai/scaffold.runtime.json (916B)
+Success Dry run complete
 RAW_EXIT_CODE=0
 ```

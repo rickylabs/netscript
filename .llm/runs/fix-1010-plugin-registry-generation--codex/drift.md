@@ -6,6 +6,14 @@ The owner explicitly waived the open-model Plan-Gate for the AI chat-route follo
 PLAN-EVAL/IMPL-EVAL to the supervisor. No evaluator tool is launched and no `plan-eval.md` is
 fabricated or changed by this implementation session.
 
+## 2026-08-02 — correction — AI tool survived; manifest admitted scaffold factory
+
+The leading hypothesis included the possibility that authoritative regeneration dropped
+`e2e-tool`. Reproduction refuted that branch: the generated registry imported `e2e-tool.ts` and
+`echo.ts`, then failed on `skill-loader.ts`. The plugin compiler's default target excludes that
+factory, but manifest-driven generation correctly uses the manifest target, whose exclusion list
+had drifted. The fix aligns the published manifest with the existing canonical compiler target.
+
 ## 2026-08-01 — minor — sync context mechanism narrowed
 
 The issue suspected that plugin sync loaded project configuration in the CLI context. Current source
