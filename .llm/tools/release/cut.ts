@@ -30,6 +30,13 @@ export interface ReleasePrDependencies {
   ) => Promise<GitHubResponse>;
 }
 
+/** Format the release-cut PR failure line shown to the operator. */
+export function formatReleasePrCreationError(error: unknown): string {
+  return `release:cut could not create the release PR: ${
+    error instanceof Error ? error.message : String(error)
+  }`;
+}
+
 const defaultReleasePrDependencies: ReleasePrDependencies = {
   resolveToken: () => resolveGithubToken(),
   request: githubRequest,
@@ -119,11 +126,7 @@ export async function createReleasePullRequest(
     if (url) console.log(url);
     return true;
   } catch (error) {
-    console.error(
-      `release:cut could not create the release PR: ${
-        error instanceof Error ? error.message : String(error)
-      }`,
-    );
+    console.error(formatReleasePrCreationError(error));
     console.error(
       `Branch ${branch} was pushed successfully. Open the PR manually against main using the generated body file.`,
     );

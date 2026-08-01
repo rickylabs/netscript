@@ -51,6 +51,7 @@ Start at the root `release:cut` task, follow `cut.ts` into `resolveGithubToken`,
 | ---- | ----- | ---- | ----- |
 | 2026-08-01T21:21:17+02:00 | 1 | research | Clean requested branch/baseline confirmed; reproduction and consumer/task audit matched the issue lead. |
 | 2026-08-01T21:31:00+02:00 | 1 | PLAN-EVAL response | Independent evaluator returned FAIL on D3: replaced subprocess/live-network committed test design with pure classification/message helpers and rendered-line assertions. |
+| 2026-08-01T21:45:00+02:00 | 2 | implementation | Added the host-scoped task permission, narrowed missing-net classification, preserved genuine-auth formatting, and added two hermetic regression tests. |
 
 ## Decisions
 
@@ -83,27 +84,32 @@ Requires net access to "api.github.com:443", run again with the --allow-net flag
 
 | Gate | Command or check | Result | Notes |
 | ---- | ---------------- | ------ | ----- |
-| requested check | pending implementation | NOT_RUN | |
-| requested lint | pending implementation | NOT_RUN | |
-| requested tests | pending implementation | NOT_RUN | |
+| requested check | `deno run -A .llm/tools/run-deno-check.ts --root .llm/tools --ext ts` | PASS | Exit 0; stdout/stderr empty. |
+| literal requested lint | `deno lint .llm/tools/agentic/lib/agentic-lib.ts .llm/tools/release/cut.ts` | FAIL | Literal output: `error: No target files found.` Root config excludes `.llm/`; this is not a code verdict. |
+| supplemental focused lint | `deno lint --no-config .llm/tools/agentic/lib/agentic-lib.ts .llm/tools/release/cut.ts` | PASS | Literal output: `Checked 2 files` |
+| authoritative scoped lint wrapper | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --file .llm/tools/agentic/lib/agentic-lib.ts --file .llm/tools/release/cut.ts --pretty` | PASS | Selected 2 files / 1 batch; exit 0; 0 occurrences. |
+| requested tests | `deno test --allow-read --allow-env --allow-net=api.github.com .llm/tools/agentic/lib/agentic-lib_test.ts` | PASS | `running 65 tests`; `ok | 65 passed | 0 failed (211ms)` |
+| task listing | `deno task --quiet 2>&1 | grep -n "release:cut"` | PASS | Literal output: `116:- release:cut` |
+| task definition | `grep -n '"release:cut"' deno.json` | PASS | Line 97 includes `--allow-net=api.github.com`. |
 
 ### Fitness Gates
 
 | Gate | Result | Evidence | Notes |
 | ---- | ------ | -------- | ----- |
-| proportional Archetype-6 review | PENDING_SCRIPT | focused diff review after implementation | `.llm/tools` is outside package fitness scanner scope. |
+| proportional Archetype-6 review | PASS | independent harness slice-review session | Verified exact permission scope, first-candidate abort before `(401)`, preserved genuine-auth path, hermetic tests, consumer check, and four-file implementation scope; no findings. |
 
 ### Runtime Gates
 
 | Gate | Result | Evidence | Notes |
 | ---- | ------ | -------- | ----- |
-| exact-flags authenticated probe | NOT_RUN | pending implementation | Must run after task fix. |
+| exact-flags authenticated probe | PASS | `rickylabs` | Real `gh auth token`; exact updated release-cut read/write/run/env/net flag set. |
+| missing-permission operator probe | PASS | `release:cut could not create the release PR: Cannot reach api.github.com: missing --allow-net=api.github.com. Requires net access to "api.github.com:443", run again with the --allow-net flag` | Contains no `401` and no `gh auth login`; no credential was printed. |
 
 ### Consumer Gates
 
 | Consumer | Result | Evidence | Notes |
 | -------- | ------ | -------- | ----- |
-| named resolver/request consumers | NOT_RUN | scoped `.llm/tools` check | pending implementation |
+| named resolver/request consumers | PASS | scoped `.llm/tools` check exited 0 | Shared return contract remains `string | null`; only the classified permission failure throws. |
 
 ## Handoff Notes
 
