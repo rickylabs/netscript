@@ -50,6 +50,18 @@
 - Installed-plugin ownership ledger — issue #167 uninstall follow-up owns it.
 - Non-runtime plugins — legitimately produce no runtime registry and do not fail.
 
+### AI follow-up design (2026-08-02)
+
+- Public surface: no new exports or commands; retain `generate plugins` as authoritative.
+- Domain vocabulary: existing runtime manifest targets and generated AI tool/agent registries.
+- Ports: existing `FileSystemPort` and `ProcessPort`; no new effect seam.
+- Constants: one E2E failure-hint constant beside the existing app-home hint.
+- Commit slices: gate diagnostics; evidence-led generator fix and imported registry test; final
+  harness/gate evidence.
+- Deferred scope: AI runtime/provider behavior outside registry regeneration.
+- Contributor path: AI registry discovery remains declared by `plugins/ai/scaffold.runtime.json`
+  and rendered by the plugin-owned compiler.
+
 ### Contributor Path
 
 Add a runtime generator by publishing `scaffold.runtime.json` with `runtimeRegistryGenerator` and

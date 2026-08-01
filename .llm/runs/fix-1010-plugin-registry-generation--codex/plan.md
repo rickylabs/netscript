@@ -149,3 +149,38 @@ on empty runtime results, and make `plugin sync` delegate to it.
 - Installed metadata cannot identify package source generically.
 - Plugin generator output cannot be validated without plugin-specific knowledge.
 - Current source no longer reproduces the parent-process import failure after delegation.
+
+## Follow-up Plan — AI chat-route registry regression (2026-08-02)
+
+### Finding and scope
+
+The previously deferred AI integration decision is reopened because the merge-readiness runtime
+suite now reaches and fails `behavior.ai-chat-route`. The affected surface remains Archetype 6:
+the CLI's manifest-driven installed-runtime generation and its E2E gate. No public export or
+`deno.json` surface change is planned.
+
+### Locked decisions
+
+1. Make the AI behavior gate explicitly capture subprocess output and provide an actionable failure
+   hint; do not weaken its route, tool-resolution, or handler-call assertions.
+2. Reproduce from an existing scaffold artifact or a minimal local-source project before changing
+   generation behavior, and record the exact import/runtime error.
+3. Fix the manifest-driven generation path or AI generator contract proven responsible. Plugin
+   manifests remain the authority; no host-side AI name switch is allowed.
+4. Add executable integration evidence by importing generated AI registries and asserting resolved
+   `Map` entries.
+5. Keep the change internal. If no export map changes, JSR surface review is `no surface change` and
+   publish-shape mutation gates are unnecessary.
+
+### Commit slices
+
+| # | Slice | Proof |
+| - | ----- | ----- |
+| 1 | Explicit AI gate capture and failure hint | E2E gate-definition test/check |
+| 2 | Root-cause generation fix plus imported-registry regression | focused generate/plugins tests |
+| 3 | Harness evidence and requested static/quality gates | scoped wrappers + `quality:gate` |
+
+### Evaluator waiver
+
+The owner waived the open-model Plan-Gate on 2026-08-01 and assigned PLAN-EVAL/IMPL-EVAL to the
+supervisor. This implementation session proceeds without creating or modifying `plan-eval.md`.

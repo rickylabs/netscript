@@ -1,5 +1,11 @@
 # Drift Log — fix-1010-plugin-registry-generation--codex
 
+## 2026-08-02 — owner waiver — supervisor evaluates AI follow-up
+
+The owner explicitly waived the open-model Plan-Gate for the AI chat-route follow-up and assigned
+PLAN-EVAL/IMPL-EVAL to the supervisor. No evaluator tool is launched and no `plan-eval.md` is
+fabricated or changed by this implementation session.
+
 ## 2026-08-01 — minor — sync context mechanism narrowed
 
 The issue suspected that plugin sync loaded project configuration in the CLI context. Current source
