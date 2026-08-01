@@ -21,6 +21,25 @@
 - **Action:** retry the same mandated route with all evidence embedded and tools explicitly unused.
 - **Evidence:** provider canary passed immediately before the failed evaluator launch.
 
+## 2026-08-01 — Cold topology explains local 200 versus CI 500
+
+- **What:** Reproduced the production failure and isolated the generated import map as the causal
+  difference.
+- **Source:** Exact `scaffold.runtime --source jsr --cli jsr:@netscript/cli@0.0.2-canary.5`
+  topology under `.llm/tmp/cli-e2e`, with `DENO_DIR=/tmp/netscript-deno-cold-before-1007`.
+- **Expected:** Determine whether repository nesting/root installs or the app catalog controls
+  Vite-visible dependency installation.
+- **Actual:** Root dependencies downloaded into the cold Deno cache, but the canary app's own
+  `node_modules/.deno` lacked TanStack Preact Query and the exact app-home probe returned HTTP 500.
+  A copy made without any `node_modules`, with only the four generated imports added and a second
+  empty DENO_DIR, installed `@tanstack+preact-query@5.101.4`; the identical probe returned HTTP 200
+  with 130,356 bytes of HTML.
+- **Severity:** significant
+- **Action:** fix confirmed; retain the catalog change and treat the earlier `/tmp` 200 as a warm
+  generated-app false pass, not contradictory root-cause evidence.
+- **Evidence:** `.llm/tmp/canary5-cold-repro.ndjson`; cold workspaces
+  `plugin-smoke-20260801-040212` and `cold-after-manual-1007` (ephemeral, untracked).
+
 ## 2026-08-01 — SDK runtime subset is also required
 
 - **What:** The first full runtime gate exposed incompatible `@tanstack/db` 0.6.16/0.6.17 types.
@@ -30,3 +49,13 @@
 - **Severity:** significant
 - **Action:** rescope within issue #1007 to derive SDK runtime dependencies from its existing `package.json` contract and enforce them in the same drift test.
 - **Evidence:** full gate passed 20 steps and failed only generated type-check at the duplicate TanStack DB boundary.
+
+## 2026-08-01 — Query DB collection range admitted an incompatible minor
+
+- **What:** App-level SDK pins alone did not unify TanStack DB types.
+- **Source:** `deno why` in the generated workspace after gate attempts 1 and 2.
+- **Expected:** Direct scaffold imports would converge the SDK dependency graph.
+- **Actual:** `@tanstack/query-db-collection@1.1.0` depends on DB 0.6.16 while current Fresh/SDK packages depend on DB 0.6.17.
+- **Severity:** significant
+- **Action:** use `deps:latest` stable-channel authority and align the root/SDK/scaffold range to `^1.2.1`, whose inspected graph uses DB 0.6.17.
+- **Evidence:** `deps:latest --filter @tanstack/query-db-collection`; `deno info npm:@tanstack/query-db-collection@1.2.1`.

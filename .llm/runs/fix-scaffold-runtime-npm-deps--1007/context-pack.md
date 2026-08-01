@@ -12,7 +12,7 @@
 
 ## Current State
 
-Issue #1007 and draft PR #1008 are open. The scaffold catalog now emits the runtime subset and a focused three-way drift contract passes.
+Issue #1007 and draft PR #1008 are open. The scaffold catalog emits the runtime subset, the drift contract passes, and an empty-cache before/after test reproduced HTTP 500 then proved HTTP 200 after only the generated imports changed.
 
 ## Completed
 
@@ -51,8 +51,8 @@ Issue #1007 and draft PR #1008 are open. The scaffold catalog now emits the runt
 | --- | --- | --- |
 | Static | PLAN-EVAL passed | `plan-eval.md` |
 | Fitness | focused pass | 15 focused test steps passed |
-| Runtime | baseline failed | production run 30677734061 |
-| Consumer | baseline failed cold / passed warm | drift log |
+| Runtime | cold causal A/B passed | baseline 500; import-only copy 200/130,356 bytes |
+| Consumer | causal proof passed | `drift.md` cold-topology entry |
 
 ## Open Questions
 
