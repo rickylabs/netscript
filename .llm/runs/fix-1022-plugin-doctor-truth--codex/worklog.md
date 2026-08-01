@@ -94,5 +94,8 @@ transport rather than misrepresented as complete.
 - Passing `cli` through `normalizePluginManifest` revives the previously dropped auth doctor hook;
   retained as a small drive-by correctness fix.
 - Known risk: source `.ts` doctor modules resolve in local/copied-source plugins. Published/compiled
-  binary resolution needs a production-package smoke in a follow-up; record as debt before claiming
-  published-binary parity.
+  binary resolution needs a production-package smoke in a follow-up; debt
+  `cli-plugin-doctor-published-module` records the missing proof.
+- Correction gates: all four scoped check/lint/fmt roots passed with zero findings; 33 targeted
+  tests passed, including command exit 0 on output produced by both real workers generators and the
+  real shared sagas generator. `quality:gate` also exited 0 with no new findings.

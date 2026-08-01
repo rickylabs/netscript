@@ -21,4 +21,5 @@ implemented locally.
 
 - Drift: evaluator transport owner override recorded in `supervisor.md`; production config child
   loader flattens Zod issues, so acceptance box 5 remains unticked.
-- Debt: none created yet.
+- Debt: `cli-plugin-doctor-published-module` records the compiled/public CLI + JSR plugin module
+  resolution smoke that remains unproved.
