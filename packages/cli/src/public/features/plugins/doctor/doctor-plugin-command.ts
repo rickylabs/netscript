@@ -11,6 +11,7 @@ import type { CliffyCommand } from "../../../../kernel/presentation/command-type
 import { Command } from '@cliffy/command';
 
 import { outputText } from '../../../../kernel/presentation/output/default-output.ts';
+import { RemoteError } from '../../../../kernel/domain/errors/cli-exit-error.ts';
 import { type ProjectRootResolver, requireProjectRoot } from '../../../presentation/support.ts';
 import type { PluginDoctorInput, PluginDoctorReport } from './doctor-plugin-use-case.ts';
 
@@ -46,6 +47,13 @@ export function createDoctorPluginCommand(
       );
       const reports = await dependencies.doctor({ projectRoot });
       renderDoctorReports(reports, print);
+      const errored = reports.filter((report) => report.status === 'error');
+      if (errored.length > 0) {
+        const names = errored.map((report) => report.pluginName).join(', ');
+        const summary = `Plugin doctor failed: ${names}. Follow the remediation commands above.`;
+        print(summary);
+        throw new RemoteError(1, summary, { context: { plugins: names } });
+      }
     });
 }
 

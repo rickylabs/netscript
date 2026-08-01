@@ -31,6 +31,7 @@ type RegisteredPluginSnapshot = Pick<
   | 'entrypoints'
   | 'runtime'
   | 'runtimeConfig'
+  | 'doctor'
   | 'cli'
 >;
 
@@ -113,6 +114,8 @@ function normalizePluginManifest(
       }
       : undefined,
     runtimeConfig: definition.runtimeConfig,
+    doctor: definition.doctor,
+    cli: definition.cli,
   };
 }
 
@@ -453,6 +456,7 @@ function resolveRegisteredPluginSnapshot(
     runtimeConfig: definition.contributions.runtimeConfigTopics?.length
       ? { schemas: [] }
       : undefined,
+    doctor: definition.contributions.doctor,
     cli: definition.contributions.cli,
   };
 }
