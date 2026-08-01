@@ -1,4 +1,5 @@
-import { basename, dirname, join } from '@std/path';
+import { parse as parseJsonc } from '@std/jsonc';
+import { basename, dirname, fromFileUrl, isAbsolute, join, resolve } from '@std/path';
 
 import type { FileSystemPort } from '../../../../kernel/ports/file-system-port.ts';
 import type { ProcessPort } from '../../../../kernel/ports/process-port.ts';
@@ -36,6 +37,11 @@ interface InstalledRuntimePackage {
   readonly version: string;
 }
 
+interface ResolvedRuntimeManifest {
+  readonly generatorBase: string;
+  readonly value: unknown;
+}
+
 /** Minimal JSON HTTP response used to fetch published runtime manifests. */
 export interface RuntimeManifestResponse {
   readonly ok: boolean;
@@ -62,15 +68,13 @@ export function createInstalledRuntimeRegistryGenerator(
     const generated: GeneratedPluginRegistry[] = [];
 
     for (const installed of packages) {
-      const manifestUrl = publishedPackageFileUrl(installed, 'scaffold.runtime.json');
-      const response = await dependencies.fetchManifest(manifestUrl);
-      if (response.status === 404) continue;
-      if (!response.ok) {
-        throw new Error(
-          `Failed to load runtime registry manifest for "${installed.name}" (HTTP ${response.status}).`,
-        );
-      }
-      const manifest = readRuntimeManifest(await response.json(), installed.name);
+      const resolvedManifest = await resolveRuntimeManifest(
+        input.projectRoot,
+        installed,
+        dependencies,
+      );
+      if (!resolvedManifest) continue;
+      const manifest = readRuntimeManifest(resolvedManifest.value, installed.name);
       const generator = manifest.runtimeRegistryGenerator;
       const targets = manifest.runtimeRegistries;
       if (!generator || !targets?.length) continue;
@@ -93,7 +97,7 @@ export function createInstalledRuntimeRegistryGenerator(
         dependencies,
         installed,
         generator,
-        manifestUrl,
+        generatorBase: resolvedManifest.generatorBase,
         projectRoot: input.projectRoot,
         rawManifest: manifest.raw,
         targets,
@@ -110,6 +114,73 @@ export function createInstalledRuntimeRegistryGenerator(
 
     return generated;
   };
+}
+
+async function resolveRuntimeManifest(
+  projectRoot: string,
+  installed: InstalledRuntimePackage,
+  dependencies: InstalledRuntimeRegistryGeneratorDependencies,
+): Promise<ResolvedRuntimeManifest | undefined> {
+  const memberRoot = await findWorkspaceMemberRoot(projectRoot, installed.packageName, dependencies.fs);
+  if (memberRoot) {
+    const manifestPath = join(memberRoot, 'scaffold.runtime.json');
+    if (await dependencies.fs.exists(manifestPath)) {
+      return {
+        generatorBase: memberRoot,
+        value: JSON.parse(await dependencies.fs.readFile(manifestPath)),
+      };
+    }
+  }
+
+  const manifestUrl = publishedPackageFileUrl(installed, 'scaffold.runtime.json');
+  const response = await dependencies.fetchManifest(manifestUrl);
+  if (response.status === 404) return undefined;
+  if (!response.ok) {
+    throw new Error(
+      `Failed to load runtime registry manifest for "${installed.name}" (HTTP ${response.status}).`,
+    );
+  }
+  return { generatorBase: manifestUrl, value: await response.json() };
+}
+
+async function findWorkspaceMemberRoot(
+  projectRoot: string,
+  packageName: string,
+  fs: FileSystemPort,
+): Promise<string | undefined> {
+  const configPath = join(projectRoot, 'deno.json');
+  if (!await fs.exists(configPath)) return undefined;
+  const config = asRecord(parseJsonc(await fs.readFile(configPath)));
+  const imports = asRecord(config.imports);
+  const candidates = Object.entries(imports).filter(([key, value]) =>
+    (key === packageName || key.startsWith(`${packageName}/`)) &&
+    typeof value === 'string' && isLocalImport(value)
+  );
+  for (const [, value] of candidates) {
+    let current = dirname(resolveLocalImport(projectRoot, value as string));
+    while (true) {
+      for (const configName of ['deno.json', 'deno.jsonc']) {
+        const memberConfigPath = join(current, configName);
+        if (!await fs.exists(memberConfigPath)) continue;
+        const memberConfig = asRecord(parseJsonc(await fs.readFile(memberConfigPath)));
+        if (memberConfig.name === packageName) return current;
+      }
+      const parent = dirname(current);
+      if (parent === current) break;
+      current = parent;
+    }
+  }
+  return undefined;
+}
+
+function isLocalImport(value: string): boolean {
+  return value.startsWith('./') || value.startsWith('../') || value.startsWith('file:') ||
+    isAbsolute(value);
+}
+
+function resolveLocalImport(projectRoot: string, value: string): string {
+  if (value.startsWith('file:')) return fromFileUrl(value);
+  return isAbsolute(value) ? value : resolve(projectRoot, value);
 }
 
 async function discoverInstalledRuntimePackages(
@@ -217,7 +288,7 @@ async function runGenerator(options: {
   readonly dependencies: InstalledRuntimeRegistryGeneratorDependencies;
   readonly installed: InstalledRuntimePackage;
   readonly generator: RuntimeRegistryGeneratorDeclaration;
-  readonly manifestUrl: string;
+  readonly generatorBase: string;
   readonly projectRoot: string;
   readonly rawManifest: unknown;
   readonly targets: readonly RuntimeRegistryTarget[];
@@ -230,10 +301,9 @@ async function runGenerator(options: {
   );
   await options.dependencies.fs.writeFile(manifestPath, `${JSON.stringify(options.rawManifest)}\n`);
   try {
-    const generatorUrl = new URL(
-      options.generator.command,
-      options.manifestUrl,
-    ).href;
+    const generatorUrl = options.generatorBase.startsWith('https:')
+      ? new URL(options.generator.command, options.generatorBase).href
+      : join(options.generatorBase, options.generator.command);
     const result = await options.dependencies.process.exec('deno', [
       'run',
       '--config',
