@@ -5,6 +5,7 @@ import {
   artifactText,
   collectInstallArtifacts,
   type NetScriptPlugin,
+  type ScaffoldArtifact,
 } from '@netscript/plugin/adapter';
 
 type DenoConfig = Readonly<{
@@ -131,21 +132,54 @@ async function main(): Promise<void> {
       }),
     );
     const emittedFiles: string[] = [];
-    const owners = new Map<string, string>();
-    for (const plugin of await adapterPlugins()) {
-      for (const artifact of collectInstallArtifacts(plugin)) {
-        if (!artifact.path.endsWith('.ts') && !artifact.path.endsWith('.tsx')) continue;
-        const previousOwner = owners.get(artifact.path);
-        if (previousOwner !== undefined) {
+    const emissions = new Map<
+      string,
+      Readonly<{ owner: string; source: string; text: string }>
+    >();
+    let sampleCount = 0;
+
+    const emit = async (
+      plugin: NetScriptPlugin,
+      source: string,
+      artifact: ScaffoldArtifact,
+    ): Promise<void> => {
+      if (!artifact.path.endsWith('.ts') && !artifact.path.endsWith('.tsx')) return;
+      const text = artifactText(artifact);
+      const previous = emissions.get(artifact.path);
+      if (previous !== undefined) {
+        if (previous.owner !== plugin.name) {
           throw new Error(
-            `Emitted sample collision at ${artifact.path}: ${previousOwner} and ${plugin.name}`,
+            `Emitted sample collision at ${artifact.path}: ${previous.owner} and ${plugin.name}`,
           );
         }
-        owners.set(artifact.path, plugin.name);
-        const target = join(workspace, artifact.path);
-        await Deno.mkdir(join(target, '..'), { recursive: true });
-        await Deno.writeTextFile(target, artifactText(artifact));
-        emittedFiles.push(target);
+        if (previous.text !== text) {
+          throw new Error(
+            `Conflicting ${plugin.name} samples at ${artifact.path}: ${previous.source} and ${source}`,
+          );
+        }
+        return;
+      }
+
+      emissions.set(artifact.path, { owner: plugin.name, source, text });
+      const target = join(workspace, artifact.path);
+      await Deno.mkdir(join(target, '..'), { recursive: true });
+      await Deno.writeTextFile(target, text);
+      emittedFiles.push(target);
+    };
+
+    for (const plugin of await adapterPlugins()) {
+      sampleCount += plugin.install.starterResources.length;
+      for (const artifact of collectInstallArtifacts(plugin)) {
+        await emit(plugin, 'install', artifact);
+      }
+      for (const resource of plugin.resources ?? []) {
+        if (resource.defaultInput === undefined) {
+          throw new Error(`${plugin.name} resource ${resource.name} has no defaultInput.`);
+        }
+        for (const artifact of resource.scaffolder.emit(resource.defaultInput)) {
+          if (artifact.path.endsWith('.ts') || artifact.path.endsWith('.tsx')) sampleCount += 1;
+          await emit(plugin, `add ${resource.name}`, artifact);
+        }
       }
     }
 
@@ -162,7 +196,7 @@ async function main(): Promise<void> {
     const result = await command.output();
     if (!result.success) Deno.exit(result.code);
     console.log(
-      `Checked ${emittedFiles.length} emitted TypeScript samples from ${owners.size} artifact paths.`,
+      `Checked ${sampleCount} emitted TypeScript samples from ${emissions.size} artifact paths.`,
     );
   } finally {
     await Deno.remove(workspace, { recursive: true });
