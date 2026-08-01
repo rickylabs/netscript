@@ -12,6 +12,16 @@ Append-only. Record deviations from the issue framing, locked plan, route policy
   remains the observed run-state/backchannel asymmetry in Aspire CLI 13.4.6.
 - Route/scope change: none.
 
+## 2026-08-01 — Cause changed from upstream to NetScript-side
+
+- Severity: significant.
+- Expected: Aspire CLI automatic lookup defect requiring a documented URL workaround.
+- Actual: removing NetScript's anonymous dashboard flag restored automatic discovery under a
+  detached isolated start; the generated configuration suppressed the tokenized dashboard info.
+- Impact: remove docs/skill/upstream-issue work from scope; fix both generator emission sites and
+  prove automatic `--apphost` discovery in E2E.
+- Authorization: demanded by cycle-1 PLAN-EVAL Finding 1; within the issue's explicit conditional fix shape.
+
 ## 2026-08-01 — Formal local evaluator credential unavailable
 
 - Severity: significant (process blocker, not product-scope drift).

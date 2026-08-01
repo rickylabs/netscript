@@ -14,10 +14,12 @@
 | 1 | A fresh NetScript-generated TypeScript AppHost reproduces the defect on Aspire CLI 13.4.6. | Start `.llm/tmp/telemetry-1025-repro/aspire/apphost.mts`; automatic `aspire otel traces users --apphost apphost.mts ...` prints `Could not fetch telemetry data from the dashboard. The dashboard is not available.` and exits 12. |
 | 2 | Aspire run-state contains the correct URL while automatic discovery fails. | In the same detached-start shell, `aspire ps --format Json` returned `dashboardUrl: https://localhost:42183`. |
 | 3 | Dashboard HTTP access works with explicit discovery. | With the run-state URL, `aspire otel traces users --dashboard-url https://localhost:43903 ... --format Json` returned `[]` and exit 0. Empty data is expected in the minimal control before traffic. |
-| 4 | The defect is upstream Aspire CLI discovery, not a missing NetScript template publication hook. | The same Aspire process writes the URL to run-state and serves its dashboard; only the CLI's AppHost/backchannel lookup fails. The CLI forbids combining `--apphost` and `--dashboard-url`, so the workaround must target the dashboard directly. |
+| 4 | The defect is NetScript-side: anonymous dashboard mode suppresses the login-token URL needed by automatic discovery. | In the disposable generated scaffold, remove only `ASPIRE_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS` from both `aspire.config.json` and `configure-dashboard.mts`; a detached isolated start then prints a tokenized dashboard login URL and automatic `aspire otel traces users --apphost apphost.mts ...` returns `[]`, exit 0. |
 | 5 | `aspire otel traces --help` and `aspire export --help` expose `--dashboard-url` but no `--isolated`. | Live 13.4.6 help output captured during research. |
 | 6 | Existing telemetry checks can silently warn. | `.llm/tools/e2e/scaffold-e2e-test.ts:1227-1264` sets `critical` from `--strict-telemetry`; neither command asserts non-empty JSON. |
-| 7 | A minimal C# control was attempted but template resolution exceeded the execution window. | `aspire new aspire-empty ... --language csharp` stopped after `Resolving template version...`; this is partial evidence and is not used to claim parity. |
+| 7 | `ASPIRE_ALLOW_UNSECURED_TRANSPORT` is not the cause and must remain. | Removing it makes startup fail because NetScript configures an HTTP OTLP endpoint; restoring it while leaving anonymous mode unset makes discovery pass. |
+| 8 | The presumed isolated-mode defect does not exist after the template fix. | The passing control used `aspire start --isolated` and automatic `aspire otel traces ... --apphost apphost.mts`; no `--isolated` option is needed on the consumer command. |
+| 9 | Anonymous mode is emitted twice by NetScript. | `generate-aspire-config.ts` writes the environment variable into `aspire.config.json`; `configure-dashboard.ts.template` sets it in the AppHost process. Both must be removed and the embedded asset regenerated. |
 
 ## jsr-audit surface scan
 
@@ -25,9 +27,6 @@
 
 ## Open questions
 
-- Must resolve now: exact `aspire ps` selection logic when more than one isolated AppHost is running.
-  Resolve by matching the canonical `appHostPath` to `this.appHost`, never selecting array element 0.
 - Must resolve now: what counts as non-empty telemetry JSON. Resolve by parsing command stdout and
   requiring a non-empty JSON array for the traces step after the suite has exercised HTTP traffic.
-- Safe to defer: upstream behavior on a minimal C# AppHost, because the run-state/backchannel
-  asymmetry already locates the failing component in Aspire CLI and the NetScript workaround is the same.
+- Safe to defer: no open cause question remains; the local A/B control directly changed the failing behavior.

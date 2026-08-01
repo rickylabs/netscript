@@ -15,11 +15,10 @@
 
 - No NetScript public API or CLI verb changes.
 - Repository E2E behavior: detached scaffold runtime telemetry becomes a semantic gate.
-- Agent/documentation surface: literal-error troubleshooting recipe for `otel` and `export`.
+- Generated scaffold surface: authenticated dashboard URLs remain automatically discoverable.
 
 ### Domain Vocabulary
 
-- `DashboardRunState` — the minimal `appHostPath`/`dashboardUrl` record parsed from `aspire ps`.
 - `OutputAssertion` — an internal post-command semantic assertion for captured stdout.
 
 ### Ports
@@ -28,38 +27,38 @@
 
 ### Constants
 
-- Telemetry export filename and literal dashboard error text; no new extensible enum axis.
+- Telemetry export filename; no new extensible enum axis.
 
 ### Commit Slices
 
 | # | Slice | Gate | Files |
 | - | - | - | - |
 | 1 | Bootstrap research/plan and obtain PLAN-EVAL | PLAN-EVAL PASS | `.llm/runs/.../*` |
-| 2 | Make workaround discoverable and sync skill mirror | sync check + docs gates | `.agents/skills/aspire/SKILL.md`, `.claude/skills/aspire/SKILL.md`, `docs/site/observability/telemetry.md`, run artifacts |
-| 3 | Strengthen detached telemetry/export regression | scoped check/lint/fmt + focused tests | `.llm/tools/e2e/scaffold-e2e-test.ts`, tests, run artifacts |
+| 2 | Remove anonymous dashboard mode at both generator sources | focused template tests + asset generation | `generate-aspire-config.ts`, dashboard template, embedded asset, tests, run artifacts |
+| 3 | Strengthen automatic detached telemetry/export regression | scoped check/lint/fmt + focused tests | `.llm/tools/e2e/scaffold-e2e-test.ts`, tests, run artifacts |
 | 4 | Execute one-pass runtime evidence and final evaluation | scaffold runtime + IMPL-EVAL | run artifacts and PR/issue evidence |
 
 ### Deferred Scope
 
-- Upstream CLI implementation fix — owned by the upstream issue.
-- C# AppHost parity control — not required to implement or validate the run-state workaround.
+- C# AppHost parity control — the NetScript A/B control directly established the cause.
 
 ### Contributor Path
 
-Start at `#checkTelemetry()` in `.llm/tools/e2e/scaffold-e2e-test.ts`; dashboard discovery stays next
-to the commands that consume it. Agent-facing recovery starts at the literal error heading in the Aspire skill.
+Start at the dashboard environment variables in `generate-aspire-config.ts` and the dashboard helper
+template; runtime proof lives at `#checkTelemetry()` in `.llm/tools/e2e/scaffold-e2e-test.ts`.
 
 ## Progress Log
 
 | Time | Slice | Step | Notes |
 | --- | --- | --- | --- |
 | 2026-08-01 21:21 CEST | 1 | research complete | Exact failure exit 12 and explicit-URL exit 0 reproduced on generated TS AppHost. |
+| 2026-08-01 21:26 CEST | 1 | discriminator complete | Removing anonymous mode restored tokenized URL and automatic traces exit 0 under `--isolated`. |
 
 ## Decisions
 
 | Decision | Reason | Source |
 | --- | --- | --- |
-| Upstream classification | Run-state has URL and dashboard serves; only automatic CLI lookup fails. | research F1-F4 |
+| NetScript-side classification | Removing only anonymous mode changed automatic discovery from exit 12 to exit 0. | research F4, F7-F9 |
 
 ## Drift
 
@@ -71,3 +70,5 @@ to the commands that consume it. Agent-facing recovery starts at the literal err
 
 - PLAN-EVAL launch: BLOCKED before launch. Live provider canary reported absent OpenRouter
   credential (`auth_required`) for the canonical Qwen evaluator route. No implementation started.
+- Separate owner-supervisor PLAN-EVAL at `575aea3fb`: FAIL_PLAN; required the anonymous-mode A/B
+  control and an honest acceptance mapping. Both plan defects are now amended for cycle 2.
