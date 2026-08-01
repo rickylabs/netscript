@@ -118,3 +118,26 @@ transport rather than misrepresented as complete.
   still encodes the old exit-0 lie; it is recorded as depending on #1010 rather than weakening doctor.
 - Targeted tests: 21 passed (19 nested install cases), 0 failed. Scoped checks completed without
   diagnostics; all four lint and format roots passed with zero findings.
+
+### IMPL-EVAL round 4 publish correction
+
+- Cause verified: both plugin packages exported `./doctor` while their explicit `publish.include`
+  allowlists omitted the root `doctor.ts` module. Added it beside the other individually listed root
+  modules; no glob or source behavior changed.
+- Publish dry-run command: `deno task publish:dry-run` (repo task invokes
+  `.llm/tools/release/run-publish-dry-run.ts`). Verbatim relevant output:
+
+  ```text
+  Task publish:dry-run deno run --allow-read --allow-write --allow-run .llm/tools/release/run-publish-dry-run.ts
+  Publishing a workspace...
+  Check plugins/sagas/doctor.ts
+  Check plugins/workers/doctor.ts
+  Simulating publish of @netscript/plugin-sagas@0.0.2 with files:
+     file:///home/codex/repos/fix-1022/plugins/sagas/doctor.ts (113B)
+  Success Dry run complete
+  ```
+
+  Exit code: `0`; zero publish problems. The complete workspace output also simulated
+  `@netscript/plugin-workers@0.0.2` and its module graph included `plugins/workers/doctor.ts`.
+- `deno task quality:gate`: exit `0`; existing warning-only doctrine/dependency findings, no failures.
+- Scoped checks: workers `99` files / `0` diagnostics; sagas `72` files / `0` diagnostics.
