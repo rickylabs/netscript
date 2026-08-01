@@ -54,6 +54,7 @@ environment, or project-root inputs to it, and tests inject env/cwd/import behav
 | Time | Slice | Step | Notes |
 | --- | --- | --- | --- |
 | 2026-08-01 | plan | research/design | Verified all supplied cause leads against `3ab64720f`; no implementation started. |
+| 2026-08-01 | plan-eval | evaluator launch | Canonical Qwen/Claude-OpenRouter session `5e52c824-93f1-49ef-80ae-12fcd8a4c1e8` failed authentication before a model turn; no verdict produced and no implementation started. |
 
 ## Decisions
 
@@ -69,4 +70,5 @@ environment, or project-root inputs to it, and tests inject env/cwd/import behav
 
 ## Gate Results
 
-Pending PLAN-EVAL.
+Pending PLAN-EVAL. The local evaluator route is blocked on OpenRouter authentication; harness
+policy forbids substituting self-evaluation or dispatching cloud OpenHands for this local run.
