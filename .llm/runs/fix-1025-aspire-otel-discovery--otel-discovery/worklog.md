@@ -61,12 +61,17 @@ template; runtime proof lives at `#checkTelemetry()` in `.llm/tools/e2e/scaffold
 | 2026-08-01 22:02 CEST | 3 | independent slice review FAIL | Opus session `5744e2a4` found authenticated-dashboard blast radius in the real `scaffold.runtime` telemetry consumers and generated telemetry UI. Sign-off withheld. |
 | 2026-08-01 23:48 CEST | C2-S0 | rejected implementation restored | All seven named product/diagnostic files restored to `origin/main`; run artifacts retained. |
 | 2026-08-01 23:55 CEST | C2-S1 | A/B diverged; implementation stopped | Authenticated and anonymous detached starts both returned automatic traces `[]`, exit 0. Owner stop condition invoked. |
+| 2026-08-02 00:16 CEST | C3-S1 | traffic-bearing discriminator complete | Bare, `--apphost`, and explicit URL returned non-empty traces exit 0; both export routes wrote non-empty archives. Reported exit 12 does not reproduce. |
+| 2026-08-02 00:29 CEST | C3-S2-S4 | implementation and scoped gates complete | Generated bare-first telemetry/export tasks, README/skill/docs guidance, and a real runtime gate requiring non-empty trace JSON. Focused tests 35/35; scoped check/lint/fmt, docs maintenance, and quality gate passed. |
+| 2026-08-02 00:30 CEST | C3-S5 | one-pass runtime gate partial | Required single `scaffold.runtime` run exited 1: 44 passed, then pre-existing `behavior.service-health` failed on an unhealthy Prisma database check before the new telemetry gate was reached; cleanup passed. No rerun performed. |
 
 ## Decisions
 
 | Decision | Reason | Source |
 | --- | --- | --- |
-| NetScript-side classification | Removing only anonymous mode changed automatic discovery from exit 12 to exit 0. | research F4, F7-F9 |
+| Cycle-1 NetScript-side classification (superseded) | Removing only anonymous mode appeared to change automatic discovery from exit 12 to exit 0; later controlled runs did not reproduce it. | research F4, F7-F9; cycle-3 discriminator |
+| Current cause remains unclassified | With real traffic, every supported discovery route and both export variants succeeded on the installed build; the historical exit 12 is not reproducible. | cycle-3 discriminator |
+| Generated bare-first route with URL fallback | Gives cold-start agents a memorable task while preserving dashboard security and recovering if Aspire discovery regresses. | cycle-3 plan L1-L5 |
 
 ## Drift
 
@@ -98,3 +103,17 @@ template; runtime proof lives at `#checkTelemetry()` in `.llm/tools/e2e/scaffold
 - Full `scaffold.runtime`: NOT RUN because the cause-verification stop condition fired first.
 - Acceptance box 4 upstream issue: owner action required if the final classification is upstream;
   this lane has no authority to file on `dotnet/aspire`.
+- Cycle-3 discriminator: PASS for all tested routes; root-cause row is `none reproduces` on the
+  installed 13.4.6 build. Emitted route will use bare-first plus explicit-URL fallback.
+- Cycle-3 focused tests: PASS — 35 passed, 0 failed.
+- Cycle-3 scoped TypeScript check/lint/fmt: PASS — 72 files, zero diagnostics/findings.
+- Cycle-3 docs maintenance and skill sync: PASS — 98 docs, zero broken links/anchors; sync clean.
+- Cycle-3 package quality gate: PASS — zero quality findings; existing dependency/doctrine warnings
+  remain non-blocking.
+- Cycle-3 full `scaffold.runtime`: FAIL (exit 1) after 44 passes. `behavior.service-health` reported
+  the generated users service's Prisma database check unhealthy; the new
+  `behavior.otel-task-traces` gate was not reached. Cleanup passed. Per the one-pass instruction,
+  the suite was not rerun and box 5 is only partly evidenced.
+- Post-suite retained-scaffold attempt: the AppHost could be restarted detached, but generated
+  resources exited before worker traffic could be produced; it was stopped cleanly. This does not
+  upgrade the runtime-gate result.

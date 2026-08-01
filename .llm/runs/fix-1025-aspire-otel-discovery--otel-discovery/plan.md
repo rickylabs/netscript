@@ -1,5 +1,49 @@
 # Plan: detached Aspire telemetry discovery
 
+## Cycle 3 implementation plan — 2026-08-02
+
+Owner waiver remains active: the supervisor owns PLAN-EVAL/IMPL-EVAL and this generator will not
+invoke an external evaluator lane. Cycle 1's environment-variable change remains rejected.
+
+### Locked decisions
+
+| ID | Decision | Rationale |
+| --- | --- | --- |
+| C3-L1 | Run one traffic-bearing detached discriminator across bare, `--apphost`, and explicit-URL routes. | Empty telemetry cannot prove discovery, and cycle 2 did not test the bare command. |
+| C3-L2 | Emit workspace tasks using whichever route the discriminator proves reliable. | Cold-start users should not memorize Aspire discovery flags. |
+| C3-L3 | Keep dashboard configuration and security byte-unchanged. | Anonymous access is load-bearing for existing consumers. |
+| C3-L4 | Put runtime coverage in `packages/cli/e2e`'s real `scaffold.runtime` gate. | The rejected `.llm/tools/e2e` path is diagnostic only. |
+| C3-L5 | Keep the 53-file dashboard guidance sweep deferred. | Only the generated README, Aspire skill, and one observability page are owned here. |
+
+### Open-decision sweep
+
+| Decision | Status | Resolution |
+| --- | --- | --- |
+| Task transport (`--apphost` vs `--dashboard-url`) | must resolve now | Step-1 discriminator selects the proven detached route. |
+| Export output contract | resolved | Forward all user arguments; Aspire owns output-path semantics. |
+| URL-resolution failure wording | resolved | Non-zero exit, actual process/parse cause, and literal explicit-URL invocation. |
+| Upstream issue | owner action | This lane has no authority to file against `dotnet/aspire`. |
+
+### Cycle-3 slices
+
+| # | Slice | Gate | Files |
+| --- | --- | --- | --- |
+| C3-S1 | Traffic-bearing detached discriminator and cause record | raw four-row command evidence | `research.md`, `drift.md`, `worklog.md`, issue/PR comment |
+| C3-S2 | Emitted telemetry/export tasks and unit contracts | focused workspace generator tests + scoped static gates | `deno-json.ts`, `generators_test.ts`, supporting generated helper if required |
+| C3-S3 | Discoverability at existing entry points | docs maintenance + focused README tests | `generate-readme.ts`, Aspire skill + mirror, one observability page |
+| C3-S4 | Real runtime regression | focused E2E tests/static gates | `packages/cli/e2e/src/application/gates/scaffold/**` |
+| C3-S5 | One-pass scaffold evidence and handoff | `scaffold.runtime` once, terminal exit | run artifacts, PR evidence |
+
+### Risks
+
+| Risk | Mitigation |
+| --- | --- |
+| Telemetry flush lag yields a false empty result | Generate traffic first, prove non-empty via the known-good explicit URL, then compare routes against the same live AppHost. |
+| Multiple running AppHosts select the wrong URL | Match the generated workspace's absolute `appHostPath` in `aspire ps` parsing. |
+| Shell quoting breaks forwarded arguments | Put resolver/forwarding logic in a generated Deno script and keep tasks as simple `deno run -A` entry points. |
+| Failure guidance invents a URL when none exists | Print the real discovery/parse cause and an explicit command template using `<url>` when resolution produced no URL. |
+
+
 ## Cycle 2 replacement plan — 2026-08-01
 
 Owner waiver: the open-model Plan-Gate lane is waived. The supervisor owns PLAN-EVAL/IMPL-EVAL;

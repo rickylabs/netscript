@@ -63,3 +63,22 @@ cycle 1, where anonymous mode produced `The dashboard is not available`, exit 12
 
 The cycle-2 brief requires stopping when the A/B differs. The generated workspace resolver, README,
 Aspire skill, observability docs, and real runtime-gate changes therefore remain unimplemented.
+
+## Cycle 3 traffic-bearing discriminator — 2026-08-02
+
+One anonymous-mode AppHost was started detached with Aspire CLI
+`13.4.6+87fe259e4fc244c599019a7b1304c85a1488f248`. Five HTTP requests were sent to the generated
+dashboard application. The explicit-URL control returned 3,289 bytes of non-empty JSON containing
+the resulting `GET` server spans before the comparison commands ran.
+
+| Row | Invocation | Exit | Output evidence |
+| --- | --- | --- | --- |
+| A | `aspire otel traces dashboard-tyhhpjtr` | 0 | 3,322 bytes; `Scanning for running AppHosts...` followed by a non-empty JSON trace array |
+| B | `aspire otel traces dashboard-tyhhpjtr --apphost apphost.mts` | 0 | 3,289 bytes; non-empty JSON trace array |
+| C | `aspire otel traces dashboard-tyhhpjtr --dashboard-url https://localhost:44851` | 0 | 3,289 bytes; non-empty JSON trace array |
+| D1 | `aspire export -o /tmp/1025-c3-export-bare-83457.zip` | 0 | gathered all four data classes; 14,261-byte archive |
+| D2 | `aspire export --apphost apphost.mts -o /tmp/1025-c3-export-apphost-83457.zip` | 0 | gathered all four data classes; 15,795-byte archive |
+
+Conclusion: the reported exit-12 failure does not reproduce on this Aspire CLI build when telemetry
+is non-empty. Bare discovery works against the detached AppHost. The emitted task should use the
+bare command as the primary route and retain explicit-dashboard fallback for the reported failure.

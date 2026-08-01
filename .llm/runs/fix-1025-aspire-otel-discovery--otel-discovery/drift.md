@@ -73,3 +73,28 @@ Append-only. Record deviations from the issue framing, locked plan, route policy
 - Impact: cycle-1 evidence is not repeatable in the current persistent-shell control. Building a
   generated resolver on anonymous mode as the presently reproducible cause would violate the brief.
 - Disposition: stop before cycle-2 product implementation and report. No expensive runtime E2E run.
+
+## 2026-08-02 — Reported bare-command exit 12 does not reproduce with real traffic
+
+- Severity: significant cause reclassification; implementation shape remains bounded.
+- Control: one anonymous-mode detached AppHost, five HTTP requests, explicit URL first proved
+  non-empty traces were present.
+- Actual: bare, `--apphost`, and explicit-URL trace commands all returned the same non-empty traces
+  with exit 0. Bare and `--apphost` export both returned exit 0 and non-empty archives.
+- Cause classification: no current row explains the issue's exit 12 on Aspire CLI
+  `13.4.6+87fe259e4fc244c599019a7b1304c85a1488f248`; the reported failure is not reproducible on this
+  build. Do not attribute it to anonymous mode or `--apphost` absence.
+- Implementation adjustment: use the proven bare route first and add an explicit-dashboard fallback
+  so generated tasks remain useful if the reported discovery failure recurs.
+
+## 2026-08-02 — Full runtime pass stopped before the new telemetry gate
+
+- Severity: partial validation evidence; no implementation-scope change.
+- Command: `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` (run once).
+- Actual: exit 1 with 44 gates passed. `behavior.service-health` exhausted its probes because the
+  users service returned HTTP 503 with an unhealthy Prisma database check. The new generated-task
+  telemetry gate appears later in the suite and was not reached. Aspire cleanup passed.
+- Follow-up: a retained-scaffold detached restart did not keep the generated resources alive long
+  enough to generate fresh worker traffic, so it supplied no substitute non-empty task output.
+- Disposition: do not rerun the expensive suite; report acceptance box 5 as partly evidenced. Unit,
+  scoped, docs, and quality gates remain green.
