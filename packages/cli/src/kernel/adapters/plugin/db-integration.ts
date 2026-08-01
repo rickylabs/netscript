@@ -237,7 +237,7 @@ export async function copyPluginSchemasToRootDb(
   }
 
   if (results.length === 0 && options.schemaDeclared === true) {
-    const searchedPaths = [sourceRoot, options.packageSearchPath].filter(
+    const searchedPaths = [sourceRoot.replaceAll('\\', '/'), options.packageSearchPath].filter(
       (path): path is string => path !== undefined,
     );
     throw new ScaffoldValidationError(

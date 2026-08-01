@@ -204,3 +204,136 @@ not attributable to this test-only change. It remains untouched.
 
 Scope remains the single `check-test` defect. The owner retains PR/issue/push actions, so no GitHub
 surface was mutated. No drift from the repair plan and no architecture debt were introduced.
+
+## Augment Review Repair Slice — PR #1043
+
+### Plan and Design (2026-08-02)
+
+- Baseline: `0177a791fdb156623094528105a514f61fe90c08`; CI is green before this slice.
+- Archetype/boundaries: Archetype 6 CLI/tooling. `public/infra/jsr/` continues to own package-file
+  network IO and integrity policy; `kernel/adapters/plugin/` continues to own filesystem target and
+  diagnostic layout policy. No public signature, command surface, port, or dependency changes.
+- Slice 1 — integrity: retain original metadata key, normalized fetch path, and expected checksum as
+  one schema-file record; checksum the second-fetch bytes before decoding; hard-fail mismatches or
+  absent expectations. Add colocated positive and tamper-rejection tests. Gate: public JSR infra tests.
+- Slice 2 — diagnostics: normalize only the `sourceRoot` copy inserted into `searchedPaths`, using
+  the existing `replaceAll('\\', '/')` idiom. Filesystem probes keep the native `sourceRoot`.
+  Existing exact assertions remain unchanged. Gate: kernel plugin adapter tests.
+- Risks: normalized keys must not be used to index slash-prefixed metadata; integrity errors must
+  expose package/path/expected/actual; sort order and return type must remain stable; no pinned
+  NetScript JSR literal may enter tests. The requested focused, version guard, and scoped static
+  gates mitigate these risks.
+- Deferred/N/A: no cross-feature verified-byte plumbing, fetch caching, production install-flow
+  behavior beyond checksum gating, public API change, E2E/Aspire runtime, dependency, lockfile, or
+  GitHub mutation. JSR publish-surface audit is N/A because no exported signature or metadata changes.
+- Open decisions: none. The owner fixes the error policy and exact normalization approach in the
+  brief; implementation uses the existing layer-local `Error` pattern rather than importing a
+  feature-owned exit-code constant backward into infra.
+- Evaluation: the written 2026-08-01 owner waiver authorizes direct implementation after this plan;
+  the Opus 5 supervisor performs PLAN-EVAL and IMPL-EVAL. No external evaluator or fabricated
+  `plan-eval.md`.
+
+### Implementation and verification evidence (2026-08-02)
+
+- Integrity records retain the original metadata key, normalized fetch path, and expected checksum.
+  The bytes returned by the schema fetch are checksum-verified before UTF-8 decoding; tampering and
+  missing checksum expectations hard-fail with identifying diagnostics.
+- Only the `sourceRoot` copy placed in `searchedPaths` is slash-normalized. Native `sourceRoot`
+  remains unchanged for filesystem `exists`/`walk` operations, and both existing exact assertions
+  remain unchanged.
+- Initial new-test run exposed a `BufferSource` type mismatch in the test-only checksum helper. The
+  helper now copies into an `ArrayBuffer`, matching production technique; no design or scope drift.
+
+```text
+deno test -A packages/cli/src/public/infra/jsr/
+fetchJsrPackageSchemaFragments returns checksum-verified schema content ... ok (2ms)
+fetchJsrPackageSchemaFragments rejects tampered schema content ... ok (1ms)
+fetchJsrPackageSchemaFragments rejects a schema without a checksum ... ok (809µs)
+ok | 4 passed (8 steps) | 0 failed (156ms)
+```
+
+```text
+deno test -A packages/cli/src/public/features/plugins/
+ok | 22 passed (56 steps) | 0 failed (5s)
+```
+
+```text
+deno test -A packages/cli/src/kernel/adapters/plugin/
+ok | 24 passed | 0 failed (639ms)
+```
+
+```text
+deno test -A packages/cli/src/kernel/constants/version-drift_test.ts
+ok | 2 passed | 0 failed (407ms)
+```
+
+```text
+deno run -A .llm/tools/run-deno-check.ts --root packages/cli --ext ts,tsx
+{"source":{"mode":"selection","cwd":"/home/codex/repos/fix-1014"},"command":"deno check --quiet --unstable-kv <files>","selection":{"filesSelected":743,"batches":7,"failedBatches":0},"summary":{"totalOccurrences":0,"uniqueOccurrences":0,"uniqueCodes":0,"uniquePaths":0},"groups":[]}
+```
+
+```text
+deno run -A .llm/tools/run-deno-lint.ts --root packages/cli --ext ts,tsx
+{"source":{"mode":"command","cwd":"/home/codex/repos/fix-1014","exitCode":0},"selection":{"filesSelected":743,"batches":4},"summary":{"totalOccurrences":0,"uniqueOccurrences":0,"uniqueRules":0,"uniquePaths":0},"groups":[]}
+```
+
+```text
+deno run -A .llm/tools/run-deno-fmt.ts --root packages/cli --ext ts,tsx
+{"command":"deno fmt --check","cwd":"/home/codex/repos/fix-1014","mode":"check","summary":{"filesSelected":743,"batches":4,"failedBatches":0,"findings":0,"ignoredFindings":0},"findings":[]}
+```
+
+Harness fitness evidence:
+
+```text
+deno task quality:scan
+{"ok":true,"mode":"repository","scanned":["packages/cli/src","plugins"],"findings":[],"allowCount":7,...}
+
+deno task arch:check
+exit 0; all scanned doctrine roots report FAIL=0; existing WARN/INFO and dependency catalog warnings only.
+```
+
+Teardown audit — this slice did not start Aspire or containers, so no resources were stopped or
+removed. The required final inspection found two pre-existing/concurrently-owned Postgres containers
+and no running AppHost; ownership was not attributable to this unit-only run, so destructive cleanup
+was intentionally not attempted:
+
+```text
+docker ps -a
+CONTAINER ID   IMAGE           COMMAND                  CREATED              STATUS          PORTS                       NAMES
+97aacabc9209   postgres:18.3   "docker-entrypoint.s…"   About a minute ago   Up 57 seconds   127.0.0.1:44651->5432/tcp   postgres-dda83380
+d8ff61336f8b   postgres:18.3   "docker-entrypoint.s…"   35 minutes ago       Up 35 minutes   127.0.0.1:44621->5432/tcp   postgres-bc75ea00
+
+aspire ps
+Scanning for running AppHosts...
+ℹ️ No running AppHost found. Use 'aspire run' to start one first.
+```
+
+### Reconcile
+
+The implementation matches both review comments without moving the public-infra/kernel boundary,
+changing public signatures, weakening assertions, introducing dependencies, or modifying the
+lockfile. The supervisor retains all PR/issue/push actions. No new architecture debt or scope drift.
+
+### Superseding final teardown audit
+
+A second inspection immediately before handoff found that another concurrent session had started an
+Aspire AppHost and two additional cache containers after the earlier audit. This slice invoked no
+Aspire, E2E, or container-start command; these resources are not owned by this run and were therefore
+left running rather than disrupting the concurrent session.
+
+```text
+docker ps -a
+CONTAINER ID   IMAGE                            COMMAND                  CREATED          STATUS          PORTS                       NAMES
+cd2ba25ba81c   ghcr.io/microsoft/garnet:1.1.1   "/app/GarnetServer"      19 seconds ago   Up 7 seconds    127.0.0.1:44655->6379/tcp   garnet-nuvrrafd
+0a53946f57a5   redis:7                          "docker-entrypoint.s…"   19 seconds ago   Up 9 seconds    127.0.0.1:44654->6379/tcp   redis-gacgwedg
+97aacabc9209   postgres:18.3                    "docker-entrypoint.s…"   2 minutes ago    Up 2 minutes    127.0.0.1:44651->5432/tcp   postgres-dda83380
+d8ff61336f8b   postgres:18.3                    "docker-entrypoint.s…"   37 minutes ago   Up 36 minutes   127.0.0.1:44621->5432/tcp   postgres-bc75ea00
+
+aspire ps
+Scanning for running AppHosts...
+┌────────────────────┬─────────┬────────┬────────┬─────────┬─────────────────────────┐
+│ Path               │ Status  │ SDK    │ PID    │ CLI PID │ Dashboard               │
+├────────────────────┼─────────┼────────┼────────┼─────────┼─────────────────────────┤
+│ aspire/apphost.mts │ running │ 13.4.6 │ 146924 │ 146839  │ https://localhost:44773 │
+└────────────────────┴─────────┴────────┴────────┴─────────┴─────────────────────────┘
+```
