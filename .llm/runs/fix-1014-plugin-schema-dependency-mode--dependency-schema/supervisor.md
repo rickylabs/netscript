@@ -16,10 +16,12 @@
 | Task lane | Provider / model / effort | Role in this run |
 | --- | --- | --- |
 | `normal_implementation` | Codex · OpenAI · GPT-5.6 Sol · medium | Research, implementation, gates, local commits |
-| `formal_evaluation` | Claude Code · OpenRouter · Qwen 3.7 Max · bound preset | Separate-session PLAN-EVAL and IMPL-EVAL |
-| `review_codex` | Claude · Anthropic · Fable 5 · low | Opposite-family substantive slice review |
+| `review_codex` | Claude · Anthropic · Opus 5 supervisor | Separate-session PLAN-EVAL, slice review, and IMPL-EVAL under the owner waiver |
 
 ## Recorded lane/eval overrides
 
 - Owner explicitly prohibited pushing and opening a PR. This overrides the normal harness draft-PR,
   push, and per-slice PR-comment trail; local commits plus run artifacts are the commit trail.
+- Written owner waiver (2026-08-01): the `formal_evaluation` Qwen/OpenRouter lane is retired for the
+  0.0.3 fix train. The Opus 5 supervisor performs PLAN-EVAL and IMPL-EVAL in a separate Claude-family
+  session from the GPT-family implementation.

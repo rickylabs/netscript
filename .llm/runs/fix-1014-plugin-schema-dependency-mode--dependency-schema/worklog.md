@@ -69,6 +69,8 @@ host-side plugin-name mapping.
 | 2026-08-01 | 1 | research | Baseline functional repro: zero copies/no target; 0.0.2 metadata mapping verified. |
 | 2026-08-01 | 1 | design | Source ladder, declaration signal, error boundary, and gate set locked. |
 | 2026-08-01 | 1 | plan gate | Canonical Qwen PLAN-EVAL launch failed authentication before an agentic turn; implementation remains stopped. |
+| 2026-08-01 | 1 | owner waiver | Opus 5 supervisor retired the Qwen lane, supplied the independent PLAN-EVAL, and pre-approved the one-row replan. |
+| 2026-08-01 | 1 | replan | Acceptance box 4 moved from the structurally local-path-only userland suite to a semantic JSR-shaped `installPlugin` integration test. D1–D5 unchanged. |
 
 ## Decisions
 
@@ -83,6 +85,7 @@ host-side plugin-name mapping.
 | --- | --- | --- |
 | No PR/push trail by owner instruction | minor process override | yes |
 | Formal evaluator unavailable | significant process blocker | yes |
+| Retired evaluator blocker superseded by owner waiver | significant process update | yes |
 
 ## Gate Results
 
@@ -108,10 +111,12 @@ host-side plugin-name mapping.
 
 | Consumer | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| `scaffold.userland-install` | NOT_RUN | confirmed suite ID | Run once after units are green. |
+| Semantic JSR-shaped install integration | NOT_RUN | approved substitute for box 4 | Part of focused unit command. |
+| `scaffold.userland-install` | N/A | local-path hard-force in `plugin-install-gates.ts` | Cannot evidence dependency mode. |
+| Published `scaffold.runtime --source jsr` | NOT_RUN | requires published 0.0.3 CLI fix | Release-train follow-up evidence. |
 
 ## Handoff Notes
 
 - PLAN-EVAL should challenge D1–D5 and the userland suite's stale placeholder expectation first.
-- Resume only after the approved evaluator can authenticate or the owner explicitly waives the
-  Plan-Gate in writing; closed-model substitution and self-certification are prohibited.
+- The Opus 5 owner waiver supersedes the retired-lane blocker. The one-row replan is pre-approved;
+  implementation may proceed without a second PLAN-EVAL.

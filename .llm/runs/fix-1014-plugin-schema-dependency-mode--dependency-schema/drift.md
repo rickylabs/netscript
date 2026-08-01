@@ -38,3 +38,27 @@ Drift is append-only.
 - **Action:** defer pending owner login, credential restoration, or explicit written Plan-Gate waiver.
 - **Evidence:** Claude session `43406813-5e60-461d-9e65-fe74c8e16875`; zero input/output tokens and
   authentication failure.
+
+## 2026-08-01 — Owner waiver supersedes retired evaluator blocker
+
+- **What:** The Qwen/OpenRouter formal evaluator lane is retired for the 0.0.3 fix train. The Opus 5
+  supervisor performs PLAN-EVAL and IMPL-EVAL under the ordinary Claude-vs-GPT review ladder.
+- **Source:** Written owner waiver and supervisor PLAN-EVAL, 2026-08-01.
+- **Expected:** The prior entry treated missing Qwen credentials as a hard blocker.
+- **Actual:** Independent evaluation is supplied by the separate Claude-family supervisor session;
+  implementation is unblocked after the pre-approved one-row replan.
+- **Severity:** significant
+- **Action:** accept; never relaunch or report blocked on the retired lane.
+- **Evidence:** `plan-eval.md`; owner message; corrected `supervisor.md`.
+
+## 2026-08-01 — Userland suite cannot evidence dependency mode
+
+- **What:** `scaffold.userland-install` hard-forces `--local-path`, yielding an empty metadata file
+  map and copied-source fallback.
+- **Source:** `packages/cli/e2e/src/application/gates/scaffold/plugin-install-gates.ts`.
+- **Expected:** The original brief and plan treated the suite as acceptance-box-4 evidence.
+- **Actual:** A green assertion there would not exercise package-file resolution. Box 4 moves to a
+  semantic JSR-shaped `installPlugin` integration test; published JSR runtime proof waits for 0.0.3.
+- **Severity:** significant
+- **Action:** fix plan/test evidence; retain stale-placeholder finding separately.
+- **Evidence:** supervisor `plan-eval.md` row 8 and corrected `plan.md` validation table.

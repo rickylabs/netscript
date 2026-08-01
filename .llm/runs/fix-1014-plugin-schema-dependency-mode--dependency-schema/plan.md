@@ -44,6 +44,8 @@ copied-source or no-DB behavior.
 - Preserve target path and filename rules.
 - Fail only when DB is required, migrations are declared, and both sources resolve zero fragments.
 - Add semantic unit tests and a true-userland root-fragment/content assertion.
+- Add a semantic dependency-mode install-flow integration test using a JSR-shaped descriptor and
+  injected package fetcher. Treat the local-path-only userland suite as non-evidence for box 4.
 
 ## Non-Scope
 
@@ -75,7 +77,7 @@ copied-source or no-DB behavior.
 | Decision | Status | Notes |
 | --- | --- | --- |
 | Exact resolved-fragment input shape | safe to defer to implementation naming | It is internal and tested; D1–D5 lock behavior and ownership. |
-| Whether to repair the stale userland placeholder expectation | safe to defer | Replace it with the real root fragment assertion if current gate proves it stale; do not broaden into legacy scaffolder cleanup. |
+| Whether to repair the stale userland placeholder expectation | safe to defer | Repair cheaply if possible, but never count the local-path-only suite as dependency-mode evidence. |
 
 ## Risk Register
 
@@ -102,7 +104,7 @@ copied-source or no-DB behavior.
 | F-1/F-3/F-5/F-10/F-11/F-12/F-15–F-19 | yes | `quality:gate`, scoped wrappers, review, focused tests |
 | F-6/F-7/F-8/F-9 | no surface delta, reviewed | JSR scan records unchanged exports/metadata and compatible 0.0.2 file list |
 | F-CLI-1…31 | applicable subset/manual | `arch:check` plus structural review; no command vocabulary/composition delta |
-| Consumer install | yes | `scaffold.userland-install` one-pass gate |
+| Consumer install | yes | Semantic `installPlugin` integration with JSR descriptor + injected fetcher; published `scaffold.runtime --source jsr` remains release-train evidence once 0.0.3 exists |
 
 ## Arch-Debt Implications
 
@@ -120,7 +122,9 @@ copied-source or no-DB behavior.
 | 3 | scoped lint | `deno run -A .llm/tools/run-deno-lint.ts --root packages/cli` | exit 0 |
 | 4 | scoped fmt | `deno run -A .llm/tools/run-deno-fmt.ts --root packages/cli` | exit 0 |
 | 5 | doctrine quality | `deno task quality:gate` | exit 0 or attributable existing debt only |
-| 6 | consumer E2E | `deno task e2e:cli run scaffold.userland-install` | exit 0; run once after units are green |
+| 6 | semantic dependency install | focused `installPlugin` integration test in the unit command above | injected JSR fetcher writes the real fragment to the root schema path |
+| 7 | local userland regression | `deno task e2e:cli run scaffold.userland-install` | optional/non-box-4: local-path-only lane; run only if stale assertion is repaired and a regression verdict is needed |
+| 8 | published dependency E2E | `deno task e2e:cli:prod` / `scaffold.runtime --source jsr` | deferred to 0.0.3 publication; current 0.0.2 cannot contain this CLI fix |
 
 ## Dependencies
 
