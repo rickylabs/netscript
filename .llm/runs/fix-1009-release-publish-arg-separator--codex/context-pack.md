@@ -16,8 +16,8 @@ The branch was clean at baseline `3ab64720f`. Research independently confirms th
 cause and AC4 sweep. The before probe fails at `github-release.ts` parsing the forwarded bare
 separator. An unauthorized closed-model `plan-eval.md` was rejected and demoted to
 `supervisor-advisory-review.md`. The OpenHands Qwen evaluator posted a formal PASS; its missing
-artifact is transcribed verbatim in `plan-eval.md` with a checkable provenance pointer. Slice 1 is
-implemented, substantively reviewed, and focused-test green.
+artifact was initially transcribed, then superseded by the evaluator-authored `plan-eval.md` in
+`28f2a5aea`. Both implementation slices are complete and the scoped validation is green.
 
 ## Completed
 
@@ -26,17 +26,19 @@ implemented, substantively reviewed, and focused-test green.
 - Parser/task/test survey and exact before probe completed.
 - Two-slice plan and Design checkpoint recorded.
 - Formal open-model PLAN-EVAL PASS recorded.
-- Slice 1 focused test passed 15/15 and supervisor review passed.
+- Slice 1 focused test passed 15/15 and independent `review_codex_light` review passed.
+- Slice 2 focused test and the complete requested suite passed 38/38.
+- The exact after probe reached the green-canary gate without `Unknown argument: --`.
 
 ## In Progress
 
-- Sign off and push Slice 1, then begin Slice 2.
+- Obtain the Slice 2 independent review, commit/push/comment the slice, then run IMPL-EVAL.
 
 ## Next Steps
 
-1. Commit/push/comment Slice 1.
-2. Implement preflight tolerance/test; run full scoped validation and after probe.
-3. Obtain separate-session IMPL-EVAL PASS and finalize PR evidence/status.
+1. Commit/push/comment Slice 2.
+2. Obtain separate-session open-model IMPL-EVAL PASS.
+3. Finalize PR evidence and move from draft only when every acceptance box is evidenced.
 
 ## Key Decisions
 
@@ -52,15 +54,17 @@ implemented, substantively reviewed, and focused-test green.
 | `.llm/runs/fix-1009-release-publish-arg-separator--codex/` | new | Harness bootstrap/plan only. |
 | `.llm/tools/release/github-release.ts` | changed | Skip bare `--` anywhere in argv. |
 | `.llm/tools/release/github-release_test.ts` | changed | Parse every documented publish Usage invocation. |
+| `.llm/tools/release/preflight-text-imports.ts` | changed | Skip a bare task separator. |
+| `.llm/tools/release/preflight-text-imports_test.ts` | changed | Exercise forwarded separator through the entry point. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | Slice 1 focused PASS | `github-release_test.ts`: 15 passed, 0 failed. |
-| Fitness | plan PASS | OpenHands Qwen verdict comment and transcribed `plan-eval.md`. |
-| Runtime | baseline fail captured | Exact before probe. |
-| Consumer | pending | Document-derived parser test. |
+| Static | PASS | Four-file check, release fmt/lint, and focused suite 38/38. |
+| Fitness | plan PASS | OpenHands Qwen verdict comment and evaluator-authored `plan-eval.md`. |
+| Runtime | PASS | Exact after probe reached the canary gate, beyond argument parsing. |
+| Consumer | PASS | Document-derived parser test and task subprocess test. |
 
 ## Open Questions
 

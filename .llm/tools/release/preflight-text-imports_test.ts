@@ -64,3 +64,20 @@ Deno.test('preflight allows protocol-guarded fromFileUrl import.meta conversion'
   const findings = await scanFile(new URL('negative-guarded-file-url.ts', fixtureRoot).pathname);
   assertEquals(findings, []);
 });
+
+Deno.test('release:preflight task argv accepts a bare separator', async () => {
+  const script = new URL('./preflight-text-imports.ts', import.meta.url);
+  const fixture = new URL('negative-url-composition.ts', fixtureRoot);
+  const output = await new Deno.Command(Deno.execPath(), {
+    args: ['run', '--allow-read', script.pathname, '--', '--file', fixture.pathname],
+    stdout: 'piped',
+    stderr: 'piped',
+  }).output();
+
+  assertEquals(new TextDecoder().decode(output.stderr), '');
+  assertEquals(output.code, 0);
+  assertStringIncludes(
+    new TextDecoder().decode(output.stdout),
+    'release:preflight text-imports — PASS',
+  );
+});

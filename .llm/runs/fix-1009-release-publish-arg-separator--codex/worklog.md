@@ -62,7 +62,12 @@ subprocess test using the exact forwarded `--` argv.
 | 2026-08-01 | 1 | implementation | Added the position-independent publish separator skip and non-vacuous source-derived Usage test. |
 | 2026-08-01 | 1 | gate | `github-release_test.ts`: 15 passed, 0 failed; the existing unknown-argument/missing-value guard remains green. |
 | 2026-08-01 | 1 | supervisor review | PASS: sibling pattern matched, final unknown-argument branch unchanged, and every matching Usage line is parsed after a non-zero count assertion. |
+| 2026-08-01 | 1 | independent review | `review_codex_light` PASS: adversarial and mutation probes confirmed position-independent tolerance, strict unknown handling, and a non-vacuous doc/parser guard. |
 | 2026-08-01 | 1 | reconcile | PR #1040 remains draft; issue scope, labels, milestone, and closing keyword still match with no rescope required. |
+| 2026-08-01 | 2 | implementation | Added the position-independent preflight separator skip and a subprocess test of forwarded task argv. |
+| 2026-08-01 | 2 | validation | Four-file check and release-directory fmt/lint wrappers passed; requested focused suite passed 38/38. |
+| 2026-08-01 | 2 | after probe | Forwarded `--` parsed successfully; command reached the expected green-canary publication gate, with no `Unknown argument: --`. |
+| 2026-08-01 | 2 | independent review | `review_codex_light` PASS: real task and adversarial argv probes preserved strict unknown/value errors; full release suite passed 65/65. |
 
 ## Decisions
 
@@ -92,22 +97,25 @@ subprocess test using the exact forwarded `--` argv.
 | CLI contract plan | NOT_RUN | PLAN-EVAL pending | No implementation before PASS. |
 | Formal Plan-Gate | PASS | OpenHands Qwen PR verdict + transcribed `plan-eval.md` | Separate open-model session; evaluator-authored file supersedes if later pushed. |
 | Publish parser focused test | PASS | `deno test --allow-all .llm/tools/release/github-release_test.ts` | 15 passed, 0 failed. |
+| Scoped type check | PASS | Four explicit owned TypeScript roots | 4 selected, 0 failed batches, 0 diagnostics. |
+| Release fmt/lint | PASS | Repo-native scoped wrappers | 32 files; 0 failed batches/findings. |
+| Focused release suite | PASS | Five requested test files | 38 passed, 0 failed. |
 
 ### Runtime Gates
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| Task entry-point probe | NOT_RUN | After implementation | Later external failure permitted. |
+| Task entry-point probe | PASS | Exact required command reached `verifyGreenCanaryPair` | Exit 1 at the expected canary gate; parser did not reject `--`. |
 
 ### Consumer Gates
 
 | Consumer | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| Release operators | NOT_RUN | Document-derived tests | Pending implementation. |
+| Release operators | PASS | Document-derived publish test plus real task probe | Documented argv and Deno task forwarding agree. |
 
 ## Handoff Notes
 
 - PLAN-EVAL should verify the drift guard actually couples source `Usage:` lines to `parseArgs`.
 - Confirm non-task-wired scripts remain explicitly outside scope.
-- The evaluator verdict is authoritative from the linked PR comment; the missing artifact is a
-  provenance-marked transcription, not supervisor judgment.
+- The evaluator-authored PLAN-EVAL artifact landed in `28f2a5aea` and superseded the temporary
+  provenance-marked transcription.

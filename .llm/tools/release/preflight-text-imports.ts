@@ -621,6 +621,7 @@ function parseArgs(argv: string[]): Options | null {
   let root = Deno.cwd();
   for (let index = 0; index < argv.length; index++) {
     const arg = argv[index];
+    if (arg === '--') continue;
     switch (arg) {
       case '--root':
         root = requireValue(argv, ++index, arg);

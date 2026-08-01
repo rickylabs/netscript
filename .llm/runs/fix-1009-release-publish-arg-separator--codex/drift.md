@@ -80,3 +80,16 @@ documentation.
 - **Action:** accept
 - **Evidence:** `plan-eval.md` records the route, comment URL, timestamp, workflow run, and PASS.
   The Plan-Gate is open. If the evaluator later pushes its file, prefer it and record supersession.
+
+## 2026-08-01 — Evaluator artifact superseded the transcription
+
+- **What:** Workflow run `30715484303` later pushed the evaluator-authored `plan-eval.md` in commit
+  `28f2a5aea`, replacing the temporary transcription.
+- **Source:** Branch history and the canonical run artifact.
+- **Expected:** Prefer the evaluator's own tracked artifact if it lands.
+- **Actual:** The evaluator-authored file is now authoritative and the temporary transcription is
+  retained only in commit history.
+- **Severity:** minor
+- **Action:** accept
+- **Evidence:** `28f2a5aea` and the PLAN-EVAL comment at
+  https://github.com/rickylabs/netscript/pull/1040#issuecomment-5153138819.
