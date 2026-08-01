@@ -1,5 +1,11 @@
 # Drift Log — fix-1010-plugin-registry-generation--codex
 
+## 2026-08-02 — owner waiver — supervisor evaluates rebase follow-up
+
+The existing owner waiver applies to this rebase slice: the supervisor performs evaluation. This
+session writes a plan and proceeds directly without launching an evaluator or changing
+`plan-eval.md`.
+
 ## 2026-08-02 — owner waiver — supervisor evaluates AI follow-up
 
 The owner explicitly waived the open-model Plan-Gate for the AI chat-route follow-up and assigned

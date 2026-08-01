@@ -184,3 +184,17 @@ the CLI's manifest-driven installed-runtime generation and its E2E gate. No publ
 
 The owner waived the open-model Plan-Gate on 2026-08-01 and assigned PLAN-EVAL/IMPL-EVAL to the
 supervisor. This implementation session proceeds without creating or modifying `plan-eval.md`.
+
+## Follow-up Plan — rebase onto current main (2026-08-02)
+
+1. Preserve the two untracked supervisor briefs and fetch `origin`.
+2. Rebase the branch onto `origin/main`. Resolve only generated asset conflicts by taking merged
+   sources and running `gen:assets-barrel`; stop on any unexpected non-generated conflict.
+3. Verify the AI `skill-loader.ts` exclusion and the adjacent 0.0.3 changes both survived.
+4. Run the scoped check, quality, focused registry tests, and one cleanup-enabled
+   `scaffold.runtime` pass. Read and record its summary and named behavior gates.
+5. Verify no AppHost/container residue, commit the rebase evidence, then force-push with lease and
+   prove local/remote SHA equality.
+
+The owner-waived supervisor evaluator route remains in force; no evaluator tool or evaluator
+artifact is used by this session.

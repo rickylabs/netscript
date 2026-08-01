@@ -62,6 +62,15 @@
 - Contributor path: AI registry discovery remains declared by `plugins/ai/scaffold.runtime.json`
   and rendered by the plugin-owned compiler.
 
+### Rebase follow-up design (2026-08-02)
+
+- Public surface: no intended source or export change; this is history integration and verification.
+- Conflict policy: generated assets regenerate from merged sources; unexpected source conflicts
+  stop the slice.
+- Commit slices: plan; rebased conflict resolution; validation/teardown evidence; explicit
+  force-with-lease push verification.
+- Deferred scope: no rediagnosis or widening of issue #1010 behavior fixes.
+
 ### Contributor Path
 
 Add a runtime generator by publishing `scaffold.runtime.json` with `runtimeRegistryGenerator` and
