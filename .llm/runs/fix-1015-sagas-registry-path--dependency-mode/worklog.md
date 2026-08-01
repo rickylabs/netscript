@@ -56,6 +56,7 @@ environment, or project-root inputs to it, and tests inject env/cwd/import behav
 | 2026-08-01 | plan | research/design | Verified all supplied cause leads against `3ab64720f`; no implementation started. |
 | 2026-08-01 | plan-eval | evaluator launch | Canonical Qwen/Claude-OpenRouter session `5e52c824-93f1-49ef-80ae-12fcd8a4c1e8` failed authentication before a model turn; no verdict produced and no implementation started. |
 | 2026-08-01 | plan-eval | cycle 1 remediation | Opus 5 returned FAIL with three bounded planning fixes. Owner waived the open-model route and authorized implementation after committing the exact remediation; plan amended without redesign. |
+| 2026-08-01 | 1 | shared resolver | Added injected env/cwd/project-root resolution with explicit → env → fallback precedence, Windows/backslash coverage, and absolute specifier preservation. Focused tests passed. |
 
 ## Decisions
 
@@ -73,3 +74,7 @@ environment, or project-root inputs to it, and tests inject env/cwd/import behav
 
 PLAN-EVAL cycle 1 recorded in `plan-eval.md`. Its complete bounded remediation is committed with
 the amended plan under the owner's instruction; implementation is authorized without cycle 2.
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| Resolver focused tests | PASS | 3 resolver tests passed: precedence/fallback, Windows paths, absolute specifiers. |
