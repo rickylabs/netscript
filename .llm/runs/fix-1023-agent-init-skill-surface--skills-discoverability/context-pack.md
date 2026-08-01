@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `fix-1023-agent-init-skill-surface--skills-discoverability` |
 | Branch | `fix/1023-agent-init-skill-surface` |
-| Current phase | `implement` |
+| Current phase | `evaluate` |
 | Archetype | `6 — CLI / Tooling` |
 | Scope overlays | `docs` |
 
@@ -22,13 +22,12 @@ Research confirms the issue's cause: source content/manifest and generated asset
 
 ## In Progress
 
-- Slice 2 generated artifact ready to commit; post-commit asset freshness rerun and IMPL-EVAL next.
+- Both slices are committed and pushed; all scoped gates pass; separate-session IMPL-EVAL next.
 
 ## Next Steps
 
-1. Implement and validate source/content/tests/docs slice.
-2. Regenerate and prove the embedded artifact with the full scoped gate set.
-3. Run separate-session IMPL-EVAL.
+1. Run separate-session IMPL-EVAL.
+2. Address any evaluator finding or finalize PR evidence/status on PASS.
 
 ## Key Decisions
 

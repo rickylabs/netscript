@@ -77,7 +77,7 @@ PLAN-EVAL passed before implementation began.
 | Type check | `deno run -A .llm/tools/run-deno-check.ts --root packages/cli --ext ts,tsx` | PASS | 742 files, 7 batches, 0 failed, 0 diagnostics |
 | Lint | `deno lint packages/cli` | PASS | Checked 107 files |
 | Init tests | `deno test -A packages/cli/src/public/features/agent/init/` | PASS | 4 passed, 0 failed |
-| Asset freshness | `deno task check:assets-barrel` | PENDING POST-COMMIT | Pre-commit run correctly displayed the owned generated diff; rerun after committing it |
+| Asset freshness | `deno task check:assets-barrel` | PASS | post-commit generator produced no diff; the task now includes `skills.generated.ts` |
 
 ### Fitness Gates
 
@@ -98,3 +98,10 @@ PLAN-EVAL passed before implementation began.
 - Inspect the route parser and generated hash first.
 - `scaffold.runtime` is N/A by explicit owner instruction and the release-gate matrix: no scaffold,
   plugin scaffold, DB wiring, or Aspire helper generation changed.
+
+### Post-slice reconcile
+
+- PR #1034 remains the sole resolving PR with `Closes #1023`, milestone `0.0.3`, the requested area/
+  priority/type labels, and exactly one lifecycle status.
+- No new reviewer comments require implementation changes. PLAN-EVAL remains PASS.
+- No plan or doctrine drift beyond the already-recorded stale repro entry/flag.
