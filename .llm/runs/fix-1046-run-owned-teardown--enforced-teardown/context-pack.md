@@ -21,10 +21,11 @@ three-valued, path-segment-safe, identity-pair-safe, fail-closed, and guarded ag
 - Research, locked plan, supervisor identity, implementation brief, and PLAN-EVAL PASS.
 - Draft PR #1047 exists for the branch.
 - Slice 1 resumability artifacts and slice 2 ownership classifier/tests.
+- Slice 3 schema-versioned atomic registry and tests.
 
 ## In Progress
 
-- Slice 3 schema-versioned atomic run registry.
+- Slice 4 read-only, bounded Aspire/Docker probes with observed-shape fixtures.
 
 ## Next Steps
 
