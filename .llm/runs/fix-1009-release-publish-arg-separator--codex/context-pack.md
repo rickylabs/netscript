@@ -14,8 +14,9 @@
 
 The branch was clean at baseline `3ab64720f`. Research independently confirms the reported narrow
 cause and AC4 sweep. The before probe fails at `github-release.ts` parsing the forwarded bare
-separator. An unauthorized closed-model `plan-eval.md` was rejected and must be replaced by the
-cloud OpenHands Qwen evaluator; no source implementation has started.
+separator. An unauthorized closed-model `plan-eval.md` was rejected and demoted to
+`supervisor-advisory-review.md`; the canonical verdict slot is empty pending the cloud OpenHands
+Qwen evaluator. No source implementation has started.
 
 ## Completed
 
@@ -26,8 +27,8 @@ cloud OpenHands Qwen evaluator; no source implementation has started.
 
 ## In Progress
 
-- Draft PR #1040 is open; dispatch formal PLAN-EVAL on the cloud OpenHands fallback to replace the
-  invalid closed-model artifact because the local OpenRouter transport has no credential.
+- Draft PR #1040 is open; wait for the already-dispatched cloud OpenHands PLAN-EVAL. Do not
+  re-dispatch or implement while the canonical verdict slot is empty.
 
 ## Next Steps
 
@@ -64,8 +65,8 @@ cloud OpenHands Qwen evaluator; no source implementation has started.
 
 ## Drift and Debt
 
-- Drift: local evaluator credential absence and the rejected closed-model artifact are recorded;
-  cause/scope has no drift.
+- Drift: local evaluator credential absence, the rejected closed-model artifact, and the
+  supervisor's conceded lane misclassification are recorded; cause/scope has no drift.
 - Debt: none.
 
 ## Commits

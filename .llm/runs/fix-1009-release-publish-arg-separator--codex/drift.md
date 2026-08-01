@@ -51,3 +51,17 @@ documentation.
 - **Action:** fix
 - **Evidence:** Cloud OpenHands Qwen PLAN-EVAL must independently replace the artifact before any
   implementation. Commit history is retained as the audit trail.
+
+## 2026-08-01 — Supervisor conceded evaluator-lane misclassification
+
+- **What:** The supervisor withdrew its claim that `review_codex_light` could satisfy PLAN-EVAL,
+  acknowledged that ordinary opposite-family review is distinct from formal evaluation, and
+  renamed its artifact to `supervisor-advisory-review.md`.
+- **Source:** Supervisor steering correction and `lane-policy.md:146-175`.
+- **Expected:** Only the formal open-model evaluator may author `plan-eval.md`.
+- **Actual:** The invalid artifact is preserved as a non-authoritative advisory; the canonical
+  `plan-eval.md` slot is empty pending OpenHands Qwen.
+- **Severity:** significant
+- **Action:** fix
+- **Evidence:** This entry, the advisory header, and commit history retain both process errors: the
+  unannounced artifact and the lane-table misread.
