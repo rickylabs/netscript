@@ -13,13 +13,18 @@
 
 import {
   appendVerdictContractEpilogue,
+  buildGithubTokenResolutionError,
   buildMergeBody,
+  buildMissingGithubNetPermissionMessage,
   buildOpenHandsComment,
   buildPullRequestBody,
   buildWslCommand,
   evaluateGitSafety,
   extractVerdict,
+  formatGithubTokenAttempt,
+  GITHUB_NET_PERMISSION_FLAG,
   type GitInfo,
+  isMissingGithubNetPermission,
   parseEvalVerdict,
   parseGithubHostsOauthToken,
   parseOpenHandsStatusComment,
@@ -37,6 +42,7 @@ import {
 } from './agentic-lib.ts';
 import { assert, assertEquals } from '@std/assert';
 import { OPENROUTER_MODEL_IDS } from '../config/models.ts';
+import { formatReleasePrCreationError } from '../../release/cut.ts';
 
 const here = new URL('.', import.meta.url).pathname;
 // On Windows the pathname is like /C:/...; strip the leading slash for Deno.readTextFile.
@@ -138,6 +144,31 @@ Deno.test('gh hosts fallback extracts only github.com oauth_token without exposi
   assertEquals(parseGithubHostsOauthToken(synthetic), 'synthetic-secret');
   assertEquals(parseGithubHostsOauthToken(synthetic, 'missing.example'), null);
   assertEquals(parseGithubHostsOauthToken('github.com:\n    oauth_token:'), null);
+});
+
+Deno.test('missing GitHub net permission is classified and rendered without auth advice', () => {
+  const permissionError = new Deno.errors.NotCapable(
+    'Requires net access to "api.github.com:443", run again with the --allow-net flag',
+  );
+  assert(isMissingGithubNetPermission(permissionError));
+  assert(!isMissingGithubNetPermission(new Deno.errors.NotCapable('Requires read access')));
+  assert(!isMissingGithubNetPermission(new Error('Requires net access to api.github.com')));
+
+  const message = buildMissingGithubNetPermissionMessage(permissionError);
+  const rendered = formatReleasePrCreationError(new Error(message));
+  assert(rendered.startsWith('release:cut could not create the release PR:'));
+  assert(rendered.includes(GITHUB_NET_PERMISSION_FLAG));
+  assert(rendered.includes(permissionError.message));
+  assert(!rendered.includes('401'));
+  assert(!rendered.includes('gh auth login'));
+});
+
+Deno.test('genuinely rejected GitHub credentials retain 401 diagnostics and auth remedy', () => {
+  const attempt = formatGithubTokenAttempt('env:GH_TOKEN', null);
+  assertEquals(attempt, 'env:GH_TOKEN (401)');
+  const message = buildGithubTokenResolutionError([attempt], 'codex');
+  assert(message.includes('(401)'));
+  assert(message.includes('gh auth login'));
 });
 
 // --- sq (bash single-quoting) --------------------------------------------
