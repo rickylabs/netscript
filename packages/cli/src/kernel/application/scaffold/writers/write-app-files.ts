@@ -4,6 +4,7 @@ import { SCAFFOLD_DEFAULTS } from '../../../constants/scaffold/scaffold-defaults
 import { SCAFFOLD_FILES } from '../../../constants/scaffold/scaffold-files.ts';
 import type { ValidatedInitOptions } from '../../../domain/scaffold/scaffold-options.ts';
 import { generateAppDenoJson } from '../../../adapters/templates/app/generate-app-deno-json.ts';
+import { generateAppTsConfig } from '../../../adapters/templates/app/generate-app-tsconfig.ts';
 import { generateAppViteConfig } from '../../../adapters/templates/app/generate-vite-config.ts';
 import {
   loadAppScaffoldTemplateAssets,
@@ -162,6 +163,10 @@ export async function writeNormalizedAppFiles(
     jsrResolver: context.jsrResolver,
   });
   await write(appDenoJsonPath, appDenoJson);
+  await write(
+    join(appDir, SCAFFOLD_FILES.TSCONFIG_APP),
+    generateAppTsConfig(),
+  );
   const uiInstall = await installUiRegistryItems({
     projectRoot: appDir,
     names: DEFAULT_UI_INIT_ITEMS,

@@ -9,17 +9,24 @@ import { DEFAULT_TEMPLATE_REGISTRY } from '../../application/registries/template
 import {
   SCAFFOLD_JSR_RELEASE_PACKAGES,
 } from '../../constants/scaffold/scaffold-workspace-packages.ts';
-import {
-  netscriptJsrSpecifier,
-} from '../../constants/jsr-specifiers.ts';
+import { netscriptJsrSpecifier } from '../../constants/jsr-specifiers.ts';
 import { generateDenoJson } from './deno-json.ts';
 import { generateNetScriptConfig } from './netscript-config.ts';
 import { generateReadme } from './generate-readme.ts';
+import { generateTsConfig } from './tsconfig.ts';
 
 // `generateNetScriptConfig` reads templates synchronously, which requires a
 // previously-awaited registry hydration. These tests call the generators
 // directly (outside the CLI dispatch path), so hydrate at module load.
 await DEFAULT_TEMPLATE_REGISTRY.hydrate();
+
+Deno.test('generateTsConfig terminates parent lookup without claiming Deno files', () => {
+  const result = JSON.parse(generateTsConfig());
+
+  assertEquals(result, { files: [] });
+  assert(!('extends' in result));
+  assert(!('include' in result));
+});
 
 Deno.test('generateDenoJson emits the expected root workspace shape in JSR mode', () => {
   const result = JSON.parse(generateDenoJson({
@@ -38,9 +45,7 @@ Deno.test('generateDenoJson emits the expected root workspace shape in JSR mode'
   });
   assertEquals(result.minimumDependencyAge, {
     age: 'P1D',
-    exclude: SCAFFOLD_JSR_RELEASE_PACKAGES.map((packageName) =>
-      `jsr:@netscript/${packageName}`
-    ),
+    exclude: SCAFFOLD_JSR_RELEASE_PACKAGES.map((packageName) => `jsr:@netscript/${packageName}`),
   });
   assertEquals(result.nodeModulesDir, 'auto');
   assertEquals(result.unstable, ['raw-imports', 'kv']);
@@ -104,9 +109,7 @@ Deno.test('generateDenoJson scopes the minimum dependency age exception to NetSc
   const exclusions = result.minimumDependencyAge.exclude as string[];
 
   assertEquals(exclusions, [
-    ...SCAFFOLD_JSR_RELEASE_PACKAGES.map((packageName) =>
-      `jsr:@netscript/${packageName}`
-    ),
+    ...SCAFFOLD_JSR_RELEASE_PACKAGES.map((packageName) => `jsr:@netscript/${packageName}`),
   ]);
   assertEquals(new Set(exclusions).size, exclusions.length);
   assert(exclusions.every((specifier) => specifier.startsWith('jsr:@netscript/')));

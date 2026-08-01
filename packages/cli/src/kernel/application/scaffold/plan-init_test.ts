@@ -183,6 +183,20 @@ Deno.test('scaffoldRoot emits CI/CD workflow templates for shipped deploy target
   assertEquals(scaffolder.directories.has('/workspace/deploy-app'), true);
 });
 
+Deno.test('scaffoldRoot writes and bookkeeps a self-contained root tsconfig', async () => {
+  const scaffolder = new InMemoryScaffolder();
+  const first = await scaffoldRoot(context(scaffolder), options());
+  const tsconfigPath = '/workspace/deploy-app/tsconfig.json';
+  const tsconfig = JSON.parse(scaffolder.files.get(tsconfigPath) ?? '{}');
+
+  assert(first.filesCreated.includes(tsconfigPath));
+  assertEquals(tsconfig, { files: [] });
+  assert(!('extends' in tsconfig));
+
+  const second = await scaffoldRoot(context(scaffolder), options());
+  assert(second.filesSkipped.includes(tsconfigPath));
+});
+
 Deno.test('#966 scaffoldRoot keeps source appsettings tracked by git', async () => {
   const scaffolder = new InMemoryScaffolder();
   await scaffoldRoot(context(scaffolder), options());

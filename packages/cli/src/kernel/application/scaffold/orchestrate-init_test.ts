@@ -4,6 +4,7 @@ import { InMemoryScaffolder } from '../testing/in-memory-scaffolder.ts';
 import type { ValidatedInitOptions } from '../../domain/scaffold/scaffold-options.ts';
 import type { ScaffoldResult } from '../../domain/core-types.ts';
 import { initNextSteps } from './orchestrate-init.ts';
+import { SCAFFOLD_FILES } from '../../constants/scaffold/scaffold-files.ts';
 
 function baseOptions(overrides: Partial<ValidatedInitOptions> = {}): ValidatedInitOptions {
   return {
@@ -25,6 +26,12 @@ function baseOptions(overrides: Partial<ValidatedInitOptions> = {}): ValidatedIn
     ...overrides,
   };
 }
+
+Deno.test('root and app scaffold bookkeeping share the project-boundary filename', () => {
+  assertEquals(SCAFFOLD_FILES.TSCONFIG_ROOT, 'tsconfig.json');
+  assertEquals(SCAFFOLD_FILES.TSCONFIG_APP, 'tsconfig.json');
+  assertEquals(SCAFFOLD_FILES.TSCONFIG_APPHOST, 'tsconfig.apphost.json');
+});
 
 Deno.test('initNextSteps includes public database preparation steps for JSR init', () => {
   const steps = initNextSteps(baseOptions({ dbEngine: 'postgres' }));

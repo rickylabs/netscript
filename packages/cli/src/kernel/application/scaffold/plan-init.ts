@@ -4,6 +4,7 @@ import { SCAFFOLD_FILES } from '../../constants/scaffold/scaffold-files.ts';
 import type { ScaffoldResult } from '../../domain/core-types.ts';
 import type { ValidatedInitOptions } from '../../domain/scaffold/scaffold-options.ts';
 import { generateDenoJson } from '../../templates/workspace/deno-json.ts';
+import { generateTsConfig } from '../../templates/workspace/tsconfig.ts';
 import { generateNetScriptConfig } from '../../templates/workspace/netscript-config.ts';
 import { generateReadme } from '../../templates/workspace/generate-readme.ts';
 import { generateEditorConfigFiles } from '../../adapters/scaffold/editor-config.ts';
@@ -98,6 +99,21 @@ export async function scaffoldRoot(
     filesCreated.push(denoJsonPath);
   } else {
     filesSkipped.push(denoJsonPath);
+  }
+
+  // TypeScript project boundary (Tier 1 — programmatic). Deno continues to
+  // read deno.json; this file only stops Node-side tools walking above the project.
+  const tsconfigPath = join(targetPath, SCAFFOLD_FILES.TSCONFIG_ROOT);
+  if (
+    await context.scaffolder.writeFile(
+      tsconfigPath,
+      generateTsConfig(),
+      options.force,
+    )
+  ) {
+    filesCreated.push(tsconfigPath);
+  } else {
+    filesSkipped.push(tsconfigPath);
   }
 
   // 2. netscript.config.ts (Tier 1 — programmatic)
