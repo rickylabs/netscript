@@ -108,3 +108,18 @@ The doctrine snapshot labels `@netscript/cli` “Restructure,” while the assoc
 - Full scaffold runtime smoke is explicitly N/A because this changes neither scaffold output nor plugin/DB/Aspire helper generation.
 - Publishing/release verification remains with the 0.0.3 release run.
 
+## 2026-08-01 Review Follow-up Addendum (owner Plan-Gate waiver)
+
+The owner waived external PLAN-EVAL/IMPL-EVAL for the PR-review follow-up. The supervisor proceeds
+directly with three surgical changes against `cc238e27badf775f460daf50c8e0cb923c3f8e04`:
+
+1. Replace blanket Docker cleanup guidance with inspect-first Aspire CLI commands; ship no container
+   removal command because no current-AppHost-only Docker label filter is proven or needed.
+2. Make route-integrity coverage enumerate all installed `SKILL.md` files plus installed `help.md`,
+   assert the scanned path set, and prove a temporary dangling help route makes the test fail.
+3. Replace bare `help.md` references with `.claude/skills/help.md`, regenerate the embedded barrel,
+   run the six owner-specified gates, and commit locally without pushing.
+
+Locked constraints: installer logic stays untouched; Aspire cache clearing is described only as CLI
+disk-cache maintenance; no `aspire prune`/`clean`/`rm`, blanket process kill, or Docker removal verb
+will ship.

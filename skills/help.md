@@ -35,16 +35,19 @@ If `healthReports` is empty, you have no evidence. Get some before you believe t
 Ports held, resources answering that are not yours, a stack that will not start cleanly.
 
 ```sh
-aspire ps                                        # what is actually running
-aspire stop --all --non-interactive --nologo     # stop everything
-docker ps -a                                     # then clear exited orphans
+aspire ps --format Json --non-interactive --nologo           # inspect running AppHosts first
+aspire describe --format Json --non-interactive --nologo     # inspect resource state
+aspire resource <resource> stop                              # stop one resource when targeted cleanup is enough
+aspire stop --all --non-interactive --nologo                 # only after confirming every listed AppHost is yours
 ```
 
 **Never kill `aspire mcp start`** — those are your MCP servers, not AppHosts.
 
 On a shared machine, confirm the thing answering a port is yours: compare the resource's *assigned*
 port from `aspire describe --format Json` against the fixed/default port you are probing. A foreign
-service on a default port will happily answer and look healthy.
+service on a default port will happily answer and look healthy. If stopping the AppHost does not
+restore a clean state, run `aspire doctor --format Json --non-interactive --nologo`; leave leftover
+containers for Aspire to reclaim rather than removing containers by hand.
 
 ## Vite will not start, or hangs
 
@@ -162,9 +165,17 @@ tools that walk upward will inherit it. A generated project should carry its own
 ## Cleaning up after yourself
 
 ```sh
-aspire stop --all --non-interactive --nologo
-docker ps -aq | xargs -r docker rm -f
+aspire ps --format Json --non-interactive --nologo           # inspect before stopping anything
+aspire describe --format Json --non-interactive --nologo     # inspect runtime/resource state
+aspire resource <resource> stop                              # targeted stop when the whole stack should stay up
+aspire stop --all --non-interactive --nologo                 # only after confirming every listed AppHost is yours
 ```
 
-Leaving AppHosts and containers running is how the *next* run gets a port conflict it cannot
-explain.
+Re-run `aspire ps` and `aspire describe` after stopping. Aspire's `dcp` helper processes can take
+about 20 seconds to exit, so re-check rather than killing them. Leaving AppHosts running is how the
+*next* run gets a port conflict it cannot explain; leftover containers are Aspire's to reclaim. If
+cleanup still looks wrong, use `aspire doctor --format Json --non-interactive --nologo` to diagnose
+the container runtime, SDK, and certificates.
+
+`aspire cache clear` clears only the Aspire CLI's disk cache. It does **not** stop AppHosts or remove
+containers, so use it only for a CLI-cache problem—not as runtime cleanup.

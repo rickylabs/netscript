@@ -126,24 +126,31 @@ Deno.test("agent init installs the diagnostic surface with no dangling skill rou
     }
 
     const installed = new Set(manifest.skills);
+    const routingPaths = [
+      ...manifest.skills.map((skill) => `${skill}/SKILL.md`),
+      "help.md",
+    ];
+    const scannedFiles = new Set<string>();
     const referenced = new Set<string>();
     const dangling = new Set<string>();
-    for (const skill of manifest.skills) {
+    for (const path of routingPaths) {
       const markdown = await Deno.readTextFile(
-        join(root, ".claude", "skills", skill, "SKILL.md"),
+        join(root, ".claude", "skills", path),
       );
+      scannedFiles.add(path);
       for (const reference of extractSkillReferences(markdown)) {
         referenced.add(reference);
-        if (!installed.has(reference)) dangling.add(`${skill} -> ${reference}`);
+        if (!installed.has(reference)) dangling.add(`${path} -> ${reference}`);
       }
     }
+    assertEquals([...scannedFiles], routingPaths);
+    assertEquals([...dangling], []);
     assertEquals([...referenced].sort(), [
       "aspire",
       "deno",
       "netscript-build",
       "netscript-operate",
     ]);
-    assertEquals([...dangling], []);
 
     const agents = await Deno.readTextFile(join(root, "AGENTS.md"));
     assertStringIncludes(agents, "`aspire`");
