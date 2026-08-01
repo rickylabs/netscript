@@ -98,3 +98,80 @@ No lockfile or unrelated source change was produced. `scaffold.runtime` was not 
 ### Reconcile
 
 PR #1030 closes #1026 and explicitly references the installed-surface portion of #1023 without closing it. S1–S4 are complete; final Opus supervisor IMPL-EVAL remains the merge gate.
+
+## Follow-up slice — safe cleanup guidance
+
+### Plan
+
+- Baseline: supervisor IMPL-EVAL `PASS` at `1760e58b4`; owner-provided briefing commit `3938980c0` is already present locally.
+- Scope: replace only the bodies of `A dangling AppHost is causing conflicts` and `Cleaning up after yourself` with the canonical #1034 wording from `707e8d235`/head `a5310a19c`.
+- Generated contract: run `gen:assets-barrel` twice and require the second run to leave no additional diff.
+- Safety gate: no container-removal command survives; remaining Docker mentions must be read-only and subordinate to Aspire.
+- Validation: verify every retained Aspire verb/flag against CLI 13.4.6, then run the four requested scoped gates.
+- Process: owner-waived evaluator lane; supervisor owns IMPL-EVAL. One implementation commit, no rebase, no push, no agent-init TypeScript changes.
+
+### Implementation and raw evidence
+
+- Replaced only the two cleanup-section bodies with the canonical #1034 wording at `a5310a19c` (fix commit `707e8d235`). Section-boundary `diff -u` produced no output for either section.
+- Aspire CLI verification: `aspire --version` returned `13.4.6+87fe259e4fc244c599019a7b1304c85a1488f248`; `ps`, `describe`, `resource`, `stop`, `doctor`, and `cache clear` help each exited 0 and exposed every retained verb/flag.
+- Regeneration ran twice. Complete owned-diff hashes were identical:
+
+```text
+first_diff=f774d9fde16a456a7f7893d66b2b8dda764d4b70fd5aefa763aa6f4a3d319b3c
+second_diff=f774d9fde16a456a7f7893d66b2b8dda764d4b70fd5aefa763aa6f4a3d319b3c
+reproducible=yes
+```
+
+Safety grep (exit 1 means no matches; stdout was empty):
+
+```text
+$ grep -nE 'docker (rm|kill|prune|stop)|xargs .*docker' skills/help.md
+<no output>
+```
+
+Surviving container mentions are prose subordinating cleanup to Aspire:
+
+```text
+50:containers for Aspire to reclaim rather than removing containers by hand.
+163:*next* run gets a port conflict it cannot explain; leftover containers are Aspire's to reclaim. If
+165:the container runtime, SDK, and certificates.
+168:containers, so use it only for a CLI-cache problem—not as runtime cleanup.
+```
+
+Scoped check (exit 0):
+
+```json
+{"source":{"mode":"selection","cwd":"/home/codex/repos/fix-1026"},"command":"deno check --quiet --unstable-kv <files>","selection":{"filesSelected":744,"batches":7,"failedBatches":0},"summary":{"totalOccurrences":0,"uniqueOccurrences":0,"uniqueCodes":0,"uniquePaths":0},"groups":[]}
+```
+
+Scoped lint (exit 0):
+
+```json
+{"source":{"mode":"command","cwd":"/home/codex/repos/fix-1026","exitCode":0},"selection":{"filesSelected":744,"batches":4},"summary":{"totalOccurrences":0,"uniqueOccurrences":0,"uniqueRules":0,"uniquePaths":0},"groups":[]}
+```
+
+Scoped skills format (exit 1):
+
+```json
+{"command":"deno fmt --check","cwd":"/home/codex/repos/fix-1026","mode":"check","summary":{"filesSelected":6,"batches":1,"failedBatches":1,"findings":3,"ignoredFindings":0},"findings":[{"path":"/home/codex/repos/fix-1026/skills/help.md","reason":"-On a shared machine, confirm the thing answering a port is yours: compare the resource's *assigned*"},{"path":"/home/codex/repos/fix-1026/skills/netscript-build/SKILL.md","reason":"-description: \"Scaffold and build NetScript applications with the `netscript` CLI. USE FOR: init a project, contract-first flow, database lifecycle (init/generate/migrate/seed/status), add and sync plugins, add services, add UI, generate registries. DO NOT USE FOR: monitoring, debugging, or performance analysis (use netscript-operate); Aspire orchestration (use the aspire skill).\""},{"path":"/home/codex/repos/fix-1026/skills/netscript-operate/SKILL.md","reason":"-description: \"Monitor, debug, and analyze a running NetScript application through the NetScript MCP tools. USE FOR: is my app healthy, list recent runs, inspect one execution, find recent errors, why did a job fail, why is a service slow, database/KV bottlenecks, run diagnostics, search the docs. DO NOT USE FOR: scaffolding or changing the project (use netscript-build); Aspire dashboards or raw resource logs (use the aspire skill).\""}]}
+```
+
+The `help.md` finding is the canonical #1034 wording required verbatim; the other two are pre-existing. Formatting them would violate this slice's exact-convergence/section-only constraints.
+
+Focused test (exit 0):
+
+```text
+Check packages/cli/src/public/features/agent/init/init-agent_test.ts
+running 7 tests from ./packages/cli/src/public/features/agent/init/init-agent_test.ts
+agent init writes Claude config, skills, and marked AGENTS section idempotently ... ok (78ms)
+agent init selects VS Code and detect-or-all host table ... ok (12ms)
+agent init rejects a bundle whose manifest hash does not match ... ok (3ms)
+installed skill routing resolves to installed skills or help ... ok (18ms)
+aspire delegation is skipped when Playwright CLI is already installed ... ok (14ms)
+aspire delegation timeout is swallowed after cancelling the fake ... ok (27ms)
+aspire delegation errors are swallowed with unconditional MCP config ... ok (18ms)
+
+ok | 7 passed | 0 failed (192ms)
+```
+
+No agent-init TypeScript, lockfile, or scaffold output changed. E2E was not run per supervisor instruction.
