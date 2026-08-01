@@ -58,6 +58,7 @@ environment, or project-root inputs to it, and tests inject env/cwd/import behav
 | 2026-08-01 | plan-eval | cycle 1 remediation | Opus 5 returned FAIL with three bounded planning fixes. Owner waived the open-model route and authorized implementation after committing the exact remediation; plan amended without redesign. |
 | 2026-08-01 | 1 | shared resolver | Added injected env/cwd/project-root resolution with explicit → env → fallback precedence, Windows/backslash coverage, and absolute specifier preservation. Focused tests passed. |
 | 2026-08-01 | 2 | runner dependency shape | Removed package-relative resolution and proved the fallback importer receives the consumer project URL and loads one definition. |
+| 2026-08-01 | 3 | API service seam | Routed `registerSagas` through the shared precedence resolver and injected importer/registrar seams; service test registered one loaded definition. |
 
 ## Decisions
 
@@ -80,3 +81,4 @@ the amended plan under the owner's instruction; implementation is authorized wit
 | --- | --- | --- |
 | Resolver focused tests | PASS | 3 resolver tests passed: precedence/fallback, Windows paths, absolute specifiers. |
 | Runner dependency-shape test | PASS | `startSagaRunner` loaded one definition from `file:///consumer/project/...`; no JSR install was performed. |
+| Service init test | PASS | `registerSagas` imported the consumer-project URL and passed one definition to the registrar seam. |

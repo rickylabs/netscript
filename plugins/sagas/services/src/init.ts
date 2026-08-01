@@ -6,11 +6,24 @@
  * @module
  */
 
-import { loadSagaRegistryModule } from '../../src/runtime/saga-runner.ts';
+import {
+  loadSagaRegistryModule,
+  type SagaRuntimeModuleImporter,
+} from '../../src/runtime/saga-runner.ts';
+import {
+  type ProjectRegistryModuleOptions,
+  resolveProjectRegistryModule,
+} from '../../src/runtime/project-registry-module.ts';
 import type { SagaDefinition } from '@netscript/plugin-sagas-core/domain';
 import { registerSagaDefinitions } from './saga-registry.ts';
 
-const DEFAULT_REGISTRY_MODULE = '../../../../.netscript/generated/plugin-sagas/sagas.registry.ts';
+/** Inputs used to load and register service-side saga definitions. */
+export type RegisterSagasOptions =
+  & ProjectRegistryModuleOptions
+  & Readonly<{
+    importer?: SagaRuntimeModuleImporter;
+    registerDefinitions?: (definitions: readonly SagaDefinition[]) => Promise<unknown>;
+  }>;
 
 /**
  * Register sagas from netscript.config.ts on startup.
@@ -18,10 +31,11 @@ const DEFAULT_REGISTRY_MODULE = '../../../../.netscript/generated/plugin-sagas/s
  * This loads saga definitions and registers them with the SagaRegistry.
  * The actual saga processor runs separately (in the sagas/ directory).
  */
-export async function registerSagas(): Promise<readonly SagaDefinition[]> {
-  const definitions = await loadSagaRegistryModule(
-    new URL(DEFAULT_REGISTRY_MODULE, import.meta.url).href,
-  );
-  await registerSagaDefinitions(definitions);
+export async function registerSagas(
+  options: RegisterSagasOptions = {},
+): Promise<readonly SagaDefinition[]> {
+  const registryModule = resolveProjectRegistryModule(options);
+  const definitions = await loadSagaRegistryModule(registryModule, options.importer);
+  await (options.registerDefinitions ?? registerSagaDefinitions)(definitions);
   return definitions;
 }
