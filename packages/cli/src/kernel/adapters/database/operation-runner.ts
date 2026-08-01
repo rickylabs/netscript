@@ -28,6 +28,7 @@ import {
 
 const DEFAULT_POLL_INTERVAL_MS = 1_000;
 const DEFAULT_TIMEOUT_MS = 15 * 60_000;
+const NO_RUNNING_APPHOST_MESSAGE = 'No AppHost is currently running';
 
 interface DbOperationRunnerOptions {
   readonly executor?: AspireCommandExecutor;
@@ -124,6 +125,7 @@ export class DbOperationRunner {
   ): Promise<number> {
     const displayName = buildExecutableDisplayName(operation, configKey);
     outputText(`Starting db ${operation} for ${configKey}...`);
+    const startedByInvocation = !(await this.hasRunningAppHost(apphostPath, aspireDir));
 
     await this.runAspire(
       buildAspireArgs('start', apphostPath),
@@ -148,8 +150,33 @@ export class DbOperationRunner {
 
       return code;
     } finally {
-      await this.stopDetached(apphostPath, aspireDir);
+      if (startedByInvocation) {
+        await this.stopDetached(apphostPath, aspireDir);
+      }
     }
+  }
+
+  private async hasRunningAppHost(apphostPath: string, aspireDir: string): Promise<boolean> {
+    const args = [
+      'describe',
+      '--apphost',
+      apphostPath,
+      '--format',
+      'Json',
+      '--non-interactive',
+      '--nologo',
+    ];
+    const output = await this.executor.output(args, { cwd: aspireDir });
+    if (output.code === 0) {
+      return true;
+    }
+
+    const details = output.stderr.trim() || output.stdout.trim() || 'unknown Aspire error';
+    if (`${output.stdout}\n${output.stderr}`.includes(NO_RUNNING_APPHOST_MESSAGE)) {
+      return false;
+    }
+
+    throw new Error(`aspire describe failed: ${details}`);
   }
 
   private async printResourceLogs(

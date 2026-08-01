@@ -52,12 +52,46 @@ adjacent test and assert exact Aspire commands before changing cleanup authority
 | --- | --- | --- | --- |
 | 2026-08-01 | bootstrap | research/design | Concrete unconditional `aspire stop` established; PLAN-EVAL pending. |
 | 2026-08-01 | plan-eval | evaluator launch | Separate Qwen session `aa3c6460-8788-4e0d-b4c3-9b04fc11eb17` launched with the canonical route but failed authentication before evaluating. |
+| 2026-08-01 | plan-eval | supervisor waiver | `WAIVED — evaluator transport unavailable, supervisor-approved`. The owner approved D1–D4 and authorized implementation without a fabricated formal verdict artifact. |
+| 2026-08-01 | slice 1 | implementation | Added pre-start ownership probe, conditional cleanup, and resident/owned/failure/ambiguous-probe coverage. |
+| 2026-08-01 | slice 1 | targeted gate | First run exited 1 on a fixture typo; second exited 1 on a stale poll-count expectation; final run passed 4 modules / 14 steps. |
+| 2026-08-01 | slice 1 | supervisor review | Full diff approved: ownership fails closed, resident path has no stop, owned failure cleans up, studio is unchanged, and there is no cast/ignore/template/lock churn. |
+| 2026-08-01 | slice 1 | reconcile | Issue #1011 remains open; PR #1027 retains `Closes #1011`, milestone 0.0.3, required taxonomy, and draft state. No rescope or debt change. |
 
 ## Gate Results
 
-All implementation gates are `NOT_RUN` until PLAN-EVAL returns `PASS`. The first evaluator launch
-exited before evaluation with `Not logged in`; no verdict artifact was created.
+PLAN-EVAL: **WAIVED — evaluator transport unavailable, supervisor-approved**. The first evaluator
+launch exited before evaluation with `Not logged in`; no verdict artifact exists or is claimed.
+
+### Static Gates
+
+| Gate | Command | Result | Notes |
+| --- | --- | --- | --- |
+| Adapter tests | `deno test -A packages/cli/src/kernel/adapters/database/` | PASS, exit 0 | 4 modules, 14 steps; earlier test-development exits 1 retained above. |
+| Scoped check (requested spelling) | `...run-deno-check.ts --root packages/cli --ext ts,tsx --unstable-kv` | INVALID, exit 1 | Wrapper rejects `--unstable-kv`; it enables that flag by default. |
+| Scoped check (supported equivalent) | `...run-deno-check.ts --root packages/cli --ext ts,tsx` | PASS, exit 0 | 742 files, 7 batches; reports `deno check --quiet --unstable-kv`. |
+| Scoped lint | `...run-deno-lint.ts --root packages/cli --ext ts,tsx` | PASS, exit 0 | 742 files, 4 batches, 0 findings. |
+| Scoped format | `...run-deno-fmt.ts --root packages/cli --ext ts,tsx` | PASS, exit 0 | 742 files, 4 batches, 0 findings. |
+
+### Fitness Gates
+
+| Gate | Result | Evidence | Notes |
+| --- | --- | --- | --- |
+| Code quality | PASS, exit 0 | `deno task quality:scan` | No findings; seven pre-existing allowed boundaries reported. |
+| Doctrine fitness | PASS, exit 0 | `deno task arch:check` | Zero FAIL findings; repository-baseline WARN/INFO diagnostics only. |
+| Manual A6 review | PASS | supervisor diff review | Private adapter/test change; no new public surface, casts, lint ignores, permissions, templates, or debt. |
+
+### Runtime and Consumer Gates
+
+| Gate | Result | Evidence | Notes |
+| --- | --- | --- | --- |
+| Resident lifecycle seam | PASS | `never stops an AppHost that was already running` | Exact commands: `describe`, `start`, `describe`, `logs`; no `stop`. |
+| Invocation-owned cleanup | PASS | success + non-zero status tests | `stop` is last command only after documented no-running probe. |
+| Ambiguous probe | PASS | `fails closed when ... ambiguous` | Exact commands: `describe`; never reaches `start`. |
+| Studio path | PASS | existing studio test | Zero detached output calls; interactive `run` spawn unchanged. |
+| Full scaffold runtime | N/A | user instruction | Not run; no scaffold/template/generated output changed. |
 
 ## Handoff Notes
 
-- PLAN-EVAL should inspect D1/D2 closely: ambiguous probe failures must fail closed.
+- Review the explicit `startedByInvocation` assignment and four ownership command sequences first.
+  Formal PLAN-EVAL was owner-waived; no PASS artifact is claimed.

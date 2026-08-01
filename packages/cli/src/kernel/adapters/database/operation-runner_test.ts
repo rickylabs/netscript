@@ -3,7 +3,7 @@
  */
 
 import { join } from '@std/path';
-import { assertEquals } from 'jsr:@std/assert@^1';
+import { assertEquals, assertRejects } from 'jsr:@std/assert@^1';
 import { describe, it } from 'jsr:@std/testing@^1/bdd';
 
 import { DbOperationRunner } from './operation-runner.ts';
@@ -92,11 +92,16 @@ describe('DbOperationRunner', () => {
 
       assertEquals(code, 0);
       assertEquals(executor.spawnCalls.length, 0);
-      assertEquals(executor.outputCalls.length, 6);
-      assertEquals(executor.outputCalls[0].args[0], 'start');
-      assertEquals(executor.outputCalls[0].args.includes('--isolated'), false);
-      assertEquals(executor.outputCalls[0].args.includes('--'), false);
-      assertEquals(executor.outputCalls[1].args, [
+      assertEquals(commandNames(executor), [
+        'describe',
+        'start',
+        'describe',
+        'describe',
+        'describe',
+        'logs',
+        'stop',
+      ]);
+      assertEquals(executor.outputCalls[0].args, [
         'describe',
         '--apphost',
         apphostPath,
@@ -105,22 +110,25 @@ describe('DbOperationRunner', () => {
         '--non-interactive',
         '--nologo',
       ]);
-      assertEquals(executor.outputCalls[4].args[0], 'logs');
-      assertEquals(executor.outputCalls[5].args[0], 'stop');
+      assertEquals(executor.outputCalls[1].args[0], 'start');
+      assertEquals(executor.outputCalls[1].args.includes('--isolated'), false);
+      assertEquals(executor.outputCalls[1].args.includes('--'), false);
+      assertEquals(executor.outputCalls[5].args[0], 'logs');
+      assertEquals(executor.outputCalls[6].args[0], 'stop');
       assertEquals(
-        executor.outputCalls[0].options.env?.NETSCRIPT_PRISMA_OPERATION,
+        executor.outputCalls[1].options.env?.NETSCRIPT_PRISMA_OPERATION,
         'migrate',
       );
       assertEquals(
-        executor.outputCalls[0].options.env?.NETSCRIPT_PRISMA_TARGET,
+        executor.outputCalls[1].options.env?.NETSCRIPT_PRISMA_TARGET,
         'postgres',
       );
       assertEquals(
-        executor.outputCalls[0].options.env?.NETSCRIPT_PRISMA_NAME,
+        executor.outputCalls[1].options.env?.NETSCRIPT_PRISMA_NAME,
         'init',
       );
       assertEquals(
-        executor.outputCalls[0].options.env?.ASPIRE_CLI_START_TIMEOUT,
+        executor.outputCalls[1].options.env?.ASPIRE_CLI_START_TIMEOUT,
         '300',
       );
     });
@@ -138,7 +146,7 @@ describe('DbOperationRunner', () => {
 
       assertEquals(code, 0);
       assertEquals(
-        executor.outputCalls[0].options.env?.ASPIRE_CLI_START_TIMEOUT,
+        executor.outputCalls[1].options.env?.ASPIRE_CLI_START_TIMEOUT,
         '900',
       );
     });
@@ -148,6 +156,7 @@ describe('DbOperationRunner', () => {
     await withAspireStartTimeout(undefined, async () => {
       const apphostPath = join(PROJECT_ROOT, 'aspire', 'apphost.mts');
       const executor = new FakeAspireExecutor([
+        noRunningAppHost(),
         { code: 0, stdout: '{"appHostPid":123}', stderr: '' },
         { code: 0, stdout: '', stderr: '' },
         {
@@ -177,8 +186,8 @@ describe('DbOperationRunner', () => {
       );
 
       assertEquals(code, 0);
-      assertEquals(executor.outputCalls[1].args[0], 'describe');
       assertEquals(executor.outputCalls[2].args[0], 'describe');
+      assertEquals(executor.outputCalls[3].args[0], 'describe');
     });
   });
 
@@ -194,10 +203,56 @@ describe('DbOperationRunner', () => {
 
       assertEquals(code, 0);
       assertEquals(
-        executor.outputCalls[0].options.env?.ASPIRE_CLI_START_TIMEOUT,
+        executor.outputCalls[1].options.env?.ASPIRE_CLI_START_TIMEOUT,
         '300',
       );
     });
+  });
+
+  it('never stops an AppHost that was already running', async () => {
+    const apphostPath = join(PROJECT_ROOT, 'aspire', 'apphost.mts');
+    const executor = new FakeAspireExecutor([
+      { code: 0, stdout: JSON.stringify([{ appHostPath: apphostPath }]), stderr: '' },
+      { code: 0, stdout: '{"appHostPid":123}', stderr: '' },
+      finishedResource(apphostPath, 0),
+      { code: 0, stdout: 'Database is up to date.', stderr: '' },
+    ]);
+
+    const code = await createFastRunner(executor).execute(createRequest('status'));
+
+    assertEquals(code, 0);
+    assertEquals(commandNames(executor), ['describe', 'start', 'describe', 'logs']);
+    assertEquals(executor.outputCalls.some((call) => call.args[0] === 'stop'), false);
+  });
+
+  it('stops an AppHost started by this invocation after an operation failure', async () => {
+    const apphostPath = join(PROJECT_ROOT, 'aspire', 'apphost.mts');
+    const executor = new FakeAspireExecutor([
+      noRunningAppHost(),
+      { code: 0, stdout: '{"appHostPid":123}', stderr: '' },
+      finishedResource(apphostPath, 1),
+      { code: 0, stdout: 'No migration history.', stderr: '' },
+      { code: 0, stdout: 'stopped', stderr: '' },
+    ]);
+
+    const code = await createFastRunner(executor).execute(createRequest('status'));
+
+    assertEquals(code, 1);
+    assertEquals(commandNames(executor), ['describe', 'start', 'describe', 'logs', 'stop']);
+  });
+
+  it('fails closed when the AppHost ownership probe is ambiguous', async () => {
+    const executor = new FakeAspireExecutor([
+      { code: 2, stdout: '', stderr: 'Dashboard connection failed.' },
+    ]);
+
+    await assertRejects(
+      () => createFastRunner(executor).execute(createRequest('status')),
+      Error,
+      'aspire describe failed: Dashboard connection failed.',
+    );
+
+    assertEquals(commandNames(executor), ['describe']);
   });
 
   it('keeps studio interactive and passes db cli mode through environment variables', async () => {
@@ -234,6 +289,7 @@ function createFastRunner(executor: FakeAspireExecutor): DbOperationRunner {
 
 function createDetachedSuccessExecutor(apphostPath: string): FakeAspireExecutor {
   return new FakeAspireExecutor([
+    noRunningAppHost(),
     { code: 0, stdout: '{"appHostPid":123}', stderr: '' },
     { code: 0, stdout: '[]', stderr: '' },
     {
@@ -273,6 +329,38 @@ function createDetachedSuccessExecutor(apphostPath: string): FakeAspireExecutor 
     { code: 0, stdout: 'Migration applied.', stderr: '' },
     { code: 0, stdout: 'stopped', stderr: '' },
   ]);
+}
+
+function noRunningAppHost(): CommandOutput {
+  return {
+    code: 1,
+    stdout: '',
+    stderr: "No AppHost is currently running for 'apphost.mts'.",
+  };
+}
+
+function finishedResource(apphostPath: string, exitCode: number): CommandOutput {
+  return {
+    code: 0,
+    stdout: JSON.stringify([
+      {
+        appHostPath: apphostPath,
+        resources: [
+          {
+            displayName: 'prisma-status-postgres',
+            resourceType: 'Executable',
+            state: 'Finished',
+            exitCode,
+          },
+        ],
+      },
+    ]),
+    stderr: '',
+  };
+}
+
+function commandNames(executor: FakeAspireExecutor): string[] {
+  return executor.outputCalls.map((call) => call.args[0]);
 }
 
 async function withAspireStartTimeout(
