@@ -11,6 +11,7 @@ export const SCAFFOLD_FILES = {
   MAIN: 'main.ts',
   README: 'README.md',
   APPHOST_MTS: 'apphost.mts',
+  ASPIRE_CLI_TASK: 'aspire-cli.ts',
   TSCONFIG_ROOT: 'tsconfig.json',
   TSCONFIG_APP: 'tsconfig.json',
   TSCONFIG_APPHOST: 'tsconfig.apphost.json',

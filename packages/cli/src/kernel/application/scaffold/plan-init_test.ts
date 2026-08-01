@@ -205,6 +205,27 @@ Deno.test('#966 scaffoldRoot keeps source appsettings tracked by git', async () 
   assertEquals(gitignore.split(/\r?\n/).includes('appsettings.json'), false);
 });
 
+Deno.test('scaffoldRoot emits the Aspire CLI task runner only for Aspire workspaces', async () => {
+  const scaffolder = new InMemoryScaffolder();
+  const result = await scaffoldRoot(context(scaffolder), options());
+  const taskPath = '/workspace/deploy-app/.netscript/aspire-cli.ts';
+
+  assert(result.filesCreated.includes(taskPath));
+  assertStringIncludes(scaffolder.files.get(taskPath) ?? '', 'const [mode, ...forwardedArgs]');
+  assertStringIncludes(
+    scaffolder.files.get(taskPath) ?? '',
+    'aspire otel <sub> <resource> --dashboard-url <url>',
+  );
+
+  const noAspireScaffolder = new InMemoryScaffolder();
+  const noAspireResult = await scaffoldRoot(
+    context(noAspireScaffolder),
+    options({ noAspire: true }),
+  );
+  assert(!noAspireResult.filesCreated.includes(taskPath));
+  assertEquals(noAspireScaffolder.files.has(taskPath), false);
+});
+
 Deno.test('scaffoldRoot emits deploy workflow invocations accepted by the real deploy parser', async () => {
   const scaffolder = new InMemoryScaffolder();
   await scaffoldRoot(context(scaffolder), options());
