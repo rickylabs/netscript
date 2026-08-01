@@ -1,4 +1,5 @@
 import type { CodexFailure } from './classify-codex-failure.ts';
+import type { LeakReport } from '../teardown/leak-check.ts';
 
 export interface SliceBudgets {
   readonly maxTurns: number;
@@ -25,6 +26,18 @@ export function parseDoneContract(reply: string): DoneContract {
   if (line === 'DONE') return { state: 'done' };
   const blocked = line.match(/^BLOCKED:\s+(.+)$/);
   return blocked ? { state: 'blocked', reason: blocked[1].trim() } : { state: 'running' };
+}
+
+/** Downgrades DONE when positively owned resources survived the scoped teardown attempt. */
+export function enforceTeardown(contract: DoneContract, leaks: LeakReport): DoneContract {
+  if (contract.state !== 'done') return contract;
+  const owned = leaks.survivors.filter((entry) => entry.ownership === 'owned');
+  if (owned.length === 0) return contract;
+  const survivors = owned.map((entry) => `${entry.identity} — ${entry.command}`).join('; ');
+  return {
+    state: 'blocked',
+    reason: `teardown: ${owned.length} owned resource(s) survived: ${survivors}`,
+  };
 }
 
 /** Computes the retry delay for a classified provider failure. */

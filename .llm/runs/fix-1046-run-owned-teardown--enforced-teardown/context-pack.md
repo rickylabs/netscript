@@ -26,10 +26,11 @@ three-valued, path-segment-safe, identity-pair-safe, fail-closed, and guarded ag
 - Slice 5 JSON/Markdown leak reporter; live host observation found only foreign `fix-1025` Postgres.
 - Slice 6 dry-run-default teardown, per-resource apply, immediate label re-verification, and forbidden-command guard.
 - Slice 7 `agentic:leak-check`/`agentic:teardown` tasks and tooling index entries.
+- Slice 8 pure `enforceTeardown` plus DONE-branch leak-check → teardown → re-check wiring.
 
 ## In Progress
 
-- Slice 8 load-bearing DONE-contract enforcement and run-loop wiring.
+- Slice 9 E2E cleanup default and AppHost registry integration.
 
 ## Next Steps
 
