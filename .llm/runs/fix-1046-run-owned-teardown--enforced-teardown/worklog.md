@@ -69,6 +69,7 @@ new resource shape. Terminal enforcement is isolated in `run-codex-slice-lib.ts`
 | 2026-08-02 | 2 | Ownership proof | Red test first (missing module), then five fail-closed ownership tests passed with wrapper check. Reconcile: PR #1047 remains draft; no new review comments changed scope. |
 | 2026-08-02 | 3 | Run registry | Schema v1 registry uses same-directory temp+rename and identity-pair deduplication. Reconcile: issue/PR scope unchanged. |
 | 2026-08-02 | 4 | Read-only probes | Aspire 13.4.6 and Docker label fixtures normalize through bounded ports; malformed mounts expose no path proof. Reconcile: no scope changes. |
+| 2026-08-02 | 5 | Leak reporter | Read-only host run reported one foreign `fix-1025` Postgres container and performed no mutation. Reconcile: no review/scope changes. |
 
 ## Decisions
 
@@ -94,6 +95,7 @@ this run changes no `packages/**` or `plugins/**` source.
 | 2 | scoped check + ownership tests | PASS | wrapper: 2 files, 0 findings; `deno test`: 5 passed, 0 failed |
 | 3 | scoped check + registry tests | PASS | wrapper: 4 files, 0 findings; `deno test`: 3 passed, 0 failed |
 | 4 | scoped check + fixture probe tests | PASS | wrapper: 7 files, 0 findings; `deno test`: 2 passed, 0 failed |
+| 5 | scoped check + reporter tests + host read | PASS | wrapper: 9 files, 0 findings; tests 2/2; host report names foreign `postgres-bc75ea00` with exact user command |
 
 ## Handoff Notes
 

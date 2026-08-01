@@ -23,10 +23,11 @@ three-valued, path-segment-safe, identity-pair-safe, fail-closed, and guarded ag
 - Slice 1 resumability artifacts and slice 2 ownership classifier/tests.
 - Slice 3 schema-versioned atomic registry and tests.
 - Slice 4 bounded read-only probes with captured Aspire 13.4.6/Docker fixtures.
+- Slice 5 JSON/Markdown leak reporter; live host observation found only foreign `fix-1025` Postgres.
 
 ## In Progress
 
-- Slice 5 read-only leak report generation and host observation.
+- Slice 6 scoped dry-run/apply teardown with immediate container re-verification.
 
 ## Next Steps
 

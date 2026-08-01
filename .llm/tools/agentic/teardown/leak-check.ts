@@ -1,0 +1,144 @@
+import { join } from '@std/path';
+import { classify, type Ownership, type ResourceCandidate } from './ownership.ts';
+import { probeResources } from './probes.ts';
+import { readRunResources, type RunResourceRegistry } from './run-resources.ts';
+
+export const STALE_AFTER_MS: number = 2 * 60 * 60 * 1000;
+
+export interface LeakEntry {
+  readonly kind: ResourceCandidate['kind'];
+  readonly identity: string;
+  readonly ownership: Ownership;
+  readonly owner: string;
+  readonly ageMs: number | null;
+  readonly stale: boolean;
+  readonly command: string;
+  readonly resource: ResourceCandidate;
+}
+
+export interface LeakReport {
+  readonly schemaVersion: 1;
+  readonly generatedAt: string;
+  readonly worktreeRoot: string;
+  readonly survivors: readonly LeakEntry[];
+}
+
+function shellQuote(value: string): string {
+  return `'${value.replaceAll("'", "'\\''")}'`;
+}
+
+/** Builds the exact per-resource command shown to a human or terminal blocker. */
+export function stopCommand(resource: ResourceCandidate): string {
+  return resource.kind === 'apphost'
+    ? `aspire stop --apphost ${shellQuote(resource.appHostPath)} --non-interactive --nologo`
+    : `docker rm -f ${shellQuote(resource.id)}`;
+}
+
+function ownerFrom(resource: ResourceCandidate): string {
+  const path = resource.kind === 'apphost' ? resource.appHostPath : resource.mountSource;
+  const match = path?.match(/^(\/home\/codex\/repos\/[^/]+)/);
+  return match?.[1] ?? 'unknown';
+}
+
+function registeredStart(resource: ResourceCandidate, registry: RunResourceRegistry): string | undefined {
+  if (resource.kind === 'apphost') {
+    return registry.appHosts.find((entry) =>
+      entry.appHostPid === resource.appHostPid &&
+      entry.appHostStartedAt === resource.appHostStartedAt
+    )?.startedAt;
+  }
+  return registry.containers.find((entry) =>
+    entry.creatorPid === resource.creatorPid &&
+    entry.creatorProcessStartTime === resource.creatorProcessStartTime
+  )?.startedAt;
+}
+
+/** Converts all survivors, including unknown-owner resources, into a deterministic report. */
+export function buildLeakReport(
+  resources: readonly ResourceCandidate[],
+  registry: RunResourceRegistry,
+  worktreeRoot: string,
+  nowMs: number = Date.now(),
+  staleAfterMs: number = STALE_AFTER_MS,
+): LeakReport {
+  return {
+    schemaVersion: 1,
+    generatedAt: new Date(nowMs).toISOString(),
+    worktreeRoot,
+    survivors: resources.map((resource) => {
+      const startedAt = registeredStart(resource, registry);
+      const parsedStart = startedAt ? Date.parse(startedAt) : Number.NaN;
+      const ageMs = Number.isFinite(parsedStart) ? Math.max(0, nowMs - parsedStart) : null;
+      return {
+        kind: resource.kind,
+        identity: resource.kind === 'apphost'
+          ? `${resource.appHostPath} (pid ${resource.appHostPid ?? 'unknown'})`
+          : `${resource.name ?? resource.id} (${resource.id})`,
+        ownership: classify(resource, registry, worktreeRoot),
+        owner: ownerFrom(resource),
+        ageMs,
+        stale: ageMs !== null && ageMs >= staleAfterMs,
+        command: stopCommand(resource),
+        resource,
+      };
+    }),
+  };
+}
+
+/** Renders every survivor and exact remediation command; unknown age/owner remain explicit. */
+export function renderLeakReport(report: LeakReport): string {
+  const lines = [
+    '# Run resource leak report',
+    '',
+    `Generated: ${report.generatedAt}`,
+    `Worktree: \`${report.worktreeRoot}\``,
+    '',
+  ];
+  if (report.survivors.length === 0) return `${lines.join('\n')}No surviving Aspire resources found.\n`;
+  for (const entry of report.survivors) {
+    lines.push(
+      `## ${entry.kind}: ${entry.identity}`,
+      '',
+      `- Ownership: \`${entry.ownership}\``,
+      `- Apparent owner: \`${entry.owner}\``,
+      `- Age: ${entry.ageMs === null ? 'unknown' : `${entry.ageMs} ms`}`,
+      `- Stale: ${entry.stale}`,
+      `- User command: \`${entry.command}\``,
+      '',
+    );
+  }
+  return `${lines.join('\n')}\n`;
+}
+
+/** Performs a read-only leak check, writing Markdown and returning the JSON report. */
+export async function runLeakCheck(
+  sliceDir: string,
+  worktreeRoot: string,
+  staleAfterMs: number = STALE_AFTER_MS,
+): Promise<LeakReport> {
+  const registry = await readRunResources(sliceDir, worktreeRoot);
+  const report = buildLeakReport(await probeResources(), registry, worktreeRoot, Date.now(), staleAfterMs);
+  await Deno.mkdir(sliceDir, { recursive: true });
+  await Deno.writeTextFile(join(sliceDir, 'leak-report.md'), renderLeakReport(report));
+  return report;
+}
+
+function parseArgs(args: string[]): { sliceDir: string; worktreeRoot: string; staleAfterMs: number } {
+  let sliceDir = '';
+  let worktreeRoot = Deno.cwd();
+  let staleAfterMs = STALE_AFTER_MS;
+  for (let i = 0; i < args.length; i++) {
+    if (args[i] === '--slice-dir') sliceDir = args[++i] ?? '';
+    else if (args[i] === '--worktree') worktreeRoot = args[++i] ?? '';
+    else if (args[i] === '--stale-after') staleAfterMs = Number(args[++i]) * 1000;
+    else throw new Error(`unknown argument: ${args[i]}`);
+  }
+  if (!sliceDir) throw new Error('--slice-dir is required');
+  if (!Number.isFinite(staleAfterMs) || staleAfterMs < 0) throw new Error('--stale-after must be seconds >= 0');
+  return { sliceDir, worktreeRoot, staleAfterMs };
+}
+
+if (import.meta.main) {
+  const options = parseArgs(Deno.args);
+  console.log(JSON.stringify(await runLeakCheck(options.sliceDir, options.worktreeRoot, options.staleAfterMs), null, 2));
+}
