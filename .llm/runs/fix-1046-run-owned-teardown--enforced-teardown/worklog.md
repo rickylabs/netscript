@@ -11,6 +11,19 @@
 
 ## Design
 
+### Augment review amendment — 2026-08-02
+
+- Public surface: `ProbeStatus`, resilient aggregate probe results, exported AppHost-only probing,
+  injectable `runLeakCheck`, and a bounded AppHost discovery helper for E2E registration.
+- Ports: existing `CommandPort` and `FilePort`; retry time is injected as `now`/`delay` so tests do
+  not sleep. Probe error normalization remains at the command adapter boundary.
+- Invariants: probe status is diagnostic only; `classify()` ownership proofs and `actionable()` are
+  unchanged; only owned survivors can block DONE or authorize teardown.
+- Commit slices: the five ordered Augment comments recorded in `plan.md`, each with focused tests,
+  run-artifact evidence, explicit push, and PR comment.
+- Deferred scope: changing shipped Aspire guidance remains #1048; no AppHost is started by these
+  unit-level remediations.
+
 ### Public Surface
 
 - `classify(...)` — pure, three-valued resource ownership classification.
@@ -79,6 +92,7 @@ new resource shape. Terminal enforcement is isolated in `run-codex-slice-lib.ts`
 | 2026-08-02 | 11    | Supervisor IMPL-EVAL    | PASS under the explicit owner waiver. Close-gate review requires a partial/draft PR without a closing keyword because criterion 5 depends on unmerged #1034.                                       |
 | 2026-08-02 | 5R    | Supervisor review fix   | Docker RFC3339Nano `Created` now supplies report-only age when registry time is absent; red-first foreign-stale test passes. Ownership/actionability unchanged.                                    |
 | 2026-08-02 | 11R   | Post-merge closeout     | Merged #1034 assets dogfooded as six consumer files; #1048 tracks the exact unsafe Aspire guidance inventory. All post-merge gates pass and acceptance box 5 is evidenced.                          |
+| 2026-08-02 | A1    | Resilient leak probes   | Aspire and Docker probes settle independently with explicit ok/unavailable/failed status. Two unavailable tools leave DONE unchanged; mixed Aspire success is retained.                         |
 
 ## Decisions
 

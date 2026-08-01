@@ -183,3 +183,25 @@ becomes machine-enforced for AppHosts/containers.
   label-injection hook.
 - Cross-machine / CI-runner leak reporting.
 - Adding a teardown symptom row to `skills/help.md` — owned by #1034; follow-up comment on that PR.
+# Augment review remediation plan — 2026-08-02
+
+The owner waived a new open-model PLAN-EVAL for this review round; the supervisor performs the
+review gates. Existing decisions D1–D8 remain locked, especially the owned-only mutation bar.
+
+1. **Probe resilience (#3696850088):** add per-tool probe outcomes at the process adapter boundary,
+   preserve successful sibling results, thread injectable command/file ports through leak-check,
+   and prove unavailable tools cannot block DONE.
+2. **AppHost settle window (#3696850097):** add an immediately-first, bounded retry helper with an
+   injected delay and configurable budget; distinguish timeout from probe failure in diagnostics.
+3. **AppHost-only registry probe (#3696850093):** route E2E registration through the exported
+   Aspire-only probe so Docker availability is outside this operation's dependency graph.
+4. **Portable attribution (#3696850101):** derive the sibling-worktree parent from the active
+   worktree root for reporting and foreign classification without changing either owned proof.
+5. **Traversal pruning (#3696850083):** prune `.git` and `.llm/runs` before recursion, then prove the
+   guard still fails against a temporary tracked-file violation and record the red output.
+
+Risks are bounded by focused regression tests: probe status must never authorize mutation; retry
+uses a finite monotonic budget; derived attribution uses path segments; traversal keeps exact
+canonical and dogfood inventories. No package/plugin export changes or architecture debt are
+introduced. Required final gates are the six commands in the supervisor brief plus a final
+read-only Docker/Aspire inventory.

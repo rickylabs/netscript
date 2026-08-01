@@ -39,7 +39,7 @@ consumer bundle contains `aspire`, `deno`, `help.md`, `netscript`, `netscript-bu
 
 ## In Progress
 
-- None.
+- Augment review remediation: fix 1/5 complete locally; fixes 2–5 pending.
 
 ## Next Steps
 

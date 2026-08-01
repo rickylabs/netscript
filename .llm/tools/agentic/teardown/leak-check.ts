@@ -1,6 +1,10 @@
 import { join } from '@std/path';
 import { classify, type Ownership, type ResourceCandidate } from './ownership.ts';
-import { probeResources } from './probes.ts';
+import {
+  type ProbeStatus,
+  probeResourceReport,
+} from './probes.ts';
+import { type CommandPort, type FilePort, systemCommands, systemFiles } from './ports.ts';
 import { readRunResources, type RunResourceRegistry } from './run-resources.ts';
 
 export const STALE_AFTER_MS: number = 2 * 60 * 60 * 1000;
@@ -20,8 +24,17 @@ export interface LeakReport {
   readonly schemaVersion: 1;
   readonly generatedAt: string;
   readonly worktreeRoot: string;
+  readonly probes: {
+    readonly aspire: ProbeStatus;
+    readonly docker: ProbeStatus;
+  };
   readonly survivors: readonly LeakEntry[];
 }
+
+const OK_PROBES: LeakReport['probes'] = {
+  aspire: { state: 'ok' },
+  docker: { state: 'ok' },
+};
 
 function shellQuote(value: string): string {
   return `'${value.replaceAll("'", "'\\''")}'`;
@@ -69,11 +82,13 @@ export function buildLeakReport(
   worktreeRoot: string,
   nowMs: number = Date.now(),
   staleAfterMs: number = STALE_AFTER_MS,
+  probes: LeakReport['probes'] = OK_PROBES,
 ): LeakReport {
   return {
     schemaVersion: 1,
     generatedAt: new Date(nowMs).toISOString(),
     worktreeRoot,
+    probes,
     survivors: resources.map((resource) => {
       const startedAt = registeredStart(resource, registry) ?? resource.createdAt;
       const parsedStart = parseTimestamp(startedAt);
@@ -101,6 +116,8 @@ export function renderLeakReport(report: LeakReport): string {
     '',
     `Generated: ${report.generatedAt}`,
     `Worktree: \`${report.worktreeRoot}\``,
+    `Aspire probe: ${renderProbeStatus(report.probes.aspire)}`,
+    `Docker probe: ${renderProbeStatus(report.probes.docker)}`,
     '',
   ];
   if (report.survivors.length === 0) {
@@ -121,19 +138,28 @@ export function renderLeakReport(report: LeakReport): string {
   return `${lines.join('\n')}\n`;
 }
 
+function renderProbeStatus(status: ProbeStatus): string {
+  return status.state === 'ok' ? 'ok' : `${status.state} — ${status.message}`;
+}
+
 /** Performs a read-only leak check, writing Markdown and returning the JSON report. */
 export async function runLeakCheck(
   sliceDir: string,
   worktreeRoot: string,
   staleAfterMs: number = STALE_AFTER_MS,
+  commands: CommandPort = systemCommands,
+  files: FilePort = systemFiles,
+  now: () => number = Date.now,
 ): Promise<LeakReport> {
   const registry = await readRunResources(sliceDir, worktreeRoot);
+  const probed = await probeResourceReport(commands, files);
   const report = buildLeakReport(
-    await probeResources(),
+    probed.resources,
     registry,
     worktreeRoot,
-    Date.now(),
+    now(),
     staleAfterMs,
+    probed.probes,
   );
   await Deno.mkdir(sliceDir, { recursive: true });
   await Deno.writeTextFile(join(sliceDir, 'leak-report.md'), renderLeakReport(report));

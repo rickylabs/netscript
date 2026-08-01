@@ -25,6 +25,7 @@ function leaks(ownership: 'owned' | 'foreign' | 'unproven'): LeakReport {
     schemaVersion: 1,
     generatedAt: '2026-08-02T00:00:00Z',
     worktreeRoot: '/worktree',
+    probes: { aspire: { state: 'ok' }, docker: { state: 'ok' } },
     survivors: [{
       kind: 'apphost',
       identity: '/worktree/apphost.mts (pid 1)',

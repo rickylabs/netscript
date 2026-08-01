@@ -19,6 +19,19 @@ interface DockerInspectRow {
   readonly Config?: { readonly Labels?: Record<string, string> | null };
 }
 
+export type ProbeStatus =
+  | { readonly state: 'ok' }
+  | { readonly state: 'unavailable'; readonly message: string }
+  | { readonly state: 'failed'; readonly message: string };
+
+export interface ResourceProbeResult {
+  readonly resources: readonly ResourceCandidate[];
+  readonly probes: {
+    readonly aspire: ProbeStatus;
+    readonly docker: ProbeStatus;
+  };
+}
+
 function processStartedAt(stat: string): string | undefined {
   const close = stat.lastIndexOf(')');
   if (close < 0) return undefined;
@@ -44,7 +57,12 @@ async function resolvedPath(
   }
 }
 
-async function probeAppHosts(commands: CommandPort, files: FilePort, timeoutMs: number) {
+/** Discovers AppHosts using only Aspire and process metadata. */
+export async function probeAppHosts(
+  commands: CommandPort = systemCommands,
+  files: FilePort = systemFiles,
+  timeoutMs: number = DEFAULT_PROBE_TIMEOUT_MS,
+): Promise<ResourceCandidate[]> {
   const result = await commands.run(['aspire', 'ps', '--format', 'Json'], timeoutMs);
   if (result.code !== 0) {
     throw new Error(`aspire ps failed (${result.code}): ${result.stderr.trim()}`);
@@ -105,17 +123,46 @@ async function probeContainers(commands: CommandPort, files: FilePort, timeoutMs
   return candidates;
 }
 
+function probeFailure(error: unknown): ProbeStatus {
+  const message = error instanceof Error ? error.message : String(error);
+  return error instanceof Deno.errors.NotFound
+    ? { state: 'unavailable', message }
+    : { state: 'failed', message };
+}
+
+async function settledProbe(
+  run: () => Promise<ResourceCandidate[]>,
+): Promise<{ resources: ResourceCandidate[]; status: ProbeStatus }> {
+  try {
+    return { resources: await run(), status: { state: 'ok' } };
+  } catch (error) {
+    return { resources: [], status: probeFailure(error) };
+  }
+}
+
+/** Runs Aspire and Docker discovery independently and retains each probe's outcome. */
+export async function probeResourceReport(
+  commands: CommandPort = systemCommands,
+  files: FilePort = systemFiles,
+  timeoutMs: number = DEFAULT_PROBE_TIMEOUT_MS,
+): Promise<ResourceProbeResult> {
+  const [aspire, docker] = await Promise.all([
+    settledProbe(() => probeAppHosts(commands, files, timeoutMs)),
+    settledProbe(() => probeContainers(commands, files, timeoutMs)),
+  ]);
+  return {
+    resources: [...aspire.resources, ...docker.resources],
+    probes: { aspire: aspire.status, docker: docker.status },
+  };
+}
+
 /** Discovers only Aspire AppHosts and Aspire-labelled containers with bounded read-only probes. */
 export async function probeResources(
   commands: CommandPort = systemCommands,
   files: FilePort = systemFiles,
   timeoutMs: number = DEFAULT_PROBE_TIMEOUT_MS,
 ): Promise<ResourceCandidate[]> {
-  const [appHosts, containers] = await Promise.all([
-    probeAppHosts(commands, files, timeoutMs),
-    probeContainers(commands, files, timeoutMs),
-  ]);
-  return [...appHosts, ...containers];
+  return [...(await probeResourceReport(commands, files, timeoutMs)).resources];
 }
 
 /** Re-reads one container's labels immediately before a possible removal. */
