@@ -70,6 +70,8 @@ plugin-name registry.
 | 2026-08-01 | follow-up | workspace resolver | Added workspace-first runtime manifest/generator resolution through `FileSystemPort`, with package-name-guarded upward discovery and the published HTTP fallback preserved. Commit `0e466f6a9`. |
 | 2026-08-01 | follow-up | trigger manifest | Excluded scaffold-only `triggers/runtime.ts` from the published trigger runtime registry manifest; retained the generator's invalid-definition throw. Commit `9e93f757f`. |
 | 2026-08-01 | follow-up | executable integration | Replaced text-only registry assertions with four tests: real generated-registry load, invalid-module rejection, workspace-first/no-fetch, and JSR-only published fallback. Commit `1ce434a4a`. |
+| 2026-08-01 | follow-up | coverage restoration | Added real generated-module loading for workers and sagas. Workers asserts `example-job` is registered and excluded `job-tools.ts` is absent; sagas asserts `order-processing` is registered and a non-`-saga.ts` file is absent. Commit `e42696ae5`. |
+| 2026-08-01 | follow-up | fixture correction | First saga run failed 5 passed/1 failed because `not-a-saga.ts` does end in `-saga.ts`; renamed the negative fixture to `saga-tools.ts`, after which all six integration tests passed. |
 
 ## Decisions
 
@@ -104,6 +106,10 @@ plugin-name registry.
 | Follow-up quality | `deno task ci:quality` | PASS (exit 0) | Check/lint/fmt/dependency and specifier/port guards completed; catalog warnings are pre-existing non-failing output. |
 | Follow-up focused tests | `deno test -A packages/cli/src/public/features/generate/plugins/` | PASS (exit 0) | 6 passed (4 steps); generated trigger module was imported in-process. |
 | Follow-up publish dry-run | `deno task publish:dry-run` | PASS (exit 0) | Workspace publish simulation included `plugins/triggers/scaffold.runtime.json`; terminal output ended `Success Dry run complete`. |
+| Coverage follow-up workspace check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages --root plugins --ext ts,tsx` | PASS (exit 0) | 2635 files, 22 batches, 0 findings. |
+| Coverage follow-up focused tests | `deno test -A packages/cli/src/public/features/generate/plugins/` | PASS (exit 0) | 8 passed (4 steps), 0 failed; workers, sagas, and triggers registries imported. |
+| Coverage follow-up quality | `deno task ci:quality` | PASS (exit 0) | Check/lint/fmt and repository guards passed; existing dependency catalog warnings remained non-failing. |
+| Coverage follow-up publish | `deno task publish:dry-run` | PASS (exit 0) | 2420-line output ended `Success Dry run complete`; existing dynamic-import warnings remained non-failing. |
 
 ### Fitness Gates
 
@@ -186,6 +192,46 @@ ok | 6 passed (4 steps) | 0 failed (356ms)
 RAW_EXIT_CODE=0
 
 FOLLOW-UP PUBLISH DRY RUN (2676-line file listing truncated by the terminal; exact final output)
+Success Dry run complete
+RAW_EXIT_CODE=0
+
+COVERAGE FOLLOW-UP FIXTURE ITERATION
+$ deno test -A packages/cli/src/public/features/generate/plugins/installed-runtime-registry-integration_test.ts
+generated workers registry loads jobs and excludes job tools ... ok (150ms)
+generated sagas registry loads saga definitions and ignores other TypeScript files ... FAILED (188ms)
+AssertionError: Values are not equal. Actual true / Expected false
+FAILED | 5 passed | 1 failed (634ms)
+error: Test failed
+RAW_EXIT_CODE=1
+
+COVERAGE FOLLOW-UP WORKSPACE CHECK
+$ deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages --root plugins --ext ts,tsx
+{"source":{"mode":"selection","cwd":"/home/codex/repos/fix-1010"},"command":"deno check --quiet --unstable-kv <files>","selection":{"filesSelected":2635,"batches":22,"failedBatches":0},"summary":{"totalOccurrences":0,"uniqueOccurrences":0,"uniqueCodes":0,"uniquePaths":0},"groups":[]}
+RAW_EXIT_CODE=0
+
+COVERAGE FOLLOW-UP FOCUSED TESTS
+$ deno test -A packages/cli/src/public/features/generate/plugins/
+generate plugin registries command ... ok (7ms)
+installed runtime registry generator ... ok (9ms)
+generated trigger registry loads valid definitions and excludes scaffold runtime glue ... ok (134ms)
+generated trigger registry rejects a non-definition module that is not excluded ... ok (146ms)
+workspace import resolves the on-disk trigger manifest without fetching JSR ... ok (12ms)
+generated workers registry loads jobs and excludes job tools ... ok (133ms)
+generated sagas registry loads saga definitions and ignores other TypeScript files ... ok (153ms)
+JSR-only imports retain the published manifest and generator fallback ... ok (17ms)
+ok | 8 passed (4 steps) | 0 failed (891ms)
+RAW_EXIT_CODE=0
+
+COVERAGE FOLLOW-UP CI QUALITY
+$ deno task ci:quality
+[fmt:check] {"command":"deno fmt --check","cwd":"/home/codex/repos/fix-1010","mode":"check","summary":{"filesSelected":1883,"batches":10,"failedBatches":0,"findings":0,"ignoredFindings":0},"findings":[]}
+[lint] {"source":{"mode":"command","cwd":"/home/codex/repos/fix-1010","exitCode":0},"selection":{"filesSelected":1734,"batches":9},"summary":{"totalOccurrences":0,"uniqueOccurrences":0,"uniqueRules":0,"uniquePaths":0},"groups":[]}
+[check] {"source":{"mode":"selection","cwd":"/home/codex/repos/fix-1010"},"command":"deno check --quiet --unstable-kv <files>","selection":{"filesSelected":2486,"batches":21,"failedBatches":0},"summary":{"totalOccurrences":0,"uniqueOccurrences":0,"uniqueCodes":0,"uniquePaths":0},"groups":[]}
+Task ci:quality (no command)
+RAW_EXIT_CODE=0
+
+COVERAGE FOLLOW-UP PUBLISH DRY RUN (2420-line file listing truncated by terminal)
+$ deno task publish:dry-run
 Success Dry run complete
 RAW_EXIT_CODE=0
 ```

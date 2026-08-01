@@ -14,6 +14,9 @@
   hollow text checks with generated-module loading/rejection tests.
 - Follow-up broad check, `ci:quality`, focused tests, and publish dry-run all exit 0. Full E2E was
   intentionally not rerun per supervisor instruction.
+- Workers, sagas, and triggers now each have a generated-registry loading assertion with negative
+  exclusion/suffix evidence; the focused suite passes 8 tests (4 steps), 0 failed.
+- Evaluator: Opus 5 supervisor (owner-waived open-model lane, 2026-08-01).
 
 ## Root Cause
 
@@ -38,5 +41,5 @@
 ## Next
 
 1. Supervisor runs the requested single full E2E pass.
-2. Run ordinary opposite-family slice review and separate open-model IMPL-EVAL.
+2. Supervisor completes PR lifecycle and any remaining review/evaluation activity.
 3. Never push/open PR from this implementation session.

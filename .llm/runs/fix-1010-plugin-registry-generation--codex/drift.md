@@ -42,6 +42,18 @@ so webhook behavior passed accidentally. The fix keeps invalid trigger modules l
 the known scaffold glue, and makes local-source scaffolds consume the workspace manifest before the
 published fallback.
 
+This changes the previous slice plan's published-only manifest resolution to workspace-first
+resolution with the published path retained as fallback. The deviation is necessary because a
+repository manifest fix otherwise cannot affect local-source CI until after a release is published.
+
+## 2026-08-01 — test strategy deviation — integration suite replaced
+
+The existing integration test was replaced instead of extended. It asserted emitted source text
+only and used `{ id: "generic" }` as its trigger fixture, which is not a valid
+`TriggerDefinition` because it lacks `kind` and `handler`. It therefore could not detect a generated
+registry that throws during import. The replacement executes the real generators and imports the
+resulting workers, sagas, and triggers registry modules before asserting resolved entries.
+
 ## 2026-08-01 — tooling incident — duplicate broad checks terminated
 
 The broad check exceeded the command wrapper's first yield. Three recovery attempts unintentionally
