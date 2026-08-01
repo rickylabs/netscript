@@ -1,11 +1,14 @@
 {
   "name": "netscript-skills",
-  "version": "0.1.0",
-  "skills": ["netscript", "netscript-operate", "netscript-build"],
+  "version": "0.2.0",
+  "skills": ["netscript", "netscript-operate", "netscript-build", "aspire", "deno"],
   "files": [
     "netscript/SKILL.md",
     "netscript-operate/SKILL.md",
     "netscript-build/SKILL.md",
+    "aspire/SKILL.md",
+    "deno/SKILL.md",
+    "help.md",
     "manifest.json"
   ]
 }

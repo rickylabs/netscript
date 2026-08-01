@@ -52,8 +52,19 @@ Add or edit a source skill under `skills/`, register it in `skills/manifest.json
 | Time | Slice | Step | Notes |
 | --- | --- | --- | --- |
 | 2026-08-01 | plan | repro | Actual contributor binary reproduced exactly three skills and 164 lines; requested entry path/flag are stale. |
+| 2026-08-01 | plan-eval | PASS | Separate OpenHands/Qwen session passed every Plan-Gate box; run 30714594170. |
+| 2026-08-01 | S1 | source/content complete | Adapted the three supplied drafts; manifest now names five skills plus `help.md`; dangling specialist routes removed; plugin symptom added to help/build/operate; AGENTS, tests, docs, and freshness task updated. |
 
 ## Gate Results
 
-Pending PLAN-EVAL; implementation has not begun.
+PLAN-EVAL passed before implementation began. Implementation gates remain pending.
 
+### Slice 1 review
+
+- Source manifest is the finite route authority: `netscript`, `netscript-operate`,
+  `netscript-build`, `aspire`, `deno`.
+- Focused grep found no `deno-fresh`, `netscript-deno-toolchain`, or Deno-doc-only handoff in
+  source skills.
+- Symptom-first occurrences of `netscript plugin doctor` exist in `help.md`, `netscript-build`, and
+  `netscript-operate`; the Aspire/Deno drafts retain the required symptom anchors.
+- Generated artifact and executable tests intentionally remain S2, after regeneration.

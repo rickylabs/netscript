@@ -14,7 +14,7 @@ import {
 const START_MARKER = "<!-- netscript-agent:start -->";
 const END_MARKER = "<!-- netscript-agent:end -->";
 const AGENTS_SECTION =
-  `${START_MARKER}\n## NetScript agent tooling\n\nUse the installed NetScript skills and MCP server for framework-aware build, diagnostics, and operations.\n${END_MARKER}`;
+  `${START_MARKER}\n## NetScript agent tooling\n\nUse the installed \`netscript\`, \`netscript-build\`, \`netscript-operate\`, \`aspire\`, and \`deno\` skills with the NetScript MCP server. Start with \`.claude/skills/help.md\` when a symptom is unclear; use \`aspire\` for orchestration and runtime-state problems, and \`deno\` for runtime and toolchain problems.\n${END_MARKER}`;
 
 /** Embedded skill bundle accepted by the installer and its integrity test seam. */
 export interface AgentSkillBundle {

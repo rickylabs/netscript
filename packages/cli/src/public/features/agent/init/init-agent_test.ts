@@ -1,6 +1,7 @@
 import { assertEquals, assertRejects, assertStringIncludes } from "@std/assert";
 import { join } from "@std/path";
 import { NETSCRIPT_RELEASE_VERSION } from "../../../../kernel/constants/jsr-specifiers.ts";
+import { EMBEDDED_SKILL_FILES } from "../../../../kernel/assets/skills.generated.ts";
 import { DenoAgentInitFileSystem } from "./agent-init-file-system.ts";
 import { initAgent } from "./init-agent.ts";
 
@@ -96,3 +97,82 @@ Deno.test("agent init rejects a bundle whose manifest hash does not match", asyn
     await Deno.remove(root, { recursive: true });
   }
 });
+
+Deno.test("agent init installs the diagnostic surface with no dangling skill routes", async () => {
+  const root = await Deno.makeTempDir();
+  try {
+    await initAgent({ projectRoot: root, host: "claude" }, {
+      fs: new DenoAgentInitFileSystem(),
+    });
+    const manifest = JSON.parse(EMBEDDED_SKILL_FILES["manifest.json"]) as {
+      readonly skills: readonly string[];
+    };
+    assertEquals(manifest.skills, [
+      "netscript",
+      "netscript-operate",
+      "netscript-build",
+      "aspire",
+      "deno",
+    ]);
+    for (const path of [
+      "aspire/SKILL.md",
+      "deno/SKILL.md",
+      "help.md",
+    ]) {
+      assertEquals(
+        await Deno.stat(join(root, ".claude", "skills", path)).then(() => true),
+        true,
+      );
+    }
+
+    const installed = new Set(manifest.skills);
+    const referenced = new Set<string>();
+    const dangling = new Set<string>();
+    for (const skill of manifest.skills) {
+      const markdown = await Deno.readTextFile(
+        join(root, ".claude", "skills", skill, "SKILL.md"),
+      );
+      for (const reference of extractSkillReferences(markdown)) {
+        referenced.add(reference);
+        if (!installed.has(reference)) dangling.add(`${skill} -> ${reference}`);
+      }
+    }
+    assertEquals([...referenced].sort(), [
+      "aspire",
+      "deno",
+      "netscript-build",
+      "netscript-operate",
+    ]);
+    assertEquals([...dangling], []);
+
+    const agents = await Deno.readTextFile(join(root, "AGENTS.md"));
+    assertStringIncludes(agents, "`aspire`");
+    assertStringIncludes(agents, "`deno`");
+    assertStringIncludes(agents, ".claude/skills/help.md");
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+function extractSkillReferences(markdown: string): ReadonlySet<string> {
+  const references = new Set<string>();
+  for (
+    const match of markdown.matchAll(
+      /\buse (?:the )?`?([a-z][a-z0-9-]+)`?(?: skill)?(?=[;).,]|$)/gi,
+    )
+  ) {
+    references.add(match[1].toLowerCase());
+  }
+
+  const lines = markdown.split("\n");
+  for (let index = 0; index < lines.length; index++) {
+    if (!/\|\s*(?:Skill|Go to)\s*\|/i.test(lines[index])) continue;
+    for (let row = index + 2; row < lines.length && /^\s*\|/.test(lines[row]); row++) {
+      const target = lines[row].split("|").at(-2) ?? "";
+      for (const match of target.matchAll(/`([a-z][a-z0-9-]+)`/gi)) {
+        references.add(match[1].toLowerCase());
+      }
+    }
+  }
+  return references;
+}
