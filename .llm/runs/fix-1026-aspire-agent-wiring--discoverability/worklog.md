@@ -39,3 +39,13 @@ PLAN-EVAL launch evidence:
 - `claude-print` with `qwen/qwen3.7-max`: exit 1, `model_not_found` / no access.
 - `agentic:provider-canary --live --profile claude-openrouter ...`: `status: blocked`, `credential: absent`, `auth_required`.
 - No source implementation started.
+
+Reconciliation: the owner waived the open-model evaluator lane for the 0.0.3 fix train. Opus supervisor commit `31adeb936` records PLAN-EVAL `PASS`; implementation is unblocked. Its four conditions are incorporated into S2–S4.
+
+## S2 — shipped skills close routing loops
+
+- Adapted the supplied Aspire, Deno, and symptom playbook drafts into `skills/`.
+- Extended the manifest installed set and regenerated the embedded bundle/hash.
+- Updated the NetScript router to resolve Aspire, Deno, and unknown-symptom handoffs locally.
+- Evidence: `deno task gen:assets-barrel && deno task check:assets-barrel` exited 0; the focused agent suite passed its manifest-driven referential-integrity assertion in the S2/S3 working tree.
+- Reconcile: #1026 remains fully resolved by this PR; #1023 is referenced only because this slice satisfies its installed-surface portion while leaving the sibling issue's remaining scope intact.

@@ -179,3 +179,4 @@ the container runtime, SDK, and certificates.
 
 `aspire cache clear` clears only the Aspire CLI's disk cache. It does **not** stop AppHosts or remove
 containers, so use it only for a CLI-cache problem—not as runtime cleanup.
+

@@ -268,3 +268,4 @@ lacks fails loudly: `Command 'rebuild' not available for resource 'users'.`
 If configured, use Playwright CLI for functional testing of resources. Get endpoints from
 `aspire describe --format Json` — and verify the port is yours, per above — rather than assuming a
 default. Run `playwright-cli --help` for available commands.
+
