@@ -23,6 +23,13 @@ export const TERMINAL_RESOURCE_STATES: ReadonlySet<string> = new Set([
 
 const DB_CLI_ASPIRE_START_TIMEOUT_SECONDS = '300';
 const ASPIRE_CLI_START_TIMEOUT_ENV = 'ASPIRE_CLI_START_TIMEOUT';
+const NO_RUNNING_APPHOST_LINE =
+  /^[ \t]*(?:error:[ \t]*)?No AppHost is currently running(?:[ \t]|[.'"]|$)/m;
+
+/** Whether Aspire output is the documented no-running-AppHost diagnostic. */
+export function isNoRunningAppHostOutput(stdout: string, stderr: string): boolean {
+  return NO_RUNNING_APPHOST_LINE.test(`${stdout}\n${stderr}`);
+}
 
 export function buildDbCliEnv(
   operation: DbOperationRequest['operation'],
