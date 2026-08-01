@@ -50,6 +50,10 @@ contract change; do not hand-edit generated output.
 `netscript plugin install` → `netscript plugin sync` → `netscript plugin doctor`. Regenerate the
 registry with `netscript generate plugins` when the plugin set changes.
 
+**A plugin install seemed to work, but its boundary never runs or the generated registry looks
+wrong.** Run `netscript plugin doctor` before reading source or hand-probing endpoints, then
+regenerate with `netscript generate plugins` only if the diagnostic identifies stale wiring.
+
 **Add a service.**
 `netscript service add` → `netscript service generate` to produce wiring.
 
