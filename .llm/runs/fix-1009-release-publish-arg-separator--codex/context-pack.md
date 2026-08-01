@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `fix-1009-release-publish-arg-separator--codex` |
 | Branch | `fix/1009-release-publish-arg-separator` |
-| Current phase | `plan` |
+| Current phase | `plan-eval` |
 | Archetype | `6 — CLI / Tooling` (contract/gate subset) |
 | Scope overlays | `none` |
 
@@ -27,8 +27,9 @@ Qwen evaluator. No source implementation has started.
 
 ## In Progress
 
-- Draft PR #1040 is open; wait for the already-dispatched cloud OpenHands PLAN-EVAL. Do not
-  re-dispatch or implement while the canonical verdict slot is empty.
+- BLOCKED at Plan-Gate: draft PR #1040 is `status:plan-eval`; the already-dispatched cloud
+  OpenHands evaluator has not landed `plan-eval.md`. Do not re-dispatch or implement while the
+  canonical verdict slot is empty.
 
 ## Next Steps
 
