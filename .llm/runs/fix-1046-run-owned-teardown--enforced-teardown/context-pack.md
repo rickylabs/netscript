@@ -2,21 +2,21 @@
 
 ## Run Metadata
 
-| Field | Value |
-| --- | --- |
-| Run ID | `fix-1046-run-owned-teardown--enforced-teardown` |
-| Branch | `fix/1046-run-owned-teardown` |
-| Current phase | `evaluate` |
-| Archetype | `6 — CLI / tooling` |
-| Scope overlays | `docs` |
+| Field          | Value                                            |
+| -------------- | ------------------------------------------------ |
+| Run ID         | `fix-1046-run-owned-teardown--enforced-teardown` |
+| Branch         | `fix/1046-run-owned-teardown`                    |
+| Current phase  | `close`                                          |
+| Archetype      | `6 — CLI / tooling`                              |
+| Scope overlays | `docs`                                           |
 
 ## Current State
 
 Research F1–F10 and locked decisions D1–D8 are approved by the existing supervisor PLAN-EVAL PASS.
-Slices 1–10 and the final gate pass are complete. The branch is pushed through slice 10; final gate
-evidence is ready for the owner-authorized supervisor IMPL-EVAL. Acceptance criteria 1–4 are
-implemented and tested. Criterion 5 cannot be completed on this base because PR #1034's assets are
-not embedded; the install/routing mechanism is present and verified without copying those assets.
+Slices 1–11 and the owner-authorized supervisor IMPL-EVAL PASS are complete. Acceptance criteria 1–4
+are implemented and tested. Criterion 5 cannot be completed on this base because PR #1034's assets
+are not embedded; the install/routing mechanism is present and verified without copying those
+assets. PR #1047 must remain draft/partial and must not carry a closing keyword.
 
 ## Completed
 
@@ -26,18 +26,20 @@ not embedded; the install/routing mechanism is present and verified without copy
 - Slice 3 schema-versioned atomic registry and tests.
 - Slice 4 bounded read-only probes with captured Aspire 13.4.6/Docker fixtures.
 - Slice 5 JSON/Markdown leak reporter; live host observation found only foreign `fix-1025` Postgres.
-- Slice 6 dry-run-default teardown, per-resource apply, immediate label re-verification, and forbidden-command guard.
+- Slice 6 dry-run-default teardown, per-resource apply, immediate label re-verification, and
+  forbidden-command guard.
 - Slice 7 `agentic:leak-check`/`agentic:teardown` tasks and tooling index entries.
 - Slice 8 pure `enforceTeardown` plus DONE-branch leak-check → teardown → re-check wiring.
 - Slice 9 E2E cleanup-on default, explicit opt-out, and creation-time AppHost registry capture.
-- Slice 10 dogfood task, generated consumer bundle, and symptom-indexed routing. Base limitation:
-  PR #1034 assets (`aspire`, `deno`, `help.md`) are not yet embedded, so acceptance box 5 is open.
+- Slice 10 dogfood task, generated consumer bundle, and symptom-indexed routing. Base limitation: PR
+  #1034 assets (`aspire`, `deno`, `help.md`) are not yet embedded, so acceptance box 5 is open.
 - Supervisor A1 review fix: foreign/unproven Docker resources derive report-only age from probed
   `Created`; ownership and actionability are unchanged.
 
 ## In Progress
 
-- Owner-authorized supervisor IMPL-EVAL and PR body/label close-out.
+- Merge/rebase PR #1034, rerun `agentic:dogfood-skills`, and evidence the three consumer assets in a
+  follow-up before issue #1046 can close.
 
 ## Next Steps
 
@@ -47,29 +49,29 @@ not embedded; the install/routing mechanism is present and verified without copy
 
 ## Key Decisions
 
-| Decision | Source | Notes |
-| --- | --- | --- |
-| Fail closed | `plan.md` D1–D2 | `foreign` and `unproven` are never actionable. |
-| Per-resource mutation only | `plan.md` D3 | No bulk stop/removal form is expressible. |
-| Registry identity uses PID + start time | `plan.md` D1 | Bare PID matches never prove ownership. |
+| Decision                                | Source          | Notes                                          |
+| --------------------------------------- | --------------- | ---------------------------------------------- |
+| Fail closed                             | `plan.md` D1–D2 | `foreign` and `unproven` are never actionable. |
+| Per-resource mutation only              | `plan.md` D3    | No bulk stop/removal form is expressible.      |
+| Registry identity uses PID + start time | `plan.md` D1    | Bare PID matches never prove ownership.        |
 
 ## Files Changed
 
-| Path | Status | Notes |
-| --- | --- | --- |
-| `worklog.md` | new | Design checkpoint and evidence ledger. |
-| `context-pack.md` | new | Resumable implementation state. |
-| `drift.md` | new | Append-only process drift. |
-| `codex-thread-ids.md` | new | Daemon-attached implementation identity. |
+| Path                  | Status | Notes                                    |
+| --------------------- | ------ | ---------------------------------------- |
+| `worklog.md`          | new    | Design checkpoint and evidence ledger.   |
+| `context-pack.md`     | new    | Resumable implementation state.          |
+| `drift.md`            | new    | Append-only process drift.               |
+| `codex-thread-ids.md` | new    | Daemon-attached implementation identity. |
 
 ## Gates
 
-| Gate family | Current status | Evidence |
-| --- | --- | --- |
-| Static | pending | Per-slice wrapper/test commands will be recorded in `worklog.md`. |
-| Fitness | N/A | No package/plugin source changes. |
-| Runtime | pending | Fixture tests and read-only host leak check. |
-| Consumer | pending | Dogfood task; base may not yet contain PR #1034 assets. |
+| Gate family | Current status | Evidence                                                          |
+| ----------- | -------------- | ----------------------------------------------------------------- |
+| Static      | pending        | Per-slice wrapper/test commands will be recorded in `worklog.md`. |
+| Fitness     | N/A            | No package/plugin source changes.                                 |
+| Runtime     | pending        | Fixture tests and read-only host leak check.                      |
+| Consumer    | pending        | Dogfood task; base may not yet contain PR #1034 assets.           |
 
 ## Open Questions
 
