@@ -58,6 +58,7 @@ subprocess test using the exact forwarded `--` argv.
 | 2026-08-01 | 0 | before probe | Exit 1 at `github-release.ts:349`; `Unknown argument: --`. |
 | 2026-08-01 | 0 | design | Scope, semantic test strategy, and two implementation slices locked. |
 | 2026-08-01 | 0 | PLAN-EVAL blocked | Local OpenRouter credentials are absent; the sole OpenHands Qwen dispatch has not landed a tracked `plan-eval.md`. Implementation remains stopped. |
+| 2026-08-01 | 0 | PLAN-EVAL PASS | OpenHands Qwen posted the authoritative PASS; missing artifact transcribed with URL/timestamp/run provenance. |
 
 ## Decisions
 
@@ -85,7 +86,7 @@ subprocess test using the exact forwarded `--` argv.
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
 | CLI contract plan | NOT_RUN | PLAN-EVAL pending | No implementation before PASS. |
-| Formal Plan-Gate | NOT_RUN | Canonical `plan-eval.md` slot is empty | PR remains draft at `status:plan-eval`; no re-dispatch or workaround. |
+| Formal Plan-Gate | PASS | OpenHands Qwen PR verdict + transcribed `plan-eval.md` | Separate open-model session; evaluator-authored file supersedes if later pushed. |
 
 ### Runtime Gates
 
@@ -103,4 +104,5 @@ subprocess test using the exact forwarded `--` argv.
 
 - PLAN-EVAL should verify the drift guard actually couples source `Usage:` lines to `parseArgs`.
 - Confirm non-task-wired scripts remain explicitly outside scope.
-- Current blocker: the already-dispatched OpenHands Qwen evaluator has not committed its verdict.
+- The evaluator verdict is authoritative from the linked PR comment; the missing artifact is a
+  provenance-marked transcription, not supervisor judgment.

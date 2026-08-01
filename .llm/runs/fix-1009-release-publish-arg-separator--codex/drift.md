@@ -65,3 +65,18 @@ documentation.
 - **Action:** fix
 - **Evidence:** This entry, the advisory header, and commit history retain both process errors: the
   unannounced artifact and the lane-table misread.
+
+## 2026-08-01 — Open-model PLAN-EVAL passed but artifact was not pushed
+
+- **What:** The OpenHands Qwen evaluator posted a formal PLAN-EVAL PASS with the required
+  machine-readable verdict token, but workflow run `30715484303` did not commit its claimed
+  `plan-eval.md` artifact.
+- **Source:** https://github.com/rickylabs/netscript/pull/1040#issuecomment-5153138819 at
+  `2026-08-01T19:51:26Z`.
+- **Expected:** Evaluator-authored tracked `plan-eval.md` plus the PR verdict comment.
+- **Actual:** Authoritative verdict comment exists; the artifact was transcribed verbatim with an
+  explicit provenance header.
+- **Severity:** minor
+- **Action:** accept
+- **Evidence:** `plan-eval.md` records the route, comment URL, timestamp, workflow run, and PASS.
+  The Plan-Gate is open. If the evaluator later pushes its file, prefer it and record supersession.

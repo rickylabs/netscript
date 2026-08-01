@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `fix-1009-release-publish-arg-separator--codex` |
 | Branch | `fix/1009-release-publish-arg-separator` |
-| Current phase | `plan-eval` |
+| Current phase | `implement` |
 | Archetype | `6 — CLI / Tooling` (contract/gate subset) |
 | Scope overlays | `none` |
 
@@ -15,8 +15,9 @@
 The branch was clean at baseline `3ab64720f`. Research independently confirms the reported narrow
 cause and AC4 sweep. The before probe fails at `github-release.ts` parsing the forwarded bare
 separator. An unauthorized closed-model `plan-eval.md` was rejected and demoted to
-`supervisor-advisory-review.md`; the canonical verdict slot is empty pending the cloud OpenHands
-Qwen evaluator. No source implementation has started.
+`supervisor-advisory-review.md`. The OpenHands Qwen evaluator posted a formal PASS; its missing
+artifact is transcribed verbatim in `plan-eval.md` with a checkable provenance pointer. No source
+implementation has started yet.
 
 ## Completed
 
@@ -27,16 +28,13 @@ Qwen evaluator. No source implementation has started.
 
 ## In Progress
 
-- BLOCKED at Plan-Gate: draft PR #1040 is `status:plan-eval`; the already-dispatched cloud
-  OpenHands evaluator has not landed `plan-eval.md`. Do not re-dispatch or implement while the
-  canonical verdict slot is empty.
+- Plan-Gate PASS is recorded from the authoritative OpenHands Qwen PR verdict. Begin Slice 1.
 
 ## Next Steps
 
-1. Obtain separate-session `plan-eval.md` PASS.
-2. Implement publish parser plus doc-derived test; validate, review, commit, push, comment.
-3. Implement preflight tolerance/test; run full scoped validation and after probe.
-4. Obtain separate-session IMPL-EVAL PASS and finalize PR evidence/status.
+1. Implement publish parser plus doc-derived test; validate, review, commit, push, comment.
+2. Implement preflight tolerance/test; run full scoped validation and after probe.
+3. Obtain separate-session IMPL-EVAL PASS and finalize PR evidence/status.
 
 ## Key Decisions
 
@@ -56,7 +54,7 @@ Qwen evaluator. No source implementation has started.
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
 | Static | pending | Runs after implementation. |
-| Fitness | plan pending | PLAN-EVAL not yet run. |
+| Fitness | plan PASS | OpenHands Qwen verdict comment and transcribed `plan-eval.md`. |
 | Runtime | baseline fail captured | Exact before probe. |
 | Consumer | pending | Document-derived parser test. |
 
