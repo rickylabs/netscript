@@ -29,6 +29,7 @@ import { dispatchPluginScaffold } from '../dispatch/dispatch-plugin-verb.ts';
 await DEFAULT_TEMPLATE_REGISTRY.hydrate();
 
 const REPO_ROOT = resolve(dirname(fromFileUrl(import.meta.url)), '../../../../../../..');
+const PUBLISHED_PLUGIN_VERSION = '0.0.1-alpha.12';
 
 function repoPath(path: string): string {
   return join(REPO_ROOT, path);
@@ -254,6 +255,110 @@ describe('public install plugin flow', () => {
     );
     assertStringIncludes(error.message, 'process runner');
     assertFalse(await fs.exists('/workspace/alpha/plugins/workers/mod.ts'));
+  });
+
+  it('installs a published Prisma fragment from JSR metadata into the root schema tree', async () => {
+    const fs = new MemoryFileSystemAdapter();
+    await writeProjectFiles(fs);
+    await writeConfiguredPostgres(fs);
+    const templateAdapter = new StringTemplateAdapter(fs);
+    const scaffolder = new Scaffolder(templateAdapter, fs);
+    const schema = 'model SagaInstance {\n  id String @id\n}\n';
+    const schemaBytes = new TextEncoder().encode(schema);
+    const descriptor = {
+      ...sagasDescriptor(),
+      versionMetadata: {
+        ...sagasDescriptor().versionMetadata,
+        files: { '/database/sagas.prisma': await checksum(schemaBytes) },
+      },
+    };
+    const fetchedUrls: string[] = [];
+
+    const result = await installPlugin({
+      kind: 'sagas',
+      pluginName: 'sagas',
+      serviceReferences: [],
+      pluginReferences: [],
+      noDb: false,
+      includeSamples: false,
+      skipConfirmation: true,
+      projectRoot: '/workspace/alpha',
+      overwrite: false,
+    }, {
+      fs,
+      scaffolder,
+      templateAdapter,
+      registry: new PluginKindRegistry(),
+      registryScaffolder: new PluginRegistryScaffolder(scaffolder),
+      workspaceMutator: new PluginWorkspaceMutator(fs),
+      pluginValidator: { validate: () => Promise.resolve({ ok: true, descriptor }) },
+      processRunner: successfulPluginScaffoldProcess(),
+      packageFileFetcher: {
+        fetchFile: (url) => {
+          fetchedUrls.push(url);
+          return Promise.resolve(schemaBytes);
+        },
+      },
+      regenerateHelpers: () => Promise.resolve([]),
+    });
+
+    const targetPath = '/workspace/alpha/database/postgres/schema/plugins/sagas/sagas.prisma';
+    assertEquals(result.schemaCopies.length, 1);
+    assertEquals(result.schemaCopies[0].targetPath.replaceAll('\\', '/'), targetPath);
+    assertEquals(await fs.readFile(targetPath), schema);
+    assertEquals(fetchedUrls, [
+      'https://jsr.io/@netscript/plugin-sagas/0.0.1-alpha.12/database/sagas.prisma',
+      'https://jsr.io/@netscript/plugin-sagas/0.0.1-alpha.12/database/sagas.prisma',
+    ]); // integrity verification + schema resolution
+  });
+
+  it('rejects a DB-required JSR plugin that declares migrations without a published fragment', async () => {
+    const fs = new MemoryFileSystemAdapter();
+    await writeProjectFiles(fs);
+    await writeConfiguredPostgres(fs);
+    const templateAdapter = new StringTemplateAdapter(fs);
+    const scaffolder = new Scaffolder(templateAdapter, fs);
+    const manifestBytes = new TextEncoder().encode('{}\n');
+    const descriptor = {
+      ...sagasDescriptor(),
+      versionMetadata: {
+        ...sagasDescriptor().versionMetadata,
+        files: { '/scaffold.plugin.json': await checksum(manifestBytes) },
+      },
+    };
+
+    const error = await assertRejects(
+      () =>
+        installPlugin({
+          kind: 'sagas',
+          pluginName: 'sagas',
+          serviceReferences: [],
+          pluginReferences: [],
+          noDb: false,
+          includeSamples: false,
+          skipConfirmation: true,
+          projectRoot: '/workspace/alpha',
+          overwrite: false,
+        }, {
+          fs,
+          scaffolder,
+          templateAdapter,
+          registry: new PluginKindRegistry(),
+          registryScaffolder: new PluginRegistryScaffolder(scaffolder),
+          workspaceMutator: new PluginWorkspaceMutator(fs),
+          pluginValidator: { validate: () => Promise.resolve({ ok: true, descriptor }) },
+          processRunner: successfulPluginScaffoldProcess(),
+          packageFileFetcher: { fetchFile: () => Promise.resolve(manifestBytes) },
+          regenerateHelpers: () => Promise.resolve([]),
+        }),
+      ScaffoldValidationError,
+    );
+
+    assertStringIncludes(error.message, 'sagas');
+    assertEquals(error.context?.searchedPaths, [
+      '/workspace/alpha/plugins/sagas/database',
+      `jsr:@netscript/plugin-sagas@${PUBLISHED_PLUGIN_VERSION}/database/**/*.prisma`,
+    ]);
   });
 
   it('previews a local-path plugin-owned scaffolder without writing files', async () => {
@@ -1068,6 +1173,50 @@ async function writeProjectFiles(fs: MemoryFileSystemAdapter): Promise<void> {
     '/workspace/alpha/deno.json',
     JSON.stringify({ workspace: ['apps/web'] }, null, 2) + '\n',
   );
+}
+
+async function writeConfiguredPostgres(fs: MemoryFileSystemAdapter): Promise<void> {
+  await fs.writeFile(
+    '/workspace/alpha/appsettings.json',
+    JSON.stringify({
+      NetScript: {
+        Name: 'alpha-app',
+        Services: {},
+        Plugins: {},
+        BackgroundProcessors: {},
+        Databases: {
+          postgres: { Enabled: true, Engine: 'Postgres', DatabaseName: 'alpha' },
+        },
+      },
+    }, null, 2) + '\n',
+  );
+}
+
+async function checksum(bytes: Uint8Array): Promise<string> {
+  const input = new ArrayBuffer(bytes.byteLength);
+  new Uint8Array(input).set(bytes);
+  const digest = await crypto.subtle.digest('SHA-256', input);
+  return `sha256-${Array.from(new Uint8Array(digest))
+    .map((byte) => byte.toString(16).padStart(2, '0'))
+    .join('')}`;
+}
+
+function successfulPluginScaffoldProcess(): {
+  exec: () => Promise<{ code: number; stdout: string; stderr: string }>;
+} {
+  return {
+    exec: () =>
+      Promise.resolve({
+        code: 0,
+        stdout: JSON.stringify({
+          status: 'applied',
+          createdFiles: [],
+          modifiedFiles: [],
+          databaseMigrationsAdded: false,
+        }),
+        stderr: '',
+      }),
+  };
 }
 
 async function writeRealProjectFiles(projectRoot: string): Promise<void> {
