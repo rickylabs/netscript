@@ -54,3 +54,30 @@ Evaluator independently ran:
 None. The change is minimal, well-scoped, and fully verified against the approved plan and archetype 6 gates. The later-stage canary/network/token failures in the real probe are expected and acceptable per the issue acceptance criteria.
 
 OPENHANDS_VERDICT: PASS
+
+---
+
+# IMPL-EVAL ADDENDUM — supervisor pass (owner-waived lane)
+
+Evaluator: Opus 5 supervisor (owner-waived open-model lane, 2026-08-01)
+
+Verified against the pushed commits, not against the slice's report.
+
+| Issue acceptance criterion | Result | Supervisor-run evidence |
+| --- | --- | --- |
+| AC1 documented `release:publish -- <tag> --notes-file <path>` works | PASS | Direct `parseArgs(['--','v0.0.1-alpha.20','--notes-file','intro.md'])` returns `{version:"0.0.1-alpha.20", notesFile:"intro.md", ...}`. Docstring at `github-release.ts:33-34` left as documented; parser now agrees with it. |
+| AC2 `parseArgs` tolerates a bare `--` | PASS | Same probe. Strictness preserved: `parseArgs(['--','v0.0.1','--bogus'])` still throws `Unknown argument: --bogus`. |
+| AC3 a test covers the documented invocation | PASS | `github-release_test.ts:201` derives argv from the source `Usage:` lines and asserts a non-zero match count, so deleting the docstring fails the test rather than silently passing. Suite green. |
+| AC4 same check applied to other documented `--` entry points | PASS | Sweep of `.llm/tools/release/`: only `cut.ts`, `canary.ts`, `github-release.ts` document a `--` usage line; `cut.ts`/`canary.ts` already tolerated it and carry their own separator tests (both green). Task-wired `release:preflight` was additionally fixed and covered by a real subprocess test. |
+
+Supervisor-run gates (in `/home/codex/repos/fix-1009`):
+
+- `deno run -A .llm/tools/run-deno-check.ts --root .llm/tools/release --ext ts` — 32 files, 1 batch, 0 failed batches, 0 diagnostics.
+- `deno test .llm/tools/release/{github-release,preflight-text-imports,cut,canary}_test.ts` — 37 passed, 0 failed.
+- `deno fmt --check` on the four changed files — clean.
+- Real task probe: `deno task release:preflight -- --file .llm/tools/release/github-release.ts` — exit 0, three PASS lines, no `Unknown argument: --`.
+- `e2e:cli` deliberately not run: no scaffold, plugin-scaffold, DB-wiring or Aspire-helper output is touched.
+
+## Verdict — supervisor
+
+`PASS`

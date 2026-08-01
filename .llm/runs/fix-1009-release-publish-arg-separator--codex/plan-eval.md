@@ -33,3 +33,34 @@ None. The plan's open-decision sweep is complete and accurate. All decisions tha
 Independent evaluation by canonical OpenHands open-model evaluator (qwen/qwen3.7-max via OpenRouter). The previous closed-model artifact was rejected per `drift.md` 2026-08-01 entry. Research findings verified against tree: `parseArgs` in both target files currently reject bare `--` at their unknown-argument branches (`github-release.ts:349`, `preflight-text-imports.ts:635`); siblings already skip it; task wiring matches. Plan is complete, decisions locked, slices ordered, risks mitigated. Implementation may begin.
 
 OPENHANDS_VERDICT: PASS
+
+---
+
+# PLAN-EVAL ADDENDUM — supervisor pass (owner-waived lane)
+
+Evaluator: Opus 5 supervisor (owner-waived open-model lane, 2026-08-01)
+
+The owner waived the open-model Plan-Gate for the 0.0.3 fix train on 2026-08-01: implementation is
+delegated to Codex (GPT family), so generator and evaluator are already different sessions and
+different model families. This addendum records the supervisor's own independent pass. It does not
+retract the OpenHands `qwen/qwen3.7-max` verdict above — that workflow run
+(`30715484303`) was confirmed to exist and to have completed successfully — it stands alongside it.
+
+I wrote the brief that shaped this plan, so the rows below weight hardest the parts I specified:
+the AC4 sweep boundary and the "verify the cause first" instruction.
+
+| Plan-Gate item | Result | Evidence |
+| --- | --- | --- |
+| Research present and current | PASS | `research.md`; independently re-confirmed: `cut.ts:45`, `canary.ts:38`, `publish-readiness.ts:446`, `verify-canary-pair.ts:12`, `surface-diff.ts:275` already skip `--`; only `github-release.ts` and `preflight-text-imports.ts` did not. |
+| Cause verified, not assumed | PASS | Direct probe of `parseArgs(['--','v0.0.1-alpha.20','--notes-file','intro.md'])` on the baseline reproduced `Unknown argument: --`; the issue's stated cause is exact. |
+| Decisions locked | PASS | `plan.md` D1–D3. D2 (derive test cases from the source `Usage:` lines rather than hard-coding them) is the decision that actually closes the drift, and it is locked with rationale. |
+| Open-decision sweep | PASS | `plan.md` sweep; nothing deferred that would force rework. |
+| Commit slices (< 30, gate + files each) | PASS | Two slices, each naming files and proving gate; realised as `830efa69b`, `7c7cfe0b4`/`b610b43d6`. |
+| Risk register | PASS | `plan.md` names the real risk — that tolerating `--` could weaken unknown-flag rejection — and mitigates it with a retained strictness test. Independently probed: `--bogus` still throws. |
+| Gate set selected | PASS | Archetype 6 CLI/tooling contract subset; proportionate. No scaffold/DB/Aspire surface, so `e2e:cli` correctly excluded. |
+| Deferred scope explicit | PASS | `plan.md` non-scope defers non-task-wired scripts. Scrutinised because my brief drew that boundary: `preflight-release.ts` takes bare positionals and is not task-wired, and `run-publish.ts` is reached only via `publish:dry-run`; neither documents a `--` form, so AC4 is satisfied without them. |
+| jsr-audit surface scan | N/A | `.llm/tools/` only; no package or plugin export surface. |
+
+## Verdict — supervisor
+
+`PASS`
