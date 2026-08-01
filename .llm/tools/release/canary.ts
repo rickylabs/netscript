@@ -14,6 +14,7 @@ export interface CanaryOptions {
   readonly targetVersion: string;
   readonly dryRun: boolean;
   readonly root: string;
+  readonly republishVersion?: string;
 }
 
 export interface CanaryVersionDependencies {
@@ -32,6 +33,7 @@ export function parseArgs(argv: string[]): CanaryOptions {
   let targetVersion = '';
   let dryRun = false;
   let root = Deno.cwd();
+  let republishVersion: string | undefined;
   for (let index = 0; index < argv.length; index++) {
     const arg = argv[index];
     switch (arg) {
@@ -42,6 +44,9 @@ export function parseArgs(argv: string[]): CanaryOptions {
         break;
       case '--root':
         root = requireValue(argv, ++index, arg);
+        break;
+      case '--republish-version':
+        republishVersion = requireValue(argv, ++index, arg);
         break;
       case '--help':
         printHelp();
@@ -54,13 +59,54 @@ export function parseArgs(argv: string[]): CanaryOptions {
   }
   if (!targetVersion) throw new Error('release:canary requires a target stable version.');
   validateStableTarget(targetVersion);
-  return { targetVersion, dryRun, root };
+  if (republishVersion) validateRepublishVersion(targetVersion, republishVersion);
+  return { targetVersion, dryRun, root, ...(republishVersion ? { republishVersion } : {}) };
 }
 
 export function validateStableTarget(version: string): void {
   if (!/^(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)$/.test(version)) {
     throw new Error(
       `Canary target must be a stable semantic version without a prerelease or build suffix: ${version}`,
+    );
+  }
+}
+
+/** Require an existing canary version to belong to the requested stable release train. */
+export function validateRepublishVersion(targetVersion: string, republishVersion: string): void {
+  validateStableTarget(targetVersion);
+  const pattern = new RegExp(
+    `^${escapeRegExp(targetVersion)}-${CANARY_PRERELEASE_LABEL}\\.(0|[1-9]\\d*)$`,
+  );
+  if (!pattern.test(republishVersion)) {
+    throw new Error(
+      `Canary republish version must belong to target ${targetVersion} and match ` +
+        `${targetVersion}-${CANARY_PRERELEASE_LABEL}.N: ${republishVersion}`,
+    );
+  }
+}
+
+/** Prove the clean checkout has the exact committed tree recorded by the canary tag. */
+export async function verifyCanaryRepublishTree(
+  root: string,
+  republishVersion: string,
+  runner: ReleaseCommandRunner = runCommand,
+): Promise<void> {
+  const status = await runner('git', ['status', '--porcelain'], root);
+  if (status.code !== 0) {
+    throw new Error(`git status --porcelain failed with exit ${status.code}.`);
+  }
+  if (status.stdout.trim() !== '') {
+    throw new Error(
+      `Canary republish refused: working tree is dirty; ${republishVersion} must be published ` +
+        'from a clean checkout.',
+    );
+  }
+
+  const tagTree = await resolveTree(root, `v${republishVersion}^{tree}`, runner);
+  const headTree = await resolveTree(root, 'HEAD^{tree}', runner);
+  if (tagTree !== headTree) {
+    throw new Error(
+      `Canary republish refused: tagged tree ${tagTree} differs from checked-out tree ${headTree}.`,
     );
   }
 }
@@ -150,12 +196,30 @@ function requireValue(argv: string[], index: number, flag: string): string {
   return value;
 }
 
+async function resolveTree(
+  root: string,
+  revision: string,
+  runner: ReleaseCommandRunner,
+): Promise<string> {
+  const result = await runner('git', ['rev-parse', revision], root);
+  if (result.code !== 0) {
+    throw new Error(`git rev-parse ${revision} failed with exit ${result.code}.`);
+  }
+  const sha = result.stdout.trim();
+  if (!/^[0-9a-f]{40,64}$/i.test(sha)) {
+    throw new Error(`git rev-parse ${revision} returned an invalid tree SHA: ${sha || '<empty>'}`);
+  }
+  return sha;
+}
+
 function printHelp(): void {
   console.log(`Usage:
   deno task release:canary -- <target-stable-version> [--dry-run]
 
 Options:
   --dry-run      Run version discovery, bump, and gates without creating refs.
+  --republish-version <version>
+                 Verify a clean checkout matches an existing canary tag; do not create refs.
   --root <path>  Repository root. Defaults to the current directory.
   --help         Show this help.`);
 }
@@ -170,6 +234,11 @@ function isJsonObject(value: unknown): value is Record<string, unknown> {
 
 async function main(): Promise<void> {
   const options = parseArgs(Deno.args);
+  if (options.republishVersion) {
+    await verifyCanaryRepublishTree(options.root, options.republishVersion);
+    console.log(`release:canary verified same-semver republish ${options.republishVersion}`);
+    return;
+  }
   const version = await deriveCanaryVersion(options.root, options.targetVersion);
   console.log(`release:canary selected ${version}`);
   const bump: BumpResult = await prepareRelease(options.root, version, 'release:canary', 'canary');

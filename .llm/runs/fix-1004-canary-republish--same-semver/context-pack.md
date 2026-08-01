@@ -2,17 +2,19 @@
 
 ## Run Metadata
 
-| Field | Value |
-| --- | --- |
-| Run ID | `fix-1004-canary-republish--same-semver` |
-| Branch | `fix/1004-canary-republish` |
-| Current phase | `plan-eval` |
-| Archetype | N/A |
-| Scope overlays | none |
+| Field          | Value                                    |
+| -------------- | ---------------------------------------- |
+| Run ID         | `fix-1004-canary-republish--same-semver` |
+| Branch         | `fix/1004-canary-republish`              |
+| Current phase  | `gate`                                   |
+| Archetype      | N/A                                      |
+| Scope overlays | none                                     |
 
 ## Current State
 
-Research confirms issue #1004's diagnosis against current `origin/main`. The plan and Design checkpoint are ready, but the canonical local PLAN-EVAL route is blocked by a missing OpenRouter credential; no implementation files have changed.
+Slice 2 is implemented and all authoritative scoped gates pass. The owner-waived Opus PLAN-EVAL's
+sole finding was incorporated: republish now requires both a clean working tree and equal tag/HEAD
+committed trees.
 
 ## Completed
 
@@ -20,20 +22,24 @@ Research confirms issue #1004's diagnosis against current `origin/main`. The pla
 - Clean baseline verified.
 - All three causal claims verified.
 - Plan and Design checkpoint recorded.
+- Owner-waived PLAN-EVAL completed with one scoped correction and no required second cycle.
+- Republish workflow, fail-closed guard, tests, and release doctrine implemented.
+- Scoped format, lint, check, and permission-corrected tests pass.
 
 ## In Progress
 
-- Owner direction on the unavailable local evaluator route.
+- Commit/push slice 2 and hand off to owner-routed Opus IMPL-EVAL.
 
 ## Next Steps
 
-1. Make the local OpenRouter evaluator credential available, or explicitly authorize a harness route exception/waiver.
-2. Run separate PLAN-EVAL.
-3. Implement only after PASS or a written owner waiver.
+1. Commit and push slice 2 with explicit refspec.
+2. Update draft PR evidence and lifecycle label.
+3. Owner-routed Opus supervisor runs IMPL-EVAL.
 
 ## Drift and Debt
 
-- Drift: canonical local evaluator route blocked by missing credential.
+- Drift: missing local evaluator route superseded by owner waiver; working-tree cleanliness added
+  from PLAN-EVAL.
 - Debt: none.
 
 ## Commits
