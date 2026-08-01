@@ -163,6 +163,7 @@ export interface RegisteredPluginConfig {
   runtime?: RegisteredPluginRuntimeContribution;
   runtimeConfig?: RegisteredPluginRuntimeConfig;
   doctor?: string;
+  manifestError?: string;
   cli?: {
     readonly doctorChecks?: readonly 'auth-backend'[];
   };

@@ -91,6 +91,8 @@ export interface PluginManifestOfficialSource {
   readonly serviceEntrypoint: string;
   /** Optional background entrypoint copied or generated for the plugin. */
   readonly backgroundEntrypoint?: string;
+  /** Plugin adapter module that owns static doctor checks. */
+  readonly doctorEntrypoint?: string;
   /** Generated service configuration key. */
   readonly serviceConfigKey: string;
   /** Generated service port. */
@@ -190,6 +192,7 @@ const officialSourceSchema: z.ZodType<PluginManifestOfficialSource> = z.object({
   backgroundDir: z.string().min(1).optional(),
   serviceEntrypoint: z.string().min(1),
   backgroundEntrypoint: z.string().min(1).optional(),
+  doctorEntrypoint: z.string().min(1).optional(),
   serviceConfigKey: z.string().min(1),
   servicePort: z.number().int().nonnegative(),
   backgroundPort: z.number().int().nonnegative(),

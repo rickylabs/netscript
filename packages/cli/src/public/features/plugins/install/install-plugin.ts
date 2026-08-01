@@ -2,7 +2,8 @@ import {
   parsePluginManifest,
   type ScaffoldResult as PluginOwnedScaffoldResult,
 } from '@netscript/plugin/protocol';
-import { join } from '@std/path';
+import { join, resolve } from '@std/path';
+import { toFileUrl } from '@std/path/to-file-url';
 import { copyPluginSchemasToRootDb } from '../../../../kernel/adapters/plugin/db-integration.ts';
 import { PluginKindRegistry } from '../../../../kernel/application/registries/plugin-kind-registry.ts';
 import { PluginWorkspaceMutator } from '../../../../kernel/adapters/plugin/workspace-mutator.ts';
@@ -192,6 +193,7 @@ export async function installPlugin(
     dependencies.scaffolder,
     dependencies.templateAdapter,
   );
+  await persistPluginDoctorMetadata(plan, resolvedPlugin, pluginOwned, dependencies.fs);
 
   return {
     ...rendered,
@@ -201,6 +203,29 @@ export async function installPlugin(
     schemaCopies,
     helperFiles,
   };
+}
+
+async function persistPluginDoctorMetadata(
+  plan: PluginInstallPlan,
+  resolvedPlugin: ResolvedPluginBeforePlanning,
+  scaffold: PluginOwnedScaffoldResult,
+  fs: FileSystemPort,
+): Promise<void> {
+  const doctorEntrypoint = resolvedPlugin.descriptor.manifest.officialSource?.doctorEntrypoint;
+  if (!doctorEntrypoint) return;
+
+  const doctorSpecifier = resolvedPlugin.source.kind === 'local-path'
+    ? toFileUrl(resolve(resolvedPlugin.source.path, doctorEntrypoint)).href
+    : `${versionedJsrSpecifier(resolvedPlugin.descriptor)}/doctor`;
+  const metadata = {
+    ...resolvedPlugin.descriptor.manifest,
+    officialSource: {
+      ...resolvedPlugin.descriptor.manifest.officialSource,
+      doctorEntrypoint: doctorSpecifier,
+    },
+  };
+  const pluginDir = resolvePluginConfigDirectory(plan, scaffold);
+  await fs.writeFile(join(pluginDir, 'scaffold.plugin.json'), `${JSON.stringify(metadata, null, 2)}\n`);
 }
 
 export async function resolvePluginDescriptorBeforePlanning(
@@ -266,11 +291,21 @@ export async function resolveLocalPluginDescriptor(
     registry.register(provider.kind, provider);
   }
   const resolvedPackage = resolvePluginPackageSpec(parsed.manifest.name);
+  const doctorEntrypoint = readDoctorEntrypoint(manifestJson);
+  const manifest = doctorEntrypoint && parsed.manifest.officialSource
+    ? {
+      ...parsed.manifest,
+      officialSource: {
+        ...parsed.manifest.officialSource,
+        doctorEntrypoint,
+      },
+    }
+    : parsed.manifest;
   return {
     descriptor: {
       package: resolvedPackage,
       version: parsed.manifest.version,
-      manifest: parsed.manifest,
+      manifest,
       packageMetadata: { latest: parsed.manifest.version, isYanked: false },
       versionMetadata: {
         exports: { [parsed.manifest.scaffolder.export]: parsed.manifest.scaffolder.export },
@@ -281,6 +316,16 @@ export async function resolveLocalPluginDescriptor(
     planningKind: provider?.kind,
     source: { kind: 'local-path', path: localPath },
   };
+}
+
+function readDoctorEntrypoint(value: unknown): string | undefined {
+  if (!value || typeof value !== 'object') return undefined;
+  const officialSource = Reflect.get(value, 'officialSource');
+  if (!officialSource || typeof officialSource !== 'object') return undefined;
+  const doctorEntrypoint = Reflect.get(officialSource, 'doctorEntrypoint');
+  return typeof doctorEntrypoint === 'string' && doctorEntrypoint.length > 0
+    ? doctorEntrypoint
+    : undefined;
 }
 
 export async function runPluginOwnedScaffold(

@@ -111,6 +111,7 @@ Deno.test('loadRegisteredPluginMetadata reads scaffold manifests without importi
           serviceEntrypoint: 'services/src/main.ts',
           servicePort: 8091,
           permissions: ['--allow-read'],
+          doctorEntrypoint: './src/adapter/plugin.ts',
         },
       },
       null,
@@ -127,6 +128,41 @@ Deno.test('loadRegisteredPluginMetadata reads scaffold manifests without importi
 
   if (plugins.workers.infrastructure?.requires.join(',') !== 'kv') {
     throw new Error('Expected scaffold manifest infrastructure metadata to be normalized');
+  }
+  if (plugins.workers.doctor !== './src/adapter/plugin.ts') {
+    throw new Error('Expected static scaffold metadata to carry the doctor adapter path');
+  }
+});
+
+Deno.test('loadRegisteredPluginMetadata isolates malformed scaffold metadata per plugin', async () => {
+  const projectRoot = await Deno.makeTempDir();
+  for (const name of ['broken', 'healthy']) {
+    const pluginRoot = resolve(projectRoot, `plugins/${name}`);
+    await Deno.mkdir(pluginRoot, { recursive: true });
+    await Deno.writeTextFile(resolve(pluginRoot, 'mod.ts'), 'export default {};\n');
+  }
+  await Deno.writeTextFile(
+    resolve(projectRoot, 'plugins/broken/scaffold.plugin.json'),
+    '{ invalid json',
+  );
+  await Deno.writeTextFile(
+    resolve(projectRoot, 'plugins/healthy/scaffold.plugin.json'),
+    JSON.stringify({
+      provider: { displayName: 'Healthy' },
+      officialSource: { canonicalName: 'healthy' },
+    }),
+  );
+  const config = {
+    plugins: ['./plugins/broken/mod.ts', './plugins/healthy/mod.ts'],
+  } as never;
+
+  const plugins = await loadRegisteredPluginMetadata(projectRoot, config);
+
+  if (!plugins.broken?.manifestError) {
+    throw new Error('Expected malformed plugin metadata to be retained as a plugin-local error');
+  }
+  if (plugins.healthy?.manifestError || plugins.healthy?.displayName !== 'Healthy') {
+    throw new Error('Expected healthy plugin metadata to load after a sibling failure');
   }
 });
 

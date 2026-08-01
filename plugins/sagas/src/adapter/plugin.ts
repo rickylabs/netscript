@@ -6,9 +6,13 @@
 import type {
   DoctorCheckSpec,
   InstallStarterResource,
+  ItemScaffolder,
   NetScriptPlugin,
   PluginCommandContext,
+  ScaffoldArtifact,
 } from '@netscript/plugin/adapter';
+import { textArtifact } from '@netscript/plugin/adapter';
+import installerManifest from '../../scaffold.plugin.json' with { type: 'json' };
 import { PLUGIN_PACKAGE_VERSION } from '../package-metadata.generated.ts';
 import { SAGAS_REGISTRY_PATH } from '../cli/registry-generator.ts';
 import {
@@ -22,10 +26,35 @@ import {
 
 /** Starter resources emitted by the sagas install command. */
 export const sagasStarterResources: readonly InstallStarterResource[] = [
+  {
+    scaffolder: {
+      name: 'doctor-metadata',
+      emit(): readonly ScaffoldArtifact[] {
+        return [textArtifact('sagas/scaffold.plugin.json', renderDoctorMetadata())];
+      },
+    } satisfies ItemScaffolder<undefined>,
+    input: undefined,
+  },
   { scaffolder: sagaResource.scaffolder, input: DEFAULT_SAGA_INPUT },
   { scaffolder: barrelScaffolder, input: DEFAULT_BARREL_INPUT },
   { scaffolder: runtimeGlueScaffolder, input: DEFAULT_RUNTIME_GLUE_INPUT },
 ];
+
+function renderDoctorMetadata(): string {
+  const doctorEntrypoint = import.meta.url.startsWith('file:')
+    ? new URL('../../doctor.ts', import.meta.url).href
+    : `jsr:@netscript/plugin-sagas@${PLUGIN_PACKAGE_VERSION}/doctor`;
+  return `${
+    JSON.stringify(
+      {
+        ...installerManifest,
+        officialSource: { ...installerManifest.officialSource, doctorEntrypoint },
+      },
+      null,
+      2,
+    )
+  }\n`;
+}
 
 const GENERATE_SAGA_REGISTRY = 'netscript plugin sagas generate-registry';
 

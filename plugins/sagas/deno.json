@@ -14,6 +14,7 @@
     "./aspire": "./src/aspire/mod.ts",
     "./runtime": "./src/runtime/mod.ts",
     "./contracts": "./contracts/v1/mod.ts",
+    "./doctor": "./doctor.ts",
     "./services": "./services/src/main.ts",
     "./streams": "./streams/mod.ts",
     "./streams/server": "./streams/server.ts"

@@ -6,9 +6,13 @@
 import type {
   DoctorCheckSpec,
   InstallStarterResource,
+  ItemScaffolder,
   NetScriptPlugin,
   PluginCommandContext,
+  ScaffoldArtifact,
 } from '@netscript/plugin/adapter';
+import { textArtifact } from '@netscript/plugin/adapter';
+import installerManifest from '../../scaffold.plugin.json' with { type: 'json' };
 import { PLUGIN_PACKAGE_VERSION } from '../package-metadata.generated.ts';
 import { WORKERS_JOB_REGISTRY_PATH } from '../runtime/generated-jobs.ts';
 import {
@@ -25,11 +29,36 @@ import {
 
 /** Starter resources emitted by the workers install command. */
 export const workersStarterResources: readonly InstallStarterResource[] = [
+  {
+    scaffolder: {
+      name: 'doctor-metadata',
+      emit(): readonly ScaffoldArtifact[] {
+        return [textArtifact('workers/scaffold.plugin.json', renderDoctorMetadata())];
+      },
+    } satisfies ItemScaffolder<undefined>,
+    input: undefined,
+  },
   { scaffolder: jobResource.scaffolder, input: DEFAULT_JOB_INPUT },
   { scaffolder: taskResource.scaffolder, input: DEFAULT_TASK_INPUT },
   { scaffolder: barrelScaffolder, input: DEFAULT_BARREL_INPUT },
   { scaffolder: runtimeGlueScaffolder, input: DEFAULT_RUNTIME_GLUE_INPUT },
 ];
+
+function renderDoctorMetadata(): string {
+  const doctorEntrypoint = import.meta.url.startsWith('file:')
+    ? new URL('../../doctor.ts', import.meta.url).href
+    : `jsr:@netscript/plugin-workers@${PLUGIN_PACKAGE_VERSION}/doctor`;
+  return `${
+    JSON.stringify(
+      {
+        ...installerManifest,
+        officialSource: { ...installerManifest.officialSource, doctorEntrypoint },
+      },
+      null,
+      2,
+    )
+  }\n`;
+}
 
 const GENERATE_WORKERS_REGISTRY = 'netscript generate plugins';
 

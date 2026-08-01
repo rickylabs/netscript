@@ -52,9 +52,11 @@ function pluginInstallCommand(
 
     if (kind === PLUGIN.AI && mcp) args.push('--mcp');
 
-    if (context.request.suiteId === SCAFFOLD.USERLAND_INSTALL) {
+    if (
+      context.request.suiteId === SCAFFOLD.USERLAND_INSTALL ||
+      context.request.options.packageSource !== PACKAGE_SOURCE.JSR
+    ) {
       args.push(
-        '--ci',
         '--local-path',
         join(context.project.repoRoot, 'plugins', localPluginDir(kind)),
       );
