@@ -6,15 +6,17 @@
 | --- | --- |
 | Run ID | `fix-1046-run-owned-teardown--enforced-teardown` |
 | Branch | `fix/1046-run-owned-teardown` |
-| Current phase | `implement` |
+| Current phase | `evaluate` |
 | Archetype | `6 — CLI / tooling` |
 | Scope overlays | `docs` |
 
 ## Current State
 
 Research F1–F10 and locked decisions D1–D8 are approved by the existing supervisor PLAN-EVAL PASS.
-The implementation thread is attached to this worktree. Slice 2 now proves ownership is
-three-valued, path-segment-safe, identity-pair-safe, fail-closed, and guarded against MCP commands.
+Slices 1–10 and the final gate pass are complete. The branch is pushed through slice 10; final gate
+evidence is ready for the owner-authorized supervisor IMPL-EVAL. Acceptance criteria 1–4 are
+implemented and tested. Criterion 5 cannot be completed on this base because PR #1034's assets are
+not embedded; the install/routing mechanism is present and verified without copying those assets.
 
 ## Completed
 
@@ -35,7 +37,7 @@ three-valued, path-segment-safe, identity-pair-safe, fail-closed, and guarded ag
 
 ## In Progress
 
-- Slice 11 full gate/evaluator/PR close-out.
+- Owner-authorized supervisor IMPL-EVAL and PR body/label close-out.
 
 ## Next Steps
 
