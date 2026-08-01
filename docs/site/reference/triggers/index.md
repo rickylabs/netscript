@@ -181,8 +181,6 @@ The following entrypoints are published alongside the root export.
 | `TriggerCircuitBreakerSpec` | type alias | Circuit breaker policy for repeated trigger dispatch failures. |
 | `TriggerConcurrencySpec` | type alias | Bounded dispatch concurrency for a trigger definition. |
 | `TriggerDeduplicationSpec` | type alias | Event-boundary deduplication policy. |
-| `TriggerBackfillSpec` | type alias | Quartz-style misfire handling for scheduled trigger backfill. |
-| `TriggerBackfillPolicy` | type alias | Scheduled trigger backfill misfire policy. |
 | `TriggerDurabilityTier` | type alias | Trigger durability tier. |
 | `CronExpression` | type alias | Cron expression accepted by scheduled trigger definitions. |
 | `TriggerKind` | type alias | Open trigger discriminator. |
@@ -202,7 +200,6 @@ The following entrypoints are published alongside the root export.
 | `TRIGGER_KINDS` | Canonical trigger kinds known by Group F. |
 | `TRIGGER_EVENT_STATUSES` | Trigger event lifecycle statuses. |
 | `TRIGGER_DURABILITY_TIERS` | Durability tiers supported by trigger definitions. |
-| `TRIGGER_BACKFILL_POLICIES` | Scheduled trigger backfill misfire policies. |
 
 ### DLQ, event-store, and idempotency support types
 

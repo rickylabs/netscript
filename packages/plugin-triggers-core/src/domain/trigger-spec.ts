@@ -1,4 +1,3 @@
-import type { TriggerBackfillPolicy } from './constants.ts';
 import type { TriggerEvent } from './trigger-event.ts';
 
 /** Retry policy applied by the trigger processor before DLQ handoff. */
@@ -29,12 +28,4 @@ export type TriggerDeduplicationSpec<TEvent extends TriggerEvent = TriggerEvent>
   ttlMs: number;
   key?: (event: TEvent) => string | undefined;
   payloadHashFallback: boolean;
-}>;
-
-/** Quartz-style misfire handling for scheduled trigger backfill. */
-export type TriggerBackfillSpec = Readonly<{
-  enabled: boolean;
-  windowMs: number;
-  policy: TriggerBackfillPolicy;
-  maxMissedFires?: number;
 }>;

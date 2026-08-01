@@ -44,6 +44,10 @@ export const streamSchemaScaffolder: ItemScaffolder<StreamSchemaInput> = {
 export const streamSchemaResource: PluginResource<StreamSchemaInput> = {
   name: 'schema',
   scaffolder: streamSchemaScaffolder,
+  defaultInput: {
+    name: 'invoices',
+    collections: [{ name: 'event', type: 'invoice.changed', primaryKey: 'id' }],
+  },
   parseInput: parseStreamSchemaInput,
 };
 

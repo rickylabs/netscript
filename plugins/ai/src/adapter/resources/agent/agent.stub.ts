@@ -23,8 +23,12 @@ import { ai, chatModelId } from '../ai.ts';
 /** Build the "%%AGENT_ID%%" agent loop bound to this app's AI runtime. */
 export function %%AGENT_EXPORT%%(): AgentLoop {
   const runtime = ai();
+  const provider = runtime.getModelProvider();
+  if (provider.createChatClient === undefined) {
+    throw new Error('The configured AI provider does not support chat clients.');
+  }
   return createAgentLoop({
-    modelProvider: runtime.getModelProvider(),
+    modelProvider: { id: provider.id, createChatClient: provider.createChatClient },
     history: slidingWindowHistory({ maxMessages: 32 }),
     tools: runtime.tools,
   });

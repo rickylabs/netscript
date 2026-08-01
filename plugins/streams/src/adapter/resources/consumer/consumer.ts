@@ -51,6 +51,7 @@ export const streamConsumerScaffolder: ItemScaffolder<StreamConsumerInput> = {
 export const streamConsumerResource: PluginResource<StreamConsumerInput> = {
   name: 'consumer',
   scaffolder: streamConsumerScaffolder,
+  defaultInput: { topic: '/billing/invoices' },
   parseInput: (args: PluginCliArgs): StreamConsumerInput => ({ topic: requiredResourceId(args) }),
 };
 

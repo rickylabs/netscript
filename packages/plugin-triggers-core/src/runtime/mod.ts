@@ -59,12 +59,7 @@ export type {
   WebhookVerificationResult,
   WebhookVerifierPort,
 } from '../ports/mod.ts';
-export {
-  TRIGGER_BACKFILL_POLICIES,
-  TRIGGER_DURABILITY_TIERS,
-  TRIGGER_EVENT_STATUSES,
-  TRIGGER_KINDS,
-} from '../domain/mod.ts';
+export { TRIGGER_DURABILITY_TIERS, TRIGGER_EVENT_STATUSES, TRIGGER_KINDS } from '../domain/mod.ts';
 export type { JobDefinition, JobId } from '@netscript/plugin-workers-core';
 export type {
   CronExpression,
@@ -86,8 +81,6 @@ export type {
   StreamTriggerDefinition,
   StreamTriggerPayload,
   TriggerActionResult,
-  TriggerBackfillPolicy,
-  TriggerBackfillSpec,
   TriggerCircuitBreakerSpec,
   TriggerConcurrencySpec,
   TriggerContext,

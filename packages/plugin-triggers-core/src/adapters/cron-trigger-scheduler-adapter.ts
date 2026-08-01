@@ -1,12 +1,11 @@
 import { createScheduler } from '@netscript/cron';
 import type { CreateSchedulerOptions } from '@netscript/cron';
-import {
-  type ScheduledTriggerPayload,
-  type ScheduledTriggerSpec,
-  type TriggerEvent,
-  type TriggerEventId,
-  type TriggerId,
-  TriggersError,
+import type {
+  ScheduledTriggerPayload,
+  ScheduledTriggerSpec,
+  TriggerEvent,
+  TriggerEventId,
+  TriggerId,
 } from '../domain/mod.ts';
 import type {
   ScheduledTriggerHandle,
@@ -102,13 +101,6 @@ export class CronTriggerSchedulerAdapter implements TriggerSchedulerPort {
     spec: ScheduledTriggerSpec,
     handler: ScheduledHandler,
   ): Promise<ScheduledTriggerHandle> {
-    if (spec.persistent === true) {
-      throw TriggersError.unsupportedOperation(
-        'scheduled-trigger.persistent',
-        'Persistent scheduled triggers are reserved until Deno persistent cron support lands.',
-      );
-    }
-
     await this.unschedule(id);
 
     const record: CronScheduleRecord = { id, spec, handler };

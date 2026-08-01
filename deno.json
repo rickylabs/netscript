@@ -21,6 +21,7 @@
     "ci:quality": {
       "dependencies": [
         "check",
+        "check:emitted-samples",
         "lint",
         "fmt:check",
         "deps:check",
@@ -40,6 +41,7 @@
         ".llm/tools/run-deno-check.ts"
       ]
     },
+    "check:emitted-samples": "deno run --allow-read --allow-write --allow-run .llm/tools/validation/check-emitted-samples.ts",
     "test": "deno test --allow-all",
     "quality:scan": "deno run --allow-read .llm/tools/quality/scan-code-quality.ts",
     "quality:scan:repo": "deno run --allow-read .llm/tools/quality/scan-code-quality.ts --root packages --root plugins",

@@ -43,6 +43,8 @@ Deno.test('triggers add resources emit the same shape at user-named paths', () =
   assertEquals(fileWatch.path, 'triggers/incoming-ledger-trigger.ts');
   assertStringIncludes(artifactText(webhook), 'paymentWebhookTrigger');
   assertStringIncludes(artifactText(scheduled), 'nightlyRollupTrigger');
+  assertEquals(artifactText(scheduled).includes('persistent'), false);
+  assertEquals(artifactText(scheduled).includes('backfill'), false);
   assertStringIncludes(artifactText(fileWatch), 'incomingLedgerTrigger');
 });
 
