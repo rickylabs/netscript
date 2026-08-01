@@ -79,7 +79,7 @@ ordering assertions beside the corresponding generator tests under the Aspire he
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| PLAN-EVAL | NOT_RUN | pending separate session | Hard stop before implementation. |
+| PLAN-EVAL | PASS | `plan-eval.md` 2026-08-01 | Separate session · Claude Code + OpenRouter · Qwen preset. All Plan-Gate checklist items satisfied. Implementation may begin. |
 
 ### Runtime Gates
 
@@ -95,5 +95,5 @@ ordering assertions beside the corresponding generator tests under the Aspire he
 
 ## Handoff Notes
 
-- PLAN-EVAL should challenge scope-2 evidence and the honest boundary around live AppHost coverage first.
+- PLAN-EVAL completed 2026-08-01. Verdict: PASS. All load-bearing claims verified: UNPINNED_APP emits endpoint but no probe; services and plugins evidence `/health`; `HealthCheckPath?: string | false` contract is complete; endpoint-before-probe ordering and tauri/desktop/task exclusions are protected; validation plan is honest about generator integration floor versus live AppHost dead-port test. Implementation may begin.
 

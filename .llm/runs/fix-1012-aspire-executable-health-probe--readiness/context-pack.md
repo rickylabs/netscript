@@ -6,14 +6,14 @@
 | --- | --- |
 | Run ID | `fix-1012-aspire-executable-health-probe--readiness` |
 | Branch | `fix/1012-aspire-executable-health-probe` |
-| Current phase | `plan` |
+| Current phase | `implement` |
 | Archetype | `6 — CLI / Tooling` |
 | Scope overlays | `service` |
 
 ## Current State
 
 The reported cause is reproduced against the clean `origin/main` baseline. Research and design are
-locked; implementation is blocked on a separate-session PLAN-EVAL PASS.
+locked, and separate-session PLAN-EVAL returned PASS. Implementation may begin.
 
 ## Completed
 
@@ -22,16 +22,17 @@ locked; implementation is blocked on a separate-session PLAN-EVAL PASS.
 - Service and plugin `/health` evidence.
 - Doctrine/archetype and JSR public-surface scan.
 - Plan and Design checkpoint.
+- Separate Qwen/OpenRouter PLAN-EVAL PASS (`plan-eval.md`).
 
 ## In Progress
 
-- Bootstrap commit, draft PR, and PLAN-EVAL handoff.
+- Focused implementation slice.
 
 ## Next Steps
 
-1. Commit and push harness planning artifacts; open the draft PR.
-2. Run separate open-model PLAN-EVAL.
-3. On PASS only, launch the focused implementation slice.
+1. Launch the focused implementation slice through the canonical agentic route.
+2. Run the named slice gates and substantive opposite-family review.
+3. Commit/push/comment the signed-off slice, then run separate IMPL-EVAL.
 
 ## Key Decisions
 
@@ -51,7 +52,7 @@ locked; implementation is blocked on a separate-session PLAN-EVAL PASS.
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
 | Static | reproduction PASS | `deno eval` output recorded in worklog/research |
-| Fitness | pending | PLAN-EVAL hard stop |
+| Fitness | PLAN-EVAL PASS; implementation gates pending | `plan-eval.md` |
 | Runtime | pending | live feasibility not yet claimed |
 | Consumer | pending | implementation tests not yet run |
 
@@ -61,10 +62,9 @@ locked; implementation is blocked on a separate-session PLAN-EVAL PASS.
 
 ## Drift and Debt
 
-- Drift: none.
+- Drift: minor evaluator write-boundary overrun recorded in `drift.md`; accepted because edits were accurate run-state reconciliation only.
 - Debt: existing CLI/Aspire doctrine debt unchanged.
 
 ## Commits
 
 - See the draft PR's commit list + per-slice PR comments.
-
