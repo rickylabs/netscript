@@ -6,13 +6,13 @@
 | --- | --- |
 | Run ID | `fix-1019-saga-correlation-selector--prisma-selector` |
 | Branch | `fix/1019-saga-correlation-selector` |
-| Current phase | `plan-eval` |
+| Current phase | `implement` |
 | Archetype | `5 — Plugin Package` |
 | Scope overlays | none |
 
 ## Current State
 
-Research and design are locked. Prisma 7.8 generation from a wrapper containing the shipped fragment verbatim confirmed the issue cause exactly. No product implementation has begun. The canonical separate-session PLAN-EVAL is blocked because the OpenRouter credential is absent.
+Research and design are locked. Prisma 7.8 generation from a wrapper containing the shipped fragment verbatim confirmed the issue cause exactly. Owner-authorized Opus 5 PLAN-EVAL passed with mandatory conditions C1-C3. No product implementation preceded the pass.
 
 ## Completed
 
@@ -22,13 +22,13 @@ Research and design are locked. Prisma 7.8 generation from a wrapper containing 
 
 ## In Progress
 
-- Separate-session PLAN-EVAL launch blocked on provider credential / owner-authorized compliant fallback.
+- Slice 1 implementation, including the ungated schema-derived guard and gated live round-trip.
 
 ## Next Steps
 
-1. Restore the canonical local evaluator credential or obtain owner direction for a compliant fallback, then obtain PLAN-EVAL PASS.
-2. Open/advance the draft PR and implement slice 1.
-3. Run live Postgres round-trip and scoped gates.
+1. Implement slice 1 under PLAN-EVAL conditions C1-C3.
+2. Run live Postgres round-trip and scoped gates.
+3. Hand off to the owner-authorized Opus 5 IMPL-EVAL.
 
 ## Key Decisions
 
@@ -57,7 +57,7 @@ Research and design are locked. Prisma 7.8 generation from a wrapper containing 
 
 ## Drift and Debt
 
-- Drift: canonical PLAN-EVAL route blocked by missing credential; invalid owner-waiver artifact rejected.
+- Drift: resolved; owner authorized the Opus 5 fix-train evaluator route and restored its verdict.
 - Debt: none new or deepened.
 
 ## Commits

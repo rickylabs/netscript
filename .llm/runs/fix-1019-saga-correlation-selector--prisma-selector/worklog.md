@@ -50,6 +50,7 @@ Change the shipped fragment, regenerate Prisma 7.8 types to confirm the input ke
 | --- | --- | --- | --- |
 | 2026-08-01 | plan | research | Prisma 7.8 generated the reported named selector; lock churn removed. |
 | 2026-08-01 | plan-eval | launch | Canonical Qwen route blocked: OpenRouter credential absent; product implementation remains stopped. |
+| 2026-08-01 | plan-eval | owner override | Opus 5 supervisor PLAN-EVAL restored as authoritative; PASS conditional on C1-C3. |
 
 ## Decisions
 
@@ -61,7 +62,7 @@ Change the shipped fragment, regenerate Prisma 7.8 types to confirm the input ke
 
 | Drift | Severity | Logged in drift.md |
 | --- | --- | --- |
-| Local formal-evaluator credential unavailable | significant | yes |
+| Fix-train evaluator route clarified by owner | significant | yes |
 
 ## Gate Results
 
@@ -69,5 +70,4 @@ All implementation gates are `NOT_RUN` until PLAN-EVAL passes.
 
 ## Handoff Notes
 
-- PLAN-EVAL is blocked until the canonical open-model route is credentialed or the owner explicitly
-  authorizes a compliant fallback. Product code remains untouched.
+- PLAN-EVAL passed under the owner-authorized Opus 5 supervisor route. IMPL-EVAL must verify C1-C3.
