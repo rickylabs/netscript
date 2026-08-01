@@ -199,7 +199,7 @@ export const checkoutSaga = defineSaga('CheckoutSaga')
   })
 
   // === Compensation: PaymentFailed → cancel the order. ===
-  .compensate('PaymentFailed', (saga, event) => {
+  .on('PaymentFailed', (saga, event) => {
     if (saga.state.status !== 'payment_pending') return [];
     const msg = event.payload as { reason: string };
     saga.state = { ...saga.state, status: 'cancelled', cancelReason: `Payment failed: ${msg.reason}` };
@@ -225,8 +225,12 @@ Read the shape, not the line count:
   playground models compensation exactly this way — as failure-event handlers that walk the state
   machine backward.
 
-{{ comp callout { type: "note", title: "Two ways to express compensation" } }}
-The builder also exposes a dedicated <code>.compensate(eventType, handler)</code> method — same handler shape as <code>.on()</code>, but registered as the compensation path for a failed event type. You can write <code>.compensate('PaymentFailed', ...)</code> instead of an <code>.on('PaymentFailed', ...)</code> branch to make the undo intent explicit in the chain. The playground's order saga uses plain <code>.on()</code> failure handlers; both compile and both run. Choose the one that reads clearest for your team — see <a href="/explanation/durability-model/">Durability model</a>.
+{{ comp callout { type: "note", title: "Inbound failure messages use .on()" } }}
+The builder also exposes <code>.compensate(eventType, handler)</code>, but that registry is used by
+explicit compensation cascades with runtime context. A worker-published
+<code>PaymentFailed</code> is an ordinary inbound saga message, so register it with
+<code>.on('PaymentFailed', ...)</code> as shown. See the
+<a href="/explanation/durability-model/">Durability model</a> for explicit compensation flows.
 {{ /comp }}
 
 ## Step 4 — Enqueue payment through the triggers API
