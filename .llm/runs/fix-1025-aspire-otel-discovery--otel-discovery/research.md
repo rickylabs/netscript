@@ -7,7 +7,7 @@
 - The current E2E still starts the generated AppHost with `--isolated`; telemetry commands do not
   accept that flag and do not pass `--dashboard-url`.
 
-## Findings
+## Cycle-1 findings — retained for history
 
 | # | Finding | How to verify |
 | - | - | - |
@@ -31,9 +31,35 @@
 - Slow-type/public API risk: none; no exported TypeScript signatures change. Generated-asset and
   package fitness are covered by focused tests, `check:assets-barrel`, and `quality:gate`.
 
-## Open questions
+## Cycle-1 open questions — superseded by the cycle-2 amendment below
 
 - Must resolve now: what counts as non-empty telemetry JSON. Resolve by parsing command stdout and
   requiring a non-empty JSON array for the traces step after the suite has exercised HTTP traffic.
 - Resolved now: `aspire export` recovery. Observed exit 0 and a non-empty zip after removing anonymous mode.
 - Safe to defer: no open cause question remains; the local A/B control directly changed the failing behavior.
+# Cycle 2 verification amendment — 2026-08-01
+
+## F10 — Rejected source change restored
+
+The seven rejected product/diagnostic files were restored to `origin/main`. There is no dashboard
+environment-variable, generated Aspire config, embedded asset, docs sample, or diagnostic-harness
+diff remaining.
+
+## F11 — Fresh A/B differs from cycle-1 evidence
+
+Using the existing disposable generated AppHost and Aspire CLI
+`13.4.6+87fe259e4fc244c599019a7b1304c85a1488f248` in a persistent shell:
+
+| Mode | `aspire ps` dashboard URL | Automatic traces | Exit |
+| --- | --- | --- | --- |
+| authenticated | `https://localhost:45747/login?t=…` | `[]` | 0 |
+| anonymous | `https://localhost:45737` | `[]` | 0 |
+
+The anonymous dashboard returned HTTP 200. Only
+`ASPIRE_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS=true` changed between halves. This directly differs from
+cycle 1, where anonymous mode produced `The dashboard is not available`, exit 12.
+
+## F12 — Cycle-2 implementation stop condition reached
+
+The cycle-2 brief requires stopping when the A/B differs. The generated workspace resolver, README,
+Aspire skill, observability docs, and real runtime-gate changes therefore remain unimplemented.

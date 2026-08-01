@@ -2,7 +2,7 @@
 
 ## Current state
 
-- Phase: plan / awaiting PLAN-EVAL.
+- Phase: cycle-2 cause verification stopped on divergent evidence.
 - Branch baseline equals `origin/main` at `3ab64720ffe06dedc80f12e8f7bb9fa281de37b9`.
 - Worktree was clean at bootstrap.
 
@@ -18,15 +18,17 @@
   generated-config sample is in scope, and the wider alignment surface must be reported.
 - Live help proves `otel`/`export` accept `--dashboard-url` and do not accept `--isolated`.
 
-## Locked direction
+## Cycle-2 direction and stop
 
-- NetScript-side anonymous dashboard configuration defect.
-- Remove both anonymous-mode emission sites and regenerate embedded assets.
-- Keep automatic `--apphost` discovery and assert non-empty trace JSON plus a non-empty export zip.
+- Cycle-1 anonymous-dashboard removal remains rejected and has been restored to `origin/main`.
+- Supervisor-authored `plan-eval-cycle2.md` approved the emitted-task direction with partial-
+  acceptance limitations; the generator did not run an evaluator.
+- Fresh persistent-shell A/B did not reproduce the anonymous-mode failure: authenticated and
+  anonymous modes both returned automatic traces `[]`, exit 0.
+- Per the owner brief, no emitted-task/docs/runtime-gate implementation began after that divergence.
 
-## Blocker / next action
+## Next action
 
-- Draft PR #1036 is open and the bootstrap commit is pushed.
-- Supervisor adjudication in `plan-eval.md` records conditional PASS and authorizes implementation.
-- Findings A/B, the token blast-radius audit, and Finding C's package gate-table amendment are complete.
-- Proceed with slices 2 and 3; leave PR draft for human security-posture review.
+- Commit and push the cycle-2 restore/evidence slice, update draft PR #1036, and report the divergent
+  A/B. Owner/supervisor must decide whether to require another controlled reproduction or reframe
+  the cause before product implementation resumes.

@@ -1,5 +1,33 @@
 # Plan: detached Aspire telemetry discovery
 
+## Cycle 2 replacement plan — 2026-08-01
+
+Owner waiver: the open-model Plan-Gate lane is waived. The supervisor owns PLAN-EVAL/IMPL-EVAL;
+this generator does not invoke or fabricate either evaluator. The supervisor-authored
+`plan-eval-cycle2.md` is the independent cycle-2 verdict.
+
+1. Restore the rejected anonymous-dashboard implementation to `origin/main` and preserve run history.
+2. Re-run the authenticated/anonymous detached AppHost A/B before relying on the prior cause.
+3. If the A/B matches, emit dependency-free `aspire:otel` and `aspire:export` workspace tasks,
+   document them in the generated README, Aspire skill, and one observability page, then add the
+   runtime assertion to the real `scaffold.runtime` gate.
+4. Run scoped static/docs gates, then the full runtime suite exactly once.
+
+Stop condition: if the A/B differs, record drift and report without implementing the replacement
+fix. That condition was reached: both modes returned automatic traces exit 0.
+
+Cycle-2 slices:
+
+| # | Slice | Gate | Status |
+| --- | --- | --- | --- |
+| C2-S0 | Restore rejected cycle-1 source edits; retain failure history | clean tracked source diff against `origin/main` for the seven files | complete |
+| C2-S1 | Verify authenticated/anonymous detached discovery A/B | raw `aspire ps`, HTTP, and `aspire otel` output | divergent; stop |
+| C2-S2 | Emit zero-memorisation workspace routes and focused tests | scoped check/lint/fmt/test | not started |
+| C2-S3 | Docs/skill/README discoverability | docs maintenance | not started |
+| C2-S4 | Real `scaffold.runtime` regression and one-pass runtime gate | full scaffold runtime | not run |
+
+## Superseded cycle-1 plan — retained for history only
+
 ## Run Metadata
 
 | Field | Value |

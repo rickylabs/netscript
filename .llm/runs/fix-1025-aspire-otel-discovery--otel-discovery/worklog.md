@@ -55,6 +55,12 @@ template; runtime proof lives at `#checkTelemetry()` in `.llm/tools/e2e/scaffold
 | 2026-08-01 21:26 CEST | 1 | discriminator complete | Removing anonymous mode restored tokenized URL and automatic traces exit 0 under `--isolated`. |
 | 2026-08-01 21:38 CEST | 1 | export amendment complete | Patched detached export saved a 12,857-byte zip and exited 0. |
 | 2026-08-01 21:41 CEST | 1 | token blast-radius audit | 53 files matched dashboard/open/`:18888` guidance; wider alignment reported, not expanded. |
+| 2026-08-01 21:47 CEST | 2 | generator fix complete | Removed anonymous dashboard mode from config and helper sources, regenerated embedded assets, and corrected the verbatim docs sample. |
+| 2026-08-01 21:49 CEST | 2 | focused gates complete | Generator tests: 3 passed / 21 steps; scoped template check, lint, and fmt passed; docs maintenance passed. |
+| 2026-08-01 21:52 CEST | 3 | harness assertion implemented | Automatic traces now require a non-empty JSON array; export requires a non-empty archive; both are critical gates. |
+| 2026-08-01 22:02 CEST | 3 | independent slice review FAIL | Opus session `5744e2a4` found authenticated-dashboard blast radius in the real `scaffold.runtime` telemetry consumers and generated telemetry UI. Sign-off withheld. |
+| 2026-08-01 23:48 CEST | C2-S0 | rejected implementation restored | All seven named product/diagnostic files restored to `origin/main`; run artifacts retained. |
+| 2026-08-01 23:55 CEST | C2-S1 | A/B diverged; implementation stopped | Authenticated and anonymous detached starts both returned automatic traces `[]`, exit 0. Owner stop condition invoked. |
 
 ## Decisions
 
@@ -76,3 +82,19 @@ template; runtime proof lives at `#checkTelemetry()` in `.llm/tools/e2e/scaffold
   control and an honest acceptance mapping. Both plan defects are now amended for cycle 2.
 - Supervisor cycle-3 adjudication: conditional PASS. Findings A/B, token audit, and the published
   package gate-table amendment are complete; implementation is authorized.
+- Generator focused tests: PASS — 3 tests, 21 steps, 0 failures.
+- Template scoped check/lint/fmt: PASS — 28 TypeScript files, zero findings.
+- E2E harness scoped check/lint/fmt: PASS — 1 TypeScript file, zero findings after targeted format.
+- Docs maintenance: PASS — 98 docs, zero broken links/anchors, docs accuracy PASS, Claude skill sync PASS.
+- Docs site build: output reached Lume configuration and diagram verification, but the wrapper did
+  not return a definitive exit code; do not claim this gate until rerun yields a terminal verdict.
+- Package quality gate: PASS — quality scan returned no findings and doctrine/dependency checks
+  completed successfully.
+- Independent Tier-A slice review: FAIL — the security-posture change breaks unauthenticated
+  dashboard API consumers outside the initially inspected harness. Full runtime E2E not run.
+- Cycle-2 Plan-Gate: supervisor-authored `plan-eval-cycle2.md` records PASS with binding partial-
+  acceptance limitations; no generator evaluator/provider command was attempted.
+- Cycle-2 A/B: DIVERGED — automatic traces exit 0 in both authenticated and anonymous modes.
+- Full `scaffold.runtime`: NOT RUN because the cause-verification stop condition fired first.
+- Acceptance box 4 upstream issue: owner action required if the final classification is upstream;
+  this lane has no authority to file on `dotnet/aspire`.
