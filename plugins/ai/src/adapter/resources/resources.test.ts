@@ -96,7 +96,10 @@ Deno.test('ai stream route threads AbortSignal and exposes stop() (F-13)', () =>
   assertStringIncludes(source, 'loop.stop()');
   assertStringIncludes(source, "from '@netscript/plugin-ai-core'");
   assertStringIncludes(source, 'aiContractV1');
-  assertStringIncludes(source, 'createAiRouter(aiRouteImplementation)');
+  assertStringIncludes(
+    source,
+    'export const aiRouter = createAiRouter<AiRequestContext>(aiRouteImplementation)',
+  );
   assertStringIncludes(source, 'toNetScriptChatResponse');
 });
 

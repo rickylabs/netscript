@@ -129,7 +129,7 @@ export const aiRouteContract = aiContractV1;
 
 /**
  * Contract-bound /v1/ai router handlers for host integrations and tests.
- * This is the explicit-context form of createAiRouter(aiRouteImplementation).
+ * The request context is explicit so the binding retains its app-owned request.
  */
 export const aiRouter = createAiRouter<AiRequestContext>(aiRouteImplementation);
 

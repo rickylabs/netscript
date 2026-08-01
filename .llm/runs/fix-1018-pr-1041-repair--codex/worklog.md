@@ -36,5 +36,17 @@
 
 ## Evidence
 
-Pending implementation and gates.
+- Emitted-sample gate: 40 actual TypeScript/TSX artifact emissions, 30 unique checked paths.
+- AI resource tests: 10 passed, 0 failed after restoring the exact router-binding assertion.
+- Router negative control: deleting only the `aiRouter` export produced 9 passed / 1 failed; the
+  assertion named the missing exact export binding. The export was restored before commit.
+- Scoped lint: 52 selected files, 0 findings.
+- Scoped format check: 52 selected files, 0 findings.
 
+## IMPL-EVAL corrections
+
+- Replaced the mixed-unit `starterResources.length + add artifacts` count with actual artifact
+  counting on both branches. The measured result is 23 install plus 17 add emissions, not the
+  earlier estimated 39.
+- Replaced the prose-satisfiable router assertion with the exact emitted export statement and
+  removed the call-shaped text from its documentation.
