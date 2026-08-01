@@ -51,6 +51,10 @@ Change the shipped fragment, regenerate Prisma 7.8 types to confirm the input ke
 | 2026-08-01 | plan | research | Prisma 7.8 generated the reported named selector; lock churn removed. |
 | 2026-08-01 | plan-eval | launch | Canonical Qwen route blocked: OpenRouter credential absent; product implementation remains stopped. |
 | 2026-08-01 | plan-eval | owner override | Opus 5 supervisor PLAN-EVAL restored as authoritative; PASS conditional on C1-C3. |
+| 2026-08-01 | 1 | implementation | Correlation `name:` changed to `map:`; one selector constant now drives delegate, calls, and fake. |
+| 2026-08-01 | 1 | C1 | Ungated test derived `sagaId_correlationKey` from the shipped fragment and passed. |
+| 2026-08-01 | 1 | live runtime | Postgres 18.3 db push + Prisma 7.8 generate + required store round-trip passed: `1 passed, 0 failed`. |
+| 2026-08-01 | 1 | reconcile | PR body records C2 deployed-index consequence and C3 latent transition selector; issue/PR scope unchanged. |
 
 ## Decisions
 
@@ -66,8 +70,37 @@ Change the shipped fragment, regenerate Prisma 7.8 types to confirm the input ke
 
 ## Gate Results
 
-All implementation gates are `NOT_RUN` until PLAN-EVAL passes.
+### Static Gates
+
+| Gate | Command or check | Result | Notes |
+| --- | --- | --- | --- |
+| scoped check | `run-deno-check.ts --root packages/plugin-sagas-core --root plugins/sagas --ext ts` | PASS | 178 files, 0 findings |
+| scoped lint | `run-deno-lint.ts --root packages/plugin-sagas-core --root plugins/sagas --ext ts` | PASS | 178 files, 0 findings |
+| scoped format | `run-deno-fmt.ts ... --ignore-line-endings` | PASS | 178 files, 0 findings |
+| scoped tests | `deno test --allow-all packages/plugin-sagas-core/ plugins/sagas/` | PASS | Live test intentionally ignored without env; ungated schema guard passed |
+
+### Fitness Gates
+
+| Gate | Result | Evidence | Notes |
+| --- | --- | --- | --- |
+| per-root doctrine | PASS | both requested `check-doctrine.ts` commands | zero FAIL; pre-existing warnings only |
+| code quality | PASS | `deno task quality:gate` | scanner `ok:true`; arch checks zero FAIL |
+| JSR audit | PASS with existing warnings | `audit-jsr-package.ts` for both roots | dry-run OK; no new public/export risk |
+
+### Runtime Gates
+
+| Gate | Result | Evidence | Notes |
+| --- | --- | --- | --- |
+| Prisma/Postgres round-trip | PASS | Postgres 18.3 on ephemeral port 42110; `1 passed, 0 failed` | Shipped fragment copied verbatim; db push and Prisma 7.8 generation shown in output |
+
+### Consumer Gates
+
+| Consumer | Result | Evidence | Notes |
+| --- | --- | --- | --- |
+| Prisma 7.8 generated client | PASS | generated `SagaRuntimeCorrelationWhereUniqueInput` | exposes `sagaId_correlationKey`; sibling remains named selector |
 
 ## Handoff Notes
 
-- PLAN-EVAL passed under the owner-authorized Opus 5 supervisor route. IMPL-EVAL must verify C1-C3.
+- PLAN-EVAL passed under the owner-authorized Opus 5 supervisor route. IMPL-EVAL should verify the
+  selector constant/derived test, verbatim-fragment live wrapper, real terminal evidence, and C2/C3
+  PR disclosures.
