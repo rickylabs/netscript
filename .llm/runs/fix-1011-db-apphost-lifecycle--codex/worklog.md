@@ -51,10 +51,12 @@ adjacent test and assert exact Aspire commands before changing cleanup authority
 | Time | Slice | Step | Notes |
 | --- | --- | --- | --- |
 | 2026-08-01 | bootstrap | research/design | Concrete unconditional `aspire stop` established; PLAN-EVAL pending. |
+| 2026-08-01 | plan-eval | evaluator launch | Separate Qwen session `aa3c6460-8788-4e0d-b4c3-9b04fc11eb17` launched with the canonical route but failed authentication before evaluating. |
 
 ## Gate Results
 
-All implementation gates are `NOT_RUN` until PLAN-EVAL returns `PASS`.
+All implementation gates are `NOT_RUN` until PLAN-EVAL returns `PASS`. The first evaluator launch
+exited before evaluation with `Not logged in`; no verdict artifact was created.
 
 ## Handoff Notes
 
