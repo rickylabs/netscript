@@ -84,12 +84,21 @@ the amended plan under the owner's instruction; implementation is authorized wit
 | Resolver focused tests | PASS | 3 resolver tests passed: precedence/fallback, Windows paths, absolute specifiers. |
 | Runner dependency-shape test | PASS | `startSagaRunner` loaded one definition from `file:///consumer/project/...`; no JSR install was performed. |
 | Service init test | PASS | `registerSagas` imported the consumer-project URL and passed one definition to the registrar seam. |
-| `deno run -A .llm/tools/run-deno-check.ts --root plugins/sagas --ext ts` | PASS | Exit 0; wrapper emitted no diagnostics. |
-| `deno fmt --check plugins/sagas` | PASS | `Checked 78 files`. |
-| `deno lint plugins/sagas` | PASS | `Checked 73 files`. |
-| `deno test -A plugins/sagas/tests/` | PASS | 24 passed, 0 failed before the runner test was moved byte-for-byte into its own test file; final rerun pending. |
+| `deno run -A .llm/tools/run-deno-check.ts --root plugins/sagas --ext ts` | PASS | Exit 0; 74 files selected, 1 batch, 0 failed batches/diagnostics. |
+| `deno fmt --check plugins/sagas` | PASS | `Checked 79 files`. |
+| `deno lint plugins/sagas` | PASS | `Checked 74 files`. |
+| `deno test -A plugins/sagas/tests/` | PASS | Final committed-tree rerun: 24 passed, 0 failed. |
 | `deno test -A plugins/sagas/src/adapter/resources/resources.test.ts` | PASS | 4 passed, 0 failed; emitted glue text remains unchanged. |
 | Aspire contribution test | PASS | 1 passed, 0 failed. |
 | Scoped fmt/lint wrappers | PASS | 73 files selected; zero failed batches/findings. |
 | `deno task quality:gate` | PASS | Code-quality scan: zero findings; doctrine scan: zero FAIL, existing WARN/INFO only. |
 | `rg "import\\.meta\\.url" plugins/sagas/` | PASS | No matches; no registry path resolution remains. |
+| Lock hygiene | PASS | `deno.lock` has no diff from `origin/main`. |
+
+## Acceptance Evidence
+
+| Criterion | Evidence | Status |
+| --- | --- | --- |
+| Every saga entrypoint receives an absolute project-owned registry URL. | API init and runner share the tested `NETSCRIPT_PROJECT_ROOT ?? Deno.cwd()` fallback; generated glue remains explicitly project-root-based; Aspire declares the absolute URL forward-looking. | Evidenced, with `declareEnv` explicitly not counted as runtime delivery. |
+| No consumer workspace is inferred by walking upward from a package module URL. | `rg "import\\.meta\\.url" plugins/sagas/` returned no matches; runner and service package-relative code was removed. | Evidenced. |
+| Runtime starts from published-package shape with non-empty registry. | Injected importer test uses a JSR-shaped package module URL, receives `file:///consumer/project/...`, and supervisor reports `definitionCount: 1`. | Dependency-shaped evidence only; **no published JSR install ran, so the literal published-install box remains unticked**. |
