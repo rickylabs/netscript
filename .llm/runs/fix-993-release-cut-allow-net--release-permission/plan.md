@@ -45,9 +45,9 @@ Grant `release:cut` the exact GitHub API host permission it needs, and preserve 
 
 | ID | Decision | Rationale |
 | --- | -------- | --------- |
-| D1 | Rethrow only `Deno.errors.NotCapable` from `validateGithubToken`, wrapping it in a message naming `--allow-net=api.github.com`. | Smallest diff; fails on the first candidate and preserves existing handling for HTTP/network failures. |
+| D1 | Rethrow only a `Deno.errors.NotCapable` whose text identifies missing net access to `api.github.com`, wrapping it in a message naming `--allow-net=api.github.com` and retaining the original error text. | Fails on the first candidate without misclassifying a future non-net capability error, while preserving existing handling for HTTP/network failures. |
 | D2 | Keep the public return type `Promise<string \| null>`. | Successful and genuine-auth-failure consumers keep their existing contract. |
-| D3 | Test the exported function through a subprocess lacking net permission, plus an invalid-token live request with net permission. | Proves the actual process permission boundary and the real 401 path without introducing a speculative helper. |
+| D3 | Extract and export a pure missing-net predicate and message builder, then hermetically test classification plus the rendered `release:cut could not create the release PR: ...` line. Keep the real-token request as supervisor-run acceptance evidence only. | Deterministically proves the flag-bearing/no-401/no-auth-advice contract without adding subprocess or network dependencies to the 63-test unit suite. |
 | D4 | Host-scope the task permission to `api.github.com`. | Matches the centralized endpoint and least-privilege requirement. |
 
 ## Open-Decision Sweep
@@ -62,7 +62,7 @@ Grant `release:cut` the exact GitHub API host permission it needs, and preserve 
 | Risk | Mitigation |
 | ---- | ---------- |
 | Catching all `NotCapable` errors could mislabel a future non-net permission failure inside the request path. | Message includes the original error and the exact currently required net flag; scope remains the single `githubRequest` call. |
-| Live invalid-token test depends on GitHub availability. | It is explicitly required by acceptance and runs with host-scoped network permission. |
+| A committed live-network test would regress the hermetic agentic library suite. | Unit-test pure classification/rendering only; keep the exact-flags real-token request as separately recorded acceptance evidence. |
 | A consumer assumes `validateGithubToken` never throws. | Run the scoped `.llm/tools` check covering every listed consumer and inspect the direct `gh-token.ts` call. |
 | Full release cut is destructive. | Do not run it; use exact-flag direct probes and task-line inspection. |
 
@@ -94,9 +94,9 @@ Grant `release:cut` the exact GitHub API host permission it needs, and preserve 
 | ----- | ---- | ---------------- | --------------- |
 | 1 | check | `deno run -A .llm/tools/run-deno-check.ts --root .llm/tools --ext ts` | exit 0 |
 | 2 | lint | `deno lint .llm/tools/agentic/lib/agentic-lib.ts .llm/tools/release/cut.ts` | exit 0 |
-| 3 | tests | `deno test --allow-read --allow-env --allow-net=api.github.com .llm/tools/agentic/lib/agentic-lib_test.ts` | exit 0, new regressions pass |
+| 3 | tests | `deno test --allow-read --allow-env --allow-net=api.github.com .llm/tools/agentic/lib/agentic-lib_test.ts` | exit 0; hermetic classification and rendered-line regressions pass without using the granted network capability |
 | 4 | task surface | `deno task --quiet 2>&1 \| grep -n "release:cut"` | host-scoped net flag visible |
-| 5 | acceptance probe | direct `validateGithubToken` probe under exact `release:cut` flags | prints authenticated login |
+| 5 | acceptance probe | direct `validateGithubToken` probe under exact `release:cut` flags | prints authenticated login; recorded in `worklog.md`, not committed as a network test |
 
 ## Dependencies
 
@@ -105,4 +105,3 @@ Grant `release:cut` the exact GitHub API host permission it needs, and preserve 
 ## Drift Watch
 
 - Any different error shape, endpoint host, task snapshot, or consumer contract discovered during implementation must be appended to `drift.md` and may require re-evaluation.
-

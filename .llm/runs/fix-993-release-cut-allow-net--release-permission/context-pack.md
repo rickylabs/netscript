@@ -6,30 +6,30 @@
 | --- | --- |
 | Run ID | `fix-993-release-cut-allow-net--release-permission` |
 | Branch | `fix/993-release-cut-allow-net` |
-| Current phase | `plan-eval` |
+| Current phase | `implement` |
 | Archetype | `6 - CLI / Tooling` analogue |
 | Scope overlays | none |
 
 ## Current State
 
-The clean branch is exactly at the supplied baseline. Reproduction confirms the stated cause: the real token validates only when `api.github.com` net permission is present, while the current bare catch converts `NotCapable` to `null` and later `(401)` diagnostics.
+The clean branch began exactly at the supplied baseline. Reproduction confirms the stated cause. The independent PLAN-EVAL failed the original network/subprocess test design; D1/D3 are now revised to narrow net classification and hermetically test pure helpers plus the rendered operator line.
 
 ## Completed
 
 - Skill/harness bootstrap and required reference reads.
 - Worktree/baseline verification.
 - Task, endpoint, error-shape, consumer, and live-token reproduction research.
-- Locked two-slice plan and Design checkpoint.
+- Locked two-slice plan and Design checkpoint, then corrected D1/D3 from the independent PLAN-EVAL findings.
 
 ## In Progress
 
-- Separate-session PLAN-EVAL.
+- Implementation slice after owner-authorized PLAN-EVAL correction.
 
 ## Next Steps
 
-1. Obtain PLAN-EVAL `PASS`.
-2. Commit/push the bootstrap artifacts and open the required draft PR.
-3. Implement the one code slice, validate, review, commit/push/comment.
+1. Implement the scoped task permission and pure error classification/rendering seam.
+2. Run the exact requested validation and acceptance probe.
+3. Complete substantive slice review, commit/push/comment.
 4. Run separate-session IMPL-EVAL and finalize PR evidence/labels.
 
 ## Key Decisions
@@ -65,4 +65,3 @@ The clean branch is exactly at the supplied baseline. Reproduction confirms the 
 ## Commits
 
 - See the draft PR's commit list + per-slice PR comments after the bootstrap commit is pushed.
-

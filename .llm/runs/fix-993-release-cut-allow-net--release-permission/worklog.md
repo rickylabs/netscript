@@ -50,12 +50,15 @@ Start at the root `release:cut` task, follow `cut.ts` into `resolveGithubToken`,
 | Time | Slice | Step | Notes |
 | ---- | ----- | ---- | ----- |
 | 2026-08-01T21:21:17+02:00 | 1 | research | Clean requested branch/baseline confirmed; reproduction and consumer/task audit matched the issue lead. |
+| 2026-08-01T21:31:00+02:00 | 1 | PLAN-EVAL response | Independent evaluator returned FAIL on D3: replaced subprocess/live-network committed test design with pure classification/message helpers and rendered-line assertions. |
 
 ## Decisions
 
 | Decision | Reason | Source |
 | -------- | ------ | ------ |
 | Rethrow `NotCapable` from token validation | A missing process permission cannot be repaired by trying more credentials. | reproduction + plan D1 |
+| Require both `NotCapable` and a GitHub-host net-access message | Avoid misclassifying future non-net capability failures. | independent PLAN-EVAL finding C + revised D1 |
+| Test pure classification and operator rendering hermetically | The focused suite must not acquire subprocess or GitHub egress dependencies. | independent PLAN-EVAL finding A/B + revised D3 |
 
 ## Drift
 
@@ -105,4 +108,3 @@ Requires net access to "api.github.com:443", run again with the --allow-net flag
 ## Handoff Notes
 
 - PLAN-EVAL should inspect D1/D3, the destructive-release non-scope, and whether the proposed tests prove both acceptance paths.
-
