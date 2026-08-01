@@ -117,3 +117,56 @@ template; runtime proof lives at `#checkTelemetry()` in `.llm/tools/e2e/scaffold
 - Post-suite retained-scaffold attempt: the AppHost could be restarted detached, but generated
   resources exited before worker traffic could be produced; it was stopped cleanly. This does not
   upgrade the runtime-gate result.
+
+## Rebase and re-proof — 2026-08-02
+
+### Rebase
+
+- Fetched `origin` with pruning and rebased the branch onto `origin/main` at
+  `8b69d78f01c55fde3f95efad8cfe2b8e1583fea1`.
+- The real rebase matched the supervisor's probe: commit `c5c70c21b` produced the sole conflict in
+  `packages/cli/src/kernel/constants/scaffold/scaffold-files.ts`.
+- Resolved semantically by retaining the branch's `ASPIRE_CLI_TASK: 'aspire-cli.ts'` together with
+  main's `TSCONFIG_ROOT: 'tsconfig.json'` and `TSCONFIG_APP: 'tsconfig.json'` (and the adjacent
+  `TSCONFIG_APPHOST`). The other overlapping files auto-merged; no generated file was hand-patched.
+- Post-rebase invariants: the destructive Docker-guidance grep returned no matches; CI still has
+  `133: run: deno task check:emitted-samples`; the Aspire skill and Claude mirror compare byte-for-byte.
+
+### Gate evidence
+
+| Command | Exit | Observed result |
+| --- | ---: | --- |
+| `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/cli --ext ts,tsx` | 0 | 751 files, 7 batches, 0 failed batches, 0 diagnostics. |
+| `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/cli --ext ts,tsx` | 0 | 751 files, 4 batches, 0 findings. |
+| `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/cli --ext ts,tsx` | 0 | 751 files, 4 batches, 0 findings. |
+| `deno task check` | 0 | 2,495 files, 21 batches, 0 failed batches, 0 diagnostics. |
+| `deno task test` | 0 | 2,391 passed (553 steps), 0 failed, 12 ignored; telemetry task tests passed. |
+| `deno task check:emitted-samples` | 0 | Checked 40 emitted TypeScript samples from 30 artifact paths. |
+| `deno task lint` | 0 | 1,739 selected files, 0 findings. |
+| `deno task fmt:check` | 0 | 1,888 selected files, 0 findings. |
+| `deno task docs:links` | 0 | 98 docs; 0 broken links, anchors, or orphans. |
+| `deno task docs:accuracy` | 0 | PASS: 4 saga pages, 8 preferred paths, 18 CLI mutation families. |
+| `deno task quality:gate` | 0 | Quality scan found no violations; architecture checks completed with existing non-blocking warnings. |
+| `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | 1 | 44 passed, 1 failed at `behavior.service-health`; cleanup passed. |
+
+`docs:links` plus `docs:accuracy` were used instead of `docs:maintenance` because the latter includes
+the known pre-existing `agentic:sync-claude:check` failure for
+`.claude/skills/netscript-release/SKILL.md` on `origin/main`. The owned Aspire mirror was checked
+directly and is synchronized.
+
+### Runtime result and teardown
+
+- Retained log: `.llm/tmp/cli-e2e/plugin-smoke-20260802-011511.log`.
+- `behavior.service-health` failed after 116,625 ms. The users endpoint at
+  `http://localhost:3001/health` returned HTTP 503 with status `unhealthy`; its sole database check
+  reported an invalid `prisma.$queryRaw()` raw-query failure. The HTTPS endpoint was unreachable,
+  while an unrelated proxy health endpoint returned 200 and did not satisfy the aggregate check.
+- `behavior.otel-task-traces` was **not reached**, so this re-proof supplies no runtime trace output
+  and does not close the existing acceptance evidence gap. The one-pass suite was not rerun.
+- Suite cleanup stopped this run's AppHost and removed exactly its six recorded container IDs:
+  `f1ee472635ee`, `c3a715864e75`, `4d09a3fa0eaa`, `5acbc9ed85b4`, `383cc0f87b22`, and
+  `f9a4f02d39b6`.
+- Before the suite, `aspire ps` was `[]`; afterward it listed only a foreign AppHost under
+  `/home/codex/repos/fix-1010/...`, which was left untouched. Docker returned to the same two
+  pre-existing Postgres containers (`postgres-dda83380`, `postgres-bc75ea00`); no container created
+  by this run remained.

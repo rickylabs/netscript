@@ -32,3 +32,14 @@
 - Commit and push the cycle-2 restore/evidence slice, update draft PR #1036, and report the divergent
   A/B. Owner/supervisor must decide whether to require another controlled reproduction or reframe
   the cause before product implementation resumes.
+
+## Rebase proof — 2026-08-02
+
+- Branch rebased onto `origin/main` at `8b69d78f0`; the only conflict retained
+  `ASPIRE_CLI_TASK`, `TSCONFIG_ROOT`, and `TSCONFIG_APP` in the scaffold file constants.
+- Scoped CLI check/lint/fmt and all CI-relevant static/unit/docs/quality gates passed.
+- The required one-pass `scaffold.runtime` run exited 1 after 44 passes at the same users-service
+  Prisma database health failure. `behavior.otel-task-traces` was not reached; cleanup removed all
+  resources owned by this run.
+- Next action is to commit this evidence, force-push the rebased branch with lease, and verify the
+  local and remote object IDs match. The PR remains draft and its runtime acceptance gap remains open.
