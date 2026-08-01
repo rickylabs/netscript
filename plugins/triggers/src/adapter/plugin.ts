@@ -12,6 +12,8 @@ import {
   DEFAULT_RUNTIME_GLUE_INPUT,
   DEFAULT_SCHEDULED_INPUT,
   DEFAULT_WEBHOOK_INPUT,
+  EMPTY_BARREL_INPUT,
+  emptyBarrelScaffolder,
   fileWatchResource,
   runtimeGlueScaffolder,
   scheduledResource,
@@ -20,10 +22,30 @@ import {
 
 /** Starter resources emitted by the triggers install command. */
 export const triggersStarterResources: readonly InstallStarterResource[] = [
-  { scaffolder: webhookResource.scaffolder, input: DEFAULT_WEBHOOK_INPUT },
-  { scaffolder: scheduledResource.scaffolder, input: DEFAULT_SCHEDULED_INPUT },
-  { scaffolder: fileWatchResource.scaffolder, input: DEFAULT_FILE_WATCH_INPUT },
-  { scaffolder: barrelScaffolder, input: DEFAULT_BARREL_INPUT },
+  {
+    scaffolder: webhookResource.scaffolder,
+    input: DEFAULT_WEBHOOK_INPUT,
+    samples: { kind: 'omit' },
+  },
+  {
+    scaffolder: scheduledResource.scaffolder,
+    input: DEFAULT_SCHEDULED_INPUT,
+    samples: { kind: 'omit' },
+  },
+  {
+    scaffolder: fileWatchResource.scaffolder,
+    input: DEFAULT_FILE_WATCH_INPUT,
+    samples: { kind: 'omit' },
+  },
+  {
+    scaffolder: barrelScaffolder,
+    input: DEFAULT_BARREL_INPUT,
+    samples: {
+      kind: 'alternate',
+      scaffolder: emptyBarrelScaffolder,
+      input: EMPTY_BARREL_INPUT,
+    },
+  },
   { scaffolder: runtimeGlueScaffolder, input: DEFAULT_RUNTIME_GLUE_INPUT },
 ];
 

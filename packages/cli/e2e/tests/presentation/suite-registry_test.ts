@@ -58,12 +58,15 @@ Deno.test('plugin suite includes all official plugin and generated-check gates',
   ]);
 });
 
-Deno.test('true userland suite runs init, one local-path plugin install, assertion, and cleanup', () => {
+Deno.test('true userland suite runs init, four no-samples plugin installs, assertion, and cleanup', () => {
   const userland = resolveSuite(SCAFFOLD.USERLAND_INSTALL);
   assertEquals(userland.gates.map((gate) => gate.id), [
     GATE.PREFLIGHT_DENO,
     GATE.SCAFFOLD_INIT,
     'scaffold.plugin.worker',
+    'scaffold.plugin.saga',
+    'scaffold.plugin.trigger',
+    'scaffold.plugin.stream',
     GATE.USERLAND_INSTALL_ASSERTIONS,
     GATE.CLEANUP_USERLAND_SMOKE_ROOT,
   ]);

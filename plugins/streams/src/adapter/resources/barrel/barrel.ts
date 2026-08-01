@@ -24,6 +24,20 @@ export const DEFAULT_BARREL_INPUT: BarrelInput = {
   streamId: DEFAULT_STREAM_INPUT.id,
 };
 
+/** Input accepted by the empty streams barrel scaffolder. */
+export type EmptyBarrelInput = Readonly<Record<string, never>>;
+
+/** Canonical input for a streams install without samples. */
+export const EMPTY_BARREL_INPUT: EmptyBarrelInput = {};
+
+/** Streams barrel emitted when install samples are excluded. */
+export const emptyBarrelScaffolder: ItemScaffolder<EmptyBarrelInput> = {
+  name: 'empty-barrel',
+  emit(): readonly ScaffoldArtifact[] {
+    return [textArtifact('streams/mod.ts', '/** @module Generated streams. */\n\nexport {};\n')];
+  },
+};
+
 /** Streams barrel item scaffolder emitted during install. */
 export const barrelScaffolder: ItemScaffolder<BarrelInput> = {
   name: 'barrel',

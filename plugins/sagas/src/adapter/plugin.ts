@@ -10,14 +10,24 @@ import {
   DEFAULT_BARREL_INPUT,
   DEFAULT_RUNTIME_GLUE_INPUT,
   DEFAULT_SAGA_INPUT,
+  EMPTY_BARREL_INPUT,
+  emptyBarrelScaffolder,
   runtimeGlueScaffolder,
   sagaResource,
 } from './resources/mod.ts';
 
 /** Starter resources emitted by the sagas install command. */
 export const sagasStarterResources: readonly InstallStarterResource[] = [
-  { scaffolder: sagaResource.scaffolder, input: DEFAULT_SAGA_INPUT },
-  { scaffolder: barrelScaffolder, input: DEFAULT_BARREL_INPUT },
+  { scaffolder: sagaResource.scaffolder, input: DEFAULT_SAGA_INPUT, samples: { kind: 'omit' } },
+  {
+    scaffolder: barrelScaffolder,
+    input: DEFAULT_BARREL_INPUT,
+    samples: {
+      kind: 'alternate',
+      scaffolder: emptyBarrelScaffolder,
+      input: EMPTY_BARREL_INPUT,
+    },
+  },
   { scaffolder: runtimeGlueScaffolder, input: DEFAULT_RUNTIME_GLUE_INPUT },
 ];
 

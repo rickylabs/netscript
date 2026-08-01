@@ -253,6 +253,7 @@ describe('plugin scaffold dispatch', () => {
       projectRoot: '/workspace/app',
       pluginName: 'fixture',
       dryRun: false,
+      includeSamples: false,
       permissionFlags: [
         '--allow-read=/workspace/app',
         '--allow-write=/workspace/app/plugins/fixture',
@@ -273,7 +274,7 @@ describe('plugin scaffold dispatch', () => {
         '--deny-run',
         'jsr:@acme/plugin-fixture@1.0.0/scaffold',
         '--context-json',
-        '{"workspaceRoot":"/workspace/app","options":{"pluginName":"fixture","mcp":false},"dryRun":false}',
+        '{"workspaceRoot":"/workspace/app","options":{"pluginName":"fixture","mcp":false,"includeSamples":false},"dryRun":false}',
       ],
       cwd: '/workspace/app',
     });
