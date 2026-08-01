@@ -32,7 +32,8 @@ artifact was initially transcribed, then superseded by the evaluator-authored `p
 
 ## In Progress
 
-- Obtain the Slice 2 independent review, commit/push/comment the slice, then run IMPL-EVAL.
+- Slice 2 independent and supervisor reviews passed. Commit/push/comment the slice, update the PR
+  body evidence, then run IMPL-EVAL.
 
 ## Next Steps
 

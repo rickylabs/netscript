@@ -68,6 +68,9 @@ subprocess test using the exact forwarded `--` argv.
 | 2026-08-01 | 2 | validation | Four-file check and release-directory fmt/lint wrappers passed; requested focused suite passed 38/38. |
 | 2026-08-01 | 2 | after probe | Forwarded `--` parsed successfully; command reached the expected green-canary publication gate, with no `Unknown argument: --`. |
 | 2026-08-01 | 2 | independent review | `review_codex_light` PASS: real task and adversarial argv probes preserved strict unknown/value errors; full release suite passed 65/65. |
+| 2026-08-01 | 2 | exact check note | The literal `--root .` + four `--file` command selected 2,843 repo files and failed only on 10 unrelated existing `docs/site` Lume/isolated-declaration diagnostics; the actual four-file wrapper selection passed with zero findings. |
+| 2026-08-01 | 2 | supervisor review | PASS: one-line sibling pattern, real entry-point test, no guard weakening, clean owned diff, and all owned gates green. |
+| 2026-08-01 | 2 | reconcile | No new issue/PR feedback changes scope; PR remains draft and is ready for the IMPL-EVAL handoff after this slice is pushed. |
 
 ## Decisions
 
@@ -98,6 +101,7 @@ subprocess test using the exact forwarded `--` argv.
 | Formal Plan-Gate | PASS | OpenHands Qwen PR verdict + transcribed `plan-eval.md` | Separate open-model session; evaluator-authored file supersedes if later pushed. |
 | Publish parser focused test | PASS | `deno test --allow-all .llm/tools/release/github-release_test.ts` | 15 passed, 0 failed. |
 | Scoped type check | PASS | Four explicit owned TypeScript roots | 4 selected, 0 failed batches, 0 diagnostics. |
+| Literal root-plus-files check | FAIL (unrelated baseline) | 2,843 selected; 1/24 batches failed | Only 10 diagnostics in `docs/site/_config.ts` and `_plugins/ai-tooling.ts`; no owned release file finding. |
 | Release fmt/lint | PASS | Repo-native scoped wrappers | 32 files; 0 failed batches/findings. |
 | Focused release suite | PASS | Five requested test files | 38 passed, 0 failed. |
 
