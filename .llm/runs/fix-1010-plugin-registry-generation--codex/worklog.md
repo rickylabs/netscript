@@ -97,6 +97,8 @@ plugin-name registry.
 | 2026-08-02 | AI slice 2 | reproduced | Ran the exact behavior import script against retained scaffold `plugin-smoke-20260801-205015`; exit 1: `AI tool module ai/tools/skill-loader.ts does not export an AiToolDefinition.` Generated registry retained `e2e-tool.ts` but also imported scaffold factory `skill-loader.ts`. |
 | 2026-08-02 | AI slice 2 | root cause | Manifest-driven generation correctly passed `plugins/ai/scaffold.runtime.json`, but that manifest omitted the compiler's canonical `skill-loader.ts` exclusion. Added the exclusion to the published asset; invalid AI modules continue to throw. |
 | 2026-08-02 | AI slice 2 | regression proof | Added an integration test that runs the real AI generator, imports both emitted registries, asserts `Map` entries `e2e-tool` and `assistant`, and proves `skill-loader` is absent. Seven integration tests passed. Regenerated the retained failing scaffold and the exact behavior script then exited 0. |
+| 2026-08-02 | rebase | integrated main | Fetched `origin/main` at `8b69d78f0` and rebased 17 branch commits. The only conflict was generated `packages/cli/src/kernel/assets/skills.generated.ts`; regenerated it from merged skill sources, then `check:assets-barrel` passed. Rebased head before evidence commit: `2e35aeed9`. |
+| 2026-08-02 | rebase | manifest audit | `plugins/ai/scaffold.runtime.json` retained main's surrounding manifest and the branch's `skill-loader.ts` exclusion without manual reconciliation. Trigger `runtime.ts` exclusion also survived. |
 
 ## Decisions
 
@@ -321,5 +323,15 @@ AI FINAL QUALITY GATE
 $ deno task quality:gate
 {"ok":true,"mode":"repository","scanned":["packages/cli/src","plugins"],"findings":[],"allowCount":7}
 Doctrine checks: FAIL=0 for all configured roots; existing WARN/INFO retained.
+RAW_EXIT_CODE=0
+
+REBASE GENERATED-ASSET RESOLUTION
+$ git rebase origin/main
+CONFLICT (content): packages/cli/src/kernel/assets/skills.generated.ts
+$ deno task gen:assets-barrel
+Task gen:assets-barrel deno run --no-lock --allow-read --allow-write --allow-run=deno .llm/tools/generate-cli-assets-barrel.ts
+$ deno task check:assets-barrel
+Task check:assets-barrel deno task gen:assets-barrel && git diff --exit-code -- packages/cli/src/kernel/assets/embedded.generated.ts packages/cli/src/kernel/assets/skills.generated.ts packages/plugin/src/kernel/assets/embedded.generated.ts packages/fresh-ui/registry.generated.ts packages/service/src/primitives/scalar.generated.ts
+Successfully rebased and updated refs/heads/fix/1010-plugin-registry-generation.
 RAW_EXIT_CODE=0
 ```

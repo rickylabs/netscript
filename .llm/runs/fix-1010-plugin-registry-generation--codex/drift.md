@@ -6,6 +6,14 @@ The existing owner waiver applies to this rebase slice: the supervisor performs 
 session writes a plan and proceeds directly without launching an evaluator or changing
 `plan-eval.md`.
 
+## 2026-08-02 — expected generated conflict — regenerated from merged sources
+
+Rebasing onto `origin/main@8b69d78f0` produced only the predicted conflict in
+`packages/cli/src/kernel/assets/skills.generated.ts`. No side was selected and the generated file
+was not hand-edited. `gen:assets-barrel` rebuilt it from main's expanded 0.0.3 skill sources plus
+the branch's authoritative registry guidance; `check:assets-barrel` then passed. No non-generated
+conflict appeared.
+
 ## 2026-08-02 — owner waiver — supervisor evaluates AI follow-up
 
 The owner explicitly waived the open-model Plan-Gate for the AI chat-route follow-up and assigned
