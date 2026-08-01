@@ -12,7 +12,9 @@ import { createInstalledRuntimeRegistryGenerator } from './installed-runtime-reg
 
 const REPOSITORY_ROOT = fromFileUrl(new URL('../../../../../../..', import.meta.url));
 const TRIGGER_REGISTRY_PATH = '.netscript/generated/plugin-triggers/triggers.registry.ts';
-const TRIGGER_PACKAGE = '@netscript/plugin-triggers';
+const WORKERS_REGISTRY_PATH = '.netscript/generated/plugin-workers/job-registry.ts';
+const SAGAS_REGISTRY_PATH = '.netscript/generated/plugin-sagas/sagas.registry.ts';
+type RuntimePluginPackage = 'plugin-workers' | 'plugin-sagas' | 'plugin-triggers';
 const VALID_TRIGGER = `
 export default {
   id: 'generic-inbound-webhook',
@@ -30,7 +32,7 @@ if (import.meta.main) {
 
 Deno.test('generated trigger registry loads valid definitions and excludes scaffold runtime glue', async () => {
   await withTempProject(async (projectRoot) => {
-    await writeWorkspaceProject(projectRoot, {
+    await writeWorkspaceProject(projectRoot, ['plugin-triggers'], {
       'triggers/generic-inbound-webhook.ts': VALID_TRIGGER,
       'triggers/runtime.ts': RUNTIME_GLUE,
     });
@@ -51,7 +53,7 @@ Deno.test('generated trigger registry loads valid definitions and excludes scaff
 
 Deno.test('generated trigger registry rejects a non-definition module that is not excluded', async () => {
   await withTempProject(async (projectRoot) => {
-    await writeWorkspaceProject(projectRoot, {
+    await writeWorkspaceProject(projectRoot, ['plugin-triggers'], {
       'triggers/not-a-trigger.ts': 'export default { id: "missing-kind-and-handler" };\n',
     });
     const generate = createInstalledRuntimeRegistryGenerator({
@@ -72,7 +74,11 @@ Deno.test('generated trigger registry rejects a non-definition module that is no
 
 Deno.test('workspace import resolves the on-disk trigger manifest without fetching JSR', async () => {
   await withTempProject(async (projectRoot) => {
-    await writeWorkspaceProject(projectRoot, { 'triggers/generic.ts': VALID_TRIGGER });
+    await writeWorkspaceProject(
+      projectRoot,
+      ['plugin-triggers'],
+      { 'triggers/generic.ts': VALID_TRIGGER },
+    );
     const process = new RecordingGeneratorProcess();
     let fetchCalls = 0;
     const generate = createInstalledRuntimeRegistryGenerator({
@@ -91,6 +97,68 @@ Deno.test('workspace import resolves the on-disk trigger manifest without fetchi
       process.generator,
       join(REPOSITORY_ROOT, 'plugins/triggers/src/cli/generate-runtime-registries.ts'),
     );
+  });
+});
+
+Deno.test('generated workers registry loads jobs and excludes job tools', async () => {
+  await withTempProject(async (projectRoot) => {
+    await writeWorkspaceProject(projectRoot, ['plugin-workers'], {
+      'workers/jobs/example-job.ts': `
+const handler = Object.assign(async () => undefined, { id: 'example-job' });
+export default handler;
+`,
+      'workers/jobs/job-tools.ts': `
+const handler = Object.assign(async () => undefined, { id: 'excluded-job-tools' });
+export default handler;
+`,
+    });
+    const generate = createInstalledRuntimeRegistryGenerator({
+      fs: new DenoFileSystem(),
+      process: new DenoProcess(),
+      fetchManifest: () => Promise.reject(new Error('workspace generation must not fetch')),
+    });
+
+    await generate({ dryRun: false, projectRoot });
+
+    const module = await import(`${toFileUrl(join(projectRoot, WORKERS_REGISTRY_PATH)).href}?workers`);
+    assert(module.registry instanceof Map);
+    assertEquals(module.registry.has('example-job'), true);
+    assertEquals(module.registry.has('excluded-job-tools'), false);
+    assertEquals(module.registry.size, 1);
+  });
+});
+
+Deno.test('generated sagas registry loads saga definitions and ignores other TypeScript files', async () => {
+  await withTempProject(async (projectRoot) => {
+    const sagaSource = (id: string) => `
+function defineSaga(id: string) {
+  return {
+    id,
+    durability: 't1',
+    initialState: {},
+    handledMessageTypes: [],
+    handlers: new Map(),
+  };
+}
+export default defineSaga('${id}');
+`;
+    await writeWorkspaceProject(projectRoot, ['plugin-sagas'], {
+      'sagas/order-processing-saga.ts': sagaSource('order-processing'),
+      'sagas/saga-tools.ts': sagaSource('wrong-suffix'),
+    });
+    const generate = createInstalledRuntimeRegistryGenerator({
+      fs: new DenoFileSystem(),
+      process: new DenoProcess(),
+      fetchManifest: () => Promise.reject(new Error('workspace generation must not fetch')),
+    });
+
+    await generate({ dryRun: false, projectRoot });
+
+    const module = await import(`${toFileUrl(join(projectRoot, SAGAS_REGISTRY_PATH)).href}?sagas`);
+    assert(module.sagaRegistry instanceof Map);
+    assertEquals(module.sagaRegistry.has('order-processing'), true);
+    assertEquals(module.sagaRegistry.has('wrong-suffix'), false);
+    assertEquals(module.sagaRegistry.size, 1);
   });
 });
 
@@ -146,21 +214,24 @@ class RecordingGeneratorProcess implements ProcessPort {
 
 async function writeWorkspaceProject(
   projectRoot: string,
+  packages: readonly RuntimePluginPackage[],
   files: Readonly<Record<string, string>>,
 ): Promise<void> {
   const rootConfig = JSON.parse(await Deno.readTextFile(join(REPOSITORY_ROOT, 'deno.json'))) as {
     imports: Record<string, string>;
   };
+  const workspaceImports = Object.fromEntries(packages.map((packageName) => [
+    `@netscript/${packageName}/runtime`,
+    toFileUrl(join(REPOSITORY_ROOT, runtimeEntrypoint(packageName))).href,
+  ]));
   await writeProjectConfig(projectRoot, {
     ...rootConfig.imports,
     '@netscript/plugin/cli': toFileUrl(
       join(REPOSITORY_ROOT, 'packages/plugin/src/cli/mod.ts'),
     ).href,
-    '@netscript/plugin-triggers/runtime': toFileUrl(
-      join(REPOSITORY_ROOT, 'plugins/triggers/src/runtime/mod.ts'),
-    ).href,
+    ...workspaceImports,
   });
-  await writeAppSettings(projectRoot);
+  await writeAppSettings(projectRoot, packages);
   for (const [path, source] of Object.entries(files)) await write(join(projectRoot, path), source);
 }
 
@@ -168,7 +239,7 @@ async function writePublishedProject(projectRoot: string): Promise<void> {
   await writeProjectConfig(projectRoot, {
     '@netscript/plugin-triggers/runtime': netscriptJsrSpecifier('plugin-triggers', '/runtime'),
   });
-  await writeAppSettings(projectRoot);
+  await writeAppSettings(projectRoot, ['plugin-triggers']);
   await write(join(projectRoot, 'triggers/generic.ts'), VALID_TRIGGER);
 }
 
@@ -179,17 +250,27 @@ async function writeProjectConfig(
   await write(join(projectRoot, 'deno.json'), `${JSON.stringify({ imports })}\n`);
 }
 
-async function writeAppSettings(projectRoot: string): Promise<void> {
+async function writeAppSettings(
+  projectRoot: string,
+  packages: readonly RuntimePluginPackage[],
+): Promise<void> {
+  const plugins = Object.fromEntries(packages.map((packageName) => [
+    packageName.slice('plugin-'.length),
+    { Entrypoint: netscriptJsrSpecifier(packageName, '/services') },
+  ]));
   await write(
     join(projectRoot, 'appsettings.json'),
     `${JSON.stringify({
       NetScript: {
-        Plugins: {
-          triggers: { Entrypoint: netscriptJsrSpecifier('plugin-triggers', '/services') },
-        },
+        Plugins: plugins,
       },
     })}\n`,
   );
+}
+
+function runtimeEntrypoint(packageName: RuntimePluginPackage): string {
+  if (packageName === 'plugin-workers') return 'plugins/workers/bin/runtime.ts';
+  return `plugins/${packageName.slice('plugin-'.length)}/src/runtime/mod.ts`;
 }
 
 function testManifest(): unknown {
