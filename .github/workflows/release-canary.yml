@@ -1,5 +1,5 @@
 name: release-canary
-run-name: canary ${{ inputs.target-version }} from ${{ github.ref_name }}
+run-name: canary ${{ inputs.republish-version || inputs.target-version }} from ${{ github.ref_name }}
 
 on:
   workflow_dispatch:
@@ -7,6 +7,10 @@ on:
       target-version:
         description: Release version targeted by this canary, for example 0.0.2
         required: true
+        type: string
+      republish-version:
+        description: Existing same-train canary to complete, for example 0.0.2-canary.3
+        required: false
         type: string
 
 permissions:
@@ -16,7 +20,7 @@ permissions:
   statuses: write
 
 concurrency:
-  group: release-canary-${{ inputs.target-version }}
+  group: release-canary-${{ inputs.republish-version || inputs.target-version }}
   cancel-in-progress: false
 
 jobs:
@@ -32,7 +36,7 @@ jobs:
       - name: Setup Deno
         uses: denoland/setup-deno@v2
         with:
-          deno-version: "2.9.0"
+          deno-version: '2.9.0'
 
       - name: Record content SHA and pending pair
         id: context
@@ -50,7 +54,8 @@ jobs:
             -f target_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
 
       - name: Cut ephemeral canary branch and tag
-        id: canary
+        id: cut
+        if: inputs.republish-version == ''
         env:
           TARGET_VERSION: ${{ inputs.target-version }}
         run: |
@@ -64,6 +69,30 @@ jobs:
           echo "version=$version" >> "$GITHUB_OUTPUT"
           echo "tag=v$version" >> "$GITHUB_OUTPUT"
           echo "branch=release/canary-$version" >> "$GITHUB_OUTPUT"
+
+      - name: Verify same-semver canary republish
+        if: inputs.republish-version != ''
+        env:
+          TARGET_VERSION: ${{ inputs.target-version }}
+          REPUBLISH_VERSION: ${{ inputs.republish-version }}
+        run: deno task release:canary -- "$TARGET_VERSION" --republish-version "$REPUBLISH_VERSION"
+
+      - name: Resolve canary context
+        id: canary
+        env:
+          REPUBLISH_VERSION: ${{ inputs.republish-version }}
+          CUT_VERSION: ${{ steps.cut.outputs.version }}
+          CUT_TAG: ${{ steps.cut.outputs.tag }}
+          CUT_BRANCH: ${{ steps.cut.outputs.branch }}
+        run: |
+          version="${REPUBLISH_VERSION:-$CUT_VERSION}"
+          tag="${REPUBLISH_VERSION:+v$REPUBLISH_VERSION}"
+          tag="${tag:-$CUT_TAG}"
+          test -n "$version"
+          test -n "$tag"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "branch=${CUT_BRANCH:-}" >> "$GITHUB_OUTPUT"
 
       - name: Publish readiness
         run: deno task publish:readiness
@@ -108,7 +137,7 @@ jobs:
 
       - name: Delete ephemeral canary branch
         id: cleanup
-        if: always() && steps.canary.outputs.branch != ''
+        if: always() && inputs.republish-version == '' && steps.canary.outputs.branch != ''
         continue-on-error: true
         env:
           CANARY_BRANCH: ${{ steps.canary.outputs.branch }}

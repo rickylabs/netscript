@@ -5,6 +5,8 @@ import {
   deriveCanaryVersion,
   parseArgs,
   readRegistryVersions,
+  validateRepublishVersion,
+  verifyCanaryRepublishTree,
 } from './canary.ts';
 
 Deno.test('canary version takes the maximum registry N across all members including yanked versions', async () => {
@@ -33,6 +35,82 @@ Deno.test('canary parser accepts only a stable target and task separator', () =>
   });
   assertThrows(() => parseArgs(['0.0.2-beta.1']), Error, 'stable semantic version');
   assertThrows(() => parseArgs(['0.0.2+build.1']), Error, 'stable semantic version');
+});
+
+Deno.test('canary republish version must be canonical and belong to the target train', () => {
+  validateRepublishVersion('0.0.2', '0.0.2-canary.0');
+  validateRepublishVersion('0.0.2', '0.0.2-canary.3');
+  assertThrows(
+    () => validateRepublishVersion('0.0.2', '0.0.3-canary.3'),
+    Error,
+    'belong to target 0.0.2',
+  );
+  assertThrows(
+    () => validateRepublishVersion('0.0.2', '0.0.2-canary.03'),
+    Error,
+    'match 0.0.2-canary.N',
+  );
+  assertEquals(
+    parseArgs(['0.0.2', '--republish-version', '0.0.2-canary.3', '--root', '/repo']),
+    {
+      targetVersion: '0.0.2',
+      dryRun: false,
+      root: '/repo',
+      republishVersion: '0.0.2-canary.3',
+    },
+  );
+});
+
+Deno.test('canary republish accepts only a clean checkout matching the tagged tree', async () => {
+  const tree = 'a'.repeat(40);
+  const commands: string[] = [];
+  await verifyCanaryRepublishTree('/repo', '0.0.2-canary.3', (command, args) => {
+    commands.push(`${command} ${args.join(' ')}`);
+    return Promise.resolve({
+      code: 0,
+      stdout: args[0] === 'status' ? '' : `${tree}\n`,
+      stderr: '',
+    });
+  });
+  assertEquals(commands, [
+    'git status --porcelain',
+    'git rev-parse v0.0.2-canary.3^{tree}',
+    'git rev-parse HEAD^{tree}',
+  ]);
+});
+
+Deno.test('canary republish refuses a dirty checkout before comparing committed trees', async () => {
+  await assertRejects(
+    () =>
+      verifyCanaryRepublishTree('/repo', '0.0.2-canary.3', (_command, args) =>
+        Promise.resolve({
+          code: 0,
+          stdout: args[0] === 'status' ? ' M packages/sdk/mod.ts\n' : `${'a'.repeat(40)}\n`,
+          stderr: '',
+        })),
+    Error,
+    'working tree is dirty',
+  );
+});
+
+Deno.test('canary republish names both tree SHAs when tagged content differs', async () => {
+  const tagTree = 'a'.repeat(40);
+  const headTree = 'b'.repeat(40);
+  await assertRejects(
+    () =>
+      verifyCanaryRepublishTree('/repo', '0.0.2-canary.3', (_command, args) =>
+        Promise.resolve({
+          code: 0,
+          stdout: args[0] === 'status'
+            ? ''
+            : args[1]?.startsWith('v')
+            ? `${tagTree}\n`
+            : `${headTree}\n`,
+          stderr: '',
+        })),
+    Error,
+    `tagged tree ${tagTree} differs from checked-out tree ${headTree}`,
+  );
 });
 
 Deno.test('canary ref creation pushes only an ephemeral branch and provenance tag', async () => {

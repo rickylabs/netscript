@@ -65,8 +65,8 @@ gate.
 
 Framework source under `packages/**` and `plugins/**` must emit exact `jsr:@netscript/*` pins for
 the current release train. Consumer-facing scaffolds do not use floor ranges: a generated project
-must resolve the same coordinated package set as the CLI that generated it. Derive emitted pins
-from generated package metadata, `NETSCRIPT_RELEASE_VERSION`, or `netscriptJsrSpecifier`; the
+must resolve the same coordinated package set as the CLI that generated it. Derive emitted pins from
+generated package metadata, `NETSCRIPT_RELEASE_VERSION`, or `netscriptJsrSpecifier`; the
 `check:netscript-jsr-specifiers` gate rejects versionless, stale exact, and range-pinned values.
 
 `release:cut` is fail-fast and ordered:
@@ -247,6 +247,15 @@ the automated `release:canary` verdict over this manual checklist; keep the manu
 the gate does not yet cover.
 
 ## Same-Semver Republish (Partial-Publish Recovery)
+
+For a partially published **canary**, re-dispatch `release-canary.yml` at the existing canary tag
+and set both `target-version` and `republish-version` (for example `0.0.2` and `0.0.2-canary.3`).
+Republish mode creates no branch, commit, or tag and deletes no branch. Before the unchanged publish
+chain runs, it fails closed unless the checkout is clean and both `v<republish-version>^{tree}` and
+`HEAD^{tree}` resolve to the same tree SHA. The dispatcher must therefore select the existing tag as
+the workflow ref; the guard deliberately does not check it out. On success, the unchanged publisher
+skips already-registered members, fills the missing members, runs the exact canary-pinned production
+E2E, and records `release/canary-pair` on that tag's commit.
 
 Proven during the 0.0.1-beta.10 cut (2026-07-17,
 [run `29558968037`](https://github.com/rickylabs/netscript/actions/runs/29558968037)): a

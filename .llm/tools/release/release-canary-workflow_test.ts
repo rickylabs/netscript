@@ -29,6 +29,26 @@ Deno.test('canary workflow reuses the publisher and records only an awaited gree
   assertStringIncludes(source, 'inputs[published-version]=$CANARY_VERSION');
   assertStringIncludes(source, 'context=release/canary-pair');
   assertStringIncludes(source, 'git push origin --delete "$CANARY_BRANCH"');
+  assertStringIncludes(source, 'republish-version:');
+  assertStringIncludes(source, "if: inputs.republish-version == ''");
+  assertStringIncludes(source, "if: inputs.republish-version != ''");
+  assertStringIncludes(
+    source,
+    'deno task release:canary -- "$TARGET_VERSION" --republish-version "$REPUBLISH_VERSION"',
+  );
+  assertStringIncludes(source, 'echo "version=$version" >> "$GITHUB_OUTPUT"');
+  assertStringIncludes(source, 'echo "tag=$tag" >> "$GITHUB_OUTPUT"');
+  assertStringIncludes(source, 'echo "branch=${CUT_BRANCH:-}" >> "$GITHUB_OUTPUT"');
+  assertStringIncludes(
+    source,
+    "if: always() && inputs.republish-version == '' && steps.canary.outputs.branch != ''",
+  );
+  const guard = source.indexOf('Verify same-semver canary republish');
+  const readiness = source.indexOf('deno task publish:readiness');
+  assert(
+    guard >= 0 && guard < readiness,
+    'republish identity guard must precede every publish step',
+  );
   assertEquals(source.includes('make_latest'), false);
   assertEquals(source.includes('gh release'), false);
 });
