@@ -12,3 +12,14 @@
 - **Action:** fix
 - **Evidence:** research findings 6–7 and plan decisions D2–D3.
 
+## 2026-08-01 — local formal evaluator credential unavailable
+
+- **What:** The canonical local `claude-openrouter` PLAN-EVAL launch exited before starting because
+  `OPENROUTER_API_KEY` is unavailable on this host.
+- **Source:** Bound formal evaluator launch through `.llm/tools/agentic/claude/claude-print.ts`.
+- **Expected:** A separate Qwen open-model session writes `plan-eval.md` before implementation.
+- **Actual:** No evaluator session was created and no verdict exists. The OpenHands handoff policy
+  prohibits substituting cloud OpenHands for a local-machine run.
+- **Severity:** significant
+- **Action:** defer pending owner credential restoration or explicit written Plan-Gate waiver
+- **Evidence:** launcher exit code 4, output `OPENROUTER_API_KEY unavailable`.

@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `fix-1017-plugin-install-no-samples--codex` |
 | Branch | `fix/1017-plugin-install-no-samples` |
-| Current phase | `plan` |
+| Current phase | `plan-eval` |
 | Archetype | `6 — CLI / Tooling` with Archetype 5 connectors |
 | Scope overlays | `none` |
 
@@ -14,7 +14,8 @@
 
 Research and design are complete. The reported subprocess/adapter cause holds. Every official
 plugin barrel references samples, so the plan includes generic no-samples structural fallback input.
-No implementation has started; PLAN-EVAL is the hard next step.
+No implementation has started. The canonical local PLAN-EVAL launch is blocked because this host
+has no `OPENROUTER_API_KEY`; cloud OpenHands is prohibited for a local-machine run.
 
 ## Completed
 
@@ -24,13 +25,13 @@ No implementation has started; PLAN-EVAL is the hard next step.
 
 ## In Progress
 
-- Plan-stage commit, draft PR, and separate-session PLAN-EVAL.
+- Plan-stage commit and draft PR are complete; PLAN-EVAL is blocked before session creation.
 
 ## Next Steps
 
-1. Commit and push plan artifacts; open the draft PR with `Closes #1017` and milestone 0.0.3.
-2. Run separate-session PLAN-EVAL.
-3. Implement only after `PASS`.
+1. Restore the local OpenRouter credential and rerun separate-session PLAN-EVAL, or obtain an
+   explicit written owner waiver of the Plan-Gate.
+2. Implement only after `PASS` or that explicit waiver.
 
 ## Key Decisions
 
@@ -49,7 +50,7 @@ No implementation has started; PLAN-EVAL is the hard next step.
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Plan | pending evaluator | plan/research/worklog |
+| Plan | blocked before evaluator launch | launcher exit 4; drift log |
 | Static/Fitness/Runtime/Consumer | not run | implementation prohibited before PLAN-EVAL |
 
 ## Open Questions
@@ -58,10 +59,9 @@ No implementation has started; PLAN-EVAL is the hard next step.
 
 ## Drift and Debt
 
-- Drift: all four barrels were confirmed sample-dependent; recorded as minor.
+- Drift: all four barrels were confirmed sample-dependent; local evaluator launch is blocked.
 - Debt: no new debt expected.
 
 ## Commits
 
 - See the draft PR commit list + per-slice comments.
-
