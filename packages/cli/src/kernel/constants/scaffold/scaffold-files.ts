@@ -11,6 +11,8 @@ export const SCAFFOLD_FILES = {
   MAIN: 'main.ts',
   README: 'README.md',
   APPHOST_MTS: 'apphost.mts',
+  TSCONFIG_ROOT: 'tsconfig.json',
+  TSCONFIG_APP: 'tsconfig.json',
   TSCONFIG_APPHOST: 'tsconfig.apphost.json',
 } as const;
 

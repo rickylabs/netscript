@@ -17,5 +17,15 @@
 - **Expected:** A separate local open-model PLAN-EVAL session.
 - **Actual:** Exit 4, `status: blocked`, `credential: absent`, diagnostic `auth_required`.
 - **Severity:** significant
-- **Action:** defer pending owner authorization of a permitted evaluator path
-- **Evidence:** Provider-canary JSON captured in the supervisor session; no implementation started.
+- **Action:** resolved by owner waiver
+- **Evidence:** Owner instruction on 2026-08-01 assigns PLAN-EVAL and IMPL-EVAL for the 0.0.3 fix train to a separate Opus 5 supervisor session. `plan-eval.md` records PASS; no further Qwen/OpenRouter probe is permitted or required.
+
+## 2026-08-01 — Runtime gate blocked at Aspire certificate trust
+
+- **What:** The required one-pass `scaffold.runtime` suite failed before database initialization.
+- **Source:** `.llm/tmp/cli-e2e/plugin-smoke-20260801-214030.log`.
+- **Expected:** Full runtime gate PASS.
+- **Actual:** 16 gates passed; `database.init` timed out after 286424ms because Aspire could not establish certificate trust (`certutil` unavailable); cleanup passed. No tsconfig lookup error occurred.
+- **Severity:** significant
+- **Action:** defer rerun to an Aspire-capable evaluator/CI host; do not broaden #1016 into environment repair
+- **Evidence:** Suite exit 1, `passed=16 failed=1`; failure stderr and Aspire log paths are captured in the JSONL gate log.

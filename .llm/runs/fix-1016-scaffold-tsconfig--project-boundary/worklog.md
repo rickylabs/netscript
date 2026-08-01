@@ -28,7 +28,7 @@
 
 ### Constants
 
-- `SCAFFOLD_FILES.TSCONFIG` — root/app `tsconfig.json`.
+- `SCAFFOLD_FILES.TSCONFIG_ROOT` / `TSCONFIG_APP` — explicit root/app `tsconfig.json` names.
 - `SCAFFOLD_FILES.TSCONFIG_APPHOST` — existing unrelated Aspire file remains unchanged.
 
 ### Commit Slices
@@ -52,6 +52,10 @@ Start at `scaffold-files.ts`, then follow the root/app generator imports into `s
 | Time | Slice | Step | Notes |
 | --- | --- | --- | --- |
 | 2026-08-01 | pre-plan | research | Baseline failure reproduced for Prisma and on first Vite SSR request; proposed contents prototyped successfully. |
+| 2026-08-01 | S1 | implementation | Added two Tier-1 generators, root/app writes, file constant, and semantic tests. |
+| 2026-08-01 | S1 | targeted gate | 66 tests / 242 steps passed. |
+| 2026-08-01 | S1 | consumer A/B | Generated 176-file project beneath invalid parent; Deno check and db generate exited 0; SSR `/` returned HTTP 200. |
+| 2026-08-01 | S1 | runtime gate | Canonical one-pass suite stopped at `database.init` because Aspire certificate trust timed out; 16 prior gates passed and cleanup passed. |
 
 ## Decisions
 
@@ -72,14 +76,21 @@ Start at `scaffold-files.ts`, then follow the root/app generator imports into `s
 
 | Gate | Command or check | Result | Notes |
 | --- | --- | --- | --- |
-| PLAN-EVAL | separate formal evaluator | NOT_RUN | Hard stop before implementation. |
-| Local evaluator canary | policy-bound Qwen/OpenRouter route | BLOCKED | Exit 4: credential absent; no cloud fallback inferred. |
+| Retired evaluator canary | former Qwen/OpenRouter route | RESOLVED | Owner waiver removes this dependency from the 0.0.3 fix train; no further probe. |
+| PLAN-EVAL | owner-designated separate Opus 5 supervisor | PASS | `plan-eval.md`; three binding conditions observed. |
+| Scoped check | wrapper, `packages/cli`, 744 files / 7 batches | PASS | 0 occurrences; exit 0. |
+| Scoped lint | wrapper, `packages/cli`, 744 files / 4 batches | PASS | 0 occurrences; exit 0. |
+| Scoped format | wrapper, `packages/cli`, 744 files / 4 batches | PASS | 0 findings; exit 0. |
+| Targeted tests | `deno test -A .../scaffold .../templates` | PASS | 66 tests / 242 steps / 0 failed. |
 
 ### Fitness Gates
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| Archetype 6 / JSR | NOT_RUN | planned | Run after implementation. |
+| Code quality | PASS | `deno task quality:gate` exit 0 | No findings; seven pre-existing named allowances. |
+| Doctrine | PASS with warnings | `deno task arch:check` within quality gate | Exit 0; warnings are pre-existing and outside this slice. |
+| JSR doc lint | PASS | CLI export map, three entrypoints | 0 errors / missing JSDoc / private refs. |
+| JSR publish dry-run | PASS with existing warnings | `deno publish --dry-run --allow-dirty` | Exit 0; three pre-existing unanalyzable dynamic imports, no slow-type failure. |
 
 ### Runtime Gates
 
@@ -87,13 +98,18 @@ Start at `scaffold-files.ts`, then follow the root/app generator imports into `s
 | --- | --- | --- | --- |
 | Before: database generate | PASS (failure reproduced) | exit 1, unresolved Astro parent extends | Confirms defect. |
 | Before: Vite SSR | PASS (failure reproduced) | Vite SSR error on first `/` request | Starting the process alone is insufficient. |
+| After: database generate | PASS | `db generate completed successfully.`; exit 0 | First attempt hit unrelated Aspire certificate timeout before Prisma; retry with `ASPIRE_DCP_USE_DEVELOPER_CERTIFICATE=false` completed. |
+| After: Vite SSR | PASS | `HTTP/1.1 200`, HTML body | Real request to `/`; initial dependency cold-start exceeded 60s, following request completed immediately. |
+| `scaffold.runtime` | FAIL (environment) | `passed=16 failed=1`; `database.init` timed out starting AppHost | Exact one-pass gate was run once. Failure is Aspire certificate trust (`certutil` unavailable), not a tsconfig resolution failure. |
 
 ### Consumer Gates
 
 | Consumer | Result | Evidence | Notes |
 | --- | --- | --- | --- |
 | Prototype root/app configs | PASS | db generate exit 0; SSR HTTP 200; Deno check 0 before/after | Research-only temp prototype, not implementation. |
+| Generated root/app configs | PASS | root/app content inspected in fresh `repro-after` | Both self-contained, no `extends` or `include`; created count increased 174 → 176. |
 
 ## Handoff Notes
 
-- PLAN-EVAL should inspect locked decisions D1/D2 and the empirical distinction between Vite startup and SSR request.
+- Slice reviewer should inspect the exact config shapes, force-aware writes, semantic tests, and unchanged Deno behavior.
+- IMPL-EVAL must treat the parent A/B as manual end-to-end evidence plus unit property tests, and must not report `scaffold.runtime` green.
