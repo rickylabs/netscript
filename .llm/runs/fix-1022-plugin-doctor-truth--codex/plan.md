@@ -65,3 +65,21 @@
 
 The owner waived a separate Plan-Gate evaluator for this round. No evaluator verdict was created or
 claimed by the implementation session.
+
+## Green-CI plan (2026-08-02)
+
+1. Rebase onto `origin/main`; preserve main's starter sample semantics while removing the branch's
+   forbidden doctor-metadata starter entries.
+2. Keep CLI-owned static metadata persistence and replace workers/sagas remediation text with real,
+   version-pinned plugin CLI commands.
+3. Repair the scaffold lane without weakening assertions: doctor must fail before registries exist,
+   both real plugin generators then run, and the unchanged health gate must pass afterward.
+4. Reassess the broad local-path e2e routing change after rebase and revert it unless the strengthened
+   lane requires it.
+5. Run the requested targeted, scoped, publish, quality, scaffold, runtime, and full-test gates;
+   clean only resources created by this run.
+6. Record real evidence, update draft PR #1045 while retaining `Refs #1022`, force-push with lease,
+   and verify local/remote SHAs and CI.
+
+The owner waiver remains active. The implementation proceeds directly without creating or claiming
+a new evaluator verdict.
