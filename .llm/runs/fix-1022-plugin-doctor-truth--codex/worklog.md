@@ -42,5 +42,40 @@ and keep host execution generic.
 
 ## Gate Results
 
-Initial scoped checks passed for plugin, workers, sagas, and CLI before the final test additions;
-the complete requested gate rerun remains pending.
+### Static gates
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| CLI scoped check | PASS | 743 files; 0 diagnostics |
+| plugin scoped check | PASS | 153 files; 0 diagnostics |
+| workers scoped check | PASS | 98 files; 0 diagnostics |
+| sagas scoped check | PASS | 71 files; 0 diagnostics |
+| touched-file lint | PASS | exit 0 |
+| touched-file format check | PASS | exit 0 |
+| targeted tests | PASS | 26 passed, 0 failed |
+| `quality:gate` | PASS | quality scan: no findings; doctrine checks: no failures |
+
+### Acceptance evidence
+
+- Box 1: absent registry rows are `error`; command renders the plugin summary and throws
+  `RemoteError(1, ...)`. Command regression asserts `exitCode === 1`.
+- Box 2: `checkRuntimeConfig` was deleted because it had no failure state.
+- Box 3: workers and sagas populate `DoctorSpec.extraChecks`; `.withDoctor(path)` carries the
+  adapter module into the manifest snapshot and the host executes its checks generically.
+- Box 5: **not evidenced on the production path**. `project-config-loader.ts` converts child-process
+  Zod output into a plain `Error` string. The use case expands structured `issues` when a loader
+  preserves them, but the shipped child adapter currently does not. Leave the issue box unticked.
+- Box 7: zero-registry command test renders the workers error/remediation and asserts exit code 1.
+
+### Before / after fixture
+
+The same zero-registry fixture printed all healthy/warning rows and `EXIT_CODE=0` at baseline
+`3ab64720f`. Current code prints three workers registry errors, the command
+`netscript plugin workers compile-registry`, a failed-plugin summary, and `EXIT_CODE=1`.
+
+### Reconcile note
+
+Draft PR #1045 carries `Closes #1022`, milestone 0.0.3, `type:fix`, `area:cli`, `area:plugins`,
+`priority:p1`, and exactly one lifecycle label (`status:impl`). Acceptance boxes 4, 5, and 6 remain
+unticked; 4/6 are owner-deferred AppHost work, and 5 is blocked by the existing child-loader error
+transport rather than misrepresented as complete.
