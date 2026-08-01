@@ -1,5 +1,5 @@
-import { assertEquals } from 'jsr:@std/assert@^1';
-import { PrismaPg } from 'npm:@prisma/adapter-pg@^7.8.0';
+import { assertEquals, assertThrows } from 'jsr:@std/assert@^1';
+import { PrismaPg } from 'npm:@prisma/adapter-pg@7.8.0';
 
 import type {
   SagaCorrelationKey,
@@ -11,12 +11,72 @@ import type {
 import { PrismaSagaStore } from './prisma-saga-store.ts';
 
 const TEST_DATABASE_URL = Deno.env.get('SAGA_PRISMA_TEST_DATABASE_URL');
+const PRISMA_VERSION = '7.8.0';
+const PRISMA_CLI_SPECIFIER = `npm:prisma@${PRISMA_VERSION}`;
+const PRISMA_CLIENT_RUNTIME_PREFIX = `"npm:@prisma/client@${PRISMA_VERSION}/runtime/`;
+
+Deno.test('Prisma saga integration accepts a loopback throwaway database URL', () => {
+  assertThrowawayDatabaseUrl(
+    'postgresql://postgres:secret@127.0.0.1:42110/netscript_saga_review_1032',
+  );
+  assertThrowawayDatabaseUrl('postgres://postgres:secret@localhost/netscript_saga_local');
+  assertThrowawayDatabaseUrl('postgresql://postgres:secret@[::1]/netscript_saga_ipv6');
+});
+
+Deno.test('Prisma saga integration rejects a remote database URL without leaking credentials', () => {
+  const password = 'review-secret-password';
+  const error = assertThrows(
+    () =>
+      assertThrowawayDatabaseUrl(
+        `postgresql://postgres:${password}@db.example.com/netscript_saga_review`,
+      ),
+    Error,
+    'loopback host',
+  );
+  assertEquals(error.message.includes(password), false);
+});
+
+Deno.test('Prisma saga integration rejects a non-throwaway database name', () => {
+  assertThrows(
+    () => assertThrowawayDatabaseUrl('postgresql://postgres:secret@127.0.0.1/staging'),
+    Error,
+    'database name "staging"',
+  );
+});
+
+Deno.test('Prisma saga integration rejects a non-Postgres protocol', () => {
+  assertThrows(
+    () => assertThrowawayDatabaseUrl('mysql://root:secret@127.0.0.1/netscript_saga_review'),
+    Error,
+    'protocol "mysql:"',
+  );
+});
+
+Deno.test('Prisma saga integration rejects a malformed database URL', () => {
+  const password = 'malformed-secret';
+  const error = assertThrows(
+    () => assertThrowawayDatabaseUrl(`not a url ${password}`),
+    Error,
+    'valid PostgreSQL URL',
+  );
+  assertEquals(error.message.includes(password), false);
+});
+
+Deno.test('Prisma saga integration keeps every npm Prisma specifier at one version', async () => {
+  const source = await Deno.readTextFile(new URL(import.meta.url));
+  const versions = [...source.matchAll(/npm:(?:prisma|@prisma\/[a-z-]+)@([^/'"`]+)/g)]
+    .map((match) => match[1]);
+
+  assertEquals(versions.length, 3);
+  assertEquals(versions, [PRISMA_VERSION, '${PRISMA_VERSION}', '${PRISMA_VERSION}']);
+});
 
 Deno.test({
   name: 'PrismaSagaStore round-trips through the shipped fragment on Postgres',
   ignore: !TEST_DATABASE_URL,
   fn: async () => {
     if (!TEST_DATABASE_URL) throw new Error('SAGA_PRISMA_TEST_DATABASE_URL is required.');
+    assertThrowawayDatabaseUrl(TEST_DATABASE_URL);
 
     const workspace = await Deno.makeTempDir({ prefix: 'netscript-saga-prisma-' });
     try {
@@ -33,9 +93,10 @@ Deno.test({
       });
       const store = new PrismaSagaStore({ prisma });
 
-      const sagaId = 'billing-saga' as SagaId;
-      const correlationKey = 'order-live-1' as SagaCorrelationKey;
-      const instanceId = 'billing-saga:order-live-1' as SagaInstanceId;
+      const suffix = crypto.randomUUID().replaceAll('-', '').slice(0, 12);
+      const sagaId = `billing-saga-${suffix}` as SagaId;
+      const correlationKey = `order-live-${suffix}` as SagaCorrelationKey;
+      const instanceId = `${sagaId}:${correlationKey}` as SagaInstanceId;
       const occurredAt = new Date('2026-08-01T12:00:00.000Z');
       const envelope: SagaStateEnvelope<{ status: string }> = Object.freeze({
         metadata: Object.freeze({
@@ -74,6 +135,11 @@ Deno.test({
         assertEquals(await store.findByCorrelation(sagaId, correlationKey), undefined);
         assertEquals(await store.transitions(instanceId), []);
       } finally {
+        try {
+          await store.delete(instanceId);
+        } catch {
+          // Best-effort cleanup must not mask the test's assertion failure.
+        }
         await prisma.$disconnect();
       }
     } finally {
@@ -118,7 +184,7 @@ export default defineConfig({
 
 async function runPrisma(args: readonly string[], databaseUrl: string): Promise<void> {
   const command = new Deno.Command(Deno.execPath(), {
-    args: ['run', '--no-lock', '--allow-all', 'npm:prisma@7.8.0', ...args],
+    args: ['run', '--no-lock', '--allow-all', PRISMA_CLI_SPECIFIER, ...args],
     env: { ...Deno.env.toObject(), DATABASE_URL: databaseUrl },
     stdout: 'inherit',
     stderr: 'inherit',
@@ -138,10 +204,41 @@ async function normalizeGeneratedRuntimeImport(workspace: string): Promise<void>
     replacements++;
     await Deno.writeTextFile(
       path,
-      generated.replaceAll(barePrefix, '"npm:@prisma/client@^7.8.0/runtime/'),
+      generated.replaceAll(barePrefix, PRISMA_CLIENT_RUNTIME_PREFIX),
     );
   }
   if (replacements === 0) {
     throw new Error('Prisma generated runtime import changed; update the Deno test wrapper.');
+  }
+}
+
+function assertThrowawayDatabaseUrl(rawUrl: string): void {
+  let url: URL;
+  try {
+    url = new URL(rawUrl);
+  } catch {
+    throw new Error(
+      'Rejected saga integration database URL: expected a valid PostgreSQL URL on loopback with a database named netscript_saga_<lowercase_suffix>.',
+    );
+  }
+
+  if (url.protocol !== 'postgres:' && url.protocol !== 'postgresql:') {
+    throw new Error(
+      `Rejected saga integration database protocol "${url.protocol}": expected "postgres:" or "postgresql:".`,
+    );
+  }
+
+  const loopbackHosts = new Set(['127.0.0.1', 'localhost', '::1', '[::1]']);
+  if (!loopbackHosts.has(url.hostname)) {
+    throw new Error(
+      `Rejected saga integration database host "${url.hostname}": expected a loopback host (127.0.0.1, localhost, or ::1).`,
+    );
+  }
+
+  const databaseName = url.pathname.slice(1);
+  if (!/^netscript_saga_[a-z0-9_]+$/.test(databaseName)) {
+    throw new Error(
+      `Rejected saga integration database name "${databaseName}": expected netscript_saga_<lowercase_suffix>.`,
+    );
   }
 }
