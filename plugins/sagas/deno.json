@@ -47,6 +47,7 @@
       "scaffold.plugin.json",
       "scaffold.runtime.json",
       "cli.ts",
+      "doctor.ts",
       "scaffold.ts",
       "mod.ts",
       "verify-plugin.ts",
