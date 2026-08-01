@@ -1,4 +1,5 @@
 import { assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
+import { fromFileUrl } from 'jsr:@std/path@^1';
 import { scanFile, scanSource } from './preflight-text-imports.ts';
 
 Deno.test('preflight rejects import attributes in publishable source', () => {
@@ -30,7 +31,7 @@ Deno.test('preflight ignores import-attribute text in inert source regions', () 
 const fixtureRoot = new URL('./tests/fixtures/', import.meta.url);
 
 Deno.test('preflight flags cross-line import.meta-relative reads', async () => {
-  const findings = await scanFile(new URL('positive-openapi-break.ts', fixtureRoot).pathname);
+  const findings = await scanFile(fromFileUrl(new URL('positive-openapi-break.ts', fixtureRoot)));
   assertEquals(findings.length, 1);
   assertEquals(findings[0].check, 'text-imports');
   assertEquals(findings[0].line, 6);
@@ -41,18 +42,18 @@ Deno.test('preflight flags cross-line import.meta-relative reads', async () => {
 });
 
 Deno.test('preflight ignores URL constructors and generated constants without Deno reads', async () => {
-  const findings = await scanFile(new URL('negative-url-composition.ts', fixtureRoot).pathname);
+  const findings = await scanFile(fromFileUrl(new URL('negative-url-composition.ts', fixtureRoot)));
   assertEquals(findings, []);
 });
 
 Deno.test('preflight allowlist suppresses a single read line', async () => {
-  const findings = await scanFile(new URL('allowlisted-read.ts', fixtureRoot).pathname);
+  const findings = await scanFile(fromFileUrl(new URL('allowlisted-read.ts', fixtureRoot)));
   assertEquals(findings, []);
 });
 
 Deno.test('preflight flags eager fromFileUrl on import.meta.url', async () => {
   const findings = await scanFile(
-    new URL('positive-file-url-import-meta.ts', fixtureRoot).pathname,
+    fromFileUrl(new URL('positive-file-url-import-meta.ts', fixtureRoot)),
   );
   assertEquals(findings.length, 1);
   assertEquals(findings[0].check, 'file-url-import-meta');
@@ -61,7 +62,9 @@ Deno.test('preflight flags eager fromFileUrl on import.meta.url', async () => {
 });
 
 Deno.test('preflight allows protocol-guarded fromFileUrl import.meta conversion', async () => {
-  const findings = await scanFile(new URL('negative-guarded-file-url.ts', fixtureRoot).pathname);
+  const findings = await scanFile(
+    fromFileUrl(new URL('negative-guarded-file-url.ts', fixtureRoot)),
+  );
   assertEquals(findings, []);
 });
 
@@ -69,7 +72,7 @@ Deno.test('release:preflight task argv accepts a bare separator', async () => {
   const script = new URL('./preflight-text-imports.ts', import.meta.url);
   const fixture = new URL('negative-url-composition.ts', fixtureRoot);
   const output = await new Deno.Command(Deno.execPath(), {
-    args: ['run', '--allow-read', script.pathname, '--', '--file', fixture.pathname],
+    args: ['run', '--allow-read', fromFileUrl(script), '--', '--file', fromFileUrl(fixture)],
     stdout: 'piped',
     stderr: 'piped',
   }).output();

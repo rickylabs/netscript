@@ -76,6 +76,9 @@ subprocess test using the exact forwarded `--` argv.
 
 ## Decisions
 
+Review-fix plan: convert every test-owned file URL to a platform path with the directory-standard `fromFileUrl` helper.
+Then run the focused test and single-file check/fmt/lint wrappers, record their output, and commit locally without pushing.
+
 | Decision | Reason | Source |
 | --- | --- | --- |
 | Position-independent separator skip | Matches tolerant sibling entry points. | `cut.ts`, `canary.ts` |
@@ -94,6 +97,31 @@ subprocess test using the exact forwarded `--` argv.
 | Gate | Command or check | Result | Notes |
 | --- | --- | --- | --- |
 | Baseline task probe | `deno task release:publish -- v0.0.9 --message "probe" --dry-run` | FAIL (expected before fix) | Parser throws `Unknown argument: --`. |
+
+### Review-fix gate output (2026-08-02)
+
+```text
+$ deno test --allow-all .llm/tools/release/preflight-text-imports_test.ts
+running 8 tests from ./.llm/tools/release/preflight-text-imports_test.ts
+preflight rejects import attributes in publishable source ... ok
+preflight ignores import-attribute text in inert source regions ... ok
+preflight flags cross-line import.meta-relative reads ... ok
+preflight ignores URL constructors and generated constants without Deno reads ... ok
+preflight allowlist suppresses a single read line ... ok
+preflight flags eager fromFileUrl on import.meta.url ... ok
+preflight allows protocol-guarded fromFileUrl import.meta conversion ... ok
+release:preflight task argv accepts a bare separator ... ok
+ok | 8 passed | 0 failed
+
+$ deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root .llm/tools/release/preflight-text-imports_test.ts --ext ts,tsx
+{"command":"deno fmt --check","cwd":"/home/codex/repos/fix-1009","mode":"check","summary":{"filesSelected":1,"batches":1,"failedBatches":0,"findings":0,"ignoredFindings":0},"findings":[]}
+
+$ deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root .llm/tools/release/preflight-text-imports_test.ts --ext ts,tsx
+{"source":{"mode":"command","cwd":"/home/codex/repos/fix-1009","exitCode":0},"selection":{"filesSelected":1,"batches":1},"summary":{"totalOccurrences":0,"uniqueOccurrences":0,"uniqueRules":0,"uniquePaths":0},"groups":[]}
+
+$ deno run -A .llm/tools/run-deno-check.ts --root .llm/tools/release/preflight-text-imports_test.ts --ext ts,tsx --pretty
+filesSelected: 1; batches: 1; failedBatches: 0; totalOccurrences: 0; groups: []
+```
 
 ### Fitness Gates
 
