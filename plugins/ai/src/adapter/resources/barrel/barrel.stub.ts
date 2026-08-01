@@ -47,7 +47,7 @@ export function ai(): AiRuntime {
       defaultModelProvider: DEFAULT_CHAT_PROVIDER,
       tools: aiTools,
     });
-    void initializeMcpTools(runtime.tools);
+    void initializeMcpTools(aiTools);
   }
   return runtime ??
     createAiRuntime({ defaultModelProvider: DEFAULT_CHAT_PROVIDER, tools: aiTools });

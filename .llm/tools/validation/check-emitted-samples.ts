@@ -7,6 +7,12 @@ import {
   type NetScriptPlugin,
 } from '@netscript/plugin/adapter';
 
+type DenoConfig = Readonly<{
+  name?: string;
+  exports?: string | Readonly<Record<string, string>>;
+  imports?: Readonly<Record<string, string>>;
+}>;
+
 if (import.meta.dirname === undefined) {
   throw new Error('The emitted-sample gate requires a file URL.');
 }
@@ -40,9 +46,90 @@ async function adapterPlugins(): Promise<readonly NetScriptPlugin[]> {
   return plugins.sort((left, right) => left.name.localeCompare(right.name));
 }
 
+async function readConfig(path: string): Promise<DenoConfig> {
+  return JSON.parse(await Deno.readTextFile(path));
+}
+
+async function workspaceImports(): Promise<Record<string, string>> {
+  const imports: Record<string, string> = {};
+  const members: Array<Readonly<{ directory: string; config: DenoConfig }>> = [];
+  for (const group of ['packages', 'plugins']) {
+    const groupRoot = join(repositoryRoot, group);
+    for await (const entry of Deno.readDir(groupRoot)) {
+      if (!entry.isDirectory) continue;
+      const directory = join(groupRoot, entry.name);
+      try {
+        members.push({ directory, config: await readConfig(join(directory, 'deno.json')) });
+      } catch (error) {
+        if (!(error instanceof Deno.errors.NotFound)) throw error;
+      }
+    }
+  }
+
+  for (const { directory, config } of members) {
+    for (const [specifier, target] of Object.entries(config.imports ?? {})) {
+      imports[specifier] = target.startsWith('.')
+        ? toFileUrl(resolve(directory, target)).href
+        : target;
+    }
+  }
+  for (const { directory, config } of members) {
+    if (config.name === undefined || config.exports === undefined) continue;
+    const exports = typeof config.exports === 'string' ? { '.': config.exports } : config.exports;
+    for (const [subpath, target] of Object.entries(exports)) {
+      const specifier = subpath === '.' ? config.name : `${config.name}/${subpath.slice(2)}`;
+      imports[specifier] = toFileUrl(resolve(directory, target)).href;
+    }
+  }
+
+  const rootConfig = JSON.parse(await Deno.readTextFile(join(repositoryRoot, 'deno.json')));
+  for (const [name, version] of Object.entries<string>(rootConfig.catalog)) {
+    imports[name] ??= `npm:${name}@${version}`;
+  }
+  const preactVersion: string = rootConfig.catalog.preact;
+  imports.preact = `npm:preact@${preactVersion}`;
+  imports['preact/hooks'] = `npm:preact@${preactVersion}/hooks`;
+  imports['preact/jsx-runtime'] = `npm:preact@${preactVersion}/jsx-runtime`;
+  return imports;
+}
+
+async function writeHostFixtures(workspace: string): Promise<void> {
+  const fixtures: Readonly<Record<string, string>> = {
+    '.netscript/generated/plugin-ai/tools.registry.ts':
+      `import type { AiToolDefinition } from '@netscript/ai/tools';\n` +
+      `export const registry: ReadonlyMap<string, AiToolDefinition> = new Map();\n`,
+    '.netscript/generated/plugin-ai/agents.registry.ts':
+      `import type { AgentLoop } from '@netscript/ai/agent';\n` +
+      `export const registry: ReadonlyMap<string, () => AgentLoop> = new Map();\n`,
+    'ai/components/ui/markdown.tsx': `import type { ComponentChildren, JSX } from 'preact';\n` +
+      `export function Markdown(props: { children?: ComponentChildren }): JSX.Element {\n` +
+      `  return <>{props.children}</>;\n}\n`,
+  };
+  for (const [path, source] of Object.entries(fixtures)) {
+    const target = join(workspace, path);
+    await Deno.mkdir(join(target, '..'), { recursive: true });
+    await Deno.writeTextFile(target, source);
+  }
+}
+
 async function main(): Promise<void> {
   const workspace = await Deno.makeTempDir({ prefix: 'netscript-emitted-samples-' });
   try {
+    await writeHostFixtures(workspace);
+    const configPath = join(workspace, 'deno.json');
+    await Deno.writeTextFile(
+      configPath,
+      JSON.stringify({
+        imports: await workspaceImports(),
+        compilerOptions: {
+          strict: true,
+          noImplicitAny: true,
+          noImplicitReturns: true,
+          jsx: 'precompile',
+          jsxImportSource: 'preact',
+        },
+      }),
+    );
     const emittedFiles: string[] = [];
     const owners = new Map<string, string>();
     for (const plugin of await adapterPlugins()) {
@@ -68,7 +155,7 @@ async function main(): Promise<void> {
 
     const command = new Deno.Command(Deno.execPath(), {
       cwd: repositoryRoot,
-      args: ['check', '--config', join(repositoryRoot, 'deno.json'), ...emittedFiles.sort()],
+      args: ['check', '--config', configPath, ...emittedFiles.sort()],
       stdout: 'inherit',
       stderr: 'inherit',
     });
