@@ -25,3 +25,16 @@ Drift is append-only.
 - **Severity:** minor
 - **Action:** fix the assertion within the slice; defer legacy placeholder redesign.
 - **Evidence:** `research.md` findings 2 and 7.
+
+## 2026-08-01 — Formal PLAN-EVAL transport unavailable
+
+- **What:** The canonical local formal evaluator could not authenticate.
+- **Source:** `claude-print` launched with the `claude-openrouter` runtime config, model
+  `qwen/qwen3.7-max`, and effort `high`; it returned `Not logged in · Please run /login` before an
+  agentic turn.
+- **Expected:** A separate open-model session writes `plan-eval.md` with `PASS` or `FAIL_PLAN`.
+- **Actual:** No evaluator artifact was written and no source implementation began.
+- **Severity:** significant
+- **Action:** defer pending owner login, credential restoration, or explicit written Plan-Gate waiver.
+- **Evidence:** Claude session `43406813-5e60-461d-9e65-fe74c8e16875`; zero input/output tokens and
+  authentication failure.

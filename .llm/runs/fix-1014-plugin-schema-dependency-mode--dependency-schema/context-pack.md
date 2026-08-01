@@ -14,6 +14,8 @@
 
 Research and design are locked. The reported defect reproduces at the kernel copier boundary, and
 JSR 0.0.2 metadata proves the required package files exist. No implementation files have changed.
+The canonical Qwen PLAN-EVAL transport failed authentication before an agentic turn, so the harness
+hard stop remains in force.
 
 ## Completed
 
@@ -24,11 +26,12 @@ JSR 0.0.2 metadata proves the required package files exist. No implementation fi
 
 ## In Progress
 
-- Separate-session PLAN-EVAL.
+- Blocked separate-session PLAN-EVAL authentication recovery or explicit owner waiver.
 
 ## Next Steps
 
-1. Obtain PLAN-EVAL `PASS`.
+1. Restore/login the `claude-openrouter` evaluator profile and obtain PLAN-EVAL `PASS`, or receive
+   an explicit written Plan-Gate waiver from the owner.
 2. Implement the single locked slice.
 3. Run focused/unit/static/fitness gates, then the consumer E2E once.
 4. Obtain opposite-family slice review and separate-session IMPL-EVAL.
@@ -59,11 +62,13 @@ JSR 0.0.2 metadata proves the required package files exist. No implementation fi
 
 ## Open Questions
 
-- None blocking PLAN-EVAL.
+- Will the owner restore the approved local evaluator login, or explicitly waive the Plan-Gate for
+  this run?
 
 ## Drift and Debt
 
-- Drift: owner-prohibited PR/push overrides normal harness commit trail.
+- Drift: owner-prohibited PR/push overrides normal harness commit trail; canonical evaluator
+  authentication is unavailable.
 - Debt: no new architecture debt planned.
 
 ## Commits

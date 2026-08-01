@@ -68,6 +68,7 @@ host-side plugin-name mapping.
 | --- | --- | --- | --- |
 | 2026-08-01 | 1 | research | Baseline functional repro: zero copies/no target; 0.0.2 metadata mapping verified. |
 | 2026-08-01 | 1 | design | Source ladder, declaration signal, error boundary, and gate set locked. |
+| 2026-08-01 | 1 | plan gate | Canonical Qwen PLAN-EVAL launch failed authentication before an agentic turn; implementation remains stopped. |
 
 ## Decisions
 
@@ -81,6 +82,7 @@ host-side plugin-name mapping.
 | Drift | Severity | Logged in drift.md |
 | --- | --- | --- |
 | No PR/push trail by owner instruction | minor process override | yes |
+| Formal evaluator unavailable | significant process blocker | yes |
 
 ## Gate Results
 
@@ -111,3 +113,5 @@ host-side plugin-name mapping.
 ## Handoff Notes
 
 - PLAN-EVAL should challenge D1–D5 and the userland suite's stale placeholder expectation first.
+- Resume only after the approved evaluator can authenticate or the owner explicitly waives the
+  Plan-Gate in writing; closed-model substitution and self-certification are prohibited.
