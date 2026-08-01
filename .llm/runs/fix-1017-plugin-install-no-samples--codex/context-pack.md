@@ -20,6 +20,12 @@ black-box suite, and structural output type-checks. Scoped gates are green. The 
 `scaffold.runtime` run failed only at Aspire AppHost startup during `database.init` after all
 scaffold/plugin gates passed.
 
+Follow-up 2026-08-02: the stale suite-registry presentation expectation is aligned with the
+intentional four-plugin no-samples suite while retaining one exact ordered full-list `assertEquals`.
+All four historical workers plugin-package materialisation paths were empirically absent under
+no-samples, so Task 2 was dropped. Focused and whole-CLI tests plus the scoped check and E2E lint
+pass; the requested broad E2E format check exposes only an unrelated pre-existing README reflow.
+
 ## Completed
 
 - Required skill/doctrine/harness reads.

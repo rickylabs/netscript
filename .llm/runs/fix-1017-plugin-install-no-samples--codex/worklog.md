@@ -132,3 +132,131 @@ while the CLI only serializes the boolean install intent.
 
 - IMPL-EVAL should inspect the published `InstallStarterSamplesPolicy`, exact six-path E2E list,
   and the environmental attribution of the single `scaffold.runtime` failure.
+
+## Follow-up slice: `check-test` registry alignment (2026-08-02)
+
+### Design
+
+- Public surface: none; presentation-test and E2E assertion coverage only.
+- Domain vocabulary: the true-userland suite's exact ordered gate IDs remain the contract.
+- Ports/constants: no new ports or constants; reuse the suite registry and existing required-path list.
+- Commit slice: update the stale full-list expectation and conditionally restore four workers
+  materialisation assertions, proven by the requested focused/full CLI/static/E2E gates.
+- Deferred scope: AI plugin behavior (#1039), production install behavior, and PR/issue metadata.
+- Contributor path: when the suite's gate sequence changes intentionally, update the one complete
+  ordered expectation in `suite-registry_test.ts`; retain artifact assertions independently of
+  sample-file policy when the generated project proves them.
+
+### Implementation outcome
+
+- Task 1 landed: the test name now says four no-samples installs, and its single ordered
+  full-list `assertEquals` includes worker, saga, trigger, and stream.
+- Task 2 was dropped after empirical verification. Under `--no-samples`, none of the four old
+  `plugins/workers/...` materialisation paths exists. The first run proved the two TypeScript paths
+  absent with `TS2307`; a narrowed second run reported the JSON and Prisma paths missing explicitly.
+  No production behavior or assertion was fudged to manufacture those artifacts.
+
+### Raw gate output
+
+`deno test --allow-all packages/cli/e2e/tests/presentation/suite-registry_test.ts`
+
+```text
+Check packages/cli/e2e/tests/presentation/suite-registry_test.ts
+running 9 tests from ./packages/cli/e2e/tests/presentation/suite-registry_test.ts
+registry exposes scaffold capability suites from constants ... ok (1ms)
+native desktop suite is registered with an honest fixture preflight ... ok (2ms)
+capability suites select only their scoped gates ... ok (4ms)
+plugin suite includes all official plugin and generated-check gates ... ok (2ms)
+true userland suite runs init, four no-samples plugin installs, assertion, and cleanup ... ok (2ms)
+runtime suite includes full scaffold, database, runtime, and behavior gates ... ok (1ms)
+runtime suite waits for the generated app and requests its home page ... ok (1ms)
+runtime suite omits database resource wait for sqlite ... ok (539µs)
+runtime suite selects mssql database resource wait for mssql ... ok (852µs)
+
+ok | 9 passed | 0 failed (35ms)
+EXIT_CODE=0
+```
+
+`deno test --allow-all packages/cli`
+
+```text
+ok | 493 passed (454 steps) | 0 failed (53s)
+EXIT_CODE=0
+```
+
+`deno run --allow-all .llm/tools/run-deno-check.ts --root packages/cli --ext ts`
+
+```json
+{"source":{"mode":"selection","cwd":"/home/codex/repos/fix-1017"},"command":"deno check --quiet --unstable-kv <files>","selection":{"filesSelected":742,"batches":7,"failedBatches":0},"summary":{"totalOccurrences":0,"uniqueOccurrences":0,"uniqueCodes":0,"uniquePaths":0},"groups":[]}
+```
+
+```text
+EXIT_CODE=0
+```
+
+`deno lint packages/cli/e2e`
+
+```text
+Checked 107 files
+EXIT_CODE=0
+```
+
+`deno fmt --check packages/cli/e2e`
+
+```text
+from /home/codex/repos/fix-1017/packages/cli/e2e/README.md:
+ 64 | -The structured native report is written to
+ 64 | +The structured native report is written to `.llm/tmp/desktop-native-e2e/evidence.json`. A
+ 65 | -`.llm/tmp/desktop-native-e2e/evidence.json`. A host-inapplicable gate is `NOT_RUN`, not a pass.
+ 65 | +host-inapplicable gate is `NOT_RUN`, not a pass. The current WSL execution reached the signed
+ 66 | -The current WSL execution reached the signed manifest through ephemeral-CA TLS but failed in the
+ 66 | +manifest through ephemeral-CA TLS but failed in the packaged runtime because
+ 67 | -packaged runtime because `op_desktop_verify_ed25519` was unavailable; that recorded `FAIL` is the
+ 67 | +`op_desktop_verify_ed25519` was unavailable; that recorded `FAIL` is the Linux verdict until the
+ 68 | -Linux verdict until the consumed runtime/SDK seam is reconciled and the complete gate reruns green.
+ 68 | +consumed runtime/SDK seam is reconciled and the complete gate reruns green.
+
+error: Found 1 not formatted file in 111 files
+EXIT_CODE=1
+```
+
+The owned file passes independently:
+
+```text
+$ deno fmt --check packages/cli/e2e/tests/presentation/suite-registry_test.ts
+Checked 1 file
+```
+
+Task 2 empirical failures before it was reverted:
+
+```text
+TS2307 [ERROR]: Cannot find module '.../plugins/workers/mod.ts'.
+TS2307 [ERROR]: Cannot find module '.../plugins/workers/services/src/main.ts'.
+Found 2 errors.
+Summary: passed=7 failed=1
+EXIT_CODE=1
+```
+
+```text
+missing expected artifact: plugins/workers/scaffold.plugin.json
+missing expected artifact: plugins/workers/database/schema.prisma
+Summary: passed=7 failed=1
+EXIT_CODE=1
+```
+
+Final E2E after Task 2 was dropped:
+
+```text
+scratch project outside checkout: /tmp/netscript-userland-install-20d8ccb333c180b2/plugin-smoke-20260802-001345
+present artifacts: deno.json, workers/mod.ts, workers/runtime.ts, sagas/mod.ts, sagas/runtime.ts, triggers/mod.ts, triggers/runtime.ts, streams/mod.ts
+type-checked structural outputs: workers/mod.ts, workers/runtime.ts, sagas/mod.ts, sagas/runtime.ts, triggers/mod.ts, triggers/runtime.ts, streams/mod.ts
+no copied packages/, plugin src tree, scaffold entrypoint, or monorepo path leaks found
+Summary: passed=8 failed=0
+EXIT_CODE=0
+```
+
+### Reconcile
+
+This follow-up keeps the existing PR and partial `Refs #1017` framing. No PR/issue mutation or push
+was performed. AI behavior remains deferred to #1039. The unrelated README formatting finding was
+recorded without widening this assertion-only slice.

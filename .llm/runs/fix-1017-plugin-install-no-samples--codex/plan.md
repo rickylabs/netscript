@@ -138,3 +138,32 @@ resources when false, and keep generated structural barrel/runtime files valid a
 - Any caller whose intended samples value cannot be derived.
 - Any structural resource besides the four barrels/runtime glue that references suppressed samples.
 - Any need for plugin-kind branching in the CLI or adapter.
+
+## Follow-up plan: restore `check-test` (2026-08-02)
+
+The owner waived a second PLAN-EVAL cycle for this narrow follow-up. The intentional four-plugin
+no-samples suite is production ground truth; only its stale presentation expectation and potentially
+dropped orthogonal materialisation coverage are in scope.
+
+### Locked decisions
+
+1. Keep the suite-registry assertion as one exact, ordered, complete-list `assertEquals`; update its
+   name and expected worker/saga/trigger/stream gate sequence only.
+2. Provisionally restore the four workers plugin-package materialisation paths. Keep them only when
+   `scaffold.userland-install` proves they all exist under `--no-samples`; otherwise revert Task 2
+   without weakening or substituting assertions.
+3. Do not touch production CLI/plugin/connector code, the AI plugin, PR metadata, or prior commits.
+
+### Slice and gates
+
+| Slice | Files | Proof |
+| --- | --- | --- |
+| Track the intentional four-plugin suite exactly and restore materialisation coverage when empirically valid. | `suite-registry_test.ts`, `true-userland-install-suite.ts`, run artifacts | focused registry test; whole CLI tests; scoped CLI check; E2E lint/fmt; one userland-install E2E |
+
+### Risks and deferred scope
+
+- Risk: a restored materialisation path is not part of no-samples output. Mitigation: the real E2E
+  is the keep/drop decision, with no production workaround.
+- Risk: making CI green by loosening the contract. Mitigation: preserve exact ordered full-list
+  equality.
+- Deferred: AI sample classification (#1039), PR/issue edits, and all production implementation.
