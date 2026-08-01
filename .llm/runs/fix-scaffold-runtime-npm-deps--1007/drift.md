@@ -20,3 +20,13 @@
 - **Severity:** minor
 - **Action:** retry the same mandated route with all evidence embedded and tools explicitly unused.
 - **Evidence:** provider canary passed immediately before the failed evaluator launch.
+
+## 2026-08-01 — SDK runtime subset is also required
+
+- **What:** The first full runtime gate exposed incompatible `@tanstack/db` 0.6.16/0.6.17 types.
+- **Source:** `.llm/tmp/cli-e2e/plugin-smoke-20260801-040631.log`, `generated.deno-check`.
+- **Expected:** The Fresh runtime subset alone would make the generated workspace self-contained.
+- **Actual:** SDK runtime dependencies also need app-level pins; without them the generated graph can resolve duplicate incompatible minors.
+- **Severity:** significant
+- **Action:** rescope within issue #1007 to derive SDK runtime dependencies from its existing `package.json` contract and enforce them in the same drift test.
+- **Evidence:** full gate passed 20 steps and failed only generated type-check at the duplicate TanStack DB boundary.

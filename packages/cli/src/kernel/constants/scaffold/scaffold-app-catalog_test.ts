@@ -11,22 +11,41 @@ async function readConfig(url: URL): Promise<DenoConfig> {
   return JSON.parse(await Deno.readTextFile(url)) as DenoConfig;
 }
 
-Deno.test('scaffold runtime npm imports match the workspace and Fresh catalogs', async () => {
+Deno.test('scaffold runtime npm imports match workspace, Fresh, and SDK catalogs', async () => {
   const root = await readConfig(new URL('../../../../../../deno.json', import.meta.url));
   const fresh = await readConfig(new URL('../../../../../fresh/deno.json', import.meta.url));
+  const sdk = await readConfig(new URL('../../../../../sdk/deno.json', import.meta.url));
+  const sdkPackage = await readConfig(new URL('../../../../../sdk/package.json', import.meta.url));
+  const sdkRuntimeDependencies = Object.keys(
+    (sdkPackage as { dependencies?: Record<string, string> }).dependencies ?? {},
+  );
+  const runtimeDependencies = new Set([
+    ...runtimeCatalogDependencies,
+    ...sdkRuntimeDependencies,
+  ]);
+  const scaffoldImports: Readonly<Record<string, string>> = SCAFFOLD_APP_IMPORTS;
 
-  for (const dependency of runtimeCatalogDependencies) {
+  for (const dependency of runtimeDependencies) {
     const version = root.catalog?.[dependency];
     assertEquals(typeof version, 'string', `${dependency} must exist in the root catalog`);
 
     const expected = `npm:${dependency}@${version}`;
+    if (runtimeCatalogDependencies.includes(dependency as never)) {
+      assertEquals(
+        fresh.imports?.[dependency],
+        expected,
+        `${dependency} in the Fresh manifest must match the root catalog`,
+      );
+    }
+    if (sdkRuntimeDependencies.includes(dependency)) {
+      assertEquals(
+        sdk.imports?.[dependency],
+        expected,
+        `${dependency} in the SDK manifest must match the root catalog`,
+      );
+    }
     assertEquals(
-      fresh.imports?.[dependency],
-      expected,
-      `${dependency} in the Fresh manifest must match the root catalog`,
-    );
-    assertEquals(
-      SCAFFOLD_APP_IMPORTS[dependency],
+      scaffoldImports[dependency],
       expected,
       `${dependency} in scaffold output must match the root catalog`,
     );

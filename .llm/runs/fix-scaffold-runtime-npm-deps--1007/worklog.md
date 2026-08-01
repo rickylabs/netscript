@@ -54,6 +54,9 @@ When a published Fresh runtime begins importing another npm package, add it to t
 | 2026-08-01 04:16 CEST | 1 | PLAN-EVAL | Qwen formal evaluator PASS, session `31d664ea-98e3-4bcc-9475-53005c9f5595`. |
 | 2026-08-01 04:20 CEST | 2 | implementation | Added four missing runtime imports, aligned signals to root catalog, and extracted the existing Fresh runtime list for a three-way drift test. |
 | 2026-08-01 04:21 CEST | 2 | focused gate | 15 focused test steps passed. |
+| 2026-08-01 04:30 CEST | 3 | pristine consumer | Published canary.5 app returned HTTP 200 and 130,143 bytes of HTML. |
+| 2026-08-01 04:38 CEST | 3 | full gate | Failed only generated check: SDK resolved incompatible TanStack DB minors. |
+| 2026-08-01 04:42 CEST | 3 | rescope | Added SDK runtime set derived from its package manifest; focused tests and scoped wrappers pass. |
 
 ## Decisions
 
@@ -69,6 +72,7 @@ When a published Fresh runtime begins importing another npm package, add it to t
 | Published command is `init`, not `new` | minor | yes |
 | DB-generated files are a prerequisite for service app home | significant | yes |
 | Warm local install returned 200 despite missing imports | significant | yes |
+| SDK runtime set required in scaffold | significant | yes |
 
 ## Gate Results
 
@@ -78,6 +82,9 @@ When a published Fresh runtime begins importing another npm package, add it to t
 | --- | --- | --- | --- |
 | PLAN-EVAL | separate formal evaluator | PASS | `.llm/runs/fix-scaffold-runtime-npm-deps--1007/plan-eval.md` |
 | focused tests | `deno test -A ...scaffold-app-catalog_test.ts ...generators-config_test.ts ...package-manifest_test.ts` | PASS | 4 tests / 15 steps |
+| scoped check/lint/fmt | repo wrappers rooted at `packages/cli` | PASS | 742 selected files; zero findings |
+| quality | `deno task quality:gate` | PASS | Existing warnings only; zero failures. |
+| JSR doc lint | `deno task doc:lint --root packages/cli --pretty` | PASS | zero errors |
 
 ### Fitness Gates
 
@@ -90,6 +97,8 @@ When a published Fresh runtime begins importing another npm package, add it to t
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
 | canary.5 production | FAIL | run 30677734061 artifact | Expected baseline failure. |
+| pristine fixed consumer | PASS | HTTP 200, 130,143-byte HTML | Current scaffold catalog + published canary.5 packages. |
+| scaffold.runtime attempt 1 | FAIL | `plugin-smoke-20260801-040631.log` | Revealed missing SDK app pins; rescope applied. |
 
 ### Consumer Gates
 

@@ -33,7 +33,7 @@ Ensure generated Fresh apps directly install the runtime npm subset needed by `@
 
 ## Scope
 
-- Add the existing Fresh runtime dependency subset to `SCAFFOLD_APP_CATALOG` and `SCAFFOLD_APP_IMPORTS`.
+- Add the existing Fresh runtime subset and the SDK package runtime dependencies to `SCAFFOLD_APP_CATALOG` and `SCAFFOLD_APP_IMPORTS`.
 - Add a regression test that checks root catalog, Fresh manifest, scaffold catalog/import-map consistency.
 - Preserve the lockfile update caused by the already-landed Fresh/SDK manifest dependency declarations if validation confirms it.
 
@@ -52,7 +52,7 @@ Ensure generated Fresh apps directly install the runtime npm subset needed by `@
 
 | ID | Decision | Rationale |
 | --- | --- | --- |
-| D1 | Runtime subset is `@preact/signals`, `@tanstack/preact-query`, `@tanstack/query-core`, `@tanstack/react-db`, and `vite`. | Reuses the existing Fresh manifest contract rather than creating another list. |
+| D1 | Runtime subset is the existing Fresh test list plus the keys of SDK `package.json` dependencies. | Reuses both existing package contracts rather than creating another list. |
 | D2 | Scaffold values mirror root catalog values and emit `npm:` imports. | Deno catalogs are npm-only workspace indirection, not generated output syntax. |
 | D3 | Test the three authorities together. | The defect survives when any pair drifts silently. |
 
@@ -114,4 +114,3 @@ Ensure generated Fresh apps directly install the runtime npm subset needed by `@
 ## Drift Watch
 
 - Any runtime dependency beyond the existing Fresh list, changed generated config shape, or cold-app failure after imports are present.
-
