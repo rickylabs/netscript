@@ -24,6 +24,8 @@ import {
 
 const ATTEMPTS = 60;
 const RETRY_DELAY_MS = 1_000;
+const MAX_DIAGNOSTIC_CHARS = 24_000;
+const MAX_DIAGNOSTIC_LINES = 300;
 
 export interface ProbeAppHomeOptions {
   readonly attempts?: number;
@@ -32,6 +34,90 @@ export interface ProbeAppHomeOptions {
   readonly resolveLiveUrls?: (appHost: string, appName: string) => Promise<string[]>;
   readonly delay?: (milliseconds: number) => Promise<void>;
   readonly log?: (message: string) => void;
+  readonly collectResourceLogs?: (appHost: string, appName: string) => Promise<string>;
+}
+
+interface FreshOverlayError {
+  readonly message?: unknown;
+  readonly stack?: unknown;
+  readonly frame?: unknown;
+}
+
+/** Formats an HTTP response body for a bounded, actionable failure report. */
+export function diagnosticBody(body: string): string {
+  const overlay = freshOverlayError(body);
+  if (overlay) {
+    return boundDiagnostic(
+      [
+        typeof overlay.message === 'string' ? `Fresh error: ${overlay.message}` : undefined,
+        typeof overlay.stack === 'string' && overlay.stack ? overlay.stack : undefined,
+        typeof overlay.frame === 'string' && overlay.frame ? overlay.frame : undefined,
+      ].filter((part): part is string => part !== undefined).join('\n'),
+    );
+  }
+  return boundDiagnostic(body);
+}
+
+function freshOverlayError(body: string): FreshOverlayError | undefined {
+  const marker = /\bconst\s+error\s*=\s*/g.exec(body);
+  if (!marker) return undefined;
+  const start = marker.index + marker[0].length;
+  if (body[start] !== '{') return undefined;
+
+  let depth = 0;
+  let quoted = false;
+  let escaped = false;
+  for (let index = start; index < body.length; index++) {
+    const character = body[index];
+    if (quoted) {
+      if (escaped) escaped = false;
+      else if (character === '\\') escaped = true;
+      else if (character === '"') quoted = false;
+      continue;
+    }
+    if (character === '"') quoted = true;
+    else if (character === '{') depth++;
+    else if (character === '}' && --depth === 0) {
+      try {
+        return JSON.parse(body.slice(start, index + 1)) as FreshOverlayError;
+      } catch {
+        return undefined;
+      }
+    }
+  }
+  return undefined;
+}
+
+function boundDiagnostic(value: string): string {
+  const lines = value.split(/\r?\n/).slice(0, MAX_DIAGNOSTIC_LINES).join('\n');
+  const bounded = lines.slice(0, MAX_DIAGNOSTIC_CHARS);
+  return bounded.length < value.length ? `${bounded}\n… diagnostic truncated …` : bounded;
+}
+
+async function aspireResourceLogs(appHost: string, appName: string): Promise<string> {
+  const output = await new Deno.Command('aspire', {
+    args: [
+      'logs',
+      appName,
+      '--apphost',
+      appHost,
+      '--tail',
+      String(MAX_DIAGNOSTIC_LINES),
+      '--timestamps',
+      '--non-interactive',
+      '--nologo',
+    ],
+    stdout: 'piped',
+    stderr: 'piped',
+  }).output();
+  const stdout = new TextDecoder().decode(output.stdout).trim();
+  const stderr = new TextDecoder().decode(output.stderr).trim();
+  if (!output.success) {
+    return boundDiagnostic(
+      `unable to collect Aspire logs (exit ${output.code}): ${stderr || stdout}`,
+    );
+  }
+  return boundDiagnostic(stdout || '(Aspire returned no resource logs)');
 }
 
 /** Probes a generated app until it renders or its bounded retry budget is exhausted. */
@@ -48,6 +134,7 @@ export async function probeAppHome(
   const delay = options.delay ??
     ((milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds)));
   const log = options.log ?? console.info;
+  const collectResourceLogs = options.collectResourceLogs ?? aspireResourceLogs;
   const pinned = readPinnedAppPort(projectRoot, appName);
   const fixedUrls = pinned === undefined ? undefined : [`http://127.0.0.1:${pinned}/`];
 
@@ -85,7 +172,7 @@ export async function probeAppHome(
           log(`app home page rendered at ${url}: HTTP ${response.status} (${body.length} bytes)`);
           return;
         }
-        lastFailure.set(url, `HTTP ${response.status} (${contentType}): ${body.slice(0, 200)}`);
+        lastFailure.set(url, `HTTP ${response.status} (${contentType}):\n${diagnosticBody(body)}`);
       } catch (error) {
         lastFailure.set(url, error instanceof Error ? error.message : String(error));
       }
@@ -96,10 +183,14 @@ export async function probeAppHome(
   if (lastUrls.length === 0 && lastPending) {
     throw new Error(`${lastPending} after ${attempts} attempts`);
   }
+  const resourceLogs = appHost
+    ? await collectResourceLogs(appHost, appName)
+    : '(resource logs unavailable: no AppHost path was supplied)';
   throw new Error(
     `app home page did not render after ${attempts} attempts; last resolved candidates: ` +
       `${lastUrls.join(', ')}\n` +
-      [...lastFailure].map(([url, reason]) => `  ${url} -> ${reason}`).join('\n'),
+      [...lastFailure].map(([url, reason]) => `  ${url} -> ${reason}`).join('\n') +
+      `\n\nLast ${appName} resource logs:\n${resourceLogs}`,
   );
 }
 

@@ -6,7 +6,10 @@ import {
   generatedAppHomeUrls,
   readPinnedAppPort,
 } from '../../../src/application/gates/scaffold/generated-app-endpoint.ts';
-import { probeAppHome } from '../../../src/application/gates/scaffold/probe-app-home.ts';
+import {
+  diagnosticBody,
+  probeAppHome,
+} from '../../../src/application/gates/scaffold/probe-app-home.ts';
 import { generateAppsettings } from '../../../../src/kernel/templates/aspire/generate-appsettings.ts';
 import { PORT_RANGES, SCAFFOLD_APP_PORT } from '../../../../src/kernel/constants/port-ranges.ts';
 import { SCAFFOLD_FILES } from '../../../../src/kernel/constants/scaffold/scaffold-files.ts';
@@ -290,6 +293,53 @@ Deno.test('app-home probe bounds a resource endpoint that never appears', async 
       'resource dashboard still declared no HTTP endpoint after 3 attempts',
     );
     assertEquals(describeCalls, 3);
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+Deno.test('app-home diagnostics extract the Fresh overlay error and stack', () => {
+  const body = `<!DOCTYPE html><html><head><title>Error</title></head><body>
+    <script type="module">
+      const error = {"message":"Cannot find module 'npm:@tanstack/preact-query@^5.101.0'","stack":"at fetchModule (vite.js:42)\\nat render (app.tsx:7)","frame":""}
+      try { console.error(error) } catch (_) {}
+    </script></body></html>`;
+
+  assertEquals(
+    diagnosticBody(body),
+    "Fresh error: Cannot find module 'npm:@tanstack/preact-query@^5.101.0'\n" +
+      'at fetchModule (vite.js:42)\nat render (app.tsx:7)',
+  );
+});
+
+Deno.test('app-home diagnostics retain a useful bounded fallback for unknown responses', () => {
+  const body = `upstream failure: ${'x'.repeat(30_000)}`;
+  const diagnostic = diagnosticBody(body);
+  assertEquals(diagnostic.startsWith('upstream failure:'), true);
+  assertEquals(diagnostic.includes('diagnostic truncated'), true);
+  assertEquals(diagnostic.length < body.length, true);
+});
+
+Deno.test('app-home exhaustion includes the app resource logs', async () => {
+  const root = await projectWithAppsettings(JSON.stringify({ NetScript: { Apps: {} } }));
+  try {
+    await assertRejects(
+      () =>
+        probeAppHome(root, 'dashboard', '/tmp/apphost.ts', {
+          attempts: 1,
+          retryDelayMs: 0,
+          log: () => {},
+          resolveLiveUrls: () => Promise.resolve(['http://127.0.0.1:12345/']),
+          fetchUrl: () =>
+            Promise.resolve(
+              new Response('broken', { status: 500, headers: { 'content-type': 'text/plain' } }),
+            ),
+          collectResourceLogs: (appHost, appName) =>
+            Promise.resolve(`logs for ${appName} via ${appHost}: server-side stack`),
+        }),
+      Error,
+      'Last dashboard resource logs:\nlogs for dashboard via /tmp/apphost.ts: server-side stack',
+    );
   } finally {
     await Deno.remove(root, { recursive: true });
   }
