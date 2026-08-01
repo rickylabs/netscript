@@ -102,3 +102,49 @@ the amended plan under the owner's instruction; implementation is authorized wit
 | Every saga entrypoint receives an absolute project-owned registry URL. | API init and runner share the tested `NETSCRIPT_PROJECT_ROOT ?? Deno.cwd()` fallback; generated glue remains explicitly project-root-based; Aspire declares the absolute URL forward-looking. | Evidenced, with `declareEnv` explicitly not counted as runtime delivery. |
 | No consumer workspace is inferred by walking upward from a package module URL. | `rg "import\\.meta\\.url" plugins/sagas/` returned no matches; runner and service package-relative code was removed. | Evidenced. |
 | Runtime starts from published-package shape with non-empty registry. | Injected importer test uses a JSR-shaped package module URL, receives `file:///consumer/project/...`, and supervisor reports `definitionCount: 1`. | Dependency-shaped evidence only; **no published JSR install ran, so the literal published-install box remains unticked**. |
+
+## Review Follow-up Design — comment 3696652319
+
+### Public Surface
+
+- No public-surface change. `isProjectRelativeSpecifier` remains module-private and the internal
+  resolver/export map remain unchanged.
+
+### Domain Vocabulary and Ports
+
+- Project-relative specifier: normalized `.`, `..`, `./…`, or `../…` only.
+- No new ports; existing injected `projectRoot` and `readEnv` seams make tests host-independent.
+
+### Constants
+
+- None introduced; the change classifies syntax rather than defining finite domain values.
+
+### Commit Slice
+
+| # | Slice | Gate | Files |
+| --- | --- | --- | --- |
+| R1 | Normalize predicate separators and prove Windows parent-relative resolution without widening bare specifiers. | Four exact requested validation commands | resolver, resolver test, plan/worklog/context |
+
+### Deferred Scope and Contributor Path
+
+- All original remaining scope stays deferred. Future specifier classification changes belong in
+  the private predicate and must extend seam-level tests before touching `projectFileUrl`.
+
+### Review Follow-up Progress and Evidence
+
+| Time | Step | Result |
+| --- | --- | --- |
+| 2026-08-01 | implementation | Normalized separators once in the private predicate; `projectFileUrl` and downstream entrypoints unchanged. |
+| 2026-08-01 | regression coverage | Added Windows parent-relative, multi-level, mixed-separator, bare-parent, bare-specifier, and absolute-specifier seam assertions. |
+| 2026-08-01 | reconcile | PR #1031 remains partial work with its existing Remaining-scope framing; review comment `3696652319` is the only owned follow-up and no issue acceptance scope changed. |
+
+| Exact command | Exit | Real output summary |
+| --- | --- | --- |
+| `deno run -A .llm/tools/run-deno-check.ts --root plugins/sagas --ext ts` | 0 | 74 files selected, 1 batch, 0 failed batches, 0 diagnostics. |
+| `deno lint plugins/sagas` | 0 | `Checked 74 files`. |
+| `deno fmt --check plugins/sagas` | 0 | `Checked 79 files`. |
+| `deno test -A plugins/sagas/tests/` | 0 | `ok | 25 passed | 0 failed (3s)`. |
+
+Slice review: the diff is limited to predicate classification, seam-level tests, and harness
+records. It does not widen bare specifiers, export the predicate, or change `projectFileUrl`, glue,
+services, runner, Aspire contribution, entrypoints, or acceptance framing.

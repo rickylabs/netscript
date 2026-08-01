@@ -41,6 +41,7 @@ export function projectFileUrl(relativePath: string, projectRoot: string): URL {
 }
 
 function isProjectRelativeSpecifier(specifier: string): boolean {
-  return specifier === '.' || specifier.startsWith('./') || specifier.startsWith('../') ||
-    specifier.startsWith('.\\');
+  const normalized = specifier.replaceAll('\\', '/');
+  return normalized === '.' || normalized === '..' ||
+    normalized.startsWith('./') || normalized.startsWith('../');
 }

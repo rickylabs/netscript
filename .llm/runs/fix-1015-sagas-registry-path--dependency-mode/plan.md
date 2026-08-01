@@ -135,3 +135,40 @@ module location.
 
 - Any need to alter generated glue text or Aspire entrypoints requires stopping/rescoping.
 - Any public export-map change requires renewed JSR surface review.
+
+## Review Follow-up Plan — Windows parent-relative specifiers
+
+### Authorization and verified finding
+
+- Owner waived the open-model Plan-Gate for this 2026-08-01 review slice and authorized direct
+  implementation after writing this plan. The Opus 5 supervisor remains the separate evaluator;
+  no new `plan-eval.md` will be created.
+- Augment review comment `3696652319` is confirmed: `..\\foo` and bare `..` bypass the current
+  predicate and are returned raw instead of being anchored to the injected project root.
+
+### Locked decisions
+
+| ID | Decision | Rationale |
+| --- | --- | --- |
+| R1 | Normalize `\\` to `/` once inside the private predicate, then recognize `.`, `..`, `./`, and `../`. | Covers Windows and POSIX parent-relative syntax without accumulating separator-specific branches. |
+| R2 | Leave `projectFileUrl` and all downstream entrypoints unchanged. | It already normalizes the anchored path correctly; the defect is predicate classification only. |
+| R3 | Preserve bare module specifiers and absolute URL/module specifiers verbatim. | `sub/x.ts`, `sub\\x.ts`, `jsr:`, `file:`, and `https:` are deliberately outside project-relative classification. |
+
+### Commit slice
+
+| Order | Proof obligation | Gate | Files |
+| --- | --- | --- | --- |
+| 1 | Windows parent-relative, multi-level, mixed-separator, bare-parent, and unchanged bare/absolute specifiers behave consistently through `resolveProjectRegistryModule`. | The four exact requested validation commands. | `plugins/sagas/src/runtime/project-registry-module.ts`, `plugins/sagas/tests/runtime/project-registry-module_test.ts`, existing run artifacts |
+
+### Non-scope
+
+- No changes to service init, saga runner, Aspire contribution or entrypoints, generated glue,
+  export maps, PR remaining-scope framing, or issue #1015's two unmet criteria.
+- No scaffold runtime E2E and no additional evaluator transport.
+
+### Risk and mitigation
+
+| Risk | Mitigation |
+| --- | --- |
+| Bare relative module specifiers are accidentally anchored. | Assert `sub/x.ts` and `sub\\x.ts` remain verbatim. |
+| Cross-platform test depends on the host OS or filesystem. | Inject Windows `projectRoot` and `readEnv`; assert URL strings only. |

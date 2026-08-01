@@ -10,7 +10,7 @@
 
 ## Next action
 
-All exact scoped gates passed on the committed implementation tree, plus the harness quality gate.
-Update PR #1031 and hand off to the owner-authorized Opus 5 supervisor for IMPL-EVAL. Do not retry
-OpenRouter/Qwen or dispatch OpenHands. The dependency-shaped test is not a real published JSR
-install and remains explicitly reported as such.
+The bounded Augment follow-up for comment `3696652319` is implemented and all four exact gates pass.
+Commit once, push with `git push origin HEAD:refs/heads/fix/1015-sagas-registry-path` without adding
+an upstream, confirm local and remote SHAs match, and reply directly to the review thread. Preserve
+all original remaining-scope framing and do not launch an evaluator transport.

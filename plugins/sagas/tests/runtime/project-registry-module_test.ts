@@ -38,9 +38,34 @@ Deno.test('projectFileUrl handles Windows drive roots and backslashes on every h
   );
 });
 
+Deno.test('resolveProjectRegistryModule anchors Windows parent-relative specifiers', () => {
+  const projectRoot = 'C:\\Users\\eric\\proj';
+  const cases = [
+    ['..\\foo\\reg.ts', 'file:///C:/Users/eric/foo/reg.ts'],
+    ['..\\generated\\sagas.registry.ts', 'file:///C:/Users/eric/generated/sagas.registry.ts'],
+    ['..\\..\\a\\b.ts', 'file:///C:/Users/a/b.ts'],
+    ['..\\generated/sagas.registry.ts', 'file:///C:/Users/eric/generated/sagas.registry.ts'],
+    ['..', 'file:///C:/Users/eric/'],
+    ['..\\', 'file:///C:/Users/eric/'],
+  ] as const;
+
+  for (const [registryModule, expected] of cases) {
+    assertEquals(
+      resolveProjectRegistryModule({
+        registryModule,
+        projectRoot,
+        readEnv: () => undefined,
+      }),
+      expected,
+    );
+  }
+});
+
 Deno.test('resolveProjectRegistryModule preserves absolute URL and module specifiers', () => {
   for (
     const specifier of [
+      'sub/x.ts',
+      'sub\\x.ts',
       'file:///workspace/custom.registry.ts',
       'jsr:@example/registry',
       'https://example.test/registry.ts',
