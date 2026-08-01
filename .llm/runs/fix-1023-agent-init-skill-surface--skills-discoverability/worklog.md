@@ -54,10 +54,11 @@ Add or edit a source skill under `skills/`, register it in `skills/manifest.json
 | 2026-08-01 | plan | repro | Actual contributor binary reproduced exactly three skills and 164 lines; requested entry path/flag are stale. |
 | 2026-08-01 | plan-eval | PASS | Separate OpenHands/Qwen session passed every Plan-Gate box; run 30714594170. |
 | 2026-08-01 | S1 | source/content complete | Adapted the three supplied drafts; manifest now names five skills plus `help.md`; dangling specialist routes removed; plugin symptom added to help/build/operate; AGENTS, tests, docs, and freshness task updated. |
+| 2026-08-01 | S2 | generated + validated | Regenerated hash `71a86900a53bb52eb6e3ba974426fb66657aa50b433586c522ab55b621487264`; narrowed the route parser after its first run exposed false positives for ordinary “use CLI/help” prose. |
 
 ## Gate Results
 
-PLAN-EVAL passed before implementation began. Implementation gates remain pending.
+PLAN-EVAL passed before implementation began.
 
 ### Slice 1 review
 
@@ -68,3 +69,32 @@ PLAN-EVAL passed before implementation began. Implementation gates remain pendin
 - Symptom-first occurrences of `netscript plugin doctor` exist in `help.md`, `netscript-build`, and
   `netscript-operate`; the Aspire/Deno drafts retain the required symptom anchors.
 - Generated artifact and executable tests intentionally remain S2, after regeneration.
+
+### Static Gates
+
+| Gate | Command or check | Result | Notes |
+| --- | --- | --- | --- |
+| Type check | `deno run -A .llm/tools/run-deno-check.ts --root packages/cli --ext ts,tsx` | PASS | 742 files, 7 batches, 0 failed, 0 diagnostics |
+| Lint | `deno lint packages/cli` | PASS | Checked 107 files |
+| Init tests | `deno test -A packages/cli/src/public/features/agent/init/` | PASS | 4 passed, 0 failed |
+| Asset freshness | `deno task check:assets-barrel` | PENDING POST-COMMIT | Pre-commit run correctly displayed the owned generated diff; rerun after committing it |
+
+### Fitness Gates
+
+| Gate | Result | Evidence | Notes |
+| --- | --- | --- | --- |
+| Code-quality scan | PASS | `deno task quality:scan` | no findings; 7 pre-existing allowances reported |
+| Architecture check | PASS | `deno task arch:check` | exit 0; repository warnings are pre-existing and outside this slice |
+| Docs overlay | PASS | source/installed grep + semantic test | enumerations aligned; symptom routes present; no dangling installed skill reference |
+
+### Consumer Gates
+
+| Consumer | Result | Evidence | Notes |
+| --- | --- | --- | --- |
+| Fresh Claude install | PASS | temp artifact `/tmp/tmp.nsCKv5AcJh` | five `SKILL.md` files + `help.md`, 863 lines; AGENTS names all routes |
+
+## Handoff Notes
+
+- Inspect the route parser and generated hash first.
+- `scaffold.runtime` is N/A by explicit owner instruction and the release-gate matrix: no scaffold,
+  plugin scaffold, DB wiring, or Aspire helper generation changed.

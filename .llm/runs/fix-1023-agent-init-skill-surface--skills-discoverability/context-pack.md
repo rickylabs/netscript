@@ -22,7 +22,7 @@ Research confirms the issue's cause: source content/manifest and generated asset
 
 ## In Progress
 
-- Slice 1 source/content ready to commit; slice 2 regeneration and validation next.
+- Slice 2 generated artifact ready to commit; post-commit asset freshness rerun and IMPL-EVAL next.
 
 ## Next Steps
 
@@ -44,6 +44,7 @@ Research confirms the issue's cause: source content/manifest and generated asset
 | `.llm/runs/fix-1023-agent-init-skill-surface--skills-discoverability/` | new | harness research/plan/design state |
 | `skills/**` | changed/new | five-skill manifest, adapted drafts, repaired routes, symptom playbook |
 | `packages/cli/src/public/features/agent/init/` | changed | AGENTS guidance and semantic installer test |
+| `packages/cli/src/kernel/assets/skills.generated.ts` | changed | regenerated five-skill content and SHA-256 hash |
 | `README.md`, `docs/site/reference/**`, `deno.json` | changed | enumerations and generated freshness gate |
 
 ## Gates
@@ -51,7 +52,9 @@ Research confirms the issue's cause: source content/manifest and generated asset
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
 | Plan | PASS | `plan-eval.md`; OpenHands run 30714594170 |
-| Static/Fitness/Consumer | not run | implementation prohibited before PLAN-EVAL |
+| Static | PASS | 742-file type check; 107-file lint; 4 init tests |
+| Fitness | PASS | quality scan clean; arch check exit 0 with pre-existing warnings |
+| Consumer | PASS | fresh temp install contains five skills + help, 863 lines |
 
 ## Open Questions
 

@@ -158,7 +158,14 @@ function extractSkillReferences(markdown: string): ReadonlySet<string> {
   const references = new Set<string>();
   for (
     const match of markdown.matchAll(
-      /\buse (?:the )?`?([a-z][a-z0-9-]+)`?(?: skill)?(?=[;).,]|$)/gi,
+      /\buse (?:the )?`?([a-z][a-z0-9-]+)`? skill\b/gi,
+    )
+  ) {
+    references.add(match[1].toLowerCase());
+  }
+  for (
+    const match of markdown.matchAll(
+      /\(use (?:the )?`?([a-z][a-z0-9-]+)`?\)/gi,
     )
   ) {
     references.add(match[1].toLowerCase());
