@@ -179,3 +179,34 @@ None. The defect is fixed at its two generator sources; no architecture violatio
 
 - If removing anonymous mode does not restore automatic discovery in the full scaffold E2E, rescope
   before adding any explicit URL workaround.
+
+## Rebase and re-proof plan — 2026-08-02
+
+This is a history-integration and validation slice only. The existing Archetype 6 CLI/tooling
+design and emitted-task implementation remain locked; no product redesign is authorized.
+
+1. Capture the local/remote baseline, preserve the supervisor-provided `implement-rebase.md`, fetch
+   `origin`, and rebase onto current `origin/main`.
+2. Resolve conflicts semantically. For `scaffold-files.ts`, preserve `ASPIRE_CLI_TASK`,
+   `TSCONFIG_ROOT`, and `TSCONFIG_APP`; record any deviation from the probe in `drift.md`.
+3. Verify the #1034 no-docker-nuke invariant and #1041 emitted-samples CI wiring before validation.
+4. Run package-scoped CLI check/lint/fmt wrappers, then the requested root CI gates and
+   `quality:gate`. Treat the known unrelated `netscript-release` Claude mirror drift as pre-existing;
+   verify the Aspire skill pair directly.
+5. Run exactly one full `scaffold.runtime --cleanup --format pretty` pass. Read its retained log,
+   record the terminal code, and quote whether `behavior.otel-task-traces` ran and what it returned.
+6. Stop owned AppHosts, inspect `aspire ps` and `docker ps -a`, and remove only run-owned leftovers
+   if cleanup missed any.
+7. Commit the updated run evidence, force-push with lease to the explicit branch ref, and verify the
+   local HEAD, remote ref, and PR head object match. Leave PR/issue metadata untouched.
+
+### Rebase risks
+
+| Risk | Mitigation |
+| --- | --- |
+| Conflict drops #1038 TypeScript config keys | Resolve by preserving all three constants and inspect the rebased diff against `origin/main`. |
+| Rebase resurrects destructive container guidance | Run the literal repository-wide forbidden-pattern grep before gates. |
+| Rebase drops emitted-sample CI coverage | Inspect `.github/workflows/ci.yml` and run `check:emitted-samples`. |
+| Root tasks provide a false green for `packages/cli` | Use all three scoped wrappers with `--root packages/cli --ext ts,tsx`. |
+| Runtime suite fails before telemetry | Report the exact preceding gate and do not infer telemetry success. |
+| Runtime leaves resources behind | Use `--cleanup`, then Aspire-CLI-first teardown and scoped container inspection. |
