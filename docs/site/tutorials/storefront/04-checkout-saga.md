@@ -360,7 +360,7 @@ ns-sagas publish OrderCreated \
 # 2. Enqueue the process-payment worker through the supported triggers ingress.
 curl -X POST http://localhost:8093/api/v1/webhooks/checkout/payment \
   -H 'content-type: application/json' \
-  -d='{ "orderId": "ord_1001", "amount": 4999 }'
+  -d '{ "orderId": "ord_1001", "amount": 4999 }'
 
 # 3. The worker publishes PaymentCompleted; this direct publish is a deterministic local stand-in.
 ns-sagas publish PaymentCompleted \
@@ -392,7 +392,8 @@ ns-sagas list --instances --saga=CheckoutSaga --json
 The first instance shows `status: 'paid'` carrying its `transactionId`; the second shows
 `status: 'cancelled'` carrying the `cancelReason` your compensation branch stamped. (The forward path
 continues to `completed` once you also author the `reserve-inventory` and `create-shipment` jobs the
-saga `send`s — this track stops at the payment leg, so `paid` is checkout's observable checkpoint.)
+triggers boundary enqueues — saga `send(...)` cascades remain internal saga-bus messages. This track
+stops at the payment leg, so `paid` is checkout's observable checkpoint.)
 
 - [ ] The workers, sagas, triggers, and streams plugins are installed and registered.
 - [ ] `checkout-saga.ts` defines state, a correlation key, the forward handlers, and a
