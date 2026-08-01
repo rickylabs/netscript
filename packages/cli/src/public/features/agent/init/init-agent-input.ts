@@ -13,4 +13,5 @@ export interface InitAgentInput {
 export interface InitAgentResult {
   readonly hosts: readonly AgentHost[];
   readonly changedFiles: readonly string[];
+  readonly messages: readonly string[];
 }

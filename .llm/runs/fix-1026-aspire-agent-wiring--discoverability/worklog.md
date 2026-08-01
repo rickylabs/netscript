@@ -49,3 +49,13 @@ Reconciliation: the owner waived the open-model evaluator lane for the 0.0.3 fix
 - Updated the NetScript router to resolve Aspire, Deno, and unknown-symptom handoffs locally.
 - Evidence: `deno task gen:assets-barrel && deno task check:assets-barrel` exited 0; the focused agent suite passed its manifest-driven referential-integrity assertion in the S2/S3 working tree.
 - Reconcile: #1026 remains fully resolved by this PR; #1023 is referenced only because this slice satisfies its installed-surface portion while leaving the sibling issue's remaining scope intact.
+
+## S3 — unconditional MCP and bounded optional delegation
+
+- Added the `AspireAgentInitializer` consumed port and a Deno adapter at the allowed public adapter edge. The use case contains no `Deno.Command`.
+- Both host configs merge `aspire agent mcp` while preserving unrelated root/server keys.
+- Delegation uses the exact verified argument vector, a 60-second `AbortSignal.timeout`, non-fatal result messages, and skips when `.claude/skills/playwright-cli/SKILL.md` exists.
+- Expanded the marked AGENTS block and tests for merge/idempotence, referential integrity, timeout cancellation, swallowed failures, unconditional MCP, and required diagnostic terms.
+- Evidence: focused agent tests 9/9 pass; scoped CLI check selects 744 files with zero diagnostics; scoped CLI lint selects 744 files with zero findings; `quality:gate` exits 0 with zero new quality findings.
+- Doctrine note: the direct whole-CLI readiness scan still reports the package's pre-existing 48 FAIL / 42 WARN Restructure backlog; none names the new port, adapter, use case, or tests. No new debt is introduced.
+- Reconcile: the draft PR retains `Closes #1026`; its `Refs #1023` paragraph explicitly scopes the overlap.

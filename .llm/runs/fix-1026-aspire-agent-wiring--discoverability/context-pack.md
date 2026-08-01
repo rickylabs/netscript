@@ -8,3 +8,4 @@
 - Exclusions: scaffold runtime E2E, `.llm/tools` shipping, scaffold templates, `packages/mcp`.
 - Binding conditions: warn when Aspire is missing despite unconditional MCP config; skip delegation when Playwright product exists; prove the AGENTS → installed route → symptom/command chain; make the #1023 overlap explicit.
 - S2 implemented: Aspire/Deno/help assets, manifest/router updates, regenerated embedded hash. Focused agent tests currently pass in the working tree.
+- S3 implemented and gated: unconditional Aspire MCP config; injected Deno adapter; timeout, warning, failure swallowing, and Playwright-product idempotence. Focused tests/check/lint/quality gate pass.
