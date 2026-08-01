@@ -10,6 +10,7 @@ import { generateRegisterPlugins } from '../register/generate-register-plugins.t
 import * as fixtures from './generators-test-support.ts';
 import { DEFAULT_TEMPLATE_REGISTRY } from '../../../../application/registries/template-registry.ts';
 import { netscriptJsrSpecifier } from '../../../../constants/jsr-specifiers.ts';
+import { RESOURCE_DEFAULTS } from '@netscript/aspire/constants';
 
 // These generators read templates synchronously, which requires a previously-
 // awaited registry hydration. The tests exercise them directly (outside the CLI
@@ -86,6 +87,36 @@ describe('generateRegisterServices', () => {
     );
     assertStringIncludes(output, 'resource.withEnvironment(key, value)');
     assertStringIncludes(output, '// OTEL telemetry (full executable env set)');
+  });
+
+  it('should register an HTTP health probe after the endpoint for unpinned services', () => {
+    const output = generateRegisterServices({
+      ...emptyOptions,
+      services: { users: fixtures.UNPINNED_SERVICE },
+    });
+
+    assertStringIncludes(
+      output,
+      `await resource.withHttpHealthCheck({ path: '${RESOURCE_DEFAULTS.AppHealthCheckPath}', endpointName: '${RESOURCE_DEFAULTS.HttpEndpointName}' });`,
+    );
+    assert(
+      output.indexOf('.withHttpEndpoint(') < output.indexOf('.withHttpHealthCheck('),
+      'service health probe must follow its HTTP endpoint',
+    );
+  });
+
+  it('should support custom and disabled service health probes', () => {
+    const custom = generateRegisterServices({
+      ...emptyOptions,
+      services: { users: { ...fixtures.UNPINNED_SERVICE, HealthCheckPath: '/ready' } },
+    });
+    const disabled = generateRegisterServices({
+      ...emptyOptions,
+      services: { users: { ...fixtures.UNPINNED_SERVICE, HealthCheckPath: false } },
+    });
+
+    assertStringIncludes(custom, "path: '/ready'");
+    assert(!disabled.includes('withHttpHealthCheck'));
   });
 
   it('should use --watch-hmr flag for services (HMR-capable)', () => {
@@ -215,6 +246,36 @@ describe('generateRegisterPlugins', () => {
     );
     assertStringIncludes(output, 'resource.withEnvironment(key, value)');
     assertStringIncludes(output, '// OTEL telemetry (full executable env set)');
+  });
+
+  it('should register an HTTP health probe after the endpoint for unpinned plugins', () => {
+    const output = generateRegisterPlugins({
+      ...emptyOptions,
+      plugins: { auth: fixtures.UNPINNED_PLUGIN },
+    });
+
+    assertStringIncludes(
+      output,
+      `await resource.withHttpHealthCheck({ path: '${RESOURCE_DEFAULTS.AppHealthCheckPath}', endpointName: '${RESOURCE_DEFAULTS.HttpEndpointName}' });`,
+    );
+    assert(
+      output.indexOf('.withHttpEndpoint(') < output.indexOf('.withHttpHealthCheck('),
+      'plugin health probe must follow its HTTP endpoint',
+    );
+  });
+
+  it('should support custom and disabled plugin health probes', () => {
+    const custom = generateRegisterPlugins({
+      ...emptyOptions,
+      plugins: { auth: { ...fixtures.UNPINNED_PLUGIN, HealthCheckPath: '/ready' } },
+    });
+    const disabled = generateRegisterPlugins({
+      ...emptyOptions,
+      plugins: { auth: { ...fixtures.UNPINNED_PLUGIN, HealthCheckPath: false } },
+    });
+
+    assertStringIncludes(custom, "path: '/ready'");
+    assert(!disabled.includes('withHttpHealthCheck'));
   });
 
   it('should inject configured plugin environment variables', () => {

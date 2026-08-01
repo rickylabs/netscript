@@ -77,6 +77,16 @@ export function generateRegisterPlugins(options: RegisterPluginsOptions): string
       `    const resource = builder.addExecutable('${name}', 'deno', workdir, ['run', '--config', 'deno.json', '--minimum-dependency-age=0', '${DENO_NO_LEGACY_ABORT_FLAG}', '${RESOURCE_DEFAULTS.NodeModulesDirNoneFlag}', ...perms, '${entrypoint}'])`,
     );
     lines.push(`      .${renderHttpEndpointCall(entry)};`);
+
+    if (entry.HealthCheckPath !== false) {
+      const healthCheckPath = entry.HealthCheckPath ?? RESOURCE_DEFAULTS.AppHealthCheckPath;
+      lines.push(``);
+      lines.push(`    // HTTP health probe — a listening socket alone is not "healthy".`);
+      lines.push(
+        `    await resource.withHttpHealthCheck({ path: '${healthCheckPath}', endpointName: '${RESOURCE_DEFAULTS.HttpEndpointName}' });`,
+      );
+    }
+
     lines.push(
       `    await resource.withEnvironment('NETSCRIPT_PLUGIN_SERVICE_BOOTSTRAP_MODULE', bootstrapModule);`,
     );
