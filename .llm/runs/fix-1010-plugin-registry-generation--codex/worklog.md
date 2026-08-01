@@ -65,6 +65,7 @@ plugin-name registry.
 | 2026-08-01 | plan-eval | blocked launch | Canonical OpenRouter evaluator canary reported missing credential; no evaluation occurred.                                                                                                                                 |
 | 2026-08-01 | plan-eval | PASS           | Separate Claude Code + OpenRouter Qwen session completed PLAN-EVAL. All 8 Plan-Gate items checked. D3/D4 spot-checked against source — both confirmed. Verdict written to `plan-eval.md`. Implementation hard stop lifted. |
 | 2026-08-01 | slice 1   | implemented    | Added manifest-driven generation, project-configured subprocess execution, canonical target reporting, dry-run behavior, and named empty-runtime failure. |
+| 2026-08-01 | slice 2   | implemented    | `plugin sync` delegates to authoritative generation; CLI reference/embedded build skill updated; real workers/sagas/triggers generators emit and assert canonical non-empty exports. |
 
 ## Decisions
 
@@ -88,6 +89,8 @@ plugin-name registry.
 | Reproduction | published 0.0.2 clean-room sequence | FAIL (expected baseline) | generate exit 0/zero; sync exit 1/zod |
 | Slice 1 focused tests | `deno test -A packages/cli/src/public/features/generate/plugins/*_test.ts` | PASS (exit 0) | 2 files, 4 steps passed |
 | Slice 1 targeted check | targeted `deno check --unstable-kv` | PASS (exit 0) | Generator, command, and composition type-check. |
+| Slice 2 focused tests | `deno test -A packages/cli/src/public/features/generate/plugins/*_test.ts packages/cli/src/public/features/plugins/host/plugin-loader_test.ts` | PASS (exit 0) | 4 files, 6 steps; real official generators covered. |
+| Slice 2 targeted check | targeted `deno check --unstable-kv` | PASS (exit 0) | Sync adapter, composition, and integration test type-check. |
 
 ### Fitness Gates
 
@@ -105,7 +108,7 @@ plugin-name registry.
 
 | Consumer                               | Result  | Evidence                          | Notes                               |
 | -------------------------------------- | ------- | --------------------------------- | ----------------------------------- |
-| workers/sagas/triggers runtime loaders | NOT_RUN | planned clean-install integration | Must see non-empty canonical files. |
+| workers/sagas/triggers runtime loaders | PASS | `installed-runtime-registry-integration_test.ts` | Canonical paths and non-empty source/import/export shapes asserted using each real plugin generator. |
 
 ## Handoff Notes
 

@@ -25,6 +25,7 @@ interface RuntimeRegistryTarget extends RuntimeRegistryDirectory {
 }
 
 interface RuntimeRegistryManifest {
+  readonly raw: unknown;
   readonly runtimeRegistries?: readonly RuntimeRegistryTarget[];
   readonly runtimeRegistryGenerator?: RuntimeRegistryGeneratorDeclaration;
 }
@@ -94,6 +95,7 @@ export function createInstalledRuntimeRegistryGenerator(
         generator,
         manifestUrl,
         projectRoot: input.projectRoot,
+        rawManifest: manifest.raw,
         targets,
       });
       for (const target of targets) {
@@ -119,19 +121,19 @@ async function discoverInstalledRuntimePackages(
   const settings = asRecord(JSON.parse(await fs.readFile(path)));
   const plugins = asRecord(asRecord(settings.NetScript).Plugins);
   const found = new Map<string, InstalledRuntimePackage>();
-  for (const [name, raw] of Object.entries(plugins)) {
+  for (const raw of Object.values(plugins)) {
     const entrypoint = asRecord(raw).Entrypoint;
     if (typeof entrypoint !== 'string') continue;
-    const parsed = parseJsrEntrypoint(name, entrypoint);
+    const parsed = parseJsrEntrypoint(entrypoint);
     if (parsed) found.set(`${parsed.packageName}@${parsed.version}`, parsed);
   }
   return [...found.values()];
 }
 
-function parseJsrEntrypoint(name: string, entrypoint: string): InstalledRuntimePackage | undefined {
+function parseJsrEntrypoint(entrypoint: string): InstalledRuntimePackage | undefined {
   const match = /^jsr:(@[^/]+\/[^/@]+)@([^/]+)(?:\/.*)?$/.exec(entrypoint);
   if (!match) return undefined;
-  return { name, packageName: match[1], version: match[2] };
+  return { name: match[1], packageName: match[1], version: match[2] };
 }
 
 function publishedPackageFileUrl(installed: InstalledRuntimePackage, path: string): string {
@@ -145,8 +147,9 @@ function readRuntimeManifest(value: unknown, plugin: string): RuntimeRegistryMan
   const targets = Array.isArray(manifest.runtimeRegistries)
     ? manifest.runtimeRegistries.map(readTarget)
     : [];
-  if (typeof generator.command !== 'string') return { runtimeRegistries: targets };
+  if (typeof generator.command !== 'string') return { raw: value, runtimeRegistries: targets };
   return {
+    raw: value,
     runtimeRegistryGenerator: {
       command: generator.command,
       args: readStrings(generator.args),
@@ -216,6 +219,7 @@ async function runGenerator(options: {
   readonly generator: RuntimeRegistryGeneratorDeclaration;
   readonly manifestUrl: string;
   readonly projectRoot: string;
+  readonly rawManifest: unknown;
   readonly targets: readonly RuntimeRegistryTarget[];
 }): Promise<void> {
   const manifestPath = join(
@@ -224,13 +228,7 @@ async function runGenerator(options: {
     '.runtime-manifests',
     `${safeName(options.installed.packageName)}.json`,
   );
-  await options.dependencies.fs.writeFile(
-    manifestPath,
-    `${JSON.stringify({
-      runtimeRegistryGenerator: options.generator,
-      runtimeRegistries: options.targets,
-    })}\n`,
-  );
+  await options.dependencies.fs.writeFile(manifestPath, `${JSON.stringify(options.rawManifest)}\n`);
   try {
     const generatorUrl = new URL(
       options.generator.command,

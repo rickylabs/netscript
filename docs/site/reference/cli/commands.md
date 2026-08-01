@@ -104,7 +104,7 @@ helper layer.
 | --- | --- |
 | `netscript generate aspire` | Regenerate Aspire AppHost helpers from `appsettings.json`. Flag: `--project-root <path>`. |
 | `netscript generate runtime-schemas` | Generate JSON Schema files for runtime config topics. Flags: `--project-root <path>`, `--dry-run`, `--force`, `--verbose`. |
-| `netscript generate plugins` | Generate plugin registries from project source. Flags: `--project-root <path>`, `--dry-run`, `--verbose`. |
+| `netscript generate plugins` | Authoritative command: run each installed plugin's declared runtime registry generator under the project configuration. Flags: `--project-root <path>`, `--dry-run`, `--verbose`. |
 
 ## `plugin` — extended verbs
 
@@ -114,7 +114,7 @@ the [CLI reference](/cli-reference/#plugins). The full group also carries:
 | Command | Description |
 | --- | --- |
 | `netscript plugin scaffold <name>` | Scaffold a NetScript plugin package. Flags: `--target <path>`, `--project-root <path>`, `--force`. |
-| `netscript plugin sync` | Synchronize plugin contributions and generated registries. Flag: `--project-root <path>`. |
+| `netscript plugin sync` | Compatibility alias that delegates registry synchronization to `netscript generate plugins`. Flag: `--project-root <path>`. |
 | `netscript plugin update <name>` | Re-pin and regenerate an installed plugin. Flag: `--project-root <path>`. |
 | `netscript plugin item-add <name> <item> [args...]` | Scaffold an item with a custom plugin. Flag: `--project-root <path>`. |
 | `netscript plugin enable <pkg> [args...]` | Run a plugin's published `enable` command. Flag: `--project-root <path>`. |

@@ -1,7 +1,6 @@
 import {
   AstExtractor,
   FilesystemWalker,
-  ModuleManifestResolver,
   RegistryEmitter,
 } from '@netscript/plugin/sdk';
 
@@ -58,10 +57,6 @@ import type { DoctorPluginCommandDependencies } from '../plugins/doctor/doctor-p
 import type { JsrPluginValidatorPort } from '../plugins/install/jsr-plugin-validator-port.ts';
 import type { JsrPackageFileFetcher } from '../../infra/jsr/verify-jsr-package-integrity.ts';
 import { doctorPlugin } from '../plugins/doctor/doctor-plugin-use-case.ts';
-import {
-  createPluginHostLoader,
-  type PluginHostLoaderPort,
-} from '../plugins/host/plugin-loader.ts';
 import type { RemovePluginDependencies } from '../plugins/remove/remove-plugin.ts';
 import type { PluginScaffoldDependencies } from '../plugins/scaffold/scaffold-plugin-use-case.ts';
 import type { PublicCliHost } from './public-command-tree.ts';
@@ -137,7 +132,7 @@ export interface PublicCommandDependencies {
   /** Dependencies for host-side plugin loading. */
   readonly pluginHostDependencies: {
     readonly resolveProjectRoot: (projectRoot?: string) => Promise<string | undefined>;
-    readonly createLoader: (projectRoot: string) => PluginHostLoaderPort;
+    readonly generate: GeneratePluginRegistriesCommandDependencies['generate'];
   };
   /** Dependencies for plugin CLI dispatch. */
   readonly pluginDispatchDependencies: {
@@ -196,18 +191,11 @@ export function createPublicCommandDependencies(
   const resolveProjectRoot = async (projectRoot?: string) =>
     projectRoot ? host.resolvePath(projectRoot) : await findDeployProjectRoot(host.cwd()) ??
       undefined;
-  const createHostLoader = (projectRoot: string) =>
-    createPluginHostLoader({
-      projectRoot,
-      configLoader: {
-        load: async (projectRoot) => await loadConfig({ cwd: projectRoot }),
-      },
-      manifestResolver: new ModuleManifestResolver({ projectRoot }),
-      walker: new FilesystemWalker(),
-      extractor: new AstExtractor(),
-      emitter: new RegistryEmitter(),
-      fs,
-    });
+  const generatePluginRegistries = createInstalledRuntimeRegistryGenerator({
+    fetchManifest: (url) => fetch(url, { headers: { Accept: 'application/json' } }),
+    fs,
+    process,
+  });
   const serviceAddDependencies = {
     fs,
     scaffolder,
@@ -281,7 +269,7 @@ export function createPublicCommandDependencies(
     },
     pluginHostDependencies: {
       resolveProjectRoot,
-      createLoader: createHostLoader,
+      generate: generatePluginRegistries,
     },
     pluginDispatchDependencies: {
       dispatchPort: createPluginDispatchPort(process),
@@ -327,11 +315,7 @@ export function createPublicCommandDependencies(
       extractor: new AstExtractor(),
       emitter: new RegistryEmitter(),
       fs,
-      generate: createInstalledRuntimeRegistryGenerator({
-        fetchManifest: (url) => fetch(url, { headers: { Accept: 'application/json' } }),
-        fs,
-        process,
-      }),
+      generate: generatePluginRegistries,
     },
     deployBuildDependencies: {
       loadConfig: (options) => loadDeployConfig({ ...options, loadNetScriptConfig: loadConfig }),

@@ -2,11 +2,12 @@
 
 ## Status
 
-- Phase: Implement — slice 1 complete.
+- Phase: Implement — slices 1 and 2 complete.
 - Branch/worktree clean at baseline before run artifacts.
 - Published 0.0.2 reproduction captured once in `.llm/tmp/issue-1010-clean-room-repro.log`.
 - PLAN-EVAL passed in a separate Claude Code + OpenRouter Qwen session before implementation.
 - Slice 1 implements manifest-driven authoritative generation; focused tests and targeted check pass.
+- Slice 2 delegates sync and proves non-empty workers/sagas/triggers canonical registries with the real generators.
 
 ## Root Cause
 
@@ -26,6 +27,5 @@
 
 ## Next
 
-1. Commit slice 1 locally.
-2. Delegate plugin sync and add clean workers/sagas/triggers integration evidence in slice 2.
-3. Run required gates once, separate IMPL-EVAL, final local commit; never push/open PR.
+1. Commit slice 2 locally.
+2. Run required gates once, separate IMPL-EVAL, final local commit; never push/open PR.

@@ -5,14 +5,14 @@ import { CliCommand } from '../../../../kernel/application/abstracts/cli-command
 import { outputText } from '../../../../kernel/presentation/output/default-output.ts';
 import type { ProjectRootResolver } from '../../../presentation/support.ts';
 import { requireProjectRoot } from '../../../presentation/support.ts';
-import type { PluginHostLoaderPort } from './plugin-loader.ts';
+import type { GenerateInstalledPluginRegistries } from '../../generate/plugins/generate-installed-plugin-registries.ts';
 
 /** Dependencies for the host-side plugin sync command. */
 export interface HostPluginCommandDependencies {
   /** Resolve the project root from flags or environment. */
   readonly resolveProjectRoot: ProjectRootResolver;
-  /** Create a host loader for the resolved project root. */
-  readonly createLoader: (projectRoot: string) => PluginHostLoaderPort;
+  /** Delegate to authoritative installed-plugin registry generation. */
+  readonly generate: GenerateInstalledPluginRegistries;
   /** Output sink for command summaries. */
   readonly print?: (message: string) => void;
 }
@@ -31,15 +31,18 @@ export class HostPluginCommand extends CliCommand<Command> {
     const print = this.dependencies.print ?? outputText;
     return new Command()
       .name('sync')
-      .description('Synchronize plugin contributions and generated registries')
+      .description('Delegate registry synchronization to `netscript generate plugins`')
       .option('--project-root <path:string>', 'Project root directory')
       .action(async (options: { projectRoot?: string }): Promise<void> => {
         const projectRoot = await requireProjectRoot(
           this.dependencies.resolveProjectRoot,
           options.projectRoot,
         );
-        const state = await this.dependencies.createLoader(projectRoot).resolve();
-        print(`Synchronized ${state.plugins.length} plugin(s).`);
+        const generated = await this.dependencies.generate({ dryRun: false, projectRoot });
+        print(
+          `Synchronized ${generated.length} registry file(s) via ` +
+            '`netscript generate plugins`.',
+        );
       });
   }
 }

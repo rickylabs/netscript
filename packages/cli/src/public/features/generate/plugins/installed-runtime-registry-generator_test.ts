@@ -25,7 +25,7 @@ describe('installed runtime registry generator', () => {
 
     assertEquals(result, [{
       path: '.netscript/generated/plugin-custom/custom.registry.ts',
-      plugin: 'custom-api',
+      plugin: '@acme/plugin-custom',
       registrableItems: 1,
     }]);
     assertEquals(process.calls.length, 1);
@@ -59,9 +59,9 @@ describe('installed runtime registry generator', () => {
     const error = await assertRejects(
       () => generate({ dryRun: false, projectRoot: '/workspace/app' }),
       EmptyPluginRegistryError,
-      'empty-api',
+      '@acme/plugin-empty',
     );
-    assertEquals(error.plugin, 'empty-api');
+    assertEquals(error.plugin, '@acme/plugin-empty');
   });
 
   it('dry-run reports canonical paths without executing or writing', async () => {
