@@ -31,7 +31,7 @@ export const workersStarterResources: readonly InstallStarterResource[] = [
   { scaffolder: runtimeGlueScaffolder, input: DEFAULT_RUNTIME_GLUE_INPUT },
 ];
 
-const GENERATE_WORKERS_REGISTRY = 'netscript plugin workers compile-registry';
+const GENERATE_WORKERS_REGISTRY = 'netscript generate plugins';
 
 async function readWorkersRegistry(context: PluginCommandContext): Promise<string | undefined> {
   if (!await context.fileSystem.exists(WORKERS_JOB_REGISTRY_PATH)) return undefined;
@@ -67,13 +67,16 @@ const workersRegistryChecks: readonly DoctorCheckSpec[] = [{
   name: 'every declared job is registered',
   async run(context) {
     const source = await readWorkersRegistry(context);
-    const declared = source?.match(/import \* as job\d+ /g)?.length ?? 0;
-    const handlers = source?.match(/resolveJobHandler\(job\d+,/g)?.length ?? 0;
+    const declared = source?.match(/import (?:\* as )?job\d+ (?:from )?/g)?.length ?? 0;
+    const compiledHandlers = source?.match(/resolveJobHandler\(job\d+,/g)?.length ?? 0;
+    const generatedHandlers = source?.match(/\[job\d+\.id, job\d+\]/g)?.length ?? 0;
     const definitions = source?.match(/createLocalJobDefinition\(/g)?.length ?? 0;
     const loadable = source !== undefined &&
       source.includes('export const jobDefinitions') &&
       source.includes('export const registry') &&
-      declared > 0 && handlers === declared && definitions === declared + 1;
+      declared > 0 &&
+      compiledHandlers + generatedHandlers === declared &&
+      definitions === declared + 1;
     return {
       name: 'every declared job is registered',
       ok: loadable,
