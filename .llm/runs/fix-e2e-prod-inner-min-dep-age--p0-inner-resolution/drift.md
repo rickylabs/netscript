@@ -13,3 +13,15 @@ The local formal evaluator credential was unavailable. On 2026-07-17 the owner e
 the implementation session to implement S1 without attempting PLAN-EVAL because evaluations are
 supervisor-dispatched. This instruction is the written Plan-Gate waiver required by the run loop;
 the implementation session did not self-evaluate.
+
+## D-3 — unpinned Aspire endpoint hypothesis disproved
+
+The owner's prime hypothesis for the `0.0.2-canary.2` app-home failure was wrong: a live Aspire
+13.4.6 executable registered with `.withHttpEndpoint({ env: 'PORT' })` did expose an allocated proxy
+URL in `urls[]` and a separate target port in `environment.PORT`. Reproduction with the published
+CLI instead showed the dashboard resource had exited (`state: Finished`, `exitCode: 1`) because
+Deno did not apply the generated version-qualified `minimumDependencyAge.exclude` entry to the
+newly published `@netscript/fresh`. Changing the experimental exclusion to the versionless package
+identity `jsr:@netscript/fresh` made Vite start and repopulated Aspire's `urls[]`. The implementation
+therefore corrects the shipped workspace policy rather than the endpoint declaration or retry
+budget.

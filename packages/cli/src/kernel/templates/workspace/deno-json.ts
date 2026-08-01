@@ -58,8 +58,11 @@ export function generateDenoJson(options: WorkspaceDenoJsonOptions): string {
   const minimumDependencyAge = options.importMode === 'jsr'
     ? {
       age: 'P1D',
+      // Deno matches minimum-age exclusions by package identity. Adding the release version here
+      // leaves newly published packages subject to the age window and breaks generated apps for
+      // roughly 24 hours after every release.
       exclude: SCAFFOLD_JSR_RELEASE_PACKAGES.map((packageName) =>
-        netscriptJsrSpecifier(packageName)
+        `jsr:@netscript/${packageName}`
       ),
     }
     : undefined;
