@@ -84,6 +84,7 @@ plugin-name registry.
 | 2026-08-01 | follow-up | executable integration | Replaced text-only registry assertions with four tests: real generated-registry load, invalid-module rejection, workspace-first/no-fetch, and JSR-only published fallback. Commit `1ce434a4a`. |
 | 2026-08-01 | follow-up | coverage restoration | Added real generated-module loading for workers and sagas. Workers asserts `example-job` is registered and excluded `job-tools.ts` is absent; sagas asserts `order-processing` is registered and a non-`-saga.ts` file is absent. Commit `e42696ae5`. |
 | 2026-08-01 | follow-up | fixture correction | First saga run failed 5 passed/1 failed because `not-a-saga.ts` does end in `-saga.ts`; renamed the negative fixture to `saga-tools.ts`, after which all six integration tests passed. |
+| 2026-08-02 | AI slice 1 | diagnostics | Made `behavior.ai-chat-route` explicitly capture subprocess output and added a registry/import-focused failure hint. Gate-definition tests: 5 passed, 0 failed; targeted check exit 0. |
 
 ## Decisions
 
@@ -245,5 +246,12 @@ RAW_EXIT_CODE=0
 COVERAGE FOLLOW-UP PUBLISH DRY RUN (2420-line file listing truncated by terminal)
 $ deno task publish:dry-run
 Success Dry run complete
+RAW_EXIT_CODE=0
+
+AI DIAGNOSTICS SLICE
+$ deno test -A packages/cli/e2e/tests/application/gates/scaffold-gates_test.ts
+ok | 5 passed | 0 failed (46ms)
+$ deno check packages/cli/e2e/src/application/gates/scaffold/runtime-gates.ts
+Check packages/cli/e2e/src/application/gates/scaffold/runtime-gates.ts
 RAW_EXIT_CODE=0
 ```
