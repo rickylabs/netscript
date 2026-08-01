@@ -12,8 +12,8 @@
 
 ## Current State
 
-The reported cause is reproduced against the clean `origin/main` baseline. Research and design are
-locked, and separate-session PLAN-EVAL returned PASS. Implementation may begin.
+The reported cause is reproduced against the clean `origin/main` baseline. The Opus supervisor's
+PLAN-EVAL returned PASS with two conditions, both carried into the completed implementation.
 
 ## Completed
 
@@ -22,17 +22,18 @@ locked, and separate-session PLAN-EVAL returned PASS. Implementation may begin.
 - Service and plugin `/health` evidence.
 - Doctrine/archetype and JSR public-surface scan.
 - Plan and Design checkpoint.
-- Separate Qwen/OpenRouter PLAN-EVAL PASS (`plan-eval.md`).
+- Opus supervisor PLAN-EVAL PASS (`plan-eval.md`).
+- Focused implementation and all scoped validation gates complete.
 
 ## In Progress
 
-- Focused implementation slice.
+- Separate supervisor IMPL-EVAL.
 
 ## Next Steps
 
-1. Launch the focused implementation slice through the canonical agentic route.
-2. Run the named slice gates and substantive opposite-family review.
-3. Commit/push/comment the signed-off slice, then run separate IMPL-EVAL.
+1. Commit and push the completed focused slice.
+2. Update draft PR #1033 with acceptance and gate evidence.
+3. Supervisor runs separate IMPL-EVAL and decides readiness.
 
 ## Key Decisions
 
@@ -45,24 +46,24 @@ locked, and separate-session PLAN-EVAL returned PASS. Implementation may begin.
 
 | Path | Status | Notes |
 | --- | --- | --- |
-| `.llm/runs/fix-1012-aspire-executable-health-probe--readiness/` | new | Harness bootstrap, research, plan, design, resumable state. |
+| Aspire config, constants, generators, and focused tests | modified | Readiness probes for all generated HTTP executables with explicit opt-outs. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
 | Static | reproduction PASS | `deno eval` output recorded in worklog/research |
-| Fitness | PLAN-EVAL PASS; implementation gates pending | `plan-eval.md` |
-| Runtime | pending | live feasibility not yet claimed |
-| Consumer | pending | implementation tests not yet run |
+| Fitness | PLAN-EVAL PASS; implementation gates PASS | `plan-eval.md`, `worklog.md` |
+| Runtime | generator integration PASS; live AppHost NOT_RUN | no stable live dead-port fixture; no coverage claim |
+| Consumer | PASS | generated helper semantic tests |
 
 ## Open Questions
 
-- Is a stable live AppHost dead-port fixture feasible without expanding this focused slice?
+- None for the implementation lane. The supervisor owns IMPL-EVAL and readiness.
 
 ## Drift and Debt
 
-- Drift: minor evaluator write-boundary overrun recorded in `drift.md`; accepted because edits were accurate run-state reconciliation only.
+- Drift: the earlier false Qwen/OpenRouter evaluator attribution was corrected by owner instruction and recorded in `drift.md`.
 - Debt: existing CLI/Aspire doctrine debt unchanged.
 
 ## Commits

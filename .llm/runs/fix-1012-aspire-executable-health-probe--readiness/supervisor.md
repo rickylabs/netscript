@@ -2,8 +2,8 @@
 
 | Field | Value |
 | --- | --- |
-| Model | Codex · OpenAI · GPT-5 |
-| Session | API root session (opaque session id unavailable) |
+| Model | Opus 5 supervisor |
+| Session | Separate supervisor session |
 | Host | Linux / `/home/codex` |
 | Checkout | `/home/codex/repos/fix-1012` |
 | Worktree | `/home/codex/repos/fix-1012` |
@@ -15,21 +15,19 @@
 
 | Task lane | Provider / model / effort | Role in this run |
 | --- | --- | --- |
-| `planning_decisions` | Codex · OpenAI · GPT-5 (root session) | Supervisor, research, plan, slice review, GitHub lifecycle |
-| `light_implementation` | Canonical route resolved by agentic runtime | Focused source/test slice |
-| `review_codex_light` | Canonical opposite-family route | Substantive slice review when implementation is Codex-authored |
-| `formal_evaluation` | Claude Code · OpenRouter · bound open-model Qwen preset | Separate PLAN-EVAL and IMPL-EVAL sessions |
+| `planning_decisions` | Opus 5 supervisor | Supervisor, plan evaluation, implementation evaluation, readiness |
+| `light_implementation` | Codex · GPT-5.6 Sol · low | Focused source/test slice in this worktree |
+| `formal_evaluation` | Opus 5 supervisor | Separate PLAN-EVAL and IMPL-EVAL sessions; owner-retired Qwen/OpenRouter lane does not apply |
 
 ## Progress
 
 | Phase | Status | Evaluator | Verdict | Artifact | Date |
 | --- | --- | --- | --- | --- | --- |
 | Research + Plan | complete | — | — | `research.md`, `plan.md`, `worklog.md` Design | 2026-08-01 |
-| PLAN-EVAL | complete | Claude Code · OpenRouter · Qwen preset | PASS | `plan-eval.md` | 2026-08-01 |
-| Implementation | pending | — | — | — | — |
+| PLAN-EVAL | complete | Opus 5 supervisor | PASS (C1, C2) | `plan-eval.md` | 2026-08-01 |
+| Implementation | complete | Codex · GPT-5.6 Sol · low | gates PASS | source/tests + `worklog.md` | 2026-08-01 |
 | IMPL-EVAL | pending | — | — | — | — |
 
 ## Next action
 
-Implementation may begin. PLAN-EVAL hard stop cleared. All load-bearing claims verified: UNPINNED_APP emits endpoint but no probe on baseline; services and plugins evidence `/health`; `HealthCheckPath?: string | false` contract is complete; endpoint-before-probe ordering and tauri/desktop/task exclusions are protected; validation plan is honest about generator integration floor versus live AppHost dead-port test.
-
+Implementation is complete. The supervisor should perform IMPL-EVAL; the implementation lane does not self-evaluate.
