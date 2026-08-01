@@ -78,6 +78,7 @@ new resource shape. Terminal enforcement is isolated in `run-codex-slice-lib.ts`
 | 2026-08-02 | 11    | Final gate handoff      | Wrapper check/lint/fmt all green on 17 owned TS files; 25 focused tests passed; Claude mirror check passed. Reconcile: PR/issue acceptance reviewed; box 5 remains the only known gap.             |
 | 2026-08-02 | 11    | Supervisor IMPL-EVAL    | PASS under the explicit owner waiver. Close-gate review requires a partial/draft PR without a closing keyword because criterion 5 depends on unmerged #1034.                                       |
 | 2026-08-02 | 5R    | Supervisor review fix   | Docker RFC3339Nano `Created` now supplies report-only age when registry time is absent; red-first foreign-stale test passes. Ownership/actionability unchanged.                                    |
+| 2026-08-02 | 11R   | Post-merge closeout     | Merged #1034 assets dogfooded as six consumer files; #1048 tracks the exact unsafe Aspire guidance inventory. All post-merge gates pass and acceptance box 5 is evidenced.                          |
 
 ## Decisions
 
@@ -117,6 +118,11 @@ this run changes no `packages/**` or `plugins/**` source.
 | 11    | `doc:lint`                                           | N/A    | no package export surface; task requires a package `--root`                                                          |
 | 11    | `quality:scan` / `arch:check` / `jsr-audit`          | N/A    | no `packages/**` or `plugins/**` source changes                                                                      |
 | 5R    | scoped check + reporter/probe tests + live host read | PASS   | wrapper: 12 files, 0 findings; 5 tests passed; live foreign/unproven containers now carry non-null ages              |
+| 11R   | post-merge scoped check/lint/fmt                     | PASS   | wrappers selected 17 files; 0 findings in each                                                                       |
+| 11R   | post-merge focused tests                             | PASS   | 25 passed, 0 failed                                                                                                   |
+| 11R   | `check:assets-barrel`                                | PASS   | regenerated tracked barrels produced no diff                                                                         |
+| 11R   | `doc:lint --root packages/cli`                       | PASS   | 3 entrypoints, 0 errors                                                                                               |
+| 11R   | dogfood + `agentic:sync-claude:check`                | PASS   | six requested consumer files installed; 17 skills / 21 mirrored files current                                        |
 
 ## Handoff Notes
 

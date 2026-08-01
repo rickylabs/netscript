@@ -13,10 +13,10 @@
 ## Current State
 
 Research F1–F10 and locked decisions D1–D8 are approved by the existing supervisor PLAN-EVAL PASS.
-Slices 1–11 and the owner-authorized supervisor IMPL-EVAL PASS are complete. Acceptance criteria 1–4
-are implemented and tested. Criterion 5 cannot be completed on this base because PR #1034's assets
-are not embedded; the install/routing mechanism is present and verified without copying those
-assets. PR #1047 must remain draft/partial and must not carry a closing keyword.
+Slices 1–11 and the owner-authorized supervisor IMPL-EVAL PASS are complete. PR #1034 is now merged
+into the branch, and all five acceptance criteria are implemented and evidenced. The regenerated
+consumer bundle contains `aspire`, `deno`, `help.md`, `netscript`, `netscript-build`, and
+`netscript-operate`; PR #1047 can close #1046.
 
 ## Completed
 
@@ -31,21 +31,20 @@ assets. PR #1047 must remain draft/partial and must not carry a closing keyword.
 - Slice 7 `agentic:leak-check`/`agentic:teardown` tasks and tooling index entries.
 - Slice 8 pure `enforceTeardown` plus DONE-branch leak-check → teardown → re-check wiring.
 - Slice 9 E2E cleanup-on default, explicit opt-out, and creation-time AppHost registry capture.
-- Slice 10 dogfood task, generated consumer bundle, and symptom-indexed routing. Base limitation: PR
-  #1034 assets (`aspire`, `deno`, `help.md`) are not yet embedded, so acceptance box 5 is open.
+- Slice 10 dogfood task, generated six-file consumer bundle, and symptom-indexed routing.
 - Supervisor A1 review fix: foreign/unproven Docker resources derive report-only age from probed
   `Created`; ownership and actionability are unchanged.
+- Post-merge closeout: all wrapper gates, 25 focused tests, CLI doc-lint, mirror sync, and the asset
+  barrel check pass. Issue #1048 tracks the exact pre-existing unsafe Aspire guidance inventory.
 
 ## In Progress
 
-- Merge/rebase PR #1034, rerun `agentic:dogfood-skills`, and evidence the three consumer assets in a
-  follow-up before issue #1046 can close.
+- None.
 
 ## Next Steps
 
-1. Commit/push/comment slice 1 and verify local/remote SHA equality.
-2. Add red ownership tests, implement the pure classifier, and run focused wrapper/test gates.
-3. Continue registry, probes, reporting, teardown, enforcement, E2E default, and discoverability.
+1. Merge PR #1047 after normal review.
+2. Resolve #1048 by replacing the shipped host-wide Aspire guidance and regenerating its barrel.
 
 ## Key Decisions
 
@@ -68,20 +67,19 @@ assets. PR #1047 must remain draft/partial and must not carry a closing keyword.
 
 | Gate family | Current status | Evidence                                                          |
 | ----------- | -------------- | ----------------------------------------------------------------- |
-| Static      | pending        | Per-slice wrapper/test commands will be recorded in `worklog.md`. |
+| Static      | PASS           | Post-merge check/lint/fmt wrappers: 17 files, 0 findings.         |
 | Fitness     | N/A            | No package/plugin source changes.                                 |
-| Runtime     | pending        | Fixture tests and read-only host leak check.                      |
-| Consumer    | pending        | Dogfood task; base may not yet contain PR #1034 assets.           |
+| Runtime     | PASS           | 25 focused tests plus read-only host leak evidence.               |
+| Consumer    | PASS           | Six requested consumer files installed; asset barrel is current. |
 
 ## Open Questions
 
-- Whether the base bundle can evidence all of `aspire`, `deno`, and `help.md`; if not, PR acceptance
-  box 5 remains unticked and the PR body states the gap.
+- None for #1046.
 
 ## Drift and Debt
 
 - Drift: bootstrap omitted three mandatory artifacts; repaired before implementation.
-- Debt: none.
+- Debt: #1048 tracks the pre-existing host-wide Aspire stop guidance in the shipped consumer assets.
 
 ## Commits
 
