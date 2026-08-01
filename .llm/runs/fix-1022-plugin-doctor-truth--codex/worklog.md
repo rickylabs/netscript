@@ -99,3 +99,22 @@ transport rather than misrepresented as complete.
 - Correction gates: all four scoped check/lint/fmt roots passed with zero findings; 33 targeted
   tests passed, including command exit 0 on output produced by both real workers generators and the
   real shared sagas generator. `quality:gate` also exited 0 with no new findings.
+
+### IMPL-EVAL round 3 correction
+
+- Restored `loadRegisteredPluginMetadata` as the doctor default. It reads static descriptors and
+  never imports project `workers/jobs/*.ts` or saga source.
+- Workers and sagas emit `scaffold.plugin.json` as a plugin-owned install artifact. Its
+  `doctorEntrypoint` is a local file URL for source installs or the versioned `./doctor` package
+  export for published installs. The imported adapter reaches registry constants and resource
+  scaffolders only; generated project registries and project job/saga modules are read as text via
+  `PluginCommandContext.fileSystem`, never imported.
+- Metadata parse failures are captured per plugin as `manifestError`. Doctor-module import failures
+  are also plugin-local; the sibling regression proves a broken doctor remains `error` while a
+  healthy plugin still renders `healthy`.
+- `scaffold.plugins`: 12 passed, 1 failed at `behavior.plugins-health` for the correct #1010
+  dependency. `generate plugins` printed `Plugin registry generation complete: 0 written.`, then
+  workers and sagas rendered registry errors with remediation commands and doctor exited 1. The gate
+  still encodes the old exit-0 lie; it is recorded as depending on #1010 rather than weakening doctor.
+- Targeted tests: 21 passed (19 nested install cases), 0 failed. Scoped checks completed without
+  diagnostics; all four lint and format roots passed with zero findings.

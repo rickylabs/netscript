@@ -29,3 +29,16 @@
 - **Severity:** significant
 - **Action:** fix
 - **Evidence:** Opus 5 IMPL-EVAL; positive tests cover both real shapes.
+
+## IMPL-EVAL round 3
+
+- The supervisor cause held: `loadRegisteredPlugins` imported project modules and collapsed all
+  diagnostics at the workspace boundary.
+- Static `scaffold.plugin.json` was not originally materialized into installed project plugin
+  directories, so merely extending its source schema left the doctor seam invisible. The correction
+  adds a plugin-owned metadata artifact and a published `./doctor` export; host code imports only that
+  declared adapter module.
+- The e2e local-source lane previously installed the published package outside the userland suite.
+  Local lanes now pass `--local-path`, so the e2e measures the worktree under test.
+- The corrected lane reaches known #1010: generation reports `0 written` and doctor exits 1 with
+  workers/sagas registry errors. This is dependency evidence, not a doctor regression.
