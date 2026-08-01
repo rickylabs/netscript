@@ -11,6 +11,7 @@ import {
   type SagaRuntimeSupervisorSnapshot,
 } from './saga-supervisor.ts';
 import { createSagaTelemetry } from '@netscript/plugin-sagas-core/telemetry';
+import { resolveProjectRegistryModule } from './project-registry-module.ts';
 
 /** Module importer boundary used by the runtime registry loader. */
 export type SagaRuntimeModuleImporter = (specifier: string) => Promise<unknown>;
@@ -24,6 +25,7 @@ export type StartSagaRunnerOptions = Readonly<{
   registryModule?: string;
   importer?: SagaRuntimeModuleImporter;
   readEnv?: SagaRunnerEnvReader;
+  cwd?: () => string;
   supervisor?: Omit<SagaRuntimeSupervisorOptions, 'loadDefinitions' | 'runtimeOptions'>;
   runtimeOptions?: Omit<CreateSagaRuntimeOptions, 'adapter'>;
 }>;
@@ -37,7 +39,6 @@ export type RunSagaRunnerOptions =
 
 type SagaRegistryModule = Readonly<Record<string, unknown>>;
 
-const DEFAULT_REGISTRY_MODULE = '../../../../.netscript/generated/plugin-sagas/sagas.registry.ts';
 const DEFAULT_POSIX_SHUTDOWN_SIGNALS = [
   'SIGINT',
   'SIGTERM',
@@ -57,8 +58,11 @@ export async function startSagaRunner(
 ): Promise<SagaRuntimeSupervisor> {
   const readEnv = options.readEnv ?? ((name: string): string | undefined => Deno.env.get(name));
   const adapter = options.adapter ?? parseAdapter(readEnv('SAGAS_ADAPTER'));
-  const registryModule = options.registryModule ?? readEnv('SAGAS_REGISTRY_MODULE') ??
-    DEFAULT_REGISTRY_MODULE;
+  const registryModule = resolveProjectRegistryModule({
+    registryModule: options.registryModule,
+    readEnv,
+    cwd: options.cwd,
+  });
   const importer = options.importer ?? defaultImporter;
   const runtimeOptions = {
     ...options.runtimeOptions,
@@ -67,7 +71,7 @@ export async function startSagaRunner(
   };
   const supervisor = new SagaRuntimeSupervisor({
     ...options.supervisor,
-    loadDefinitions: () => loadSagaRegistryModule(resolveModuleSpecifier(registryModule), importer),
+    loadDefinitions: () => loadSagaRegistryModule(registryModule, importer),
     runtimeOptions,
   });
   await supervisor.start();
@@ -116,10 +120,6 @@ function withDefaultTelemetry(
     ...native,
     instrumentation: native?.instrumentation ?? createSagaTelemetry(),
   };
-}
-
-function resolveModuleSpecifier(specifier: string): string {
-  return specifier.startsWith('.') ? new URL(specifier, import.meta.url).href : specifier;
 }
 
 function parseAdapter(value: string | undefined): SagaRuntimeAdapter | undefined {
