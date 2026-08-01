@@ -168,8 +168,8 @@ async function main(): Promise<void> {
     };
 
     for (const plugin of await adapterPlugins()) {
-      sampleCount += plugin.install.starterResources.length;
       for (const artifact of collectInstallArtifacts(plugin)) {
+        if (artifact.path.endsWith('.ts') || artifact.path.endsWith('.tsx')) sampleCount += 1;
         await emit(plugin, 'install', artifact);
       }
       for (const resource of plugin.resources ?? []) {
