@@ -54,3 +54,14 @@
 - Run framework code-quality/doctrine gates if compatible with the user's exact scoped gate limit.
 - Do not run scaffold runtime E2E; no scaffold output is planned.
 - Deferred: triggers, streams, AppHost existence/health differentiation, queue/backend reachability.
+
+## IMPL-EVAL round 3 correction plan (2026-08-01)
+
+1. Restore metadata-only plugin discovery so doctor never imports project jobs or sagas.
+2. Persist a static doctor module specifier during plugin-owned scaffold and import only that module.
+3. Convert malformed metadata and doctor import failures into plugin-local reports; keep siblings running.
+4. Prove isolation with a healthy-sibling regression and run the scaffold.plugins lane against local sources.
+5. Preserve a truthful non-zero e2e result when #1010 emits zero registries; do not weaken doctor.
+
+The owner waived a separate Plan-Gate evaluator for this round. No evaluator verdict was created or
+claimed by the implementation session.
