@@ -32,5 +32,6 @@ export function createInitAgentCommand(
             result.hosts.join(", ")
           }.`,
       );
+      for (const message of result.messages) outputText(message);
     });
 }
