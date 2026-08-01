@@ -52,6 +52,8 @@ export interface DispatchPluginScaffoldOptions {
   readonly pluginName: string;
   /** Whether the child scaffolder must preview changes only. */
   readonly dryRun: boolean;
+  /** Whether the child scaffolder should emit starter samples. */
+  readonly includeSamples?: boolean;
   /** Deno permission flags from the S3 flag builder. */
   readonly permissionFlags: readonly string[];
   /** Additional arguments forwarded after the context payload. */
@@ -214,6 +216,7 @@ async function runScaffoldEntrypoint(
           options: {
             pluginName: options.pluginName,
             mcp: options.scaffoldArgs?.includes('--mcp') === true,
+            includeSamples: options.includeSamples !== false,
           },
           dryRun: options.dryRun,
         }),

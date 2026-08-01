@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `fix-1017-plugin-install-no-samples--codex` |
 | Branch | `fix/1017-plugin-install-no-samples` |
-| Current phase | `plan-eval` |
+| Current phase | `evaluate` |
 | Archetype | `6 — CLI / Tooling` with Archetype 5 connectors |
 | Scope overlays | `none` |
 
@@ -14,8 +14,11 @@
 
 Research and design are complete. The reported subprocess/adapter cause holds. Every official
 plugin barrel references samples, so the plan includes generic no-samples structural fallback input.
-No implementation has started. The canonical local PLAN-EVAL launch is blocked because this host
-has no `OPENROUTER_API_KEY`; cloud OpenHands is prohibited for a local-machine run.
+The approved implementation slice is complete. The flag crosses the subprocess boundary, the
+adapter applies the published samples policy, all six sample paths are absent in the four-kind
+black-box suite, and structural output type-checks. Scoped gates are green. The single mandated
+`scaffold.runtime` run failed only at Aspire AppHost startup during `database.init` after all
+scaffold/plugin gates passed.
 
 ## Completed
 
@@ -25,13 +28,15 @@ has no `OPENROUTER_API_KEY`; cloud OpenHands is prohibited for a local-machine r
 
 ## In Progress
 
-- Plan-stage commit and draft PR are complete; PLAN-EVAL is blocked before session creation.
+- Plan-stage commit and draft PR are complete; PLAN-EVAL amendment is accepted.
+- Production implementation, focused tests, and black-box E2E are complete.
+- All requested scoped checks/lint/tests are green; runtime one-pass evidence is recorded.
 
 ## Next Steps
 
-1. Restore the local OpenRouter credential and rerun separate-session PLAN-EVAL, or obtain an
-   explicit written owner waiver of the Plan-Gate.
-2. Implement only after `PASS` or that explicit waiver.
+1. Commit and push the signed-off implementation slice.
+2. Post the implementation evidence comment on PR #1028.
+3. Hand off to the owner-designated Opus supervisor for IMPL-EVAL; do not mark ready.
 
 ## Key Decisions
 
@@ -39,19 +44,27 @@ has no `OPENROUTER_API_KEY`; cloud OpenHands is prohibited for a local-machine r
 | --- | --- | --- |
 | Additive samples policy supports omit or fallback input | plan D2 | Default remains emit-all. |
 | Empty barrels remain structural | plan D3 | Runtime glue remains unchanged and sample-independent. |
+| Published alternate scaffolder policy | amended plan D2 | `samples` is undefined/omit/alternate; undefined preserves emit-all. |
 
 ## Files Changed
 
 | Path | Status | Notes |
 | --- | --- | --- |
-| `.llm/runs/fix-1017-plugin-install-no-samples--codex/*` | new | Harness plan artifacts only. |
+| `packages/plugin/src/adapter/*` | changed | Published samples policy and install filtering. |
+| `packages/cli/src/public/features/plugins/*` | changed | Threaded and serialized `includeSamples`. |
+| `plugins/{workers,sagas,triggers,streams}/src/adapter/*` | changed | Sample classification and empty barrel alternatives. |
+| `packages/cli/e2e/*` | changed | Four-kind exact-path black-box evidence. |
+| `.llm/runs/fix-1017-plugin-install-no-samples--codex/*` | changed | Plan amendment, drift, and gate evidence. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Plan | blocked before evaluator launch | launcher exit 4; drift log |
-| Static/Fitness/Runtime/Consumer | not run | implementation prohibited before PLAN-EVAL |
+| Plan | amendment accepted; implementation authorized | `plan-eval.md`, owner waiver |
+| Static | PASS | scoped checks/lint/format; adapter and CLI tests |
+| Fitness | PASS with pre-existing warnings | quality gate, doc lint, publish dry-run |
+| Runtime | black-box PASS; scaffold.runtime environmental FAIL | worklog raw summaries |
+| Consumer | PASS | sample-enabled tests plus sample-free workspace check |
 
 ## Open Questions
 
@@ -59,7 +72,7 @@ has no `OPENROUTER_API_KEY`; cloud OpenHands is prohibited for a local-machine r
 
 ## Drift and Debt
 
-- Drift: all four barrels were confirmed sample-dependent; local evaluator launch is blocked.
+- Drift: evaluator credential block resolved by owner waiver; Aspire AppHost timeout recorded without rescope.
 - Debt: no new debt expected.
 
 ## Commits

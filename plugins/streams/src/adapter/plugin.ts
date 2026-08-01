@@ -9,6 +9,8 @@ import {
   barrelScaffolder,
   DEFAULT_BARREL_INPUT,
   DEFAULT_STREAM_INPUT,
+  EMPTY_BARREL_INPUT,
+  emptyBarrelScaffolder,
   streamConsumerResource,
   streamProducerResource,
   streamResource,
@@ -17,8 +19,16 @@ import {
 
 /** Starter resources emitted by the streams install command. */
 export const streamsStarterResources: readonly InstallStarterResource[] = [
-  { scaffolder: streamResource.scaffolder, input: DEFAULT_STREAM_INPUT },
-  { scaffolder: barrelScaffolder, input: DEFAULT_BARREL_INPUT },
+  { scaffolder: streamResource.scaffolder, input: DEFAULT_STREAM_INPUT, samples: { kind: 'omit' } },
+  {
+    scaffolder: barrelScaffolder,
+    input: DEFAULT_BARREL_INPUT,
+    samples: {
+      kind: 'alternate',
+      scaffolder: emptyBarrelScaffolder,
+      input: EMPTY_BARREL_INPUT,
+    },
+  },
 ];
 
 /** Thin connector object consumed by `@netscript/plugin/adapter`. */

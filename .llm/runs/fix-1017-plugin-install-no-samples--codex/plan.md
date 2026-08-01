@@ -43,8 +43,8 @@ resources when false, and keep generated structural barrel/runtime files valid a
 
 - Add `includeSamples` to `DispatchPluginScaffoldOptions` and serialized scaffold context.
 - Pass the install plan value at every dispatch call site without changing sibling semantics.
-- Add one optional additive `InstallStarterResource` samples policy: omit a resource, or use a
-  no-samples fallback input for a sample-dependent structural resource.
+- Add one optional additive `InstallStarterResource.samples` policy: omit a resource, or dispatch
+  a no-samples alternate `ItemScaffolder` with its own input for a sample-dependent structural resource.
 - Mark the six reported sample artifacts through the four official plugin starter declarations.
 - Give all four structural barrels empty no-samples inputs; keep runtime glue structural.
 - Add focused CLI/adapter tests and a CLI E2E black-box assertion for the exact six absent paths.
@@ -66,8 +66,8 @@ resources when false, and keep generated structural barrel/runtime files valid a
 | ID | Decision | Rationale |
 | --- | --- | --- |
 | D1 | Serialize `includeSamples` as a boolean in scaffold `context.options`. | It is the existing cross-process option channel and avoids parser/kernel changes. |
-| D2 | Add one optional discriminated samples policy to `InstallStarterResource`: omit or fallback input. | A boolean marker alone would suppress samples but cannot keep structural barrels valid. Undefined remains emit-all. |
-| D3 | Keep barrel and runtime glue artifacts for no-samples installs; emit empty barrels. | Structural workspace entrypoints remain present and type-check without dangling exports. |
+| D2 | Publish `InstallStarterSamplesPolicy<TAlternateInput>` and add optional `InstallStarterResource.samples`: `{ kind: 'omit' }` suppresses a sample; `{ kind: 'alternate', scaffolder, input }` invokes a distinct no-samples `ItemScaffolder` with its own input. | The alternate scaffolder owns an empty-barrel artifact source, so it is expressible independently of the fixed sample barrel stub. Undefined remains emit-all. |
+| D3 | Keep each existing structural barrel and runtime-glue artifact under no-samples; streams has no runtime glue and gains none. Each of the four barrels selects its own empty alternate scaffolder through D2. | Empty barrel scaffolders emit valid `export {};` modules without substituting the fixed sample-export stubs, so the outcome is reachable and type-checks without dangling exports. |
 | D4 | Put filtering/fallback selection in `collectInstallArtifacts(plugin, options)`. | The core adapter owns install semantics; connectors only classify resources. |
 | D5 | Add a dedicated E2E no-samples assertion gate/suite pattern under `packages/cli/e2e`, asserting the six exact paths. | This is the required black-box command boundary evidence. |
 
@@ -75,7 +75,7 @@ resources when false, and keep generated structural barrel/runtime files valid a
 
 | Decision | Status | Notes |
 | --- | --- | --- |
-| Exact optional policy name | must resolve now — resolved as part of D2 before code | Choose a documented discriminated name during the contract-first edit; no semantic choice remains open. |
+| Exact optional policy name | must resolve now — resolved | `InstallStarterSamplesPolicy<TAlternateInput>` is the exported policy type; `InstallStarterResource.samples` is its optional field. |
 | Whether to omit barrels | must resolve now — resolved by D3 | Empty structural barrels are required. |
 | Broader starter-resource redesign | safe to defer | Not needed for #1017. |
 
@@ -138,4 +138,3 @@ resources when false, and keep generated structural barrel/runtime files valid a
 - Any caller whose intended samples value cannot be derived.
 - Any structural resource besides the four barrels/runtime glue that references suppressed samples.
 - Any need for plugin-kind branching in the CLI or adapter.
-

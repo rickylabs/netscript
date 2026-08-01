@@ -52,6 +52,7 @@ export type {
   InfoSpec,
   InstallSpec,
   InstallStarterResource,
+  InstallStarterSamplesPolicy,
   NetScriptPlugin,
   PluginAdapter,
   PluginCliEntrypoint,

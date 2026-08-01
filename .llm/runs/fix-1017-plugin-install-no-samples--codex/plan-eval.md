@@ -92,4 +92,10 @@ amendment inline and records the result below.
 
 ## Amendment result
 
-_(filled after the slice re-states D2)_
+`ACCEPTED` — D2 now names the published `InstallStarterSamplesPolicy<TAlternateInput>` type and
+requires its `alternate` branch to carry a distinct `ItemScaffolder` plus that scaffolder's own
+input. D3 is reachable: workers, sagas, triggers, and streams each select an empty-barrel alternate
+scaffolder that emits a valid `export {};` module instead of invoking the fixed sample-export stub.
+Undefined policy still emits the original starter unchanged. Streams remains barrel-only and gains
+no runtime-glue resource. Per the evaluator instruction, implementation may proceed without another
+plan cycle.

@@ -3,7 +3,14 @@
  * @module
  */
 
-export { type BarrelInput, barrelScaffolder, DEFAULT_BARREL_INPUT } from './barrel/barrel.ts';
+export {
+  type BarrelInput,
+  barrelScaffolder,
+  DEFAULT_BARREL_INPUT,
+  EMPTY_BARREL_INPUT,
+  type EmptyBarrelInput,
+  emptyBarrelScaffolder,
+} from './barrel/barrel.ts';
 export {
   DEFAULT_FILE_WATCH_INPUT,
   fileWatchResource,

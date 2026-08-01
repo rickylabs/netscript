@@ -35,9 +35,26 @@ export interface PluginCommandContext {
 }
 
 /**
+ * Behavior for an install starter when the host excludes samples.
+ *
+ * `omit` suppresses a sample-only starter. `alternate` emits a structural
+ * replacement through its own scaffolder and input.
+ *
+ * @typeParam TAlternateInput Input accepted by the alternate scaffolder.
+ */
+export type InstallStarterSamplesPolicy<TAlternateInput = unknown> =
+  | { readonly kind: 'omit' }
+  | {
+    readonly kind: 'alternate';
+    readonly scaffolder: ItemScaffolder<TAlternateInput>;
+    readonly input: TAlternateInput;
+  };
+
+/**
  * Starter resource emitted by the mandatory install command.
  *
  * @typeParam TInput Input passed to the resource's item scaffolder.
+ * @typeParam TAlternateInput Input passed to its optional no-samples alternate scaffolder.
  *
  * @example
  * ```ts
@@ -47,11 +64,13 @@ export interface PluginCommandContext {
  * };
  * ```
  */
-export interface InstallStarterResource<TInput = unknown> {
+export interface InstallStarterResource<TInput = unknown, TAlternateInput = unknown> {
   /** Item scaffolder shared with future resource commands. */
   readonly scaffolder: ItemScaffolder<TInput>;
   /** Default input emitted during plugin install. */
   readonly input: TInput;
+  /** Optional behavior when the host sets `includeSamples` to `false`. */
+  readonly samples?: InstallStarterSamplesPolicy<TAlternateInput>;
 }
 
 /**

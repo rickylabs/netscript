@@ -24,6 +24,20 @@ export const DEFAULT_BARREL_INPUT: BarrelInput = {
   sagaId: DEFAULT_SAGA_INPUT.id,
 };
 
+/** Input accepted by the empty sagas barrel scaffolder. */
+export type EmptyBarrelInput = Readonly<Record<string, never>>;
+
+/** Canonical input for a sagas install without samples. */
+export const EMPTY_BARREL_INPUT: EmptyBarrelInput = {};
+
+/** Sagas barrel emitted when install samples are excluded. */
+export const emptyBarrelScaffolder: ItemScaffolder<EmptyBarrelInput> = {
+  name: 'empty-barrel',
+  emit(): readonly ScaffoldArtifact[] {
+    return [textArtifact('sagas/mod.ts', '/** @module Generated sagas. */\n\nexport {};\n')];
+  },
+};
+
 /** Sagas barrel item scaffolder emitted during install. */
 export const barrelScaffolder: ItemScaffolder<BarrelInput> = {
   name: 'barrel',
