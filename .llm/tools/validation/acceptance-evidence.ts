@@ -67,13 +67,25 @@ export function validateEvidenceMapping(
   evidence: AcceptanceEvidence[],
 ): Map<string, AcceptanceEvidence> {
   const unchecked = new Set(checkboxes.filter((box) => !box.checked).map((box) => box.text));
+  const known = new Set(checkboxes.map((box) => box.text));
   const mapping = new Map<string, AcceptanceEvidence>();
+  const seen = new Set<string>();
   const errors: string[] = [];
   for (const entry of evidence) {
-    if (!unchecked.has(entry.text)) errors.push(`Evidence names no unchecked box: ${entry.text}`);
-    else if (mapping.has(entry.text)) errors.push(`Duplicate evidence: ${entry.text}`);
-    else if (!entry.evidence) errors.push(`Evidence is empty: ${entry.text}`);
-    else mapping.set(entry.text, entry);
+    if (!known.has(entry.text)) {
+      errors.push(`Evidence names no acceptance box: ${entry.text}`);
+      continue;
+    }
+    if (seen.has(entry.text)) {
+      errors.push(`Duplicate evidence: ${entry.text}`);
+      continue;
+    }
+    seen.add(entry.text);
+    if (!entry.evidence) {
+      errors.push(`Evidence is empty: ${entry.text}`);
+      continue;
+    }
+    if (unchecked.has(entry.text)) mapping.set(entry.text, entry);
   }
   for (const text of unchecked) if (!mapping.has(text)) errors.push(`Missing evidence: ${text}`);
   if (errors.length) throw new Error(errors.join('\n'));
