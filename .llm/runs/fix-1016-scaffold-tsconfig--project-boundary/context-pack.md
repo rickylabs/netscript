@@ -12,7 +12,7 @@
 
 ## Current State
 
-Baseline and proposed contents have been empirically tested. No implementation source has been changed. The run is stopped at the mandatory PLAN-EVAL gate.
+Baseline and proposed contents have been empirically tested. No implementation source has been changed. The run is stopped at the mandatory PLAN-EVAL gate because the local OpenRouter evaluator credential is unavailable.
 
 ## Completed
 
@@ -23,11 +23,11 @@ Baseline and proposed contents have been empirically tested. No implementation s
 
 ## In Progress
 
-- Separate-session PLAN-EVAL.
+- Separate-session PLAN-EVAL launch is blocked (`auth_required`).
 
 ## Next Steps
 
-1. Obtain PLAN-EVAL `PASS`.
+1. Obtain owner authorization for a permitted evaluator path, then obtain PLAN-EVAL `PASS`.
 2. Implement the single scaffold boundary slice.
 3. Run scoped gates, A/B, one-pass runtime gate, slice review, and IMPL-EVAL.
 
@@ -55,11 +55,11 @@ Baseline and proposed contents have been empirically tested. No implementation s
 
 ## Open Questions
 
-- None before PLAN-EVAL.
+- Choose between restoring the local OpenRouter credential or explicitly authorizing a cloud OpenHands Qwen evaluator fallback.
 
 ## Drift and Debt
 
-- Drift: Vite failure is request-time SSR, not startup-time.
+- Drift: Vite failure is request-time SSR, not startup-time; local formal evaluator credential is absent.
 - Debt: no new or deepened architecture debt.
 
 ## Commits

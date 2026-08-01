@@ -73,6 +73,7 @@ Start at `scaffold-files.ts`, then follow the root/app generator imports into `s
 | Gate | Command or check | Result | Notes |
 | --- | --- | --- | --- |
 | PLAN-EVAL | separate formal evaluator | NOT_RUN | Hard stop before implementation. |
+| Local evaluator canary | policy-bound Qwen/OpenRouter route | BLOCKED | Exit 4: credential absent; no cloud fallback inferred. |
 
 ### Fitness Gates
 
