@@ -2,12 +2,14 @@
 
 ## Status
 
-- Phase: Implement — slices 1 and 2 complete.
+- Phase: Gate — implementation slices complete; evaluation pending.
 - Branch/worktree clean at baseline before run artifacts.
 - Published 0.0.2 reproduction captured once in `.llm/tmp/issue-1010-clean-room-repro.log`.
 - PLAN-EVAL passed in a separate Claude Code + OpenRouter Qwen session before implementation.
 - Slice 1 implements manifest-driven authoritative generation; focused tests and targeted check pass.
 - Slice 2 delegates sync and proves non-empty workers/sagas/triggers canonical registries with the real generators.
+- Scoped check/lint/test/format, quality, JSR audit, and publish dry-run gates pass.
+- Full runtime raw exit 1: 44 pass, only unrelated users-service health timeout; all registry-specific gates pass.
 
 ## Root Cause
 
@@ -27,5 +29,6 @@
 
 ## Next
 
-1. Commit slice 2 locally.
-2. Run required gates once, separate IMPL-EVAL, final local commit; never push/open PR.
+1. Commit validation artifacts locally.
+2. Run ordinary opposite-family slice review and separate open-model IMPL-EVAL.
+3. Apply evaluator fixes if any, final local commit; never push/open PR.

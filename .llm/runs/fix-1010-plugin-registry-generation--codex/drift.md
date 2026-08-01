@@ -23,3 +23,12 @@ profile `claude-openrouter`, model `qwen/qwen3.7-max`, effort `high`. Closed-mod
 prohibited. OpenHands cannot be used without violating the owner's no-PR/no-upstream constraint.
 PLAN-EVAL therefore has no verdict and the implementation hard stop remains active pending an
 owner-authorized waiver or evaluator credential availability.
+
+## 2026-08-01 — minor — unrelated full-runtime service health timeout
+
+The required one-pass `scaffold.runtime` run passed 44 gates, including installed plugin generation,
+generated-workspace checking, workers/sagas/triggers process readiness, and worker registry behavior.
+Only `behavior.service-health` failed after 117796ms; `cleanup.aspire-stop` passed. This users-service
+health timeout is outside registry generation/sync context and occurred after every registry-specific
+gate had passed. Per the slice constraint, it is recorded without widening the diff or rerunning the
+expensive one-pass command.

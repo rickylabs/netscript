@@ -66,6 +66,7 @@ plugin-name registry.
 | 2026-08-01 | plan-eval | PASS           | Separate Claude Code + OpenRouter Qwen session completed PLAN-EVAL. All 8 Plan-Gate items checked. D3/D4 spot-checked against source — both confirmed. Verdict written to `plan-eval.md`. Implementation hard stop lifted. |
 | 2026-08-01 | slice 1   | implemented    | Added manifest-driven generation, project-configured subprocess execution, canonical target reporting, dry-run behavior, and named empty-runtime failure. |
 | 2026-08-01 | slice 2   | implemented    | `plugin sync` delegates to authoritative generation; CLI reference/embedded build skill updated; real workers/sagas/triggers generators emit and assert canonical non-empty exports. |
+| 2026-08-01 | slice 3   | validation     | All scoped/static/quality/JSR gates exited 0. Full runtime passed 44 gates; unrelated `behavior.service-health` timed out and raw command exited 1 after all registry-specific gates passed. |
 
 ## Decisions
 
@@ -91,18 +92,26 @@ plugin-name registry.
 | Slice 1 targeted check | targeted `deno check --unstable-kv` | PASS (exit 0) | Generator, command, and composition type-check. |
 | Slice 2 focused tests | `deno test -A packages/cli/src/public/features/generate/plugins/*_test.ts packages/cli/src/public/features/plugins/host/plugin-loader_test.ts` | PASS (exit 0) | 4 files, 6 steps; real official generators covered. |
 | Slice 2 targeted check | targeted `deno check --unstable-kv` | PASS (exit 0) | Sync adapter, composition, and integration test type-check. |
+| Required CLI check | scoped wrapper, `--root packages/cli --ext ts,tsx` | PASS (exit 0) | 747 files, 7 batches, 0 findings. |
+| Required plugin check | scoped wrapper, `--root packages/plugin --ext ts,tsx` | PASS (exit 0) | 153 files, 2 batches, 0 findings. |
+| Required CLI lint | scoped wrapper, `--root packages/cli --ext ts,tsx` | PASS (exit 0) | 747 files, 4 batches, 0 findings. |
+| Required targeted tests | `deno test -A packages/cli/src/public/features/generate packages/cli/src/public/features/plugins` | PASS (exit 0) | 26 groups, 62 steps, 0 failed. |
+| CLI format | scoped format wrapper | PASS (exit 0) | 747 files, 4 batches, 0 findings. |
 
 ### Fitness Gates
 
 | Gate      | Result  | Evidence                                                              | Notes                                                      |
 | --------- | ------- | --------------------------------------------------------------------- | ---------------------------------------------------------- |
 | Plan-Gate | PASS | Separate Qwen evaluator `plan-eval.md` | Hard stop lifted before source implementation. |
+| Code quality | `deno task quality:gate` | PASS (exit 0) | Scanner clean; doctrine checks report existing warnings only. |
+| CLI JSR audit | `audit-jsr-package.ts --root packages/cli --text` | PASS (exit 0) | Dry-run OK; 16 existing doctrine/slow-type warnings recorded. |
+| CLI publish dry-run | `deno publish --dry-run --allow-dirty --no-check=remote` | PASS (exit 0) | `Success Dry run complete`. |
 
 ### Runtime Gates
 
 | Gate               | Result  | Evidence                          | Notes                   |
 | ------------------ | ------- | --------------------------------- | ----------------------- |
-| `scaffold.runtime` | NOT_RUN | planned once after implementation | Required one-pass gate. |
+| `scaffold.runtime` | FAIL (raw exit 1) | `.llm/tmp/issue-1010-validation/scaffold-runtime.log` | 44 passed; only unrelated `behavior.service-health` timed out at 117796ms; cleanup passed. Registry generation/check/readiness/behavior gates passed. |
 
 ### Consumer Gates
 
@@ -114,3 +123,34 @@ plugin-name registry.
 
 - PLAN-EVAL should inspect D3/D4 carefully: generic installed-package discovery and project-rooted
   subprocess execution are the load-bearing decisions.
+
+## Raw Validation Output
+
+```text
+{"command":"deno check --quiet --unstable-kv <files>","selection":{"filesSelected":747,"batches":7,"failedBatches":0},"summary":{"totalOccurrences":0,"uniqueOccurrences":0,"uniqueCodes":0,"uniquePaths":0},"groups":[]}
+RAW_EXIT_CODE=0
+{"command":"deno check --quiet --unstable-kv <files>","selection":{"filesSelected":153,"batches":2,"failedBatches":0},"summary":{"totalOccurrences":0,"uniqueOccurrences":0,"uniqueCodes":0,"uniquePaths":0},"groups":[]}
+RAW_EXIT_CODE=0
+{"source":{"mode":"command","cwd":"/home/codex/repos/fix-1010","exitCode":0},"selection":{"filesSelected":747,"batches":4},"summary":{"totalOccurrences":0,"uniqueOccurrences":0,"uniqueRules":0,"uniquePaths":0},"groups":[]}
+RAW_EXIT_CODE=0
+ok | 26 passed (62 steps) | 0 failed
+RAW_EXIT_CODE=0
+{"command":"deno fmt --check","summary":{"filesSelected":747,"batches":4,"failedBatches":0,"findings":0,"ignoredFindings":0},"findings":[]}
+RAW_EXIT_CODE=0
+quality:gate: quality scan ok=true, findings=[]; doctrine FAIL=0 (existing WARN/INFO retained)
+RAW_EXIT_CODE=0
+JSR audit: # @netscript/cli@0.0.2; dry-run: OK; findings: 16 existing warnings
+RAW_EXIT_CODE=0
+Success Dry run complete
+RAW_EXIT_CODE=0
+generated.plugins-check: Generate plugin registries from discovered manifests — PASSED 1935ms
+generated.deno-check: Type-check generated workspaces — PASSED 38750ms
+runtime.wait.workers — PASSED 1615ms
+runtime.wait.sagas — PASSED 604ms
+runtime.wait.triggers — PASSED 580ms
+behavior.workers-jobs — PASSED 27ms
+behavior.service-health — FAILED 117796ms
+cleanup.aspire-stop — PASSED 378ms
+Summary: passed=44 failed=1
+RAW_EXIT_CODE=1
+```
