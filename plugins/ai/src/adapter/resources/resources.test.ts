@@ -72,6 +72,7 @@ Deno.test('ai scaffold emitters have focused golden content', () => {
   assertStringIncludes(byPath.get('ai/agents/assistant.ts') ?? '', 'createAgentLoop');
   assertStringIncludes(byPath.get('ai/agents/assistant.ts') ?? '', 'modelProvider');
   assertStringIncludes(byPath.get('ai/routes/chat-stream.ts') ?? '', 'aiContractV1');
+  assertStringIncludes(byPath.get('ai/routes/chat-stream.ts') ?? '', 'createAiRouter');
   assertStringIncludes(byPath.get('ai/routes/chat-stream.ts') ?? '', 'toNetScriptChatResponse');
   assertStringIncludes(byPath.get('ai/routes/chat.tsx') ?? '', 'createNetScriptChatConnection');
 });
@@ -95,6 +96,7 @@ Deno.test('ai stream route threads AbortSignal and exposes stop() (F-13)', () =>
   assertStringIncludes(source, 'loop.stop()');
   assertStringIncludes(source, "from '@netscript/plugin-ai-core'");
   assertStringIncludes(source, 'aiContractV1');
+  assertStringIncludes(source, 'createAiRouter(aiRouteImplementation)');
   assertStringIncludes(source, 'toNetScriptChatResponse');
 });
 
