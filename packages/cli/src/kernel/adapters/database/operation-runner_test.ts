@@ -7,6 +7,10 @@ import { assertEquals, assertRejects } from 'jsr:@std/assert@^1';
 import { describe, it } from 'jsr:@std/testing@^1/bdd';
 
 import { DbOperationRunner } from './operation-runner.ts';
+import type {
+  AppHostLifecycleLease,
+  AppHostLifecycleLock,
+} from './apphost-lifecycle-lock.ts';
 import type { DbOperationRequest, DiscoveredDatabase } from '../../domain/db-engine.ts';
 
 interface CommandOutput {
@@ -30,12 +34,14 @@ class FakeAspireExecutor {
   constructor(
     private readonly outputs: CommandOutput[] = [],
     private readonly spawnCodes: number[] = [],
+    private readonly events?: string[],
   ) {}
 
   output(
     args: readonly string[],
     options: RecordedCall['options'],
   ): Promise<CommandOutput> {
+    this.events?.push(`command:${args[0]}`);
     this.outputCalls.push({ args: [...args], options });
     const next = this.outputs.shift();
     if (!next) {
@@ -54,6 +60,23 @@ class FakeAspireExecutor {
       throw new Error(`Unexpected spawn() call: ${args.join(' ')}`);
     }
     return Promise.resolve(next);
+  }
+}
+
+class FakeAppHostLifecycleLock implements AppHostLifecycleLock {
+  constructor(
+    private readonly events: string[] = [],
+    private readonly releaseError?: Error,
+  ) {}
+
+  acquire(): Promise<AppHostLifecycleLease> {
+    this.events.push('lock:acquire');
+    return Promise.resolve({
+      release: () => {
+        this.events.push('lock:release');
+        return this.releaseError ? Promise.reject(this.releaseError) : Promise.resolve();
+      },
+    });
   }
 }
 
@@ -242,17 +265,37 @@ describe('DbOperationRunner', () => {
   });
 
   it('fails closed when the AppHost ownership probe is ambiguous', async () => {
+    const events: string[] = [];
     const executor = new FakeAspireExecutor([
       { code: 2, stdout: '', stderr: 'Dashboard connection failed.' },
-    ]);
+    ], [], events);
 
     await assertRejects(
-      () => createFastRunner(executor).execute(createRequest('status')),
+      () => createFastRunner(executor, new FakeAppHostLifecycleLock(events)).execute(
+        createRequest('status'),
+      ),
       Error,
       'aspire describe failed: Dashboard connection failed.',
     );
 
     assertEquals(commandNames(executor), ['describe']);
+    assertEquals(events, ['lock:acquire', 'command:describe', 'lock:release']);
+  });
+
+  it('does not let a lock release failure mask the operation error', async () => {
+    const executor = new FakeAspireExecutor([
+      { code: 2, stdout: '', stderr: 'Dashboard connection failed.' },
+    ]);
+
+    await assertRejects(
+      () =>
+        createFastRunner(
+          executor,
+          new FakeAppHostLifecycleLock([], new Error('release failed')),
+        ).execute(createRequest('status')),
+      Error,
+      'aspire describe failed: Dashboard connection failed.',
+    );
   });
 
   it('keeps studio interactive and passes db cli mode through environment variables', async () => {
@@ -278,9 +321,13 @@ describe('DbOperationRunner', () => {
   });
 });
 
-function createFastRunner(executor: FakeAspireExecutor): DbOperationRunner {
+function createFastRunner(
+  executor: FakeAspireExecutor,
+  lifecycleLock: AppHostLifecycleLock = new FakeAppHostLifecycleLock(),
+): DbOperationRunner {
   return new DbOperationRunner({
     executor,
+    lifecycleLock,
     pollIntervalMs: 0,
     timeoutMs: 100,
     sleep: async () => {},

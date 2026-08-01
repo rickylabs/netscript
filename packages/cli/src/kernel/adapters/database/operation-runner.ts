@@ -13,6 +13,11 @@ import { SCAFFOLD_DIRS } from '../../constants/scaffold/scaffold-dirs.ts';
 import { SCAFFOLD_FILES } from '../../constants/scaffold/scaffold-files.ts';
 import type { DbOperationRequest, DiscoveredDatabase } from '../../domain/db-engine.ts';
 import {
+  type AppHostLifecycleLock,
+  type AppHostLifecycleLease,
+  FileAppHostLifecycleLock,
+} from './apphost-lifecycle-lock.ts';
+import {
   type AspireCommandExecutor,
   type AspireCommandOptions,
   type CommandOutput,
@@ -32,6 +37,7 @@ const NO_RUNNING_APPHOST_MESSAGE = 'No AppHost is currently running';
 
 interface DbOperationRunnerOptions {
   readonly executor?: AspireCommandExecutor;
+  readonly lifecycleLock?: AppHostLifecycleLock;
   readonly pollIntervalMs?: number;
   readonly timeoutMs?: number;
   readonly sleep?: (ms: number) => Promise<void>;
@@ -40,12 +46,14 @@ interface DbOperationRunnerOptions {
 /** Executes database operations by delegating to Aspire AppHost CLI mode. */
 export class DbOperationRunner {
   private readonly executor: AspireCommandExecutor;
+  private readonly lifecycleLock: AppHostLifecycleLock;
   private readonly pollIntervalMs: number;
   private readonly timeoutMs: number;
   private readonly sleep: (ms: number) => Promise<void>;
 
   constructor(options: DbOperationRunnerOptions = {}) {
     this.executor = options.executor ?? new DenoAspireCommandExecutor();
+    this.lifecycleLock = options.lifecycleLock ?? new FileAppHostLifecycleLock();
     this.pollIntervalMs = options.pollIntervalMs ?? DEFAULT_POLL_INTERVAL_MS;
     this.timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS;
     this.sleep = options.sleep ??
@@ -125,34 +133,56 @@ export class DbOperationRunner {
   ): Promise<number> {
     const displayName = buildExecutableDisplayName(operation, configKey);
     outputText(`Starting db ${operation} for ${configKey}...`);
-    const startedByInvocation = !(await this.hasRunningAppHost(apphostPath, aspireDir));
-
-    await this.runAspire(
-      buildAspireArgs('start', apphostPath),
-      { cwd: aspireDir, env },
-    );
+    const lease = await this.lifecycleLock.acquire(apphostPath, {
+      timeoutMs: this.timeoutMs,
+      pollIntervalMs: this.pollIntervalMs,
+      sleep: this.sleep,
+    });
 
     try {
-      const code = await this.waitForExecutableCompletion(
-        operation,
-        configKey,
-        apphostPath,
-        aspireDir,
+      const startedByInvocation = !(await this.hasRunningAppHost(apphostPath, aspireDir));
+
+      await this.runAspire(
+        buildAspireArgs('start', apphostPath),
+        { cwd: aspireDir, env },
       );
 
-      await this.printResourceLogs(displayName, apphostPath, aspireDir);
+      try {
+        const code = await this.waitForExecutableCompletion(
+          operation,
+          configKey,
+          apphostPath,
+          aspireDir,
+        );
 
-      if (code === 0) {
-        outputText(`db ${operation} completed successfully.`);
-      } else {
-        outputError(`db ${operation} failed with exit code ${code}.`);
+        await this.printResourceLogs(displayName, apphostPath, aspireDir);
+
+        if (code === 0) {
+          outputText(`db ${operation} completed successfully.`);
+        } else {
+          outputError(`db ${operation} failed with exit code ${code}.`);
+        }
+
+        return code;
+      } finally {
+        if (startedByInvocation) {
+          await this.stopDetached(apphostPath, aspireDir);
+        }
       }
-
-      return code;
     } finally {
-      if (startedByInvocation) {
-        await this.stopDetached(apphostPath, aspireDir);
-      }
+      await this.releaseLease(lease, apphostPath);
+    }
+  }
+
+  private async releaseLease(lease: AppHostLifecycleLease, apphostPath: string): Promise<void> {
+    try {
+      await lease.release();
+    } catch (error) {
+      outputWarning(
+        `Failed to release database AppHost lifecycle lock for ${apphostPath}: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+      );
     }
   }
 

@@ -105,3 +105,33 @@ coupling entries remain unchanged.
 - Defer unique generated DB-operation identity and a live AppHost PID fixture.
 - Log significant drift if `aspire start` itself is proven to retire the resident instance even
   when `stop` is suppressed; that would require template/backchannel rescope.
+
+## 2026-08-01 Review Remediation Plan — Supervisor Approved
+
+The owner waived the unavailable open-model Plan-Gate and directed the supervisor to approve this
+bounded remediation plan. No `plan-eval.md` is created or implied.
+
+### Locked slices
+
+| Slice | Decision | Proof | Files |
+| --- | --- | --- | --- |
+| S1 | Serialize probe → start → poll → logs → cleanup with an injected inter-process lease. The default lock uses atomic `Deno.open({ createNew: true })`, records pid/time/token, reclaims dead/expired holders, sleeps through the runner seam, and never masks the operation error on release. | Database adapter tests including ordering, dead-pid reclaim, and thrown-operation release. | `apphost-lifecycle-lock.ts`, its test, `operation-runner.ts`, `operation-runner_test.ts`, run artifacts |
+| S2 | Classify only a line-start Aspire no-running diagnostic, allowing whitespace/`error:` prefix; include numeric exit codes for probe and command failures. | Direct helper tests plus exact runner error assertions. | `operation-runner-helpers.ts`, helper test, runner/test |
+| S3 | Cover resident AppHost plus non-zero DB status with no stop. | Exact executor sequence test. | `operation-runner_test.ts` |
+| S4 | Add a `scaffold.runtime` gate that reuses start metadata/AppHost, runs local `db status`, then requires the original pid and `aspire describe` identity to survive. Land only if the canonical full runtime suite is deterministic and green. | `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` exit 0. | E2E gate constant, runtime gate, focused script, run artifacts |
+
+### Lock location decision
+
+Use `<project>/aspire/.aspire/netscript-db-<sha256(apphostPath)>.lock`.
+`SCAFFOLD_DIRS.ASPIRE_GENERATED` already defines `.aspire`, and
+`packages/cli/src/kernel/assets/workspace/gitignore.template` already ignores `.aspire/`. The hash
+keys the advisory lock to the normalized AppHost path without inventing a top-level directory.
+
+### Risks and stop conditions
+
+- Active leases older than `timeoutMs` are reclaimable by design so a wedged process cannot brick
+  the project; lease tokens prevent an old holder from deleting a replacement lease.
+- Invalid lock contents are reclaimed only after filesystem age exceeds `timeoutMs`.
+- S4 stops without a claimed pass if `db status`, pid survival, or describe identity cannot be made
+  deterministic in the existing suite. Box 1 remains unmet regardless because project identity is
+  unchanged.

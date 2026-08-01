@@ -46,6 +46,25 @@
 Lifecycle changes start in `operation-runner.ts`; extend `FakeAspireExecutor` scenarios in the
 adjacent test and assert exact Aspire commands before changing cleanup authority.
 
+### Review Remediation Design — 2026-08-01
+
+- **Public surface:** unchanged; all new contracts remain inside the database adapter folder and
+  the E2E-only gate surface.
+- **Domain vocabulary:** `AppHostLifecycleLock`, `AppHostLifecycleLease`, `LockRecord`, and
+  `AspireAppHostAbsence` classification.
+- **Ports/seams:** inject `AppHostLifecycleLock` through `DbOperationRunnerOptions`; the default
+  file adapter owns `Deno.open`, pid liveness, timestamps, stale recovery, and removal.
+- **Constants:** use `SCAFFOLD_DIRS.ASPIRE_GENERATED` for the already-ignored `.aspire` lock home;
+  add one stable E2E gate id for resident DB lifecycle.
+- **Slices:** S1 lock/race; S2–S3 probe diagnostics and coverage; S4 live gate; final gate/review
+  artifact slice. Each slice gets its own commit and includes run-artifact progress.
+- **Deferred:** distinct DB-operation identity/backchannel remains outside this review remediation;
+  acceptance box 1 stays unticked.
+
+Lock location evidence: the generated gitignore contains `.aspire/`, and the scaffold constants
+define `ASPIRE_GENERATED: '.aspire'`. Selected path:
+`aspire/.aspire/netscript-db-<sha256(normalized-apphost-path)>.lock`.
+
 ## Progress Log
 
 | Time | Slice | Step | Notes |
@@ -57,6 +76,10 @@ adjacent test and assert exact Aspire commands before changing cleanup authority
 | 2026-08-01 | slice 1 | targeted gate | First run exited 1 on a fixture typo; second exited 1 on a stale poll-count expectation; final run passed 4 modules / 14 steps. |
 | 2026-08-01 | slice 1 | supervisor review | Full diff approved: ownership fails closed, resident path has no stop, owned failure cleans up, studio is unchanged, and there is no cast/ignore/template/lock churn. |
 | 2026-08-01 | slice 1 | reconcile | Issue #1011 remains open; PR #1027 retains `Closes #1011`, milestone 0.0.3, required taxonomy, and draft state. No rescope or debt change. |
+| 2026-08-01 | review remediation | supervisor plan approval | Owner-waived evaluator; supervisor approved S1–S4 plan above. No formal PASS or `plan-eval.md` claimed. |
+| 2026-08-01 | review remediation | research | Verified all four review findings, `.aspire/` gitignore coverage, injected-lock boundary, and existing `aspire-start.json` runtime metadata seam. |
+| 2026-08-01 | remediation S1 | implementation | Added injected file/fake lifecycle lock, atomic create, pid/time/token record, dead/expired recovery, full detached-lifecycle lease, and non-masking release warning. |
+| 2026-08-01 | remediation S1 | supervisor review | Focused tests passed 5 modules / 15 steps; corrected partial-write cleanup to close the handle before removal for Windows compatibility. |
 
 ## Gate Results
 

@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `fix-1011-db-apphost-lifecycle--codex` |
 | Branch | `fix/1011-db-apphost-lifecycle` |
-| Current phase | `gate` |
+| Current phase | `implement — review remediation` |
 | Archetype | `6 — CLI / Tooling` |
 | Scope overlays | none |
 
@@ -19,6 +19,9 @@ explicitly approved D1–D4 and waived PLAN-EVAL due to the external evaluator o
 fabricated verdict artifact. Slice 1 is implemented and all valid targeted, scoped, and harness
 gates pass. The requested check spelling used an unsupported wrapper argument; the supported
 equivalent passed and confirms `--unstable-kv` is enabled internally.
+Augment review identified an ownership race, unsafe absence substring matching, missing exit-code
+diagnostics, and missing resident+failure coverage. The owner directed S1–S4 remediation and waived
+formal evaluation; the supervisor-approved appended plan is now active.
 
 ## Completed
 
@@ -32,12 +35,14 @@ equivalent passed and confirms `--unstable-kv` is enabled internally.
 
 ## In Progress
 
-- Sign-off commit, push, and PR #1027 implementation update.
+- S1 inter-process lifecycle lease, followed by S2/S3 probe hardening and S4 live gate attempt.
 
 ## Next Steps
 
-1. Commit and push the reviewed slice.
-2. Update PR #1027 body, labels, and implementation evidence while leaving it draft.
+1. Land S1 lock adapter and tests as a logical local commit.
+2. Land S2/S3 probe hardening and coverage as a logical local commit.
+3. Attempt S4 in the canonical runtime suite; record green evidence or an honest blocker.
+4. Run all scoped/framework gates, update local PR-body handoff, and do not push.
 
 ## Key Decisions
 
@@ -64,7 +69,8 @@ equivalent passed and confirms `--unstable-kv` is enabled internally.
 
 ## Open Questions
 
-- None.
+- S4 remains conditional on the already-running isolated AppHost exposing stable pid/describe
+  identity across local `db status`; the full runtime suite is the authority.
 
 ## Drift and Debt
 
