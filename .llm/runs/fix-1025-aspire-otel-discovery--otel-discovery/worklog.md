@@ -69,4 +69,5 @@ to the commands that consume it. Agent-facing recovery starts at the literal err
 
 ## Gate Results
 
-- Pending PLAN-EVAL.
+- PLAN-EVAL launch: BLOCKED before launch. Live provider canary reported absent OpenRouter
+  credential (`auth_required`) for the canonical Qwen evaluator route. No implementation started.

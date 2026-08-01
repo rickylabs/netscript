@@ -21,7 +21,9 @@
 - Match the exact isolated AppHost path in `aspire ps` JSON, pass only `--dashboard-url`, and assert
   non-empty trace JSON plus a non-empty export zip in the existing E2E harness.
 
-## Next action
+## Blocker / next action
 
-Commit the bootstrap artifacts, open the draft PR, then launch separate open-model PLAN-EVAL. No
-implementation before PASS.
+- Draft PR #1036 is open and the bootstrap commit is pushed.
+- The canonical local Qwen PLAN-EVAL route is blocked by an absent OpenRouter credential.
+- Await owner direction: configure the credential, authorize another policy-compliant evaluator
+  transport, or explicitly waive the Plan-Gate. No implementation has begun.
