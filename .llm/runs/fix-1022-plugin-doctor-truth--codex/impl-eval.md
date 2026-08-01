@@ -127,3 +127,62 @@ Evaluator: Opus 5 supervisor (owner-waived open-model lane, 2026-08-01)
 PASS on the scope actually claimed (issue boxes 1, 2, 3, 7). **Partial against #1022** — the PR
 stays a draft for human review because of the deferred AppHost boxes and the in-process import
 behaviour change.
+
+---
+
+# IMPL-EVAL round 3 verdict — head `b944f7d38`
+
+Evaluator: Opus 5 supervisor (owner-waived open-model lane, 2026-08-01)
+
+## The round-3 blocking finding is fixed, and it mattered
+
+Round 2 shipped a doctor that, on a real scaffolded project, printed exactly one row —
+`workspace error: Could not resolve plugin manifests. Import "zod" not a dependency …` — because the
+loader swap imported the project's plugin graph. CI (`scaffold.plugins` → `behavior.plugins-health`)
+caught it; I reproduced it locally before writing the finding.
+
+Verified on `b944f7d38` by re-running `deno task e2e:cli run scaffold.plugins`. Doctor now renders
+every plugin and fails for the real reason:
+
+```
+workers  error  generated job registry exists       Missing .netscript/generated/plugin-workers/job-registry.ts. Run: netscript generate plugins
+workers  error  generated job registry is non-empty No generated jobs are registered. …
+sagas    error  generated saga registry exists      Missing … Run: netscript plugin sagas generate-registry
+triggers/streams/auth/ai  healthy/warning rows still render
+Plugin doctor failed: workers, sagas. Follow the remediation commands above.
+```
+
+That is the discoverability bar met: `generate plugins` printed `0 written` (issue #1010, unfixed on
+`main`) and the doctor named it with a runnable remediation instead of a zod stack trace or a green
+lie.
+
+## Gates re-run by the supervisor on `b944f7d38`
+
+- `run-deno-check` — cli 743 / plugin 153 / workers 99 / sagas 72 files, 0 diagnostics
+- `deno lint`, `deno fmt --check` over cli src + e2e src + plugin src + workers + sagas — exit 0
+- `deno test` over `features/plugins`, `kernel/adapters/config`, workers/sagas adapter tests —
+  55 passed, 0 failed
+- `deno task quality:gate` — exit 0
+- `e2e:cli run scaffold.plugins` — 12 passed, 1 failed: `behavior.plugins-health`, which asserts
+  exit 0 and now meets a truthful non-zero exit
+
+## Why this stays a draft for a human
+
+1. **CI stays red on the scaffold e2e lanes.** `behavior.plugins-health` encodes the pre-#1022
+   assumption that `plugin doctor` exits 0 on a scaffolded project. It does not, and should not,
+   while #1010 leaves that project with zero registries. Weakening the doctor to green the lane
+   would undo this PR. A human must choose: land #1010 first, change the gate to assert report
+   content, or accept a known-red lane.
+2. **Scope creep into the e2e install matrix.** `plugin-install-gates.ts` now routes every
+   non-JSR `packageSource` through `--local-path` and drops `--ci` from the userland-install
+   invocation. That changes what the scaffold lanes actually exercise; it is outside #1022 and
+   should be reviewed on its own merits.
+3. **New public-ish surface.** `officialSource.doctorEntrypoint` in `scaffold.plugin.json`, new
+   `plugins/{workers,sagas}/doctor.ts` exports, and `installPlugin` now writing
+   `scaffold.plugin.json` into the project are a manifest-contract change, not just a fix.
+4. Acceptance boxes 4, 5 and 6 remain unmet (live AppHost truth; production Zod field errors).
+
+## Verdict
+
+PASS on the implementation. **Not ready for merge** — `draft_needs_human` for the four reasons
+above.
