@@ -36,7 +36,7 @@
     "@orpc/zod": "npm:@orpc/zod@^1.14.6",
     "@tanstack/db": "npm:@tanstack/db@^0.6.8",
     "@tanstack/query-core": "npm:@tanstack/query-core@^5.101.0",
-    "@tanstack/query-db-collection": "npm:@tanstack/query-db-collection@^1.0.40"
+    "@tanstack/query-db-collection": "npm:@tanstack/query-db-collection@^1.2.1"
   },
   "publish": {
     "include": [

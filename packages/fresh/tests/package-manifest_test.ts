@@ -1,12 +1,5 @@
 import { assertEquals } from '@std/assert';
-
-const runtimeCatalogDependencies = [
-  '@preact/signals',
-  '@tanstack/preact-query',
-  '@tanstack/query-core',
-  '@tanstack/react-db',
-  'vite',
-] as const;
+import { runtimeCatalogDependencies } from './runtime-catalog-dependencies.ts';
 
 Deno.test('published manifest declares every catalog-backed Fresh runtime dependency', async () => {
   const manifest = JSON.parse(
