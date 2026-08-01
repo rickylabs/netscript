@@ -2,7 +2,7 @@
 
 ## Current state
 
-- Phase: Plan-Gate blocked on local evaluator authentication.
+- Phase: PLAN-EVAL cycle-1 remediation complete; implementation authorized by owner.
 - Branch/base: `fix/1015-sagas-registry-path` at `3ab64720f` from `origin/main`.
 - Root cause verified exactly as supplied: service init and runner fallback anchor registry paths to
   package `import.meta.url`; Aspire never supplies the env seam; generated glue is already correct.
@@ -10,8 +10,7 @@
 
 ## Next action
 
-Authenticate the `claude-openrouter` evaluator profile, then rerun
-`plan-eval-prompt.md` with the bound Qwen route. Session
-`5e52c824-93f1-49ef-80ae-12fcd8a4c1e8` failed before a model turn with `Not logged in` and zero
-token/cost usage. Implementation may begin only after `PASS`; OpenHands is not an allowed fallback
-for this local run.
+Implement the four commit slices in the amended plan. Do not retry OpenRouter/Qwen and do not
+dispatch OpenHands. The owner waived that route for the 0.0.3 fix train; Opus 5 is the separate
+evaluator. Preserve the honesty boundary: the injected-importer test is dependency-shaped evidence,
+not a real published JSR install.

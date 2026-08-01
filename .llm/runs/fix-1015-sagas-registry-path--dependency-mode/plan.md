@@ -70,6 +70,16 @@ module location.
 | --- | --- | --- |
 | Public export for resolver | safe to defer | Not required while glue remains unchanged; internal imports suffice. |
 | Aspire entrypoints | safe to defer | Explicitly out of scope even if dependency mode exposes a separate defect. |
+| Canonical project-root resolver home (`packages/plugin` vs per-plugin) | safe to defer | Hoisting the policy would add or change a shared public surface and touch sagas, workers, and triggers; that is outside a fixes-only 0.0.3 change. |
+
+## Commit Slices
+
+| Order | Slice and proof obligation | Proving gate | Files |
+| --- | --- | --- | --- |
+| 1 | Shared resolver proves explicit → env → project-root precedence, absolute-specifier preservation, and Windows drive/backslash handling through injected env/cwd seams. | focused resolver unit tests | `plugins/sagas/src/runtime/project-registry-module.ts`, focused test under `plugins/sagas/tests/runtime/`, run artifacts |
+| 2 | Runner proves its fallback resolves to an absolute consumer-project URL and a dependency-shaped importer loads non-empty saga definitions without package-relative anchoring. | focused `startSagaRunner` test + scoped check | `plugins/sagas/src/runtime/saga-runner.ts`, runner test under `plugins/sagas/tests/runtime/`, run artifacts |
+| 3 | API initialization proves explicit/env/fallback precedence through the same resolver and importer seam, registering non-empty definitions. | focused `registerSagas` test + scoped check | `plugins/sagas/services/src/init.ts`, service test under `plugins/sagas/tests/services/`, run artifacts |
+| 4 | Aspire contribution declares the absolute project-owned URL for future consumers, while documentation and final gates distinguish that declaration from the load-bearing runtime fallback. | Aspire contribution test + complete requested validation | `plugins/sagas/src/aspire/sagas-contribution.ts`, `plugins/sagas/tests/aspire/sagas-contribution_test.ts`, run artifacts |
 
 ## Risk Register
 
@@ -94,15 +104,16 @@ module location.
 | --- | --- | --- |
 | F-3/F-5 | yes | scoped check plus review of internal/public surface |
 | F-6/F-7 | yes | JSR audit shows no export-map change; doc-lint/publish risks unchanged |
-| F-9 | yes | Aspire env test asserts `SAGAS_REGISTRY_MODULE` |
+| F-9 | yes | Aspire env test asserts a forward-looking `SAGAS_REGISTRY_MODULE` declaration; `declareEnv` currently has no production caller and is not acceptance evidence. |
 | F-10/F-13 | yes | dependency-mode runtime tests load non-empty definitions |
 | F-19 | yes | scoped wrapper evidence |
+| Acceptance 1 runtime path | yes | Resolver tests prove the load-bearing fallback derives an absolute project URL from `NETSCRIPT_PROJECT_ROOT ?? Deno.cwd()`. |
 
 ## Arch-Debt Implications
 
 | Entry | Action | Notes |
 | --- | --- | --- |
-| `.llm/harness/debt/arch-debt.md` | none | Existing sagas idempotency debt is unrelated; no new violation planned. |
+| `.llm/harness/debt/arch-debt.md` | note/defer | `projectFileUrl` is duplicated in sagas, workers, and triggers glue. A canonical shared home would alter `packages/plugin` public surface and is deferred beyond this fixes-only milestone; do not deepen it beyond the sagas runtime resolver required here. |
 
 ## Validation Plan
 
