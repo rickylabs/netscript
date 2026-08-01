@@ -27,6 +27,8 @@ three-valued, path-segment-safe, identity-pair-safe, fail-closed, and guarded ag
 - Slice 6 dry-run-default teardown, per-resource apply, immediate label re-verification, and forbidden-command guard.
 - Slice 7 `agentic:leak-check`/`agentic:teardown` tasks and tooling index entries.
 - Slice 8 pure `enforceTeardown` plus DONE-branch leak-check → teardown → re-check wiring.
+- Supervisor A1 review fix: foreign/unproven Docker resources derive report-only age from probed
+  `Created`; ownership and actionability are unchanged.
 
 ## In Progress
 

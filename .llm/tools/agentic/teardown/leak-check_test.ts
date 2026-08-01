@@ -47,3 +47,20 @@ Deno.test('owned registry survivor reports age, staleness, and exact scoped comm
     "aspire stop --apphost '/elsewhere/apphost.mts' --non-interactive --nologo",
   );
 });
+
+Deno.test('foreign resource can be stale from probed creation time without registry evidence', () => {
+  const registry = emptyRunResources('/home/codex/repos/fix-1046');
+  const report = buildLeakReport(
+    [{
+      kind: 'container',
+      id: 'foreign-old',
+      mountSource: '/home/codex/repos/fix-1025/.data/postgres',
+      createdAt: '2026-08-01T20:00:00Z',
+    }],
+    registry,
+    registry.worktreeRoot,
+    Date.parse('2026-08-02T00:00:00Z'),
+  );
+  assertEquals(report.survivors[0].ownership, 'foreign');
+  assertEquals(report.survivors[0].stale, true);
+});

@@ -56,6 +56,12 @@ function registeredStart(
   )?.startedAt;
 }
 
+function parseTimestamp(value: string | undefined): number {
+  if (!value) return Number.NaN;
+  // Docker emits RFC3339Nano; JavaScript Date accepts millisecond precision reliably.
+  return Date.parse(value.replace(/\.(\d{3})\d+(Z|[+-]\d\d:\d\d)$/, '.$1$2'));
+}
+
 /** Converts all survivors, including unknown-owner resources, into a deterministic report. */
 export function buildLeakReport(
   resources: readonly ResourceCandidate[],
@@ -69,8 +75,8 @@ export function buildLeakReport(
     generatedAt: new Date(nowMs).toISOString(),
     worktreeRoot,
     survivors: resources.map((resource) => {
-      const startedAt = registeredStart(resource, registry);
-      const parsedStart = startedAt ? Date.parse(startedAt) : Number.NaN;
+      const startedAt = registeredStart(resource, registry) ?? resource.createdAt;
+      const parsedStart = parseTimestamp(startedAt);
       const ageMs = Number.isFinite(parsedStart) ? Math.max(0, nowMs - parsedStart) : null;
       return {
         kind: resource.kind,

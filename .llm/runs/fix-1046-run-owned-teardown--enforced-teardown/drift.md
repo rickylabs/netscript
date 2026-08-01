@@ -12,3 +12,15 @@
 - **Severity:** minor
 - **Action:** fix
 - **Evidence:** slice 1 commit adds the missing artifacts before slice 2 begins.
+
+## 2026-08-02 — Foreign staleness needed probed creation time
+
+- **What:** The initial reporter derived age only from this run's registry, leaving foreign and
+  unproven resources with unknown age even when Docker exposed `Created`.
+- **Source:** Supervisor Amendment A1 live review after slice 7.
+- **Expected:** Staleness reporting applies to every survivor without changing actionability.
+- **Actual:** Ownership/reporting were correct, but staleness was inert outside the current registry.
+- **Severity:** minor
+- **Action:** fix
+- **Evidence:** red-first test plus Docker RFC3339Nano creation-time fallback; live report now shows
+  non-null ages for foreign and unproven containers.

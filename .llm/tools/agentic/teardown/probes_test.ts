@@ -41,6 +41,7 @@ Deno.test('observed Aspire 13.4.6 shapes normalize behind ports', async () => {
     creatorPid: 45429,
     creatorProcessStartTime: '0001-01-01T00:19:04.220Z',
     mountSource: '/home/codex/repos/fix-1011/.data/postgres',
+    createdAt: '2026-08-01T21:58:00.000000000Z',
   });
 });
 

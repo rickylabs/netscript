@@ -2,6 +2,7 @@
   {
     "Id": "6bdea913000000000000000000000000",
     "Name": "/postgres-6bdea913",
+    "Created": "2026-08-01T21:58:00.000000000Z",
     "Config": {
       "Labels": {
         "com.microsoft.developer.usvc-dev.name": "postgres-6bdea913",

@@ -7,6 +7,8 @@ export interface AppHostCandidate {
   readonly appHostPath: string;
   readonly appHostPid?: number;
   readonly appHostStartedAt?: string;
+  /** Wall-clock creation timestamp from the read-only probe, when exposed. */
+  readonly createdAt?: string;
   readonly commandLine?: string;
 }
 
@@ -18,6 +20,8 @@ export interface ContainerCandidate {
   readonly creatorProcessStartTime?: string;
   /** Realpath-resolved `src=` from Aspire's mounts label, when parseable. */
   readonly mountSource?: string;
+  /** Wall-clock creation timestamp from Docker inspect, when exposed. */
+  readonly createdAt?: string;
   readonly commandLine?: string;
 }
 

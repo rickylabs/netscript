@@ -15,6 +15,7 @@ interface AspireRow {
 interface DockerInspectRow {
   readonly Id?: unknown;
   readonly Name?: unknown;
+  readonly Created?: unknown;
   readonly Config?: { readonly Labels?: Record<string, string> | null };
 }
 
@@ -98,6 +99,7 @@ async function probeContainers(commands: CommandPort, files: FilePort, timeoutMs
       creatorPid: Number.isInteger(parsedPid) ? parsedPid : undefined,
       creatorProcessStartTime: labels[ASPIRE_CREATOR_STARTED],
       mountSource: await resolvedPath(rawMount, files),
+      createdAt: typeof row.Created === 'string' ? row.Created : undefined,
     });
   }
   return candidates;
@@ -138,5 +140,6 @@ export async function probeContainer(
     creatorPid,
     creatorProcessStartTime: labels[ASPIRE_CREATOR_STARTED],
     mountSource: await resolvedPath(parseMountSource(labels[ASPIRE_MOUNTS]), files),
+    createdAt: typeof row.Created === 'string' ? row.Created : undefined,
   };
 }
