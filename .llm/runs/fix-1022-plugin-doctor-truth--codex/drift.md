@@ -19,3 +19,13 @@
 - **Action:** defer
 - **Evidence:** `packages/cli/src/kernel/adapters/config/project-config-loader.ts`; acceptance box 5
   remains unticked in PR #1045.
+
+## 2026-08-01 — workers has two registry generator shapes
+
+- **What:** The first implementation recognized only `compileWorkersRegistry` namespace imports;
+  `generateRuntimeRegistries` emits default imports and direct map entries at the same path.
+- **Expected:** One canonical generated registry syntax.
+- **Actual:** Two syntaxes satisfy the same runtime loader contract.
+- **Severity:** significant
+- **Action:** fix
+- **Evidence:** Opus 5 IMPL-EVAL; positive tests cover both real shapes.

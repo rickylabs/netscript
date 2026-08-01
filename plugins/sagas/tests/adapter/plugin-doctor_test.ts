@@ -23,3 +23,34 @@ Deno.test('sagas doctor errors with a remediation when the saga registry is abse
     'netscript plugin sagas generate-registry',
   );
 });
+
+Deno.test('sagas doctor accepts the registry shape shared by both generation paths', async () => {
+  const source = `
+import * as saga0 from './checkout.saga.ts';
+const entries = [
+  [resolveSagaDefinition(saga0, './checkout.saga.ts').id, resolveSagaDefinition(saga0, './checkout.saga.ts')],
+];
+export const sagaRegistry = new Map(entries);
+export const registry = sagaRegistry;
+`;
+  const report = await runDoctorCommand({
+    plugin: sagasAdapterPlugin,
+    context: {
+      workspaceRoot: '/workspace',
+      options: {},
+      config: { SAGAS_API_URL: 'configured' },
+      dryRun: true,
+      fileSystem: {
+        exists: () => Promise.resolve(true),
+        readText: () => Promise.resolve(source),
+        writeText: () => Promise.reject(new Error('read only')),
+      },
+    },
+  });
+  assertEquals(
+    report.checks.filter((check) =>
+      check.name.startsWith('generated') || check.name.startsWith('every')
+    ).every((check) => check.ok),
+    true,
+  );
+});

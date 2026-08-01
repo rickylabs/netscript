@@ -79,3 +79,20 @@ Draft PR #1045 carries `Closes #1022`, milestone 0.0.3, `type:fix`, `area:cli`, 
 `priority:p1`, and exactly one lifecycle label (`status:impl`). Acceptance boxes 4, 5, and 6 remain
 unticked; 4/6 are owner-deferred AppHost work, and 5 is blocked by the existing child-loader error
 transport rather than misrepresented as complete.
+
+### IMPL-EVAL correction
+
+- Fixed the blocking false-red for workers registries emitted by `netscript generate plugins`.
+  The predicate now recognizes both the runtime generator's default-import/direct-map shape and the
+  compile-registry namespace-import/handler-resolver shape; positive tests cover both.
+- Sagas has one writer shape: `generate-runtime-registries.ts` delegates to `generateSagaRegistry`,
+  so both command paths share the same namespace-import and `resolveSagaDefinition` output. A
+  positive doctor test covers it.
+- The default host loader intentionally changed from metadata-only loading to manifest loading.
+  This imports plugin modules so `contributions.doctor` is available. Import failures are caught by
+  the manifest-resolution boundary and become a workspace `error` report rather than escaping.
+- Passing `cli` through `normalizePluginManifest` revives the previously dropped auth doctor hook;
+  retained as a small drive-by correctness fix.
+- Known risk: source `.ts` doctor modules resolve in local/copied-source plugins. Published/compiled
+  binary resolution needs a production-package smoke in a follow-up; record as debt before claiming
+  published-binary parity.
