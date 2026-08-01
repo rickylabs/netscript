@@ -1,6 +1,6 @@
 {
   "name": "@netscript/cli-e2e",
-  "version": "0.0.2",
+  "version": "0.0.2-canary.6",
   "exports": {
     ".": "./mod.ts"
   },
