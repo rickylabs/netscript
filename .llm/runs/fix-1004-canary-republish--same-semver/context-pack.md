@@ -12,7 +12,7 @@
 
 ## Current State
 
-Research confirms issue #1004's diagnosis against current `origin/main`. The plan and Design checkpoint are ready for separate-session PLAN-EVAL; no implementation files have changed.
+Research confirms issue #1004's diagnosis against current `origin/main`. The plan and Design checkpoint are ready, but the canonical local PLAN-EVAL route is blocked by a missing OpenRouter credential; no implementation files have changed.
 
 ## Completed
 
@@ -23,20 +23,19 @@ Research confirms issue #1004's diagnosis against current `origin/main`. The pla
 
 ## In Progress
 
-- PLAN-EVAL and opening draft PR.
+- Owner direction on the unavailable local evaluator route.
 
 ## Next Steps
 
-1. Commit/push plan artifacts and open the draft PR.
-2. Run separate open-model PLAN-EVAL.
-3. Implement only after PASS.
+1. Make the local OpenRouter evaluator credential available, or explicitly authorize a harness route exception/waiver.
+2. Run separate PLAN-EVAL.
+3. Implement only after PASS or a written owner waiver.
 
 ## Drift and Debt
 
-- Drift: none.
+- Drift: canonical local evaluator route blocked by missing credential.
 - Debt: none.
 
 ## Commits
 
 - See the draft PR's commit list + per-slice PR comments.
-
