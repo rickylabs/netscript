@@ -49,6 +49,7 @@ Change the shipped fragment, regenerate Prisma 7.8 types to confirm the input ke
 | Time | Slice | Step | Notes |
 | --- | --- | --- | --- |
 | 2026-08-01 | plan | research | Prisma 7.8 generated the reported named selector; lock churn removed. |
+| 2026-08-01 | plan-eval | launch | Canonical Qwen route blocked: OpenRouter credential absent; product implementation remains stopped. |
 
 ## Decisions
 
@@ -60,7 +61,7 @@ Change the shipped fragment, regenerate Prisma 7.8 types to confirm the input ke
 
 | Drift | Severity | Logged in drift.md |
 | --- | --- | --- |
-| none | minor | no |
+| Local formal-evaluator credential unavailable | significant | yes |
 
 ## Gate Results
 
@@ -68,4 +69,5 @@ All implementation gates are `NOT_RUN` until PLAN-EVAL passes.
 
 ## Handoff Notes
 
-- PLAN-EVAL should spot-check generated `SagaRuntimeCorrelationWhereUniqueInput` evidence and the decision not to touch the latent transition selector.
+- PLAN-EVAL is blocked until the canonical open-model route is credentialed or the owner explicitly
+  authorizes a compliant fallback. Product code remains untouched.

@@ -12,7 +12,7 @@
 
 ## Current State
 
-Research and design are locked. Prisma 7.8 generation from a wrapper containing the shipped fragment verbatim confirmed the issue cause exactly. No product implementation has begun.
+Research and design are locked. Prisma 7.8 generation from a wrapper containing the shipped fragment verbatim confirmed the issue cause exactly. No product implementation has begun. The canonical separate-session PLAN-EVAL is blocked because the OpenRouter credential is absent.
 
 ## Completed
 
@@ -22,11 +22,11 @@ Research and design are locked. Prisma 7.8 generation from a wrapper containing 
 
 ## In Progress
 
-- Separate-session PLAN-EVAL.
+- Separate-session PLAN-EVAL launch blocked on provider credential / owner-authorized compliant fallback.
 
 ## Next Steps
 
-1. Obtain PLAN-EVAL PASS.
+1. Restore the canonical local evaluator credential or obtain owner direction for a compliant fallback, then obtain PLAN-EVAL PASS.
 2. Open/advance the draft PR and implement slice 1.
 3. Run live Postgres round-trip and scoped gates.
 
@@ -57,7 +57,7 @@ Research and design are locked. Prisma 7.8 generation from a wrapper containing 
 
 ## Drift and Debt
 
-- Drift: none.
+- Drift: canonical PLAN-EVAL route blocked by missing credential; invalid owner-waiver artifact rejected.
 - Debt: none new or deepened.
 
 ## Commits
