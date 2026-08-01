@@ -74,6 +74,7 @@ new resource shape. Terminal enforcement is isolated in `run-codex-slice-lib.ts`
 | 2026-08-02 | 7 | Task surface | Both `agentic:` tasks execute end-to-end; teardown remained dry-run and escalated a foreign `fix-1018` container. Reconcile: PR remains draft. |
 | 2026-08-02 | 8 | Terminal enforcement | DONE checks leaks, attempts one scoped teardown, re-checks, then blocks on owned survivors only. Reconcile: acceptance-critical behavior is directly tested. |
 | 2026-08-02 | 9 | E2E leak origin | Cleanup now defaults on; `--no-cleanup` preserves registry capture and prints the per-AppHost escalation command. Reconcile: no plan drift. |
+| 2026-08-02 | 10 | Dogfood/discoverability | Local CLI installed its current three-skill bundle; PR #1034's `aspire`/`deno`/`help.md` are absent, so acceptance box 5 remains unticked. Symptoms now route from all approved internal surfaces. |
 | 2026-08-02 | 5R | Supervisor review fix | Docker RFC3339Nano `Created` now supplies report-only age when registry time is absent; red-first foreign-stale test passes. Ownership/actionability unchanged. |
 
 ## Decisions
@@ -105,6 +106,7 @@ this run changes no `packages/**` or `plugins/**` source.
 | 7 | scoped format + task dogfood | PASS | wrapper: 12 TS files, 0 findings; both task entry points exited 0; supplemental docs/JSON format check passed |
 | 8 | focused wrapper check + contract tests | PASS | wrapper: 3 files, 0 findings; `deno test`: 6 passed, including owned→blocked and foreign/unproven→done |
 | 9 | focused wrapper check + option tests | PASS | wrapper: 2 files, 0 findings; `deno test`: 2 passed, 0 failed |
+| 10 | check/lint/fmt + dogfood + sync check | PASS | wrapper: 1 script, 0 findings each; consumer install exited 0; `agentic:sync-claude:check` OK; forbidden test passed |
 | 5R | scoped check + reporter/probe tests + live host read | PASS | wrapper: 12 files, 0 findings; 5 tests passed; live foreign/unproven containers now carry non-null ages |
 
 ## Handoff Notes

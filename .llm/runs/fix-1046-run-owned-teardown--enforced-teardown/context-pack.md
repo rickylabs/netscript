@@ -28,12 +28,14 @@ three-valued, path-segment-safe, identity-pair-safe, fail-closed, and guarded ag
 - Slice 7 `agentic:leak-check`/`agentic:teardown` tasks and tooling index entries.
 - Slice 8 pure `enforceTeardown` plus DONE-branch leak-check → teardown → re-check wiring.
 - Slice 9 E2E cleanup-on default, explicit opt-out, and creation-time AppHost registry capture.
+- Slice 10 dogfood task, generated consumer bundle, and symptom-indexed routing. Base limitation:
+  PR #1034 assets (`aspire`, `deno`, `help.md`) are not yet embedded, so acceptance box 5 is open.
 - Supervisor A1 review fix: foreign/unproven Docker resources derive report-only age from probed
   `Created`; ownership and actionability are unchanged.
 
 ## In Progress
 
-- Slice 10 dogfood task and symptom-indexed guidance.
+- Slice 11 full gate/evaluator/PR close-out.
 
 ## Next Steps
 

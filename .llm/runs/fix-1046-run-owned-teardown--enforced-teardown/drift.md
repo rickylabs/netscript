@@ -24,3 +24,16 @@
 - **Action:** fix
 - **Evidence:** red-first test plus Docker RFC3339Nano creation-time fallback; live report now shows
   non-null ages for foreign and unproven containers.
+
+## 2026-08-02 — Base consumer bundle lacks PR #1034 skills
+
+- **What:** Dogfooding the local CLI installed only `netscript`, `netscript-build`, and
+  `netscript-operate`; `aspire`, `deno`, and symptom-indexed `help.md` are not embedded on this base.
+- **Source:** `deno task agentic:dogfood-skills` output under
+  `.agents/generated/consumer-skills/.claude/skills/`.
+- **Expected:** The task installs whatever the local bundle contains and must pick up PR #1034 only
+  after merge; acceptance box 5 may not be claimed early.
+- **Actual:** Routing/install mechanics work end-to-end, but the three #1034 assets are absent.
+- **Severity:** minor
+- **Action:** defer
+- **Evidence:** generated consumer directory committed in slice 10; PR body leaves box 5 unticked.

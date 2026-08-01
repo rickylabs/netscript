@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "netscript": {
+      "command": "deno",
+      "args": [
+        "run",
+        "--config",
+        "/home/codex/repos/fix-1046/.agents/generated/consumer-skills/deno.json",
+        "-A",
+        "jsr:@netscript/cli@0.0.2",
+        "agent",
+        "mcp",
+        "--project-root",
+        "/home/codex/repos/fix-1046/.agents/generated/consumer-skills"
+      ]
+    }
+  }
+}
