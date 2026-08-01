@@ -80,6 +80,7 @@ define `ASPIRE_GENERATED: '.aspire'`. Selected path:
 | 2026-08-01 | review remediation | research | Verified all four review findings, `.aspire/` gitignore coverage, injected-lock boundary, and existing `aspire-start.json` runtime metadata seam. |
 | 2026-08-01 | remediation S1 | implementation | Added injected file/fake lifecycle lock, atomic create, pid/time/token record, dead/expired recovery, full detached-lifecycle lease, and non-masking release warning. |
 | 2026-08-01 | remediation S1 | supervisor review | Focused tests passed 5 modules / 15 steps; corrected partial-write cleanup to close the handle before removal for Windows compatibility. |
+| 2026-08-01 | remediation S2/S3 | implementation | Extracted anchored absence classifier, added numeric probe/command exit diagnostics, and covered quoted-message ambiguity plus resident non-zero status without stop. |
 
 ## Gate Results
 

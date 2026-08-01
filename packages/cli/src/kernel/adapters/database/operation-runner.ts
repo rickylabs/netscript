@@ -28,12 +28,12 @@ import {
   buildDbCliEnv,
   buildExecutableDisplayName,
   findExecutableStatus,
+  isNoRunningAppHostOutput,
   TERMINAL_RESOURCE_STATES,
 } from './operation-runner-helpers.ts';
 
 const DEFAULT_POLL_INTERVAL_MS = 1_000;
 const DEFAULT_TIMEOUT_MS = 15 * 60_000;
-const NO_RUNNING_APPHOST_MESSAGE = 'No AppHost is currently running';
 
 interface DbOperationRunnerOptions {
   readonly executor?: AspireCommandExecutor;
@@ -202,11 +202,11 @@ export class DbOperationRunner {
     }
 
     const details = output.stderr.trim() || output.stdout.trim() || 'unknown Aspire error';
-    if (`${output.stdout}\n${output.stderr}`.includes(NO_RUNNING_APPHOST_MESSAGE)) {
+    if (isNoRunningAppHostOutput(output.stdout, output.stderr)) {
       return false;
     }
 
-    throw new Error(`aspire describe failed: ${details}`);
+    throw new Error(`aspire describe failed with exit code ${output.code}: ${details}`);
   }
 
   private async printResourceLogs(
@@ -286,7 +286,7 @@ export class DbOperationRunner {
     const output = await this.executor.output(args, options);
     if (output.code !== 0) {
       const details = output.stderr.trim() || output.stdout.trim() || 'unknown Aspire error';
-      throw new Error(`aspire ${args[0]} failed: ${details}`);
+      throw new Error(`aspire ${args[0]} failed with exit code ${output.code}: ${details}`);
     }
     return output;
   }

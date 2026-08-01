@@ -248,6 +248,22 @@ describe('DbOperationRunner', () => {
     assertEquals(executor.outputCalls.some((call) => call.args[0] === 'stop'), false);
   });
 
+  it('never stops a resident AppHost when the database operation fails', async () => {
+    const apphostPath = join(PROJECT_ROOT, 'aspire', 'apphost.mts');
+    const executor = new FakeAspireExecutor([
+      { code: 0, stdout: JSON.stringify([{ appHostPath: apphostPath }]), stderr: '' },
+      { code: 0, stdout: '{"appHostPid":123}', stderr: '' },
+      finishedResource(apphostPath, 1),
+      { code: 0, stdout: 'No migration history.', stderr: '' },
+    ]);
+
+    const code = await createFastRunner(executor).execute(createRequest('status'));
+
+    assertEquals(code, 1);
+    assertEquals(commandNames(executor), ['describe', 'start', 'describe', 'logs']);
+    assertEquals(executor.outputCalls.some((call) => call.args[0] === 'stop'), false);
+  });
+
   it('stops an AppHost started by this invocation after an operation failure', async () => {
     const apphostPath = join(PROJECT_ROOT, 'aspire', 'apphost.mts');
     const executor = new FakeAspireExecutor([
@@ -275,7 +291,7 @@ describe('DbOperationRunner', () => {
         createRequest('status'),
       ),
       Error,
-      'aspire describe failed: Dashboard connection failed.',
+      'aspire describe failed with exit code 2: Dashboard connection failed.',
     );
 
     assertEquals(commandNames(executor), ['describe']);
@@ -294,7 +310,38 @@ describe('DbOperationRunner', () => {
           new FakeAppHostLifecycleLock([], new Error('release failed')),
         ).execute(createRequest('status')),
       Error,
-      'aspire describe failed: Dashboard connection failed.',
+      'aspire describe failed with exit code 2: Dashboard connection failed.',
+    );
+  });
+
+  it('fails closed when another error quotes the no-running-AppHost phrase', async () => {
+    const executor = new FakeAspireExecutor([
+      {
+        code: 3,
+        stdout: '',
+        stderr:
+          "Dashboard failed after reporting: No AppHost is currently running for 'apphost.mts'.",
+      },
+    ]);
+
+    await assertRejects(
+      () => createFastRunner(executor).execute(createRequest('status')),
+      Error,
+      'aspire describe failed with exit code 3: Dashboard failed after reporting:',
+    );
+    assertEquals(commandNames(executor), ['describe']);
+  });
+
+  it('includes the exit code when an Aspire command fails without details', async () => {
+    const executor = new FakeAspireExecutor([
+      noRunningAppHost(),
+      { code: 9, stdout: '', stderr: '' },
+    ]);
+
+    await assertRejects(
+      () => createFastRunner(executor).execute(createRequest('status')),
+      Error,
+      'aspire start failed with exit code 9: unknown Aspire error',
     );
   });
 
