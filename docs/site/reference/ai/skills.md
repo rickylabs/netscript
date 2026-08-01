@@ -23,7 +23,7 @@ of three ready-made skills that teach an agent the NetScript vocabulary.
 
 ## Installed NetScript skills
 
-`netscript agent init` installs three first-party skills on the **Claude Code host path**
+`netscript agent init` installs five first-party skills and a symptom playbook on the **Claude Code host path**
 (under `.claude/skills/`, alongside `.mcp.json` and the marked `AGENTS.md` section); the
 VS Code host path writes `.vscode/mcp.json` only, with no skills. They share one vocabulary with the
 `netscript` CLI and the [NetScript MCP tools](/ai/agent-tooling/#tool-catalog),
@@ -34,8 +34,12 @@ so an agent routes to a workflow and then reaches for the matching CLI verb or M
 | `netscript` | Router. Dispatches a task to the build or operate skill (or to the Aspire skill for orchestration); it is not useful on its own. |
 | `netscript-build` | Scaffold and build with real `netscript` CLI verbs: `init`, the contract-first flow, the database lifecycle, adding and syncing plugins, adding services and UI, and generating registries. |
 | `netscript-operate` | Monitor, debug, and analyze a running app through the bounded MCP tools: health, recent runs, one execution end to end, recent errors, job results, service and database performance, and doc search. |
+| `aspire` | Diagnose orchestration and runtime state from symptoms with resource descriptions, console logs, structured logs, spans, traces, and targeted resource control. |
+| `deno` | Diagnose runtime and toolchain problems with focused checks, module-resolution inspection, permissions, test sanitizers, cache evidence, and API docs. |
 
-These are the skills named in the bundle manifest and installed as an atomic set;
+These are the skills named in the bundle manifest and installed as an atomic set. The companion
+`.claude/skills/help.md` playbook starts from symptoms—including broken plugin wiring—and routes to
+the first diagnostic command;
 re-running `netscript agent init` is idempotent. See
 [Agent tooling](/ai/agent-tooling/) for the CLI × skills × MCP combo.
 

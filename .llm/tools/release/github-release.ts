@@ -314,7 +314,9 @@ export function parseArgs(argv: readonly string[]): ReleasePlan {
 
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
-    if (arg === '--version') {
+    if (arg === '--') {
+      continue;
+    } else if (arg === '--version') {
       version = readValue(index, arg);
       index += 1;
     } else if (arg === '--repo') {
