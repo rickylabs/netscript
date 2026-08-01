@@ -31,7 +31,7 @@ export class MemoryTriggerSchedulerAdapter implements TriggerSchedulerPort {
     const handle: ScheduleRecord = {
       id,
       schedule: spec,
-      persistent: spec.persistent ?? false,
+      persistent: false,
       nextFireAt: this.#now().toISOString(),
       paused: false,
       handler,

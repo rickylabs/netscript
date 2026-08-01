@@ -38,13 +38,6 @@ export const TRIGGER_EVENT_STATUSES: readonly [
   'dlq',
 ] = ['pending', 'in-flight', 'deferred', 'completed', 'failed', 'dlq'];
 
-/** Scheduled trigger backfill misfire policies. */
-export const TRIGGER_BACKFILL_POLICIES: readonly ['fire-now', 'fire-once', 'do-nothing'] = [
-  'fire-now',
-  'fire-once',
-  'do-nothing',
-];
-
 /** Default durability tier for Group F trigger definitions. */
 export const DEFAULT_TRIGGER_DURABILITY_TIER: TriggerDurabilityTier = 't1';
 
@@ -116,9 +109,6 @@ export type TriggerKind = TriggerKnownKind | (string & { readonly __triggerKind?
 
 /** Trigger event lifecycle status. */
 export type TriggerEventStatus = (typeof TRIGGER_EVENT_STATUSES)[number];
-
-/** Scheduled trigger backfill misfire policy. */
-export type TriggerBackfillPolicy = (typeof TRIGGER_BACKFILL_POLICIES)[number];
 
 /** Triggers error code. */
 export type TriggersErrorCode = (typeof TRIGGERS_ERROR_CODES)[number];

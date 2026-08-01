@@ -46,10 +46,6 @@ export function defineScheduledTrigger<TId extends string>(
 > {
   assertNonEmpty(spec.id, 'Scheduled trigger id is required.');
   assertNonEmpty(spec.cron, 'Scheduled trigger cron expression is required.');
-  if (spec.backfill) {
-    assertBackfill(spec.backfill);
-  }
-
   return Object.freeze({
     id: spec.id as TriggerId<TId>,
     kind: 'scheduled',
@@ -59,8 +55,6 @@ export function defineScheduledTrigger<TId extends string>(
     handler,
     cron: spec.cron as CronExpression,
     timezone: spec.timezone,
-    persistent: spec.persistent,
-    backfill: spec.backfill ? Object.freeze({ ...spec.backfill }) : undefined,
     description: spec.description,
     tags: spec.tags ? Object.freeze([...spec.tags]) : undefined,
     metadata: spec.metadata ? Object.freeze({ ...spec.metadata }) : undefined,
@@ -70,18 +64,5 @@ export function defineScheduledTrigger<TId extends string>(
 function assertNonEmpty(value: string, message: string): void {
   if (value.trim().length === 0) {
     throw TriggersError.validationFailed(message);
-  }
-}
-
-function assertBackfill(backfill: NonNullable<ScheduledTriggerSpec['backfill']>): void {
-  if (backfill.windowMs < 0) {
-    throw TriggersError.validationFailed(
-      'Scheduled trigger backfill windowMs must be non-negative.',
-    );
-  }
-  if (backfill.maxMissedFires !== undefined && backfill.maxMissedFires < 1) {
-    throw TriggersError.validationFailed(
-      'Scheduled trigger backfill maxMissedFires must be positive when provided.',
-    );
   }
 }

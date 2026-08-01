@@ -1,5 +1,3 @@
-import type { TriggerBackfillSpec } from './trigger-spec.ts';
-
 /** Cron expression accepted by scheduled trigger definitions. */
 export type CronExpression = string & { readonly __brand?: 'CronExpression' };
 
@@ -7,6 +5,4 @@ export type CronExpression = string & { readonly __brand?: 'CronExpression' };
 export type ScheduledTriggerSpec = Readonly<{
   cron: CronExpression;
   timezone?: string;
-  persistent?: boolean;
-  backfill?: TriggerBackfillSpec;
 }>;

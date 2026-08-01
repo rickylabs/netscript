@@ -102,13 +102,6 @@ export class CronTriggerSchedulerAdapter implements TriggerSchedulerPort {
     spec: ScheduledTriggerSpec,
     handler: ScheduledHandler,
   ): Promise<ScheduledTriggerHandle> {
-    if (spec.persistent === true) {
-      throw TriggersError.unsupportedOperation(
-        'scheduled-trigger.persistent',
-        'Persistent scheduled triggers are reserved until Deno persistent cron support lands.',
-      );
-    }
-
     await this.unschedule(id);
 
     const record: CronScheduleRecord = { id, spec, handler };
