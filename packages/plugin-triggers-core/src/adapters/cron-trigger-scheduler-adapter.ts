@@ -1,12 +1,11 @@
 import { createScheduler } from '@netscript/cron';
 import type { CreateSchedulerOptions } from '@netscript/cron';
-import {
-  type ScheduledTriggerPayload,
-  type ScheduledTriggerSpec,
-  type TriggerEvent,
-  type TriggerEventId,
-  type TriggerId,
-  TriggersError,
+import type {
+  ScheduledTriggerPayload,
+  ScheduledTriggerSpec,
+  TriggerEvent,
+  TriggerEventId,
+  TriggerId,
 } from '../domain/mod.ts';
 import type {
   ScheduledTriggerHandle,
