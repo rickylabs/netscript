@@ -68,6 +68,7 @@ new resource shape. Terminal enforcement is isolated in `run-codex-slice-lib.ts`
 | 2026-08-02 | 1 | Design checkpoint | PLAN-EVAL already passed under the explicit owner waiver; mandatory resumability artifacts completed before implementation. |
 | 2026-08-02 | 2 | Ownership proof | Red test first (missing module), then five fail-closed ownership tests passed with wrapper check. Reconcile: PR #1047 remains draft; no new review comments changed scope. |
 | 2026-08-02 | 3 | Run registry | Schema v1 registry uses same-directory temp+rename and identity-pair deduplication. Reconcile: issue/PR scope unchanged. |
+| 2026-08-02 | 4 | Read-only probes | Aspire 13.4.6 and Docker label fixtures normalize through bounded ports; malformed mounts expose no path proof. Reconcile: no scope changes. |
 
 ## Decisions
 
@@ -92,6 +93,7 @@ this run changes no `packages/**` or `plugins/**` source.
 | --- | --- | --- | --- |
 | 2 | scoped check + ownership tests | PASS | wrapper: 2 files, 0 findings; `deno test`: 5 passed, 0 failed |
 | 3 | scoped check + registry tests | PASS | wrapper: 4 files, 0 findings; `deno test`: 3 passed, 0 failed |
+| 4 | scoped check + fixture probe tests | PASS | wrapper: 7 files, 0 findings; `deno test`: 2 passed, 0 failed |
 
 ## Handoff Notes
 

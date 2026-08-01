@@ -22,10 +22,11 @@ three-valued, path-segment-safe, identity-pair-safe, fail-closed, and guarded ag
 - Draft PR #1047 exists for the branch.
 - Slice 1 resumability artifacts and slice 2 ownership classifier/tests.
 - Slice 3 schema-versioned atomic registry and tests.
+- Slice 4 bounded read-only probes with captured Aspire 13.4.6/Docker fixtures.
 
 ## In Progress
 
-- Slice 4 read-only, bounded Aspire/Docker probes with observed-shape fixtures.
+- Slice 5 read-only leak report generation and host observation.
 
 ## Next Steps
 
