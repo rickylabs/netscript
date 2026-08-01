@@ -14,11 +14,11 @@ implemented locally.
 
 ## Next Steps
 
-1. Commit/push the initial slice and open the draft PR.
-2. Run the complete scoped gates and fix findings.
-3. Update evidence and hand off for Opus 5 IMPL-EVAL.
+1. Commit/push final evidence.
+2. Hand draft PR #1045 to the Opus 5 supervisor for IMPL-EVAL.
 
 ## Drift and Debt
 
-- Drift: evaluator transport owner override recorded in `supervisor.md`.
+- Drift: evaluator transport owner override recorded in `supervisor.md`; production config child
+  loader flattens Zod issues, so acceptance box 5 remains unticked.
 - Debt: none created yet.
