@@ -80,6 +80,10 @@ ports are already in use, or a `postgres-*` container appeared that you did not 
 If ownership is `foreign` or `unproven`, leave the resource alone and use the report's exact command
 only after a human verifies the apparent owner.
 
+`deno task agentic:dogfood-skills` installs the local CLI's exact `agent init` consumer bundle under
+`.agents/generated/consumer-skills/`; the generated surface follows the CLI bundle instead of
+forking its skill content.
+
 ### `deno task e2e:cli`
 
 - Purpose: run the full merge-readiness CLI E2E suite.

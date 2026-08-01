@@ -133,6 +133,10 @@ The first command is always read-only. The second is also non-mutating unless `-
 Even with apply, only positive path/identity-pair ownership proof authorizes a per-resource action;
 foreign and unknown-owner resources are reported and left alone.
 
+`deno task agentic:dogfood-skills` runs the local `netscript agent init` bundle into
+`.agents/generated/consumer-skills/`. This generated consumer view follows the CLI bundle as it
+changes; do not copy or edit its skill content by hand.
+
 The agent-orchestration suite the supervisor uses to drive other agents. It is concern-grouped, not
 a flat folder: `runtime/` is the desired-state controller ("brain"); `runtime/cli/` are its entry
 points; `codex/`, `openhands/`, `github/`, `wsl/`, `claude/` are the execution lanes; `lib/` holds
