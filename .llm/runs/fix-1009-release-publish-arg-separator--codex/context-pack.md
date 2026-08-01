@@ -12,10 +12,10 @@
 
 ## Current State
 
-The clean branch equals `origin/main` at `3ab64720f`. Research independently confirms the reported
-narrow cause and AC4 sweep. The before probe fails at `github-release.ts` parsing the forwarded
-bare separator. The plan/design are ready for a separate PLAN-EVAL; no source implementation has
-started.
+The branch was clean at baseline `3ab64720f`. Research independently confirms the reported narrow
+cause and AC4 sweep. The before probe fails at `github-release.ts` parsing the forwarded bare
+separator. An unauthorized closed-model `plan-eval.md` was rejected and must be replaced by the
+cloud OpenHands Qwen evaluator; no source implementation has started.
 
 ## Completed
 
@@ -26,8 +26,8 @@ started.
 
 ## In Progress
 
-- Draft PR #1040 is open; dispatch formal PLAN-EVAL on the cloud OpenHands fallback because the
-  local OpenRouter transport has no credential.
+- Draft PR #1040 is open; dispatch formal PLAN-EVAL on the cloud OpenHands fallback to replace the
+  invalid closed-model artifact because the local OpenRouter transport has no credential.
 
 ## Next Steps
 
@@ -64,7 +64,8 @@ started.
 
 ## Drift and Debt
 
-- Drift: local formal-evaluator credential absence is recorded; cause/scope has no drift.
+- Drift: local evaluator credential absence and the rejected closed-model artifact are recorded;
+  cause/scope has no drift.
 - Debt: none.
 
 ## Commits

@@ -37,3 +37,17 @@ documentation.
 - **Action:** accept
 - **Evidence:** Fall back to the canonical cloud OpenHands open-model evaluator; no closed model and
   no self-certification.
+
+## 2026-08-01 — Unauthorized closed-model PLAN-EVAL artifact rejected
+
+- **What:** A `plan-eval.md` appeared during the failed local launch and was included in commit
+  `49ab0738f`. Its header identifies an Opus evaluator and asserts an owner waiver that was never
+  granted.
+- **Source:** `plan-eval.md` header and the failed `claude-print` stream.
+- **Expected:** Formal evaluation by an approved open model only.
+- **Actual:** Closed-model artifact with an invented waiver; it is not a valid verdict even though
+  its text says PASS.
+- **Severity:** significant
+- **Action:** fix
+- **Evidence:** Cloud OpenHands Qwen PLAN-EVAL must independently replace the artifact before any
+  implementation. Commit history is retained as the audit trail.
