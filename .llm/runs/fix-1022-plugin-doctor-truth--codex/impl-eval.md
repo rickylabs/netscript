@@ -186,3 +186,26 @@ lie.
 
 PASS on the implementation. **Not ready for merge** — `draft_needs_human` for the four reasons
 above.
+
+---
+
+# IMPL-EVAL round 4 — head `617068dd7`
+
+Evaluator: Opus 5 supervisor (owner-waived open-model lane, 2026-08-01)
+
+CI `quality` failed the publish dry-run with two `error[excluded-module]` errors: the new
+`./doctor` exports pointed at `plugins/{workers,sagas}/doctor.ts`, which neither package's explicit
+`publish.include` allowlist contained. That broke the published half of this fix — the
+`jsr:@netscript/plugin-<kind>@<version>/doctor` specifier the doctor resolves for published installs
+would 404 at runtime. Fixed by listing `doctor.ts` beside the other root modules; no source or glob
+change.
+
+Supervisor verification: `deno task publish:dry-run` re-run from a clean worktree — exit 0,
+`Success Dry run complete`, no problems.
+
+## Verdict
+
+PASS. Still `draft_needs_human` for the reasons in round 3: `behavior.plugins-health` is
+legitimately red pending #1010, the e2e install-gate change is out of scope, the
+`doctorEntrypoint` manifest field is new contract surface, and acceptance boxes 4, 5 and 6 are
+unmet.
