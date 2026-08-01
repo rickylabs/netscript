@@ -3,6 +3,7 @@ import { dirname, join } from '@std/path';
 
 import { DenoFileSystem } from '../../../../kernel/adapters/runtime/file-system/deno-file-system.ts';
 import { DenoProcess } from '../../../../kernel/adapters/runtime/process/deno-process.ts';
+import { netscriptJsrSpecifier } from '../../../../kernel/constants/jsr-specifiers.ts';
 import type { ProcessPort, ProcessResult } from '../../../../kernel/ports/process-port.ts';
 import { createInstalledRuntimeRegistryGenerator } from './installed-runtime-registry-generator.ts';
 
@@ -93,9 +94,9 @@ async function writeProject(projectRoot: string): Promise<void> {
     `${JSON.stringify({
       NetScript: {
         Plugins: {
-          workers: { Entrypoint: 'jsr:@netscript/plugin-workers@0.0.2/services' },
-          sagas: { Entrypoint: 'jsr:@netscript/plugin-sagas@0.0.2/services' },
-          triggers: { Entrypoint: 'jsr:@netscript/plugin-triggers@0.0.2/services' },
+          workers: { Entrypoint: netscriptJsrSpecifier('plugin-workers', '/services') },
+          sagas: { Entrypoint: netscriptJsrSpecifier('plugin-sagas', '/services') },
+          triggers: { Entrypoint: netscriptJsrSpecifier('plugin-triggers', '/services') },
         },
       },
     })}\n`,
