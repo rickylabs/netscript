@@ -31,7 +31,7 @@ when a step fails.
 You will add the runtime plugins checkout depends on, then author a `CheckoutSaga` with
 `defineSaga(...)`: typed per-instance state, a correlation key, and message handlers that walk a
 checkout from `OrderCreated` through payment toward fulfillment. You will also author the
-`process-payment` worker job that the saga drives, and you will wire the **failure path** so a
+`process-payment` worker job that a checkout trigger enqueues, and you will wire the **failure path** so a
 declined payment cancels the order instead of stranding it. By the end you can drive a checkout to a
 **paid** order and watch a failed payment **compensate to cancelled** — both observable on the Sagas
 API at `:8092`.
@@ -51,14 +51,15 @@ The Sagas API service and its KV-backed registry come up as part of the orchestr
 
 ## Step 1 — Add the checkout runtime plugins
 
-Checkout spans three official runtime plugins, and you install each one explicitly: **`sagas`** (the
-durable workflow), **`workers`** (the background jobs the saga drives), and **`streams`** (the durable
-transport that carries messages between them). Add them from the project root, with samples so you
+Checkout spans four official runtime plugins, and you install each one explicitly: **`sagas`** (the
+durable workflow), **`workers`** (background jobs), **`triggers`** (the supported worker enqueue
+boundary), and **`streams`** (the durable transport). Add them from the project root, with samples so you
 have working modules to adapt:
 
 ```sh
 netscript plugin install worker --name workers --samples
 netscript plugin install saga --name sagas --samples
+netscript plugin install trigger --name triggers --samples
 netscript plugin install stream --name streams --samples
 ```
 
@@ -73,7 +74,7 @@ Confirm they registered:
 netscript plugin list
 ```
 
-You should see `workers`, `sagas`, and `streams` in the list.
+You should see `workers`, `sagas`, `triggers`, and `streams` in the list.
 
 ## Step 2 — Read the saga builder
 
@@ -91,9 +92,10 @@ consumes. The methods you will use:
   { name: ".build()", type: "finalize", desc: "Produces the frozen SagaDefinition the runner executes. Requires at least one handler." }
 ] }) }}
 
-The other primitive you need is **`send(target, payload)`** — also from `@netscript/plugin-sagas-core`
-— which a handler returns to drive the next step: it sends a command (to a worker job) or emits an
-event. Handlers return an **array** of these effects.
+The other primitive you need is **`send(target, payload)`** — also from `@netscript/plugin-sagas-core`.
+It republishes an **internal saga message onto the saga bus**; it does not enqueue a worker job or
+task. Handlers return an array of these effects. This chapter uses `send(...)` for saga-to-saga
+messages and the triggers API's `enqueueJob(...)` effect for durable worker dispatch.
 
 ## Step 3 — Scaffold the checkout saga
 
@@ -160,7 +162,7 @@ export const checkoutSaga = defineSaga('CheckoutSaga')
   // Route every message to the instance whose orderId matches.
   .correlate((message) => String((message.payload as { orderId?: string }).orderId ?? ''))
 
-  // OrderCreated → charge the card via the process-payment worker job.
+  // OrderCreated → emit the saga's internal payment-requested message.
   .on('OrderCreated', (saga, event) => {
     const msg = event.payload as { orderId: string; customerId: string; items: CheckoutState['items']; total: number };
     saga.state = {
@@ -171,7 +173,7 @@ export const checkoutSaga = defineSaga('CheckoutSaga')
       total: msg.total,
       status: 'payment_pending',
     };
-    return [send('process-payment', { orderId: msg.orderId, amount: msg.total })];
+    return [send('CheckoutPaymentRequested', { orderId: msg.orderId, amount: msg.total })];
   })
 
   // PaymentCompleted → reserve inventory.
@@ -215,9 +217,9 @@ Read the shape, not the line count:
   (`if (saga.state.status !== 'paid') return []`) so a redelivered or out-of-order message is a
   no-op, not a corruption. [Durable workflows are state machines](/explanation/durability-model/) is a
   NetScript axiom, not a slogan.
-- **Steps are driven by `send(...)` effects.** A handler does not call the payment service directly —
-  it returns `send('process-payment', { … })`, and the runtime delivers that command to the worker
-  job. This is what lets the workflow be paused, checkpointed, and resumed.
+- **Saga messages are driven by `send(...)` effects.** `send('CheckoutPaymentRequested', { … })`
+  republishes an internal message onto the saga bus. It does not address `process-payment` or cross
+  into the workers plugin. The trigger below owns that explicit cross-plugin enqueue boundary.
 - **Compensation is a failure branch.** The `PaymentFailed` handler is the undo path: it transitions
   the same state machine to `cancelled` and emits `OrderCancelled`. The scaffolded order saga in the
   playground models compensation exactly this way — as failure-event handlers that walk the state
@@ -227,11 +229,39 @@ Read the shape, not the line count:
 The builder also exposes a dedicated <code>.compensate(eventType, handler)</code> method — same handler shape as <code>.on()</code>, but registered as the compensation path for a failed event type. You can write <code>.compensate('PaymentFailed', ...)</code> instead of an <code>.on('PaymentFailed', ...)</code> branch to make the undo intent explicit in the chain. The playground's order saga uses plain <code>.on()</code> failure handlers; both compile and both run. Choose the one that reads clearest for your team — see <a href="/explanation/durability-model/">Durability model</a>.
 {{ /comp }}
 
-## Step 4 — Author the payment worker job
+## Step 4 — Enqueue payment through the triggers API
 
-The saga `send`s a `process-payment` command; a **worker job** is what actually does the work and
-reports back. The job processes the payment, then publishes `PaymentCompleted` (or `PaymentFailed`)
-back to the saga. This is the half of the choreography that closes the loop.
+Use the supported triggers action to turn checkout ingress into durable background work. The
+generated `checkout-payment` webhook can be reduced to this definition (use a signed verifier for a
+real public endpoint; `memory` keeps this local tutorial runnable):
+
+```ts
+// triggers/checkout-payment-trigger.ts
+import { defineWebhook, enqueueJob } from '@netscript/plugin-triggers-core/builders';
+import type { JobDefinition } from '@netscript/plugin-workers-core';
+
+const processPaymentJob = {
+  id: 'process-payment' as JobDefinition<'process-payment'>['id'],
+  name: 'Process payment',
+  topic: 'default',
+} satisfies JobDefinition<'process-payment'>;
+
+export default defineWebhook(
+  (event) => Promise.resolve([enqueueJob(processPaymentJob, { payload: event.payload })]),
+  { id: 'checkout-payment', path: 'checkout/payment', verifier: 'memory' },
+);
+```
+
+Post the same order payload to this webhook when you publish `OrderCreated`. The saga records and
+emits its internal `CheckoutPaymentRequested` message; the trigger independently and durably
+enqueues `process-payment`. This explicit choreography avoids pretending that a saga cascade is a
+workers transport.
+
+## Step 5 — Author the payment worker job
+
+The trigger enqueues `process-payment`; the **worker job** does the work and reports back. It
+publishes `PaymentCompleted` (or `PaymentFailed`) to the saga with `createSagaPublisher`, closing
+the explicit cross-plugin choreography.
 
 ```ts
 // workers/jobs/process-payment.ts
@@ -289,7 +319,7 @@ Keep the strings identical on both sides.
   { name: "createSagaPublisher<M>()", type: "from @netscript/plugin-sagas/runtime", desc: "Publishes typed messages onto the saga bus so a running saga can react — how the job reports back." }
 ] }) }}
 
-## Step 5 — Type-check the workflow
+## Step 6 — Type-check the workflow
 
 The Sagas API service lists sagas from a KV-backed registry, and the scaffold's saga runtime
 registers your built definition on startup. Because `aspire start` already brings the sagas processor
@@ -318,12 +348,17 @@ messages to the saga bus — `ns-sagas publish` sends `{ type, payload }`, and t
 correlates on `payload.orderId`. Start an order, then complete its payment:
 
 ```sh
-# 1. Open the checkout — instance goes to payment_pending and sends process-payment.
+# 1. Open the checkout — the saga records payment_pending and emits CheckoutPaymentRequested.
 ns-sagas publish OrderCreated \
   --payload='{ "orderId": "ord_1001", "customerId": "cust_1001", "items": [{ "productId": "1", "quantity": 2 }], "total": 4999 }' \
   --correlation-key=ord_1001
 
-# 2. Payment succeeds — instance advances to paid, carrying its transactionId.
+# 2. Enqueue the process-payment worker through the supported triggers ingress.
+curl -X POST http://localhost:8093/api/v1/webhooks/checkout/payment \
+  -H 'content-type: application/json' \
+  -d='{ "orderId": "ord_1001", "amount": 4999 }'
+
+# 3. The worker publishes PaymentCompleted; this direct publish is a deterministic local stand-in.
 ns-sagas publish PaymentCompleted \
   --payload='{ "orderId": "ord_1001", "transactionId": "txn_777" }' \
   --correlation-key=ord_1001
@@ -355,12 +390,12 @@ The first instance shows `status: 'paid'` carrying its `transactionId`; the seco
 continues to `completed` once you also author the `reserve-inventory` and `create-shipment` jobs the
 saga `send`s — this track stops at the payment leg, so `paid` is checkout's observable checkpoint.)
 
-- [ ] `netscript plugin install worker/saga/stream ... --samples` landed `plugins/workers/`,
-      `plugins/sagas/`, and `plugins/streams/`.
+- [ ] The workers, sagas, triggers, and streams plugins are installed and registered.
 - [ ] `checkout-saga.ts` defines state, a correlation key, the forward handlers, and a
       `PaymentFailed` compensation branch.
 - [ ] `workers/jobs/process-payment.ts` publishes `PaymentCompleted` / `PaymentFailed` back to the
       saga.
+- [ ] `triggers/checkout-payment-trigger.ts` enqueues `process-payment` with `enqueueJob(...)`.
 - [ ] `ns-sagas list --registered --json` lists `CheckoutSaga`.
 - [ ] Publishing `OrderCreated` + `PaymentCompleted` yields an instance at `status: 'paid'`;
       `PaymentFailed` yields one at `status: 'cancelled'`.
@@ -372,9 +407,8 @@ The durability tier persists instance state so a workflow survives a restart, bu
 
 ## What you built
 
-- The `workers`, `sagas`, and `streams` runtime plugins, each installed explicitly with
-  `netscript plugin install <kind> --name <name> --samples` — the workflow, its jobs, and the
-  transport between them.
+- The workers, sagas, triggers, and streams runtime plugins — the workflow, its explicit worker
+  enqueue boundary, its jobs, and the transport between them.
 - A `CheckoutSaga` built with `defineSaga().state().correlate().on().build()` — a durable state
   machine that walks order → payment → fulfillment, with a `PaymentFailed` **compensation branch**
   that cancels the order.
