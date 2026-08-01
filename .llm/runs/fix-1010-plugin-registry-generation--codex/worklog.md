@@ -87,6 +87,7 @@ plugin-name registry.
 | 2026-08-02 | AI slice 1 | diagnostics | Made `behavior.ai-chat-route` explicitly capture subprocess output and added a registry/import-focused failure hint. Gate-definition tests: 5 passed, 0 failed; targeted check exit 0. |
 | 2026-08-02 | AI slice 2 | reproduced | Ran the exact behavior import script against retained scaffold `plugin-smoke-20260801-205015`; exit 1: `AI tool module ai/tools/skill-loader.ts does not export an AiToolDefinition.` Generated registry retained `e2e-tool.ts` but also imported scaffold factory `skill-loader.ts`. |
 | 2026-08-02 | AI slice 2 | root cause | Manifest-driven generation correctly passed `plugins/ai/scaffold.runtime.json`, but that manifest omitted the compiler's canonical `skill-loader.ts` exclusion. Added the exclusion to the published asset; invalid AI modules continue to throw. |
+| 2026-08-02 | AI slice 2 | regression proof | Added an integration test that runs the real AI generator, imports both emitted registries, asserts `Map` entries `e2e-tool` and `assistant`, and proves `skill-loader` is absent. Seven integration tests passed. Regenerated the retained failing scaffold and the exact behavior script then exited 0. |
 
 ## Decisions
 
@@ -270,5 +271,19 @@ Task publish:dry-run deno publish --dry-run --allow-dirty
 Simulating publish of @netscript/plugin-ai@0.0.2 with files:
    file:///home/codex/repos/fix-1010/plugins/ai/scaffold.runtime.json (916B)
 Success Dry run complete
+RAW_EXIT_CODE=0
+
+AI IMPORTED-REGISTRY REGRESSION
+$ deno test -A packages/cli/src/public/features/generate/plugins/installed-runtime-registry-integration_test.ts
+generated AI registries load resources and exclude the skill-loader factory ... ok (178ms)
+ok | 7 passed | 0 failed (1s)
+RAW_EXIT_CODE=0
+
+AI RETAINED-SCAFFOLD RE-VERIFICATION
+$ deno run --config <project>/deno.json --allow-read --allow-write plugins/ai/src/cli/generate-runtime-registries.ts --project-root <project> --manifest plugins/ai/scaffold.runtime.json --profile scaffold --official-samples false
+generated .netscript/generated/plugin-ai/tools.registry.ts (2 ai-tools)
+generated .netscript/generated/plugin-ai/agents.registry.ts (1 ai-agents)
+$ deno eval <VALIDATE_AI_CHAT_ROUTE_SCRIPT> <project>
+AI chat route contract import smoke passed
 RAW_EXIT_CODE=0
 ```

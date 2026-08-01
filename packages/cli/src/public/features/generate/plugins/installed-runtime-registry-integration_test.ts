@@ -14,7 +14,9 @@ const REPOSITORY_ROOT = fromFileUrl(new URL('../../../../../../..', import.meta.
 const TRIGGER_REGISTRY_PATH = '.netscript/generated/plugin-triggers/triggers.registry.ts';
 const WORKERS_REGISTRY_PATH = '.netscript/generated/plugin-workers/job-registry.ts';
 const SAGAS_REGISTRY_PATH = '.netscript/generated/plugin-sagas/sagas.registry.ts';
-type RuntimePluginPackage = 'plugin-workers' | 'plugin-sagas' | 'plugin-triggers';
+const AI_TOOLS_REGISTRY_PATH = '.netscript/generated/plugin-ai/tools.registry.ts';
+const AI_AGENTS_REGISTRY_PATH = '.netscript/generated/plugin-ai/agents.registry.ts';
+type RuntimePluginPackage = 'plugin-ai' | 'plugin-workers' | 'plugin-sagas' | 'plugin-triggers';
 const VALID_TRIGGER = `
 export default {
   id: 'generic-inbound-webhook',
@@ -162,6 +164,47 @@ export default defineSaga('${id}');
   });
 });
 
+Deno.test('generated AI registries load resources and exclude the skill-loader factory', async () => {
+  await withTempProject(async (projectRoot) => {
+    await writeWorkspaceProject(projectRoot, ['plugin-ai'], {
+      'ai/tools/e2e-tool.ts': `
+export default {
+  descriptor: { name: 'e2e-tool' },
+  schema: {},
+  execute: async () => ({ state: 'output-available', output: { ok: true } }),
+};
+`,
+      'ai/tools/skill-loader.ts': `
+export function createSkillLoaderTool(skills: unknown) {
+  return { skills };
+}
+`,
+      'ai/agents/assistant.ts': 'export default function assistant() { return {}; }\n',
+    });
+    const generate = createInstalledRuntimeRegistryGenerator({
+      fs: new DenoFileSystem(),
+      process: new DenoProcess(),
+      fetchManifest: () => Promise.reject(new Error('workspace generation must not fetch')),
+    });
+
+    await generate({ dryRun: false, projectRoot });
+
+    const tools = await import(
+      `${toFileUrl(join(projectRoot, AI_TOOLS_REGISTRY_PATH)).href}?ai-tools`
+    );
+    const agents = await import(
+      `${toFileUrl(join(projectRoot, AI_AGENTS_REGISTRY_PATH)).href}?ai-agents`
+    );
+    assert(tools.registry instanceof Map);
+    assertEquals(tools.registry.has('e2e-tool'), true);
+    assertEquals(tools.registry.has('skill-loader'), false);
+    assertEquals(tools.registry.size, 1);
+    assert(agents.registry instanceof Map);
+    assertEquals(agents.registry.has('assistant'), true);
+    assertEquals(agents.registry.size, 1);
+  });
+});
+
 Deno.test('JSR-only imports retain the published manifest and generator fallback', async () => {
   await withTempProject(async (projectRoot) => {
     await writePublishedProject(projectRoot);
@@ -269,6 +312,7 @@ async function writeAppSettings(
 }
 
 function runtimeEntrypoint(packageName: RuntimePluginPackage): string {
+  if (packageName === 'plugin-ai') return 'plugins/ai/cli.ts';
   if (packageName === 'plugin-workers') return 'plugins/workers/bin/runtime.ts';
   return `plugins/${packageName.slice('plugin-'.length)}/src/runtime/mod.ts`;
 }
