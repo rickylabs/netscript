@@ -34,4 +34,8 @@ Start at `public/features/agent/init/init-agent.ts` for orchestration, follow th
 
 ## Evidence
 
-Pending PLAN-EVAL.
+PLAN-EVAL launch evidence:
+
+- `claude-print` with `qwen/qwen3.7-max`: exit 1, `model_not_found` / no access.
+- `agentic:provider-canary --live --profile claude-openrouter ...`: `status: blocked`, `credential: absent`, `auth_required`.
+- No source implementation started.
