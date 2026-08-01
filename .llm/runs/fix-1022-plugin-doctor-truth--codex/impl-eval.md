@@ -83,3 +83,47 @@ including the new green-path ones. Do not run `e2e:cli run scaffold.runtime`.
 
 Keep boxes 4 and 6 unticked with the stated reason. Push to `fix/1022-plugin-doctor-truth`; PR #1045
 stays draft until this is fixed. Record the correction in `drift.md`.
+
+---
+
+# IMPL-EVAL round 2 — head `392683023`
+
+Evaluator: Opus 5 supervisor (owner-waived open-model lane, 2026-08-01)
+
+## Blocking finding from round 1 — RESOLVED
+
+| Item | Evidence |
+| --- | --- |
+| Both workers registry shapes accepted | `plugins/workers/src/adapter/plugin.ts` counts `import (?:\* as )?job\d+` and sums `resolveJobHandler(jobN,` + `[jobN.id, jobN]` entries |
+| Green path proven against the **real** generators, not fixtures | `doctor-plugin-command_test.ts` imports and runs `compileWorkersRegistry`, `generateRuntimeRegistries` (via `plugins/workers/scaffold.runtime.json`) and `generateSagaRegistry` into temp dirs, then asserts `command.parse` resolves (exit 0) |
+| Harmful remediation removed | remediation is now `netscript generate plugins`, not `compile-registry`, so following it cannot rewrite a working registry into the other shape |
+| Sagas single-shape claim | `plugins/sagas/src/cli/registry-generator.ts` is the shared writer for both paths; covered by a real-generator green test |
+| Non-blocking 1 (loader swap) | named in the PR body; `plugin manifest import failures degrade to an error report` test asserts a throwing import yields `status: 'error'`, not a crash |
+| Non-blocking 2 (`cli` passthrough drive-by) | named in the PR body |
+| Non-blocking 3 (published-binary resolution) | recorded as debt `cli-plugin-doctor-published-module` in `.llm/harness/debt/arch-debt.md` |
+
+## Gates re-run by the supervisor on `392683023`
+
+- `run-deno-check` — cli 743 / plugin 153 / workers 98 / sagas 71 files, 0 diagnostics
+- `deno lint`, `deno fmt --check` on touched dirs — exit 0
+- doctor tests — 11 passed / 0 failed
+- `packages/cli/src/public/features/plugins`, `kernel/adapters/config`, `packages/plugin/src` — 60 passed / 0 failed
+- `deno task quality:gate` — exit 0
+- `e2e:cli run scaffold.runtime` — deliberately not run; no scaffold output changed
+
+## Residual concerns (not blocking, human-visible)
+
+1. The checks are **source-text regexes** over generated output rather than assertions on the
+   loader contract, which was the round-1 preferred remedy. They now cover both real writers and
+   have green tests per writer, so the false-red is gone — but a third generator shape would
+   silently re-open the same class of defect.
+2. `doctorPlugin` now imports plugin modules into the CLI process. Contained and tested, but it is
+   a real behaviour change for a diagnostic command.
+3. Acceptance boxes 4, 5 and 6 are not met. The PR was converted from `Closes` to `Refs` with a
+   Remaining scope section; `closingIssuesReferences` verified empty via GraphQL.
+
+## Verdict
+
+PASS on the scope actually claimed (issue boxes 1, 2, 3, 7). **Partial against #1022** — the PR
+stays a draft for human review because of the deferred AppHost boxes and the in-process import
+behaviour change.
