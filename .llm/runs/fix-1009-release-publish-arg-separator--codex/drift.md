@@ -24,3 +24,16 @@ documentation.
 - **Severity:** minor
 - **Action:** accept
 - **Evidence:** `supervisor.md` routes and override.
+
+## 2026-08-01 — Local formal evaluator transport unavailable
+
+- **What:** The local `claude-print` Qwen launch first resolved against the native Claude endpoint
+  and returned `model_not_found`; the canonical OpenRouter profile cannot be applied because this
+  host has no OpenRouter credential.
+- **Source:** Separate-session launch output and credential-presence check (names/status only).
+- **Expected:** Local Claude Code + OpenRouter Qwen PLAN-EVAL.
+- **Actual:** `OPENROUTER_API_KEY`, `ANTHROPIC_AUTH_TOKEN`, and `ANTHROPIC_API_KEY` are unset.
+- **Severity:** minor
+- **Action:** accept
+- **Evidence:** Fall back to the canonical cloud OpenHands open-model evaluator; no closed model and
+  no self-certification.

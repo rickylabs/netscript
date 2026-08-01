@@ -26,7 +26,8 @@ started.
 
 ## In Progress
 
-- Commit/push harness bootstrap, open draft PR, and run formal PLAN-EVAL.
+- Draft PR #1040 is open; dispatch formal PLAN-EVAL on the cloud OpenHands fallback because the
+  local OpenRouter transport has no credential.
 
 ## Next Steps
 
@@ -63,7 +64,7 @@ started.
 
 ## Drift and Debt
 
-- Drift: none; cause matches task prompt.
+- Drift: local formal-evaluator credential absence is recorded; cause/scope has no drift.
 - Debt: none.
 
 ## Commits
