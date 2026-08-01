@@ -59,3 +59,13 @@
 - **Severity:** significant
 - **Action:** use `deps:latest` stable-channel authority and align the root/SDK/scaffold range to `^1.2.1`, whose inspected graph uses DB 0.6.17.
 - **Evidence:** `deps:latest --filter @tanstack/query-db-collection`; `deno info npm:@tanstack/query-db-collection@1.2.1`.
+
+## 2026-08-01 — Local fixed-port collision masked the final runtime verdict
+
+- **What:** The full suite twice failed only `behavior.service-health` after all dependency-sensitive gates passed.
+- **Source:** Default `scaffold.runtime` runs `plugin-smoke-20260801-041634` and `plugin-smoke-20260801-042859`.
+- **Expected:** Generated users service owns the scaffold's hardcoded port 3001.
+- **Actual:** Windows `Get-NetTCPConnection` identified port 3001 as owned by out-of-scope `products.exe` PID 10700. The untruncated JSON response came from that service and referenced its stopped database at `127.0.0.1:50564`. The suite does not wait for `users`, so the bind failure surfaced only at the later probe.
+- **Severity:** environmental
+- **Action:** Do not terminate the unrelated process. Temporarily change only the local E2E fixture port to 13001, run the required one-pass command, then restore the source file before committing.
+- **Evidence:** Isolated-port run passed all 62 gates, including `generated.deno-check`, `behavior.service-health`, and `behavior.app-home`; final branch has no E2E port change.
