@@ -7,7 +7,7 @@
  *
  * Examples:
  * - deno run --allow-read --allow-write --allow-run --allow-net --allow-env .llm/tools/e2e/scaffold-e2e-test.ts
- * - deno run --allow-read --allow-write --allow-run --allow-net --allow-env .llm/tools/e2e/scaffold-e2e-test.ts --format pretty --cleanup
+ * - deno run --allow-read --allow-write --allow-run --allow-net --allow-env .llm/tools/e2e/scaffold-e2e-test.ts --format pretty
  * - deno run --allow-read --allow-write --allow-run --allow-net --allow-env .llm/tools/e2e/scaffold-e2e-test.ts --repo . --name plugin-smoke-manual --strict-telemetry
  */
 
@@ -16,12 +16,14 @@ import { ensureDir } from 'jsr:@std/fs@1/ensure-dir';
 import { exists } from 'jsr:@std/fs@1/exists';
 import { dirname, fromFileUrl, join, resolve } from 'jsr:@std/path@1';
 import { Command } from 'jsr:@cliffy/command@1.0.0';
+import { probeResources } from '../agentic/teardown/probes.ts';
+import { registerAppHost } from '../agentic/teardown/run-resources.ts';
 
 type OutputFormat = 'ndjson' | 'json' | 'pretty';
 type StepKind = 'command' | 'http' | 'tcp' | 'sleep' | 'summary';
 type StepStatus = 'passed' | 'failed' | 'warning' | 'skipped';
 
-interface Options {
+export interface Options {
   repo: string;
   cli: string;
   smokeRoot: string;
@@ -30,6 +32,7 @@ interface Options {
   source: 'auto' | 'starter' | 'local';
   samples: boolean;
   cleanup: boolean;
+  runResourcesDir: string;
   dryRun: boolean;
   skipTelemetry: boolean;
   strictTelemetry: boolean;
@@ -45,7 +48,7 @@ interface Options {
   authUrl: string;
 }
 
-interface CommandOptionValues {
+export interface CommandOptionValues {
   repo?: string;
   cli?: string;
   smokeRoot?: string;
@@ -55,6 +58,8 @@ interface CommandOptionValues {
   samples?: boolean;
   noSamples?: boolean;
   cleanup?: boolean;
+  noCleanup?: boolean;
+  runResourcesDir?: string;
   dryRun?: boolean;
   skipTelemetry?: boolean;
   strictTelemetry?: boolean;
@@ -188,7 +193,7 @@ function parseFormat(raw: string): OutputFormat {
   throw new Error(`--format must be one of ndjson, json, pretty; got "${raw}"`);
 }
 
-function defaultOptions(): Options {
+export function defaultOptions(): Options {
   const repo = inferRepoRoot();
   return {
     repo,
@@ -198,7 +203,9 @@ function defaultOptions(): Options {
     db: 'postgres',
     source: 'local',
     samples: true,
-    cleanup: false,
+    cleanup: true,
+    runResourcesDir: Deno.env.get('NETSCRIPT_RUN_DIR') ??
+      join(repo, '.llm', 'tmp', 'manual-scaffold-smoke'),
     dryRun: false,
     skipTelemetry: false,
     strictTelemetry: false,
@@ -233,7 +240,7 @@ function authSmokeEnvLines(indent: string): string[] {
   );
 }
 
-function normalizeCommandOptions(raw: CommandOptionValues): Options {
+export function normalizeCommandOptions(raw: CommandOptionValues): Options {
   const defaults = defaultOptions();
   const repo = raw.repo ? resolve(raw.repo) : defaults.repo;
   const cli = raw.cli ? resolve(raw.cli) : join(repo, 'packages', 'cli', 'bin', 'netscript-dev.ts');
@@ -250,7 +257,10 @@ function normalizeCommandOptions(raw: CommandOptionValues): Options {
     db: raw.db ?? defaults.db,
     source: parseSourceMode(raw.source ?? defaults.source),
     samples: !(raw.samples === false || raw.noSamples === true),
-    cleanup: raw.cleanup === true,
+    cleanup: raw.noCleanup === true ? false : raw.cleanup ?? defaults.cleanup,
+    runResourcesDir: raw.runResourcesDir
+      ? resolve(raw.runResourcesDir)
+      : Deno.env.get('NETSCRIPT_RUN_DIR') ?? join(smokeRoot, name),
     dryRun: raw.dryRun === true,
     skipTelemetry: raw.skipTelemetry === true,
     strictTelemetry: raw.strictTelemetry === true,
@@ -304,9 +314,17 @@ async function parseCliOptions(args: string[]): Promise<Options | null> {
       default: true,
     })
     .option('--no-samples', 'Skip official sample tasks/jobs/sagas/triggers.')
-    .option('--cleanup', 'Stop the generated Aspire AppHost before exit.', {
-      default: false,
+    .option('--cleanup', 'Stop the generated Aspire AppHost before exit (default).', {
+      default: true,
     })
+    .option(
+      '--no-cleanup',
+      'Leave the generated AppHost running, register it, and print an escalation command.',
+    )
+    .option(
+      '--run-resources-dir <path:string>',
+      'Directory for run-resources.json. Default: NETSCRIPT_RUN_DIR or generated project root.',
+    )
     .option('--dry-run', 'Emit the planned steps without executing commands or HTTP calls.', {
       default: false,
     })
@@ -674,6 +692,8 @@ class SmokeRunner {
     } finally {
       if (this.#options.cleanup && this.#startedAspire && !this.#options.dryRun) {
         await this.#cleanupAspire();
+      } else if (!this.#options.cleanup && this.#startedAspire && !this.#options.dryRun) {
+        console.error(`ESCALATION: cleanup disabled; run: ${this.stopCommand.join(' ')}`);
       }
     }
 
@@ -1040,6 +1060,25 @@ class SmokeRunner {
       env: authSmokeEnv(),
     });
     this.#startedAspire = !this.#options.dryRun;
+    if (this.#startedAspire) await this.#registerStartedAppHost();
+  }
+
+  async #registerStartedAppHost(): Promise<void> {
+    const appHost = (await probeResources()).find((resource) =>
+      resource.kind === 'apphost' && resolve(resource.appHostPath) === resolve(this.appHost)
+    );
+    if (
+      !appHost || appHost.kind !== 'apphost' || appHost.appHostPid === undefined ||
+      !appHost.appHostStartedAt
+    ) {
+      throw new Error(`started AppHost was not discoverable for registry: ${this.appHost}`);
+    }
+    await registerAppHost(this.#options.runResourcesDir, this.#options.repo, {
+      appHostPath: appHost.appHostPath,
+      appHostPid: appHost.appHostPid,
+      appHostStartedAt: appHost.appHostStartedAt,
+      startedAt: new Date().toISOString(),
+    });
   }
 
   async #waitForResources(): Promise<void> {
@@ -1580,4 +1619,4 @@ async function main(): Promise<void> {
   }
 }
 
-await main();
+if (import.meta.main) await main();
