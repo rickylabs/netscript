@@ -25,3 +25,15 @@ newly published `@netscript/fresh`. Changing the experimental exclusion to the v
 identity `jsr:@netscript/fresh` made Vite start and repopulated Aspire's `urls[]`. The implementation
 therefore corrects the shipped workspace policy rather than the endpoint declaration or retry
 budget.
+
+## D-4 — warm dependency cache hid the canary.4 render defect
+
+The first exact published-CLI reproduction returned HTTP 200 because the contributor Deno cache
+already contained Fresh's npm runtime dependencies. Repeating the same generated app with an empty
+`DENO_DIR` reproduced the production HTTP 500: Vite could not resolve
+`npm:@tanstack/preact-query@^5.101.0` imported by the published `@netscript/fresh`. The package's
+workspace `package.json` declared five catalog-backed runtime dependencies, but the JSR-published
+`deno.json` did not. After correcting Fresh's manifest, the same cold-cache probe exposed the next
+missing dependency in `@netscript/sdk` (`@orpc/tanstack-query`), so the implementation aligns both
+publish manifests with their runtime dependency sets and adds cold-cache regression assertions. It
+does not change the generated page or add retries.
