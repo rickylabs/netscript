@@ -59,3 +59,42 @@ Reconciliation: the owner waived the open-model evaluator lane for the 0.0.3 fix
 - Evidence: focused agent tests 9/9 pass; scoped CLI check selects 744 files with zero diagnostics; scoped CLI lint selects 744 files with zero findings; `quality:gate` exits 0 with zero new quality findings.
 - Doctrine note: the direct whole-CLI readiness scan still reports the package's pre-existing 48 FAIL / 42 WARN Restructure backlog; none names the new port, adapter, use case, or tests. No new debt is introduced.
 - Reconcile: the draft PR retains `Closes #1026`; its `Refs #1023` paragraph explicitly scopes the overlap.
+
+## S4 — acceptance and discoverability evidence
+
+### Cold-start chain
+
+Fresh root: `/tmp/netscript-agent-1026.mjAZ0z`.
+
+1. **Unprompted entry:** generated `AGENTS.md` lines 4–8 name “Healthy but not responding”, `aspire`, `deno`, `help.md`, `netscript plugin doctor`, `aspire logs`, `aspire otel logs|spans|traces`, and `deno info`.
+2. **Resolved routes:** installed `netscript/SKILL.md` lines 18–20 and 35–37 route Aspire → `aspire`, Deno → `deno`, and unexplained hang/vanish/silence → `help.md`; the manifest-driven test verifies those names exist in the installed set.
+3. **Symptom beside command:** installed `help.md` maps “Healthy is not proof”, “Vite ... hangs”, and “An event does not fire” to `aspire logs`, `aspire otel traces`, and `aspire resource ... restart`; installed `aspire/SKILL.md` carries the same diagnostic commands.
+
+The first real CLI run installed `playwright-cli`. The second printed `NetScript agent integration is already current.` with `elapsed=1.47 exit=0`, proving the product guard skipped the ~7-second delegation. Both generated host configs contain the exact Aspire MCP entry.
+
+### Missing executable
+
+With child `PATH=/usr/bin`, the real CLI printed exactly one line:
+
+`Aspire agent wiring was skipped: the aspire executable was not found on PATH.`
+
+The same run still wrote `{"command":"aspire","args":["agent","mcp"]}`.
+
+### Final gates
+
+| Gate | Exit | Evidence |
+| --- | ---: | --- |
+| assets generation + check | 0 | generation ran twice; no diff failure |
+| scoped CLI check | 0 | 744 files, 7 batches, 0 diagnostics |
+| scoped CLI lint | 0 | 744 files, 4 batches, 0 findings |
+| focused agent tests | 0 | 9 passed, 0 failed |
+| owned skill formatting | 0 | 5 files checked |
+| scoped CLI TS formatting | 0 | 744 files, 0 findings |
+| exact broad `deno fmt --check skills packages/cli` | 1 | pre-existing drift in `packages/cli/e2e/README.md`, `skills/netscript-operate/SKILL.md`, and `skills/netscript-build/SKILL.md`; no owned file is unformatted |
+| quality gate | 0 | quality scan clean; architecture/dependency command completed with existing warnings |
+
+No lockfile or unrelated source change was produced. `scaffold.runtime` was not run per explicit scope.
+
+### Reconcile
+
+PR #1030 closes #1026 and explicitly references the installed-surface portion of #1023 without closing it. S1–S4 are complete; final Opus supervisor IMPL-EVAL remains the merge gate.
