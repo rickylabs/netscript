@@ -5,8 +5,8 @@
 The issue suspected that plugin sync loaded project configuration in the CLI context. Current source
 already loads `netscript.config.ts` in a child Deno process with the project's `deno.json` and cwd.
 The clean-room failure occurs afterward when `ModuleManifestResolver` dynamically imports configured
-project modules in the parent CLI process, where the project's bare `zod` import is unavailable.
-The plan therefore removes that duplicate sync analysis path by delegating sync to authoritative,
+project modules in the parent CLI process, where the project's bare `zod` import is unavailable. The
+plan therefore removes that duplicate sync analysis path by delegating sync to authoritative,
 project-rooted runtime generation.
 
 ## 2026-08-01 — process override — PR lifecycle retained by owner

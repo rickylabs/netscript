@@ -45,6 +45,7 @@ import { detectServiceOs } from '../../../kernel/adapters/deploy/runtime-detect.
 import type { OsServicePort } from '../../ports/os-service-port.ts';
 import type { ServiceManifest } from '../../ports/service-manifest-port.ts';
 import type { GeneratePluginRegistriesCommandDependencies } from '../generate/plugins/generate-plugin-registries-command.ts';
+import { createInstalledRuntimeRegistryGenerator } from '../generate/plugins/installed-runtime-registry-generator.ts';
 import type { GenerateRuntimeSchemasCommandDependencies } from '../generate/runtime-schemas/generate-runtime-schemas-command.ts';
 import type { InitPipelineContext } from '../../../kernel/application/scaffold/context.ts';
 import type { FileSystemPort } from '../../../kernel/ports/file-system-port.ts';
@@ -326,6 +327,11 @@ export function createPublicCommandDependencies(
       extractor: new AstExtractor(),
       emitter: new RegistryEmitter(),
       fs,
+      generate: createInstalledRuntimeRegistryGenerator({
+        fetchManifest: (url) => fetch(url, { headers: { Accept: 'application/json' } }),
+        fs,
+        process,
+      }),
     },
     deployBuildDependencies: {
       loadConfig: (options) => loadDeployConfig({ ...options, loadNetScriptConfig: loadConfig }),
