@@ -34,7 +34,7 @@
 | # | Slice | Gate | Files |
 | - | - | - | - |
 | 1 | Bootstrap research/plan and obtain PLAN-EVAL | PLAN-EVAL PASS | `.llm/runs/.../*` |
-| 2 | Remove anonymous dashboard mode at both generator sources | focused template tests + asset generation | `generate-aspire-config.ts`, dashboard template, embedded asset, tests, run artifacts |
+| 2 | Remove anonymous dashboard mode at both generator sources | focused template tests + asset generation | `generate-aspire-config.ts`, `generate-aspire-config_test.ts`, `configure-dashboard.ts.template`, `generators-pipeline_test.ts`, `embedded.generated.ts`, `docs/site/explanation/aspire.md`, run artifacts |
 | 3 | Strengthen automatic detached telemetry/export regression | scoped check/lint/fmt + focused tests | `.llm/tools/e2e/scaffold-e2e-test.ts`, tests, run artifacts |
 | 4 | Execute one-pass runtime evidence and final evaluation | scaffold runtime + IMPL-EVAL | run artifacts and PR/issue evidence |
 
@@ -53,6 +53,8 @@ template; runtime proof lives at `#checkTelemetry()` in `.llm/tools/e2e/scaffold
 | --- | --- | --- | --- |
 | 2026-08-01 21:21 CEST | 1 | research complete | Exact failure exit 12 and explicit-URL exit 0 reproduced on generated TS AppHost. |
 | 2026-08-01 21:26 CEST | 1 | discriminator complete | Removing anonymous mode restored tokenized URL and automatic traces exit 0 under `--isolated`. |
+| 2026-08-01 21:38 CEST | 1 | export amendment complete | Patched detached export saved a 12,857-byte zip and exited 0. |
+| 2026-08-01 21:41 CEST | 1 | token blast-radius audit | 53 files matched dashboard/open/`:18888` guidance; wider alignment reported, not expanded. |
 
 ## Decisions
 
@@ -72,3 +74,5 @@ template; runtime proof lives at `#checkTelemetry()` in `.llm/tools/e2e/scaffold
   credential (`auth_required`) for the canonical Qwen evaluator route. No implementation started.
 - Separate owner-supervisor PLAN-EVAL at `575aea3fb`: FAIL_PLAN; required the anonymous-mode A/B
   control and an honest acceptance mapping. Both plan defects are now amended for cycle 2.
+- Supervisor cycle-3 adjudication: conditional PASS. Findings A/B, token audit, and the published
+  package gate-table amendment are complete; implementation is authorized.

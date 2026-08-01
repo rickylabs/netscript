@@ -20,13 +20,20 @@
 | 7 | `ASPIRE_ALLOW_UNSECURED_TRANSPORT` is not the cause and must remain. | Removing it makes startup fail because NetScript configures an HTTP OTLP endpoint; restoring it while leaving anonymous mode unset makes discovery pass. |
 | 8 | The presumed isolated-mode defect does not exist after the template fix. | The passing control used `aspire start --isolated` and automatic `aspire otel traces ... --apphost apphost.mts`; no `--isolated` option is needed on the consumer command. |
 | 9 | Anonymous mode is emitted twice by NetScript. | `generate-aspire-config.ts` writes the environment variable into `aspire.config.json`; `configure-dashboard.ts.template` sets it in the AppHost process. Both must be removed and the embedded asset regenerated. |
+| 10 | `aspire export` recovers when anonymous mode is removed. | Against the patched detached isolated reproduction, export gathered resource data, console logs, structured logs, and traces; saved a 12,857-byte zip; and exited 0. |
+| 11 | Existing docs corroborate the authenticated behavior. | `docs/site/explanation/aspire.md:352` says `aspire start` prints a one-time dashboard login token. |
+| 12 | F2/F3 used different expected ephemeral ports. | The failing and explicit-URL controls were separate detached starts (`:42183` and `:43903`); generated profiles bind `localhost:0`, so the port change is unrelated to the cause. |
+| 13 | Token-facing documentation exceeds this slice. | A repository-wide audit found 53 files matching dashboard/open/`:18888` guidance. Several mention the token, but many direct links do not; this is reported rather than expanded into a corpus rewrite. |
 
 ## jsr-audit surface scan
 
-- N/A: this slice changes repository E2E tooling, skills, and documentation, not a published package surface.
+- Surface scanned: `@netscript/cli` generator sources and published embedded assets.
+- Slow-type/public API risk: none; no exported TypeScript signatures change. Generated-asset and
+  package fitness are covered by focused tests, `check:assets-barrel`, and `quality:gate`.
 
 ## Open questions
 
 - Must resolve now: what counts as non-empty telemetry JSON. Resolve by parsing command stdout and
   requiring a non-empty JSON array for the traces step after the suite has exercised HTTP traffic.
+- Resolved now: `aspire export` recovery. Observed exit 0 and a non-empty zip after removing anonymous mode.
 - Safe to defer: no open cause question remains; the local A/B control directly changed the failing behavior.

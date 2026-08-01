@@ -65,6 +65,7 @@ then make scaffold E2E semantically prove automatic `otel` and `export` against 
 | Export output path cleanup | resolved | Write under the generated project and remove during normal suite cleanup. |
 | Empty logs behavior | safe to defer | Traces after exercised traffic is the acceptance regression; logs remain useful but are not the semantic gate. |
 | Acceptance box 1 | resolved | Template fix makes automatic discovery work; no partial documented-remedy claim is needed. |
+| Acceptance box 2 | resolved | Patched automatic export exited 0 and wrote a non-empty zip. |
 
 ## Risk Register
 
@@ -73,6 +74,7 @@ then make scaffold E2E semantically prove automatic `otel` and `export` against 
 | JSON contains banners/noise | Use `--non-interactive --nologo --format Json`; parse trimmed stdout and report the raw tail on failure. |
 | Export passes without a file | Assert the requested zip exists and has non-zero size. |
 | Removing anonymous mode breaks HTTP OTLP | Preserve `ASPIRE_ALLOW_UNSECURED_TRANSPORT`; targeted startup control already proved this requirement. |
+| Dashboard now requires its one-time login token | Correct the owned generated-config sample, keep the PR draft for human security review, and report the wider 53-file docs surface without expanding scope. |
 | Expensive E2E repeated | Run the requested telemetry/full runtime path once after implementation. |
 
 ## Fitness Gates
@@ -84,7 +86,9 @@ then make scaffold E2E semantically prove automatic `otel` and `export` against 
 | Asset generation | yes | Repo-native embedded asset generator plus focused template tests. |
 | Runtime telemetry | yes | One-pass scaffold runtime E2E with raw otel/export evidence. |
 | Source alignment | yes | Live Aspire 13.4.6 before/control reproduction. |
-| JSR/package gates | no | No published package source change. |
+| Package quality | yes | `deno task quality:gate` because generator/template assets ship in `@netscript/cli`. |
+| Asset barrel | yes | `deno task check:assets-barrel` proves generated output is synchronized. |
+| JSR surface | scoped | No exported signature change; publish-surface scan recorded in research. |
 
 ## Arch-Debt Implications
 
@@ -95,7 +99,9 @@ None. The defect is fixed at its two generator sources; no architecture violatio
 1. Scoped check, lint, and fmt wrappers for `.llm/tools/e2e`.
 2. Focused tests covering parser/assertion behavior.
 3. Embedded asset generation/check and focused template tests.
-4. One-pass `scaffold.runtime --cleanup --format pretty` telemetry evidence, with strict semantic checks.
+4. `deno task quality:gate` for the published CLI generator slice.
+5. Docs maintenance/build evidence for the corrected `aspire.md` sample.
+6. One-pass `scaffold.runtime --cleanup --format pretty` telemetry evidence, with strict semantic checks.
 
 ## Drift Watch
 

@@ -13,6 +13,9 @@
 - Automatic traces output: `Could not fetch telemetry data from the dashboard. The dashboard is not available.`; exit 12.
 - Removing only `ASPIRE_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS` produced a tokenized login URL and
   automatic `--apphost` traces output `[]`, exit 0, under an isolated detached start.
+- Patched automatic export gathered all data classes, saved a 12,857-byte zip, and exited 0.
+- Token blast-radius audit matched 53 docs/README/generated-asset files; only the owned verbatim
+  generated-config sample is in scope, and the wider alignment surface must be reported.
 - Live help proves `otel`/`export` accept `--dashboard-url` and do not accept `--isolated`.
 
 ## Locked direction
@@ -24,6 +27,6 @@
 ## Blocker / next action
 
 - Draft PR #1036 is open and the bootstrap commit is pushed.
-- Cycle-1 owner-supervisor PLAN-EVAL returned FAIL_PLAN and is committed in `plan-eval.md`.
-- The requested discriminator and acceptance correction are complete; request cycle-2 PLAN-EVAL.
-- No implementation has begun.
+- Supervisor adjudication in `plan-eval.md` records conditional PASS and authorizes implementation.
+- Findings A/B, the token blast-radius audit, and Finding C's package gate-table amendment are complete.
+- Proceed with slices 2 and 3; leave PR draft for human security-posture review.

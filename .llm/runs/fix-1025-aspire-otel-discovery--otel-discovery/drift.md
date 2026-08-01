@@ -29,8 +29,15 @@ Append-only. Record deviations from the issue framing, locked plan, route policy
   OpenRouter + `qwen/qwen3.7-max`.
 - Actual: `deno task agentic:provider-canary --live --profile claude-openrouter ...` returned
   `status: blocked`, `credential: absent`, and `auth_required`; no evaluator session launched.
-- Policy consequence: closed/paid models are prohibited, and the OpenHands handoff skill prohibits
-  dispatching cloud OpenHands for a local-machine run. The supervisor cannot self-evaluate.
-- Required unblock: owner supplies/configures an OpenRouter credential for the canonical local
-  evaluator, or explicitly authorizes a different policy-compliant evaluator transport/waives the
-  Plan-Gate. No implementation may begin before one of those occurs.
+- Superseded by owner waiver: the Opus supervisor performs PLAN-EVAL/IMPL-EVAL for the 0.0.3 fix
+  train. Generator is Codex/GPT family and evaluator is Claude family in a separate session, so
+  evaluator independence holds. Missing OpenRouter credentials are not a blocker for this run.
+
+## 2026-08-01 — Token-facing documentation exceeds slice boundary
+
+- Severity: significant, deferred documentation alignment (not architecture debt).
+- Audit: 53 files matched dashboard/open/`:18888` guidance across docs, README, and generated assets.
+- In-scope correction: the verbatim generated config sample in `docs/site/explanation/aspire.md`.
+- Out-of-scope surface: broader guidance that links directly to the dashboard without consistently
+  repeating that the URL/token comes from `aspire start`.
+- Disposition: report to the owner and keep PR draft; do not widen #1025 into a docs-corpus rewrite.
