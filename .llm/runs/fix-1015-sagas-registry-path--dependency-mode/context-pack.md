@@ -2,7 +2,7 @@
 
 ## Current state
 
-- Phase: PLAN-EVAL cycle-1 remediation complete; implementation authorized by owner.
+- Phase: implementation complete; final validation/IMPL-EVAL handoff pending.
 - Branch/base: `fix/1015-sagas-registry-path` at `3ab64720f` from `origin/main`.
 - Root cause verified exactly as supplied: service init and runner fallback anchor registry paths to
   package `import.meta.url`; Aspire never supplies the env seam; generated glue is already correct.
@@ -10,7 +10,7 @@
 
 ## Next action
 
-Implement the four commit slices in the amended plan. Do not retry OpenRouter/Qwen and do not
-dispatch OpenHands. The owner waived that route for the 0.0.3 fix train; Opus 5 is the separate
-evaluator. Preserve the honesty boundary: the injected-importer test is dependency-shaped evidence,
-not a real published JSR install.
+Rerun the exact final validation after the test-file split, update PR #1031 with per-slice evidence,
+then hand off to the Opus 5 supervisor for IMPL-EVAL. Do not retry OpenRouter/Qwen or dispatch
+OpenHands. The dependency-shaped test is not a real published JSR install and must remain reported
+that way.

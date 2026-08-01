@@ -3,6 +3,7 @@ import {
   SAGAS_API_SERVICE_NAME,
   SAGAS_PLUGIN_VERSION,
 } from '../constants.ts';
+import { projectFileUrl } from '../runtime/project-registry-module.ts';
 
 const SAGAS_PLUGIN_PACKAGE_NAME = '@netscript/plugin-sagas' as const;
 const SAGAS_BACKGROUND_RESOURCE_NAME = 'sagas-runner' as const;
@@ -129,11 +130,15 @@ export class SagasAspireContribution {
   }
 
   /** Declare environment values used by sagas Aspire resources. */
-  declareEnv(_ctx: SagasContributionContext): Record<string, SagasEnvSource | string> {
+  declareEnv(ctx: SagasContributionContext): Record<string, SagasEnvSource | string> {
     return {
       SAGAS_API_URL: `http://localhost:${SAGAS_API_DEFAULT_PORT}`,
       SAGAS_ADAPTER: 'native',
       SAGAS_DURABILITY_TIER: 't1',
+      SAGAS_REGISTRY_MODULE: projectFileUrl(
+        '.netscript/generated/plugin-sagas/sagas.registry.ts',
+        ctx.projectRoot,
+      ).href,
       [SAGAS_RUNNER_CONCURRENCY_ENV]: SAGAS_DEFAULT_RUNNER_CONCURRENCY,
     };
   }

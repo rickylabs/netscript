@@ -59,6 +59,8 @@ Deno.test('SagasAspireContribution registers API and background resources', () =
     SAGAS_API_URL: 'http://localhost:8092',
     SAGAS_ADAPTER: 'native',
     SAGAS_DURABILITY_TIER: 't1',
+    SAGAS_REGISTRY_MODULE:
+      'file:///workspace/netscript-app/.netscript/generated/plugin-sagas/sagas.registry.ts',
     SAGAS_RUNNER_CONCURRENCY: '2',
   });
   assertEquals(contribution.declareHealthChecks(ctx), [{

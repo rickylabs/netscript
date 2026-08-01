@@ -59,6 +59,8 @@ environment, or project-root inputs to it, and tests inject env/cwd/import behav
 | 2026-08-01 | 1 | shared resolver | Added injected env/cwd/project-root resolution with explicit → env → fallback precedence, Windows/backslash coverage, and absolute specifier preservation. Focused tests passed. |
 | 2026-08-01 | 2 | runner dependency shape | Removed package-relative resolution and proved the fallback importer receives the consumer project URL and loads one definition. |
 | 2026-08-01 | 3 | API service seam | Routed `registerSagas` through the shared precedence resolver and injected importer/registrar seams; service test registered one loaded definition. |
+| 2026-08-01 | 4 | Aspire declaration | Added the absolute project URL to the forward-looking dead `declareEnv` seam and its test; the runtime fallback remains the acceptance mechanism. |
+| 2026-08-01 | 1–4 | reconcile | PR #1031 still closes #1015, taxonomy/milestone are correct, no new reviewer comments changed scope, and no plan drift beyond the evaluator-recorded dead seam/cross-plugin duplication. |
 
 ## Decisions
 
@@ -82,3 +84,12 @@ the amended plan under the owner's instruction; implementation is authorized wit
 | Resolver focused tests | PASS | 3 resolver tests passed: precedence/fallback, Windows paths, absolute specifiers. |
 | Runner dependency-shape test | PASS | `startSagaRunner` loaded one definition from `file:///consumer/project/...`; no JSR install was performed. |
 | Service init test | PASS | `registerSagas` imported the consumer-project URL and passed one definition to the registrar seam. |
+| `deno run -A .llm/tools/run-deno-check.ts --root plugins/sagas --ext ts` | PASS | Exit 0; wrapper emitted no diagnostics. |
+| `deno fmt --check plugins/sagas` | PASS | `Checked 78 files`. |
+| `deno lint plugins/sagas` | PASS | `Checked 73 files`. |
+| `deno test -A plugins/sagas/tests/` | PASS | 24 passed, 0 failed before the runner test was moved byte-for-byte into its own test file; final rerun pending. |
+| `deno test -A plugins/sagas/src/adapter/resources/resources.test.ts` | PASS | 4 passed, 0 failed; emitted glue text remains unchanged. |
+| Aspire contribution test | PASS | 1 passed, 0 failed. |
+| Scoped fmt/lint wrappers | PASS | 73 files selected; zero failed batches/findings. |
+| `deno task quality:gate` | PASS | Code-quality scan: zero findings; doctrine scan: zero FAIL, existing WARN/INFO only. |
+| `rg "import\\.meta\\.url" plugins/sagas/` | PASS | No matches; no registry path resolution remains. |
