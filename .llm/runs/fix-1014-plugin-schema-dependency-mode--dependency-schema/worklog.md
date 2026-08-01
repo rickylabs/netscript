@@ -137,3 +137,70 @@ host-side plugin-name mapping.
 | 2 | Kernel writes resolved fragments to the unchanged engine/plugin target and preserves bare-schema naming. | `db-integration_test.ts`: named and bare filename tests PASS. |
 | 3 | JSR dependency installs throw `ScaffoldValidationError` for DB-required, declared, zero-fragment packages; no-DB/no-schema remain no-ops. | Kernel boundary test plus install-flow rejection test PASS with searched paths. |
 | 4 | Dependency-mode semantic install flow writes the real published fragment into root schema. | `install-plugin_test.ts` PASS; local-path-only userland suite explicitly excluded. |
+
+## CI Repair Slice — PR #1043 `check-test`
+
+### Plan (2026-08-01)
+
+- Baseline: `a510cef87b15d7b3c43adca0f54704270d267908`; reproduce the pinned-specifier guard failure before editing.
+- Scope: test-fixture-only refactor in `install-plugin_test.ts`; introduce one fixture-version constant and interpolate the expected `jsr:` diagnostic without weakening its exact `assertEquals` contract. Preserve the two literal `https://jsr.io/` URL expectations as instructed.
+- Boundaries: do not change production behavior, the repo-wide version guard, release constants, workflows, PR metadata, or the kernel/public-infra ownership split.
+- Gates: run the guard test, focused install-flow test, combined plugin test directories, scoped check, lint, and broad fmt commands exactly as requested; record raw outcomes here.
+- Evaluation: owner waiver dated 2026-08-01 authorizes direct implementation after this plan; the Opus 5 supervisor performs PLAN-EVAL and IMPL-EVAL. No external evaluator lane will be launched and no new `plan-eval.md` will be fabricated.
+
+### Baseline reproduction (2026-08-01)
+
+```text
+deno test -A packages/cli/src/kernel/constants/version-drift_test.ts
+FAILED | 1 passed | 1 failed (449ms)
+Found hardcoded pinned NetScript JSR specifiers:
+/home/codex/repos/fix-1014/packages/cli/src/public/features/plugins/install/install-plugin_test.ts
+```
+
+### Implementation and gate evidence (2026-08-01)
+
+- Added `PUBLISHED_PLUGIN_VERSION` in `install-plugin_test.ts` and interpolated only the expected
+  `jsr:` searched path. Exact `assertEquals` semantics and both array elements remain intact.
+- Production files, the version-drift guard, release constants, workflows, and the two explicit
+  `https://jsr.io/` expectations were not changed. No layer boundary or runtime behavior moved.
+
+```text
+deno test -A packages/cli/src/kernel/constants/version-drift_test.ts
+ok | 2 passed | 0 failed (240ms)
+```
+
+```text
+deno test -A packages/cli/src/public/features/plugins/install/install-plugin_test.ts
+installs a published Prisma fragment from JSR metadata into the root schema tree ... ok (10ms)
+rejects a DB-required JSR plugin that declares migrations without a published fragment ... ok (3ms)
+ok | 1 passed (21 steps) | 0 failed (3s)
+```
+
+```text
+deno test -A packages/cli/src/kernel/adapters/plugin/ packages/cli/src/public/features/plugins/
+ok | 46 passed (56 steps) | 0 failed (6s)
+```
+
+```text
+deno run -A .llm/tools/run-deno-check.ts --root packages/cli --ext ts,tsx
+{"source":{"mode":"selection","cwd":"/home/codex/repos/fix-1014"},"command":"deno check --quiet --unstable-kv <files>","selection":{"filesSelected":742,"batches":7,"failedBatches":0},"summary":{"totalOccurrences":0,"uniqueOccurrences":0,"uniqueCodes":0,"uniquePaths":0},"groups":[]}
+```
+
+```text
+deno run -A .llm/tools/run-deno-lint.ts --root packages/cli
+{"source":{"mode":"command","cwd":"/home/codex/repos/fix-1014","exitCode":0},"selection":{"filesSelected":742,"batches":4},"summary":{"totalOccurrences":0,"uniqueOccurrences":0,"uniqueRules":0,"uniquePaths":0},"groups":[]}
+```
+
+```text
+deno run -A .llm/tools/run-deno-fmt.ts --root packages/cli
+exit 1
+{"command":"deno fmt --check","cwd":"/home/codex/repos/fix-1014","mode":"check","summary":{"filesSelected":750,"batches":4,"failedBatches":1,"findings":1,"ignoredFindings":0},"findings":[{"path":"/home/codex/repos/fix-1014/packages/cli/e2e/README.md","reason":"-The structured native report is written to"}]}
+```
+
+The broad formatting result is the single pre-existing, owner-identified Markdown finding and is
+not attributable to this test-only change. It remains untouched.
+
+### Reconcile
+
+Scope remains the single `check-test` defect. The owner retains PR/issue/push actions, so no GitHub
+surface was mutated. No drift from the repair plan and no architecture debt were introduced.

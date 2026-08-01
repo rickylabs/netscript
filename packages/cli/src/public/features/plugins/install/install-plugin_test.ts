@@ -29,6 +29,7 @@ import { dispatchPluginScaffold } from '../dispatch/dispatch-plugin-verb.ts';
 await DEFAULT_TEMPLATE_REGISTRY.hydrate();
 
 const REPO_ROOT = resolve(dirname(fromFileUrl(import.meta.url)), '../../../../../../..');
+const PUBLISHED_PLUGIN_VERSION = '0.0.1-alpha.12';
 
 function repoPath(path: string): string {
   return join(REPO_ROOT, path);
@@ -356,7 +357,7 @@ describe('public install plugin flow', () => {
     assertStringIncludes(error.message, 'sagas');
     assertEquals(error.context?.searchedPaths, [
       '/workspace/alpha/plugins/sagas/database',
-      'jsr:@netscript/plugin-sagas@0.0.1-alpha.12/database/**/*.prisma',
+      `jsr:@netscript/plugin-sagas@${PUBLISHED_PLUGIN_VERSION}/database/**/*.prisma`,
     ]);
   });
 
