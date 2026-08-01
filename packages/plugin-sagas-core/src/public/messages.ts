@@ -11,13 +11,27 @@ import { SagasError } from '../domain/mod.ts';
 /** Delay accepted by the `schedule()` cascaded-message constructor. */
 export type SagaScheduleDelay = Date | number | `${number}${'ms' | 's' | 'm' | 'h' | 'd'}`;
 
-/** Options accepted by `send()`. */
+/**
+ * Options for republishing an internal saga message onto the saga bus.
+ *
+ * A `send` cascade does not trigger a worker job or task. Use the explicit
+ * `./integration/workers` helpers or the triggers API enqueue path for workers.
+ */
 export type SendOptions = CascadedMessageOptions;
 
-/** Options accepted by `spawn()`. */
+/**
+ * Options reserved for the unsupported `spawn()` cascade.
+ *
+ * @unsupported Dispatching a spawn cascade throws `SAGA_NOT_IMPLEMENTED`.
+ */
 export type SpawnOptions = Pick<CascadedMessageOptions, 'idempotencyKey' | 'concurrencyKey'>;
 
-/** Create a cascaded send message. */
+/**
+ * Create a cascade that republishes an internal saga message onto the saga bus.
+ *
+ * This does not trigger a worker job or task. Use the explicit
+ * `./integration/workers` helpers or the triggers API enqueue path for workers.
+ */
 export function send(
   target: CascadedMessageTarget | string,
   payload: unknown,
@@ -46,7 +60,11 @@ export function schedule(
   });
 }
 
-/** Create a cascaded child-saga spawn message. */
+/**
+ * Create an unsupported child-saga spawn cascade.
+ *
+ * @unsupported Dispatching the returned cascade throws `SAGA_NOT_IMPLEMENTED`.
+ */
 export function spawn(
   child: SagaDefinition | SagaId | string,
   input: unknown,
