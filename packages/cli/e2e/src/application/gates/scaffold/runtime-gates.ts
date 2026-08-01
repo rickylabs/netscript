@@ -224,8 +224,6 @@ export function createRuntimeGates(
         `${context.project.repoRoot}/packages/cli/e2e/src/application/gates/scaffold/durable-cli-parity.ts`,
       ],
       (context) => context.project.projectRoot,
-      'capture',
-      AI_CHAT_ROUTE_FAILURE_HINT,
     ),
     httpGate(
       GATE.BEHAVIOR_TRIGGERS_HEALTH,
@@ -296,6 +294,8 @@ export function createRuntimeGates(
           context.project.projectRoot,
         ),
       (context) => context.project.projectRoot,
+      'capture',
+      AI_CHAT_ROUTE_FAILURE_HINT,
     ),
   ];
 }

@@ -334,6 +334,32 @@ The interrupted pre-follow-up local E2E log
 `.llm/tmp/issue-1010-rebased-scaffold-runtime.log` ends at `database.init` with no summary. It is
 not treated as gate evidence.
 
+### Diagnostic placement slice
+
+Moved `AI_CHAT_ROUTE_FAILURE_HINT` and the explicit capture mode from
+`behavior.durable-cli-parity` to `behavior.ai-chat-route`. A gate-definition regression now proves
+the AI gate captures output and carries the stderr-oriented hint, while durable parity carries no AI
+failure hint.
+
+```text
+$ deno test -A packages/cli/e2e/tests/application/builders/runtime-gates_test.ts
+Check packages/cli/e2e/tests/application/builders/runtime-gates_test.ts
+running 10 tests from ./packages/cli/e2e/tests/application/builders/runtime-gates_test.ts
+runtime aspire start gate captures detached endpoint metadata ... ok (1ms)
+app home gate hands the probe a project and an AppHost to resolve the port from ... ok (1ms)
+app home gate can reach a localhost endpoint, not only 127.0.0.1 ... ok (273µs)
+runtime gates wait for postgres resource by default ... ok (217µs)
+runtime gates include durable workers and sagas CLI parity ... ok (449µs)
+AI chat route gate captures generated registry import failures ... ok (371µs)
+runtime gates wait for mysql resource when mysql is selected ... ok (267µs)
+runtime gates skip database resource wait for sqlite ... ok (166µs)
+runtime service health gate asserts only the selected sqlite adapter ... ok (410µs)
+runtime gates wait for mssql resource with extended timeout when mssql is selected ... ok (440µs)
+
+ok | 10 passed | 0 failed (17ms)
+RAW_EXIT_CODE=0
+```
+
 AI FINAL SCOPED LINT
 $ deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/cli --ext ts,tsx
 {"source":{"mode":"command","cwd":"/home/codex/repos/fix-1010","exitCode":0},"selection":{"filesSelected":747,"batches":4},"summary":{"totalOccurrences":0,"uniqueOccurrences":0,"uniqueRules":0,"uniquePaths":0},"groups":[]}
