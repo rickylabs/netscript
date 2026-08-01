@@ -37,3 +37,22 @@
 - **Severity:** minor
 - **Action:** defer
 - **Evidence:** generated consumer directory committed in slice 10; PR body leaves box 5 unticked.
+
+## 2026-08-02 — PR #1034 merge made consumer assets available and exposed unsafe guidance
+
+- **What:** The supervisor merged `origin/main` at `a2003cf5c` into this branch. Regenerating the
+  dogfooded bundle now installs `aspire`, `deno`, and `help.md`, while the forbidden-command guard
+  identifies three pre-existing shipped paths that recommend host-wide Aspire teardown.
+- **Source:** Supervisor final-round context change, `deno task agentic:dogfood-skills`, and the
+  repository-wide forbidden-command test.
+- **Expected:** Acceptance box 5 becomes evidenceable without editing `skills/**`; existing unsafe
+  consumer guidance remains visible and bounded until repaired upstream.
+- **Actual:** The six-file consumer surface is installed. The exact sorted violation inventory is
+  `packages/cli/src/kernel/assets/skills.generated.ts`, `skills/aspire/SKILL.md`, and
+  `skills/help.md`. Regeneration also materializes exact mirrors under the generated consumer
+  `aspire` and `help.md` paths; the guard inventories those two separately rather than broadening
+  or ignoring the pattern.
+- **Severity:** major
+- **Action:** track
+- **Evidence:** follow-up issue #1048 tracks replacing the shipped host-wide guidance with scoped,
+  per-AppHost cleanup. The guard fails if a fourth path appears.
