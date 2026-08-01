@@ -303,6 +303,37 @@ $ deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages
 {"source":{"mode":"selection","cwd":"/home/codex/repos/fix-1010"},"command":"deno check --quiet --unstable-kv <files>","selection":{"filesSelected":747,"batches":7,"failedBatches":0},"summary":{"totalOccurrences":0,"uniqueOccurrences":0,"uniqueCodes":0,"uniquePaths":0},"groups":[]}
 RAW_EXIT_CODE=0
 
+## 2026-08-02 — scaffold workspace manifest resolution follow-up
+
+### Design
+
+- **Public surface:** unchanged. The change is internal to the installed-runtime adapter and the
+  scaffold E2E gate definition.
+- **Domain vocabulary:** a workspace member is a directory declared by the project's Deno
+  `workspace` configuration whose `deno.json`/`deno.jsonc` `name` exactly matches the installed
+  package name.
+- **Ports:** all resolver filesystem access remains through the existing `FileSystemPort`; generator
+  execution remains through `ProcessPort`.
+- **Constants:** no new finite public IDs. Existing gate and package metadata remain authoritative.
+- **Commit slices:** (1) correct AI gate capture placement; (2) resolve generic workspace members
+  and prove scaffold-shaped AI registry loading; (3) record raw gates, teardown, and push evidence.
+- **Deferred scope:** no generator shape relaxation, plugin-name special cases, release/version
+  changes, PR body, issue checkboxes, or unrelated scaffold repairs.
+- **Contributor path:** start at `resolveRuntimeManifest()` and its colocated loading integration
+  tests; workspace and published resolution remain two inputs to the same adapter flow.
+
+### Baseline evidence
+
+`./.llm/tmp/cli-e2e/plugin-smoke-20260802-005521/deno.json` declares `"./plugins/*"` in
+`workspace`. Its imports include local paths for `@netscript/plugin-workers/runtime` and
+`@netscript/plugin-triggers/runtime`, but contain no `@netscript/plugin-ai` key. The AI package is
+present as the local workspace member `plugins/ai`; the imports-only resolver therefore misses it
+and selects the published 0.0.2 manifest.
+
+The interrupted pre-follow-up local E2E log
+`.llm/tmp/issue-1010-rebased-scaffold-runtime.log` ends at `database.init` with no summary. It is
+not treated as gate evidence.
+
 AI FINAL SCOPED LINT
 $ deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/cli --ext ts,tsx
 {"source":{"mode":"command","cwd":"/home/codex/repos/fix-1010","exitCode":0},"selection":{"filesSelected":747,"batches":4},"summary":{"totalOccurrences":0,"uniqueOccurrences":0,"uniqueRules":0,"uniquePaths":0},"groups":[]}

@@ -198,3 +198,41 @@ supervisor. This implementation session proceeds without creating or modifying `
 
 The owner-waived supervisor evaluator route remains in force; no evaluator tool or evaluator
 artifact is used by this session.
+
+## Follow-up Plan — scaffold workspace manifest resolution (2026-08-02)
+
+### Evidence and locked direction
+
+The retained scaffold at `.llm/tmp/cli-e2e/plugin-smoke-20260802-005521/deno.json` proves the
+resolution asymmetry: its workspace includes `./plugins/*`, while its imports map has local runtime
+entries for workers and triggers but no `@netscript/plugin-ai` entry. The current resolver inspects
+only imports, so it cannot discover the local `plugins/ai` workspace member and incorrectly falls
+back to the published 0.0.2 manifest.
+
+1. Move AI failure capture/hint from durable CLI parity to `behavior.ai-chat-route`, preserving all
+   behavior assertions.
+2. Extend the existing adapter resolver to inspect declared workspace members as well as local
+   imports. Match member `deno.json`/`deno.jsonc` `name` exactly; do not hard-code plugin identities
+   and do not introduce filesystem effects outside `FileSystemPort`.
+3. Add a scaffold-shaped AI regression with `./plugins/*`, no local AI import, and a local
+   `@netscript/plugin-ai` member. Execute the real generator, import the resulting tool registry,
+   and assert its resolved `Map` contains the real tool but excludes scaffold glue. Also assert the
+   published manifest fetch is never called.
+4. Preserve the published fallback for JSR-only projects and the loud invalid-definition throw.
+
+### Commit slices
+
+| # | Slice | Proof |
+| - | ----- | ----- |
+| 1 | Correct AI gate diagnostic placement | gate-definition test + scoped check |
+| 2 | Generic workspace-member resolution and scaffold-shaped AI loading test | focused generate/plugins tests |
+| 3 | Harness evidence, required quality/runtime gates, teardown state, and push proof | requested commands and raw logs |
+
+### Surface and JSR review
+
+The change remains internal to the CLI adapter and E2E/test surfaces. No plugin export map,
+`deno.json` public surface, or published asset is changed; the existing AI manifest correction is
+retained unchanged. The JSR-audit result for this follow-up is therefore `no new public surface`.
+
+The owner-waived supervisor evaluator route remains in force. This session will not launch or
+fabricate an evaluator artifact.

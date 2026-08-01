@@ -2,7 +2,7 @@
 
 ## Status
 
-- Phase: AI chat-route follow-up gate complete; supervisor-owned full E2E/evaluation pending.
+- Phase: scaffold workspace manifest-resolution follow-up implementation planned.
 - Branch/worktree clean at baseline before run artifacts.
 - Published 0.0.2 reproduction captured once in `.llm/tmp/issue-1010-clean-room-repro.log`.
 - PLAN-EVAL passed in a separate Claude Code + OpenRouter Qwen session before implementation.
@@ -48,6 +48,9 @@
 
 ## Next
 
-1. Supervisor runs the requested single full E2E pass and verifies `behavior.ai-chat-route` green.
-2. Supervisor completes PR lifecycle and any remaining review/evaluation activity.
-3. Never push/open PR from this implementation session.
+1. Correct AI behavior-gate output capture placement.
+2. Resolve local plugins through Deno workspace members as well as local imports and prove the AI
+   scaffold shape with an imported-registry test.
+3. Run the requested static, quality, focused, and single full runtime gates; record scoped teardown.
+4. Push the branch as explicitly authorized and prove local/remote SHA equality. Do not edit the PR
+   or issue; supervisor retains their lifecycle.
