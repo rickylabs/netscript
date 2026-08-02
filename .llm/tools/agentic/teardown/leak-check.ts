@@ -1,4 +1,4 @@
-import { join } from '@std/path';
+import { dirname, isAbsolute, join, relative, resolve } from '@std/path';
 import { classify, type Ownership, type ResourceCandidate } from './ownership.ts';
 import { probeResourceReport, type ProbeStatus } from './probes.ts';
 import { type CommandPort, type FilePort, systemCommands, systemFiles } from './ports.ts';
@@ -44,10 +44,21 @@ export function stopCommand(resource: ResourceCandidate): string {
     : `docker rm -f ${shellQuote(resource.id)}`;
 }
 
-function ownerFrom(resource: ResourceCandidate): string {
+/**
+ * Names the sibling worktree a resource appears to belong to.
+ *
+ * The sibling root is derived from `worktreeRoot`'s own parent rather than a fixed path, so a
+ * checkout outside `/home/codex/repos` still attributes its neighbours instead of calling every
+ * resource `unknown`.
+ */
+function ownerFrom(resource: ResourceCandidate, worktreeRoot: string): string {
   const path = resource.kind === 'apphost' ? resource.appHostPath : resource.mountSource;
-  const match = path?.match(/^(\/home\/codex\/repos\/[^/]+)/);
-  return match?.[1] ?? 'unknown';
+  if (!path || !isAbsolute(path) || !isAbsolute(worktreeRoot)) return 'unknown';
+  const siblingRoot = dirname(resolve(worktreeRoot));
+  const delta = relative(siblingRoot, resolve(path));
+  if (delta === '' || delta.startsWith('..') || isAbsolute(delta)) return 'unknown';
+  const [first] = delta.split(/[\\/]/);
+  return first ? join(siblingRoot, first) : 'unknown';
 }
 
 function registeredStart(
@@ -96,7 +107,7 @@ export function buildLeakReport(
           ? `${resource.appHostPath} (pid ${resource.appHostPid ?? 'unknown'})`
           : `${resource.name ?? resource.id} (${resource.id})`,
         ownership: classify(resource, registry, worktreeRoot),
-        owner: ownerFrom(resource),
+        owner: ownerFrom(resource, worktreeRoot),
         ageMs,
         stale: ageMs !== null && ageMs >= staleAfterMs,
         command: stopCommand(resource),

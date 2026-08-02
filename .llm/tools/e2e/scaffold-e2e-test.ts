@@ -16,8 +16,12 @@ import { ensureDir } from 'jsr:@std/fs@1/ensure-dir';
 import { exists } from 'jsr:@std/fs@1/exists';
 import { dirname, fromFileUrl, join, resolve } from 'jsr:@std/path@1';
 import { Command } from 'jsr:@cliffy/command@1.0.0';
-import { probeResources } from '../agentic/teardown/probes.ts';
+import { probeAppHosts } from '../agentic/teardown/probes.ts';
 import { registerAppHost } from '../agentic/teardown/run-resources.ts';
+
+/** `aspire ps` can lag `aspire start`; retry discovery briefly before falling back to path proof. */
+const REGISTER_APPHOST_ATTEMPTS = 5;
+const REGISTER_APPHOST_INTERVAL_MS = 400;
 
 type OutputFormat = 'ndjson' | 'json' | 'pretty';
 type StepKind = 'command' | 'http' | 'tcp' | 'sleep' | 'summary';
@@ -1063,22 +1067,39 @@ class SmokeRunner {
     if (this.#startedAspire) await this.#registerStartedAppHost();
   }
 
+  /**
+   * Records the AppHost this run started so teardown can prove ownership by identity.
+   *
+   * Only AppHosts are probed — Docker has no bearing on this lookup and probing it would put a
+   * container inspect on the critical path of every start. `aspire ps` can also lag `aspire start`
+   * by a moment, so discovery is retried briefly; failing to register is a warning rather than a
+   * run-ending error, because the AppHost still carries path proof from the worktree.
+   */
   async #registerStartedAppHost(): Promise<void> {
-    const appHost = (await probeResources()).find((resource) =>
-      resource.kind === 'apphost' && resolve(resource.appHostPath) === resolve(this.appHost)
-    );
-    if (
-      !appHost || appHost.kind !== 'apphost' || appHost.appHostPid === undefined ||
-      !appHost.appHostStartedAt
-    ) {
-      throw new Error(`started AppHost was not discoverable for registry: ${this.appHost}`);
+    for (let attempt = 0; attempt < REGISTER_APPHOST_ATTEMPTS; attempt++) {
+      if (attempt > 0) {
+        await new Promise((resolve) => setTimeout(resolve, REGISTER_APPHOST_INTERVAL_MS));
+      }
+      const appHost = (await probeAppHosts()).find((resource) =>
+        resource.kind === 'apphost' && resolve(resource.appHostPath) === resolve(this.appHost)
+      );
+      if (
+        appHost?.kind === 'apphost' && appHost.appHostPid !== undefined &&
+        appHost.appHostStartedAt
+      ) {
+        await registerAppHost(this.#options.runResourcesDir, this.#options.repo, {
+          appHostPath: appHost.appHostPath,
+          appHostPid: appHost.appHostPid,
+          appHostStartedAt: appHost.appHostStartedAt,
+          startedAt: new Date().toISOString(),
+        });
+        return;
+      }
     }
-    await registerAppHost(this.#options.runResourcesDir, this.#options.repo, {
-      appHostPath: appHost.appHostPath,
-      appHostPid: appHost.appHostPid,
-      appHostStartedAt: appHost.appHostStartedAt,
-      startedAt: new Date().toISOString(),
-    });
+    console.warn(
+      `started AppHost was not discoverable for registry: ${this.appHost} — ` +
+        'teardown will fall back to path proof',
+    );
   }
 
   async #waitForResources(): Promise<void> {

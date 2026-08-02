@@ -117,3 +117,23 @@ Deno.test('successful Aspire probe survives unavailable Docker', async () => {
     await Deno.remove(sliceDir, { recursive: true });
   }
 });
+
+Deno.test('apparent owner is derived from the worktree parent, not a fixed path', () => {
+  const registry = emptyRunResources('/srv/ci/checkout-a');
+  const report = buildLeakReport(
+    [{ kind: 'container', id: 'x', mountSource: '/srv/ci/checkout-b/.data/postgres' }],
+    registry,
+    '/srv/ci/checkout-a',
+  );
+  assertEquals(report.survivors[0].owner, '/srv/ci/checkout-b');
+});
+
+Deno.test('a resource outside the sibling root has no apparent owner', () => {
+  const registry = emptyRunResources('/srv/ci/checkout-a');
+  const report = buildLeakReport(
+    [{ kind: 'container', id: 'y', mountSource: '/var/lib/docker/volumes/z' }],
+    registry,
+    '/srv/ci/checkout-a',
+  );
+  assertEquals(report.survivors[0].owner, 'unknown');
+});

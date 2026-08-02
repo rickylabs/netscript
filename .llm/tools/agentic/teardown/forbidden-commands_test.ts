@@ -44,8 +44,12 @@ Deno.test('repository contains no shared-host bulk teardown command', async () =
   assertEquals(dogfoodMirrorPaths.sort(), expectedDogfoodMirrorPaths);
 });
 
+/** Directories with no scannable source, skipped before descending rather than after yielding. */
+const WALK_SKIP = new Set(['.git', 'node_modules', '_fresh', '.netscript', 'runs']);
+
 async function* walk(root: string): AsyncGenerator<string> {
   for await (const entry of Deno.readDir(root)) {
+    if (entry.isDirectory && WALK_SKIP.has(entry.name)) continue;
     const path = `${root}/${entry.name}`;
     if (entry.isDirectory) yield* walk(path);
     else if (entry.isFile) yield path;
