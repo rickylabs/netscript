@@ -55,14 +55,15 @@ exclude generated output, scratch workspaces, and future-wave packages.
 **Code-quality gate (required for `packages/**`/`plugins/**` waves).** The scoped check/lint/fmt
 wrappers above are necessary but NOT sufficient: they pass code containing `any`, honor an inline
 `// deno-lint-ignore no-explicit-any`, and do not flag host-side hardcoded plugin-name coupling —
-the two doctrine violations that reached `main` in the beta.9 CLI wave (#745). Run `deno task
-quality:gate` (which chains `deno task quality:scan` + `deno task arch:check`) on any framework-wave
-slice; `deno task quality:scan:repo` audits the whole `packages/cli/src`+`plugins` surface. The
-scanner (`.llm/tools/quality/scan-code-quality.ts`) fails on `any`/`as unknown as`/`as any`,
-blanket `no-explicit-any` ignores, and host-side plugin-name checks; the only suppression is an
-inline `// quality-allow: <reason>` on the offending line (reason required, count reported,
-`--max-allow <n>` bounds it). CI mirrors this in `code-quality.yml`. A green scoped wrapper is never
-a substitute for `quality:gate` on framework source.
+the two doctrine violations that reached `main` in the beta.9 CLI wave (#745). Run
+`deno task
+quality:gate` (which chains `deno task quality:scan` + `deno task arch:check`) on any
+framework-wave slice; `deno task quality:scan:repo` audits the whole `packages/cli/src`+`plugins`
+surface. The scanner (`.llm/tools/quality/scan-code-quality.ts`) fails on
+`any`/`as unknown as`/`as any`, blanket `no-explicit-any` ignores, and host-side plugin-name checks;
+the only suppression is an inline `// quality-allow: <reason>` on the offending line (reason
+required, count reported, `--max-allow <n>` bounds it). CI mirrors this in `code-quality.yml`. A
+green scoped wrapper is never a substitute for `quality:gate` on framework source.
 
 ## Dependency Evidence
 
@@ -124,6 +125,17 @@ When posting automation requests, specify:
 - lock hygiene: do not commit `deno.lock` or source churn unless a reviewed fix requires it
 
 ## Supervisor Automation (agentic tools)
+
+### Resource-hygiene symptoms
+
+If a run failed and you do not know what is still running, `behavior.service-health` timed out,
+ports are already in use, or a `postgres-*` container exists that you did not start, begin with the
+read-only `deno task agentic:leak-check -- --slice-dir <run-dir> --worktree <worktree>`. It reports
+owned, foreign, and unknown-owner resources. `deno task agentic:teardown -- ...` is dry-run by
+default; `--apply` is explicit and can act only on positively proven run-owned resources.
+
+Use `deno task agentic:dogfood-skills` to install the local CLI's current consumer bundle into
+`.agents/generated/consumer-skills/`; never fork that bundle by hand.
 
 The supervisor drives Tier-D Codex and Tier-E OpenHands through `.llm/tools/agentic/*`, each exposed
 as an `agentic:*` `deno task` (see `deno.json` and the index in `.llm/harness/workflow/tooling.md`).

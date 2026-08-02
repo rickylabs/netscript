@@ -13,7 +13,8 @@ implementation slice, and the full **IMPL-EVAL** at Evaluate. The Plan-Gate is a
 2. Select the smallest doctrine archetype that fits.
 3. Apply any scope overlay for frontend, service, or docs work.
 4. Read `debt/arch-debt.md` for relevant open debt.
-5. Read the current doctrine verdict in `docs/architecture/doctrine/10-codebase-verdict-and-handoff.md`.
+5. Read the current doctrine verdict in
+   `docs/architecture/doctrine/10-codebase-verdict-and-handoff.md`.
 6. Seed `plan.md`.
 
 ## 2. Research
@@ -107,8 +108,8 @@ before escalation to the user.
      proves, not what it contains,
    - push, then comment on the draft PR with the slice scope, commit hash, and gate evidence — the
      draft-PR commit list + per-slice PR comments are the commit trail (there is no `commits.md`),
-   - update `worklog.md` + `context-pack.md` as part of the same slice (a slice whose commit does not
-     touch the run dir is incomplete),
+   - update `worklog.md` + `context-pack.md` as part of the same slice (a slice whose commit does
+     not touch the run dir is incomplete),
    - run the **post-slice reconcile loop** (below) and write one reconcile note in `worklog.md`.
 3. Append `drift.md` when facts diverge from the plan, RFC, or doctrine.
 
@@ -160,8 +161,9 @@ violation classes that reached `main` in the beta.9 CLI wave (#745): (1) `any` +
 (`Command<any,…>` under a lint-ignore, `as unknown as`/`as any`), and (2) host-side hardcoded
 plugin-name coupling (`plugin.name === 'auth'`, `kind === 'ai'`). Running `quality:scan` (which
 fails on both) and `arch:check` (doctrine fitness) per slice is what catches them. A green scoped
-wrapper is never a substitute for these two gates on a framework-source wave. A `// deno-lint-ignore`
-added to make a wrapper pass is itself a finding — never silence a gate to green it.
+wrapper is never a substitute for these two gates on a framework-source wave. A
+`// deno-lint-ignore` added to make a wrapper pass is itself a finding — never silence a gate to
+green it.
 
 Gate **evidence is wrapper-sourced and mandatory**: type-check / lint / format from the scoped
 wrappers (`.llm/tools/run-deno-check|lint|fmt.ts`), doc-lint from `deno task doc:lint`, and
@@ -197,12 +199,17 @@ Runs that cut or gate a release call the hard release gates here — **`e2e-cli-
 which gate is required when, and the evidence bar — is `gates/release-gates.md`. This phase does
 **not** define the gates themselves: their definitions, sequencing, and race-free production
 verification are owned by **#309's release engineering** (see the `netscript-release` skill).
-Reference and call them here; do not redefine them. For a run that does not cut a release, this phase
-is a no-op.
+Reference and call them here; do not redefine them. For a run that does not cut a release, this
+phase is a no-op.
 
 ## 9. Close
 
-1. Update `context-pack.md`.
-2. Update `debt/arch-debt.md` for any created or closed debt entries.
-3. Promote repeated lessons to `lessons/` only when the promotion rule is met.
-4. Write a dated `.llm/YYYY-MM-DD-description.md` session record.
+1. If the run failed and you do not know what is still running, `behavior.service-health` timed out,
+   ports are already in use, or a `postgres-*` container appeared that you did not start, run
+   `deno task agentic:leak-check -- --slice-dir <run-dir> --worktree <worktree>`. Report foreign and
+   unknown-owner resources; never mutate them. Preview owned cleanup with `agentic:teardown` and add
+   `--apply` only when positive ownership proof is present.
+2. Update `context-pack.md`.
+3. Update `debt/arch-debt.md` for any created or closed debt entries.
+4. Promote repeated lessons to `lessons/` only when the promotion rule is met.
+5. Write a dated `.llm/YYYY-MM-DD-description.md` session record.

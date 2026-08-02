@@ -1,0 +1,193 @@
+import type { ResourceCandidate } from './ownership.ts';
+import type { CommandPort, FilePort } from './ports.ts';
+import { systemCommands, systemFiles } from './ports.ts';
+
+export const ASPIRE_CREATOR_PID = 'com.microsoft.developer.usvc-dev.creatorProcessId';
+export const ASPIRE_CREATOR_STARTED = 'com.microsoft.developer.usvc-dev.creatorProcessStartTime';
+export const ASPIRE_MOUNTS = 'com.microsoft.developer.usvc-dev.mountsLabel';
+export const DEFAULT_PROBE_TIMEOUT_MS = 10_000;
+
+interface AspireRow {
+  readonly appHostPath?: unknown;
+  readonly appHostPid?: unknown;
+}
+
+interface DockerInspectRow {
+  readonly Id?: unknown;
+  readonly Name?: unknown;
+  readonly Created?: unknown;
+  readonly Config?: { readonly Labels?: Record<string, string> | null };
+}
+
+export type ProbeStatus =
+  | { readonly state: 'ok' }
+  | { readonly state: 'unavailable'; readonly message: string }
+  | { readonly state: 'failed'; readonly message: string };
+
+export interface ResourceProbeResult {
+  readonly resources: readonly ResourceCandidate[];
+  readonly probes: {
+    readonly aspire: ProbeStatus;
+    readonly docker: ProbeStatus;
+  };
+}
+
+/** Reads field 22 of `/proc/<pid>/stat`, the value that makes a pid identity stable across reuse. */
+export function processStartedAt(stat: string): string | undefined {
+  const close = stat.lastIndexOf(')');
+  if (close < 0) return undefined;
+  return stat.slice(close + 2).trim().split(/\s+/)[19];
+}
+
+/** Parses `src=` from a Docker mount label without authorizing malformed input. */
+export function parseMountSource(label: string | undefined): string | undefined {
+  if (!label) return undefined;
+  const match = label.match(/(?:^|,)src=([^,]+)(?:,|$)/);
+  return match?.[1]?.trim() || undefined;
+}
+
+async function resolvedPath(
+  path: string | undefined,
+  files: FilePort,
+): Promise<string | undefined> {
+  if (!path) return undefined;
+  try {
+    return await files.realPath(path);
+  } catch {
+    return undefined;
+  }
+}
+
+/** Discovers AppHosts using only Aspire and process metadata. */
+export async function probeAppHosts(
+  commands: CommandPort = systemCommands,
+  files: FilePort = systemFiles,
+  timeoutMs: number = DEFAULT_PROBE_TIMEOUT_MS,
+): Promise<ResourceCandidate[]> {
+  const result = await commands.run(['aspire', 'ps', '--format', 'Json'], timeoutMs);
+  if (result.code !== 0) {
+    throw new Error(`aspire ps failed (${result.code}): ${result.stderr.trim()}`);
+  }
+  const rows: unknown = JSON.parse(result.stdout);
+  if (!Array.isArray(rows)) throw new Error('aspire ps JSON is not an array');
+  const candidates: ResourceCandidate[] = [];
+  for (const row of rows as AspireRow[]) {
+    if (typeof row.appHostPath !== 'string' || typeof row.appHostPid !== 'number') continue;
+    const appHostPath = await resolvedPath(row.appHostPath, files);
+    if (!appHostPath) continue;
+    let appHostStartedAt: string | undefined;
+    let commandLine: string | undefined;
+    try {
+      appHostStartedAt = processStartedAt(await files.readText(`/proc/${row.appHostPid}/stat`));
+      commandLine = (await files.readText(`/proc/${row.appHostPid}/cmdline`)).replaceAll('\0', ' ');
+    } catch {
+      // A process can exit between `aspire ps` and `/proc`; its path evidence remains usable.
+    }
+    candidates.push({
+      kind: 'apphost',
+      appHostPath,
+      appHostPid: row.appHostPid,
+      appHostStartedAt,
+      commandLine,
+    });
+  }
+  return candidates;
+}
+
+async function probeContainers(commands: CommandPort, files: FilePort, timeoutMs: number) {
+  const ids = await commands.run(['docker', 'ps', '-a', '--format', '{{.ID}}'], timeoutMs);
+  if (ids.code !== 0) throw new Error(`docker ps failed (${ids.code}): ${ids.stderr.trim()}`);
+  const containerIds = ids.stdout.split(/\r?\n/).map((id) => id.trim()).filter(Boolean);
+  if (containerIds.length === 0) return [];
+  const inspected = await commands.run(['docker', 'inspect', ...containerIds], timeoutMs);
+  if (inspected.code !== 0) {
+    throw new Error(`docker inspect failed (${inspected.code}): ${inspected.stderr.trim()}`);
+  }
+  const rows: unknown = JSON.parse(inspected.stdout);
+  if (!Array.isArray(rows)) throw new Error('docker inspect JSON is not an array');
+  const candidates: ResourceCandidate[] = [];
+  for (const row of rows as DockerInspectRow[]) {
+    const labels = row.Config?.Labels ?? {};
+    if (typeof row.Id !== 'string' || !labels[ASPIRE_CREATOR_PID]) continue;
+    const parsedPid = Number(labels[ASPIRE_CREATOR_PID]);
+    const rawMount = parseMountSource(labels[ASPIRE_MOUNTS]);
+    candidates.push({
+      kind: 'container',
+      id: row.Id,
+      name: typeof row.Name === 'string' ? row.Name.replace(/^\//, '') : undefined,
+      creatorPid: Number.isInteger(parsedPid) ? parsedPid : undefined,
+      creatorProcessStartTime: labels[ASPIRE_CREATOR_STARTED],
+      mountSource: await resolvedPath(rawMount, files),
+      createdAt: typeof row.Created === 'string' ? row.Created : undefined,
+    });
+  }
+  return candidates;
+}
+
+function probeFailure(error: unknown): ProbeStatus {
+  const message = error instanceof Error ? error.message : String(error);
+  return error instanceof Deno.errors.NotFound
+    ? { state: 'unavailable', message }
+    : { state: 'failed', message };
+}
+
+async function settledProbe(
+  run: () => Promise<ResourceCandidate[]>,
+): Promise<{ resources: ResourceCandidate[]; status: ProbeStatus }> {
+  try {
+    return { resources: await run(), status: { state: 'ok' } };
+  } catch (error) {
+    return { resources: [], status: probeFailure(error) };
+  }
+}
+
+/** Runs Aspire and Docker discovery independently and retains each probe's outcome. */
+export async function probeResourceReport(
+  commands: CommandPort = systemCommands,
+  files: FilePort = systemFiles,
+  timeoutMs: number = DEFAULT_PROBE_TIMEOUT_MS,
+): Promise<ResourceProbeResult> {
+  const [aspire, docker] = await Promise.all([
+    settledProbe(() => probeAppHosts(commands, files, timeoutMs)),
+    settledProbe(() => probeContainers(commands, files, timeoutMs)),
+  ]);
+  return {
+    resources: [...aspire.resources, ...docker.resources],
+    probes: { aspire: aspire.status, docker: docker.status },
+  };
+}
+
+/** Discovers only Aspire AppHosts and Aspire-labelled containers with bounded read-only probes. */
+export async function probeResources(
+  commands: CommandPort = systemCommands,
+  files: FilePort = systemFiles,
+  timeoutMs: number = DEFAULT_PROBE_TIMEOUT_MS,
+): Promise<ResourceCandidate[]> {
+  return [...(await probeResourceReport(commands, files, timeoutMs)).resources];
+}
+
+/** Re-reads one container's labels immediately before a possible removal. */
+export async function probeContainer(
+  id: string,
+  commands: CommandPort = systemCommands,
+  files: FilePort = systemFiles,
+  timeoutMs: number = DEFAULT_PROBE_TIMEOUT_MS,
+): Promise<ResourceCandidate | undefined> {
+  const inspected = await commands.run(['docker', 'inspect', id], timeoutMs);
+  if (inspected.code !== 0) return undefined;
+  const rows: unknown = JSON.parse(inspected.stdout);
+  if (!Array.isArray(rows) || !rows[0]) return undefined;
+  const row = rows[0] as DockerInspectRow;
+  const labels = row.Config?.Labels ?? {};
+  const creatorPid = Number(labels[ASPIRE_CREATOR_PID]);
+  if (typeof row.Id !== 'string' || !Number.isInteger(creatorPid)) return undefined;
+  return {
+    kind: 'container',
+    id: row.Id,
+    name: typeof row.Name === 'string' ? row.Name.replace(/^\//, '') : undefined,
+    creatorPid,
+    creatorProcessStartTime: labels[ASPIRE_CREATOR_STARTED],
+    mountSource: await resolvedPath(parseMountSource(labels[ASPIRE_MOUNTS]), files),
+    createdAt: typeof row.Created === 'string' ? row.Created : undefined,
+  };
+}

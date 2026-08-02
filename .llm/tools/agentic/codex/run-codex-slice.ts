@@ -3,9 +3,13 @@ import { classifyCodexFailure } from './classify-codex-failure.ts';
 import {
   computeBackoff,
   DEFAULT_SLICE_BUDGETS,
+  enforceTeardown,
   parseDoneContract,
   remainingBudgetDelay,
 } from './run-codex-slice-lib.ts';
+import { runLeakCheck } from '../teardown/leak-check.ts';
+import { readRunResources } from '../teardown/run-resources.ts';
+import { runTeardown } from '../teardown/teardown.ts';
 import { parseThreadInfo, requireValue, UUID } from '../lib/agentic-lib.ts';
 import { LocalSenderOwnershipAdapter } from '../runtime/adapters/local-sender-ownership-adapter.ts';
 
@@ -143,7 +147,16 @@ async function main(): Promise<void> {
       o.message ??
         'Continue the slice. End the final response with exactly DONE or BLOCKED: <reason>.',
     ]);
-    const contract = parseDoneContract(result.output);
+    let contract = parseDoneContract(result.output);
+    if (contract.state === 'done') {
+      let leaks = await runLeakCheck(o.sliceDir!, o.worktree!);
+      if (leaks.survivors.some((entry) => entry.ownership === 'owned')) {
+        const registry = await readRunResources(o.sliceDir!, o.worktree!);
+        await runTeardown(leaks, registry, true);
+        leaks = await runLeakCheck(o.sliceDir!, o.worktree!);
+      }
+      contract = enforceTeardown(contract, leaks);
+    }
     if (contract.state === 'done') state = 'done';
     else if (contract.state === 'blocked') {
       state = 'blocked';

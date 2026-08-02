@@ -1,0 +1,16 @@
+[
+  {
+    "Id": "6bdea913000000000000000000000000",
+    "Name": "/postgres-6bdea913",
+    "Created": "2026-08-01T21:58:00.000000000Z",
+    "Config": {
+      "Labels": {
+        "com.microsoft.developer.usvc-dev.name": "postgres-6bdea913",
+        "com.microsoft.developer.usvc-dev.creatorProcessId": "45429",
+        "com.microsoft.developer.usvc-dev.creatorProcessStartTime": "0001-01-01T00:19:04.220Z",
+        "com.microsoft.developer.usvc-dev.mountsLabel": "type=bind,src=/home/codex/repos/fix-1011/.data/postgres",
+        "com.microsoft.developer.usvc-dev.persistent": "true"
+      }
+    }
+  }
+]

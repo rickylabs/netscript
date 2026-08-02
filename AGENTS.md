@@ -19,15 +19,15 @@ GitHub process. Two obligations are non-negotiable for any agent that opens issu
 
 1. **Closing keyword.** A PR that fully resolves an issue MUST carry a GitHub closing keyword
    (`Closes #N` / `Fixes #N` / `Resolves #N`) in its **body** so the merge auto-closes the issue.
-   Bare `#N` and `Refs #N` do **not** auto-close — that omission is what stranded 40+ merged PRs with
-   stale-open issues. Partial work references `#N` without a keyword and states remaining scope; never
-   put a closing keyword on an epic/umbrella.
-   Close-gate rules for verified acceptance before issue closure live in `.agents/skills/netscript-pr`.
-2. **Taxonomy + milestones.** Apply the namespaced colon labels (`type:`/`area:`/`priority:`/`wave:`/
-   `epic:`/`gate:`/`status:`, exactly one `status:`) and assign an explicit release milestone
-   (`0.0.2`…`0.0.9` or `Backlog / Triage`). The full taxonomy and milestone guidance,
-   and templates live in the netscript-pr skill; the machine-readable label set is
-   `.github/labels.yml`.
+   Bare `#N` and `Refs #N` do **not** auto-close — that omission is what stranded 40+ merged PRs
+   with stale-open issues. Partial work references `#N` without a keyword and states remaining
+   scope; never put a closing keyword on an epic/umbrella. Close-gate rules for verified acceptance
+   before issue closure live in `.agents/skills/netscript-pr`.
+2. **Taxonomy + milestones.** Apply the namespaced colon labels
+   (`type:`/`area:`/`priority:`/`wave:`/ `epic:`/`gate:`/`status:`, exactly one `status:`) and
+   assign an explicit release milestone (`0.0.2`…`0.0.9` or `Backlog / Triage`). The full taxonomy
+   and milestone guidance, and templates live in the netscript-pr skill; the machine-readable label
+   set is `.github/labels.yml`.
 
 Use `.agents/skills/netscript-release` for release cuts, publish handoffs, race-free production E2E
 verification, and rollback.
@@ -47,11 +47,12 @@ ad-hoc shell orchestration:
 - **Volatile values have one home.** Model ids, tool versions, and endpoints live only in
   `.llm/tools/agentic/config/` (`models.ts`, `versions.ts`, `endpoints.ts`); a guard test fails the
   suite if they are hardcoded elsewhere.
-- **Drive lanes through the agentic suite.** `.llm/tools/agentic/` (exposed as `deno task
-  agentic:*`) is the only interface for launching/watching/steering Codex, dispatching OpenHands,
-  and PR lifecycle — never ad-hoc `wsl.exe`/PowerShell. The desired-state runtime controller
-  (`deno task agentic:runtime doctor|status|repair codex-remote`) is the health/repair entry point.
-  The suite map is `.llm/tools/agentic/README.md`; the harness-facing index is
+- **Drive lanes through the agentic suite.** `.llm/tools/agentic/` (exposed as
+  `deno task
+  agentic:*`) is the only interface for launching/watching/steering Codex, dispatching
+  OpenHands, and PR lifecycle — never ad-hoc `wsl.exe`/PowerShell. The desired-state runtime
+  controller (`deno task agentic:runtime doctor|status|repair codex-remote`) is the health/repair
+  entry point. The suite map is `.llm/tools/agentic/README.md`; the harness-facing index is
   `.llm/harness/workflow/tooling.md`.
 
 ## Operating Rules
@@ -66,6 +67,30 @@ ad-hoc shell orchestration:
 5. Drift is explicit: if implementation reality diverges from plan, docs, or doctrine, record it in
    the harness run drift/worklog artifacts.
 6. Do not delete lock files or caches, and do not run `deno cache --reload`, without approval.
+
+## Resource hygiene
+
+Dogfood the consumer-facing agent bundle with `deno task agentic:dogfood-skills`; it installs the
+current local CLI bundle under `.agents/generated/consumer-skills/`. Use that generated surface when
+present, plus the internal `.agents/skills/aspire` diagnostic skill.
+
+Start from the symptom. If your run failed and you do not know what is still running,
+`behavior.service-health` timed out, ports are already in use, or there is a `postgres-*` container
+you did not start, run the read-only reporter:
+
+```text
+deno task agentic:leak-check -- --slice-dir <run-dir> --worktree <worktree>
+```
+
+Review every foreign/unknown-owner entry and leave it alone. To preview run-owned cleanup use
+`deno task agentic:teardown -- --slice-dir <run-dir> --worktree <worktree>`; mutation requires the
+explicit `--apply` flag and remains scoped to positively proven resources.
+
+If your run starts resources from a directory outside its worktree — clean-clone verification is the
+usual case — declare that directory with `--owned-root <path>` on either command. Ownership is
+proven by path containment, so without it the clone's containers carry no proof and escalate to the
+user as someone else's, which is how a run's own leak reaches you as a question rather than a
+cleanup. A root shallow enough to cover other runs (`/tmp`, `/home`) is refused.
 
 ## Read Order
 
@@ -119,9 +144,9 @@ the canonical home; do not restate its gotchas elsewhere.
 ### Supervisor wake (token-free)
 
 When supervising sub-agents, do not poll. Run `.llm/tools/harness/watch-run.ts <run-dir>` as a
-**background** process: it `Deno.watchFs`-es `worklog.md` and exits 0 on the next
-change (re-waking the supervisor turn), or exits 2 on a `--timeout-seconds` heartbeat if a sub-agent
-hangs without writing.
+**background** process: it `Deno.watchFs`-es `worklog.md` and exits 0 on the next change (re-waking
+the supervisor turn), or exits 2 on a `--timeout-seconds` heartbeat if a sub-agent hangs without
+writing.
 
 ## Validation
 
