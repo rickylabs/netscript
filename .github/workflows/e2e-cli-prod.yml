@@ -111,6 +111,7 @@ jobs:
         if: failure()
         run: |
           echo "::error::Production CLI E2E failed for @netscript/cli@${{ steps.version.outputs.version }}."
+          deno run --allow-read .llm/tools/e2e/print-failed-report-steps.ts .llm/tmp/cli-e2e-prod-report.json || true
 
       - name: Upload production E2E artifacts
         if: always()

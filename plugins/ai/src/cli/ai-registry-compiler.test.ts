@@ -1,6 +1,13 @@
 import { assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
+import { artifactText, substituteTokens } from '@netscript/plugin/adapter';
 import type { ProjectFileEntry, ProjectFiles } from '@netscript/plugin/cli';
-import { type AiRegistryTarget, compileAiRegistry } from './ai-registry-compiler.ts';
+import { mcpToolStub } from '../adapter/resources/mcp-tool/mcp-tool.stub.ts';
+import { toolScaffolder } from '../adapter/resources/tool/tool.ts';
+import {
+  type AiRegistryTarget,
+  compileAiRegistry,
+  exportsReadyAiToolDefinition,
+} from './ai-registry-compiler.ts';
 
 const TOOLS_TARGET: AiRegistryTarget = {
   kind: 'ai-tools',
@@ -31,7 +38,7 @@ Deno.test('compileAiRegistry emits a name-keyed tool registry', async () => {
     'ai/agents/assistant.ts',
   ]);
 
-  const result = await compileAiRegistry(files, TOOLS_TARGET, validToolModule);
+  const result = await compileAiRegistry(files, TOOLS_TARGET);
 
   assertEquals(result.registryPath, '.netscript/generated/plugin-ai/tools.registry.ts');
   assertEquals(result.written, true);
@@ -91,42 +98,109 @@ Deno.test('compileAiRegistry emits a stem-keyed agent factory registry', async (
 Deno.test('compileAiRegistry short-circuits when the resource dir is empty/missing', async () => {
   const files = new MemoryProjectFiles(['ai/agents/assistant.ts']);
 
-  const result = await compileAiRegistry(files, TOOLS_TARGET, validToolModule);
+  const result = await compileAiRegistry(files, TOOLS_TARGET);
 
   assertEquals(result.written, false);
   assertEquals(result.count, 0);
   assertEquals(files.written.has('.netscript/generated/plugin-ai/tools.registry.ts'), false);
 });
 
-Deno.test('compileAiRegistry selects tool modules by definition shape', async () => {
-  const files = new MemoryProjectFiles([
-    'ai/tools/e2e-tool.ts',
-    'ai/tools/skill-loader.ts',
-  ]);
-
-  const result = await compileAiRegistry(files, TOOLS_TARGET, (specifier) => {
-    if (specifier.endsWith('/skill-loader.ts')) {
-      return Promise.resolve({ createSkillLoaderTool: () => ({}) });
-    }
-    return validToolModule(specifier);
-  });
+Deno.test('compileAiRegistry includes the emitted tool stub without executing it', async () => {
+  const tool = toolScaffolder.emit({ id: 'e2e-tool' })[0];
+  const files = new MemoryProjectFiles(new Map([[tool.path, artifactText(tool)]]));
+  const result = await compileAiRegistry(files, TOOLS_TARGET);
 
   assertEquals(result.files, ['ai/tools/e2e-tool.ts']);
   assertEquals(result.count, 1);
   const source = files.written.get(TOOLS_TARGET.registryPath) ?? '';
-  assertStringIncludes(source, 'ai/tools/e2e-tool.ts');
-  assertEquals(source.includes('skill-loader.ts'), false);
+  assertStringIncludes(source, 'import * as tool0 from "../../../ai/tools/e2e-tool.ts";');
+  assertStringIncludes(source, '...resolveAiToolDefinitions(tool0, "ai/tools/e2e-tool.ts"),');
 });
 
-function validToolModule(_specifier: string): Promise<Readonly<Record<string, unknown>>> {
-  return Promise.resolve({
-    default: {
-      descriptor: { name: 'fixture-tool' },
-      schema: {},
-      execute: () => undefined,
-    },
-  });
-}
+Deno.test('compileAiRegistry excludes the actual skill-loader stub by source shape', async () => {
+  assertEquals(TOOLS_TARGET.exclude.includes('skill-loader.ts'), false);
+  const tool = toolScaffolder.emit({ id: 'e2e-tool' })[0];
+  const files = new MemoryProjectFiles(
+    new Map([
+      [tool.path, artifactText(tool)],
+      ['ai/tools/skill-loader.ts', substituteTokens(mcpToolStub, {})],
+    ]),
+  );
+
+  const result = await compileAiRegistry(files, TOOLS_TARGET);
+
+  assertEquals(result.files, ['ai/tools/e2e-tool.ts']);
+  assertEquals(result.count, 1);
+  assertEquals(
+    (files.written.get(TOOLS_TARGET.registryPath) ?? '').includes('skill-loader.ts'),
+    false,
+  );
+});
+
+Deno.test('compileAiRegistry never resolves imports from app-owned tool modules', async () => {
+  const source = `
+    import { defineAiTool as buildTool } from '@unresolvable/example';
+    export default buildTool('remote-safe').server(() => ({ ok: true }));
+  `;
+  const files = new MemoryProjectFiles(new Map([['ai/tools/remote-safe.ts', source]]));
+
+  const result = await compileAiRegistry(files, TOOLS_TARGET);
+
+  assertEquals(result.files, ['ai/tools/remote-safe.ts']);
+  assertEquals(result.written, true);
+});
+
+Deno.test('tool source selection ignores factories, comments, strings, and malformed input', () => {
+  assertEquals(
+    exportsReadyAiToolDefinition(`
+      // export const fake = defineAiTool('comment');
+      const text = "export default defineAiTool('string')";
+      export function createTool() { return defineAiTool('factory'); }
+    `),
+    false,
+  );
+  assertEquals(exportsReadyAiToolDefinition('export const broken = ['), false);
+  assertEquals(
+    exportsReadyAiToolDefinition(`
+      import { defineAiTool as tool } from '@netscript/ai/tools';
+      export const tools = [
+        tool('one').server(() => 1),
+        tool('two').server(() => 2),
+      ];
+    `),
+    true,
+  );
+});
+
+Deno.test('tool source selection accepts structural objects but not partial or factory values', () => {
+  assertEquals(
+    exportsReadyAiToolDefinition(`
+      export default {
+        descriptor: { name: 'e2e-tool' },
+        schema: {},
+        execute: async () => ({ state: 'output-available', output: { ok: true } }),
+      };
+    `),
+    true,
+  );
+  assertEquals(
+    exportsReadyAiToolDefinition(`
+      export const partial = {
+        descriptor: { name: 'partial' },
+        execute: async () => ({ ok: true }),
+      };
+    `),
+    false,
+  );
+  assertEquals(
+    exportsReadyAiToolDefinition(`
+      export function createSkillLoaderTool(skills) {
+        return { skills };
+      }
+    `),
+    false,
+  );
+});
 
 /** Assert the generated module contains no `as`/`any` unsound casts. */
 function assertNoUnsoundCasts(source: string): void {
@@ -145,8 +219,13 @@ class MemoryProjectFiles implements ProjectFiles {
   readonly written = new Map<string, string>();
   readonly #contents: Map<string, string>;
 
-  constructor(paths: readonly string[]) {
-    this.#contents = new Map(paths.map((path) => [path, 'export default {};']));
+  constructor(paths: readonly string[] | Map<string, string>) {
+    this.#contents = paths instanceof Map ? new Map(paths) : new Map(paths.map((path) => [
+      path,
+      path.startsWith('ai/tools/')
+        ? "export const tool = defineAiTool('fixture').server(() => ({}));"
+        : 'export default {};',
+    ]));
   }
 
   resolve(path: string): string {
