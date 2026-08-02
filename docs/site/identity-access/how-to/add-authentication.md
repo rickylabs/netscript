@@ -131,10 +131,10 @@ scaffolded with `--db`). It defines four better-auth-shaped models mapped to the
 {{ comp.apiTable({
   caption: "auth.prisma models → your database tables",
   rows: [
-    { name: "User", type: "auth_users", desc: "Authenticated principals. Populated by backends that persist users (better-auth)." },
-    { name: "Session", type: "auth_sessions", desc: "Server-side session records. kv-oauth keeps sessions in KV; this table backs the Prisma-persisting backend." },
-    { name: "Account", type: "auth_accounts", desc: "Linked provider accounts (the OAuth/OIDC identities behind a user)." },
-    { name: "Verification", type: "auth_verifications", desc: "Verification / challenge records used during account flows." }
+    { name: "AuthUser", type: "auth_users", desc: "Authenticated principals. Populated by backends that persist users (better-auth)." },
+    { name: "AuthSession", type: "auth_sessions", desc: "Server-side session records. kv-oauth keeps sessions in KV; this table backs the Prisma-persisting backend." },
+    { name: "AuthAccount", type: "auth_accounts", desc: "Linked provider accounts (the OAuth/OIDC identities behind a user)." },
+    { name: "AuthVerification", type: "auth_verifications", desc: "Verification / challenge records used during account flows." }
   ]
 }) }}
 

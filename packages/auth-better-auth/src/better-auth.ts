@@ -7,6 +7,13 @@ import type {
 import { betterAuth, type BetterAuthOptions } from 'better-auth';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
 
+const AUTH_PRISMA_MODEL_NAMES = {
+  user: 'authUser',
+  session: 'authSession',
+  account: 'authAccount',
+  verification: 'authVerification',
+} as const;
+
 /** Prisma providers supported by better-auth's first-party Prisma adapter. */
 export type BetterAuthPrismaProvider =
   | 'sqlite'
@@ -160,6 +167,10 @@ export function configureNetscriptBetterAuthOptions(
     ...explicitBetterAuthOptions
   } = options;
   return {
+    user: { modelName: AUTH_PRISMA_MODEL_NAMES.user },
+    session: { modelName: AUTH_PRISMA_MODEL_NAMES.session },
+    account: { modelName: AUTH_PRISMA_MODEL_NAMES.account },
+    verification: { modelName: AUTH_PRISMA_MODEL_NAMES.verification },
     ...betterAuthOptions,
     ...explicitBetterAuthOptions,
     ...(plugins === undefined ? {} : { plugins }),

@@ -26,6 +26,7 @@ import type {
   PluginKindProvider,
   PluginSchemaCopyResult,
 } from '../../domain/plugin-kind.ts';
+import { writePluginSchemaFragment } from './prisma-schema-writer.ts';
 
 /** CLI flags that affect plugin database resolution. */
 export interface PluginDbFlags {
@@ -211,12 +212,13 @@ export async function copyPluginSchemasToRootDb(
   const packageFragments = options.packageFragments ?? [];
   if (packageFragments.length > 0) {
     for (const fragment of packageFragments) {
-      results.push(await writeSchemaFragment(
+      results.push(await writePluginSchemaFragment(
         projectRoot,
         pluginName,
         provider.dirName,
         fragment.path,
         fragment.content,
+        adapters.fs,
         adapters.scaffolder,
         options.overwrite ?? false,
       ));
@@ -224,12 +226,13 @@ export async function copyPluginSchemasToRootDb(
   } else if (await adapters.fs.exists(sourceRoot)) {
     for await (const entry of adapters.fs.walk(sourceRoot)) {
       if (!entry.isFile || !entry.path.endsWith('.prisma')) continue;
-      results.push(await writeSchemaFragment(
+      results.push(await writePluginSchemaFragment(
         projectRoot,
         pluginName,
         provider.dirName,
         entry.path,
         await adapters.fs.readFile(entry.path),
+        adapters.fs,
         adapters.scaffolder,
         options.overwrite ?? false,
       ));
@@ -247,32 +250,6 @@ export async function copyPluginSchemasToRootDb(
   }
 
   return results;
-}
-
-async function writeSchemaFragment(
-  projectRoot: string,
-  pluginName: string,
-  engineDirName: string,
-  sourcePath: string,
-  content: string,
-  scaffolder: ScaffolderPort,
-  overwrite: boolean,
-): Promise<PluginSchemaCopyResult> {
-  const normalizedSourcePath = sourcePath.replaceAll('\\', '/');
-  const fileName = normalizedSourcePath.endsWith(`${SCAFFOLD_DIRS.DATABASE}/schema.prisma`)
-    ? `${pluginName}.prisma`
-    : normalizedSourcePath.split('/').at(-1) ?? `${pluginName}.prisma`;
-  const targetPath = join(
-    projectRoot,
-    SCAFFOLD_DIRS.DATABASE,
-    engineDirName,
-    'schema',
-    SCAFFOLD_DIRS.PLUGINS,
-    pluginName,
-    fileName,
-  );
-  const written = await scaffolder.writeFile(targetPath, content, overwrite);
-  return { sourcePath, targetPath, written };
 }
 
 async function discoverDatabases(

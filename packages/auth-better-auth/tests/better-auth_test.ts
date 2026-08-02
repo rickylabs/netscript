@@ -129,6 +129,36 @@ Deno.test('configureNetscriptBetterAuthOptions forwards dedicated plugins', () =
   assertEquals(configured.plugins, [passthroughPlugin]);
 });
 
+Deno.test('configureNetscriptBetterAuthOptions defaults to namespaced Prisma model names', () => {
+  const configured = configureNetscriptBetterAuthOptions({
+    prisma: {},
+    provider: 'sqlite',
+  });
+
+  assertEquals(configured.user?.modelName, 'authUser');
+  assertEquals(configured.session?.modelName, 'authSession');
+  assertEquals(configured.account?.modelName, 'authAccount');
+  assertEquals(configured.verification?.modelName, 'authVerification');
+});
+
+Deno.test('configureNetscriptBetterAuthOptions lets escape-hatch model names override defaults', () => {
+  const configured = configureNetscriptBetterAuthOptions({
+    prisma: {},
+    provider: 'sqlite',
+    betterAuthOptions: {
+      user: { modelName: 'ConsumerUser' },
+      session: { modelName: 'ConsumerSession' },
+      account: { modelName: 'ConsumerAccount' },
+      verification: { modelName: 'ConsumerVerification' },
+    },
+  });
+
+  assertEquals(configured.user?.modelName, 'ConsumerUser');
+  assertEquals(configured.session?.modelName, 'ConsumerSession');
+  assertEquals(configured.account?.modelName, 'ConsumerAccount');
+  assertEquals(configured.verification?.modelName, 'ConsumerVerification');
+});
+
 Deno.test('configureNetscriptBetterAuthOptions forwards escape-hatch options under NetScript database', () => {
   const configured = configureNetscriptBetterAuthOptions({
     prisma: {},

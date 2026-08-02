@@ -1,5 +1,5 @@
 /// better-auth user record.
-model User {
+model AuthUser {
   id            String    @id @db.VarChar(191)
   name          String    @db.VarChar(255)
   email         String    @unique @db.VarChar(320)
@@ -7,14 +7,14 @@ model User {
   image         String?   @db.Text
   createdAt     DateTime  @default(now()) @map("created_at")
   updatedAt     DateTime  @updatedAt @map("updated_at")
-  sessions      Session[]
-  accounts      Account[]
+  sessions      AuthSession[]
+  accounts      AuthAccount[]
 
   @@map("auth_users")
 }
 
 /// better-auth session record.
-model Session {
+model AuthSession {
   id        String   @id @db.VarChar(191)
   expiresAt DateTime @map("expires_at")
   token     String   @unique @db.VarChar(191)
@@ -23,19 +23,19 @@ model Session {
   ipAddress String?  @map("ip_address") @db.VarChar(255)
   userAgent String?  @map("user_agent") @db.Text
   userId    String   @map("user_id") @db.VarChar(191)
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      AuthUser @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@map("auth_sessions")
 }
 
 /// better-auth account/provider record.
-model Account {
+model AuthAccount {
   id                    String    @id @db.VarChar(191)
   accountId             String    @map("account_id") @db.VarChar(191)
   providerId            String    @map("provider_id") @db.VarChar(191)
   userId                String    @map("user_id") @db.VarChar(191)
-  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user                  AuthUser  @relation(fields: [userId], references: [id], onDelete: Cascade)
   accessToken           String?   @map("access_token") @db.Text
   refreshToken          String?   @map("refresh_token") @db.Text
   idToken               String?   @map("id_token") @db.Text
@@ -52,7 +52,7 @@ model Account {
 }
 
 /// better-auth verification token record.
-model Verification {
+model AuthVerification {
   id         String   @id @db.VarChar(191)
   identifier String   @db.VarChar(255)
   value      String   @db.Text

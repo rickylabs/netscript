@@ -59,8 +59,11 @@ Deno.test('auth official source and database contribution are discoverable', asy
   assertEquals(officialSource.serviceEntrypoint, provider.defaultServiceEntrypoint);
 
   const prisma = await Deno.readTextFile(prismaUrl);
+  for (const model of ['AuthUser', 'AuthSession', 'AuthAccount', 'AuthVerification']) {
+    assert(new RegExp(`^model ${model} \\{`, 'm').test(prisma), `missing model ${model}`);
+  }
   for (const model of ['User', 'Session', 'Account', 'Verification']) {
-    assert(prisma.includes(`model ${model}`), `missing model ${model}`);
+    assert(!new RegExp(`^model ${model} \\{`, 'm').test(prisma), `unexpected model ${model}`);
   }
 });
 

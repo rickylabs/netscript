@@ -134,8 +134,8 @@ netscript db status              # confirm the migration is applied
 
 {{ comp callout { type: "note", title: "Which backends actually use these tables" } }}
 <code>auth.prisma</code> defines four better-auth-shaped models —
-<code>User</code> &rarr; <code>auth_users</code>, <code>Session</code> &rarr; <code>auth_sessions</code>,
-<code>Account</code> &rarr; <code>auth_accounts</code>, <code>Verification</code> &rarr;
+<code>AuthUser</code> &rarr; <code>auth_users</code>, <code>AuthSession</code> &rarr; <code>auth_sessions</code>,
+<code>AuthAccount</code> &rarr; <code>auth_accounts</code>, <code>AuthVerification</code> &rarr;
 <code>auth_verifications</code>. The migration runs regardless, but storage differs by backend:
 <strong>kv-oauth</strong> keeps sessions in Deno KV (not these tables), <strong>workos</strong> is
 effectively stateless (sealed cookie), and <strong>better-auth</strong> is the one that reads/writes
