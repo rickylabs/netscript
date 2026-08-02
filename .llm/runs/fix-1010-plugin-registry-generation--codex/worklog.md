@@ -452,3 +452,72 @@ Task check:assets-barrel deno task gen:assets-barrel && git diff --exit-code -- 
 Successfully rebased and updated refs/heads/fix/1010-plugin-registry-generation.
 RAW_EXIT_CODE=0
 ```
+
+## 2026-08-02 — current-main merge result
+
+- Fetched `origin/main` at `cd12a2f2e7b0cdfdf4da1f9b475dbb1f48862154` and merged without
+  rebasing. The only conflict was generated
+  `packages/cli/src/kernel/assets/skills.generated.ts`; merged `skills/**` sources were retained,
+  then `deno task gen:assets-barrel` regenerated it. `check:assets-barrel` exited 0. Merge commit:
+  `87414edf6`.
+- No public export or `deno.json` surface needed reconciliation; JSR audit was not activated.
+
+### Invariants
+
+1. **PASS — Aspire-first/safe skills.** `skills/help.md` is Aspire CLI 13.4.6-first;
+   `grep -rnE 'docker rm -f|docker ps -aq' skills/` returned no matches.
+2. **PASS — emitted samples.** `.github/workflows/ci.yml:133` runs
+   `check:emitted-samples`; the validator emits install at line 173 and every `add` resource at 181.
+3. **PASS — acceptance evidence.** `acceptance-evidence.ts:69-70` builds `unchecked` for required
+   mappings and `known` from all checkboxes; ticked boxes are valid no-ops.
+4. **PASS — Aspire forwarded args.** `aspire-cli-task.ts:19` strips one leading `--` with
+   `rawForwardedArgs.slice(1)`; the generator test asserts the emitted line.
+5. **PASS — AI manifest.** `plugins/ai/scaffold.runtime.json:13` retains `skill-loader.ts` in the
+   `ai-tools` exclusion.
+
+### Verification — raw verdict output
+
+```text
+$ deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/cli --ext ts,tsx
+{"source":{"mode":"selection","cwd":"/home/codex/repos/fix-1010"},"command":"deno check --quiet --unstable-kv <files>","selection":{"filesSelected":758,"batches":7,"failedBatches":0},"summary":{"totalOccurrences":0,"uniqueOccurrences":0,"uniqueCodes":0,"uniquePaths":0},"groups":[]}
+RAW_EXIT_CODE=0
+
+$ deno task quality:gate
+Task quality:gate deno task quality:scan && deno task arch:check
+{"ok":true,"mode":"repository","scanned":["packages/cli/src","plugins"],"findings":[],"allowCount":7,"allowances":[...]}
+Doctrine checks: every configured root reported FAIL=0; existing WARN/INFO retained.
+RAW_EXIT_CODE=0
+
+$ deno task check:assets-barrel
+Task check:assets-barrel deno task gen:assets-barrel && git diff --exit-code -- packages/cli/src/kernel/assets/embedded.generated.ts packages/cli/src/kernel/assets/skills.generated.ts packages/plugin/src/kernel/assets/embedded.generated.ts packages/fresh-ui/registry.generated.ts packages/service/src/primitives/scalar.generated.ts
+Task gen:assets-barrel deno run --no-lock --allow-read --allow-write --allow-run=deno .llm/tools/generate-cli-assets-barrel.ts
+RAW_EXIT_CODE=0
+
+$ deno test -A packages/cli/src/public/features/generate/plugins/
+generate plugin registries command ... ok (5ms)
+installed runtime registry generator ... ok (7ms)
+generated trigger registry loads valid definitions and excludes scaffold runtime glue ... ok (236ms)
+generated trigger registry rejects a non-definition module that is not excluded ... ok (117ms)
+workspace import resolves the on-disk trigger manifest without fetching JSR ... ok (14ms)
+generated workers registry loads jobs and excludes job tools ... ok (114ms)
+generated sagas registry loads saga definitions and ignores other TypeScript files ... ok (94ms)
+generated AI registries load resources and exclude the skill-loader factory ... ok (135ms)
+JSR-only imports retain the published manifest and generator fallback ... ok (4ms)
+ok | 9 passed (4 steps) | 0 failed (1s)
+RAW_EXIT_CODE=0
+```
+
+Unabridged streams are retained at `.llm/tmp/issue-1010-merge-*.log`.
+
+### Teardown
+
+The superseded earlier run left three stopped containers owned by this worktree. Removed only
+`postgres-29f040e0`, `garnet-apzbtmzt`, and `redis-jvfyhumd` by exact ID (`docker rm`, raw exit 0).
+Final `aspire ps --format Json --non-interactive --nologo` output: `[]`. Final `docker ps -a`:
+
+```text
+1fad8c348cce postgres-dda83380 Exited (255) 7 hours ago .../fix-1025/.../postgres
+d8ff61336f8b postgres-bc75ea00 Exited (255) 7 hours ago .../fix-1025/.../postgres
+```
+
+Those foreign stopped `fix-1025` containers were left untouched.

@@ -107,3 +107,14 @@ resolution model without adding an AI-specific identity or changing the loud reg
 The prior diagnostic slice accidentally put the AI failure hint on durable CLI parity. Capture and
 the hint are moved to `behavior.ai-chat-route`, with a gate-definition regression guarding their
 placement. The behavior gate assertions themselves are unchanged.
+
+## 2026-08-02 — integration method — merge replaces rebase
+
+This follow-up explicitly requires merging current main to avoid replaying already-pushed history.
+The only conflict was the forecast generated skills barrel; it was regenerated from merged sources.
+No non-generated conflict or public-surface reconciliation occurred.
+
+The prior request's local runtime pass was superseded mid-run and is not evidence. The new owner
+instruction makes cloud runtime authoritative and prohibits another local pass. Three stopped
+containers owned by the aborted run were removed by exact ID; foreign `fix-1025` containers were
+preserved.
