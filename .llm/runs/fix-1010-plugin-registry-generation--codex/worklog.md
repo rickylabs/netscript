@@ -403,6 +403,23 @@ Reconcile note: no PR or issue mutation was performed because the supervisor own
 implementation changes no public export/config surface, so JSR audit impact is `none`; the existing
 published AI manifest asset remains unchanged by this slice.
 
+## 2026-08-02 — merge current main follow-up
+
+### Design
+
+- **Public surface:** no intentional change; this slice integrates already-merged mainline work.
+- **Domain vocabulary/ports/constants:** unchanged.
+- **Commit slices:** merge commit with generated barrel resolution, followed by harness gate/push
+  evidence if the merge commit cannot include final evidence.
+- **Conflict policy:** regenerate generated assets from merged sources; stop on any non-generated
+  conflict.
+- **Deferred scope:** no AI re-diagnosis, no full local runtime run, no PR/issue mutation.
+
+The superseded runtime pass had reached behavior gates when the new merge-only request arrived. Its
+command was aborted and cleanup completed; `aspire ps --format Json --non-interactive --nologo`
+returned `[]`, and no matching `scaffold.runtime` process remained. The incomplete log is not gate
+evidence. Per the new owner instruction, no additional local AppHost will be started.
+
 AI FINAL SCOPED LINT
 $ deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/cli --ext ts,tsx
 {"source":{"mode":"command","cwd":"/home/codex/repos/fix-1010","exitCode":0},"selection":{"filesSelected":747,"batches":4},"summary":{"totalOccurrences":0,"uniqueOccurrences":0,"uniqueRules":0,"uniquePaths":0},"groups":[]}

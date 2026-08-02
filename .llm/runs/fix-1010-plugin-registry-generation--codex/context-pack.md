@@ -2,7 +2,7 @@
 
 ## Status
 
-- Phase: scaffold workspace manifest resolution implemented; final gates and push pending.
+- Phase: merge-current-main follow-up planned; integration and push pending.
 - Branch/worktree clean at baseline before run artifacts.
 - Published 0.0.2 reproduction captured once in `.llm/tmp/issue-1010-clean-room-repro.log`.
 - PLAN-EVAL passed in a separate Claude Code + OpenRouter Qwen session before implementation.
@@ -51,6 +51,7 @@
 
 ## Next
 
-1. Run the requested static, quality, focused, and single full runtime gates; record scoped teardown.
-2. Push the branch as explicitly authorized and prove local/remote SHA equality. Do not edit the PR
+1. Merge `origin/main`, regenerate the conflicted skills asset, and verify five carried invariants.
+2. Run the four merge verification gates and record final Docker/Aspire state; do not run local E2E.
+3. Push the branch as explicitly authorized and prove local/remote SHA equality. Do not edit the PR
    or issue; supervisor retains their lifecycle.

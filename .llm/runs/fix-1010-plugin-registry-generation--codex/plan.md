@@ -236,3 +236,19 @@ retained unchanged. The JSR-audit result for this follow-up is therefore `no new
 
 The owner-waived supervisor evaluator route remains in force. This session will not launch or
 fabricate an evaluator artifact.
+
+## Follow-up Plan — merge current main and push (2026-08-02)
+
+1. Preserve untracked supervisor briefs and fetch `origin`.
+2. Merge `origin/main` without rewriting history. Stop on any unexpected non-generated conflict.
+3. Resolve the expected generated `skills.generated.ts` conflict exclusively by regenerating from
+   the cleanly merged `skills/**` sources with `gen:assets-barrel`, then verify the generated asset.
+4. Explicitly check the five carried invariants: Aspire-first safe skill text, emitted-samples add
+   coverage, all-box acceptance evidence, forwarded-argument separator stripping, and the AI skill
+   loader exclusion.
+5. Run the four requested gates, record raw evidence and final Aspire/Docker state, commit harness
+   evidence if needed, push normally, and prove local/remote SHA equality.
+
+This merge changes no planned public export or `deno.json` surface, so JSR audit is not activated
+unless conflict resolution reveals such a change. The owner-waived evaluator route remains in
+force; no evaluator artifact will be created.
