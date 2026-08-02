@@ -521,3 +521,17 @@ d8ff61336f8b postgres-bc75ea00 Exited (255) 7 hours ago .../fix-1025/.../postgre
 ```
 
 Those foreign stopped `fix-1025` containers were left untouched.
+
+### Push proof
+
+```text
+$ git push origin HEAD:refs/heads/fix/1010-plugin-registry-generation
+To https://github.com/rickylabs/netscript.git
+   b14860fdf..52dad048d  HEAD -> fix/1010-plugin-registry-generation
+$ git rev-parse HEAD
+52dad048da4e0f9d0d38d34b1697c2b4a6b01b88
+$ git ls-remote origin fix/1010-plugin-registry-generation
+52dad048da4e0f9d0d38d34b1697c2b4a6b01b88 refs/heads/fix/1010-plugin-registry-generation
+```
+
+This evidence commit is pushed immediately afterward and final SHA equality is rechecked.
