@@ -2,7 +2,7 @@
 
 ## Status
 
-- Phase: current main merged, local merge gates green, branch pushed; supervisor cloud gate pending.
+- Phase: structural AI tool discovery follow-up planned; implementation pending.
 - Branch/worktree clean at baseline before run artifacts.
 - Published 0.0.2 reproduction captured once in `.llm/tmp/issue-1010-clean-room-repro.log`.
 - PLAN-EVAL passed in a separate Claude Code + OpenRouter Qwen session before implementation.
@@ -51,5 +51,7 @@
 
 ## Next
 
-1. Supervisor verifies authoritative cloud `scaffold.runtime` and completes PR/issue lifecycle.
-2. Do not run another local full runtime pass; local resources are clean and the branch is pushed.
+1. Make AI registry selection shape-based and prove it by importing emitted output.
+2. Resolve exact-name first-party members from the contributor source root for published-shaped
+   scaffold projects, retaining third-party/published fallback.
+3. Run requested gates, record teardown, push, and prove SHA equality. Do not run local full E2E.

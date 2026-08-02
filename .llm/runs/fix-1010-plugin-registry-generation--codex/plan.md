@@ -252,3 +252,41 @@ fabricate an evaluator artifact.
 This merge changes no planned public export or `deno.json` surface, so JSR audit is not activated
 unless conflict resolution reveals such a change. The owner-waived evaluator route remains in
 force; no evaluator artifact will be created.
+
+## Follow-up Plan — structural AI tool discovery (2026-08-02)
+
+### Proven mechanism
+
+The retained cloud-shaped scaffold `.llm/tmp/cli-e2e/plugin-smoke-20260802-011923` has an AI
+appsettings entrypoint of `jsr:@netscript/plugin-ai@0.0.2/services`, no `@netscript/plugin-ai`
+import, and no `plugins/ai/deno.json`; its only plugin workspace package is the generic
+`plugins/deno.json`. Exact-name project workspace resolution therefore cannot select the repository
+AI package. The observed generated throw is only emitted when the published manifest includes
+`skill-loader.ts`, confirming the published 0.0.2 manifest/generator path won.
+
+### Locked decisions
+
+1. Make AI tool registry resolution structural: modules without an `AiToolDefinition` contribute
+   zero definitions instead of crashing the entire registry. Valid tool definitions remain selected
+   by the existing descriptor/schema/execute predicate; a non-empty registry is still enforced by
+   the installed-runtime command.
+2. Give the installed-runtime adapter an optional local source workspace root supplied only by the
+   contributor CLI host. Resolve packages from that root generically by exact `deno.json` name.
+   Public hosts and third-party plugins without an exact local member retain the published fallback.
+3. Add a published-shaped project fixture: no local plugin import/member, published appsettings,
+   `skill-loader.ts` plus a valid tool. Supply the contributor source root, prove `fetchManifest`
+   is never called, execute the real local AI generator, import the emitted registry, and assert the
+   valid tool is present while the factory contributes nothing.
+4. Retain the manifest exclusion as an optimization and publishing contract; correctness no longer
+   depends on that filename.
+
+### Commit slices
+
+| # | Slice | Proof |
+| - | ----- | ----- |
+| 1 | Shape-filter invalid AI tool modules | AI compiler tests importing emitted registry |
+| 2 | Generic contributor source-workspace resolution and published-shaped integration | focused installed-runtime tests |
+| 3 | Harness evidence, requested gates, teardown snapshot, push proof | scoped check, quality gate, focused tests |
+
+No export map or `deno.json` change is planned, so JSR audit remains unnecessary unless the
+implementation crosses that boundary. The evaluator waiver remains in force.

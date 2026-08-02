@@ -535,3 +535,36 @@ $ git ls-remote origin fix/1010-plugin-registry-generation
 ```
 
 This evidence commit is pushed immediately afterward and final SHA equality is rechecked.
+
+## 2026-08-02 — structural AI tool discovery follow-up
+
+### Design
+
+- **Public surface:** unchanged; compiler behavior and internal CLI adapter wiring only.
+- **Domain vocabulary:** a registrable AI tool is an exported value satisfying the existing
+  `descriptor` + `schema` + callable `execute` predicate. A source workspace member is an exact-name
+  Deno workspace package supplied by the local contributor host.
+- **Ports:** filesystem lookup remains through `FileSystemPort`; generator execution remains through
+  `ProcessPort`. The source root is optional composition data, not discovered with new `Deno.*` in
+  the use case.
+- **Constants:** canonical AI target paths and predicates remain authoritative; no plugin-name table.
+- **Commit slices:** structural compiler, generic source-root resolver/integration, final evidence.
+- **Deferred scope:** no deletion/rename of MCP skill loader, no manifest filename proliferation, no
+  AppHost/full E2E, no PR or issue mutation.
+- **Contributor path:** AI-specific export selection stays in `ai-registry-compiler.ts`; generic
+  package-source choice stays in `installed-runtime-registry-generator.ts`.
+
+### Mechanism evidence
+
+The retained failing scaffold `.llm/tmp/cli-e2e/plugin-smoke-20260802-011923` contains:
+
+```text
+appsettings.json: "Entrypoint": "jsr:@netscript/plugin-ai@0.0.2/services"
+deno.json: no @netscript/plugin-ai import
+plugins/ai/deno.json: absent
+```
+
+Its project workspace therefore cannot match the installed package name. The generated registry
+contains the published compiler's exact `AI tool module ... does not export` throw and imports
+`ai/tools/skill-loader.ts`, which the repository manifest excludes. This proves the published 0.0.2
+manifest/generator path won; the repository manifest was not read.
