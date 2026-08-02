@@ -7,6 +7,7 @@ import type {
   JsrHttpResponse,
 } from '../../features/plugins/install/jsr-plugin-validator-port.ts';
 import { resolvePluginPackageSpec } from '../../features/plugins/install/plugin-package-resolver.ts';
+import { NETSCRIPT_RELEASE_VERSION } from '../../../kernel/constants/jsr-specifiers.ts';
 
 describe('FetchJsrPluginValidator', () => {
   it('returns a validated plugin descriptor for a published NetScript manifest', async () => {
@@ -22,6 +23,33 @@ describe('FetchJsrPluginValidator', () => {
       assertEquals(result.descriptor.versionMetadata.files['/scaffold.plugin.json'], 'sha256-good');
       assertEquals(result.descriptor.details.score, 95);
     }
+  });
+
+  it('installs the CLI\'s own release version rather than latest', async () => {
+    // A prerelease CLI must not pull the stable channel's plugin: its schema fragments and
+    // scaffold manifest would come from an older release than the project being scaffolded.
+    const fixtures = validFixtures();
+    fixtures.set('https://jsr.io/@netscript/plugin-workers/meta.json', {
+      status: 200,
+      body: {
+        latest: '0.0.2',
+        versions: { '0.0.2': {}, [NETSCRIPT_RELEASE_VERSION]: {} },
+      },
+    });
+    fixtures.set(`https://jsr.io/@netscript/plugin-workers/${NETSCRIPT_RELEASE_VERSION}_meta.json`, {
+      status: 200,
+      body: { manifestPath: '/scaffold.plugin.json', files: { '/scaffold.plugin.json': 'sha256-good' } },
+    });
+    fixtures.set(
+      `https://jsr.io/@netscript/plugin-workers/${NETSCRIPT_RELEASE_VERSION}/scaffold.plugin.json`,
+      { status: 200, body: { ...validPluginManifest(), version: NETSCRIPT_RELEASE_VERSION } },
+    );
+    const validator = new FetchJsrPluginValidator(new FixtureHttpClient(fixtures));
+
+    const result = await validator.validate(resolvePluginPackageSpec('workers'));
+
+    assertEquals(result.ok, true);
+    if (result.ok) assertEquals(result.descriptor.version, NETSCRIPT_RELEASE_VERSION);
   });
 
   it('resolves the semver-greatest prerelease when JSR latest is null', async () => {
