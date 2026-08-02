@@ -125,6 +125,114 @@ Deno.test('bump-version wrapper coordinates an exact version with zero residue',
   }
 });
 
+for (
+  const [name, newVersion] of [
+    ['stable', '1.3.0'],
+    ['canary', '1.2.3-canary.1'],
+  ] as const
+) {
+  Deno.test(`coordinated ${name} bump preserves third-party versions`, async () => {
+    const temp = await Deno.makeTempDir({ prefix: `netscript-${name}-identity-bump-` });
+    try {
+      await Deno.mkdir(`${temp}/packages/example`, { recursive: true });
+      await Deno.writeTextFile(
+        `${temp}/deno.json`,
+        JSON.stringify(
+          {
+            version: '1.2.3',
+            workspace: ['packages/*'],
+            imports: {
+              stream: 'npm:stream@1.2.3',
+              streamRange: 'npm:stream@^1.2.3',
+            },
+            publish: false,
+          },
+          null,
+          2,
+        ) + '\n',
+      );
+      await Deno.writeTextFile(
+        `${temp}/packages/example/deno.json`,
+        JSON.stringify(
+          {
+            name: '@netscript/example',
+            version: '1.2.3',
+            imports: {
+              desktop: 'jsr:@netscript/sdk@1.2.3/desktop',
+              ranged: 'jsr:@netscript/example@^1.2.3',
+              npmMirror: 'npm:@netscript/example@1.2.3',
+            },
+          },
+          null,
+          2,
+        ) + '\n',
+      );
+      await Deno.writeTextFile(
+        `${temp}/packages/example/scaffold.plugin.json`,
+        JSON.stringify(
+          {
+            version: '1.2.3',
+            dependencies: {
+              '@netscript/plugin': '1.2.3',
+              '@netscript/sdk': '>=1.2.3',
+            },
+          },
+          null,
+          2,
+        ) + '\n',
+      );
+      await Deno.writeTextFile(
+        `${temp}/deno.lock`,
+        JSON.stringify(
+          {
+            version: '5',
+            specifiers: { 'npm:stream@1.2.3': '1.2.3' },
+            npm: { 'stream@1.2.3': { integrity: 'sha512-genuine-third-party-pin' } },
+            workspace: {
+              members: {
+                'packages/example': {
+                  dependencies: ['jsr:@netscript/example@1.2.3'],
+                },
+              },
+            },
+          },
+          null,
+          2,
+        ) + '\n',
+      );
+      assertEquals((await run('git', ['init'], temp)).code, 0);
+      assertEquals((await run('git', ['add', 'deno.lock'], temp)).code, 0);
+
+      const { coordinateVersionBump, findVersionResidue } = await import('./bump-version.ts');
+      await coordinateVersionBump(temp, newVersion, name);
+
+      const rootManifest = await Deno.readTextFile(`${temp}/deno.json`);
+      const memberManifest = await Deno.readTextFile(`${temp}/packages/example/deno.json`);
+      const scaffold = await Deno.readTextFile(
+        `${temp}/packages/example/scaffold.plugin.json`,
+      );
+      const lock = await Deno.readTextFile(`${temp}/deno.lock`);
+
+      assertStringIncludes(rootManifest, `"version": "${newVersion}"`);
+      assertStringIncludes(rootManifest, `"stream": "npm:stream@1.2.3"`);
+      assertStringIncludes(rootManifest, `"streamRange": "npm:stream@^1.2.3"`);
+      assertStringIncludes(memberManifest, `"version": "${newVersion}"`);
+      assertStringIncludes(memberManifest, `jsr:@netscript/sdk@${newVersion}/desktop`);
+      assertStringIncludes(memberManifest, `jsr:@netscript/example@^${newVersion}`);
+      assertStringIncludes(memberManifest, `npm:@netscript/example@${newVersion}`);
+      assertStringIncludes(scaffold, `"version": "${newVersion}"`);
+      assertStringIncludes(scaffold, `"@netscript/plugin": "${newVersion}"`);
+      assertStringIncludes(scaffold, `"@netscript/sdk": ">=${newVersion}"`);
+      assertStringIncludes(lock, `"npm:stream@1.2.3": "1.2.3"`);
+      assertStringIncludes(lock, `"stream@1.2.3"`);
+      assertStringIncludes(lock, `jsr:@netscript/example@${newVersion}`);
+      assertEquals(await findVersionResidue(temp, '1.2.3'), []);
+    } finally {
+      await Deno.remove(temp, { recursive: true });
+    }
+  });
+}
+
 Deno.test('discoverVersionFiles includes tracked locks and excludes untracked adjacent locks', async () => {
   const { discoverVersionFiles } = await import('./bump-version.ts');
   const root = await Deno.makeTempDir({ prefix: 'ns-tracked-lock-discovery-' });

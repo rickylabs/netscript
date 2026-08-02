@@ -72,8 +72,32 @@ export async function findVersionResidue(root: string, oldVersion: string): Prom
 }
 
 function containsExactVersion(text: string, version: string): boolean {
-  const escaped = version.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  return new RegExp(`(?<![0-9A-Za-z.+-])${escaped}(?![0-9A-Za-z.+-])`).test(text);
+  return rewriteNetScriptVersion(text, version, `${version}-netscript-residue-probe`) !== text;
+}
+
+/** Rewrite exact release versions only where a JSON surface identifies NetScript ownership. */
+export function rewriteNetScriptVersion(
+  text: string,
+  oldVersion: string,
+  newVersion: string,
+): string {
+  const escaped = oldVersion.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return text
+    .replace(new RegExp(`("version"\\s*:\\s*")${escaped}(?=")`, 'g'), `$1${newVersion}`)
+    .replace(
+      new RegExp(
+        `((?:jsr|npm):@netscript/[A-Za-z0-9._-]+@(?:\\^|~|>=|<=|>|<|=)?)${escaped}(?=[^0-9A-Za-z.+-]|$)`,
+        'g',
+      ),
+      `$1${newVersion}`,
+    )
+    .replace(
+      new RegExp(
+        `("@netscript/[A-Za-z0-9._-]+"\\s*:\\s*"(?:\\^|~|>=|<=|>|<|=)?)${escaped}(?=")`,
+        'g',
+      ),
+      `$1${newVersion}`,
+    );
 }
 
 /** Validate a stable forward bump or a same-core canary prerelease of the current stable version. */
@@ -213,7 +237,7 @@ async function replaceVersionFiles(
 ): Promise<void> {
   for (const path of files) {
     const text = await Deno.readTextFile(path);
-    const next = text.replaceAll(oldVersion, newVersion);
+    const next = rewriteNetScriptVersion(text, oldVersion, newVersion);
     if (next !== text) await Deno.writeTextFile(path, next);
   }
 }
