@@ -623,3 +623,55 @@ JSR-only imports retain the published manifest and generator fallback ... ok (2m
 ok | 10 passed (5 steps) | 0 failed (612ms)
 RAW_EXIT_CODE=0
 ```
+
+### Final requested verification
+
+```text
+$ deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/cli --ext ts,tsx
+{"source":{"mode":"selection","cwd":"/home/codex/repos/fix-1010"},"command":"deno check --quiet --unstable-kv <files>","selection":{"filesSelected":758,"batches":7,"failedBatches":0},"summary":{"totalOccurrences":0,"uniqueOccurrences":0,"uniqueCodes":0,"uniquePaths":0},"groups":[]}
+RAW_EXIT_CODE=0
+
+$ deno task quality:gate
+Task quality:gate deno task quality:scan && deno task arch:check
+{"ok":true,"mode":"repository","scanned":["packages/cli/src","plugins"],"findings":[],"allowCount":7,"allowances":[...]}
+Doctrine checks: every configured root reported FAIL=0; existing WARN/INFO retained.
+RAW_EXIT_CODE=0
+
+$ deno test -A packages/cli/src/public/features/generate/plugins/ plugins/ai/
+generate plugin registries command ... ok (3ms)
+installed runtime registry generator ... ok (10ms)
+generated trigger registry loads valid definitions and excludes scaffold runtime glue ... ok (67ms)
+generated trigger registry rejects a non-definition module that is not excluded ... ok (62ms)
+workspace import resolves the on-disk trigger manifest without fetching JSR ... ok (4ms)
+generated workers registry loads jobs and excludes job tools ... ok (56ms)
+generated sagas registry loads saga definitions and ignores other TypeScript files ... ok (55ms)
+generated AI registries load resources and exclude the skill-loader factory ... ok (75ms)
+marked source workspace wins for a published-shaped AI project ... ok (82ms)
+JSR-only imports retain the published manifest and generator fallback ... ok (3ms)
+plugins/ai resource tests: 10 passed
+plugins/ai CLI command tests: 3 passed
+plugins/ai compiler tests: 4 passed
+plugins/ai doctor tests: 2 passed
+plugins/ai manifest tests: 4 passed
+ok | 33 passed (5 steps) | 0 failed (1s)
+RAW_EXIT_CODE=0
+```
+
+Unabridged output is retained in `.llm/tmp/issue-1010-structural-ai-*.log`.
+
+### Exit state
+
+No AppHost was started in this slice. Final state:
+
+```text
+$ aspire ps --format Json --non-interactive --nologo
+[]
+ASPIRE_RAW_EXIT_CODE=0
+
+$ docker ps -a
+1fad8c348cce postgres-dda83380 Exited (255) 7 hours ago .../fix-1025/.../postgres
+d8ff61336f8b postgres-bc75ea00 Exited (255) 7 hours ago .../fix-1025/.../postgres
+DOCKER_RAW_EXIT_CODE=0
+```
+
+Both stopped containers are foreign `fix-1025` artifacts and were left untouched.

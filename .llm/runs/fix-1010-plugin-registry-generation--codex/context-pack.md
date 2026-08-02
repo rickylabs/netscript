@@ -2,7 +2,8 @@
 
 ## Status
 
-- Phase: structural filtering and marked source-workspace resolution implemented; final gates pending.
+- Phase: structural filtering and marked source resolution complete; all requested gates green;
+  evidence commit and push pending.
 - Branch/worktree clean at baseline before run artifacts.
 - Published 0.0.2 reproduction captured once in `.llm/tmp/issue-1010-clean-room-repro.log`.
 - PLAN-EVAL passed in a separate Claude Code + OpenRouter Qwen session before implementation.
@@ -51,7 +52,5 @@
 
 ## Next
 
-1. Make AI registry selection shape-based and prove it by importing emitted output.
-2. Resolve exact-name first-party members from the contributor source root for published-shaped
-   scaffold projects, retaining third-party/published fallback.
-3. Run requested gates, record teardown, push, and prove SHA equality. Do not run local full E2E.
+1. Commit final gate evidence, push, and prove SHA equality.
+2. Supervisor runs authoritative cloud scaffold runtime and owns PR/issue lifecycle.
