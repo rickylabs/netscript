@@ -65,6 +65,7 @@ export function createOtelGates(): readonly GateDefinition[] {
         'run',
         '--allow-run',
         '--allow-read',
+        '--allow-net=127.0.0.1:8093',
         new URL('./validate-aspire-task-traces.ts', import.meta.url).pathname,
         context.project.projectRoot,
         'workers',

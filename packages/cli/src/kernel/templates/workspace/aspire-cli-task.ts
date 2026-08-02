@@ -22,9 +22,18 @@ if (mode !== 'otel' && mode !== 'export') {
   Deno.exit(2);
 }
 
-const primary = await runAspire([mode, ...forwardedArgs]);
+let primary: Deno.CommandOutput;
+try {
+  primary = await runAspire([mode, ...forwardedArgs]);
+} catch (error) {
+  const cause = error instanceof Error ? error.message : String(error);
+  console.error(\`Dashboard URL resolution failed: aspire command failed to start: \${cause}\`);
+  console.error(guidance);
+  Deno.exit(1);
+}
 await relay(primary);
 if (primary.success) Deno.exit(0);
+if (hasOption(forwardedArgs, '--dashboard-url')) Deno.exit(primary.code || 1);
 
 try {
   const dashboardUrl = await resolveDashboardUrl();
@@ -84,6 +93,10 @@ function extractJson(text: string): string {
   const arrayStart = trimmed.indexOf('[');
   if (arrayStart < 0) throw new Error('aspire ps did not emit a JSON array');
   return trimmed.slice(arrayStart);
+}
+
+function hasOption(args: readonly string[], name: string): boolean {
+  return args.some((arg) => arg === name || arg.startsWith(\`\${name}=\`));
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

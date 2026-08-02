@@ -210,3 +210,50 @@ design and emitted-task implementation remain locked; no product redesign is aut
 | Root tasks provide a false green for `packages/cli` | Use all three scoped wrappers with `--root packages/cli --ext ts,tsx`. |
 | Runtime suite fails before telemetry | Report the exact preceding gate and do not infer telemetry success. |
 | Runtime leaves resources behind | Use `--cleanup`, then Aspire-CLI-first teardown and scoped container inspection. |
+
+## CI telemetry-gate repair amendment — 2026-08-02
+
+Archetype remains 6 (CLI/tooling). This amendment repairs diagnostics and the existing strict
+runtime assertion; it does not redesign the generated task or change dashboard security.
+
+### Locked decisions
+
+1. Write `.llm/tmp/e2e-report-scaffold-runtime.json`; this matches the existing
+   `**/e2e-report*.json` upload glob without changing artifact policy.
+2. Add a checked reusable Deno report printer before upload. It prints each failed gate's id,
+   `error`, and captured stdout/stderr evidence. Desktop-native is deferred because making it useful
+   requires more than the permitted one-line change.
+3. Make the task-trace gate self-sufficient by generating webhook traffic, then trying deduplicated
+   candidates derived from `aspire describe`, requested display name, and nested running-system
+   records from `aspire ps`. Each attempt logs candidate, exit code, and output byte count.
+4. Preserve the non-empty JSON assertion and critical gate status. Final failure includes all
+   candidates plus the last code/stdout/stderr in the thrown error.
+5. Catch primary Aspire process-start errors in the emitted runner and print the existing actionable
+   resolution guidance. Do not append a fallback URL when forwarded args already contain
+   `--dashboard-url`; leave `--apphost` behavior unchanged because live help does not establish the
+   claimed incompatibility.
+
+### Commit slices and gates
+
+| Slice | Proof | Files | Gate |
+| --- | --- | --- | --- |
+| CI failure evidence | Failed report data is retained and legible | workflow, `.llm/tools/e2e` script/test, run artifacts | focused test + scoped check/lint/fmt |
+| Strict runtime repair | Traffic and candidate iteration still require non-empty task JSON | validator/test, `otel-gates.ts`, run artifacts | focused tests + scoped wrappers |
+| Emitted runner hardening | Command-start and duplicate-URL cases are actionable | workspace template/tests, generated asset, run artifacts | generator tests + `check:assets-barrel` |
+| Final proof | All scoped/quality gates and teardown are recorded | run artifacts | requested validation set |
+
+### Open-decision sweep and risks
+
+- Candidate expected to win in CI: open until cloud diagnostics run; safe to defer because the gate
+  tries and reports every resolved identity rather than choosing one by assumption.
+- Dashboard resource-list endpoint: safe to defer; no stable endpoint is required when nested
+  running-system records plus describe/display candidates are supported.
+- Risk: webhook traffic itself fails. Mitigation: fail immediately with HTTP status/body so the
+  report names the real prerequisite failure.
+- Risk: banner text precedes JSON. Mitigation: retain the existing first-valid-array parser.
+- Risk: generated barrel drifts. Mitigation: regenerate with `gen:assets-barrel` and run
+  `check:assets-barrel`.
+- Debt/public surface: none; pure helpers are test seams inside the E2E validator and no published
+  CLI export changes.
+- Deferred: full local `scaffold.runtime`, dashboard security changes, PR/issue metadata, and
+  desktop-native reporting beyond a one-line amendment.

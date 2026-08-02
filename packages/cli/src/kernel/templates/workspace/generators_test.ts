@@ -107,7 +107,10 @@ Deno.test('generateDenoJson emits detached Aspire telemetry task routes', () => 
 
 Deno.test('generateAspireCliTaskRunner emits bare-first fallback and actionable failure', () => {
   const source = generateAspireCliTaskRunner();
-  assertStringIncludes(source, "const primary = await runAspire([mode, ...forwardedArgs])");
+  assertStringIncludes(source, "primary = await runAspire([mode, ...forwardedArgs])");
+  assertStringIncludes(source, 'aspire command failed to start');
+  assertStringIncludes(source, "if (hasOption(forwardedArgs, '--dashboard-url'))");
+  assertStringIncludes(source, "arg === name || arg.startsWith(`${name}=`)");
   assertStringIncludes(source, "'--dashboard-url', dashboardUrl");
   assertStringIncludes(source, "await Deno.realPath('aspire/apphost.mts')");
   assertEquals(

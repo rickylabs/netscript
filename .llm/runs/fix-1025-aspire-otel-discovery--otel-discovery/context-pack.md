@@ -43,3 +43,15 @@
   resources owned by this run.
 - Next action is to commit this evidence, force-push the rebased branch with lease, and verify the
   local and remote object IDs match. The PR remains draft and its runtime acceptance gap remains open.
+
+## CI task-trace repair — 2026-08-02
+
+- Added retained scaffold-runtime JSON reporting plus a failure-only checked diagnostic printer.
+- Kept the strict critical telemetry task assertion, made it generate traffic, and added ordered
+  resource-candidate attempts with complete final failure details.
+- Hardened generated runner command-start and duplicate-dashboard-option behavior; asset barrel is
+  current.
+- Scoped check/lint/fmt, 26 focused tests, asset-barrel, and quality gates pass. No local runtime
+  suite was run by instruction. Cloud CI must determine which candidate wins and whether acceptance
+  box 5 can close.
+- Teardown is clean: `aspire ps` empty, no running Docker containers, no resources created here.

@@ -180,3 +180,72 @@ directly and is synchronized.
   artifact verification then showed local HEAD, the remote branch, and PR #1036's `headRefOid` all
   at `384065f820545871231d705990a4ad5734db56cf`. PR #1036 remained a draft. A final evidence commit
   follows this entry and will be verified the same way.
+
+## Design amendment — CI task-trace repair
+
+- Public surface: no new NetScript CLI verb or package export. Workflow gains a JSON report path;
+  the generated `aspire:otel`/`aspire:export` runner retains its existing interface.
+- Domain vocabulary: `AspireResourceCandidate` is represented as a deduplicated resource-name list;
+  `FailedGateDiagnostic` is the report-printer's structural input.
+- Ports: existing `Deno.Command`, `fetch`, filesystem report, and reporter evidence boundaries only;
+  no abstraction or adapter is added.
+- Constants: webhook URL, attempt count/delay, and scaffold-runtime report path remain finite local
+  values. Existing gate IDs and command names are unchanged.
+- Contributor path: candidate parsing and trace JSON parsing live in
+  `validate-aspire-task-traces.ts`; CI failure rendering lives in one reusable `.llm/tools/e2e`
+  script; emitted-task behavior remains in `aspire-cli-task.ts` and its generator test.
+- Deferred scope: full local runtime rerun, security posture, broader reporter redesign,
+  desktop-native multi-step wiring, PR body, and issue acceptance boxes.
+
+## CI task-trace repair implementation and evidence — 2026-08-02
+
+### Changes
+
+- Cloud scaffold runtime now writes `.llm/tmp/e2e-report-scaffold-runtime.json`, a name already
+  matched by the upload glob `**/e2e-report*.json`. A failure-only step runs the checked reusable
+  `.llm/tools/e2e/print-failed-report-steps.ts` before upload and prints failed gate id, error, and
+  captured stdout/stderr. Desktop-native was not changed because useful parity is more than one line.
+- `behavior.otel.task-traces` now sends five webhook requests, resolves ordered/deduplicated
+  candidates from `aspire describe`, the requested display name, and nested resource records from
+  `aspire ps`, and logs every candidate's exit code and output byte count. It still requires exit 0
+  and a non-empty JSON trace array. Final failure now embeds candidates, last candidate/code, and
+  last stdout/stderr in the thrown error.
+- The emitted runner catches primary `aspire` process-start failures and emits the existing
+  dashboard-resolution guidance. It does not append a second `--dashboard-url` when the caller
+  already supplied that option (including `--dashboard-url=value`). Live 13.4.6 help did not prove
+  `--apphost` mutual exclusion, so `--apphost` behavior was deliberately left unchanged.
+- Ran the asset generator. No embedded barrel changed; `check:assets-barrel` confirms the generated
+  barrels are current.
+
+### Validation
+
+| Command | Exit | Actual output |
+| --- | ---: | --- |
+| `deno test --allow-all .llm/tools/e2e/print-failed-report-steps_test.ts packages/cli/e2e/src/application/gates/scaffold/validate-aspire-task-traces_test.ts packages/cli/src/kernel/templates/workspace/generators_test.ts` | 0 | `ok | 26 passed | 0 failed` (5 validator, 19 generator, 2 report-printer tests). |
+| `run-deno-check.ts --root .llm/tools/e2e --root packages/cli/e2e/src/application/gates/scaffold --root packages/cli/src/kernel/templates/workspace --ext ts,tsx` | 0 | 32 files, 1 batch, 0 failed batches, 0 diagnostics. |
+| Matching scoped `run-deno-lint.ts` | 0 | 32 files, 0 findings. |
+| Matching scoped `run-deno-fmt.ts` | 0 | 32 files, 0 findings. |
+| `deno task check:assets-barrel` | 0 | Regeneration completed; watched generated barrels had no diff. |
+| `deno task quality:gate` | 0 | Quality scan `ok: true`, no findings; architecture/dependency checks completed with existing warnings only. |
+| `git diff --check` | 0 | No whitespace errors. |
+
+The requested `deno task check:test` does not exist in this checkout; the focused `deno test`
+command above is the repository-supported equivalent and includes both named test surfaces.
+Per the assignment, no local `scaffold.runtime` run was attempted. Cloud CI remains the runtime
+authority.
+
+### Expected CI discriminator
+
+Given the immediately preceding dashboard API gate observes `service.name === "workers"`, the
+requested display candidate `workers` is expected to win after the new self-generated traffic has
+settled. If Aspire instead requires a DCP-suffixed identity, the preceding `describe` candidate or a
+nested running-system candidate will win and the log will name it. This remains an expectation, not
+a claimed runtime result.
+
+### Teardown
+
+- This slice started no AppHost and created no containers.
+- `aspire ps --format Json --non-interactive --nologo` returned `[]`.
+- `docker ps -a` reported 0 running and 5 pre-existing stopped/exited containers:
+  `postgres-29f040e0`, `garnet-apzbtmzt`, `redis-jvfyhumd`, `postgres-dda83380`, and
+  `postgres-bc75ea00`. None was created or removed by this slice.

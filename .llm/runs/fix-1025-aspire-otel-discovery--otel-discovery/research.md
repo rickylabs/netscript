@@ -82,3 +82,22 @@ the resulting `GET` server spans before the comparison commands ran.
 Conclusion: the reported exit-12 failure does not reproduce on this Aspire CLI build when telemetry
 is non-empty. Bare discovery works against the detached AppHost. The emitted task should use the
 bare command as the primary route and retain explicit-dashboard fallback for the reported failure.
+
+## CI telemetry-gate repair findings — 2026-08-02
+
+- Cloud job `91430785548` is authoritative for this amendment: the dashboard API trace gate passes,
+  while `behavior.otel.task-traces` exhausts its ten retries and the pretty reporter discards the
+  captured command evidence.
+- `RunReport.steps[]` already carries `error` and command evidence containing `stdoutTail` and
+  `stderrTail`; `ReportFileReporter` writes that object only when `--report` is supplied. The current
+  scaffold-runtime workflow supplies no report path, so the existing artifact upload has nothing to
+  upload.
+- `aspire otel traces --help` says the positional argument filters by resource name. It lists both
+  `--apphost` and `--dashboard-url`, but does not document their mutual exclusion. Therefore the
+  emitted task will suppress URL fallback only when the caller already supplied `--dashboard-url`;
+  it will not infer special handling for `--apphost`.
+- `aspire ps --format Json` identifies running AppHosts and their dashboard URLs. Candidate resource
+  discovery must tolerate richer/nested resource records while retaining `describe` name and the
+  requested display name; no resource form is hard-coded as the sole truth.
+- The requested `.agents/skills/deno/SKILL.md` is absent. The available repository Deno authority,
+  `.agents/skills/netscript-deno-toolchain/SKILL.md`, is used instead.
