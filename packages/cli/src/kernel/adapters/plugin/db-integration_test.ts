@@ -202,3 +202,79 @@ Deno.test('copyPluginSchemasToRootDb validates declared schemas without widening
     [],
   );
 });
+
+Deno.test('copyPluginSchemasToRootDb rejects a dependency fragment that collides with a base declaration', async () => {
+  const fs = new MemoryFileSystemAdapter();
+  const scaffolder = new Scaffolder(new StringTemplateAdapter(fs), fs);
+  const basePath = '/project/database/postgres/schema/schema.prisma';
+  const fragmentPath = 'database/auth.prisma';
+  await fs.writeFile(basePath, 'model User {\n  id String @id\n}\n');
+
+  const error = await assertRejects(
+    () =>
+      copyPluginSchemasToRootDb(
+        '/project',
+        'auth',
+        {
+          requiresDb: true,
+          dbExists: true,
+          targetConfigKey: 'postgres',
+          targetEngine: 'postgres',
+          needsProvisioning: false,
+        },
+        { fs, scaffolder },
+        {
+          packageFragments: [{
+            path: fragmentPath,
+            content: 'model User {\n  id Int @id\n}\n',
+          }],
+          schemaDeclared: true,
+        },
+      ),
+    ScaffoldValidationError,
+  );
+
+  assertStringIncludes(error.message, 'auth');
+  assertStringIncludes(error.message, fragmentPath);
+  assertStringIncludes(error.message, 'User');
+  assertStringIncludes(error.message, basePath);
+  assertEquals(error.context, {
+    pluginName: 'auth',
+    fragmentPath,
+    declarationKind: 'model',
+    declarationName: 'User',
+    existingPath: basePath,
+  });
+});
+
+Deno.test('copyPluginSchemasToRootDb deduplicates an identical base declaration', async () => {
+  const fs = new MemoryFileSystemAdapter();
+  const scaffolder = new Scaffolder(new StringTemplateAdapter(fs), fs);
+  const schema = 'model User {\n  id String @id\n}\n';
+  const targetPath = '/project/database/postgres/schema/plugins/auth/auth.prisma';
+  await fs.writeFile('/project/database/postgres/schema/schema.prisma', schema);
+
+  const results = await copyPluginSchemasToRootDb(
+    '/project',
+    'auth',
+    {
+      requiresDb: true,
+      dbExists: true,
+      targetConfigKey: 'postgres',
+      targetEngine: 'postgres',
+      needsProvisioning: false,
+    },
+    { fs, scaffolder },
+    {
+      packageFragments: [{ path: 'database/auth.prisma', content: schema }],
+      schemaDeclared: true,
+    },
+  );
+
+  assertEquals(results, [{
+    sourcePath: 'database/auth.prisma',
+    targetPath,
+    written: false,
+  }]);
+  assertEquals(await fs.exists(targetPath), false);
+});
