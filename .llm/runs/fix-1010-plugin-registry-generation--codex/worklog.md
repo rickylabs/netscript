@@ -675,3 +675,17 @@ DOCKER_RAW_EXIT_CODE=0
 ```
 
 Both stopped containers are foreign `fix-1025` artifacts and were left untouched.
+
+### Push proof
+
+```text
+$ git push origin HEAD:refs/heads/fix/1010-plugin-registry-generation
+To https://github.com/rickylabs/netscript.git
+   aceae4924..988bd93f9  HEAD -> fix/1010-plugin-registry-generation
+$ git rev-parse HEAD
+988bd93f97a9b5626e1a5797010b4a136969d024
+$ git ls-remote origin fix/1010-plugin-registry-generation
+988bd93f97a9b5626e1a5797010b4a136969d024 refs/heads/fix/1010-plugin-registry-generation
+```
+
+The push-proof artifact commit is pushed immediately and parity is checked once more.

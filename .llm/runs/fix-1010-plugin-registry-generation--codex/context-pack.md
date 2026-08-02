@@ -2,8 +2,7 @@
 
 ## Status
 
-- Phase: structural filtering and marked source resolution complete; all requested gates green;
-  evidence commit and push pending.
+- Phase: structural filtering and marked source resolution complete; gates green and branch pushed.
 - Branch/worktree clean at baseline before run artifacts.
 - Published 0.0.2 reproduction captured once in `.llm/tmp/issue-1010-clean-room-repro.log`.
 - PLAN-EVAL passed in a separate Claude Code + OpenRouter Qwen session before implementation.
@@ -52,5 +51,4 @@
 
 ## Next
 
-1. Commit final gate evidence, push, and prove SHA equality.
-2. Supervisor runs authoritative cloud scaffold runtime and owns PR/issue lifecycle.
+1. Supervisor runs authoritative cloud scaffold runtime and owns PR/issue lifecycle.
