@@ -44,6 +44,8 @@ export interface AntigravityEvidenceObservation {
   readonly expectedMarker?: string;
   readonly expectedInstructionMarker?: 'AGENTS' | 'GEMINI';
   readonly staticCapabilities?: readonly AntigravityCapability[];
+  /** Set when the probe asked for `--output-format` and the stream parsed into typed events. */
+  readonly structuredOutputParsed?: boolean;
   readonly ownerAcceptedCapabilities?: readonly AntigravityCapability[];
 }
 export interface AntigravityCitationEvidence {
@@ -118,7 +120,13 @@ export function classifyAntigravityEvidence(
   for (const capability of observation.staticCapabilities ?? []) {
     capabilities[capability] = 'supported';
   }
-  capabilities.structured_output = 'unsupported';
+  // Antigravity CLI 1.1.8 added `--output-format json|stream-json`; before that there was nothing
+  // to detect, so this was pinned unsupported. It is now read from the probe.
+  capabilities.structured_output = observation.structuredOutputParsed === undefined
+    ? 'unknown'
+    : observation.structuredOutputParsed
+    ? 'supported'
+    : 'unsupported';
   if (observation.expectedMarker) {
     capabilities.headless = observation.exitCode === 0 &&
         observation.stdout.trim() === observation.expectedMarker
