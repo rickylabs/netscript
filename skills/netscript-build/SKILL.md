@@ -47,8 +47,9 @@ Run in order: `init → generate → migrate → seed`, then `status` to confirm
 contract change; do not hand-edit generated output.
 
 **Plugin lifecycle.**
-`netscript plugin install` → `netscript plugin sync` → `netscript plugin doctor`. Regenerate the
-registry with `netscript generate plugins` when the plugin set changes.
+`netscript plugin install` → `netscript generate plugins` → `netscript plugin doctor`.
+`netscript generate plugins` is authoritative; the compatibility `plugin sync` command delegates
+to it.
 
 **A plugin install seemed to work, but its boundary never runs or the generated registry looks
 wrong.** Run `netscript plugin doctor` before reading source or hand-probing endpoints, then

@@ -70,17 +70,12 @@ describe('plugin host loader', () => {
     const messages: string[] = [];
     const command = createHostPluginCommand({
       resolveProjectRoot: (projectRoot) => Promise.resolve(projectRoot ?? '/workspace/app'),
-      createLoader: (projectRoot) => {
+      generate: (input) => {
+        const projectRoot = input.projectRoot;
         roots.push(projectRoot);
-        return {
-          resolve: () =>
-            Promise.resolve({
-              config: createConfig([]),
-              plugins: [],
-              contributions: {},
-              emissions: [],
-            }),
-        };
+        return Promise.resolve([
+          { path: '.netscript/generated/example.ts', plugin: 'example', registrableItems: 1 },
+        ]);
       },
       print: (message) => messages.push(message),
     });
@@ -88,7 +83,9 @@ describe('plugin host loader', () => {
     await command.parse(['--project-root', '/workspace/nested']);
 
     assertEquals(roots, ['/workspace/nested']);
-    assertEquals(messages, ['Synchronized 0 plugin(s).']);
+    assertEquals(messages, [
+      'Synchronized 1 registry file(s) via `netscript generate plugins`.',
+    ]);
   });
 });
 

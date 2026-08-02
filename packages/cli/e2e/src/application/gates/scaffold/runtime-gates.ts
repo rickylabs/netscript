@@ -32,6 +32,11 @@ const APP_HOME_FAILURE_HINT =
   'here means the app itself is not rendering — check the app resource logs in the Aspire ' +
   'dashboard.';
 
+const AI_CHAT_ROUTE_FAILURE_HINT =
+  'The generated AI chat route or composition could not be imported, or the self-wired ' +
+  '`e2e-tool` was absent or not callable after plugin registry generation. Inspect the captured ' +
+  'stderr for the failing generated module and registry path.';
+
 function runtimeWaitGate(resource: AspireResource): GateDefinition {
   return commandGate(
     `runtime.wait.${resource}`,
@@ -289,6 +294,8 @@ export function createRuntimeGates(
           context.project.projectRoot,
         ),
       (context) => context.project.projectRoot,
+      'capture',
+      AI_CHAT_ROUTE_FAILURE_HINT,
     ),
   ];
 }

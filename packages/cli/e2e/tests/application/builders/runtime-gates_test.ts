@@ -106,6 +106,17 @@ Deno.test('runtime gates include durable workers and sagas CLI parity', () => {
     '--allow-read',
     '/repo/packages/cli/e2e/src/application/gates/scaffold/durable-cli-parity.ts',
   ]);
+  assertEquals(gate.failureHint, undefined);
+});
+
+Deno.test('AI chat route gate captures generated registry import failures', () => {
+  const gate = createRuntimeGates().find((entry) => entry.id === GATE.BEHAVIOR_AI_CHAT_ROUTE);
+  if (gate?.kind !== 'command') {
+    throw new Error('Expected AI chat route gate to be a command gate.');
+  }
+
+  assertEquals(gate.outputMode, 'capture');
+  assertEquals(gate.failureHint?.includes('captured stderr'), true);
 });
 
 Deno.test('runtime gates wait for mysql resource when mysql is selected', () => {

@@ -1,19 +1,15 @@
-import type { CliffyCommand } from "../../../../kernel/presentation/command-types.ts";
+import type { CliffyCommand } from '../../../../kernel/presentation/command-types.ts';
 import { Command } from '@cliffy/command';
-import { join } from '@std/path';
-import type {
-  EmitterPort,
-  ExtractorPort,
-  RegistryEmission,
-  WalkerPort,
-} from '@netscript/plugin/sdk';
+import type { EmitterPort, ExtractorPort, WalkerPort } from '@netscript/plugin/sdk';
 
 import { CliCommand } from '../../../../kernel/application/abstracts/cli-command.ts';
 import type { FileSystemPort } from '../../../../kernel/ports/file-system-port.ts';
 import { outputText } from '../../../../kernel/presentation/output/default-output.ts';
 import { type ProjectRootResolver, requireProjectRoot } from '../../../presentation/support.ts';
-import { resolveWalkerEmissions } from '../../plugins/host/trigger-walker.ts';
-
+import type {
+  GenerateInstalledPluginRegistries,
+  GeneratedPluginRegistry,
+} from './generate-installed-plugin-registries.ts';
 
 interface GeneratePluginRegistriesCommandInput {
   readonly dryRun?: boolean;
@@ -25,13 +21,15 @@ interface GeneratePluginRegistriesCommandInput {
 export interface GeneratePluginRegistriesCommandDependencies {
   /** Resolve the project root from flags or environment. */
   readonly resolveProjectRoot: ProjectRootResolver;
-  /** SDK walker port. */
+  /** Generate every registry declared by installed plugin runtime manifests. */
+  readonly generate: GenerateInstalledPluginRegistries;
+  /** Generic SDK walker retained for plugin item add/update commands. */
   readonly walker: WalkerPort;
-  /** SDK extractor port. */
+  /** Generic SDK extractor retained for plugin item add/update commands. */
   readonly extractor: ExtractorPort;
-  /** SDK emitter port. */
+  /** Generic SDK emitter retained for plugin item add/update commands. */
   readonly emitter: EmitterPort;
-  /** Filesystem adapter used to write generated registry files. */
+  /** Filesystem retained for plugin item add/update command emissions. */
   readonly fs: FileSystemPort;
   /** Print completion lines. */
   readonly print?: (message: string) => void;
@@ -49,9 +47,7 @@ export class GeneratePluginRegistriesCommand extends CliCommand<CliffyCommand> {
     const print = this.dependencies.print ?? outputText;
     return new Command()
       .name('plugins')
-      .description('Generate plugin registries from project source')
-      // Permission surface: --allow-read for project source/config, --allow-write for
-      // .netscript/generated output when not using --dry-run.
+      .description('Generate installed plugin runtime registries (authoritative)')
       .option('--dry-run', 'Show what would be written without making changes', { default: false })
       .option('--project-root <path:string>', 'Project root directory')
       .option('--verbose', 'Show generated registry paths', { default: false })
@@ -60,24 +56,15 @@ export class GeneratePluginRegistriesCommand extends CliCommand<CliffyCommand> {
           this.dependencies.resolveProjectRoot,
           options.projectRoot,
         );
-        const emissions = await resolveWalkerEmissions({
-          projectRoot,
-          walker: this.dependencies.walker,
-          extractor: this.dependencies.extractor,
-          emitter: this.dependencies.emitter,
-        });
-
-        await writeEmissions({
+        const generated = await this.dependencies.generate({
           dryRun: options.dryRun ?? false,
-          emissions,
-          fs: this.dependencies.fs,
           projectRoot,
         });
 
         const verb = options.dryRun ? 'would write' : 'written';
-        print(`Plugin registry generation complete: ${emissions.length} ${verb}.`);
+        print(`Plugin registry generation complete: ${generated.length} ${verb}.`);
         if (options.verbose) {
-          for (const emission of emissions) print(emission.path);
+          for (const registry of generated) print(registry.path);
         }
       });
   }
@@ -90,14 +77,4 @@ export function createGeneratePluginRegistriesCommand(
   return new GeneratePluginRegistriesCommand(dependencies).define();
 }
 
-async function writeEmissions(options: {
-  readonly dryRun: boolean;
-  readonly emissions: readonly RegistryEmission[];
-  readonly fs: FileSystemPort;
-  readonly projectRoot: string;
-}): Promise<void> {
-  if (options.dryRun) return;
-  for (const emission of options.emissions) {
-    await options.fs.writeFile(join(options.projectRoot, emission.path), emission.text);
-  }
-}
+export type { GeneratedPluginRegistry };
