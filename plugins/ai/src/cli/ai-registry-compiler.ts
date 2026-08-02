@@ -56,7 +56,7 @@ export const AI_TOOLS_TARGET: AiRegistryTarget = {
   dir: 'ai/tools',
   registryPath: '.netscript/generated/plugin-ai/tools.registry.ts',
   fileSuffixes: ['.ts'],
-  exclude: ['_registry.ts', 'mod.ts', 'types.ts', 'skill-loader.ts'],
+  exclude: ['_registry.ts', 'mod.ts', 'types.ts'],
   varPrefix: 'tool',
   typeImport: { name: 'AiToolDefinition', from: '@netscript/ai/tools' },
 };
@@ -84,11 +84,6 @@ export interface AiRegistryCompileResult {
   readonly written: boolean;
 }
 
-/** Loads one project module so registry inputs can be validated before emission. */
-export type AiRegistryModuleLoader = (
-  specifier: string,
-) => Promise<Readonly<Record<string, unknown>>>;
-
 /**
  * Compile one AI runtime-registry target into its generated module.
  *
@@ -100,14 +95,13 @@ export type AiRegistryModuleLoader = (
 export async function compileAiRegistry(
   files: ProjectFiles,
   target: AiRegistryTarget,
-  loadModule: AiRegistryModuleLoader = loadProjectModule,
 ): Promise<AiRegistryCompileResult> {
   const discovered = (await listResourceFiles(files, target.dir, target.fileSuffixes))
     .map((entry) => entry.relativePath.replaceAll('\\', '/'))
     .filter((path) => isRegistryInput(path, target))
     .sort((left, right) => left.localeCompare(right));
   const inputs = target.kind === 'ai-tools'
-    ? await selectToolDefinitionModules(files, discovered, loadModule)
+    ? await selectToolDefinitionModules(files, discovered)
     : discovered;
 
   if (inputs.length === 0) {
@@ -124,40 +118,123 @@ export async function compileAiRegistry(
 async function selectToolDefinitionModules(
   files: ProjectFiles,
   inputs: readonly string[],
-  loadModule: AiRegistryModuleLoader,
 ): Promise<readonly string[]> {
   const selected: string[] = [];
   for (const path of inputs) {
-    const module = await loadModule(files.toImportUrl(path));
-    if (resolveAiToolDefinitions(module).length > 0) selected.push(path);
+    const source = await files.readTextFile(path);
+    if (source !== undefined && exportsReadyAiToolDefinition(source)) selected.push(path);
   }
   return selected;
 }
 
-async function loadProjectModule(
-  specifier: string,
-): Promise<Readonly<Record<string, unknown>>> {
-  const module: unknown = await import(specifier);
-  if (!isModuleRecord(module)) return {};
-  return module;
+/**
+ * Report whether source exports a ready `defineAiTool(...)` definition.
+ *
+ * This deliberately recognizes only exported initializers (or arrays of them),
+ * never calls nested in function bodies. The small lexer skips comments and
+ * string/template contents so incidental text cannot become registry membership.
+ * Unrecognized or incomplete input simply returns false.
+ */
+export function exportsReadyAiToolDefinition(source: string): boolean {
+  try {
+    const tokens = lexSource(source);
+    const builders = new Set(['defineAiTool']);
+    for (let index = 0; index < tokens.length - 3; index++) {
+      if (
+        tokens[index] === 'defineAiTool' && tokens[index + 1] === 'as' &&
+        isIdentifier(tokens[index + 2])
+      ) {
+        builders.add(tokens[index + 2]);
+      }
+    }
+
+    for (let index = 0; index < tokens.length; index++) {
+      if (tokens[index] !== 'export') continue;
+      if (tokens[index + 1] === 'default') {
+        if (isToolInitializer(tokens, index + 2, builders)) return true;
+        continue;
+      }
+      if (tokens[index + 1] !== 'const') continue;
+      let cursor = index + 2;
+      while (cursor < tokens.length && tokens[cursor] !== ';') {
+        while (cursor < tokens.length && tokens[cursor] !== '=' && tokens[cursor] !== ';') cursor++;
+        if (tokens[cursor] !== '=') break;
+        if (isToolInitializer(tokens, cursor + 1, builders)) return true;
+        cursor = skipInitializer(tokens, cursor + 1);
+        if (tokens[cursor] === ',') cursor++;
+      }
+    }
+  } catch {
+    // Static selection is best-effort by contract; malformed source is excluded.
+  }
+  return false;
 }
 
-function isModuleRecord(value: unknown): value is Readonly<Record<string, unknown>> {
-  return typeof value === 'object' && value !== null;
+function isToolInitializer(
+  tokens: readonly string[],
+  start: number,
+  builders: ReadonlySet<string>,
+): boolean {
+  if (builders.has(tokens[start]) && tokens[start + 1] === '(') return true;
+  if (tokens[start] !== '[') return false;
+  let cursor = start + 1;
+  while (cursor < tokens.length && tokens[cursor] !== ']') {
+    if (!builders.has(tokens[cursor]) || tokens[cursor + 1] !== '(') return false;
+    cursor = skipInitializer(tokens, cursor);
+    if (tokens[cursor] === ',') cursor++;
+  }
+  return tokens[cursor] === ']';
 }
 
-function resolveAiToolDefinitions(
-  module: Readonly<Record<string, unknown>>,
-): readonly unknown[] {
-  const candidates = [module.default, module.tool, module.definition, ...Object.values(module)];
-  return candidates.flatMap((candidate) => Array.isArray(candidate) ? candidate : [candidate])
-    .filter(isAiToolDefinition);
+function skipInitializer(tokens: readonly string[], start: number): number {
+  const closing: Record<string, string> = { '(': ')', '[': ']', '{': '}' };
+  const stack: string[] = [];
+  for (let index = start; index < tokens.length; index++) {
+    const token = tokens[index];
+    if (token in closing) stack.push(closing[token]);
+    else if (stack.at(-1) === token) stack.pop();
+    else if (stack.length === 0 && (token === ',' || token === ';')) return index;
+  }
+  return tokens.length;
 }
 
-function isAiToolDefinition(candidate: unknown): boolean {
-  if (typeof candidate !== 'object' || candidate === null) return false;
-  return 'descriptor' in candidate && 'schema' in candidate && 'execute' in candidate &&
-    typeof candidate.execute === 'function';
+function lexSource(source: string): readonly string[] {
+  const tokens: string[] = [];
+  for (let index = 0; index < source.length;) {
+    const char = source[index];
+    const next = source[index + 1];
+    if (/\s/.test(char)) {
+      index++;
+    } else if (char === '/' && next === '/') {
+      index = source.indexOf('\n', index + 2);
+      if (index < 0) break;
+    } else if (char === '/' && next === '*') {
+      const end = source.indexOf('*/', index + 2);
+      if (end < 0) break;
+      index = end + 2;
+    } else if (char === "'" || char === '"' || char === '`') {
+      const quote = char;
+      index++;
+      while (index < source.length) {
+        if (source[index] === '\\') index += 2;
+        else if (source[index++] === quote) break;
+      }
+      tokens.push('<string>');
+    } else if (/[A-Za-z_$]/.test(char)) {
+      let end = index + 1;
+      while (end < source.length && /[\w$]/.test(source[end])) end++;
+      tokens.push(source.slice(index, end));
+      index = end;
+    } else {
+      tokens.push(char);
+      index++;
+    }
+  }
+  return tokens;
+}
+
+function isIdentifier(token: string | undefined): token is string {
+  return token !== undefined && /^[A-Za-z_$][\w$]*$/.test(token);
 }
 
 /**
