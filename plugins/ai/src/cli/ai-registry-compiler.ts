@@ -128,12 +128,14 @@ async function selectToolDefinitionModules(
 }
 
 /**
- * Report whether source exports a ready `defineAiTool(...)` definition.
+ * Report whether source exports a ready AI tool definition.
  *
- * This deliberately recognizes only exported initializers (or arrays of them),
- * never calls nested in function bodies. The small lexer skips comments and
- * string/template contents so incidental text cannot become registry membership.
- * Unrecognized or incomplete input simply returns false.
+ * This deliberately recognizes only exported initializers (or arrays of them):
+ * `defineAiTool(...)` chains and object literals with top-level `descriptor`,
+ * `schema`, and `execute` properties. It never considers values created inside
+ * function bodies. The small lexer skips comments and string/template contents
+ * so incidental text cannot become registry membership. Unrecognized or
+ * incomplete input simply returns false.
  */
 export function exportsReadyAiToolDefinition(source: string): boolean {
   try {
@@ -176,14 +178,44 @@ function isToolInitializer(
   builders: ReadonlySet<string>,
 ): boolean {
   if (builders.has(tokens[start]) && tokens[start + 1] === '(') return true;
+  if (tokens[start] === '{') return declaresToolObject(tokens, start);
   if (tokens[start] !== '[') return false;
   let cursor = start + 1;
   while (cursor < tokens.length && tokens[cursor] !== ']') {
-    if (!builders.has(tokens[cursor]) || tokens[cursor + 1] !== '(') return false;
+    if (!isToolInitializer(tokens, cursor, builders)) return false;
     cursor = skipInitializer(tokens, cursor);
     if (tokens[cursor] === ',') cursor++;
   }
   return tokens[cursor] === ']';
+}
+
+function declaresToolObject(tokens: readonly string[], start: number): boolean {
+  const required = new Set(['descriptor', 'schema', 'execute']);
+  let depth = 0;
+  let atPropertyStart = true;
+  for (let index = start; index < tokens.length; index++) {
+    const token = tokens[index];
+    if (token === '{') {
+      depth++;
+      continue;
+    }
+    if (token === '}') {
+      depth--;
+      if (depth === 0) return required.size === 0;
+      continue;
+    }
+    if (depth !== 1) continue;
+    if (token === ',') {
+      atPropertyStart = true;
+      continue;
+    }
+    if (!atPropertyStart) continue;
+    if (isIdentifier(token) && (tokens[index + 1] === ':' || tokens[index + 1] === '(')) {
+      required.delete(token);
+    }
+    atPropertyStart = false;
+  }
+  return false;
 }
 
 function skipInitializer(tokens: readonly string[], start: number): number {

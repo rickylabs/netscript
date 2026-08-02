@@ -2,8 +2,9 @@
 
 ## Current State
 
-Implementation and focused acceptance behavior are green. Three one-pass E2E attempts are blocked
-before the chat gate by the unrelated users service-health baseline; this is not claimed green.
+Implementation and acceptance behavior are green. Supervisor CI subsequently produced one
+`scaffold.runtime` report with 66 passed, 0 failed, including lifecycle, service-health, and
+AI chat-route in the same run. Follow-up structural-object compatibility is also green.
 
 ## Completed
 
@@ -12,14 +13,14 @@ before the chat gate by the unrelated users service-health baseline; this is not
 
 ## In Progress
 
-- PR publication with an honest merge-readiness blocker.
+- Follow-up commit and explicit push to PR #1057.
 
 ## Next Steps
 
-1. Commit, push, and open the draft PR with `status:impl-eval`.
-2. Obtain a completed report containing both required AI gates after service-health baseline recovery.
+1. Commit and push the structural-object compatibility fix.
+2. Update PR #1057 validation state from the recorded green evidence.
 
 ## Drift and Debt
 
-- Drift: evaluator route waiver and E2E environmental blocker recorded in `drift.md`.
+- Drift: evaluator route waiver and resolved environmental E2E incident recorded in `drift.md`.
 - Debt: none.

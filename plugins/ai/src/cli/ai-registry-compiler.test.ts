@@ -172,6 +172,36 @@ Deno.test('tool source selection ignores factories, comments, strings, and malfo
   );
 });
 
+Deno.test('tool source selection accepts structural objects but not partial or factory values', () => {
+  assertEquals(
+    exportsReadyAiToolDefinition(`
+      export default {
+        descriptor: { name: 'e2e-tool' },
+        schema: {},
+        execute: async () => ({ state: 'output-available', output: { ok: true } }),
+      };
+    `),
+    true,
+  );
+  assertEquals(
+    exportsReadyAiToolDefinition(`
+      export const partial = {
+        descriptor: { name: 'partial' },
+        execute: async () => ({ ok: true }),
+      };
+    `),
+    false,
+  );
+  assertEquals(
+    exportsReadyAiToolDefinition(`
+      export function createSkillLoaderTool(skills) {
+        return { skills };
+      }
+    `),
+    false,
+  );
+});
+
 /** Assert the generated module contains no `as`/`any` unsound casts. */
 function assertNoUnsoundCasts(source: string): void {
   for (const pattern of [' as Record', ' as unknown', ' as any', ': any', '<any>']) {

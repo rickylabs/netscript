@@ -100,3 +100,48 @@ not treated as green.
 
 - Issue #1054 remains the closing target; PR must use `Closes #1054`, milestone 0.0.3,
   `type:fix`, `area:plugins`, and one `status:` label.
+
+## Follow-up 1 — preserve structural tool objects
+
+### RED
+
+Required `check-test` evidence supplied by the supervisor against commit `95ab4c3bb`:
+
+```text
+generated AI registries load resources and exclude the skill-loader factory ... FAILED
+marked source workspace wins for a published-shaped AI project ... FAILED
+error: Installed plugin "@netscript/plugin-ai" did not write declared registry
+  .netscript/generated/plugin-ai/tools.registry.ts.
+FAILED | 2438 passed | 2 failed
+```
+
+Root cause: the static selector accepted only `defineAiTool(...)` initializer roots, narrowing the
+generated registry's established runtime contract, which also accepts structural tool objects with
+top-level `descriptor`, `schema`, and `execute` members. The integration fixtures and assertions
+were not changed.
+
+### GREEN
+
+The selector now accepts either a builder chain or a structural tool object (including arrays),
+while requiring object keys at literal depth one. Exported factories, partial objects, nested keys,
+comments, strings, and malformed input remain excluded.
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| `plugins/ai` full tests | PASS | 27 passed, 0 failed |
+| installed runtime registry integration | PASS | 8 passed, 0 failed; fixtures/assertions unchanged |
+| root `deno task test` | PASS | 2441 passed (558 steps), 0 failed, 13 ignored |
+| scoped check | PASS | 38 files, 0 findings; no user-supplied `--unstable-kv` |
+| scoped fmt | PASS | 38 files, 0 findings |
+| scoped lint | PASS | 38 files, 0 findings |
+| command-level unresolved import proof | PASS | `add tool second` exit 0; registry contains `second.ts` and `unresolvable.ts`, excludes `skill-loader.ts` |
+| paired scaffold runtime | PASS | supervisor CI: `Summary: passed=66 failed=0`; lifecycle 104ms, service-health 29658ms, chat-route 698ms in the same run |
+
+### Follow-up substantive review
+
+- The new object check is lexical and pure; no app module is executed.
+- Only exported value initializers are inspected, so `export function createSkillLoaderTool(...)`
+  remains excluded regardless of returned object contents.
+- Object keys are collected only at the outer literal depth and must include all three runtime
+  discriminator members.
+- No version, workflow dispatch, integration fixture, or unrelated source change was made.
