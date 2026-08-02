@@ -84,6 +84,11 @@ export interface AiRegistryCompileResult {
   readonly written: boolean;
 }
 
+/** Loads one project module so registry inputs can be validated before emission. */
+export type AiRegistryModuleLoader = (
+  specifier: string,
+) => Promise<Readonly<Record<string, unknown>>>;
+
 /**
  * Compile one AI runtime-registry target into its generated module.
  *
@@ -95,11 +100,15 @@ export interface AiRegistryCompileResult {
 export async function compileAiRegistry(
   files: ProjectFiles,
   target: AiRegistryTarget,
+  loadModule: AiRegistryModuleLoader = loadProjectModule,
 ): Promise<AiRegistryCompileResult> {
-  const inputs = (await listResourceFiles(files, target.dir, target.fileSuffixes))
+  const discovered = (await listResourceFiles(files, target.dir, target.fileSuffixes))
     .map((entry) => entry.relativePath.replaceAll('\\', '/'))
     .filter((path) => isRegistryInput(path, target))
     .sort((left, right) => left.localeCompare(right));
+  const inputs = target.kind === 'ai-tools'
+    ? await selectToolDefinitionModules(files, discovered, loadModule)
+    : discovered;
 
   if (inputs.length === 0) {
     return { files: inputs, registryPath: target.registryPath, count: 0, written: false };
@@ -110,6 +119,45 @@ export async function compileAiRegistry(
     : renderToolRegistry(target, inputs);
   await files.writeTextFile(target.registryPath, source);
   return { files: inputs, registryPath: target.registryPath, count: inputs.length, written: true };
+}
+
+async function selectToolDefinitionModules(
+  files: ProjectFiles,
+  inputs: readonly string[],
+  loadModule: AiRegistryModuleLoader,
+): Promise<readonly string[]> {
+  const selected: string[] = [];
+  for (const path of inputs) {
+    const module = await loadModule(files.toImportUrl(path));
+    if (resolveAiToolDefinitions(module).length > 0) selected.push(path);
+  }
+  return selected;
+}
+
+async function loadProjectModule(
+  specifier: string,
+): Promise<Readonly<Record<string, unknown>>> {
+  const module: unknown = await import(specifier);
+  if (!isModuleRecord(module)) return {};
+  return module;
+}
+
+function isModuleRecord(value: unknown): value is Readonly<Record<string, unknown>> {
+  return typeof value === 'object' && value !== null;
+}
+
+function resolveAiToolDefinitions(
+  module: Readonly<Record<string, unknown>>,
+): readonly unknown[] {
+  const candidates = [module.default, module.tool, module.definition, ...Object.values(module)];
+  return candidates.flatMap((candidate) => Array.isArray(candidate) ? candidate : [candidate])
+    .filter(isAiToolDefinition);
+}
+
+function isAiToolDefinition(candidate: unknown): boolean {
+  if (typeof candidate !== 'object' || candidate === null) return false;
+  return 'descriptor' in candidate && 'schema' in candidate && 'execute' in candidate &&
+    typeof candidate.execute === 'function';
 }
 
 /**

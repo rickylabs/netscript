@@ -568,3 +568,25 @@ Its project workspace therefore cannot match the installed package name. The gen
 contains the published compiler's exact `AI tool module ... does not export` throw and imports
 `ai/tools/skill-loader.ts`, which the repository manifest excludes. This proves the published 0.0.2
 manifest/generator path won; the repository manifest was not read.
+
+### Structural compiler slice
+
+`compileAiRegistry` now imports each discovered AI tool module under the generator's project Deno
+configuration and selects only modules exporting at least one value satisfying the existing
+`AiToolDefinition` shape predicate. The emitted module retains its loud resolver guard, so a selected
+module that changes shape after generation still fails explicitly. Factory/glue modules are absent
+from emitted imports rather than silently tolerated at registry-load time, and the compile result's
+count reflects registrable modules.
+
+```text
+$ deno test -A plugins/ai/src/cli/ai-registry-compiler.test.ts
+Check plugins/ai/src/cli/ai-registry-compiler.test.ts
+running 4 tests from ./plugins/ai/src/cli/ai-registry-compiler.test.ts
+compileAiRegistry emits a name-keyed tool registry ... ok (6ms)
+compileAiRegistry emits a stem-keyed agent factory registry ... ok (293µs)
+compileAiRegistry short-circuits when the resource dir is empty/missing ... ok (75µs)
+compileAiRegistry selects tool modules by definition shape ... ok (213µs)
+
+ok | 4 passed | 0 failed (10ms)
+RAW_EXIT_CODE=0
+```

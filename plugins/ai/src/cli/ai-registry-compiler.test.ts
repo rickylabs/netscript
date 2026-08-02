@@ -31,7 +31,7 @@ Deno.test('compileAiRegistry emits a name-keyed tool registry', async () => {
     'ai/agents/assistant.ts',
   ]);
 
-  const result = await compileAiRegistry(files, TOOLS_TARGET);
+  const result = await compileAiRegistry(files, TOOLS_TARGET, validToolModule);
 
   assertEquals(result.registryPath, '.netscript/generated/plugin-ai/tools.registry.ts');
   assertEquals(result.written, true);
@@ -91,12 +91,42 @@ Deno.test('compileAiRegistry emits a stem-keyed agent factory registry', async (
 Deno.test('compileAiRegistry short-circuits when the resource dir is empty/missing', async () => {
   const files = new MemoryProjectFiles(['ai/agents/assistant.ts']);
 
-  const result = await compileAiRegistry(files, TOOLS_TARGET);
+  const result = await compileAiRegistry(files, TOOLS_TARGET, validToolModule);
 
   assertEquals(result.written, false);
   assertEquals(result.count, 0);
   assertEquals(files.written.has('.netscript/generated/plugin-ai/tools.registry.ts'), false);
 });
+
+Deno.test('compileAiRegistry selects tool modules by definition shape', async () => {
+  const files = new MemoryProjectFiles([
+    'ai/tools/e2e-tool.ts',
+    'ai/tools/skill-loader.ts',
+  ]);
+
+  const result = await compileAiRegistry(files, TOOLS_TARGET, (specifier) => {
+    if (specifier.endsWith('/skill-loader.ts')) {
+      return Promise.resolve({ createSkillLoaderTool: () => ({}) });
+    }
+    return validToolModule(specifier);
+  });
+
+  assertEquals(result.files, ['ai/tools/e2e-tool.ts']);
+  assertEquals(result.count, 1);
+  const source = files.written.get(TOOLS_TARGET.registryPath) ?? '';
+  assertStringIncludes(source, 'ai/tools/e2e-tool.ts');
+  assertEquals(source.includes('skill-loader.ts'), false);
+});
+
+function validToolModule(_specifier: string): Promise<Readonly<Record<string, unknown>>> {
+  return Promise.resolve({
+    default: {
+      descriptor: { name: 'fixture-tool' },
+      schema: {},
+      execute: () => undefined,
+    },
+  });
+}
 
 /** Assert the generated module contains no `as`/`any` unsound casts. */
 function assertNoUnsoundCasts(source: string): void {
