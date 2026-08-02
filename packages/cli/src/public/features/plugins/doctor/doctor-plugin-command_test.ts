@@ -43,7 +43,10 @@ Deno.test('plugin doctor exits non-zero when generated registries are absent', a
   );
   assertEquals(error.exitCode, 1);
   assertStringIncludes(output.join('\n'), 'generated job registry exists');
-  assertStringIncludes(output.join('\n'), 'netscript generate plugins');
+  assertStringIncludes(
+    output.join('\n'),
+    'deno run -A jsr:@netscript/plugin-workers@0.0.2/cli compile-registry',
+  );
   assertStringIncludes(output.at(-1) ?? '', 'Plugin doctor failed: @netscript/plugin-workers');
 });
 

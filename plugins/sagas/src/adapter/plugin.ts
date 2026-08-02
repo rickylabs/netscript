@@ -37,7 +37,8 @@ export const sagasStarterResources: readonly InstallStarterResource[] = [
   { scaffolder: runtimeGlueScaffolder, input: DEFAULT_RUNTIME_GLUE_INPUT },
 ];
 
-const GENERATE_SAGA_REGISTRY = 'netscript plugin sagas generate-registry';
+const GENERATE_SAGA_REGISTRY =
+  `deno run -A jsr:@netscript/plugin-sagas@${PLUGIN_PACKAGE_VERSION}/cli generate-registry`;
 
 async function readSagaRegistry(context: PluginCommandContext): Promise<string | undefined> {
   if (!await context.fileSystem.exists(SAGAS_REGISTRY_PATH)) return undefined;

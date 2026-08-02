@@ -41,7 +41,8 @@ export const workersStarterResources: readonly InstallStarterResource[] = [
   { scaffolder: runtimeGlueScaffolder, input: DEFAULT_RUNTIME_GLUE_INPUT },
 ];
 
-const GENERATE_WORKERS_REGISTRY = 'netscript generate plugins';
+const GENERATE_WORKERS_REGISTRY =
+  `deno run -A jsr:@netscript/plugin-workers@${PLUGIN_PACKAGE_VERSION}/cli compile-registry`;
 
 async function readWorkersRegistry(context: PluginCommandContext): Promise<string | undefined> {
   if (!await context.fileSystem.exists(WORKERS_JOB_REGISTRY_PATH)) return undefined;

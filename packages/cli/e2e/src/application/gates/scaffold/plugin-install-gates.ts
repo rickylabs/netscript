@@ -55,10 +55,16 @@ function pluginInstallCommand(
       args.push('--saga-store-backend', 'kv');
     }
 
-    if (
-      context.request.suiteId === SCAFFOLD.USERLAND_INSTALL ||
-      context.request.options.packageSource !== PACKAGE_SOURCE.JSR
-    ) {
+    if (context.request.suiteId === SCAFFOLD.USERLAND_INSTALL) {
+      args.push(
+        '--ci',
+        '--local-path',
+        join(context.project.repoRoot, 'plugins', localPluginDir(kind)),
+      );
+      return cli(context, ...args);
+    }
+
+    if (context.request.options.packageSource !== PACKAGE_SOURCE.JSR) {
       args.push(
         '--local-path',
         join(context.project.repoRoot, 'plugins', localPluginDir(kind)),

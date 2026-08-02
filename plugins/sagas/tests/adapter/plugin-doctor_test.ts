@@ -20,7 +20,7 @@ Deno.test('sagas doctor errors with a remediation when the saga registry is abse
   assertEquals(report.checks.find((check) => check.name.includes('exists'))?.ok, false);
   assertStringIncludes(
     report.checks.find((check) => check.name.includes('exists'))?.message ?? '',
-    'netscript plugin sagas generate-registry',
+    'deno run -A jsr:@netscript/plugin-sagas@0.0.2/cli generate-registry',
   );
 });
 

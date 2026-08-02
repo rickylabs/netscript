@@ -224,13 +224,26 @@ export async function installPlugin(
   };
 }
 
-async function persistPluginDoctorMetadata(
+/**
+ * Persist the static doctor descriptor after plugin-owned scaffold completes.
+ *
+ * @example
+ * ```ts
+ * await persistPluginDoctorMetadata(plan, resolvedPlugin, scaffold, fs);
+ * ```
+ */
+export async function persistPluginDoctorMetadata(
   plan: PluginInstallPlan,
   resolvedPlugin: ResolvedPluginBeforePlanning,
   scaffold: PluginOwnedScaffoldResult,
   fs: FileSystemPort,
 ): Promise<void> {
-  const doctorEntrypoint = resolvedPlugin.descriptor.manifest.officialSource?.doctorEntrypoint;
+  const doctorEntrypoint = resolvedPlugin.descriptor.manifest.officialSource?.doctorEntrypoint ??
+    (resolvedPlugin.source.kind === 'local-path'
+      ? readDoctorEntrypoint(
+        JSON.parse(await fs.readFile(join(resolvedPlugin.source.path, 'scaffold.plugin.json'))),
+      )
+      : undefined);
   if (!doctorEntrypoint) return;
 
   const doctorSpecifier = resolvedPlugin.source.kind === 'local-path'

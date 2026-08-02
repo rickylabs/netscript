@@ -20,7 +20,7 @@ Deno.test('workers doctor errors with a remediation when the job registry is abs
   assertEquals(report.checks.find((check) => check.name.includes('exists'))?.ok, false);
   assertStringIncludes(
     report.checks.find((check) => check.name.includes('exists'))?.message ?? '',
-    'netscript generate plugins',
+    'deno run -A jsr:@netscript/plugin-workers@0.0.2/cli compile-registry',
   );
 });
 

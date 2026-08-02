@@ -2,7 +2,7 @@ import type { CommandExecutor } from '../../ports/command-executor.ts';
 import type { CommandGateDefinition, GateResult } from '../../domain/gate-definition.ts';
 import type { RunContext } from '../../domain/run-context.ts';
 
-/** Gate that succeeds when a command exits with code 0. */
+/** Gate that succeeds when command exit and output expectations are satisfied. */
 export class CommandGate {
   constructor(
     private readonly definition: CommandGateDefinition,
@@ -18,7 +18,12 @@ export class CommandGate {
       outputMode: this.definition.outputMode,
       failureHint: this.definition.failureHint,
     });
-    const passed = result.code === 0 && !result.timedOut;
+    const expectedExitCode = this.definition.expectedExitCode ?? 0;
+    const missingOutput = (this.definition.stdoutIncludes ?? []).filter((value) =>
+      !result.stdout.includes(value)
+    );
+    const passed = result.code === expectedExitCode && !result.timedOut &&
+      missingOutput.length === 0;
     return {
       id: this.definition.id,
       title: this.definition.title,
@@ -36,7 +41,11 @@ export class CommandGate {
           stderrTail: tail(result.stderr),
         },
       }],
-      error: passed ? undefined : `Command failed with exit code ${result.code}.`,
+      error: passed
+        ? undefined
+        : missingOutput.length > 0
+        ? `Command output omitted: ${missingOutput.join(', ')}.`
+        : `Command exited ${result.code}; expected ${expectedExitCode}.`,
     };
   }
 }

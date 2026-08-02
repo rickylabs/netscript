@@ -23,6 +23,7 @@ import type { JsrPluginValidatorPort } from '../../../../public/features/plugins
 import type { JsrPackageFileFetcher } from '../../../../public/infra/jsr/verify-jsr-package-integrity.ts';
 import {
   createPluginOwnedPluginResult,
+  persistPluginDoctorMetadata,
   resolvePluginConfigDirectory,
   resolvePluginDescriptorBeforePlanning,
   runPluginOwnedScaffold,
@@ -162,6 +163,9 @@ export async function installLocalPlugin(
     dependencies.scaffolder,
     dependencies.templateAdapter,
   );
+  if (pluginOwned !== undefined && resolvedPlugin !== undefined) {
+    await persistPluginDoctorMetadata(plan, resolvedPlugin, pluginOwned, dependencies.fs);
+  }
 
   return {
     ...rendered,
