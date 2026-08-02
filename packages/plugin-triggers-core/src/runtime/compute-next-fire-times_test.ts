@@ -57,17 +57,20 @@ Deno.test('computeNextFireTimes defaults from to current time', () => {
   assert(nextMs <= Math.ceil(after / 60_000) * 60_000 + 60_000);
 });
 
-Deno.test('computeNextFireTimes honors non-persistent one-shot preview semantics', () => {
+Deno.test('computeNextFireTimes returns the requested number of preview instants', () => {
   const definition = defineScheduledTrigger(() => Promise.resolve([]), {
     id: 'one-shot',
     cron: '*/10 * * * *',
     timezone: 'UTC',
-    persistent: false,
   });
 
   assertEquals(
     computeNextFireTimes(definition, 3, new Date('2024-01-01T00:01:00.000Z')),
-    ['2024-01-01T00:10:00.000Z'],
+    [
+      '2024-01-01T00:10:00.000Z',
+      '2024-01-01T00:20:00.000Z',
+      '2024-01-01T00:30:00.000Z',
+    ],
   );
 });
 

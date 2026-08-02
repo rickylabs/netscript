@@ -25,7 +25,7 @@ Deno.test('rejects mismatched text and missing boxes', () => {
   assertThrows(
     () => validateEvidenceMapping(boxes, [{ text: 'changed', evidence: 'CI' }]),
     Error,
-    'Evidence names no unchecked box',
+    'Evidence names no acceptance box',
   );
 });
 
@@ -38,14 +38,52 @@ Deno.test('rejects extra unchecked issue boxes', () => {
   );
 });
 
-Deno.test('already-ticked boxes need no evidence and cannot be mirrored again', () => {
+Deno.test('already-ticked boxes need no evidence and supplied evidence is a no-op', () => {
   const boxes = acceptanceCheckboxes('## Acceptance\n- [x] done');
   assertEquals(validateEvidenceMapping(boxes, []).size, 0);
-  assertThrows(
-    () => validateEvidenceMapping(boxes, [{ text: 'done', evidence: 'old run' }]),
-    Error,
-    'Evidence names no unchecked box',
+  assertEquals(
+    validateEvidenceMapping(boxes, [{ text: 'done', evidence: 'old run' }]).size,
+    0,
   );
+});
+
+Deno.test('rejects empty evidence for unchecked and already-checked boxes', () => {
+  for (const checked of [' ', 'x']) {
+    const boxes = acceptanceCheckboxes(`## Acceptance\n- [${checked}] item`);
+    assertThrows(
+      () => validateEvidenceMapping(boxes, [{ text: 'item', evidence: '' }]),
+      Error,
+      'Evidence is empty: item',
+    );
+  }
+});
+
+Deno.test('rejects duplicate evidence for unchecked and already-checked boxes', () => {
+  for (const checked of [' ', 'x']) {
+    const boxes = acceptanceCheckboxes(`## Acceptance\n- [${checked}] item`);
+    assertThrows(
+      () =>
+        validateEvidenceMapping(boxes, [
+          { text: 'item', evidence: 'first run' },
+          { text: 'item', evidence: 'second run' },
+        ]),
+      Error,
+      'Duplicate evidence: item',
+    );
+  }
+});
+
+Deno.test('re-running the mirror against already-ticked boxes is a no-op', () => {
+  const issue = '## Acceptance\n- [ ] exact acceptance text';
+  const evidence = [{ text: 'exact acceptance text', evidence: 'test run URL' }];
+
+  const firstMapping = validateEvidenceMapping(acceptanceCheckboxes(issue), evidence);
+  assertEquals(firstMapping.size, 1);
+  const tickedIssue = checkAcceptanceBoxes(issue, new Set(firstMapping.keys()));
+  assertEquals(tickedIssue, '## Acceptance\n- [x] exact acceptance text');
+
+  const secondMapping = validateEvidenceMapping(acceptanceCheckboxes(tickedIssue), evidence);
+  assertEquals(secondMapping.size, 0);
 });
 
 Deno.test('umbrella reference without closing keyword is untouched', () => {

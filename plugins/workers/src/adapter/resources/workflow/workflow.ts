@@ -33,5 +33,6 @@ export const workflowScaffolder: ItemScaffolder<WorkflowInput> = {
 export const workflowResource: PluginResource<WorkflowInput> = {
   name: 'workflow',
   scaffolder: workflowScaffolder,
+  defaultInput: { id: 'daily-maintenance' },
   parseInput: parseWorkflowInput,
 };

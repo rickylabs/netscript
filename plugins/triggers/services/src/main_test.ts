@@ -367,7 +367,7 @@ Deno.test('triggers connector smoke', async (t) => {
       assertEquals(body.triggerId, 'sched-1');
       assertEquals(body.nextFireAt.length, 2);
       assertEquals(body.timezone, 'UTC');
-      assertEquals(body.persistent, true);
+      assertEquals(body.persistent, false);
     });
 
     await t.step('subscribeEvents streams a heartbeat', async () => {

@@ -47,6 +47,10 @@ Deno.test('streams add stream emits the same shape at the user-named path', () =
   assertStringIncludes(artifactText(artifacts[0]), 'InvoiceEventsStreamDefinition');
   assertStringIncludes(artifactText(artifacts[0]), 'invoiceEventsStreamSchema');
   assertStringIncludes(artifactText(artifacts[0]), 'invoiceEventsStream');
+  assertStringIncludes(
+    artifactText(artifacts[0]),
+    'schema: StreamStandardSchema<InvoiceEventsStreamDefinitionEvent>',
+  );
   assertStringIncludes(artifactText(artifacts[0]), "'/v1/streams/invoices/events'");
 });
 

@@ -51,6 +51,9 @@ function pluginInstallCommand(
     ];
 
     if (kind === PLUGIN.AI && mcp) args.push('--mcp');
+    if (kind === PLUGIN.SAGA && !state.samples) {
+      args.push('--saga-store-backend', 'kv');
+    }
 
     if (context.request.suiteId === SCAFFOLD.USERLAND_INSTALL) {
       args.push(

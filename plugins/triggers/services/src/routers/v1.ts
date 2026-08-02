@@ -213,7 +213,7 @@ export const triggersV1: TriggersHandlers<TriggersV1RouteKey> = {
       triggerId: definition.id,
       nextFireAt: computeNextFireTimes(definition, input.count ?? 5),
       timezone: definition.timezone,
-      persistent: definition.persistent ?? true,
+      persistent: false,
     };
   }),
 

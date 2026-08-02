@@ -13,6 +13,7 @@ export const SCAFFOLD_DIRS = {
   DATABASE: 'database',
   ASPIRE_TS: 'aspire',
   CONFIG: 'config',
+  NETSCRIPT: '.netscript',
   VERSIONS: 'versions',
   V1: 'v1',
   HELPERS: '.helpers',

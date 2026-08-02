@@ -129,6 +129,9 @@ jobs:
       - name: Publish asset freshness
         run: deno task check:publish-assets
 
+      - name: Emitted sample type-check
+        run: deno task check:emitted-samples
+
       - name: NetScript JSR emitted-specifier guard
         run: deno task check:netscript-jsr-specifiers
 

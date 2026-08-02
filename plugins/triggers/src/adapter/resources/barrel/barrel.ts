@@ -41,6 +41,20 @@ export const DEFAULT_BARREL_INPUT: BarrelInput = {
   fileWatchFile: DEFAULT_FILE_WATCH_INPUT.fileName ?? 'incoming-file-watch',
 };
 
+/** Input accepted by the empty triggers barrel scaffolder. */
+export type EmptyBarrelInput = Readonly<Record<string, never>>;
+
+/** Canonical input for a triggers install without samples. */
+export const EMPTY_BARREL_INPUT: EmptyBarrelInput = {};
+
+/** Triggers barrel emitted when install samples are excluded. */
+export const emptyBarrelScaffolder: ItemScaffolder<EmptyBarrelInput> = {
+  name: 'empty-barrel',
+  emit(): readonly ScaffoldArtifact[] {
+    return [textArtifact('triggers/mod.ts', '/** @module Generated triggers. */\n\nexport {};\n')];
+  },
+};
+
 /** Triggers barrel item scaffolder emitted during install. */
 export const barrelScaffolder: ItemScaffolder<BarrelInput> = {
   name: 'barrel',

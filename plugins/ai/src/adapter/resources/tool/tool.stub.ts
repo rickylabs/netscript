@@ -45,7 +45,8 @@ export const %%TOOL_EXPORT%% = defineAiTool('%%TOOL_ID%%')
     required: ['query'],
   })
   .input(%%TOOL_EXPORT%%Input)
-  .server(({ query }) => {
+  .server((input) => {
+    const query = input?.query ?? '';
     // TODO: implement %%TOOL_ID%%. App-owned — this is your business logic.
     return { ok: true, echo: query };
   });

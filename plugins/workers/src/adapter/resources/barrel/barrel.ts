@@ -28,6 +28,20 @@ export const DEFAULT_BARREL_INPUT: BarrelInput = {
   taskId: DEFAULT_TASK_INPUT.id,
 };
 
+/** Input accepted by the empty workers barrel scaffolder. */
+export type EmptyBarrelInput = Readonly<Record<string, never>>;
+
+/** Canonical input for a workers install without samples. */
+export const EMPTY_BARREL_INPUT: EmptyBarrelInput = {};
+
+/** Workers barrel emitted when install samples are excluded. */
+export const emptyBarrelScaffolder: ItemScaffolder<EmptyBarrelInput> = {
+  name: 'empty-barrel',
+  emit(): readonly ScaffoldArtifact[] {
+    return [textArtifact('workers/mod.ts', '/** @module Generated workers. */\n\nexport {};\n')];
+  },
+};
+
 /** Workers barrel item scaffolder emitted during install. */
 export const barrelScaffolder: ItemScaffolder<BarrelInput> = {
   name: 'barrel',
