@@ -1,5 +1,5 @@
 import { assertEquals } from '@std/assert';
-import { actionable, classify, type ResourceCandidate } from './ownership.ts';
+import { actionable, classify, type ResourceCandidate, validOwnedRoot } from './ownership.ts';
 
 const root = '/home/codex/repos/fix-1046';
 
@@ -70,6 +70,35 @@ Deno.test('aspire mcp command line is rejected despite otherwise owned path', ()
         commandLine: 'aspire mcp start --stdio',
       },
       { appHosts: [], containers: [] },
+      root,
+    ),
+    'unproven',
+  );
+});
+
+Deno.test('a clean-clone container outside the worktree is owned once its root is registered', () => {
+  const cleanClone = '/tmp/opencode/cleanroom/statusline';
+  const candidate: ResourceCandidate = {
+    kind: 'container',
+    id: 'clean-clone',
+    mountSource: `${cleanClone}/.data/postgres`,
+  };
+  assertEquals(classify(candidate, { appHosts: [], containers: [] }, root), 'unproven');
+  assertEquals(
+    classify(candidate, { appHosts: [], containers: [], ownedRoots: [cleanClone] }, root),
+    'owned',
+  );
+});
+
+Deno.test('an over-broad owned root cannot claim another run', () => {
+  assertEquals(validOwnedRoot('/'), false);
+  assertEquals(validOwnedRoot('/tmp'), false);
+  assertEquals(validOwnedRoot('relative/path'), false);
+  assertEquals(validOwnedRoot('/tmp/opencode'), true);
+  assertEquals(
+    classify(
+      { kind: 'container', id: 'other', mountSource: '/tmp/someone-else/.data' },
+      { appHosts: [], containers: [], ownedRoots: ['/tmp'] },
       root,
     ),
     'unproven',

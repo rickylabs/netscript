@@ -7,7 +7,9 @@ import { emptyRunResources } from './run-resources.ts';
 const files: FilePort = {
   realPath: (path) => Promise.resolve(path),
   readText: (path) =>
-    Promise.resolve(path.endsWith('/stat') ? '1 (aspire) S 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 44' : 'aspire start'),
+    Promise.resolve(
+      path.endsWith('/stat') ? '1 (aspire) S 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 44' : 'aspire start',
+    ),
 };
 
 Deno.test('report never hides foreign or unproven survivors', () => {

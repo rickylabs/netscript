@@ -1,15 +1,50 @@
 import { classify } from './ownership.ts';
 import type { CommandPort, FilePort } from './ports.ts';
 import { systemCommands, systemFiles } from './ports.ts';
-import { probeContainer } from './probes.ts';
+import { probeContainer, processStartedAt } from './probes.ts';
 import { type LeakEntry, type LeakReport, runLeakCheck } from './leak-check.ts';
-import { readRunResources, type RunResourceRegistry } from './run-resources.ts';
+import { readRunResources, registerOwnedRoot, type RunResourceRegistry } from './run-resources.ts';
 
 export interface TeardownResult {
   readonly applied: boolean;
   readonly stoppedAppHosts: readonly string[];
   readonly removedContainers: readonly string[];
   readonly escalated: readonly LeakEntry[];
+}
+
+export interface TeardownOptions {
+  /** Confirmation probes after `aspire stop` before an AppHost is declared stopped. */
+  readonly confirmAttempts?: number;
+  readonly confirmIntervalMs?: number;
+  readonly sleep?: (ms: number) => Promise<void>;
+}
+
+const DEFAULT_CONFIRM_ATTEMPTS = 6;
+const DEFAULT_CONFIRM_INTERVAL_MS = 500;
+
+const defaultSleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
+
+/**
+ * Reports whether an AppHost process is gone.
+ *
+ * `aspire stop` exits 0 once it has signalled the AppHost, which it does before the child tree is
+ * down — a run observed it report success with services and containers still alive. So liveness is
+ * read from `/proc` rather than inferred from the exit code, and a recorded start time
+ * distinguishes a surviving process from an unrelated one that reused the pid.
+ */
+async function appHostGone(
+  resource: { readonly appHostPid?: number; readonly appHostStartedAt?: string },
+  files: FilePort,
+): Promise<boolean> {
+  if (resource.appHostPid === undefined) return false;
+  let stat: string;
+  try {
+    stat = await files.readText(`/proc/${resource.appHostPid}/stat`);
+  } catch {
+    return true;
+  }
+  const startedAt = processStartedAt(stat);
+  return Boolean(resource.appHostStartedAt && startedAt && startedAt !== resource.appHostStartedAt);
 }
 
 /** Stops/removes only positively owned resources; mutation requires explicit apply=true. */
@@ -19,11 +54,16 @@ export async function runTeardown(
   apply: boolean,
   commands: CommandPort = systemCommands,
   files: FilePort = systemFiles,
+  options: TeardownOptions = {},
 ): Promise<TeardownResult> {
   const stoppedAppHosts: string[] = [];
   const removedContainers: string[] = [];
   const escalated = report.survivors.filter((entry) => entry.ownership !== 'owned');
   if (!apply) return { applied: false, stoppedAppHosts, removedContainers, escalated };
+
+  const attempts = options.confirmAttempts ?? DEFAULT_CONFIRM_ATTEMPTS;
+  const intervalMs = options.confirmIntervalMs ?? DEFAULT_CONFIRM_INTERVAL_MS;
+  const sleep = options.sleep ?? defaultSleep;
 
   for (const entry of report.survivors) {
     if (entry.ownership !== 'owned' || entry.resource.kind !== 'apphost') continue;
@@ -35,7 +75,16 @@ export async function runTeardown(
       '--non-interactive',
       '--nologo',
     ], 30_000);
-    if (result.code === 0) stoppedAppHosts.push(entry.resource.appHostPath);
+    if (result.code !== 0) {
+      escalated.push(entry);
+      continue;
+    }
+    let gone = false;
+    for (let attempt = 0; attempt < attempts && !gone; attempt++) {
+      if (attempt > 0) await sleep(intervalMs);
+      gone = await appHostGone(entry.resource, files);
+    }
+    if (gone) stoppedAppHosts.push(entry.resource.appHostPath);
     else escalated.push(entry);
   }
 
@@ -56,24 +105,31 @@ export async function runTeardown(
   return { applied: true, stoppedAppHosts, removedContainers, escalated };
 }
 
-function parseArgs(args: string[]): { sliceDir: string; worktreeRoot: string; apply: boolean } {
+function parseArgs(
+  args: string[],
+): { sliceDir: string; worktreeRoot: string; apply: boolean; ownedRoots: string[] } {
   let sliceDir = '';
   let worktreeRoot = Deno.cwd();
   let apply = false;
+  const ownedRoots: string[] = [];
   for (let i = 0; i < args.length; i++) {
     if (args[i] === '--') continue;
     else if (args[i] === '--slice-dir') sliceDir = args[++i] ?? '';
     else if (args[i] === '--worktree') worktreeRoot = args[++i] ?? '';
+    else if (args[i] === '--owned-root') ownedRoots.push(args[++i] ?? '');
     else if (args[i] === '--apply') apply = true;
     else if (args[i] === '--dry-run') apply = false;
     else throw new Error(`unknown argument: ${args[i]}`);
   }
   if (!sliceDir) throw new Error('--slice-dir is required');
-  return { sliceDir, worktreeRoot, apply };
+  return { sliceDir, worktreeRoot, apply, ownedRoots };
 }
 
 if (import.meta.main) {
   const options = parseArgs(Deno.args);
+  for (const root of options.ownedRoots) {
+    await registerOwnedRoot(options.sliceDir, options.worktreeRoot, root);
+  }
   const registry = await readRunResources(options.sliceDir, options.worktreeRoot);
   const report = await runLeakCheck(options.sliceDir, options.worktreeRoot);
   console.log(JSON.stringify(await runTeardown(report, registry, options.apply), null, 2));

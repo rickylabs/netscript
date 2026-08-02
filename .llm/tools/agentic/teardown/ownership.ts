@@ -36,16 +36,39 @@ export interface RegistryIdentityView {
     readonly creatorPid: number;
     readonly creatorProcessStartTime: string;
   }[];
+  /**
+   * Absolute directories the run created outside its own worktree, so their resources still have
+   * path proof. Clean-clone verification is the motivating case: the clone lives under `/tmp`, so
+   * Aspire labels its containers with a mount source no worktree contains.
+   */
+  readonly ownedRoots?: readonly string[];
 }
 
 const WORKTREE_PREFIX = resolve('/home/codex/repos');
 const MCP_COMMAND = /(?:^|\s)aspire\s+mcp\b/i;
+/** A root shallower than this (`/`, `/tmp`, `/home`) would claim other runs' resources. */
+const MIN_OWNED_ROOT_SEGMENTS = 2;
 
 /** Returns true only when an absolute candidate path is contained by root on path boundaries. */
 export function pathContained(candidate: string, root: string): boolean {
   if (!isAbsolute(candidate) || !isAbsolute(root)) return false;
   const delta = relative(resolve(root), resolve(candidate));
   return delta === '' || (!delta.startsWith('..') && !isAbsolute(delta));
+}
+
+/** Rejects declared roots too broad to be one run's own directory. */
+export function validOwnedRoot(root: string): boolean {
+  if (!isAbsolute(root)) return false;
+  return resolve(root).split(/[\\/]/).filter(Boolean).length >= MIN_OWNED_ROOT_SEGMENTS;
+}
+
+function ownedByPath(
+  path: string,
+  worktreeRoot: string,
+  ownedRoots: readonly string[] = [],
+): boolean {
+  if (pathContained(path, worktreeRoot)) return true;
+  return ownedRoots.some((root) => validOwnedRoot(root) && pathContained(path, root));
 }
 
 function foreignWorktree(path: string | undefined, root: string): boolean {
@@ -78,7 +101,7 @@ export function classify(
 ): Ownership {
   if (candidate.commandLine && MCP_COMMAND.test(candidate.commandLine)) return 'unproven';
   const evidencePath = candidate.kind === 'apphost' ? candidate.appHostPath : candidate.mountSource;
-  if (evidencePath && pathContained(evidencePath, worktreeRoot)) return 'owned';
+  if (evidencePath && ownedByPath(evidencePath, worktreeRoot, registry.ownedRoots)) return 'owned';
   if (registryMatches(candidate, registry)) return 'owned';
   if (foreignWorktree(evidencePath, worktreeRoot)) return 'foreign';
   return 'unproven';

@@ -1,11 +1,8 @@
 import { join } from '@std/path';
 import { classify, type Ownership, type ResourceCandidate } from './ownership.ts';
-import {
-  type ProbeStatus,
-  probeResourceReport,
-} from './probes.ts';
+import { probeResourceReport, type ProbeStatus } from './probes.ts';
 import { type CommandPort, type FilePort, systemCommands, systemFiles } from './ports.ts';
-import { readRunResources, type RunResourceRegistry } from './run-resources.ts';
+import { readRunResources, registerOwnedRoot, type RunResourceRegistry } from './run-resources.ts';
 
 export const STALE_AFTER_MS: number = 2 * 60 * 60 * 1000;
 
@@ -168,14 +165,16 @@ export async function runLeakCheck(
 
 function parseArgs(
   args: string[],
-): { sliceDir: string; worktreeRoot: string; staleAfterMs: number } {
+): { sliceDir: string; worktreeRoot: string; staleAfterMs: number; ownedRoots: string[] } {
   let sliceDir = '';
   let worktreeRoot = Deno.cwd();
   let staleAfterMs = STALE_AFTER_MS;
+  const ownedRoots: string[] = [];
   for (let i = 0; i < args.length; i++) {
     if (args[i] === '--') continue;
     else if (args[i] === '--slice-dir') sliceDir = args[++i] ?? '';
     else if (args[i] === '--worktree') worktreeRoot = args[++i] ?? '';
+    else if (args[i] === '--owned-root') ownedRoots.push(args[++i] ?? '');
     else if (args[i] === '--stale-after') staleAfterMs = Number(args[++i]) * 1000;
     else throw new Error(`unknown argument: ${args[i]}`);
   }
@@ -183,11 +182,14 @@ function parseArgs(
   if (!Number.isFinite(staleAfterMs) || staleAfterMs < 0) {
     throw new Error('--stale-after must be seconds >= 0');
   }
-  return { sliceDir, worktreeRoot, staleAfterMs };
+  return { sliceDir, worktreeRoot, staleAfterMs, ownedRoots };
 }
 
 if (import.meta.main) {
   const options = parseArgs(Deno.args);
+  for (const root of options.ownedRoots) {
+    await registerOwnedRoot(options.sliceDir, options.worktreeRoot, root);
+  }
   console.log(
     JSON.stringify(
       await runLeakCheck(options.sliceDir, options.worktreeRoot, options.staleAfterMs),

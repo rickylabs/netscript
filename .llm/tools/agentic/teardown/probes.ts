@@ -32,7 +32,8 @@ export interface ResourceProbeResult {
   };
 }
 
-function processStartedAt(stat: string): string | undefined {
+/** Reads field 22 of `/proc/<pid>/stat`, the value that makes a pid identity stable across reuse. */
+export function processStartedAt(stat: string): string | undefined {
   const close = stat.lastIndexOf(')');
   if (close < 0) return undefined;
   return stat.slice(close + 2).trim().split(/\s+/)[19];

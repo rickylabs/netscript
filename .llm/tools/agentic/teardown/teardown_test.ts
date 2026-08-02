@@ -65,7 +65,11 @@ Deno.test('apply stops each AppHost by path and re-verifies a single container i
   };
   const files: FilePort = {
     realPath: (path) => Promise.resolve(path),
-    readText: () => Promise.resolve(''),
+    readText: (path) => {
+      // The AppHost process is gone after the stop, so `/proc/<pid>` no longer resolves.
+      if (path.startsWith('/proc/')) return Promise.reject(new Deno.errors.NotFound(path));
+      return Promise.resolve('');
+    },
   };
   const result = await runTeardown(
     buildLeakReport(resources, registry, root),
@@ -81,6 +85,70 @@ Deno.test('apply stops each AppHost by path and re-verifies a single container i
     ['docker', 'inspect', 'owned-id'],
     ['docker', 'rm', '-f', 'owned-id'],
   ]);
+});
+
+Deno.test('a zero exit from aspire stop is not accepted while the process survives', async () => {
+  const registry = emptyRunResources(root);
+  const resource = {
+    kind: 'apphost' as const,
+    appHostPath: `${root}/apphost.mts`,
+    appHostPid: 1,
+    appHostStartedAt: '12345',
+  };
+  const commands: CommandPort = {
+    // `aspire stop` reports success once it has signalled the AppHost, before its tree is down.
+    run: () => Promise.resolve({ code: 0, stdout: '', stderr: '' }),
+  };
+  const files: FilePort = {
+    realPath: (path) => Promise.resolve(path),
+    readText: () => Promise.resolve(`1 (dotnet) S ${'0 '.repeat(18)}12345`),
+  };
+  const slept: number[] = [];
+  const result = await runTeardown(
+    buildLeakReport([resource], registry, root),
+    registry,
+    true,
+    commands,
+    files,
+    {
+      confirmAttempts: 3,
+      confirmIntervalMs: 25,
+      sleep: (ms) => {
+        slept.push(ms);
+        return Promise.resolve();
+      },
+    },
+  );
+  assertEquals(result.stoppedAppHosts, []);
+  assertEquals(result.escalated.length, 1);
+  assertEquals(slept, [25, 25]);
+});
+
+Deno.test('a pid reused by another process counts as stopped', async () => {
+  const registry = emptyRunResources(root);
+  const resource = {
+    kind: 'apphost' as const,
+    appHostPath: `${root}/apphost.mts`,
+    appHostPid: 1,
+    appHostStartedAt: '12345',
+  };
+  const commands: CommandPort = {
+    run: () => Promise.resolve({ code: 0, stdout: '', stderr: '' }),
+  };
+  const files: FilePort = {
+    realPath: (path) => Promise.resolve(path),
+    readText: () => Promise.resolve(`1 (other) S ${'0 '.repeat(18)}99999`),
+  };
+  const result = await runTeardown(
+    buildLeakReport([resource], registry, root),
+    registry,
+    true,
+    commands,
+    files,
+    { sleep: () => Promise.resolve() },
+  );
+  assertEquals(result.stoppedAppHosts, [`${root}/apphost.mts`]);
+  assertEquals(result.escalated, []);
 });
 
 Deno.test('changed labels abandon removal and escalate', async () => {

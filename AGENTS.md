@@ -86,6 +86,12 @@ Review every foreign/unknown-owner entry and leave it alone. To preview run-owne
 `deno task agentic:teardown -- --slice-dir <run-dir> --worktree <worktree>`; mutation requires the
 explicit `--apply` flag and remains scoped to positively proven resources.
 
+If your run starts resources from a directory outside its worktree — clean-clone verification is the
+usual case — declare that directory with `--owned-root <path>` on either command. Ownership is
+proven by path containment, so without it the clone's containers carry no proof and escalate to the
+user as someone else's, which is how a run's own leak reaches you as a question rather than a
+cleanup. A root shallow enough to cover other runs (`/tmp`, `/home`) is refused.
+
 ## Read Order
 
 Read only what the task needs.

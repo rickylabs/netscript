@@ -1,7 +1,9 @@
-import { dirname, join } from '@std/path';
-import type { RegistryIdentityView } from './ownership.ts';
+import { dirname, join, resolve } from '@std/path';
+import { type RegistryIdentityView, validOwnedRoot } from './ownership.ts';
 
-export const RUN_RESOURCES_SCHEMA_VERSION = 1 as const;
+export const RUN_RESOURCES_SCHEMA_VERSION = 2 as const;
+/** v1 registries predate `ownedRoots`; they read as an empty list rather than failing the run. */
+const SUPPORTED_SCHEMA_VERSIONS: readonly number[] = [1, RUN_RESOURCES_SCHEMA_VERSION];
 export const RUN_RESOURCES_FILE = 'run-resources.json';
 
 export interface RegisteredAppHost {
@@ -23,6 +25,7 @@ export interface RunResourceRegistry extends RegistryIdentityView {
   readonly worktreeRoot: string;
   readonly appHosts: readonly RegisteredAppHost[];
   readonly containers: readonly RegisteredContainer[];
+  readonly ownedRoots: readonly string[];
 }
 
 /** Creates an empty registry for one run/worktree. */
@@ -32,15 +35,18 @@ export function emptyRunResources(worktreeRoot: string): RunResourceRegistry {
     worktreeRoot,
     appHosts: [],
     containers: [],
+    ownedRoots: [],
   };
 }
 
-function validRegistry(value: unknown): value is RunResourceRegistry {
+function validRegistry(value: unknown): value is Omit<RunResourceRegistry, 'schemaVersion'> {
   if (!value || typeof value !== 'object') return false;
   const item = value as Record<string, unknown>;
-  return item.schemaVersion === RUN_RESOURCES_SCHEMA_VERSION &&
+  return typeof item.schemaVersion === 'number' &&
+    SUPPORTED_SCHEMA_VERSIONS.includes(item.schemaVersion) &&
     typeof item.worktreeRoot === 'string' && Array.isArray(item.appHosts) &&
-    Array.isArray(item.containers);
+    Array.isArray(item.containers) &&
+    (item.ownedRoots === undefined || Array.isArray(item.ownedRoots));
 }
 
 /** Reads a registry, returning an empty fail-closed registry when it is absent. */
@@ -53,7 +59,11 @@ export async function readRunResources(
     if (!validRegistry(parsed) || parsed.worktreeRoot !== worktreeRoot) {
       throw new Error('run resource registry schema or worktree mismatch');
     }
-    return parsed;
+    return {
+      ...parsed,
+      schemaVersion: RUN_RESOURCES_SCHEMA_VERSION,
+      ownedRoots: (parsed.ownedRoots ?? []).filter(validOwnedRoot),
+    };
   } catch (error) {
     if (error instanceof Deno.errors.NotFound) return emptyRunResources(worktreeRoot);
     throw error;
@@ -97,6 +107,27 @@ export async function registerContainer(
     entry.creatorProcessStartTime !== container.creatorProcessStartTime
   );
   await writeRunResources(sliceDir, { ...registry, containers: [...containers, container] });
+}
+
+/**
+ * Registers a directory the run created outside its worktree so resources rooted there keep path
+ * proof. Rejects roots broad enough to claim another run's resources.
+ */
+export async function registerOwnedRoot(
+  sliceDir: string,
+  worktreeRoot: string,
+  root: string,
+): Promise<void> {
+  const normalized = resolve(root);
+  if (!validOwnedRoot(normalized)) {
+    throw new Error(`refusing to register owned root: ${root}`);
+  }
+  const registry = await readRunResources(sliceDir, worktreeRoot);
+  if (registry.ownedRoots.includes(normalized)) return;
+  await writeRunResources(sliceDir, {
+    ...registry,
+    ownedRoots: [...registry.ownedRoots, normalized],
+  });
 }
 
 /** Resolves the slice directory containing a registry file. */
