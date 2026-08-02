@@ -590,3 +590,36 @@ compileAiRegistry selects tool modules by definition shape ... ok (213µs)
 ok | 4 passed | 0 failed (10ms)
 RAW_EXIT_CODE=0
 ```
+
+### Marked source-workspace resolution slice
+
+Local-source scaffolds already carry `.netscript-source-root`, written by the maintainer package
+copier. The adapter now reads that marker through `FileSystemPort` and resolves the installed
+package against the marked root's Deno workspace by exact package `name`, after project-local
+resolution and before JSR fallback. A source root containing only another package cannot intercept
+a third-party plugin; the published fetch remains the fallback.
+
+The published-shaped AI fixture has a JSR appsettings entrypoint, no local AI import, and no project
+AI member. It runs the real repository generator, imports the emitted registry, asserts a non-empty
+`Map` containing `e2e-tool`, asserts the factory contributes nothing, and records zero fetches.
+
+```text
+$ deno test -A packages/cli/src/public/features/generate/plugins/
+generate plugin registries command ... ok (3ms)
+installed runtime registry generator ...
+  runs a published manifest generator under the project config and canonical target ... ok (2ms)
+  names the installed plugin and rejects a declared empty runtime ... ok (0ms)
+  dry-run reports canonical paths without executing or writing ... ok (0ms)
+  does not substitute an unrelated marked source package for a third-party plugin ... ok (1ms)
+installed runtime registry generator ... ok (6ms)
+generated trigger registry loads valid definitions and excludes scaffold runtime glue ... ok (76ms)
+generated trigger registry rejects a non-definition module that is not excluded ... ok (64ms)
+workspace import resolves the on-disk trigger manifest without fetching JSR ... ok (3ms)
+generated workers registry loads jobs and excludes job tools ... ok (62ms)
+generated sagas registry loads saga definitions and ignores other TypeScript files ... ok (79ms)
+generated AI registries load resources and exclude the skill-loader factory ... ok (74ms)
+marked source workspace wins for a published-shaped AI project ... ok (70ms)
+JSR-only imports retain the published manifest and generator fallback ... ok (2ms)
+ok | 10 passed (5 steps) | 0 failed (612ms)
+RAW_EXIT_CODE=0
+```

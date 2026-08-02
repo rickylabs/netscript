@@ -82,6 +82,34 @@ describe('installed runtime registry generator', () => {
     assertEquals(process.calls, []);
     assertEquals(await fs.exists(result[0].path), false);
   });
+
+  it('does not substitute an unrelated marked source package for a third-party plugin', async () => {
+    const fs = new MemoryFileSystem({
+      '/workspace/app/appsettings.json': appsettings(
+        'custom-api',
+        'jsr:@acme/plugin-custom@1.2.3/services',
+      ),
+      '/workspace/app/deno.json': '{}',
+      '/workspace/app/.netscript-source-root': '/source',
+      '/workspace/app/custom/item.ts': 'export const item = {};',
+      '/source/deno.json': JSON.stringify({ workspace: ['plugins/official'] }),
+      '/source/plugins/official/deno.json': JSON.stringify({ name: '@netscript/plugin-official' }),
+      '/source/plugins/official/scaffold.runtime.json': JSON.stringify(runtimeManifest('official')),
+    });
+    let fetchCalls = 0;
+    const generate = createInstalledRuntimeRegistryGenerator({
+      fs,
+      process: new RecordingProcess(fs),
+      fetchManifest: () => {
+        fetchCalls++;
+        return Promise.resolve(jsonResponse(runtimeManifest('custom')));
+      },
+    });
+
+    await generate({ dryRun: false, projectRoot: '/workspace/app' });
+
+    assertEquals(fetchCalls, 1);
+  });
 });
 
 function appsettings(name: string, entrypoint: string): string {

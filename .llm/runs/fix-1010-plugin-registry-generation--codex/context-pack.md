@@ -2,7 +2,7 @@
 
 ## Status
 
-- Phase: structural AI compiler filtering implemented; contributor source resolution pending.
+- Phase: structural filtering and marked source-workspace resolution implemented; final gates pending.
 - Branch/worktree clean at baseline before run artifacts.
 - Published 0.0.2 reproduction captured once in `.llm/tmp/issue-1010-clean-room-repro.log`.
 - PLAN-EVAL passed in a separate Claude Code + OpenRouter Qwen session before implementation.

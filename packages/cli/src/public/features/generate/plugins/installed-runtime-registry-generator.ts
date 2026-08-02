@@ -3,6 +3,7 @@ import { basename, dirname, fromFileUrl, isAbsolute, join, resolve, SEPARATOR } 
 
 import type { FileSystemPort } from '../../../../kernel/ports/file-system-port.ts';
 import type { ProcessPort } from '../../../../kernel/ports/process-port.ts';
+import { SCAFFOLD_FILES } from '../../../../kernel/constants/scaffold/scaffold-files.ts';
 import {
   EmptyPluginRegistryError,
   type GenerateInstalledPluginRegistries,
@@ -132,6 +133,24 @@ async function resolveRuntimeManifest(
     }
   }
 
+  const sourceRoot = await readMarkedSourceRoot(projectRoot, dependencies.fs);
+  if (sourceRoot) {
+    const sourceMemberRoot = await findWorkspaceMemberRoot(
+      sourceRoot,
+      installed.packageName,
+      dependencies.fs,
+    );
+    if (sourceMemberRoot) {
+      const manifestPath = join(sourceMemberRoot, 'scaffold.runtime.json');
+      if (await dependencies.fs.exists(manifestPath)) {
+        return {
+          generatorBase: sourceMemberRoot,
+          value: JSON.parse(await dependencies.fs.readFile(manifestPath)),
+        };
+      }
+    }
+  }
+
   const manifestUrl = publishedPackageFileUrl(installed, 'scaffold.runtime.json');
   const response = await dependencies.fetchManifest(manifestUrl);
   if (response.status === 404) return undefined;
@@ -141,6 +160,16 @@ async function resolveRuntimeManifest(
     );
   }
   return { generatorBase: manifestUrl, value: await response.json() };
+}
+
+async function readMarkedSourceRoot(
+  projectRoot: string,
+  fs: FileSystemPort,
+): Promise<string | undefined> {
+  const markerPath = join(projectRoot, SCAFFOLD_FILES.SOURCE_ROOT_MARKER);
+  if (!await fs.exists(markerPath)) return undefined;
+  const sourceRoot = (await fs.readFile(markerPath)).trim();
+  return sourceRoot.length > 0 ? sourceRoot : undefined;
 }
 
 async function findWorkspaceMemberRoot(
@@ -188,7 +217,7 @@ async function findDeclaredWorkspaceMember(
   fs: FileSystemPort,
 ): Promise<string | undefined> {
   for (const entry of readStrings(rawWorkspace) ?? []) {
-    if (!isLocalImport(entry)) continue;
+    if (!isLocalWorkspaceEntry(entry)) continue;
     for (const candidate of await expandWorkspaceEntry(projectRoot, entry, fs)) {
       for (const configName of ['deno.json', 'deno.jsonc']) {
         const memberConfigPath = join(candidate, configName);
@@ -199,6 +228,10 @@ async function findDeclaredWorkspaceMember(
     }
   }
   return undefined;
+}
+
+function isLocalWorkspaceEntry(value: string): boolean {
+  return !/^(?:jsr|npm|https?):/.test(value);
 }
 
 async function expandWorkspaceEntry(

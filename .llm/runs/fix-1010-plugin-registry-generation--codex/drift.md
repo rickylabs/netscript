@@ -118,3 +118,17 @@ The prior request's local runtime pass was superseded mid-run and is not evidenc
 instruction makes cloud runtime authoritative and prohibits another local pass. Three stopped
 containers owned by the aborted run were removed by exact ID; foreign `fix-1025` containers were
 preserved.
+
+## 2026-08-02 — structural fix plus marked source authority
+
+The published 0.0.2 generator cannot contain code authored in this PR, so changing only the AI
+compiler would leave pre-release local-source CI executing stale JSR code. The scaffold already
+records its originating checkout in `.netscript-source-root`; the adapter now treats an exact-name
+package in that declared source workspace as authoritative before JSR. This is not an AI/name
+special case, and a regression proves an unrelated source package cannot shadow a third-party
+plugin.
+
+Correctness also moves away from filename exclusions: the AI compiler selects tool modules by the
+`AiToolDefinition` export shape before emission. The manifest exclusion remains an efficient
+published convention, while the shape predicate prevents the next factory module from recreating
+the failure. The emitted module's loud guard remains for post-generation shape drift.

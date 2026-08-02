@@ -211,6 +211,46 @@ export function createSkillLoaderTool(skills: unknown) {
   });
 });
 
+Deno.test('marked source workspace wins for a published-shaped AI project', async () => {
+  await withTempProject(async (projectRoot) => {
+    await writeMarkedSourceAiProject(projectRoot, {
+      'ai/tools/e2e-tool.ts': `
+export default {
+  descriptor: { name: 'e2e-tool' },
+  schema: {},
+  execute: async () => ({ state: 'output-available', output: { ok: true } }),
+};
+`,
+      'ai/tools/skill-loader.ts': `
+export function createSkillLoaderTool(skills: unknown) {
+  return { skills };
+}
+`,
+      'ai/agents/assistant.ts': 'export default function assistant() { return {}; }\n',
+    });
+    let fetchCalls = 0;
+    const generate = createInstalledRuntimeRegistryGenerator({
+      fs: new DenoFileSystem(),
+      process: new DenoProcess(),
+      fetchManifest: () => {
+        fetchCalls++;
+        return Promise.reject(new Error('marked source workspace must win'));
+      },
+    });
+
+    await generate({ dryRun: false, projectRoot });
+
+    const tools = await import(
+      `${toFileUrl(join(projectRoot, AI_TOOLS_REGISTRY_PATH)).href}?marked-source-tools`
+    );
+    assert(tools.registry instanceof Map);
+    assertEquals(tools.registry.has('e2e-tool'), true);
+    assertEquals(tools.registry.has('skill-loader'), false);
+    assertEquals(tools.registry.size, 1);
+    assertEquals(fetchCalls, 0);
+  });
+});
+
 Deno.test('JSR-only imports retain the published manifest and generator fallback', async () => {
   await withTempProject(async (projectRoot) => {
     await writePublishedProject(projectRoot);
@@ -302,6 +342,24 @@ async function writeScaffoldWorkspaceAiProject(
     ['./plugins/*'],
   );
   await copy(join(REPOSITORY_ROOT, 'plugins/ai'), join(projectRoot, 'plugins/ai'));
+  await writeAppSettings(projectRoot, ['plugin-ai']);
+  for (const [path, source] of Object.entries(files)) await write(join(projectRoot, path), source);
+}
+
+async function writeMarkedSourceAiProject(
+  projectRoot: string,
+  files: Readonly<Record<string, string>>,
+): Promise<void> {
+  const rootConfig = JSON.parse(await Deno.readTextFile(join(REPOSITORY_ROOT, 'deno.json'))) as {
+    imports: Record<string, string>;
+  };
+  await writeProjectConfig(projectRoot, {
+    ...rootConfig.imports,
+    '@netscript/plugin/cli': toFileUrl(
+      join(REPOSITORY_ROOT, 'packages/plugin/src/cli/mod.ts'),
+    ).href,
+  });
+  await write(join(projectRoot, '.netscript-source-root'), `${REPOSITORY_ROOT}\n`);
   await writeAppSettings(projectRoot, ['plugin-ai']);
   for (const [path, source] of Object.entries(files)) await write(join(projectRoot, path), source);
 }
