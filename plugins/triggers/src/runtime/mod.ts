@@ -8,7 +8,6 @@ export { createRuntimeTriggerProcessor } from './trigger-runtime-processor.ts';
 export { startCombinedProcess, startTriggerProcessorRuntime } from './trigger-processor.ts';
 export {
   TRIGGER_ACTION_KINDS,
-  TRIGGER_BACKFILL_POLICIES,
   TRIGGER_DURABILITY_TIERS,
   TRIGGER_EVENT_STATUSES,
   TRIGGER_KINDS,
@@ -37,8 +36,6 @@ export type {
   StreamTriggerDefinition,
   StreamTriggerPayload,
   TriggerActionResult,
-  TriggerBackfillPolicy,
-  TriggerBackfillSpec,
   TriggerCircuitBreakerSpec,
   TriggerConcurrencySpec,
   TriggerContext,

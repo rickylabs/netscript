@@ -29,12 +29,11 @@ This closes the continuous-app loop. A webhook lands on the triggers service, it
 POST.
 
 The failure modes ingress must absorb are mundane and expensive: a payment provider retries the
-same webhook five times because your handler took too long; a half-written CSV fires an import
-mid-copy on a network share; a cron host reboots through the 02:00 run. Each has a declared answer
-here — `idempotencyKey` collapses sender retries, `stabilityThreshold` waits out the half-written
-file, and `backfill` replays the missed fire. Because every trigger is a frozen definition rather
-than routing code, the registry surface can list what fires what — the same property that lets a
-coding agent enumerate an app's ingress edges before touching one.
+same webhook five times because your handler took too long, or a half-written CSV fires an import
+mid-copy on a network share. Each has a declared answer here — `idempotencyKey` collapses sender
+retries and `stabilityThreshold` waits out the half-written file. Because every trigger is a frozen
+definition rather than routing code, the registry surface can list what fires what — the same
+property that lets a coding agent enumerate an app's ingress edges before touching one.
 
 {{ comp callout { type: "important", title: "Typed oRPC contract, raw webhook ingress" } }}
 Like <a href="/services-sdk/services/">services</a>, <a href="/background-processing/workers/">workers</a>,
@@ -303,7 +302,7 @@ const nightlyReconcileJob = {
   topic: 'default',
 } satisfies JobDefinition<'nightly-reconcile'>;
 
-// Runs at 02:00 UTC. backfill replays fires the scheduler missed while down.
+// Runs at 02:00 UTC while the trigger runtime is active.
 export const nightlyReconcile = defineScheduledTrigger(
   () => Promise.resolve([enqueueJob(nightlyReconcileJob, { payload: {} })]),
   {
@@ -311,8 +310,6 @@ export const nightlyReconcile = defineScheduledTrigger(
     description: 'Nightly reconciliation sweep.',
     cron: '0 2 * * *',
     timezone: 'UTC',
-    persistent: true,
-    backfill: { enabled: true, windowMs: 86_400_000, policy: 'fire-once' },
   },
 );
 
@@ -325,8 +322,6 @@ export default nightlyReconcile;
     { name: "id", type: "string (required)", desc: "Stable identifier for the scheduled trigger definition." },
     { name: "cron", type: "CronExpression (required)", desc: "Cron expression governing when the handler fires, e.g. '0 2 * * *'." },
     { name: "timezone", type: "string?", desc: "IANA timezone the cron expression is evaluated in. Defaults to the runtime's zone." },
-    { name: "persistent", type: "boolean?", desc: "Whether the schedule state survives restarts so missed fires can be reasoned about." },
-    { name: "backfill", type: "TriggerBackfillSpec?", desc: "Quartz-style misfire handling: { enabled, windowMs, policy: 'fire-now'|'fire-once'|'do-nothing', maxMissedFires? } — replays fires the scheduler missed while down." },
     { name: "description", type: "string?", desc: "Human-readable summary for tooling." },
     { name: "tags", type: "readonly string[]?", desc: "Free-form discovery labels." },
     { name: "metadata", type: "Readonly<Record<string, unknown>>?", desc: "Arbitrary structured metadata." }

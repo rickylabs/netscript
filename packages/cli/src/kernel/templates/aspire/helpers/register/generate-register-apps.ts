@@ -115,7 +115,7 @@ export function generateRegisterApps(options: RegisterAppsOptions): string {
     // --- app type: HTTP health probe ---
     // Registered after the endpoint it derives its base address from. Only `app`
     // resources serve routes we control; tauri/desktop/task expose no such contract.
-    if (type === 'app' && entry.Port) {
+    if (type === 'app') {
       buildHealthProbeBlock(lines, id, entry);
     }
 

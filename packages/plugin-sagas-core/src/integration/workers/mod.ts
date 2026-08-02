@@ -1,5 +1,5 @@
 /**
- * Worker integration helpers that trigger jobs and tasks from saga cascades.
+ * Explicit workers-port helpers that trigger jobs and tasks outside synchronous saga handlers.
  *
  * @module
  */

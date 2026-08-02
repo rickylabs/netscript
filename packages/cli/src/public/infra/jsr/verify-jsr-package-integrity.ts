@@ -6,6 +6,14 @@ export interface JsrPackageFileFetcher {
   fetchFile(url: string): Promise<Uint8Array>;
 }
 
+/** Published Prisma fragment resolved from a validated JSR package descriptor. */
+export interface JsrPackageSchemaFragment {
+  /** Slash-normalized package path from JSR version metadata. */
+  readonly path: string;
+  /** UTF-8 Prisma schema content fetched from the published package. */
+  readonly content: string;
+}
+
 /** Result returned by package integrity verification. */
 export type JsrPackageIntegrityResult =
   | { readonly ok: true; readonly checkedFiles: readonly string[] }
@@ -45,10 +53,53 @@ export class WebJsrPackageFileFetcher implements JsrPackageFileFetcher {
   }
 }
 
+/** Fetch all published Prisma fragments below the package's `database` directory. */
+export async function fetchJsrPackageSchemaFragments(
+  descriptor: ValidatedPluginDescriptor,
+  fetcher: JsrPackageFileFetcher = new WebJsrPackageFileFetcher(),
+): Promise<readonly JsrPackageSchemaFragment[]> {
+  const schemaFiles = Object.entries(descriptor.versionMetadata.files)
+    .map(([metadataPath, expected]) => ({
+      metadataPath,
+      path: normalizeJsrPackagePath(metadataPath),
+      expected,
+    }))
+    .filter(({ path }) => path.startsWith('database/') && path.endsWith('.prisma'))
+    .sort((left, right) => left.path.localeCompare(right.path));
+
+  return await Promise.all(schemaFiles.map(async ({ metadataPath, path, expected }) => {
+    if (typeof expected !== 'string' || expected.length === 0) {
+      throw new Error(
+        `Plugin package integrity check failed for ${descriptor.package.packageSpecifier}: ` +
+          `${metadataPath}; expected checksum is missing.`,
+      );
+    }
+    const bytes = await fetcher.fetchFile(jsrPackageFileUrl(descriptor, path));
+    const actual = await sha256Checksum(bytes);
+    if (actual !== expected) {
+      throw new Error(
+        `Plugin package integrity check failed for ${descriptor.package.packageSpecifier}: ` +
+          `${metadataPath}; expected ${expected}; actual ${actual}.`,
+      );
+    }
+    return { path, content: new TextDecoder().decode(bytes) };
+  }));
+}
+
+/** Build the searched package location shown when a declared schema cannot resolve. */
+export function jsrPackageSchemaSearchPath(descriptor: ValidatedPluginDescriptor): string {
+  return `jsr:${descriptor.package.packageSpecifier}@${descriptor.version}/database/**/*.prisma`;
+}
+
 function jsrPackageFileUrl(descriptor: ValidatedPluginDescriptor, path: string): string {
-  const cleanPath = path.startsWith('/') ? path.slice(1) : path;
+  const cleanPath = normalizeJsrPackagePath(path);
   const pkg = descriptor.package;
   return `https://jsr.io/@${pkg.scope}/${pkg.packageName}/${descriptor.version}/${cleanPath}`;
+}
+
+function normalizeJsrPackagePath(path: string): string {
+  const cleanPath = path.startsWith('/') ? path.slice(1) : path;
+  return cleanPath.replaceAll('\\', '/');
 }
 
 async function sha256Checksum(bytes: Uint8Array): Promise<string> {

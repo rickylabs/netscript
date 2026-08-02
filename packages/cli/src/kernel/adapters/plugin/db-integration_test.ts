@@ -1,9 +1,10 @@
-import { assertEquals } from 'jsr:@std/assert@^1';
+import { assertEquals, assertRejects, assertStringIncludes } from 'jsr:@std/assert@^1';
 
 import { MemoryFileSystemAdapter } from '../scaffold/memory-fs.ts';
 import { Scaffolder } from '../scaffold/scaffolder.ts';
 import { StringTemplateAdapter } from '../scaffold/template-adapter.ts';
 import { copyPluginSchemasToRootDb, copyPluginSchemaToRootDb } from './db-integration.ts';
+import { ScaffoldValidationError } from '../../domain/errors.ts';
 
 Deno.test('copyPluginSchemaToRootDb copies plugin schema into active root DB schema tree', async () => {
   const fs = new MemoryFileSystemAdapter();
@@ -96,4 +97,108 @@ Deno.test('copyPluginSchemasToRootDb copies production plugin schema filenames',
     '/project/database/postgres/schema/plugins/workers/workers.prisma',
   );
   assertEquals(await fs.readFile(result[0].targetPath), schema);
+});
+
+Deno.test('copyPluginSchemasToRootDb prefers package fragments over copied placeholders', async () => {
+  const fs = new MemoryFileSystemAdapter();
+  const scaffolder = new Scaffolder(new StringTemplateAdapter(fs), fs);
+  const realSchema = 'model SagaInstance { id String @id }\n';
+  await fs.writeFile('/project/plugins/sagas/database/schema.prisma', '// placeholder\n');
+
+  const result = await copyPluginSchemasToRootDb(
+    '/project',
+    'sagas',
+    {
+      requiresDb: true,
+      dbExists: true,
+      targetConfigKey: 'postgres',
+      targetEngine: 'postgres',
+      needsProvisioning: false,
+    },
+    { fs, scaffolder },
+    {
+      packageFragments: [{ path: 'database/sagas.prisma', content: realSchema }],
+      schemaDeclared: true,
+    },
+  );
+
+  assertEquals(result.length, 1);
+  assertEquals(
+    result[0].targetPath.replaceAll('\\', '/'),
+    '/project/database/postgres/schema/plugins/sagas/sagas.prisma',
+  );
+  assertEquals(await fs.readFile(result[0].targetPath), realSchema);
+});
+
+Deno.test('copyPluginSchemasToRootDb keeps the bare schema filename rule for package fragments', async () => {
+  const fs = new MemoryFileSystemAdapter();
+  const scaffolder = new Scaffolder(new StringTemplateAdapter(fs), fs);
+  const result = await copyPluginSchemasToRootDb(
+    '/project',
+    'custom',
+    {
+      requiresDb: true,
+      dbExists: true,
+      targetConfigKey: 'postgres',
+      targetEngine: 'postgres',
+      needsProvisioning: false,
+    },
+    { fs, scaffolder },
+    { packageFragments: [{ path: '/database/schema.prisma', content: 'model Custom {}\n' }] },
+  );
+
+  assertEquals(
+    result[0].targetPath.replaceAll('\\', '/'),
+    '/project/database/postgres/schema/plugins/custom/custom.prisma',
+  );
+});
+
+Deno.test('copyPluginSchemasToRootDb validates declared schemas without widening no-DB behavior', async () => {
+  const fs = new MemoryFileSystemAdapter();
+  const scaffolder = new Scaffolder(new StringTemplateAdapter(fs), fs);
+  const packageSearchPath = 'jsr:@example/plugin@0.0.2/database/**/*.prisma';
+  const detection = {
+    requiresDb: true,
+    dbExists: true,
+    targetConfigKey: 'postgres',
+    targetEngine: 'postgres' as const,
+    needsProvisioning: false,
+  };
+
+  const error = await assertRejects(
+    () =>
+      copyPluginSchemasToRootDb(
+        '/project',
+        'missing-db-plugin',
+        detection,
+        { fs, scaffolder },
+        { schemaDeclared: true, packageSearchPath },
+      ),
+    ScaffoldValidationError,
+  );
+  assertStringIncludes(error.message, 'missing-db-plugin');
+  assertEquals(error.context?.searchedPaths, [
+    '/project/plugins/missing-db-plugin/database',
+    packageSearchPath,
+  ]);
+  assertEquals(
+    await copyPluginSchemasToRootDb(
+      '/project',
+      'no-schema',
+      detection,
+      { fs, scaffolder },
+      { schemaDeclared: false },
+    ),
+    [],
+  );
+  assertEquals(
+    await copyPluginSchemasToRootDb(
+      '/project',
+      'no-db',
+      { ...detection, requiresDb: false, targetEngine: null },
+      { fs, scaffolder },
+      { schemaDeclared: true },
+    ),
+    [],
+  );
 });

@@ -14,45 +14,60 @@ import { defineStub, type StubSource } from '@netscript/plugin/adapter';
 export const chatRouteStub: StubSource<never> = defineStub({
   source: `/** App-owned AI chat island. Streams from ./chat-stream and renders parts. */
 
-import { useState } from 'preact/hooks';
+import type { JSX } from 'preact';
+import { useEffect, useState } from 'preact/hooks';
 import {
   createNetScriptChatConnection,
   projectChatSnapshot,
   type NetScriptChatMessage,
-  type RenderPart,
+  type NetScriptChatSnapshot,
 } from '@netscript/fresh/ai';
 import { Markdown } from '../components/ui/markdown.tsx';
 
 const connection = createNetScriptChatConnection({
-  endpoint: '/api/ai/chat-stream',
+  target: { sessionId: 'default' },
+  streamPath: '/api/ai/chat-stream',
 });
 
-function renderPart(part: RenderPart): preact.JSX.Element {
-  if (part.kind === 'text') {
-    return <Markdown>{part.text}</Markdown>;
-  }
-  return <pre class="ai-part">{JSON.stringify(part, null, 2)}</pre>;
-}
-
-function renderMessage(message: NetScriptChatMessage): preact.JSX.Element {
+function renderMessage(message: NetScriptChatMessage): JSX.Element {
   return (
     <li class={\`ai-message ai-message--\${message.role}\`}>
-      {projectChatSnapshot(message).parts.map(renderPart)}
+      <Markdown>{message.content}</Markdown>
     </li>
   );
 }
 
 /** Interactive AI chat island. */
-export default function ChatIsland(): preact.JSX.Element {
+export default function ChatIsland(): JSX.Element {
   const [input, setInput] = useState('');
-  const snapshot = connection.useSnapshot();
+  const [snapshot, setSnapshot] = useState<Pick<NetScriptChatSnapshot, 'messages' | 'renderParts'>>(
+    () => projectChatSnapshot([]),
+  );
+  const [streaming, setStreaming] = useState(false);
+
+  useEffect(() => {
+    const abort = new AbortController();
+    const chunks: unknown[] = [];
+    void (async () => {
+      setStreaming(true);
+      try {
+        for await (const chunk of connection.subscribe(abort.signal)) {
+          chunks.push(chunk);
+          setSnapshot(projectChatSnapshot(chunks));
+        }
+      } finally {
+        setStreaming(false);
+      }
+    })();
+    return () => abort.abort();
+  }, []);
 
   async function send(event: Event): Promise<void> {
     event.preventDefault();
     const text = input.trim();
     if (text.length === 0) return;
     setInput('');
-    await connection.send({ role: 'user', text });
+    await connection.send([{ id: crypto.randomUUID(), role: 'user', content: text }]);
   }
 
   return (
@@ -64,8 +79,8 @@ export default function ChatIsland(): preact.JSX.Element {
           onInput={(event) => setInput((event.target as HTMLInputElement).value)}
           placeholder="Ask anything…"
         />
-        <button type="submit" disabled={snapshot.streaming}>Send</button>
-        {snapshot.streaming
+        <button type="submit" disabled={streaming}>Send</button>
+        {streaming
           ? <button type="button" onClick={() => connection.stop()}>Stop</button>
           : null}
       </form>

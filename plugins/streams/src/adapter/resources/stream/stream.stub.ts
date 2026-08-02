@@ -31,14 +31,22 @@ import {
   defineStreamSchema,
   type DurableStreamProducer,
   type StateSchema,
+  type StreamStandardSchema,
   type StreamStateDefinition,
 } from '@netscript/plugin-streams-core';
 import { z } from 'zod';
 
+/** Payload stored by the sample notifications stream. */
+type %%STREAM_DEFINITION%%Event = Readonly<{
+  id: string;
+  type: string;
+  payload: Record<string, unknown>;
+}>;
+
 /** Collection definition for the sample notifications stream. */
 interface %%STREAM_DEFINITION%% extends StreamStateDefinition {
   readonly event: {
-    readonly schema: unknown;
+    readonly schema: StreamStandardSchema<%%STREAM_DEFINITION%%Event>;
     readonly type: '%%EVENT_TYPE%%';
     readonly primaryKey: 'id';
   };

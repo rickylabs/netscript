@@ -27,7 +27,10 @@ export interface RunInstallCommandOptions {
 export async function runInstallCommand(
   options: RunInstallCommandOptions,
 ): Promise<ScaffoldResult> {
-  const artifacts = collectInstallArtifacts(options.plugin);
+  const artifacts = collectInstallArtifacts(
+    options.plugin,
+    options.context.options.includeSamples !== false,
+  );
   return await writeArtifacts({
     artifacts,
     context: options.context,
@@ -70,6 +73,7 @@ export function createInstallScaffoldEntrypoint(
  * Emit starter artifacts from the plugin's install seams.
  *
  * @param plugin Plugin contract supplying starter resources.
+ * @param includeSamples Whether sample starters should be emitted.
  * @returns Artifacts emitted by every starter resource.
  *
  * @example
@@ -78,10 +82,19 @@ export function createInstallScaffoldEntrypoint(
  * console.log(artifacts.length);
  * ```
  */
-export function collectInstallArtifacts(plugin: NetScriptPlugin): readonly ScaffoldArtifact[] {
-  return plugin.install.starterResources.flatMap((starter) =>
-    starter.scaffolder.emit(starter.input)
-  );
+export function collectInstallArtifacts(
+  plugin: NetScriptPlugin,
+  includeSamples = true,
+): readonly ScaffoldArtifact[] {
+  return plugin.install.starterResources.flatMap((starter) => {
+    if (includeSamples || starter.samples === undefined) {
+      return starter.scaffolder.emit(starter.input);
+    }
+    if (starter.samples.kind === 'omit') {
+      return [];
+    }
+    return starter.samples.scaffolder.emit(starter.samples.input);
+  });
 }
 
 interface WriteArtifactsOptions {

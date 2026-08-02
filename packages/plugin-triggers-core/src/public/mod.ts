@@ -59,7 +59,6 @@ export {
 } from '../runtime/mod.ts';
 export { createKvTriggerEnabledStateStore } from '../stores/mod.ts';
 export {
-  TRIGGER_BACKFILL_POLICIES,
   TRIGGER_DURABILITY_TIERS,
   TRIGGER_EVENT_STATUSES,
   TRIGGER_KINDS,
@@ -104,8 +103,6 @@ export type {
   ScheduledTriggerSpec,
   StreamTriggerPayload,
   TriggerActionResult,
-  TriggerBackfillPolicy,
-  TriggerBackfillSpec,
   TriggerCircuitBreakerSpec,
   TriggerConcurrencySpec,
   TriggerContext,

@@ -278,8 +278,9 @@ the release it runs.
   search, and command execution — over stdio. Every result is capped server-side (50 items, 2,000
   characters per string) so telemetry never floods the context window, and tools classify traces
   into worker/saga/trigger/stream/service domains and correlate whole executions by id.
-- **Skills are the playbook.** `agent init` installs three content-hashed skills (`netscript`,
-  `netscript-operate`, `netscript-build`) shipped with the same release as the CLI.
+- **Skills are the playbook.** `agent init` installs five content-hashed skills (`netscript`,
+  `netscript-operate`, `netscript-build`, `aspire`, `deno`) plus a symptom-indexed `help.md`, all
+  shipped with the same release as the CLI.
 - **The CLI is the hands.** The MCP `execute_command` tool shells the real CLI through a
   default-deny policy gate: 17 allowed command prefixes, 6 explicit denies (`deploy`, `init`,
   `marketplace`, `db reset`, `plugin remove`, `ui:remove`), deny beats allow, anything unmatched is

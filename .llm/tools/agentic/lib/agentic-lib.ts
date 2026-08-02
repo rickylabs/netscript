@@ -979,9 +979,42 @@ export async function validateGithubToken(token: string): Promise<string | null>
     const loginField = githubField(res.body, 'login');
     const login = res.ok && typeof loginField === 'string' ? loginField : null;
     return login;
-  } catch {
+  } catch (error) {
+    if (isMissingGithubNetPermission(error)) {
+      throw new Error(buildMissingGithubNetPermissionMessage(error), { cause: error });
+    }
     return null;
   }
+}
+
+const GITHUB_API_HOST = new URL(GITHUB_API_BASE_URL).hostname;
+export const GITHUB_NET_PERMISSION_FLAG: string = `--allow-net=${GITHUB_API_HOST}`;
+
+/** Return whether an error is Deno's missing-net capability failure for the GitHub API host. */
+export function isMissingGithubNetPermission(error: unknown): boolean {
+  return error instanceof Deno.errors.NotCapable &&
+    error.message.includes('Requires net access') &&
+    error.message.includes(GITHUB_API_HOST);
+}
+
+/** Build the actionable diagnostic for a missing GitHub API net permission. */
+export function buildMissingGithubNetPermissionMessage(error: unknown): string {
+  const detail = error instanceof Error ? error.message : String(error);
+  return `Cannot reach ${GITHUB_API_HOST}: missing ${GITHUB_NET_PERMISSION_FLAG}. ${detail}`;
+}
+
+/** Format one validated token-source attempt without exposing its credential. */
+export function formatGithubTokenAttempt(source: string, login: string | null): string {
+  return login ? `${source} (valid)` : `${source} (401)`;
+}
+
+/** Build the existing operator guidance for genuinely rejected GitHub credentials. */
+export function buildGithubTokenResolutionError(tried: readonly string[], wslUser: string): string {
+  const summary = tried.length ? tried.join(', ') : 'no candidate produced a token';
+  return `No valid GitHub token resolved (tried: ${summary}). ` +
+    `Authenticate once with \`gh auth login\` (WSL: \`wsl.exe -u ${wslUser} -- gh auth login\`) ` +
+    `so \`gh auth token\` can supply a self-refreshing credential, or store a PAT via ` +
+    `\`git credential approve\`, then retry.`;
 }
 
 /** Run a subprocess, returning trimmed stdout, or null on failure / missing --allow-run. */
@@ -1075,7 +1108,7 @@ export async function resolveGithubToken(
     if (!token) return null;
     if (!validate) return { token, source };
     const login = await validateGithubToken(token);
-    tried.push(login ? `${source} (valid)` : `${source} (401)`);
+    tried.push(formatGithubTokenAttempt(source, login));
     return login ? { token, source: `${source} (${login})` } : null;
   };
 
@@ -1114,13 +1147,7 @@ export async function resolveGithubToken(
     if (r) return r;
   }
 
-  const summary = tried.length ? tried.join(', ') : 'no candidate produced a token';
-  throw new Error(
-    `No valid GitHub token resolved (tried: ${summary}). ` +
-      `Authenticate once with \`gh auth login\` (WSL: \`wsl.exe -u ${resolvedWslUser} -- gh auth login\`) ` +
-      `so \`gh auth token\` can supply a self-refreshing credential, or store a PAT via ` +
-      `\`git credential approve\`, then retry.`,
-  );
+  throw new Error(buildGithubTokenResolutionError(tried, resolvedWslUser));
 }
 
 /** Read one property from an unknown GitHub JSON response after object narrowing. */

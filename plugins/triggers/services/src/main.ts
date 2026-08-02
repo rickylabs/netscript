@@ -68,7 +68,6 @@ import { acceptWebhook, listTriggerEvents, WEBHOOK_PATH_PREFIX } from './raw-tri
 
 export {
   TRIGGER_ACTION_KINDS,
-  TRIGGER_BACKFILL_POLICIES,
   TRIGGER_DURABILITY_TIERS,
   TRIGGER_EVENT_STATUSES,
   TRIGGER_KINDS,
@@ -97,8 +96,6 @@ export type {
   StreamTriggerDefinition,
   StreamTriggerPayload,
   TriggerActionResult,
-  TriggerBackfillPolicy,
-  TriggerBackfillSpec,
   TriggerCircuitBreakerSpec,
   TriggerConcurrencySpec,
   TriggerContext,

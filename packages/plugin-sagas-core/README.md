@@ -20,7 +20,7 @@ plugin binds to a NetScript host; use it directly for custom hosts, libraries, a
 ## Why teams use it
 
 - **A fluent, typed saga DSL** — `defineSaga(id).state().on().build()` produces a frozen
-  `SagaDefinition`; handlers return cascaded effects via `send`, `schedule`, `spawn`,
+  `SagaDefinition`; handlers return cascaded effects via `send`, `schedule`,
   `sagaComplete`, `sagaFail`, and `sagaCompensate`.
 - **At-least-once, exactly-applied** — idempotency keys reserve a message target before delivery and
   record applied `(instanceId, key)` pairs, so duplicates return `alreadyApplied` instead of
@@ -43,7 +43,7 @@ flowchart LR
     R --> P["Injected ports<br/>store · bus · clock · idempotency"]
     P --> T["Transports<br/>Redis Streams · Garnet LIST"]
     P --> Mem["In-memory doubles<br/>(deterministic tests)"]
-    R --> FX["Cascaded effects<br/>send · schedule · spawn · compensate"]
+    R --> FX["Cascaded effects<br/>send · schedule · compensate"]
 ```
 
 ## Install
@@ -70,7 +70,7 @@ const registrationSaga = defineSaga('user-registration')
   .on<'UserRegistered', UserRegistered>('UserRegistered', (saga, event) => {
     saga.state.status = 'welcoming';
     return [
-      send('send-welcome-email', { email: event.payload.email }, {
+      send('WelcomeEmailRequested', { email: event.payload.email }, {
         idempotencyKey: `welcome:${event.payload.userId}`,
       }),
     ];
@@ -142,7 +142,7 @@ const orderSaga = defineSaga('order')
 | `./transports`            | Redis Streams and Garnet LIST delivery adapters                                            |
 | `./stores`                | The durable store port behind a stable subpath                                             |
 | `./middleware`            | Hono saga middleware and SSE event middleware                                              |
-| `./integration/workers`   | Saga cascades into worker jobs and tasks (`triggerJob`, `triggerTask`)                     |
+| `./integration/workers`   | Explicit workers-port helpers for jobs and tasks (`triggerJob`, `triggerTask`); `send()` does not use them |
 | `./integration/publisher` | The `SagaPublisherPort` boundary                                                           |
 | `./contracts/v1`          | The versioned saga API contract                                                            |
 | `./testing`               | In-memory stores, controllable clock, runtime test helper                                  |

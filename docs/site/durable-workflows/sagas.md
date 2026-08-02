@@ -80,7 +80,7 @@ process and how effect-based outcomes differ from a retry loop.
   items: [
     { icon: "◆", title: "Fluent builder", body: "defineSaga(id).durability().state().on().compensate().build() — id, durability tier, typed state, message handlers, compensations, then build(). One chain, fully type-checked." },
     { icon: "▣", title: "Durable store backend", body: "Runtime state persists to kv or prisma, chosen by NETSCRIPT_SAGA_STORE / appsettings. createDurableSagaRuntime({ backend, prisma }) owns the resources." },
-    { icon: "≋", title: "Effect-based outcomes", body: "Every handler returns an array of effects — sagaComplete, sagaFail, sagaCompensate, send, schedule, spawn are named outcomes returned from handlers, never a fall-through." },
+    { icon: "≋", title: "Effect-based outcomes", body: "Every handler returns an array of effects — sagaComplete, sagaFail, sagaCompensate, send, and schedule are named outcomes. spawn is exported but runtime dispatch is unsupported." },
     { icon: "⊡", title: "Served on :8092", body: "An oRPC API lists registered sagas, inspects running instances, publishes messages, and streams activity over SSE." },
     { icon: "⇄", title: "Cross-plugin choreography", body: "The workers create-user-settings job publishes UserSettingsCreated; this saga consumes it — one message crossing the plugin boundary, type-checked on both sides." },
     { icon: "◷", title: "Crash-survivable", body: "State checkpoints between messages, so an instance picks up exactly where it left off after a restart. That survival is the entire point of a saga." }
@@ -159,8 +159,9 @@ exposes a first-class <code>.compensate(eventType, handler)</code> that register
 handler keyed by message type. A running handler routes into it by returning the
 <code>sagaCompensate(message, reason?)</code> effect. So a saga's whole lifecycle —
 advance, <code>sagaComplete</code>, <code>sagaFail</code>, <code>sagaCompensate</code>,
-<code>send</code>, <code>schedule</code>, <code>spawn</code> — is <strong>named outcomes
-returned from handlers</strong>, never a fall-through or an unhandled throw. The undo logic
+<code>send</code>, and <code>schedule</code> — is a <strong>named outcome returned from
+handlers</strong>, never a fall-through. <code>spawn</code> is reserved in the type vocabulary but
+dispatch currently throws <code>SAGA_NOT_IMPLEMENTED</code>. The undo logic
 itself lives in the <code>.compensate()</code> handler, not inline in the forward path.
 {{ /comp }}
 
@@ -222,8 +223,8 @@ returned `SagaBuilder`.
 
 A handler's only side effect is the array of **cascaded messages** it returns. These
 helpers (`@netscript/plugin-sagas-core`) construct the named effects. Every kind in
-`CASCADED_MESSAGE_KINDS` (`send | scheduled | spawn | complete | fail | compensate`) has
-a constructor.
+`CASCADED_MESSAGE_KINDS` (`send | scheduled | spawn | complete | fail | compensate`) has a
+constructor, but `spawn` is contract-only today and is not supported by runtime dispatch.
 
 {{ comp.apiTable({
   caption: "Effect helpers — saga handler outcomes",
@@ -231,9 +232,9 @@ a constructor.
     { name: "sagaComplete(result?)", type: "=> CascadedMessage<'complete'>", desc: "Terminal success. Marks the instance finished and records the optional result payload." },
     { name: "sagaFail(reason)", type: "string | Error => CascadedMessage<'fail'>", desc: "Terminal failure. Records the reason; no further messages are applied to the instance." },
     { name: "sagaCompensate(message, reason?)", type: "=> CascadedMessage<'compensate'>", desc: "Route into the matching .compensate(type, ...) handler to undo an already-applied step." },
-    { name: "send(target, payload, options)", type: "=> CascadedMessage<'send'>", desc: "Dispatch a command to a target (job, saga, or runtime adapter). options carry idempotencyKey / concurrencyKey / retry / queue." },
+    { name: "send(target, payload, options)", type: "=> CascadedMessage<'send'>", desc: "Republish an internal message onto the saga bus. It does not trigger a worker job or task. options carry idempotencyKey / concurrencyKey / retry / queue." },
     { name: "schedule(message, delay)", type: "delay: Date | number | '5m' => CascadedMessage<'scheduled'>", desc: "Deliver a wrapped message after a delay (a Date, ms, or a '30s'/'5m'/'2h'/'1d' string)." },
-    { name: "spawn(child, input, options)", type: "=> CascadedMessage<'spawn'>", desc: "Start a child saga from a definition or id, passing typed input. options take idempotencyKey / concurrencyKey." }
+    { name: "spawn(child, input, options)", type: "=> CascadedMessage<'spawn'>", desc: "Unsupported. Constructs the reserved child-saga effect, but dispatch throws SAGA_NOT_IMPLEMENTED." }
   ]
 }) }}
 
@@ -243,7 +244,7 @@ Saga handlers stay synchronous and pure; the *transport* layer that carries casc
 messages and feeds fan-out work is where you tune concurrency. `createParallelQueue` (from
 {{ comp.xref({ key: "ref:queue", text: "@netscript/queue" }) }}) is the primitive for
 that: it wraps a base queue so a single listener processes several messages at once. It is
-the right tool when a saga spawns many independent children or pushes I/O-bound side work
+the right tool when a workflow fans out independent internal messages or pushes I/O-bound side work
 (API calls, DB writes) that should run in parallel rather than one at a time. The
 `concurrency` option is the whole story — `1` is plain sequential, anything higher enables
 parallel processing.
@@ -475,9 +476,10 @@ first.
 {{ comp callout { type: "important", title: "Handlers are synchronous and pure" } }}
 A <code>SagaHandler</code> returns <code>readonly CascadedMessage[]</code> — it is
 <strong>synchronous</strong> and does no direct I/O. All side effects (charging payment,
-sending mail, spawning a child) are expressed as <em>effects</em> the runtime applies, so
+sending an internal saga message) are expressed as <em>effects</em> the runtime applies, so
 the handler is replayable and crash-safe. Do not <code>await</code> a network call inside a
-handler; emit a <code>send(...)</code> effect and let the target do the work. Compensation
+handler; emit a <code>send(...)</code> effect for another saga message. Use the explicit workers
+integration helpers or triggers API <code>enqueueJob(...)</code> path for worker work. Compensation
 follows the same rule — its undo runs in the <code>.compensate()</code> handler as more
 effects, not as inline cleanup.
 {{ /comp }}

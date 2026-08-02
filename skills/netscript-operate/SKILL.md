@@ -45,6 +45,11 @@ Start with `doctor` — it checks telemetry reachability, project wiring, Aspire
 diagnostics with pass/warn/fail and fix suggestions, and works without a running app. Fix what it
 flags before re-querying telemetry tools.
 
+**A plugin's boundary never runs, or installation succeeded but nothing is wired.** Run
+`netscript plugin doctor` before reading source or hand-probing endpoints. Use
+`.claude/skills/help.md` when you do not yet know whether the symptom belongs to NetScript, Aspire,
+or Deno.
+
 ## Docs funnel
 
 `search_docs` (or `list_docs`) to find the right document → `get_doc` with a `section` to read only

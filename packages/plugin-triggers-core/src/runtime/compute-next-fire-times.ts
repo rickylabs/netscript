@@ -42,7 +42,7 @@ export function computeNextFireTimes(
   }
   const timezone = spec.timezone ?? 'UTC';
   const formatter = createFormatter(timezone);
-  const limit = spec.persistent === false ? 1 : count;
+  const limit = count;
   const results: string[] = [];
   const seen = new Set<string>();
   let cursor = floorToMinute(from).getTime() + 60_000;

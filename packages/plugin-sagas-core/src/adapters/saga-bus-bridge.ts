@@ -134,7 +134,7 @@ export class SagaBusBridge implements SagaBusPort {
         await this.#compensate(message);
         return;
       case 'spawn':
-        throw SagasError.notImplemented('spawn cascades are deferred to phase 7d.');
+        throw SagasError.notImplemented('Spawn cascades are unsupported.');
     }
   }
 

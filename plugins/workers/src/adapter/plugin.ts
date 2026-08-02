@@ -11,6 +11,8 @@ import {
   DEFAULT_JOB_INPUT,
   DEFAULT_RUNTIME_GLUE_INPUT,
   DEFAULT_TASK_INPUT,
+  EMPTY_BARREL_INPUT,
+  emptyBarrelScaffolder,
   jobResource,
   runtimeGlueScaffolder,
   taskResource,
@@ -19,9 +21,17 @@ import {
 
 /** Starter resources emitted by the workers install command. */
 export const workersStarterResources: readonly InstallStarterResource[] = [
-  { scaffolder: jobResource.scaffolder, input: DEFAULT_JOB_INPUT },
-  { scaffolder: taskResource.scaffolder, input: DEFAULT_TASK_INPUT },
-  { scaffolder: barrelScaffolder, input: DEFAULT_BARREL_INPUT },
+  { scaffolder: jobResource.scaffolder, input: DEFAULT_JOB_INPUT, samples: { kind: 'omit' } },
+  { scaffolder: taskResource.scaffolder, input: DEFAULT_TASK_INPUT, samples: { kind: 'omit' } },
+  {
+    scaffolder: barrelScaffolder,
+    input: DEFAULT_BARREL_INPUT,
+    samples: {
+      kind: 'alternate',
+      scaffolder: emptyBarrelScaffolder,
+      input: EMPTY_BARREL_INPUT,
+    },
+  },
   { scaffolder: runtimeGlueScaffolder, input: DEFAULT_RUNTIME_GLUE_INPUT },
 ];
 

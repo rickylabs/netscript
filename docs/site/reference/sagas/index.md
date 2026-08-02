@@ -164,8 +164,8 @@ plugins. Its root entrypoint (`./mod.ts`) is the authoring surface for saga defi
 | `defineSaga` | function | `defineSaga(id: TId): SagaBuilder` | Start a userland saga definition chain. |
 | `defineQuery` | function | `defineQuery(name: TName): QueryDefinition` | Define a synchronous read-only query for a running saga instance. |
 | `defineSignal` | function | `defineSignal(name: TName): SignalDefinition` | Define a signal that can be sent to a running saga instance. |
-| `send` | function | `send(target, payload: unknown, options?: SendOptions): CascadedMessage` | Create a cascaded send message. |
-| `spawn` | function | `spawn(child, input: unknown, options?: SpawnOptions): CascadedMessage` | Create a cascaded child-saga spawn message. |
+| `send` | function | `send(target, payload: unknown, options?: SendOptions): CascadedMessage` | Republish an internal message onto the saga bus; does not trigger workers. |
+| `spawn` | function | `spawn(child, input: unknown, options?: SpawnOptions): CascadedMessage` | Unsupported reserved effect; runtime dispatch throws `SAGA_NOT_IMPLEMENTED`. |
 | `schedule` | function | `schedule(message, delay: SagaScheduleDelay): CascadedMessage` | Create a cascaded scheduled message. |
 | `sagaComplete` | function | `sagaComplete(result: unknown): CascadedMessage` | Create a terminal saga completion message. |
 | `sagaFail` | function | `sagaFail(reason): CascadedMessage` | Create a terminal saga failure message. |
@@ -183,7 +183,7 @@ plugins. Its root entrypoint (`./mod.ts`) is the authoring surface for saga defi
 | `SagaConcurrencyOptions` / `SagaConcurrencyPolicy` | type alias | Concurrency options/policy for a saga definition. |
 | `CascadedMessage` / `CascadedMessageKind` / `CascadedMessageTarget` | type alias | Cascaded-message side-effect ledger vocabulary. |
 | `QueryDefinition` / `SignalDefinition` | type alias | Query/signal definitions reserved by the public DSL. |
-| `SendOptions` / `SpawnOptions` / `SagaScheduleDelay` | type alias | Options for the `send()`, `spawn()`, and `schedule()` constructors. |
+| `SendOptions` / `SpawnOptions` / `SagaScheduleDelay` | type alias | Constructor options; `SpawnOptions` belongs to the unsupported `spawn()` effect. |
 
 #### Core sub-path entrypoints
 

@@ -42,6 +42,11 @@ export const streamProducerScaffolder: ItemScaffolder<StreamProducerInput> = {
 export const streamProducerResource: PluginResource<StreamProducerInput> = {
   name: 'producer',
   scaffolder: streamProducerScaffolder,
+  defaultInput: {
+    name: 'invoices',
+    streamPath: '/billing/invoices',
+    producerId: 'billing-service',
+  },
   parseInput: parseStreamProducerInput,
 };
 

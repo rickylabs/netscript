@@ -38,6 +38,11 @@ export type CascadedMessage<TKind extends CascadedMessageKind = CascadedMessageK
       message: SagaMessage | CascadedMessage;
       scheduledFor: Date;
     }
+    /**
+     * Reserved child-saga cascade.
+     *
+     * @unsupported Runtime dispatch throws `SAGA_NOT_IMPLEMENTED`.
+     */
     | {
       kind: 'spawn';
       sagaId: SagaId;

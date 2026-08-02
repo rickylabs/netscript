@@ -11,7 +11,6 @@ export {
   DEFAULT_TRIGGER_INITIAL_DELAY_MS,
   DEFAULT_TRIGGER_MAX_ATTEMPTS,
   DEFAULT_TRIGGER_MAX_DELAY_MS,
-  TRIGGER_BACKFILL_POLICIES,
   TRIGGER_DURABILITY_TIERS,
   TRIGGER_EVENT_STATUSES,
   TRIGGER_INGRESS_MAX_RESPONSE_MS,
@@ -29,7 +28,6 @@ export {
   UnsupportedOperationError,
 } from './errors.ts';
 export type {
-  TriggerBackfillPolicy,
   TriggerDurabilityTier,
   TriggerEventStatus,
   TriggerKind,
@@ -61,7 +59,6 @@ export type {
   WebhookTriggerPayload,
 } from './trigger-event.ts';
 export type {
-  TriggerBackfillSpec,
   TriggerCircuitBreakerSpec,
   TriggerConcurrencySpec,
   TriggerDeduplicationSpec,

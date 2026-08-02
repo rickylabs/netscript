@@ -3,12 +3,7 @@
 export { defineFileWatch } from './define-file-watch.ts';
 export { defineScheduledTrigger } from './define-scheduled-trigger.ts';
 export { defineWebhook, enqueueJob } from './define-webhook.ts';
-export {
-  TRIGGER_BACKFILL_POLICIES,
-  TRIGGER_DURABILITY_TIERS,
-  TRIGGER_EVENT_STATUSES,
-  TRIGGER_KINDS,
-} from '../domain/mod.ts';
+export { TRIGGER_DURABILITY_TIERS, TRIGGER_EVENT_STATUSES, TRIGGER_KINDS } from '../domain/mod.ts';
 export type { FileWatchHandler, FileWatchSpec } from './define-file-watch.ts';
 export type {
   DefineScheduledTriggerSpec,
@@ -32,8 +27,6 @@ export type {
   ScheduledTriggerSpec,
   StreamTriggerPayload,
   TriggerActionResult,
-  TriggerBackfillPolicy,
-  TriggerBackfillSpec,
   TriggerCircuitBreakerSpec,
   TriggerConcurrencySpec,
   TriggerContext,

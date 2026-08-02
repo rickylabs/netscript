@@ -21,6 +21,7 @@
     "ci:quality": {
       "dependencies": [
         "check",
+        "check:emitted-samples",
         "lint",
         "fmt:check",
         "deps:check",
@@ -40,6 +41,7 @@
         ".llm/tools/run-deno-check.ts"
       ]
     },
+    "check:emitted-samples": "deno run --allow-read --allow-write --allow-run .llm/tools/validation/check-emitted-samples.ts",
     "test": "deno test --allow-all",
     "quality:scan": "deno run --allow-read .llm/tools/quality/scan-code-quality.ts",
     "quality:scan:repo": "deno run --allow-read .llm/tools/quality/scan-code-quality.ts --root packages --root plugins",
@@ -86,7 +88,7 @@
     "agentic:opencode-eval": "deno run --no-lock --allow-read --allow-run --allow-env .llm/tools/agentic/opencode/opencode-eval.ts",
     "agentic:opencode-web": "deno run --no-lock --allow-read --allow-run --allow-env .llm/tools/agentic/opencode/opencode-web.ts",
     "gen:assets-barrel": "deno run --no-lock --allow-read --allow-write --allow-run=deno .llm/tools/generate-cli-assets-barrel.ts",
-    "check:assets-barrel": "deno task gen:assets-barrel && git diff --exit-code -- packages/cli/src/kernel/assets/embedded.generated.ts packages/plugin/src/kernel/assets/embedded.generated.ts packages/fresh-ui/registry.generated.ts packages/service/src/primitives/scalar.generated.ts",
+    "check:assets-barrel": "deno task gen:assets-barrel && git diff --exit-code -- packages/cli/src/kernel/assets/embedded.generated.ts packages/cli/src/kernel/assets/skills.generated.ts packages/plugin/src/kernel/assets/embedded.generated.ts packages/fresh-ui/registry.generated.ts packages/service/src/primitives/scalar.generated.ts",
     "gen:publish-assets": "deno run --no-lock --allow-read --allow-write --allow-run=deno .llm/tools/generate-publish-assets.ts",
     "check:publish-assets": "deno task gen:publish-assets --check",
     "check:scaffold-versions": "deno run .llm/tools/validation/check-scaffold-versions.ts --pretty",
@@ -94,7 +96,7 @@
     "check:aspire-host-ports": "deno run --allow-read .llm/tools/validation/check-aspire-host-ports.ts --pretty",
     "release:preflight": "deno run --allow-read .llm/tools/release/preflight-text-imports.ts",
     "publish:readiness": "deno run --allow-read --allow-run --allow-net=jsr.io,api.jsr.io .llm/tools/release/publish-readiness.ts",
-    "release:cut": "deno run --allow-read --allow-write --allow-run --allow-env .llm/tools/release/cut.ts",
+    "release:cut": "deno run --allow-read --allow-write --allow-run --allow-env --allow-net=api.github.com .llm/tools/release/cut.ts",
     "release:canary": "deno run --allow-read --allow-write --allow-run --allow-net=jsr.io .llm/tools/release/canary.ts",
     "release:publish": "deno run --allow-net --allow-env --allow-run --allow-read .llm/tools/release/github-release.ts",
     "release:verify-canary-pair": "deno run --allow-net=api.github.com --allow-env=GH_TOKEN --allow-run=git --allow-read .llm/tools/release/verify-canary-pair.ts",
