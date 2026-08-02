@@ -123,6 +123,7 @@ export const GATE = {
   BEHAVIOR_OTEL_WEBHOOK: 'behavior.otel.webhook',
   BEHAVIOR_OTEL_STREAM_CONSUMER: 'behavior.otel.stream-consumer',
   BEHAVIOR_OTEL_TRACES: 'behavior.otel.traces',
+  BEHAVIOR_OTEL_TASK_TRACES: 'behavior.otel.task-traces',
   CLEANUP_USERLAND_SMOKE_ROOT: 'cleanup.userland-smoke-root',
   CLEANUP_ASPIRE_STOP: 'cleanup.aspire-stop',
   CLEANUP_DOCKER_CREATED_CONTAINERS: 'cleanup.docker-created-containers',

@@ -24,6 +24,8 @@ This repository uses Aspire to orchestrate its distributed application. Resource
 | View structured logs | `aspire otel logs [resource]` |
 | View traces | `aspire otel traces [resource]` |
 | Logs for a trace | `aspire otel logs --trace-id <id>` |
+| Detached workspace telemetry | `deno task aspire:otel -- traces <resource>` |
+| Export detached telemetry | `deno task aspire:export -- -o telemetry.zip` |
 | Add an integration | `aspire add` |
 | List running AppHosts | `aspire ps` |
 | Update AppHost packages | `aspire update` |
@@ -35,6 +37,14 @@ This repository uses Aspire to orchestrate its distributed application. Resource
 | Call resource MCP tool | `aspire mcp call <resource> <tool> --input <json>` |
 
 Most commands support `--format Json` for machine-readable output. Use `--apphost <path>` to target a specific AppHost.
+
+### Detached dashboard discovery
+
+In a generated NetScript workspace, prefer `deno task aspire:otel -- <subcommand> [resource]` and
+`deno task aspire:export -- [options]`. They forward arguments and recover through the dashboard URL
+reported by `aspire ps` if Aspire automatic discovery fails. If bare Aspire prints
+`The dashboard is not available` (exit 12), use the generated task; telemetry may still be healthy
+and reachable through the dashboard HTTP API.
 
 ## Key workflows
 

@@ -56,6 +56,21 @@ export function createOtelGates(): readonly GateDefinition[] {
       'capture',
       'No OTEL traces found. Ensure the AppHost was started with --isolated and the dashboard telemetry API is reachable.',
     ),
+    commandGate(
+      GATE.BEHAVIOR_OTEL_TASK_TRACES,
+      'Validate generated detached Aspire telemetry task',
+      GATE_PHASE.BEHAVIOR,
+      (context) => [
+        'deno',
+        'run',
+        '--allow-run',
+        '--allow-read',
+        '--allow-net=127.0.0.1:8093',
+        new URL('./validate-aspire-task-traces.ts', import.meta.url).pathname,
+        context.project.projectRoot,
+        'workers',
+      ],
+    ),
   ];
 }
 

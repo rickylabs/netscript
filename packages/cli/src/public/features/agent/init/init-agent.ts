@@ -5,6 +5,7 @@ import {
 } from "../../../../kernel/assets/skills.generated.ts";
 import { netscriptJsrSpecifier } from "../../../../kernel/constants/jsr-specifiers.ts";
 import type { AgentInitFileSystem } from "./agent-init-file-system.ts";
+import type { AspireAgentInitializer } from "./aspire-agent-initializer.ts";
 import {
   type AgentHost,
   type InitAgentInput,
@@ -14,7 +15,9 @@ import {
 const START_MARKER = "<!-- netscript-agent:start -->";
 const END_MARKER = "<!-- netscript-agent:end -->";
 const AGENTS_SECTION =
-  `${START_MARKER}\n## NetScript agent tooling\n\nUse the installed \`netscript\`, \`netscript-build\`, \`netscript-operate\`, \`aspire\`, and \`deno\` skills with the NetScript MCP server. Start with \`.claude/skills/help.md\` when a symptom is unclear; use \`aspire\` for orchestration and runtime-state problems, and \`deno\` for runtime and toolchain problems.\n${END_MARKER}`;
+  `${START_MARKER}\n## NetScript agent tooling\n\nInstalled skills: \`netscript\`, \`netscript-build\`, \`netscript-operate\`, \`aspire\`, and \`deno\`; use \`help.md\` when something hangs, vanishes, stays silent, or is Healthy but not responding.\n\nRoute Aspire orchestration and telemetry symptoms to the \`aspire\` skill. Route Deno runtime, type, permission, and module-resolution symptoms to the \`deno\` skill. For an unexplained hang, vanish, or silence, open \`help.md\`.\n\nBefore hand-rolled \`curl\` probes or print debugging, run \`netscript plugin doctor\`, \`aspire logs\`, \`aspire otel logs|spans|traces\`, and \`deno info\`.\n${END_MARKER}`;
+const ASPIRE_INIT_TIMEOUT_MS = 60_000;
+const PLAYWRIGHT_SKILL_PATH = ".claude/skills/playwright-cli/SKILL.md";
 
 /** Embedded skill bundle accepted by the installer and its integrity test seam. */
 export interface AgentSkillBundle {
@@ -25,6 +28,8 @@ export interface AgentSkillBundle {
 /** Dependencies for the agent installer use case. */
 export interface InitAgentDependencies {
   readonly fs: AgentInitFileSystem;
+  readonly aspireAgentInitializer: AspireAgentInitializer;
+  readonly aspireTimeoutMs?: number;
   readonly bundle?: AgentSkillBundle;
 }
 
@@ -40,6 +45,7 @@ export async function initAgent(
   await verifyBundle(bundle);
   const hosts = await resolveHosts(input, dependencies.fs);
   const changedFiles: string[] = [];
+  const messages: string[] = [];
   if (hosts.includes("claude")) {
     await writeHostConfig(
       dependencies.fs,
@@ -75,7 +81,31 @@ export async function initAgent(
       changedFiles,
     );
   }
-  return { hosts, changedFiles };
+  if (
+    hosts.includes("claude") &&
+    !await dependencies.fs.exists(
+      join(input.projectRoot, PLAYWRIGHT_SKILL_PATH),
+    )
+  ) {
+    const signal = AbortSignal.timeout(
+      dependencies.aspireTimeoutMs ?? ASPIRE_INIT_TIMEOUT_MS,
+    );
+    try {
+      const result = await dependencies.aspireAgentInitializer.initialize(
+        input.projectRoot,
+        signal,
+      );
+      if (!result.ok) messages.push(aspireSkipped(result.reason));
+    } catch (error) {
+      const reason = signal.aborted
+        ? "aspire agent init timed out"
+        : error instanceof Error
+        ? error.message
+        : String(error);
+      messages.push(aspireSkipped(reason));
+    }
+  }
+  return { hosts, changedFiles, messages };
 }
 
 async function resolveHosts(
@@ -128,6 +158,10 @@ async function writeHostConfig(
               projectRoot,
             ],
           },
+          aspire: {
+            command: "aspire",
+            args: ["agent", "mcp"],
+          },
         },
       },
       null,
@@ -135,6 +169,10 @@ async function writeHostConfig(
     )
   }\n`;
   await writeChanged(fs, path, content, changed);
+}
+
+function aspireSkipped(reason: string): string {
+  return `Aspire agent wiring was skipped: ${reason.replace(/[.]+$/, "")}.`;
 }
 
 async function writeChanged(
