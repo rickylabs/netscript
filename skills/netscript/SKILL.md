@@ -15,6 +15,9 @@ alone.** Pick a workflow skill below and follow its tables.
 |---|---|
 | Scaffold, add resources, database lifecycle, generators — changing the project | `netscript-build` |
 | Health, failing runs, slow services, error triage, docs lookup — observing the project | `netscript-operate` |
+| Aspire orchestration, resource health, logs, spans, or traces | `aspire` |
+| Deno runtime, type checking, permissions, or module resolution | `deno` |
+| Something hangs, vanishes, or stays silent and the cause is unclear | [`help.md`](../help.md) |
 
 ## CLI vs MCP
 
@@ -31,6 +34,7 @@ alone.** Pick a workflow skill below and follow its tables.
 |---|---|
 | Aspire start/stop, dashboard, resource graph, raw traces/logs | `aspire` |
 | Generic Deno runtime / tooling questions | `deno` |
+| Unexplained hang, vanish, silence, or “Healthy but not responding” | [`help.md`](../help.md) |
 
 When the symptom is unclear—something hangs, vanishes, or silently does nothing—start with
 `.claude/skills/help.md`. It routes from the failure to the first diagnostic command.
