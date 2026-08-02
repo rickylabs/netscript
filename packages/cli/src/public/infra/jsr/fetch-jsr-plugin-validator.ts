@@ -1,5 +1,6 @@
 import { parsePluginManifest } from '@netscript/plugin/protocol';
 import { compare, parse } from '@std/semver';
+import { NETSCRIPT_RELEASE_VERSION } from '../../../kernel/constants/jsr-specifiers.ts';
 import type {
   JsrHttpClient,
   JsrHttpResponse,
@@ -52,8 +53,16 @@ export class FetchJsrPluginValidator implements JsrPluginValidatorPort {
       };
     }
 
+    // Resolve the plugin at the CLI's own release version, not at `latest`. A prerelease CLI
+    // (`0.0.3-canary.N`) otherwise resolves the stable channel and installs an older plugin's
+    // schema fragments into a project scaffolded by the prerelease — which is how a stale
+    // `model User` reached a 0.0.3 canary and collided with the scaffold's own model.
+    // Only the metadata/file URLs are pinned; generated import specifiers are untouched, so the
+    // identity-based `minimumDependencyAge` exclusion in generated projects still applies and a
+    // freshly published version is not subject to the age window.
+    const resolvedVersion = resolveInstallVersion(packageMeta, NETSCRIPT_RELEASE_VERSION);
     const versionResponse = await this.http.fetch(
-      jsrVersionMetaUrl(resolvedPackage, packageMeta.latest),
+      jsrVersionMetaUrl(resolvedPackage, resolvedVersion),
       {
         headers: JSON_HEADERS,
       },
@@ -77,7 +86,7 @@ export class FetchJsrPluginValidator implements JsrPluginValidatorPort {
     const details = readPackageDetails(await detailsResponse.json());
 
     const manifestResponse = await this.http.fetch(
-      jsrPackageFileUrl(resolvedPackage, packageMeta.latest, 'scaffold.plugin.json'),
+      jsrPackageFileUrl(resolvedPackage, resolvedVersion, 'scaffold.plugin.json'),
       { headers: JSON_HEADERS },
     );
     if (manifestResponse.status === 404) {
@@ -110,7 +119,7 @@ export class FetchJsrPluginValidator implements JsrPluginValidatorPort {
       ok: true,
       descriptor: {
         package: resolvedPackage,
-        version: packageMeta.latest,
+        version: resolvedVersion,
         manifest: manifestResult.manifest,
         packageMetadata: packageMeta,
         versionMetadata,
@@ -157,7 +166,7 @@ function invalidMetadata(message: string): JsrPluginValidationResult {
 
 function readPackageMeta(
   json: unknown,
-): { readonly latest: string; readonly isYanked: boolean } | undefined {
+): PackageMeta | undefined {
   const record = asRecord(json);
   const versions = asRecord(record.versions);
   const latest = resolveInstallableVersion(record.latest, versions);
@@ -168,7 +177,28 @@ function readPackageMeta(
   return {
     latest,
     isYanked: latestMetadata.yanked === true,
+    versions,
   };
+}
+
+interface PackageMeta {
+  readonly latest: string;
+  readonly isYanked: boolean;
+  readonly versions: Readonly<Record<string, unknown>>;
+}
+
+/**
+ * Resolve the version to install: the CLI's own release version when that exact version is
+ * published and not yanked, otherwise the package's latest.
+ *
+ * A prerelease CLI must install the matching prerelease plugin. Resolving `latest` makes a
+ * `0.0.3-canary.N` CLI pull the stable channel's plugin, so its schema fragments and scaffold
+ * manifest come from an older release than the project being scaffolded.
+ */
+function resolveInstallVersion(meta: PackageMeta, cliVersion: string): string {
+  const candidate = asRecord(meta.versions[cliVersion]);
+  const isPublished = Object.hasOwn(meta.versions, cliVersion);
+  return isPublished && candidate.yanked !== true ? cliVersion : meta.latest;
 }
 
 function resolveInstallableVersion(
