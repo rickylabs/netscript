@@ -117,11 +117,21 @@ After the release content is ready and before creating the stable release:
 4. The temporary `release/canary-<version>` branch is deleted best-effort. The canary tag remains as
    provenance and collision evidence.
 
-Canary versions are immutable. Never delete or reuse a failed canary version. If a canary was
-published and then its production E2E failed, preserve the workflow and tag evidence, yank that
-version for every package member that published it, fix forward, and dispatch the next `canary.N`.
-Yanking removes it from normal resolution without erasing the audit record; yanked versions still
-count when choosing the next N.
+Canary versions are immutable. Never delete or reuse a failed canary version.
+
+**A failed canary is not an incident — it is the canary doing its job (owner decision, 2026-08-02).**
+If a canary published and its pinned production E2E then failed, preserve the workflow and tag
+evidence, fix forward, and dispatch the next `canary.N`. **Do not yank the failed canary.** A canary
+is a prerelease: normal semver resolution never selects it, so a failed one is inert for consumers
+and remains useful as audit evidence of what was tried. Failed canary versions still count when
+choosing the next N.
+
+Yanking stays available for the case it was written for — a canary that is actively harmful to
+resolve, for example one that published corrupt or wrong-identity artifacts. That is a judgement
+call for the owner, not the default response to a red gate.
+
+The stable channel is unaffected either way: `release/canary-pair` is written only on a green pair,
+and `release:publish` fails closed without it.
 
 ## Merge And Stable Publish Flow
 
