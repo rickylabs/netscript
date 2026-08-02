@@ -15,7 +15,8 @@ export function generateAspireCliTaskRunner(): string {
 
 const decoder = new TextDecoder();
 const guidance = ${JSON.stringify(ASPIRE_DASHBOARD_RESOLUTION_GUIDANCE)};
-const [mode, ...forwardedArgs] = Deno.args;
+const [mode, ...rawForwardedArgs] = Deno.args;
+const forwardedArgs = rawForwardedArgs[0] === '--' ? rawForwardedArgs.slice(1) : rawForwardedArgs;
 
 if (mode !== 'otel' && mode !== 'export') {
   console.error('Expected task mode "otel" or "export".');

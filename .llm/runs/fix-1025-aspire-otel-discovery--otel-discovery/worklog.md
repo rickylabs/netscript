@@ -249,3 +249,52 @@ a claimed runtime result.
 - `docker ps -a` reported 0 running and 5 pre-existing stopped/exited containers:
   `postgres-29f040e0`, `garnet-apzbtmzt`, `redis-jvfyhumd`, `postgres-dda83380`, and
   `postgres-bc75ea00`. None was created or removed by this slice.
+
+## Design amendment — documented task argv repair
+
+- Public surface: unchanged task names and documented invocation. Both separator-bearing and bare
+  forms become valid through one emitted-runner normalization.
+- Domain rule: strip exactly one leading task separator from forwarded arguments; preserve all later
+  `--` tokens verbatim.
+- Ports/constants: no new port or extensible constant. Existing Aspire process boundary and task
+  modes are unchanged.
+- Commit slice: shared runner normalization plus emitted-source regression assertion, proven by
+  focused generator/validator tests, scoped wrappers, asset-barrel check, and quality gate.
+- Deferred: candidate/retry trimming, documentation edits, runtime-suite rerun, PR/issue metadata.
+
+## Documented task argv repair implementation and evidence — 2026-08-02
+
+### Root cause and fix
+
+- Cloud run `30724453231`, job `91433488402` showed every candidate exiting 1 because the emitted
+  runner invoked `aspire otel -- traces ...`. Deno's explicit task separator was the first forwarded
+  argument, not syntax consumed before `Deno.args` reached the generated script.
+- The emitted runner now destructures `rawForwardedArgs` and removes exactly its index-zero value
+  when that value is `--`. Bare calls are unchanged, and later `--` values are preserved.
+- This normalization happens before the shared `mode` invocation, so both documented forms are
+  repaired: `deno task aspire:otel -- traces <resource>` and
+  `deno task aspire:export -- --dashboard-url <url> -o <path>`. Their bare equivalents use the same
+  normalized array without modification. Generator tests retain both emitted task definitions and
+  assert the exact leading-only strip in the emitted source.
+- The runtime gate still contains `['task', 'aspire:otel', '--', 'traces', ...]`; it continues to
+  exercise the documented form. Candidate order, `MAX_ATTEMPTS = 10`, and settle delay are unchanged.
+- Audit command over `packages/cli/src/kernel/templates/` found no other generated wrapper that
+  splits and forwards `Deno.args` this way; `aspire-cli-task.ts` was the sole match.
+
+### Validation
+
+| Command | Exit | Actual output |
+| --- | ---: | --- |
+| Direct `deno fmt` on the two explicit template files | 1 | `error: No target files found.` The workspace formatter excludes this root; no later command in that initial chain ran. |
+| `deno task check:assets-barrel` | 0 | Asset generation completed and watched generated barrels had no diff. |
+| `deno test --allow-all .../generators_test.ts .../validate-aspire-task-traces_test.ts` | 0 | `ok | 24 passed | 0 failed` (19 generator and 5 validator tests). |
+| Scoped `run-deno-check.ts --root packages/cli/src/kernel/templates/workspace --ext ts,tsx` | 0 | 8 files, 1 batch, 0 failed batches, 0 diagnostics. |
+| Matching scoped `run-deno-lint.ts` | 0 | 8 files, 0 findings. |
+| Matching scoped `run-deno-fmt.ts` | 0 | 8 files, 0 findings; this wrapper is the repository-authoritative format verdict. |
+| `deno task quality:gate` | 0 | Quality scan `ok: true`, zero findings; architecture/dependency checks completed with existing warnings only. |
+| `git diff --check` | 0 | No whitespace errors. |
+
+No AppHost or container was started. Final `aspire ps --format Json --non-interactive --nologo`
+returned `[]`; `docker ps -a` reported 0 running and the same five pre-existing exited containers
+(`postgres-29f040e0`, `garnet-apzbtmzt`, `redis-jvfyhumd`, `postgres-dda83380`,
+`postgres-bc75ea00`). They were left untouched.

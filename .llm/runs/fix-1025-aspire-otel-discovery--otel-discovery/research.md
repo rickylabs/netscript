@@ -101,3 +101,17 @@ bare command as the primary route and retain explicit-dashboard fallback for the
   requested display name; no resource form is hard-coded as the sole truth.
 - The requested `.agents/skills/deno/SKILL.md` is absent. The available repository Deno authority,
   `.agents/skills/netscript-deno-toolchain/SKILL.md`, is used instead.
+
+## CI argv discriminator — 2026-08-02
+
+- Cloud run `30724453231`, job `91433488402` proved the candidate loop was reaching a real DCP
+  identity (`workers-api-saqkntfq`) but every generated task invocation exited 1 before telemetry
+  lookup. Aspire reported the literal separator and all following tokens as unmatched.
+- Root cause: Deno removes the task name but retains the explicit task separator in `Deno.args` for
+  this emitted command shape. The runner destructured only `mode`, leaving `forwardedArgs` beginning
+  with `--`, and constructed `aspire otel -- traces ...`.
+- The same runner serves `aspire:export`, so its documented `deno task aspire:export -- ...` form has
+  the identical defect. Stripping only `forwardedArgs[0]` repairs both modes without changing any
+  later literal separator supplied by the caller.
+- Repository audit of `packages/cli/src/kernel/templates/` found no other generated wrapper that
+  destructures `Deno.args` into forwarded arguments this way. The affected runner is the sole match.

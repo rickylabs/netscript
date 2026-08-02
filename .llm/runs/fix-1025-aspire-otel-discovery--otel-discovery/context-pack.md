@@ -55,3 +55,15 @@
   suite was run by instruction. Cloud CI must determine which candidate wins and whether acceptance
   box 5 can close.
 - Teardown is clean: `aspire ps` empty, no running Docker containers, no resources created here.
+
+## Documented task argv repair — 2026-08-02
+
+- CI diagnostics proved the generated runner forwarded Deno's leading task separator and built
+  `aspire otel -- traces ...`; identity resolution was not the immediate failure.
+- The runner now strips only a leading `--` from forwarded arguments. This repairs both otel/export
+  documented and bare forms while preserving later separators and all previously landed fallback
+  behavior.
+- The gate retains its documented separator. Focused tests: 24 passed; scoped check/lint/fmt,
+  asset-barrel, and quality gates pass. No other generated task wrapper has the same pattern.
+- No runtime resources were started; teardown remains empty/unchanged. Next action is commit, push,
+  and local/remote SHA verification; cloud CI is the runtime authority.

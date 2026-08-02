@@ -257,3 +257,20 @@ runtime assertion; it does not redesign the generated task or change dashboard s
   CLI export changes.
 - Deferred: full local `scaffold.runtime`, dashboard security changes, PR/issue metadata, and
   desktop-native reporting beyond a one-line amendment.
+
+## Documented task argv repair amendment — 2026-08-02
+
+The cloud diagnostic closes the remaining cause question. Keep the gate and documentation intact;
+repair the shared emitted runner by normalizing only a leading Deno task separator.
+
+1. Replace the direct forwarded-argument destructure with raw arguments plus
+   `rawForwardedArgs[0] === '--' ? rawForwardedArgs.slice(1) : rawForwardedArgs`.
+2. Preserve the bare-first flow, explicit-dashboard fallback, duplicate-dashboard guard, and
+   command-start guidance without modification.
+3. Add an emitted-source assertion for the exact leading-only normalization and retain the gate's
+   documented `deno task aspire:otel -- traces ...` command.
+4. Regenerate/check asset barrels, run focused/scoped/quality gates, audit sibling generated
+   wrappers, and verify teardown. No runtime AppHost is needed for this deterministic argv fix.
+
+Risk is limited to over-stripping caller arguments; the exact index-zero conditional prevents it.
+No public API, dashboard security, retry window, candidate list, PR metadata, or issue state changes.
