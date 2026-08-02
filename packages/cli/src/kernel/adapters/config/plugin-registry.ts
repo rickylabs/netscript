@@ -31,6 +31,7 @@ type RegisteredPluginSnapshot = Pick<
   | 'entrypoints'
   | 'runtime'
   | 'runtimeConfig'
+  | 'doctor'
   | 'cli'
 >;
 
@@ -56,6 +57,7 @@ interface ScaffoldPluginMetadata {
     readonly serviceEntrypoint?: string;
     readonly servicePort?: number;
     readonly backgroundPort?: number;
+    readonly doctorEntrypoint?: string;
     readonly permissions?: readonly string[];
   };
 }
@@ -113,6 +115,8 @@ function normalizePluginManifest(
       }
       : undefined,
     runtimeConfig: definition.runtimeConfig,
+    doctor: definition.doctor,
+    cli: definition.cli,
   };
 }
 
@@ -163,10 +167,18 @@ export async function loadRegisteredPluginMetadata(
 ): Promise<Record<string, RegisteredPluginConfig>> {
   const plugins: Record<string, RegisteredPluginConfig> = {};
   for (const spec of resolvePluginSpecs(config)) {
-    const metadata = await resolveScaffoldPluginMetadata(projectRoot, spec);
-    const plugin = metadata
-      ? normalizeScaffoldPluginMetadata(projectRoot, metadata, config.paths)
-      : normalizePluginSpecMetadata(projectRoot, spec, config.paths);
+    let plugin: RegisteredPluginConfig;
+    try {
+      const metadata = await resolveScaffoldPluginMetadata(projectRoot, spec);
+      plugin = metadata
+        ? normalizeScaffoldPluginMetadata(projectRoot, metadata, config.paths)
+        : normalizePluginSpecMetadata(projectRoot, spec, config.paths);
+    } catch (error) {
+      plugin = {
+        ...normalizePluginSpecMetadata(projectRoot, spec, config.paths),
+        manifestError: error instanceof Error ? error.message : String(error),
+      };
+    }
     plugins[resolvePluginLocalName(plugin.name)] = plugin;
   }
   return plugins;
@@ -236,6 +248,7 @@ function normalizeScaffoldPluginMetadata(
     workdir,
     rootDir: resolve(projectRoot, workdir),
     permissions: permissions ? [...permissions] : undefined,
+    doctor: metadata.officialSource?.doctorEntrypoint,
     service: serviceEntrypoint
       ? {
         entrypoint: serviceEntrypoint,
@@ -453,6 +466,7 @@ function resolveRegisteredPluginSnapshot(
     runtimeConfig: definition.contributions.runtimeConfigTopics?.length
       ? { schemas: [] }
       : undefined,
+    doctor: definition.contributions.doctor,
     cli: definition.contributions.cli,
   };
 }

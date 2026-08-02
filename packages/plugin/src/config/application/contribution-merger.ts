@@ -22,5 +22,6 @@ export function mergeContributions(
     telemetry: [...(left.telemetry ?? []), ...(right.telemetry ?? [])],
     migrations: [...(left.migrations ?? []), ...(right.migrations ?? [])],
     aspire: right.aspire ?? left.aspire,
+    doctor: right.doctor ?? left.doctor,
   };
 }

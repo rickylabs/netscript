@@ -25,14 +25,15 @@ export interface GenerateSagaRegistryResult {
   readonly sagas: readonly string[];
 }
 
-const DEFAULT_REGISTRY_PATH = '.netscript/generated/plugin-sagas/sagas.registry.ts';
+/** Canonical project-relative generated saga registry path. */
+export const SAGAS_REGISTRY_PATH = '.netscript/generated/plugin-sagas/sagas.registry.ts';
 
 /** Generate a static registry from fluent saga definition modules. */
 export async function generateSagaRegistry(
   files: ProjectFiles,
   options: GenerateSagaRegistryOptions = {},
 ): Promise<GenerateSagaRegistryResult> {
-  const registryPath = options.registryPath ?? DEFAULT_REGISTRY_PATH;
+  const registryPath = options.registryPath ?? SAGAS_REGISTRY_PATH;
   const inspected = await inspectSagasProject(files, { roots: options.roots });
   const sourcePaths = inspected.entries.map((entry) => entry.sourcePath).filter((path) =>
     isIncludedSourcePath(path, options)

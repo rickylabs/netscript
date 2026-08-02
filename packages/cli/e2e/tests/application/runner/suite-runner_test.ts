@@ -63,14 +63,26 @@ Deno.test('suite runner emits a failed report and prunes only created Docker res
 
 Deno.test('suite runner skips cleanup phase when cleanup is disabled', async () => {
   const commands: CommandRequest[] = [];
+  let pluginDoctorRuns = 0;
   const executor: CommandExecutor = {
     run(request): Promise<CommandResult> {
       commands.push(request);
+      const isPluginDoctor = request.command.includes('plugin') &&
+        request.command.includes('doctor');
+      if (isPluginDoctor) pluginDoctorRuns++;
+      const isUnhealthyPluginDoctor = isPluginDoctor && pluginDoctorRuns === 1;
       return Promise.resolve({
         command: request.command,
         cwd: request.cwd,
-        code: 0,
-        stdout: '',
+        code: isUnhealthyPluginDoctor ? 1 : 0,
+        stdout: isUnhealthyPluginDoctor
+          ? [
+            '.netscript/generated/plugin-workers/job-registry.ts',
+            '.netscript/generated/plugin-sagas/sagas.registry.ts',
+            'deno run -A jsr:@netscript/plugin-workers@',
+            'deno run -A jsr:@netscript/plugin-sagas@',
+          ].join('\n')
+          : '',
         stderr: '',
         timedOut: false,
       });

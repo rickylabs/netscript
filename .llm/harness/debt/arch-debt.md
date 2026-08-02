@@ -2139,3 +2139,17 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Gate:** Close when doctrine-06 Archetype 5 Minimum shape matches the observed authoritative
   `plugins/*` layout and sibling package names, and the archetype-5 profile no longer defers to the
   observed layout.
+
+## packages/cli — published plugin doctor module resolution (`cli-plugin-doctor-published-module`)
+
+- **Reason:** Issue #1022 adds manifest-declared `.ts` doctor adapter modules resolved relative to
+  copied plugin roots. Local and copied-source paths are tested, but a compiled CLI consuming a
+  remotely published JSR plugin may not have a filesystem-backed `.ts` path at that root.
+- **Owner:** CLI/plugin runtime integration.
+- **Target:** Before claiming published-binary parity for plugin-contributed doctor checks.
+- **Linked plan:** `.llm/runs/fix-1022-plugin-doctor-truth--codex/plan.md`; PR #1045.
+- **Created:** 2026-08-01
+- **Status:** open, DEBT_ACCEPTED — local/copied-source behavior ships while production-package
+  resolution receives a dedicated smoke and URL-aware module locator.
+- **Gate:** Close when a compiled/public CLI installs a JSR plugin, resolves its doctor adapter,
+  executes a contributed check, and reports import failures as structured doctor errors.

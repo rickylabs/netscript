@@ -64,19 +64,14 @@ function pluginInstallCommand(
       return cli(context, ...args);
     }
 
-    if (context.request.options.packageSource === PACKAGE_SOURCE.JSR) {
+    if (context.request.options.packageSource !== PACKAGE_SOURCE.JSR) {
+      args.push(
+        '--local-path',
+        join(context.project.repoRoot, 'plugins', localPluginDir(kind)),
+      );
       return cli(context, ...args);
     }
 
-    if (kind === PLUGIN.SAGA) {
-      return [
-        'deno',
-        'run',
-        '-A',
-        'packages/cli/bin/netscript-dev.ts',
-        ...args,
-      ];
-    }
     return cli(context, ...args);
   };
 }

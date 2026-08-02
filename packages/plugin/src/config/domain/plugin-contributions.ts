@@ -35,4 +35,6 @@ export interface PluginContributions {
   readonly migrations?: readonly MigrationContribution[];
   /** Aspire contribution module reference. */
   readonly aspire?: string;
+  /** Plugin adapter module containing doctor checks. */
+  readonly doctor?: string;
 }

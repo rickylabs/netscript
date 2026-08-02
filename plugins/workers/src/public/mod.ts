@@ -107,6 +107,7 @@ const workersManifest = definePlugin('@netscript/plugin-workers', VERSION)
     command: 'deno task workers:e2e',
   }])
   .withAspire('./src/aspire/mod.ts')
+  .withDoctor('./src/adapter/plugin.ts')
   .withHooks({
     setup: (ctx): void => {
       ctx.logger.info('Workers plugin loaded', {

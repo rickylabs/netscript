@@ -42,6 +42,10 @@ export interface CommandGateDefinition extends BaseGateDefinition {
   readonly command: CommandFactory;
   readonly outputMode?: CommandOutputMode;
   readonly failureHint?: string;
+  /** Exit code required for this gate; defaults to zero. */
+  readonly expectedExitCode?: number;
+  /** Substrings that must all appear in captured standard output. */
+  readonly stdoutIncludes?: readonly string[];
 }
 
 /** Semantic gate backed by an HTTP health probe. */

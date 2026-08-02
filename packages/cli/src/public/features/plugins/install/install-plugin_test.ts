@@ -449,6 +449,10 @@ describe('public install plugin flow', () => {
         "@netscript/plugin-workers/runtime",
       );
       assertStringIncludes(
+        await Deno.readTextFile(join(projectRoot, 'workers/scaffold.plugin.json')),
+        'plugins/workers/doctor.ts',
+      );
+      assertStringIncludes(
         await Deno.readTextFile(join(projectRoot, 'appsettings.json')),
         `"Entrypoint": "${netscriptJsrSpecifier('plugin-workers', '/services')}"`,
       );
