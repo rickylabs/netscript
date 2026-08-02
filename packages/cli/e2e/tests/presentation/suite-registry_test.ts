@@ -107,6 +107,7 @@ Deno.test('runtime suite includes full scaffold, database, runtime, and behavior
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_PLUGINS_HEALTH), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_OTEL_WEBHOOK), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_OTEL_TRACES), true);
+  assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_OTEL_TASK_TRACES), true);
 });
 
 // #954: the suite used to start the whole AppHost without ever waiting on the generated app

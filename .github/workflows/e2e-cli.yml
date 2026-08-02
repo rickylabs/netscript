@@ -230,7 +230,11 @@ jobs:
 
       - name: Full scaffold runtime E2E (one pass, with cleanup)
         if: env.RUN == 'true'
-        run: deno task e2e:cli run scaffold.runtime --cleanup --format pretty
+        run: deno task e2e:cli run scaffold.runtime --cleanup --format pretty --report .llm/tmp/e2e-report-scaffold-runtime.json
+
+      - name: Print failed E2E gate evidence
+        if: failure() && env.RUN == 'true'
+        run: deno run --allow-read .llm/tools/e2e/print-failed-report-steps.ts .llm/tmp/e2e-report-scaffold-runtime.json
 
       - name: Upload E2E report artifact
         if: always() && env.RUN == 'true'

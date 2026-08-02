@@ -134,6 +134,8 @@ export function generateReadme(options: ReadmeOptions): string {
   if (!options.noAspire) {
     lines.push('| `cd aspire && aspire restore` | Restore Aspire SDK modules (run once) |');
     lines.push('| `deno task aspire:start` | Start Aspire orchestration with the configurable cold-start budget |');
+    lines.push('| `deno task aspire:otel -- traces <resource>` | Query detached AppHost telemetry with automatic dashboard fallback |');
+    lines.push('| `deno task aspire:export -- -o telemetry.zip` | Export detached AppHost telemetry with automatic dashboard fallback |');
   }
   lines.push('| `deno task check` | Type-check all workspace members |');
   lines.push('| `deno task lint`  | Run linter |');
@@ -146,6 +148,18 @@ export function generateReadme(options: ReadmeOptions): string {
     '| `deno run -A packages/cli/bin/netscript.ts --help` | Show public CLI commands |',
   );
   lines.push('');
+
+  if (!options.noAspire) {
+    lines.push('### Detached Aspire telemetry');
+    lines.push('');
+    lines.push(
+      'After generating traffic, use `deno task aspire:otel -- traces <resource>` or ' +
+        '`deno task aspire:export -- -o telemetry.zip`. These tasks first use Aspire automatic ' +
+        'discovery, then resolve this workspace’s dashboard URL from `aspire ps --format Json` ' +
+        'and retry explicitly if automatic discovery fails.',
+    );
+    lines.push('');
+  }
 
   if (!options.noAspire) {
     lines.push('## Deployment CI');

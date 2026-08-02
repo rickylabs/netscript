@@ -7,6 +7,7 @@ import { generateDenoJson } from '../../templates/workspace/deno-json.ts';
 import { generateTsConfig } from '../../templates/workspace/tsconfig.ts';
 import { generateNetScriptConfig } from '../../templates/workspace/netscript-config.ts';
 import { generateReadme } from '../../templates/workspace/generate-readme.ts';
+import { generateAspireCliTaskRunner } from '../../templates/workspace/aspire-cli-task.ts';
 import { generateEditorConfigFiles } from '../../adapters/scaffold/editor-config.ts';
 import { loadRootScaffoldTemplateAssets } from '../../adapters/templates/scaffold-template-assets.ts';
 import { generateAppsettings } from '../../templates/aspire/generate-appsettings.ts';
@@ -213,6 +214,24 @@ export async function scaffoldRoot(
   //    port and the target port, which is what `aspire start --isolated` needs
   //    to place two workspaces on one machine (#952).
   if (!options.noAspire) {
+    const netscriptDir = join(targetPath, SCAFFOLD_DIRS.NETSCRIPT);
+    if (!directoriesCreated.includes(netscriptDir)) {
+      await context.scaffolder.createDir(netscriptDir);
+      directoriesCreated.push(netscriptDir);
+    }
+    const aspireCliTaskPath = join(netscriptDir, SCAFFOLD_FILES.ASPIRE_CLI_TASK);
+    if (
+      await context.scaffolder.writeFile(
+        aspireCliTaskPath,
+        generateAspireCliTaskRunner(),
+        options.force,
+      )
+    ) {
+      filesCreated.push(aspireCliTaskPath);
+    } else {
+      filesSkipped.push(aspireCliTaskPath);
+    }
+
     const appsettingsContent = generateAppsettings({
       name: options.name,
       appName: options.appName,

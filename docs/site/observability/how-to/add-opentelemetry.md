@@ -146,6 +146,23 @@ task executor emits <code>task.execute</code> spans. All of that is automatic �
 real instrumentation from <code>@netscript/telemetry</code>, not the scaffold helpers.
 {{ /comp }}
 
+### Query or export a detached AppHost
+
+Generated workspaces include task routes that do not require you to discover or remember the
+dashboard URL:
+
+```bash
+deno task aspire:otel -- traces <resource>
+deno task aspire:otel -- logs <resource>
+deno task aspire:export -- -o telemetry.zip
+```
+
+Generate traffic before querying traces; a healthy but idle AppHost legitimately returns an empty
+array. The tasks forward all arguments, try Aspire's automatic detached discovery first, and retry
+with the matching `dashboardUrl` from `aspire ps --format Json` if needed. If bare Aspire reports
+`The dashboard is not available`, use these task routes—the collector and dashboard data may still
+be healthy.
+
 ## Step 3 — Add your own spans in a job handler (the real way today)
 
 The scaffold hands you `createJobTools(ctx)` so you can author against `log`, `progress`, and
