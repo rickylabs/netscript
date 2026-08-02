@@ -67,3 +67,11 @@
   asset-barrel, and quality gates pass. No other generated task wrapper has the same pattern.
 - No runtime resources were started; teardown remains empty/unchanged. Next action is commit, push,
   and local/remote SHA verification; cloud CI is the runtime authority.
+
+## Runtime proof and stale-test cleanup — 2026-08-02
+
+- Cloud `scaffold.runtime` is green on the argv fix: 63 passed, 0 failed, including the generated
+  otel task gate.
+- Updated only the stale scaffold-emission assertion to use the generated-file banner; no product
+  code changed. Focused tests: 25 passed; scoped kernel check/lint/fmt: 327 files, zero findings.
+- Teardown remains clean and unchanged. Next action is commit, explicit-refspec push, and SHA match.

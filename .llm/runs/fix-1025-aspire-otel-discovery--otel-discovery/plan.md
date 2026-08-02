@@ -274,3 +274,10 @@ repair the shared emitted runner by normalizing only a leading Deno task separat
 
 Risk is limited to over-stripping caller arguments; the exact index-zero conditional prevents it.
 No public API, dashboard security, retry window, candidate list, PR metadata, or issue state changes.
+
+## Stale scaffold assertion cleanup — 2026-08-02
+
+Cloud runtime proof is green (`63 passed, 0 failed`); only `plan-init_test.ts` retained a variable-name
+assertion from before the argv normalization. Replace it with the generated-file banner so this test
+continues to prove runner emission/omission, while exact source-shape assertions remain exclusively
+in `generators_test.ts`. No product source changes or runtime rerun are required.
