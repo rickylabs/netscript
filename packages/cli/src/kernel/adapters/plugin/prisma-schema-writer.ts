@@ -40,6 +40,7 @@ export async function writePluginSchemaFragment(
   );
   const preparedContent = await guardPrismaSchemaFragment(
     schemaRoot,
+    targetPath,
     pluginName,
     sourcePath,
     content,
@@ -53,12 +54,13 @@ export async function writePluginSchemaFragment(
 
 async function guardPrismaSchemaFragment(
   schemaRoot: string,
+  targetPath: string,
   pluginName: string,
   sourcePath: string,
   content: string,
   fs: FileSystemPort,
 ): Promise<string | null> {
-  const existing = await collectSchemaDeclarations(schemaRoot, fs);
+  const existing = await collectSchemaDeclarations(schemaRoot, targetPath, fs);
   const incoming = scanPrismaDeclarations(content);
   const seenIncoming = new Map<string, PrismaDeclaration>();
   const redundant: PrismaDeclaration[] = [];
@@ -98,13 +100,20 @@ async function guardPrismaSchemaFragment(
 
 async function collectSchemaDeclarations(
   schemaRoot: string,
+  targetPath: string,
   fs: FileSystemPort,
 ): Promise<Map<string, ExistingPrismaDeclaration[]>> {
   const declarations = new Map<string, ExistingPrismaDeclaration[]>();
   if (!(await fs.exists(schemaRoot))) return declarations;
 
+  // The fragment's own previously-written copy lives under schemaRoot. Reinstalling
+  // (`plugin install --force`) must compare against the rest of the tree, never against
+  // itself: otherwise a changed fragment collides with its prior version and the error
+  // blames the plugin for conflicting with its own installed file.
+  const normalizedTarget = targetPath.replaceAll('\\', '/');
   for await (const entry of fs.walk(schemaRoot)) {
     if (!entry.isFile || !entry.path.endsWith('.prisma')) continue;
+    if (entry.path.replaceAll('\\', '/') === normalizedTarget) continue;
     for (const declaration of scanPrismaDeclarations(await fs.readFile(entry.path))) {
       const matches = declarations.get(declaration.name) ?? [];
       matches.push({ path: entry.path.replaceAll('\\', '/'), declaration });

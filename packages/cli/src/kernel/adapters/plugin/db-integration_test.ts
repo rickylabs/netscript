@@ -278,3 +278,38 @@ Deno.test('copyPluginSchemasToRootDb deduplicates an identical base declaration'
   }]);
   assertEquals(await fs.exists(targetPath), false);
 });
+
+Deno.test('copyPluginSchemasToRootDb reinstalls a changed fragment without self-collision', async () => {
+  const fs = new MemoryFileSystemAdapter();
+  const scaffolder = new Scaffolder(new StringTemplateAdapter(fs), fs);
+  const targetPath = '/project/database/postgres/schema/plugins/auth/auth.prisma';
+  // A prior install already wrote the fragment; the plugin now ships a changed body.
+  await fs.writeFile(targetPath, 'model AuthUser {\n  id String @id\n}\n');
+  const updated = 'model AuthUser {\n  id String @id\n  email String\n}\n';
+
+  const results = await copyPluginSchemasToRootDb(
+    '/project',
+    'auth',
+    {
+      requiresDb: true,
+      dbExists: true,
+      targetConfigKey: 'postgres',
+      targetEngine: 'postgres',
+      needsProvisioning: false,
+    },
+    { fs, scaffolder },
+    {
+      packageFragments: [{ path: 'database/auth.prisma', content: updated }],
+      schemaDeclared: true,
+      overwrite: true,
+    },
+  );
+
+  // The fragment must not be compared against its own previously-written copy.
+  assertEquals(results, [{
+    sourcePath: 'database/auth.prisma',
+    targetPath,
+    written: true,
+  }]);
+  assertEquals(await fs.readFile(targetPath), updated);
+});
