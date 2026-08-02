@@ -69,7 +69,7 @@ model SagaRuntimeCorrelation {
   createdAt      DateTime @default(now()) @map("created_at")
   updatedAt      DateTime @updatedAt @map("updated_at")
 
-  @@unique([sagaId, correlationKey], name: "saga_runtime_correlation_saga_key")
+  @@unique([sagaId, correlationKey], map: "saga_runtime_correlation_saga_key")
   @@index([instanceId])
   @@map("saga_runtime_correlation")
 }

@@ -10,7 +10,20 @@ import type {
   SagaTransitionRecord,
 } from '../runtime/mod.ts';
 
-import { PrismaSagaStore, type PrismaSagaStoreClient } from './prisma-saga-store.ts';
+import {
+  PrismaSagaStore,
+  type PrismaSagaStoreClient,
+  SAGA_RUNTIME_CORRELATION_SELECTOR,
+} from './prisma-saga-store.ts';
+
+Deno.test('PrismaSagaStore selector is derived from the shipped schema fragment', async () => {
+  const schema = await Deno.readTextFile(shippedSagaSchemaPath());
+
+  assertEquals(
+    compoundUniqueSelector(schema, 'SagaRuntimeCorrelation', ['sagaId', 'correlationKey']),
+    SAGA_RUNTIME_CORRELATION_SELECTOR,
+  );
+});
 
 Deno.test('PrismaSagaStore round-trips state envelopes', async () => {
   const store = new PrismaSagaStore({ prisma: new MemoryPrismaSagaClient() });
@@ -219,17 +232,23 @@ class MemoryPrismaSagaClient implements PrismaSagaStoreClient {
 
   readonly sagaRuntimeCorrelation = {
     findUnique: (args: {
-      where: { sagaId_correlationKey: { sagaId: string; correlationKey: string } };
+      where: {
+        [SAGA_RUNTIME_CORRELATION_SELECTOR]: { sagaId: string; correlationKey: string };
+      };
     }): Promise<CorrelationRow | null> =>
       Promise.resolve(
-        this.#correlations.get(correlationKey(args.where.sagaId_correlationKey)) ?? null,
+        this.#correlations.get(
+          correlationKey(args.where[SAGA_RUNTIME_CORRELATION_SELECTOR]),
+        ) ?? null,
       ),
     upsert: (args: {
-      where: { sagaId_correlationKey: { sagaId: string; correlationKey: string } };
+      where: {
+        [SAGA_RUNTIME_CORRELATION_SELECTOR]: { sagaId: string; correlationKey: string };
+      };
       update: { instanceId: string };
       create: CorrelationRow;
     }): Promise<unknown> => {
-      const key = correlationKey(args.where.sagaId_correlationKey);
+      const key = correlationKey(args.where[SAGA_RUNTIME_CORRELATION_SELECTOR]);
       const current = this.#correlations.get(key);
       const next = current ? { ...current, ...args.update } : { ...args.create };
       this.#correlations.set(key, next);
@@ -254,4 +273,26 @@ class MemoryPrismaSagaClient implements PrismaSagaStoreClient {
 
 function correlationKey(input: { sagaId: string; correlationKey: string }): string {
   return `${input.sagaId}:${input.correlationKey}`;
+}
+
+function shippedSagaSchemaPath(): string {
+  return new URL('../../../../plugins/sagas/database/sagas.prisma', import.meta.url).pathname;
+}
+
+function compoundUniqueSelector(
+  schema: string,
+  modelName: string,
+  expectedFields: readonly string[],
+): string {
+  const escapedModelName = modelName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const model = schema.match(new RegExp(`model\\s+${escapedModelName}\\s*\\{([\\s\\S]*?)\\n\\}`));
+  if (!model) throw new Error(`Missing Prisma model ${modelName}.`);
+
+  const unique = model[1].match(/@@unique\(\[([^\]]+)\]([^)]*)\)/);
+  if (!unique) throw new Error(`Missing compound unique constraint on ${modelName}.`);
+
+  const fields = unique[1].split(',').map((field) => field.trim());
+  assertEquals(fields, expectedFields);
+  const explicitClientName = unique[2].match(/\bname\s*:\s*"([^"]+)"/);
+  return explicitClientName?.[1] ?? fields.join('_');
 }
