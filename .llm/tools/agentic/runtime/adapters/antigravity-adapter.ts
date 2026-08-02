@@ -43,6 +43,13 @@ export interface AntigravityEvidenceRequest {
   readonly model?: string;
   readonly agent?: string;
   readonly project?: string;
+  /**
+   * Trades the sandbox for `--dangerously-skip-permissions`.
+   *
+   * Only for runs nobody is watching: in print mode a permission prompt does not fail, it returns
+   * an empty response with exit 0, which reads as a successful no-op rather than a blocked run.
+   */
+  readonly unattended?: boolean;
   readonly ownerAcceptedCapabilities?: readonly AntigravityCapability[];
 }
 interface AntigravityCommandOutput {
@@ -184,14 +191,19 @@ export class AntigravityEvidenceAdapter {
       1,
       Math.min(request.timeoutMs ?? ANTIGRAVITY_CANARY_TIMEOUT_MS, 60_000),
     );
+    // Without a project, `agy --print` roots its workspace at
+    // `~/.gemini/antigravity-cli/scratch` rather than `cwd` — the `init` event still reports `cwd`,
+    // so the mismatch is silent. A probe that only echoes a marker passes anyway; anything that
+    // touches a file does not, and observed behaviour under skipped permissions was to fabricate
+    // the missing file rather than report the failure. `--new-project` roots it at `cwd`.
     const args = [
       '--print',
       '--print-timeout',
       `${timeoutMs}ms`,
-      '--sandbox',
+      ...(request.unattended ? ['--dangerously-skip-permissions'] : ['--sandbox']),
       ...(request.model ? ['--model', request.model] : []),
       ...(request.agent ? ['--agent', request.agent] : []),
-      ...(request.project ? ['--project', request.project] : []),
+      ...(request.project ? ['--project', request.project] : ['--new-project']),
       prompt(request.probe),
     ];
     const controller = new AbortController();

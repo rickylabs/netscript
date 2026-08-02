@@ -18,7 +18,7 @@ Deno.test('finite Antigravity evidence proves exact headless markers without raw
   });
   assertEquals(result.status, 'passed');
   assertEquals(result.evidence.capabilities.headless, 'supported');
-  assertEquals(result.evidence.capabilities.structured_output, 'unsupported');
+  assertEquals(result.evidence.capabilities.structured_output, 'unknown');
   assertEquals(Object.keys(result.evidence.capabilities), [...ANTIGRAVITY_CAPABILITIES]);
   assertEquals(result.evidence.rawOutputRetained, false);
   assert(!JSON.stringify(result).includes('AGY_HEADLESS_CANARY_OK'));
@@ -100,4 +100,18 @@ Deno.test('AGENTS and GEMINI instruction markers are classified independently', 
   assertEquals(gemini.evidence.capabilities.gemini_instructions, 'supported');
   assertEquals(gemini.evidence.capabilities.agents_instructions, 'unknown');
   assert(!JSON.stringify([agents, gemini]).includes('INSTRUCTION_OK'));
+});
+
+Deno.test('structured output is read from the probe, not pinned', () => {
+  const base = { exitCode: 0, timedOut: false, stdout: '', stderr: '' };
+  assertEquals(
+    classifyAntigravityEvidence({ ...base, structuredOutputParsed: true })
+      .evidence.capabilities.structured_output,
+    'supported',
+  );
+  assertEquals(
+    classifyAntigravityEvidence({ ...base, structuredOutputParsed: false })
+      .evidence.capabilities.structured_output,
+    'unsupported',
+  );
 });
