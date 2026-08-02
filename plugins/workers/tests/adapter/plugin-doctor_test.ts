@@ -1,6 +1,7 @@
 import { assertEquals, assertStringIncludes } from '@std/assert';
 import { runDoctorCommand } from '@netscript/plugin/adapter';
 import { workersAdapterPlugin } from '../../src/adapter/plugin.ts';
+import { PLUGIN_PACKAGE_VERSION } from '../../src/package-metadata.generated.ts';
 
 Deno.test('workers doctor errors with a remediation when the job registry is absent', async () => {
   const report = await runDoctorCommand({
@@ -20,7 +21,7 @@ Deno.test('workers doctor errors with a remediation when the job registry is abs
   assertEquals(report.checks.find((check) => check.name.includes('exists'))?.ok, false);
   assertStringIncludes(
     report.checks.find((check) => check.name.includes('exists'))?.message ?? '',
-    'deno run -A jsr:@netscript/plugin-workers@0.0.2/cli compile-registry',
+    `deno run -A jsr:@netscript/plugin-workers@${PLUGIN_PACKAGE_VERSION}/cli compile-registry`,
   );
 });
 

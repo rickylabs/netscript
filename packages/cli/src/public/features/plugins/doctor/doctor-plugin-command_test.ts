@@ -9,6 +9,7 @@ import { createDoctorPluginCommand } from './doctor-plugin-command.ts';
 import { doctorPlugin } from './doctor-plugin-use-case.ts';
 import { compileWorkersRegistry } from '../../../../../../../plugins/workers/src/cli/registry-compiler.ts';
 import { generateRuntimeRegistries } from '../../../../../../../plugins/workers/src/cli/runtime-registry-generator.ts';
+import { PLUGIN_PACKAGE_VERSION as WORKERS_PACKAGE_VERSION } from '../../../../../../../plugins/workers/src/package-metadata.generated.ts';
 import { generateSagaRegistry } from '../../../../../../../plugins/sagas/src/cli/registry-generator.ts';
 
 Deno.test('plugin doctor exits non-zero when generated registries are absent', async () => {
@@ -45,7 +46,7 @@ Deno.test('plugin doctor exits non-zero when generated registries are absent', a
   assertStringIncludes(output.join('\n'), 'generated job registry exists');
   assertStringIncludes(
     output.join('\n'),
-    'deno run -A jsr:@netscript/plugin-workers@0.0.2/cli compile-registry',
+    `deno run -A jsr:@netscript/plugin-workers@${WORKERS_PACKAGE_VERSION}/cli compile-registry`,
   );
   assertStringIncludes(output.at(-1) ?? '', 'Plugin doctor failed: @netscript/plugin-workers');
 });
