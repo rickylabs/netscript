@@ -68,6 +68,7 @@ they do not add parser strategies or I/O.
 | 2026-08-04 | 1 | implementation | Regrouped the command-domain triplet without changing the root exports; added the documented projection subpath, deterministic operation index, public-import tests, and README entry. |
 | 2026-08-04 | 1 | review | Verified source-order indexing, dotted ids, method-path fallback, ignored Path Item metadata, unchanged 14-tool claims, pure-domain imports, and empty lock diff. |
 | 2026-08-04 | 2 | implementation/review | Added exact identity resolution and a committed ambiguity fixture. Verified id precedence, uppercase method-path fallback, case-variant refusal, duplicate-id ambiguity candidates, and non-executing substring suggestions. |
+| 2026-08-04 | 3 | implementation/review | Added the four-rung description ladder, a per-rung fixture, and the byte-identical 3657-byte generated no-DB spec. Verified the real operations have no operation summary/description and fire rung 3; nested schema property `summary` does not leak into operation descriptions. |
 
 ## Decisions
 
@@ -105,6 +106,10 @@ they do not add parser strategies or I/O.
 | Slice 2 identity tests | `deno test packages/mcp/tests/operation-index_test.ts packages/mcp/tests/canonical-identity_test.ts` | PASS | 6 passed, 0 failed. |
 | Slice 2 scoped check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/mcp --ext ts,tsx` | PASS | 73 files, one batch, zero diagnostics. |
 | Slice 2 hygiene | `git diff --check`; raw `git diff -- deno.lock` | PASS | No whitespace errors; lock diff empty. |
+| Slice 3 ladder tests | `deno test packages/mcp/tests/operation-index_test.ts packages/mcp/tests/canonical-identity_test.ts packages/mcp/tests/description-ladder_test.ts` | PASS | 8 passed, 0 failed; all four rungs and real generated rung 3 covered. |
+| Real fixture provenance | `cmp <P2-no-db-live-spec.json> packages/mcp/tests/fixtures/openapi/no-db-generated-openapi.json`; `wc -c` | PASS | Byte-identical; 3657 bytes. |
+| Slice 3 scoped check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/mcp --ext ts,tsx` | PASS | 75 files, one batch, zero diagnostics. |
+| Slice 3 hygiene | `git diff --check`; raw `git diff -- deno.lock` | PASS | No whitespace errors; lock diff empty. |
 
 ### Fitness Gates
 

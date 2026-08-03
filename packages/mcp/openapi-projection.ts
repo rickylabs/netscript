@@ -20,3 +20,4 @@ export type {
   ResolvedOperation,
   UnknownOperation,
 } from './src/domain/openapi/canonical-identity.ts';
+export { describeOpenApiOperation } from './src/domain/openapi/description-ladder.ts';
