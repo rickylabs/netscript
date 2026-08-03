@@ -152,6 +152,7 @@ compressed asset; never hand-edit the generated TypeScript or API text.
 | 2026-08-03T13:13:00+02:00 | S2 | real consumer fixture | Ran the local CLI from a temp consumer project with one exact `@netscript/config@0.0.3` dependency and the generated-project minimum-age exclusion. Exit 0 installed 168 docs files, the #1068 router, 4/4 config export sections, and matching version provenance; the temp project was removed. |
 | 2026-08-03T13:22:00+02:00 | S2 | opposite-family review | Separate Claude Opus 4.8 session `bcdbdd4b-edc6-42ec-82ea-11edf9b2404a` returned `SLICE_REVIEW: PASS` after checking optionality, exact-version resolution, every-export generation, fail-before-write behavior, symptom discovery, generated-asset freshness, and publication boundaries. Its two observations were non-blocking: VS Code hosts retain their pre-existing no-prose behavior, and the new source/generated assets must be included in the slice commit. |
 | 2026-08-03T13:30:00+02:00 | S2 | sign-off gates | Combined focused regression suite passed 37/37; scoped check/lint/fmt selected 31 TypeScript files with zero findings; links, accuracy, quality, architecture, CLI doc lint, publish dry-run, and byte-stable asset regeneration passed. The JSR simulation lists the 1.51 MB docs asset plus tool/skill assets. |
+| 2026-08-03T13:36:00+02:00 | S2 | commit/evidence | Committed and pushed `e1ba0b005`; detached pre-fix worktree at `d6265fa52` produced exit 1 when asserting `--with-docs` in real CLI help, while current help prints the several-megabyte flag. Checked all five evidenced #1061 boxes and posted issue/PR evidence comments `5165184953` / `5165185588`. |
 
 ## Decisions
 
@@ -203,6 +204,7 @@ compressed asset; never hand-edit the generated TypeScript or API text.
 | S2 CLI doc lint | PASS | 3 entrypoints, 0 diagnostics | Zero missing JSDoc or private-type references. |
 | S2 publish dry-run | PASS | `@netscript/cli@0.0.3`; generated docs 1.51 MB | Simulated JSR file list contains docs, tools, and skills assets. |
 | S2 generated asset freshness | PASS | regenerate + identical SHA-256 | Docs `71606ae0…`, tools `ea4529fb…`, skills `42880579…`. |
+| S2 pre-fix red | PASS | detached `d6265fa52` CLI help assertion exited 1 | Current CLI prints the `--with-docs` option; temporary worktree removed. |
 
 ### Runtime Gates
 

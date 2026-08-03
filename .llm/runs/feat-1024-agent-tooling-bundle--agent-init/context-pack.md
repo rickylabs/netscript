@@ -6,15 +6,15 @@
 | --- | --- |
 | Run ID | `feat-1024-agent-tooling-bundle--agent-init` |
 | Branch | `feat/1024-agent-tooling-bundle` |
-| Current phase | `implementation — slice 2 commit` |
+| Current phase | `implementation — merge-readiness` |
 | Archetype | `6 — CLI / Tooling` |
 | Scope overlays | `docs` |
 
 ## Current State
 
 PLAN-EVAL passed in evaluator commit `c31084e02`; slice 1 was signed off at `d6265fa52`. Slice 2 is
-implemented with focused tests, a successful site build, a real temp-project install, a clean
-opposite-family review, and clean scoped sign-off gates. It awaits its commit/evidence trail.
+implemented, independently reviewed, signed off, committed at `e1ba0b005`, pushed, and mirrored to
+#1061/PR #1092 with all five #1061 acceptance boxes checked. Merge-readiness gates are active.
 
 ## Completed
 
@@ -39,16 +39,17 @@ opposite-family review, and clean scoped sign-off gates. It awaits its commit/ev
   `bcdbdd4b-edc6-42ec-82ea-11edf9b2404a`.
 - Passed the 37-test combined regression suite, 31-file scoped check/lint/fmt, docs links/accuracy,
   quality, architecture, CLI doc lint, publish dry-run, and byte-stable generated-asset proof.
+- Committed/pushed slice 2 and posted its criterion-level evidence after a detached pre-fix red proof.
 
 ## In Progress
 
-- Slice-2 commit, push, and criterion-level evidence comments.
+- Full static/runtime gates, formal IMPL-EVAL, close-gate, and PR readiness.
 
 ## Next Steps
 
-1. Commit/push slice 2 and post criterion-level evidence.
-2. Begin full merge-readiness/runtime gates only after the S2 commit trail is reconciled.
-3. Run formal IMPL-EVAL, close-gate, and CI/readiness checks after runtime proof.
+1. Run the full static gates and guarded leak-check.
+2. Run the non-concurrent scaffold runtime and clone-independent installed-consumer proof.
+3. Mirror #1024 criteria 5–6, then run formal IMPL-EVAL, close-gate, and CI/readiness checks.
 
 ## Key Decisions
 
