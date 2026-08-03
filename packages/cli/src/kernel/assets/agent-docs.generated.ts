@@ -267,7 +267,7 @@ export const EMBEDDED_AGENT_DOCS_PACKAGE_EXPORTS: Readonly<Record<string, readon
   ],
   '@netscript/kv': ['.', './kvdex', './redis', './testing'],
   '@netscript/logger': ['.', './middleware', './orpc'],
-  '@netscript/mcp': ['.', './cli'],
+  '@netscript/mcp': ['.', './cli', './openapi-projection'],
   '@netscript/plugin': [
     '.',
     './abstracts',
