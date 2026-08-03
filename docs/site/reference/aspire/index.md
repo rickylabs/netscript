@@ -27,6 +27,7 @@ config, schema, type, adapter, and testing APIs live on typed sub-path exports:
 - [`@netscript/aspire/application`](#sub-path-exports) — AppHost composition, the contribution registry, and resolver helpers.
 - [`@netscript/aspire/adapters`](#sub-path-exports) — the SDK-neutral TypeScript builder adapter.
 - [`@netscript/aspire/testing`](#sub-path-exports) — in-memory builder, contribution base class, and test fixtures.
+- [`@netscript/aspire/public`](#sub-path-exports) — production aggregate re-exporting all public surfaces.
 
 ## Diagnostics (root export)
 
@@ -231,6 +232,10 @@ authors writing Aspire composition tests.
 | `MemoryAspireReference` | interface | — | Recorded relationship between two in-memory Aspire resources. |
 | `AspireResourceKind` | type alias | — | Aspire resource kinds produced by plugin contributions. |
 
+## Production aggregate (`@netscript/aspire/public`)
+
+The production aggregate entrypoint re-exports all public config, schema, types, constants, application composition, adapters, diagnostics, and testing symbols from a single import path. Use `@netscript/aspire/public` when an application or plugin prefers a unified import over individual sub-path specifiers, while reserving the root `@netscript/aspire` entrypoint exclusively for diagnostics (`inspectAspire`).
+
 ## Sub-path exports
 
 The following entrypoints are published alongside the root export. Each is generated from its own
@@ -246,6 +251,7 @@ The following entrypoints are published alongside the root export. Each is gener
 | `@netscript/aspire/application` | `./src/application/mod.ts` | AppHost composition, contribution registry, and resolvers. |
 | `@netscript/aspire/adapters` | `./src/adapters/mod.ts` | SDK-neutral TypeScript builder adapter. |
 | `@netscript/aspire/testing` | `./src/testing/mod.ts` | In-memory builder, contribution base class, and fixtures. |
+| `@netscript/aspire/public` | `./src/public/mod.ts` | Production aggregate re-exporting all public surfaces. |
 
 ---
 
