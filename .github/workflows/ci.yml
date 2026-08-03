@@ -128,9 +128,14 @@ jobs:
         # `--name-status -M` so renames/copies report BOTH sides — a
         # source->docs rename can never classify docs-only (see e2e-cli.yml).
         run: |
-          echo "changed<<__EOF__" >> "$GITHUB_OUTPUT"
-          git diff --name-status -M "$BASE_SHA...$HEAD_SHA" >> "$GITHUB_OUTPUT"
-          echo "__EOF__" >> "$GITHUB_OUTPUT"
+          diff_file="$(mktemp)"
+          trap 'rm -f "$diff_file"' EXIT
+          git diff --name-status -M "$BASE_SHA...$HEAD_SHA" > "$diff_file"
+          {
+            echo "changed<<__EOF__"
+            cat "$diff_file"
+            echo "__EOF__"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Extract root deno.json (base + head, tasks-only discrimination)
         id: rootcfg

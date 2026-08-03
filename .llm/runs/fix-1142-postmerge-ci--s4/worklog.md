@@ -11,7 +11,8 @@
 - Commit slice: make diff output transactional, skip downstream E2E jobs when the diff cannot be
   resolved, and guard all OpenHands work behind remote ref resolution. Proved by the negative-case
   transcripts and workflow YAML validation below.
-- Deferred scope: production E2E workflows, `ci.yml`, and release tooling are explicitly excluded.
+- Deferred scope: production E2E workflows and release tooling are explicitly excluded. The
+  supervisor lifted the `ci.yml` exclusion only for its remaining unsafe changed-files heredoc.
 - Contributor path: change classification stays in `e2e-cli.yml`; OpenHands trigger/ref handling
   stays at the beginning of the `agent` job in `openhands-agent.yml`.
 
@@ -24,6 +25,12 @@
 - `openhands-agent.yml` now resolves the requested branch/tag before acknowledging the trigger or
   checking out code. A missing ref emits a notice, records `exists=false`, exits successfully, and
   guards every later agent and housekeeping step. Other `ls-remote` failures remain genuine errors.
+- Supervisor follow-up corrected the same unsafe output ordering in `ci.yml` and
+  `surface-diff.yml`: each now computes the diff in a temporary file and appends the complete
+  heredoc only after success. Their bare `pull_request` triggers use GitHub's default activity set
+  (`opened`, `synchronize`, `reopened`), so they do not run on post-merge `closed` events. A genuine
+  pre-merge diff error therefore retains the existing fail-closed behavior and surfaces directly;
+  no `diff_unavailable` skip output is appropriate for these workflows.
 
 ## Negative-case evidence
 
@@ -72,13 +79,25 @@ exists=false
 | --- | --- | --- |
 | `command -v actionlint` | unavailable | No workflow linter is installed; the unapproved npm fallback was not used. |
 | Deno YAML parse | PASS | `YAML OK` for `.github/workflows/e2e-cli.yml` and `.github/workflows/openhands-agent.yml`. |
+| Follow-up Deno YAML parse | PASS | `YAML OK` for `.github/workflows/ci.yml` and `.github/workflows/surface-diff.yml`. |
 | Negative case: old diff output | PASS | Exit 128 leaves the intentionally reproduced unterminated `changed<<__EOF__` block. |
 | Negative case: new diff output | PASS | Exit 0 writes only `diff_unavailable=true` and prints the Git failure. |
 | Negative case: deleted ref | PASS | `git rev-parse --verify` takes the guarded notice path. |
-| `rtk git diff` self-review | PASS | Reviewed only the two owned workflows and this run worklog; no out-of-scope source change found. |
+| `rtk git diff` self-review | PASS | Reviewed all four owned workflows and this run worklog; no out-of-scope source change found. |
+| Remaining unsafe workflow pattern scan | PASS | No `changed<<__EOF__` opener is followed directly by a fallible `git diff` anywhere under `.github/workflows/`. |
 
 ## Reconcile
 
 - Issues #1142 and #1174 remain open for the supervisor-owned PR to close. No labels, milestones,
   comments, pushes, or PR state were changed by this implementation lane.
 - No plan/design drift observed from the locked S4 contract.
+
+## S4 sign-off (Tier-A review)
+
+- 2026-08-03 · Substantive review of `13a47acf4`: temp-file-then-append makes the GITHUB_OUTPUT
+  heredoc transactional; merged-PR short-circuit at classify job `if`; `diff_unavailable`
+  propagated to all three downstream jobs; every openhands-agent step after the ls-remote guard
+  gated on `target-ref.outputs.exists` (verified per-step, including the two `always()` steps).
+  Negative cases reproduced with transcripts (old pattern exit 128 → unterminated heredoc; new
+  pattern well-formed + true git error; deleted-ref guard notice path). YAML parse PASS both files;
+  actionlint honestly recorded unavailable.
