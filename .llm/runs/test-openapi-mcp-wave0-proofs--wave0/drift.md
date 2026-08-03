@@ -93,3 +93,19 @@ Drift is append-only.
 - **Action:** move `use harness` to line 1 without changing assignment content; reformat, commit,
   and repeat dry-run before live launch.
 - **Evidence:** dry-run diagnostic `must begin with use harness`.
+
+## 2026-08-03 — Separate implementation worktree required by sender ownership
+
+- **What:** The supervisor's API session is also the durable app-server sender for the provided PR
+  worktree, so the agentic suite refused a second implementation sender there.
+- **Source:** `agentic:launch-codex-slice` returned `duplicate_sender_risk`; session metadata proved
+  the recorded owner was this user-addressed supervisor turn.
+- **Expected:** PLAN-EVAL and implementation run in sessions separate from the supervisor without
+  violating one-sender-per-worktree.
+- **Actual:** A local no-upstream implementation branch/worktree was created at the approved commit:
+  `/home/codex/repos/ns005-proofs-impl`, `test/openapi-mcp-wave0-proofs-impl`. The child may draft
+  only; it cannot commit, push, or edit GitHub. Supervisor integration remains on the PR branch.
+- **Severity:** minor orchestration drift; role/model/effort and commit authority are unchanged.
+- **Action:** accept; use only thread `019fc95d-ce57-7893-98b3-36977bec0cf1` at that worktree and
+  transfer reviewed drafts into the PR worktree with explicit scope checks.
+- **Evidence:** `codex-thread-ids.md`; live launch observed provider/model/effort match.

@@ -85,6 +85,7 @@ logic into a product template in this run.
 | 2026-08-03 | S0        | PLAN-EVAL retry        | The generic agent adapter's 30-second bound expired before the first full evaluator turn could write an artifact. A fresh single-session retry used a 240-second orchestration bound without changing provider/model/guard policy.            |
 | 2026-08-03 | S0        | PLAN-EVAL              | Separate Qwen 3.7 Max/high session wrote `plan-eval.md` with `PASS` after rechecking source, RFC §4/§9, D1–D12, the open-decision sweep, all 5 commit slices, service gates, deferred scope, and JSR N/A.                                     |
 | 2026-08-03 | S0        | implementation handoff | Launcher dry-run failed closed because `use harness` followed the brief title instead of occupying line 1. Reordered the activation line; no implementation process was started.                                                              |
+| 2026-08-03 | S1        | implementation launch  | One tracked Codex `gpt-5.6-sol`/medium thread launched in a dedicated no-upstream worktree after one-sender safety rejected the supervisor-owned PR worktree. Child has draft-only authority and must stop after each slice.                  |
 
 ## Decisions
 
