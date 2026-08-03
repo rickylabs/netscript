@@ -165,7 +165,12 @@ export default defineSaga('${id}');
   });
 });
 
-Deno.test('published dependency starts a saga runtime with a project-owned non-empty registry', async () => {
+// Resolves the same public `/runtime` export subpath consumers install, but from the
+// repository workspace instead of `jsr:@netscript/plugin-sagas@<release version>`. Resolving
+// the registry artifact at the workspace's own declared version is circular on a release
+// branch (the version is not published until the release merges), so registry-artifact
+// resolution is owned by the post-publish production smoke (`e2e-cli-prod.yml`), not this lane.
+Deno.test('packaged runtime export starts a saga runtime with a project-owned non-empty registry', async () => {
   await withTempProject(async (projectRoot) => {
     await write(join(projectRoot, SAGAS_REGISTRY_PATH), `
 const definition = {
@@ -178,7 +183,7 @@ const definition = {
 export const sagaRegistry = new Map([[definition.id, definition]]);
 `);
     await write(join(projectRoot, 'run-published-saga.ts'), `
-import { startSagaRunner } from 'jsr:@netscript/plugin-sagas@${NETSCRIPT_RELEASE_VERSION}/runtime';
+import { startSagaRunner } from '@netscript/plugin-sagas/runtime';
 const supervisor = await startSagaRunner({ cwd: () => Deno.cwd() });
 console.log(JSON.stringify(supervisor.snapshot()));
 await supervisor.stop('dependency integration complete');
@@ -191,7 +196,8 @@ await supervisor.stop('dependency integration complete');
         '--allow-read',
         '--allow-env',
         '--allow-net',
-        '--minimum-dependency-age=0',
+        '--config',
+        join(REPOSITORY_ROOT, 'deno.json'),
         'run-published-saga.ts',
       ],
       cwd: projectRoot,
