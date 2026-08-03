@@ -15,7 +15,7 @@
 Research and contract-first design are complete against `origin/main` at `ab0fa13fe`. #1042 already
 selected correction; #1075 now recursively dispatches handler effects, exposing the remaining
 tutorial sends as loud `SAGA_NOT_FOUND` failures. The owner waived the credential-blocked
-PLAN-EVAL on the record, and implementation is proceeding with slice 1.
+PLAN-EVAL on the record. Slice 1 is pushed; slice 2 implementation and local gates are complete.
 
 ## Completed
 
@@ -28,17 +28,21 @@ PLAN-EVAL on the record, and implementation is proceeding with slice 1.
 - Opposite-family owner reviewer explicitly waived PLAN-EVAL; waiver recorded in `drift.md`.
 - Slice 1 regression proved red on baseline product behavior: `assertThrows` failed because
   `spawn()` returned normally.
+- Slice 1 commit `06cac832aaaadbea7caa3699ab4acf2cace8e0d6` was pushed with PR evidence.
+- Slice 2 regression proved red against the unchanged tutorial: the typechecked integration test
+  failed because the storefront still authored `CheckoutPaymentRequested` through saga `send()`.
+- Storefront now crosses the real trigger queue, static worker registry, worker handler, and saga
+  publisher; the focused round trip reaches `paid`.
 
 ## In Progress
 
-- Slice 1 sign-off commit and PR evidence comment.
+- Slice 2 commit and PR evidence handoff.
 
 ## Next Steps
 
-1. Commit, push, and comment slice 1 evidence.
-2. Continue to the storefront docs and cross-plugin integration slice.
-3. Prove the slice 2 regression test red against `ab0fa13fe` before changing its production/docs
-   dependencies.
+1. Commit, push, and comment slice 2 evidence.
+2. Run aggregate merge-readiness gates and acceptance mirroring.
+3. Request formal IMPL-EVAL; its transport remains credential-blocked and is not waived.
 
 ## Key Decisions
 
@@ -52,16 +56,19 @@ PLAN-EVAL on the record, and implementation is proceeding with slice 1.
 
 | Path | Status | Notes |
 | --- | --- | --- |
-| `.llm/runs/fix-1013-saga-send-spawn--1013/*` | new | Harness planning artifacts only. |
+| `.llm/runs/fix-1013-saga-send-spawn--1013/*` | modified | Harness evidence and handoff state. |
+| `docs/site/**/saga*.md`, storefront tutorial | modified | Corrected public contract and runnable choreography. |
+| `.llm/tools/docs/check-accuracy-and-discoverability.ts` | modified | Guards the corrected tutorial and spawn contract. |
+| `plugins/sagas/tests/runtime/storefront-checkout-flow_test.ts` | new | Real trigger-worker-saga round-trip regression. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | baseline recorded | focused `deno doc`; full doc-lint baseline |
-| Fitness | baseline recorded | JSR audit with attributed warnings |
-| Runtime | research only | empirical code trace and #1075 diff |
-| Consumer | baseline FAIL | tutorial emits orphan saga messages and lacks actual path test |
+| Static | PASS | scoped check/lint/fmt; docs accuracy; emitted-specifier guard |
+| Fitness | PASS | quality scan clean; all doctrine roots `FAIL=0` |
+| Runtime | PASS locally | focused round trip plus six full affected package suites |
+| Consumer | PASS locally | docs links/build/accuracy and tutorial source contract |
 
 Slice 1 is green: saga-core package `68 passed / 0 failed / 2 ignored`; scoped check/lint/fmt have
 zero findings; quality scan is clean; doctrine roots report `FAIL=0`; focused public docs render

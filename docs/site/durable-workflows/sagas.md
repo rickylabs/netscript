@@ -80,7 +80,7 @@ process and how effect-based outcomes differ from a retry loop.
   items: [
     { icon: "◆", title: "Fluent builder", body: "defineSaga(id).durability().state().on().compensate().build() — id, durability tier, typed state, message handlers, compensations, then build(). One chain, fully type-checked." },
     { icon: "▣", title: "Durable store backend", body: "Runtime state persists to kv or prisma, chosen by NETSCRIPT_SAGA_STORE / appsettings. createDurableSagaRuntime({ backend, prisma }) owns the resources." },
-    { icon: "≋", title: "Effect-based outcomes", body: "Every handler returns an array of effects — sagaComplete, sagaFail, sagaCompensate, send, and schedule are named outcomes. spawn is exported but runtime dispatch is unsupported." },
+    { icon: "≋", title: "Effect-based outcomes", body: "Every handler returns an array of effects — sagaComplete, sagaFail, sagaCompensate, send, and schedule are named outcomes. spawn is exported only to fail immediately with SAGA_NOT_IMPLEMENTED." },
     { icon: "⊡", title: "Served on :8092", body: "An oRPC API lists registered sagas, inspects running instances, publishes messages, and streams activity over SSE." },
     { icon: "⇄", title: "Cross-plugin choreography", body: "The workers create-user-settings job publishes UserSettingsCreated; this saga consumes it — one message crossing the plugin boundary, type-checked on both sides." },
     { icon: "◷", title: "Crash-survivable", body: "State checkpoints between messages, so an instance picks up exactly where it left off after a restart. That survival is the entire point of a saga." }
@@ -91,9 +91,10 @@ process and how effect-based outcomes differ from a retry loop.
 
 The runnable shape you grow into: a real state type, multiple `.on(...)` handlers, and a
 `.compensate(...)` branch that unwinds an already-charged payment when fulfillment fails.
-The first handler reserves stock and emits a `send(...)` effect to charge payment; the
-failure path returns `sagaCompensate(...)` so the engine routes the matching compensation
-handler, which refunds and then fails the instance.
+The saga records workflow state and consumes results published by explicit worker boundaries. It
+does not use `send(...)` to address a service or job. The failure path returns
+`sagaCompensate(...)` so the engine routes the matching compensation handler, records cancellation,
+and then fails the instance.
 
 ```ts
 // plugins/sagas/order-saga.ts
@@ -102,12 +103,11 @@ import {
   sagaComplete,
   sagaCompensate,
   sagaFail,
-  send,
 } from '@netscript/plugin-sagas-core';
 
 // The state is the source of truth that survives across messages and crashes.
 type OrderState = Readonly<{
-  status: 'awaiting-payment' | 'awaiting-fulfillment' | 'completed' | 'refunded';
+  status: 'awaiting-payment' | 'awaiting-fulfillment' | 'completed' | 'cancelled';
   orderId?: string;
   paymentId?: string;
 }>;
@@ -121,11 +121,10 @@ export const orderSaga = defineSaga('order-saga')
   .durability('t1')
   // Typed initial state, seeded once at instance creation.
   .state<OrderState>({ status: 'awaiting-payment' })
-  // Handler 1: an order was placed — record it and ask the payment service to charge.
+  // Handler 1: record the workflow. A trigger enqueues payment work separately.
   .on<'OrderPlaced', OrderPlaced>('OrderPlaced', (saga, event) => {
     saga.state = { ...saga.state, orderId: event.payload.orderId };
-    // `send` is an effect: dispatch a command to another target, not a direct call.
-    return [send({ kind: 'service', id: 'payments' }, { orderId: event.payload.orderId }, {})];
+    return [];
   })
   // Handler 2: payment captured — advance toward fulfillment.
   .on<'PaymentCaptured', PaymentCaptured>('PaymentCaptured', (saga, event) => {
@@ -140,13 +139,10 @@ export const orderSaga = defineSaga('order-saga')
   .on<'FulfillmentFailed', FulfillmentFailed>('FulfillmentFailed', (saga, event) => {
     return [sagaCompensate({ type: 'FulfillmentFailed', payload: event.payload }, event.payload.reason)];
   })
-  // Compensation: undo the already-applied payment, then fail the instance.
+  // Compensation: record cancellation, then fail the instance.
   .compensate<'FulfillmentFailed', FulfillmentFailed>('FulfillmentFailed', (saga, event) => {
-    saga.state = { ...saga.state, status: 'refunded' };
-    return [
-      send({ kind: 'service', id: 'payments' }, { refund: saga.state.paymentId }, {}),
-      sagaFail(`order ${event.payload.orderId} unfulfilled: ${event.payload.reason}`),
-    ];
+    saga.state = { ...saga.state, status: 'cancelled' };
+    return [sagaFail(`order ${event.payload.orderId} unfulfilled: ${event.payload.reason}`)];
   })
   .build();
 
@@ -160,8 +156,8 @@ handler keyed by message type. A running handler routes into it by returning the
 <code>sagaCompensate(message, reason?)</code> effect. So a saga's whole lifecycle —
 advance, <code>sagaComplete</code>, <code>sagaFail</code>, <code>sagaCompensate</code>,
 <code>send</code>, and <code>schedule</code> — is a <strong>named outcome returned from
-handlers</strong>, never a fall-through. <code>spawn</code> is reserved in the type vocabulary but
-dispatch currently throws <code>SAGA_NOT_IMPLEMENTED</code>. The undo logic
+handlers</strong>, never a fall-through. <code>spawn()</code> is reserved in the public vocabulary
+but calling it immediately throws <code>SAGA_NOT_IMPLEMENTED</code>. The undo logic
 itself lives in the <code>.compensate()</code> handler, not inline in the forward path.
 {{ /comp }}
 
@@ -243,8 +239,8 @@ keys are persisted as separate saga instances.
 
 A handler's only side effect is the array of **cascaded messages** it returns. These
 helpers (`@netscript/plugin-sagas-core`) construct the named effects. Every kind in
-`CASCADED_MESSAGE_KINDS` (`send | scheduled | spawn | complete | fail | compensate`) has a
-constructor, but `spawn` is contract-only today and is not supported by runtime dispatch.
+`CASCADED_MESSAGE_KINDS` retains `spawn` in the wire vocabulary so deserialized unsupported effects
+fail loudly, but the public `spawn()` function returns `never` and throws before creating an effect.
 
 {{ comp.apiTable({
   caption: "Effect helpers — saga handler outcomes",
@@ -254,7 +250,7 @@ constructor, but `spawn` is contract-only today and is not supported by runtime 
     { name: "sagaCompensate(message, reason?)", type: "=> CascadedMessage<'compensate'>", desc: "Route into the matching .compensate(type, ...) handler to undo an already-applied step." },
     { name: "send(target, payload, options)", type: "=> CascadedMessage<'send'>", desc: "Republish an internal message onto the saga bus. It does not trigger a worker job or task. options carry idempotencyKey / concurrencyKey / retry / queue." },
     { name: "schedule(message, delay)", type: "delay: Date | number | '5m' => CascadedMessage<'scheduled'>", desc: "Deliver a wrapped message after a delay (a Date, ms, or a '30s'/'5m'/'2h'/'1d' string)." },
-    { name: "spawn(child, input, options)", type: "=> CascadedMessage<'spawn'>", desc: "Unsupported. Constructs the reserved child-saga effect, but dispatch throws SAGA_NOT_IMPLEMENTED." }
+    { name: "spawn(child, input, options)", type: "=> never", desc: "Unsupported. Calling it immediately throws SAGA_NOT_IMPLEMENTED; the runtime also rejects deserialized spawn effects defensively." }
   ]
 }) }}
 

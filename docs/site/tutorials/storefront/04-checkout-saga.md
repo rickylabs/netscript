@@ -92,10 +92,10 @@ consumes. The methods you will use:
   { name: ".build()", type: "finalize", desc: "Produces the frozen SagaDefinition the runner executes. Requires at least one handler." }
 ] }) }}
 
-The other primitive you need is **`send(target, payload)`** — also from `@netscript/plugin-sagas-core`.
-It republishes an **internal saga message onto the saga bus**; it does not enqueue a worker job or
-task. Handlers return an array of these effects. This chapter uses `send(...)` for saga-to-saga
-messages and the triggers API's `enqueueJob(...)` effect for durable worker dispatch.
+The saga DSL also exports **`send(target, payload)`** for cascaded messages handled by registered
+saga definitions. It does not call a service, enqueue a worker job, or run a task. This payment leg
+does not need an internal cascade: its trigger uses `enqueueJob(...)` for durable worker dispatch,
+and the worker publishes a typed result back to the saga.
 
 ## Step 3 — Scaffold the checkout saga
 
@@ -121,20 +121,17 @@ The command writes `sagas/checkout-saga.ts` plus `sagas/checkout.config.ts`, inc
 handler and a compensation-handler skeleton, and refreshes the saga registry. Extend that generated
 definition with the checkout state and lifecycle below. It correlates by `orderId`, starts `pending`,
 and walks the lifecycle. When payment fails, the forward handler returns a
-`sagaCompensate(...)` effect and the matching `.compensate(...)` branch performs the undo step.
+`sagaCompensate(...)` effect and the matching `.compensate(...)` branch records cancellation.
 
 ```ts
 // sagas/checkout-saga.ts
-import { defineSaga, sagaCompensate, send } from '@netscript/plugin-sagas-core';
-import type { SagaState } from '@netscript/plugin-sagas-core/domain';
+import { defineSaga, sagaCompensate } from '@netscript/plugin-sagas-core';
+import type { SagaCorrelationKey, SagaState } from '@netscript/plugin-sagas-core/domain';
 
 type OrderStatus =
   | 'pending'
   | 'payment_pending'
   | 'paid'
-  | 'inventory_reserved'
-  | 'shipped'
-  | 'completed'
   | 'cancelled';
 
 // Per-instance checkout state. Runtime metadata is handled for you.
@@ -158,10 +155,7 @@ const initialState: CheckoutState = {
 
 export const checkoutSaga = defineSaga('CheckoutSaga')
   .state(initialState)
-  // Route every message to the instance whose orderId matches.
-  .correlate((message) => String((message.payload as { orderId?: string }).orderId ?? ''))
-
-  // OrderCreated → emit the saga's internal payment-requested message.
+  // OrderCreated records the workflow. The trigger below owns worker dispatch.
   .on('OrderCreated', (saga, event) => {
     const msg = event.payload as { orderId: string; customerId: string; items: CheckoutState['items']; total: number };
     saga.state = {
@@ -172,28 +166,14 @@ export const checkoutSaga = defineSaga('CheckoutSaga')
       total: msg.total,
       status: 'payment_pending',
     };
-    return [send('CheckoutPaymentRequested', { orderId: msg.orderId, amount: msg.total })];
+    return [];
   })
 
-  // PaymentCompleted → reserve inventory.
+  // The payment worker publishes this result back to the saga.
   .on('PaymentCompleted', (saga, event) => {
     if (saga.state.status !== 'payment_pending') return [];
     const msg = event.payload as { transactionId: string };
     saga.state = { ...saga.state, status: 'paid', transactionId: msg.transactionId };
-    return [send('reserve-inventory', { orderId: saga.state.orderId, items: saga.state.items })];
-  })
-
-  // InventoryReserved → book shipment.
-  .on('InventoryReserved', (saga) => {
-    if (saga.state.status !== 'paid') return [];
-    saga.state = { ...saga.state, status: 'inventory_reserved' };
-    return [send('create-shipment', { orderId: saga.state.orderId })];
-  })
-
-  // ShipmentCreated → done.
-  .on('ShipmentCreated', (saga) => {
-    if (saga.state.status !== 'inventory_reserved') return [];
-    saga.state = { ...saga.state, status: 'completed' };
     return [];
   })
 
@@ -212,8 +192,13 @@ export const checkoutSaga = defineSaga('CheckoutSaga')
       status: 'cancelled',
       cancelReason: `Payment failed: ${msg.reason}`,
     };
-    return [send('OrderCancelled', { orderId: msg.orderId, reason: msg.reason })];
+    return [];
   })
+
+  // Route every handled message to the instance whose orderId matches.
+  .correlate((message) =>
+    String((message.payload as { orderId?: string }).orderId ?? '') as SagaCorrelationKey
+  )
 
   .build();
 
@@ -226,12 +211,12 @@ Read the shape, not the line count:
   (`if (saga.state.status !== 'paid') return []`) so a redelivered or out-of-order message is a
   no-op, not a corruption. [Durable workflows are state machines](/explanation/durability-model/) is a
   NetScript axiom, not a slogan.
-- **Saga messages are driven by `send(...)` effects.** `send('CheckoutPaymentRequested', { … })`
-  republishes an internal message onto the saga bus. It does not address `process-payment` or cross
-  into the workers plugin. The trigger below owns that explicit cross-plugin enqueue boundary.
+- **This saga does not dispatch worker work.** `send(...)` is available for messages handled by a
+  registered saga definition, but no such cascade is needed in this payment leg. The trigger below
+  owns the explicit cross-plugin enqueue boundary.
 - **Compensation is an explicit effect and registered branch.** The forward `PaymentFailed`
   handler returns `sagaCompensate(...)`; the matching `.compensate('PaymentFailed', ...)` handler
-  transitions the same state machine to `cancelled` and emits `OrderCancelled`.
+  transitions the same state machine to `cancelled` without inventing another unhandled message.
 
 {{ comp callout { type: "note", title: "The durable runtime wires compensation" } }}
 An inbound <code>PaymentFailed</code> is first handled by <code>.on(...)</code>. Returning
@@ -259,7 +244,7 @@ const processPaymentJob = {
 } satisfies JobDefinition<'process-payment'>;
 
 export default defineWebhook(
-  (event) => Promise.resolve([enqueueJob(processPaymentJob, { payload: event.payload })]),
+  (event) => Promise.resolve([enqueueJob(processPaymentJob, { payload: event.payload.body })]),
   { id: 'checkout-payment', path: 'checkout/payment', verifier: 'memory' },
 );
 ```
@@ -301,7 +286,7 @@ const handler = defineJobHandler(async (ctx) => {
     // ... charge the card via your provider (mock here) ...
     const transactionId = `txn_${Date.now()}`;
 
-    // Tell the saga payment succeeded — it advances to inventory.
+    // Tell the saga payment succeeded — it advances to paid.
     await sagaPublisher.publish({ type: 'PaymentCompleted', payload: { orderId, transactionId } });
 
     return createSuccessResult({ orderId, transactionId, amount });
@@ -369,12 +354,10 @@ ns-sagas publish OrderCreated \
 curl -X POST http://localhost:8093/api/v1/webhooks/checkout/payment \
   -H 'content-type: application/json' \
   -d '{ "orderId": "ord_1001", "amount": 4999 }'
-
-# 3. The worker publishes PaymentCompleted; this direct publish is a deterministic local stand-in.
-ns-sagas publish PaymentCompleted \
-  --payload='{ "orderId": "ord_1001", "transactionId": "txn_777" }' \
-  --correlation-key=ord_1001
 ```
+
+The registered worker resolves and runs `process-payment`, which publishes `PaymentCompleted` back
+to the correlated saga instance. No direct `PaymentCompleted` command is needed on the happy path.
 
 Inspect that instance and confirm it reached `paid`:
 
@@ -399,9 +382,9 @@ ns-sagas list --instances --saga=CheckoutSaga --json
 
 The first instance shows `status: 'paid'` carrying its `transactionId`; the second shows
 `status: 'cancelled'` carrying the `cancelReason` your compensation branch stamped. (The forward path
-continues to `completed` once you also author the `reserve-inventory` and `create-shipment` jobs the
-triggers boundary enqueues — saga `send(...)` cascades remain internal saga-bus messages. This track
-stops at the payment leg, so `paid` is checkout's observable checkpoint.)
+can continue once you separately author inventory and shipment triggers/jobs. Saga `send(...)`
+cascades remain internal saga-bus messages; this chapter stops at the implemented payment leg, so
+`paid` is checkout's observable checkpoint.)
 
 - [ ] The workers, sagas, triggers, and streams plugins are installed and registered.
 - [ ] `checkout-saga.ts` defines state, a correlation key, the forward handlers, and a
@@ -410,8 +393,9 @@ stops at the payment leg, so `paid` is checkout's observable checkpoint.)
       saga.
 - [ ] `triggers/checkout-payment-trigger.ts` enqueues `process-payment` with `enqueueJob(...)`.
 - [ ] `ns-sagas list --registered --json` lists `CheckoutSaga`.
-- [ ] Publishing `OrderCreated` + `PaymentCompleted` yields an instance at `status: 'paid'`;
-      `PaymentFailed` yields one at `status: 'cancelled'`.
+- [ ] Publishing `OrderCreated` and invoking the checkout trigger yields an instance at
+      `status: 'paid'`; publishing `PaymentFailed` directly exercises the isolated compensation
+      branch and yields one at `status: 'cancelled'`.
 - [ ] `deno task check` passes.
 
 {{ comp callout { type: "warning", title: "Durability is not free correctness" } }}
@@ -423,14 +407,13 @@ The durability tier persists instance state so a workflow survives a restart, bu
 - The workers, sagas, triggers, and streams runtime plugins — the workflow, its explicit worker
   enqueue boundary, its jobs, and the transport between them.
 - A `CheckoutSaga` built with `defineSaga().state().correlate().on().build()` — a durable state
-  machine that walks order → payment → fulfillment, with a `PaymentFailed` **compensation branch**
-  that cancels the order.
+  machine that walks order → payment, with a `PaymentFailed` **compensation branch** that cancels
+  the order. Inventory and shipping remain explicit future trigger/job legs.
 - A `process-payment` worker job (`defineJobHandler`, `createSuccessResult` / `createFailureResult`)
   that publishes results back to the saga with `createSagaPublisher`, closing the choreography.
 - A workflow observable as instances on the Sagas API at `:8092`.
 
-Checkout is now reliable: it survives restarts and undoes itself on failure. The last piece is letting
-the outside world — a shipping or payment provider — tell your shop what happened, which you do with a
-verified webhook next.
+Checkout now survives restarts and records a durable cancellation when payment fails. The next
+chapter adds a verified webhook for outside providers.
 
 {{ comp.nextPrev({ prev: { label: "3 · Cart contracts", href: "/tutorials/storefront/03-cart-contracts/" }, next: { label: "5 · Shipping webhook", href: "/tutorials/storefront/05-shipping-webhook/" } }) }}

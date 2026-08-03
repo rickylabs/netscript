@@ -72,6 +72,9 @@ the target message type.
 | 2026-08-03 11:25 CEST | slice 1 | implementation | `spawn()` now returns `never` and throws `SAGA_NOT_IMPLEMENTED` before ledger acceptance; focused test passed 3/3. |
 | 2026-08-03 11:30 CEST | slice 1 | ordinary review | Claude Fable opposite-family review requested changes: retain wire-level spawn dispatch coverage and record red proof. Both findings were accepted and fixed before sign-off. |
 | 2026-08-03 11:45 CEST | slice 1 | re-review | Claude Fable opposite-family reviewer independently reran the focused and full package suites and returned `PASS`; both prior findings are closed. |
+| 2026-08-03 12:00 CEST | slice 2 | pre-fix red | With the typechecked integration test added but tutorial/docs unchanged, the focused test failed 0/1 at the source-contract assertion because the storefront still authored `send('CheckoutPaymentRequested', ...)`. |
+| 2026-08-03 12:10 CEST | slice 2 | implementation | Corrected the tutorial to the explicit trigger queue/worker registry/result-publish boundary, fixed the webhook body payload shape, and made the saga stop at `paid`; added a real in-process round-trip regression. |
+| 2026-08-03 12:25 CEST | slice 2 | ordinary review | Claude Fable independently inspected dispatcher resolution and saga instance identity, reran the focused test and docs accuracy, and returned `PASS`. Non-blocking notes: the test intentionally binds behavioral proof to tutorial source assertions, and uses equivalent `runtime.publish` rather than invoking the tutorial publisher helper verbatim. |
 
 ## Decisions
 
@@ -98,6 +101,9 @@ the target message type.
 | Baseline full doc lint | `deno task doc:lint --root packages/plugin-sagas-core --pretty` | FAIL baseline | 9 combined private-type refs in 3 unrelated files; root and affected public entrypoints are clean. |
 | Slice 1 public surface | `deno doc --filter spawn packages/plugin-sagas-core/mod.ts` | PASS | Renders `spawn(...): never` and the named-error contract. |
 | Slice 1 scoped check/lint/fmt | Repo wrappers over `packages/plugin-sagas-core`, `--ext ts,tsx` | PASS | 110 files; zero findings in all three wrappers. |
+| Slice 2 scoped check/lint/fmt | Repo wrappers over saga/trigger/worker packages and docs checker, `--ext ts,tsx` | PASS | 548 files; zero findings after formatting the new test. |
+| Slice 2 docs accuracy | `deno task docs:accuracy` | PASS | Four saga pages checked; storefront worker boundary and spawn contract verified. |
+| Slice 2 emitted specifiers | `deno task check:netscript-jsr-specifiers` | PASS | 2,235 scanned, one existing allowance, zero failures. |
 
 ### Fitness Gates
 
@@ -107,6 +113,8 @@ the target message type.
 | Plan-Gate | `WAIVED` | Owner authorization in product thread; recorded in `drift.md` | Environmental waiver only; IMPL-EVAL remains required. |
 | Slice 1 quality scan | `PASS` | Repository scan `ok: true`, no findings | Seven existing attributed allowances; none added. |
 | Slice 1 architecture | `PASS` | `arch:check` completed with every doctrine root `FAIL=0` | Saga-core retains two baseline warnings; no new debt. |
+| Slice 2 quality scan | `PASS` | Repository scan `ok: true`, no findings | Seven existing attributed allowances; none added. |
+| Slice 2 architecture | `PASS` | Explicit summary check reported all 16 doctrine roots `FAIL=0` | Existing warnings only. |
 
 ### Runtime Gates
 
@@ -115,15 +123,17 @@ the target message type.
 | Current effect trace | PASS | bridge/engine code plus #1075 diff | `publish()` recursively consumes ledgers; `send` remains saga-bus only. |
 | Slice 1 pre-fix red | PASS | Focused test failed on unchanged baseline product code | `spawn()` returned normally; `assertThrows` reported `Expected function to throw.` |
 | Slice 1 package suite | PASS | 68 passed, 0 failed, 2 ignored | Full `packages/plugin-sagas-core` suite, not a file-only verdict. |
+| Slice 2 pre-fix red | PASS | Typechecked focused integration failed 0/1 on unchanged tutorial/docs | The documented `CheckoutPaymentRequested` saga send proved the central path was still false. |
+| Slice 2 focused round trip | PASS | 1 passed, 0 failed | Trigger enqueues webhook body; registry resolves worker; worker publishes result; saga reaches `paid`. |
+| Slice 2 affected package suites | PASS | sagas-core 68/0/2; sagas 42/0; triggers-core 38/0; triggers 35/0/12; workers-core 25/0; workers 49/0 | Full package suites across the bridge blast radius. |
 
 ### Consumer Gates
 
 | Consumer | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| Storefront tutorial | FAIL baseline | orphan `send()` targets and no trigger-worker runtime test | Owned by slice 2 after PLAN-EVAL. |
+| Storefront tutorial | PASS | docs build generated 589 files; links 98 docs/0 broken/0 orphan; accuracy guard and round-trip test pass | Tutorial now describes the runnable trigger-worker-saga path and stops at `paid`. |
 
 ## Handoff Notes
 
-- PLAN-EVAL should challenge `D3` (`spawn(): never`) and verify the integration test uses a
-  registry-resolved job rather than a queue-only assertion.
-- No implementation file has been changed before a PLAN-EVAL `PASS`.
+- Slice 2 ordinary opposite-family review passed; commit and PR evidence are next.
+- Formal IMPL-EVAL remains required; only PLAN-EVAL was waived.
