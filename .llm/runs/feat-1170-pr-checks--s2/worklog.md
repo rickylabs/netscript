@@ -107,3 +107,6 @@ All requested gates were rerun after the fix on 2026-08-03:
   current-pass) raised, fixed on the same thread as `pending` with negative test; supervisor
   re-ran tests independently: 6 passed / 0 failed. Live read-only demo against merged PR #1094:
   31 checks, superseded/stale-post-merge labeled, currentFailures=0, exit 0.
+
+- 2026-08-03 21:50: fresh PR event push — close-gate mirror label check is rerun-blind (frozen
+  event payload); root cause fixed on #1178's branch. See design-run worklog.
