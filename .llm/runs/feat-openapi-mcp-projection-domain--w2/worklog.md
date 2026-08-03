@@ -119,12 +119,17 @@ they do not add parser strategies or I/O.
 | Slice 4 scoped check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/mcp --ext ts,tsx` | PASS | 77 files, one batch, zero diagnostics. |
 | MCP doctrine scan | `check-doctrine.ts --root packages/mcp` | PASS for introduced surface | Schema views reduced below the 300-line F-1 cap; only pre-existing flows cardinality and architecture-doc info remain. |
 | Framework quality | `deno task quality:gate` | PASS | Exit 0; quality scan clean and architecture chain completed with baseline warnings only. |
+| Final scoped lint | `run-deno-lint.ts --root packages/mcp --ext ts,tsx --config packages/mcp/deno.json --pretty` | PASS | 77 files, zero occurrences. The first no-config wrapper run hit the root Deno 2.9 workspace parse failure and produced no lint findings; explicit package config is the authoritative rerun. |
+| Final scoped format | `run-deno-fmt.ts --root packages/mcp --ext ts,tsx --config packages/mcp/deno.json --pretty` | PASS | 77 files, zero findings. The first no-config run hit the same root workspace parse failure; explicit package config passed. |
+| Final doc-lint | `deno task doc:lint --root packages/mcp --pretty` | PASS | 0 errors/private refs/missing docs across 3 entrypoints. |
+| Final publish dry-run | package `deno task publish:dry-run` | PASS | Exit 0; all 3 entrypoints checked and intended projection/domain files included. |
+| Final lock/boundary hygiene | raw diff/grep + fixture `cmp` | PASS | No `deno.lock` diff, no domain I/O/runtime imports, no lint ignores/double casts/quality allowances; P2 fixture remains byte-identical at 3657 bytes. |
 
 ### Fitness Gates
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| JSR baseline scan | PASS with baseline warnings | `audit-jsr-package.ts --root packages/mcp --text` | Existing domain/flow cardinality warnings; helper banner overcount documented. |
+| Final JSR audit | PASS with baseline warnings | `audit-jsr-package.ts --root packages/mcp --text` | New 3-entrypoint surface publishes; domain cardinality warning is resolved. Only pre-existing flows cardinality plus the known dry-run banner overcount remain. |
 
 ### Runtime Gates
 

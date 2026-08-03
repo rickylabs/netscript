@@ -39,3 +39,16 @@ Drift is append-only.
 - **Action:** accept
 - **Boundary:** No published/runtime permission, projection I/O, or production behavior changed.
 - **Evidence:** `packages/mcp/deno.json`; `worklog.md` Package tests row.
+
+## 2026-08-04 — Scoped lint/format explicit package config
+
+- **What:** Final lint and format wrappers were rerun with `--config packages/mcp/deno.json`.
+- **Source:** Slice 5 validation.
+- **Expected:** Scoped wrappers launched from the repo root inherit the root config.
+- **Actual:** Deno 2.9.3 rejected the root string-array `workspace` shape before examining source,
+  producing zero lint/format findings but non-zero tool exits. The same wrappers, file selection,
+  and non-mutating modes passed against the owned package config (77 files, zero findings).
+- **Severity:** minor
+- **Action:** accept
+- **Boundary:** Root config migration is repo-wide and out of scope; no config or lockfile was changed.
+- **Evidence:** `worklog.md` final scoped lint/format rows.

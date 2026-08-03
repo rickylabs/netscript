@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `feat-openapi-mcp-projection-domain--w2` |
 | Branch | `feat/openapi-mcp-projection-domain` |
-| Current phase | `plan` → `implement` under milestone waiver |
+| Current phase | `impl-eval` under milestone composition |
 | Archetype | `2 — Integration` (pure domain slice) |
 | Scope overlays | none |
 
@@ -29,13 +29,13 @@ orchestrator's already-owned single Codex sender.
 
 ## In Progress
 
-- Supervisor Slice 4 sign-off, commit, explicit-refspec push, and PR evidence comment.
+- Composed independent evaluation: draft→ready augment, OpenHands, then orchestrator pre-merge gate.
 
 ## Next Steps
 
-1. Sign off and push Slice 4.
-2. Run the full Slice 5 merge-readiness gates.
-3. Complete composed independent evaluation and close-gate evidence.
+1. Commit/push final merge-readiness evidence.
+2. Complete draft→ready augment and OpenHands evaluation.
+3. Satisfy the review-thread/close gates and hand back to the milestone orchestrator.
 
 ## Key Decisions
 
@@ -69,10 +69,10 @@ orchestrator's already-owned single Codex sender.
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
 | Plan | composed/authorized | `plan-eval.md`, user milestone directive |
-| Static | baseline green | doc-lint + package publish dry-run |
-| Fitness | baseline recorded | structured JSR audit |
+| Static | final green | 78 tests; scoped check/lint/fmt; doc-lint; publish dry-run |
+| Fitness | final green with baseline warnings | quality gate + structured JSR audit |
 | Runtime | N/A | pure domain scope |
-| Consumer | Slices 1–4 green | public entrypoint tests, package suite, and scoped check |
+| Consumer | final green | public entrypoint tests, package suite, scoped gates, doc-lint, publish dry-run |
 
 ## Open Questions
 
