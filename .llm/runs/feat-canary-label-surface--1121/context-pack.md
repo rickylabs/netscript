@@ -59,7 +59,7 @@ opposite-family review returned two blockers, now fixed and awaiting gate/review
 | Static | PASS (slice 1) | focused tests 15/15; non-empty 32-file check/lint/fmt wrapper artifacts |
 | Fitness | PASS (slice 1 identity) | workflow cut step has no `deno.json`; JSON version is resolved canary |
 | Runtime | NOT_RUN | live canaries external |
-| Consumer | NOT_RUN | workflow test planned |
+| Consumer | PASS | release-canary workflow identity consumption covered by focused tests |
 
 ## Open Questions
 
