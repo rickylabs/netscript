@@ -46,5 +46,5 @@ actionable findings with file/decision references and distinguish blockers from 
 Commit and push only the tracked evaluator artifact needed for this evaluation. Do not mutate
 `deno.lock`, product code, generated assets, issue bodies, or unrelated run files. Post one structured
 PR comment beginning `[PHASE: PLAN-EVAL]` and include the exact machine line
-`OPENHANDS_VERDICT: APPROVED` for `PASS`, or `OPENHANDS_VERDICT: CHANGES_REQUESTED` for
-`FAIL_PLAN`. The tracked artifact is authoritative if a summary disagrees.
+`OPENHANDS_VERDICT: PASS` for `PASS`, or `OPENHANDS_VERDICT: FAIL_PLAN` for `FAIL_PLAN`. The
+tracked artifact is authoritative if a summary disagrees.
