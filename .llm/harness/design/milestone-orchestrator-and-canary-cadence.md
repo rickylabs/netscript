@@ -152,6 +152,21 @@ The #1083 obligation — breaking changes surfaced from closed issues must reach
 satisfied continuously at each canary rather than reconstructed at the cut, which is the point in
 the process where it was historically dropped.
 
+
+### Reviewer substitution is a legitimate waiver **[observed 2026-08-03]**
+
+The slice review gate says **no lane self-certifies**. It does *not* say the reviewer must be an
+agent. When the owner reviews the work directly, the invariant is satisfied — he is not the
+generator — and the opposite-family pass can be dropped for that slice.
+
+This matters on a critical path: during the canary exercise, several implementation turns were
+consumed by opposite-family re-review passes and by recording their verdicts, while a p0 release
+blocker waited. The waiver is a **substitution of reviewer, not an absence of review**, and it is
+recorded as such in the run's `drift.md` rather than silently applied.
+
+Unchanged by the waiver: the automated gates. They are evidence, not sign-off, and a green gate was
+never a substitute for review in either direction.
+
 ## Cut-time checklist **[observed]**
 
 Derived from what was actually missed or nearly missed in 0.0.4:
