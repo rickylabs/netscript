@@ -199,6 +199,12 @@
 - name: "epic:agentic-combo"
   color: "5319e7"
   description: "NetScript agentic combo epic (MCP server + public skills + CLI)"
+- name: "epic:unified-runtime"
+  color: "6f42c1"
+  description: "Unified single-runtime deployment epic (Nitro v3 single deploy output, child of #327)"
+- name: "epic:desktop-frontend"
+  color: "5319e7"
+  description: "Desktop Frontend wave — the full frontend as a native desktop app, the NetScript way (beta.11, child of #327)"
 
 # ── wave: release-train bucket (maps to milestone) ───────────────────────────
 - name: "wave:v1"
