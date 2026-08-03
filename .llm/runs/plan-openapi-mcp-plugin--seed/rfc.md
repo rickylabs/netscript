@@ -152,6 +152,103 @@ response semantics are not in the evidence and are not claimed, S-23) and
 `design/examples/discovery-and-policy.md` (discovery byte-by-byte, nine degraded modes, the
 three-rung execution opt-in as the owner experiences it).
 
+### End-to-end flows (diagrams, #822 convention — example app "acme-notes")
+
+**Architecture — who talks to whom.** The dashed boundary is the process boundary Aspire does
+not bridge; the manifest is the designed crossing:
+
+```mermaid
+flowchart LR
+  subgraph apphost["Aspire AppHost — acme-notes"]
+    cb["post-allocation callback<br/>[P1-arbitrated, S-7]"]
+    notes["notes service<br/>127.0.0.1:61501<br/>/api/openapi.json"]
+    search["search service<br/>127.0.0.1:61502<br/>/api/openapi.json"]
+  end
+  cb -- "atomic write" --> manifest[".netscript/run/endpoints.json<br/>projectRoot · runId · loopback URLs (S-8)"]
+  appsettings["aspire/appsettings.json<br/>NetScript.Services (static list)"]
+  policy[".netscript/agent-mcp.json<br/>overrides · excludeServices · EndpointPolicy (S-1)"]
+  subgraph mcp["netscript agent mcp — packages/mcp (stdio)"]
+    tools["list_api_services<br/>list_service_operations<br/>get_operation_schema<br/><i>(v2, gated: invoke_service_operation)</i>"]
+    dir["ServiceEndpointDirectoryPort<br/>precedence: override &gt; manifest &gt; appsettings (S-10)"]
+    spec["ServiceSpecPort<br/>loopback-only · bounded · no credentials (S-4/S-11)"]
+  end
+  agent["Agent host<br/>(.mcp.json, written by agent init)"] -- stdio --> tools
+  tools --> dir
+  tools --> spec
+  dir --> manifest
+  dir --> appsettings
+  dir --> policy
+  spec -- "bounded GET" --> notes
+  spec -- "bounded GET" --> search
+```
+
+**The debug moment — the curl loop replaced** (hypothetical replay, S-23; three bounded calls,
+mutation stays in the agent's own visible shell):
+
+```mermaid
+sequenceDiagram
+  participant A as Agent (mid-debug)
+  participant M as MCP server
+  participant D as Endpoint directory
+  participant S as notes service
+  A->>M: list_api_services {}
+  M->>D: list()
+  D-->>M: entries + per-source outcomes (S-9)
+  M->>S: GET /api/openapi.json (timeout+abort, S-11)
+  S-->>M: live spec (per-request generated) + identity check (S-8)
+  M-->>A: notes running · 127.0.0.1:61501 · 7 operations
+  A->>M: list_service_operations { service: "notes" }
+  M-->>A: notes.create · POST /api/notes · "Create a note…"
+  A->>M: get_operation_schema { operation: "notes.create", view: "all" }
+  M-->>A: request/response/errors views + curl template (authNote, S-24)
+  A->>S: curl — from the agent's own shell, human-visible
+```
+
+**Discovery status mapping — every degraded mode is a designed output** (one mapping, S-12;
+absence-of-red is never rendered green, S-9):
+
+```mermaid
+flowchart TD
+  start(["list_api_services"]) --> m{"run manifest?"}
+  m -- "absent" --> app["appsettings static list"]
+  m -- "failed: invalid / unreadable / foreign root" --> srcfail["sources block reports failed(reason) — S-9"]
+  srcfail --> app
+  m -- "used: projectRoot + runId match (S-8)" --> probe
+  app --> probe{"bounded spec fetch"}
+  probe -- "connection refused" --> nr["not_running + start hint"]
+  probe -- "timeout / HTTP error / parse failure" --> su["spec_unavailable + cause<br/>(401/403 → authz hint, P3)"]
+  probe -- "200, wrong self-identification" --> im["identity_mismatch (S-8)<br/>never healthy, never invoked"]
+  probe -- "200 + identity OK" --> run["running · operations counted<br/>from the parsed spec (S-14)"]
+  excl["introspection.excludeServices (S-25)"] -. "spec never fetched" .-> ex["excluded"]
+```
+
+**Execution policy — three rungs, fail-closed** (v2, fork F2; every arrow down is a human edit
+to `.netscript/agent-mcp.json`, never agent-reachable):
+
+```mermaid
+stateDiagram-v2
+    [*] --> Disabled
+    Disabled: Disabled — the default
+    note right of Disabled
+        absent, malformed, empty, or partial
+        policy file ALL land here (S-1, fail-closed);
+        refusals name the config path
+    end note
+    Disabled --> SafeMethodsOnly: owner sets enabled = true
+    SafeMethodsOnly: Safe methods only (GET/HEAD)
+    note right of SafeMethodsOnly
+        method read from the RESOLVED spec
+        operation, never caller input (A2)
+    end note
+    SafeMethodsOnly --> PerOperationGrants: owner adds allowUnsafe ids
+    PerOperationGrants: Per-operation grants + confirm echo
+    note right of PerOperationGrants
+        canonical dotted id only, ambiguity refuses (S-2);
+        deny wins over any grant; confirm is friction,
+        not a control (S-3); receipts after validation (S-15)
+    end note
+```
+
 ## 4. Plan — waves and gates (for the implementing run)
 
 **Wave 0 — proofs before contracts freeze, each emitting a committed
