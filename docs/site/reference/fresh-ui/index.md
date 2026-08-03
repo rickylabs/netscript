@@ -11,12 +11,13 @@ plugins return to the [reference overview](/reference/).
 
 The root entrypoint (`@netscript/fresh-ui`) intentionally stays small: copy-based registry
 components and islands remain on workspace-local deep paths so applications can own and evolve
-them after copy. The root module exposes only the supported helper utilities that are safe to
-consume as package runtime dependencies. Two sub-path exports carry the runtime seams:
+Five sub-path exports carry the package runtime seams:
 
-- [`@netscript/fresh-ui/interactive`](#sub-path-exports) — package-owned interactive
-  namespaces for stateful, accessible primitives.
+- [`@netscript/fresh-ui/ai/render-ui`](#sub-path-exports) — safe, bounded generative-UI renderer for validated tool payloads.
+- [`@netscript/fresh-ui/desktop`](#sub-path-exports) — browser-safe native desktop chrome helpers.
+- [`@netscript/fresh-ui/interactive`](#sub-path-exports) — package-owned interactive namespaces for stateful, accessible primitives.
 - [`@netscript/fresh-ui/primitives`](#sub-path-exports) — L0 platform-contract primitives.
+- [`@netscript/fresh-ui/registry`](#sub-path-exports) — embedded copy-registry manifest and file content.
 
 ## Class-name helper
 
@@ -251,15 +252,102 @@ encapsulate real behavior.
 | `PrimitiveChildren` | type alias | Renderable content accepted by L0 primitives (a child or readonly array of children). |
 | `VisuallyHiddenStyle` | type alias | Inline style accepted by visually-hidden primitives. |
 
+## Generative UI renderer (@netscript/fresh-ui/ai/render-ui)
+
+Exported from `@netscript/fresh-ui/ai/render-ui`. This module provides a safe, bounded generative-UI renderer that converts structured `render_ui` tool payloads into standard Preact DOM nodes.
+
+> **Input contract:** The renderer consumes input already validated by `@netscript/ai/tools` (`RenderUiToolInput`). It does not validate arbitrary model output; callers must parse and validate raw model payloads with `@netscript/ai/tools` before passing them to the renderer.
+
+### Allowed block categories
+
+The renderer restricts markup generation to a curated 8-block allowlist across three categories (`RENDER_UI_BLOCK_CATEGORIES`):
+
+| Category | Allowed block types | Description |
+| --- | --- | --- |
+| `layout` | `stack`, `grid`, `section` | Container elements that layout child blocks. |
+| `viz` | `chart`, `metric` | Visual presentation blocks for stats and trend data. |
+| `data` | `table`, `list`, `card` | Data presentation blocks for tabular and item lists. |
+
+### Depth bounds and fallback reasons
+
+To protect against deeply nested or malformed model payloads, rendering is bounded by `maxDepth` (defaults to `RENDER_UI_MAX_DEPTH` = `6`). When a payload cannot be rendered safely, a styled fallback element is emitted with a specific `RenderUiFallbackReason`:
+
+- `'max-depth'`: Payload nesting exceeded the configured maximum depth limit.
+- `'unknown-type'`: Block type is outside the accepted 8-block allowlist.
+- `'invalid-node'`: Node payload is malformed or unrenderable.
+
+### Renderer symbols
+
+| Symbol | Kind | Description |
+| --- | --- | --- |
+| `renderUiPayload` | function | `function renderUiPayload(payload: RenderUiToolInput, options?: RenderUiOptions): RenderUiNode` — Renders a validated payload into safe Preact DOM. |
+| `RenderUiSurface` | component | `function RenderUiSurface(props: RenderUiSurfaceProps): RenderUiNode` — JSX component wrapper around `renderUiPayload`. |
+| `RENDER_UI_MAX_DEPTH` | const `6` | Default maximum recursive block depth. |
+| `RENDER_UI_BLOCK_CATEGORIES` | const | Map of accepted categories to block type names (`layout`, `viz`, `data`). |
+| `RenderUiToolInput` | type alias | Re-exported validated payload type from `@netscript/ai/tools`. |
+| `RenderUiOptions` / `RenderUiSurfaceProps` | interfaces | Renderer configuration and component prop contracts (`maxDepth`, `payload`). |
+| `RenderUiFallbackReason` | type alias | Union of fallback reasons: `'max-depth' \| 'unknown-type' \| 'invalid-node'`. |
+
+### Renderer example
+
+```tsx
+import { RenderUiSurface, renderUiPayload } from "@netscript/fresh-ui/ai/render-ui";
+
+const payload = {
+  component: "section",
+  title: "System Performance",
+  props: {
+    children: [
+      {
+        type: "grid",
+        props: {
+          children: [
+            {
+              type: "metric",
+              props: { label: "P99 Latency", value: "24 ms", detail: "healthy" },
+            },
+            {
+              type: "metric",
+              props: { label: "Error Rate", value: "0.01%", detail: "normal" },
+            },
+          ],
+        },
+      },
+      {
+        type: "table",
+        title: "Active Services",
+        props: {
+          columns: [
+            { key: "name", header: "Service" },
+            { key: "status", header: "Status" },
+          ],
+          rows: [
+            { name: "auth-service", status: "healthy" },
+            { name: "payment-gateway", status: "healthy" },
+          ],
+        },
+      },
+    ],
+  },
+};
+
+export function PerformanceWidget() {
+  return <RenderUiSurface payload={payload} maxDepth={6} />;
+}
+```
+
 ## Sub-path exports
 
-The following entrypoints are published alongside the root export.
+The following 6 entrypoints are published as declared in the package export map:
 
 | Export | Entrypoint | Purpose |
 | --- | --- | --- |
 | `@netscript/fresh-ui` | `./mod.ts` | Stable runtime helpers (`cn`, redirect-flash toast helpers, the `Icon` primitive, and `DataGrid` — documented above). |
-| `@netscript/fresh-ui/interactive` | `./interactive.ts` | Package-owned interactive namespaces (documented above). |
-| `@netscript/fresh-ui/primitives` | `./primitives.tsx` | L0 platform-contract primitives (documented above). |
+| `@netscript/fresh-ui/ai/render-ui` | `./src/ai/render-ui.tsx` | Safe, bounded generative-UI renderer (`renderUiPayload`, `RenderUiSurface`, block vocabulary — documented above). |
+| `@netscript/fresh-ui/desktop` | `./desktop.ts` | Browser-safe native desktop chrome helpers and IPC bridge definitions (`createDesktopChrome`). |
+| `@netscript/fresh-ui/interactive` | `./interactive.ts` | Package-owned interactive compound namespaces (`Accordion`, `Dialog`, `Drawer`, `Popover`, `Sheet`, `Tabs`, `Tooltip` — documented above). |
+| `@netscript/fresh-ui/primitives` | `./primitives.tsx` | L0 platform-contract primitives (`Show`, `VisuallyHidden`, `SrOnly` — documented above). |
+| `@netscript/fresh-ui/registry` | `./registry.ts` | Embedded Fresh UI copy-registry manifest and file content (`freshUiRegistryManifest`, `FRESH_UI_REGISTRY_CONTENT`). |
 
 ---
 

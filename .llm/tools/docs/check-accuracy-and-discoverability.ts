@@ -130,6 +130,47 @@ for (const command of requiredMutationFamilies) {
   requireText(cliReference, `\`netscript ${command}`, 'CLI mutation map');
 }
 
+const ALLOWED_FRESH_ROOT_SYMBOLS = new Set([
+  'CachedListEntryLike',
+  'CacheEntryLike',
+  'hasAllCacheEntries',
+  'minCachedAt',
+  'projectCachedItemFromList',
+]);
+
+async function checkFreshRootImports(dirPath: string): Promise<number> {
+  let count = 0;
+  for await (const entry of Deno.readDir(new URL(dirPath, root))) {
+    const fullPath = `${dirPath}/${entry.name}`;
+    if (entry.isDirectory) {
+      count += await checkFreshRootImports(fullPath);
+    } else if (entry.isFile && entry.name.endsWith('.md')) {
+      const content = await read(fullPath);
+      const importMatches = content.matchAll(
+        /import\s+(?:type\s+)?\{([^}]+)\}\s+from\s+["']@netscript\/fresh["']/g,
+      );
+      for (const match of importMatches) {
+        const symbols = match[1]
+          .split(',')
+          .map((s) => s.trim().replace(/^type\s+/, ''))
+          .filter(Boolean);
+        for (const sym of symbols) {
+          const cleanSym = sym.split(/\s+as\s+/)[0].trim();
+          if (cleanSym && !ALLOWED_FRESH_ROOT_SYMBOLS.has(cleanSym)) {
+            throw new Error(
+              `${fullPath}: symbol '${cleanSym}' is imported from '@netscript/fresh' root, but it is not a valid root export. Use the appropriate subpath export instead.`,
+            );
+          }
+        }
+        count++;
+      }
+    }
+  }
+  return count;
+}
+
+const checkedFreshRootImports = await checkFreshRootImports('docs');
+
 console.log(
-  `docs accuracy: PASS (${publicDocs.length} saga pages, storefront worker boundary, spawn contract, 8 preferred paths, ${requiredMutationFamilies.length} CLI mutation families)`,
+  `docs accuracy: PASS (${publicDocs.length} saga pages, storefront worker boundary, spawn contract, 8 preferred paths, ${requiredMutationFamilies.length} CLI mutation families, ${checkedFreshRootImports} valid @netscript/fresh root imports checked)`,
 );

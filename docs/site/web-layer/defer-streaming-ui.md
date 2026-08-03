@@ -32,7 +32,7 @@ policy.
 content or a render function that turns the resolved value into content.
 
 ```tsx
-import { Deferred } from "@netscript/fresh";
+import { Deferred } from "@netscript/fresh/defer";
 
 export function Panel({ slowData }: { slowData: Promise<readonly string[]> }) {
   return (
@@ -73,7 +73,7 @@ refresh the region on the client.
 The props are described by `DeferPageProps`:
 
 ```tsx
-import { DeferPage } from "@netscript/fresh";
+import { DeferPage } from "@netscript/fresh/defer";
 
 export function OrdersRegion(
   { ctx, cachedOrders, cachedAt }: {
@@ -124,7 +124,7 @@ a fully populated `DeferPolicyResolved` used by both the server and the island
 renderers:
 
 ```ts
-import { resolveDeferPolicy } from "@netscript/fresh";
+import { resolveDeferPolicy } from "@netscript/fresh/defer";
 
 const resolved = resolveDeferPolicy(
   { profile: "balanced" },

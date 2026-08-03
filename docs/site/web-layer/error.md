@@ -59,7 +59,7 @@ import {
   hasError,
   extractData,
   extractErrorWithFallback,
-} from "@netscript/fresh";
+} from "@netscript/fresh/error";
 
 // No-fallback form: errored result carries only normalized error data.
 const loadOrders = errorHandler(async () => {
@@ -81,7 +81,7 @@ if (hasError(result)) {
 With a fallback, the errored result still hands you usable data:
 
 ```ts
-import { errorHandler, hasError, extractErrorWithFallback } from "@netscript/fresh";
+import { errorHandler, hasError, extractErrorWithFallback } from "@netscript/fresh/error";
 
 const loadStats = errorHandler(
   async () => await fetchStats(),
@@ -120,7 +120,7 @@ The helpers below unpack a `LoaderResult` after you have classified it. Pick the
 - `children?` — a render prop or replacement node for custom presentation.
 
 ```tsx
-import { ErrorDisplay, hasError, extractData } from "@netscript/fresh";
+import { ErrorDisplay, hasError, extractData } from "@netscript/fresh/error";
 
 export default function Page({ result }) {
   if (hasError(result)) {
@@ -141,7 +141,7 @@ export default function Page({ result }) {
 For compact, in-flow surfaces — a failed widget inside an otherwise healthy page — use `InlineError`, which renders the same normalized `ErrorData` in a tighter layout:
 
 ```tsx
-import { InlineError } from "@netscript/fresh";
+import { InlineError } from "@netscript/fresh/error";
 
 <InlineError error={result.error} />;
 ```
@@ -151,7 +151,7 @@ import { InlineError } from "@netscript/fresh";
 The `children` prop of `ErrorDisplay` accepts a render prop that receives `ErrorPrimitives` — a precomputed view payload shared by package-owned and app-owned error views. It exposes the resolved `errorTitle`, `errorMessage`, `errorCode`, `errorType`, `errorStatus`, `errorTimestamp`, `errorIcon`, `isRetryable`, and the default renderer's utility classes (`bgColor`, `borderColor`, `textColor`), alongside the raw `error`. This lets you replace the markup while keeping the framework's classification and message resolution.
 
 ```tsx
-import { ErrorDisplay } from "@netscript/fresh";
+import { ErrorDisplay } from "@netscript/fresh/error";
 
 <ErrorDisplay error={result.error}>
   {(p) => (

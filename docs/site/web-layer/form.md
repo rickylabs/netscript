@@ -25,23 +25,83 @@ Build server-validated forms on `resolveFormState` and `Form` today; adopt the r
 descriptors as your pages need them.
 {{ /comp }}
 
-## How the surface fits together
+## Primary path: defining a form page with definePage().withForm()
 
-A server-validated form moves through three layers:
+The standard way to build a server-validated form in `@netscript/fresh` is through `definePage().withForm()`. A single builder page definition owns validation, CSRF headers, form state, error preservation, and mutation logic.
 
-1. **Parse** the incoming `FormData` into a plain nested object with `formDataToRawValues`,
-   then normalize empty strings to `undefined` with `normalizeFormValues`.
-2. **Validate** the normalized values. A schema adapter such as the one returned by
-   `createStandardSchemaAdapter` turns any Standard Schema v1 validator into a
-   `FormSchemaAdapter`, whose `safeParse` returns a normalized success or failure result.
-   On failure, errors flatten into the canonical `FormErrors` shape.
-3. **Render** the managed `Form` component with the resolved `FormState`. On a GET request
-   the state starts from your initial values; on a failed POST it preserves the submitted
-   values and errors so the page re-renders with the user's input intact.
+Here is a complete route module:
 
-`resolveFormState` is the bridge between the route handler and the component: it inspects
-the handler `data` and either preserves an existing `FormState` or builds a fresh one from
-initial values.
+```tsx
+// routes/contact.tsx
+import { definePage } from "@netscript/fresh/builders";
+import type { RuntimeFormState } from "@netscript/fresh/builders";
+import { z } from "zod";
+import { contactsClient } from "../lib/api-clients.ts";
+
+const ContactSchema = z.object({
+  email: z.string().email(),
+  message: z.string().min(10),
+});
+
+function ContactForm(props: RuntimeFormState<z.input<typeof ContactSchema>>) {
+  return (
+    <form method="post">
+      <input name="email" value={String(props.values.email ?? "")} />
+      <textarea name="message">{String(props.values.message ?? "")}</textarea>
+      <button type="submit">Send</button>
+    </form>
+  );
+}
+
+export const contactPage = definePage()
+  .withRouteContract({
+    $route: "/contact",
+    pathSchema: z.object({}),
+    searchSchema: z.object({}),
+  })
+  .withForm("contact", ContactForm, {
+    schema: ContactSchema,
+    method: "POST",
+    csrf: true,
+    initial: () => ({ email: "", message: "" }),
+    mutate: async (input) => {
+      // Write through a contract-derived typed SDK mutation client
+      const created = await contactsClient.create(input);
+      return { id: created.id };
+    },
+    redirectTo: (output) => `/contact/thanks?id=${output.id}`,
+    invalidate: async () => {
+      await contactsClient.invalidateList();
+    },
+  })
+  .build();
+
+export default contactPage.default;
+```
+
+### When to use withForm vs client-only island mutations
+
+- **Use `definePage().withForm()`** for 80% of form cases: server-rendered HTML forms, standard POST navigation, server-validated inputs with CSRF protection, and automatic GET/POST error-state preservation without requiring JavaScript on the client.
+- **Use a client-only `useIslandMutation` form** when you need instant optimistic UI updates, rich interactive client-side state (such as inline auto-saving or interactive draft preview), or when the form lives in a hydrated island that performs async API calls without triggering a server page navigation.
+
+```
+Need a form in Fresh?
+├─ Server-rendered form, POST navigation, CSRF & error round-trips?
+│   └─ Use definePage().withForm(...) (Primary 80% path)
+└─ Hydrated island, instant optimistic UI, client-only interactive widget?
+    └─ Use useIslandMutation with query utils (Island path)
+```
+
+## Lower-level form primitives
+
+When you need custom handler orchestration or bespoke parsing pipelines, `@netscript/fresh/form` exposes low-level form primitives:
+
+1. **Parse** the incoming `FormData` into a plain nested object with `formDataToRawValues`, then normalize empty strings to `undefined` with `normalizeFormValues`.
+2. **Validate** the normalized values. A schema adapter such as the one returned by `createStandardSchemaAdapter` turns any Standard Schema v1 validator into a `FormSchemaAdapter`, whose `safeParse` returns a normalized success or failure result. On failure, errors flatten into the canonical `FormErrors` shape.
+3. **Render** the managed `Form` component with the resolved `FormState`. On a GET request the state starts from your initial values; on a failed POST it preserves the submitted values and errors so the page re-renders with the user's input intact.
+
+`resolveFormState` is the bridge between the route handler and the component: it inspects the handler `data` and either preserves an existing `FormState` or builds a fresh one from initial values.
+
 
 ## Defining and rendering a form
 
