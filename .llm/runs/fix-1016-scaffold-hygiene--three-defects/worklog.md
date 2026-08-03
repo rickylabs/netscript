@@ -88,6 +88,5 @@ Add scaffold boundary cases beside existing CLI E2E fixture gates; add starter p
 - GitHub's first deno-only run exposed an invalid CI placement: `scaffold.infrastructure` reached
   `database.init` without Aspire and failed. The hostile-parent gates were moved into the existing
   Aspire-backed `scaffold.runtime` sequence; the clean-clone README gate remains deno-only.
-- Root `deno task test` completed all 2,516 product assertions twice; on each run the sole failure
-  was the repository scanner encountering a different pre-existing unreadable E2E data directory.
-  After trashing every remaining run-owned fixture, the scanner passed independently.
+- Root `deno task test` final rerun: `2517 passed (564 steps)`, `0 failed`, `16 ignored`.
+- Final `agentic:leak-check`: Aspire ok, Docker ok, `survivors: []`.
