@@ -86,6 +86,7 @@ job. Release prose is edited in the tracked notes-file input.
 | 2026-08-03 | 1 | hosted CI remediation | The later repo-wide test exposed mixed Node/Deno timer typing in `claude-print.ts`; `5efcaf770` changed the annotation to `ReturnType<typeof setTimeout>` without runtime change. |
 | 2026-08-03 | 4 | opposite-family review | Fable session `0512c736-61f4-423d-bb87-a20fccaa4cb6` returned `PASS`; remediation session `bdef503c-d888-42ff-8860-7b7cda5fa4ba` verified resolution-accurate wording and retained `PASS`. |
 | 2026-08-03 | 4 | supervisor sign-off | Inspected the release-intro composition contract, removed API/runtime behavior, tracked live-surface grep, formatting, release parser test, and reviewer evidence; approved the slice for commit. |
+| 2026-08-03 | 5 | IMPL-EVAL | Guarded OpenRouter/Qwen session `fd89ce34-4ca0-440a-8ab4-b20d3013e7d0` returned `PASS` after inspecting all five boundaries; no prohibited/missing child-model request was attempted. |
 
 ## Decisions
 
@@ -132,10 +133,16 @@ job. Release prose is edited in the tracked notes-file input.
 - #1083 release parser `notes-file` contract: `1 passed, 0 failed`.
 - #1083 tracked live-surface search: zero `assertResolvable` matches outside historical run evidence.
 - #1083 review: `PASS`; resolution wording finding resolved.
-- Remaining implementation gates: final full-suite tests and IMPL-EVAL `NOT_RUN`.
+- Full repository `deno task test` after timer remediation: `2548 passed (564 steps), 0 failed, 16
+  ignored` in 5m10s; the ignored tests require separately provisioned integration/E2E services.
+- Close-gate and answered review-thread gate: hosted run `30808935212`, both `success`.
+- IMPL-EVAL: `PASS` — guarded open-model session
+  `fd89ce34-4ca0-440a-8ab4-b20d3013e7d0`; no denial audit was created because it made no
+  prohibited or missing model request.
+- Remaining gate: final hosted checks for the harness-artifact head before draft→ready transition.
 
 ## Handoff Notes
 
-- #1083 is supervisor-approved for its issue commit. After push and issue evidence, proceed to final
-  gates and separate IMPL-EVAL. The full root test run is already in progress; hosted CI rerun
-  `30808732349` validates the timer portability remediation and Redis lane together.
+- All implementation slices and formal evaluation are complete. Push the final harness-artifact
+  commit, wait for that exact head's required checks and review-thread gate, then mark PR #1094
+  ready and replace `status:impl` with `status:ready-merge`.
