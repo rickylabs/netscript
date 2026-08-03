@@ -115,6 +115,56 @@ Deno.test('plugin doctor reports visible validation issues by field', async () =
   assertStringIncludes(reports[0].checks[0].message ?? '', 'Expected number');
 });
 
+Deno.test('plugin doctor distinguishes an absent AppHost from unhealthy resources', async () => {
+  const reports = await doctorPlugin({ projectRoot: '/workspace' }, {
+    fs: new MemoryFileSystemAdapter(),
+    loadConfig: () => Promise.resolve(configWithResources()),
+    inspectAppHost: { inspect: () => Promise.resolve({ status: 'not-running' }) },
+  });
+  assertEquals(reports[0].checks[0].id, 'apphost:not-running');
+  assertStringIncludes(reports[0].checks[0].message ?? '', 'No AppHost is running');
+});
+
+Deno.test('plugin doctor reports configured resources missing from the running AppHost by name', async () => {
+  const reports = await doctorPlugin({ projectRoot: '/workspace' }, {
+    fs: new MemoryFileSystemAdapter(),
+    loadConfig: () => Promise.resolve(configWithResources()),
+    inspectAppHost: {
+      inspect: () => Promise.resolve({
+        status: 'running',
+        resources: [{ name: 'api', state: 'Running', healthStatus: 'Healthy' }],
+      }),
+    },
+  });
+  const appHost = reports[0];
+  assertEquals(appHost.status, 'error');
+  assertEquals(appHost.checks.find((check) => check.id === 'apphost:missing:web')?.status, 'error');
+  assertStringIncludes(
+    appHost.checks.find((check) => check.id === 'apphost:missing:main-db')?.message ?? '',
+    'main-db',
+  );
+});
+
+Deno.test('plugin doctor reports a running but unhealthy AppHost resource', async () => {
+  const reports = await doctorPlugin({ projectRoot: '/workspace' }, {
+    fs: new MemoryFileSystemAdapter(),
+    loadConfig: () => Promise.resolve(configWithResources()),
+    inspectAppHost: {
+      inspect: () => Promise.resolve({
+        status: 'running',
+        resources: [
+          { name: 'api', state: 'Running', healthStatus: 'Unhealthy' },
+          { name: 'web', state: 'Running', healthStatus: 'Healthy' },
+          { name: 'main-db', state: 'Running', healthStatus: 'Healthy' },
+        ],
+      }),
+    },
+  });
+  const check = reports[0].checks.find((candidate) => candidate.id === 'apphost:resource:api');
+  assertEquals(check?.status, 'error');
+  assertStringIncludes(check?.message ?? '', 'Unhealthy');
+});
+
 Deno.test('plugin manifest import failures degrade to an error report', async () => {
   const reports = await doctorPlugin({ projectRoot: '/workspace' }, {
     fs: new MemoryFileSystemAdapter(),
@@ -183,6 +233,15 @@ async function assertWorkersCommandPasses(registrySource: string): Promise<void>
       }),
   });
   await command.parse(['--project-root', projectRoot]);
+}
+
+function configWithResources() {
+  return {
+    plugins: [],
+    services: { api: { port: 8000 } },
+    apps: { web: { port: 3000 } },
+    databases: { 'main-db': { engine: 'postgres' } },
+  } as never;
 }
 
 async function assertSagaCommandPasses(registrySource: string): Promise<void> {

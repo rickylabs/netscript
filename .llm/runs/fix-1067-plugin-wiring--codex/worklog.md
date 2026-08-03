@@ -70,6 +70,8 @@ CLI E2E/dependency fixture rather than importing workspace source directly.
 | 2026-08-03 | slice 1   | contract/implementation | Added a full installed-entry reconcile at install and Aspire-helper regeneration boundaries. Dependency names resolve through persisted target manifests to their actual `serviceConfigKey`; explicit install references are persisted as declarations; dangling edges remain absent. No official manifest was duplicated or changed. |
 | 2026-08-03 | slice 1   | producer semantics | Replaced asynchronous warn/queue/drop behavior for absent stream discovery with a synchronous constructor error naming the missing `streams` reference and the install/regenerate repair. The former drop-writes test now requires rejection. Network timeout/retry remains deferred to 0.0.5. |
 | 2026-08-03 | slice 1   | main-red proof | Stashed all implementation changes, restored only the new real-plugin permutation test onto `origin/main`/`c1dee1697`, and ran the complete test file. It failed at the permutation equality step: expected included `"streams"`, actual contained only `"workers-api"`; summary `FAILED | 0 passed (21 steps) | 1 failed (1 step)`. Restored the full stash afterward. |
+| 2026-08-03 | slice 1   | review/commit | Supervisor accepted the implementation with two fixes: removed stale `assertResolvable` documentation and declared the exported member removal as an intentional 0.0.4 breaking change. Committed and pushed `3e9abf10c`. |
+| 2026-08-03 | slice 2   | live AppHost truth | Added an injected AppHost inspection port and Aspire CLI adapter. It checks `aspire ps` before `describe`, reports an absent AppHost distinctly, and compares configured services/apps/databases to named running resources with unhealthy state preserved. Existing workers plugin negative test explicitly proves a contributed check returns `ok: false`. |
 
 ## Decisions
 
@@ -97,6 +99,16 @@ the owner-authorized supervisor.
 | `deno task arch:check` | Exit 0; every doctrine root reported `FAIL=0` (pre-existing warnings only). |
 | Public doc lint | CLI: `0` errors. Streams-core: only `5` pre-existing private-type-ref findings in unchanged telemetry files; `missingJSDoc=0`. |
 | Required CLI E2E | `scaffold.plugins` suite artifact `.llm/tmp/cli-e2e/plugin-smoke-20260803-090030.log`: `ok: true`, `passed=16`, `failed=0`, `skipped=0`. Generated appsettings contains `streams` for workers/sagas/triggers service and background entries, plus their declared/self references. |
+
+### Slice 2
+
+| Gate | Trusted artifact/output |
+| ---- | ----------------------- |
+| Focused doctor behavior | `15 passed | 0 failed`: absent AppHost, named missing resources, running-but-unhealthy resource, adapter `ps`/`describe` sequencing, and real workers-contributed `ok: false`. |
+| `packages/cli` check/test | Check passed; full package suite `549 passed (474 steps) | 0 failed`. |
+| Scoped check/lint/fmt | Six touched CLI files; check `0` failed batches/occurrences, lint `0` occurrences, fmt `0` findings. |
+| `deno task quality:scan` | `ok: true`, `findings: []`; seven existing allowances only. |
+| `deno task arch:check` | Exit 0; every doctrine root `FAIL=0` with pre-existing warnings only. |
 
 ## Handoff Notes
 

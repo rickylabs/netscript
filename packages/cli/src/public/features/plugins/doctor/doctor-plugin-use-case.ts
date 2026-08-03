@@ -54,6 +54,25 @@ export interface PluginDoctorDependencies {
     projectRoot: string,
     config?: NetScriptConfig,
   ) => Promise<Record<string, RegisteredPluginConfig>>;
+  /** Inspect the running Aspire AppHost for configured resource truth. */
+  readonly inspectAppHost?: AppHostInspector;
+}
+
+/** One named resource observed from a running AppHost. */
+export interface AppHostResourceState {
+  readonly name: string;
+  readonly state?: string;
+  readonly healthStatus?: string;
+}
+
+/** Explicit AppHost lifecycle and resource snapshot. */
+export type AppHostInspection =
+  | { readonly status: 'not-running' }
+  | { readonly status: 'running'; readonly resources: readonly AppHostResourceState[] };
+
+/** Runtime observation port used by plugin doctor. */
+export interface AppHostInspector {
+  inspect(projectRoot: string): Promise<AppHostInspection>;
 }
 
 /** Run host-side health checks for configured plugins. */
@@ -69,7 +88,10 @@ export async function doctorPlugin(
   }
 
   const pluginSpecs = resolvePluginSpecs(config);
-  if (pluginSpecs.length === 0) return [];
+  const appHostReport = dependencies.inspectAppHost
+    ? await diagnoseAppHost(input.projectRoot, config, dependencies.inspectAppHost)
+    : undefined;
+  if (pluginSpecs.length === 0) return appHostReport ? [appHostReport] : [];
 
   let plugins: Record<string, RegisteredPluginConfig>;
   try {
@@ -80,9 +102,60 @@ export async function doctorPlugin(
     return [workspaceErrorReport('manifest-resolution', 'Could not resolve plugin manifests.', error)];
   }
 
-  return await Promise.all(
+  const reports = await Promise.all(
     Object.values(plugins).map((plugin) => diagnosePlugin(input.projectRoot, plugin, dependencies)),
   );
+  return appHostReport ? [appHostReport, ...reports] : reports;
+}
+
+async function diagnoseAppHost(
+  projectRoot: string,
+  config: NetScriptConfig,
+  inspector: AppHostInspector,
+): Promise<PluginDoctorReport> {
+  try {
+    const snapshot = await inspector.inspect(projectRoot);
+    if (snapshot.status === 'not-running') {
+      return workspaceErrorReport(
+        'apphost:not-running',
+        'Aspire AppHost running',
+        new Error('No AppHost is running for this project. Start it and rerun plugin doctor.'),
+      );
+    }
+    const observed = new Map(snapshot.resources.map((resource) => [resource.name, resource]));
+    const checks = configuredResourceNames(config).map((name): PluginDoctorCheck => {
+      const resource = observed.get(name);
+      if (!resource) {
+        return {
+          id: `apphost:missing:${name}`,
+          title: `AppHost resource ${name}`,
+          status: 'error',
+          message: `Configured resource "${name}" is missing from the running AppHost.`,
+        };
+      }
+      const healthy = resource.state?.toLowerCase() === 'running' &&
+        resource.healthStatus?.toLowerCase() === 'healthy';
+      return {
+        id: `apphost:resource:${name}`,
+        title: `AppHost resource ${name}`,
+        status: healthy ? 'healthy' : 'error',
+        message: healthy
+          ? 'Running and healthy'
+          : `Resource "${name}" is ${resource.state ?? 'unknown'} / ${resource.healthStatus ?? 'unknown'}.`,
+      };
+    });
+    return { pluginName: 'apphost', status: aggregateStatus(checks), checks };
+  } catch (error) {
+    return workspaceErrorReport('apphost:inspection', 'Could not inspect Aspire AppHost.', error);
+  }
+}
+
+function configuredResourceNames(config: NetScriptConfig): readonly string[] {
+  return [...new Set([
+    ...Object.keys(config.services ?? {}),
+    ...Object.keys(config.apps ?? {}),
+    ...Object.keys(config.databases ?? {}),
+  ])].sort();
 }
 
 async function diagnosePlugin(

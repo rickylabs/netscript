@@ -63,6 +63,7 @@ import type { PublicCliHost } from './public-command-tree.ts';
 import { FetchAuthSessionHttp } from '../plugins/auth/auth-session-client.ts';
 import type { AuthSessionHttpPort } from '../plugins/auth/auth-types.ts';
 import { generateAspire } from '../generate/aspire/generate-aspire.ts';
+import { AspireAppHostDoctorInspector } from '../../../kernel/adapters/aspire/apphost-doctor-inspector.ts';
 
 /** Dependencies shared by public command groups. */
 export interface PublicCommandDependencies {
@@ -285,6 +286,7 @@ export function createPublicCommandDependencies(
         await doctorPlugin(input, {
           fs,
           loadConfig,
+          inspectAppHost: new AspireAppHostDoctorInspector(process),
         }),
     },
     authSessionHttp: new FetchAuthSessionHttp(),
