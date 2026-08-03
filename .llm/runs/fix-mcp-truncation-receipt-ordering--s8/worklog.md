@@ -60,6 +60,8 @@ when it applies any descendant cap.
 | Time | Slice | Step | Notes |
 | --- | --- | --- | --- |
 | 2026-08-03 | bootstrap | research/design | Re-baselined #1134 and RFC S-13/S-15 against clean `origin/main`; baseline doc-lint 0 diagnostics. |
+| 2026-08-03 | plan-eval | transport | Canonical Qwen evaluator launch timed out before any verdict/file change; retrying same route with a bounded timeout extension. |
+| 2026-08-03 | plan-eval | verdict | Separate Claude Code + OpenRouter Qwen session returned `PASS`; both implementation slices authorized. |
 
 ## Decisions
 
@@ -87,6 +89,7 @@ when it applies any descendant cap.
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
 | Full Archetype-2 column | NOT_RUN | plan gate first | Selected per RFC S-20 |
+| Plan-Gate | PASS | `plan-eval.md` | All eight checklist items passed; no unresolved decisions |
 
 ### Runtime Gates
 

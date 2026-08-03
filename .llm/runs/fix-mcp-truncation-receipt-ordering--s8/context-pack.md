@@ -6,14 +6,14 @@
 | --- | --- |
 | Run ID | `fix-mcp-truncation-receipt-ordering--s8` |
 | Branch | `fix/mcp-truncation-receipt-ordering` |
-| Current phase | `plan` |
+| Current phase | `implement` |
 | Archetype | `2 - Integration` |
 | Scope overlays | `none` |
 
 ## Current State
 
-Clean worktree baseline equals `origin/main` at `fb75cf6f`. Research and design are locked; no
-package source has changed. The run awaits a separate local open-model PLAN-EVAL.
+Clean worktree baseline equals `origin/main` at `fb75cf6f`. Research and design are locked, and a
+separate local open-model PLAN-EVAL returned `PASS`. No package source has changed yet.
 
 ## Completed
 
@@ -21,16 +21,17 @@ package source has changed. The run awaits a separate local open-model PLAN-EVAL
 - Read required harness, PR, doctrine, JSR, tooling, and Archetype-2 authorities.
 - Re-baselined actual MCP receipt/truncation code and adjacent debt.
 - Ran baseline full-export doc lint: 0 diagnostics across `mod.ts` and `cli.ts`.
+- Obtained tracked PLAN-EVAL `PASS` from Claude Code + OpenRouter Qwen.
 
 ## In Progress
 
-- Bootstrap commit, draft PR, then PLAN-EVAL.
+- Slice 1: receipt settlement after validation and failed-attempt fixture.
 
 ## Next Steps
 
-1. Commit/push run artifacts and open the draft PR with `status:plan`.
-2. Run separate-session local Qwen PLAN-EVAL; do not edit package source before PASS.
-3. Implement and gate the two slices in design order.
+1. Implement and gate receipt settlement after validation.
+2. Perform opposite-family slice review, commit, push, and comment.
+3. Implement and gate truncation metadata + byte ceiling.
 
 ## Key Decisions
 
@@ -51,7 +52,7 @@ package source has changed. The run awaits a separate local open-model PLAN-EVAL
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
 | Static | baseline PASS | package doc lint 0 diagnostics |
-| Fitness | planned | full Archetype-2 matrix selected |
+| Fitness | plan-gate PASS | full Archetype-2 matrix selected and approved |
 | Runtime | planned | two required fixtures |
 | Consumer | N/A unless drift | exports locked unchanged |
 

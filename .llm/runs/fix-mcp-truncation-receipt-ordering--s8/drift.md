@@ -15,3 +15,15 @@ documentation.
 - **Action:** fix
 - **Evidence:** RFC S-15 already calls this a `withReceipt`/runner integration and anticipates both
   locations; scope remains ordering only.
+
+## 2026-08-03 — First local PLAN-EVAL transport timed out
+
+- **What:** The canonical guarded local evaluator launched on Claude Code + OpenRouter Qwen but hit
+  the suite child-process timeout before writing `plan-eval.md`.
+- **Source:** local evaluator outcome for command `plan-eval-1134`.
+- **Expected:** A tracked `PASS` or `FAIL_PLAN` artifact.
+- **Actual:** Transport exit 1 with diagnostic `timeout`; no verdict artifact and no tree changes.
+- **Severity:** minor
+- **Action:** fix
+- **Evidence:** Retry the same route with a concise prompt and a longer bounded process timeout;
+  this is not counted as a `FAIL_PLAN` cycle because no evaluator verdict was emitted.
