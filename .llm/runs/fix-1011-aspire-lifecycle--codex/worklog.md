@@ -86,6 +86,9 @@ by adding a named gate to `packages/cli/e2e/src/application/gates/scaffold/runti
 | 2026-08-03 | S1 | implementation | Generated `db-operation-apphost.mts`; detached DB operations exclusively lock/probe/start/poll/log/stop that path with `--isolated`; studio remains on resident `apphost.mts`. Added live resident identity gate. |
 | 2026-08-03 | S1 | package/static gates | CLI package suite: 554 passed / 0 failed. Scoped check/lint/fmt: zero findings. `quality:gate`: PASS with pre-existing warnings only. |
 | 2026-08-03 | S1 | slice review | Fable alias and routing-id fallback were unavailable; native `claude-opus-4-8` fallback session `d8cc7066-8900-4c1f-a0bd-2bfe264f48b1` found a symlink false-red, fixed via `realPath` fallback, then emitted `REVIEW_PASS`. Live runtime remains honestly deferred. |
+| 2026-08-03 | S2 | red proof | Generator, inspector, and doctor tests failed pre-fix: endpoint-bearing task/Tauri resources had no probe, `healthReports` were discarded, and an empty-report resource was certified healthy. The missing-Aspire-binary test passed in the same run. |
+| 2026-08-03 | S2 | implementation | All endpoint-bearing app entries receive the configured HTTP probe; `AppHostInspector` preserves raw report evidence; doctor warns instead of certifying Healthy when reports are absent. Added a generator-driven live dead-port fixture and non-healthy/evidence gate to `scaffold.runtime`. |
+| 2026-08-03 | S2 | package/static gates | CLI package suite, root check, scoped check/lint/fmt, quality scan, and architecture check passed; only pre-existing catalog/doctrine warnings remain. |
 
 ## Decisions
 
@@ -112,8 +115,13 @@ by adding a named gate to `packages/cli/e2e/src/application/gates/scaffold/runti
 - Scoped check/lint/fmt: `PASS` — zero findings after formatting the new E2E gate.
 - `quality:gate`: `PASS` — quality scan clean; architecture check has only pre-existing warnings.
 - Opposite-family slice review: `REVIEW_PASS` after resolving canonical-path false-red risk.
+- S2 red proof: `PASS` — 3 expected failures before implementation; missing-binary coverage stayed
+  green in the same run.
+- S2 CLI package/root/static gates: `PASS` — package suite and root check completed successfully;
+  scoped check/lint/fmt and quality scan reported zero findings; architecture check emitted only
+  pre-existing warnings.
 - Live `scaffold.runtime`: `NOT_RUN` — deliberately once-only at merge-readiness; no #1011
-  acceptance box may be ticked yet.
+  or #1012 acceptance box may be ticked yet.
 
 ## Handoff Notes
 

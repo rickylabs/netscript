@@ -410,7 +410,7 @@ describe('generateRegisterApps', () => {
     assert(!output.includes('withHttpHealthCheck'));
   });
 
-  it('should not register a health probe for non-app resource types', () => {
+  it('should register a health probe for every endpoint-bearing executable', () => {
     const output = generateRegisterApps({
       ...emptyOptions,
       apps: {
@@ -418,6 +418,16 @@ describe('generateRegisterApps', () => {
         desktop: fixtures.DESKTOP_APP,
         chores: fixtures.TASK_APP,
       },
+    });
+    assertStringIncludes(output, 'await shell.withHttpHealthCheck(');
+    assertStringIncludes(output, 'await chores.withHttpHealthCheck(');
+    assert(!output.includes('await desktop.withHttpHealthCheck('));
+  });
+
+  it('should not register a health probe for an endpoint-less task', () => {
+    const output = generateRegisterApps({
+      ...emptyOptions,
+      apps: { chores: fixtures.UNPINNED_TASK_APP },
     });
     assert(!output.includes('withHttpHealthCheck'));
   });

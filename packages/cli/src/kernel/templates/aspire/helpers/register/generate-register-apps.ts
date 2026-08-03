@@ -23,11 +23,10 @@
  * All types receive executable-mode OTEL telemetry and optional
  * KV cache dependency injection.
  *
- * `app` resources additionally get an HTTP health probe against their own
- * server-rendered health route. Aspire falls back to "process is Running means ready"
- * for a resource with no registered health check, which is how a Fresh app that fails
- * during SSR could still report `Healthy` (#954). Set `HealthCheckPath: false` on the
- * app entry to opt out, or to a path string to probe a different route.
+ * Every endpoint-bearing executable additionally gets an HTTP health probe.
+ * Aspire falls back to "process is Running means ready" for a resource with no
+ * registered health check. Set `HealthCheckPath: false` to opt out, or to a path
+ * string to probe a different route.
  */
 
 import type { RegisterAppsOptions } from '../types.ts';
@@ -112,10 +111,10 @@ export function generateRegisterApps(options: RegisterAppsOptions): string {
       lines.push(`    await ${id}.${renderHttpEndpointCall(entry)};`);
     }
 
-    // --- app type: HTTP health probe ---
-    // Registered after the endpoint it derives its base address from. Only `app`
-    // resources serve routes we control; tauri/desktop/task expose no such contract.
-    if (type === 'app') {
+    // --- Endpoint readiness probe ---
+    // Registered after the endpoint it derives its base address from. Without a
+    // probe Aspire equates a running executable with a ready server.
+    if (needsHttpEndpoint(type, entry)) {
       buildHealthProbeBlock(lines, id, entry);
     }
 
