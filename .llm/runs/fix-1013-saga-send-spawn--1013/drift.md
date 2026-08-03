@@ -27,3 +27,17 @@ Drift is append-only.
 - **Severity:** significant
 - **Action:** defer
 - **Evidence:** `deno task agentic:provider-canary --live --profile claude-openrouter --model qwen/qwen3.7-max --effort xhigh --worktree /home/codex/repos/ns004-sagasend`
+
+## 2026-08-03 — Owner-authorized PLAN-EVAL waiver
+
+- **What:** The owner explicitly waived the blocked PLAN-EVAL gate for this slice and authorized
+  implementation to proceed.
+- **Source:** Owner message in the product thread beginning “Plan-Gate is waived for this slice.”
+- **Expected:** A separate open-model Qwen session returns `PASS` before implementation.
+- **Actual:** The evaluator credential is deliberately unavailable while #1087 remains open because
+  the launched evaluator can autonomously spawn prohibited closed-model helpers. The owner acted as
+  an opposite-family Claude reviewer of the Codex-authored plan and waived only this Plan-Gate.
+- **Severity:** significant
+- **Action:** accept
+- **Evidence:** Owner states the generator≠reviewer invariant holds and cites the same release waiver
+  precedent used by PR #1075. This does not self-certify implementation or waive IMPL-EVAL.

@@ -67,6 +67,11 @@ the target message type.
 | --- | --- | --- | --- |
 | 2026-08-03 11:00 CEST | planning | research | Re-baselined #1013 against #1042 and #1075; actual current failure is orphan saga-message dispatch, not an unconsumed ledger. |
 | 2026-08-03 11:00 CEST | planning | evaluator canary | Local Qwen route blocked with `auth_required`; implementation remains paused. |
+| 2026-08-03 11:15 CEST | plan-eval | owner waiver | Opposite-family owner reviewer waived the environmentally blocked Plan-Gate on the record; implementation authorized. |
+| 2026-08-03 11:20 CEST | slice 1 | pre-fix red | With only the new construction-time assertion applied to baseline product code, `deno test --allow-all packages/plugin-sagas-core/tests/runtime/checkout-saga-contract_test.ts` failed 1/3: `AssertionError: Expected function to throw.` |
+| 2026-08-03 11:25 CEST | slice 1 | implementation | `spawn()` now returns `never` and throws `SAGA_NOT_IMPLEMENTED` before ledger acceptance; focused test passed 3/3. |
+| 2026-08-03 11:30 CEST | slice 1 | ordinary review | Claude Fable opposite-family review requested changes: retain wire-level spawn dispatch coverage and record red proof. Both findings were accepted and fixed before sign-off. |
+| 2026-08-03 11:45 CEST | slice 1 | re-review | Claude Fable opposite-family reviewer independently reran the focused and full package suites and returned `PASS`; both prior findings are closed. |
 
 ## Decisions
 
@@ -91,19 +96,25 @@ the target message type.
 | --- | --- | --- | --- |
 | Baseline focused public surface | `deno doc --filter send|spawn packages/plugin-sagas-core/mod.ts` | PASS | Confirms current documented signatures before change. |
 | Baseline full doc lint | `deno task doc:lint --root packages/plugin-sagas-core --pretty` | FAIL baseline | 9 combined private-type refs in 3 unrelated files; root and affected public entrypoints are clean. |
+| Slice 1 public surface | `deno doc --filter spawn packages/plugin-sagas-core/mod.ts` | PASS | Renders `spawn(...): never` and the named-error contract. |
+| Slice 1 scoped check/lint/fmt | Repo wrappers over `packages/plugin-sagas-core`, `--ext ts,tsx` | PASS | 110 files; zero findings in all three wrappers. |
 
 ### Fitness Gates
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
 | `F-5/F-6/F-7` baseline scan | `DEBT_ACCEPTED` / baseline | JSR audit: dry-run OK, one slow-type warning, source-root cardinality warning | Planned explicit `never` adds no slow type or folder child. |
-| Plan-Gate | `NOT_RUN` | Local evaluator canary blocked | Owner waiver or restored Qwen credential required. |
+| Plan-Gate | `WAIVED` | Owner authorization in product thread; recorded in `drift.md` | Environmental waiver only; IMPL-EVAL remains required. |
+| Slice 1 quality scan | `PASS` | Repository scan `ok: true`, no findings | Seven existing attributed allowances; none added. |
+| Slice 1 architecture | `PASS` | `arch:check` completed with every doctrine root `FAIL=0` | Saga-core retains two baseline warnings; no new debt. |
 
 ### Runtime Gates
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
 | Current effect trace | PASS | bridge/engine code plus #1075 diff | `publish()` recursively consumes ledgers; `send` remains saga-bus only. |
+| Slice 1 pre-fix red | PASS | Focused test failed on unchanged baseline product code | `spawn()` returned normally; `assertThrows` reported `Expected function to throw.` |
+| Slice 1 package suite | PASS | 68 passed, 0 failed, 2 ignored | Full `packages/plugin-sagas-core` suite, not a file-only verdict. |
 
 ### Consumer Gates
 

@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `fix-1013-saga-send-spawn--1013` |
 | Branch | `fix/1013-saga-send-spawn` |
-| Current phase | `plan-eval` |
+| Current phase | `impl` |
 | Archetype | `5 - Plugin Package` with sibling runtime rules |
 | Scope overlays | `docs` |
 
@@ -14,7 +14,8 @@
 
 Research and contract-first design are complete against `origin/main` at `ab0fa13fe`. #1042 already
 selected correction; #1075 now recursively dispatches handler effects, exposing the remaining
-tutorial sends as loud `SAGA_NOT_FOUND` failures. Product implementation is paused at the Plan-Gate.
+tutorial sends as loud `SAGA_NOT_FOUND` failures. The owner waived the credential-blocked
+PLAN-EVAL on the record, and implementation is proceeding with slice 1.
 
 ## Completed
 
@@ -23,16 +24,21 @@ tutorial sends as loud `SAGA_NOT_FOUND` failures. Product implementation is paus
 - JSR/public-surface baseline scanned.
 - Design checkpoint and three ordered slices written.
 - Local formal evaluator canary attempted and recorded as credential-blocked.
+- Planning slice `0fa339144` pushed and draft PR #1091 opened with `Closes #1013`.
+- Opposite-family owner reviewer explicitly waived PLAN-EVAL; waiver recorded in `drift.md`.
+- Slice 1 regression proved red on baseline product behavior: `assertThrows` failed because
+  `spawn()` returned normally.
 
 ## In Progress
 
-- Bootstrap commit, draft PR creation, and PLAN-EVAL unblock.
+- Slice 1 sign-off commit and PR evidence comment.
 
 ## Next Steps
 
-1. Commit/push the run bootstrap and open the draft PR with `Closes #1013`.
-2. Obtain a separate Qwen PLAN-EVAL `PASS`, or an explicit owner waiver in writing.
-3. Only then implement slice 1 and prove its regression red on `ab0fa13fe`.
+1. Commit, push, and comment slice 1 evidence.
+2. Continue to the storefront docs and cross-plugin integration slice.
+3. Prove the slice 2 regression test red against `ab0fa13fe` before changing its production/docs
+   dependencies.
 
 ## Key Decisions
 
@@ -57,13 +63,18 @@ tutorial sends as loud `SAGA_NOT_FOUND` failures. Product implementation is paus
 | Runtime | research only | empirical code trace and #1075 diff |
 | Consumer | baseline FAIL | tutorial emits orphan saga messages and lacks actual path test |
 
+Slice 1 is green: saga-core package `68 passed / 0 failed / 2 ignored`; scoped check/lint/fmt have
+zero findings; quality scan is clean; doctrine roots report `FAIL=0`; focused public docs render
+`spawn(...): never`; opposite-family slice re-review returned `PASS`.
+
 ## Open Questions
 
-- Blocking: restore the local open-model evaluator credential or explicitly waive PLAN-EVAL.
+- None for implementation. IMPL-EVAL transport remains an end-of-run risk and is not waived.
 
 ## Drift and Debt
 
-- Drift: #1075 changed the failure mode; local evaluator route is credential-blocked.
+- Drift: #1075 changed the failure mode; local evaluator route is credential-blocked; the owner
+  waived PLAN-EVAL only.
 - Debt: no new entry proposed; existing saga runtime/cardinality and adapter debts are untouched.
 
 ## Commits

@@ -22,7 +22,7 @@ export type SendOptions = CascadedMessageOptions;
 /**
  * Options reserved for the unsupported `spawn()` cascade.
  *
- * @unsupported Dispatching a spawn cascade throws `SAGA_NOT_IMPLEMENTED`.
+ * @unsupported Calling `spawn()` throws `SAGA_NOT_IMPLEMENTED`.
  */
 export type SpawnOptions = Pick<CascadedMessageOptions, 'idempotencyKey' | 'concurrencyKey'>;
 
@@ -61,22 +61,21 @@ export function schedule(
 }
 
 /**
- * Create an unsupported child-saga spawn cascade.
+ * Reject an unsupported child-saga spawn request.
  *
- * @unsupported Dispatching the returned cascade throws `SAGA_NOT_IMPLEMENTED`.
+ * @unsupported Child-saga lifecycle semantics are not implemented.
+ * @throws {SagasError} Always throws with code `SAGA_NOT_IMPLEMENTED` before an effect can enter a
+ * saga ledger.
  */
 export function spawn(
   child: SagaDefinition | SagaId | string,
   input: unknown,
   options: SpawnOptions = {},
-): CascadedMessage<'spawn'> {
-  return Object.freeze({
-    kind: 'spawn',
-    sagaId: normalizeSagaId(child),
-    input,
-    idempotencyKey: options.idempotencyKey,
-    concurrencyKey: options.concurrencyKey,
-  });
+): never {
+  void child;
+  void input;
+  void options;
+  throw SagasError.notImplemented('Spawn cascades are unsupported.');
 }
 
 /** Create a terminal saga completion message. */
@@ -111,12 +110,6 @@ function normalizeTarget(target: CascadedMessageTarget | string): CascadedMessag
   if (typeof target !== 'string') return target;
   assertNonEmpty(target, 'Cascaded message target must not be empty.');
   return Object.freeze({ kind: 'message', id: target });
-}
-
-function normalizeSagaId(child: SagaDefinition | SagaId | string): SagaId {
-  if (typeof child === 'object' && 'id' in child) return child.id;
-  assertNonEmpty(child, 'Child saga id must not be empty.');
-  return child.trim() as SagaId;
 }
 
 function resolveScheduledFor(delay: SagaScheduleDelay): Date {
