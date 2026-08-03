@@ -18,11 +18,8 @@ This entrypoint is intentionally narrow. It exposes the shipped helper surface u
 playground consumers and keeps deeper form internals out of the public package contract.
 
 {{ comp callout { type: "note" } }}
-The shipped `FormState` model is intentionally small. Richer runtime state — field
-descriptors, collection intents, progressive enhancement — exists in the surface (for
-example `RuntimeFormState` and `FormEnhancementSnapshot`) and is introduced incrementally.
-Build server-validated forms on `resolveFormState` and `Form` today; adopt the richer
-descriptors as your pages need them.
+Use `definePage().withForm()` as the primary path for server-validated forms. Reach for
+`resolveFormState` and `Form` when you need the lower-level primitives covered below.
 {{ /comp }}
 
 ## Primary path: defining a form page with definePage().withForm()

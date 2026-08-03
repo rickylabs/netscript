@@ -11,7 +11,8 @@ plugins return to the [reference overview](/reference/).
 
 The root entrypoint (`@netscript/fresh-ui`) intentionally stays small: copy-based registry
 components and islands remain on workspace-local deep paths so applications can own and evolve
-Five sub-path exports carry the package runtime seams:
+them after copy. The root module exposes only the supported helper utilities that are safe to
+consume as package runtime dependencies. Five sub-path exports carry the package runtime seams:
 
 - [`@netscript/fresh-ui/ai/render-ui`](#sub-path-exports) — safe, bounded generative-UI renderer for validated tool payloads.
 - [`@netscript/fresh-ui/desktop`](#sub-path-exports) — browser-safe native desktop chrome helpers.
