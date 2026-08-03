@@ -92,6 +92,9 @@ export class HelpersGeneratorPipeline {
       services: config.Services,
       version: config.Version,
       denoDefaults: config.Defaults.Deno,
+      databaseEngine: config.PrimaryDatabase
+        ? config.Databases[config.PrimaryDatabase]?.Engine
+        : undefined,
     }));
 
     // 6. Tier 1: Register plugins (two-pass cross-ref)
