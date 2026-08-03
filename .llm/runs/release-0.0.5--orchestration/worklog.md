@@ -534,3 +534,12 @@ slices; #1106/#1109 re-wave on owner action.
 W4 → #1135, #1136, #1104 (3 lanes). W5 → #1102, #1093, #1108 (3 lanes). #1085 (W6) re-nets
 against #1186's landed refusal-audit at dispatch — its exit-code boxes are likely already
 satisfied; brief will demand the delta only. Canary points unchanged.
+
+## 2026-08-04 — Merge 11: PR #1192 (#1191, --allow-ffi)
+
+Full gate record: latest-per-name contexts green (superseded CANCELLED/FAILURE from earlier
+runs); all five #1191 boxes ticked with the P2 DB re-measurement evidence (`P2-db.json` appended
+to the wave-0 proofs in the diff); files exactly the CLI command-emission surface (4 files);
+0 ignores; permission-emission test independently re-run 2/2 (32 steps); closing refs verified
+present at merge (finding-19 row) — **#1191 auto-closed by the merge** (`f7f7cc718`,
+23:24:37Z). The slice also self-dispatched an OpenHands evaluation and recorded its pass.
