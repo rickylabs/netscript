@@ -58,7 +58,10 @@ export class DebounceFilter implements WatchFilter {
     let upstreamDone = false;
     let upstreamError: unknown = null;
 
-    const pending = new Map<string, { timer: number; event: WatchEvent }>();
+    const pending = new Map<
+      string,
+      { timer: ReturnType<typeof setTimeout>; event: WatchEvent }
+    >();
 
     const notifyNext = () => {
       if (resolveNext) {
