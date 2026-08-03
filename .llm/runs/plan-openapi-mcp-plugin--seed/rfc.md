@@ -54,9 +54,10 @@ across all three runs: **zero** (#1072).
 
 1. **Extend `packages/mcp` core; no plugin, no new package (D1).** The projection — operation
    identity, description ladder, schema views, failure envelopes — is convention-bearing
-   agent-facing vocabulary: core, by the ARCHETYPE-5 thinness law. What a plugin could wire has
-   **no provider variance** (one MCP server, one in-repo spec producer, one discovery
-   mechanism); doctrine 07: "If you cannot name the axis cleanly, do not abstract." A
+   agent-facing vocabulary: core, by the ARCHETYPE-5 thinness law. What a plugin could wire
+   sits on one **named internal axis** — `EndpointSource`, whose variants are all first-party
+   adapters of one core port with no external provider behind any of them (S-21; the full
+   argument is §5); doctrine 07's axis discipline is honored by naming it, not by a plugin. A
    `plugins/openapi-mcp` would either own the convention (the archetype's named fat-plugin
    smell) or be an AP-22 shell — and would need an MCP-tools contribution axis core would have
    to grow first, reproducing #1093 at birth. Full AP/F-by-name argument:
