@@ -219,3 +219,25 @@ export function createGeneratedCheckGates(): readonly GateDefinition[] {
     ),
   ];
 }
+
+/** Create generated-project boundary behavior gates. */
+export function createProjectBoundaryGates(): readonly GateDefinition[] {
+  return [
+    commandGate(
+      GATE.BEHAVIOR_PROJECT_BOUNDARY_DEV,
+      'Start the generated Fresh dev server below a hostile parent tsconfig',
+      GATE_PHASE.BEHAVIOR,
+      (context) => [
+        'deno',
+        'run',
+        '--allow-all',
+        join(
+          context.project.repoRoot,
+          'packages/cli/e2e/src/application/gates/scaffold/probe-project-boundary-dev.ts',
+        ),
+        context.project.projectRoot,
+      ],
+      (context) => context.project.repoRoot,
+    ),
+  ];
+}

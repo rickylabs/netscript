@@ -162,6 +162,10 @@ jobs:
         if: env.RUN == 'true'
         run: deno task e2e:cli run scaffold.contracts --format pretty
 
+      - name: scaffold.infrastructure (hostile parent tsconfig)
+        if: env.RUN == 'true'
+        run: deno task e2e:cli run scaffold.infrastructure --cleanup --format pretty
+
       - name: scaffold.plugins (official plugins + registry gen + plugin doctor)
         if: env.RUN == 'true'
         run: deno task e2e:cli run scaffold.plugins --format pretty

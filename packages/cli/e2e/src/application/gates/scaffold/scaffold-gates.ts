@@ -62,6 +62,18 @@ function isJsrCompatibleCliEntrypoint(cliEntrypoint: string): boolean {
 export function createScaffoldGates(state: PluginSuiteState): readonly GateDefinition[] {
   return [
     commandGate(
+      GATE.SCAFFOLD_HOSTILE_PARENT_TSCONFIG,
+      'Place an unresolvable TypeScript config above the generated project',
+      GATE_PHASE.SCAFFOLD,
+      (context) => [
+        'deno',
+        'eval',
+        `await Deno.writeTextFile(${
+          JSON.stringify(context.project.smokeRoot + '/tsconfig.json')
+        }, '{ "extends": "astro/tsconfigs/strict" }\\n')`,
+      ],
+    ),
+    commandGate(
       GATE.SCAFFOLD_INIT,
       'Scaffold generated project',
       GATE_PHASE.SCAFFOLD,
