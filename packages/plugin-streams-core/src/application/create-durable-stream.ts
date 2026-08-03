@@ -59,7 +59,9 @@ export class DurableStreamProducer<TDef extends StreamStateDefinition>
     this.#schema = options.schema;
     this.#producerId = options.producerId;
     this.#instrumentation = options.instrumentation ?? createStreamsInstrumentation();
-    this.#initPromise = this.#connect(options.signal);
+    const url = resolveRequiredStreamUrl(this.streamPath);
+    const headers = getStreamsAuth();
+    this.#initPromise = this.#connect(url, headers, options.signal);
   }
 
   /** Whether this producer has begun shutdown and no longer accepts writes. */
@@ -67,13 +69,13 @@ export class DurableStreamProducer<TDef extends StreamStateDefinition>
     return this.#closed;
   }
 
-  async #connect(signal?: AbortSignal): Promise<void> {
-    let url = '';
-    let headers: Record<string, string> = {};
+  async #connect(
+    url: string,
+    headers: Record<string, string>,
+    signal?: AbortSignal,
+  ): Promise<void> {
     let handle: DurableStream;
     try {
-      url = buildStreamUrl(this.streamPath);
-      headers = getStreamsAuth();
       handle = await DurableStream.create({
         url,
         contentType: 'application/json',
@@ -261,6 +263,19 @@ export class DurableStreamProducer<TDef extends StreamStateDefinition>
       },
     });
     return headers;
+  }
+}
+
+function resolveRequiredStreamUrl(streamPath: string): string {
+  try {
+    return buildStreamUrl(streamPath);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    throw new Error(
+      `[DurableStreamProducer] Missing plugin reference "streams" for stream "${streamPath}". ` +
+        'Install the streams plugin, then run `netscript service generate` to regenerate Aspire wiring. ' +
+        message,
+    );
   }
 }
 

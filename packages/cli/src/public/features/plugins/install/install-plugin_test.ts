@@ -161,6 +161,26 @@ const authProvider: PluginKindProvider = {
 };
 
 describe('public install plugin flow', () => {
+  for (
+    const [pluginName, forbiddenSample, requiredGlue] of [
+      ['workers', 'workers/jobs/health-check.ts', 'workers/runtime.ts'],
+      ['sagas', 'sagas/user-registration-saga.ts', 'sagas/runtime.ts'],
+      ['triggers', 'triggers/daily-maintenance.ts', 'triggers/runtime.ts'],
+      ['streams', 'streams/notifications-stream.ts', 'streams/mod.ts'],
+    ] as const
+  ) {
+    it(`threads includeSamples false into the ${pluginName} scaffolder`, async () => {
+      const projectRoot = await Deno.makeTempDir();
+      try {
+        await installOfficialPluginWithoutSamples(projectRoot, pluginName);
+        assertEquals(await pathExists(join(projectRoot, requiredGlue)), true);
+        assertEquals(await pathExists(join(projectRoot, forbiddenSample)), false);
+      } finally {
+        await Deno.remove(projectRoot, { recursive: true });
+      }
+    });
+  }
+
   it('plans a starter plugin request from project metadata', async () => {
     const fs = new MemoryFileSystemAdapter();
     await writeProjectFiles(fs);
@@ -952,6 +972,31 @@ describe('public install plugin flow', () => {
     }
   });
 
+  it('reconciles dependency-derived plugin references independently of install order', async () => {
+    const forwardRoot = await Deno.makeTempDir();
+    const reverseRoot = await Deno.makeTempDir();
+    try {
+      const forward = await installOfficialPlugins(forwardRoot, ['workers', 'sagas', 'streams']);
+      const reverse = await installOfficialPlugins(reverseRoot, ['streams', 'sagas', 'workers']);
+
+      assertEquals(forward, reverse);
+      assertEquals(forward.BackgroundProcessors.workers.PluginReferences, [
+        'streams',
+        'workers-api',
+      ]);
+      assertEquals(forward.BackgroundProcessors.sagas.PluginReferences, [
+        'sagas-api',
+        'streams',
+        'workers-api',
+      ]);
+      assertEquals(forward.Plugins['workers-api'].PluginReferences, ['streams']);
+      assertEquals(forward.Plugins['sagas-api'].PluginReferences, ['streams', 'workers-api']);
+    } finally {
+      await Deno.remove(forwardRoot, { recursive: true });
+      await Deno.remove(reverseRoot, { recursive: true });
+    }
+  });
+
   it('runs the real auth local-path scaffolder through plugin install', async () => {
     const projectRoot = await Deno.makeTempDir();
     const authRoot = repoPath('plugins/auth');
@@ -1243,6 +1288,93 @@ async function writeRealProjectFiles(projectRoot: string): Promise<void> {
     join(projectRoot, 'deno.json'),
     JSON.stringify({ workspace: ['apps/web'] }, null, 2) + '\n',
   );
+}
+
+interface PluginEntriesSnapshot {
+  readonly Plugins: Record<string, { readonly PluginReferences?: readonly string[] }>;
+  readonly BackgroundProcessors: Record<string, { readonly PluginReferences?: readonly string[] }>;
+}
+
+async function installOfficialPlugins(
+  projectRoot: string,
+  order: readonly ('workers' | 'sagas' | 'streams')[],
+): Promise<PluginEntriesSnapshot> {
+  await writeRealProjectFiles(projectRoot);
+  const fs = new DenoFileSystem();
+  const templateAdapter = new StringTemplateAdapter(fs);
+  const scaffolder = new Scaffolder(templateAdapter, fs);
+  const registry = new PluginKindRegistry();
+  const dependencies = {
+    fs,
+    scaffolder,
+    templateAdapter,
+    registry,
+    registryScaffolder: new PluginRegistryScaffolder(scaffolder),
+    workspaceMutator: new PluginWorkspaceMutator(fs),
+    processRunner: new DenoProcess(),
+    regenerateHelpers: () => Promise.resolve([]),
+  };
+
+  for (const pluginName of order) {
+    await installPlugin({
+      kind: pluginName,
+      pluginName,
+      serviceReferences: [],
+      pluginReferences: [],
+      noDb: true,
+      includeSamples: false,
+      localPath: repoPath(`plugins/${pluginName}`),
+      projectRoot,
+      overwrite: false,
+      ...(pluginName === 'sagas' ? { sagaStoreBackend: 'prisma' as const } : {}),
+    }, dependencies);
+  }
+
+  const appsettings = JSON.parse(await Deno.readTextFile(join(projectRoot, 'appsettings.json'))) as {
+    NetScript: PluginEntriesSnapshot;
+  };
+  return appsettings.NetScript;
+}
+
+async function installOfficialPluginWithoutSamples(
+  projectRoot: string,
+  pluginName: 'workers' | 'sagas' | 'triggers' | 'streams',
+): Promise<void> {
+  await writeRealProjectFiles(projectRoot);
+  const fs = new DenoFileSystem();
+  const templateAdapter = new StringTemplateAdapter(fs);
+  const scaffolder = new Scaffolder(templateAdapter, fs);
+  await installPlugin({
+    kind: pluginName,
+    pluginName,
+    serviceReferences: [],
+    pluginReferences: [],
+    noDb: true,
+    includeSamples: false,
+    localPath: repoPath(`plugins/${pluginName}`),
+    projectRoot,
+    overwrite: false,
+    ...(pluginName === 'sagas' ? { sagaStoreBackend: 'kv' as const } : {}),
+  }, {
+    fs,
+    scaffolder,
+    templateAdapter,
+    registry: new PluginKindRegistry(),
+    registryScaffolder: new PluginRegistryScaffolder(scaffolder),
+    workspaceMutator: new PluginWorkspaceMutator(fs),
+    processRunner: new DenoProcess(),
+    regenerateHelpers: () => Promise.resolve([]),
+  });
+}
+
+async function pathExists(path: string): Promise<boolean> {
+  try {
+    await Deno.stat(path);
+    return true;
+  } catch (error) {
+    if (error instanceof Deno.errors.NotFound) return false;
+    throw error;
+  }
 }
 
 async function assertFalseExists(path: string): Promise<void> {

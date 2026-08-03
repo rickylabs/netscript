@@ -140,10 +140,10 @@ export is `@netscript/plugin-streams-core` with two sub-path exports (`/telemetr
 | --- | --- | --- | --- |
 | `defineStreamSchema` | function | `function defineStreamSchema(collections): StateSchema` | Define a type-safe durable stream schema. |
 | `createDurableStream` | function | `function createDurableStream(options): DurableStreamProducer` | Create or reuse a durable stream producer for a stream path. |
-| `createServiceStreamProducer` | function | `function createServiceStreamProducer(options): DurableStreamProducer` | Blessed Service-facing producer factory. Wraps `createDurableStream` reusing `getStreamsUrl`/`getStreamsAuth`; eagerly resolves the streams URL and auth (`assertResolvable`, default `true`) so a mis-wired Service **throws at construction** instead of silently dropping writes. |
+| `createServiceStreamProducer` | function | `function createServiceStreamProducer(options): DurableStreamProducer` | Blessed Service-facing producer factory. Wraps `createDurableStream` reusing `getStreamsUrl`/`getStreamsAuth`; a missing `streams` reference **throws at construction** instead of blocking or silently dropping writes. Install streams and run `netscript service generate` to reconcile a missing reference. |
 | `DurableStreamProducer` | class | `class DurableStreamProducer` | Server-side writer for a named durable stream. |
 | `DurableStreamProducerOptions` | interface | `interface DurableStreamProducerOptions` | Options accepted by `createDurableStream` / `DurableStreamProducer`. |
-| `ServiceStreamProducerOptions` | interface | `interface ServiceStreamProducerOptions extends DurableStreamProducerOptions` | Options for `createServiceStreamProducer`: the `DurableStreamProducerOptions` fields plus the optional `assertResolvable` fail-fast gate (default `true`). |
+| `ServiceStreamProducerOptions` | interface | `interface ServiceStreamProducerOptions extends DurableStreamProducerOptions` | Options for `createServiceStreamProducer`; it has the same fields as `DurableStreamProducerOptions`. |
 | `StreamProducerPort` | interface | `interface StreamProducerPort` | Port implemented by stream producers that publish State Protocol changes. |
 | `inspectStreamTopic` | function | `function inspectStreamTopic(input): StreamTopicInspectionReport` | Inspect a stream schema and optional producer metadata. |
 | `StreamTopicInspectionInput` | interface | `interface StreamTopicInspectionInput` | Input accepted by `inspectStreamTopic`. |

@@ -11,6 +11,8 @@ import { compileWorkersRegistry } from '../../../../../../../plugins/workers/src
 import { generateRuntimeRegistries } from '../../../../../../../plugins/workers/src/cli/runtime-registry-generator.ts';
 import { PLUGIN_PACKAGE_VERSION as WORKERS_PACKAGE_VERSION } from '../../../../../../../plugins/workers/src/package-metadata.generated.ts';
 import { generateSagaRegistry } from '../../../../../../../plugins/sagas/src/cli/registry-generator.ts';
+import { AspireAppHostDoctorInspector } from '../../../../kernel/adapters/aspire/apphost-doctor-inspector.ts';
+import type { ProcessPort, ProcessResult } from '../../../../kernel/ports/process-port.ts';
 
 Deno.test('plugin doctor exits non-zero when generated registries are absent', async () => {
   const projectRoot = '/workspace';
@@ -115,6 +117,102 @@ Deno.test('plugin doctor reports visible validation issues by field', async () =
   assertStringIncludes(reports[0].checks[0].message ?? '', 'Expected number');
 });
 
+Deno.test('plugin doctor distinguishes an absent AppHost from unhealthy resources', async () => {
+  const reports = await doctorPlugin({ projectRoot: '/workspace' }, {
+    fs: new MemoryFileSystemAdapter(),
+    loadConfig: () => Promise.resolve(configWithResources()),
+    inspectAppHost: { inspect: () => Promise.resolve({ status: 'not-running' }) },
+  });
+  assertEquals(reports[0].status, 'warning');
+  assertEquals(reports[0].checks[0].id, 'apphost:not-running');
+  assertStringIncludes(reports[0].checks[0].message ?? '', 'No AppHost is running');
+});
+
+Deno.test('plugin doctor warns and exits zero when Aspire inspection is unavailable', async () => {
+  const output: string[] = [];
+  const command = createDoctorPluginCommand({
+    resolveProjectRoot: () => Promise.resolve('/workspace'),
+    print: (line) => output.push(line),
+    doctor: (input) =>
+      doctorPlugin(input, {
+        fs: new MemoryFileSystemAdapter(),
+        loadConfig: () => Promise.resolve(configWithResources()),
+        inspectAppHost: new AspireAppHostDoctorInspector(new MissingAspireProcess()),
+      }),
+  });
+
+  await command.parse(['--project-root', '/workspace']);
+  assertStringIncludes(output.join('\n'), 'warning');
+  assertStringIncludes(output.join('\n'), 'AppHost inspection was skipped');
+  assertStringIncludes(output.join('\n'), 'aspire command not found');
+});
+
+Deno.test('plugin doctor reports configured resources missing from the running AppHost by name', async () => {
+  const reports = await doctorPlugin({ projectRoot: '/workspace' }, {
+    fs: new MemoryFileSystemAdapter(),
+    loadConfig: () => Promise.resolve(configWithResources()),
+    inspectAppHost: {
+      inspect: () => Promise.resolve({
+        status: 'running',
+        resources: [{ name: 'api', state: 'Running', healthStatus: 'Healthy' }],
+      }),
+    },
+  });
+  const appHost = reports[0];
+  assertEquals(appHost.status, 'error');
+  assertEquals(appHost.checks.find((check) => check.id === 'apphost:missing:web')?.status, 'error');
+  assertStringIncludes(
+    appHost.checks.find((check) => check.id === 'apphost:missing:main-db')?.message ?? '',
+    'main-db',
+  );
+});
+
+Deno.test('plugin doctor reports a running but unhealthy AppHost resource', async () => {
+  const reports = await doctorPlugin({ projectRoot: '/workspace' }, {
+    fs: new MemoryFileSystemAdapter(),
+    loadConfig: () => Promise.resolve(configWithResources()),
+    inspectAppHost: {
+      inspect: () => Promise.resolve({
+        status: 'running',
+        resources: [
+          { name: 'api', state: 'Running', healthStatus: 'Unhealthy' },
+          { name: 'web', state: 'Running', healthStatus: 'Healthy' },
+          { name: 'main-db', state: 'Running', healthStatus: 'Healthy' },
+        ],
+      }),
+    },
+  });
+  const check = reports[0].checks.find((candidate) => candidate.id === 'apphost:resource:api');
+  assertEquals(check?.status, 'error');
+  assertStringIncludes(check?.message ?? '', 'Unhealthy');
+});
+
+Deno.test('plugin doctor maps realistic database config names without inventing section resources', async () => {
+  const reports = await doctorPlugin({ projectRoot: '/workspace' }, {
+    fs: new MemoryFileSystemAdapter(),
+    loadConfig: () => Promise.resolve(configWithResources()),
+    inspectAppHost: {
+      inspect: () => Promise.resolve({
+        status: 'running',
+        resources: [
+          { name: 'api', state: 'Running', healthStatus: 'Healthy' },
+          { name: 'web', state: 'Running', healthStatus: 'Healthy' },
+          { name: 'main-db', state: 'Running', healthStatus: 'Healthy' },
+        ],
+      }),
+    },
+  });
+
+  assertEquals(reports[0].status, 'healthy');
+  assertEquals(reports[0].checks.some((check) => check.title.includes('active')), false);
+  assertEquals(reports[0].checks.some((check) => check.title.includes('config')), false);
+  assertEquals(reports[0].checks.map((check) => check.id), [
+    'apphost:resource:api',
+    'apphost:resource:main-db',
+    'apphost:resource:web',
+  ]);
+});
+
 Deno.test('plugin manifest import failures degrade to an error report', async () => {
   const reports = await doctorPlugin({ projectRoot: '/workspace' }, {
     fs: new MemoryFileSystemAdapter(),
@@ -183,6 +281,24 @@ async function assertWorkersCommandPasses(registrySource: string): Promise<void>
       }),
   });
   await command.parse(['--project-root', projectRoot]);
+}
+
+function configWithResources() {
+  return {
+    plugins: [],
+    services: { api: { port: 8000 } },
+    apps: { web: { port: 3000 } },
+    databases: {
+      active: 'postgres',
+      config: [{ name: 'main-db', provider: 'postgres', schema: 'database/postgres/prisma' }],
+    },
+  } as never;
+}
+
+class MissingAspireProcess implements ProcessPort {
+  exec(): Promise<ProcessResult> {
+    return Promise.reject(new Deno.errors.NotFound('aspire command not found'));
+  }
 }
 
 async function assertSagaCommandPasses(registrySource: string): Promise<void> {

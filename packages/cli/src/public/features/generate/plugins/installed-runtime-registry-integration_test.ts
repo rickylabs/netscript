@@ -165,6 +165,47 @@ export default defineSaga('${id}');
   });
 });
 
+Deno.test('published dependency starts a saga runtime with a project-owned non-empty registry', async () => {
+  await withTempProject(async (projectRoot) => {
+    await write(join(projectRoot, SAGAS_REGISTRY_PATH), `
+const definition = {
+  id: 'published-dependency',
+  durability: 't1',
+  initialState: {},
+  handledMessageTypes: [],
+  handlers: new Map(),
+};
+export const sagaRegistry = new Map([[definition.id, definition]]);
+`);
+    await write(join(projectRoot, 'run-published-saga.ts'), `
+import { startSagaRunner } from 'jsr:@netscript/plugin-sagas@${NETSCRIPT_RELEASE_VERSION}/runtime';
+const supervisor = await startSagaRunner({ cwd: () => Deno.cwd() });
+console.log(JSON.stringify(supervisor.snapshot()));
+await supervisor.stop('dependency integration complete');
+`);
+
+    const result = await new Deno.Command(Deno.execPath(), {
+      args: [
+        'run',
+        '--unstable-kv',
+        '--allow-read',
+        '--allow-env',
+        '--allow-net',
+        '--minimum-dependency-age=0',
+        'run-published-saga.ts',
+      ],
+      cwd: projectRoot,
+      stdout: 'piped',
+      stderr: 'piped',
+    }).output();
+    const stdout = new TextDecoder().decode(result.stdout);
+    const stderr = new TextDecoder().decode(result.stderr);
+    assertEquals(result.code, 0, stderr);
+    const snapshot = JSON.parse(stdout.trim()) as { definitionCount: number };
+    assertEquals(snapshot.definitionCount, 1);
+  });
+});
+
 Deno.test('generated AI registries load resources and exclude the skill-loader factory', async () => {
   await withTempProject(async (projectRoot) => {
     await writeScaffoldWorkspaceAiProject(projectRoot, {

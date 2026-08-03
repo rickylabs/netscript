@@ -14,6 +14,7 @@ import { addWorkspaceMember, removeWorkspaceMember } from '../scaffold/workspace
 import type { FileSystemPort } from '../../ports/file-system-port.ts';
 import type { ScaffolderPort, TemplatePort } from '../../ports/template-port.ts';
 import type { ServiceConfigEntry } from '../../domain/service-shape.ts';
+import { reconcilePluginReferences } from '../plugin/plugin-reference-reconciler.ts';
 
 /** Project metadata needed to scaffold service resources. */
 export interface ServiceProjectMetadata {
@@ -153,6 +154,8 @@ export async function regenerateAspireHelpers(
       { projectRoot, aspireDir },
     );
   }
+
+  await reconcilePluginReferences(projectRoot, fs);
 
   const parsed = await parseAppSettings(appsettingsPath);
   const rawAppsettings = JSON.parse(await fs.readFile(appsettingsPath)) as unknown;
