@@ -174,6 +174,30 @@ Deno.test('empty explicit docs root is an explicit corpus error, never bare zero
   );
 });
 
+Deno.test('unexpected corpus failures remain bounded structured tool errors', async () => {
+  const flows = createDocsFlows({
+    list: () => Promise.reject(new Error('adapter secret detail')),
+    search: () => Promise.reject(new Error('adapter secret detail')),
+    get: () => Promise.reject(new Error('adapter secret detail')),
+  });
+
+  for (
+    const result of [
+      await flows.list_docs({}),
+      await flows.search_docs({ query: 'workers' }),
+      await flows.get_doc({ slug: 'workers' }),
+    ]
+  ) {
+    assertEquals(result, {
+      ok: false,
+      error: {
+        code: 'docs_corpus_error',
+        message: 'The documentation corpus could not complete the request.',
+      },
+    });
+  }
+});
+
 const realDocsRoot = new URL('../../../docs/site/', import.meta.url).pathname;
 const realDocsPresent = await Deno.stat(realDocsRoot).then(() => true).catch((error) => {
   if (error instanceof Deno.errors.NotFound) return false;

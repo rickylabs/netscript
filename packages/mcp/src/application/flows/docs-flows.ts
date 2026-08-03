@@ -112,5 +112,11 @@ function corpusFailure(error: unknown): ToolExecutionResult {
   if (error instanceof DocsCorpusUnavailableError) {
     return { ok: false, error: { code: error.code, message: error.message } };
   }
-  throw error;
+  return {
+    ok: false,
+    error: {
+      code: 'docs_corpus_error',
+      message: 'The documentation corpus could not complete the request.',
+    },
+  };
 }
