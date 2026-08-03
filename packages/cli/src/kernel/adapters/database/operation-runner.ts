@@ -163,7 +163,7 @@ export class DbOperationRunner {
       const startedByInvocation = !(await this.hasRunningAppHost(apphostPath, aspireDir));
 
       await this.runAspire(
-        buildAspireArgs('start', apphostPath, { isolated: true }),
+        buildAspireArgs('start', apphostPath),
         { cwd: aspireDir, env },
       );
 

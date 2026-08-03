@@ -134,7 +134,7 @@ describe('DbOperationRunner', () => {
         '--nologo',
       ]);
       assertEquals(executor.outputCalls[1].args[0], 'start');
-      assertEquals(executor.outputCalls[1].args.includes('--isolated'), true);
+      assertEquals(executor.outputCalls[1].args.includes('--isolated'), false);
       assertEquals(executor.outputCalls[1].args.includes(join(PROJECT_ROOT, 'aspire', 'apphost.mts')), false);
       assertEquals(executor.outputCalls[1].args.includes('--'), false);
       assertEquals(executor.outputCalls[5].args[0], 'logs');
