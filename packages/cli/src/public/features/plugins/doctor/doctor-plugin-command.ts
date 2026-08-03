@@ -67,13 +67,22 @@ export function createDoctorPluginCommand(
       const reports = await dependencies.doctor({ projectRoot });
       renderDoctorReports(reports, print);
       const errored = reports.filter((report) => report.status === "error");
-      await (dependencies.diagnosticEvidence?.(projectRoot) ??
-        new FilesystemDiagnosticEvidence(projectRoot)).write({
-          resource: options.resource ?? "project",
-          command: "netscript plugin doctor",
-          timestamp: new Date().toISOString(),
-          exitStatus: errored.length > 0 ? 1 : 0,
-        });
+      const resource = options.resource ?? "project";
+      try {
+        await (dependencies.diagnosticEvidence?.(projectRoot) ??
+          new FilesystemDiagnosticEvidence(projectRoot)).write({
+            resource,
+            command: "netscript plugin doctor",
+            timestamp: new Date().toISOString(),
+            exitStatus: errored.length > 0 ? 1 : 0,
+          });
+      } catch (error) {
+        const reason = error instanceof Error ? error.message : String(error);
+        print(
+          `Warning: diagnostic evidence was not recorded for resource "${resource}"; ` +
+            `agent drift record will refuse until a successful diagnostic writes a receipt. ${reason}`,
+        );
+      }
       if (errored.length > 0) {
         const names = errored.map((report) => report.pluginName).join(", ");
         const summary =

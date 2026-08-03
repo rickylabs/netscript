@@ -203,6 +203,35 @@ Deno.test('plugin doctor warns and exits zero when Aspire inspection is unavaila
   assertStringIncludes(output.join('\n'), 'aspire command not found');
 });
 
+Deno.test('plugin doctor reports normally when diagnostic evidence cannot be written', async () => {
+  const output: string[] = [];
+  const command = createDoctorPluginCommand({
+    resolveProjectRoot: () => Promise.resolve('/read-only'),
+    print: (line) => output.push(line),
+    doctor: () => Promise.resolve([{
+      pluginName: 'aspire',
+      status: 'warning',
+      checks: [{
+        id: 'apphost:inspection',
+        title: 'AppHost inspection',
+        status: 'warning',
+        message: 'inspection unavailable',
+      }],
+    }]),
+    diagnosticEvidence: () => ({
+      read: () => Promise.resolve(undefined),
+      write: () => Promise.reject(new Deno.errors.PermissionDenied('read-only checkout')),
+      appendDrift: () => Promise.resolve(),
+    }),
+  });
+
+  await command.parse(['--resource', 'api']);
+  assertStringIncludes(output.join('\n'), 'aspire\twarning\tAppHost inspection');
+  assertStringIncludes(output.join('\n'), 'diagnostic evidence was not recorded');
+  assertStringIncludes(output.join('\n'), 'agent drift record will refuse');
+  assertStringIncludes(output.join('\n'), 'read-only checkout');
+});
+
 Deno.test('plugin doctor reports configured resources missing from the running AppHost by name', async () => {
   const reports = await doctorPlugin({ projectRoot: '/workspace' }, {
     fs: new MemoryFileSystemAdapter(),

@@ -42,6 +42,7 @@ import type { EmbeddedDocsSource } from './src/infrastructure/embedded-docs-corp
 import { FilesystemDiagnosticEvidence } from './src/infrastructure/filesystem-diagnostic-evidence.ts';
 import { createRecordDriftFlow } from './src/application/flows/record-drift-flow.ts';
 import type { ToolExecutionResult, ToolFlow } from './src/domain/tool-types.ts';
+import type { DiagnosticEvidencePort } from './src/domain/diagnostic-evidence-port.ts';
 
 export * from './mod.ts';
 
@@ -58,6 +59,11 @@ export interface McpCliOptions {
   /** Explicit telemetry endpoint supplied by the outer CLI. */ readonly endpoint?: string;
   /** Additional package-embedded documentation supplied by an outer CLI. */ readonly embeddedDocs?:
     readonly EmbeddedDocsSource[];
+  /** Override project-local diagnostic evidence persistence. */ readonly diagnosticEvidence?:
+    DiagnosticEvidencePort;
+  /** Report a non-fatal failure to persist diagnostic evidence. */ readonly onEvidenceWarning?: (
+    message: string,
+  ) => void;
 }
 
 /** Resolve an explicit public documentation override from flags or environment. */
@@ -100,7 +106,8 @@ export function createMcpCliServer(options: McpCliOptions = {}): McpServer {
     : new EmbeddedDocsCorpus({
       documents: [{ slug: 'mcp', source: MCP_PACKAGE_README }, ...(options.embeddedDocs ?? [])],
     });
-  const evidence = new FilesystemDiagnosticEvidence(projectRoot);
+  const evidence = options.diagnosticEvidence ?? new FilesystemDiagnosticEvidence(projectRoot);
+  const warnEvidence = options.onEvidenceWarning ?? ((message: string) => console.error(message));
   const probe = new FetchTelemetryProbe((endpoint) =>
     createAspireDashboardFetch(endpoint, {}) ?? fetch
   );
@@ -109,28 +116,37 @@ export function createMcpCliServer(options: McpCliOptions = {}): McpServer {
     environment,
     flows: {
       ...createDocsFlows(docsCorpus),
-      get_app_status: withReceipt(createGetAppStatusFlow(query), evidence, 'mcp get_app_status'),
-      list_runs: withReceipt(createListRunsFlow(query), evidence, 'mcp list_runs'),
-      get_run: withReceipt(createGetRunFlow(query), evidence, 'mcp get_run'),
+      get_app_status: withReceipt(
+        createGetAppStatusFlow(query),
+        evidence,
+        'mcp get_app_status',
+        warnEvidence,
+      ),
+      list_runs: withReceipt(createListRunsFlow(query), evidence, 'mcp list_runs', warnEvidence),
+      get_run: withReceipt(createGetRunFlow(query), evidence, 'mcp get_run', warnEvidence),
       get_recent_errors: withReceipt(
         createGetRecentErrorsFlow(query),
         evidence,
         'mcp get_recent_errors',
+        warnEvidence,
       ),
       get_last_job_result: withReceipt(
         createGetLastJobResultFlow(query),
         evidence,
         'mcp get_last_job_result',
+        warnEvidence,
       ),
       analyze_service_performance: withReceipt(
         createAnalyzeServicePerformanceFlow(query),
         evidence,
         'mcp analyze_service_performance',
+        warnEvidence,
       ),
       analyze_db_bottlenecks: withReceipt(
         createAnalyzeDbBottlenecksFlow(query),
         evidence,
         'mcp analyze_db_bottlenecks',
+        warnEvidence,
       ),
       list_commands: createListCommandsFlow(
         options.commandCatalog ?? new StaticCommandCatalog(),
@@ -149,6 +165,7 @@ export function createMcpCliServer(options: McpCliOptions = {}): McpServer {
         ], projectRoot),
         evidence,
         'mcp doctor',
+        warnEvidence,
       ),
       record_drift: createRecordDriftFlow(evidence),
     },
@@ -157,8 +174,9 @@ export function createMcpCliServer(options: McpCliOptions = {}): McpServer {
 
 function withReceipt(
   flow: ToolFlow,
-  evidence: FilesystemDiagnosticEvidence,
+  evidence: DiagnosticEvidencePort,
   command: string,
+  warn: (message: string) => void,
 ): ToolFlow {
   return async (input): Promise<ToolExecutionResult> => {
     const result = await flow(input);
@@ -172,12 +190,20 @@ function withReceipt(
       ? result.value as Record<string, unknown>
       : undefined;
     const succeeded = result.ok && value?.status !== 'fail';
-    await evidence.write({
-      resource,
-      command,
-      timestamp: new Date().toISOString(),
-      exitStatus: succeeded ? 0 : 1,
-    });
+    try {
+      await evidence.write({
+        resource,
+        command,
+        timestamp: new Date().toISOString(),
+        exitStatus: succeeded ? 0 : 1,
+      });
+    } catch (error) {
+      const reason = error instanceof Error ? error.message : String(error);
+      warn(
+        `Warning: diagnostic evidence was not recorded for resource "${resource}"; ` +
+          `record_drift will refuse until a successful diagnostic writes a receipt. ${reason}`,
+      );
+    }
     return result;
   };
 }

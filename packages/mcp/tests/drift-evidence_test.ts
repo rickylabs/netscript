@@ -139,3 +139,29 @@ Deno.test('an actual MCP doctor call writes a diagnostic receipt', async () => {
     await Deno.remove(root, { recursive: true });
   }
 });
+
+Deno.test('MCP doctor result survives a diagnostic evidence write failure', async () => {
+  const warnings: string[] = [];
+  const evidence: DiagnosticEvidencePort = {
+    read: () => Promise.resolve(undefined),
+    write: () => Promise.reject(new Deno.errors.PermissionDenied('read-only checkout')),
+    appendDrift: () => Promise.resolve(),
+  };
+  const server = createMcpCliServer({
+    projectRoot: '/read-only',
+    endpoint: 'http://127.0.0.1:1',
+    diagnosticEvidence: evidence,
+    onEvidenceWarning: (message) => warnings.push(message),
+  });
+  const response = await server.handle({
+    jsonrpc: '2.0',
+    id: 3,
+    method: 'tools/call',
+    params: { name: 'doctor', arguments: { resource: 'api' } },
+  });
+
+  assertEquals(response?.result?.isError, false);
+  assertStringIncludes(warnings.join('\n'), 'diagnostic evidence was not recorded');
+  assertStringIncludes(warnings.join('\n'), 'record_drift will refuse');
+  assertStringIncludes(warnings.join('\n'), 'read-only checkout');
+});
