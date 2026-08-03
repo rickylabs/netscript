@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `feat-1024-agent-tooling-bundle--agent-init` |
 | Branch | `feat/1024-agent-tooling-bundle` |
-| Current phase | `plan` |
+| Current phase | `plan-eval` |
 | Archetype | `6 — CLI / Tooling` |
 | Scope overlays | `docs` |
 
@@ -14,7 +14,8 @@
 
 Research and design are complete. The branch was clean and is now rebased onto `origin/main` at
 `e5bae2858`, which includes merged PR #1079's docs task router. No implementation file has been
-created or changed. The hard stop is a separate Qwen PLAN-EVAL.
+created or changed. The canonical local Qwen canary was blocked by missing OpenRouter credentials;
+the hard stop is now a separate OpenHands/Qwen PLAN-EVAL with the same tracked-verdict contract.
 
 ## Completed
 
@@ -28,14 +29,13 @@ created or changed. The hard stop is a separate Qwen PLAN-EVAL.
 
 ## In Progress
 
-- Bootstrap commit and draft PR, followed by separate-session PLAN-EVAL.
+- Separate-session PLAN-EVAL through the OpenHands/Qwen fallback.
 
 ## Next Steps
 
-1. Commit/push run artifacts and open the draft PR with an explicit 11-item Definition of Done.
-2. Post RESEARCH/PLAN phase comments and move the PR lifecycle label to `status:plan-eval`.
-3. Launch local formal evaluator (Claude OpenRouter Qwen) to write `plan-eval.md`.
-4. Begin slice 1 only on `PASS`.
+1. Dispatch the formal OpenHands/OpenRouter Qwen evaluator with a PLAN-EVAL-only prompt.
+2. Accept only the tracked `plan-eval.md` verdict after verifying its commit and scope.
+3. Begin slice 1 only on `PASS`; repair the plan and re-evaluate on `FAIL_PLAN`.
 
 ## Key Decisions
 
@@ -69,7 +69,8 @@ created or changed. The hard stop is a separate Qwen PLAN-EVAL.
 
 ## Drift and Debt
 
-- Drift: baseline advanced to include merged #1079; current session route identity is opaque.
+- Drift: baseline advanced to include merged #1079; current session route identity is opaque; the
+  local evaluator canary lacked credentials, so formal evaluation uses the OpenHands Qwen fallback.
 - Debt: no new/deepened debt expected or accepted.
 
 ## Commits

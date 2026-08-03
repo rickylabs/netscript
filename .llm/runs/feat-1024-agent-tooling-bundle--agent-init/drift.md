@@ -26,3 +26,16 @@ documentation.
 - **Action:** accept
 - **Evidence:** `supervisor.md` records the owner-authorized current session; formal Qwen evaluation
   and opposite-family slice review remain separate and canonical.
+
+## 2026-08-03 — local formal evaluator route lacks credentials
+
+- **What:** The canonical local OpenRouter/Qwen PLAN-EVAL canary could not authenticate.
+- **Source:** `deno task agentic:provider-canary --live --profile claude-openrouter
+  --model qwen/qwen3.7-max --effort high --worktree /home/codex/repos/ns004-agenttools`.
+- **Expected:** A separate local Qwen session writes the tracked PLAN-EVAL verdict.
+- **Actual:** The canary returned `BLOCKED` with reason `auth_required`; no evaluator process was
+  launched and no implementation began.
+- **Severity:** moderate
+- **Action:** accept a separate OpenHands/OpenRouter Qwen evaluator as the harness fallback.
+- **Evidence:** exact canary command and observed `auth_required` result are recorded in the
+  worklog; the tracked `plan-eval.md` remains the only verdict authority.

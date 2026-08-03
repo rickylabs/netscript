@@ -144,6 +144,7 @@ compressed asset; never hand-edit the generated TypeScript or API text.
 | Time | Slice | Step | Notes |
 | --- | --- | --- | --- |
 | 2026-08-03T11:08:30+02:00 | bootstrap | research/plan | Rebased clean branch onto merged #1079, read both issue bodies and governing skills/doctrine, selected Archetype 6 + docs overlay, and locked two slices. |
+| 2026-08-03T12:14:00+02:00 | plan-eval | route canary | Canonical local OpenRouter/Qwen canary returned `BLOCKED (auth_required)` without launching a process. Selected the separate OpenHands Qwen fallback; implementation remains stopped pending its tracked verdict. |
 
 ## Decisions
 
@@ -160,6 +161,7 @@ compressed asset; never hand-edit the generated TypeScript or API text.
 | --- | --- | --- |
 | Baseline advanced from `ab0fa13fe` to `e5bae2858` to consume merged #1079. | minor | yes |
 | Current owner-started Codex session identity is opaque and differs from the named orchestrator route. | minor | yes |
+| Local formal evaluator route lacks OpenRouter credentials; use separate OpenHands Qwen fallback. | moderate | yes |
 
 ## Gate Results
 
@@ -174,7 +176,7 @@ compressed asset; never hand-edit the generated TypeScript or API text.
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| Plan-Gate | NOT_RUN | separate Qwen session pending | No implementation permitted yet. |
+| Plan-Gate | IN_PROGRESS | local canary blocked; separate OpenHands Qwen fallback requested | No implementation permitted before tracked `plan-eval.md` says `PASS`. |
 
 ### Runtime Gates
 
