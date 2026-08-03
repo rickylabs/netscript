@@ -77,6 +77,8 @@ heading in the shipped template.
 | 2026-08-03 | S2 | implementation | Renamed the shipped authoritative template section to Definition of Done and documented the narrow authority rule in `netscript-pr`. |
 | 2026-08-03 | S2 | reconcile | Template, skill, and parser agree: DoD/Acceptance unchecked boxes block; Slices and unrelated lists do not. Decision D1 is now shipped with its negative fixture. |
 | 2026-08-03 | S2 | validation | Combined validator + CI-classifier tests passed 57/57; TS scoped wrappers passed. Markdown whole-file fmt reported two pre-existing unrelated lines, so no broad prose reformat was applied. |
+| 2026-08-03 | S3 | self-application | Updated PR #1181 with exact issue acceptance evidence, truthful completed DoD boxes, and non-closing refs; moved to `status:impl-eval` and ready-for-review to fire milestone-composed review. |
+| 2026-08-03 | S3 | handoff snapshot | GitHub reports ready/open/mergeable at `f9fec6316`; combined status pending with zero reported contexts immediately after transition. Review/pre-merge and closing-keyword boxes remain honestly unchecked. |
 
 ## Decisions
 
@@ -125,11 +127,13 @@ heading in the shipped template.
 
 | Consumer | Result | Evidence | Notes |
 | -------- | ------ | -------- | ----- |
-| PR authors/CI | PASS (local) | parser negative fixture + CI classifier 50-test suite | live PR self-application still pending |
+| PR authors/CI | PENDING (remote) | parser negative fixture + CI classifier 50-test suite green locally; PR #1181 ready | composed review/check contexts just triggered |
 | Template/convention consistency | PASS | `.github/pull_request_template.md` + `netscript-pr` focused diff | authoritative headings and non-authoritative lists agree with parser test |
 
 ## Handoff Notes
 
 - Code review should inspect D1 (narrow authoritative headings), D5 (timestamp OR hash staleness),
   D6 (additive semantics), and the explicit issue-only `headSha` behavior.
-- S2 must still align the shipped PR template and `netscript-pr` convention before readiness.
+- The milestone orchestrator retains merge authority. After composed review/pre-merge gates pass,
+  tick the final two PR DoD boxes, replace `Refs #1171/#1105` with closing keywords, apply
+  `status:ready-merge` before the final push/rerun, and verify the shipped close-gate on live state.

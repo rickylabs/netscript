@@ -28,15 +28,16 @@ milestone-run composed evaluator/pre-merge surface.
 
 ## In Progress
 
-- S2 template/skill alignment and local gates are complete; supervisor diff review, commit, push,
-  and PR self-application are next.
+- PR #1181 is ready-for-review at `status:impl-eval`; milestone-composed augment/OpenHands/check
+  surfaces and orchestrator pre-merge gate are pending.
 
 ## Next Steps
 
-1. Implement and validate S1, then supervisor-review and push its sign-off commit.
-2. Implement and validate S2, then supervisor-review and push its sign-off commit.
-3. Reconcile the live PR, run the composed review/pre-merge surfaces, and hand merge authority back
-   to the milestone orchestrator.
+1. Milestone orchestrator watches the composed review/check surfaces and performs the per-PR
+   pre-merge gate.
+2. Address any substantive code review finding with a new tracked slice; do not tick around it.
+3. Once green, tick the final review and closing-keyword DoD boxes, replace both non-closing refs
+   with `Closes`, move to `status:ready-merge` before the final push/rerun, and run live close-gate.
 
 ## Key Decisions
 
@@ -64,7 +65,10 @@ milestone-run composed evaluator/pre-merge surface.
 | Static | PASS | combined tests 57/57; scoped TS check/lint/fmt green; focused prose diff clean |
 | Fitness | N/A | repo-tooling scope |
 | Runtime | N/A | no service/scaffold/CLI runtime change |
-| Consumer | planned | parser tests + live PR |
+| Consumer | pending remote | local parser/classifier tests green; PR #1181 composed review triggered |
+
+Remote snapshot: PR #1181 is open, non-draft, mergeable, and `status:impl-eval`; GitHub combined
+status was `pending` with zero contexts immediately after the ready transition.
 
 ## Open Questions
 
