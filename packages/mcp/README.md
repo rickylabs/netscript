@@ -4,7 +4,7 @@
 [![CI](https://github.com/rickylabs/netscript/actions/workflows/ci.yml/badge.svg)](https://github.com/rickylabs/netscript/actions/workflows/ci.yml)
 [![Docs](https://img.shields.io/badge/docs-rickylabs.github.io-blue)](https://rickylabs.github.io/netscript/)
 
-**The Model Context Protocol server for NetScript: 13 token-bounded tools that let a coding agent
+**The Model Context Protocol server for NetScript: 14 token-bounded tools that let a coding agent
 monitor a running app, debug a correlated execution, read framework-semantic telemetry, run the
 doctor, and search the docs — all over stdio.**
 
@@ -24,7 +24,7 @@ Aspire's own MCP server: Aspire speaks resources and containers; this server spe
 
 ## Why agents like it
 
-- **13 token-bounded tools** — every successful result is capped server-side (50 array items, 2,000
+- **14 token-bounded tools** — every successful result is capped server-side (50 array items, 2,000
   characters per string) before it reaches the model; the analytics tools never return raw spans at
   all.
 - **Framework-semantic trace intelligence** — tools classify telemetry into `worker`, `saga`,
@@ -45,7 +45,7 @@ Aspire's own MCP server: Aspire speaks resources and containers; this server spe
 
 ```mermaid
 flowchart LR
-    A["Agent host<br/>(Claude Code, VS Code, ...)"] <-- "JSON-RPC / stdio" --> S["netscript agent mcp<br/>13 tools · bounded results"]
+    A["Agent host<br/>(Claude Code, VS Code, ...)"] <-- "JSON-RPC / stdio" --> S["netscript agent mcp<br/>14 tools · bounded results"]
     S --> T["Telemetry endpoint<br/>(OTLP read model)"]
     S --> D["Docs corpus<br/>(public Markdown)"]
     S --> P["Command policy<br/>(default-deny allowlist)"]
@@ -133,26 +133,54 @@ results, and `get_run` returns a structured `run_not_found` error the agent can 
 
 ## Tool catalog
 
-| Tool                          | Required input | Bounded result                                                               |
-| ----------------------------- | -------------- | ---------------------------------------------------------------------------- |
-| `get_app_status`              | —              | Health verdict, counts, per-domain summaries                                 |
-| `list_runs`                   | —              | Recent executions filtered by domain, status, service, time                  |
-| `get_run`                     | `id`           | One correlated execution with bounded spans and logs                         |
-| `get_recent_errors`           | —              | Recent errors grouped by service and domain                                  |
-| `get_last_job_result`         | —              | The latest matching job outcome                                              |
-| `analyze_service_performance` | `service`      | Duration percentiles, throughput, error rate                                 |
-| `analyze_db_bottlenecks`      | —              | Ranked database and KV operations                                            |
-| `doctor`                      | —              | Telemetry, Aspire, wiring, and plugin checks; suggested fixes on problems    |
-| `search_docs`                 | `query`        | Ranked public-document matches with snippets                                 |
-| `list_docs`                   | —              | Public-document summaries                                                    |
-| `get_doc`                     | `slug`         | One public document, or one named section of it                              |
-| `list_commands`               | —              | Live CLI command descriptors                                                 |
-| `execute_command`             | `command`      | Exit code, duration, and bounded output tail; structured denial when blocked |
+| Tool                          | Required input    | Bounded result                                                               |
+| ----------------------------- | ----------------- | ---------------------------------------------------------------------------- |
+| `get_app_status`              | —                 | Health verdict, counts, per-domain summaries                                 |
+| `list_runs`                   | —                 | Recent executions filtered by domain, status, service, time                  |
+| `get_run`                     | `id`              | One correlated execution with bounded spans and logs                         |
+| `get_recent_errors`           | —                 | Recent errors grouped by service and domain                                  |
+| `get_last_job_result`         | —                 | The latest matching job outcome                                              |
+| `analyze_service_performance` | `service`         | Duration percentiles, throughput, error rate                                 |
+| `analyze_db_bottlenecks`      | —                 | Ranked database and KV operations                                            |
+| `doctor`                      | —                 | Telemetry, Aspire, wiring, and plugin checks; suggested fixes on problems    |
+| `search_docs`                 | `query`           | Ranked public-document matches with snippets                                 |
+| `list_docs`                   | —                 | Public-document summaries                                                    |
+| `get_doc`                     | `slug`            | One public document, or one named section of it                              |
+| `list_commands`               | —                 | Live CLI command descriptors                                                 |
+| `execute_command`             | `command`         | Exit code, duration, and bounded output tail; structured denial when blocked |
+| `record_drift`                | `resource`, `summary` | Evidence-gated drift entry appended to project drift log                     |
 
 A top-level input/result field overview for every tool is on the
 [MCP reference](https://rickylabs.github.io/netscript/reference/mcp/); the complete Standard Schema
 contracts are published as `TOOL_INPUT_SCHEMAS` / `TOOL_OUTPUT_SCHEMAS` and returned by the live
 `tools/list`.
+
+## Record drift
+
+`record_drift` is an evidence-gated mutating tool that records verified architecture or runtime drift into `.netscript/agent/drift.jsonl`.
+
+- **Required evidence**: Requires a fresh successful diagnostic receipt (timestamped within 15 minutes, `exitStatus: 0`) for the target resource. Receipts are automatically produced when calling `doctor`, telemetry tools, or `netscript plugin doctor --resource <resource>`.
+- **Target & Scope**: The `resource` argument targets a specific plugin, service, or `'project'`. Receipts live at `.netscript/agent/diagnostics/<resource>.json`.
+- **Mutation behavior**: Appends a single JSON line to `.netscript/agent/drift.jsonl` under the project root containing `timestamp`, `resource`, `summary`, optional `details`, and the attached evidence receipt.
+- **Failure modes**: If no receipt exists, if the receipt is older than 15 minutes, or if the receipt recorded a non-zero exit status, `record_drift` refuses with structured error code `diagnostic_evidence_required`.
+- **Dry-run / Preview**: Inspecting receipts or running `doctor` / telemetry tools previews current diagnostic state without mutating `drift.jsonl`.
+
+## Embedding as a library
+
+To run the public stdio composition from your own Deno entrypoint:
+
+```ts
+import { runMcpStdioServer } from '@netscript/mcp/cli';
+
+await runMcpStdioServer({
+  projectRoot: Deno.cwd(),
+  // Omit docsRoot to use the package-embedded corpus, or select a filesystem corpus explicitly.
+  docsRoot: Deno.env.get('NETSCRIPT_DOCS_ROOT'),
+});
+```
+
+`runMcpStdioServer` owns the newline-delimited stdio transport. It shuts down when the host closes
+stdin or terminates the process; callers do not need to reach into an internal transport API.
 
 ## Public surface
 
@@ -185,7 +213,7 @@ The full flag reference, policy table, and composition options are on the docs s
 
 ## Docs
 
-- **MCP reference — the 13-tool field overview, policy, and exports**:
+- **MCP reference — the 14-tool field overview, policy, and exports**:
   [rickylabs.github.io/netscript/reference/mcp/](https://rickylabs.github.io/netscript/reference/mcp/)
 - **Agent tooling — install, flags, troubleshooting, CLI × skills × MCP**:
   [rickylabs.github.io/netscript/capabilities/agent-tooling/](https://rickylabs.github.io/netscript/capabilities/agent-tooling/)

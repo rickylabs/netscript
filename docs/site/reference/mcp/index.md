@@ -11,7 +11,7 @@ surface and is maintained by hand; the authoritative, always-current symbol list
 [`deno doc jsr:@netscript/mcp{{ releaseSpecifier }}`](https://jsr.io/@netscript/mcp/doc). For the
 full index of packages and plugins return to the [reference overview](/reference/).
 
-`@netscript/mcp` publishes 13 token-bounded MCP tools that let a coding agent monitor a running app,
+`@netscript/mcp` publishes 14 token-bounded MCP tools that let a coding agent monitor a running app,
 debug a correlated execution, read framework-semantic telemetry, run the doctor, search the public
 documentation, and trigger allowlisted CLI commands — over newline-delimited JSON-RPC on stdio, with
 no npm MCP SDK on the dependency graph.
@@ -31,7 +31,7 @@ Two entrypoints carry the surface:
 | Symbol                 | Kind      | Summary                                                                        |
 | ---------------------- | --------- | ------------------------------------------------------------------------------ |
 | `createMcpServer`      | function  | Create the MCP server with `initialize` / `tools/list` / `tools/call` support. |
-| `createToolRegistry`   | function  | Immutable, enumerable definitions of the 13 tools.                             |
+| `createToolRegistry`   | function  | Immutable, enumerable definitions of the 14 tools.                             |
 | `McpServer`            | interface | Callable server subset: `handle(message)` plus the registered `tools`.         |
 | `McpServerOptions`     | interface | Composition seams: `probe`, `environment`, `flows`, `truncation`.              |
 | `MCP_PROTOCOL_VERSION` | const     | The MCP protocol version the runner implements (`2025-11-25`).                 |
@@ -40,13 +40,13 @@ Two entrypoints carry the surface:
 
 | Symbol                | Kind      | Summary                                                    |
 | --------------------- | --------- | ---------------------------------------------------------- |
-| `TOOL_NAMES`          | const     | The 13 tool names, in registry order.                      |
+| `TOOL_NAMES`          | const     | The 14 tool names, in registry order.                      |
 | `TOOL_INPUT_SCHEMAS`  | const     | Standard Schema input contract per tool.                   |
 | `TOOL_OUTPUT_SCHEMAS` | const     | Standard Schema output contract per tool.                  |
 | `validateSchema`      | function  | Validate a value against a tool schema, throwing on drift. |
 | `ToolDefinition`      | interface | A tool's name, contracts, and flow.                        |
 | `ToolFlow`            | type      | The function a tool executes; depends only on ports.       |
-| `ToolName`            | type      | Union of the 13 tool names.                                |
+| `ToolName`            | type      | Union of the 14 tool names.                                |
 
 ### Per-tool field overview
 
@@ -69,9 +69,10 @@ input caps the result count server-side before truncation applies.
 | `doctor`                      | `endpoint`                                            | `status`, `endpoint`, `counts`, `checks`, `families`                                                                                                              |
 | `search_docs`                 | **`query`**, `limit`                                  | `count`, `matches`                                                                                                                                                |
 | `list_docs`                   | `limit`                                               | `count`, `docs`                                                                                                                                                   |
-| `get_doc`                     | **`slug`**, `section`                                 | `slug`, `title`, `section`, `content`                                                                                                                             |
+| `get_doc`                     | **`slug`**, `section`                                 | `slug`, `title`, `section`, `content`, `redirectedFrom`                                                                                                           |
 | `list_commands`               | `filter`, `limit`                                     | `count`, `commands`                                                                                                                                               |
 | `execute_command`             | **`command`**, `args`                                 | `exitCode`, `durationMs`, `outputTail`, `truncated`, `timedOut`                                                                                                   |
+| `record_drift`                | **`resource`**, **`summary`**, `details`              | `recorded`, `resource`, `receipt`                                                                                                                                 |
 
 **Truncation semantics.** After a flow succeeds, `truncateResult` recursively bounds the result
 using `DEFAULT_TRUNCATION_POLICY` — arrays are capped at 50 elements and strings at 2,000 UTF-16
@@ -80,6 +81,16 @@ code units — before the runner serializes it. The analytics tools (`analyze_se
 aggregates. `execute_command` returns only a bounded combined output tail (4,096 bytes by default)
 and flags `truncated` when output was cut. A failed flow returns a structured tool error (a stable
 `code` plus a message), not a truncated success.
+
+## Record drift
+
+`record_drift` is an evidence-gated mutating tool that appends structured architecture or runtime drift entries to `.netscript/agent/drift.jsonl`.
+
+- **Required Evidence**: Must be authorized by a fresh successful diagnostic receipt (created within 15 minutes, `exitStatus: 0`) for the target resource. Diagnostic receipts are automatically produced by `doctor`, telemetry tools, or `netscript plugin doctor --resource <resource>`.
+- **Target & Scope**: `resource` identifies the target component (e.g. plugin name, service name, or `'project'`). Receipts live at `.netscript/agent/diagnostics/<resource>.json`.
+- **Mutation Behavior**: Appends one JSON line to `.netscript/agent/drift.jsonl` containing `timestamp`, `resource`, `summary`, optional `details`, and the attached evidence receipt.
+- **Failure Modes**: If no receipt is found, if the receipt is older than 15 minutes, or if the receipt recorded a non-zero exit status, the tool fails with structured error code `diagnostic_evidence_required`.
+- **Dry-run / Preview**: Inspecting receipt files or invoking `doctor` previews diagnostic state without appending to `drift.jsonl`.
 
 ## Output bounds
 
@@ -126,13 +137,14 @@ own composition root.
 
 ## Default adapters
 
-| Symbol                 | Kind     | Summary                                                            |
-| ---------------------- | -------- | ------------------------------------------------------------------ |
-| `FilesystemDocsCorpus` | class    | `DocsCorpusPort` over a local Markdown root (default `docs/site`). |
-| `SpawnCommandExecutor` | class    | `CommandExecutorPort` that spawns the `netscript` binary.          |
-| `StaticCommandCatalog` | class    | `CommandCatalogPort` used when no live catalog is injected.        |
-| `PluginDoctorFamily`   | class    | Plugin diagnostics as a doctor check family.                       |
-| `slugifyDocsHeading`   | function | Normalize a Markdown heading into a `get_doc` section slug.        |
+| Symbol                 | Kind     | Summary                                                                              |
+| ---------------------- | -------- | ------------------------------------------------------------------------------------ |
+| `EmbeddedDocsCorpus`   | class    | Default `DocsCorpusPort` shipped with the package; indexes package Markdown assets. |
+| `FilesystemDocsCorpus` | class    | `DocsCorpusPort` over a local Markdown root (used when `--docs-root` is set).        |
+| `SpawnCommandExecutor` | class    | `CommandExecutorPort` that spawns the `netscript` binary.                            |
+| `StaticCommandCatalog` | class    | `CommandCatalogPort` used when no live catalog is injected.                          |
+| `PluginDoctorFamily`   | class    | Plugin diagnostics as a doctor check family.                                         |
+| `slugifyDocsHeading`   | function | Normalize a Markdown heading into a `get_doc` section slug.                          |
 
 ## Sub-path exports
 

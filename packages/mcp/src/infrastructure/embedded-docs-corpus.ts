@@ -7,7 +7,7 @@ import {
 } from '../domain/docs-corpus-port.ts';
 import {
   normalizeSlug,
-  parseMarkdownDocument,
+  processDocsSources,
   rankDocument,
   tokenize,
   toSummary,
@@ -32,14 +32,14 @@ export interface EmbeddedDocsCorpusOptions {
 /** Immutable docs corpus backed by Markdown assets imported with the package. */
 export class EmbeddedDocsCorpus implements DocsCorpusPort {
   readonly #documents: ReadonlyMap<string, DocsDocument>;
+  readonly #aliases: ReadonlyMap<string, string>;
 
   /** Parse the supplied package assets once at composition time. */
   constructor(options: EmbeddedDocsCorpusOptions) {
     const maxLength = options.maxDocumentLength ?? MAX_INDEXED_DOC_LENGTH;
-    this.#documents = new Map(options.documents.map((document) => {
-      const slug = normalizeSlug(document.slug);
-      return [slug, parseMarkdownDocument(slug, document.source, maxLength)];
-    }));
+    const { documents, aliases } = processDocsSources(options.documents, maxLength);
+    this.#documents = documents;
+    this.#aliases = aliases;
   }
 
   /** List embedded document summaries in stable slug order. */
@@ -64,8 +64,15 @@ export class EmbeddedDocsCorpus implements DocsCorpusPort {
     );
   }
 
-  /** Retrieve an embedded document by normalized slug. */
+  /** Retrieve an embedded document by normalized slug or alias. */
   get(slug: string): Promise<DocsDocument | undefined> {
-    return Promise.resolve(this.#documents.get(normalizeSlug(slug)));
+    const normalized = normalizeSlug(slug);
+    const canonicalSlug = this.#aliases.get(normalized) ?? normalized;
+    const document = this.#documents.get(canonicalSlug);
+    if (!document) return Promise.resolve(undefined);
+    if (canonicalSlug !== normalized) {
+      return Promise.resolve({ ...document, redirectedFrom: normalized });
+    }
+    return Promise.resolve(document);
   }
 }

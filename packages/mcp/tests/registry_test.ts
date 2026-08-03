@@ -1,4 +1,4 @@
-import { assertEquals, assertMatch } from '@std/assert';
+import { assert, assertEquals, assertMatch } from '@std/assert';
 import { createToolRegistry, TOOL_INPUT_SCHEMAS, TOOL_NAMES, TOOL_OUTPUT_SCHEMAS } from '../mod.ts';
 import { validateSchema } from '../src/domain/schema.ts';
 
@@ -45,4 +45,36 @@ Deno.test('non-doctor tools expose planned structured failures in S1', async () 
       status: 'planned',
     },
   });
+});
+
+Deno.test('docs drift proof: documentation reflects registered tool surface and count', async () => {
+  const readme = await Deno.readTextFile(new URL('../README.md', import.meta.url));
+  const refMcp = await Deno.readTextFile(
+    new URL('../../../docs/site/reference/mcp/index.md', import.meta.url),
+  );
+  const agentTooling = await Deno.readTextFile(
+    new URL('../../../docs/site/ai/agent-tooling.md', import.meta.url),
+  );
+
+  assertEquals(TOOL_NAMES.length, 14);
+  assertEquals(TOOL_NAMES.includes('record_drift'), true);
+
+  assert(
+    readme.includes('14 token-bounded tools'),
+    'README.md does not state 14 token-bounded tools',
+  );
+  assert(
+    refMcp.includes('14 token-bounded tools') || refMcp.includes('14 tools'),
+    'reference/mcp/index.md missing 14 tools count',
+  );
+  assert(
+    agentTooling.includes('Fourteen tools') || agentTooling.includes('14 tools'),
+    'agent-tooling.md missing 14 tools count',
+  );
+
+  for (const toolName of TOOL_NAMES) {
+    assert(readme.includes(`\`${toolName}\``), `README.md missing tool: ${toolName}`);
+    assert(refMcp.includes(`\`${toolName}\``), `reference/mcp/index.md missing tool: ${toolName}`);
+    assert(agentTooling.includes(`\`${toolName}\``), `agent-tooling.md missing tool: ${toolName}`);
+  }
 });

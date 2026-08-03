@@ -209,6 +209,7 @@ const outputShapes: Record<ToolName, Readonly<Record<string, unknown>>> = {
     title: stringProperty,
     section: stringProperty,
     content: stringProperty,
+    redirectedFrom: stringProperty,
   }, [
     'slug',
     'title',
