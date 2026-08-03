@@ -62,6 +62,11 @@ versions, endpoints), with the routing lane→model bindings in `runtime/routing
 referencing those ids; change a model/version/endpoint only there. See the suite README's
 "Maintenance map".
 
+**Symptom: “my PR is green but should not merge yet.”** Run
+`deno task agentic:review-threads -- --repo rickylabs/netscript --pr <number> --pretty`. The
+read-only gate exposes silent review findings before merge: a reply or reasoned decline counts as
+answered, UI resolution is irrelevant, and outdated threads are listed but do not block.
+
 | Task                             | Tool                                      | Use                                                                                                |
 | -------------------------------- | ----------------------------------------- | -------------------------------------------------------------------------------------------------- |
 | `agentic:launch-codex-slice`     | `launch-codex-slice.ts`                   | stage + safety-check + launch a WSL Codex slice; records the thread id                             |
@@ -73,6 +78,7 @@ referencing those ids; change a model/version/endpoint only there. See the suite
 | `agentic:gh-pr`                  | `gh-pr.ts`                                | leaf-PR lifecycle: create · verdict · merge (eval-gated by default)                                |
 | `agentic:gh-watch`               | `gh-watch.ts`                             | **token-free CI/verdict watch** — background, exits terminal to re-wake the supervisor             |
 | `agentic:gh-token`               | `gh-token.ts`                             | **durable GitHub-token resolver/store** — `check` at session start, `store` once on rotation       |
+| `agentic:review-threads`         | `review-threads.ts`                       | list all PR review threads and fail while a current thread has no reply                            |
 | `agentic:claude-hook-log`        | `claude-hook-log.ts`                      | append Claude Code hook events to the run's hook log                                               |
 | `agentic:sync-claude` / `:check` | `sync-claude-skills.ts`                   | regenerate / verify the `.claude/skills/` mirror from `.agents/skills/`                            |
 | `agentic:check-claude`           | `validate-claude-surface.ts`              | validate the Claude configuration/skills/hooks surface                                             |

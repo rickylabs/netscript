@@ -223,6 +223,14 @@ to re-wake the supervisor — a token-free re-wake with no polling loop kept in 
 Credential Manager), printing only source and login; `gh-token.ts store` persists one stdin PAT to
 Windows GCM and WSL `gh` so future sessions resolve it automatically.
 
+### `github/review-threads.ts` — when a green PR still should not merge
+
+Run `deno task agentic:review-threads -- --repo rickylabs/netscript --pr <number> --pretty` when
+checks are green but review findings may be silent. It lists every thread with author, location,
+severity when present, and answered/unanswered state, then exits non-zero for any current thread
+without a reply. Resolution clicks are irrelevant; a reasoned decline is a reply, and outdated
+threads never block. The command is read-only and is also enforced in CI's `close-gate` job.
+
 ## The brain: the runtime controller
 
 ### `runtime/cli/agentic-runtime.ts` — the canonical surface
@@ -422,7 +430,7 @@ again outside `config/`.
 | **Model id**                                        | `config/models.ts`                                     | `MODEL_IDS` (native), `OPENROUTER_MODEL_IDS` (presets), and `OPENCODE_MODEL_IDS` (native OpenCode lane). These are the only model-id string literals.                                 |
 | **Routing binding** (lane → agent → model → effort) | `runtime/routing-policy.ts` (`CANONICAL_ROUTE_POLICY`) | The lane authority, rendered by `.llm/harness/workflow/lane-policy.md`; it references `config/models.ts` for the ids.                                                                 |
 | **Tool version**                                    | `config/versions.ts`                                   | Runtime version sets plus `OPENCODE_TOOL` for the pinned OpenCode version, binary name, auth-file location, variant, and web defaults.                                                |
-| **Endpoint / host / installer URL**                 | `config/endpoints.ts`                                  | Node dist host, npm registry, Antigravity host + installer, OpenRouter base URLs, GitHub API base. Keep the `agentic:wsl-foundation` `--allow-net=` allowlist in `deno.json` in sync. |
+| **Endpoint / host / installer URL**                 | `config/endpoints.ts`                                  | Node dist host, npm registry, Antigravity host + installer, OpenRouter base URLs, GitHub REST + GraphQL APIs. Keep the `agentic:wsl-foundation` `--allow-net=` allowlist in `deno.json` in sync. |
 | **Provider profile / OpenRouter preset**            | `runtime/provider-profiles.ts`                         | Credential-key wiring and preset effort/purpose; model ids come from `config/models.ts`.                                                                                              |
 | **Fallback / lane policy**                          | `runtime/routing-policy.ts`                            | Fallback candidate rules, subscription/approval gates, dated transitions.                                                                                                             |
 | **Agent / provider vocabulary**                     | `runtime/contract.ts`                                  | `AGENT_KINDS`, `PROVIDER_KINDS`, `EFFORTS`, diagnostic codes, `EXIT_CODES`.                                                                                                           |

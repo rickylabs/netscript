@@ -24,3 +24,6 @@ export const OPENROUTER_RESPONSES_BASE_URL = 'https://openrouter.ai/api/v1';
 
 /** GitHub REST API base URL for all `github/` + OpenHands tools. */
 export const GITHUB_API_BASE_URL = 'https://api.github.com';
+
+/** GitHub GraphQL API used for review-thread state unavailable from REST. */
+export const GITHUB_GRAPHQL_API_URL = 'https://api.github.com/graphql';
