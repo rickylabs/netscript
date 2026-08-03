@@ -322,3 +322,21 @@ comment; failed close-gate job rerun (30849924186); gh-watch re-armed.
 Minor: first `gh-watch` invocation died on the `deno task -- --` separator ("Unknown argument:
 --") yet the wrapper exited 0 — arg-contract inconsistency across the agentic suite (`pr-checks`
 tolerates `--`, `gh-watch` does not); more #1173-adjacent evidence.
+
+## 2026-08-03 — #1181 merge path, #1187 filed, #1180 ready
+
+- **#1181 merge blocked by stale check-runs:** branch protection read attempt-1's failed
+  close-gate check-run (91809338954) despite attempt-2 all-jobs-success (close-gate check-run
+  91809990609, `filter=latest` jobs API). No `--admin` override on the run's first merge —
+  full rerun (attempt 3) triggered to mint fresh check-runs; merge armed on its success.
+- **#1187 filed + scheduled (wave 3, Sol·low-medium):** `agentic:pr-checks` misses supersede
+  across rerun attempts — classified the stale attempt-1 failure as current-fail and the
+  rerun-cancelled check-test as a current cancellation. First live rerun case for the tool,
+  ~1h after landing. The 0.0.4 "defects filed from inside the run" pattern, recurring.
+- **PR #1180 (canary-payload, `Refs #1166`) marked ready** — slice handoff clean: merge-aware
+  derivation proven RED-first on a synthetic DAG, genuine-empty vs derivation-failure distinct,
+  87-test adjacent regression green, publish mechanics untouched. Composed review fires on
+  ready; stage-D gate follows.
+- Interim workaround recorded: until #1187 lands, per-merge check reads use
+  `actions/runs/{id}/jobs?filter=latest` as ground truth wherever pr-checks disagrees with a
+  rerun's latest attempt.
