@@ -1,4 +1,4 @@
-import { assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
+import { assert, assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
 import { artifactText, collectInstallArtifacts, substituteTokens } from '@netscript/plugin/adapter';
 import { sagasAdapterPlugin } from '../plugin.ts';
 import { DEFAULT_SAGA_INPUT, sagaScaffolder } from './mod.ts';
@@ -60,6 +60,24 @@ Deno.test('sagas install emits only userland glue under sagas', () => {
       );
     }
   }
+});
+
+Deno.test('sagas install runtime glue registers Redis before starting the runner', () => {
+  const runtimeArtifact = collectInstallArtifacts(sagasAdapterPlugin).find((artifact) =>
+    artifact.path === 'sagas/runtime.ts'
+  );
+  assert(runtimeArtifact, 'sagas install must emit sagas/runtime.ts');
+
+  const source = artifactText(runtimeArtifact);
+  const registrationImport = "import '@netscript/kv/redis';";
+  const runnerImport = "import { runSagaRunner } from '@netscript/plugin-sagas/runtime';";
+
+  assertStringIncludes(source, registrationImport);
+  assertStringIncludes(source, runnerImport);
+  assert(
+    source.indexOf(registrationImport) < source.indexOf(runnerImport),
+    'Redis adapter registration must run before the saga runner module is imported',
+  );
 });
 
 Deno.test('sagas resource token map rejects misspelled tokens at compile time', () => {

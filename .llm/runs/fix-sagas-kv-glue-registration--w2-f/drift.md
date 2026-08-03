@@ -35,3 +35,24 @@ Drift is append-only.
 - **Action:** accept
 - **Evidence:** `plan-eval.md`; `worklog.md` Plan Gate row.
 
+## 2026-08-04 — Isolated detached AppHost did not persist
+
+- **What:** `aspire start --isolated` reported a dashboard/PID and exit 0, but the PID exited and
+  `aspire ps` immediately returned no AppHost before any application resource evidence was available.
+- **Source:** fresh RED scaffold start; detached CLI log ended after startup-readiness notification.
+- **Expected:** The isolated AppHost remains discoverable for resource inspection.
+- **Actual:** No host or resource survived; no saga claim was made from the exit code.
+- **Severity:** minor
+- **Action:** accept
+- **Evidence:** Worklog records the no-host result; normal generated `aspire:start` path is the retry.
+
+## 2026-08-04 — Sibling run acquired the shared AppHost slot
+
+- **What:** Between the empty-host preflight and retry, #1191 started an AppHost from
+  `/home/codex/repos/ns005-ffi/.llm/tmp/issue1191/ffi-red-green/aspire/apphost.mts`.
+- **Source:** live `aspire ps --format Json` after the retry.
+- **Expected:** This slice held the W2 expensive/runtime slot after empty preflight.
+- **Actual:** The sibling AppHost is now the sole discoverable owner.
+- **Severity:** significant
+- **Action:** accept
+- **Evidence:** Live RED is queued; foreign host/resources are not stopped or mutated.
