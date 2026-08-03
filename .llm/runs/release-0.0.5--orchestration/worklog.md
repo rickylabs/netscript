@@ -402,3 +402,18 @@ by the very sentence explaining that discipline.
   orchestrator, 15/15; body completed truthfully.
 - Wave-1 remaining before canary.1: `proofs` (#1127–#1129, turn still running) and
   `mcp-receipts` (#1183, resumed to finish slice 2).
+
+## 2026-08-03 — R3: #1189 scheduled (W6-A, canary.4 train)
+
+Owner filed #1189 from the wave-4 control run; explicitly not assumed into #1184's train.
+Placement: **W6-A, Sol·high, canary.4 train**, after #1093 — separate PRs per the critical-code
+split rule despite the shared plugin-core surface and shared third-party-parity theme (gap 2,
+the `officialSource` reconciliation gate, is the sibling of #1093's hardcoded discovery). The
+slice brief (`slices/plugin-linking-seam/implement.md`) carries: the owner's contract framing
+(declare in plugin config, one core seam, no per-plugin logic anywhere), all three
+source-referenced gaps, the eight acceptance boxes, the adapted seven-point protocol
+(single-command install/start with zero appsettings edits, OTEL-proven cross-boundary call,
+RED-first, install-order independence, uninstall cleanup), and the fixture third-party plugin
+wired without touching CLI source as the non-negotiable seam proof. Wave-6 rebalanced (tail →
+wave 7); #1189 holds W6's expensive-gate slot. `status:plan` set; decision commented on the
+issue.

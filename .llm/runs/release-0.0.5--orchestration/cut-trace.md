@@ -44,3 +44,11 @@ dispatch, in exactly epic #1169's S1→S2→S4 order.
 ## Failure table
 
 _(time-costing failures, as they happen)_
+- **R3 (2026-08-03, wave 1 landing):** owner filed #1189 (p1, plugin linking must be declared in
+  plugin config and wired by one core seam — the plugin→consuming-service edge has no
+  declaration vocabulary; `officialSource` gating blinds reconciliation to third-party plugins;
+  `-api` suffix heuristic instead of declared identifiers; downstream of #1067 one hop out).
+  Scheduled **W6-A · Sol·high · canary.4 train**, sequenced after #1093 (W5-B) — shared
+  plugin-core surface split per the critical-code rule, #1093's third-party fixture reused for
+  the linking seam proof. Wave-6 tail (#1110, #1137+#1138) slides to wave 7. Also this cycle:
+  orchestrator filed #1187 (pr-checks cross-attempt supersede) → wave 3.
