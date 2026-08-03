@@ -66,8 +66,14 @@ export async function recentActiveSessions(
 export function isAnchoredCodexAppServer(argv: string, home: string): boolean {
   const prefix = `${home}/.codex/`;
   if (!argv.startsWith(prefix)) return false;
+  return isCodexAppServer(argv);
+}
+
+/** Matches a real Codex executable argv followed by `app-server`, regardless of ownership. */
+export function isCodexAppServer(argv: string): boolean {
   const executable = argv.slice(0, argv.indexOf(' '));
-  return executable.endsWith('/codex') && argv.slice(executable.length).startsWith(' app-server');
+  return (executable === 'codex' || executable.endsWith('/codex')) &&
+    argv.slice(executable.length).startsWith(' app-server');
 }
 
 export function parseProcessTable(output: string, home: string): Readonly<{
@@ -81,7 +87,7 @@ export function parseProcessTable(output: string, home: string): Readonly<{
     if (!match) continue;
     const pid = Number(match[1]);
     const argv = match[3];
-    if (argv.includes('codex') && argv.includes('app-server')) {
+    if (isCodexAppServer(argv)) {
       appServers.push({ pid, argv, anchored: isAnchoredCodexAppServer(argv, home) });
     } else if (/\b(deno|dotnet|aspire|docker|npm|node|git)\b/.test(argv)) {
       childCommands.push(argv.split(' ')[0]);
@@ -116,7 +122,7 @@ export class LocalCodexRemoteAdapter implements CodexRemoteRepairPort {
     const anchoredAppServerPresent = table.appServers.some((process) => process.anchored);
     const activeSessions = await recentActiveSessions(
       `${this.home}/.codex/sessions`,
-      anchoredAppServerPresent || socket,
+      anchoredAppServerPresent,
     );
     const version = (value: string): string | null => value.match(/\d+\.\d+\.\d+/)?.[0] ?? null;
     let remoteValue: Record<string, unknown> = {};

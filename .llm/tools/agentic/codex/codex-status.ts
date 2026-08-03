@@ -35,19 +35,24 @@ import { classifyCodexRolloutFailure } from './classify-codex-failure.ts';
 
 export const CODEX_STATUS_PROCESS_TABLE_MARKER = '__NETSCRIPT_CODEX_PROCESS_TABLE__' as const;
 
-/** Parses the daemon version and counts only anchored Codex app-server argv entries. */
+/** Parses the daemon version and reports total plus owned Codex app-server counts. */
 export function parseCodexDaemonProbe(
   output: string,
   home: string,
-): { version: string | null; appServerProcesses: number } {
+): {
+  version: string | null;
+  appServerProcesses: number;
+  anchoredAppServerProcesses: number;
+} {
   const marker = `${CODEX_STATUS_PROCESS_TABLE_MARKER}\n`;
   const markerIndex = output.indexOf(marker);
   const header = markerIndex === -1 ? output : output.slice(0, markerIndex);
   const processTable = markerIndex === -1 ? '' : output.slice(markerIndex + marker.length);
+  const appServers = parseProcessTable(processTable, home).appServers;
   return {
     version: header.match(/^VERSION=(.*)$/m)?.[1]?.trim() || null,
-    appServerProcesses:
-      parseProcessTable(processTable, home).appServers.filter((process) => process.anchored).length,
+    appServerProcesses: appServers.length,
+    anchoredAppServerProcesses: appServers.filter((process) => process.anchored).length,
   };
 }
 

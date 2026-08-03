@@ -11,7 +11,11 @@ Deno.test('Codex status reports zero when the process table has no real app-serv
     `VERSION=codex-cli 0.150.0\n${CODEX_STATUS_PROCESS_TABLE_MARKER}\n${wrapper}\n`,
     home,
   );
-  assertEquals(result, { version: 'codex-cli 0.150.0', appServerProcesses: 0 });
+  assertEquals(result, {
+    version: 'codex-cli 0.150.0',
+    appServerProcesses: 0,
+    anchoredAppServerProcesses: 0,
+  });
 });
 
 Deno.test('Codex status ignores its wrapper shell and counts the anchored app-server', () => {
@@ -22,5 +26,23 @@ Deno.test('Codex status ignores its wrapper shell and counts the anchored app-se
       `${anchored}\n${wrapper}\n`,
     home,
   );
-  assertEquals(result, { version: 'codex-cli 0.150.0', appServerProcesses: 1 });
+  assertEquals(result, {
+    version: 'codex-cli 0.150.0',
+    appServerProcesses: 1,
+    anchoredAppServerProcesses: 1,
+  });
+});
+
+Deno.test('Codex status reports unanchored app-servers without claiming ownership', () => {
+  const unanchored = '1258643 1 /opt/codex/bin/codex app-server --listen unix:///tmp/codex.sock';
+  const result = parseCodexDaemonProbe(
+    `VERSION=codex-cli 0.150.0\n${CODEX_STATUS_PROCESS_TABLE_MARKER}\n` +
+      `${unanchored}\n${wrapper}\n`,
+    home,
+  );
+  assertEquals(result, {
+    version: 'codex-cli 0.150.0',
+    appServerProcesses: 1,
+    anchoredAppServerProcesses: 0,
+  });
 });

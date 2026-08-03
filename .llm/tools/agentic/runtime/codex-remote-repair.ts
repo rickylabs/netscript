@@ -77,8 +77,7 @@ function diagnostic(
 }
 
 function repairRefusal(observation: CodexRemoteObservation): RuntimeDiagnostic | null {
-  const sessionRealityPresent = observation.controlSocketPresent ||
-    observation.appServers.some((process) => process.anchored);
+  const sessionRealityPresent = observation.appServers.some((process) => process.anchored);
   if (
     (sessionRealityPresent && observation.activeSessionIds.length) ||
     observation.activeChildCommands.length
