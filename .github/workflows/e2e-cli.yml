@@ -166,6 +166,10 @@ jobs:
         if: env.RUN == 'true'
         run: deno task e2e:cli run scaffold.infrastructure --cleanup --format pretty
 
+      - name: generated README from a clean clone
+        if: env.RUN == 'true'
+        run: deno run --allow-all packages/cli/e2e/src/application/gates/scaffold/verify-clean-clone-readme.ts
+
       - name: scaffold.plugins (official plugins + registry gen + plugin doctor)
         if: env.RUN == 'true'
         run: deno task e2e:cli run scaffold.plugins --format pretty
