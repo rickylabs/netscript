@@ -2,7 +2,7 @@ import { assertEquals } from '@std/assert';
 import { buildLeakReport } from './leak-check.ts';
 import type { CommandPort, FilePort } from './ports.ts';
 import { emptyRunResources } from './run-resources.ts';
-import { runTeardown } from './teardown.ts';
+import { runTeardown, teardownExitCode } from './teardown.ts';
 
 const root = '/home/codex/repos/fix-1046';
 
@@ -25,6 +25,33 @@ Deno.test('dry run and foreign resources execute no commands', async () => {
   );
   assertEquals((await runTeardown(report, registry, false, commands)).applied, false);
   assertEquals(called, []);
+});
+
+Deno.test('apply exits non-zero when requested cleanup is escalated', () => {
+  const report = buildLeakReport(
+    [{ kind: 'container', id: 'foreign', mountSource: '/home/codex/repos/fix-1025/.data' }],
+    emptyRunResources(root),
+    root,
+  );
+  const escalated = report.survivors[0];
+  assertEquals(
+    teardownExitCode({
+      applied: true,
+      stoppedAppHosts: [],
+      removedContainers: [],
+      escalated: [escalated],
+    }),
+    4,
+  );
+  assertEquals(
+    teardownExitCode({
+      applied: false,
+      stoppedAppHosts: [],
+      removedContainers: [],
+      escalated: [escalated],
+    }),
+    0,
+  );
 });
 
 Deno.test('apply stops each AppHost by path and re-verifies a single container id', async () => {

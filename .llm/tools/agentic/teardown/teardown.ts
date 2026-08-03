@@ -12,6 +12,11 @@ export interface TeardownResult {
   readonly escalated: readonly LeakEntry[];
 }
 
+/** Maps a completed teardown to an honest CLI status. */
+export function teardownExitCode(result: TeardownResult): number {
+  return result.applied && result.escalated.length > 0 ? 4 : 0;
+}
+
 export interface TeardownOptions {
   /** Confirmation probes after `aspire stop` before an AppHost is declared stopped. */
   readonly confirmAttempts?: number;
@@ -132,5 +137,7 @@ if (import.meta.main) {
   }
   const registry = await readRunResources(options.sliceDir, options.worktreeRoot);
   const report = await runLeakCheck(options.sliceDir, options.worktreeRoot);
-  console.log(JSON.stringify(await runTeardown(report, registry, options.apply), null, 2));
+  const result = await runTeardown(report, registry, options.apply);
+  console.log(JSON.stringify(result, null, 2));
+  Deno.exitCode = teardownExitCode(result);
 }
