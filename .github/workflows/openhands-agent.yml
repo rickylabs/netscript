@@ -295,9 +295,46 @@ jobs:
             core.setOutput('branch_name', `openhands/${issueNumber || context.runId}-${context.runAttempt}`);
             core.setOutput('started_at', new Date().toISOString());
 
+      - name: Verify target ref still exists
+        id: target-ref
+        env:
+          CHECKOUT_REPO: ${{ steps.request.outputs.checkout_repo }}
+          CHECKOUT_REF: ${{ steps.request.outputs.checkout_ref }}
+          GH_TOKEN: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
+        run: |
+          set +e
+          auth="$(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w 0)"
+          error_file="$(mktemp)"
+          trap 'rm -f "$error_file"' EXIT
+
+          if [[ "$CHECKOUT_REF" == refs/* ]]; then
+            patterns=("$CHECKOUT_REF")
+          else
+            patterns=("refs/heads/$CHECKOUT_REF" "refs/tags/$CHECKOUT_REF")
+          fi
+
+          git -c "http.extraheader=AUTHORIZATION: basic $auth" \
+            ls-remote --exit-code --refs "https://github.com/${CHECKOUT_REPO}.git" \
+            "${patterns[@]}" >/dev/null 2>"$error_file"
+          status=$?
+
+          if [ "$status" -eq 0 ]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if [ "$status" -eq 2 ]; then
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::OpenHands skipped because target ref ${CHECKOUT_REPO}@${CHECKOUT_REF} no longer exists."
+            exit 0
+          fi
+
+          echo "Unable to resolve OpenHands target ref ${CHECKOUT_REPO}@${CHECKOUT_REF}." >&2
+          cat "$error_file" >&2
+          exit "$status"
+
       - name: Acknowledge trigger and post run link
         id: ack
-        if: steps.request.outputs.output_mode != 'summary-only' && steps.request.outputs.issue_number != ''
+        if: steps.target-ref.outputs.exists == 'true' && steps.request.outputs.output_mode != 'summary-only' && steps.request.outputs.issue_number != ''
         # Housekeeping: an ack failure must not kill the run; the finalize step
         # creates a fresh comment when no ack comment id exists.
         continue-on-error: true
@@ -353,6 +390,7 @@ jobs:
             core.setOutput('comment_id', String(comment.id));
 
       - name: Checkout repository
+        if: steps.target-ref.outputs.exists == 'true'
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
         with:
           repository: ${{ steps.request.outputs.checkout_repo }}
@@ -361,6 +399,7 @@ jobs:
           token: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
 
       - name: Hydrate OpenHands automation from workflow ref
+        if: steps.target-ref.outputs.exists == 'true'
         # The checkout above is the PR head, which may carry stale/absent
         # runtime files; always run the versions from the workflow's own ref.
         env:
@@ -377,6 +416,7 @@ jobs:
 
       - name: Load NetScript toolchain
         id: toolchain
+        if: steps.target-ref.outputs.exists == 'true'
         run: |
           set -euo pipefail
           source /tmp/openhands-runtime/toolchain.env
@@ -385,6 +425,7 @@ jobs:
 
       - name: Prepare OpenHands artifact paths
         id: artifacts
+        if: steps.target-ref.outputs.exists == 'true'
         env:
           CHECKOUT_REF: ${{ steps.request.outputs.checkout_ref }}
           ISSUE_NUMBER: ${{ steps.request.outputs.issue_number }}
@@ -429,6 +470,7 @@ jobs:
           } >> "$GITHUB_ENV"
 
       - name: Prepare OpenHands request files
+        if: steps.target-ref.outputs.exists == 'true'
         env:
           REQUEST_PROMPT: ${{ steps.request.outputs.prompt }}
           REQUEST_MODEL: ${{ steps.request.outputs.model }}
@@ -506,23 +548,27 @@ jobs:
           fi
 
       - name: Setup Deno
+        if: steps.target-ref.outputs.exists == 'true'
         uses: denoland/setup-deno@22d081ff2d3a40755e97629de92e3bcbfa7cf2ed # v2.0.5
         with:
           deno-version: ${{ steps.toolchain.outputs.deno-version }}
           cache-hash: ${{ hashFiles('**/deno.json') }}
 
       - name: Setup .NET SDK
+        if: steps.target-ref.outputs.exists == 'true'
         uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5
         with:
           dotnet-version: ${{ steps.toolchain.outputs.dotnet-version }}
 
       - name: Setup Docker
+        if: steps.target-ref.outputs.exists == 'true'
         uses: docker/setup-docker-action@6d7cfa65f60a9dda7b46e5513fa982536f3c9877 # v5
         with:
           version: latest
 
       - name: Bootstrap NetScript toolchain
         id: bootstrap
+        if: steps.target-ref.outputs.exists == 'true'
         run: |
           set +e
           bash /tmp/openhands-runtime/setup.sh 2>&1 | tee "$OPENHANDS_RUN_DIR/bootstrap.log"
@@ -531,16 +577,19 @@ jobs:
           exit "$status"
 
       - name: Set up Python
+        if: steps.target-ref.outputs.exists == 'true'
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: '3.13'
 
       - name: Install uv
+        if: steps.target-ref.outputs.exists == 'true'
         uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39 # v8.2.0
         with:
           enable-cache: false
 
       - name: Install OpenHands SDK
+        if: steps.target-ref.outputs.exists == 'true'
         run: |
           uv pip install --system "openhands-sdk @ git+https://github.com/OpenHands/software-agent-sdk.git@main#subdirectory=openhands-sdk"
           uv pip install --system "openhands-tools @ git+https://github.com/OpenHands/software-agent-sdk.git@main#subdirectory=openhands-tools"
@@ -550,6 +599,7 @@ jobs:
           uv pip install --system fastapi
 
       - name: Resolve provider credentials
+        if: steps.target-ref.outputs.exists == 'true'
         env:
           LLM_PROVIDER: ${{ steps.request.outputs.provider }}
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
@@ -603,6 +653,7 @@ jobs:
       # ------------------------------------------------------------ agent run
       - name: Run OpenHands
         id: run-agent
+        if: steps.target-ref.outputs.exists == 'true'
         env:
           LLM_MODEL: ${{ steps.request.outputs.model }}
           OPENHANDS_MAX_ITERATIONS: ${{ steps.request.outputs.iterations }}
@@ -620,7 +671,7 @@ jobs:
       # job conclusion (which belongs to the agent path above).
       - name: Materialize OpenHands trace
         id: trace
-        if: always()
+        if: always() && steps.target-ref.outputs.exists == 'true'
         continue-on-error: true
         env:
           BOOTSTRAP_OUTCOME: ${{ steps.bootstrap.outcome }}
@@ -791,7 +842,7 @@ jobs:
         # deno.lock, never node_modules, never agent source changes (the agent
         # pushes its own source commits per the request contract). Disallowed
         # leftovers are counted, sampled, and preserved in the Actions artifact.
-        if: always() && steps.request.outputs.is_pr == 'true' && steps.artifacts.outputs.trace_dir != ''
+        if: always() && steps.target-ref.outputs.exists == 'true' && steps.request.outputs.is_pr == 'true' && steps.artifacts.outputs.trace_dir != ''
         continue-on-error: true
         env:
           TOKEN: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
@@ -856,7 +907,7 @@ jobs:
 
       - name: Create pull request for non-PR triggers
         id: create-pr
-        if: always() && steps.run-agent.outcome == 'success' && steps.request.outputs.is_pr != 'true'
+        if: always() && steps.target-ref.outputs.exists == 'true' && steps.run-agent.outcome == 'success' && steps.request.outputs.is_pr != 'true'
         continue-on-error: true
         uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8
         with:
@@ -870,7 +921,7 @@ jobs:
 
       - name: Post review-thread replies
         id: replies
-        if: always() && steps.request.outputs.output_mode == 'thread-replies' && steps.request.outputs.is_pr == 'true'
+        if: always() && steps.target-ref.outputs.exists == 'true' && steps.request.outputs.output_mode == 'thread-replies' && steps.request.outputs.is_pr == 'true'
         continue-on-error: true
         env:
           GH_TOKEN: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
@@ -913,7 +964,7 @@ jobs:
         # agent failed. It needs steps.request outputs to know WHERE to post; a
         # run that dies inside the request step itself can only write the job
         # step summary.
-        if: always()
+        if: always() && steps.target-ref.outputs.exists == 'true'
         continue-on-error: true
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
         env:
@@ -1148,7 +1199,7 @@ jobs:
             }
 
       - name: Upload OpenHands artifacts
-        if: always() && steps.artifacts.outputs.run_dir != ''
+        if: always() && steps.target-ref.outputs.exists == 'true' && steps.artifacts.outputs.run_dir != ''
         continue-on-error: true
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
