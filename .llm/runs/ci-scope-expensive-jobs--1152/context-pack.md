@@ -1,15 +1,15 @@
 # Context pack — ci-scope-expensive-jobs--1152
 
-**State**: plan written, awaiting PLAN-EVAL. No implementation slices landed.
+**State**: implementation complete on PR #1155 (draft), live-verified by demo runs; awaiting the
+PR's own full CI green, then acceptance-evidence mirror → ready-merge → merge.
 
-- Branch `ci/scope-expensive-jobs` (base `origin/main`), worktree `/home/codex/repos/ns-ci-scope`.
-- #1151 already shipped separately: PR #1153, verified by run 30825776156 (docs-only demo →
-  desktop skipped-by-policy). Not part of this run's remaining scope.
-- Read order to resume: `supervisor.md` → `research.md` → `plan.md` (D1–D5 decisions, S1–S6
-  slices, open questions 1–4).
-- Next actions: (1) dispatch PLAN-EVAL on the open-model evaluator lane; (2) on PASS, implement
-  S1→S6 sequentially on this branch, one commit+push+PR comment per slice; (3) before/after
-  measurement posted on #1152.
-- Hard constraints: label set frozen (`ci:full`/`ci:skip-scaffold`/`ci:skip-e2e`), skipped jobs
-  still report, unrecognised path ⇒ whole vector true, no routing tables in YAML, no
-  docker/scaffold runs from this shared machine.
+- Branch `ci/scope-expensive-jobs`; PR #1155 (`Closes #1152`). #1151 already SHIPPED via PR #1153.
+- Landed: classifier capability vector (needs_deno/docker/desktop/docs/surface) + #1122 precision
+  (tier-defining workflows only; root deno.json tasks-only discrimination), consumers in
+  e2e-cli.yml / ci.yml / surface-diff.yml (all skipped-by-policy pattern, fail-closed), Node-24
+  action bumps.
+- Evidence: 50 classifier unit tests; demo run 30827771974 (docs-only → all three expensive jobs
+  skipped); demo run 30827782060 (release-workflow-only → same, the #1122 replay).
+- Follow-ups: post-merge observation of first real docs-only PR; needs_docker package-set
+  tightening against observed green history; sqlite-tier e2e idea filed as its own issue.
+- Constraints: label set frozen; skipped jobs still report; unrecognised path ⇒ vector all true.
