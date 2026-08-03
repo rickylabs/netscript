@@ -25,7 +25,7 @@ includes `schema`, `initial`, `mutate`, `onIntent`, `redirectTo`, `onSuccess`, `
 `method`, and `spanName`.
 
 ```tsx
-import { definePage } from '@netscript/fresh';
+import { definePage } from '@netscript/fresh/builders';
 import { z } from 'zod';
 
 const ContactSchema = z.object({
