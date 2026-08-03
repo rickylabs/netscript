@@ -2153,3 +2153,35 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   resolution receives a dedicated smoke and URL-aware module locator.
 - **Gate:** Close when a compiled/public CLI installs a JSR plugin, resolves its doctor adapter,
   executes a contributed check, and reports import failures as structured doctor errors.
+
+## documentation lane authored framework source (`docs-lane-framework-source-1020`)
+
+- **Reason:** PR #1079 (documentation-sequencing slice, `docs/1068-task-routing`) landed framework
+  source on the documentation lane. Commit `fb5d7a0de` added `plugins/streams/services/src/durability.ts`
+  (new `describeStorageDurability` module, 29 lines), `durability_test.ts` (38 lines), a startup
+  warning wired into `plugins/streams/services/src/main.ts`, and a `plugins/streams/deno.json` task
+  change — plus JSDoc in `packages/fresh`, `packages/plugin-workers-core` and `packages/sdk`.
+  `CLAUDE.md`'s documentation-authoring exception is explicit that authoring touches **no
+  `packages/`/`plugins/` source code**, and that any framework-source change stays a WSL Codex
+  daemon-attached slice. This crossed that boundary.
+- **Root cause is upstream of the slice:** issue #1020 is labelled `type:docs`, but its acceptance
+  ("the non-durable in-memory default is unsurfaced" → a startup warning) **requires code**. A
+  `type:docs` issue whose acceptance cannot be met by prose should not be routed to the documentation
+  lane. The slice followed its brief; the routing decision was wrong, and the orchestrator's
+  pre-merge review checked the router change (#1068) without auditing the changed-file list for
+  framework paths.
+- **Owner:** 0.0.4 release orchestrator (routing + merge review).
+- **Decision:** **DEBT_ACCEPTED, not reverted.** The change is small, additive, unit-tested, and was
+  required by the issue's own acceptance; it passed the full CI surface including `scaffold-runtime`,
+  `quality:scan` (byte-identical to the pre-change baseline) and `arch:check` (FAIL=0). Reverting
+  green, tested, required work to satisfy a lane boundary would cost more than it protects. The
+  deviation is recorded rather than buried.
+- **Created:** 2026-08-03
+- **Status:** open, DEBT_ACCEPTED — **owner-reviewed 2026-08-03**: content assessed directly and
+  judged acceptable ("mostly comments and test"). The code stands as merged. The **process** finding
+  is upheld, not waived: this must not recur, so the gate below remains the closing condition.
+- **Gate:** Close when (a) issue triage classifies a `type:docs` issue whose acceptance requires
+  source changes as `type:fix`/`type:feat` with an `area:docs` tag instead, and (b) the pre-merge
+  review step for any documentation-lane PR audits the changed-file list for `packages/**` and
+  `plugins/**` paths before merge. Until then, assume the docs lane can silently acquire source
+  scope.

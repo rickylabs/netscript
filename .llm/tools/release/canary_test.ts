@@ -1,5 +1,6 @@
 import { assertEquals, assertRejects, assertThrows } from 'jsr:@std/assert@^1';
 import {
+  canaryResult,
   type CanaryVersionDependencies,
   createCanaryRefs,
   deriveCanaryVersion,
@@ -7,6 +8,7 @@ import {
   readRegistryVersions,
   validateRepublishVersion,
   verifyCanaryRepublishTree,
+  writeCanaryResult,
 } from './canary.ts';
 
 Deno.test('canary version takes the maximum registry N across all members including yanked versions', async () => {
@@ -28,13 +30,31 @@ Deno.test('canary version uses tags as a secondary collision guard and tolerates
 });
 
 Deno.test('canary parser accepts only a stable target and task separator', () => {
-  assertEquals(parseArgs(['--', '0.0.2', '--dry-run', '--root', '/repo']), {
+  assertEquals(parseArgs(['--', '0.0.2', '--dry-run', '--root', '/repo', '--output', '/result']), {
     targetVersion: '0.0.2',
     dryRun: true,
     root: '/repo',
+    output: '/result',
   });
   assertThrows(() => parseArgs(['0.0.2-beta.1']), Error, 'stable semantic version');
   assertThrows(() => parseArgs(['0.0.2+build.1']), Error, 'stable semantic version');
+});
+
+Deno.test('machine result carries the resolved 0.0.4 canary identity', async () => {
+  const root = await Deno.makeTempDir();
+  try {
+    const output = `${root}/canary-result.json`;
+    await writeCanaryResult(output, canaryResult('0.0.4-canary.1'));
+
+    assertEquals(JSON.parse(await Deno.readTextFile(output)), {
+      version: '0.0.4-canary.1',
+      tag: 'v0.0.4-canary.1',
+      branch: 'release/canary-0.0.4-canary.1',
+    });
+    assertEquals(canaryResult('0.0.4-canary.1', true).branch, '');
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
 });
 
 Deno.test('canary republish version must be canonical and belong to the target train', () => {

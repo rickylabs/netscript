@@ -105,6 +105,7 @@
     "publish:readiness": "deno run --allow-read --allow-run --allow-net=jsr.io,api.jsr.io .llm/tools/release/publish-readiness.ts",
     "release:cut": "deno run --allow-read --allow-write --allow-run --allow-env --allow-net=api.github.com .llm/tools/release/cut.ts",
     "release:canary": "deno run --allow-read --allow-write --allow-run --allow-net=jsr.io .llm/tools/release/canary.ts",
+    "release:canary-label": "deno run --allow-env=GH_TOKEN,GITHUB_TOKEN,GITHUB_REPOSITORY --allow-net=api.github.com,jsr.io --allow-run=git .llm/tools/release/canary-label.ts",
     "release:publish": "deno run --allow-net --allow-env --allow-run --allow-read .llm/tools/release/github-release.ts",
     "release:verify-canary-pair": "deno run --allow-net=api.github.com --allow-env=GH_TOKEN --allow-run=git --allow-read .llm/tools/release/verify-canary-pair.ts",
     "surface:diff": "deno run --allow-read --allow-write --allow-run .llm/tools/release/surface-diff.ts",
