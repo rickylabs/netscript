@@ -242,6 +242,73 @@ The order is always: build the adapter, call <code>getDriverAdapter()</code>, pa
 <code>"… client not initialized. Call setClient() …"</code>.
 {{ /comp }}
 
+### Unsupported by NetScript, supported by Prisma (libSQL / Turso example)
+
+When you need a backing database that Prisma supports (such as **libSQL / Turso** via `@prisma/adapter-libsql`, PlanetScale, or Cloudflare D1) but NetScript does not ship a pre-packaged wrapper for, wire Prisma's driver adapter directly in application code.
+
+#### 1. Distinguishing Prisma's driver adapter from NetScript's `DatabaseAdapter`
+
+It is important to distinguish the two levels of adapters:
+
+- **Prisma driver adapter (`PrismaLibSql`)**: Low-level engine adapter provided by upstream (`@prisma/adapter-libsql`). Its sole job is bridging Prisma 7 query engine calls to the underlying driver (e.g. `@libsql/client`). You pass this directly to `new PrismaClient({ adapter })`.
+- **NetScript `DatabaseAdapter` wrapper**: High-level framework port (`@netscript/database/ports`) implemented by NetScript's factories (`createPostgresAdapter`, `createMysqlAdapter`, `createMssqlAdapter`). It encapsulates connection lifecycle (`connect()`, `disconnect()`), health checks (`healthCheck()`), status metrics (`getStatus()`), and raw query dispatch (`executeRaw()`).
+
+When using an unsupported driver like libSQL/Turso directly, your application uses Prisma's driver adapter without implementing NetScript's `DatabaseAdapter`.
+
+#### 2. Code example (libSQL / Turso)
+
+Below is a complete, pasteable example using `@prisma/adapter-libsql` and the generated Deno Prisma client shape:
+
+```ts
+// database/turso/mod.ts (or services/chat/src/db.ts)
+import { PrismaLibSql } from '@prisma/adapter-libsql';
+import { PrismaClient as TursoClient } from './schema/.generated/client.server.ts';
+
+// 1. Resolve environment variables under Deno
+const connectionString = Deno.env.get('TURSO_DATABASE_URL') ?? 'libsql://my-app.turso.io';
+const authToken = Deno.env.get('TURSO_AUTH_TOKEN');
+
+// 2. Construct Prisma's driver adapter directly
+const adapter = new PrismaLibSql({
+  url: connectionString,
+  authToken,
+});
+
+// 3. Instantiate the generated Deno Prisma client with the driver adapter
+export const turso = new TursoClient({ adapter });
+
+// 4. Application-owned health check ping
+export async function checkTursoHealth(): Promise<boolean> {
+  try {
+    await turso.$queryRaw`SELECT 1`;
+    return true;
+  } catch {
+    return false;
+  }
+}
+```
+
+#### 3. Application-owned responsibilities
+
+Because NetScript does not wrap the driver, the application owns the following responsibilities:
+
+- **Client generation & output shape**: Configure `schema/schema.prisma` with `generator client { provider = "prisma-client", output = "./.generated", runtime = "deno" }`. Run `netscript db generate --db <name>` to output the Deno-compatible client at `./schema/.generated/client.server.ts`.
+- **Environment & connection management**: Resolve URL and credentials (such as `TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN`) via `Deno.env.get()`.
+- **Lifecycle & health**: Manage startup/shutdown (`turso.$connect()`, `turso.$disconnect()`) and implement custom health checks (e.g. `turso.$queryRaw`SELECT 1\``) for readiness probes or health reporting.
+- **Tracing & telemetry**: Configure query logging or OpenTelemetry tracing directly on the `PrismaClient` instance if desired.
+- **Permissions (driver-dependent)**: Grant the specific Deno runtime permissions required by your database driver (`--allow-net`, `--allow-env`, `--allow-read` for network/cloud drivers like libSQL over HTTP; `--allow-ffi` is driver-dependent and only needed if using native/C bindings), and declare required permissions on Aspire apphost entries when launching under Aspire.
+
+#### 4. Decision rule: Direct use vs. reusable `DatabaseAdapter` wrapper
+
+- **Use direct Prisma driver adapter (`new PrismaClient({ adapter })`) app-locally when**:
+  - You are adding a single service/datasource with an upstream driver (e.g. libSQL/Turso).
+  - Standard `PrismaClient` methods satisfy all query needs.
+  - You do not need centralized `netscript db` lifecycle hooks or multi-plugin status reporting.
+- **Implement a reusable NetScript `DatabaseAdapter` wrapper when**:
+  - The database driver will be shared across multiple plugins or workspace packages.
+  - You need uniform `connect()`, `disconnect()`, `healthCheck()`, and `getStatus()` behavior across the workspace.
+  - CLI tools or plugin doctor require standardized status reporting.
+
 ## In-production pitfalls
 
 {{ comp callout { type: "warning", title: "Watch for these" } }}

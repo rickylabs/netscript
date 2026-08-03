@@ -123,8 +123,8 @@ and a context, returns the resources it wants in the graph:
 
 ```ts
 // plugins/<name>/src/aspire-contribution.ts (conceptual shape)
-import { AspireNSPluginContribution } from "@netscript/aspire";
-import type { AspireBuilder, AspireResource, ContributionContext } from "@netscript/aspire";
+import { AspireNSPluginContribution } from "@netscript/aspire/public";
+import type { AspireBuilder, AspireResource, ContributionContext } from "@netscript/aspire/application";
 
 class WorkersContribution extends AspireNSPluginContribution {
   readonly pluginName = "@netscript/plugin-workers";
@@ -146,16 +146,61 @@ The host side composes those contributions. `composeAppHost` walks the plugin ma
 ones that declare an `aspire` contribution, instantiates each, and collects the resources:
 
 ```ts
-// conceptual: how the AppHost asks plugins for their resources
-import { composeAppHost } from "@netscript/aspire";
+// How the AppHost composes plugin contributions into a builder
+import { AspireTypeScriptBuilder } from "@netscript/aspire/adapters";
+import {
+  composeAppHost,
+  type AspireBuilder,
+  type AspireResource,
+  type ComposePluginManifest,
+  type ContributionContext,
+} from "@netscript/aspire/application";
+import { AspireNSPluginContribution } from "@netscript/aspire/public";
+
+class WorkersContribution extends AspireNSPluginContribution {
+  readonly pluginName = "@netscript/plugin-workers";
+
+  contribute(_builder: AspireBuilder, _ctx: ContributionContext): readonly AspireResource[] {
+    return [{ name: "workers-service", kind: "deno-service", port: 8080 }];
+  }
+}
+
+const builder = new AspireTypeScriptBuilder();
+const context: ContributionContext = {
+  projectRoot: Deno.cwd(),
+  port: (_key, fallback = 8080) => fallback,
+  env: (source) => (typeof source === "string" ? source : source.kind === "literal" ? source.value : "configured"),
+  resource: () => undefined,
+  manifest: { name: "apphost" },
+};
+const plugins: readonly ComposePluginManifest[] = [
+  {
+    name: "@netscript/plugin-workers",
+    contributions: { aspire: WorkersContribution },
+  },
+];
 
 const { resources, registry } = composeAppHost({
-  builder,          // the Aspire builder port
-  context,          // ContributionContext (paths, ports, env)
-  plugins,          // [{ name, contributions: { aspire: Contribution } }, ...]
+  builder,
+  context,
+  plugins,
 });
 // `registry` is a ContributionRegistry keyed by pluginName; a duplicate
 // plugin name throws DuplicateContributionError — the graph is dedup-checked.
+```
+
+Use `@netscript/aspire/application` when authoring focused composition modules. When an application or plugin prefers a single entrypoint for all configuration, composition, type, and testing exports, `@netscript/aspire/public` is the supported production aggregate export (`import { composeAppHost } from "@netscript/aspire/public"`). Note that the root export `@netscript/aspire` is reserved strictly for diagnostics (`inspectAspire`).
+
+### Editor schema validation workflow
+
+To enable editor validation and autocompletion for `appsettings.json`, `@netscript/aspire/schema` (also re-exported by `@netscript/aspire/public`) provides `generateAppSettingsJsonSchema`:
+
+```ts
+import { generateAppSettingsJsonSchema } from "@netscript/aspire/schema";
+
+// Generates a draft-7 JSON Schema derived directly from Zod AppSettingsSchema
+const jsonSchema = generateAppSettingsJsonSchema();
+await Deno.writeTextFile("./.vscode/appsettings.schema.json", JSON.stringify(jsonSchema, null, 2));
 ```
 
 The shape of each node the contributions produce is deliberately narrow — every resource is one of
