@@ -141,8 +141,7 @@ export class SagaBusBridge implements SagaBusPort {
       case 'complete':
         return;
       case 'fail':
-        if (compensation) return;
-        await this.#compensate(message);
+        await this.#compensate(message, compensation);
         return;
       case 'compensate':
         await this.#compensate(message, compensation);

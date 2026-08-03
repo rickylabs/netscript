@@ -1,7 +1,7 @@
 import { assert, assertEquals, assertRejects, assertStrictEquals } from 'jsr:@std/assert@^1';
 
 import { MemoryKvAdapter } from '@netscript/kv';
-import { defineSaga, sagaCompensate, send } from '@netscript/plugin-sagas-core';
+import { defineSaga, sagaCompensate, sagaFail, send } from '@netscript/plugin-sagas-core';
 import type {
   SagaCorrelationIndexEntry,
   SagaCorrelationKey,
@@ -117,6 +117,30 @@ Deno.test('createDurableSagaRuntime rejects sagaCompensate without a matching br
     );
   } finally {
     await durable.runtime.stop('missing compensation test complete');
+    await durable.dispose();
+  }
+});
+
+Deno.test('createDurableSagaRuntime dispatches sagaFail through its compensation branch', async () => {
+  const durable = await createDurableSagaRuntime({ kv: new MemoryKvAdapter() });
+  const calls: string[] = [];
+  const definition = defineSaga('failure-compensation')
+    .state<SagaState>({ status: 'pending' })
+    .on<string, unknown>('Start', () => [sagaFail('payment declined')])
+    .compensate<string, unknown>('Start', (saga, message) => {
+      calls.push(`compensate:${message.type}`);
+      saga.state = { status: 'compensated' };
+      return [];
+    })
+    .build();
+
+  await durable.runtime.start();
+  try {
+    await durable.runtime.register([definition]);
+    await durable.runtime.publish({ type: 'Start', payload: {} });
+    assertEquals(calls, ['compensate:Start']);
+  } finally {
+    await durable.runtime.stop('failure compensation test complete');
     await durable.dispose();
   }
 });
