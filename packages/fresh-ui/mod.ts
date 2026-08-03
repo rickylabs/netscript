@@ -2,6 +2,7 @@
  * @module
  * Stable runtime entrypoints for `@netscript/fresh-ui`.
  *
+ * Copy-based registry components and collections are defined in `freshUiRegistryManifest` (`@netscript/fresh-ui/registry`).
  * Copy-based registry components and islands intentionally remain on
  * workspace-local deep paths so applications can own and evolve them
  * after copy. This root entrypoint exposes only the supported helper
