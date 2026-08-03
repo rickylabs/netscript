@@ -111,3 +111,16 @@ paragraphs, mirror byte-identical. Follow-up slice dispositions:
 - **M1/M2** — escalated: definitional dispute over the `[observed]` source of record
   (cut-trace-only vs the ratified design record's own practice); supervisor position recorded in
   drift.md, owner to ratify or overrule.
+
+## Eval cycle 3 — CHANGES_REQUESTED on two mechanical residues; substance resolved
+
+Verdict: `sol-eval-3.md`. C3/C7/C9/M1/M2/M4/M7 resolved — C9 and M1/M2 under the owner rulings
+recorded on #1120; Sol independently re-ran the check-3 demo (RED exit 1 / GREEN exit 0) and
+re-fetched #1155's rollup, confirming both gate demonstrations against live data. Survivors,
+both residues of the cycle-2 fixes, fixed in this slice:
+
+- **C10** — dropped the false implication that the published-version guard means the tag exists;
+  the note now states the tool does not check the tag and what GitHub would do if it were absent
+  (create it at default-branch HEAD — the wrong commit).
+- **M8** — the PR body's "every gate" acceptance row now cites the `gate-demos.md`
+  demonstrations and #1160's fixed status instead of the pre-demo wording.

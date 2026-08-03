@@ -92,9 +92,11 @@ path must never be added (two paths to the same fact is how a label and a note d
 Contract (enforced by the tool):
 
 - The note is a **GitHub release at tag `v<version>`, marked prerelease**. A canary never takes
-  `Latest` — that belongs to stable. The tag itself is created by the canary cut; the tool does
-  not verify the tag's prior existence — its guard is the published-version refusal above, which
-  in practice means the tag exists before a note can.
+  `Latest` — that belongs to stable. The tag itself is created by the canary cut, not by this
+  tool, and the tool does not verify the tag exists before publishing the release — if the tag
+  were absent, GitHub would create it at the default-branch HEAD, the wrong commit. Publishing a
+  note therefore assumes the canary cut already created `v<version>`; the published-version
+  refusal bounds *which* versions can be named, not whether their tag exists.
 - Re-running is **idempotent**: an existing canary release is updated, not duplicated or failed.
 - An empty payload (nothing merged since the previous canary point) produces an **explicit
   empty-payload note**, not a silent success and not a crash.
