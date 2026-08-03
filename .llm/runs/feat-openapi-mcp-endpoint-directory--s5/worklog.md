@@ -91,6 +91,7 @@ never import an infrastructure adapter from a consumer flow.
 | 2026-08-04 | supervisor | decisive timeout proof | Added an end-to-end default-probe fixture whose spec fetch never settles and proved the hung row times out while a healthy sibling returns. Corrected the README to the generated `aspire/apphost.mts` default and removed an unusable placeholder run id. |
 | 2026-08-04 | review | opposite-family substantive review | The Fable 5 primary returned `model_not_found`; the configured Claude-family Opus 4.8 medium fallback reviewed the entire change. Initial verdict PASS with three actionable low findings. The supervisor preserved path-mounted base URLs, added parent-cancellation proof, and documented service identity; the same reviewer re-ran 15/15 focused tests and retained PASS with all three resolved. |
 | 2026-08-04 | supervisor | merge-readiness gates | Package tests passed 81/81; scoped check/lint/fmt passed over 79 files; package scan and `quality:gate` passed; embedded assets, full-export doc lint, raw entrypoint doc lint, JSR audit, and publish dry-run passed. JSR's sole slow-type warning remains the recorded progress-banner false positive; no actual slow-type diagnostic appeared. |
+| 2026-08-04 | impl-eval | composed OpenHands evaluation | OpenHands (`openrouter/qwen/qwen3.7-max`) independently reviewed the complete diff, re-ran the 15/15 decisive fixtures and 81/81 package tests, and returned PASS. The tracked `evaluate.md` and [verdict comment](https://github.com/rickylabs/netscript/pull/1194#issuecomment-5172905933) prove both #1131 acceptance boxes. |
 
 ## Decisions
 
@@ -111,6 +112,8 @@ never import an infrastructure adapter from a consumer flow.
 | Planned flat role files were grouped to avoid new/deepened cardinality debt | minor | yes |
 | JSR audit parser treats Deno's slow-type progress banner as a warning | minor | yes |
 | Fable 5 review primary unavailable; same-family Opus fallback used | minor | yes |
+| OpenHands persistent status comment did not transition from Running and no trace directory was emitted | minor | yes |
+| OpenHands report retained a stale JSDoc advisory after the source fix | minor | yes |
 
 ## Gate Results
 
@@ -182,6 +185,17 @@ keeps `src/infrastructure` within the cap.
 | Embedded assets + full-export docs | PASS, exit 0; generated asset current; both entrypoints zero diagnostics |
 | JSR audit + publish dry-run | PASS, exit 0; only recorded progress-banner false positive; 79 intended publish files, no actual slow-type diagnostic |
 | Lock/forbidden-pattern hygiene | PASS after run-artifact EOF cleanup; no `deno.lock` churn, new lint ignores, `@ts-ignore`, or unsafe double casts |
+
+### Composed IMPL-EVAL
+
+| Gate | Result |
+| --- | --- |
+| OpenHands independent evaluation | PASS at `3e26b2bee`; qwen3.7-max independently reviewed the full diff and re-ran the decisive gates |
+| Acceptance box 1 | PROVEN; every source outcome and status row, including foreign-root manifest, torn manifest with healthy appsettings, and reused-port identity mismatch |
+| Acceptance box 2 | PROVEN; a non-cooperative hanging fetch times out at row level while its healthy sibling returns `running` |
+| Focused fixtures | PASS, exit 0; 15 passed, 0 failed |
+| Package tests | PASS, exit 0; 81 passed, 0 failed |
+| Evaluator artifact | `evaluate.md`; verdict comment https://github.com/rickylabs/netscript/pull/1194#issuecomment-5172905933 |
 
 ## Handoff Notes
 

@@ -117,3 +117,34 @@ Drift is append-only.
 - **Severity:** minor
 - **Action:** accept for this run; preserve both route identities in the review artifact.
 - **Evidence:** `review-codex-complex.md` §§1 and 6.
+
+## 2026-08-04 — OpenHands completion used the verdict artifact, not its stale status comment
+
+- **What:** The OpenHands workflow emitted an exact PASS verdict and committed `evaluate.md`, while
+  its earlier persistent status comment remained on `Running`; the workflow also did not emit the
+  optional trace directory.
+- **Source:** Agentic watcher result, PR comments, Actions run `30862805934`, and commit
+  `3e26b2bee`.
+- **Expected:** The persistent comment transitions to the terminal state and trace output accompanies
+  the evaluator artifact.
+- **Actual:** The later verdict comment and tracked evaluator artifact are terminal and internally
+  consistent; the stale progress comment and absent optional trace do not weaken acceptance proof.
+- **Severity:** minor
+- **Action:** accept for this run; use the exact watcher verdict, final PR comment, and tracked
+  `evaluate.md` as the authoritative evidence.
+- **Evidence:** https://github.com/rickylabs/netscript/pull/1194#issuecomment-5172905933;
+  `.llm/runs/feat-openapi-mcp-endpoint-directory--s5/evaluate.md`.
+
+## 2026-08-04 — Evaluator retained a stale identity-JSDoc advisory
+
+- **What:** OpenHands says `FetchServiceEndpointProbe` JSDoc does not repeat the root identity JSON
+  contract, but the reviewed source already documents that the root endpoint must return a JSON
+  `service` field matching the candidate name.
+- **Source:** `evaluate.md` finding F-3 compared with
+  `packages/mcp/src/infrastructure/service-endpoints/fetch-service-endpoint-probe.ts`.
+- **Expected:** The final evaluator narrative reflects the post-review source fix.
+- **Actual:** The advisory is factually stale but explicitly non-blocking; executable verification,
+  product behavior, and the PASS verdict are unaffected.
+- **Severity:** minor
+- **Action:** accept the immutable evaluator artifact and record the correction here.
+- **Evidence:** OpenHands PASS artifact; current `FetchServiceEndpointProbe` JSDoc.
