@@ -41,3 +41,15 @@
 - `deno task agentic:check-claude` — all five checks OK.
 - fmt: repo `deno.json` fmt scope is `packages/**`/`plugins/**` TS only — the authored Markdown is
   outside fmt jurisdiction; house 100-col style applied by hand.
+
+## S4 — verification issue + acceptance evidence + status flip
+
+- Filed #1163 (milestone 0.0.6, `type:test`, #1090 pattern) — owns the observational criterion
+  "0.0.5 runs on this system", with four checkable criteria incl. upgrading/falsifying each
+  `[asserted]` rule the run exercises.
+- PR #1161 body finalised (all slices + DoD ticked); `## Acceptance evidence` posted mapping every
+  #1120 acceptance box verbatim to evidence; `status:impl` → `status:impl-eval` in the same
+  action.
+- Non-duplication verified: `grep -n "OIDC\|publish:readiness\|release:preflight"` over the three
+  artifacts hits only the cadence doc's ownership-disclaimer lines (12–13).
+- Awaiting owner ratification (D1). Merge closes #1120; D2 then unblocks 0.0.5 delivery.
