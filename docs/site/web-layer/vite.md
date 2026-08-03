@@ -38,7 +38,7 @@ A minimal integration points the plugin at the Fresh app root. With no alias
 entries supplied, the plugin generates aliases from the app root.
 
 ```ts
-import { createNetScriptVitePlugin } from "@netscript/fresh";
+import { createNetScriptVitePlugin } from "@netscript/fresh/vite";
 
 const netscript = createNetScriptVitePlugin({
   appRoot: "./app",
@@ -63,7 +63,7 @@ matched specifier).
 import {
   createNetScriptVitePlugin,
   type NetScriptViteAlias,
-} from "@netscript/fresh";
+} from "@netscript/fresh/vite";
 
 const aliasEntries: NetScriptViteAlias[] = [
   { find: "@app/", replacement: "./app/" },
@@ -97,7 +97,7 @@ when the source key is absent. Provide the source values through `env`.
 import {
   createNetScriptVitePlugin,
   type NetScriptViteEnvMapping,
-} from "@netscript/fresh";
+} from "@netscript/fresh/vite";
 
 const envMappings: NetScriptViteEnvMapping[] = [
   {

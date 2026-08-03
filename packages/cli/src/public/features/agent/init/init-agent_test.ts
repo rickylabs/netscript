@@ -11,9 +11,26 @@ import { EMBEDDED_SKILL_FILES } from "../../../../kernel/assets/skills.generated
 import { DenoAgentInitFileSystem } from "./agent-init-file-system.ts";
 import type { AspireAgentInitializer } from "./aspire-agent-initializer.ts";
 import { initAgent } from "./init-agent.ts";
+import type { AgentDocsGenerator } from "./agent-docs-generator.ts";
 
 const SUCCESSFUL_ASPIRE_INITIALIZER: AspireAgentInitializer = {
   initialize: () => Promise.resolve({ ok: true }),
+};
+
+const FIXTURE_DOCS_GENERATOR: AgentDocsGenerator = {
+  generate: () =>
+    Promise.resolve({
+      frameworkVersion: NETSCRIPT_RELEASE_VERSION,
+      proseFileCount: 2,
+      apiPackageCount: 1,
+      apiExportCount: 2,
+      files: {
+        "llms.txt": "# NetScript\n\n## Task router\n",
+        "llms-full.txt": "complete docs\n",
+        "deno-doc/config.txt": "config API\n",
+        "MANIFEST.md": "Start at `.netscript/docs/llms.txt`.\n",
+      },
+    }),
 };
 
 Deno.test("agent init writes Claude config, skills, and marked AGENTS section idempotently", async () => {
@@ -356,6 +373,195 @@ Deno.test("agent init installs the complete diagnostic surface", async () => {
       "netscript-build",
       "netscript-operate",
     ]);
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+Deno.test("agent init installs the consumer tool surface for every host", async () => {
+  const root = await Deno.makeTempDir();
+  try {
+    await initAgent({ projectRoot: root, host: "all" }, {
+      fs: new DenoAgentInitFileSystem(),
+      aspireAgentInitializer: SUCCESSFUL_ASPIRE_INITIALIZER,
+    });
+    for (
+      const path of [
+        "consumer-tools.json",
+        "README.md",
+        "release.json",
+        "run-deno-check.ts",
+        "run-deno-lint.ts",
+        "run-deno-doc-lint.ts",
+        "validation/check-aspire-host-ports.ts",
+        "quality/scan-code-quality.ts",
+        "deps/outdated.ts",
+        "deps/why.ts",
+        "e2e/scaffold-e2e-test.ts",
+      ]
+    ) {
+      assert(
+        await new DenoAgentInitFileSystem().exists(
+          join(root, ".llm", "tools", path),
+        ),
+        `missing installed consumer tool file: ${path}`,
+      );
+    }
+
+    const referenceFiles = [
+      join(root, "AGENTS.md"),
+      ...Object.keys(EMBEDDED_SKILL_FILES)
+        .filter((path) => path.endsWith(".md"))
+        .map((path) => join(root, ".claude", "skills", path)),
+      join(root, ".llm", "tools", "README.md"),
+    ];
+    for (const referenceFile of referenceFiles) {
+      if (!await new DenoAgentInitFileSystem().exists(referenceFile)) continue;
+      const content = await Deno.readTextFile(referenceFile);
+      for (const match of content.matchAll(/\.llm\/tools\/[A-Za-z0-9_./-]+/g)) {
+        const relativePath = match[0].replace(/[.,;:)]+$/, "");
+        assert(
+          await new DenoAgentInitFileSystem().exists(join(root, relativePath)),
+          `${referenceFile} names missing ${relativePath}`,
+        );
+      }
+    }
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+Deno.test("installed consumer tools resolve from the project when process CWD differs", async () => {
+  const root = await Deno.makeTempDir();
+  const foreignCwd = await Deno.makeTempDir();
+  try {
+    await initAgent({ projectRoot: root, host: "vscode" }, {
+      fs: new DenoAgentInitFileSystem(),
+      aspireAgentInitializer: SUCCESSFUL_ASPIRE_INITIALIZER,
+    });
+    const manifest = JSON.parse(
+      await Deno.readTextFile(join(root, ".llm", "tools", "consumer-tools.json")),
+    ) as { readonly tools: readonly { path: string }[] };
+    for (const tool of manifest.tools) {
+      const output = await new Deno.Command(Deno.execPath(), {
+        args: [
+          "run",
+          "--allow-read",
+          "--allow-run",
+          "--allow-env",
+          "--allow-net",
+          join(root, ".llm", "tools", tool.path),
+          "--help",
+        ],
+        cwd: foreignCwd,
+        stdout: "piped",
+        stderr: "piped",
+      }).output();
+      assertEquals(output.code, 0, `${tool.path} --help failed`);
+    }
+    const reportPath = join(root, "consumer-smoke-plan.json");
+    const smokeTool = manifest.tools.find((tool) =>
+      tool.path === "e2e/scaffold-e2e-test.ts"
+    );
+    assert(smokeTool);
+    const smokeOutput = await new Deno.Command(Deno.execPath(), {
+      args: [
+        "run",
+        "--allow-read",
+        "--allow-write",
+        "--allow-run",
+        "--allow-env",
+        "--allow-net",
+        join(root, ".llm", "tools", smokeTool.path),
+        "--repo",
+        root,
+        "--dry-run",
+        "--format",
+        "json",
+        "--report",
+        reportPath,
+      ],
+      cwd: foreignCwd,
+      stdout: "piped",
+      stderr: "piped",
+    }).output();
+    assertEquals(
+      smokeOutput.code,
+      0,
+      `consumer scaffold smoke dry-run failed: ${new TextDecoder().decode(smokeOutput.stderr)} ${
+        new TextDecoder().decode(smokeOutput.stdout)
+      }`,
+    );
+    const report = JSON.parse(await Deno.readTextFile(reportPath)) as {
+      readonly project: { readonly smokeRoot: string; readonly logFile: string };
+    };
+    assert(report.project.smokeRoot.startsWith(root));
+    assert(report.project.logFile.startsWith(root));
+    assertEquals([...(await Array.fromAsync(Deno.readDir(foreignCwd)))], []);
+  } finally {
+    await Deno.remove(root, { recursive: true });
+    await Deno.remove(foreignCwd, { recursive: true });
+  }
+});
+
+Deno.test("agent init leaves the offline docs corpus absent unless requested", async () => {
+  const root = await Deno.makeTempDir();
+  let calls = 0;
+  try {
+    await initAgent({ projectRoot: root, host: "vscode" }, {
+      fs: new DenoAgentInitFileSystem(),
+      aspireAgentInitializer: SUCCESSFUL_ASPIRE_INITIALIZER,
+      docsGenerator: {
+        generate: () => {
+          calls += 1;
+          return FIXTURE_DOCS_GENERATOR.generate(root);
+        },
+      },
+    });
+    assertEquals(calls, 0);
+    assertFalse(await new DenoAgentInitFileSystem().exists(join(root, ".netscript", "docs")));
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+Deno.test("agent init --with-docs installs a path-closed local corpus", async () => {
+  const root = await Deno.makeTempDir();
+  try {
+    const result = await initAgent({ projectRoot: root, host: "claude", withDocs: true }, {
+      fs: new DenoAgentInitFileSystem(),
+      aspireAgentInitializer: SUCCESSFUL_ASPIRE_INITIALIZER,
+      docsGenerator: FIXTURE_DOCS_GENERATOR,
+    });
+    for (const path of ["llms.txt", "llms-full.txt", "deno-doc/config.txt", "MANIFEST.md"]) {
+      assert(await new DenoAgentInitFileSystem().exists(join(root, ".netscript", "docs", path)));
+    }
+    const agents = await Deno.readTextFile(join(root, "AGENTS.md"));
+    assertStringIncludes(agents, ".netscript/docs/llms.txt");
+    const manifest = await Deno.readTextFile(join(root, ".netscript", "docs", "MANIFEST.md"));
+    for (const match of manifest.matchAll(/\.netscript\/docs\/[A-Za-z0-9_./-]+/g)) {
+      assert(await new DenoAgentInitFileSystem().exists(join(root, match[0])));
+    }
+    assert(result.messages.some((message) => message.includes("1 API packages / 2 export subpaths")));
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+Deno.test("offline docs failure occurs before any project write", async () => {
+  const root = await Deno.makeTempDir();
+  try {
+    await assertRejects(
+      () =>
+        initAgent({ projectRoot: root, host: "all", withDocs: true }, {
+          fs: new DenoAgentInitFileSystem(),
+          aspireAgentInitializer: SUCCESSFUL_ASPIRE_INITIALIZER,
+          docsGenerator: { generate: () => Promise.reject(new Error("version mismatch")) },
+        }),
+      Error,
+      "version mismatch",
+    );
+    assertEquals([...(await Array.fromAsync(Deno.readDir(root)))], []);
   } finally {
     await Deno.remove(root, { recursive: true });
   }

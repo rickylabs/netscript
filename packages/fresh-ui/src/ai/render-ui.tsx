@@ -107,7 +107,7 @@ const DATA_TYPES = new Set<string>(RENDER_UI_BLOCK_CATEGORIES.data);
  *
  * @example
  * ```tsx
- * import { renderUiPayload } from "@netscript/fresh-ui";
+ * import { renderUiPayload } from "@netscript/fresh-ui/ai/render-ui";
  *
  * const node = renderUiPayload({
  *   component: "stack",
@@ -138,7 +138,7 @@ export function renderUiPayload(
  *
  * @example
  * ```tsx
- * import { RenderUiSurface } from "@netscript/fresh-ui";
+ * import { RenderUiSurface } from "@netscript/fresh-ui/ai/render-ui";
  *
  * <RenderUiSurface payload={{ component: "card", title: "Summary" }} />;
  * ```

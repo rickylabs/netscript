@@ -1,8 +1,8 @@
 /**
  * MCP-friendly full scaffold E2E smoke for CLI/plugin/DB/Aspire changes.
  *
- * This tool creates a fresh generated NetScript project, adds the official plugin suite in local
- * contributor mode, runs the DB init/generate/seed workflow, starts Aspire, calls real plugin
+ * This tool creates a fresh generated NetScript project, adds the official plugin suite with the
+ * selected exact CLI, runs the DB init/generate/seed workflow, starts Aspire, calls real plugin
  * endpoints, triggers a worker job, and emits machine-readable step results.
  *
  * Examples:
@@ -16,12 +16,6 @@ import { ensureDir } from 'jsr:@std/fs@1/ensure-dir';
 import { exists } from 'jsr:@std/fs@1/exists';
 import { dirname, fromFileUrl, join, resolve } from 'jsr:@std/path@1';
 import { Command } from 'jsr:@cliffy/command@1.0.0';
-import { probeAppHosts } from '../agentic/teardown/probes.ts';
-import { registerAppHost } from '../agentic/teardown/run-resources.ts';
-
-/** `aspire ps` can lag `aspire start`; retry discovery briefly before falling back to path proof. */
-const REGISTER_APPHOST_ATTEMPTS = 5;
-const REGISTER_APPHOST_INTERVAL_MS = 400;
 
 type OutputFormat = 'ndjson' | 'json' | 'pretty';
 type StepKind = 'command' | 'http' | 'tcp' | 'sleep' | 'summary';
@@ -36,7 +30,6 @@ export interface Options {
   source: 'auto' | 'starter' | 'local';
   samples: boolean;
   cleanup: boolean;
-  runResourcesDir: string;
   dryRun: boolean;
   skipTelemetry: boolean;
   strictTelemetry: boolean;
@@ -50,6 +43,7 @@ export interface Options {
   sagasUrl: string;
   triggersUrl: string;
   authUrl: string;
+  aspireCommand: string;
 }
 
 export interface CommandOptionValues {
@@ -63,7 +57,6 @@ export interface CommandOptionValues {
   noSamples?: boolean;
   cleanup?: boolean;
   noCleanup?: boolean;
-  runResourcesDir?: string;
   dryRun?: boolean;
   skipTelemetry?: boolean;
   strictTelemetry?: boolean;
@@ -77,6 +70,7 @@ export interface CommandOptionValues {
   sagasUrl?: string;
   triggersUrl?: string;
   authUrl?: string;
+  aspireCommand?: string;
 }
 
 interface CommandDetails {
@@ -116,7 +110,7 @@ interface StepResult {
   error?: string;
 }
 
-interface Report {
+export interface Report {
   ok: boolean;
   startedAspire: boolean;
   stoppedAspire: boolean;
@@ -158,9 +152,25 @@ class SmokeFailure extends Error {
 }
 
 const decoder = new TextDecoder();
-function inferRepoRoot(): string {
+function inferProjectRoot(): string {
   const toolPath = fromFileUrl(import.meta.url);
-  return resolve(dirname(toolPath), '..', '..');
+  return resolve(dirname(toolPath), '..', '..', '..');
+}
+
+function localCliOrReleased(projectRoot: string): { cli: string; source: Options['source'] } {
+  const localCli = join(projectRoot, 'packages', 'cli', 'bin', 'netscript-dev.ts');
+  try {
+    Deno.statSync(localCli);
+    return { cli: localCli, source: 'local' };
+  } catch (error) {
+    if (!(error instanceof Deno.errors.NotFound)) throw error;
+  }
+  const releasePath = join(projectRoot, '.llm', 'tools', 'release.json');
+  const release = JSON.parse(Deno.readTextFileSync(releasePath)) as { cli?: string };
+  if (!release.cli?.match(/^jsr:@netscript\/cli@\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?$/)) {
+    throw new Error(`Installed release metadata has no exact CLI specifier: ${releasePath}`);
+  }
+  return { cli: release.cli, source: 'starter' };
 }
 
 function timestampName(date = new Date()): string {
@@ -198,18 +208,17 @@ function parseFormat(raw: string): OutputFormat {
 }
 
 export function defaultOptions(): Options {
-  const repo = inferRepoRoot();
+  const repo = inferProjectRoot();
+  const released = localCliOrReleased(repo);
   return {
     repo,
-    cli: join(repo, 'packages', 'cli', 'bin', 'netscript-dev.ts'),
+    cli: released.cli,
     smokeRoot: join(repo, '.llm', 'tmp', 'manual-scaffold-smoke'),
     name: `plugin-smoke-${timestampName()}`,
     db: 'postgres',
-    source: 'local',
+    source: released.source,
     samples: true,
     cleanup: true,
-    runResourcesDir: Deno.env.get('NETSCRIPT_RUN_DIR') ??
-      join(repo, '.llm', 'tmp', 'manual-scaffold-smoke'),
     dryRun: false,
     skipTelemetry: false,
     strictTelemetry: false,
@@ -222,6 +231,7 @@ export function defaultOptions(): Options {
     sagasUrl: 'http://localhost:8092',
     triggersUrl: 'http://localhost:8093',
     authUrl: 'http://localhost:8094',
+    aspireCommand: Deno.env.get('NETSCRIPT_ASPIRE_COMMAND') ?? 'aspire',
   };
 }
 
@@ -247,7 +257,8 @@ function authSmokeEnvLines(indent: string): string[] {
 export function normalizeCommandOptions(raw: CommandOptionValues): Options {
   const defaults = defaultOptions();
   const repo = raw.repo ? resolve(raw.repo) : defaults.repo;
-  const cli = raw.cli ? resolve(raw.cli) : join(repo, 'packages', 'cli', 'bin', 'netscript-dev.ts');
+  const released = raw.cli ? undefined : localCliOrReleased(repo);
+  const cli = raw.cli ? raw.cli.startsWith('jsr:') ? raw.cli : resolve(raw.cli) : released!.cli;
   const smokeRoot = raw.smokeRoot
     ? resolve(raw.smokeRoot)
     : join(repo, '.llm', 'tmp', 'manual-scaffold-smoke');
@@ -259,12 +270,13 @@ export function normalizeCommandOptions(raw: CommandOptionValues): Options {
     smokeRoot,
     name,
     db: raw.db ?? defaults.db,
-    source: parseSourceMode(raw.source ?? defaults.source),
+    source: parseSourceMode(
+      raw.source === 'auto'
+        ? released?.source ?? defaults.source
+        : raw.source ?? released?.source ?? defaults.source,
+    ),
     samples: !(raw.samples === false || raw.noSamples === true),
     cleanup: raw.noCleanup === true ? false : raw.cleanup ?? defaults.cleanup,
-    runResourcesDir: raw.runResourcesDir
-      ? resolve(raw.runResourcesDir)
-      : Deno.env.get('NETSCRIPT_RUN_DIR') ?? join(smokeRoot, name),
     dryRun: raw.dryRun === true,
     skipTelemetry: raw.skipTelemetry === true,
     strictTelemetry: raw.strictTelemetry === true,
@@ -289,6 +301,7 @@ export function normalizeCommandOptions(raw: CommandOptionValues): Options {
     sagasUrl: (raw.sagasUrl ?? defaults.sagasUrl).replace(/\/+$/, ''),
     triggersUrl: (raw.triggersUrl ?? defaults.triggersUrl).replace(/\/+$/, ''),
     authUrl: (raw.authUrl ?? defaults.authUrl).replace(/\/+$/, ''),
+    aspireCommand: raw.aspireCommand ?? defaults.aspireCommand,
   };
 }
 
@@ -298,10 +311,10 @@ async function parseCliOptions(args: string[]): Promise<Options | null> {
     .name('scaffold-e2e-test')
     .version('1.0.0')
     .description('Run the full generated-project scaffold smoke for CLI/plugin/DB/Aspire changes.')
-    .option('--repo <path:string>', 'NetScript repo root. Default: inferred from tool path.')
+    .option('--repo <path:string>', 'Initialized project root. Default: inferred from tool path.')
     .option(
       '--cli <path:string>',
-      'CLI entrypoint. Default: <repo>/packages/cli/bin/netscript-dev.ts.',
+      'CLI entrypoint. Default: local checkout CLI or the installed exact JSR release.',
     )
     .option(
       '--smoke-root <path:string>',
@@ -311,8 +324,8 @@ async function parseCliOptions(args: string[]): Promise<Options | null> {
     .option('--db <engine:string>', 'DB engine/key for plugin DB provisioning.', {
       default: 'postgres',
     })
-    .option('--source <mode:string>', 'Compatibility metadata; netscript-dev uses local sources.', {
-      default: 'local',
+    .option('--source <mode:string>', 'CLI source metadata: auto, starter, or local.', {
+      default: 'auto',
     })
     .option('--samples', 'Include official sample tasks/jobs/sagas/triggers.', {
       default: true,
@@ -324,10 +337,6 @@ async function parseCliOptions(args: string[]): Promise<Options | null> {
     .option(
       '--no-cleanup',
       'Leave the generated AppHost running, register it, and print an escalation command.',
-    )
-    .option(
-      '--run-resources-dir <path:string>',
-      'Directory for run-resources.json. Default: NETSCRIPT_RUN_DIR or generated project root.',
     )
     .option('--dry-run', 'Emit the planned steps without executing commands or HTTP calls.', {
       default: false,
@@ -359,6 +368,7 @@ async function parseCliOptions(args: string[]): Promise<Options | null> {
     .option('--http-timeout-ms <ms:integer>', 'Per-request timeout in milliseconds.', {
       default: 30_000,
     })
+    .option('--aspire-command <path:string>', 'Aspire executable. Defaults to aspire.')
     .option('--workers-url <url:string>', 'Workers API base URL.', {
       default: 'http://localhost:8091',
     })
@@ -661,7 +671,14 @@ class SmokeRunner {
   }
 
   get stopCommand(): string[] {
-    return ['aspire', 'stop', '--apphost', this.appHost, '--non-interactive', '--nologo'];
+    return [
+      this.#options.aspireCommand,
+      'stop',
+      '--apphost',
+      this.appHost,
+      '--non-interactive',
+      '--nologo',
+    ];
   }
 
   async run(): Promise<Report> {
@@ -675,6 +692,7 @@ class SmokeRunner {
       await this.#validateGeneratedProject();
       await this.#runDbWorkflow();
       await this.#typeCheckGeneratedProject();
+      await this.#validateGeneratedHostPorts();
       await this.#startAspire();
       await this.#waitForResources();
       await this.#inspectRuntime();
@@ -722,12 +740,15 @@ class SmokeRunner {
   }
 
   #commandArgs(...args: string[]): string[] {
-    return ['run', '-A', this.#options.cli, ...args];
+    const releaseFlags = this.#options.cli.startsWith('jsr:') ? ['--minimum-dependency-age=0'] : [];
+    return ['run', '-A', ...releaseFlags, this.#options.cli, ...args];
   }
 
   async #preflight(): Promise<void> {
     await this.#ensureExists('preflight-repo', 'Repo root exists', this.#options.repo);
-    await this.#ensureExists('preflight-cli', 'CLI entrypoint exists', this.#options.cli);
+    if (!this.#options.cli.startsWith('jsr:')) {
+      await this.#ensureExists('preflight-cli', 'CLI entrypoint exists', this.#options.cli);
+    }
     await this.#runCommand({
       id: 'preflight-deno-version',
       title: 'Deno is available',
@@ -738,13 +759,13 @@ class SmokeRunner {
       id: 'preflight-aspire-version',
       title: 'Aspire CLI is available',
       cwd: this.#options.repo,
-      command: ['aspire', '--version'],
+      command: [this.#options.aspireCommand, '--version'],
     });
     await this.#runCommand({
       id: 'preflight-no-running-apphost',
       title: 'List running Aspire AppHosts',
       cwd: this.#options.repo,
-      command: ['aspire', 'ps', '--format', 'Json'],
+      command: [this.#options.aspireCommand, 'ps', '--format', 'Json'],
       critical: false,
     });
   }
@@ -758,6 +779,14 @@ class SmokeRunner {
       critical: true,
       details: { path },
     });
+    if (this.#options.dryRun) {
+      this.#record({
+        ...createBaseStep(id, title, 'summary', true, startedAt),
+        status: 'skipped',
+        details: { path },
+      });
+      return;
+    }
     const pathExists = await exists(path);
     this.#record({
       ...createBaseStep(id, title, 'summary', true, startedAt),
@@ -824,7 +853,7 @@ class SmokeRunner {
           'deno',
           ...this.#commandArgs(
             'plugin',
-            'add',
+            'install',
             plugin.kind,
             '--name',
             plugin.name,
@@ -836,6 +865,22 @@ class SmokeRunner {
         ],
       });
     }
+  }
+
+  async #validateGeneratedHostPorts(): Promise<void> {
+    await this.#runCommand({
+      id: 'validate-generated-host-ports',
+      title: 'Reject pinned Aspire host ports in the generated scaffold',
+      cwd: this.#options.repo,
+      command: [
+        'deno',
+        'run',
+        '--allow-read',
+        join(this.#options.repo, '.llm', 'tools', 'validation', 'check-aspire-host-ports.ts'),
+        this.projectRoot,
+        '--pretty',
+      ],
+    });
   }
 
   async #validateGeneratedProject(): Promise<void> {
@@ -852,7 +897,7 @@ class SmokeRunner {
       id: 'aspire-restore',
       title: 'Restore Aspire TypeScript SDK modules',
       cwd: join(this.projectRoot, 'aspire'),
-      command: ['aspire', 'restore'],
+      command: [this.#options.aspireCommand, 'restore'],
     });
     await this.#runCommand({
       id: 'db-init',
@@ -911,19 +956,19 @@ class SmokeRunner {
 
   async #validateAuthGeneratedWiring(): Promise<void> {
     await this.#ensureExists(
-      'auth-plugin-copied-manifest',
-      'Auth plugin manifest copied into generated workspace',
-      join(this.projectRoot, 'plugins', 'auth', 'scaffold.plugin.json'),
-    );
-    await this.#ensureExists(
-      'auth-plugin-copied-prisma',
-      'Auth plugin Prisma schema copied into generated workspace',
-      join(this.projectRoot, 'plugins', 'auth', 'database', 'auth.prisma'),
+      'auth-entrypoint-generated',
+      'Auth entrypoint generated into the consumer workspace',
+      join(this.projectRoot, 'auth', 'mod.ts'),
     );
     await this.#ensureExists(
       'auth-db-contribution-generated',
-      'Auth Prisma contribution generated into database schema folder',
+      'Auth Prisma contribution generated into the database schema folder',
       join(this.projectRoot, 'database', 'postgres', 'schema', 'plugins', 'auth', 'auth.prisma'),
+    );
+    await this.#ensureExists(
+      'auth-aspire-helper-generated',
+      'Aspire plugin registration helper generated into the consumer workspace',
+      join(this.projectRoot, 'aspire', '.helpers', 'register-plugins.mts'),
     );
   }
 
@@ -1028,6 +1073,14 @@ class SmokeRunner {
   }
 
   async #typeCheckGeneratedProject(): Promise<void> {
+    const generatedTargets = [
+      './plugins',
+      './workers',
+      './sagas',
+      './triggers',
+      './services',
+      './database',
+    ];
     await this.#runCommand({
       id: 'deno-check-generated-workspaces',
       title: 'Type-check generated packages/plugins/background/services/database',
@@ -1036,13 +1089,8 @@ class SmokeRunner {
         'deno',
         'check',
         '--unstable-kv',
-        './packages',
-        './plugins',
-        './workers',
-        './sagas',
-        './triggers',
-        './services',
-        './database',
+        ...(this.#options.source === 'local' ? ['./packages'] : []),
+        ...generatedTargets,
       ],
     });
   }
@@ -1053,7 +1101,7 @@ class SmokeRunner {
       title: 'Start generated Aspire AppHost',
       cwd: this.projectRoot,
       command: [
-        'aspire',
+        this.#options.aspireCommand,
         'start',
         '--apphost',
         this.appHost,
@@ -1064,42 +1112,6 @@ class SmokeRunner {
       env: authSmokeEnv(),
     });
     this.#startedAspire = !this.#options.dryRun;
-    if (this.#startedAspire) await this.#registerStartedAppHost();
-  }
-
-  /**
-   * Records the AppHost this run started so teardown can prove ownership by identity.
-   *
-   * Only AppHosts are probed — Docker has no bearing on this lookup and probing it would put a
-   * container inspect on the critical path of every start. `aspire ps` can also lag `aspire start`
-   * by a moment, so discovery is retried briefly; failing to register is a warning rather than a
-   * run-ending error, because the AppHost still carries path proof from the worktree.
-   */
-  async #registerStartedAppHost(): Promise<void> {
-    for (let attempt = 0; attempt < REGISTER_APPHOST_ATTEMPTS; attempt++) {
-      if (attempt > 0) {
-        await new Promise((resolve) => setTimeout(resolve, REGISTER_APPHOST_INTERVAL_MS));
-      }
-      const appHost = (await probeAppHosts()).find((resource) =>
-        resource.kind === 'apphost' && resolve(resource.appHostPath) === resolve(this.appHost)
-      );
-      if (
-        appHost?.kind === 'apphost' && appHost.appHostPid !== undefined &&
-        appHost.appHostStartedAt
-      ) {
-        await registerAppHost(this.#options.runResourcesDir, this.#options.repo, {
-          appHostPath: appHost.appHostPath,
-          appHostPid: appHost.appHostPid,
-          appHostStartedAt: appHost.appHostStartedAt,
-          startedAt: new Date().toISOString(),
-        });
-        return;
-      }
-    }
-    console.warn(
-      `started AppHost was not discoverable for registry: ${this.appHost} — ` +
-        'teardown will fall back to path proof',
-    );
   }
 
   async #waitForResources(): Promise<void> {
@@ -1121,7 +1133,7 @@ class SmokeRunner {
         title: `Wait for Aspire resource ${resource}`,
         cwd: this.projectRoot,
         command: [
-          'aspire',
+          this.#options.aspireCommand,
           'wait',
           resource,
           '--apphost',
@@ -1138,25 +1150,49 @@ class SmokeRunner {
       id: 'aspire-describe',
       title: 'Describe generated Aspire topology',
       cwd: this.projectRoot,
-      command: ['aspire', 'describe', '--apphost', this.appHost],
+      command: [this.#options.aspireCommand, 'describe', '--apphost', this.appHost],
     });
     await this.#runCommand({
       id: 'aspire-logs-workers',
       title: 'Read workers background logs',
       cwd: this.projectRoot,
-      command: ['aspire', 'logs', 'workers', '--apphost', this.appHost, '-n', '120'],
+      command: [
+        this.#options.aspireCommand,
+        'logs',
+        'workers',
+        '--apphost',
+        this.appHost,
+        '-n',
+        '120',
+      ],
     });
     await this.#runCommand({
       id: 'aspire-logs-workers-api',
       title: 'Read workers API logs',
       cwd: this.projectRoot,
-      command: ['aspire', 'logs', 'workers-api', '--apphost', this.appHost, '-n', '120'],
+      command: [
+        this.#options.aspireCommand,
+        'logs',
+        'workers-api',
+        '--apphost',
+        this.appHost,
+        '-n',
+        '120',
+      ],
     });
     await this.#runCommand({
       id: 'aspire-logs-auth',
       title: 'Read auth logs',
       cwd: this.projectRoot,
-      command: ['aspire', 'logs', 'auth', '--apphost', this.appHost, '-n', '120'],
+      command: [
+        this.#options.aspireCommand,
+        'logs',
+        'auth',
+        '--apphost',
+        this.appHost,
+        '-n',
+        '120',
+      ],
     });
   }
 
@@ -1288,7 +1324,7 @@ class SmokeRunner {
       title: 'Query Aspire structured logs for workers',
       cwd: this.projectRoot,
       command: [
-        'aspire',
+        this.#options.aspireCommand,
         'otel',
         'logs',
         'workers',
@@ -1308,7 +1344,7 @@ class SmokeRunner {
       title: 'Query Aspire traces for workers',
       cwd: this.projectRoot,
       command: [
-        'aspire',
+        this.#options.aspireCommand,
         'otel',
         'traces',
         'workers',
@@ -1618,14 +1654,18 @@ class SmokeRunner {
   }
 }
 
+/** Run one scaffold smoke and return its structured report without exiting the process. */
+export async function runSmoke(options: Options): Promise<Report> {
+  return await new SmokeRunner(options).run();
+}
+
 async function main(): Promise<void> {
   const options = await parseCliOptions(Deno.args);
   if (!options) {
     return;
   }
 
-  const runner = new SmokeRunner(options);
-  const report = await runner.run();
+  const report = await runSmoke(options);
 
   if (options.format === 'ndjson') {
     console.log(JSON.stringify({ event: 'summary', report }));

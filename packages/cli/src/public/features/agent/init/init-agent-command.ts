@@ -15,15 +15,20 @@ export function createInitAgentCommand(
 ): CliffyCommand {
   return new Command()
     .name("init")
-    .description("Install NetScript MCP and skills for detected agent hosts")
+    .description("Install NetScript MCP, consumer tools, and skills for detected agent hosts")
     .option("--host <host:string>", "Agent host: claude, vscode, or all")
-    .action(async (options: { host?: string }): Promise<void> => {
+    .option(
+      "--with-docs",
+      "Install the several-megabyte offline framework and exact-version API documentation bundle",
+    )
+    .action(async (options: { host?: string; withDocs?: boolean }): Promise<void> => {
       if (options.host && !["claude", "vscode", "all"].includes(options.host)) {
         throw new Error(`Unsupported agent host: ${options.host}`);
       }
       const result = await dependencies.init({
         projectRoot: dependencies.projectRoot(),
         host: options.host as InitAgentInput["host"],
+        withDocs: options.withDocs,
       });
       outputText(
         result.changedFiles.length === 0

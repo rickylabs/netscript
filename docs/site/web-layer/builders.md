@@ -109,7 +109,7 @@ This envelope demonstrates the core page builder capabilities:
 The smallest useful page is much shorter when you only need basic rendering:
 
 ```ts
-import { definePage } from "@netscript/fresh";
+import { definePage } from "@netscript/fresh/builders";
 
 const page = definePage()
   .withResource("metrics", async () => {
@@ -219,7 +219,7 @@ and a `component`. It also accepts an optional `errorComponent`, `errorTitle`,
 requires a `query` `() => Promise<TProps>`.
 
 ```ts
-import { definePartial } from "@netscript/fresh";
+import { definePartial } from "@netscript/fresh/builders";
 
 export const liveCount = definePartial({
   name: "live-count",

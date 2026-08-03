@@ -53,6 +53,12 @@ Host detection installs the matching files. If neither host directory exists,
 NetScript prepares both hosts. Use `--host claude`, `--host vscode`, or
 `--host all` to select explicitly.
 
+If network lookup is unavailable or the framework is unfamiliar, add `--with-docs`. This opt-in
+expands a several-megabyte local corpus containing the release-built prose and task router plus
+`deno doc` output for every export subpath of each exact NetScript package version found in the
+project. Version disagreement or a failed documentation command aborts before the local docs tree
+is written; without the flag, no offline corpus is installed.
+
 | Host        | Files written                                                                                        |
 | ----------- | ---------------------------------------------------------------------------------------------------- |
 | Claude Code | `.mcp.json`, NetScript skills under `.claude/skills/`, and a marked NetScript section in `AGENTS.md` |
