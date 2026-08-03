@@ -52,3 +52,30 @@ Drift is append-only.
 - **Action:** accept
 - **Boundary:** Root config migration is repo-wide and out of scope; no config or lockfile was changed.
 - **Evidence:** `worklog.md` final scoped lint/format rows.
+
+## 2026-08-04 — OpenHands provider-prefixed model identifier
+
+- **What:** The independent evaluator required one corrected dispatch.
+- **Source:** Composed IMPL-EVAL handoff.
+- **Expected:** The lane-policy model id `qwen/qwen3.7-max` runs through the OpenRouter workflow.
+- **Actual:** Actions run `30861232769` failed before token use or verdict because the OpenHands SDK
+  required the LiteLLM-compatible `openrouter/qwen/qwen3.7-max` identifier. The dispatcher accepted
+  that corrected approved route in dry-run; run `30861395106` then completed successfully with a
+  formal `PASS` and committed `evaluate.md`.
+- **Severity:** minor
+- **Action:** accept
+- **Boundary:** No implementation source or lockfile was changed by either evaluator run.
+- **Evidence:** PR comments `5172694135` and `5172753320`; Actions runs `30861232769` and
+  `30861395106`.
+
+## 2026-08-04 — Augment composed reviewer unavailable
+
+- **What:** The draft-to-ready Augment path did not produce a review.
+- **Source:** Composed milestone evaluation.
+- **Expected:** Augment supplies the draft-to-ready review component.
+- **Actual:** The bot reported that the account had no review credits. The separate OpenHands
+  evaluator completed with `PASS` and found no substitute blocker; the milestone orchestrator
+  retains the final pre-merge ruling.
+- **Severity:** minor
+- **Action:** accept
+- **Evidence:** PR comment `5172543505`; `evaluate.md` External Composed-Path Evidence.
