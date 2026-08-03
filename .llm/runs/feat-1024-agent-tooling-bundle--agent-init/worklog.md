@@ -224,6 +224,7 @@ compressed asset; never hand-edit the generated TypeScript or API text.
 | Final quality/doctrine | PASS | `quality:scan` zero findings; `arch:check` FAIL=0 | Existing allowances/warnings only. |
 | Final CLI doc lint | PASS | 3 entrypoints, 0 diagnostics | Published-package missing-JSDoc bar satisfied. |
 | Final publish dry-run | PASS | `Success Dry run complete` | JSR simulation includes generated docs, tools, and skills assets; existing dynamic-import warnings only. |
+| IMPL-EVAL | PASS | `db15616a4`; OpenHands/OpenRouter Qwen 3.7 Max, xhigh; Actions run `30812892343` | Independent evaluator found no blockers, confirmed every checked issue box is evidenced, and accepted the reduced close scope (`Closes #1061`, `Refs #1024`). |
 
 ### Runtime Gates
 
