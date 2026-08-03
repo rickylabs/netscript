@@ -17,6 +17,8 @@ permissions:
   actions: write
   contents: write
   id-token: write
+  issues: write
+  pull-requests: write
   statuses: write
 
 concurrency:
@@ -115,6 +117,18 @@ jobs:
 
       - name: Publish canary through the production path
         run: deno run --allow-read --allow-write --allow-run .llm/tools/release/run-publish.ts
+
+      - name: Label published canary payload and verify drift
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CANARY_VERSION: ${{ steps.canary.outputs.version }}
+          SOURCE_SHA: ${{ steps.context.outputs.source_sha }}
+        run: |
+          set -euo pipefail
+          deno task release:canary-label -- \
+            --repo "$GITHUB_REPOSITORY" \
+            --published-version "$CANARY_VERSION" \
+            --head "$SOURCE_SHA"
 
       - name: Dispatch exact canary production E2E
         id: dispatch

@@ -10,6 +10,7 @@ Deno.test('canary workflow reuses the publisher and records only an awaited gree
     '.llm/tools/release/run-publish.ts --dry-run',
     '.llm/tools/release/run-publish.ts --preflight',
     '.llm/tools/release/run-publish.ts\n',
+    'deno task release:canary-label',
     'return_run_details=true',
     'gh run watch "$E2E_RUN_ID" --exit-status',
     '-f state=success',
@@ -22,7 +23,14 @@ Deno.test('canary workflow reuses the publisher and records only an awaited gree
   }
 
   for (
-    const permission of ['actions: write', 'contents: write', 'id-token: write', 'statuses: write']
+    const permission of [
+      'actions: write',
+      'contents: write',
+      'id-token: write',
+      'issues: write',
+      'pull-requests: write',
+      'statuses: write',
+    ]
   ) {
     assertStringIncludes(source, permission);
   }
@@ -42,6 +50,8 @@ Deno.test('canary workflow reuses the publisher and records only an awaited gree
   );
   assertStringIncludes(source, 'version="$(jq -er \'.version\' "$CANARY_RESULT")"');
   assertStringIncludes(source, 'test "$version" != "null"');
+  assertStringIncludes(source, '--published-version "$CANARY_VERSION"');
+  assertStringIncludes(source, '--head "$SOURCE_SHA"');
   const cutStep = source.slice(
     source.indexOf('- name: Cut ephemeral canary branch and tag'),
     source.indexOf('- name: Verify same-semver canary republish'),
