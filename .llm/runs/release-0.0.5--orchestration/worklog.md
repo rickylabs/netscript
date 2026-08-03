@@ -289,3 +289,16 @@ in-flight wave-1 surfaces — not dispatched now. `status:triage` → `status:pl
 decision commented on the issue. Brief written (`slices/sagas-kv-glue/implement.md`) — first of
 the wave-2 generation carrying the D6 evaluator-composition rule up front. Wave 2 width: 4 Codex
 (#1130, #1131, #1119, #1184) + 1 agy (#1106); #1184 holds the wave-2 expensive-gate slot.
+
+## 2026-08-03 — Owner amends #1184: seven-point saga verification standard
+
+Owner raised #1184's verification bar (new box: full lifecycle E2E in a locally scaffolded
+project with OTEL evidence) and set a seven-point protocol — fresh default scaffold, genuinely
+healthy resource (empty `healthReports` = nothing checked), full lifecycle incl. `sagaCompensate`,
+`aspire otel traces/spans/logs` with correlation held (the #1066 collapse), RED captured before
+GREEN, restart durability, artefact-not-exit-code. Rationale: #1064–#1066 closed on passing
+engine tests while the real scaffold stayed broken. **Standard applies to all saga work in this
+milestone**, recorded here as an owner-set rule. W2-F brief rewritten around the protocol;
+effort re-tiered Sol·medium → **Sol·high** (verification protocol is the dominant work).
+Classification unchanged: PR-closable on local protocol evidence; canary.2 pair adds the
+published-artifact confirmation.
