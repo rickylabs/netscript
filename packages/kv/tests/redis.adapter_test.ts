@@ -55,6 +55,38 @@ Deno.test({
   },
 });
 
+Deno.test({
+  name: 'RedisKvAdapter fails during a Redis restart and recovers on the same instance',
+  ignore: !Deno.env.get('NETSCRIPT_TEST_REDIS_URL') ||
+    !Deno.env.get('NETSCRIPT_TEST_REDIS_CONTAINER'),
+  async fn() {
+    const url = Deno.env.get('NETSCRIPT_TEST_REDIS_URL');
+    const container = Deno.env.get('NETSCRIPT_TEST_REDIS_CONTAINER');
+    assert(url);
+    assert(container);
+    const kv = new RedisKvAdapter({ url, namespace: `restart-${crypto.randomUUID()}` });
+
+    try {
+      await kv.set(['health'], 'before');
+      await docker('stop', container);
+
+      await assertRejects(
+        () => withTimeout(kv.get(['health']), 2_000),
+        Error,
+      );
+
+      await docker('start', container);
+      await eventually(async () => {
+        await kv.set(['health'], 'after');
+        assertEquals((await kv.get(['health']))?.value, 'after');
+      }, 10_000);
+    } finally {
+      await docker('start', container, true);
+      await kv.close();
+    }
+  },
+});
+
 async function collect<T>(entries: AsyncIterable<T>): Promise<T[]> {
   const collected: T[] = [];
   for await (const entry of entries) collected.push(entry);
@@ -71,4 +103,30 @@ async function withTimeout<T>(operation: Promise<T>, timeoutMs: number): Promise
   } finally {
     if (timeout !== undefined) clearTimeout(timeout);
   }
+}
+
+async function docker(action: 'start' | 'stop', container: string, tolerateFailure = false) {
+  const output = await new Deno.Command('docker', {
+    args: [action, container],
+    stdout: 'null',
+    stderr: 'piped',
+  }).output();
+  if (!output.success && !tolerateFailure) {
+    throw new Error(new TextDecoder().decode(output.stderr));
+  }
+}
+
+async function eventually(operation: () => Promise<void>, timeoutMs: number): Promise<void> {
+  const deadline = performance.now() + timeoutMs;
+  let lastError: unknown;
+  while (performance.now() < deadline) {
+    try {
+      await operation();
+      return;
+    } catch (error) {
+      lastError = error;
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
+  }
+  throw lastError;
 }

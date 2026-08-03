@@ -32,6 +32,9 @@ const RETRY_OPTIONS = {
   jitter: 1,
 } as const;
 
+const IOREDIS_RECONNECT_ATTEMPTS = 5;
+const IOREDIS_RECONNECT_MAX_DELAY_MS = 1_000;
+
 /**
  * Manages the lifecycle of ioredis client and subscriber connections for the
  * Redis KV adapter.
@@ -85,6 +88,11 @@ export class RedisConnectionManager {
   async ensureClient(): Promise<Redis> {
     if (this.closed) {
       throw new KvClosedError('RedisKvAdapter is closed.');
+    }
+
+    if (this.client?.status === 'end') {
+      this.client = null;
+      this.clientPromise = null;
     }
 
     if (this.client) {
@@ -260,9 +268,15 @@ export class RedisConnectionManager {
       lazyConnect: false,
       maxRetriesPerRequest: 3,
       ...this.options,
+      // These are adapter guarantees rather than caller preferences: commands
+      // must never disappear into an offline queue, readiness must be proven,
+      // and reconnect attempts must be bounded without disabling recovery.
       enableOfflineQueue: false,
       enableReadyCheck: true,
-      retryStrategy: () => null,
+      retryStrategy: (attempt) =>
+        attempt <= IOREDIS_RECONNECT_ATTEMPTS
+          ? Math.min(attempt * 100, IOREDIS_RECONNECT_MAX_DELAY_MS)
+          : null,
     };
 
     if (this.url.startsWith('rediss://') && !options.tls) {
