@@ -162,10 +162,6 @@ jobs:
         if: env.RUN == 'true'
         run: deno task e2e:cli run scaffold.contracts --format pretty
 
-      - name: scaffold.infrastructure (hostile parent tsconfig)
-        if: env.RUN == 'true'
-        run: deno task e2e:cli run scaffold.infrastructure --cleanup --format pretty
-
       - name: generated README from a clean clone
         if: env.RUN == 'true'
         run: deno run --allow-all packages/cli/e2e/src/application/gates/scaffold/verify-clean-clone-readme.ts

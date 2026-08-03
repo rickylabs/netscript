@@ -45,4 +45,49 @@ Add scaffold boundary cases beside existing CLI E2E fixture gates; add starter p
 
 - Current-main scaffold emitted both boundary configs.
 - Current-main generated clean clone tracks both route artifacts and passes literal `deno task check`.
-- No implementation has started; PLAN-EVAL pending.
+- A tag `v0.0.2` clean-room reproduction also tracked both route artifacts and passed literal
+  `deno task check`; the reported historical RED could not be reproduced honestly.
+
+## Implementation evidence
+
+### #1016 — `96d300650`
+
+- `scaffold.infrastructure` writes the hostile parent config, generates the database client,
+  type-checks the generated workspace, and receives HTTP 200 from the Fresh development server.
+- Full suite: `Summary: passed=9 failed=0`.
+- Counterfactual: removing the generated root and app tsconfigs made database generation fail with
+  `File 'astro/tsconfigs/strict' not found` and made the development probe fail with HTTP 500.
+- Pushed and recorded on PR #1081 before beginning #1021.
+
+### #1021 — `2e6ce30c0`
+
+- The CI gate creates a generated project, commits it, clones it to a fresh OS temporary directory,
+  verifies the route artifacts, and runs README literal `deno task check`.
+- Observed: `clean clone ran README command verbatim: deno task check`.
+- Missing-binary regression: `1 passed, 0 failed`; `Deno.Command` `NotFound` becomes an explicit gate
+  diagnostic.
+- Pushed and recorded on PR #1081 before beginning #1039.
+
+### #1039 — `a3ad1296d`
+
+- All seven AI starters are explicitly omitted, alternated, or documented structural.
+- Black-box real install: `1 passed, 0 failed`; emitted sample paths are absent and the structural
+  generated workspace passes `deno check --unstable-kv`.
+- Parent-commit counterfactual: `0 passed, 1 failed` because `ai/tools/echo.ts` was emitted.
+- Pushed and recorded on PR #1081.
+
+## Merge readiness
+
+- Root `deno task check`: passed (cached verdict after unchanged inputs).
+- Scoped CLI E2E lint/fmt and AI check/lint/fmt wrappers: zero findings.
+- `scaffold.infrastructure --cleanup --format pretty`: 9 passed, 0 failed.
+- Root test initially found a run-owned, root-readable Postgres fixture cleanup artifact after 2,516
+  tests passed. The exact fixture/container was removed; the failing teardown scanner then passed.
+- `agentic:leak-check`: Aspire ok, Docker ok, no survivors.
+- `deno task quality:gate`: passed; existing doctrine/catalog warnings remained non-failing.
+- GitHub's first deno-only run exposed an invalid CI placement: `scaffold.infrastructure` reached
+  `database.init` without Aspire and failed. The hostile-parent gates were moved into the existing
+  Aspire-backed `scaffold.runtime` sequence; the clean-clone README gate remains deno-only.
+- Root `deno task test` completed all 2,516 product assertions twice; on each run the sole failure
+  was the repository scanner encountering a different pre-existing unreadable E2E data directory.
+  After trashing every remaining run-owned fixture, the scanner passed independently.
