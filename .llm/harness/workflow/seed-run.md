@@ -133,7 +133,10 @@ and re-read the stage contracts.
 - Dynamic-Workflow `args` may not reach the script — embed inputs as consts in the script body.
 - Evaluator "Job status: failure" with a PASS verdict in the PR comment = commit-back push
   failure, not a FAIL.
-- `gh` bodies via `--body-file` only; run `gh` from a neutral dir when in a Windows worktree.
+- PR/comment publication scratch uses `.llm/tmp/<run-id>/<session-id>/...`; for PR creation, pass
+  `--body-file .llm/tmp/<run-id>/<session-id>/pr-body.md`. Never use a workspace-shared filename.
+  Durable reviewed bodies may live in the run directory. Run `gh` from a neutral dir in a Windows
+  worktree.
 - Push with explicit refspecs; a worktree created off `origin/main` inherits it as upstream.
 - Tool-surface mandates (rtk, deps wrappers, scoped check/lint/fmt) live in `workflow/tooling.md`
   and the `netscript-tools` / `netscript-deno-toolchain` skills.

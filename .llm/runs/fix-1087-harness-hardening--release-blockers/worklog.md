@@ -74,6 +74,9 @@ job. Release prose is edited in the tracked notes-file input.
 | 2026-08-03 | 1 | #1087 implementation | Added a loopback Anthropic request guard configured through the evaluator child environment, exact central open-model allowlist, real launch/resume session identity, redacted JSONL denial audit, and SIGTERM→SIGKILL abort with exit 78. |
 | 2026-08-03 | 1 | opposite-family review | Fable review session `7a34e115-1da4-4a2e-b7ad-621f79c1f5d6` returned `PASS`; remediation continuation `55852a33-55b4-4898-9909-0a1ad0545c7c` verified all actionable findings resolved. |
 | 2026-08-03 | 1 | supervisor sign-off | Inspected the guard/wrapper/adapter boundary, reviewer evidence, complete suite, scoped wrappers, and credential-blind audit tests; approved the slice for commit. |
+| 2026-08-03 | 2 | #1084 implementation | `gh-pr create` now stages supplied content into an invocation-owned UUID directory, stamps owner+SHA-256 metadata, and re-reads/verifies the artifact before payload construction; guidance now requires per-run/per-session scratch. |
+| 2026-08-03 | 2 | opposite-family review | Fable session `064bce5b-16b5-404d-b966-a16168b93caa` returned `PASS`; continuation `5b04b3dc-6ebe-4da9-932f-4971b67f3500` verified the pre-existing-root mode fix. |
+| 2026-08-03 | 2 | supervisor sign-off | Inspected concurrency/cross-owner/tamper tests, real dry-run artifact modes/redaction, full tool suite, active guidance grep, and reviewer findings; approved the slice for commit. |
 
 ## Decisions
 
@@ -97,9 +100,15 @@ job. Release prose is edited in the tracked notes-file input.
 - #1087 complete `.llm/tools/agentic/` suite: `332 passed, 0 failed` (independently rerun by reviewer).
 - #1087 scoped check/lint/fmt: `129 files, 0 findings` each.
 - #1087 review: `PASS`; all actionable findings resolved.
+- #1084 publication/compatibility focused suite: `8 passed, 0 failed`.
+- #1084 real `agentic:gh-pr create --dry-run`: unique UUID path; 0700 directory; 0600 body and metadata; body not printed.
+- #1084 complete `.llm/tools/agentic/` suite: `337 passed, 0 failed`.
+- #1084 scoped check/lint/fmt: `131 files, 0 findings` each.
+- #1084 active guidance grep: only per-run/per-session `pr-body.md` examples remain.
+- #1084 review: `PASS`; root-mode finding resolved, intentional gitignored audit retention accepted.
 - Remaining implementation gates: `NOT_RUN`.
 
 ## Handoff Notes
 
-- #1087 is supervisor-approved for its issue commit. After push and evidence comment, proceed to
-  #1084 without combining the slices.
+- #1084 is supervisor-approved for its issue commit. After push and evidence comment, proceed to
+  #1080 without combining the slices.

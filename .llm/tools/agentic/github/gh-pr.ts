@@ -22,7 +22,8 @@
  * passed on argv, or echoed. `--dry-run` needs no token and makes no network call.
  *
  * Usage:
- *   deno run --allow-read --allow-env --allow-net .llm/tools/agentic/github/gh-pr.ts \
+ *   deno run --allow-read --allow-write=.llm/tmp/agentic/gh-pr --allow-env --allow-net \
+ *     .llm/tools/agentic/github/gh-pr.ts \
  *     create --head feat/prime-time/auth-s3-kv-oauth --base feat/prime-time/auth \
  *     --title "S3 — …" --body-file <win-path> [--draft] [--allow-base-main]
  *
@@ -53,6 +54,7 @@ import {
   resolveGithubToken,
   selectLatestOpenHandsComment,
 } from '../lib/agentic-lib.ts';
+import { readOwnedPublicationBody, stagePublicationBody } from './publication-body.ts';
 
 type Sub = 'create' | 'verdict' | 'merge';
 
@@ -280,7 +282,10 @@ async function main(): Promise<void> {
       );
       Deno.exit(6);
     }
-    const body = o.bodyFile ? await Deno.readTextFile(o.bodyFile) : (o.body ?? '');
+    const suppliedBody = o.bodyFile ? await Deno.readTextFile(o.bodyFile) : (o.body ?? '');
+    const publicationSession = crypto.randomUUID();
+    const artifact = await stagePublicationBody(suppliedBody, publicationSession);
+    const body = await readOwnedPublicationBody(artifact, publicationSession);
     const payload = buildPullRequestBody({
       title: o.title!,
       head: o.head!,
@@ -295,11 +300,17 @@ async function main(): Promise<void> {
         `  head  : ${o.head} -> base ${o.base}${o.draft ? ' (draft)' : ''}`,
         `  title : ${o.title}`,
         `  bytes : ${new TextEncoder().encode(body).length}`,
+        `  staged: ${artifact.bodyPath}`,
       ], {
         mode: 'dry-run',
         sub: 'create',
         ok: true,
         repo: o.repo,
+        publication: {
+          session: artifact.sessionId,
+          bodyPath: artifact.bodyPath,
+          fingerprint: artifact.fingerprint,
+        },
         payload: { ...payload, body: `<${body.length} chars>` },
       });
       Deno.exit(0);
