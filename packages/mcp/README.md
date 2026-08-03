@@ -206,8 +206,6 @@ import { createServiceEndpointDirectory } from '@netscript/mcp';
 
 const endpoints = createServiceEndpointDirectory({
   projectRoot: Deno.cwd(),
-  appHostPath: './aspire/apphost.ts',
-  expectedRunId: '<current AppHost run id>',
 });
 
 const { entries, sources } = await endpoints.list();
@@ -217,7 +215,9 @@ The effective per-service precedence is `override > aspire-cli > run-manifest > 
 source remains visible as `used`, `absent`, or `failed`; a failed Aspire CLI query or a stale
 manifest is never rendered as healthy absence. The manifest at `.netscript/run/endpoints.json` is
 eligible only when its real project root and `runId` match the supplied current run. `appHostPath`
-should identify the exact AppHost when the default Aspire CLI adapter is enabled.
+defaults to `./aspire/apphost.mts`; override it when the active AppHost lives elsewhere. Supply
+`expectedRunId` only when the host owns the current AppHost run token; without that identity proof,
+a present run manifest is reported as failed and does not contribute endpoints.
 
 Explicit operator endpoints and exclusions live only in the S5-owned subsection of
 `.netscript/agent-mcp.json`; sibling settings are ignored:

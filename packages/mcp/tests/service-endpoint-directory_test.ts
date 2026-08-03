@@ -210,6 +210,42 @@ Deno.test('one hanging row times out while healthy rows return under the concurr
   assertEquals(active, 0);
 });
 
+Deno.test('one non-cooperative hanging spec fetch times out while another directory row returns', async () => {
+  const outcomes = {
+    override: used('override', [
+      candidate('hang', 'override', 'http://127.0.0.1:4200'),
+      candidate('healthy', 'override', 'http://127.0.0.1:4201'),
+    ]),
+    'aspire-cli': absent('aspire-cli'),
+    'run-manifest': absent('run-manifest'),
+    appsettings: absent('appsettings'),
+  } satisfies Readonly<Record<EndpointSource, SourceOutcome>>;
+  const fetchFixture: typeof fetch = (input) => {
+    const url = new URL(String(input));
+    if (url.port === '4200') return new Promise<Response>(() => {});
+    if (url.pathname === '/api/openapi.json') {
+      return Promise.resolve(Response.json({ openapi: '3.1.0', paths: {} }));
+    }
+    return Promise.resolve(Response.json({ service: 'healthy' }));
+  };
+
+  const result = await createServiceEndpointDirectory({
+    projectRoot: '/project',
+    sourceAdapters: sourceAdapters(outcomes),
+    fetch: fetchFixture,
+    timeoutMs: 20,
+    concurrency: 2,
+  }).list();
+
+  assertEquals(result.entries.map((entry) => [entry.name, entry.status]), [
+    ['hang', 'spec_unavailable'],
+    ['healthy', 'running'],
+  ]);
+  const hanging = result.entries[0];
+  assert(hanging?.status === 'spec_unavailable');
+  assertStringIncludes(hanging.reason, 'timed out after 20ms');
+});
+
 Deno.test('fetch probe requests spec before identity without redirects or credentials', async () => {
   const calls: Array<{ url: string; init: RequestInit | undefined }> = [];
   const fetchFixture: typeof fetch = (input, init) => {
