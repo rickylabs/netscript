@@ -184,12 +184,22 @@ stdin or terminates the process; callers do not need to reach into an internal t
 
 ## Public surface
 
-Two entrypoints carry the package:
+Three entrypoints carry the package:
 
-| Entry   | What it gives you                                                                                                                    |
-| ------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| `.`     | Tool contracts and schemas, the tool registry, the protocol runner (`createMcpServer`), port interfaces, and default adapters        |
-| `./cli` | The executable composition (`createMcpCliServer`, `runMcpStdioServer`) that binds real telemetry, docs, doctor, and process adapters |
+| Entry                  | What it gives you                                                                                                                    |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `.`                    | Tool contracts and schemas, the tool registry, the protocol runner (`createMcpServer`), port interfaces, and default adapters        |
+| `./cli`                | The executable composition (`createMcpCliServer`, `runMcpStdioServer`) that binds real telemetry, docs, doctor, and process adapters |
+| `./openapi-projection` | Pure OpenAPI operation indexing and schema projections, with no discovery, filesystem, network, or runtime work                      |
+
+The projection subpath accepts an already-loaded OpenAPI document. It keeps discovery and I/O at
+the caller's boundary:
+
+```ts
+import { indexOpenApiOperations } from '@netscript/mcp/openapi-projection';
+
+const index = indexOpenApiOperations(openApiDocument);
+```
 
 Every tool flow depends on a port interface, so embedders and tests supply their own adapters and
 assert against the published schemas. The always-current symbol list is

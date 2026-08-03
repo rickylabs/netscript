@@ -30,10 +30,10 @@ import {
 } from './src/infrastructure/plugin-doctor-family.ts';
 import { ProjectWiringDoctorFamily } from './src/infrastructure/project-wiring-doctor-family.ts';
 import { createDoctorFlow } from './src/application/flows/doctor-flow.ts';
-import type { CommandCatalogPort } from './src/domain/command-catalog-port.ts';
-import type { CommandExecutorPort } from './src/domain/command-executor-port.ts';
+import type { CommandCatalogPort } from './src/domain/command/command-catalog-port.ts';
+import type { CommandExecutorPort } from './src/domain/command/command-executor-port.ts';
 import type { ProjectDoctorPort } from './src/domain/project-doctor-port.ts';
-import { type CommandPolicy, DEFAULT_COMMAND_POLICY } from './src/domain/command-policy.ts';
+import { type CommandPolicy, DEFAULT_COMMAND_POLICY } from './src/domain/command/command-policy.ts';
 import { createListCommandsFlow } from './src/application/flows/list-commands-flow.ts';
 import { createExecuteCommandFlow } from './src/application/flows/execute-command-flow.ts';
 import { StaticCommandCatalog } from './src/infrastructure/static-command-catalog.ts';

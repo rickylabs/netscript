@@ -2,7 +2,7 @@ import {
   type CommandCatalogPort,
   type CommandDescriptor,
   MAX_COMMAND_DESCRIPTOR_LENGTH,
-} from '../../domain/command-catalog-port.ts';
+} from '../../domain/command/command-catalog-port.ts';
 import { isRecord } from '../../domain/schema.ts';
 import type { ToolExecutionResult, ToolFlow } from '../../domain/tool-types.ts';
 
