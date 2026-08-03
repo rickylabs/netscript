@@ -8,6 +8,8 @@ const CANARY_LABEL_COLOR = '1d76db';
 const PUBLISHED_CANARY_PACKAGE = '@netscript/cli';
 
 export interface CanaryPayload {
+  readonly commitCount: number;
+  readonly outcome: 'populated' | 'genuine-empty';
   readonly pullRequests: readonly number[];
   readonly issues: readonly number[];
   readonly pullRequestTitles: Readonly<Record<number, string>>;
@@ -15,7 +17,7 @@ export interface CanaryPayload {
 }
 
 export interface CanaryPayloadDependencies {
-  readonly firstParentCommits: (previous: string, head: string) => Promise<readonly string[]>;
+  readonly rangeCommits: (previous: string, head: string) => Promise<readonly string[]>;
   readonly associatedPullRequests: (commit: string) => Promise<readonly number[]>;
   readonly closingIssues: (pullRequest: number) => Promise<readonly number[]>;
   readonly pullRequestTitle?: (pullRequest: number) => Promise<string>;
@@ -111,7 +113,7 @@ export async function resolvePreviousPoint(
     : await dependencies.nearestStable(head);
 }
 
-/** Compute PR and closed-issue membership from first-parent merge history. */
+/** Compute PR and closed-issue membership from merge-aware range history. */
 export async function deriveCanaryPayload(
   previous: string,
   head: string,
@@ -119,13 +121,19 @@ export async function deriveCanaryPayload(
 ): Promise<CanaryPayload> {
   const pullRequests: number[] = [];
   const seen = new Set<number>();
-  for (const commit of await dependencies.firstParentCommits(previous, head)) {
+  const commits = await dependencies.rangeCommits(previous, head);
+  for (const commit of commits) {
     for (const pullRequest of await dependencies.associatedPullRequests(commit)) {
       if (!seen.has(pullRequest)) {
         seen.add(pullRequest);
         pullRequests.push(pullRequest);
       }
     }
+  }
+  if (commits.length > 0 && pullRequests.length === 0) {
+    throw new Error(
+      `Canary payload derivation inspected ${commits.length} commit(s) in ${previous}..${head} but found no associated main-branch pull requests.`,
+    );
   }
   const issues = new Set<number>();
   const pullRequestTitles: Record<number, string> = {};
@@ -139,6 +147,8 @@ export async function deriveCanaryPayload(
       : `Pull request #${pullRequest}`;
   }
   return {
+    commitCount: commits.length,
+    outcome: commits.length === 0 ? 'genuine-empty' : 'populated',
     pullRequests,
     issues: [...issues].sort((left, right) => left - right),
     pullRequestTitles,
@@ -157,13 +167,13 @@ export function renderCanaryReleaseNote(
   const lines = [
     `# NetScript ${publishedVersion}`,
     '',
-    `Canary payload derived from first-parent merge history after \`${previous}\`.`,
+    `Canary payload derived from merge-aware history after \`${previous}\` (${payload.commitCount} commit(s) inspected; outcome: ${payload.outcome}).`,
     '',
     '## Included pull requests',
     '',
   ];
   if (payload.pullRequests.length === 0) {
-    lines.push('_Empty payload: no pull requests merged since the previous canary point._');
+    lines.push('_Genuine empty payload: no commits landed since the previous canary point._');
   } else {
     for (const pullRequest of payload.pullRequests) {
       const closed = payload.closedIssuesByPullRequest[pullRequest] ?? [];
@@ -227,8 +237,7 @@ export function checkCanaryDrift(
   const coreOf = (version: string): string =>
     /-canary\.\d+$/.test(version) ? targetCore(version) : version;
   const target = targetVersion === undefined ? undefined : coreOf(targetVersion);
-  const inTarget = (version: string): boolean =>
-    target === undefined || coreOf(version) === target;
+  const inTarget = (version: string): boolean => target === undefined || coreOf(version) === target;
   const canaryLabels = new Set(
     labels
       .filter((label) => label.startsWith(CANARY_LABEL_PREFIX))
@@ -295,8 +304,8 @@ async function gitLines(args: readonly string[]): Promise<readonly string[]> {
   return result.stdout.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
 }
 
-async function firstParentCommits(previous: string, head: string): Promise<readonly string[]> {
-  return await gitLines(['rev-list', '--first-parent', '--reverse', `${previous}..${head}`]);
+async function rangeCommits(previous: string, head: string): Promise<readonly string[]> {
+  return await gitLines(['rev-list', '--topo-order', '--reverse', `${previous}..${head}`]);
 }
 
 async function canarySource(version: string): Promise<string> {
@@ -505,7 +514,7 @@ async function main(): Promise<void> {
     );
     activeCheck = 'merge-history-payload';
     const payload = await deriveCanaryPayload(previous, options.head, {
-      firstParentCommits,
+      rangeCommits,
       associatedPullRequests: (commit) => github.associatedPullRequests(commit),
       closingIssues: (pullRequest) => github.closingIssues(pullRequest),
       pullRequestTitle: (pullRequest) => github.pullRequestTitle(pullRequest),
@@ -514,7 +523,7 @@ async function main(): Promise<void> {
       checks,
       activeCheck,
       true,
-      `${payload.pullRequests.length} PR(s), ${payload.issues.length} closed issue(s) from ${previous}..${options.head}`,
+      `${payload.outcome}: inspected ${payload.commitCount} commit(s); ${payload.pullRequests.length} PR(s), ${payload.issues.length} closed issue(s) from ${previous}..${options.head}`,
     );
 
     const note = renderCanaryReleaseNote(
