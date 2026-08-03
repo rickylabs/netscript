@@ -5,6 +5,14 @@ use harness
 You are the implementation supervisor for the PR closing #1131 (epic #1126, RFC #1123). Read the
 issue body and RFC first. Wave-0 gating is satisfied: `proofs/P1-verdict.md` exists.
 
+## SKILL
+
+- `.agents/skills/netscript-harness`
+- `.agents/skills/netscript-pr`
+- `.agents/skills/netscript-doctrine` (packages/mcp Archetype-2)
+- `.agents/skills/aspire` (the aspire-cli adapter surface)
+- `.agents/skills/jsr-audit` (new port exports)
+
 ## Milestone-run evaluator rule (read before planning)
 
 Per `.llm/harness/workflow/milestone-run.md` § Evaluator protocol and orchestrator ruling D6: do

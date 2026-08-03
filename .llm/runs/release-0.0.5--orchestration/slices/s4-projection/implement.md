@@ -6,6 +6,13 @@ You are the implementation supervisor for the PR closing #1130 (epic #1126, RFC 
 issue body and RFC first. Wave-0 gating is satisfied: `proofs/P2-verdict.md` exists (committed,
 `.llm/runs/test-openapi-mcp-wave0-proofs--wave0/proofs/`).
 
+## SKILL
+
+- `.agents/skills/netscript-harness`
+- `.agents/skills/netscript-pr`
+- `.agents/skills/netscript-doctrine` (packages/mcp Archetype-2)
+- `.agents/skills/jsr-audit` (export surface moves: new module)
+
 ## Milestone-run evaluator rule (read before planning)
 
 Per `.llm/harness/workflow/milestone-run.md` § Evaluator protocol and orchestrator ruling D6: do

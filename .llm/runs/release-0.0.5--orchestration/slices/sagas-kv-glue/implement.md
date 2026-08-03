@@ -14,6 +14,14 @@ registered; the AppHost provisions Redis/Garnet by default; `openSagaRuntimeKv` 
 auto-detects the cache and throws `KvConnectionError`; the saga background processor dies at
 startup while the saga API stays up returning an empty set — invisible from outside.
 
+## SKILL
+
+- `.agents/skills/netscript-harness`
+- `.agents/skills/netscript-pr`
+- `.agents/skills/netscript-doctrine` (plugins/sagas framework surface)
+- `.agents/skills/netscript-cli` (scaffold semantics)
+- `.agents/skills/aspire` (OTEL evidence: traces/spans/logs)
+
 ## Milestone-run evaluator rule (read before planning)
 
 This slice runs inside milestone run `release-0.0.5--orchestration`. Per

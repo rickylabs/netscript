@@ -5,6 +5,13 @@ use harness
 You are the implementation supervisor for the PR closing #1191. Read the issue body first —
 it carries the observed evidence paths from the wave-0 proof run and five acceptance boxes.
 
+## SKILL
+
+- `.agents/skills/netscript-harness`
+- `.agents/skills/netscript-pr`
+- `.agents/skills/netscript-cli` (scaffold command emission)
+- `.agents/skills/aspire` (health/OTEL verification)
+
 ## Milestone-run evaluator rule (read before planning)
 
 Per `.llm/harness/workflow/milestone-run.md` § Evaluator protocol and orchestrator ruling D6: do
