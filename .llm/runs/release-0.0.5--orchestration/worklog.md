@@ -543,3 +543,21 @@ to the wave-0 proofs in the diff); files exactly the CLI command-emission surfac
 0 ignores; permission-emission test independently re-run 2/2 (32 steps); closing refs verified
 present at merge (finding-19 row) — **#1191 auto-closed by the merge** (`f7f7cc718`,
 23:24:37Z). The slice also self-dispatched an OpenHands evaluation and recorded its pass.
+
+## 2026-08-04 — R5: three wave-4-control-run issues scheduled (#1190 p0, #1196, #1197)
+
+- **#1190 (p0, saga publish never delivers, both KV backends)** — queue-jump dispatched
+  immediately (`fix/saga-publish-delivery`, Sol·high), **canary.2 train with #1184** per owner
+  directive: joint end-to-end verification on the combined state; #1193's final protocol
+  evidence re-runs after #1190 lands, both backends proven separately. #1193 could not be
+  steered mid-turn (no rival sends); its natural protocol run will capture the publish hang as
+  RED evidence, and the coordination steer lands at its turn boundary. **#1184's disposition
+  changes: it does not close green against a non-delivering surface.**
+- **#1196 (db command's ephemeral AppHost masks resident)** — wave 3, canary.2 train,
+  Sol·medium. The live stray instance under `ns005-sagas/.llm/tmp/` is covered by #1193's
+  leak-check obligation at its gate.
+- **#1197 (agent-surface adoption, measured)** — observational hand-close, measured against
+  **canary.3** (first train where S6 tools + S9 activation are both present); 0.0.4 baseline
+  is the filed 452-call run. A canary.2 baseline run optional.
+- All three labeled `status:plan` with scheduling comments. Milestone grew again mid-run;
+  dispositions updated in plan (mid-run additions).
