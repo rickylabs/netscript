@@ -28,6 +28,15 @@ import { TEMPLATE_KEYS } from '../../../../assets/manifest.ts';
 import { renderTemplateAssetSync } from '../../../../adapters/templates/template-asset.ts';
 import { renderHttpEndpointCall } from './render-http-endpoint.ts';
 
+function withRequiredServicePermissions(
+  permissions: readonly string[],
+  databaseEngine: RegisterServicesOptions['databaseEngine'],
+): readonly string[] {
+  return databaseEngine === 'Sqlite' && !permissions.includes('--allow-ffi')
+    ? [...permissions, '--allow-ffi']
+    : permissions;
+}
+
 /**
  * Generates the `register-services.mts` file content for a scaffolded Aspire
  * project. Produces a two-pass registration function that creates all service
@@ -37,7 +46,7 @@ import { renderHttpEndpointCall } from './render-http-endpoint.ts';
  * @returns Generated TypeScript source as a string
  */
 export function generateRegisterServices(options: RegisterServicesOptions): string {
-  const { services, version: _version, denoDefaults } = options;
+  const { services, version: _version, denoDefaults, databaseEngine } = options;
   const entries = Object.entries(services);
 
   // --- Pass 1 blocks: create all service resources ---
@@ -47,6 +56,12 @@ export function generateRegisterServices(options: RegisterServicesOptions): stri
     const entrypoint = entry.Entrypoint ?? RESOURCE_DEFAULTS.ServiceEntrypoint;
     const workdir = entry.Workdir ?? `${SCAFFOLD_DIRS.SERVICES}/${name}`;
     const watchMode = denoDefaults.WatchMode;
+    const entryPermissions = entry.Permissions
+      ? withRequiredServicePermissions(entry.Permissions, databaseEngine)
+      : undefined;
+    const defaultPermissions = entryPermissions
+      ? denoDefaults.Permissions
+      : withRequiredServicePermissions(denoDefaults.Permissions, databaseEngine);
 
     const lines: string[] = [];
     lines.push(`  // --- ${name} ---`);
@@ -54,12 +69,12 @@ export function generateRegisterServices(options: RegisterServicesOptions): stri
 
     // Resolve permissions — services use HMR watch
     lines.push(`    const perms = resolvePermissions(`);
-    if (entry.Permissions) {
-      lines.push(`      ${JSON.stringify(entry.Permissions)},`);
+    if (entryPermissions) {
+      lines.push(`      ${JSON.stringify(entryPermissions)},`);
     } else {
       lines.push(`      undefined,`);
     }
-    lines.push(`      ${JSON.stringify(denoDefaults.Permissions)},`);
+    lines.push(`      ${JSON.stringify(defaultPermissions)},`);
     lines.push(`      ${watchMode},`);
     lines.push(`      '${RESOURCE_DEFAULTS.WatchHmrFlag}',`);
     lines.push(`    );`);

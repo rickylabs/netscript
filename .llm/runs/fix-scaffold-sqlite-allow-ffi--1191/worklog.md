@@ -66,6 +66,15 @@ predicate and extend the cross-engine semantic permission table in its focused g
 | --- | --- | --- | --- |
 | 2026-08-04 | 1 | bootstrap | Issue #1191 read; clean baseline equals origin/main; AppHost slot free. |
 | 2026-08-04 | 1 | plan-gate | `composed per milestone-run.md (orchestrator waiver)`; plan locked before implementation. |
+| 2026-08-04 | 2 | prerequisite | First start exposed missing generated Prisma/Zod output; stopped exact AppHost, then ran documented DB init/generate/seed. Not counted as target RED. |
+| 2026-08-04 | 2 | RED runtime | Unmodified generator: `users` Finished, exit 1, Unhealthy with populated report; console log names `NotCapable` and required `--allow-ffi`. |
+| 2026-08-04 | 2 | RED test | Focused generated-output test exited 1 only on the SQLite permission row: expected one FFI flag, observed zero. |
+| 2026-08-04 | 2 | implementation | Added the primary database engine to the internal generator options and applied the required FFI flag to the selected default/explicit service permission set with de-duplication. |
+| 2026-08-04 | 2 | focused GREEN | Generator suite passed 32 steps; none/Postgres/MySQL/MSSQL emit zero FFI, SQLite emits one, including explicit-permission de-duplication. |
+| 2026-08-04 | 3 | GREEN runtime | Same scaffold regenerated: actual argv contains FFI; `users` Running/Healthy with populated healthy report; HTTP health 200; OpenAPI and OTEL artefacts captured. |
+| 2026-08-04 | 3 | P2 | Wrote `P2-db.json` from the live 32,414-byte DB spec and posted S4/S6 impact assessment on epic #1126. |
+| 2026-08-04 | 3 | exact stop | Exact AppHost stop; `aspire ps` empty; service PID exited immediately and DCP controller exited after bounded wait. |
+| 2026-08-04 | 3 | final gates | Helper suite, scoped wrappers, quality gate, doc lint, publish dry-run, and leak check all passed. Leak check reported only foreign resources, left untouched. |
 
 ## Decisions
 
@@ -79,6 +88,7 @@ predicate and extend the cross-engine semantic permission table in its focused g
 | Drift | Severity | Logged in drift.md |
 | --- | --- | --- |
 | Formal local PLAN-EVAL composed by milestone protocol | minor/authorized | yes |
+| Mandated P2 script emits stale no-DB classifier prose | significant/deferred | yes |
 
 ## Gate Results
 
@@ -86,28 +96,34 @@ predicate and extend the cross-engine semantic permission table in its focused g
 
 | Gate | Command or check | Result | Notes |
 | --- | --- | --- | --- |
-| scoped check/lint/fmt | planned | NOT_RUN | Slice 2. |
+| focused helper suite | `deno test -A --unstable-kv packages/cli/src/kernel/templates/aspire/helpers/tests` | PASS | 18 tests, 164 steps. |
+| scoped check/lint/fmt | `.llm/tools/run-deno-{check,lint,fmt}.ts --root packages/cli/src/kernel/templates/aspire/helpers --ext ts,tsx` | PASS | 22 files; zero findings. |
 
 ### Fitness Gates
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| quality/architecture/JSR | NOT_RUN | planned commands | Slice 2/3. |
+| framework quality | PASS | `deno task quality:gate` | Quality scan, architecture, and dependency gates exit 0; baseline warnings only. |
+| public docs | PASS | `deno task doc:lint --root packages/cli --pretty` | Three entrypoints; zero findings. |
+| package publish | PASS | `packages/cli: deno task publish:dry-run` | Publish simulation succeeds; existing dynamic-import warnings only. |
+| resource hygiene | PASS | `deno task agentic:leak-check -- --slice-dir ... --worktree ...` | Aspire/Docker probes OK; no slice-owned survivors; foreign containers left untouched. |
+| full `scaffold.runtime` | NOT_RUN (serialized ownership) | #1184 owns the milestone slot | Focused real scaffold/AppHost owner verification is complete; no overlapping run was started. |
 
 ### Runtime Gates
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| SQLite RED/GREEN | NOT_RUN | real scaffold artefacts | Serialized slot confirmed free. |
+| SQLite RED | PASS | `proofs/red-runtime.json` | Real local-source scaffold after DB init/generate/seed; missing-FFI cause isolated. |
+| SQLite GREEN | PASS | `proofs/green-runtime.json` | Running + Healthy; populated report; HTTP 200; OTEL records. |
 
 ### Consumer Gates
 
 | Consumer | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| generated service argv | NOT_RUN | focused semantic test | RED first. |
+| generated service argv | PASS | focused test: 32 steps | RED exit 1 before fix; GREEN after fix; five-engine audit. |
+| P2 DB branch | PASS with classifier finding | `../test-openapi-mcp-wave0-proofs--wave0/proofs/evidence/P2-db.json` | Measurement complete; stale hardcoded no-DB classifier recorded as drift. |
 
 ## Handoff Notes
 
 - Review the emitted `deno run` argv predicate, cross-engine non-FFI assertions, populated Aspire
   health reports, and `P2-db.json` before accepting the five issue boxes.
-

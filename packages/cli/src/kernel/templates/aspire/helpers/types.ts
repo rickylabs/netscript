@@ -65,6 +65,8 @@ export interface RegisterServicesOptions {
   readonly services: Record<string, ServiceEntry>;
   readonly version: string;
   readonly denoDefaults: DenoDefaults;
+  /** Selected primary database engine, used for engine-required runtime permissions. */
+  readonly databaseEngine?: DatabaseEntry['Engine'];
 }
 
 /** Options for register-plugins.mts generation. */

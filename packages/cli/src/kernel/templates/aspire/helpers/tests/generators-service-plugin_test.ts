@@ -3,7 +3,7 @@
  */
 
 import { describe, it } from 'jsr:@std/testing@^1/bdd';
-import { assert, assertStringIncludes } from 'jsr:@std/assert@^1';
+import { assert, assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
 import type { PluginEntry } from '@netscript/aspire/types';
 import { generateRegisterServices } from '../register/generate-register-services.ts';
 import { generateRegisterPlugins } from '../register/generate-register-plugins.ts';
@@ -125,6 +125,41 @@ describe('generateRegisterServices', () => {
       services: { users: fixtures.MINIMAL_SERVICE },
     });
     assertStringIncludes(output, "'--watch-hmr'");
+  });
+
+  it('should emit FFI permission only for SQLite-backed service commands', () => {
+    const engines = [undefined, 'Postgres', 'Mysql', 'Mssql', 'Sqlite'] as const;
+
+    for (const databaseEngine of engines) {
+      const output = generateRegisterServices({
+        ...emptyOptions,
+        services: { users: fixtures.MINIMAL_SERVICE },
+        databaseEngine,
+      });
+      const emittedFfiPermissions = output.match(/--allow-ffi/g)?.length ?? 0;
+
+      assertEquals(
+        emittedFfiPermissions,
+        databaseEngine === 'Sqlite' ? 1 : 0,
+        `${databaseEngine ?? 'none'} service permission set`,
+      );
+    }
+  });
+
+  it('should preserve explicit service permissions while requiring SQLite FFI once', () => {
+    const output = generateRegisterServices({
+      ...emptyOptions,
+      services: {
+        users: {
+          ...fixtures.MINIMAL_SERVICE,
+          Permissions: ['--allow-net', '--allow-ffi'],
+        },
+      },
+      databaseEngine: 'Sqlite',
+    });
+
+    assertStringIncludes(output, '["--allow-net","--allow-ffi"]');
+    assertEquals(output.match(/--allow-ffi/g)?.length, 1);
   });
 
   it('should wire primary database dependency for all services', () => {
