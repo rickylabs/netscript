@@ -128,3 +128,22 @@ Deno.test('canary release is a prerelease and can never become Latest', () => {
   assertEquals(payload.prerelease, true);
   assertEquals(payload.make_latest, 'false');
 });
+
+Deno.test('drift is scoped to the target train and still catches real divergence', () => {
+  // #1160: eleven canaries shipped before this surface existed. Comparing across trains made the
+  // gate unpassable — the first live canary (0.0.4-canary.1) failed on 0.0.1/0.0.2/0.0.3 versions
+  // that can never be labelled.
+  const older = ['0.0.3-canary.5', '0.0.2-canary.1'];
+  const clean = checkCanaryDrift(['canary:0.0.4-canary.1'], [...older, '0.0.4-canary.1'], '0.0.4');
+  assertEquals(clean.ok, true);
+  assertEquals(clean.publishedVersionsWithoutLabels, []);
+
+  // The guard must keep firing on the target train, in both directions.
+  const missing = checkCanaryDrift(['canary:0.0.4-canary.1'], [...older, '0.0.4-canary.1', '0.0.4-canary.2'], '0.0.4');
+  assertEquals(missing.ok, false);
+  assertEquals(missing.publishedVersionsWithoutLabels, ['0.0.4-canary.2']);
+
+  const orphan = checkCanaryDrift(['canary:0.0.4-canary.9'], ['0.0.4-canary.1'], '0.0.4');
+  assertEquals(orphan.ok, false);
+  assertEquals(orphan.labelsWithoutPublishedVersions, ['canary:0.0.4-canary.9']);
+});
