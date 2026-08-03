@@ -53,3 +53,16 @@
 - **Action:** accept
 - **Evidence:** Supervisor waiver dated 2026-08-03; prior canary evidence remains recorded and will
   not be rerun.
+
+## 2026-08-03 — Teardown discovery missed an owned Redis container
+
+- **What:** The teardown preview returned no containers for the slice's explicitly labelled Redis.
+- **Source:** `agentic:teardown` preview plus Docker inspection.
+- **Expected:** The teardown tool discovers the container from the worktree and owned-root inputs.
+- **Actual:** Inspection proved the exact named target through its worktree bind mount, project
+  label, resource label, and isolated port; the container and anonymous volume were removed with a
+  name-scoped Docker fallback. The subsequent leak check reports zero survivors.
+- **Severity:** minor
+- **Action:** accept
+- **Evidence:** `netscript-saga-1075-redis`, project `/home/codex/repos/ns004-sagas`, port 46379;
+  final leak report generated at 2026-08-03T07:43:51.975Z.

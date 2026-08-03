@@ -71,6 +71,7 @@ integration test.
 | 2026-08-03 | slice 2   | gate      | Default compensation and nested cascade passed; package suites passed 64 + 40 tests.           |
 | 2026-08-03 | slice 3   | implement | Extractor precedes explicit key and stable default; message id removed from identity.          |
 | 2026-08-03 | slice 3   | gate      | Concurrent split, same-key resume, and fallbacks passed; core suite passed 67 tests.           |
+| 2026-08-03 | aggregate | gate      | Root check, final Redis regression, scoped lint/fmt, publish dry-run, quality and arch passed.  |
 
 ## Decisions
 
@@ -105,6 +106,11 @@ integration test.
 | #1064 scoped format | PASS    | 139 files, 0 findings                                | Source TypeScript only.                                    |
 | `quality:scan`      | PASS    | `ok:true`, no findings                               | Existing allowance count 7.                                |
 | `arch:check`        | PASS    | all doctrine roots `FAIL=0`                          | Existing warnings only.                                    |
+| Root `check`        | PASS    | 2,512 files, 21 batches, 0 diagnostics               | Authoritative structured wrapper artifact.                 |
+| Aggregate lint     | PASS    | 215 files, 0 findings                                | Touched package/plugin TypeScript.                          |
+| Aggregate format   | PASS    | 215 files, 0 findings                                | Touched package/plugin TypeScript.                          |
+| Forbidden additions | PASS  | 0 `deno-lint-ignore`; 0 `as unknown as`              | Added TypeScript lines audited against base.                |
+| Lock hygiene       | PASS    | 0 `deno.lock` changes                                | Branch diff audited against base.                           |
 
 ### Runtime Gates
 
@@ -123,12 +129,14 @@ integration test.
 | #1066 focused           | PASS   | 6 passed, 0 failed                 | Concurrent workflows and distinct-id resume covered.       |
 | Saga-core #1066 suite   | PASS   | 67 passed, 0 failed                | Two unrelated integration tests ignored.                   |
 | #1066 scoped wrappers   | PASS   | 110 files, 0 diagnostics/findings  | Check, lint, and source format clean.                      |
+| Final real Redis        | PASS   | 4 passed, 0 failed                 | Combined-tree dead-port, list, save, and CAS regression.    |
 
 ### Consumer Gates
 
 | Consumer | Result | Evidence                        | Notes                                  |
 | -------- | ------ | ------------------------------- | -------------------------------------- |
 | Docs     | PASS   | 98 docs, 0 broken links/anchors | Capability content and tutorial agree. |
+| Plugin publish dry-run | PASS | `Success Dry run complete` | Existing dynamic-import warnings only. |
 
 ## Handoff Notes
 
