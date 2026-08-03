@@ -44,3 +44,9 @@ Append-only.
   observations, cited per claim). Demoting filed-issue observations (#1113, #1115) to
   "asserted/unproven" would be less accurate, not more honest — supervisor position, owner to
   ratify or overrule. **No merge: the owner's green-gate condition is unmet.**
+- 2026-08-03 · **owner ruled on both escalated forks ("approved", in-session)** — (1) D2 reads as
+  **orchestrated delivery**; #1153/#1155 are outside its scope — recorded as a comment and a box
+  annotation on #1120; D2 evidence box re-ticked with the ruling cited. (2) The wider
+  `[observed]` source-of-record definition is **ratified** (trace + filed issues + dated design
+  observations, cited per claim); no demotion. Cycle 3 steered on the same Sol thread to verify
+  `bf1f8456f` under the rulings; the standing merge-on-green directive resumes.
