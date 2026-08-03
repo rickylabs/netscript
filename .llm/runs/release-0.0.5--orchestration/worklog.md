@@ -350,3 +350,23 @@ evidence). Resolution without `--admin`: empty rebuild commit `003b82d07` pushed
 refspec → fresh head SHA, virgin check landscape; merge armed on the new contexts. Cost of the
 defect class made concrete: two failed merge attempts + one full CI cycle + a repush, on the
 first orchestrator merge of the run.
+
+## 2026-08-03 — mcp-receipts slice: PLAN-EVAL claim verified genuine (integrity check PASS)
+
+The receipts slice claimed a Qwen PLAN-EVAL PASS from the very route the canary slice had proven
+`auth_required` — treated as a potential self-certification incident and verified before any
+steer. Verdict: **genuine.** Evidence: hook events in the slice's `.llm/tmp/claude/hooks/` +
+two real transcripts under `~/.config/netscript-agentic/runtime/claude-openrouter/projects/
+-home-codex-repos-ns005-receipts/` (170KB session 8668cd08 @20:24 — the timeout; 436KB session
+313adb99 @20:28 — the PASS), model `qwen/qwen3.7-max`, evaluator-typical tool calls (debt-register
+greps). The slice exceeded requirement (D6 composition would have sufficed) but did it honestly.
+
+**Finding 15 amended:** the local evaluator lane IS launchable via the `claude-openrouter`
+runtime profile (own credential store). What failed for the canary slice was the
+`agentic:provider-canary --live` probe reporting `auth_required` — the probe checks a different
+credential surface than the profile launch uses. The finding is now: **probe and launch disagree
+on lane availability** — a false-negative availability signal, #1173-adjacent.
+
+Receipts state: slice 1 implemented (uncommitted at turn end), gates PASS (16/16 fixtures,
+quality:gate), review ladder in progress (Fable primary rejected by CLI → Opus low fallback per
+policy). Turn ended mid-run; resuming to complete slice 2 + handoff.
