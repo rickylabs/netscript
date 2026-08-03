@@ -134,7 +134,7 @@ aspire start       # boots Postgres + Redis + services, opens the dashboard
 ```
 
 {{ comp callout { type: "note", title: "Portable process handling for aspire start" } }}
-<code>aspire start</code> is a long-lived foreground process that orchestrates your infrastructure (Postgres, Redis, services) and must remain active. In interactive development or agent sessions, run <code>aspire start</code> in a dedicated terminal window, process manager, or separate agent background task so it stays running while subsequent workspace commands (such as <code>netscript db init</code>, <code>generate</code>, or <code>seed</code>) are executed from the workspace root in a separate session. Avoid relying on shell-specific syntax like <code>aspire start &amp;</code> as background process handling varies across operating systems and agent runners.
+<code>aspire start</code> starts the AppHost in the background and returns after the detached host is running. Keep that AppHost running while subsequent workspace commands (such as <code>netscript db init</code>, <code>generate</code>, or <code>seed</code>) are executed from the workspace root. Use <code>aspire stop</code> when you are finished.
 {{ /comp }}
 
 {{ comp callout { type: "note", title: "Prefer no orchestration?" } }}
