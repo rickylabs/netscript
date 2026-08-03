@@ -15,9 +15,19 @@ it to your Aspire AppHost. Topics are durable and replayable, so consumers that 
 restart mid-stream catch up instead of missing events.
 
 The plugin is deliberately self-contained: it needs neither Postgres nor Deno KV, so it installs
-without provisioning any database. The producer and schema primitives live in
-[`@netscript/plugin-streams-core`](https://jsr.io/@netscript/plugin-streams-core) — this package
-wires the streams service into a NetScript host.
+without provisioning any database.
+
+> **Durability is opt-in.** The scaffolded service reads `STREAMS_DATA_DIR`. When it is **unset —
+> which is the default the scaffold installs — the service stores events in memory only**, so they
+> do not survive a restart. Set `STREAMS_DATA_DIR=<path>` to switch to file-backed storage. The
+> service logs a warning at startup whenever it comes up non-durable. "Durable and replayable" above
+> describes the topic model; it holds once storage is file-backed.
+>
+> Note also that the framework prepends `/v1/stream/netscript` to the configured `streamPath`:
+> `streamPath: '/workers/executions'` resolves to `<base>/v1/stream/netscript/workers/executions`.
+> Calling the configured path verbatim returns 404. The producer and schema primitives live in
+> [`@netscript/plugin-streams-core`](https://jsr.io/@netscript/plugin-streams-core) — this package
+> wires the streams service into a NetScript host.
 
 ## Why teams use it
 

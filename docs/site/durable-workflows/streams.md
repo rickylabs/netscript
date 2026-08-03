@@ -285,6 +285,19 @@ diagnostic report for a schema (handy in tests and CLI doctors).
   ]
 }) }}
 
+### Resolved stream URLs
+
+When configuring `streamPath` (e.g. `streamPath: '/workers/executions'`), the framework automatically prepends `STREAMS_URL_PREFIX = '/v1/stream/netscript'` inside `buildStreamUrl`.
+
+Concrete example:
+- `streamPath`: `'/workers/executions'`
+- `baseUrl`: `'https://streams.example.test'`
+- Resolved endpoint: `'https://streams.example.test/v1/stream/netscript/workers/executions'`
+
+{{ comp callout { type: "warning", title: "Storage durability — in-memory by default" } }}
+When <code>STREAMS_DATA_DIR</code> is unset, the streams service uses <strong>in-memory, non-durable storage</strong> — stream event data will be lost when the process restarts. Set <code>STREAMS_DATA_DIR=&lt;path&gt;</code> to enable file-backed durable storage.
+{{ /comp }}
+
 ## Known limitations
 
 Be deliberate about what the alpha producer does and does not guarantee.

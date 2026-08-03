@@ -14,6 +14,8 @@
  * ```ts
  * import { createStreamProducer } from '@netscript/sdk/streams';
  *
+ * // Note: framework prepends STREAMS_URL_PREFIX ('/v1/stream/netscript');
+ * // '/user/chat-room-1' resolves to '<base>/v1/stream/netscript/user/chat-room-1'.
  * const producer = createStreamProducer({
  *   streamPath: '/user/chat-room-1',
  *   schema: chatStreamSchema,
