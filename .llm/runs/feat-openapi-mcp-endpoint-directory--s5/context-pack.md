@@ -25,14 +25,16 @@ guidance is binding. No implementation exists yet.
 
 ## In Progress
 
-- Launch attached Codex implementation lane for slices 1–3.
+- Launch the attached Codex implementation lane for slices 1–3 from the run-owned staging
+  worktree. The provided PR worktree remains owned by this Desktop supervisor session.
 
 ## Next Steps
 
-1. Commit/push bootstrap and open the draft PR with plan-phase evidence.
-2. Launch the canonical complex implementation route through `.llm/tools/agentic/`.
-3. Review each landed slice, run gates, push/comment, and reconcile GitHub state.
-4. Trigger composed final evaluation surfaces and prepare close-gate evidence.
+1. Launch the canonical complex implementation route through `.llm/tools/agentic/` in the
+   run-owned staging worktree.
+2. Review each landed slice, fast-forward the provided PR worktree, run gates, and reconcile
+   GitHub state.
+3. Trigger composed final evaluation surfaces and prepare close-gate evidence.
 
 ## Key Decisions
 
@@ -69,4 +71,3 @@ guidance is binding. No implementation exists yet.
 ## Commits
 
 - See the draft PR's commit list + per-slice PR comments.
-

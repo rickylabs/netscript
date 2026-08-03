@@ -2,6 +2,19 @@
 
 Drift is append-only.
 
+## 2026-08-04 — Attached implementation uses a run-owned staging worktree
+
+- **What:** The canonical implementation lane runs in `/home/codex/repos/ns005-s5-impl` on local
+  branch `agent/openapi-mcp-endpoint-directory-s5`, then pushes each slice to the required PR ref.
+- **Source:** The agentic sender registry refused a rival sender because the provided worktree is
+  durably owned by the live Desktop supervisor thread.
+- **Expected:** The implementation lane would attach directly to the provided PR worktree.
+- **Actual:** A separate run-owned worktree preserves the one-sender invariant; the PR branch,
+  explicit push refspec, commit order, and review surface remain unchanged.
+- **Severity:** minor
+- **Action:** accept
+- **Evidence:** agentic launcher `duplicate_sender_risk`; implementation brief path/branch contract.
+
 ## 2026-08-04 — Milestone evaluator composition replaces local formal PLAN-EVAL
 
 - **What:** No local formal PLAN-EVAL is launched; the plan gate is recorded as composed waiver.
@@ -34,4 +47,3 @@ Drift is append-only.
 - **Severity:** significant
 - **Action:** fix
 - **Evidence:** `research.md` finding 8/open-question resolution; `plan.md` D4.
-

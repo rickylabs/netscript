@@ -2,8 +2,11 @@ use harness
 
 # Implementation Brief: OMB S5 ServiceEndpointDirectoryPort + adapters — #1131
 
-You are the attached implementation lane. Work only in
-`/home/codex/repos/ns005-s5` on branch `feat/openapi-mcp-endpoint-directory`.
+You are the attached implementation lane. Work only in the run-owned staging worktree
+`/home/codex/repos/ns005-s5-impl` on local branch
+`agent/openapi-mcp-endpoint-directory-s5`. The PR branch remains
+`feat/openapi-mcp-endpoint-directory`; every slice must push to that exact remote ref using the
+explicit refspec below. Do not switch either worktree's branch or launch another sender.
 
 ## SKILL
 
@@ -59,4 +62,3 @@ Implement the three Design slices in order. After each:
 Do not mark the PR ready, add `Closes #1131`, tick final DoD boxes, trigger evaluation, or merge.
 Those remain supervisor authority. Stop with a concise handoff after slice 3 gates, or write
 `BLOCKED: <reason>` if a locked decision cannot be implemented without rescope.
-

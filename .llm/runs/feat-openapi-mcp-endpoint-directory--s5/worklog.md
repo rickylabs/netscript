@@ -79,6 +79,7 @@ never import an infrastructure adapter from a consumer flow.
 | --- | --- | --- | --- |
 | 2026-08-04 | bootstrap | research/design/plan lock | Issue/RFC/P1/P3/doctrine/Aspire/JSR baselines read; clean baseline confirmed. |
 | 2026-08-04 | Plan Gate | composed per milestone-run.md (orchestrator waiver) | Owner/orchestrator directive: no local formal PLAN-EVAL; plan locked for same-run implementation. |
+| 2026-08-04 | implementation dispatch | sender ownership reconciled | The provided PR worktree is durably owned by this Desktop supervisor thread; implementation uses a run-owned staging worktree and pushes each commit to the exact PR refspec. |
 
 ## Decisions
 
@@ -105,4 +106,3 @@ and package publish dry-run both passed before implementation; see `research.md`
 
 - Implement against locked decisions D1–D9; do not import S4.
 - The fixture matrices and timeout negative case are the decisive #1131 evidence.
-
