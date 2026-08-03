@@ -41,6 +41,9 @@ interface DbOperationRunnerOptions {
   readonly pollIntervalMs?: number;
   readonly timeoutMs?: number;
   readonly sleep?: (ms: number) => Promise<void>;
+  readonly writeOperationRequest?: (path: string, env: Record<string, string>) => Promise<void>;
+  readonly removeOperationRequest?: (path: string) => Promise<void>;
+  readonly ensureProcessStopped?: (pid: number) => Promise<void>;
 }
 
 /** Executes database operations by delegating to Aspire AppHost CLI mode. */
@@ -50,6 +53,9 @@ export class DbOperationRunner {
   private readonly pollIntervalMs: number;
   private readonly timeoutMs: number;
   private readonly sleep: (ms: number) => Promise<void>;
+  private readonly writeOperationRequest: (path: string, env: Record<string, string>) => Promise<void>;
+  private readonly removeOperationRequest: (path: string) => Promise<void>;
+  private readonly ensureProcessStopped: (pid: number) => Promise<void>;
 
   constructor(options: DbOperationRunnerOptions = {}) {
     this.executor = options.executor ?? new DenoAspireCommandExecutor();
@@ -58,6 +64,16 @@ export class DbOperationRunner {
     this.timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS;
     this.sleep = options.sleep ??
       ((ms: number) => new Promise((resolve) => setTimeout(resolve, ms)));
+    this.writeOperationRequest = options.writeOperationRequest ??
+      ((path, env) => Deno.writeTextFile(path, JSON.stringify(env)));
+    this.removeOperationRequest = options.removeOperationRequest ?? (async (path) => {
+      try {
+        await Deno.remove(path);
+      } catch (error) {
+        if (!(error instanceof Deno.errors.NotFound)) throw error;
+      }
+    });
+    this.ensureProcessStopped = options.ensureProcessStopped ?? ensureProcessStopped;
   }
 
   /**
@@ -87,7 +103,7 @@ export class DbOperationRunner {
     database: DiscoveredDatabase,
   ): Promise<number> {
     const aspireDir = join(request.projectRoot, SCAFFOLD_DIRS.ASPIRE_TS);
-    const apphostPath = join(aspireDir, SCAFFOLD_FILES.APPHOST_MTS);
+    const residentAppHostPath = join(aspireDir, SCAFFOLD_FILES.APPHOST_MTS);
     const env = buildDbCliEnv(
       request.operation,
       database.configKey,
@@ -95,13 +111,18 @@ export class DbOperationRunner {
     );
 
     if (request.operation === 'studio') {
-      return await this.executeInteractive(apphostPath, aspireDir, env);
+      return await this.executeInteractive(residentAppHostPath, aspireDir, env);
     }
+
+    const operationAppHostPath = join(
+      aspireDir,
+      SCAFFOLD_FILES.DB_OPERATION_APPHOST_MTS,
+    );
 
     return await this.executeDetached(
       request.operation,
       database.configKey,
-      apphostPath,
+      operationAppHostPath,
       aspireDir,
       env,
     );
@@ -132,6 +153,7 @@ export class DbOperationRunner {
     env: Record<string, string>,
   ): Promise<number> {
     const displayName = buildExecutableDisplayName(operation, configKey);
+    const operationRequestPath = join(apphostPath, '..', '.netscript-db-operation.json');
     outputText(`Starting db ${operation} for ${configKey}...`);
     const lease = await this.lifecycleLock.acquire(apphostPath, {
       timeoutMs: this.timeoutMs,
@@ -140,12 +162,14 @@ export class DbOperationRunner {
     });
 
     try {
+      await this.writeOperationRequest(operationRequestPath, env);
       const startedByInvocation = !(await this.hasRunningAppHost(apphostPath, aspireDir));
 
-      await this.runAspire(
+      const start = await this.runAspire(
         buildAspireArgs('start', apphostPath),
         { cwd: aspireDir, env },
       );
+      const startedPid = readStartedAppHostPid(start.stdout);
 
       try {
         const code = await this.waitForExecutableCompletion(
@@ -166,10 +190,11 @@ export class DbOperationRunner {
         return code;
       } finally {
         if (startedByInvocation) {
-          await this.stopDetached(apphostPath, aspireDir);
+          await this.stopDetached(apphostPath, aspireDir, startedPid);
         }
       }
     } finally {
+      await this.removeOperationRequest(operationRequestPath);
       await this.releaseLease(lease, apphostPath);
     }
   }
@@ -291,7 +316,11 @@ export class DbOperationRunner {
     return output;
   }
 
-  private async stopDetached(apphostPath: string, aspireDir: string): Promise<void> {
+  private async stopDetached(
+    apphostPath: string,
+    aspireDir: string,
+    startedPid: number | undefined,
+  ): Promise<void> {
     const output = await this.executor.output(
       ['stop', '--apphost', apphostPath, '--non-interactive', '--nologo'],
       { cwd: aspireDir },
@@ -303,5 +332,42 @@ export class DbOperationRunner {
         }`,
       );
     }
+    if (startedPid !== undefined) {
+      await this.ensureProcessStopped(startedPid);
+    }
+  }
+}
+
+function readStartedAppHostPid(stdout: string): number | undefined {
+  const start = stdout.indexOf('{');
+  if (start < 0) return undefined;
+  try {
+    const value = JSON.parse(stdout.slice(start)) as { appHostPid?: unknown };
+    return typeof value.appHostPid === 'number' && Number.isSafeInteger(value.appHostPid) &&
+        value.appHostPid > 0
+      ? value.appHostPid
+      : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+async function ensureProcessStopped(pid: number): Promise<void> {
+  if (!processIsAlive(pid)) return;
+  Deno.kill(pid, 'SIGTERM');
+  for (let attempt = 0; attempt < 50; attempt++) {
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    if (!processIsAlive(pid)) return;
+  }
+  Deno.kill(pid, 'SIGKILL');
+}
+
+function processIsAlive(pid: number): boolean {
+  try {
+    Deno.kill(pid, 0);
+    return true;
+  } catch (error) {
+    if (error instanceof Deno.errors.NotFound) return false;
+    throw error;
   }
 }

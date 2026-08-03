@@ -272,6 +272,26 @@ Deno.test('plugin doctor reports a running but unhealthy AppHost resource', asyn
   assertStringIncludes(check?.message ?? '', 'Unhealthy');
 });
 
+Deno.test('plugin doctor does not certify healthy without readiness evidence', async () => {
+  const reports = await doctorPlugin({ projectRoot: '/workspace' }, {
+    fs: new MemoryFileSystemAdapter(),
+    loadConfig: () => Promise.resolve(configWithResources()),
+    inspectAppHost: {
+      inspect: () => Promise.resolve({
+        status: 'running',
+        resources: [
+          { name: 'api', state: 'Running', healthStatus: 'Healthy', healthReports: [] },
+          { name: 'web', state: 'Running', healthStatus: 'Healthy', healthReports: [{}] },
+          { name: 'main-db', state: 'Running', healthStatus: 'Healthy', healthReports: [{}] },
+        ],
+      }),
+    },
+  });
+  const check = reports[0].checks.find((candidate) => candidate.id === 'apphost:resource:api');
+  assertEquals(check?.status, 'warning');
+  assertStringIncludes(check?.message ?? '', 'no readiness evidence');
+});
+
 Deno.test('plugin doctor maps realistic database config names without inventing section resources', async () => {
   const reports = await doctorPlugin({ projectRoot: '/workspace' }, {
     fs: new MemoryFileSystemAdapter(),
@@ -280,9 +300,9 @@ Deno.test('plugin doctor maps realistic database config names without inventing 
       inspect: () => Promise.resolve({
         status: 'running',
         resources: [
-          { name: 'api', state: 'Running', healthStatus: 'Healthy' },
-          { name: 'web', state: 'Running', healthStatus: 'Healthy' },
-          { name: 'main-db', state: 'Running', healthStatus: 'Healthy' },
+          { name: 'api', state: 'Running', healthStatus: 'Healthy', healthReports: [{}] },
+          { name: 'web', state: 'Running', healthStatus: 'Healthy', healthReports: [{}] },
+          { name: 'main-db', state: 'Running', healthStatus: 'Healthy', healthReports: [{}] },
         ],
       }),
     },

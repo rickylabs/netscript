@@ -91,7 +91,15 @@ export function generateRegisterInfrastructure(
     // resolved resource — otherwise the runtime rejects with
     // "Argument 'source' is a Promise-like value". So we `await` the entire
     // chain here.
-    if (entry.Engine === 'Mssql') {
+    if (entry.Engine === 'Postgres' || entry.Engine === 'Mysql') {
+      lines.push(`  const ${id}_password = await builder.addParameter('${name}-password', {`)
+      lines.push(`    value: ensureDatabasePassword(appHostDir, '${name}'),`)
+      lines.push(`    secret: true,`)
+      lines.push(`  });`)
+      lines.push(`  const ${id}_server = await builder.${method}('${name}', {`)
+      lines.push(`    password: ${id}_password,`)
+      lines.push(`  })`)
+    } else if (entry.Engine === 'Mssql') {
       lines.push(
         `  const ${id}_password = await builder.addParameter('${name}-password', {`,
       )

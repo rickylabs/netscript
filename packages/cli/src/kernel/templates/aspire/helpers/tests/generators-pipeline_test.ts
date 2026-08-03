@@ -8,10 +8,10 @@ import { generateHelpers, HelpersGeneratorPipeline } from '../helpers-generator-
 import * as fixtures from './generators-test-support.ts';
 
 describe('HelpersGeneratorPipeline', () => {
-  it('should generate all 12 files with apphost enabled (default)', async () => {
+  it('should generate all AppHost project files when enabled', async () => {
     const pipeline = new HelpersGeneratorPipeline();
     const files = await pipeline.execute({ config: fixtures.POPULATED_CONFIG });
-    assertEquals(files.length, 13);
+    assertEquals(files.length, 28);
   });
 
   it('should generate 11 files without apphost', async () => {
@@ -90,6 +90,21 @@ describe('HelpersGeneratorPipeline', () => {
       !paths.includes('.helpers/apphost.mts'),
       'apphost.mts should NOT be inside .helpers/',
     );
+  });
+
+  it('should include an independently targetable DB-operation AppHost entry', async () => {
+    const files = await generateHelpers({ config: fixtures.POPULATED_CONFIG });
+    const dbAppHost = files.find((file) => file.path === 'db-operation/apphost.mts');
+
+    assert(dbAppHost, 'should include a distinct DB-operation Aspire project');
+    assertStringIncludes(dbAppHost.content, 'createNetScriptAppHost');
+    assertStringIncludes(dbAppHost.content, "'../../appsettings.json'");
+    assertStringIncludes(dbAppHost.content, "from './.aspire/modules/aspire.mts'");
+    assertStringIncludes(dbAppHost.content, "from './.helpers/index.mts'");
+    assertStringIncludes(dbAppHost.content, '.netscript-db-operation.json');
+    assert(files.some((file) => file.path === 'db-operation/aspire.config.json'));
+    assert(files.some((file) => file.path === 'db-operation/tsconfig.apphost.json'));
+    assert(files.some((file) => file.path === 'db-operation/.helpers/index.mts'));
   });
 
   it('should not include apphost.mts when generateAppHost is false', async () => {
@@ -223,7 +238,8 @@ describe('HelpersGeneratorPipeline', () => {
       (f) => f.path === '.helpers/register-infrastructure.mts',
     );
     assert(regInfra, 'register-infrastructure.mts should exist');
-    assertStringIncludes(regInfra!.content, "builder.addPostgres('main')");
+    assertStringIncludes(regInfra!.content, "builder.addPostgres('main', {");
+    assertStringIncludes(regInfra!.content, "ensureDatabasePassword(appHostDir, 'main')");
 
     // Register plugins should include our plugin
     const regPlugins = files.find(
@@ -254,7 +270,7 @@ describe('HelpersGeneratorPipeline', () => {
   it('should handle empty config producing valid no-op output', async () => {
     const pipeline = new HelpersGeneratorPipeline();
     const files = await pipeline.execute({ config: fixtures.EMPTY_CONFIG });
-    assertEquals(files.length, 13);
+    assertEquals(files.length, 28);
 
     const regServices = files.find(
       (f) => f.path === '.helpers/register-services.mts',
@@ -287,7 +303,7 @@ describe('HelpersGeneratorPipeline', () => {
 describe('generateHelpers', () => {
   it('should return the same file count as pipeline.execute()', async () => {
     const files = await generateHelpers({ config: fixtures.POPULATED_CONFIG });
-    assertEquals(files.length, 13);
+    assertEquals(files.length, 28);
   });
 
   it('should support generateAppHost: false', async () => {

@@ -32,13 +32,23 @@ Deno.test('AppHost doctor inspector returns named resource state from the matchi
       status: 'Running',
     }])),
     ok(JSON.stringify({
-      resources: [{ displayName: 'api', state: 'Running', healthStatus: 'Unhealthy' }],
+      resources: [{
+        displayName: 'api',
+        state: 'Running',
+        healthStatus: 'Unhealthy',
+        healthReports: { http: { status: 'Unhealthy' } },
+      }],
     })),
   ]);
   const result = await new AspireAppHostDoctorInspector(process).inspect('/workspace');
   assertEquals(result, {
     status: 'running',
-    resources: [{ name: 'api', state: 'Running', healthStatus: 'Unhealthy' }],
+    resources: [{
+      name: 'api',
+      state: 'Running',
+      healthStatus: 'Unhealthy',
+      healthReports: { http: { status: 'Unhealthy' } },
+    }],
   });
   assertEquals(process.commands.map((command) => command.args[0]), ['ps', 'describe']);
 });

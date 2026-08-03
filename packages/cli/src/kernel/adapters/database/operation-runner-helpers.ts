@@ -55,10 +55,14 @@ function resolveAspireCliStartTimeout(): string {
 export function buildAspireArgs(
   command: 'run' | 'start',
   apphostPath: string,
+  options: { readonly isolated?: boolean } = {},
 ): string[] {
   const args = [command, '--apphost', apphostPath];
   if (command === 'start') {
     args.push('--format', 'Json', '--non-interactive');
+    if (options.isolated) {
+      args.push('--isolated');
+    }
   }
   args.push('--nologo');
   return args;
