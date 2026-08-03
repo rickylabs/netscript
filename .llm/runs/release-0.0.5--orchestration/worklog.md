@@ -241,3 +241,16 @@ was in evaluation. Recorded as re-planning event R1 in `cut-trace.md` with a cle
 Dispatching four attached Codex slices (briefs under `slices/`, worktrees off `fb75cf6fc`):
 `proofs` (#1127 #1128 #1129, Sol·high), `canary-payload` (#1166 `Refs`, Sol·medium),
 `mcp-receipts` (#1134, Sol·medium), `close-gate` (#1171 #1105, Sol·medium).
+
+**Dispatch incident (finding 13 + live #1173 evidence):** all four first launches refused at
+git-safety — `git worktree add -b <branch> origin/main` sets an upstream, and push-safety
+requires NONE — **and every refusal exited 0**, caught only by the artifact check (no
+`codex-thread-ids.md` written). This is a live reproduction of the #1173 defect class
+(`no refusal exits 0`) in `launch-codex-slice.ts` itself; quoted into #1173's evidence when its
+slice dispatches. Upstreams cleared (`git branch --unset-upstream` ×4), all four relaunched.
+
+13. **[launcher-refusal-exit-0]** `launch-codex-slice` git-safety refusal exits 0 with a JSON
+    `ok:false` line — a supervisor watching exit codes dispatches nothing and believes
+    otherwise. Also: the launcher help documents no `--json`/exit-code contract for refusals;
+    the orchestrator's defense was the thread-id artifact check, which should be named in the
+    skill/profile as the mandatory post-dispatch verification.
