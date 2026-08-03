@@ -1,6 +1,6 @@
-# Implementation Prompt: OMB wave-0 proofs
-
 use harness
+
+# Implementation Prompt: OMB wave-0 proofs
 
 ## SKILL
 

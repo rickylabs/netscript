@@ -81,3 +81,15 @@ Drift is append-only.
 - **Action:** accept for this proof run and retain both failed-attempt evidence and the successful
   separate-session verdict. Do not modify agentic runtime product code in this slice.
 - **Evidence:** first outcome `timedOut=true`; successful retry outcome exit 0; `plan-eval.md`.
+
+## 2026-08-03 — Implementation brief activation line reordered
+
+- **What:** The committed implementation brief contained `use harness` after its Markdown title; the
+  agentic launcher requires that exact activation text on the first line.
+- **Source:** `agentic:launch-codex-slice --dry-run` brief-contract validation.
+- **Expected:** The launcher accepts the committed brief before any child turn is sent.
+- **Actual:** Dry-run failed closed and launched nothing.
+- **Severity:** minor.
+- **Action:** move `use harness` to line 1 without changing assignment content; reformat, commit,
+  and repeat dry-run before live launch.
+- **Evidence:** dry-run diagnostic `must begin with use harness`.
