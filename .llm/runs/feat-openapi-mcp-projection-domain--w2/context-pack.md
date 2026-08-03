@@ -14,7 +14,7 @@
 
 The branch began as a clean exact child of current `origin/main`. Live issue/RFC and the complete P2
 no-DB proof/evidence have been consumed. The plan and Design checkpoint are locked. Formal local
-PLAN-EVAL is intentionally composed/waived by the milestone-run rule. Slices 1–2 are implemented,
+PLAN-EVAL is intentionally composed/waived by the milestone-run rule. Slices 1–3 are implemented,
 reviewed, committed/pending sign-off as applicable, and focused-green in the milestone
 orchestrator's already-owned single Codex sender.
 
@@ -29,12 +29,12 @@ orchestrator's already-owned single Codex sender.
 
 ## In Progress
 
-- Supervisor Slice 2 sign-off, commit, explicit-refspec push, and PR evidence comment.
+- Supervisor Slice 3 sign-off, commit, explicit-refspec push, and PR evidence comment.
 
 ## Next Steps
 
-1. Sign off and push Slice 2.
-2. Implement/review Slices 3–4 at stopped checkpoints.
+1. Sign off and push Slice 3.
+2. Implement/review Slice 4 at its stopped checkpoint.
 3. Run the full Slice 5 merge-readiness gates and composed independent evaluation.
 
 ## Key Decisions
@@ -57,6 +57,9 @@ orchestrator's already-owned single Codex sender.
 | `packages/mcp/tests/operation-index_test.ts` | new | Public-consumer index contract tests. |
 | `packages/mcp/src/domain/openapi/canonical-identity.ts` | new | Exact refusal-first operation resolution. |
 | `packages/mcp/tests/{canonical-identity_test.ts,fixtures/openapi/identity-ambiguity.json}` | new | Case-variant, duplicate-id, and fuzzy-suggestion evidence. |
+| `packages/mcp/src/domain/openapi/description-ladder.ts` | new | Deterministic four-rung single-line description policy. |
+| `packages/mcp/tests/description-ladder_test.ts` | new | Per-rung and real-generated-spec assertions. |
+| `packages/mcp/tests/fixtures/openapi/{description-ladder,no-db-generated-openapi}.json` | new | Synthetic rung corpus plus byte-identical committed P2 no-DB spec. |
 | `packages/mcp/{deno.json,README.md}` | modified | Export/check surface and domain-subpath documentation. |
 
 ## Gates
