@@ -161,6 +161,26 @@ const authProvider: PluginKindProvider = {
 };
 
 describe('public install plugin flow', () => {
+  for (
+    const [pluginName, forbiddenSample, requiredGlue] of [
+      ['workers', 'workers/jobs/health-check.ts', 'workers/runtime.ts'],
+      ['sagas', 'sagas/user-registration-saga.ts', 'sagas/runtime.ts'],
+      ['triggers', 'triggers/daily-maintenance.ts', 'triggers/runtime.ts'],
+      ['streams', 'streams/notifications-stream.ts', 'streams/mod.ts'],
+    ] as const
+  ) {
+    it(`threads includeSamples false into the ${pluginName} scaffolder`, async () => {
+      const projectRoot = await Deno.makeTempDir();
+      try {
+        await installOfficialPluginWithoutSamples(projectRoot, pluginName);
+        assertEquals(await pathExists(join(projectRoot, requiredGlue)), true);
+        assertEquals(await pathExists(join(projectRoot, forbiddenSample)), false);
+      } finally {
+        await Deno.remove(projectRoot, { recursive: true });
+      }
+    });
+  }
+
   it('plans a starter plugin request from project metadata', async () => {
     const fs = new MemoryFileSystemAdapter();
     await writeProjectFiles(fs);
@@ -1314,6 +1334,47 @@ async function installOfficialPlugins(
     NetScript: PluginEntriesSnapshot;
   };
   return appsettings.NetScript;
+}
+
+async function installOfficialPluginWithoutSamples(
+  projectRoot: string,
+  pluginName: 'workers' | 'sagas' | 'triggers' | 'streams',
+): Promise<void> {
+  await writeRealProjectFiles(projectRoot);
+  const fs = new DenoFileSystem();
+  const templateAdapter = new StringTemplateAdapter(fs);
+  const scaffolder = new Scaffolder(templateAdapter, fs);
+  await installPlugin({
+    kind: pluginName,
+    pluginName,
+    serviceReferences: [],
+    pluginReferences: [],
+    noDb: true,
+    includeSamples: false,
+    localPath: repoPath(`plugins/${pluginName}`),
+    projectRoot,
+    overwrite: false,
+    ...(pluginName === 'sagas' ? { sagaStoreBackend: 'kv' as const } : {}),
+  }, {
+    fs,
+    scaffolder,
+    templateAdapter,
+    registry: new PluginKindRegistry(),
+    registryScaffolder: new PluginRegistryScaffolder(scaffolder),
+    workspaceMutator: new PluginWorkspaceMutator(fs),
+    processRunner: new DenoProcess(),
+    regenerateHelpers: () => Promise.resolve([]),
+  });
+}
+
+async function pathExists(path: string): Promise<boolean> {
+  try {
+    await Deno.stat(path);
+    return true;
+  } catch (error) {
+    if (error instanceof Deno.errors.NotFound) return false;
+    throw error;
+  }
 }
 
 async function assertFalseExists(path: string): Promise<void> {
