@@ -12,9 +12,9 @@
 
 ## Current State
 
-Research and Design are complete against clean `origin/main` at `0b05217cc`. The canonical
-separate-session PLAN-EVAL route could not start. The owner explicitly waived that gate under
-#1087's safety precedent and authorized immediate implementation; no PLAN-EVAL PASS is claimed.
+Research and Design are complete against clean `origin/main` at `0b05217cc`. The owner explicitly
+waived the blocked PLAN-EVAL under #1087's safety precedent. Slice 1 is implemented; its first
+opposite-family review returned two blockers, now fixed and awaiting gate/review confirmation.
 
 ## Completed
 
@@ -25,7 +25,7 @@ separate-session PLAN-EVAL route could not start. The owner explicitly waived th
 
 ## In Progress
 
-- Slice 1: machine-readable canary identity.
+- Slice 1 reviewer findings fixed; rerun gates/review, then supervisor sign-off commit.
 
 ## Next Steps
 
@@ -47,13 +47,17 @@ separate-session PLAN-EVAL route could not start. The owner explicitly waived th
 | Path | Status | Notes |
 | --- | --- | --- |
 | `.llm/runs/feat-canary-label-surface--1121/*` | new | Plan/design bootstrap only. |
+| `.llm/tools/release/canary.ts` | changed | Emits resolver-owned JSON identity; shares ref-name construction. |
+| `.llm/tools/release/canary_test.ts` | changed | Covers parse/result identity. |
+| `.github/workflows/release-canary.yml` | changed | Consumes JSON with fail-closed extraction. |
+| `.llm/tools/release/release-canary-workflow_test.ts` | changed | Pins artifact consumption and bans `deno.json` in the cut step. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | NOT_RUN | implementation not authorized until PLAN-EVAL |
-| Fitness | NOT_RUN | focused proof planned |
+| Static | PASS (slice 1) | focused tests 15/15; non-empty 32-file check/lint/fmt wrapper artifacts |
+| Fitness | PASS (slice 1 identity) | workflow cut step has no `deno.json`; JSON version is resolved canary |
 | Runtime | NOT_RUN | live canaries external |
 | Consumer | NOT_RUN | workflow test planned |
 
@@ -64,7 +68,8 @@ separate-session PLAN-EVAL route could not start. The owner explicitly waived th
 ## Drift and Debt
 
 - Drift: sibling-checkout trace location; Codex entry supervisor route; formal evaluator credential
-  unavailable and owner-waived under #1087.
+  unavailable and owner-waived under #1087; ordinary-review configured model id unavailable, with
+  native `opus` resolving to Claude Opus 5.
 - Debt: none.
 
 ## Commits

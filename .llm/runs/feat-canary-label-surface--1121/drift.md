@@ -58,3 +58,17 @@ Drift is append-only.
   blocked evaluator as having passed.
 - **Evidence:** this drift entry, the owner message, and the PR #1122 phase trail. Same stated waiver
   precedent: PRs #1075, #1088, and #1091.
+
+## 2026-08-03 — Ordinary-review model alias fallback
+
+- **What:** The configured native review model id `opus-4.8` returned `model_not_found`; the native
+  subscription's supported `opus` alias resolved to Claude Opus 5.
+- **Source:** two `claude-print` launches; first produced no review, second reported model
+  `claude-opus-5` and session `e10ff8f5-dfb4-4036-9b2d-62b51e1b06ce`.
+- **Expected:** `review_codex_light` primary from lane policy.
+- **Actual:** same Anthropic subscription and opposite family, supported Opus alias, high effort;
+  no OpenRouter transport or paid-key fallback.
+- **Severity:** minor routing drift.
+- **Action:** accept for this urgent slice and record the observed identity; do not edit volatile
+  model configuration in this PR.
+- **Evidence:** `review-s1.md` and Claude session output.

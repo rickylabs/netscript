@@ -68,6 +68,9 @@ post-publish step in `.github/workflows/release-canary.yml`.
 | 2026-08-03 | plan | design | Locked two thin implementation slices and explicit external live-cut dependency. |
 | 2026-08-03 | plan-eval | launch blocked | Canonical Qwen route resolved, but approved child credential injection returned `auth_required`; no evaluator/model turn ran. |
 | 2026-08-03 | plan-eval | owner waiver | Owner waived the blocked gate on-record under #1087's evaluator-helper safety finding and directed implementation now. |
+| 2026-08-03 | slice 1 | implementation | Added resolver-owned JSON identity and replaced workflow manifest inference with artifact consumption. |
+| 2026-08-03 | slice 1 | gates | Focused tests 15/15 PASS; release-tool check/lint/fmt wrappers selected 32 files with zero diagnostics/findings. |
+| 2026-08-03 | slice 1 | opposite-family review | Native Claude Opus 5 requested changes: stale run evidence and non-failing inline `jq` substitutions; both fixed before sign-off. |
 
 ## Decisions
 
@@ -91,12 +94,17 @@ post-publish step in `.github/workflows/release-canary.yml`.
 | Gate | Command or check | Result | Notes |
 | --- | --- | --- | --- |
 | PLAN-EVAL | separate local open-model evaluator | NOT_RUN / WAIVED | Launch blocked before model start. Owner explicitly waived the gate under #1087; no PASS is claimed. |
+| Slice 1 focused tests | focused canary + workflow tests | PASS | 15 passed, 0 failed. |
+| Release-tool check | scoped check wrapper over `.llm/tools/release` | PASS | 32 files selected; 0 failed batches/diagnostics. |
+| Release-tool lint | scoped lint wrapper over `.llm/tools/release` | PASS | 32 files selected; exit 0; 0 diagnostics. |
+| Release-tool format | scoped fmt wrapper over `.llm/tools/release` | PASS | 32 files selected; 0 failed batches/findings after scoped formatting. |
 
 ### Fitness Gates
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| Identity/payload/drift proof | NOT_RUN | implementation tests planned | No implementation exists yet. |
+| Slice 1 identity proof | PASS | focused test + workflow cut-step assertion | JSON reports `0.0.4-canary.1`; cut step contains no `deno.json` reference. |
+| Payload/drift proof | NOT_RUN | slice 2 | Not implemented yet. |
 
 ### Runtime Gates
 
@@ -108,13 +116,15 @@ post-publish step in `.github/workflows/release-canary.yml`.
 
 | Consumer | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| `release-canary.yml` | NOT_RUN | workflow tests planned | Consumes JSON result and post-publish label tool. |
+| `release-canary.yml` identity | PASS | workflow test | Consumes JSON result; assignment-form `jq -e` plus null/non-empty guards fail closed. |
 
 ## Handoff Notes
 
 - PLAN-EVAL should inspect L3/L4/L5 closely: coordinated publish marker, target drift scope, and
   content-point selection are the load-bearing decisions.
-- No implementation file has been changed before PLAN-EVAL.
+- Implementation began only after the owner's recorded Plan-Gate waiver.
 - The first canonical evaluator launch was blocked before a session existed; do not treat route
   validation or provider-canary output as a verdict.
 - Implementation is authorized by the owner's written waiver, not by evaluator evidence.
+- Slice 1 reviewer session `e10ff8f5-dfb4-4036-9b2d-62b51e1b06ce` resolved native `opus` to
+  Claude Opus 5 and wrote `review-s1.md`; configured literal `opus-4.8` was unavailable.

@@ -58,17 +58,22 @@ jobs:
         if: inputs.republish-version == ''
         env:
           TARGET_VERSION: ${{ inputs.target-version }}
+          CANARY_RESULT: ${{ runner.temp }}/canary-result.json
         run: |
           set -euo pipefail
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          deno task release:canary -- "$TARGET_VERSION"
-          version="$(jq -r '.version' deno.json)"
+          deno task release:canary -- "$TARGET_VERSION" --output "$CANARY_RESULT"
+          version="$(jq -er '.version' "$CANARY_RESULT")"
+          tag="$(jq -er '.tag' "$CANARY_RESULT")"
+          branch="$(jq -er '.branch' "$CANARY_RESULT")"
           test -n "$version"
           test "$version" != "null"
+          test -n "$tag"
+          test "$tag" != "null"
           echo "version=$version" >> "$GITHUB_OUTPUT"
-          echo "tag=v$version" >> "$GITHUB_OUTPUT"
-          echo "branch=release/canary-$version" >> "$GITHUB_OUTPUT"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "branch=$branch" >> "$GITHUB_OUTPUT"
 
       - name: Verify same-semver canary republish
         if: inputs.republish-version != ''

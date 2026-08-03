@@ -36,6 +36,17 @@ Deno.test('canary workflow reuses the publisher and records only an awaited gree
     source,
     'deno task release:canary -- "$TARGET_VERSION" --republish-version "$REPUBLISH_VERSION"',
   );
+  assertStringIncludes(
+    source,
+    'deno task release:canary -- "$TARGET_VERSION" --output "$CANARY_RESULT"',
+  );
+  assertStringIncludes(source, 'version="$(jq -er \'.version\' "$CANARY_RESULT")"');
+  assertStringIncludes(source, 'test "$version" != "null"');
+  const cutStep = source.slice(
+    source.indexOf('- name: Cut ephemeral canary branch and tag'),
+    source.indexOf('- name: Verify same-semver canary republish'),
+  );
+  assertEquals(cutStep.includes('deno.json'), false);
   assertStringIncludes(source, 'echo "version=$version" >> "$GITHUB_OUTPUT"');
   assertStringIncludes(source, 'echo "tag=$tag" >> "$GITHUB_OUTPUT"');
   assertStringIncludes(source, 'echo "branch=${CUT_BRANCH:-}" >> "$GITHUB_OUTPUT"');

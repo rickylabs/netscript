@@ -181,8 +181,7 @@ export async function createCanaryRefs(
   files: readonly string[],
   runner: ReleaseCommandRunner = runCommand,
 ): Promise<void> {
-  const branch = `release/canary-${version}`;
-  const tag = `v${version}`;
+  const { branch, tag } = canaryResult(version);
   await mustRun('git', ['checkout', '-b', branch], root, runner);
   await mustRun('git', ['add', ...files], root, runner);
   await mustRun('git', ['commit', '-m', `chore(release): cut ${version}`], root, runner);
