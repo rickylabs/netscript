@@ -47,5 +47,95 @@
   question raised, not resolved by habit). 3 observational hand-closes, 3 epics/tracking,
   #1139 gated out.
 - Plan reported to owner before any dispatch (PLAN-EVAL substitution proposal, drift D1).
-  **No dispatch until the owner responds.** Stage-B quota/transport gates deliberately not yet
-  run — they are recorded immediately before each wave dispatch, not at plan time.
+
+## 2026-08-03 — Owner decisions on the plan report
+
+1. **Canary density:** "6 if strictly needed otherwise 3-4" → plan revised to **4 declared
+   points** (boundaries of waves 1, 3, 5, 6); wave-2/4 boundaries canary-free unless promoted by
+   a recorded decision. `plan.md` updated.
+2. **Failed canary:** blocks **only the cut**, never the next dispatch ("issues are fixed on the
+   next canaries"). Cadence open question 2 now has a run decision with owner provenance.
+3. **PLAN-EVAL:** owner routed it to **Codex · GPT-5.6 Sol · xhigh** — the canonical
+   `review_claude` lane (opposite-family; subscription transport, so the evaluator-transport
+   closed-model prohibition is not implicated). Drift D1 updated.
+
+## 2026-08-03 — PLAN-EVAL dispatch (pre-dispatch gates recorded)
+
+Precondition record (what was queried, when, result — per stage B contract):
+
+- `agentic:runtime doctor --json` @ 19:30:42Z → all capabilities `available`; codex/claude/
+  antigravity routes `ready`; no conflicts.
+- `agentic:codex-status` → managed daemon running (codex 0.144.6), 1 anchored app-server process;
+  5 rollout files today, newest 2 written ~7 min before dispatch — other sessions live on the
+  shared machine; a single evaluator launch judged not a heavy run.
+- `agentic:routing-state` → **no persisted quota-fallback transitions** (no provider degraded);
+  `review_claude` canonical route confirmed as `codex/openai/gpt-5.6-sol effort=xhigh` — matches
+  the owner's instruction verbatim. Transport: OpenAI subscription via managed app-server (not
+  OpenRouter) — paid-transport check satisfied for this dispatch.
+
+Dispatch: run artifacts committed (`79a28e612`), eval brief committed (`c5a803b23`), evaluator
+worktree `/home/codex/repos/ns-005-planeval` @ `eval/0.0.5-wave-plan`. Launch via
+`agentic:launch-codex-slice` (dry-run green: brief valid, staged 3376 bytes, git-safety clean),
+then live launch backgrounded. Thread id in `slices/plan-eval/codex-thread-ids.md`. Wave-1
+dispatch holds until the PLAN-EVAL verdict is read (full artifact, never a truncated log).
+
+## 2026-08-03 — PLAN-EVAL v1: FAIL — plan v2 written
+
+Verdict read in full from `plan-eval.md` (330 lines, committed `b8b7475b1` on the eval branch;
+turn ~14 min, thread `019fc91c-9985-7950-b849-74c4dbb8f2cd`). All six dimensions FAIL. Response,
+finding by finding:
+
+- **COV-1** accepted: v1 header said 23 PRs/37 issues over a 22-row/36-issue table; #1175 had no
+  disposition. → totals corrected; #1175 **moved to 0.0.6** with reason (its own
+  release-activity constraint + epic slicing places S8 post-release).
+- **CLU-1..6** accepted: #1166+#1004+#1148, #1130+#1131, #1108+#1110, #1173+#1085, #1168+#1024,
+  #1106+#1109, #1115+#1119 all split — each pair shared a lane or directory, not acceptance.
+  #1174+#1142 pairing confirmed sound by the evaluator.
+- **SEQ-1** accepted — the decisive miss: epic #1169's binding slice order lives in a **comment**
+  (S1 first → S2/S4 → S3 → S5 → S6), which the body-only digest never read. Lane rebuilt
+  S1-first across waves 1–5.
+- **CAN-1** accepted: v1 carried both the six-point draft annotations and the four-point section
+  (incomplete edit). v2 has one schedule: canary.1/2/3/4 at boundaries of waves 1/3/5/7.
+- **CAN-2** accepted: membership wording now names the corrected merge-aware derivation #1166
+  lands, not "first-parent".
+- **HON-1** accepted in substance: #1140 moved to 0.0.6 (post-ship observation cannot exist in
+  the milestone that ships the surface); #1090 stays, scoped to inherited-0.0.4 observations.
+- **HON-2/HON-3** accepted: #1166 and #1168 reclassified as **PR + evidence hand-close** — PRs
+  carry `Refs`, boxes tick only on recorded evidence (canary.1's merge-commit case; a real fired
+  retry), else they move with reason.
+- **GATE-1** accepted: owner brief copied into the run dir (`owner-brief.md`) — `.llm/tmp/` is
+  untracked, so the evaluator worktree could not see it.
+- **GATE-2** partially accepted: `research.md` + `context-pack.md` written; plan v2 adds the
+  open-decision sweep, risk register, and per-cluster proving gates; `phase-registry.md`
+  recorded as not-applicable in `supervisor.md`. See finding 8 below for the doctrine question.
+- **GATE-3** accepted as a staleness defect: the preconditions **had** run before the eval
+  dispatch but the committed text still said "not yet run". v2 text fixed; fresh checks will be
+  recorded before every wave dispatch regardless.
+- **GATE-4** accepted: `supervisor.md` PLAN-EVAL section now records the owner-routed
+  `review_claude` lane, matching drift D1.
+
+### Findings for #1163 (continued)
+
+6. **[epic-order-in-comments]** Binding sequencing (epic #1169's slice order) lived in an issue
+   comment, invisible to a body-level milestone read. Neither the skill nor the profile says the
+   milestone read must include epic comments/slicing records. It must — or epics must carry their
+   slice order in the body.
+7. **[cadence-doc-self-stale]** `canary-cadence.md` itself specifies membership "computed from
+   first-parent merge history" — the exact derivation #1166 proves incomplete for merge-commit
+   topologies. When #1166 lands, the cadence doc's wording is stale; flagged rather than edited
+   mid-run (the doc is the system under observation).
+8. **[plan-gate-inheritance]** `milestone-run.md` inherits "general harness mechanics" from
+   `run-loop.md` without saying whether run-loop's full Plan-Gate (research.md, risk register,
+   open-decision sweep, per-slice gates/files) applies to a **wave plan**. PLAN-EVAL read it as
+   applying in full; the profile is silent. The profile should state which Plan-Gate boxes bind a
+   milestone run — this run satisfied the evaluator's reading.
+9. **[eval-worktree-visibility]** The profile's evaluator protocol never states that PLAN-EVAL
+   inputs must be **committed** (untracked scratch like `.llm/tmp/` is invisible in an evaluator
+   worktree). Cost one GATE blocker; now doctrine-by-precedent: everything the evaluator must
+   see lives in the committed run dir.
+
+## 2026-08-03 — PLAN-EVAL v2 resubmission
+
+Plan v2 + supporting artifacts committed on `orchestrator/0.0.5`, merged into the eval worktree,
+and the same evaluator thread resumed (backgrounded, no shell timeout) with a re-evaluation
+request scoped to the v2 diff. Wave-1 dispatch still holds for the v2 verdict.

@@ -32,15 +32,17 @@ code. Implementation routes per `lane-policy.md`; the merge decision is the orch
 through the `milestone-run.md` pre-merge gate. The real stable JSR publish is the owner's call
 only.
 
-## PLAN-EVAL decision (required by milestone-run.md, [asserted] rule)
+## PLAN-EVAL decision (owner-decided 2026-08-03; see drift.md D1)
 
-The profile's default: a committed wave plan gets a separate-session PLAN-EVAL. Decision for this
-run: **the wave plan is reported to the owner before any dispatch** (owner instruction), and owner
-review of the plan constitutes reviewer substitution per `milestone-run.md` § Evaluator protocol —
-legitimate for run artifacts and evidence prose, which the wave plan is. If the owner instead wants
-a formal PLAN-EVAL on the evaluator lane (Qwen 3.7 via claude-openrouter), that runs before wave 1
-dispatch. Recorded in `drift.md` either way. Not silently applied: the owner sees this decision in
-the plan report.
+The wave plan gets a separate-session PLAN-EVAL on the **`review_claude` lane: Codex · OpenAI ·
+GPT-5.6 Sol · xhigh** — owner-routed, matching the canonical `routing-policy.ts` binding verbatim
+(opposite-family review of Claude-authored work, subscription transport). Generator (this Fable
+session) ≠ evaluator (Codex session in `/home/codex/repos/ns-005-planeval` on
+`eval/0.0.5-wave-plan`); the evaluator's verdict artifact is `plan-eval.md`. First verdict:
+**FAIL** (2026-08-03, commit `b8b7475b1`) — all blockers addressed in plan v2, then resubmitted to
+the same thread. `phase-registry.md` is not used for this run: waves are tracked in `plan.md` and
+`cut-trace.md`, which serve the phase-group role (recorded here per the profile's
+"when phase groups apply" clause).
 
 ## Coordination notes at run start
 

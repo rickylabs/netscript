@@ -1,135 +1,157 @@
-# Wave plan — 0.0.5 (stage B)
+# Wave plan v2 — 0.0.5 (stage B)
 
-44 open issues at run start. Clustered on **acceptance text** (digest via read-only explore agent,
-2026-08-03), not labels. 37 issues close through 23 PRs; 3 are observational hand-closes
-(#1149, #1090, #1140); 3 are epics/tracking (#1126, #1169, #1117 — no closing keywords);
-#1139 is F2-gated and out of scope unless the owner flips F2.
+v2, 2026-08-03: revised against PLAN-EVAL `FAIL` (`plan-eval.md`, commit `b8b7475b1`) — every
+blocker resolved, every major addressed. v1 is in git history (`79a28e612`). Clustering is built
+on acceptance text (`research.md` records the read); 44 open issues at run start, 42 now in
+milestone after two recorded moves.
 
-## Issue-disposition classes
+## Issue disposition — every milestone issue, exactly one class
 
-- **PR-closable (37)** — clustered below.
-- **Observational (3):** #1149 (canary label/note exercise — executed by the orchestrator at
-  stage E, retro-audit of the two 0.0.4 canaries plus live evidence from this run's canaries; box
-  4 gated on #1166 landing), #1090 (observational hub — receives routed boxes from #1140, #1117
-  box 6, #1102 final box; hand-closed on recorded observation or moved), #1140 (S14 — routes to
-  #1090, cannot close by PR).
-- **Epics/tracking (3):** #1126, #1169 (umbrellas — never carry closing keywords; #1169's
-  "one-pass publish" DoD box is expected to be evidenced by this run's own stable cut), #1117
-  (tracking issue implemented by epic #1126 — candidate hand-verified close after S9/S12 land).
-- **Gated out (1):** #1139 (S13, F2 stands at (a) — "filing ≠ green light"). Moves at cut with
-  written reason unless owner flips F2.
+| Class | Count | Issues |
+| --- | --- | --- |
+| PR-closable | 34 | all issues in the wave table except #1166 and #1168 |
+| PR + evidence hand-close | 2 | #1166 (PR carries `Refs`; boxes 2–4 tick only on canary.1's recorded merge-commit demonstration and the #1149 re-verification), #1168 (PR closes retry classification + visibility boxes; the transient-vs-ceiling measurement box ticks only on a real fired retry during this run, else it moves with a written reason) |
+| Observational hand-close | 2 | #1149 (0.0.4 retro-audit + this run's canary evidence; box 4 gated on #1166), #1090 (inherited-0.0.4 observations only; hand-closed on evidence or moved at cut) |
+| Epic / tracking — no closing keywords | 3 | #1126, #1169 (its one-pass DoD box is evidenced by this run's stable cut), #1117 (hand-verified close after S9/S12 land; box 6 routed to #1140@0.0.6) |
+| Gated out (F2 stands at (a)) | 1 | #1139 — moves at cut with written reason unless owner flips F2 |
+| Moved to 0.0.6 (done, reasons on issues) | 2 | #1140 (post-ship observation; HON-1), #1175 (release-activity constraint; COV-1) |
 
-## Mislabel corrections (skill rule: acceptance > labels)
+Total: 34 + 2 + 2 + 3 + 1 + 2 = **44** ✓. The wave table contains **31 PRs covering 36 issues**
+(34 PR-closable + the two Refs-carrying PRs for #1166/#1168).
 
-- #1112 `type:docs` but requires database-adapter code + tests → routed as a **code** slice.
-- #1110 `type:docs` but requires a `packages/contracts` JSDoc fix + test fixture → **code** slice.
-- #1108 `type:docs` but core deliverable is a drift **gate** → code slice (has `area:tooling`).
-- #1102 `area:docs` but deliverable is `packages/mcp` retrieval code → **code** slice.
-- Labels to be corrected on GitHub at dispatch of each affected PR.
+## Wave table
 
-## PR clusters and waves
+Lanes per `lane-policy.md`; Sol = Codex GPT-5.6 Sol, agy = Antigravity docs lane (serialized, one
+docs PR per wave — quota contingency is re-waving, never substitution). Review composes existing
+triggers (draft→ready augment + OpenHands label). Dependencies run across waves only. Gate columns
+name the **proving gates** per cluster; every `packages/**`/`plugins/**` PR additionally takes the
+framework-wave law: `quality:gate` (scan + arch:check), scoped check/lint/fmt wrappers, doc-lint +
+publish dry-run when the export surface moves (jsr-audit risk: #1102, #1093, #1110, #1112, OMB
+S4–S7 — all touch published packages).
 
-Lane notation per `lane-policy.md`: Sol = Codex · GPT-5.6 Sol (effort per slice); agy =
-Antigravity/Gemini docs-authoring lane. Review/evaluation composes the existing triggers
-(draft→ready augment + OpenHands label) — no per-PR local evaluator. ≤3 local Codex supervisors
-concurrent (+1 agy remote where shown); dependencies run across waves, never inside one.
+### Wave 1
 
-### Wave 1 — unblock everything
+| PR | Issues | Scope | Lane | Proving gates |
+| --- | --- | --- | --- | --- |
+| W1-A | #1168 | epic #1169 S1 — first per the epic's slicing record: retry classification, attempt-visible report, retry-rate record; measurement box per disposition above | Sol · medium | non-retry negative test; report artifact shows retried-pass distinctly |
+| W1-B | #1127 #1128 #1129 | OMB wave-0 proofs; P1 arbitrates F1 (FAIL ⇒ F1(b), S7 re-scoped) | Sol · high | three committed `proofs/P<n>-verdict.md`; skipped ≠ passed |
+| W1-C | #1166 (`Refs`) | canary-payload derivation: merge-aware, genuine-empty vs derivation-failure distinguishable | Sol · medium | negative fixture; canary.1 supplies the real-cut demonstration post-merge |
+| W1-D | #1134 | OMB S8 existing-machinery: truncation metadata + receipt-after-validation | Sol · medium | both fixtures (failed receipt on invalid output; no silent 75→50) |
 
-| PR | Issues | Scope | Lane |
-| --- | --- | --- | --- |
-| W1-A | #1127 #1128 #1129 | OMB wave-0 proofs; S1 arbitrates F1 — a FAIL is a legitimate verdict activating F1(b) and re-scoping S7 | Sol · high |
-| W1-B | #1166 #1004 #1148 | release-lane integrity: canary payload merge-commit fix, same-semver republish path, version-residue scan | Sol · medium |
-| W1-C | #1170 | `agentic:pr-checks` latest-run-per-name rollup — supersedes the manual false-red rule this run otherwise applies per merge | Sol · medium |
-
-**→ Canary 0.0.5-canary.1.** Landing #1166 first makes canary.1 the demonstration vehicle for its
-observational box and for #1149's retro-audit.
+**→ Canary point 1** (wave-1 boundary). Payload = whatever landed since 0.0.4 stable, derived by
+the **corrected #1166 implementation** — the point must record the merge-commit/updated-branch
+case before #1166's boxes tick.
 
 ### Wave 2
 
-| PR | Issues | Scope | Lane |
-| --- | --- | --- | --- |
-| W2-A | #1130 #1131 | OMB spine: projection domain (gated by S2 verdict) + directory port/adapters (gated by S1 verdict; F1(b) switches primary source, same contract) | Sol · high |
-| W2-B | #1134 | S8 existing-machinery fixes — hard-blocks S10, S6 receipt semantics depend on it | Sol · medium |
-| W2-C | #1174 #1142 | CI state honesty (epic #1169's own slice S4 groups them): deleted-ref guard + `$GITHUB_OUTPUT` heredoc sweep | Sol · medium |
-| W2-D | #1106 #1109 | pure-docs batch: auth session lifecycles + runtime testing/replay docs. Quota contingency: if the agy cap hits, remainder re-waves — no silent model substitution | agy · low |
-
-**→ canary.2**
+| PR | Issues | Scope | Lane | Proving gates |
+| --- | --- | --- | --- | --- |
+| W2-A | #1170 | epic S2: `agentic:pr-checks` latest-run-per-name rollup | Sol · medium | two-fixture negative case (cancelled-superseded clean; genuine red non-zero) |
+| W2-B | #1174 #1142 | epic S4 (one slice per #1174's body): deleted-ref guard + `$GITHUB_OUTPUT` sweep | Sol · medium | deleted-ref negative case; post-merge conclusions green-or-absent on a real merge |
+| W2-C | #1130 | OMB S4 projection domain (P2 verdict in hand) | Sol · high | ladder/ambiguity/no-hallucinated-envelope fixtures; Archetype-2 column |
+| W2-D | #1131 | OMB S5 directory port + adapters (P1 verdict in hand; F1(b) switches primary source, same contract) | Sol · high | full source-outcome fixture matrix; row-level timeout fixture |
+| W2-E | #1106 | auth session-lifecycle docs (pure docs) | agy · low | adapter-entrypoint compile checks; docs link check |
 
 ### Wave 3
 
-| PR | Issues | Scope | Lane |
-| --- | --- | --- | --- |
-| W3-A | #1132 | S6 three read tools (needs S4/S5/S8 — all landed) | Sol · high |
-| W3-B | #1133 | S7 manifest emission — scope set by the P1 verdict (template emission vs `aspire-cli` adapter); effort re-tiered at dispatch from the verdict | Sol · medium–high |
-| W3-C | #1171 #1105 | close-gate honesty: verdict carries evaluated state + PR-body checklist convention (recommendation to brief: gate fails on unticked PR-body DoD boxes — the #1088 incident argues for enforcement over convention) | Sol · medium |
+| PR | Issues | Scope | Lane | Proving gates |
+| --- | --- | --- | --- | --- |
+| W3-A | #1171 #1105 | epic S3 + close-gate PR-body convention (shared `check-close-gate.ts`, shared verdict-honesty acceptance; recommendation to brief: enforce, per #1088) | Sol · medium | stale-verdict test; PR-body failing-case fixture |
+| W3-B | #1132 | OMB S6 three read tools (S4/S5/S8 landed) | Sol · high | truncation/absent-count/sources-verbatim fixtures; registry 14→17 |
+| W3-C | #1133 | OMB S7 manifest emission — scope + effort set by the P1 verdict at dispatch | Sol · medium–high | `scaffold.runtime` evidence (serialized; sole expensive-gate holder this wave) |
+| W3-D | #1119 | AI-rollout canary rename — early, before further canary points harden the vocabulary | Sol · low | no bare "canary" left for AI rollout; nothing silently broken |
+| W3-E | #1109 | runtime testing/observation/replay docs | agy · low | per-example compile coverage; published-subpath imports |
 
-**→ canary.3**
+**→ Canary point 2** (wave-3 boundary — OMB spine + read tools: the release's main
+public-surface change).
 
 ### Wave 4
 
-| PR | Issues | Scope | Lane |
-| --- | --- | --- | --- |
-| W4-A | #1135 #1136 | S9 activation surfaces + S10 evidence-gate acceptance (S8 landed two waves prior) | Sol · medium |
-| W4-B | #1172 | serialize `scaffold.runtime`, contention names itself; forced-collision negative case as a real run | Sol · medium |
-| W4-C | #1173 #1085 | agentic refusal honesty sweep + launch-codex-slice SIGTERM — clustered because both target the same `duplicate_sender_risk` exit-0 path; #1173's audit decides how much of #1085 box 2 is already true | Sol · medium |
-| W4-D | #1104 | cron retry/backoff: decision box (implement vs deprecate) + fake-clock tests across both adapters | Sol · high |
-
-**→ canary.4**
+| PR | Issues | Scope | Lane | Proving gates |
+| --- | --- | --- | --- | --- |
+| W4-A | #1172 | epic S5: serialize `scaffold.runtime` + lease naming holder | Sol · medium | forced-collision negative case as a real run; release surface untouched |
+| W4-B | #1135 | OMB S9 activation surfaces + migration fixture | Sol · medium | byte fixtures; S-18 re-init fixture |
+| W4-C | #1136 | OMB S10 evidence-gate acceptance (S8 landed wave 1) | Sol · medium | post-fix receipt satisfies gate; pre-validation receipt unproducible |
+| W4-D | #1104 | cron retry/backoff: implement-vs-deprecate decision + fake-clock tests | Sol · high | deterministic retry/exhaustion/cap/cancellation tests on both adapters |
 
 ### Wave 5
 
-| PR | Issues | Scope | Lane |
-| --- | --- | --- | --- |
-| W5-A | #1102 | intent-aware capability discovery in the docs MCP (+ eval corpus); final box routes to #1090 | Sol · high |
-| W5-B | #1093 | plugin discovery de-hardcoding + third-party fixture proven by a test that fails on today's main | Sol · high |
-| W5-C | #1108 #1110 | docs-reference drift gate derived from `deno.json.exports` + bulk inventory repair; subsumes #1110's contracts inventory, adds its pagination walkthrough + JSDoc fix | Sol · medium |
-| W5-D | #1137 #1138 | S11 contract summary enrichment (F3a, all first-party contracts) + S12 reference docs (S6 surface final after wave 3) | Sol · low |
+| PR | Issues | Scope | Lane | Proving gates |
+| --- | --- | --- | --- | --- |
+| W5-A | #1173 | epic S6 refusal-honesty audit (after S5, per epic order) | Sol · medium | audit list on the PR; negative-case test per refusal path |
+| W5-B | #1102 | intent-aware capability discovery + eval corpus; tracking box → #1140@0.0.6 | Sol · high | checked-in corpus with expected top-k; bounded responses |
+| W5-C | #1093 | plugin-discovery de-hardcoding | Sol · high | third-party fixture test that fails on today's main; doctrine check |
+| W5-D | #1108 | docs-reference drift gate + bulk inventory repair | Sol · medium | negative fixture: an added export fails until mapped |
 
-**→ canary.5** — #1117 candidate close after this wave (all implementable boxes verifiable;
-box 6 routed to #1090).
+**→ Canary point 3** (wave-5 boundary).
 
-### Wave 6 — tail
+### Wave 6
 
-| PR | Issues | Scope | Lane |
-| --- | --- | --- | --- |
-| W6-A | #1115 #1119 | codex-follow/live state + AI-rollout canary rename (shared surface: `.llm/tools/agentic/` + README/tooling index). Rename wanted "before the cadence hardens" — earlier if a wave-1–3 lane frees early | Sol · medium |
-| W6-B | #1112 | MySQL Prisma adapter: docs + the adapter-code/test boxes (mislabel-corrected code slice) | Sol · medium |
-| W6-C | #1116 | AI docs (retries/budgets/citations) + possible `packages/ai*` JSDoc touches | Sol · low |
-| W6-D | #1168 #1024 | e2e retry-with-visibility + measurement box, + #1024's last box (standalone scaffold e2e) — shared e2e-tooling surface | Sol · medium |
+| PR | Issues | Scope | Lane | Proving gates |
+| --- | --- | --- | --- | --- |
+| W6-A | #1085 | launch-codex-slice lifecycle (scope netted against #1173's audit findings) | Sol · medium | orphaned-session test; SIGTERM survival |
+| W6-B | #1004 | same-semver canary republish path (last box: demonstrated partial-publish retry — a canary re-run this cycle can supply it, else the box moves with reason) | Sol · medium | skip-already-published logged on the demonstration |
+| W6-C | #1148 | version-residue scan widening | Sol · low | seeded stale `.ts` fails; exclusions documented |
+| W6-D | #1110 | contracts pagination walkthrough + JSDoc fix (after #1108, shared page) | Sol · low | Prisma-shaped compile fixture; boundary/error coverage |
+| W6-E | #1137 #1138 | OMB S11 contract enrichment (F3a) + S12 reference docs (S6 surface final) | Sol · low | publish dry-run + doc-lint on touched packages; links green |
 
-**→ canary.6 (final) → stage F cut-time checklist → stable 0.0.5 cut (owner's publish call).**
+### Wave 7
 
-#1175 (p3, JSR-propagation poll) is explicitly constrained to land *away from* in-flight release
-activity — held as a cut-adjacent decision: post-cut if timing permits, else moved to 0.0.6 with
-written reason.
+| PR | Issues | Scope | Lane | Proving gates |
+| --- | --- | --- | --- | --- |
+| W7-A | #1024 | last box: standalone consumer scaffold e2e | Sol · medium | scaffolded project runs full smoke without the framework repo |
+| W7-B | #1112 | MySQL Prisma adapter docs + option/cleanup code + tests (mislabel-corrected) | Sol · medium | adapter option-translation/cleanup tests |
+| W7-C | #1116 | AI docs (retries/budgets/citations) + JSDoc touches | Sol · low | typed examples compile; focused provider-retry tests |
+| W7-D | #1115 | `codex-follow` + live state (rollout recency, not process liveness) | Sol · medium | one-command "working/idle/stalled" answer demonstrated |
 
-## Canary points — owner-decided 2026-08-03
+**→ Canary point 4** (wave-7 boundary — final; supplies the green canary pair
+`netscript-release` requires) → stage F cut-time checklist → stable cut (owner's publish call).
 
-Both cadence open questions were put to the owner with the plan report; decisions:
+## Canary schedule — the single, four-point declaration
 
-1. **Density (owner: "6 if strictly needed otherwise 3-4"):** **four declared canary points** —
-   **canary.1 @ wave-1 boundary** (strictly needed: it is the demonstration vehicle for #1166's
-   observational box and #1149's audit), **canary.2 @ wave-3 boundary** (OMB spine + read tools —
-   the release's main public-surface change), **canary.3 @ wave-5 boundary** (activation,
-   enrichment, discovery), **canary.4 @ wave-6 boundary** (final canary; the green pair required
-   by `netscript-release` before a stable cut). Wave-2 and wave-4 boundaries get no canary unless
-   re-planning makes one strictly needed — that promotion is a recorded decision at the boundary.
-2. **Failed canary (owner: "it shouldn't block — issues are fixed on the next canaries"):** a red
-   canary blocks **only the cut**, never the next wave's dispatch. Failures are absorbed by
-   subsequent canaries; failed-canary handling itself is `netscript-release` doctrine.
+Owner-decided 2026-08-03 ("6 if strictly needed otherwise 3-4" / "failed canary doesn't block"):
 
-Membership stays content-derived at each point (whatever landed since the previous point,
-first-parent merge history via `release:canary-label`); labels derived from the published version
-through `release-canary.yml`, never typed.
+| Point | Boundary | Rationale |
+| --- | --- | --- |
+| canary.1 | wave 1 | strictly needed: the demonstration vehicle for #1166 and #1149 |
+| canary.2 | wave 3 | OMB spine + read tools — main public-surface change |
+| canary.3 | wave 5 | activation, discovery, enrichment groundwork |
+| canary.4 | wave 7 | final; the green-pair precondition for the stable cut |
 
-## Dispatch preconditions (stage B gates — run per wave, recorded in worklog.md)
+Boundaries of waves 2, 4, 6 carry **no** canary; promotion of one is a recorded decision at that
+boundary. Membership at every point is **content-derived from actual merge history using the
+corrected, merge-aware derivation #1166 lands in wave 1** — the wave is a dispatch unit, the
+canary is a content unit; a PR that lands out of plan order is still in the payload. Version
+strings and labels come from `release-canary.yml`'s publish output (D3) — never typed, never from
+this plan. A red canary blocks **only the cut**, never the next dispatch.
 
-Provider quota + paid-transport verification are checked and their output recorded in `worklog.md`
-immediately before each wave's dispatch — a wave dispatched without that record is a did-not-run.
-Not yet run: no dispatch has occurred.
+## Open-decision sweep
+
+| Decision | Class | Holder |
+| --- | --- | --- |
+| F1 mechanism (manifest seam vs aspire-cli) | resolved by P1 verdict, wave 1 | #1127 |
+| #1104 implement-vs-deprecate | must-resolve at W4-D dispatch: supervisor briefs both, PR records the choice + rationale | orchestrator brief |
+| #1105 enforce-vs-convention for PR-body checklists | must-resolve at W3-A dispatch; recommendation: enforce (per #1088) | orchestrator brief |
+| #1139 in/out | safe-to-defer; out unless owner flips F2 | owner |
+| #1149/#1166/#1168 evidence boxes | resolved by declared evidence points (canary.1, a fired retry) or move with reason | orchestrator at cut |
+| canary promotion at waves 2/4/6 | safe-to-defer; recorded decision if promoted | orchestrator |
+
+## Risk register
+
+| Risk | Mitigation |
+| --- | --- |
+| P1 proof FAILs (legitimate) | F1(b) pre-planned: W2-D keeps scope, W3-C re-scoped + re-tiered at dispatch |
+| Codex weekly quota (57% used at plan time) exhausts mid-run | quota recorded per wave-dispatch; waves shrink rather than substitute; owner informed at ≥85% |
+| agy cap mid-docs (0.0.4 precedent) | one docs PR per wave, serialized; re-wave remainder, never substitute |
+| `scaffold.runtime` contention (three concurrent runs = two false fails, 0.0.4) | expensive gates serialized: one holder per wave (W3-C; W4-A adds the lease) |
+| shared-machine load (froze at 160 in 0.0.4) | ≤4 local Codex lanes + ≤1 agy per wave; `codex-status` + leak-check before each dispatch |
+| stale-red / false-green check readings during merges | pre-merge gate rules 4 + false-red (#1142); after W2-A lands, `agentic:pr-checks` supersedes the manual rule |
+| #1166 regression discovered at canary.1 | canary.1 verdict is a finding, not a hand-patch; failed canary blocks only the cut |
 
 ## Re-planning stance
 
-The plan above is a dispatch schedule, not a contract. Undispatched remainder re-clusters freely
-(queue-jumps land when they unblock a lane); `cut-trace.md` records what actually happens.
+The plan is a dispatch schedule, not a contract. Undispatched remainder re-clusters freely;
+queue-jumps land when they unblock a lane; `cut-trace.md` records what actually happened. The
+stage-B dispatch preconditions (provider quota + paid-transport) are checked and recorded in
+`worklog.md` immediately before **every** wave dispatch — the PLAN-EVAL dispatch record
+(2026-08-03) is the template.
