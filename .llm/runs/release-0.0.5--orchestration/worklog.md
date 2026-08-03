@@ -302,3 +302,23 @@ milestone**, recorded here as an owner-set rule. W2-F brief rewritten around the
 effort re-tiered Sol·medium → **Sol·high** (verification protocol is the dominant work).
 Classification unchanged: PR-closable on local protocol evidence; canary.2 pair adds the
 published-artifact confirmation.
+
+## 2026-08-03 — PR #1181 (close-gate slice) at the stage-D gate
+
+Slice implemented both issues and self-marked ready (composed review fired). Gate state on first
+terminal read: scaffold-static/runtime, desktop-native-linux, deps-report, classify, surface-diff,
+agent all current-pass (`agentic:pr-checks`, head `c7248eb00`); review-threads PASS (0 threads);
+**close-gate current-fail** — and legitimately: #1105's three issue boxes were unticked on GitHub
+while the PR body claimed them (the acceptance-evidence mirror skipped; known label-before-ready
+trap). Notably the failing run executed the PR's own new tool: the S0–S3 progress checklist was
+correctly ignored (non-authoritative heading) — the #1105 enforcement's live self-application.
+
+Gate check 5 (independent re-verification) before ticking: local test run 7/7 incl.
+`fails unchecked PR DoD but ignores non-authoritative checklists` and the pre-edit/post-edit
+stale-snapshot negative case; template diff shows `## Definition of Done` authoritative + Slices
+progress-only + netscript-pr skill aligned. On that evidence: #1105 boxes ticked with evidence
+comment; failed close-gate job rerun (30849924186); gh-watch re-armed.
+
+Minor: first `gh-watch` invocation died on the `deno task -- --` separator ("Unknown argument:
+--") yet the wrapper exited 0 — arg-contract inconsistency across the agentic suite (`pr-checks`
+tolerates `--`, `gh-watch` does not); more #1173-adjacent evidence.
