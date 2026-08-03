@@ -15,7 +15,7 @@ This repository uses Aspire to orchestrate its distributed application. Resource
 | Start isolated (worktrees) | `aspire start --isolated` |
 | Restart the app | `aspire start` (stops previous automatically) |
 | Wait for resource healthy | `aspire wait <resource>` |
-| Stop the app | `aspire stop` |
+| Stop the exact AppHost | `aspire stop --apphost <exact-AppHost-path>` |
 | List resources | `aspire describe` or `aspire resources` |
 | Run resource command | `aspire resource <resource> <command>` |
 | Start/stop/restart resource | `aspire resource <resource> start|stop|restart` |
@@ -37,6 +37,11 @@ This repository uses Aspire to orchestrate its distributed application. Resource
 | Call resource MCP tool | `aspire mcp call <resource> <tool> --input <json>` |
 
 Most commands support `--format Json` for machine-readable output. Use `--apphost <path>` to target a specific AppHost.
+
+On a shared host, always take the exact `appHostPath` from `aspire ps` and pass it to the stop
+command. Use `aspire resource <name> stop` when only one resource needs cleanup. The host-wide
+`aspire stop` mode with `--all` is dangerous to sibling runs and unreliable: it has reported
+`No running AppHost found` and exited 0 while processes rooted at the AppHost survived.
 
 ### Detached dashboard discovery
 
@@ -105,6 +110,7 @@ aspire mcp call <resource> <tool> --input '{"key":"value"}'   # invoke a tool
 - **Always start the app first** (`aspire start`) before making changes to verify the starting state.
 - **To restart, just run `aspire start` again** — it automatically stops the previous instance. NEVER use `aspire stop` then `aspire run`. NEVER use `aspire run` at all.
 - **Only restart the AppHost when AppHost code changes.** For .NET project resources, use `aspire resource <name> rebuild` instead.
+- **Never kill an `aspire mcp start` process.** It is the session's MCP server, not a stray AppHost.
 - Use `--isolated` when working in a worktree.
 - **Avoid persistent containers** early in development to prevent state management issues.
 - **Never install the Aspire workload** — it is obsolete.
