@@ -1,6 +1,9 @@
 import { assertEquals } from 'jsr:@std/assert@^1.0.0';
 import {
+  classifyDenoConfigChange,
+  classifyPath,
   decide,
+  type Decision,
   isDocsOnlyPath,
   isImpacting,
   parseFiles,
@@ -8,6 +11,19 @@ import {
   parseNameStatus,
   sanitizeReason,
 } from './ci-classify-changes.ts';
+
+function vector(d: Decision) {
+  return {
+    deno: d.needsDeno,
+    docker: d.needsDocker,
+    desktop: d.needsDesktop,
+    docs: d.needsDocs,
+    surface: d.needsSurface,
+  };
+}
+
+const ALL_TRUE = { deno: true, docker: true, desktop: true, docs: true, surface: true };
+const ALL_FALSE = { deno: false, docker: false, desktop: false, docs: false, surface: false };
 
 // ── rename-hole regression (adversarial review, defect 1) ────────────────────
 
@@ -55,6 +71,8 @@ Deno.test('rename of a Markdown file under packages stays docs-only', () => {
   assertEquals(d.docsOnly, true);
   assertEquals(d.runStatic, false);
   assertEquals(d.runRuntime, false);
+  // Mirrors the old surface-diff `paths: packages/**` trigger.
+  assertEquals(d.needsSurface, true);
 });
 
 Deno.test('parseNameStatus: unrecognisable line degrades to a bare path (forces run)', () => {
@@ -98,6 +116,8 @@ Deno.test('reason with a GITHUB_OUTPUT-injection filename stays one line', () =>
   assertEquals(d.runStatic, true);
 });
 
+// ── per-path classification ──────────────────────────────────────────────────
+
 Deno.test('docs surfaces are docs-only', () => {
   for (
     const p of [
@@ -125,7 +145,7 @@ Deno.test('critical workflow paths win over the markdown allowlist', () => {
   assertEquals(isDocsOnlyPath('.github/workflows/README.md'), false);
 });
 
-Deno.test('impacting surfaces force the gate', () => {
+Deno.test('impacting surfaces force the scaffold gate', () => {
   for (
     const p of [
       'packages/cli/e2e/cli.ts',
@@ -137,6 +157,7 @@ Deno.test('impacting surfaces force the gate', () => {
       'deno.lock',
       'examples/x/deno.json',
       '.github/workflows/e2e-cli.yml',
+      '.github/workflows/ci.yml',
     ]
   ) {
     assertEquals(isImpacting(p), true, `expected impacting: ${p}`);
@@ -149,6 +170,273 @@ Deno.test('unknown root paths force the gate (conservative default)', () => {
   assertEquals(isDocsOnlyPath('mod.ts'), false);
   assertEquals(isDocsOnlyPath('.gitignore'), false);
 });
+
+Deno.test('SAFETY: an unrecognised path forces EVERY output true', () => {
+  for (const p of ['tools/foo.sh', 'scripts/x.py', '.github/labels.yml', 'Makefile']) {
+    const caps = classifyPath(p);
+    assertEquals(caps, {
+      scaffold: true,
+      docker: true,
+      desktop: true,
+      deno: true,
+      docs: true,
+      surface: true,
+    }, `expected full escalation for: ${p}`);
+    const d = decide({ eventName: 'pull_request', files: [p], labels: [] });
+    assertEquals(d.runStatic, true, p);
+    assertEquals(d.runRuntime, true, p);
+    assertEquals(vector(d), ALL_TRUE, p);
+  }
+});
+
+Deno.test('SAFETY: the classifier own sources force everything (.github/scripts)', () => {
+  const d = decide({
+    eventName: 'pull_request',
+    files: ['.github/scripts/ci-classify-changes.ts'],
+    labels: [],
+  });
+  assertEquals(d.runStatic, true);
+  assertEquals(d.runRuntime, true);
+  assertEquals(vector(d), ALL_TRUE);
+});
+
+// ── tier-defining vs non-tier workflows (#1122 precision) ────────────────────
+
+Deno.test('tier-defining workflow edits escalate scaffold, docker and desktop', () => {
+  for (const wf of ['.github/workflows/e2e-cli.yml', '.github/workflows/ci.yml']) {
+    const d = decide({ eventName: 'pull_request', files: [wf], labels: [] });
+    assertEquals(d.runStatic, true, wf);
+    assertEquals(d.runRuntime, true, wf);
+    assertEquals(d.needsDocker, true, wf);
+    assertEquals(d.needsDesktop, true, wf);
+    assertEquals(d.needsDeno, true, wf);
+  }
+});
+
+Deno.test('NEGATIVE: non-tier workflow edits set needs_deno ONLY', () => {
+  for (
+    const wf of [
+      '.github/workflows/release-canary.yml',
+      '.github/workflows/pages.yml',
+      '.github/workflows/publish.yml',
+      '.github/workflows/surface-diff.yml',
+    ]
+  ) {
+    const d = decide({ eventName: 'pull_request', files: [wf], labels: [] });
+    assertEquals(d.runStatic, false, wf);
+    assertEquals(d.runRuntime, false, wf);
+    assertEquals(vector(d), { ...ALL_FALSE, deno: true }, wf);
+  }
+});
+
+// ── root deno.json discrimination (#1122 precision) ──────────────────────────
+
+const DENO_BASE = JSON.stringify({
+  version: '0.0.3',
+  workspace: ['packages/*'],
+  imports: { '@std/assert': 'jsr:@std/assert@^1.0.0' },
+  tasks: { check: 'deno check .' },
+});
+const DENO_TASKS_ONLY = JSON.stringify({
+  version: '0.0.3',
+  workspace: ['packages/*'],
+  imports: { '@std/assert': 'jsr:@std/assert@^1.0.0' },
+  tasks: { 'check': 'deno check .', 'release:canary-label': 'deno run x.ts' },
+});
+const DENO_TOOLCHAIN = JSON.stringify({
+  version: '0.0.3',
+  workspace: ['packages/*', 'plugins/*'],
+  imports: { '@std/assert': 'jsr:@std/assert@^1.0.0' },
+  tasks: { check: 'deno check .' },
+});
+
+Deno.test('classifyDenoConfigChange: tasks-only vs toolchain vs unparseable', () => {
+  assertEquals(classifyDenoConfigChange(DENO_BASE, DENO_TASKS_ONLY), 'tasks-only');
+  assertEquals(classifyDenoConfigChange(DENO_BASE, DENO_BASE), 'tasks-only');
+  assertEquals(classifyDenoConfigChange(DENO_BASE, DENO_TOOLCHAIN), 'toolchain');
+  assertEquals(classifyDenoConfigChange(DENO_BASE, '{not json'), 'toolchain');
+  assertEquals(classifyDenoConfigChange(undefined, DENO_BASE), 'toolchain');
+  assertEquals(classifyDenoConfigChange(DENO_BASE, undefined), 'toolchain');
+  assertEquals(classifyDenoConfigChange('', DENO_BASE), 'toolchain');
+  assertEquals(classifyDenoConfigChange(DENO_BASE, '[1,2]'), 'toolchain');
+});
+
+Deno.test('#1122 REPLAY: release workflow + tasks-only deno.json + .llm tools stays off the scaffold tiers', () => {
+  const d = decide({
+    eventName: 'pull_request',
+    files: [
+      '.github/workflows/release-canary.yml',
+      'deno.json',
+      '.llm/tools/release/canary-label.ts',
+      '.llm/tools/generate-publish-assets.ts',
+      '.llm/runs/some-run/worklog.md',
+    ],
+    labels: [],
+    rootDenoConfig: { base: DENO_BASE, head: DENO_TASKS_ONLY },
+  });
+  assertEquals(d.runStatic, false);
+  assertEquals(d.runRuntime, false);
+  assertEquals(d.needsDocker, false);
+  assertEquals(d.needsDesktop, false);
+  // check-test still runs: root `deno test` discovers `.llm/tools` tests and
+  // `.llm/tools/release/release-canary-workflow_test.ts` reads the workflow.
+  assertEquals(d.needsDeno, true);
+  assertEquals(d.docsOnly, false);
+});
+
+Deno.test('root deno.json toolchain change (workspace/imports) escalates everything', () => {
+  const d = decide({
+    eventName: 'pull_request',
+    files: ['deno.json'],
+    labels: [],
+    rootDenoConfig: { base: DENO_BASE, head: DENO_TOOLCHAIN },
+  });
+  assertEquals(d.runStatic, true);
+  assertEquals(d.runRuntime, true);
+  assertEquals(d.needsDesktop, true);
+  assertEquals(d.needsDeno, true);
+});
+
+Deno.test('NEGATIVE: root deno.json with NO base/head content escalates (fail toward running)', () => {
+  const d = decide({ eventName: 'pull_request', files: ['deno.json'], labels: [] });
+  assertEquals(d.runStatic, true);
+  assertEquals(d.runRuntime, true);
+  assertEquals(d.needsDesktop, true);
+});
+
+Deno.test('deno.lock always escalates (tasks-only discrimination never applies)', () => {
+  const d = decide({
+    eventName: 'pull_request',
+    files: ['deno.lock'],
+    labels: [],
+    rootDenoConfig: { base: DENO_BASE, head: DENO_TASKS_ONLY },
+  });
+  assertEquals(d.runStatic, true);
+  assertEquals(d.runRuntime, true);
+  assertEquals(d.needsDesktop, true);
+});
+
+Deno.test('nested workspace deno.json escalates regardless of root discrimination', () => {
+  const d = decide({
+    eventName: 'pull_request',
+    files: ['examples/x/deno.json'],
+    labels: [],
+    rootDenoConfig: { base: DENO_BASE, head: DENO_TASKS_ONLY },
+  });
+  assertEquals(d.runStatic, true);
+  assertEquals(d.runRuntime, true);
+});
+
+// ── capability vector per source area ────────────────────────────────────────
+
+Deno.test('packages (non-cli) code: deno+docker+scaffold+surface, NOT desktop', () => {
+  const d = decide({
+    eventName: 'pull_request',
+    files: ['packages/database/src/mod.ts'],
+    labels: [],
+  });
+  assertEquals(d.runStatic, true);
+  assertEquals(d.runRuntime, true);
+  assertEquals(vector(d), { deno: true, docker: true, desktop: false, docs: false, surface: true });
+});
+
+Deno.test('packages/cli code: the .deb surface -> needs_desktop', () => {
+  const d = decide({
+    eventName: 'pull_request',
+    files: ['packages/cli/src/public/features/deploy/target/desktop/release/release-group.ts'],
+    labels: [],
+  });
+  assertEquals(d.needsDesktop, true);
+  assertEquals(d.needsDocker, true);
+});
+
+Deno.test('plugins code: docker yes, desktop/surface no', () => {
+  const d = decide({
+    eventName: 'pull_request',
+    files: ['plugins/workers/mod.ts'],
+    labels: [],
+  });
+  assertEquals(d.runRuntime, true);
+  assertEquals(vector(d), {
+    deno: true,
+    docker: true,
+    desktop: false,
+    docs: false,
+    surface: false,
+  });
+});
+
+Deno.test('NEGATIVE: agent-context-only change (.agents one-file PR, #1055) skips everything', () => {
+  const d = decide({
+    eventName: 'pull_request',
+    files: ['.agents/skills/netscript-pr/SKILL.md'],
+    labels: [],
+  });
+  assertEquals(d.docsOnly, true);
+  assertEquals(d.runStatic, false);
+  assertEquals(d.runRuntime, false);
+  assertEquals(vector(d), ALL_FALSE);
+});
+
+Deno.test('docs/ markdown: needs_docs only', () => {
+  const d = decide({
+    eventName: 'pull_request',
+    files: ['docs/site/index.md'],
+    labels: [],
+  });
+  assertEquals(d.docsOnly, true);
+  assertEquals(vector(d), { ...ALL_FALSE, docs: true });
+});
+
+Deno.test('package README: docs + surface, no toolchain', () => {
+  const d = decide({
+    eventName: 'pull_request',
+    files: ['packages/cli/README.md'],
+    labels: [],
+  });
+  assertEquals(d.docsOnly, true);
+  assertEquals(d.runStatic, false);
+  assertEquals(vector(d), {
+    deno: false,
+    docker: false,
+    desktop: false,
+    docs: true,
+    surface: true,
+  });
+});
+
+Deno.test('.llm/tools code files set needs_deno (root deno test discovers them)', () => {
+  const d = decide({
+    eventName: 'pull_request',
+    files: ['.llm/tools/release/canary-label.ts'],
+    labels: [],
+  });
+  assertEquals(d.docsOnly, false);
+  assertEquals(d.runStatic, false);
+  assertEquals(d.runRuntime, false);
+  assertEquals(vector(d), { ...ALL_FALSE, deno: true });
+});
+
+Deno.test('NEGATIVE: .llm non-code files stay fully skipped', () => {
+  const d = decide({
+    eventName: 'pull_request',
+    files: ['.llm/runs/x/worklog.md', '.llm/harness/workflow/lane-policy.md'],
+    labels: [],
+  });
+  assertEquals(d.docsOnly, true);
+  assertEquals(vector(d), ALL_FALSE);
+});
+
+Deno.test('docs/ code files set docs AND deno', () => {
+  const d = decide({
+    eventName: 'pull_request',
+    files: ['docs/site/build.ts'],
+    labels: [],
+  });
+  assertEquals(vector(d), { ...ALL_FALSE, deno: true, docs: true });
+});
+
+// ── decide: aggregate + labels ───────────────────────────────────────────────
 
 Deno.test('decide: docs-only PR skips both jobs', () => {
   const d = decide({
@@ -205,11 +493,12 @@ Deno.test('decide: one code file forces both jobs', () => {
   assertEquals(d.runRuntime, true);
 });
 
-Deno.test('decide: empty diff is not docs-only -> runs', () => {
+Deno.test('decide: empty diff runs EVERYTHING (cannot classify)', () => {
   const d = decide({ eventName: 'pull_request', files: [], labels: [] });
   assertEquals(d.docsOnly, false);
   assertEquals(d.runStatic, true);
   assertEquals(d.runRuntime, true);
+  assertEquals(vector(d), ALL_TRUE);
 });
 
 Deno.test('decide: ci:skip-e2e skips runtime only', () => {
@@ -242,7 +531,20 @@ Deno.test('decide: both skip labels skip both jobs', () => {
   assertEquals(d.runRuntime, false);
 });
 
-Deno.test('decide: ci:full overrides docs-only', () => {
+Deno.test('NEGATIVE: skip labels never widen to the vector (frozen semantics)', () => {
+  const d = decide({
+    eventName: 'pull_request',
+    files: ['packages/cli/mod.ts'],
+    labels: ['ci:skip-scaffold', 'ci:skip-e2e'],
+  });
+  // The scaffold tiers are label-skipped, but check-test/quality/desktop
+  // still see the code change.
+  assertEquals(d.needsDeno, true);
+  assertEquals(d.needsDesktop, true);
+  assertEquals(d.needsDocker, true);
+});
+
+Deno.test('decide: ci:full overrides docs-only and forces the ENTIRE vector', () => {
   const d = decide({
     eventName: 'pull_request',
     files: ['docs/site/a.md'],
@@ -250,6 +552,7 @@ Deno.test('decide: ci:full overrides docs-only', () => {
   });
   assertEquals(d.runStatic, true);
   assertEquals(d.runRuntime, true);
+  assertEquals(vector(d), ALL_TRUE);
 });
 
 Deno.test('decide: ci:full overrides skip labels', () => {
@@ -262,10 +565,11 @@ Deno.test('decide: ci:full overrides skip labels', () => {
   assertEquals(d.runRuntime, true);
 });
 
-Deno.test('decide: workflow_dispatch runs both (no diff)', () => {
+Deno.test('decide: workflow_dispatch runs everything (no diff)', () => {
   const d = decide({ eventName: 'workflow_dispatch', files: [], labels: [] });
   assertEquals(d.runStatic, true);
   assertEquals(d.runRuntime, true);
+  assertEquals(vector(d), ALL_TRUE);
 });
 
 Deno.test('decide: workflow_dispatch honours skip labels', () => {
