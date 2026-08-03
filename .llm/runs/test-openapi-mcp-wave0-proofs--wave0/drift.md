@@ -109,3 +109,33 @@ Drift is append-only.
 - **Action:** accept; use only thread `019fc95d-ce57-7893-98b3-36977bec0cf1` at that worktree and
   transfer reviewed drafts into the PR worktree with explicit scope checks.
 - **Evidence:** `codex-thread-ids.md`; live launch observed provider/model/effort match.
+
+## 2026-08-03 — P1 generated SQLite runtime lacks FFI permission
+
+- **What:** The prepared SQLite scaffold's generated users resource exits because its Deno command
+  omits `--allow-ffi`, which the generated `libsql` dependency requires.
+- **Source:** Owned Aspire `users` console log and description from the final P1 run.
+- **Expected:** After documented DB initialization, the generated users service becomes healthy so
+  the manifest, Aspire description, and live request can agree.
+- **Actual:** The allocation callback wrote a complete manifest, but Aspire described `users` as
+  `Finished` / exit 1 with no URL. A later HTTP 200 was not tied to a listener owner or precise
+  timing and therefore cannot satisfy D5's coherent same-run evidence bar.
+- **Severity:** significant; product/template change required for a healthy repeat.
+- **Action:** Record explicit P1 `FAIL` and qualified F1(b); recommend eventual `FAIL_RESCOPE` only
+  for the DB-backed product path. Leave product/template source unchanged.
+- **Evidence:** `proofs/evidence/P1-runtime.json`, `proofs/evidence/P1-attempts.md`, and
+  `proofs/P1-verdict.md`.
+
+## 2026-08-03 — S1 Fable evidence/disposition amendment
+
+- **What:** Separate Fable review found the initial S1 wording over-attributed an unexplained HTTP
+  200, under-qualified F1(b), and made the DB-path rescope appear to halt independent proofs.
+- **Source:** `reviews/S1-fable.md` findings M1–M3 and m1–m3.
+- **Expected:** P1 remains explicit `FAIL` under D5/D6 while evidence attribution, decision cause,
+  evaluator authority, and independent downstream work are stated precisely.
+- **Actual:** The same Codex thread amended evidence and wording without rerunning Aspire. Separate
+  native Fable re-review approved every disposition and found no new blocker.
+- **Severity:** major evidence/decision-record clarification; no runtime or product change.
+- **Action:** Keep P1 `FAIL` and qualified/revisitable F1(b); only a separate evaluator may issue
+  `FAIL_RESCOPE`. Permit the supervisor to authorize independent no-DB P2 and P3 work.
+- **Evidence:** `reviews/S1-fable.md`, `reviews/S1-fable-rereview.md`, and amended P1 artifacts.

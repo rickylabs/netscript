@@ -12,9 +12,12 @@
 
 ## Current State
 
-Research and Design are locked at D1–D12. Separate Qwen PLAN-EVAL passed. No P1/P2/P3 experiment or
-verdict exists and no outcome is implied. Draft PR #1182 is open with the required labels/milestone
-and no closing keywords. Implementation may begin only in the separate tracked Codex lane.
+Research and Design are locked at D1–D12 and separate Qwen PLAN-EVAL passed. The tracked Codex lane
+completed S1 with explicit P1 `FAIL`, selecting qualified F1(b). The callback emitted correct
+allocated values and a complete manifest, but the generated SQLite users process exited because
+`--allow-ffi` is absent. Listener ownership and precise timing for a later HTTP 200 were not
+captured, so that observation is ambiguous and cannot satisfy D5. Separate Fable re-review approved
+the amended evidence and causal qualifier. No S2/S3 work has begun.
 
 ## Completed
 
@@ -23,16 +26,20 @@ and no closing keywords. Implementation may begin only in the separate tracked C
 - Harness bootstrap commit/push, draft PR #1182, and research phase comment.
 - Locked plan, Design checkpoint, measurement schemas, commit slices, and gate set.
 - Separate Qwen 3.7 Max/high `plan-eval.md` with `PASS`.
+- S1 disposable SQLite scaffold, documented DB preparation, callback experiment, normalized
+  evidence, explicit P1 `FAIL`/F1(b) verdict, exact owned-resource teardown, and separate Fable
+  approval after one amendment cycle.
 
 ## In Progress
 
-- S0 sign-off commit/push and draft-PR Plan/PLAN-EVAL reporting.
+- Supervisor integration of the approved S1 artifact set and RFC/epic decision-record update.
 
 ## Next Steps
 
-1. Commit/push S0 and post the plan / plan-eval phase comments.
-2. Launch one tracked Codex implementation thread from `implement.md`.
-3. Serialize S1–S3 with Fable review and supervisor sign-off after each.
+1. Commit/push reviewed S1 and synchronize local/GitHub RFC §9 plus epic #1126.
+2. Authorize no-DB P2 and P3 in the tracked Codex thread.
+3. Resolve how the explicit DB-backed P2 failure is recorded without productizing the permission
+   defect in this proof PR.
 
 ## Key Decisions
 
@@ -42,33 +49,36 @@ and no closing keywords. Implementation may begin only in the separate tracked C
 | P1 is not pre-decided                  | RFC §9 / #1127                    | Only measured evidence selects F1(a) or F1(b).   |
 | Two owned scaffolds run serially       | #1128 / shared-host hazard        | SQLite P1/P2 first, no-DB P2 second.             |
 | Incomplete/skipped is FAIL             | RFC §4 / user contract            | Never represent a missing proof as pass.         |
+| P1 selects qualified F1(b)             | Plan D5/D6 + reviewed evidence    | The seam worked; owned-run coherence failed.     |
 | Formal evaluation stays Qwen/open-only | Harness lane policy               | No closed-model or supervisor fallback.          |
 
 ## Files Changed
 
 | Path                                              | Status       | Notes                                                   |
 | ------------------------------------------------- | ------------ | ------------------------------------------------------- |
-| `.llm/runs/test-openapi-mcp-wave0-proofs--wave0/` | modified/new | Harness research, plan/design, prompts, and drift only. |
+| `.llm/runs/test-openapi-mcp-wave0-proofs--wave0/` | modified/new | Harness records plus reviewed S1 proof artifacts.       |
 
 ## Gates
 
 | Gate family      | Current status          | Evidence                                 |
 | ---------------- | ----------------------- | ---------------------------------------- |
 | Plan-Gate        | PASS                    | Separate Qwen verdict in `plan-eval.md`. |
-| Static           | NOT_RUN                 | No implementation.                       |
-| Runtime          | NOT_RUN                 | No experiment started.                   |
-| Resource hygiene | baseline inventory only | Foreign resources listed; no mutation.   |
+| Static           | PASS                    | Scoped S1 check/lint/fmt and scope audit.          |
+| Runtime          | P1 FAIL                 | Qualified F1(b); DB-path rescope recommended.      |
+| Resource hygiene | PASS                    | No owned survivors; foreign resources untouched.  |
 
 ## Open Questions
 
-- P1/P2/P3 measured values remain open by design; their decision rules are locked.
+- P1 is resolved as explicit `FAIL` / qualified F1(b), with separate Fable approval.
+- DB-backed P2 is product-blocked; no-DB P2 and P3 remain runnable.
 - Evaluator credential availability is resolved: the parser-backed live canary passed with tools,
   reasoning, and streaming supported.
 
 ## Drift and Debt
 
-- Drift: supervisor route override, stale overlay read paths, and resolved first-canary credential
-  inheritance recorded in `drift.md`.
+- Drift: supervisor route override, stale overlay read paths, resolved evaluator credential
+  inheritance, and the significant generated `--allow-ffi` permission defect are recorded in
+  `drift.md`.
 - Debt: none.
 
 ## Commits
