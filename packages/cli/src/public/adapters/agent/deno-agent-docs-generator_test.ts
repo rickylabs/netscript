@@ -21,6 +21,11 @@ async function writeProject(root: string, imports: Record<string, string>): Prom
   await Deno.writeTextFile(join(root, 'deno.json'), `${JSON.stringify({ imports }, null, 2)}\n`);
 }
 
+function differentReleaseVersion(): string {
+  const [major, minor, patch] = NETSCRIPT_RELEASE_VERSION.split('.').map(Number);
+  return `${major}.${minor}.${patch + 1}`;
+}
+
 Deno.test('offline docs cover every export subpath at the exact installed version', async () => {
   const root = await Deno.makeTempDir();
   try {
@@ -52,13 +57,14 @@ Deno.test('offline docs cover every export subpath at the exact installed versio
 Deno.test('lock evidence resolves a non-exact JSR range', async () => {
   const root = await Deno.makeTempDir();
   try {
-    await writeProject(root, { '@netscript/config': 'jsr:@netscript/config@^0.0.3' });
+    const range = `jsr:@netscript/config@^${NETSCRIPT_RELEASE_VERSION}`;
+    await writeProject(root, { '@netscript/config': range });
     await Deno.writeTextFile(
       join(root, 'deno.lock'),
-      JSON.stringify({ specifiers: { 'jsr:@netscript/config@^0.0.3': '0.0.3' } }),
+      JSON.stringify({ specifiers: { [range]: NETSCRIPT_RELEASE_VERSION } }),
     );
     assertEquals(await resolveInstalledNetScriptPackages(root), [
-      { name: '@netscript/config', version: '0.0.3' },
+      { name: '@netscript/config', version: NETSCRIPT_RELEASE_VERSION },
     ]);
   } finally {
     await Deno.remove(root, { recursive: true });
@@ -85,13 +91,17 @@ Deno.test('workspace evidence resolves a local package version without a lock', 
 Deno.test('missing lock evidence, version mismatch, and launch throws fail loudly', async () => {
   const root = await Deno.makeTempDir();
   try {
-    await writeProject(root, { '@netscript/config': 'jsr:@netscript/config@^0.0.3' });
+    await writeProject(root, {
+      '@netscript/config': `jsr:@netscript/config@^${NETSCRIPT_RELEASE_VERSION}`,
+    });
     await assertRejects(
       () => resolveInstalledNetScriptPackages(root),
       Error,
       'Cannot prove an exact installed version',
     );
-    await writeProject(root, { '@netscript/config': 'jsr:@netscript/config@0.0.2' });
+    await writeProject(root, {
+      '@netscript/config': `jsr:@netscript/config@${differentReleaseVersion()}`,
+    });
     await assertRejects(
       () => new DenoAgentDocsGenerator(new RecordingRunner()).generate(root),
       Error,
