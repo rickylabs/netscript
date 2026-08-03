@@ -9,7 +9,12 @@ import type {
   ToolName,
 } from '../../domain/tool-types.ts';
 import { type JsonRpcResponse, parseJsonRpcRequest } from '../../domain/json-rpc.ts';
-import { DEFAULT_TRUNCATION_POLICY, truncateResult, type TruncationPolicy } from './truncation.ts';
+import {
+  DEFAULT_TRUNCATION_POLICY,
+  ResultByteLimitError,
+  truncateResult,
+  type TruncationPolicy,
+} from './truncation.ts';
 import { MCP_PACKAGE_VERSION } from '../../publish-assets.generated.ts';
 import { settleFlowReceipt } from './receipt-lifecycle.ts';
 
@@ -124,6 +129,12 @@ export function createMcpServer(options: McpServerOptions): McpServer {
         validateSchema(tool.outputSchema, bounded);
       } catch (error) {
         await settleFlowReceipt(tool.flow, input, false);
+        if (error instanceof ResultByteLimitError) {
+          return rpcError(request.id, -32603, 'Tool result exceeds the transport limit', {
+            code: 'tool_result_too_large',
+            message: error.message,
+          });
+        }
         return rpcError(request.id, -32603, 'Tool returned an invalid structured result', {
           code: 'invalid_tool_result',
           message: error instanceof Error ? error.message : 'Output contract validation failed',

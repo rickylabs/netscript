@@ -31,3 +31,11 @@ remains on the canonical open-model route and ordinary source review remains opp
 The slice-1 `review_codex` primary could not start because the installed Claude CLI rejected the
 configured Fable model id. The policy-declared Claude-family `token_limit_fallback` route (Opus,
 same low effort) is used for ordinary review; formal evaluation is unchanged.
+
+## Supervisor sign-off
+
+- Slice 1: receipt settlement remains an internal composition detail; flow identity is preserved
+  in the registry and receipt writes retain CLI warning-only failure behavior.
+- Slice 2: metadata changes only where the result already declares a boolean `truncated` field,
+  avoiding output-schema invention. Byte accounting uses `TextEncoder` after recursive bounds and
+  before the runner's second schema validation and receipt settlement.

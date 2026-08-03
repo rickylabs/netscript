@@ -64,6 +64,9 @@ when it applies any descendant cap.
 | 2026-08-03 | plan-eval | verdict | Separate Claude Code + OpenRouter Qwen session returned `PASS`; both implementation slices authorized. |
 | 2026-08-03 | slice 1 | gate | Targeted receipt/doctor tests PASS (16/16) with required `--allow-write`; scoped check PASS. Scoped lint/fmt wrappers PASS with explicit `packages/mcp/deno.json` after the root workspace shorthand produced a Deno 2.9 parser error. `quality:gate` PASS. |
 | 2026-08-03 | slice 1 | review route | Fable primary rejected by installed Claude CLI before review; launching policy-declared Opus low fallback. |
+| 2026-08-03 | slice 1 | supervisor sign-off | Diff reviewed against D1/D2; focused receipt/doctor gate repeated at 16 passed, 0 failed; committed as `f00d6338e`. |
+| 2026-08-03 | slice 2 | implementation | Central recursive outcome propagation flips existing boolean `truncated` fields only; a fixed 65,536-byte UTF-8 post-bound ceiling rejects irreducibly large results with an internal error signal. |
+| 2026-08-03 | slice 2 | targeted gate | Truncation + receipt + doctor fixtures PASS: 20 passed, 0 failed. Scoped package check/lint/fmt PASS across 68 TypeScript files with zero findings. |
 
 ## Decisions
 
@@ -98,6 +101,7 @@ when it applies any descendant cap.
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
 | Receipt/doctor fixtures | PASS | 16 passed, 0 failed | Includes invalid-output and thrown-flow failed receipts |
+| Truncation/receipt/doctor fixtures | PASS | 20 passed, 0 failed | Includes 75→50 with `truncated: true`, nested metadata propagation, and the UTF-8 byte ceiling |
 
 ### Consumer Gates
 
