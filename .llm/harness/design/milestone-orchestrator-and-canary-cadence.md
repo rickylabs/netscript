@@ -119,6 +119,39 @@ This is not a style preference. It is the direct lesson of the two dead 0.0.4 gu
 If a label and its published JSR version ever diverge during that exercise, that is a **finding to
 record, not a nuisance to hand-patch**.
 
+
+### Canary release notes **[observed gap, owner-identified 2026-08-03]**
+
+A canary today publishes to JSR and creates a git tag `v<version>`, and **that is all**. There is no
+GitHub release and no note: `gh release list` returns only `v0.0.3`, `v0.0.2`, `v0.0.1-beta.11` —
+**zero canaries**. A canary is therefore an opaque version string. You can see *that* one shipped,
+never *what is in it*.
+
+This design initially covered the **label** (which canary) and the **stable cut-time note** (the
+#1083 class), and omitted the canary's own note. That is the "what does it contain" half of this
+epic's own question, and the omission was the owner's find, not the author's.
+
+**The payload is already the note.** Slice A computes the PRs merged between canary points and the
+issues they closed, in order to apply the label. The same derivation renders the note — and it must
+be *the same* derivation, not a second path, because two paths to the same fact is how a label and a
+note drift apart.
+
+Rules:
+
+- The note is published as a **GitHub release on the existing `v<version>` tag, marked prerelease**.
+  A canary must never take `Latest` — that belongs to stable.
+- Re-running is **idempotent**: it updates an existing canary release rather than failing or
+  duplicating.
+- An empty payload (nothing merged since the last canary) produces an **explicit empty-payload
+  note**, not a silent success and not a crash.
+- Publishing a note for a version that was never published **fails**, under the same identity
+  constraint as the label.
+
+**Consequence for the cadence:** the canary note is what accumulates into the stable release note.
+The #1083 obligation — breaking changes surfaced from closed issues must reach the notes — is
+satisfied continuously at each canary rather than reconstructed at the cut, which is the point in
+the process where it was historically dropped.
+
 ## Cut-time checklist **[observed]**
 
 Derived from what was actually missed or nearly missed in 0.0.4:
