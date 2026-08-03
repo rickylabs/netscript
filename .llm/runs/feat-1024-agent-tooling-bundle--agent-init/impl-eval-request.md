@@ -3,8 +3,8 @@ use harness
 # IMPL-EVAL request: agent init tooling and offline docs bundles
 
 Evaluate the implementation on PR #1092 only. Do not implement product changes, tick issue boxes,
-rewrite acceptance evidence, mutate `deno.lock`, or launch `scaffold.runtime`: the local host has a
-separate active Aspire run and the supervisor owns the serialized runtime retry.
+rewrite acceptance evidence, mutate `deno.lock`, or launch `scaffold.runtime`: the supervisor has
+already completed the serialized runtime and consumer runs.
 
 ## SKILL
 
@@ -42,9 +42,20 @@ Challenge especially:
 6. whether tests cover `Deno.Command` launch throws and the excluded-file exit-zero trap;
 7. whether public package JSDoc, architecture boundaries, lock hygiene, and generated-asset freshness
    are clean;
-8. whether issue/PR boxes already checked are supported by evidence. Leave #1024 criteria 5–6
-   unchecked: the local full runtime retry is pending after a 47/48 run was invalidated by a foreign
-   concurrent AppHost and failed only `behavior.service-health` with database-unhealthy.
+8. whether issue/PR boxes already checked are supported by evidence. #1024 criterion 5 is checked:
+   a fresh installed tool, invoked from `/tmp`, completed 22 exact-release steps and its final-artifact
+   validator then rejected all six pinned host ports emitted by public `0.0.3`. Criterion 6 remains
+   unchecked because the current public scaffold cannot pass that enforced gate. The PR therefore
+   uses `Refs #1024`, not a closing keyword. #1061 is fully evidenced and remains `Closes #1061`.
+
+Static verification at final product head `04757a018` is green: root check selected 2,524 files in 22
+batches; root test passed 2,535 tests (564 steps), zero failed and 16 ignored; changed-file
+check/lint/fmt, quality scan, architecture check, CLI doc lint, asset freshness, and publish dry-run
+all pass. A quiet-host local-source `scaffold.runtime` passed 47/48 and cleanup, failing only the
+pre-existing `behavior.service-health` Prisma/database-unhealthy shape. Do not treat that as a green
+runtime result. Judge whether the PR may pass its honestly reduced close scope: full #1061 closure
+plus the independently useful and evidenced #1024 tooling work, with #1024 deliberately left open
+for the scaffold-owned criterion 6.
 
 ## Required output
 

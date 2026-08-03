@@ -163,6 +163,7 @@ compressed asset; never hand-edit the generated TypeScript or API text.
 | 2026-08-03T15:53:00+02:00 | S3 | generated-artifact enforcement | A fresh reinstalled consumer tool run from `/tmp` passed 22 steps through exact-release scaffold, five plugins, DB init/generate/seed/status, auth path closure, and generated type-check. The final-artifact host-port gate then correctly rejected six literal `withHttpEndpoint({ port: ... })` pins emitted by published `0.0.3`. This evidences #1024 criterion 5 but blocks criterion 6 on the current public release; the concurrent scaffold lane owns those emitted defaults, so this slice did not weaken the validator or edit that worktree. The failed run's exact owned container was removed and leak-check returned zero survivors. |
 | 2026-08-03T15:59:00+02:00 | S3 | serialized merge gate | With leak-check at zero and no foreign AppHost, the required one-pass local-source `scaffold.runtime` passed 47 gates and cleanup, failing only `behavior.service-health`: the users service stayed HTTP 503 because Prisma's raw query could not reach the generated database. This reproduces the earlier clean baseline failure at the same gate and is not caused by the tooling/docs diff. No run-owned survivors remained. |
 | 2026-08-03T16:06:00+02:00 | S3 | full-test red/fix | Final `deno task test` passed 2,533 tests but exposed two failures: the forbidden-command walker hit root-owned Postgres state left by prior failed runtime fixtures, and the version-drift guard found a pinned release string in the generated tool barrel plus a docs test fixture. Removed only the three exact run-owned fixture directories through a root-capable disposable container; leak-check stayed clear. Kept the version guard strict: the generated barrel now derives `release.json` at runtime through `netscriptJsrSpecifier('cli')`, while its hash remains generation-time verified, and docs mismatch/range fixtures derive versions. Focused 21/21 plus scoped check/lint/fmt pass. |
+| 2026-08-03T16:18:00+02:00 | S3 | final static verification | After the release-metadata fix, `deno task check` passed 2,524 files in 22 batches and `deno task test` passed 2,535 tests (564 steps), with 16 intentional ignores and zero failures. Changed-file check/lint/fmt, `quality:scan`, `arch:check`, CLI `deno doc --lint`, asset-barrel verification, and `publish:dry-run` all passed. The publication simulation ended `Success Dry run complete` and included the generated CLI docs/tool/skill assets; existing unanalyzable-dynamic-import warnings remain unrelated. |
 
 ## Decisions
 
@@ -217,6 +218,12 @@ compressed asset; never hand-edit the generated TypeScript or API text.
 | S2 generated asset freshness | PASS | regenerate + identical SHA-256 | Docs `71606ae0…`, tools `ea4529fb…`, skills `42880579…`. |
 | S2 pre-fix red | PASS | detached `d6265fa52` CLI help assertion exited 1 | Current CLI prints the `--with-docs` option; temporary worktree removed. |
 | Consumer exact-release availability | PASS after fix | fresh installed tool reached exact `jsr:@netscript/cli@0.0.3`; pre-fix failed on Deno 24h policy; regression suite 15/15 | Explicit public-release flag bypasses only the time-based registry quarantine; local CLI commands are unchanged. Runtime continuation pending quiet host. |
+| Final root check | PASS | 2,524 files; 22 batches; 0 diagnostics | Run at `04757a018`. |
+| Final root test | PASS | 2,535 passed (564 steps), 0 failed, 16 ignored | Run after removing only reporter-proven run-owned fixture state. |
+| Final changed-file check/lint/fmt | PASS | zero findings | Includes generator, generated asset, CLI agent feature, docs builder, and tests. |
+| Final quality/doctrine | PASS | `quality:scan` zero findings; `arch:check` FAIL=0 | Existing allowances/warnings only. |
+| Final CLI doc lint | PASS | 3 entrypoints, 0 diagnostics | Published-package missing-JSDoc bar satisfied. |
+| Final publish dry-run | PASS | `Success Dry run complete` | JSR simulation includes generated docs, tools, and skills assets; existing dynamic-import warnings only. |
 
 ### Runtime Gates
 
