@@ -92,6 +92,7 @@ by adding a named gate to `packages/cli/e2e/src/application/gates/scaffold/runti
 | 2026-08-03 | S3 | runtime discovery | The first merge-readiness run failed at `database.init`: Aspire rejected the second root-level file because `aspire.config.json` still identified only `apphost.mts`. This disproved the planned path-only identity model before any lifecycle acceptance was claimed. |
 | 2026-08-03 | S3 | lifecycle correction | Replaced the second loose entry with a complete nested Aspire project (`db-operation/` config, SDK, tsconfig, helper graph). Because detached Aspire does not forward the caller environment, the lock owner writes a short-lived operation request file that the nested AppHost consumes before composition. A live `db status` reached Prisma and returned its expected no-migrations exit without leaking resources. |
 | 2026-08-03 | S3 | describe schema correction | Live `aspire describe` proved `healthReports` is a keyed object in Aspire 13.4, not an array. Inspector, doctor evidence counting, and the dead-port gate now preserve/count both keyed-object and array shapes. |
+| 2026-08-03 | S3 | failure observability | The pretty E2E reporter previously printed only `FAILED <ms>`. It now emits the gate error plus captured stderr (or stdout fallback), with a regression test using the exact database-init diagnostic shape. |
 
 ## Decisions
 
