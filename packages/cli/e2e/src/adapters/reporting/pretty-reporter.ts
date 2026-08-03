@@ -12,7 +12,7 @@ export class PrettyReporter implements Reporter {
     } else if (event.type === 'gate-start') {
       await write(`> ${event.gateId}: ${event.title}\n`);
     } else if (event.type === 'gate-end') {
-      await this.output(`  ${event.result.verdict.toUpperCase()} ${event.result.durationMs}ms\n`);
+      await this.output(formatVerdict(event.result));
       if (event.result.verdict === 'failed') {
         if (event.result.error) await this.output(indent(event.result.error));
         const command = event.result.evidence.find((item) => item.kind === 'command');
@@ -28,6 +28,27 @@ export class PrettyReporter implements Reporter {
       );
     }
   }
+}
+
+function formatVerdict(
+  result: Extract<ReportEvent, { readonly type: 'gate-end' }>['result'],
+): string {
+  const verdict = result.verdict.toUpperCase();
+  if (!result.retried) return `  ${verdict} ${result.durationMs}ms\n`;
+  const durations = result.attempts.map((attempt) => formatDuration(attempt.durationMs)).join(
+    ' + ',
+  );
+  if (result.verdict === 'passed') {
+    const previous = result.attempts[result.attempts.length - 2];
+    return `  ${verdict} (attempt ${result.attempts.length}/${result.attempts.length} after ${previous.failureClass} attempt ${previous.attempt}, ${durations})\n`;
+  }
+  return `  ${verdict} ${result.durationMs}ms (attempt durations: ${durations})\n`;
+}
+
+function formatDuration(durationMs: number): string {
+  if (durationMs < 1_000) return `${durationMs}ms`;
+  const seconds = durationMs / 1_000;
+  return `${Number.isInteger(seconds) ? seconds : seconds.toFixed(1)}s`;
 }
 
 function indent(text: string): string {

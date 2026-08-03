@@ -7,6 +7,24 @@ import type { ExecutionPlatform } from './platform.ts';
 /** Gate verdicts emitted by the runner. */
 export type GateVerdict = 'passed' | 'failed' | 'skipped';
 
+/** Stable classification used to decide whether a command attempt may be retried. */
+export type GateFailureClass = 'timeout' | 'canceled' | 'assertion';
+
+/** Result of one execution attempt within a gate. */
+export type GateAttempt = {
+  readonly attempt: number;
+  readonly verdict: 'passed' | 'failed';
+  readonly durationMs: number;
+  readonly failureClass?: GateFailureClass;
+  readonly exitCode?: number;
+};
+
+/** Opt-in retry policy for command gates. */
+export interface CommandGateRetryPolicy {
+  readonly classes: readonly GateFailureClass[];
+  readonly maxRetries: 1;
+}
+
 /** Build a command from the current run context. */
 export type CommandFactory = (context: RunContext) => readonly string[];
 
@@ -23,6 +41,8 @@ export interface GateResult {
   readonly verdict: GateVerdict;
   readonly critical: boolean;
   readonly evidence: readonly Evidence[];
+  readonly attempts: GateAttempt[];
+  readonly retried: boolean;
   readonly error?: string;
 }
 
@@ -46,6 +66,7 @@ export interface CommandGateDefinition extends BaseGateDefinition {
   readonly expectedExitCode?: number;
   /** Substrings that must all appear in captured standard output. */
   readonly stdoutIncludes?: readonly string[];
+  readonly retry?: CommandGateRetryPolicy;
 }
 
 /** Semantic gate backed by an HTTP health probe. */

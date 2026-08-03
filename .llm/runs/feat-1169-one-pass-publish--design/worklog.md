@@ -50,3 +50,23 @@ one file) and copies the `commandGate(…, { retry })` pattern; report consumers
   Notable: `duplicate_sender_risk` refusal already exits 4 with tests — F5 re-scoped to
   verify-and-audit. Slicing proposal posted on #1169 (deliverable 1). Awaiting PLAN-EVAL
   (separate open-model session) before any implementation slice.
+
+## S1 evidence
+
+- 2026-08-03 · S1 implementation: added attempt-visible command-gate results and an opt-in,
+  one-retry policy. `runtime.aspire-restore` is the only opted-in gate. Assertion failures are
+  rejected by the retry predicate even when `classes: ['assertion']` is explicitly configured.
+- `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/cli/e2e --ext ts`
+  → exit 0; 117 files selected, 0 failed batches, 0 findings.
+- `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/cli/e2e --ext ts`
+  → exit 0; 117 files selected, 0 findings.
+- `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/cli/e2e --ext ts`
+  → exit 0; 117 files selected, 0 failed batches, 0 findings.
+- `deno task --cwd packages/cli/e2e test` → exit 0; 80 passed, 0 failed. Includes six fake-executor
+  command-gate cases and retried-pass/exhausted-retry console visibility cases.
+- `deno test .llm/tools/e2e/print-failed-report-steps_test.ts` → exit 0; 4 passed, 0 failed. The
+  existing parser remains compatible with the extended report step shape; no parser edit needed.
+- Harness supplemental gate: `deno task quality:gate` via `rtk proxy` → exit 0. Quality scan found
+  no violations; architecture checks completed with only pre-existing non-failing warnings.
+- `deno task e2e:cli` intentionally not run; the S1 brief reserves that expensive gate for the
+  Tier-A supervisor.
