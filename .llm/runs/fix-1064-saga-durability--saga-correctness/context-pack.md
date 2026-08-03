@@ -12,9 +12,9 @@
 
 ## Current State
 
-#1064 and #1065 are implemented and gated. The default durable runtime now dispatches returned
-compensation effects through its installed compensator, redispatches compensation-produced effects,
-and rejects unknown or incomplete effect handling loudly.
+All three defect slices are implemented and locally gated. Instance identity now resolves from the
+definition extractor, then explicit correlation key, then stable saga/type default; transport
+message ids never fork durable workflows.
 
 ## Completed
 
@@ -25,13 +25,13 @@ and rejects unknown or incomplete effect handling loudly.
 
 ## In Progress
 
-- Commit, push, and comment #1065 evidence before starting #1066.
+- Commit, push, and comment #1066 evidence, then run aggregate merge-readiness gates.
 
 ## Next Steps
 
-1. Commit, push, and comment #1065.
-2. Implement and gate #1066 extractor-first instance identity.
-3. Run aggregate gates and supervisor review; drive draft PR to ready-for-merge.
+1. Commit, push, and comment #1066.
+2. Run aggregate gates and JSR/public-surface checks.
+3. Obtain supervisor review and drive draft PR to ready-for-merge.
 
 ## Key Decisions
 

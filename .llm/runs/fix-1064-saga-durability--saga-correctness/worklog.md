@@ -69,6 +69,8 @@ integration test.
 | 2026-08-03 | slice 1   | gate      | Real Redis list/save/CAS passed; package suites passed 79 + 63 tests.                          |
 | 2026-08-03 | slice 2   | implement | Publish ledgers dispatch; durable runtime wires compensation; incomplete effects throw.        |
 | 2026-08-03 | slice 2   | gate      | Default compensation and nested cascade passed; package suites passed 64 + 40 tests.           |
+| 2026-08-03 | slice 3   | implement | Extractor precedes explicit key and stable default; message id removed from identity.          |
+| 2026-08-03 | slice 3   | gate      | Concurrent split, same-key resume, and fallbacks passed; core suite passed 67 tests.           |
 
 ## Decisions
 
@@ -118,6 +120,9 @@ integration test.
 | Saga-core #1065 suite   | PASS   | 64 passed, 0 failed                | Two unrelated integration tests ignored.                   |
 | Sagas plugin suite      | PASS   | 40 passed, 0 failed                | Default durable runtime path exercised.                    |
 | #1065 scoped wrappers   | PASS   | 186 files, 0 diagnostics/findings  | Check, lint, and source format clean.                      |
+| #1066 focused           | PASS   | 6 passed, 0 failed                 | Concurrent workflows and distinct-id resume covered.       |
+| Saga-core #1066 suite   | PASS   | 67 passed, 0 failed                | Two unrelated integration tests ignored.                   |
+| #1066 scoped wrappers   | PASS   | 110 files, 0 diagnostics/findings  | Check, lint, and source format clean.                      |
 
 ### Consumer Gates
 

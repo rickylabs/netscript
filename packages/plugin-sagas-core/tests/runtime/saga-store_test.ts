@@ -5,6 +5,7 @@ import type {
   SagaCorrelationKey,
   SagaDefinition,
   SagaInstanceId,
+  SagaMessageId,
   SagaState,
   SagaStateEnvelope,
   SagaTransitionRecord,
@@ -124,6 +125,128 @@ Deno.test('native runtime persists terminal status from failure and compensation
     await runtime.stop('terminal status test complete');
   }
 });
+
+Deno.test('native runtime separates concurrent workflows by definition correlation extractor', async () => {
+  const store = new MemorySagaStore();
+  const runtime = createSagaRuntime({ native: { store } });
+  const definition = correlatedCounterDefinition('extracted-correlation');
+
+  await runtime.register([definition]);
+  await runtime.start();
+  try {
+    await Promise.all([
+      runtime.publish({
+        id: 'message-a' as SagaMessageId,
+        type: 'Increment',
+        payload: { workflowId: 'workflow-a' },
+      }),
+      runtime.publish({
+        id: 'message-b' as SagaMessageId,
+        type: 'Increment',
+        payload: { workflowId: 'workflow-b' },
+      }),
+    ]);
+
+    assertEquals(store.envelopes.get('extracted-correlation:workflow-a' as SagaInstanceId)?.state, {
+      count: 1,
+    });
+    assertEquals(store.envelopes.get('extracted-correlation:workflow-b' as SagaInstanceId)?.state, {
+      count: 1,
+    });
+    assertEquals(store.envelopes.size, 2);
+  } finally {
+    await runtime.stop('extracted correlation concurrency test complete');
+  }
+});
+
+Deno.test('native runtime resumes one extracted workflow across distinct message ids', async () => {
+  const store = new MemorySagaStore();
+  const runtime = createSagaRuntime({ native: { store } });
+  const definition = correlatedCounterDefinition('resumed-correlation');
+
+  await runtime.register([definition]);
+  await runtime.start();
+  try {
+    await runtime.publish({
+      id: 'message-1' as SagaMessageId,
+      type: 'Increment',
+      payload: { workflowId: 'workflow-a' },
+    });
+    await runtime.publish({
+      id: 'message-2' as SagaMessageId,
+      type: 'Increment',
+      payload: { workflowId: 'workflow-a' },
+    });
+
+    assertEquals(store.envelopes.get('resumed-correlation:workflow-a' as SagaInstanceId)?.state, {
+      count: 2,
+    });
+    assertEquals(store.envelopes.size, 1);
+  } finally {
+    await runtime.stop('extracted correlation resume test complete');
+  }
+});
+
+Deno.test('native runtime falls back from undefined extractor to explicit key then stable default', async () => {
+  const store = new MemorySagaStore();
+  const runtime = createSagaRuntime({ native: { store } });
+  const definition = defineSaga('fallback-correlation')
+    .state<SagaState>({ count: 0 })
+    .correlate(() => undefined)
+    .on<string, unknown>('Increment', (saga) => {
+      saga.state = { count: Number(saga.state.count) + 1 };
+      return [];
+    })
+    .build() as SagaDefinition;
+
+  await runtime.register([definition]);
+  await runtime.start();
+  try {
+    await runtime.publish({
+      id: 'explicit-id' as SagaMessageId,
+      type: 'Increment',
+      payload: {},
+      correlationKey: 'explicit' as SagaCorrelationKey,
+    });
+    await runtime.publish({
+      id: 'default-id-1' as SagaMessageId,
+      type: 'Increment',
+      payload: {},
+    });
+    await runtime.publish({
+      id: 'default-id-2' as SagaMessageId,
+      type: 'Increment',
+      payload: {},
+    });
+
+    assertEquals(store.envelopes.get('fallback-correlation:explicit' as SagaInstanceId)?.state, {
+      count: 1,
+    });
+    assertEquals(
+      store.envelopes.get(
+        'fallback-correlation:fallback-correlation:Increment' as SagaInstanceId,
+      )?.state,
+      { count: 2 },
+    );
+    assertEquals(store.envelopes.size, 2);
+  } finally {
+    await runtime.stop('correlation fallback test complete');
+  }
+});
+
+function correlatedCounterDefinition(id: string): SagaDefinition {
+  return defineSaga(id)
+    .state<SagaState>({ count: 0 })
+    .on<string, unknown>('Increment', (saga) => {
+      saga.state = { count: Number(saga.state.count) + 1 };
+      return [];
+    })
+    .correlate((message) => {
+      const payload = message.payload as { workflowId: string };
+      return payload.workflowId as SagaCorrelationKey;
+    })
+    .build() as SagaDefinition;
+}
 
 class MemorySagaStore implements SagaStorePort {
   readonly id = 'memory-saga-store-test';

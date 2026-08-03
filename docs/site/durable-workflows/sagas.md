@@ -214,6 +214,18 @@ returned `SagaBuilder`.
   ]
 }) }}
 
+### Instance-key precedence
+
+For every handled message, the native engine resolves one durable instance key in this order:
+
+1. the value returned by the definition's `.correlate(...)` extractor;
+2. the message's explicit `correlationKey` when the extractor returns `undefined`;
+3. the stable default `<sagaId>:<messageType>` correlation key.
+
+The transport-level message `id` is never an instance key. Distinct message ids can therefore
+resume the same workflow, while two concurrent messages whose extractor returns different business
+keys are persisted as separate saga instances.
+
 {{ comp.tabbedCode({ tabs: [
   {
     label: "Simple — minimal saga",
