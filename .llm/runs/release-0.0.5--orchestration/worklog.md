@@ -493,3 +493,44 @@ slices; #1106/#1109 re-wave on owner action.
     permission-denied headless run reports `SUCCESS` with an empty response. Lane provisioning
     (like credential provisioning, finding 15) is a precondition the policy never states, and
     the CLI's success-on-refusal is #1173-class.
+
+## 2026-08-04 — Canary point 1: GREEN PAIR — stage-E records (quoted)
+
+- **Published:** `0.0.5-canary.1` on all five packages (JSR meta queried directly). Workflow
+  run 30858888833 success; pinned `e2e-cli-prod` success @22:34:15Z;
+  **`release/canary-pair=success` @22:42:10Z on `2c8865e8c`** (statuses API, quoted).
+- **Note (D3 derivation, quoted):** GitHub prerelease `v0.0.5-canary.1` (prerelease=true, never
+  Latest): "Canary payload derived from **merge-aware history** after `v0.0.4` (10 commit(s)
+  inspected; **outcome: populated**)" — the #1180/#1166 derivation and its explicit
+  populated-vs-genuine-empty vocabulary, live in production. Payload: 10 PRs.
+- **Labels:** `canary:0.0.5-canary.1` applied to all 10 payload PRs + 9 closed issues by the
+  workflow. **Two issues missed** (#1105, #1128) — root causes distinct and both recorded:
+  #1182 deliberately carried `Refs #1128` (its verdict declined self-claim — honest), and
+  #1181's closing references were **empty at merge** despite close-gate reading both pre-merge
+  (`closingIssuesReferences: []` verified). Hand-closed both on prior verified evidence,
+  hand-labeled with explanatory comments. Not a drift-gate patch: the drift gate's
+  label↔version contract was green; issue-completeness is outside its scope.
+- **External merges 8–10 (parallel lane, interleaved with wave-1):** #1185 (`~22:5x`, closes
+  #1172), #1186 (`ed1510719` 23:00, closes #1173), #1179 (`8d3cc926b` 23:14, closes #1171
+  attribution). All three retro-audited via pr-checks: `ok:true`, zero current-fails. Main's
+  close-gate verified to retain #1181's provenance fields post-#1179 (8 grep hits) — the two
+  rebuilds composed.
+
+### Findings for #1163 (continued)
+
+19. **[body-edit-strips-closing-refs]** Orchestrator body edits between the close-gate read and
+    the merge (box-ticking via `gh pr edit --body-file`) left #1181 with zero
+    closingIssuesReferences at merge — the auto-close silently did not fire and #1105 stranded
+    open behind a merged PR. The pre-merge gate needs a final row: **re-verify
+    closingIssuesReferences AFTER the last body edit, immediately before merge.** Adopted for
+    every subsequent merge this run.
+20. **[labeler-blind-to-hand-closes]** `release:canary-label` derives issue labels from GitHub
+    closing references, so honestly-Refs'd PRs (evidence hand-closes) and stripped-ref merges
+    produce label gaps the drift gate cannot see. #1149's exercise caught exactly this — its
+    evidence value confirmed on the first live canary.
+
+## 2026-08-04 — R4: waves compress (external closes #1172, #1173)
+
+W4 → #1135, #1136, #1104 (3 lanes). W5 → #1102, #1093, #1108 (3 lanes). #1085 (W6) re-nets
+against #1186's landed refusal-audit at dispatch — its exit-code boxes are likely already
+satisfied; brief will demand the delta only. Canary points unchanged.
