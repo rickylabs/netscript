@@ -58,6 +58,8 @@ Deno.test('consumer mode selects the exact released CLI without a framework clon
       report.steps.some((step) => JSON.stringify(step.details).includes('scaffold.plugin.json')),
       false,
     );
+    const typeCheck = report.steps.find((step) => step.id === 'deno-check-generated-workspaces');
+    assertEquals(JSON.stringify(typeCheck?.details).includes('"./packages"'), false);
   } finally {
     await Deno.remove(root, { recursive: true });
   }

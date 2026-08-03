@@ -1073,6 +1073,14 @@ class SmokeRunner {
   }
 
   async #typeCheckGeneratedProject(): Promise<void> {
+    const generatedTargets = [
+      './plugins',
+      './workers',
+      './sagas',
+      './triggers',
+      './services',
+      './database',
+    ];
     await this.#runCommand({
       id: 'deno-check-generated-workspaces',
       title: 'Type-check generated packages/plugins/background/services/database',
@@ -1081,13 +1089,8 @@ class SmokeRunner {
         'deno',
         'check',
         '--unstable-kv',
-        './packages',
-        './plugins',
-        './workers',
-        './sagas',
-        './triggers',
-        './services',
-        './database',
+        ...(this.#options.source === 'local' ? ['./packages'] : []),
+        ...generatedTargets,
       ],
     });
   }
