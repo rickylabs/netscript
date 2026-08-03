@@ -77,6 +77,7 @@ CLI E2E/dependency fixture rather than importing workspace source directly.
 | 2026-08-03 | slice 3   | #1015 evidence | Existing Aspire/service tests prove absolute project-owned registry URLs. Added `published dependency starts a saga runtime with a project-owned non-empty registry`, which imports `jsr:@netscript/plugin-sagas@0.0.3/runtime`, starts it against the consumer project's generated registry, and asserts `definitionCount === 1`. No saga source/runtime/store file was changed. |
 | 2026-08-03 | slice 3   | #1017 evidence | Added per-plugin assertions that worker, saga, trigger, and stream install commands each receive `--no-samples` and never `--samples`. The true-userland E2E artifact independently showed all four real commands with `--no-samples` and reduced created-file counts. Its final source-leak assertion found pre-existing local-path doctor URLs in persisted manifests; this is unrelated to sample threading and was not expanded into a redesign. |
 | 2026-08-03 | slice 3   | final review correction | Added four named product-level install cases that pass `includeSamples: false` through `installPlugin` into each real official scaffolder and assert required glue exists while that plugin's sample is absent. Also records explicitly that `ba0bc937b` changed no-AppHost from `error` to `warning`: this preserves pre-start doctor usability, while missing registries and running-but-unhealthy resources remain errors. |
+| 2026-08-03 | slice 2 follow-up | deno-only regression | Added the third AppHost observation arm, `unavailable`. `Deno.errors.NotFound` from executing Aspire (covering a missing binary or missing Aspire cwd) becomes a warning that names why inspection was skipped; a working Aspire command returning non-zero still throws and becomes an inspection error. The command-level regression test injects a process that throws `NotFound` and proves `plugin doctor` exits zero. |
 
 ## Decisions
 
@@ -114,6 +115,12 @@ the owner-authorized supervisor.
 | Scoped check/lint/fmt | Six touched CLI files; check `0` failed batches/occurrences, lint `0` occurrences, fmt `0` findings. |
 | `deno task quality:scan` | `ok: true`, `findings: []`; seven existing allowances only. |
 | `deno task arch:check` | Exit 0; every doctrine root `FAIL=0` with pre-existing warnings only. |
+
+### Deno-only doctor regression follow-up
+
+| Gate | Trusted artifact/output |
+| ---- | ----------------------- |
+| Inspector + doctor command | `15 passed | 0 failed`; includes process `exec` throwing `Deno.errors.NotFound`, an `apphost:inspection-unavailable` warning, successful command completion, and a distinct non-zero Aspire result that remains an error. |
 
 ### Slice 3
 

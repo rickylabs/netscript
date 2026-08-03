@@ -12,6 +12,20 @@ export class AspireAppHostDoctorInspector implements AppHostInspector {
 
   /** Return an explicit absent/running snapshot; never infer liveness from `describe` exit code. */
   async inspect(projectRoot: string): Promise<AppHostInspection> {
+    try {
+      return await this.inspectAvailableCli(projectRoot);
+    } catch (error) {
+      if (error instanceof Deno.errors.NotFound) {
+        return {
+          status: 'unavailable',
+          reason: `AppHost inspection was skipped because Aspire could not be executed: ${error.message}`,
+        };
+      }
+      throw error;
+    }
+  }
+
+  private async inspectAvailableCli(projectRoot: string): Promise<AppHostInspection> {
     const appHostPath = resolve(projectRoot, 'aspire/apphost.mts');
     const ps = await this.process.exec('aspire', [
       'ps',

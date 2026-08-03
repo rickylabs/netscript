@@ -11,6 +11,8 @@ import { compileWorkersRegistry } from '../../../../../../../plugins/workers/src
 import { generateRuntimeRegistries } from '../../../../../../../plugins/workers/src/cli/runtime-registry-generator.ts';
 import { PLUGIN_PACKAGE_VERSION as WORKERS_PACKAGE_VERSION } from '../../../../../../../plugins/workers/src/package-metadata.generated.ts';
 import { generateSagaRegistry } from '../../../../../../../plugins/sagas/src/cli/registry-generator.ts';
+import { AspireAppHostDoctorInspector } from '../../../../kernel/adapters/aspire/apphost-doctor-inspector.ts';
+import type { ProcessPort, ProcessResult } from '../../../../kernel/ports/process-port.ts';
 
 Deno.test('plugin doctor exits non-zero when generated registries are absent', async () => {
   const projectRoot = '/workspace';
@@ -124,6 +126,25 @@ Deno.test('plugin doctor distinguishes an absent AppHost from unhealthy resource
   assertEquals(reports[0].status, 'warning');
   assertEquals(reports[0].checks[0].id, 'apphost:not-running');
   assertStringIncludes(reports[0].checks[0].message ?? '', 'No AppHost is running');
+});
+
+Deno.test('plugin doctor warns and exits zero when Aspire inspection is unavailable', async () => {
+  const output: string[] = [];
+  const command = createDoctorPluginCommand({
+    resolveProjectRoot: () => Promise.resolve('/workspace'),
+    print: (line) => output.push(line),
+    doctor: (input) =>
+      doctorPlugin(input, {
+        fs: new MemoryFileSystemAdapter(),
+        loadConfig: () => Promise.resolve(configWithResources()),
+        inspectAppHost: new AspireAppHostDoctorInspector(new MissingAspireProcess()),
+      }),
+  });
+
+  await command.parse(['--project-root', '/workspace']);
+  assertStringIncludes(output.join('\n'), 'warning');
+  assertStringIncludes(output.join('\n'), 'AppHost inspection was skipped');
+  assertStringIncludes(output.join('\n'), 'aspire command not found');
 });
 
 Deno.test('plugin doctor reports configured resources missing from the running AppHost by name', async () => {
@@ -243,6 +264,12 @@ function configWithResources() {
     apps: { web: { port: 3000 } },
     databases: { 'main-db': { engine: 'postgres' } },
   } as never;
+}
+
+class MissingAspireProcess implements ProcessPort {
+  exec(): Promise<ProcessResult> {
+    return Promise.reject(new Deno.errors.NotFound('aspire command not found'));
+  }
 }
 
 async function assertSagaCommandPasses(registrySource: string): Promise<void> {

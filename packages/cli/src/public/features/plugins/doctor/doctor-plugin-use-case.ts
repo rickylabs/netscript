@@ -68,6 +68,7 @@ export interface AppHostResourceState {
 /** Explicit AppHost lifecycle and resource snapshot. */
 export type AppHostInspection =
   | { readonly status: 'not-running' }
+  | { readonly status: 'unavailable'; readonly reason: string }
   | { readonly status: 'running'; readonly resources: readonly AppHostResourceState[] };
 
 /** Runtime observation port used by plugin doctor. */
@@ -115,6 +116,18 @@ async function diagnoseAppHost(
 ): Promise<PluginDoctorReport> {
   try {
     const snapshot = await inspector.inspect(projectRoot);
+    if (snapshot.status === 'unavailable') {
+      return {
+        pluginName: 'apphost',
+        status: 'warning',
+        checks: [{
+          id: 'apphost:inspection-unavailable',
+          title: 'Aspire AppHost inspection available',
+          status: 'warning',
+          message: snapshot.reason,
+        }],
+      };
+    }
     if (snapshot.status === 'not-running') {
       return {
         pluginName: 'apphost',
