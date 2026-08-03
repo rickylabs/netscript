@@ -87,7 +87,6 @@ export interface EffortEscalation {
 }
 
 const MAJOR_UI_UX_PRESET = OPENROUTER_PRESETS['claude-design-glm-5-2'];
-const DOCUMENTATION_AUTHORING_PRESET = OPENROUTER_PRESETS['claude-docs-gemini-3-6-flash'];
 const FORMAL_EVALUATOR_PRESET = OPENROUTER_PRESETS['claude-evaluator-qwen-3-7-max'];
 
 /** Canonical machine-readable route bindings rendered by the harness lane-policy document. */
@@ -217,12 +216,10 @@ export const CANONICAL_ROUTE_POLICY: readonly CanonicalRoutePolicy[] = [
   {
     lane: 'documentation_authoring',
     purpose: 'documentation',
-    agent: 'claude',
-    provider: 'openrouter',
-    profileId: DOCUMENTATION_AUTHORING_PRESET.profileId,
-    presetId: DOCUMENTATION_AUTHORING_PRESET.id,
-    model: DOCUMENTATION_AUTHORING_PRESET.model,
-    effort: DOCUMENTATION_AUTHORING_PRESET.effort,
+    agent: 'antigravity',
+    provider: 'google',
+    model: MODEL_IDS.antigravity,
+    effort: 'low',
     condition: 'documentation_generation',
   },
   // --- Single-pass audit of a Claude-generated docs changeset ---------------------

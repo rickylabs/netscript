@@ -2,12 +2,14 @@ import {
   ANTIGRAVITY_MAX_CAPTURE_BYTES,
   type AntigravityCommandOptions,
   AntigravityEvidenceAdapter,
+  printArguments,
 } from './antigravity-adapter.ts';
-import { assert, assertEquals } from '@std/assert';
+import { MODEL_IDS } from '../../config/models.ts';
+import { assert, assertEquals, assertThrows } from '@std/assert';
 
 const encoder = new TextEncoder();
 
-Deno.test('Antigravity adapter builds a bounded sandboxed request with child-only environment', async () => {
+Deno.test('Antigravity adapter passes the prompt as the final print value', async () => {
   let captured: { executable: string; options: AntigravityCommandOptions } | undefined;
   const adapter = new AntigravityEvidenceAdapter(
     {
@@ -24,7 +26,9 @@ Deno.test('Antigravity adapter builds a bounded sandboxed request with child-onl
         output: () =>
           Promise.resolve({
             code: 0,
-            stdout: encoder.encode('AGY_HEADLESS_CANARY_OK'),
+            stdout: encoder.encode(
+              '{"event":"result","result":{"status":"SUCCESS","response":"AGY_HEADLESS_CANARY_OK\\n"}}\n',
+            ),
             stderr: new Uint8Array(),
           }),
       };
@@ -34,28 +38,40 @@ Deno.test('Antigravity adapter builds a bounded sandboxed request with child-onl
     cwd: '/home/codex/repos/worktree',
     probe: 'headless',
     timeoutMs: 10_000,
-    model: 'caller-model',
-    agent: 'caller-agent',
-    project: 'caller-project',
   });
   assertEquals(result.status, 'passed');
+  assertEquals(result.evidence.capabilities.headless, 'supported');
+  assertEquals(result.evidence.capabilities.structured_output, 'supported');
   assertEquals(captured?.executable, 'agy');
   assertEquals(captured?.options.args, [
-    '--print',
-    '--print-timeout',
-    '10000ms',
-    '--sandbox',
     '--model',
-    'caller-model',
-    '--agent',
-    'caller-agent',
-    '--project',
-    'caller-project',
+    MODEL_IDS.antigravityDocs,
+    '--output-format',
+    'stream-json',
+    '--dangerously-skip-permissions',
+    '--new-project',
+    '--print',
     'Read-only canary. Reply with exactly AGY_HEADLESS_CANARY_OK. Do not use tools or modify files.',
   ]);
+  const printIndex = captured?.options.args.indexOf('--print') ?? -1;
+  assertEquals(printIndex, (captured?.options.args.length ?? 0) - 2);
+  assertEquals(captured?.options.args[printIndex + 1]?.startsWith('--'), false);
   assertEquals(captured?.options.env, { HOME: '/home/codex', PATH: '/home/codex/.local/bin' });
   assertEquals(captured?.options.clearEnv, true);
   assert(!JSON.stringify(result).includes('SYNTHETIC_VALUE_NOT_FOR_CHILD'));
+});
+
+Deno.test('Antigravity argv rejects an empty or flag-shaped resolved prompt', () => {
+  assertThrows(
+    () => printArguments('headless', ''),
+    Error,
+    'prompt must be the non-flag value',
+  );
+  assertThrows(
+    () => printArguments('headless', '--print-timeout'),
+    Error,
+    'prompt must be the non-flag value',
+  );
 });
 
 Deno.test('Antigravity adapter classifies auth/service failure and retains no raw output', async () => {

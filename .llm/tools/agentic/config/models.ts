@@ -28,6 +28,8 @@ export const MODEL_IDS = {
   sonnet: 'sonnet-5',
   /** Google/Antigravity CLI identifier. */
   antigravity: 'agy',
+  /** Google/Antigravity documentation and evidence model. */
+  antigravityDocs: 'gemini-3.6-flash-high',
 } as const;
 
 /**
@@ -48,7 +50,6 @@ export const NATIVE_CANARY_MODEL_ARGS = {
 export const OPENROUTER_MODEL_IDS = {
   minimax: 'minimax/minimax-m3',
   qwen: 'qwen/qwen3.7-max',
-  gemini: 'google/gemini-3.6-flash',
   glm: 'z-ai/glm-5.2',
   grok: 'x-ai/grok-4.5',
 } as const;

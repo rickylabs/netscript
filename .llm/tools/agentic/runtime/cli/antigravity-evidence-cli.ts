@@ -19,14 +19,11 @@ interface ParsedEvidenceArgs {
   readonly probe: AntigravityEvidenceProbe;
   readonly cwd: string;
   readonly timeoutMs?: number;
-  readonly model?: string;
-  readonly agent?: string;
-  readonly project?: string;
   readonly aggregate?: string;
   readonly json: boolean;
 }
 function usage(): string {
-  return 'Usage: deno task agentic:antigravity-evidence --probe <headless|web-citations|agents-instructions|gemini-instructions> --cwd <native-worktree> [--timeout-ms <1..60000>] [--model <id>] [--agent <id>] [--project <id>] [--aggregate <absolute-json-path>] [--json]';
+  return 'Usage: deno task agentic:antigravity-evidence --probe <headless|web-citations|agents-instructions|gemini-instructions> --cwd <native-worktree> [--timeout-ms <1..60000>] [--aggregate <absolute-json-path>] [--json]';
 }
 /** Parses the bounded evidence CLI without accepting prompt or credential values. */
 export function parseAntigravityEvidenceArgs(args: readonly string[]): ParsedEvidenceArgs {
@@ -36,7 +33,7 @@ export function parseAntigravityEvidenceArgs(args: readonly string[]): ParsedEvi
     const token = args[index];
     if (token === '--json') json = true;
     else if (
-      ['--probe', '--cwd', '--timeout-ms', '--model', '--agent', '--project', '--aggregate']
+      ['--probe', '--cwd', '--timeout-ms', '--aggregate']
         .includes(
           token,
         )
@@ -65,9 +62,6 @@ export function parseAntigravityEvidenceArgs(args: readonly string[]): ParsedEvi
     probe: probe as AntigravityEvidenceProbe,
     cwd,
     timeoutMs,
-    model: values.get('--model'),
-    agent: values.get('--agent'),
-    project: values.get('--project'),
     aggregate,
     json,
   };
@@ -80,9 +74,6 @@ async function main(): Promise<number> {
       cwd: parsed.cwd,
       probe: parsed.probe,
       timeoutMs: parsed.timeoutMs,
-      model: parsed.model,
-      agent: parsed.agent,
-      project: parsed.project,
       ownerAcceptedCapabilities: OWNER_ACCEPTED,
     });
     const aggregated = parsed.aggregate
