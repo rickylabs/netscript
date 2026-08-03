@@ -42,9 +42,59 @@ arguments and the `THasRoute` flag. A page bound with `withRoute()` always build
 
 ## Building a page
 
-The example below composes documented builder methods only: it declares a resource,
-applies a search schema, registers a render layer, sets a status code, and builds an
-unrouted page definition. `definePage` infers each generic from the calls you make.
+Here is a page declaring resources, a policy, telemetry, multiple independent render layers, a route-bound form, layout slots, and response shaping in a single fluent chain:
+
+```ts
+import { definePage } from "@netscript/fresh";
+import { z } from "zod";
+import { MetricChart } from "../components/MetricChart.tsx";
+import { EditOrderForm } from "../components/EditOrderForm.tsx";
+
+const orderPage = definePage()
+  .withRouteContract({
+    pathSchema: z.object({ id: z.string() }),
+    searchSchema: z.object({ tab: z.string().optional() }),
+  })
+  .withResource("metrics", async (ctx) => {
+    return await loadOrderMetrics(ctx.path.id);
+  })
+  .withPolicy("balanced")
+  .withTelemetry({ enabled: true, spanName: "order-detail-page" })
+  .withLayer("chart", MetricChart, {
+    delivery: "stream",
+    loader: async (ctx) => ({ points: await ctx.resource("metrics") }),
+    fallback: () => <div>Loading metrics…</div>,
+  })
+  .withForm("editOrder", EditOrderForm, {
+    schema: z.object({ status: z.string() }),
+    mutate: async (values, ctx) => {
+      await updateOrderStatus(ctx.path.id, values.status);
+    },
+  })
+  .withLayout(({ slots }) => (
+    <div class="layout">
+      <main>{slots.main}</main>
+      <aside>{slots.chart}</aside>
+      <section>{slots.editOrder}</section>
+    </div>
+  ))
+  .withHeader("x-page-type", "order-detail")
+  .withStatus(200)
+  .build();
+
+export default orderPage.default;
+```
+
+This envelope demonstrates the core page builder capabilities:
+- **Route typing:** `withRouteContract` applies path and search schemas so `ctx.path` and `ctx.search` are strongly typed throughout the chain.
+- **Resource resolution:** `withResource` declares request-scoped data factories accessible via `ctx.resource(key)`.
+- **Independent layers & partials:** `withLayer` declares parallel render units with custom delivery modes (`blocking`, `defer`, or `stream`).
+- **Partial fallbacks & staleTime:** layer configs support loading fallbacks and staleness policies.
+- **Managed forms:** `withForm` wires Zod schema validation, CSRF headers, and `mutate` handlers into a typed form layer.
+- **Telemetry:** `withTelemetry` configures OpenTelemetry span names and tracing.
+- **Layout slots:** `withLayout` receives a `slots` map containing rendered layers for flexible page structuring.
+
+The smallest useful page is much shorter when you only need basic rendering:
 
 ```ts
 import { definePage } from "@netscript/fresh";
