@@ -179,3 +179,30 @@ Drift is append-only.
   through the agentic suite before authorizing new implementation work.
 - **Evidence:** supervisor turn command records; `reviews/S2-fable.md` and
   `reviews/S2-fable-rereview.md`.
+
+## 2026-08-03 — First P3 launch carried a stale worktree path
+
+- **What:** The first fresh P3 medium-effort launch used a brief whose absolute worktree path still
+  named the earlier S1/S2 implementation worktree.
+- **Source:** Supervisor staging error in `/home/codex/omb-wave0-p3-brief.md`; launched thread
+  `019fc994-8d03-7ff3-94b4-8361e3dedff9`.
+- **Expected:** A fresh sender-owned worktree and a brief naming that same worktree.
+- **Actual:** The turn performed only read-only discovery against the stale path. The supervisor
+  interrupted it before any test, fixture, evidence edit, or other mutation.
+- **Severity:** minor and contained; no proof evidence derives from this turn.
+- **Action:** Treat the turn as invalid and preserve its identity here. Do not resume it.
+- **Evidence:** supervisor launch/interrupt transcript; no P3 artifact cites this thread.
+
+## 2026-08-03 — P3 recovered in an isolated sender-owned worktree
+
+- **What:** P3 was relaunched through the agentic suite in a second no-upstream worktree with a
+  corrected brief and the required `gpt-5.6-sol`/medium route.
+- **Source:** Sender-ownership fail-closed behavior plus the contained stale-path launch above.
+- **Expected:** One valid medium-effort Codex sender owns the P3 implementation worktree.
+- **Actual:** Thread `019fc996-3a80-7171-b6a8-1ae9c248f113` in
+  `/home/codex/repos/ns005-proofs-p3b-impl` produced the reviewed P3 draft; no other sender wrote
+  there.
+- **Severity:** minor, resolved orchestration drift.
+- **Action:** Integrate only the P3b artifacts after Fable review; retain both valid implementation
+  thread identities in `codex-thread-ids.md`.
+- **Evidence:** `briefs/S3-implement.md`, `reviews/S3-fable.md`, and thread record.

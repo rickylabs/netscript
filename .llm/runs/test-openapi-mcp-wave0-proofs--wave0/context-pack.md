@@ -19,7 +19,10 @@ allocated values and a complete manifest, but the generated SQLite users process
 captured, so that observation is ambiguous and cannot satisfy D5. Separate Fable re-review approved
 the amended evidence and causal qualifier. S2 is also complete and separately re-reviewed: the
 attributed no-DB live spec was measured, but the required DB branch remains unavailable, so the
-combined P2 verdict is explicit `FAIL`. P3 has not begun.
+combined P2 verdict is explicit `FAIL`. S3 executed the focused existing auth fixture and produced a
+separately Fable-approved P3 `PASS`: all 401/403/200 branches ran, the exact error envelopes and
+authorized status are normalized in evidence, and the exact D9 wording is ratified without a
+production-feature claim.
 
 ## Completed
 
@@ -34,17 +37,18 @@ combined P2 verdict is explicit `FAIL`. P3 has not begun.
 - S2 fresh no-DB scaffold measurement with exact attribution/teardown, committed raw-spec input,
   complete/auditable keyword inventory, explicit combined P2 `FAIL`, and separate Fable approval
   after one amendment cycle.
+- S3 focused auth fixture execution and normalized evidence: exit 0, one selected test passed, zero
+  failed, all required request branches exercised, and separate Fable approval.
 
 ## In Progress
 
-- Supervisor integration and PR reporting for the approved S2 artifact set.
+- Supervisor verification and integration of the approved S3 artifact set.
 
 ## Next Steps
 
-1. Commit/push reviewed S2 and report its explicit partial-progress FAIL on #1128 without checking
-   acceptance or adding a closing keyword.
-2. Launch P3 on the required medium-effort implementation route, preserving the one-sender rule.
-3. Run separate Fable review after P3, then final hygiene and Qwen IMPL-EVAL.
+1. Run supervisor verification, scoped final hygiene, and commit/push S3.
+2. Sync #1129 acceptance and PR closing semantics while keeping #1128 open.
+3. Run the final leak/review-thread gates and separate Qwen IMPL-EVAL.
 
 ## Key Decisions
 
@@ -59,25 +63,26 @@ combined P2 verdict is explicit `FAIL`. P3 has not begun.
 
 ## Files Changed
 
-| Path                                              | Status       | Notes                                                   |
-| ------------------------------------------------- | ------------ | ------------------------------------------------------- |
-| `.llm/runs/test-openapi-mcp-wave0-proofs--wave0/` | modified/new | Harness records plus reviewed S1/S2 proof artifacts.    |
+| Path                                              | Status       | Notes                              |
+| ------------------------------------------------- | ------------ | ---------------------------------- |
+| `.llm/runs/test-openapi-mcp-wave0-proofs--wave0/` | modified/new | Reviewed S1/S2/S3 proof artifacts. |
 
 ## Gates
 
-| Gate family      | Current status          | Evidence                                 |
-| ---------------- | ----------------------- | ---------------------------------------- |
-| Plan-Gate        | PASS                    | Separate Qwen verdict in `plan-eval.md`. |
-| Static           | PASS                    | Scoped S1 check/lint/fmt and scope audit.          |
-| Runtime          | P1 FAIL; P2 FAIL        | P2 no-DB measured; DB branch remains unavailable.  |
-| Resource hygiene | PASS                    | No owned survivors; foreign resources untouched.  |
+| Gate family      | Current status   | Evidence                                              |
+| ---------------- | ---------------- | ----------------------------------------------------- |
+| Plan-Gate        | PASS             | Separate Qwen verdict in `plan-eval.md`.              |
+| Static           | PASS / S3 TS N/A | S1/S2 scoped checks preserved; S3 owns no TypeScript. |
+| Runtime          | P1 FAIL; P2 FAIL | P2 no-DB measured; DB branch remains unavailable.     |
+| P3 fixture       | PASS             | Focused test passed; Fable independently reran it.    |
+| Resource hygiene | PASS             | No owned survivors; foreign resources untouched.      |
 
 ## Open Questions
 
 - P1 is resolved as explicit `FAIL` / qualified F1(b), with separate Fable approval.
 - P2 is resolved as explicit combined `FAIL`, with sound no-DB measurements and separate Fable
   approval; #1128 acceptance remains open because DB measurements are absent.
-- P3 remains runnable and not started.
+- P3 is resolved as `PASS` with separate Fable approval; supervisor integration remains.
 - Evaluator credential availability is resolved: the parser-backed live canary passed with tools,
   reasoning, and streaming supported.
 
@@ -85,7 +90,8 @@ combined P2 verdict is explicit `FAIL`. P3 has not begun.
 
 - Drift: supervisor route override, stale overlay read paths, resolved evaluator credential
   inheritance, the significant generated `--allow-ffi` permission defect, S2 command/runtime
-  deviations, and resumed-thread effort reporting are recorded in `drift.md`.
+  deviations, resumed-thread effort reporting, and the isolated P3 launch recovery are recorded in
+  `drift.md`.
 - Debt: none.
 
 ## Commits
