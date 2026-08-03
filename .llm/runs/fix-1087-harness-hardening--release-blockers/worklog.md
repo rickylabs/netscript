@@ -81,6 +81,11 @@ job. Release prose is edited in the tracked notes-file input.
 | 2026-08-03 | 3 | empirical sensitivity proof | Against run-owned Redis on `127.0.0.1:16379`, both named regressions passed normally; after the surgical pre-fix transform, each failed with 16 CAS winners instead of 1, and the adapter was byte-restored. |
 | 2026-08-03 | 3 | opposite-family review | Fable session `d49c38bc-b026-4d0d-8343-d3890633ed2a` returned `PASS`; remediation continuation replaced positional file/name arrays with one paired record authority and retained `PASS`. |
 | 2026-08-03 | 3 | supervisor sign-off | Inspected workflow/service wiring, fail-closed missing-env behavior, exact test observation, negative-control restoration, affected package suite, scoped wrappers, and reviewer evidence; approved the slice for commit while the final root check continues. |
+| 2026-08-03 | 4 | #1083 implementation | Added the tracked 0.0.4 release-intro input with an explicit Breaking Changes entry naming the removed streams option, migration instruction, and fail-fast startup behavior. |
+| 2026-08-03 | 3 | hosted CI proof | Run `30808236575`, job `91668504084`: healthy Redis; both exact regressions `ok`; both exact regressions `FAILED` under the pre-#1075 transform; outer negative control `PASS`. All #1080 acceptance boxes were then evidenced and ticked. |
+| 2026-08-03 | 1 | hosted CI remediation | The later repo-wide test exposed mixed Node/Deno timer typing in `claude-print.ts`; `5efcaf770` changed the annotation to `ReturnType<typeof setTimeout>` without runtime change. |
+| 2026-08-03 | 4 | opposite-family review | Fable session `0512c736-61f4-423d-bb87-a20fccaa4cb6` returned `PASS`; remediation session `bdef503c-d888-42ff-8860-7b7cda5fa4ba` verified resolution-accurate wording and retained `PASS`. |
+| 2026-08-03 | 4 | supervisor sign-off | Inspected the release-intro composition contract, removed API/runtime behavior, tracked live-surface grep, formatting, release parser test, and reviewer evidence; approved the slice for commit. |
 
 ## Decisions
 
@@ -117,11 +122,20 @@ job. Release prose is edited in the tracked notes-file input.
 - #1080 focused gate unit suite: `3 passed, 0 failed`.
 - #1080 scoped check/lint/fmt: `2 files, 0 findings` each.
 - #1080 review: `PASS`; paired-record cleanup independently rechecked.
-- #1080 CI proof: pending pushed `check-test` run before acceptance boxes are ticked.
-- Remaining implementation gates: root check in progress; final full-suite gates `NOT_RUN`.
+- #1080 hosted CI proof: run `30808236575`, job `91668504084`; healthy service and required env;
+  both exact tests observed `ok`; both observed `FAILED` under pre-fix behavior with 16 winners
+  versus 1; outer negative control `PASS`.
+- Root `deno task check`: `2526 files, 22 batches, 0 findings`.
+- Validation-tool scoped check/lint/fmt after root check: `16 files, 0 findings` each.
+- Final agentic suite: `337 passed, 0 failed`, including volatile-config and routing-policy guards.
+- #1083 tracked release intro + reviewer prompt formatting: `2 files, clean`.
+- #1083 release parser `notes-file` contract: `1 passed, 0 failed`.
+- #1083 tracked live-surface search: zero `assertResolvable` matches outside historical run evidence.
+- #1083 review: `PASS`; resolution wording finding resolved.
+- Remaining implementation gates: final full-suite tests and IMPL-EVAL `NOT_RUN`.
 
 ## Handoff Notes
 
-- #1080 is supervisor-approved for its issue commit. After push, use the hosted `check-test`
-  log—not source inspection alone—to evidence and tick its acceptance boxes before proceeding to
-  #1083. The root check remains a final slice gate and continues in parallel.
+- #1083 is supervisor-approved for its issue commit. After push and issue evidence, proceed to final
+  gates and separate IMPL-EVAL. The full root test run is already in progress; hosted CI rerun
+  `30808732349` validates the timer portability remediation and Redis lane together.
