@@ -215,9 +215,26 @@ export function canaryReleasePayload(
 export function checkCanaryDrift(
   labels: readonly string[],
   publishedVersions: readonly string[],
+  targetVersion?: string,
 ): CanaryDrift {
-  const canaryLabels = new Set(labels.filter((label) => label.startsWith(CANARY_LABEL_PREFIX)));
-  const expectedLabels = new Set(publishedVersions.map(canaryLabelFor));
+  // Scope to the target train. Canaries published before this surface existed (0.0.1-canary.1
+  // through 0.0.3-canary.5) carry no label and never can — labelling them retroactively would
+  // manufacture the data the check inspects. Comparing across trains makes the gate unpassable
+  // by construction, which is the defect #1160 records. `targetCore` already existed for this;
+  // it was simply not wired in.
+  // Accept either form for the target: the caller passes a published canary
+  // (`0.0.4-canary.1`), while a stable train (`0.0.4`) is the more natural thing to reason about.
+  const coreOf = (version: string): string =>
+    /-canary\.\d+$/.test(version) ? targetCore(version) : version;
+  const target = targetVersion === undefined ? undefined : coreOf(targetVersion);
+  const inTarget = (version: string): boolean =>
+    target === undefined || coreOf(version) === target;
+  const canaryLabels = new Set(
+    labels
+      .filter((label) => label.startsWith(CANARY_LABEL_PREFIX))
+      .filter((label) => inTarget(label.slice(CANARY_LABEL_PREFIX.length))),
+  );
+  const expectedLabels = new Set(publishedVersions.filter(inTarget).map(canaryLabelFor));
   const labelsWithoutPublishedVersions = [...canaryLabels].filter((label) =>
     !expectedLabels.has(label)
   ).sort();
@@ -537,7 +554,7 @@ async function main(): Promise<void> {
     const labels = (await github.listLabels()).filter((name) =>
       name.startsWith(CANARY_LABEL_PREFIX)
     );
-    const drift = checkCanaryDrift(labels, publishedVersions);
+    const drift = checkCanaryDrift(labels, publishedVersions, options.publishedVersion);
     setCheck(
       checks,
       activeCheck,
