@@ -2,7 +2,7 @@ import type {
   EndpointCandidate,
   ServiceEndpointProbePort,
   ServiceEndpointProbeResult,
-} from '../domain/service-endpoint-directory-port.ts';
+} from '../../ports/service-endpoint-directory-port.ts';
 
 /** Default maximum bytes retained from either probe response. */
 export const DEFAULT_SERVICE_ENDPOINT_RESPONSE_BYTE_LIMIT = 2_000_000;

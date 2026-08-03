@@ -1,9 +1,9 @@
 import { assertEquals, assertStringIncludes } from '@std/assert';
-import type { SourceOutcome } from '../src/domain/service-endpoint-directory-port.ts';
-import { AppsettingsEndpointSource } from '../src/infrastructure/appsettings-endpoint-source.ts';
-import { AspireCliEndpointSource } from '../src/infrastructure/aspire-cli-endpoint-source.ts';
-import { OverrideEndpointSource } from '../src/infrastructure/override-endpoint-source.ts';
-import { RunManifestEndpointSource } from '../src/infrastructure/run-manifest-endpoint-source.ts';
+import type { SourceOutcome } from '../src/ports/service-endpoint-directory-port.ts';
+import { AppsettingsEndpointSource } from '../src/infrastructure/service-endpoints/appsettings-endpoint-source.ts';
+import { AspireCliEndpointSource } from '../src/infrastructure/service-endpoints/aspire-cli-endpoint-source.ts';
+import { OverrideEndpointSource } from '../src/infrastructure/service-endpoints/override-endpoint-source.ts';
+import { RunManifestEndpointSource } from '../src/infrastructure/service-endpoints/run-manifest-endpoint-source.ts';
 import {
   APPSETTINGS_FIXTURE,
   ASPIRE_DESCRIBE_FIXTURE,

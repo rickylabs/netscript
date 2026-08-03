@@ -4,7 +4,7 @@ import type {
   EndpointSourceContext,
   EndpointSourcePort,
   SourceOutcome,
-} from '../domain/service-endpoint-directory-port.ts';
+} from '../../ports/service-endpoint-directory-port.ts';
 
 /** Injectable filesystem boundary for appsettings discovery. */
 export interface AppsettingsEndpointSourceOptions {

@@ -47,8 +47,11 @@ export interface EndpointCandidate {
 
 /** A source was read successfully, including a valid empty result. */
 export interface UsedSourceOutcome {
+  /** Source adapter that completed successfully. */
   readonly source: EndpointSource;
+  /** Successful source-read discriminator. */
   readonly outcome: 'used';
+  /** Endpoint facts emitted by the source, possibly empty. */
   readonly candidates: readonly EndpointCandidate[];
   /** Service names excluded by this source's configuration. */
   readonly excludedServices: readonly string[];
@@ -56,19 +59,29 @@ export interface UsedSourceOutcome {
 
 /** A source carrier was not present. */
 export interface AbsentSourceOutcome {
+  /** Source adapter whose carrier was absent. */
   readonly source: EndpointSource;
+  /** Missing-carrier discriminator. */
   readonly outcome: 'absent';
+  /** No candidates are available from an absent source. */
   readonly candidates: readonly [];
+  /** No exclusions are available from an absent source. */
   readonly excludedServices: readonly [];
 }
 
 /** A present or required source could not produce trustworthy facts. */
 export interface FailedSourceOutcome {
+  /** Source adapter that could not produce trustworthy facts. */
   readonly source: EndpointSource;
+  /** Failed source-read discriminator. */
   readonly outcome: 'failed';
+  /** Machine-readable failure classification. */
   readonly code: SourceFailureCode;
+  /** Human-readable bounded failure detail. */
   readonly reason: string;
+  /** Failed sources never contribute candidates. */
   readonly candidates: readonly [];
+  /** Failed sources never contribute exclusions. */
   readonly excludedServices: readonly [];
 }
 
@@ -105,12 +118,15 @@ export type ServiceEndpointStatus = (typeof SERVICE_ENDPOINT_STATUSES)[number];
 
 /** One lower-precedence endpoint value that disagreed with the selected candidate. */
 export interface EndpointConflict {
+  /** Lower-precedence source that supplied a different URL. */
   readonly source: EndpointSource;
+  /** Discarded lower-precedence base URL. */
   readonly baseUrl: string;
 }
 
 /** Successful spec and service-identity probe. */
 export interface RunningServiceEndpointProbeResult {
+  /** Successful probe discriminator. */
   readonly outcome: 'running';
   /** Parsed OpenAPI document retained opaquely for the later projection slice. */
   readonly spec: unknown;
@@ -118,9 +134,13 @@ export interface RunningServiceEndpointProbeResult {
 
 /** Expected degraded probe result converted to one directory row. */
 export interface FailedServiceEndpointProbeResult {
+  /** Degraded probe classification. */
   readonly outcome: Exclude<ServiceEndpointStatus, 'running' | 'excluded'>;
+  /** Human-readable bounded failure detail. */
   readonly reason: string;
+  /** Response status when an HTTP response caused the failure. */
   readonly httpStatus?: number;
+  /** Operator remediation when the failure has ratified guidance. */
   readonly guidance?: string;
 }
 
@@ -135,46 +155,67 @@ export interface ServiceEndpointProbePort {
   probe(candidate: EndpointCandidate, signal: AbortSignal): Promise<ServiceEndpointProbeResult>;
 }
 
-interface ServiceEndpointRowBase {
+/** Identity and arbitration facts shared by every service endpoint row. */
+export interface ServiceEndpointRowBase {
+  /** Stable service name. */
   readonly name: string;
+  /** Source selected by precedence for this service. */
   readonly source: EndpointSource;
+  /** Lower-precedence URLs that disagreed with the selected candidate. */
   readonly conflicts: readonly EndpointConflict[];
 }
 
 /** A verified service endpoint with an opaque parsed OpenAPI document. */
 export interface RunningServiceEndpointRow extends ServiceEndpointRowBase {
+  /** Verified-running row discriminator. */
   readonly status: 'running';
+  /** Selected and verified service base URL. */
   readonly baseUrl: string;
+  /** Parsed OpenAPI document retained opaquely for later consumers. */
   readonly spec: unknown;
 }
 
 /** A configured service for which no listener could be reached. */
 export interface NotRunningServiceEndpointRow extends ServiceEndpointRowBase {
+  /** Not-running row discriminator. */
   readonly status: 'not_running';
+  /** Selected URL when discovery found one but no listener was reachable. */
   readonly baseUrl?: string;
+  /** Human-readable bounded failure detail. */
   readonly reason: string;
 }
 
 /** A listening service whose OpenAPI document could not be consumed. */
 export interface SpecUnavailableServiceEndpointRow extends ServiceEndpointRowBase {
+  /** Unavailable-spec row discriminator. */
   readonly status: 'spec_unavailable';
+  /** Selected service base URL. */
   readonly baseUrl: string;
+  /** Human-readable bounded failure detail. */
   readonly reason: string;
+  /** Response status when an HTTP response caused the failure. */
   readonly httpStatus?: number;
+  /** Operator remediation for an unavailable spec. */
   readonly guidance?: string;
 }
 
 /** An endpoint that did not identify as the selected service. */
 export interface IdentityMismatchServiceEndpointRow extends ServiceEndpointRowBase {
+  /** Identity-mismatch row discriminator. */
   readonly status: 'identity_mismatch';
+  /** Selected URL that identified as another service. */
   readonly baseUrl: string;
+  /** Human-readable bounded mismatch detail. */
   readonly reason: string;
 }
 
 /** A service deliberately excluded before any network request. */
 export interface ExcludedServiceEndpointRow extends ServiceEndpointRowBase {
+  /** Excluded row discriminator. */
   readonly status: 'excluded';
+  /** Selected URL when discovery produced one before exclusion. */
   readonly baseUrl?: string;
+  /** Human-readable exclusion detail. */
   readonly reason: string;
 }
 
@@ -188,7 +229,9 @@ export type ServiceEndpointRow =
 
 /** Complete service directory result, including all consulted source outcomes. */
 export interface ServiceEndpointDirectoryResult {
+  /** Stable service rows sorted by service name. */
   readonly entries: readonly ServiceEndpointRow[];
+  /** Outcome from every source in precedence order. */
   readonly sources: readonly SourceOutcome[];
 }
 

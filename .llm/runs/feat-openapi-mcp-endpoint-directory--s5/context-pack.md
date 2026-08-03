@@ -12,10 +12,11 @@
 
 ## Current State
 
-Research and design are locked at clean `origin/main` `2c8865e8c`. Slices 1–2 now implement the
+Research and design are locked at clean `origin/main` `2c8865e8c`. Slices 1–3 now implement the
 contract-first endpoint vocabulary, all four source adapters, deterministic composition, and the
-bounded spec-first identity probe. The source/status matrix, hanging-row isolation case, and full
-package tests are green. Public exports/docs and JSR fitness remain for slice 3.
+bounded spec-first identity probe, with the complete surface published and documented through both
+entrypoints. All implementation, consumer, JSR, and publish gates are green; supervisor evaluation
+and merge-readiness actions remain deliberately unstarted.
 
 ## Completed
 
@@ -32,17 +33,21 @@ package tests are green. Public exports/docs and JSR fitness remain for slice 3.
 - Implemented credential-free, redirect-free OpenAPI-first probing, exact P3 401/403 guidance,
   identity verification, response bounds, and opaque spec preservation.
 - Proved 12/12 endpoint tests, 78/78 package tests, and 79-file scoped check/lint/fmt.
+- Published the complete S5 surface from `.` and transitively `./cli`, documented default adapter
+  permissions/configuration, and regenerated the embedded README asset.
+- Proved zero full-export doc diagnostics, JSR audit exit 0, clean publish dry run, and no dependency
+  or lock churn. Grouping the adapters/port kept folder-cardinality debt at baseline.
 
 ## In Progress
 
-- Slice 3 public exports, docs, and consumer/JSR gates. The provided PR worktree remains owned by
-  the Desktop supervisor session; this attached thread remains the sole staging sender.
+- Implementation handoff after the Slice 3 commit/push/comment. The provided PR worktree remains
+  owned by the Desktop supervisor session; this attached thread remains the sole staging sender.
 
 ## Next Steps
 
-1. Export the complete directory/source/probe surface through both package entrypoints.
-2. Document composition, carrier/permission expectations, status behavior, and S6 usage.
-3. Run full scoped, doc-lint, JSR audit, publish dry-run, and lock-hygiene gates.
+1. Supervisor performs substantive review and the composed evaluation protocol.
+2. Supervisor decides when to update PR/issue acceptance state and mark the draft ready.
+3. Keep S6 projection/tool registration and S7 run-token producer wiring in their owned slices.
 
 ## Key Decisions
 
@@ -57,22 +62,24 @@ package tests are green. Public exports/docs and JSR fitness remain for slice 3.
 | Path | Status | Notes |
 | --- | --- | --- |
 | `.llm/runs/feat-openapi-mcp-endpoint-directory--s5/` | updated | Slice 1 evidence, reconcile note, attached-thread metadata |
-| `packages/mcp/src/domain/service-endpoint-*` | new | Discriminated contract and discovered-URL policy |
-| `packages/mcp/src/infrastructure/*endpoint-source.ts` | new | Four named source adapters |
+| `packages/mcp/src/ports/service-endpoint-directory-port.ts` | new | Discriminated contract and three consumed ports |
+| `packages/mcp/src/infrastructure/service-endpoints/` | new | Four named sources, URL policy, and fetch probe |
 | `packages/mcp/tests/service-endpoint-source*` | new | Aspire/source fixture matrix; 6/6 passing |
 | `packages/mcp/src/application/service-endpoint-directory.ts` | new | Default composition, precedence, bounds, isolation |
 | `packages/mcp/src/infrastructure/fetch-service-endpoint-probe.ts` | new | Spec-first identity probe and P3 mapping |
 | `packages/mcp/tests/service-endpoint-directory_test.ts` | new | Complete status/timeout/probe fixture matrix |
 | `packages/mcp/deno.json` | updated | Test-only write permission for existing temp-dir tests |
+| `packages/mcp/mod.ts`, `README.md` | updated | Published S5 surface and consumer/config/permission docs |
+| `packages/mcp/src/publish-assets.generated.ts` | updated | Regenerated embedded README corpus |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | slices 1–2 PASS | 12 focused tests + 78 package tests + scoped check/lint/fmt |
-| Fitness | slices 1–2 PASS | package quality scan + `quality:gate` |
+| Static | slices 1–3 PASS | 12 focused tests + 78 package tests + 79-file check/lint/fmt |
+| Fitness | slices 1–3 PASS | package quality scan + `quality:gate` + JSR audit |
 | Runtime | PASS | all source/status rows and hanging-row isolation fixture-proven |
-| Consumer | pending | public exports/docs planned |
+| Consumer | PASS | both entrypoints check/doc-lint clean; publish dry run clean |
 
 ## Open Questions
 
@@ -85,6 +92,10 @@ package tests are green. Public exports/docs and JSR fitness remain for slice 3.
   parse for those Deno subcommands in this worktree; no source/config mutation was made.
 - Drift fixed: the package test task lacked the test-only write permission required by existing
   temporary-directory tests; adding it restored the exact locked task to 78/78.
+- Drift fixed: flat owned files initially created a new infrastructure cardinality warning; the A2
+  port and adapters are now grouped under `src/ports/` and `infrastructure/service-endpoints/`.
+- Tooling note: the JSR helper counts Deno's neutral slow-type progress banner as a warning; raw doc
+  lint and publish show no actual slow-type diagnostic.
 - Debt: preserve existing `MCP-A6-V2-SHAPE`; no new debt planned.
 
 ## Commits

@@ -85,6 +85,9 @@ never import an infrastructure adapter from a consumer flow.
 | 2026-08-04 | 2 | composition + bounded probe | Added the default directory composition, deterministic precedence/conflicts, pre-fetch exclusions, bounded concurrency, per-row timeout/error isolation, and the credential-free/redirect-free spec-first identity probe. The fixture matrix passed 12/12 across source and directory tests; the package passed 78/78. |
 | 2026-08-04 | 2 | package test gate repair | Added the missing test-only `--allow-write` permission required by the package's existing temporary-directory tests. The initially failing exact package task then passed 78/78 without changing runtime permissions or product dependencies. |
 | 2026-08-04 | 2 | post-slice reconcile | PR #1194 remains draft at slice 1, references #1131 without a closing keyword, and has no reviewer comments after the slice 1 implementation comment. Issue #1131 remains open with both acceptance gates unchecked. No contract rescope or precedence readjustment was needed. |
+| 2026-08-04 | 3 | public surface + docs | Published the factory, constants, discriminated contracts, ports, and default adapters from `.`; `./cli` inherits the same surface. Added carrier, precedence, status, permission, and composition guidance and regenerated the embedded README asset. |
+| 2026-08-04 | 3 | doctrine reconcile | Moved the consumed contract to `src/ports/` and grouped the owned adapters under `src/infrastructure/service-endpoints/`. This removed the new infrastructure cardinality warning and kept existing domain/application warning counts at their baseline 13. |
+| 2026-08-04 | 3 | post-slice reconcile | PR #1194 remains draft at slice 2, references #1131 without a closing keyword, and has no reviewer comments after the slice 2 implementation comment. Issue #1131 remains open with both acceptance gates unchecked. No DoD box, issue acceptance box, or evaluation state was changed. |
 
 ## Decisions
 
@@ -102,6 +105,8 @@ never import an infrastructure adapter from a consumer flow.
 | Local `main` stale; `origin/main` is true baseline | minor | yes |
 | RFC omitted how MCP learns the current manifest `runId`; S5 requires injection | significant | yes |
 | Existing package tests need test-only write permission for temporary directories | minor | yes |
+| Planned flat role files were grouped to avoid new/deepened cardinality debt | minor | yes |
+| JSR audit parser treats Deno's slow-type progress banner as a warning | minor | yes |
 
 ## Gate Results
 
@@ -136,11 +141,35 @@ are the exact successful evidence.
 
 The exact package task first exposed a missing test-only `--allow-write` permission in its existing
 temporary-directory tests. The task definition was repaired, rerun, and is the passing evidence
-above. Slice 3 consumer/JSR gates remain `NOT_RUN`.
+above.
+
+### Slice 3 — published surface and JSR fitness
+
+| Gate | Command | Result |
+| --- | --- | --- |
+| Focused directory/source matrix | `deno test --allow-env --allow-net --allow-run --allow-read packages/mcp/tests/service-endpoint-*_test.ts` | PASS, exit 0; 12 passed, 0 failed |
+| Package tests | `deno task --cwd packages/mcp test` | PASS, exit 0; 78 passed, 0 failed |
+| Scoped check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/mcp --ext ts,tsx` | PASS, exit 0; 79 files, 0 diagnostics |
+| Scoped lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/mcp --ext ts,tsx --config packages/mcp/deno.json` | PASS, exit 0; 79 files, 0 findings |
+| Scoped format | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/mcp --ext ts,tsx --config packages/mcp/deno.json` | PASS, exit 0; 79 files, 0 findings |
+| Embedded publish assets | `deno task check:publish-assets` | PASS, exit 0; generated README asset current |
+| Package code quality | `deno run --allow-read .llm/tools/quality/scan-code-quality.ts --root packages/mcp` | PASS, exit 0; no findings or allowances |
+| Framework quality | `deno task quality:gate` | PASS, exit 0; quality scan and architecture task completed |
+| Full-export docs | `deno task doc:lint --root packages/mcp --pretty`; raw `deno doc --lint` per entrypoint | PASS, exit 0; `.` and `./cli`, zero diagnostics/private refs/missing docs |
+| JSR fitness | `deno run --allow-read --allow-run --allow-env .llm/tools/fitness/audit-jsr-package.ts --root packages/mcp --text` | PASS, exit 0; no FAIL findings; two inherited cardinality warnings plus one parser false positive recorded in `drift.md` |
+| Publish dry run | `deno task --cwd packages/mcp publish:dry-run` | PASS, exit 0; both entrypoints checked, clean 79-file publish, no slow-type diagnostic |
+| Diff hygiene | `git diff --check`; changed-file forbidden-pattern scan; raw lock/status review | PASS, exit 0; no whitespace errors, unsafe casts, lint ignores, dependency/lock churn, or unrelated files |
+
+The final Slice 3 evidence is from the post-grouping tree. The JSR helper's `slowTypeWarnings=1` is
+not a Deno slow-type diagnostic: its regex matches Deno's neutral `Checking for slow types in the
+public API...` progress banner. Raw `deno doc --lint` and the publish dry run both pass without a
+slow-type error or warning. The two cardinality warnings (`src/domain` and
+`src/application/flows`, each 13) are inherited baseline package shape; the new adapter grouping
+keeps `src/infrastructure` within the cap.
 
 ## Handoff Notes
 
 - Implement against locked decisions D1–D9; do not import S4.
 - The fixture matrices and timeout negative case are the decisive #1131 evidence.
-- Slices 1–2 are ready for the supervisor's substantive review; this implementation lane does not
-  self-certify the slice.
+- Slices 1–3 and their gates are complete. The implementation lane does not self-certify, mark the
+  PR ready, trigger evaluation, or exercise merge authority.

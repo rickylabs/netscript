@@ -76,3 +76,31 @@ Drift is append-only.
 - **Severity:** minor
 - **Action:** fix
 - **Evidence:** `packages/mcp/deno.json`; `worklog.md` Slice 2 package-test gate.
+
+## 2026-08-04 — A2 port and adapters grouped after cardinality audit
+
+- **What:** The Design file list described a flat domain contract and flat infrastructure adapters;
+  the first Slice 3 audit showed the five owned adapters would add a new `src/infrastructure`
+  cardinality warning and increase the inherited domain count.
+- **Source:** Archetype-2 port ownership plus F-16/R-FOLD-CARD and the Slice 3 JSR audit.
+- **Expected:** Preserve existing horizontal package debt without adding or deepening a violation.
+- **Actual:** The consumed contract lives in `src/ports/`; owned source/probe adapters and their URL
+  policy live in `src/infrastructure/service-endpoints/` without a sub-barrel. Public exports and
+  behavior are unchanged. Final audit restores inherited `src/domain` and
+  `src/application/flows` counts to their baseline 13 and introduces no infrastructure warning.
+- **Severity:** minor
+- **Action:** fix
+- **Evidence:** final JSR audit; zero-diagnostic scoped/doc gates in `worklog.md` Slice 3.
+
+## 2026-08-04 — JSR audit matches Deno's slow-type progress banner
+
+- **What:** `audit-jsr-package.ts` reports `slowTypeWarnings=1` because its `/slow type/i` matcher
+  captures Deno's neutral `Checking for slow types in the public API...` progress line.
+- **Source:** Slice 3 audit output and the helper's `runDryRun()` matcher.
+- **Expected:** Only an actual slow-type diagnostic would produce an audit warning.
+- **Actual:** Raw `deno doc --lint` for both entrypoints and `deno publish --dry-run --allow-dirty`
+  pass; Deno emits no slow-type error/warning after the progress line. The shared audit helper was
+  not changed by this package-scoped lane.
+- **Severity:** minor
+- **Action:** accept
+- **Evidence:** `worklog.md` Slice 3 doc/audit/publish rows.

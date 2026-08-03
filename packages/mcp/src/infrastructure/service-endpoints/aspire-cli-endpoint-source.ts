@@ -5,13 +5,16 @@ import type {
   EndpointSourcePort,
   SourceFailureCode,
   SourceOutcome,
-} from '../domain/service-endpoint-directory-port.ts';
-import { normalizeDiscoveredEndpointUrl } from '../domain/service-endpoint-url.ts';
+} from '../../ports/service-endpoint-directory-port.ts';
+import { normalizeDiscoveredEndpointUrl } from './endpoint-url.ts';
 
 /** Captured result of one Aspire CLI invocation. */
 export interface AspireCliCommandResult {
+  /** Process exit status. */
   readonly code: number;
+  /** Captured standard output. */
   readonly stdout: string;
+  /** Captured standard error. */
   readonly stderr: string;
 }
 

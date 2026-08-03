@@ -5,8 +5,8 @@ import type {
   EndpointSourcePort,
   SourceFailureCode,
   SourceOutcome,
-} from '../domain/service-endpoint-directory-port.ts';
-import { normalizeDiscoveredEndpointUrl } from '../domain/service-endpoint-url.ts';
+} from '../../ports/service-endpoint-directory-port.ts';
+import { normalizeDiscoveredEndpointUrl } from './endpoint-url.ts';
 
 /** Injectable filesystem boundary for identity-bound manifest discovery. */
 export interface RunManifestEndpointSourceOptions {

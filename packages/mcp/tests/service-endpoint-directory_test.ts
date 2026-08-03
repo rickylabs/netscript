@@ -10,11 +10,11 @@ import type {
   ServiceEndpointProbePort,
   ServiceEndpointProbeResult,
   SourceOutcome,
-} from '../src/domain/service-endpoint-directory-port.ts';
+} from '../src/ports/service-endpoint-directory-port.ts';
 import {
   FetchServiceEndpointProbe,
   SPEC_UNAVAILABLE_AUTH_GUIDANCE,
-} from '../src/infrastructure/fetch-service-endpoint-probe.ts';
+} from '../src/infrastructure/service-endpoints/fetch-service-endpoint-probe.ts';
 
 function candidate(
   name: string,

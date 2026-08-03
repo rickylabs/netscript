@@ -12,12 +12,12 @@ import {
   type ServiceEndpointProbeResult,
   type ServiceEndpointRow,
   type SourceOutcome,
-} from '../domain/service-endpoint-directory-port.ts';
-import { AppsettingsEndpointSource } from '../infrastructure/appsettings-endpoint-source.ts';
-import { AspireCliEndpointSource } from '../infrastructure/aspire-cli-endpoint-source.ts';
-import { FetchServiceEndpointProbe } from '../infrastructure/fetch-service-endpoint-probe.ts';
-import { OverrideEndpointSource } from '../infrastructure/override-endpoint-source.ts';
-import { RunManifestEndpointSource } from '../infrastructure/run-manifest-endpoint-source.ts';
+} from '../ports/service-endpoint-directory-port.ts';
+import { AppsettingsEndpointSource } from '../infrastructure/service-endpoints/appsettings-endpoint-source.ts';
+import { AspireCliEndpointSource } from '../infrastructure/service-endpoints/aspire-cli-endpoint-source.ts';
+import { FetchServiceEndpointProbe } from '../infrastructure/service-endpoints/fetch-service-endpoint-probe.ts';
+import { OverrideEndpointSource } from '../infrastructure/service-endpoints/override-endpoint-source.ts';
+import { RunManifestEndpointSource } from '../infrastructure/service-endpoints/run-manifest-endpoint-source.ts';
 
 /** Default deadline for one service spec and identity probe. */
 export const DEFAULT_SERVICE_ENDPOINT_TIMEOUT_MS = 3_000;
