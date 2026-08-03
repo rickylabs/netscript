@@ -42,6 +42,13 @@ export type WorkerExecutionRecord = Readonly<
 
 /** Options for creating a workers durable stream producer. */
 export type WorkersStreamProducerOptions = Readonly<{
+  /**
+   * Stream path relative to the streams server root.
+   * Defaults to `'/workers/executions'`.
+   *
+   * Note: The framework automatically prepends `STREAMS_URL_PREFIX` (`/v1/stream/netscript`).
+   * For example, `streamPath: '/workers/executions'` resolves to `<base>/v1/stream/netscript/workers/executions`.
+   */
   streamPath?: string;
   producerId?: string;
 }>;

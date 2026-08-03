@@ -24,6 +24,7 @@ import { createPluginService } from '@netscript/plugin/service';
 import { DurableStreamTestServer } from '@durable-streams/server';
 import { PLUGIN_PACKAGE_VERSION } from '../../src/package-metadata.generated.ts';
 import { createStreamsProxyHandler } from './proxy.ts';
+import { describeStorageDurability } from './durability.ts';
 
 /** Connector version, single-sourced from the streams package `deno.json`. */
 const VERSION: string = PLUGIN_PACKAGE_VERSION;
@@ -33,6 +34,10 @@ const port = parseInt(
   10,
 );
 const dataDir = Deno.env.get('STREAMS_DATA_DIR');
+const durability = describeStorageDurability(dataDir);
+if (!durability.durable) {
+  console.warn(`[streams] Warning: ${durability.message}`);
+}
 
 // ── Start the upstream streams server on an internal port ─────────────
 const internalPortOverride = Deno.env.get('STREAMS_INTERNAL_PORT');
