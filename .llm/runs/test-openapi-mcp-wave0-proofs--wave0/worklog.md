@@ -91,6 +91,11 @@ logic into a product template in this run.
 | 2026-08-03 | S1        | runtime verdict        | P1 is explicit `FAIL`: Aspire described `users` as `Finished` / exit 1 because generated permissions omit `--allow-ffi`. The later HTTP 200 is unattributed and cannot satisfy D5. Qualified F1(b) is selected without refuting the seam. |
 | 2026-08-03 | S1        | Fable review           | First review requested six evidence/wording corrections; the same Codex thread amended them without rerunning Aspire. Native Fable re-review approved all dispositions and found no new blocker.                                            |
 | 2026-08-03 | S1        | rescope recommendation | Product fix remains outside this PR. Only DB-backed P2 is blocked; no-DB P2 and P3 remain independently runnable after supervisor authorization. Exact owned teardown and hygiene checks passed.                                            |
+| 2026-08-03 | S2        | baseline               | Re-inventoried two foreign AppHosts, six foreign/unproven containers, port 43127, and Aspire MCP processes read-only. No foreign or unproven resource was mutated.                                                                            |
+| 2026-08-03 | S2        | no-DB measurement      | Fresh local-source `--db none` scaffold produced an attributed healthy 3657-byte OpenAPI 3.1.1 spec with three dotted operationIds, no refs, no non-2xx responses/common envelope, and no truncation-limit exceedance.                      |
+| 2026-08-03 | S2        | DB carry-forward       | Did not rerun or modify SQLite. Carried the attributed P1 missing-`--allow-ffi` failure forward and explicitly excluded the ambiguous P1 HTTP 200.                                                                                              |
+| 2026-08-03 | S2        | teardown/verdict       | Exact owned AppHost stopped; zero owned processes, port listeners, or containers survived. P2 is explicit `FAIL` because D7 requires both branches; #1128 acceptance remains open.                                                           |
+| 2026-08-03 | S2        | Fable review           | First review found an incomplete keyword allowlist. The same Codex thread retained the raw spec and made all keys auditable offline; native Fable re-review approved all M1/m1–m3 dispositions.                                              |
 
 ## Decisions
 
@@ -111,6 +116,9 @@ logic into a product template in this run.
 | Service overlay's two additional-read files absent                | minor           | yes                |
 | First evaluator canary did not inherit documented file credential | minor, resolved | yes                |
 | P1 generated SQLite runtime lacks `--allow-ffi`                   | significant     | yes                |
+| P2 detached-start controlling-session behavior                   | minor           | yes                |
+| P2 split fetch/measurement command                               | minor           | yes                |
+| Resumed Codex thread reports low effort                          | minor           | yes                |
 
 ## Gate Results
 
@@ -119,8 +127,8 @@ logic into a product template in this run.
 | Gate                      | Command or check                     | Result  | Notes                                                         |
 | ------------------------- | ------------------------------------ | ------- | ------------------------------------------------------------- |
 | Plan artifact format      | scoped run formatter                 | PASS    | All owned run Markdown checked after PLAN-EVAL output.        |
-| Experiment check/lint/fmt | scoped wrappers under `<run>/proofs` | PASS    | One TypeScript file selected; zero check/lint/fmt findings.   |
-| No lint ignores           | owned-source scan                    | PASS    | No lint-ignore directive in the P1 experiment.                |
+| Experiment check/lint/fmt | scoped wrappers under `<run>/proofs` | PASS    | Two TypeScript files selected; zero check/lint/fmt findings.  |
+| No lint ignores           | owned-source scan                    | PASS    | No lint-ignore directive in either P1 or P2 experiment.       |
 | Lock/scope audit          | raw status + root lock hash          | PASS    | Only run artifacts changed; root lock hash remained unchanged. |
 
 ### Fitness Gates
@@ -128,17 +136,17 @@ logic into a product template in this run.
 | Gate                   | Result  | Evidence                  | Notes            |
 | ---------------------- | ------- | ------------------------- | ---------------- |
 | Archetype F-*          | N/A     | No package/plugin surface | Proof-only run.  |
-| Service contract check | NOT_RUN | P2 live spec evidence     | After Plan-Gate. |
+| Service contract check | FAIL    | `proofs/evidence/P2-*`    | No-DB measured; required DB branch remains failed/blocked. |
 | Service runtime health | FAIL    | `proofs/evidence/P1-runtime.json` | Generated users process exits without `--allow-ffi`. |
 | Trace/log review       | PASS    | `proofs/evidence/P1-runtime.json` | Failure and ambiguous HTTP observation preserved.    |
-| Consumer check         | NOT_RUN | P2 projector evidence     | After Plan-Gate. |
+| Consumer check         | FAIL    | `proofs/evidence/P2-no-db.json` | No-DB complete; D7 requires the unavailable DB measurement. |
 
 ### Runtime Gates
 
 | Gate                    | Result  | Evidence               | Notes                                 |
 | ----------------------- | ------- | ---------------------- | ------------------------------------- |
 | P1 lifecycle            | FAIL    | `proofs/evidence/P1-*`                     | Explicit P1 `FAIL`; qualified/revisitable F1(b).      |
-| P2 DB/no-DB measurement | NOT_RUN | `proofs/evidence/P2-*`                     | DB half product-blocked; no-DB half remains runnable. |
+| P2 DB/no-DB measurement | FAIL    | `proofs/evidence/P2-*`                     | No-DB measured; DB half unavailable, so D7/D12 maps combined P2 to FAIL. |
 | P3 auth fixture         | NOT_RUN | `proofs/evidence/P3-*`                     | Independent of the permission defect.                |
 | Resource leak check     | PASS    | `proofs/evidence/P1-resource-hygiene.json` | No owned survivors; foreign entries untouched.       |
 
@@ -146,8 +154,8 @@ logic into a product template in this run.
 
 | Consumer                      | Result  | Evidence    | Notes                              |
 | ----------------------------- | ------- | ----------- | ---------------------------------- |
-| Generated DB scaffold spec    | NOT_RUN | P2 evidence | Must be live, not source-inferred. |
-| Generated no-DB scaffold spec | NOT_RUN | P2 evidence | Must be live, not source-inferred. |
+| Generated DB scaffold spec    | FAIL   | `proofs/evidence/P2-db-failure.json` | Live measurement blocked by attributed permission defect. |
+| Generated no-DB scaffold spec | PASS   | `proofs/evidence/P2-no-db.json`      | Attributed live spec measured against D7/D8.               |
 
 ## Handoff Notes
 
@@ -155,5 +163,6 @@ logic into a product template in this run.
   P1 `FAIL` and causally qualified/revisitable F1(b) are ready for supervisor decision-record sync.
 - The later HTTP 200 has no captured listener owner or precise timing and remains ambiguous; it is
   not pass evidence.
-- No-DB P2 and P3 may proceed independently; DB-backed P2 requires an explicit failed-proof record
-  or a separately authorized scratch-only workaround, never a product/template edit in this PR.
+- S2 passed separate Fable re-review. Its combined P2 verdict remains explicit `FAIL`; #1128 stays
+  open because the required DB measurement is absent, while the no-DB evidence is sound.
+- P3 may proceed independently. Do not add a #1128 closing keyword or check its acceptance box.

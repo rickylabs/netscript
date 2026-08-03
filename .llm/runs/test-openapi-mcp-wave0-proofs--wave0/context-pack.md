@@ -17,7 +17,9 @@ completed S1 with explicit P1 `FAIL`, selecting qualified F1(b). The callback em
 allocated values and a complete manifest, but the generated SQLite users process exited because
 `--allow-ffi` is absent. Listener ownership and precise timing for a later HTTP 200 were not
 captured, so that observation is ambiguous and cannot satisfy D5. Separate Fable re-review approved
-the amended evidence and causal qualifier. No S2/S3 work has begun.
+the amended evidence and causal qualifier. S2 is also complete and separately re-reviewed: the
+attributed no-DB live spec was measured, but the required DB branch remains unavailable, so the
+combined P2 verdict is explicit `FAIL`. P3 has not begun.
 
 ## Completed
 
@@ -29,17 +31,20 @@ the amended evidence and causal qualifier. No S2/S3 work has begun.
 - S1 disposable SQLite scaffold, documented DB preparation, callback experiment, normalized
   evidence, explicit P1 `FAIL`/F1(b) verdict, exact owned-resource teardown, and separate Fable
   approval after one amendment cycle.
+- S2 fresh no-DB scaffold measurement with exact attribution/teardown, committed raw-spec input,
+  complete/auditable keyword inventory, explicit combined P2 `FAIL`, and separate Fable approval
+  after one amendment cycle.
 
 ## In Progress
 
-- Supervisor integration of the approved S1 artifact set and RFC/epic decision-record update.
+- Supervisor integration and PR reporting for the approved S2 artifact set.
 
 ## Next Steps
 
-1. Commit/push reviewed S1 and synchronize local/GitHub RFC §9 plus epic #1126.
-2. Authorize no-DB P2 and P3 in the tracked Codex thread.
-3. Resolve how the explicit DB-backed P2 failure is recorded without productizing the permission
-   defect in this proof PR.
+1. Commit/push reviewed S2 and report its explicit partial-progress FAIL on #1128 without checking
+   acceptance or adding a closing keyword.
+2. Launch P3 on the required medium-effort implementation route, preserving the one-sender rule.
+3. Run separate Fable review after P3, then final hygiene and Qwen IMPL-EVAL.
 
 ## Key Decisions
 
@@ -56,7 +61,7 @@ the amended evidence and causal qualifier. No S2/S3 work has begun.
 
 | Path                                              | Status       | Notes                                                   |
 | ------------------------------------------------- | ------------ | ------------------------------------------------------- |
-| `.llm/runs/test-openapi-mcp-wave0-proofs--wave0/` | modified/new | Harness records plus reviewed S1 proof artifacts.       |
+| `.llm/runs/test-openapi-mcp-wave0-proofs--wave0/` | modified/new | Harness records plus reviewed S1/S2 proof artifacts.    |
 
 ## Gates
 
@@ -64,21 +69,23 @@ the amended evidence and causal qualifier. No S2/S3 work has begun.
 | ---------------- | ----------------------- | ---------------------------------------- |
 | Plan-Gate        | PASS                    | Separate Qwen verdict in `plan-eval.md`. |
 | Static           | PASS                    | Scoped S1 check/lint/fmt and scope audit.          |
-| Runtime          | P1 FAIL                 | Qualified F1(b); DB-path rescope recommended.      |
+| Runtime          | P1 FAIL; P2 FAIL        | P2 no-DB measured; DB branch remains unavailable.  |
 | Resource hygiene | PASS                    | No owned survivors; foreign resources untouched.  |
 
 ## Open Questions
 
 - P1 is resolved as explicit `FAIL` / qualified F1(b), with separate Fable approval.
-- DB-backed P2 is product-blocked; no-DB P2 and P3 remain runnable.
+- P2 is resolved as explicit combined `FAIL`, with sound no-DB measurements and separate Fable
+  approval; #1128 acceptance remains open because DB measurements are absent.
+- P3 remains runnable and not started.
 - Evaluator credential availability is resolved: the parser-backed live canary passed with tools,
   reasoning, and streaming supported.
 
 ## Drift and Debt
 
 - Drift: supervisor route override, stale overlay read paths, resolved evaluator credential
-  inheritance, and the significant generated `--allow-ffi` permission defect are recorded in
-  `drift.md`.
+  inheritance, the significant generated `--allow-ffi` permission defect, S2 command/runtime
+  deviations, and resumed-thread effort reporting are recorded in `drift.md`.
 - Debt: none.
 
 ## Commits

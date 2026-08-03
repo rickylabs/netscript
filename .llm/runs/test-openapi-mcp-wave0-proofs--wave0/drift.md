@@ -139,3 +139,43 @@ Drift is append-only.
 - **Action:** Keep P1 `FAIL` and qualified/revisitable F1(b); only a separate evaluator may issue
   `FAIL_RESCOPE`. Permit the supervisor to authorize independent no-DB P2 and P3 work.
 - **Evidence:** `reviews/S1-fable.md`, `reviews/S1-fable-rereview.md`, and amended P1 artifacts.
+
+## 2026-08-03 — S2 detached-start controlling-session behavior
+
+- **What:** Two initial owned `aspire start` attempts reported success but disappeared when their
+  command sessions ended, before the no-DB service listened. A retained controlling shell kept the
+  third serialized start alive for attribution, measurement, and exact stop.
+- **Source:** Owned `aspire ps`, port, process-tree, and startup-log observations.
+- **Expected:** A detached start remains discoverable after the launching command returns.
+- **Actual:** The first two starts left no AppHost or listener and produced no fetch. The third used
+  the same fresh unmodified scaffold and remained healthy while its controlling session stayed open.
+- **Severity:** minor environment/transport behavior; no product or evidence-bar change.
+- **Action:** Preserve failed attempts, attribute only the retained run, and stop its exact path.
+- **Evidence:** `proofs/evidence/P2-attempts.md` and `proofs/evidence/P2-runtime.json`.
+
+## 2026-08-03 — P2 split fetch/measurement command
+
+- **What:** The locked validation row named `p2-measure-spec.ts` with network permission. S2 instead
+  used `p2-measure-live-spec.ts`: a separately recorded bounded fetch wrote a retained raw spec,
+  then a file-only measurement command used `--no-lock --allow-read --allow-write` and no network.
+- **Source:** Plan validation row 4 and executed S2 command record.
+- **Expected:** One measurement filename/command with `--allow-read --allow-net`.
+- **Actual:** Fetch and measurement were split; the measurement filename and permissions differ.
+- **Severity:** minor; narrower measurement authority and more auditable retained input.
+- **Action:** Retain the exact 3657-byte raw input and regenerate evidence without network access.
+- **Evidence:** `proofs/evidence/P2-no-db-live-spec.json`, `proofs/evidence/P2-runtime.json`, and
+  `proofs/experiments/p2-measure-live-spec.ts`.
+
+## 2026-08-03 — Resumed Codex thread reports low effort
+
+- **What:** The agentic suite resumed the approved implementation thread and preserved its thread,
+  model (`gpt-5.6-sol`), provider, approval, and sandbox identity, but the resumed CLI transcript
+  reported reasoning effort `low` rather than the launch-time `medium` route.
+- **Source:** `agentic:codex-resume` S2 and amendment transcripts versus `codex-thread-ids.md`.
+- **Expected:** Same-thread resume preserves the recorded implementation route including effort.
+- **Actual:** The resume interface exposes no effort flag and the transcript reports `low`.
+- **Severity:** minor route drift; S2 was separately reviewed twice and supervisor-integrated.
+- **Action:** Do not use another low-reported resume for P3. Re-establish the required medium route
+  through the agentic suite before authorizing new implementation work.
+- **Evidence:** supervisor turn command records; `reviews/S2-fable.md` and
+  `reviews/S2-fable-rereview.md`.

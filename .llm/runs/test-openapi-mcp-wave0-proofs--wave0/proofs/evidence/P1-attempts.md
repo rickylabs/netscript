@@ -9,6 +9,6 @@ All paths below are normalized to the owned scratch root. No foreign AppHost, co
 | First retained runtime  | Service failed before listening | The documented DB initialization/generation/seed prerequisites had not run; the service could not import `schema/.generated/zod/crud.ts`. Exact AppHost teardown passed before DB preparation.                                                                                                                                                                                                                                                     |
 | Prepared runtime        | P1 `FAIL`                       | The post-allocation callback atomically wrote the complete manifest, but Aspire described `users` as `Finished` with exit code 1. Console logs show missing `--allow-ffi` for `libsql`. A later spec fetch returned 200, but listener PID/ownership and precise describe-to-fetch timing were not captured. Possible explanations include a restart, stale description, or foreign listener; the observation is ambiguous and does not satisfy D5. |
 
-The root `deno.lock` hash remained `264f029ec1a000c9a2880eb1db926373a35a589d`. The final
+The root `deno.lock` SHA-1 digest remained `264f029ec1a000c9a2880eb1db926373a35a589d`. The final
 exact-target stop left no owned AppHost process, port 3001 listener, or container. Normalized counts
 for foreign/unproven survivors are in `P1-resource-hygiene.json`; they were left untouched.

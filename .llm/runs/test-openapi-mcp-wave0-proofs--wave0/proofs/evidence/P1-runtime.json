@@ -9,6 +9,7 @@
   "scratchProject": "<scratch-root>/p1-sqlite",
   "experiment": "proofs/experiments/p1-post-allocation-manifest.ts",
   "setup": {
+    "rootDenoLockDigestAlgorithm": "SHA-1",
     "scaffoldExitCode": 0,
     "aspireRestoreExitCode": 0,
     "dbInitExitCode": 0,
