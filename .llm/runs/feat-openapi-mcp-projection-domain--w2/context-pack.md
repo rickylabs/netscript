@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `feat-openapi-mcp-projection-domain--w2` |
 | Branch | `feat/openapi-mcp-projection-domain` |
-| Current phase | `impl-eval` under milestone composition |
+| Current phase | `orchestrator pre-merge handoff` |
 | Archetype | `2 — Integration` (pure domain slice) |
 | Scope overlays | none |
 
@@ -15,8 +15,9 @@
 The branch began as a clean exact child of current `origin/main`. Live issue/RFC and the complete P2
 no-DB proof/evidence have been consumed. The plan and Design checkpoint are locked. Formal local
 PLAN-EVAL is intentionally composed/waived by the milestone-run rule. Slices 1–4 are implemented,
-reviewed, committed/pending sign-off as applicable, and focused-green in the milestone
-orchestrator's already-owned single Codex sender.
+reviewed, committed, and focused-green. The independent OpenHands IMPL-EVAL passed and the current
+review-thread gate reports 0 threads / 0 unanswered. The branch is completing close-gate metadata
+and fresh CI before handoff to the milestone orchestrator.
 
 ## Completed
 
@@ -26,16 +27,20 @@ orchestrator's already-owned single Codex sender.
 - Current `@netscript/mcp` surface inspected with `deno doc`.
 - Baseline doc-lint and package publish dry-run passed.
 - JSR baseline warnings recorded without changing debt.
+- Independent OpenHands IMPL-EVAL passed on Actions run `30861395106`; `evaluate.md` is committed.
+- Current review-thread gate passed with 0 threads and 0 unanswered.
 
 ## In Progress
 
-- Composed independent evaluation: draft→ready augment, OpenHands, then orchestrator pre-merge gate.
+- Regenerated the checked-in MCP publish-asset manifest after fresh CI detected the new public
+  subpath was not yet embedded.
 
 ## Next Steps
 
-1. Commit/push final merge-readiness evidence.
-2. Complete draft→ready augment and OpenHands evaluation.
-3. Satisfy the review-thread/close gates and hand back to the milestone orchestrator.
+1. Commit/push the generated publish manifest and final run evidence.
+2. Tick the now-true composed-evaluation DoD item, add the closing keyword, and apply
+   `status:ready-merge` so the close-gate reruns.
+3. Observe fresh CI and hand back to the milestone orchestrator without merging.
 
 ## Key Decisions
 
@@ -69,7 +74,7 @@ orchestrator's already-owned single Codex sender.
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
 | Plan | composed/authorized | `plan-eval.md`, user milestone directive |
-| Static | final green | 78 tests; scoped check/lint/fmt; doc-lint; publish dry-run |
+| Static | final green; generated manifest correction pending commit | 78 tests; scoped check/lint/fmt; doc-lint; publish dry-run; CI publish-asset check |
 | Fitness | final green with baseline warnings | quality gate + structured JSR audit |
 | Runtime | N/A | pure domain scope |
 | Consumer | final green | public entrypoint tests, package suite, scoped gates, doc-lint, publish dry-run |
@@ -80,7 +85,8 @@ orchestrator's already-owned single Codex sender.
 
 ## Drift and Debt
 
-- Drift: authorized PLAN-EVAL composition plus a test-only permission correction for existing temp-dir tests.
+- Drift: authorized PLAN-EVAL composition, test-only permission correction, OpenHands model-id
+  normalization, and unavailable Augment review credits.
 - Debt: `MCP-A6-V2-SHAPE` remains untouched; baseline cardinality is addressed without a new entry.
 
 ## Commits

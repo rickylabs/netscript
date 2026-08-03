@@ -72,6 +72,8 @@ they do not add parser strategies or I/O.
 | 2026-08-04 | 2a | acceptance correction | Tightened identity refusal for two spec IDs that collide under case-folding. Either exact spelling now returns both candidates; a differently cased unique ID remains an unknown suggestion only. |
 | 2026-08-04 | 4 | implementation/review | Added request/success/error/all projections, path/operation parameter merging, bounded local-ref expansion, unresolved/external-ref preservation, and detected-only common error compaction. The real no-DB fixture returns exact `{}` errors for all three operations. |
 | 2026-08-04 | 4 | gate correction | Package `deno task test` exposed a baseline task-permission defect: three existing temp-directory tests require write permission. Added test-only `--allow-write`; no runtime permission or domain I/O changed. |
+| 2026-08-04 | 5 | composed evaluation | The first OpenHands dispatch reached the runner but produced no verdict because LiteLLM rejected the unprefixed `qwen/qwen3.7-max` model identifier. A single corrected `openrouter/qwen/qwen3.7-max` retry completed successfully and committed `evaluate.md` with `IMPL-EVAL: PASS`. |
+| 2026-08-04 | 5 | close-gate review | The current review-thread gate passed with 0 threads and 0 unanswered. Fresh CI correctly reported the self-referential DoD/closing-keyword metadata still pending and found the MCP generated publish-asset manifest stale after the new subpath export. Regenerated only that manifest with the repo-native task. |
 
 ## Decisions
 
@@ -81,6 +83,7 @@ they do not add parser strategies or I/O.
 | PLAN-EVAL gate is composed | Explicit milestone-run D6 owner waiver | user directive + milestone-run.md |
 | No local/external ref fetch | Pure domain boundary | canonical design + S4 scope |
 | Implement in the owning supervisor session | The milestone orchestrator already launched this worktree's single allowed Codex sender; a nested launch was correctly refused as duplicate-sender risk | agentic sender registry + `codex-status` |
+| Retry OpenHands once with a provider-prefixed model id | The first run failed before tokens or verdict with an explicit LiteLLM provider-shape error; the dispatcher dry-run accepted the corrected approved Qwen route | Actions runs `30861232769` and `30861395106` |
 
 ## Drift
 
@@ -88,6 +91,8 @@ they do not add parser strategies or I/O.
 | --- | --- | --- |
 | Formal PLAN-EVAL replaced by milestone composition | minor/process-authorized | yes |
 | Package test task lacked existing temp-write permission | minor/test-infrastructure | yes |
+| OpenHands model identifier required a provider prefix | minor/evaluator-infrastructure | yes |
+| Augment review unavailable because the account had no credits | minor/external-composition | yes |
 
 ## Gate Results
 
@@ -124,6 +129,9 @@ they do not add parser strategies or I/O.
 | Final doc-lint | `deno task doc:lint --root packages/mcp --pretty` | PASS | 0 errors/private refs/missing docs across 3 entrypoints. |
 | Final publish dry-run | package `deno task publish:dry-run` | PASS | Exit 0; all 3 entrypoints checked and intended projection/domain files included. |
 | Final lock/boundary hygiene | raw diff/grep + fixture `cmp` | PASS | No `deno.lock` diff, no domain I/O/runtime imports, no lint ignores/double casts/quality allowances; P2 fixture remains byte-identical at 3657 bytes. |
+| OpenHands IMPL-EVAL | corrected approved Qwen route; Actions run `30861395106`; committed `evaluate.md` | PASS | Independent evaluator repeated the package, doctrine, JSR/publish, identity, ladder, ref-bound, exact no-DB `{}` and lock gates; no substitute blocker found. |
+| Current review threads | `deno task agentic:review-threads -- --repo rickylabs/netscript --pr 1195 --pretty` | PASS | 0 threads, 0 unanswered after the evaluator artifact commit. |
+| Generated publish assets | `deno task gen:publish-assets`; `deno task check:publish-assets`; package publish dry-run | PASS | CI found the new `./openapi-projection` public subpath absent from the checked-in MCP publish manifest; regeneration changed only `packages/mcp/src/publish-assets.generated.ts`, the check passed, and all 3 entrypoints dry-ran successfully. |
 
 ### Fitness Gates
 
