@@ -21,7 +21,7 @@ no prompts, parseable output. Add `--format Json` when you need fields rather th
 |---|---|
 | Start (or restart — it stops the previous instance) | `aspire start` |
 | Start isolated (worktrees, parallel agents) | `aspire start --isolated` |
-| Stop this AppHost / all AppHosts | `aspire stop` / `aspire stop --all` |
+| Stop one exact AppHost | `aspire stop --apphost <exact-AppHost-path>` |
 | Running AppHosts + dashboard URL + PID + log path | `aspire ps --format Json` |
 | Resource state, URLs, env, health reports | `aspire describe [<resource>] --format Json` |
 | Include Aspire infra resources · stream changes | `aspire describe --include-hidden` · `--follow` |
@@ -166,7 +166,7 @@ process's output — read it before restarting.
 ### "The AppHost is gone"
 
 `aspire ps --format Json --non-interactive --nologo` returning an empty array means nothing is
-running — something stopped it (another `aspire start`, an `aspire stop --all`, or a tool that takes
+running — something stopped it (another `aspire start`, the host-wide stop mode, or a tool that takes
 over the AppHost's port, e.g. a database CLI command). When one *is* running it returns
 `appHostPath`, `appHostPid`, `cliPid`, `sdkVersion`, `dashboardUrl` and **`logFilePath`** — the
 AppHost's own log, which explains startup and shutdown when resource logs cannot.
@@ -246,16 +246,21 @@ lacks fails loudly: `Command 'rebuild' not available for resource 'users'.`
 ## Important rules
 
 - **Never kill an `aspire mcp start` process.** Those are the session's MCP servers, not stray
-  AppHosts. `aspire stop --all` shuts AppHosts down and leaves them alone.
+  AppHosts.
 - **`Healthy` with `healthReports: {}` is not evidence.** Get console logs, structured logs, or a
   probe against the resource's own port.
 - **To restart, just run `aspire start` again** — it stops the previous instance. Never `aspire stop`
   then `aspire run`, and never `aspire run` in an agent session (it is interactive/foreground).
 - **Use `--isolated`** in worktrees or when another agent may be running.
-- **Clean up what you start**: `aspire stop --all --non-interactive --nologo`, then check `docker ps`.
-  `dcp` helper processes take ~20s to exit after the stop returns, so re-check rather than killing
-  them. Leave pre-existing containers alone — Aspire reuses persistent ones and deleting them
-  destroys another session's data.
+- **Clean up only the AppHost you started**: take its exact `appHostPath` from `aspire ps`, then run
+  `aspire stop --apphost <exact-AppHost-path> --non-interactive --nologo`. Use
+  `aspire resource <name> stop` when targeted cleanup is enough, then check `docker ps`.
+  The host-wide `aspire stop` mode with `--all` is both unsafe and unreliable on a shared host: it
+  has reported `No running AppHost found` and exited 0 while processes rooted at the AppHost
+  survived. Three independent agents observed that failure in one night. `dcp` helper processes
+  take ~20s to exit after a scoped stop returns, so re-check rather than killing them. Leave
+  pre-existing containers alone — Aspire reuses persistent ones and deleting them destroys another
+  session's data.
 - **Prefer `aspire logs` / `aspire otel` over hand-rolled `curl` probing.** A `curl` timeout tells you
   nothing about why; the failing span names the exact call that broke.
 - **Prefer `aspire docs search <query>` / `aspire docs get <slug>`** over searching package caches; it
