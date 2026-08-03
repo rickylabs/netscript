@@ -71,3 +71,11 @@ E2E suite contention: refused to start because pid 4110093 holds /tmp/netscript-
 - Issue #1172 remains open for supervisor review/sign-off.
 - Locked scope remains intact; no drift or deferred follow-up was discovered.
 - No actual `scaffold.runtime` suite was run.
+
+## S5 sign-off (Tier-A review)
+
+- 2026-08-03 · Reviewed `09c89be53`: job-level global concurrency scoped to scaffold-runtime only
+  (queue, not cancel); lease is port-injected for deterministic tests; runner acquires only for
+  SCAFFOLD.RUNTIME and releases in finally on both paths; real live-holder refusal transcript in
+  worklog names pid/worktree/lease path and exits 23. Independent re-run: 84/84 tests, scoped
+  wrappers green.
