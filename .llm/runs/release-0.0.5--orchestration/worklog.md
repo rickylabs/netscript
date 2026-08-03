@@ -207,3 +207,37 @@ when complete. Round-3 PLAN-EVAL confirmation next, then wave-1 dispatch.
 **`Success — Dry run complete`, exit 0** across the workspace publish surface. The 0.0.5 baseline
 export surface packs clean; per-slice surface impact is assessed in each per-PR brief per the
 ratified exception.
+
+## 2026-08-03 — PLAN-EVAL round 3: PASS — and re-planning event R1
+
+Round 3 (commit `e5de448e5`): honesty + gate compliance both PASS under the owner-recorded
+exception; all six dimensions green. Binding consequence accepted: **per-PR briefs must carry the
+promised depth or its absence is a dispatch/pre-merge gate failure.**
+
+Immediately after: fresh baseline fetch revealed **three external merges** on main (#1176→#1168,
+#1177→#1170, #1178→#1142+#1174) — a parallel lane executed epic #1169's S1→S2→S4 while the plan
+was in evaluation. Recorded as re-planning event R1 in `cut-trace.md` with a clean retroactive
+`agentic:pr-checks` audit (all `ok:true`, zero current-fails, 20:11Z). Milestone now 38 open.
+
+### Findings for #1163 (continued)
+
+12. **[merge-authority-boundary]** The profile assigns the orchestrator merge authority over the
+    milestone, but a parallel lane merged three milestone PRs directly (correctly, per repo CI)
+    within hours of run start. The system does not say whether orchestrator merge authority is
+    exclusive, nor how external merges interact with the stage-D per-PR gate — this run handles
+    them as recorded re-planning + retroactive audit.
+
+## 2026-08-03 — Wave-1 dispatch (revised per R1) — pre-dispatch gates
+
+- **Quota:** Codex weekly window 57% used (prolite; observed 19:46Z from the evaluator turn's
+  rate-limit event); `agentic:routing-state` at 20:07Z: no persisted quota-fallback transitions.
+  agy lane not used this wave.
+- **Transport:** managed app-server daemon running (codex 0.144.6, 1 anchored process,
+  `agentic:codex-status` 20:07Z); all lanes on OpenAI subscription via `launch-codex-slice`
+  route validation (provider/model/effort verified per launch, mismatch blocks).
+- **Shared machine:** evaluator thread idle since round-3 verdict; no foreign heavy runs
+  observed in `codex-status` sessions beyond known rollouts.
+
+Dispatching four attached Codex slices (briefs under `slices/`, worktrees off `fb75cf6fc`):
+`proofs` (#1127 #1128 #1129, Sol·high), `canary-payload` (#1166 `Refs`, Sol·medium),
+`mcp-receipts` (#1134, Sol·medium), `close-gate` (#1171 #1105, Sol·medium).
