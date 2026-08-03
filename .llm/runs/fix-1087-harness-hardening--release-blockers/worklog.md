@@ -70,13 +70,14 @@ job. Release prose is edited in the tracked notes-file input.
 | --- | --- | --- | --- |
 | 2026-08-03 | 0 | bootstrap/research | Read all four issue bodies; verified clean requested baseline; selected Archetype 6 + docs overlay. |
 | 2026-08-03 | 0 | design | Locked child-request proxy, publication ownership, Redis negative control, and release-note location. |
+| 2026-08-03 | 0 | PLAN-EVAL | Open-model evaluator session `e52d58f7-9130-4c7b-af67-2e975edcb1e5` returned `PASS`; tool surface was restricted to `Bash`, `Read`, and `Write` during the pre-#1087 safety gap. |
 
 ## Decisions
 
 | Decision | Reason | Source |
 | --- | --- | --- |
 | Do not launch an unconstrained local Qwen evaluator before #1087. | That would knowingly exercise the release's only p0 cost hole. | issue #1087 + lane policy |
-| Use a session-scoped Claude configuration denying `Agent` for bootstrap PLAN-EVAL. | Keeps the formal local Qwen route while making child recruitment unavailable before the code guard lands. | local Claude `--help`; runtime isolated config design |
+| Use a session-scoped Claude configuration excluding all child/session delegation tools for bootstrap PLAN-EVAL. | Keeps the formal local Qwen route while making child recruitment unavailable before the code guard lands. | local Claude `--help`; runtime isolated config design |
 
 ## Drift
 
@@ -87,9 +88,10 @@ job. Release prose is edited in the tracked notes-file input.
 
 ## Gate Results
 
-All implementation gates are `NOT_RUN` pending PLAN-EVAL.
+- PLAN-EVAL: `PASS` — `.llm/runs/fix-1087-harness-hardening--release-blockers/plan-eval.md`.
+- Implementation gates: `NOT_RUN`.
 
 ## Handoff Notes
 
-- PLAN-EVAL should challenge D1/D2 abort/log semantics, D4 ownership semantics, and D7's permanent
-  negative-control proof before allowing implementation.
+- PLAN-EVAL challenged D1/D2 abort/log semantics, D4 ownership semantics, and D7's permanent
+  negative-control proof and returned `PASS`; implementation may proceed.
