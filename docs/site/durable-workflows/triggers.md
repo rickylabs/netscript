@@ -264,13 +264,13 @@ for await (const event of watcher.watch()) {
     { name: "paths", type: "readonly string[] (required)", desc: "Directories to watch (at least one required)." },
     { name: "patterns", type: "readonly string[]?", desc: "Glob patterns for filtering files. Default ['*']." },
     { name: "events", type: "readonly EventKind[]?", desc: "Which FS events to yield ('create'|'modify'|'remove'). Default ['create']." },
-    { name: "debounceMs", type: "number?", desc: "Per-file debounce in milliseconds. Default 2000." },
+    { name: "debounceMs", type: "number?", desc: "Per-file debounce in milliseconds. Default 0 (disabled)." },
     { name: "contentHash", type: "boolean?", desc: "Compute a SHA-256 content hash for de-duplication. Default true." },
     { name: "processExisting", type: "boolean?", desc: "Scan existing files on startup and emit them as create events. Default false." },
     { name: "forcePolling", type: "boolean?", desc: "Force the polling strategy instead of native FS notifications. Default false (use for network paths)." },
     { name: "pollIntervalMs", type: "number?", desc: "Polling interval for the polling strategy. Minimum 500. Default 5000." },
     { name: "minFileSize", type: "number?", desc: "Skip files smaller than this many bytes. Default 0." },
-    { name: "maxFileAge", type: "number?", desc: "Skip files older than this (ms); only applies during the startup scan." },
+    { name: "maxFileAge", type: "number?", desc: "Skip files older than this (ms); only applies during the startup scan when processExisting is true." },
     { name: "stabilityThreshold", type: "StabilityOptions?", desc: "When set, waits for files to stop growing before yielding (network-FS tolerant)." },
     { name: "signal", type: "AbortSignal?", desc: "Abort signal for graceful shutdown of the watch loop." }
   ]
@@ -279,10 +279,10 @@ for await (const event of watcher.watch()) {
 The watcher selects the strategy for you: native OS notifications for local paths,
 polling for network paths or when `forcePolling: true`, and a `HybridStrategy` that
 blends both. Events pass a filter pipeline before you see them — `GlobFilter` limits
-filenames, `StabilityFilter` waits for files to stop growing, and `DedupFilter` skips
-repeated content hashes within its window. The concrete `NativeStrategy`,
-`PollingStrategy`, and `HybridStrategy` classes are internal; construct watchers with
-`createWatcher` or `new FileWatcher(...)`.
+filenames, `DebounceFilter` collapses rapid burst events per path, `StabilityFilter`
+waits for files to stop growing, and `DedupFilter` skips repeated content hashes
+within its window. The concrete `NativeStrategy`, `PollingStrategy`, and `HybridStrategy`
+classes are internal; construct watchers with `createWatcher` or `new FileWatcher(...)`.
 
 ## Scheduled triggers — cron without a daemon
 

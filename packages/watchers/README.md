@@ -22,7 +22,7 @@ actually wants to consume.
   polling for network shares; set `forcePolling: true` for SMB/NFS mounts where native events are
   unreliable.
 - **Composable filter pipeline** — events flow through `GlobFilter` (filename patterns),
-  `StabilityFilter` (waits for writes to finish), and `DedupFilter` (skips repeated content hashes)
+  `DebounceFilter` (collapses rapid burst events per path), `StabilityFilter` (waits for writes to finish), and `DedupFilter` (skips repeated content hashes)
   in configured order.
 - **Deterministic shutdown** — `watch()` is an async generator, `stop()` is idempotent, and a
   supplied `AbortSignal` chains into the watcher's internal controller, so a host runtime can bind
@@ -40,7 +40,7 @@ flowchart LR
     FS["Filesystem"] --> S{"strategy"}
     S --> N["Native<br/>OS events"]
     S --> P["Polling<br/>network paths"]
-    N & P --> G["GlobFilter"] --> ST["StabilityFilter"] --> D["DedupFilter"] --> E["WatchEvent<br/>stream"]
+    N & P --> G["GlobFilter"] --> DB["DebounceFilter"] --> ST["StabilityFilter"] --> D["DedupFilter"] --> E["WatchEvent<br/>stream"]
 ```
 
 ## Install
@@ -57,29 +57,35 @@ the pre-release line.
 ```typescript
 import { createWatcher } from '@netscript/watchers';
 
+const controller = new AbortController();
 const watcher = createWatcher({
   paths: ['./incoming'],
   patterns: ['*.csv'],
   events: ['create', 'modify'],
+  processExisting: true,
+  maxFileAge: 86400000,
+  debounceMs: 500,
   stabilityThreshold: { checkIntervalMs: 1000, stableChecks: 3 },
+  signal: controller.signal,
 });
 
-for await (const event of watcher.watch()) {
-  console.log(`${event.kind}: ${event.path}`);
+try {
+  for await (const event of watcher.watch()) {
+    console.log(`${event.kind}: ${event.path}`);
+  }
+} finally {
   watcher.stop();
 }
 ```
 
-The loop yields each `*.csv` created or modified under `./incoming` — but only after the file has
-stayed unchanged for three consecutive checks, so downstream processing never reads a half-written
-upload.
+The loop yields each `*.csv` created or modified under `./incoming` — scanning existing files on startup within 24h, debouncing rapid bursts per path, and waiting until the file has stayed unchanged for three consecutive checks before downstream processing consumes it.
 
 ## Public surface
 
 | Symbol group                                                             | What it gives you                          |
 | ------------------------------------------------------------------------ | ------------------------------------------ |
 | `createWatcher`, `FileWatcher`                                           | The watcher runtime and its factory        |
-| `GlobFilter`, `StabilityFilter`, `DedupFilter`                           | The composable filter pipeline             |
+| `GlobFilter`, `DebounceFilter`, `StabilityFilter`, `DedupFilter`         | The composable filter pipeline             |
 | `NativeStrategy`, `PollingStrategy`, `HybridStrategy`                    | Watch strategies behind the auto-selection |
 | `safeReadFile`, `safeStat`, `computeContentHash`, `AccessFailureTracker` | Resilient filesystem helpers               |
 | `WatchEvent`, `WatcherOptions`, `EventKind`, `WatchStrategy`             | The typed event contract                   |
