@@ -12,9 +12,10 @@
 
 ## Current State
 
-Research and design are locked at clean `origin/main` `2c8865e8c`. P1 selects qualified F1(b), so
-the current precedence is override > aspire-cli > run-manifest > appsettings. P3 exact failure
-guidance is binding. No implementation exists yet.
+Research and design are locked at clean `origin/main` `2c8865e8c`. Slice 1 now implements the
+contract-first endpoint vocabulary and all four source adapters. The focused source matrix is green
+for every required carrier/failure branch. P1 precedence and P3 exact failure guidance remain
+binding for slice 2.
 
 ## Completed
 
@@ -22,19 +23,21 @@ guidance is binding. No implementation exists yet.
   harness/doctrine/Aspire/JSR/PR/tooling authorities, and package consumers.
 - Confirmed baseline doc lint and publish dry-run clean, no lock churn.
 - Recorded Design checkpoint and the milestone-run PLAN-EVAL composed waiver.
+- Implemented discriminated source/directory/probe contracts and the named source precedence.
+- Implemented override, Aspire CLI, run-manifest, and appsettings sources with injected IO seams.
+- Proved 6/6 source fixtures, scoped check/lint/fmt, package-specific quality scan, and
+  `quality:gate` with no unsafe casts, lint ignores, or lock churn.
 
 ## In Progress
 
-- Launch the attached Codex implementation lane for slices 1–3 from the run-owned staging
-  worktree. The provided PR worktree remains owned by this Desktop supervisor session.
+- Slice 2 composition and bounded probe implementation. The provided PR worktree remains owned by
+  the Desktop supervisor session; this attached thread remains the sole staging sender.
 
 ## Next Steps
 
-1. Launch the canonical complex implementation route through `.llm/tools/agentic/` in the
-   run-owned staging worktree.
-2. Review each landed slice, fast-forward the provided PR worktree, run gates, and reconcile
-   GitHub state.
-3. Trigger composed final evaluation surfaces and prepare close-gate evidence.
+1. Compose the four outcomes under the locked precedence with visible conflicts/exclusions.
+2. Implement the redirect-free, credential-free, bounded spec and identity probe.
+3. Prove every status plus the hanging-row isolation case, then proceed to public exports/docs.
 
 ## Key Decisions
 
@@ -48,15 +51,18 @@ guidance is binding. No implementation exists yet.
 
 | Path | Status | Notes |
 | --- | --- | --- |
-| `.llm/runs/feat-openapi-mcp-endpoint-directory--s5/` | new | Harness bootstrap/plan/design/waiver/brief |
+| `.llm/runs/feat-openapi-mcp-endpoint-directory--s5/` | updated | Slice 1 evidence, reconcile note, attached-thread metadata |
+| `packages/mcp/src/domain/service-endpoint-*` | new | Discriminated contract and discovered-URL policy |
+| `packages/mcp/src/infrastructure/*endpoint-source.ts` | new | Four named source adapters |
+| `packages/mcp/tests/service-endpoint-source*` | new | Aspire/source fixture matrix; 6/6 passing |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | baseline PASS; implementation pending | current package doc lint/dry-run only |
-| Fitness | pending | full A2 column planned |
-| Runtime | pending | fixture matrix and bounded timeout case |
+| Static | slice 1 PASS | focused test + scoped check/lint/fmt |
+| Fitness | slice 1 PASS | package quality scan + `quality:gate` |
+| Runtime | source matrix PASS; probe pending | 6/6 source fixtures |
 | Consumer | pending | public exports/docs planned |
 
 ## Open Questions
@@ -66,6 +72,8 @@ guidance is binding. No implementation exists yet.
 ## Drift and Debt
 
 - Drift: composed evaluator waiver; true remote baseline; manifest run-id injection clarification.
+- Drift: lint/fmt wrappers require the package config because the root workspace glob shape does not
+  parse for those Deno subcommands in this worktree; no source/config mutation was made.
 - Debt: preserve existing `MCP-A6-V2-SHAPE`; no new debt planned.
 
 ## Commits

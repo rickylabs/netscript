@@ -80,6 +80,8 @@ never import an infrastructure adapter from a consumer flow.
 | 2026-08-04 | bootstrap | research/design/plan lock | Issue/RFC/P1/P3/doctrine/Aspire/JSR baselines read; clean baseline confirmed. |
 | 2026-08-04 | Plan Gate | composed per milestone-run.md (orchestrator waiver) | Owner/orchestrator directive: no local formal PLAN-EVAL; plan locked for same-run implementation. |
 | 2026-08-04 | implementation dispatch | sender ownership reconciled | The provided PR worktree is durably owned by this Desktop supervisor thread; implementation uses a run-owned staging worktree and pushes each commit to the exact PR refspec. |
+| 2026-08-04 | 1 | contract + source adapters | Added the discriminated directory/source/probe vocabulary, loopback normalization policy, and override/Aspire CLI/run-manifest/appsettings adapters. Source matrix passed 6/6, including CLI absent/non-zero/parse failures, foreign/missing/mismatched manifest identity, torn manifest with healthy appsettings, unknown shared-carrier fields, exclusions, and unpinned services. |
+| 2026-08-04 | 1 | post-slice reconcile | PR #1194 remains draft, references #1131 without a closing keyword, and has no new implementation/reviewer comments; issue #1131 remains open with both acceptance gates unchecked. The launcher metadata push ref was corrected to the user-authorized PR branch. No scope or precedence readjustment was needed. |
 
 ## Decisions
 
@@ -99,10 +101,25 @@ never import an infrastructure adapter from a consumer flow.
 
 ## Gate Results
 
-All implementation gates are `NOT_RUN` until their owning slice lands. Baseline full-export doc lint
-and package publish dry-run both passed before implementation; see `research.md`.
+### Slice 1 — contract and source adapters
+
+| Gate | Command | Result |
+| --- | --- | --- |
+| Focused source matrix | `deno test --allow-env --allow-net --allow-run --allow-read packages/mcp/tests/service-endpoint-*_test.ts` | PASS, exit 0; 6 passed, 0 failed |
+| Scoped check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/mcp --ext ts,tsx` | PASS, exit 0; 76 files, 0 diagnostics |
+| Scoped lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/mcp --ext ts,tsx --config packages/mcp/deno.json` | PASS, exit 0; 76 files, 0 findings |
+| Scoped format | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/mcp --ext ts,tsx --config packages/mcp/deno.json` | PASS, exit 0; 76 files, 0 findings |
+| Code quality | `deno run --allow-read .llm/tools/quality/scan-code-quality.ts --root packages/mcp` | PASS, exit 0; no findings or allowances |
+| Framework quality | `deno task quality:gate` | PASS, exit 0; quality scan and architecture task completed |
+| Diff hygiene | `git diff --check`; forbidden-pattern scan | PASS, exit 0; no whitespace errors, unsafe casts, lint ignores, or console calls |
+
+The wrapper invocations without `--config packages/mcp/deno.json` encountered the root workspace
+configuration parser failure recorded in `drift.md`; the package-configured wrapper verdicts above
+are the exact successful evidence. Slice 2 and slice 3 gates remain `NOT_RUN`.
 
 ## Handoff Notes
 
 - Implement against locked decisions D1–D9; do not import S4.
 - The fixture matrices and timeout negative case are the decisive #1131 evidence.
+- Slice 1 is ready for the supervisor's substantive review; this implementation lane does not
+  self-certify the slice.

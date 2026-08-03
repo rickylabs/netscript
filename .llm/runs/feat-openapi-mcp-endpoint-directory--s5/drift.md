@@ -47,3 +47,19 @@ Drift is append-only.
 - **Severity:** significant
 - **Action:** fix
 - **Evidence:** `research.md` finding 8/open-question resolution; `plan.md` D4.
+
+## 2026-08-04 — Scoped lint and format need the package config
+
+- **What:** The scoped lint/fmt wrappers failed before source analysis when Deno parsed the root
+  workspace glob entries; rerunning the same wrapper selections with
+  `--config packages/mcp/deno.json` passed with zero findings.
+- **Source:** Slice 1 validation output from `run-deno-lint.ts` and `run-deno-fmt.ts`.
+- **Expected:** The plan's wrapper commands would run from the repository root without an explicit
+  config.
+- **Actual:** `deno check` accepted the selection, while `deno lint`/`deno fmt` reported
+  `invalid type: string "packages/*", expected struct WorkspaceConfig` until the package config was
+  supplied.
+- **Severity:** minor
+- **Action:** accept for this lane; use the package config for exact lint/fmt evidence and leave root
+  configuration changes out of scope.
+- **Evidence:** `worklog.md` Slice 1 gate table; package-configured lint/fmt exit 0 over 76 files.
