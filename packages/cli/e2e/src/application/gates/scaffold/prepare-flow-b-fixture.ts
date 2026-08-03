@@ -289,10 +289,16 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 async function runDeno(args: readonly string[], cwd: string, label: string): Promise<void> {
-  const result = await new Deno.Command('deno', { args: [...args], cwd }).output();
+  const result = await new Deno.Command('deno', { args: [...args], cwd, clearEnv: true, env: childEnv() }).output();
   if (result.success) return;
   const stderr = new TextDecoder().decode(result.stderr).trim();
   throw new Error(`${label} failed: ${stderr}`);
+}
+
+function childEnv(): Record<string, string> {
+  const env = { ...Deno.env.toObject() };
+  delete env.LD_LIBRARY_PATH;
+  return env;
 }
 
 // Pre-warm the flow-b module graph before Aspire launches workers-api: the
@@ -320,6 +326,8 @@ const warm = await new Deno.Command('deno', {
     warmupEntrypoint,
   ],
   cwd: projectRoot,
+  clearEnv: true,
+  env: childEnv(),
 }).output();
 if (!warm.success) {
   throw new Error(
