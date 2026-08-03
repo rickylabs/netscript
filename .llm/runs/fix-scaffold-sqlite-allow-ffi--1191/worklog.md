@@ -76,6 +76,7 @@ predicate and extend the cross-engine semantic permission table in its focused g
 | 2026-08-04 | 3 | exact stop | Exact AppHost stop; `aspire ps` empty; service PID exited immediately and DCP controller exited after bounded wait. |
 | 2026-08-04 | 3 | final gates | Helper suite, scoped wrappers, quality gate, doc lint, publish dry-run, and leak check all passed. Leak check reported only foreign resources, left untouched. |
 | 2026-08-04 | 2/3 | sign-off | Substantive diff review passed; implementation/evidence commit `c795d6f8f` recorded. |
+| 2026-08-04 | eval | independent IMPL-EVAL | OpenHands/Qwen formal evaluator returned PASS; commit-back `01bb577ff` contains only `evaluate.md`; no product, lock, or scratch churn. |
 
 ## Decisions
 
@@ -109,6 +110,7 @@ predicate and extend the cross-engine semantic permission table in its focused g
 | package publish | PASS | `packages/cli: deno task publish:dry-run` | Publish simulation succeeds; existing dynamic-import warnings only. |
 | resource hygiene | PASS | `deno task agentic:leak-check -- --slice-dir ... --worktree ...` | Aspire/Docker probes OK; no slice-owned survivors; foreign containers left untouched. |
 | full `scaffold.runtime` | NOT_RUN (serialized ownership) | #1184 owns the milestone slot | Focused real scaffold/AppHost owner verification is complete; no overlapping run was started. |
+| independent IMPL-EVAL | PASS | `evaluate.md`; Actions run `30860595979` | All five DoD boxes supported; P2 classifier remains a non-blocking deferred finding. |
 
 ### Runtime Gates
 

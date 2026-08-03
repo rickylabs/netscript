@@ -36,13 +36,15 @@ Closes #1191
   include the request trace.
 - Resource hygiene: exact AppHost stop and leak-check passed with no slice-owned survivors; foreign
   containers were left untouched.
+- Independent IMPL-EVAL: PASS; all five DoD boxes supported. The evaluator commit-back contains
+  only `evaluate.md`, with no product-source, lockfile, or scratch churn.
 - Full `scaffold.runtime` was not started because the serialized milestone slot belongs to #1184;
   this PR completed its focused live scaffold/AppHost proof without overlap.
 
 ## Harness
 
 - Run dir: `.llm/runs/fix-scaffold-sqlite-allow-ffi--1191/`
-- Phase: implementation complete; composed milestone evaluation pending
+- Phase: IMPL-EVAL PASS; ready-merge close-gate/orchestrator handoff
 
 ## Drift / Debt
 

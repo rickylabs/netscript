@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `fix-scaffold-sqlite-allow-ffi--1191` |
 | Branch | `fix/scaffold-sqlite-allow-ffi` |
-| Current phase | `implementation complete; composed implementation evaluation pending` |
+| Current phase | `IMPL-EVAL PASS; ready-merge close-gate handoff` |
 | Archetype | `6 — CLI / Tooling` |
 | Scope overlays | `service` |
 
@@ -33,13 +33,13 @@ the epic S4/S6 impact comment are complete.
 
 ## In Progress
 
-- Draft-to-ready handoff for the composed milestone implementation evaluation.
+- Close-gate evidence mirror and orchestrator pre-merge handoff.
 
 ## Next Steps
 
-1. Commit and push the implementation/evidence slice by explicit refspec.
-2. Update PR body/comments and move the single status label to implementation evaluation.
-3. Let the milestone-run composed evaluator and orchestrator pre-merge gate make the merge ruling.
+1. Apply `status:ready-merge` after local evidence-mirror preflight.
+2. Require a current green close-gate and named CI results.
+3. Hand merge authority to the milestone orchestrator; do not merge from this supervisor session.
 
 ## Key Decisions
 
@@ -65,6 +65,7 @@ the epic S4/S6 impact comment are complete.
 | Runtime | RED + GREEN PASS | `proofs/red-runtime.json`; `proofs/green-runtime.json` |
 | Consumer | PASS | focused 32-step generated-output suite; `P2-db.json` |
 | Hygiene | PASS | exact stop; leak report has no slice-owned survivors |
+| Independent evaluation | PASS | `evaluate.md`; OpenHands run `30860595979` |
 
 ## Open Questions
 
@@ -81,3 +82,4 @@ the epic S4/S6 impact comment are complete.
 - `d398b48a4` — locked research/plan and draft PR surface.
 - `c795d6f8f` — implementation, generated-output coverage, live RED/GREEN evidence, P2 evidence,
   and final gates.
+- `01bb577ff` — independent OpenHands IMPL-EVAL PASS (`evaluate.md` only).
