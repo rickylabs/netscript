@@ -40,3 +40,17 @@
 - **Action:** accept
 - **Evidence:** `worklog.md`, `proofs/red-runtime.json`, `proofs/green-runtime.json`, and the final
   implementation commit.
+
+## 2026-08-04 — Milestone-composed cloud evaluator transport
+
+- **What:** The formal IMPL-EVAL is dispatched to cloud OpenHands with the approved open-model Qwen
+  route after draft→ready.
+- **Source:** Owner instruction and `milestone-run.md` explicitly compose OpenHands for this
+  milestone PR; the supervisor is authorized to dispatch the cloud evaluator.
+- **Expected:** The general OpenHands handoff card defaults a local-machine formal evaluation to
+  the local Claude/OpenRouter transport.
+- **Actual:** This milestone-specific run uses the cloud evaluator composition the owner required,
+  while preserving the same open-only Qwen/high policy identity and evaluator separation.
+- **Severity:** minor/authorized
+- **Action:** accept
+- **Evidence:** `impl-eval-prompt.md`, dispatcher output, and the eventual tracked `evaluate.md`.

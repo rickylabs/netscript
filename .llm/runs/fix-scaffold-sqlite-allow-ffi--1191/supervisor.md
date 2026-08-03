@@ -16,11 +16,12 @@
 | Task lane | Provider / model / effort | Role in this run |
 | --- | --- | --- |
 | `normal_implementation` | Current Codex implementation session | Generator and implementation supervisor |
-| milestone composed evaluation | draft→ready augment + OpenHands + orchestrator pre-merge gate | Independent evaluation surface |
+| milestone composed evaluation | cloud OpenHands; OpenRouter/Qwen open model/high + orchestrator pre-merge gate | Independent evaluation surface |
 
 ## Recorded lane/eval overrides
 
 - Formal local PLAN-EVAL is not launched. The owner explicitly directs the per-PR milestone rule:
   `composed per milestone-run.md (orchestrator waiver)`. The plan is locked before implementation;
   evaluation composes draft→ready augment, OpenHands, and the orchestrator pre-merge gate.
-
+- The supervisor dispatches the milestone-required cloud IMPL-EVAL with the approved open-only Qwen
+  identity at high effort; no closed model or implementation session evaluates this slice.
