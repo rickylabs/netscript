@@ -370,3 +370,20 @@ on lane availability** — a false-negative availability signal, #1173-adjacent.
 Receipts state: slice 1 implemented (uncommitted at turn end), gates PASS (16/16 fixtures,
 quality:gate), review ladder in progress (Fable primary rejected by CLI → Opus low fallback per
 policy). Turn ended mid-run; resuming to complete slice 2 + handoff.
+
+## 2026-08-03 — PR #1180 close-gate red: the "hand-closes #N" parser trap
+
+Close-gate failed on #1180 listing #1166 as a closing issue with unticked boxes — despite the
+body carrying `Refs #1166` and zero closing keywords in any commit. Root cause (proven by
+elimination — no linked branch, no ConnectedEvent, every body revision `Refs`-only, then a
+targeted reword flipping `closingIssuesReferences` from `[1166]` to `[]`): the prose sentence
+"the milestone orchestrator **hand-closes #1166** on that evidence" — GitHub's keyword parser
+treats the hyphenated "hand-closes" as `closes #1166`. Merging would have auto-closed #1166
+with untickable boxes; the exact dishonest close the Refs discipline exists to prevent, planted
+by the very sentence explaining that discipline.
+
+16. **[hand-closes-parser-trap]** "hand-close(s) #N" is standing vocabulary in this system's
+    artifacts (profile, plan, briefs). In a PR body it silently becomes a closing keyword.
+    netscript-pr should ban keyword-adjacent issue references in prose ("completes #N by hand",
+    "closed by hand (`#N`)" are safe forms); close-gate could flag body text whose
+    closingIssuesReferences disagree with an explicit `Refs`-only declaration.
