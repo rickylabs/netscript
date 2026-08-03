@@ -203,13 +203,13 @@ Deno.test('Claude OpenRouter launch and resume use the isolated print wrapper', 
     nativeExt4: true,
   });
   assertEquals(launch.diagnostics, []);
-  assertEquals(launch.request?.arguments.slice(0, 5), [
+  assertEquals(launch.request?.arguments.slice(0, 4), [
     'run',
     '--no-lock',
     '--allow-read',
     '--allow-run',
-    CLAUDE_PRINT_WRAPPER,
   ]);
+  assertEquals(launch.request?.arguments[4], CLAUDE_PRINT_WRAPPER);
   assertEquals(launch.request?.arguments.slice(5), [
     '--model',
     'z-ai/glm-5.2',
@@ -237,6 +237,51 @@ Deno.test('Claude OpenRouter launch and resume use the isolated print wrapper', 
   });
   assertEquals(resume.diagnostics, []);
   assertEquals(resume.request?.arguments.slice(-2), ['--resume', sessionId]);
+});
+
+Deno.test('formal evaluator routes alone receive the child-model request guard', () => {
+  const evaluator = planClaudeCommand({
+    command: {
+      kind: 'launch',
+      commandId: 'formal-evaluator',
+      mode: 'plan',
+      route: route({
+        agent: 'claude',
+        profileId: 'claude-openrouter',
+        model: 'qwen/qwen3.7-max',
+        effort: 'high',
+      }),
+      content,
+    },
+    nativeExt4: true,
+  });
+  assertEquals(evaluator.diagnostics, []);
+  assert(evaluator.request?.arguments.includes('--enforce-open-evaluator-models'));
+  assert(
+    evaluator.request?.arguments.some((argument) =>
+      argument === '--allow-write=.llm/tmp/agentic/evaluator-policy'
+    ),
+  );
+  assert(evaluator.request?.arguments.some((argument) => argument.startsWith('--allow-net=')));
+
+  const design = planClaudeCommand({
+    command: {
+      kind: 'launch',
+      commandId: 'creative-design',
+      mode: 'plan',
+      route: route({
+        agent: 'claude',
+        profileId: 'claude-openrouter',
+        model: 'z-ai/glm-5.2',
+        effort: 'xhigh',
+      }),
+      content,
+    },
+    nativeExt4: true,
+  });
+  assert(!design.request?.arguments.includes('--enforce-open-evaluator-models'));
+  assert(!design.request?.arguments.some((argument) => argument.startsWith('--allow-write')));
+  assert(!design.request?.arguments.some((argument) => argument.startsWith('--allow-net')));
 });
 
 Deno.test('custom Claude base URL is sanitized and always reports experimental remote unavailable', () => {

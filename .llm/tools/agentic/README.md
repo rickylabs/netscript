@@ -208,9 +208,16 @@ override), and never targets base `main` without `--allow-base-main` — and it 
 the merge body so a race can't merge a moved tip.
 
 ```bash
-deno run --allow-read .llm/tools/agentic/github/gh-pr.ts create \
-  --repo rickylabs/netscript --head feat/x/s4 --base feat/x --title "…" --body-file <path> --dry-run --pretty
+deno task agentic:gh-pr create \
+  --repo rickylabs/netscript --head feat/x/s4 --base feat/x --title "…" \
+  --body-file .llm/tmp/<run-id>/<session-id>/pr-body.md --dry-run --pretty
 ```
+
+Publication scratch is always per-run and per-session. For every create invocation, the tool copies
+inline or file content into its own UUID directory under `.llm/tmp/agentic/gh-pr/`, writes
+owner+SHA-256 metadata, and re-verifies both before constructing the GitHub request. Cross-session
+reuse or post-stage tampering is refused. A durable reviewed body may instead live in its harness
+run directory; never use a workspace-shared scratch filename.
 
 Exit: `0` ok/PASS · `1` API failure · `2` usage · `4` missing token · `6` base-`main` guard · `7`
 not mergeable · `10` eval FAIL · `11` eval pending · `12` no eval comment.
@@ -284,6 +291,12 @@ OpenRouter Claude routes run with an isolated `CLAUDE_CONFIG_DIR`, explicitly em
 `config/endpoints.ts`. This prevents a cached native Claude login from silently overriding the
 gateway. `claude/claude-print.ts` is the launch/resume wrapper for non-mobile gateway sessions.
 Native Claude remote control remains a different surface.
+
+The formal-evaluator preset additionally replaces `ANTHROPIC_BASE_URL` in the spawned evaluator
+environment with a loopback request guard. Every model-bearing request must name a model in
+`OPEN_EVALUATOR_MODEL_IDS`; a denial returns 403, terminates the evaluator, exits non-zero, and
+writes a credential-blind JSONL event under `.llm/tmp/agentic/evaluator-policy/` with only the model
+id and requesting session. This child-surface policy is configuration, not prompt guidance.
 
 Preset capability is data in `runtime/provider-profiles.ts`: the Claude GLM design preset is
 live-agentic supported, while the legacy Codex GLM design preset is explicitly unsupported because

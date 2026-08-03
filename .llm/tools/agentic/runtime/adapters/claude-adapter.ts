@@ -2,9 +2,15 @@
 
 import type { RuntimeCommand, RuntimeDiagnostic } from '../contract.ts';
 import type { AgentCommandPlan, AgentProcessRequest } from '../ports.ts';
-import { childEnvironmentPolicyForProfile, resolveProviderProfile } from '../provider-profiles.ts';
+import {
+  childEnvironmentPolicyForProfile,
+  matchOpenRouterPreset,
+  resolveProviderProfile,
+} from '../provider-profiles.ts';
 import { AGENT_COMMAND_TIMEOUT_MS, MAX_AGENT_CAPTURE_BYTES } from './codex-adapter.ts';
 import { validateProviderRoute } from './provider-adapter.ts';
+import { EVALUATOR_MODEL_AUDIT_ROOT } from '../../claude/evaluator-model-guard.ts';
+import { LOOPBACK_HOST, OPENROUTER_ANTHROPIC_BASE_URL } from '../../config/endpoints.ts';
 
 export const CLAUDE_SMOKE_WRAPPER = '.llm/tools/agentic/claude/claude-remote-smoke.ts';
 export const CLAUDE_PRINT_WRAPPER = '.llm/tools/agentic/claude/claude-print.ts';
@@ -56,7 +62,14 @@ function staticRequest(
 function printRequest(
   command: Extract<ClaudeCommand, { kind: 'launch' | 'resume' }>,
   environment: import('../ports.ts').ChildEnvironmentPolicy,
+  enforceOpenEvaluatorModels: boolean,
 ): AgentProcessRequest {
+  const evaluatorPermissions = enforceOpenEvaluatorModels
+    ? [
+      `--allow-write=${EVALUATOR_MODEL_AUDIT_ROOT}`,
+      `--allow-net=${LOOPBACK_HOST},${new URL(OPENROUTER_ANTHROPIC_BASE_URL).host}`,
+    ]
+    : [];
   return {
     executable: 'deno',
     arguments: [
@@ -64,6 +77,7 @@ function printRequest(
       '--no-lock',
       '--allow-read',
       '--allow-run',
+      ...evaluatorPermissions,
       CLAUDE_PRINT_WRAPPER,
       '--model',
       command.route.model,
@@ -71,6 +85,7 @@ function printRequest(
       command.route.effort,
       '--prompt',
       command.content.path,
+      ...(enforceOpenEvaluatorModels ? ['--enforce-open-evaluator-models'] : []),
       ...(command.kind === 'resume' ? ['--resume', command.session.sessionId] : []),
     ],
     cwd: command.route.worktree,
@@ -139,6 +154,7 @@ export function planClaudeCommand(input: ClaudePlanningInput): AgentCommandPlan 
     request = printRequest(
       command,
       childEnvironmentPolicyForProfile(profile, command.route),
+      matchOpenRouterPreset(command.route)?.purpose === 'evaluation',
     );
   }
   return {

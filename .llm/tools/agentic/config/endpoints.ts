@@ -22,6 +22,10 @@ export const ANTIGRAVITY_INSTALLER_URL = 'https://antigravity.google/cli/install
 export const OPENROUTER_ANTHROPIC_BASE_URL = 'https://openrouter.ai/api';
 export const OPENROUTER_RESPONSES_BASE_URL = 'https://openrouter.ai/api/v1';
 
+/** Loopback binding used by local policy proxies that must never accept remote traffic. */
+export const LOOPBACK_HOST = '127.0.0.1';
+export const LOOPBACK_HTTP_PROTOCOL = 'http:';
+
 /** GitHub REST API base URL for all `github/` + OpenHands tools. */
 export const GITHUB_API_BASE_URL = 'https://api.github.com';
 
