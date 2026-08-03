@@ -561,3 +561,17 @@ present at merge (finding-19 row) — **#1191 auto-closed by the merge** (`f7f7c
   is the filed 452-call run. A canary.2 baseline run optional.
 - All three labeled `status:plan` with scheduling comments. Milestone grew again mid-run;
   dispositions updated in plan (mid-run additions).
+
+## 2026-08-04 — Merge 12 (#1194/#1131); #1195 gate RED at check 6
+
+- **Merge 12: PR #1194 (`6821545af`, 23:58:25Z) closed #1131** (auto-close verified). Gate
+  record: latest check-runs green on final head `f05cb8ed5`; threads 0; files exactly the
+  port + four adapters + probe + fixtures; 0 ignores; 15/15 fixture matrix independently
+  re-run; refs verified at merge. S5 also self-ran an IMPL-EVAL PASS and dispatched the cloud
+  augment — composed evaluation exceeded.
+- **PR #1195 (S4) gate verdict: RED at check 6** — undeclared command-execution allowlist
+  surface (`domain/command/{policy,executor-port,catalog-port}` + two flow edits, 104 lines)
+  absent from #1130's acceptance, the PR body's S-rows, and the slice's own drift/worklog.
+  The #1079 incident class, caught live by the gate; also adjacent to the F2-gated execution
+  fork. Slice steered: split to a parked branch, unwind, re-gate the reduced surface. The
+  projection module itself is aligned — the RED is the undeclared extras only.
