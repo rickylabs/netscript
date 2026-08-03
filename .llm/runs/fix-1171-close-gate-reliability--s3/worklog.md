@@ -148,3 +148,47 @@ must perform the required substantive slice review and separate-session evaluati
 - Independent gates: check/lint/fmt 17 files 0 findings; deno test .llm/tools/validation 34/34;
   live check-close-gate PASS on merged #1176 (legacy em-dash evidence read compatibly); live
   mirror dry-run on #1178 with provenance + corrected notice.
+
+## Reconciliation with #1181 (2026-08-03)
+
+Rebased `fix/1171-close-gate-reliability` onto `origin/main` at `c49bd1db2`, which contains #1181
+commit `3049ef027`. Conflicts were limited to `check-close-gate.ts` and its tests; the rebuilt S3
+implementation remained the base and #1181's additive PR-body Definition-of-Done capability was
+ported into it.
+
+### Reconciled contract
+
+- Added `PrFinding`, `findUncheckedPrBody`, the `prFindings` report field, and
+  `closeGatePasses(overrideActive, issueFindings, prFindings)`. Unchecked boxes beneath PR-body
+  `## Definition of Done` or `## Acceptance` now fail the gate; `## Slices` and other checklists do
+  not.
+- Ported #1181's PR-body negative test, override/pass semantics, and pretty-report assertion. The
+  provenance assertion was deliberately adapted from #1181's duplicate `evaluatedIssues` field to
+  S3's canonical `issues: [{number, updatedAt, bodySha256}]` field and compact
+  `provenance: head=… evaluated=…` pretty output. No information asserted by #1181 was dropped.
+- Retained S3's shared acceptance parser, live API reads, structured evidence, post-merge notices,
+  named repair actions, stale-snapshot helper tests, race-aware mirror, and frozen-payload workflow
+  guard.
+- Kept the #1181 PR template unchanged from main: its `Definition of Done` heading and comments
+  match the implemented authoritative-section predicate.
+- Canonical `netscript-pr` documentation now contains both #1181's PR-body DoD wording and S3's
+  structured-evidence/operator playbook. The rules are complementary and no contradiction was
+  found: PR-body DoD/Acceptance boxes govern PR completion claims, while issue acceptance evidence
+  governs boxes in issues named by closing keywords. The generated `.claude` copy was synchronized.
+- `deno.lock` has no reconciliation diff.
+
+### Reconciliation gates
+
+| Gate | Result |
+| --- | --- |
+| Scoped validation check | PASS · 17 files · 0 occurrences |
+| Scoped validation lint | PASS · 17 files · 0 occurrences |
+| Scoped validation format | PASS · 17 files · 0 findings |
+| `deno test --allow-read --allow-env --allow-write .llm/tools/validation/` | PASS · 37 passed · 0 failed |
+| `ci.yml` YAML parse | PASS |
+| `deno task agentic:check-claude` | PASS · config, mirror sync, and hook lock checks |
+| Lock hygiene | PASS · `deno.lock` unchanged |
+
+Reconcile note: #1181's PR-body enforcement is preserved as an additive predicate rather than a
+replacement parser/report. The supervisor's previous sign-off and IMPL-EVAL predate this
+reconciliation commit; the reconciliation diff remains intentionally unpushed for renewed review.
