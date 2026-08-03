@@ -202,6 +202,9 @@
 - name: "epic:frontend-contrib"
   color: "1d76db"
   description: "Frontend contribution layer epic (plugins that ship UI)"
+- name: "epic:openapi-mcp"
+  color: "5319e7"
+  description: "OpenAPI→MCP service introspection epic (RFC #1123, tracking #1117)"
 
 # ── wave: release-train bucket (maps to milestone) ───────────────────────────
 - name: "wave:v1"
