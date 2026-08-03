@@ -94,7 +94,7 @@ export class SagaCompensator {
   }
 
   /** Run compensation from a cascaded compensate command. */
-  compensateCascaded<TState extends SagaState>(
+  async compensateCascaded<TState extends SagaState>(
     definition: SagaDefinition<string, TState, SagaMessage>,
     instanceId: SagaInstanceId,
     state: TState,
@@ -106,13 +106,19 @@ export class SagaCompensator {
       );
     }
 
-    return this.compensate({
+    const result = await this.compensate({
       definition,
       instanceId,
       state,
       message: message.message,
       reason: message.reason,
     });
+    if (!result.compensated) {
+      throw SagasError.notImplemented(
+        `sagaCompensate effect for "${message.message.type}" requires a registered .compensate() handler.`,
+      );
+    }
+    return result;
   }
 
   /** Run compensation using a failure cascade reason. */

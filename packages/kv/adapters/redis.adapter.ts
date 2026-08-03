@@ -72,6 +72,7 @@ const logger = createPackageLogger('kv');
 export class RedisKvAdapter implements WatchableKv {
   private readonly connection: RedisConnectionManager;
   private readonly namespace: string;
+  private atomicTail: Promise<void> = Promise.resolve();
 
   /**
    * Redis supports watch operations through pub/sub and polling.
@@ -444,6 +445,22 @@ export class RedisKvAdapter implements WatchableKv {
    * @returns Atomic operation result
    */
   async atomic(
+    checks: AtomicCheck[],
+    mutations: AtomicMutation[],
+  ): Promise<AtomicResult> {
+    const previous = this.atomicTail;
+    const next = Promise.withResolvers<void>();
+    this.atomicTail = next.promise;
+    await previous;
+
+    try {
+      return await this.executeAtomic(checks, mutations);
+    } finally {
+      next.resolve();
+    }
+  }
+
+  private async executeAtomic(
     checks: AtomicCheck[],
     mutations: AtomicMutation[],
   ): Promise<AtomicResult> {

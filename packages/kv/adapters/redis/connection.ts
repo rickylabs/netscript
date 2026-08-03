@@ -32,6 +32,9 @@ const RETRY_OPTIONS = {
   jitter: 1,
 } as const;
 
+const IOREDIS_RECONNECT_ATTEMPTS = 5;
+const IOREDIS_RECONNECT_MAX_DELAY_MS = 1_000;
+
 /**
  * Manages the lifecycle of ioredis client and subscriber connections for the
  * Redis KV adapter.
@@ -85,6 +88,11 @@ export class RedisConnectionManager {
   async ensureClient(): Promise<Redis> {
     if (this.closed) {
       throw new KvClosedError('RedisKvAdapter is closed.');
+    }
+
+    if (this.client?.status === 'end') {
+      this.client = null;
+      this.clientPromise = null;
     }
 
     if (this.client) {
@@ -164,7 +172,21 @@ export class RedisConnectionManager {
    * @returns Connected Redis client.
    */
   private async connect(): Promise<Redis> {
-    return await retry(() => this.connectOnce(), RETRY_OPTIONS);
+    try {
+      return await retry(() => this.connectOnce(), RETRY_OPTIONS);
+    } catch (error) {
+      const connectionError = new KvConnectionError(
+        `RedisKvAdapter could not connect to ${
+          maskRedisUrl(this.url)
+        } after ${RETRY_OPTIONS.maxAttempts} attempts: ${toErrorMessage(error)}`,
+        { cause: error },
+      );
+      logger.error('Redis KV adapter connection failed', {
+        url: maskRedisUrl(this.url),
+        error: connectionError.message,
+      });
+      throw connectionError;
+    }
   }
 
   /**
@@ -176,15 +198,18 @@ export class RedisConnectionManager {
   private async connectOnce(): Promise<Redis> {
     const client = new Redis(this.url, this.createRedisOptions());
 
-    await new Promise<void>((resolve, reject) => {
-      client.once('ready', () => resolve());
-      client.once('error', (error: Error) => reject(error));
-    }).catch((error: unknown) => {
+    try {
+      await new Promise<void>((resolve, reject) => {
+        client.once('ready', () => resolve());
+        client.once('error', (error: Error) => reject(error));
+      });
+    } catch (error: unknown) {
+      client.disconnect();
       throw new KvConnectionError(
         `Failed to connect RedisKvAdapter to ${maskRedisUrl(this.url)}: ${toErrorMessage(error)}`,
         { cause: error },
       );
-    });
+    }
 
     logger.info('Connected Redis KV adapter', { url: maskRedisUrl(this.url) });
 
@@ -204,17 +229,20 @@ export class RedisConnectionManager {
   private async connectSubscriberOnce(): Promise<Redis> {
     const subscriber = new Redis(this.url, this.createRedisOptions());
 
-    await new Promise<void>((resolve, reject) => {
-      subscriber.once('ready', () => resolve());
-      subscriber.once('error', (error: Error) => reject(error));
-    }).catch((error: unknown) => {
+    try {
+      await new Promise<void>((resolve, reject) => {
+        subscriber.once('ready', () => resolve());
+        subscriber.once('error', (error: Error) => reject(error));
+      });
+    } catch (error: unknown) {
+      subscriber.disconnect();
       throw new KvConnectionError(
         `Failed to connect RedisKvAdapter subscriber to ${maskRedisUrl(this.url)}: ${
           toErrorMessage(error)
         }`,
         { cause: error },
       );
-    });
+    }
 
     subscriber.on('error', (error: Error) => {
       logger.error('Redis KV subscriber reported an error', { error: error.message });
@@ -236,11 +264,19 @@ export class RedisConnectionManager {
   private createRedisOptions(): RedisOptions {
     const options: RedisOptions = {
       connectTimeout: REDIS_CONNECT_TIMEOUT_MS,
-      enableReadyCheck: true,
       keepAlive: REDIS_KEEPALIVE_MS,
       lazyConnect: false,
       maxRetriesPerRequest: 3,
       ...this.options,
+      // These are adapter guarantees rather than caller preferences: commands
+      // must never disappear into an offline queue, readiness must be proven,
+      // and reconnect attempts must be bounded without disabling recovery.
+      enableOfflineQueue: false,
+      enableReadyCheck: true,
+      retryStrategy: (attempt) =>
+        attempt <= IOREDIS_RECONNECT_ATTEMPTS
+          ? Math.min(attempt * 100, IOREDIS_RECONNECT_MAX_DELAY_MS)
+          : null,
     };
 
     if (this.url.startsWith('rediss://') && !options.tls) {

@@ -1,6 +1,7 @@
 import { assert, assertEquals, assertRejects, assertStrictEquals } from 'jsr:@std/assert@^1';
 
 import { MemoryKvAdapter } from '@netscript/kv';
+import { defineSaga, sagaCompensate, sagaFail, send } from '@netscript/plugin-sagas-core';
 import type {
   SagaCorrelationIndexEntry,
   SagaCorrelationKey,
@@ -66,6 +67,82 @@ Deno.test('createDurableSagaRuntime rejects Prisma backend without client', asyn
     Error,
     'Prisma saga store backend requires a Prisma client.',
   );
+});
+
+Deno.test('createDurableSagaRuntime dispatches returned compensation through its default compensator', async () => {
+  const durable = await createDurableSagaRuntime({ kv: new MemoryKvAdapter() });
+  const calls: string[] = [];
+  const definition = defineSaga('default-compensation')
+    .state<SagaState>({ status: 'pending' })
+    .on<string, unknown>('Start', () => [
+      sagaCompensate({ type: 'Undo', payload: { orderId: 'ord-1' } }, 'rollback'),
+    ])
+    .on<string, unknown>('Compensated', (_saga, message) => {
+      calls.push(`cascade:${String(message.payload)}`);
+      return [];
+    })
+    .compensate<string, unknown>('Undo', (saga, message) => {
+      const payload = message.payload as { orderId: string };
+      calls.push(`compensate:${payload.orderId}`);
+      saga.state = { status: 'compensated' };
+      return [send('Compensated', 'ord-1')];
+    })
+    .build();
+
+  await durable.runtime.start();
+  try {
+    await durable.runtime.register([definition]);
+    await durable.runtime.publish({ type: 'Start', payload: {} });
+    assertEquals(calls, ['compensate:ord-1', 'cascade:ord-1']);
+  } finally {
+    await durable.runtime.stop('default compensation test complete');
+    await durable.dispose();
+  }
+});
+
+Deno.test('createDurableSagaRuntime rejects sagaCompensate without a matching branch', async () => {
+  const durable = await createDurableSagaRuntime({ kv: new MemoryKvAdapter() });
+  const definition = defineSaga('missing-compensation')
+    .state<SagaState>({ status: 'pending' })
+    .on<string, unknown>('Start', () => [sagaCompensate({ type: 'Undo', payload: {} })])
+    .build();
+
+  await durable.runtime.start();
+  try {
+    await durable.runtime.register([definition]);
+    await assertRejects(
+      () => durable.runtime.publish({ type: 'Start', payload: {} }),
+      Error,
+      'sagaCompensate effect for "Undo" requires a registered .compensate() handler.',
+    );
+  } finally {
+    await durable.runtime.stop('missing compensation test complete');
+    await durable.dispose();
+  }
+});
+
+Deno.test('createDurableSagaRuntime dispatches sagaFail through its compensation branch', async () => {
+  const durable = await createDurableSagaRuntime({ kv: new MemoryKvAdapter() });
+  const calls: string[] = [];
+  const definition = defineSaga('failure-compensation')
+    .state<SagaState>({ status: 'pending' })
+    .on<string, unknown>('Start', () => [sagaFail('payment declined')])
+    .compensate<string, unknown>('Start', (saga, message) => {
+      calls.push(`compensate:${message.type}`);
+      saga.state = { status: 'compensated' };
+      return [];
+    })
+    .build();
+
+  await durable.runtime.start();
+  try {
+    await durable.runtime.register([definition]);
+    await durable.runtime.publish({ type: 'Start', payload: {} });
+    assertEquals(calls, ['compensate:Start']);
+  } finally {
+    await durable.runtime.stop('failure compensation test complete');
+    await durable.dispose();
+  }
 });
 
 class RecordingSagaStore implements SagaStorePort {

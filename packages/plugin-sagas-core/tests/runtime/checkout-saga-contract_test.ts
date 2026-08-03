@@ -1,7 +1,7 @@
 import { assertEquals, assertRejects } from '@std/assert';
 
 import { defineSaga, send, spawn } from '../../mod.ts';
-import type { SagaState } from '../../src/domain/mod.ts';
+import type { CascadedMessage, SagaState } from '../../src/domain/mod.ts';
 import { SagasError } from '../../src/domain/mod.ts';
 import { createSagaEngine, createSagaRuntime } from '../../src/runtime/mod.ts';
 
@@ -104,6 +104,18 @@ Deno.test('dispatching spawn rejects with the documented unsupported error', asy
     () => runtime.dispatchCascaded([spawn('ChildSaga', {})]),
     SagasError,
     'Spawn cascades are unsupported.',
+  );
+
+  assertEquals(error.code, 'SAGA_NOT_IMPLEMENTED');
+});
+
+Deno.test('dispatching an unknown cascade kind fails loudly with the effect name', async () => {
+  const runtime = createSagaRuntime();
+  const messages: CascadedMessage[] = JSON.parse('[{"kind":"mystery"}]');
+  const error = await assertRejects(
+    () => runtime.dispatchCascaded(messages),
+    SagasError,
+    'Unhandled saga cascade effect kind "mystery"; no dispatcher option is registered.',
   );
 
   assertEquals(error.code, 'SAGA_NOT_IMPLEMENTED');

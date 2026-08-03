@@ -216,8 +216,8 @@ export class SagaEngine implements SagaBusPort {
         throw SagasError.sagaNotFound(`${entry.sagaId}:${message.type}`);
       }
 
-      const correlationKey = resolveCorrelationKey(entry.sagaId, message);
-      const instanceId = await this.#resolveInstanceId(entry.sagaId, message, correlationKey);
+      const correlationKey = resolveCorrelationKey(entry.definition, message);
+      const instanceId = await this.#resolveInstanceId(entry.sagaId, correlationKey);
       const loaded = await this.#store?.load(instanceId);
       const baseState = loaded?.state ?? entry.definition.initialState;
       if (message.idempotencyKey) {
@@ -329,11 +329,10 @@ export class SagaEngine implements SagaBusPort {
 
   async #resolveInstanceId(
     sagaId: SagaId,
-    message: SagaMessage,
     correlationKey: SagaCorrelationKey,
   ): Promise<SagaInstanceId> {
     const correlated = await this.#store?.findByCorrelation(sagaId, correlationKey);
-    return correlated ?? resolveInstanceId(sagaId, message);
+    return correlated ?? resolveInstanceId(sagaId, correlationKey);
   }
 
   async #persistTransition(
@@ -437,9 +436,11 @@ function getErrorType(error: unknown): string {
   return typeof error;
 }
 
-function resolveInstanceId(sagaId: SagaId, message: SagaMessage): SagaInstanceId {
-  const key = message.correlationKey ?? message.id ?? `${sagaId}:${message.type}`;
-  return `${sagaId}:${key}` as SagaInstanceId;
+function resolveInstanceId(
+  sagaId: SagaId,
+  correlationKey: SagaCorrelationKey,
+): SagaInstanceId {
+  return `${sagaId}:${correlationKey}` as SagaInstanceId;
 }
 
 function withPublishOptions(message: SagaMessage, options: SagaPublishOptions): SagaMessage {
@@ -452,9 +453,14 @@ function withPublishOptions(message: SagaMessage, options: SagaPublishOptions): 
   });
 }
 
-function resolveCorrelationKey(sagaId: SagaId, message: SagaMessage): SagaCorrelationKey {
-  return (message.correlationKey ?? message.id ??
-    `${sagaId}:${message.type}`) as SagaCorrelationKey;
+function resolveCorrelationKey(
+  definition: SagaDefinition<string, SagaState, SagaMessage>,
+  message: SagaMessage,
+): SagaCorrelationKey {
+  const rule = definition.correlations.find((candidate) => candidate.eventType === message.type) ??
+    definition.correlations.find((candidate) => candidate.eventType === '*');
+  return rule?.correlate(message) ?? message.correlationKey ??
+    (`${definition.id}:${message.type}` as SagaCorrelationKey);
 }
 
 function cloneState<TState extends SagaState>(state: TState): TState {
