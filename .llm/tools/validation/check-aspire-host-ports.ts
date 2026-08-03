@@ -22,8 +22,9 @@ import { walk } from 'jsr:@std/fs@^1/walk';
 import { relative } from 'jsr:@std/path@^1';
 
 const DEFAULT_ROOTS = ['packages/cli/src'] as const;
-const SOURCE_EXTENSIONS = new Set(['.ts', '.tsx', '.mts', '.template']);
+const SOURCE_EXTENSIONS = new Set(['.ts', '.tsx', '.mts', '.template', '.json']);
 const ALLOW_MARKER = 'aspire-host-port-ok:';
+const GENERATED_STATE_DIR = /[\\/](?:\.data|\.git|node_modules)(?:[\\/]|$)/;
 
 /**
  * `withHttpEndpoint({ port: 8010 ... })` — a numeric literal in the host-port
@@ -43,6 +44,7 @@ const LITERAL_HOST_PORT = /withHttpEndpoint\(\s*\{[^}]*\bport:\s*\d/;
  * recognised by the ternary on the same line.
  */
 const ENTRY_PORT_KEY = /\b(?:Host)?Port:\s*\S/;
+const JSON_PORT_KEY = /"(?:Host)?Port"\s*:\s*\d/;
 const CONDITIONAL_WRITE = /\?/;
 
 /** Files that compose resource entries for the scaffolded `appsettings.json`. */
@@ -100,14 +102,17 @@ export function scanContent(
 ): { findings: HostPortFinding[]; allowances: HostPortAllowance[] } {
   const findings: HostPortFinding[] = [];
   const allowances: HostPortAllowance[] = [];
-  const checksEntryPorts = SCAFFOLD_ENTRY_FILES.includes(normalized(path));
+  const normalizedPath = normalized(path);
+  const checksEntryPorts = SCAFFOLD_ENTRY_FILES.includes(normalizedPath);
+  const checksGeneratedJson = normalizedPath.endsWith('/aspire/appsettings.json');
 
   content.split('\n').forEach((text, index) => {
     const hitsEndpoint = LITERAL_HOST_PORT.test(text);
     const hitsEntry = checksEntryPorts &&
       ENTRY_PORT_KEY.test(text) &&
       !CONDITIONAL_WRITE.test(text);
-    if (!hitsEndpoint && !hitsEntry) return;
+    const hitsGeneratedJson = checksGeneratedJson && JSON_PORT_KEY.test(text);
+    if (!hitsEndpoint && !hitsEntry && !hitsGeneratedJson) return;
 
     const line = index + 1;
     const reason = allowanceReason(text);
@@ -153,7 +158,12 @@ export async function scanHostPorts(
   let scannedFiles = 0;
 
   for (const root of roots) {
-    for await (const entry of walk(root, { includeDirs: false })) {
+    for await (
+      const entry of walk(root, {
+        includeDirs: false,
+        skip: [GENERATED_STATE_DIR],
+      })
+    ) {
       const path = normalized(relative('.', entry.path));
       if (![...SOURCE_EXTENSIONS].some((suffix) => path.endsWith(suffix))) continue;
       if (path.includes('/node_modules/') || isTestPath(path)) continue;
@@ -169,8 +179,19 @@ export async function scanHostPorts(
 }
 
 if (import.meta.main) {
+  if (Deno.args.includes('--help') || Deno.args.includes('-h')) {
+    console.log([
+      'Usage:',
+      '  deno run --allow-read check-aspire-host-ports.ts [root ...] [--pretty]',
+      '',
+      'Roots default to packages/cli/src. Pass a generated project root to validate the scaffold',
+      'that consumers actually received.',
+    ].join('\n'));
+    Deno.exit(0);
+  }
   const pretty = Deno.args.includes('--pretty');
-  const result = await scanHostPorts();
+  const roots = Deno.args.filter((arg) => !arg.startsWith('-'));
+  const result = await scanHostPorts(roots.length > 0 ? roots : DEFAULT_ROOTS);
 
   if (pretty) {
     console.log(`Scanned ${result.scannedFiles} files.`);

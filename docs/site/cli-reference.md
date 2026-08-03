@@ -268,7 +268,7 @@ planning-only cloud targets, and the artifact-copy verbs are in the
 {{ comp.apiTable({
   caption: "AI agent commands",
   rows: [
-    { name: "Install agent tooling", type: "netscript agent init", desc: "Install NetScript MCP and skills for detected agent hosts (<code>--host claude</code>, <code>vscode</code>, or <code>all</code>)." },
+    { name: "Install agent tooling", type: "netscript agent init", desc: "Install NetScript MCP, consumer tools, and skills for detected agent hosts (<code>--host claude</code>, <code>vscode</code>, or <code>all</code>). Add <code>--with-docs</code> to opt into a several-megabyte expanded offline prose corpus plus every export subpath of the exact installed NetScript package versions." },
     { name: "Run the MCP server", type: "netscript agent mcp", desc: "Start the NetScript MCP server over standard input/output." }
   ]
 }) }}

@@ -5,7 +5,8 @@
  * the shapes that replaced them.
  */
 import { assert, assertEquals } from 'jsr:@std/assert@^1';
-import { scanContent } from './check-aspire-host-ports.ts';
+import { join } from 'jsr:@std/path@^1';
+import { scanContent, scanHostPorts } from './check-aspire-host-ports.ts';
 
 const APPHOST = 'packages/cli/src/kernel/application/scaffold/render-ts-apphost.ts';
 const APPSETTINGS = 'packages/cli/src/kernel/templates/aspire/generate-appsettings.ts';
@@ -87,4 +88,30 @@ Deno.test('treats an empty justification as a failure', () => {
   assertEquals(allowances, []);
   assertEquals(findings.length, 1);
   assert(findings[0].message.includes('empty reason'));
+});
+
+Deno.test('rejects a pinned host port in a generated appsettings file', () => {
+  const result = scanContent(
+    'fixture/aspire/appsettings.json',
+    '{\n  "Resources": { "api": { "HostPort": 8091 } }\n}\n',
+  );
+  assertEquals(result.findings.length, 1);
+});
+
+Deno.test('does not descend into generated runtime state', async () => {
+  const root = await Deno.makeTempDir();
+  try {
+    const stateDir = join(root, '.data', 'postgres');
+    await Deno.mkdir(stateDir, { recursive: true });
+    await Deno.writeTextFile(
+      join(stateDir, 'appsettings.json'),
+      '{"Resources":{"db":{"HostPort":5432}}}',
+    );
+
+    const result = await scanHostPorts([root]);
+    assertEquals(result.scannedFiles, 0);
+    assertEquals(result.findings, []);
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
 });

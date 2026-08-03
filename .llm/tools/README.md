@@ -4,6 +4,13 @@ Reusable Deno utilities for MCP/Codex sessions live here. This is the single nav
 `.llm/tools/` surface: what each subtree is for, and which script answers which question. Keep
 one-off scripts in `.llm/tmp/`.
 
+## Consumer boundary
+
+Only the eight entrypoints in [`consumer-tools.json`](./consumer-tools.json) are agent-grade,
+consumer-facing files shipped by `netscript agent init`. Their symptom index and exact permission
+commands live in [`consumer-README.md`](./consumer-README.md), which is installed as
+`.llm/tools/README.md`. All other files and subtrees documented below are repository-internal.
+
 This README is reference for the tooling **architecture**; it does not restate the operating rules
 that govern _when_ to reach for these tools. For those, see:
 

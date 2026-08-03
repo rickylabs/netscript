@@ -1,4 +1,4 @@
-import { relative, resolve } from '@std/path';
+import { relative, resolve } from 'jsr:@std/path@^1';
 
 export type QualityRule =
   | 'explicit-any-ignore'
