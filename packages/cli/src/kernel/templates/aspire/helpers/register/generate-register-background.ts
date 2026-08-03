@@ -69,6 +69,14 @@ export function generateRegisterBackground(options: RegisterBackgroundOptions): 
     lines.push(
       `    const ${id} = builder.addExecutable('${name}', 'deno', ${id}_workdir, ['run', '--minimum-dependency-age=0', '${RESOURCE_DEFAULTS.NodeModulesDirNoneFlag}', '${RESOURCE_DEFAULTS.UnstableWorkerOptionsFlag}', ...${id}_perms, '${entrypoint}']);`,
     );
+    if (isSagasBackgroundResource(name, entrypoint)) {
+      lines.push(``);
+      lines.push(`    // Saga supervisor health endpoint and real Aspire probe.`);
+      lines.push(`    await ${id}.withHttpEndpoint({ env: 'PORT' });`);
+      lines.push(
+        `    await ${id}.withHttpHealthCheck({ path: '${RESOURCE_DEFAULTS.AppHealthCheckPath}', endpointName: '${RESOURCE_DEFAULTS.HttpEndpointName}' });`,
+      );
+    }
     lines.push(
       `    await ${id}.withEnvironment('NETSCRIPT_PLUGIN_SERVICE_BOOTSTRAP_MODULE', ${id}_bootstrapModule);`,
     );
@@ -226,4 +234,8 @@ export function generateRegisterBackground(options: RegisterBackgroundOptions): 
 
 function isTriggersBackgroundResource(name: string, entrypoint: string): boolean {
   return name === 'triggers' || entrypoint === 'triggers/runtime.ts';
+}
+
+function isSagasBackgroundResource(name: string, entrypoint: string): boolean {
+  return name === 'sagas' || entrypoint === 'sagas/runtime.ts';
 }

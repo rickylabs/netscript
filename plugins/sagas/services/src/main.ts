@@ -20,15 +20,20 @@ import '@netscript/kv/redis';
 import type { PluginServiceContext } from '@netscript/plugin/sdk';
 import type { RunningService } from '@netscript/service';
 import { createPluginService } from '@netscript/plugin/service';
-import { type SagaStreamPrismaClient, startSagasStreamMirror } from '../../streams/server.ts';
+import { resolveSagaStoreBackend } from '@netscript/plugin-sagas-core/stores';
+import { startSagasStreamMirror } from '../../streams/server.ts';
 import { createSagaDeliveryPublisher } from '../../src/runtime/saga-delivery.ts';
+import { resolveSagaServicePrismaClient } from './database-client.ts';
 import { router } from './router.ts';
 import { registerSagas } from './init.ts';
 import type { SagaServiceDatabaseClient } from './routers/v1-types.ts';
 
 export type { PluginServiceContext } from '@netscript/plugin/sdk';
 
-type ServiceDatabaseClient = SagaServiceDatabaseClient & SagaStreamPrismaClient;
+type SagaServiceContextSettings = Readonly<{
+  sagas?: { store?: { backend?: string } };
+  Sagas?: { Store?: { Backend?: string } };
+}>;
 type PluginServiceBootstrap = {
   createPluginServiceContext(pluginName: string): Promise<PluginServiceContext>;
 };
@@ -42,6 +47,10 @@ export default async function createSagasService(
   ctx: PluginServiceContext,
 ): Promise<RunningService> {
   const port = parseInt(ctx.env.PORT ?? Deno.env.get('PORT') ?? '8092');
+  const sagaStoreBackend = resolveSagaStoreBackend({
+    env: { ...Deno.env.toObject(), ...ctx.env },
+    appsettings: serviceAppsettings(ctx),
+  });
   let dbClient: SagaServiceDatabaseClient = emptySagaDatabaseClient;
   let useKvProjection = true;
   const sagaPublisher = createSagaDeliveryPublisher();
@@ -60,15 +69,23 @@ export default async function createSagasService(
 
   queueMicrotask(async () => {
     try {
-      const resolvedDbClient = await ctx.db.getClient();
-      assertServiceDatabaseClient(resolvedDbClient);
-      dbClient = resolvedDbClient;
-      useKvProjection = false;
+      const hostDbClient = await ctx.db.getClient();
+      const sagaDbClient = resolveSagaServicePrismaClient(hostDbClient, sagaStoreBackend);
+      if (sagaDbClient) {
+        dbClient = sagaDbClient;
+        useKvProjection = false;
+      }
       await registerSagas();
-      void startSagasStreamMirror({ prisma: resolvedDbClient })
-        .catch((error) => {
-          console.warn('[Sagas API] Durable stream hook skipped:', error);
-        });
+      if (sagaDbClient) {
+        void startSagasStreamMirror({ prisma: sagaDbClient })
+          .catch((error) => {
+            console.warn('[Sagas API] Durable stream hook skipped:', error);
+          });
+      } else {
+        console.warn(
+          '[Sagas API] Saga Prisma delegates unavailable; KV runtime continues without DB query projections.',
+        );
+      }
 
       console.log(`[Sagas API] Running on http://localhost:${port}`);
     } catch (error) {
@@ -102,39 +119,13 @@ function countNoSagaRows(): Promise<0> {
   return Promise.resolve(0);
 }
 
-function assertServiceDatabaseClient(value: unknown): asserts value is ServiceDatabaseClient {
-  if (!isObject(value)) {
-    throw new Error('Sagas database client must be an object.');
-  }
-
-  const sagaInstance = Reflect.get(value, 'sagaInstance');
-  const sagaExecutionHistory = Reflect.get(value, 'sagaExecutionHistory');
-  const sagaRuntimeState = Reflect.get(value, 'sagaRuntimeState');
-  const sagaRuntimeTransition = Reflect.get(value, 'sagaRuntimeTransition');
-  const sagaRuntimeCorrelation = Reflect.get(value, 'sagaRuntimeCorrelation');
-
-  if (
-    !isObject(sagaInstance) ||
-    !hasMethod(sagaInstance, 'findMany') ||
-    !hasMethod(sagaInstance, 'count') ||
-    !isObject(sagaExecutionHistory) ||
-    !hasMethod(sagaExecutionHistory, 'findMany') ||
-    !hasMethod(sagaExecutionHistory, 'count') ||
-    !isObject(sagaRuntimeState) ||
-    !isObject(sagaRuntimeTransition) ||
-    !isObject(sagaRuntimeCorrelation) ||
-    !hasMethod(value, '$transaction')
-  ) {
-    throw new Error('Sagas database client is missing required Prisma delegates.');
-  }
-}
-
-function hasMethod(value: object, key: string): boolean {
-  return typeof Reflect.get(value, key) === 'function';
-}
-
-function isObject(value: unknown): value is object {
-  return typeof value === 'object' && value !== null;
+function serviceAppsettings(ctx: PluginServiceContext): SagaServiceContextSettings | undefined {
+  const candidate = ctx as PluginServiceContext & {
+    readonly appsettings?: SagaServiceContextSettings;
+    readonly settings?: SagaServiceContextSettings;
+    readonly config?: SagaServiceContextSettings;
+  };
+  return candidate.appsettings ?? candidate.settings ?? candidate.config;
 }
 
 async function loadSagasServiceContext(): Promise<PluginServiceContext> {

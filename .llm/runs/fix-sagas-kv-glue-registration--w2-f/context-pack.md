@@ -12,27 +12,31 @@
 
 ## Current State
 
-Plan/design are locked. A RED emitted-artifact test now fails on the missing Redis registration, and
-a real unfixed local-source scaffold exists under `.llm/tmp/1184-red/saga-kv-red`; its emitted
-runtime was inspected and lacks the import. The live AppHost RED is queued behind a foreign #1191
-AppHost that acquired the shared slot after preflight.
+Implementation and the owner runtime protocol are green. The final fresh scaffold under
+`.llm/tmp/1184-final/saga-kv-final` proved populated background health, full terminal and
+compensating lifecycles, correlation, OTEL traces/spans/logs, and restart durability.
 
 ## Completed
 
 - Read amended #1184 and re-baselined all load-bearing claims.
 - Selected Archetype 5 + service overlay and required gates.
 - Recorded supervisor identity, research, design, plan, waiver, and environmental drift.
-- Captured the emitted-glue RED (exit 1) and verified the fresh scaffold artefact/cache wiring.
+- Captured the emitted-glue RED and real generated `KvConnectionError`.
+- Registered Redis in regenerated glue and preserved explicit Deno-KV selection.
+- Added saga-only supervisor health endpoint/probe after the empty-report verifier RED.
+- Allowed KV runtime startup without optional Prisma projection delegates; Prisma remains strict.
+- Completed all seven owner runtime evidence steps and cleaned owned resources.
 
 ## In Progress
 
-- Slice 1: wait for the shared AppHost slot, then capture the real unfixed `KvConnectionError`.
+- Slice 4: framework gates, serialized `scaffold.runtime`, composed review, PR evidence, hygiene.
 
 ## Next Steps
 
-1. Commit/push the RED test and evidence to draft PR #1193.
-2. When the foreign #1191 AppHost stops, start the unfixed scaffold and preserve `KvConnectionError` evidence.
-3. Apply the one-line stub fix and continue through owner runtime protocol.
+1. Commit/push the completed implementation and runtime evidence.
+2. Run scoped check/lint/fmt, `quality:gate`, doc/publish gates.
+3. Serialize and run the one-pass `scaffold.runtime` merge-readiness gate.
+4. Complete composed draft→ready review and update PR/issue evidence.
 
 ## Key Decisions
 
@@ -40,31 +44,36 @@ AppHost that acquired the shared slot after preflight.
 | --- | --- | --- |
 | Fix the stub with `@netscript/kv/redis` registration | plan D1 | Generated output is not user-editable authority. |
 | Keep Deno-KV compatibility by relying on existing provider selection | plan D2 | Registration does not select Redis. |
+| Add saga-only health endpoint/probe | owner health bar | Populated report is backed by supervisor startup. |
+| Permit missing Prisma projections only for KV backend | runtime evidence | #1093 remains untouched. |
 
 ## Files Changed
 
 | Path | Status | Notes |
 | --- | --- | --- |
-| `.llm/runs/fix-sagas-kv-glue-registration--w2-f/*` | new | Harness bootstrap only. |
-| `plugins/sagas/src/adapter/resources/resources.test.ts` | changed | RED semantic assertion over emitted runtime glue. |
+| `plugins/sagas/src/adapter/resources/*` | changed | Redis registration + health glue + emitted-artifact tests. |
+| `packages/cli/.../generate-register-background.ts` | changed | Saga-only endpoint/health probe. |
+| `plugins/sagas/services/src/database-client*`, `main.ts` | changed | KV bootstrap without optional Prisma projections. |
+| `.llm/runs/fix-sagas-kv-glue-registration--w2-f/*` | changed | Evidence and drift. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | baseline | doc-lint: 15 existing private refs, 0 missing JSDoc |
-| Fitness | pending | plan locks `quality:gate` + F-13 runtime evidence |
-| Runtime | queued | foreign #1191 AppHost owns the slot |
-| Consumer | RED partial | real scaffold emitted broken glue; live failure pending slot |
+| Static | in progress | focused tests/check green; full framework gates pending |
+| Fitness | runtime PASS | owner protocol fully evidenced |
+| Runtime | PASS | populated health, lifecycle, OTEL, restart |
+| Consumer | PASS local | fresh scaffold; published confirmation at canary point 2 |
 
 ## Open Questions
 
-- None blocking implementation.
+- No implementation blocker. Shared expensive-gate slot must be empty before `scaffold.runtime`.
 
 ## Drift and Debt
 
-- Drift: milestone artifacts/legacy service docs absent; isolated start exited; sibling #1191 acquired the AppHost slot after preflight.
-- Debt: no new/deepened debt planned; #1093 untouched.
+- Drift: milestone artifacts/legacy docs absent; detached starts exited without attached PTY; empty
+  health and KV/Prisma coupling required explicit rescope.
+- Debt: #1093 remains untouched; no generated schema hand-edit was used.
 
 ## Commits
 

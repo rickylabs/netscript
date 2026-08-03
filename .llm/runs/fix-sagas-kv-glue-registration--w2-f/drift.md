@@ -69,3 +69,30 @@ Drift is append-only.
 - **Severity:** minor
 - **Action:** accept
 - **Evidence:** Retry will keep an attached PTY alive while all owner-protocol evidence is collected.
+
+## 2026-08-04 — Owner health bar requires saga-specific AppHost probe wiring
+
+- **What:** The fixed background process reached `Running`, but `aspire describe sagas` returned an
+  empty `healthReports` object. The owner explicitly disallows treating that fallback state as proof.
+- **Source:** Fresh fixed scaffold under `.llm/tmp/1184-green/saga-kv-green`.
+- **Expected:** The generated saga background resource has a populated report backed by a check of
+  the started saga supervisor.
+- **Actual:** Generic background-process generation exposes no endpoint or health probe.
+- **Severity:** significant
+- **Action:** rescope
+- **Evidence:** Add a saga-only supervisor health endpoint in regenerated glue plus its generated
+  AppHost endpoint/probe wiring; do not change generic workers/triggers or public package exports.
+
+## 2026-08-04 — KV saga API required unrelated Prisma projection delegates
+
+- **What:** The fresh scaffold selected `NETSCRIPT_SAGA_STORE=kv`, but the saga API aborted its
+  post-listen startup when the host Prisma client lacked saga projection delegates. The existing
+  empty query adapter was never allowed to serve its intended KV-only fallback role.
+- **Source:** `aspire otel logs sagas-api`; fresh scaffold with normal DB init/generate/seed.
+- **Expected:** KV durable runtime opens the configured Redis adapter independently of optional
+  Prisma query/stream projections; Prisma backend continues to fail closed without its delegates.
+- **Actual:** An unconditional assertion prevented the KV runtime from starting.
+- **Severity:** significant
+- **Action:** rescope
+- **Evidence:** Add an internal backend-aware resolver with unit coverage. This deliberately leaves
+  #1093 schema extraction untouched and introduces no package export.
