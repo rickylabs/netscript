@@ -219,6 +219,9 @@ jobs:
   scaffold-runtime:
     name: scaffold-runtime (aspire + docker + postgres)
     needs: classify
+    concurrency:
+      group: e2e-scaffold-runtime-global
+      cancel-in-progress: false
     # Job always starts (so its status reports); real work is guarded by the
     # classifier so docs-only / `ci:skip-e2e` short-circuit to SUCCESS. Heavy;
     # additive until observed green. This is the docker tier (#1152): reached
