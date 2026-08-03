@@ -132,3 +132,19 @@ The slice directory arrived with the supervisor's `implement.md` and thread meta
 `supervisor.md`, `plan.md`, or `plan-eval.md`. The owner prompt supplied locked invariants and
 explicitly assigned this implementation lane. No evaluator verdict is invented here; the supervisor
 must perform the required substantive slice review and separate-session evaluation before merge.
+
+## S3 sign-off (Tier-A review)
+
+- 2026-08-03 · Research decision (rebuild; no candidate ≥30% coverage) reviewed and accepted —
+  sources verified, coverage table honest. Implementation reviewed in full: live reads only with a
+  frozen-payload regression guard test; structured `acceptance-evidence` fenced block with
+  box-index fallback + legacy format kept one release behind a deprecation warning; provenance on
+  every verdict; whole-mapping validation before first mutation; mid-air-edit retry with hash
+  compare; provenance comment deduped by marker; `[post-merge]` boxes excluded with notice;
+  `labeled` activity type added to ci.yml triggers.
+- Supervisor changes on top: rebased onto main past #1177/#1178 (ci.yml conflict resolved in favor
+  of tool-owned label logic, superseding the #1178 hotfix step); discarded deno.lock churn;
+  reworded the skip notice (reruns DO work now that reads are live).
+- Independent gates: check/lint/fmt 17 files 0 findings; deno test .llm/tools/validation 34/34;
+  live check-close-gate PASS on merged #1176 (legacy em-dash evidence read compatibly); live
+  mirror dry-run on #1178 with provenance + corrected notice.

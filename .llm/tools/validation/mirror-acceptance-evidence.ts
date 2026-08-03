@@ -64,7 +64,7 @@ async function main(): Promise<void> {
       evaluatedAt,
       issues: snapshots,
       warnings: [
-        `Mirror skipped because live PR labels do not include ${READY_LABEL}; apply the label then push because reruns do not create a new labeled event.`,
+        `Mirror skipped because live PR labels do not include ${READY_LABEL}; apply the label and the labeled event triggers a fresh run (labels are read live, so a manual rerun also works).`,
       ],
     }, options.pretty);
     return;
