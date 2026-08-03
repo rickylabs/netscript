@@ -28,6 +28,8 @@ export const MODEL_IDS = {
   sonnet: 'sonnet-5',
   /** Google/Antigravity CLI identifier. */
   antigravity: 'agy',
+  /** Google/Antigravity documentation and evidence model. */
+  antigravityDocs: 'gemini-3.6-flash-high',
 } as const;
 
 /**

@@ -17,6 +17,7 @@
 - Remove every config-supported Gemini-over-OpenRouter route.
 - Preserve formal evaluator routes and their approved Qwen/Minimax open-model set.
 - Keep the existing named Gemini-generator rejection test; after this change it rejects the lane first because its purpose remains documentation, not evaluation.
+- Fold owner-authorized issue #1089 into PR #1086. Antigravity print invocations use the centralized native Gemini docs model, stream JSON, skipped permissions, and a new project; omit `--print-timeout`; place `--print` as the final flag with the prompt as its value.
 
 ## Open-Decision Sweep
 
@@ -24,7 +25,8 @@ No open decisions would force rework. Provider-profile cleanup, test updates, an
 
 ## Commit Slice
 
-One slice changes `config/models.ts`, `runtime/provider-profiles.ts`, `runtime/routing-policy.ts`, their focused tests, `lane-policy.md`, and this run directory. It is proved by the requested check, full agentic tests, no-hardcoded guard, routing guard, and scoped lint/fmt wrappers.
+1. Repoint the documentation lane and remove the paid-credit config path.
+2. Correct Antigravity prompt argv and stream-JSON evidence parsing for #1089. Proved by focused adapter tests, a unique-marker live invocation, empirical `agentic:antigravity-evidence`, the full agentic suite, and scoped lint/fmt.
 
 ## Risk Register
 
@@ -34,7 +36,7 @@ One slice changes `config/models.ts`, `runtime/provider-profiles.ts`, `runtime/r
 
 ## Deferred Scope
 
-- No evaluator route, adapter implementation, credentials, release tooling, or package/plugin code changes.
+- No evaluator route, credentials, release tooling, or package/plugin code changes.
 
 ## Debt
 

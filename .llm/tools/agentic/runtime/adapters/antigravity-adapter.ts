@@ -9,6 +9,7 @@ import type { CapabilityState, RuntimeCommand, RuntimeDiagnostic } from '../cont
 import type { AgentCommandPlan, AgentProcessRequest } from '../ports.ts';
 import { PROVIDER_CREDENTIAL_KEYS, PROVIDER_ROUTE_KEYS } from '../provider-profiles.ts';
 import type { ObservedAuthState, ObservedComponentState } from '../state.ts';
+import { MODEL_IDS } from '../../config/models.ts';
 import { AGENT_COMMAND_TIMEOUT_MS, MAX_AGENT_CAPTURE_BYTES } from './codex-adapter.ts';
 import { validateProviderRoute } from './provider-adapter.ts';
 
@@ -40,16 +41,6 @@ export interface AntigravityEvidenceRequest {
   readonly cwd: string;
   readonly probe: AntigravityEvidenceProbe;
   readonly timeoutMs?: number;
-  readonly model?: string;
-  readonly agent?: string;
-  readonly project?: string;
-  /**
-   * Trades the sandbox for `--dangerously-skip-permissions`.
-   *
-   * Only for runs nobody is watching: in print mode a permission prompt does not fail, it returns
-   * an empty response with exit 0, which reads as a successful no-op rather than a blocked run.
-   */
-  readonly unattended?: boolean;
   readonly ownerAcceptedCapabilities?: readonly AntigravityCapability[];
 }
 interface AntigravityCommandOutput {
@@ -130,13 +121,7 @@ function staticRequest(cwd: string): AgentProcessRequest {
 function liveRequest(cwd: string): AgentProcessRequest {
   return {
     executable: 'agy',
-    arguments: [
-      '--print',
-      '--print-timeout',
-      `${ANTIGRAVITY_CANARY_TIMEOUT_MS}ms`,
-      '--sandbox',
-      prompt('headless'),
-    ],
+    arguments: printArguments('headless'),
     cwd,
     timeoutMs: ANTIGRAVITY_CANARY_TIMEOUT_MS,
     maxCaptureBytes: ANTIGRAVITY_MAX_CAPTURE_BYTES,
@@ -163,6 +148,32 @@ function prompt(probe: AntigravityEvidenceProbe): string {
   return 'Read-only canary. Follow the repository GEMINI.md and reply with GEMINI_INSTRUCTION_OK. Do not modify files.';
 }
 
+/** Builds the fixed Antigravity print argv and rejects any lost or flag-shaped prompt. */
+export function printArguments(
+  probe: AntigravityEvidenceProbe,
+  resolvedPrompt = prompt(probe),
+): string[] {
+  const args = [
+    '--model',
+    MODEL_IDS.antigravityDocs,
+    '--output-format',
+    'stream-json',
+    '--dangerously-skip-permissions',
+    '--new-project',
+    '--print',
+    resolvedPrompt,
+  ];
+  const printIndex = args.indexOf('--print');
+  const emittedPrompt = args[printIndex + 1];
+  if (
+    printIndex !== args.length - 2 || !emittedPrompt || emittedPrompt.startsWith('--') ||
+    emittedPrompt !== resolvedPrompt
+  ) {
+    throw new Error('Antigravity prompt must be the non-flag value following the final --print');
+  }
+  return args;
+}
+
 function expectedMarker(probe: AntigravityEvidenceProbe): string | undefined {
   return probe === 'headless' ? 'AGY_HEADLESS_CANARY_OK' : undefined;
 }
@@ -171,6 +182,26 @@ function environment(reader: AntigravityEnvironmentReader): Record<string, strin
   const child = { ...reader.toObject() };
   for (const key of [...PROVIDER_CREDENTIAL_KEYS, ...PROVIDER_ROUTE_KEYS]) delete child[key];
   return child;
+}
+
+function streamJsonResponse(stdout: string): { text: string; parsed: boolean } {
+  let parsed = false;
+  let response: string | undefined;
+  for (const line of stdout.split('\n')) {
+    if (!line.trim()) continue;
+    try {
+      const value: unknown = JSON.parse(line);
+      if (!value || typeof value !== 'object') continue;
+      parsed = true;
+      const result = (value as Record<string, unknown>).result;
+      if (!result || typeof result !== 'object') continue;
+      const candidate = (result as Record<string, unknown>).response;
+      if (typeof candidate === 'string') response = candidate;
+    } catch {
+      return { text: stdout, parsed: false };
+    }
+  }
+  return { text: response ?? stdout, parsed };
 }
 
 /** Runs one fixed, bounded, read-only Antigravity probe and returns classified evidence only. */
@@ -191,21 +222,12 @@ export class AntigravityEvidenceAdapter {
       1,
       Math.min(request.timeoutMs ?? ANTIGRAVITY_CANARY_TIMEOUT_MS, 60_000),
     );
-    // Without a project, `agy --print` roots its workspace at
+    // Without `--new-project`, `agy --print` roots its workspace at
     // `~/.gemini/antigravity-cli/scratch` rather than `cwd` — the `init` event still reports `cwd`,
     // so the mismatch is silent. A probe that only echoes a marker passes anyway; anything that
     // touches a file does not, and observed behaviour under skipped permissions was to fabricate
     // the missing file rather than report the failure. `--new-project` roots it at `cwd`.
-    const args = [
-      '--print',
-      '--print-timeout',
-      `${timeoutMs}ms`,
-      ...(request.unattended ? ['--dangerously-skip-permissions'] : ['--sandbox']),
-      ...(request.model ? ['--model', request.model] : []),
-      ...(request.agent ? ['--agent', request.agent] : []),
-      ...(request.project ? ['--project', request.project] : ['--new-project']),
-      prompt(request.probe),
-    ];
+    const args = printArguments(request.probe);
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeoutMs);
     try {
@@ -219,11 +241,16 @@ export class AntigravityEvidenceAdapter {
         stderr: 'piped',
         signal: controller.signal,
       }).output();
+      const rawStdout = new TextDecoder().decode(
+        output.stdout.slice(0, ANTIGRAVITY_MAX_CAPTURE_BYTES),
+      );
+      const stdout = streamJsonResponse(rawStdout);
       return classifyAntigravityEvidence({
         exitCode: output.code,
         timedOut: false,
-        stdout: new TextDecoder().decode(output.stdout.slice(0, ANTIGRAVITY_MAX_CAPTURE_BYTES)),
+        stdout: stdout.text,
         stderr: new TextDecoder().decode(output.stderr.slice(0, ANTIGRAVITY_MAX_CAPTURE_BYTES)),
+        structuredOutputParsed: stdout.parsed,
         expectedMarker: expectedMarker(request.probe),
         expectedInstructionMarker: request.probe === 'agents-instructions'
           ? 'AGENTS'

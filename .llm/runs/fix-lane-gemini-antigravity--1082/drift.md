@@ -19,3 +19,13 @@
 - **Severity:** significant
 - **Action:** defer
 - **Evidence:** Interrupted evaluator session; no `evaluate.md` was produced and no implementation file changed.
+
+## 2026-08-03 — Owner-authorized scope expansion to #1089
+
+- **What:** Fold Antigravity prompt argv repair and empirical evidence verification into PR #1086.
+- **Source:** Owner continuation instruction naming #1089.
+- **Expected:** Original plan resolved only #1082 routing/config.
+- **Actual:** The canonical route would remain nominal because the adapter swallowed its prompt.
+- **Severity:** significant
+- **Action:** rescope
+- **Evidence:** #1089, adapter diff, live marker response, and empirical evidence-command output.

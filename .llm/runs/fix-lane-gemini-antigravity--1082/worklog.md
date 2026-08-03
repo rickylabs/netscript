@@ -24,6 +24,7 @@
 | # | Slice | Gate | Files |
 | - | - | - | - |
 | 1 | Repoint documentation authoring and remove the paid-credit config path | requested check/test + scoped lint/fmt | agentic config/runtime/tests, lane policy, run artifacts |
+| 2 | Pass the Antigravity prompt correctly and empirically re-verify evidence | focused adapter tests + live marker + evidence CLI + full suite | Antigravity adapter/CLI/config/tests and run artifacts |
 
 ### Deferred Scope
 
@@ -38,6 +39,8 @@ Change native model ids only in `config/models.ts`, bind lanes in `runtime/routi
 - 2026-08-03: research and plan locked; owner instructed immediate implementation after the prior shell timeout.
 - 2026-08-03: implementation edits applied and requested automated gates passed.
 - 2026-08-03: separate Claude Opus 4.8 session `8e5d5878-e84e-474c-ba88-2dc7799e9601` returned `SLICE_REVIEW: PASS`; it independently reran 41 focused guards.
+- 2026-08-03: owner authorized folding #1089 into PR #1086; adapter argv and evidence parsing implemented.
+- 2026-08-03: separate Claude Opus 4.8 session `c8a9d802-ce07-42e6-8fff-8844b3dcd106` returned `SLICE_REVIEW: PASS` for #1089; it independently reran all 25 focused guards.
 
 ## Gate Results
 
@@ -51,7 +54,13 @@ Change native model ids only in `config/models.ts`, bind lanes in `runtime/routi
 | Forbidden-route search | PASS | no `OPENROUTER_MODEL_IDS.gemini`, `claude-docs-gemini`, or Gemini OpenRouter model id remains in the scoped config/policy surface |
 | Harness slice review | PASS | separate native Claude/Opus session; exact six-file diff reviewed, 41 focused guards independently green |
 | Formal IMPL-EVAL | BLOCKED | Qwen parent session spawned prohibited closed-model helpers; interrupted before verdict |
+| #1089 focused tests | PASS | 25 passed, 0 failed, including prompt-as-print-value and volatile guard |
+| #1089 direct live probe | PASS | unique response marker `ANTIGRAVITY_PROMPT_VALUE_1089_OK` returned by `agy` |
+| `agentic:antigravity-evidence` | PASS | empirical `headless: supported`, `structured_output: supported`, exit 0, no diagnostics, raw output not retained |
+| Full agentic suite after #1089 | PASS | 323 passed, 0 failed |
+| Scoped lint/fmt after #1089 | PASS | 127 files, 0 findings |
+| #1089 harness slice review | PASS | separate native Claude/Opus session; all eight criteria verified and 25 focused guards independently green |
 
 ## Reconcile Note
 
-PR #1086 is published. The five issue acceptance boxes are ready for evidence mirroring; merge readiness remains blocked on a compliant open-model-only IMPL-EVAL.
+PR #1086 is published. #1082 acceptance is mirrored; #1089 acceptance awaits the second slice commit/comment and issue update. Merge readiness remains blocked on a compliant open-model-only IMPL-EVAL.

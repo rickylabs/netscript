@@ -343,12 +343,11 @@ Deno.test('Antigravity observations are finite and live evidence is bounded', ()
   };
   const plan = planAntigravityCommand({ command, nativeExt4: true });
   assertEquals(plan.request?.executable, 'agy');
-  assertEquals(plan.request?.arguments.slice(0, 4), [
+  assertEquals(plan.request?.arguments.slice(-2), [
     '--print',
-    '--print-timeout',
-    '30000ms',
-    '--sandbox',
+    'Read-only canary. Reply with exactly AGY_HEADLESS_CANARY_OK. Do not use tools or modify files.',
   ]);
+  assertEquals(plan.request?.arguments.includes('--print-timeout'), false);
   assertEquals(codes(plan.diagnostics), []);
 });
 

@@ -94,12 +94,13 @@ Deno.test('Antigravity static and bounded live probes use agy without a Gemini a
     nativeExt4: true,
   });
   equal(live.request?.executable, 'agy');
-  equal(live.request?.arguments.slice(0, 4), [
+  equal(live.request?.arguments.slice(-2), [
     '--print',
-    '--print-timeout',
-    '30000ms',
-    '--sandbox',
+    'Read-only canary. Reply with exactly AGY_HEADLESS_CANARY_OK. Do not use tools or modify files.',
   ]);
+  equal(live.request?.arguments.includes('--print-timeout'), false);
+  equal(live.request?.arguments.includes('--new-project'), true);
+  equal(live.request?.arguments.includes('--dangerously-skip-permissions'), true);
   equal(live.diagnostics, []);
   equal(JSON.stringify([staticPlan, live]).includes('agy login'), false);
   equal(JSON.stringify([staticPlan, live]).includes('executable":"gemini'), false);
