@@ -23,7 +23,7 @@ jobs:
       reason: ${{ steps.decide.outputs.reason }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -80,7 +80,7 @@ jobs:
 
       - name: Checkout
         if: env.RUN == 'true'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Deno
         if: env.RUN == 'true'

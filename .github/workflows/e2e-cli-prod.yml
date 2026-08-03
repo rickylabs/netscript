@@ -27,7 +27,7 @@ jobs:
     timeout-minutes: 75
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Deno
         uses: denoland/setup-deno@v2
@@ -35,7 +35,7 @@ jobs:
           deno-version: '2.9.0'
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: '10.0.x'
 
@@ -48,7 +48,7 @@ jobs:
 
       - name: Download published version
         if: github.event_name == 'workflow_run'
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: netscript-published-version-${{ github.event.workflow_run.id }}
           run-id: ${{ github.event.workflow_run.id }}
@@ -122,7 +122,7 @@ jobs:
 
       - name: Upload production E2E artifacts
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: e2e-cli-prod-${{ steps.version.outputs.version }}
           path: |
