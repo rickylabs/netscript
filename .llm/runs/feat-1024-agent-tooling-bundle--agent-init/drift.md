@@ -82,3 +82,31 @@ documentation.
   and retry only after a stable quiet window.
 - **Evidence:** suite summary `passed=47 failed=1`; sole failure `behavior.service-health`; cleanup
   stopped the owned AppHost and removed all three run-owned containers.
+
+## 2026-08-03 — published scaffold still emits pinned host ports
+
+- **What:** The installed clone-independent smoke reaches the final generated-artifact gate, which
+  rejects six literal Aspire host ports emitted by the current public `@netscript/cli@0.0.3`.
+- **Source:** fresh consumer run from `/tmp` after local `agent init`; exact release metadata.
+- **Expected:** The installed smoke completes without a framework checkout.
+- **Actual:** Twenty-two steps pass, then the shipped validator rejects one service and five plugin
+  endpoint pins. The concurrent scaffold lane owns those emitted defaults.
+- **Severity:** moderate
+- **Action:** do not weaken the gate or edit `/home/codex/repos/ns004-scaffold`; leave #1024's final
+  criterion unchecked and remove its closing keyword until a released scaffold passes.
+- **Evidence:** exact CLI `jsr:@netscript/cli@0.0.3`; six file/line findings; cleanup reporter found
+  zero survivors after removing the exact owned Postgres container.
+
+## 2026-08-03 — quiet-host merge smoke reproduces baseline service-health failure
+
+- **What:** A fully serialized local-source `scaffold.runtime` retry still fails the users aggregate
+  health probe after every resource wait succeeds.
+- **Source:** required one-pass merge gate after leak-check reported zero foreign or owned resources.
+- **Expected:** All runtime gates pass.
+- **Actual:** 47 gates and cleanup pass; `behavior.service-health` returns HTTP 503 because Prisma's
+  raw query cannot reach the generated database. This matches the earlier clean baseline shape.
+- **Severity:** moderate
+- **Action:** record as a baseline blocker outside the tooling/docs diff; do not claim a green
+  runtime verdict.
+- **Evidence:** `passed=47 failed=1`; the sole stderr names HTTP 503, `database` unhealthy, and the
+  Prisma raw-query failure; post-run leak-check reports zero survivors.
