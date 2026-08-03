@@ -193,3 +193,17 @@ The design decisions the wave plan embodies, recorded per the Plan-Gate's Design
    per-PR supervisor brief at dispatch (committed under `slices/`), where the implementing
    context exists — pending owner ratification per R2-GATE-1 escalation.
 5. **Docs lane serialized** (one agy PR per wave) with re-waving as the quota contingency.
+
+## 2026-08-03 — Owner ratifies Plan-Gate exception (drift D5)
+
+Owner selected "Exception + per-PR depth" from the escalation: the wave plan is ratified as a
+dispatch schedule; run-loop Plan-Gate depth binds the **per-PR supervisor briefs** (each brief at
+dispatch names files, archetype/overlays, doctrine verdict + debt disposition, and proving gates,
+committed under `slices/`); the <30-slice bound does not apply to a milestone dispatch schedule.
+Baseline `publish:dry-run` launched as the plan-level JSR/slow-type scan — result recorded below
+when complete. Round-3 PLAN-EVAL confirmation next, then wave-1 dispatch.
+
+**Baseline JSR/slow-type scan result (2026-08-03):** `rtk proxy deno task publish:dry-run` →
+**`Success — Dry run complete`, exit 0** across the workspace publish surface. The 0.0.5 baseline
+export surface packs clean; per-slice surface impact is assessed in each per-PR brief per the
+ratified exception.
