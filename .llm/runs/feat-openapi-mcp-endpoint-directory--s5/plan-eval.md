@@ -29,4 +29,3 @@ bounded concurrency, and the S4 independence boundary.
 
 Implementation is authorized in the same run by the explicit milestone-run/orchestrator ruling. This
 artifact does not claim a separate-session PLAN-EVAL occurred.
-

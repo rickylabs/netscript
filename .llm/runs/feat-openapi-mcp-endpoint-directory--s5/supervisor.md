@@ -29,4 +29,3 @@ Written at run start per `workflow/lane-policy.md` § Supervisor identity.
   **composed per milestone-run.md (orchestrator waiver)** and implementation proceeds in this run.
 - Per-PR final evaluation composes the draft→ready augment review, OpenHands, and the orchestrator
   pre-merge gate. This is the owner-authorized milestone-run application, not self-certification.
-

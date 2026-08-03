@@ -48,4 +48,3 @@
   primary live source; manifest and appsettings remain lower additive fallbacks.
 - **Projection coupling:** no S4 imports. A successful probe may retain parsed JSON as opaque data;
   S6 owns projection and operation counting.
-

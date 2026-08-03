@@ -161,4 +161,3 @@ timeouts, and fixtures proving every source outcome and status row.
 - Aspire resource JSON field changes, manifest proof shape divergence, a need for S4 types, inability
   to verify current run identity, or any requested scaffold/CLI tool wiring must be logged before
   expanding scope.
-

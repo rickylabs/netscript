@@ -88,6 +88,9 @@ never import an infrastructure adapter from a consumer flow.
 | 2026-08-04 | 3 | public surface + docs | Published the factory, constants, discriminated contracts, ports, and default adapters from `.`; `./cli` inherits the same surface. Added carrier, precedence, status, permission, and composition guidance and regenerated the embedded README asset. |
 | 2026-08-04 | 3 | doctrine reconcile | Moved the consumed contract to `src/ports/` and grouped the owned adapters under `src/infrastructure/service-endpoints/`. This removed the new infrastructure cardinality warning and kept existing domain/application warning counts at their baseline 13. |
 | 2026-08-04 | 3 | post-slice reconcile | PR #1194 remains draft at slice 2, references #1131 without a closing keyword, and has no reviewer comments after the slice 2 implementation comment. Issue #1131 remains open with both acceptance gates unchecked. No DoD box, issue acceptance box, or evaluation state was changed. |
+| 2026-08-04 | supervisor | decisive timeout proof | Added an end-to-end default-probe fixture whose spec fetch never settles and proved the hung row times out while a healthy sibling returns. Corrected the README to the generated `aspire/apphost.mts` default and removed an unusable placeholder run id. |
+| 2026-08-04 | review | opposite-family substantive review | The Fable 5 primary returned `model_not_found`; the configured Claude-family Opus 4.8 medium fallback reviewed the entire change. Initial verdict PASS with three actionable low findings. The supervisor preserved path-mounted base URLs, added parent-cancellation proof, and documented service identity; the same reviewer re-ran 15/15 focused tests and retained PASS with all three resolved. |
+| 2026-08-04 | supervisor | merge-readiness gates | Package tests passed 81/81; scoped check/lint/fmt passed over 79 files; package scan and `quality:gate` passed; embedded assets, full-export doc lint, raw entrypoint doc lint, JSR audit, and publish dry-run passed. JSR's sole slow-type warning remains the recorded progress-banner false positive; no actual slow-type diagnostic appeared. |
 
 ## Decisions
 
@@ -107,6 +110,7 @@ never import an infrastructure adapter from a consumer flow.
 | Existing package tests need test-only write permission for temporary directories | minor | yes |
 | Planned flat role files were grouped to avoid new/deepened cardinality debt | minor | yes |
 | JSR audit parser treats Deno's slow-type progress banner as a warning | minor | yes |
+| Fable 5 review primary unavailable; same-family Opus fallback used | minor | yes |
 
 ## Gate Results
 
@@ -166,6 +170,18 @@ public API...` progress banner. Raw `deno doc --lint` and the publish dry run bo
 slow-type error or warning. The two cardinality warnings (`src/domain` and
 `src/application/flows`, each 13) are inherited baseline package shape; the new adapter grouping
 keeps `src/infrastructure` within the cap.
+
+### Supervisor merge-readiness rerun
+
+| Gate | Result |
+| --- | --- |
+| Opposite-family substantive review | PASS retained at `3a095bc85`; 15/15 focused tests; findings F-1–F-3 resolved |
+| Package tests | PASS, exit 0; 81 passed, 0 failed |
+| Scoped check/lint/fmt | PASS, exit 0; 79 files, zero diagnostics/findings |
+| Package code quality + `quality:gate` | PASS, exit 0; no package findings/allowances; repository gate completed with inherited warnings only |
+| Embedded assets + full-export docs | PASS, exit 0; generated asset current; both entrypoints zero diagnostics |
+| JSR audit + publish dry-run | PASS, exit 0; only recorded progress-banner false positive; 79 intended publish files, no actual slow-type diagnostic |
+| Lock/forbidden-pattern hygiene | PASS after run-artifact EOF cleanup; no `deno.lock` churn, new lint ignores, `@ts-ignore`, or unsafe double casts |
 
 ## Handoff Notes
 

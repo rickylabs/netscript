@@ -104,3 +104,16 @@ Drift is append-only.
 - **Severity:** minor
 - **Action:** accept
 - **Evidence:** `worklog.md` Slice 3 doc/audit/publish rows.
+
+## 2026-08-04 — Fable review primary unavailable at provider
+
+- **What:** The canonical `review_codex_complex` primary could not start because the native provider
+  returned `model_not_found` for `fable-5` before review work or token use.
+- **Source:** Claude session `1abc6d8e-4c4a-4677-81dd-057eaab9145d` launch result.
+- **Expected:** Anthropic Fable 5 at medium effort performs the opposite-family substantive review.
+- **Actual:** The configured Claude-family Opus 4.8 fallback ran at medium effort in separate session
+  `a5d06fbf-041d-4d6a-a4d1-a69fce9ed447`; it returned PASS, then re-reviewed its three addressed
+  findings and retained PASS. Generator/evaluator family separation remained intact.
+- **Severity:** minor
+- **Action:** accept for this run; preserve both route identities in the review artifact.
+- **Evidence:** `review-codex-complex.md` §§1 and 6.
