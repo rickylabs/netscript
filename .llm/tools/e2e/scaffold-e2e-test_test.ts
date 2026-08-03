@@ -52,6 +52,12 @@ Deno.test('consumer mode selects the exact released CLI without a framework clon
     assertStringIncludes(JSON.stringify(init?.details), '"--minimum-dependency-age=0"');
     const worker = report.steps.find((step) => step.id === 'plugin-add-workers');
     assertStringIncludes(JSON.stringify(worker?.details), '"plugin","install","worker"');
+    const authEntrypoint = report.steps.find((step) => step.id === 'auth-entrypoint-generated');
+    assertStringIncludes(JSON.stringify(authEntrypoint?.details), 'auth/mod.ts');
+    assertEquals(
+      report.steps.some((step) => JSON.stringify(step.details).includes('scaffold.plugin.json')),
+      false,
+    );
   } finally {
     await Deno.remove(root, { recursive: true });
   }

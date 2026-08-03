@@ -956,19 +956,19 @@ class SmokeRunner {
 
   async #validateAuthGeneratedWiring(): Promise<void> {
     await this.#ensureExists(
-      'auth-plugin-copied-manifest',
-      'Auth plugin manifest copied into generated workspace',
-      join(this.projectRoot, 'plugins', 'auth', 'scaffold.plugin.json'),
-    );
-    await this.#ensureExists(
-      'auth-plugin-copied-prisma',
-      'Auth plugin Prisma schema copied into generated workspace',
-      join(this.projectRoot, 'plugins', 'auth', 'database', 'auth.prisma'),
+      'auth-entrypoint-generated',
+      'Auth entrypoint generated into the consumer workspace',
+      join(this.projectRoot, 'auth', 'mod.ts'),
     );
     await this.#ensureExists(
       'auth-db-contribution-generated',
-      'Auth Prisma contribution generated into database schema folder',
+      'Auth Prisma contribution generated into the database schema folder',
       join(this.projectRoot, 'database', 'postgres', 'schema', 'plugins', 'auth', 'auth.prisma'),
+    );
+    await this.#ensureExists(
+      'auth-aspire-helper-generated',
+      'Aspire plugin registration helper generated into the consumer workspace',
+      join(this.projectRoot, 'aspire', '.helpers', 'register-plugins.mts'),
     );
   }
 
