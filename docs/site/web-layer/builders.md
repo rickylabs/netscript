@@ -42,16 +42,19 @@ arguments and the `THasRoute` flag. A page bound with `withRoute()` always build
 
 ## Building a page
 
-Here is a page declaring resources, a policy, telemetry, multiple independent render layers, a route-bound form, layout slots, and response shaping in a single fluent chain:
+Here is a page declaring resources, a policy, telemetry, multiple independent render
+layers, a route-bound form, layout slots, and response shaping in a single fluent
+chain:
 
-```ts
-import { definePage } from "@netscript/fresh";
+```tsx
+import { definePage } from "@netscript/fresh/builders";
 import { z } from "zod";
-import { MetricChart } from "../components/MetricChart.tsx";
+import { MetricChart, MetricChartSkeleton } from "../components/MetricChart.tsx";
 import { EditOrderForm } from "../components/EditOrderForm.tsx";
 
 const orderPage = definePage()
   .withRouteContract({
+    $route: "/orders/[id]",
     pathSchema: z.object({ id: z.string() }),
     searchSchema: z.object({ tab: z.string().optional() }),
   })
@@ -61,9 +64,12 @@ const orderPage = definePage()
   .withPolicy("balanced")
   .withTelemetry({ enabled: true, spanName: "order-detail-page" })
   .withLayer("chart", MetricChart, {
-    delivery: "stream",
     loader: async (ctx) => ({ points: await ctx.resource("metrics") }),
-    fallback: () => <div>Loading metrics…</div>,
+    partial: "/partials/orders/chart",
+    partialName: "orders-chart",
+    fallback: <MetricChartSkeleton />,
+    staleTime: 15_000,
+    staleReloadMode: "background",
   })
   .withForm("editOrder", EditOrderForm, {
     schema: z.object({ status: z.string() }),
@@ -71,11 +77,10 @@ const orderPage = definePage()
       await updateOrderStatus(ctx.path.id, values.status);
     },
   })
-  .withLayout(({ slots }) => (
+  .withLayout((slots, _ctx) => (
     <div class="layout">
-      <main>{slots.main}</main>
-      <aside>{slots.chart}</aside>
-      <section>{slots.editOrder}</section>
+      <aside>{slots.chart()}</aside>
+      <section>{slots.editOrder()}</section>
     </div>
   ))
   .withHeader("x-page-type", "order-detail")
@@ -86,13 +91,20 @@ export default orderPage.default;
 ```
 
 This envelope demonstrates the core page builder capabilities:
-- **Route typing:** `withRouteContract` applies path and search schemas so `ctx.path` and `ctx.search` are strongly typed throughout the chain.
-- **Resource resolution:** `withResource` declares request-scoped data factories accessible via `ctx.resource(key)`.
-- **Independent layers & partials:** `withLayer` declares parallel render units with custom delivery modes (`blocking`, `defer`, or `stream`).
-- **Partial fallbacks & staleTime:** layer configs support loading fallbacks and staleness policies.
-- **Managed forms:** `withForm` wires Zod schema validation, CSRF headers, and `mutate` handlers into a typed form layer.
+
+- **Route typing:** `withRouteContract` applies `$route`, path, and search schemas
+  so `ctx.path` and `ctx.search` are strongly typed throughout the chain.
+- **Resource resolution:** `withResource` declares request-scoped data factories
+  accessible via `ctx.resource(key)`.
+- **Independent layers & partials:** `withLayer` declares parallel render units with
+  `partial` routes and `partialName` tags.
+- **Partial fallbacks & staleTime:** layer configs support JSX `fallback` elements,
+  `staleTime` windows, and `staleReloadMode`.
+- **Managed forms:** `withForm` wires Zod schema validation, CSRF headers, and `mutate`
+  handlers into a typed form layer.
 - **Telemetry:** `withTelemetry` configures OpenTelemetry span names and tracing.
-- **Layout slots:** `withLayout` receives a `slots` map containing rendered layers for flexible page structuring.
+- **Layout slots:** `withLayout` receives a `slots` map containing callable layer renderers
+  for flexible page structuring.
 
 The smallest useful page is much shorter when you only need basic rendering:
 

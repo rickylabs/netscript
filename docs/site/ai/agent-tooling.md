@@ -179,7 +179,12 @@ required:
   text instead of parsing HTML chrome. The twin lives at the page URL plus
   `index.md`: this page's twin is [`/ai/agent-tooling/index.md`](/ai/agent-tooling/index.md),
   and the same suffix works on any page.
-- **A tiered `llms.txt`.** [`/llms.txt`](/llms.txt) is the index tier: it starts with a task router that maps your goal to the recommended reading order (manual → generated scaffold → `deno doc` symbol lookup), followed by every real page as an absolute canonical link with a one-line summary, grouped by section, plus a short note telling agents how to reach the twins. [`/llms-full.txt`](/llms-full.txt) is the full tier: every page's Markdown twin concatenated into one corpus for bulk ingestion.
+- **A tiered `llms.txt`.** [`/llms.txt`](/llms.txt) is the index tier: it starts
+  with a task router that maps your goal to the recommended reading order (manual →
+  generated scaffold → `deno doc` symbol lookup), followed by every real page as an
+  absolute canonical link with a one-line summary, grouped by section, plus a short
+  note telling agents how to reach the twins. [`/llms-full.txt`](/llms-full.txt) is
+  the full tier: every page's Markdown twin concatenated into one corpus for bulk ingestion.
 
 The ladder, cheapest first: start at `llms.txt`, fetch the twin of the one page
 you need, and reach for `llms-full.txt` only when you genuinely want everything.
