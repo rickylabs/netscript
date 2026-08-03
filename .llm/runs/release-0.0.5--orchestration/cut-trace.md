@@ -11,6 +11,9 @@ never reconstructed. Format follows `release-0.0.4--orchestration/cut-trace.md`.
 | 2 | 2026-08-03 (pre-dispatch) | `dcfe75ca1` | #1177 | #1170 | external — not orchestrator-dispatched |
 | 3 | 2026-08-03 (pre-dispatch) | `fb75cf6fc` | #1178 | #1142, #1174 | external — not orchestrator-dispatched |
 
+| 4 | 2026-08-03T20:49:09Z | `3049ef027` | #1181 | #1171, #1105 | wave 1 (orchestrator-merged, full stage-D gate) |
+| 5 | 2026-08-03T20:50:26Z | `c49bd1db2` | #1180 | — (`Refs #1166`; hand-close on canary.1 evidence) | wave 1 (orchestrator-merged, full stage-D gate) |
+
 Retroactive merge audit (orchestrator, 2026-08-03T20:11Z, via the freshly-landed
 `agentic:pr-checks`): PRs #1176/#1177/#1178 all `ok:true`, zero `current-fail` classifications
 (head SHAs `7d64ef559`/`ac0252fbd`/`611e295b4`). These merges did **not** pass through the

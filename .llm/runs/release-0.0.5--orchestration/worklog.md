@@ -387,3 +387,18 @@ by the very sentence explaining that discipline.
     netscript-pr should ban keyword-adjacent issue references in prose ("completes #N by hand",
     "closed by hand (`#N`)" are safe forms); close-gate could flag body text whose
     closingIssuesReferences disagree with an explicit `Refs`-only declaration.
+
+## 2026-08-03 — Wave-1 merges 4 and 5
+
+- **#1181 merged (`3049ef027`)** after its own DoD enforcement made the orchestrator tick the
+  final two (truthfully completed) body boxes — the shipped gate red-flagged its own PR body
+  twice and both reds were legitimate. Full stage-D record: close-gate green after the
+  fresh-SHA rebuild; 0 new ignores; required contexts green; claims independently re-verified
+  (7/7 local tests + template diff); files audit clean; body complete.
+- **#1180 merged (`c49bd1db2`)** closing nothing by design (`Refs #1166` preserved; the
+  "hand-closes" parser trap defused first). Stage-D record: close-gate rerun success; pr-checks
+  ok with 13 current-passes, 0 fails; 0 new ignores; only `.llm/tools/release/canary-label.ts`
+  + test changed outside run artifacts; decisive derivation suite independently re-run by the
+  orchestrator, 15/15; body completed truthfully.
+- Wave-1 remaining before canary.1: `proofs` (#1127–#1129, turn still running) and
+  `mcp-receipts` (#1183, resumed to finish slice 2).
