@@ -17,5 +17,6 @@ milestone 0.0.5. Effort low: authoring, not design.
 - #1119 collision: do not deepen; "canary" in these docs = release canary.
 - `.claude/skills/` stays generated (`deno task agentic:sync-claude`), then `agentic:check-claude`.
 
-**State**: S0 done (run dir + plan.md outline). Next: draft PR, then S1 cadence → S2 profile →
-S3 skill+mirror+validation → S4 verification issue + acceptance evidence.
+**State**: S0–S3 done — draft PR #1161; `canary-cadence.md` (`1774f6c95`), `milestone-run.md`
+(`04efa4b0e`), skill + regenerated mirror + green `agentic:check-claude` (this commit). Next: S4 —
+verification issue in 0.0.6 (#1090 pattern), acceptance-evidence comment, `status:impl-eval`.
