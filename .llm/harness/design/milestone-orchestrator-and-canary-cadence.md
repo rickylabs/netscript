@@ -167,6 +167,13 @@ recorded as such in the run's `drift.md` rather than silently applied.
 Unchanged by the waiver: the automated gates. They are evidence, not sign-off, and a green gate was
 never a substitute for review in either direction.
 
+**The waiver is scoped by what the review is catching, not by convenience.** On this slice the
+opposite-family pass found *non-failing inline `jq` substitutions* — a check that could not fail,
+silence reported as a pass — in a tool whose whole purpose is proving gates can fire. A review
+finding defects of the class the work exists to prevent has earned its cost; a review of prose has
+not. So: **keep opposite-family review for code, drop it for run artifacts and evidence prose.**
+Before waiving a review, look at what it last found.
+
 ## Cut-time checklist **[observed]**
 
 Derived from what was actually missed or nearly missed in 0.0.4:
