@@ -108,3 +108,11 @@ The first format check exited `1` on the new assertion layout; `deno fmt` was ap
 
 Issue #1173 remains open for supervisor review/sign-off. This implementation closes the requested
 S6 code and evidence scope; no PR, push, label, milestone, or issue mutation was performed.
+
+## S6 sign-off (Tier-A review)
+
+- 2026-08-03 · Reviewed `46c4d715e`: Task 1 finding accepted — the observed exit-0 was an evidence
+  error (artifact-reader `cat` status attributed to the launcher; transcript cited); the launcher
+  exited 4 at the time of observation. Audit table covers every import.meta.main entrypoint +
+  agentic:* task; one genuine defect (teardown --apply escalation exited 0) fixed to exit 4 with
+  negative test. Independent re-run: agentic check 133 files 0 findings; teardown tests 28/28.
