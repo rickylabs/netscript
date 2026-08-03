@@ -134,6 +134,11 @@ by adding a named gate to `packages/cli/e2e/src/application/gates/scaffold/runti
   unticked pending completion of the resident PID/backchannel gate.
 - CLI package suite after the credential correction: 555 tests passed; two stale exact-string
   assertions failed, were corrected in `596c31dc7`, and their focused 24-step suite passes.
+- Hosted `scaffold.runtime` after selecting the lifecycle gate: `PASS` — 71 passed, 0 failed;
+  `behavior.db-status-preserves-apphost` passed in 21.998s and endpoint readiness passed in 845ms.
+- #1011 and #1012 acceptance boxes: all evidenced, commented, and ticked. Close-gate rerun queued.
+- IMPL-EVAL: `BLOCKED` — canonical open-model provider canary reported absent credential and no
+  evaluator session was launched. No verdict is claimed.
 
 ## Handoff Notes
 

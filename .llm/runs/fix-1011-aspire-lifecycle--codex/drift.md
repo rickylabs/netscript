@@ -53,3 +53,18 @@ Drift is append-only.
   PLAN-EVAL verdict. Automated gates, per-slice review, IMPL-EVAL handling, and close-gate evidence
   remain required.
 - **Evidence:** this drift entry, PR #1088 plan artifacts, and the supervising thread waiver.
+
+## 2026-08-03 — IMPL-EVAL route remains credential-blocked
+
+- **What:** The required final open-model evaluator could not be launched.
+- **Source:** canonical `agentic:provider-canary --live` launch for the `formal_evaluation` route.
+- **Expected:** a separate Qwen evaluator reads the completed implementation and writes
+  `evaluate.md` with an allowed verdict.
+- **Actual:** the route returned `status=blocked`, `credential=absent`, diagnostic
+  `auth_required` (`retryable=false`), with zero tool/reasoning/streaming events. No evaluator
+  session or verdict artifact exists.
+- **Severity:** blocking
+- **Action:** do not self-certify or mark the draft ready. An explicit owner waiver for IMPL-EVAL,
+  or a safely restored canonical evaluator route, is required.
+- **Evidence:** provider canary invocation recorded in the PR implementation summary; absence of
+  `evaluate.md` is intentional.
