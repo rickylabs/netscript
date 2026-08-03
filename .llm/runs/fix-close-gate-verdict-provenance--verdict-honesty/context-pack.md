@@ -14,7 +14,9 @@
 
 Research, plan, and Design checkpoint are complete against current `origin/main`. The chosen #1105
 convention is ENFORCE for unchecked PR Definition-of-Done/Acceptance boxes. No implementation work
-has begun; the next legal action is separate-session PLAN-EVAL.
+has begun. The canonical local Qwen evaluator canary is blocked because its isolated child
+environment has no OpenRouter credential; the next legal action is still separate-session
+PLAN-EVAL after owner/config resolution.
 
 ## Completed
 
@@ -26,15 +28,15 @@ has begun; the next legal action is separate-session PLAN-EVAL.
 
 ## In Progress
 
-- Commit/push S0, open draft PR, and run canonical local Qwen PLAN-EVAL.
+- Resolve the formal evaluator route. Draft PR #1181 and S0 are already pushed.
 
 ## Next Steps
 
-1. Commit and push S0 harness artifacts.
-2. Open the draft PR with `type:fix`, `area:tooling`, exactly one plan-phase status, milestone 0.0.5.
-3. Launch separate local Qwen PLAN-EVAL; accept only committed `plan-eval.md` as verdict source.
-4. On PASS, launch the routed Codex implementation slice; otherwise repair the plan or report the
-   hard blocker.
+1. Owner/config selects one allowed resolution: provide local `OPENROUTER_API_KEY`, or explicitly
+   authorize conversion to a cloud-driven OpenHands Qwen evaluation run.
+2. Launch the separate PLAN-EVAL and accept only committed `plan-eval.md` as verdict source.
+3. On PASS, repair/establish the routed Codex implementation session and launch S1; otherwise repair
+   the plan or report the evaluator finding.
 
 ## Key Decisions
 
@@ -62,12 +64,13 @@ has begun; the next legal action is separate-session PLAN-EVAL.
 
 ## Open Questions
 
-- Can the canonical local Qwen evaluator credential/identity be resolved on this host? If not, the
-  run remains blocked; cloud fallback is not implicitly authorized for a local run.
+- Which owner-authorized evaluator resolution should be used: configure local
+  `OPENROUTER_API_KEY`, or convert the evaluation to a cloud-driven OpenHands Qwen run?
 
 ## Drift and Debt
 
-- Drift: local agentic runtime reports `MISSING_IDENTITY`; recorded in `drift.md`.
+- Drift: local agentic runtime reports `MISSING_IDENTITY`, and the formal evaluator canary reports
+  `auth_required` with no provider process launched; both are recorded in `drift.md`.
 - Debt: none.
 
 ## Commits

@@ -69,6 +69,7 @@ heading in the shipped template.
 | 2026-08-03 | S0 | baseline | `check-close-gate_test.ts`: 3 passed, 0 failed. Worktree clean at `fb75cf6fc`. |
 | 2026-08-03 | S0 | route check | Agentic runtime status blocked with `MISSING_IDENTITY`; no implementation launched. |
 | 2026-08-03 | S0 | design checkpoint | Locked ENFORCE convention and three implementation/readiness slices before PLAN-EVAL. |
+| 2026-08-03 | S0 | PLAN-EVAL launch | Local Qwen canary blocked with `auth_required`; no provider process launched and implementation remains stopped. |
 
 ## Decisions
 
@@ -98,6 +99,7 @@ heading in the shipped template.
 | Gate | Result | Evidence | Notes |
 | ---- | ------ | -------- | ----- |
 | Plan-Gate | NOT_RUN | separate evaluator pending | hard stop |
+| Local evaluator route | BLOCKED | provider canary: credential absent, process not launched | owner/config action required |
 | Framework/JSR fitness | N/A | repo-tooling scope | no `packages/**`/`plugins/**` |
 
 ### Runtime Gates
