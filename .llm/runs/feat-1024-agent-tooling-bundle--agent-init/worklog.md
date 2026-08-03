@@ -153,6 +153,8 @@ compressed asset; never hand-edit the generated TypeScript or API text.
 | 2026-08-03T13:22:00+02:00 | S2 | opposite-family review | Separate Claude Opus 4.8 session `bcdbdd4b-edc6-42ec-82ea-11edf9b2404a` returned `SLICE_REVIEW: PASS` after checking optionality, exact-version resolution, every-export generation, fail-before-write behavior, symptom discovery, generated-asset freshness, and publication boundaries. Its two observations were non-blocking: VS Code hosts retain their pre-existing no-prose behavior, and the new source/generated assets must be included in the slice commit. |
 | 2026-08-03T13:30:00+02:00 | S2 | sign-off gates | Combined focused regression suite passed 37/37; scoped check/lint/fmt selected 31 TypeScript files with zero findings; links, accuracy, quality, architecture, CLI doc lint, publish dry-run, and byte-stable asset regeneration passed. The JSR simulation lists the 1.51 MB docs asset plus tool/skill assets. |
 | 2026-08-03T13:36:00+02:00 | S2 | commit/evidence | Committed and pushed `e1ba0b005`; detached pre-fix worktree at `d6265fa52` produced exit 1 when asserting `--with-docs` in real CLI help, while current help prints the several-megabyte flag. Checked all five evidenced #1061 boxes and posted issue/PR evidence comments `5165184953` / `5165185588`. |
+| 2026-08-03T13:58:00+02:00 | S3 | full static gates | Required `deno task check` and `deno task test` completed without failures; structured verification selected 2,524 TypeScript files across 22 batches with zero diagnostics. Stopped a redundant compact-reporter rerun started only for duplicate evidence. |
+| 2026-08-03T14:10:00+02:00 | S3 | runtime contention | Initial guarded runtime was interrupted before service startup when a foreign Aspire verification appeared after the clear leak-check. After that owner exited and the reporter showed zero survivors, a fresh one-pass run started; another foreign AppHost began two seconds later. The run passed 47 gates but `behavior.service-health` returned database-unhealthy and failed; cleanup passed and removed all run-owned containers. This is invalid due to documented concurrency and does not evidence acceptance. |
 
 ## Decisions
 
@@ -172,6 +174,7 @@ compressed asset; never hand-edit the generated TypeScript or API text.
 | Local formal evaluator route lacks OpenRouter credentials; use separate OpenHands Qwen fallback. | moderate | yes |
 | Named Fable and policy-alias Claude review routes were unavailable; native `claude-opus-4-8` completed the required opposite-family review. | minor | yes |
 | `docs:maintenance` reaches unrelated stale Claude mirrors for `aspire` and `netscript-release`; this slice's `docs:links` and `docs:accuracy` sub-gates pass and the foreign mirrors were left untouched. | minor | yes |
+| Foreign Aspire verification runs repeatedly appeared after clean leak-check snapshots; one owned run was interrupted and one 47/48 run hit the documented contention-only service-health failure. | moderate | yes |
 
 ## Gate Results
 
@@ -210,7 +213,7 @@ compressed asset; never hand-edit the generated TypeScript or API text.
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| scaffold runtime | NOT_RUN | implementation not started | Leak-check required first. |
+| scaffold runtime | INVALID — retry required | guarded run passed 47/48; `behavior.service-health` database-unhealthy while a foreign AppHost ran concurrently | Suite cleanup passed; no acceptance box ticked. Wait for a stable quiet window before a fresh one-pass retry. |
 
 ### Consumer Gates
 

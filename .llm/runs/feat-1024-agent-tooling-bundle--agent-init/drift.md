@@ -66,3 +66,19 @@ documentation.
 - **Action:** accept baseline drift; do not rewrite unrelated generated skills.
 - **Evidence:** `docs=98 broken-links=0 broken-anchors=0`; `docs accuracy: PASS`; mirror checker names
   only `.claude/skills/aspire/SKILL.md` and `.claude/skills/netscript-release/SKILL.md`.
+
+## 2026-08-03 — foreign runtime began after clean ownership check
+
+- **What:** A separate Aspire verification repeatedly began after this slice's read-only leak-check
+  returned clear, creating a race between the guard and the expensive runtime start.
+- **Source:** `agentic:leak-check`, process ownership paths, and the scaffold runtime JSON log.
+- **Expected:** Run `scaffold.runtime` without another slice on the 15 GB host.
+- **Actual:** The first owned run was interrupted before service startup. After the foreign owner
+  exited and leak-check reported zero survivors, a fresh run started; a new foreign AppHost under
+  `/home/codex/repos/ns004-aspire-e8-verify` began two seconds later. The owned run passed 47 gates
+  but its users health probe reported database-unhealthy; cleanup passed.
+- **Severity:** moderate
+- **Action:** reject the result as acceptance evidence, tick nothing, leave foreign resources alone,
+  and retry only after a stable quiet window.
+- **Evidence:** suite summary `passed=47 failed=1`; sole failure `behavior.service-health`; cleanup
+  stopped the owned AppHost and removed all three run-owned containers.
