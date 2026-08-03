@@ -66,6 +66,7 @@ post-publish step in `.github/workflows/release-canary.yml`.
 | --- | --- | --- | --- |
 | 2026-08-03 | plan | research | Read #1121/#1120 and the observed 0.0.4 trace; re-baselined clean branch at `0b05217cc`. |
 | 2026-08-03 | plan | design | Locked two thin implementation slices and explicit external live-cut dependency. |
+| 2026-08-03 | plan-eval | launch blocked | Canonical Qwen route resolved, but approved child credential injection returned `auth_required`; no evaluator/model turn ran. |
 
 ## Decisions
 
@@ -88,7 +89,7 @@ post-publish step in `.github/workflows/release-canary.yml`.
 
 | Gate | Command or check | Result | Notes |
 | --- | --- | --- | --- |
-| PLAN-EVAL | separate local open-model evaluator | NOT_RUN | Hard stop before slice 1. |
+| PLAN-EVAL | separate local open-model evaluator | NOT_RUN | Launch blocked before model start: OpenRouter credential absent. Hard stop remains in force. |
 
 ### Fitness Gates
 
@@ -113,3 +114,5 @@ post-publish step in `.github/workflows/release-canary.yml`.
 - PLAN-EVAL should inspect L3/L4/L5 closely: coordinated publish marker, target drift scope, and
   content-point selection are the load-bearing decisions.
 - No implementation file has been changed before PLAN-EVAL.
+- The first canonical evaluator launch was blocked before a session existed; do not treat route
+  validation or provider-canary output as a verdict.

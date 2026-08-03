@@ -24,3 +24,20 @@ Drift is append-only.
 - **Severity:** minor.
 - **Action:** accept as an entry-surface override; preserve all separation invariants.
 - **Evidence:** `supervisor.md` route table.
+
+## 2026-08-03 — Formal evaluator credential unavailable
+
+- **What:** The canonical local PLAN-EVAL route resolved correctly but could not launch because the
+  isolated child environment has no OpenRouter credential.
+- **Source:** `planClaudeCommand` route validation, `ChildProcessEnvironmentAdapter`, and a bounded
+  `agentic:provider-canary --live` probe.
+- **Expected:** Claude Code + OpenRouter, bound open-model Qwen evaluator, high effort.
+- **Actual:** route diagnostics were empty, then child injection returned `auth_required`;
+  `OPENROUTER_API_KEY`, `ANTHROPIC_AUTH_TOKEN`, and `ANTHROPIC_API_KEY` are all absent, and the
+  provider canary reported `credential: absent` without starting a model turn.
+- **Severity:** significant.
+- **Action:** block before implementation and request the owner's smallest authorized recovery:
+  make the local OpenRouter credential available, authorize an open-model cloud evaluator fallback,
+  or explicitly waive PLAN-EVAL.
+- **Evidence:** launch at `2026-08-03T15:29:29+02:00`; no `plan-eval.md` was written and no source
+  implementation file was changed.
