@@ -1,8 +1,12 @@
 # RFC — OpenAPI→MCP: making a service's own API legible to the agent building it
 
+> **AUTHORITY BANNER (2026-08-03): the board is FILED — GitHub wins on conflict.** Epic
+> **#1126**, children **#1127–#1140** (OMB-1..14 mapping in `FILING-LOG.md`). Forks ratified
+> per §9; **F1 remains proof-arbitrated by #1127's verdict artifact**, not settled by fiat.
+
 | | |
 | --- | --- |
-| **Status** | **Proposed (rev 2, adversarially hardened)** — generator (Fable 5 · medium) → Codex GPT-5.6 Sol · xhigh adversarial, **25 findings (10 blockers), 25/25 accepted and integrated** (`adversarial-sol.md` / `adversarial-triage.md`); awaiting owner ratification of forks F1–F5 (§9). No implementation until ratified (#1117 pipeline). |
+| **Status** | **Ratified (owner, 2026-08-03) — rev 2, adversarially hardened; board filed.** Pipeline: generator (Fable 5 · medium) → Codex GPT-5.6 Sol · xhigh adversarial, **25 findings (10 blockers), 25/25 accepted and integrated** (`adversarial-sol.md` / `adversarial-triage.md`) → fork ratification + board filing (epic #1126, children #1127–#1140, milestone 0.0.5). F1 is proof-arbitrated (§9). |
 | **Tracking** | Refs #1117 (0.0.5, tracking — no closing keyword) · #1102 (capability lane, distinct) · #1072/#1078 (gate precedent) · #1071 (conventions surface) · #1093 (addressed §5, not fixed here) |
 | **Run record** | `.llm/runs/plan-openapi-mcp-plugin--seed/` — research, plan (D1–D9 / forks F1–F5, rev 2), canonical design 00–06 (rev 2), 2 worked examples, adversarial findings + triage (25/25) |
 | **Evidence base** | Verified in-source: `.withOpenAPI().withDocs()` on every preset (`define-service.ts:227-228`), spec routes (`service-builder-impl.ts:466-484`), per-request spec generation (`openapi.ts:74-93`), `operationId` = dotted contract path (`@orpc/openapi@1.14.13` `openapi.BwdtJjDu.mjs:535-549`), closed MCP registry + central truncation (`tool-registry.ts`, `mcp-server.ts:105-112`), `.mcp.json` spawn (`init-agent.ts:127-172`), `services__*` env convention + `getAllServices()` (`service-url.ts:55-176`); prior art code-read with licenses verified (research.md §3) |
@@ -323,9 +327,10 @@ machine-local run state bound to `projectRoot` + `runId`, and endpoints must pas
 cross-check before reporting or invocation (S-8). The four rev-1 uncertainties all became
 findings and are integrated (`04-execution-and-security.md §6`).
 
-## 7. Proposed board (placeholders — NOT filed; filing follows ratification)
+## 7. Board — FILED 2026-08-03 (owner-authorized). Epic **#1126**; OMB-1..14 → **#1127–#1140** per `FILING-LOG.md`; GitHub wins on conflict. Original proposal below:
 
-Epic under #1117, milestone 0.0.5. Children (`[openapi-mcp S<n>] …`):
+Epic under #1117, milestone 0.0.5, label `epic:openapi-mcp` (created for this filing). Children
+(`[openapi-mcp S<n>] …`, each `Part of #1126`, `status:plan`, milestone 0.0.5):
 
 | ID | Wave | Slice |
 | --- | --- | --- |
@@ -359,7 +364,15 @@ retained as recorded defenses. Notable status change from review: D3's discovery
 from "chosen" to "[P1]-arbitrated" (S-7). Generator ≠ reviewer sessions throughout, per the
 harness invariant.
 
-## 9. Open forks for owner arbitration
+## 9. Forks — RATIFIED 2026-08-03 (owner-authorized, relayed)
+
+**F2(a), F3(a), F4(a) ratified at the seed recommendations; F5 was already applied to this PR
+and matches precedent. F1 is deliberately NOT ratified by fiat:** S-7 unlocked it, so it is
+recorded as **proof-arbitrated** — option (a) stands only if #1127's committed
+`proofs/P1-verdict.md` demonstrates the post-allocation seam, and a FAIL verdict is a
+legitimate result that activates option (b) (the `aspire-cli` source), not a blocker. #1127's
+verdict is the deciding artifact; #1131 and #1133 may not start before it exists. The original
+fork table is retained below as the decision record:
 
 | # | Fork | Options | Seed recommendation |
 | --- | --- | --- | --- |
@@ -375,4 +388,4 @@ harness invariant.
 document condenses the run's normative record (`design/canonical/00–06` rev 2, `plan.md` rev 2,
 `design/examples/`). Where this RFC and the run docs conflict, the run docs win until
 ratification, then GitHub wins. Refs #1117 #1102 #1072 #1071 #1093 — no closing keywords; the §7
-board is placeholders, filed only after owner ratification.</sub>
+board is now live (epic #1126, children #1127–#1140); F1 remains open pending #1127's verdict.</sub>

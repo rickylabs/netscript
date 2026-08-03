@@ -199,6 +199,9 @@
 - name: "epic:agentic-combo"
   color: "5319e7"
   description: "NetScript agentic combo epic (MCP server + public skills + CLI)"
+- name: "epic:openapi-mcp"
+  color: "5319e7"
+  description: "OpenAPI→MCP service introspection epic (RFC #1123, tracking #1117)"
 
 # ── wave: release-train bucket (maps to milestone) ───────────────────────────
 - name: "wave:v1"
