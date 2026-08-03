@@ -19,15 +19,24 @@ classes themselves are internal implementation details.
 ```ts
 import { createWatcher } from '@netscript/watchers';
 
+const controller = new AbortController();
 const watcher = createWatcher({
   paths: ['./incoming'],
   patterns: ['*.csv'],
   events: ['create'],
+  processExisting: true,
+  maxFileAge: 86400000,
+  debounceMs: 500,
   stabilityThreshold: { checkIntervalMs: 1000, stableChecks: 3 },
+  signal: controller.signal,
 });
 
-for await (const event of watcher.watch()) {
-  console.log(`${event.kind}: ${event.path}`);
+try {
+  for await (const event of watcher.watch()) {
+    console.log(`${event.kind}: ${event.path}`);
+  }
+} finally {
+  watcher.stop();
 }
 ```
 
@@ -56,6 +65,8 @@ configured order inside the `FileWatcher` pipeline. Each implements the `WatchFi
 | `GlobFilter` | class | `constructor` | `new GlobFilter(patterns: readonly string[])` | Yields only events whose filenames match at least one glob pattern. |
 | | | `apply` | `async *apply(events: AsyncIterable<WatchEvent>): AsyncIterable<WatchEvent>` | Apply the glob filter to an event stream. |
 | | | `matches` | `matches(filePath: string): boolean` | Check if a file path matches any configured glob pattern. |
+| `DebounceFilter` | class | `constructor` | `new DebounceFilter(options: DebounceFilterOptions \| number, signal?: AbortSignal)` | Suppresses rapid successive events for the same file path within a configurable window (`debounceMs`). |
+| | | `apply` | `async *apply(events: AsyncIterable<WatchEvent>): AsyncIterable<WatchEvent>` | Apply the debounce filter to an event stream. |
 | `StabilityFilter` | class | `constructor` | `new StabilityFilter(options?: StabilityOptions, signal?: AbortSignal)` | Waits for file writes to complete (size stops changing) before yielding events. |
 | | | `apply` | `async *apply(events: AsyncIterable<WatchEvent>): AsyncIterable<WatchEvent>` | Apply the stability filter to an event stream. |
 | | | `waitForStability` | `async waitForStability(filePath: string): Promise<WatchEvent["fileInfo"]>` | Wait for a file to stop growing. |
@@ -86,13 +97,14 @@ Low-level helpers that swallow only "missing/inaccessible" errors and re-throw t
 
 | Symbol | Description |
 | --- | --- |
-| `WatcherOptions` | Configuration for a `FileWatcher` instance (paths, patterns, events, stability threshold, signal, force polling). |
+| `WatcherOptions` | Configuration for a `FileWatcher` instance (paths, patterns, events, debounceMs, contentHash, processExisting, forcePolling, pollIntervalMs, minFileSize, maxFileAge, stabilityThreshold, signal). |
 | `WatchEvent` | A single file-system event yielded by a watcher strategy. |
 | `WatchFilter` | A filter takes an async iterable of events and yields only those that pass. |
 | `WatchStrategyHandler` | A watch strategy produces raw file-system events as an async iterable. |
 | `FileInfo` | Metadata about a watched file, built from `Deno.FileInfo`. |
 | `StabilityOptions` | Configuration for the stability filter (`checkIntervalMs`, `stableChecks`). |
 | `DedupFilterOptions` | Options for creating a `DedupFilter` (`windowMs`, default `60000`). |
+| `DebounceFilterOptions` | Options for creating a `DebounceFilter` (`debounceMs`). |
 
 ## Type aliases
 

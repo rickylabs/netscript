@@ -26,5 +26,6 @@ export type { HybridStrategy, HybridStrategyOptions } from '../strategies/hybrid
 export { StabilityFilter } from '../filters/stability.ts';
 export { GlobFilter } from '../filters/glob.ts';
 export { computeContentHash, DedupFilter, type DedupFilterOptions } from '../filters/dedup.ts';
+export { DebounceFilter, type DebounceFilterOptions } from '../filters/debounce.ts';
 
 export { AccessFailureTracker, safeReadFile, safeStat } from '../fs.ts';

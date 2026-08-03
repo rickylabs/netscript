@@ -99,7 +99,7 @@ export interface WatcherOptions {
   readonly patterns?: readonly string[];
   /** Which FS events to yield. @default ['create'] */
   readonly events?: readonly EventKind[];
-  /** Per-file debounce in milliseconds. @default 2000 */
+  /** Per-file debounce in milliseconds. Rapid events for the same path within this window are collapsed. @default 0 (disabled) */
   readonly debounceMs?: number;
   /** Compute SHA-256 content hash for deduplication. @default true */
   readonly contentHash?: boolean;
@@ -111,7 +111,7 @@ export interface WatcherOptions {
   readonly pollIntervalMs?: number;
   /** Skip files smaller than this size in bytes. @default 0 */
   readonly minFileSize?: number;
-  /** Skip files older than this value in milliseconds (only applies during startup scan). */
+  /** Skip files older than this value in milliseconds during the startup scan when `processExisting` is true. */
   readonly maxFileAge?: number;
   /** File stability check configuration. When set, waits for files to stop growing. */
   readonly stabilityThreshold?: StabilityOptions;
