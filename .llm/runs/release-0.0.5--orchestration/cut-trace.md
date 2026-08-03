@@ -24,6 +24,12 @@ dispatch, in exactly epic #1169's S1→S2→S4 order.
 
 ## Re-planning events
 
+- **R2 (2026-08-03, wave 1 in flight):** owner filed #1184 (p1, sagas scaffold glue registers no
+  KV adapter → saga runner crashes on default scaffold; found by the wave-4 DeepSeek run on
+  published 0.0.4; downstream of #1064–#1066). Scheduled — not dispatched — as **W2-F** into the
+  **canary.2 train** per owner instruction ("one canary train, not a train of its own"); no
+  cross-cut with in-flight wave-1 surfaces. Wave 2 becomes: #1130, #1131, #1119, **#1184**
+  (4 Codex) + agy #1106; #1184 holds the wave-2 `scaffold.runtime` expensive-gate slot.
 - **R1 (2026-08-03, pre-dispatch):** W1-A (#1168), W2-A (#1170), W2-B (#1142+#1174) landed
   externally before wave-1 dispatch (merges 1–3 above). Absorbed per the profile: undispatched
   remainder re-clustered — revised wave 1 = proofs (#1127–#1129), #1166, #1134, plus W3-A

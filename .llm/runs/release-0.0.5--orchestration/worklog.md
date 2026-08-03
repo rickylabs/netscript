@@ -276,3 +276,16 @@ Orchestrator ruling recorded as drift D6; steer sent to the thread (proceed; PLA
     OpenRouter Qwen preset) is not launchable in this environment: `auth_required`, credential
     absent. Lane-policy binds a route that cannot currently run locally; any slice or run that
     genuinely needs formal PLAN-EVAL must use owner-provisioned credentials or the cloud lane.
+
+## 2026-08-03 — R2: #1184 filed (owner) and scheduled into the canary.2 train
+
+Owner filed #1184 (p1, published-artifact defect: sagas scaffold glue registers no KV adapter →
+`KvConnectionError` kills the saga runner on a default scaffold; silent from outside). Scheduled
+per owner instruction into **one existing canary train**: slice **W2-F**, dispatching with wave 2,
+landing in canary.2's payload. Acceptance read: all four boxes are locally provable (the
+`scaffold.runtime` suite proves the scaffold-start box), so it is **PR-closable**; canary.2's
+pair supplies the published-artifact confirmation, quoted on the issue. No cross-cut with
+in-flight wave-1 surfaces — not dispatched now. `status:triage` → `status:plan`; scheduling
+decision commented on the issue. Brief written (`slices/sagas-kv-glue/implement.md`) — first of
+the wave-2 generation carrying the D6 evaluator-composition rule up front. Wave 2 width: 4 Codex
+(#1130, #1131, #1119, #1184) + 1 agy (#1106); #1184 holds the wave-2 expensive-gate slot.

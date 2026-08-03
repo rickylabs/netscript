@@ -15,6 +15,7 @@ milestone after two recorded moves.
 | Epic / tracking — no closing keywords | 3 | #1126, #1169 (its one-pass DoD box is evidenced by this run's stable cut), #1117 (hand-verified close after S9/S12 land; box 6 routed to #1140@0.0.6) |
 | Gated out (F2 stands at (a)) | 1 | #1139 — moves at cut with written reason unless owner flips F2 |
 | Moved to 0.0.6 (done, reasons on issues) | 2 | #1140 (post-ship observation; HON-1), #1175 (release-activity constraint; COV-1) |
+| Mid-run addition (filed 2026-08-03, owner) | 1 | #1184 (sagas generated glue registers no KV adapter — p1 published-artifact defect) → **PR-closable**, scheduled W2-F into the canary.2 train; all four boxes PR-provable (scaffold.runtime proves the scaffold-start box locally); canary.2's pair supplies the published-artifact confirmation, quoted on the issue before close |
 
 Total: 33 + 3 + 2 + 3 + 1 + 2 = **44** ✓. The wave table contains **31 PRs covering 36 issues**
 (34 PR-closable + the two Refs-carrying PRs for #1166/#1168).
