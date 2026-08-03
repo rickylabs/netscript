@@ -22,8 +22,34 @@
  * Exit codes: 0 = ok · 2 = usage error · 5 = --worktree given but not found.
  */
 
-import { requireValue, wsl, wslGitInfo, wslGitLogsPath, wslUser } from '../lib/agentic-lib.ts';
+import {
+  requireValue,
+  wsl,
+  wslGitInfo,
+  wslGitLogsPath,
+  wslHome,
+  wslUser,
+} from '../lib/agentic-lib.ts';
+import { parseProcessTable } from '../runtime/adapters/local-codex-remote-adapter.ts';
 import { classifyCodexRolloutFailure } from './classify-codex-failure.ts';
+
+export const CODEX_STATUS_PROCESS_TABLE_MARKER = '__NETSCRIPT_CODEX_PROCESS_TABLE__' as const;
+
+/** Parses the daemon version and counts only anchored Codex app-server argv entries. */
+export function parseCodexDaemonProbe(
+  output: string,
+  home: string,
+): { version: string | null; appServerProcesses: number } {
+  const marker = `${CODEX_STATUS_PROCESS_TABLE_MARKER}\n`;
+  const markerIndex = output.indexOf(marker);
+  const header = markerIndex === -1 ? output : output.slice(0, markerIndex);
+  const processTable = markerIndex === -1 ? '' : output.slice(markerIndex + marker.length);
+  return {
+    version: header.match(/^VERSION=(.*)$/m)?.[1]?.trim() || null,
+    appServerProcesses:
+      parseProcessTable(processTable, home).appServers.filter((process) => process.anchored).length,
+  };
+}
 
 interface Options {
   worktree?: string;
@@ -96,12 +122,11 @@ async function main(): Promise<void> {
     o.user,
     `export PATH="$HOME/.local/bin:$PATH"; ` +
       `echo "VERSION=$(codex app-server daemon version 2>/dev/null | head -n1)"; ` +
-      `echo "PROCS=$(ps -eo pid,etime,cmd 2>/dev/null | grep -E "[a]pp-server" | wc -l | tr -d ' ')"`,
+      `echo "${CODEX_STATUS_PROCESS_TABLE_MARKER}"; ` +
+      `ps -eo pid=,ppid=,args= 2>/dev/null`,
   );
-  report.daemon = {
-    version: daemon.stdout.match(/^VERSION=(.*)$/m)?.[1]?.trim() || null,
-    appServerProcesses: Number(daemon.stdout.match(/^PROCS=(\d+)$/m)?.[1] ?? '0'),
-  };
+  const home = o.user === wslUser() ? wslHome() : `/home/${o.user}`;
+  report.daemon = parseCodexDaemonProbe(daemon.stdout, home);
 
   // Worktree state + logs path.
   if (o.worktree) {

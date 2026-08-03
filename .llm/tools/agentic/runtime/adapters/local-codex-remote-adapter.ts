@@ -28,7 +28,12 @@ async function command(executable: string, args: readonly string[]): Promise<Com
   };
 }
 
-async function recentActiveSessions(root: string): Promise<string[]> {
+/** Returns incomplete rollout ids only when live process/socket reality can anchor them. */
+export async function recentActiveSessions(
+  root: string,
+  sessionRealityPresent: boolean,
+): Promise<string[]> {
+  if (!sessionRealityPresent) return [];
   const files: Array<{ path: string; modified: number }> = [];
   async function walk(directory: string): Promise<void> {
     for await (const entry of Deno.readDir(directory)) {
@@ -97,7 +102,7 @@ export class LocalCodexRemoteAdapter implements CodexRemoteRepairPort {
   }
 
   async inspect(_worktree: string): Promise<CodexRemoteObservation> {
-    const [cli, daemon, remote, processes, socket, activeSessions] = await Promise.all([
+    const [cli, daemon, remote, processes, socket] = await Promise.all([
       command('codex', ['--version']),
       command('codex', ['app-server', 'daemon', 'version']),
       command('codex', ['remote-control', 'status', '--json']),
@@ -106,9 +111,13 @@ export class LocalCodexRemoteAdapter implements CodexRemoteRepairPort {
         if (error instanceof Deno.errors.NotFound) return false;
         throw error;
       }),
-      recentActiveSessions(`${this.home}/.codex/sessions`),
     ]);
     const table = parseProcessTable(processes.stdout, this.home);
+    const anchoredAppServerPresent = table.appServers.some((process) => process.anchored);
+    const activeSessions = await recentActiveSessions(
+      `${this.home}/.codex/sessions`,
+      anchoredAppServerPresent || socket,
+    );
     const version = (value: string): string | null => value.match(/\d+\.\d+\.\d+/)?.[0] ?? null;
     let remoteValue: Record<string, unknown> = {};
     try {
