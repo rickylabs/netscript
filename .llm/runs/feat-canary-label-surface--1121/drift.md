@@ -72,3 +72,5 @@ Drift is append-only.
 - **Action:** accept for this urgent slice and record the observed identity; do not edit volatile
   model configuration in this PR.
 - **Evidence:** `review-s1.md` and Claude session output.
+
+2026-08-03 — Owner-authorized review waiver: owner review substitutes for opposite-family review on run artifacts/prose only; code under `.llm/tools/release/**` retains one focused opposite-family pass.
