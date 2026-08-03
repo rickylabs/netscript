@@ -67,6 +67,8 @@ when it applies any descendant cap.
 | 2026-08-03 | slice 1 | supervisor sign-off | Diff reviewed against D1/D2; focused receipt/doctor gate repeated at 16 passed, 0 failed; committed as `f00d6338e`. |
 | 2026-08-03 | slice 2 | implementation | Central recursive outcome propagation flips existing boolean `truncated` fields only; a fixed 65,536-byte UTF-8 post-bound ceiling rejects irreducibly large results with an internal error signal. |
 | 2026-08-03 | slice 2 | targeted gate | Truncation + receipt + doctor fixtures PASS: 20 passed, 0 failed. Scoped package check/lint/fmt PASS across 68 TypeScript files with zero findings. |
+| 2026-08-03 | final gates | framework wave | Full MCP suite PASS (66/66); `quality:gate` exit 0; doc lint 2 entrypoints/0 diagnostics; no export, lock, or prohibited-pattern churn. |
+| 2026-08-03 | impl-eval | verdict | Separate guarded Claude Code + OpenRouter Qwen parent session returned `PASS`; it independently repeated tests, quality/doc gates, and the five close-gated behavior audits. |
 
 ## Decisions
 
@@ -93,8 +95,9 @@ when it applies any descendant cap.
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| Full Archetype-2 column | IN_PROGRESS | `deno task quality:gate` PASS for slice 1 | Final full-wave evidence follows slice 2 |
+| Full Archetype-2 column | PASS | `evaluate.md`; full package/static/framework evidence | No new or deepened doctrine debt |
 | Plan-Gate | PASS | `plan-eval.md` | All eight checklist items passed; no unresolved decisions |
+| Implementation evaluation | PASS | `evaluate.md` | Separate open-model session; no findings |
 
 ### Runtime Gates
 

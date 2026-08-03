@@ -39,3 +39,17 @@ documentation.
 - **Action:** accept
 - **Evidence:** Use the `review_codex` `token_limit_fallback` entry from
   `workflow/lane-policy.md` / `runtime/routing-policy.ts`; opposite-family invariant remains intact.
+
+## 2026-08-03 — IMPL-EVAL transport retries were guard-clean
+
+- **What:** The first IMPL-EVAL launch omitted the runtime profile's OpenRouter source-to-Claude
+  credential mapping and received 401 before a turn. The next guarded Qwen attempt tried to spawn a
+  closed-model lookup child, which the evaluator model guard terminated before a verdict.
+- **Source:** local Claude Code evaluator launch transcripts; evaluator policy audit guard.
+- **Expected:** One complete open-model Qwen parent evaluation turn.
+- **Actual:** Neither failed attempt produced a verdict or source change. A tightened no-delegation
+  parent-only Qwen retry completed and wrote `evaluate.md` with `PASS`.
+- **Severity:** minor
+- **Action:** accept
+- **Evidence:** Final evaluator session records model `qwen/qwen3.7-max`, guard enabled, full gate
+  execution, and exact `PASS`; no closed-model evaluator work was admitted.
