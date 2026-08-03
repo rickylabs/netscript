@@ -14,6 +14,7 @@ export class HttpGate {
   }
 
   async execute(context: RunContext): Promise<GateResult> {
+    const started = performance.now();
     const url = this.definition.url(context);
     const deadline = Date.now() + context.request.options.httpTimeoutMs;
     let lastResult: HttpResult | undefined;
@@ -36,6 +37,12 @@ export class HttpGate {
             critical: this.definition.critical,
             verdict: 'passed',
             evidence: [{ kind: 'http', label: this.definition.id, data: result }],
+            attempts: [{
+              attempt: 1,
+              verdict: 'passed',
+              durationMs: Math.round(performance.now() - started),
+            }],
+            retried: false,
           };
         }
       } catch (error) {
@@ -62,6 +69,13 @@ export class HttpGate {
       critical: this.definition.critical,
       verdict: 'failed',
       evidence: [{ kind: 'http', label: this.definition.id, data: result }],
+      attempts: [{
+        attempt: 1,
+        verdict: 'failed',
+        durationMs: Math.round(performance.now() - started),
+        failureClass: 'assertion',
+      }],
+      retried: false,
       error: lastError
         ? `HTTP ${this.definition.method} ${url} failed: ${lastError}.`
         : `HTTP ${this.definition.method} ${url} returned ${result.status}.`,

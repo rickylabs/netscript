@@ -35,6 +35,8 @@ export async function runGate(
       critical: gate.critical,
       verdict: 'failed',
       evidence: [],
+      attempts: [{ attempt: 1, verdict: 'failed', durationMs: 0, failureClass: 'assertion' }],
+      retried: false,
       error: error instanceof Error ? error.message : String(error),
     };
   }
@@ -67,6 +69,8 @@ function skipUnsupportedPlatform(
         reason: `Gate requires one of: ${supportedPlatforms.join(', ')}.`,
       },
     }],
+    attempts: [{ attempt: 1, verdict: 'passed', durationMs: 0 }],
+    retried: false,
   };
 }
 

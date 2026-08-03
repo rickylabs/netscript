@@ -73,14 +73,16 @@ jobs:
     # Applicability gate: PRs to main or integration branch families,
     # `e2e-cli-gate`-labeled PRs, or manual dispatch exercise this workflow.
     if: >-
-      github.event_name == 'workflow_dispatch' ||
-      github.event.pull_request.base.ref == 'main' ||
-      startsWith(github.event.pull_request.base.ref, 'feat/') ||
-      startsWith(github.event.pull_request.base.ref, 'epic/') ||
-      contains(github.event.pull_request.labels.*.name, 'e2e-cli-gate')
+      (github.event_name != 'pull_request' || github.event.pull_request.merged != true) &&
+      (github.event_name == 'workflow_dispatch' ||
+       github.event.pull_request.base.ref == 'main' ||
+       startsWith(github.event.pull_request.base.ref, 'feat/') ||
+       startsWith(github.event.pull_request.base.ref, 'epic/') ||
+       contains(github.event.pull_request.labels.*.name, 'e2e-cli-gate'))
     runs-on: ubuntu-latest
     timeout-minutes: 10
     outputs:
+      diff_unavailable: ${{ steps.diff.outputs.diff_unavailable }}
       run_static: ${{ steps.decide.outputs.run_static }}
       run_runtime: ${{ steps.decide.outputs.run_runtime }}
       docs_only: ${{ steps.decide.outputs.docs_only }}
@@ -114,13 +116,27 @@ jobs:
         # found in adversarial review). The classifier parses this format and
         # feeds old+new for R*/C* and the deleted path for D.
         run: |
-          echo "changed<<__EOF__" >> "$GITHUB_OUTPUT"
-          git diff --name-status -M "$BASE_SHA...$HEAD_SHA" >> "$GITHUB_OUTPUT"
-          echo "__EOF__" >> "$GITHUB_OUTPUT"
+          diff_file="$(mktemp)"
+          error_file="$(mktemp)"
+          trap 'rm -f "$diff_file" "$error_file"' EXIT
+
+          if ! git diff --name-status -M "$BASE_SHA...$HEAD_SHA" > "$diff_file" 2> "$error_file"; then
+            echo "Unable to classify changes because the PR base or head SHA is no longer resolvable." >&2
+            cat "$error_file" >&2
+            echo "diff_unavailable=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          {
+            echo "diff_unavailable=false"
+            echo "changed<<__EOF__"
+            cat "$diff_file"
+            echo "__EOF__"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Extract root deno.json (base + head, tasks-only discrimination)
         id: rootcfg
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' && steps.diff.outputs.diff_unavailable != 'true'
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
@@ -138,6 +154,7 @@ jobs:
 
       - name: Decide run/skip
         id: decide
+        if: github.event_name != 'pull_request' || steps.diff.outputs.diff_unavailable != 'true'
         env:
           EVENT_NAME: ${{ github.event_name }}
           CHANGED_NAME_STATUS: ${{ steps.diff.outputs.changed }}
@@ -155,7 +172,7 @@ jobs:
     # runs and RUN defaults to true — a skip requires classify to have SUCCEEDED
     # with an explicit `run_static=false`. `skipped` classify (applicability gate:
     # not a PR to main / no `e2e-cli-gate` label) keeps the old skip behavior.
-    if: ${{ !cancelled() && needs.classify.result != 'skipped' }}
+    if: ${{ !cancelled() && needs.classify.result != 'skipped' && needs.classify.outputs.diff_unavailable != 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
@@ -211,7 +228,7 @@ jobs:
     # true — a skip requires classify to have SUCCEEDED with an explicit
     # `run_runtime=false`. `skipped` classify (applicability gate) keeps the old
     # skip behavior.
-    if: ${{ !cancelled() && needs.classify.result != 'skipped' }}
+    if: ${{ !cancelled() && needs.classify.result != 'skipped' && needs.classify.outputs.diff_unavailable != 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
     env:
@@ -294,7 +311,7 @@ jobs:
     # true — a skip requires classify to have SUCCEEDED with an explicit
     # `needs_desktop=false`. `skipped` classify (applicability gate) keeps the
     # old skip behavior.
-    if: ${{ !cancelled() && needs.classify.result != 'skipped' }}
+    if: ${{ !cancelled() && needs.classify.result != 'skipped' && needs.classify.outputs.diff_unavailable != 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
