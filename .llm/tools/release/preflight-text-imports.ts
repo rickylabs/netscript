@@ -533,6 +533,61 @@ function findInlineReads(source: string, path: string): TextImportFinding[] {
   return findings;
 }
 
+/**
+ * True when `index` falls inside a string or template literal.
+ *
+ * Generated assets embed tool source as *data*: `agent-tools.generated.ts` ships every
+ * `.llm/tools` module as a double-quoted constant so `agent init` can write them into a
+ * consumer project. The published module never executes that data, but matching it as if it
+ * were syntax blocked every 0.0.4 cut (#1145).
+ *
+ * This answers "is this offset inside a literal" rather than blanking the source, because
+ * `blankStringsAndComments` also empties the quotes inside
+ * `new URL('...', import.meta.url)` — which is exactly the syntax the guard must keep
+ * catching. Comments are tracked so an apostrophe in prose cannot open a phantom string and
+ * silently suppress every finding after it.
+ */
+function isInsideStringLiteral(source: string, index: number): boolean {
+  let quote: string | undefined;
+  let inLineComment = false;
+  let inBlockComment = false;
+  for (let i = 0; i < index; i++) {
+    const ch = source[i];
+    const next = source[i + 1];
+    if (inLineComment) {
+      if (ch === '\n') inLineComment = false;
+      continue;
+    }
+    if (inBlockComment) {
+      if (ch === '*' && next === '/') {
+        inBlockComment = false;
+        i++;
+      }
+      continue;
+    }
+    if (quote !== undefined) {
+      if (ch === '\\') {
+        i++;
+        continue;
+      }
+      if (ch === quote) quote = undefined;
+      continue;
+    }
+    if (ch === '/' && next === '/') {
+      inLineComment = true;
+      i++;
+      continue;
+    }
+    if (ch === '/' && next === '*') {
+      inBlockComment = true;
+      i++;
+      continue;
+    }
+    if (ch === "'" || ch === '"' || ch === '`') quote = ch;
+  }
+  return quote !== undefined;
+}
+
 function findImportMetaFileUrlConversions(
   source: string,
   path: string,
@@ -542,6 +597,7 @@ function findImportMetaFileUrlConversions(
     /(?:\bdirname\s*\(\s*)?\bfromFileUrl\s*\(\s*(?:import\.meta\.url|new\s+URL\s*\(\s*(['"`])(?:\\.|(?!\1).)*\1\s*,\s*import\.meta\.url\s*\))\s*\)/g;
   for (const match of source.matchAll(fileUrlConversion)) {
     if (match.index === undefined) continue;
+    if (isInsideStringLiteral(source, match.index)) continue;
     const line = lineAt(source, match.index);
     if (hasAllowlist(source, line)) continue;
     const guardLine = nearbyFileProtocolGuardLine(source, line);

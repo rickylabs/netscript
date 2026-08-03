@@ -61,6 +61,19 @@ Deno.test('preflight flags eager fromFileUrl on import.meta.url', async () => {
   assertStringIncludes(findings[0].message, 'https: import.meta.url');
 });
 
+Deno.test('preflight ignores embedded string source but still flags following executable code', () => {
+  const findings = scanSource(
+    [
+      `const generated = "const label = \\"canary\\"; fromFileUrl(import.meta.url);";`,
+      `const root = fromFileUrl(import.meta.url);`,
+    ].join('\n'),
+    'agent-tools.generated.ts',
+  );
+  assertEquals(findings.length, 1);
+  assertEquals(findings[0].check, 'file-url-import-meta');
+  assertEquals(findings[0].line, 2);
+});
+
 Deno.test('preflight allows protocol-guarded fromFileUrl import.meta conversion', async () => {
   const findings = await scanFile(
     fromFileUrl(new URL('negative-guarded-file-url.ts', fixtureRoot)),
@@ -83,4 +96,29 @@ Deno.test('release:preflight task argv accepts a bare separator', async () => {
     new TextDecoder().decode(output.stdout),
     'release:preflight text-imports — PASS',
   );
+});
+
+Deno.test('file-url check ignores embedded string data but still fails on real syntax', () => {
+  // #1145: `agent-tools.generated.ts` embeds every `.llm/tools` module as a double-quoted
+  // constant so `agent init` can write them into a consumer project. The published module never
+  // executes that data, but matching it blocked every 0.0.4 cut.
+  const embedded = [
+    'export const AGENT_TOOLS: Record<string, string> = {',
+    `  'e2e/scaffold-e2e-test.ts':`,
+    `    "import { fromFileUrl } from 'jsr:@std/path@1';\\nconst root = fromFileUrl(import.meta.url);\\n",`,
+    '};',
+  ].join('\n');
+  const embeddedFindings = scanSource(embedded, 'packages/cli/src/kernel/assets/agent-tools.generated.ts')
+    .filter((finding) => finding.check === 'file-url-import-meta');
+  assertEquals(embeddedFindings.length, 0);
+
+  // The ban must still fire on genuine module syntax — a fix that only proves the pass
+  // direction would disable the guard it is meant to preserve.
+  const real = [
+    `import { fromFileUrl } from 'jsr:@std/path@1';`,
+    'const root = fromFileUrl(import.meta.url);',
+  ].join('\n');
+  const realFindings = scanSource(real, 'packages/cli/src/kernel/real.ts')
+    .filter((finding) => finding.check === 'file-url-import-meta');
+  assertEquals(realFindings.length, 1);
 });
