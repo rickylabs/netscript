@@ -1,27 +1,95 @@
 name: public-surface-diff
 
+# #1152: the old workflow-level `paths: packages/**` filter meant this job did
+# not report at all on non-matching PRs, so it could never be promoted to a
+# required check. The classifier's `needs_surface` output mirrors that filter
+# exactly (any `packages/**` change, plus the conservative unrecognised-path
+# escalation); the job now always starts and reports, short-circuiting to a
+# skipped-by-policy step. FAIL-CLOSED: a failed classify forces a full run.
+
 on:
   pull_request:
-    paths:
-      - "packages/**"
 
 permissions:
   contents: read
 
 jobs:
-  surface-diff:
+  classify:
+    name: classify changes
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 10
+    outputs:
+      needs_surface: ${{ steps.decide.outputs.needs_surface }}
+      reason: ${{ steps.decide.outputs.reason }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
 
       - name: Setup Deno
         uses: denoland/setup-deno@v2
         with:
           deno-version: "2.9.0"
 
+      - name: Self-check the classifier
+        run: >-
+          deno test --allow-read --allow-write --allow-env
+          .github/scripts/ci-classify-changes.test.ts
+
+      - name: Compute changed files (merge-base diff, rename-aware)
+        id: diff
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        # `--name-status -M` so renames/copies report BOTH sides (see
+        # e2e-cli.yml).
+        run: |
+          echo "changed<<__EOF__" >> "$GITHUB_OUTPUT"
+          git diff --name-status -M "$BASE_SHA...$HEAD_SHA" >> "$GITHUB_OUTPUT"
+          echo "__EOF__" >> "$GITHUB_OUTPUT"
+
+      # No root deno.json extraction here: `needs_surface` is independent of
+      # the tasks-only discrimination (the root config never lives under
+      # `packages/`), and the missing-content default is the conservative one.
+      - name: Decide run/skip
+        id: decide
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          CHANGED_NAME_STATUS: ${{ steps.diff.outputs.changed }}
+          PR_LABELS: ${{ toJSON(github.event.pull_request.labels.*.name) }}
+        run: deno run --allow-read --allow-write --allow-env .github/scripts/ci-classify-changes.ts
+
+  surface-diff:
+    needs: classify
+    # Job always starts (so its status reports); FAIL-CLOSED on classify
+    # failure, same pattern as the other classifier consumers.
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      RUN: ${{ needs.classify.result != 'success' || needs.classify.outputs.needs_surface == 'true' }}
+      SKIP_REASON: ${{ needs.classify.outputs.reason }}
+    steps:
+      - name: Skipped by policy
+        if: env.RUN != 'true'
+        # REASON contains raw changed-file names — never interpolate it into
+        # shell source; pass via env and print with printf.
+        run: |
+          printf '::notice::surface-diff skipped by policy. %s\n' "$SKIP_REASON"
+
+      - name: Checkout
+        if: env.RUN == 'true'
+        uses: actions/checkout@v5
+
+      - name: Setup Deno
+        if: env.RUN == 'true'
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: "2.9.0"
+
       # Beta rollout is observational. Issue #309 owns the stable-line flip to blocking.
       - name: Classify public API changes
+        if: env.RUN == 'true'
         run: deno task surface:diff
         continue-on-error: true

@@ -25,23 +25,28 @@ name: e2e-cli
 # any other PR carrying the `e2e-cli-gate` label, PLUS manual dispatch.
 #
 # Skip policy (see `.github/scripts/ci-classify-changes.ts`): the `classify` job
-# derives `run_static` / `run_runtime` from the PR diff and labels. All three
-# expensive jobs still START and report SUCCESS, but short-circuit to a
-# "skipped-by-policy" step when their work is not needed:
+# emits the #1152 capability vector (`run_static`, `run_runtime`, `needs_*`)
+# from the PR diff and labels. All three expensive jobs still START and report
+# SUCCESS, but short-circuit to a "skipped-by-policy" step when their work is
+# not needed:
 #
-#   - docs-only diff (only `**/*.md(x)`, `docs/`, `.llm/`, `.agents/`, `.claude/`,
-#     and never `packages/`/`plugins/`/`apps/`/`deno.json*`/`deno.lock`/
-#     `.github/workflows/`) -> skip both.
+#   - `run_static`: any scaffold-impacting change (`packages/`/`plugins/`/
+#     `apps/`, tier-defining workflows, toolchain `deno.json*`/`deno.lock`,
+#     or any unrecognised path).
+#   - `run_runtime`: the docker tier — same signal v1 (deliberately wide;
+#     tighten only against observed green history, per #1152).
+#   - `needs_desktop`: the `.deb`/updater surface — `packages/cli/`, tier
+#     workflows, toolchain config (#1151/#1152).
+#   - Only `e2e-cli.yml` and `ci.yml` escalate the scaffold tiers; other
+#     workflow edits and tasks-only root `deno.json` diffs do not (#1122).
 #   - `ci:skip-scaffold` -> skip scaffold-static; `ci:skip-e2e` -> skip
-#     scaffold-runtime; `ci:full` -> force both regardless.
-#   - `desktop-native-linux` has no dedicated classifier output yet (#1152 adds
-#     `needs_desktop`); until then it runs whenever EITHER scaffold tier runs and
-#     skips only when the classifier said neither is needed (#1151).
+#     scaffold-runtime; `ci:full` -> force everything regardless.
 #
 # The jobs run + report SUCCESS rather than using `paths-ignore`/job-level `if`,
-# so they never strand a required status check if promoted to one later. The
-# cheap required trio (quality / check-test / deps-report) lives in ci.yml and is
-# NOT touched by this policy. Release gates (publish, e2e-cli-prod*) have no skip.
+# so they never strand a required status check if promoted to one later. ci.yml
+# gates its required jobs (check-test / quality) through its own classify job
+# under the same policy (#1152). Release gates (publish, e2e-cli-prod*) have no
+# skip.
 #
 # FAIL-CLOSED RULE: a skip requires `classify` to SUCCEED with an explicit
 # `run_*=false`. If classify fails for any reason, the expensive jobs run in
@@ -79,10 +84,11 @@ jobs:
       run_static: ${{ steps.decide.outputs.run_static }}
       run_runtime: ${{ steps.decide.outputs.run_runtime }}
       docs_only: ${{ steps.decide.outputs.docs_only }}
+      needs_desktop: ${{ steps.decide.outputs.needs_desktop }}
       reason: ${{ steps.decide.outputs.reason }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -112,12 +118,32 @@ jobs:
           git diff --name-status -M "$BASE_SHA...$HEAD_SHA" >> "$GITHUB_OUTPUT"
           echo "__EOF__" >> "$GITHUB_OUTPUT"
 
+      - name: Extract root deno.json (base + head, tasks-only discrimination)
+        id: rootcfg
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        # Missing/unreadable content classifies as `toolchain` (fail toward
+        # running) — hence `|| true` on both sides.
+        run: |
+          {
+            echo "base<<__CFG_EOF__"
+            git show "$BASE_SHA:deno.json" 2>/dev/null || true
+            echo "__CFG_EOF__"
+            echo "head<<__CFG_EOF__"
+            git show "$HEAD_SHA:deno.json" 2>/dev/null || true
+            echo "__CFG_EOF__"
+          } >> "$GITHUB_OUTPUT"
+
       - name: Decide run/skip
         id: decide
         env:
           EVENT_NAME: ${{ github.event_name }}
           CHANGED_NAME_STATUS: ${{ steps.diff.outputs.changed }}
           PR_LABELS: ${{ toJSON(github.event.pull_request.labels.*.name) }}
+          ROOT_DENO_JSON_BASE: ${{ steps.rootcfg.outputs.base }}
+          ROOT_DENO_JSON_HEAD: ${{ steps.rootcfg.outputs.head }}
         run: deno run --allow-read --allow-write --allow-env .github/scripts/ci-classify-changes.ts
 
   scaffold-static:
@@ -145,7 +171,7 @@ jobs:
 
       - name: Checkout
         if: env.RUN == 'true'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Deno
         if: env.RUN == 'true'
@@ -178,7 +204,9 @@ jobs:
     needs: classify
     # Job always starts (so its status reports); real work is guarded by the
     # classifier so docs-only / `ci:skip-e2e` short-circuit to SUCCESS. Heavy;
-    # additive until observed green.
+    # additive until observed green. This is the docker tier (#1152): reached
+    # on the classifier's docker signal — deliberately wide in v1, tightened
+    # only against observed green history.
     # FAIL-CLOSED: if `classify` FAILED, this job still runs and RUN defaults to
     # true — a skip requires classify to have SUCCEEDED with an explicit
     # `run_runtime=false`. `skipped` classify (applicability gate) keeps the old
@@ -199,7 +227,7 @@ jobs:
 
       - name: Checkout
         if: env.RUN == 'true'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Deno
         if: env.RUN == 'true'
@@ -209,7 +237,7 @@ jobs:
 
       - name: Setup .NET
         if: env.RUN == 'true'
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: "10.0.x"
 
@@ -245,7 +273,7 @@ jobs:
 
       - name: Upload E2E report artifact
         if: always() && env.RUN == 'true'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: e2e-cli-scaffold-runtime-report
           path: |
@@ -258,19 +286,19 @@ jobs:
     name: desktop-native-linux (deb + signed updater)
     needs: classify
     # Job always starts (so its status reports); real work is guarded by the
-    # classifier exactly like its two siblings (#1151). No dedicated desktop
-    # classifier output exists yet (#1152 adds `needs_desktop`), so the
-    # conservative proxy is: run whenever EITHER scaffold tier runs, skip only
-    # when the classifier said neither is needed.
+    # classifier exactly like its two siblings (#1151). The `.deb`/updater
+    # surface lives entirely under `packages/cli/`, so the dedicated
+    # `needs_desktop` output (#1152) gates it: `packages/cli/`, tier-defining
+    # workflows, and toolchain config changes run it; everything else skips.
     # FAIL-CLOSED: if `classify` FAILED, this job still runs and RUN defaults to
     # true — a skip requires classify to have SUCCEEDED with an explicit
-    # `run_static=false` AND `run_runtime=false`. `skipped` classify
-    # (applicability gate) keeps the old skip behavior.
+    # `needs_desktop=false`. `skipped` classify (applicability gate) keeps the
+    # old skip behavior.
     if: ${{ !cancelled() && needs.classify.result != 'skipped' }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
-      RUN: ${{ needs.classify.result != 'success' || needs.classify.outputs.run_static == 'true' || needs.classify.outputs.run_runtime == 'true' }}
+      RUN: ${{ needs.classify.result != 'success' || needs.classify.outputs.needs_desktop == 'true' }}
       SKIP_REASON: ${{ needs.classify.outputs.reason }}
     steps:
       - name: Skipped by policy
@@ -282,7 +310,7 @@ jobs:
 
       - name: Checkout
         if: env.RUN == 'true'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Deno
         if: env.RUN == 'true'
@@ -337,7 +365,7 @@ jobs:
 
       - name: Upload native desktop evidence
         if: always() && env.RUN == 'true'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: e2e-cli-desktop-native-linux-report
           path: .llm/tmp/desktop-native-e2e/evidence.json
@@ -355,6 +383,7 @@ jobs:
           CLASSIFY_RESULT: ${{ needs.classify.result }}
           RUN_STATIC: ${{ needs.classify.outputs.run_static }}
           RUN_RUNTIME: ${{ needs.classify.outputs.run_runtime }}
+          RUN_DESKTOP: ${{ needs.classify.outputs.needs_desktop }}
           STATIC_RESULT: ${{ needs.scaffold-static.result }}
           RUNTIME_RESULT: ${{ needs.scaffold-runtime.result }}
           DESKTOP_NATIVE_LINUX_RESULT: ${{ needs.desktop-native-linux.result }}
@@ -380,14 +409,7 @@ jobs:
           static_outcome="$(describe_scaffold_lane "$RUN_STATIC" "$STATIC_RESULT")"
           runtime_outcome="$(describe_scaffold_lane "$RUN_RUNTIME" "$RUNTIME_RESULT")"
 
-          # Desktop has no dedicated classifier output yet (#1152): it is
-          # selected whenever either scaffold tier is (#1151).
-          if [ "$RUN_STATIC" = "true" ] || [ "$RUN_RUNTIME" = "true" ]; then
-            desktop_selected="true"
-          else
-            desktop_selected="false"
-          fi
-          desktop_outcome="$(describe_scaffold_lane "$desktop_selected" "$DESKTOP_NATIVE_LINUX_RESULT")"
+          desktop_outcome="$(describe_scaffold_lane "$RUN_DESKTOP" "$DESKTOP_NATIVE_LINUX_RESULT")"
 
           {
             echo "## Scaffold CI lane visibility"

@@ -15,6 +15,17 @@ name: ci
 #
 #   - `deps-report` — non-blocking dependency-freshness report (informational).
 #
+# Skip policy (#1152, see `.github/scripts/ci-classify-changes.ts`): the
+# `classify` job emits the capability vector; `check-test` reads `needs_deno`
+# and `quality` reads `needs_deno || needs_docs`. Both jobs still START and
+# report SUCCESS (they are required checks) but short-circuit to a
+# "skipped-by-policy" step when the diff cannot affect them — the same
+# pattern as e2e-cli.yml's scaffold tiers, and the same FAIL-CLOSED rule: a
+# skip requires `classify` to SUCCEED with an explicit `needs_*=false`; a
+# failed classify forces a full run. Push events (no diff) always run in
+# full. `ci:full` forces everything; the skip labels do NOT extend here.
+# `close-gate` and `deps-report` are never gated.
+#
 # Still out of scope here (deferred Phase-2 "repo process automation" umbrella):
 # the toolchain-heavy CLI runtime e2e (`deno task e2e:cli` / scaffold.runtime,
 # which spawns `aspire` + `docker` + `postgres`), OIDC publish (S3), and the
@@ -46,7 +57,7 @@ jobs:
       pull-requests: read
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Deno
         uses: denoland/setup-deno@v2
@@ -83,10 +94,82 @@ jobs:
           --pr "${{ github.event.pull_request.number }}"
           --pretty
 
+  classify:
+    name: classify changes
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      needs_deno: ${{ steps.decide.outputs.needs_deno }}
+      needs_docs: ${{ steps.decide.outputs.needs_docs }}
+      docs_only: ${{ steps.decide.outputs.docs_only }}
+      reason: ${{ steps.decide.outputs.reason }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: '2.9.0'
+
+      - name: Self-check the classifier
+        run: >-
+          deno test --allow-read --allow-write --allow-env
+          .github/scripts/ci-classify-changes.test.ts
+
+      - name: Compute changed files (merge-base diff, rename-aware)
+        id: diff
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        # `--name-status -M` so renames/copies report BOTH sides — a
+        # source->docs rename can never classify docs-only (see e2e-cli.yml).
+        run: |
+          echo "changed<<__EOF__" >> "$GITHUB_OUTPUT"
+          git diff --name-status -M "$BASE_SHA...$HEAD_SHA" >> "$GITHUB_OUTPUT"
+          echo "__EOF__" >> "$GITHUB_OUTPUT"
+
+      - name: Extract root deno.json (base + head, tasks-only discrimination)
+        id: rootcfg
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        # Missing/unreadable content classifies as `toolchain` (fail toward
+        # running) — hence `|| true` on both sides.
+        run: |
+          {
+            echo "base<<__CFG_EOF__"
+            git show "$BASE_SHA:deno.json" 2>/dev/null || true
+            echo "__CFG_EOF__"
+            echo "head<<__CFG_EOF__"
+            git show "$HEAD_SHA:deno.json" 2>/dev/null || true
+            echo "__CFG_EOF__"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Decide run/skip
+        id: decide
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          CHANGED_NAME_STATUS: ${{ steps.diff.outputs.changed }}
+          PR_LABELS: ${{ toJSON(github.event.pull_request.labels.*.name) }}
+          ROOT_DENO_JSON_BASE: ${{ steps.rootcfg.outputs.base }}
+          ROOT_DENO_JSON_HEAD: ${{ steps.rootcfg.outputs.head }}
+        run: deno run --allow-read --allow-write --allow-env .github/scripts/ci-classify-changes.ts
+
   check-test:
+    needs: classify
+    # Required check: always starts and reports (see the skip-policy header).
+    # FAIL-CLOSED: a failed classify forces RUN=true.
+    if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
+      RUN: ${{ needs.classify.result != 'success' || needs.classify.outputs.needs_deno == 'true' }}
+      SKIP_REASON: ${{ needs.classify.outputs.reason }}
       NETSCRIPT_TEST_REDIS_URL: redis://127.0.0.1:6379
     services:
       redis:
@@ -99,78 +182,122 @@ jobs:
           --health-timeout 3s
           --health-retries 10
     steps:
+      - name: Skipped by policy
+        if: env.RUN != 'true'
+        # REASON contains raw changed-file names — never interpolate it into
+        # shell source; pass via env and print with printf.
+        run: |
+          printf '::notice::check-test skipped by policy. %s\n' "$SKIP_REASON"
+
       - name: Checkout
-        uses: actions/checkout@v4
+        if: env.RUN == 'true'
+        uses: actions/checkout@v5
 
       - name: Setup Deno
+        if: env.RUN == 'true'
         uses: denoland/setup-deno@v2
         with:
           deno-version: '2.9.0'
 
       - name: Install workspace dependencies
+        if: env.RUN == 'true'
         run: deno install
 
       - name: Repo-wide check
+        if: env.RUN == 'true'
         run: deno task check
 
       - name: Required real-Redis regression tests
+        if: env.RUN == 'true'
         run: deno task test:redis-regression
 
       - name: Prove the pre-#1075 adapter turns the gate red
+        if: env.RUN == 'true'
         run: deno task test:redis-regression:negative-control
 
       - name: Repo-wide test
+        if: env.RUN == 'true'
         run: deno task test
 
       - name: Agentic OpenRouter preset canary
+        if: env.RUN == 'true'
         run: deno task agentic:provider-canary
 
   quality:
+    needs: classify
+    # Required check: always starts and reports. Runs for toolchain-relevant
+    # diffs AND docs diffs (fmt/docs-accuracy/taglines validate Markdown), so
+    # the gate is `needs_deno || needs_docs`. FAIL-CLOSED on classify failure.
+    if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    env:
+      RUN: ${{ needs.classify.result != 'success' || needs.classify.outputs.needs_deno == 'true' || needs.classify.outputs.needs_docs == 'true' }}
+      SKIP_REASON: ${{ needs.classify.outputs.reason }}
     steps:
+      - name: Skipped by policy
+        if: env.RUN != 'true'
+        # REASON contains raw changed-file names — never interpolate it into
+        # shell source; pass via env and print with printf.
+        run: |
+          printf '::notice::quality skipped by policy. %s\n' "$SKIP_REASON"
+
       - name: Checkout
-        uses: actions/checkout@v4
+        if: env.RUN == 'true'
+        uses: actions/checkout@v5
 
       - name: Setup Deno
+        if: env.RUN == 'true'
         uses: denoland/setup-deno@v2
         with:
           deno-version: '2.9.0'
 
       - name: Install workspace dependencies
+        if: env.RUN == 'true'
         run: deno install
 
       - name: Lint
+        if: env.RUN == 'true'
         run: deno task lint
 
       - name: Format check
+        if: env.RUN == 'true'
         run: deno task fmt:check
 
       - name: JSR tagline length
+        if: env.RUN == 'true'
         run: deno task docs:tagline:check
 
       - name: Docs accuracy check
+        if: env.RUN == 'true'
         run: deno task docs:accuracy
 
       - name: Generated asset freshness
+        if: env.RUN == 'true'
         run: deno task check:assets-barrel
 
       - name: Publish asset freshness
+        if: env.RUN == 'true'
         run: deno task check:publish-assets
 
       - name: Emitted sample type-check
+        if: env.RUN == 'true'
         run: deno task check:emitted-samples
 
       - name: NetScript JSR emitted-specifier guard
+        if: env.RUN == 'true'
         run: deno task check:netscript-jsr-specifiers
 
       - name: Scaffold version guard (no preview pins)
+        if: env.RUN == 'true'
         run: deno task check:scaffold-versions
 
       - name: Publish dry-run (0 slow-types across all units)
+        if: env.RUN == 'true'
         run: deno task publish:dry-run
 
       - name: Critical advisory audit
+        if: env.RUN == 'true'
         run: deno task audit:critical
 
   deps-report:
@@ -178,7 +305,7 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Deno
         uses: denoland/setup-deno@v2
@@ -194,7 +321,7 @@ jobs:
 
   lane-visibility:
     name: core CI lane visibility
-    needs: [close-gate, check-test, quality, deps-report]
+    needs: [close-gate, classify, check-test, quality, deps-report]
     if: ${{ always() && github.event_name == 'pull_request' }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -202,19 +329,43 @@ jobs:
       - name: Summarize core lane outcomes
         env:
           CLOSE_GATE_RESULT: ${{ needs.close-gate.result }}
+          CLASSIFY_RESULT: ${{ needs.classify.result }}
+          NEEDS_DENO: ${{ needs.classify.outputs.needs_deno }}
+          NEEDS_DOCS: ${{ needs.classify.outputs.needs_docs }}
           CHECK_TEST_RESULT: ${{ needs.check-test.result }}
           QUALITY_RESULT: ${{ needs.quality.result }}
           DEPS_REPORT_RESULT: ${{ needs.deps-report.result }}
         run: |
+          describe_core_lane() {
+            selected="$1"
+            result="$2"
+            if [ "$CLASSIFY_RESULT" = "success" ] && [ "$selected" != "true" ]; then
+              printf 'skipped by policy'
+            elif [ "$result" = "skipped" ]; then
+              printf 'not scheduled'
+            else
+              printf 'ran (%s)' "$result"
+            fi
+          }
+
+          if [ "$NEEDS_DENO" = "true" ] || [ "$NEEDS_DOCS" = "true" ]; then
+            quality_selected="true"
+          else
+            quality_selected="false"
+          fi
+          check_test_outcome="$(describe_core_lane "$NEEDS_DENO" "$CHECK_TEST_RESULT")"
+          quality_outcome="$(describe_core_lane "$quality_selected" "$QUALITY_RESULT")"
+
           {
             echo "## Core CI lane visibility"
             echo
-            echo "These lanes were scheduled for this pull request; each outcome is the terminal job result."
+            echo "A successful required job can be a policy skip; this table uses classifier outputs to distinguish it from real execution."
             echo
             echo "| Lane | Outcome |"
             echo "| --- | --- |"
             printf '| `close-gate` | ran (%s) |\n' "$CLOSE_GATE_RESULT"
-            printf '| `check-test` | ran (%s) |\n' "$CHECK_TEST_RESULT"
-            printf '| `quality` | ran (%s) |\n' "$QUALITY_RESULT"
+            printf '| `classify` | ran (%s) |\n' "$CLASSIFY_RESULT"
+            printf '| `check-test` | %s |\n' "$check_test_outcome"
+            printf '| `quality` | %s |\n' "$quality_outcome"
             printf '| `deps-report` | ran (%s) |\n' "$DEPS_REPORT_RESULT"
           } >> "$GITHUB_STEP_SUMMARY"
