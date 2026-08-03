@@ -75,7 +75,7 @@ NetScript's ecosystem expands smoothly through customizable plugins. Let's docum
 * **Key APIs:**
   * `defineSaga(id)`: DSL defining durability tiers (`t1`/`t2`/`t3`), state schemas, message correlation rules, and signal patterns.
   * `on(eventType, handler)` & `compensate(eventType, handler)`: Implements saga-based checkpoint steps. If a transaction falls over midway, the runtime walks backwards executing compensatory procedures.
-  * Pure Ledger Actions: Handlers emit pure cascaded instructions (`send`, `schedule`, `compensate`) to keep transitions easily testable and isolated from network side-effects. The exported `spawn` effect is reserved but runtime dispatch is unsupported.
+  * Pure Ledger Actions: Handlers emit pure cascaded instructions (`send`, `schedule`, `compensate`) to keep transitions easily testable and isolated from network side-effects. The exported `spawn()` call is reserved and throws `SAGA_NOT_IMPLEMENTED` immediately.
 
 ### 3. Event Triggers (`@netscript/plugin-triggers-core` / `plugins/triggers`)
 * **What it offers:** Highly resilient event-driven ingress hooks that capture webhooks, message queues, and crons.

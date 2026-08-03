@@ -1,4 +1,4 @@
-import { assertEquals, assertRejects } from '@std/assert';
+import { assertEquals, assertRejects, assertThrows } from '@std/assert';
 
 import { defineSaga, send, spawn } from '../../mod.ts';
 import type { CascadedMessage, SagaState } from '../../src/domain/mod.ts';
@@ -98,10 +98,23 @@ Deno.test('checkout tutorial sends and delivers only internal saga messages', as
   }
 });
 
-Deno.test('dispatching spawn rejects with the documented unsupported error', async () => {
+Deno.test('constructing spawn rejects before an unsupported effect enters the ledger', () => {
+  const error = assertThrows(
+    () => spawn('ChildSaga', {}),
+    SagasError,
+    'Spawn cascades are unsupported.',
+  );
+
+  assertEquals(error.code, 'SAGA_NOT_IMPLEMENTED');
+});
+
+Deno.test('dispatching a deserialized spawn effect retains the defensive rejection', async () => {
   const runtime = createSagaRuntime();
+  const messages: CascadedMessage[] = JSON.parse(
+    '[{"kind":"spawn","sagaId":"ChildSaga","input":{}}]',
+  );
   const error = await assertRejects(
-    () => runtime.dispatchCascaded([spawn('ChildSaga', {})]),
+    () => runtime.dispatchCascaded(messages),
     SagasError,
     'Spawn cascades are unsupported.',
   );

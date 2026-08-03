@@ -12,6 +12,12 @@ function requireText(text: string, needle: string, location: string): void {
   }
 }
 
+function forbidText(text: string, needle: string, location: string): void {
+  if (text.includes(needle)) {
+    throw new Error(`${location}: contains forbidden stale claim ${JSON.stringify(needle)}`);
+  }
+}
+
 const sagaPagePaths = [
   'docs/site/durable-workflows/sagas.md',
   'docs/site/tutorials/storefront/04-checkout-saga.md',
@@ -20,6 +26,8 @@ const sagaPagePaths = [
 ];
 const publicDocs = await Promise.all(sagaPagePaths.map(read));
 const sagaSource = await read('packages/plugin-sagas-core/src/builders/define-saga.ts');
+const sagaMessages = await read('packages/plugin-sagas-core/src/public/messages.ts');
+const sagaReference = await read('docs/site/reference/sagas/index.md');
 
 // Assert the public contract (an exported `defineSaga` whose first parameter is a bare id),
 // not an exact source spelling, so contract-preserving refactors do not trip the docs guard.
@@ -36,6 +44,29 @@ for (const [index, page] of publicDocs.entries()) {
     );
   }
 }
+
+const storefront = publicDocs[1];
+const durableSagas = publicDocs[0];
+for (
+  const orphanSend of [
+    "send('CheckoutPaymentRequested'",
+    "send('reserve-inventory'",
+    "send('create-shipment'",
+    "send('OrderCancelled'",
+  ]
+) {
+  forbidText(storefront, orphanSend, sagaPagePaths[1]);
+}
+requireText(storefront, 'event.payload.body', sagaPagePaths[1]);
+forbidText(durableSagas, "{ kind: 'service', id: 'payments' }", sagaPagePaths[0]);
+requireText(durableSagas, 'type: "=> never"', sagaPagePaths[0]);
+requireText(sagaReference, 'options?: SpawnOptions): never', 'saga reference');
+
+const spawnSource = sagaMessages.slice(sagaMessages.indexOf('export function spawn('));
+if (!/^export function spawn\([\s\S]*?\): never \{/.test(spawnSource)) {
+  throw new Error('saga messages source: public `spawn()` must return `never`');
+}
+requireText(spawnSource, "SagasError.notImplemented('Spawn cascades are unsupported.')", 'spawn');
 
 const howToIndex = await read('docs/site/how-to/index.md');
 for (
@@ -100,5 +131,5 @@ for (const command of requiredMutationFamilies) {
 }
 
 console.log(
-  `docs accuracy: PASS (${publicDocs.length} saga pages, 8 preferred paths, ${requiredMutationFamilies.length} CLI mutation families)`,
+  `docs accuracy: PASS (${publicDocs.length} saga pages, storefront worker boundary, spawn contract, 8 preferred paths, ${requiredMutationFamilies.length} CLI mutation families)`,
 );
