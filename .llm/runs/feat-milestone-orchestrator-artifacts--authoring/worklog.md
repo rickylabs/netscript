@@ -124,3 +124,10 @@ both residues of the cycle-2 fixes, fixed in this slice:
   (create it at default-branch HEAD — the wrong commit).
 - **M8** — the PR body's "every gate" acceptance row now cites the `gate-demos.md`
   demonstrations and #1160's fixed status instead of the pre-demo wording.
+
+## Eval cycle 4 — VERDICT: PASS (zero findings)
+
+`sol-eval-4.md`: C10 and M8 resolved and verified against `canary.ts`/`canary-label.ts`; the
+`eb833401d` diff introduces no new defect. Merge proceeds under the owner's standing
+merge-on-green directive: ready → `status:ready-merge` → evidence mirror + close-gate →
+squash-merge → terminal labels → eval-worktree teardown.
