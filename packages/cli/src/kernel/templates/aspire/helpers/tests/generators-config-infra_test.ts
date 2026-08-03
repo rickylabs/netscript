@@ -151,7 +151,7 @@ describe('generateRegisterInfrastructure', () => {
     );
     assertStringIncludes(
       output,
-      "import { type CacheWiring, ensureGarnetToolManifest, generateAccessToken, resolveDataPath, shouldUseContainerCache } from './_aspire-compat.mts'",
+      "import { type CacheWiring, ensureDatabasePassword, ensureGarnetToolManifest, generateAccessToken, resolveDataPath, shouldUseContainerCache } from './_aspire-compat.mts'",
     );
   });
 
@@ -160,7 +160,8 @@ describe('generateRegisterInfrastructure', () => {
       databases: { main: fixtures.MINIMAL_DATABASE },
       caches: {},
     });
-    assertStringIncludes(output, "builder.addPostgres('main')");
+    assertStringIncludes(output, "builder.addPostgres('main', {");
+    assertStringIncludes(output, "ensureDatabasePassword(appHostDir, 'main')");
     assertStringIncludes(output, "databases.set('main',");
     assertStringIncludes(output, '(Postgres, Container)');
   });
