@@ -1,0 +1,23 @@
+{
+  "openapi": "3.1.1",
+  "paths": {
+    "/health": {
+      "get": {
+        "operationId": "v1.health.list"
+      }
+    },
+    "/health/archive": {
+      "get": {
+        "operationId": "v1.health.list"
+      }
+    },
+    "/health/status": {
+      "post": {
+        "operationId": "v1.health.updateStatus"
+      }
+    },
+    "/anonymous": {
+      "delete": {}
+    }
+  }
+}
