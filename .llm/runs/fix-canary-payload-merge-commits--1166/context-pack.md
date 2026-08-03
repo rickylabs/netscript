@@ -12,9 +12,9 @@
 
 ## Current State
 
-The branch contains only harness commits over `origin/main`; no implementation file has changed.
-Research and Design are locked. The milestone orchestrator approved the plan and issued a written
-waiver of the per-PR local PLAN-EVAL hard stop under `milestone-run.md`'s composed evaluator protocol.
+Implementation and all locked local gates are complete in the transient native-WSL slice worktree.
+The reviewed working tree is intentionally uncommitted for the supervisor's opposite-family review
+and sign-off commit. The milestone orchestrator's per-PR PLAN-EVAL waiver remains in force.
 
 ## Completed
 
@@ -24,16 +24,15 @@ waiver of the per-PR local PLAN-EVAL hard stop under `milestone-run.md`'s compos
 
 ## In Progress
 
-- Draft PR #1180 is open with the required partial reference, milestone, and taxonomy.
-- PLAN-EVAL is recorded as composed/waived for this delegated milestone PR; the earlier local route
-  failure remains visible as a did-not-run, not a verdict.
+- Draft PR #1180 remains supervisor-owned with the required partial reference, milestone, and taxonomy.
+- Opposite-family substantive review and supervisor sign-off commit are pending; this implementation
+  lane did not self-certify, commit, push, or mutate PR metadata.
 
 ## Next Steps
 
-1. Delegate slice 1, capture RED→GREEN, and run the focused/adjacent/scoped gates.
-2. Perform the required opposite-family code review, fix findings, and make the supervisor sign-off
-   commit.
-3. Push/comment and hand the PR to the milestone run's composed evaluator/pre-merge gate.
+1. Perform the required opposite-family code review and address any findings.
+2. Make the supervisor sign-off commit, push/comment, and hand the PR to the milestone run's
+   composed evaluator/pre-merge gate.
 
 ## Key Decisions
 
@@ -47,16 +46,20 @@ waiver of the per-PR local PLAN-EVAL hard stop under `milestone-run.md`'s compos
 
 | Path | Status | Notes |
 | --- | --- | --- |
-| `.llm/runs/fix-canary-payload-merge-commits--1166/*` | new | Harness bootstrap only. |
+| `.llm/runs/fix-canary-payload-merge-commits--1166/*` | existing | Harness bootstrap and slice evidence. |
+| `.llm/tools/release/canary-label.ts` | modified | Merge-aware range traversal, explicit derivation evidence, fail-closed suspicious empty. |
+| `.llm/tools/release/canary-label_test.ts` | modified | Real-git RED→GREEN fixture plus empty/failure regressions. |
+| `.llm/runs/fix-canary-payload-merge-commits--1166/worklog.md` | modified | RED/GREEN and gate evidence. |
+| `.llm/runs/fix-canary-payload-merge-commits--1166/context-pack.md` | modified | Supervisor review handoff state. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | authorized | PLAN-EVAL composed per `milestone-run.md`; written orchestrator waiver recorded. |
-| Fitness | pending | Synthetic fixture and regression suite planned. |
+| Static | PASS | Focused 15/15; adjacent 87/87; scoped check/lint/fmt clean. |
+| Fitness | PASS | Real DAG proves baseline omission and merge-aware inclusion; empty/failure split covered. |
 | Runtime | N/A | No release cut or runtime behavior. |
-| Consumer | pending | Existing GitHub surface regression tests. |
+| Consumer | PASS | Existing GitHub association, note, unpublished refusal, and drift regressions green. |
 
 ## Open Questions
 

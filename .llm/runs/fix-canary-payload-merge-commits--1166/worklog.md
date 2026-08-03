@@ -67,6 +67,13 @@ changes for future traversal corrections.
 | 2026-08-03 | 0 | PLAN-EVAL launch blocked | Canonical local Qwen route returned `auth_required`: `OPENROUTER_API_KEY` is absent, so no evaluator process, tools, reasoning, or verdict ran. Cloud OpenHands was not dispatched because `openhands-handoff` prohibits substituting a cloud evaluator for a local-machine run. |
 | 2026-08-03 | 0 | orchestrator steer | `release-0.0.5--orchestration` approved the locked plan and waived the per-PR local PLAN-EVAL under `milestone-run.md`'s composed evaluator protocol. Implementation authorized; pre-merge composed evaluation remains orchestrator-owned. |
 | 2026-08-03 | 1 | launch isolation | Sender guard found the supervisor's active thread in the PR worktree and refused a rival launch. S1 moved to dedicated native worktree `/home/codex/repos/ns005-canary-payload-s1` on transient branch `fix/canary-payload-merge-commits-s1`; final supervisor commit will push explicitly to the PR branch. |
+| 2026-08-03 | 1 | RED | Added a real `Deno.makeTempDir` git DAG with local identity, explicit `main`/`release`/PR branches, a main PR merge, and a release update merge. `deno test --allow-all .llm/tools/release/canary-label_test.ts` exited 1: the fixture proved baseline `git rev-list --first-parent --reverse previous..head` omitted the PR merge SHA, then payload assertion failed with actual `[]` versus expected `[1166]` (12 passed, 1 failed). |
+| 2026-08-03 | 1 | implementation | Replaced `firstParentCommits` with `rangeCommits` using `git rev-list --topo-order --reverse previous..head`; added `commitCount` plus `populated`/`genuine-empty`; made a non-empty/no-PR result throw before label, note, or drift mutation. |
+| 2026-08-03 | 1 | GREEN | Focused test exited 0 with 15 passed; adjacent release suite exited 0 with 87 passed. Genuine empty, suspicious empty, unpublished refusal, note behavior, and drift semantics are covered. |
+| 2026-08-03 | 1 | scoped gates | Check and lint passed. Initial format check found two owned-file formatting differences; scoped `deno fmt` touched only `canary-label.ts` and its test, then focused/adjacent/check/lint/fmt all reran green. |
+| 2026-08-03 | 1 | reconcile | Diff stayed within the two locked release-tool files plus run evidence; no issue/PR metadata was mutated, `Refs #1166` remains supervisor-owned, and no plan/drift rescope was required. |
+| 2026-08-03 | 1 | opposite-family review | Separate Claude Opus 4.8 high-effort review returned PASS after independently rebuilding the DAG and reproducing focused, adjacent, check, lint, format, lock, and forbidden-construct gates. No blocking findings. |
+| 2026-08-03 | 1 | supervisor sign-off | Accepted S1 for commit and explicit-refspec push. Two informational residuals remain documented in `review-s1.md`: cadence wording lags the merge-aware mechanism, and the concrete one-line git adapter is verified by inspection/manual reproduction rather than invoked directly by the injected-port test. |
 
 ## Decisions
 
@@ -89,16 +96,22 @@ changes for future traversal corrections.
 | Gate | Command or check | Result | Notes |
 | --- | --- | --- | --- |
 | PLAN-EVAL | milestone-run composed evaluator protocol + written orchestrator waiver | COMPOSED / WAIVED | Per `milestone-run.md`: per-PR local formal evaluator is not spawned; draft→ready augment review, label-triggered OpenHands, and orchestrator pre-merge gate preserve separation. Locked plan approved as written. |
-| Focused tests | `deno test --allow-all .llm/tools/release/canary-label_test.ts` | NOT_RUN | RED→GREEN evidence pending. |
-| Scoped check/lint/fmt | repo wrappers over `.llm/tools/release` | NOT_RUN | Pending implementation. |
+| Focused tests | `deno test --allow-all .llm/tools/release/canary-label_test.ts` | PASS | RED exit 1 (12 pass/1 fail), then GREEN 15/15. |
+| Adjacent tests | `deno test --allow-all .llm/tools/release/*_test.ts` | PASS | 87/87. |
+| Scoped check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root .llm/tools/release --ext ts` | PASS | 34 files, 0 diagnostics. |
+| Scoped lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root .llm/tools/release --ext ts` | PASS | 34 files, 0 findings. |
+| Scoped format | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root .llm/tools/release --ext ts` | PASS | Final rerun: 34 files, 0 findings. |
+| Forbidden constructs | added-line diff scan for `deno-lint-ignore`, `as unknown as`, `@ts-ignore` | PASS | No matches outside or inside run artifacts. |
+| Lock hygiene | `git diff origin/main -- deno.lock` | PASS | Empty. |
+| Opposite-family review | Claude Opus 4.8, high effort, separate session | PASS | Independent DAG reproduction and all named gates green; see `review-s1.md`. |
 
 ### Fitness Gates
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| Merge-aware payload | NOT_RUN | synthetic fixture pending | Must show old traversal omission. |
-| Empty/failure distinction | NOT_RUN | focused tests pending | Genuine and suspicious cases required. |
-| Regression contract | NOT_RUN | adjacent tests pending | No behavior removal allowed. |
+| Merge-aware payload | PASS | real synthetic git DAG | Baseline first-parent omitted buried PR SHA; merge-aware derivation included mapped PR #1166. |
+| Empty/failure distinction | PASS | focused tests | Zero commits returns `genuine-empty`; one unassociated commit rejects before downstream mutation. |
+| Regression contract | PASS | focused + 87-test adjacent suite | Unpublished refusal, note/idempotence client path, association filtering, and drift behavior retained. |
 
 ### Runtime Gates
 
@@ -110,11 +123,13 @@ changes for future traversal corrections.
 
 | Consumer | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| GitHub label/note/drift surface | NOT_RUN | regression tests pending | Derivation-only change. |
+| GitHub label/note/drift surface | PASS | focused + adjacent regression tests | Derivation-only change; no publish mechanics changed. |
 
 ## Handoff Notes
 
-- PLAN-EVAL should challenge L1 (range semantics), L4 (suspicious-empty policy), and whether the
-  synthetic fixture proves old RED rather than merely asserting the new implementation.
+- Slice passed the required opposite-family substantive review and supervisor sign-off and is ready
+  for the supervisor-owned commit, explicit-refspec push, and draft PR evidence update.
 - The failed provider canary remains a did-not-run record, not a verdict. The milestone orchestrator's
   written steer separately waives the per-PR hard stop and binds this slice to composed evaluation.
+- Live canary.1 evidence and #1149 re-verification remain acceptance boxes 2–4 and are deliberately
+  deferred to the orchestrator after merge; the PR must retain `Refs #1166`, never `Closes #1166`.
