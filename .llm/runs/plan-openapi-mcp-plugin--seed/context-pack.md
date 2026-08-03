@@ -38,7 +38,7 @@ placeholders OMB-1..14 not filed.
 ## Next Steps
 
 1. Owner ratification of forks F1–F5 (rfc.md §9).
-2. RFC PR carrying rfc.md (labels per F5) — **not opened by this session**.
+2. ~~RFC PR~~ — **done**: draft PR #1123 (owner-directed, labels + Backlog / Triage applied).
 3. Board filing (OMB-1..14 placeholders), then implementation per rfc.md §4 — Wave-0 proof
    artifacts (`proofs/P<n>-verdict.md`) before any contract freezes.
 

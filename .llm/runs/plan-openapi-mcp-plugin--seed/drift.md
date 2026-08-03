@@ -31,3 +31,17 @@ documentation.
 - **Severity:** minor
 - **Action:** accept (owner-directed); supervisor.md routes table remains accurate on identities
 - **Evidence:** launch record + thread id in `codex-thread-ids.md` (written by the launcher)
+
+## 2026-08-03 — RFC PR opened by owner direction (stop-line lifted)
+
+- **What:** Draft PR #1123 opened carrying rfc.md as body, labels per fork F5, milestone
+  Backlog / Triage; phase comment posted on #1117.
+- **Source:** owner message ("open the draft PR following the style of the recently closed
+  rfc"); style reference #890/#891, both merged 2026-08-03.
+- **Expected:** generator brief forbade opening the PR.
+- **Actual:** Owner lifted the stop-line post-integration; F5's label/milestone recommendation
+  applied as ratified-by-use.
+- **Severity:** minor
+- **Action:** accept (owner-directed)
+- **Evidence:** https://github.com/rickylabs/netscript/pull/1123 ·
+  #1117 phase comment 2026-08-03
