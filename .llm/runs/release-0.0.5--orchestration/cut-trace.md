@@ -25,6 +25,7 @@ dispatch, in exactly epic #1169's S1→S2→S4 order.
 
 | Canary | Declared at | Published version | Payload (from merge history) | Label+note verdict |
 | --- | --- | --- | --- | --- |
+| 1 | wave-1 boundary, 2026-08-03T22:30Z | `0.0.5-canary.1` (run 30858888833; pair `success` @22:42:10Z on `2c8865e8c`) | 10 PRs: #1176 #1177 #1178 #1181 #1180 #1185 #1186 #1183 #1179 #1182 (merge-aware derivation, outcome `populated`) | labels on 10 PRs + 9 issues by workflow; #1105/#1128 gaps hand-remediated on evidence (findings 19–20); note = D3-derived prerelease `v0.0.5-canary.1` |
 
 ## Re-planning events
 
