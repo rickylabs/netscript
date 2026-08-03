@@ -4,6 +4,8 @@ NetScript PR conventions (see .agents/skills/netscript-pr and CONTRIBUTING.md):
 - Apply exactly one status: label and the relevant type:/area: labels.
 - Keep Validation honest: paste real results / exit codes. A checked box with no evidence
   is how false-green merges happen.
+- Every unchecked box under Definition of Done or Acceptance blocks close-gate. Slices and other
+  checklists are progress aids and are not authoritative merge claims.
 -->
 
 ## Summary
@@ -16,6 +18,8 @@ NetScript PR conventions (see .agents/skills/netscript-pr and CONTRIBUTING.md):
 - Part of #<!-- umbrella --> · Sub-PRs: #<!-- n --> <!-- omit the side that doesn't apply -->
 
 ## Slices
+
+<!-- Progress tracking only. The authoritative merge checklist is Definition of Done below. -->
 
 - [ ] S1 <slice> — <commit>
 - [ ] S2 <slice>
@@ -37,7 +41,9 @@ NetScript PR conventions (see .agents/skills/netscript-pr and CONTRIBUTING.md):
 
 - <DEBT_ACCEPTED rows or "none">
 
-## Checklist
+## Definition of Done
+
+<!-- Every box in this section must be truthfully checked before status:ready-merge. -->
 
 - [ ] Branch name and labels follow the taxonomy (exactly one `status:` label).
 - [ ] Every referenced issue's acceptance + `gate:` boxes are checked with linked evidence (required before `status:ready-merge`).

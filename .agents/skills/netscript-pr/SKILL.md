@@ -70,10 +70,19 @@ Always structure the body like this so reviewers and automation find the same an
 ## Drift / Debt
 
 - <DEBT_ACCEPTED rows or "none">
+
+## Definition of Done
+
+- [ ] <truthful, evidence-backed completion claim>
 ```
 
 Keep `Validation` honest: paste real results/exit codes; if a gate was skipped, say so. A green
 checkbox with no evidence is how false-green merges happen.
+
+`## Definition of Done` and `## Acceptance` are the authoritative PR-body checklist sections. Any
+unchecked box beneath either heading fails close-gate. `## Slices` is progress tracking, and other
+planning, rollout, or explanatory checklists are non-authoritative; do not put a durable completion
+claim outside Definition of Done/Acceptance merely to avoid enforcement.
 
 ## Linking issues (auto-close on merge) — MANDATORY
 
@@ -157,8 +166,9 @@ Enforcement lives at three points:
    checked and has linked evidence.
 2. **CI close-gate** — `.github/workflows/ci.yml` runs the opt-in evidence mirror for
    `status:ready-merge`, then `.llm/tools/validation/check-close-gate.ts` on pull requests. The
-   checker independently fetches each issue closed by the PR body and fails if any close-gated issue
-   checkbox remains unchecked; mirroring is not a bypass.
+   checker fails on unchecked PR-body Definition-of-Done/Acceptance boxes and independently fetches
+   each issue closed by the PR body, failing if any close-gated issue checkbox remains unchecked;
+   mirroring is not a bypass.
 3. **PR-template/evaluator checklist** — the PR close-gate checkbox and IMPL-EVAL pass both confirm
    the same evidence before `status:ready-merge`.
 
