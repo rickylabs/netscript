@@ -9,6 +9,7 @@ import {
   EMBEDDED_AGENT_TOOL_PATHS,
 } from "../../../../kernel/assets/agent-tools.generated.ts";
 import { netscriptJsrSpecifier } from "../../../../kernel/constants/jsr-specifiers.ts";
+import type { AgentDocsGenerator } from "./agent-docs-generator.ts";
 import type { AgentInitFileSystem } from "./agent-init-file-system.ts";
 import type { AspireAgentInitializer } from "./aspire-agent-initializer.ts";
 import {
@@ -19,8 +20,12 @@ import {
 
 const START_MARKER = "<!-- netscript-agent:start -->";
 const END_MARKER = "<!-- netscript-agent:end -->";
-const AGENTS_SECTION =
-  `${START_MARKER}\n## NetScript agent tooling\n\nInstalled skills: \`netscript\`, \`netscript-build\`, \`netscript-operate\`, \`aspire\`, and \`deno\`. Search \`.claude/skills/help.md\` through MCP \`search_docs\` when something hangs, vanishes, stays silent, is Healthy but does not respond, or leaves a dangling AppHost.\n\nUse MCP \`doctor\` for NetScript, Aspire, project-wiring, and plugin prerequisites. Use \`get_app_status\` and \`get_recent_errors\` for live telemetry symptoms; use the \`analyze_*\` tools and \`aspire otel logs|spans|traces\` for performance and database evidence. Route Deno runtime, type, permission, and module-resolution symptoms to the \`deno\` skill. The symptom-indexed project tools are listed in \`.llm/tools/README.md\`; for type evidence use \`.llm/tools/run-deno-check.ts\`, which fails when configuration excludes every requested file.\n\nBefore hand-rolled \`curl\` probes or print debugging, run \`netscript plugin doctor\`, \`aspire logs\`, \`aspire otel logs|spans|traces\`, and \`deno info\`. Drift is gated, not suggested: \`netscript agent drift record\` and MCP \`record_drift\` refuse unless the same resource has a successful \`netscript plugin doctor --resource <name>\` or MCP diagnostic receipt from the last 15 minutes. Receipts live under \`.netscript/agent/diagnostics/\`; accepted entries append to \`.netscript/agent/drift.jsonl\`.\n${END_MARKER}`;
+function agentsSection(withDocs: boolean): string {
+  const docs = withDocs
+    ? " Offline framework and exact-version API docs are installed; start at `.netscript/docs/llms.txt`."
+    : " Need offline framework or API guidance? Run `netscript agent init --with-docs`.";
+  return `${START_MARKER}\n## NetScript agent tooling\n\nInstalled skills: \`netscript\`, \`netscript-build\`, \`netscript-operate\`, \`aspire\`, and \`deno\`. Search \`.claude/skills/help.md\` through MCP \`search_docs\` when something hangs, vanishes, stays silent, is Healthy but does not respond, or leaves a dangling AppHost.\n\nUse MCP \`doctor\` for NetScript, Aspire, project-wiring, and plugin prerequisites. Use \`get_app_status\` and \`get_recent_errors\` for live telemetry symptoms; use the \`analyze_*\` tools and \`aspire otel logs|spans|traces\` for performance and database evidence. Route Deno runtime, type, permission, and module-resolution symptoms to the \`deno\` skill. The symptom-indexed project tools are listed in \`.llm/tools/README.md\`; for type evidence use \`.llm/tools/run-deno-check.ts\`, which fails when configuration excludes every requested file.${docs}\n\nBefore hand-rolled \`curl\` probes or print debugging, run \`netscript plugin doctor\`, \`aspire logs\`, \`aspire otel logs|spans|traces\`, and \`deno info\`. Drift is gated, not suggested: \`netscript agent drift record\` and MCP \`record_drift\` refuse unless the same resource has a successful \`netscript plugin doctor --resource <name>\` or MCP diagnostic receipt from the last 15 minutes. Receipts live under \`.netscript/agent/diagnostics/\`; accepted entries append to \`.netscript/agent/drift.jsonl\`.\n${END_MARKER}`;
+}
 const ASPIRE_INIT_TIMEOUT_MS = 60_000;
 const PLAYWRIGHT_SKILL_PATH = ".claude/skills/playwright-cli/SKILL.md";
 
@@ -42,6 +47,7 @@ export interface InitAgentDependencies {
   readonly aspireTimeoutMs?: number;
   readonly bundle?: AgentSkillBundle;
   readonly toolBundle?: AgentToolBundle;
+  readonly docsGenerator?: AgentDocsGenerator;
 }
 
 /** Install MCP host configuration and agent skills without rewriting unchanged files. */
@@ -63,6 +69,12 @@ export async function initAgent(
     hash: EMBEDDED_AGENT_TOOL_BUNDLE_HASH,
   };
   await verifyBundle(toolBundle, toolBundle.paths, "Agent tool");
+  const docs = input.withDocs
+    ? await dependencies.docsGenerator?.generate(input.projectRoot)
+    : undefined;
+  if (input.withDocs && !docs) {
+    throw new Error("Offline documentation generation is not configured");
+  }
   const hosts = await resolveHosts(input, dependencies.fs);
   const changedFiles: string[] = [];
   const messages: string[] = [];
@@ -71,6 +83,17 @@ export async function initAgent(
       dependencies.fs,
       join(input.projectRoot, ".llm", "tools", path),
       toolBundle.files[path] ?? "",
+      changedFiles,
+    );
+  }
+  for (const [path, content] of Object.entries(docs?.files ?? {})) {
+    if (path.startsWith("/") || path.split("/").includes("..")) {
+      throw new Error(`Offline documentation bundle contains unsafe path: ${path}`);
+    }
+    await writeChanged(
+      dependencies.fs,
+      join(input.projectRoot, ".netscript", "docs", path),
+      content,
       changedFiles,
     );
   }
@@ -96,7 +119,7 @@ export async function initAgent(
     await writeChanged(
       dependencies.fs,
       agentsPath,
-      upsertMarkedSection(current),
+      upsertMarkedSection(current, input.withDocs === true),
       changedFiles,
     );
   }
@@ -132,6 +155,11 @@ export async function initAgent(
         : String(error);
       messages.push(aspireSkipped(reason));
     }
+  }
+  if (docs) {
+    messages.push(
+      `Installed offline NetScript ${docs.frameworkVersion} documentation at .netscript/docs (${docs.proseFileCount} prose files, ${docs.apiPackageCount} API packages / ${docs.apiExportCount} export subpaths).`,
+    );
   }
   return { hosts, changedFiles, messages };
 }
@@ -214,16 +242,17 @@ async function writeChanged(
   changed.push(path);
 }
 
-function upsertMarkedSection(content: string): string {
+function upsertMarkedSection(content: string, withDocs = false): string {
+  const section = agentsSection(withDocs);
   const start = content.indexOf(START_MARKER);
   const end = content.indexOf(END_MARKER);
   if (start >= 0 && end >= start) {
-    return `${content.slice(0, start)}${AGENTS_SECTION}${
+    return `${content.slice(0, start)}${section}${
       content.slice(end + END_MARKER.length)
     }`;
   }
   const prefix = content.trimEnd();
-  return `${prefix}${prefix ? "\n\n" : ""}${AGENTS_SECTION}\n`;
+  return `${prefix}${prefix ? "\n\n" : ""}${section}\n`;
 }
 
 async function verifyBundle(

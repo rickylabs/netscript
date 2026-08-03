@@ -148,6 +148,10 @@ compressed asset; never hand-edit the generated TypeScript or API text.
 | 2026-08-03T12:27:00+02:00 | plan-eval | PASS | Verified evaluator commit `c31084e02`: tracked `plan-eval.md` says `PASS`; five advisory checks were carried into implementation. |
 | 2026-08-03T12:38:00+02:00 | S1 | red/green implementation | Pre-fix focused test failed on missing `.llm/tools/consumer-tools.json`; implemented the manifest-driven eight-tool bundle, symptom routing, excluded-target detection, clone-independent E2E defaults, generated host-port subprocess gate, and structured missing-binary result. Focused suite now passes 26 tests. |
 | 2026-08-03T12:53:00+02:00 | S1 | opposite-family review | Native Claude Opus 4.8 first returned `CHANGES_REQUIRED`: move host-port validation after full plugin/registry generation and add the new barrel to `check:assets-barrel`; two low observations requested a real foreign-CWD dry-run and accurate `--source auto` provenance. All four were fixed, the focused suite passed 26/26, and the resumed independent review returned `SLICE_REVIEW: PASS`. |
+| 2026-08-03T13:12:00+02:00 | S2 | red/green implementation | Added `--with-docs`, a 1.18 MB gzip source / 1.6 MB JSR-safe generated asset with 166 router-bearing prose files, exact project evidence resolution (pin, lock range, workspace), every-export `deno doc`, provenance, fail-before-writes installation, symptom routing, and CLI/site references. Focused suite passes 35 tests. |
+| 2026-08-03T13:13:00+02:00 | S2 | real consumer fixture | Ran the local CLI from a temp consumer project with one exact `@netscript/config@0.0.3` dependency and the generated-project minimum-age exclusion. Exit 0 installed 168 docs files, the #1068 router, 4/4 config export sections, and matching version provenance; the temp project was removed. |
+| 2026-08-03T13:22:00+02:00 | S2 | opposite-family review | Separate Claude Opus 4.8 session `bcdbdd4b-edc6-42ec-82ea-11edf9b2404a` returned `SLICE_REVIEW: PASS` after checking optionality, exact-version resolution, every-export generation, fail-before-write behavior, symptom discovery, generated-asset freshness, and publication boundaries. Its two observations were non-blocking: VS Code hosts retain their pre-existing no-prose behavior, and the new source/generated assets must be included in the slice commit. |
+| 2026-08-03T13:30:00+02:00 | S2 | sign-off gates | Combined focused regression suite passed 37/37; scoped check/lint/fmt selected 31 TypeScript files with zero findings; links, accuracy, quality, architecture, CLI doc lint, publish dry-run, and byte-stable asset regeneration passed. The JSR simulation lists the 1.51 MB docs asset plus tool/skill assets. |
 
 ## Decisions
 
@@ -166,6 +170,7 @@ compressed asset; never hand-edit the generated TypeScript or API text.
 | Current owner-started Codex session identity is opaque and differs from the named orchestrator route. | minor | yes |
 | Local formal evaluator route lacks OpenRouter credentials; use separate OpenHands Qwen fallback. | moderate | yes |
 | Named Fable and policy-alias Claude review routes were unavailable; native `claude-opus-4-8` completed the required opposite-family review. | minor | yes |
+| `docs:maintenance` reaches unrelated stale Claude mirrors for `aspire` and `netscript-release`; this slice's `docs:links` and `docs:accuracy` sub-gates pass and the foreign mirrors were left untouched. | minor | yes |
 
 ## Gate Results
 
@@ -187,6 +192,17 @@ compressed asset; never hand-edit the generated TypeScript or API text.
 | S1 quality/doctrine | PASS | `quality:scan`; `arch:check` exit 0 | Existing warnings only; no new findings/debt. |
 | CLI doc lint | PASS | 3 entrypoints, 0 diagnostics | Published package bar remains clean. |
 | Generated asset freshness | PASS | regenerate + byte-compare | Skills and agent-tools barrels unchanged after regeneration; hashes recorded in command output. |
+| S2 focused tests | PASS | 35 passed, 0 failed | Includes router-required build, no-flag absence, path closure, lock/workspace/no-lock cases, mismatch, and launch-throw behavior. |
+| S2 docs site build | PASS | `NO_COLOR=1 deno task build` in `docs/site` | 589 files generated; an initial Vento failure caught unsafe Markdown formatting churn, which was reverted before the successful build. |
+| S2 real install | PASS | temp local-CLI consumer fixture | 168 docs files; router true; exact version true; 4/4 config export subpaths. |
+| S2 opposite-family review | PASS | Claude Opus 4.8 session `bcdbdd4b-edc6-42ec-82ea-11edf9b2404a` | No actionable defect; all eight requested challenge areas verified. |
+| S2 combined regression suite | PASS | 37 passed, 0 failed | Includes S1 tool regressions, optional docs, exact package evidence, every export, router/path closure, mismatch, and missing-binary launch throws. |
+| S2 scoped check/lint/fmt | PASS | 31 TypeScript files selected; zero failed batches/findings | Includes generated assets, CLI agent feature/adapters, and docs builder. |
+| Docs links/accuracy | PASS | 98 docs, 0 broken links/anchors; accuracy PASS | Umbrella maintenance then stopped on two unrelated stale Claude mirrors. |
+| S2 quality/doctrine | PASS | `quality:scan`; `arch:check` exit 0 | Existing warnings only; no new findings/debt. |
+| S2 CLI doc lint | PASS | 3 entrypoints, 0 diagnostics | Zero missing JSDoc or private-type references. |
+| S2 publish dry-run | PASS | `@netscript/cli@0.0.3`; generated docs 1.51 MB | Simulated JSR file list contains docs, tools, and skills assets. |
+| S2 generated asset freshness | PASS | regenerate + identical SHA-256 | Docs `71606ae0…`, tools `ea4529fb…`, skills `42880579…`. |
 
 ### Runtime Gates
 
@@ -200,7 +216,7 @@ compressed asset; never hand-edit the generated TypeScript or API text.
 | --- | --- | --- | --- |
 | current agent-init fixture | PASS | 9 focused tests | Establishes pre-change behavior only. |
 | tool bundle | PASS | 26 focused tests; independent review | Pre-fix missing-manifest red proof retained; installed paths, foreign-CWD dry-run, missing binary, and final-artifact host-port ordering covered. |
-| docs bundle | NOT_RUN | slice 2 pending | Must include pre-fix red proof. |
+| docs bundle | PASS | 35 focused tests; real temp-project install; independent review | Pre-fix no-flag behavior and missing-generator/path/router/version/binary failure cases are asserted; exact install produced 168 files and 4/4 exports. |
 
 ## Handoff Notes
 

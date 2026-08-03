@@ -12,6 +12,12 @@ Every command here was verified against **Aspire CLI 13.4.6**, **Deno 2.9.3** an
 > asking the runtime. `aspire otel` — the command that shows logs, spans and traces — was run **zero
 > times** across all five. Ask the tools first.
 
+## Framework or package guidance is unavailable offline
+
+Run `netscript agent init --with-docs`. It installs a version-checked offline corpus and reports the
+local task-router entrypoint. The API portion is generated from the exact NetScript packages in the
+project, including every published export subpath.
+
 ---
 
 ## `Healthy` is not proof

@@ -11,9 +11,26 @@ import { EMBEDDED_SKILL_FILES } from "../../../../kernel/assets/skills.generated
 import { DenoAgentInitFileSystem } from "./agent-init-file-system.ts";
 import type { AspireAgentInitializer } from "./aspire-agent-initializer.ts";
 import { initAgent } from "./init-agent.ts";
+import type { AgentDocsGenerator } from "./agent-docs-generator.ts";
 
 const SUCCESSFUL_ASPIRE_INITIALIZER: AspireAgentInitializer = {
   initialize: () => Promise.resolve({ ok: true }),
+};
+
+const FIXTURE_DOCS_GENERATOR: AgentDocsGenerator = {
+  generate: () =>
+    Promise.resolve({
+      frameworkVersion: NETSCRIPT_RELEASE_VERSION,
+      proseFileCount: 2,
+      apiPackageCount: 1,
+      apiExportCount: 2,
+      files: {
+        "llms.txt": "# NetScript\n\n## Task router\n",
+        "llms-full.txt": "complete docs\n",
+        "deno-doc/config.txt": "config API\n",
+        "MANIFEST.md": "Start at `.netscript/docs/llms.txt`.\n",
+      },
+    }),
 };
 
 Deno.test("agent init writes Claude config, skills, and marked AGENTS section idempotently", async () => {
@@ -484,6 +501,69 @@ Deno.test("installed consumer tools resolve from the project when process CWD di
   } finally {
     await Deno.remove(root, { recursive: true });
     await Deno.remove(foreignCwd, { recursive: true });
+  }
+});
+
+Deno.test("agent init leaves the offline docs corpus absent unless requested", async () => {
+  const root = await Deno.makeTempDir();
+  let calls = 0;
+  try {
+    await initAgent({ projectRoot: root, host: "vscode" }, {
+      fs: new DenoAgentInitFileSystem(),
+      aspireAgentInitializer: SUCCESSFUL_ASPIRE_INITIALIZER,
+      docsGenerator: {
+        generate: () => {
+          calls += 1;
+          return FIXTURE_DOCS_GENERATOR.generate(root);
+        },
+      },
+    });
+    assertEquals(calls, 0);
+    assertFalse(await new DenoAgentInitFileSystem().exists(join(root, ".netscript", "docs")));
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+Deno.test("agent init --with-docs installs a path-closed local corpus", async () => {
+  const root = await Deno.makeTempDir();
+  try {
+    const result = await initAgent({ projectRoot: root, host: "claude", withDocs: true }, {
+      fs: new DenoAgentInitFileSystem(),
+      aspireAgentInitializer: SUCCESSFUL_ASPIRE_INITIALIZER,
+      docsGenerator: FIXTURE_DOCS_GENERATOR,
+    });
+    for (const path of ["llms.txt", "llms-full.txt", "deno-doc/config.txt", "MANIFEST.md"]) {
+      assert(await new DenoAgentInitFileSystem().exists(join(root, ".netscript", "docs", path)));
+    }
+    const agents = await Deno.readTextFile(join(root, "AGENTS.md"));
+    assertStringIncludes(agents, ".netscript/docs/llms.txt");
+    const manifest = await Deno.readTextFile(join(root, ".netscript", "docs", "MANIFEST.md"));
+    for (const match of manifest.matchAll(/\.netscript\/docs\/[A-Za-z0-9_./-]+/g)) {
+      assert(await new DenoAgentInitFileSystem().exists(join(root, match[0])));
+    }
+    assert(result.messages.some((message) => message.includes("1 API packages / 2 export subpaths")));
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+Deno.test("offline docs failure occurs before any project write", async () => {
+  const root = await Deno.makeTempDir();
+  try {
+    await assertRejects(
+      () =>
+        initAgent({ projectRoot: root, host: "all", withDocs: true }, {
+          fs: new DenoAgentInitFileSystem(),
+          aspireAgentInitializer: SUCCESSFUL_ASPIRE_INITIALIZER,
+          docsGenerator: { generate: () => Promise.reject(new Error("version mismatch")) },
+        }),
+      Error,
+      "version mismatch",
+    );
+    assertEquals([...(await Array.fromAsync(Deno.readDir(root)))], []);
+  } finally {
+    await Deno.remove(root, { recursive: true });
   }
 });
 

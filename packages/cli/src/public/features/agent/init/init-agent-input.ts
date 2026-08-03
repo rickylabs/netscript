@@ -7,6 +7,7 @@ export type AgentHost = typeof AGENT_HOSTS[number];
 export interface InitAgentInput {
   readonly projectRoot: string;
   readonly host?: AgentHost | "all";
+  readonly withDocs?: boolean;
 }
 
 /** Result of one idempotent agent installation. */

@@ -117,6 +117,8 @@ playbook, and **MCP** is the eyes. Install all three into a project root:
 
 ```bash
 netscript agent init
+# Opt in to the several-megabyte offline prose + exact installed-version API corpus.
+netscript agent init --with-docs
 ```
 
 Claude Code receives `.mcp.json`, the NetScript skill bundle, and a marked section in `AGENTS.md`;
@@ -125,6 +127,10 @@ VS Code receives `.vscode/mcp.json`. Hosts are auto-detected, or select them wit
 ([`@netscript/mcp`](https://jsr.io/@netscript/mcp)); its data boundary covers telemetry, project
 metadata, generated registries, and public docs — never project source, environment values,
 credentials, or secrets.
+
+`--with-docs` is deliberately opt-in because it expands to several megabytes. It installs the
+release task router/prose and generates API text for every export subpath of the exact NetScript
+package versions present in the project; a version mismatch aborts rather than writing stale docs.
 
 ## Deployment
 

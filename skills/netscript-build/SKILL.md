@@ -60,6 +60,11 @@ For type-checking, prefer the installed `run-deno-check.ts`: bare `deno check` c
 `No matching files found` and still exit 0 when configuration excludes the target. The runner
 reports its selected file count and fails when that count is zero.
 
+**You are offline or unfamiliar with a framework package/API.** Run
+`netscript agent init --with-docs`. The opt-in installs the release prose plus API documentation for
+every export subpath of each exact NetScript package found in the project; the command reports the
+local starting point and fails instead of installing docs for a mismatched version.
+
 **Contract-first.** `netscript contract add` (define the schema/type contract) →
 `netscript generate runtime-schemas` (emit generated types) → implement against the generated
 surface. Re-run `generate` after every contract change; do not hand-edit generated output.

@@ -6,15 +6,15 @@
 | --- | --- |
 | Run ID | `feat-1024-agent-tooling-bundle--agent-init` |
 | Branch | `feat/1024-agent-tooling-bundle` |
-| Current phase | `implementation — slice 1 sign-off` |
+| Current phase | `implementation — slice 2 commit` |
 | Archetype | `6 — CLI / Tooling` |
 | Scope overlays | `docs` |
 
 ## Current State
 
-PLAN-EVAL passed in evaluator commit `c31084e02`. Slice 1 is implemented; its focused/static fitness
-gates and required opposite-family review pass. Final scoped verification precedes its sign-off
-commit.
+PLAN-EVAL passed in evaluator commit `c31084e02`; slice 1 was signed off at `d6265fa52`. Slice 2 is
+implemented with focused tests, a successful site build, a real temp-project install, a clean
+opposite-family review, and clean scoped sign-off gates. It awaits its commit/evidence trail.
 
 ## Completed
 
@@ -31,15 +31,24 @@ commit.
 - Passed 26 focused tests, scoped check/lint/fmt, `quality:scan`, `arch:check`, and CLI doc lint.
 - Addressed two medium and two low review findings; resumed Claude Opus 4.8 review returned
   `SLICE_REVIEW: PASS`.
+- Committed/pushed slice 1 and posted its gate/acceptance evidence before starting slice 2.
+- Implemented the compressed router-bearing prose asset, exact installed-version/every-export API
+  generation, optional installer, symptom routing, provenance, and informed CLI/site docs.
+- Proved a real temp consumer install: 168 files, router present, one package / four export subpaths.
+- Verified separate Claude Opus 4.8 slice review `SLICE_REVIEW: PASS` in session
+  `bcdbdd4b-edc6-42ec-82ea-11edf9b2404a`.
+- Passed the 37-test combined regression suite, 31-file scoped check/lint/fmt, docs links/accuracy,
+  quality, architecture, CLI doc lint, publish dry-run, and byte-stable generated-asset proof.
 
 ## In Progress
 
-- Final slice-1 scoped verification and generated-asset freshness proof.
+- Slice-2 commit, push, and criterion-level evidence comments.
 
 ## Next Steps
 
-1. Commit, push, and post slice 1 gate evidence.
-2. Begin slice 2 only after the slice 1 commit trail is reconciled.
+1. Commit/push slice 2 and post criterion-level evidence.
+2. Begin full merge-readiness/runtime gates only after the S2 commit trail is reconciled.
+3. Run formal IMPL-EVAL, close-gate, and CI/readiness checks after runtime proof.
 
 ## Key Decisions
 
@@ -62,9 +71,9 @@ commit.
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
 | Static | baseline PASS | CLI doc lint 0; agent-init tests 9/9. |
-| Fitness | PASS for plan and S1 | PLAN-EVAL PASS; scoped gates clean; opposite-family review PASS. |
+| Fitness | PASS through S2 sign-off | PLAN-EVAL/S1 PASS; S2 regressions, docs/site, static/package, real install, and independent review PASS. |
 | Runtime | not run | implementation absent. |
-| Consumer | S1 focused PASS | 26 tests; foreign-CWD path closure and missing-binary behavior proven. |
+| Consumer | S1 PASS; S2 temp fixture PASS | Tool path closure plus 168-file docs install with router and 4/4 export sections. |
 
 ## Open Questions
 
@@ -74,7 +83,8 @@ commit.
 ## Drift and Debt
 
 - Drift: baseline advanced to include merged #1079; current session route identity is opaque; the
-  local evaluator canary lacked credentials, so formal evaluation uses the OpenHands Qwen fallback.
+  local evaluator canary lacked credentials, so formal evaluation uses the OpenHands Qwen fallback;
+  umbrella docs maintenance finds two unrelated stale Claude mirrors while the slice docs gates pass.
 - Debt: no new/deepened debt expected or accepted.
 
 ## Commits

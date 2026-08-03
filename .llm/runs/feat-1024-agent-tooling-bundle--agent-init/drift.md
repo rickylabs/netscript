@@ -53,3 +53,16 @@ documentation.
 - **Action:** accept
 - **Evidence:** Claude session `964dfe11-04fb-4f0e-8b80-66d423354123`; focused suite 26/26 after
   the review fixes.
+
+## 2026-08-03 — umbrella docs maintenance sees unrelated mirror drift
+
+- **What:** `deno task docs:maintenance` reaches the repository-wide Claude skill mirror check,
+  which reports stale `aspire` and `netscript-release` mirrors outside this slice.
+- **Source:** slice-2 sign-off command output.
+- **Expected:** The slice documentation checks complete without unrelated generated-surface drift.
+- **Actual:** `docs:links` passed with zero broken links/anchors and `docs:accuracy` passed; the next
+  repository-wide mirror check stopped on two files this slice does not own.
+- **Severity:** minor
+- **Action:** accept baseline drift; do not rewrite unrelated generated skills.
+- **Evidence:** `docs=98 broken-links=0 broken-anchors=0`; `docs accuracy: PASS`; mirror checker names
+  only `.claude/skills/aspire/SKILL.md` and `.claude/skills/netscript-release/SKILL.md`.
