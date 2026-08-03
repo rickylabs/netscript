@@ -211,3 +211,113 @@ the sign-off commit:
   unchecked.
 
 F3–F6 are quality findings for the implementer's judgement and do not block.
+
+---
+
+# Re-Review (Round 2)
+
+| Field | Value |
+| --- | --- |
+| Reviewer session | `e10ff8f5-dfb4-4036-9b2d-62b51e1b06ce` (Claude Opus 5) — same opposite-family lane |
+| Subject | Working tree after the implementer's round-1 fixes |
+| Method | Independent re-run of every gate plus a fresh shell probe of the F2 fix; no claim taken on trust |
+
+## Re-Verification
+
+| # | Command | Result |
+| --- | --- | --- |
+| 1 | `deno test --allow-all --frozen` on both focused test files | `ok \| 15 passed \| 0 failed (207ms)` |
+| 2 | scoped check wrapper over `.llm/tools/release` | 34 files, `totalOccurrences: 0` |
+| 3 | scoped lint wrapper | exit 0, 34 files, `totalOccurrences: 0` |
+| 4 | scoped fmt wrapper | 34 files, `findings: 0` |
+| 5 | `md5sum deno.lock` | `9a82643cb4c86e301f1598a783cdfd29` — unchanged across both review rounds |
+| 6 | Shell probe of assignment-form `jq -e` under `set -euo pipefail` | Aborts as required; see F2 below |
+
+## Finding Dispositions
+
+**F1 — Run-artifact evidence — RESOLVED.** `worklog.md` now carries three slice-1 Progress Log rows
+(implementation, gates, opposite-family review), four Static Gate `PASS` rows with per-command
+counts, a split Fitness table separating the slice-1 identity `PASS` from the slice-2
+payload/drift `NOT_RUN`, and a Consumer `PASS` for `release-canary.yml`. The false claim at the old
+`worklog.md:117` is corrected to "Implementation began only after the owner's recorded Plan-Gate
+waiver." `context-pack.md` is refreshed with the changed-file table and Static/Fitness `PASS` rows.
+The waiver framing is preserved throughout — no artifact claims a PLAN-EVAL `PASS`. The new
+`drift.md` entry recording the `opus-4.8` → `opus` alias fallback is the correct handling of a
+routing deviation and does not overstate the lane.
+
+**F2 — Fail-closed extraction — RESOLVED, verified empirically.** The cut step
+(`release-canary.yml:67-76`) now uses assignment form for all three fields and restores the guards
+on `version` and `tag`. I re-probed the semantics rather than reasoning about them:
+
+```text
+version="$(jq -er '.version' /tmp/b.json)"   # .version absent
+→ script exit 1, "REACHED-AFTER-NULL" never printed
+
+version="$(jq -er '.version' /tmp/nope.json)"  # file missing
+→ script exit 2, "REACHED-AFTER-MISSING" never printed
+```
+
+The round-1 hole is closed: assignment form propagates the substitution's status to `set -e`, so
+`jq -e` now genuinely fails the step. `branch` is correctly left without a `test -n` guard — the
+republish identity legitimately carries `''`, which `jq -e` treats as success — while still being
+protected against null/missing by the assignment form. The explicit `!= "null"` guards on `version`
+and `tag` are belt-and-braces on top of that.
+
+**F3 — RESOLVED.** The temp `deno.json` scaffolding is gone; the test now asserts only what it
+actually exercises — the `canaryResult`/`writeCanaryResult` round trip and the republish empty-branch
+case.
+
+**F5 — RESOLVED and strengthened beyond the finding.** The brittle single-spelling negative is
+replaced by a bounded slice of the cut step with `assertEquals(cutStep.includes('deno.json'), false)`
+(`release-canary-workflow_test.ts:43-47`). This rejects *any* re-introduction of manifest inference
+in that step regardless of quoting, which is a stronger guarantee than round 1 asked for. The new
+assertions also pin the assignment form and the null guard.
+
+**F6 — RESOLVED.** `createCanaryRefs` destructures `canaryResult(version)` (`canary.ts:184`), so ref
+names have one construction site. The leak scenario from round 1 — a result artifact naming a branch
+that was never pushed, defeating the cleanup step — is now structurally impossible.
+
+**F4 — Still open, still non-blocking.** `main()`'s `--output` wiring remains unexported and
+untested; the write-after-`createCanaryRefs` ordering rests on code reading. Reasonable to carry into
+slice 2, which is already introducing injectable ports.
+
+## New Observations
+
+**N1 — Slice-2 surface is present in the working tree during slice-1 sign-off.** The tree now also
+contains untracked `.llm/tools/release/canary-label.ts` and `canary-label_test.ts`, plus a *tracked*
+`deno.json` modification registering `release:canary-label`. Two consequences, neither a defect in
+slice-1 code:
+
+- The slice-1 sign-off commit must be path-scoped to the four source files plus the run artifacts.
+  Staging `deno.json` wholesale would commit a task pointing at a file that is not in the commit,
+  producing a broken intermediate revision on the branch.
+- The wrapper counts recorded as slice-1 evidence (32 files) no longer reproduce; the same commands
+  now select 34, because the slice-2 files sit under the wrapper's root. The evidence was accurate
+  when captured and the delta is fully explained by the two new files — worth a one-line note rather
+  than a re-run, since the diagnostics are zero either way.
+
+**N2 — One stale row in `context-pack.md`.** Its Gates table still reads
+`Consumer | NOT_RUN | workflow test planned` (`context-pack.md:62`) while `worklog.md` records the
+`release-canary.yml` identity consumer gate as `PASS`. The two artifacts now contradict each other on
+the same gate. This is the small residue of F1's category and is a one-line correction.
+
+## Final Verdict
+
+**PASS**
+
+Both round-1 blockers are fixed and independently verified — the run artifacts now carry real,
+non-empty slice-1 evidence without overstating the waived Plan-Gate, and the workflow's identity
+extraction genuinely fails closed under shell probe. Objectives O1–O3 are all met: `release:canary`
+emits the resolver-owned JSON identity, the workflow consumes that artifact with no `deno.json` or
+log inference anywhere in the cut step, and success is backed by 15/15 focused tests and three
+non-empty scoped wrapper runs with zero findings. `deno.lock` is untouched across both rounds, no
+`packages/**` or `plugins/**` surface is affected, and slice 2's post-publish label surface is
+correctly absent from slice-1 content.
+
+Two commit-time conditions for the supervisor, neither requiring another review pass:
+
+1. Path-scope the sign-off commit to slice-1 files; do not stage `deno.json` or the `canary-label.*`
+   files with it (N1).
+2. Correct the `context-pack.md` Consumer gate row to match `worklog.md` (N2).
+
+F4 remains an open non-blocking quality item for slice 2.
