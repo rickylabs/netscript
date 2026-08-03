@@ -81,12 +81,18 @@ export function createDocsFlows(
             title: document.title,
             section: section.heading,
             content: section.content,
+            ...(document.redirectedFrom ? { redirectedFrom: document.redirectedFrom } : {}),
           },
         };
       }
       return {
         ok: true,
-        value: { slug: document.slug, title: document.title, content: document.content },
+        value: {
+          slug: document.slug,
+          title: document.title,
+          content: document.content,
+          ...(document.redirectedFrom ? { redirectedFrom: document.redirectedFrom } : {}),
+        },
       };
     },
   };

@@ -47,6 +47,8 @@ export interface DocsDocument extends DocsSummary {
   readonly content: string;
   /** Indexed section bodies. */
   readonly sectionContents: readonly DocsSection[];
+  /** Normalized slug of an alias or legacy URL that resolved to this document. */
+  readonly redirectedFrom?: string;
 }
 
 /** Ranked documentation search result. */

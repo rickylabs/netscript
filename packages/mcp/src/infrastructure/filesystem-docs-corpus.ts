@@ -12,9 +12,9 @@ import {
 
 const EXCLUDED_DIRECTORIES = new Set(['_plan', '_data', '_components', '_includes']);
 
-interface CachedDocument {
+interface CachedSource {
   readonly mtime: number;
-  readonly document: DocsDocument;
+  readonly source: string;
 }
 
 /** Options for a filesystem-backed public documentation corpus. */
@@ -25,12 +25,25 @@ export interface FilesystemDocsCorpusOptions {
   readonly maxDocumentLength?: number;
 }
 
+/** Raw Markdown source input prior to alias resolution. */
+export interface RawDocsSource {
+  readonly slug: string;
+  readonly source: string;
+}
+
+/** Result of indexing and alias resolution across docs sources. */
+export interface DocsCorpusIndexedState {
+  readonly documents: Map<string, DocsDocument>;
+  readonly aliases: Map<string, string>;
+}
+
 /** Lazily index a public Markdown tree with per-file mtime reuse. */
 export class FilesystemDocsCorpus implements DocsCorpusPort {
   readonly #root: string;
   readonly #maxDocumentLength: number;
-  #cache = new Map<string, CachedDocument>();
+  #cache = new Map<string, CachedSource>();
   #documents = new Map<string, DocsDocument>();
+  #aliases = new Map<string, string>();
 
   /** Configure a corpus rooted at a public Markdown directory. */
   constructor(options: FilesystemDocsCorpusOptions) {
@@ -56,10 +69,17 @@ export class FilesystemDocsCorpus implements DocsCorpusPort {
       .sort((a, b) => b.score - a.score || a.slug.localeCompare(b.slug));
   }
 
-  /** Retrieve the current public document matching a normalized slug. */
+  /** Retrieve the current public document matching a normalized slug or alias. */
   async get(slug: string): Promise<DocsDocument | undefined> {
     await this.#refresh();
-    return this.#documents.get(normalizeSlug(slug));
+    const normalized = normalizeSlug(slug);
+    const canonicalSlug = this.#aliases.get(normalized) ?? normalized;
+    const document = this.#documents.get(canonicalSlug);
+    if (!document) return undefined;
+    if (canonicalSlug !== normalized) {
+      return { ...document, redirectedFrom: normalized };
+    }
+    return document;
   }
 
   async #refresh(): Promise<void> {
@@ -73,7 +93,7 @@ export class FilesystemDocsCorpus implements DocsCorpusPort {
       throw error;
     }
     const seen = new Set<string>();
-    const documents = new Map<string, DocsDocument>();
+    const sources: RawDocsSource[] = [];
     for await (const path of walkMarkdown(rootReal)) {
       if (!isPublicDocsPath(relative(rootReal, path))) continue;
       const realPath = await Deno.realPath(path);
@@ -84,23 +104,24 @@ export class FilesystemDocsCorpus implements DocsCorpusPort {
       let cached = this.#cache.get(realPath);
       if (!cached || cached.mtime !== mtime) {
         const source = await Deno.readTextFile(realPath);
-        cached = {
-          mtime,
-          document: parseMarkdownDocument(
-            slugFromPath(relative(rootReal, realPath)),
-            source,
-            this.#maxDocumentLength,
-          ),
-        };
+        cached = { mtime, source };
         this.#cache.set(realPath, cached);
       }
-      documents.set(cached.document.slug, cached.document);
+      sources.push({
+        slug: slugFromPath(relative(rootReal, realPath)),
+        source: cached.source,
+      });
     }
     for (const path of this.#cache.keys()) if (!seen.has(path)) this.#cache.delete(path);
+    if (sources.length === 0) {
+      throw new DocsCorpusUnavailableError(this.#root);
+    }
+    const { documents, aliases } = processDocsSources(sources, this.#maxDocumentLength);
     if (documents.size === 0) {
       throw new DocsCorpusUnavailableError(this.#root);
     }
     this.#documents = documents;
+    this.#aliases = aliases;
   }
 }
 
@@ -117,6 +138,74 @@ async function* walkMarkdown(directory: string): AsyncGenerator<string> {
       yield path;
     }
   }
+}
+
+/** Process raw docs sources into canonical documents and resolved alias mappings. */
+export function processDocsSources(
+  sources: readonly RawDocsSource[],
+  maxDocumentLength: number = MAX_INDEXED_DOC_LENGTH,
+): DocsCorpusIndexedState {
+  const documents = new Map<string, DocsDocument>();
+  const rawAliases = new Map<string, string>();
+
+  for (const entry of sources) {
+    const rawSlug = normalizeSlug(entry.slug);
+    const fm = parseFrontMatter(entry.source);
+
+    if (fm.layout === 'layouts/redirect.vto' || (fm.redirectTo && !fm.body.trim())) {
+      if (fm.redirectTo) {
+        const targetSlug = normalizeSlug(fm.redirectTo);
+        if (rawAliases.has(rawSlug) && rawAliases.get(rawSlug) !== targetSlug) {
+          throw new Error(
+            `Duplicate docs alias: '${rawSlug}' maps to both '${
+              rawAliases.get(rawSlug)
+            }' and '${targetSlug}'`,
+          );
+        }
+        rawAliases.set(rawSlug, targetSlug);
+      }
+      continue;
+    }
+
+    const document = parseMarkdownDocument(rawSlug, entry.source, maxDocumentLength);
+    documents.set(document.slug, document);
+
+    if (fm.oldUrl) {
+      const aliasSlug = normalizeSlug(fm.oldUrl);
+      if (rawAliases.has(aliasSlug) && rawAliases.get(aliasSlug) !== document.slug) {
+        throw new Error(
+          `Duplicate docs alias: '${aliasSlug}' maps to both '${
+            rawAliases.get(aliasSlug)
+          }' and '${document.slug}'`,
+        );
+      }
+      rawAliases.set(aliasSlug, document.slug);
+    }
+  }
+
+  for (const [aliasSlug] of rawAliases) {
+    if (documents.has(aliasSlug)) {
+      throw new Error(`Docs alias '${aliasSlug}' conflicts with canonical document`);
+    }
+  }
+
+  const resolvedAliases = new Map<string, string>();
+  for (const [aliasSlug, initialTarget] of rawAliases) {
+    let current = initialTarget;
+    const visited = [aliasSlug];
+    while (rawAliases.has(current)) {
+      if (visited.includes(current)) {
+        throw new Error(`Docs alias cycle detected: ${[...visited, current].join(' -> ')}`);
+      }
+      visited.push(current);
+      current = rawAliases.get(current)!;
+    }
+    if (documents.has(current)) {
+      resolvedAliases.set(aliasSlug, current);
+    }
+  }
+
+  return { documents, aliases: resolvedAliases };
 }
 
 /** Parse one Markdown source into the shared docs document contract. */
@@ -145,7 +234,17 @@ export function parseMarkdownDocument(
   };
 }
 
-function parseFrontMatter(source: string): { attributes: Record<string, string>; body: string } {
+/** Parsed front matter metadata. */
+export interface ParsedFrontMatter {
+  readonly attributes: Record<string, string>;
+  readonly body: string;
+  readonly layout?: string;
+  readonly redirectTo?: string;
+  readonly oldUrl?: string;
+}
+
+/** Parse YAML front matter at the top of a Markdown source file. */
+export function parseFrontMatter(source: string): ParsedFrontMatter {
   if (!source.startsWith('---\n') && !source.startsWith('---\r\n')) {
     return { attributes: {}, body: source };
   }
@@ -154,10 +253,16 @@ function parseFrontMatter(source: string): { attributes: Record<string, string>;
   if (end < 0) return { attributes: {}, body: source };
   const attributes: Record<string, string> = {};
   for (const line of lines.slice(1, end)) {
-    const match = /^(title|description):\s*(.*)$/.exec(line);
+    const match = /^([a-zA-Z0-9_-]+):\s*(.*)$/.exec(line);
     if (match?.[1] && match[2] !== undefined) attributes[match[1]] = unquote(match[2].trim());
   }
-  return { attributes, body: lines.slice(end + 1).join('\n').trimStart() };
+  return {
+    attributes,
+    body: lines.slice(end + 1).join('\n').trimStart(),
+    layout: attributes['layout'],
+    redirectTo: attributes['redirectTo'],
+    oldUrl: attributes['oldUrl'],
+  };
 }
 
 function parseSections(content: string): DocsSection[] {
@@ -194,8 +299,15 @@ export function rankDocument(
     score += occurrences(body, term);
   }
   if (score === 0) return undefined;
-  const firstTerm = terms.find((term) => body.includes(term))!;
-  return { slug: document.slug, title: document.title, snippet: snippet(body, firstTerm), score };
+  const firstTerm = terms.find((term) => body.includes(term)) ??
+    terms.find((term) => headings.includes(term)) ??
+    terms.find((term) => title.includes(term));
+  return {
+    slug: document.slug,
+    title: document.title,
+    snippet: snippet(document.content, firstTerm),
+    score,
+  };
 }
 
 /** Normalize a free-text docs query into unique lexical terms. */
@@ -213,10 +325,13 @@ function occurrences(haystack: string, needle: string): number {
   return count;
 }
 
-function snippet(content: string, term: string): string {
-  const index = Math.max(0, content.indexOf(term));
-  const start = Math.max(0, index - 80);
-  const end = Math.min(content.length, index + term.length + 120);
+function snippet(content: string, term?: string): string {
+  if (!content) return '';
+  const index = term ? content.toLocaleLowerCase().indexOf(term.toLocaleLowerCase()) : -1;
+  const startPos = index >= 0 ? index : 0;
+  const termLen = (term && index >= 0) ? term.length : 0;
+  const start = Math.max(0, startPos - 80);
+  const end = Math.min(content.length, startPos + termLen + 120);
   return `${start > 0 ? '…' : ''}${oneLine(content.slice(start, end))}${
     end < content.length ? '…' : ''
   }`;

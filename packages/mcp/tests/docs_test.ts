@@ -1,7 +1,11 @@
 import { assert, assertEquals, assertGreater } from '@std/assert';
 import { createDocsFlows } from '../src/application/flows/docs-flows.ts';
 import { createMcpServer } from '../src/application/runner/mcp-server.ts';
-import { FilesystemDocsCorpus } from '../src/infrastructure/filesystem-docs-corpus.ts';
+import {
+  FilesystemDocsCorpus,
+  processDocsSources,
+} from '../src/infrastructure/filesystem-docs-corpus.ts';
+import { EmbeddedDocsCorpus } from '../src/infrastructure/embedded-docs-corpus.ts';
 import { createMcpCliServer, resolveDocsRoot } from '../cli.ts';
 
 const fixtureRoot = new URL('./fixtures/docs/', import.meta.url).pathname;
@@ -183,5 +187,144 @@ Deno.test({
     const docs = await new FilesystemDocsCorpus({ root: realDocsRoot }).list();
     assert(docs.length > 0);
     assert(!docs.some((doc) => doc.slug.includes('doctrine') || doc.slug === 'ROADMAP'));
+  },
+});
+
+Deno.test('search_docs does not throw on title-only, heading-only, body-only, or natural language queries', async () => {
+  const corpus = new EmbeddedDocsCorpus({
+    documents: [
+      {
+        slug: 'title-only-match',
+        source: '---\ntitle: Turso database integration\n---\n\nBody contains no matched keywords.',
+      },
+      {
+        slug: 'heading-only-match',
+        source:
+          '# How do I build a page that validates and submits a form?\n\nBody content goes here.',
+      },
+      {
+        slug: 'empty-body-doc',
+        source: '---\ntitle: empty body test\n---\n',
+      },
+      {
+        slug: 'body-only-match',
+        source:
+          '# General Info\n\nAvoid hitting service every page render and keep server data fresh without polling.',
+      },
+    ],
+  });
+
+  const querySweep = [
+    'form',
+    'retry policy',
+    'telemetry',
+    'How do I build a page that validates and submits a form?',
+    'avoid hitting service every page render',
+    'Turso database',
+    'keep server data fresh without polling',
+  ];
+
+  for (const query of querySweep) {
+    const results = await corpus.search(query);
+    assert(Array.isArray(results), `search failed for query: ${query}`);
+    for (const match of results) {
+      assert(typeof match.snippet === 'string');
+    }
+  }
+});
+
+Deno.test('docs corpus canonicalizes redirect pages and oldUrl aliases', async () => {
+  const corpus = new EmbeddedDocsCorpus({
+    documents: [
+      {
+        slug: 'capabilities/ai',
+        source: '---\nlayout: layouts/redirect.vto\nredirectTo: /ai/\n---\n',
+      },
+      {
+        slug: 'ai/agent-tooling',
+        source:
+          '---\ntitle: Agent Tooling\noldUrl: /capabilities/agent-tooling/\n---\n\nAgent tooling body content.',
+      },
+      {
+        slug: 'ai',
+        source: '---\ntitle: AI Engine\n---\n\nAI Engine body content.',
+      },
+    ],
+  });
+
+  const list = await corpus.list();
+  assertEquals(list.map((d: { slug: string }) => d.slug).sort(), ['ai', 'ai/agent-tooling']);
+
+  const search = await corpus.search('AI Engine');
+  assertEquals(search.map((m: { slug: string }) => m.slug), ['ai']);
+
+  const redirectGet = await corpus.get('capabilities/ai');
+  assert(redirectGet !== undefined);
+  assertEquals(redirectGet.slug, 'ai');
+  assertEquals(redirectGet.redirectedFrom, 'capabilities/ai');
+
+  const oldUrlGet = await corpus.get('capabilities/agent-tooling');
+  assert(oldUrlGet !== undefined);
+  assertEquals(oldUrlGet.slug, 'ai/agent-tooling');
+  assertEquals(oldUrlGet.redirectedFrom, 'capabilities/agent-tooling');
+
+  const canonicalGet = await corpus.get('ai/agent-tooling');
+  assert(canonicalGet !== undefined);
+  assertEquals(canonicalGet.slug, 'ai/agent-tooling');
+  assertEquals(canonicalGet.redirectedFrom, undefined);
+});
+
+Deno.test('docs corpus fails deterministically on duplicate aliases and alias cycles', () => {
+  let threw = false;
+  try {
+    processDocsSources([
+      { slug: 'page1', source: '---\noldUrl: /dup-alias/\n---\nPage 1' },
+      { slug: 'page2', source: '---\noldUrl: /dup-alias/\n---\nPage 2' },
+    ]);
+  } catch (err) {
+    threw = true;
+    assert((err as Error).message.includes('Duplicate docs alias'));
+  }
+  assert(threw, 'expected duplicate alias to throw');
+
+  threw = false;
+  try {
+    processDocsSources([
+      { slug: 'a', source: '---\nlayout: layouts/redirect.vto\nredirectTo: /b/\n---\n' },
+      { slug: 'b', source: '---\nlayout: layouts/redirect.vto\nredirectTo: /a/\n---\n' },
+    ]);
+  } catch (err) {
+    threw = true;
+    assert((err as Error).message.includes('Docs alias cycle detected'));
+  }
+  assert(threw, 'expected alias cycle to throw');
+});
+
+Deno.test({
+  name: 'real public docs corpus processes redirects and resolves oldUrl aliases',
+  ignore: !realDocsPresent,
+  async fn() {
+    const corpus = new FilesystemDocsCorpus({ root: realDocsRoot });
+    const list = await corpus.list();
+    assert(!list.some((doc) => doc.slug === 'capabilities/ai' || doc.slug === 'capabilities'));
+
+    const doc = await corpus.get('capabilities/agent-tooling');
+    assert(doc !== undefined);
+    assertEquals(doc.slug, 'ai/agent-tooling');
+    assertEquals(doc.redirectedFrom, 'capabilities/agent-tooling');
+
+    const querySweep = [
+      'form',
+      'retry policy',
+      'telemetry',
+      'How do I build a page that validates and submits a form?',
+      'avoid hitting service every page render',
+      'Turso database',
+      'keep server data fresh without polling',
+    ];
+    for (const query of querySweep) {
+      const results = await corpus.search(query);
+      assert(Array.isArray(results));
+    }
   },
 });
