@@ -30,16 +30,18 @@ skill restates them, publish mechanics (`netscript-release`), or lane routing (`
 
 ## Evidence discipline
 
-Rules below are **[observed]** — earned from the instrumented 0.0.4 trace
-(`.llm/runs/release-0.0.4--orchestration/cut-trace.md`) — or **[asserted]** — plausible and
-unproven. The distinction is load-bearing: 0.0.4 shipped two guards whose predicate could never
+Rules below are **[observed]** — recorded during the 0.0.4 execution: in the instrumented trace
+(`.llm/runs/release-0.0.4--orchestration/cut-trace.md`), in the issues that run filed (#1113,
+#1115, …), in the epic's ratified learnings (#1120), or in the ratified design doc's dated
+observations — with the source cited at the claim — or **[asserted]** — plausible and unproven. The distinction is load-bearing: 0.0.4 shipped two guards whose predicate could never
 fire, and they looked correct while doing nothing. Treat asserted rules as candidates to attack;
 when your run falsifies or confirms one, record it in the run's `cut-trace.md` so the marker can
 be upgraded with a citation, not by fiat.
 
 ## Reading a milestone into PR clusters
 
-**One supervisor per PR, each PR closing a group of linked issues [observed].** This avoids
+**One supervisor per PR, each PR closing a group of linked issues [observed — cut-trace merge
+table; #1120 learnings].** This avoids
 micro-PRs, and avoids a supervisor blocked because closing its issue depends on another lane's
 work. Cluster by shared surface and shared acceptance, then check the cluster both ways:
 
@@ -55,8 +57,9 @@ work. Cluster by shared surface and shared acceptance, then check the cluster bo
 
 ## Wave sequencing and dispatch
 
-**Waves are small [observed].** A workflow blocks until every agent in it completes, so a large
-fan-out stops the next block from starting — and it is what froze the host at load 160 in 0.0.4.
+**Waves are small [observed — #1120 learnings].** A workflow blocks until every agent in it
+completes, so a large fan-out stops the next block from starting — and it is what froze the host
+at load 160 in 0.0.4.
 Sequence so that each wave's PRs are independent of each other; dependencies run *across* waves,
 not inside one.
 
@@ -68,9 +71,9 @@ Before dispatching a wave, the preconditions in `milestone-run.md` stage B (prov
 paid-transport verification) must be green — the orchestrator's judgement call is *sequencing
 around* a constrained provider, not dispatching into it. Quota exhaustion is a first-class
 failure mode, not bad luck: the 0.0.4 docs lane hit a hard cap mid-delivery and correctly refused
-to substitute another model silently **[observed]**. Recovery judgement: redeem the
-soonest-expiring reset, and treat the provider status panel as stale afterwards — verify with a
-real call, not the display **[observed]**.
+to substitute another model silently **[observed — #1120 learnings; cut-trace failure table]**.
+Recovery judgement: redeem the soonest-expiring reset, and treat the provider status panel as
+stale afterwards — verify with a real call, not the display **[observed — design record]**.
 
 ## Re-planning is normal
 
@@ -93,15 +96,20 @@ skill holds no routing. The orchestrator's delegation judgement, beyond routing:
 
 - **Brief the gate as a deliverable.** Supervisors go idle at a red gate rather than escalating —
   four occurrences in 0.0.4, plus three slices hard-stopped on an environmental block the brief
-  could have pre-empted **[observed]**. The brief names the gates the supervisor must turn green
-  and the known environmental hazards, up front.
-- **Launch attached, never one-shot.** An app-server-attached thread takes further turns via its
-  `threadId`; an ad-hoc `codex exec` is one-shot and unreachable — an hour was lost to this
-  **[observed]**.
-- **Evaluate only when necessary [observed].** Draft→ready already triggers the augment review; a
-  label auto-triggers OpenHands. Spawning a local evaluator per PR is waste. The evaluator
-  invariants and the scoped reviewer-substitution waiver are defined in `milestone-run.md`
-  § Evaluator protocol.
+  could have pre-empted **[observed — design record; cut-trace failure table]**. The brief names
+  the gates the supervisor must turn green and the known environmental hazards, up front.
+- **Launch attached, never one-shot — and through the agentic suite.** An app-server-attached
+  thread takes further turns via its `threadId`; an ad-hoc `codex exec` is one-shot and
+  unreachable — an hour was lost to this **[observed — #1120 learnings]**. The launcher, watcher,
+  and steering surfaces are mapped in `.llm/harness/workflow/tooling.md`, and the handoff
+  protocol in `workflow/agent-handoff.md` — never ad-hoc shell.
+- **Intercept between turns, not on git activity.** `codex-watch --mode turn` fires on
+  `task_complete`, when the agent is idle between turns — that is the clean point to read, steer,
+  or stop; git activity is not that signal **[observed — #1120 learnings]**.
+- **Evaluate only when necessary [observed — #1120 learnings].** Draft→ready already triggers the
+  augment review; a label auto-triggers OpenHands (repo CI behaviour). Spawning a local evaluator
+  per PR is waste. The evaluator invariants and the scoped reviewer-substitution waiver are
+  defined in `milestone-run.md` § Evaluator protocol.
 
 ## Merge authority
 
@@ -109,8 +117,9 @@ The orchestrator holds merge authority: a delegated supervisor lands a PR, but o
 orchestrator merges it, and only through the **pre-merge gate defined in `milestone-run.md`** —
 run per PR, recorded per PR. Two judgement rules sit with the authority:
 
-- **Never steer or merge from a truncated log [observed].** A `head -14` excerpt said two issues
-  were satisfied; the raw log showed zero implementation. Pull the full artifact before acting.
+- **Never steer or merge from a truncated log [observed — design record].** A `head -14` excerpt
+  said two issues were satisfied; the raw log showed zero implementation. Pull the full artifact
+  before acting.
 - **Merge order is a decision the canary consumes.** The orchestrator chooses what lands before
   each declared canary point; `canary-cadence.md` turns whatever actually landed into the payload.
   Choose merge order to make canary points meaningful; do not expect the cadence to repair an
@@ -139,15 +148,17 @@ raise them, or follow the run's recorded decision.
 
 ## Supervision pitfalls
 
-- **Liveness is not progress, and artifacts are not always where you launched [observed].** A
-  research agent believed idle for 70 minutes was 25/27 complete, writing into per-sub-agent
-  worktrees, and came within one command of being killed (#1115). Verify a growing artifact, a new
-  commit, or a live session — not an open socket — and look across the repo root before judging.
-- **Never establish ownership by string match [observed].** An "is a turn live here" check matched
-  worktree paths quoted inside *other agents' brief text*. Match the actual `--cwd` argument;
-  inverted, this mistake deletes a live agent's worktree.
-- **Verify the artefact, never the exit code [observed].** Three agents claimed to have stopped
-  their AppHost; all three process trees were still running, while the stop command exited 0.
+- **Liveness is not progress, and artifacts are not always where you launched [observed — run
+  record, #1115].** A research agent believed idle for 70 minutes was 25/27 complete, writing
+  into per-sub-agent worktrees, and came within one command of being killed. Verify a growing
+  artifact, a new commit, or a live session — not an open socket — and look across the repo root
+  before judging.
+- **Never establish ownership by string match [observed — design record].** An "is a turn live
+  here" check matched worktree paths quoted inside *other agents' brief text*. Match the actual
+  `--cwd` argument; inverted, this mistake deletes a live agent's worktree.
+- **Verify the artefact, never the exit code [observed — design record].** Three agents claimed
+  to have stopped their AppHost; all three process trees were still running, while the stop
+  command exited 0.
 
 ## Reference files
 
@@ -156,6 +167,8 @@ raise them, or follow the run's recorded decision.
 | `.llm/harness/workflow/milestone-run.md` | every milestone run — the run shape, gates, DoD |
 | `.llm/harness/workflow/canary-cadence.md` | declaring canary points; label/note/drift contract |
 | `.llm/harness/workflow/lane-policy.md` | lane and evaluator routing |
+| `.llm/harness/workflow/tooling.md` | the agentic launch/watch/steer tool surface for stage C |
+| `.llm/harness/workflow/agent-handoff.md` | handing work to OpenHands or local agents mid-run |
 | `.agents/skills/netscript-release` | any publish, verification, or rollback step |
 | `.agents/skills/netscript-pr` | branch/PR/label/milestone mechanics, close-gate |
 | `.agents/skills/netscript-harness` | general harness operating model |

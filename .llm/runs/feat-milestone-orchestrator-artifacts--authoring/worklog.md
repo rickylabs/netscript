@@ -53,3 +53,37 @@
 - Non-duplication verified: `grep -n "OIDC\|publish:readiness\|release:preflight"` over the three
   artifacts hits only the cadence doc's ownership-disclaimer lines (12–13).
 - Awaiting owner ratification (D1). Merge closes #1120; D2 then unblocks 0.0.5 delivery.
+
+## Eval cycle 1 — Sol·xhigh adversarial pass (`review_claude`), verdict CHANGES_REQUESTED
+
+Thread `019fc874-c9b4-7b43-8af7-8abc6d6dae8d`, isolated worktree at `aa11f0b33`; verdict of
+record: PR comment + `sol-eval-1.md`. 9 critical / 6 major; all triaged **accepted** — none
+declined. Fixes:
+
+- **C1** cadence ownership bullets and the failed-canary parenthetical reduced to pure pointers —
+  no `netscript-release` doctrine content restated.
+- **C2** drift-gate section rewritten to the observable contract; check-name enumeration,
+  allocation strategy, and algorithm detail removed (consult `canary-label.ts`).
+- **C3** "notes accumulate into the stable note" corrected in both cadence and cut checklist: no
+  mechanism exists; canary notes are cut source material read manually; marked [asserted].
+- **C4** "ends every run with a drift check" corrected: non-dry runs end with the drift verdict;
+  `--dry-run` stops pre-mutation with visible not-run records.
+- **C5** "impossible by construction" overclaim replaced: canonical derivation is the
+  `release-canary.yml` wiring passing the publish step's own output; the standalone CLI bounds
+  but does not derive.
+- **C6** stage-B quota/transport gates given a proof form: recorded check output in `worklog.md`
+  before dispatch; absent record = did-not-run.
+- **C7** pre-merge check 3 firing status stated honestly: exclusion observed; predicate-on-new-
+  ignore not yet demonstrated.
+- **C8** #1120 acceptance box 1 given a relocation note (run-from-it proof → #1163, #1090/#1121
+  precedent); evidence mapping re-scoped accordingly.
+- **C9** D2 mapping corrected: #1153/#1155 (milestone 0.0.5) merged 15:30/15:49Z pre-ratification;
+  surfaced for the owner's D2 interpretation instead of "by construction".
+- **M1/M2/M3** `[observed]` definition widened to the recorded 0.0.4 execution (trace + filed
+  issues + ratified design record) and every flagged claim re-cited to its actual source; the
+  repo-version trap re-attributed as a scoping finding, not a trace observation.
+- **M4** #1142 mitigation split: defect observed, latest-run-per-check selection rule marked
+  [asserted] until exercised.
+- **M5** stage-C operability closed: tooling.md + agent-handoff.md wired into skill and profile;
+  `codex-watch --mode turn` interception rule added.
+- **M6** context-pack state corrected with an explicit do-not-repeat-S4 guard.

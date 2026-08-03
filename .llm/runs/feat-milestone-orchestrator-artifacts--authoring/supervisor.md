@@ -21,6 +21,7 @@ operating identity is discoverable without chat memory.
 | --- | --- | --- |
 | Supervisor + doc author | Claude Fable 5, effort low | authors the three #1120 artifacts (documentation-authoring exception, CLAUDE.md 2026-06-18) |
 | Evaluator of record | Owner ratification on the draft PR | D1: the instrument **is** a draft PR for ratification; owner ≠ generator |
+| `review_claude` adversarial pass | Codex · OpenAI · `gpt-5.6-sol` · xhigh (canonical binding) | opposite-family eval of the PR; owner directive 2026-08-03: a green verdict merges #1161 |
 
 Reference `.llm/harness/workflow/lane-policy.md`; do not copy its complete route table here.
 
