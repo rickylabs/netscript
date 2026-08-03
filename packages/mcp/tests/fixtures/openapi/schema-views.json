@@ -1,0 +1,106 @@
+{
+  "openapi": "3.1.1",
+  "components": {
+    "schemas": {
+      "Input": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" }
+        },
+        "required": ["name"]
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "message": { "type": "string" }
+        },
+        "required": ["message"]
+      },
+      "Node": {
+        "type": "object",
+        "properties": {
+          "next": { "$ref": "#/components/schemas/Node" }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/widgets/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": { "type": "string" }
+        },
+        {
+          "name": "trace",
+          "in": "header",
+          "schema": { "type": "string" }
+        }
+      ],
+      "post": {
+        "operationId": "widgets.create",
+        "parameters": [
+          {
+            "name": "trace",
+            "in": "header",
+            "required": true,
+            "description": "Operation override",
+            "schema": { "type": "string", "minLength": 1 }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/Input" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Node" }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          },
+          "500": {
+            "description": "External error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "https://example.test/error.json" }
+              }
+            }
+          },
+          "default": {
+            "description": "Unresolved local error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Missing" }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

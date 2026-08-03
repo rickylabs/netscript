@@ -74,6 +74,18 @@ export function resolveCanonicalOperation(
   index: OpenApiOperationIndex,
   input: string,
 ): OperationResolution {
+  const foldedInput = input.toLocaleLowerCase('en-US');
+  const caseCollision = index.operations.filter((candidate) =>
+    candidate.operationId?.toLocaleLowerCase('en-US') === foldedInput
+  );
+  if (caseCollision.length > 1) {
+    return Object.freeze({
+      status: 'ambiguous',
+      input,
+      candidates: Object.freeze(caseCollision),
+    });
+  }
+
   const operationIdMatches = index.operations.filter((candidate) =>
     candidate.operationId === input
   );
