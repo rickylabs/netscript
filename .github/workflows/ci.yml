@@ -75,6 +75,15 @@ jobs:
           --pr "${{ github.event.pull_request.number }}"
           --pretty
 
+      - name: Answered review-thread gate
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: >
+          deno task agentic:review-threads --
+          --repo "${{ github.repository }}"
+          --pr "${{ github.event.pull_request.number }}"
+          --pretty
+
   check-test:
     runs-on: ubuntu-latest
     timeout-minutes: 30

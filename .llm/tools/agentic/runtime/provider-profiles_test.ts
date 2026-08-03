@@ -58,6 +58,7 @@ Deno.test('OpenRouter preset slugs and route purposes are locked', () => {
   assertEquals(OPENROUTER_PRESET_MODELS, [
     'minimax/minimax-m3',
     'qwen/qwen3.7-max',
+    'google/gemini-3.6-flash',
     'z-ai/glm-5.2',
     'x-ai/grok-4.5',
   ]);
@@ -81,6 +82,17 @@ Deno.test('OpenRouter preset slugs and route purposes are locked', () => {
     agenticTurn: 'supported',
     transport: 'anthropic-messages',
     reasoningTrace: 'present',
+    incompatibility: null,
+  });
+  assertEquals(OPENROUTER_PRESETS['claude-docs-gemini-3-6-flash'], {
+    id: 'claude-docs-gemini-3-6-flash',
+    profileId: 'claude-openrouter',
+    model: 'google/gemini-3.6-flash',
+    effort: 'high',
+    purpose: 'documentation-authoring',
+    agenticTurn: 'supported',
+    transport: 'anthropic-messages',
+    reasoningTrace: 'unverified',
     incompatibility: null,
   });
   assertEquals(matchOpenRouterPreset(route({ effort: 'medium' })), null);

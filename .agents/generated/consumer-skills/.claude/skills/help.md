@@ -38,7 +38,7 @@ Ports held, resources answering that are not yours, a stack that will not start 
 aspire ps --format Json --non-interactive --nologo           # inspect running AppHosts first
 aspire describe --format Json --non-interactive --nologo     # inspect resource state
 aspire resource <resource> stop                              # stop one resource when targeted cleanup is enough
-aspire stop --all --non-interactive --nologo                 # only after confirming every listed AppHost is yours
+aspire stop --apphost <exact-AppHost-path> --non-interactive --nologo
 ```
 
 **Never kill `aspire mcp start`** — those are your MCP servers, not AppHosts.
@@ -48,6 +48,10 @@ port from `aspire describe --format Json` against the fixed/default port you are
 service on a default port will happily answer and look healthy. If stopping the AppHost does not
 restore a clean state, run `aspire doctor --format Json --non-interactive --nologo`; leave leftover
 containers for Aspire to reclaim rather than removing containers by hand.
+
+Do not use the host-wide `aspire stop` mode with `--all`. On shared hosts it can stop sibling runs,
+and it is not a reliable cleanup oracle: three independent agents saw it report
+`No running AppHost found` and exit 0 while processes rooted at the AppHost survived.
 
 ## Vite will not start, or hangs
 
@@ -168,7 +172,7 @@ tools that walk upward will inherit it. A generated project should carry its own
 aspire ps --format Json --non-interactive --nologo           # inspect before stopping anything
 aspire describe --format Json --non-interactive --nologo     # inspect runtime/resource state
 aspire resource <resource> stop                              # targeted stop when the whole stack should stay up
-aspire stop --all --non-interactive --nologo                 # only after confirming every listed AppHost is yours
+aspire stop --apphost <exact-AppHost-path> --non-interactive --nologo
 ```
 
 Re-run `aspire ps` and `aspire describe` after stopping. Aspire's `dcp` helper processes can take

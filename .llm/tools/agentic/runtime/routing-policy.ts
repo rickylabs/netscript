@@ -37,6 +37,7 @@ export const ROUTING_LANES = [
   'major_ui_ux_adversarial_review',
   'adversarial_design_eval',
   'documentation_review',
+  'documentation_authoring',
   'docs_audit',
   'docs_polish',
   'chore_code',
@@ -86,6 +87,7 @@ export interface EffortEscalation {
 }
 
 const MAJOR_UI_UX_PRESET = OPENROUTER_PRESETS['claude-design-glm-5-2'];
+const DOCUMENTATION_AUTHORING_PRESET = OPENROUTER_PRESETS['claude-docs-gemini-3-6-flash'];
 const FORMAL_EVALUATOR_PRESET = OPENROUTER_PRESETS['claude-evaluator-qwen-3-7-max'];
 
 /** Canonical machine-readable route bindings rendered by the harness lane-policy document. */
@@ -211,6 +213,17 @@ export const CANONICAL_ROUTE_POLICY: readonly CanonicalRoutePolicy[] = [
     model: MODEL_IDS.codexLuna,
     effort: 'high',
     condition: 'fallback_on_sonnet_token_limit',
+  },
+  {
+    lane: 'documentation_authoring',
+    purpose: 'documentation',
+    agent: 'claude',
+    provider: 'openrouter',
+    profileId: DOCUMENTATION_AUTHORING_PRESET.profileId,
+    presetId: DOCUMENTATION_AUTHORING_PRESET.id,
+    model: DOCUMENTATION_AUTHORING_PRESET.model,
+    effort: DOCUMENTATION_AUTHORING_PRESET.effort,
+    condition: 'documentation_generation',
   },
   // --- Single-pass audit of a Claude-generated docs changeset ---------------------
   // Owner-revised 2026-07-17. The whole changeset is audited in ONE pass by
@@ -481,8 +494,14 @@ export function resolveCanonicalFormalEvaluatorRoute(
   if (
     route.purpose !== 'evaluation' || route.agent !== 'claude' ||
     route.provider !== 'openrouter' || route.profileId !== 'claude-openrouter' ||
-    route.evaluatorModelPolicy !== 'open_only' ||
-    !OPEN_EVALUATOR_MODEL_IDS.some((model) => model === route.model) ||
+    route.evaluatorModelPolicy !== 'open_only'
+  ) {
+    throw new Error('formal evaluator requires an evaluation route on Claude OpenRouter');
+  }
+  if (!OPEN_EVALUATOR_MODEL_IDS.some((model) => model === route.model)) {
+    throw new Error('formal evaluator model is not approved for open-only evaluation');
+  }
+  if (
     !preset || preset.purpose !== 'evaluation' || preset.model !== route.model ||
     preset.agenticTurn !== 'supported' || preset.reasoningTrace !== 'present'
   ) {

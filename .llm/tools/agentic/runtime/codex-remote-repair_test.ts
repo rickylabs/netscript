@@ -9,6 +9,7 @@ import {
   CODEX_CONTROL_SOCKET_RELATIVE,
   isAnchoredCodexAppServer,
   parseProcessTable,
+  recentActiveSessions,
 } from './adapters/local-codex-remote-adapter.ts';
 import { assert } from '@std/assert';
 
@@ -92,12 +93,79 @@ Deno.test('repair refuses active sessions and child commands before every mutati
   }
 });
 
+Deno.test('repair proceeds from absent state despite stale non-completed rollout evidence', async () => {
+  const sessionRoot = await Deno.makeTempDir({ prefix: 'netscript-stale-rollout-' });
+  try {
+    await Deno.writeTextFile(
+      `${sessionRoot}/019f4b72-2ea4-7050-917e-6d6918371265.jsonl`,
+      '{"type":"agent_message"}\n',
+    );
+    const activeSessionIds = await recentActiveSessions(sessionRoot, false);
+    const port = new FakeRepairPort([observed({
+      appServers: [],
+      controlSocketPresent: false,
+      activeSessionIds,
+    })]);
+    const result = await runCodexRemoteRepair(worktree, true, port);
+    assert(activeSessionIds.length === 0);
+    assert(result.status === 'planned');
+    assert(port.events.join(',') === 'inspect');
+  } finally {
+    await Deno.remove(sessionRoot, { recursive: true });
+  }
+});
+
+Deno.test('repair proceeds from stale_socket state despite stale non-completed rollout evidence', async () => {
+  const sessionRoot = await Deno.makeTempDir({ prefix: 'netscript-stale-socket-rollout-' });
+  try {
+    await Deno.writeTextFile(
+      `${sessionRoot}/019f4b72-2ea4-7050-917e-6d6918371265.jsonl`,
+      '{"type":"agent_message"}\n',
+    );
+    const activeSessionIds = await recentActiveSessions(sessionRoot, false);
+    const port = new FakeRepairPort([observed({
+      appServers: [],
+      controlSocketPresent: true,
+      activeSessionIds,
+    })]);
+    const result = await runCodexRemoteRepair(worktree, true, port);
+    assert(activeSessionIds.length === 0);
+    assert(result.state === 'stale_socket');
+    assert(result.status === 'planned');
+    assert(port.events.join(',') === 'inspect');
+  } finally {
+    await Deno.remove(sessionRoot, { recursive: true });
+  }
+});
+
+Deno.test('repair still refuses a non-completed rollout anchored by a live app-server', async () => {
+  const sessionRoot = await Deno.makeTempDir({ prefix: 'netscript-live-rollout-' });
+  try {
+    const sessionId = '019f4b72-2ea4-7050-917e-6d6918371265';
+    await Deno.writeTextFile(`${sessionRoot}/${sessionId}.jsonl`, '{"type":"agent_message"}\n');
+    const activeSessionIds = await recentActiveSessions(sessionRoot, true);
+    const port = new FakeRepairPort([observed({
+      controlSocketPresent: false,
+      activeSessionIds,
+    })]);
+    const result = await runCodexRemoteRepair(worktree, true, port);
+    assert(activeSessionIds.join(',') === sessionId);
+    assert(result.status === 'blocked');
+    assert(result.diagnostics[0]?.code === 'active_session');
+    assert(port.events.join(',') === 'inspect');
+  } finally {
+    await Deno.remove(sessionRoot, { recursive: true });
+  }
+});
+
 Deno.test('repair refuses unanchored processes and parser never broad-matches shells', async () => {
   assert(isAnchoredCodexAppServer(anchoredArgv, home));
   assert(!isAnchoredCodexAppServer('bash -lc pkill -f "codex app-server"', home));
   assert(!isAnchoredCodexAppServer('/usr/local/bin/codex app-server', home));
   const table = parseProcessTable(
-    `71 1 ${anchoredArgv}\n72 1 bash -lc pkill -f "codex app-server"\n`,
+    `71 1 ${anchoredArgv}\n` +
+      '72 1 bash -lc pkill -f "codex app-server"\n' +
+      '73 1 /usr/local/bin/codex app-server --remote-control\n',
     home,
   );
   assert(table.appServers.length === 2);
