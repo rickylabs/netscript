@@ -374,6 +374,14 @@ legitimate result that activates option (b) (the `aspire-cli` source), not a blo
 verdict is the deciding artifact; #1131 and #1133 may not start before it exists. The original
 fork table is retained below as the decision record:
 
+**P1 verdict (2026-08-03): `FAIL`; F1(b) selected for the current decision record.** The
+post-allocation callback did emit a complete identity-bound manifest with the allocated
+`http://localhost:3001` endpoint, so the seam itself was not refuted. The locked coherent-owned-run
+bar failed because the generated SQLite service exited without `--allow-ffi`; a later HTTP 200 was
+unattributed and could not establish manifest/description/health agreement. F1(b) is therefore the
+first-class endpoint source now, while a future healthy owned-run proof may legitimately revisit F1.
+Both mechanisms remain additive implementations of the same endpoint-source port.
+
 | # | Fork | Options | Seed recommendation |
 | --- | --- | --- | --- |
 | F1 | Endpoint manifest mechanism | (a) generated run-mode **post-allocation** callback writes the run-state manifest (b) `aspire` CLI query adapter (c) MCP as Aspire-hosted HTTP resource | **(a), [P1]-arbitrated** — S-7 proved the naive helper-body write impossible, so (a) stands only if P1's artifact demonstrates the post-allocation seam; (b) is a first-class source in the same port contract otherwise; (c) rejected (no HTTP transport exists; port chicken-and-egg; `.mcp.json` churn) |
@@ -388,4 +396,5 @@ fork table is retained below as the decision record:
 document condenses the run's normative record (`design/canonical/00–06` rev 2, `plan.md` rev 2,
 `design/examples/`). Where this RFC and the run docs conflict, the run docs win until
 ratification, then GitHub wins. Refs #1117 #1102 #1072 #1071 #1093 — no closing keywords; the §7
-board is now live (epic #1126, children #1127–#1140); F1 remains open pending #1127's verdict.</sub>
+board is now live (epic #1126, children #1127–#1140); F1 was resolved to qualified F1(b) by
+#1127's committed proof verdict.</sub>
