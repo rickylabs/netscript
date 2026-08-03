@@ -90,3 +90,7 @@ one file) and copies the `commandGate(…, { retry })` pattern; report consumers
 - CI run 30845659110 (this PR): `runtime.aspire-restore: PASSED 5558ms` cold, attempt 1 — 0.6% of
   the 900s ceiling. Verdict: stall-class, not ceiling-bound; retry chosen accordingly, ceiling
   unchanged. All #1176 checks settled green except close-gate (mirror pending ready-merge label).
+
+- 2026-08-03 21:50: close-gate rerun-blindness root-caused (mirror `if:` read frozen event labels;
+  reruns can never see a later label). Fixed in ci.yml on the S4 branch (#1178, live API read).
+  This push exists to mint a fresh PR event whose payload carries status:ready-merge.
