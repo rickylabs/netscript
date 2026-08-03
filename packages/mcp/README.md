@@ -186,15 +186,63 @@ stdin or terminates the process; callers do not need to reach into an internal t
 
 Two entrypoints carry the package:
 
-| Entry   | What it gives you                                                                                                                    |
-| ------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| `.`     | Tool contracts and schemas, the tool registry, the protocol runner (`createMcpServer`), port interfaces, and default adapters        |
-| `./cli` | The executable composition (`createMcpCliServer`, `runMcpStdioServer`) that binds real telemetry, docs, doctor, and process adapters |
+| Entry   | What it gives you                                                                                                      |
+| ------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `.`     | Tool contracts and schemas, the tool registry, protocol runner, service endpoint directory ports, and default adapters |
+| `./cli` | The executable composition plus every export from `.`, including the service endpoint directory surface                |
 
 Every tool flow depends on a port interface, so embedders and tests supply their own adapters and
 assert against the published schemas. The always-current symbol list is
 [`deno doc jsr:@netscript/mcp@<version>`](https://jsr.io/@netscript/mcp/doc) (pin `<version>` on the
 pre-release line, as above).
+
+### Discover service OpenAPI endpoints
+
+Embedders can compose the four discovery sources and bounded network probe without importing an
+OpenAPI projection layer:
+
+```ts
+import { createServiceEndpointDirectory } from '@netscript/mcp';
+
+const endpoints = createServiceEndpointDirectory({
+  projectRoot: Deno.cwd(),
+});
+
+const { entries, sources } = await endpoints.list();
+```
+
+The effective per-service precedence is `override > aspire-cli > run-manifest > appsettings`. Every
+source remains visible as `used`, `absent`, or `failed`; a failed Aspire CLI query or a stale
+manifest is never rendered as healthy absence. The manifest at `.netscript/run/endpoints.json` is
+eligible only when its real project root and `runId` match the supplied current run. `appHostPath`
+defaults to `./aspire/apphost.mts`; override it when the active AppHost lives elsewhere. Supply
+`expectedRunId` only when the host owns the current AppHost run token; without that identity proof,
+a present run manifest is reported as failed and does not contribute endpoints.
+
+Explicit operator endpoints and exclusions live only in the S5-owned subsection of
+`.netscript/agent-mcp.json`; sibling settings are ignored:
+
+```json
+{
+  "introspection": {
+    "serviceEndpoints": {
+      "orders": "https://orders.example.test"
+    },
+    "excludeServices": ["internal-admin"]
+  }
+}
+```
+
+Exclusions are applied before network access. Other rows report `running`, `not_running`,
+`spec_unavailable`, or `identity_mismatch`; parsed OpenAPI is retained as opaque JSON for a later
+consumer. Probes do not send credentials or follow redirects. A 401/403 explains how to expose only
+the OpenAPI route anonymously or supply a reachable public spec URL. A running service must return
+JSON containing its selected service name, for example `{ "service": "orders" }`, from its selected
+base path; this second request prevents a reused port from being mistaken for the intended service.
+
+The default library composition needs `--allow-read` for carriers and real-path checks,
+`--allow-run` for `aspire describe`, and `--allow-net` for bounded spec/identity requests. Tests and
+custom hosts can replace every source and the probe through `ServiceEndpointDirectoryOptions`.
 
 ## Configuration at a glance
 
@@ -203,6 +251,9 @@ pre-release line, as above).
 - **Docs corpus**: by default the docs tools index the documentation shipped with the installed
   package; set `--docs-root <path>` (or `NETSCRIPT_DOCS_ROOT`) to serve a project or site corpus
   instead.
+- **Service endpoint discovery** (library surface): `.netscript/agent-mcp.json` override, then the
+  Aspire CLI machine-readable query, then an identity-bound run manifest, then
+  `aspire/appsettings.json`; lower-priority disagreements remain visible as conflicts.
 - **Command policy**: the shipped default allows the prefixes
   `db init|generate|migrate|seed|status|introspect`, `generate`, `contract`, `service list`,
   `plugin install|list|sync|doctor`, and `ui:add|ui:init|ui:list|ui:update`, and denies `deploy`,

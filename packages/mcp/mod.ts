@@ -99,3 +99,59 @@ export type {
   EmbeddedDocsCorpusOptions,
   EmbeddedDocsSource,
 } from './src/infrastructure/embedded-docs-corpus.ts';
+export {
+  createServiceEndpointDirectory,
+  DEFAULT_SERVICE_ENDPOINT_CONCURRENCY,
+  DEFAULT_SERVICE_ENDPOINT_TIMEOUT_MS,
+} from './src/application/service-endpoint-directory.ts';
+export type { ServiceEndpointDirectoryOptions } from './src/application/service-endpoint-directory.ts';
+export {
+  ENDPOINT_SOURCE_PRECEDENCE,
+  ENDPOINT_SOURCES,
+  SERVICE_ENDPOINT_STATUSES,
+  SOURCE_FAILURE_CODES,
+} from './src/ports/service-endpoint-directory-port.ts';
+export type {
+  AbsentSourceOutcome,
+  EndpointCandidate,
+  EndpointConflict,
+  EndpointSource,
+  EndpointSourceContext,
+  EndpointSourcePort,
+  ExcludedServiceEndpointRow,
+  FailedServiceEndpointProbeResult,
+  FailedSourceOutcome,
+  IdentityMismatchServiceEndpointRow,
+  NotRunningServiceEndpointRow,
+  RunningServiceEndpointProbeResult,
+  RunningServiceEndpointRow,
+  ServiceEndpointDirectoryPort,
+  ServiceEndpointDirectoryResult,
+  ServiceEndpointProbePort,
+  ServiceEndpointProbeResult,
+  ServiceEndpointRow,
+  ServiceEndpointRowBase,
+  ServiceEndpointStatus,
+  SourceFailureCode,
+  SourceOutcome,
+  SpecUnavailableServiceEndpointRow,
+  UsedSourceOutcome,
+} from './src/ports/service-endpoint-directory-port.ts';
+export { AppsettingsEndpointSource } from './src/infrastructure/service-endpoints/appsettings-endpoint-source.ts';
+export type { AppsettingsEndpointSourceOptions } from './src/infrastructure/service-endpoints/appsettings-endpoint-source.ts';
+export { AspireCliEndpointSource } from './src/infrastructure/service-endpoints/aspire-cli-endpoint-source.ts';
+export type {
+  AspireCliCommand,
+  AspireCliCommandResult,
+  AspireCliEndpointSourceOptions,
+} from './src/infrastructure/service-endpoints/aspire-cli-endpoint-source.ts';
+export {
+  DEFAULT_SERVICE_ENDPOINT_RESPONSE_BYTE_LIMIT,
+  FetchServiceEndpointProbe,
+  SPEC_UNAVAILABLE_AUTH_GUIDANCE,
+} from './src/infrastructure/service-endpoints/fetch-service-endpoint-probe.ts';
+export type { FetchServiceEndpointProbeOptions } from './src/infrastructure/service-endpoints/fetch-service-endpoint-probe.ts';
+export { OverrideEndpointSource } from './src/infrastructure/service-endpoints/override-endpoint-source.ts';
+export type { OverrideEndpointSourceOptions } from './src/infrastructure/service-endpoints/override-endpoint-source.ts';
+export { RunManifestEndpointSource } from './src/infrastructure/service-endpoints/run-manifest-endpoint-source.ts';
+export type { RunManifestEndpointSourceOptions } from './src/infrastructure/service-endpoints/run-manifest-endpoint-source.ts';
