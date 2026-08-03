@@ -6,15 +6,15 @@
 | --- | --- |
 | Run ID | `fix-canary-payload-merge-commits--1166` |
 | Branch | `fix/canary-payload-merge-commits` |
-| Current phase | `plan-eval` |
+| Current phase | `implement` |
 | Archetype | N/A — internal release tooling |
 | Scope overlays | none |
 
 ## Current State
 
-The branch contains only the harness bootstrap commit over `origin/main`; no implementation file has
-changed. Research and Design are locked. The canonical local Qwen evaluator launch is blocked by an
-absent OpenRouter credential, and the Plan-Gate hard stop remains in force.
+The branch contains only harness commits over `origin/main`; no implementation file has changed.
+Research and Design are locked. The milestone orchestrator approved the plan and issued a written
+waiver of the per-PR local PLAN-EVAL hard stop under `milestone-run.md`'s composed evaluator protocol.
 
 ## Completed
 
@@ -25,15 +25,15 @@ absent OpenRouter credential, and the Plan-Gate hard stop remains in force.
 ## In Progress
 
 - Draft PR #1180 is open with the required partial reference, milestone, and taxonomy.
-- PLAN-EVAL launch is blocked before a model turn (`auth_required`).
+- PLAN-EVAL is recorded as composed/waived for this delegated milestone PR; the earlier local route
+  failure remains visible as a did-not-run, not a verdict.
 
 ## Next Steps
 
-1. Restore `OPENROUTER_API_KEY` to the approved child environment and run separate local Qwen
-   PLAN-EVAL, or obtain an explicit written owner waiver.
-2. Only after PASS/waiver, delegate slice 1, capture RED→GREEN, run gates, and perform
-   opposite-family substantive review.
-3. Sign off, push/comment, then run a distinct Qwen IMPL-EVAL session.
+1. Delegate slice 1, capture RED→GREEN, and run the focused/adjacent/scoped gates.
+2. Perform the required opposite-family code review, fix findings, and make the supervisor sign-off
+   commit.
+3. Push/comment and hand the PR to the milestone run's composed evaluator/pre-merge gate.
 
 ## Key Decisions
 
@@ -53,19 +53,19 @@ absent OpenRouter credential, and the Plan-Gate hard stop remains in force.
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | blocked | PLAN-EVAL route returned `auth_required`; no evaluator turn ran. |
+| Static | authorized | PLAN-EVAL composed per `milestone-run.md`; written orchestrator waiver recorded. |
 | Fitness | pending | Synthetic fixture and regression suite planned. |
 | Runtime | N/A | No release cut or runtime behavior. |
 | Consumer | pending | Existing GitHub surface regression tests. |
 
 ## Open Questions
 
-- Blocking: restore the local evaluator credential or obtain an explicit written Plan-Gate waiver.
+- None that block implementation; live-cut evidence remains explicitly deferred.
 
 ## Drift and Debt
 
-- Drift: owner-opened Codex supervisor recorded as minor route fallback; local evaluator credential
-  absence recorded as significant because it blocks the hard Plan-Gate.
+- Drift: owner-opened Codex supervisor, failed local evaluator attempt, and subsequent milestone-run
+  composed-evaluation waiver are recorded.
 - Debt: none.
 
 ## Commits

@@ -65,6 +65,7 @@ changes for future traversal corrections.
 | 2026-08-03 | 0 | bootstrap/research | Read #1166, required skills/cadence, current implementation/tests, and re-baselined cleanly at `fb75cf6f`. |
 | 2026-08-03 | 0 | design | Locked full-range traversal, explicit successful-empty evidence, and fail-closed suspicious-empty policy. |
 | 2026-08-03 | 0 | PLAN-EVAL launch blocked | Canonical local Qwen route returned `auth_required`: `OPENROUTER_API_KEY` is absent, so no evaluator process, tools, reasoning, or verdict ran. Cloud OpenHands was not dispatched because `openhands-handoff` prohibits substituting a cloud evaluator for a local-machine run. |
+| 2026-08-03 | 0 | orchestrator steer | `release-0.0.5--orchestration` approved the locked plan and waived the per-PR local PLAN-EVAL under `milestone-run.md`'s composed evaluator protocol. Implementation authorized; pre-merge composed evaluation remains orchestrator-owned. |
 
 ## Decisions
 
@@ -86,7 +87,7 @@ changes for future traversal corrections.
 
 | Gate | Command or check | Result | Notes |
 | --- | --- | --- | --- |
-| PLAN-EVAL | `deno task agentic:provider-canary --live --profile claude-openrouter --model qwen/qwen3.7-max --effort high --worktree ...` | BLOCKED / NOT_RUN | Exit 4; `auth_required`, credential absent, zero tool/reasoning/streaming events. No verdict; hard stop remains before slice 1. |
+| PLAN-EVAL | milestone-run composed evaluator protocol + written orchestrator waiver | COMPOSED / WAIVED | Per `milestone-run.md`: per-PR local formal evaluator is not spawned; draft→ready augment review, label-triggered OpenHands, and orchestrator pre-merge gate preserve separation. Locked plan approved as written. |
 | Focused tests | `deno test --allow-all .llm/tools/release/canary-label_test.ts` | NOT_RUN | RED→GREEN evidence pending. |
 | Scoped check/lint/fmt | repo wrappers over `.llm/tools/release` | NOT_RUN | Pending implementation. |
 
@@ -114,5 +115,5 @@ changes for future traversal corrections.
 
 - PLAN-EVAL should challenge L1 (range semantics), L4 (suspicious-empty policy), and whether the
   synthetic fixture proves old RED rather than merely asserting the new implementation.
-- Do not treat the provider canary or route validation as PLAN-EVAL. A real separate model turn must
-  write `plan-eval.md`, unless the owner explicitly waives the Plan-Gate in writing.
+- The failed provider canary remains a did-not-run record, not a verdict. The milestone orchestrator's
+  written steer separately waives the per-PR hard stop and binds this slice to composed evaluation.
