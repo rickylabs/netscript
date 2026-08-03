@@ -238,7 +238,8 @@ describe('HelpersGeneratorPipeline', () => {
       (f) => f.path === '.helpers/register-infrastructure.mts',
     );
     assert(regInfra, 'register-infrastructure.mts should exist');
-    assertStringIncludes(regInfra!.content, "builder.addPostgres('main')");
+    assertStringIncludes(regInfra!.content, "builder.addPostgres('main', {");
+    assertStringIncludes(regInfra!.content, "ensureDatabasePassword(appHostDir, 'main')");
 
     // Register plugins should include our plugin
     const regPlugins = files.find(

@@ -113,6 +113,31 @@ export function resolveDataPath(
   return resolveWorkspacePath(appHostDir, relativePath);
 }
 
+/**
+ * Returns one project-scoped database password shared by every AppHost identity.
+ * Aspire stores generated parameter values per AppHost project, so the resident
+ * and short-lived database-operation projects cannot rely on its implicit value
+ * when they attach to the same persistent data directory.
+ */
+export function ensureDatabasePassword(appHostDir: string, resourceName: string): string {
+  const secretsDir = resolveWorkspacePath(appHostDir, join('.data', 'aspire-secrets'));
+  const passwordPath = join(secretsDir, `${resourceName}.password`);
+  mkdirSync(secretsDir, { recursive: true, mode: 0o700 });
+
+  if (!existsSync(passwordPath)) {
+    const password = crypto.randomUUID().replaceAll('-', '');
+    try {
+      writeFileSync(passwordPath, password, { encoding: 'utf8', flag: 'wx', mode: 0o600 });
+    } catch (error) {
+      if (!(error instanceof Error) || !('code' in error) || error.code !== 'EEXIST') throw error;
+    }
+  }
+
+  const password = readFileSync(passwordPath, 'utf8').trim();
+  if (!password) throw new Error(`Database password file is empty: ${passwordPath}`);
+  return password;
+}
+
 // ============================================================================
 // Database environment helpers
 // ============================================================================

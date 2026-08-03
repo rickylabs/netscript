@@ -350,4 +350,20 @@ describe('generateRegisterInfrastructure', () => {
     assertStringIncludes(output, "mssql_server.addDatabase('app-mssql-db')")
     assertStringIncludes(output, "databases.set('mssql', mssql);")
   })
+
+  it('shares container database credentials across AppHost identities', () => {
+    for (const Engine of ['Postgres', 'Mysql'] as const) {
+      const name = Engine.toLowerCase()
+      const output = generateRegisterInfrastructure({
+        databases: { [name]: { Enabled: true, Engine, Mode: 'Container', Persistent: true } },
+        caches: {},
+        primaryDatabase: name,
+      })
+
+      assertStringIncludes(output, `builder.addParameter('${name}-password', {`)
+      assertStringIncludes(output, `value: ensureDatabasePassword(appHostDir, '${name}')`)
+      assertStringIncludes(output, `builder.${Engine === 'Postgres' ? 'addPostgres' : 'addMySql'}('${name}', {`)
+      assertStringIncludes(output, `password: ${name}_password`)
+    }
+  })
 })
