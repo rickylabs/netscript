@@ -95,6 +95,8 @@ export function createSuiteRunner(options: SuiteRunnerOptions): SuiteRunner {
               critical: false,
               durationMs: 0,
               evidence: [{ kind: 'docker' as const, label: 'removed containers', data: removed }],
+              attempts: [{ attempt: 1, verdict: 'passed' as const, durationMs: 0 }],
+              retried: false,
             });
           }
         }

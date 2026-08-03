@@ -85,6 +85,10 @@ export function createRuntimeGates(
         '--non-interactive',
         '--nologo',
       ],
+      undefined,
+      undefined,
+      undefined,
+      { classes: ['timeout', 'canceled'], maxRetries: 1 },
     ),
     commandGate(
       GATE.RUNTIME_AUTH_SMOKE_ENV,

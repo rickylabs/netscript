@@ -1,6 +1,6 @@
 import type { Evidence } from './evidence.ts';
 import type { GateId, SuiteId } from './cli-surface.ts';
-import type { GateVerdict } from './gate-definition.ts';
+import type { GateAttempt, GateVerdict } from './gate-definition.ts';
 
 /** Result for a single gate or step. */
 export interface StepResult {
@@ -10,6 +10,8 @@ export interface StepResult {
   readonly durationMs: number;
   readonly critical: boolean;
   readonly evidence: readonly Evidence[];
+  readonly attempts: readonly GateAttempt[];
+  readonly retried: boolean;
   readonly error?: string;
 }
 

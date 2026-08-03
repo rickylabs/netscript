@@ -4,6 +4,7 @@ import { PACKAGE_SOURCE } from '../../../domain/extension-axes.ts';
 import { resolve } from '@std/path';
 import type {
   CommandFactory,
+  CommandGateRetryPolicy,
   GateDefinition,
   HttpGateDefinition,
 } from '../../../domain/gate-definition.ts';
@@ -50,6 +51,7 @@ export function commandGate(
   cwd: (context: RunContext) => string = (context) => context.project.repoRoot,
   outputMode: CommandOutputMode = 'capture',
   failureHint?: string,
+  retry?: CommandGateRetryPolicy,
 ): GateDefinition {
   return {
     id,
@@ -61,6 +63,7 @@ export function commandGate(
     cwd,
     outputMode,
     failureHint,
+    retry,
   };
 }
 
