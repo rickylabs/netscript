@@ -38,6 +38,7 @@ Deno.test('shared release preparation runs the stable gate sequence in order', a
   assertEquals(calls, [
     'bump:0.0.1-canary.1:canary',
     'deno task gen:publish-assets',
+    'deno task gen:assets-barrel',
     'residue:0.0.1-beta.10',
     'deno task publish:readiness',
     'deno task publish:dry-run',
@@ -65,5 +66,5 @@ Deno.test('shared release preparation regenerates assets then stops when residue
     Error,
     'Version residue remains',
   );
-  assertEquals(calls, ['deno task gen:publish-assets']);
+  assertEquals(calls, ['deno task gen:publish-assets', 'deno task gen:assets-barrel']);
 });

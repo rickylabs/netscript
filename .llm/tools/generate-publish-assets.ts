@@ -9,6 +9,14 @@ const CHECK = Deno.args.includes('--check');
 const stalePaths: string[] = [];
 
 export const PUBLISH_ASSET_OUTPUTS = [
+  '.llm/assets/agent-docs/provenance.json',
+  'packages/cli/src/kernel/assets/agent-tools.generated.ts',
+  'packages/cli/src/kernel/assets/agent-docs.generated.ts',
+  'packages/cli/src/kernel/assets/embedded.generated.ts',
+  'packages/cli/src/kernel/assets/skills.generated.ts',
+  'packages/plugin/src/kernel/assets/embedded.generated.ts',
+  'packages/fresh-ui/registry.generated.ts',
+  'packages/service/src/primitives/scalar.generated.ts',
   'packages/mcp/src/publish-assets.generated.ts',
   'packages/cli/src/kernel/assets/publish-assets.generated.ts',
   'packages/fresh-ui/src/package-metadata.generated.ts',
@@ -21,6 +29,12 @@ export const PUBLISH_ASSET_OUTPUTS = [
   'plugins/triggers/src/package-metadata.generated.ts',
   'plugins/workers/src/package-metadata.generated.ts',
 ] as const;
+
+interface AgentDocsProvenance {
+  readonly schemaVersion: 1;
+  readonly version: string;
+  readonly [key: string]: unknown;
+}
 
 async function readVersion(path: string): Promise<string> {
   const config = JSON.parse(await Deno.readTextFile(new URL(path, ROOT))) as PackageConfig;
@@ -64,6 +78,34 @@ async function write(path: string, source: string): Promise<void> {
     return;
   }
   await Deno.writeTextFile(url, expected);
+}
+
+/** Refresh the release identity in the checked-in docs provenance before embedding it in the CLI. */
+export async function refreshAgentDocsProvenance(
+  root: URL = ROOT,
+  check: boolean = CHECK,
+): Promise<void> {
+  const version = await readVersionFromRoot(root, 'packages/cli/deno.json');
+  const path = '.llm/assets/agent-docs/provenance.json';
+  const url = new URL(path, root);
+  const provenance = JSON.parse(await Deno.readTextFile(url)) as AgentDocsProvenance;
+  if (provenance.schemaVersion !== 1 || typeof provenance.version !== 'string') {
+    throw new Error(`${path} must contain schemaVersion 1 and a string version`);
+  }
+  const expected = `${JSON.stringify({ ...provenance, version }, null, 2)}\n`;
+  if (check) {
+    if (await Deno.readTextFile(url) !== expected) stalePaths.push(path);
+    return;
+  }
+  await Deno.writeTextFile(url, expected);
+}
+
+async function readVersionFromRoot(root: URL, path: string): Promise<string> {
+  const config = JSON.parse(await Deno.readTextFile(new URL(path, root))) as PackageConfig;
+  if (typeof config.version !== 'string' || !config.version.trim()) {
+    throw new Error(`${path} requires a non-empty version`);
+  }
+  return config.version;
 }
 
 async function generateMcpAssets(): Promise<void> {
@@ -134,6 +176,7 @@ if (import.meta.main) {
   const unknownArgs = Deno.args.filter((arg) => arg !== '--check');
   if (unknownArgs.length > 0) throw new Error(`Unknown argument: ${unknownArgs[0]}`);
   await Promise.all([
+    refreshAgentDocsProvenance(),
     generateMcpAssets(),
     generateCliAssets(),
     generateFreshUiMetadata(),

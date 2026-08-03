@@ -53,6 +53,14 @@ export async function prepareRelease(
     root,
     dependencies,
   );
+  await runGate(
+    label,
+    'gen:assets-barrel',
+    'deno',
+    ['task', 'gen:assets-barrel'],
+    root,
+    dependencies,
+  );
 
   const residue = await dependencies.findResidue(root, bump.oldVersion);
   if (residue.length > 0) {

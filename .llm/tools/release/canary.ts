@@ -15,6 +15,13 @@ export interface CanaryOptions {
   readonly dryRun: boolean;
   readonly root: string;
   readonly republishVersion?: string;
+  readonly output?: string;
+}
+
+export interface CanaryResult {
+  readonly version: string;
+  readonly tag: string;
+  readonly branch: string;
 }
 
 export interface CanaryVersionDependencies {
@@ -34,6 +41,7 @@ export function parseArgs(argv: string[]): CanaryOptions {
   let dryRun = false;
   let root = Deno.cwd();
   let republishVersion: string | undefined;
+  let output: string | undefined;
   for (let index = 0; index < argv.length; index++) {
     const arg = argv[index];
     switch (arg) {
@@ -48,6 +56,9 @@ export function parseArgs(argv: string[]): CanaryOptions {
       case '--republish-version':
         republishVersion = requireValue(argv, ++index, arg);
         break;
+      case '--output':
+        output = requireValue(argv, ++index, arg);
+        break;
       case '--help':
         printHelp();
         Deno.exit(0);
@@ -60,7 +71,27 @@ export function parseArgs(argv: string[]): CanaryOptions {
   if (!targetVersion) throw new Error('release:canary requires a target stable version.');
   validateStableTarget(targetVersion);
   if (republishVersion) validateRepublishVersion(targetVersion, republishVersion);
-  return { targetVersion, dryRun, root, ...(republishVersion ? { republishVersion } : {}) };
+  return {
+    targetVersion,
+    dryRun,
+    root,
+    ...(republishVersion ? { republishVersion } : {}),
+    ...(output ? { output } : {}),
+  };
+}
+
+/** Build the machine-readable identity consumed by post-publish automation. */
+export function canaryResult(version: string, republish = false): CanaryResult {
+  return {
+    version,
+    tag: `v${version}`,
+    branch: republish ? '' : `release/canary-${version}`,
+  };
+}
+
+/** Write the resolved canary identity without requiring consumers to inspect bumped manifests. */
+export async function writeCanaryResult(path: string, result: CanaryResult): Promise<void> {
+  await Deno.writeTextFile(path, `${JSON.stringify(result)}\n`);
 }
 
 export function validateStableTarget(version: string): void {
@@ -150,8 +181,7 @@ export async function createCanaryRefs(
   files: readonly string[],
   runner: ReleaseCommandRunner = runCommand,
 ): Promise<void> {
-  const branch = `release/canary-${version}`;
-  const tag = `v${version}`;
+  const { branch, tag } = canaryResult(version);
   await mustRun('git', ['checkout', '-b', branch], root, runner);
   await mustRun('git', ['add', ...files], root, runner);
   await mustRun('git', ['commit', '-m', `chore(release): cut ${version}`], root, runner);
@@ -220,6 +250,7 @@ Options:
   --dry-run      Run version discovery, bump, and gates without creating refs.
   --republish-version <version>
                  Verify a clean checkout matches an existing canary tag; do not create refs.
+  --output <path> Write resolved version, tag, and branch as JSON after successful preparation.
   --root <path>  Repository root. Defaults to the current directory.
   --help         Show this help.`);
 }
@@ -236,6 +267,9 @@ async function main(): Promise<void> {
   const options = parseArgs(Deno.args);
   if (options.republishVersion) {
     await verifyCanaryRepublishTree(options.root, options.republishVersion);
+    if (options.output) {
+      await writeCanaryResult(options.output, canaryResult(options.republishVersion, true));
+    }
     console.log(`release:canary verified same-semver republish ${options.republishVersion}`);
     return;
   }
@@ -244,11 +278,13 @@ async function main(): Promise<void> {
   const bump: BumpResult = await prepareRelease(options.root, version, 'release:canary', 'canary');
 
   if (options.dryRun) {
+    if (options.output) await writeCanaryResult(options.output, canaryResult(version));
     console.log('release:canary dry-run complete; branch/commit/tag/push skipped.');
     return;
   }
 
   await createCanaryRefs(options.root, version, bump.files);
+  if (options.output) await writeCanaryResult(options.output, canaryResult(version));
   console.log(`release:canary created v${version}; no release PR was created.`);
 }
 
