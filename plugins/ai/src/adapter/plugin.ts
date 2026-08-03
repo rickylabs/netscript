@@ -16,6 +16,8 @@ import {
   DEFAULT_STREAM_PROXY_INPUT,
   DEFAULT_TOOL_INPUT,
   emitMcpRegistry,
+  EMPTY_BARREL_INPUT,
+  emptyBarrelScaffolder,
   modelsScaffolder,
   streamProxyScaffolder,
   threadStoreResource,
@@ -33,16 +35,42 @@ export type { InstallStarterResource, NetScriptPlugin } from '@netscript/plugin/
  * persistence is intentionally excluded (opt-in via `--persist-threads`).
  */
 export const aiStarterResources: readonly InstallStarterResource[] = [
+  // Structural: model configuration is required independently of sample tools and agents.
   { scaffolder: modelsScaffolder, input: DEFAULT_MODELS_INPUT },
-  { scaffolder: barrelScaffolder, input: DEFAULT_BARREL_INPUT },
-  { scaffolder: toolResource.scaffolder, input: DEFAULT_TOOL_INPUT },
-  { scaffolder: agentResource.scaffolder, input: DEFAULT_AGENT_INPUT },
   {
+    scaffolder: barrelScaffolder,
+    input: DEFAULT_BARREL_INPUT,
+    samples: {
+      kind: 'alternate',
+      scaffolder: emptyBarrelScaffolder,
+      input: EMPTY_BARREL_INPUT,
+    },
+  },
+  {
+    scaffolder: toolResource.scaffolder,
+    input: DEFAULT_TOOL_INPUT,
+    samples: { kind: 'omit' },
+  },
+  {
+    scaffolder: agentResource.scaffolder,
+    input: DEFAULT_AGENT_INPUT,
+    samples: { kind: 'omit' },
+  },
+  {
+    // Structural: the empty MCP registry is imported by full sample installs and supports later adds.
     scaffolder: { name: 'mcp-registry', emit: () => [emitMcpRegistry([])] },
     input: {},
   },
-  { scaffolder: streamProxyScaffolder, input: DEFAULT_STREAM_PROXY_INPUT },
-  { scaffolder: chatRouteScaffolder, input: DEFAULT_CHAT_ROUTE_INPUT },
+  {
+    scaffolder: streamProxyScaffolder,
+    input: DEFAULT_STREAM_PROXY_INPUT,
+    samples: { kind: 'omit' },
+  },
+  {
+    scaffolder: chatRouteScaffolder,
+    input: DEFAULT_CHAT_ROUTE_INPUT,
+    samples: { kind: 'omit' },
+  },
 ];
 
 /** Thin connector object consumed by `@netscript/plugin/adapter`. */

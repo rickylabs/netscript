@@ -46,6 +46,7 @@ export const GATE_PHASE = {
 export const GATE = {
   PREFLIGHT_DENO: 'preflight.deno',
   PREFLIGHT_ASPIRE: 'preflight.aspire',
+  SCAFFOLD_HOSTILE_PARENT_TSCONFIG: 'scaffold.hostile-parent-tsconfig',
   SCAFFOLD_INIT: 'scaffold.init',
   SERVICE_LIST: 'service.list',
   CONTRACT_ADD: 'contract.add',
@@ -93,6 +94,7 @@ export const GATE = {
   RUNTIME_WAIT_APP: 'runtime.wait.dashboard',
   RUNTIME_ASPIRE_DESCRIBE: 'runtime.aspire-describe',
   BEHAVIOR_APP_HOME: 'behavior.app-home',
+  BEHAVIOR_PROJECT_BOUNDARY_DEV: 'behavior.project-boundary-dev',
   BEHAVIOR_WORKERS_HEALTH: 'behavior.workers-health',
   BEHAVIOR_WORKERS_JOBS: 'behavior.workers-jobs',
   BEHAVIOR_WORKERS_TASKS: 'behavior.workers-tasks',

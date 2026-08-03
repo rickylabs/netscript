@@ -6,7 +6,11 @@ import {
   createBehaviorPluginUnhealthyGates,
   createPluginRegistryGenerationGates,
 } from './behavior-plugins-health-gate.ts';
-import { createDatabaseGates, createGeneratedCheckGates } from './database-gates.ts';
+import {
+  createDatabaseGates,
+  createGeneratedCheckGates,
+  createProjectBoundaryGates,
+} from './database-gates.ts';
 import { createGeneratedPluginCheckGates } from './generated-plugins-check-gate.ts';
 import { createOtelGates } from './otel-gates.ts';
 import { createCleanupGates, createRuntimeGates } from './runtime-gates.ts';
@@ -24,6 +28,7 @@ export function createScaffoldCapabilityGates(
     ...createUiAiGates(),
     ...createDatabaseGates(),
     ...createGeneratedCheckGates(),
+    ...createProjectBoundaryGates(),
     ...createBehaviorPluginUnhealthyGates(),
     ...createGeneratedPluginCheckGates(),
     ...createPluginRegistryGenerationGates(),
