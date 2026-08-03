@@ -254,3 +254,25 @@ slice dispatches. Upstreams cleared (`git branch --unset-upstream` ×4), all fou
     otherwise. Also: the launcher help documents no `--json`/exit-code contract for refusals;
     the orchestrator's defense was the thread-id artifact check, which should be named in the
     skill/profile as the mandatory post-dispatch verification.
+
+## 2026-08-03 — Wave-1 first turns: the evaluator-composition rule is invisible to slices
+
+The canary-payload slice's first turn ended idle-at-gate: it activated the general run-loop
+Plan-Gate, attempted the local Qwen PLAN-EVAL (`agentic:provider-canary --live` →
+`auth_required`, no OpenRouter credential in the slice environment), recorded the block honestly
+in its run dir, and stopped — the 0.0.4 idle-at-red-gate pattern, executed by the book. Its
+locked plan is sound (merge-aware range port, second-parent fixture RED-first, genuine-empty vs
+suspicious-empty as distinct outcomes, `Refs #1166`, boxes 2–4 left to the orchestrator).
+Orchestrator ruling recorded as drift D6; steer sent to the thread (proceed; PLAN-EVAL row =
+"composed per milestone-run.md"). Expect the same wall from the other three slices; same steer.
+
+14. **[slice-cannot-see-the-profile]** A per-PR slice activating `use harness` runs the
+    run-loop Plan-Gate and cannot know it is inside a milestone run whose profile forbids
+    per-PR local evaluators. The composition rule lives only at milestone level; nothing routes
+    it into a slice session. Wave-1 briefs (mine) did not carry it — wave-2+ briefs will; the
+    system should require milestone-slice briefs to state the evaluator-composition rule, or
+    the harness skill should define a milestone-slice mode.
+15. **[evaluator-lane-unprovisioned]** The canonical local formal-evaluator route (Claude Code +
+    OpenRouter Qwen preset) is not launchable in this environment: `auth_required`, credential
+    absent. Lane-policy binds a route that cannot currently run locally; any slice or run that
+    genuinely needs formal PLAN-EVAL must use owner-provisioned credentials or the cloud lane.
