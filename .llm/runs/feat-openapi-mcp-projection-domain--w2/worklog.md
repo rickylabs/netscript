@@ -67,6 +67,7 @@ they do not add parser strategies or I/O.
 | 2026-08-04 | bootstrap | research/plan | Live issue/RFC, doctrine, package surface, and P2 proof/evidence consumed; plan locked. |
 | 2026-08-04 | 1 | implementation | Regrouped the command-domain triplet without changing the root exports; added the documented projection subpath, deterministic operation index, public-import tests, and README entry. |
 | 2026-08-04 | 1 | review | Verified source-order indexing, dotted ids, method-path fallback, ignored Path Item metadata, unchanged 14-tool claims, pure-domain imports, and empty lock diff. |
+| 2026-08-04 | 2 | implementation/review | Added exact identity resolution and a committed ambiguity fixture. Verified id precedence, uppercase method-path fallback, case-variant refusal, duplicate-id ambiguity candidates, and non-executing substring suggestions. |
 
 ## Decisions
 
@@ -101,6 +102,9 @@ they do not add parser strategies or I/O.
 | Slice 1 command/index tests | `deno test --allow-run packages/mcp/tests/operation-index_test.ts packages/mcp/tests/command_flows_test.ts packages/mcp/tests/command_adapters_test.ts packages/mcp/tests/command_composition_test.ts` | PASS | 12 passed, 0 failed. Initial invocation omitted `--allow-run` and produced the expected permission refusal in three subprocess tests; corrected command passed. |
 | Slice 1 scoped check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/mcp --ext ts,tsx` | PASS | 71 files, one batch, zero diagnostics after adding the required explicit exported constant type. |
 | Slice 1 lock hygiene | raw `git diff -- deno.lock` | PASS | Empty. |
+| Slice 2 identity tests | `deno test packages/mcp/tests/operation-index_test.ts packages/mcp/tests/canonical-identity_test.ts` | PASS | 6 passed, 0 failed. |
+| Slice 2 scoped check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/mcp --ext ts,tsx` | PASS | 73 files, one batch, zero diagnostics. |
+| Slice 2 hygiene | `git diff --check`; raw `git diff -- deno.lock` | PASS | No whitespace errors; lock diff empty. |
 
 ### Fitness Gates
 
