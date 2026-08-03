@@ -9,3 +9,13 @@
 - **Severity:** minor
 - **Action:** accept
 - **Evidence:** Current task instruction and `supervisor.md`.
+
+## 2026-08-03 — Formal evaluator launch blocked by closed-model delegation
+
+- **What:** The bound local Qwen evaluator launched successfully but autonomously delegated read-only exploration to Claude/Opus subagents.
+- **Source:** Claude Code + OpenRouter session `e2a9d033-1331-4afd-8aa7-a6d6c03c2921`.
+- **Expected:** Every formal evaluator turn remains open-model-only on Qwen.
+- **Actual:** The Qwen parent spawned closed-model helper sessions, so the supervisor interrupted the run before accepting a verdict.
+- **Severity:** significant
+- **Action:** defer
+- **Evidence:** Interrupted evaluator session; no `evaluate.md` was produced and no implementation file changed.

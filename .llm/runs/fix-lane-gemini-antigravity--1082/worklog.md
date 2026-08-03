@@ -50,7 +50,8 @@ Change native model ids only in `config/models.ts`, bind lanes in `runtime/routi
 | Scoped format wrapper | PASS | 127 files, 1 batch, 0 findings after formatting the owned test file |
 | Forbidden-route search | PASS | no `OPENROUTER_MODEL_IDS.gemini`, `claude-docs-gemini`, or Gemini OpenRouter model id remains in the scoped config/policy surface |
 | Harness slice review | PASS | separate native Claude/Opus session; exact six-file diff reviewed, 41 focused guards independently green |
+| Formal IMPL-EVAL | BLOCKED | Qwen parent session spawned prohibited closed-model helpers; interrupted before verdict |
 
 ## Reconcile Note
 
-Issue #1082 remains open with five unchecked acceptance boxes pending PR publication and evidence mirroring.
+PR #1086 is published. The five issue acceptance boxes are ready for evidence mirroring; merge readiness remains blocked on a compliant open-model-only IMPL-EVAL.
