@@ -4,7 +4,23 @@
  */
 
 export { createToolRegistry } from './src/application/tool-registry.ts';
-export { createMcpServer, MCP_PROTOCOL_VERSION } from './src/application/runner/mcp-server.ts';
+export {
+  createMcpServer,
+  MCP_AGENT_INSTRUCTIONS,
+  MCP_PROTOCOL_VERSION,
+} from './src/application/runner/mcp-server.ts';
+export {
+  createRecordDriftFlow,
+  DIAGNOSTIC_RECEIPT_TTL_MS,
+  diagnosticEvidenceRefusal,
+  recordDrift,
+} from './src/application/flows/record-drift-flow.ts';
+export type { RecordDriftInput } from './src/application/flows/record-drift-flow.ts';
+export type {
+  DiagnosticEvidencePort,
+  DiagnosticEvidenceReceipt,
+} from './src/domain/diagnostic-evidence-port.ts';
+export { FilesystemDiagnosticEvidence } from './src/infrastructure/filesystem-diagnostic-evidence.ts';
 export type { McpServer, McpServerOptions } from './src/application/runner/mcp-server.ts';
 export { DEFAULT_TRUNCATION_POLICY, truncateResult } from './src/application/runner/truncation.ts';
 export type { TruncationPolicy } from './src/application/runner/truncation.ts';

@@ -38,6 +38,10 @@ import { createListCommandsFlow } from './src/application/flows/list-commands-fl
 import { createExecuteCommandFlow } from './src/application/flows/execute-command-flow.ts';
 import { StaticCommandCatalog } from './src/infrastructure/static-command-catalog.ts';
 import { SpawnCommandExecutor } from './src/infrastructure/spawn-command-executor.ts';
+import type { EmbeddedDocsSource } from './src/infrastructure/embedded-docs-corpus.ts';
+import { FilesystemDiagnosticEvidence } from './src/infrastructure/filesystem-diagnostic-evidence.ts';
+import { createRecordDriftFlow } from './src/application/flows/record-drift-flow.ts';
+import type { ToolExecutionResult, ToolFlow } from './src/domain/tool-types.ts';
 
 export * from './mod.ts';
 
@@ -52,6 +56,8 @@ export interface McpCliOptions {
   /** Project root used by docs, execution, and doctor flows. */ readonly projectRoot?: string;
   /** Explicit public documentation corpus root. */ readonly docsRoot?: string;
   /** Explicit telemetry endpoint supplied by the outer CLI. */ readonly endpoint?: string;
+  /** Additional package-embedded documentation supplied by an outer CLI. */ readonly embeddedDocs?:
+    readonly EmbeddedDocsSource[];
 }
 
 /** Resolve an explicit public documentation override from flags or environment. */
@@ -92,8 +98,9 @@ export function createMcpCliServer(options: McpCliOptions = {}): McpServer {
   const docsCorpus = configuredDocsRoot
     ? new FilesystemDocsCorpus({ root: configuredDocsRoot })
     : new EmbeddedDocsCorpus({
-      documents: [{ slug: 'mcp', source: MCP_PACKAGE_README }],
+      documents: [{ slug: 'mcp', source: MCP_PACKAGE_README }, ...(options.embeddedDocs ?? [])],
     });
+  const evidence = new FilesystemDiagnosticEvidence(projectRoot);
   const probe = new FetchTelemetryProbe((endpoint) =>
     createAspireDashboardFetch(endpoint, {}) ?? fetch
   );
@@ -102,13 +109,29 @@ export function createMcpCliServer(options: McpCliOptions = {}): McpServer {
     environment,
     flows: {
       ...createDocsFlows(docsCorpus),
-      get_app_status: createGetAppStatusFlow(query),
-      list_runs: createListRunsFlow(query),
-      get_run: createGetRunFlow(query),
-      get_recent_errors: createGetRecentErrorsFlow(query),
-      get_last_job_result: createGetLastJobResultFlow(query),
-      analyze_service_performance: createAnalyzeServicePerformanceFlow(query),
-      analyze_db_bottlenecks: createAnalyzeDbBottlenecksFlow(query),
+      get_app_status: withReceipt(createGetAppStatusFlow(query), evidence, 'mcp get_app_status'),
+      list_runs: withReceipt(createListRunsFlow(query), evidence, 'mcp list_runs'),
+      get_run: withReceipt(createGetRunFlow(query), evidence, 'mcp get_run'),
+      get_recent_errors: withReceipt(
+        createGetRecentErrorsFlow(query),
+        evidence,
+        'mcp get_recent_errors',
+      ),
+      get_last_job_result: withReceipt(
+        createGetLastJobResultFlow(query),
+        evidence,
+        'mcp get_last_job_result',
+      ),
+      analyze_service_performance: withReceipt(
+        createAnalyzeServicePerformanceFlow(query),
+        evidence,
+        'mcp analyze_service_performance',
+      ),
+      analyze_db_bottlenecks: withReceipt(
+        createAnalyzeDbBottlenecksFlow(query),
+        evidence,
+        'mcp analyze_db_bottlenecks',
+      ),
       list_commands: createListCommandsFlow(
         options.commandCatalog ?? new StaticCommandCatalog(),
       ),
@@ -116,15 +139,47 @@ export function createMcpCliServer(options: McpCliOptions = {}): McpServer {
         options.commandExecutor ?? new SpawnCommandExecutor(),
         options.commandPolicy ?? DEFAULT_COMMAND_POLICY,
       ),
-      doctor: createDoctorFlow(probe, environment, [
-        new AspireDoctorFamily(),
-        new ProjectWiringDoctorFamily(),
-        new PluginDoctorFamily(
-          options.projectDoctor ?? new UnwiredProjectDoctor(),
-        ),
-      ], projectRoot),
+      doctor: withReceipt(
+        createDoctorFlow(probe, environment, [
+          new AspireDoctorFamily(),
+          new ProjectWiringDoctorFamily(),
+          new PluginDoctorFamily(
+            options.projectDoctor ?? new UnwiredProjectDoctor(),
+          ),
+        ], projectRoot),
+        evidence,
+        'mcp doctor',
+      ),
+      record_drift: createRecordDriftFlow(evidence),
     },
   });
+}
+
+function withReceipt(
+  flow: ToolFlow,
+  evidence: FilesystemDiagnosticEvidence,
+  command: string,
+): ToolFlow {
+  return async (input): Promise<ToolExecutionResult> => {
+    const result = await flow(input);
+    const record = input && typeof input === 'object' ? input as Record<string, unknown> : {};
+    const resource = typeof record.resource === 'string'
+      ? record.resource
+      : typeof record.service === 'string'
+      ? record.service
+      : 'project';
+    const value = result.ok && result.value && typeof result.value === 'object'
+      ? result.value as Record<string, unknown>
+      : undefined;
+    const succeeded = result.ok && value?.status !== 'fail';
+    await evidence.write({
+      resource,
+      command,
+      timestamp: new Date().toISOString(),
+      exitStatus: succeeded ? 0 : 1,
+    });
+    return result;
+  };
 }
 
 if (import.meta.main) await runMcpStdioServer();

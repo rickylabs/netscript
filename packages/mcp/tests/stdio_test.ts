@@ -1,9 +1,9 @@
-import { assertEquals } from '@std/assert';
+import { assert, assertEquals } from '@std/assert';
 import { MCP_PACKAGE_VERSION } from '../src/publish-assets.generated.ts';
 
 Deno.test('stdio initialize, list, and unreachable doctor round trip', async () => {
   const command = new Deno.Command(Deno.execPath(), {
-    args: ['run', '--allow-env', '--allow-net', '--allow-read', 'cli.ts'],
+    args: ['run', '--allow-env', '--allow-net', '--allow-read', '--allow-write', 'cli.ts'],
     cwd: new URL('..', import.meta.url),
     stdin: 'piped',
     stdout: 'piped',
@@ -37,6 +37,10 @@ Deno.test('stdio initialize, list, and unreachable doctor round trip', async () 
   );
   assertEquals(responses[0].result.serverInfo.name, '@netscript/mcp');
   assertEquals(responses[0].result.serverInfo.version, MCP_PACKAGE_VERSION);
-  assertEquals(responses[1].result.tools.length, 13);
+  assertEquals(responses[1].result.tools.length, 14);
+  assert(typeof responses[0].result.instructions === 'string');
+  for (const name of ['doctor', 'get_app_status', 'get_recent_errors', 'record_drift']) {
+    assert(responses[0].result.instructions.includes(name));
+  }
   assertEquals(responses[2].result.structuredContent.status, 'warn');
 });

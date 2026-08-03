@@ -5,6 +5,7 @@ node_modules/
 .deploy/
 *.exe
 .data/
+.netscript/agent/diagnostics/
 
 # IDE
 .idea/
