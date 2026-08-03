@@ -19,7 +19,11 @@ export interface FetchServiceEndpointProbeOptions {
   readonly fetch?: typeof fetch;
 }
 
-/** Fetches OpenAPI first, then verifies the service identity at `/`. */
+/**
+ * Fetches OpenAPI first, then verifies the service identity at the selected base path.
+ *
+ * The identity response must be JSON with a `service` field equal to the candidate name.
+ */
 export class FetchServiceEndpointProbe implements ServiceEndpointProbePort {
   readonly #responseByteLimit: number;
   readonly #fetch: typeof fetch;
@@ -42,7 +46,8 @@ export class FetchServiceEndpointProbe implements ServiceEndpointProbePort {
       return { outcome: 'not_running', reason: 'Candidate has no discovered endpoint.' };
     }
     signal.throwIfAborted();
-    const specUrl = new URL('/api/openapi.json', `${candidate.baseUrl}/`);
+    const baseUrl = new URL(`${candidate.baseUrl}/`);
+    const specUrl = new URL('api/openapi.json', baseUrl);
     let specResponse: Response;
     try {
       specResponse = await this.#request(specUrl, signal);
@@ -73,7 +78,7 @@ export class FetchServiceEndpointProbe implements ServiceEndpointProbePort {
 
     let identityResponse: Response;
     try {
-      identityResponse = await this.#request(new URL('/', `${candidate.baseUrl}/`), signal);
+      identityResponse = await this.#request(baseUrl, signal);
     } catch (error) {
       return {
         outcome: 'identity_mismatch',

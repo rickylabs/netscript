@@ -236,7 +236,9 @@ Explicit operator endpoints and exclusions live only in the S5-owned subsection 
 Exclusions are applied before network access. Other rows report `running`, `not_running`,
 `spec_unavailable`, or `identity_mismatch`; parsed OpenAPI is retained as opaque JSON for a later
 consumer. Probes do not send credentials or follow redirects. A 401/403 explains how to expose only
-the OpenAPI route anonymously or supply a reachable public spec URL.
+the OpenAPI route anonymously or supply a reachable public spec URL. A running service must return
+JSON containing its selected service name, for example `{ "service": "orders" }`, from its selected
+base path; this second request prevents a reused port from being mistaken for the intended service.
 
 The default library composition needs `--allow-read` for carriers and real-path checks,
 `--allow-run` for `aspire describe`, and `--allow-net` for bounded spec/identity requests. Tests and

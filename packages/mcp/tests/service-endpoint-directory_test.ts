@@ -1,4 +1,4 @@
-import { assert, assertEquals, assertStringIncludes } from '@std/assert';
+import { assert, assertEquals, assertRejects, assertStringIncludes } from '@std/assert';
 import {
   createServiceEndpointDirectory,
   type ServiceEndpointDirectoryOptions,
@@ -246,6 +246,28 @@ Deno.test('one non-cooperative hanging spec fetch times out while another direct
   assertStringIncludes(hanging.reason, 'timed out after 20ms');
 });
 
+Deno.test('parent cancellation rejects the directory instead of fabricating endpoint rows', async () => {
+  const outcomes = {
+    override: used('override', [candidate('slow', 'override', 'http://127.0.0.1:4200')]),
+    'aspire-cli': absent('aspire-cli'),
+    'run-manifest': absent('run-manifest'),
+    appsettings: absent('appsettings'),
+  } satisfies Readonly<Record<EndpointSource, SourceOutcome>>;
+  const probe: ServiceEndpointProbePort = {
+    probe: (_entry, signal) =>
+      new Promise((_resolve, reject) => {
+        signal.addEventListener('abort', () => reject(signal.reason), { once: true });
+      }),
+  };
+  const controller = new AbortController();
+  const pending = createServiceEndpointDirectory(
+    directoryOptions(outcomes, probe, { timeoutMs: 1_000 }),
+  ).list(controller.signal);
+  controller.abort(new DOMException('fixture cancelled', 'AbortError'));
+
+  await assertRejects(() => pending, DOMException, 'fixture cancelled');
+});
+
 Deno.test('fetch probe requests spec before identity without redirects or credentials', async () => {
   const calls: Array<{ url: string; init: RequestInit | undefined }> = [];
   const fetchFixture: typeof fetch = (input, init) => {
@@ -270,6 +292,28 @@ Deno.test('fetch probe requests spec before identity without redirects or creden
     assertEquals(call.init?.credentials, 'omit');
     assertEquals(new Headers(call.init?.headers).has('authorization'), false);
   }
+});
+
+Deno.test('fetch probe preserves a path-mounted operator base for spec and identity requests', async () => {
+  const calls: string[] = [];
+  const fetchFixture: typeof fetch = (input) => {
+    const url = String(input);
+    calls.push(url);
+    if (url.endsWith('/api/openapi.json')) {
+      return Promise.resolve(Response.json({ openapi: '3.1.0', paths: {} }));
+    }
+    return Promise.resolve(Response.json({ service: 'orders' }));
+  };
+  const result = await new FetchServiceEndpointProbe({ fetch: fetchFixture }).probe(
+    candidate('orders', 'override', 'https://gateway.example.test/services/orders'),
+    new AbortController().signal,
+  );
+
+  assertEquals(result.outcome, 'running');
+  assertEquals(calls, [
+    'https://gateway.example.test/services/orders/api/openapi.json',
+    'https://gateway.example.test/services/orders/',
+  ]);
 });
 
 Deno.test('fetch probe maps spec failures and uses exact P3 guidance for 401 and 403', async () => {
