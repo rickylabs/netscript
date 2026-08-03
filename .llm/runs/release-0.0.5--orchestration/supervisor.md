@@ -20,10 +20,21 @@ This run is the first real execution of the milestone-orchestrator system (PR #1
 the owner brief: **where the skill/profile/cadence is unclear or missing, record the gap as a
 finding — do not route around it silently.** Findings accumulate in `drift.md` and `worklog.md`.
 
-## Launch precondition (verified, not relayed)
+## Launch precondition (verified, not relayed; strengthened per R2-GATE-3)
 
-JSR `meta.json` queried directly 2026-08-03: `@netscript/{cli,service,contracts,sdk,mcp}` all
-report `latest: 0.0.4`. Precondition green; run proceeds.
+Queried 2026-08-03, sources cited:
+
+- **Stable:** JSR `meta.json` for `@netscript/{cli,service,contracts,sdk,mcp}` all report
+  `latest: 0.0.4` (direct registry read, ~18:5xZ).
+- **Canary pair (green):** `release-canary.yml` run 30837369299 (`canary 0.0.4`,
+  2026-08-03T17:34:34Z, **success** → 0.0.4-canary.3) and run 30843023308 (`canary 0.0.4 from
+  main`, 18:49:54Z, **success** → 0.0.4-canary.4); GitHub prereleases `v0.0.4-canary.1..4` exist,
+  stable release `v0.0.4` cut 19:01:55Z marked Latest.
+- **Pinned consumer E2E:** `e2e-cli-prod-local` run 30844211837, 2026-08-03T19:05:17Z,
+  **success** (post-stable verification). Earlier canary-lane failures (16:01Z, 16:25Z runs) are
+  the pre-fix rerun churn #1169 exists to eliminate, not open reds.
+
+Precondition green; run proceeds.
 
 ## Role boundary
 

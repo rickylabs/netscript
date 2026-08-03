@@ -9,14 +9,14 @@ milestone after two recorded moves.
 
 | Class | Count | Issues |
 | --- | --- | --- |
-| PR-closable | 34 | all issues in the wave table except #1166 and #1168 |
-| PR + evidence hand-close | 2 | #1166 (PR carries `Refs`; boxes 2–4 tick only on canary.1's recorded merge-commit demonstration and the #1149 re-verification), #1168 (PR closes retry classification + visibility boxes; the transient-vs-ceiling measurement box ticks only on a real fired retry during this run, else it moves with a written reason) |
+| PR-closable | 33 | all issues in the wave table except #1166, #1168, #1004 |
+| PR + evidence hand-close | 3 | #1166 (PR carries `Refs`; boxes 2–4 tick only on canary.1's recorded merge-commit demonstration and the #1149 re-verification), #1168 (PR closes retry classification + visibility boxes; the transient-vs-ceiling measurement box ticks only on a real fired retry during this run, else it moves with a written reason), #1004 (R2-HON-1: its last box needs a real partial-publish retry's registry log — W6-B carries `Refs #1004`; hand-close on recorded evidence or the box moves with reason) |
 | Observational hand-close | 2 | #1149 (0.0.4 retro-audit + this run's canary evidence; box 4 gated on #1166), #1090 (inherited-0.0.4 observations only; hand-closed on evidence or moved at cut) |
 | Epic / tracking — no closing keywords | 3 | #1126, #1169 (its one-pass DoD box is evidenced by this run's stable cut), #1117 (hand-verified close after S9/S12 land; box 6 routed to #1140@0.0.6) |
 | Gated out (F2 stands at (a)) | 1 | #1139 — moves at cut with written reason unless owner flips F2 |
 | Moved to 0.0.6 (done, reasons on issues) | 2 | #1140 (post-ship observation; HON-1), #1175 (release-activity constraint; COV-1) |
 
-Total: 34 + 2 + 2 + 3 + 1 + 2 = **44** ✓. The wave table contains **31 PRs covering 36 issues**
+Total: 33 + 3 + 2 + 3 + 1 + 2 = **44** ✓. The wave table contains **31 PRs covering 36 issues**
 (34 PR-closable + the two Refs-carrying PRs for #1166/#1168).
 
 ## Wave table
@@ -90,7 +90,7 @@ public-surface change).
 | PR | Issues | Scope | Lane | Proving gates |
 | --- | --- | --- | --- | --- |
 | W6-A | #1085 | launch-codex-slice lifecycle (scope netted against #1173's audit findings) | Sol · medium | orphaned-session test; SIGTERM survival |
-| W6-B | #1004 | same-semver canary republish path (last box: demonstrated partial-publish retry — a canary re-run this cycle can supply it, else the box moves with reason) | Sol · medium | skip-already-published logged on the demonstration |
+| W6-B | #1004 (`Refs`) | same-semver canary republish path (last box: demonstrated partial-publish retry — a canary re-run this cycle can supply it, else the box moves with reason) | Sol · medium | skip-already-published logged on the demonstration |
 | W6-C | #1148 | version-residue scan widening | Sol · low | seeded stale `.ts` fails; exclusions documented |
 | W6-D | #1110 | contracts pagination walkthrough + JSDoc fix (after #1108, shared page) | Sol · low | Prisma-shaped compile fixture; boundary/error coverage |
 | W6-E | #1137 #1138 | OMB S11 contract enrichment (F3a) + S12 reference docs (S6 surface final) | Sol · low | publish dry-run + doc-lint on touched packages; links green |

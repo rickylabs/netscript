@@ -139,3 +139,57 @@ finding by finding:
 Plan v2 + supporting artifacts committed on `orchestrator/0.0.5`, merged into the eval worktree,
 and the same evaluator thread resumed (backgrounded, no shell timeout) with a re-evaluation
 request scoped to the v2 diff. Wave-1 dispatch still holds for the v2 verdict.
+
+## 2026-08-03 — PLAN-EVAL round 2: FAIL (4/6 PASS) — owner escalation
+
+Verdict read in full (`plan-eval.md` § Round 2, commit `f3cac1600`). Coverage, sequencing, and
+canary placement **PASS**; cluster integrity **PASS-WITH-FINDINGS** (R2-CLU-1 minor: 31 PRs near
+micro-PR fan-out — the same eval's round 1 forced the splits; tension recorded). Remaining FAILs
+and response:
+
+- **R2-HON-1 (blocker) — accepted, fixed:** #1004 reclassified `PR + evidence hand-close`
+  (its last box needs a live partial-publish registry log); W6-B now carries `Refs #1004`;
+  ledger corrected to 33 + 3.
+- **R2-GATE-2 (major) — accepted, fixed:** #1004 had zero `status:` labels; `status:plan` added
+  (orchestrator is the issue-maintenance lane; the evaluator correctly declined to mutate).
+- **R2-GATE-3 (major) — accepted, fixed:** launch precondition strengthened in `supervisor.md`
+  with the concrete 0.0.4 pair: canary runs 30837369299 (17:34Z, success) + 30843023308 (18:49Z,
+  success), prereleases `v0.0.4-canary.1..4`, stable `v0.0.4` 19:01Z, pinned prod E2E run
+  30844211837 (19:05Z, success).
+- **R2-GATE-1 (blocker) — escalated, not self-resolved:** the evaluator reads run-loop's full
+  Plan-Gate (Design checkpoint, files-per-slice, per-slice archetype/overlay + doctrine verdicts
+  + debt disposition, current JSR/slow-type scan, <30 slices) as binding on the milestone wave
+  plan. The milestone profile is silent on this (finding 8). Whether to author that surface at
+  orchestrator level, push it into per-PR supervisor briefs at dispatch (recorded as an approved
+  Plan-Gate exception), or treat the wave plan as exempt is an **owner decision** — and the
+  evaluator's second-consecutive-FAIL escalation rule requires owner sign-off before a third
+  cycle regardless.
+
+### Findings for #1163 (continued)
+
+10. **[opposing-pressure]** Round 1 forced cluster splits (22 → 31 PRs); round 2 then flagged
+    31 as exceeding the Plan-Gate's <30 and near micro-PR fan-out. The system gives an evaluator
+    two rules that push a generator in opposite directions with no reconciliation rule at
+    milestone scale. Needs an explicit statement of which bound wins for a wave plan (or that
+    PR-count bounds don't apply to milestone dispatch schedules).
+11. **[escalation-rule-provenance]** The evaluator asserts "second failed PLAN-EVAL cycle
+    requires owner escalation" as harness verdict protocol. Honored (it is also the reasonable
+    move), but the milestone profile does not state a cycle-count escalation rule — provenance
+    should be confirmed and the rule written down wherever it actually lives.
+
+## 2026-08-03 — Design checkpoint (stage B)
+
+The design decisions the wave plan embodies, recorded per the Plan-Gate's Design requirement:
+
+1. **Epic lanes follow their filed structure** — #1169's slicing comment and RFC #1123's gating
+   graph are treated as binding over local clustering heuristics (GitHub wins).
+2. **Evidence-gated closes are a disposition class** — #1166/#1168/#1004 PRs carry `Refs`;
+   closure is a hand-close on recorded evidence or a reasoned move. No closing keyword may
+   outrun its evidence.
+3. **Canary points are content units at declared wave boundaries** (4 points, waves 1/3/5/7),
+   membership from the corrected merge-aware derivation, identity from publish output (D3).
+4. **Framework-touching PRs inherit the Archetype-2 gate column + quality:gate law**; per-PR
+   file maps, archetype/overlay selection, and doctrine/debt disposition are produced in each
+   per-PR supervisor brief at dispatch (committed under `slices/`), where the implementing
+   context exists — pending owner ratification per R2-GATE-1 escalation.
+5. **Docs lane serialized** (one agy PR per wave) with re-waving as the quota contingency.
