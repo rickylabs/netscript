@@ -70,3 +70,17 @@ one file) and copies the `commandGate(…, { retry })` pattern; report consumers
   no violations; architecture checks completed with only pre-existing non-failing warnings.
 - `deno task e2e:cli` intentionally not run; the S1 brief reserves that expensive gate for the
   Tier-A supervisor.
+
+## S1 sign-off (Tier-A review)
+
+- 2026-08-03 · Substantive review of `26970dad9`: retry predicate hard-blocks `assertion` in code
+  (`shouldRetry`), attempts/retried flow GateResult → StepResult → report JSON via spread in
+  `runGate`; pretty reporter distinguishes retried-pass and prints all attempt durations on
+  exhaustion. Six negative-case tests verified present. Minor accepted debts: HTTP-gate deadline
+  failure classed `assertion` (http gates cannot opt into retry, so inert); skipped gates record a
+  `passed` attempt (GateAttempt has no `skipped`). Positional `commandGate` args growing — future
+  cleanup candidate.
+- Independent gate re-run by supervisor: scoped check/lint/fmt 117 files 0 findings; package tests
+  80/80; diff smell scan (deno-lint-ignore / as unknown as / `: any`) = 0.
+- Reconcile: #1168 remains open until PR merge; instrumentation-decision acceptance box (transient
+  vs ceiling) satisfiable only at first real retry occurrence — recorded honestly, not asserted.
