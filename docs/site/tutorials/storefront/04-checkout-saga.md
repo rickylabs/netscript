@@ -120,13 +120,12 @@ ns-sagas add saga checkout --message-type=OrderCreated --durability=t1 --topic=c
 The command writes `sagas/checkout-saga.ts` plus `sagas/checkout.config.ts`, including a normal
 handler and a compensation-handler skeleton, and refreshes the saga registry. Extend that generated
 definition with the checkout state and lifecycle below. It correlates by `orderId`, starts `pending`,
-and walks the lifecycle. Crucially,
-it has explicit **failure branches**: if payment fails or inventory is unavailable, it transitions to
-`cancelled` and emits a cancellation — this is compensation.
+and walks the lifecycle. When payment fails, the forward handler returns a
+`sagaCompensate(...)` effect and the matching `.compensate(...)` branch performs the undo step.
 
 ```ts
 // sagas/checkout-saga.ts
-import { defineSaga, send } from '@netscript/plugin-sagas-core';
+import { defineSaga, sagaCompensate, send } from '@netscript/plugin-sagas-core';
 import type { SagaState } from '@netscript/plugin-sagas-core/domain';
 
 type OrderStatus =
@@ -198,12 +197,22 @@ export const checkoutSaga = defineSaga('CheckoutSaga')
     return [];
   })
 
-  // === Compensation: PaymentFailed → cancel the order. ===
+  // Request compensation using the message type registered below.
   .on('PaymentFailed', (saga, event) => {
     if (saga.state.status !== 'payment_pending') return [];
-    const msg = event.payload as { reason: string };
-    saga.state = { ...saga.state, status: 'cancelled', cancelReason: `Payment failed: ${msg.reason}` };
-    return [send('OrderCancelled', { orderId: saga.state.orderId, reason: msg.reason })];
+    const msg = event.payload as { orderId: string; reason: string };
+    return [sagaCompensate({ type: 'PaymentFailed', payload: msg }, msg.reason)];
+  })
+
+  // The default durable runtime routes the returned effect here.
+  .compensate('PaymentFailed', (saga, event) => {
+    const msg = event.payload as { orderId: string; reason: string };
+    saga.state = {
+      ...saga.state,
+      status: 'cancelled',
+      cancelReason: `Payment failed: ${msg.reason}`,
+    };
+    return [send('OrderCancelled', { orderId: msg.orderId, reason: msg.reason })];
   })
 
   .build();
@@ -220,17 +229,16 @@ Read the shape, not the line count:
 - **Saga messages are driven by `send(...)` effects.** `send('CheckoutPaymentRequested', { … })`
   republishes an internal message onto the saga bus. It does not address `process-payment` or cross
   into the workers plugin. The trigger below owns that explicit cross-plugin enqueue boundary.
-- **Compensation is a failure branch.** The `PaymentFailed` handler is the undo path: it transitions
-  the same state machine to `cancelled` and emits `OrderCancelled`. The scaffolded order saga in the
-  playground models compensation exactly this way — as failure-event handlers that walk the state
-  machine backward.
+- **Compensation is an explicit effect and registered branch.** The forward `PaymentFailed`
+  handler returns `sagaCompensate(...)`; the matching `.compensate('PaymentFailed', ...)` handler
+  transitions the same state machine to `cancelled` and emits `OrderCancelled`.
 
-{{ comp callout { type: "note", title: "Inbound failure messages use .on()" } }}
-The builder also exposes <code>.compensate(eventType, handler)</code>, but that registry is used by
-explicit compensation cascades with runtime context. A worker-published
-<code>PaymentFailed</code> is an ordinary inbound saga message, so register it with
-<code>.on('PaymentFailed', ...)</code> as shown. See the
-<a href="/explanation/durability-model/">Durability model</a> for explicit compensation flows.
+{{ comp callout { type: "note", title: "The durable runtime wires compensation" } }}
+An inbound <code>PaymentFailed</code> is first handled by <code>.on(...)</code>. Returning
+<code>sagaCompensate(...)</code> from that handler is what routes execution into the matching
+<code>.compensate(...)</code> branch. <code>createDurableSagaRuntime(...)</code> installs the
+compensator by default; custom composition with lower-level <code>createSagaRuntime(...)</code>
+must supply <code>native.compensator</code> explicitly.
 {{ /comp }}
 
 ## Step 4 — Enqueue payment through the triggers API

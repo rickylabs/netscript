@@ -67,6 +67,8 @@ integration test.
 | 2026-08-03 | plan-eval | waived    | PR-A supervisor supplied a written opposite-family Plan-Gate waiver.                           |
 | 2026-08-03 | slice 1   | implement | Bounded Redis connection failure and serialized connection-scoped atomic sections.             |
 | 2026-08-03 | slice 1   | gate      | Real Redis list/save/CAS passed; package suites passed 79 + 63 tests.                          |
+| 2026-08-03 | slice 2   | implement | Publish ledgers dispatch; durable runtime wires compensation; incomplete effects throw.        |
+| 2026-08-03 | slice 2   | gate      | Default compensation and nested cascade passed; package suites passed 64 + 40 tests.           |
 
 ## Decisions
 
@@ -112,12 +114,16 @@ integration test.
 | #1064 real Redis        | PASS   | 4 passed, 0 failed                 | List/save bounded; exactly 1/16 CAS winner.                |
 | KV package suite        | PASS   | 79 passed, 0 failed                | Real test separately executed with owned Redis URL.        |
 | Saga-core package suite | PASS   | 63 passed, 0 failed                | Real test separately executed with owned Redis URL.        |
+| #1065 focused           | PASS   | 12 passed, 0 failed                | Default compensation, nested send, and loud failures.      |
+| Saga-core #1065 suite   | PASS   | 64 passed, 0 failed                | Two unrelated integration tests ignored.                   |
+| Sagas plugin suite      | PASS   | 40 passed, 0 failed                | Default durable runtime path exercised.                    |
+| #1065 scoped wrappers   | PASS   | 186 files, 0 diagnostics/findings  | Check, lint, and source format clean.                      |
 
 ### Consumer Gates
 
-| Consumer | Result  | Evidence                | Notes                      |
-| -------- | ------- | ----------------------- | -------------------------- |
-| Docs     | NOT_RUN | planned canonical pages | Gate after implementation. |
+| Consumer | Result | Evidence                        | Notes                                  |
+| -------- | ------ | ------------------------------- | -------------------------------------- |
+| Docs     | PASS   | 98 docs, 0 broken links/anchors | Capability content and tutorial agree. |
 
 ## Handoff Notes
 

@@ -12,9 +12,9 @@
 
 ## Current State
 
-#1064 is implemented and gated: dead Redis fails loudly and boundedly, while a real Redis adapter
-lists saga data and admits exactly one concurrent expected-version save. The written supervisor
-waiver permits implementation despite the credential-blocked PLAN-EVAL lane.
+#1064 and #1065 are implemented and gated. The default durable runtime now dispatches returned
+compensation effects through its installed compensator, redispatches compensation-produced effects,
+and rejects unknown or incomplete effect handling loudly.
 
 ## Completed
 
@@ -25,14 +25,13 @@ waiver permits implementation despite the credential-blocked PLAN-EVAL lane.
 
 ## In Progress
 
-- Commit, push, and comment #1064 evidence before starting #1065.
+- Commit, push, and comment #1065 evidence before starting #1066.
 
 ## Next Steps
 
-1. Commit, push, and comment #1064.
-2. Implement and gate #1065 without touching concurrent scaffold-owned files.
-3. Repeat for #1066.
-4. Run aggregate gates and supervisor review; drive draft PR to ready-for-merge.
+1. Commit, push, and comment #1065.
+2. Implement and gate #1066 extractor-first instance identity.
+3. Run aggregate gates and supervisor review; drive draft PR to ready-for-merge.
 
 ## Key Decisions
 

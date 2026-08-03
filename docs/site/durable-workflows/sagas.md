@@ -165,6 +165,14 @@ dispatch currently throws <code>SAGA_NOT_IMPLEMENTED</code>. The undo logic
 itself lives in the <code>.compensate()</code> handler, not inline in the forward path.
 {{ /comp }}
 
+`createDurableSagaRuntime(...)` installs the native `SagaCompensator` automatically. A
+`sagaCompensate(...)` returned by a registered forward handler therefore runs its matching
+`.compensate(type, ...)` branch without a second dispatch call. If you compose the lower-level
+`createSagaRuntime(...)` yourself, pass `native.compensator`; externally supplied compensation
+cascades also require `native.resolveCompensation` so the runtime can recover the definition,
+instance, and state. Missing compensators, resolvers, matching branches, and unknown effect kinds
+fail with a named `SAGA_NOT_IMPLEMENTED` error instead of being discarded.
+
 ## Key types first
 
 Before the options, the primary interfaces the DSL works in. `SagaState` is the base

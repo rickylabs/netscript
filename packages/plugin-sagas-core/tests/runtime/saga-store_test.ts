@@ -14,14 +14,13 @@ import type {
   SagaStorePort,
   SagaStoreWriteOptions,
 } from '../../src/ports/mod.ts';
-import { createSagaRuntime } from '../../src/runtime/mod.ts';
+import { createSagaRuntime, SagaCompensator } from '../../src/runtime/mod.ts';
+import { TestSagaClock } from '../../src/testing/mod.ts';
 
 Deno.test('native runtime loads and saves saga state between correlated messages', async () => {
   const observedCounts: number[] = [];
   const store = new MemorySagaStore();
-  const runtime = createSagaRuntime({
-    native: { store },
-  });
+  const runtime = createSagaRuntime({ native: { store } });
   const definition = defineSaga('persistent-state')
     .state<SagaState>({ count: 0 })
     .on('counter.incremented', (saga) => {
@@ -89,7 +88,7 @@ Deno.test('native runtime persists transition from snapshot before in-place muta
 Deno.test('native runtime persists terminal status from failure and compensation cascades', async () => {
   const store = new MemorySagaStore();
   const runtime = createSagaRuntime({
-    native: { store },
+    native: { store, compensator: new SagaCompensator({ clock: new TestSagaClock() }) },
   });
   const definition = defineSaga('terminal-status')
     .state<SagaState>({})
@@ -97,6 +96,7 @@ Deno.test('native runtime persists terminal status from failure and compensation
     .on('order.compensating', () => [
       sagaCompensate({ type: 'payment.refund', payload: {} }, 'inventory unavailable'),
     ])
+    .compensate('payment.refund', () => [])
     .build() as SagaDefinition;
 
   await runtime.register([definition]);

@@ -1,9 +1,12 @@
+import { delay } from '@std/async';
 import type {
+  SagaClockPort,
   SagaRuntime,
   SagaRuntimeNativeOptions,
+  SagaSleepOptions,
   SagaStorePort,
 } from '@netscript/plugin-sagas-core/runtime';
-import { createSagaRuntime } from '@netscript/plugin-sagas-core/runtime';
+import { createSagaRuntime, SagaCompensator } from '@netscript/plugin-sagas-core/runtime';
 import type { KvStore } from '@netscript/kv';
 
 import {
@@ -41,6 +44,9 @@ export async function createDurableSagaRuntime(
     native: {
       ...options.native,
       store: resources.store,
+      compensator: options.native?.compensator ?? new SagaCompensator({
+        clock: systemSagaClock,
+      }),
     },
   });
 
@@ -51,6 +57,12 @@ export async function createDurableSagaRuntime(
     dispose: resources.dispose,
   });
 }
+
+const systemSagaClock: SagaClockPort = Object.freeze({
+  id: 'system-saga-clock',
+  now: () => new Date(),
+  sleep: (ms: number, options?: SagaSleepOptions) => delay(ms, { signal: options?.signal }),
+});
 
 type DurableSagaStoreResources = Readonly<{
   store: SagaStorePort;

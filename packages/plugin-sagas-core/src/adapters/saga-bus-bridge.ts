@@ -14,7 +14,11 @@ import {
   type SagaIdempotencyTarget,
   sagaMessageIdempotencyTarget,
 } from '../runtime/saga-idempotency.ts';
-import type { SagaCompensationRequest, SagaCompensator } from '../runtime/saga-compensator.ts';
+import type {
+  SagaCompensationRequest,
+  SagaCompensationResult,
+  SagaCompensator,
+} from '../runtime/saga-compensator.ts';
 import type { SagaEngine } from '../runtime/saga-engine.ts';
 import type { SagaScheduler } from '../runtime/saga-scheduler.ts';
 import type { SagaInstrumentation } from '../telemetry/mod.ts';
@@ -45,6 +49,7 @@ export class SagaBusBridge implements SagaBusPort {
   readonly #resolveCompensation?: SagaBridgeCompensationResolver;
   readonly #idempotency: SagaIdempotencyPort;
   readonly #instrumentation?: SagaInstrumentation;
+  readonly #definitions = new Map<string, SagaDefinition>();
 
   /** Create a native saga bus bridge. */
   constructor(options: SagaBusBridgeOptions) {
@@ -72,6 +77,9 @@ export class SagaBusBridge implements SagaBusPort {
   /** Register saga definitions with the engine. */
   async register(definitions: readonly SagaDefinition[]): Promise<void> {
     await this.#engine.register(definitions);
+    for (const definition of definitions) {
+      this.#definitions.set(definition.id, definition);
+    }
   }
 
   /** Publish one saga message through the engine. */
@@ -84,7 +92,7 @@ export class SagaBusBridge implements SagaBusPort {
       return;
     }
 
-    await this.#engine.publish(withPublishOptions(message, options), options);
+    await this.#handleAndDispatch(withPublishOptions(message, options));
   }
 
   /** Dispatch cascaded messages through engine, scheduler, or compensator. */
@@ -114,10 +122,13 @@ export class SagaBusBridge implements SagaBusPort {
     return this.#engine.query(dispatch);
   }
 
-  async #dispatchOne(message: CascadedMessage): Promise<void> {
+  async #dispatchOne(
+    message: CascadedMessage,
+    compensation?: SagaCompensationRequest,
+  ): Promise<void> {
     switch (message.kind) {
       case 'send':
-        await this.#engine.publish({
+        await this.#handleAndDispatch({
           type: message.target.id,
           payload: message.payload,
           idempotencyKey: message.idempotencyKey,
@@ -130,11 +141,39 @@ export class SagaBusBridge implements SagaBusPort {
       case 'complete':
         return;
       case 'fail':
-      case 'compensate':
+        if (compensation) return;
         await this.#compensate(message);
+        return;
+      case 'compensate':
+        await this.#compensate(message, compensation);
         return;
       case 'spawn':
         throw SagasError.notImplemented('Spawn cascades are unsupported.');
+      default:
+        throw SagasError.notImplemented(
+          `Unhandled saga cascade effect kind "${
+            String(Reflect.get(message, 'kind'))
+          }"; no dispatcher option is registered.`,
+        );
+    }
+  }
+
+  async #handleAndDispatch(message: SagaMessage): Promise<void> {
+    const results = await this.#engine.handle(message);
+    for (const result of results) {
+      const definition = this.#definitions.get(result.sagaId);
+      if (!definition) {
+        throw SagasError.sagaNotFound(result.sagaId);
+      }
+      const request: SagaCompensationRequest = {
+        definition,
+        instanceId: result.instanceId,
+        state: result.state,
+        message: result.message,
+      };
+      for (const cascaded of result.cascaded) {
+        await this.#dispatchOne(cascaded, request);
+      }
     }
   }
 
@@ -149,27 +188,43 @@ export class SagaBusBridge implements SagaBusPort {
     await this.#scheduler.scheduleCascaded(message);
   }
 
-  async #compensate(message: CascadedMessage<'fail' | 'compensate'>): Promise<void> {
-    if (!this.#compensator || !this.#resolveCompensation) {
-      throw SagasError.notImplemented('compensation cascades require SagaCompensator context.');
+  async #compensate(
+    message: CascadedMessage<'fail' | 'compensate'>,
+    context?: SagaCompensationRequest,
+  ): Promise<void> {
+    if (!this.#compensator) {
+      throw SagasError.notImplemented(
+        'compensation cascades require the compensator option.',
+      );
     }
 
-    const request = await this.#resolveCompensation(message);
+    const request = context ?? await this.#resolveCompensation?.(message);
     if (!request) {
-      throw SagasError.sagaInstanceNotFound(message.kind);
+      throw SagasError.notImplemented(
+        'externally dispatched compensation cascades require the resolveCompensation option.',
+      );
     }
 
+    let result: SagaCompensationResult;
     if (message.kind === 'fail') {
-      await this.#compensator.compensateFailure(request, message);
-      return;
+      result = await this.#compensator.compensateFailure(request, message);
+    } else {
+      result = await this.#compensator.compensateCascaded(
+        request.definition,
+        request.instanceId,
+        request.state,
+        message,
+      );
     }
 
-    await this.#compensator.compensateCascaded(
-      request.definition,
-      request.instanceId,
-      request.state,
-      message,
-    );
+    const nextRequest: SagaCompensationRequest = {
+      ...request,
+      state: result.state,
+      message: result.message,
+    };
+    for (const cascaded of result.cascaded) {
+      await this.#dispatchOne(cascaded, nextRequest);
+    }
   }
 }
 
