@@ -1,7 +1,11 @@
 import {
   acceptanceCheckboxes,
+  type AcceptanceEvidence,
+  bodySha256,
   checkAcceptanceBoxes,
   extractClosingIssues,
+  type IssueSnapshot,
+  issueSnapshot,
   parseAcceptanceEvidence,
   validateEvidenceMapping,
 } from './acceptance-evidence.ts';
@@ -10,75 +14,209 @@ interface Issue {
   number: number;
   title: string;
   body: string | null;
+  updated_at: string;
+  labels?: Array<{ name?: string } | string>;
+  head?: { sha: string };
 }
+
 interface Comment {
   html_url: string;
   body: string | null;
 }
+
+export interface MirrorClient {
+  getIssue(number: number): Promise<Issue>;
+  getPullRequest(number: number): Promise<Issue>;
+  getComments(number: number): Promise<Comment[]>;
+  updateIssue(number: number, body: string): Promise<void>;
+  postComment(number: number, body: string): Promise<void>;
+}
+
+interface MirrorIssueResult {
+  changed: boolean;
+  snapshot: IssueSnapshot;
+  evidence: string[];
+  notice?: string;
+}
+
+const READY_LABEL = 'status:ready-merge';
+const MAX_MIRROR_ATTEMPTS = 2;
 
 async function main(): Promise<void> {
   const options = parseArgs(Deno.args);
   const token = Deno.env.get('GITHUB_TOKEN') ?? Deno.env.get('GH_TOKEN');
   if (!token) throw new Error('GITHUB_TOKEN or GH_TOKEN is required');
   const client = new GitHubClient(options.repo, token);
-  const pr = await client.get<Issue>(`/pulls/${options.pr}`);
+  const pr = await client.getPullRequest(options.pr);
+  const evaluatedAt = new Date().toISOString();
+  const headSha = pr.head?.sha ?? 'unavailable';
+  const labels = pr.labels ?? [];
   const issueNumbers = extractClosingIssues(pr.body ?? '');
-  if (!issueNumbers.length) {
-    console.log(
-      options.pretty
-        ? 'acceptance-mirror NOOP: no closing-keyword issues'
-        : JSON.stringify({ ok: true, changed: [] }),
+  if (!hasLabel(labels, READY_LABEL)) {
+    const snapshots = await Promise.all(
+      issueNumbers.map(async (issueNumber) => issueSnapshot(await client.getIssue(issueNumber))),
     );
+    printReport({
+      ok: true,
+      dryRun: options.dryRun,
+      changed: [],
+      headSha,
+      evaluatedAt,
+      issues: snapshots,
+      warnings: [
+        `Mirror skipped because live PR labels do not include ${READY_LABEL}; apply the label and the labeled event triggers a fresh run (labels are read live, so a manual rerun also works).`,
+      ],
+    }, options.pretty);
     return;
   }
-  const comments = await client.get<Comment[]>(`/issues/${options.pr}/comments`);
-  const evidence = [pr.body ?? '', ...comments.map((comment) => comment.body ?? '')]
-    .flatMap(parseAcceptanceEvidence);
-  const candidates: Array<{ issue: Issue; boxes: ReturnType<typeof acceptanceCheckboxes> }> = [];
+
+  const comments = await client.getComments(options.pr);
+  const parsed = [pr.body ?? '', ...comments.map((comment) => comment.body ?? '')]
+    .map(parseAcceptanceEvidence);
+  const evidence = parsed.flatMap((result) => result.entries);
+  const warnings = [...new Set(parsed.flatMap((result) => result.warnings))];
+  // Validate the complete live mapping before the first mutation. A bad later issue must not leave
+  // an earlier closing issue partially mirrored.
   for (const issueNumber of issueNumbers) {
-    const issue = await client.get<Issue>(`/issues/${issueNumber}`);
+    const issue = await client.getIssue(issueNumber);
+    validateEvidenceMapping(
+      issueNumber,
+      acceptanceCheckboxes(issue.body ?? ''),
+      evidence,
+    );
+  }
+  const results: Array<MirrorIssueResult & { issue: number }> = [];
+  for (const issueNumber of issueNumbers) {
+    const result = await mirrorIssue(client, issueNumber, evidence, options.dryRun);
+    results.push({ issue: issueNumber, ...result });
+    if (result.changed && !options.dryRun) {
+      await postProvenanceCommentOnce(client, options.pr, issueNumber, result);
+    }
+    if (result.notice) warnings.push(result.notice);
+  }
+
+  printReport({
+    ok: true,
+    dryRun: options.dryRun,
+    changed: results.filter((item) => item.changed).map((item) => item.issue),
+    headSha,
+    evaluatedAt,
+    issues: results.map((item) => item.snapshot),
+    warnings,
+  }, options.pretty);
+}
+
+/** Mirrors one issue from a freshly fetched body and retries once if the post-PATCH body diverges. */
+export async function mirrorIssue(
+  client: MirrorClient,
+  issueNumber: number,
+  evidence: AcceptanceEvidence[],
+  dryRun: boolean,
+): Promise<MirrorIssueResult> {
+  for (let attempt = 1; attempt <= MAX_MIRROR_ATTEMPTS; attempt++) {
+    const issue = await client.getIssue(issueNumber);
+    const beforeHash = await bodySha256(issue.body ?? '');
     const boxes = acceptanceCheckboxes(issue.body ?? '');
-    candidates.push({ issue, boxes });
-  }
-  const mapping = validateEvidenceMapping(candidates.flatMap((item) => item.boxes), evidence);
-  const changes: Array<{ issue: Issue; body: string; evidence: string[] }> = [];
-  for (const { issue, boxes } of candidates) {
-    const issueEntries = boxes.filter((box) => !box.checked).map((box) => mapping.get(box.text)!)
-      .filter(Boolean);
-    if (issueEntries.length) {
-      changes.push({
-        issue,
-        body: checkAcceptanceBoxes(
-          issue.body ?? '',
-          new Set(issueEntries.map((entry) => entry.text)),
-        ),
-        evidence: issueEntries.map((entry) => `${entry.text} — ${entry.evidence}`),
-      });
+    const mapping = validateEvidenceMapping(issueNumber, boxes, evidence);
+    const postMerge = boxes.filter((box) => box.postMerge);
+    const desiredBody = checkAcceptanceBoxes(issue.body ?? '', new Set(mapping.keys()));
+    if (desiredBody === (issue.body ?? '') || dryRun) {
+      return {
+        changed: desiredBody !== (issue.body ?? ''),
+        snapshot: await issueSnapshot(issue),
+        evidence: evidenceLines(boxes, mapping),
+        notice: postMergeNotice(issueNumber, postMerge.map((box) => box.text)),
+      };
+    }
+
+    await client.updateIssue(issueNumber, desiredBody);
+    const after = await client.getIssue(issueNumber);
+    const afterHash = await bodySha256(after.body ?? '');
+    const desiredHash = await bodySha256(desiredBody);
+    if (afterHash === desiredHash) {
+      return {
+        changed: true,
+        snapshot: await issueSnapshot(after),
+        evidence: evidenceLines(boxes, mapping),
+        notice: postMergeNotice(issueNumber, postMerge.map((box) => box.text)),
+      };
+    }
+    if (attempt === MAX_MIRROR_ATTEMPTS) {
+      throw new Error(
+        `Issue #${issueNumber}: body changed during acceptance mirroring (before ${beforeHash}, expected ${desiredHash}, live ${afterHash}); retry from the latest issue body after the concurrent edit finishes.`,
+      );
     }
   }
-  for (const change of changes) {
-    if (!options.dryRun) {
-      await client.patch(`/issues/${change.issue.number}`, { body: change.body });
-      await client.post(`/issues/${change.issue.number}/comments`, {
-        body: `Acceptance evidence mirrored from #${options.pr}.\n\n${
-          change.evidence.map((line) => `- ${line}`).join('\n')
-        }`,
-      });
-    }
-  }
-  const prefix = options.dryRun ? 'DRY-RUN' : 'APPLIED';
-  console.log(
-    options.pretty
-      ? `acceptance-mirror ${prefix}: ${
-        changes.map((item) => `#${item.issue.number} (${item.evidence.length})`).join(', ') ||
-        'no changes'
-      }`
-      : JSON.stringify({
-        ok: true,
-        dryRun: options.dryRun,
-        changed: changes.map((item) => item.issue.number),
-      }),
+  throw new Error(`Issue #${issueNumber}: acceptance mirroring exhausted its retry.`);
+}
+
+async function postProvenanceCommentOnce(
+  client: MirrorClient,
+  pr: number,
+  issue: number,
+  result: MirrorIssueResult,
+): Promise<void> {
+  const marker = `<!-- acceptance-evidence-mirror:pr=${pr};issue=${issue} -->`;
+  const comments = await client.getComments(issue);
+  if (comments.some((comment) => comment.body?.includes(marker))) return;
+  await client.postComment(
+    issue,
+    [
+      marker,
+      `Acceptance evidence mirrored from #${pr}.`,
+      '',
+      ...result.evidence.map((line) => `- ${line}`),
+      '',
+      `Provenance: updatedAt=${result.snapshot.updatedAt}; bodySha256=${result.snapshot.bodySha256}`,
+    ].join('\n'),
   );
+}
+
+function evidenceLines(
+  boxes: ReturnType<typeof acceptanceCheckboxes>,
+  mapping: Map<number, AcceptanceEvidence>,
+): string[] {
+  return [...mapping].map(([index, entry]) => {
+    const box = boxes.find((candidate) => candidate.index === index);
+    return `"${box?.text ?? `box-index ${index}`}" — ${entry.evidence}`;
+  });
+}
+
+function postMergeNotice(issue: number, texts: string[]): string | undefined {
+  return texts.length
+    ? `Issue #${issue}: excluded post-merge box(es) ${
+      texts.map((text) => `"${text}"`).join(', ')
+    }; verify in a follow-up comment and tick after merge.`
+    : undefined;
+}
+
+interface MirrorReport {
+  ok: boolean;
+  dryRun: boolean;
+  changed: number[];
+  headSha: string;
+  evaluatedAt: string;
+  issues: IssueSnapshot[];
+  warnings: string[];
+}
+
+function printReport(report: MirrorReport, pretty: boolean): void {
+  if (!pretty) {
+    console.log(JSON.stringify(report));
+    return;
+  }
+  console.log(
+    `acceptance-mirror ${report.dryRun ? 'DRY-RUN' : 'APPLIED'}: ${
+      report.changed.map((issue) => `#${issue}`).join(', ') || 'no changes'
+    }`,
+  );
+  console.log(`provenance: head=${report.headSha} evaluated=${report.evaluatedAt}`);
+  for (const issue of report.issues) {
+    console.log(
+      `snapshot: #${issue.number} updated=${issue.updatedAt} bodySha256=${issue.bodySha256}`,
+    );
+  }
+  for (const warning of report.warnings) console.log(`notice: ${warning}`);
 }
 
 function parseArgs(args: string[]): { repo: string; pr: number; dryRun: boolean; pretty: boolean } {
@@ -86,12 +224,12 @@ function parseArgs(args: string[]): { repo: string; pr: number; dryRun: boolean;
   let pr = 0;
   let dryRun = false;
   let pretty = false;
-  for (let i = 0; i < args.length; i++) {
-    if (args[i] === '--repo') repo = args[++i] ?? '';
-    else if (args[i] === '--pr') pr = Number(args[++i]);
-    else if (args[i] === '--dry-run') dryRun = true;
-    else if (args[i] === '--pretty') pretty = true;
-    else throw new Error(`Unknown argument: ${args[i]}`);
+  for (let index = 0; index < args.length; index++) {
+    if (args[index] === '--repo') repo = args[++index] ?? '';
+    else if (args[index] === '--pr') pr = Number(args[++index]);
+    else if (args[index] === '--dry-run') dryRun = true;
+    else if (args[index] === '--pretty') pretty = true;
+    else throw new Error(`Unknown argument: ${args[index]}`);
   }
   if (!/^[^/\s]+\/[^/\s]+$/.test(repo) || !Number.isInteger(pr) || pr < 1) {
     throw new Error('Usage: --repo owner/name --pr number [--dry-run] [--pretty]');
@@ -99,16 +237,26 @@ function parseArgs(args: string[]): { repo: string; pr: number; dryRun: boolean;
   return { repo, pr, dryRun, pretty };
 }
 
-class GitHubClient {
+function hasLabel(labels: NonNullable<Issue['labels']>, name: string): boolean {
+  return labels.some((label) => (typeof label === 'string' ? label : label.name) === name);
+}
+
+class GitHubClient implements MirrorClient {
   constructor(private repo: string, private token: string) {}
-  get<T>(path: string): Promise<T> {
-    return this.request<T>('GET', path);
+  getIssue(number: number): Promise<Issue> {
+    return this.request<Issue>('GET', `/issues/${number}`);
   }
-  patch<T>(path: string, body: unknown): Promise<T> {
-    return this.request<T>('PATCH', path, body);
+  getPullRequest(number: number): Promise<Issue> {
+    return this.request<Issue>('GET', `/pulls/${number}`);
   }
-  post<T>(path: string, body: unknown): Promise<T> {
-    return this.request<T>('POST', path, body);
+  getComments(number: number): Promise<Comment[]> {
+    return this.request<Comment[]>('GET', `/issues/${number}/comments`);
+  }
+  async updateIssue(number: number, body: string): Promise<void> {
+    await this.request<Issue>('PATCH', `/issues/${number}`, { body });
+  }
+  async postComment(number: number, body: string): Promise<void> {
+    await this.request<Comment>('POST', `/issues/${number}/comments`, { body });
   }
   private async request<T>(method: string, path: string, body?: unknown): Promise<T> {
     const response = await fetch(`https://api.github.com/repos/${this.repo}${path}`, {

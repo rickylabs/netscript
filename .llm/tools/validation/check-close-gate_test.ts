@@ -1,15 +1,14 @@
-import { assertEquals, assertRejects, assertStringIncludes } from 'jsr:@std/assert@1';
+import { assertEquals, assertRejects, assertStringIncludes, assertThrows } from 'jsr:@std/assert@1';
 import {
+  assertCloseGateWorkflowUsesLiveLabels,
   closeGatePasses,
   fetchGitHubJsonWithRetry,
   type Finding,
-  findStaleIssues,
   findUncheckedAcceptance,
   findUncheckedPrBody,
   formatPrettyReport,
   type PrFinding,
   type Report,
-  snapshotIssue,
 } from './check-close-gate.ts';
 
 Deno.test('close-gate retries transient GitHub failures before returning JSON', async () => {
@@ -29,10 +28,10 @@ Deno.test('close-gate retries transient GitHub failures before returning JSON', 
         }
         const status = statuses[authenticatedCalls++];
         return Promise.resolve(
-          new Response(
-            status === 200 ? JSON.stringify({ ok: true }) : 'transient',
-            { status, headers: { 'content-type': 'application/json' } },
-          ),
+          new Response(status === 200 ? JSON.stringify({ ok: true }) : 'transient', {
+            status,
+            headers: { 'content-type': 'application/json' },
+          }),
         );
       },
       sleep: (milliseconds) => {
@@ -41,7 +40,6 @@ Deno.test('close-gate retries transient GitHub failures before returning JSON', 
       },
     },
   );
-
   assertEquals(result, { ok: true });
   assertEquals(authenticatedCalls, 3);
   assertEquals(anonymousCalls, 2);
@@ -66,7 +64,6 @@ Deno.test('close-gate falls back to public metadata after an authenticated 5xx',
       sleep: () => Promise.resolve(),
     },
   );
-
   assertEquals(result, { number: 772 });
   assertEquals(authorizations, [true, false]);
 });
@@ -88,42 +85,21 @@ Deno.test('close-gate does not retry non-transient GitHub failures', async () =>
   assertEquals(calls, 1);
 });
 
-Deno.test('close-gate snapshots make a pre-edit issue verdict mechanically stale', async () => {
-  const evaluated = await snapshotIssue({
-    number: 1171,
-    title: 'verdict provenance',
-    body: '## Acceptance\n- [ ] before edit',
-    updated_at: '2026-08-03T19:00:00Z',
-  });
-  const current = await snapshotIssue({
-    number: 1171,
-    title: 'verdict provenance',
-    body: '## Acceptance\n- [x] after edit',
-    updated_at: '2026-08-03T19:10:00Z',
-  });
-
-  assertEquals(findStaleIssues([evaluated], [current]), [{
-    number: 1171,
-    evaluated,
-    current,
-  }]);
-  assertEquals(findStaleIssues([current], [current]), []);
-});
-
-Deno.test('close-gate keeps issue pass fail and override semantics unchanged', () => {
+Deno.test('close-gate keeps issue pass fail and override semantics with rebuilt findings', () => {
   const unchecked = findUncheckedAcceptance({
     number: 1171,
     title: 'verdict provenance',
     body: '## Acceptance\n- [ ] required\n## Planning\n- [ ] not authoritative',
     updated_at: '2026-08-03T19:00:00Z',
-  });
+    labels: [],
+  }).findings;
   const checked = findUncheckedAcceptance({
     number: 1171,
     title: 'verdict provenance',
     body: '## Acceptance\n- [x] required\n## Planning\n- [ ] not authoritative',
     updated_at: '2026-08-03T19:00:00Z',
-  });
-
+    labels: [],
+  }).findings;
   assertEquals(unchecked.length, 1);
   assertEquals(checked, []);
   assertEquals(closeGatePasses(false, unchecked, []), false);
@@ -145,7 +121,6 @@ Deno.test('close-gate fails unchecked PR DoD but ignores non-authoritative check
       '- [ ] ordinary checklist',
     ].join('\n'),
   });
-
   assertEquals(findings.map(({ line, section, text }) => ({ line, section, text })), [{
     line: 4,
     section: 'Definition of Done',
@@ -154,13 +129,14 @@ Deno.test('close-gate fails unchecked PR DoD but ignores non-authoritative check
   assertEquals(closeGatePasses(false, [], findings), false);
 });
 
-Deno.test('close-gate pretty log carries report provenance', () => {
+Deno.test('close-gate pretty log carries rebuilt provenance and PR findings', () => {
   const finding: Finding = {
     issue: 1171,
     title: 'verdict provenance',
     line: 2,
     section: 'Acceptance',
     text: 'required',
+    action: 'tick the issue box',
   };
   const prFinding: PrFinding = {
     pr: 1181,
@@ -168,6 +144,7 @@ Deno.test('close-gate pretty log carries report provenance', () => {
     line: 10,
     section: 'Definition of Done',
     text: 'finish implementation',
+    action: 'tick the PR box',
   };
   const report: Report = {
     gate: 'close-gate',
@@ -179,7 +156,7 @@ Deno.test('close-gate pretty log carries report provenance', () => {
     overrideLabel: 'status:close-gate-override',
     overrideActive: false,
     closingIssues: [1171],
-    evaluatedIssues: [{
+    issues: [{
       number: 1171,
       updatedAt: '2026-08-03T19:00:00Z',
       bodySha256: 'deadbeef',
@@ -189,12 +166,38 @@ Deno.test('close-gate pretty log carries report provenance', () => {
     notes: [],
   };
   const output = formatPrettyReport(report).join('\n');
-
-  assertStringIncludes(output, 'head SHA: abc123');
-  assertStringIncludes(output, 'evaluated at: 2026-08-03T20:00:00Z');
+  assertStringIncludes(output, 'provenance: head=abc123 evaluated=2026-08-03T20:00:00Z');
   assertStringIncludes(
     output,
-    'evaluated issue: #1171 updatedAt=2026-08-03T19:00:00Z bodySha256=deadbeef',
+    'snapshot: #1171 updated=2026-08-03T19:00:00Z bodySha256=deadbeef',
   );
   assertStringIncludes(output, 'unchecked PR body: #1181 line 10 [Definition of Done]');
+});
+
+Deno.test('close-gate workflow guard accepts live reads and fires on frozen label regression', async () => {
+  const workflow = await Deno.readTextFile('.github/workflows/ci.yml');
+  assertCloseGateWorkflowUsesLiveLabels(workflow);
+  assertThrows(
+    () =>
+      assertCloseGateWorkflowUsesLiveLabels(`jobs:
+  close-gate:
+    if: contains(github.event.pull_request.labels.*.name, 'status:ready-merge')
+  next-job:
+    runs-on: ubuntu-latest
+`),
+    Error,
+    'reads frozen github.event.pull_request.labels',
+  );
+});
+
+Deno.test('post-merge close-gate box is excluded with a visible notice', () => {
+  const result = findUncheckedAcceptance({
+    number: 1142,
+    title: 'release gate',
+    body: '## Acceptance\n- [ ] [post-merge] verify production',
+    updated_at: '2026-08-03T10:00:00Z',
+    labels: [],
+  });
+  assertEquals(result.findings, []);
+  assertEquals(result.notices[0].includes('excluded post-merge box'), true);
 });

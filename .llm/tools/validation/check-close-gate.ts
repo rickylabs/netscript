@@ -1,3 +1,10 @@
+import {
+  acceptanceCheckboxes,
+  extractClosingIssues,
+  type IssueSnapshot,
+  issueSnapshot,
+} from './acceptance-evidence.ts';
+
 interface Options {
   repo: string;
   pr?: number;
@@ -12,6 +19,7 @@ export interface GitHubIssue {
   title: string;
   body: string | null;
   updated_at: string;
+  labels: Array<{ name?: string } | string>;
 }
 
 interface GitHubPullRequest {
@@ -21,16 +29,13 @@ interface GitHubPullRequest {
   head: { sha: string };
 }
 
-interface GitHubIssueWithLabels {
-  labels: Array<{ name?: string } | string>;
-}
-
 export interface Finding {
   issue: number;
   title: string;
   line: number;
   section: string;
   text: string;
+  action: string;
 }
 
 export interface PrFinding {
@@ -39,18 +44,23 @@ export interface PrFinding {
   line: number;
   section: string;
   text: string;
+  action: string;
 }
 
-export interface IssueSnapshot {
-  number: number;
-  updatedAt: string;
-  bodySha256: string;
-}
-
-export interface StaleIssue {
-  number: number;
-  evaluated: IssueSnapshot;
-  current: IssueSnapshot | null;
+export interface Report {
+  gate: 'close-gate';
+  ok: boolean;
+  repo: string;
+  pr?: number;
+  headSha: string;
+  evaluatedAt: string;
+  overrideLabel: string;
+  overrideActive: boolean;
+  closingIssues: number[];
+  issues: IssueSnapshot[];
+  findings: Finding[];
+  prFindings: PrFinding[];
+  notes: string[];
 }
 
 interface HeadingState {
@@ -59,24 +69,6 @@ interface HeadingState {
   relevant: boolean;
 }
 
-export interface Report {
-  gate: 'close-gate';
-  ok: boolean;
-  repo: string;
-  pr?: number;
-  headSha: string | null;
-  evaluatedAt: string;
-  overrideLabel: string;
-  overrideActive: boolean;
-  closingIssues: number[];
-  evaluatedIssues: IssueSnapshot[];
-  findings: Finding[];
-  prFindings: PrFinding[];
-  notes: string[];
-}
-
-const CLOSING_KEYWORD_PATTERN =
-  /\b(?:close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved)\s+(?:(?:https:\/\/github\.com\/[^/\s]+\/[^/\s]+\/issues\/)|#)(\d+)\b/gi;
 const CHECKBOX_PATTERN = /^\s*[-*]\s+\[( |x|X)\]\s+(.*)$/;
 const HEADING_PATTERN = /^(#{1,6})\s+(.+?)\s*#*\s*$/;
 const DEFAULT_OVERRIDE_LABEL = 'status:close-gate-override';
@@ -110,54 +102,50 @@ export async function fetchGitHubJsonWithRetry<T>(
         'x-github-api-version': '2022-11-28',
       },
     });
-    if (response.ok) {
-      return await response.json() as T;
-    }
+    if (response.ok) return await response.json() as T;
 
     const body = await response.text();
     const retryable = response.status === 429 || response.status >= 500;
     if (!retryable || attempt === maxAttempts) {
       throw new Error(`GitHub API ${url} failed: ${response.status} ${body}`);
     }
-
-    // GitHub can transiently fail only the token-authenticated edge while the
-    // same metadata remains available for a public repository. This gate is
-    // read-only, so an anonymous fallback is safe; private repositories simply
-    // return a non-success response and continue authenticated retries.
     const publicResponse = await fetchImpl(url, {
       headers: {
         'accept': 'application/vnd.github+json',
         'x-github-api-version': '2022-11-28',
       },
     });
-    if (publicResponse.ok) {
-      return await publicResponse.json() as T;
-    }
+    if (publicResponse.ok) return await publicResponse.json() as T;
     await publicResponse.body?.cancel();
-
     const retryAfterSeconds = Number(response.headers.get('retry-after'));
     const delay = Number.isFinite(retryAfterSeconds) && retryAfterSeconds > 0
       ? retryAfterSeconds * 1_000
       : GITHUB_API_RETRY_DELAY_MS * attempt;
     await sleep(delay);
   }
-
   throw new Error(`GitHub API ${url} exhausted retries`);
+}
+
+/** Fails if the close-gate job regresses to frozen pull-request label payloads. */
+export function assertCloseGateWorkflowUsesLiveLabels(workflow: string): void {
+  const job = workflow.match(/\n  close-gate:\n([\s\S]*?)(?=\n  [a-z][\w-]*:\n)/)?.[1] ?? '';
+  if (job.includes('github.event.pull_request.labels')) {
+    throw new Error(
+      'close-gate job reads frozen github.event.pull_request.labels; fetch live PR labels through the API instead.',
+    );
+  }
 }
 
 async function main(): Promise<void> {
   const options = parseArgs(Deno.args);
   const token = options.token ?? Deno.env.get('GITHUB_TOKEN') ?? Deno.env.get('GH_TOKEN');
-
-  if (!token) {
-    throw new Error('GITHUB_TOKEN or GH_TOKEN is required for GitHub API access');
-  }
+  if (!token) throw new Error('GITHUB_TOKEN or GH_TOKEN is required for GitHub API access');
 
   const client = new GitHubClient(options.repo, token);
   const notes: string[] = [];
   let issueNumbers = [...options.issues];
   let overrideActive = false;
-  let headSha = Deno.env.get('GITHUB_SHA') ?? null;
+  let headSha = 'not-applicable';
   let prFindings: PrFinding[] = [];
 
   if (options.pr !== undefined) {
@@ -168,7 +156,7 @@ async function main(): Promise<void> {
       a,
       b,
     ) => a - b);
-    const prIssue = await client.getIssueForLabels(options.pr);
+    const prIssue = await client.getIssue(options.pr);
     overrideActive = hasLabel(prIssue.labels, options.overrideLabel);
     if (issueNumbers.length === 0) {
       notes.push(
@@ -179,12 +167,13 @@ async function main(): Promise<void> {
 
   issueNumbers = [...new Set(issueNumbers)].sort((a, b) => a - b);
   const findings: Finding[] = [];
-  const evaluatedIssues: IssueSnapshot[] = [];
-
+  const snapshots: IssueSnapshot[] = [];
   for (const issueNumber of issueNumbers) {
     const issue = await client.getIssue(issueNumber);
-    evaluatedIssues.push(await snapshotIssue(issue));
-    findings.push(...findUncheckedAcceptance(issue));
+    snapshots.push(await issueSnapshot(issue));
+    const result = findUncheckedAcceptance(issue);
+    findings.push(...result.findings);
+    notes.push(...result.notices);
   }
 
   const ok = closeGatePasses(overrideActive, findings, prFindings);
@@ -198,12 +187,11 @@ async function main(): Promise<void> {
     overrideLabel: options.overrideLabel,
     overrideActive,
     closingIssues: issueNumbers,
-    evaluatedIssues,
+    issues: snapshots,
     findings,
     prFindings,
     notes,
   };
-
   printReport(report, options.pretty);
   Deno.exit(ok ? 0 : 1);
 }
@@ -215,7 +203,6 @@ function parseArgs(args: string[]): Options {
   let token: string | undefined;
   let pretty = false;
   let overrideLabel = DEFAULT_OVERRIDE_LABEL;
-
   for (let index = 0; index < args.length; index++) {
     const arg = args[index];
     switch (arg) {
@@ -250,22 +237,18 @@ function parseArgs(args: string[]): Options {
         throw new Error(`Unknown argument: ${arg}`);
     }
   }
-
   if (!/^[^/\s]+\/[^/\s]+$/.test(repo)) {
     throw new Error('--repo must be owner/name, or set GITHUB_REPOSITORY');
   }
   if (pr === undefined && issues.length === 0) {
     throw new Error('Provide --pr <number> or at least one --issue <number>');
   }
-
   return { repo, pr, issues, token, pretty, overrideLabel };
 }
 
 function requireValue(args: string[], index: number, flag: string): string {
   const value = args[index + 1];
-  if (!value || value.startsWith('--')) {
-    throw new Error(`Missing value for ${flag}`);
-  }
+  if (!value || value.startsWith('--')) throw new Error(`Missing value for ${flag}`);
   return value;
 }
 
@@ -283,60 +266,34 @@ function printHelp(): void {
     '  deno run --allow-env --allow-net .llm/tools/validation/check-close-gate.ts --repo owner/repo --pr 123 --pretty',
     '  deno run --allow-env --allow-net .llm/tools/validation/check-close-gate.ts --repo owner/repo --issue 260 --pretty',
     '',
-    'Checks PR body closing keywords against referenced issue acceptance/gate checkboxes.',
+    'Checks authoritative PR-body checkboxes and closing-issue acceptance/gate checkboxes.',
   ].join('\n'));
 }
 
-function extractClosingIssues(body: string): number[] {
-  const issues = new Set<number>();
-  for (const match of body.matchAll(CLOSING_KEYWORD_PATTERN)) {
-    issues.add(Number(match[1]));
-  }
-  return [...issues];
-}
-
-export function findUncheckedAcceptance(issue: GitHubIssue): Finding[] {
+export function findUncheckedAcceptance(
+  issue: GitHubIssue,
+): { findings: Finding[]; notices: string[] } {
   const findings: Finding[] = [];
-  const body = issue.body ?? '';
-  const lines = body.split(/\r?\n/);
-  const headingStack: HeadingState[] = [];
-
-  for (let index = 0; index < lines.length; index++) {
-    const line = lines[index];
-    const heading = line.match(HEADING_PATTERN);
-    if (heading) {
-      const level = heading[1].length;
-      const title = stripMarkdown(heading[2]);
-      while (headingStack.length > 0 && headingStack[headingStack.length - 1].level >= level) {
-        headingStack.pop();
-      }
-      headingStack.push({ level, title, relevant: isRelevantSection(title) });
-    }
-
-    const checkbox = line.match(CHECKBOX_PATTERN);
-    if (!checkbox || checkbox[1].toLowerCase() === 'x') {
+  const notices: string[] = [];
+  for (const box of acceptanceCheckboxes(issue.body ?? '')) {
+    if (box.postMerge) {
+      notices.push(
+        `Issue #${issue.number}: excluded post-merge box "${box.text}" from the merge gate; verify it in a follow-up comment and tick it after merge.`,
+      );
       continue;
     }
-
-    const text = checkbox[2].trim();
-    const gateCheckbox = /^`?gate:/i.test(text);
-    const relevantHeading = [...headingStack].reverse().find((entry) => entry.relevant);
-    if (!gateCheckbox && relevantHeading === undefined) {
-      continue;
-    }
-
+    if (box.checked) continue;
     findings.push({
       issue: issue.number,
       title: issue.title,
-      line: index + 1,
-      section: gateCheckbox
-        ? relevantHeading?.title ?? 'gate checkbox'
-        : relevantHeading?.title ?? 'acceptance/gate',
-      text,
+      line: box.line,
+      section: 'acceptance/gate',
+      text: box.text,
+      action:
+        `Tick issue #${issue.number} box "${box.text}" after attaching evidence, or add structured PR evidence and apply status:ready-merge then push; reruns cannot observe a new label event.`,
     });
   }
-
-  return findings;
+  return { findings, notices };
 }
 
 /** Finds unchecked authoritative checkboxes in a pull request body. */
@@ -344,67 +301,33 @@ export function findUncheckedPrBody(pr: GitHubPullRequest): PrFinding[] {
   const findings: PrFinding[] = [];
   const lines = (pr.body ?? '').split(/\r?\n/);
   const headingStack: HeadingState[] = [];
-
   for (let index = 0; index < lines.length; index++) {
     const line = lines[index];
     const heading = line.match(HEADING_PATTERN);
     if (heading) {
       const level = heading[1].length;
       const title = stripMarkdown(heading[2]);
-      while (headingStack.length > 0 && headingStack[headingStack.length - 1].level >= level) {
-        headingStack.pop();
-      }
+      while ((headingStack.at(-1)?.level ?? 0) >= level) headingStack.pop();
       headingStack.push({ level, title, relevant: isAuthoritativePrSection(title) });
     }
-
     const checkbox = line.match(CHECKBOX_PATTERN);
     if (!checkbox || checkbox[1].toLowerCase() === 'x') continue;
     const relevantHeading = [...headingStack].reverse().find((entry) => entry.relevant);
     if (!relevantHeading) continue;
-
+    const text = checkbox[2].trim();
     findings.push({
       pr: pr.number,
       title: pr.title,
       line: index + 1,
       section: relevantHeading.title,
-      text: checkbox[2].trim(),
+      text,
+      action: `Tick PR #${pr.number} box "${text}" only after its claim is true and evidenced.`,
     });
   }
-
   return findings;
 }
 
-/** Captures the GitHub issue-body identity carried by a close-gate verdict. */
-export async function snapshotIssue(issue: GitHubIssue): Promise<IssueSnapshot> {
-  const digest = await crypto.subtle.digest(
-    'SHA-256',
-    new TextEncoder().encode(issue.body ?? ''),
-  );
-  return {
-    number: issue.number,
-    updatedAt: issue.updated_at,
-    bodySha256: [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, '0')).join(
-      '',
-    ),
-  };
-}
-
-/** Returns evaluated issue snapshots that no longer match the current issue state. */
-export function findStaleIssues(
-  evaluatedIssues: readonly IssueSnapshot[],
-  currentIssues: readonly IssueSnapshot[],
-): StaleIssue[] {
-  const currentByNumber = new Map(currentIssues.map((issue) => [issue.number, issue]));
-  return evaluatedIssues.flatMap((evaluated) => {
-    const current = currentByNumber.get(evaluated.number) ?? null;
-    return current === null || current.updatedAt !== evaluated.updatedAt ||
-        current.bodySha256 !== evaluated.bodySha256
-      ? [{ number: evaluated.number, evaluated, current }]
-      : [];
-  });
-}
-
-/** Preserves the override while making PR-body Definition-of-Done findings additive. */
+/** Preserves the override while requiring both issue and PR-body authoritative boxes. */
 export function closeGatePasses(
   overrideActive: boolean,
   issueFindings: readonly Finding[],
@@ -417,20 +340,12 @@ function stripMarkdown(value: string): string {
   return value.replaceAll('`', '').replace(/\s+/g, ' ').trim();
 }
 
-function isRelevantSection(title: string): boolean {
-  const normalized = title.toLowerCase();
-  return normalized.includes('acceptance') ||
-    normalized.includes('definition of done') ||
-    normalized.includes('fitness gate') ||
-    /\bgates?\b/.test(normalized);
-}
-
 function isAuthoritativePrSection(title: string): boolean {
   const normalized = title.toLowerCase();
   return normalized.includes('definition of done') || normalized.includes('acceptance');
 }
 
-function hasLabel(labels: GitHubIssueWithLabels['labels'], name: string): boolean {
+function hasLabel(labels: GitHubIssue['labels'], name: string): boolean {
   return labels.some((label) => (typeof label === 'string' ? label : label.name) === name);
 }
 
@@ -439,41 +354,36 @@ function printReport(report: Report, pretty: boolean): void {
     console.log(JSON.stringify(report));
     return;
   }
-
   for (const line of formatPrettyReport(report)) console.log(line);
 }
 
 /** Formats the human-readable CI log with the same provenance as report JSON. */
 export function formatPrettyReport(report: Report): string[] {
-  const lines: string[] = [];
   const subject = report.pr === undefined ? report.repo : `${report.repo}#${report.pr}`;
-  lines.push(`close-gate ${report.ok ? 'PASS' : 'FAIL'} ${subject}`);
-  lines.push(`head SHA: ${report.headSha ?? 'null'}`);
-  lines.push(`evaluated at: ${report.evaluatedAt}`);
-  if (report.overrideActive) {
-    lines.push(`override: ${report.overrideLabel}`);
-  }
-  if (report.closingIssues.length === 0) {
-    lines.push('closing issues: none');
-  } else {
-    lines.push(`closing issues: ${report.closingIssues.map((issue) => `#${issue}`).join(', ')}`);
-  }
-  for (const issue of report.evaluatedIssues) {
+  const lines = [
+    `close-gate ${report.ok ? 'PASS' : 'FAIL'} ${subject}`,
+    `provenance: head=${report.headSha} evaluated=${report.evaluatedAt}`,
+  ];
+  for (const issue of report.issues) {
     lines.push(
-      `evaluated issue: #${issue.number} updatedAt=${issue.updatedAt} bodySha256=${issue.bodySha256}`,
+      `snapshot: #${issue.number} updated=${issue.updatedAt} bodySha256=${issue.bodySha256}`,
     );
   }
-  for (const note of report.notes) {
-    lines.push(`note: ${note}`);
-  }
+  if (report.overrideActive) lines.push(`override: ${report.overrideLabel}`);
+  lines.push(
+    report.closingIssues.length === 0
+      ? 'closing issues: none'
+      : `closing issues: ${report.closingIssues.map((issue) => `#${issue}`).join(', ')}`,
+  );
+  for (const note of report.notes) lines.push(`note: ${note}`);
   for (const finding of report.findings) {
     lines.push(
-      `unchecked: #${finding.issue} line ${finding.line} [${finding.section}] ${finding.text}`,
+      `unchecked: #${finding.issue} line ${finding.line} [${finding.section}] "${finding.text}"; compared current live issue body. Fix: ${finding.action}`,
     );
   }
   for (const finding of report.prFindings) {
     lines.push(
-      `unchecked PR body: #${finding.pr} line ${finding.line} [${finding.section}] ${finding.text}`,
+      `unchecked PR body: #${finding.pr} line ${finding.line} [${finding.section}] "${finding.text}". Fix: ${finding.action}`,
     );
   }
   return lines;
@@ -481,21 +391,14 @@ export function formatPrettyReport(report: Report): string[] {
 
 class GitHubClient {
   constructor(private readonly repo: string, private readonly token: string) {}
-
   getPullRequest(number: number): Promise<GitHubPullRequest> {
     return this.getJson<GitHubPullRequest>(`/repos/${this.repo}/pulls/${number}`);
   }
-
   getIssue(number: number): Promise<GitHubIssue> {
     return this.getJson<GitHubIssue>(`/repos/${this.repo}/issues/${number}`);
   }
-
-  getIssueForLabels(number: number): Promise<GitHubIssueWithLabels> {
-    return this.getJson<GitHubIssueWithLabels>(`/repos/${this.repo}/issues/${number}`);
-  }
-
-  private async getJson<T>(path: string): Promise<T> {
-    return await fetchGitHubJsonWithRetry<T>(`https://api.github.com${path}`, this.token);
+  private getJson<T>(path: string): Promise<T> {
+    return fetchGitHubJsonWithRetry<T>(`https://api.github.com${path}`, this.token);
   }
 }
 
