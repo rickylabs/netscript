@@ -63,3 +63,16 @@ Drift is append-only.
 - **Action:** accept for this lane; use the package config for exact lint/fmt evidence and leave root
   configuration changes out of scope.
 - **Evidence:** `worklog.md` Slice 1 gate table; package-configured lint/fmt exit 0 over 76 files.
+
+## 2026-08-04 — Package test task omitted test-only write permission
+
+- **What:** The locked package-test command initially failed three pre-existing tests before their
+  assertions because they create temporary directories, while the task omitted `--allow-write`.
+- **Source:** Slice 2 `deno task --cwd packages/mcp test` output for `drift-evidence_test.ts` and
+  `stdio_test.ts`.
+- **Expected:** The package task would execute its complete test corpus and exit 0.
+- **Actual:** The task definition now grants write access only to the test process; runtime and
+  published package permissions are unchanged. The exact task then passed 78/78.
+- **Severity:** minor
+- **Action:** fix
+- **Evidence:** `packages/mcp/deno.json`; `worklog.md` Slice 2 package-test gate.

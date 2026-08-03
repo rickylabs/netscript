@@ -27,6 +27,7 @@ export const SOURCE_FAILURE_CODES = [
   'command_not_found',
   'command_failed',
   'parse_failed',
+  'source_failed',
 ] as const;
 
 /** Machine-readable endpoint source failure classification. */

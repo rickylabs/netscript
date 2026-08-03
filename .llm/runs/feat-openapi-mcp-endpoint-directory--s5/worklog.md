@@ -82,6 +82,9 @@ never import an infrastructure adapter from a consumer flow.
 | 2026-08-04 | implementation dispatch | sender ownership reconciled | The provided PR worktree is durably owned by this Desktop supervisor thread; implementation uses a run-owned staging worktree and pushes each commit to the exact PR refspec. |
 | 2026-08-04 | 1 | contract + source adapters | Added the discriminated directory/source/probe vocabulary, loopback normalization policy, and override/Aspire CLI/run-manifest/appsettings adapters. Source matrix passed 6/6, including CLI absent/non-zero/parse failures, foreign/missing/mismatched manifest identity, torn manifest with healthy appsettings, unknown shared-carrier fields, exclusions, and unpinned services. |
 | 2026-08-04 | 1 | post-slice reconcile | PR #1194 remains draft, references #1131 without a closing keyword, and has no new implementation/reviewer comments; issue #1131 remains open with both acceptance gates unchecked. The launcher metadata push ref was corrected to the user-authorized PR branch. No scope or precedence readjustment was needed. |
+| 2026-08-04 | 2 | composition + bounded probe | Added the default directory composition, deterministic precedence/conflicts, pre-fetch exclusions, bounded concurrency, per-row timeout/error isolation, and the credential-free/redirect-free spec-first identity probe. The fixture matrix passed 12/12 across source and directory tests; the package passed 78/78. |
+| 2026-08-04 | 2 | package test gate repair | Added the missing test-only `--allow-write` permission required by the package's existing temporary-directory tests. The initially failing exact package task then passed 78/78 without changing runtime permissions or product dependencies. |
+| 2026-08-04 | 2 | post-slice reconcile | PR #1194 remains draft at slice 1, references #1131 without a closing keyword, and has no reviewer comments after the slice 1 implementation comment. Issue #1131 remains open with both acceptance gates unchecked. No contract rescope or precedence readjustment was needed. |
 
 ## Decisions
 
@@ -98,6 +101,7 @@ never import an infrastructure adapter from a consumer flow.
 | Formal PLAN-EVAL composed/waived by milestone ruling | significant | yes |
 | Local `main` stale; `origin/main` is true baseline | minor | yes |
 | RFC omitted how MCP learns the current manifest `runId`; S5 requires injection | significant | yes |
+| Existing package tests need test-only write permission for temporary directories | minor | yes |
 
 ## Gate Results
 
@@ -115,11 +119,28 @@ never import an infrastructure adapter from a consumer flow.
 
 The wrapper invocations without `--config packages/mcp/deno.json` encountered the root workspace
 configuration parser failure recorded in `drift.md`; the package-configured wrapper verdicts above
-are the exact successful evidence. Slice 2 and slice 3 gates remain `NOT_RUN`.
+are the exact successful evidence.
+
+### Slice 2 — composition and bounded probe
+
+| Gate | Command | Result |
+| --- | --- | --- |
+| Focused directory/source matrix | `deno test --allow-env --allow-net --allow-run --allow-read packages/mcp/tests/service-endpoint-*_test.ts` | PASS, exit 0; 12 passed, 0 failed |
+| Package tests | `deno task --cwd packages/mcp test` | PASS, exit 0; 78 passed, 0 failed |
+| Scoped check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/mcp --ext ts,tsx` | PASS, exit 0; 79 files, 0 diagnostics |
+| Scoped lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/mcp --ext ts,tsx --config packages/mcp/deno.json` | PASS, exit 0; 79 files, 0 findings |
+| Scoped format | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/mcp --ext ts,tsx --config packages/mcp/deno.json` | PASS, exit 0; 79 files, 0 findings |
+| Code quality | `deno run --allow-read .llm/tools/quality/scan-code-quality.ts --root packages/mcp` | PASS, exit 0; no findings or allowances |
+| Framework quality | `deno task quality:gate` | PASS, exit 0; quality scan and architecture task completed |
+| Diff hygiene | `git diff --check`; forbidden-pattern scan | PASS, exit 0; no whitespace errors, unsafe casts, lint ignores, or console calls |
+
+The exact package task first exposed a missing test-only `--allow-write` permission in its existing
+temporary-directory tests. The task definition was repaired, rerun, and is the passing evidence
+above. Slice 3 consumer/JSR gates remain `NOT_RUN`.
 
 ## Handoff Notes
 
 - Implement against locked decisions D1–D9; do not import S4.
 - The fixture matrices and timeout negative case are the decisive #1131 evidence.
-- Slice 1 is ready for the supervisor's substantive review; this implementation lane does not
+- Slices 1–2 are ready for the supervisor's substantive review; this implementation lane does not
   self-certify the slice.
