@@ -69,6 +69,9 @@ they do not add parser strategies or I/O.
 | 2026-08-04 | 1 | review | Verified source-order indexing, dotted ids, method-path fallback, ignored Path Item metadata, unchanged 14-tool claims, pure-domain imports, and empty lock diff. |
 | 2026-08-04 | 2 | implementation/review | Added exact identity resolution and a committed ambiguity fixture. Verified id precedence, uppercase method-path fallback, case-variant refusal, duplicate-id ambiguity candidates, and non-executing substring suggestions. |
 | 2026-08-04 | 3 | implementation/review | Added the four-rung description ladder, a per-rung fixture, and the byte-identical 3657-byte generated no-DB spec. Verified the real operations have no operation summary/description and fire rung 3; nested schema property `summary` does not leak into operation descriptions. |
+| 2026-08-04 | 2a | acceptance correction | Tightened identity refusal for two spec IDs that collide under case-folding. Either exact spelling now returns both candidates; a differently cased unique ID remains an unknown suggestion only. |
+| 2026-08-04 | 4 | implementation/review | Added request/success/error/all projections, path/operation parameter merging, bounded local-ref expansion, unresolved/external-ref preservation, and detected-only common error compaction. The real no-DB fixture returns exact `{}` errors for all three operations. |
+| 2026-08-04 | 4 | gate correction | Package `deno task test` exposed a baseline task-permission defect: three existing temp-directory tests require write permission. Added test-only `--allow-write`; no runtime permission or domain I/O changed. |
 
 ## Decisions
 
@@ -84,6 +87,7 @@ they do not add parser strategies or I/O.
 | Drift | Severity | Logged in drift.md |
 | --- | --- | --- |
 | Formal PLAN-EVAL replaced by milestone composition | minor/process-authorized | yes |
+| Package test task lacked existing temp-write permission | minor/test-infrastructure | yes |
 
 ## Gate Results
 
@@ -110,6 +114,11 @@ they do not add parser strategies or I/O.
 | Real fixture provenance | `cmp <P2-no-db-live-spec.json> packages/mcp/tests/fixtures/openapi/no-db-generated-openapi.json`; `wc -c` | PASS | Byte-identical; 3657 bytes. |
 | Slice 3 scoped check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/mcp --ext ts,tsx` | PASS | 75 files, one batch, zero diagnostics. |
 | Slice 3 hygiene | `git diff --check`; raw `git diff -- deno.lock` | PASS | No whitespace errors; lock diff empty. |
+| Slice 4 schema-view tests | `deno test packages/mcp/tests/schema-views_test.ts` | PASS | 3 passed: merged request/ref cycle, detected common errors + preserved refs, and exact no-DB `{}` errors. |
+| Package tests | package `deno task test` | PASS after task correction | 78 passed, 0 failed. Initial task ran 74 pass / 3 permission-only failures because its task omitted write access for existing temp-dir tests; test-only permission was corrected. |
+| Slice 4 scoped check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/mcp --ext ts,tsx` | PASS | 77 files, one batch, zero diagnostics. |
+| MCP doctrine scan | `check-doctrine.ts --root packages/mcp` | PASS for introduced surface | Schema views reduced below the 300-line F-1 cap; only pre-existing flows cardinality and architecture-doc info remain. |
+| Framework quality | `deno task quality:gate` | PASS | Exit 0; quality scan clean and architecture chain completed with baseline warnings only. |
 
 ### Fitness Gates
 
@@ -127,7 +136,7 @@ they do not add parser strategies or I/O.
 
 | Consumer | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| New subpath | PASS (Slice 1) | `tests/operation-index_test.ts` imports `../openapi-projection.ts` | Full surface gates repeat at merge readiness. |
+| New subpath | PASS (Slices 1–4) | all new tests import `../openapi-projection.ts` | Full surface gates repeat at merge readiness. |
 
 ## Handoff Notes
 

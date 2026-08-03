@@ -5,11 +5,11 @@ import ambiguityFixture from './fixtures/openapi/identity-ambiguity.json' with {
 const index = indexOpenApiOperations(ambiguityFixture);
 
 Deno.test('canonical identity resolves exact operation id before exact method path', () => {
-  const byId = resolveCanonicalOperation(index, 'v1.health.updateStatus');
+  const byId = resolveCanonicalOperation(index, 'v1.health.check');
   assertEquals(byId.status, 'resolved');
   if (byId.status === 'resolved') {
     assertEquals(byId.matchedBy, 'operationId');
-    assertEquals(byId.operation.methodPath, 'POST /health/status');
+    assertEquals(byId.operation.methodPath, 'GET /health/check');
   }
 
   const byMethodPath = resolveCanonicalOperation(index, 'DELETE /anonymous');
@@ -20,12 +20,23 @@ Deno.test('canonical identity resolves exact operation id before exact method pa
   }
 });
 
-Deno.test('canonical identity refuses a case-variant id and offers it only as a suggestion', () => {
-  const result = resolveCanonicalOperation(index, 'V1.HEALTH.UPDATESTATUS');
+Deno.test('canonical identity refuses case-variant ids as ambiguous candidates', () => {
+  const result = resolveCanonicalOperation(index, 'v1.health.updateStatus');
+  assertEquals(result.status, 'ambiguous');
+  if (result.status === 'ambiguous') {
+    assertEquals(result.candidates.map((candidate) => candidate.methodPath), [
+      'POST /health/status',
+      'PUT /health/status-alias',
+    ]);
+  }
+});
+
+Deno.test('a differently cased unique id remains a non-executing suggestion', () => {
+  const result = resolveCanonicalOperation(index, 'V1.HEALTH.CHECK');
   assertEquals(result.status, 'unknown');
   if (result.status === 'unknown') {
     assertEquals(result.suggestions.map((candidate) => candidate.operationId), [
-      'v1.health.updateStatus',
+      'v1.health.check',
     ]);
   }
 });
@@ -45,6 +56,6 @@ Deno.test('substring matches remain non-executing suggestions', () => {
   const result = resolveCanonicalOperation(index, 'health');
   assertEquals(result.status, 'unknown');
   if (result.status === 'unknown') {
-    assertEquals(result.suggestions.length, 3);
+    assertEquals(result.suggestions.length, 5);
   }
 });

@@ -26,3 +26,16 @@ Drift is append-only.
 - **Severity:** minor
 - **Action:** accept
 - **Evidence:** `supervisor.md`.
+
+## 2026-08-04 — MCP package test task temp-write permission
+
+- **What:** The package test task gained test-only write permission.
+- **Source:** Slice 4 package gate.
+- **Expected:** Existing `deno task test` passes without changing its task permissions.
+- **Actual:** Three pre-existing tests call `Deno.makeTempDir()` and the task omitted `--allow-write`,
+  producing permission-only failures after 74 tests passed. Running the identical suite with write
+  permission passed, so the package task was corrected and then passed 78/78.
+- **Severity:** minor
+- **Action:** accept
+- **Boundary:** No published/runtime permission, projection I/O, or production behavior changed.
+- **Evidence:** `packages/mcp/deno.json`; `worklog.md` Package tests row.

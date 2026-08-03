@@ -16,6 +16,16 @@
         "operationId": "v1.health.updateStatus"
       }
     },
+    "/health/status-alias": {
+      "put": {
+        "operationId": "V1.HEALTH.UPDATESTATUS"
+      }
+    },
+    "/health/check": {
+      "get": {
+        "operationId": "v1.health.check"
+      }
+    },
     "/anonymous": {
       "delete": {}
     }

@@ -14,7 +14,7 @@
 
 The branch began as a clean exact child of current `origin/main`. Live issue/RFC and the complete P2
 no-DB proof/evidence have been consumed. The plan and Design checkpoint are locked. Formal local
-PLAN-EVAL is intentionally composed/waived by the milestone-run rule. Slices 1–3 are implemented,
+PLAN-EVAL is intentionally composed/waived by the milestone-run rule. Slices 1–4 are implemented,
 reviewed, committed/pending sign-off as applicable, and focused-green in the milestone
 orchestrator's already-owned single Codex sender.
 
@@ -29,13 +29,13 @@ orchestrator's already-owned single Codex sender.
 
 ## In Progress
 
-- Supervisor Slice 3 sign-off, commit, explicit-refspec push, and PR evidence comment.
+- Supervisor Slice 4 sign-off, commit, explicit-refspec push, and PR evidence comment.
 
 ## Next Steps
 
-1. Sign off and push Slice 3.
-2. Implement/review Slice 4 at its stopped checkpoint.
-3. Run the full Slice 5 merge-readiness gates and composed independent evaluation.
+1. Sign off and push Slice 4.
+2. Run the full Slice 5 merge-readiness gates.
+3. Complete composed independent evaluation and close-gate evidence.
 
 ## Key Decisions
 
@@ -60,6 +60,8 @@ orchestrator's already-owned single Codex sender.
 | `packages/mcp/src/domain/openapi/description-ladder.ts` | new | Deterministic four-rung single-line description policy. |
 | `packages/mcp/tests/description-ladder_test.ts` | new | Per-rung and real-generated-spec assertions. |
 | `packages/mcp/tests/fixtures/openapi/{description-ladder,no-db-generated-openapi}.json` | new | Synthetic rung corpus plus byte-identical committed P2 no-DB spec. |
+| `packages/mcp/src/domain/openapi/schema-views.ts` | new | Pure request/response/error/all projections with bounded local refs. |
+| `packages/mcp/tests/{schema-views_test.ts,fixtures/openapi/schema-views.json}` | new | Declared-error, ref, request merge, compaction, and no-DB empty-error evidence. |
 | `packages/mcp/{deno.json,README.md}` | modified | Export/check surface and domain-subpath documentation. |
 
 ## Gates
@@ -70,7 +72,7 @@ orchestrator's already-owned single Codex sender.
 | Static | baseline green | doc-lint + package publish dry-run |
 | Fitness | baseline recorded | structured JSR audit |
 | Runtime | N/A | pure domain scope |
-| Consumer | Slice 1 green | public entrypoint import test + scoped check |
+| Consumer | Slices 1–4 green | public entrypoint tests, package suite, and scoped check |
 
 ## Open Questions
 
@@ -78,7 +80,7 @@ orchestrator's already-owned single Codex sender.
 
 ## Drift and Debt
 
-- Drift: authorized PLAN-EVAL composition only.
+- Drift: authorized PLAN-EVAL composition plus a test-only permission correction for existing temp-dir tests.
 - Debt: `MCP-A6-V2-SHAPE` remains untouched; baseline cardinality is addressed without a new entry.
 
 ## Commits
