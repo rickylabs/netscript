@@ -74,6 +74,7 @@ they do not add parser strategies or I/O.
 | 2026-08-04 | 4 | gate correction | Package `deno task test` exposed a baseline task-permission defect: three existing temp-directory tests require write permission. Added test-only `--allow-write`; no runtime permission or domain I/O changed. |
 | 2026-08-04 | 5 | composed evaluation | The first OpenHands dispatch reached the runner but produced no verdict because LiteLLM rejected the unprefixed `qwen/qwen3.7-max` model identifier. A single corrected `openrouter/qwen/qwen3.7-max` retry completed successfully and committed `evaluate.md` with `IMPL-EVAL: PASS`. |
 | 2026-08-04 | 5 | close-gate review | The current review-thread gate passed with 0 threads and 0 unanswered. Fresh CI correctly reported the self-referential DoD/closing-keyword metadata still pending and found the MCP generated publish-asset manifest stale after the new subpath export. Regenerated only that manifest with the repo-native task. |
+| 2026-08-04 | 5 | merge-readiness handoff | Corrected the PR's structured acceptance block to the repo's constrained `issue`/`entries`/`box-index` schema, then observed authoritative close-gate, full scaffold runtime, scaffold static, desktop-native, surface-diff, repo check/test, quality, and lane-visibility checks pass. GitHub reports the ready-merge PR `MERGEABLE` / `CLEAN`; merge authority remains with the milestone orchestrator. |
 
 ## Decisions
 
@@ -132,6 +133,8 @@ they do not add parser strategies or I/O.
 | OpenHands IMPL-EVAL | corrected approved Qwen route; Actions run `30861395106`; committed `evaluate.md` | PASS | Independent evaluator repeated the package, doctrine, JSR/publish, identity, ladder, ref-bound, exact no-DB `{}` and lock gates; no substitute blocker found. |
 | Current review threads | `deno task agentic:review-threads -- --repo rickylabs/netscript --pr 1195 --pretty` | PASS | 0 threads, 0 unanswered after the evaluator artifact commit. |
 | Generated publish assets | `deno task gen:publish-assets`; `deno task check:publish-assets`; package publish dry-run | PASS | CI found the new `./openapi-projection` public subpath absent from the checked-in MCP publish manifest; regeneration changed only `packages/mcp/src/publish-assets.generated.ts`, the check passed, and all 3 entrypoints dry-ran successfully. |
+| PR close gate | Actions run `30862374051`; job `91846994088` | PASS | Structured acceptance mirror, referenced issue acceptance, and answered review-thread checks all passed against the live ready-merge body. |
+| Current PR check rollup | `deno task agentic:pr-checks -- --repo rickylabs/netscript --pr 1195 --pretty` | PASS | Head `0094071a9…`: 0 current failures; scaffold runtime/static, desktop native, surface diff, core CI, quality, and close-gate all current-pass. |
 
 ### Fitness Gates
 
