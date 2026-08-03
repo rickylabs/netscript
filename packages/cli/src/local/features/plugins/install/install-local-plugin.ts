@@ -7,6 +7,7 @@ import { PluginRegistryScaffolder } from '../../../../kernel/adapters/plugin/reg
 import { PluginScaffolder } from '../../../../kernel/adapters/plugin/scaffolder.ts';
 import { PluginWorkspaceMutator } from '../../../../kernel/adapters/plugin/workspace-mutator.ts';
 import { regenerateAspireHelpers } from '../../../../kernel/adapters/service/workspace-mutator.ts';
+import { reconcilePluginReferences } from '../../../../kernel/adapters/plugin/plugin-reference-reconciler.ts';
 import { SCAFFOLD_DIRS } from '../../../../kernel/constants/scaffold/scaffold-dirs.ts';
 import { SCAFFOLD_FILES } from '../../../../kernel/constants/scaffold/scaffold-files.ts';
 import type { FileSystemPort } from '../../../../kernel/ports/file-system-port.ts';
@@ -23,7 +24,7 @@ import type { JsrPluginValidatorPort } from '../../../../public/features/plugins
 import type { JsrPackageFileFetcher } from '../../../../public/infra/jsr/verify-jsr-package-integrity.ts';
 import {
   createPluginOwnedPluginResult,
-  persistPluginDoctorMetadata,
+  persistPluginMetadata,
   resolvePluginConfigDirectory,
   resolvePluginDescriptorBeforePlanning,
   runPluginOwnedScaffold,
@@ -156,6 +157,10 @@ export async function installLocalPlugin(
     rendered.workspaceMembers,
   );
 
+  if (pluginOwned !== undefined && resolvedPlugin !== undefined) {
+    await persistPluginMetadata(plan, resolvedPlugin, pluginOwned, dependencies.fs);
+  }
+  await reconcilePluginReferences(plan.projectRoot, dependencies.fs);
   const regenerateHelpers = dependencies.regenerateHelpers ?? regenerateAspireHelpers;
   const helperFiles = await regenerateHelpers(
     plan.projectRoot,
@@ -163,10 +168,6 @@ export async function installLocalPlugin(
     dependencies.scaffolder,
     dependencies.templateAdapter,
   );
-  if (pluginOwned !== undefined && resolvedPlugin !== undefined) {
-    await persistPluginDoctorMetadata(plan, resolvedPlugin, pluginOwned, dependencies.fs);
-  }
-
   return {
     ...rendered,
     provisionedCache,

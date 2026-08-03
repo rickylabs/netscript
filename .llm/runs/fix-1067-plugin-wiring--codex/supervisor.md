@@ -1,24 +1,24 @@
 # Supervisor Identity — fix-1067-plugin-wiring--codex
 
-| Field | Value |
-| --- | --- |
-| Model | OpenAI Codex (GPT-5 family) |
-| Session | current Codex API session (thread id not exposed) |
-| Host | Linux / `/home/codex` |
-| Checkout | `/home/codex/repos/ns004-plugins` |
-| Worktree | `/home/codex/repos/ns004-plugins` |
-| Branch | `fix/1067-plugin-wiring` |
-| Baseline | `f663fe0e4` (`origin/main`, 2026-08-03) |
-| Run ID | `fix-1067-plugin-wiring--codex` |
+| Field    | Value                                             |
+| -------- | ------------------------------------------------- |
+| Model    | OpenAI Codex (GPT-5 family)                       |
+| Session  | current Codex API session (thread id not exposed) |
+| Host     | Linux / `/home/codex`                             |
+| Checkout | `/home/codex/repos/ns004-plugins`                 |
+| Worktree | `/home/codex/repos/ns004-plugins`                 |
+| Branch   | `fix/1067-plugin-wiring`                          |
+| Baseline | `f663fe0e4` (`origin/main`, 2026-08-03)           |
+| Run ID   | `fix-1067-plugin-wiring--codex`                   |
 
 ## Routes in force
 
-| Task lane | Provider / model / effort | Role in this run |
-| --- | --- | --- |
-| `planning_decisions` | OpenAI Codex, current session | Owner-launched supervisor and plan generator |
-| `complex_implementation` | OpenAI Codex, current session | Three bounded but cross-surface implementation slices |
-| `review_codex_complex` | Claude family, Fable 5 medium | Per-slice substantive opposite-family review |
-| `formal_evaluation` | Claude Code + OpenRouter, Qwen 3.7 Max open-model preset | Separate-session PLAN-EVAL and IMPL-EVAL |
+| Task lane                | Provider / model / effort                                | Role in this run                                      |
+| ------------------------ | -------------------------------------------------------- | ----------------------------------------------------- |
+| `planning_decisions`     | OpenAI Codex, current session                            | Owner-launched supervisor and plan generator          |
+| `complex_implementation` | OpenAI Codex, current session                            | Three bounded but cross-surface implementation slices |
+| `review_codex_complex`   | Claude family, Fable 5 medium                            | Per-slice substantive opposite-family review          |
+| `formal_evaluation`      | Claude Code + OpenRouter, Qwen 3.7 Max open-model preset | Separate-session PLAN-EVAL and IMPL-EVAL              |
 
 ## Recorded lane/eval overrides
 

@@ -1,4 +1,4 @@
-import { assertEquals, assertRejects } from '@std/assert';
+import { assertEquals, assertRejects, assertThrows } from '@std/assert';
 import { DurableStreamProducer } from '../../src/application/create-durable-stream.ts';
 import { createStreamTopicFixture } from '../../src/testing/mod.ts';
 
@@ -62,22 +62,24 @@ Deno.test('DurableStreamProducer close completes after an aborted connection', a
   }
 });
 
-Deno.test('DurableStreamProducer drops writes when streams URL is unavailable', async () => {
+Deno.test('DurableStreamProducer fails synchronously when streams URL is unavailable', () => {
   const previousUrl = Deno.env.get('DURABLE_STREAMS_URL');
   const previousServiceUrl = Deno.env.get('services__streams__http__0');
   Deno.env.delete('DURABLE_STREAMS_URL');
   Deno.env.delete('services__streams__http__0');
 
   try {
-    const producer = new DurableStreamProducer({
-      streamPath: '/missing-url',
-      schema: createStreamTopicFixture(),
-      producerId: 'missing-url-producer',
-    });
-
-    producer.upsert('execution', { id: 'dropped' });
-    await producer.close();
-    assertEquals(producer.closed, true);
+    const error = assertThrows(
+      () =>
+        new DurableStreamProducer({
+          streamPath: '/missing-url',
+          schema: createStreamTopicFixture(),
+          producerId: 'missing-url-producer',
+        }),
+      Error,
+      'Missing plugin reference "streams"',
+    );
+    assertEquals(error.message.includes('netscript service generate'), true);
   } finally {
     if (previousUrl === undefined) {
       Deno.env.delete('DURABLE_STREAMS_URL');

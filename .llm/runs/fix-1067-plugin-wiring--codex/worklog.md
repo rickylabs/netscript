@@ -2,12 +2,12 @@
 
 ## Run Metadata
 
-| Field | Value |
-| --- | --- |
-| Run ID | `fix-1067-plugin-wiring--codex` |
-| Branch | `fix/1067-plugin-wiring` |
-| Archetype | 6 CLI/Tooling + 5 Plugin + 3 Runtime/Behavior |
-| Scope overlays | service |
+| Field          | Value                                         |
+| -------------- | --------------------------------------------- |
+| Run ID         | `fix-1067-plugin-wiring--codex`               |
+| Branch         | `fix/1067-plugin-wiring`                      |
+| Archetype      | 6 CLI/Tooling + 5 Plugin + 3 Runtime/Behavior |
+| Scope overlays | service                                       |
 
 ## Design
 
@@ -15,33 +15,37 @@
 
 - `netscript plugin install` — converges every installed resource’s references.
 - `netscript service generate` / `netscript generate aspire` — reconciles before helper emission.
-- `DurableStreamProducer` / `createDurableStream` — same type surface, stricter missing-discovery failure semantics.
+- `DurableStreamProducer` / `createDurableStream` — same type surface, stricter missing-discovery
+  failure semantics.
 - `netscript plugin doctor` — reports config and live AppHost resource truth.
 
 ### Domain Vocabulary
 
 - `DeclaredPluginReferenceMap` — desired outgoing edges keyed by installed plugin/resource identity.
 - `InstalledPluginResourceSet` — keys present across appsettings plugin/background sections.
-- `AppHostInspection` — discriminated `not-running` or `running` snapshot with named resource states.
+- `AppHostInspection` — discriminated `not-running` or `running` snapshot with named resource
+  states.
 - `AppHostResourceState` — resource name plus health/state sufficient for doctor classification.
 
 ### Ports
 
 - Existing filesystem/process ports remain the IO seams.
-- A narrow doctor AppHost inspector dependency isolates Aspire process/JSON behavior from the use case.
+- A narrow doctor AppHost inspector dependency isolates Aspire process/JSON behavior from the use
+  case.
 
 ### Constants
 
-- Existing canonical manifest names and appsettings keys remain authoritative; no hardcoded host-side plugin-name table.
+- Existing canonical manifest names and appsettings keys remain authoritative; no hardcoded
+  host-side plugin-name table.
 - Stable doctor check ids for AppHost absent, resource missing, and resource unhealthy outcomes.
 
 ### Commit Slices
 
-| # | Slice | Gate | Files |
-| - | --- | --- | --- |
-| 1 | Prove order-independent declared-edge reconciliation and fail-fast stream discovery | permutation/main-red proof; plugin-streams focused tests; `scaffold.plugins` | CLI reconcile/install/generate tests and adapter(s), `packages/plugin-streams-core`, sagas/triggers manifests, run artifacts |
-| 2 | Prove doctor can fail on config, plugin contribution, absent AppHost, missing resource, and unhealthy resource | focused doctor tests plus scoped gates | doctor use case/adapter/composition tests; allowed plugin doctor specs only if evidence demands; run artifacts |
-| 3 | Prove residual clean-public schema, published saga registry runtime, and all-four no-samples acceptance | focused consumer/E2E tests and touched-unit gates | CLI E2E/integration tests and fixtures only; no saga engine/store/runtime edits; run artifacts |
+| # | Slice                                                                                                          | Gate                                                                         | Files                                                                                                                        |
+| - | -------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| 1 | Prove order-independent declared-edge reconciliation and fail-fast stream discovery                            | permutation/main-red proof; plugin-streams focused tests; `scaffold.plugins` | CLI reconcile/install/generate tests and adapter(s), `packages/plugin-streams-core`, sagas/triggers manifests, run artifacts |
+| 2 | Prove doctor can fail on config, plugin contribution, absent AppHost, missing resource, and unhealthy resource | focused doctor tests plus scoped gates                                       | doctor use case/adapter/composition tests; allowed plugin doctor specs only if evidence demands; run artifacts               |
+| 3 | Prove residual clean-public schema, published saga registry runtime, and all-four no-samples acceptance        | focused consumer/E2E tests and touched-unit gates                            | CLI E2E/integration tests and fixtures only; no saga engine/store/runtime edits; run artifacts                               |
 
 ### Deferred Scope
 
@@ -58,24 +62,44 @@ CLI E2E/dependency fixture rather than importing workspace source directly.
 
 ## Progress Log
 
-| Time | Slice | Step | Notes |
-| --- | --- | --- | --- |
-| 2026-08-03 | plan | bootstrap/research | Skills loaded in required order; baseline hashes verified; producer warn/drop path read and reported before source change. |
-| 2026-08-03 | plan-eval | evaluator canary | `agentic:provider-canary` returned `blocked`, `credential: absent`, and `auth_required` for the canonical Qwen route; no evaluator launched. |
+| Time       | Slice     | Step               | Notes                                                                                                                                                                                                           |
+| ---------- | --------- | ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-08-03 | plan      | bootstrap/research | Skills loaded in required order; baseline hashes verified; producer warn/drop path read and reported before source change.                                                                                      |
+| 2026-08-03 | plan-eval | evaluator canary   | `agentic:provider-canary` returned `blocked`, `credential: absent`, and `auth_required` for the canonical Qwen route; no evaluator launched.                                                                    |
+| 2026-08-03 | plan-eval | supervisor verdict | Owner-authorized opposite-family supervisor independently reproduced the canary block, waived formal PLAN-EVAL, approved the plan with D3 corrected to consume manifest `dependencies`, and authorized Slice 1. |
+| 2026-08-03 | slice 1   | contract/implementation | Added a full installed-entry reconcile at install and Aspire-helper regeneration boundaries. Dependency names resolve through persisted target manifests to their actual `serviceConfigKey`; explicit install references are persisted as declarations; dangling edges remain absent. No official manifest was duplicated or changed. |
+| 2026-08-03 | slice 1   | producer semantics | Replaced asynchronous warn/queue/drop behavior for absent stream discovery with a synchronous constructor error naming the missing `streams` reference and the install/regenerate repair. The former drop-writes test now requires rejection. Network timeout/retry remains deferred to 0.0.5. |
+| 2026-08-03 | slice 1   | main-red proof | Stashed all implementation changes, restored only the new real-plugin permutation test onto `origin/main`/`c1dee1697`, and ran the complete test file. It failed at the permutation equality step: expected included `"streams"`, actual contained only `"workers-api"`; summary `FAILED | 0 passed (21 steps) | 1 failed (1 step)`. Restored the full stash afterward. |
 
 ## Decisions
 
-| Decision | Reason | Source |
-| --- | --- | --- |
-| One run with three commits, not supervisor sub-PR groups | Owner mandates one branch, push per slice, and no PR edits. | owner brief + harness supervisor definition |
-| Reconcile all entries at install/generate boundaries | Implements the supplied equation by construction. | owner contract / plan D1–D2 |
+| Decision                                                 | Reason                                                                                                                 | Source                                      |
+| -------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- |
+| One run with three commits, not supervisor sub-PR groups | Owner mandates one branch, push per slice, and no PR edits.                                                            | owner brief + harness supervisor definition |
+| Reconcile all entries at install/generate boundaries     | Implements the supplied equation by construction.                                                                      | owner contract / plan D1–D2                 |
+| Resolve dependencies through target manifests            | One declaration of truth covers workers/sagas/triggers and preserves the target's real `serviceConfigKey` (`streams`). | supervisor correction / plan D3             |
 
 ## Gate Results
 
-All implementation gates are `NOT_RUN` until separate-session PLAN-EVAL returns `PASS`.
-Formal plan gate is `BLOCKED`: the canonical local open-model evaluator credential is absent.
+Formal PLAN-EVAL is unavailable due to the evidenced credential block and is explicitly waived by
+the owner-authorized supervisor.
+
+### Slice 1
+
+| Gate | Trusted artifact/output |
+| ---- | ----------------------- |
+| Main-red acceptance proof | Full `install-plugin_test.ts` on main with only the new test restored: `FAILED | 0 passed (21 steps) | 1 failed (1 step)`; diff showed missing `streams` in the earlier-install producer entry. |
+| Focused reconciliation/install | `3 passed (22 steps) | 0 failed`; includes both real install permutations, dangling-edge activation, all three producers, and renamed installed instance mapping. |
+| `packages/cli` check/test | Package `deno task check` passed. Full package `deno task test` exited 0 after running the suite; focused acceptance output above is the semantic artifact. |
+| `plugin-streams-core` check/test | Package check passed; package tests `9 passed | 0 failed`, including synchronous missing-reference rejection and no drop-writes expectation. |
+| Scoped check/lint/fmt | CLI full wrappers: check `763` files/`0` failed batches/`0` occurrences; lint `763`/`0`; fmt `763`/`0`. Streams-core: check `22`/`0`; lint `22`/`0`; fmt `22`/`0`. Final focused CLI rerun: check `8`/`0`, lint `8`/`0`, fmt `13`/`0`. |
+| `deno task quality:scan` | `ok: true`, `findings: []` (existing allow count `7`). |
+| `deno task arch:check` | Exit 0; every doctrine root reported `FAIL=0` (pre-existing warnings only). |
+| Public doc lint | CLI: `0` errors. Streams-core: only `5` pre-existing private-type-ref findings in unchanged telemetry files; `missingJSDoc=0`. |
+| Required CLI E2E | `scaffold.plugins` suite artifact `.llm/tmp/cli-e2e/plugin-smoke-20260803-090030.log`: `ok: true`, `passed=16`, `failed=0`, `skipped=0`. Generated appsettings contains `streams` for workers/sagas/triggers service and background entries, plus their declared/self references. |
 
 ## Handoff Notes
 
-- PLAN-EVAL should challenge installed identity mapping, explicit user references, AppHost JSON
-  truth source, the main-red proof method, and the published dependency-mode test transport.
+- Slice 1 is ready for the owner-authorized supervisor's substantive implementation review before
+  commit/push. Review focus: installed identity mapping, persisted explicit references, the
+  main-red proof method, and fail-fast producer semantics.

@@ -8,6 +8,7 @@ import { copyPluginSchemasToRootDb } from '../../../../kernel/adapters/plugin/db
 import { PluginKindRegistry } from '../../../../kernel/application/registries/plugin-kind-registry.ts';
 import { PluginWorkspaceMutator } from '../../../../kernel/adapters/plugin/workspace-mutator.ts';
 import { regenerateAspireHelpers } from '../../../../kernel/adapters/service/workspace-mutator.ts';
+import { reconcilePluginReferences } from '../../../../kernel/adapters/plugin/plugin-reference-reconciler.ts';
 import { SCAFFOLD_DIRS } from '../../../../kernel/constants/scaffold/scaffold-dirs.ts';
 import type {
   PluginInfrastructureDependency,
@@ -205,6 +206,8 @@ export async function installPlugin(
 
   await dependencies.workspaceMutator.ensureWorkspaceMember(plan.projectRoot);
 
+  await persistPluginMetadata(plan, resolvedPlugin, pluginOwned, dependencies.fs);
+  await reconcilePluginReferences(plan.projectRoot, dependencies.fs);
   const regenerateHelpers = dependencies.regenerateHelpers ?? regenerateAspireHelpers;
   const helperFiles = await regenerateHelpers(
     plan.projectRoot,
@@ -212,8 +215,6 @@ export async function installPlugin(
     dependencies.scaffolder,
     dependencies.templateAdapter,
   );
-  await persistPluginDoctorMetadata(plan, resolvedPlugin, pluginOwned, dependencies.fs);
-
   return {
     ...rendered,
     resolvedPlugin: resolvedPlugin?.descriptor,
@@ -229,10 +230,10 @@ export async function installPlugin(
  *
  * @example
  * ```ts
- * await persistPluginDoctorMetadata(plan, resolvedPlugin, scaffold, fs);
+ * await persistPluginMetadata(plan, resolvedPlugin, scaffold, fs);
  * ```
  */
-export async function persistPluginDoctorMetadata(
+export async function persistPluginMetadata(
   plan: PluginInstallPlan,
   resolvedPlugin: ResolvedPluginBeforePlanning,
   scaffold: PluginOwnedScaffoldResult,
@@ -244,16 +245,20 @@ export async function persistPluginDoctorMetadata(
         JSON.parse(await fs.readFile(join(resolvedPlugin.source.path, 'scaffold.plugin.json'))),
       )
       : undefined);
-  if (!doctorEntrypoint) return;
-
-  const doctorSpecifier = resolvedPlugin.source.kind === 'local-path'
-    ? toFileUrl(resolve(resolvedPlugin.source.path, doctorEntrypoint)).href
-    : `${versionedJsrSpecifier(resolvedPlugin.descriptor)}/doctor`;
+  const doctorSpecifier = doctorEntrypoint
+    ? (resolvedPlugin.source.kind === 'local-path'
+      ? toFileUrl(resolve(resolvedPlugin.source.path, doctorEntrypoint)).href
+      : `${versionedJsrSpecifier(resolvedPlugin.descriptor)}/doctor`)
+    : undefined;
   const metadata = {
     ...resolvedPlugin.descriptor.manifest,
     officialSource: {
       ...resolvedPlugin.descriptor.manifest.officialSource,
-      doctorEntrypoint: doctorSpecifier,
+      pluginReferences: mergeUniqueReferences(
+        resolvedPlugin.descriptor.manifest.officialSource?.pluginReferences ?? [],
+        plan.pluginReferences,
+      ),
+      ...(doctorSpecifier ? { doctorEntrypoint: doctorSpecifier } : {}),
     },
   };
   const pluginDir = resolvePluginConfigDirectory(plan, scaffold);

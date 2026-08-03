@@ -217,10 +217,9 @@ emits a `doc.ready` completion event from the callback where the work finishes â
 reach for `createServiceStreamProducer` instead of wiring `createDurableStream`
 and the URL/auth resolvers by hand. It is a thin wrapper over `createDurableStream`
 that reuses the exact same singleton producer and Aspire discovery
-(`getStreamsUrl` / `getStreamsAuth`), and it adds one guard: `assertResolvable`
-(default `true`) eagerly resolves the streams URL and auth at construction, so a
-Service that forgot to declare the `streams` reference **throws immediately**
-rather than silently dropping every write.
+(`getStreamsUrl` / `getStreamsAuth`). Stream discovery is resolved at
+construction, so a Service that lacks the `streams` plugin reference **throws
+immediately** rather than blocking or silently dropping writes.
 
 ```ts
 // services/ingestion/emit-completion.ts
@@ -238,8 +237,8 @@ const completions = defineStreamSchema({
   },
 });
 
-// assertResolvable defaults to true: this throws now if neither
-// DURABLE_STREAMS_URL nor services__streams__http__0 is wired.
+// This throws now if neither DURABLE_STREAMS_URL nor
+// services__streams__http__0 is wired.
 const producer = createServiceStreamProducer({
   streamPath: "/support-chat/completions",
   schema: completions,
@@ -250,12 +249,11 @@ producer.upsert("completion", { id: "run-1", status: "done" });
 await producer.flush();
 ```
 
-A Service that declares `ServiceReferences: ["streams"]` always has the streams
-endpoint wired, so the guard resolves without throwing. Set `assertResolvable:
-false` to keep the tolerant, lazy-connect behavior of `createDurableStream` when
-a Service may legitimately start before the streams service is reachable.
-`ServiceStreamProducerOptions` is `DurableStreamProducerOptions` plus this
-optional `assertResolvable` flag; the returned `DurableStreamProducer` is
+The CLI writes the required plugin reference when the streams plugin is
+installed. If construction reports a missing `streams` reference, install the
+streams plugin and run `netscript service generate` to reconcile the generated
+configuration. `ServiceStreamProducerOptions` has the same fields as
+`DurableStreamProducerOptions`; the returned `DurableStreamProducer` is
 identical, so the write/flush/close surface below applies unchanged.
 
 ## Runtime & transport â€” URL and auth resolution

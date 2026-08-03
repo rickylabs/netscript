@@ -133,25 +133,3 @@ Deno.test('createServiceStreamProducer fails fast when the streams service is no
     restoreEnv();
   }
 });
-
-Deno.test('createServiceStreamProducer with assertResolvable:false defers resolution to connect time', async () => {
-  const restoreEnv = snapshotStreamsEnv();
-  Deno.env.delete('DURABLE_STREAMS_URL');
-  Deno.env.delete('services__streams__http__0');
-
-  try {
-    // Does not throw at construction because eager validation is disabled.
-    const producer = createServiceStreamProducer({
-      streamPath: '/eischat/deferred',
-      schema: createStreamTopicFixture(),
-      producerId: 'eischat-deferred',
-      assertResolvable: false,
-    });
-
-    producer.upsert('execution', { id: 'dropped' });
-    await producer.close();
-    assertEquals(producer.closed, true);
-  } finally {
-    restoreEnv();
-  }
-});
