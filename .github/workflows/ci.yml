@@ -65,15 +65,26 @@ jobs:
           deno-version: '2.9.0'
 
       - name: Mirror structured acceptance evidence
-        if: contains(github.event.pull_request.labels.*.name, 'status:ready-merge')
+        # Label is read LIVE from the API, never from github.event: the event
+        # payload is frozen at run creation, so a `status:ready-merge` label
+        # added later is invisible to reruns — the gate then fails on every
+        # rerun with no path to green except a fresh push (#1169 stale-state
+        # class, observed on PRs #1176-#1178, 2026-08-03).
         env:
           GITHUB_TOKEN: ${{ github.token }}
-        run: >
-          deno run --allow-env --allow-net
-          .llm/tools/validation/mirror-acceptance-evidence.ts
-          --repo "${{ github.repository }}"
-          --pr "${{ github.event.pull_request.number }}"
-          --pretty
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          labels="$(gh api "repos/${{ github.repository }}/issues/${PR_NUMBER}/labels" --jq '.[].name')"
+          echo "live labels @ $(date -u +%FT%TZ): $(tr '\n' ' ' <<<"$labels")"
+          if ! grep -qx 'status:ready-merge' <<<"$labels"; then
+            echo "mirror skipped: status:ready-merge not present (live read)"
+            exit 0
+          fi
+          deno run --allow-env --allow-net \
+            .llm/tools/validation/mirror-acceptance-evidence.ts \
+            --repo "${{ github.repository }}" \
+            --pr "${PR_NUMBER}" \
+            --pretty
 
       - name: Referenced issue acceptance gate
         env:

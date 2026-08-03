@@ -101,3 +101,14 @@ exists=false
   Negative cases reproduced with transcripts (old pattern exit 128 → unterminated heredoc; new
   pattern well-formed + true git error; deleted-ref guard notice path). YAML parse PASS both files;
   actionlint honestly recorded unavailable.
+
+## Follow-up: mirror label read from frozen event payload (owner-reported, 2026-08-03 21:45)
+
+- Symptom: close-gate failed on every rerun of #1176–#1178 despite `status:ready-merge` present;
+  mirror step showed skipped. Root cause read from the run: the step `if:` used
+  `github.event.pull_request.labels`, which is frozen at run creation — reruns can never see a
+  label added later; only a fresh push could pass. Same stale-state class as #1142/#1174.
+- Fix: step now fetches labels live via `gh api .../labels`, logs the label set + timestamp it
+  read (verdict provenance), skips cleanly without the label, runs the mirror with it.
+- Negative case: the observed failures ARE the negative case (mirror skipped on rerun with label
+  present under the old condition — three real occurrences); YAML parse PASS.
