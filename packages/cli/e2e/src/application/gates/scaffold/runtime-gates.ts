@@ -143,6 +143,23 @@ export function createRuntimeGates(
       ],
     ),
     commandGate(
+      GATE.BEHAVIOR_DB_STATUS_PRESERVES_APPHOST,
+      'DB status preserves resident AppHost identity',
+      GATE_PHASE.BEHAVIOR,
+      (context) => [
+        'deno',
+        'run',
+        '--allow-read',
+        '--allow-run=aspire,deno',
+        `${context.project.repoRoot}/packages/cli/e2e/src/application/gates/scaffold/verify-db-status-preserves-apphost.ts`,
+        context.project.projectRoot,
+        context.project.repoRoot,
+        context.project.appHost,
+        database,
+      ],
+      (context) => context.project.projectRoot,
+    ),
+    commandGate(
       GATE.BEHAVIOR_SERVICE_HEALTH,
       'Users service health',
       GATE_PHASE.BEHAVIOR,

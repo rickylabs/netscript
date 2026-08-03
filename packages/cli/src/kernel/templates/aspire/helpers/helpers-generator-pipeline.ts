@@ -130,6 +130,12 @@ export class HelpersGeneratorPipeline {
             `../${SCAFFOLD_FILES.APPSETTINGS}`,
           templates,
         ),
+        await this.renderAppHost(
+          configPath ??
+            `../${SCAFFOLD_FILES.APPSETTINGS}`,
+          templates,
+          SCAFFOLD_FILES.DB_OPERATION_APPHOST_MTS,
+        ),
       );
     }
 
@@ -203,6 +209,7 @@ export class HelpersGeneratorPipeline {
   async renderAppHost(
     configPath: string,
     templates?: AspireHelperTemplateAssets,
+    path: string = SCAFFOLD_FILES.APPHOST_MTS,
   ): Promise<GeneratedFile> {
     const resolvedTemplates = templates ?? await loadAspireHelperTemplateAssets();
     const vars: Record<string, string> = {
@@ -216,7 +223,7 @@ export class HelpersGeneratorPipeline {
       : renderSimple(resolvedTemplates.apphostTemplate, vars);
 
     return {
-      path: SCAFFOLD_FILES.APPHOST_MTS,
+      path,
       content,
     };
   }

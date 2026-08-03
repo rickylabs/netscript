@@ -87,7 +87,7 @@ export class DbOperationRunner {
     database: DiscoveredDatabase,
   ): Promise<number> {
     const aspireDir = join(request.projectRoot, SCAFFOLD_DIRS.ASPIRE_TS);
-    const apphostPath = join(aspireDir, SCAFFOLD_FILES.APPHOST_MTS);
+    const residentAppHostPath = join(aspireDir, SCAFFOLD_FILES.APPHOST_MTS);
     const env = buildDbCliEnv(
       request.operation,
       database.configKey,
@@ -95,13 +95,18 @@ export class DbOperationRunner {
     );
 
     if (request.operation === 'studio') {
-      return await this.executeInteractive(apphostPath, aspireDir, env);
+      return await this.executeInteractive(residentAppHostPath, aspireDir, env);
     }
+
+    const operationAppHostPath = join(
+      aspireDir,
+      SCAFFOLD_FILES.DB_OPERATION_APPHOST_MTS,
+    );
 
     return await this.executeDetached(
       request.operation,
       database.configKey,
-      apphostPath,
+      operationAppHostPath,
       aspireDir,
       env,
     );
@@ -143,7 +148,7 @@ export class DbOperationRunner {
       const startedByInvocation = !(await this.hasRunningAppHost(apphostPath, aspireDir));
 
       await this.runAspire(
-        buildAspireArgs('start', apphostPath),
+        buildAspireArgs('start', apphostPath, { isolated: true }),
         { cwd: aspireDir, env },
       );
 

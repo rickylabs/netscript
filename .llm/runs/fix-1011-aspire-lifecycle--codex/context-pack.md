@@ -6,15 +6,16 @@
 | --- | --- |
 | Run ID | `fix-1011-aspire-lifecycle--codex` |
 | Branch | `fix/1011-aspire-lifecycle` |
-| Current phase | `plan-eval (blocked)` |
+| Current phase | `implementation (Plan-Gate owner-waived)` |
 | Archetype | `6 — CLI / Tooling` |
 | Scope overlays | service intent; overlay file absent |
 
 ## Current State
 
 Research and contract-first design are locked against `origin/main` @ `ab0fa13fe`. Draft PR #1088
-publishes the plan; no product code has changed. The canonical separate PLAN-EVAL route is blocked
-because its isolated Claude/OpenRouter profile is not logged in, so it produced no verdict artifact.
+publishes the plan. S1 now routes detached DB operations through a distinct generated isolated
+AppHost and adds a live resident-identity gate. The canonical separate PLAN-EVAL route remains
+credential-blocked, but the owner explicitly waived the gate as the opposite-family Claude reviewer.
 
 ## Completed
 
@@ -22,18 +23,18 @@ because its isolated Claude/OpenRouter profile is not logged in, so it produced 
 - Lifecycle ownership and readiness contracts written.
 - Commit slices and full gate set selected.
 - S0 plan commit `5601b8fa0` pushed; draft PR #1088 opened with research and plan comments.
+- S1 red proof, implementation, full CLI package/static/fitness gates, and opposite-family review.
 
 ## In Progress
 
-- Restore the formal-evaluator credential or obtain an explicit owner-authorized fallback/waiver.
+- S1 commit/push/comment, followed by S2 readiness implementation.
 
 ## Next Steps
 
-1. Authenticate the isolated Claude/OpenRouter evaluator profile and require a separate Qwen
-   PLAN-EVAL `PASS`, or record an explicit owner-authorized fallback/waiver.
-2. Implement S1, run focused gates, obtain opposite-family review, commit/push/comment.
-3. Implement S2 with the same review/commit trail.
-4. Run merge-readiness gates once, IMPL-EVAL, close-gate evidence, and ready transition.
+1. Commit/push/comment the reviewed S1 slice.
+2. Implement S2 with the same evidence and commit trail.
+3. Run merge-readiness gates once, handle IMPL-EVAL under the recorded route constraint, reconcile
+   close-gate evidence, and transition only if every criterion is proven.
 
 ## Key Decisions
 
@@ -47,22 +48,24 @@ because its isolated Claude/OpenRouter profile is not logged in, so it produced 
 
 | Path | Status | Notes |
 | --- | --- | --- |
-| `.llm/runs/fix-1011-aspire-lifecycle--codex/` | new | Harness plan-stage artifacts only. |
+| `.llm/runs/fix-1011-aspire-lifecycle--codex/` | modified | Waiver, S1 evidence, gates, and review. |
+| `packages/cli/src/kernel/adapters/database/` | modified | Detached DB lifecycle uses a distinct isolated AppHost identity. |
+| `packages/cli/src/kernel/templates/aspire/helpers/` | modified | Generates the DB-operation AppHost entry. |
+| `packages/cli/e2e/src/` | modified | Live resident PID/backchannel preservation gate. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Plan | BLOCKED | Canonical Qwen launch returned `Not logged in · Please run /login`; artifact absent. |
-| Static | NOT_RUN | Implementation hard stop. |
-| Fitness | NOT_RUN | Implementation hard stop. |
-| Runtime | NOT_RUN | Implementation hard stop. |
+| Plan | WAIVED | Canonical launch blocked; owner supplied opposite-family review and explicit waiver. |
+| Static | PASS (S1) | CLI package 554/0; scoped check/lint/fmt zero findings. |
+| Fitness | PASS (S1) | `quality:gate`; pre-existing warnings only. |
+| Runtime | NOT_RUN | Once-only `scaffold.runtime` deferred to merge-readiness. |
 | Consumer | NOT_RUN | Implementation hard stop. |
 
 ## Open Questions
 
-- Will the owner restore the canonical evaluator profile authentication, or explicitly authorize a
-  documented fallback/waiver for this PLAN-EVAL?
+- None before S1 implementation.
 
 ## Drift and Debt
 

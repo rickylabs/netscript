@@ -11,7 +11,7 @@ describe('HelpersGeneratorPipeline', () => {
   it('should generate all 12 files with apphost enabled (default)', async () => {
     const pipeline = new HelpersGeneratorPipeline();
     const files = await pipeline.execute({ config: fixtures.POPULATED_CONFIG });
-    assertEquals(files.length, 13);
+    assertEquals(files.length, 14);
   });
 
   it('should generate 11 files without apphost', async () => {
@@ -90,6 +90,15 @@ describe('HelpersGeneratorPipeline', () => {
       !paths.includes('.helpers/apphost.mts'),
       'apphost.mts should NOT be inside .helpers/',
     );
+  });
+
+  it('should include an independently targetable DB-operation AppHost entry', async () => {
+    const files = await generateHelpers({ config: fixtures.POPULATED_CONFIG });
+    const dbAppHost = files.find((file) => file.path === 'db-operation-apphost.mts');
+
+    assert(dbAppHost, 'should include db-operation-apphost.mts at the Aspire root');
+    assertStringIncludes(dbAppHost.content, 'createNetScriptAppHost');
+    assertStringIncludes(dbAppHost.content, "'../appsettings.json'");
   });
 
   it('should not include apphost.mts when generateAppHost is false', async () => {
@@ -254,7 +263,7 @@ describe('HelpersGeneratorPipeline', () => {
   it('should handle empty config producing valid no-op output', async () => {
     const pipeline = new HelpersGeneratorPipeline();
     const files = await pipeline.execute({ config: fixtures.EMPTY_CONFIG });
-    assertEquals(files.length, 13);
+    assertEquals(files.length, 14);
 
     const regServices = files.find(
       (f) => f.path === '.helpers/register-services.mts',
@@ -287,7 +296,7 @@ describe('HelpersGeneratorPipeline', () => {
 describe('generateHelpers', () => {
   it('should return the same file count as pipeline.execute()', async () => {
     const files = await generateHelpers({ config: fixtures.POPULATED_CONFIG });
-    assertEquals(files.length, 13);
+    assertEquals(files.length, 14);
   });
 
   it('should support generateAppHost: false', async () => {

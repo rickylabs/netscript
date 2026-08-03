@@ -100,6 +100,7 @@ export const GATE = {
   BEHAVIOR_WORKERS_TRIGGER_HEALTH_JOB: 'behavior.workers-trigger-health-job',
   BEHAVIOR_WORKERS_EXECUTIONS: 'behavior.workers-executions',
   BEHAVIOR_SERVICE_HEALTH: 'behavior.service-health',
+  BEHAVIOR_DB_STATUS_PRESERVES_APPHOST: 'behavior.db-status-preserves-apphost',
   BEHAVIOR_SAGAS_HEALTH: 'behavior.sagas-health',
   BEHAVIOR_SAGAS_LIST: 'behavior.sagas-list',
   BEHAVIOR_SAGAS_INSTANCES: 'behavior.sagas-instances',

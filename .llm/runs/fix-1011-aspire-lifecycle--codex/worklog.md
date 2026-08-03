@@ -81,6 +81,11 @@ by adding a named gate to `packages/cli/e2e/src/application/gates/scaffold/runti
 | 2026-08-03 | S0 | research/design | Re-baselined #1011/#1012 against #1027/#1033 and read #1076 first. |
 | 2026-08-03 | S0 | plan publication | Committed/pushed the contract and plan, opened draft PR #1088, and posted research/plan evidence. |
 | 2026-08-03 | S0 | PLAN-EVAL | Canonical local Qwen launch was rejected by the isolated Claude/OpenRouter profile with `Not logged in · Please run /login`; no evaluator artifact or verdict exists. Implementation remains stopped. |
+| 2026-08-03 | S0 | Plan-Gate waiver | Owner, acting as the opposite-family Claude reviewer, explicitly waived the credential-blocked gate due to #1087 and authorized implementation. No synthetic evaluator verdict recorded. |
+| 2026-08-03 | S1 | red proof | New runner and generator contracts failed pre-fix: detached `describe` targeted `aspire/apphost.mts` instead of `db-operation-apphost.mts`, and the DB-operation entry was absent. |
+| 2026-08-03 | S1 | implementation | Generated `db-operation-apphost.mts`; detached DB operations exclusively lock/probe/start/poll/log/stop that path with `--isolated`; studio remains on resident `apphost.mts`. Added live resident identity gate. |
+| 2026-08-03 | S1 | package/static gates | CLI package suite: 554 passed / 0 failed. Scoped check/lint/fmt: zero findings. `quality:gate`: PASS with pre-existing warnings only. |
+| 2026-08-03 | S1 | slice review | Fable alias and routing-id fallback were unavailable; native `claude-opus-4-8` fallback session `d8cc7066-8900-4c1f-a0bd-2bfe264f48b1` found a symlink false-red, fixed via `realPath` fallback, then emitted `REVIEW_PASS`. Live runtime remains honestly deferred. |
 
 ## Decisions
 
@@ -100,9 +105,15 @@ by adding a named gate to `packages/cli/e2e/src/application/gates/scaffold/runti
 
 ## Gate Results
 
-PLAN-EVAL is `BLOCKED`: the canonical local Qwen route could not authenticate and produced no
-`plan-eval.md`. All implementation/static/runtime/consumer gates remain `NOT_RUN` until PLAN-EVAL
-passes or the owner explicitly authorizes and records a gate exception/fallback.
+- PLAN-EVAL: `WAIVED` by owner; canonical route remains credential-blocked with no synthetic verdict.
+- S1 red proof: `PASS` — both new contracts failed against pre-fix behavior with the expected
+  resident-path/absent-file artifacts.
+- CLI package test: `PASS` — 554 tests / 479 steps, 0 failed.
+- Scoped check/lint/fmt: `PASS` — zero findings after formatting the new E2E gate.
+- `quality:gate`: `PASS` — quality scan clean; architecture check has only pre-existing warnings.
+- Opposite-family slice review: `REVIEW_PASS` after resolving canonical-path false-red risk.
+- Live `scaffold.runtime`: `NOT_RUN` — deliberately once-only at merge-readiness; no #1011
+  acceptance box may be ticked yet.
 
 ## Handoff Notes
 

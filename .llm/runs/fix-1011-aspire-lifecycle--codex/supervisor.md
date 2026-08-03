@@ -36,3 +36,12 @@ Written at run start per `workflow/lane-policy.md` § Supervisor identity.
   exists.
 - Product implementation is stopped pending restored authentication or an explicit owner-authorized
   and recorded fallback/waiver.
+
+## Owner-authorized Plan-Gate waiver
+
+- On 2026-08-03 the owner explicitly waived Plan-Gate for this slice, identifying as the
+  opposite-family Claude reviewer of the Codex-authored plan.
+- The owner tied the unavailable credential to #1087's unsafe evaluator-helper behavior and directed
+  that the route remain inaccessible during this release.
+- Implementation is authorized; this does not create a `PASS` verdict or waive slice gates,
+  IMPL-EVAL handling, acceptance evidence, or close-gate reconciliation.
