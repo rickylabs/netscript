@@ -288,6 +288,12 @@ Deno.test('deep-analysis Fable fallback requires classified Codex quota exhausti
 Deno.test('canonical research lane remains Antigravity after Gemini docs authoring is added', () => {
   const route = resolveCanonicalRoute('research_extraction', new Date('2026-07-10T00:00:00Z'));
   equal([route.agent, route.provider, route.model], ['antigravity', 'google', 'agy']);
+  equal(
+    CANONICAL_ROUTE_POLICY.filter((entry) => /gemini/i.test(entry.model)).map((entry) =>
+      entry.lane
+    ),
+    ['documentation_authoring'],
+  );
 });
 
 Deno.test('documentation authoring uses Gemini on Claude OpenRouter as a generator lane', () => {
@@ -419,13 +425,29 @@ Deno.test('formal evaluator rejects closed models and reused generator sessions'
 Deno.test('formal evaluator rejects the Gemini documentation-authoring generator lane', () => {
   const at = new Date('2026-08-03T00:00:00Z');
   const geminiGeneratorRoute = resolveCanonicalRoute('documentation_authoring', at);
-  assertThrows(() =>
-    resolveCanonicalFormalEvaluatorRoute({
-      authorFamily: 'openai',
-      generatorSession: { ...session, agent: 'codex', sessionId: 'codex-generator' },
-      evaluatorSession: { ...session, agent: 'claude', sessionId: 'open-evaluator' },
-      route: geminiGeneratorRoute,
-    }, at)
+  assertThrows(
+    () =>
+      resolveCanonicalFormalEvaluatorRoute({
+        authorFamily: 'openai',
+        generatorSession: { ...session, agent: 'codex', sessionId: 'codex-generator' },
+        evaluatorSession: { ...session, agent: 'claude', sessionId: 'open-evaluator' },
+        route: geminiGeneratorRoute,
+      }, at),
+    Error,
+    'formal evaluator requires an evaluation route',
+  );
+
+  const formalRoute = resolveCanonicalRoute('formal_evaluation', at);
+  assertThrows(
+    () =>
+      resolveCanonicalFormalEvaluatorRoute({
+        authorFamily: 'openai',
+        generatorSession: { ...session, agent: 'codex', sessionId: 'codex-generator' },
+        evaluatorSession: { ...session, agent: 'claude', sessionId: 'open-evaluator' },
+        route: { ...formalRoute, model: OPENROUTER_MODEL_IDS.gemini },
+      }, at),
+    Error,
+    'formal evaluator model is not approved for open-only evaluation',
   );
 });
 

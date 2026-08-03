@@ -494,8 +494,14 @@ export function resolveCanonicalFormalEvaluatorRoute(
   if (
     route.purpose !== 'evaluation' || route.agent !== 'claude' ||
     route.provider !== 'openrouter' || route.profileId !== 'claude-openrouter' ||
-    route.evaluatorModelPolicy !== 'open_only' ||
-    !OPEN_EVALUATOR_MODEL_IDS.some((model) => model === route.model) ||
+    route.evaluatorModelPolicy !== 'open_only'
+  ) {
+    throw new Error('formal evaluator requires an evaluation route on Claude OpenRouter');
+  }
+  if (!OPEN_EVALUATOR_MODEL_IDS.some((model) => model === route.model)) {
+    throw new Error('formal evaluator model is not approved for open-only evaluation');
+  }
+  if (
     !preset || preset.purpose !== 'evaluation' || preset.model !== route.model ||
     preset.agenticTurn !== 'supported' || preset.reasoningTrace !== 'present'
   ) {
