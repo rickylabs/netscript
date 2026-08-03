@@ -340,3 +340,13 @@ tolerates `--`, `gh-watch` does not); more #1173-adjacent evidence.
 - Interim workaround recorded: until #1187 lands, per-merge check reads use
   `actions/runs/{id}/jobs?filter=latest` as ground truth wherever pr-checks disagrees with a
   rerun's latest attempt.
+
+## 2026-08-03 — #1181: branch protection itself reads the stale attempt
+
+Attempt 3 (full rerun) succeeded and the merge was **still** refused: the PR rollup pinned the
+required `check-test` context to the attempt-1 CANCELLED check-run — GitHub's rules engine
+exhibits the same cross-attempt staleness as `pr-checks` (#1187 impact escalated with this
+evidence). Resolution without `--admin`: empty rebuild commit `003b82d07` pushed via explicit
+refspec → fresh head SHA, virgin check landscape; merge armed on the new contexts. Cost of the
+defect class made concrete: two failed merge attempts + one full CI cycle + a repush, on the
+first orchestrator merge of the run.
