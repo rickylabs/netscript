@@ -199,6 +199,9 @@
 - name: "epic:agentic-combo"
   color: "5319e7"
   description: "NetScript agentic combo epic (MCP server + public skills + CLI)"
+- name: "epic:frontend-contrib"
+  color: "1d76db"
+  description: "Frontend contribution layer epic (plugins that ship UI)"
 
 # ── wave: release-train bucket (maps to milestone) ───────────────────────────
 - name: "wave:v1"
