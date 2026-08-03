@@ -27,3 +27,7 @@ Written at run start per `workflow/lane-policy.md` § Supervisor identity.
 The active Codex host is the supervisor/generator session rather than the canonical Claude
 orchestrator. This is the owner-provided implementation-supervisor context; formal evaluation
 remains on the canonical open-model route and ordinary source review remains opposite-family.
+
+The slice-1 `review_codex` primary could not start because the installed Claude CLI rejected the
+configured Fable model id. The policy-declared Claude-family `token_limit_fallback` route (Opus,
+same low effort) is used for ordinary review; formal evaluation is unchanged.

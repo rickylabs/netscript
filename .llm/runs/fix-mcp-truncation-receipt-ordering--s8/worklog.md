@@ -62,6 +62,8 @@ when it applies any descendant cap.
 | 2026-08-03 | bootstrap | research/design | Re-baselined #1134 and RFC S-13/S-15 against clean `origin/main`; baseline doc-lint 0 diagnostics. |
 | 2026-08-03 | plan-eval | transport | Canonical Qwen evaluator launch timed out before any verdict/file change; retrying same route with a bounded timeout extension. |
 | 2026-08-03 | plan-eval | verdict | Separate Claude Code + OpenRouter Qwen session returned `PASS`; both implementation slices authorized. |
+| 2026-08-03 | slice 1 | gate | Targeted receipt/doctor tests PASS (16/16) with required `--allow-write`; scoped check PASS. Scoped lint/fmt wrappers PASS with explicit `packages/mcp/deno.json` after the root workspace shorthand produced a Deno 2.9 parser error. `quality:gate` PASS. |
+| 2026-08-03 | slice 1 | review route | Fable primary rejected by installed Claude CLI before review; launching policy-declared Opus low fallback. |
 
 ## Decisions
 
@@ -88,14 +90,14 @@ when it applies any descendant cap.
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| Full Archetype-2 column | NOT_RUN | plan gate first | Selected per RFC S-20 |
+| Full Archetype-2 column | IN_PROGRESS | `deno task quality:gate` PASS for slice 1 | Final full-wave evidence follows slice 2 |
 | Plan-Gate | PASS | `plan-eval.md` | All eight checklist items passed; no unresolved decisions |
 
 ### Runtime Gates
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| MCP targeted fixtures | NOT_RUN | implementation pending | No external service required |
+| Receipt/doctor fixtures | PASS | 16 passed, 0 failed | Includes invalid-output and thrown-flow failed receipts |
 
 ### Consumer Gates
 

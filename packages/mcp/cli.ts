@@ -41,8 +41,9 @@ import { SpawnCommandExecutor } from './src/infrastructure/spawn-command-executo
 import type { EmbeddedDocsSource } from './src/infrastructure/embedded-docs-corpus.ts';
 import { FilesystemDiagnosticEvidence } from './src/infrastructure/filesystem-diagnostic-evidence.ts';
 import { createRecordDriftFlow } from './src/application/flows/record-drift-flow.ts';
-import type { ToolExecutionResult, ToolFlow } from './src/domain/tool-types.ts';
+import type { ToolFlow } from './src/domain/tool-types.ts';
 import type { DiagnosticEvidencePort } from './src/domain/diagnostic-evidence-port.ts';
+import { withFlowReceipt } from './src/application/runner/receipt-lifecycle.ts';
 
 export * from './mod.ts';
 
@@ -178,18 +179,13 @@ function withReceipt(
   command: string,
   warn: (message: string) => void,
 ): ToolFlow {
-  return async (input): Promise<ToolExecutionResult> => {
-    const result = await flow(input);
+  return withFlowReceipt(flow, async (input, succeeded): Promise<void> => {
     const record = input && typeof input === 'object' ? input as Record<string, unknown> : {};
     const resource = typeof record.resource === 'string'
       ? record.resource
       : typeof record.service === 'string'
       ? record.service
       : 'project';
-    const value = result.ok && result.value && typeof result.value === 'object'
-      ? result.value as Record<string, unknown>
-      : undefined;
-    const succeeded = result.ok && value?.status !== 'fail';
     try {
       await evidence.write({
         resource,
@@ -204,8 +200,7 @@ function withReceipt(
           `record_drift will refuse until a successful diagnostic writes a receipt. ${reason}`,
       );
     }
-    return result;
-  };
+  });
 }
 
 if (import.meta.main) await runMcpStdioServer();

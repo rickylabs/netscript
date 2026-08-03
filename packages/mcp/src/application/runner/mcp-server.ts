@@ -2,10 +2,16 @@ import { createDoctorFlow } from '../flows/doctor-flow.ts';
 import { createToolRegistry } from '../tool-registry.ts';
 import type { TelemetryProbePort } from '../../domain/telemetry-probe-port.ts';
 import { validateSchema } from '../../domain/schema.ts';
-import type { ToolDefinition, ToolFlow, ToolName } from '../../domain/tool-types.ts';
+import type {
+  ToolDefinition,
+  ToolExecutionResult,
+  ToolFlow,
+  ToolName,
+} from '../../domain/tool-types.ts';
 import { type JsonRpcResponse, parseJsonRpcRequest } from '../../domain/json-rpc.ts';
 import { DEFAULT_TRUNCATION_POLICY, truncateResult, type TruncationPolicy } from './truncation.ts';
 import { MCP_PACKAGE_VERSION } from '../../publish-assets.generated.ts';
+import { settleFlowReceipt } from './receipt-lifecycle.ts';
 
 /** Current stable MCP protocol revision implemented by the runner. */
 export const MCP_PROTOCOL_VERSION = '2025-11-25';
@@ -93,23 +99,37 @@ export function createMcpServer(options: McpServerOptions): McpServer {
           error instanceof Error ? error.message : 'Invalid tool arguments',
         );
       }
-      const execution = await tool.flow(input);
+      let execution: ToolExecutionResult;
+      try {
+        execution = await tool.flow(input);
+      } catch {
+        await settleFlowReceipt(tool.flow, input, false);
+        return rpcError(request.id, -32603, 'Tool execution failed', {
+          code: 'tool_execution_failed',
+          message: 'The tool flow did not complete.',
+        });
+      }
       if (!execution.ok) {
+        await settleFlowReceipt(tool.flow, input, false);
         return rpcResult(request.id, {
           content: [{ type: 'text', text: execution.error.message }],
           structuredContent: execution.error,
           isError: true,
         });
       }
+      let bounded: unknown;
       try {
         validateSchema(tool.outputSchema, execution.value);
+        bounded = truncateResult(execution.value, policy);
+        validateSchema(tool.outputSchema, bounded);
       } catch (error) {
+        await settleFlowReceipt(tool.flow, input, false);
         return rpcError(request.id, -32603, 'Tool returned an invalid structured result', {
           code: 'invalid_tool_result',
           message: error instanceof Error ? error.message : 'Output contract validation failed',
         });
       }
-      const bounded = truncateResult(execution.value, policy);
+      await settleFlowReceipt(tool.flow, input, resultSucceeded(execution.value));
       return rpcResult(request.id, {
         content: [{ type: 'text', text: JSON.stringify(bounded) }],
         structuredContent: bounded as Record<string, unknown>,
@@ -117,6 +137,10 @@ export function createMcpServer(options: McpServerOptions): McpServer {
       });
     },
   };
+}
+
+function resultSucceeded(value: unknown): boolean {
+  return !(value !== null && typeof value === 'object' && Reflect.get(value, 'status') === 'fail');
 }
 
 function rpcResult(id: string | number, result: Record<string, unknown>): JsonRpcResponse {

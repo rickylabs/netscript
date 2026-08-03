@@ -27,3 +27,15 @@ documentation.
 - **Action:** fix
 - **Evidence:** Retry the same route with a concise prompt and a longer bounded process timeout;
   this is not counted as a `FAIL_PLAN` cycle because no evaluator verdict was emitted.
+
+## 2026-08-03 — Ordinary review primary route unavailable
+
+- **What:** The installed Claude CLI rejected the policy-configured Fable model id before the
+  slice-1 ordinary review began.
+- **Source:** `review_codex` launch exit 1, API 404 `model_not_found`.
+- **Expected:** Claude Fable low ordinary review.
+- **Actual:** No review turn and no file changes; policy-declared Claude Opus low fallback available.
+- **Severity:** minor
+- **Action:** accept
+- **Evidence:** Use the `review_codex` `token_limit_fallback` entry from
+  `workflow/lane-policy.md` / `runtime/routing-policy.ts`; opposite-family invariant remains intact.
