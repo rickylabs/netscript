@@ -131,3 +131,11 @@ both residues of the cycle-2 fixes, fixed in this slice:
 `eb833401d` diff introduces no new defect. Merge proceeds under the owner's standing
 merge-on-green directive: ready → `status:ready-merge` → evidence mirror + close-gate →
 squash-merge → terminal labels → eval-worktree teardown.
+
+## Merge window note — mirror/label event race
+
+The `ready_for_review`-adjacent CI run at 17:45:36Z carried an event payload snapshotted before
+`status:ready-merge` landed, so the label-gated evidence mirror skipped and close-gate correctly
+failed on #1120's still-unchecked boxes (the gate distinguishing did-not-run from pass, working
+as specified). Re-triggered via synchronize with the label present; mirror dry-run had already
+validated all 8 mappings.
