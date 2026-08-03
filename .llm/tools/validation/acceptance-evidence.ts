@@ -1,17 +1,42 @@
 export interface AcceptanceCheckbox {
   line: number;
+  index: number;
   text: string;
   checked: boolean;
+  postMerge: boolean;
 }
 
 export interface AcceptanceEvidence {
-  text: string;
+  issue?: number;
+  text?: string;
+  boxIndex?: number;
   evidence: string;
+  legacy: boolean;
+}
+
+export interface IssueSnapshot {
+  number: number;
+  updatedAt: string;
+  bodySha256: string;
+}
+
+export interface VerdictProvenance {
+  headSha: string;
+  evaluatedAt: string;
+  issues: IssueSnapshot[];
+}
+
+export interface EvidenceParseResult {
+  entries: AcceptanceEvidence[];
+  warnings: string[];
 }
 
 const CHECKBOX_PATTERN = /^(\s*[-*]\s+\[)( |x|X)(\]\s+)(.*)$/;
 const HEADING_PATTERN = /^(#{1,6})\s+(.+?)\s*#*\s*$/;
+const FENCE_PATTERN = /^\s*```acceptance-evidence\s*$/i;
 const EVIDENCE_HEADING = 'acceptance evidence';
+const LEGACY_WARNING =
+  'Deprecated legacy "## Acceptance evidence" list detected; replace it with a fenced ```acceptance-evidence YAML block.';
 
 export function extractClosingIssues(body: string): number[] {
   const pattern =
@@ -22,26 +47,44 @@ export function extractClosingIssues(body: string): number[] {
 export function acceptanceCheckboxes(body: string): AcceptanceCheckbox[] {
   const result: AcceptanceCheckbox[] = [];
   const headings: Array<{ level: number; relevant: boolean }> = [];
-  for (const [index, line] of body.split(/\r?\n/).entries()) {
+  for (const [lineIndex, line] of body.split(/\r?\n/).entries()) {
     const heading = line.match(HEADING_PATTERN);
     if (heading) {
       const level = heading[1].length;
-      while (headings.at(-1)?.level && headings.at(-1)!.level >= level) headings.pop();
+      while ((headings.at(-1)?.level ?? 0) >= level) headings.pop();
       headings.push({ level, relevant: isGateHeading(stripMarkdown(heading[2])) });
     }
     const checkbox = line.match(CHECKBOX_PATTERN);
     if (!checkbox) continue;
     const text = checkbox[4].trim();
     if (!/^`?gate:/i.test(text) && !headings.some((item) => item.relevant)) continue;
-    result.push({ line: index + 1, text, checked: checkbox[2].toLowerCase() === 'x' });
+    result.push({
+      line: lineIndex + 1,
+      index: result.length + 1,
+      text,
+      checked: checkbox[2].toLowerCase() === 'x',
+      postMerge: /\[post-merge\]/i.test(text),
+    });
   }
   return result;
 }
 
-export function parseAcceptanceEvidence(markdown: string): AcceptanceEvidence[] {
-  const result: AcceptanceEvidence[] = [];
+/** Parses fenced structured evidence plus the one-release legacy list format. */
+export function parseAcceptanceEvidence(markdown: string): EvidenceParseResult {
+  const entries: AcceptanceEvidence[] = [];
+  const warnings: string[] = [];
+  const lines = markdown.split(/\r?\n/);
+  for (let index = 0; index < lines.length; index++) {
+    if (!FENCE_PATTERN.test(lines[index])) continue;
+    const block: string[] = [];
+    for (index++; index < lines.length && !/^\s*```\s*$/.test(lines[index]); index++) {
+      block.push(lines[index]);
+    }
+    entries.push(...parseStructuredBlock(block));
+  }
+
   let sectionLevel: number | undefined;
-  for (const line of markdown.split(/\r?\n/)) {
+  for (const line of lines) {
     const heading = line.match(HEADING_PATTERN);
     if (heading) {
       const level = heading[1].length;
@@ -54,51 +97,172 @@ export function parseAcceptanceEvidence(markdown: string): AcceptanceEvidence[] 
     if (!checkbox || checkbox[2].toLowerCase() !== 'x') continue;
     const separator = checkbox[4].lastIndexOf(' — ');
     if (separator < 1) continue;
-    result.push({
+    entries.push({
       text: checkbox[4].slice(0, separator).trim(),
       evidence: checkbox[4].slice(separator + 3).trim(),
+      legacy: true,
     });
+    if (!warnings.includes(LEGACY_WARNING)) warnings.push(LEGACY_WARNING);
   }
-  return result;
+  return { entries, warnings };
 }
 
 export function validateEvidenceMapping(
+  issue: number,
   checkboxes: AcceptanceCheckbox[],
   evidence: AcceptanceEvidence[],
-): Map<string, AcceptanceEvidence> {
-  const unchecked = new Set(checkboxes.filter((box) => !box.checked).map((box) => box.text));
-  const known = new Set(checkboxes.map((box) => box.text));
-  const mapping = new Map<string, AcceptanceEvidence>();
-  const seen = new Set<string>();
+): Map<number, AcceptanceEvidence> {
+  const actionable = checkboxes.filter((box) => !box.postMerge);
+  const unchecked = actionable.filter((box) => !box.checked);
+  const mapping = new Map<number, AcceptanceEvidence>();
   const errors: string[] = [];
-  for (const entry of evidence) {
-    if (!known.has(entry.text)) {
-      errors.push(`Evidence names no acceptance box: ${entry.text}`);
+  for (const entry of evidence.filter((item) => item.issue === undefined || item.issue === issue)) {
+    const box = resolveEvidenceBox(entry, actionable);
+    if (!box) {
+      const compared = entry.text !== undefined
+        ? `exact box text "${entry.text.trim()}"`
+        : `box-index ${entry.boxIndex ?? 'missing'}`;
+      errors.push(
+        `Issue #${issue}: no acceptance box matched ${compared}; add an entry for box "${
+          entry.text ?? `#${entry.boxIndex}`
+        }" using exact trimmed text or its current box-index.`,
+      );
       continue;
     }
-    if (seen.has(entry.text)) {
-      errors.push(`Duplicate evidence: ${entry.text}`);
+    if (mapping.has(box.index)) {
+      errors.push(
+        `Issue #${issue}: box "${box.text}" has duplicate evidence; keep exactly one entry for that box.`,
+      );
       continue;
     }
-    seen.add(entry.text);
-    if (!entry.evidence) {
-      errors.push(`Evidence is empty: ${entry.text}`);
+    if (!entry.evidence.trim()) {
+      errors.push(
+        `Issue #${issue}: box "${box.text}" matched but evidence was empty; add a non-empty evidence value for that box.`,
+      );
       continue;
     }
-    if (unchecked.has(entry.text)) mapping.set(entry.text, entry);
+    if (!box.checked) mapping.set(box.index, entry);
   }
-  for (const text of unchecked) if (!mapping.has(text)) errors.push(`Missing evidence: ${text}`);
+  for (const box of unchecked) {
+    if (!mapping.has(box.index)) {
+      errors.push(
+        `Issue #${issue}: unchecked box "${box.text}" has no matching evidence entry; add an entry for box "${box.text}" in a fenced acceptance-evidence block.`,
+      );
+    }
+  }
   if (errors.length) throw new Error(errors.join('\n'));
   return mapping;
 }
 
-export function checkAcceptanceBoxes(body: string, texts: ReadonlySet<string>): string {
-  return body.split(/\r?\n/).map((line) => {
+export function checkAcceptanceBoxes(body: string, indexes: ReadonlySet<number>): string {
+  let gateIndex = 0;
+  const relevantLines = new Set(acceptanceCheckboxes(body).map((box) => box.line));
+  return body.split(/\r?\n/).map((line, lineIndex) => {
+    if (!relevantLines.has(lineIndex + 1)) return line;
+    gateIndex++;
     const checkbox = line.match(CHECKBOX_PATTERN);
-    return checkbox && checkbox[2] === ' ' && texts.has(checkbox[4].trim())
+    return checkbox && checkbox[2] === ' ' && indexes.has(gateIndex)
       ? `${checkbox[1]}x${checkbox[3]}${checkbox[4]}`
       : line;
   }).join('\n');
+}
+
+export async function bodySha256(body: string): Promise<string> {
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(body));
+  return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, '0')).join('');
+}
+
+export async function issueSnapshot(issue: {
+  number: number;
+  updated_at: string;
+  body: string | null;
+}): Promise<IssueSnapshot> {
+  return {
+    number: issue.number,
+    updatedAt: issue.updated_at,
+    bodySha256: await bodySha256(issue.body ?? ''),
+  };
+}
+
+export async function staleSnapshots(
+  expected: IssueSnapshot[],
+  current: Array<{ number: number; updated_at: string; body: string | null }>,
+): Promise<IssueSnapshot[]> {
+  const currentByNumber = new Map(
+    await Promise.all(
+      current.map(async (issue) => [issue.number, await issueSnapshot(issue)] as const),
+    ),
+  );
+  return expected.filter((snapshot) => {
+    const live = currentByNumber.get(snapshot.number);
+    return live === undefined || live.updatedAt !== snapshot.updatedAt ||
+      live.bodySha256 !== snapshot.bodySha256;
+  });
+}
+
+function resolveEvidenceBox(
+  entry: AcceptanceEvidence,
+  boxes: AcceptanceCheckbox[],
+): AcceptanceCheckbox | undefined {
+  const text = entry.text;
+  if (text !== undefined) return boxes.find((box) => box.text.trim() === text.trim());
+  if (entry.boxIndex !== undefined) return boxes.find((box) => box.index === entry.boxIndex);
+  return undefined;
+}
+
+// This intentionally accepts the documented, unambiguous YAML subset without introducing a
+// runtime package dependency into CI validation: scalar `issue`, then `entries`, each with exactly
+// one `box` or `box-index` and an `evidence` scalar. Quoted YAML scalars are recommended.
+function parseStructuredBlock(lines: string[]): AcceptanceEvidence[] {
+  let issue = 0;
+  const entries: AcceptanceEvidence[] = [];
+  let current: Partial<AcceptanceEvidence> | undefined;
+  const flush = () => {
+    if (!current) return;
+    if (issue < 1) {
+      throw new Error('Structured acceptance evidence requires a positive issue number.');
+    }
+    if ((current.text === undefined) === (current.boxIndex === undefined)) {
+      throw new Error(
+        `Issue #${issue}: each evidence entry requires exactly one of box or box-index.`,
+      );
+    }
+    if (current.evidence === undefined) {
+      throw new Error(`Issue #${issue}: each evidence entry requires evidence.`);
+    }
+    entries.push({ ...current, issue, evidence: current.evidence, legacy: false });
+  };
+  for (const rawLine of lines) {
+    const line = rawLine.trim();
+    if (!line || line === 'entries:') continue;
+    const field = line.match(/^-?\s*(issue|box|box-index|evidence):\s*(.*)$/);
+    if (!field) throw new Error(`Invalid acceptance-evidence YAML line: ${line}`);
+    const [, key, rawValue] = field;
+    const value = yamlScalar(rawValue);
+    if (key === 'issue') {
+      issue = Number(value);
+      continue;
+    }
+    if (/^-\s*/.test(line)) {
+      flush();
+      current = {};
+    }
+    current ??= {};
+    if (key === 'box') current.text = value;
+    else if (key === 'box-index') current.boxIndex = Number(value);
+    else current.evidence = value;
+  }
+  flush();
+  return entries;
+}
+
+function yamlScalar(value: string): string {
+  const trimmed = value.trim();
+  if (trimmed.startsWith('"') && trimmed.endsWith('"')) return JSON.parse(trimmed) as string;
+  if (trimmed.startsWith("'") && trimmed.endsWith("'")) {
+    return trimmed.slice(1, -1).replaceAll("''", "'");
+  }
+  return trimmed.replace(/\s+#.*$/, '').trim();
 }
 
 function stripMarkdown(value: string): string {

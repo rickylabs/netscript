@@ -120,22 +120,46 @@ The machine convention is intentionally narrow:
   (command output, run URL, CI job, or reviewer/evaluator comment). The automation catches unchecked
   boxes; the coordinator/evaluator verifies the evidence link quality before closing.
 
-For the normal evidence-mirroring path, put an exact `## Acceptance evidence` section in the PR
-body or a PR comment. Include one checked line for every still-unchecked close-gated issue box,
-copying its text verbatim and following it with an em dash plus linked evidence:
+For the normal evidence-mirroring path, put one fenced `acceptance-evidence` YAML block in the PR
+body or a PR comment for each closing issue. Map each unchecked box by exact text after trimming, or
+use its one-based `box-index` when copying a long box would be unwieldy:
 
-```markdown
-## Acceptance evidence
-
-- [x] <verbatim issue checkbox text> — <command output, run URL, CI job, or evaluator comment>
+````markdown
+```acceptance-evidence
+issue: 1170
+entries:
+  - box: "Exit code is non-zero only when a current failure exists"
+    evidence: "pr-checks_test.ts fixture; report.ok gate"
+  - box-index: 2
+    evidence: "CI run URL"
 ```
+````
+
+The explicit fields make punctuation—including em dashes in either the box or evidence—ordinary
+data. During one transition release the mirror still reads the legacy exact
+`## Acceptance evidence` checked-list format and emits a deprecation warning naming the fenced
+format. New or edited evidence must use the fenced format.
+
+An acceptance box containing the case-insensitive marker `[post-merge]` is visibly excluded from
+the merge gate. Use this only for facts that cannot exist until after merge, such as verifying the
+published artifact. Verify it in a follow-up issue/PR comment and tick the issue box after merge;
+do not drop the PR's closing keyword merely to escape a structurally impossible pre-merge check.
 
 When the PR carries `status:ready-merge`, CI runs
 `.llm/tools/validation/mirror-acceptance-evidence.ts` before the close-gate. The mirror validates the
 complete mapping before it checks matched issue boxes and posts an issue provenance comment linking
-the PR. Unknown, duplicate, mismatched, or missing entries fail without mutation. Use `--dry-run`
-to validate a real PR safely. Issues mentioned without a closing keyword (including epics/umbrellas
-referenced with `Part of`) are never mutated.
+the PR. Unknown, duplicate, mismatched, or missing entries fail without mutation, naming the issue,
+box, comparison, and exact repair. The mirror fetches the current issue immediately before PATCH,
+checks the resulting body hash, retries once after a mid-air edit, and deduplicates its provenance
+comment by a stable marker. Use `--dry-run` to validate a real PR safely. Issues mentioned without a
+closing keyword (including epics/umbrellas referenced with `Part of`) are never mutated.
+
+The mirror and checker fetch the PR, its labels/body/head, comments, and every closing issue live
+through the API at execution time. Workflow event payloads supply only repository and PR
+identifiers: a job re-run retains its original event snapshot and is not a substitute for a new
+label event. Apply `status:ready-merge`, then push (or otherwise trigger a new PR event). Every
+pretty/JSON verdict prints `headSha`, `evaluatedAt`, and per-issue `number`, `updatedAt`, and
+`bodySha256`, so reviewers can mechanically detect a verdict evaluated against an older issue body.
 
 A PR whose `status:` is `research`, `plan`, or `plan-eval` **MUST NOT be merged** — a plan-only
 artifact set can never satisfy an implementation Definition-of-Done. Merge requires

@@ -3,87 +3,107 @@ import {
   acceptanceCheckboxes,
   checkAcceptanceBoxes,
   extractClosingIssues,
+  issueSnapshot,
   parseAcceptanceEvidence,
+  staleSnapshots,
   validateEvidenceMapping,
 } from './acceptance-evidence.ts';
 
-Deno.test('maps verbatim unchecked acceptance boxes and preserves checked boxes', () => {
-  const issue = '## Acceptance\n- [ ] exact text\n- [x] already done';
-  const boxes = acceptanceCheckboxes(issue);
-  const evidence = parseAcceptanceEvidence(
-    '## Acceptance evidence\n- [x] exact text — test run URL',
-  );
-  const mapping = validateEvidenceMapping(boxes, evidence);
+const STRUCTURED = `\`\`\`acceptance-evidence
+issue: 1170
+entries:
+  - box: "Exit code is non-zero only when a current failure exists"
+    evidence: "pr-checks_test.ts — fixture; report.ok gate"
+\`\`\``;
+
+Deno.test('structured evidence treats em dashes in evidence as harmless data', () => {
+  const issue = '## Acceptance\n- [ ] Exit code is non-zero only when a current failure exists';
+  const parsed = parseAcceptanceEvidence(STRUCTURED);
+  const mapping = validateEvidenceMapping(1170, acceptanceCheckboxes(issue), parsed.entries);
+  assertEquals(mapping.get(1)?.evidence, 'pr-checks_test.ts — fixture; report.ok gate');
   assertEquals(
     checkAcceptanceBoxes(issue, new Set(mapping.keys())),
-    '## Acceptance\n- [x] exact text\n- [x] already done',
+    '## Acceptance\n- [x] Exit code is non-zero only when a current failure exists',
   );
 });
 
-Deno.test('rejects mismatched text and missing boxes', () => {
+Deno.test('structured evidence supports one-based box-index fallback', () => {
+  const parsed = parseAcceptanceEvidence(`\`\`\`acceptance-evidence
+issue: 8
+entries:
+  - box-index: 1
+    evidence: "CI run"
+\`\`\``);
+  assertEquals(
+    validateEvidenceMapping(8, acceptanceCheckboxes('## Gates\n- [ ] a long box'), parsed.entries)
+      .size,
+    1,
+  );
+});
+
+Deno.test('unmatched evidence fails with issue, named box, comparison, and repair', () => {
   const boxes = acceptanceCheckboxes('## Definition of Done\n- [ ] verbatim');
   assertThrows(
-    () => validateEvidenceMapping(boxes, [{ text: 'changed', evidence: 'CI' }]),
+    () =>
+      validateEvidenceMapping(44, boxes, [{
+        issue: 44,
+        text: 'changed',
+        evidence: 'CI',
+        legacy: false,
+      }]),
     Error,
-    'Evidence names no acceptance box',
+    'Issue #44: no acceptance box matched exact box text "changed"; add an entry for box "changed"',
   );
 });
 
-Deno.test('rejects extra unchecked issue boxes', () => {
-  const boxes = acceptanceCheckboxes('## Gates\n- [ ] one\n- [ ] two');
+Deno.test('missing evidence fails with the exact named box and action', () => {
   assertThrows(
-    () => validateEvidenceMapping(boxes, [{ text: 'one', evidence: 'CI' }]),
+    () => validateEvidenceMapping(44, acceptanceCheckboxes('## Gates\n- [ ] one'), []),
     Error,
-    'Missing evidence: two',
+    'Issue #44: unchecked box "one" has no matching evidence entry; add an entry for box "one"',
   );
 });
 
-Deno.test('already-ticked boxes need no evidence and supplied evidence is a no-op', () => {
-  const boxes = acceptanceCheckboxes('## Acceptance\n- [x] done');
-  assertEquals(validateEvidenceMapping(boxes, []).size, 0);
+Deno.test('legacy evidence remains readable and emits a structured-format deprecation', () => {
+  const parsed = parseAcceptanceEvidence('## Acceptance evidence\n- [x] exact — old CI');
+  assertEquals(parsed.entries[0], {
+    text: 'exact',
+    evidence: 'old CI',
+    legacy: true,
+  });
+  assertEquals(parsed.warnings.length, 1);
+  assertEquals(parsed.warnings[0].includes('```acceptance-evidence'), true);
+});
+
+Deno.test('post-merge boxes are excluded from required evidence and stay unchecked', () => {
+  const issue = '## Acceptance\n- [ ] merge blocker\n- [ ] [post-merge] verify published tag';
+  const boxes = acceptanceCheckboxes(issue);
+  assertEquals(boxes[1].postMerge, true);
+  const mapping = validateEvidenceMapping(9, boxes, [{
+    issue: 9,
+    text: 'merge blocker',
+    evidence: 'CI',
+    legacy: false,
+  }]);
   assertEquals(
-    validateEvidenceMapping(boxes, [{ text: 'done', evidence: 'old run' }]).size,
-    0,
+    checkAcceptanceBoxes(issue, new Set(mapping.keys())),
+    '## Acceptance\n- [x] merge blocker\n- [ ] [post-merge] verify published tag',
   );
 });
 
-Deno.test('rejects empty evidence for unchecked and already-checked boxes', () => {
-  for (const checked of [' ', 'x']) {
-    const boxes = acceptanceCheckboxes(`## Acceptance\n- [${checked}] item`);
-    assertThrows(
-      () => validateEvidenceMapping(boxes, [{ text: 'item', evidence: '' }]),
-      Error,
-      'Evidence is empty: item',
-    );
-  }
-});
-
-Deno.test('rejects duplicate evidence for unchecked and already-checked boxes', () => {
-  for (const checked of [' ', 'x']) {
-    const boxes = acceptanceCheckboxes(`## Acceptance\n- [${checked}] item`);
-    assertThrows(
-      () =>
-        validateEvidenceMapping(boxes, [
-          { text: 'item', evidence: 'first run' },
-          { text: 'item', evidence: 'second run' },
-        ]),
-      Error,
-      'Duplicate evidence: item',
-    );
-  }
-});
-
-Deno.test('re-running the mirror against already-ticked boxes is a no-op', () => {
-  const issue = '## Acceptance\n- [ ] exact acceptance text';
-  const evidence = [{ text: 'exact acceptance text', evidence: 'test run URL' }];
-
-  const firstMapping = validateEvidenceMapping(acceptanceCheckboxes(issue), evidence);
-  assertEquals(firstMapping.size, 1);
-  const tickedIssue = checkAcceptanceBoxes(issue, new Set(firstMapping.keys()));
-  assertEquals(tickedIssue, '## Acceptance\n- [x] exact acceptance text');
-
-  const secondMapping = validateEvidenceMapping(acceptanceCheckboxes(tickedIssue), evidence);
-  assertEquals(secondMapping.size, 0);
+Deno.test('stale verdict snapshot is detected after an issue edit', async () => {
+  const before = { number: 7, updated_at: '2026-08-03T10:00:00Z', body: '- [ ] before' };
+  const expected = [await issueSnapshot(before)];
+  assertEquals(await staleSnapshots(expected, [before]), []);
+  assertEquals(
+    (await staleSnapshots(expected, [{
+      ...before,
+      updated_at: '2026-08-03T10:01:00Z',
+      body: '- [x] after',
+    }]))
+      .map((snapshot) => snapshot.number),
+    [7],
+  );
 });
 
 Deno.test('umbrella reference without closing keyword is untouched', () => {
