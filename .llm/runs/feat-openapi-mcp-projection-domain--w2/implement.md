@@ -1,6 +1,6 @@
-# Implementation Prompt: OMB S4 OpenAPI projection domain — Slice 1
-
 use harness
+
+# Implementation Prompt: OMB S4 OpenAPI projection domain — Slice 1
 
 You are the delegated implementation lane. Implement **Slice 1 only**, run its focused gates,
 update this run's `worklog.md` and `context-pack.md`, then stop without committing or pushing. The
@@ -9,11 +9,12 @@ PR comment. Do not begin Slice 2.
 
 ## SKILL
 
-- `.agents/skills/netscript-harness`
-- `.agents/skills/netscript-doctrine` (`packages/mcp`, Archetype 2; pure domain slice)
-- `.agents/skills/jsr-audit` (new subpath export)
-- `.agents/skills/netscript-tools`
-- `.agents/skills/rtk`
+- `.agents/skills/netscript-harness` — follow the locked Design checkpoint and stopped-slice handoff.
+- `.agents/skills/netscript-doctrine` — preserve the `packages/mcp` Archetype-2 pure-domain boundary.
+- `.agents/skills/jsr-audit` — keep the new subpath documented, explicitly typed, and publishable.
+- `.agents/skills/netscript-tools` — use the scoped wrappers and preserve lock hygiene.
+- `.agents/skills/rtk` — compress read-heavy git/search output without treating it as gate evidence.
+- `.agents/skills/codex-wsl-remote` — keep this daemon-attached WSL thread steerable and avoid rival sends.
 
 Read each selected `SKILL.md` completely, then read:
 

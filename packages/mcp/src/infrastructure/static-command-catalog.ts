@@ -2,7 +2,7 @@ import {
   type CommandCatalogPort,
   type CommandDescriptor,
   MAX_COMMAND_DESCRIPTOR_LENGTH,
-} from '../domain/command-catalog-port.ts';
+} from '../domain/command/command-catalog-port.ts';
 
 /** Informational descriptor used until the CLI injects its live registry in S7. */
 export const UNWIRED_COMMAND_DESCRIPTOR: CommandDescriptor = Object.freeze({

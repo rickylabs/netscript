@@ -12,10 +12,10 @@
 
 ## Current State
 
-The branch is a clean exact child of current `origin/main`. Live issue/RFC and the complete P2
+The branch began as a clean exact child of current `origin/main`. Live issue/RFC and the complete P2
 no-DB proof/evidence have been consumed. The plan and Design checkpoint are locked. Formal local
-PLAN-EVAL is intentionally composed/waived by the milestone-run rule; implementation may start in
-the same run, one supervised slice at a time.
+PLAN-EVAL is intentionally composed/waived by the milestone-run rule. Slice 1 is implemented and
+focused-green in the milestone orchestrator's already-owned single Codex sender.
 
 ## Completed
 
@@ -28,13 +28,13 @@ the same run, one supervised slice at a time.
 
 ## In Progress
 
-- Bootstrap commit and draft PR, then delegated Slice 1.
+- Supervisor Slice 1 sign-off, commit, explicit-refspec push, and PR evidence comment.
 
 ## Next Steps
 
-1. Commit/push run bootstrap via explicit refspec and open the draft PR.
-2. Launch the bound implementation lane for Slice 1 only.
-3. Review, gate, sign off, push, and comment each slice before resuming the lane.
+1. Sign off and push Slice 1.
+2. Implement/review Slices 2–4 at stopped checkpoints.
+3. Run the full Slice 5 merge-readiness gates and composed independent evaluation.
 
 ## Key Decisions
 
@@ -50,6 +50,11 @@ the same run, one supervised slice at a time.
 | Path | Status | Notes |
 | --- | --- | --- |
 | `.llm/runs/feat-openapi-mcp-projection-domain--w2/*` | new | Harness research, locked plan, design, waiver, and handoff. |
+| `packages/mcp/src/domain/command/*` | moved | Existing command contracts/policy regrouped to preserve direct-child cardinality. |
+| `packages/mcp/src/domain/openapi/operation-index.ts` | new | Pure deterministic structural operation index. |
+| `packages/mcp/openapi-projection.ts` | new | Curated public projection subpath. |
+| `packages/mcp/tests/operation-index_test.ts` | new | Public-consumer index contract tests. |
+| `packages/mcp/{deno.json,README.md}` | modified | Export/check surface and domain-subpath documentation. |
 
 ## Gates
 
@@ -59,7 +64,7 @@ the same run, one supervised slice at a time.
 | Static | baseline green | doc-lint + package publish dry-run |
 | Fitness | baseline recorded | structured JSR audit |
 | Runtime | N/A | pure domain scope |
-| Consumer | pending | implementation slices |
+| Consumer | Slice 1 green | public entrypoint import test + scoped check |
 
 ## Open Questions
 

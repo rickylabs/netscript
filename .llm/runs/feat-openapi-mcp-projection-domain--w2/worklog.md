@@ -65,6 +65,8 @@ they do not add parser strategies or I/O.
 | Time | Slice | Step | Notes |
 | --- | --- | --- | --- |
 | 2026-08-04 | bootstrap | research/plan | Live issue/RFC, doctrine, package surface, and P2 proof/evidence consumed; plan locked. |
+| 2026-08-04 | 1 | implementation | Regrouped the command-domain triplet without changing the root exports; added the documented projection subpath, deterministic operation index, public-import tests, and README entry. |
+| 2026-08-04 | 1 | review | Verified source-order indexing, dotted ids, method-path fallback, ignored Path Item metadata, unchanged 14-tool claims, pure-domain imports, and empty lock diff. |
 
 ## Decisions
 
@@ -73,6 +75,7 @@ they do not add parser strategies or I/O.
 | Errors absent means exact `{}` | Measured reality; no envelope inference | P2 verdict/evidence |
 | PLAN-EVAL gate is composed | Explicit milestone-run D6 owner waiver | user directive + milestone-run.md |
 | No local/external ref fetch | Pure domain boundary | canonical design + S4 scope |
+| Implement in the owning supervisor session | The milestone orchestrator already launched this worktree's single allowed Codex sender; a nested launch was correctly refused as duplicate-sender risk | agentic sender registry + `codex-status` |
 
 ## Drift
 
@@ -95,6 +98,9 @@ they do not add parser strategies or I/O.
 | Branch baseline | raw git SHA/merge-base/status | PASS | Exact clean `origin/main` baseline `2c8865e8…`. |
 | Baseline doc-lint | `deno task doc:lint --root packages/mcp --pretty` | PASS | 0 diagnostics across 2 existing entrypoints. |
 | Baseline publish dry-run | package `deno task publish:dry-run` | PASS | Exit 0; no actual slow-type diagnostic. |
+| Slice 1 command/index tests | `deno test --allow-run packages/mcp/tests/operation-index_test.ts packages/mcp/tests/command_flows_test.ts packages/mcp/tests/command_adapters_test.ts packages/mcp/tests/command_composition_test.ts` | PASS | 12 passed, 0 failed. Initial invocation omitted `--allow-run` and produced the expected permission refusal in three subprocess tests; corrected command passed. |
+| Slice 1 scoped check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/mcp --ext ts,tsx` | PASS | 71 files, one batch, zero diagnostics after adding the required explicit exported constant type. |
+| Slice 1 lock hygiene | raw `git diff -- deno.lock` | PASS | Empty. |
 
 ### Fitness Gates
 
@@ -112,7 +118,7 @@ they do not add parser strategies or I/O.
 
 | Consumer | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| New subpath | NOT_RUN | planned public-import tests | Runs per slice and at merge readiness. |
+| New subpath | PASS (Slice 1) | `tests/operation-index_test.ts` imports `../openapi-projection.ts` | Full surface gates repeat at merge readiness. |
 
 ## Handoff Notes
 
