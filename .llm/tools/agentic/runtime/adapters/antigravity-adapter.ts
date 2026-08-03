@@ -151,7 +151,7 @@ function prompt(probe: AntigravityEvidenceProbe): string {
 /** Builds the fixed Antigravity print argv and rejects any lost or flag-shaped prompt. */
 export function printArguments(
   probe: AntigravityEvidenceProbe,
-  resolvedPrompt = prompt(probe),
+  resolvedPrompt: string = prompt(probe),
 ): string[] {
   const args = [
     '--model',
