@@ -853,7 +853,7 @@ class SmokeRunner {
           'deno',
           ...this.#commandArgs(
             'plugin',
-            'add',
+            'install',
             plugin.kind,
             '--name',
             plugin.name,

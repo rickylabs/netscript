@@ -50,6 +50,8 @@ Deno.test('consumer mode selects the exact released CLI without a framework clon
     const report = await runSmoke(options);
     const init = report.steps.find((step) => step.id === 'init-project');
     assertStringIncludes(JSON.stringify(init?.details), '"--minimum-dependency-age=0"');
+    const worker = report.steps.find((step) => step.id === 'plugin-add-workers');
+    assertStringIncludes(JSON.stringify(worker?.details), '"plugin","install","worker"');
   } finally {
     await Deno.remove(root, { recursive: true });
   }
