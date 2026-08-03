@@ -36,11 +36,20 @@ Deno.test('consumer mode selects the exact released CLI without a framework clon
       `${root}/.llm/tools/release.json`,
       '{"cli":"jsr:@netscript/cli@0.0.3"}\n',
     );
-    const options = normalizeCommandOptions({ repo: root, name: 'consumer-smoke' });
+    const options = normalizeCommandOptions({
+      repo: root,
+      name: 'consumer-smoke',
+      dryRun: true,
+      format: 'json',
+      logFile: `${root}/smoke.log`,
+    });
     assertEquals(options.cli, 'jsr:@netscript/cli@0.0.3');
     assertEquals(options.source, 'starter');
     assertStringIncludes(options.smokeRoot, root);
     assertStringIncludes(options.logFile, root);
+    const report = await runSmoke(options);
+    const init = report.steps.find((step) => step.id === 'init-project');
+    assertStringIncludes(JSON.stringify(init?.details), '"--minimum-dependency-age=0"');
   } finally {
     await Deno.remove(root, { recursive: true });
   }

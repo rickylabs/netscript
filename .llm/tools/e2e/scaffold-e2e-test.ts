@@ -740,7 +740,8 @@ class SmokeRunner {
   }
 
   #commandArgs(...args: string[]): string[] {
-    return ['run', '-A', this.#options.cli, ...args];
+    const releaseFlags = this.#options.cli.startsWith('jsr:') ? ['--minimum-dependency-age=0'] : [];
+    return ['run', '-A', ...releaseFlags, this.#options.cli, ...args];
   }
 
   async #preflight(): Promise<void> {

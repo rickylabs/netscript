@@ -155,6 +155,7 @@ compressed asset; never hand-edit the generated TypeScript or API text.
 | 2026-08-03T13:36:00+02:00 | S2 | commit/evidence | Committed and pushed `e1ba0b005`; detached pre-fix worktree at `d6265fa52` produced exit 1 when asserting `--with-docs` in real CLI help, while current help prints the several-megabyte flag. Checked all five evidenced #1061 boxes and posted issue/PR evidence comments `5165184953` / `5165185588`. |
 | 2026-08-03T13:58:00+02:00 | S3 | full static gates | Required `deno task check` and `deno task test` completed without failures; structured verification selected 2,524 TypeScript files across 22 batches with zero diagnostics. Stopped a redundant compact-reporter rerun started only for duplicate evidence. |
 | 2026-08-03T14:10:00+02:00 | S3 | runtime contention | Initial guarded runtime was interrupted before service startup when a foreign Aspire verification appeared after the clear leak-check. After that owner exited and the reporter showed zero survivors, a fresh one-pass run started; another foreign AppHost began two seconds later. The run passed 47 gates but `behavior.service-health` returned database-unhealthy and failed; cleanup passed and removed all run-owned containers. This is invalid due to documented concurrency and does not evidence acceptance. |
+| 2026-08-03T14:27:00+02:00 | S3 | consumer red/fix | A real fresh-project installed-tool run from `/tmp` proved clone-independent mode selected `jsr:@netscript/cli@0.0.3` but failed before scaffold because direct `deno run jsr:` does not honor the project config's minimum-age exclusion. Added explicit `--minimum-dependency-age=0` only to public-release commands, plus a dry-run regression assertion. Focused tool/runner/host-port suite passes 15/15; scoped check/lint/fmt passes; regenerated embedded tools contain the fix. Runtime rerun waits on a newly started foreign verification. |
 
 ## Decisions
 
@@ -208,6 +209,7 @@ compressed asset; never hand-edit the generated TypeScript or API text.
 | S2 publish dry-run | PASS | `@netscript/cli@0.0.3`; generated docs 1.51 MB | Simulated JSR file list contains docs, tools, and skills assets. |
 | S2 generated asset freshness | PASS | regenerate + identical SHA-256 | Docs `71606ae0…`, tools `ea4529fb…`, skills `42880579…`. |
 | S2 pre-fix red | PASS | detached `d6265fa52` CLI help assertion exited 1 | Current CLI prints the `--with-docs` option; temporary worktree removed. |
+| Consumer exact-release availability | PASS after fix | fresh installed tool reached exact `jsr:@netscript/cli@0.0.3`; pre-fix failed on Deno 24h policy; regression suite 15/15 | Explicit public-release flag bypasses only the time-based registry quarantine; local CLI commands are unchanged. Runtime continuation pending quiet host. |
 
 ### Runtime Gates
 
