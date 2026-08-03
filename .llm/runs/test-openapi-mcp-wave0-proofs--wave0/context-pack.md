@@ -6,7 +6,7 @@
 | -------------- | -------------------------------------- |
 | Run ID         | `test-openapi-mcp-wave0-proofs--wave0` |
 | Branch         | `test/openapi-mcp-wave0-proofs`        |
-| Current phase  | evaluating                             |
+| Current phase  | complete                               |
 | Archetype      | N/A — proof/measurement slice          |
 | Scope overlays | service                                |
 
@@ -42,13 +42,13 @@ production-feature claim.
 
 ## In Progress
 
-- Separate Qwen IMPL-EVAL after final hygiene gates passed.
+- None. The run is complete; PR disposition remains with the orchestrator.
 
 ## Next Steps
 
-1. Run separate Qwen IMPL-EVAL and integrate its verdict without supervisor reinterpretation.
-2. Synchronize the PR checklist/status with the formal verdict.
-3. Keep #1128 open unless its missing DB-backed acceptance evidence is supplied in a future slice.
+1. Orchestrator decides whether to take draft PR #1182 out of draft and merge the proof artifacts.
+2. Keep #1128 open unless its missing DB-backed acceptance evidence is supplied in a future slice.
+3. Product remediation for the generated SQLite `--allow-ffi` defect remains outside this PR.
 
 ## Key Decisions
 
@@ -77,6 +77,7 @@ production-feature claim.
 | P3 fixture       | PASS             | Focused test passed; Fable independently reran it.    |
 | Resource hygiene | PASS             | Final leak check found zero run-owned survivors.      |
 | Review threads   | PASS             | 0 threads; 0 unanswered on PR #1182.                  |
+| IMPL-EVAL        | PASS             | Separate Qwen 3.7 Max/high `evaluate.md`.             |
 
 ## Open Questions
 
@@ -84,7 +85,9 @@ production-feature claim.
 - P2 is resolved as explicit combined `FAIL`, with sound no-DB measurements and separate Fable
   approval; #1128 acceptance remains open because DB measurements are absent.
 - P3 is resolved as `PASS`, separately Fable-approved, committed, and synchronized to #1129.
-- Final leak and review-thread gates pass; formal IMPL-EVAL is the remaining merge-readiness gate.
+- Final leak and review-thread gates pass; formal IMPL-EVAL is `PASS`.
+- The evaluator accepted honest P1/P2 FAIL verdicts as complete proof outputs while preserving #1128
+  as open partial work.
 - Evaluator credential availability is resolved: the parser-backed live canary passed with tools,
   reasoning, and streaming supported.
 
