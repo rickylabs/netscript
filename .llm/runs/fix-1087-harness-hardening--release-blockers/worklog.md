@@ -77,6 +77,10 @@ job. Release prose is edited in the tracked notes-file input.
 | 2026-08-03 | 2 | #1084 implementation | `gh-pr create` now stages supplied content into an invocation-owned UUID directory, stamps owner+SHA-256 metadata, and re-reads/verifies the artifact before payload construction; guidance now requires per-run/per-session scratch. |
 | 2026-08-03 | 2 | opposite-family review | Fable session `064bce5b-16b5-404d-b966-a16168b93caa` returned `PASS`; continuation `5b04b3dc-6ebe-4da9-932f-4971b67f3500` verified the pre-existing-root mode fix. |
 | 2026-08-03 | 2 | supervisor sign-off | Inspected concurrency/cross-owner/tamper tests, real dry-run artifact modes/redaction, full tool suite, active guidance grep, and reviewer findings; approved the slice for commit. |
+| 2026-08-03 | 3 | #1080 implementation | Added a healthy Redis service and mandatory URL to `check-test`, an exact-name execution gate for both #1075 integrations, and a source-restoring negative control that removes exactly the #1075 serialization field/wrapper. |
+| 2026-08-03 | 3 | empirical sensitivity proof | Against run-owned Redis on `127.0.0.1:16379`, both named regressions passed normally; after the surgical pre-fix transform, each failed with 16 CAS winners instead of 1, and the adapter was byte-restored. |
+| 2026-08-03 | 3 | opposite-family review | Fable session `d49c38bc-b026-4d0d-8343-d3890633ed2a` returned `PASS`; remediation continuation replaced positional file/name arrays with one paired record authority and retained `PASS`. |
+| 2026-08-03 | 3 | supervisor sign-off | Inspected workflow/service wiring, fail-closed missing-env behavior, exact test observation, negative-control restoration, affected package suite, scoped wrappers, and reviewer evidence; approved the slice for commit while the final root check continues. |
 
 ## Decisions
 
@@ -106,9 +110,18 @@ job. Release prose is edited in the tracked notes-file input.
 - #1084 scoped check/lint/fmt: `131 files, 0 findings` each.
 - #1084 active guidance grep: only per-run/per-session `pr-body.md` examples remain.
 - #1084 review: `PASS`; root-mode finding resolved, intentional gitignored audit retention accepted.
-- Remaining implementation gates: `NOT_RUN`.
+- #1080 missing-env proof: exit `1` with `refusing silently skipped Redis tests` before test launch.
+- #1080 required real-Redis gate: both exact named regressions observed `ok`.
+- #1080 pre-fix negative control: both exact named regressions observed `FAILED` with 16 winners versus 1 expected; adapter restore verified by `git diff --exit-code`.
+- #1080 affected package + gate-unit suite: `151 passed, 0 failed, 2 ignored`; the ignored restart/container-control and Prisma integrations are unrelated to the two required Redis regressions.
+- #1080 focused gate unit suite: `3 passed, 0 failed`.
+- #1080 scoped check/lint/fmt: `2 files, 0 findings` each.
+- #1080 review: `PASS`; paired-record cleanup independently rechecked.
+- #1080 CI proof: pending pushed `check-test` run before acceptance boxes are ticked.
+- Remaining implementation gates: root check in progress; final full-suite gates `NOT_RUN`.
 
 ## Handoff Notes
 
-- #1084 is supervisor-approved for its issue commit. After push and evidence comment, proceed to
-  #1080 without combining the slices.
+- #1080 is supervisor-approved for its issue commit. After push, use the hosted `check-test`
+  log—not source inspection alone—to evidence and tick its acceptance boxes before proceeding to
+  #1083. The root check remains a final slice gate and continues in parallel.

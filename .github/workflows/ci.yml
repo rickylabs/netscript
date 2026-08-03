@@ -3,10 +3,9 @@ name: ci
 # S2 full CI. Lanes over the existing `deno task`s:
 #
 #   - `check-test` — the lean, required S1 pre-merge gate: repo-wide `deno check`
-#     + `deno test`, the service-free static + unit gates that run on a stock
-#     runner. Kept intentionally minimal so `feat/package-quality` -> `main` is
-#     gated on service-free health, not on toolchain availability or tangential
-#     advisories.
+#     + `deno test`, plus the required Redis CAS/saga-store regression gate.
+#     A lightweight Redis service makes those integrations mandatory rather than
+#     silently skipped.
 #
 #   - `quality` — the S2 full quality lane the original header reserved: lint,
 #     fmt, scaffold-version guard, publish dry-run, and critical advisory audit.
@@ -87,6 +86,18 @@ jobs:
   check-test:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    env:
+      NETSCRIPT_TEST_REDIS_URL: redis://127.0.0.1:6379
+    services:
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -101,6 +112,12 @@ jobs:
 
       - name: Repo-wide check
         run: deno task check
+
+      - name: Required real-Redis regression tests
+        run: deno task test:redis-regression
+
+      - name: Prove the pre-#1075 adapter turns the gate red
+        run: deno task test:redis-regression:negative-control
 
       - name: Repo-wide test
         run: deno task test
