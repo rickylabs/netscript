@@ -24,6 +24,7 @@ import { relative } from 'jsr:@std/path@^1';
 const DEFAULT_ROOTS = ['packages/cli/src'] as const;
 const SOURCE_EXTENSIONS = new Set(['.ts', '.tsx', '.mts', '.template', '.json']);
 const ALLOW_MARKER = 'aspire-host-port-ok:';
+const GENERATED_STATE_DIR = /[\\/](?:\.data|\.git|node_modules)(?:[\\/]|$)/;
 
 /**
  * `withHttpEndpoint({ port: 8010 ... })` — a numeric literal in the host-port
@@ -157,7 +158,12 @@ export async function scanHostPorts(
   let scannedFiles = 0;
 
   for (const root of roots) {
-    for await (const entry of walk(root, { includeDirs: false })) {
+    for await (
+      const entry of walk(root, {
+        includeDirs: false,
+        skip: [GENERATED_STATE_DIR],
+      })
+    ) {
       const path = normalized(relative('.', entry.path));
       if (![...SOURCE_EXTENSIONS].some((suffix) => path.endsWith(suffix))) continue;
       if (path.includes('/node_modules/') || isTestPath(path)) continue;
