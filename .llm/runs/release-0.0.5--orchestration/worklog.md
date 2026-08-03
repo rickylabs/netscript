@@ -440,3 +440,23 @@ Full-artifact review of all three proof verdicts (PR #1182):
   (canary.2 train); #1119 slides W2→W3 to hold width at 4 Codex + agy.
 - Decision record posted to RFC #1123 + epic #1126; seed RFC §9 already updated by the slice.
   #1127/#1128/#1129 boxes verified/ticked on evidence; PR #1182 marked ready; gate watcher armed.
+
+## 2026-08-03/04 — Wave 1 complete; canary point 1 declared; wave-2 dispatch
+
+- Merge 7: PR #1182 (`2c8865e8c`, 22:29:37Z) closed #1127 #1128 #1129 through the full gate
+  (latest-per-name contexts green; only proofs + run artifacts in the diff; verdicts reviewed
+  in full as the decisive-claim verification).
+- **Canary point 1 declared at the wave-1 boundary.** `release-canary.yml` dispatched with
+  `target-version=0.0.5` (run 30858888833). Payload = merges 1–7 since v0.0.4, computed by the
+  #1180-fixed derivation. Label/note/drift check records to be quoted here on completion
+  (stage E contract). #1166 box-2 topology (merge-buried PR behind `gh pr update-branch`) is
+  watched for, not manufactured — if no real cut exhibits it this cycle, the box moves with
+  reason at cut time.
+- **Wave-2 dispatch (pre-dispatch gates):** quota — `routing-state` no fallback transitions;
+  Codex weekly 57%-used baseline unchanged in kind (re-read at launch); transport — managed
+  app-server (subscription), launcher validates route per slice; machine — canary run is
+  cloud-side (Actions), local load is the 4 slice launches only.
+- Wave 2 lanes: #1130 (S4, Sol·high, P2 no-DB inventory as input), #1131 (S5, Sol·high, F1(b)
+  primary + P3 wording), #1184 (sagas glue, Sol·high, seven-point protocol), #1191
+  (--allow-ffi, Sol·medium, includes P2 DB re-measurement). agy #1106 launch surface to be
+  resolved (first agy lane of the run).
