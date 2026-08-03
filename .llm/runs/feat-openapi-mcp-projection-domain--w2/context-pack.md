@@ -16,8 +16,9 @@ The branch began as a clean exact child of current `origin/main`. Live issue/RFC
 no-DB proof/evidence have been consumed. The plan and Design checkpoint are locked. Formal local
 PLAN-EVAL is intentionally composed/waived by the milestone-run rule. Slices 1–4 are implemented,
 reviewed, committed, and focused-green. The independent OpenHands IMPL-EVAL passed and the current
-review-thread gate reports 0 threads / 0 unanswered. The branch is completing close-gate metadata
-and fresh CI before handoff to the milestone orchestrator.
+review-thread gate reports 0 threads / 0 unanswered. The live PR is labeled `status:ready-merge`,
+its close-gate and full current check rollup pass, and GitHub reports it mergeable/clean. Merge
+authority remains with the milestone orchestrator.
 
 ## Completed
 
@@ -29,18 +30,16 @@ and fresh CI before handoff to the milestone orchestrator.
 - JSR baseline warnings recorded without changing debt.
 - Independent OpenHands IMPL-EVAL passed on Actions run `30861395106`; `evaluate.md` is committed.
 - Current review-thread gate passed with 0 threads and 0 unanswered.
+- Ready-merge close-gate and current PR check rollup passed with zero current failures.
 
 ## In Progress
 
-- Regenerated the checked-in MCP publish-asset manifest after fresh CI detected the new public
-  subpath was not yet embedded.
+- None. Implementation-supervisor handoff is complete.
 
 ## Next Steps
 
-1. Commit/push the generated publish manifest and final run evidence.
-2. Tick the now-true composed-evaluation DoD item, add the closing keyword, and apply
-   `status:ready-merge` so the close-gate reruns.
-3. Observe fresh CI and hand back to the milestone orchestrator without merging.
+1. Milestone orchestrator performs its final pre-merge ruling.
+2. Merge only under milestone-orchestrator authority; the implementation supervisor does not merge.
 
 ## Key Decisions
 
@@ -74,10 +73,10 @@ and fresh CI before handoff to the milestone orchestrator.
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
 | Plan | composed/authorized | `plan-eval.md`, user milestone directive |
-| Static | final green; generated manifest correction pending commit | 78 tests; scoped check/lint/fmt; doc-lint; publish dry-run; CI publish-asset check |
+| Static | final green | 78 tests; scoped check/lint/fmt; doc-lint; publish dry-run; CI publish-asset check |
 | Fitness | final green with baseline warnings | quality gate + structured JSR audit |
 | Runtime | N/A | pure domain scope |
-| Consumer | final green | public entrypoint tests, package suite, scoped gates, doc-lint, publish dry-run |
+| Consumer | final green | public entrypoint tests, package suite, scoped gates, doc-lint, publish dry-run, full scaffold runtime/static CI |
 
 ## Open Questions
 
