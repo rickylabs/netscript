@@ -98,3 +98,12 @@ All requested gates were rerun after the fix on 2026-08-03:
 - Issue #1170 remains open for supervisor review and eventual PR linkage; this implementation lane
   performed no GitHub mutation, push, or PR action.
 - No implementation drift or architecture debt was identified.
+
+## S2 sign-off (Tier-A review)
+
+- 2026-08-03 · Substantive review of `692856e4d`: pure classifier + thin gh adapter separation as
+  contracted; latest-per-name by started_at with id tiebreak; provenance (headSha, evaluatedAt) in
+  report and exit gate keyed solely on current-fail. Review finding (in-progress runs classified
+  current-pass) raised, fixed on the same thread as `pending` with negative test; supervisor
+  re-ran tests independently: 6 passed / 0 failed. Live read-only demo against merged PR #1094:
+  31 checks, superseded/stale-post-merge labeled, currentFailures=0, exit 0.
