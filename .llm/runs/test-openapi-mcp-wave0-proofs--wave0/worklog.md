@@ -101,6 +101,9 @@ logic into a product template in this run.
 | 2026-08-03 | S3        | verdict/wording         | P3 is explicit `PASS`; the exact D9 `spec_unavailable` text is ratified. Mapping is configuration guidance only and does not claim the later MCP-facing production feature is implemented.                                                                               |
 | 2026-08-03 | S3        | Fable review            | Native Fable independently reran the focused fixture, verified attribution and byte-identical D9 wording, and returned `APPROVED`; minor thread-record and assertion-line hygiene was folded into supervisor integration.                                                |
 | 2026-08-03 | S3        | supervisor verification | Supervisor reran the focused fixture (exit 0; 1 passed, 0 failed), matched the D9 sentence exactly, parsed the normalized evidence, confirmed no package/plugin/lock/seed-RFC diff, and completed the nine-file scoped formatting sweep.                                 |
+| 2026-08-03 | S4        | leak check              | Final `agentic:leak-check` with the run dir, PR worktree, and declared experiment scratch root found zero run-owned survivors. It reported one foreign AppHost, three foreign containers, and one unproven container; all were left untouched.                           |
+| 2026-08-03 | S4        | review-thread gate      | `agentic:review-threads` passed for PR #1182: 0 threads, 0 unanswered.                                                                                                                                                                                                   |
+| 2026-08-03 | S4        | GitHub close-gate       | #1129 acceptance checked and linked after commit `5c041bdfd`; PR now carries `Closes #1127` and `Closes #1129`. #1128 remains open and has no closing keyword because its DB-backed acceptance evidence is absent.                                                       |
 
 ## Decisions
 
@@ -142,6 +145,8 @@ logic into a product template in this run.
 | S3 no lint ignores        | owned proof TypeScript scan                                          | PASS   | No `deno-lint-ignore` directive found; S1/S2 source left unchanged.                   |
 | S3 diff integrity         | `git diff --check`                                                   | PASS   | Exit 0; no whitespace errors.                                                         |
 | S3 fixture                | `deno test --allow-all --frozen … --filter …`                        | PASS   | Exit 0; 1 passed, 0 failed, 1 filtered out.                                           |
+| Final leak check          | `agentic:leak-check` with run/worktree/owned-root                    | PASS   | Zero owned survivors; foreign/unproven resources reported and untouched.              |
+| PR review-thread gate     | `agentic:review-threads` for PR #1182                                | PASS   | 0 threads; 0 unanswered.                                                              |
 
 ### Fitness Gates
 

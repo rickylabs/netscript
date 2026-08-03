@@ -6,7 +6,7 @@
 | -------------- | -------------------------------------- |
 | Run ID         | `test-openapi-mcp-wave0-proofs--wave0` |
 | Branch         | `test/openapi-mcp-wave0-proofs`        |
-| Current phase  | implementation                         |
+| Current phase  | evaluating                             |
 | Archetype      | N/A — proof/measurement slice          |
 | Scope overlays | service                                |
 
@@ -42,13 +42,13 @@ production-feature claim.
 
 ## In Progress
 
-- Supervisor verification and integration of the approved S3 artifact set.
+- Separate Qwen IMPL-EVAL after final hygiene gates passed.
 
 ## Next Steps
 
-1. Run supervisor verification, scoped final hygiene, and commit/push S3.
-2. Sync #1129 acceptance and PR closing semantics while keeping #1128 open.
-3. Run the final leak/review-thread gates and separate Qwen IMPL-EVAL.
+1. Run separate Qwen IMPL-EVAL and integrate its verdict without supervisor reinterpretation.
+2. Synchronize the PR checklist/status with the formal verdict.
+3. Keep #1128 open unless its missing DB-backed acceptance evidence is supplied in a future slice.
 
 ## Key Decisions
 
@@ -75,14 +75,16 @@ production-feature claim.
 | Static           | PASS / S3 TS N/A | S1/S2 scoped checks preserved; S3 owns no TypeScript. |
 | Runtime          | P1 FAIL; P2 FAIL | P2 no-DB measured; DB branch remains unavailable.     |
 | P3 fixture       | PASS             | Focused test passed; Fable independently reran it.    |
-| Resource hygiene | PASS             | No owned survivors; foreign resources untouched.      |
+| Resource hygiene | PASS             | Final leak check found zero run-owned survivors.      |
+| Review threads   | PASS             | 0 threads; 0 unanswered on PR #1182.                  |
 
 ## Open Questions
 
 - P1 is resolved as explicit `FAIL` / qualified F1(b), with separate Fable approval.
 - P2 is resolved as explicit combined `FAIL`, with sound no-DB measurements and separate Fable
   approval; #1128 acceptance remains open because DB measurements are absent.
-- P3 is resolved as `PASS` with separate Fable approval; supervisor integration remains.
+- P3 is resolved as `PASS`, separately Fable-approved, committed, and synchronized to #1129.
+- Final leak and review-thread gates pass; formal IMPL-EVAL is the remaining merge-readiness gate.
 - Evaluator credential availability is resolved: the parser-backed live canary passed with tools,
   reasoning, and streaming supported.
 
