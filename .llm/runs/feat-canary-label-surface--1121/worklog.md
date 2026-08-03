@@ -67,6 +67,7 @@ post-publish step in `.github/workflows/release-canary.yml`.
 | 2026-08-03 | plan | research | Read #1121/#1120 and the observed 0.0.4 trace; re-baselined clean branch at `0b05217cc`. |
 | 2026-08-03 | plan | design | Locked two thin implementation slices and explicit external live-cut dependency. |
 | 2026-08-03 | plan-eval | launch blocked | Canonical Qwen route resolved, but approved child credential injection returned `auth_required`; no evaluator/model turn ran. |
+| 2026-08-03 | plan-eval | owner waiver | Owner waived the blocked gate on-record under #1087's evaluator-helper safety finding and directed implementation now. |
 
 ## Decisions
 
@@ -89,7 +90,7 @@ post-publish step in `.github/workflows/release-canary.yml`.
 
 | Gate | Command or check | Result | Notes |
 | --- | --- | --- | --- |
-| PLAN-EVAL | separate local open-model evaluator | NOT_RUN | Launch blocked before model start: OpenRouter credential absent. Hard stop remains in force. |
+| PLAN-EVAL | separate local open-model evaluator | NOT_RUN / WAIVED | Launch blocked before model start. Owner explicitly waived the gate under #1087; no PASS is claimed. |
 
 ### Fitness Gates
 
@@ -116,3 +117,4 @@ post-publish step in `.github/workflows/release-canary.yml`.
 - No implementation file has been changed before PLAN-EVAL.
 - The first canonical evaluator launch was blocked before a session existed; do not treat route
   validation or provider-canary output as a verdict.
+- Implementation is authorized by the owner's written waiver, not by evaluator evidence.

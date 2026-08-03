@@ -6,15 +6,15 @@
 | --- | --- |
 | Run ID | `feat-canary-label-surface--1121` |
 | Branch | `feat/canary-label-surface` |
-| Current phase | `plan-eval` (blocked before launch) |
+| Current phase | `implement` (Plan-Gate explicitly waived) |
 | Archetype | N/A — internal release tooling |
 | Scope overlays | none |
 
 ## Current State
 
-Research and Design are complete against clean `origin/main` at `0b05217cc`. No implementation has
-started. The canonical separate-session PLAN-EVAL route resolved, but the isolated evaluator child
-could not start because no OpenRouter credential is available. The hard stop remains active.
+Research and Design are complete against clean `origin/main` at `0b05217cc`. The canonical
+separate-session PLAN-EVAL route could not start. The owner explicitly waived that gate under
+#1087's safety precedent and authorized immediate implementation; no PLAN-EVAL PASS is claimed.
 
 ## Completed
 
@@ -25,15 +25,13 @@ could not start because no OpenRouter credential is available. The hard stop rem
 
 ## In Progress
 
-- Awaiting owner-authorized recovery of the blocked formal evaluator launch.
+- Slice 1: machine-readable canary identity.
 
 ## Next Steps
 
-1. Make `OPENROUTER_API_KEY` available to the approved local evaluator child, or obtain an explicit
-   owner-authorized fallback/waiver.
-2. Run PLAN-EVAL in a separate bound Qwen session.
-3. On PASS only, launch slice 1 in the tracked Codex implementation thread.
-4. Review, sign off, push, and comment before slice 2.
+1. Implement slice 1 under the recorded owner waiver.
+2. Run opposite-family review, supervisor sign-off, push, and PR evidence comment.
+3. Implement and independently review slice 2.
 
 ## Key Decisions
 
@@ -61,14 +59,12 @@ could not start because no OpenRouter credential is available. The hard stop rem
 
 ## Open Questions
 
-- Blocking process question: local OpenRouter credential, explicit open-model cloud fallback, or
-  written PLAN-EVAL waiver.
 - Live canary evidence remains an operational prerequisite for final close-gate readiness.
 
 ## Drift and Debt
 
 - Drift: sibling-checkout trace location; Codex entry supervisor route; formal evaluator credential
-  unavailable.
+  unavailable and owner-waived under #1087.
 - Debt: none.
 
 ## Commits

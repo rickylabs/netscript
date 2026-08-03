@@ -41,3 +41,20 @@ Drift is append-only.
   or explicitly waive PLAN-EVAL.
 - **Evidence:** launch at `2026-08-03T15:29:29+02:00`; no `plan-eval.md` was written and no source
   implementation file was changed.
+
+## 2026-08-03 — Owner waives Plan-Gate after #1087 safety finding
+
+- **What:** The owner explicitly waived PLAN-EVAL and directed immediate implementation, acting as
+  the opposite-family reviewer of Codex-authored work.
+- **Source:** owner instruction in the Codex session, 2026-08-03; #1087 precedent.
+- **Expected:** bound local open-model Qwen formal evaluator before implementation.
+- **Actual:** the lane remains credential-blocked by design because #1087 observed an evaluator
+  autonomously spawning prohibited closed-model helpers; the route guard constrains only the
+  launched route, not helpers the model launches. Re-enabling it would make paid-model leakage
+  reachable again.
+- **Severity:** significant process override; no product-scope change.
+- **Action:** accept the explicit written Plan-Gate waiver. Preserve generator/reviewer separation
+  through opposite-family slice review and final implementation review; do not describe the
+  blocked evaluator as having passed.
+- **Evidence:** this drift entry, the owner message, and the PR #1122 phase trail. Same stated waiver
+  precedent: PRs #1075, #1088, and #1091.
