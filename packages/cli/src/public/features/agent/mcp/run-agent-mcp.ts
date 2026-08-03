@@ -8,6 +8,7 @@ import {
   CliProjectDoctor,
   PublicCliCommandCatalog,
 } from "./cli-mcp-adapters.ts";
+import { EMBEDDED_SKILL_FILES } from "../../../../kernel/assets/skills.generated.ts";
 
 /** Start the batteries-included MCP server with real CLI adapters. */
 export async function runAgentMcp(
@@ -44,5 +45,6 @@ export function createAgentMcpOptions(
     projectDoctor: new CliProjectDoctor(
       dependencies.pluginDoctorDependencies.doctor,
     ),
+    embeddedDocs: [{ slug: "help", source: EMBEDDED_SKILL_FILES["help.md"] }],
   };
 }

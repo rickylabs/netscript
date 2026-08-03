@@ -8,6 +8,7 @@ import { initAgent } from "./init/init-agent.ts";
 import { createInitAgentCommand } from "./init/init-agent-command.ts";
 import { createAgentMcpCommand } from "./mcp/agent-mcp-command.ts";
 import { runAgentMcp } from "./mcp/run-agent-mcp.ts";
+import { createRecordDriftCommand } from "./drift/record-drift-command.ts";
 
 /** Create the public agent tooling command group. */
 export function createAgentCommand(
@@ -35,5 +36,14 @@ export function createAgentCommand(
         projectRoot: host.cwd,
         init: (input) => initAgent(input, { fs, aspireAgentInitializer }),
       }),
+    )
+    .command(
+      "drift",
+      new Command()
+        .description("Manage evidence-gated agent drift records")
+        .action(function () {
+          this.showHelp();
+        })
+        .command("record", createRecordDriftCommand(host.cwd)),
     );
 }

@@ -9,7 +9,8 @@ import { createAgentMcpOptions } from "./run-agent-mcp.ts";
 import { createPublicCommandDependencies } from "../../root/public-command-dependencies.ts";
 
 Deno.test("agent MCP adapters expose real verbs and non-stub plugin doctor results", async () => {
-  const root = Deno.cwd();
+  const root = await Deno.makeTempDir({ prefix: "netscript-cli-mcp-adapters-" });
+  try {
   const dependencies = createPublicCommandDependencies({
     cwd: () => root,
     resolvePath: (path?: string) => path ?? root,
@@ -43,7 +44,7 @@ Deno.test("agent MCP adapters expose real verbs and non-stub plugin doctor resul
     },
   };
   const server = createMcpCliServer({
-    projectRoot: Deno.cwd(),
+    projectRoot: root,
     commandCatalog: catalog,
     commandExecutor: executor,
     projectDoctor: doctor,
@@ -118,5 +119,8 @@ Deno.test("agent MCP adapters expose real verbs and non-stub plugin doctor resul
   assertStringIncludes(doctorText, "plugins_additional_checks");
   if (doctorText.includes("not wired")) {
     throw new Error("doctor used the unwired project stub");
+  }
+  } finally {
+    await Deno.remove(root, { recursive: true });
   }
 });

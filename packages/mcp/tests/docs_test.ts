@@ -117,6 +117,27 @@ Deno.test('CLI composition defaults list, search, and get to package-shipped doc
   assertEquals((get?.result?.structuredContent as { slug: string }).slug, 'mcp');
 });
 
+Deno.test('CLI composition makes installed help symptoms reachable through MCP docs', async () => {
+  const server = createMcpCliServer({
+    projectRoot: fixtureRoot,
+    embeddedDocs: [{
+      slug: 'help',
+      source: '# Help\n\n## Healthy is not proof\n\nA hang can leave a dangling AppHost.',
+    }],
+  });
+  for (const query of ['Healthy is not proof', 'hang', 'dangling AppHost']) {
+    const response = await server.handle({
+      jsonrpc: '2.0',
+      id: query,
+      method: 'tools/call',
+      params: { name: 'search_docs', arguments: { query } },
+    });
+    const matches =
+      (response?.result?.structuredContent as { matches: Array<{ slug: string }> }).matches;
+    assert(matches.some((match) => match.slug === 'help'));
+  }
+});
+
 Deno.test('missing explicit docs root returns path and --docs-root remediation', async () => {
   const missingRoot = new URL('./fixtures/docs-not-present', import.meta.url).pathname;
   const server = createMcpCliServer({ projectRoot: fixtureRoot, docsRoot: missingRoot });

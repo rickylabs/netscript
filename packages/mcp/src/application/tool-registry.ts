@@ -22,6 +22,7 @@ const kinds: Readonly<Record<ToolName, ToolKind>> = {
   get_doc: 'read',
   list_commands: 'meta',
   execute_command: 'mutate',
+  record_drift: 'mutate',
 };
 const summaries: Readonly<Record<ToolName, string>> = {
   get_app_status: 'Summarize NetScript app health.',
@@ -38,6 +39,8 @@ const summaries: Readonly<Record<ToolName, string>> = {
   list_commands: 'List bounded CLI command descriptors from the injected command catalog.',
   execute_command:
     'Execute one CLI command through an explicit allowlist gate and return only a bounded combined output tail.',
+  record_drift:
+    'Record drift only after a fresh successful diagnostic receipt for the same resource.',
 };
 
 /** Build the immutable enumerable v1 tool registry. */

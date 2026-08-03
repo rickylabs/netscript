@@ -54,6 +54,15 @@ export async function writeExampleServiceAppFiles(
     ? appExampleServiceSummaryPanelTemplate
     : appExampleServiceSummaryPanelMemoryTemplate;
   await write(
+    join(input.serviceExampleDir, 'README.md'),
+    `# Example service screen
+
+Copy the architecture: contract-derived query factories, \`definePage\` layers, the server/island boundary, typed query and mutation options, partial refresh, and telemetry flow.
+
+Delete or replace the sample data: example records, labels, statuses, notes, and demonstration-only controls are placeholders for your domain.
+`,
+  );
+  await write(
     join(input.libDir, 'example-service.ts'),
     await context.templateAdapter.render(appExampleServiceTemplate, appTemplateVars),
   );

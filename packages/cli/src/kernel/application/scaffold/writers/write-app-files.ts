@@ -16,6 +16,10 @@ import { adjustLocalBase } from '../support/helpers.ts';
 import { createScaffoldPlan } from '../../../domain/scaffold/scaffold-plan.ts';
 import { generateRouteManifestSeed, generateRoutesSeed } from './app-route-seeds.ts';
 import { writeExampleServiceAppFiles } from './write-example-service-app-files.ts';
+import {
+  buildAppAgentsMarkdown,
+  buildWebLayerMarkdown,
+} from '../../../templates/app/agent-conventions.ts';
 
 export async function writeNormalizedAppFiles(
   context: InitPipelineContext,
@@ -119,6 +123,12 @@ export async function writeNormalizedAppFiles(
   const telemetryExampleDir = join(examplesRoutesDir, 'telemetry');
   const telemetryExampleComponentsDir = join(telemetryExampleDir, '(_components)');
   const telemetryExampleSharedDir = join(telemetryExampleDir, '(_shared)');
+  const conventionsInput = {
+    appName: options.appName,
+    dbEngine: options.dbEngine,
+    includeExampleService: options.includeExampleService,
+    serviceName: options.serviceName,
+  };
 
   await createDir(routesDir);
   await createDir(examplesRoutesDir);
@@ -163,6 +173,8 @@ export async function writeNormalizedAppFiles(
     jsrResolver: context.jsrResolver,
   });
   await write(appDenoJsonPath, appDenoJson);
+  await write(join(appDir, 'AGENTS.md'), buildAppAgentsMarkdown(conventionsInput));
+  await write(join(appDir, 'WEB-LAYER.md'), buildWebLayerMarkdown(conventionsInput));
   await write(
     join(appDir, SCAFFOLD_FILES.TSCONFIG_APP),
     generateAppTsConfig(),

@@ -97,7 +97,9 @@ Deno.test('agent mcp real CLI stdio smoke', async () => {
     for (const response of responses) assertEquals(response.error, undefined);
 
     assertEquals(responses[0].result?.serverInfo?.name, '@netscript/mcp');
-    assertEquals(responses[1].result?.tools?.length, 13);
+    const tools = responses[1].result?.tools ?? [];
+    assertEquals(tools.length, 14);
+    assert(tools.some((tool) => tool.name === 'record_drift'));
 
     const doctor = responses[2].result?.structuredContent;
     assert(doctor);

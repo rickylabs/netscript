@@ -89,7 +89,7 @@ const inputShapes: Record<ToolName, Readonly<Record<string, unknown>>> = {
     sinceUnixMs: { type: 'number' },
     limit: limitProperty,
   }),
-  doctor: objectSchema({ endpoint: stringProperty }),
+  doctor: objectSchema({ endpoint: stringProperty, resource: stringProperty }),
   search_docs: objectSchema({ query: stringProperty, limit: searchLimitProperty }, ['query']),
   list_docs: objectSchema({ limit: limitProperty }),
   get_doc: objectSchema({ slug: stringProperty, section: stringProperty }, ['slug']),
@@ -98,6 +98,11 @@ const inputShapes: Record<ToolName, Readonly<Record<string, unknown>>> = {
     command: stringProperty,
     args: { type: 'array', items: stringProperty, maxItems: 32 },
   }, ['command']),
+  record_drift: objectSchema({
+    resource: stringProperty,
+    summary: stringProperty,
+    details: stringProperty,
+  }, ['resource', 'summary']),
 };
 
 const outputShapes: Record<ToolName, Readonly<Record<string, unknown>>> = {
@@ -228,6 +233,11 @@ const outputShapes: Record<ToolName, Readonly<Record<string, unknown>>> = {
     truncated: { type: 'boolean' },
     timedOut: { type: 'boolean' },
   }, ['exitCode', 'durationMs', 'outputTail', 'truncated', 'timedOut']),
+  record_drift: objectSchema({
+    recorded: { type: 'boolean' },
+    resource: stringProperty,
+    receipt: { type: 'object' },
+  }, ['recorded', 'resource', 'receipt']),
 };
 
 /** Standard-Schema input contracts for the complete v1 tool surface. */
