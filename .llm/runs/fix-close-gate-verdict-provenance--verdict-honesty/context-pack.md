@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `fix-close-gate-verdict-provenance--verdict-honesty` |
 | Branch | `fix/close-gate-verdict-provenance` |
-| Current phase | `plan-eval` |
+| Current phase | `implement` |
 | Archetype | `N/A` — repository tooling |
 | Scope overlays | `none` |
 
@@ -14,9 +14,9 @@
 
 Research, plan, and Design checkpoint are complete against current `origin/main`. The chosen #1105
 convention is ENFORCE for unchecked PR Definition-of-Done/Acceptance boxes. No implementation work
-has begun. The canonical local Qwen evaluator canary is blocked because its isolated child
-environment has no OpenRouter credential; the next legal action is still separate-session
-PLAN-EVAL after owner/config resolution.
+has begun. The canonical local Qwen evaluator was unavailable, and milestone orchestrator decision
+D6 subsequently approved the locked plan and replaced per-PR local formal evaluation with the
+milestone-run composed evaluator/pre-merge surface.
 
 ## Completed
 
@@ -28,15 +28,14 @@ PLAN-EVAL after owner/config resolution.
 
 ## In Progress
 
-- Resolve the formal evaluator route. Draft PR #1181 and S0 are already pushed.
+- S1 code and tests are green locally; supervisor diff review and sign-off commit are next.
 
 ## Next Steps
 
-1. Owner/config selects one allowed resolution: provide local `OPENROUTER_API_KEY`, or explicitly
-   authorize conversion to a cloud-driven OpenHands Qwen evaluation run.
-2. Launch the separate PLAN-EVAL and accept only committed `plan-eval.md` as verdict source.
-3. On PASS, repair/establish the routed Codex implementation session and launch S1; otherwise repair
-   the plan or report the evaluator finding.
+1. Implement and validate S1, then supervisor-review and push its sign-off commit.
+2. Implement and validate S2, then supervisor-review and push its sign-off commit.
+3. Reconcile the live PR, run the composed review/pre-merge surfaces, and hand merge authority back
+   to the milestone orchestrator.
 
 ## Key Decisions
 
@@ -51,21 +50,22 @@ PLAN-EVAL after owner/config resolution.
 | Path | Status | Notes |
 | ---- | ------ | ----- |
 | `.llm/runs/fix-close-gate-verdict-provenance--verdict-honesty/**` | new | S0 harness artifacts only |
+| `.llm/tools/validation/check-close-gate.ts` | changed | provenance, stale comparison, PR DoD enforcement, pretty log |
+| `.llm/tools/validation/check-close-gate_test.ts` | changed | 7-test regression/negative suite |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | ----------- | -------------- | -------- |
 | Plan-Gate | pending | separate evaluator not yet run |
-| Static | baseline pass | existing targeted test 3/3 |
+| Static | PASS | targeted tests 7/7; scoped check/lint/fmt green over 2 files |
 | Fitness | N/A | repo-tooling scope |
 | Runtime | N/A | no service/scaffold/CLI runtime change |
 | Consumer | planned | parser tests + live PR |
 
 ## Open Questions
 
-- Which owner-authorized evaluator resolution should be used: configure local
-  `OPENROUTER_API_KEY`, or convert the evaluation to a cloud-driven OpenHands Qwen run?
+- None. Orchestrator decision D6 resolved the evaluator protocol for this slice.
 
 ## Drift and Debt
 

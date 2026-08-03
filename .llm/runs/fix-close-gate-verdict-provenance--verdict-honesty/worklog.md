@@ -70,6 +70,10 @@ heading in the shipped template.
 | 2026-08-03 | S0 | route check | Agentic runtime status blocked with `MISSING_IDENTITY`; no implementation launched. |
 | 2026-08-03 | S0 | design checkpoint | Locked ENFORCE convention and three implementation/readiness slices before PLAN-EVAL. |
 | 2026-08-03 | S0 | PLAN-EVAL launch | Local Qwen canary blocked with `auth_required`; no provider process launched and implementation remains stopped. |
+| 2026-08-03 | S1 | orchestrator steer | Milestone decision D6 waives per-PR local formal evaluation; locked plan approved and implementation authorized. |
+| 2026-08-03 | S1 | implementation | Added report provenance, issue snapshots/stale comparison, PR authoritative-section findings, and regression tests. |
+| 2026-08-03 | S1 | gate loop | First run exposed a fixture line-number error; corrected expected line 5→4. Scoped fmt then exposed import ordering; formatted only the two owned TS files. |
+| 2026-08-03 | S1 | reconcile | Issues #1171/#1105 remain open; PR #1181 remains draft with non-closing refs and `status:plan-eval` until code review/readiness. No unrelated changes or lock churn. |
 
 ## Decisions
 
@@ -78,6 +82,7 @@ heading in the shipped template.
 | Enforce only PR Definition-of-Done/Acceptance boxes | Matches owner decision and avoids false blockers from legitimate non-DoD lists | user contract, #1105, `netscript-pr` |
 | Additive report fields and PR findings | Preserve established issue pass/fail behavior | #1171 |
 | No implementation until separate evaluator PASS | Harness hard invariant | plan-gate |
+| Compose per-PR evaluation under milestone run | Explicit orchestrator waiver D6 | milestone-run.md + owner steer |
 
 ## Drift
 
@@ -92,14 +97,16 @@ heading in the shipped template.
 | Gate | Command or check | Result | Notes |
 | ---- | ---------------- | ------ | ----- |
 | Baseline targeted tests | `deno test .llm/tools/validation/check-close-gate_test.ts` | PASS | 3 passed, 0 failed before edits |
-| Scoped check/lint/fmt | planned wrapper commands | NOT_RUN | implementation hard stop |
+| Targeted behavior | `deno test .llm/tools/validation/check-close-gate_test.ts` | PASS | 7 passed, 0 failed |
+| Scoped type-check | `run-deno-check.ts` over 2 files | PASS | 0 occurrences; `--unstable-kv` wrapper default |
+| Scoped lint | `run-deno-lint.ts` over 2 files | PASS | exit 0, 0 occurrences; no ignores added |
+| Scoped format | `run-deno-fmt.ts` over 2 files | PASS | 0 findings after owned-file format |
 
 ### Fitness Gates
 
 | Gate | Result | Evidence | Notes |
 | ---- | ------ | -------- | ----- |
-| Plan-Gate | NOT_RUN | separate evaluator pending | hard stop |
-| Local evaluator route | BLOCKED | provider canary: credential absent, process not launched | owner/config action required |
+| Plan-Gate | composed per milestone-run.md (orchestrator waiver) | owner steer + drift D6 | wave-1 per-PR slice |
 | Framework/JSR fitness | N/A | repo-tooling scope | no `packages/**`/`plugins/**` |
 
 ### Runtime Gates
@@ -116,6 +123,6 @@ heading in the shipped template.
 
 ## Handoff Notes
 
-- PLAN-EVAL should inspect D1 (narrow authoritative headings), D5 (timestamp OR hash staleness),
+- Code review should inspect D1 (narrow authoritative headings), D5 (timestamp OR hash staleness),
   D6 (additive semantics), and the explicit issue-only `headSha` behavior.
-- No implementation files have been edited.
+- S2 must still align the shipped PR template and `netscript-pr` convention before readiness.

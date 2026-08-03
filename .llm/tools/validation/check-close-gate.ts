@@ -7,28 +7,50 @@ interface Options {
   overrideLabel: string;
 }
 
-interface GitHubIssue {
+export interface GitHubIssue {
   number: number;
   title: string;
   body: string | null;
+  updated_at: string;
 }
 
 interface GitHubPullRequest {
   number: number;
   title: string;
   body: string | null;
+  head: { sha: string };
 }
 
 interface GitHubIssueWithLabels {
   labels: Array<{ name?: string } | string>;
 }
 
-interface Finding {
+export interface Finding {
   issue: number;
   title: string;
   line: number;
   section: string;
   text: string;
+}
+
+export interface PrFinding {
+  pr: number;
+  title: string;
+  line: number;
+  section: string;
+  text: string;
+}
+
+export interface IssueSnapshot {
+  number: number;
+  updatedAt: string;
+  bodySha256: string;
+}
+
+export interface StaleIssue {
+  number: number;
+  evaluated: IssueSnapshot;
+  current: IssueSnapshot | null;
 }
 
 interface HeadingState {
@@ -37,15 +59,19 @@ interface HeadingState {
   relevant: boolean;
 }
 
-interface Report {
+export interface Report {
   gate: 'close-gate';
   ok: boolean;
   repo: string;
   pr?: number;
+  headSha: string | null;
+  evaluatedAt: string;
   overrideLabel: string;
   overrideActive: boolean;
   closingIssues: number[];
+  evaluatedIssues: IssueSnapshot[];
   findings: Finding[];
+  prFindings: PrFinding[];
   notes: string[];
 }
 
@@ -131,9 +157,13 @@ async function main(): Promise<void> {
   const notes: string[] = [];
   let issueNumbers = [...options.issues];
   let overrideActive = false;
+  let headSha = Deno.env.get('GITHUB_SHA') ?? null;
+  let prFindings: PrFinding[] = [];
 
   if (options.pr !== undefined) {
     const pr = await client.getPullRequest(options.pr);
+    headSha = pr.head.sha;
+    prFindings = findUncheckedPrBody(pr);
     issueNumbers = [...new Set([...issueNumbers, ...extractClosingIssues(pr.body ?? '')])].sort((
       a,
       b,
@@ -149,22 +179,28 @@ async function main(): Promise<void> {
 
   issueNumbers = [...new Set(issueNumbers)].sort((a, b) => a - b);
   const findings: Finding[] = [];
+  const evaluatedIssues: IssueSnapshot[] = [];
 
   for (const issueNumber of issueNumbers) {
     const issue = await client.getIssue(issueNumber);
+    evaluatedIssues.push(await snapshotIssue(issue));
     findings.push(...findUncheckedAcceptance(issue));
   }
 
-  const ok = overrideActive || findings.length === 0;
+  const ok = closeGatePasses(overrideActive, findings, prFindings);
   const report: Report = {
     gate: 'close-gate',
     ok,
     repo: options.repo,
     pr: options.pr,
+    headSha,
+    evaluatedAt: new Date().toISOString(),
     overrideLabel: options.overrideLabel,
     overrideActive,
     closingIssues: issueNumbers,
+    evaluatedIssues,
     findings,
+    prFindings,
     notes,
   };
 
@@ -259,7 +295,7 @@ function extractClosingIssues(body: string): number[] {
   return [...issues];
 }
 
-function findUncheckedAcceptance(issue: GitHubIssue): Finding[] {
+export function findUncheckedAcceptance(issue: GitHubIssue): Finding[] {
   const findings: Finding[] = [];
   const body = issue.body ?? '';
   const lines = body.split(/\r?\n/);
@@ -303,6 +339,80 @@ function findUncheckedAcceptance(issue: GitHubIssue): Finding[] {
   return findings;
 }
 
+/** Finds unchecked authoritative checkboxes in a pull request body. */
+export function findUncheckedPrBody(pr: GitHubPullRequest): PrFinding[] {
+  const findings: PrFinding[] = [];
+  const lines = (pr.body ?? '').split(/\r?\n/);
+  const headingStack: HeadingState[] = [];
+
+  for (let index = 0; index < lines.length; index++) {
+    const line = lines[index];
+    const heading = line.match(HEADING_PATTERN);
+    if (heading) {
+      const level = heading[1].length;
+      const title = stripMarkdown(heading[2]);
+      while (headingStack.length > 0 && headingStack[headingStack.length - 1].level >= level) {
+        headingStack.pop();
+      }
+      headingStack.push({ level, title, relevant: isAuthoritativePrSection(title) });
+    }
+
+    const checkbox = line.match(CHECKBOX_PATTERN);
+    if (!checkbox || checkbox[1].toLowerCase() === 'x') continue;
+    const relevantHeading = [...headingStack].reverse().find((entry) => entry.relevant);
+    if (!relevantHeading) continue;
+
+    findings.push({
+      pr: pr.number,
+      title: pr.title,
+      line: index + 1,
+      section: relevantHeading.title,
+      text: checkbox[2].trim(),
+    });
+  }
+
+  return findings;
+}
+
+/** Captures the GitHub issue-body identity carried by a close-gate verdict. */
+export async function snapshotIssue(issue: GitHubIssue): Promise<IssueSnapshot> {
+  const digest = await crypto.subtle.digest(
+    'SHA-256',
+    new TextEncoder().encode(issue.body ?? ''),
+  );
+  return {
+    number: issue.number,
+    updatedAt: issue.updated_at,
+    bodySha256: [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, '0')).join(
+      '',
+    ),
+  };
+}
+
+/** Returns evaluated issue snapshots that no longer match the current issue state. */
+export function findStaleIssues(
+  evaluatedIssues: readonly IssueSnapshot[],
+  currentIssues: readonly IssueSnapshot[],
+): StaleIssue[] {
+  const currentByNumber = new Map(currentIssues.map((issue) => [issue.number, issue]));
+  return evaluatedIssues.flatMap((evaluated) => {
+    const current = currentByNumber.get(evaluated.number) ?? null;
+    return current === null || current.updatedAt !== evaluated.updatedAt ||
+        current.bodySha256 !== evaluated.bodySha256
+      ? [{ number: evaluated.number, evaluated, current }]
+      : [];
+  });
+}
+
+/** Preserves the override while making PR-body Definition-of-Done findings additive. */
+export function closeGatePasses(
+  overrideActive: boolean,
+  issueFindings: readonly Finding[],
+  prFindings: readonly PrFinding[],
+): boolean {
+  return overrideActive || (issueFindings.length === 0 && prFindings.length === 0);
+}
+
 function stripMarkdown(value: string): string {
   return value.replaceAll('`', '').replace(/\s+/g, ' ').trim();
 }
@@ -315,6 +425,11 @@ function isRelevantSection(title: string): boolean {
     /\bgates?\b/.test(normalized);
 }
 
+function isAuthoritativePrSection(title: string): boolean {
+  const normalized = title.toLowerCase();
+  return normalized.includes('definition of done') || normalized.includes('acceptance');
+}
+
 function hasLabel(labels: GitHubIssueWithLabels['labels'], name: string): boolean {
   return labels.some((label) => (typeof label === 'string' ? label : label.name) === name);
 }
@@ -325,24 +440,43 @@ function printReport(report: Report, pretty: boolean): void {
     return;
   }
 
+  for (const line of formatPrettyReport(report)) console.log(line);
+}
+
+/** Formats the human-readable CI log with the same provenance as report JSON. */
+export function formatPrettyReport(report: Report): string[] {
+  const lines: string[] = [];
   const subject = report.pr === undefined ? report.repo : `${report.repo}#${report.pr}`;
-  console.log(`close-gate ${report.ok ? 'PASS' : 'FAIL'} ${subject}`);
+  lines.push(`close-gate ${report.ok ? 'PASS' : 'FAIL'} ${subject}`);
+  lines.push(`head SHA: ${report.headSha ?? 'null'}`);
+  lines.push(`evaluated at: ${report.evaluatedAt}`);
   if (report.overrideActive) {
-    console.log(`override: ${report.overrideLabel}`);
+    lines.push(`override: ${report.overrideLabel}`);
   }
   if (report.closingIssues.length === 0) {
-    console.log('closing issues: none');
+    lines.push('closing issues: none');
   } else {
-    console.log(`closing issues: ${report.closingIssues.map((issue) => `#${issue}`).join(', ')}`);
+    lines.push(`closing issues: ${report.closingIssues.map((issue) => `#${issue}`).join(', ')}`);
+  }
+  for (const issue of report.evaluatedIssues) {
+    lines.push(
+      `evaluated issue: #${issue.number} updatedAt=${issue.updatedAt} bodySha256=${issue.bodySha256}`,
+    );
   }
   for (const note of report.notes) {
-    console.log(`note: ${note}`);
+    lines.push(`note: ${note}`);
   }
   for (const finding of report.findings) {
-    console.log(
+    lines.push(
       `unchecked: #${finding.issue} line ${finding.line} [${finding.section}] ${finding.text}`,
     );
   }
+  for (const finding of report.prFindings) {
+    lines.push(
+      `unchecked PR body: #${finding.pr} line ${finding.line} [${finding.section}] ${finding.text}`,
+    );
+  }
+  return lines;
 }
 
 class GitHubClient {
