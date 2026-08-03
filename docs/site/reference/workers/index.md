@@ -158,7 +158,7 @@ contract helper before any KV write.
 | `triggerJob` | `POST /jobs/{id}/trigger` | `{ id, payload?, priority?, delay?, correlationId?, traceparent?, tracestate? }` | `{ jobId, triggered }` |
 | `triggerTask` | `POST /tasks/{id}/trigger` | `{ id, payload?, priority?, delay?, correlationId? }` | `{ taskId, triggered }` |
 
-See the [background-jobs capability page](/capabilities/background-jobs/#trigger-a-job-from-a-typed-client)
+See the [background-jobs capability page](/background-processing/workers/#trigger-a-job-from-a-typed-client)
 for the typed-client walkthrough.
 
 ### `@netscript/plugin-workers/scaffolding`

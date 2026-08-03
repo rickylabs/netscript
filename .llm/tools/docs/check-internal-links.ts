@@ -1,7 +1,8 @@
 /**
  * check-internal-links.ts — verify every internal `href` in a built docs site
  * resolves to an emitted page (or index directory), accounting for the site's
- * base path. Exits 1 and lists the offenders when any internal link is unresolved.
+ * base path and validating fragment anchors (#anchor). Exits 1 and lists the
+ * offenders when any internal link is unresolved.
  *
  * Perms: --allow-read (the built-site directory + `_config.ts`).
  *
@@ -19,7 +20,15 @@ const skippedSchemes = [
   'mailto:',
   'tel:',
   'javascript:',
+  'jsr:',
+  'npm:',
 ];
+
+export interface CheckInternalLinksResult {
+  internalLinkCount: number;
+  htmlFilesCount: number;
+  unresolved: Map<string, Set<string>>;
+}
 
 function printHelp(): void {
   console.log(
@@ -38,13 +47,9 @@ function printHelp(): void {
   );
 }
 
-if (import.meta.main) {
-  if (Deno.args.includes('--help') || Deno.args.includes('-h')) {
-    printHelp();
-    Deno.exit(0);
-  }
-
-  const rootArg = Deno.args[0] ?? 'docs/site/_site';
+export async function checkInternalLinks(
+  rootArg: string = 'docs/site/_site',
+): Promise<CheckInternalLinksResult> {
   const siteRoot = await absolutePath(rootArg);
   const siteRootPrefix = siteRoot.endsWith('/') ? siteRoot : `${siteRoot}/`;
 
@@ -78,9 +83,23 @@ if (import.meta.main) {
   const unresolved = new Map<string, Set<string>>();
   let internalLinkCount = 0;
 
+  const pageAnchors = new Map<string, Set<string>>();
+  const htmlContents = new Map<string, string>();
+
   for (const htmlFile of htmlFiles) {
     const html = await Deno.readTextFile(htmlFile);
-    const source = toSitePath(htmlFile);
+    const sourcePath = toSitePath(htmlFile);
+    htmlContents.set(sourcePath, html);
+    pageAnchors.set(sourcePath, extractAnchors(html));
+  }
+
+  for (const htmlFile of htmlFiles) {
+    const sourcePath = toSitePath(htmlFile);
+    const html = htmlContents.get(sourcePath)!;
+
+    const sourceDir = sourcePath.endsWith('/index.html')
+      ? sourcePath.slice(0, -'index.html'.length)
+      : sourcePath.slice(0, sourcePath.lastIndexOf('/') + 1) || '/';
 
     for (const href of hrefsIn(html)) {
       if (!isInternalLink(href)) {
@@ -89,22 +108,65 @@ if (import.meta.main) {
 
       internalLinkCount++;
 
-      const resolved = resolveInternalHref(href, basePath);
+      const resolved = resolveInternalHref(href, sourcePath, sourceDir, basePath);
       if (!resolved) {
-        addUnresolved(unresolved, source, href);
+        addUnresolved(unresolved, sourcePath, href);
         continue;
       }
 
-      if (!emittedFiles.has(resolved.filePath) && !indexDirectories.has(resolved.directoryPath)) {
-        addUnresolved(unresolved, source, href);
+      const { filePath, directoryPath, targetSitePath, fragment } = resolved;
+
+      const pageExists = hasExtension(targetSitePath)
+        ? (emittedFiles.has(filePath) || emittedFiles.has(targetSitePath))
+        : (indexDirectories.has(directoryPath) || emittedFiles.has(filePath) ||
+          emittedFiles.has(targetSitePath));
+      if (!pageExists) {
+        addUnresolved(unresolved, sourcePath, href);
+        continue;
+      }
+
+      if (fragment) {
+        const htmlKey = emittedFiles.has(filePath)
+          ? filePath
+          : (emittedFiles.has(targetSitePath) ? targetSitePath : null);
+        if (htmlKey && pageAnchors.has(htmlKey)) {
+          const anchors = pageAnchors.get(htmlKey)!;
+          let decodedFragment = fragment;
+          try {
+            decodedFragment = decodeURIComponent(fragment);
+          } catch {
+            // fallback if URI decoding fails
+          }
+          if (!anchors.has(fragment) && !anchors.has(decodedFragment)) {
+            addUnresolved(unresolved, sourcePath, href);
+          }
+        }
       }
     }
   }
 
-  if (unresolved.size > 0) {
+  return {
+    internalLinkCount,
+    htmlFilesCount: htmlFiles.length,
+    unresolved,
+  };
+}
+
+if (import.meta.main) {
+  if (Deno.args.includes('--help') || Deno.args.includes('-h')) {
+    printHelp();
+    Deno.exit(0);
+  }
+
+  const rootArg = Deno.args[0] ?? 'docs/site/_site';
+  const result = await checkInternalLinks(rootArg);
+
+  if (result.unresolved.size > 0) {
     console.error('Unresolved internal links:');
     for (
-      const [source, hrefs] of [...unresolved.entries()].sort(([a], [b]) => a.localeCompare(b))
+      const [source, hrefs] of [...result.unresolved.entries()].sort(([a], [b]) =>
+        a.localeCompare(b)
+      )
     ) {
       console.error(`  ${source}`);
       for (const href of [...hrefs].sort()) {
@@ -114,7 +176,9 @@ if (import.meta.main) {
     Deno.exit(1);
   }
 
-  console.log(`${internalLinkCount} internal links across ${htmlFiles.length} pages — all resolve`);
+  console.log(
+    `${result.internalLinkCount} internal links across ${result.htmlFilesCount} pages — all resolve`,
+  );
 }
 
 async function absolutePath(path: string): Promise<string> {
@@ -154,42 +218,91 @@ function hrefsIn(html: string): string[] {
   return hrefs;
 }
 
-function isInternalLink(href: string): boolean {
+export function isInternalLink(href: string): boolean {
   const normalized = href.trim().toLowerCase();
-  return href.startsWith('/') &&
+  return normalized.length > 0 &&
     !href.startsWith('//') &&
-    !normalized.startsWith('#') &&
     !skippedSchemes.some((scheme) => normalized.startsWith(scheme));
 }
 
-function resolveInternalHref(
+export function extractAnchors(html: string): Set<string> {
+  const anchors = new Set<string>();
+  const attributePattern = /\b(?:id|name)\s*=\s*(?:"([^"]+)"|'([^']+)'|([^\s>]+))/gi;
+  let match: RegExpExecArray | null;
+  while ((match = attributePattern.exec(html)) !== null) {
+    const val = match[1] ?? match[2] ?? match[3];
+    if (val) {
+      anchors.add(val);
+    }
+  }
+  return anchors;
+}
+
+export function resolveRelativePath(sourceDir: string, relativePath: string): string {
+  const stack = sourceDir.split('/').filter(Boolean);
+  const parts = relativePath.split('/');
+  for (const part of parts) {
+    if (part === '' || part === '.') continue;
+    if (part === '..') {
+      stack.pop();
+    } else {
+      stack.push(part);
+    }
+  }
+  const joined = stack.join('/');
+  const trailingSlash =
+    (relativePath.endsWith('/') || relativePath === '.' || relativePath.endsWith('/.')) ? '/' : '';
+  return `/${joined}${trailingSlash}`;
+}
+
+export function resolveInternalHref(
   href: string,
+  sourcePath: string,
+  sourceDir: string,
   basePath: string,
-): { filePath: string; directoryPath: string } | undefined {
-  let path = href.split('#', 1)[0].split('?', 1)[0];
+):
+  | { filePath: string; directoryPath: string; targetSitePath: string; fragment?: string }
+  | undefined {
+  const [pathAndQuery, fragment] = href.split('#', 2);
+  let rawPath = pathAndQuery.split('?', 1)[0].trim();
 
-  if (basePath !== '/' && (path === basePath.slice(0, -1) || path.startsWith(basePath))) {
-    path = path === basePath.slice(0, -1) ? '/' : `/${path.slice(basePath.length)}`;
+  if (basePath !== '/' && (rawPath === basePath.slice(0, -1) || rawPath.startsWith(basePath))) {
+    rawPath = rawPath === basePath.slice(0, -1) ? '/' : `/${rawPath.slice(basePath.length)}`;
   }
 
-  if (!path.startsWith('/')) {
-    return undefined;
+  let targetSitePath: string;
+  if (rawPath === '') {
+    targetSitePath = sourcePath;
+  } else if (rawPath.startsWith('/')) {
+    targetSitePath = rawPath;
+  } else {
+    targetSitePath = resolveRelativePath(sourceDir, rawPath);
   }
 
-  if (path === '/') {
-    return { filePath: '/index.html', directoryPath: '/' };
+  if (targetSitePath === '/') {
+    return { filePath: '/index.html', directoryPath: '/', targetSitePath, fragment };
   }
 
-  if (path.endsWith('/')) {
-    return { filePath: `${path}index.html`, directoryPath: path };
+  if (targetSitePath.endsWith('/')) {
+    return {
+      filePath: `${targetSitePath}index.html`,
+      directoryPath: targetSitePath,
+      targetSitePath,
+      fragment,
+    };
   }
 
-  if (hasExtension(path)) {
-    const directoryPath = path.slice(0, path.lastIndexOf('/') + 1) || '/';
-    return { filePath: path, directoryPath };
+  if (hasExtension(targetSitePath)) {
+    const directoryPath = targetSitePath.slice(0, targetSitePath.lastIndexOf('/') + 1) || '/';
+    return { filePath: targetSitePath, directoryPath, targetSitePath, fragment };
   }
 
-  return { filePath: `${path}/index.html`, directoryPath: `${path}/` };
+  return {
+    filePath: `${targetSitePath}/index.html`,
+    directoryPath: `${targetSitePath}/`,
+    targetSitePath,
+    fragment,
+  };
 }
 
 function hasExtension(path: string): boolean {
