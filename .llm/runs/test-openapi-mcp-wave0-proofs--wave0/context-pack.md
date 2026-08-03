@@ -2,68 +2,76 @@
 
 ## Run Metadata
 
-| Field | Value |
-| --- | --- |
-| Run ID | `test-openapi-mcp-wave0-proofs--wave0` |
-| Branch | `test/openapi-mcp-wave0-proofs` |
-| Current phase | research |
-| Archetype | N/A — proof/measurement slice |
-| Scope overlays | service |
+| Field          | Value                                  |
+| -------------- | -------------------------------------- |
+| Run ID         | `test-openapi-mcp-wave0-proofs--wave0` |
+| Branch         | `test/openapi-mcp-wave0-proofs`        |
+| Current phase  | implementation                         |
+| Archetype      | N/A — proof/measurement slice          |
+| Scope overlays | service                                |
 
 ## Current State
 
-The clean proof branch is rebased exactly to current `origin/main`. Required issues and RFC sections
-are read. Aspire 13.4 exposes a plausible TypeScript post-allocation callback, but no P1/P2/P3
-experiment has run and no verdict is implied. The harness Plan-Gate remains closed.
+Research and Design are locked at D1–D12. Separate Qwen PLAN-EVAL passed. No P1/P2/P3 experiment or
+verdict exists and no outcome is implied. Draft PR #1182 is open with the required labels/milestone
+and no closing keywords. Implementation may begin only in the separate tracked Codex lane.
 
 ## Completed
 
-- Required skill / harness / doctrine / RFC / issue reading.
+- Required skills, issue bodies, epic, RFC §§4/9, doctrine, harness, source, and Aspire API reading.
 - Current-main re-baseline and shared-host inventory.
-- Initial source and official Aspire API research.
+- Harness bootstrap commit/push, draft PR #1182, and research phase comment.
+- Locked plan, Design checkpoint, measurement schemas, commit slices, and gate set.
+- Separate Qwen 3.7 Max/high `plan-eval.md` with `PASS`.
 
 ## In Progress
 
-- Locking the proof design, exact measurement methods, and gate set.
+- S0 sign-off commit/push and draft-PR Plan/PLAN-EVAL reporting.
 
 ## Next Steps
 
-1. Complete `research.md`, `plan.md`, and the `## Design` checkpoint.
-2. Commit/push the plan state and obtain separate-session PLAN-EVAL `PASS`.
-3. Launch one tracked implementation thread and serialize P1, P2, then P3.
+1. Commit/push S0 and post the plan / plan-eval phase comments.
+2. Launch one tracked Codex implementation thread from `implement.md`.
+3. Serialize S1–S3 with Fable review and supervisor sign-off after each.
 
 ## Key Decisions
 
-| Decision | Source | Notes |
-| --- | --- | --- |
-| No `packages/**` changes | User contract / doctrine boundary | Productization belongs to #1133 and later waves. |
-| P1 is not pre-decided | RFC §9 / #1127 | Only measured verdict selects F1(a) or F1(b). |
-| Foreign resources are immutable | Shared-host hazard | Exact-path targeting and ownership proof only. |
+| Decision                               | Source                            | Notes                                            |
+| -------------------------------------- | --------------------------------- | ------------------------------------------------ |
+| No `packages/**` changes               | User contract / doctrine boundary | Productization belongs to #1133 and later waves. |
+| P1 is not pre-decided                  | RFC §9 / #1127                    | Only measured evidence selects F1(a) or F1(b).   |
+| Two owned scaffolds run serially       | #1128 / shared-host hazard        | SQLite P1/P2 first, no-DB P2 second.             |
+| Incomplete/skipped is FAIL             | RFC §4 / user contract            | Never represent a missing proof as pass.         |
+| Formal evaluation stays Qwen/open-only | Harness lane policy               | No closed-model or supervisor fallback.          |
 
 ## Files Changed
 
-| Path | Status | Notes |
-| --- | --- | --- |
-| `.llm/runs/test-openapi-mcp-wave0-proofs--wave0/` | new | Harness bootstrap only. |
+| Path                                              | Status       | Notes                                                   |
+| ------------------------------------------------- | ------------ | ------------------------------------------------------- |
+| `.llm/runs/test-openapi-mcp-wave0-proofs--wave0/` | modified/new | Harness research, plan/design, prompts, and drift only. |
 
 ## Gates
 
-| Gate family | Current status | Evidence |
-| --- | --- | --- |
-| Plan-Gate | NOT_RUN | Plan/design still being completed. |
-| Static | NOT_RUN | No implementation. |
-| Runtime | NOT_RUN | No experiment started. |
-| Resource hygiene | initial inventory only | Foreign resources listed; no mutation. |
+| Gate family      | Current status          | Evidence                                 |
+| ---------------- | ----------------------- | ---------------------------------------- |
+| Plan-Gate        | PASS                    | Separate Qwen verdict in `plan-eval.md`. |
+| Static           | NOT_RUN                 | No implementation.                       |
+| Runtime          | NOT_RUN                 | No experiment started.                   |
+| Resource hygiene | baseline inventory only | Foreign resources listed; no mutation.   |
 
 ## Open Questions
 
-- P1, P2, and P3 measured outcomes remain open by design.
+- P1/P2/P3 measured values remain open by design; their decision rules are locked.
+- Evaluator credential availability is resolved: the parser-backed live canary passed with tools,
+  reasoning, and streaming supported.
 
 ## Drift and Debt
 
-- Drift: supervisor route override and stale overlay read paths recorded in `drift.md`.
+- Drift: supervisor route override, stale overlay read paths, and resolved first-canary credential
+  inheritance recorded in `drift.md`.
 - Debt: none.
 
 ## Commits
 
-- See the draft PR's commit list + per-slice PR comments.
+- `b0be3673e57cfcd70388f5dffb2080799017356a` — harness bootstrap / draft-PR seed.
+- See the draft PR's commit list + per-slice PR comments for subsequent sign-off commits.
