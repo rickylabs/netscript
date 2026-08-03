@@ -56,3 +56,16 @@ Drift is append-only.
 - **Severity:** significant
 - **Action:** accept
 - **Evidence:** Live RED is queued; foreign host/resources are not stopped or mutated.
+
+## 2026-08-04 — Fixed detached AppHost also exited after readiness
+
+- **What:** The fixed scaffold's generated `aspire:start` reported dashboard URL and PID, but the
+  detached process exited immediately after the tool-owned PTY closed; `aspire ps` returned `[]`.
+- **Source:** `.aspire/logs/cli_20260803T224949373_detach-child_55c594f1afb1432d8efc3732c85130cf.log`
+  ends at the AppHost startup-readiness notification and contains no application resource output.
+- **Expected:** The detached AppHost remains alive for resource inspection.
+- **Actual:** No host survived, so the successful CLI exit is deliberately not counted as health or
+  runtime evidence.
+- **Severity:** minor
+- **Action:** accept
+- **Evidence:** Retry will keep an attached PTY alive while all owner-protocol evidence is collected.

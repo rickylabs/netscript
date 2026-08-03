@@ -59,7 +59,11 @@ semantic install-artifact assertions live in the adjacent `resources.test.ts`.
 | 2026-08-04 | 0 | plan lock | Decisions D1–D5 locked; formal PLAN-EVAL composed per milestone waiver. |
 | 2026-08-04 | 1 | emitted-glue RED | Added a semantic assertion over the collected `sagas/runtime.ts`; focused test failed exactly because Redis registration is absent. |
 | 2026-08-04 | 1 | real scaffold created | Local CLI created `.llm/tmp/1184-red/saga-kv-red` with Postgres/default Redis cache and installed the sagas plugin; emitted runtime was inspected. |
+| 2026-08-04 | 1 | real runtime RED | Executing that generated runtime with the scaffold's default `CACHE_PROVIDER=redis` failed in `openSagaRuntimeKv` with `KvConnectionError` before the runner could start. |
 | 2026-08-04 | 1 | AppHost queued | A sibling #1191 AppHost acquired the shared slot after preflight; it is foreign and was left untouched. |
+| 2026-08-04 | 2 | stub GREEN | Added the package-owned Redis registration import before the runner import; the focused emitted-glue test passed. |
+| 2026-08-04 | 2 | green scaffold created | Local CLI created `.llm/tmp/1184-green/saga-kv-green`; regenerated `sagas/runtime.ts` contains the registration import before the runner. |
+| 2026-08-04 | 2 | Deno-KV compatibility | The green generated project selected `CACHE_PROVIDER=denokv`, wrote and read a KV value successfully while the Redis registration module was loaded. |
 
 ## Decisions
 
@@ -89,6 +93,7 @@ semantic install-artifact assertions live in the adjacent `resources.test.ts`.
 | --- | --- | --- | --- |
 | Public-surface baseline | `deno task doc:lint --root plugins/sagas --pretty` | BASELINE | 15 existing private-type refs, 0 missing JSDoc; no planned export change. |
 | Generated-glue RED | `deno test --allow-all .../resources.test.ts --filter "registers Redis before"` | EXPECTED_FAIL | Exit 1; 0 passed, 1 failed. |
+| Generated-glue GREEN | same focused command after the stub fix | PASS | `1 passed | 0 failed | 4 filtered out`. |
 
 ### Fitness Gates
 
@@ -102,13 +107,15 @@ semantic install-artifact assertions live in the adjacent `resources.test.ts`.
 | --- | --- | --- | --- |
 | Shared-host preflight | PASS | `aspire ps --format Json` → `[]` | No AppHost/scaffold run active. |
 | Fresh scaffold artifact | PASS | `.llm/tmp/1184-red/saga-kv-red/sagas/runtime.ts` inspected | Real CLI scaffold; source lacks adapter registration and imports only the runner. |
-| Unfixed AppHost RED | QUEUED | foreign AppHost `/home/codex/repos/ns005-ffi/.../apphost.mts` | One-AppHost rule; no foreign mutation. |
+| Unfixed generated runtime RED | PASS | actual generated `sagas/runtime.ts` stack | `KvConnectionError` thrown from `getKv` → `openSagaRuntimeKv` → runner startup. |
+| Fixed generated artifact | PASS | `.llm/tmp/1184-green/saga-kv-green/sagas/runtime.ts` inspected | Registration precedes runner import. |
+| Fixed AppHost lifecycle | QUEUED | detached host did not persist; no health claim made | Retry in an attached PTY after an empty shared-host preflight. |
 
 ### Consumer Gates
 
 | Consumer | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| Fresh generated scaffold | NOT_RUN | pending slices 1–3 | Must be real local scaffold. |
+| Fresh generated scaffold | IN_PROGRESS | RED and GREEN artifacts plus Deno-KV compatibility captured | AppHost lifecycle/OTEL/restart remain. |
 
 ## Owner Protocol Evidence
 
@@ -152,6 +159,53 @@ FAILED | 0 passed | 1 failed | 4 filtered out
 ```
 
 This is the intended RED: it exercises the collected install artefact, not the saga engine.
+
+### Step 5b — RED fresh generated runtime
+
+The real scaffold's generated runtime was executed with the same provider selection its AppHost
+generates:
+
+```text
+CACHE_PROVIDER=redis REDIS_URI=redis://127.0.0.1:6379 deno run \
+  --minimum-dependency-age=0 --node-modules-dir=none --unstable-worker-options \
+  --unstable-kv --allow-all sagas/runtime.ts
+```
+
+The command exited 1, and the output—not the exit code—identified the shipped failure path:
+
+```text
+KvConnectionError: Redis/Garnet was selected but no Redis adapter is registered. Import
+"@netscript/kv/redis" (or call registerRedisKvAdapter()) before opening KV.
+    at initializeKv (.../packages/kv/src/shared.ts:130:13)
+    at getKv (.../packages/kv/src/shared.ts:158:20)
+    at openSagaRuntimeKv (.../packages/plugin-sagas-core/src/runtime/kv-runtime.ts:20:16)
+    at SagaRuntimeSupervisor.start (.../runtime/supervisor.ts:110:27)
+    at startSagaRunner (.../runtime/runner.ts:103:20)
+    at runSagaRunner (.../runtime/runner.ts:121:25)
+    at .../sagas/runtime.ts:9:3
+```
+
+### Step 1b — GREEN fresh generated artefact
+
+The fixed local-source scaffold regenerated the user-facing file with package-owned registration
+before runner startup:
+
+```ts
+import '@netscript/kv/redis';
+import { runSagaRunner } from '@netscript/plugin-sagas/runtime';
+```
+
+### Compatibility — generated glue with `CACHE_PROVIDER=denokv`
+
+From the fixed generated project, a real Deno-KV open/write/read was performed while the Redis
+registration import was loaded. The inspected value was:
+
+```text
+{"value":"denokv"}
+```
+
+This proves the side-effect import registers a capability without overriding explicit provider
+selection.
 
 ## Handoff Notes
 

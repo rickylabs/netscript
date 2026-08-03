@@ -13,6 +13,7 @@ export const runtimeGlueStub: StubSource<never> = defineStub({
     ' * @module',
     ' */',
     '',
+    "import '@netscript/kv/redis';",
     "import { runSagaRunner } from '@netscript/plugin-sagas/runtime';",
     '',
     'if (import.meta.main) {',
