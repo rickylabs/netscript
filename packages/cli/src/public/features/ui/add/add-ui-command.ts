@@ -23,15 +23,33 @@ export function createUiAddCommand(
   const print = dependencies.print ?? outputText;
   return new Command()
     .name("ui:add")
-    .description("Add a Fresh page, island, registry item, or collection")
+    .description(
+      "Scaffold the Fresh page + island + query-loader triad for a data screen, or copy an app-owned UI registry item",
+    )
+    .example(
+      "Data-screen triad",
+      "netscript ui:add page incidents --island\nCreates one data-screen unit: typed page route + colocated hydrating island + query loader. Use it when a route will load data and hydrate an interactive region.",
+    )
+    .example(
+      "Registry item",
+      "netscript ui:add data-table\nUse a registry item when the route already exists and you only need an app-owned component and its styles.",
+    )
     .arguments("<kind:string> [name:string]")
     .option("--project-root <path:string>", "Project root directory")
     .option("--registry-root <path:string>", "Fresh UI package root override")
     .option("--theme <name:string>", "Theme registry item (defaults to the official theme)")
     .option("--force", "Overwrite existing copied UI files", { default: false })
-    .option("--route <id:string>", "Typed route id override")
-    .option("--island", "Add a colocated hydrating island", { default: false })
-    .option("--query", "Use the query-aware island template", { default: false })
+    .option("--route <id:string>", "Override the generated page's typed route id")
+    .option(
+      "--island",
+      "For page scaffolds, add the colocated hydrating island and query-loader parts of the triad",
+      { default: false },
+    )
+    .option(
+      "--query",
+      "For island scaffolds, generate a QueryIsland-based surface for contract-derived queries",
+      { default: false },
+    )
     .action(async (options: UiAddCommandInput & { route?: string; island?: boolean; query?: boolean }, kind: string, name?: string): Promise<void> => {
       const projectRoot = await requireProjectRoot(
         dependencies.resolveProjectRoot,
