@@ -74,6 +74,9 @@ heading in the shipped template.
 | 2026-08-03 | S1 | implementation | Added report provenance, issue snapshots/stale comparison, PR authoritative-section findings, and regression tests. |
 | 2026-08-03 | S1 | gate loop | First run exposed a fixture line-number error; corrected expected line 5→4. Scoped fmt then exposed import ordering; formatted only the two owned TS files. |
 | 2026-08-03 | S1 | reconcile | Issues #1171/#1105 remain open; PR #1181 remains draft with non-closing refs and `status:plan-eval` until code review/readiness. No unrelated changes or lock churn. |
+| 2026-08-03 | S2 | implementation | Renamed the shipped authoritative template section to Definition of Done and documented the narrow authority rule in `netscript-pr`. |
+| 2026-08-03 | S2 | reconcile | Template, skill, and parser agree: DoD/Acceptance unchecked boxes block; Slices and unrelated lists do not. Decision D1 is now shipped with its negative fixture. |
+| 2026-08-03 | S2 | validation | Combined validator + CI-classifier tests passed 57/57; TS scoped wrappers passed. Markdown whole-file fmt reported two pre-existing unrelated lines, so no broad prose reformat was applied. |
 
 ## Decisions
 
@@ -101,6 +104,9 @@ heading in the shipped template.
 | Scoped type-check | `run-deno-check.ts` over 2 files | PASS | 0 occurrences; `--unstable-kv` wrapper default |
 | Scoped lint | `run-deno-lint.ts` over 2 files | PASS | exit 0, 0 occurrences; no ignores added |
 | Scoped format | `run-deno-fmt.ts` over 2 files | PASS | 0 findings after owned-file format |
+| Combined targeted tests | validator + CI classifier test files | PASS | 57 passed, 0 failed |
+| Owned prose diff | `git diff --check` + focused inspection | PASS | no whitespace errors; template and skill wording agree |
+| Markdown whole-file fmt | wrapper over template + skill | NON_VERDICT_BASELINE | two unrelated pre-existing line-wrap findings; no broad churn applied |
 
 ### Fitness Gates
 
@@ -119,7 +125,8 @@ heading in the shipped template.
 
 | Consumer | Result | Evidence | Notes |
 | -------- | ------ | -------- | ----- |
-| PR authors/CI | NOT_RUN | tests + live PR planned | template/convention and report output are consumer surfaces |
+| PR authors/CI | PASS (local) | parser negative fixture + CI classifier 50-test suite | live PR self-application still pending |
+| Template/convention consistency | PASS | `.github/pull_request_template.md` + `netscript-pr` focused diff | authoritative headings and non-authoritative lists agree with parser test |
 
 ## Handoff Notes
 

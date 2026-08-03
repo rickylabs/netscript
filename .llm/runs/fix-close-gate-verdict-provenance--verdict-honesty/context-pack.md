@@ -28,7 +28,8 @@ milestone-run composed evaluator/pre-merge surface.
 
 ## In Progress
 
-- S1 code and tests are green locally; supervisor diff review and sign-off commit are next.
+- S2 template/skill alignment and local gates are complete; supervisor diff review, commit, push,
+  and PR self-application are next.
 
 ## Next Steps
 
@@ -52,13 +53,15 @@ milestone-run composed evaluator/pre-merge surface.
 | `.llm/runs/fix-close-gate-verdict-provenance--verdict-honesty/**` | new | S0 harness artifacts only |
 | `.llm/tools/validation/check-close-gate.ts` | changed | provenance, stale comparison, PR DoD enforcement, pretty log |
 | `.llm/tools/validation/check-close-gate_test.ts` | changed | 7-test regression/negative suite |
+| `.github/pull_request_template.md` | changed | authoritative Definition-of-Done heading and guidance |
+| `.agents/skills/netscript-pr/SKILL.md` | changed | convention aligned to enforcement |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | ----------- | -------------- | -------- |
 | Plan-Gate | pending | separate evaluator not yet run |
-| Static | PASS | targeted tests 7/7; scoped check/lint/fmt green over 2 files |
+| Static | PASS | combined tests 57/57; scoped TS check/lint/fmt green; focused prose diff clean |
 | Fitness | N/A | repo-tooling scope |
 | Runtime | N/A | no service/scaffold/CLI runtime change |
 | Consumer | planned | parser tests + live PR |

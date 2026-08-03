@@ -53,3 +53,16 @@
 - **Severity:** minor
 - **Action:** accept — preserves reviewable atomic behavior and does not expand scope.
 - **Evidence:** S1 diff and targeted 7-test suite.
+
+## 2026-08-03 — Markdown whole-file formatting baseline
+
+- **What:** The scoped Markdown format wrapper reports two line-wrap findings outside this slice's
+  changed hunks, one in each prose file.
+- **Source:** `run-deno-fmt.ts` over `.github/pull_request_template.md` and
+  `.agents/skills/netscript-pr/SKILL.md`.
+- **Expected:** Focused convention changes without unrelated prose reformatting.
+- **Actual:** Whole-file formatter would require unrelated baseline churn; `git diff --check` and
+  focused changed-hunk inspection are clean.
+- **Severity:** minor
+- **Action:** accept — do not broaden the change; record the wrapper result as non-verdict baseline.
+- **Evidence:** two reported existing lines: umbrella-PR prose and scaffold-runtime template line.
