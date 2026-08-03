@@ -75,6 +75,7 @@ predicate and extend the cross-engine semantic permission table in its focused g
 | 2026-08-04 | 3 | P2 | Wrote `P2-db.json` from the live 32,414-byte DB spec and posted S4/S6 impact assessment on epic #1126. |
 | 2026-08-04 | 3 | exact stop | Exact AppHost stop; `aspire ps` empty; service PID exited immediately and DCP controller exited after bounded wait. |
 | 2026-08-04 | 3 | final gates | Helper suite, scoped wrappers, quality gate, doc lint, publish dry-run, and leak check all passed. Leak check reported only foreign resources, left untouched. |
+| 2026-08-04 | 2/3 | sign-off | Substantive diff review passed; implementation/evidence commit `c795d6f8f` recorded. |
 
 ## Decisions
 

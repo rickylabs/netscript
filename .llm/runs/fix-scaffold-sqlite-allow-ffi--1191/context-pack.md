@@ -78,4 +78,6 @@ the epic S4/S6 impact comment are complete.
 
 ## Commits
 
-- See the draft PR's commit list + per-slice PR comments.
+- `d398b48a4` — locked research/plan and draft PR surface.
+- `c795d6f8f` — implementation, generated-output coverage, live RED/GREEN evidence, P2 evidence,
+  and final gates.
