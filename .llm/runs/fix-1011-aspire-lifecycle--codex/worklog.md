@@ -126,8 +126,14 @@ by adding a named gate to `packages/cli/e2e/src/application/gates/scaffold/runti
 - S2 CLI package/root/static gates: `PASS` — package suite and root check completed successfully;
   scoped check/lint/fmt and quality scan reported zero findings; architecture check emitted only
   pre-existing warnings.
-- Live `scaffold.runtime`: `NOT_RUN` — deliberately once-only at merge-readiness; no #1011
-  or #1012 acceptance box may be ticked yet.
+- Live `scaffold.runtime`: first run reproduced CI's invalid loose AppHost identity; the corrected
+  nested project then reproduced cross-identity Postgres password drift (`28P01`). A fresh run after
+  `9cb9c631d` passed `database.init`, `database.generate`, `database.seed`, resident
+  `runtime.wait.postgres`, and the dead-port readiness gate. It later exposed a separate generated
+  users-service connection-format failure. #1012 acceptance is evidenced and ticked; #1011 remains
+  unticked pending completion of the resident PID/backchannel gate.
+- CLI package suite after the credential correction: 555 tests passed; two stale exact-string
+  assertions failed, were corrected in `596c31dc7`, and their focused 24-step suite passes.
 
 ## Handoff Notes
 

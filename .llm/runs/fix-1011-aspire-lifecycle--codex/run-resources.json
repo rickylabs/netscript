@@ -4,6 +4,7 @@
   "appHosts": [],
   "containers": [],
   "ownedRoots": [
-    "/home/codex/repos/ns004-aspire/.llm/tmp/cli-e2e/plugin-smoke-20260803-120622"
+    "/home/codex/repos/ns004-aspire/.llm/tmp/cli-e2e/plugin-smoke-20260803-120622",
+    "/home/codex/repos/ns004-aspire/.llm/tmp/cli-e2e/plugin-smoke-20260803-123931"
   ]
 }
