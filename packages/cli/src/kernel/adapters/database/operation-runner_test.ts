@@ -381,6 +381,7 @@ function createFastRunner(
     sleep: async () => {},
     writeOperationRequest: () => Promise.resolve(),
     removeOperationRequest: () => Promise.resolve(),
+    ensureProcessStopped: () => Promise.resolve(),
   });
 }
 
