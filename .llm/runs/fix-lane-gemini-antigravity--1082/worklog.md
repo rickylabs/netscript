@@ -57,9 +57,10 @@ Change native model ids only in `config/models.ts`, bind lanes in `runtime/routi
 | #1089 focused tests | PASS | 25 passed, 0 failed, including prompt-as-print-value and volatile guard |
 | #1089 direct live probe | PASS | unique response marker `ANTIGRAVITY_PROMPT_VALUE_1089_OK` returned by `agy` |
 | `agentic:antigravity-evidence` | PASS | empirical `headless: supported`, `structured_output: supported`, exit 0, no diagnostics, raw output not retained |
-| Full agentic suite after #1089 | PASS | 323 passed, 0 failed |
+| Full agentic suite after #1089 | PASS | 324 passed, 0 failed, including the build-time prompt invariant |
 | Scoped lint/fmt after #1089 | PASS | 127 files, 0 findings |
 | #1089 harness slice review | PASS | separate native Claude/Opus session; all eight criteria verified and 25 focused guards independently green |
+| #1089 final direct probe | PASS | prompt `Reply with exactly ANTIGRAVITY_PROMPT_VALUE_1089_FINAL_OK and nothing else.` returned `ANTIGRAVITY_PROMPT_VALUE_1089_FINAL_OK` |
 
 ## Reconcile Note
 
