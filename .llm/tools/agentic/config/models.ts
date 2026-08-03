@@ -48,7 +48,6 @@ export const NATIVE_CANARY_MODEL_ARGS = {
 export const OPENROUTER_MODEL_IDS = {
   minimax: 'minimax/minimax-m3',
   qwen: 'qwen/qwen3.7-max',
-  gemini: 'google/gemini-3.6-flash',
   glm: 'z-ai/glm-5.2',
   grok: 'x-ai/grok-4.5',
 } as const;
