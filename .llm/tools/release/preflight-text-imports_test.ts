@@ -74,6 +74,15 @@ Deno.test('preflight ignores embedded string source but still flags following ex
   assertEquals(findings[0].line, 2);
 });
 
+Deno.test('preflight still flags executable code in a template interpolation', () => {
+  const findings = scanSource(
+    'const root = `${fromFileUrl(import.meta.url)}`;',
+    'template-interpolation.ts',
+  );
+  assertEquals(findings.length, 1);
+  assertEquals(findings[0].check, 'file-url-import-meta');
+});
+
 Deno.test('preflight allows protocol-guarded fromFileUrl import.meta conversion', async () => {
   const findings = await scanFile(
     fromFileUrl(new URL('negative-guarded-file-url.ts', fixtureRoot)),
@@ -108,7 +117,10 @@ Deno.test('file-url check ignores embedded string data but still fails on real s
     `    "import { fromFileUrl } from 'jsr:@std/path@1';\\nconst root = fromFileUrl(import.meta.url);\\n",`,
     '};',
   ].join('\n');
-  const embeddedFindings = scanSource(embedded, 'packages/cli/src/kernel/assets/agent-tools.generated.ts')
+  const embeddedFindings = scanSource(
+    embedded,
+    'packages/cli/src/kernel/assets/agent-tools.generated.ts',
+  )
     .filter((finding) => finding.check === 'file-url-import-meta');
   assertEquals(embeddedFindings.length, 0);
 
