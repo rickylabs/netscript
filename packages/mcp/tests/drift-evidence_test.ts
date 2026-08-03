@@ -3,6 +3,8 @@ import { DIAGNOSTIC_RECEIPT_TTL_MS, recordDrift } from '../mod.ts';
 import type { DiagnosticEvidencePort, DiagnosticEvidenceReceipt } from '../mod.ts';
 import { FilesystemDiagnosticEvidence } from '../mod.ts';
 import { createMcpCliServer } from '../cli.ts';
+import { createMcpServer } from '../mod.ts';
+import { withFlowReceipt } from '../src/application/runner/receipt-lifecycle.ts';
 
 class MemoryEvidence implements DiagnosticEvidencePort {
   receipt?: DiagnosticEvidenceReceipt;
@@ -135,9 +137,76 @@ Deno.test('an actual MCP doctor call writes a diagnostic receipt', async () => {
     const receipt = await new FilesystemDiagnosticEvidence(root).read('api');
     assertEquals(receipt?.command, 'mcp doctor');
     assertEquals(receipt?.resource, 'api');
+    assertEquals(receipt?.exitStatus, 1);
   } finally {
     await Deno.remove(root, { recursive: true });
   }
+});
+
+Deno.test('invalid MCP tool output replaces stale green evidence with a failed receipt', async () => {
+  const evidence = new MemoryEvidence();
+  evidence.receipt = {
+    resource: 'api',
+    command: 'mcp doctor',
+    timestamp: new Date(0).toISOString(),
+    exitStatus: 0,
+  };
+  const invalidDoctor = withFlowReceipt(
+    () => Promise.resolve({ ok: true, value: { status: 'unknown' } }),
+    (_input, succeeded) =>
+      evidence.write({
+        resource: 'api',
+        command: 'mcp doctor',
+        timestamp: new Date().toISOString(),
+        exitStatus: succeeded ? 0 : 1,
+      }),
+  );
+  const response = await createMcpServer({
+    probe: { probe: () => Promise.resolve({ reachable: true, message: 'ready' }) },
+    flows: { doctor: invalidDoctor },
+  }).handle({
+    jsonrpc: '2.0',
+    id: 4,
+    method: 'tools/call',
+    params: { name: 'doctor', arguments: { resource: 'api' } },
+  });
+
+  assertEquals(response?.error?.code, -32603);
+  assertEquals((response?.error?.data as Record<string, unknown>).code, 'invalid_tool_result');
+  assertEquals(evidence.receipt?.exitStatus, 1);
+  assertEquals(evidence.receipt?.resource, 'api');
+});
+
+Deno.test('throwing MCP tool flow replaces stale green evidence with a failed receipt', async () => {
+  const evidence = new MemoryEvidence();
+  evidence.receipt = {
+    resource: 'api',
+    command: 'mcp doctor',
+    timestamp: new Date(0).toISOString(),
+    exitStatus: 0,
+  };
+  const throwingDoctor = withFlowReceipt(
+    () => Promise.reject(new Error('fixture failure')),
+    (_input, succeeded) =>
+      evidence.write({
+        resource: 'api',
+        command: 'mcp doctor',
+        timestamp: new Date().toISOString(),
+        exitStatus: succeeded ? 0 : 1,
+      }),
+  );
+  const response = await createMcpServer({
+    probe: { probe: () => Promise.resolve({ reachable: true, message: 'ready' }) },
+    flows: { doctor: throwingDoctor },
+  }).handle({
+    jsonrpc: '2.0',
+    id: 5,
+    method: 'tools/call',
+    params: { name: 'doctor', arguments: { resource: 'api' } },
+  });
+
+  assertEquals((response?.error?.data as Record<string, unknown>).code, 'tool_execution_failed');
+  assertEquals(evidence.receipt?.exitStatus, 1);
 });
 
 Deno.test('MCP doctor result survives a diagnostic evidence write failure', async () => {
