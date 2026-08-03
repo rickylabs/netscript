@@ -78,6 +78,7 @@ CLI E2E/dependency fixture rather than importing workspace source directly.
 | 2026-08-03 | slice 3   | #1017 evidence | Added per-plugin assertions that worker, saga, trigger, and stream install commands each receive `--no-samples` and never `--samples`. The true-userland E2E artifact independently showed all four real commands with `--no-samples` and reduced created-file counts. Its final source-leak assertion found pre-existing local-path doctor URLs in persisted manifests; this is unrelated to sample threading and was not expanded into a redesign. |
 | 2026-08-03 | slice 3   | final review correction | Added four named product-level install cases that pass `includeSamples: false` through `installPlugin` into each real official scaffolder and assert required glue exists while that plugin's sample is absent. Also records explicitly that `ba0bc937b` changed no-AppHost from `error` to `warning`: this preserves pre-start doctor usability, while missing registries and running-but-unhealthy resources remain errors. |
 | 2026-08-03 | slice 2 follow-up | deno-only regression | Added the third AppHost observation arm, `unavailable`. `Deno.errors.NotFound` from executing Aspire (covering a missing binary or missing Aspire cwd) becomes a warning that names why inspection was skipped; a working Aspire command returning non-zero still throws and becomes an inspection error. The command-level regression test injects a process that throws `NotFound` and proves `plugin doctor` exits zero. |
+| 2026-08-03 | slice 1 follow-up | sorted-helper fixture | Kept deterministic appsettings record sorting and repaired both Flow-B marker extractions (`workers-api` and background `workers`) to accept EOF as the boundary when the resource sorts last. Missing resource markers still fail. Repository scan found no other next-marker slicing pattern. |
 
 ## Decisions
 
@@ -121,6 +122,13 @@ the owner-authorized supervisor.
 | Gate | Trusted artifact/output |
 | ---- | ----------------------- |
 | Inspector + doctor command | `15 passed | 0 failed`; includes process `exec` throwing `Deno.errors.NotFound`, an `apphost:inspection-unavailable` warning, successful command completion, and a distinct non-zero Aspire result that remains an error. |
+
+### Sorted generated-helper follow-up
+
+| Gate | Trusted artifact/output |
+| ---- | ----------------------- |
+| Scoped check/lint/fmt | `prepare-flow-b-fixture.ts`: one file selected; check/lint/fmt all zero after formatting. |
+| Full runtime E2E | Artifact `plugin-smoke-20260803-095103.log`: decisive `runtime.flow-b-fixture` passed in `1257ms`, proving the last-block extraction. The full suite finished `passed=47 failed=1`; the later unrelated `behavior.service-health` gate timed out on a PostgreSQL Prisma raw-query health failure. `cleanup.aspire-stop` passed and the suite removed its three created containers. The runtime suite is therefore not reported green. |
 
 ### Slice 3
 

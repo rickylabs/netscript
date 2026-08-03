@@ -93,10 +93,16 @@ if (mode === 'local') {
 
 const workersMarker = '  // --- workers-api ---';
 const workersIndex = registerPlugins.indexOf(workersMarker);
-const nextResourceIndex = registerPlugins.indexOf('  // --- ', workersIndex + workersMarker.length);
-if (workersIndex < 0 || nextResourceIndex < 0) {
+if (workersIndex < 0) {
   throw new Error('generated register-plugins.mts did not contain the workers-api resource block');
 }
+const followingResourceIndex = registerPlugins.indexOf(
+  '  // --- ',
+  workersIndex + workersMarker.length,
+);
+const nextResourceIndex = followingResourceIndex < 0
+  ? registerPlugins.length
+  : followingResourceIndex;
 const workersBlock = registerPlugins.slice(workersIndex, nextResourceIndex);
 // The published flow-b config introduces jsr pins that are minutes old at
 // release-verification time; the Aspire-launched service must bypass Deno's
@@ -203,13 +209,16 @@ const registerBackgroundPath = `${projectRoot}/aspire/.helpers/register-backgrou
 const registerBackground = await Deno.readTextFile(registerBackgroundPath);
 const workersBackgroundMarker = '  // --- workers ---';
 const workersBackgroundIndex = registerBackground.indexOf(workersBackgroundMarker);
-const nextBackgroundIndex = registerBackground.indexOf(
+if (workersBackgroundIndex < 0) {
+  throw new Error('generated register-background.mts did not contain the workers resource block');
+}
+const followingBackgroundIndex = registerBackground.indexOf(
   '  // --- ',
   workersBackgroundIndex + workersBackgroundMarker.length,
 );
-if (workersBackgroundIndex < 0 || nextBackgroundIndex < 0) {
-  throw new Error('generated register-background.mts did not contain the workers resource block');
-}
+const nextBackgroundIndex = followingBackgroundIndex < 0
+  ? registerBackground.length
+  : followingBackgroundIndex;
 const workersBackgroundBlock = registerBackground.slice(
   workersBackgroundIndex,
   nextBackgroundIndex,

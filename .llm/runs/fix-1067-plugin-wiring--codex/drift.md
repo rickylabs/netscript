@@ -78,3 +78,17 @@
 - **Action:** record as a 0.0.5 candidate to separate local development provenance from portable
   consumer metadata; do not expand the residual acceptance-test slice.
 - **Evidence:** four passed scaffold gates and the final assertion's two manifest-only findings.
+
+## 2026-08-03 — reconciliation stabilizes generated resource ordering
+
+- **What:** Reconciliation sorts the `Plugins` and `BackgroundProcessors` records, which changes the
+  order of resource blocks emitted into generated Aspire helpers for existing projects.
+- **Source:** Slice 1 deterministic appsettings contract and the `runtime.flow-b-fixture` CI gate.
+- **Expected:** Existing insertion order placed workers before another resource, and an E2E fixture
+  assumed every workers block had a following marker.
+- **Actual:** Stable alphabetical records can place workers last. The fixture now treats end-of-file
+  as the valid end of a final resource block while still failing when the workers marker is absent.
+- **Severity:** minor
+- **Action:** accept as an intentional visible generated-artifact change; include stable ordering in
+  PR/release notes.
+- **Evidence:** reconciler permutation test and `scaffold.runtime` `runtime.flow-b-fixture` gate.
