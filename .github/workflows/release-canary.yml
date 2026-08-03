@@ -187,3 +187,5 @@ jobs:
             echo "- Production E2E run: ${E2E_URL:-not-dispatched}"
             echo "- Ephemeral branch cleanup: ${{ steps.cleanup.outcome }}"
           } >> "$GITHUB_STEP_SUMMARY"
+
+# #1122-class demo: a release-workflow-only edit must NOT escalate the scaffold tiers (#1152 verification; temporary comment).
