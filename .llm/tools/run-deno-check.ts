@@ -350,7 +350,6 @@ function chunk<T>(items: T[], size: number): T[][] {
 function buildCheckArgs(options: Options, files: string[]): string[] {
   return [
     'check',
-    '--quiet',
     ...(options.unstableKv ? ['--unstable-kv'] : []),
     ...options.denoArgs,
     ...files,
@@ -365,10 +364,12 @@ async function runBatch(files: string[], options: Options): Promise<BatchResult>
     stderr: 'piped',
   }).output();
 
+  const output = new TextDecoder().decode(result.stdout) + new TextDecoder().decode(result.stderr);
+  const excludedAllTargets = /No matching files found/i.test(output);
   return {
     files,
-    exitCode: result.code,
-    output: new TextDecoder().decode(result.stdout) + new TextDecoder().decode(result.stderr),
+    exitCode: result.code === 0 && excludedAllTargets ? 2 : result.code,
+    output,
   };
 }
 
@@ -554,6 +555,7 @@ async function main(): Promise<void> {
   console.log(JSON.stringify(report, null, options.pretty ? 2 : undefined));
 
   if (sourceMode === 'command' && sourceExitCode && sourceExitCode !== 0) Deno.exit(sourceExitCode);
+  if (sourceMode === 'selection' && files?.length === 0) Deno.exit(2);
   if (sourceMode === 'selection' && failedBatches > 0) Deno.exit(1);
 }
 

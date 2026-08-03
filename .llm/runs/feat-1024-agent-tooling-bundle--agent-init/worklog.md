@@ -145,6 +145,9 @@ compressed asset; never hand-edit the generated TypeScript or API text.
 | --- | --- | --- | --- |
 | 2026-08-03T11:08:30+02:00 | bootstrap | research/plan | Rebased clean branch onto merged #1079, read both issue bodies and governing skills/doctrine, selected Archetype 6 + docs overlay, and locked two slices. |
 | 2026-08-03T12:14:00+02:00 | plan-eval | route canary | Canonical local OpenRouter/Qwen canary returned `BLOCKED (auth_required)` without launching a process. Selected the separate OpenHands Qwen fallback; implementation remains stopped pending its tracked verdict. |
+| 2026-08-03T12:27:00+02:00 | plan-eval | PASS | Verified evaluator commit `c31084e02`: tracked `plan-eval.md` says `PASS`; five advisory checks were carried into implementation. |
+| 2026-08-03T12:38:00+02:00 | S1 | red/green implementation | Pre-fix focused test failed on missing `.llm/tools/consumer-tools.json`; implemented the manifest-driven eight-tool bundle, symptom routing, excluded-target detection, clone-independent E2E defaults, generated host-port subprocess gate, and structured missing-binary result. Focused suite now passes 26 tests. |
+| 2026-08-03T12:53:00+02:00 | S1 | opposite-family review | Native Claude Opus 4.8 first returned `CHANGES_REQUIRED`: move host-port validation after full plugin/registry generation and add the new barrel to `check:assets-barrel`; two low observations requested a real foreign-CWD dry-run and accurate `--source auto` provenance. All four were fixed, the focused suite passed 26/26, and the resumed independent review returned `SLICE_REVIEW: PASS`. |
 
 ## Decisions
 
@@ -162,6 +165,7 @@ compressed asset; never hand-edit the generated TypeScript or API text.
 | Baseline advanced from `ab0fa13fe` to `e5bae2858` to consume merged #1079. | minor | yes |
 | Current owner-started Codex session identity is opaque and differs from the named orchestrator route. | minor | yes |
 | Local formal evaluator route lacks OpenRouter credentials; use separate OpenHands Qwen fallback. | moderate | yes |
+| Named Fable and policy-alias Claude review routes were unavailable; native `claude-opus-4-8` completed the required opposite-family review. | minor | yes |
 
 ## Gate Results
 
@@ -176,7 +180,13 @@ compressed asset; never hand-edit the generated TypeScript or API text.
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| Plan-Gate | IN_PROGRESS | local canary blocked; separate OpenHands Qwen fallback requested | No implementation permitted before tracked `plan-eval.md` says `PASS`. |
+| Plan-Gate | PASS | `c31084e02`; OpenHands/Qwen 3.7 Max/high | Five advisory checks retained for IMPL-EVAL. |
+| S1 focused tests | PASS | 26 passed, 0 failed | Includes pre-fix red, foreign-CWD tool help, exact public CLI, missing Aspire binary, and generated JSON host-port scan. |
+| S1 opposite-family review | PASS | Claude Opus 4.8 session `964dfe11-04fb-4f0e-8b80-66d423354123` | Initial two medium findings fixed; resumed review verified all fixes and reported no actionable defect. |
+| S1 scoped check/lint/fmt | PASS | 12 TypeScript files selected; zero failed batches/findings | Repo-native JSON wrappers, rerun after review fixes. |
+| S1 quality/doctrine | PASS | `quality:scan`; `arch:check` exit 0 | Existing warnings only; no new findings/debt. |
+| CLI doc lint | PASS | 3 entrypoints, 0 diagnostics | Published package bar remains clean. |
+| Generated asset freshness | PASS | regenerate + byte-compare | Skills and agent-tools barrels unchanged after regeneration; hashes recorded in command output. |
 
 ### Runtime Gates
 
@@ -189,7 +199,8 @@ compressed asset; never hand-edit the generated TypeScript or API text.
 | Consumer | Result | Evidence | Notes |
 | --- | --- | --- | --- |
 | current agent-init fixture | PASS | 9 focused tests | Establishes pre-change behavior only. |
-| tool/docs bundle | NOT_RUN | implementation pending | Must include pre-fix red proof. |
+| tool bundle | PASS | 26 focused tests; independent review | Pre-fix missing-manifest red proof retained; installed paths, foreign-CWD dry-run, missing binary, and final-artifact host-port ordering covered. |
+| docs bundle | NOT_RUN | slice 2 pending | Must include pre-fix red proof. |
 
 ## Handoff Notes
 

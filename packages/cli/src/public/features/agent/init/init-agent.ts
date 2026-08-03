@@ -3,6 +3,11 @@ import {
   EMBEDDED_SKILL_BUNDLE_HASH,
   EMBEDDED_SKILL_FILES,
 } from "../../../../kernel/assets/skills.generated.ts";
+import {
+  EMBEDDED_AGENT_TOOL_BUNDLE_HASH,
+  EMBEDDED_AGENT_TOOL_FILES,
+  EMBEDDED_AGENT_TOOL_PATHS,
+} from "../../../../kernel/assets/agent-tools.generated.ts";
 import { netscriptJsrSpecifier } from "../../../../kernel/constants/jsr-specifiers.ts";
 import type { AgentInitFileSystem } from "./agent-init-file-system.ts";
 import type { AspireAgentInitializer } from "./aspire-agent-initializer.ts";
@@ -15,7 +20,7 @@ import {
 const START_MARKER = "<!-- netscript-agent:start -->";
 const END_MARKER = "<!-- netscript-agent:end -->";
 const AGENTS_SECTION =
-  `${START_MARKER}\n## NetScript agent tooling\n\nInstalled skills: \`netscript\`, \`netscript-build\`, \`netscript-operate\`, \`aspire\`, and \`deno\`. Search \`.claude/skills/help.md\` through MCP \`search_docs\` when something hangs, stays silent, is Healthy but does not respond, or leaves a dangling AppHost.\n\nUse MCP \`doctor\` for NetScript, Aspire, project-wiring, and plugin prerequisites. Use \`get_app_status\` and \`get_recent_errors\` for live telemetry symptoms; use the \`analyze_*\` tools and \`aspire otel logs|spans|traces\` for performance and database evidence. Route Deno runtime, type, permission, and module-resolution symptoms to the \`deno\` skill.\n\nDrift is gated, not suggested: \`netscript agent drift record\` and MCP \`record_drift\` refuse unless the same resource has a successful \`netscript plugin doctor --resource <name>\` or MCP diagnostic receipt from the last 15 minutes. Receipts live under \`.netscript/agent/diagnostics/\`; accepted entries append to \`.netscript/agent/drift.jsonl\`.\n${END_MARKER}`;
+  `${START_MARKER}\n## NetScript agent tooling\n\nInstalled skills: \`netscript\`, \`netscript-build\`, \`netscript-operate\`, \`aspire\`, and \`deno\`. Search \`.claude/skills/help.md\` through MCP \`search_docs\` when something hangs, vanishes, stays silent, is Healthy but does not respond, or leaves a dangling AppHost.\n\nUse MCP \`doctor\` for NetScript, Aspire, project-wiring, and plugin prerequisites. Use \`get_app_status\` and \`get_recent_errors\` for live telemetry symptoms; use the \`analyze_*\` tools and \`aspire otel logs|spans|traces\` for performance and database evidence. Route Deno runtime, type, permission, and module-resolution symptoms to the \`deno\` skill. The symptom-indexed project tools are listed in \`.llm/tools/README.md\`; for type evidence use \`.llm/tools/run-deno-check.ts\`, which fails when configuration excludes every requested file.\n\nBefore hand-rolled \`curl\` probes or print debugging, run \`netscript plugin doctor\`, \`aspire logs\`, \`aspire otel logs|spans|traces\`, and \`deno info\`. Drift is gated, not suggested: \`netscript agent drift record\` and MCP \`record_drift\` refuse unless the same resource has a successful \`netscript plugin doctor --resource <name>\` or MCP diagnostic receipt from the last 15 minutes. Receipts live under \`.netscript/agent/diagnostics/\`; accepted entries append to \`.netscript/agent/drift.jsonl\`.\n${END_MARKER}`;
 const ASPIRE_INIT_TIMEOUT_MS = 60_000;
 const PLAYWRIGHT_SKILL_PATH = ".claude/skills/playwright-cli/SKILL.md";
 
@@ -25,12 +30,18 @@ export interface AgentSkillBundle {
   readonly hash: string;
 }
 
+/** Embedded project tool bundle accepted by the installer and its integrity test seam. */
+export interface AgentToolBundle extends AgentSkillBundle {
+  readonly paths: readonly string[];
+}
+
 /** Dependencies for the agent installer use case. */
 export interface InitAgentDependencies {
   readonly fs: AgentInitFileSystem;
   readonly aspireAgentInitializer: AspireAgentInitializer;
   readonly aspireTimeoutMs?: number;
   readonly bundle?: AgentSkillBundle;
+  readonly toolBundle?: AgentToolBundle;
 }
 
 /** Install MCP host configuration and agent skills without rewriting unchanged files. */
@@ -42,10 +53,27 @@ export async function initAgent(
     files: EMBEDDED_SKILL_FILES,
     hash: EMBEDDED_SKILL_BUNDLE_HASH,
   };
-  await verifyBundle(bundle);
+  const skillManifest = JSON.parse(bundle.files["manifest.json"] ?? "{}") as {
+    readonly files?: readonly string[];
+  };
+  await verifyBundle(bundle, skillManifest.files ?? [], "Skill");
+  const toolBundle = dependencies.toolBundle ?? {
+    files: EMBEDDED_AGENT_TOOL_FILES,
+    paths: EMBEDDED_AGENT_TOOL_PATHS,
+    hash: EMBEDDED_AGENT_TOOL_BUNDLE_HASH,
+  };
+  await verifyBundle(toolBundle, toolBundle.paths, "Agent tool");
   const hosts = await resolveHosts(input, dependencies.fs);
   const changedFiles: string[] = [];
   const messages: string[] = [];
+  for (const path of toolBundle.paths) {
+    await writeChanged(
+      dependencies.fs,
+      join(input.projectRoot, ".llm", "tools", path),
+      toolBundle.files[path] ?? "",
+      changedFiles,
+    );
+  }
   if (hosts.includes("claude")) {
     await writeHostConfig(
       dependencies.fs,
@@ -198,13 +226,13 @@ function upsertMarkedSection(content: string): string {
   return `${prefix}${prefix ? "\n\n" : ""}${AGENTS_SECTION}\n`;
 }
 
-async function verifyBundle(bundle: AgentSkillBundle): Promise<void> {
-  const manifestText = bundle.files["manifest.json"];
-  if (!manifestText) throw new Error("Embedded skill manifest is missing.");
-  const manifest = JSON.parse(manifestText) as {
-    readonly files: readonly string[];
-  };
-  const canonical = manifest.files.map((path) =>
+async function verifyBundle(
+  bundle: AgentSkillBundle,
+  paths: readonly string[],
+  label: string,
+): Promise<void> {
+  if (paths.length === 0) throw new Error(`${label} bundle manifest is missing or empty.`);
+  const canonical = paths.map((path) =>
     `${path}\0${bundle.files[path] ?? ""}`
   ).join("\0");
   const digest = await crypto.subtle.digest(
@@ -216,7 +244,7 @@ async function verifyBundle(bundle: AgentSkillBundle): Promise<void> {
   ).join("");
   if (actual !== bundle.hash) {
     throw new Error(
-      `Skill bundle hash mismatch: expected ${bundle.hash}, received ${actual}.`,
+      `${label} bundle hash mismatch: expected ${bundle.hash}, received ${actual}.`,
     );
   }
 }

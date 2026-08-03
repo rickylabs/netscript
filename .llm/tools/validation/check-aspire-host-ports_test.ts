@@ -88,3 +88,11 @@ Deno.test('treats an empty justification as a failure', () => {
   assertEquals(findings.length, 1);
   assert(findings[0].message.includes('empty reason'));
 });
+
+Deno.test('rejects a pinned host port in a generated appsettings file', () => {
+  const result = scanContent(
+    'fixture/aspire/appsettings.json',
+    '{\n  "Resources": { "api": { "HostPort": 8091 } }\n}\n',
+  );
+  assertEquals(result.findings.length, 1);
+});

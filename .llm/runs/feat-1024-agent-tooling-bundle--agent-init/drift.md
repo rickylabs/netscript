@@ -39,3 +39,17 @@ documentation.
 - **Action:** accept a separate OpenHands/OpenRouter Qwen evaluator as the harness fallback.
 - **Evidence:** exact canary command and observed `auth_required` result are recorded in the
   worklog; the tracked `plan-eval.md` remains the only verdict authority.
+
+## 2026-08-03 — named review routes unavailable, native Opus used
+
+- **What:** The named Fable review model and the lane-policy Claude alias were unavailable to the
+  local Claude launcher.
+- **Source:** bounded read-only launch attempts with `fable-5` and `opus-4.8` returned
+  `model_not_found`.
+- **Expected:** Use the named opposite-family slice-review route.
+- **Actual:** The native model id `claude-opus-4-8` launched successfully; its initial review found
+  two medium defects, and the resumed session returned `SLICE_REVIEW: PASS` after fixes.
+- **Severity:** minor
+- **Action:** accept
+- **Evidence:** Claude session `964dfe11-04fb-4f0e-8b80-66d423354123`; focused suite 26/26 after
+  the review fixes.

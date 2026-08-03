@@ -361,6 +361,132 @@ Deno.test("agent init installs the complete diagnostic surface", async () => {
   }
 });
 
+Deno.test("agent init installs the consumer tool surface for every host", async () => {
+  const root = await Deno.makeTempDir();
+  try {
+    await initAgent({ projectRoot: root, host: "all" }, {
+      fs: new DenoAgentInitFileSystem(),
+      aspireAgentInitializer: SUCCESSFUL_ASPIRE_INITIALIZER,
+    });
+    for (
+      const path of [
+        "consumer-tools.json",
+        "README.md",
+        "release.json",
+        "run-deno-check.ts",
+        "run-deno-lint.ts",
+        "run-deno-doc-lint.ts",
+        "validation/check-aspire-host-ports.ts",
+        "quality/scan-code-quality.ts",
+        "deps/outdated.ts",
+        "deps/why.ts",
+        "e2e/scaffold-e2e-test.ts",
+      ]
+    ) {
+      assert(
+        await new DenoAgentInitFileSystem().exists(
+          join(root, ".llm", "tools", path),
+        ),
+        `missing installed consumer tool file: ${path}`,
+      );
+    }
+
+    const referenceFiles = [
+      join(root, "AGENTS.md"),
+      ...Object.keys(EMBEDDED_SKILL_FILES)
+        .filter((path) => path.endsWith(".md"))
+        .map((path) => join(root, ".claude", "skills", path)),
+      join(root, ".llm", "tools", "README.md"),
+    ];
+    for (const referenceFile of referenceFiles) {
+      if (!await new DenoAgentInitFileSystem().exists(referenceFile)) continue;
+      const content = await Deno.readTextFile(referenceFile);
+      for (const match of content.matchAll(/\.llm\/tools\/[A-Za-z0-9_./-]+/g)) {
+        const relativePath = match[0].replace(/[.,;:)]+$/, "");
+        assert(
+          await new DenoAgentInitFileSystem().exists(join(root, relativePath)),
+          `${referenceFile} names missing ${relativePath}`,
+        );
+      }
+    }
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+Deno.test("installed consumer tools resolve from the project when process CWD differs", async () => {
+  const root = await Deno.makeTempDir();
+  const foreignCwd = await Deno.makeTempDir();
+  try {
+    await initAgent({ projectRoot: root, host: "vscode" }, {
+      fs: new DenoAgentInitFileSystem(),
+      aspireAgentInitializer: SUCCESSFUL_ASPIRE_INITIALIZER,
+    });
+    const manifest = JSON.parse(
+      await Deno.readTextFile(join(root, ".llm", "tools", "consumer-tools.json")),
+    ) as { readonly tools: readonly { path: string }[] };
+    for (const tool of manifest.tools) {
+      const output = await new Deno.Command(Deno.execPath(), {
+        args: [
+          "run",
+          "--allow-read",
+          "--allow-run",
+          "--allow-env",
+          "--allow-net",
+          join(root, ".llm", "tools", tool.path),
+          "--help",
+        ],
+        cwd: foreignCwd,
+        stdout: "piped",
+        stderr: "piped",
+      }).output();
+      assertEquals(output.code, 0, `${tool.path} --help failed`);
+    }
+    const reportPath = join(root, "consumer-smoke-plan.json");
+    const smokeTool = manifest.tools.find((tool) =>
+      tool.path === "e2e/scaffold-e2e-test.ts"
+    );
+    assert(smokeTool);
+    const smokeOutput = await new Deno.Command(Deno.execPath(), {
+      args: [
+        "run",
+        "--allow-read",
+        "--allow-write",
+        "--allow-run",
+        "--allow-env",
+        "--allow-net",
+        join(root, ".llm", "tools", smokeTool.path),
+        "--repo",
+        root,
+        "--dry-run",
+        "--format",
+        "json",
+        "--report",
+        reportPath,
+      ],
+      cwd: foreignCwd,
+      stdout: "piped",
+      stderr: "piped",
+    }).output();
+    assertEquals(
+      smokeOutput.code,
+      0,
+      `consumer scaffold smoke dry-run failed: ${new TextDecoder().decode(smokeOutput.stderr)} ${
+        new TextDecoder().decode(smokeOutput.stdout)
+      }`,
+    );
+    const report = JSON.parse(await Deno.readTextFile(reportPath)) as {
+      readonly project: { readonly smokeRoot: string; readonly logFile: string };
+    };
+    assert(report.project.smokeRoot.startsWith(root));
+    assert(report.project.logFile.startsWith(root));
+    assertEquals([...(await Array.fromAsync(Deno.readDir(foreignCwd)))], []);
+  } finally {
+    await Deno.remove(root, { recursive: true });
+    await Deno.remove(foreignCwd, { recursive: true });
+  }
+});
+
 function extractSkillReferences(markdown: string): ReadonlySet<string> {
   const references = new Set<string>();
   for (

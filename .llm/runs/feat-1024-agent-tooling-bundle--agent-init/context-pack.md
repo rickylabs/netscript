@@ -6,16 +6,15 @@
 | --- | --- |
 | Run ID | `feat-1024-agent-tooling-bundle--agent-init` |
 | Branch | `feat/1024-agent-tooling-bundle` |
-| Current phase | `plan-eval` |
+| Current phase | `implementation — slice 1 sign-off` |
 | Archetype | `6 — CLI / Tooling` |
 | Scope overlays | `docs` |
 
 ## Current State
 
-Research and design are complete. The branch was clean and is now rebased onto `origin/main` at
-`e5bae2858`, which includes merged PR #1079's docs task router. No implementation file has been
-created or changed. The canonical local Qwen canary was blocked by missing OpenRouter credentials;
-the hard stop is now a separate OpenHands/Qwen PLAN-EVAL with the same tracked-verdict contract.
+PLAN-EVAL passed in evaluator commit `c31084e02`. Slice 1 is implemented; its focused/static fitness
+gates and required opposite-family review pass. Final scoped verification precedes its sign-off
+commit.
 
 ## Completed
 
@@ -26,16 +25,21 @@ the hard stop is now a separate OpenHands/Qwen PLAN-EVAL with the same tracked-v
   public surface, debt, and merged #1079.
 - Ran baseline CLI doc lint (0 diagnostics) and focused agent-init tests (9/9).
 - Locked a two-slice plan and Design checkpoint.
+- Verified separate OpenHands/Qwen PLAN-EVAL `PASS`.
+- Implemented the manifest-driven eight-tool install, symptom routing, excluded-file trap guard,
+  clone-independent scaffold E2E defaults, host-port subprocess gate, and missing-binary fixture.
+- Passed 26 focused tests, scoped check/lint/fmt, `quality:scan`, `arch:check`, and CLI doc lint.
+- Addressed two medium and two low review findings; resumed Claude Opus 4.8 review returned
+  `SLICE_REVIEW: PASS`.
 
 ## In Progress
 
-- Separate-session PLAN-EVAL through the OpenHands/Qwen fallback.
+- Final slice-1 scoped verification and generated-asset freshness proof.
 
 ## Next Steps
 
-1. Dispatch the formal OpenHands/OpenRouter Qwen evaluator with a PLAN-EVAL-only prompt.
-2. Accept only the tracked `plan-eval.md` verdict after verifying its commit and scope.
-3. Begin slice 1 only on `PASS`; repair the plan and re-evaluate on `FAIL_PLAN`.
+1. Commit, push, and post slice 1 gate evidence.
+2. Begin slice 2 only after the slice 1 commit trail is reconciled.
 
 ## Key Decisions
 
@@ -58,9 +62,9 @@ the hard stop is now a separate OpenHands/Qwen PLAN-EVAL with the same tracked-v
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
 | Static | baseline PASS | CLI doc lint 0; agent-init tests 9/9. |
-| Fitness | plan pending | PLAN-EVAL not yet run. |
+| Fitness | PASS for plan and S1 | PLAN-EVAL PASS; scoped gates clean; opposite-family review PASS. |
 | Runtime | not run | implementation absent. |
-| Consumer | baseline only | pre-change agent-init fixture passes. |
+| Consumer | S1 focused PASS | 26 tests; foreign-CWD path closure and missing-binary behavior proven. |
 
 ## Open Questions
 
