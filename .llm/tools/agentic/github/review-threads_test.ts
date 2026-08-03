@@ -65,6 +65,22 @@ Deno.test('reasoned decline is a reply and passes without a code change', () => 
   assertEquals(report.unanswered, 0);
 });
 
+Deno.test('same-author follow-up does not answer a review thread', () => {
+  const report = assessReviewThreads('rickylabs/netscript', 1056, [thread({
+    comments: {
+      totalCount: 2,
+      nodes: [
+        { author: { login: 'reviewer' }, body: 'Please change this.' },
+        { author: { login: 'reviewer' }, body: 'Additional context from the reviewer.' },
+      ],
+    },
+  })]);
+  assertEquals(report.ok, false);
+  assertEquals(report.unanswered, 1);
+  assertEquals(report.threads[0]?.answered, false);
+  assertEquals(report.threads[0]?.blocking, true);
+});
+
 Deno.test('outdated unanswered review thread is listed but ignored', () => {
   const report = assessReviewThreads('rickylabs/netscript', 1056, [thread({ isOutdated: true })]);
   assertEquals(report.ok, true);

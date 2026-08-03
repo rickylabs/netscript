@@ -72,7 +72,7 @@ const REVIEW_THREADS_QUERY = `
             path
             line
             originalLine
-            comments(first: 2) {
+            comments(first: 100) {
               totalCount
               nodes { author { login } body }
             }
@@ -92,7 +92,10 @@ export function assessReviewThreads(
 ): ReviewThreadReport {
   const findings = threads.map((thread): ReviewThreadFinding => {
     const initial = thread.comments.nodes[0];
-    const answered = thread.comments.totalCount > 1;
+    const initiatingAuthor = initial?.author?.login ?? null;
+    const answered = thread.comments.totalCount > 1 && thread.comments.nodes.slice(1).some(
+      (comment) => comment.author?.login !== initiatingAuthor,
+    );
     const outdated = thread.isOutdated;
     return {
       author: initial?.author?.login ?? 'unknown',
