@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `fix-1013-saga-send-spawn--1013` |
 | Branch | `fix/1013-saga-send-spawn` |
-| Current phase | `impl` |
+| Current phase | `impl-eval-blocked` |
 | Archetype | `5 - Plugin Package` with sibling runtime rules |
 | Scope overlays | `docs` |
 
@@ -15,7 +15,8 @@
 Research and contract-first design are complete against `origin/main` at `ab0fa13fe`. #1042 already
 selected correction; #1075 now recursively dispatches handler effects, exposing the remaining
 tutorial sends as loud `SAGA_NOT_FOUND` failures. The owner waived the credential-blocked
-PLAN-EVAL on the record. Slice 1 is pushed; slice 2 implementation and local gates are complete.
+PLAN-EVAL on the record. Both implementation slices, aggregate local gates, and issue acceptance
+evidence are complete. Formal IMPL-EVAL cannot launch because its credential is deliberately absent.
 
 ## Completed
 
@@ -33,16 +34,20 @@ PLAN-EVAL on the record. Slice 1 is pushed; slice 2 implementation and local gat
   failed because the storefront still authored `CheckoutPaymentRequested` through saga `send()`.
 - Storefront now crosses the real trigger queue, static worker registry, worker handler, and saga
   publisher; the focused round trip reaches `paid`.
+- Slice 2 commit `eccc247c6497796b293235daca3ee7da38971da1` was pushed with PR evidence.
+- Root check and all six affected publish dry-runs are green.
+- #1013 acceptance boxes are checked with linked evidence; its mutually exclusive alternatives were
+  normalized to explicitly record the selected correction route and implementation N/A.
 
 ## In Progress
 
-- Slice 2 commit and PR evidence handoff.
+- Formal IMPL-EVAL transport remediation or an explicit owner decision for that separate gate.
 
 ## Next Steps
 
-1. Commit, push, and comment slice 2 evidence.
-2. Run aggregate merge-readiness gates and acceptance mirroring.
-3. Request formal IMPL-EVAL; its transport remains credential-blocked and is not waived.
+1. Do not self-certify or substitute a paid/closed evaluator.
+2. If the owner separately waives IMPL-EVAL, record it and finish review-thread/ready gates.
+3. Otherwise resume only when the canonical open-model evaluator route is safe and credentialed.
 
 ## Key Decisions
 
@@ -69,6 +74,7 @@ PLAN-EVAL on the record. Slice 1 is pushed; slice 2 implementation and local gat
 | Fitness | PASS | quality scan clean; all doctrine roots `FAIL=0` |
 | Runtime | PASS locally | focused round trip plus six full affected package suites |
 | Consumer | PASS locally | docs links/build/accuracy and tutorial source contract |
+| Formal IMPL-EVAL | BLOCKED | canonical canary: auth required, credential absent, no session launched |
 
 Slice 1 is green: saga-core package `68 passed / 0 failed / 2 ignored`; scoped check/lint/fmt have
 zero findings; quality scan is clean; doctrine roots report `FAIL=0`; focused public docs render
@@ -76,7 +82,7 @@ zero findings; quality scan is clean; doctrine roots report `FAIL=0`; focused pu
 
 ## Open Questions
 
-- None for implementation. IMPL-EVAL transport remains an end-of-run risk and is not waived.
+- Whether the owner separately waives the now-confirmed IMPL-EVAL environmental block.
 
 ## Drift and Debt
 

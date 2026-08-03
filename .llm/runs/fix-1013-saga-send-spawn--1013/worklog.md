@@ -75,6 +75,8 @@ the target message type.
 | 2026-08-03 12:00 CEST | slice 2 | pre-fix red | With the typechecked integration test added but tutorial/docs unchanged, the focused test failed 0/1 at the source-contract assertion because the storefront still authored `send('CheckoutPaymentRequested', ...)`. |
 | 2026-08-03 12:10 CEST | slice 2 | implementation | Corrected the tutorial to the explicit trigger queue/worker registry/result-publish boundary, fixed the webhook body payload shape, and made the saga stop at `paid`; added a real in-process round-trip regression. |
 | 2026-08-03 12:25 CEST | slice 2 | ordinary review | Claude Fable independently inspected dispatcher resolution and saga instance identity, reran the focused test and docs accuracy, and returned `PASS`. Non-blocking notes: the test intentionally binds behavioral proof to tutorial source assertions, and uses equivalent `runtime.publish` rather than invoking the tutorial publisher helper verbatim. |
+| 2026-08-03 12:45 CEST | slice 3 | aggregate gates | Root check completed green; all six affected publish dry-runs emitted `Success Dry run complete`; acceptance evidence was posted and #1013's mutually exclusive route boxes were normalized to the selected correction route. |
+| 2026-08-03 12:50 CEST | impl-eval | blocked canary | Canonical Qwen/OpenRouter canary returned `status: blocked`, `auth_required`, `credential: absent`, zero evaluator events, and no process launch. Formal IMPL-EVAL remains unmet. |
 
 ## Decisions
 
@@ -104,6 +106,8 @@ the target message type.
 | Slice 2 scoped check/lint/fmt | Repo wrappers over saga/trigger/worker packages and docs checker, `--ext ts,tsx` | PASS | 548 files; zero findings after formatting the new test. |
 | Slice 2 docs accuracy | `deno task docs:accuracy` | PASS | Four saga pages checked; storefront worker boundary and spawn contract verified. |
 | Slice 2 emitted specifiers | `deno task check:netscript-jsr-specifiers` | PASS | 2,235 scanned, one existing allowance, zero failures. |
+| Aggregate root check | `deno task check` | PASS | Repo wrapper completed and unchanged-input invocation returned its cached green artifact. |
+| Aggregate publish dry-runs | Package `publish:dry-run` for saga/trigger/worker core + plugins | PASS | All six emitted `Success Dry run complete`. |
 
 ### Fitness Gates
 
@@ -135,5 +139,5 @@ the target message type.
 
 ## Handoff Notes
 
-- Slice 2 ordinary opposite-family review passed; commit and PR evidence are next.
-- Formal IMPL-EVAL remains required; only PLAN-EVAL was waived.
+- Product implementation, local gates, and close-gate acceptance evidence are complete.
+- Formal IMPL-EVAL is blocked by the deliberately absent credential; only PLAN-EVAL was waived.

@@ -41,3 +41,15 @@ Drift is append-only.
 - **Action:** accept
 - **Evidence:** Owner states the generator≠reviewer invariant holds and cites the same release waiver
   precedent used by PR #1075. This does not self-certify implementation or waive IMPL-EVAL.
+
+## 2026-08-03 — Formal IMPL-EVAL transport remains credential-blocked
+
+- **What:** After implementation and aggregate local gates, the canonical Qwen IMPL-EVAL route
+  could not launch.
+- **Source:** `agentic:provider-canary` for the bound formal-evaluation route.
+- **Expected:** A separate Qwen evaluator independently runs gates and writes `evaluate.md`.
+- **Actual:** The canary returned `status: blocked`, `auth_required`, `credential: absent`, zero
+  tool/reasoning/streaming events, and no evaluator process. No paid/closed substitute was used.
+- **Severity:** significant
+- **Action:** block
+- **Evidence:** `deno task agentic:provider-canary --live --profile claude-openrouter --model qwen/qwen3.7-max --effort xhigh --worktree /home/codex/repos/ns004-sagasend` exited 4 before launch. The PLAN-EVAL waiver does not cover this gate.
