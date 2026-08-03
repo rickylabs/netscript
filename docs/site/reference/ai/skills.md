@@ -26,7 +26,7 @@ of three ready-made skills that teach an agent the NetScript vocabulary.
 `netscript agent init` installs five first-party skills and a symptom playbook on the **Claude Code host path**
 (under `.claude/skills/`, alongside `.mcp.json` and the marked `AGENTS.md` section); the
 VS Code host path writes `.vscode/mcp.json` only, with no skills. They share one vocabulary with the
-`netscript` CLI and the [NetScript MCP tools](/ai/agent-tooling/#tool-catalog),
+`netscript` CLI and the [NetScript MCP tools](/ai/agent-tooling/#what-the-server-exposes),
 so an agent routes to a workflow and then reaches for the matching CLI verb or MCP tool.
 
 | Skill | Role |

@@ -1,5 +1,3 @@
-The deliverable — complete file content for `docs/site/reference/plugin-ai/index.md`:
-
 ---
 layout: layouts/base.vto
 title: "@netscript/plugin-ai"

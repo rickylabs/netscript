@@ -97,7 +97,7 @@ matching `config override` verbs.
 ## `generate` — code generation
 
 Beyond `generate plugins` and `generate runtime-schemas` (covered in the
-[CLI reference](/cli-reference/#code-generation)), the group also regenerates the Aspire
+[CLI reference](/cli-reference/#generate)), the group also regenerates the Aspire
 helper layer.
 
 | Command | Description |
@@ -139,7 +139,7 @@ The backends selectable here are the same ones read at runtime by
 ## `service` — extended verbs
 
 The common `service add`, `service list`, and `service generate` verbs are in the
-[CLI reference](/cli-reference/#services--contracts). The full group also carries:
+[CLI reference](/cli-reference/#services-contracts). The full group also carries:
 
 | Command | Description |
 | --- | --- |
@@ -153,7 +153,7 @@ The common `service add`, `service list`, and `service generate` verbs are in th
 ## `contract` — extended verbs
 
 The common `contract add` and `contract list` verbs are in the
-[CLI reference](/cli-reference/#contracts). The full group also carries:
+[CLI reference](/cli-reference/#services-contracts). The full group also carries:
 
 | Command | Description |
 | --- | --- |

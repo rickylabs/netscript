@@ -149,6 +149,9 @@ jobs:
       - name: JSR tagline length
         run: deno task docs:tagline:check
 
+      - name: Docs accuracy check
+        run: deno task docs:accuracy
+
       - name: Generated asset freshness
         run: deno task check:assets-barrel
 

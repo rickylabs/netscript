@@ -31,7 +31,7 @@ A service listens over plain HTTP by default. Pass a <code>tls</code> option
 (<code>ServiceTlsOptions { cert, key }</code> as PEM strings) to <code>defineService</code> or the builder's
 <code>.serve()</code> — or set both <code>NETSCRIPT_TLS_CERT_FILE</code> and
 <code>NETSCRIPT_TLS_KEY_FILE</code> (file paths) — and the listener serves HTTPS and negotiates HTTP/2
-via ALPN automatically. See <a href="/capabilities/services/#tls-http-2-opt-in">Services → TLS &amp; HTTP/2</a>.
+via ALPN automatically. See <a href="/services-sdk/services/#tls-http2-opt-in">Services → TLS &amp; HTTP/2</a>.
 {{ /comp }}
 
 {{ comp.cardsGrid({ columns: 3, cards: [

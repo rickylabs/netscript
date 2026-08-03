@@ -73,6 +73,7 @@ site.addEventListener("beforeBuild", async () => {
 // Lume build exits non-zero (build = link checker). Filter form returns the href:
 //   {{ "cap:services" |> xref }}
 site.filter("xref", (key: string) => resolveXref(key).href);
+site.filter("slugify", slugify);
 
 // Inline-code (ic): comp string args are emitted raw and are NOT markdown-
 // processed, so `code` spans authored with backticks render as literal backtick

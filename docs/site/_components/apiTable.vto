@@ -37,7 +37,7 @@
               <td class="{{ last ? 'ns-api-table__desc' : (i === 0 ? 'ns-api-table__name' : 'ns-api-table__type') }}">{{ entry[1] |> ic }}</td>
             {{ /for }}
           {{ else }}
-            <td class="ns-api-table__name"><code>{{ row.name }}</code></td>
+            <td class="ns-api-table__name"{{ if row.name }} id="{{ row.name |> slugify }}"{{ /if }}><code>{{ row.name }}</code></td>
             <td class="ns-api-table__type"><code>{{ row.type }}</code></td>
             <td class="ns-api-table__desc">{{ row.desc |> ic }}</td>
           {{ /if }}

@@ -14,7 +14,7 @@ runtime, and confirm it is wired up and healthy.
 
 This is a task-oriented recipe. It assumes you already have a NetScript workspace (created
 with `netscript init`) and that the `netscript` command is on your path. Each step is a
-single command you run from your workspace root; the [Verify](#step-4--verify-the-plugin-is-registered)
+single command you run from your workspace root; the [Verify](#step-4-verify-the-plugin-is-registered)
 step proves the plugin landed before you write a line of application code. For the exact
 APIs each plugin exposes, follow the [reference links](#reference) at the end — this guide
 adds the plugin; the reference documents its surface.
@@ -149,7 +149,7 @@ The auth plugin sets <code>requiresDb</code> and <code>requiresKv</code>, and co
 own Prisma models (<code>auth_users</code>, <code>auth_sessions</code>,
 <code>auth_accounts</code>, <code>auth_verifications</code>). Keep DB wiring on (do not pass
 <code>--no-db</code>) and run the database steps in
-<a href="#step-3--generate-registries-and-wire-the-database">Step 3</a> so its tables exist
+<a href="#step-3-generate-registries-and-wire-the-database">Step 3</a> so its tables exist
 before the service starts.
 {{ /comp }}
 
