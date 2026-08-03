@@ -30,3 +30,17 @@ Append-only.
   factually strained (#1153/#1155 merged pre-ratification carrying the 0.0.5 milestone) —
   surfaced to the owner in the acceptance evidence rather than papered over. Re-review steered on
   the same Sol thread (eval loop 1 of 2 before escalation).
+- 2026-08-03 · **eval cycle 2: CHANGES_REQUESTED — second failure, ESCALATED to owner** (verdict
+  `sol-eval-2.md`). Resolved by Sol: C1, C2, C4, C5, C6, C8, M3, M5, M6; no duplicate paragraphs;
+  mirror byte-identical. Of the 8 cycle-2 findings, 5 fixed in the follow-up slice: C3 residue
+  (reference-table row), C10 (tag-existence wording corrected against the tool), M7 (#1160 is
+  closed — lineage note now says so), and C7 + M4 converted from undemonstrated to **demonstrated**
+  (`gate-demos.md`: check-3 synthetic RED/GREEN; #1142 selection rule recovering PR #1155's true
+  pre-merge verdict from its live rollup containing a post-merge FAILURE). Escalated, needing an
+  owner ruling: **C9** — D2 is factually strained by pre-ratification 0.0.5-milestone merges
+  #1153/#1155; the D2 evidence box is now UNTICKED pending a ruling (orchestrated-delivery reading
+  recorded on #1120, or criterion moves); **M1/M2** — Sol holds `[observed]` must be cut-trace-only;
+  the artifacts follow the ratified design doc's practice (trace + filed issues + dated design
+  observations, cited per claim). Demoting filed-issue observations (#1113, #1115) to
+  "asserted/unproven" would be less accurate, not more honest — supervisor position, owner to
+  ratify or overrule. **No merge: the owner's green-gate condition is unmet.**

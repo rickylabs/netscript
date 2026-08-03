@@ -87,3 +87,27 @@ declined. Fixes:
 - **M5** stage-C operability closed: tooling.md + agent-handoff.md wired into skill and profile;
   `codex-watch --mode turn` interception rule added.
 - **M6** context-pack state corrected with an explicit do-not-repeat-S4 guard.
+
+## Eval cycle 2 — verdict CHANGES_REQUESTED; second failure → escalation
+
+Verdict: `sol-eval-2.md`. Sol confirms C1/C2/C4/C5/C6/C8/M3/M5/M6 resolved, no duplicate
+paragraphs, mirror byte-identical. Follow-up slice dispositions:
+
+- **C3 residue** — cadence reference-table row still said "verification of note accumulation";
+  now "reads the canary notes manually". Fixed.
+- **C10** — "release on the *existing* tag" implied a tag-existence check the tool does not
+  perform; wording corrected (tag created by the canary cut; tool creates-or-updates the release;
+  its guard is the published-version refusal). Fixed.
+- **M7** — #1160 is CLOSED; the "known limitation" became a lineage note keeping the
+  never-hand-patch doctrine. Fixed.
+- **C7** — resolved by demonstration rather than argument: `gate-demos.md` § Demo 1 shows the
+  check-3 predicate RED (exit 1) on a new ignore in publishable source, GREEN on excluded-path
+  quotes, GREEN on a clean diff. Row updated to cite it.
+- **M4** — resolved by demonstration on live data: `gate-demos.md` § Demo 2 applies both clauses
+  of the #1142 rule to merged PR #1155's real rollup (post-merge FAILURE +28s, superseded
+  CANCELLED) and recovers the true pre-merge SUCCESS. Row updated; [asserted] marker removed.
+- **C9** — escalated: owner ruling required on D2's reading (see drift.md); the D2 evidence box
+  in the PR body is now UNTICKED pending that ruling.
+- **M1/M2** — escalated: definitional dispute over the `[observed]` source of record
+  (cut-trace-only vs the ratified design record's own practice); supervisor position recorded in
+  drift.md, owner to ratify or overrule.

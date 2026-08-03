@@ -91,8 +91,10 @@ path must never be added (two paths to the same fact is how a label and a note d
 
 Contract (enforced by the tool):
 
-- The note is a **GitHub release on the existing `v<version>` tag, marked prerelease**. A canary
-  never takes `Latest` — that belongs to stable.
+- The note is a **GitHub release at tag `v<version>`, marked prerelease**. A canary never takes
+  `Latest` — that belongs to stable. The tag itself is created by the canary cut; the tool does
+  not verify the tag's prior existence — its guard is the published-version refusal above, which
+  in practice means the tag exists before a note can.
 - Re-running is **idempotent**: an existing canary release is updated, not duplicated or failed.
 - An empty payload (nothing merged since the previous canary point) produces an **explicit
   empty-payload note**, not a silent success and not a crash.
@@ -126,9 +128,10 @@ Gate integrity, per the #1120 proof-of-firing bar:
   every check it defines, including the ones it did not reach — an early exit leaves visible
   not-run records instead of silence. Silence is a failure, not a pass. How that reporting is
   implemented is the tool's own concern: consult `canary-label.ts`, not this document.
-- **Known limitation:** the drift check is not yet target-scoped, so historical canaries from
-  earlier trains report as missing labels (#1160). Treat that as the tracked defect it is — do not
-  hand-patch labels to green the gate, and do not widen the gate's tolerance to silence it.
+- **Lineage note:** the drift check originally reported historical canaries from earlier trains
+  as missing labels; that scoping defect was fixed under #1160 (closed). The doctrine it left
+  behind stands: when the drift gate reports red, treat it as a finding — never hand-patch labels
+  to green it, and never widen the gate's tolerance to silence it.
 
 ## Flexibility: what the cadence must absorb **[observed]**
 
@@ -163,7 +166,7 @@ Neither of these is settled. An orchestrator must not treat either answer as a r
 | --- | --- |
 | `.llm/tools/release/canary-label.ts` (`deno task release:canary-label`) | label derivation, payload computation, note rendering, drift gate |
 | `.agents/skills/netscript-release` | all publish mechanics, the green canary pair, failed-canary doctrine, rollback |
-| [`milestone-run.md`](./milestone-run.md) | the run shape that consumes this cadence; cut-time verification of note accumulation |
+| [`milestone-run.md`](./milestone-run.md) | the run shape that consumes this cadence; its cut checklist reads the canary notes manually |
 | `.agents/skills/agent-milestone-orchestrator` | the role that declares wave boundaries and decides when a canary goes out |
 | [`cut-trace.md`](../../runs/release-0.0.4--orchestration/cut-trace.md) | the observed evidence base |
-| #1149 · #1160 · #1119 | live-canary exercise (0.0.5) · drift-scoping defect · naming collision |
+| #1149 · #1160 · #1119 | live-canary exercise (0.0.5) · drift-scoping defect (fixed) · naming collision |

@@ -73,7 +73,7 @@ narrower, the row says exactly what is and is not yet demonstrated. Items 6 and 
 | --- | --- | --- | --- |
 | 1 | `close-gate` result is green | red close-gates idled four supervisors in 0.0.4 | a PR with no close-gate result is **unproven, not clean** — the result must exist |
 | 2 | zero unticked `- [ ]` on every issue the PR closes | 15 unchecked boxes across #1078's issues forced the mid-flight split of #1024/#1061 | an unfetched issue body counts as unticked |
-| 3 | no new `deno-lint-ignore` / `as unknown as` / `@ts-ignore` in the diff, **excluding `.llm/runs/**`** | what the record shows firing is the **exclusion** (false positives from run artifacts and the scanner's own source); the predicate catching a genuinely new ignore has **not** been observed in a milestone run — demonstrate that before trusting this row (#745 is the incident class it exists for) | a diff not scanned is a missing verdict, not a pass |
+| 3 | no new `deno-lint-ignore` / `as unknown as` / `@ts-ignore` in the diff, **excluding `.llm/runs/**`** | two-part record: the exclusion fired in 0.0.4 (false positives from run artifacts and the scanner's own source), and the predicate itself is demonstrated on a synthetic diff — RED on a new ignore in publishable source, GREEN on excluded-path quotes (`release-0.0.4` follow-up demo: `.llm/runs/feat-milestone-orchestrator-artifacts--authoring/gate-demos.md` § Demo 1; #745 is the incident class) | a diff not scanned is a missing verdict, not a pass |
 | 4 | named expensive gates report `SUCCESS`, not `SKIPPED`/`CANCELLED` | #778/#775 looked mergeable with every substantive check skipped, on a base dead since 17 July — **"clean" repeatedly meant "nothing ran"** | this check *is* the did-not-run detector; name the gates, don't count greens |
 | 5 | the single decisive claim per issue, re-verified independently | a `head -14` truncated log nearly auto-closed two issues with zero implementation; the raw log caught it | an unverified claim stays a claim — record it as unverified |
 | 6 | changed-file audit for `packages/**`/`plugins/**` on docs-lane PRs | #1079: a docs slice landed framework source (upstream cause: #1020 labelled `type:docs` with code acceptance) | an unaudited docs PR is unaudited — say so in the gate record |
@@ -95,9 +95,10 @@ These govern every gate this profile names and every gate a milestone run adds:
   merged PR's `statusCheckRollup` contains superseded red runs. Merge-history audits must compare
   check-run timestamps to the merge time and take **only the latest run per check name** — an
   audit that sums all runs manufactures false reds, the mirror image of check 4's false greens.
-  The defect is observed (#1142); the selection rule is its **prescribed mitigation, not yet
-  exercised in a milestone run [asserted]** — demonstrate it on a real superseded-run case before
-  relying on it.
+  The defect is observed (#1142), and both clauses of the rule are **demonstrated on live data**:
+  merged PR #1155's rollup carries a post-merge `classify changes` FAILURE (+28s after merge) and
+  a superseded pre-merge CANCELLED; applying the rule recovers the true pre-merge SUCCESS
+  (`.llm/runs/feat-milestone-orchestrator-artifacts--authoring/gate-demos.md` § Demo 2).
 - **Expensive gates are serialised across slices.** Three concurrent `scaffold.runtime` runs
   produced two failures that were contention, not defects **[observed]**.
 - **The honesty rule.** A criterion that cannot be truthfully ticked **moves with its issue to
