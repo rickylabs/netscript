@@ -64,6 +64,9 @@ integration test.
 | 2026-08-03 | plan      | diagnosis | Default runtime dropped compensation; correlation failed in both collapse and fork directions. |
 | 2026-08-03 | plan      | design    | Locked three defect slices plus merge-readiness slice; awaiting PLAN-EVAL.                     |
 | 2026-08-03 | plan-eval | blocked   | Canonical local Qwen route returned `auth_required`; no evaluator session launched.            |
+| 2026-08-03 | plan-eval | waived    | PR-A supervisor supplied a written opposite-family Plan-Gate waiver.                           |
+| 2026-08-03 | slice 1   | implement | Bounded Redis connection failure and serialized connection-scoped atomic sections.             |
+| 2026-08-03 | slice 1   | gate      | Real Redis list/save/CAS passed; package suites passed 79 + 63 tests.                          |
 
 ## Decisions
 
@@ -75,10 +78,10 @@ integration test.
 
 ## Drift
 
-| Drift                                                                     | Severity    | Logged in drift.md |
-| ------------------------------------------------------------------------- | ----------- | ------------------ |
-| Reported Redis hang did not reproduce; a deterministic CAS violation did  | significant | yes                |
-| Supervisor-named capability path is absent; canonical routed page differs | minor       | yes                |
+| Drift                                                                                          | Severity    | Logged in drift.md |
+| ---------------------------------------------------------------------------------------------- | ----------- | ------------------ |
+| Healthy Redis did not reproduce the field hang; dead-endpoint bounded failure remains required | significant | yes                |
+| Capability path is a redirect stub to the canonical content page                               | minor       | yes                |
 
 ## Gate Results
 
@@ -90,17 +93,25 @@ integration test.
 
 ### Fitness Gates
 
-| Gate      | Result  | Evidence                                             | Notes                                                      |
-| --------- | ------- | ---------------------------------------------------- | ---------------------------------------------------------- |
-| Plan-Gate | NOT_RUN | local Qwen provider canary blocked (`auth_required`) | Implementation blocked until PASS or written owner waiver. |
+| Gate                | Result  | Evidence                                             | Notes                                                      |
+| ------------------- | ------- | ---------------------------------------------------- | ---------------------------------------------------------- |
+| Plan-Gate           | NOT_RUN | local Qwen provider canary blocked (`auth_required`) | Implementation blocked until PASS or written owner waiver. |
+| #1064 scoped check  | PASS    | 139 files, 0 diagnostics                             | KV and saga-core wrapper.                                  |
+| #1064 scoped lint   | PASS    | 139 files, 0 findings                                | No ignored diagnostics.                                    |
+| #1064 scoped format | PASS    | 139 files, 0 findings                                | Source TypeScript only.                                    |
+| `quality:scan`      | PASS    | `ok:true`, no findings                               | Existing allowance count 7.                                |
+| `arch:check`        | PASS    | all doctrine roots `FAIL=0`                          | Existing warnings only.                                    |
 
 ### Runtime Gates
 
-| Gate                   | Result | Evidence                           | Notes                                                      |
-| ---------------------- | ------ | ---------------------------------- | ---------------------------------------------------------- |
-| Pre-fix real Redis CAS | FAIL   | 16 fulfilled, 0 rejected           | Expected diagnostic failure confirms #1064 contract drift. |
-| Pre-fix compensation   | FAIL   | 0 compensation calls               | Expected diagnostic failure confirms #1065.                |
-| Pre-fix correlation    | FAIL   | shared instance / per-message fork | Expected diagnostic failures confirm #1066.                |
+| Gate                    | Result | Evidence                           | Notes                                                      |
+| ----------------------- | ------ | ---------------------------------- | ---------------------------------------------------------- |
+| Pre-fix real Redis CAS  | FAIL   | 16 fulfilled, 0 rejected           | Expected diagnostic failure confirms #1064 contract drift. |
+| Pre-fix compensation    | FAIL   | 0 compensation calls               | Expected diagnostic failure confirms #1065.                |
+| Pre-fix correlation     | FAIL   | shared instance / per-message fork | Expected diagnostic failures confirm #1066.                |
+| #1064 real Redis        | PASS   | 4 passed, 0 failed                 | List/save bounded; exactly 1/16 CAS winner.                |
+| KV package suite        | PASS   | 79 passed, 0 failed                | Real test separately executed with owned Redis URL.        |
+| Saga-core package suite | PASS   | 63 passed, 0 failed                | Real test separately executed with owned Redis URL.        |
 
 ### Consumer Gates
 

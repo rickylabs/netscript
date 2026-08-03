@@ -6,15 +6,15 @@
 | -------------- | -------------------------------------------- |
 | Run ID         | `fix-1064-saga-durability--saga-correctness` |
 | Branch         | `fix/1064-saga-durability`                   |
-| Current phase  | `plan-eval`                                  |
+| Current phase  | `implement`                                  |
 | Archetype      | `2`, `3`, `5`                                |
 | Scope overlays | `docs`                                       |
 
 ## Current State
 
-Production source remains unchanged. All three defects have pre-fix empirical failures and the
-formal plan is committed, but the required separate-session PLAN-EVAL is blocked by missing local
-OpenRouter credentials.
+#1064 is implemented and gated: dead Redis fails loudly and boundedly, while a real Redis adapter
+lists saga data and admits exactly one concurrent expected-version save. The written supervisor
+waiver permits implementation despite the credential-blocked PLAN-EVAL lane.
 
 ## Completed
 
@@ -25,46 +25,45 @@ OpenRouter credentials.
 
 ## In Progress
 
-- Obtain supervisor direction or restore the canonical local evaluator credential.
+- Commit, push, and comment #1064 evidence before starting #1065.
 
 ## Next Steps
 
-1. Restore the canonical local Qwen evaluator route and run PLAN-EVAL, or obtain a written owner
-   waiver.
-2. Implement, gate, commit, push, and comment #1064.
-3. Repeat independently for #1065 and #1066.
-4. Run aggregate gates and IMPL-EVAL; drive draft PR to ready-for-merge.
+1. Commit, push, and comment #1064.
+2. Implement and gate #1065 without touching concurrent scaffold-owned files.
+3. Repeat for #1066.
+4. Run aggregate gates and supervisor review; drive draft PR to ready-for-merge.
 
 ## Key Decisions
 
-| Decision                                               | Source         | Notes                                                         |
-| ------------------------------------------------------ | -------------- | ------------------------------------------------------------- |
-| Real CAS violation is the #1064 implementation target  | research       | Original hang not reproduced and will not be falsely claimed. |
-| No new public exports                                  | plan/jsr scan  | Drift trigger if implementation contradicts this.             |
-| Effect and instance identity resolution are exhaustive | issue/doctrine | No silent fallthrough or message-id identity.                 |
+| Decision                                               | Source         | Notes                                                  |
+| ------------------------------------------------------ | -------------- | ------------------------------------------------------ |
+| #1064 has two distinct targets                         | research       | Bound dead-endpoint failure and repair concurrent CAS. |
+| No new public exports                                  | plan/jsr scan  | Drift trigger if implementation contradicts this.      |
+| Effect and instance identity resolution are exhaustive | issue/doctrine | No silent fallthrough or message-id identity.          |
 
 ## Files Changed
 
-| Path                                                     | Status | Notes                           |
-| -------------------------------------------------------- | ------ | ------------------------------- |
-| `.llm/runs/fix-1064-saga-durability--saga-correctness/*` | new    | Harness planning/evidence only. |
+| Path                                                    | Status      | Notes                                         |
+| ------------------------------------------------------- | ----------- | --------------------------------------------- |
+| Redis adapter, connection manager, and real Redis tests | changed/new | #1064 implementation and regression evidence. |
 
 ## Gates
 
-| Gate family | Current status            | Evidence                                     |
-| ----------- | ------------------------- | -------------------------------------------- |
-| Static      | planning PASS             | `deno doc` surface scan                      |
-| Fitness     | blocked                   | local evaluator `auth_required`              |
-| Runtime     | pre-fix failures captured | real Redis, compensation, correlation probes |
-| Consumer    | pending                   | docs/tests after implementation              |
+| Gate family | Current status   | Evidence                                 |
+| ----------- | ---------------- | ---------------------------------------- |
+| Static      | planning PASS    | `deno doc` surface scan                  |
+| Fitness     | PASS with waiver | supervisor waiver; quality and arch pass |
+| Runtime     | #1064 PASS       | real Redis plus bounded dead endpoint    |
+| Consumer    | pending          | docs/tests after implementation          |
 
 ## Open Questions
 
-- Canonical local PLAN-EVAL credential is absent; cloud OpenHands is not permitted for a local run.
+- None blocking slice 1 delivery.
 
 ## Drift and Debt
 
-- Drift: hang non-reproduction and canonical docs path recorded.
+- Drift: healthy/dead Redis distinction and capability redirect recorded.
 - Debt: none proposed; existing KV adapter audit remains open.
 
 ## Commits

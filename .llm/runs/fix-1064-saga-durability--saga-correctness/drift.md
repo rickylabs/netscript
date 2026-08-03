@@ -1,26 +1,27 @@
 # Drift Log: saga engine correctness
 
-## 2026-08-03 — Redis hang did not reproduce, atomic contract failure did
+## 2026-08-03 — Healthy Redis result does not resolve the field hang
 
-- **What:** The reported indefinite wait was not observed against owned Redis 7, Garnet 1.1.1, the
-  auto-detected shared runtime, or published 0.0.3. A concurrent CAS probe deterministically
-  admitted all 16 competing writers.
+- **What:** Owned healthy Redis/Garnet completed the exercised paths, while a concurrent CAS probe
+  admitted all 16 competing writers. The healthy result is scoped to that setup and cannot close the
+  field hang; dead-endpoint bounded failure is independently required.
 - **Source:** Real-server probes in ignored `.llm/tmp/repro-1064-*.ts`.
-- **Expected:** `KvSagaStore.save` would stop at Redis atomic commit.
-- **Actual:** Sequential saves complete; connection-shared `WATCH` does not protect concurrent
-  atomic operations.
+- **Expected:** The healthy-container reproduction would expose the deployed hang.
+- **Actual:** Healthy sequential saves complete; the deployed localhost/dead-endpoint condition
+  still requires a dedicated reproduction. Connection-shared `WATCH` independently fails CAS.
 - **Severity:** significant
 - **Action:** fix
 - **Evidence:** `repro-1064-concurrent-cas.ts` output: `fulfilled: 16`, `rejected: 0`, final
   writer 16.
 
-## 2026-08-03 — Canonical capability page path differs from addendum
+## 2026-08-03 — Capability path redirects to canonical content
 
-- **What:** `docs/site/capabilities/durable-sagas.md` is absent; the routed `cap:durable-sagas` page
-  is `docs/site/durable-workflows/sagas.md`.
+- **What:** `docs/site/capabilities/durable-sagas.md` is a three-line redirect stub whose target is
+  `docs/site/durable-workflows/sagas.md`.
 - **Source:** docs tree and xref search.
-- **Expected:** Edit the supervisor-named capabilities path.
-- **Actual:** Acceptance must update the existing canonical page and storefront tutorial.
+- **Expected:** State precedence on the sagas capability page.
+- **Actual:** Acceptance updates the canonical content reached through that redirect, plus the
+  storefront tutorial.
 - **Severity:** minor
 - **Action:** accept
 - **Evidence:** `rg -n "cap:durable-sagas" docs/site` and both existing pages.
@@ -39,3 +40,16 @@
 - **Action:** rescope
 - **Evidence:** The provider canary reports `credential: absent`. Cloud OpenHands is prohibited for
   this local run by the OpenHands routing skill.
+
+## 2026-08-03 — PLAN-GATE waived by PR-A supervisor
+
+- **What:** “Plan-Gate for this run is waived.” The supervisor states: “You are not self-certifying
+  — I am certifying,” and will substantively review each slice.
+- **Source:** Written PR-A supervisor message in the implementation session.
+- **Expected:** Separate local Qwen PLAN-EVAL before implementation.
+- **Actual:** The canonical open-model lane is credential-blocked and closed-model substitutes are
+  prohibited; the opposite-family supervisor supplied the written waiver requested by the run.
+- **Severity:** significant
+- **Action:** accept
+- **Evidence:** Supervisor waiver dated 2026-08-03; prior canary evidence remains recorded and will
+  not be rerun.

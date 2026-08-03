@@ -82,7 +82,7 @@ by extractor → explicit key → deterministic default, including two concurren
 | `D4` | Default factory composes the existing `SagaCompensator`; an injected compensator remains the override.                                                                            | Keeps plugin thin and advanced injection intact.                                      |
 | `D5` | Unknown cascade kinds throw an error naming the kind; missing scheduler/compensator errors continue naming the missing option.                                                    | Eliminates silent-drop paths.                                                         |
 | `D6` | Correlation precedence is definition extractor (specific rule before wildcard) → explicit `message.correlationKey` → message-type default. `message.id` is never an instance key. | Meets #1066 in both collapse and fork directions.                                     |
-| `D7` | Canonical docs are `docs/site/durable-workflows/sagas.md` and the storefront tutorial because the supervisor-named capability path is absent.                                     | Updates the actual routed documentation surface.                                      |
+| `D7` | Canonical content lives at `docs/site/durable-workflows/sagas.md`; `docs/site/capabilities/durable-sagas.md` redirects there. Update the canonical page and storefront tutorial.  | Updates the content reviewers reach through the capability redirect.                  |
 
 ## Open-Decision Sweep
 

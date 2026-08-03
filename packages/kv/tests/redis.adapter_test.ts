@@ -1,0 +1,74 @@
+import { assert, assertEquals, assertRejects, assertStringIncludes } from '@std/assert';
+import { KvConnectionError } from '../application/errors.ts';
+import { RedisKvAdapter } from '../redis.ts';
+
+Deno.test('RedisKvAdapter fails a dead endpoint loudly within a bounded interval', async () => {
+  const kv = new RedisKvAdapter({
+    url: 'redis://127.0.0.1:1',
+    options: { connectTimeout: 100 },
+  });
+  const startedAt = performance.now();
+
+  try {
+    const error = await assertRejects(
+      () => withTimeout(collect(kv.list({ prefix: ['registry'] })), 5_000),
+      KvConnectionError,
+    );
+    assertStringIncludes(error.message, 'could not connect');
+    assertStringIncludes(error.message, 'after 3 attempts');
+    assert(performance.now() - startedAt < 5_000);
+  } finally {
+    await kv.close();
+  }
+});
+
+Deno.test({
+  name: 'RedisKvAdapter lists real Redis entries and admits one atomic CAS winner',
+  ignore: !Deno.env.get('NETSCRIPT_TEST_REDIS_URL'),
+  async fn() {
+    const url = Deno.env.get('NETSCRIPT_TEST_REDIS_URL');
+    assert(url);
+    const kv = new RedisKvAdapter({ url, namespace: `test-${crypto.randomUUID()}` });
+
+    try {
+      await kv.set(['registry', 'orders'], { id: 'orders' });
+      const entries = await withTimeout(collect(kv.list({ prefix: ['registry'] })), 5_000);
+      assertEquals(entries.map((entry) => entry.value), [{ id: 'orders' }]);
+
+      await kv.set(['sagas', 'orders'], { writer: 0 });
+      const current = await kv.get(['sagas', 'orders']);
+      assert(current);
+      const outcomes = await withTimeout(
+        Promise.all(
+          Array.from({ length: 16 }, (_, writer) =>
+            kv.atomic(
+              [{ key: ['sagas', 'orders'], versionstamp: current.versionstamp }],
+              [{ type: 'set', key: ['sagas', 'orders'], value: { writer: writer + 1 } }],
+            )),
+        ),
+        5_000,
+      );
+      assertEquals(outcomes.filter((outcome) => outcome.ok).length, 1);
+    } finally {
+      await kv.close();
+    }
+  },
+});
+
+async function collect<T>(entries: AsyncIterable<T>): Promise<T[]> {
+  const collected: T[] = [];
+  for await (const entry of entries) collected.push(entry);
+  return collected;
+}
+
+async function withTimeout<T>(operation: Promise<T>, timeoutMs: number): Promise<T> {
+  let timeout: ReturnType<typeof setTimeout> | undefined;
+  const deadline = new Promise<never>((_, reject) => {
+    timeout = setTimeout(() => reject(new Error(`operation exceeded ${timeoutMs}ms`)), timeoutMs);
+  });
+  try {
+    return await Promise.race([operation, deadline]);
+  } finally {
+    if (timeout !== undefined) clearTimeout(timeout);
+  }
+}
