@@ -417,3 +417,26 @@ RED-first, install-order independence, uninstall cleanup), and the fixture third
 wired without touching CLI source as the non-negotiable seam proof. Wave-6 rebalanced (tail →
 wave 7); #1189 holds W6's expensive-gate slot. `status:plan` set; decision commented on the
 issue.
+
+## 2026-08-04 — Wave-0 proof verdicts reviewed; F1(b) recorded; #1191 filed
+
+Full-artifact review of all three proof verdicts (PR #1182):
+
+- **P1 FAIL → F1(b), qualified.** The post-allocation seam WORKED (atomic identity-bound
+  manifest, localhost-name URL); the coherent-owned-run bar failed on an unhealthy service —
+  the generated SQLite command omits `--allow-ffi` (`libsql`) — and an unattributed HTTP 200
+  was correctly refused as evidence. F1(b) = `aspire-cli` adapter primary; S7/#1133 re-scoped;
+  S5/#1131 unchanged; revisit clause owner-owned. The proof applied "liveness is not progress"
+  to itself.
+- **P2 FAIL (honest mapping).** No-DB branch fully measured (3657B spec, dotted operationIds,
+  keyword inventory, `{}` error views, no aggregate ceiling); DB branch blocked by the same
+  defect. **Orchestrator ruling (recorded as drift D8):** S4/S6 proceed on the no-DB inventory
+  — the gating law requires the verdict artifact to exist, and it does; the DB re-measurement
+  rides #1191, and any contract contradiction is a recorded re-scope at the next boundary.
+- **P3 PASS.**
+- **#1191 filed (p1, W2 scaffold-defect class):** `--allow-ffi` omitted from generated
+  SQLite/libsql service commands; acceptance includes RED-first scaffold proof, permission
+  audit across the other DB templates, and the P2 DB-branch re-measurement. Scheduled wave 2
+  (canary.2 train); #1119 slides W2→W3 to hold width at 4 Codex + agy.
+- Decision record posted to RFC #1123 + epic #1126; seed RFC §9 already updated by the slice.
+  #1127/#1128/#1129 boxes verified/ticked on evidence; PR #1182 marked ready; gate watcher armed.
