@@ -72,6 +72,10 @@ CLI E2E/dependency fixture rather than importing workspace source directly.
 | 2026-08-03 | slice 1   | main-red proof | Stashed all implementation changes, restored only the new real-plugin permutation test onto `origin/main`/`c1dee1697`, and ran the complete test file. It failed at the permutation equality step: expected included `"streams"`, actual contained only `"workers-api"`; summary `FAILED | 0 passed (21 steps) | 1 failed (1 step)`. Restored the full stash afterward. |
 | 2026-08-03 | slice 1   | review/commit | Supervisor accepted the implementation with two fixes: removed stale `assertResolvable` documentation and declared the exported member removal as an intentional 0.0.4 breaking change. Committed and pushed `3e9abf10c`. |
 | 2026-08-03 | slice 2   | live AppHost truth | Added an injected AppHost inspection port and Aspire CLI adapter. It checks `aspire ps` before `describe`, reports an absent AppHost distinctly, and compares configured services/apps/databases to named running resources with unhealthy state preserved. Existing workers plugin negative test explicitly proves a contributed check returns `ok: false`. |
+| 2026-08-03 | slice 2   | commit | Committed and pushed live AppHost truth as `7168abd11`. A later scaffold E2E compatibility pass refined not-running to a distinct warning while keeping running-but-unhealthy an error, so static doctor checks remain usable before AppHost startup. |
+| 2026-08-03 | slice 3   | #1014 evidence | `installs a published Prisma fragment from JSR metadata into the root schema tree` performs a clean public install and asserts the fetched plugin fragment exists under the root schema tree. It passed in the 21-test residual acceptance run; no further implementation change was needed. |
+| 2026-08-03 | slice 3   | #1015 evidence | Existing Aspire/service tests prove absolute project-owned registry URLs. Added `published dependency starts a saga runtime with a project-owned non-empty registry`, which imports `jsr:@netscript/plugin-sagas@0.0.3/runtime`, starts it against the consumer project's generated registry, and asserts `definitionCount === 1`. No saga source/runtime/store file was changed. |
+| 2026-08-03 | slice 3   | #1017 evidence | Added per-plugin assertions that worker, saga, trigger, and stream install commands each receive `--no-samples` and never `--samples`. The true-userland E2E artifact independently showed all four real commands with `--no-samples` and reduced created-file counts. Its final source-leak assertion found pre-existing local-path doctor URLs in persisted manifests; this is unrelated to sample threading and was not expanded into a redesign. |
 
 ## Decisions
 
@@ -107,6 +111,19 @@ the owner-authorized supervisor.
 | Focused doctor behavior | `15 passed | 0 failed`: absent AppHost, named missing resources, running-but-unhealthy resource, adapter `ps`/`describe` sequencing, and real workers-contributed `ok: false`. |
 | `packages/cli` check/test | Check passed; full package suite `549 passed (474 steps) | 0 failed`. |
 | Scoped check/lint/fmt | Six touched CLI files; check `0` failed batches/occurrences, lint `0` occurrences, fmt `0` findings. |
+| `deno task quality:scan` | `ok: true`, `findings: []`; seven existing allowances only. |
+| `deno task arch:check` | Exit 0; every doctrine root `FAIL=0` with pre-existing warnings only. |
+
+### Slice 3
+
+| Gate | Trusted artifact/output |
+| ---- | ----------------------- |
+| Residual acceptance set | `21 passed (22 steps) | 0 failed`: clean published schema fragment, generated saga registry, absolute Aspire/service registry URLs, and suite shape. |
+| Published dependency runtime | Published `@netscript/plugin-sagas@0.0.3/runtime` process exited 0 with a project-owned generated registry and `definitionCount: 1`; full integration file passed `9/9`. |
+| All-four negative flag | Focused suite registry test passed and individually asserts worker/saga/trigger/stream commands contain `--no-samples` and exclude `--samples`. True-userland E2E executed all four successfully; its later unrelated content-leak assertion failed on local-path doctor metadata (`plugin-smoke-20260803-092131.log`). |
+| `packages/cli` check/test | Check passed; full package suite `550 passed (474 steps) | 0 failed`. |
+| Required CLI E2E | `scaffold.plugins`: `passed=16`, `failed=0`, `skipped=0` after the no-AppHost warning compatibility refinement. |
+| Scoped check/lint/fmt | Four touched CLI files; check/lint/fmt all reported zero failures/occurrences/findings. |
 | `deno task quality:scan` | `ok: true`, `findings: []`; seven existing allowances only. |
 | `deno task arch:check` | Exit 0; every doctrine root `FAIL=0` with pre-existing warnings only. |
 

@@ -121,6 +121,7 @@ Deno.test('plugin doctor distinguishes an absent AppHost from unhealthy resource
     loadConfig: () => Promise.resolve(configWithResources()),
     inspectAppHost: { inspect: () => Promise.resolve({ status: 'not-running' }) },
   });
+  assertEquals(reports[0].status, 'warning');
   assertEquals(reports[0].checks[0].id, 'apphost:not-running');
   assertStringIncludes(reports[0].checks[0].message ?? '', 'No AppHost is running');
 });

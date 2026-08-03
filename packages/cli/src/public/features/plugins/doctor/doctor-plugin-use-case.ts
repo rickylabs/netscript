@@ -116,11 +116,16 @@ async function diagnoseAppHost(
   try {
     const snapshot = await inspector.inspect(projectRoot);
     if (snapshot.status === 'not-running') {
-      return workspaceErrorReport(
-        'apphost:not-running',
-        'Aspire AppHost running',
-        new Error('No AppHost is running for this project. Start it and rerun plugin doctor.'),
-      );
+      return {
+        pluginName: 'apphost',
+        status: 'warning',
+        checks: [{
+          id: 'apphost:not-running',
+          title: 'Aspire AppHost running',
+          status: 'warning',
+          message: 'No AppHost is running for this project. Start it and rerun plugin doctor.',
+        }],
+      };
     }
     const observed = new Map(snapshot.resources.map((resource) => [resource.name, resource]));
     const checks = configuredResourceNames(config).map((name): PluginDoctorCheck => {

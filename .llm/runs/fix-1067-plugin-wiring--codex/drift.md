@@ -63,3 +63,18 @@
 - **Severity:** significant
 - **Action:** accept as an intentional 0.0.4 breaking change and declare it in release/PR notes.
 - **Evidence:** `create-service-stream-producer.ts`, its focused test, and streams documentation.
+
+## 2026-08-03 — local-path doctor metadata trips the userland source-leak assertion
+
+- **What:** The all-four no-samples userland E2E completed every install successfully, then its
+  generic content scan rejected absolute `file:` doctor entrypoints persisted in workers/sagas
+  `scaffold.plugin.json`.
+- **Source:** `plugin-smoke-20260803-092131.log`.
+- **Expected:** The suite's final assertion accepts the intentionally local-path-backed install
+  while rejecting copied framework source and sample artifacts.
+- **Actual:** Sample artifacts were absent and all four commands received `--no-samples`, but the
+  local doctor module locator necessarily names the checkout used by this development-mode suite.
+- **Severity:** minor
+- **Action:** record as a 0.0.5 candidate to separate local development provenance from portable
+  consumer metadata; do not expand the residual acceptance-test slice.
+- **Evidence:** four passed scaffold gates and the final assertion's two manifest-only findings.

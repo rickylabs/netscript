@@ -73,6 +73,25 @@ Deno.test('true userland suite runs init, four no-samples plugin installs, asser
     GATE.USERLAND_INSTALL_ASSERTIONS,
     GATE.CLEANUP_USERLAND_SMOKE_ROOT,
   ]);
+
+  const context = {
+    request: { suiteId: userland.id, options: userland.defaultOptions },
+    project: {
+      repoRoot: '/repo',
+      cliEntrypoint: '/repo/packages/cli/bin/netscript.ts',
+      smokeRoot: '/scratch',
+      projectName: 'consumer',
+      projectRoot: '/scratch/consumer',
+      appHost: '/scratch/consumer/aspire/apphost.mts',
+    },
+  } as const;
+  for (const kind of ['worker', 'saga', 'trigger', 'stream']) {
+    const gate = userland.gates.find((candidate) => candidate.id === `scaffold.plugin.${kind}`);
+    if (!gate || gate.kind !== 'command') throw new Error(`Missing ${kind} install command gate.`);
+    const command = gate.command(context);
+    assertEquals(command.includes('--no-samples'), true, `${kind} must receive --no-samples`);
+    assertEquals(command.includes('--samples'), false, `${kind} must not receive --samples`);
+  }
 });
 
 Deno.test('runtime suite includes full scaffold, database, runtime, and behavior gates', () => {
