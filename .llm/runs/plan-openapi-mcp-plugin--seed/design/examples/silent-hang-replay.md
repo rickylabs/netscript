@@ -1,9 +1,14 @@
-# Worked Example 1 — Replaying the wave-four silent hang
+# Worked Example 1 — A hypothetical replay of the wave-four silent hang
 
-> Draft — design document only. This replays the measured incident from #1117/#1064: an agent's
-> publish endpoint hung with no error; ~25 minutes of blind `curl` followed. The replay shows the
-> same situation with the v1 introspection tools in place. Service names and schemas are
-> illustrative of a scaffolded app; every tool behavior shown is specified in
+> Draft — design document only. Rev 2 (S-23): **this walkthrough is hypothetical throughout.**
+> What is measured (research.md §1): an agent's publish endpoint hung with no error, ~25 minutes
+> of blind `curl` followed, and the agent wrote afterwards that the unread docs would have
+> explained the RPC envelope. What is NOT in the evidence: the endpoint's actual response
+> semantics, body, or causal chain — the 202/poll mechanism below is *one plausible mechanism
+> consistent with the symptom*, invented for illustration, not recovered from incident
+> artifacts. The example demonstrates what the tools would show for such a service; it is not
+> evidence that the specific incident would have resolved in three calls. Service names and
+> schemas are illustrative; every tool behavior shown is specified in
 > `../canonical/01-tool-surface.md`–`03`.
 
 ## The situation
@@ -26,9 +31,9 @@ services:
 hint: Use list_service_operations {service} next.
 ```
 
-One call has already eliminated the two most expensive guesses of the original incident: the
-port, and the existence/health of the service (a `configured (not running)` row here would have
-ended the debugging in ten seconds — the hang's root cause class).
+One call has already eliminated two expensive guesses: the port, and the existence/health of
+the service (a `not_running` row here — 02's status mapping — would have ended that branch of
+debugging in ten seconds).
 
 **Step 2 — what the service actually exposes.**
 
@@ -64,10 +69,13 @@ curl -X POST http://localhost:61432/api/publisher/publish \
   -d '{"document":{"title":"...","body":"...","channels":["rss"]}}'
 ```
 
-This output is the quoted counterfactual made concrete: *"the free Scalar docs I never opened…
-would have explained instantly"* — the RPC envelope, the 202-not-200 semantics (the response
-says to poll `publisher.status`; a client awaiting a body "hangs" by design), and a paste-ready
-correct request. The incident's 25 minutes reduce to three calls, ~40 lines of bounded output.
+For this hypothetical service, the output shows the class of fact the wave-four agent lacked:
+the envelope, the async-semantics note (the response schema's own description says to poll
+`publisher.status` — a client written to await a final result would wait on the wrong thing),
+and a correct request template. The honest claim (S-23): the tools deliver the service's
+declared contract in three bounded calls; whether that contract would have explained *the*
+incident depends on what that service actually declared, which the evidence does not record.
+The `curlExample` carries its `authNote` (01, S-24) — shape-ready, authorization not inferred.
 
 **Step 4 — where the agent goes next (activation surface E).** If the agent instead started
 from symptoms — `get_recent_errors` or `doctor` — those outputs point at `get_operation_schema`

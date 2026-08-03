@@ -1,6 +1,10 @@
-# Discovery Across Dynamic Ports (canonical design, rev 1)
+# Discovery Across Dynamic Ports (canonical design, rev 2)
 
-> Draft — design document only. The mechanism seam is Wave-0 proof [P1].
+> Draft — design document only. Rev 2 integrates Sol stage-2 findings S-4, S-7–S-12
+> (`../../adversarial-triage.md`). The producer mechanism is **P1-arbitrated, not chosen**
+> (S-7); the manifest carries identity, not just liveness hints (S-8); the directory contract
+> reports source outcomes (S-9), deterministic precedence (S-10), bounded fetches (S-11), and a
+> single status mapping (S-12).
 
 ## The problem, stated precisely
 
@@ -23,85 +27,149 @@ runtime ports.
 
 | Option | Verdict |
 | --- | --- |
-| (a) **AppHost-published endpoint manifest** — the generated Aspire helpers, which already hold every service resource and wire `getEndpoint('http')` references (`generate-register-services.ts:40-144`), additionally write `{service → resolved URL}` to a run-state file the MCP reads | **Chosen.** Offline, zero new processes/transports, no version coupling; the AppHost is the only party that authoritatively knows resolved ports |
-| (b) MCP shells out to the `aspire` CLI to query running resources | Fallback if [P1] fails. Works today (the aspire MCP proves the data is reachable) but couples to CLI output format and requires the CLI on PATH in the MCP's spawn context |
+| (a) **AppHost-published endpoint manifest** — generated Aspire code writes `{service → resolved URL}` to a run-state file the MCP reads | **Preferred, contingent on [P1]** (see producer section — the currently generated helper body provably runs *before* endpoint allocation, S-7) |
+| (b) MCP queries the `aspire` CLI for running resources | Activated if [P1] fails. The port contract below already contains this source and its failure states (S-10) — the earlier claim that the fallback "changes nothing" is withdrawn |
 | (c) Host the MCP inside the AppHost as an Aspire resource (per #1117's original sketch) | Rejected: requires an HTTP MCP transport that does not exist (`stdio only`, research §2.2), reintroduces the port problem for the MCP itself, and forces `.mcp.json` churn from static command to per-run URL |
 | (d) Fixed ports for all services | Rejected: regresses #952-era ephemeral-port behavior and collides on shared machines |
 
-## The endpoint manifest (option a)
+## The endpoint manifest (option a) — and why it is not yet locked
 
-**Producer.** The generated `.helpers/register-services.mts` (or a sibling helper the generator
-pipeline emits, `helpers-generator-pipeline.ts:68,92`) writes, once endpoints are allocated:
+**The S-7 correction.** The rev-1 text nominated `register-services.mts` as the producer. The
+reviewer showed that is unreachable as written: `createNetScriptAppHost()` registers resources
+and returns (`generate-index-1.ts.template:33-72`) **before** the entry point calls
+`builder.build().run()` (`apphost.ts.template:6-11`), and the helper's `getEndpoint()` values
+are deferred references consumed by `withEnvironment`
+(`generate-register-services-1.ts.template:64-85`) — endpoint values resolve during application
+startup, readable only via lifecycle eventing (Aspire resource-lifecycle docs). A write in the
+helper body would emit placeholders, not `http://localhost:<allocated>`.
+
+**[P1] is therefore the arbitration, with a positive artifact (S-17/plan):** demonstrate a
+generated, run-mode, **post-allocation** callback (Aspire lifecycle event surfaced to the
+generated code — TS or the C# AppHost side) that resolves each endpoint *from the host network
+perspective* and writes the manifest. The proof commits `proofs/P1-verdict.md` with the working
+mechanism or a negative verdict; a negative verdict activates option (b), and Wave-1's discovery
+slice has a hard prerequisite on that artifact.
+
+**The manifest, when produced (either mechanism):**
 
 ```jsonc
 // <project-root>/.netscript/run/endpoints.json   (location: owner fork F1; gitignored)
 {
   "schemaVersion": 1,
-  "apphostPid": 41230,
+  "projectRoot": "/home/u/apps/acme-notes",     // identity binding (S-8)
+  "runId": "0198f3c2-…",                        // fresh per AppHost run; not PID-derived
   "writtenAt": "2026-08-03T14:02:11Z",
   "services": {
-    "publisher": { "http": "http://localhost:61432" },
-    "workers-api": { "http": "http://localhost:61433" }
+    "publisher": { "http": "http://127.0.0.1:61432" },
+    "workers-api": { "http": "http://127.0.0.1:61433" }
   }
 }
 ```
 
-Write is atomic (temp + rename), byte-idempotent per the codegen precedent
-(`generate-runtime-schemas.ts:107-176` skip-identical rule). **[P1] must prove** the exact seam:
-whether the TS helper layer can observe *resolved* URLs (an endpoint-allocated lifecycle point,
-e.g. Aspire's after-endpoints-allocated event surfaced to the helpers) or whether the C# AppHost
-side must emit it. This is stated as unproven; if neither seam exists cleanly, F1(b) — the
-`aspire` CLI query adapter behind the same port — is the fallback and **the port contract below
-does not change**.
+Write is atomic (temp + rename, temp files cleaned on startup), byte-idempotent per the codegen
+precedent (`generate-runtime-schemas.ts:107-176`). URLs are written as **literal loopback
+hosts** (S-4 §security below).
 
-**Consumer.** A new `packages/mcp` domain port, adapter-injected like every other port
-(`run-agent-mcp.ts:22` composition):
+## Identity and staleness (S-8)
+
+PID + wall-clock freshness is insufficient (PID reuse; writer clock skew; copied
+worktrees/run dirs; `--project-root` mismatch). Rev 2 binds identity instead:
+
+- A manifest is **eligible** only if its `projectRoot` equals the MCP's resolved
+  `--project-root` (real-path compared). A copied worktree's manifest is refused with an
+  explicit `manifest_foreign` source outcome, never silently used.
+- `runId` is minted per AppHost run and is the freshness token; `writtenAt` is advisory
+  display only, never a guard.
+- **Before an endpoint is reported as `running` — and always before any v2 invocation — the
+  fetched service must prove it belongs to the binding:** the spec fetch is cross-checked
+  against the service's self-identification (`withServiceInfo` is on every preset,
+  `define-service.ts:230`; the served name must equal the directory entry's name). A reused
+  port serving some *other* project's service fails the cross-check and the row reports
+  `identity_mismatch` — it does not become a healthy row, and v2 will not send to it.
+
+## The directory port (S-9, S-10)
 
 ```ts
 // packages/mcp/src/domain/service-endpoint-directory-port.ts
 export interface ServiceEndpointDirectoryPort {
-  /** All services the app declares, merged with live endpoints when available. */
-  list(): Promise<readonly ServiceEndpointEntry[]>;
+  list(): Promise<ServiceEndpointDirectoryResult>;
+}
+export interface ServiceEndpointDirectoryResult {
+  readonly entries: readonly ServiceEndpointEntry[];
+  /** One outcome per consulted source — a failed read is data, never a silent absence. */
+  readonly sources: readonly SourceOutcome[];
+}
+export type EndpointSource = 'run-manifest' | 'appsettings' | 'override' | 'aspire-cli';
+export interface SourceOutcome {
+  readonly source: EndpointSource;
+  readonly outcome: 'used' | 'absent' | 'failed';
+  readonly reason?: string;            // present iff failed: unreadable | invalid | foreign | …
 }
 export interface ServiceEndpointEntry {
   readonly name: string;
-  readonly baseUrl?: string;                       // absent → not running
-  readonly source: 'run-manifest' | 'appsettings' | 'override';
+  readonly baseUrl?: string;           // absent → not running / excluded
+  readonly source: EndpointSource;
+  readonly conflict?: { readonly source: EndpointSource; readonly baseUrl: string };
 }
 ```
 
-Resolution order inside the default adapter: run manifest (fresh, see staleness) → 
-`appsettings.json` static list (entries surface as `configured (not running)`) → explicit
-`serviceEndpoints` override on `McpCliOptions` (parity with the existing `--docs-root`/env
-override pattern, `cli.ts:70-79`) for non-Aspire or CI use.
+- **Precedence is deterministic and per-service:** `override` > `run-manifest` >
+  `appsettings` (an explicit override exists precisely to beat discovered state — S-10 inverted
+  the rev-1 order). When a lower-precedence source disagrees, the winning entry carries the
+  losing value in `conflict` so `list_api_services` can surface it; disagreement is visible,
+  never adjudicated silently.
+- `aspire-cli` is a first-class source with its own failure states (CLI absent from PATH,
+  non-zero exit, unparseable output, multi-AppHost ambiguity) reported as `SourceOutcome.failed`
+  reasons — the F1(b) fallback activates *inside* this contract, not by bending it.
+- The `sources` block flows into `list_api_services` output verbatim (01), which is what makes
+  "manifest unreadable + appsettings fine" distinguishable from "AppHost never started" — the
+  absence-of-red-is-not-green requirement.
+- Doctrine note (S-21): `EndpointSource` is a **named axis** per doctrine 07 — typed
+  identifier, adapters mapped by a factory at the composition edge. All variants are first-party
+  adapters of this one core port; the axis is named so the plugin question can be re-asked
+  honestly if an external endpoint provider ever appears (06 §1).
 
-## Staleness and trust
+## Status mapping (S-12 — one mapping, used by 01 and the examples)
 
-- The manifest is advisory, never authoritative: **liveness is the spec fetch itself.** Tools
-  fetch `<baseUrl>/api/openapi.json` at use time (the spec is per-request-generated,
-  `openapi.ts:74-93`, so success ⇒ current truth). Connection refused ⇒ the entry degrades to
-  `configured (not running)` with the stale manifest noted.
-- `apphostPid` + `writtenAt` let the adapter flag a manifest older than the running AppHost or
-  orphaned by a dead one; it never guesses — it reports.
-- The manifest is machine-local run state: gitignored, never committed, torn down by the same
-  hygiene that owns `.netscript/` run artifacts. It contains only localhost URLs — no secrets.
+| Probe result | Public status |
+| --- | --- |
+| No listener (connection refused / no route) | `not_running` (rendered `configured (not running)` with source context) |
+| Listener, but timeout / HTTP error / redirect / parse failure on the spec | `spec_unavailable` (with status code or failure class; 401/403 adds the authz-cause hint, [P3]) |
+| Spec OK but identity cross-check fails | `identity_mismatch` |
+| Excluded by `introspection.excludeServices` (S-25) | `excluded` — spec never fetched, tested |
 
-## Security posture of the fetch adapter
+## Fetch adapter — bounds and loopback (S-4, S-11)
 
-`ServiceSpecPort`'s default adapter fetches **loopback only** (hosts resolving to
-127.0.0.0/8/::1 — Aspire-assigned service URLs are localhost by construction); anything else
-requires the explicit override config. This is the awslabs `--allow-private-networks` idea
-inverted for a local-first tool: we allow *only* private-loopback and gate everything else. No
-redirects followed; response size capped before parse; JSON parse failures surface as
-`spec_unavailable` with the first bytes summarized. No credentials are attached to spec fetches,
-ever; a 401/403 is a *reported condition* (01 failure envelopes, [P3]), not a retry-with-creds.
+Every read-path fetch has a **bounded timeout and abort**, per-service failure isolation, and a
+small concurrency cap: one service accepting the TCP connection and never responding becomes one
+`spec_unavailable (timeout)` row while the rest of the directory returns — the tool that exists
+to diagnose hangs must itself be un-hangable (S-11 adopted; the v2 flow's bounds now apply to v1
+reads too).
+
+The loopback guarantee is narrowed to what a parse-level check can honestly deliver, plus one
+strengthening:
+
+- Manifest/appsettings-sourced URLs must carry **literal loopback hosts** (127.0.0.0/8 dotted
+  literals or `::1`); the producer writes them that way. `localhost` and other DNS names are
+  resolved via `Deno.resolveDns` first; if every resolved address is loopback, the fetch is
+  **pinned to the resolved IP** (host header preserved), otherwise refused. Suffix tricks
+  (`localhost.evil`) never match a literal check; IPv6-mapped forms are normalized before the
+  test.
+- Explicit `override` entries may name non-loopback hosts: those are **operator-trusted by
+  definition** and labeled as such in output. plan.md's "no network beyond localhost" is
+  correspondingly scoped: *no non-loopback traffic without an explicit human-written override*.
+- Residual gap, stated: resolve-then-pin closes the rebinding window but is still not a
+  socket-level bind; that depth remains the recorded debt item (06 §5) and the claim "SSRF-safe
+  loopback resolution" is not made.
+
+No redirects; response size capped before parse; JSON parse failures surface as
+`spec_unavailable` with the first bytes summarized. No credentials attached to spec fetches,
+ever; 401/403 is a reported condition, not a retry-with-creds.
 
 ## What this deliberately does not build
 
-- No file-watch, no daemon, no push channel — tools read at call time; the agent's cadence is
-  the refresh cadence.
-- No cross-machine discovery, no non-loopback fleets — out of scope for the local dev loop this
-  serves.
+- No file-watch, no daemon, no push channel — tools read at call time.
+- No cross-machine discovery, no non-loopback fleets.
 - No dependence on `getAllServices()` in the MCP process (it would silently return `[]` there —
   the trap this section exists to design away). Inside service processes it remains the right
-  helper, and nothing here changes it.
+  helper; a one-line doc note is queued as debt (06 §5).

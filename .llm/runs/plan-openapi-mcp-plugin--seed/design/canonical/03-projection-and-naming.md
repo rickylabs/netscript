@@ -1,7 +1,8 @@
-# Projection and Naming (canonical design, rev 1)
+# Projection and Naming (canonical design, rev 2)
 
-> Draft — design document only. This is where "reads like NetScript, not like a REST dump" is
-> earned concretely.
+> Draft — design document only. Rev 2 integrates Sol stage-2 findings S-2, S-19, S-22
+> (`../../adversarial-triage.md`). This is where "reads like NetScript, not like a REST dump"
+> is earned concretely.
 
 ## 1. Why we write the projection ourselves
 
@@ -35,8 +36,13 @@ results, not as tool names.
   sees in contract source and in oRPC client code — one vocabulary everywhere.
 - Fallback (spec from a non-preset service or hand-set operationId absent): `METHOD path` string
   (`POST /api/publisher/publish`), accepted by `get_operation_schema` interchangeably with the
-  id. The matcher is exact-first, then case-insensitive, then substring-suggest (01 failure
-  envelope) — never fuzzy-guessing execution targets.
+  id. **Canonicalization law (S-2):** lookup resolves input to exactly **one** spec operation —
+  exact dotted id first, else exact `METHOD path` — and everything downstream (views, policy
+  predicates, receipts) uses only the canonical dotted identity. Ambiguity refuses: a spec
+  containing case-variant ids (`Foo.read` / `foo.read`) or an input matching more than one
+  operation returns the candidates instead of picking one. Case-insensitive and substring
+  matching exist **only** to populate the `operation_unknown` suggestion list (01) — they are
+  display aids, never resolution, and never execution matchers.
 
 ## 3. Schema views
 
@@ -46,7 +52,7 @@ results, not as tool names.
 | --- | --- |
 | `request` | merged path/query/header parameters (name, location, required, schema, description) + request-body JSON Schema, internal refs inlined, cycle-guarded (WeakSet, harsha precedent) |
 | `response` | the success-response schema (2xx), plus `Returns: <status codes>` line (awslabs enrichment) |
-| `errors` | the common error envelope family from `commonErrorMap` (`contract-primitives.ts:81`) — rendered once, compactly, because every NetScript operation shares it; this is exactly the "RPC envelope" the wave-four agent was guessing at |
+| `errors` | derived from the operation's **actual declared responses** (S-19): the no-database scaffold's in-memory contract template builds routes from bare `oc`, not `baseContract` (`contract.memory.ts.template:73-87` vs `contract-primitives.ts:81`), so the common envelope is *not* universal. When the projection detects the `commonErrorMap` family in the operation's responses it renders it once, compactly — that is the "RPC envelope" the wave-four agent was guessing at; when absent, the view shows exactly what the operation declares and never hallucinates the family |
 | `all` | the three above, applied to the truncation budget in that priority order |
 
 Ref inlining is bounded: refs are internal by construction; a cycle or depth overflow degrades to
@@ -59,12 +65,17 @@ first rung that yields text (nihal1294's ladder, adapted):
 
 1. `.route({ summary })` — once the D9 enrichment slice lands, the normal case.
 2. First sentence of `.route({ description })`.
-3. The **output schema's** top-level `.describe()` text, when it reads as a sentence.
+3. Humanized operationId (S-22 — the prior-art rung restored): `publisher.publish` →
+   "Publish (publisher)". Deterministic, always well-defined. The rev-1 rung — "output schema's
+   top-level `.describe()` when it reads as a sentence" — is removed: it had no deterministic
+   predicate, and generated scaffolds describe *fields*, not the top-level object
+   (`contract.memory.ts.template:13-47`), so it was normally unreachable anyway.
 4. Synthesized verb+resource from method + path: `POST /api/publisher/publish` →
    "Invoke publish on publisher." — always available, honestly mechanical.
 
 Rung provenance is not surfaced (agents don't care); the ladder is a pure function with fixture
-tests per rung.
+tests per rung, and the fixture corpus includes a real generated no-summary spec proving which
+rung fires for a pristine scaffold.
 
 ## 5. Before / after — the case for a tailored surface
 

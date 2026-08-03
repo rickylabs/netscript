@@ -6,35 +6,41 @@
 | --- | --- |
 | Run ID | `plan-openapi-mcp-plugin--seed` |
 | Branch | `plan/openapi-mcp-plugin` |
-| Current phase | generator stage complete; adversarial pass pending |
-| Archetype | 3 (`packages/mcp` extension); ARCHETYPE-5 evaluated → rejected (design/canonical/06) |
+| Current phase | rev 2 complete (adversarial integrated 25/25); awaiting owner ratification |
+| Archetype | **2 — integration** (S-20 reclassification); ARCHETYPE-5 evaluated → rejected (design/canonical/06) |
 | Scope overlays | none |
 
 ## Current State
 
-The seed design is complete at rev 1: an RFC (`rfc.md`) proposing three read MCP tools
-projecting every scaffolded service's live `/api/openapi.json` into the existing
-`netscript agent mcp` server, an endpoint-manifest discovery lane for Aspire dynamic ports, a
-designed-but-deferred execution tool behind a deny-by-default policy, and an activation design
-on the #1071/#1072 lineage. Core ruling: **extend `packages/mcp`; no plugin** (thinness law;
-no provider variance; #1093 neither blocks nor is worsened). Nothing implemented; no PR opened
-(brief stop-line); board placeholders OMB-1..13 not filed.
+The design is complete at **rev 2, adversarially hardened**: rfc.md proposes three read MCP
+tools projecting every scaffolded service's live `/api/openapi.json` into the existing
+`netscript agent mcp` server; discovery is an identity-bound endpoint manifest whose producer
+mechanism is **[P1]-arbitrated** (S-7: the helper body runs pre-allocation; `aspire-cli` is a
+first-class fallback source); execution is designed-but-deferred behind a fail-closed
+`.netscript/agent-mcp.json` policy with canonical-identity evaluation; activation follows
+#1071/#1072 with the S-18 exact-pin migration correction. Core ruling **unchanged through
+review**: extend `packages/mcp`; no plugin — now argued on the named `EndpointSource` axis
+(S-21), not on denied variance. Stage 2: Codex GPT-5.6 Sol xhigh found 25 (10 blockers);
+**25/25 accepted and integrated**. Nothing implemented; no PR opened (brief stop-line); board
+placeholders OMB-1..14 not filed.
 
 ## Completed
 
 - research.md (3-way fan-out + in-session ✔ verification; decisive find: oRPC defaults
   `operationId` to the dotted contract path — `@orpc/openapi@1.14.13`)
-- plan.md (D1–D9, forks F1–F5), canonical design 00–06, examples ×2, rfc.md
-- supervisor.md, drift.md, worklog.md
+- plan.md rev 2 (D1–D9, forks F1–F5), canonical design 00–06 rev 2, examples ×2 rev 2, rfc.md
+  rev 2
+- adversarial pipeline: brief (with the three 0.0.4 orchestrator learnings as required attack
+  surface) → dispatch via `agentic:launch-codex-slice` (thread in `codex-thread-ids.md`) →
+  `adversarial-sol.md` (25 findings) → `adversarial-triage.md` (25/25) → integration
+- supervisor.md, drift.md (2 entries), worklog.md
 
 ## Next Steps
 
-1. Supervisor dispatches Codex GPT-5.6 Sol xhigh adversarial pass over the run dir (attack
-   surface pre-named in `04-execution-and-security.md §6` and rfc.md §6).
-2. Generator integrates findings → `adversarial-sol.md` + `adversarial-triage.md`, rev 2 of
-   canonical docs + rfc.md.
-3. RFC PR (labels per fork F5) for owner ratification; then board filing; then implementation
-   per rfc.md §4 (Wave-0 proofs first).
+1. Owner ratification of forks F1–F5 (rfc.md §9).
+2. RFC PR carrying rfc.md (labels per F5) — **not opened by this session**.
+3. Board filing (OMB-1..14 placeholders), then implementation per rfc.md §4 — Wave-0 proof
+   artifacts (`proofs/P<n>-verdict.md`) before any contract freezes.
 
 ## Key Decisions
 

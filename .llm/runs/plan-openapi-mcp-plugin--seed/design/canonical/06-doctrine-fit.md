@@ -1,8 +1,9 @@
-# Doctrine Fit — the plugin question, archetypes, gates, debt (canonical design, rev 1)
+# Doctrine Fit — the plugin question, archetypes, gates, debt (canonical design, rev 2)
 
-> Draft — design document only. This is the section the brief centers: the plugin-versus-core
-> ruling with doctrine citations, ARCHETYPE-5 anti-patterns and fitness functions **by name**,
-> and a straight answer on #1093.
+> Draft — design document only. Rev 2 integrates Sol stage-2 findings S-20 (archetype
+> reclassification) and S-21 (the residue argument re-based on a named axis). This is the
+> section the brief centers: the plugin-versus-core ruling with doctrine citations, ARCHETYPE-5
+> anti-patterns and fitness functions **by name**, and a straight answer on #1093.
 
 ## 1. The verdict: extend core; no plugin
 
@@ -18,17 +19,27 @@ which already owns the agent-facing tool vocabulary (14 tools, closed registry,
 projection anywhere else would make a second home for MCP tool conventions.
 
 **(ii) What is left for a plugin to wire?** Candidates from the brief: per-service opt-in
-(a config field on an existing typed options surface — `McpCliOptions`), spec-URL discovery (a
-port + two adapters reading files the scaffold already owns, 02), Aspire resource registration
-(**rejected on its merits** in 02 — option (c) — not deferred to a plugin), execution policy (a
-typed config object, 04). Each is composition, but composition of *core things into core's own
-composition root* (`run-agent-mcp.ts:22`), not the binding of a core convention to an external
-provider. The reference shape test settles it: `auth-core` + adapters earns its split because
-**three real vendor backends** implement one port. Here there is exactly one MCP server, one
-spec producer (our own oRPC generator), one discovery mechanism. Doctrine 07's axis rule
-(`07-composition-and-extension.md:101-112`): a typed identifier, a factory, and a registration
-mechanism are warranted when variability can be *named* — "If you cannot name the axis cleanly,
-do not abstract." There is no second variant of anything here to name.
+(the validated `.netscript/agent-mcp.json` carrier, 04), spec-URL discovery (a port + adapters
+reading artifacts the scaffold already owns, 02), Aspire resource registration (**rejected on
+its merits** in 02 — option (c) — not deferred to a plugin), execution policy (04). Each is
+composition of *core things into core's own composition root* (`run-agent-mcp.ts:22`), not the
+binding of a core convention to an external provider.
+
+**The S-21 correction — argue the axis, not "no variance."** Rev 1 claimed "one discovery
+mechanism, no provider variance"; the reviewer rightly pointed out that 02 itself defines four
+endpoint-source variants (`run-manifest` / `appsettings` / `override` / `aspire-cli`) with
+materially different availability and failure semantics, and doctrine 07's axis table already
+names runtime kind (`aspire`, `bare-deno`, `ci-runner`). That claim is withdrawn. The axis is
+now **named** per doctrine 07 (`:101-112`): typed identifier `EndpointSource`, adapters mapped
+by a factory at the composition edge, contract in `ServiceEndpointDirectoryPort` (02 §port).
+The verdict is then re-argued *on* the axis: every variant is a **first-party adapter of one
+core-owned port**, distinguished by where endpoint facts are read from — none binds NetScript
+to an external vendor or product, which is what the `auth-core` + adapters split exists for
+(three real vendor backends behind one port). A named internal axis with first-party variants
+is the normal shape of a core package's infrastructure layer, not a plugin boundary. **The
+honest trigger that would reopen the plugin question is an external endpoint provider** — e.g.
+a third-party orchestrator publishing endpoints — at which point the named axis is exactly the
+seam a thin adapter (or plugin) would implement. Until then, core retains all variants.
 
 **(iii) Is the split worth two packages?** A `plugins/openapi-mcp` would either (a) own the
 projection — a **fat plugin owning what core should own**, the profile's first named
@@ -54,7 +65,7 @@ axis would feed.
 
 | Surface | Change | Archetype | Gates |
 | --- | --- | --- | --- |
-| `packages/mcp` | projection domain module, 2 ports, 3 read flows (+1 gated mutate flow later), 3 infrastructure adapters, registry/contract entries | ARCHETYPE-3 (runtime behavior — existing package) | static + F-columns below; `quality:scan`, `arch:check` |
+| `packages/mcp` | projection domain module, 2 ports, 3 read flows (+1 gated mutate flow later), infrastructure adapters, registry/contract entries | **ARCHETYPE-2 (integration — S-20 reclassification)**: the additions are bounded request flows behind ports/adapters over HTTP + filesystem, not a long-running lifecycle/supervisor/state machine, which is Archetype 3's subject; Archetype 2 is the profile that names exactly this shape | the **full** ARCHETYPE-2 column of `gates/archetype-gate-matrix.md` — no hand-picked subset (rev 1's "F-13 does not apply" waiver is retracted; applicability comes from the matrix, not this doc); plus `quality:scan`, `arch:check` |
 | `packages/cli` | Aspire helpers template emits the endpoint manifest [P1]; `agent mcp` composition injects the new adapters; `agent init`/scaffold template AGENTS.md line | ARCHETYPE-6 (CLI/tooling — existing) | static; `scaffold.runtime` at merge-readiness for template slices |
 | `packages/contracts` + first-party `*-core` contracts | additive `.route({ summary, tags })` enrichment (D9) | ARCHETYPE-1/2 (existing contract packages) | static; doc-lint; publish dry-run |
 | `plugins/*` | **no changes** | — | — |
@@ -88,12 +99,13 @@ because the reviewer will (and should) test the core extension against the same 
   accretion.
 - **AP-25 (side effects in non-edge files):** `fetch` lives only in the infrastructure adapter;
   domain projection is pure and fixture-tested.
-- **Fitness columns:** F-1 (file size), F-3 (layering: domain imports nothing from
-  infrastructure), F-5 (public surface audit — `packages/mcp` exports stay `.` and `./cli`;
-  new ports exported deliberately or kept internal), F-6/F-7 (JSR publishability + doc score for
-  the touched packages), F-10 (test shape: per-rung ladder fixtures, port fakes), F-12 (naming),
-  F-14 (no console), F-17/F-18 (co-location, no sub-barrels), F-19 (scoped gate runners as the
-  verdict source). F-13 does not apply (no saga/runtime invariants).
+- **Fitness columns (S-20):** the governing set is the **complete ARCHETYPE-2 column** of
+  `gates/archetype-gate-matrix.md` — this document no longer enumerates a subset, because a
+  hand-picked list is exactly how a required gate gets silently waived. Illustrative mapping
+  (not the authority): F-1 (file size), F-3 (layering: domain imports nothing from
+  infrastructure), F-5 (public surface audit — `packages/mcp` exports stay `.` and `./cli`),
+  F-10 (per-rung ladder fixtures, port fakes, the S-1 fail-closed fixture set, the S-5
+  validator corpus), F-19 (scoped gate runners as the verdict source).
 
 ## 4. #1093 — the straight answer
 

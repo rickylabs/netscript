@@ -1,8 +1,10 @@
-# Tool Surface (canonical design, rev 1)
+# Tool Surface (canonical design, rev 2)
 
-> Draft — design document only. Shapes follow `packages/mcp/src/domain/tool-contracts.ts`
-> conventions: hand-written JSON Schema, `additionalProperties: false`, Standard-Schema wrapped,
-> centrally output-validated and truncated (`mcp-server.ts:105-112`).
+> Draft — design document only. Rev 2 integrates Sol stage-2 findings S-9, S-12, S-13, S-14,
+> S-15, S-24, S-25 (`../../adversarial-triage.md`). Shapes follow
+> `packages/mcp/src/domain/tool-contracts.ts` conventions: hand-written JSON Schema,
+> `additionalProperties: false`, Standard-Schema wrapped, centrally output-validated and
+> truncated (`mcp-server.ts:105-112`) — with the truncation-metadata correction below.
 
 ## Naming and kinds
 
@@ -23,27 +25,39 @@ what the agent's tool picker sees (05-activation.md):
 
 Input: `{}` (no required fields; optional `includeStopped?: boolean` default true).
 
-Output (bounded; one row per service from the endpoint directory, 02-discovery.md):
+Output (bounded; one row per service from the endpoint directory, 02-discovery.md, plus the
+directory's per-source outcomes — a failed source read is data, never a silent absence, S-9):
 
 ```jsonc
 {
   "services": [
     {
       "name": "publisher",
-      "status": "running",            // running | configured (not running) | spec_unavailable
-      "baseUrl": "http://localhost:61432",   // absent unless running
-      "specUrl": "http://localhost:61432/api/openapi.json",
-      "docsUrl": "http://localhost:61432/api/docs",
-      "operations": 7,                // from a HEAD-style cheap fetch; absent if not running
-      "source": "run-manifest"        // run-manifest | appsettings | override
+      "status": "running",            // running | not_running | spec_unavailable
+                                      //   | identity_mismatch | excluded   (02 §status mapping)
+      "baseUrl": "http://127.0.0.1:61432",   // absent unless running
+      "specUrl": "http://127.0.0.1:61432/api/openapi.json",
+      "docsUrl": "http://127.0.0.1:61432/api/docs",
+      "operations": 7,                // computed from the parsed spec of the liveness GET;
+                                      // ABSENT whenever no spec was fetched — never defaulted (S-14)
+      "source": "run-manifest",       // run-manifest | appsettings | override | aspire-cli
+      "conflict": null                // populated when a lower-precedence source disagreed (S-10)
     }
+  ],
+  "sources": [
+    { "source": "run-manifest", "outcome": "failed", "reason": "invalid JSON" },
+    { "source": "appsettings",  "outcome": "used" }
   ],
   "hint": "Use list_service_operations {service} next."
 }
 ```
 
-Rows for configured-but-not-running services carry `status: "configured (not running)"` and a
-`hint` naming the start command — the tool teaches the fix rather than failing silently (D6).
+Rows for `not_running` services carry a `hint` naming the start command — the tool teaches the
+fix rather than failing silently (D6). The `sources` block is what distinguishes "manifest
+unreadable, appsettings healthy" from "AppHost never started": identical service rows, different
+source outcomes (the absence-of-red-is-not-green requirement). `excluded` rows (S-25,
+`introspection.excludeServices` in the validated config carrier, 04 §3) appear by name with no
+spec fetch — proven by test.
 
 ## `list_service_operations`
 
@@ -82,10 +96,16 @@ Output: one compact row per operation from the projection (03):
 }
 ```
 
-Row cost is deliberately flat (~1 line per operation) so a 50-operation service fits the
-truncation budget; `filter`/`limit` exist for the pathological case, and `truncated: true` plus
-the filter hint is emitted rather than silently cutting (no-silent-caps rule). Real-size
-measurement against a scaffolded app is Wave-0 proof [P2].
+**Truncation arithmetic (S-13 — corrected).** The central truncator slices arrays to 50 and
+does not update sibling metadata (`truncation.ts:9-28`), so a flow returning 75 rows with
+`truncated: false` would reach the client as 50 rows and a false flag. Rev 2 requirements: (a)
+flows self-cap every array **below** the central caps and compute `truncated` **after** their
+own capping, so the central pass never edits their output; (b) the implementing run changes the
+central truncator to recompute truncation metadata after any cap it applies and to enforce a
+whole-result byte bound — recorded as a named slice, since it touches existing machinery; (c)
+"row cost" claims are replaced by measured budgets from Wave-0 proof [P2]. `filter`/`limit`
+remain for the pathological case, and a `truncated: true` result carries the filter hint rather
+than silently cutting (no-silent-caps rule).
 
 ## `get_operation_schema`
 
@@ -108,20 +128,30 @@ Output: the dereferenced JSON Schema **view** (03 §3) — request parameters + 
 success-response schema, or the error envelope family — with Zod `.describe()` descriptions
 intact (they flow today: `zod-helpers.ts:44-101` → `ZodToJsonSchemaConverter`). `view` exists
 because whole operations can exceed the truncation budget; the tool returns views, never a raw
-spec dump [P2]. A `curlExample` field renders one ready-to-run request line (method, URL with
-resolved base, minimal valid body skeleton) — the single highest-leverage output for the
-mid-debug agent, borrowed from awslabs' enrichment.
+spec dump [P2]. A `curlExample` field renders one request line (method, URL with resolved base,
+minimal valid body skeleton) — the single highest-leverage output for the mid-debug agent,
+borrowed from awslabs' enrichment. **Auth honesty (S-24):** service auth middleware installs
+globally before the spec routes (`service-builder-impl.ts:442-474`) and the generator receives
+no security metadata (`openapi.ts:74-92`), so a protected operation can look unauthenticated in
+the spec — absence of security metadata is **not evidence of no auth**, and the tool never
+infers it. The example is therefore always labeled an *unauthenticated request template*, with
+an `authNote` stating that a 401/403 means the service enforces auth and credentials must be
+supplied by the developer. "Paste-ready" is claimed for shape (method, URL, valid body
+skeleton), never for authorization.
 
 ## Failure envelopes (uniform across the three)
 
-Structured, never throwy, following house bounded-summary style:
+Structured, never throwy, following house bounded-summary style, and aligned one-to-one with
+02's status mapping (S-12 — one mapping, no second vocabulary):
 
 - `service_unknown` — name + the known-service list (from the directory) in the message.
-- `service_not_running` — with the start hint.
-- `spec_unavailable` — HTTP status from the spec fetch; when 401/403, the message names the
-  likely cause ("an authz rule matches /api — see define-service auth options") per open
-  question 2 / proof [P3].
-- `operation_unknown` — with three nearest ids by substring match (cheap, no fuzzy dependency).
+- `service_not_running` — no listener; with the start hint.
+- `spec_unavailable` — listener present but timeout / HTTP error / parse failure; carries the
+  failure class; when 401/403, the message names the likely cause ("an authz rule matches /api —
+  see define-service auth options") per proof [P3].
+- `identity_mismatch` / `excluded` — per 02 (S-8, S-25).
+- `operation_unknown` — with three nearest ids by substring match (suggestion display only —
+  never an execution matcher, S-2).
 
 ## Registry integration
 
@@ -130,6 +160,12 @@ Structured, never throwy, following house bounded-summary style:
 - Flows live in `application/flows/` one file per tool (house shape), pure over two injected
   ports: `ServiceEndpointDirectoryPort` (02) and a `ServiceSpecPort` (localhost fetch adapter,
   infrastructure) — both constructor-injected with test fakes, per doctrine 07 injection rule.
-- `withReceipt` wrapping (`cli.ts:175`): the read flows write diagnostic receipts exactly like
-  the existing read flows, which is what makes fork F4's evidence-gate integration a
-  configuration choice rather than new machinery.
+- `withReceipt` wrapping (`cli.ts:175`) — **with the S-15 correction**: today the wrapper marks
+  success when the flow returns, *before* the runner validates the output
+  (`mcp-server.ts:96-112`), so an invalid tool result (or a throw, which the runner does not
+  catch around `tool.flow`) can leave green or stale-green evidence. Rev 2 requires receipt
+  commit to move **after** output validation, and thrown/validation failures to record a failed
+  attempt — a named change to existing machinery, prerequisite to any evidence-gate use of these
+  receipts. With that fix, F4(a) (receipts *accepted* as evidence) is wiring; F4(b) (receipts
+  *required*) additionally needs per-evidence-class receipt keys (S-16, see 05 §2F) and is
+  costed as new machinery in the fork table, not as configuration.

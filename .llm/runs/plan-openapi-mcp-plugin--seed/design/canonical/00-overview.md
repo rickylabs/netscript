@@ -1,9 +1,12 @@
-# OpenAPI→MCP — Overview (canonical design, rev 1)
+# OpenAPI→MCP — Overview (canonical design, rev 2)
 
 > **Draft — design document only. No GitHub mutations, no product code.** Produced by
-> `plan-openapi-mcp-plugin--seed`. Pending the Codex GPT-5.6 Sol xhigh adversarial pass and owner
-> ratification. Mechanisms marked [P1]–[P3] are Wave-0 proof gates (`../../plan.md`) —
-> verified-API-unproven-behavior is stated as such.
+> `plan-openapi-mcp-plugin--seed`. Rev 2: the Codex GPT-5.6 Sol xhigh adversarial pass is
+> integrated (25/25 findings accepted — `../../adversarial-sol.md`, dispositions in
+> `../../adversarial-triage.md`); pending owner ratification. Mechanisms marked [P1]–[P3] are
+> Wave-0 proof gates with **committed verdict artifacts** (`../../plan.md`, S-17) —
+> verified-API-unproven-behavior is stated as such, and [P1] now *arbitrates* the discovery
+> producer rather than confirming it (S-7).
 
 ## The one-paragraph story
 
@@ -40,11 +43,13 @@ not an afterthought.
    agent mid-debug, about to hand-roll `curl`. Three calls or fewer from "which services exist"
    to "the exact request/response schema of the failing endpoint", with output that fits the
    registry's truncation budget.
-2. **Convention in core, and there is nothing left over.** The projection — operation identity,
-   naming, description ladder, schema views, filtering vocabulary — is convention-bearing and
-   lives in `packages/mcp` domain (thinness law, ARCHETYPE-5). The residue a plugin could own
-   (opt-in, discovery, policy) has no provider variance and no second implementation; doctrine 07
-   forbids abstracting an axis you cannot name. **Extend core; no plugin** (06 §1–2).
+2. **Convention in core, and the residue is a named internal axis.** The projection — operation
+   identity, naming, description ladder, schema views, filtering vocabulary — is
+   convention-bearing and lives in `packages/mcp` domain (thinness law, ARCHETYPE-5). The
+   residue a plugin could own (opt-in, discovery, policy) sits on one **named** axis —
+   `EndpointSource` (S-21) — whose variants are all first-party adapters of one core port; no
+   external provider exists, so core retains them, and a first external endpoint provider is
+   the recorded trigger to re-ask the plugin question. **Extend core; no plugin** (06 §1–2).
 3. **Meta-tools, not a tool per operation.** The registry is a closed enum with static schemas
    and central truncation (`tool-registry.ts`, `mcp-server.ts:105-112`) — that constraint is
    load-bearing, not an obstacle: prior-art consensus (Stainless, ivo-toby, Apideck) is that
@@ -67,9 +72,11 @@ not an afterthought.
 
 ```
 Aspire AppHost (running)
-  .helpers/register-services.mts        ← already generated per app
-    └─ [NEW] writes .netscript/run/endpoints.json     [P1]
-         { "publisher": { "http": "http://localhost:61432", ... }, ... }
+  generated run-mode post-allocation callback [P1-arbitrated, S-7 — the helper *body* runs
+    before allocation; fallback: aspire-cli query adapter]
+    └─ [NEW] writes .netscript/run/endpoints.json
+         { projectRoot, runId,                                  ← identity binding (S-8)
+           "publisher": { "http": "http://127.0.0.1:61432" }, … }
 
 agent host (Claude Code / VS Code)
   spawns: netscript agent mcp --project-root <root>    ← already configured by agent init

@@ -76,8 +76,17 @@ machine).
 N/A — design-only run; no product code, no gates run. Runtime claims are cited from source, not
 exercised (recorded in supervisor.md overrides).
 
-## STAGE-COMPLETE: generator
+## Stage 2 — adversarial pass and integration (2026-08-03, same day)
 
-Next: supervisor dispatches Codex GPT-5.6 Sol xhigh adversarial pass (findings only); this
-session (or a successor generator session) integrates and records dispositions in
-`adversarial-triage.md`, bumping the canonical docs and rfc.md to rev 2.
+| Step | Notes |
+| --- | --- |
+| Adversarial brief | Owner-directed: three 0.0.4 release-orchestrator learnings folded in as **required** attack surface (predicate-bugs-must-fire; absence-of-red-is-not-green; RFC-instrument scope guard) + the #1117-sizing contradiction flagged for hardest attack. `briefs/adversarial-sol-brief.md`, commit `d27a55589` |
+| Dispatch | `deno task agentic:launch-codex-slice`, route openai/gpt-5.6-sol/xhigh (lane-policy `review_claude`); brief-contract validation (`use harness` + `## SKILL`) enforced by the launcher; thread `019fc7a9-dd54-7ff0-8608-c556f644d747` (`codex-thread-ids.md`); dispatch-authority change recorded in `drift.md` |
+| Findings | `adversarial-sol.md`: 25 findings — 10 blockers, 13 major, 2 minor — plus a defended-checks table. All three required surfaces produced blockers |
+| Triage | `adversarial-triage.md`: **25/25 accepted** (2 accepted-with-scope). Headline verdicts survive: extend-core-no-plugin (re-based on the named `EndpointSource` axis, S-21) and the meta-tool triad (explicitly defended). Real status change: D3 discovery mechanism now [P1]-arbitrated (S-7) |
+| Integration (rev 2) | plan.md, canonical 00–06, both examples, rfc.md updated; named existing-machinery fixes added to the wave plan (S-13 truncation metadata, S-15 receipt-after-validation); archetype reclassified 3 → 2 (S-20); board placeholders now OMB-1..14 |
+
+## STAGE-COMPLETE: generator + adversarial integration
+
+Next: owner ratification of forks F1–F5, then RFC PR (labels per F5 — not opened by this
+session), then board filing, then implementation per rfc.md §4 (Wave-0 proof artifacts first).
