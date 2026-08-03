@@ -460,3 +460,22 @@ Full-artifact review of all three proof verdicts (PR #1182):
   primary + P3 wording), #1184 (sagas glue, Sol·high, seven-point protocol), #1191
   (--allow-ffi, Sol·medium, includes P2 DB re-measurement). agy #1106 launch surface to be
   resolved (first agy lane of the run).
+
+## 2026-08-04 — Wave-2 launched (4 Codex + agy); two more launcher findings
+
+- First launch batch refused at validate — the three new briefs lacked the literal `## SKILL`
+  chapter (`validateHandoffContract` in `agentic-lib.ts`) and the sagas rewrite had dropped
+  its own. **All four refusals exited 0 again** — the same launcher defect as the git-safety
+  batch, now demonstrated on a second refusal path. Both instances quoted for #1173.
+- Briefs patched (SKILL chapters), all four relaunched and verified by artifact:
+  s4 `019fc9c3-19de`, s5 `019fc9c3-237f`, sagas `019fc9c3-2d9f`, ffi `019fc9c3-3a52` — all
+  route-matched (openai/gpt-5.6-sol, high/high/high/medium).
+- **agy docs lane (#1106) launched ad-hoc**: `agy --print <brief> --effort low --mode
+  accept-edits --print-timeout 60m` from the `ns005-authdocs` worktree, output captured to the
+  slice dir. Conversation id to be read from the JSON result / `~/.gemini` transcripts.
+
+17. **[no-agy-launcher-parity]** The agentic suite has launch/watch/steer tooling for Codex and
+    an evidence CLI for Antigravity, but **no launcher for the documentation-authoring agy
+    lane** — no brief validation, no route verification, no transcript-id artifact, no
+    watcher. The 0.0.5 run drives it with a raw `agy --print` and hand-captured output; #1115
+    (observability for Codex *and* agy) covers the watch half, but launch parity is unowned.
