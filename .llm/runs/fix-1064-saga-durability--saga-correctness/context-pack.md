@@ -12,8 +12,9 @@
 
 ## Current State
 
-Production tree remains unchanged at seeded HEAD `60f5f2e66`. All three defects have pre-fix
-empirical failures; the formal plan is ready for separate-session PLAN-EVAL.
+Production source remains unchanged. All three defects have pre-fix empirical failures and the
+formal plan is committed, but the required separate-session PLAN-EVAL is blocked by missing local
+OpenRouter credentials.
 
 ## Completed
 
@@ -24,11 +25,12 @@ empirical failures; the formal plan is ready for separate-session PLAN-EVAL.
 
 ## In Progress
 
-- Commit/push plan artifacts, update draft PR, and obtain PLAN-EVAL verdict.
+- Obtain supervisor direction or restore the canonical local evaluator credential.
 
 ## Next Steps
 
-1. Run PLAN-EVAL using the bound Qwen evaluator in a separate local Claude Code session.
+1. Restore the canonical local Qwen evaluator route and run PLAN-EVAL, or obtain a written owner
+   waiver.
 2. Implement, gate, commit, push, and comment #1064.
 3. Repeat independently for #1065 and #1066.
 4. Run aggregate gates and IMPL-EVAL; drive draft PR to ready-for-merge.
@@ -52,13 +54,13 @@ empirical failures; the formal plan is ready for separate-session PLAN-EVAL.
 | Gate family | Current status            | Evidence                                     |
 | ----------- | ------------------------- | -------------------------------------------- |
 | Static      | planning PASS             | `deno doc` surface scan                      |
-| Fitness     | pending                   | PLAN-EVAL required                           |
+| Fitness     | blocked                   | local evaluator `auth_required`              |
 | Runtime     | pre-fix failures captured | real Redis, compensation, correlation probes |
 | Consumer    | pending                   | docs/tests after implementation              |
 
 ## Open Questions
 
-- None blocking Plan-Gate.
+- Canonical local PLAN-EVAL credential is absent; cloud OpenHands is not permitted for a local run.
 
 ## Drift and Debt
 

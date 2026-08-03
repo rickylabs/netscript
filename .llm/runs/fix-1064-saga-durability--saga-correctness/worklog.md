@@ -58,11 +58,12 @@ integration test.
 
 ## Progress Log
 
-| Time       | Slice | Step      | Notes                                                                                          |
-| ---------- | ----- | --------- | ---------------------------------------------------------------------------------------------- |
-| 2026-08-03 | plan  | diagnosis | Redis/Garnet direct paths completed; Redis concurrent CAS admitted 16/16 writers.              |
-| 2026-08-03 | plan  | diagnosis | Default runtime dropped compensation; correlation failed in both collapse and fork directions. |
-| 2026-08-03 | plan  | design    | Locked three defect slices plus merge-readiness slice; awaiting PLAN-EVAL.                     |
+| Time       | Slice     | Step      | Notes                                                                                          |
+| ---------- | --------- | --------- | ---------------------------------------------------------------------------------------------- |
+| 2026-08-03 | plan      | diagnosis | Redis/Garnet direct paths completed; Redis concurrent CAS admitted 16/16 writers.              |
+| 2026-08-03 | plan      | diagnosis | Default runtime dropped compensation; correlation failed in both collapse and fork directions. |
+| 2026-08-03 | plan      | design    | Locked three defect slices plus merge-readiness slice; awaiting PLAN-EVAL.                     |
+| 2026-08-03 | plan-eval | blocked   | Canonical local Qwen route returned `auth_required`; no evaluator session launched.            |
 
 ## Decisions
 
@@ -89,9 +90,9 @@ integration test.
 
 ### Fitness Gates
 
-| Gate      | Result  | Evidence                        | Notes                              |
-| --------- | ------- | ------------------------------- | ---------------------------------- |
-| Plan-Gate | NOT_RUN | separate Qwen evaluator pending | Implementation blocked until PASS. |
+| Gate      | Result  | Evidence                                             | Notes                                                      |
+| --------- | ------- | ---------------------------------------------------- | ---------------------------------------------------------- |
+| Plan-Gate | NOT_RUN | local Qwen provider canary blocked (`auth_required`) | Implementation blocked until PASS or written owner waiver. |
 
 ### Runtime Gates
 

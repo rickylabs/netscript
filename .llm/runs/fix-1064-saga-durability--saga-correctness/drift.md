@@ -24,3 +24,18 @@
 - **Severity:** minor
 - **Action:** accept
 - **Evidence:** `rg -n "cap:durable-sagas" docs/site` and both existing pages.
+
+## 2026-08-03 — Local PLAN-EVAL transport is credential-blocked
+
+- **What:** The canonical local Claude Code + OpenRouter evaluator could not launch because the
+  selected provider credential is absent.
+- **Source:**
+  `deno task agentic:provider-canary --live --profile claude-openrouter --model
+  qwen/qwen3.7-max --effort high --worktree /home/codex/repos/ns004-sagas`.
+- **Expected:** A separate Qwen evaluator session writes `plan-eval.md` before implementation.
+- **Actual:** The agentic canary returned exit 4, `status: blocked`, diagnostic `auth_required`; no
+  evaluator session was created.
+- **Severity:** significant
+- **Action:** rescope
+- **Evidence:** The provider canary reports `credential: absent`. Cloud OpenHands is prohibited for
+  this local run by the OpenHands routing skill.
