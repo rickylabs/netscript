@@ -66,6 +66,7 @@ changes for future traversal corrections.
 | 2026-08-03 | 0 | design | Locked full-range traversal, explicit successful-empty evidence, and fail-closed suspicious-empty policy. |
 | 2026-08-03 | 0 | PLAN-EVAL launch blocked | Canonical local Qwen route returned `auth_required`: `OPENROUTER_API_KEY` is absent, so no evaluator process, tools, reasoning, or verdict ran. Cloud OpenHands was not dispatched because `openhands-handoff` prohibits substituting a cloud evaluator for a local-machine run. |
 | 2026-08-03 | 0 | orchestrator steer | `release-0.0.5--orchestration` approved the locked plan and waived the per-PR local PLAN-EVAL under `milestone-run.md`'s composed evaluator protocol. Implementation authorized; pre-merge composed evaluation remains orchestrator-owned. |
+| 2026-08-03 | 1 | launch isolation | Sender guard found the supervisor's active thread in the PR worktree and refused a rival launch. S1 moved to dedicated native worktree `/home/codex/repos/ns005-canary-payload-s1` on transient branch `fix/canary-payload-merge-commits-s1`; final supervisor commit will push explicitly to the PR branch. |
 
 ## Decisions
 

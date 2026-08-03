@@ -39,3 +39,18 @@ Drift is append-only.
 - **Action:** accept
 - **Evidence:** User/orchestrator steer in this session; `worklog.md` PLAN-EVAL row marked
   `COMPOSED / WAIVED`. L1, L4, and `Refs #1166` handling were approved as written.
+
+## 2026-08-03 — Implementation isolated from supervisor sender
+
+- **What:** The implementation launch moved from the PR worktree to a dedicated native WSL
+  worktree and transient slice branch.
+- **Source:** `agentic:launch-codex-slice` sender-ownership guard returned
+  `duplicate_sender_risk` for the supervisor's existing thread.
+- **Expected:** One implementation sender in the provided PR worktree.
+- **Actual:** The worktree already belongs to the active supervisor sender; a second launch would
+  violate the one-active-send invariant.
+- **Severity:** minor
+- **Action:** accept
+- **Evidence:** `/home/codex/repos/ns005-canary-payload-s1`, branch
+  `fix/canary-payload-merge-commits-s1`; supervisor retains review/sign-off and pushes the signed
+  commit with the required explicit refspec to `fix/canary-payload-merge-commits`.

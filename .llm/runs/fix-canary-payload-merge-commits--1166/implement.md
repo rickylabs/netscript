@@ -3,7 +3,8 @@ use harness
 # S1 — Merge-aware canary payload derivation (#1166)
 
 You are the implementation agent for one locked NetScript harness slice. Work only in
-`/home/codex/repos/ns005-canary-payload` on branch `fix/canary-payload-merge-commits`. The milestone
+`/home/codex/repos/ns005-canary-payload-s1` on transient slice branch
+`fix/canary-payload-merge-commits-s1`, based exactly on the PR branch tip. The milestone
 orchestrator approved the plan and waived the per-PR local PLAN-EVAL under
 `.llm/harness/workflow/milestone-run.md`. You implement and gather evidence; you do not self-certify,
 commit, push, change PR metadata, or dispatch evaluators. Leave the reviewed working tree for the
