@@ -187,6 +187,32 @@ Deno.test('plugin doctor reports a running but unhealthy AppHost resource', asyn
   assertStringIncludes(check?.message ?? '', 'Unhealthy');
 });
 
+Deno.test('plugin doctor maps realistic database config names without inventing section resources', async () => {
+  const reports = await doctorPlugin({ projectRoot: '/workspace' }, {
+    fs: new MemoryFileSystemAdapter(),
+    loadConfig: () => Promise.resolve(configWithResources()),
+    inspectAppHost: {
+      inspect: () => Promise.resolve({
+        status: 'running',
+        resources: [
+          { name: 'api', state: 'Running', healthStatus: 'Healthy' },
+          { name: 'web', state: 'Running', healthStatus: 'Healthy' },
+          { name: 'main-db', state: 'Running', healthStatus: 'Healthy' },
+        ],
+      }),
+    },
+  });
+
+  assertEquals(reports[0].status, 'healthy');
+  assertEquals(reports[0].checks.some((check) => check.title.includes('active')), false);
+  assertEquals(reports[0].checks.some((check) => check.title.includes('config')), false);
+  assertEquals(reports[0].checks.map((check) => check.id), [
+    'apphost:resource:api',
+    'apphost:resource:main-db',
+    'apphost:resource:web',
+  ]);
+});
+
 Deno.test('plugin manifest import failures degrade to an error report', async () => {
   const reports = await doctorPlugin({ projectRoot: '/workspace' }, {
     fs: new MemoryFileSystemAdapter(),
@@ -262,7 +288,10 @@ function configWithResources() {
     plugins: [],
     services: { api: { port: 8000 } },
     apps: { web: { port: 3000 } },
-    databases: { 'main-db': { engine: 'postgres' } },
+    databases: {
+      active: 'postgres',
+      config: [{ name: 'main-db', provider: 'postgres', schema: 'database/postgres/prisma' }],
+    },
   } as never;
 }
 

@@ -169,10 +169,13 @@ async function diagnoseAppHost(
 }
 
 function configuredResourceNames(config: NetScriptConfig): readonly string[] {
+  const databaseNames = config.databases.config.flatMap((database) =>
+    database.name ? [database.name] : []
+  );
   return [...new Set([
     ...Object.keys(config.services ?? {}),
     ...Object.keys(config.apps ?? {}),
-    ...Object.keys(config.databases ?? {}),
+    ...databaseNames,
   ])].sort();
 }
 
