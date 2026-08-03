@@ -156,10 +156,33 @@ closing keyword (including epics/umbrellas referenced with `Part of`) are never 
 
 The mirror and checker fetch the PR, its labels/body/head, comments, and every closing issue live
 through the API at execution time. Workflow event payloads supply only repository and PR
-identifiers: a job re-run retains its original event snapshot and is not a substitute for a new
-label event. Apply `status:ready-merge`, then push (or otherwise trigger a new PR event). Every
+identifiers: a job re-run retains its original event snapshot, but because every read is live, a
+re-run after labeling now works — and applying `status:ready-merge` itself triggers a fresh run
+(the workflow listens to `labeled`). Every
 pretty/JSON verdict prints `headSha`, `evaluatedAt`, and per-issue `number`, `updatedAt`, and
 `bodySha256`, so reviewers can mechanically detect a verdict evaluated against an older issue body.
+
+### Close-gate operator playbook (read before touching a red close-gate)
+
+1. **Pre-flight before labeling.** Validate the evidence mapping locally — this catches every
+   mapping error without burning a CI round trip:
+   `GH_TOKEN=$(gh auth token) deno run --allow-env --allow-net .llm/tools/validation/mirror-acceptance-evidence.ts --repo <owner/name> --pr <n> --dry-run --pretty`
+2. **Red close-gate? Establish currency first.** Run
+   `deno task agentic:pr-checks -- --repo <owner/name> --pr <n> --pretty` before any forensic
+   digging. A red whose classification is `superseded`/`stale-post-merge`/`cancelled` is not a
+   current failure — do not chase it; let the queued current run land or trigger one. Only a
+   `current-fail` close-gate is worth reading.
+3. **Read the verdict's provenance.** Every gate/mirror output prints `headSha`, `evaluatedAt`,
+   and per-issue `updatedAt` + `bodySha256`. If the snapshot predates your latest issue/body edit,
+   the verdict is stale by construction — refresh the run instead of re-deriving the mapping.
+4. **Closing keywords are the gate's only trigger source today.** `Refs #N` / `Part of #N` are
+   never gated or mutated. Beware the side door: a manual **Development-sidebar link** makes
+   GitHub auto-close the issue on merge *without* close-gate ever checking it (#1188 tracks
+   closing that gap). Until #1188 lands, do not manually link issues you are not prepared to see
+   auto-closed unverified — use body references instead.
+5. **Post-merge-only facts** get the `[post-merge]` marker in the issue box (excluded from the
+   merge gate with a notice), never a dropped closing keyword and never a merge-blocking box that
+   only the merge itself can satisfy.
 
 A PR whose `status:` is `research`, `plan`, or `plan-eval` **MUST NOT be merged** — a plan-only
 artifact set can never satisfy an implementation Definition-of-Done. Merge requires
