@@ -285,10 +285,35 @@ Deno.test('deep-analysis Fable fallback requires classified Codex quota exhausti
   );
 });
 
-Deno.test('canonical research lane is Antigravity agy and no Gemini model is inferred', () => {
+Deno.test('canonical research lane remains Antigravity after Gemini docs authoring is added', () => {
   const route = resolveCanonicalRoute('research_extraction', new Date('2026-07-10T00:00:00Z'));
   equal([route.agent, route.provider, route.model], ['antigravity', 'google', 'agy']);
-  equal(CANONICAL_ROUTE_POLICY.some((entry) => /gemini/i.test(entry.model)), false);
+});
+
+Deno.test('documentation authoring uses Gemini on Claude OpenRouter as a generator lane', () => {
+  const route = resolveCanonicalRoute(
+    'documentation_authoring',
+    new Date('2026-08-03T00:00:00Z'),
+  );
+  equal([
+    route.purpose,
+    route.agent,
+    route.provider,
+    route.profileId,
+    route.presetId,
+    route.model,
+    route.effort,
+    route.evaluatorModelPolicy,
+  ], [
+    'documentation',
+    'claude',
+    'openrouter',
+    'claude-openrouter',
+    'claude-docs-gemini-3-6-flash',
+    OPENROUTER_MODEL_IDS.gemini,
+    'high',
+    undefined,
+  ]);
 });
 
 Deno.test('Claude review stays opposite-family on GPT-5.6 Sol xhigh', () => {
@@ -387,6 +412,19 @@ Deno.test('formal evaluator rejects closed models and reused generator sessions'
       authorFamily: 'openai',
       generatorSession,
       evaluatorSession: generatorSession,
+    }, at)
+  );
+});
+
+Deno.test('formal evaluator rejects the Gemini documentation-authoring generator lane', () => {
+  const at = new Date('2026-08-03T00:00:00Z');
+  const geminiGeneratorRoute = resolveCanonicalRoute('documentation_authoring', at);
+  assertThrows(() =>
+    resolveCanonicalFormalEvaluatorRoute({
+      authorFamily: 'openai',
+      generatorSession: { ...session, agent: 'codex', sessionId: 'codex-generator' },
+      evaluatorSession: { ...session, agent: 'claude', sessionId: 'open-evaluator' },
+      route: geminiGeneratorRoute,
     }, at)
   );
 });

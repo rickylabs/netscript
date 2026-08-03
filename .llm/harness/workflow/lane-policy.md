@@ -34,6 +34,7 @@ approval — and each Fable primary carries an in-plan token-limit fallback.
 | Review of **Claude** work (`review_claude`)                                                                                                                                                | Codex · OpenAI · GPT-5.6 Sol · xhigh                                                                                              | —                                    |
 | Delegated **code** chores (`chore_code`)                                                                                                                                                   | **Claude · Anthropic · Opus 4.8 · medium**                                                                                        | Codex · OpenAI · GPT-5.6 Luna · max  |
 | Docs / cleanup / easy chores (`documentation_review`)                                                                                                                                      | **Claude · Anthropic · Sonnet 5 · high**                                                                                          | Codex · OpenAI · GPT-5.6 Luna · high |
+| Documentation authoring (`documentation_authoring`)                                                                                                                                        | **Claude · OpenRouter · Gemini 3.6 Flash · `claude-docs-gemini-3-6-flash` preset · high**                                         | —                                    |
 | Opposite-family single-pass audit of a Claude-generated docs changeset (`docs_audit`). Gate set in [`doc-audit.md`](./doc-audit.md).                                                        | **Codex · OpenAI · GPT-5.6 Sol · medium** (`high` for large changesets)                                                          | — (opposite-family by design)        |
 | Final edit-only prose polish after audit + fixes (`docs_polish`). Doctrine in [`doc-audit.md`](./doc-audit.md).                                                                             | **Claude · Anthropic · Fable 5 · medium**                                                                                        | Claude · Anthropic · Opus 4.8 · xhigh → (no Claude surface) Claude · OpenRouter · GLM 5.2 · xhigh |
 | Major UI/UX work — lead route (`major_ui_ux_design`)                                                                                                                                       | Claude · OpenRouter · GLM 5.2 · `claude-design-glm-5-2` preset · xhigh                                                            | —                                    |
@@ -50,9 +51,9 @@ major UI/UX work that does run. GLM 5.2 stays scoped to **pure design work, plus
 exception: the `docs_polish` no-Claude-surface last-resort fallback** (2026-07-17, above) — it is
 not an implementation or general-evaluation model.
 
-The issue-body "Gemini 3.5 Flash" reference for research/extraction was superseded by epic #574's
-2026-07-10 Antigravity reconciliation. A distinct Gemini-model lane is an owner open question, not
-an inferred route.
+**Owner decision (2026-08-03).** Documentation authoring routes to Gemini 3.6 Flash on the Claude +
+OpenRouter transport. This is a generator lane only: it does not change the formal evaluator lane,
+its approved open-model set, or the prohibition on Gemini over evaluator transports.
 
 **Forward rule (not a lane).** Any future **max-effort OpenAI implementation** route pairs with a
 **Claude · Fable 5 · high** adversarial review. This extends the effort-paired ladder above; when

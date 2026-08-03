@@ -108,6 +108,7 @@ export const PROVIDER_PROFILES: Readonly<Record<ProviderProfileId, ProviderProfi
 export const OPENROUTER_PRESET_IDS = [
   'claude-fanout-minimax-m3',
   'claude-evaluator-qwen-3-7-max',
+  'claude-docs-gemini-3-6-flash',
   'claude-design-glm-5-2',
   'codex-design-glm-5-2',
   'codex-long-medium-grok-4-5',
@@ -128,11 +129,13 @@ export type OpenRouterIncompatibility = typeof OPENROUTER_INCOMPATIBILITIES[numb
 export const OPENROUTER_PRESET_MODELS: readonly [
   typeof OPENROUTER_MODEL_IDS.minimax,
   typeof OPENROUTER_MODEL_IDS.qwen,
+  typeof OPENROUTER_MODEL_IDS.gemini,
   typeof OPENROUTER_MODEL_IDS.glm,
   typeof OPENROUTER_MODEL_IDS.grok,
 ] = [
   OPENROUTER_MODEL_IDS.minimax,
   OPENROUTER_MODEL_IDS.qwen,
+  OPENROUTER_MODEL_IDS.gemini,
   OPENROUTER_MODEL_IDS.glm,
   OPENROUTER_MODEL_IDS.grok,
 ];
@@ -142,7 +145,12 @@ export interface OpenRouterPreset {
   readonly profileId: Extract<ProviderProfileId, 'claude-openrouter' | 'codex-openrouter'>;
   readonly model: typeof OPENROUTER_PRESET_MODELS[number];
   readonly effort: Effort;
-  readonly purpose: 'workflow-fanout' | 'evaluation' | 'creative-design' | 'long-running-medium';
+  readonly purpose:
+    | 'workflow-fanout'
+    | 'evaluation'
+    | 'documentation-authoring'
+    | 'creative-design'
+    | 'long-running-medium';
   readonly agenticTurn: OpenRouterAgenticTurnStatus;
   readonly transport: OpenRouterTransport;
   readonly reasoningTrace: OpenRouterReasoningTraceStatus;
@@ -171,6 +179,17 @@ export const OPENROUTER_PRESETS: Readonly<Record<OpenRouterPresetId, OpenRouterP
       agenticTurn: 'supported',
       transport: 'anthropic-messages',
       reasoningTrace: 'present',
+      incompatibility: null,
+    }),
+    'claude-docs-gemini-3-6-flash': Object.freeze({
+      id: 'claude-docs-gemini-3-6-flash',
+      profileId: 'claude-openrouter',
+      model: OPENROUTER_MODEL_IDS.gemini,
+      effort: 'high',
+      purpose: 'documentation-authoring',
+      agenticTurn: 'supported',
+      transport: 'anthropic-messages',
+      reasoningTrace: 'unverified',
       incompatibility: null,
     }),
     'claude-design-glm-5-2': Object.freeze({
