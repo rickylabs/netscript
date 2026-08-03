@@ -16,6 +16,7 @@ import { ReportFileReporter } from './adapters/reporting/report-file-reporter.ts
 import { SystemClock } from './adapters/time/system-clock.ts';
 import { DenoPlatform } from './adapters/platform/deno-platform.ts';
 import { defaultCliEntrypoint } from './application/builders/workspace/workspace-options.ts';
+import { createDefaultSuiteLeaseManager } from './application/runner/suite-lease.ts';
 
 function timestampName(date = new Date()): string {
   const pad = (value: number) => String(value).padStart(2, '0');
@@ -33,6 +34,7 @@ export function createDefaultRunner(options: RunOptions): SuiteRunner {
     dockerCleaner: new DockerCliResourceCleaner(),
     reporter: createReporter(options),
     platform: new DenoPlatform(),
+    suiteLeaseManager: createDefaultSuiteLeaseManager(),
   });
 }
 

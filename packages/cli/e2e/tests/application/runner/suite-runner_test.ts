@@ -1,4 +1,4 @@
-import { assertEquals } from '@std/assert';
+import { assertEquals, assertRejects } from '@std/assert';
 import type { Clock } from '../../../src/ports/clock.ts';
 import type {
   CommandExecutor,
@@ -13,7 +13,9 @@ import type { HttpClient, HttpRequest, HttpResult } from '../../../src/ports/htt
 import type { Reporter } from '../../../src/ports/reporter.ts';
 import type { PlatformPort } from '../../../src/ports/platform.ts';
 import { createSuiteRunner } from '../../../src/application/runner/suite-runner.ts';
+import type { SuiteLease, SuiteLeaseManager } from '../../../src/application/runner/suite-lease.ts';
 import { GATE, SCAFFOLD } from '../../../src/domain/cli-surface.ts';
+import type { SuiteId } from '../../../src/domain/cli-surface.ts';
 import type { RunOptions } from '../../../src/domain/run-context.ts';
 import {
   createScaffoldCapabilitySuite,
@@ -54,6 +56,7 @@ Deno.test('suite runner emits a failed report and prunes only created Docker res
     dockerCleaner: cleaner,
     reporter: new NullReporter(),
     platform: new FakePlatform(),
+    suiteLeaseManager: new RecordingSuiteLeaseManager(),
   }).run(suite, { suiteId: suite.id, options });
 
   assertEquals(report.ok, false);
@@ -103,6 +106,7 @@ Deno.test('suite runner skips cleanup phase when cleanup is disabled', async () 
     dockerCleaner: cleaner,
     reporter: new NullReporter(),
     platform: new FakePlatform(),
+    suiteLeaseManager: new RecordingSuiteLeaseManager(),
   }).run(suite, { suiteId: suite.id, options });
 
   assertEquals(report.ok, true);
@@ -141,6 +145,7 @@ Deno.test('suite runner cleans up after a targeted non-cleanup gate when cleanup
     dockerCleaner: cleaner,
     reporter: new NullReporter(),
     platform: new FakePlatform(),
+    suiteLeaseManager: new RecordingSuiteLeaseManager(),
   }).run(suite, { suiteId: suite.id, gateId: GATE.SCAFFOLD_INIT, options });
 
   assertEquals(cleaner.snapshots, 1);
@@ -179,11 +184,54 @@ Deno.test('suite runner can target cleanup gate without suite cleanup enabled', 
     dockerCleaner: cleaner,
     reporter: new NullReporter(),
     platform: new FakePlatform(),
+    suiteLeaseManager: new RecordingSuiteLeaseManager(),
   }).run(suite, { suiteId: suite.id, gateId: GATE.CLEANUP_ASPIRE_STOP, options });
 
   assertEquals(cleaner.snapshots, 0);
   assertEquals(commands.length, 1);
   assertEquals(commands[0].command.includes('stop'), true);
+});
+
+Deno.test('suite runner releases the expensive-suite lease when suite execution throws', async () => {
+  const leaseManager = new RecordingSuiteLeaseManager();
+  const suite = createScaffoldRuntimeSuite({ repoRoot: '.', format: 'json' });
+  const runner = createSuiteRunner({
+    clock: new FakeClock(),
+    commandExecutor: new SuccessfulCommandExecutor(),
+    httpClient: new FakeHttpClient(),
+    reporter: new ThrowingReporter(),
+    platform: new FakePlatform(),
+    suiteLeaseManager: leaseManager,
+  });
+
+  await assertRejects(
+    () => runner.run(suite, { suiteId: suite.id, options: suite.defaultOptions }),
+    Error,
+    'planned suite failure',
+  );
+  assertEquals(leaseManager.releases, 1);
+
+  const nextLease = await leaseManager.acquire(suite.id, '.');
+  assertEquals(leaseManager.acquisitions, 2);
+  await nextLease.release();
+});
+
+Deno.test('suite runner does not interact with the lease for a cheap suite', async () => {
+  const leaseManager = new RecordingSuiteLeaseManager();
+  const capability = scaffoldCapabilitySuites.find((suite) => suite.id === SCAFFOLD.SERVICE);
+  if (!capability) throw new Error('scaffold.service suite is not registered.');
+  const suite = createScaffoldCapabilitySuite(capability, { repoRoot: '.', format: 'json' });
+
+  await createSuiteRunner({
+    clock: new FakeClock(),
+    commandExecutor: new SuccessfulCommandExecutor(),
+    httpClient: new FakeHttpClient(),
+    reporter: new NullReporter(),
+    platform: new FakePlatform(),
+    suiteLeaseManager: leaseManager,
+  }).run(suite, { suiteId: suite.id, options: suite.defaultOptions });
+
+  assertEquals(leaseManager.acquisitions, 0);
 });
 
 class FakeClock implements Clock {
@@ -212,6 +260,44 @@ function createScaffoldRuntimeSuite(overrides: Partial<RunOptions>) {
 class NullReporter implements Reporter {
   emit(): Promise<void> {
     return Promise.resolve();
+  }
+}
+
+class ThrowingReporter implements Reporter {
+  emit(): Promise<void> {
+    return Promise.reject(new Error('planned suite failure'));
+  }
+}
+
+class SuccessfulCommandExecutor implements CommandExecutor {
+  run(request: CommandRequest): Promise<CommandResult> {
+    return Promise.resolve({
+      command: request.command,
+      cwd: request.cwd,
+      code: 0,
+      stdout: '',
+      stderr: '',
+      timedOut: false,
+    });
+  }
+}
+
+class RecordingSuiteLeaseManager implements SuiteLeaseManager {
+  acquisitions = 0;
+  releases = 0;
+  #held = false;
+
+  acquire(_suiteId: SuiteId, _worktree: string): Promise<SuiteLease> {
+    if (this.#held) return Promise.reject(new Error('lease already held'));
+    this.#held = true;
+    this.acquisitions += 1;
+    return Promise.resolve({
+      release: () => {
+        this.#held = false;
+        this.releases += 1;
+        return Promise.resolve();
+      },
+    });
   }
 }
 

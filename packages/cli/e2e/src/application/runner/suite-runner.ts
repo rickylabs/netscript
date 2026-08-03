@@ -3,7 +3,7 @@ import type { StepResult } from '../../domain/report.ts';
 import type { GateDefinition } from '../../domain/gate-definition.ts';
 import type { RunRequest } from '../../domain/run-context.ts';
 import type { SuiteDefinition } from '../../domain/suite-definition.ts';
-import { GATE } from '../../domain/cli-surface.ts';
+import { GATE, SCAFFOLD } from '../../domain/cli-surface.ts';
 import type { Clock } from '../../ports/clock.ts';
 import type { CommandExecutor } from '../../ports/command-executor.ts';
 import type { DockerResourceCleaner } from '../../ports/docker-resource-cleaner.ts';
@@ -13,6 +13,7 @@ import type { PlatformPort } from '../../ports/platform.ts';
 import { createSmokeProject } from '../builders/workspace/smoke-project-factory.ts';
 import { buildExecutionPlan } from './execution-plan-builder.ts';
 import { runGate } from './gate-runner.ts';
+import type { SuiteLeaseManager } from './suite-lease.ts';
 
 function selectCleanupGates(
   suite: SuiteDefinition,
@@ -45,6 +46,7 @@ export interface SuiteRunnerOptions {
   readonly dockerCleaner?: DockerResourceCleaner;
   readonly reporter: Reporter;
   readonly platform: PlatformPort;
+  readonly suiteLeaseManager: SuiteLeaseManager;
 }
 
 /** Executable suite runner. */
@@ -56,68 +58,75 @@ export interface SuiteRunner {
 export function createSuiteRunner(options: SuiteRunnerOptions): SuiteRunner {
   return {
     async run(suite, request) {
-      const startedAt = options.clock.now();
-      const startedMs = options.clock.monotonicMs();
-      const project = createSmokeProject(request.options);
-      const context = { request, project };
-      const snapshot = request.options.cleanup
-        ? await options.dockerCleaner?.captureSnapshot()
+      const lease = suite.id === SCAFFOLD.RUNTIME
+        ? await options.suiteLeaseManager.acquire(suite.id, request.options.repoRoot)
         : undefined;
-      const steps: StepResult[] = [];
-
-      await options.reporter.emit({ type: 'suite-start', suiteId: suite.id });
-      const plan = buildExecutionPlan(suite, request.gateId);
-      const cleanupGates = selectCleanupGates(suite, plan, request);
-      const mainGates = selectMainGates(plan, request);
-
       try {
-        for (const gate of mainGates) {
-          await options.reporter.emit({ type: 'gate-start', gateId: gate.id, title: gate.title });
-          const step = await runGate(gate, context, options);
-          steps.push(step);
-          await options.reporter.emit({ type: 'gate-end', result: step });
-          if (step.critical && step.verdict === 'failed') break;
-        }
-      } finally {
-        for (const gate of cleanupGates) {
-          await options.reporter.emit({ type: 'gate-start', gateId: gate.id, title: gate.title });
-          const step = await runGate(gate, context, options);
-          steps.push(step);
-          await options.reporter.emit({ type: 'gate-end', result: step });
-        }
-        if (request.options.cleanup && snapshot) {
-          const removed = await options.dockerCleaner?.pruneCreatedResources(snapshot);
-          if (removed && removed.length > 0) {
-            steps.push({
-              id: GATE.CLEANUP_DOCKER_CREATED_CONTAINERS,
-              title: 'Prune suite-created Docker containers',
-              verdict: 'passed' as const,
-              critical: false,
-              durationMs: 0,
-              evidence: [{ kind: 'docker' as const, label: 'removed containers', data: removed }],
-              attempts: [{ attempt: 1, verdict: 'passed' as const, durationMs: 0 }],
-              retried: false,
-            });
+        const startedAt = options.clock.now();
+        const startedMs = options.clock.monotonicMs();
+        const project = createSmokeProject(request.options);
+        const context = { request, project };
+        const snapshot = request.options.cleanup
+          ? await options.dockerCleaner?.captureSnapshot()
+          : undefined;
+        const steps: StepResult[] = [];
+
+        await options.reporter.emit({ type: 'suite-start', suiteId: suite.id });
+        const plan = buildExecutionPlan(suite, request.gateId);
+        const cleanupGates = selectCleanupGates(suite, plan, request);
+        const mainGates = selectMainGates(plan, request);
+
+        try {
+          for (const gate of mainGates) {
+            await options.reporter.emit({ type: 'gate-start', gateId: gate.id, title: gate.title });
+            const step = await runGate(gate, context, options);
+            steps.push(step);
+            await options.reporter.emit({ type: 'gate-end', result: step });
+            if (step.critical && step.verdict === 'failed') break;
+          }
+        } finally {
+          for (const gate of cleanupGates) {
+            await options.reporter.emit({ type: 'gate-start', gateId: gate.id, title: gate.title });
+            const step = await runGate(gate, context, options);
+            steps.push(step);
+            await options.reporter.emit({ type: 'gate-end', result: step });
+          }
+          if (request.options.cleanup && snapshot) {
+            const removed = await options.dockerCleaner?.pruneCreatedResources(snapshot);
+            if (removed && removed.length > 0) {
+              steps.push({
+                id: GATE.CLEANUP_DOCKER_CREATED_CONTAINERS,
+                title: 'Prune suite-created Docker containers',
+                verdict: 'passed' as const,
+                critical: false,
+                durationMs: 0,
+                evidence: [{ kind: 'docker' as const, label: 'removed containers', data: removed }],
+                attempts: [{ attempt: 1, verdict: 'passed' as const, durationMs: 0 }],
+                retried: false,
+              });
+            }
           }
         }
-      }
 
-      const failed = steps.filter((step) => step.verdict === 'failed').length;
-      const report: RunReport = {
-        ok: failed === 0,
-        suiteId: suite.id,
-        projectRoot: project.projectRoot,
-        startedAt: startedAt.toISOString(),
-        durationMs: Math.round(options.clock.monotonicMs() - startedMs),
-        steps,
-        summary: {
-          passed: steps.filter((step) => step.verdict === 'passed').length,
-          failed,
-          skipped: steps.filter((step) => step.verdict === 'skipped').length,
-        },
-      };
-      await options.reporter.emit({ type: 'suite-end', report });
-      return report;
+        const failed = steps.filter((step) => step.verdict === 'failed').length;
+        const report: RunReport = {
+          ok: failed === 0,
+          suiteId: suite.id,
+          projectRoot: project.projectRoot,
+          startedAt: startedAt.toISOString(),
+          durationMs: Math.round(options.clock.monotonicMs() - startedMs),
+          steps,
+          summary: {
+            passed: steps.filter((step) => step.verdict === 'passed').length,
+            failed,
+            skipped: steps.filter((step) => step.verdict === 'skipped').length,
+          },
+        };
+        await options.reporter.emit({ type: 'suite-end', report });
+        return report;
+      } finally {
+        await lease?.release();
+      }
     },
   };
 }
