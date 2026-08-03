@@ -479,3 +479,17 @@ Full-artifact review of all three proof verdicts (PR #1182):
     lane** — no brief validation, no route verification, no transcript-id artifact, no
     watcher. The 0.0.5 run drives it with a raw `agy --print` and hand-captured output; #1115
     (observability for Codex *and* agy) covers the watch half, but launch parity is unowned.
+
+## 2026-08-04 — agy docs lane blocked; deferred (drift D9)
+
+First headless agy attempt: tool permission auto-denied, **empty run reported as
+`status: SUCCESS`** (conversation `159227b0`, 2.9s, zero output — the silent-refusal-as-success
+class again, this time in the agy CLI). The two unblock paths are owner-only in this
+environment. Lane deferred per the no-substitution rule; wave 2 proceeds with its 4 Codex
+slices; #1106/#1109 re-wave on owner action.
+
+18. **[agy-headless-unprovisioned]** `lane-policy.md` binds documentation authoring to agy, but
+    the lane cannot run unattended without pre-provisioned `permissions.allow` rules — and a
+    permission-denied headless run reports `SUCCESS` with an empty response. Lane provisioning
+    (like credential provisioning, finding 15) is a precondition the policy never states, and
+    the CLI's success-on-refusal is #1173-class.
