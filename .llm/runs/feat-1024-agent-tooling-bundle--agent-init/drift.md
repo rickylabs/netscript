@@ -110,3 +110,20 @@ documentation.
   runtime verdict.
 - **Evidence:** `passed=47 failed=1`; the sole stderr names HTTP 503, `database` unhealthy, and the
   Prisma raw-query failure; post-run leak-check reports zero survivors.
+
+## 2026-08-03 — merge-readiness rebase consumes the completed scaffold lane
+
+- **What:** `origin/main` advanced by six commits after formal evaluation, including merged #1078
+  and the release-blocking harness controls from #1094.
+- **Source:** merge-readiness inspection after the first IMPL-EVAL pass.
+- **Expected:** The evaluated branch remains directly mergeable into its base.
+- **Actual:** The branch was six commits behind. Rebasing produced two conflicts in the generated
+  `AGENTS.md` guidance string in `init-agent.ts`, where #1078's MCP diagnostics and gated-drift
+  language overlap this slice's symptom-indexed tool and optional-docs routing.
+- **Severity:** moderate
+- **Action:** preserve #1078's diagnostic/receipt language in intent and compose this slice's
+  tool/docs discovery into the same section; edit no scaffold-owned implementation. Repeat focused
+  and full static gates, then obtain a fresh formal IMPL-EVAL on the rebased diff.
+- **Evidence:** rebase onto `d0802e150`; focused 26/26, root check 2,541 files / 22 batches / zero
+  diagnostics, root test 2,571 passed (567 steps) / zero failed / 16 ignored, agent-surface lint/fmt,
+  CLI doc lint, and generated-asset freshness all pass.

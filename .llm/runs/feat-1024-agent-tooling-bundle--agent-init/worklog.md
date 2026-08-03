@@ -164,6 +164,7 @@ compressed asset; never hand-edit the generated TypeScript or API text.
 | 2026-08-03T15:59:00+02:00 | S3 | serialized merge gate | With leak-check at zero and no foreign AppHost, the required one-pass local-source `scaffold.runtime` passed 47 gates and cleanup, failing only `behavior.service-health`: the users service stayed HTTP 503 because Prisma's raw query could not reach the generated database. This reproduces the earlier clean baseline failure at the same gate and is not caused by the tooling/docs diff. No run-owned survivors remained. |
 | 2026-08-03T16:06:00+02:00 | S3 | full-test red/fix | Final `deno task test` passed 2,533 tests but exposed two failures: the forbidden-command walker hit root-owned Postgres state left by prior failed runtime fixtures, and the version-drift guard found a pinned release string in the generated tool barrel plus a docs test fixture. Removed only the three exact run-owned fixture directories through a root-capable disposable container; leak-check stayed clear. Kept the version guard strict: the generated barrel now derives `release.json` at runtime through `netscriptJsrSpecifier('cli')`, while its hash remains generation-time verified, and docs mismatch/range fixtures derive versions. Focused 21/21 plus scoped check/lint/fmt pass. |
 | 2026-08-03T16:18:00+02:00 | S3 | final static verification | After the release-metadata fix, `deno task check` passed 2,524 files in 22 batches and `deno task test` passed 2,535 tests (564 steps), with 16 intentional ignores and zero failures. Changed-file check/lint/fmt, `quality:scan`, `arch:check`, CLI `deno doc --lint`, asset-barrel verification, and `publish:dry-run` all passed. The publication simulation ended `Success Dry run complete` and included the generated CLI docs/tool/skill assets; existing unanalyzable-dynamic-import warnings remain unrelated. |
+| 2026-08-03T16:39:00+02:00 | S3 | merge-readiness rebase | Rebasing onto current main `d0802e150` consumed six merged commits, including #1078. Two conflicts were limited to the installed `AGENTS.md` guidance string; the resolution retains #1078's MCP/diagnostic-receipt gate and composes this slice's tool/docs symptom routing. Focused 26/26, root check 2,541 files / 22 batches, root test 2,571 passed (567 steps), agent-surface lint/fmt, CLI doc lint, and asset freshness all pass. A fresh IMPL-EVAL is required for the rebased diff. |
 
 ## Decisions
 
@@ -225,6 +226,9 @@ compressed asset; never hand-edit the generated TypeScript or API text.
 | Final CLI doc lint | PASS | 3 entrypoints, 0 diagnostics | Published-package missing-JSDoc bar satisfied. |
 | Final publish dry-run | PASS | `Success Dry run complete` | JSR simulation includes generated docs, tools, and skills assets; existing dynamic-import warnings only. |
 | IMPL-EVAL | PASS | `db15616a4`; OpenHands/OpenRouter Qwen 3.7 Max, xhigh; Actions run `30812892343` | Independent evaluator found no blockers, confirmed every checked issue box is evidenced, and accepted the reduced close scope (`Closes #1061`, `Refs #1024`). |
+| Rebased root check | PASS | 2,541 files; 22 batches; 0 diagnostics | Current main integration at `b1a3a97bfe`. |
+| Rebased root test | PASS | 2,571 passed (567 steps), 0 failed, 16 ignored | Includes the merged #1078 agent-surface coverage. |
+| Rebased conflict surface | PASS | focused 26/26; 17-file lint/fmt clean; CLI doc lint clean; asset-barrel diff clean | Combined MCP diagnostics/gated drift with tool/docs discovery. |
 
 ### Runtime Gates
 

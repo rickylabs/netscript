@@ -21,7 +21,8 @@ already completed the serialized runtime and consumer runs.
 - Branch: `feat/1024-agent-tooling-bundle`
 - Run: `.llm/runs/feat-1024-agent-tooling-bundle--agent-init/`
 - Issues: #1024 and #1061; read both bodies and all eleven acceptance criteria.
-- Review the full diff from `e5bae2858` through current branch head, not only the latest commit.
+- Review the full diff from current base `d0802e150` through current branch head, not only the latest
+  commit. This is a fresh post-rebase evaluation; replace the earlier `impl-eval.md` verdict.
 - Read `research.md`, `plan.md`, `plan-eval.md`, `worklog.md`, `context-pack.md`, `drift.md`, both
   slice review prompts, and the runtime leak report.
 - Treat the tracked evaluator artifact as authoritative; do not accept prose summaries over code,
@@ -47,15 +48,19 @@ Challenge especially:
    validator then rejected all six pinned host ports emitted by public `0.0.3`. Criterion 6 remains
    unchecked because the current public scaffold cannot pass that enforced gate. The PR therefore
    uses `Refs #1024`, not a closing keyword. #1061 is fully evidenced and remains `Closes #1061`.
+9. whether the two rebase conflict resolutions in `init-agent.ts` correctly preserve merged #1078's
+   MCP diagnostics and gated drift-receipt contract while composing this slice's symptom-indexed
+   tools and optional offline-docs routing. No scaffold-owned implementation was edited.
 
-Static verification at final product head `04757a018` is green: root check selected 2,524 files in 22
-batches; root test passed 2,535 tests (564 steps), zero failed and 16 ignored; changed-file
-check/lint/fmt, quality scan, architecture check, CLI doc lint, asset freshness, and publish dry-run
-all pass. A quiet-host local-source `scaffold.runtime` passed 47/48 and cleanup, failing only the
-pre-existing `behavior.service-health` Prisma/database-unhealthy shape. Do not treat that as a green
-runtime result. Judge whether the PR may pass its honestly reduced close scope: full #1061 closure
-plus the independently useful and evidenced #1024 tooling work, with #1024 deliberately left open
-for the scaffold-owned criterion 6.
+The pre-rebase static verification was green, including quality, architecture, and publish dry-run.
+Post-rebase verification at product head `b1a3a97bfe` is also green: focused conflict-surface tests
+26/26; root check selected 2,541 files in 22 batches; root test passed 2,571 tests (567 steps), zero
+failed and 16 ignored; agent-surface lint/fmt, CLI doc lint, and generated-asset freshness pass. A
+quiet-host local-source `scaffold.runtime` passed 47/48 and cleanup, failing only the pre-existing
+`behavior.service-health` Prisma/database-unhealthy shape. Do not treat that as a green runtime
+result. Judge whether the PR may pass its honestly reduced close scope: full #1061 closure plus the
+independently useful and evidenced #1024 tooling work, with #1024 deliberately left open for the
+scaffold-owned criterion 6.
 
 ## Required output
 
