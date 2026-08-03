@@ -285,6 +285,12 @@ OpenRouter Claude routes run with an isolated `CLAUDE_CONFIG_DIR`, explicitly em
 gateway. `claude/claude-print.ts` is the launch/resume wrapper for non-mobile gateway sessions.
 Native Claude remote control remains a different surface.
 
+The formal-evaluator preset additionally replaces `ANTHROPIC_BASE_URL` in the spawned evaluator
+environment with a loopback request guard. Every model-bearing request must name a model in
+`OPEN_EVALUATOR_MODEL_IDS`; a denial returns 403, terminates the evaluator, exits non-zero, and
+writes a credential-blind JSONL event under `.llm/tmp/agentic/evaluator-policy/` with only the model
+id and requesting session. This child-surface policy is configuration, not prompt guidance.
+
 Preset capability is data in `runtime/provider-profiles.ts`: the Claude GLM design preset is
 live-agentic supported, while the legacy Codex GLM design preset is explicitly unsupported because
 the Responses route declares a native namespace tool that the available OpenRouter endpoints reject.

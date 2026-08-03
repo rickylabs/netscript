@@ -71,6 +71,9 @@ job. Release prose is edited in the tracked notes-file input.
 | 2026-08-03 | 0 | bootstrap/research | Read all four issue bodies; verified clean requested baseline; selected Archetype 6 + docs overlay. |
 | 2026-08-03 | 0 | design | Locked child-request proxy, publication ownership, Redis negative control, and release-note location. |
 | 2026-08-03 | 0 | PLAN-EVAL | Open-model evaluator session `e52d58f7-9130-4c7b-af67-2e975edcb1e5` returned `PASS`; tool surface was restricted to `Bash`, `Read`, and `Write` during the pre-#1087 safety gap. |
+| 2026-08-03 | 1 | #1087 implementation | Added a loopback Anthropic request guard configured through the evaluator child environment, exact central open-model allowlist, real launch/resume session identity, redacted JSONL denial audit, and SIGTERM→SIGKILL abort with exit 78. |
+| 2026-08-03 | 1 | opposite-family review | Fable review session `7a34e115-1da4-4a2e-b7ad-621f79c1f5d6` returned `PASS`; remediation continuation `55852a33-55b4-4898-9909-0a1ad0545c7c` verified all actionable findings resolved. |
+| 2026-08-03 | 1 | supervisor sign-off | Inspected the guard/wrapper/adapter boundary, reviewer evidence, complete suite, scoped wrappers, and credential-blind audit tests; approved the slice for commit. |
 
 ## Decisions
 
@@ -85,13 +88,18 @@ job. Release prose is edited in the tracked notes-file input.
 | --- | --- | --- |
 | Current Codex session is the owner-assigned supervisor rather than canonical Fable entry session. | significant | yes |
 | Bootstrap local evaluator requires a temporary `Agent` deny until #1087 lands. | significant | yes |
+| Planned light-review Opus route was unavailable at launch; #1087 review was reclassified to the canonical complex security route (Fable medium). | significant | yes |
 
 ## Gate Results
 
 - PLAN-EVAL: `PASS` — `.llm/runs/fix-1087-harness-hardening--release-blockers/plan-eval.md`.
-- Implementation gates: `NOT_RUN`.
+- #1087 focused guard/policy suite: `50 passed, 0 failed` after remediation.
+- #1087 complete `.llm/tools/agentic/` suite: `332 passed, 0 failed` (independently rerun by reviewer).
+- #1087 scoped check/lint/fmt: `129 files, 0 findings` each.
+- #1087 review: `PASS`; all actionable findings resolved.
+- Remaining implementation gates: `NOT_RUN`.
 
 ## Handoff Notes
 
-- PLAN-EVAL challenged D1/D2 abort/log semantics, D4 ownership semantics, and D7's permanent
-  negative-control proof and returned `PASS`; implementation may proceed.
+- #1087 is supervisor-approved for its issue commit. After push and evidence comment, proceed to
+  #1084 without combining the slices.
