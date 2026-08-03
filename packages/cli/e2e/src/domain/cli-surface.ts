@@ -46,7 +46,6 @@ export const GATE_PHASE = {
 export const GATE = {
   PREFLIGHT_DENO: 'preflight.deno',
   PREFLIGHT_ASPIRE: 'preflight.aspire',
-  SCAFFOLD_HOSTILE_PARENT_TSCONFIG: 'scaffold.hostile-parent-tsconfig',
   SCAFFOLD_INIT: 'scaffold.init',
   SERVICE_LIST: 'service.list',
   CONTRACT_ADD: 'contract.add',

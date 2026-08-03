@@ -10,6 +10,7 @@ import {
   SCAFFOLD_JSR_RELEASE_PACKAGES,
 } from '../../constants/scaffold/scaffold-workspace-packages.ts';
 import { netscriptJsrSpecifier } from '../../constants/jsr-specifiers.ts';
+import { generateAppTsConfig } from '../../adapters/templates/app/generate-app-tsconfig.ts';
 import { generateDenoJson } from './deno-json.ts';
 import {
   formatAspireDashboardResolutionFailure,
@@ -442,4 +443,32 @@ Deno.test('generateReadme — mysql gets persistent-container note', () => {
   });
   assertStringIncludes(md, 'MySQL');
   assertStringIncludes(md, 'Persistent: false');
+});
+
+Deno.test('generated tsconfigs terminate upward lookup so a hostile parent cannot reach the project', () => {
+  // #1016: a `tsconfig.json` anywhere above a generated project used to break `db generate` and
+  // Vite SSR, because TypeScript walks upward until it finds one. The observed failure was a
+  // parent config whose `extends` did not resolve — Prisma reported `File '<pkg>' not found.` and
+  // Vite reported `failed to resolve "extends"` for an app component.
+  //
+  // The fix is a project boundary, so the assertion is on the boundary itself rather than on any
+  // particular hostile parent. Reproducing the break needs a real toolchain, which is why this is
+  // a unit test of the generated shape and not an E2E gate.
+  const root = JSON.parse(generateTsConfig());
+  assertEquals(
+    root.files,
+    [],
+    'root tsconfig must claim no files: it exists to stop the upward walk, not to type-check Deno source',
+  );
+
+  const app = JSON.parse(generateAppTsConfig());
+  assert(
+    app.compilerOptions !== undefined,
+    'app tsconfig must carry its own compilerOptions so Vite/Fresh never inherits from above',
+  );
+  assertEquals(
+    app.extends,
+    undefined,
+    'app tsconfig must not extend anything: an extends chain is the exact mechanism #1016 broke on',
+  );
 });
