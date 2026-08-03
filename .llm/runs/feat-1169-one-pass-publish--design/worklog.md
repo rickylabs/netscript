@@ -84,3 +84,9 @@ one file) and copies the `commandGate(…, { retry })` pattern; report consumers
   80/80; diff smell scan (deno-lint-ignore / as unknown as / `: any`) = 0.
 - Reconcile: #1168 remains open until PR merge; instrumentation-decision acceptance box (transient
   vs ceiling) satisfiable only at first real retry occurrence — recorded honestly, not asserted.
+
+## S1 transient-vs-ceiling evidence (fills #1168 box 5)
+
+- CI run 30845659110 (this PR): `runtime.aspire-restore: PASSED 5558ms` cold, attempt 1 — 0.6% of
+  the 900s ceiling. Verdict: stall-class, not ceiling-bound; retry chosen accordingly, ceiling
+  unchanged. All #1176 checks settled green except close-gate (mirror pending ready-merge label).
