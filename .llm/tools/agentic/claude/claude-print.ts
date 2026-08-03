@@ -72,7 +72,7 @@ if (import.meta.main) {
     if (!prompt.trim()) throw new Error('Claude content file is empty');
     const requestingSession = options.resume ?? crypto.randomUUID();
     let process: Deno.ChildProcess | null = null;
-    let forcedKill: number | undefined;
+    let forcedKill: ReturnType<typeof setTimeout> | undefined;
     const guard = options.enforceOpenEvaluatorModels
       ? startEvaluatorModelGuard(requestingSession, (violation) => {
         console.error(
