@@ -59,9 +59,17 @@ Deno.test({
       ) {
         assertEquals(await exists(join(projectRoot, omitted)), false, omitted);
       }
+      // Type-check the generated glue against the repository workspace instead of the
+      // `jsr:@netscript/*@<release version>` pins the consumer scaffold declares. Resolving
+      // the registry artifact at the workspace's own declared version is circular on a
+      // release branch (the version is not published until the release merges); the
+      // published-artifact resolution of scaffolded projects is owned by the post-publish
+      // production smoke (`e2e-cli-prod.yml`), not this lane.
       await run(projectRoot, [
         'check',
         '--unstable-kv',
+        '--config',
+        join(repoRoot, 'deno.json'),
         'ai/ai.ts',
         'ai/models.ts',
         'ai/mcp/registry.ts',
