@@ -70,7 +70,7 @@ function readResource(value: unknown): readonly AppHostResourceState[] {
     name,
     state: readString(value, 'state'),
     healthStatus: readString(value, 'healthStatus'),
-    healthReports: readArray(value, 'healthReports'),
+    healthReports: readHealthReports(value),
   }];
 }
 
@@ -86,10 +86,13 @@ function readString(value: unknown, key: string): string | undefined {
   return typeof field === 'string' ? field : undefined;
 }
 
-function readArray(value: unknown, key: string): readonly unknown[] {
-  if (!value || typeof value !== 'object') return [];
-  const field = Reflect.get(value, key);
-  return Array.isArray(field) ? field : [];
+function readHealthReports(
+  value: unknown,
+): readonly unknown[] | Readonly<Record<string, unknown>> {
+  if (!value || typeof value !== 'object') return {};
+  const field = Reflect.get(value, 'healthReports');
+  if (Array.isArray(field)) return field;
+  return field && typeof field === 'object' ? field as Readonly<Record<string, unknown>> : {};
 }
 
 function commandError(command: string, detail: string): Error {

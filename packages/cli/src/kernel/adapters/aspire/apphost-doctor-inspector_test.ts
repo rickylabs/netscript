@@ -36,7 +36,7 @@ Deno.test('AppHost doctor inspector returns named resource state from the matchi
         displayName: 'api',
         state: 'Running',
         healthStatus: 'Unhealthy',
-        healthReports: [{ name: 'http', status: 'Unhealthy' }],
+        healthReports: { http: { status: 'Unhealthy' } },
       }],
     })),
   ]);
@@ -47,7 +47,7 @@ Deno.test('AppHost doctor inspector returns named resource state from the matchi
       name: 'api',
       state: 'Running',
       healthStatus: 'Unhealthy',
-      healthReports: [{ name: 'http', status: 'Unhealthy' }],
+      healthReports: { http: { status: 'Unhealthy' } },
     }],
   });
   assertEquals(process.commands.map((command) => command.args[0]), ['ps', 'describe']);

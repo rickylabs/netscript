@@ -41,6 +41,8 @@ interface DbOperationRunnerOptions {
   readonly pollIntervalMs?: number;
   readonly timeoutMs?: number;
   readonly sleep?: (ms: number) => Promise<void>;
+  readonly writeOperationRequest?: (path: string, env: Record<string, string>) => Promise<void>;
+  readonly removeOperationRequest?: (path: string) => Promise<void>;
 }
 
 /** Executes database operations by delegating to Aspire AppHost CLI mode. */
@@ -50,6 +52,8 @@ export class DbOperationRunner {
   private readonly pollIntervalMs: number;
   private readonly timeoutMs: number;
   private readonly sleep: (ms: number) => Promise<void>;
+  private readonly writeOperationRequest: (path: string, env: Record<string, string>) => Promise<void>;
+  private readonly removeOperationRequest: (path: string) => Promise<void>;
 
   constructor(options: DbOperationRunnerOptions = {}) {
     this.executor = options.executor ?? new DenoAspireCommandExecutor();
@@ -58,6 +62,15 @@ export class DbOperationRunner {
     this.timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS;
     this.sleep = options.sleep ??
       ((ms: number) => new Promise((resolve) => setTimeout(resolve, ms)));
+    this.writeOperationRequest = options.writeOperationRequest ??
+      ((path, env) => Deno.writeTextFile(path, JSON.stringify(env)));
+    this.removeOperationRequest = options.removeOperationRequest ?? (async (path) => {
+      try {
+        await Deno.remove(path);
+      } catch (error) {
+        if (!(error instanceof Deno.errors.NotFound)) throw error;
+      }
+    });
   }
 
   /**
@@ -137,6 +150,7 @@ export class DbOperationRunner {
     env: Record<string, string>,
   ): Promise<number> {
     const displayName = buildExecutableDisplayName(operation, configKey);
+    const operationRequestPath = join(apphostPath, '..', '.netscript-db-operation.json');
     outputText(`Starting db ${operation} for ${configKey}...`);
     const lease = await this.lifecycleLock.acquire(apphostPath, {
       timeoutMs: this.timeoutMs,
@@ -145,6 +159,7 @@ export class DbOperationRunner {
     });
 
     try {
+      await this.writeOperationRequest(operationRequestPath, env);
       const startedByInvocation = !(await this.hasRunningAppHost(apphostPath, aspireDir));
 
       await this.runAspire(
@@ -175,6 +190,7 @@ export class DbOperationRunner {
         }
       }
     } finally {
+      await this.removeOperationRequest(operationRequestPath);
       await this.releaseLease(lease, apphostPath);
     }
   }

@@ -64,7 +64,7 @@ export interface AppHostResourceState {
   readonly state?: string;
   readonly healthStatus?: string;
   /** Raw Aspire readiness reports; an empty set cannot substantiate `Healthy`. */
-  readonly healthReports?: readonly unknown[];
+  readonly healthReports?: readonly unknown[] | Readonly<Record<string, unknown>>;
 }
 
 /** Explicit AppHost lifecycle and resource snapshot. */
@@ -153,7 +153,10 @@ async function diagnoseAppHost(
           message: `Configured resource "${name}" is missing from the running AppHost.`,
         };
       }
-      const reportsReady = (resource.healthReports?.length ?? 0) > 0;
+      const reportsReady = resource.healthReports !== undefined &&
+        (Array.isArray(resource.healthReports)
+          ? resource.healthReports.length > 0
+          : Object.keys(resource.healthReports).length > 0);
       const aspireHealthy = resource.state?.toLowerCase() === 'running' &&
         resource.healthStatus?.toLowerCase() === 'healthy';
       const status = !aspireHealthy ? 'error' : reportsReady ? 'healthy' : 'warning';

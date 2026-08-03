@@ -105,7 +105,7 @@ function createRequest(
 describe('DbOperationRunner', () => {
   it('runs one-shot operations through detached Aspire start and resource polling', async () => {
     await withAspireStartTimeout(undefined, async () => {
-      const apphostPath = join(PROJECT_ROOT, 'aspire', 'db-operation-apphost.mts');
+      const apphostPath = join(PROJECT_ROOT, 'aspire', 'db-operation', 'apphost.mts');
       const executor = createDetachedSuccessExecutor(apphostPath);
       const runner = createFastRunner(executor);
 
@@ -160,7 +160,7 @@ describe('DbOperationRunner', () => {
 
   it('preserves an operator-provided Aspire CLI start timeout', async () => {
     await withAspireStartTimeout('900', async () => {
-      const apphostPath = join(PROJECT_ROOT, 'aspire', 'db-operation-apphost.mts');
+      const apphostPath = join(PROJECT_ROOT, 'aspire', 'db-operation', 'apphost.mts');
       const executor = createDetachedSuccessExecutor(apphostPath);
       const runner = createFastRunner(executor);
 
@@ -178,7 +178,7 @@ describe('DbOperationRunner', () => {
 
   it('keeps polling when Aspire describe returns empty output during startup', async () => {
     await withAspireStartTimeout(undefined, async () => {
-      const apphostPath = join(PROJECT_ROOT, 'aspire', 'db-operation-apphost.mts');
+      const apphostPath = join(PROJECT_ROOT, 'aspire', 'db-operation', 'apphost.mts');
       const executor = new FakeAspireExecutor([
         noRunningAppHost(),
         { code: 0, stdout: '{"appHostPid":123}', stderr: '' },
@@ -217,7 +217,7 @@ describe('DbOperationRunner', () => {
 
   it('uses the default Aspire CLI start timeout when the operator value is empty', async () => {
     await withAspireStartTimeout('', async () => {
-      const apphostPath = join(PROJECT_ROOT, 'aspire', 'db-operation-apphost.mts');
+      const apphostPath = join(PROJECT_ROOT, 'aspire', 'db-operation', 'apphost.mts');
       const executor = createDetachedSuccessExecutor(apphostPath);
       const runner = createFastRunner(executor);
 
@@ -234,7 +234,7 @@ describe('DbOperationRunner', () => {
   });
 
   it('never stops a DB-operation AppHost that was already running', async () => {
-    const apphostPath = join(PROJECT_ROOT, 'aspire', 'db-operation-apphost.mts');
+    const apphostPath = join(PROJECT_ROOT, 'aspire', 'db-operation', 'apphost.mts');
     const executor = new FakeAspireExecutor([
       { code: 0, stdout: JSON.stringify([{ appHostPath: apphostPath }]), stderr: '' },
       { code: 0, stdout: '{"appHostPid":123}', stderr: '' },
@@ -250,7 +250,7 @@ describe('DbOperationRunner', () => {
   });
 
   it('never stops an existing DB-operation AppHost when the operation fails', async () => {
-    const apphostPath = join(PROJECT_ROOT, 'aspire', 'db-operation-apphost.mts');
+    const apphostPath = join(PROJECT_ROOT, 'aspire', 'db-operation', 'apphost.mts');
     const executor = new FakeAspireExecutor([
       { code: 0, stdout: JSON.stringify([{ appHostPath: apphostPath }]), stderr: '' },
       { code: 0, stdout: '{"appHostPid":123}', stderr: '' },
@@ -266,7 +266,7 @@ describe('DbOperationRunner', () => {
   });
 
   it('stops an AppHost started by this invocation after an operation failure', async () => {
-    const apphostPath = join(PROJECT_ROOT, 'aspire', 'db-operation-apphost.mts');
+    const apphostPath = join(PROJECT_ROOT, 'aspire', 'db-operation', 'apphost.mts');
     const executor = new FakeAspireExecutor([
       noRunningAppHost(),
       { code: 0, stdout: '{"appHostPid":123}', stderr: '' },
@@ -379,6 +379,8 @@ function createFastRunner(
     pollIntervalMs: 0,
     timeoutMs: 100,
     sleep: async () => {},
+    writeOperationRequest: () => Promise.resolve(),
+    removeOperationRequest: () => Promise.resolve(),
   });
 }
 

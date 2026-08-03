@@ -15,14 +15,18 @@ while (Date.now() < deadline) {
   const document = JSON.parse(stdout) as { resources?: readonly Resource[] };
   const resource = document.resources?.find((entry) => entry.displayName === 'readiness-dead-port');
   if (resource) {
-    const reports = Array.isArray(resource.healthReports) ? resource.healthReports : [];
+    const reportCount = Array.isArray(resource.healthReports)
+      ? resource.healthReports.length
+      : resource.healthReports && typeof resource.healthReports === 'object'
+      ? Object.keys(resource.healthReports).length
+      : 0;
     last = `${resource.state ?? 'unknown'} / ${
       resource.healthStatus ?? 'unknown'
-    } / ${reports.length} reports`;
+    } / ${reportCount} reports`;
     if (
       resource.state?.toLowerCase() === 'running' &&
       resource.healthStatus?.toLowerCase() !== 'healthy' &&
-      reports.length > 0
+      reportCount > 0
     ) {
       console.log(`readiness-dead-port observed ${last}`);
       Deno.exit(0);
@@ -38,5 +42,5 @@ interface Resource {
   readonly displayName?: string;
   readonly state?: string;
   readonly healthStatus?: string;
-  readonly healthReports?: readonly unknown[];
+  readonly healthReports?: readonly unknown[] | Readonly<Record<string, unknown>>;
 }

@@ -34,6 +34,7 @@ import { generateRegisterApps } from './register/generate-register-apps.ts';
 import { generateRegisterTools } from './register/generate-register-tools.ts';
 import { generateDbCliMode } from './generate-db-cli-mode.ts';
 import { generateIndex } from './generate-index.ts';
+import { generateTsAspireConfig } from '../generate-aspire-config.ts';
 
 export class HelpersGeneratorPipeline {
   readonly #templateAdapter: TemplatePort | null;
@@ -124,18 +125,77 @@ export class HelpersGeneratorPipeline {
 
     // 11. Tier 2: AppHost entry point (optional — default true)
     if (generateAppHost !== false) {
+      const operationHelpers = files
+        .filter((file) => file.path.startsWith(`${SCAFFOLD_DIRS.HELPERS}/`))
+        .map((file) => ({
+          path: `db-operation/${file.path}`,
+          content: file.path.endsWith(`/${HELPERS_FILES.INDEX}`)
+            ? file.content.replace(
+              "resolve(await builder.appHostDirectory(), '..')",
+              "resolve(await builder.appHostDirectory(), '../..')",
+            )
+            : file.content,
+        }));
       files.push(
+        ...operationHelpers,
         await this.renderAppHost(
           configPath ??
             `../${SCAFFOLD_FILES.APPSETTINGS}`,
           templates,
         ),
         await this.renderAppHost(
-          configPath ??
-            `../${SCAFFOLD_FILES.APPSETTINGS}`,
+          configPath ? `../${configPath}` : `../../${SCAFFOLD_FILES.APPSETTINGS}`,
           templates,
           SCAFFOLD_FILES.DB_OPERATION_APPHOST_MTS,
+          {
+            sdkImport: './.aspire/modules/aspire.mts',
+            helpersImport: './.helpers/index.mts',
+            prelude: [
+              "import { readFileSync } from 'node:fs';",
+              "const dbOperationEnv = JSON.parse(readFileSync(new URL('./.netscript-db-operation.json', import.meta.url), 'utf8'));",
+              'Object.assign(process.env, dbOperationEnv);',
+            ].join('\n'),
+          },
         ),
+        {
+          path: `db-operation/${SCAFFOLD_FILES.ASPIRE_CONFIG}`,
+          content: generateTsAspireConfig({
+            dbEngines: Object.values(config.Databases).flatMap((entry) => {
+              const engine = entry.Engine.toLowerCase();
+              return engine === 'postgres' || engine === 'mysql' || engine === 'mssql' ||
+                  engine === 'sqlite'
+                ? [engine]
+                : [];
+            }),
+            cache: false,
+          }),
+        },
+        {
+          path: `db-operation/${SCAFFOLD_FILES.TSCONFIG_APPHOST}`,
+          content: JSON.stringify({
+            compilerOptions: {
+              target: 'ES2022',
+              module: 'NodeNext',
+              moduleResolution: 'NodeNext',
+              allowImportingTsExtensions: true,
+              esModuleInterop: true,
+              forceConsistentCasingInFileNames: true,
+              strict: true,
+              skipLibCheck: true,
+              noEmit: true,
+            },
+            include: [
+              'apphost.mts',
+              '.helpers/_aspire-compat.mts',
+              '.helpers/configure-dashboard.mts',
+              '.helpers/db-cli-mode.mts',
+              '.helpers/index.mts',
+              '.helpers/register-*.mts',
+              '.aspire/modules/*.mts',
+            ],
+            exclude: ['node_modules'],
+          }, null, 2) + '\n',
+        },
       );
     }
 
@@ -210,17 +270,25 @@ export class HelpersGeneratorPipeline {
     configPath: string,
     templates?: AspireHelperTemplateAssets,
     path: string = SCAFFOLD_FILES.APPHOST_MTS,
+    imports?: {
+      readonly sdkImport: string;
+      readonly helpersImport: string;
+      readonly prelude?: string;
+    },
   ): Promise<GeneratedFile> {
     const resolvedTemplates = templates ?? await loadAspireHelperTemplateAssets();
     const vars: Record<string, string> = {
       configPath,
-      sdkImport: SCAFFOLD_ASPIRE_MODULES.SDK_IMPORT_FROM_ROOT,
-      helpersImport: SCAFFOLD_ASPIRE_MODULES.HELPERS_IMPORT_FROM_ROOT,
+      sdkImport: imports?.sdkImport ?? SCAFFOLD_ASPIRE_MODULES.SDK_IMPORT_FROM_ROOT,
+      helpersImport: imports?.helpersImport ?? SCAFFOLD_ASPIRE_MODULES.HELPERS_IMPORT_FROM_ROOT,
     };
 
-    const content = this.#templateAdapter
+    let content = this.#templateAdapter
       ? await this.#templateAdapter.render(resolvedTemplates.apphostTemplate, vars)
       : renderSimple(resolvedTemplates.apphostTemplate, vars);
+    if (imports?.prelude) {
+      content = content.replace('const builder = await createBuilder();', `${imports.prelude}\n\nconst builder = await createBuilder();`);
+    }
 
     return {
       path,

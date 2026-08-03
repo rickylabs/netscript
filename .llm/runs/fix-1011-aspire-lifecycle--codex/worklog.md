@@ -15,7 +15,7 @@
 
 - `netscript db status` behavior changes without changing its command name/options/result contract.
 - Generated `aspire/apphost.mts` remains the resident entry; generated
-  `aspire/db-operation-apphost.mts` is a tooling entry, not a JSR export.
+  `aspire/db-operation/apphost.mts` is a tooling entry, not a JSR export.
 - `netscript plugin doctor` keeps its output model but adds an unverified/warning health-evidence arm.
 - No `mod.ts`, subpath, or package export-map change.
 
@@ -36,7 +36,7 @@
 
 ### Constants
 
-- `SCAFFOLD_FILES.DB_OPERATION_APPHOST_MTS` — `db-operation-apphost.mts`.
+- `SCAFFOLD_FILES.DB_OPERATION_APPHOST_MTS` — `db-operation/apphost.mts`.
 - Existing `GATE`/`ASPIRE_RESOURCE` constant families receive named resident-lifecycle and
   dead-port-readiness values; no free string IDs in suite registration.
 - Existing `RESOURCE_DEFAULTS.HttpEndpointName` and `AppHealthCheckPath` remain readiness defaults.
@@ -89,6 +89,9 @@ by adding a named gate to `packages/cli/e2e/src/application/gates/scaffold/runti
 | 2026-08-03 | S2 | red proof | Generator, inspector, and doctor tests failed pre-fix: endpoint-bearing task/Tauri resources had no probe, `healthReports` were discarded, and an empty-report resource was certified healthy. The missing-Aspire-binary test passed in the same run. |
 | 2026-08-03 | S2 | implementation | All endpoint-bearing app entries receive the configured HTTP probe; `AppHostInspector` preserves raw report evidence; doctor warns instead of certifying Healthy when reports are absent. Added a generator-driven live dead-port fixture and non-healthy/evidence gate to `scaffold.runtime`. |
 | 2026-08-03 | S2 | package/static gates | CLI package suite, root check, scoped check/lint/fmt, quality scan, and architecture check passed; only pre-existing catalog/doctrine warnings remain. |
+| 2026-08-03 | S3 | runtime discovery | The first merge-readiness run failed at `database.init`: Aspire rejected the second root-level file because `aspire.config.json` still identified only `apphost.mts`. This disproved the planned path-only identity model before any lifecycle acceptance was claimed. |
+| 2026-08-03 | S3 | lifecycle correction | Replaced the second loose entry with a complete nested Aspire project (`db-operation/` config, SDK, tsconfig, helper graph). Because detached Aspire does not forward the caller environment, the lock owner writes a short-lived operation request file that the nested AppHost consumes before composition. A live `db status` reached Prisma and returned its expected no-migrations exit without leaking resources. |
+| 2026-08-03 | S3 | describe schema correction | Live `aspire describe` proved `healthReports` is a keyed object in Aspire 13.4, not an array. Inspector, doctor evidence counting, and the dead-port gate now preserve/count both keyed-object and array shapes. |
 
 ## Decisions
 
