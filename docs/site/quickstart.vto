@@ -61,12 +61,25 @@ swap <code>netscript</code> for <code>deno x jsr:@netscript/cli{{ releaseSpecifi
 One command lays down the whole opinionated workspace — a Fresh 2 app, shared oRPC
 contracts, a plugin registry, and the Aspire orchestration layer:
 
-```bash
-netscript init my-app --db postgres
-```
+{{ comp.tabbedCode({ tabs: [
+  {
+    label: "Interactive (human)",
+    lang: "bash",
+    code: "netscript init my-app --db postgres"
+  },
+  {
+    label: "Agent / CI path",
+    lang: "bash",
+    code: "# Non-interactive scaffold with defaults accepted + agent host & MCP setup\nnetscript init my-app --db postgres --ci --yes\ncd my-app\nnetscript agent init --host all"
+  }
+] }) }}
 
 {{ comp callout { type: "note", title: "Pick your database engine" } }}
 Postgres is the recommended default shown throughout these docs. The database is polyglot — swap <code>--db postgres</code> for <code>mysql</code>, <code>mssql</code>, or <code>sqlite</code> to scaffold a Prisma-backed schema for that engine instead. (<code>postgres</code> / <code>mysql</code> / <code>mssql</code> run as an Aspire container resource; <code>sqlite</code> is file-backed with no container.)
+{{ /comp }}
+
+{{ comp callout { type: "tip", title: "Non-interactive flags & agent initialization" } }}
+Running unattended in CI or through a coding agent? Use <code>--ci</code> (or <code>--non-interactive</code>) and <code>-y</code> / <code>--yes</code> to accept defaults without interactive prompts. Follow with <code>netscript agent init --host all</code> (or <code>--host claude</code> / <code>--host vscode</code>) to write host configurations (<code>.mcp.json</code>, <code>.vscode/mcp.json</code>), install skill bundles into <code>.claude/skills/</code>, and configure the NetScript MCP stdio server. Opt into offline documentation with <code>--with-docs</code>. See <a href="/ai/agent-tooling/">Agent tooling</a> for details.
 {{ /comp }}
 
 {{ comp callout { type: "tip" } }}
@@ -119,6 +132,10 @@ cd my-app/aspire
 aspire restore   # one-time: downloads the AppHost SDK modules
 aspire start       # boots Postgres + Redis + services, opens the dashboard
 ```
+
+{{ comp callout { type: "note", title: "Portable process handling for aspire start" } }}
+<code>aspire start</code> starts the AppHost in the background and returns after the detached host is running. Keep that AppHost running while subsequent workspace commands (such as <code>netscript db init</code>, <code>generate</code>, or <code>seed</code>) are executed from the workspace root. Use <code>aspire stop</code> when you are finished.
+{{ /comp }}
 
 {{ comp callout { type: "note", title: "Prefer no orchestration?" } }}
 Scaffold with <code>netscript init my-app --no-aspire</code> and start the Fresh app directly
@@ -179,6 +196,30 @@ The scaffolded <code>/design</code> showcase is the fastest way to feel what you
 tokens are real CSS custom properties, and the components are source you own and
 can edit on the spot. Open <a href="http://localhost:8000/design">http://localhost:8000/design</a>.
 {{ /comp }}
+
+## Workspace layout & agent guidance
+
+When scaffolded non-interactively or initialized with `netscript agent init`, the generated workspace includes structured directory roles and canonical guidance anchors for developers and coding agents alike.
+
+### Navigation anchors for agents
+
+Coding agents joining or editing a NetScript workspace should inspect these entry points first:
+
+- **`AGENTS.md` (root and `apps/<app>/AGENTS.md`)** — Root and application-scoped architecture doctrine, file boundaries, and coding conventions.
+- **`apps/<app>/WEB-LAYER.md`** — Frontend guidelines for the Fresh 2 app, island rules, page patterns, and UI component discovery.
+- **`.netscript/`** — Installed agent receipts, local configuration, and (when `netscript agent init --with-docs` is used) offline framework and package API documentation.
+
+### Workspace directory roles
+
+- **`apps/`** — Web applications (e.g., the Fresh 2 `dashboard` app).
+- **`services/`** — Backend oRPC services defined via `defineService`.
+- **`contracts/`** — Shared API contracts, schema definitions, and CRUD contracts.
+- **`plugins/`** — Monorepo plugin implementations (`workers`, `sagas`, `triggers`, `streams`, `auth`, `ai`).
+- **`database/`** — Polyglot Prisma database schema, migrations, and seed scripts.
+- **`aspire/`** — TypeScript AppHost orchestrating Postgres, Redis, services, and the Aspire dashboard.
+
+For full details on the MCP stdio server, skills bundle, and offline documentation routing, see [Agent tooling](/ai/agent-tooling/). Automated behavioral evaluation of agent execution is tracked in issue #1090.
+
 
 ## You now have
 
