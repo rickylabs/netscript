@@ -28,3 +28,11 @@ Written at run start per `workflow/lane-policy.md` § Supervisor identity.
   session occupies `planning_decisions` instead of launching a second Fable orchestrator. Formal
   evaluator separation and opposite-family slice review remain unchanged. Mirrored in `drift.md`.
 
+## Formal evaluation status
+
+- PLAN-EVAL launch requested `qwen/qwen3.7-max` at high effort through the isolated
+  Claude/OpenRouter configuration.
+- The profile returned `Not logged in · Please run /login`; no `plan-eval.md` or evaluator verdict
+  exists.
+- Product implementation is stopped pending restored authentication or an explicit owner-authorized
+  and recorded fallback/waiver.

@@ -79,6 +79,8 @@ by adding a named gate to `packages/cli/e2e/src/application/gates/scaffold/runti
 | Time | Slice | Step | Notes |
 | --- | --- | --- | --- |
 | 2026-08-03 | S0 | research/design | Re-baselined #1011/#1012 against #1027/#1033 and read #1076 first. |
+| 2026-08-03 | S0 | plan publication | Committed/pushed the contract and plan, opened draft PR #1088, and posted research/plan evidence. |
+| 2026-08-03 | S0 | PLAN-EVAL | Canonical local Qwen launch was rejected by the isolated Claude/OpenRouter profile with `Not logged in · Please run /login`; no evaluator artifact or verdict exists. Implementation remains stopped. |
 
 ## Decisions
 
@@ -94,10 +96,13 @@ by adding a named gate to `packages/cli/e2e/src/application/gates/scaffold/runti
 | --- | --- | --- |
 | Harness references a missing `SCOPE-service.md` | minor | yes |
 | Runtime-provided Codex session is supervisor rather than canonical Fable primary | minor | yes |
+| Canonical formal-evaluator profile is unauthenticated | blocking | yes |
 
 ## Gate Results
 
-All implementation/static/runtime/consumer gates are `NOT_RUN` until PLAN-EVAL passes.
+PLAN-EVAL is `BLOCKED`: the canonical local Qwen route could not authenticate and produced no
+`plan-eval.md`. All implementation/static/runtime/consumer gates remain `NOT_RUN` until PLAN-EVAL
+passes or the owner explicitly authorizes and records a gate exception/fallback.
 
 ## Handoff Notes
 
@@ -106,4 +111,3 @@ All implementation/static/runtime/consumer gates are `NOT_RUN` until PLAN-EVAL p
   absence of an explicit stop command.
 - IMPL-EVAL should inspect zero-report handling for false-positive healthy and false-positive error
   outcomes, including the missing-Aspire-binary arm.
-

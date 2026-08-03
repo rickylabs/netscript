@@ -25,3 +25,16 @@ Drift is append-only.
 - **Action:** accept and record in `supervisor.md`.
 - **Evidence:** `supervisor.md` route table.
 
+## 2026-08-03 — Canonical formal evaluator cannot authenticate
+
+- **What:** The separate PLAN-EVAL launch through the lane-policy Claude Code + OpenRouter route
+  could not authenticate.
+- **Source:** isolated profile auth check and bounded evaluator launch.
+- **Expected:** Qwen `qwen/qwen3.7-max` at high effort writes an independent `plan-eval.md` verdict.
+- **Actual:** Claude Code returned `Not logged in · Please run /login`; no evaluator artifact was
+  created and no verdict can be claimed.
+- **Severity:** blocking
+- **Action:** stop before product implementation; require restored profile authentication or an
+  explicit owner-authorized, documented evaluator fallback/waiver.
+- **Evidence:** missing `plan-eval.md`; evaluator session
+  `260fb161-ad49-45b3-afad-4f44b8635b54` in the isolated profile.
