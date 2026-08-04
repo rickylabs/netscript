@@ -28,8 +28,8 @@ event straight to a background job. Triggers are how NetScript receives events f
 
 You will add the `triggers` plugin, then author a webhook with `defineWebhook(...)` that is
 **HMAC-SHA256 verified** against a shared secret and, on each accepted request, `enqueueJob(...)`s a
-worker job to process the shipping update off the request path. You will start the triggers API on
-`:8093` and `POST` a real payload to it, watching the inbound event get recorded and the job enqueued.
+worker job to process the shipping update off the request path. You will start the triggers API
+and `POST` a real payload to it, watching the inbound event get recorded and the job enqueued.
 
 ## Before you begin
 
@@ -239,11 +239,14 @@ API on its own during development, start it from the plugin workspace:
 deno task --cwd plugins/triggers dev
 ```
 
-The triggers API listens on port **`:8093`** by default. Confirm it is alive:
+The triggers API listens on a host port the installer picked, so read its endpoint from the
+[Aspire dashboard](/explanation/aspire/) resource list — `triggers-api` — and confirm it is alive:
 
 ```sh
-curl http://localhost:8093/health
+curl <triggers-endpoint>/health
 ```
+
+Everything below writes `<triggers-endpoint>` for that value.
 
 ## Verify your progress
 
@@ -254,7 +257,7 @@ quick local smoke, flip `verifier` to `'memory'` (the open, no-signature verifie
 is accepted; switch back to `'hmac-sha256'` for anything real. With verification satisfied:
 
 ```sh
-curl -X POST http://localhost:8093/api/v1/webhooks/shipping/status \
+curl -X POST <triggers-endpoint>/api/v1/webhooks/shipping/status \
   -H "content-type: application/json" \
   -d '{"orderId":"ord_1001","status":"shipped","trackingNumber":"1Z999"}'
 ```
@@ -266,10 +269,10 @@ The request resolves the trigger id `shipping/status`, your handler runs, and it
 sides of the hand-off:
 
 ```sh
-# 1. The trigger recorded the inbound event (Hono, :8093)
-curl "http://localhost:8093/api/v1/events?limit=10"
+# 1. The trigger recorded the inbound event (Hono ingress)
+curl "<triggers-endpoint>/api/v1/events?limit=10"
 
-# 2. The worker job it enqueued has executed (workers API, :8091)
+# 2. The worker job it enqueued has executed (workers API; the CLI resolves it)
 ns-workers executions --limit=10 --json
 ```
 
@@ -280,8 +283,8 @@ durable job.
 - [ ] `netscript plugin install trigger --name triggers --samples` landed `plugins/triggers/`.
 - [ ] `shipping-status-webhook.ts` uses `verifier: 'hmac-sha256'` with a `secretEnv`.
 - [ ] `WEBHOOK_SHIPPING_SECRET` is set in the environment running the triggers service.
-- [ ] `curl http://localhost:8093/health` answers.
-- [ ] A verified `POST` records an event (`:8093`) and produces a worker execution (`:8091`).
+- [ ] `curl <triggers-endpoint>/health` answers.
+- [ ] A verified `POST` records an event on the triggers API and produces a worker execution.
 
 {{ comp callout { type: "warning", title: "If the job does not appear" } }}
 <ul>
@@ -298,8 +301,8 @@ durable job.
 - An **HMAC-SHA256 verified** webhook authored with `defineWebhook(handler, { id, path, verifier,
   secretEnv, ... })` that rejects forged requests and `enqueueJob(...)`s a `process-shipping-update`
   job on each accepted one.
-- A verified inbound `POST` confirmed end to end: an event recorded on the triggers API (`:8093`) and
-  a worker execution on the workers API (`:8091`).
+- A verified inbound `POST` confirmed end to end: an event recorded on the triggers API and a worker
+  execution on the workers API.
 
 Your storefront now spans the full arc — catalog, cart, durable checkout, and a verified webhook from
 the outside world. The last chapter runs the whole thing as one orchestrated system on your machine.

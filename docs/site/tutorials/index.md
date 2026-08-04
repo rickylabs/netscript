@@ -37,7 +37,7 @@ the one closest to what you're building.
 {{ comp.featureGrid({ items: [
   {
     title: "Storefront",
-    body: "Build an e-commerce backend: a typed catalog service, contract-first cart, a durable <code>checkout</code> saga with compensation, and an HMAC-verified shipping webhook. The track for <strong>services + durable workflows</strong>. 6 chapters.",
+    body: "Build an e-commerce backend: a typed catalog service, contract-first cart, a durable <code>checkout</code> saga with compensation, and an HMAC-verified shipping webhook. The track for <strong>services + durable workflows</strong>. 7 chapters.",
     href: "/tutorials/storefront/"
   },
   {

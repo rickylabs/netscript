@@ -72,16 +72,18 @@ plugin and its API plus background processor appear; remove it and they vanish, 
     { name: "OTLP collector", type: "http://localhost:4318", desc: "OpenTelemetry endpoint the dashboard runs; framework spans and structured logs land here automatically." },
     { name: "postgres", type: "Container", desc: "Throwaway Docker Postgres. The database netscript db commands target — reachable only while Aspire is up." },
     { name: "redis", type: "Container (cache)", desc: "Redis cache — the default `--cache-backend`; Redis-compatible. Backs the KV/queue workloads — this is what auto-discovery resolves the queue to once it is up." },
-    { name: "workers API + processor", type: ":8091 (PLUGIN_API range) + executable", desc: "The :8091 API enqueues; a separate background processor drains the queue and runs your import job." },
-    { name: "triggers API + processor", type: ":8093 (PLUGIN_API range) + executable", desc: "The :8093 API plus the processor that runs your file-watch and cron triggers." }
+    { name: "workers API + processor", type: "allocated port + executable", desc: "The API enqueues; a separate background processor drains the queue and runs your import job." },
+    { name: "triggers API + processor", type: "allocated port + executable", desc: "The API plus the processor that runs your file-watch and cron triggers." }
   ]
 }) }}
 
-{{ comp callout { type: "note", title: "Plugin API ports are range-allocated, not fixed" } }}
-The runtime plugins publish their APIs from the <code>:8091–8099</code> PLUGIN_API range. The
-conventional assignments (workers <code>:8091</code>, triggers <code>:8093</code>) are what this
-two-plugin workspace lands on — but the dashboard's <strong>Resources</strong> tab is the authority
-for the exact port each resource bound, not a memorized number. Read it from there.
+{{ comp callout { type: "note", title: "Plugin API ports are allocated per project, not fixed" } }}
+A plugin runtime installed without <code>--port</code> gets a host port the installer picks: a hash of
+your <em>project name</em> over the IANA dynamic range (<code>49152–65535</code>), probing upward past
+ports already claimed in this workspace. That keeps two of your own projects apart in practice, but it
+is not a guarantee — the range is finite and workspaces cannot see each other's allocations — and no
+number printed here would match yours. The dashboard's <strong>Resources</strong> tab is the authority for the exact port each
+resource bound. Read it from there.
 {{ /comp }}
 
 ## Step 2 — Restore and run
@@ -163,9 +165,9 @@ instrumenting the run end to end, and <code>log.*</code> emits real structured l
 Confirm the whole graph is healthy and the pipeline ran:
 
 ```sh
-# Both plugin APIs answer.
-curl http://localhost:8091/health
-curl http://localhost:8093/health
+# Both plugin APIs answer (endpoints from the Resources tab).
+curl <workers-endpoint>/health
+curl <triggers-endpoint>/health
 
 # The dropped file produced an import execution.
 ns-workers executions --limit=10 --json
@@ -186,7 +188,7 @@ Expected: both health checks return healthy JSON, and the executions feed shows 
 
 - [ ] `aspire start` is up; the dashboard lists `postgres`, `redis`, workers, and triggers all green.
 - [ ] `netscript db init/generate` succeeded against the Aspire Postgres.
-- [ ] `curl :8091/health` and `curl :8093/health` both return healthy.
+- [ ] `curl <workers-endpoint>/health` and `curl <triggers-endpoint>/health` both return healthy.
 - [ ] A file drop produced an `import-products` execution and a dispatch/execution trace in the dashboard.
 
 {{ comp callout { type: "warning", title: "Footguns when aspire start will not boot" } }}
