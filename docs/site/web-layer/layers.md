@@ -61,9 +61,9 @@ does not have. `routes/_layout.tsx` does not help, because a Fresh layout receiv
 `{ Component }` and wraps it — it is chrome around a whole route, not a placement grid for the parts
 inside one.
 
-**Adding a region is a three-file edit.** The handler's `Promise.all` tuple, the destructuring, the
-props bag, and the JSX all change together, and the type that ties them is inferred from the handler
-rather than declared per region.
+**Adding a region couples several sites in the route module.** The handler's `Promise.all`, the
+returned data shape, and the JSX must change together, and the type tying them together is inferred
+from the whole handler rather than declared per region.
 
 **Concurrency is bookkeeping.** Two fetches overlap because you wrote `Promise.all`. Add a third and
 forget, and you have silently serialised the page — with no trace to say so, because there are no
@@ -331,10 +331,11 @@ the props type describes the rendered case rather than the empty one.
 - **Fallbacks are not universal.** A deferred or streamed region without a `fallback` gets a default
   `aria-busy` placeholder; a plain inline region without one renders nothing when its loader comes back
   empty.
-- **The `delivery` span attribute reports a different default than the behaviour.** The span records
+- **The `delivery` span attribute currently misreports its default.** The span records
   `delivery ?? 'blocking'` while the defer decision reads `delivery ?? 'defer'`, so a region that
-  omits `delivery` and declares a `partial` defers but traces as `blocking`. Read the
-  `page.layer.has_partial` attribute alongside it.
+  omits `delivery` and declares a `partial` defers but traces as `blocking`. That is a reporting
+  discrepancy rather than a difference in behaviour, and it is expected to be corrected — until it is,
+  read `page.layer.has_partial` alongside it.
 
 ## Related
 

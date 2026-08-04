@@ -79,12 +79,13 @@ inserted after everything registered above them. Those rules are real and they l
 whoever wrote the file. Copy it into a second app, add an app-level middleware in the wrong place, and
 the failure is a slow asset path or an unreachable explicit route — not an error.
 
-Two things are also silently absent. There is no `Set-Cookie`-free way to say "this app is
-`dashboard`" for future logging defaults, and — the consequential one — the SDK's KV cache provider is
-never registered, so `getCachedEntry()` throws at the first loader that calls it. That registration is
-an import side effect of `defineFreshApp`'s own module, documented in
-[The query bridge](/web-layer/query-bridge/#the-import-that-makes-any-of-this-work); bypassing
-`defineFreshApp` bypasses it.
+One thing is also silently absent: the SDK's KV cache provider is never registered, so
+`getCachedEntry()` throws at the first loader that calls it. That registration is an import side
+effect — `@netscript/fresh/server` re-exports the module whose body imports `@netscript/sdk/cache` —
+and it is documented in
+[The query bridge](/web-layer/query-bridge/#the-import-that-makes-any-of-this-work). A bare Fresh
+entry point that never imports `@netscript/fresh/server` bypasses it. Calling `defineFreshApp` is not
+itself the trigger; evaluating the `/server` module is.
 
 ### The bootstrap order
 
@@ -196,9 +197,11 @@ widens with it, along with the `middleware` array's `ctx`.
 - **A custom `fsRoutes` callback never receives a pattern.** Its second parameter exists in the type,
   but the runtime only computes a pattern from the string form — which does not take the callback
   branch. Close over the pattern you want instead of reading the argument.
-- **`main.ts` is not where the KV cache provider is registered by you.** It is registered by importing
-  `@netscript/fresh/server` at all. Constructing the app another way is what breaks
-  `getCachedEntry()`, and the failure surfaces in a loader, far from the entry point.
+- **The KV cache provider is registered by the import, not by the call.** Evaluating
+  `@netscript/fresh/server` — for `defineFreshApp`, `createStreamingResponse`, or anything else on the
+  subpath — registers it. Constructing the app with `new App()` in a module that still imports
+  `/server` keeps the registration; only an entry point that never touches the subpath loses it, and
+  the failure then surfaces in a loader, far from `main.ts`.
 - **Adapter imports with their own ordering rules still go above everything.** The scaffolded
   dashboard puts `import '@netscript/kv/redis';` at the top of `main.ts` because that registration has
   to precede the first `getKv()` call — `defineFreshApp` does not sequence module-level side effects

@@ -322,11 +322,13 @@ Two consequences follow from it being an import side effect rather than a call y
 
 - **The registration is process-global, not per-app.** `setCacheProvider` writes one module-scoped
   reference. Two Fresh apps in one process share the provider.
-- **Bypassing `defineFreshApp` bypasses the registration.** Hand-rolling `new App()` — or exercising
-  a loader in a test without the bootstrap — leaves the provider unset, and the first
-  `getCachedEntry()` throws the message above. `import '@netscript/sdk/cache';` in the test setup, or
-  an explicit `setCacheProvider(cacheQuery)`, fixes it; `resetCacheProvider()` clears it again
-  between tests.
+- **The trigger is the import, not the call.** `@netscript/fresh/server` re-exports the module whose
+  body performs the side-effect import, so anything that evaluates that subpath registers the
+  provider — including a module that hand-rolls `new App()` while importing `/server` for something
+  else. What loses the registration is an entry point that never imports the subpath at all, or a
+  test that exercises a loader in isolation: the first `getCachedEntry()` then throws the message
+  above. `import '@netscript/sdk/cache';` in the test setup, or an explicit
+  `setCacheProvider(cacheQuery)`, fixes it; `resetCacheProvider()` clears it again between tests.
 
 ## What to watch for
 

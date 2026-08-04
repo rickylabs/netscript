@@ -57,10 +57,12 @@ costs show up as the app grows rather than in this snippet.
 one header must become a `define.handlers({ GET })` that renders explicitly. The rendering and the
 shaping are the same expression, so you cannot add a header without taking ownership of the render.
 
-**Headers have no merge point.** Everything contributing a header — a cache directive, a tenant tag, a
-form's CSRF cookie — has to be assembled into one literal by the same function. There is nowhere for a
-region to contribute one, so a form that needs `Set-Cookie` either reaches into that literal or sets
-the cookie somewhere else entirely.
+**Headers do not merge at the component-region level.** The handler can assemble them in
+`ResponseInit`, and Fresh middleware can add or replace headers around `await ctx.next()` — that is
+the ordinary cross-route seam for cache directives, tenant tags, and cookies. What no seam reaches is
+a rendered component: a region that needs a header of its own cannot contribute one, so a form
+wanting `Set-Cookie` has to be handled by an agreed handler or middleware that knows the region
+exists.
 
 **Metadata is placement, not resolution.** `<Head>` renders where you put it, which means it can only
 see values already in scope at that point in the tree. Titles that depend on loaded data are drilled
@@ -118,8 +120,8 @@ synthesised.
 
 ## `withMeta`: a resolver, not a placement
 
-`withMeta(resolver)` registers an async function that runs **after** every layer has resolved, so it
-can read what they produced:
+`withMeta(resolver)` registers a resolver — synchronous or asynchronous — that runs **after** every
+layer has resolved, so it can read what they produced:
 
 ```tsx
 .withMeta((ctx) => ({
