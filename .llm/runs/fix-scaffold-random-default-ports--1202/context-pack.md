@@ -6,35 +6,32 @@
 | --- | --- |
 | Run ID | `fix-scaffold-random-default-ports--1202` |
 | Branch | `fix/scaffold-random-default-ports` |
-| Current phase | Plan locked; bootstrap commit/draft PR pending |
+| Current phase | IMPL-EVAL passed; cloud verdict pending |
 | Archetype | `6 — CLI / Tooling` |
 | Scope overlays | service |
 
 ## Current State
 
-The fixed 3001 failure is a host-port collision, not stale Prisma wiring: every dynamic sibling is
-healthy, and the owner attributes the fixed-port collision to a Windows autostart service forwarded
-through WSL2. The plan uses dynamic Aspire endpoints by default and deterministic high-range
-standalone fallbacks. The runtime suite will stop forcing 3001. Cloud CI is the owner-declared
-runtime verdict source; one local serialized pass is still required as evidence.
+The fixed 3001 failure is a host-port collision, not stale Prisma wiring. Generated app/service
+Aspire resources now omit automatic host pins, standalone fallbacks are seeded in 49152–65535,
+and plugin APIs use seeded high-range pins where direct endpoint consumers still require them. The
+clean local runtime one-pass is green (70/70), and the formal open-model IMPL-EVAL passed. Cloud CI
+remains the owner-declared verdict source; the Windows-service identification remains owner-owned.
 
 ## Completed
 
-- Required skills, milestone evaluator rule, Archetype-6 profile, doctrine, gate matrix, and JSR
-  rubric read.
-- Live issue body and all live comments read.
-- Current main and generator/service/plugin/app listener paths re-baselined.
-- Plan-Gate recorded as composed under the explicit milestone waiver.
+- RED-first generated-output contract and seeded high-range allocator implemented.
+- Focused suites, scoped check/lint/fmt, quality/architecture, and CLI publish dry-run passed.
+- Clean serialized `scaffold.runtime` passed 70/70 with cleanup and zero survivors.
+- Separate-session Qwen 3.7 Max IMPL-EVAL passed with no blocking findings.
 
 ## Next Steps
 
-1. Commit/push bootstrap artifacts and open the draft PR with plan-phase labels.
-2. Add and run the generated-output test RED before source implementation.
-3. Implement the shared high-range allocation and dynamic host-pin defaults.
-4. Run focused/scoped/framework gates, then queue the serialized runtime one-pass.
+1. Commit and push the formal evaluation artifacts.
+2. Mark PR #1211 ready so hosted cloud lanes run.
+3. Require green cloud and review-thread gates before final close-gate synchronization.
 
 ## Drift and Debt
 
 - Authorized composed PLAN-EVAL; live comment-count discrepancy; inherited lockfile modification.
 - No new architecture debt planned.
-

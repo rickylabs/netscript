@@ -17,7 +17,7 @@ Refs #1202
 
 - [x] S1 Lock evidence/design and open the draft review surface
 - [x] S2 Land RED-first listener-default contract and implementation
-- [ ] S3 Complete framework/runtime/cloud/evaluation gates
+- [ ] S3 Complete framework/runtime/cloud gates (formal evaluation passed)
 
 ## Validation
 
@@ -25,11 +25,12 @@ Refs #1202
 - Generated-output RED/GREEN: pass (baseline rejected service `3000` and Vite `5173`)
 - Scoped check/lint/fmt, quality/architecture, and CLI JSR dry-run: pass
 - One-pass `scaffold.runtime`: pass (70 passed, 0 failed, cleanup green); cloud CI remains the owner-declared verdict source
+- IMPL-EVAL: pass (separate-session Qwen 3.7 Max; no blocking findings)
 
 ## Harness
 
 - Run dir: `.llm/runs/fix-scaffold-random-default-ports--1202/`
-- Phase: implementation; serialized runtime/evaluation pending
+- Phase: implementation evaluation passed; cloud verdict pending
 
 ## Drift / Debt
 

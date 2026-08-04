@@ -78,6 +78,7 @@ default, and extend the semantic generated-output table.
 | 2026-08-04 | 3 | runtime queue | Read-only leak check found the serialized slot owned by active `ns005-s7` AppHosts/containers; left untouched and queued behind. |
 | 2026-08-04 | 3 | runtime one-pass | `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` exited 0: 70 passed, 0 failed. Prisma init/generate/seed, `behavior.service-health`, project-seeded plugin endpoints, app, Flow-B, and OTEL all passed. |
 | 2026-08-04 | 3 | cleanup audit | Post-run leak check reports zero survivors. Inherited `deno.lock` diff remains exactly one excluded line. |
+| 2026-08-04 | 3 | impl-eval | Separate Claude Code + OpenRouter Qwen 3.7 Max session inspected commit `2046e2af2`; verdict PASS with no blocking findings. The open-model guard rejected an attempted default closed-model child before execution; evaluation resumed in the same Qwen session without delegation. |
 
 ## Gate Results
 
@@ -89,3 +90,4 @@ default, and extend the semantic generated-output table.
 | Quality/architecture | pass | `deno task quality:gate`, exit 0; no new allowances |
 | JSR static audit | pass | CLI `publish:dry-run`, exit 0 |
 | `scaffold.runtime` | pass | One clean local pass: 70 passed, 0 failed; cleanup pass and zero survivors |
+| IMPL-EVAL | pass | `evaluate.md`; Qwen 3.7 Max separate session, no blocking findings |
