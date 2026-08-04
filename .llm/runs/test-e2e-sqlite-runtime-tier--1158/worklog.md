@@ -381,6 +381,59 @@ Both are logged as follow-ups at Close rather than silently dropped.
 
 **Verdict: ACCEPTED** (S4 with S4a as its required fix). Proceed to S5.
 
+## Slice Review — S5 (Tier-A, supervisor)
+
+Reviewed at `65988b44`.
+
+**Reproduced gate results (supervisor-run)**
+
+| Gate                                       | Verdict               |
+| ------------------------------------------ | --------------------- |
+| `deno test --no-lock -A packages/cli/e2e/` | 110 passed, 0 failed  |
+| `run-deno-check.ts --root packages/cli`    | 787 files, 0 findings |
+| `run-deno-lint.ts --root packages/cli`     | 787 files, 0 findings |
+| `deno task quality:scan`                   | exit 0                |
+| `deno task arch:check`                     | exit 0                |
+
+**Empirical proof, not just unit tests.** The unit tests inject a rejecting runner, which proves the
+branch but not the real-world binding. I ran the **real, un-injected** `DockerCliResourceCleaner`
+under `env -i PATH=<dir containing only deno>` so `docker` was genuinely absent:
+
+```
+Warning: Docker cleanup could not inspect containers because the docker executable was not found; treating the container set as empty.
+snapshot containerIds: []
+Warning: ... (same, from prune)
+pruned: []
+NO THROW
+```
+
+A first attempt at this check was **invalid** — I trimmed `PATH` to `/usr/bin:/bin`, where
+`/usr/bin/docker` still exists, so it silently exercised the happy path and found four containers.
+Recording that here because a green-looking probe that tests nothing is exactly the failure mode
+this slice exists to prevent.
+
+**Substantive review**
+
+- Both discovery failure modes are handled: `Deno.errors.NotFound` (binary absent) and a non-zero
+  `docker ps` (daemon down / permission denied). Any **other** error is re-thrown rather than
+  swallowed — the tolerance is narrow, not blanket.
+- **Strictness preserved where it matters**: `docker rm -f` failing for a container the run _did_
+  create still throws (`pruneCreatedResources`). The postgres tier's cleanup is not weakened.
+- The `DockerResourceCleaner` **port is unchanged**, and `create-default-runner.ts` still constructs
+  `new DockerCliResourceCleaner()` — the constructor injection defaults to the real implementations,
+  so this is an adapter-internal testability seam, not a contract change.
+- The runner call site flagged by the S4 adversarial review is covered:
+  `suite runner completes
+  cleanup with a Docker-less cleaner` drives a full run with
+  `cleanup: true` and asserts `report.ok === true` plus two warnings. That is the path S6's CI job
+  takes.
+- Warning goes to `Deno.stderr` rather than `console.*`, consistent with the surrounding code and
+  the console-log lint posture.
+
+**Findings:** none.
+
+**Verdict: ACCEPTED.** Proceed to S6.
+
 ## Decisions
 
 | Decision                                                | Reason                                                                                    | Source                                               |
@@ -420,14 +473,14 @@ runner-level regression uses `cleanup: true` and the real adapter configured to 
 both list calls, then proves the runner returns an `ok` report with no steps rather than leaking the
 raw exception.
 
-| Gate       | Command                                                                                           | Raw result                                                                 |
-| ---------- | ------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| E2E tests  | `deno test --no-lock -A packages/cli/e2e/`                                                        | exit 0; 110 passed, 0 failed                                               |
-| type-check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/cli --ext ts,tsx` | exit 0; 787 files, 7 batches, 0 failed batches, 0 findings                 |
-| lint       | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/cli --ext ts,tsx`  | exit 0; 787 files, 4 batches, 0 findings                                   |
-| format     | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/cli --ext ts,tsx`   | exit 0; 787 files, 4 batches, 0 failed batches, 0 findings                 |
-| quality    | `deno task quality:scan`                                                                          | exit 0; `ok: true`, 0 findings, 7 pre-existing allowances                  |
-| doctrine   | `deno task arch:check`                                                                            | exit 0; existing out-of-scope dependency/doctrine warnings only           |
+| Gate       | Command                                                                                           | Raw result                                                      |
+| ---------- | ------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| E2E tests  | `deno test --no-lock -A packages/cli/e2e/`                                                        | exit 0; 110 passed, 0 failed                                    |
+| type-check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/cli --ext ts,tsx` | exit 0; 787 files, 7 batches, 0 failed batches, 0 findings      |
+| lint       | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/cli --ext ts,tsx`  | exit 0; 787 files, 4 batches, 0 findings                        |
+| format     | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/cli --ext ts,tsx`   | exit 0; 787 files, 4 batches, 0 failed batches, 0 findings      |
+| quality    | `deno task quality:scan`                                                                          | exit 0; `ok: true`, 0 findings, 7 pre-existing allowances       |
+| doctrine   | `deno task arch:check`                                                                            | exit 0; existing out-of-scope dependency/doctrine warnings only |
 
 **Focused assertions.** Adapter tests cover missing-binary `NotFound`, non-zero `docker ps`, an
 unchanged snapshot returning `[]` without invoking removal, and a created container whose failed

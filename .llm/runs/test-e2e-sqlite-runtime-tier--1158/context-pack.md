@@ -2,13 +2,13 @@
 
 ## Run Metadata
 
-| Field          | Value                                          |
-| -------------- | ---------------------------------------------- |
-| Run ID         | `test-e2e-sqlite-runtime-tier--1158`           |
-| Branch         | `test/e2e-sqlite-runtime-tier-1158`            |
-| Current phase  | `implement` — S5 complete; review handoff      |
-| Archetype      | `6 - CLI / Tooling`                            |
-| Scope overlays | `service`                                      |
+| Field          | Value                                     |
+| -------------- | ----------------------------------------- |
+| Run ID         | `test-e2e-sqlite-runtime-tier--1158`      |
+| Branch         | `test/e2e-sqlite-runtime-tier-1158`       |
+| Current phase  | `implement` — S5 complete; review handoff |
+| Archetype      | `6 - CLI / Tooling`                       |
+| Scope overlays | `service`                                 |
 
 ## Current State
 
@@ -49,12 +49,12 @@ prove postgres-held→sqlite and sqlite-held→postgres contention both raise
 value. The built-in suites table now discovers the container-free sqlite tier.
 
 S5 makes Docker resource discovery tolerant without weakening resource removal. The adapter's
-private list path turns a missing Docker executable (`Deno.errors.NotFound`) or non-zero
-`docker ps` into an empty container set and emits a warning through an injected writer that defaults
-to direct `Deno.stderr` output. The port contract and suite runner stay unchanged. Adapter tests
-cover both discovery failures, a no-new-container prune, and strict failed removal; a runner test
-uses `cleanup: true` with the real adapter raising `NotFound` on snapshot and prune and returns an
-`ok` report.
+private list path turns a missing Docker executable (`Deno.errors.NotFound`) or non-zero `docker ps`
+into an empty container set and emits a warning through an injected writer that defaults to direct
+`Deno.stderr` output. The port contract and suite runner stay unchanged. Adapter tests cover both
+discovery failures, a no-new-container prune, and strict failed removal; a runner test uses
+`cleanup: true` with the real adapter raising `NotFound` on snapshot and prune and returns an `ok`
+report.
 
 ## Completed
 
@@ -120,23 +120,23 @@ uses `cleanup: true` with the real adapter raising `NotFound` on snapshot and pr
 
 ## S5 Files Changed
 
-| Path                                                                                  | Notes                                                                                   |
-| ------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
-| `.llm/runs/test-e2e-sqlite-runtime-tier--1158/{worklog,context-pack}.md`              | S5 evidence and review handoff; no drift divergence.                                    |
-| `packages/cli/e2e/src/adapters/commands/docker-resource-cleaner.ts`                   | Tolerant list boundary, direct-stderr warning seam, strict removal retained.            |
-| `packages/cli/e2e/tests/adapters/commands/docker-resource-cleaner_test.ts`            | Both discovery failures, empty delta, and strict removal regressions.                   |
-| `packages/cli/e2e/tests/application/runner/suite-runner_test.ts`                      | `cleanup: true` completes when both Docker list calls raise `NotFound`.                 |
+| Path                                                                       | Notes                                                                        |
+| -------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| `.llm/runs/test-e2e-sqlite-runtime-tier--1158/{worklog,context-pack}.md`   | S5 evidence and review handoff; no drift divergence.                         |
+| `packages/cli/e2e/src/adapters/commands/docker-resource-cleaner.ts`        | Tolerant list boundary, direct-stderr warning seam, strict removal retained. |
+| `packages/cli/e2e/tests/adapters/commands/docker-resource-cleaner_test.ts` | Both discovery failures, empty delta, and strict removal regressions.        |
+| `packages/cli/e2e/tests/application/runner/suite-runner_test.ts`           | `cleanup: true` completes when both Docker list calls raise `NotFound`.      |
 
-No runner implementation, port contract, `packages/cli/src/**`, `.github/**`, live runtime,
-product cache default, or embedded-template file was touched.
+No runner implementation, port contract, `packages/cli/src/**`, `.github/**`, live runtime, product
+cache default, or embedded-template file was touched.
 
 ## Gates
 
-| Gate family | Current status | Evidence                                          |
-| ----------- | -------------- | ------------------------------------------------- |
-| Static      | `PASS`         | S5 scoped check/lint/fmt: 787 files, 0 findings. |
-| Fitness     | `PASS`         | S5 `quality:scan` and `arch:check` exited 0.     |
-| Runtime     | `NOT_RUN`      | S7 is the first live sqlite run.                  |
+| Gate family | Current status | Evidence                                                |
+| ----------- | -------------- | ------------------------------------------------------- |
+| Static      | `PASS`         | S5 scoped check/lint/fmt: 787 files, 0 findings.        |
+| Fitness     | `PASS`         | S5 `quality:scan` and `arch:check` exited 0.            |
+| Runtime     | `NOT_RUN`      | S7 is the first live sqlite run.                        |
 | Consumer    | `PASS`         | S5: 110 E2E tests; tolerant discovery + strict removal. |
 
 ## Open Questions
