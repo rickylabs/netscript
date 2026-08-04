@@ -75,6 +75,7 @@ adapter validator, real deno-doc fixtures, and schema version together.
 | 2026-08-04 | slice 2 | embedded corpus + MCP | Generated and pinned the 35-package corpus, wired the lazy hash-verified adapter and receipts, and proved mirror-free JSON-RPC discovery in an empty workspace. |
 | 2026-08-04 | gates | Archetype-2 column | Focused check/lint/fmt, 105 MCP tests, generator freshness/tests, quality gate, doctrine check, doc lint, package/root publish dry-runs, and publish-asset check passed. |
 | 2026-08-04 | gates | CLI E2E | 51/52 gates passed; unrelated generated users-service database health probe failed after successful scaffold, DB init/generate/seed, workspace checks, Aspire start, and MCP-related gates. Cleanup passed; leak check found no run-owned survivors. |
+| 2026-08-04 | CI follow-up | JSR tagline | Trimmed the MCP README tagline from 277 to 228 bytes while retaining the accurate 21-tool count; tagline check, `quality:gate`, and publish-asset freshness pass. |
 
 ## RED Evidence
 

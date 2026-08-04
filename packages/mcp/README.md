@@ -4,9 +4,9 @@
 [![CI](https://github.com/rickylabs/netscript/actions/workflows/ci.yml/badge.svg)](https://github.com/rickylabs/netscript/actions/workflows/ci.yml)
 [![Docs](https://img.shields.io/badge/docs-rickylabs.github.io-blue)](https://rickylabs.github.io/netscript/)
 
-**The Model Context Protocol server for NetScript: 21 token-bounded tools that let a coding agent
-monitor a running app, debug a correlated execution, read framework-semantic telemetry, run the
-doctor, search the docs, and discover first-party package exports — all over stdio.**
+**The Model Context Protocol server for NetScript: 21 token-bounded tools for app health, correlated
+execution debugging, framework telemetry, CLI diagnostics, documentation search, and first-party
+export discovery over stdio.**
 
 Point Claude Code or VS Code at a running NetScript app and the agent can ask _"is the app
 healthy?"_, _"why did the last import job fail?"_, and _"what is slowing down `checkout`?"_ — and
