@@ -41,3 +41,13 @@ Drift is append-only.
 - **Severity:** minor/process
 - **Action:** accept for composed evaluator review; do not copy the upstream collection conditional into NetScript merely to silence a documentation-graph limitation.
 - **Evidence:** S2 command transcripts, successful publish dry-run, and the same-fixture upstream parity proof.
+
+## 2026-08-04 — Align the documented query consumer with durable state
+
+- **What:** `@tanstack/react-db` moves from `0.1.86` to `0.1.95`, aligning its TanStack DB dependency with the `0.6.17` generation used by durable state.
+- **Source:** Current-head CI check-test job `92057035353` and native dependency inspection.
+- **Expected:** The documented live-query consumer accepts the strongly typed collections produced by both direct and wrapped StreamDB factories.
+- **Actual:** React DB 0.1.86 carried TanStack DB 0.6.8 while durable state resolved 0.6.17, so the consumer rejected both strong collections through nominal/invariant internals. React DB 0.1.95 resolves DB 0.6.17 and accepts both without weakening the fixture or adding a cast.
+- **Severity:** minor
+- **Action:** fix
+- **Evidence:** unchanged `.ts` fixture passes under root and isolated configs; root check passes 2,595 files; 207 package tests pass.
