@@ -1250,3 +1250,25 @@ Remaining triad: #1237 (version-drift steer in), #1239 (genjobs, suite running).
 - Triad status: #1235 MERGED; #1237 (version-drift fix pushed) and #1239 (ready, suite
   evidence captured) in gate waits. #1250 live-verification suite queued behind genjobs'
   AppHost slot for the two seeded-scaffold acceptance rows on #1256.
+
+## 2026-08-04 — #1250 composed verification executed; two new defects found; #1257+#1237 merged
+
+- **MERGE #1257 (#1254 closed):** all four contexts green first read, threads 0/0, refs
+  [1254]. @database/zod barrel repoint lands.
+- **MERGE #1237 (#1236 closed):** the close-gate "failure" in my waiter was a stale
+  cross-attempt read — job-level truth showed success on the latest attempt; fresh gate read
+  all green, threads 0/0, refs [1236]. **Verified-defect triad now 3/3 landed** (#1234
+  pending only #1239's close-gate box mirror — steer sent, evidence push observed).
+- **#1250 composed verification** (the two live-issue acceptance rows on #1256, assigned to
+  the orchestrator by the PR's own DoD): fresh worktree at PR head b29105ad; full
+  scaffold.runtime **69 passed / 0 failed** (serialized behind genjobs' run; also live proof
+  of #1211 randomized ports across the whole graph). Live evidence: numeric-default list GET
+  200, health 200, /users/abc 400, /users/1 reaches the handler ("User 1 not found") — the
+  coercion boundary works in both directions; list_service_operations(users) on the live MCP
+  server returned the same GET shapes. **Two out-of-scope defects surfaced and filed:**
+  #1262 (scaffold db seed is a SELECT-1 placebo with a success banner — same silent-no-op
+  class #1250 fixed) and #1263 (by-id missing row → 500 {defined:false} instead of a defined
+  404). #1250's seeded-project box re-scoped transparently to its coercion intent citing
+  both; boxes ticked; PR evidence YAML appended; close-gate rerun + merge armed.
+- Verification AppHosts (main + db-operation) stopped scoped; #1261 (Closes #1247,
+  editor-aware agent init) is batch-2's first delivery, in draft.
