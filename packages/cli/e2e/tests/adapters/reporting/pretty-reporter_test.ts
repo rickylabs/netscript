@@ -93,14 +93,14 @@ Deno.test('pretty reporter prints every attempt duration when retries fail', asy
           attempt: 1,
           verdict: 'failed',
           durationMs: 900_000,
-          failureClass: 'timeout',
+          failureClass: 'infrastructure',
           exitCode: 1,
         },
         {
           attempt: 2,
           verdict: 'failed',
           durationMs: 900_000,
-          failureClass: 'timeout',
+          failureClass: 'infrastructure',
           exitCode: 1,
         },
       ],
@@ -111,4 +111,5 @@ Deno.test('pretty reporter prints every attempt duration when retries fail', asy
   });
 
   assertStringIncludes(output.join(''), 'attempt durations: 900s + 900s');
+  assertStringIncludes(output.join(''), 'failure class: infrastructure');
 });

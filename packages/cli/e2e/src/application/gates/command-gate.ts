@@ -7,8 +7,12 @@ import type {
 } from '../../domain/gate-definition.ts';
 import type { RunContext } from '../../domain/run-context.ts';
 
-export const RETRYABLE_COMMAND_FAILURE_CLASSES = ['timeout', 'canceled'] as const;
-export const MAX_COMMAND_GATE_ATTEMPTS = 2;
+export const RETRYABLE_COMMAND_FAILURE_CLASSES = [
+  'timeout',
+  'canceled',
+  'infrastructure',
+] as const;
+export const MAX_COMMAND_GATE_ATTEMPTS = 3;
 const CANCELED_EXIT_CODE = 6;
 const CANCELED_MARKER = /task was canceled/i;
 
@@ -34,7 +38,7 @@ export class CommandGate {
       const result = await this.executor.run({
         cwd: this.definition.cwd(context),
         command: this.definition.command(context),
-        timeoutMs: context.request.options.commandTimeoutMs,
+        timeoutMs: this.definition.timeoutMs ?? context.request.options.commandTimeoutMs,
         outputMode: this.definition.outputMode,
         failureHint: this.definition.failureHint,
       });
@@ -44,7 +48,9 @@ export class CommandGate {
       );
       const passed = result.code === expectedExitCode && !result.timedOut &&
         missingOutput.length === 0;
-      const failureClass = passed ? undefined : classifyFailure(result);
+      const failureClass = passed
+        ? undefined
+        : this.definition.failureClass ?? classifyFailure(result);
       attempts.push({
         attempt,
         verdict: passed ? 'passed' : 'failed',

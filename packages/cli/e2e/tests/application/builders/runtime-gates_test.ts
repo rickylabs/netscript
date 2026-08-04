@@ -5,7 +5,27 @@ import { PORT_RANGES } from '../../../../src/kernel/constants/port-ranges.ts';
 import { allocateScaffoldDefaultPort } from '../../../../src/kernel/domain/scaffold/default-port-allocation.ts';
 import type { RunContext } from '../../../src/domain/run-context.ts';
 import { DATABASE } from '../../../src/domain/extension-axes.ts';
-import { createRuntimeGates } from '../../../src/application/gates/scaffold/runtime-gates.ts';
+import {
+  ASPIRE_RESTORE_ATTEMPT_TIMEOUT_MS,
+  ASPIRE_RESTORE_MAX_RETRIES,
+  createRuntimeGates,
+} from '../../../src/application/gates/scaffold/runtime-gates.ts';
+
+Deno.test('runtime Aspire restore has a bounded infrastructure retry budget', () => {
+  const gate = createRuntimeGates().find((entry) => entry.id === GATE.RUNTIME_ASPIRE_RESTORE);
+
+  assertEquals(gate?.kind, 'command');
+  if (gate?.kind !== 'command') throw new Error('Expected a command gate.');
+
+  assertEquals(ASPIRE_RESTORE_ATTEMPT_TIMEOUT_MS, 180_000);
+  assertEquals(ASPIRE_RESTORE_MAX_RETRIES, 2);
+  assertEquals(gate.timeoutMs, ASPIRE_RESTORE_ATTEMPT_TIMEOUT_MS);
+  assertEquals(gate.failureClass, 'infrastructure');
+  assertEquals(gate.retry, {
+    classes: ['timeout', 'canceled', 'infrastructure'],
+    maxRetries: 2,
+  });
+});
 
 Deno.test('runtime aspire start gate captures detached endpoint metadata', () => {
   const gate = createRuntimeGates().find((entry) => entry.id === GATE.RUNTIME_ASPIRE_START);
