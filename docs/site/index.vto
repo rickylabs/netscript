@@ -7,8 +7,7 @@ title: NetScript — durable, typed applications on Deno
   tagline: "Your checkout survives the crash. Your types survive the refactor.",
   subhead: "NetScript is a framework for durable, typed, full-stack applications on Deno.",
   ctas: [
-    { label: "Start a workspace", href: "/quickstart/", primary: true },
-    { label: "Why NetScript", href: "/why/" }
+    { label: "Start a workspace", href: "/quickstart/", primary: true }
   ]
 }) }}
 
@@ -25,7 +24,7 @@ title: NetScript — durable, typed applications on Deno
   },
   {
     title: "One command starts the traced fleet",
-    body: "Aspire starts the generated resource graph and injects service discovery and OTLP settings, so health, logs, and traces are inspected from the same dashboard.",
+    body: "Start the generated resource graph together, then use Aspire's dashboard to check resource health and follow logs and traces across it.",
     href: "/observability/"
   }
 ] }) }}
@@ -34,20 +33,20 @@ title: NetScript — durable, typed applications on Deno
   {
     label: "A checkout with a real refund path",
     lang: "ts",
-    code: "import { defineSaga, sagaCompensate, send } from '@netscript/plugin-sagas-core';\n\ntype Checkout = { status: 'pending' | 'paid' };\ntype Failure = { orderId: string; reason: string };\n\nexport const checkout = defineSaga('checkout')\n  .state<Checkout>({ status: 'pending' })\n  .on<'payment.captured', { orderId: string }>(\n    'payment.captured',\n    (saga, event) => {\n      saga.state.status = 'paid';\n      return [send('inventory.reserve', { orderId: event.payload.orderId })];\n    },\n  )\n  .on<'inventory.failed', Failure>('inventory.failed', (_saga, event) => [\n    sagaCompensate(\n      { type: 'payment.captured', payload: { orderId: event.payload.orderId } },\n      event.payload.reason,\n    ),\n  ])\n  .compensate<'payment.captured', { orderId: string }>(\n    'payment.captured',\n    (_saga, event) => [send('payment.refund', { orderId: event.payload.orderId })],\n  )\n  .build();"
+    code: "import { defineSaga, sagaCompensate, send } from '@netscript/plugin-sagas-core';\nimport type { SagaCorrelationKey } from '@netscript/plugin-sagas-core';\n\ntype Checkout = { status: 'pending' | 'paid' };\ntype Failure = { orderId: string; reason: string };\ntype CheckoutEvent =\n  | { type: 'payment.captured'; payload: { orderId: string } }\n  | { type: 'inventory.failed'; payload: Failure };\n\nconst checkout = defineSaga('checkout')\n  .state<Checkout>({ status: 'pending' })\n  .correlate<CheckoutEvent>((event) => event.payload.orderId as SagaCorrelationKey)\n  .on<'payment.captured', { orderId: string }>(\n    'payment.captured',\n    (saga, event) => {\n      saga.state.status = 'paid';\n      return [send('inventory.reserve', { orderId: event.payload.orderId })];\n    },\n  )\n  .on<'inventory.failed', Failure>('inventory.failed', (_saga, event) => [\n    sagaCompensate(\n      { type: 'payment.captured', payload: { orderId: event.payload.orderId } },\n      event.payload.reason,\n    ),\n  ])\n  .compensate<'payment.captured', { orderId: string }>(\n    'payment.captured',\n    (_saga, event) => [send('payment.refund', { orderId: event.payload.orderId })],\n  )\n  .build();"
   }
 ] }) }}
 
-<p>
-When <code>inventory.failed</code> arrives, the forward handler emits
-<code>sagaCompensate(...)</code> for <code>payment.captured</code>. The runtime routes that cascade
-to the matching compensation handler, which emits <code>payment.refund</code>. A configured saga
-store records transitions between messages, so restart recovery is a runtime property—not
-something this builder declaration performs by itself.
+<p class="ns-lede">
+The definition correlates both events by <code>orderId</code>. When <code>inventory.failed</code>
+arrives, its handler returns a compensation request for <code>payment.captured</code>. Executing that
+request requires a saga bus bridge configured with a compensator, while restart recovery requires a
+durable store; with that runtime wiring, the registered compensation handler emits
+<code>payment.refund</code>.
 <a href="{{ '/durable-workflows/' |> url }}">See the durability model</a>.
 </p>
 
-<nav aria-label="Choose the next page">
+<nav class="ns-cluster" aria-label="Choose the next page">
   <a href="{{ '/quickstart/' |> url }}">Run it</a> ·
   <a href="{{ '/concepts/' |> url }}">Understand it</a> ·
   <a href="{{ '/why/' |> url }}">Decide whether it fits</a>
