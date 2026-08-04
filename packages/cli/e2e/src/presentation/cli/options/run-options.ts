@@ -18,6 +18,7 @@ export interface RawRunOptions {
   readonly source?: string;
   readonly plugins?: string;
   readonly samples?: boolean;
+  readonly cache?: boolean;
   readonly cleanup?: boolean;
   readonly format?: string;
   readonly report?: string;
@@ -35,6 +36,7 @@ export function mapRunOptions(raw: RawRunOptions): Partial<RunOptions> {
     packageSource: parseSource(raw.source),
     plugins: parsePlugins(raw.plugins),
     samples: raw.samples,
+    cache: raw.cache,
     cleanup: raw.cleanup,
     format: parseFormat(raw.format),
     reportPath: raw.report,

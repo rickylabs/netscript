@@ -3,7 +3,7 @@
  */
 
 import { describe, it } from 'jsr:@std/testing@^1/bdd';
-import { assert, assertStringIncludes } from 'jsr:@std/assert@^1';
+import { assert, assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
 import type { BackgroundProcessorEntry } from '@netscript/aspire/types';
 import { RESOURCE_DEFAULTS } from '@netscript/aspire/constants';
 import { generateRegisterBackground } from '../register/generate-register-background.ts';
@@ -57,6 +57,44 @@ describe('generateRegisterBackground', () => {
     assertStringIncludes(output, "builder.addExecutable('workers', 'deno', workers_workdir,");
     assertStringIncludes(output, "'--minimum-dependency-age=0'");
     assertStringIncludes(output, "backgroundProcessors.set('workers'");
+  });
+
+  it('emits SQLite FFI exactly once for background processors', () => {
+    const output = generateRegisterBackground({
+      ...emptyOptions,
+      processors: { workers: fixtures.MINIMAL_BACKGROUND },
+      databaseEngine: 'Sqlite',
+    });
+    const explicitOutput = generateRegisterBackground({
+      ...emptyOptions,
+      processors: {
+        workers: {
+          ...fixtures.MINIMAL_BACKGROUND,
+          Permissions: ['--allow-net', '--allow-ffi'],
+        },
+      },
+      databaseEngine: 'Sqlite',
+    });
+
+    assertEquals(output.match(/--allow-ffi/g)?.length, 1);
+    assertEquals(explicitOutput.match(/--allow-ffi/g)?.length, 1);
+  });
+
+  it('keeps non-SQLite background output byte-identical', () => {
+    const options = {
+      ...emptyOptions,
+      processors: { workers: fixtures.MINIMAL_BACKGROUND },
+    };
+    const baseline = generateRegisterBackground(options);
+    const engines = [undefined, 'Postgres', 'Mysql', 'Mssql'] as const;
+
+    for (const databaseEngine of engines) {
+      assertEquals(
+        generateRegisterBackground({ ...options, databaseEngine }),
+        baseline,
+        `${databaseEngine ?? 'none'} background output`,
+      );
+    }
   });
 
   it('should use --watch flag (not --watch-hmr) for background processors', () => {

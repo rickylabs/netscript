@@ -33,6 +33,8 @@ export interface MaintainerInitRequest {
   readonly noAspire: boolean;
   /** Optional database engine selection. */
   readonly dbEngine?: DbEngineChoice;
+  /** Whether to scaffold a shared cache resource. */
+  readonly cache?: boolean;
   /** Whether to include an example oRPC service. */
   readonly includeExampleService?: boolean;
   /** Example service name override. */

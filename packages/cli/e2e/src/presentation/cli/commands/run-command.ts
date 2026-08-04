@@ -14,15 +14,15 @@ export function createRunCommand(createRunner: CliRunnerFactory) {
     .option('--cli <path:string>', 'CLI entrypoint')
     .option('--smoke-root <path:string>', 'Generated project parent directory')
     .option('--name <name:string>', 'Generated project name')
-    .option('--db <engine:string>', 'Database engine: postgres, mysql, sqlite, or mssql', {
-      default: 'postgres',
-    })
+    .option('--db <engine:string>', 'Database engine: postgres, mysql, sqlite, or mssql')
     .option('--source <mode:string>', 'Package source: auto, starter, local, or jsr', {
       default: 'local',
     })
     .option('--plugins <list:string>', 'Comma-separated plugin kinds')
     .option('--samples', 'Include generated samples', { default: true })
     .option('--no-samples', 'Skip generated samples')
+    .option('--cache', 'Scaffold a shared cache resource')
+    .option('--no-cache', 'Skip the shared cache resource')
     .option('--cleanup', 'Stop Aspire and remove suite-created Docker containers', {
       default: false,
     })

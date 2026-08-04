@@ -62,6 +62,21 @@ function withPluginPort(script: string, previousPort: number, port: number): str
 }
 
 function runtimeWaitGate(resource: AspireResource): GateDefinition {
+  if (resource === ASPIRE_RESOURCE.WORKERS) {
+    return commandGate(
+      `runtime.wait.${resource}`,
+      `Wait for ${resource}`,
+      GATE_PHASE.RUNTIME,
+      (context) => [
+        'deno',
+        'run',
+        '--allow-run=aspire',
+        `${context.project.repoRoot}/packages/cli/e2e/src/application/gates/scaffold/wait-for-workers-runtime.ts`,
+        context.project.appHost,
+      ],
+    );
+  }
+
   return commandGate(
     `runtime.wait.${resource}`,
     `Wait for ${resource}`,
@@ -463,7 +478,8 @@ const ASPIRE_START_SCRIPT = [
   '  return trimmed.slice(objectIndex);',
   '}',
 ].join('\n');
-function runtimeResources(database: DatabaseEngine): readonly AspireResource[] {
+/** List the Aspire resources that a runtime suite waits for. */
+export function runtimeResources(database: DatabaseEngine): readonly AspireResource[] {
   return [
     ...databaseRuntimeResources(database),
     ASPIRE_RESOURCE.GARNET,

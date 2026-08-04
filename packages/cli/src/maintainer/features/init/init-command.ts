@@ -59,6 +59,7 @@ export function createMaintainerInitCommand(
     .option('--service-name <name:string>', 'Example service name')
     .option('--model-name <name:string>', 'Prisma model name for the scaffolded CRUD surface')
     .option('--service-port <port:number>', 'Example service port')
+    .option('--cache [enabled:boolean]', 'Scaffold a shared cache resource')
     .option('--editor <editor:string>', `Editor config (${EDITOR_CHOICES.join(' | ')})`)
     .option('--no-aspire', 'Skip Aspire orchestration layer')
     .option('--no-git', 'Skip git init after scaffolding')
@@ -97,6 +98,7 @@ export function createMaintainerInitCommand(
         noGit: options.git === false,
         noAspire: options.aspire === false,
         dbEngine: parseDbEngine(options.db),
+        cache: options.cache,
         includeExampleService: includeService,
         serviceName: options.serviceName,
         modelName: options.modelName,

@@ -21,26 +21,36 @@ name: e2e-cli
 #     unverified and likely needs a debugging pass before this job is promoted to a
 #     required check via branch protection.
 #
+#   - scaffold-runtime-sqlite — the cheaper full-runtime tier
+#     (`deno task e2e:cli run scaffold.runtime.sqlite --cleanup`): the same
+#     generated-project runtime path with sqlite and no Postgres/Redis resources,
+#     avoiding Postgres and Redis containers. The postgres tier above remains
+#     the merge-readiness bar.
+#
 # Triggers: every PR to main or an integration branch (`feat/**`, `epic/**`), PLUS
 # any other PR carrying the `e2e-cli-gate` label, PLUS manual dispatch.
 #
 # Skip policy (see `.github/scripts/ci-classify-changes.ts`): the `classify` job
-# emits the #1152 capability vector (`run_static`, `run_runtime`, `needs_*`)
-# from the PR diff and labels. All three expensive jobs still START and report
+# emits the #1152 capability vector (`run_static`, `run_runtime_sqlite`,
+# `run_runtime`, `needs_*`)
+# from the PR diff and labels. All four expensive jobs still START and report
 # SUCCESS, but short-circuit to a "skipped-by-policy" step when their work is
 # not needed:
 #
 #   - `run_static`: any scaffold-impacting change (`packages/`/`plugins/`/
 #     `apps/`, tier-defining workflows, toolchain `deno.json*`/`deno.lock`,
 #     or any unrecognised path).
+#   - `run_runtime_sqlite`: the cheap runtime tier — `run_static` unless
+#     `ci:skip-e2e` is present.
 #   - `run_runtime`: the docker tier — same signal v1 (deliberately wide;
 #     tighten only against observed green history, per #1152).
 #   - `needs_desktop`: the `.deb`/updater surface — `packages/cli/`, tier
 #     workflows, toolchain config (#1151/#1152).
 #   - Only `e2e-cli.yml` and `ci.yml` escalate the scaffold tiers; other
 #     workflow edits and tasks-only root `deno.json` diffs do not (#1122).
-#   - `ci:skip-scaffold` -> skip scaffold-static; `ci:skip-e2e` -> skip
-#     scaffold-runtime; `ci:full` -> force everything regardless.
+#   - `ci:skip-scaffold` -> skip scaffold-static and its derived sqlite runtime
+#     tier; `ci:skip-e2e` -> skip both runtime tiers; `ci:full` -> force
+#     everything regardless.
 #
 # The jobs run + report SUCCESS rather than using `paths-ignore`/job-level `if`,
 # so they never strand a required status check if promoted to one later. ci.yml
@@ -88,6 +98,7 @@ jobs:
     outputs:
       diff_unavailable: ${{ steps.diff.outputs.diff_unavailable }}
       run_static: ${{ steps.decide.outputs.run_static }}
+      run_runtime_sqlite: ${{ steps.decide.outputs.run_runtime_sqlite }}
       run_runtime: ${{ steps.decide.outputs.run_runtime }}
       docs_only: ${{ steps.decide.outputs.docs_only }}
       needs_desktop: ${{ steps.decide.outputs.needs_desktop }}
@@ -306,6 +317,90 @@ jobs:
             **/e2e-report*.json
           if-no-files-found: ignore
 
+  scaffold-runtime-sqlite:
+    name: scaffold-runtime-sqlite (aspire + sqlite + garnet)
+    needs: classify
+    concurrency:
+      group: e2e-scaffold-runtime-sqlite-global
+      cancel-in-progress: false
+    # Job always starts so a policy skip still reports SUCCESS. The sqlite
+    # runtime follows the scaffold-impact signal, while ci:skip-e2e remains
+    # authoritative over both runtime tiers.
+    # FAIL-CLOSED: if `classify` FAILED, this job still runs and RUN defaults to
+    # true — a skip requires classify to have SUCCEEDED with an explicit
+    # `run_runtime_sqlite=false`. `skipped` classify (applicability gate) keeps
+    # the old skip behavior.
+    if: ${{ !cancelled() && needs.classify.result != 'skipped' && needs.classify.outputs.diff_unavailable != 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      RUN: ${{ needs.classify.result != 'success' || needs.classify.outputs.run_runtime_sqlite == 'true' }}
+      SKIP_REASON: ${{ needs.classify.outputs.reason }}
+    steps:
+      - name: Skipped by policy
+        if: env.RUN != 'true'
+        # REASON contains raw changed-file names — never interpolate it into
+        # shell source; pass via env and print with printf.
+        run: |
+          printf '::notice::scaffold-runtime-sqlite skipped by policy. %s\n' "$SKIP_REASON"
+
+      - name: Checkout
+        if: env.RUN == 'true'
+        uses: actions/checkout@v5
+
+      - name: Setup Deno
+        if: env.RUN == 'true'
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: "2.9.0"
+
+      - name: Setup .NET
+        if: env.RUN == 'true'
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Install Aspire CLI
+        if: env.RUN == 'true'
+        env:
+          ASPIRE_CLI_VERSION: "13.4.6"
+        run: |
+          dotnet tool install Aspire.Cli --tool-path "$HOME/.aspire/bin" --version "$ASPIRE_CLI_VERSION"
+          echo "$HOME/.aspire/bin" >> "$GITHUB_PATH"
+
+      - name: Aspire CLI preflight
+        if: env.RUN == 'true'
+        run: |
+          aspire_version="$(aspire --version)"
+          echo "$aspire_version"
+          case "$aspire_version" in
+            13.4.*) ;;
+            *) echo "Expected Aspire CLI 13.4.x, got $aspire_version" >&2; exit 1 ;;
+          esac
+
+      - name: Install workspace dependencies
+        if: env.RUN == 'true'
+        run: deno install
+
+      - name: SQLite scaffold runtime E2E (one pass, with cleanup)
+        if: env.RUN == 'true'
+        run: deno task e2e:cli run scaffold.runtime.sqlite --cleanup --format pretty --report .llm/tmp/e2e-report-scaffold-runtime-sqlite.json
+
+      - name: Print failed E2E gate evidence
+        if: failure() && env.RUN == 'true'
+        run: deno run --allow-read .llm/tools/e2e/print-failed-report-steps.ts .llm/tmp/e2e-report-scaffold-runtime-sqlite.json
+
+      - name: Upload E2E report artifact
+        if: always() && env.RUN == 'true'
+        uses: actions/upload-artifact@v5
+        with:
+          name: e2e-cli-scaffold-runtime-sqlite-report
+          path: |
+            .llm/tmp/**/report*.json
+            .llm/tmp/**/report*.ndjson
+            **/e2e-report*.json
+          if-no-files-found: ignore
+
   desktop-native-linux:
     name: desktop-native-linux (deb + signed updater)
     needs: classify
@@ -397,7 +492,7 @@ jobs:
 
   lane-visibility:
     name: scaffold CI lane visibility
-    needs: [classify, scaffold-static, scaffold-runtime, desktop-native-linux]
+    needs: [classify, scaffold-static, scaffold-runtime, scaffold-runtime-sqlite, desktop-native-linux]
     if: ${{ always() && github.event_name == 'pull_request' && github.event.pull_request.draft == false }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -406,9 +501,11 @@ jobs:
         env:
           CLASSIFY_RESULT: ${{ needs.classify.result }}
           RUN_STATIC: ${{ needs.classify.outputs.run_static }}
+          RUN_RUNTIME_SQLITE: ${{ needs.classify.outputs.run_runtime_sqlite }}
           RUN_RUNTIME: ${{ needs.classify.outputs.run_runtime }}
           RUN_DESKTOP: ${{ needs.classify.outputs.needs_desktop }}
           STATIC_RESULT: ${{ needs.scaffold-static.result }}
+          RUNTIME_SQLITE_RESULT: ${{ needs.scaffold-runtime-sqlite.result }}
           RUNTIME_RESULT: ${{ needs.scaffold-runtime.result }}
           DESKTOP_NATIVE_LINUX_RESULT: ${{ needs.desktop-native-linux.result }}
         run: |
@@ -431,6 +528,7 @@ jobs:
           fi
 
           static_outcome="$(describe_scaffold_lane "$RUN_STATIC" "$STATIC_RESULT")"
+          runtime_sqlite_outcome="$(describe_scaffold_lane "$RUN_RUNTIME_SQLITE" "$RUNTIME_SQLITE_RESULT")"
           runtime_outcome="$(describe_scaffold_lane "$RUN_RUNTIME" "$RUNTIME_RESULT")"
 
           desktop_outcome="$(describe_scaffold_lane "$RUN_DESKTOP" "$DESKTOP_NATIVE_LINUX_RESULT")"
@@ -444,6 +542,7 @@ jobs:
             echo "| --- | --- |"
             printf '| `classify` | %s |\n' "$classify_outcome"
             printf '| `scaffold-static` | %s |\n' "$static_outcome"
+            printf '| `scaffold-runtime-sqlite` | %s |\n' "$runtime_sqlite_outcome"
             printf '| `scaffold-runtime` | %s |\n' "$runtime_outcome"
             printf '| `desktop-native-linux` | %s |\n' "$desktop_outcome"
           } >> "$GITHUB_STEP_SUMMARY"

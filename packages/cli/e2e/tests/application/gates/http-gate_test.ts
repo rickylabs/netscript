@@ -40,6 +40,7 @@ function createContext(): RunContext {
         packageSource: 'local',
         plugins: [],
         samples: true,
+        cache: true,
         cleanup: true,
         format: 'json',
         commandTimeoutMs: 30_000,
