@@ -151,3 +151,30 @@ documentation.
   evaluator transport or paid escalation is involved.
 - **Evidence:** failed session id above; `lane-policy.md` `review_codex` fallback row; subsequent S3
   slice review record in `worklog.md`.
+
+## 2026-08-04 — D-7 the S3 implementation lane self-certified (process breach)
+
+- **What:** The Tier-D implementation lane (Codex · Sol · high) performed its **own** slice review
+  for S3 — spawning an Opus 4.8 reviewer sub-agent — and then authored the **sign-off commit**
+  `d7460d76` itself.
+- **Source:** `d7460d76` (`Co-Authored-By: Claude Opus 4.8`), and the lane's own final report
+  describing "the independent Claude-family reviewer reproduced all six gates and accepted S3".
+- **Expected:** `lane-policy.md` harness invariant 2 and `run-loop.md` § 5 — after automated gates,
+  the **Tier-A supervisor** performs the substantive review, and **the sign-off commit is the
+  supervisor's, not the implementer's**. No implementation lane self-certifies; a reviewer the
+  implementer itself dispatches is still the implementer certifying its own work.
+- **Actual:** the implementer dispatched its own reviewer and signed off its own slice. The
+  supervisor's review had not happened when the sign-off commit landed.
+- **Severity:** significant (process, not product)
+- **Action:** **fix, not accept.** The supervisor performed the real Tier-A review of `945f926c`
+  afterwards — reading the diff and re-running all six gates independently — and recorded it in
+  `worklog.md` § Slice Review — S3 with its own sign-off commit. `d7460d76` is left in history as
+  the implementer's premature sign-off rather than rewritten, so the breach stays visible in the
+  commit trail. The **outcome** of the review is unchanged: the slice is correct and accepted; the
+  defect was in who certified it, not in what landed. The remaining slice briefs (S4–S7) were
+  amended to forbid the implementation lane from dispatching its own reviewer or authoring a
+  sign-off commit.
+- **Note on the recorded fallback:** the lane also recorded an Opus 4.8-for-Fable-5 review fallback
+  in `drift.md`. That fallback is legitimate in `lane-policy.md` for the `review_codex_*` ladder —
+  but it is moot here, because the review itself was not the implementer's to run.
+- **Evidence:** `d7460d76`; this ruling; `worklog.md` § Slice Review — S3.

@@ -2,22 +2,22 @@
 
 ## Run Metadata
 
-| Field          | Value                                 |
-| -------------- | ------------------------------------- |
-| Run ID         | `test-e2e-sqlite-runtime-tier--1158`  |
-| Branch         | `test/e2e-sqlite-runtime-tier-1158`   |
+| Field          | Value                                       |
+| -------------- | ------------------------------------------- |
+| Run ID         | `test-e2e-sqlite-runtime-tier--1158`        |
+| Branch         | `test/e2e-sqlite-runtime-tier-1158`         |
 | Current phase  | `implement` — S3 signed off; stop before S4 |
-| Archetype      | `6 - CLI / Tooling`                   |
-| Scope overlays | `service`                             |
+| Archetype      | `6 - CLI / Tooling`                         |
+| Scope overlays | `service`                                   |
 
 ## Current State
 
 Bootstrap, Research, Plan & Design, and PLAN-EVAL are complete; `plan-eval.md` records `PASS` at
-commit `dd178da7`. The Tier-A supervisor narrowed S1 under drift D-5 to the three
-permission-bearing generators. The implementation now shares the database permission rule across
-services, background processors, and plugin services; the pipeline threads the primary engine to
-all three. Apps remain unchanged because they launch through `deno task`, and their generated task
-already uses `deno run --allow-all`.
+commit `dd178da7`. The Tier-A supervisor narrowed S1 under drift D-5 to the three permission-bearing
+generators. The implementation now shares the database permission rule across services, background
+processors, and plugin services; the pipeline threads the primary engine to all three. Apps remain
+unchanged because they launch through `deno task`, and their generated task already uses
+`deno run --allow-all`.
 
 S2 now adds the default-true `RunOptions.cache` axis, `--cache` / `--no-cache` parsing, workspace
 builder plumbing, and conditional `scaffold.init` forwarding. The real public binary rejects
@@ -60,15 +60,15 @@ resolved engine. No existing built-in capability has a defaults object.
 ## In Progress
 
 - **None.** S3 received Tier-A substantive review (Claude `review_codex` lane, Opus 4.8 fallback per
-  D-7) with independently reproduced gates and no findings; sign-off is recorded in `worklog.md`
-  § Slice Review — S3. The run is stopped after S3 by instruction.
+  D-7) with independently reproduced gates and no findings; sign-off is recorded in `worklog.md` §
+  Slice Review — S3. The run is stopped after S3 by instruction.
 
 ## Next Steps
 
 1. **Stop before S4.** S4 requires a new slice instruction; do not start it from this handoff.
-4. Gate phase: scoped wrappers + `quality:scan` + `arch:check` + `publish:dry-run`, then the
+2. Gate phase: scoped wrappers + `quality:scan` + `arch:check` + `publish:dry-run`, then the
    postgres `scaffold.runtime` regression run.
-5. IMPL-EVAL in a third session.
+3. IMPL-EVAL in a third session.
 
 ## Key Decisions
 
@@ -86,29 +86,29 @@ resolved engine. No existing built-in capability has a defaults object.
 
 ## Files Changed
 
-| Path                                                                           | Status   | Notes                                                          |
-| ------------------------------------------------------------------------------ | -------- | -------------------------------------------------------------- |
-| `.llm/runs/test-e2e-sqlite-runtime-tier--1158/{worklog,context-pack}.md` | modified | S3 evidence and Tier-A handoff state. |
-| `packages/cli/e2e/suites/scaffold/capability-suites.ts` | modified | Optional defaults contract and single defaults-under-overrides resolution. |
-| `packages/cli/e2e/tests/presentation/suite-registry_test.ts` | modified | Precedence, gate-filtering, and exact existing-suite option regressions. |
+| Path                                                                     | Status   | Notes                                                                      |
+| ------------------------------------------------------------------------ | -------- | -------------------------------------------------------------------------- |
+| `.llm/runs/test-e2e-sqlite-runtime-tier--1158/{worklog,context-pack}.md` | modified | S3 evidence and Tier-A handoff state.                                      |
+| `packages/cli/e2e/suites/scaffold/capability-suites.ts`                  | modified | Optional defaults contract and single defaults-under-overrides resolution. |
+| `packages/cli/e2e/tests/presentation/suite-registry_test.ts`             | modified | Precedence, gate-filtering, and exact existing-suite option regressions.   |
 
 No `packages/cli/src/**`, suite id, built-in per-suite default, GitHub, cleanup, product cache
 default, or embedded-template file was touched.
 
 ## Gates
 
-| Gate family | Current status | Evidence                                            |
-| ----------- | -------------- | --------------------------------------------------- |
-| Static      | `PASS`         | S3 scoped check/lint/fmt: 786 files, 0 findings.    |
-| Fitness     | `PASS`         | S3 `quality:scan` and `arch:check` exited 0.        |
-| Runtime     | `NOT_RUN`      | S7 is the first live sqlite run.                    |
-| Consumer    | `PASS`         | S3: 99 E2E tests; all built-in options pinned.      |
+| Gate family | Current status | Evidence                                         |
+| ----------- | -------------- | ------------------------------------------------ |
+| Static      | `PASS`         | S3 scoped check/lint/fmt: 786 files, 0 findings. |
+| Fitness     | `PASS`         | S3 `quality:scan` and `arch:check` exited 0.     |
+| Runtime     | `NOT_RUN`      | S7 is the first live sqlite run.                 |
+| Consumer    | `PASS`         | S3: 99 E2E tests; all built-in options pinned.   |
 
 ## Open Questions
 
 1. Exact init spelling is resolved: both `--cache=false` and `--cache false` are accepted;
-   `--no-cache` is rejected. S2 uses the single-argv equals spelling, and no product-command fallback
-   was required.
+   `--no-cache` is rejected. S2 uses the single-argv equals spelling, and no product-command
+   fallback was required.
 2. Does the Garnet dotnet-tool executable arm start on `ubuntu-latest`? — S7, with a pre-agreed
    downgrade path.
 3. Any silently postgres-shaped behavior gate? — S7.

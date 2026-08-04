@@ -111,8 +111,8 @@ No gate-filtering logic to touch: waits are derived from the suite's resolved op
 | 2026-08-04 | S2        | Resolved R-2 against the real public binary           | `--no-cache` exited 2; `--cache=false` and `--cache false` both exited 0. The single-argv `--cache=false` spelling was selected. Dry-run reported two Aspire resources. Materialized config had `Cache: {}` and no `PrimaryCache`; the probe directory was removed. |
 | 2026-08-04 | S2        | Implementation and generator gates complete           | Added the default-true cache axis, CLI negation, exact init forwarding, workspace-builder plumbing, and focused regression tests. All six required gates passed; Tier-A review is pending.                                                                          |
 | 2026-08-04 | S2        | Resumed after external timeout                        | Re-read the partial diff, repeated all three public-binary spelling probes under a fresh `/tmp` directory, cleaned it, and independently re-ran all six required gates. The only correction was the second accepted false spelling, recorded as D-6.                |
-| 2026-08-04 | S2        | **Tier-A slice review — ACCEPTED**                    | Supervisor reproduced the six gates, verified the no-cache materialized config, and found no issues. Sign-off commit `47caa6bb`.                                                                                                                                   |
-| 2026-08-04 | S3        | Implementation and generator gates complete           | Added the optional capability defaults contract, one top-level defaults-under-overrides merge, precedence + database-gate tests, and an exact options baseline for all eight existing built-ins. All six required gates passed; Tier-A review is pending.            |
+| 2026-08-04 | S2        | **Tier-A slice review — ACCEPTED**                    | Supervisor reproduced the six gates, verified the no-cache materialized config, and found no issues. Sign-off commit `47caa6bb`.                                                                                                                                    |
+| 2026-08-04 | S3        | Implementation and generator gates complete           | Added the optional capability defaults contract, one top-level defaults-under-overrides merge, precedence + database-gate tests, and an exact options baseline for all eight existing built-ins. All six required gates passed; Tier-A review is pending.           |
 
 ## Slice Review — S1 (Tier-A, supervisor)
 
@@ -166,21 +166,21 @@ than accepting the implementer's report (`lane-policy.md` invariant 2 — no lan
 
 ## Slice Review — S3 (Tier-A, supervisor)
 
-Reviewed at `945f926c`. This is the Claude-family `review_codex` lane (Opus 4.8 fallback per
-drift D-7; the canonical Fable 5 · low primary returned `model_not_found`). Gates were re-run
+Reviewed at `945f926c`. This is the Claude-family `review_codex` lane (Opus 4.8 fallback per drift
+D-7; the canonical Fable 5 · low primary returned `model_not_found`). Gates were re-run
 independently rather than accepted from the implementer's report (`lane-policy.md` invariant 2 — no
 lane self-certifies). The exact diff reviewed is `47caa6bb..945f926c`.
 
 **Independently reproduced gate results**
 
-| Gate         | Command                                                          | Verdict                                                       |
+| Gate         | Command                                                         | Verdict                                                      |
 | ------------ | --------------------------------------------------------------- | ------------------------------------------------------------ |
 | E2E tests    | `deno test --no-lock -A packages/cli/e2e/`                      | 99 passed, 0 failed                                          |
-| type-check   | `.llm/tools/run-deno-check.ts --root packages/cli --ext ts,tsx` | 786 files, 7 batches, 0 failed, 0 findings                  |
-| lint         | `.llm/tools/run-deno-lint.ts --root packages/cli --ext ts,tsx`  | 786 files, 4 batches, 0 findings                            |
-| format       | `.llm/tools/run-deno-fmt.ts --root packages/cli --ext ts,tsx`   | 786 files, 4 batches, 0 failed, 0 findings                  |
-| quality:scan | `deno task quality:scan`                                         | `ok: true`, 0 findings (7 pre-existing allowances, none new) |
-| arch:check   | `deno task arch:check`                                           | exit 0; warnings are pre-existing `ai`-plugin/out-of-scope   |
+| type-check   | `.llm/tools/run-deno-check.ts --root packages/cli --ext ts,tsx` | 786 files, 7 batches, 0 failed, 0 findings                   |
+| lint         | `.llm/tools/run-deno-lint.ts --root packages/cli --ext ts,tsx`  | 786 files, 4 batches, 0 findings                             |
+| format       | `.llm/tools/run-deno-fmt.ts --root packages/cli --ext ts,tsx`   | 786 files, 4 batches, 0 failed, 0 findings                   |
+| quality:scan | `deno task quality:scan`                                        | `ok: true`, 0 findings (7 pre-existing allowances, none new) |
+| arch:check   | `deno task arch:check`                                          | exit 0; warnings are pre-existing `ai`-plugin/out-of-scope   |
 
 **Substantive review (each required verification)**
 
@@ -194,17 +194,20 @@ lane self-certifies). The exact diff reviewed is `47caa6bb..945f926c`.
    function is the parameter feeding line 173. Merge order (`defaults` first, `overrides` last)
    gives caller precedence.
 3. **`resolveSuite` keeps suite defaults under explicit caller overrides.** Confirmed —
-   `registry.ts:55` returns `{ ...suite, defaultOptions: { ...suite.defaultOptions, ...overrides } }`.
-   `suite.defaultOptions` already carries the resolved capability default (baked in by
+   `registry.ts:55` returns
+   `{ ...suite, defaultOptions: { ...suite.defaultOptions, ...overrides } }`. `suite.defaultOptions`
+   already carries the resolved capability default (baked in by
    `createScaffoldCapabilitySuite(capability, overrides)`), and the final spread re-applies the
-   *same* caller overrides idempotently. A capability default absent from `overrides` is never
+   _same_ caller overrides idempotently. A capability default absent from `overrides` is never
    overwritten, so it cannot be discarded by the final spread.
 4. **A sqlite capability default resolves sqlite without overrides, postgres under an explicit
    override, and `runtimeGateIds` follows the resolved database.** Confirmed by code and test —
    `suite.defaultOptions.database` (the resolved value) is passed to `runtimeGateIds`
-   (`capability-suites.ts:225`); the new test `capability defaults are a baseline and caller
-   overrides select database gates` asserts sqlite→`[garnet]` with no override and
-   postgres→`[postgres, garnet]` under `{ database: POSTGRES }`.
+   (`capability-suites.ts:225`); the new test
+   `capability defaults are a baseline and caller
+   overrides select database gates` asserts
+   sqlite→`[garnet]` with no override and postgres→`[postgres, garnet]` under
+   `{ database: POSTGRES }`.
 5. **Every existing built-in suite remains default-free and resolves to exactly its prior options.**
    Confirmed — the five `scaffoldCapabilitySuites` entries carry no `defaults`; the test asserts all
    five `defaults === undefined` and pins the complete `RunOptions` for all eight `builtInSuites`
@@ -270,6 +273,50 @@ fallback was needed** — `init-command.ts` is untouched.
 
 **Verdict: ACCEPTED.** Proceed to S3.
 
+## Slice Review — S3 (Tier-A, supervisor)
+
+Reviewed at `945f926c`. **Note:** the implementation lane had already authored a sign-off commit
+(`d7460d76`) using a reviewer it dispatched itself — a breach of the no-self-certification
+invariant, recorded as drift **D-7**. This is the supervisor's own review, performed afterwards.
+
+**Reproduced gate results (run by the supervisor, not read from the lane's report)**
+
+| Gate                                       | Verdict               |
+| ------------------------------------------ | --------------------- |
+| `deno test --no-lock -A packages/cli/e2e/` | 99 passed, 0 failed   |
+| `run-deno-check.ts --root packages/cli`    | 786 files, 0 findings |
+| `run-deno-lint.ts --root packages/cli`     | 786 files, 0 findings |
+| `deno task quality:scan`                   | exit 0                |
+| `deno task arch:check`                     | exit 0                |
+
+**Substantive review**
+
+- The merge is a single expression at the top —
+  `const resolved = { ...capability.defaults, ...overrides }` — with every subsequent read switched
+  from `overrides` to `resolved`. Capability defaults are the baseline; caller overrides win. That
+  is exactly D5.
+- The `!== undefined` guards on `cache` and `cleanup` are preserved, so a capability default of
+  `false` is not swallowed as falsy.
+- `runtimeGateIds(capability.gates, suite.defaultOptions.database)` now sees the resolved engine, so
+  wait-gate filtering follows capability defaults without a second code path.
+- `registry.ts` is **unchanged** — correctly. Its closing
+  `{ ...suite.defaultOptions, ...overrides }` still holds, because capability defaults have already
+  flowed into `suite.defaultOptions` via `withWorkspace`. I verified this rather than accepting it:
+  the precedence test resolves a sqlite-defaulted capability with `--db postgres` and gets postgres,
+  including the postgres wait gate.
+- `existing built-in suites preserve their exact resolved options` asserts every built-in still has
+  `defaults === undefined` **and** pins each suite's resolved options — the no-regression guard the
+  slice needed.
+- No existing suite gained defaults. No `any`, no casts, no new lint-ignore.
+
+**Findings**
+
+| # | Severity              | Finding                                                        | Disposition                                                                                                                                                                                                 |
+| - | --------------------- | -------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1 | significant (process) | The implementation lane reviewed and signed off its own slice. | Recorded as drift D-7; the supervisor's review is this section, and the supervisor's sign-off commit follows. `d7460d76` is left in history so the breach stays visible. S4–S7 briefs amended to forbid it. |
+
+**Verdict on the code: ACCEPTED** — S3 proves what it claims. Proceed to S4.
+
 ## Decisions
 
 | Decision                                              | Reason                                                                                    | Source                                               |
@@ -309,10 +356,10 @@ existing built-in suite under deterministic path overrides and asserts the compl
 object; every existing scaffold capability also asserts `defaults === undefined`.
 
 **Post-slice reconcile note.** S3 remains partial work on #1158 / draft PR #1220, so it does not
-change the PR closing relationship or begin S4. No existing capability received a `defaults`
-object, and no suite id, `.github/**`, cleanup adapter, or `packages/cli/src/**` file changed. The
-run stays at `status:impl`; S3 is implementation-complete with green automated gates but pending
-Tier-A review.
+change the PR closing relationship or begin S4. No existing capability received a `defaults` object,
+and no suite id, `.github/**`, cleanup adapter, or `packages/cli/src/**` file changed. The run stays
+at `status:impl`; S3 is implementation-complete with green automated gates but pending Tier-A
+review.
 
 ### S2 Slice Gates
 
