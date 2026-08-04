@@ -15,7 +15,7 @@ function contractDatabaseImports(options: ValidatedInitOptions): Record<string, 
   }
   return {
     '@database/zod':
-      `../${SCAFFOLD_DIRS.DATABASE}/${options.dbEngine}/schema/.generated/zod/schemas/models/index.ts`,
+      `../${SCAFFOLD_DIRS.DATABASE}/${options.dbEngine}/schema/.generated/zod/crud.ts`,
   };
 }
 

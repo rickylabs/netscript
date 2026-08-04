@@ -5,6 +5,8 @@
  */
 
 import { assertEquals, assertRejects, assertStringIncludes } from 'jsr:@std/assert@^1';
+import { join } from 'jsr:@std/path@^1';
+import { writeCrudZodBarrel } from '../../../../../database/scripts/mod.ts';
 import { MemoryFileSystemAdapter } from '../scaffold/memory-fs.ts';
 import { Scaffolder } from '../scaffold/scaffolder.ts';
 import { StringTemplateAdapter } from '../scaffold/template-adapter.ts';
@@ -16,6 +18,7 @@ import { ContractWorkspaceResolver } from '../contracts/workspace-resolver.ts';
 import { DEFAULT_TEMPLATE_REGISTRY } from '../../application/registries/template-registry.ts';
 import { ScaffoldValidationError } from '../../domain/errors.ts';
 import { generateV1Mod } from '../contracts/templates/generate-v1-mod.ts';
+import { generateDenoJson } from '../../templates/workspace/deno-json.ts';
 import { PortAllocator } from './port-allocator.ts';
 import { ServiceScaffolder } from './scaffolder.ts';
 import { ServiceWorkspaceResolver } from './workspace-resolver.ts';
@@ -83,7 +86,7 @@ Deno.test('shared contract scaffolder creates service contracts and aggregates v
       force: false,
       imports: {
         '@database/zod':
-          '../database/postgres/schema/.generated/zod/schemas/models/index.ts',
+          '../database/postgres/schema/.generated/zod/crud.ts',
       },
     },
   });
@@ -147,8 +150,80 @@ Deno.test('shared contract scaffolder creates service contracts and aggregates v
   );
   assertEquals(
     contractsDenoJson.imports['@database/zod'],
-    '../database/postgres/schema/.generated/zod/schemas/models/index.ts',
+    '../database/postgres/schema/.generated/zod/crud.ts',
   );
+
+  const compileRoot = await Deno.makeTempDir();
+  try {
+    const zodOutputDir = join(compileRoot, 'database', 'postgres', 'schema', '.generated', 'zod');
+    await Deno.mkdir(join(zodOutputDir, 'schemas', 'models'), { recursive: true });
+    await Deno.mkdir(join(zodOutputDir, 'schemas', 'variants', 'input'), { recursive: true });
+    await Deno.mkdir(join(zodOutputDir, 'schemas', 'objects'), { recursive: true });
+    await Deno.mkdir(join(compileRoot, 'contracts', 'versions', 'v1'), { recursive: true });
+    await Deno.mkdir(join(compileRoot, 'stubs'), { recursive: true });
+
+    await Promise.all([
+      Deno.writeTextFile(
+        join(zodOutputDir, 'schemas', 'models', 'Cycle.schema.ts'),
+        "import { z } from 'zod';\nexport const CycleSchema = z.object({ id: z.number() });\n",
+      ),
+      Deno.writeTextFile(
+        join(zodOutputDir, 'schemas', 'variants', 'input', 'Cycle.input.ts'),
+        "import { z } from 'zod';\nexport const CycleInputSchema = z.object({ id: z.number() });\n",
+      ),
+      Deno.writeTextFile(
+        join(zodOutputDir, 'schemas', 'objects', 'CycleUpdateInput.schema.ts'),
+        "import { z } from 'zod';\nexport const CycleUpdateInputObjectZodSchema = z.object({ id: z.number().optional() });\n",
+      ),
+      Deno.writeTextFile(
+        join(compileRoot, 'contracts', 'versions', 'v1', 'cycles.contract.ts'),
+        cycleContract,
+      ),
+      Deno.writeTextFile(
+        join(compileRoot, 'stubs', 'orpc.ts'),
+        'export const implement = <T>(value: T): T => value;\n',
+      ),
+      Deno.writeTextFile(
+        join(compileRoot, 'stubs', 'contracts.ts'),
+        "export const baseContract = { route: (_route: unknown) => ({ output: <T>(schema: T): T => schema }) };\n",
+      ),
+      Deno.writeTextFile(
+        join(compileRoot, 'stubs', 'crud.ts'),
+        'export function createCrudContract(_options: unknown): Record<string, unknown> { return {}; }\n',
+      ),
+    ]);
+    await writeCrudZodBarrel({ zodOutputDir, modelName: 'Cycle' });
+
+    const workspace = JSON.parse(generateDenoJson({
+      name: 'test-project',
+      appName: 'dashboard',
+      workspaceMembers: ['contracts', 'database/postgres'],
+      importMode: 'jsr',
+      dbEngines: ['postgres'],
+    }));
+    await Deno.writeTextFile(
+      join(compileRoot, 'deno.json'),
+      JSON.stringify({
+        imports: {
+          '@database/zod': workspace.imports['@database/zod'],
+          '@orpc/server': './stubs/orpc.ts',
+          '@netscript/contracts': './stubs/contracts.ts',
+          '@netscript/contracts/crud': './stubs/crud.ts',
+          zod: 'npm:zod@^4.3.6',
+        },
+      }),
+    );
+
+    const checked = await new Deno.Command(Deno.execPath(), {
+      cwd: compileRoot,
+      args: ['check', 'contracts/versions/v1/cycles.contract.ts'],
+      stdout: 'piped',
+      stderr: 'piped',
+    }).output();
+    assertEquals(checked.code, 0, new TextDecoder().decode(checked.stderr));
+  } finally {
+    await Deno.remove(compileRoot, { recursive: true });
+  }
 });
 
 Deno.test('PortAllocator assigns next available service port', async () => {

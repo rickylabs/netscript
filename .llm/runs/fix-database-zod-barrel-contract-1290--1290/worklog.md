@@ -62,8 +62,22 @@ consumer through the scaffold compile test rather than editing template imports.
 | --- | --- | --- | --- |
 | 2026-08-05 | research | Read live #1290 before branching; fetched main and created exact branch | baseline `6c3b534fc` |
 | 2026-08-05 | research | Fresh scaffold + db generate | upstream models barrel augmented; Zod errors absent; only #1287 remains |
+| 2026-08-05 | 1 | RED | Rendered `cycles.contract.ts` failed `deno check` with TS2307 at the generated models-barrel alias. |
+| 2026-08-05 | 2 | GREEN | Same generated-contract compiler fixture passed after aliasing the complete `crud.ts` aggregate. |
+| 2026-08-05 | 2 | multi-model proof | Database writer test found Product and Warehouse and emitted Schema/CreateInput/UpdateInput for both. |
+| 2026-08-05 | 2 | review | NetScript now owns the aggregate; upstream models barrel remains generator-owned; generated contract stays on `@database/zod`. |
+| 2026-08-05 | 2 | reconcile | Draft PR #1299 carries `Closes #1290`, milestone 0.0.5, p0 CLI/database labels, and `status:plan`. |
 
 ## Gates
 
-Pending implementation.
-
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| Generated-contract RED | EXPECTED FAIL | TS2307 resolving baseline `schemas/models/index.ts` alias. |
+| Generated-contract GREEN | PASS | Focused service scaffolder test; actual rendered contract compiled. |
+| Multi-model aggregate | PASS | Product + Warehouse all export three contract symbols. |
+| Focused tests | PASS | 30 passed, 0 failed across database barrel, workspace alias, and service scaffolder tests. |
+| Scoped check | PASS | 60 files selected; zero diagnostics. |
+| Scoped lint | PASS | 60 files selected; zero findings. |
+| Scoped fmt | PASS | 60 files selected; zero findings. |
+| Quality gate | PASS | code-quality scan clean; architecture gate exit 0 with baseline warnings only. |
+| Lock hygiene | PASS | Foreign `deno.lock` remains modified but unstaged. |
