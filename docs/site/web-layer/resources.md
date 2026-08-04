@@ -193,7 +193,7 @@ factory types as `never`, so `session.tenantId` fails `deno check` before the pa
 ordering rule is enforced, not merely conventional.
 
 Tenant scoping, feature flags keyed on a plan, and per-user permission sets all take this shape: the
-authoritative value is resolved once at the top of the request, and every consumer downstream is
+authoritative value is resolved once during the page-pipeline preparation, and every consumer downstream is
 reading, not re-fetching. Pair it with `withPolicy` when the page's defer behaviour should also depend
 on who is asking.
 
