@@ -350,3 +350,86 @@ No rewrite of either page is warranted; this is a focused correction to one open
 | G4-F1 — D7 opening used checklist-like, accusatory framing | **FIXED** | `query-bridge.md:55-71` now uses the requested mechanism-led transition (“three coordination seams remain”) and follows it with the response-contract, request/input, query-key, and freshness boundaries without the prior sales-copy language. |
 
 **Final Batch 2 verdict after `24dbcaaa7`: PASS.** All four Batch 2 findings are fixed; no open accuracy, bare-Fresh fairness, cross-link/navigation, or prose-register finding remains.
+
+## Batch 3 audit
+
+- **Changeset:** `24dbcaaa7..c3b6e3059` (`66195fe20` + `c3b6e3059`)
+- **Audit mode:** opposite-family `docs_audit`, evidence-only; source and controls were read/run independently of generator claims.
+
+### Gate 1 — mechanism/API accuracy: FAIL
+
+Most of both deep-dives is unusually exact. Source inspection confirmed the four `withForm` installs; handler ordering; state rebasing; field/collection descriptors; CSRF and submission-id boundaries; `FormStateLike`; all eight client defer decisions; profile values; hidden-form transport; prewarm headers and recursion guard; telemetry; streaming-layer bypass; blocking/background layer mapping; and the Suspense-ready, non-streaming boundary.
+
+Independent controls also confirmed the five previously shipped defects the pages call out:
+
+- `ControlProps` is not assignable to Preact `InputHTMLAttributes<HTMLInputElement>` because `role?: string` is wider than `AriaRole` (`TS2322`).
+- `FormState<object>` is not assignable to `FormStateLike<object>` (`TS2322`).
+- `unknown` is not assignable to `DeferPageRenderable` (`TS2322`).
+- `generateSubmissionId()` only creates a UUID and the runtime only round-trips it; no deduplication store or comparison exists.
+- Against Zod 4.4.3, the live adapter produced string length, URL pattern, array bounds, nested item constraints, and optionality, but no regex pattern or numeric min/max/step—the page's derivation table is accurate.
+
+The load-bearing defer precedence control produced:
+
+```text
+low-bandwidth + server-prewarm                         -> prewarmOnMiss=true, prewarmOnStale=true
+low-bandwidth + explicit false flags + server-prewarm -> prewarmOnMiss=true, prewarmOnStale=true
+low-bandwidth + none                                   -> prewarmOnMiss=true, prewarmOnStale=false
+```
+
+This proves the specific layer claim: `staleReloadMode: 'background'` maps to `server-prewarm` and overrides both policy prewarm fields. It also exposes one overgeneralization below.
+
+Findings:
+
+- **G1-F1 — intent validation is executed, not skipped.** `form.md:147-154` first says `parseFormSubmission` runs `schema.safeParse`, then says “Validation never runs for this branch.” `validation/pipeline.ts` awaits `adapter.safeParse(values)` before `createWithFormHandler` inspects the intent. The intent branch bypasses the **validation gate** and ignores that result; validation itself has already run. Replace the last sentence with: “The schema has already been evaluated during parsing, but this branch returns before the validation result is enforced.”
+- **G1-F2 — `RuntimeFormState` has sixteen members, not seventeen.** `form.md:174-184` enumerates 4 + 2 + 3 + 2 + 5 members, matching `_internal/runtime-types.ts`: sixteen. Replace “Seventeen” with “Sixteen.”
+- **G1-F3 — `onSuccess.message` cannot be rendered from `RuntimeFormState`.** `form.md:191-193` says the message “comes back … which you render yourself.” `reply.success` preserves `message`, but `resolveRuntimeFormState` does not copy `message` (or `status`/`output`) into the component state. Replace with: “`RuntimeFormState` exposes no success flag or message today. `nextValues` can rebase the rendered values after success; use a redirect or an application-owned feedback channel for a visible success message.”
+- **G1-F4 — only `server-prewarm`, not every legacy strategy value, overrides the prewarm flags.** `defer-streaming-ui.md:187-190` says “A legacy `staleStrategy` overrides both prewarm fields.” In `resolveDeferPolicy`, `'none'` is treated as no legacy override; only `'server-prewarm'` forces both fields to `true`. Replace the lead sentence with: “The legacy `staleStrategy: 'server-prewarm'` value overrides both prewarm fields; `'none'` leaves the policy/profile values intact.” The following `staleReloadMode: 'background'` example is correct.
+
+### Gate 2 — bare-Fresh contrast fairness: FAIL
+
+The form comparison is fair: Fresh supplies the request/render primitives, while parsing, schema-error projection, CSRF, repeatable-field identity, and the application mutation remain consumer work. The defer comparison correctly says Fresh does not supply a named cache-freshness policy, but its example invents avoidable transport work.
+
+- **G2-F1 — the bare-Fresh example bypasses the partial mechanism it just credits to Fresh.** `defer-streaming-ui.md:27-43` acknowledges `f-partial` / `f-client-nav`, then uses raw `fetch(...).text()` and says the consumer owns the HTML swap. A normal Fresh implementation can render a hidden GET form carrying `f-partial`, call `requestSubmit()` when stale, and let Fresh perform the named partial swap—the same transport shape `DeferPage` uses. Replace the raw fetch/text/swap portion with a form ref plus `requestSubmit()`, return that hidden `f-partial` form from the island, and change “client refetch” in the cost discussion to “client partial submission.” The real contrast remains intact: bare Fresh still leaves the stale window, server-prewarm/client-submit coordination, and policy vocabulary to the application.
+
+### Gate 3 — cross-links and navigation: PASS
+
+- `storefront/06-storefront-ui.md` links to `/web-layer/form/`; the built target exists.
+- `live-dashboard/04-definePage-QueryIsland.md` links to `/web-layer/defer-streaming-ui/`; the built target exists.
+- Both pages retain sibling front matter (`layout`, `templateEngine`) and the existing web-layer order (`form` 5, defer/streaming 6); these were in-place pages, so no new nav entry was required.
+- Site build: **PASS**, 607 files generated.
+- Site link gate: **PASS**, 31,662 internal links across 217 pages all resolve.
+- Changed-line internal-wording and versionless-specifier scans found no public leakage or new bare pinnable `jsr:@netscript/*` specifier.
+
+### Gate 4 — prose register: PASS
+
+The mechanism-led explanations, contract boundaries, tables, and decision guidance are consistent with `explanation/contracts.md`. The two “What to watch for” sections are compact consequence summaries rather than filler checklists, and the server-round-trip versus island-mutation guidance is concrete. No prose-only rewrite is warranted; the Gate 1 and Gate 2 replacements above are accuracy/fairness corrections.
+
+### Batch 3 gate log
+
+| Gate | Commands / source | Scope | Result | Findings | Proceeded |
+|---|---|---|---|---|---|
+| Mechanism/API accuracy | Focused reads of `define-page/builder/mod.tsx`, `form-support.ts`, form runtime/schema/descriptor sources, `Deferred.tsx`, `DeferPage.tsx`, `DeferIsland.tsx`, `policy.ts`, telemetry, and define-page runtime; `deno eval --no-lock` policy + Zod controls; three `deno check --no-lock` negative fixtures; focused form/defer tests | All changed D8/D9 mechanism and API claims, especially policy precedence and Zod 4 derivation | **FAIL** | Three form inaccuracies and one overbroad legacy-strategy sentence; advertised defect controls otherwise reproduced | Flagged with exact replacements |
+| Bare-Fresh fairness | Fresh 2 partial attributes/runtime behavior, current page examples, and `DeferPage`'s own ordinary hidden-form transport | Both “What bare Fresh makes you write” sections | **FAIL** | Defer example unnecessarily uses raw HTML fetch/swap instead of Fresh partial submission | Flagged with exact replacement shape |
+| Cross-links/nav | `cd docs/site && deno task build`; `cd docs/site && deno task check:links`; built targets, front matter, orders, changed-line scans | Changed pages and two tutorial cross-links; full generated site | **PASS** | 607 files; 31,662 links across 217 pages resolve | Proceeded |
+| Prose register | Comparison with `docs/site/explanation/contracts.md` | `form.md`, `defer-streaming-ui.md`, and added tutorial transitions | **PASS** | No filler or prose-only checklist finding | Proceeded |
+
+Test note: the first combined focused test command passed all 29 form/Deferred tests but the `DeferIsland` module setup lacked `--allow-env`; rerunning that file with `--allow-env` passed all 4 tests. This was a command-permission correction, not a product failure.
+
+### Batch 3 verdict
+
+**FAIL_FIX.** Correct G1-F1 through G1-F4 and rebuild the bare-Fresh defer example per G2-F1. The remaining form runtime, defer-policy, transport, observability, streaming, composition, cross-link/navigation, and prose-register claims pass.
+
+### Batch 3 re-audit
+
+- **Fix commit:** `445dfbf37`
+- **Per-finding disposition:**
+
+| Batch 3 finding | Status | Re-audit evidence |
+|---|---|---|
+| G1-F1 — intent branch said validation never runs | **FIXED** | `form.md:147-156` now distinguishes evaluation from enforcement: `parseFormSubmission` has already run `schema.safeParse`, while the intent branch returns before the validation result is enforced. This matches `validation/pipeline.ts` and `form-support.ts` ordering. |
+| G1-F2 — `RuntimeFormState` member count was seventeen | **FIXED** | `form.md:173-185` now says sixteen, and its grouped table totals sixteen, matching the sixteen interface members in `_internal/runtime-types.ts`. The prior count came from counting the interface's descriptive “readonly” wording as well as its members. |
+| G1-F3 — page claimed a component can render `onSuccess.message` | **FIXED** | `form.md:192-197` now says `RuntimeFormState` exposes neither a success flag nor success message, identifies that `resolveRuntimeFormState` omits `message`, `status`, and `output`, preserves the real `nextValues` rebasing behavior, and recommends a redirect or application-owned feedback channel. |
+| G1-F4 — every legacy `staleStrategy` value said to override prewarm flags | **FIXED** | `defer-streaming-ui.md:197-207` now limits the override to `'server-prewarm'`, states that `'none'` is `DeferPage`'s default and preserves policy/profile values, and accurately notes that the active override beats even explicitly false `prewarmOnMiss` / `prewarmOnStale` values. This matches the independent precedence control. |
+| G2-F1 — bare-Fresh contrast invented raw HTML fetch/swap work | **FIXED** | `defer-streaming-ui.md:25-78` now credits Fresh for the transport, renders a hidden GET form with `f-partial` / `f-client-nav`, and calls `requestSubmit()` on staleness—the same shape used in `DeferIsland.tsx`. An independent fixture passed `deno check --no-lock` with Fresh's JSX augmentation (an explicit return type was added only to satisfy this repository's unrelated workspace-wide `isolatedDeclarations` rule). The remaining contrast is fair: freshness and server/client coordination are still application policy. |
+
+**Final Batch 3 verdict after `445dfbf37`: PASS.** All five Batch 3 findings are fixed; no open mechanism/API-accuracy, bare-Fresh fairness, cross-link/navigation, or prose-register finding remains.

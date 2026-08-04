@@ -476,3 +476,41 @@ they land.
 - The benchmark's only CONFIRMED peer story for D3 (SvelteKit form actions) informed the framing —
   server-validated round trip with progressive enhancement as the default, island mutation as the
   exception — but no competitor is named in the page, matching the register of the other deep-dives.
+
+## Batch 3 fix round
+
+Audit: `.llm/runs/docs-mainpages--orchestrator/slices/deepdives-audit/audit.md` `## Batch 3 audit` —
+verdict FAIL_FIX, five items (G1-F1…G1-F4 plus the G2-F1 example rebuild). Each was re-verified
+against source before being applied; none was rebutted.
+
+Commit `445dfbf37`, pushed to `docs/web-layer-deep-dives`.
+
+### Per-finding disposition
+
+| Finding | Verified how | Disposition |
+|---|---|---|
+| **G1-F1** the intent branch does not skip validation | `validation/pipeline.ts:237` — `parseFormSubmission` awaits `adapter.safeParse(values)` before returning, and `form-support.ts:97` inspects `parsed.intent` only afterwards. My own step 2 already said the parse stage runs `schema.safeParse`, so step 4 contradicted it | **Accepted.** Step 4 now reads "The schema has already been evaluated during parsing, but this branch returns before the validation result is enforced." |
+| **G1-F2** sixteen members, not seventeen | `awk '/^export interface RuntimeFormState/,/^}/' … \| grep -c 'readonly '` → **16**. The "17" came from the S1 inventory, which counted `readonly` *occurrences*: the `formErrors: readonly string[]` line contains two. My own grouping table already listed 4+2+3+2+5 = 16 | **Accepted.** "Seventeen" → "Sixteen"; the table was already correct. |
+| **G1-F3** `onSuccess`'s `message` is not readable from `RuntimeFormState` | `awk '/^export function resolveRuntimeFormState/,/^}/' … \| grep -nE 'message\|status\|output'` returns only the `data.status === 'success'` discriminator reads at lines 25 and 28 — `message` and `output` never appear, and neither is in the returned object | **Accepted.** The paragraph now states that no success flag or message exists in the props, names `nextValues` as what does survive, and directs readers to a redirect or an application-owned channel. |
+| **G1-F4** only `'server-prewarm'` overrides the prewarm fields | `policy.ts:158` — `hasLegacyStrategy = staleStrategy !== undefined && staleStrategy !== 'none'`, and `LegacyStaleStrategy` is `'none' \| 'server-prewarm'`. `'none'` is also `DeferPage`'s default, so the overbroad sentence was wrong in the common case | **Accepted, and extended.** The bullet now names `'server-prewarm'` explicitly, states that `'none'` (the default) leaves policy and profile intact, and — per the audit's own control (`low-bandwidth` + explicit `false` flags + `server-prewarm` → both `true`) — records that when it does apply it beats an explicitly-set `prewarmOnMiss`/`prewarmOnStale`, not just the profile. |
+| **G2-F1** the bare-Fresh defer example bypasses the partial mechanism it credits to Fresh | Same class as batch 2's G2-F1. `DeferIsland.tsx:216-236` shows the ordinary shape — a hidden `method='GET'` form with `f-partial` / `f-client-nav` and `requestSubmit()` — which is available to any bare-Fresh author | **Accepted.** The island now holds a form ref, calls `requestSubmit()` when stale, and returns the hidden `f-partial` form; the raw `fetch(...).text()` and the invented hand-owned swap are gone. The lead-in now says Fresh gives you the transport and withholds the decision, a new line states "The swap itself is fine — Fresh owns it", and the second cost reads "client partial submission". The three costs are unchanged in substance: the stale window is still a magic number in two files, prewarm and submission still do not know about each other, and there is still no policy vocabulary. |
+
+Nothing was rebutted. The one "refetch" left on the page (line 13, "a refetch is correct but
+visible") describes the general freshness tradeoff in the opening, not the bare-Fresh mechanism, and
+was deliberately left.
+
+### Gate results after the fix
+
+| Gate | Command | Result |
+|---|---|---|
+| Site build | `cd docs/site && deno task build` | PASS — 607 files |
+| Site links | `cd docs/site && deno task check:links` | PASS — 31662 internal links across 217 pages, all resolve |
+| Caveat refs | `cd docs/site && deno task check:caveats` | PASS — 27 markers across 22 pages |
+| Rebuilt bare-Fresh example | `deno check --unstable-kv --no-lock --config <scratch>/deno.json probe-bare-defer.tsx` | PASS — `f-partial` / `f-client-nav` on a `<form>` and `formRef.current?.requestSubmit()` all type-check under Fresh's JSX augmentation (`import 'fresh/runtime'`). The previous raw-fetch version was never checkable, so this is strictly better evidence |
+| Vento leakage | grep for unrendered `{{ … }}` in both built pages | none — the `style` object was hoisted to a const to avoid the double-brace collision |
+| Rendered spot-check | `grep -c requestSubmit` / `grep -c "Sixteen readonly members"` in `_site` | 2 / 1 |
+| Lock hygiene | `git checkout HEAD -- deno.lock`; `git status` | clean — only the two intended docs files in the commit |
+
+The G1 fixes were prose-only, so no previously-checked NetScript example changed; the D3/D5 example
+fixtures from the first round remain valid. Scratch fixtures deleted; nothing added under
+`packages/`.
