@@ -107,3 +107,13 @@
   earlier by the 0.0.5 orchestrator — both docs work PRs of this run are on main.
 - Still open: PR #1217 (claude-openrouter launcher) awaiting Sol review verdict; Charter B
   phases 2 (#1208 sweep) and 3 (#1210 deep-dives) not yet dispatched.
+
+## 2026-08-04 — #1217 fix round + Charter B P2 dispatched
+
+- Sol review of #1217: FIX_FIRST (1 blocking: credential isolation must reuse the canonical
+  provider-environment policy; 2 major: tee-failure child handling, shallow tests; 1 minor).
+  Fix round routed back to the Opus builder with the review file.
+- Charter B P2 (#1208 phase 2) dispatched: Opus docs-exception agent sweeping all tutorial
+  tracks in /home/codex/repos/ns-tutsweep (branch docs/tutorials-sweep off post-merge main)
+  for post-rewrite inconsistencies, underleverage, and cross-track drift; findings-first
+  method, deferred items route to #1210. P3 (#1210 deep-dives) follows after P2 review.
