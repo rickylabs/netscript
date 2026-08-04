@@ -32,3 +32,13 @@
   on `msgpackr-extract@3.0.4/.scripts-warned-*`; executable fixtures now include the marker while
   still failing for a missing real Babel file.
 - **Scope impact:** no acceptance reduction; removes a false positive discovered by consumer proof.
+
+### Evaluator route guard recovery
+
+- **Expected:** formal IMPL-EVAL runs in a separate open-model Qwen session.
+- **Actual:** the Qwen evaluator initially attempted a closed-model delegated subtask. The runtime
+  guard denied that request before it ran.
+- **Disposition:** resumed the same `qwen/qwen3.7-max` session with delegation prohibited; it
+  completed the direct evaluation and recorded `PASS`. A narrow follow-up corrected non-gating
+  folder-cardinality wording in the artifact.
+- **Scope impact:** none; evaluator independence and the required open-model route were preserved.

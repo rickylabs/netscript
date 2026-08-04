@@ -27,6 +27,8 @@ ready augmentation, OpenHands evaluation, and orchestrator pre-merge gate descri
 
 ## Current state
 
-- Phase: implementation complete; draft-to-ready evaluation handoff
-- Next: augment/OpenHands/orchestrator review composed per milestone D6
+- Phase: formal IMPL-EVAL complete — `PASS`
+- Evaluator route: `qwen/qwen3.7-max`, high effort, session
+  `ef9775bb-95fe-422c-9507-602dba016727`
+- Next: publish the IMPL-EVAL phase comment and hand the ready PR to the milestone orchestrator
 - Merge authority: milestone orchestrator

@@ -68,3 +68,17 @@
 
 WSL/Linux consumer proof is green, but it is not native Windows evidence. The PR therefore retains
 `Refs #1246` and defers native Windows no-intervention startup plus Windows CI to 0.0.6/upstream.
+
+## 2026-08-04 — formal IMPL-EVAL
+
+- Launched the required separate evaluator through the local Claude/OpenRouter transport with
+  `qwen/qwen3.7-max`, high effort, session `ef9775bb-95fe-422c-9507-602dba016727`.
+- The evaluator's first turn attempted to delegate to a closed Claude model; the open-model request
+  guard denied it before execution. The same Qwen session resumed without delegation and performed
+  the evaluation directly.
+- The evaluator independently reran scoped static gates, focused tests, inspected the diff, PR
+  metadata, consumer wiring, doctrine fitness gates, and recorded `PASS` in `evaluate.md`.
+- Supervisor audit found one non-gating wording error claiming no sibling files were added. The same
+  evaluator session corrected F-16/AP-16 to the actual folder cardinality and retained `PASS`.
+- No evaluator source mutation occurred. The unrelated pre-existing `deno.lock` change remains
+  unstaged and untouched by this run.
