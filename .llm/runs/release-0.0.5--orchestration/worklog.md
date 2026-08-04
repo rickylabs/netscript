@@ -738,3 +738,15 @@ a narrative-consistency constraint optimizes for box-ticking over truth — the 
 of gates that pass without firing. Corrected bar relayed to docsorch: demonstrate only where
 the narrative calls for it; homeless features route to #1210's per-API deep-dives; slop-audit
 of the existing diff first.
+
+### Finding 24 [orchestrator-skipped-documented-launch-surface]
+
+The first docsorch launch violated the claude-manager skill on three counts: wrong effort
+(session default xhigh instead of the owner-specified low), acceptEdits instead of the
+documented bypassPermissions for the trusted agentic environment, and an improvised tmux+CLI
+shape instead of `claude --bg` — the skill's own rule "check `--help` before relying on
+remembered CLI flags" names the exact failure. Owner stopped the session. Relaunched per the
+documented shape: `claude --bg --model fable --effort low --permission-mode bypassPermissions`
+→ session `0a6865da`, slop-correction included in kickoff. Lesson for #1163: the orchestrator
+is not exempt from the read-the-skill-first rule it enforces on every slice — the launch
+surfaces it uses rarely are precisely the ones where remembered flags rot.
