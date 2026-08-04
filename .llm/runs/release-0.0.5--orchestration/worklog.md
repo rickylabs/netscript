@@ -1660,3 +1660,31 @@ canary.10; I own deciding the train.
 - Near-miss worth recording: I nearly reported "the #1240 port sweep missed .vto templates"
   from my local tree. On `origin/main` zero .vto files carry stale ports — my worktree was
   stale again (finding 35 class). Verified before reporting; no defect.
+
+## 2026-08-04 — Finding 37 CORRECTED; #1287 pulled into 0.0.5; docsorch owns the Quickstart page
+
+- **My finding-37 scope rule was wrong and blocked a real deliverable.** I told the docs lane
+  "never `.llm/`" and reverted its tooling. But the doctrine line in CLAUDE.md is *"authoring
+  touches no `packages/`/`plugins/` source code"* — `.llm/tools/` is harness tooling, not
+  framework source, and **#1108's acceptance explicitly requires a deterministic drift check**.
+  My over-correction deleted exactly what the issue demanded. Restored
+  `.llm/tools/docs/check-exports-drift.ts` (+ negative-fixture test): test passes, and the
+  checker **passes repo-wide** on a real run. **Finding 37 (revised): the mechanical scope
+  check is `--name-only | grep -E '^(packages|plugins)/'` must be empty — that is the doctrine
+  boundary. Harness tooling is permitted. A brief that is stricter than doctrine will make
+  agents revert work their own acceptance requires.** The adapter-source change remains a
+  genuine violation and stays split to #1293.
+- **#1108 downgraded to `Refs`** after checking delivery honestly: nine reference surfaces
+  repaired (ai, config, contracts, plugin, prisma-adapter-mysql, queue, sdk, service,
+  telemetry) but not Fresh UI, and two rows (machine-readable omissions, maintainer runbook)
+  undelivered. #1292 now closes only #1110 and #1116. Four #1108 boxes ticked with the
+  checker as cited evidence.
+- **#1287 moved 0.0.6 → 0.0.5 and dispatched** (cachetiers lane — the #1252 seam owner): a
+  fresh workspace fails its own `deno task check` on `QueryClientPort` vs `QueryClient`, which
+  red-lines the pilot bar's zero-errors box. Same precedent as #1290. Brief prefers the
+  STRUCTURAL fix, since this is the same seam #1278 names as its sharpest exemplar (the
+  documented `as unknown as IslandQueryClient` cast) — fixing it soundly retires both; papering
+  over the showcase retires neither.
+- **Owner: docsorch already owns the Quickstart page** (#1274 rewrite, PR #1215). No overlap —
+  #1294 is the executable walk *gate* against the published CLI, and its page↔suite drift check
+  is precisely what binds the two halves. Recorded so the split stays explicit.
