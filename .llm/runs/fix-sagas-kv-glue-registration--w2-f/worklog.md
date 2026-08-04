@@ -79,6 +79,7 @@ semantic install-artifact assertions live in the adjacent `resources.test.ts`.
 | 2026-08-04 | 4 | full-suite downstream RED | Clean reruns passed every saga wait and reached 51 passing gates, then failed only `behavior.service-health` after DB/AppHost endpoint churn. |
 | 2026-08-04 | 4 | blocker proved | Live healthy Postgres moved to port 44973 while the users Prisma client still queried port 50564; direct `/health` returned the full 503 artefact. This is outside #1184 and the PR remains draft/CI-fail. |
 | 2026-08-04 | 4 | final hygiene | `aspire ps` returned `[]`; final leak-check reports no owned survivor and leaves two foreign wave-4 Postgres containers untouched. |
+| 2026-08-04 | 4 | orchestrator steer acknowledged | Hold PR #1193 draft; do not rerun the expensive gate. Wait for #1190 to merge, rebase onto `main`, then perform one joint `scaffold.runtime` + seven-point lifecycle verification on Redis/Garnet and Deno KV before draft→ready. |
 
 ## Decisions
 
@@ -390,3 +391,20 @@ Postgres containers, and the two foreign containers reported by leak-check were 
 
 - Inspect the emitted artefact tests, saga-only health wiring, backend-aware KV bootstrap, and the
   seven owner-protocol evidence blocks. Published-package confirmation remains canary point 2.
+
+## Orchestrator Steer Acknowledgment — 2026-08-04
+
+Acknowledged and locked:
+
+1. PR #1193 remains draft at `status:ci-fail`; no `scaffold.runtime` rerun and no expensive-slot
+   consumption while the dedicated #1190 slice is active.
+2. Rebase `fix/sagas-kv-glue-registration` onto `main` only after the orchestrator explicitly
+   confirms #1190 has merged.
+3. Run one joint verification after that rebase: the exact one-pass `scaffold.runtime` suite plus
+   this slice's complete seven-point lifecycle protocol on both default Redis/Garnet and explicit
+   `CACHE_PROVIDER=denokv`.
+4. Treat that single green run as the shared local evidence for #1184 and #1190. If clean-run DB
+   endpoint churn recurs, capture old/new ports, `aspire describe` output, and both AppHost
+   identities as possible #1196-family evidence and stop rather than retrying.
+5. Only after the joint evidence is green: complete draft→ready and hand off. The orchestrator
+   retains expensive-gate coordination and merge authority.

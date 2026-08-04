@@ -114,3 +114,22 @@ Drift is append-only.
 - **Action:** escalate
 - **Evidence:** Do not mark the PR ready or claim a green expensive gate. Fixing DB-operation AppHost
   resource churn is materially outside #1184 and requires owner/orchestrator direction.
+
+## 2026-08-04 — Orchestrator joins #1184 verification with #1190 delivery
+
+- **What:** Final merge-readiness verification for this slice is deferred until the dedicated
+  #1190 saga-publish delivery slice merges to `main`; both defects must be proven together in the
+  same canary train because a runner that starts but never delivers is not a working surface.
+- **Source:** Orchestrator steer after accepting this slice's recorded seven-point protocol and
+  classifying the 51/1 suite result as environmental DB/endpoint churn rather than a #1184 defect.
+- **Expected:** This slice would independently clear `scaffold.runtime`, transition draft→ready,
+  and hand off after its own runtime proof.
+- **Actual:** PR #1193 must remain draft and must not consume the coordinated expensive-gate slot.
+  After explicit notification that #1190 has merged, rebase onto `main` and run one joint
+  verification: the one-pass `scaffold.runtime` suite plus the full seven-point lifecycle on both
+  default Redis/Garnet and `CACHE_PROVIDER=denokv`.
+- **Severity:** significant / sequencing change
+- **Action:** accept and hold
+- **Evidence:** If DB endpoint churn recurs on that single clean rerun, capture ports, both AppHost
+  identities, and `aspire describe` output as possible #1196-family evidence; do not retry. Only
+  after the joint run is green may this slice complete draft→ready and hand off.
