@@ -371,3 +371,46 @@ documentation.
   evidence.
 - **Evidence:** maintainer init command/orchestration tests; final 605-test package pass; final live
   sqlite runtime pass.
+
+## 2026-08-04 — D-16 postgres merge-bar regression FAILED at `behavior.service-health` (OPEN)
+
+- **What:** The supervisor's `scaffold.runtime` (postgres) merge-bar run finished
+  `passed=51 failed=1`. The failure is `behavior.service-health`:
+
+  ```
+  service health probe failed for users:
+    https://localhost:44677/health -> 0: fetch failed;
+    http://localhost:3001/health  -> 503: {"status":"unhealthy", checks:[{"name":"database","healthy":false,
+        "message":"Invalid `prisma.$queryRaw()` invocation: Raw query failed…"}]};
+    http://localhost:46435/health -> 200: Healthy
+  ```
+
+- **Why it matters twice over:** (1) it is the **merge bar**, so the PR cannot be called merge-ready
+  until it is green; (2) it is the **same `$queryRaw` failure** that S7 attributed to libSQL alone
+  when excluding this gate from the sqlite tier (drift D-15). Seeing it on **postgres** means D-15's
+  rationale may be narrower than the real defect, and that must be resolved rather than assumed.
+- **What is already established:**
+  - This branch **provably does not change postgres generated output**. The register-generator
+    change branches only on `databaseEngine === 'Sqlite'`, and S1 landed a test asserting non-sqlite
+    output is byte-identical across `[undefined, 'Postgres', 'Mysql', 'Mssql']`. That test is green
+    in the 605-test package suite.
+  - `git diff c6f243da..HEAD -- packages/cli/src/` touches only the register generators, their
+    types/pipeline, and maintainer init — nothing in `templates/database/**` and nothing in the
+    health-check query path.
+  - No CI baseline is available for comparison: draft PRs run no CI (#1212), and every recent
+    `e2e-cli.yml` run is `skipped`/`cancelled`.
+- **Confounder, stated but NOT used as an excuse:** the machine is running several concurrent e2e
+  suites from other worktrees (`ns005-genjobs`, `ns005-plugrm`, `wave5-sol`, `wave5-deepseek`). The
+  probe resolved **three** endpoints with inconsistent verdicts — one unreachable, one 503, one
+  **200 Healthy** — which is the signature of cross-run port/resource interference. That is a
+  hypothesis, not a finding.
+- **Severity:** significant — blocks the merge-readiness claim.
+- **Action:** **do not mark the PR ready-for-review as merge-bar-green.** Re-run `scaffold.runtime`
+  when the host is quiet and no foreign lease is held. If it fails again in isolation, treat it as
+  either a pre-existing `main` defect (verify by running the same suite at `c6f243da`) or a real
+  regression, and resolve before merge. If it passes in isolation, record the interference and keep
+  the CI run on `ready_for_review` as the authoritative verdict.
+- **Open question this raises for D-15:** if postgres can also fail the same `$queryRaw` health
+  check, the S7 exclusion rationale ("libSQL rejects the tagged form") is at best incomplete. The
+  follow-up issue must cover both engines, not just sqlite.
+- **Evidence:** `.llm/tmp/e2e-report-postgres-regression.json`; the run log; `git diff` scope above.
