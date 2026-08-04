@@ -1752,3 +1752,20 @@ thinking", "agent died mid-work" and "agent never started"; the branch distingui
 command — still on the old branch means the dispatch never took, which points at the launcher or
 the account, not the agent.** This is the second quota exhaustion (D11 was the first) and the
 last reset is now spent; a third has no local cure.
+
+## 2026-08-05 — Post-quota re-dispatch: seven PRs, all pilot blockers covered
+
+Within ~an hour of the reset redemption every dispatched slice produced a PR with correct refs:
+- **#1297** (#1227 restore bounding), **#1298** (#1294 quickstart walk gate), **#1299** (#1290
+  zod barrel contract), **#1300** (#1287 QueryClient seam), **#1301** (#1196 db AppHost
+  squatter), **#1302** (#1219 e2e label churn), **#1303** (#1188 close-gate hole).
+- **#1300 took the STRUCTURAL fix, verified not just claimed:** `createNetScriptQueryClient()`
+  now returns the concrete TanStack `QueryClient`; `QueryClientPort` becomes a
+  `Pick<QueryClient, …>` so its signatures cannot drift from the implementation. Confirmed on
+  the branch that `docs/site/web-layer/query-bridge.md` no longer contains ANY `as unknown as`
+  (was 1) and that the TS2551/TS2345 concession block is deleted. It ticks #1278 inventory A.1
+  with a citation and explicitly makes **no** closure claim on the umbrella — the honest shape.
+  The sharpest type-soundness exemplar I filed hours ago is retired by the next slice.
+- **#1303 is gated differently on purpose**: it modifies the close-gate itself, the mechanism
+  every other merge depends on, so its waiter reports instead of auto-merging — I read the diff
+  before letting it change the rules I gate by.
