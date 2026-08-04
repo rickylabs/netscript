@@ -1,0 +1,164 @@
+{
+  "logs": [
+    {
+      "resourceName": "sagas-api",
+      "content": "Waiting for resource 'postgres' to enter the 'Running' state.",
+      "isError": false
+    },
+    {
+      "resourceName": "sagas-api",
+      "content": "Waiting for resource 'saga-1223-denokv-db' to enter the 'Running' state.",
+      "isError": false
+    },
+    {
+      "resourceName": "sagas-api",
+      "content": "Waiting for resource 'postgres' to become healthy.",
+      "isError": false
+    },
+    {
+      "resourceName": "sagas-api",
+      "content": "Waiting for resource 'saga-1223-denokv-db' to become healthy.",
+      "isError": false
+    },
+    {
+      "resourceName": "sagas-api",
+      "content": "Waiting for resource ready to execute for 'postgres'.",
+      "isError": false
+    },
+    {
+      "resourceName": "sagas-api",
+      "content": "Waiting for resource ready to execute for 'saga-1223-denokv-db'.",
+      "isError": false
+    },
+    {
+      "resourceName": "sagas-api",
+      "content": "Finished waiting for resource 'saga-1223-denokv-db'.",
+      "isError": false
+    },
+    {
+      "resourceName": "sagas-api",
+      "content": "Finished waiting for resource 'postgres'.",
+      "isError": false
+    },
+    {
+      "resourceName": "sagas-api",
+      "content": "[sys] Starting process...: Cmd = /home/codex/.deno/bin/deno, Args = [\"run\", \"--config\", \"deno.json\", \"--minimum-dependency-age=0\", \"--unstable-no-legacy-abort\", \"--node-modules-dir=none\", \"--unstable-kv\", \"--allow-all\", \"jsr:@netscript/plugin-sagas@0.0.4/services\"]",
+      "isError": false
+    },
+    {
+      "resourceName": "sagas-api",
+      "content": "Warning The following peer dependency issues were found:",
+      "isError": true
+    },
+    {
+      "resourceName": "sagas-api",
+      "content": "└─┬ @tanstack/ai-preact@0.10.4",
+      "isError": true
+    },
+    {
+      "resourceName": "sagas-api",
+      "content": "  └── peer @tanstack/ai@^0.41.0: resolved to 0.39.1",
+      "isError": true
+    },
+    {
+      "resourceName": "sagas-api",
+      "content": "",
+      "isError": true
+    },
+    {
+      "resourceName": "sagas-api",
+      "content": "These packages were resolved to a version that does not satisfy a peer dependency constraint, which can cause runtime errors. To silence this warning, install a compatible version or add an \"overrides\" entry to your package.json or deno.json.",
+      "isError": true
+    },
+    {
+      "resourceName": "sagas-api",
+      "content": "Learn more: https://docs.deno.com/go/peer-deps",
+      "isError": true
+    },
+    {
+      "resourceName": "sagas-api",
+      "content": "12:08:26.370 INF netscript·services·sagas Service listening",
+      "isError": false
+    },
+    {
+      "resourceName": "sagas-api",
+      "content": "12:08:26.559 DBG netscript·packages·kv CACHE_PROVIDER forced Deno KV",
+      "isError": false
+    },
+    {
+      "resourceName": "sagas-api",
+      "content": "12:08:26.561 INF netscript·packages·kv Initializing shared Deno KV adapter",
+      "isError": false
+    },
+    {
+      "resourceName": "sagas-api",
+      "content": "[Sagas API] Saga Prisma delegates unavailable; KV runtime continues without DB query projections.",
+      "isError": true
+    },
+    {
+      "resourceName": "sagas-api",
+      "content": "[Sagas API] Running on http://localhost:45923",
+      "isError": false
+    },
+    {
+      "resourceName": "sagas-api",
+      "content": "12:09:03.670 INF netscript·services·sagas HTTP request started",
+      "isError": false
+    },
+    {
+      "resourceName": "sagas-api",
+      "content": "12:09:03.696 INF netscript·services·sagas HTTP request completed",
+      "isError": false
+    },
+    {
+      "resourceName": "sagas-api",
+      "content": "12:09:03.707 INF netscript·services·sagas HTTP request started",
+      "isError": false
+    },
+    {
+      "resourceName": "sagas-api",
+      "content": "12:09:03.714 INF netscript·services·sagas HTTP request completed",
+      "isError": false
+    },
+    {
+      "resourceName": "sagas-api",
+      "content": "12:09:03.726 INF netscript·services·sagas HTTP request started",
+      "isError": false
+    },
+    {
+      "resourceName": "sagas-api",
+      "content": "12:09:03.732 INF netscript·services·sagas HTTP request completed",
+      "isError": false
+    },
+    {
+      "resourceName": "sagas-api",
+      "content": "12:09:03.742 INF netscript·services·sagas HTTP request started",
+      "isError": false
+    },
+    {
+      "resourceName": "sagas-api",
+      "content": "12:09:03.748 INF netscript·services·sagas HTTP request completed",
+      "isError": false
+    },
+    {
+      "resourceName": "sagas-api",
+      "content": "12:09:08.762 INF netscript·services·sagas HTTP request started",
+      "isError": false
+    },
+    {
+      "resourceName": "sagas-api",
+      "content": "12:09:08.766 INF netscript·services·sagas HTTP request completed",
+      "isError": false
+    },
+    {
+      "resourceName": "sagas-api",
+      "content": "12:09:08.778 INF netscript·services·sagas HTTP request started",
+      "isError": false
+    },
+    {
+      "resourceName": "sagas-api",
+      "content": "12:09:08.780 INF netscript·services·sagas HTTP request completed",
+      "isError": false
+    }
+  ]
+}

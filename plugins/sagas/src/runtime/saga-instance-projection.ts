@@ -81,6 +81,7 @@ export class PrismaSagaInstanceProjection implements SagaInstanceProjectionPort 
   /** Upsert a stable row keyed by saga definition and engine instance id. */
   async upsert(projection: SagaInstanceProjection): Promise<void> {
     const state = projectionState(projection);
+    const dates = projectionDates(projection.envelope.metadata);
     const create = {
       id: projection.instanceId,
       sagaName: projection.sagaId,
@@ -88,8 +89,8 @@ export class PrismaSagaInstanceProjection implements SagaInstanceProjectionPort 
       version: projection.envelope.metadata.version,
       isCompleted: projection.envelope.metadata.status === 'completed',
       state,
-      createdAt: projection.envelope.metadata.createdAt,
-      updatedAt: projection.envelope.metadata.updatedAt,
+      createdAt: dates.createdAt,
+      updatedAt: dates.updatedAt,
     };
     await this.#prisma.sagaInstance.upsert({
       where: {
@@ -104,7 +105,7 @@ export class PrismaSagaInstanceProjection implements SagaInstanceProjectionPort 
         version: projection.envelope.metadata.version,
         isCompleted: projection.envelope.metadata.status === 'completed',
         state,
-        updatedAt: projection.envelope.metadata.updatedAt,
+        updatedAt: dates.updatedAt,
       },
     });
   }
@@ -183,6 +184,7 @@ export class ProjectingSagaStore implements SagaStorePort {
 
 function projectionState(projection: SagaInstanceProjection): Readonly<Record<string, unknown>> {
   const { metadata } = projection.envelope;
+  const dates = projectionDates(metadata);
   return Object.freeze({
     ...projection.envelope.state,
     sagaId: projection.sagaId,
@@ -196,9 +198,9 @@ function projectionState(projection: SagaInstanceProjection): Readonly<Record<st
       version: metadata.version,
       status: metadata.status,
       durability: metadata.durability,
-      createdAt: metadata.createdAt.toISOString(),
-      updatedAt: metadata.updatedAt.toISOString(),
-      completedAt: metadata.completedAt?.toISOString(),
+      createdAt: dates.createdAt.toISOString(),
+      updatedAt: dates.updatedAt.toISOString(),
+      completedAt: dates.completedAt?.toISOString(),
       traceparent: metadata.traceparent,
       tracestate: metadata.tracestate,
     },
@@ -207,6 +209,7 @@ function projectionState(projection: SagaInstanceProjection): Readonly<Record<st
 
 function readModel(projection: SagaInstanceProjection): SagaInstanceReadModel {
   const metadata = projection.envelope.metadata;
+  const dates = projectionDates(metadata);
   return Object.freeze({
     sagaName: projection.sagaId,
     sagaId: projection.sagaId,
@@ -215,11 +218,39 @@ function readModel(projection: SagaInstanceProjection): SagaInstanceReadModel {
     correlationKey: projection.correlationKey,
     state: projectionState(projection),
     status: metadata.status,
-    createdAt: metadata.createdAt.toISOString(),
-    updatedAt: metadata.updatedAt.toISOString(),
-    completedAt: metadata.completedAt?.toISOString(),
+    createdAt: dates.createdAt.toISOString(),
+    updatedAt: dates.updatedAt.toISOString(),
+    completedAt: dates.completedAt?.toISOString(),
     version: metadata.version,
     messageCount: metadata.version,
     lastMessageType: projection.transition.transition.message.type,
   });
+}
+
+function projectionDates(metadata: SagaStateEnvelope['metadata']): Readonly<{
+  createdAt: Date;
+  updatedAt: Date;
+  completedAt?: Date;
+}> {
+  return Object.freeze({
+    createdAt: revivePersistedDate(metadata.createdAt, 'createdAt'),
+    updatedAt: revivePersistedDate(metadata.updatedAt, 'updatedAt'),
+    completedAt: metadata.completedAt === undefined
+      ? undefined
+      : revivePersistedDate(metadata.completedAt, 'completedAt'),
+  });
+}
+
+function revivePersistedDate(value: unknown, field: string): Date {
+  const revived = value instanceof Date
+    ? value
+    : typeof value === 'string'
+    ? new Date(value)
+    : null;
+  if (revived === null || Number.isNaN(revived.getTime())) {
+    throw new TypeError(
+      `Saga projection metadata.${field} must be a valid Date or persisted date string.`,
+    );
+  }
+  return revived;
 }

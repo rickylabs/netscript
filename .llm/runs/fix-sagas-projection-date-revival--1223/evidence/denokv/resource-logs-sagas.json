@@ -1,0 +1,89 @@
+{
+  "logs": [
+    {
+      "resourceName": "sagas",
+      "content": "Waiting for resource 'postgres' to enter the 'Running' state.",
+      "isError": false
+    },
+    {
+      "resourceName": "sagas",
+      "content": "Waiting for resource 'saga-1223-denokv-db' to enter the 'Running' state.",
+      "isError": false
+    },
+    {
+      "resourceName": "sagas",
+      "content": "Waiting for resource 'postgres' to become healthy.",
+      "isError": false
+    },
+    {
+      "resourceName": "sagas",
+      "content": "Waiting for resource 'saga-1223-denokv-db' to become healthy.",
+      "isError": false
+    },
+    {
+      "resourceName": "sagas",
+      "content": "Waiting for resource ready to execute for 'postgres'.",
+      "isError": false
+    },
+    {
+      "resourceName": "sagas",
+      "content": "Waiting for resource ready to execute for 'saga-1223-denokv-db'.",
+      "isError": false
+    },
+    {
+      "resourceName": "sagas",
+      "content": "Finished waiting for resource 'saga-1223-denokv-db'.",
+      "isError": false
+    },
+    {
+      "resourceName": "sagas",
+      "content": "Finished waiting for resource 'postgres'.",
+      "isError": false
+    },
+    {
+      "resourceName": "sagas",
+      "content": "[sys] Starting process...: Cmd = /home/codex/.deno/bin/deno, Args = [\"run\", \"--minimum-dependency-age=0\", \"--node-modules-dir=none\", \"--unstable-worker-options\", \"--unstable-kv\", \"--allow-all\", \"--watch\", \"sagas/runtime.ts\"]",
+      "isError": false
+    },
+    {
+      "resourceName": "sagas",
+      "content": "Watcher Process started.",
+      "isError": true
+    },
+    {
+      "resourceName": "sagas",
+      "content": "Warning The following peer dependency issues were found:",
+      "isError": true
+    },
+    {
+      "resourceName": "sagas",
+      "content": "└─┬ @tanstack/ai-preact@0.10.4",
+      "isError": true
+    },
+    {
+      "resourceName": "sagas",
+      "content": "  └── peer @tanstack/ai@^0.41.0: resolved to 0.39.1",
+      "isError": true
+    },
+    {
+      "resourceName": "sagas",
+      "content": "",
+      "isError": true
+    },
+    {
+      "resourceName": "sagas",
+      "content": "These packages were resolved to a version that does not satisfy a peer dependency constraint, which can cause runtime errors. To silence this warning, install a compatible version or add an \"overrides\" entry to your package.json or deno.json.",
+      "isError": true
+    },
+    {
+      "resourceName": "sagas",
+      "content": "Learn more: https://docs.deno.com/go/peer-deps",
+      "isError": true
+    },
+    {
+      "resourceName": "sagas",
+      "content": "Listening on http://0.0.0.0:45765/ (http://localhost:45765/)",
+      "isError": true
+    }
+  ]
+}
