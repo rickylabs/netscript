@@ -409,3 +409,39 @@ Acknowledged and locked:
    identities as possible #1196-family evidence and stop rather than retrying.
 5. Only after the joint evidence is green: complete draft→ready and hand off. The orchestrator
    retains expensive-gate coordination and merge authority.
+
+## 2026-08-04 — joint protocol handoff: stopped on baseline endpoint churn
+
+The daemon-resume run reclaimed the explicitly assigned AppHost slot by stopping only the exact,
+stale S7 AppHosts (36–38 minutes old), then verified their four recorded PIDs were absent and
+`aspire ps --format Json` was `[]`. A fresh local-source Redis/Garnet scaffold was generated from
+the rebased branch. Its emitted `sagas/runtime.ts` imports `@netscript/kv/redis`; its generated
+registry contains both the sample saga and `issue1184-protocol`; scoped format/check passed.
+
+The protocol then hit the steer-defined environmental stop condition before saga resources could
+start. Quoted artefacts:
+
+```text
+AppHost: /home/codex/repos/ns005-sagas/.llm/tmp/1184-joint/redis-local/saga-joint-redis-local/aspire/apphost.mts
+CLI PID: 778827; AppHost PID: 778859; dashboard: https://localhost:45843
+Docker: {"5432/tcp":[{"HostIp":"127.0.0.1","HostPort":"45117"}]}
+Docker port: 5432/tcp -> 127.0.0.1:45117
+[postgres] database system is ready to accept connections
+[postgres] Could not determine host address and port for container port ... could not find host port for container port 5432 (no matching host port found)
+[postgres] Could not create Endpoint object(s) ... could not find host port for container port 5432 (no matching host port found)
+describe: postgres state=Running healthStatus=Unhealthy urls=[]
+describe: saga-joint-redis-local-db state=Running healthStatus=Unhealthy resource.connectionString=null
+describe: sagas-api state=Waiting waitingFor=[postgres,saga-joint-redis-local-db]
+describe: sagas state=Waiting waitingFor=[postgres,saga-joint-redis-local-db]
+```
+
+This independently reproduces the pristine-main `scaffold.runtime` baseline red tracked by #1202
+and falls in the #1196 endpoint-churn family. Per the orchestrator steer, the run stopped rather
+than retrying. Therefore the seven-point Redis lifecycle did not begin, the Deno KV lifecycle was
+not started, the rewritten branch was not pushed, PR #1193 was not marked ready, and no completion
+or handoff claim is made. The AppHost is stopped below and its exact process tree is verified dead.
+
+Teardown evidence: `aspire stop` reported the exact AppHost stopped successfully; PIDs `778827`
+and `778859` were absent; `aspire ps --format Json` returned `[]`; scoped teardown removed owned
+container `0252db96d2ef...`; the final leak-check contains only two foreign S7 Postgres containers,
+which were left untouched. No `deno.lock` churn remains.

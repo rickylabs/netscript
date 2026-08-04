@@ -149,3 +149,17 @@ Drift is append-only.
 - **Action:** reconcile without touching foreign resources
 - **Evidence:** Preserve the preflight leak report, rebase only the clean feature branch, and start
   no AppHost until `aspire ps --format Json` returns `[]`.
+
+## 2026-08-04 joint verification stop: endpoint churn recurred
+
+The orchestrator-assigned joint Redis/Deno KV protocol was stopped at the explicit environmental
+hazard condition before either lifecycle was driven. A fresh rebased-branch Redis/Garnet scaffold
+started AppHost `/home/codex/repos/ns005-sagas/.llm/tmp/1184-joint/redis-local/saga-joint-redis-local/aspire/apphost.mts`
+(CLI PID `778827`, AppHost PID `778859`, dashboard `https://localhost:45843`). PostgreSQL itself
+reported ready, and Docker exposed `5432/tcp -> 127.0.0.1:45117`, but Aspire repeatedly logged
+`could not find host port for container port 5432 (no matching host port found)` and
+`Could not create Endpoint object(s)`. Consequently `postgres` and
+`saga-joint-redis-local-db` were `Unhealthy`, their describe artefacts exposed no URL/connection
+string, and both `sagas-api` and `sagas` remained `Waiting`. This is the #1196/#1202 endpoint-churn
+family called out by the steer, so no retry, backend substitution, PR readiness transition, or
+claim of seven-point completion was made.
