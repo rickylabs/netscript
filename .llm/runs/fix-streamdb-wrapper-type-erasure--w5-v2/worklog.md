@@ -66,6 +66,7 @@ full published-surface gates.
 | 2026-08-04 16:14 CEST | S1 | GREEN | Indexed the wrapper collection map from upstream `StreamDB<StateSchema<TDef>>`; the same fixture exited 0 and the focused runtime wiring test passed 1/1. |
 | 2026-08-04 18:15 CEST | S2 | static/publish | Package check, scoped TypeScript check/lint/fmt, quality gate, 207 package tests, and publish dry-run passed. Full doc/JSR scans retained package baseline debt and added four upstream npm private-type references. |
 | 2026-08-04 18:31 CEST | S2 | CI repair | Current-head root check exposed the older React DB consumer on TanStack DB 0.6.8. Aligned the Fresh consumer to React DB 0.1.95 / DB 0.6.17; the unchanged strong `.ts` fixture passes both root and isolated consumer checks, root check passes 2,595 files, and 207 tests pass. |
+| 2026-08-04 18:44 CEST | S2 | scaffold catalog | Updated the scaffold-side React DB catalog constant to `^0.1.95`, restoring the single-home version invariant after the required consumer alignment. |
 | 2026-08-04 18:24 CEST | S2 | CI diagnosis | CI's merge ref recompiled the consumer fixture under an older root TanStack graph and failed both wrapper and upstream control. During diagnosis `origin/main` advanced to aligned React DB/DB versions; the attempted `.mts` isolation was superseded and discarded. A new head commit triggers a clean merge-ref run without dependency churn in this PR. |
 
 ## Decisions
