@@ -1352,3 +1352,12 @@ loop after one steer; it kept the user-owned deno.lock unstaged — lock hygiene
 milestone honestly. **Owner wave: 8 of 11 closed** (#1250/#1253/#1254/#1235/#1236/#1247/
 #1252 + #1246's mitigation with the issue moved). Remaining: #1234 (#1239 mirror), #1251
 (#1266 draft), #1248 (#1269 retriggered CI). Rides canary.9.
+
+## 2026-08-04 — #1269 event-stream wedge → recreated as #1270 (same branch)
+
+#1269's pull_request event stream was fully dead: pushes spawned only draft-economy skip
+shells (correct — the PR flipped ready), but ready_for_review, synchronize (my empty-commit
+retrigger), and reopened (close/reopen kick) all spawned NOTHING — no ci.yml pull_request
+run for any post-flip head. Finding 21's wedge class, second specimen; the recreate cure
+applied: #1269 closed with reason, #1270 opened from the same branch with identical
+body/labels/milestone (Closes #1248 preserved). Watcher + waiter moved to #1270.
