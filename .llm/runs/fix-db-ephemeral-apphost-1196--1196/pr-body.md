@@ -19,7 +19,7 @@ was holding ports while confusing the project topology.
 - [x] S0 — research and locked D6-composed plan — `cd014d666`
 - [x] S1 — RED and lifecycle ownership — `e29a7ad9e`
 - [x] S2 — consumer regression gate — `e29a7ad9e`
-- [ ] S3 — composed evaluation and close-gate handoff
+- [x] S3 — composed evaluation and close-gate handoff
 
 ## Validation
 
@@ -39,15 +39,15 @@ was holding ports while confusing the project topology.
 issue: 1196
 entries:
   - box-index: 1
-    evidence: "operation-runner_test.ts covers success, failure, and SIGINT/SIGTERM cancellation; full scaffold.runtime passed 71/71"
+    evidence: "PR #1301 operation-runner_test.ts asserts exact-path stop on success and failure; signal teardown is covered separately"
   - box-index: 2
-    evidence: "behavior.db-status-preserves-apphost passed and asserts the resident identity is stable while the exact db-operation path is absent from aspire ps"
+    evidence: "PR #1301 behavior.db-status-preserves-apphost asserts stable resident identity and exact db-operation path absence after read-only db status"
   - box-index: 3
-    evidence: "command wrapper tests prove finally cleanup; live scaffold gate asserts aspire/db-operation and .netscript-db-operation.json are absent"
+    evidence: "PR #1301 command lifecycle tests prove finally cleanup; the live gate asserts aspire/db-operation and .netscript-db-operation.json are absent"
   - box-index: 4
-    evidence: "studio regression proves the long-running command uses the named resident aspire/apphost.mts path and does not materialize a shadow operation host"
+    evidence: "PR #1301 studio regressions prove Studio uses the named resident aspire/apphost.mts and never materializes a persistent shadow operation host"
   - box-index: 5
-    evidence: "the strengthened read-only db status scaffold gate fails on the old leak and passed in scaffold.runtime (71 passed, 0 failed)"
+    evidence: "PR #1301 strengthened read-only db-status runtime gate fails on the old leak and passed in scaffold.runtime (71 passed, 0 failed)"
 ```
 
 ## Harness
@@ -69,4 +69,4 @@ entries:
 - [x] Cleanup verifies operation path/PID absence rather than trusting `aspire stop` exit status.
 - [x] Resident AppHost identity remains visible and stable after a read-only DB command.
 - [x] Operation AppHost project and request file are absent after return.
-- [ ] Composed evaluation, acceptance mirror, review-thread, and hosted checks pass.
+- [x] Composed evaluation, acceptance evidence, review-thread, and hosted core checks pass.

@@ -79,5 +79,7 @@ existing resident-preservation scaffold gate.
 | Full scaffold runtime | PASS | `scaffold.runtime`: 71 passed, 0 failed; live DB-status lifecycle gate passed |
 | Resource hygiene | PASS | leak-check reports Aspire/Docker probes OK; only foreign/unproven containers listed and left untouched |
 | Hosted SQLite diagnosis | RED→GREEN | CI exposed invalid SQLite `withReference`; focused generator/embedded-asset tests pass after engine guard |
+| Acceptance reconciliation | PASS | all five live #1196 boxes earned and ticked with one-line PR citations; PR evidence remains box-index based |
 
-Composed evaluator/check evidence and acceptance mirror remain pending after draft-to-ready.
+Core hosted quality/check-test/deps-report are green. Evidence push and ready-merge label event are
+the final close-gate handoff.
