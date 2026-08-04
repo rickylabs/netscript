@@ -106,6 +106,8 @@ export async function installPlugin(
   request: InstallPluginInput,
   dependencies: InstallPluginDependencies,
 ): Promise<InstallPluginResult> {
+  const rootDenoJsonBefore = await readOptionalRootDenoJson(request.projectRoot, dependencies.fs);
+  const managedFilesBefore = await readManagedInstallFiles(request.projectRoot, dependencies.fs);
   const registry = dependencies.registry ?? new PluginKindRegistry();
   const resolvedPlugin = await resolvePluginDescriptorBeforePlanning(
     request,
@@ -207,7 +209,10 @@ export async function installPlugin(
 
   await dependencies.workspaceMutator.ensureWorkspaceMember(plan.projectRoot);
 
-  await persistPluginMetadata(plan, resolvedPlugin, pluginOwned, dependencies.fs);
+  await persistPluginMetadata(plan, resolvedPlugin, pluginOwned, dependencies.fs, {
+    managedFilesBefore,
+    rootDenoJsonBefore,
+  });
   await reconcilePluginReferences(plan.projectRoot, dependencies.fs);
   const regenerateHelpers = dependencies.regenerateHelpers ?? regenerateAspireHelpers;
   const helperFiles = await regenerateHelpers(
@@ -239,6 +244,10 @@ export async function persistPluginMetadata(
   resolvedPlugin: ResolvedPluginBeforePlanning,
   scaffold: PluginOwnedScaffoldResult,
   fs: FileSystemPort,
+  installState: {
+    readonly managedFilesBefore?: Readonly<Record<string, string | null>>;
+    readonly rootDenoJsonBefore?: string;
+  } = {},
 ): Promise<void> {
   const doctorEntrypoint = resolvedPlugin.descriptor.manifest.officialSource?.doctorEntrypoint ??
     (resolvedPlugin.source.kind === 'local-path'
@@ -253,6 +262,12 @@ export async function persistPluginMetadata(
     : undefined;
   const metadata = {
     ...resolvedPlugin.descriptor.manifest,
+    netscriptInstall: {
+      managedFilesBefore: installState.managedFilesBefore,
+      managedFilesAfter: await readManagedInstallFiles(plan.projectRoot, fs),
+      rootDenoJsonBefore: installState.rootDenoJsonBefore,
+      rootDenoJsonAfter: await readOptionalRootDenoJson(plan.projectRoot, fs),
+    },
     officialSource: {
       ...resolvedPlugin.descriptor.manifest.officialSource,
       pluginReferences: mergeUniqueReferences(
@@ -264,6 +279,32 @@ export async function persistPluginMetadata(
   };
   const pluginDir = resolvePluginConfigDirectory(plan, scaffold);
   await fs.writeFile(join(pluginDir, 'scaffold.plugin.json'), `${JSON.stringify(metadata, null, 2)}\n`);
+}
+
+async function readOptionalRootDenoJson(
+  projectRoot: string,
+  fs: FileSystemPort,
+): Promise<string | undefined> {
+  const path = join(projectRoot, 'deno.json');
+  return await fs.exists(path) ? await fs.readFile(path) : undefined;
+}
+
+const MANAGED_INSTALL_FILES = [
+  'plugins/deno.json',
+  'plugins/mod.ts',
+  'services/_shared/plugin-service-context.ts',
+] as const;
+
+async function readManagedInstallFiles(
+  projectRoot: string,
+  fs: FileSystemPort,
+): Promise<Readonly<Record<string, string | null>>> {
+  const files: Record<string, string | null> = {};
+  for (const relativePath of MANAGED_INSTALL_FILES) {
+    const path = join(projectRoot, relativePath);
+    files[relativePath] = await fs.exists(path) ? await fs.readFile(path) : null;
+  }
+  return files;
 }
 
 export async function resolvePluginDescriptorBeforePlanning(
