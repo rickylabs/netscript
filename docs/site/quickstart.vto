@@ -4,14 +4,18 @@ title: Quickstart
 templateEngine: [vento, md]
 ---
 
-This path installs the CLI, scaffolds one example service, starts the generated resource graph,
-and makes one visible edit.
+From an empty directory to a running workspace: scaffold a typed example service, a Fresh app that
+consumes it through a derived client, Postgres, a shared cache, and the Aspire dashboard that
+observes those resources. This page runs one instance of the model described in
+[Core concepts](/concepts/).
 
 {{ comp callout { type: "note", title: "Prerequisites" } }}
-Install <strong><a href="https://docs.deno.com">Deno 2.x</a></strong>, the
-<strong><a href="https://learn.microsoft.com/dotnet/aspire/">.NET Aspire CLI</a></strong>, and start
-Docker before continuing. Aspire orchestrates the local resource graph; Postgres and the shared
-cache run in Docker containers that Aspire starts for you.
+Install <strong><a href="https://docs.deno.com">Deno 2.x</a></strong> and the
+<strong><a href="https://learn.microsoft.com/dotnet/aspire/">.NET Aspire CLI</a></strong>, and have
+Docker running before continuing. Aspire orchestrates the local resource graph; Postgres and the
+shared cache run in containers it starts for you. The .NET dependency is the orchestrator only —
+your application code is Deno throughout. <a href="/quickstart/aspire/">Why Aspire, and how to opt
+out</a>.
 {{ /comp }}
 
 ## 1. Install the CLI
@@ -30,6 +34,17 @@ The `--service` flag scaffolds the example oRPC service alongside the workspace.
 the remaining defaults without prompts, including the `dashboard` app name and shared Redis cache
 used below.
 
+What lands on disk is the meta-framework as a directory layout:
+
+- `contracts/` — the typed boundary. One versioned definition of every operation;
+  [how contracts work](/explanation/contracts/).
+- `services/users/` — implements the contract with handlers that are type-locked to it;
+  [Services & SDK](/services-sdk/).
+- `apps/dashboard/` — the Fresh app, consuming the same contract through a derived client;
+  [the web layer](/web-layer/).
+- `aspire/` — the generated AppHost that runs everything above as one observed graph;
+  [orchestration & runtime](/orchestration-runtime/).
+
 ## 3. Start the resource graph
 
 **Nothing runs until this step.**
@@ -40,9 +55,13 @@ aspire restore   # first run only
 aspire start
 ```
 
-Use the dashboard URL and one-time login token printed by `aspire start`. Wait until all four
-resources report healthy — the Fresh app, example service, Postgres, and shared cache — then open
-the Fresh app from its resource link. The page heading should read `my-app`.
+Open the dashboard URL with the one-time login token that `aspire start` prints. Wait until all
+four resources report healthy — the Fresh app, the example service, Postgres, and the shared
+cache — then open the Fresh app from its resource link. The page heading should read `my-app`.
+
+The dashboard is the operational view of the workspace. Open a resource to inspect its logs;
+after exercising an instrumented path, use the trace view to follow work across processes. See
+[Observability](/observability/) for the telemetry model.
 
 {{ comp callout { type: "note", title: "Aspire comes before any database command" } }}
 The AppHost must start Postgres before a migration, generation, or seed command can connect to it.
@@ -55,9 +74,12 @@ you need the database workflow.
 Open `apps/dashboard/routes/(_components)/home-view.tsx`. Find the wrapped introductory sentence
 that starts with `A generated NetScript workspace` and replace that sentence with
 `This checkout dashboard is ours.` Save the file, then refresh the Fresh app URL from Aspire. The
-new sentence should appear below the `my-app` heading while the app remains healthy.
+new sentence appears below the `my-app` heading while every resource stays healthy.
 
-[See how the web layer is structured](/web-layer/).
+A one-line edit is deliberately unspectacular. The point is what you edited: a server-rendered
+Fresh view inside a workspace whose service, database, and cache kept running around it. The
+interesting changes — adding an operation to the contract and watching its types reach this page —
+are the first thing [the Storefront tutorial](/tutorials/storefront/) makes you do.
 
 When you are finished, stop the AppHost from the `aspire/` directory:
 
@@ -65,4 +87,10 @@ When you are finished, stop the AppHost from the `aspire/` directory:
 aspire stop --apphost ./apphost.mts
 ```
 
-Continue with [the Storefront tutorial](/tutorials/storefront/) or [the mental model](/concepts/).
+## Where to go next
+
+- [The Storefront tutorial](/tutorials/storefront/) — build a real system on this scaffold:
+  contract changes, durable work, and a UI that survives them.
+- [Core concepts](/concepts/) — the five-layer model you just ran, explained once.
+- [Why NetScript](/why/) — the argument and the trade-offs, for the colleague who asks why this
+  is not just Fresh plus a queue.

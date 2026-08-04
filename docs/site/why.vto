@@ -6,7 +6,7 @@ templateEngine: [vento, md]
 
 {{ comp.hero({
   tagline: "For teams whose TypeScript app has become a system.",
-  subhead: "NetScript fits long-lived products where request handling, background work, browser UI, and operations have become one application. The trade: pick-any-library freedom for a coordinated Deno workspace.",
+  subhead: "NetScript is a meta-framework: it coordinates the web layer, services, durable runtimes, and operations you would otherwise integrate by hand. The trade is explicit — pick-any-library freedom for a coordinated Deno workspace.",
   ctas: [
     { label: "Start a workspace", href: "/quickstart/", primary: true },
     { label: "Read the mental model", href: "/concepts/" }
@@ -32,17 +32,18 @@ not choosing them once; it is maintaining the seams between them:
 
 That standing maintenance is the **integration tax**: unrelated tools pretending to be one system.
 
-## 2. The two decisions that are expensive to retrofit
+## 2. What a meta-framework changes
 
-We didn't invent new primitives. NetScript makes two early architecture choices explicit: callers
-derive their types from shared contracts, and multi-step work runs through durable state. These
-decisions become expensive to retrofit after they spread through an application. Replacing
-parallel client definitions or ad-hoc effects then means changing callers and workflows; logging
-can still be added later.
+NetScript does not replace the underlying primitives — Fresh renders, Hono serves, and Postgres
+stores as they would without it. It standardizes boundaries that become expensive after they have
+spread through an application: shared contracts keep handlers and callers aligned, durable
+runtimes make long-running work explicit, and generated resource wiring keeps processes,
+dependencies, and telemetry in one operational model. These constraints cost flexibility; their
+value is that a team does not redesign the same seams independently in every service.
 
-The rest of NetScript makes those two decisions operational. Services serve the contract at request
-time, plugin runtimes own the work that outlives a request, and Aspire brings up the resources with
-their telemetry connected. The implementation details live in [Core concepts](/concepts/).
+NetScript makes those boundaries operational. Services serve the contract at request time, plugin
+runtimes own the work that outlives a request, and Aspire brings up the resources with their
+telemetry connected. The implementation details live in [Core concepts](/concepts/).
 
 ## 3. Compare the center of gravity
 

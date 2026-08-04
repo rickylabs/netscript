@@ -13,7 +13,13 @@ templateEngine: [vento, md]
   ]
 }) }}
 
-{{ comp.diagram({ src: "/assets/diagrams/architecture-overview.svg", alt: "A NetScript workspace: contracts define services; services and plugin runtimes connect to the Fresh web app; the AppHost materializes the resources and their infrastructure as one observed graph.", caption: "The mental model: contracts → services → plugins → web layer, with Aspire and telemetry connecting the running resources." }) }}
+<p class="ns-lede">
+The five layers solve different boundary problems. Contracts define operation inputs and outputs;
+services implement those operations; plugin manifests declare additional runtime resources; the
+web layer carries typed results to users; and Aspire connects the processes, dependencies, and
+telemetry. Read the sections in order for the map, then follow each section into the detailed
+documentation.
+</p>
 
 ## 1. Contracts define the boundary
 
@@ -62,7 +68,9 @@ Use [the web-layer overview](/web-layer/) for the complete model, then follow th
 
 ## 5. Observability connects the resource graph
 
-Every layer above runs inside a resource graph. The generated AppHost composes apps, services,
+{{ comp.diagram({ src: "/assets/diagrams/aspire-resource-graph.svg", alt: "An Aspire AppHost starts Postgres, Redis, and an orders plugin's API, worker, and saga runner; the dashboard observes each resource, while the three processes share database and cache connections.", caption: "One plugin can become several observed resources. Aspire starts its API and background processors alongside their shared infrastructure." }) }}
+
+The diagram zooms into one plugin. At workspace scale, the generated AppHost also composes apps, services,
 plugin processors, databases, and cache resources, then injects service-discovery and OTLP
 configuration into their processes. The Aspire dashboard reads health, logs, traces, and metrics
 from that running graph; trace context carried by SDK calls keeps client and service spans
