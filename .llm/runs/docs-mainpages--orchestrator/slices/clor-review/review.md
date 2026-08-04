@@ -134,3 +134,54 @@ normal CLI polish here because a typo should fail before any OpenRouter request 
 `deno.lock` SHA-256 was
 `d1905ca33fa0af26bacbe3a9971a83af347afcdcb415c6770fc8b2f12aea13af` before and after the requested
 tests. No live provider call was made, so this review consumed no OpenRouter credit.
+
+## Re-review
+
+- **Re-review range:** `d19db2773..a839ce747` (three commits)
+- **Final verdict:** **APPROVE**
+
+The generator genuinely resolved every prior finding. I found no new blocking, major, or minor
+correctness issue in the follow-up diff.
+
+### Prior findings disposition
+
+| Prior finding | Disposition | Independent evidence |
+| --- | --- | --- |
+| **BLOCKING — cached Claude auth and rival provider credentials were not isolated** | **Resolved** | `openRouterClaudeEnvironment()` now obtains the canonical `claude-openrouter` profile, materializes it through `applyChildEnvironmentPolicy()`, and hands the resulting complete environment to `runClaudePrint()` with `clearEnv: true` (`openrouter-run.ts:121-166`). The policy removes `OPENROUTER_API_KEY`, `OPENAI_API_KEY`, inherited route variables, and the caller's native config path; binds only the resolved key to `ANTHROPIC_AUTH_TOKEN`; empties `ANTHROPIC_API_KEY`; and installs the isolated `CLAUDE_CONFIG_DIR`. Tests assert the spawned environment, absent source/rival keys, isolated config, unchanged parent map, and key-free argv. |
+| **MAJOR — tee failure abandoned a live child and lost exit fidelity** | **Resolved** | The output file is opened before spawn (`claude-print.ts:168-172`). Any later stream/write failure enters `terminateChild()`, which sends SIGTERM, schedules SIGKILL after one second, awaits child status, and clears the timer (`claude-print.ts:115-140,207-216`). Tests prove an unwritable path never spawns, a mid-stream failure sends SIGTERM/reaps, tee success preserves content/status, and an ordinary child code `37` passes through unchanged. The SIGKILL branch is source-verified; the fast fake settles on SIGTERM, so the test does not wait a real second merely to exercise the timer. |
+| **MAJOR — six tests did not exercise the runner/guard/process boundary** | **Resolved** | The launcher suite now has 17 tests and directly imports `runClaudePrint`. It pins mandatory guard opt-in, canonical spawned environment plus `clearEnv`, credential absence from argv, ordinary exit mapping, caller base-URL override resistance, denied model → SIGTERM + exit `78`, tee success, pre-spawn output failure, and post-spawn child reaping. Existing guard-handler and runtime profile/adapter suites remain green. |
+| **MINOR — unknown/duplicate/value-less flags were silently accepted** | **Resolved** | `parseOpenRouterRunArguments()` now consumes argv sequentially against a finite flag set and rejects unknown, duplicate, or missing-value arguments before launch (`openrouter-run.ts:40-83`). The exact prior `--ouptut` typo is now a negative test. |
+
+### Flagged ownership seam — accepted
+
+Exporting `applyChildEnvironmentPolicy()` from
+`runtime/adapters/child-process-environment-adapter.ts` is acceptable and is **not a finding**. The
+function is a pure materializer over the runtime `ChildEnvironmentPolicy` port and
+`EnvironmentReader`; the adapter remains its natural owner and still consumes the same function.
+The Claude launcher depends inward on the general runtime layer, and no runtime/Claude import cycle
+is introduced. Moving the helper to a new neutral module would change file ownership but not improve
+the dependency direction or safety contract; doing so now would be speculative churn. A move can be
+reconsidered if the policy materializer gains additional independent consumers or adapter-specific
+dependencies.
+
+### Tests independently rerun
+
+The following one-pass affected-suite command completed with raw exit `0` and exactly **60 passed,
+0 failed**:
+
+```text
+deno test --no-lock --allow-read --allow-write --allow-env --allow-run --allow-net \
+  .llm/tools/agentic/claude/openrouter-run_test.ts \
+  .llm/tools/agentic/claude/evaluator-model-guard_test.ts \
+  .llm/tools/agentic/runtime/child-process-environment-adapter_test.ts \
+  .llm/tools/agentic/runtime/provider-profiles_test.ts \
+  .llm/tools/agentic/runtime/runner-provider-profiles_test.ts \
+  .llm/tools/agentic/runtime/provider-canary_test.ts \
+  .llm/tools/agentic/runtime/adapters_test.ts \
+  .llm/tools/agentic/config/no-hardcoded-volatile_test.ts
+```
+
+The pre-existing `claude-print_test.ts` compatibility suite also passed independently: **3 passed,
+0 failed**. `git diff --check d19db2773..HEAD` passed. `deno.lock` retained SHA-256
+`d1905ca33fa0af26bacbe3a9971a83af347afcdcb415c6770fc8b2f12aea13af` across validation. No live
+provider request was made and no OpenRouter credit was consumed.
