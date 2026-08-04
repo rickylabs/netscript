@@ -1199,6 +1199,13 @@ a.ns-card:focus-visible {
 }
 
 .ns-tabbed__tablist {
+  /* Progressive enhancement: the tab bar is inert until script.js confirms it can
+     run and adds .is-enhanced. Without this gate a no-JS (or pre-JS) reader gets a
+     fully styled, non-functional tab bar with every panel stacked underneath it. */
+  display: none;
+}
+
+.ns-tabbed.is-enhanced .ns-tabbed__tablist {
   display: flex;
   flex-wrap: wrap;
   gap: 0.15rem;
