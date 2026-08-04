@@ -107,14 +107,28 @@ jobs:
             --report .llm/tmp/cli-e2e-prod-report.json \
             --log-file .llm/tmp/cli-e2e-prod.ndjson
 
+      - name: Quickstart walk E2E (published CLI, seven verdicts)
+        run: |
+          deno task e2e:cli run quickstart.walk \
+            --source jsr \
+            --cli "jsr:@netscript/cli@${{ steps.version.outputs.version }}" \
+            --cleanup \
+            --format pretty \
+            --report .llm/tmp/quickstart-walk-prod-report.json \
+            --log-file .llm/tmp/quickstart-walk-prod.ndjson
+
       - name: Report production E2E failure
         if: failure()
         run: |
-          report=.llm/tmp/cli-e2e-prod-report.json
-          if [ -f "$report" ]; then
-            deno run --allow-read --allow-env=GITHUB_STEP_SUMMARY --allow-write="$GITHUB_STEP_SUMMARY" \
-              .llm/tools/e2e/print-failed-report-steps.ts --github "$report" || true
-          else
+          found=false
+          for report in .llm/tmp/cli-e2e-prod-report.json .llm/tmp/quickstart-walk-prod-report.json; do
+            if [ -f "$report" ]; then
+              found=true
+              deno run --allow-read --allow-env=GITHUB_STEP_SUMMARY --allow-write="$GITHUB_STEP_SUMMARY" \
+                .llm/tools/e2e/print-failed-report-steps.ts --github "$report" || true
+            fi
+          done
+          if [ "$found" = false ]; then
             message="Production CLI E2E failed for @netscript/cli@${{ steps.version.outputs.version }}; no JSON report was produced."
             echo "::error::$message"
             printf '## Production CLI E2E failure\n\n%s\n' "$message" >> "$GITHUB_STEP_SUMMARY"
@@ -128,4 +142,6 @@ jobs:
           path: |
             .llm/tmp/cli-e2e-prod-report.json
             .llm/tmp/cli-e2e-prod.ndjson
+            .llm/tmp/quickstart-walk-prod-report.json
+            .llm/tmp/quickstart-walk-prod.ndjson
           if-no-files-found: ignore

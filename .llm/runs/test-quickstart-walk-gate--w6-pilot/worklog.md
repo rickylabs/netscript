@@ -23,3 +23,10 @@
 - `deno task quality:gate`: exit 0; repository warnings are pre-existing and no new finding is in the slice.
 - Timeout tests inject a command runner and use no sleeps; restore and start produce distinct `#1227` classifications.
 - Reconcile: #1294 remains open, PR #1298 is draft at `status:impl`, no new review comments changed scope.
+
+### S3 — published canary wiring
+
+- `e2e-cli-prod.yml` invokes `quickstart.walk` immediately beside `scaffold.runtime`, passing `--source jsr` and the exact artifact-provided CLI version.
+- Quickstart uses distinct JSON/NDJSON artifacts; failure reporting scans both reports so the numbered failed step reaches the workflow summary.
+- `@std/yaml` parse: PASS.
+- Reconcile: the workflow still installs the exact CLI before either suite; no release sequencing or lockfile change was introduced.
