@@ -81,7 +81,7 @@ function OrdersTable(props: { items: Order[]; onAdvance: (vars: { id: string; st
   );
 }
 
-Client Island with Server+Client Dehydration
+// Client island receiving server-dehydrated query state
 interface OrdersQueryIslandProps {
   dehydratedState?: DehydratedState;
   input: { limit: number; offset: number; status?: string };
@@ -133,7 +133,7 @@ function OrdersQueryIsland(props: OrdersQueryIslandProps) {
   return <OrdersTable items={data?.items ?? []} onAdvance={mutation.mutate} />;
 }
 
-Statistics Partial component showing deferred load
+// Stats partial component rendering a deferred promise
 interface StatsProps {
   statsPromise: Promise<{ revenue: number }>;
 }
@@ -146,7 +146,7 @@ function StatsLayer(props: StatsProps) {
   );
 }
 
-Form Component
+// Form component
 import type { RuntimeFormState } from '@netscript/fresh/form';
 const checkoutFormSchema = z.object({
   address: z.string().min(1),
@@ -163,7 +163,7 @@ function CheckoutForm(props: RuntimeFormState<z.input<typeof checkoutFormSchema>
   );
 }
 
-Combined Page Definition utilizing Page Builder Fluent API
+// Page definition exercising the builder chain
 const ordersPage = definePage()
   .withRoute(ordersRoute)
   .withTelemetry({ enabled: true, spanName: 'dashboard.orders.view' })
