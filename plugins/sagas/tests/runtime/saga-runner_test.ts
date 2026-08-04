@@ -1,6 +1,7 @@
 import { assertEquals, assertFalse } from 'jsr:@std/assert@^1';
 import { defineSaga } from '@netscript/plugin-sagas-core';
 import { createSagaRuntime } from '@netscript/plugin-sagas-core/runtime';
+import { MemoryQueueAdapter } from '@netscript/queue/testing';
 import { startSagaRunner } from '../../src/runtime/saga-runner.ts';
 
 Deno.test('startSagaRunner loads a non-empty dependency-shaped registry from the project root', async () => {
@@ -13,6 +14,7 @@ Deno.test('startSagaRunner loads a non-empty dependency-shaped registry from the
   const imported: string[] = [];
 
   const supervisor = await startSagaRunner({
+    deliveryQueue: new MemoryQueueAdapter({ pollInterval: 1 }),
     readEnv: () => undefined,
     cwd: () => '/consumer/project',
     importer: (specifier) => {

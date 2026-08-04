@@ -20,7 +20,7 @@ import type {
   SagaCompensator,
 } from '../runtime/saga-compensator.ts';
 import type { SagaEngine } from '../runtime/saga-engine.ts';
-import type { SagaScheduler } from '../runtime/saga-scheduler.ts';
+import type { SagaSchedulerPort } from '../runtime/saga-scheduler.ts';
 import type { SagaInstrumentation } from '../telemetry/mod.ts';
 
 /** Resolver used when a fail/compensate cascade needs saga state context. */
@@ -32,7 +32,7 @@ export type SagaBridgeCompensationResolver = (
 export type SagaBusBridgeOptions = Readonly<{
   id?: string;
   engine: SagaEngine;
-  scheduler?: SagaScheduler;
+  scheduler?: SagaSchedulerPort;
   compensator?: SagaCompensator;
   resolveCompensation?: SagaBridgeCompensationResolver;
   idempotency?: SagaIdempotencyPort | SagaIdempotencyDedupTable;
@@ -44,7 +44,7 @@ export class SagaBusBridge implements SagaBusPort {
   /** Stable adapter identifier. */
   readonly id: string;
   readonly #engine: SagaEngine;
-  readonly #scheduler?: SagaScheduler;
+  readonly #scheduler?: SagaSchedulerPort;
   readonly #compensator?: SagaCompensator;
   readonly #resolveCompensation?: SagaBridgeCompensationResolver;
   readonly #idempotency: SagaIdempotencyPort;

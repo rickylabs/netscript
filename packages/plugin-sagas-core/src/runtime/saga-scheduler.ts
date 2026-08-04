@@ -37,6 +37,18 @@ export type SagaScheduledMessageDispatcher = (
   message: SagaMessage | CascadedMessage,
 ) => Promise<void>;
 
+/** Lifecycle and scheduling boundary consumed by the saga bus bridge. */
+export interface SagaSchedulerPort {
+  /** Stable scheduler identifier used by diagnostics. */
+  readonly id: string;
+  /** Start accepting scheduled cascade messages. */
+  start(): Promise<void>;
+  /** Stop accepting scheduled cascade messages. */
+  stop(): Promise<void>;
+  /** Durably arrange delivery of a scheduled cascade. */
+  scheduleCascaded(message: CascadedMessage<'scheduled'>): Promise<unknown>;
+}
+
 /** Options for the durable saga scheduler. */
 export type SagaSchedulerOptions = Readonly<{
   id?: string;
@@ -63,7 +75,7 @@ export type SagaSchedulerDrainResult = Readonly<{
 }>;
 
 /** Durable timer scheduler for `schedule()` cascaded messages. */
-export class SagaScheduler {
+export class SagaScheduler implements SagaSchedulerPort {
   /** Stable scheduler identifier. */
   readonly id: string;
   readonly #clock: SagaClockPort;

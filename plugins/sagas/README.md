@@ -26,7 +26,8 @@ them to a NetScript host.
 - **Compensation built in** — workflows declare forward steps and compensations; saga state is
   persisted so a crash mid-flow resumes instead of stranding half-applied effects.
 - **Saga API included** — the `sagas-api` service (default port `8092`) backs saga and instance
-  introspection over a versioned contract.
+  introspection over a versioned contract. Publish durably enqueues for the background runner and
+  returns a non-2xx response on enqueue failure or deadline expiry.
 - **An operations CLI** — `list`, `inspect`, `add-saga`, `update-saga`, `remove-saga`,
   `generate-registry`, and `publish` cover authoring and inspection; `inspect` degrades gracefully
   to a local source scan when the Saga API is not running.
@@ -41,7 +42,8 @@ them to a NetScript host.
 flowchart LR
     M["sagasPlugin<br/>(manifest: service, runtime,<br/>schema, Aspire resources)"] --> H["NetScript host<br/>(plugin install + sync)"]
     H --> A["sagas-api<br/>:8092"]
-    H --> R["Saga runtime<br/>steps + compensations"]
+    A --> Q["sagas queue<br/>Redis/Garnet or Deno KV"]
+    Q --> R["Saga runner<br/>steps + compensations"]
     R --> P["Durable state<br/>(resume after restart)"]
     R --> S["Durable streams<br/>saga entities"]
 ```

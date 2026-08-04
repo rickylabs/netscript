@@ -8,6 +8,18 @@
 export { createSagaPublisher, HttpSagaPublisher } from './saga-publisher.ts';
 export { createDurableSagaRuntime } from './create-durable-saga-runtime.ts';
 export {
+  createSagaDeliveryPublisher,
+  createSagaDeliveryQueue,
+  SAGA_DELIVERY_QUEUE,
+  SagaQueueDelivery,
+  SagaQueueScheduler,
+} from './saga-delivery.ts';
+export {
+  KvSagaInstanceProjection,
+  PrismaSagaInstanceProjection,
+  ProjectingSagaStore,
+} from './saga-instance-projection.ts';
+export {
   loadSagaRegistryModule,
   runSagaRunner,
   startSagaRunner,
@@ -83,10 +95,25 @@ export type {
   SagaScheduler,
   SagaSchedulerDrainFailure,
   SagaSchedulerDrainResult,
+  SagaSchedulerPort,
   SagaSignalDispatch,
   SagaStorePort,
   SagaStoreWriteOptions,
 } from '@netscript/plugin-sagas-core/runtime';
+export type {
+  SagaDeliveryContext,
+  SagaDeliveryMessage,
+  SagaDeliveryPublisher,
+  SagaDeliveryPublisherOptions,
+  SagaDeliveryQueuePort,
+  SagaRuntimeDeliveryPort,
+} from './saga-delivery.ts';
+export type {
+  PrismaSagaInstanceProjectionClient,
+  SagaInstanceProjection,
+  SagaInstanceProjectionPort,
+  SagaInstanceReadModel,
+} from './saga-instance-projection.ts';
 export type {
   HttpSagaPublisherOptions,
   SagaPublisherEnvReader,

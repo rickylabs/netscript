@@ -1,7 +1,7 @@
 import { getKv } from '@netscript/kv';
-import { collection, createNetscriptDb, type KvObject, model } from '@netscript/kv/kvdex';
 import { z } from 'zod';
 import { SAGA_INSTANCE_STATUSES } from '@netscript/plugin-sagas-core/domain';
+import type { SagaInstanceReadModel } from '../../../src/runtime/saga-instance-projection.ts';
 import type {
   PrismaRecord,
   SagaDefinitionResponse,
@@ -16,32 +16,14 @@ import type {
 } from './v1-types.ts';
 
 /** Kvdex saga instance shape used by the fallback list path. */
-export type SagaInstanceKv = Readonly<{
-  /** Saga definition name. */
-  sagaName: string;
-  /** Correlation identifier. */
-  correlationId: string;
-  /** Persisted saga state. */
-  state: Record<string, unknown>;
-  /** Instance status. */
-  status: SagaInstanceApiStatus;
-  /** Creation timestamp. */
-  createdAt: string;
-  /** Last update timestamp. */
-  updatedAt: string;
-  /** Optional completion timestamp. */
-  completedAt?: string;
-  /** State version. */
-  version: number;
-  /** Approximate message count. */
-  messageCount: number;
-  /** Optional last message type. */
-  lastMessageType?: string;
-}>;
+export type SagaInstanceKv = SagaInstanceReadModel;
 
 const SagaInstanceKvSchema: z.ZodType<SagaInstanceKv> = z.object({
   sagaName: z.string(),
+  sagaId: z.string(),
+  instanceId: z.string(),
   correlationId: z.string(),
+  correlationKey: z.string(),
   state: z.record(z.string(), z.unknown()),
   status: z.enum(SAGA_INSTANCE_STATUSES),
   createdAt: z.string(),
@@ -52,43 +34,24 @@ const SagaInstanceKvSchema: z.ZodType<SagaInstanceKv> = z.object({
   lastMessageType: z.string().optional(),
 });
 
-const sagaModel = model<KvObject>();
-const sagaIdGen = (instance: KvObject) =>
-  `${String(instance.sagaName)}:${String(instance.correlationId)}`;
-
-type SagaCollectionOptions = {
-  idGenerator: typeof sagaIdGen;
-  indices: { sagaName: 'secondary'; status: 'secondary' };
-};
-
-const sagaInstances: ReturnType<
-  typeof collection<KvObject, KvObject, SagaCollectionOptions>
-> = collection(sagaModel, {
-  idGenerator: sagaIdGen,
-  indices: {
-    sagaName: 'secondary',
-    status: 'secondary',
-  },
-});
-
-const sagaInstancesSchema: { sagaInstances: typeof sagaInstances } = {
-  sagaInstances,
-};
-
-/** Inferred KV database returned by the NetScript Kvdex factory. */
-export type SagaKvDatabase = Awaited<
-  ReturnType<typeof createNetscriptDb<typeof sagaInstancesSchema>>
->;
-
-let sagaDb: Awaited<ReturnType<typeof createNetscriptDb<typeof sagaInstancesSchema>>> | null = null;
-
-/** Return the KV-backed fallback saga database. */
-export async function getSagaDb(): Promise<SagaKvDatabase> {
-  if (!sagaDb) {
-    await getKv();
-    sagaDb = await createNetscriptDb(sagaInstancesSchema);
+/** List runner-written KV saga instance projections. */
+export async function listSagaInstanceKv(): Promise<SagaInstanceKv[]> {
+  const kv = await getKv();
+  const instances: SagaInstanceKv[] = [];
+  for await (const entry of kv.list<unknown>({ prefix: ['saga_instances'] })) {
+    instances.push(parseSagaInstanceKv(entry.value));
   }
-  return sagaDb;
+  return instances.sort((left, right) => right.createdAt.localeCompare(left.createdAt));
+}
+
+/** Find one runner-written KV saga instance projection. */
+export async function findSagaInstanceKv(
+  sagaName: string,
+  correlationId: string,
+): Promise<SagaInstanceKv | undefined> {
+  return (await listSagaInstanceKv()).find((instance) =>
+    instance.sagaName === sagaName && instance.correlationId === correlationId
+  );
 }
 
 /** Validate and return one KV-backed saga instance. */

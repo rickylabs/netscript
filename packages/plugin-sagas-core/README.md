@@ -20,8 +20,8 @@ plugin binds to a NetScript host; use it directly for custom hosts, libraries, a
 ## Why teams use it
 
 - **A fluent, typed saga DSL** — `defineSaga(id).state().on().build()` produces a frozen
-  `SagaDefinition`; handlers return cascaded effects via `send`, `schedule`,
-  `sagaComplete`, `sagaFail`, and `sagaCompensate`.
+  `SagaDefinition`; handlers return cascaded effects via `send`, `schedule`, `sagaComplete`,
+  `sagaFail`, and `sagaCompensate`.
 - **At-least-once, exactly-applied** — idempotency keys reserve a message target before delivery and
   record applied `(instanceId, key)` pairs, so duplicates return `alreadyApplied` instead of
   re-running effects.
@@ -103,6 +103,12 @@ await runtime.start();
 await runtime.stop('example complete');
 ```
 
+For the started single-point form, use `startSagas({ definitions })` from
+`@netscript/plugin-sagas-core/presets`; the returned `runtime` accepts `publish()` immediately and
+the returned `shutdown()` owns teardown. Low-level `createSagaRuntime()` remains explicit about
+`register()` and `start()`. A definition that emits `schedule()` requires a scheduler in a low-level
+composition; the scaffolded plugin runner supplies its queue-backed scheduler.
+
 Reserve a signal and a query, register a compensation, and fail explicitly when an event cannot be
 applied:
 
@@ -134,18 +140,19 @@ const orderSaga = defineSaga('order')
 
 ## Public surface
 
-| Entry                     | What it gives you                                                                          |
-| ------------------------- | ------------------------------------------------------------------------------------------ |
-| `.`                       | The saga DSL: `defineSaga`, `defineSignal`, `defineQuery`, and the cascaded-effect helpers |
-| `./runtime`               | `createSagaRuntime` — engine, scheduler, and compensator                                   |
-| `./ports`                 | `SagaStorePort`, `SagaBusPort`, `SagaClockPort`, `SagaIdempotencyPort`, and siblings       |
-| `./transports`            | Redis Streams and Garnet LIST delivery adapters                                            |
-| `./stores`                | The durable store port behind a stable subpath                                             |
-| `./middleware`            | Hono saga middleware and SSE event middleware                                              |
+| Entry                     | What it gives you                                                                                          |
+| ------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `.`                       | The saga DSL: `defineSaga`, `defineSignal`, `defineQuery`, and the cascaded-effect helpers                 |
+| `./runtime`               | `createSagaRuntime` — engine, scheduler, and compensator                                                   |
+| `./ports`                 | `SagaStorePort`, `SagaBusPort`, `SagaClockPort`, `SagaIdempotencyPort`, and siblings                       |
+| `./transports`            | Redis Streams and Garnet LIST delivery adapters                                                            |
+| `./stores`                | The durable store port behind a stable subpath                                                             |
+| `./middleware`            | Hono saga middleware and SSE event middleware                                                              |
 | `./integration/workers`   | Explicit workers-port helpers for jobs and tasks (`triggerJob`, `triggerTask`); `send()` does not use them |
-| `./integration/publisher` | The `SagaPublisherPort` boundary                                                           |
-| `./contracts/v1`          | The versioned saga API contract                                                            |
-| `./testing`               | In-memory stores, controllable clock, runtime test helper                                  |
+| `./integration/publisher` | The `SagaPublisherPort` boundary                                                                           |
+| `./contracts/v1`          | The versioned saga API contract                                                                            |
+| `./presets`               | Started `startSagas` / `startSagaHandlers` composition helpers                                             |
+| `./testing`               | In-memory stores, controllable clock, runtime test helper                                                  |
 
 The always-current symbol list is
 [`deno doc jsr:@netscript/plugin-sagas-core@<version>`](https://jsr.io/@netscript/plugin-sagas-core/doc)

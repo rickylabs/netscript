@@ -12,6 +12,18 @@ import {
 } from './saga-supervisor.ts';
 import { createSagaTelemetry } from '@netscript/plugin-sagas-core/telemetry';
 import { resolveProjectRegistryModule } from './project-registry-module.ts';
+import {
+  createSagaDeliveryQueue,
+  type SagaDeliveryQueuePort,
+  SagaQueueDelivery,
+  SagaQueueScheduler,
+} from './saga-delivery.ts';
+import {
+  KvSagaInstanceProjection,
+  PrismaSagaInstanceProjection,
+  type PrismaSagaInstanceProjectionClient,
+  type SagaInstanceProjectionPort,
+} from './saga-instance-projection.ts';
 
 /** Module importer boundary used by the runtime registry loader. */
 export type SagaRuntimeModuleImporter = (specifier: string) => Promise<unknown>;
@@ -26,6 +38,8 @@ export type StartSagaRunnerOptions = Readonly<{
   importer?: SagaRuntimeModuleImporter;
   readEnv?: SagaRunnerEnvReader;
   cwd?: () => string;
+  deliveryQueue?: SagaDeliveryQueuePort;
+  projection?: SagaInstanceProjectionPort | false;
   supervisor?: Omit<SagaRuntimeSupervisorOptions, 'loadDefinitions' | 'runtimeOptions'>;
   runtimeOptions?: Omit<CreateSagaRuntimeOptions, 'adapter'>;
 }>;
@@ -38,6 +52,13 @@ export type RunSagaRunnerOptions =
   }>;
 
 type SagaRegistryModule = Readonly<Record<string, unknown>>;
+type SagaRunnerBootstrap = Readonly<{
+  createPluginServiceContext(pluginName: string): Promise<
+    Readonly<{
+      db: Readonly<{ getClient(): Promise<unknown> }>;
+    }>
+  >;
+}>;
 
 const DEFAULT_POSIX_SHUTDOWN_SIGNALS = [
   'SIGINT',
@@ -64,15 +85,23 @@ export async function startSagaRunner(
     cwd: options.cwd,
   });
   const importer = options.importer ?? defaultImporter;
+  const queue = options.deliveryQueue ?? createSagaDeliveryQueue();
+  const delivery = options.supervisor?.delivery ?? new SagaQueueDelivery(queue);
   const runtimeOptions = {
     ...options.runtimeOptions,
-    native: withDefaultTelemetry(options.runtimeOptions?.native),
+    native: {
+      ...withDefaultTelemetry(options.runtimeOptions?.native),
+      scheduler: options.runtimeOptions?.native?.scheduler ?? new SagaQueueScheduler(queue),
+    },
     adapter,
   };
+  const projection = options.supervisor?.projection ?? await resolveProjection(options, readEnv);
   const supervisor = new SagaRuntimeSupervisor({
     ...options.supervisor,
     loadDefinitions: () => loadSagaRegistryModule(registryModule, importer),
     runtimeOptions,
+    delivery,
+    projection,
   });
   await supervisor.start();
   return supervisor;
@@ -90,8 +119,21 @@ export async function runSagaRunner(
   options: RunSagaRunnerOptions = {},
 ): Promise<SagaRuntimeSupervisorSnapshot> {
   const supervisor = await startSagaRunner(options);
-  const signal = await waitForShutdownSignal(options.shutdownSignals ?? defaultShutdownSignals());
-  return await supervisor.stop(`signal:${signal}`);
+  try {
+    const outcome = await Promise.race([
+      waitForShutdownSignal(options.shutdownSignals ?? defaultShutdownSignals()).then((signal) =>
+        Object.freeze({ kind: 'signal' as const, signal })
+      ),
+      supervisor.waitForDelivery().then(() => Object.freeze({ kind: 'delivery-stopped' as const })),
+    ]);
+    if (outcome.kind === 'delivery-stopped') {
+      throw new Error('Saga delivery listener stopped before process shutdown.');
+    }
+    return await supervisor.stop(`signal:${outcome.signal}`);
+  } catch (cause) {
+    await supervisor.stop('saga-delivery-failed');
+    throw cause;
+  }
 }
 
 /** Load saga definitions from the generated static registry module. */
@@ -111,6 +153,38 @@ export async function loadSagaRegistryModule(
 
 function defaultImporter(specifier: string): Promise<unknown> {
   return import(specifier) as Promise<unknown>;
+}
+
+async function resolveProjection(
+  options: StartSagaRunnerOptions,
+  readEnv: SagaRunnerEnvReader,
+): Promise<SagaInstanceProjectionPort | undefined> {
+  if (options.projection === false) {
+    return undefined;
+  }
+  if (options.projection) {
+    return options.projection;
+  }
+  const bootstrapModule = readEnv('NETSCRIPT_PLUGIN_SERVICE_BOOTSTRAP_MODULE');
+  if (!bootstrapModule) {
+    return new KvSagaInstanceProjection();
+  }
+  const imported = await import(bootstrapModule) as SagaRunnerBootstrap;
+  const context = await imported.createPluginServiceContext('sagas');
+  const client = await context.db.getClient();
+  return isProjectionClient(client)
+    ? new PrismaSagaInstanceProjection(client)
+    : new KvSagaInstanceProjection();
+}
+
+function isProjectionClient(
+  candidate: unknown,
+): candidate is PrismaSagaInstanceProjectionClient {
+  if (!isRecord(candidate)) {
+    return false;
+  }
+  const sagaInstance = candidate.sagaInstance;
+  return isRecord(sagaInstance) && typeof sagaInstance.upsert === 'function';
 }
 
 function withDefaultTelemetry(
