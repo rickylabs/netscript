@@ -25,7 +25,11 @@
 - Compute estimate: milestone 0.0.5 has 28 PRs / 146 commits. At the harness one-slice-commit per
   push convention, ~146 draft pushes × 13 retired routinely materialized jobs = ~1,898 avoided job
   starts; up to ~2,044 when the path-filtered code-quality job also matches.
-- AFTER draft push and ready-flip run URLs: to be added from this PR's Actions history.
+- AFTER draft PR #1212: core CI [run 30891562617](https://github.com/rickylabs/netscript/actions/runs/30891562617),
+  e2e [run 30891563314](https://github.com/rickylabs/netscript/actions/runs/30891563314), and surface
+  [run 30891563153](https://github.com/rickylabs/netscript/actions/runs/30891563153) all completed
+  `skipped`; no jobs ran. This is the same pull-request push shape with `draft: true`.
+- AFTER ready-flip run URLs: to be added after transitioning PR #1212.
 
 ## Validation
 
