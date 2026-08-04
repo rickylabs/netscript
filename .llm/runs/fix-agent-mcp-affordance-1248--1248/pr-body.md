@@ -10,14 +10,15 @@ Explain `netscript agent mcp` when a developer launches it interactively while p
 ## Slices
 
 - [x] S0 Issue-first research, locked plan, draft surface — `9dd3e82cd`
-- [x] S1 TTY affordance and editor snippets — pending implementation commit
-- [x] S2 Help/docs and targeted gates — pending implementation commit
+- [x] S1 TTY affordance and editor snippets — `bab5eaefc`
+- [x] S2 Help/docs and targeted gates — `bab5eaefc`
 
 ## Validation
 
 - Focused MCP command/adapters: 4 passed
 - CLI package: 597 passed / 484 steps
 - Scoped check/lint/fmt and diff hygiene: pass
+- Documentation links and accuracy: pass
 
 ## Harness
 
