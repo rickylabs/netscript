@@ -1126,3 +1126,14 @@ outrank the caveat kill-list; nothing in-flight displaced. Plan rows added (tota
   byte-identical 0.0.4→canary.2. The adjacent REAL failure mode is passing method-bearing
   RuntimeFormState into an island instead of its serializable snapshot (misuse).
 They ride whichever canary follows their merges (content-derived membership).
+
+## 2026-08-04 — MERGE #1233 (#1136 closed); W5-V3 dispatched — all three verified defects in flight
+
+- **Merge: PR #1233 (S10/F4a)** — all four contexts green on first gate read (the agent's
+  ready-merge label mirror satisfied close-gate itself); refs `Closes #1136`, sidebar [1136]
+  exact; threads 0/0; #1136 auto-closed, verified. Delivered with the S8-ordering dependency
+  verified on main first, public positive + negative receipt proofs, F4b excluded, opposite-
+  family review PASS. OMB epic: only S9 (#1232, ready, agent polishing) remains this wave;
+  S11/S12 at wave 7.
+- **#1236 slice dispatched** (ns005-plugrm, Sol·medium) — all three verified defects now have
+  live lanes (#1234 ns005-genjobs, #1235 ns005-streamdb, #1236 ns005-plugrm).
