@@ -38,10 +38,10 @@ Deno.test('createQueryFactory builds stable action keys and query options', asyn
   const store = new MemoryCacheStore();
   setCacheProvider(new CacheQuery(store));
 
-  const client = {
+  const client: ServiceClient<typeof contract> = {
     list: (input: ListInput): Promise<ListOutput> =>
       Promise.resolve({ items: [`${input.limit}:${input.offset}`] }),
-  } as unknown as ServiceClient<typeof contract>;
+  };
 
   const factory = createQueryFactory('orders', contract, client);
   const key = factory.list.key({ limit: 20, offset: 0 });
@@ -63,12 +63,12 @@ Deno.test('queryOptions shares the server CacheQuery entry and action invalidati
 
   let currentItem = 'before-mutation';
   let clientCalls = 0;
-  const client = {
+  const client: ServiceClient<typeof contract> = {
     list: (_input: ListInput): Promise<ListOutput> => {
       clientCalls += 1;
       return Promise.resolve({ items: [currentItem] });
     },
-  } as unknown as ServiceClient<typeof contract>;
+  };
 
   const factory = createQueryFactory('orders', contract, client);
   const input = { limit: 20, offset: 0 };
@@ -89,12 +89,12 @@ Deno.test('queryOptions remains a direct service query when no server cache is r
   resetCacheProvider();
 
   let clientCalls = 0;
-  const client = {
+  const client: ServiceClient<typeof contract> = {
     list: (_input: ListInput): Promise<ListOutput> => {
       clientCalls += 1;
       return Promise.resolve({ items: [`call-${clientCalls}`] });
     },
-  } as unknown as ServiceClient<typeof contract>;
+  };
 
   const options = createQueryFactory('orders', contract, client).list.queryOptions({
     limit: 20,

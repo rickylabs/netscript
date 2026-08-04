@@ -10,7 +10,7 @@ import {
   DEFAULT_QUERY_CACHE_INVALIDATION_PATH,
   type ServerQueryCacheKey,
   type ServerQueryCacheKeyPart,
-} from '../../application/query/query-cache-invalidation.ts';
+} from '../../application/query/cache-invalidation/mod.ts';
 
 /** Configuration for the framework-owned server query-cache invalidation route. */
 export interface FreshQueryCacheInvalidationOptions {

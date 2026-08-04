@@ -80,6 +80,8 @@ hydration in `packages/fresh/src/application/query/`; extend the HTTP edge in
 | 2026-08-04 | S2 | GREEN | Fresh now seeds hydration data once before observer creation, preserves its server timestamp, and exposes fetching/refetching state. Focused tests 5/5 and scoped Fresh check pass. |
 | 2026-08-04 | S3 | RED | A POST to the planned standard invalidation path returned 404 from current `defineFreshApp` (7 pass, 1 fail). |
 | 2026-08-04 | S3 | GREEN | Fresh now owns the same-origin JSON endpoint and browser helper; the mutate→invalidate→reload integration test observes the committed value. Focused tests 13/13, scoped check, and source-format gate pass. |
+| 2026-08-04 | S4 | audit correction | The first final Fresh audit exposed a slice-owned query-directory cardinality warning (13 > 12). Moved the helper/test into one focused submodule; rerun returned exactly the four recorded baseline findings. |
+| 2026-08-04 | S4 | validation | Fresh package tests pass 215/215; Fresh/SDK scoped checks, lint and format pass; `quality:gate` exits 0; doc-lint/audit counts do not deepen. |
 
 ## Decisions
 
@@ -115,13 +117,19 @@ hydration in `packages/fresh/src/application/query/`; extend the HTTP edge in
 | S3 Fresh focused tests | three invalidation/bootstrapping test files | PASS | 13 passed; default/override/disable, request validation, browser helper, and reload path |
 | S3 Fresh scoped check | `run-deno-check.ts --root packages/fresh --ext ts,tsx` | PASS | 179 selected files; zero diagnostics |
 | S3 Fresh source format | `run-deno-fmt.ts --root packages/fresh --ext ts,tsx` | PASS | 179 selected files; zero findings after formatting owned files |
+| Fresh package test | `deno task --cwd packages/fresh test` | PASS | 215 passed; zero failed after final module layout |
+| Fresh scoped lint / format | repo wrappers over `packages/fresh` | PASS | 179 files; zero findings |
+| SDK scoped check / lint / format | repo wrappers over `packages/sdk` | PASS | 77 files; zero diagnostics/findings |
+| Doctrine quality | `deno task quality:gate` | PASS | exit 0; repository dependency/doctrine warnings are pre-existing and outside slice |
+| Patch hygiene | `git diff --check` + added-line marker scan | PASS | no whitespace errors; no new ignore directives, `as unknown as`, or `@ts-ignore` |
 
 ### Fitness Gates
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| JSR baseline Fresh | BASELINE_FAIL | `audit-jsr-package.ts` | dry-run OK; pre-existing module-tag/cardinality/slow-type findings |
-| JSR baseline SDK | BASELINE_WARN | `audit-jsr-package.ts` | dry-run OK; pre-existing cardinality/slow-type warnings |
+| JSR baseline Fresh | NO_DEEPENING | `audit-jsr-package.ts` | dry-run OK; exact baseline 4 findings after correcting slice-owned cardinality |
+| JSR baseline SDK | NO_DEEPENING | `audit-jsr-package.ts` | dry-run OK; exact baseline 2 warnings |
+| Structured doc lint | NO_DEEPENING | Fresh 44; SDK 1 | exact recorded baselines |
 
 ### Runtime Gates
 
@@ -140,4 +148,5 @@ hydration in `packages/fresh/src/application/query/`; extend the HTTP edge in
 ## Handoff Notes
 
 - Inspect D1/D2/D5 and the RED proof entries first.
-- Compare final structured doc/audit counts to the recorded baseline; do not accept new findings.
+- D6 deliberately leaves formal evaluation to draft→ready augment and the orchestrator pre-merge gate.
+- The user-owned `deno.lock` queue row remains unstaged and is not part of this PR.

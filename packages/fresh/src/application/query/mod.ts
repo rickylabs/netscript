@@ -33,7 +33,7 @@ export {
   type InvalidateServerQueryCacheOptions,
   type ServerQueryCacheKey,
   type ServerQueryCacheKeyPart,
-} from './query-cache-invalidation.ts';
+} from './cache-invalidation/mod.ts';
 
 // === Package-owned query types ===
 export type {

@@ -1,8 +1,5 @@
 import { assertEquals, assertRejects } from '@std/assert';
-import {
-  DEFAULT_QUERY_CACHE_INVALIDATION_PATH,
-  invalidateServerQueryCache,
-} from './query-cache-invalidation.ts';
+import { DEFAULT_QUERY_CACHE_INVALIDATION_PATH, invalidateServerQueryCache } from './mod.ts';
 
 Deno.test('invalidateServerQueryCache sends the canonical key to the standard endpoint', async () => {
   let receivedInput: string | URL | Request | undefined;

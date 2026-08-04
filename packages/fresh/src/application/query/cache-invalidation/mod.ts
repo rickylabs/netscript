@@ -1,3 +1,9 @@
+/**
+ * Browser-to-server query-cache invalidation contract.
+ *
+ * @module
+ */
+
 /** Default path of the framework-owned server query-cache invalidation endpoint. */
 export const DEFAULT_QUERY_CACHE_INVALIDATION_PATH = '/_netscript/query-cache/invalidate';
 

@@ -1,6 +1,6 @@
 import { assertEquals } from '@std/assert';
 import { App } from 'fresh';
-import { invalidateServerQueryCache } from '../../application/query/query-cache-invalidation.ts';
+import { invalidateServerQueryCache } from '../../application/query/cache-invalidation/mod.ts';
 import { registerQueryCacheInvalidationRoute } from './query-cache-invalidation.ts';
 
 Deno.test('standard invalidation edge makes the next server read observe a committed mutation', async () => {
