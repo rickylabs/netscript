@@ -620,3 +620,18 @@ rerun becomes captured #1196-family evidence, not a retry.
   minute. Rebase itself: 12 commits replayed, two mechanical union conflicts (deno.json tasks,
   README surface table) resolved as supersets, generated publish assets **regenerated not
   hand-merged**, 93/93 combined S4+S5 tests green, pushed to PR #1199.
+
+## 2026-08-04 — Docs lane round 2; a verification-tooling self-catch (finding 22)
+
+- agy round 2 (236s, conversation continued) added the sign-out leg + JWKS configuration and
+  pushed `3326d507a`. Orchestrator re-verification with corrected grep syntax: all six #1106
+  box claims present on the page (Set-Cookie/forwarding 13 refs, sign-out 7, Location 10,
+  JWKS 5, allowedReturnTo 3, Principal 14, sealed-vs-bearer). Boxes ticked with evidence
+  comment; fresh-head contexts watched for the gate.
+
+22. **[orchestrator-grep-false-negative]** Three of the five "gaps" my first docs audit
+    reported were my own tooling: `grep -E "a\|b"` treats `\|` as literal — the multi-word
+    patterns matched nothing and read as missing content. Location was the only true gap
+    (plus JWKS/sign-out being thin). The audit that guards against false greens produced
+    false REDs; verification commands are evidence and need the same negative-case discipline
+    as gates (a control pattern that MUST match would have caught this instantly).
