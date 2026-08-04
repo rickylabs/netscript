@@ -13,18 +13,18 @@ title: NetScript — the Deno meta-framework for typed, observable systems
 }) }}
 
 <p class="ns-lede">
-Frameworks give you a web layer, or a service layer, or an orchestrator — and leave the seams
-between them to you. Those seams are where types drift, where background work gets faked with
-retry loops, and where an incident turns into an archaeology session across five tools. NetScript
-exists to own the seams. You describe an operation once, as a contract; the meta-framework carries
-that single definition into the service that implements it, the OpenAPI document that describes it,
-the SDK client that calls it, and the page that renders it. What you did not write cannot drift.
+Frameworks can supply the web layer, the service layer, and the orchestrator while leaving their
+boundaries to the application. Those boundaries are where request types diverge, where durable
+work is reduced to local retry loops, and where incident evidence splits across disconnected logs,
+resource state, and traces. NetScript gives an operation one contract definition, then uses it to
+type the handler and the client and to generate the OpenAPI description. What is derived from the
+contract cannot drift from it.
 </p>
 
 {{ comp.featureGrid({ items: [
   {
     title: "The contract is the spine",
-    body: "A zod schema and an oRPC route, written once. Service handlers are type-locked to it, the OpenAPI document is generated from it, and the SDK client is derived from it — three surfaces you never write by hand.",
+    body: "A zod schema and an oRPC route define the operation once. A service handler supplies the business logic with contract-locked input and output types; OpenAPI and the SDK client are derived from the same definition, so the boundary shape is never declared twice.",
     href: "/explanation/contracts/"
   },
   {
@@ -41,10 +41,11 @@ the SDK client that calls it, and the page that renders it. What you did not wri
 
 ## One definition, carried end to end
 
-{{ comp.diagram({ src: "/assets/diagrams/contract-flow.svg", alt: "One zod schema and oRPC route feed a type-locked service handler, a generated OpenAPI document, and a derived SDK client with query keys; the SDK feeds the page loader and island, so server and callers cannot drift.", caption: "The principle in one picture: you write the shape once; the handler, the OpenAPI document, the client, and the page are typed from it." }) }}
+{{ comp.diagram({ src: "/assets/diagrams/contract-flow.svg", alt: "One zod schema and oRPC route feed a hand-written but contract-locked service handler, a generated OpenAPI document, and a derived SDK client with query keys; the SDK feeds the page loader and island, so server and callers cannot drift.", caption: "The principle in one picture: declare the boundary once; write the handler against it; derive the OpenAPI document and client from it; consume those types in the page." }) }}
 
-The same operation at three points in the stack. Tab 1 is the only shape you write — everything in
-tabs 2 and 3 is typed from it.
+The same operation at three authored points in the stack. Tab 1 is the only place its input and
+output shapes are declared; the handler and page remain application code, but their boundary types
+come from that contract.
 
 {{ comp.tabbedCode({ tabs: [
   {
@@ -60,7 +61,7 @@ tabs 2 and 3 is typed from it.
   {
     label: "3 · The page",
     lang: "tsx",
-    code: "// apps/dashboard/routes/users/index.tsx\nimport { definePage } from '@netscript/fresh/builders';\nimport { api } from '@app/lib/api-clients.ts'; // derived from the contract\nimport { routes } from '@app/router.ts';\nimport UsersTable from './(_islands)/UsersTable.tsx';\n\nexport const usersPage = definePage()\n  .withRoute(routes.users.$route)\n  .withLayer('users', UsersTable, {\n    loader: async (ctx) => {\n      // Same contract action, same types, and the same query key\n      // the island hydrates from. No hand-written client.\n      const entry = await api.users.list.getCachedEntry({\n        limit: ctx.search.limit,\n      });\n      return { users: entry?.data, cachedAt: entry?.cachedAt };\n    },\n  })\n  .withLayout((slots) => <main class='ns-page'>{slots.users()}</main>)\n  .build();"
+    code: "// apps/dashboard/routes/users/index.tsx\nimport { definePage } from '@netscript/fresh/builders';\nimport { api } from '@app/lib/api-clients.ts'; // derived from the contract\nimport { routes } from '@app/router.ts';\nimport UsersTable from './(_islands)/UsersTable.tsx';\n\nexport const usersPage = definePage()\n  .withRoute(routes.users.$route)\n  .withLayer('users', UsersTable, {\n    loader: async (ctx) => {\n      // Same contract action and input/output types. The server loader\n      // reads the cache; the island receives the result as layer props.\n      const input = { limit: ctx.search.limit };\n      const entry = await api.users.list.getCachedEntry(input);\n      if (entry) return { users: entry.data, cachedAt: entry.cachedAt };\n      return {\n        users: await api.users.list.queryOptions(input).queryFn(),\n        cachedAt: Date.now(),\n      };\n    },\n  })\n  .withLayout((slots) => <main class='ns-page'>{slots.users()}</main>)\n  .build();\n\nexport const { default: page } = usersPage;\nexport { page as default };"
   }
 ] }) }}
 

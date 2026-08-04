@@ -4,10 +4,10 @@ title: Quickstart
 templateEngine: [vento, md]
 ---
 
-Ten minutes from an empty directory to a running system: a typed example service, a Fresh app that
-consumes it through a derived client, Postgres and a shared cache in containers, and an Aspire
-dashboard tracing all of it. Every piece you are about to scaffold is one instance of the model
-described in [Core concepts](/concepts/) — this page only runs it.
+From an empty directory to a running workspace: scaffold a typed example service, a Fresh app that
+consumes it through a derived client, Postgres, a shared cache, and the Aspire dashboard that
+observes those resources. This page runs one instance of the model described in
+[Core concepts](/concepts/).
 
 {{ comp callout { type: "note", title: "Prerequisites" } }}
 Install <strong><a href="https://docs.deno.com">Deno 2.x</a></strong> and the
@@ -59,9 +59,9 @@ Open the dashboard URL with the one-time login token that `aspire start` prints.
 four resources report healthy — the Fresh app, the example service, Postgres, and the shared
 cache — then open the Fresh app from its resource link. The page heading should read `my-app`.
 
-You are looking at the whole system: click any resource for its logs, and any request for its
-trace. This dashboard is the same surface you will use when something breaks —
-[observability](/observability/) is wired in from the first minute, not bolted on later.
+The dashboard is the operational view of the workspace. Open a resource to inspect its logs;
+after exercising an instrumented path, use the trace view to follow work across processes. See
+[Observability](/observability/) for the telemetry model.
 
 {{ comp callout { type: "note", title: "Aspire comes before any database command" } }}
 The AppHost must start Postgres before a migration, generation, or seed command can connect to it.

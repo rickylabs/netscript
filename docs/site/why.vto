@@ -34,13 +34,12 @@ That standing maintenance is the **integration tax**: unrelated tools pretending
 
 ## 2. What a meta-framework changes
 
-NetScript does not invent new primitives — Fresh renders, Hono serves, Postgres stores, exactly as
-they would without it. What it adds is ownership of the two architecture decisions that are
-expensive to retrofit once they spread through an application: callers derive their types from
-shared contracts, and multi-step work runs through durable state. Replacing parallel client
-definitions or ad-hoc effects later means changing every caller and workflow; logging, by
-contrast, can still be added at any point. A meta-framework earns its keep exactly here — at the
-decisions you cannot cheaply reverse.
+NetScript does not replace the underlying primitives — Fresh renders, Hono serves, and Postgres
+stores as they would without it. It standardizes boundaries that become expensive after they have
+spread through an application: shared contracts keep handlers and callers aligned, durable
+runtimes make long-running work explicit, and generated resource wiring keeps processes,
+dependencies, and telemetry in one operational model. These constraints cost flexibility; their
+value is that a team does not redesign the same seams independently in every service.
 
 The rest of NetScript makes those two decisions operational. Services serve the contract at request
 time, plugin runtimes own the work that outlives a request, and Aspire brings up the resources with
