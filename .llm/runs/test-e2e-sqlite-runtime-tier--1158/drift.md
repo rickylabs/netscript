@@ -414,3 +414,40 @@ documentation.
   check, the S7 exclusion rationale ("libSQL rejects the tagged form") is at best incomplete. The
   follow-up issue must cover both engines, not just sqlite.
 - **Evidence:** `.llm/tmp/e2e-report-postgres-regression.json`; the run log; `git diff` scope above.
+
+## 2026-08-04 — D-16 RESOLVED: the postgres merge-bar failure is pre-existing on `main`
+
+- **What:** D-16 is closed as **not a regression**. `scaffold.runtime` fails identically at
+  merge-base `main` @ `c6f243da`, with none of this branch's changes present.
+
+  | Run                                  | Result               | Failing gate              |
+  | ------------------------------------ | -------------------- | ------------------------- |
+  | This branch (isolated, own lease)    | `passed=51 failed=1` | `behavior.service-health` |
+  | `main` @ `c6f243da` (clean worktree) | `passed=51 failed=1` | `behavior.service-health` |
+
+  Both fail with the same `Invalid \`prisma.$queryRaw()\` invocation: Raw query failed` and the same
+  three-endpoint probe pattern (one unreachable, one 503 db-unhealthy, one 200 Healthy).
+
+- **How it was established, and what was discarded along the way:**
+  1. First failure came with concurrent foreign e2e runs on the host, so **cross-run interference
+     was the leading hypothesis** — recorded as a hypothesis, never as a pass.
+  2. The suite was re-run **in isolation**, with the lease held by this worktree and no foreign
+     runs. It **failed identically**. The interference hypothesis was **wrong** and was abandoned
+     rather than defended.
+  3. A clean worktree was created at `c6f243da`, verified to contain none of this branch's changes
+     (`withDatabasePermissions` absent from every register generator), and the identical suite run
+     there. Same failure. Four contention retries were needed before it could acquire the lease —
+     contention verdicts were discarded as non-results, not counted as failures.
+- **Consequence for this PR:** the branch does **not** regress the merge bar. It also cannot turn it
+  green: `scaffold.runtime` is **currently red on `main`**, which means the repo's merge-readiness
+  gate is broken independently of #1158.
+- **Consequence for D-15 / issue #1259:** confirmed. The exclusion rationale in S7 ("libSQL rejects
+  the tagged `$queryRaw` form") is **too narrow** — the same call form fails on **postgres** too, on
+  `main`, in isolation. #1259 was filed covering both engines before this evidence landed; it is now
+  updated with the decisive baseline comparison.
+- **Severity:** significant (repo-wide), but **not attributable to this run**.
+- **Action:** close D-16 as not-a-regression. Do **not** claim the merge bar is green — it is red on
+  both sides. Hand the defect to #1259 with proof, and let the owner decide whether to merge a PR
+  that is at parity with a broken gate.
+- **Evidence:** `pg-retry.log` (branch, isolated), `pg-baseline.log` (merge-base), both retained;
+  `.llm/tmp/e2e-report-postgres-retry.json` and the baseline report.
