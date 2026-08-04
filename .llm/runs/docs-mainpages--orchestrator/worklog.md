@@ -201,3 +201,29 @@
 
 - **#1272 merged** (18:57Z, zero fails). All program deliverables shipped. Run idle, awaiting
   owner's Charter A fix list.
+
+## 2026-08-04 evening — owner steering: fixes + three epics + #1274 dispatched
+
+- **customize-fresh-ui render bug diagnosed and fixed.** Root cause: server-rendered markup
+  leaves every tab panel visible (hiding is JS-applied via `.is-enhanced` + `[hidden]`) while
+  `.ns-tabbed__tablist` rendered unconditionally — so before/without JS a reader gets a styled,
+  dead tab bar with every variant stacked below. Verified against the deployed HTML + CSS.
+  Gated the tablist on `.is-enhanced` (the component's own stated intent). 47 pages affected,
+  incl. the homepage code moment. Branch `docs/fixes`.
+- **Desktop width fix** on the same branch: prose measure was a flat 80ch (~610px) inside a
+  much wider grid track. Now steps 80→88→96ch at 1400/1800px, TOC rail widens, and full-bleed
+  elements use the whole column.
+- **Epics filed:** #1275 migration chapter (migrate-from guides, capability equivalence matrix,
+  e2e recipes — deferrable checkboxes), #1276 type-soundness ratification (evidence swept:
+  docs conceding TS2551/TS2345 + `as unknown as`, `~orpc: any` in the PUBLIC contract surface,
+  56 source casts, 8 lint suppressions, 7 ratified allowances; 6 tranches incl. a CI gate),
+  #1277 docs-site layout/UI polish (with the two fixes already landed recorded, and the GLM
+  design-lane requirement noted).
+- **Lane change D-16:** authoring moves to agy (gemini-3.6-flash·high) + Codex Sol·medium per
+  owner; orchestrator is orchestrator + validator/evaluator only.
+- **#1274 Quickstart rewrite dispatched** — Codex Sol·medium, worktree /home/codex/repos/
+  ns-quickstart, branch docs/quickstart-1274-work, thread 019fce5d-0118-7dd3-9b91-fc0622c3696d,
+  route matched. Brief carries the wave-6 context (the page is the only instruction agents get),
+  the owner's priority order (verify gate → db init → feature-authoring loop → contract
+  derivation → orientation → six bugs), and both hard constraints (sync with storefront/01,
+  orientation not length).

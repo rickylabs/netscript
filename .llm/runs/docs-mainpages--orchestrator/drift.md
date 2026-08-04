@@ -118,3 +118,10 @@ Confirmed findings:
   layer 5; quickstart rebuilt with promise → scaffold-anatomy → dashboard payoff → honest
   first change; why reframed around what a meta-framework changes. Owner-ordered adversarial
   pass: Sol · HIGH (explicit effort override on resume) against the owner's exact criticisms.
+
+- **D-16 (owner lane instruction, 2026-08-04 evening).** Authoring lanes for all further
+  docs work: **agy · gemini-3.6-flash · high** and **Codex · GPT-5.6 Sol · medium** as the
+  writing sub-agents; the orchestrator (Fable 5 · low) stays orchestrator + validator/evaluator
+  and does not author. Supersedes the Opus docs-exception authoring used for #1222/#1241/#1272.
+  Opposite-family review invariant unchanged: a Codex-authored page is reviewed Claude-family
+  or by agy; the orchestrator owns the final gate.
