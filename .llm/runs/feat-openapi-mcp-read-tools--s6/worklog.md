@@ -77,6 +77,18 @@ Start at `tool-contracts.ts` for wire shape, follow the named flow in
 | Package publish dry-run | PASS — no slow-type failure; S6 files in intended publish list |
 | Lock hygiene | PASS after reversing Deno's unrelated queue lock resolution; final diff pending |
 
+## CI reconcile
+
+- The first OpenHands dispatch failed before model execution because the workflow received an
+  unqualified LiteLLM model id. Retried through the repo dispatcher with
+  `openrouter/qwen/qwen3.7-max`; composed evaluation remains in progress.
+- Branch CI found one stale cross-package fixture: the real CLI stdio smoke still asserted the
+  pre-S6 registry count of 14. Updated it to the live post-S6 count of 17; the focused smoke passes
+  1/1 and its scoped format check passes.
+- The scaffold runtime reached 29 passing steps before an unrelated Aspire restore preparation
+  timed out after two 900-second attempts. The staged brief explicitly excludes AppHost/scaffold
+  runs for this fixture-only slice.
+
 ## Slice reconcile
 
 - Issue 1132 remains open with three acceptance boxes; PR 1204 is draft with `status:plan` and

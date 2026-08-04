@@ -16,3 +16,19 @@
 - **Disposition:** no local formal PLAN-EVAL/IMPL-EVAL. Record composed waiver rows; use
   draft→ready augment + OpenHands + orchestrator pre-merge gate, retaining opposite-family code
   review.
+
+## 2026-08-04 — OpenHands provider qualification
+
+- **Severity:** infrastructure
+- **Observed:** the first dispatch passed `qwen/qwen3.7-max`; LiteLLM rejected it before model
+  execution because the provider prefix was absent.
+- **Disposition:** retry once with the dispatcher's documented literal id
+  `openrouter/qwen/qwen3.7-max`; retain the failed run as infrastructure evidence.
+
+## 2026-08-04 — stale CLI registry fixture
+
+- **Severity:** implementation reconcile
+- **Observed:** package-local registry and stdio fixtures passed at 17, but the repository-wide real
+  CLI stdio smoke retained the pre-S6 expectation of 14.
+- **Disposition:** synchronize that fixture to the verified live 14→17 delta and prove it with the
+  focused real CLI stdio test.
