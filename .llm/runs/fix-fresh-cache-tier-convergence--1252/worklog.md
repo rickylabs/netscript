@@ -75,6 +75,7 @@ hydration in `packages/fresh/src/application/query/`; extend the HTTP edge in
 | 2026-08-04 | S0 | reconcile | Rebasing onto new main `26fe0da9b` changed the bootstrap commit to `e39c9c4d7`; explicit lease/refspec push preserved the remote commit trail and lock edit. |
 | 2026-08-04 | S1 | RED | Corrected assertion compared item values; current direct queryFn then failed at the second read: `Expected before-mutation, got after-mutation` (2 pass, 1 fail). |
 | 2026-08-04 | S1 | GREEN | Server query options now select the registered CacheProvider; browser/no-provider calls remain direct. Focused tests 3/3 and scoped SDK check pass. |
+| 2026-08-04 | S1 | reconcile | Issue #1252 still has exactly the four specification comments already researched; PR #1265 has no external review/evaluator comment. Labels/milestone/closing keyword remain correct. |
 
 ## Decisions
 

@@ -30,7 +30,7 @@ local PLAN-EVAL.
 
 ## In Progress
 
-- S1 sign-off commit, push, and PR slice evidence.
+- S1 PR slice evidence and post-slice reconciliation.
 
 ## Next Steps
 
@@ -79,4 +79,5 @@ local PLAN-EVAL.
 
 ## Commits
 
-- See the draft PR's commit list + per-slice PR comments after S0.
+- S0 bootstrap/reconcile: `e39c9c4d7`, `fd766dcd4`.
+- S1 cache-aware query options: `4838516f2` (plus this reconcile evidence commit).
