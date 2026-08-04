@@ -1617,3 +1617,19 @@ one page over. Caught by scope-diffing the branch before merge (`--name-only | g
 trust — `git diff origin/main...HEAD --name-only | grep -v '^docs/'` must be empty before a
 docs PR is gated. A generator asked to make an example executable will, if the surface does not
 support it, extend the surface; that is the predictable failure mode, not an aberration.**
+
+## 2026-08-04 — #1227 reprioritized on live evidence: it is eating canary pairs
+
+Canary.9's pinned prod E2E (run 30950885499) has run **37 minutes** on the single
+`Full scaffold runtime E2E (published CLI, one pass)` step. Baseline from the two prior
+successful runs of the same workflow: **8m and 9m end to end**. Same signature that killed
+canary.6's pair — so #1227 has now cost **two canary pairs**, making its cost recurring and
+measurable. Steered the CI lane to take **#1227 first**, ahead of #1188 (gate hole) and #1219,
+overriding my own earlier ordering: a defect with a demonstrated recurring cost outranks one
+with a theoretical one, and I had ordered by severity-on-paper rather than by observed burn.
+**#1219 also reproduced live in the same window:** e2e-cli runs 30952993597 and 30953259748
+both spawned and were cancelled within four minutes on the DOCS-ONLY PR #1292 — the expensive
+lane firing on a changeset that cannot affect it. Both live occurrences were cited in the
+steer as evidence rather than restating the issue bodies.
+Per finding 26 canary.9 is NOT cancelled; if its pair fails it is recorded as a failed pair
+and the ledger's next green pair comes from canary.10's full chain.
