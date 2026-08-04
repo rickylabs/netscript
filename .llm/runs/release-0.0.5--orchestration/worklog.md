@@ -1788,3 +1788,21 @@ Within ~an hour of the reset redemption every dispatched slice produced a PR wit
 - The #1290 lane held #1299 in DRAFT rather than claim a box that depended on #1300 landing.
   Recording it as the behaviour the gate exists to force, arrived at without being told.
 Remaining pilot blockers: #1290 (#1299, rebasing) and #1294 (#1298, ready and gating).
+
+## 2026-08-05 — ALL FOUR WAVE-6 PILOT BLOCKERS CLOSED; canary.10 dispatched
+
+- **#1299 → #1290 CLOSED.** Its last red was a self-referential PR-body DoD box ("Required
+  cloud, acceptance, and review gates pass") — only the orchestrator can honestly tick that,
+  so I verified the three contexts green + threads 0/0 on `7c21fa4b` and ticked with that
+  citation. The box itself was earned post-rebase: pristine workspace, full root
+  `deno task check`, zero diagnostics across apps, services and contracts.
+- **Pilot blocker set complete: #1227, #1287, #1294, #1290** — plus #1219, #1188 and (pending)
+  #1196 from the same push.
+- **canary.10 dispatched** — the wave-6 pilot release, and the FIRST canary whose workflow
+  walks the Quickstart against the published CLI with seven independent verdicts (#1294's
+  `quickstart.walk`, wired next to `scaffold.runtime`).
+- What canary.10 answers that no previous canary could: whether a clean machine can follow the
+  Quickstart end to end unattended. Every earlier canary's green pair proved only that
+  `scaffold.runtime` passed — which is exactly why #1290 (fresh `init --service` failing
+  `deno task check`) rode invisibly through canary.9. The owner's bar is now enforced by a gate
+  rather than by hand.
