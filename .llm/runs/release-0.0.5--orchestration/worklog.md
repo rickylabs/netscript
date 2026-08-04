@@ -1227,3 +1227,13 @@ so resume all victims rather than debugging any one of them.**
   left scaffold output at ^0.1.86 and the lockstep test caught it (2763 passed / 1 failed).
   Steer 2 sent: lockstep or revert, plus acceptance-evidence mirror for close-gate. The
   gate is doing exactly its job: two real defects stopped pre-merge.
+
+## 2026-08-04 — MERGE #1238 (#1235 closed): StreamDB wrapper type preservation lands
+
+Gate record: head `664e8fb6` — quality/check-test/deps-report green (after two real
+defects caught and fixed in the gate loop: fixture TS2322, react-db catalog lockstep),
+close-gate green on job rerun after the orchestrator gate box was ticked with evidence
+(label re-add was an idempotent no-op → no labeled event → job-level rerun was the cure;
+matches the "reruns also work now" contract). Threads 0/0, refs [1235] verified post-edit.
+**#1235 auto-closed, verified.** Second of the verified-defect triad lands; rides canary.8.
+Remaining triad: #1237 (version-drift steer in), #1239 (genjobs, suite running).
