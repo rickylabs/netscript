@@ -1,7 +1,7 @@
 import { definePage } from '@netscript/fresh/builders';
 import {
-  dehydrateQueryClient,
   type DehydratedState,
+  dehydrateQueryClient,
   hydrateFromDehydrated,
   useMutation,
   useQuery,
@@ -10,7 +10,6 @@ import {
 import { Deferred } from '@netscript/fresh/defer';
 import { z } from 'zod';
 import { useRef } from 'preact/hooks';
-import type { JSX } from 'preact';
 
 // Define typed route contract
 import { bindRoutePattern, defineRouteContract } from '@netscript/fresh/route';
@@ -43,19 +42,20 @@ const ordersQueryUtils = {
   list: {
     queryOptions: (input: { limit: number; offset: number; status?: string }) => ({
       queryKey: ['orders', input] as const,
-      queryFn: async (): Promise<OrderList> => {
-        return { items: [], total: 0 };
+      queryFn: (): Promise<OrderList> => {
+        return Promise.resolve({ items: [], total: 0 });
       },
     }),
-    clientKey: (input?: { limit: number; offset: number; status?: string }) => ['orders', input] as const,
-    getCachedEntry: async (input: { limit: number; offset: number; status?: string }) => {
-      return { data: { items: [], total: 0 } as OrderList, cachedAt: Date.now() };
+    clientKey: (input?: { limit: number; offset: number; status?: string }) =>
+      ['orders', input] as const,
+    getCachedEntry: (_input: { limit: number; offset: number; status?: string }) => {
+      return Promise.resolve({ data: { items: [], total: 0 } as OrderList, cachedAt: Date.now() });
     },
   },
   update: {
     mutationOptions: () => ({
-      mutationFn: async (variables: { id: string; status: string }): Promise<Order> => {
-        return { id: variables.id, status: variables.status, amount: 100 };
+      mutationFn: (variables: { id: string; status: string }): Promise<Order> => {
+        return Promise.resolve({ id: variables.id, status: variables.status, amount: 100 });
       },
     }),
   },
@@ -68,13 +68,17 @@ function createNetScriptQueryClient() {
 import { getIslandQueryClient } from '@netscript/fresh/query';
 
 // Preact stubs
-function OrdersTable(props: { items: Order[]; onAdvance: (vars: { id: string; status: string }) => void }) {
+function OrdersTable(
+  props: { items: Order[]; onAdvance: (vars: { id: string; status: string }) => void },
+) {
   return (
     <div>
       {props.items.map((item) => (
         <div key={item.id}>
           {item.status}
-          <button onClick={() => props.onAdvance({ id: item.id, status: 'shipped' })}>Advance</button>
+          <button type='button' onClick={() => props.onAdvance({ id: item.id, status: 'shipped' })}>
+            Advance
+          </button>
         </div>
       ))}
     </div>
@@ -155,10 +159,10 @@ const checkoutFormSchema = z.object({
 
 function CheckoutForm(props: RuntimeFormState<z.input<typeof checkoutFormSchema>>) {
   return (
-    <form method="POST">
-      <input name="address" value={props.values.address ?? ''} />
+    <form method='POST'>
+      <input name='address' value={props.values.address ?? ''} />
       {props.fieldErrors?.address && <span>{props.fieldErrors.address}</span>}
-      <button type="submit">Submit</button>
+      <button type='submit'>Submit</button>
     </form>
   );
 }
@@ -205,9 +209,8 @@ const ordersPage = definePage()
   // Demonstrating withForm in the builder
   .withForm('checkoutForm', CheckoutForm, {
     schema: checkoutFormSchema,
-    mutate: async (_input) => {
-      // Mock mutation call
-      return { success: true };
+    mutate: (_input) => {
+      return Promise.resolve({ success: true });
     },
     onSuccess: () => {
       return { message: 'Address updated successfully' };
