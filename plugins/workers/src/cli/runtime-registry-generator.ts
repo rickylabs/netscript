@@ -189,8 +189,14 @@ async function generateRuntimeRegistry(
       lines.push(`  resolveJobHandler(${entry.varName}, ${JSON.stringify(entry.path)}),`);
     });
     lines.push('];', '', `export const registry = new Map<string, ${valueType}>([`);
-    [...files, ...pluginEntries].forEach((_entry, index) => {
-      lines.push(`  [jobHandlers[${index}].${target.registryKey}, jobHandlers[${index}]],`);
+    files.forEach((file, index) => {
+      lines.push(`  [${JSON.stringify(basename(file, '.ts'))}, jobHandlers[${index}]],`);
+    });
+    pluginEntries.forEach((_entry, index) => {
+      const handlerIndex = files.length + index;
+      lines.push(
+        `  [jobHandlers[${handlerIndex}].${target.registryKey}, jobHandlers[${handlerIndex}]],`,
+      );
     });
   } else {
     lines.push('', `export const registry = new Map<string, ${valueType}>([`);
@@ -285,8 +291,9 @@ function appendJobDefinitions(
 
   lines.push('const jobDefinitionEntries: readonly [string, RegisterJobInput][] = [');
   files.forEach((file, index) => {
+    const jobId = JSON.stringify(basename(file, '.ts'));
     lines.push(
-      `  [jobHandlers[${index}].${target.registryKey}, createLocalJobDefinition(jobHandlers[${index}].${target.registryKey}, './${file}')],`,
+      `  [${jobId}, createLocalJobDefinition(${jobId}, './${file}')],`,
     );
   });
   pluginEntries.forEach((entry, index) => {

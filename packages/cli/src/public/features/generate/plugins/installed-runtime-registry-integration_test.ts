@@ -107,8 +107,7 @@ Deno.test('generated workers registry loads a custom-only job and excludes job t
   await withTempProject(async (projectRoot) => {
     await writeWorkspaceProject(projectRoot, ['plugin-workers'], {
       'workers/jobs/custom-claim-job.ts': `
-const handler = Object.assign(async () => undefined, { id: 'custom-claim-job' });
-export const customClaimJob = handler;
+export const customClaimJob = async () => undefined;
 `,
       'workers/jobs/job-tools.ts': `
 const handler = Object.assign(async () => undefined, { id: 'excluded-job-tools' });

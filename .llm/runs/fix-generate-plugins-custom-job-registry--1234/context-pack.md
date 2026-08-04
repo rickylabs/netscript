@@ -15,7 +15,8 @@
 The plan is locked and PR #1239 is draft with `status:impl`. Public structural discovery and the E2E
 registry regeneration path are implemented. Full runtime evaluation exposed and now fixed the
 manifest generator's default-import mismatch with real scaffolded named handler exports; targeted
-coverage is GREEN and a complete runtime rerun remains.
+coverage is GREEN. A second runtime detail—local IDs belong to filenames, not handler properties—is
+also fixed and directly proven through service startup. A complete runtime rerun remains.
 
 ## Completed
 
@@ -30,6 +31,8 @@ coverage is GREEN and a complete runtime rerun remains.
 - Removed Flow B's generated-registry mutation and documented structural discovery.
 - Logged significant gate-discovered drift and aligned manifest output with the established workers
   handler resolution contract.
+- Aligned local job ID derivation with the existing registry compiler and proved the failed suite
+  project reaches workers `Service listening` after public regeneration.
 
 ## In Progress
 

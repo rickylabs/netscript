@@ -79,6 +79,8 @@ exclusions.
 | 2026-08-04 17:59 CEST | 3 | runtime gate fix | First full smoke passed 27 gates, then exposed an omitted local `.netscript/e2e` directory creation before warmup; made that prerequisite explicit. |
 | 2026-08-04 18:14 CEST | 3 | runtime contract drift | Second full smoke passed Flow B, then workers startup exposed named-export incompatibility in the public manifest generator; logged significant drift and strengthened RED coverage. |
 | 2026-08-04 18:22 CEST | 3 | named-export RED/GREEN | Real scaffold-shaped custom test failed 0/1 on default import, then passed 1/1 after generator handler resolution; full installed-registry file passed 9/9. |
+| 2026-08-04 18:43 CEST | 3 | filename-ID RED/GREEN | Removed the test-only handler `id`; reproduced `toJobName(undefined)`, then derived local IDs from filenames like the established compiler. Targeted 1/1 and full 9/9 passed. |
+| 2026-08-04 18:44 CEST | 3 | service diagnostic | Regenerated the failed suite project through the public CLI; workers service loaded 2 generated jobs and reached `Service listening`. |
 
 ## Decisions
 
@@ -107,6 +109,8 @@ exclusions.
 | Installed registry integration | full integration test file | PASS | 9 passed, 0 failed. |
 | Scaffold-shaped named export RED | targeted custom-only integration test | FAIL | Expected second RED: generated default import rejected the named handler export. |
 | Scaffold-shaped named export GREEN | same targeted test after generator fix | PASS | 1 passed, 0 failed; full file again 9/9. |
+| Scaffold-shaped filename ID RED | plain named handler without synthetic `id` | FAIL | Expected RED: `toJobName(undefined)` exposed handler-ID assumption. |
+| Scaffold-shaped filename ID GREEN | local IDs derived from discovered filenames | PASS | 1 passed, 0 failed; full file again 9/9. |
 | E2E fixture check | `deno check --unstable-kv` on Flow B and runtime gates | PASS | Both modules checked. |
 | Focused lint/fmt | direct lint and fmt check on touched source/docs | PASS | No new ignore; touched files formatted. |
 | Scoped check/lint/fmt | repo wrappers | NOT_RUN | Pending implementation. |
@@ -128,6 +132,8 @@ exclusions.
 | `scaffold.runtime` | NOT_RUN | planned one-pass command | Run only after targeted/static green. |
 | `scaffold.runtime` attempt 1 | FAIL | 27 passed, 1 failed | Flow B public regeneration succeeded; fixture warmup failed because its directory no longer had an implicit creator. Scoped fix applied; full rerun required. |
 | `scaffold.runtime` attempt 2 | FAIL | 33 passed, 1 failed | Flow B gate passed; `workers-api` exposed the generated default-import/named-export mismatch. Contract fix applied; full rerun required. |
+| `scaffold.runtime` attempt 3 | FAIL | 33 passed, 1 failed | Named import succeeded; `workers-api` exposed that scaffold handlers have no runtime `id`. Filename-ID fix applied; full rerun required. |
+| Failed-project workers service diagnostic | PASS | Public regeneration + direct service command | Loaded 2 generated jobs and reached `Service listening`; missing stream env was expected outside Aspire. |
 
 ### Consumer Gates
 
