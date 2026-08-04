@@ -97,3 +97,19 @@ Deno.test('search_exports ranks the specific helper below a general helper by pa
   assertEquals(value.matches[0]?.score, 60);
   assertEquals(value.truncated, false);
 });
+
+Deno.test('search_exports identifies why the generated corpus cannot load', async () => {
+  const brokenCorpus: ExportSurfaceCorpusPort = {
+    load: () =>
+      Promise.reject(
+        new Error('export corpus version 0.0.4 does not match 0.0.5-canary.7'),
+      ),
+  };
+  const result = await createExportSurfaceFlows(brokenCorpus).search_exports({
+    query: 'definePage',
+  });
+
+  assert(!result.ok);
+  assertEquals(result.error.code, 'export_corpus_error');
+  assertMatch(result.error.message, /version 0\.0\.4 does not match 0\.0\.5-canary\.7/);
+});

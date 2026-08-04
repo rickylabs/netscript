@@ -263,10 +263,13 @@ async function withCorpus(
 ): Promise<ToolExecutionResult> {
   try {
     return await action(await port.load());
-  } catch {
+  } catch (error) {
+    const cause = error instanceof Error && error.message.trim()
+      ? truncateText(error.message.trim(), 600).value
+      : 'unknown corpus load failure';
     return failure(
       'export_corpus_error',
-      'The generated export-surface corpus could not complete the request.',
+      `The generated export-surface corpus could not complete the request: ${cause}`,
     );
   }
 }

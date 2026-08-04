@@ -5,6 +5,7 @@ import {
   type VersionBumpMode,
 } from '../deps/bump-version.ts';
 import { PUBLISH_ASSET_OUTPUTS } from '../generate-publish-assets.ts';
+import { EXPORT_SURFACE_CORPUS_OUTPUT } from '../docs/generate-export-surface-corpus.ts';
 import { join } from 'jsr:@std/path@^1.0.0';
 
 export interface CommandResult {
@@ -55,6 +56,14 @@ export async function prepareRelease(
   );
   await runGate(
     label,
+    'gen:mcp-export-corpus',
+    'deno',
+    ['task', 'gen:mcp-export-corpus'],
+    root,
+    dependencies,
+  );
+  await runGate(
+    label,
     'gen:assets-barrel',
     'deno',
     ['task', 'gen:assets-barrel'],
@@ -88,6 +97,7 @@ export async function prepareRelease(
     files: [
       ...bump.files,
       ...PUBLISH_ASSET_OUTPUTS.map((path) => join(root, path)),
+      join(root, EXPORT_SURFACE_CORPUS_OUTPUT),
     ],
   };
 }
