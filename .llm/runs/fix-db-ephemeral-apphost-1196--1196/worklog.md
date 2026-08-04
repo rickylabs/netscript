@@ -72,5 +72,11 @@ existing resident-preservation scaffold gate.
 | Focused lifecycle tests | PASS | operation runner + command wrapper: 4 tests / 13 steps |
 | Scoped check | PASS | 17 selected CLI/E2E files; zero findings |
 | Lock hygiene | PASS | pre-existing `deno.lock` modification remains unstaged |
+| `quality:gate` | PASS | quality scan zero findings; architecture/dependency gate exit 0 |
+| Scoped check/lint/fmt | PASS | 17 selected files; zero findings |
+| CLI package check/test | PASS | exported entrypoint check and full CLI package suite exit 0 |
+| Publish dry-run | PASS | `@netscript/cli@0.0.4` simulation completed successfully; known dynamic-import warnings only |
+| Full scaffold runtime | PASS | `scaffold.runtime`: 71 passed, 0 failed; live DB-status lifecycle gate passed |
+| Resource hygiene | PASS | leak-check reports Aspire/Docker probes OK; only foreign/unproven containers listed and left untouched |
 
-Merge-readiness gates pending.
+Composed evaluator/check evidence and acceptance mirror remain pending after draft-to-ready.
