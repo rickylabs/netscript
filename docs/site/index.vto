@@ -5,7 +5,7 @@ title: NetScript — durable, typed applications on Deno
 
 {{ comp.hero({
   tagline: "Your checkout survives the crash. Your types survive the refactor.",
-  subhead: "NetScript is a framework for durable, typed, full-stack applications on Deno.",
+  subhead: "NetScript gives you durable state machines, one typed contract across the stack, and an observed resource graph — on Deno, without a hosted platform.",
   ctas: [
     { label: "Start a workspace", href: "/quickstart/", primary: true }
   ]
@@ -14,7 +14,7 @@ title: NetScript — durable, typed applications on Deno
 {{ comp.featureGrid({ items: [
   {
     title: "Durability is a state machine",
-    body: "Define state transitions and compensation in TypeScript; the runtime records every step through its saga store instead of treating a multi-step flow as a retry loop.",
+    body: "A multi-step flow is not a retry loop. Define each step and its rollback in TypeScript; the runtime can record progress through its saga store.",
     href: "/durable-workflows/"
   },
   {
@@ -23,8 +23,8 @@ title: NetScript — durable, typed applications on Deno
     href: "/services-sdk/"
   },
   {
-    title: "One command starts the traced fleet",
-    body: "aspire start brings up the whole generated resource graph; the dashboard then reports resource health and carries logs and traces across it.",
+    title: "The traced fleet starts with one command",
+    body: "aspire start brings up every generated resource; the dashboard shows health, logs, and traces for the whole graph from one page.",
     href: "/observability/"
   }
 ] }) }}
@@ -38,10 +38,11 @@ title: NetScript — durable, typed applications on Deno
 ] }) }}
 
 <p class="ns-lede">
-The definition correlates both events by <code>orderId</code>. When <code>inventory.failed</code>
-arrives, its handler returns a compensation request for <code>payment.captured</code>. Executing that
-request needs a saga bus bridge with a compensator; surviving a restart needs a durable store. With
-that wiring, the registered handler emits <code>payment.refund</code>.
+Both events correlate by <code>orderId</code>. When <code>inventory.failed</code> arrives, its
+handler returns a compensation request for <code>payment.captured</code>. A saga bus bridge
+configured with a compensator resolves that request, and a durable store records progress across
+restarts. With those runtime pieces in place, the registered handler emits
+<code>payment.refund</code>.
 <a href="{{ '/durable-workflows/' |> url }}">See the durability model</a>.
 </p>
 
