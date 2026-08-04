@@ -21,3 +21,25 @@
 - **Action:** accept
 - **Evidence:** `.llm/harness/workflow/milestone-run.md`
 
+## 2026-08-04 — real Aspire proxy collision required target-port selection
+
+- **What:** A live scaffold described fixed proxy URL `127.0.0.1:3001` while that port belonged to a
+  foreign `products` process; the resource's allocated executable `PORT` was the trustworthy live target.
+- **Source:** Canonical `scaffold.runtime` named gate `behavior.mcp-endpoint-directory`.
+- **Expected:** The first declared HTTP URL would resolve to the described service.
+- **Actual:** Identity probe correctly returned `identity_mismatch`; adapter selection was hardened to
+  prefer the described executable target port without weakening project/run/service identity checks.
+- **Severity:** significant
+- **Action:** fix
+- **Evidence:** focused multi-port fixture plus scaffold output recorded in `worklog.md`.
+
+## 2026-08-04 — local full gate blocked by unrelated runtime health
+
+- **What:** Serialized canonical attempts did not reach a green suite after S7 was registered.
+- **Source:** `scaffold.runtime --cleanup --format pretty`.
+- **Expected:** All baseline runtime resources healthy, then S7 assertion passes.
+- **Actual:** Attempts stopped at existing users DB-health aggregation or workers-api readiness; cleanup
+  passed. The one S7 execution fired its negative identity case and drove the target-port fix.
+- **Severity:** minor
+- **Action:** defer to fresh branch CI verdict
+- **Evidence:** `worklog.md`; GitHub scaffold-runtime was green on the prior adapter commit.

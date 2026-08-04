@@ -12,8 +12,9 @@
 
 ## Current State
 
-The identity-bound F1(b) adapter slice is implemented and its package/JSR gates pass. Baseline
-verification still owns the AppHost slot; no expensive gate has started here.
+The identity-bound F1(b) adapter and scaffold named gate are implemented. A real proxy collision
+proved the identity guard and added allocated target-PORT selection. Package/static gates pass;
+fresh branch CI must provide the final canonical runtime verdict.
 
 ## Completed
 
@@ -23,15 +24,17 @@ verification still owns the AppHost slot; no expensive gate has started here.
 - Adapter fixtures cover CLI absence, command failure, benign format drift, torn output, foreign
   project resources, and AppHost restart races.
 - Package check/tests, scoped lint/fmt, quality/architecture, docs, and publish dry-run gates pass.
+- Canonical S7 negative case rejected a foreign service on the fixed proxy port.
 
 ## In Progress
 
-- Commit/push slice 2 and queue the serialized scaffold runtime proof.
+- Commit/push S3, then watch fresh branch CI and composed evaluation.
 
 ## Next Steps
 
-1. Re-check S6 and AppHost slot, then run serialized scaffold runtime evidence.
-2. Push explicit refspec, maintain draft PR phase trail, and hand to composed evaluation.
+1. Push explicit refspec and watch fresh scaffold-runtime CI.
+2. Update acceptance evidence/DoD only if the named gate passes.
+3. Hand to composed implementation evaluation.
 
 ## Key Decisions
 
@@ -50,6 +53,7 @@ verification still owns the AppHost slot; no expensive gate has started here.
 | `packages/mcp/src/ports/service-endpoint-directory-port.ts` | changed | finite `run_id_mismatch` failure code |
 | `packages/mcp/tests/service-endpoint-*` | changed | negative and drift fixtures |
 | `packages/mcp/README.md` + generated asset | changed | production behavior and permissions |
+| `packages/cli/e2e/**` | changed/new | named live directory gate wired into scaffold.runtime |
 
 ## Gates
 
@@ -57,8 +61,8 @@ verification still owns the AppHost slot; no expensive gate has started here.
 | --- | --- | --- |
 | Static | pass | check + scoped lint/fmt |
 | Fitness | pass | focused/package tests, quality scan, arch check, JSR dry run |
-| Runtime | queued | baseline owns AppHost slot |
-| Consumer | queued | directory fixture unless S6 lands |
+| Runtime | pending fresh CI | local attempts hit unrelated baseline failures; cleanup clean |
+| Consumer | negative case pass / positive pending | named gate proved foreign-port refusal; target-port fix awaits CI |
 
 ## Open Questions
 

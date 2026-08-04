@@ -114,6 +114,35 @@ Deno.test('runtime gates include durable workers and sagas CLI parity', () => {
   assertEquals(gate.failureHint, undefined);
 });
 
+Deno.test('runtime gates prove MCP Aspire endpoint discovery against the live AppHost', () => {
+  const gate = createRuntimeGates().find((entry) =>
+    entry.id === GATE.BEHAVIOR_MCP_ENDPOINT_DIRECTORY
+  );
+  if (gate?.kind !== 'command') {
+    throw new Error('Expected MCP endpoint directory gate to be a command gate.');
+  }
+  const context = {
+    project: {
+      repoRoot: '/repo',
+      projectRoot: '/workspace/app',
+      appHost: '/workspace/app/aspire/apphost.mts',
+    },
+  } as RunContext;
+  assertEquals(gate.cwd(context), '/workspace/app');
+  assertEquals(gate.command(context), [
+    'deno',
+    'run',
+    '--config',
+    '/repo/packages/mcp/deno.json',
+    '--allow-read',
+    '--allow-run=aspire',
+    '--allow-net=127.0.0.1,localhost',
+    '/repo/packages/cli/e2e/src/application/gates/scaffold/verify-mcp-endpoint-directory.ts',
+    '/workspace/app',
+    '/workspace/app/aspire/apphost.mts',
+  ]);
+});
+
 Deno.test('AI chat route gate captures generated registry import failures', () => {
   const gate = createRuntimeGates().find((entry) => entry.id === GATE.BEHAVIOR_AI_CHAT_ROUTE);
   if (gate?.kind !== 'command') {

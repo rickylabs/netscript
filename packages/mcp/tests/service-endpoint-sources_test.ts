@@ -230,7 +230,7 @@ Deno.test('Aspire CLI absence, non-zero exit, and parse failure are explicit fai
 Deno.test('Aspire CLI accepts casing drift and bounded trailing output while preserving identity', async () => {
   const outputs = [
     'Aspire 14\n{"Items":[{"AppHostPath":"/project/aspire/apphost.mts","AppHostPid":"run-7"}]}\ndone',
-    'notice\n{"Resources":[{"DisplayName":"users","Endpoints":[{"Url":"http://localhost:41234"}],"Properties":{"WorkDir":"/project/services/users"}}]}\ntelemetry',
+    'notice\n{"Resources":[{"DisplayName":"users","Endpoints":[{"Url":"http://localhost:3001"}],"Environment":{"PORT":"41234"},"Properties":{"WorkDir":"/project/services/users"}}]}\ntelemetry',
     '{"appHosts":[{"appHostPath":"/project/aspire/apphost.mts","appHostPid":"run-7"}]}',
   ];
   const source = new AspireCliEndpointSource({

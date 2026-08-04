@@ -133,7 +133,7 @@ export class AspireCliEndpointSource implements EndpointSourcePort {
     for (const rawResource of resources) {
       if (!isAspireRecord(rawResource)) continue;
       const name = resourceName(rawResource);
-      const baseUrl = firstHttpUrl(aspireField(rawResource, 'urls', 'endpoints'));
+      const baseUrl = resourceHttpUrl(rawResource);
       if (!name || !baseUrl) continue;
       const workDir = resourceWorkDir(rawResource);
       if (workDir) {
@@ -239,7 +239,8 @@ function resourceName(resource: Record<string, unknown>): string | undefined {
   return name.replace(/-[a-z0-9]{8}$/i, '');
 }
 
-function firstHttpUrl(value: unknown): string | undefined {
+function resourceHttpUrl(resource: Record<string, unknown>): string | undefined {
+  const value = aspireField(resource, 'urls', 'endpoints');
   if (!Array.isArray(value)) return undefined;
   const urls: string[] = [];
   for (const entry of value) {
@@ -247,7 +248,19 @@ function firstHttpUrl(value: unknown): string | undefined {
     const normalized = normalizeDiscoveredEndpointUrl(rawUrl, false);
     if (normalized) urls.push(normalized);
   }
-  return urls.find((url) => url.startsWith('http://')) ?? urls[0];
+  const declared = urls.find((url) => url.startsWith('http://')) ?? urls[0];
+  if (!declared) return undefined;
+
+  const environment = aspireField(resource, 'environment');
+  const rawTargetPort = isAspireRecord(environment) ? aspireField(environment, 'PORT') : undefined;
+  const targetPort = typeof rawTargetPort === 'string' || typeof rawTargetPort === 'number'
+    ? Number(rawTargetPort)
+    : Number.NaN;
+  if (!Number.isInteger(targetPort) || targetPort < 1 || targetPort > 65_535) return declared;
+  const target = new URL(declared);
+  target.protocol = 'http:';
+  target.port = String(targetPort);
+  return normalizeDiscoveredEndpointUrl(target.toString(), false) ?? declared;
 }
 
 function resourceWorkDir(resource: Record<string, unknown>): string | undefined {

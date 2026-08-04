@@ -59,6 +59,11 @@ fixture that proves both accepted drift and rejection of an adjacent torn/ambigu
 | 2026-08-04 | 2 | review | Split spawn and output parsing from the 370-line draft; final files are 36/282/64 lines. |
 | 2026-08-04 | 2 | live fault proof | A removed baseline AppHost returned `run_id_mismatch` with zero candidates; a current baseline AppHost returned `used`. |
 | 2026-08-04 | 2 | reconcile | S6 still open; no E2E tool-path dependency absorbed. AppHost gate remains serialized. |
+| 2026-08-04 | 3 | interrupted gate | First canonical pass was killed by the Codex daemon update during AppHost start. Ownership reporter found and teardown removed two run-owned containers; no foreign resources touched. |
+| 2026-08-04 | 3 | serialization | A retry was refused by the suite lease held by `ns005-ports`; queued until its PID exited. |
+| 2026-08-04 | 3 | negative E2E | Named MCP gate rejected fixed proxy port 3001 because it identified as foreign service `products`; no false live row escaped. |
+| 2026-08-04 | 3 | hardening | Adapter now prefers the real CLI-described executable target `PORT`, retaining declared URL host/protocol normalization. |
+| 2026-08-04 | 3 | baseline failures | Full one-pass attempts later stopped at existing `behavior.service-health` DB health and `runtime.wait.workers-api` gates before S7. Cleanup passed and leak checks found no survivors. |
 
 ## Decisions
 
@@ -102,7 +107,9 @@ fixture that proves both accepted drift and rejection of an adjacent torn/ambigu
 | AppHost serialization | PASS | `aspire ps --format Json` | Baseline owns slot; this run did not start resources. |
 | live stale-run refusal | PASS | direct adapter read | removed AppHost produced `run_id_mismatch`, no candidates |
 | live current-run query | PASS | direct adapter read | current baseline DB-operation AppHost produced `used` |
-| `scaffold.runtime` | NOT_RUN | queued | wait for baseline slot release |
+| `scaffold.runtime` infrastructure | FAIL (baseline) | canonical one-pass command | independent pre-S7 failures: users DB-health aggregate; workers-api timeout |
+| `behavior.mcp-endpoint-directory` negative case | PASS | canonical one-pass named gate | contested proxy identified as `products`; adapter returned `identity_mismatch` |
+| `behavior.mcp-endpoint-directory` target-port case | PENDING_CI | fresh branch run | local static fixture passes; host slot is now held by foreign `wave5-deepseek` AppHost |
 
 ### Consumer Gates
 
