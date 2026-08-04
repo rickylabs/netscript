@@ -7,6 +7,7 @@ export const SCAFFOLD = {
   INFRASTRUCTURE: 'scaffold.infrastructure',
   PLUGIN: 'scaffold.plugins',
   RUNTIME: 'scaffold.runtime',
+  RUNTIME_SQLITE: 'scaffold.runtime.sqlite',
   USERLAND_INSTALL: 'scaffold.userland-install',
 } as const;
 
@@ -17,6 +18,7 @@ export const SCAFFOLD_TITLE = {
   INFRASTRUCTURE: 'Infrastructure scaffold capability smoke',
   PLUGIN: 'Official plugin scaffold smoke',
   RUNTIME: 'Runtime scaffold capability smoke',
+  RUNTIME_SQLITE: 'Runtime scaffold capability smoke (sqlite, no docker)',
   USERLAND_INSTALL: 'True userland plugin install smoke',
 } as const;
 

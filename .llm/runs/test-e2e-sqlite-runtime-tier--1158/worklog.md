@@ -113,6 +113,7 @@ No gate-filtering logic to touch: waits are derived from the suite's resolved op
 | 2026-08-04 | S2        | Resumed after external timeout                        | Re-read the partial diff, repeated all three public-binary spelling probes under a fresh `/tmp` directory, cleaned it, and independently re-ran all six required gates. The only correction was the second accepted false spelling, recorded as D-6.                |
 | 2026-08-04 | S2        | **Tier-A slice review — ACCEPTED**                    | Supervisor reproduced the six gates, verified the no-cache materialized config, and found no issues. Sign-off commit `47caa6bb`.                                                                                                                                    |
 | 2026-08-04 | S3        | Implementation and generator gates complete           | Added the optional capability defaults contract, one top-level defaults-under-overrides merge, precedence + database-gate tests, and an exact options baseline for all eight existing built-ins. All six required gates passed; Tier-A review is pending.           |
+| 2026-08-04 | S4        | Implementation and generator gates complete           | Added the sqlite runtime id/profile, inherited executable Garnet mode, registry/CLI precedence coverage, and wait/resource consistency checks. All six required gates passed; Tier-A review is pending.                                                             |
 
 ## Slice Review — S1 (Tier-A, supervisor)
 
@@ -319,12 +320,13 @@ invariant, recorded as drift **D-7**. This is the supervisor's own review, perfo
 
 ## Decisions
 
-| Decision                                              | Reason                                                                                    | Source                                               |
-| ----------------------------------------------------- | ----------------------------------------------------------------------------------------- | ---------------------------------------------------- |
-| Garnet wait is **not** filtered                       | The resource exists under the same name in both the container and executable arms         | code (`generate-register-infrastructure.ts:182-212`) |
-| Boolean `cache` axis instead of a `cacheBackend` axis | `--cache-backend deno-kv` yields `Mode: 'External'`, and plugin-add re-adds garnet anyway | code (`generate-appsettings.ts:251-259`)             |
-| S1 (`--allow-ffi`) precedes every E2E slice           | Non-service resources exit 1 on sqlite without it                                         | code (`generate-register-services.ts:32-38`)         |
-| Per-suite `defaults` merged **under** overrides       | A suite id alone cannot pin an engine today                                               | code (`capability-suites.ts:168-192`)                |
+| Decision                                                | Reason                                                                                    | Source                                               |
+| ------------------------------------------------------- | ----------------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| Garnet wait is **not** filtered                         | The resource exists under the same name in both the container and executable arms         | code (`generate-register-infrastructure.ts:182-212`) |
+| Boolean `cache` axis instead of a `cacheBackend` axis   | `--cache-backend deno-kv` yields `Mode: 'External'`, and plugin-add re-adds garnet anyway | code (`generate-appsettings.ts:251-259`)             |
+| S1 (`--allow-ffi`) precedes every E2E slice             | Non-service resources exit 1 on sqlite without it                                         | code (`generate-register-services.ts:32-38`)         |
+| Per-suite `defaults` merged **under** overrides         | A suite id alone cannot pin an engine today                                               | code (`capability-suites.ts:168-192`)                |
+| Generic `run` supplies only explicit db/cache overrides | Cliffy defaults otherwise mask capability defaults; `full` keeps its explicit D6 defaults | code (`run-command.ts`, drift D-9)                   |
 
 ## Drift
 
@@ -334,8 +336,34 @@ invariant, recorded as drift **D-7**. This is the supervisor's own review, perfo
 | Carried-in draft's root-cause analysis was wrong     | significant | yes (D-2)          |
 | #1191's fix is services-only — new blocker           | significant | yes (D-3)          |
 | Apps own no permission-bearing command               | significant | yes (D-5 + ruling) |
+| Generic `run` defaults masked suite defaults         | significant | yes (D-9)          |
 
 ## Gate Results
+
+### S4 Slice Gates
+
+| Gate       | Command                                                                                           | Raw result                                                      |
+| ---------- | ------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| E2E tests  | `deno test --no-lock -A packages/cli/e2e/`                                                        | exit 0; 104 passed, 0 failed                                    |
+| type-check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/cli --ext ts,tsx` | exit 0; 786 files, 7 batches, 0 failed batches, 0 findings      |
+| lint       | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/cli --ext ts,tsx`  | exit 0; 786 files, 4 batches, 0 findings                        |
+| format     | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/cli --ext ts,tsx`   | exit 0; 786 files, 4 batches, 0 failed batches, 0 findings      |
+| quality    | `deno task quality:scan`                                                                          | exit 0; `ok: true`, 0 findings, 7 pre-existing allowances       |
+| doctrine   | `deno task arch:check`                                                                            | exit 0; existing out-of-scope dependency/doctrine warnings only |
+
+**Suite evidence.** `deno task e2e:cli suites` exited 0 and listed
+`scaffold.runtime.sqlite\tRuntime scaffold capability smoke (sqlite, no docker)`. The capability
+resolves to `database: sqlite`, `cache: false`; explicit `--db postgres` wins; and the sqlite
+resolution sets `NETSCRIPT_CACHE_MODE=Executable` only when the operator has not already supplied a
+value. The sqlite and postgres wait-gate arrays exactly match `runtimeResources()` for their
+engines. Both retain `runtime.wait.garnet`; sqlite has no postgres/mysql/mssql wait, while the
+unchanged runtime suite has postgres and neither mysql nor mssql.
+
+**Post-slice reconcile note.** S4 remains partial work on #1158 / draft PR #1220. No closing
+relationship, labels, milestone, `.github/**`, Docker cleanup, live runtime, or
+`packages/cli/src/**` surface changed. Drift D-9 records the generic CLI defaults that masked the
+new capability defaults. S4 is implementation-complete with green automated gates and remains
+explicitly pending Tier-A review; S5 has not started.
 
 ### S3 Slice Gates
 
@@ -431,5 +459,7 @@ has not started.
   leaves every non-sqlite scaffold byte-identical.
 - No product code exists at PLAN-EVAL time. Implementation begins only on `PASS`.
 - S1 and S2 are signed off. S3 implementation is complete with green automated gates but is **not
-  self-certified**. Tier-A must review the defaults merge, registry precedence, gate filtering, and
-  exact built-in options baseline before sign-off; do not start S4 from this handoff.
+  self-certified**. Tier-A review subsequently signed off S3. S4 is implementation-complete with
+  green automated gates but is **not self-certified**. Tier-A must review the additive constants,
+  environment precedence, generic-run drift D-9, and wait/resource matrix before sign-off; do not
+  start S5 from this handoff.

@@ -1,4 +1,4 @@
-import { assertEquals } from '@std/assert';
+import { assertEquals, assertStrictEquals } from '@std/assert';
 import { DEPLOY, GATE, SCAFFOLD } from '../../src/domain/cli-surface.ts';
 import {
   DATABASE,
@@ -7,11 +7,13 @@ import {
   REPORT_FORMAT,
 } from '../../src/domain/extension-axes.ts';
 import type { RunOptions } from '../../src/domain/run-context.ts';
+import { runtimeResources } from '../../src/application/gates/scaffold/runtime-gates.ts';
 import { builtInSuites, resolveSuite } from '../../src/presentation/cli/suites/registry.ts';
 import {
   createScaffoldCapabilitySuite,
   type ScaffoldCapabilitySuite,
   scaffoldCapabilitySuites,
+  SQLITE_RUNTIME_CACHE_MODE,
 } from '../../suites/scaffold/capability-suites.ts';
 
 Deno.test('registry exposes scaffold capability suites from constants', () => {
@@ -21,6 +23,7 @@ Deno.test('registry exposes scaffold capability suites from constants', () => {
     SCAFFOLD.INFRASTRUCTURE,
     SCAFFOLD.PLUGIN,
     SCAFFOLD.RUNTIME,
+    SCAFFOLD.RUNTIME_SQLITE,
     SCAFFOLD.USERLAND_INSTALL,
     DEPLOY.TARGETS,
     DEPLOY.DESKTOP_NATIVE,
@@ -169,6 +172,71 @@ Deno.test('runtime suite omits database resource wait for sqlite', () => {
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.RUNTIME_WAIT_GARNET), true);
 });
 
+Deno.test('sqlite runtime suite resolves its no-container defaults without overriding operator cache mode', () => {
+  const environmentVariable = SQLITE_RUNTIME_CACHE_MODE.environmentVariable;
+  const previous = Deno.env.get(environmentVariable);
+  const operatorCacheMode = 'Container';
+  try {
+    Deno.env.delete(environmentVariable);
+    const sqlite = resolveSuite(SCAFFOLD.RUNTIME_SQLITE);
+    assertEquals(sqlite.defaultOptions.database, DATABASE.SQLITE);
+    assertEquals(sqlite.defaultOptions.cache, false);
+    assertEquals(Deno.env.get(environmentVariable), SQLITE_RUNTIME_CACHE_MODE.value);
+
+    Deno.env.set(environmentVariable, operatorCacheMode);
+    resolveSuite(SCAFFOLD.RUNTIME_SQLITE);
+    assertEquals(Deno.env.get(environmentVariable), operatorCacheMode);
+  } finally {
+    if (previous === undefined) Deno.env.delete(environmentVariable);
+    else Deno.env.set(environmentVariable, previous);
+  }
+});
+
+Deno.test('sqlite runtime suite keeps explicit database overrides above suite defaults', () => {
+  const sqlite = resolveSuite(SCAFFOLD.RUNTIME_SQLITE, {
+    database: DATABASE.POSTGRES,
+  });
+  assertEquals(sqlite.defaultOptions.database, DATABASE.POSTGRES);
+  assertEquals(sqlite.defaultOptions.cache, false);
+});
+
+Deno.test('runtime suite wait matrices match runtime resources for postgres and sqlite', () => {
+  const runtimeCapability = scaffoldCapabilitySuites.find((suite) => suite.id === SCAFFOLD.RUNTIME);
+  const sqliteCapability = scaffoldCapabilitySuites.find((suite) =>
+    suite.id === SCAFFOLD.RUNTIME_SQLITE
+  );
+  if (!runtimeCapability || !sqliteCapability) {
+    throw new Error('Runtime capability suites are not registered.');
+  }
+  assertStrictEquals(sqliteCapability.gates, runtimeCapability.gates);
+
+  const cases = [
+    [resolveSuite(SCAFFOLD.RUNTIME), DATABASE.POSTGRES],
+    [resolveSuite(SCAFFOLD.RUNTIME_SQLITE), DATABASE.SQLITE],
+  ] as const;
+  for (const [suite, database] of cases) {
+    const waitGateIds = suite.gates
+      .map((gate) => gate.id)
+      .filter((id) => id.startsWith('runtime.wait.'));
+    assertEquals(
+      waitGateIds,
+      runtimeResources(database).map((resource) => `runtime.wait.${resource}`),
+      suite.id,
+    );
+  }
+
+  const sqliteGateIds = cases[1][0].gates.map((gate) => gate.id);
+  assertEquals(sqliteGateIds.includes(GATE.RUNTIME_WAIT_GARNET), true);
+  assertEquals(sqliteGateIds.includes(GATE.RUNTIME_WAIT_POSTGRES), false);
+  assertEquals(sqliteGateIds.includes(GATE.RUNTIME_WAIT_MYSQL), false);
+  assertEquals(sqliteGateIds.includes(GATE.RUNTIME_WAIT_MSSQL), false);
+
+  const runtimeGateIds = cases[0][0].gates.map((gate) => gate.id);
+  assertEquals(runtimeGateIds.includes(GATE.RUNTIME_WAIT_POSTGRES), true);
+  assertEquals(runtimeGateIds.includes(GATE.RUNTIME_WAIT_MYSQL), false);
+  assertEquals(runtimeGateIds.includes(GATE.RUNTIME_WAIT_MSSQL), false);
+});
+
 Deno.test('runtime suite selects mssql database resource wait for mssql', () => {
   const runtime = resolveSuite(SCAFFOLD.RUNTIME, { database: DATABASE.MSSQL });
   assertEquals(runtime.defaultOptions.database, DATABASE.MSSQL);
@@ -206,7 +274,9 @@ Deno.test('capability defaults are a baseline and caller overrides select databa
 
 Deno.test('existing built-in suites preserve their exact resolved options', () => {
   assertEquals(
-    scaffoldCapabilitySuites.map((suite) => suite.defaults),
+    scaffoldCapabilitySuites
+      .filter((suite) => suite.id !== SCAFFOLD.RUNTIME_SQLITE)
+      .map((suite) => suite.defaults),
     [undefined, undefined, undefined, undefined, undefined],
   );
 
@@ -241,6 +311,14 @@ Deno.test('existing built-in suites preserve their exact resolved options', () =
     [SCAFFOLD.INFRASTRUCTURE, common],
     [SCAFFOLD.PLUGIN, common],
     [SCAFFOLD.RUNTIME, common],
+    [
+      SCAFFOLD.RUNTIME_SQLITE,
+      {
+        ...common,
+        database: DATABASE.SQLITE,
+        cache: false,
+      },
+    ],
     [
       SCAFFOLD.USERLAND_INSTALL,
       {

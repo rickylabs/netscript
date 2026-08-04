@@ -40,6 +40,14 @@ Reference `.llm/harness/workflow/lane-policy.md`; do not copy its complete route
   - **`x-ai/grok-4.5`** (`codex-long-medium-grok-4-5` preset) — **complex** checks where extra
     verification on top of the supervisor _and_ Codex is warranted.
 
+  **Escalation order (owner refinement, 2026-08-04):** reach for a **Claude Opus 5 sub-agent** first
+  — dispatched _by the supervisor_, in-plan, no OpenRouter spend, and for Codex-authored work it is
+  the canonical opposite-family reviewer under the `review_codex_*` ladder. Only escalate to the
+  OpenRouter/OpenCode lanes above when a sub-agent is genuinely not enough. Two constraints survive
+  the refinement: a sub-agent is **never** the formal PLAN-EVAL/IMPL-EVAL evaluator (that stays the
+  open-model Qwen preset), and it must be dispatched by the **supervisor** — an implementation lane
+  dispatching its own reviewer is the D-7 breach, not a review.
+
   This is an **explicit** owner approval, so it does not violate `lane-policy.md` invariant 4 (no
   _implicit_ paid or higher-effort escalation). It does **not** widen the **formal** PLAN-EVAL /
   IMPL-EVAL lane, which stays open-models-only on the bound Qwen preset. Owner's framing: "in

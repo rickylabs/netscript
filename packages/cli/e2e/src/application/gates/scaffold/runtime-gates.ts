@@ -387,7 +387,8 @@ const ASPIRE_START_SCRIPT = [
   '  return trimmed.slice(objectIndex);',
   '}',
 ].join('\n');
-function runtimeResources(database: DatabaseEngine): readonly AspireResource[] {
+/** List the Aspire resources that a runtime suite waits for. */
+export function runtimeResources(database: DatabaseEngine): readonly AspireResource[] {
   return [
     ...databaseRuntimeResources(database),
     ASPIRE_RESOURCE.GARNET,

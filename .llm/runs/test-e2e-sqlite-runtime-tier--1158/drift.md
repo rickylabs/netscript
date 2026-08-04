@@ -199,3 +199,43 @@ documentation.
   **S7** (the zero-container claim and the Garnet-executable arm — the load-bearing claims of the
   whole PR). Each use is logged here with its verdict.
 - **Evidence:** `supervisor.md` § Recorded lane/eval overrides; this entry.
+
+## 2026-08-04 — D-9 generic run-command defaults masked capability defaults
+
+- **What:** S4 pre-implementation tracing found that the generic `run` command supplied implicit
+  `database: postgres` and `cache: true` values even when the operator passed neither flag.
+- **Source:** `packages/cli/e2e/src/presentation/cli/commands/run-command.ts` declared Cliffy
+  defaults on `--db` and `--cache`; `mapRunOptions()` correctly treated those materialized values as
+  caller overrides.
+- **Expected:** Plan D5 treated the S3 defaults-under-overrides seam as sufficient for
+  `deno task e2e:cli run scaffold.runtime.sqlite` to resolve sqlite with cache disabled.
+- **Actual:** Registry resolution with no overrides was correct, but the real generic CLI path
+  supplied postgres/cache-on overrides and defeated both suite defaults.
+- **Severity:** significant (the new id listed and resolved in unit code but would not request the
+  promised no-container profile through its user-facing command).
+- **Action:** remove only the implicit `--db` and `--cache` defaults from generic `run`. Existing
+  `scaffold.runtime` remains postgres/cache-on through its unchanged `RunOptions` defaults, and
+  `full` retains its explicit postgres/cache-on flags per D6. Add CLI-program tests for the sqlite
+  default path, explicit `--db postgres` precedence, and the unchanged `full` defaults.
+- **Evidence:** `cli-program_test.ts`; 104-test E2E gate; exact `full` assertions; suite-list
+  output.
+
+## 2026-08-04 — D-9 adversarial-check escalation order (owner refinement of D-8)
+
+- **What:** The owner refined D-8: reach for a **Claude Opus 5 sub-agent** first, and only consider
+  the OpenCode / OpenRouter lanes if that is genuinely not enough.
+- **Source:** owner directive, this session.
+- **Severity:** minor (ordering, no invariant weakened)
+- **Action:** accept. Effective order for supplementary adversarial checks:
+  1. supervisor's own verification (always, non-negotiable — the Tier-A slice review);
+  2. **Claude Opus 5 sub-agent**, dispatched by the supervisor — in-plan, no OpenRouter spend, and
+     for Codex-authored work this _is_ the canonical opposite-family reviewer of the
+     `review_codex_*` ladder;
+  3. OpenRouter/OpenCode lanes (`qwen/qwen3.7-max` quick, `x-ai/grok-4.5` complex) only when 1–2 are
+     insufficient. Unchanged: the formal PLAN-EVAL/IMPL-EVAL evaluator stays the bound open-model
+     Qwen preset, and a reviewer dispatched by the implementation lane is not a review (drift D-7).
+     Revised plan for this run: use an Opus 5 sub-agent for the **S6** CI-policy check and the
+     **S7** zero-container/Garnet-arm check; escalate to Grok 4.5 only if the sub-agent's verdict is
+     inconclusive or contradicts the supervisor's reading.
+- **Evidence:** `supervisor.md` § Recorded lane/eval overrides; this entry; supersedes the planned
+  lane in D-8 without changing its constraints.

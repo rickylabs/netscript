@@ -6,8 +6,14 @@ import {
   SCAFFOLD_TITLE,
   type SuiteId,
 } from '../../src/domain/cli-surface.ts';
+import { DATABASE } from '../../src/domain/extension-axes.ts';
 import type { RunOptions } from '../../src/domain/run-context.ts';
 import type { SuiteDefinition } from '../../src/domain/suite-definition.ts';
+
+export const SQLITE_RUNTIME_CACHE_MODE = {
+  environmentVariable: 'NETSCRIPT_CACHE_MODE',
+  value: 'Executable',
+} as const;
 
 /** Built-in scaffold capability suite shape. */
 export interface ScaffoldCapabilitySuite {
@@ -163,6 +169,12 @@ export const scaffoldCapabilitySuites: readonly ScaffoldCapabilitySuite[] = [
     title: SCAFFOLD_TITLE.RUNTIME,
     gates: RUNTIME_GATES,
   },
+  {
+    id: SCAFFOLD.RUNTIME_SQLITE,
+    title: SCAFFOLD_TITLE.RUNTIME_SQLITE,
+    gates: RUNTIME_GATES,
+    defaults: { database: DATABASE.SQLITE, cache: false },
+  },
 ];
 
 /** Build one scaffold capability smoke suite. */
@@ -170,6 +182,15 @@ export function createScaffoldCapabilitySuite(
   capability: ScaffoldCapabilitySuite,
   overrides: Partial<RunOptions> = {},
 ): SuiteDefinition {
+  if (
+    capability.id === SCAFFOLD.RUNTIME_SQLITE &&
+    Deno.env.get(SQLITE_RUNTIME_CACHE_MODE.environmentVariable) === undefined
+  ) {
+    Deno.env.set(
+      SQLITE_RUNTIME_CACHE_MODE.environmentVariable,
+      SQLITE_RUNTIME_CACHE_MODE.value,
+    );
+  }
   const resolved = { ...capability.defaults, ...overrides };
   const suite = defineCliE2eSuite()
     .withId(capability.id)

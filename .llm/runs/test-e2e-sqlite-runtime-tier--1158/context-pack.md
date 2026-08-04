@@ -2,13 +2,13 @@
 
 ## Run Metadata
 
-| Field          | Value                                       |
-| -------------- | ------------------------------------------- |
-| Run ID         | `test-e2e-sqlite-runtime-tier--1158`        |
-| Branch         | `test/e2e-sqlite-runtime-tier-1158`         |
-| Current phase  | `implement` — S3 signed off; stop before S4 |
-| Archetype      | `6 - CLI / Tooling`                         |
-| Scope overlays | `service`                                   |
+| Field          | Value                                             |
+| -------------- | ------------------------------------------------- |
+| Run ID         | `test-e2e-sqlite-runtime-tier--1158`              |
+| Branch         | `test/e2e-sqlite-runtime-tier-1158`               |
+| Current phase  | `implement` — S4 complete; awaiting Tier-A review |
+| Archetype      | `6 - CLI / Tooling`                               |
+| Scope overlays | `service`                                         |
 
 ## Current State
 
@@ -31,6 +31,14 @@ reporting read now uses that resolved object. The existing `resolveSuite` caller
 unchanged, so a sqlite capability default survives an empty override and an explicit postgres
 override still wins. Database wait filtering reads the materialized default options and follows the
 resolved engine. No existing built-in capability has a defaults object.
+
+S4 adds the `scaffold.runtime.sqlite` capability with sqlite/cache-off defaults and reuses
+`RUNTIME_GATES` by reference. Resolution pins `NETSCRIPT_CACHE_MODE=Executable` only when the
+operator has not set it. The generic `run` command no longer supplies implicit db/cache overrides,
+because those masked capability defaults (drift D-9); unchanged suite defaults keep
+`scaffold.runtime` postgres/cache-on, and `full` retains its explicit postgres/cache-on defaults.
+Wait gates are tested against `runtimeResources()` for sqlite and postgres, with Garnet retained in
+both and no database resource wait on sqlite.
 
 ## Completed
 
@@ -56,19 +64,22 @@ resolved engine. No existing built-in capability has a defaults object.
   regression coverage; 99 E2E tests and all five static/fitness commands passed.
 - S3 received Tier-A substantive review with no findings; all six required gates were reproduced
   independently. Sign-off recorded in `worklog.md`.
+- S4 implementation completed with the additive suite profile, operator-first cache-mode seam, real
+  CLI default/override coverage, and wait/resource consistency assertions. All six required gates
+  passed: 104 E2E tests plus scoped check/lint/fmt, `quality:scan`, and `arch:check`.
 
 ## In Progress
 
-- **None.** S3 received Tier-A substantive review (Claude `review_codex` lane, Opus 4.8 fallback per
-  D-7) with independently reproduced gates and no findings; sign-off is recorded in `worklog.md` §
-  Slice Review — S3. The run is stopped after S3 by instruction.
+- **S4 awaits Tier-A substantive review.** The implementation lane has not reviewed, dispatched a
+  reviewer, self-certified, or authored a sign-off commit.
 
 ## Next Steps
 
-1. **Stop before S4.** S4 requires a new slice instruction; do not start it from this handoff.
-2. Gate phase: scoped wrappers + `quality:scan` + `arch:check` + `publish:dry-run`, then the
+1. Tier-A supervisor reviews S4 and authors any sign-off commit.
+2. **Stop before S5.** S5 requires a new slice instruction; do not start it from this handoff.
+3. Gate phase: scoped wrappers + `quality:scan` + `arch:check` + `publish:dry-run`, then the
    postgres `scaffold.runtime` regression run.
-3. IMPL-EVAL in a third session.
+4. IMPL-EVAL in a third session.
 
 ## Key Decisions
 
@@ -86,23 +97,26 @@ resolved engine. No existing built-in capability has a defaults object.
 
 ## Files Changed
 
-| Path                                                                     | Status   | Notes                                                                      |
-| ------------------------------------------------------------------------ | -------- | -------------------------------------------------------------------------- |
-| `.llm/runs/test-e2e-sqlite-runtime-tier--1158/{worklog,context-pack}.md` | modified | S3 evidence and Tier-A handoff state.                                      |
-| `packages/cli/e2e/suites/scaffold/capability-suites.ts`                  | modified | Optional defaults contract and single defaults-under-overrides resolution. |
-| `packages/cli/e2e/tests/presentation/suite-registry_test.ts`             | modified | Precedence, gate-filtering, and exact existing-suite option regressions.   |
+| Path                                                                           | Status   | Notes                                                                 |
+| ------------------------------------------------------------------------------ | -------- | --------------------------------------------------------------------- |
+| `.llm/runs/test-e2e-sqlite-runtime-tier--1158/{worklog,context-pack,drift}.md` | modified | S4 evidence, handoff state, and D-9 CLI-default drift.                |
+| `packages/cli/e2e/src/domain/cli-surface.ts`                                   | modified | Additive sqlite runtime id and title.                                 |
+| `packages/cli/e2e/suites/scaffold/capability-suites.ts`                        | modified | SQLite/cache-off profile and operator-first executable-cache seam.    |
+| `packages/cli/e2e/src/application/gates/scaffold/runtime-gates.ts`             | modified | Exported documented resource list for cross-site consistency testing. |
+| `packages/cli/e2e/src/presentation/cli/commands/run-command.ts`                | modified | Generic run no longer masks per-suite db/cache defaults.              |
+| `packages/cli/e2e/tests/presentation/{suite-registry,cli-program}_test.ts`     | modified | Registry, CLI precedence, environment, and wait/resource regressions. |
 
-No `packages/cli/src/**`, suite id, built-in per-suite default, GitHub, cleanup, product cache
-default, or embedded-template file was touched.
+No `packages/cli/src/**`, `.github/**`, cleanup adapter, live runtime, product cache default, or
+embedded-template file was touched.
 
 ## Gates
 
-| Gate family | Current status | Evidence                                         |
-| ----------- | -------------- | ------------------------------------------------ |
-| Static      | `PASS`         | S3 scoped check/lint/fmt: 786 files, 0 findings. |
-| Fitness     | `PASS`         | S3 `quality:scan` and `arch:check` exited 0.     |
-| Runtime     | `NOT_RUN`      | S7 is the first live sqlite run.                 |
-| Consumer    | `PASS`         | S3: 99 E2E tests; all built-in options pinned.   |
+| Gate family | Current status | Evidence                                           |
+| ----------- | -------------- | -------------------------------------------------- |
+| Static      | `PASS`         | S4 scoped check/lint/fmt: 786 files, 0 findings.   |
+| Fitness     | `PASS`         | S4 `quality:scan` and `arch:check` exited 0.       |
+| Runtime     | `NOT_RUN`      | S7 is the first live sqlite run.                   |
+| Consumer    | `PASS`         | S4: 104 E2E tests; suite list and CLI path proven. |
 
 ## Open Questions
 
@@ -118,7 +132,9 @@ default, or embedded-template file was touched.
 - **Drift:** D-1 supervisor lane override (minor); D-2 carried-in root cause wrong (significant);
   D-3 #1191 fix is services-only, new blocker (significant); D-4 CI "no docker service" framing
   (minor); D-5 apps have no permission-bearing command (significant); D-6 resumed cache-spelling
-  probe corrected the partial handoff evidence (minor). All in `drift.md`.
+  probe corrected the partial handoff evidence (minor); D-7 self-certification breach (significant);
+  D-8 owner-authorized supplementary verification lane (minor); D-9 generic `run` defaults masked
+  capability defaults (significant). All in `drift.md`.
 - **Debt:** two entries to create at Close — the unreachable `Mode: 'Local'` cache arm, and
   `SCAFFOLD_DEFAULTS.CACHE_BACKEND: 'redis'` forcing a container on every scaffold.
 
