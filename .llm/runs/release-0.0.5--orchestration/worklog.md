@@ -1361,3 +1361,18 @@ retrigger), and reopened (close/reopen kick) all spawned NOTHING — no ci.yml p
 run for any post-flip head. Finding 21's wedge class, second specimen; the recreate cure
 applied: #1269 closed with reason, #1270 opened from the same branch with identical
 body/labels/milestone (Closes #1248 preserved). Watcher + waiter moved to #1270.
+
+## 2026-08-04 — CORRECTION: the "#1269 event wedge" was an unmergeable conflict, not finding 21
+
+Root cause found by test-merging locally: the branch conflicted with main in
+`docs/site/reference/cli/commands.md` — #1247's editor-aware `agent init` row (landed via
+#1261) vs #1248's new `agent mcp` row. GitHub does not compute mergeability or dispatch
+pull_request CI for an unmergeable head, which produces exactly the "zero runs spawn on any
+head" symptom. My three escalations (empty-commit retrigger, close/reopen, PR recreation
+#1270→#1271 incl. a sibling branch) were all treating a content conflict as infrastructure;
+none could have worked. **Finding 30 (supersedes my earlier attribution): before declaring an
+event-stream wedge, check `mergeable`/`mergeStateStatus` and test-merge origin/main locally —
+UNKNOWN mergeability that never resolves means conflict, and the cure is a resolve+push, not
+a kick.** The earlier finding-21 specimen (#1187 family) remains valid on its own evidence;
+this one is reclassified. Resolution pushed (each side's own truth kept); #1269/#1270 stay
+closed with reasons, #1271 carries the work.
