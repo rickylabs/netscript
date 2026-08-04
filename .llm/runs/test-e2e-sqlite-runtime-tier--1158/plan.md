@@ -166,19 +166,19 @@ Found during research; each is real work the carried-in draft did not name:
 
 ## Validation Plan
 
-| Order | Gate               | Command or check                                                                                  | Expected result                                  |
-| ----- | ------------------ | ------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
-| 1     | type-check         | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/cli --ext ts,tsx` | PASS                                             |
-| 2     | lint               | `.llm/tools/run-deno-lint.ts --root packages/cli --ext ts,tsx`                                    | PASS                                             |
-| 3     | format             | `.llm/tools/run-deno-fmt.ts --root packages/cli --ext ts,tsx`                                     | PASS                                             |
-| 4     | code quality       | `deno task quality:scan`                                                                          | PASS (no `any`+cast, no hardcoded plugin names)  |
-| 5     | doctrine fitness   | `deno task arch:check`                                                                            | PASS                                             |
-| 6     | unit               | `deno test packages/cli/src/kernel/templates/aspire/helpers/tests/` (S1)                          | PASS, incl. non-sqlite byte-identical assertions |
-| 7     | unit               | `deno test packages/cli/e2e/` (S2–S5)                                                             | PASS                                             |
-| 8     | classifier unit    | `deno test .github/scripts/` (S6)                                                                 | PASS, incl. `ci:full` / `ci:skip-e2e` matrices   |
-| 9     | **new tier, live** | `deno task e2e:cli run scaffold.runtime.sqlite --cleanup --format pretty` (S7)                    | PASS with **zero** containers created            |
-| 10    | regression         | `deno task e2e:cli run scaffold.runtime --cleanup --format pretty`                                | PASS — the postgres merge bar is unchanged       |
-| 11    | publishability     | `deno task publish:dry-run`                                                                       | PASS                                             |
+| Order | Gate               | Command or check                                                                                  | Expected result                                                                                                                                                   |
+| ----- | ------------------ | ------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1     | type-check         | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/cli --ext ts,tsx` | PASS                                                                                                                                                              |
+| 2     | lint               | `.llm/tools/run-deno-lint.ts --root packages/cli --ext ts,tsx`                                    | PASS                                                                                                                                                              |
+| 3     | format             | `.llm/tools/run-deno-fmt.ts --root packages/cli --ext ts,tsx`                                     | PASS                                                                                                                                                              |
+| 4     | code quality       | `deno task quality:scan`                                                                          | PASS (no `any`+cast, no hardcoded plugin names)                                                                                                                   |
+| 5     | doctrine fitness   | `deno task arch:check`                                                                            | PASS                                                                                                                                                              |
+| 6     | unit               | `deno test packages/cli/src/kernel/templates/aspire/helpers/tests/` (S1)                          | PASS, incl. non-sqlite byte-identical assertions                                                                                                                  |
+| 7     | unit               | `deno test packages/cli/e2e/` (S2–S5)                                                             | PASS                                                                                                                                                              |
+| 8     | classifier unit    | `deno test .github/scripts/` (S6)                                                                 | PASS, incl. `ci:full` / `ci:skip-e2e` matrices                                                                                                                    |
+| 9     | **new tier, live** | `deno task e2e:cli run scaffold.runtime.sqlite --cleanup --format pretty` (S7)                    | PASS with postgres and redis eliminated and a **net-zero** container delta (one garnet container created then removed by cleanup — amended after R-3, drift D-14) |
+| 10    | regression         | `deno task e2e:cli run scaffold.runtime --cleanup --format pretty`                                | PASS — the postgres merge bar is unchanged                                                                                                                        |
+| 11    | publishability     | `deno task publish:dry-run`                                                                       | PASS                                                                                                                                                              |
 
 > Order 10 is the expensive existing gate. Per `AGENTS.md` it runs once, at merge-readiness — not
 > per slice.
