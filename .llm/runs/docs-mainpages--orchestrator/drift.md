@@ -91,3 +91,8 @@ Confirmed findings:
   checkable adjustment proposals count, and ship-confidence rests on executed-evidence audits
   (the Opus audit that ran the scaffold), never on flattering verdict prose. Do not relay
   evaluator praise in PR comments or reports.
+
+- **D-13 (owner addition, 2026-08-04).** Owner added a dedicated anti-slop / terminology /
+  consistency prose gate on #1216: Minimax M3. OpenCode transport still down (err_be8ff72e on
+  a trivial probe), so M3 runs over claude-print (OpenRouter), effort high — an approved open
+  model on the proven transport. Merge of #1216 waits on this pass + CI settle.
