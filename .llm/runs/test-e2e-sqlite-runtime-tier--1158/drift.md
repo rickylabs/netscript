@@ -312,18 +312,18 @@ documentation.
   `runtime.wait.garnet` passed and the executable resource remained `Running`/`Healthy` with a
   stable PID. One run then exposed an empty workers job registry and returned HTTP 404 from the
   health-job trigger; two other runs exposed all three jobs and accepted the trigger but never
-  exposed an execution to the API. The stronger `runtime.wait.workers` gate proved the scheduler
-  and worker-pool startup markers before those behavior gates.
+  exposed an execution to the API. The stronger `runtime.wait.workers` gate proved the scheduler and
+  worker-pool startup markers before those behavior gates.
 - **Expected:** the workers API and background runtime share registered jobs, queued messages, and
   execution state through the Redis-compatible Garnet endpoint.
 - **Actual:** first-boot KV/queue visibility differed across the API and background processes even
   though Garnet and both workers processes were healthy.
 - **Severity:** significant (the zero-container acceptance changes; the sqlite tier's primary
   Postgres/Redis savings remain).
-- **Action:** remove the `NETSCRIPT_CACHE_MODE=Executable` pin from
-  `capability-suites.ts` and `.github/workflows/e2e-cli.yml`; retain the complete behavior gate list
-  and assertions; rerun with an honest container delta. Update plan D2 to the reduced-container
-  profile. No behavior gate is excluded.
+- **Action:** remove the `NETSCRIPT_CACHE_MODE=Executable` pin from `capability-suites.ts` and
+  `.github/workflows/e2e-cli.yml`; retain the complete behavior gate list and assertions; rerun with
+  an honest container delta. Update plan D2 to the reduced-container profile. No behavior gate is
+  excluded.
 - **Evidence:** `.llm/tmp/e2e-report-scaffold-runtime-sqlite.json`,
   `.llm/tmp/e2e-report-scaffold-runtime-sqlite-diagnostic.json`, and
   `.llm/tmp/e2e-report-scaffold-runtime-sqlite-diagnostic-2.json`; live Aspire describe snapshot
@@ -341,15 +341,15 @@ documentation.
   implementation.
 - **Actual:** the behavior gate exercises a product health implementation that remains
   Postgres-shaped even though its probe script accepts the selected database name.
-- **Severity:** significant (one behavior assertion is inapplicable to this tier; no tier or
-  product assertion is weakened in the existing Postgres suite).
+- **Severity:** significant (one behavior assertion is inapplicable to this tier; no tier or product
+  assertion is weakened in the existing Postgres suite).
 - **Action:** follow R-4's pre-agreed exit: exclude only `behavior.service-health` from the sqlite
   capability's gate list, keep it unchanged in `scaffold.runtime`, and add a regression test that
   the two lists differ by exactly that one gate. Do not modify the assertion or service package in
   this issue.
-- **Evidence:** failed S7 report gate `behavior.service-health`; generated
-  `database/sqlite/mod.ts` uses `$queryRawUnsafe('SELECT 1')` successfully while
-  `packages/service/src/primitives/health.ts` uses the incompatible tagged form.
+- **Evidence:** failed S7 report gate `behavior.service-health`; generated `database/sqlite/mod.ts`
+  uses `$queryRawUnsafe('SELECT 1')` successfully while `packages/service/src/primitives/health.ts`
+  uses the incompatible tagged form.
 
 ## 2026-08-04 — D-16 S2 verified the public init path, not the live maintainer path
 
@@ -358,8 +358,7 @@ documentation.
   `bin/netscript.ts` command. The maintainer command did not declare or forward `--cache`, so the
   live `scaffold.init` gate rejected the argument even though S2's public-binary probe was green.
 - **Source:** live S7 `scaffold.init` failure; command resolution in the generated E2E workspace;
-  `packages/cli/src/maintainer/features/init/init-command.ts` and
-  `orchestrate-maintainer-init.ts`.
+  `packages/cli/src/maintainer/features/init/init-command.ts` and `orchestrate-maintainer-init.ts`.
 - **Expected:** the command path used by the E2E accepts `--cache=false` and forwards it to the
   shared init request.
 - **Actual:** only the public command had the option; the maintainer command's schema and request

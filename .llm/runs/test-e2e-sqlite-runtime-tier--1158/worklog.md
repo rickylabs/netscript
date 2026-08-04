@@ -493,6 +493,92 @@ ci:full           sqlite=true   … scaffold-runtime-sqlite forced by ci:full
 
 **Verdict: ACCEPTED.** Proceed to S7 — the live run.
 
+## Slice Review — S7 (Tier-A, supervisor)
+
+Reviewed at `51e6b08e`. This is the evidence slice; it survived two external interruptions (a
+session restart and a driver timeout) and its uncommitted work was recovered and verified by the
+supervisor before relaunch, not discarded.
+
+**Reproduced gate results (supervisor-run)**
+
+| Gate                                      | Verdict                                                                                 |
+| ----------------------------------------- | --------------------------------------------------------------------------------------- |
+| `deno test --no-lock -A packages/cli/`    | 605 passed (490 steps), 0 failed                                                        |
+| `deno test --no-lock -A .github/scripts/` | 56 passed, 0 failed                                                                     |
+| `run-deno-check.ts --root packages/cli`   | 789 files, 0 findings                                                                   |
+| `run-deno-lint.ts --root packages/cli`    | 789 files, 0 findings                                                                   |
+| `deno task quality:scan`                  | exit 0                                                                                  |
+| `deno task arch:check`                    | exit 0                                                                                  |
+| `deno task publish:dry-run`               | exit 0                                                                                  |
+| gate-list check (`resolveSuite`)          | `scaffold.runtime` 69 gates incl. `behavior.service-health`; sqlite 67 gates without it |
+
+**The headline claim changed, and the artefacts were corrected to match.** The plan's original
+acceptance was "**zero containers created**". R-3 resolved **negatively** — the Docker-less Garnet
+executable arm showed inconsistent cross-process KV/queue visibility — so the pre-agreed downgrade
+was taken. The honest claim is now:
+
+> **Postgres and Redis are eliminated. One Garnet container is created during the run and removed by
+> cleanup, for a net delta of zero.**
+
+That is a materially weaker claim than "no Docker", and the run says so everywhere it matters rather
+than letting the original wording stand:
+
+- suite title → `Runtime scaffold capability smoke (sqlite, reduced containers)`
+- CI job name → `scaffold-runtime-sqlite (aspire + sqlite + garnet)`
+- `plan.md` D2 rewritten to "Reduced-container profile", citing the negative R-3 result
+- `NETSCRIPT_CACHE_MODE` pin removed from **both** the suite and the CI job; a regression test now
+  asserts the suite leaves the variable **unset** and still honours an operator-set value
+
+I verified each of those at source. A tier that still called itself "no docker" while starting a
+container would have been the worst outcome of this run.
+
+**Bonus:** removing the pin also deleted the `Deno.env.set` inside the suite factory, which closes
+the impurity the S4 adversarial review had recorded as taste-only.
+
+**R-4 — the excluded gate, checked rather than accepted.** `behavior.service-health` is excluded
+from the sqlite suite only. The stated reason is that the generated users service's aggregate health
+check uses Prisma's tagged `$queryRaw\`SELECT
+1\``form, which the libSQL adapter rejects. I
+confirmed the tagged form exists in the generated template (`embedded.generated.ts`contains both`queryRaw\`SELECT
+1\``and`queryRawUnsafe(...)`), so the rationale is grounded in the product, not
+a test-shape excuse. Critically: the gate is **retained unchanged in`scaffold.runtime`**
+(verified — 69 vs 67 gates), so postgres coverage is not weakened. Recorded as drift D-15.
+
+**This exclusion is a product finding, not just a test decision.** A user scaffolding a sqlite
+project today gets a service whose aggregate `/health` check fails against libSQL. That is a real
+gap this run discovered and must not be buried in a drift note — it is filed as a follow-up at
+Close.
+
+**R-5 resolved positively:** workers jobs, tasks, seed, trigger, and execution visibility all pass,
+so nothing before plugin install depends on a primary cache.
+
+**Two real defects the live run caught that no unit test could**
+
+1. **The maintainer CLI gap.** The E2E resolves its entrypoint to `bin/netscript-dev.ts` (the
+   _maintainer_ CLI) via `defaultCliEntrypoint`, **not** the public `bin/netscript.ts`. S2 verified
+   `--cache=false` against the _public_ CLI, which accepts it; the maintainer CLI did not declare
+   the option, so the live run failed with `Unknown option "--cache"`. **This was a supervisor
+   review miss in S2** — the evidence was real but tested the wrong binary. I reproduced it by
+   stashing the fix and re-running. Fixed here by adding `--cache` to the maintainer init command
+   and threading it through the request; the public CLI is unchanged.
+2. **`--allow-all` already grants FFI**, so sqlite no longer appends a redundant `--allow-ffi` — a
+   refinement of S1 that only a live run over the real generated apphost would surface.
+
+**Acceptance evidence:** `scaffold.runtime.sqlite: 68 passed, 0 failed, 0 skipped`, `cleanup: PASS`,
+and `comm -13` over before/after container snapshots was **empty**. The only pre-existing container
+in both snapshots is a **foreign** postgres container owned by another worktree — reported, never
+touched.
+
+**Findings**
+
+| # | Severity | Finding                                                                                        | Disposition                                                                                    |
+| - | -------- | ---------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| 1 | product  | Generated sqlite services fail their aggregate `/health` check (tagged `$queryRaw` vs libSQL). | Follow-up issue at Close. Not this issue's scope; the tier documents it rather than hiding it. |
+| 2 | process  | S2's verification used the public CLI where the E2E uses the maintainer CLI.                   | Supervisor miss, fixed in S7; recorded so the lesson is not lost.                              |
+
+**Verdict: ACCEPTED**, with the reduced-container claim stated plainly. The postgres merge-bar
+regression is queued separately (see Gate Results).
+
 ## Decisions
 
 | Decision                                                | Reason                                                                                    | Source                                               |
@@ -786,15 +872,15 @@ commit, post its evidence comment, and stop without review or sign-off.
 ## S7 Live SQLite Runtime Evidence
 
 This section supersedes the pre-S7 handoff above without rewriting its historical record. The
-implementation lane resumed the externally timed-out worktree, preserved every existing change,
-and continued from the already-isolated first-boot state-loss failure.
+implementation lane resumed the externally timed-out worktree, preserved every existing change, and
+continued from the already-isolated first-boot state-loss failure.
 
 Three instrumented executable-Garnet attempts kept `runtime.wait.garnet` green and the same healthy
-Garnet PID alive, but produced inconsistent state across the workers API and background runtime:
-one run exposed no jobs and returned 404 from the trigger, while two exposed the jobs and accepted
-the trigger but never exposed an execution. Per the locked decision deadline, R-3 therefore
-resolved negatively. The sqlite suite and CI job no longer pin `NETSCRIPT_CACHE_MODE=Executable`;
-the tier uses ambient container-backed Garnet while still removing both Postgres and Redis (D-14).
+Garnet PID alive, but produced inconsistent state across the workers API and background runtime: one
+run exposed no jobs and returned 404 from the trigger, while two exposed the jobs and accepted the
+trigger but never exposed an execution. Per the locked decision deadline, R-3 therefore resolved
+negatively. The sqlite suite and CI job no longer pin `NETSCRIPT_CACHE_MODE=Executable`; the tier
+uses ambient container-backed Garnet while still removing both Postgres and Redis (D-14).
 
 The first downgraded run passed the complete workers path and then failed only
 `behavior.service-health`. The generated users-service health primitive invokes Prisma's tagged
@@ -819,31 +905,31 @@ deno task e2e:cli run scaffold.runtime.sqlite --cleanup --format pretty --report
 
 Result: **PASS — 68 passed, 0 failed, 0 skipped; cleanup passed.**
 
-| Gate family | Outcome | Rationale/evidence |
-| ----------- | ------- | ------------------ |
-| `runtime.wait.garnet` | `PASS` | Ambient container-backed Garnet became healthy. |
-| `runtime.wait.workers` | `PASS` | Scheduler and worker-pool readiness markers observed. |
-| `database.init`, `database.generate`, `database.seed` | `PASS` | SQLite lifecycle and seed completed. |
-| `behavior.workers-*` | `PASS` | Health, jobs, tasks, seed, trigger, and execution visibility all passed; R-5 resolves positively. |
-| remaining `behavior.*` | `PASS` | Sagas, triggers, auth, AI, UI, plugins, streams, and OTEL paths passed. |
-| `behavior.service-health` | `N/A` in sqlite only | Provider-specific libSQL incompatibility under D-15; retained unchanged in Postgres runtime. |
+| Gate family                                           | Outcome              | Rationale/evidence                                                                                |
+| ----------------------------------------------------- | -------------------- | ------------------------------------------------------------------------------------------------- |
+| `runtime.wait.garnet`                                 | `PASS`               | Ambient container-backed Garnet became healthy.                                                   |
+| `runtime.wait.workers`                                | `PASS`               | Scheduler and worker-pool readiness markers observed.                                             |
+| `database.init`, `database.generate`, `database.seed` | `PASS`               | SQLite lifecycle and seed completed.                                                              |
+| `behavior.workers-*`                                  | `PASS`               | Health, jobs, tasks, seed, trigger, and execution visibility all passed; R-5 resolves positively. |
+| remaining `behavior.*`                                | `PASS`               | Sagas, triggers, auth, AI, UI, plugins, streams, and OTEL paths passed.                           |
+| `behavior.service-health`                             | `N/A` in sqlite only | Provider-specific libSQL incompatibility under D-15; retained unchanged in Postgres runtime.      |
 
-The before and after snapshots each contain only `97b906460988`, the foreign
-`postgres-89449635` resource owned by `/home/codex/repos/wave5-deepseek`. `comm -13` is empty.
-Garnet was created during the run and removed by run-owned cleanup, so the honest net container
-delta is **zero**. No foreign resource was mutated.
+The before and after snapshots each contain only `97b906460988`, the foreign `postgres-89449635`
+resource owned by `/home/codex/repos/wave5-deepseek`. `comm -13` is empty. Garnet was created during
+the run and removed by run-owned cleanup, so the honest net container delta is **zero**. No foreign
+resource was mutated.
 
 ### Final Implementation Gates
 
-| Gate | Result |
-| ---- | ------ |
-| `deno test --no-lock -A packages/cli/` | `PASS` — 605 tests (490 steps), 0 failed |
-| scoped check | `PASS` — 789 files, 7 batches, 0 findings |
-| scoped lint | `PASS` — 789 files, 4 batches, 0 findings |
-| scoped format | `PASS` — 789 files, 4 batches, 0 findings |
-| `deno task quality:scan` | `PASS` — `ok: true`, 0 findings; 7 pre-existing allowances |
-| `deno task arch:check` | `PASS` — exit 0; pre-existing warnings only |
-| `deno task e2e:cli suites` | `PASS` — both runtime tiers listed |
+| Gate                                   | Result                                                     |
+| -------------------------------------- | ---------------------------------------------------------- |
+| `deno test --no-lock -A packages/cli/` | `PASS` — 605 tests (490 steps), 0 failed                   |
+| scoped check                           | `PASS` — 789 files, 7 batches, 0 findings                  |
+| scoped lint                            | `PASS` — 789 files, 4 batches, 0 findings                  |
+| scoped format                          | `PASS` — 789 files, 4 batches, 0 findings                  |
+| `deno task quality:scan`               | `PASS` — `ok: true`, 0 findings; 7 pre-existing allowances |
+| `deno task arch:check`                 | `PASS` — exit 0; pre-existing warnings only                |
+| `deno task e2e:cli suites`             | `PASS` — both runtime tiers listed                         |
 
 This is implementation evidence only. Under D-7 and the owner review boundary, this lane does not
 dispatch a reviewer, add a `## Slice Review` section, self-certify, or author a sign-off commit.

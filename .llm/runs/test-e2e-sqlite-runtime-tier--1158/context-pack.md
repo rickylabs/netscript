@@ -2,13 +2,13 @@
 
 ## Run Metadata
 
-| Field          | Value                                      |
-| -------------- | ------------------------------------------ |
-| Run ID         | `test-e2e-sqlite-runtime-tier--1158`       |
-| Branch         | `test/e2e-sqlite-runtime-tier-1158`        |
-| Current phase  | `implement` — S7 complete; closeout        |
-| Archetype      | `6 - CLI / Tooling`                        |
-| Scope overlays | `service`                                  |
+| Field          | Value                                |
+| -------------- | ------------------------------------ |
+| Run ID         | `test-e2e-sqlite-runtime-tier--1158` |
+| Branch         | `test/e2e-sqlite-runtime-tier-1158`  |
+| Current phase  | `implement` — S7 complete; closeout  |
+| Archetype      | `6 - CLI / Tooling`                  |
+| Scope overlays | `service`                            |
 
 ## Current State
 
@@ -19,9 +19,9 @@ processors, and plugin services; the pipeline threads the primary engine to all 
 unchanged because they launch through `deno task`, and their generated task already uses
 `deno run --allow-all`.
 
-S2 adds the default-true `RunOptions.cache` axis, `--cache` / `--no-cache` parsing, workspace builder
-plumbing, and conditional `scaffold.init` forwarding. The public binary rejects `--no-cache` but
-accepts both `--cache=false` and `--cache false`; the E2E uses the single-argv `--cache=false`
+S2 adds the default-true `RunOptions.cache` axis, `--cache` / `--no-cache` parsing, workspace
+builder plumbing, and conditional `scaffold.init` forwarding. The public binary rejects `--no-cache`
+but accepts both `--cache=false` and `--cache false`; the E2E uses the single-argv `--cache=false`
 spelling. S7 exposed a verification gap: the live E2E resolves `bin/netscript-dev.ts`, whose
 maintainer init command did not accept `--cache`. That maintainer-only command now declares and
 forwards the option (D-16); the public CLI remains unchanged.
@@ -77,11 +77,12 @@ stale label descriptions changed; the frozen label set remains exactly three.
 
 S7 completes the live tier. Three instrumented executable-Garnet attempts proved healthy processes
 but inconsistent cross-process job/queue/execution visibility, resolving R-3 negatively and taking
-the pre-agreed D2 downgrade. The first container-backed run passed all workers gates and then isolated
-the sole provider-specific `behavior.service-health` failure, resolving R-4 through the locked
-one-gate sqlite exclusion. The final run passed 68/68 selected gates and cleanup. The before/after
-container snapshots contain the same foreign Postgres container and `comm -13` is empty: Garnet was
-created during the run and removed by cleanup, so the honest net container delta is zero.
+the pre-agreed D2 downgrade. The first container-backed run passed all workers gates and then
+isolated the sole provider-specific `behavior.service-health` failure, resolving R-4 through the
+locked one-gate sqlite exclusion. The final run passed 68/68 selected gates and cleanup. The
+before/after container snapshots contain the same foreign Postgres container and `comm -13` is
+empty: Garnet was created during the run and removed by cleanup, so the honest net container delta
+is zero.
 
 ## Completed
 
@@ -124,8 +125,8 @@ created during the run and removed by cleanup, so the honest net container delta
 - S6a diagnostics remediation completed with all reason branches and named mutation holes pinned,
   sibling-aligned report collection, explicit `@std/yaml` parsing, and all gates green: 56 tests
   plus scoped check/lint/fmt with zero findings.
-- S7 live runtime completed after the locked R-3 downgrade and R-4 provider-specific gate
-  exclusion. The selected suite passed 68/68 gates, including cleanup; all database gates,
+- S7 live runtime completed after the locked R-3 downgrade and R-4 provider-specific gate exclusion.
+  The selected suite passed 68/68 gates, including cleanup; all database gates,
   `runtime.wait.garnet`, `runtime.wait.workers`, and the workers job/seed/trigger/execution chain
   passed. R-5 therefore resolves positively.
 - The complete package gate passed: 605 tests, scoped check/lint/fmt over 789 files, `quality:scan`,
@@ -146,37 +147,37 @@ created during the run and removed by cleanup, so the honest net container delta
 
 ## Key Decisions
 
-| Decision                                                                             | Source                                               | Notes                                                        |
-| ------------------------------------------------------------------------------------ | ---------------------------------------------------- | ------------------------------------------------------------ |
-| `D0` S1 extends SQLite `--allow-ffi` across permission-bearing resources             | code — shared database-permissions helper            | Services, background processors, and plugins; apps excluded. |
-| `D1` additive suite id `scaffold.runtime.sqlite`                                     | plan / owner constraint 1                            | Default `scaffold.runtime` untouched.                        |
-| `D2` reduced-container profile = sqlite + cache disabled + ambient Garnet arm | S7 / drift D-14 | Executable Garnet failed cross-process state semantics; Postgres and Redis remain eliminated. |
-| `D3` boolean `RunOptions.cache`, **no** `cacheBackend` axis                          | code — `generate-appsettings.ts:251-259`             | `deno-kv` emits `External`, not `Local`.                     |
-| `D4` runtime waits unchanged; garnet **not** filtered                                | code — `runtime-gates.ts:390-405`                    | Same resource name in both arms.                             |
-| `D5` per-suite `defaults` merged under caller overrides                              | code — `capability-suites.ts:168-192`                | A suite id alone cannot pin an engine today.                 |
-| `E5` classifier output `run_runtime_sqlite`, no new `ci:*` labels                    | code — `ci-classify-changes.ts:292-360`              | Keeps `ci:skip-e2e` authoritative over both runtime tiers.   |
-| `D6` merge-readiness stays postgres                                                  | issue #1158 constraints                              | No change to `full-command.ts`.                              |
-| `D8` Docker cleanup tolerant on both failure paths                                   | code — `docker-resource-cleaner.ts:9-43`             | Missing binary **and** non-zero `docker ps`.                 |
+| Decision                                                                      | Source                                    | Notes                                                                                         |
+| ----------------------------------------------------------------------------- | ----------------------------------------- | --------------------------------------------------------------------------------------------- |
+| `D0` S1 extends SQLite `--allow-ffi` across permission-bearing resources      | code — shared database-permissions helper | Services, background processors, and plugins; apps excluded.                                  |
+| `D1` additive suite id `scaffold.runtime.sqlite`                              | plan / owner constraint 1                 | Default `scaffold.runtime` untouched.                                                         |
+| `D2` reduced-container profile = sqlite + cache disabled + ambient Garnet arm | S7 / drift D-14                           | Executable Garnet failed cross-process state semantics; Postgres and Redis remain eliminated. |
+| `D3` boolean `RunOptions.cache`, **no** `cacheBackend` axis                   | code — `generate-appsettings.ts:251-259`  | `deno-kv` emits `External`, not `Local`.                                                      |
+| `D4` runtime waits unchanged; garnet **not** filtered                         | code — `runtime-gates.ts:390-405`         | Same resource name in both arms.                                                              |
+| `D5` per-suite `defaults` merged under caller overrides                       | code — `capability-suites.ts:168-192`     | A suite id alone cannot pin an engine today.                                                  |
+| `E5` classifier output `run_runtime_sqlite`, no new `ci:*` labels             | code — `ci-classify-changes.ts:292-360`   | Keeps `ci:skip-e2e` authoritative over both runtime tiers.                                    |
+| `D6` merge-readiness stays postgres                                           | issue #1158 constraints                   | No change to `full-command.ts`.                                                               |
+| `D8` Docker cleanup tolerant on both failure paths                            | code — `docker-resource-cleaner.ts:9-43`  | Missing binary **and** non-zero `docker ps`.                                                  |
 
 ## S7 Files Changed
 
-| Area | Notes |
-| ---- | ----- |
-| permissions | SQLite `--allow-all` expands to include FFI, with direct helper coverage. |
-| maintainer init | `netscript-dev init` accepts and forwards `--cache`; public CLI unchanged. |
-| runtime readiness | Workers scheduler and pool readiness gate plus builder coverage. |
-| suite policy | Executable Garnet pin removed; sqlite excludes only `behavior.service-health`. |
-| CI + artifacts | Workflow follows ambient Garnet; plan, drift, worklog, context, and leak evidence reconciled. |
+| Area              | Notes                                                                                         |
+| ----------------- | --------------------------------------------------------------------------------------------- |
+| permissions       | SQLite `--allow-all` expands to include FFI, with direct helper coverage.                     |
+| maintainer init   | `netscript-dev init` accepts and forwards `--cache`; public CLI unchanged.                    |
+| runtime readiness | Workers scheduler and pool readiness gate plus builder coverage.                              |
+| suite policy      | Executable Garnet pin removed; sqlite excludes only `behavior.service-health`.                |
+| CI + artifacts    | Workflow follows ambient Garnet; plan, drift, worklog, context, and leak evidence reconciled. |
 
 ## Gates
 
-| Gate family | Current status | Evidence |
-| ----------- | -------------- | -------- |
-| Static | `PASS` | 605 package tests; scoped check/lint/fmt over 789 files. |
-| Fitness | `PASS` | `quality:scan` green with no findings; `arch:check` exit 0. |
-| Runtime | `PASS` | `scaffold.runtime.sqlite`: 68 passed, 0 failed; cleanup passed. |
-| Consumer | `PASS` | Database, workers, plugin, auth, AI, UI, and OTEL behavior gates passed. |
-| Discovery | `PASS` | `deno task e2e:cli suites` lists both runtime tiers with honest titles. |
+| Gate family | Current status | Evidence                                                                 |
+| ----------- | -------------- | ------------------------------------------------------------------------ |
+| Static      | `PASS`         | 605 package tests; scoped check/lint/fmt over 789 files.                 |
+| Fitness     | `PASS`         | `quality:scan` green with no findings; `arch:check` exit 0.              |
+| Runtime     | `PASS`         | `scaffold.runtime.sqlite`: 68 passed, 0 failed; cleanup passed.          |
+| Consumer    | `PASS`         | Database, workers, plugin, auth, AI, UI, and OTEL behavior gates passed. |
+| Discovery   | `PASS`         | `deno task e2e:cli suites` lists both runtime tiers with honest titles.  |
 
 ## Open Questions
 
