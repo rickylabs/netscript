@@ -1146,3 +1146,18 @@ OMB epic now waits only on S11/S12 (wave 7). Rides canary.8 with #1226 + #1233.
 Canary.8 plan: dispatch after the verified-defect triad (#1239/#1238/#1237) merges — a
 canary train of three user-facing fixes plus the S9/S10/cron surfaces; no owner deadline
 pending, canary.7's green pair holds the stable-cut precondition meanwhile.
+
+## 2026-08-04 — Fix-driven port-prose sweep dispatched (#1240, agy lane); watchers re-armed
+
+- Post-compaction resume: watcher re-armed (5-min PR poll: ready flips, head moves, closes,
+  V1/V2/V3 draft staleness). V1 #1239 / V2 #1238 / V3 #1237 all fresh (<30 min head activity).
+  #1220 (sqlite runtime tier, #1158) identified as owner-authored — no slice record; left
+  alone, watched for a ready flip only.
+- **#1240 filed** (docs port-prose sweep after #1211): the standing fix-driven caveat rule's
+  first executable sweep — 15 user-facing files carry 8091/8092/3000/5173 prose (wider than
+  the inventory's earlier 8-file count; pattern was broader this pass). Dispatched on the
+  documentation-authoring lane per lane-policy (**agy · low**, D10 skip-permissions grant):
+  worktree ns005-portdocs, branch docs/randomized-ports-prose, brief
+  `slices/caveat-burndown/portdocs-brief.md` (judgment-first narrative brief per finding 23 —
+  kept-accurate is a valid verdict; per-file judgment table is the deliverable). Draft PR will
+  carry `Closes #1240`.
