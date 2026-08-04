@@ -933,3 +933,18 @@ the global-mutex supersede, not a failure). #1209 remains ready; merge at your d
   sub-second before launch). Cloud on the same head: quality ✓, deps-report ✓, check-test
   pending, close-gate red until box 53 ticks. Merge path: check-test green → tick box 53
   citing both halves → rerun close-gate → merge.
+
+## 2026-08-04 — #1211 merge sequence; label-cancel incident → #1219; owner skip directive honored
+
+- The 29-min-deep cloud runtime run (30899643890) on #1211 was cancelled at 10:43:59Z by the
+  owner's own `ci:skip-e2e`/`ci:skip-scaffold` label adds — `e2e-cli.yml` still triggers on
+  labeled/unlabeled with cancel-in-progress (the #1214 ci.yml fix was never applied to it).
+  Filed **#1219** (p1, 0.0.5, plan row added: fast-iteration slice between canary.6 and wave 4).
+- Owner skip directive honored: surviving run 30901864277 short-circuited **scaffold-runtime ✓**
+  (skip-proof) on `095663e49` and concluded success. Evidence set for DoD box 53 complete:
+  local 70/70 + quality/check-test/deps-report ✓ + e2e-cli ✓ (owner skip).
+- PR body: boxes 53 + S3 ticked with full evidence citation; stale "cloud verdict pending"
+  prose resolved. Refs-check: `Refs #1202` only. **Sidebar closing-link check (the #1188
+  compensating control, first execution): `closingIssuesReferences` = [] — clean.**
+- Full ci rerun (30899643898) fired for the close-gate flip; merge armed on green. #1201 slice
+  launch + fleet watchers unaffected.
