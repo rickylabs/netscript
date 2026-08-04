@@ -792,3 +792,16 @@ shipped alongside (.github/scripts/draft-workflow-policy.test.ts). Every remaini
 draft pushes stop burning cloud compute from this merge forward. Gate record: 4/4 contexts
 green first read, threads 0, files exactly the workflow surface, 0 ignores, refs [1207],
 auto-close verified.
+
+## 2026-08-04 — Merge #1193 (`62893db8c`, #1184 closed, #1190 evidence-held); CANARY.2 DISPATCHED
+
+**Canary point 2 declared and dispatched** (run 30892646211, target 0.0.5): payload = everything
+merged since canary.1 — #1192 (ffi), #1194 (S5), #1199 (S4), #1200 (auth docs), #1198 (saga
+engine, Refs #1190), #1212 (draft-CI economy), #1193 (sagas glue, closes #1184). The sagas pair
+lands in one train per the owner directive.
+
+**Fleet monitor v2** (owner suggestion, adopted + recorded for #1163 as a skill-amendment
+candidate): a 5-minute milestone-PR-state poll — ready flips, head movement, and PR-staleness
+(draft head unmoved ≥30min = the working-but-not-shipping signal that rollout-age watching
+alone cannot see). Double verification: rollout-age (agent alive) × PR-head-age (work
+shipping); divergence is the alarm.
