@@ -61,27 +61,31 @@ standard runner consumes the shared `sagas` queue and projects transitions autom
 
 ## Progress Log
 
-| Time       | Slice | Step           | Notes                                                                                                                                                                      |
-| ---------- | ----- | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-08-04 | 1     | research       | Read #1190 first; re-baselined #1193, failed scaffold, doctrine, harness, CLI, Aspire, tooling, JSR, and code paths.                                                       |
-| 2026-08-04 | 1     | environment    | Found one foreign #1193 `aspire/db-operation` AppHost; reported and left untouched.                                                                                        |
-| 2026-08-04 | 1     | design         | Locked queue-backed API→runner delivery and projection seam.                                                                                                               |
-| 2026-08-04 | 1     | PLAN-EVAL      | composed per milestone-run.md (orchestrator waiver)                                                                                                                        |
-| 2026-08-04 | 1     | RED            | Real router request with a never-settling publisher exceeded the 100ms harness deadline: `Expected actual: "request-timed-out" not to be: "request-timed-out"`.            |
-| 2026-08-04 | 2     | delivery       | HTTP now awaits traced durable enqueue with a finite deadline; runner owns queue listener and queue-backed delayed cascades.                                               |
-| 2026-08-04 | 3     | projection     | Runner store decorator mirrors persisted transitions to Prisma `saga_instances` or the named KV fallback when delegates are unavailable.                                   |
-| 2026-08-04 | 3     | focused gates  | Queue 35/35, saga core 69 pass (2 ignored integrations), sagas plugin 44/44; HTTP GREEN completed in 26–39ms and two transitions projected.                                |
-| 2026-08-04 | 4     | quality gates  | Scoped check/lint/fmt and `quality:gate` passed; all three changed packages passed `deno publish --dry-run --allow-dirty`.                                                 |
-| 2026-08-04 | 4     | public surface | Queue doc-lint is clean. Core/plugin retain 9/15 pre-existing private-reference findings; new delivery/projection types have zero missing JSDoc and no private-type leaks. |
+| Time       | Slice | Step                | Notes                                                                                                                                                                                       |
+| ---------- | ----- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-08-04 | 1     | research            | Read #1190 first; re-baselined #1193, failed scaffold, doctrine, harness, CLI, Aspire, tooling, JSR, and code paths.                                                                        |
+| 2026-08-04 | 1     | environment         | Found one foreign #1193 `aspire/db-operation` AppHost; reported and left untouched.                                                                                                         |
+| 2026-08-04 | 1     | design              | Locked queue-backed API→runner delivery and projection seam.                                                                                                                                |
+| 2026-08-04 | 1     | PLAN-EVAL           | composed per milestone-run.md (orchestrator waiver)                                                                                                                                         |
+| 2026-08-04 | 1     | RED                 | Real router request with a never-settling publisher exceeded the 100ms harness deadline: `Expected actual: "request-timed-out" not to be: "request-timed-out"`.                             |
+| 2026-08-04 | 2     | delivery            | HTTP now awaits traced durable enqueue with a finite deadline; runner owns queue listener and queue-backed delayed cascades.                                                                |
+| 2026-08-04 | 3     | projection          | Runner store decorator mirrors persisted transitions to Prisma `saga_instances` or the named KV fallback when delegates are unavailable.                                                    |
+| 2026-08-04 | 3     | focused gates       | Queue 35/35, saga core 69 pass (2 ignored integrations), sagas plugin 44/44; HTTP GREEN completed in 26–39ms and two transitions projected.                                                 |
+| 2026-08-04 | 4     | quality gates       | Scoped check/lint/fmt and `quality:gate` passed; all three changed packages passed `deno publish --dry-run --allow-dirty`.                                                                  |
+| 2026-08-04 | 4     | public surface      | Queue doc-lint is clean. Core/plugin retain 9/15 pre-existing private-reference findings; new delivery/projection types have zero missing JSDoc and no private-type leaks.                  |
+| 2026-08-04 | 5     | orchestrator steer  | Both-backend scaffold/restart/OTEL protocol transferred to PR #1193; this slice must not run or claim that joint evidence.                                                                  |
+| 2026-08-04 | 5     | interrupted cleanup | The in-progress composed scaffold stopped at `runtime.wait.workers-api`; scoped teardown removed its two proven-owned Postgres containers and left two foreign wave-4 containers untouched. |
+| 2026-08-04 | 5     | CI diagnosis        | GitHub `quality` identified one unused type import; `close-gate` identified stale unchecked omnibus DoD rows. The import and PR contract were narrowed to this PR's evidenced scope.        |
 
 ## Decisions
 
-| Decision                         | Reason                                                                                | Source                           |
-| -------------------------------- | ------------------------------------------------------------------------------------- | -------------------------------- |
-| Queue-backed delivery            | Both backends + trace propagation already exist and workers establish the convention. | `plan.md` D1; queue/workers code |
-| HTTP acknowledges enqueue        | Removes engine/scheduler work from request latency and prevents indefinite publish.   | `plan.md` D2–D3                  |
-| Runner projects after transition | Engine store remains canonical while API instances become truthful.                   | `plan.md` D4–D5                  |
-| No local formal PLAN-EVAL        | Explicit milestone protocol/orchestrator waiver.                                      | owner directive; `plan.md` D6    |
+| Decision                          | Reason                                                                                   | Source                           |
+| --------------------------------- | ---------------------------------------------------------------------------------------- | -------------------------------- |
+| Queue-backed delivery             | Both backends + trace propagation already exist and workers establish the convention.    | `plan.md` D1; queue/workers code |
+| HTTP acknowledges enqueue         | Removes engine/scheduler work from request latency and prevents indefinite publish.      | `plan.md` D2–D3                  |
+| Runner projects after transition  | Engine store remains canonical while API instances become truthful.                      | `plan.md` D4–D5                  |
+| No local formal PLAN-EVAL         | Explicit milestone protocol/orchestrator waiver.                                         | owner directive; `plan.md` D6    |
+| Joint protocol transfers to #1193 | The orchestrator coordinates the single expensive both-backend run after this PR merges. | final orchestrator steer         |
 
 ## Drift
 
@@ -115,22 +119,26 @@ standard runner consumes the shared `sagas` queue and projects transitions autom
 
 ### Runtime Gates
 
-| Gate                | Result  | Evidence                                              | Notes                                                                                                     |
-| ------------------- | ------- | ----------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
-| 0.0.4 RED           | FAIL    | issue #1190 + failed scaffold drift/worklog           | No HTTP status in 15s; no instance; runner only started.                                                  |
-| HTTP-boundary RED   | FAIL    | `publish-http-boundary_test.ts` before implementation | Actual router request exceeded 100ms and failed its assertion.                                            |
-| HTTP-boundary GREEN | PASS    | `publish-http-boundary_test.ts`                       | Deadline returned non-2xx in ~10ms; enqueue→runner→persist→project→scheduled follow-up passed in 26–39ms. |
-| Redis/Garnet GREEN  | NOT_RUN | pending                                               | Serialized AppHost required.                                                                              |
-| Deno KV GREEN       | NOT_RUN | pending                                               | Separate serialized AppHost required.                                                                     |
-| OTEL traces/spans   | NOT_RUN | pending                                               | Must quote path and correlation.                                                                          |
+| Gate                | Result      | Evidence                                              | Notes                                                                                                     |
+| ------------------- | ----------- | ----------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| 0.0.4 RED           | FAIL        | issue #1190 + failed scaffold drift/worklog           | No HTTP status in 15s; no instance; runner only started.                                                  |
+| HTTP-boundary RED   | FAIL        | `publish-http-boundary_test.ts` before implementation | Actual router request exceeded 100ms and failed its assertion.                                            |
+| HTTP-boundary GREEN | PASS        | `publish-http-boundary_test.ts`                       | Deadline returned non-2xx in ~10ms; enqueue→runner→persist→project→scheduled follow-up passed in 26–39ms. |
+| Redis/Garnet GREEN  | TRANSFERRED | PR #1193 joint verification                           | Not run or claimed in this PR per orchestrator steer.                                                     |
+| Deno KV GREEN       | TRANSFERRED | PR #1193 joint verification                           | Not run or claimed in this PR per orchestrator steer.                                                     |
+| OTEL traces/spans   | TRANSFERRED | PR #1193 joint verification                           | PR #1193 must quote the correlated path after this implementation merges.                                 |
 
 ### Consumer Gates
 
-| Consumer      | Result  | Evidence                                           | Notes                                |
-| ------------- | ------- | -------------------------------------------------- | ------------------------------------ |
-| real scaffold | NOT_RUN | pending #1193 integration and AppHost availability | Must verify artifact, not exit code. |
+| Consumer      | Result      | Evidence                    | Notes                                          |
+| ------------- | ----------- | --------------------------- | ---------------------------------------------- |
+| real scaffold | TRANSFERRED | PR #1193 joint verification | The orchestrator owns the expensive-gate slot. |
 
 ## Handoff Notes
 
 - Inspect the HTTP→queue→runner ownership boundary first, then projection write ordering.
 - Reject any claim that HTTP 2xx alone proves runner delivery; require GET/persistence/spans.
+- Merge handoff: #1198 supplies the HTTP-boundary RED→GREEN and engine/runtime fix. PR #1193 owns
+  the single post-merge Redis/Garnet + Deno KV scaffold, restart, persistence, GET, and OTEL proof.
+- Do not add a closing keyword for #1190 to this PR. The orchestrator hand-closes the issue only
+  after #1193 records the transferred evidence.

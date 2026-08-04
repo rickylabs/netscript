@@ -14,7 +14,6 @@ import { createSagaTelemetry } from '@netscript/plugin-sagas-core/telemetry';
 import { resolveProjectRegistryModule } from './project-registry-module.ts';
 import {
   createSagaDeliveryQueue,
-  type SagaDeliveryMessage,
   type SagaDeliveryQueuePort,
   SagaQueueDelivery,
   SagaQueueScheduler,
