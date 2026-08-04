@@ -93,7 +93,7 @@ and flags `truncated` when output was cut. A failed flow returns a structured to
 
 `record_drift` is an evidence-gated mutating tool that appends structured architecture or runtime drift entries to `.netscript/agent/drift.jsonl`.
 
-- **Required Evidence**: Must be authorized by a fresh successful diagnostic receipt (created within 15 minutes, `exitStatus: 0`) for the target resource. Diagnostic receipts are automatically produced by `doctor`, telemetry tools, or `netscript plugin doctor --resource <resource>`.
+- **Required Evidence**: Must be authorized by a fresh successful diagnostic receipt (created within 15 minutes, `exitStatus: 0`) for the target resource. Diagnostic receipts are automatically produced by `doctor`, telemetry tools, API introspection tools, or `netscript plugin doctor --resource <resource>`.
 - **Target & Scope**: `resource` identifies the target component (e.g. plugin name, service name, or `'project'`). Receipts live at `.netscript/agent/diagnostics/<resource>.json`.
 - **Mutation Behavior**: Appends one JSON line to `.netscript/agent/drift.jsonl` containing `timestamp`, `resource`, `summary`, optional `details`, and the attached evidence receipt.
 - **Failure Modes**: If no receipt is found, if the receipt is older than 15 minutes, or if the receipt recorded a non-zero exit status, the tool fails with structured error code `diagnostic_evidence_required`.
