@@ -232,7 +232,7 @@ The plugin's service is named `auth-api` and is built with `@netscript/service`'
 }) }}
 
 {{ comp callout { type: "note", title: "Single Active Backend Design Boundary" } }}
-NetScript's authentication plugin is architected around a single active backend configuration per deployment, resolved at startup via the <code>NETSCRIPT_AUTH_BACKEND</code> environment variable (or <code>auth.backend</code> settings). This design boundary prioritizes clean, isolated runtime execution for individual identity providers. Consequently, features such as dynamic multi-backend routing, cross-backend account linking, and global multi-store session revocation are not supported in this version. For complex multi-tenant or federated identity requirements, routing must be managed upstream or via an external aggregator, as swapping providers requires redeployment with updated credentials.
+NetScript's authentication plugin is architected around a single active backend configuration per deployment, resolved at startup via the <code>NETSCRIPT_AUTH_BACKEND</code> environment variable (or <code>auth.backend</code> settings). This design boundary prioritizes clean, isolated runtime execution for individual identity providers. So features such as dynamic multi-backend routing, cross-backend account linking, and global multi-store session revocation are not supported in this version. For complex multi-tenant or federated identity requirements, routing must be managed upstream or via an external aggregator, as swapping providers requires redeployment with updated credentials.
 <!-- caveat: arch-debt:auth-single-active-backend-boundary -->
 {{ /comp }}
 
