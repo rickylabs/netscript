@@ -174,6 +174,28 @@ describe('generateRegisterBackground', () => {
     );
   });
 
+  it('should register the saga supervisor health endpoint and probe', () => {
+    const sagaProcessor = {
+      ...fixtures.MINIMAL_BACKGROUND,
+      Entrypoint: 'sagas/runtime.ts',
+      Sagas: { Store: { Backend: 'kv' } },
+    } as BackgroundProcessorEntry;
+    const output = generateRegisterBackground({
+      ...emptyOptions,
+      processors: { sagas: sagaProcessor },
+    });
+
+    assertStringIncludes(output, "await sagas.withHttpEndpoint({ env: 'PORT' })");
+    assertStringIncludes(
+      output,
+      `await sagas.withHttpHealthCheck({ path: '${RESOURCE_DEFAULTS.AppHealthCheckPath}', endpointName: '${RESOURCE_DEFAULTS.HttpEndpointName}' })`,
+    );
+    assert(
+      output.indexOf('.withHttpEndpoint(') < output.indexOf('.withHttpHealthCheck('),
+      'health probe must be registered after the saga endpoint it derives its base address from',
+    );
+  });
+
   it('should point triggers background at the generated trigger registry module', () => {
     const triggerProcessor: BackgroundProcessorEntry = {
       ...fixtures.MINIMAL_BACKGROUND,
