@@ -5,7 +5,10 @@ export function withDatabasePermissions(
   permissions: readonly string[],
   databaseEngine?: DatabaseEntry['Engine'],
 ): readonly string[] {
-  return databaseEngine === 'Sqlite' && !permissions.includes('--allow-ffi')
+  const ffiAlreadyGranted = permissions.includes('--allow-all') ||
+    permissions.includes('--allow-ffi');
+
+  return databaseEngine === 'Sqlite' && !ffiAlreadyGranted
     ? [...permissions, '--allow-ffi']
     : permissions;
 }

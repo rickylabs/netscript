@@ -109,6 +109,31 @@ Deno.test('runtime gates include durable workers and sagas CLI parity', () => {
   assertEquals(gate.failureHint, undefined);
 });
 
+Deno.test('workers wait gate requires runtime startup evidence before behavior gates', () => {
+  const gate = createRuntimeGates(DATABASE.SQLITE).find((entry) =>
+    entry.id === GATE.RUNTIME_WAIT_WORKERS
+  );
+  if (gate?.kind !== 'command') {
+    throw new Error('Expected workers wait gate to be a command gate.');
+  }
+
+  assertEquals(
+    gate.command({
+      project: {
+        repoRoot: '/repo',
+        appHost: '/workspace/app/aspire/apphost.mts',
+      },
+    } as RunContext),
+    [
+      'deno',
+      'run',
+      '--allow-run=aspire',
+      '/repo/packages/cli/e2e/src/application/gates/scaffold/wait-for-workers-runtime.ts',
+      '/workspace/app/aspire/apphost.mts',
+    ],
+  );
+});
+
 Deno.test('AI chat route gate captures generated registry import failures', () => {
   const gate = createRuntimeGates().find((entry) => entry.id === GATE.BEHAVIOR_AI_CHAT_ROUTE);
   if (gate?.kind !== 'command') {

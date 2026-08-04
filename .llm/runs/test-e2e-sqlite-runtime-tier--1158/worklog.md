@@ -28,7 +28,8 @@ Framework (`packages/cli` published surface) — S1 only:
 E2E harness (`packages/cli/e2e`, internal to the package, not a JSR surface):
 
 - `SCAFFOLD.RUNTIME_SQLITE` — new suite id `'scaffold.runtime.sqlite'`.
-- `SCAFFOLD_TITLE.RUNTIME_SQLITE` — `'Runtime scaffold capability smoke (sqlite, no docker)'`.
+- `SCAFFOLD_TITLE.RUNTIME_SQLITE` —
+  `'Runtime scaffold capability smoke (sqlite, reduced containers)'`.
 - `RunOptions.cache: boolean` — new run axis.
 - `ScaffoldCapabilitySuite.defaults?: Partial<RunOptions>` — per-suite default options.
 - CLI: `--cache` / `--no-cache` on `run` and `full`.
@@ -47,22 +48,21 @@ E2E harness (`packages/cli/e2e`, internal to the package, not a JSR surface):
 ### Ports
 
 None created. The existing `CommandExecutor` port is deliberately **not** extended with an `env`
-field — subprocesses inherit the runner process environment, so `NETSCRIPT_CACHE_MODE` is set
-process-wide by the CI job and by the sqlite suite (finding 13). Adding an `env` seam would be a
-speculative port for a need this run does not have.
+field. S7 resolved the executable Garnet experiment negatively (D-14), so the sqlite suite and CI
+job leave `NETSCRIPT_CACHE_MODE` unset and use the existing ambient Docker-capable arm. Adding an
+`env` seam would be a speculative port for a need this run does not have.
 
 `DockerResourceCleaner` (existing port) keeps its contract; only the Deno adapter becomes tolerant.
 
 ### Constants
 
 - `SCAFFOLD.RUNTIME_SQLITE = 'scaffold.runtime.sqlite'` (`e2e/src/domain/cli-surface.ts`)
-- `SCAFFOLD_TITLE.RUNTIME_SQLITE = 'Runtime scaffold capability smoke (sqlite, no docker)'`
+- `SCAFFOLD_TITLE.RUNTIME_SQLITE = 'Runtime scaffold capability smoke (sqlite, reduced containers)'`
 - `EXPENSIVE_RUNTIME_SUITE_IDS` — the shared tuple containing both runtime tiers, with the
   `ExpensiveRuntimeSuiteId` union derived from it.
-- `NETSCRIPT_CACHE_MODE` value `'Executable'` — referenced through one named constant in the sqlite
-  suite module, not as a bare string at two call sites.
-- Gate ids: **none added**. The sqlite suite reuses `RUNTIME_GATES` verbatim (D4 filters nothing);
-  `runtime.wait.garnet` and the engine-filtered DB waits already do the right thing.
+- Gate ids: **none added**. The sqlite suite derives its list from `RUNTIME_GATES`, excluding only
+  `behavior.service-health` because the generated service's tagged Prisma raw query is not supported
+  by libSQL (D-15). `scaffold.runtime` retains the complete list unchanged.
 
 ### Commit Slices
 
@@ -91,7 +91,7 @@ S2–S3 build the seams, S4 assembles the suite, S5 makes teardown safe, S6 wire
 
 ### Contributor Path
 
-To add another container-free tier (say mysql-less, or a bare-runtime tier), a contributor:
+To add another reduced-container tier (say mysql-less, or a bare-runtime tier), a contributor:
 
 1. adds the id + title to `SCAFFOLD` / `SCAFFOLD_TITLE` in `e2e/src/domain/cli-surface.ts`;
 2. appends one entry to `scaffoldCapabilitySuites` in `suites/scaffold/capability-suites.ts` with a
@@ -782,3 +782,68 @@ commit, post its evidence comment, and stop without review or sign-off.
   **not self-certified**. Tier-A must review the classifier conjunction, workflow fail-closed
   guards, reason clauses, artifact collection, independent concurrency, and lane visibility before
   sign-off; do not start S7 from this handoff.
+
+## S7 Live SQLite Runtime Evidence
+
+This section supersedes the pre-S7 handoff above without rewriting its historical record. The
+implementation lane resumed the externally timed-out worktree, preserved every existing change,
+and continued from the already-isolated first-boot state-loss failure.
+
+Three instrumented executable-Garnet attempts kept `runtime.wait.garnet` green and the same healthy
+Garnet PID alive, but produced inconsistent state across the workers API and background runtime:
+one run exposed no jobs and returned 404 from the trigger, while two exposed the jobs and accepted
+the trigger but never exposed an execution. Per the locked decision deadline, R-3 therefore
+resolved negatively. The sqlite suite and CI job no longer pin `NETSCRIPT_CACHE_MODE=Executable`;
+the tier uses ambient container-backed Garnet while still removing both Postgres and Redis (D-14).
+
+The first downgraded run passed the complete workers path and then failed only
+`behavior.service-health`. The generated users-service health primitive invokes Prisma's tagged
+`$queryRaw` form, which libSQL rejects, even though the generated sqlite database module's
+`$queryRawUnsafe('SELECT 1')` succeeds. Per the pre-agreed R-4 exit, only that gate is filtered from
+the sqlite capability list. `scaffold.runtime` retains the original gate and assertion unchanged,
+and a regression test proves the lists differ by exactly this one id (D-15).
+
+The live run also corrected an S2 verification gap: E2E uses the maintainer
+`bin/netscript-dev.ts init` path, not the public CLI path S2 probed. The maintainer command now
+declares and forwards `--cache`; focused tests and the package test gate cover the correction
+(D-16). The stronger `runtime.wait.workers` readiness gate waits for scheduler and worker-pool
+startup markers before behavior checks.
+
+### Final Runtime Verdict
+
+Command:
+
+```text
+deno task e2e:cli run scaffold.runtime.sqlite --cleanup --format pretty --report .llm/tmp/e2e-report-scaffold-runtime-sqlite.json
+```
+
+Result: **PASS — 68 passed, 0 failed, 0 skipped; cleanup passed.**
+
+| Gate family | Outcome | Rationale/evidence |
+| ----------- | ------- | ------------------ |
+| `runtime.wait.garnet` | `PASS` | Ambient container-backed Garnet became healthy. |
+| `runtime.wait.workers` | `PASS` | Scheduler and worker-pool readiness markers observed. |
+| `database.init`, `database.generate`, `database.seed` | `PASS` | SQLite lifecycle and seed completed. |
+| `behavior.workers-*` | `PASS` | Health, jobs, tasks, seed, trigger, and execution visibility all passed; R-5 resolves positively. |
+| remaining `behavior.*` | `PASS` | Sagas, triggers, auth, AI, UI, plugins, streams, and OTEL paths passed. |
+| `behavior.service-health` | `N/A` in sqlite only | Provider-specific libSQL incompatibility under D-15; retained unchanged in Postgres runtime. |
+
+The before and after snapshots each contain only `97b906460988`, the foreign
+`postgres-89449635` resource owned by `/home/codex/repos/wave5-deepseek`. `comm -13` is empty.
+Garnet was created during the run and removed by run-owned cleanup, so the honest net container
+delta is **zero**. No foreign resource was mutated.
+
+### Final Implementation Gates
+
+| Gate | Result |
+| ---- | ------ |
+| `deno test --no-lock -A packages/cli/` | `PASS` — 605 tests (490 steps), 0 failed |
+| scoped check | `PASS` — 789 files, 7 batches, 0 findings |
+| scoped lint | `PASS` — 789 files, 4 batches, 0 findings |
+| scoped format | `PASS` — 789 files, 4 batches, 0 findings |
+| `deno task quality:scan` | `PASS` — `ok: true`, 0 findings; 7 pre-existing allowances |
+| `deno task arch:check` | `PASS` — exit 0; pre-existing warnings only |
+| `deno task e2e:cli suites` | `PASS` — both runtime tiers listed |
+
+This is implementation evidence only. Under D-7 and the owner review boundary, this lane does not
+dispatch a reviewer, add a `## Slice Review` section, self-certify, or author a sign-off commit.

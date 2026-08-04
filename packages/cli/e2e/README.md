@@ -113,7 +113,7 @@ and requested PR checks should use
 | `scaffold.infrastructure` | init, database init/generate/seed, typecheck               |
 | `scaffold.plugins`        | init, official plugins, registry generation, plugin doctor |
 | `scaffold.runtime`        | full scaffold runtime behavior path                        |
-| `scaffold.runtime.sqlite` | container-free sqlite runtime tier                         |
+| `scaffold.runtime.sqlite` | reduced-container sqlite runtime tier                      |
 
 ## Required Permissions
 

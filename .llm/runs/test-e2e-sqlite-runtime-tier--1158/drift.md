@@ -303,3 +303,72 @@ documentation.
   tier. Leave `suite-lease.ts` and Docker cleanup unchanged.
 - **Evidence:** S4a runner tests; 105-test E2E pass; scoped check/lint/fmt, `quality:scan`, and
   `arch:check` passes recorded in `worklog.md`.
+
+## 2026-08-04 — D-14 executable Garnet arm failed cross-process runtime semantics
+
+- **What:** S7 resolved R-3 negatively and took locked decision D2's pre-agreed downgrade from
+  executable Garnet to the ambient Docker-capable Garnet arm.
+- **Source:** three instrumented sqlite runtime reports under `.llm/tmp/`. In every run
+  `runtime.wait.garnet` passed and the executable resource remained `Running`/`Healthy` with a
+  stable PID. One run then exposed an empty workers job registry and returned HTTP 404 from the
+  health-job trigger; two other runs exposed all three jobs and accepted the trigger but never
+  exposed an execution to the API. The stronger `runtime.wait.workers` gate proved the scheduler
+  and worker-pool startup markers before those behavior gates.
+- **Expected:** the workers API and background runtime share registered jobs, queued messages, and
+  execution state through the Redis-compatible Garnet endpoint.
+- **Actual:** first-boot KV/queue visibility differed across the API and background processes even
+  though Garnet and both workers processes were healthy.
+- **Severity:** significant (the zero-container acceptance changes; the sqlite tier's primary
+  Postgres/Redis savings remain).
+- **Action:** remove the `NETSCRIPT_CACHE_MODE=Executable` pin from
+  `capability-suites.ts` and `.github/workflows/e2e-cli.yml`; retain the complete behavior gate list
+  and assertions; rerun with an honest container delta. Update plan D2 to the reduced-container
+  profile. No behavior gate is excluded.
+- **Evidence:** `.llm/tmp/e2e-report-scaffold-runtime-sqlite.json`,
+  `.llm/tmp/e2e-report-scaffold-runtime-sqlite-diagnostic.json`, and
+  `.llm/tmp/e2e-report-scaffold-runtime-sqlite-diagnostic-2.json`; live Aspire describe snapshot
+  `.llm/tmp/ns1158-aspire-describe-live.json`.
+
+## 2026-08-04 — D-15 users-service aggregate health is libSQL-incompatible
+
+- **What:** the first container-backed S7 run reached `behavior.service-health` after all workers
+  behavior gates passed, then the generated users service returned HTTP 503 because its database
+  health check uses Prisma's tagged `$queryRaw\`SELECT 1\`` form, which the libSQL adapter rejects.
+- **Source:** the live health response reported `Invalid prisma.$queryRaw() invocation` / raw query
+  failure. The same run had already passed sqlite init, generate, seed, generated type-check, the
+  engine-aware `db status` AppHost-preservation gate, and every workers gate.
+- **Expected:** a provider-neutral health assertion, or a sqlite-compatible database health
+  implementation.
+- **Actual:** the behavior gate exercises a product health implementation that remains
+  Postgres-shaped even though its probe script accepts the selected database name.
+- **Severity:** significant (one behavior assertion is inapplicable to this tier; no tier or
+  product assertion is weakened in the existing Postgres suite).
+- **Action:** follow R-4's pre-agreed exit: exclude only `behavior.service-health` from the sqlite
+  capability's gate list, keep it unchanged in `scaffold.runtime`, and add a regression test that
+  the two lists differ by exactly that one gate. Do not modify the assertion or service package in
+  this issue.
+- **Evidence:** failed S7 report gate `behavior.service-health`; generated
+  `database/sqlite/mod.ts` uses `$queryRawUnsafe('SELECT 1')` successfully while
+  `packages/service/src/primitives/health.ts` uses the incompatible tagged form.
+
+## 2026-08-04 — D-16 S2 verified the public init path, not the live maintainer path
+
+- **What:** S7's first live invocation showed that the E2E resolves `bin/netscript-dev.ts` and its
+  maintainer `init` command, while S2's cache-spelling probe exercised only the public
+  `bin/netscript.ts` command. The maintainer command did not declare or forward `--cache`, so the
+  live `scaffold.init` gate rejected the argument even though S2's public-binary probe was green.
+- **Source:** live S7 `scaffold.init` failure; command resolution in the generated E2E workspace;
+  `packages/cli/src/maintainer/features/init/init-command.ts` and
+  `orchestrate-maintainer-init.ts`.
+- **Expected:** the command path used by the E2E accepts `--cache=false` and forwards it to the
+  shared init request.
+- **Actual:** only the public command had the option; the maintainer command's schema and request
+  omitted it.
+- **Severity:** significant (S2's claimed verification boundary was incomplete and blocked the live
+  tier; the public CLI behavior itself was correctly reported).
+- **Action:** add the boolean `--cache [enabled:boolean]` option to the maintainer init command,
+  forward it through orchestration, and cover both parsing and request propagation. Keep the public
+  CLI unchanged and record this as a real divergence from S2 rather than rewriting its historical
+  evidence.
+- **Evidence:** maintainer init command/orchestration tests; final 605-test package pass; final live
+  sqlite runtime pass.

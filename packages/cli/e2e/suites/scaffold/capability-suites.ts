@@ -10,12 +10,6 @@ import { DATABASE } from '../../src/domain/extension-axes.ts';
 import type { RunOptions } from '../../src/domain/run-context.ts';
 import type { SuiteDefinition } from '../../src/domain/suite-definition.ts';
 
-/** Process-level cache mode used by the Docker-less runtime suite. */
-export const SQLITE_RUNTIME_CACHE_MODE = {
-  environmentVariable: 'NETSCRIPT_CACHE_MODE',
-  value: 'Executable',
-} as const;
-
 /** Built-in scaffold capability suite shape. */
 export interface ScaffoldCapabilitySuite {
   readonly id: SuiteId;
@@ -124,6 +118,12 @@ const RUNTIME_GATES = [
   GATE.CLEANUP_ASPIRE_STOP,
 ] as const;
 
+// The generated users service currently probes Prisma with a tagged raw query that
+// is not supported by the libSQL adapter. Keep that product-health assertion in
+// the Postgres merge-readiness suite while the reduced-container tier exercises
+// every provider-neutral runtime behavior.
+const RUNTIME_SQLITE_GATES = RUNTIME_GATES.filter((gate) => gate !== GATE.BEHAVIOR_SERVICE_HEALTH);
+
 const PLUGIN_GATES = [
   GATE.PREFLIGHT_DENO,
   GATE.SCAFFOLD_INIT,
@@ -173,7 +173,7 @@ export const scaffoldCapabilitySuites: readonly ScaffoldCapabilitySuite[] = [
   {
     id: SCAFFOLD.RUNTIME_SQLITE,
     title: SCAFFOLD_TITLE.RUNTIME_SQLITE,
-    gates: RUNTIME_GATES,
+    gates: RUNTIME_SQLITE_GATES,
     defaults: { database: DATABASE.SQLITE, cache: false },
   },
 ];
@@ -183,15 +183,6 @@ export function createScaffoldCapabilitySuite(
   capability: ScaffoldCapabilitySuite,
   overrides: Partial<RunOptions> = {},
 ): SuiteDefinition {
-  if (
-    capability.id === SCAFFOLD.RUNTIME_SQLITE &&
-    Deno.env.get(SQLITE_RUNTIME_CACHE_MODE.environmentVariable) === undefined
-  ) {
-    Deno.env.set(
-      SQLITE_RUNTIME_CACHE_MODE.environmentVariable,
-      SQLITE_RUNTIME_CACHE_MODE.value,
-    );
-  }
   const resolved = { ...capability.defaults, ...overrides };
   const suite = defineCliE2eSuite()
     .withId(capability.id)

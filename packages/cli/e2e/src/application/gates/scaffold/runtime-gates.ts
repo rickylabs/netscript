@@ -38,6 +38,21 @@ const AI_CHAT_ROUTE_FAILURE_HINT =
   'stderr for the failing generated module and registry path.';
 
 function runtimeWaitGate(resource: AspireResource): GateDefinition {
+  if (resource === ASPIRE_RESOURCE.WORKERS) {
+    return commandGate(
+      `runtime.wait.${resource}`,
+      `Wait for ${resource}`,
+      GATE_PHASE.RUNTIME,
+      (context) => [
+        'deno',
+        'run',
+        '--allow-run=aspire',
+        `${context.project.repoRoot}/packages/cli/e2e/src/application/gates/scaffold/wait-for-workers-runtime.ts`,
+        context.project.appHost,
+      ],
+    );
+  }
+
   return commandGate(
     `runtime.wait.${resource}`,
     `Wait for ${resource}`,

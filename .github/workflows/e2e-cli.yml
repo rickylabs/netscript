@@ -23,8 +23,8 @@ name: e2e-cli
 #
 #   - scaffold-runtime-sqlite — the cheaper full-runtime tier
 #     (`deno task e2e:cli run scaffold.runtime.sqlite --cleanup`): the same
-#     generated-project runtime path with sqlite and the executable Garnet arm,
-#     avoiding postgres/redis/garnet containers. The postgres tier above remains
+#     generated-project runtime path with sqlite and no Postgres/Redis resources,
+#     avoiding Postgres and Redis containers. The postgres tier above remains
 #     the merge-readiness bar.
 #
 # Triggers: every PR to main or an integration branch (`feat/**`, `epic/**`), PLUS
@@ -318,7 +318,7 @@ jobs:
           if-no-files-found: ignore
 
   scaffold-runtime-sqlite:
-    name: scaffold-runtime-sqlite (aspire + sqlite + executable garnet)
+    name: scaffold-runtime-sqlite (aspire + sqlite + garnet)
     needs: classify
     concurrency:
       group: e2e-scaffold-runtime-sqlite-global
@@ -334,7 +334,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 40
     env:
-      NETSCRIPT_CACHE_MODE: Executable
       RUN: ${{ needs.classify.result != 'success' || needs.classify.outputs.run_runtime_sqlite == 'true' }}
       SKIP_REASON: ${{ needs.classify.outputs.reason }}
     steps:

@@ -24,7 +24,7 @@ export const SCAFFOLD_TITLE = {
   INFRASTRUCTURE: 'Infrastructure scaffold capability smoke',
   PLUGIN: 'Official plugin scaffold smoke',
   RUNTIME: 'Runtime scaffold capability smoke',
-  RUNTIME_SQLITE: 'Runtime scaffold capability smoke (sqlite, no docker)',
+  RUNTIME_SQLITE: 'Runtime scaffold capability smoke (sqlite, reduced containers)',
   USERLAND_INSTALL: 'True userland plugin install smoke',
 } as const;
 
