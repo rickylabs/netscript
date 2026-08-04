@@ -99,10 +99,11 @@ No gate-filtering logic to touch: waits are derived from the suite's resolved op
 
 ## Progress Log
 
-| Time       | Slice     | Step                                                 | Notes                                                                                       |
-| ---------- | --------- | ---------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| 2026-08-04 | bootstrap | Research pass re-derived against `main` @ `c6f243da` | 5 corrections to the carried-in draft, 2 of them blockers. See `research.md` § Re-baseline. |
-| 2026-08-04 | bootstrap | Run dir authored; branch + draft PR opened           | Harness artifacts only — no product code (D9).                                              |
+| Time       | Slice     | Step                                                  | Notes                                                                                                                                 |
+| ---------- | --------- | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-08-04 | bootstrap | Research pass re-derived against `main` @ `c6f243da`  | 5 corrections to the carried-in draft, 2 of them blockers. See `research.md` § Re-baseline.                                           |
+| 2026-08-04 | bootstrap | Run dir authored; branch + draft PR opened            | Harness artifacts only — no product code (D9).                                                                                        |
+| 2026-08-04 | S1        | Pre-implementation trace stopped on app-command drift | `generate-register-apps.ts` launches `deno task` and owns no permission list; recorded as significant drift D-5 before product edits. |
 
 ## Decisions
 

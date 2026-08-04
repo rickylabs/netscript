@@ -2,19 +2,22 @@
 
 ## Run Metadata
 
-| Field          | Value                                |
-| -------------- | ------------------------------------ |
-| Run ID         | `test-e2e-sqlite-runtime-tier--1158` |
-| Branch         | `test/e2e-sqlite-runtime-tier-1158`  |
-| Current phase  | `plan-eval`                          |
-| Archetype      | `6 - CLI / Tooling`                  |
-| Scope overlays | `service`                            |
+| Field          | Value                                 |
+| -------------- | ------------------------------------- |
+| Run ID         | `test-e2e-sqlite-runtime-tier--1158`  |
+| Branch         | `test/e2e-sqlite-runtime-tier-1158`   |
+| Current phase  | `implement` — S1 blocked on drift D-5 |
+| Archetype      | `6 - CLI / Tooling`                   |
+| Scope overlays | `service`                             |
 
 ## Current State
 
-Bootstrap, Research, and Plan & Design are complete. The run dir holds `supervisor.md`,
-`research.md`, `plan.md`, `worklog.md` (with the `## Design` section), `drift.md`, and this file.
-**No product code exists** — the Plan-Gate is a hard stop and has not run yet.
+Bootstrap, Research, Plan & Design, and PLAN-EVAL are complete; `plan-eval.md` records `PASS` at
+commit `dd178da7`. S1 began with a baseline trace and stopped before product edits on significant
+drift D-5: contrary to locked decision D0 and research finding 8, `generate-register-apps.ts` does
+not emit `resolvePermissions(...)` or any permission-bearing command. It launches apps through
+`deno task`, whose CLI accepts no Deno permission flags; the default generated Fresh task already
+uses `deno run --allow-all`.
 
 The carried-in draft from the failed Copilot/Grok run was re-derived against `main` @ `c6f243da` and
 **corrected in four places**; two corrections are blockers. The plan's D2/D3/D4/E5 deliberately
@@ -34,15 +37,15 @@ supersede the draft's decisions of the same names.
 
 ## In Progress
 
-- **PLAN-EVAL** — separate session, open-model evaluator lane (Claude · OpenRouter ·
-  `qwen/qwen3.7-max`), per `evaluator/plan-protocol.md` + `gates/plan-gate.md` → writes
-  `plan-eval.md`.
+- **S1 blocked for Tier-A rescope.** No product file has been edited and no slice gate has run.
+  Drift D-5 requires a supervisor decision: rescope the shared helper to the three
+  permission-bearing generators, or first design a real app task-permission contract.
 
 ## Next Steps
 
-1. Run PLAN-EVAL in a separate session; record `PASS` / `FAIL_PLAN` in `plan-eval.md`.
-2. **On `PASS` only:** implement S1 (the `--allow-ffi` blocker) as a WSL Codex daemon-attached slice
-   via `.llm/tools/agentic/`, on `complex_implementation` (Sol · high).
+1. Tier-A supervisor reviews drift D-5 and revises D0/S1 if appropriate. Do not encode `--allow-ffi`
+   as a `deno task` argument or generated comment.
+2. Relaunch/resume S1 only with a permission-bearing app design or explicit three-generator rescope.
 3. Slice review gate (Tier-A supervisor) → sign-off commit → push → PR comment. Repeat for S2–S7.
 4. Gate phase: scoped wrappers + `quality:scan` + `arch:check` + `publish:dry-run`, then the
    postgres `scaffold.runtime` regression run.
@@ -64,9 +67,10 @@ supersede the draft's decisions of the same names.
 
 ## Files Changed
 
-| Path                                             | Status | Notes                                          |
-| ------------------------------------------------ | ------ | ---------------------------------------------- |
-| `.llm/runs/test-e2e-sqlite-runtime-tier--1158/*` | new    | Harness artifacts only — the bootstrap commit. |
+| Path                                                                           | Status   | Notes                                                          |
+| ------------------------------------------------------------------------------ | -------- | -------------------------------------------------------------- |
+| `.llm/runs/test-e2e-sqlite-runtime-tier--1158/*`                               | new      | Harness artifacts only — the bootstrap commit.                 |
+| `.llm/runs/test-e2e-sqlite-runtime-tier--1158/{drift,worklog,context-pack}.md` | modified | S1 blocking drift D-5; uncommitted pending supervisor rescope. |
 
 No `packages/` or `.github/` file has been touched (D9).
 
@@ -74,7 +78,7 @@ No `packages/` or `.github/` file has been touched (D9).
 
 | Gate family | Current status | Evidence                                            |
 | ----------- | -------------- | --------------------------------------------------- |
-| Static      | `NOT_RUN`      | No product code yet.                                |
+| Static      | `NOT_RUN`      | S1 stopped before product edits.                    |
 | Fitness     | `NOT_RUN`      | Planned-surface jsr scan recorded in `research.md`. |
 | Runtime     | `NOT_RUN`      | S7 is the first live sqlite run.                    |
 | Consumer    | `NOT_RUN`      | S1 must leave non-sqlite scaffolds byte-identical.  |
