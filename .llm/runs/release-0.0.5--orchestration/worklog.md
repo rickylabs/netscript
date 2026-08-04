@@ -1376,3 +1376,14 @@ UNKNOWN mergeability that never resolves means conflict, and the cure is a resol
 a kick.** The earlier finding-21 specimen (#1187 family) remains valid on its own evidence;
 this one is reclassified. Resolution pushed (each side's own truth kept); #1269/#1270 stay
 closed with reasons, #1271 carries the work.
+
+## 2026-08-04 — MERGE #1271 (#1248) + #1239 (#1234): owner wave 10 of 11 closed
+
+- **#1271 merged** — CI spawned within seconds of the conflict resolution (finding 30
+  confirmed by construction), all four green, threads 0/0, refs [1248]; #1248 auto-closed.
+- **#1239 merged** — all four green after the agent's own box+mirror loop, threads 0/0,
+  refs [1234]; **#1234 auto-closed** — the verified-defect triad is fully retired.
+- **Owner onboarding wave: 10 of 11 closed in ~5 hours** (#1250, #1253, #1254, #1247,
+  #1248, #1252, #1234, #1235, #1236 + #1246's mitigation landed with the issue honestly
+  moved to 0.0.6 against upstream deno/deno#35804). Remaining: **#1251** (PR #1266, still
+  draft — the aspire backing-resources fix). All merged work rides canary.9.
