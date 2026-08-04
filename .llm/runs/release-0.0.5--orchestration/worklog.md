@@ -972,3 +972,20 @@ PR #1215. FYI for the release cut: four docs/site pages changed, no packages/ so
 - **#1218** = the #1201 corpus slice's draft PR (opened 10:42:59Z by the launched Sol·high
   agent, labeled + milestoned correctly). Wave-4 lane live. #1216 merged by the docs lane
   (`c6f243dac`) — rides canary.6's content-derived train.
+
+## 2026-08-04 — Wrapper-kill incident: all three lanes died silently; re-fired kill-resistant
+
+- ~13:12–13:13 the three background steer/launch wrappers (S7-D15, sagas-protocol, export
+  launch) were stopped harness-side. **All three Codex turns died with them** — `codex exec
+  resume` is in-process; the daemon-attached survival property belongs to the app-server launch
+  path only. The D15 steer reached S7's rollout but was never processed.
+- **Finding 28 [one-mtime-read-is-not-liveness]:** my first verdict ("all three alive, kills
+  were wrapper-only") read rollout mtimes seconds after the kills and mistook final writes for
+  ongoing activity; the S7 "evidence commits" were rebase-rewritten S3-era commits (identical
+  committer timestamps — the tell). Liveness requires two reads separated in time, or a process
+  check (`pgrep` for the exec), never a single fresh mtime. The quiescence monitor caught the
+  truth 6 minutes later.
+- Re-fired all three via `setsid nohup` codex-resume (turn now survives wrapper stops);
+  verified fresh rollout writes ~30s post-fire on every thread. Sagas told to leak-check its own
+  orphaned scaffold resources (nuget-search processes, postgres container) before resuming the
+  protocol; wave5 untouched throughout.
