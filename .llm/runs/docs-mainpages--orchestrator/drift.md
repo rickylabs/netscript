@@ -102,3 +102,19 @@ Confirmed findings:
   consistency, syntactic craft, structural AI tells — on **Qwen 3.7 Max at highest effort**.
   S8 launched over the new agentic:claude-openrouter transport (its first production use),
   effort max. #1216 merge waits on S8 + CI.
+
+- **D-15 (owner rejection + remap, 2026-08-04 afternoon).** Owner reviewed the merged #1216 set:
+  REJECTED. Root causes owned by the orchestrator: (a) the synthesis swapped one feature
+  (CRUD) for another (saga, a plugin) instead of presenting the meta-framework; (b) the
+  condemned architecture-overview diagram survived on concepts; (c) seven review passes gated
+  accuracy, none gated the thesis. Corrected bar (owner verbatim intent): enterprise-grade
+  entry point for experienced devs, stakeholders, tech enthusiasts; TRUE to NetScript the
+  meta-framework; storyline + cross-linking; meaningful good-looking diagrams AND code
+  snippets; quality parity with the inner site. Remap authored BY THE ORCHESTRATOR ITSELF
+  (owner instruction "revamp that yourself") on branch docs/main-pages-remap: homepage
+  presents the contract-carried-end-to-end principle with a new contract-flow Mermaid→SVG
+  diagram and a 3-tab contract→service→page code moment mirroring the site's verified
+  examples; concepts loses the giant diagram, gains the focused aspire-resource-graph on
+  layer 5; quickstart rebuilt with promise → scaffold-anatomy → dashboard payoff → honest
+  first change; why reframed around what a meta-framework changes. Owner-ordered adversarial
+  pass: Sol · HIGH (explicit effort override on resume) against the owner's exact criticisms.
