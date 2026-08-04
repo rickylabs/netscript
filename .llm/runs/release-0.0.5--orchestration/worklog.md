@@ -1099,3 +1099,10 @@ versions); labels on 5 items; prerelease note. Pinned prod E2E success — inclu
 runtime.aspire-restore gate that infra-killed canary.6's pair (#1227 still open for hardening).
 `Record green canary pair` + summary success. **Stable-cut green-pair precondition now held by
 canary.7** — the freshest possible train minus #1226 (in gate).
+
+## 2026-08-04 — MERGE #1226 (#1104 closed): cron retry/backoff contract implemented
+
+Gate record: rerun 30910826721 all four green (close-gate green after the #1104 six-box
+evidence mirror — decision **implement**, rationale: trigger adapter consumes `attempt`;
+removal breaks real consumers); refs `Closes #1104`, sidebar [1104] exact; threads 0/0;
+**#1104 auto-closed, verified.** Rides canary.8. W4-D done; W4-B/C (S9/S10) dispatching now.
