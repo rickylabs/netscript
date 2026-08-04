@@ -22,21 +22,20 @@ PLAN-EVAL.
 - Activated required harness/doctrine/PR/Fresh/tooling/JSR skills.
 - Read harness workflow, Archetype 4, frontend overlay, doctrine public-surface/folder/fitness rules.
 - Read issue body plus corrective comments and the full three-file reference patch.
-- Fast-forwarded branch to current `origin/main` `9bcfd18f2`.
+- Fast-forwarded, then rebased branch to current `origin/main` `26fe0da9b`.
 - Recorded pre-existing `deno.lock` ownership and JSR/doc baseline findings.
 - Locked research, plan, Design checkpoint, and composed-waiver artifact.
 
 ## In Progress
 
-- S0 bootstrap commit, explicit refspec push, and draft PR creation.
+- S0 baseline reconciliation after draft PR creation.
 
 ## Next Steps
 
-1. Commit only run artifacts (exclude `deno.lock`), push explicit refspec, open labeled draft PR.
-2. Write S1 SDK RED test, capture failure, implement cache-aware server `queryOptions`, and green it.
-3. Write S2 Fresh timestamp/first-paint RED tests, implement mount reconciliation, and green them.
-4. Write S3 standard invalidation endpoint RED integration, implement server/client seam, and green it.
-5. Run S4 scoped/quality/JSR no-deepening gates and prepare draft→ready evaluation handoff.
+1. Write S1 SDK RED test, capture failure, implement cache-aware server `queryOptions`, and green it.
+2. Write S2 Fresh timestamp/first-paint RED tests, implement mount reconciliation, and green them.
+3. Write S3 standard invalidation endpoint RED integration, implement server/client seam, and green it.
+4. Run S4 scoped/quality/JSR no-deepening gates and prepare draft→ready evaluation handoff.
 
 ## Key Decisions
 
@@ -75,4 +74,3 @@ PLAN-EVAL.
 ## Commits
 
 - See the draft PR's commit list + per-slice PR comments after S0.
-

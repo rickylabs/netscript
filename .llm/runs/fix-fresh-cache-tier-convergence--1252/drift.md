@@ -42,3 +42,13 @@ Drift is append-only.
 - **Action:** accept as no-deepening baseline; do not expand #1252 into unrelated remediation.
 - **Evidence:** `research.md` JSR scan; `worklog.md` baseline gate rows.
 
+## 2026-08-04 — Main advanced during draft creation
+
+- **What:** Two unrelated service/MCP fixes landed after S0 pushed and before source work began.
+- **Source:** PR base SHA `26fe0da9b`; `git rev-list origin/main...HEAD` after draft creation.
+- **Expected:** Locked baseline `9bcfd18f2` remained current through bootstrap.
+- **Actual:** Current main advanced to `26fe0da9b` without touching Fresh/SDK.
+- **Severity:** minor
+- **Action:** rebase the single S0 commit with autostash, restore the user lock edit, and force-update
+  only with an explicit remote-SHA lease and explicit refspec.
+- **Evidence:** rebased S0 `e39c9c4d7`; remote prior SHA `45a402198`; explicit lease push output.

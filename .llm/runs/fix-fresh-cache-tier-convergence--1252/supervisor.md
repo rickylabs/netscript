@@ -10,7 +10,7 @@ Written at run start per `workflow/lane-policy.md` § Supervisor identity.
 | Checkout | `/home/codex/repos/ns005-cachetiers` |
 | Worktree | `/home/codex/repos/ns005-cachetiers` |
 | Branch | `fix/fresh-cache-tier-convergence` |
-| Baseline | `9bcfd18f28c60c07206b6ce5dd564d1d3f6edeee` · `origin/main` · 2026-08-04 |
+| Baseline | `26fe0da9b966e41a01493ff1c10baa609fb42460` · `origin/main` · 2026-08-04 |
 | Run ID | `fix-fresh-cache-tier-convergence--1252` |
 
 ## Routes in force
@@ -28,4 +28,3 @@ Written at run start per `workflow/lane-policy.md` § Supervisor identity.
   sub-runs, and integration sub-PRs are not applicable.
 - The worktree does not expose an observed model/session identifier. The owner-requested
   OpenAI · GPT-5.6 Sol · medium identity is recorded without inventing a thread id.
-

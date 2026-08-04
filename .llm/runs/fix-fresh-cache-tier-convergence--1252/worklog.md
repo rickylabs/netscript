@@ -72,6 +72,7 @@ hydration in `packages/fresh/src/application/query/`; extend the HTTP edge in
 | 2026-08-04 | S0 | research | Read issue body/comments and exact Pulseboard `56accbb` patch before source work. |
 | 2026-08-04 | S0 | re-baseline | Fast-forwarded branch from `3a267aef1` to current `origin/main` `9bcfd18f2`; preserved user-owned lock edit. |
 | 2026-08-04 | S0 | design | Locked Archetype 4 + frontend contract and recorded D6 composed waiver. |
+| 2026-08-04 | S0 | reconcile | Rebasing onto new main `26fe0da9b` changed the bootstrap commit to `e39c9c4d7`; explicit lease/refspec push preserved the remote commit trail and lock edit. |
 
 ## Decisions
 
@@ -124,4 +125,3 @@ hydration in `packages/fresh/src/application/query/`; extend the HTTP edge in
 
 - Inspect D1/D2/D5 and the RED proof entries first.
 - Compare final structured doc/audit counts to the recorded baseline; do not accept new findings.
-

@@ -5,7 +5,9 @@
 - Carried-in sources:
   - issue [#1252](https://github.com/rickylabs/netscript/issues/1252), including its four corrective/specification comments;
   - Pulseboard commit [`56accbb9f222acace4bdefb117dc4c6cfeb59bce`](https://github.com/rickylabs/pulseboard/commit/56accbb9f222acace4bdefb117dc4c6cfeb59bce).
-- Re-derived against `origin/main` @ `9bcfd18f28c60c07206b6ce5dd564d1d3f6edeee` on 2026-08-04.
+- Re-derived against `origin/main` @ `9bcfd18f28c60c07206b6ce5dd564d1d3f6edeee` on 2026-08-04,
+  then rebased before implementation onto `26fe0da9b966e41a01493ff1c10baa609fb42460` after two
+  unrelated service/MCP commits landed during draft creation.
 - The dispatched branch was three commits behind `origin/main` and had no local commits. It was
   fast-forwarded before planning. The only pre-existing worktree edit is one user-owned
   `deno.lock` row for `jsr:@netscript/queue@0.0.4`; it is excluded from this run.
@@ -67,4 +69,3 @@ The framework seam should absorb those requirements, not transplant product code
   service mutation or product-specific route is introduced.
 - Hydration precedence: server-provided `initialData` wins exactly once on hook mount; optimistic
   writes and client refetches win thereafter. `initialDataUpdatedAt` preserves server cache age.
-
