@@ -1407,3 +1407,25 @@ closed with reasons, #1271 carries the work.
   scaffold at a published canary, and a mandatory "what you give up" section per page.
 - Both milestoned 0.0.6 deliberately: they are chapter/program scale, and 0.0.5's cut is
   gated on the wave + caveat work already in flight. Owner can pull either into 0.0.5.
+
+## 2026-08-04 — #1251 honest stop VERIFIED, then re-scoped: blocked row split to #1280
+
+The #1266 lane stopped #1251 as a research-only partial claiming an upstream boundary. I
+verified the claim rather than accepting it — and it holds, on two independent legs:
+(1) Aspire's own health-checks doc states verbatim "TypeScript AppHost support for
+registering custom health checks with `builder.Services.AddHealthChecks()` is not yet
+available"; (2) the TS-available `withHttpHealthCheck` needs an HTTP endpoint, and Deno KV
+Connect 0.11.0 serves only authenticated POST `/`, `/snapshot_read`, `/atomic_write`,
+`/watch` — so a generated `/health` would be a probe that reports green while checking
+nothing, precisely the healthStatus-without-healthReports failure #1251 exists to kill. The
+agent prototyped and discarded on exactly this basis: correct engineering judgment.
+**But the stop over-reached: only 1 of 5 acceptance rows was blocked.** Orchestrator action:
+- **#1280 filed** (0.0.6, status:blocked) carrying the health-check row + the two-part proof
+  + the two unblock paths to watch.
+- **#1251 re-scoped**: health row marked [post-merge]/split; the deno-kv row narrowed to
+  resolved value + URL. Four rows remain deliverable in 0.0.5.
+- Lane re-steered on #1266 to deliver those four, keep the research artifacts as #1280's
+  evidence, and state the split in the PR body.
+**Finding 31 (for #1163): an agent's honest stop must be verified in BOTH directions — is the
+blocker real (here: yes), and does it actually block everything claimed (here: no). Accepting
+an over-broad stop silently converts one blocked requirement into a whole missed issue.**
