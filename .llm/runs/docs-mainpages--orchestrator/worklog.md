@@ -198,3 +198,6 @@
   against this site's own deploy how-to — corrected) → re-audit PASS at 260201d32.
 - PR #1272 opened → ready → merge on green settle. Closes the last open program task; only
   the owner's Charter A fix list remains parked.
+
+- **#1272 merged** (18:57Z, zero fails). All program deliverables shipped. Run idle, awaiting
+  owner's Charter A fix list.
