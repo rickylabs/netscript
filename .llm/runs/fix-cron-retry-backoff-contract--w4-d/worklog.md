@@ -67,6 +67,7 @@ run the same test matrix against both provider factories.
 | 2026-08-04 14:23 +02:00 | S1 | RED provider contract | Added one fake-time retry contract applied to memory and captured native Deno callbacks; both providers expose only attempt `0`. |
 | 2026-08-04 14:34 +02:00 | S2 | shared retry runtime | Retained adapter policy snapshots, added the shared abortable retry loop, and turned the dual-provider fake-time matrix green. |
 | 2026-08-04 14:38 +02:00 | S2 | supervisor review | Centralized policy snapshots, added explicit stop-during-backoff coverage for both providers, and independently reran the slice gates. |
+| 2026-08-04 14:44 +02:00 | S3 | public contract + consumer | Locked exact JSDoc/manual semantics and proved the scheduled-trigger event retains cron attempt `2`. |
 
 ## Decisions
 
@@ -96,6 +97,12 @@ run the same test matrix against both provider factories.
 | S2 scoped check | `deno run --no-lock --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/cron --ext ts --deno-arg --no-lock --deno-arg --unstable-cron --pretty` | PASS (exit 0) | 14 files selected; 0 diagnostics; wrapper supplied `--unstable-kv` |
 | S2 scoped lint | `deno run --no-lock --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/cron --ext ts --pretty` | PASS (exit 0) | 14 files selected; 0 occurrences |
 | S2 scoped format | `deno run --no-lock --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/cron --ext ts --pretty` | PASS (exit 0) | 14 files selected; 0 findings |
+| S3 scoped check | `run-deno-check.ts --root packages/cron --file packages/plugin-triggers-core/src/adapters/cron-trigger-scheduler-adapter_test.ts --ext ts ...` | PASS (exit 0) | 15 files; zero diagnostics; wrapper supplied `--unstable-kv` |
+| S3 scoped lint/fmt | scoped wrappers over cron + consumer test | PASS (exit 0) | 15 files; zero lint or format findings |
+| S3 full export-map doc-lint | `deno task doc:lint --root packages/cron --pretty` | PASS (exit 0) | combined diagnostics 0 across four exports |
+| S3 publish dry-run | `deno task --cwd packages/cron publish:dry-run` | PASS (exit 0) | 11 files; stable package surface simulates successfully |
+| S3 docs links | `deno task docs:links` | PASS (exit 0) | 102 docs; zero broken links/anchors |
+| S3 docs accuracy | `deno task docs:accuracy` | PASS (exit 0) | repository accuracy/discoverability checks pass |
 
 ### Fitness Gates
 
@@ -118,7 +125,7 @@ run the same test matrix against both provider factories.
 
 | Consumer | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| `plugin-triggers-core` attempt mapping | NOT_RUN | S3 pending | Consumer confirmed by source trace. |
+| `plugin-triggers-core` attempt mapping | PASS (exit 0) | `deno test --no-lock --unstable-kv packages/plugin-triggers-core/src/adapters/cron-trigger-scheduler-adapter_test.ts` | 1 passed; runtime cron attempt `2` is copied unchanged to the scheduled trigger event. |
 
 ## Handoff Notes
 
@@ -131,3 +138,7 @@ run the same test matrix against both provider factories.
 - No public export or documentation changed in S2; consumer/docs work remains S3.
 - The agent commit and supervisor staged diff contain no `deno.lock` change. The supervisor's
   pre-existing unstaged lock edit remains excluded and must not be staged.
+- S3 preserves the export map and replaces the duplicated inline backoff shape with the already
+  published `BackoffStrategy` type; doc-lint reports zero combined diagnostics.
+- The manual and JSDoc now agree on `maxRetries`, attempt numbering, all three formulas, capping,
+  cancellation, and one aggregate terminal event/run-count update per invocation.

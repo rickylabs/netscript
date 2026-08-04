@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `fix-cron-retry-backoff-contract--w4-d` |
 | Branch | `fix/cron-retry-backoff-contract` |
-| Current phase | `implement — S2 supervisor-approved; S3 next` |
+| Current phase | `implement — S3 complete; S4 merge-readiness next` |
 | Archetype | `2 — Integration` |
 | Scope overlays | `docs` |
 
@@ -17,6 +17,9 @@ providers. Each adapter snapshots `maxRetries` and `backoff`; the executor appli
 attempts, the three capped delay policies, abortable `@std/async` waits, and one aggregate terminal
 event/history update per invocation. The provider-parity matrix uses fake time and captures
 `Deno.cron`, so it registers no native cron work and uses no wall-clock sleeps.
+Public JSDoc and the manual now define the same attempt range, default retry count, delay formulas,
+cap, cancellation, and aggregate-event semantics. A focused scheduled-trigger consumer test proves
+that a cron retry attempt is forwarded unchanged.
 
 ## Completed
 
@@ -35,17 +38,20 @@ event/history update per invocation. The provider-parity matrix uses fake time a
 - Ran the supervisor-reviewed focused matrix (`12 passed | 0 failed`) and full cron suite
   (`22 passed | 0 failed`).
 - Ran scoped check/lint/fmt and cron quality/doctrine gates successfully.
+- Clarified the existing stable types without adding or removing an export.
+- Corrected the manual's lifecycle example and documented exact retry math and aggregation.
+- Added and passed the scheduled-trigger attempt-forwarding consumer test.
+- Reran doc-lint, docs links, and docs accuracy successfully.
 
 ## In Progress
 
-- S3 public documentation and consumer-contract evidence.
+- S4 full Archetype 2 merge-readiness gate column and PR evaluation handoff.
 
 ## Next Steps
 
-1. Clarify exact retry, backoff, attempt, cancellation, and aggregate-event semantics in public JSDoc
-   and the manual.
-2. Prove the scheduled-trigger consumer still receives the cron attempt.
-3. Run documentation/public-surface gates and prepare S4 merge-readiness evidence.
+1. Run the full package/publication/fitness/consumer gate set and hygiene scan.
+2. Reconcile issue wording and acceptance evidence.
+3. Push S4 evidence, mark the draft ready, and wait for the milestone-composed augment gate.
 
 ## Key Decisions
 
@@ -63,6 +69,9 @@ event/history update per invocation. The provider-parity matrix uses fake time a
 | `packages/cron/adapters/memory.adapter.ts` | updated | retained schedule retry policy |
 | `packages/cron/adapters/deno.adapter.ts` | updated | retained native schedule retry policy |
 | `packages/cron/tests/retry-backoff_test.ts` | updated | deterministic twelve-case dual-provider matrix |
+| `packages/cron/ports/types.ts` | updated | exact stable retry/attempt/event JSDoc and named backoff type reuse |
+| `docs/site/data-persistence/kv-queues-cron.md` | updated | exact formulas, defaults, cancellation, aggregation, corrected event example |
+| `packages/plugin-triggers-core/src/adapters/cron-trigger-scheduler-adapter_test.ts` | new | attempt-forwarding consumer proof |
 | `.llm/runs/fix-cron-retry-backoff-contract--w4-d/worklog.md` | updated | exact RED exit/assertion evidence |
 | `.llm/runs/fix-cron-retry-backoff-contract--w4-d/context-pack.md` | updated | S1 supervisor handback |
 | `.llm/runs/fix-cron-retry-backoff-contract--w4-d/codex-thread-ids.md` | generated | attached-thread identity and steering evidence |
@@ -75,7 +84,7 @@ event/history update per invocation. The provider-parity matrix uses fake time a
 | Static | PASS | scoped check/lint/fmt plus baseline doc-lint/publish dry-run |
 | Fitness | PASS with known documentation observations | scoped quality/doctrine; baseline JSR audit |
 | Runtime | PASS | focused `12/12`; full cron suite `22/22` |
-| Consumer | pending | S3 |
+| Consumer | PASS | focused scheduled-trigger test; attempt `2` forwarded unchanged |
 
 ## Open Questions
 
