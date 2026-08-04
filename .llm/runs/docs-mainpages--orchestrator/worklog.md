@@ -49,3 +49,13 @@
   fixture; caught by re-verification (failedBatches=1 with 0 diagnostics → bare deno check),
   repaired in 949a572e1, bare check exit 0. Lesson: never trust wrapper "0 occurrences" when
   failedBatches>0; verify with the bare command before push.
+
+## 2026-08-04 — quality lane + Sol audit cycle
+
+- Full quality lane on the fixture: 7 lint findings fixed without suppressions + fmt
+  normalization (5b3ff38bf); bare lint/fmt/check all green. (Interim broken pushes 78edb11d6
+  → repaired 949a572e1 recorded above.)
+- Sol docs_audit first pass (thread resumed after stall): **FAIL_FIX**, findings A1 (false
+  Deferred streaming claim vs non-streaming runtime) + P1 (filler/imprecise hydration recap,
+  trailing whitespace). Both fixed in ae2944908; wording mirrors Deferred.tsx source doc.
+- Re-audit at ae2944908 requested from the same Sol thread; CI watcher running.
