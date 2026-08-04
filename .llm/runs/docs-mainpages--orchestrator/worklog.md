@@ -227,3 +227,22 @@
   the owner's priority order (verify gate → db init → feature-authoring loop → contract
   derivation → orientation → six bugs), and both hard constraints (sync with storefront/01,
   orientation not length).
+
+## 2026-08-04 late — mobile card defect, Quickstart audit FAIL_FIX, two p0/p1 issues
+
+- **Owner-reported render defect diagnosed by measurement, not stylesheet reading** (the method
+  #1277 asks for): `.ns-card` carries `height: 100%` for grid equalisation; below 1100px
+  `.ns-content-rail` was stretch-aligned, giving `.ns-prose` a definite height, so every
+  standalone card inflated to the full page — measured 15,276px at 412px wide vs 158px on
+  desktop. Scoped equal-height to grid contexts + start-aligned the rail at all widths.
+  Verified in Chromium at 412/768/1440 (168/111/73px). **PR #1291 merged 21:18Z.**
+  (#1286 — dead tab bar + 80ch width strand — merged 20:59Z, deployed 21:00Z.)
+- **#1274 audit: FAIL_FIX**, 2 blocking + 9 major, produced by executing the page's happy path
+  on a real scaffold. It refuted two of the generator's own claims.
+- **#1290 filed (p0):** the `@database/zod` alias repoint points at a barrel exporting only
+  `UserSchema` while the generated contract imports `UserCreateInput`/`UserUpdateInput` — a
+  fresh `--service` scaffold fails `deno task check` (3 errors) and the example service
+  crashes at startup. The regression test asserts the alias *string*, which is why CI passed.
+  Together with #1287 this is why 3 of the Quickstart's 7 verify boxes are red today.
+- Fix round dispatched; first resume returned empty and changed nothing (judged by artifacts,
+  not exit code) — re-dispatched detached.
