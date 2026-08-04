@@ -1321,3 +1321,16 @@ re-dispatch train.
 #1268 merged (all four green first read, threads 0/0, refs [1267] — box 3 completes
 post-merge on the canary verdict). Canary.8 attempt 2 dispatched immediately; train now
 additionally carries #1261 (#1247) and #1268 itself. Stage-E verification on completion.
+
+## 2026-08-04 — CANARY.8 stage-E: GREEN PAIR on the freshest train (attempt 2)
+
+`0.0.5-canary.8` published by run 30935024555 — every step green: production-path publish,
+payload label + drift verification, canary-pinned prod E2E, `Record green canary pair`,
+summary. Tag v0.0.5-canary.8 confirmed. Attempt 1 minted nothing (pre-publish refusal,
+#1267/#1268 — box 3 completed with this evidence, issue closed). Train: 12 PRs since
+canary.7 incl. six owner-wave fixes (#1250/#1253/#1254/#1235/#1236/#1247), S9/S10/cron,
+port-prose sweep, deep-dives batch 1. #1149 stage-E comment posted. **Stable-cut
+green-pair precondition now held by canary.8.** Remaining before cut consideration:
+#1239 (#1234 mirror), #1266 (#1251), #1269 (#1248), #1265 (#1252), #1264 (#1246 Refs,
+upstream-classified), then the caveat kill-list + reframe program and the cut-time
+checklist (stage F).
