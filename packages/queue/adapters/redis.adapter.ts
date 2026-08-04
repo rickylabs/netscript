@@ -205,14 +205,12 @@ export class RedisAdapter<T = unknown> implements MessageQueue<T> {
    * Stop the listener, delayed processor, and blocking Redis client.
    */
   async stop(): Promise<void> {
-    if (!this.listening) {
-      return;
-    }
-
     this.abortController?.abort();
     this.listening = false;
     this.stopDelayedProcessor();
     this.clients?.blocking.disconnect();
+    this.clients?.commands.disconnect();
+    this.clients = null;
     await new Promise((resolve) => setTimeout(resolve, 100));
   }
 

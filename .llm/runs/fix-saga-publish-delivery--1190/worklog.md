@@ -77,6 +77,9 @@ standard runner consumes the shared `sagas` queue and projects transitions autom
 | 2026-08-04 | 5     | interrupted cleanup | The in-progress composed scaffold stopped at `runtime.wait.workers-api`; scoped teardown removed its two proven-owned Postgres containers and left two foreign wave-4 containers untouched. |
 | 2026-08-04 | 5     | CI diagnosis        | GitHub `quality` identified one unused type import; `close-gate` identified stale unchecked omnibus DoD rows. The import and PR contract were narrowed to this PR's evidenced scope.        |
 | 2026-08-04 | 5     | close-gate          | The mandated linked-issue sentence renders verbatim while its closing verb is entity-encoded in source; live verdict is `PASS`, `closing issues: none`, so #1190 cannot auto-close here.    |
+| 2026-08-04 | 6     | check-test diagnosis | The rerun reached the generated-registry saga integration and then remained live for 25 minutes until GitHub's 30-minute job ceiling cancelled it; no test assertion failed.              |
+| 2026-08-04 | 6     | shutdown fix        | Redis queue shutdown now releases both owned clients even after listener cancellation; saga delivery shutdown has a finite provider acknowledgement grace period.                       |
+| 2026-08-04 | 6     | focused verification | Queue abort cleanup, saga runner, and generated registry tests passed 13/13; scoped check/lint/fmt passed over 125 files with zero findings.                                               |
 
 ## Decisions
 

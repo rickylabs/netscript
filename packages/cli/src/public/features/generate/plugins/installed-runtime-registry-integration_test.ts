@@ -184,7 +184,21 @@ export const sagaRegistry = new Map([[definition.id, definition]]);
 `);
     await write(join(projectRoot, 'run-published-saga.ts'), `
 import { startSagaRunner } from '@netscript/plugin-sagas/runtime';
-const supervisor = await startSagaRunner({ cwd: () => Deno.cwd() });
+let stopListening = () => {};
+const deliveryQueue = {
+  nativeRetrial: true,
+  enqueue: () => Promise.resolve(),
+  listen: (_handler: unknown, options?: { signal?: AbortSignal }) =>
+    new Promise<void>((resolve) => {
+      stopListening = resolve;
+      options?.signal?.addEventListener('abort', () => resolve(), { once: true });
+    }),
+  stop: () => {
+    stopListening();
+    return Promise.resolve();
+  },
+};
+const supervisor = await startSagaRunner({ cwd: () => Deno.cwd(), deliveryQueue });
 console.log(JSON.stringify(supervisor.snapshot()));
 await supervisor.stop('dependency integration complete');
 `);

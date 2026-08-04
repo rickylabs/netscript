@@ -10,6 +10,7 @@ import { getTraceContext } from '@netscript/telemetry/context';
 
 /** Shared queue name used by saga API publishers and background runners. */
 export const SAGA_DELIVERY_QUEUE = 'sagas' as const;
+const DELIVERY_STOP_GRACE_MS = 1_000;
 
 /** JSON-safe saga message carried between the API and runner processes. */
 export type SagaDeliveryMessage = Readonly<{
@@ -147,7 +148,16 @@ export class SagaQueueDelivery implements SagaRuntimeDeliveryPort {
   async stop(): Promise<void> {
     this.#controller?.abort();
     await this.#queue.stop();
-    await this.#completion;
+    const completion = this.#completion;
+    if (completion) {
+      await Promise.race([
+        completion,
+        new Promise<void>((resolve) => setTimeout(resolve, DELIVERY_STOP_GRACE_MS)),
+      ]);
+      // A provider that cannot acknowledge cancellation must not keep shutdown pending or surface
+      // a detached rejection after its owned resources have been closed.
+      completion.catch(() => undefined);
+    }
     this.#completion = undefined;
     this.#controller = undefined;
   }
