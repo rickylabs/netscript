@@ -1342,3 +1342,13 @@ classification: upstream Deno defect (deno/deno#35804); 0.0.5 ships the detectio
 remediation mitigation with a fails-if-silent test; the full fix is 0.0.6 scope tracked
 against upstream. #1246 milestone moved with reasoned comment — the one honest move of the
 owner's eleven, exactly as scoped at dispatch. Rides canary.9.
+
+## 2026-08-04 — MERGE #1265 (#1252 closed): cache-tier convergence absorbed into the framework
+
+All four green on the evidence head 07a82abe (close-gate cured by the agent's own box+mirror
+loop after one steer; it kept the user-owned deno.lock unstaged — lock hygiene held), threads
+0/0, refs [1252]; #1252 auto-closed. The pulseboard-56accbb-as-spec absorption lands in
+0.0.5 — the larger of the two W6-S items the owner flagged as not-to-be-rushed made the
+milestone honestly. **Owner wave: 8 of 11 closed** (#1250/#1253/#1254/#1235/#1236/#1247/
+#1252 + #1246's mitigation with the issue moved). Remaining: #1234 (#1239 mirror), #1251
+(#1266 draft), #1248 (#1269 retriggered CI). Rides canary.9.
