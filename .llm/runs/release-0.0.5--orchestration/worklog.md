@@ -750,3 +750,19 @@ documented shape: `claude --bg --model fable --effort low --permission-mode bypa
 → session `0a6865da`, slop-correction included in kickoff. Lesson for #1163: the orchestrator
 is not exempt from the read-the-skill-first rule it enforces on every slice — the launch
 surfaces it uses rarely are precisely the ones where remembered flags rot.
+
+### Finding 25 [reactive-supervision-is-the-root-defect] + structural fix
+
+Owner escalation after repeated babysitting: the docsorch launch violated spec twice, #1198 sat
+unsupervised after a wrapper kill, #1207 stalled 34 minutes unnoticed, the docs slop shipped a
+round further than it should have — all one defect: **per-event wake-up supervision with
+verification only after suspicion**. Every silent failure mode this run documented (killed
+wrappers, quota deaths, plateau turns, status-field lies) exploits exactly that gap.
+
+Structural fix now running: a persistent fleet-health Monitor (4-min sweep) that emits STALL
+(rollout >15min quiet), PROGRESS (commit-count deltas), and READY (PR flips incl. the #1193
+canary.2 trigger) events across all six Codex lanes + the fleet PRs. Supervision is now
+continuous; the orchestrator acts on anomalies instead of discovering them. For #1163: the
+milestone-orchestrator skill should mandate a standing health loop as part of stage C — the
+watch-run/codex-watch surfaces exist but nothing requires composing them into always-on
+coverage.
