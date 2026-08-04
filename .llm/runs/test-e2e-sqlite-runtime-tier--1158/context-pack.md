@@ -6,7 +6,7 @@
 | -------------- | ----------------------------------------- |
 | Run ID         | `test-e2e-sqlite-runtime-tier--1158`      |
 | Branch         | `test/e2e-sqlite-runtime-tier-1158`       |
-| Current phase  | `implement` — S5 complete; review handoff |
+| Current phase  | `implement` — S6 complete; review handoff |
 | Archetype      | `6 - CLI / Tooling`                       |
 | Scope overlays | `service`                                 |
 
@@ -56,6 +56,16 @@ discovery failures, a no-new-container prune, and strict failed removal; a runne
 `cleanup: true` with the real adapter raising `NotFound` on snapshot and prune and returns an `ok`
 report.
 
+S6 extends the classifier with `run_runtime_sqlite`, derived as `run_static && !ci:skip-e2e` after
+the precedence-winning `ci:full` path. The new `scaffold-runtime-sqlite` workflow job uses the same
+draft, `diff_unavailable`, skipped-by-policy, and failed-classifier guards as its siblings; pins
+`NETSCRIPT_CACHE_MODE=Executable`; installs Deno 2.9.0, .NET 10, and Aspire CLI 13.4.6; and invokes
+the sqlite suite with cleanup plus a distinct report artifact. Its 40-minute timeout leaves setup
+and Garnet-restore headroom while remaining 20 minutes shorter than the container-backed postgres
+job. An independent concurrency group prevents either runtime tier from queueing behind the other.
+`lane-visibility` now reports the sqlite result. The three frozen `ci:*` labels and the existing
+postgres/draft jobs are unchanged.
+
 ## Completed
 
 - Skills activated: `netscript-harness`, `netscript-doctrine` (archetype + verdict),
@@ -90,16 +100,20 @@ report.
   visibility, no-container pruning, strict failed-removal preservation, and runner-level
   `cleanup: true` coverage. All six requested gates passed: 110 E2E tests; 787-file scoped
   check/lint/fmt scans; `quality:scan`; and `arch:check`.
+- S5 received Tier-A substantive review with no findings and sign-off at `1335ab26`.
+- S6 implementation completed with the full classifier matrix, failed-classifier and
+  `diff_unavailable` workflow assertions, lane visibility, and an explicit YAML parse. All four
+  requested gates passed; 54 classifier/draft-policy tests passed.
 
 ## In Progress
 
-- **S5 is ready for its one-commit implementation handoff.** This lane does not review,
-  self-certify, dispatch a reviewer, or author a sign-off commit.
+- **S6 is ready for its one-commit implementation handoff.** This lane does not review,
+  self-certify, dispatch a reviewer, author a sign-off commit, or start S7.
 
 ## Next Steps
 
-1. Supervisor reviews the S5 commit and PR evidence under the owner-defined review boundary.
-2. **Stop before S6.** S6 remains separately planned; do not start it from this handoff.
+1. Supervisor reviews the S6 commit and PR evidence under the owner-defined review boundary.
+2. **Stop before S7.** S7 is the first live sqlite runtime run and remains separately planned.
 3. Later gate phase: scoped wrappers + `quality:scan` + `arch:check` + `publish:dry-run`, then the
    postgres `scaffold.runtime` regression run.
 4. IMPL-EVAL in a third session.
@@ -118,26 +132,27 @@ report.
 | `D6` merge-readiness stays postgres                                                  | issue #1158 constraints                              | No change to `full-command.ts`.                              |
 | `D8` Docker cleanup tolerant on both failure paths                                   | code — `docker-resource-cleaner.ts:9-43`             | Missing binary **and** non-zero `docker ps`.                 |
 
-## S5 Files Changed
+## S6 Files Changed
 
-| Path                                                                       | Notes                                                                        |
-| -------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
-| `.llm/runs/test-e2e-sqlite-runtime-tier--1158/{worklog,context-pack}.md`   | S5 evidence and review handoff; no drift divergence.                         |
-| `packages/cli/e2e/src/adapters/commands/docker-resource-cleaner.ts`        | Tolerant list boundary, direct-stderr warning seam, strict removal retained. |
-| `packages/cli/e2e/tests/adapters/commands/docker-resource-cleaner_test.ts` | Both discovery failures, empty delta, and strict removal regressions.        |
-| `packages/cli/e2e/tests/application/runner/suite-runner_test.ts`           | `cleanup: true` completes when both Docker list calls raise `NotFound`.      |
+| Path                                                                     | Notes                                                                     |
+| ------------------------------------------------------------------------ | ------------------------------------------------------------------------- |
+| `.llm/runs/test-e2e-sqlite-runtime-tier--1158/{worklog,context-pack}.md` | S6 evidence and review handoff; no drift divergence.                      |
+| `.github/scripts/ci-classify-changes.ts`                                 | `run_runtime_sqlite` decision, output, log, and fail-closed default.      |
+| `.github/scripts/ci-classify-changes.test.ts`                            | Policy matrix plus workflow guard/output assertions.                     |
+| `.github/workflows/e2e-cli.yml`                                         | New runtime job, independent concurrency, and lane-visibility reporting. |
 
-No runner implementation, port contract, `packages/cli/src/**`, `.github/**`, live runtime, product
-cache default, or embedded-template file was touched.
+No `labels.yml`, draft guard, postgres runtime job, `packages/**`, `plugins/**`, live runtime,
+product cache default, or embedded-template file was touched.
 
 ## Gates
 
-| Gate family | Current status | Evidence                                                |
-| ----------- | -------------- | ------------------------------------------------------- |
-| Static      | `PASS`         | S5 scoped check/lint/fmt: 787 files, 0 findings.        |
-| Fitness     | `PASS`         | S5 `quality:scan` and `arch:check` exited 0.            |
-| Runtime     | `NOT_RUN`      | S7 is the first live sqlite run.                        |
-| Consumer    | `PASS`         | S5: 110 E2E tests; tolerant discovery + strict removal. |
+| Gate family | Current status | Evidence                                                        |
+| ----------- | -------------- | --------------------------------------------------------------- |
+| Static      | `PASS`         | 54 tests; scoped check/lint/fmt over 3 `.github` TS files.      |
+| YAML        | `PASS`         | `@std/yaml` parsed `.github/workflows/e2e-cli.yml`.              |
+| Fitness     | `N/A`          | No `packages/**` or `plugins/**`; quality/architecture omitted. |
+| Runtime     | `NOT_RUN`      | Forbidden for S6; S7 is the first live sqlite run.              |
+| Consumer    | `PASS`         | Classifier matrix and workflow fail-closed source assertions.   |
 
 ## Open Questions
 

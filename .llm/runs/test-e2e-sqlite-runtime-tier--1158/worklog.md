@@ -636,6 +636,45 @@ has not started.
 | ------------------ | ------ | ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------- |
 | generated projects | `PASS` | semantic generator tests | Postgres, MySQL, MSSQL, and no-engine output is byte-identical to the pre-branch path for services, background processors, and plugins. |
 
+### S6 CI Policy and Cheap Runtime Job
+
+The classifier now emits `run_runtime_sqlite`. `ci:full` reaches the existing `fullDecision()` and
+therefore forces it true. Every other classified PR derives it as `runStatic && !skipE2e`, keeping
+`ci:skip-e2e` authoritative over both runtime tiers without introducing a label. `ci:skip-scaffold`
+has no independent sqlite override: in the pinned scaffold-impacting case it makes `runStatic`
+false, so the derived sqlite result is explicitly false. Docs-only changes are false,
+scaffold-impacting changes are true, and conservative unrecognised/empty-diff decisions are true.
+
+`scaffold-runtime-sqlite` copies the existing runtime job's applicability, failed-classifier,
+skipped-by-policy, toolchain setup, Aspire preflight, failed-report evidence, and artifact structure.
+It keys `RUN` on the new output, sets `NETSCRIPT_CACHE_MODE=Executable` at job scope, invokes
+`scaffold.runtime.sqlite --cleanup` with a distinct report path/artifact name, and uses
+`e2e-scaffold-runtime-sqlite-global` so it never queues behind postgres. The 40-minute timeout is 20
+minutes below postgres while retaining headroom for Deno install, .NET/Aspire setup, Garnet tool
+restore, and the full behavior suite. `lane-visibility` now needs and renders the sqlite job. The
+existing draft guards, `scaffold-runtime` job, and `.github/labels.yml` are unchanged.
+
+| Gate       | Command                                                                                         | Raw result                                    |
+| ---------- | ----------------------------------------------------------------------------------------------- | --------------------------------------------- |
+| classifier | `deno test --no-lock -A .github/scripts/`                                                       | exit 0; 54 passed, 0 failed                   |
+| type-check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root .github --ext ts`        | exit 0; 3 files, 1 batch, 0 findings          |
+| lint       | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root .github --ext ts`         | exit 0; 3 files, 1 batch, 0 findings          |
+| format     | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root .github --ext ts`          | exit 0; 3 files, 1 batch, 0 findings          |
+| YAML       | `deno eval --no-lock` with `jsr:@std/yaml@^1.0.0` over `.github/workflows/e2e-cli.yml`          | exit 0; parsed to a mapping                   |
+
+The first lint iteration found two `no-regex-spaces` findings in the new workflow-source test. The
+test now uses a line-based job extractor; the complete final matrix above was rerun and passed.
+`quality:scan` and `arch:check` are not applicable because S6 changes no `packages/**` or
+`plugins/**` source. Per the owner brief, `deno task e2e:cli` was not run; S7 owns the first live
+sqlite execution.
+
+**Post-slice reconcile note.** Issue #1158 and draft PR #1220 remain open at `status:impl` and
+milestone 23; the PR retains `Closes #1158`. The latest PR comment is the Tier-A S5 sign-off that
+explicitly authorizes S6, and there are no review threads. No labels or milestone require a change.
+S6 matches locked decision E5 and risks R-6/R-7/R-8 without plan/doctrine divergence, so
+`drift.md` is unchanged. This implementation lane hands off one commit and does not review,
+self-certify, dispatch a reviewer, author a sign-off, or start S7.
+
 ## Handoff Notes
 
 - **Read `research.md` § Re-baseline first.** The carried-in draft's stated blocker was wrong; the
@@ -644,9 +683,6 @@ has not started.
   executable arm under `NETSCRIPT_CACHE_MODE=Executable` on CI, and (b) that S1's permission change
   leaves every non-sqlite scaffold byte-identical.
 - No product code exists at PLAN-EVAL time. Implementation begins only on `PASS`.
-- S1 and S2 are signed off. S3 implementation is complete with green automated gates but is **not
-  self-certified**. Tier-A review subsequently signed off S3. S4 is implementation-complete with
-  green automated gates and Tier-A subsequently signed off S4/S4a. S5 is implementation-complete
-  with all six requested gates green but is **not self-certified**. Tier-A must review the adapter
-  tolerance boundary, warning seam, strict removal behavior, and runner regression before sign-off;
-  do not start S6 from this handoff.
+- S1–S5 are signed off. S6 is implementation-complete with green automated gates but is **not
+  self-certified**. Tier-A must review the classifier conjunction, workflow fail-closed guards,
+  independent concurrency, and lane visibility before sign-off; do not start S7 from this handoff.

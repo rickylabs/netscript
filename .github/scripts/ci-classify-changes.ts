@@ -5,9 +5,11 @@
  * `.github/workflows/ci.yml`, and `.github/workflows/surface-diff.yml`
  * (#1152; paths are the mechanism, labels are the override):
  *
- *   - `run_static`    -> scaffold-static (any scaffold-impacting change)
- *   - `run_runtime`   -> scaffold-runtime; docker is the exception tier,
- *                        reached on the docker signal (v1: deliberately wide)
+ *   - `run_static`         -> scaffold-static (any scaffold-impacting change)
+ *   - `run_runtime_sqlite` -> scaffold-runtime-sqlite (the cheap runtime tier,
+ *                             reached when static runs unless e2e is skipped)
+ *   - `run_runtime`        -> scaffold-runtime; docker is the exception tier,
+ *                             reached on the docker signal (v1: deliberately wide)
  *   - `needs_deno`    -> check-test / quality: any change the Deno toolchain
  *                        checks or tests (root `deno test` discovers
  *                        `.llm/tools` and `.github/scripts` tests, so code
@@ -31,7 +33,7 @@
  * Label precedence (highest first) — the set is frozen at exactly three:
  *   1. `ci:full`          -> force EVERY output true.
  *   2. `ci:skip-scaffold` -> skip `scaffold-static`.
- *      `ci:skip-e2e`      -> skip `scaffold-runtime`.
+ *      `ci:skip-e2e`      -> skip both runtime tiers.
  *      (Skip labels keep their scaffold-tier-only semantics; they never
  *      widen to the required trio or desktop.)
  *   3. otherwise          -> paths decide.
@@ -258,6 +260,7 @@ export interface DecisionInput {
 
 export interface Decision {
   runStatic: boolean;
+  runRuntimeSqlite: boolean;
   runRuntime: boolean;
   docsOnly: boolean;
   needsDeno: boolean;
@@ -271,6 +274,7 @@ export interface Decision {
 function fullDecision(docsOnly: boolean, reason: string): Decision {
   return {
     runStatic: true,
+    runRuntimeSqlite: true,
     runRuntime: true,
     docsOnly,
     needsDeno: true,
@@ -305,6 +309,7 @@ export function decide(input: DecisionInput): Decision {
         `${input.eventName}: no diff to classify -> run (skip labels honoured)`,
       ),
       runStatic: !skipScaffold,
+      runRuntimeSqlite: !skipScaffold && !skipE2e,
       runRuntime: !skipE2e,
     };
   }
@@ -365,6 +370,10 @@ export function decide(input: DecisionInput): Decision {
     runtimeReason = 'scaffold-runtime: docker-tier change detected';
   }
 
+  // scaffold-runtime-sqlite (the cheap runtime tier follows the static
+  // scaffold signal; ci:skip-e2e remains authoritative over both runtimes).
+  const runRuntimeSqlite = runStatic && !skipE2e;
+
   const impactingNote = docsOnly
     ? `${changed.length} file(s), all docs-only`
     : `${impacting.length}/${changed.length} impacting file(s), e.g. ${
@@ -375,6 +384,7 @@ export function decide(input: DecisionInput): Decision {
 
   return {
     runStatic,
+    runRuntimeSqlite,
     runRuntime,
     docsOnly,
     needsDeno: caps.deno,
@@ -484,6 +494,7 @@ async function main(): Promise<void> {
 
   const lines = [
     `run_static=${decision.runStatic}`,
+    `run_runtime_sqlite=${decision.runRuntimeSqlite}`,
     `run_runtime=${decision.runRuntime}`,
     `docs_only=${decision.docsOnly}`,
     `needs_deno=${decision.needsDeno}`,
@@ -500,6 +511,7 @@ async function main(): Promise<void> {
   console.log(`  labels:        ${labels.join(', ') || '(none)'}`);
   console.log(`  changed:       ${files.length} file(s)`);
   console.log(`  run_static:    ${decision.runStatic}`);
+  console.log(`  run_runtime_sqlite: ${decision.runRuntimeSqlite}`);
   console.log(`  run_runtime:   ${decision.runRuntime}`);
   console.log(`  docs_only:     ${decision.docsOnly}`);
   console.log(`  needs_deno:    ${decision.needsDeno}`);
