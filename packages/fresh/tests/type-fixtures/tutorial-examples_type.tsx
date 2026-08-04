@@ -1,6 +1,7 @@
 import { definePage } from '@netscript/fresh/builders';
 import {
   dehydrateQueryClient,
+  type DehydratedState,
   hydrateFromDehydrated,
   useMutation,
   useQuery,
@@ -80,9 +81,9 @@ function OrdersTable(props: { items: Order[]; onAdvance: (vars: { id: string; st
   );
 }
 
-// 1. Client Island with Server+Client Dehydration
+Client Island with Server+Client Dehydration
 interface OrdersQueryIslandProps {
-  dehydratedState?: any;
+  dehydratedState?: DehydratedState;
   input: { limit: number; offset: number; status?: string };
   initialOrders: OrderList;
   cachedAt: number;
@@ -132,7 +133,7 @@ function OrdersQueryIsland(props: OrdersQueryIslandProps) {
   return <OrdersTable items={data?.items ?? []} onAdvance={mutation.mutate} />;
 }
 
-// 2. Statistics Partial component showing deferred load
+Statistics Partial component showing deferred load
 interface StatsProps {
   statsPromise: Promise<{ revenue: number }>;
 }
@@ -145,7 +146,7 @@ function StatsLayer(props: StatsProps) {
   );
 }
 
-// 3. Form Component
+Form Component
 import type { RuntimeFormState } from '@netscript/fresh/form';
 const checkoutFormSchema = z.object({
   address: z.string().min(1),
@@ -162,7 +163,7 @@ function CheckoutForm(props: RuntimeFormState<z.input<typeof checkoutFormSchema>
   );
 }
 
-// 4. Combined Page Definition utilizing Page Builder Fluent API
+Combined Page Definition utilizing Page Builder Fluent API
 const ordersPage = definePage()
   .withRoute(ordersRoute)
   .withTelemetry({ enabled: true, spanName: 'dashboard.orders.view' })
