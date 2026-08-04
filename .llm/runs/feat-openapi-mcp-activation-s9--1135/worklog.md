@@ -82,7 +82,8 @@ migration behavior.
 | --- | --- | --- | --- |
 | activation + migration fixtures | `deno test ...init-agent_test.ts ...stdio_test.ts ...telemetry-flows_test.ts ...doctor_test.ts ...public-command-tree_test.ts` | PASS | 29 passed, 0 failed; current tool count 21 |
 
-Full static, quality, JSR, consumer, and formal evaluator gates remain pending.
+Full static, quality, JSR, consumer, and formal evaluator gates are recorded below and in
+`evaluate.md`.
 
 ### Static Gates
 
@@ -116,9 +117,15 @@ Full static, quality, JSR, consumer, and formal evaluator gates remain pending.
 
 ### Post-slice reconcile
 
-- #1135 remains open with two unticked acceptance boxes; draft PR #1232 carries `Closes #1135`,
-  `Part of #1126`, milestone 0.0.5, the requested taxonomy, and exactly one `status:impl` label.
-- No new issue/PR comments were present at the implementation checkpoint.
+- #1135 remains open with both acceptance boxes checked; ready PR #1232 carries `Closes #1135`,
+  `Part of #1126`, milestone 0.0.5, the requested taxonomy, and exactly one
+  `status:ready-merge` label.
+- Formal Qwen IMPL-EVAL returned `PASS` in `evaluate.md`; the structured PR phase comment mirrors
+  that verdict.
+- GitHub's repo-wide version-drift guard found the S-18 test's literal current-version pin. The
+  post-eval CI repair now derives the simulated migration target as the next patch from
+  `NETSCRIPT_RELEASE_VERSION` while keeping the prior-release JSON fixture byte-exact. The guard
+  plus agent-init suite pass 17/17.
 
 ## Handoff Notes
 

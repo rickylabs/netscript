@@ -2,10 +2,12 @@ import {
   assert,
   assertEquals,
   assertFalse,
+  assertMatch,
   assertRejects,
   assertStringIncludes,
 } from "@std/assert";
 import { dirname, join } from "@std/path";
+import { format, increment, parse } from "@std/semver";
 import { NETSCRIPT_RELEASE_VERSION } from "../../../../kernel/constants/jsr-specifiers.ts";
 import { EMBEDDED_SKILL_FILES } from "../../../../kernel/assets/skills.generated.ts";
 import { DenoAgentInitFileSystem } from "./agent-init-file-system.ts";
@@ -22,7 +24,8 @@ const OPENAPI_TOOL_TRIAD = [
   "list_service_operations",
   "get_operation_schema",
 ] as const;
-const MIGRATION_TARGET_SPECIFIER = "jsr:@netscript/cli@0.0.5";
+const MIGRATION_TARGET_SPECIFIER =
+  `jsr:@netscript/cli@${format(increment(parse(NETSCRIPT_RELEASE_VERSION), "patch", {}))}`;
 
 const FIXTURE_DOCS_GENERATOR: AgentDocsGenerator = {
   generate: () =>
@@ -160,10 +163,9 @@ Deno.test("S-18 prior-release host stays pinned until agent init and restart exp
       await Deno.readTextFile(new URL("prior-release-tools.json", fixtureRoot)),
     ) as readonly string[];
     const before = JSON.parse(await Deno.readTextFile(join(root, ".mcp.json")));
-    assertStringIncludes(
-      JSON.stringify(before.mcpServers.netscript.args),
-      "jsr:@netscript/cli@0.0.4",
-    );
+    const priorSpecifier = before.mcpServers.netscript.args[4] as string;
+    assertMatch(priorSpecifier, /^jsr:@netscript\/cli@\d+\.\d+\.\d+$/);
+    assertFalse(priorSpecifier === MIGRATION_TARGET_SPECIFIER);
     for (const tool of OPENAPI_TOOL_TRIAD) assertFalse(priorTools.includes(tool));
 
     await initAgent({ projectRoot: root, host: "claude" }, {
