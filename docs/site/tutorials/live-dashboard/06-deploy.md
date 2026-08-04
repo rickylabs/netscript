@@ -81,21 +81,22 @@ up for this track:
     { name: "postgres", type: "Container", desc: "Provisioned via Docker. The database your orders service reads — reachable only once Aspire is up." },
     { name: "redis", type: "Container (cache)", desc: "Redis cache — the default `--cache-backend`; Redis-compatible. Backs the KV-backed query layer from chapter 3." },
     { name: "orders", type: ":3002", desc: "Your oRPC service (defineService). RPC at /api/rpc/*, OpenAPI at /api/v1/orders/*." },
-    { name: "dashboard (Fresh app)", type: ":8010", desc: "Your Fresh frontend — the live dashboard you built in chapters 4–5." },
-    { name: "streams", type: ":4437", desc: "Durable-streams producer runtime, present once the sagas plugin is installed. Feeds useLiveQuery." }
+    { name: "dashboard (Fresh app)", type: "allocated port", desc: "Your Fresh frontend — the live dashboard you built in chapters 4–5. Read its port from the dashboard resource list." },
+    { name: "streams", type: "allocated port", desc: "Durable-streams producer runtime, present once the sagas plugin is installed. Feeds useLiveQuery." }
   ]
 }) }}
 
-{{ comp callout { type: "note", title: "Ports are range-allocated — read the dashboard for the truth" } }}
-The conventional ports above (orders <code>:3002</code>, Fresh app <code>:8010</code>, streams <code>:4437</code>) are what a default workspace lands on, but services come from the <code>:3000–3099</code> range and plugin runtimes from <code>:8091–8099</code> / <code>:4437</code>. The Aspire dashboard's resource list is the authority for the exact port each resource bound — read it from there, not from memory.
+{{ comp callout { type: "note", title: "Only pinned ports are predictable — read the dashboard for the rest" } }}
+<code>orders</code> answers on <code>:3002</code> because you pinned it with <code>--service-port</code> in chapter 1. Nothing else in this graph has a memorizable number: scaffolded apps and plugin runtimes take a port derived from your <em>project name</em> out of the IANA dynamic range (<code>49152–65535</code>), so two workspaces on one machine never collide — and no tutorial can print the number yours landed on. The Aspire dashboard's resource list is the authority; read every unpinned port from there.
 {{ /comp }}
 
 ## Step 3 — Open the live dashboard
 
-With the graph up, open your Fresh app and the orders route you built:
+With the graph up, find the `dashboard` resource in the Aspire resource list, open its endpoint, and
+append the orders route you built:
 
 ```
-http://localhost:8010/dashboard/orders/
+/dashboard/orders/
 ```
 
 The table renders cache-first (chapter 4), refetches on the client, and — if the streams runtime is
@@ -135,8 +136,11 @@ the new order on its next revalidation. One command, the full spine, observable 
 
 ```sh
 # From the workspace root, with `aspire start` up in another terminal:
-curl http://localhost:3002/health      # orders service
-curl http://localhost:4437/health      # streams runtime (if sagas installed)
+curl http://localhost:3002/health      # orders service — pinned, so the port is known
+
+# The streams runtime's port is allocated, not pinned. Copy its endpoint from the
+# Aspire resource list, then:
+curl <streams-endpoint>/health         # streams runtime (if sagas installed)
 ```
 
 Both should return healthy responses, and the dashboard at `:18888` should list `postgres`,
@@ -144,7 +148,8 @@ Both should return healthy responses, and the dashboard at `:18888` should list 
 
 - [ ] `aspire restore` then `aspire start` boots the graph without errors.
 - [ ] `https://localhost:18888` lists every resource healthy.
-- [ ] `http://localhost:8010/dashboard/orders/` renders the live table.
+- [ ] The `dashboard` app's endpoint (from the resource list) + `/dashboard/orders/` renders the
+      live table.
 - [ ] Creating an order is visible in the dashboard traces and the live monitor.
 
 {{ comp callout { type: "warning", title: "Aspire is the LOCAL story — not a production deployer" } }}
@@ -156,7 +161,7 @@ Both should return healthy responses, and the dashboard at `:18888` should list 
 <li><strong>Docker not running.</strong> Aspire provisions Postgres + Redis through Docker; no daemon means the happy path does not start. Start Docker, or take the <code>--no-aspire</code> path with your own infrastructure.</li>
 <li><strong>Wrong directory.</strong> <code>aspire restore</code> and <code>aspire start</code> run from inside <code>aspire/</code>; <code>netscript db</code> commands run from the workspace root. Mixing them up is the most common first-run error.</li>
 <li><strong>db command before <code>aspire start</code>.</strong> Every <code>netscript db</code> command needs a live Postgres — bring the graph up first.</li>
-<li><strong>Ports in use.</strong> The dashboard wants <code>:18888</code>/<code>:18889</code> and OTLP <code>:4318</code>; the service, Fresh app, and streams claim <code>:3000+</code>, <code>:8010</code>, and <code>:4437</code>. A stale prior run holding a port blocks boot — free it.</li>
+<li><strong>Ports in use.</strong> The dashboard wants <code>:18888</code>/<code>:18889</code> and OTLP <code>:4318</code>; the pinned <code>orders</code> service claims <code>:3002</code>, and the Fresh app and streams claim allocated ports in <code>49152–65535</code>. A stale prior run holding a port blocks boot — free it.</li>
 </ul>
 {{ /comp }}
 

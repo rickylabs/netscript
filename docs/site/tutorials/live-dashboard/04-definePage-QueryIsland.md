@@ -105,7 +105,7 @@ the same typed search input:
 
 ```tsx
 // apps/dashboard/routes/(dashboard)/dashboard/orders/index.tsx
-import { definePage } from '@netscript/fresh/builders';
+import { definePage } from '@app/utils.ts';
 import { dehydrateQueryClient } from '@netscript/fresh/query';
 import { createNetScriptQueryClient } from '@netscript/sdk/query-client';
 import { baseQueries, ordersQueryUtils } from '@app/lib/api-clients.ts';
@@ -136,6 +136,11 @@ export const ordersListPage = definePage()
     return dehydrateQueryClient(queryClient);
   })
 ```
+
+`definePage` comes from `@app/utils.ts`, not straight from `@netscript/fresh/builders`. Your scaffold
+wrote that module in chapter 1 — it is a two-line re-export that binds the builder to the app's
+`State` type (`export function definePage() { return createDefinePage<State>(); }`), so every page in
+the app shares one typed context. Import it from anywhere else and you lose that binding.
 
 `spanName: 'dashboard.orders.list'` is not decoration: every render of this page emits a span under
 that name, and it shows up in the Aspire dashboard's traces view alongside the service call the
@@ -343,14 +348,13 @@ export default function StatsLayer(props: StatsProps) {
 
 ## Verify your progress
 
-Make sure `aspire start` is up, then open the route in a browser:
+Make sure `aspire start` is up, then open the route in a browser at `/dashboard/orders/`.
 
-```
-http://localhost:8010/dashboard/orders/
-```
-
-(The Fresh app's port is `:8010` in the Aspire stack; confirm the exact port in the
-[dashboard](/explanation/aspire/) resource list.) You should see the orders table render
+You need the app's port to do that, and there is no number to memorize: scaffolded apps and plugin
+runtimes take a port derived from your project name out of the high `49152–65535` range, so every
+workspace lands somewhere different. The [Aspire dashboard](/explanation/aspire/) resource list is
+the authority — find the `dashboard` resource, click its endpoint, and append `/dashboard/orders/`.
+You should see the orders table render
 immediately — populated from KV cache, not a spinner — and a "Refreshing" indicator flicker as it
 revalidates. Advancing an order's status should update its badge instantly. Type-check too:
 

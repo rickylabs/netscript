@@ -38,8 +38,8 @@ This is the first chapter; the only prerequisite is the toolchain from the
 netscript --help
 ```
 
-You should see the public command groups: `init`, `contract`, `db`, `deploy`, `generate`,
-`marketplace`, `plugin`, `service`, `ui:add`, and `ui:init`. If `netscript` is not found, make sure
+You should see the public command groups: `agent`, `config`, `contract`, `db`, `deploy`,
+`generate`, `init`, `marketplace`, `plugin`, `service`, `ui:add`, and `ui:init`. If `netscript` is not found, make sure
 Deno's install directory is on your `PATH` and open a fresh terminal.
 
 ## Step 1 — Preview the scaffold with a dry run
