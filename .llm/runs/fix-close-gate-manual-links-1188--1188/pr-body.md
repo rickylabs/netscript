@@ -10,12 +10,16 @@ Gate every issue GitHub will close—including Development-sidebar and commit-me
 ## Slices
 
 - [x] S0 Issue-first research and draft surface — `cce241f60`
-- [ ] S1 Authoritative closing-reference discovery and provenance
-- [ ] S2 Negative/compatibility regressions and ready handoff
+- [x] S1 Authoritative closing-reference discovery and provenance — pending implementation commit
+- [x] S2 Negative/compatibility regressions and ready handoff — pending implementation commit
 
 ## Validation
 
-- Pending implementation.
+- Validation tool suite: 40 passed
+- Targeted `deno check`: pass
+- Scoped lint/fmt: 17 files, 0 findings
+- Live PR #1303: body-keyword source discovered; unchecked acceptance failed as expected
+- Live PR #1180 after manual-link removal: no closing references; pass
 
 ## Harness
 
@@ -27,11 +31,11 @@ Gate every issue GitHub will close—including Development-sidebar and commit-me
 issue: 1188
 entries:
   - box-index: 1
-    evidence: "Pending implementation."
+    evidence: "The authoritative closingIssuesReferences union feeds the existing acceptance scan; the manual-only fixture resolves #1166 as manual link and unchecked acceptance makes closeGatePasses false."
   - box-index: 2
-    evidence: "Pending implementation."
+    evidence: "JSON carries closingIssueReferences and pretty output prints body keyword, commit message, or manual link; source-union and pretty-output regressions cover all three labels."
   - box-index: 3
-    evidence: "Pending implementation."
+    evidence: "The fixture proves manual link + unchecked box fails and removing the authoritative link yields an empty set/pass; live PR #1180 after link removal also passes with no closing references."
   - box-index: 4
-    evidence: "Pending implementation."
+    evidence: "Body-only resolver regression remains #1171/body keyword; live PR #1303 discovers its Closes #1188 body keyword and fails on the unchanged acceptance gate."
 ```

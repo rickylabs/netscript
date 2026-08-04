@@ -57,6 +57,7 @@ export interface Report {
   overrideLabel: string;
   overrideActive: boolean;
   closingIssues: number[];
+  closingIssueReferences: ClosingIssueReference[];
   issues: IssueSnapshot[];
   findings: Finding[];
   prFindings: PrFinding[];
@@ -79,6 +80,20 @@ interface GitHubFetchOptions {
   fetch?: typeof fetch;
   sleep?: (milliseconds: number) => Promise<void>;
   maxAttempts?: number;
+  request?: RequestInit;
+  publicFallback?: boolean;
+}
+
+export type ClosingReferenceSource = 'body keyword' | 'manual link' | 'commit message';
+
+export interface ClosingIssueReference {
+  issue: number;
+  sources: ClosingReferenceSource[];
+}
+
+interface GitHubClosingContext {
+  closingIssues: number[];
+  commitMessages: string[];
 }
 
 /** Fetch GitHub JSON while tolerating bounded transient API failures. */
@@ -95,13 +110,7 @@ export async function fetchGitHubJsonWithRetry<T>(
   const maxAttempts = options.maxAttempts ?? GITHUB_API_MAX_ATTEMPTS;
 
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-    const response = await fetchImpl(url, {
-      headers: {
-        'accept': 'application/vnd.github+json',
-        'authorization': `Bearer ${token}`,
-        'x-github-api-version': '2022-11-28',
-      },
-    });
+    const response = await fetchImpl(url, requestInit(options.request, token));
     if (response.ok) return await response.json() as T;
 
     const body = await response.text();
@@ -109,14 +118,11 @@ export async function fetchGitHubJsonWithRetry<T>(
     if (!retryable || attempt === maxAttempts) {
       throw new Error(`GitHub API ${url} failed: ${response.status} ${body}`);
     }
-    const publicResponse = await fetchImpl(url, {
-      headers: {
-        'accept': 'application/vnd.github+json',
-        'x-github-api-version': '2022-11-28',
-      },
-    });
-    if (publicResponse.ok) return await publicResponse.json() as T;
-    await publicResponse.body?.cancel();
+    if (options.publicFallback !== false) {
+      const publicResponse = await fetchImpl(url, requestInit(options.request));
+      if (publicResponse.ok) return await publicResponse.json() as T;
+      await publicResponse.body?.cancel();
+    }
     const retryAfterSeconds = Number(response.headers.get('retry-after'));
     const delay = Number.isFinite(retryAfterSeconds) && retryAfterSeconds > 0
       ? retryAfterSeconds * 1_000
@@ -124,6 +130,39 @@ export async function fetchGitHubJsonWithRetry<T>(
     await sleep(delay);
   }
   throw new Error(`GitHub API ${url} exhausted retries`);
+}
+
+function requestInit(request: RequestInit | undefined, token?: string): RequestInit {
+  const headers = new Headers(request?.headers);
+  headers.set('accept', 'application/vnd.github+json');
+  headers.set('x-github-api-version', '2022-11-28');
+  if (token) headers.set('authorization', `Bearer ${token}`);
+  return { ...request, headers };
+}
+
+/** Resolves GitHub's authoritative closing set and explains every reference source. */
+export function resolveClosingIssueReferences(
+  authoritativeIssues: readonly number[],
+  body: string,
+  commitMessages: readonly string[],
+): ClosingIssueReference[] {
+  const bodyIssues = new Set(extractClosingIssues(body));
+  const commitIssues = new Set(commitMessages.flatMap(extractClosingIssues));
+  const issueNumbers = [
+    ...new Set([
+      ...authoritativeIssues,
+      ...bodyIssues,
+      ...commitIssues,
+    ]),
+  ].sort((a, b) => a - b);
+
+  return issueNumbers.map((issue) => {
+    const sources: ClosingReferenceSource[] = [];
+    if (bodyIssues.has(issue)) sources.push('body keyword');
+    if (commitIssues.has(issue)) sources.push('commit message');
+    if (authoritativeIssues.includes(issue) && sources.length === 0) sources.push('manual link');
+    return { issue, sources };
+  });
 }
 
 /** Fails if the close-gate job regresses to frozen pull-request label payloads. */
@@ -147,20 +186,29 @@ async function main(): Promise<void> {
   let overrideActive = false;
   let headSha = 'not-applicable';
   let prFindings: PrFinding[] = [];
+  let closingIssueReferences: ClosingIssueReference[] = [];
 
   if (options.pr !== undefined) {
     const pr = await client.getPullRequest(options.pr);
+    const closingContext = await client.getClosingContext(options.pr);
     headSha = pr.head.sha;
     prFindings = findUncheckedPrBody(pr);
-    issueNumbers = [...new Set([...issueNumbers, ...extractClosingIssues(pr.body ?? '')])].sort((
-      a,
-      b,
-    ) => a - b);
+    closingIssueReferences = resolveClosingIssueReferences(
+      closingContext.closingIssues,
+      pr.body ?? '',
+      closingContext.commitMessages,
+    );
+    issueNumbers = [
+      ...new Set([
+        ...issueNumbers,
+        ...closingIssueReferences.map((reference) => reference.issue),
+      ]),
+    ].sort((a, b) => a - b);
     const prIssue = await client.getIssue(options.pr);
     overrideActive = hasLabel(prIssue.labels, options.overrideLabel);
     if (issueNumbers.length === 0) {
       notes.push(
-        'No PR body closing keywords found; close-gate has no referenced issues to check.',
+        'GitHub reports no closing references; close-gate has no referenced issues to check.',
       );
     }
   }
@@ -187,6 +235,7 @@ async function main(): Promise<void> {
     overrideLabel: options.overrideLabel,
     overrideActive,
     closingIssues: issueNumbers,
+    closingIssueReferences,
     issues: snapshots,
     findings,
     prFindings,
@@ -375,6 +424,13 @@ export function formatPrettyReport(report: Report): string[] {
       ? 'closing issues: none'
       : `closing issues: ${report.closingIssues.map((issue) => `#${issue}`).join(', ')}`,
   );
+  for (const reference of report.closingIssueReferences) {
+    lines.push(
+      `closing reference: #${reference.issue} source${reference.sources.length === 1 ? '' : 's'}: ${
+        reference.sources.join(', ')
+      }`,
+    );
+  }
   for (const note of report.notes) lines.push(`note: ${note}`);
   for (const finding of report.findings) {
     lines.push(
@@ -396,6 +452,50 @@ class GitHubClient {
   }
   getIssue(number: number): Promise<GitHubIssue> {
     return this.getJson<GitHubIssue>(`/repos/${this.repo}/issues/${number}`);
+  }
+  async getClosingContext(number: number): Promise<GitHubClosingContext> {
+    const [owner, name] = this.repo.split('/');
+    const query = [
+      'query ClosingIssues($owner: String!, $name: String!, $number: Int!) {',
+      '  repository(owner: $owner, name: $name) {',
+      '    pullRequest(number: $number) {',
+      '      closingIssuesReferences(first: 100) { nodes { number } }',
+      '      commits(first: 100) { nodes { commit { message } } }',
+      '    }',
+      '  }',
+      '}',
+    ].join('\n');
+    const response = await fetchGitHubJsonWithRetry<{
+      data?: {
+        repository?: {
+          pullRequest?: {
+            closingIssuesReferences: { nodes: Array<{ number: number }> };
+            commits: { nodes: Array<{ commit: { message: string } }> };
+          };
+        };
+      };
+      errors?: Array<{ message: string }>;
+    }>('https://api.github.com/graphql', this.token, {
+      publicFallback: false,
+      request: {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ query, variables: { owner, name, number } }),
+      },
+    });
+    if (response.errors?.length) {
+      throw new Error(
+        `GitHub GraphQL closing-reference query failed: ${
+          response.errors.map((error) => error.message).join('; ')
+        }`,
+      );
+    }
+    const pullRequest = response.data?.repository?.pullRequest;
+    if (!pullRequest) throw new Error(`GitHub GraphQL did not return PR #${number}`);
+    return {
+      closingIssues: pullRequest.closingIssuesReferences.nodes.map((issue) => issue.number),
+      commitMessages: pullRequest.commits.nodes.map((node) => node.commit.message),
+    };
   }
   private getJson<T>(path: string): Promise<T> {
     return fetchGitHubJsonWithRetry<T>(`https://api.github.com${path}`, this.token);
