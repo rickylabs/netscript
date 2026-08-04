@@ -1333,17 +1333,6 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Gate:** Close when the Web Layer examples page links to maintained hosted sandboxes or removes
   the planned-sandbox statement.
 
-## runtime — app-wide shutdown orchestrator missing (`runtime-app-wide-shutdown-orchestrator`)
-
-- **Reason:** Services, worker runtimes, queues, and database teardown each expose their own drain
-  path, but there is no single top-level `host.shutdown()` that orchestrates all app resources under
-  one budget.
-- **Owner:** Runtime orchestration follow-up.
-- **Created:** 2026-06-22.
-- **Status:** open, DEBT_ACCEPTED.
-- **Gate:** Close when the runtime exposes a documented app-wide shutdown orchestrator and the
-  graceful-shutdown guide uses it as the primary path.
-
 ## packages/cli — deployment artifacts are not generated (`cli-deploy-artifacts-missing`)
 
 - **Reason:** The scaffold records enough process and AppHost facts for manual deployment, but it

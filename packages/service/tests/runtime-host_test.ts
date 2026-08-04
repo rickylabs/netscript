@@ -3,7 +3,8 @@ import type {
   RuntimeHostBudget,
   RuntimeHostBudgetTimer,
 } from '../src/adapters/runtime-host-budget-timer.ts';
-import { ComposedRuntimeHost, createRuntimeHost } from '../src/runtime/runtime-host.ts';
+import { createRuntimeHost } from '../mod.ts';
+import { ComposedRuntimeHost } from '../src/runtime/runtime-host.ts';
 
 class ControlledBudgetTimer implements RuntimeHostBudgetTimer {
   startedWith?: number;

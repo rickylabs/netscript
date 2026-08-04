@@ -78,3 +78,42 @@ process control are intentionally absent.
 
 PR #1285 remains draft with `Closes #1231`; issue acceptance stays open until S2 closes the caveat,
 debt, and final gates. No new comments changed scope.
+
+## 2026-08-04 — S2 caveat and debt burn-down
+
+- Replaced the planned “No single app-wide shutdown orchestrator yet” call-out with the primary
+  `createRuntimeHost()` workflow and contract table.
+- Removed the sole caveat marker and deleted the matching debt entry because its close gate is now
+  met.
+- Retained and clarified still-true warnings: service signal automation, standalone worker signal
+  ownership, Windows `SIGBREAK`, per-hook failures, platform kill grace, and database teardown only
+  after ingress drains.
+- Added the pre-existing missing `@module` header on the `./rpc-path` entrypoint after the JSR audit
+  exposed it as the only failing package gate.
+
+### Final gate evidence
+
+- Full service suite: 90 passed, 0 failed.
+- Focused host tests after root-import consumer wiring: 3 passed, 0 failed.
+- Scoped check/lint/fmt: 45 files, zero findings.
+- Full-export doc lint: 3 entrypoints, zero diagnostics.
+- JSR package audit: exit 0; only sanctioned informational oRPC slow-type notice.
+- Package publish dry-run: success; new runtime and adapter files included.
+- `quality:gate`: exit 0; no new findings.
+- Focused service doctrine: zero failures; three existing warnings only.
+- Docs links: 102 docs, zero broken links/anchors.
+- Docs accuracy: PASS.
+- Retired caveat marker/title/debt id search: zero matches.
+
+### S2 supervisor review
+
+- Guide code calls only the already-public `stop()`/`disconnect()` methods.
+- Fixed phase order matches ingress-first, storage-last shutdown semantics.
+- The removed call-out and debt row are fully invalidated; no remaining warning claims the host is
+  absent.
+- `deno.lock` remains the unrelated carried modification and is excluded.
+
+### S2 reconcile
+
+All issue acceptance claims now have local evidence. PR #1285 can move from draft implementation to
+formal IMPL-EVAL; no reviewer comment changed scope.

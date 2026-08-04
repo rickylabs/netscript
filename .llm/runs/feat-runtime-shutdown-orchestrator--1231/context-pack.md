@@ -9,3 +9,6 @@
 - S1 implemented and locally green: 3 deterministic tests; scoped check/lint/fmt and doc lint clean;
   quality gate exit 0; focused service doctrine has only three existing warnings.
 - Next: commit/push/comment S1, then replace the caveat with the host path and remove the debt entry.
+- S2 is complete: caveat and debt removed, still-true warnings retained/clarified, docs gates green.
+- Full service suite is 90/0; JSR audit, publish dry-run, doc lint, wrappers, quality gate, docs links,
+  and docs accuracy pass. Next: commit/push/comment S2, mark ready, run separate IMPL-EVAL.
