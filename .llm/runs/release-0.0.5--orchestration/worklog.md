@@ -1056,3 +1056,21 @@ with this run so release notes and docs agree at cut time.
   ledger's next green pair comes from **canary.7's full chain** (train: #1221, #1218, #1224 on
   merge). Stable-cut precondition still held by canary.5's green pair; the cut itself waits for
   a green pair on the final train as always.
+
+## 2026-08-04 — Caveat burn-down program stood up (owner goal: most call-outs gone by 0.0.5 end)
+
+Inventory built from origin/main's structured markers (`<!-- caveat: arch-debt:<id> -->`): 27
+tagged occurrences across 10 debt ids + untagged tutorial caveats. Full classification:
+`slices/caveat-burndown/inventory.md`. Actions taken:
+- **Kill list (5 slices, issues filed/pulled):** #1228 workers job-tools no-op wiring (5
+  markers — largest surface), #1225 sagas per-transition mirror feed (pulled Backlog→0.0.5;
+  the owner-screenshotted tutorial caveat), #1229 triggers defer scheduler, #1230 fresh
+  telemetry defaults, #1231 app-wide shutdown orchestrator. Enter waves 5–6 ahead of p3 docs
+  items.
+- **Reframe list (6 debts, 18 markers):** seamless-auth-roadmap, auth-single-backend,
+  workers non-Deno sandbox, streams topic transport, cli deploy artifacts, hosted sandboxes —
+  true v1 boundaries; call-outs get rewritten from warnings into design statements by the docs
+  lane rather than dishonestly deleted. #1222 (docsorch P2 sweep) merged meanwhile — rides
+  canary.7.
+- Cut-time checklist gains a caveat gate: no warning-type call-out on main without a matching
+  open debt entry; markers ≤ reframe list.
