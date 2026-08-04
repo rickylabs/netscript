@@ -17,7 +17,7 @@ never drops work mid-flight.
 {{ comp.apiTable({
   caption: "What you need",
   rows: [
-    { name: "@netscript/service", type: "package", desc: "Provides createService().onShutdown().serve() — signal handling and request draining live here." },
+    { name: "@netscript/service", type: "package", desc: "Provides createRuntimeHost() for one app-wide budget plus createService().onShutdown().serve() for request draining." },
     { name: "@netscript/plugin-workers-core/shutdown", type: "subpath export", desc: "ShutdownManager for draining worker/scheduler resources; the worker runtime also exposes a runtime.shutdown handle." },
     { name: "@netscript/queue", type: "package (if you consume a queue)", desc: "MessageQueue.listen(handler, { signal }) + stop() let an AbortSignal stop consumption gracefully." },
     { name: "A long-running entrypoint", type: "main.ts", desc: "A service or worker process you start with deno run / aspire start that needs to stop cleanly." }
@@ -180,19 +180,59 @@ without dropping a message mid-process: pass an `AbortSignal` to `listen()`, or 
   }
 ] }) }}
 
+## Step 5 — Compose the whole app under one budget
+
+Use `createRuntimeHost()` when one process owns a service plus workers, a queue consumer, and a
+database connection. Each callback invokes the resource's existing drain; the host adds no service,
+worker, queue, or database teardown logic. It supplies the missing composition boundary: one phase
+order, one deadline, and one report.
+
+```ts
+import { createRuntimeHost } from '@netscript/service';
+
+const host = createRuntimeHost({
+  timeoutMs: 15_000,
+  drains: [
+    { id: 'api', phase: 'service', drain: () => service.stop() },
+    { id: 'jobs', phase: 'workers', drain: () => workers.stop('shutdown') },
+    { id: 'messages', phase: 'queue', drain: () => queue.stop() },
+    { id: 'primary-db', phase: 'database', drain: () => database.disconnect() },
+  ],
+});
+
+// Route the process signal or supervisor request into the same idempotent operation.
+const report = await host.shutdown('SIGTERM');
+```
+
+The fixed phase order is `service → workers → queue → database`, so the app stops accepting work
+before draining processors and closes storage last. Registration order is stable inside a phase. A
+rejected drain is reported as `failed` and later drains still run. If the shared budget expires, the
+active drain is `timed-out`, remaining drains are `skipped`, and `shutdown()` returns without waiting
+indefinitely for the slow resource.
+
+{{ comp.apiTable({
+  caption: "App-wide runtime host (@netscript/service)",
+  rows: [
+    { name: "createRuntimeHost(options)", type: "=> RuntimeHost", desc: "Composes existing drains using one timeoutMs budget (default 30_000)." },
+    { name: "RuntimeHostDrain", type: "{ id; phase; drain(reason?) }", desc: "Calls one existing resource drain in the service, workers, queue, or database phase." },
+    { name: "host.shutdown(reason?)", type: "=> Promise<RuntimeHostShutdownReport>", desc: "Runs once, returns the same promise on repeat calls, and never waits beyond the shared budget." },
+    { name: "RuntimeHostShutdownReport", type: "{ reason?; timedOut; outcomes }", desc: "Ordered stopped, failed, timed-out, or skipped outcomes for every registered resource." }
+  ]
+}) }}
+
 ## In-production pitfalls
 
 {{ comp callout { type: "warning", title: "Footguns before you ship" } }}
 <ul>
-<li><strong>Set <code>drainTimeoutMs</code> below your platform's kill grace.</strong>
-The drain defaults to <code>30_000</code>. If your orchestrator sends <code>SIGKILL</code>
+<li><strong>Set <code>drainTimeoutMs</code> or the host's <code>timeoutMs</code> below your platform's kill grace.</strong>
+Both defaults are <code>30_000</code>. If your orchestrator sends <code>SIGKILL</code>
 sooner (Kubernetes <code>terminationGracePeriodSeconds</code> defaults to 30s), in-flight
 work is cut off — pick a budget comfortably under the grace period.</li>
 <li><strong>Workers do not auto-handle signals.</strong> Only a service's
 <code>serve()</code> installs <code>SIGINT</code>/<code>SIGTERM</code>. A standalone
 worker entrypoint that omits <code>Deno.addSignalListener</code> will be killed
 ungracefully — register the listener and route it into
-<code>runtime.shutdown.shutdown()</code>.</li>
+<code>runtime.shutdown.shutdown()</code>, or into <code>host.shutdown()</code> for a combined app.</li>
 <li><strong>Use <code>SIGBREAK</code>, not <code>SIGTERM</code>, on Windows.</strong>
 Deno does not deliver <code>SIGTERM</code> on Windows; the service listener already
 uses <code>SIGBREAK</code> internally, but your own worker signal wiring must too.</li>
@@ -200,23 +240,11 @@ uses <code>SIGBREAK</code> internally, but your own worker signal wiring must to
 <code>ShutdownHook</code> that rejects is captured as a failed
 <code>ShutdownHookOutcome</code> in the report, not re-thrown — inspect the returned
 <code>ShutdownReport</code> (or the logged warning) to catch teardown failures.</li>
-<li><strong>Close the DB in a hook, not at module scope.</strong> Call
-<code>db.$disconnect()</code> inside <code>.onShutdown()</code> so it runs <em>after</em>
-in-flight requests drain — disconnecting earlier breaks requests still being served.</li>
+<li><strong>Close the DB in the host's database phase or a service hook, not at module scope.</strong>
+Use a <code>database</code>-phase host drain for a combined app, or call
+<code>db.$disconnect()</code> inside <code>.onShutdown()</code> for a service-only process. Both run
+after in-flight requests drain; disconnecting earlier breaks requests still being served.</li>
 </ul>
-{{ /comp }}
-
-{{ comp callout { type: "important", title: "No single app-wide shutdown orchestrator yet" } }}
-{{ comp.badge({ status: "planned", label: "Planned" }) }} The framework drains <strong>each runtime
-independently</strong>: <code>serve()</code> drains a service, <code>ShutdownManager</code>
-drains workers, <code>queue.stop()</code> drains a consumer. There is <strong>no</strong>
-single top-level <code>host.shutdown()</code> that orchestrates a service + its workers +
-its queue + its DB together under one budget. Until that lands, <em>you</em> compose them:
-register every long-lived resource with the worker runtime's
-<code>runtime.shutdown</code>, and put service-owned teardown in <code>.onShutdown()</code>.
-Co-locating a service and workers in one process means wiring both drains in the same
-entrypoint by hand.
-<!-- caveat: arch-debt:runtime-app-wide-shutdown-orchestrator -->
 {{ /comp }}
 
 ## See also
