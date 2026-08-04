@@ -936,7 +936,6 @@ html[data-theme="light"] .ns-theme-toggle .ns-icon-moon {
   border: 1px solid var(--ns-border, rgba(255, 255, 255, 0.12));
   border-radius: var(--ns-radius-md, 8px);
   background: var(--ns-card, var(--ns-surface, rgba(255, 255, 255, 0.02)));
-  height: 100%;
   color: inherit;
   text-decoration: none;
   transition: border-color 0.15s ease, transform 0.15s ease;
@@ -1815,4 +1814,23 @@ a.ns-cards-grid__card:focus-visible {
 .ns-prose > .ns-learning-path {
   max-width: none;
   width: 100%;
+}
+
+
+/* ─── Card height is a grid concern, not a card concern ────────
+   `.ns-card` carried `height: 100%` so siblings in a grid line up. In prose the
+   same declaration resolves against whatever definite height the card's
+   containing block has: below 1100px `.ns-content-rail` is a stretch-aligned
+   grid, so `.ns-prose` gets a definite height and every standalone card inflated
+   to the full page (measured: a 158px card became 15,276px at 412px wide).
+   Equal-height now applies only where cards are actually laid out together. */
+
+.ns-cards-grid .ns-card,
+.ns-feature-grid .ns-card,
+.ns-cards-grid__card {
+  height: 100%;
+}
+
+.ns-content-rail {
+  align-items: start;
 }
