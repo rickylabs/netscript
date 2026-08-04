@@ -1808,3 +1808,25 @@ Remaining pilot blockers: #1290 (#1299, rebasing) and #1294 (#1298, ready and ga
   `scaffold.runtime` passed — which is exactly why #1290 (fresh `init --service` failing
   `deno task check`) rode invisibly through canary.9. The owner's bar is now enforced by a gate
   rather than by hand.
+
+## 2026-08-05 — CANARY.10: publish SUCCEEDED but the workflow aborted on a status poll; recovered
+
+Run 30959045252 reported `failure` on "Publish canary through the production path" with
+`Failed to get publishing status for @netscript/plugin-ai at 0.0.5-canary.10` — but the
+publish itself had worked. **Verified against JSR directly: all 25 packages carry
+0.0.5-canary.10** (cli, sdk, service, fresh, contracts, plugin, mcp, ai, the five plugin-*,
+database, kv, queue, config, telemetry, logger, watchers, aspire, cron, runtime-config,
+fresh-ui). The failure was a transient status poll after a successful upload, so the run
+recorded a failed pair and skipped labelling, drift and the pinned E2E — leaving real
+artifacts with no proof chain.
+**Finding 40 (for #1163): a publish step's exit code is not the publish's outcome. When the
+canary lane fails, check JSR for the artifacts before treating the version as unminted — the
+recovery for "published but unverified" (reconcile + dispatch the E2E standalone) is completely
+different from "not published" (re-mint the next number), and doing the wrong one either
+re-publishes over a live version or abandons a good one.** This is #1004's family (no
+same-semver republish path) seen from the other side.
+Recovery executed, all standalone: `release:canary-label --published-version 0.0.5-canary.10`
+→ **all five checks PASS** (version exists; 11 PRs / 10 closed issues in the payload;
+canary label on 21 items; prerelease note created; drift 14 labels vs 25 published versions).
+Then dispatched `e2e-cli-prod.yml` at 0.0.5-canary.10 (run 30959439986) — the first execution
+of #1294's `quickstart.walk` against a published CLI. Its verdicts answer the owner's bar.
