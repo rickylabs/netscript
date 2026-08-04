@@ -319,3 +319,160 @@ No shipped example is currently broken by the defect: the live-dashboard tutoria
 | Lock hygiene | `git checkout HEAD -- deno.lock`; `git status` | Clean — only the two intended docs files in the commit |
 
 Scratch fixtures deleted; nothing added under `packages/`.
+
+## Batch 3 (D3+D5)
+
+Worktree `/home/codex/repos/ns-deepdives`, branch `docs/web-layer-deep-dives` (on top of the audited
+`24dbcaaa7`). Pushed with explicit refspec; no PR opened.
+
+Commits:
+
+- `66195fe20` docs(web-layer): deepen forms into a mechanism deep-dive
+- `c3b6e3059` docs(web-layer): deepen deferred rendering into a policy deep-dive
+
+Both slices **deepen existing pages** rather than adding sub-pages, per the S1 inventory §2 verdicts
+(`form.md` → "Deepen → D3", `defer-streaming-ui.md` → "Deepen → D5"). Sidebar and `index.md` nav are
+unchanged; every leaf already had an entry.
+
+### D3 — `docs/site/web-layer/form.md` (order 5, 373 → 491 lines)
+
+Structure:
+
+1. **Opening** — a form is a round trip, and the round trip is the work.
+2. **What bare Fresh makes you write** — a real Fresh 2 `define.handlers({ GET, POST })` module
+   matching the idiom already audited in `resources.md` (`{ data: … }`,
+   `define.page<typeof handler>`): hand-mapped Zod issues into an invented `Record<string, string[]>`,
+   five accessibility facts re-derived per field, CSRF entirely yours, `items[0].productId` as a
+   hand-rolled encoding. Then the four named costs.
+3. **One call, four installs** — the load-bearing mechanism, from `builder/mod.tsx`: `withForm`
+   appends a **layer**, a **method handler** at `method ?? 'POST'`, a **CSRF header resolver**
+   (absent when `csrf: false`), and `config.form`. Plus the two inference sites (`schema` → `mutate`
+   input; `mutate` return → `NoInfer<TOutput>` in `redirectTo`/`onSuccess`/`invalidate`).
+4. **The submission pipeline** — the nine ordered stages from `form-support.ts` with their span
+   names (`{spanName}.parse|intent|mutate|invalidate|redirect`, default `form.{id}`), the verbatim
+   CSRF-failure message, `redirectTo` shadowing `onSuccess`, the forced
+   `Cache-Control: no-store, no-cache, must-revalidate` on both the 303 and a returned `Response`,
+   and the structural POST-reply detection that makes value preservation work with no session store.
+5. **`RuntimeFormState`** — all 17 members grouped by purpose; `initialValues` rebased after a
+   successful submit (`state.ts:91`); what is deliberately absent (no `status`, no `pending`).
+6. **Fields, constraints, and the markup they generate** — the four prop bags, `controlProps` as a
+   **method**, and the two verified boundaries below.
+7. **Collections and intents** — descriptor button builders, `IntentButtonProps` with
+   `formNoValidate: true`, `applyCollectionKeyOperation` keeping per-row identity, and the
+   `onIntent` trap.
+8. **CSRF** — double-submit cookie with the real cookie attributes, constant-time compare, what
+   `csrf: false` removes, and the module's own "easy to replace after a future security review".
+9. **Idempotency: an id, not a guarantee** — corrects the previous page's overclaim.
+10. **Progressive enhancement** — `createFormEnhancementSnapshot` / `useFormEnhancement` / `Form` /
+    `FormRegion`, and the `never`-typed handler slots.
+11. **Server round trip or island mutation** — the split the tutorials settled, framed as page event
+    vs widget event, with the enhanced-`withForm` middle path named.
+12. **The narrower helper surface** — `FormState`/`resolveFormState` as the older, smaller model.
+13. **What to watch for**, then corrected API summary tables and the related grid.
+
+Four corrections to previously-shipped content, each proven rather than asserted:
+
+| Correction | Proof |
+|---|---|
+| `<Form state={resolveFormState(...)}>` (the old page's own example) does not compile — `Form`'s `state` is `FormStateLike = RuntimeFormState \| FormEnhancementSnapshot`, and `FormState` has none of the 14 required members | `deno check` on the extracted fence: `TS2322 … missing the following properties from type 'FormEnhancementSnapshot<ContactValues>': id, action, method, initialValues, and 10 more` |
+| `controlProps` is a **method**, and spreading it onto an intrinsic element fails on `role` (`ControlProps` says `string`, Preact says `AriaRole`) | `deno check` failure; `role={undefined}` after the spread and individually-named props both compile. `@netscript/fresh-ui`'s `registry/components/ui/control-props.ts` exists for exactly this |
+| Zod-derived constraints are **partial**: no `min`/`max`/`step` for numbers, no `pattern` for `.regex()` | runtime control over `createZodAdapter(schema).getConstraints()`, plus a dump of the Zod 4.4.3 check kinds (`greater_than`, `less_than`, `multiple_of`, `string_format:regex`) the extractor does not read |
+| The submission id is an identifier, not deduplication — `idempotency.ts` is two constants and a `randomUUID`, and nothing stores or compares ids | source read; the module's own comment says later phases "can add idempotency storage without changing page contracts" |
+
+Also corrected: the "one form per page" claim was rewritten to the verifiable one — each `withForm`
+writes `handlers[method]`, so two `POST` forms collide on the handler slot while both regions still
+render.
+
+### D5 — `docs/site/web-layer/defer-streaming-ui.md` (order 6, 241 → 375 lines)
+
+Structure:
+
+1. **Opening** — deferring is easy; deciding *when* to fill in is what goes wrong.
+2. **What bare Fresh makes you write** — the island `useEffect` freshness check and the server-side
+   fire-and-forget `fetch`, then the three costs: the stale window as a magic number in two files,
+   server prewarm and client refetch not knowing about each other, and no vocabulary for
+   "how should this region behave".
+3. **`Deferred`** — props, the verbatim `Deferred requires a single render-function child.` throw as
+   a **render-time** failure, and the built-in `ns-deferred-error` shell.
+4. **`DeferPage` is a decision maker, not a data loader** — plus the two prop shapes that are easy to
+   get wrong (`component` is rendered content, `ctx` is a structural three-field slice), and a
+   callout for the two silent misconfigurations (falsy `component` reads as a cache miss; no
+   `cachedAt` means a refresh on every render).
+5. **You rarely write `DeferPage` yourself** — points at D4's mapping table rather than repeating it,
+   and adds the two layer switches that belong here (`delivery: 'stream'`,
+   `staleReloadMode: 'blocking'` vs `'background'`).
+6. **The policy engine** — the four profiles with their real numbers, read through the two columns
+   that actually differ, then the resolution precedence.
+7. **The client decision** — the eight-branch table with its stable reasons.
+8. **The transport underneath** — hidden `method='GET'` form + `requestSubmit()`, the shared/partial
+   search-param split, and the `queueMicrotask` prewarm with `X-Defer-Prewarm: 1` and its
+   re-entrancy guard. The Suspense-ready and request-not-connection boundaries are *referenced* to
+   D4's section anchors rather than restated, per the slice brief.
+9. **Observability** — the three span emitters and the two diagnostic pairings.
+10. **What to watch for**, then the streams half (unchanged), an expanded API table, related grid.
+
+Load-bearing claims proven by runtime control rather than by reading:
+
+| Claim | Control result |
+|---|---|
+| A legacy `staleStrategy` overrides a profile's prewarm fields | `resolveDeferPolicy('low-bandwidth', undefined, 'server-prewarm')` → `prewarmOnStale: true`, against the profile's `false`. This is the path `staleReloadMode: 'background'` takes, so a layer can contradict the profile it names |
+| `staleTimeOverrideMs` beats the policy object's `staleTimeMs` | `resolveDeferPolicy({ profile:'balanced', staleTimeMs: 5_000 }, 60_000, undefined).staleTimeMs` → `60000` |
+| The eight decision branches and their reasons | all eight exercised: `fresh-cache`, `server-revalidating`, `policy-background-refresh`, `stale-cache`, `full-miss`, `missing-freshness`, `partial-hit`, `partial-miss` |
+| `staleTimeMs: 0` disqualifies the server-revalidating skip | `decideDeferClientAction({ staleTimeMs: 0, hasCachedData: true, serverRevalidating: true, policy: force-refresh })` → `submit` / `policy-background-refresh` |
+| `resolveDetailDeferConfig` | `(true)` → `{ staleTime: 30000, policy: 'background-refresh' }`; `(false)` → `{ staleTime: 0, policy: { profile:'background-refresh', skipClientWhenServerPrewarm:false } }` |
+
+One correction to previously-shipped content: the old page's `DeferPage` example passed
+`component={cachedOrders}` typed `unknown`, which both fails `deno check`
+(`TS2322: Type 'unknown' is not assignable to type 'DeferPageRenderable'`) and misrepresents the
+prop — `component` is the region already rendered, which is why the page runtime passes
+`renderLayerComponent(descriptor.component, data)` into it.
+
+### Tutorial cross-links (one each)
+
+- `tutorials/storefront/06-storefront-ui.md` — after the checkout-mutation bullets: adding to a cart
+  is a widget event, a checkout that collects an address and navigates is a page event → link to
+  `/web-layer/form/`.
+- `tutorials/live-dashboard/04-definePage-QueryIsland.md` — in the "This is the dense part" callout
+  that already enumerates `staleTime` / `staleReloadMode`: what `'balanced'` and those two decide
+  between them → link to `/web-layer/defer-streaming-ui/`.
+
+### Gate results
+
+| Gate | Command | Result |
+|---|---|---|
+| Site build | `cd docs/site && deno task build` | PASS — 607 files |
+| Site links | `cd docs/site && deno task check:links` | PASS — 31662 internal links across 217 pages, all resolve |
+| Caveat refs | `cd docs/site && deno task check:caveats` | PASS — 27 markers across 22 pages |
+| Extracted D3 examples | `deno check --unstable-kv --no-lock --config <scratch>/deno.json probe5-formpage.tsx probe6-collection.tsx` | PASS |
+| Extracted D5 example | `deno check … probe7-deferpage.tsx` | PASS |
+| Negative controls | `deno check …` on `<Form state={resolveFormState(...)}>`, on a bare `controlProps()` spread, and on `component={unknown}` | all three fail as documented |
+| Defer policy control | `deno run --allow-env … control-policy.ts` | 13 controls, results in the table above |
+| Form runtime control | `deno run --allow-env … control-form.ts` | constraint map, `formDataToRawValues`/`normalizeFormValues`, collection intent round trip, CSRF compare |
+| Zod check-kind dump | `deno run --allow-env … control-zodkinds.ts` | Zod 4.4.3 kinds recorded in the table above |
+| Lock hygiene | `git checkout HEAD -- deno.lock` before each commit; `git status` | clean — only docs files in both commits |
+
+Anchors used in cross-references were verified against the built HTML ids
+(`#deferred-loader-composition-the-page-runtime-drives-the-partial`,
+`#what-the-runtime-actually-does-today`), not guessed.
+
+Scratch fixtures under `.llm/tmp/p3b3/` removed; nothing added under `packages/`.
+
+### Escalation
+
+The two D3 findings are framework defects the docs merely expose, so they were filed as
+[#1249](https://github.com/rickylabs/netscript/issues/1249) (`type:fix`, `area:fresh`,
+`priority:p2`, `status:triage`, Backlog / Triage) with both controls, the Zod 4 check-kind table, and
+a suggested fix for each. The issue records that `form.md`'s prose should be simplified back once
+they land.
+
+### Notes for the evaluator
+
+- Validation is generator-side only per the CLAUDE.md documentation-authoring exception; a separate
+  opposite-family session still owes a per-page verdict.
+- The scratch config used for extracted-example checks sets `jsx: "precompile"` /
+  `jsxImportSource: "preact"` — the same compiler options `packages/fresh/deno.json` and the
+  scaffolded app use — so the `controlProps` failure is a consumer-facing result, not a config
+  artifact.
+- The benchmark's only CONFIRMED peer story for D3 (SvelteKit form actions) informed the framing —
+  server-validated round trip with progressive enhancement as the default, island mutation as the
+  exception — but no competitor is named in the page, matching the register of the other deep-dives.

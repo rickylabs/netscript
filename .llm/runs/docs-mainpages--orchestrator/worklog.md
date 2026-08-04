@@ -156,3 +156,11 @@
   docs/site; correct site gate is docs/site check:links — batch-1 link evidence was vacuous,
   re-evidenced by batch 2's run of the real gate).
 - Batch-2 Sol audit dispatched on the established auditor thread.
+
+## 2026-08-04 — P3 batch 3 authored
+
+- D3 (form.md 373→491) + D5 (defer-streaming-ui.md 241→375) deepened in place per inventory;
+  one cross-link each (storefront ch.6, live-dashboard ch.4). Five proven defects in
+  previously-shipped docs corrected; framework pair filed as #1249. 13+4 runtime controls and
+  3 negative controls back the tables; real site link gate cited (31,662 links). Batch-3 Sol
+  audit dispatched. Remaining: D2 layers, D8 response shaping, D9 defineFreshApp.
