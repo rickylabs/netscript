@@ -1769,3 +1769,22 @@ Within ~an hour of the reset redemption every dispatched slice produced a PR wit
 - **#1303 is gated differently on purpose**: it modifies the close-gate itself, the mechanism
   every other merge depends on, so its waiter reports instead of auto-merging — I read the diff
   before letting it change the rules I gate by.
+
+## 2026-08-05 — Pilot blockers landing: #1227, #1287, #1219, #1188 closed
+
+- **#1297 → #1227 CLOSED.** The defect that destroyed canary.6 and canary.9 pairs and could
+  halt an unattended agent at `aspire start` on a clean machine. The pilot's hardest blocker.
+- **#1300 → #1287 CLOSED.** Structural QueryClient seam (verified: zero `as unknown as` left in
+  query-bridge.md, TS2551/TS2345 concession deleted). Unblocked #1290's final box; the chained
+  steer fired automatically at 22:44Z and the #1290 lane is rebasing to re-prove its scaffold.
+- **#1302 → #1219 CLOSED.** e2e-cli stops respawning/cancelling on label events.
+- **#1303 → #1188 CLOSED — merged only after reading the diff, since it changes the close-gate
+  itself.** Verified it STRENGTHENS rather than loosens: the closing set is now the union of
+  GraphQL `closingIssuesReferences` (which includes manual Development-sidebar links), body
+  keywords and commit messages, each source-labelled. More issues get gated, not fewer. Ran its
+  suite on the branch (20 passed / 0 failed) and confirmed the manual-link fixture asserts a
+  sidebar-linked issue is detected. This closes the hole that let manual links auto-close issues
+  without gating — open since #1180.
+- The #1290 lane held #1299 in DRAFT rather than claim a box that depended on #1300 landing.
+  Recording it as the behaviour the gate exists to force, arrived at without being told.
+Remaining pilot blockers: #1290 (#1299, rebasing) and #1294 (#1298, ready and gating).
