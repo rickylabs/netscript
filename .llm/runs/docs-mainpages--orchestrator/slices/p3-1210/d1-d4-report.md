@@ -748,3 +748,97 @@ than designed semantics, which was the intent of the request.
 
 Scratch fixture under `.llm/tmp/p3b4fix/` and its `packages/fresh` copy removed; nothing added under
 `packages/`.
+
+## Benchmark page
+
+Worktree `/home/codex/repos/ns-deepdives`, branch `docs/tutorial-benchmark` (off `77c034c33` main,
+carrying merged deep-dives #1241 and the remapped main pages). Commit `c33f633a2`, pushed with
+explicit refspec. No PR opened.
+
+New page: `docs/site/explanation/compared.md` — "How NetScript's path compares", order 8, the eighth
+explanation essay. `explanation/` was the right home over `web-layer/`: the page is understanding-
+oriented and framework-wide, and it inherits the zone's `prev`/`next` + `order` convention rather
+than the deep-dives' bare `order`.
+
+### Structure
+
+1. **Opening + scope callout** — this compares *paths*, not features; nothing here claims a peer
+   cannot build what NetScript builds. Points at `/why/` as the short version.
+2. **What the canonical flows emphasize** — one subsection each for Next.js, Nuxt, SvelteKit, and
+   Laravel/Rails, each with live URLs, then an `apiTable` summarizing all five and a synthesis: all
+   five render something within minutes and all five teach **one process**, with data access as a
+   step inside it and operational concerns at the end or absent.
+3. **Where NetScript's path diverges** — the four divergences as the brief specified (contract
+   before the page, workspace-not-app, durable runtime not longer handler, observed graph from the
+   first run), each *linking* rather than restating: `/explanation/contracts/`, `/concepts/`,
+   `/quickstart/`, `/why/`, `/orchestration-runtime/`, `/explanation/durability-model/`,
+   `/durable-workflows/`, `/explanation/aspire/`, `/observability/`. Plus a "web layer inherits the
+   same ordering" paragraph linking six deep-dives (`resources`, `layers`, `form`, `partials`,
+   `defer-streaming-ui`, `query-bridge`), and a "what the ordering costs" list.
+4. **What peers do better today** — six plainly-stated items from the undersell analysis: in-browser
+   learning (SvelteKit's tutorial, Nuxt's online starters) with NetScript having no equivalent; time
+   to a rendered screen; Rails' generators; the batteries-included breadth; a day-one deployment
+   answer; ecosystem depth. Closes with a callout saying outright when a peer is the better choice.
+5. **Where to go next** + related grid + `nextPrev`.
+
+### Truth-layer discipline
+
+Only `benchmark-verification.md` CONFIRMED grades were carried; everything graded WRONG was
+re-fetched live (2026-08-04) and rewritten to current truth, and two claims the verification left
+**UNVERIFIABLE** were fetched rather than published on the benchmark's word.
+
+| Verification grade | What the page does |
+|---|---|
+| Laravel §1.4 **WRONG** (dead URL, chapters that do not exist) | Re-fetched `laravel.com/learn/getting-started-with-laravel`: 13 lessons, Chirper, **deployment is lesson 4**, ending at basic registration + login/logout. The claimed "Notifications & Email" and "Authorization/`ChirpPolicy`" chapters are absent and are **not** repeated — and no negative claim is made about them either. `bootcamp.laravel.com` and the 404 `laravel.com/docs/getting-started` are not cited; `laravel.com/docs/installation` is. |
+| Rails §1.4 **WRONG** (app domain changed) | Re-fetched: a **Product store**, `Product`/`ProductsController`, **23** sections, authentication via `bin/rails generate authentication`, Kamal. No Article/Comment/blog claim survives. |
+| Nuxt §1.2 **WRONG** (ordering) | Re-fetched the real sidebar: **18** sections in exact order. The page states outright that presentation concerns precede Data Fetching and State Management — the opposite of the benchmark's condensed 7-step ordering. |
+| Next.js **PARTIALLY CONFIRMED** (chapter numbers off by one) | The off-by-one is sidestepped entirely: **no chapter is cited by number**. Content and order are CONFIRMED, so the 16-chapter arc is described in prose. Canonical `/docs/app/getting-started/installation` used, per the verification. |
+| Next.js cross-linking **UNVERIFIABLE** | Fetched the Fetching Data chapter: it does link to the route-handlers reference. Claim narrowed from the benchmark's "every chapter" to what one verified sample supports. |
+| Rails generators (unverified in both docs) | Fetched the actual commands. The initial draft's "one command emits model, migration, controller, views" was **wrong** — the guide uses *separate* model and controller generators plus a third for authentication. Corrected before commit. |
+| SvelteKit **CONFIRMED** | Cited as-is, on the canonical `svelte.dev/tutorial` (not the 308-redirecting `learn.svelte.dev`). |
+
+**Every external URL curl-verified 200 with no redirect** before publishing (10 URLs), and the
+built HTML was grepped to confirm the rendered set is exactly those 10.
+
+Command names were also narrowed to fetched evidence: `laravel new` and bare `rails new` were
+dropped in favor of `create-next-app`, `npm create nuxt@latest`, and `bin/rails new`.
+
+### Nav / cross-link wiring
+
+- `explanation/compared.md` front matter: `order: 8`, `prev` → aspire, `next` → Capabilities. The
+  `/explanation/` lane is folder-derived (`_data.ts` `navLanes` → `roots: ["/explanation/"]`, sorted
+  by `order`), so the sidebar picks it up with no hand-maintained list to edit.
+- `explanation/aspire.md` — `next` and its `nextPrev` re-pointed from Capabilities to the new page,
+  keeping the zone's chain unbroken.
+- `explanation/index.md` — "Seven topics" → "Eight", one `featureGrid` card, one `learningPath` step.
+- `why.vto` — **one** cross-link, appended to the §3 "Compare the center of gravity" table as "the
+  longer comparison". No other main-page edit.
+
+### Register
+
+No competitor bashing (each flow is described on its own terms, and the closing callout names when a
+peer is the better choice); no superlatives, pricing, or marketing claims (swept); no `jsr:`
+specifiers at all — the page carries no code; no filler ("simply" removed on review).
+
+### Gate results
+
+| Gate | Command | Result |
+|---|---|---|
+| Site build | `cd docs/site && deno task build` | PASS — 617 files (was 613: +1 page, +derived) |
+| Site links | `cd docs/site && deno task check:links` | PASS — 32773 internal links across 220 pages (was 219), all resolve |
+| Caveat refs | `cd docs/site && deno task check:caveats` | PASS — 27 markers across 22 pages |
+| External URLs | `curl -sIL` over all 10 cited URLs | all **200**, no redirect |
+| Vento leakage | grep `{{` in the four built pages | 0 each |
+| Lock hygiene | `git checkout HEAD -- deno.lock`; `git status` | clean — only the four intended docs files in the commit |
+
+### Notes for the evaluator
+
+- Validation is generator-side only per the CLAUDE.md documentation-authoring exception; a separate
+  opposite-family session still owes a per-page verdict.
+- The one judgement call worth reviewing: `explanation/index.md` was edited (count, grid, path)
+  because leaving "Seven topics" against an eight-page folder is visible drift. It is an
+  `explanation/` sibling, not a main page, so it is inside the "wire nav per siblings" instruction.
+- `competitive-benchmark.md` §2/§3 (undersell + differentiator analysis) were used only for framing
+  the "what peers do better" and "where NetScript diverges" sections; per the verification's own
+  bottom line those general characterizations hold, and no §1.4 or §1.2 detail was cited from the
+  benchmark without re-fetching.
