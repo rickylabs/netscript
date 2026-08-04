@@ -16,21 +16,16 @@ import { bindRoutePattern, defineRouteContract } from '@netscript/fresh/route';
 
 const ordersRoute = bindRoutePattern(
   defineRouteContract({
-    pathSchema: z.object({ tenantId: z.string() }),
     searchSchema: z.object({
       limit: z.number().optional().default(10),
       offset: z.number().optional().default(0),
+      status: z.string().optional(),
     }),
   }),
-  '/dashboard/[tenantId]/orders',
+  '/dashboard/orders',
 );
 
-// Dummy types/stubs to mimic SDK and Auth
-interface AuthSession {
-  tenantId: string;
-  userId: string;
-}
-
+// Dummy types/stubs to mimic the SDK query factory
 interface Order {
   id: string;
   status: string;
@@ -45,18 +40,18 @@ interface OrderList {
 // Mock SDK queries
 const ordersQueryUtils = {
   list: {
-    queryOptions: (input: { limit: number; offset: number; tenantId: string }) => ({
+    queryOptions: (input: { limit: number; offset: number; status?: string }) => ({
       queryKey: ['orders', input] as const,
       queryFn: async (): Promise<OrderList> => {
         return { items: [], total: 0 };
       },
     }),
-    clientKey: (input?: { limit: number; offset: number; tenantId: string }) => ['orders', input] as const,
-    getCachedEntry: async (input: { limit: number; offset: number; tenantId: string }) => {
+    clientKey: (input?: { limit: number; offset: number; status?: string }) => ['orders', input] as const,
+    getCachedEntry: async (input: { limit: number; offset: number; status?: string }) => {
       return { data: { items: [], total: 0 } as OrderList, cachedAt: Date.now() };
     },
   },
-  updateStatus: {
+  update: {
     mutationOptions: () => ({
       mutationFn: async (variables: { id: string; status: string }): Promise<Order> => {
         return { id: variables.id, status: variables.status, amount: 100 };
@@ -88,7 +83,7 @@ function OrdersTable(props: { items: Order[]; onAdvance: (vars: { id: string; st
 // 1. Client Island with Server+Client Dehydration
 interface OrdersQueryIslandProps {
   dehydratedState?: any;
-  input: { limit: number; offset: number; tenantId: string };
+  input: { limit: number; offset: number; status?: string };
   initialOrders: OrderList;
   cachedAt: number;
 }
@@ -110,7 +105,7 @@ function OrdersQueryIsland(props: OrdersQueryIslandProps) {
   });
 
   const mutation = useMutation({
-    ...ordersQueryUtils.updateStatus.mutationOptions(),
+    ...ordersQueryUtils.update.mutationOptions(),
     onMutate: async (variables) => {
       await queryClient.cancelQueries({ queryKey: currentKey });
       const previous = queryClient.getQueryData<OrderList>(currentKey);
@@ -172,34 +167,26 @@ const ordersPage = definePage()
   .withRoute(ordersRoute)
   .withTelemetry({ enabled: true, spanName: 'dashboard.orders.view' })
   .withPolicy('balanced')
-  // cross-layer request-dedup: auth is resolved once
-  .withResource('auth', (ctx) => {
-    const auth: AuthSession = { tenantId: ctx.path.tenantId, userId: 'user-123' };
-    return auth;
-  })
-  // per-layer refinement idiom: use auth context for the query
+  // cross-layer request-dedup: the cached orders slice is read once per request
   .withResource('ordersData', async (ctx) => {
-    const auth = await ctx.resource('auth');
     return await ordersQueryUtils.list.getCachedEntry({
       limit: ctx.search.limit,
       offset: ctx.search.offset,
-      tenantId: auth.tenantId,
+      status: ctx.search.status,
     });
   })
   .withResource('dehydratedQuery', async (ctx) => {
-    const auth = await ctx.resource('auth');
     const queryClient = createNetScriptQueryClient();
     const queryOptions = ordersQueryUtils.list.queryOptions({
       limit: ctx.search.limit,
       offset: ctx.search.offset,
-      tenantId: auth.tenantId,
+      status: ctx.search.status,
     });
     await queryClient.prefetchQuery(queryOptions);
     return dehydrateQueryClient(queryClient);
   })
   .withLayer('ordersQuery', OrdersQueryIsland, {
     loader: async (ctx) => {
-      const auth = await ctx.resource('auth');
       const entry = await ctx.resource('ordersData');
       const dehydratedState = await ctx.resource('dehydratedQuery');
       return {
@@ -207,7 +194,7 @@ const ordersPage = definePage()
         input: {
           limit: ctx.search.limit,
           offset: ctx.search.offset,
-          tenantId: auth.tenantId,
+          status: ctx.search.status,
         },
         initialOrders: entry.data,
         cachedAt: entry.cachedAt,
@@ -227,8 +214,7 @@ const ordersPage = definePage()
   })
   // Demonstrating definePartial & deferred-loader composition
   .withLayer('stats', StatsLayer, {
-    loader: async (ctx) => {
-      await ctx.resource('auth');
+    loader: () => {
       // Deferred loader composition: returning a Promise resolved in background
       const statsPromise = Promise.resolve({ revenue: 45000 });
       return { statsPromise };

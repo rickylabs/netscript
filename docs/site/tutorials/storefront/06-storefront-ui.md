@@ -294,7 +294,12 @@ const cartPage = definePage()
 export default cartPage.default;
 ```
 
-Binding the route to `cartRoute` automatically registers the contract-derived schemas. `cartRoute.parseSearch` applies the `paginationSearchSchema` defaults, so `/cart/cust_1001` with no query string still yields a typed `{ limit: 12, offset: 0 }` inside the page builder context. A link elsewhere builds the URL with `cartRoute.href({ path: { customer: 'cust_1001' } })` — the pattern is written once, in the contract.
+`.withRoute(cartRoute)` hands the contract's schemas to the builder, so the parsing you would
+otherwise write by hand happens before your loader runs: `ctx.path.customer` is a typed string and
+`ctx.search` carries the `paginationSearchSchema` defaults, so `/cart/cust_1001` with no query string
+still yields `{ limit: 12, offset: 0 }`. A link elsewhere builds the URL with
+`cartRoute.href({ path: { customer: 'cust_1001' } })` — the pattern is written once, in the contract,
+and both the page and the link read it from there.
 
 ## Test it out
 
@@ -331,7 +336,10 @@ product carries an **Add to cart** button wired to the typed checkout mutation.
 
 ## What you built
 
-- A `GET /cart/[customer]` page built with `definePage()`, binding to the contract, loading resource data on the server, and wiring the checkout island as a component layer.
+- A `GET /cart/[customer]` page whose route is a **bound route contract**: one object owns the
+  pattern, the typed `{ customer }` path param, and the pagination search, and it produces both the
+  page's typed context and the URL a link would call. `definePage` binds that contract, resolves the
+  first page of products on the server, and wires the checkout island as a layer.
 - A single clients module with one typed `createServiceClient` per service, each wrapped in
   `createServiceQueryUtils` — the contract-derived query and mutation helpers.
 - An island that **reads** the catalog with `useIslandQuery` and **begins checkout** with

@@ -102,3 +102,69 @@ $ deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --file packages
 ```
 
 The check resolved with **0 occurrences, 0 errors, 0 warnings (Exit code 0)**, proving that all demonstrated page-builder patterns (including forms, dehydration, resources, partials, and telemetry) compile with strict type safety.
+
+## 2026-08-04 — Slop-audit repair pass (lane: Claude docs-exception subagent)
+
+Owner slop-audit of commit `38009a962` found the deepened chapter-4 rewrite had force-fit features
+with no narrative predecessor. Surgical repair applied (verified-good additions retained):
+
+`docs/site/tutorials/live-dashboard/04-definePage-QueryIsland.md`
+
+- Removed the auth force-fit entirely: `resolveAuthSession`, the `@app/lib/auth.ts` import, the
+  `auth` resource, `auth.tenantId`, and the `throw new Response('Unauthorized', 401)` guards. The
+  tutorial never scaffolds auth, so none of it had a predecessor.
+- `withResource` dedup is now demonstrated honestly with the `ordersData` cached-entry resource
+  shared by the `list` and `ordersQuery` layers — one KV read, two consumers.
+- Restored route-contract fidelity: all resource/query/layer inputs use
+  `{ limit, offset, status }` from `ctx.search`, matching the Step 1 search schema. No `tenantId`
+  anywhere in the chapter.
+- Deleted the six numbered feature-checklist comments; replaced with short plain comments only where
+  the code needs one.
+- Restored the deleted good prose: the `definePage` builder steps `comp.apiTable` (recovered from
+  `f7558aa1c`, plus a new `.withResource(name, factory)` row) and the
+  "This is the dense part — and it earns its weight" callout, both reintegrated after the full
+  builder chain.
+- Dropped the `withForm('statusForm', …)` layer, the `StatusForm` import, `{slots.statusForm()}`,
+  and its prose — the island already demonstrates status updates via optimistic `useMutation`.
+- Trimmed the page-module import list to what the page module actually uses (island-only hooks and
+  `zod` no longer imported server-side).
+- Fixed the mutation util name back to the chapter-3 naming `ordersQueryUtils.update` (was
+  `updateStatus`).
+- Stats layer keeps `Deferred` + partial but loses the auth-derived input; it now calls
+  `baseQueries.orders.getStats({ status: ctx.search.status })`.
+- Closed the traces gap: added prose at `.withTelemetry({ spanName: 'dashboard.orders.list' })`
+  explaining the span surfaces in the Aspire dashboard traces view.
+- Corrected the verify checklist file list (the `(_shared)/query-loaders.ts` module no longer exists
+  in this version of the chapter).
+
+`packages/fresh/tests/type-fixtures/tutorial-examples_type.tsx`
+
+- Mirrored the corrections: dropped the `AuthSession` stub and `auth` resource, dropped the
+  `tenantId` path schema in favour of a `status` search field, renamed the mutation util
+  `updateStatus` → `update`, and de-authed the stats loader. The `checkoutForm` demo stays (it
+  mirrors the storefront chapter, which legitimately uses `withForm`).
+
+`docs/site/tutorials/chat/03-chat-ui.md` / `docs/site/tutorials/storefront/06-storefront-ui.md`
+
+- Slop-checked against the same bar. No auth force-fit, no checklist comments; the `definePage`
+  surfaces used (`withRouteContract`, `withLayout((slots, ctx) => …)`, `withResource`) verified
+  against `packages/fresh/src`. Two prose regressions repaired: the storefront "What you built"
+  bullet had lost the bound-route-contract explanation (restored, extended with the builder), and
+  its Step 4 paragraph claimed `parseSearch` runs in a page that no longer calls it (reworded to
+  describe builder-side parsing). The chat "What you built" run-on sentence was rebalanced.
+
+`deno.lock`
+
+- Attempted the `git checkout f7558aa1c -- deno.lock` revert of the added
+  `jsr:@netscript/queue@0.0.4` line. Any `deno check` in this workspace regenerates it immediately
+  (verified: clean after checkout, one insertion again after a bare
+  `deno check --unstable-kv` on the fixture). Left in place as a legitimate lock refresh.
+
+Gate:
+
+```text
+deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/fresh/tests/type-fixtures --ext tsx
+→ filesSelected 1, failedBatches 0, totalOccurrences 0 (exit 0)
+```
+
+Changes left uncommitted for orchestrator review per the slice review gate.

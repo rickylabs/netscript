@@ -227,9 +227,10 @@ deno task --cwd apps/dashboard check
 
 ## What you built
 
-A working chat UI: a chat page built with `definePage()` that seeds the transcript snapshot on the server side and wires the interactive Chat island; copied, app-owned components; an SSR-seeded island that sends through the
-durable connection and re-renders on settle; and `chat-render` turning assistant markdown
-into rich blocks. Next you give the model a tool to call — and render its result as a
+A working chat UI: copied, app-owned components; a `definePage` page that resolves the
+transcript snapshot as a request-scoped resource and hands it to the island; an SSR-seeded
+island that sends through the durable connection and re-renders on settle; and `chat-render`
+turning assistant markdown into rich blocks. Next you give the model a tool to call — and render its result as a
 tool-call card with citation chips.
 
 {{ comp.nextPrev({ prev: { label: "2 · Durable chat route", href: "/tutorials/chat/02-durable-chat-route/" }, next: { label: "4 · Server-side tool call", href: "/tutorials/chat/04-tool-call/" } }) }}

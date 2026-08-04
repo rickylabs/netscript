@@ -96,73 +96,59 @@ and `offset` through it rather than reading `searchParams` by hand.
 
 ## Step 2 — Define the page and cache-first resource pipeline
 
-The page reads data through request-scoped **resource factories**. Using `.withResource()`, you declare factories that resolve credentials once, de-duplicate queries across layers, and fetch cache-first data. The page builder resolves these sequentially, letting downstream resources depend on upstream values:
+The page reads data through request-scoped **resource factories**. `.withResource(name, factory)`
+registers a value that is computed at most once per request, no matter how many layers ask for it.
+That matters here because two layers want the same cached orders slice: the server-rendered `list`
+table and the `ordersQuery` island seed. Declared as a resource, the KV read happens once and both
+layers share it. Downstream resources may await upstream ones, so the prefetch step below builds on
+the same typed search input:
 
 ```tsx
 // apps/dashboard/routes/(dashboard)/dashboard/orders/index.tsx
 import { definePage } from '@netscript/fresh/builders';
-import { z } from 'zod';
-import {
-  dehydrateQueryClient,
-  hydrateFromDehydrated,
-  QueryIsland,
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from '@netscript/fresh/query';
-import { Deferred } from '@netscript/fresh/defer';
+import { dehydrateQueryClient } from '@netscript/fresh/query';
 import { createNetScriptQueryClient } from '@netscript/sdk/query-client';
 import { baseQueries, ordersQueryUtils } from '@app/lib/api-clients.ts';
-import { resolveAuthSession } from '@app/lib/auth.ts';
 import { routes } from '@app/router.ts';
 import OrdersQueryIsland from './(_islands)/OrdersQueryIsland.tsx';
 import StatsLayer from './(_components)/StatsLayer.tsx';
-import StatusForm from './(_components)/StatusForm.tsx';
 import { PlaygroundOrdersList, PlaygroundOrdersListSkeleton } from './(_components)/list.tsx';
 
 export const ordersListPage = definePage()
   .withRoute(routes.dashboard.orders.$route)
   .withPolicy('balanced')
   .withTelemetry({ enabled: true, spanName: 'dashboard.orders.list' })
-  
-  // 1. Cross-layer Request-Dedup: Authenticate request once per page lifecycle
-  .withResource('auth', async (ctx) => {
-    return await resolveAuthSession(ctx.headers);
-  })
-
-  // 2. Per-layer Refinement Idiom: Use auth tenant context to scope queries safely
+  // Read once per request; the list layer and the island layer both consume this.
   .withResource('ordersData', async (ctx) => {
-    const auth = await ctx.resource('auth');
-    if (!auth) throw new Response('Unauthorized', { status: 401 });
     return await baseQueries.orders.list.getCachedEntry({
       limit: ctx.search.limit,
       offset: ctx.search.offset,
-      tenantId: auth.tenantId,
+      status: ctx.search.status,
     });
   })
-
-  // 3. Server-side Query Prefetch: Initialize QueryClient and dehydrate it
   .withResource('dehydratedQuery', async (ctx) => {
-    const auth = await ctx.resource('auth');
-    if (!auth) throw new Response('Unauthorized', { status: 401 });
-    
     const queryClient = createNetScriptQueryClient();
-    const queryOptions = ordersQueryUtils.list.queryOptions({
+    await queryClient.prefetchQuery(ordersQueryUtils.list.queryOptions({
       limit: ctx.search.limit,
       offset: ctx.search.offset,
-      tenantId: auth.tenantId,
-    });
-    
-    await queryClient.prefetchQuery(queryOptions);
+      status: ctx.search.status,
+    }));
     return dehydrateQueryClient(queryClient);
   })
 ```
 
-By defining `dehydratedQuery` as a shared resource, you prefetch orders on the server and serialise the cache. It is sent to the client alongside the initial HTML, eliminating the browser refetch flash.
+`spanName: 'dashboard.orders.list'` is not decoration: every render of this page emits a span under
+that name, and it shows up in the Aspire dashboard's traces view alongside the service call the
+loader made. When the table feels slow, that trace is where you find out whether the time went to KV,
+to the orders service, or to the render itself.
 
-## Step 3 — Add layers, form handlers, and partials
+By defining `dehydratedQuery` as a shared resource, you prefetch orders on the server and serialise
+the cache. It is sent to the client alongside the initial HTML, eliminating the browser refetch flash.
 
-Compose your page visual layers, forms, and partial layout slots. You add the interactive query table, a status-update form, and a stats panel loaded asynchronously via a deferred partial:
+## Step 3 — Add layers and partials
+
+Now compose the visual regions. You add the server-rendered table, the interactive query island, and
+a stats panel loaded asynchronously through a deferred partial — then lay them out and `build()`:
 
 ```tsx
 // apps/dashboard/routes/(dashboard)/dashboard/orders/index.tsx (continued)
@@ -180,7 +166,7 @@ Compose your page visual layers, forms, and partial layout slots. You add the in
   })
   .withLayer('ordersQuery', OrdersQueryIsland, {
     loader: async (ctx) => {
-      const auth = await ctx.resource('auth');
+      // Same resource the list layer read — resolved once, shared here.
       const entry = await ctx.resource('ordersData');
       const dehydratedState = await ctx.resource('dehydratedQuery');
       return {
@@ -188,7 +174,7 @@ Compose your page visual layers, forms, and partial layout slots. You add the in
         input: {
           limit: ctx.search.limit,
           offset: ctx.search.offset,
-          tenantId: auth.tenantId,
+          status: ctx.search.status,
         },
         initialOrders: entry?.data,
         cachedAt: entry?.cachedAt,
@@ -197,24 +183,10 @@ Compose your page visual layers, forms, and partial layout slots. You add the in
     staleTime: 15_000,
     staleReloadMode: 'background',
   })
-
-  // 4. Form integration: Typed server-bound mutation with validation
-  .withForm('statusForm', StatusForm, {
-    schema: z.object({ id: z.string(), status: z.string() }),
-    mutate: async (input) => {
-      return await baseQueries.orders.updateStatus.mutate(input);
-    },
-    onSuccess: () => {
-      return { message: 'Order status updated successfully' };
-    },
-  })
-
-  // 5. Partials & Deferred-Loader composition: Load stats asynchronously in the background
   .withLayer('stats', StatsLayer, {
-    loader: async (ctx) => {
-      const auth = await ctx.resource('auth');
-      // Returns a Promise that resolves in the background
-      const statsPromise = baseQueries.orders.getStats.getCachedEntry({ tenantId: auth.tenantId });
+    loader: (ctx) => {
+      // Not awaited: the promise is handed to the layer and resolves in the background.
+      const statsPromise = baseQueries.orders.getStats({ status: ctx.search.status });
       return { statsPromise };
     },
     partial: routes.partials.dashboard.orders.stats.$route.href(),
@@ -226,7 +198,6 @@ Compose your page visual layers, forms, and partial layout slots. You add the in
         {slots.stats()}
         {slots.list()}
         {slots.ordersQuery()}
-        {slots.statusForm()}
       </div>
     </main>
   ))
@@ -239,6 +210,26 @@ Compose your page visual layers, forms, and partial layout slots. You add the in
 export const { handler, default: page } = ordersListPage;
 export { page as default };
 ```
+
+Read the builder one call at a time:
+
+{{ comp.apiTable({
+  caption: "definePage builder steps",
+  rows: [
+    { name: ".withRoute(route)", type: "route contract", desc: "Binds the typed search schema from Step 1. The loaders receive a typed search object." },
+    { name: ".withPolicy('balanced')", type: "caching policy", desc: "The page's caching posture. 'balanced' serves cache-first and revalidates in the background." },
+    { name: ".withTelemetry({ enabled, spanName })", type: "tracing", desc: "Wraps the page render in a named span that surfaces in the Aspire dashboard traces." },
+    { name: ".withResource(name, factory)", type: "request-scoped value", desc: "Computes a value at most once per request. Layers await it with ctx.resource(name), so two layers reading the same slice cost one fetch." },
+    { name: ".withLayer(name, Component, config)", type: "a named region", desc: "Adds a layer with its own loader, partial, fallback, and staleTime. Call it once per region." },
+    { name: ".withLayout(slots => …)", type: "layout callback", desc: "Places each layer by calling slots.<name>(). The layout is plain JSX." },
+    { name: ".withMeta(() => …)", type: "head metadata", desc: "Page title and description." },
+    { name: ".build()", type: "finalize", desc: "Produces the page object: { handler, default } that Fresh serves." }
+  ]
+}) }}
+
+{{ comp callout { type: "note", title: "This is the dense part — and it earns its weight" } }}
+The layer config carries a lot: a <code>loader</code> (cache-first server read), a <code>partial</code> + <code>partialName</code> (the refresh route), a <code>fallback</code> (cold-cache skeleton), and <code>staleTime</code> + <code>staleReloadMode</code> (the staleness window and how it refreshes). It is more upfront ceremony than a plain Fresh route — the payoff is that each region renders from cache independently and refreshes without a full navigation. If you only need a static page, a plain Fresh route is lighter; reach for <code>definePage</code> when a region must be cache-first and self-refreshing, which a live table is. See <a href="/web-layer/">the Fresh meta-framework</a>.
+{{ /comp }}
 
 {{ comp callout { type: "tip", title: "Deferred-loader composition" } }}
 Returning a promise like <code>statsPromise</code> allows the page's shell to paint instantly. The stats section remains suspended with a placeholder until the promise resolves, at which point the partial streams the completed block to the browser.
@@ -266,7 +257,7 @@ function OrdersQueryInner(props) {
   const currentKey = ordersQueryUtils.list.clientKey(props.input);
   const hydratedRef = useRef(false);
 
-  // 6. Client Hydration: Load server-dehydrated state before rendering
+  // Warm the client cache from the server-dehydrated state, once, before first render.
   if (!hydratedRef.current && props.dehydratedState) {
     hydrateFromDehydrated(getIslandQueryClient(), props.dehydratedState);
     hydratedRef.current = true;
@@ -281,7 +272,7 @@ function OrdersQueryInner(props) {
 
   // Optimistic status advance — update the cache, roll back on error.
   const statusMutation = useMutation({
-    ...ordersQueryUtils.updateStatus.mutationOptions(),
+    ...ordersQueryUtils.update.mutationOptions(),
     onMutate: async (variables) => {
       await queryClient.cancelQueries({ queryKey: currentKey });
       const previous = queryClient.getQueryData(currentKey);
@@ -366,8 +357,9 @@ revalidates. Advancing an order's status should update its badge instantly. Type
 deno task check
 ```
 
-- [ ] `index.route.ts`, `(_shared)/query-loaders.ts`, `index.tsx`, and `(_islands)/OrdersQueryIsland.tsx`
-      all exist under `apps/dashboard/routes/(dashboard)/dashboard/orders/`.
+- [ ] `index.route.ts`, `index.tsx`, `(_components)/StatsLayer.tsx`, and
+      `(_islands)/OrdersQueryIsland.tsx` all exist under
+      `apps/dashboard/routes/(dashboard)/dashboard/orders/`.
 - [ ] The page renders the orders table from cache on first paint (no spinner flash).
 - [ ] Advancing a status updates the row optimistically.
 - [ ] `deno task check` is clean.
