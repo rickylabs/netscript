@@ -14,7 +14,7 @@ endpoint URL instead of an undefined connection-string parameter.
 
 - [x] S0 Issue-first research, SDK inspection, locked plan, draft surface — `115da0d5c`
 - [x] S1 Reproduced generated graph paths and upstream health capability boundary — `f79bc29b3`
-- [x] S2 Resolved SQLite/Deno KV graph resources and regressions — pending implementation commit
+- [x] S2 Resolved SQLite/Deno KV graph resources and regressions — `e12157a77`
 
 ## Validation
 
