@@ -12,7 +12,7 @@ Bound the Aspire restore gate, reuse the exact pinned NuGet packages across CI r
 - [x] S0 Issue-first research, locked design, draft surface — `e2c793d19`
 - [x] S1 Restore retry budget and infrastructure classification — `84c430cec`
 - [x] S2 Pinned NuGet cache and workflow regressions — `6c1140437`
-- [x] S3 Targeted validation and ready handoff — pending sign-off commit
+- [x] S3 Targeted validation and ready handoff — `c3d0321bf`
 
 ## Validation
 
