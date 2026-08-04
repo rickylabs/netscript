@@ -6,7 +6,7 @@ templateEngine: [vento, md]
 
 {{ comp.hero({
   tagline: "For teams whose TypeScript app has become a system.",
-  subhead: "NetScript fits long-lived products where request handling, background work, browser UI, and operations have become one application; it trades pick-any-library freedom for a coordinated Deno workspace.",
+  subhead: "NetScript fits long-lived products where request handling, background work, browser UI, and operations have become one application. The trade: pick-any-library freedom for a coordinated Deno workspace.",
   ctas: [
     { label: "Start a workspace", href: "/quickstart/", primary: true },
     { label: "Read the mental model", href: "/concepts/" }
@@ -34,11 +34,11 @@ That standing maintenance is the **integration tax**: unrelated tools pretending
 
 ## 2. The two decisions that are expensive to retrofit
 
-We didn't invent new primitives. NetScript makes two early architecture choices and carries them
-through the workspace: callers derive their types from shared contracts, and multi-step work runs
-through explicit durable state. Logging can be added later. Replacing parallel client definitions
-or ad-hoc effects after they spread through an application usually means changing every caller and
-every workflow.
+We didn't invent new primitives. NetScript makes two early architecture choices explicit: callers
+derive their types from shared contracts, and multi-step work runs through durable state. These
+decisions become expensive to retrofit after they spread through an application. Replacing
+parallel client definitions or ad-hoc effects then means changing callers and workflows; logging
+can still be added later.
 
 The rest of NetScript makes those two decisions operational. Services serve the contract at request
 time, plugin runtimes own the work that outlives a request, and Aspire brings up the resources with
@@ -64,7 +64,7 @@ No row is a universal winner. Choose the system whose primary constraint matches
     {
       name: "Encore-style stack",
       type: "Integrated infrastructure workflow is the center",
-      desc: "NetScript keeps a Deno/JSR workspace in the application and puts Aspire behind an adapter. It provides less managed infrastructure, so deployment and operations remain your responsibility."
+      desc: "NetScript keeps a Deno/JSR workspace in the application and uses .NET Aspire for local orchestration through an adapter. It provides less managed infrastructure, so deployment and operations remain your responsibility."
     },
     {
       name: "Temporal",
@@ -82,13 +82,13 @@ No row is a universal winner. Choose the system whose primary constraint matches
 ## 4. The trade-offs are real
 
 - **The package family is pre-1.0.** APIs move, so scaffolded imports use exact
-  `{{ releaseSpecifier }}` pins. If you need a frozen surface today, wait or budget for upgrades.
+  `{{ releaseSpecifier }}` pins. If you need a frozen surface today, NetScript is not ready for you.
 - **The .NET Aspire CLI is the default orchestration path.** Scaffold with `--no-aspire` to opt out;
   resource wiring and local telemetry then belong to you. [See the Aspire boundary](/quickstart/aspire/).
 - **The web layer is Fresh and Preact.** That is a deliberate fit, not compatibility with the
   React/Next ecosystem. [See the web layer](/web-layer/).
-- **A coordinated workspace is broader than a one-process app needs.** A small service pays the
-  structure cost before durable work, plugins, and multi-resource operations pay it back.
+- **A coordinated workspace adds structure a one-process app may never use.** Durability, plugin
+  runtimes, and multi-resource operations justify that cost only when the product needs them.
 - **NetScript is not a hosted platform.** You own the workspace and the deployment decisions.
 
 If those are the problems and trade-offs you recognize, [start the workspace](/quickstart/).
