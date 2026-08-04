@@ -58,6 +58,9 @@ migration behavior.
 | Time | Slice | Step | Notes |
 | --- | --- | --- | --- |
 | 2026-08-04 | bootstrap | research + plan | Current 21-tool surface re-baselined; milestone waiver composed and plan locked. |
+| 2026-08-04 | 1 | implementation + focused gate | Initialize, app template, recent-error, and doctor pointer fixtures pass. |
+| 2026-08-04 | 1 | review launch | Fable and Opus configured identities both failed pre-inference; no sign-off claimed. |
+| 2026-08-04 | 2 | implementation + focused gate | Prior 0.0.4 host fixture is rewritten to the simulated 0.0.5 exact pin; restarted current host lists 21 tools and the triad. |
 
 ## Decisions
 
@@ -73,9 +76,20 @@ migration behavior.
 
 ## Gate Results
 
-Pending implementation.
+### Focused Gates
+
+| Gate | Command or check | Result | Notes |
+| --- | --- | --- | --- |
+| activation + migration fixtures | `deno test ...init-agent_test.ts ...stdio_test.ts ...telemetry-flows_test.ts ...doctor_test.ts ...public-command-tree_test.ts` | PASS | 29 passed, 0 failed; current tool count 21 |
+
+Full static, quality, JSR, consumer, and formal evaluator gates remain pending.
+
+### Post-slice reconcile
+
+- #1135 remains open with two unticked acceptance boxes; draft PR #1232 carries `Closes #1135`,
+  `Part of #1126`, milestone 0.0.5, the requested taxonomy, and exactly one `status:impl` label.
+- No new issue/PR comments were present at the implementation checkpoint.
 
 ## Handoff Notes
 
 - Evaluator should inspect the three byte fixtures and the S-18 causal chain first.
-

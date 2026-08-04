@@ -4,6 +4,7 @@ import { join } from 'jsr:@std/path@^1';
 import cliMeta from '../../../../deno.json' with { type: 'json' };
 import {
   appConventionsReferencedPaths,
+  buildAppAgentsMarkdown,
   type AppConventionsInput,
 } from '../../../kernel/templates/app/agent-conventions.ts';
 import { createPublicCommandTree } from './public-command-tree.ts';
@@ -51,6 +52,15 @@ Deno.test('public init --dry-run leaves the target directory absent', async () =
 });
 
 Deno.test('public init emits resolvable app conventions with and without the example service', async () => {
+  assertStringIncludes(
+    buildAppAgentsMarkdown({
+      appName: 'dashboard',
+      dbEngine: 'none',
+      includeExampleService: true,
+      serviceName: 'users',
+    }),
+    'Before hand-writing a service request or probing it with curl, call MCP `list_service_operations` and `get_operation_schema` for the live contract.',
+  );
   const parent = await Deno.makeTempDir({
     prefix: 'netscript-app-conventions-',
   });
@@ -77,6 +87,8 @@ Deno.test('public init emits resolvable app conventions with and without the exa
       'netscript ui:add island <Name> --query',
     );
     assertStringIncludes(serviceMarkdown.agents, 'netscript ui:add data-table');
+    assertStringIncludes(serviceMarkdown.agents, 'probing it with curl');
+    assertStringIncludes(serviceMarkdown.agents, 'get_operation_schema');
     assertStringIncludes(
       serviceMarkdown.agents,
       'routes/examples/users/index.tsx',

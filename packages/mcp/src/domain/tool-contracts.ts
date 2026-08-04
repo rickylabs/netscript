@@ -28,6 +28,7 @@ const doctorCheckShape = objectSchema({
   status: { enum: ['pass', 'warn', 'fail'] },
   summary: stringProperty,
   fix: stringProperty,
+  operationSchemaHint: stringProperty,
 }, ['name', 'status', 'summary']);
 const doctorFamilyShape = objectSchema({
   name: { enum: ['telemetry', 'aspire', 'project', 'plugins'] },
@@ -44,6 +45,8 @@ export interface DoctorCheck {
   /** Check severity. */ readonly status: DoctorStatus;
   /** Bounded human-readable outcome. */ readonly summary: string;
   /** Action that can resolve a warning or failure. */ readonly fix?: string;
+  /** Next diagnostic step when the finding involves a service endpoint. */
+  readonly operationSchemaHint?: string;
 }
 /** Doctor check counts grouped by severity. */
 export interface DoctorCounts {

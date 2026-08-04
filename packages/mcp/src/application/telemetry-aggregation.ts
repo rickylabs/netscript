@@ -205,6 +205,8 @@ export function aggregateErrors(
     sampleMessage: group.messages[0] ?? 'Error',
     relatedRunIds: [...group.runs].slice(0, 5),
     relatedTraceIds: [...group.traces].slice(0, 5),
+    operationSchemaHint:
+      `Call get_operation_schema for service "${group.service}" before probing its endpoint with curl.`,
   })).sort((a, b) => b.lastSeenUnixMs - a.lastSeenUnixMs).slice(0, Math.min(limit, 20));
 }
 

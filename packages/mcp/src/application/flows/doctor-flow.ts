@@ -12,6 +12,12 @@ import type { TelemetryEndpointEnvironment } from '../../domain/telemetry-endpoi
 import { createTelemetryDoctorFamily } from './telemetry-doctor-family.ts';
 
 const MAX_FAMILY_CHECKS = 20;
+const OPERATION_SCHEMA_HINT =
+  'If this finding involves a service endpoint, call get_operation_schema before probing it with curl.';
+
+function withOperationSchemaHint(check: DoctorCheck): DoctorCheck {
+  return check.status === 'pass' ? check : { ...check, operationSchemaHint: OPERATION_SCHEMA_HINT };
+}
 
 function boundFamilyChecks(
   family: DoctorFamilyResult['name'],
@@ -26,7 +32,7 @@ function boundFamilyChecks(
   const omittedStatus = worstDoctorStatus(omitted);
   return [
     ...checks.slice(0, retainedCount),
-    {
+    withOperationSchemaHint({
       name: `${family}_additional_checks`,
       status: omittedStatus,
       summary:
@@ -34,20 +40,20 @@ function boundFamilyChecks(
       ...(omittedStatus === 'pass' ? {} : {
         fix: `Resolve the omitted ${family} warnings or failures and run doctor again.`,
       }),
-    },
+    }),
   ];
 }
 
 function summarizeFamily(result: DoctorFamilyResult): DoctorCheck {
   const { pass, warn, fail } = result.counts;
-  return {
+  return withOperationSchemaHint({
     name: `${result.name}_summary`,
     status: result.status,
     summary: `${pass} passed, ${warn} warned, ${fail} failed.`,
     ...(result.status === 'pass' ? {} : {
       fix: `Review the ${result.name} family details and run doctor again.`,
     }),
-  };
+  });
 }
 
 /** Create the S1 doctor flow for telemetry reachability. */
@@ -76,6 +82,7 @@ export function createDoctorFlow(
           fix: `Resolve the ${family.name} diagnostic failure and run doctor again.`,
         }];
       }
+      checks = checks.map(withOperationSchemaHint);
       const counts = countDoctorChecks(checks);
       results.push({
         name: family.name,

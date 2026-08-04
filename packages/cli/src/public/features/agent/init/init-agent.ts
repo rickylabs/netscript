@@ -48,6 +48,8 @@ export interface InitAgentDependencies {
   readonly bundle?: AgentSkillBundle;
   readonly toolBundle?: AgentToolBundle;
   readonly docsGenerator?: AgentDocsGenerator;
+  /** Exact CLI specifier override used by migration fixtures. */
+  readonly cliSpecifier?: string;
 }
 
 /** Install MCP host configuration and agent skills without rewriting unchanged files. */
@@ -104,6 +106,7 @@ export async function initAgent(
       "mcpServers",
       input.projectRoot,
       changedFiles,
+      dependencies.cliSpecifier,
     );
     for (const [path, content] of Object.entries(bundle.files)) {
       if (path === "manifest.json") continue;
@@ -130,6 +133,7 @@ export async function initAgent(
       "servers",
       input.projectRoot,
       changedFiles,
+      dependencies.cliSpecifier,
     );
   }
   if (
@@ -186,6 +190,7 @@ async function writeHostConfig(
   key: "mcpServers" | "servers",
   projectRoot: string,
   changed: string[],
+  cliSpecifier = netscriptJsrSpecifier("cli"),
 ): Promise<void> {
   const currentText = await fs.readText(path);
   const current = currentText
@@ -207,7 +212,7 @@ async function writeHostConfig(
               "--config",
               join(projectRoot, "deno.json"),
               "-A",
-              netscriptJsrSpecifier("cli"),
+              cliSpecifier,
               "agent",
               "mcp",
               "--project-root",

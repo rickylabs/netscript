@@ -1,4 +1,4 @@
-import { assert, assertEquals } from '@std/assert';
+import { assert, assertEquals, assertStringIncludes } from '@std/assert';
 import { MCP_PACKAGE_VERSION } from '../src/publish-assets.generated.ts';
 
 Deno.test('stdio initialize, list, and unreachable doctor round trip', async () => {
@@ -43,6 +43,10 @@ Deno.test('stdio initialize, list, and unreachable doctor round trip', async () 
     assertEquals(responses[0].result.serverInfo.version, MCP_PACKAGE_VERSION);
     assertEquals(responses[1].result.tools.length, 21);
     assert(typeof responses[0].result.instructions === 'string');
+    assertStringIncludes(
+      responses[0].result.instructions,
+      'When debugging or calling a service HTTP API, use list_service_operations and get_operation_schema before hand-rolling requests with curl.',
+    );
     for (
       const name of [
         'doctor',

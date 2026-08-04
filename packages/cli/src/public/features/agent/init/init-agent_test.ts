@@ -17,6 +17,13 @@ const SUCCESSFUL_ASPIRE_INITIALIZER: AspireAgentInitializer = {
   initialize: () => Promise.resolve({ ok: true }),
 };
 
+const OPENAPI_TOOL_TRIAD = [
+  "list_api_services",
+  "list_service_operations",
+  "get_operation_schema",
+] as const;
+const MIGRATION_TARGET_SPECIFIER = "jsr:@netscript/cli@0.0.5";
+
 const FIXTURE_DOCS_GENERATOR: AgentDocsGenerator = {
   generate: () =>
     Promise.resolve({
@@ -134,6 +141,44 @@ Deno.test("agent init selects VS Code and detect-or-all host table", async () =>
     } finally {
       await Deno.remove(only, { recursive: true });
     }
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+Deno.test("S-18 prior-release host stays pinned until agent init and restart exposes the tool triad", async () => {
+  const root = await Deno.makeTempDir();
+  try {
+    const fs = new DenoAgentInitFileSystem();
+    const fixtureRoot = new URL("./fixtures/", import.meta.url);
+    await fs.writeText(
+      join(root, ".mcp.json"),
+      await Deno.readTextFile(new URL("prior-release.mcp.json", fixtureRoot)),
+    );
+    await fs.writeText(join(root, "deno.json"), '{"workspace":[]}\n');
+    const priorTools = JSON.parse(
+      await Deno.readTextFile(new URL("prior-release-tools.json", fixtureRoot)),
+    ) as readonly string[];
+    const before = JSON.parse(await Deno.readTextFile(join(root, ".mcp.json")));
+    assertStringIncludes(
+      JSON.stringify(before.mcpServers.netscript.args),
+      "jsr:@netscript/cli@0.0.4",
+    );
+    for (const tool of OPENAPI_TOOL_TRIAD) assertFalse(priorTools.includes(tool));
+
+    await initAgent({ projectRoot: root, host: "claude" }, {
+      fs,
+      aspireAgentInitializer: SUCCESSFUL_ASPIRE_INITIALIZER,
+      cliSpecifier: MIGRATION_TARGET_SPECIFIER,
+    });
+    const after = JSON.parse(await Deno.readTextFile(join(root, ".mcp.json")));
+    assertEquals(after.project, "prior-release-fixture");
+    assertEquals(after.mcpServers.other.command, "other");
+    assertEquals(after.mcpServers.netscript.args[4], MIGRATION_TARGET_SPECIFIER);
+
+    const restartedTools = await listToolsAfterHostRestart(root);
+    assertEquals(restartedTools.length, 21);
+    for (const tool of OPENAPI_TOOL_TRIAD) assert(restartedTools.includes(tool));
   } finally {
     await Deno.remove(root, { recursive: true });
   }
@@ -566,6 +611,38 @@ Deno.test("offline docs failure occurs before any project write", async () => {
     await Deno.remove(root, { recursive: true });
   }
 });
+
+async function listToolsAfterHostRestart(projectRoot: string): Promise<readonly string[]> {
+  const cliPath = new URL("../../../../../bin/netscript.ts", import.meta.url).pathname;
+  const child = new Deno.Command(Deno.execPath(), {
+    args: [
+      "run",
+      "-A",
+      cliPath,
+      "agent",
+      "mcp",
+      "--project-root",
+      projectRoot,
+      "--endpoint",
+      "http://127.0.0.1:1",
+    ],
+    cwd: projectRoot,
+    stdin: "piped",
+    stdout: "piped",
+    stderr: "piped",
+  }).spawn();
+  const writer = child.stdin.getWriter();
+  await writer.write(new TextEncoder().encode(
+    `${JSON.stringify({ jsonrpc: "2.0", id: 1, method: "tools/list" })}\n`,
+  ));
+  await writer.close();
+  const output = await child.output();
+  assertEquals(output.code, 0, new TextDecoder().decode(output.stderr));
+  const response = JSON.parse(new TextDecoder().decode(output.stdout)) as {
+    readonly result: { readonly tools: readonly { readonly name: string }[] };
+  };
+  return response.result.tools.map((tool) => tool.name);
+}
 
 function extractSkillReferences(markdown: string): ReadonlySet<string> {
   const references = new Set<string>();
