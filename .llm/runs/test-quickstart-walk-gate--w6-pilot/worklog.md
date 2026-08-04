@@ -33,3 +33,11 @@
 - Full E2E harness tests: 112 passed, 0 failed.
 - The Quickstart step uses `always()` gated only by successful shared setup, so a failing `scaffold.runtime` does not silently skip the independent walk.
 - Supervisor review caught and removed obsolete permission flags from `deno eval` invocations; Deno 2.9 eval is permission-implicit and rejects those flags. Focused tests were rerun after correction.
+
+### S4 — evaluation
+
+- Separate OpenHands IMPL-EVAL run `30956679385`: PASS on head `e75fa7f48`.
+- Evaluator evidence: https://github.com/rickylabs/netscript/pull/1298#issuecomment-5185373345
+- Full package tests: 112 passed, 0 failed; final focused rerun: 7 passed, 0 failed.
+- Lock hygiene: `deno.lock` remains the sole uncommitted file and is excluded from every slice commit.
+- Reconcile: all four #1294 acceptance boxes have direct PR evidence and are ready for mirror preflight.
