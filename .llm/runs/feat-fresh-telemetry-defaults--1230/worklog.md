@@ -52,3 +52,5 @@
 - No issue or PR comment changed scope.
 - D6 continues to replace local evaluator files with draft→ready augmentation plus the orchestrator
   pre-merge gate.
+- Acceptance reconciliation: all four issue boxes earned, cited, and exactly mirrored in PR #1282;
+  mirror dry-run passed at head `9ac6cc19e` before the ready label.

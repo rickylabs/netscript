@@ -8,5 +8,9 @@
 - Fresh tests: 216/216; scoped check/lint/fmt and quality gate pass; Aspire app generator 22/22.
 - JSR audit passes after the smallest gate repair (two public-entrypoint `@module` tags); structured
   doc lint reports only pre-existing query/route/streams diagnostics.
-- Next: commit/push the implementation slice, update acceptance evidence, compose the D6 ready
-  augmentation, and hand merge-readiness to the orchestrator.
+- #1230's four acceptance boxes are checked with one-line PR citations; PR #1282 mirrors all four
+  exact texts in fenced `acceptance-evidence` YAML.
+- Acceptance mirror dry-run passed against head `9ac6cc19e`; it correctly deferred mutation until
+  the final `status:ready-merge` transition.
+- Next: push this handoff commit, mark ready, and let the D6 augmentation plus orchestrator
+  pre-merge gate own merge-readiness.
