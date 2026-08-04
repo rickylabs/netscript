@@ -153,7 +153,7 @@ describe('generateAppsettings', () => {
 
     assertEquals(config.NetScript.PrimaryCache, 'deno-kv')
     assertEquals(config.NetScript.Cache['deno-kv'].Engine, 'DenoKv')
-    assertEquals(config.NetScript.Cache['deno-kv'].Mode, 'External')
+    assertEquals(config.NetScript.Cache['deno-kv'].Mode, 'Container')
     assertEquals(config.NetScript.Cache['deno-kv'].DataPath, 'data/kv')
   })
 
