@@ -1450,3 +1450,21 @@ Byproducts filed from verification work: #1262 (seed placebo), #1263 (by-id 500 
 #1267 (residue scan, fixed same day), #1278 (type-soundness umbrella), #1279 (migration
 chapter), #1280.
 Everything merged post-canary.8 rides canary.9.
+
+## 2026-08-04 — Caveat kill-list dispatched in full (5 lanes, all reusing proven threads)
+
+With the owner wave clear, all six lanes freed. The entire kill-list went out at once, each
+on a domain-matched thread that already carries repo + harness context:
+- **#1228** workers job-tools no-op → genjobs lane (largest surface: 5 caveat markers).
+- **#1225** sagas per-transition mirror → streamdb lane (streams domain); brief names the
+  owner-screenshotted tutorial caveat as half the deliverable and carries the seven-point
+  saga verification protocol.
+- **#1230** fresh telemetry defaults → cachetiers lane (fresh domain).
+- **#1231** app-wide shutdown orchestrator → winmat lane (compose existing drains, one budget).
+- **#1229** triggers defer scheduler → plugrm lane (M-L, the largest remaining); brief carries
+  the finding-31 rule explicitly: honest partial with Refs if oversized, never a whole-issue
+  stop when only part is blocked.
+Every brief pairs the code fix with a caveat re-judgment (remove what the fix invalidates,
+keep what stays true) and a fails-if-silently-inert test where the defect class is a dead
+seam — the #1250 law generalized. This is the owner's "most call-outs gone by 0.0.5" goal
+executing; the reframe pass (6 debts, 18 markers) follows once these land.
