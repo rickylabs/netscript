@@ -149,6 +149,84 @@ Deno.test("agent init selects VS Code and detect-or-all host table", async () =>
   }
 });
 
+Deno.test('agent init applies native editor configuration for none, Zed, and VS Code', async () => {
+  const fs = new DenoAgentInitFileSystem();
+  const roots = await Promise.all([
+    Deno.makeTempDir(),
+    Deno.makeTempDir(),
+    Deno.makeTempDir(),
+  ]);
+  const [noneRoot, zedRoot, vscodeRoot] = roots;
+  try {
+    await initAgent({ projectRoot: noneRoot, host: 'claude', editor: 'none' }, {
+      fs,
+      aspireAgentInitializer: SUCCESSFUL_ASPIRE_INITIALIZER,
+    });
+    assertFalse(await fs.exists(join(noneRoot, '.zed')));
+    assertFalse(await fs.exists(join(noneRoot, '.vscode')));
+
+    await fs.writeText(
+      join(zedRoot, '.zed/settings.json'),
+      '{"custom":true,"context_servers":{"other":{"command":"other"}}}\n',
+    );
+    await initAgent({ projectRoot: zedRoot, host: 'claude', editor: 'zed' }, {
+      fs,
+      aspireAgentInitializer: SUCCESSFUL_ASPIRE_INITIALIZER,
+    });
+    const zed = JSON.parse(await Deno.readTextFile(join(zedRoot, '.zed/settings.json')));
+    assertEquals(zed.custom, true);
+    assertEquals(zed.context_servers.other.command, 'other');
+    assertEquals(zed.context_servers.netscript.command, 'deno');
+    assertEquals(zed.context_servers.aspire.command, 'aspire');
+    assert(zed.lsp.deno.settings.deno.enable);
+    assert(await fs.exists(join(zedRoot, '.zed/debug.json')));
+    assertFalse(await fs.exists(join(zedRoot, '.vscode/mcp.json')));
+
+    await initAgent({ projectRoot: vscodeRoot, host: 'claude', editor: 'vscode' }, {
+      fs,
+      aspireAgentInitializer: SUCCESSFUL_ASPIRE_INITIALIZER,
+    });
+    const vscode = JSON.parse(
+      await Deno.readTextFile(join(vscodeRoot, '.vscode/mcp.json')),
+    );
+    assertEquals(vscode.servers.netscript.command, 'deno');
+    assertEquals(vscode.servers.aspire.command, 'aspire');
+    assert(await fs.exists(join(vscodeRoot, '.vscode/settings.json')));
+    assertFalse(await fs.exists(join(vscodeRoot, '.zed/settings.json')));
+  } finally {
+    await Promise.all(roots.map((root) => Deno.remove(root, { recursive: true })));
+  }
+});
+
+Deno.test('agent init detects one existing editor and rejects an ambiguous project', async () => {
+  const detectedRoot = await Deno.makeTempDir();
+  const ambiguousRoot = await Deno.makeTempDir();
+  const fs = new DenoAgentInitFileSystem();
+  try {
+    await Deno.mkdir(join(detectedRoot, '.zed'));
+    await initAgent({ projectRoot: detectedRoot, host: 'claude' }, {
+      fs,
+      aspireAgentInitializer: SUCCESSFUL_ASPIRE_INITIALIZER,
+    });
+    assert(await fs.exists(join(detectedRoot, '.zed/settings.json')));
+
+    await Deno.mkdir(join(ambiguousRoot, '.zed'));
+    await Deno.mkdir(join(ambiguousRoot, '.vscode'));
+    await assertRejects(
+      () =>
+        initAgent({ projectRoot: ambiguousRoot, host: 'claude' }, {
+          fs,
+          aspireAgentInitializer: SUCCESSFUL_ASPIRE_INITIALIZER,
+        }),
+      Error,
+      'pass --editor zed, --editor vscode, or --editor none',
+    );
+  } finally {
+    await Deno.remove(detectedRoot, { recursive: true });
+    await Deno.remove(ambiguousRoot, { recursive: true });
+  }
+});
+
 Deno.test("S-18 prior-release host stays pinned until agent init and restart exposes the tool triad", async () => {
   const root = await Deno.makeTempDir();
   try {

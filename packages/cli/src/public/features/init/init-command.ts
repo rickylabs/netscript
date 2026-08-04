@@ -5,7 +5,10 @@ import {
   type CacheBackendChoice,
 } from '../../../kernel/domain/cache-backend.ts';
 import { DB_ENGINE_CHOICES, type DbEngineChoice } from '../../../kernel/domain/db-engine.ts';
-import type { EditorChoice } from '../../../kernel/domain/scaffold/workspace-config.ts';
+import {
+  EDITOR_CHOICES,
+  type EditorChoice,
+} from '../../../kernel/domain/scaffold/workspace-config.ts';
 import type { InitPipelineContext } from '../../../kernel/application/scaffold/context.ts';
 import { DEFAULT_TEMPLATE_REGISTRY } from '../../../kernel/application/registries/template-registry.ts';
 import { executeInit } from '../../../kernel/application/scaffold/orchestrate-init.ts';
@@ -14,8 +17,6 @@ import type { PromptPort } from '../../../kernel/ports/prompt-port.ts';
 import type { ProjectNameResolver } from '../../presentation/support.ts';
 import type { InitCommandInput } from './init-input.ts';
 import { resolveInteractiveInitInput } from './init-interactive.ts';
-
-const EDITOR_CHOICES: readonly EditorChoice[] = ['none', 'zed', 'vscode'];
 
 /** Dependencies for the public `init` command handler. */
 export interface InitCommandDependencies {

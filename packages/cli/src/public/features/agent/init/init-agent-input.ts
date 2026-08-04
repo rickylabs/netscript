@@ -7,6 +7,8 @@ export type AgentHost = typeof AGENT_HOSTS[number];
 export interface InitAgentInput {
   readonly projectRoot: string;
   readonly host?: AgentHost | "all";
+  /** Editor setup to apply; inferred from existing project config when omitted. */
+  readonly editor?: EditorChoice;
   readonly withDocs?: boolean;
 }
 
@@ -16,3 +18,4 @@ export interface InitAgentResult {
   readonly changedFiles: readonly string[];
   readonly messages: readonly string[];
 }
+import type { EditorChoice } from '../../../../kernel/domain/scaffold/workspace-config.ts';
