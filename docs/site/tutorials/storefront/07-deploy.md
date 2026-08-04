@@ -109,16 +109,16 @@ graph a single run stands up for the storefront:
   { name: "OTLP collector", type: "http://localhost:4318", desc: "OpenTelemetry endpoint the dashboard runs; framework spans and structured logs land here automatically." },
   { name: "postgres", type: "Container", desc: "Provisioned via Docker. The database your products handlers and saga store target — reachable only while Aspire is up." },
   { name: "redis", type: "Container (cache)", desc: "Redis cache — the default `--cache-backend`; Redis-compatible. Backs KV/queue workloads for the runtime plugins." },
-  { name: "products (service)", type: ":3001 (SERVICE range, from :3000)", desc: "Your catalog service. OpenAPI at /api/products/* and RPC at /api/rpc/*." },
-  { name: "sagas API", type: ":8092 (PLUGIN_API range)", desc: "Lists sagas and instances — where you watched CheckoutSaga in chapter 4." },
-  { name: "triggers API", type: ":8093 (PLUGIN_API range)", desc: "The Hono webhook ingress from chapter 5 — /api/v1/webhooks/shipping/status." },
-  { name: "workers API", type: ":8091 (PLUGIN_API range)", desc: "Lists job executions — where the enqueued shipping and payment jobs run." },
-  { name: "streams", type: ":4437", desc: "The durable streams transport that carries cross-plugin messages between the saga and the workers." },
+  { name: "products (service)", type: ":3001 (pinned in chapter 1)", desc: "Your catalog service. OpenAPI at /api/products/* and RPC at /api/rpc/*." },
+  { name: "sagas API", type: "allocated port", desc: "Lists sagas and instances — where you watched CheckoutSaga in chapter 4." },
+  { name: "triggers API", type: "allocated port", desc: "The Hono webhook ingress from chapter 5 — /api/v1/webhooks/shipping/status." },
+  { name: "workers API", type: "allocated port", desc: "Lists job executions — where the enqueued shipping and payment jobs run." },
+  { name: "streams", type: "allocated port", desc: "The durable streams transport that carries cross-plugin messages between the saga and the workers." },
   { name: "background processors", type: "executables (no port)", desc: "Each plugin's isolated runners (workers, sagas, triggers) — separate processes, not threads inside the API." }
 ] }) }}
 
-{{ comp callout { type: "note", title: "Plugin API ports are range-allocated, not fixed" } }}
-The runtime plugins publish their APIs from the <code>:8091–8099</code> <strong>PLUGIN_API</strong> range, and services from the <code>:3000–3099</code> <strong>SERVICE</strong> range. The conventional assignments (products <code>:3001</code>, workers <code>:8091</code>, sagas <code>:8092</code>, triggers <code>:8093</code>) are what this workspace lands on — but the dashboard's resource list is the authority for the exact port each resource bound, not a memorized number. Read it from there.
+{{ comp callout { type: "note", title: "Only pinned ports are predictable" } }}
+<code>products</code> answers on <code>:3001</code> because chapter 1 pinned it with <code>--service-port</code>. Every plugin API and background runtime takes a port derived from your <em>project name</em> out of the IANA dynamic range (<code>49152–65535</code>) instead, so no two workspaces on a machine collide — and no tutorial can print the number yours landed on. The dashboard's resource list is the authority; read every unpinned port from there.
 {{ /comp }}
 
 ## Step 4 — Use the dashboard
@@ -144,21 +144,20 @@ should show `postgres`, `redis`, `products`, and the `workers` / `sagas` / `trig
 healthy. Spot-check a few endpoints:
 
 ```sh
-# Catalog service
+# Catalog service — pinned in chapter 1, so the port is known
 curl http://localhost:3001/health
 
-# Saga registry lists your checkout saga
-curl http://localhost:8092/api/v1/sagas/sagas
-
-# Triggers ingress is alive
-curl http://localhost:8093/health
+# The plugin APIs take allocated ports. Copy each endpoint from the Aspire
+# resource list, then:
+curl <sagas-endpoint>/api/v1/sagas/sagas   # saga registry lists your checkout saga
+curl <triggers-endpoint>/health            # triggers ingress is alive
 ```
 
 - [ ] `ls aspire/apphost.mts aspire/aspire.config.json` shows both files.
 - [ ] `aspire start` boots and prints a dashboard URL + login token.
 - [ ] The dashboard at `https://localhost:18888` lists `postgres`, `redis`, `products`, and the
       `workers` / `sagas` / `triggers` plugin APIs, all healthy.
-- [ ] `curl` against `:3001`, `:8092`, and `:8093` all answer.
+- [ ] `curl` against `:3001` and the sagas / triggers endpoints from the resource list all answer.
 - [ ] A checkout and a webhook fire show up as correlated traces in the dashboard.
 
 {{ comp callout { type: "warning", title: "Footguns when `aspire start` will not boot" } }}
@@ -166,7 +165,7 @@ curl http://localhost:8093/health
 <li><strong>Docker not running.</strong> Aspire provisions Postgres + Redis through Docker; no daemon means the happy path does not start.</li>
 <li><strong>Wrong directory.</strong> <code>aspire restore</code> and <code>aspire start</code> run from inside <code>aspire/</code>; <code>netscript db</code> commands run from the workspace root. Mixing them up is the most common first-run error.</li>
 <li><strong>db command before <code>aspire start</code>.</strong> Every <code>netscript db</code> command needs a live Postgres. Bring the graph up first.</li>
-<li><strong>Ports in use.</strong> A stale prior run holding <code>:18888</code>, <code>:3001</code>, or an <code>:8091–8099</code> port blocks boot — check the dashboard resource list (or your process table) and free it.</li>
+<li><strong>Ports in use.</strong> A stale prior run holding <code>:18888</code>, <code>:3001</code>, or one of the allocated high-range ports blocks boot — check the dashboard resource list (or your process table) and free it.</li>
 </ul>
 {{ /comp }}
 

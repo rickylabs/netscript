@@ -264,7 +264,7 @@ The page is built using NetScript's fluent `definePage` page builder. By binding
 
 ```tsx
 // apps/storefront/routes/cart/[customer].tsx
-import { definePage } from '@netscript/fresh/builders';
+import { definePage } from '@app/utils.ts';
 import { cartRoute } from '../../../contracts/routes/cart-page.ts';
 import CheckoutIsland from '../../islands/CheckoutIsland.tsx';
 import { productsClient } from '../../lib/api-clients.ts';
@@ -293,6 +293,9 @@ const cartPage = definePage()
 
 export default cartPage.default;
 ```
+
+`definePage` is imported from `@app/utils.ts` — the module chapter 1's scaffold wrote, which
+re-exports the builder bound to your app's `State` type so every page shares one typed context.
 
 `.withRoute(cartRoute)` hands the contract's schemas to the builder, so the parsing you would
 otherwise write by hand happens before your loader runs: `ctx.path.customer` is a typed string and
