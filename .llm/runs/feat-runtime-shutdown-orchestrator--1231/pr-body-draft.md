@@ -25,8 +25,8 @@ database drain paths. One deterministic order and one deadline now govern the wh
 ## Harness
 
 - Run dir: `.llm/runs/feat-runtime-shutdown-orchestrator--1231/`
-- Phase: plan; D6 `COMPOSED_WAIVER` for local PLAN-EVAL
-- Do not merge until formal IMPL-EVAL passes and every acceptance claim is earned.
+- Phase: formal IMPL-EVAL PASS; D6 `COMPOSED_WAIVER` for local PLAN-EVAL
+- Separate-session evaluator: Claude Code + OpenRouter `qwen/qwen3.7-max` · high
 
 ## Drift / Debt
 
@@ -57,5 +57,5 @@ entries:
   - box: "Caveat marker + call-out removed; debt entry closed."
     evidence: "graceful-shutdown.md uses createRuntimeHost as Step 5; retired marker/title/debt id search returns zero matches; arch-debt entry deleted."
   - box: "Archetype gates green."
-    evidence: "90 service tests; wrapper gates clean; quality gate exit 0; JSR audit and publish dry-run pass; formal IMPL-EVAL pending before ready-merge."
+    evidence: "90 service tests; wrapper gates clean; quality gate exit 0; JSR audit and publish dry-run pass; separate-session formal IMPL-EVAL PASS."
 ```

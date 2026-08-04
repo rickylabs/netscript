@@ -117,3 +117,14 @@ debt, and final gates. No new comments changed scope.
 
 All issue acceptance claims now have local evidence. PR #1285 can move from draft implementation to
 formal IMPL-EVAL; no reviewer comment changed scope.
+
+## 2026-08-04 — formal IMPL-EVAL
+
+- Separate local Claude Code + OpenRouter evaluation ran on `qwen/qwen3.7-max` at high effort.
+- Verdict: **PASS**, with no findings and no new debt.
+- The evaluator independently reran the focused 3-test proof, the 90-test service suite, scoped
+  check/lint/fmt, doc lint, publish dry-run, quality and architecture checks, and the retired-marker
+  search.
+- All four issue acceptance boxes were judged earned. Residual risks are limited to the documented
+  absence of an all-real-resources integration test, caller-owned signal routing, and WSL-only host
+  evaluation; none invalidate the platform-independent controlled-timer proof.
