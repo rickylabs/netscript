@@ -1,4 +1,5 @@
 import { assertEquals } from '@std/assert';
+import { GITHUB_API_BASE_URL } from '../config/endpoints.ts';
 import {
   buildPrCheckReport,
   type CheckRun,
@@ -29,7 +30,7 @@ function workflowJob(values: Partial<WorkflowJob> = {}): WorkflowJob {
     conclusion: 'success',
     started_at: '2026-08-03T10:02:00Z',
     completed_at: '2026-08-03T10:03:00Z',
-    check_run_url: 'https://api.github.com/repos/rickylabs/netscript/check-runs/2',
+    check_run_url: `${GITHUB_API_BASE_URL}/repos/rickylabs/netscript/check-runs/2`,
     run_id: 10,
     run_attempt: 2,
     ...values,

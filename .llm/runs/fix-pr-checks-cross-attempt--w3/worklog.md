@@ -57,6 +57,7 @@ existing classifier cases in `pr-checks_test.ts`, then run the three scoped wrap
 | 2026-08-04T09:28+02:00 | S1 | RED | Added the cross-attempt fixtures before implementation; type check failed because `mergeLatestWorkflowJobs` and `WorkflowJob` did not exist. |
 | 2026-08-04T09:29+02:00 | S1 | implementation | Added latest-attempt workflow jobs, check-run URL correlation, explicit attempt precedence, queued-job fallback, and exit-code seam. |
 | 2026-08-04T09:33+02:00 | S1 | slice review | Opus opposite-family review found 2 high, 2 medium, and 2 low issues; all were addressed. Re-review session `833cdc49-8d3f-42ea-a8a9-0f9416d5aef2` returned PASS. |
+| 2026-08-04T09:39+02:00 | S1 | CI reconcile | Repo volatile-value guard found the GitHub API base hardcoded in the new test fixture. Replaced it with `GITHUB_API_BASE_URL` from canonical config; source behavior and DoD claims remain unchanged. |
 
 ## RED→GREEN Evidence
 
@@ -105,6 +106,7 @@ The first two cases produce `['superseded', 'current-pass']`. The negative case 
 | Scoped format | PASS | 9 selected files, 0 failed batches/findings |
 | Live PR #1181 | PASS | exit 0; 0 current failures on fresh head |
 | Opposite-family slice review | PASS after fixes | initial 6 findings addressed; re-review session recorded above |
+| Volatile config guard | PASS after fix | test fixture sources `GITHUB_API_BASE_URL` from `config/endpoints.ts` |
 
 ## Handoff Notes
 

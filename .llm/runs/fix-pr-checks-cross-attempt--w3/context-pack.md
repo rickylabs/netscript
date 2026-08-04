@@ -23,6 +23,7 @@ remain pending and genuinely failing latest attempts exit 1.
 - Recorded the milestone D6 composed-evaluation waiver for local formal PLAN-EVAL.
 - Demonstrated baseline RED and corrected GREEN (12 tests).
 - Passed scoped check/lint/format, live PR verification, and opposite-family re-review.
+- Reconciled the CI volatile-value guard by sourcing the fixture API base from canonical config.
 
 ## In Progress
 
