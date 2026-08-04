@@ -31,3 +31,13 @@ Drift is append-only.
 - **Severity:** minor
 - **Action:** fix
 - **Evidence:** `tests/type-fixtures/streamdb-consumer-deno.json`; valid RED contains exactly the two wrapper `unknown` diagnostics and the direct control compiles.
+
+## 2026-08-04 — Published-doc baseline and upstream npm references
+
+- **What:** Full-package doc lint and the JSR audit remain non-zero on unrelated existing package debt; restoring upstream inference adds four `private-type-ref` diagnostics because Deno treats the npm package's exported declaration aliases as private documentation nodes.
+- **Source:** S2 full export-map `deno doc --lint` and JSR audit.
+- **Expected:** Published-package gates complete without introducing a local fork of upstream collection inference.
+- **Actual:** Publish dry-run and its slow-types check pass. Full doc lint reports 44 errors: 40 in existing route/query/streams surfaces and four at the new upstream type references. The JSR audit retains unrelated `./ai` and `./vite` module-tag failures.
+- **Severity:** minor/process
+- **Action:** accept for composed evaluator review; do not copy the upstream collection conditional into NetScript merely to silence a documentation-graph limitation.
+- **Evidence:** S2 command transcripts, successful publish dry-run, and the same-fixture upstream parity proof.

@@ -64,6 +64,7 @@ full published-surface gates.
 | 2026-08-04 15:59 CEST | S0 | bootstrap | Read live issue first, re-baselined at exact `origin/main`, selected A4 + frontend overlay, and locked D1–D8. |
 | 2026-08-04 16:08 CEST | S1 | RED | Consumer-config compile exited 1 with two wrapper-only diagnostics: the documented `query.from` collection value and `.get()` result were `unknown`; the direct `createStreamDB` control compiled in the same fixture. |
 | 2026-08-04 16:14 CEST | S1 | GREEN | Indexed the wrapper collection map from upstream `StreamDB<StateSchema<TDef>>`; the same fixture exited 0 and the focused runtime wiring test passed 1/1. |
+| 2026-08-04 18:15 CEST | S2 | static/publish | Package check, scoped TypeScript check/lint/fmt, quality gate, 207 package tests, and publish dry-run passed. Full doc/JSR scans retained package baseline debt and added four upstream npm private-type references. |
 
 ## Decisions
 
@@ -80,6 +81,7 @@ full published-surface gates.
 | Foreign queue entry already present in `deno.lock` | minor | yes |
 | Local formal evaluator replaced by milestone composition | minor/process | yes |
 | Consumer fixture isolates one TanStack DB package identity | minor/process | yes |
+| Full package doc/JSR baselines are non-zero | minor/process | yes |
 
 ## Gate Results
 
@@ -88,15 +90,15 @@ full published-surface gates.
 | Gate | Command or check | Result | Notes |
 | --- | --- | --- | --- |
 | RED-first fixture | `deno check --no-lock --config packages/fresh/tests/type-fixtures/streamdb-consumer-deno.json --unstable-kv packages/fresh/tests/type-fixtures/streamdb-wrapper_type.ts` | PASS | RED exit 1 with two wrapper-only diagnostics; GREEN exit 0 |
-| Scoped check/lint/fmt | repo wrapper family | NOT_RUN | S2 |
-| Doc lint | full `packages/fresh` export map | NOT_RUN | S2 |
-| Publish dry-run | package task/raw package command | NOT_RUN | S2 |
+| Scoped check/lint/fmt | repo wrapper family over `packages/fresh` TS/TSX plus dedicated consumer fixture | PASS | zero findings |
+| Doc lint | `deno task doc:lint --root packages/fresh --pretty` | BASELINE_FAIL | 40 existing package errors plus four upstream npm private-type refs; no missing JSDoc added |
+| Publish dry-run | `deno publish --dry-run --allow-dirty` from `packages/fresh` | PASS | slow-types phase and package simulation completed; fixtures excluded |
 
 ### Fitness Gates
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| F-1–F-12, F-14–F-19 | NOT_RUN | S2 | A4 required set |
+| F-1–F-12, F-14–F-19 | PASS_WITH_BASELINE | scoped static gates, `quality:gate`, JSR audit, dry-run | JSR audit retains two unrelated module-tag failures; no new ignore or local type fork |
 | F-13 | N/A | no runtime behavior change | runtime invariants unaffected |
 
 ### Runtime Gates
@@ -105,6 +107,7 @@ full published-surface gates.
 | --- | --- | --- | --- |
 | Focused wrapper wiring test | `deno test --config packages/fresh/deno.json --unstable-kv --allow-env packages/fresh/src/runtime/streams/create-stream-db_test.ts` | PASS | 1 passed; URL/auth/schema/lifecycle seam retained |
 | Browser/route/render gates | N/A | source boundary | no rendered workflow change |
+| Full package tests | PASS | `deno task test` | 207 passed, 0 failed |
 
 ### Consumer Gates
 

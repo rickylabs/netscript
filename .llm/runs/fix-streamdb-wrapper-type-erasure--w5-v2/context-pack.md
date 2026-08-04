@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `fix-streamdb-wrapper-type-erasure--w5-v2` |
 | Branch | `fix/streamdb-wrapper-type-erasure` |
-| Current phase | `plan-eval (composed)` |
+| Current phase | `impl-eval (composed handoff)` |
 | Archetype | `4 — Public DSL / Builder` |
 | Scope overlays | `frontend` |
 
@@ -53,10 +53,10 @@ this same run.
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
 | Plan | COMPOSED | `plan-eval.md` |
-| Static | NOT_RUN | S1/S2 pending |
-| Fitness | NOT_RUN | S2 pending |
-| Runtime | NOT_RUN | focused wiring test pending |
-| Consumer | NOT_RUN | RED/GREEN fixture pending |
+| Static | PASS | package check plus scoped TS/TSX check/lint/fmt |
+| Fitness | PASS_WITH_BASELINE | quality passes; doc/JSR baseline and upstream npm refs recorded in drift |
+| Runtime | PASS | focused test plus 207-test package suite |
+| Consumer | PASS | RED wrapper-only failure; GREEN wrapper/control parity |
 
 ## Open Questions
 
