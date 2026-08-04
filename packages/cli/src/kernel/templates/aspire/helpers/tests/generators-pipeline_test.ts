@@ -35,6 +35,34 @@ describe('HelpersGeneratorPipeline', () => {
     }
   });
 
+  it('threads SQLite FFI to every permission-bearing register output', async () => {
+    const pipeline = new HelpersGeneratorPipeline();
+    const files = await pipeline.execute({
+      config: {
+        ...fixtures.POPULATED_CONFIG,
+        PrimaryDatabase: 'main',
+        Databases: {
+          main: { ...fixtures.MINIMAL_DATABASE, Engine: 'Sqlite' },
+        },
+      },
+    });
+    const permissionBearingPaths = [
+      '.helpers/register-services.mts',
+      '.helpers/register-plugins.mts',
+      '.helpers/register-background.mts',
+    ];
+
+    for (const path of permissionBearingPaths) {
+      const generated = files.find((file) => file.path === path);
+      assert(generated, `${path} should be generated`);
+      assertEquals(
+        generated.content.match(/--allow-ffi/g)?.length,
+        1,
+        `${path} should contain SQLite FFI exactly once`,
+      );
+    }
+  });
+
   it('should emit local import specifiers that resolve to generated files', async () => {
     const pipeline = new HelpersGeneratorPipeline();
     const files = await pipeline.execute({ config: fixtures.POPULATED_CONFIG });

@@ -162,6 +162,23 @@ describe('generateRegisterServices', () => {
     assertEquals(output.match(/--allow-ffi/g)?.length, 1);
   });
 
+  it('keeps non-SQLite service output byte-identical', () => {
+    const options = {
+      ...emptyOptions,
+      services: { users: fixtures.MINIMAL_SERVICE },
+    };
+    const baseline = generateRegisterServices(options);
+    const engines = [undefined, 'Postgres', 'Mysql', 'Mssql'] as const;
+
+    for (const databaseEngine of engines) {
+      assertEquals(
+        generateRegisterServices({ ...options, databaseEngine }),
+        baseline,
+        `${databaseEngine ?? 'none'} service output`,
+      );
+    }
+  });
+
   it('should wire primary database dependency for all services', () => {
     const output = generateRegisterServices({
       ...emptyOptions,
@@ -268,6 +285,44 @@ describe('generateRegisterPlugins', () => {
     assertStringIncludes(output, "'--unstable-no-legacy-abort'");
     assertStringIncludes(output, ".withHttpEndpoint({ port: 4400, env: 'PORT' });");
     assertStringIncludes(output, "plugins.set('auth'");
+  });
+
+  it('emits SQLite FFI exactly once for plugin services', () => {
+    const output = generateRegisterPlugins({
+      ...emptyOptions,
+      plugins: { auth: fixtures.MINIMAL_PLUGIN },
+      databaseEngine: 'Sqlite',
+    });
+    const explicitOutput = generateRegisterPlugins({
+      ...emptyOptions,
+      plugins: {
+        auth: {
+          ...fixtures.MINIMAL_PLUGIN,
+          Permissions: ['--allow-net', '--allow-ffi'],
+        },
+      },
+      databaseEngine: 'Sqlite',
+    });
+
+    assertEquals(output.match(/--allow-ffi/g)?.length, 1);
+    assertEquals(explicitOutput.match(/--allow-ffi/g)?.length, 1);
+  });
+
+  it('keeps non-SQLite plugin output byte-identical', () => {
+    const options = {
+      ...emptyOptions,
+      plugins: { auth: fixtures.MINIMAL_PLUGIN },
+    };
+    const baseline = generateRegisterPlugins(options);
+    const engines = [undefined, 'Postgres', 'Mysql', 'Mssql'] as const;
+
+    for (const databaseEngine of engines) {
+      assertEquals(
+        generateRegisterPlugins({ ...options, databaseEngine }),
+        baseline,
+        `${databaseEngine ?? 'none'} plugin output`,
+      );
+    }
   });
 
   it('should include full executable OTEL env vars for each plugin', () => {

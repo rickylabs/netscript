@@ -26,16 +26,8 @@ import { SCAFFOLD_DIRS } from '../../../../constants/scaffold/scaffold-dirs.ts';
 import { RESOURCE_DEFAULTS } from '@netscript/aspire/constants';
 import { TEMPLATE_KEYS } from '../../../../assets/manifest.ts';
 import { renderTemplateAssetSync } from '../../../../adapters/templates/template-asset.ts';
+import { withDatabasePermissions } from './database-permissions.ts';
 import { renderHttpEndpointCall } from './render-http-endpoint.ts';
-
-function withRequiredServicePermissions(
-  permissions: readonly string[],
-  databaseEngine: RegisterServicesOptions['databaseEngine'],
-): readonly string[] {
-  return databaseEngine === 'Sqlite' && !permissions.includes('--allow-ffi')
-    ? [...permissions, '--allow-ffi']
-    : permissions;
-}
 
 /**
  * Generates the `register-services.mts` file content for a scaffolded Aspire
@@ -57,11 +49,11 @@ export function generateRegisterServices(options: RegisterServicesOptions): stri
     const workdir = entry.Workdir ?? `${SCAFFOLD_DIRS.SERVICES}/${name}`;
     const watchMode = denoDefaults.WatchMode;
     const entryPermissions = entry.Permissions
-      ? withRequiredServicePermissions(entry.Permissions, databaseEngine)
+      ? withDatabasePermissions(entry.Permissions, databaseEngine)
       : undefined;
     const defaultPermissions = entryPermissions
       ? denoDefaults.Permissions
-      : withRequiredServicePermissions(denoDefaults.Permissions, databaseEngine);
+      : withDatabasePermissions(denoDefaults.Permissions, databaseEngine);
 
     const lines: string[] = [];
     lines.push(`  // --- ${name} ---`);

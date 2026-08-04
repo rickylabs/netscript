@@ -47,6 +47,9 @@ export class HelpersGeneratorPipeline {
     const { config, configPath, generateAppHost } = options;
     const templates = await loadAspireHelperTemplateAssets();
     const files: GeneratedFile[] = [];
+    const databaseEngine = config.PrimaryDatabase
+      ? config.Databases[config.PrimaryDatabase]?.Engine
+      : undefined;
 
     // 0. Tier 2: Aspire compat shim (D-7 Node.js workaround)
     files.push({
@@ -92,9 +95,7 @@ export class HelpersGeneratorPipeline {
       services: config.Services,
       version: config.Version,
       denoDefaults: config.Defaults.Deno,
-      databaseEngine: config.PrimaryDatabase
-        ? config.Databases[config.PrimaryDatabase]?.Engine
-        : undefined,
+      databaseEngine,
     }));
 
     // 6. Tier 1: Register plugins (two-pass cross-ref)
@@ -102,6 +103,7 @@ export class HelpersGeneratorPipeline {
       plugins: config.Plugins,
       version: config.Version,
       denoDefaults: config.Defaults.Deno,
+      databaseEngine,
     }));
 
     // 7. Tier 1: Register background processors
@@ -109,6 +111,7 @@ export class HelpersGeneratorPipeline {
       processors: config.BackgroundProcessors,
       version: config.Version,
       denoDefaults: config.Defaults.Deno,
+      databaseEngine,
     }));
 
     // 8. Tier 1: Register apps

@@ -6,18 +6,18 @@
 | -------------- | ------------------------------------- |
 | Run ID         | `test-e2e-sqlite-runtime-tier--1158`  |
 | Branch         | `test/e2e-sqlite-runtime-tier-1158`   |
-| Current phase  | `implement` — S1 blocked on drift D-5 |
+| Current phase  | `implement` — S1 gates green; supervisor review pending |
 | Archetype      | `6 - CLI / Tooling`                   |
 | Scope overlays | `service`                             |
 
 ## Current State
 
 Bootstrap, Research, Plan & Design, and PLAN-EVAL are complete; `plan-eval.md` records `PASS` at
-commit `dd178da7`. S1 began with a baseline trace and stopped before product edits on significant
-drift D-5: contrary to locked decision D0 and research finding 8, `generate-register-apps.ts` does
-not emit `resolvePermissions(...)` or any permission-bearing command. It launches apps through
-`deno task`, whose CLI accepts no Deno permission flags; the default generated Fresh task already
-uses `deno run --allow-all`.
+commit `dd178da7`. The Tier-A supervisor narrowed S1 under drift D-5 to the three
+permission-bearing generators. The implementation now shares the database permission rule across
+services, background processors, and plugin services; the pipeline threads the primary engine to
+all three. Apps remain unchanged because they launch through `deno task`, and their generated task
+already uses `deno run --allow-all`.
 
 The carried-in draft from the failed Copilot/Grok run was re-derived against `main` @ `c6f243da` and
 **corrected in four places**; two corrections are blockers. The plan's D2/D3/D4/E5 deliberately
@@ -34,19 +34,21 @@ supersede the draft's decisions of the same names.
 - Design checkpoint: public surface, vocabulary, ports (none created, with rationale), constants, 7
   commit slices, deferred scope, contributor path.
 - Branch created, run dir committed, draft PR opened.
+- Rescoped S1 implemented with exact-once SQLite FFI, explicit-permission deduplication, pipeline
+  propagation, and byte-identical non-SQLite assertions.
+- All six S1 gates passed: helper tests, scoped check/lint/fmt, `quality:scan`, and `arch:check`.
 
 ## In Progress
 
-- **S1 blocked for Tier-A rescope.** No product file has been edited and no slice gate has run.
-  Drift D-5 requires a supervisor decision: rescope the shared helper to the three
-  permission-bearing generators, or first design a real app task-permission contract.
+- **S1 awaiting Tier-A slice review.** Automated gates are green; the implementation lane does not
+  self-certify or begin S2.
 
 ## Next Steps
 
-1. Tier-A supervisor reviews drift D-5 and revises D0/S1 if appropriate. Do not encode `--allow-ffi`
-   as a `deno task` argument or generated comment.
-2. Relaunch/resume S1 only with a permission-bearing app design or explicit three-generator rescope.
-3. Slice review gate (Tier-A supervisor) → sign-off commit → push → PR comment. Repeat for S2–S7.
+1. Tier-A supervisor substantively reviews the landed S1 implementation and evidence.
+2. Supervisor records the S1 sign-off or returns findings. Do not encode `--allow-ffi` as a
+   `deno task` argument or generated comment.
+3. Only after supervisor sign-off may the run proceed to S2.
 4. Gate phase: scoped wrappers + `quality:scan` + `arch:check` + `publish:dry-run`, then the
    postgres `scaffold.runtime` regression run.
 5. IMPL-EVAL in a third session.
@@ -69,23 +71,25 @@ supersede the draft's decisions of the same names.
 
 | Path                                                                           | Status   | Notes                                                          |
 | ------------------------------------------------------------------------------ | -------- | -------------------------------------------------------------- |
-| `.llm/runs/test-e2e-sqlite-runtime-tier--1158/*`                               | new      | Harness artifacts only — the bootstrap commit.                 |
-| `.llm/runs/test-e2e-sqlite-runtime-tier--1158/{drift,worklog,context-pack}.md` | modified | S1 blocking drift D-5; uncommitted pending supervisor rescope. |
+| `.llm/runs/test-e2e-sqlite-runtime-tier--1158/{worklog,context-pack}.md` | modified | S1 evidence and handoff state. |
+| `packages/cli/src/kernel/templates/aspire/helpers/register/{database-permissions,generate-register-services,generate-register-background,generate-register-plugins}.ts` | modified/new | Shared SQLite permission policy and three consumers. |
+| `packages/cli/src/kernel/templates/aspire/helpers/{types,helpers-generator-pipeline}.ts` | modified | Optional engine contracts and call-site threading. |
+| `packages/cli/src/kernel/templates/aspire/helpers/tests/*` | modified | Semantic permission and non-SQLite invariance coverage. |
 
-No `packages/` or `.github/` file has been touched (D9).
+No app generator, `RegisterAppsOptions`, E2E, GitHub, cache, or embedded-template file was touched.
 
 ## Gates
 
 | Gate family | Current status | Evidence                                            |
 | ----------- | -------------- | --------------------------------------------------- |
-| Static      | `NOT_RUN`      | S1 stopped before product edits.                    |
-| Fitness     | `NOT_RUN`      | Planned-surface jsr scan recorded in `research.md`. |
+| Static      | `PASS`         | Scoped check/lint/fmt wrappers: 0 findings.         |
+| Fitness     | `PASS`         | `quality:scan` and `arch:check` exited 0.           |
 | Runtime     | `NOT_RUN`      | S7 is the first live sqlite run.                    |
-| Consumer    | `NOT_RUN`      | S1 must leave non-sqlite scaffolds byte-identical.  |
+| Consumer    | `PASS`         | Semantic tests prove non-SQLite output invariance. |
 
 ## Open Questions
 
-1. Exact init spelling to disable the cache (`--cache false` vs a declared `--no-cache`) — S2.
+1. Exact init spelling to disable the cache (`--cache false` vs a declared `--no-cache`) — S2; not started.
 2. Does the Garnet dotnet-tool executable arm start on `ubuntu-latest`? — S7, with a pre-agreed
    downgrade path.
 3. Any silently postgres-shaped behavior gate? — S7.

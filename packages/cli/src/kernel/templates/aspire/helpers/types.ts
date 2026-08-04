@@ -74,6 +74,8 @@ export interface RegisterPluginsOptions {
   readonly plugins: Record<string, PluginEntry>;
   readonly version: string;
   readonly denoDefaults: DenoDefaults;
+  /** Selected primary database engine, used for engine-required runtime permissions. */
+  readonly databaseEngine?: DatabaseEntry['Engine'];
 }
 
 /** Options for register-background.mts generation. */
@@ -81,6 +83,8 @@ export interface RegisterBackgroundOptions {
   readonly processors: Record<string, BackgroundProcessorEntry>;
   readonly version: string;
   readonly denoDefaults: DenoDefaults;
+  /** Selected primary database engine, used for engine-required runtime permissions. */
+  readonly databaseEngine?: DatabaseEntry['Engine'];
 }
 
 /** Options for register-apps.mts generation. */

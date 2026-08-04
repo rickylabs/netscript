@@ -17,12 +17,13 @@ Recorded before any implementation file is created, per `workflow/run-loop.md` �
 
 Framework (`packages/cli` published surface) — S1 only:
 
-- No new exports. `generateRegisterApps` / `generateRegisterBackground` / `generateRegisterPlugins`
-  keep their signatures; their options types gain an optional
+- No new package exports. `generateRegisterServices` / `generateRegisterBackground` /
+  `generateRegisterPlugins` keep their signatures; `RegisterBackgroundOptions` and
+  `RegisterPluginsOptions` gain an optional
   `readonly databaseEngine?: DatabaseEntry['Engine']`, matching `RegisterServicesOptions`.
 - One internal helper, `withDatabasePermissions(permissions, databaseEngine)`, extracted from
-  `generate-register-services.ts` into the shared `register/` helper module and reused by all four
-  generators. Not exported from the package.
+  `generate-register-services.ts` into the shared `register/` module and reused by the three
+  permission-bearing generators. Not exported from the package. Apps remain unchanged per D-5.
 
 E2E harness (`packages/cli/e2e`, internal to the package, not a JSR surface):
 
@@ -65,7 +66,7 @@ speculative port for a need this run does not have.
 
 | # | Slice                                                                                                                                                                                      | Gate                                                                                                 | Files                                                                                                                                                                                                                                               |
 | - | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1 | **`--allow-ffi` reaches every sqlite resource, not just services** — proves the #1191 fix is no longer services-only.                                                                      | `deno test packages/cli/src/kernel/templates/aspire/helpers/tests/` + `quality:scan` + `arch:check`  | `register/generate-register-{apps,background,plugins,services}.ts`, `helpers/types.ts`, generator call sites, `helpers/tests/*`                                                                                                                     |
+| 1 | **`--allow-ffi` reaches every permission-bearing sqlite resource, not just services** — proves the #1191 fix is no longer services-only.                                                   | `deno test packages/cli/src/kernel/templates/aspire/helpers/tests/` + scoped wrappers + `quality:scan` + `arch:check` | `register/{database-permissions,generate-register-{background,plugins,services}}.ts`, `helpers/types.ts`, the pipeline call site, `helpers/tests/*`                                                                                                |
 | 2 | **The E2E can scaffold a project with no cache resource** — `RunOptions.cache` + `--cache/--no-cache` + `scaffold.init` forwards it; omitting it reproduces today's command byte-for-byte. | `deno test packages/cli/e2e/` (incl. a golden `scaffoldInitCommand` assertion for the default path)  | `e2e/src/domain/run-context.ts`, `presentation/cli/options/run-options.ts`, `presentation/cli/commands/{run,full}-command.ts`, `gates/scaffold/scaffold-gates.ts`, `builders/workspace/suite-builder-options.ts`, `create-default-runner.ts`, tests |
 | 3 | **A capability suite can pin its own defaults while the CLI still overrides them.**                                                                                                        | `deno test packages/cli/e2e/` — precedence test: suite default `sqlite` + `--db postgres` → postgres | `suites/scaffold/capability-suites.ts`, `presentation/cli/suites/registry.ts`, tests                                                                                                                                                                |
 | 4 | **`scaffold.runtime.sqlite` exists, resolves, and requests zero container resources.**                                                                                                     | `deno task e2e:cli suites` lists it; registry + wait-matrix unit tests                               | `e2e/src/domain/cli-surface.ts`, `suites/scaffold/capability-suites.ts`, tests                                                                                                                                                                      |
@@ -104,6 +105,8 @@ No gate-filtering logic to touch: waits are derived from the suite's resolved op
 | 2026-08-04 | bootstrap | Research pass re-derived against `main` @ `c6f243da`  | 5 corrections to the carried-in draft, 2 of them blockers. See `research.md` § Re-baseline.                                           |
 | 2026-08-04 | bootstrap | Run dir authored; branch + draft PR opened            | Harness artifacts only — no product code (D9).                                                                                        |
 | 2026-08-04 | S1        | Pre-implementation trace stopped on app-command drift | `generate-register-apps.ts` launches `deno task` and owns no permission list; recorded as significant drift D-5 before product edits. |
+| 2026-08-04 | S1        | Resumed after supervisor D-5 ruling                    | Implemented the three-generator rescope; apps were not touched and receive neither task arguments nor generated comments.             |
+| 2026-08-04 | S1        | Implementation gates complete                          | All six required gates passed; slice is awaiting Tier-A substantive review and sign-off.                                               |
 
 ## Decisions
 
@@ -121,6 +124,7 @@ No gate-filtering logic to touch: waits are derived from the suite's resolved op
 | Supervisor lane is Opus 5, not the canonical Fable 5 | minor       | yes (D-1)          |
 | Carried-in draft's root-cause analysis was wrong     | significant | yes (D-2)          |
 | #1191's fix is services-only — new blocker           | significant | yes (D-3)          |
+| Apps own no permission-bearing command               | significant | yes (D-5 + ruling) |
 
 ## Gate Results
 
@@ -128,23 +132,23 @@ No gate-filtering logic to touch: waits are derived from the suite's resolved op
 
 | Gate         | Command or check                                                | Result    | Notes                     |
 | ------------ | --------------------------------------------------------------- | --------- | ------------------------- |
-| type-check   | `.llm/tools/run-deno-check.ts --root packages/cli --ext ts,tsx` | `NOT_RUN` | No product code yet (D9). |
-| lint         | `.llm/tools/run-deno-lint.ts --root packages/cli --ext ts,tsx`  | `NOT_RUN` | Same.                     |
-| format       | `.llm/tools/run-deno-fmt.ts --root packages/cli --ext ts,tsx`   | `NOT_RUN` | Same.                     |
-| quality:scan | `deno task quality:scan`                                        | `NOT_RUN` | Required from S1 onward.  |
-| arch:check   | `deno task arch:check`                                          | `NOT_RUN` | Required from S1 onward.  |
+| type-check   | `.llm/tools/run-deno-check.ts --root packages/cli --ext ts,tsx` | `PASS` | 786 files; 7 batches; 0 failed; 0 findings. |
+| lint         | `.llm/tools/run-deno-lint.ts --root packages/cli --ext ts,tsx`  | `PASS` | 786 files; 4 batches; 0 findings.           |
+| format       | `.llm/tools/run-deno-fmt.ts --root packages/cli --ext ts,tsx`   | `PASS` | 786 files; 4 batches; 0 findings.           |
+| quality:scan | `deno task quality:scan`                                        | `PASS` | Repository scan found no violations.        |
+| arch:check   | `deno task arch:check`                                          | `PASS` | Exit 0; existing out-of-scope warnings only. |
 
 ### Fitness Gates
 
 | Gate   | Result    | Evidence | Notes                                           |
 | ------ | --------- | -------- | ----------------------------------------------- |
-| `F-1`  | `NOT_RUN` | —        | Bootstrap is harness artifacts only.            |
-| `F-3`  | `NOT_RUN` | —        | Same.                                           |
+| `F-1`  | `PASS`    | scoped lint wrapper | 0 findings.                              |
+| `F-3`  | `PASS`    | `deno task arch:check` | Exit 0.                               |
 | `F-5`  | `NOT_RUN` | —        | Planned-surface scan recorded in `research.md`. |
 | `F-6`  | `NOT_RUN` | —        | `publish:dry-run` at Gate phase.                |
-| `F-9`  | `NOT_RUN` | —        | S1 is the permission-declaration slice.         |
-| `F-10` | `NOT_RUN` | —        | Per-slice tests named in the slice table.       |
-| `F-19` | `NOT_RUN` | —        | Scoped wrappers only.                           |
+| `F-9`  | `PASS`    | generator tests | SQLite FFI exactly once in all three outputs. |
+| `F-10` | `PASS`    | helper test directory | 18 passed, 171 steps, 0 failed.        |
+| `F-19` | `PASS`    | scoped wrappers | check/lint/fmt all passed.                       |
 
 ### Runtime Gates
 
@@ -157,7 +161,7 @@ No gate-filtering logic to touch: waits are derived from the suite's resolved op
 
 | Consumer           | Result    | Evidence | Notes                                                                     |
 | ------------------ | --------- | -------- | ------------------------------------------------------------------------- |
-| generated projects | `NOT_RUN` | —        | S1 changes emitted permissions; non-sqlite output must be byte-identical. |
+| generated projects | `PASS` | semantic generator tests | Postgres, MySQL, MSSQL, and no-engine output is byte-identical to the pre-branch path for services, background processors, and plugins. |
 
 ## Handoff Notes
 
@@ -167,3 +171,5 @@ No gate-filtering logic to touch: waits are derived from the suite's resolved op
   executable arm under `NETSCRIPT_CACHE_MODE=Executable` on CI, and (b) that S1's permission change
   leaves every non-sqlite scaffold byte-identical.
 - No product code exists at PLAN-EVAL time. Implementation begins only on `PASS`.
+- S1 implementation is complete with green automated gates but is **not self-certified**. Tier-A
+  must review the slice before sign-off; do not start S2 from this handoff.

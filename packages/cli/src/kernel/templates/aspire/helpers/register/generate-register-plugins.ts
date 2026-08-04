@@ -25,6 +25,7 @@ import { RESOURCE_DEFAULTS } from '@netscript/aspire/constants';
 import { TEMPLATE_KEYS } from '../../../../assets/manifest.ts';
 import { renderTemplateAssetSync } from '../../../../adapters/templates/template-asset.ts';
 import { netscriptJsrSpecifier } from '../../../../constants/jsr-specifiers.ts';
+import { withDatabasePermissions } from './database-permissions.ts';
 import { renderHttpEndpointCall } from './render-http-endpoint.ts';
 
 const DENO_NO_LEGACY_ABORT_FLAG = '--unstable-no-legacy-abort';
@@ -40,7 +41,7 @@ const DENO_NO_LEGACY_ABORT_FLAG = '--unstable-no-legacy-abort';
  * @returns Generated TypeScript source as a string
  */
 export function generateRegisterPlugins(options: RegisterPluginsOptions): string {
-  const { plugins, version: _version, denoDefaults } = options;
+  const { plugins, version: _version, denoDefaults, databaseEngine } = options;
   const entries = Object.entries(plugins);
 
   // --- Pass 1 blocks: create all plugin resources ---
@@ -49,6 +50,12 @@ export function generateRegisterPlugins(options: RegisterPluginsOptions): string
   for (const [name, entry] of entries) {
     const workdir = entry.Workdir ?? '.';
     const entrypoint = entry.Entrypoint ?? netscriptJsrSpecifier(`plugin-${name}`, '/services');
+    const entryPermissions = entry.Permissions
+      ? withDatabasePermissions(entry.Permissions, databaseEngine)
+      : undefined;
+    const defaultPermissions = entryPermissions
+      ? denoDefaults.Permissions
+      : withDatabasePermissions(denoDefaults.Permissions, databaseEngine);
 
     const lines: string[] = [];
     lines.push(`  // --- ${name} ---`);
@@ -56,12 +63,12 @@ export function generateRegisterPlugins(options: RegisterPluginsOptions): string
 
     // Resolve permissions — plugins use --watch-hmr
     lines.push(`    const perms = resolvePermissions(`);
-    if (entry.Permissions) {
-      lines.push(`      ${JSON.stringify(entry.Permissions)},`);
+    if (entryPermissions) {
+      lines.push(`      ${JSON.stringify(entryPermissions)},`);
     } else {
       lines.push(`      undefined,`);
     }
-    lines.push(`      ${JSON.stringify(denoDefaults.Permissions)},`);
+    lines.push(`      ${JSON.stringify(defaultPermissions)},`);
     lines.push(`      config.Defaults.Deno.WatchMode,`);
     lines.push(`      '${RESOURCE_DEFAULTS.WatchHmrFlag}',`);
     lines.push(`    );`);
