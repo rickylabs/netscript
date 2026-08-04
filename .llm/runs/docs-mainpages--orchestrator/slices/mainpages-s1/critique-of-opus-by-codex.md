@@ -33,9 +33,9 @@ This is contradicted by the public types and a direct worktree check.
   make those explicitly declared properties readonly.
 - A direct `deno eval --unstable-kv` against `packages/plugin-sagas-core/mod.ts` successfully built
   both current forms: `saga.state.paid = true` and `saga.state.attempts += 1`.
-- The package itself includes a test named “native runtime persists in-place nested state
-  mutations” in `packages/plugin-sagas-core/tests/runtime/saga-store_test.ts`; mutability is an
-  intentional supported behavior, not an accidental docs escape.
+- The package itself includes a test named “native runtime persists transition from snapshot
+  before in-place mutation” in `packages/plugin-sagas-core/tests/runtime/saga-store_test.ts`;
+  mutability is an intentional supported behavior, not an accidental docs escape.
 
 Reassignment with `{ ...saga.state, charged: true }` is valid, but it is an alternative style, not
 a correction required for compilation. The critique must not label the current samples broken on

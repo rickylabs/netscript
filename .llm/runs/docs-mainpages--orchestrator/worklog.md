@@ -70,3 +70,16 @@
   applied ci:skip-e2e with rationale on the PR (docs prose + compile-only fixture; ci:full
   escape hatch noted), re-triggered via empty commit 0e2c7c7b1. **CI fully green** at
   0e2c7c7b1; with Sol re-audit PASS, #1209 is green-gate merge-ready.
+
+## 2026-08-04 — Charter A: S1 closed, S2 dispatched
+
+- Adversarial round complete: outline-codex.md ⇄ outline-opus.md, cross-critiques both ways.
+  Convergent findings locked in slices/mainpages-s1/synthesis.md (notably: the "saga samples
+  don't type-check" claim was refuted by BOTH sides independently compiling them — retracted;
+  the funnel model, CRUD removal, saga-as-code-moment, one-screen budget, and the ban list are
+  locked). Owner override D-7: Opus replaced quota-blocked agy as the rival half.
+- S2 drafting dispatched: Codex Sol·medium, worktree /home/codex/repos/ns-mainpages, branch
+  docs/main-pages-revamp (off origin/main 55aa37f81), thread 019fcc1d-1f11-7533-bae9-
+  2e3b3e550ca0, route matched. Completion artifact: slices/mainpages-s2/draft-report.md.
+  Next: per-page Opus adversarial review → orchestrator slice review → draft PR → S5
+  OpenCode·Grok eval → Sol docs_audit.
