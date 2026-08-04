@@ -84,14 +84,15 @@ important structure is that those helpers split cleanly by environment:
 | `.getCachedEntry(input)` | server | KV read, `{ data, cachedAt }` or `null` |
 | `.invalidate()` | server | drop the KV entries under this resource/action prefix |
 | `.key(input)` | anywhere | the server-tier cache key |
-| `.queryOptions(input, options?)` | client | `{ queryKey, queryFn, staleTime }` for a TanStack hook |
+| `.queryOptions(input, options?)` | server or client | TanStack options whose `queryFn` uses KV on the server and the typed client in the browser |
 | `.mutationOptions(options?)` | client | `{ mutationKey, mutationFn }` plus your callbacks |
 | `.clientKey(input?)` | client | the client-tier key for a truthy input; the action prefix otherwise |
 
-The first five go through `getCacheProvider()`; the last four are pure functions over the resource
-name, action name, and input. That is why the same import is safe in a loader and in an island — the
-browser only ever touches the pure half. Call a provider-backed method from client code and the error
-tells you so:
+The explicit server methods go through `getCacheProvider()`. `queryOptions()` is the bridge: its
+`queryFn` selects that same provider when server bootstrap has registered one, and falls back to the
+typed client when no provider exists in the browser. The key, mutation options, and client-key
+helpers remain pure functions over the resource name, action name, and input. Call an explicitly
+provider-backed method from client code and the error tells you so:
 
 ```text
 [NetScript SDK] Cache provider not initialized. Add `import '@netscript/sdk/cache';` to your server
@@ -129,6 +130,24 @@ toClientKeyPrefix('orders', 'list'); // ['orders', 'list']  — every orders.lis
 await ordersQueryUtils.list.invalidate(); // server tier: drops the KV entries
 queryClient.invalidateQueries(bridgeInvalidation('orders', 'list')); // client tier
 ```
+
+An island cannot call the server-only `.invalidate()` method directly. Fresh owns the HTTP edge for
+that hop: `defineFreshApp()` registers a same-origin, JSON-only POST route at
+`/_netscript/query-cache/invalidate`, and the browser helper sends the canonical server key to it.
+After a committed mutation, invalidate the tiers in this order:
+
+```ts
+import { invalidateServerQueryCache } from '@netscript/fresh/query';
+
+await invalidateServerQueryCache(ordersQueryUtils.list.key(input));
+await queryClient.invalidateQueries({ queryKey: ordersQueryUtils.list.clientKey() });
+```
+
+The endpoint accepts an exact key or prefix made from JSON primitives. Existing app middleware is
+applied to it, so put authentication and authorization middleware on the app as usual. Apps that
+need a different path can set
+`queryCacheInvalidation: { path: '/internal/cache/invalidate' }`; set it to `false` to disable the
+route.
 
 The one thing that *must* line up is the client key on both sides of hydration: the entries the
 server prefetched land in the island's `QueryClient` under the keys the server used, so
@@ -191,6 +210,7 @@ function OrdersInner(props: OrdersIslandProps) {
   const query = useQuery({
     ...ordersQueryUtils.list.queryOptions(props.input),
     initialData: props.initialOrders,
+    initialDataUpdatedAt: props.cachedAt,
     staleTime: 15_000,
   });
 
@@ -203,31 +223,17 @@ constant as the server's `DEFAULT_QUERY_STALE_TIME`, with `gcTime` matching the 
 and `refetchOnWindowFocus` off), hydration paints the rows the server already rendered and does not
 immediately refetch. That is the refetch flash, removed.
 
-**Two boundaries here are worth stating exactly, because the type system draws them differently than
-the documentation does.**
-
 `queryOptions()` never sets `initialData` itself. Its return type — `QueryOptionsWithInitialData` —
 declares `initialData?` and `initialDataUpdatedAt?`, and the module comment describes the intended
 flow: *"The server loader calls `getCachedEntry()` and passes the result as island props. The island
 then sets `initialData` and `initialDataUpdatedAt` on the returned query options."* The factory
 populates neither field; supplying them is the island's job, by design.
 
-But `initialDataUpdatedAt` **cannot currently be passed through the Fresh island hooks.**
-`IslandQueryOptions` in `@netscript/fresh/query` declares `queryKey`, `queryFn`, `initialData`,
-`enabled`, `staleTime`, `gcTime`, `select`, `onError`, `refetchInterval`, and
-`refetchIntervalInBackground` — and no `initialDataUpdatedAt`. Adding it to the options literal is a
-compile error:
-
-```text
-TS2353: Object literal may only specify known properties, and 'initialDataUpdatedAt' does not exist
-in type 'IslandQueryOptions<…>'.
-```
-
-The consequence is concrete: a `cachedAt` of ten minutes ago cannot age the hydrated entry, so
-TanStack treats `initialData` as freshly fetched at hydration time. Thread `cachedAt` into the island
-if you want to *show* it ("updated 10 minutes ago"), but do not expect it to shorten the client's
-freshness window. When the entry's real age has to drive refetch behaviour, use the dehydration path
-below, which carries per-query timestamps.
+Fresh accepts both fields and seeds them into the shared QueryClient before the observer reads it.
+That mount-time server snapshot wins even when a previous island left an older entry under the same
+key. It wins only once for that hook mount: later optimistic writes and refetches take precedence.
+When `cachedAt` is already outside `staleTime`, the rows still paint immediately while
+`isFetching`/`isRefetching` report the background refresh.
 
 ## Dehydrate, or props?
 
@@ -242,7 +248,7 @@ The mechanical differences behind that advice:
 | | `initialData` props | dehydrate / hydrate |
 | --- | --- | --- |
 | Payload | one value per island prop | every prefetched query in one state object |
-| Age | not transferable (see above) | `dataUpdatedAt` per query, plus a `dehydratedAt` stamp |
+| Age | `initialDataUpdatedAt` from the server entry | `dataUpdatedAt` per query, plus a `dehydratedAt` stamp |
 | Source of the data | whatever the loader has — typically the KV entry | whatever the server `QueryClient` fetched |
 | Wiring | a prop and one option | a per-request client, a dehydrate call, a hydrate call |
 
@@ -276,11 +282,9 @@ the dehydration path currently costs you one deliberate type bridge, which is a 
 treat `initialData` props as the default and reach for dehydration only when the table above says you
 need it.
 
-Note also what that prefetch actually does: `queryOptions().queryFn` calls the service through the
-typed client. It does **not** read KV. A page that both reads `getCachedEntry` for its
-server-rendered table and prefetches into a dehydrated client is making a service call, and the
-dehydrated `dataUpdatedAt` records when *that* call happened — not when the KV entry was warmed. Use
-`.prefetch(input)` when you want the KV entry warmed instead.
+On the server, that prefetch runs `queryOptions().queryFn` through the registered CacheProvider, so
+it reads and revalidates the same KV entry as the generated action. In the browser, where no provider
+is registered, the identical options object refetches through the typed client.
 
 On the client, when the state is hydrated decides whether the first render sees it:
 
@@ -296,8 +300,8 @@ On the client, when the state is hydrated decides whether the first render sees 
 `<` in the serialized JSON with the escape `\u003c` on the way out — the escaping the bare-Fresh version above
 forgot.
 
-Guidance that holds: **props by default; dehydrate when one island needs several prefetched queries,
-or when entry age has to survive the trip.**
+Guidance that holds: **props by default; dehydrate when one island needs several prefetched
+queries.** Both paths can preserve server entry age.
 
 ## The import that makes any of this work
 
@@ -344,9 +348,10 @@ Two consequences follow from it being an import side effect rather than a call y
   guard that will catch you.
 - **`getCachedEntry` returns `null` on a cold cache, not an empty payload.** Branch on it; a
   destructure will throw.
-- **Server invalidation does not invalidate the client.** `invalidate()` clears KV; the browser's
-  `QueryClient` is untouched until something calls `invalidateQueries`. Post-mutation freshness
-  usually needs both, which is what `bridgeInvalidation` is for.
+- **Invalidation is two ordered operations.** `invalidateServerQueryCache(action.key(input))`
+  clears KV through the Fresh endpoint; the browser's `QueryClient` is untouched until
+  `invalidateQueries` runs. Await the server operation first so a reload cannot repopulate the page
+  from the entry the mutation just made stale.
 - **`clientKey()` returns a prefix for any falsy input, not just an omitted one.** The implementation
   branches on truthiness, so `clientKey(0)`, `clientKey('')`, and `clientKey(false)` all yield
   `[resource, action]` — while `queryOptions(0).queryKey` is `['orders', 'list', { input: 0 }]`. The
@@ -356,10 +361,9 @@ Two consequences follow from it being an import side effect rather than a call y
   way; an exact-key operation — `setQueryData`, `getQueryData`, `cancelQueries({ exact: true })` —
   does not. **Use `queryOptions(input).queryKey` whenever you need the exact key**, and reserve
   `clientKey()` for the prefix it reliably produces.
-- **The island query result is narrower than TanStack's.** `IslandQueryResult` declares `data`,
-  `error`, `status`, `isLoading`, `isSuccess`, `isError`, and `refetch()` — nothing else. The runtime
-  object is TanStack's, so `isRefetching` and `isFetching` are present at runtime but reading them
-  fails `deno check`. Derive what you need from `status` and `isLoading`.
+- **The island result exposes the common refresh states.** `isFetching` covers the initial request
+  and later fetches; `isRefetching` distinguishes a background refresh after data already exists.
+  The package-owned result remains intentionally narrower than TanStack's full observer object.
 
 ## Related
 

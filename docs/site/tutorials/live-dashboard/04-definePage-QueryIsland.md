@@ -256,6 +256,7 @@ import { useRef } from 'preact/hooks';
 import {
   getIslandQueryClient,
   hydrateFromDehydrated,
+  invalidateServerQueryCache,
   QueryIsland,
   useMutation,
   useQuery,
@@ -265,7 +266,8 @@ import { ordersQueryUtils } from '@app/lib/api-clients.ts';
 
 function OrdersQueryInner(props) {
   const queryClient = useQueryClient();
-  const currentKey = ordersQueryUtils.list.clientKey(props.input);
+  const listOptions = ordersQueryUtils.list.queryOptions(props.input);
+  const currentKey = listOptions.queryKey;
   const hydratedRef = useRef(false);
 
   // Warm the client cache from the server-dehydrated state, once, before first render.
@@ -276,8 +278,9 @@ function OrdersQueryInner(props) {
 
   // Resolves instantly from the hydrated cache (no spinner, no flash)
   const { data: orders, isRefetching } = useQuery({
-    ...ordersQueryUtils.list.queryOptions(props.input),
+    ...listOptions,
     initialData: props.initialOrders,
+    initialDataUpdatedAt: props.cachedAt,
     staleTime: 15_000,
   });
 
@@ -293,8 +296,11 @@ function OrdersQueryInner(props) {
     onError: (_e, _v, ctx) => {
       if (ctx?.previous) queryClient.setQueryData(currentKey, ctx.previous);
     },
-    onSettled: () =>
-      queryClient.invalidateQueries({ queryKey: ordersQueryUtils.list.clientKey() }),
+    onSuccess: async () => {
+      // Invalidate the server tier first, so a reload cannot repaint stale KV data.
+      await invalidateServerQueryCache(ordersQueryUtils.list.key(props.input));
+      await queryClient.invalidateQueries({ queryKey: ordersQueryUtils.list.clientKey() });
+    },
   });
 
   const items = orders?.items ?? [];
@@ -312,10 +318,15 @@ export default function OrdersQueryIsland(props) {
 
 One constraint makes this work: the hydrated entries land in the island's shared QueryClient under
 the exact query keys the server used, so `useQuery` only benefits if `queryOptions(props.input)`
-produces the same key the server prefetched. `initialData` itself comes from the explicit
-`initialOrders` prop — it is the belt to hydration's suspenders, covering the case where the
-dehydrated payload is absent. `clientKey(input)` is that same stable key, which is why the
-mutation's optimistic writes land on exactly the rows the query is showing.
+produces the same key the server prefetched. `initialData` comes from the explicit `initialOrders`
+prop and wins the mount-time handoff even if the shared client already contains an older entry;
+`initialDataUpdatedAt` preserves the KV entry's real age. Later optimistic writes and refetches win
+over that seed.
+
+The mutation clears two distinct tiers. `invalidateServerQueryCache()` reaches the JSON-only route
+that `defineFreshApp()` registers automatically, using `.key(props.input)` for the serialized KV
+key. Only after that succeeds does `invalidateQueries()` refresh the browser tier. No product-owned
+API route is required, and a reload between the two cannot read around the entry just invalidated.
 
 ## Step 5 — Render the Deferred stats layer
 

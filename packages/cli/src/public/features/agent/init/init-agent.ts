@@ -9,6 +9,8 @@ import {
   EMBEDDED_AGENT_TOOL_PATHS,
 } from "../../../../kernel/assets/agent-tools.generated.ts";
 import { netscriptJsrSpecifier } from "../../../../kernel/constants/jsr-specifiers.ts";
+import { generateEditorConfigFiles } from '../../../../kernel/adapters/scaffold/editor-config.ts';
+import type { EditorChoice } from '../../../../kernel/domain/scaffold/workspace-config.ts';
 import type { AgentDocsGenerator } from "./agent-docs-generator.ts";
 import type { AgentInitFileSystem } from "./agent-init-file-system.ts";
 import type { AspireAgentInitializer } from "./aspire-agent-initializer.ts";
@@ -77,7 +79,8 @@ export async function initAgent(
   if (input.withDocs && !docs) {
     throw new Error("Offline documentation generation is not configured");
   }
-  const hosts = await resolveHosts(input, dependencies.fs);
+  const editor = await resolveEditor(input, dependencies.fs);
+  const hosts = await resolveHosts(input, dependencies.fs, editor);
   const changedFiles: string[] = [];
   const messages: string[] = [];
   for (const path of toolBundle.paths) {
@@ -96,6 +99,15 @@ export async function initAgent(
       dependencies.fs,
       join(input.projectRoot, ".netscript", "docs", path),
       content,
+      changedFiles,
+    );
+  }
+  for (const file of generateEditorConfigFiles(editor)) {
+    if (file.path === '.zed/settings.json') continue;
+    await writeChanged(
+      dependencies.fs,
+      join(input.projectRoot, file.path),
+      file.content,
       changedFiles,
     );
   }
@@ -126,11 +138,19 @@ export async function initAgent(
       changedFiles,
     );
   }
-  if (hosts.includes("vscode")) {
+  if (editor === 'vscode') {
     await writeHostConfig(
       dependencies.fs,
       join(input.projectRoot, ".vscode", "mcp.json"),
       "servers",
+      input.projectRoot,
+      changedFiles,
+      dependencies.cliSpecifier,
+    );
+  }
+  if (editor === 'zed') {
+    await writeZedConfig(
+      dependencies.fs,
       input.projectRoot,
       changedFiles,
       dependencies.cliSpecifier,
@@ -168,9 +188,28 @@ export async function initAgent(
   return { hosts, changedFiles, messages };
 }
 
+async function resolveEditor(
+  input: InitAgentInput,
+  fs: AgentInitFileSystem,
+): Promise<EditorChoice> {
+  if (input.editor) return input.editor;
+  if (input.host === 'vscode' || input.host === 'all') return 'vscode';
+  const hasZed = await fs.exists(join(input.projectRoot, '.zed'));
+  const hasVsCode = await fs.exists(join(input.projectRoot, '.vscode'));
+  if (hasZed && hasVsCode) {
+    throw new Error(
+      'Both .zed and .vscode exist; pass --editor zed, --editor vscode, or --editor none.',
+    );
+  }
+  if (hasZed) return 'zed';
+  if (hasVsCode) return 'vscode';
+  return 'none';
+}
+
 async function resolveHosts(
   input: InitAgentInput,
   fs: AgentInitFileSystem,
+  editor: EditorChoice,
 ): Promise<readonly AgentHost[]> {
   if (input.host === "all") return ["claude", "vscode"];
   if (input.host) return [input.host];
@@ -178,10 +217,10 @@ async function resolveHosts(
   if (await fs.exists(join(input.projectRoot, ".claude"))) {
     detected.push("claude");
   }
-  if (await fs.exists(join(input.projectRoot, ".vscode"))) {
+  if (editor === 'vscode') {
     detected.push("vscode");
   }
-  return detected.length > 0 ? detected : ["claude", "vscode"];
+  return detected.length > 0 ? detected : ["claude"];
 }
 
 async function writeHostConfig(
@@ -229,6 +268,51 @@ async function writeHostConfig(
       2,
     )
   }\n`;
+  await writeChanged(fs, path, content, changed);
+}
+
+async function writeZedConfig(
+  fs: AgentInitFileSystem,
+  projectRoot: string,
+  changed: string[],
+  cliSpecifier = netscriptJsrSpecifier('cli'),
+): Promise<void> {
+  const path = join(projectRoot, '.zed', 'settings.json');
+  const generated = JSON.parse(
+    generateEditorConfigFiles('zed').find((file) => file.path === '.zed/settings.json')?.content ??
+      '{}',
+  ) as Record<string, unknown>;
+  const currentText = await fs.readText(path);
+  const current = currentText ? JSON.parse(currentText) as Record<string, unknown> : {};
+  const contextServers = current.context_servers && typeof current.context_servers === 'object'
+    ? current.context_servers as Record<string, unknown>
+    : {};
+  const command = (name: 'netscript' | 'aspire') =>
+    name === 'netscript'
+      ? {
+        command: 'deno',
+        args: [
+          'run',
+          '--config',
+          join(projectRoot, 'deno.json'),
+          '-A',
+          cliSpecifier,
+          'agent',
+          'mcp',
+          '--project-root',
+          projectRoot,
+        ],
+      }
+      : { command: 'aspire', args: ['agent', 'mcp'] };
+  const content = `${JSON.stringify({
+    ...generated,
+    ...current,
+    context_servers: {
+      ...contextServers,
+      netscript: command('netscript'),
+      aspire: command('aspire'),
+    },
+  }, null, 2)}\n`;
   await writeChanged(fs, path, content, changed);
 }
 

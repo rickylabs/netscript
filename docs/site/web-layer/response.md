@@ -212,6 +212,13 @@ tabulated once, in
 [Deferred and streaming UI](/web-layer/defer-streaming-ui/#the-policy-engine); the short version is
 that `balanced` trusts a fresh cache and `background-refresh` re-verifies even a fresh one.
 
+That policy governs reads; it does not make writes coherent by itself. After a mutation commits,
+await `invalidateServerQueryCache(action.key(input))` to clear the server CacheProvider entry, then
+invalidate the matching island QueryClient key. The ordering matters under `balanced`: if the
+browser reloads before the server tier is cleared, the otherwise-correct cache-first policy can
+paint the value the write just made stale. `defineFreshApp()` owns the standard invalidation route,
+so application code does not need a bespoke proxy handler.
+
 `withStreaming()` opts the page into builder-owned HTML streaming. It only affects layers that also
 declare `delivery: 'stream'`; the page-level flag and the per-layer flag are both required, and
 neither warns when the other is missing. The streaming handler still applies the page's headers and

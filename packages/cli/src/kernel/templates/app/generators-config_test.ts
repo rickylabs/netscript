@@ -73,7 +73,10 @@ describe('generateAppDenoJson', () => {
       appName: 'dashboard',
       importMode: 'jsr',
     }));
-    assertEquals(config.tasks.dev, 'deno run -A npm:vite --configLoader native');
+    assertEquals(
+      config.tasks.dev,
+      'deno task --cwd ../.. deps:verify && deno run -A npm:vite --configLoader native',
+    );
     assertEquals(config.tasks.build, 'deno run -A npm:vite build');
     assertEquals(config.tasks.serve, 'deno run -A npm:vite preview');
   });
@@ -100,7 +103,11 @@ describe('generateAppDenoJson', () => {
 
   it('should end with trailing newline', () => {
     assert(
-      generateAppDenoJson({ projectName: 'test', appName: 'web', importMode: 'jsr' }).endsWith(
+      generateAppDenoJson({
+        projectName: 'test',
+        appName: 'web',
+        importMode: 'jsr',
+      }).endsWith(
         '\n',
       ),
     );
@@ -115,7 +122,14 @@ describe('generateAppDenoJson', () => {
 
     assertEquals(config.name, '@my-project/dashboard');
     assertEquals(config.exports, './main.ts');
-    assertEquals(Object.keys(config.tasks), ['check', 'dev', 'build', 'serve', 'start', 'update']);
+    assertEquals(Object.keys(config.tasks), [
+      'check',
+      'dev',
+      'build',
+      'serve',
+      'start',
+      'update',
+    ]);
     assertEquals(config.exclude, ['**/_fresh/*']);
     assertEquals(Object.keys(config.imports).slice(0, 6), [
       '@app/',
@@ -126,7 +140,10 @@ describe('generateAppDenoJson', () => {
       'fresh',
     ]);
     assertEquals(config.imports['@app/'], './');
-    assertEquals(config.imports['@my-project/contracts'], '../../contracts/mod.ts');
+    assertEquals(
+      config.imports['@my-project/contracts'],
+      '../../contracts/mod.ts',
+    );
     assertEquals(config.imports.vite, SCAFFOLD_APP_IMPORTS.vite);
   });
 
@@ -152,7 +169,10 @@ describe('generateAppDenoJson', () => {
       packagesAsWorkspaceMembers: true,
     }));
 
-    assertEquals(config.imports['@netscript/fresh'], '../../packages/fresh/mod.ts');
+    assertEquals(
+      config.imports['@netscript/fresh'],
+      '../../packages/fresh/mod.ts',
+    );
     assertEquals(
       config.imports['@netscript/fresh/builders'],
       '../../packages/fresh/src/application/builders/mod.ts',
@@ -173,20 +193,32 @@ describe('generateAppDenoJson', () => {
       config.imports['@netscript/fresh/vite'],
       '../../packages/fresh/src/application/vite/vite.ts',
     );
-    assertEquals(config.imports['@netscript/fresh-ui'], '../../packages/fresh-ui/mod.ts');
+    assertEquals(
+      config.imports['@netscript/fresh-ui'],
+      '../../packages/fresh-ui/mod.ts',
+    );
     assertEquals(
       config.imports['@netscript/fresh-ui/interactive'],
       '../../packages/fresh-ui/interactive.ts',
     );
     assertEquals(config.imports['@netscript/sdk'], '../../packages/sdk/mod.ts');
-    assertEquals(config.imports['@netscript/sdk/client'], '../../packages/sdk/src/client/mod.ts');
-    assertEquals(config.imports['@netscript/sdk/query'], '../../packages/sdk/src/query/mod.ts');
+    assertEquals(
+      config.imports['@netscript/sdk/client'],
+      '../../packages/sdk/src/client/mod.ts',
+    );
+    assertEquals(
+      config.imports['@netscript/sdk/query'],
+      '../../packages/sdk/src/query/mod.ts',
+    );
     assertEquals(
       config.imports['@netscript/sdk/query-client'],
       '../../packages/sdk/src/query-client/mod.ts',
     );
     assertEquals(config.imports['@test/contracts'], '../../contracts/mod.ts');
-    assertEquals(config.imports['tailwindcss'], SCAFFOLD_APP_IMPORTS.tailwindcss);
+    assertEquals(
+      config.imports['tailwindcss'],
+      SCAFFOLD_APP_IMPORTS.tailwindcss,
+    );
     assertEquals(config.imports.vite, SCAFFOLD_APP_IMPORTS.vite);
     assertEquals(config.compilerOptions.types, ['vite/client']);
   });
@@ -207,7 +239,10 @@ describe('generateAppDenoJson', () => {
 
 describe('generateAppViteConfig', () => {
   it('should include the NetScript Vite plugin and workspace watch paths', () => {
-    const output = generateAppViteConfig({ appName: 'dashboard', appPort: 50_123 });
+    const output = generateAppViteConfig({
+      appName: 'dashboard',
+      appPort: 50_123,
+    });
     assertStringIncludes(output, 'createNetScriptVitePlugin');
     assertStringIncludes(output, "resolve(workspaceRoot, 'packages')");
     assertStringIncludes(output, "resolve(workspaceRoot, 'contracts')");
@@ -215,7 +250,10 @@ describe('generateAppViteConfig', () => {
   });
 
   it('should include all @app aliases mirrored from the playground', () => {
-    const output = generateAppViteConfig({ appName: 'dashboard', appPort: 50_123 });
+    const output = generateAppViteConfig({
+      appName: 'dashboard',
+      appPort: 50_123,
+    });
     assertStringIncludes(output, '@app/assets');
     assertStringIncludes(output, '@app/components');
     assertStringIncludes(output, '@app/islands');
@@ -224,17 +262,25 @@ describe('generateAppViteConfig', () => {
   });
 
   it('keeps alias and plugin ordering stable in the vite config', () => {
-    const output = generateAppViteConfig({ appName: 'dashboard', appPort: 50_123 });
+    const output = generateAppViteConfig({
+      appName: 'dashboard',
+      appPort: 50_123,
+    });
 
     assert(
-      output.indexOf("{ find: '@app/assets'") < output.indexOf("{ find: '@app/components'") &&
-        output.indexOf("{ find: '@app/components'") < output.indexOf("{ find: '@app/islands'") &&
-        output.indexOf("{ find: '@app/islands'") < output.indexOf("{ find: '@app/lib'") &&
-        output.indexOf("{ find: '@app/lib'") < output.indexOf("{ find: '@app/routes'"),
+      output.indexOf("{ find: '@app/assets'") <
+          output.indexOf("{ find: '@app/components'") &&
+        output.indexOf("{ find: '@app/components'") <
+          output.indexOf("{ find: '@app/islands'") &&
+        output.indexOf("{ find: '@app/islands'") <
+          output.indexOf("{ find: '@app/lib'") &&
+        output.indexOf("{ find: '@app/lib'") <
+          output.indexOf("{ find: '@app/routes'"),
     );
     assert(
       output.indexOf('fresh(),') < output.indexOf('tailwindCSS(),') &&
-        output.indexOf('tailwindCSS(),') < output.indexOf('createNetScriptVitePlugin({'),
+        output.indexOf('tailwindCSS(),') <
+          output.indexOf('createNetScriptVitePlugin({'),
     );
     const fallback = /process\.env\.PORT \?\? '(\d+)'/.exec(output);
     assertEquals(fallback?.[1] !== undefined, true);

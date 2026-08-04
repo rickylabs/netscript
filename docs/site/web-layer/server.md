@@ -99,9 +99,12 @@ itself the trigger; evaluating the `/server` module is.
 3. **Static files** — `app.use(staticFiles())` unless `staticFiles` is `false`; pass your own
    `Middleware` to replace Fresh's.
 4. **App middleware** — `app.use(...options.middleware)`, skipped entirely when the array is empty.
-5. **`configure(app)`** — after middleware, **before** file-system routes. Explicit routes registered
+5. **Query-cache invalidation** — register the JSON-only POST route at
+   `/_netscript/query-cache/invalidate`, unless `queryCacheInvalidation` is `false`; an object can
+   override its path. The middleware above protects this route too.
+6. **`configure(app)`** — after middleware, **before** file-system routes. Explicit routes registered
    here are inserted ahead of the generated ones.
-6. **File-system routes** — `app.fsRoutes()`, or `app.fsRoutes(pattern)` when `fsRoutes` is a string,
+7. **File-system routes** — `app.fsRoutes()`, or `app.fsRoutes(pattern)` when `fsRoutes` is a string,
    or your own callback when it is a function. `false` skips the step.
 
 The returned value is the `App<State>` itself, so `app.use(...)`, `app.get(...)`, and `app.listen(...)`
@@ -119,6 +122,7 @@ remain available afterwards for anything the options do not cover.
 | `configure` | `(app) => void` | Runs after middleware, before file-system routes. |
 | `fsRoutes` | `((app, pattern?) => void) \| false \| string` | Mount at a pattern, replace, or disable. |
 | `telemetry` | `boolean \| FreshAppTelemetryOptions` | **Reserved** — accepted and not yet read. |
+| `queryCacheInvalidation` | `FreshQueryCacheInvalidationOptions \| false` | Configure the standard server-cache invalidation path or disable it. |
 
 ```ts
 // mount an app's file routes under a prefix and serve assets elsewhere
@@ -281,6 +285,7 @@ detailed on the deferred-and-streaming-UI leaf.
 | --- | --- | --- |
 | `defineFreshApp` | `/server` | Create a NetScript-managed Fresh `App` with baseline bootstrap defaults and adapter seams. |
 | `DefineFreshAppOptions` | `/server` | Options contract for `defineFreshApp` (app, middleware, static files, lifecycle hooks, fs routes, telemetry). |
+| `FreshQueryCacheInvalidationOptions` | `/server` | Path configuration for the standard same-origin JSON invalidation route. |
 | `App` | `/server` | Fresh application instance: middleware, verb routing, `ws`, `fsRoutes`, `handler()`, `listen()`. |
 | `Middleware` | `/server` | Request-handling building block receiving a `Context<State>`. |
 | `FreshAppFactory` | `/server` | `createApp` seam: `(freshConfig?) => App<State>`. |

@@ -4,6 +4,8 @@
  * @module
  */
 
+import type { QueryParams } from '../ports/query-options.ts';
+
 /**
  * Configuration for ActionMethod.queryOptions() — the bridge between
  * server-side SDK caching and client-side TanStack Query.
@@ -13,8 +15,12 @@
  * passes the result as island props. The island then sets `initialData` and
  * `initialDataUpdatedAt` on the returned query options. See RFC 17 §3.4.
  */
-export interface ActionQueryOptions {
-  /** Override staleTime for the client-side cache (default: inherits from server factory). */
+export interface ActionQueryOptions extends QueryParams {
+  /**
+   * Override staleTime for both the server CacheQuery and client-side cache.
+   * Other cache-policy fields apply when the query function runs on a server
+   * with a registered cache provider.
+   */
   staleTime?: number;
 }
 

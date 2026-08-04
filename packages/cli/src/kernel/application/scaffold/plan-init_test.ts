@@ -50,10 +50,12 @@ function context(scaffolder: InMemoryScaffolder): InitPipelineContext {
 }
 
 function fakeDeployTarget(key: string): DeployTargetPort {
-  const handler =
-    (operation: DeployTargetOperation) =>
-    (_request: DeployTargetRequest): Promise<DeployTargetResult> =>
-      Promise.resolve({ target: key, operation, message: `${key} ${operation} ok` });
+  const handler = (operation: DeployTargetOperation) => (_request: DeployTargetRequest): Promise<DeployTargetResult> =>
+    Promise.resolve({
+      target: key,
+      operation,
+      message: `${key} ${operation} ok`,
+    });
   return {
     key,
     label: key,
@@ -82,15 +84,17 @@ function fakeDeployDependencies(): PublicCommandDependencies {
     loadConfig: () => Promise.resolve({ deploy: {} }),
     resolveProjectRoot: (projectRoot?: string) => Promise.resolve(projectRoot ?? '/workspace'),
     manifestPort: {
-      resolve: () => Promise.reject(new Error('manifest resolution is not used by this test')),
+      resolve: () =>
+        Promise.reject(
+          new Error('manifest resolution is not used by this test'),
+        ),
     },
     osServices: {},
     deployTargets: new DeployTargetRegistry([
       ['compose', fakeDeployTarget('compose')],
       ['docker', fakeDeployTarget('docker')],
     ]),
-    denoDeployTargetFactory: (_defaults: DenoDeployTargetDefaults) =>
-      fakeDeployTarget('deno-deploy'),
+    denoDeployTargetFactory: (_defaults: DenoDeployTargetDefaults) => fakeDeployTarget('deno-deploy'),
   } as unknown as PublicCommandDependencies;
 }
 
@@ -122,12 +126,16 @@ function extractDeployInvocations(workflow: string): string[][] {
     }
 
     if (trimmed.startsWith('args+=(') && trimmed.endsWith(')')) {
-      optionalShellArgs.push(...shellWords(trimmed.slice('args+=('.length, -1)));
+      optionalShellArgs.push(
+        ...shellWords(trimmed.slice('args+=('.length, -1)),
+      );
       continue;
     }
 
     if (trimmed === `deno x -A ${netscriptJsrSpecifier('cli')} "\${args[@]}"`) {
-      if (!shellArgs) throw new Error('Found args invocation before args array declaration.');
+      if (!shellArgs) {
+        throw new Error('Found args invocation before args array declaration.');
+      }
       invocations.push(shellArgs);
       if (optionalShellArgs.length > 0) {
         invocations.push([...shellArgs, ...optionalShellArgs]);
@@ -135,7 +143,9 @@ function extractDeployInvocations(workflow: string): string[][] {
       continue;
     }
 
-    if (!trimmed.startsWith(`deno x -A ${netscriptJsrSpecifier('cli')} `)) continue;
+    if (!trimmed.startsWith(`deno x -A ${netscriptJsrSpecifier('cli')} `)) {
+      continue;
+    }
 
     const commandLines = [trimmed];
     for (let cursor = index + 1; cursor < lines.length; cursor++) {
@@ -201,7 +211,8 @@ Deno.test('#966 scaffoldRoot keeps source appsettings tracked by git', async () 
   const scaffolder = new InMemoryScaffolder();
   await scaffoldRoot(context(scaffolder), options());
 
-  const gitignore = scaffolder.files.get('/workspace/deploy-app/.gitignore') ?? '';
+  const gitignore = scaffolder.files.get('/workspace/deploy-app/.gitignore') ??
+    '';
   assertEquals(gitignore.split(/\r?\n/).includes('appsettings.json'), false);
 });
 
@@ -227,6 +238,29 @@ Deno.test('scaffoldRoot emits the Aspire CLI task runner only for Aspire workspa
   );
   assert(!noAspireResult.filesCreated.includes(taskPath));
   assertEquals(noAspireScaffolder.files.has(taskPath), false);
+});
+
+Deno.test('scaffoldRoot always emits the npm materialization verifier and Deno pin', async () => {
+  for (const noAspire of [false, true]) {
+    const scaffolder = new InMemoryScaffolder();
+    const result = await scaffoldRoot(
+      context(scaffolder),
+      options({ noAspire }),
+    );
+    const verifierPath = '/workspace/deploy-app/.netscript/verify-node-modules.ts';
+    const packageJsonPath = '/workspace/deploy-app/package.json';
+
+    assert(result.filesCreated.includes(verifierPath));
+    assertStringIncludes(
+      scaffolder.files.get(verifierPath) ?? '',
+      'Deno npm materialization is incomplete.',
+    );
+    assert(result.filesCreated.includes(packageJsonPath));
+    assertEquals(JSON.parse(scaffolder.files.get(packageJsonPath) ?? '{}'), {
+      private: true,
+      engines: { deno: '2.9.0' },
+    });
+  }
 });
 
 Deno.test('scaffoldRoot emits deploy workflow invocations accepted by the real deploy parser', async () => {
@@ -284,7 +318,8 @@ Deno.test('scaffoldRoot emits deploy workflow invocations accepted by the real d
   ]);
 
   for (const args of invocations) {
-    const command = createDeployCommand(fakeDeployDependencies()).noExit().throwErrors();
+    const command = createDeployCommand(fakeDeployDependencies()).noExit()
+      .throwErrors();
     await command.parse(args.slice(1));
   }
 });

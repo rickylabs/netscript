@@ -3,7 +3,7 @@ layout: layouts/base.vto
 title: Orchestration with Aspire
 templateEngine: [vento, md]
 prev: { label: "Observability", href: "/explanation/observability/" }
-next: { label: "Capabilities", href: "/capabilities/" }
+next: { label: "How NetScript's path compares", href: "/explanation/compared/" }
 order: 7
 ---
 
@@ -548,4 +548,4 @@ The remaining trade-offs of the default path:
 - **Related:** {{ comp.xref({ key: "explain:observability", text: "Observability" }) }} explains the
   spans and logs the dashboard at `:18888` collects.
 
-{{ comp.nextPrev({ prev: { label: "Observability", href: "/explanation/observability/" }, next: { label: "Capabilities", href: "/capabilities/" } }) }}
+{{ comp.nextPrev({ prev: { label: "Observability", href: "/explanation/observability/" }, next: { label: "How NetScript's path compares", href: "/explanation/compared/" } }) }}

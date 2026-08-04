@@ -74,7 +74,13 @@ export interface ActionMethod<
 
   // === TanStack Query extensions (RFC 17) ===
 
-  /** TanStack queryOptions with typed queryKey and queryFn from the contract. */
+  /**
+   * Build TanStack query options for this action.
+   *
+   * The query function shares this action's CacheQuery entry when executed on
+   * a server with a registered cache provider. Browser execution calls the
+   * typed service client directly.
+   */
   queryOptions: (
     props: ProcedureInput<TContract, TAction>,
     options?: ActionQueryOptions,
