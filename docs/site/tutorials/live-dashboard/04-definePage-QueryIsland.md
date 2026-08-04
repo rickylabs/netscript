@@ -155,8 +155,11 @@ the cache. It is sent to the client alongside the initial HTML, eliminating the 
 
 Now compose the visual regions. You add the server-rendered table, the interactive query island, and
 a stats panel loaded asynchronously through a deferred partial — then lay them out and `build()`. The
-`partial` and `partialName` entries below are what turn a layer into a refreshable region;
-[Partials](/web-layer/partials/) covers the partial route on the other end:
+three layers resolve concurrently, so the page costs its slowest region rather than the sum — the
+loader contract, the full layer config, and slot placement are in
+[Layers, layout, and slots](/web-layer/layers/). The `partial` and `partialName` entries below are
+what turn a layer into a refreshable region; [Partials](/web-layer/partials/) covers the partial route
+on the other end:
 
 ```tsx
 // apps/dashboard/routes/(dashboard)/dashboard/orders/index.tsx (continued)
