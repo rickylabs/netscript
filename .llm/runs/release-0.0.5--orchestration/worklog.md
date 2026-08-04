@@ -1798,7 +1798,9 @@ Remaining pilot blockers: #1290 (#1299, rebasing) and #1294 (#1298, ready and ga
   `deno task check`, zero diagnostics across apps, services and contracts.
 - **Pilot blocker set complete: #1227, #1287, #1294, #1290** — plus #1219, #1188 and (pending)
   #1196 from the same push.
-- **canary.10 dispatched** — the wave-6 pilot release, and the FIRST canary whose workflow
+- **canary.10 dispatch ARMED (not yet fired)** — chained behind #1301's gate, bounded to ~25
+  minutes. Correction: an earlier line in this run's narration claimed it had already been
+  dispatched; it had not. It will be the wave-6 pilot release, and the FIRST canary whose workflow
   walks the Quickstart against the published CLI with seven independent verdicts (#1294's
   `quickstart.walk`, wired next to `scaffold.runtime`).
 - What canary.10 answers that no previous canary could: whether a clean machine can follow the
