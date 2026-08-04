@@ -84,3 +84,10 @@ Confirmed findings:
   claude-print (404 model not found). Owner redirected S5 to Gemini (agy) as its quota resets.
   S5 evaluator: agy · gemini-3.6-flash · effort high, same brief; artifact
   slices/mainpages-s5/gemini-eval.md. Opus final audit (D-9) continues unaffected.
+
+- **D-12 (owner correction, 2026-08-04).** Gemini's S5 praise wording ("elite",
+  "exceptionally fair", "massive upgrade") is itself AI slop — hollow superlatives with no
+  information content. Corrected weighting: an evaluator's praise is noise; only its concrete,
+  checkable adjustment proposals count, and ship-confidence rests on executed-evidence audits
+  (the Opus audit that ran the scaffold), never on flattering verdict prose. Do not relay
+  evaluator praise in PR comments or reports.
