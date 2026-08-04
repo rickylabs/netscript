@@ -60,6 +60,8 @@ typed evidence-class contract.
 | 2026-08-04 | doctrine | PASS WITH BASELINE NOTE | no changed-file violation; focused reporter only flags existing cardinality and a local fixture function named `describe` |
 | 2026-08-04 | JSR final | PASS | doc-lint exit 0; raw publish dry-run succeeds; public surface unchanged |
 | 2026-08-04 | opposite-family review | PASS | Claude Opus ordinary slice review; F1 documentation gap actioned before sign-off |
+| 2026-08-04 | evaluation handoff | COMPOSED PASS | independent reviewer verdict relayed in the PR; supervisor did not self-certify |
+| 2026-08-04 | lifecycle | READY-MERGE | PR non-draft; DoD/evidence mapping complete; final-head mirror/check run triggered after this record |
 
 ## Gate results
 
@@ -82,6 +84,8 @@ typed evidence-class contract.
 
 ## Reconcile notes
 
-- S0 committed and pushed; PR #1233 remains draft until independent review and S1 sign-off.
+- S0 and S1 are committed and explicitly pushed; PR #1233 is non-draft at `status:ready-merge`.
 - S1 opposite-family review: PASS. Its F1 finding was actioned by updating the hand-authored site
   reference; the package README mirror remains deferred with its generated publish asset.
+- The final evidence push is deliberately after applying `status:ready-merge`, allowing the live
+  acceptance mirror to tick issue #1136 and the close-gate to evaluate the final head.

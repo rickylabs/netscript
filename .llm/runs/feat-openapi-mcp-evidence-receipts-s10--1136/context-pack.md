@@ -11,7 +11,7 @@ the existing #1078 gate, while a result rejected after flow execution cannot lea
 - Pre-existing unrelated `deno.lock` diff: one added line; preserve and never stage.
 - S8 hard dependency: PASS, 14 focused tests green.
 - Plan: locked; PLAN-EVAL row composed per milestone-run waiver.
-- S0: committed as `1282ee551`; draft PR #1233 open with required taxonomy and milestone.
+- S0: committed as `1282ee551`; PR #1233 is non-draft with required taxonomy and milestone.
 - Implementation: complete and locally green; opposite-family S1 review PASS.
 - Tests: focused 11/0; package 109/0; configured scoped check/lint/fmt all 0 findings.
 - Quality/JSR: focused MCP scan 0 findings/0 allowances; doc-lint and raw publish dry-run pass.
@@ -30,7 +30,6 @@ the existing #1078 gate, while a result rejected after flow execution cannot lea
 
 ## Resume next
 
-1. Recheck the reviewer-requested hand-authored site-reference update.
-2. Commit S1 with updated run evidence, excluding the pre-existing `deno.lock` diff.
-3. Push by explicit refspec and update PR #1233 phase/acceptance evidence.
-4. Complete composed milestone evaluation, review-thread/check gates, and mark ready when green.
+1. Push this final ready-merge evidence record by explicit refspec.
+2. Confirm the live acceptance mirror checks issue #1136's mapped box.
+3. Require all final-head checks and the unanswered-thread gate to pass before handoff.
