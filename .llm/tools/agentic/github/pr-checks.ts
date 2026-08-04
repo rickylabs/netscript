@@ -24,10 +24,25 @@ export interface CheckRun {
   readonly started_at: string;
   readonly completed_at?: string | null;
   readonly html_url?: string;
+  readonly latest_attempt?: boolean;
 }
 
 export interface ClassifiedCheckRun extends CheckRun {
   readonly classification: CheckRunClassification;
+}
+
+export interface WorkflowJob {
+  readonly id: number;
+  readonly name: string;
+  readonly status: string;
+  readonly conclusion: string | null;
+  readonly started_at: string | null;
+  readonly completed_at: string | null;
+  readonly check_run_url: string;
+  readonly html_url?: string;
+  readonly run_id: number;
+  readonly run_attempt: number;
+  readonly workflow_run_started_at?: string;
 }
 
 export interface PrCheckReport {
@@ -56,12 +71,60 @@ interface CheckRunsResponse {
   readonly check_runs: readonly CheckRun[];
 }
 
+interface WorkflowRun {
+  readonly id: number;
+  readonly head_sha: string;
+  readonly run_started_at: string;
+}
+
+interface WorkflowRunsResponse {
+  readonly workflow_runs: readonly WorkflowRun[];
+}
+
+interface WorkflowJobsResponse {
+  readonly jobs: readonly WorkflowJob[];
+}
+
 const FAILURE_CONCLUSIONS = new Set([
   'action_required',
   'failure',
   'startup_failure',
   'timed_out',
 ]);
+
+/** Adds latest-attempt Actions jobs to the commit check-run candidates. */
+export function mergeLatestWorkflowJobs(
+  checkRuns: readonly CheckRun[],
+  jobs: readonly WorkflowJob[],
+  headSha: string,
+): CheckRun[] {
+  const runsById = new Map(checkRuns.map((run) => [run.id, run]));
+  for (const job of jobs) {
+    const checkRunId = checkRunIdFromUrl(job.check_run_url);
+    const existing = runsById.get(checkRunId);
+    runsById.set(checkRunId, {
+      id: checkRunId,
+      name: job.name,
+      head_sha: headSha,
+      status: job.status,
+      conclusion: job.conclusion,
+      started_at: job.started_at ?? job.workflow_run_started_at ?? '1970-01-01T00:00:00Z',
+      completed_at: job.completed_at,
+      html_url: job.html_url ?? existing?.html_url,
+      latest_attempt: true,
+    });
+  }
+  return [...runsById.values()];
+}
+
+function checkRunIdFromUrl(url: string): number {
+  const match = /\/check-runs\/(\d+)$/.exec(url);
+  const id = Number(match?.[1]);
+  if (!Number.isSafeInteger(id) || id < 1) {
+    throw new Error(`Invalid Actions job check_run_url: ${url}`);
+  }
+  return id;
+}
 
 /** Classifies check runs without performing I/O. */
 export function classifyCheckRuns(
@@ -116,7 +179,15 @@ export function buildPrCheckReport(
   };
 }
 
+/** Returns the CLI exit code for a completed PR-check report. */
+export function exitCodeForPrCheckReport(report: PrCheckReport): number {
+  return report.ok ? 0 : 1;
+}
+
 function compareStartedAt(left: CheckRun, right: CheckRun): number {
+  const attemptDifference = Number(left.latest_attempt ?? false) -
+    Number(right.latest_attempt ?? false);
+  if (attemptDifference) return attemptDifference;
   const timeDifference = Date.parse(left.started_at) - Date.parse(right.started_at);
   return timeDifference || left.id - right.id;
 }
@@ -194,6 +265,29 @@ async function fetchCheckRuns(repo: string, headSha: string): Promise<CheckRun[]
   return pages.flatMap((page) => page.check_runs);
 }
 
+async function fetchLatestWorkflowJobs(repo: string, headSha: string): Promise<WorkflowJob[]> {
+  const runPages = await ghApi<readonly WorkflowRunsResponse[]>(
+    `repos/${repo}/actions/runs?per_page=100`,
+    ['--method', 'GET', '-f', `head_sha=${headSha}`, '--paginate', '--slurp'],
+  );
+  const runs = runPages.flatMap((page) => page.workflow_runs)
+    .filter((run) => run.head_sha === headSha);
+  const jobs: WorkflowJob[] = [];
+  for (const run of runs) {
+    const pages = await ghApi<readonly WorkflowJobsResponse[]>(
+      `repos/${repo}/actions/runs/${run.id}/jobs?filter=latest&per_page=100`,
+      ['--method', 'GET', '--paginate', '--slurp'],
+    );
+    jobs.push(
+      ...pages.flatMap((page) => page.jobs).map((job) => ({
+        ...job,
+        workflow_run_started_at: run.run_started_at,
+      })),
+    );
+  }
+  return jobs;
+}
+
 function printReport(report: PrCheckReport, pretty: boolean): void {
   if (!pretty) {
     console.log(JSON.stringify(report));
@@ -215,7 +309,11 @@ function printReport(report: PrCheckReport, pretty: boolean): void {
 async function main(): Promise<void> {
   const options = parseArgs(Deno.args);
   const pullRequest = await fetchPullRequest(options.repo, options.pr);
-  const runs = await fetchCheckRuns(options.repo, pullRequest.head.sha);
+  const [checkRuns, workflowJobs] = await Promise.all([
+    fetchCheckRuns(options.repo, pullRequest.head.sha),
+    fetchLatestWorkflowJobs(options.repo, pullRequest.head.sha),
+  ]);
+  const runs = mergeLatestWorkflowJobs(checkRuns, workflowJobs, pullRequest.head.sha);
   const checks = classifyCheckRuns(
     runs,
     pullRequest.head.sha,
@@ -229,7 +327,7 @@ async function main(): Promise<void> {
     checks,
   );
   printReport(report, options.pretty);
-  Deno.exit(report.ok ? 0 : 1);
+  Deno.exit(exitCodeForPrCheckReport(report));
 }
 
 if (import.meta.main) await main();
