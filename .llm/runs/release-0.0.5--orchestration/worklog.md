@@ -635,3 +635,13 @@ rerun becomes captured #1196-family evidence, not a retry.
     (plus JWKS/sign-out being thin). The audit that guards against false greens produced
     false REDs; verification commands are evidence and need the same negative-case discipline
     as gates (a control pattern that MUST match would have caught this instantly).
+
+## 2026-08-04 — R6: #1201 scheduled (owner directive, canary.3 train)
+
+Owner moved #1201 into 0.0.5 and directed the canary.3 train. Placed as a **wave-4 slice
+(Sol·high)**: new export-surface corpus type + four question forms (bounded retrieval) +
+mirror-free end-to-end acceptance + version pinning; explicitly not collapsed with #1197 —
+the shared instrumented agent run on the canary.3 train measures both (#1197's tool-call
+comparison and #1201's MCP-nonzero/deno-doc-zero verdict). Separate PR from #1102, sequenced
+before it. Brief committed (`slices/export-surface-mcp/`); wave 4 becomes #1135, #1136,
+#1104, #1201.
