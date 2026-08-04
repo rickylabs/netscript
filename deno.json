@@ -91,6 +91,7 @@
     "agentic:review-threads": "deno run --no-lock --allow-read --allow-run --allow-env --allow-net=api.github.com .llm/tools/agentic/github/review-threads.ts",
     "agentic:pr-checks": "deno run --no-lock --allow-read --allow-run --allow-env --allow-net=api.github.com .llm/tools/agentic/github/pr-checks.ts",
     "agentic:claude-hook-log": "deno run --no-lock --allow-env --allow-write .llm/tools/agentic/claude/claude-hook-log.ts",
+    "agentic:claude-openrouter": "deno run --no-lock --allow-read --allow-write --allow-run --allow-env --allow-net .llm/tools/agentic/claude/openrouter-run.ts",
     "agentic:opencode": "deno run --no-lock --allow-read --allow-run --allow-env .llm/tools/agentic/opencode/opencode-run.ts",
     "agentic:opencode-eval": "deno run --no-lock --allow-read --allow-run --allow-env .llm/tools/agentic/opencode/opencode-eval.ts",
     "agentic:opencode-web": "deno run --no-lock --allow-read --allow-run --allow-env .llm/tools/agentic/opencode/opencode-web.ts",
