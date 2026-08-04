@@ -186,6 +186,9 @@ export function createScaffoldCapabilitySuite(
       if (overrides.packageSource) {
         next = next.withPackageSource(overrides.packageSource);
       }
+      if (overrides.cache !== undefined) {
+        next = next.withCache(overrides.cache);
+      }
       if (overrides.cleanup !== undefined) {
         next = next.withCleanup(overrides.cleanup);
       }

@@ -58,6 +58,7 @@ function createContext(): RunContext {
         packageSource: 'local',
         plugins: [],
         samples: false,
+        cache: true,
         cleanup: false,
         format: 'json',
         commandTimeoutMs: 1_000,

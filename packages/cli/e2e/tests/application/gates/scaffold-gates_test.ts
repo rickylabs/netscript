@@ -23,6 +23,43 @@ Deno.test('--source jsr accepts the local public CLI binary', () => {
   assertEquals(command.slice(0, 4), ['deno', 'run', '-A', '/repo/packages/cli/bin/netscript.ts']);
 });
 
+Deno.test('scaffold init default command remains byte-identical', () => {
+  assertEquals(
+    scaffoldInitGate().command(
+      createContext('/repo/packages/cli/bin/netscript.ts', PACKAGE_SOURCE.LOCAL),
+    ),
+    [
+      'deno',
+      'run',
+      '-A',
+      '/repo/packages/cli/bin/netscript.ts',
+      'init',
+      'prod-local-test',
+      '--path',
+      '/repo/.llm/tmp/cli-e2e',
+      '--db',
+      'postgres',
+      '--service',
+      '--service-name',
+      'users',
+      '--service-port',
+      '3001',
+      '--ci',
+      '--yes',
+      '--no-git',
+      '--force',
+    ],
+  );
+});
+
+Deno.test('scaffold init disables the cache exactly once', () => {
+  const command = scaffoldInitGate().command(
+    createContext('/repo/packages/cli/bin/netscript.ts', PACKAGE_SOURCE.LOCAL, false),
+  );
+
+  assertEquals(command.filter((argument) => argument === '--cache=false'), ['--cache=false']);
+});
+
 Deno.test('--source jsr rejects the local contributor CLI binary', () => {
   assertThrows(
     () =>
@@ -115,6 +152,7 @@ function scaffoldInitGate(): CommandGateDefinition {
 function createContext(
   cliEntrypoint: string,
   packageSource: RunOptions['packageSource'],
+  cache = true,
 ): RunContext {
   const options: RunOptions = {
     repoRoot: '/repo',
@@ -125,6 +163,7 @@ function createContext(
     packageSource,
     plugins: [],
     samples: false,
+    cache,
     cleanup: true,
     format: REPORT_FORMAT.PRETTY,
     commandTimeoutMs: 1,

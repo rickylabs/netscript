@@ -29,6 +29,7 @@ export function defaultRunOptions(overrides: Partial<RunOptions> = {}): RunOptio
       PLUGIN.AUTH,
     ],
     samples: true,
+    cache: true,
     cleanup: false,
     format: REPORT_FORMAT.NDJSON,
     reportPath: undefined,

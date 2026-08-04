@@ -119,3 +119,19 @@ documentation.
   Close — it is not this issue's call.
 - **Evidence:** the file:line citations above; Codex thread `019fcc83-4200-7421-a3db-d8eaaa9569b4`
   turn `019fcc83-449a-7633-9a6f-f31fdda58f19`; this ruling.
+
+## 2026-08-04 — D-6 resumed cache-spelling probe corrected the partial handoff evidence
+
+- **What:** The killed S2 turn's worklog stated that the public `netscript init` binary accepted
+  `--cache=false` and rejected `--no-cache`, without recording the third required spelling.
+- **Source:** The resumed S2 implementation lane repeated all three `--dry-run` probes against
+  `packages/cli/bin/netscript.ts` under a fresh `/tmp/ns-cache-probe.<random>` directory.
+- **Expected:** One accepted false spelling would be selected, or the product CLI would gain an
+  additive `--no-cache` negation if none worked.
+- **Actual:** `--no-cache` exited 2; both `--cache=false` and `--cache false` exited 0 and reported
+  two Aspire resources. The probe directory was removed and absence verified.
+- **Severity:** minor (evidence correction only; no implementation rescope).
+- **Action:** keep `--cache=false` because it is one unambiguous argv element; correct `worklog.md`
+  and `context-pack.md`. No edit to `packages/cli/src/public/features/init/init-command.ts`.
+- **Evidence:** resumed probe output in the S2 session; golden and exact-once assertions in
+  `packages/cli/e2e/tests/application/gates/scaffold-gates_test.ts`.

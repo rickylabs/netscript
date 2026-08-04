@@ -108,6 +108,9 @@ No gate-filtering logic to touch: waits are derived from the suite's resolved op
 | 2026-08-04 | S1        | Resumed after supervisor D-5 ruling                   | Implemented the three-generator rescope; apps were not touched and receive neither task arguments nor generated comments.             |
 | 2026-08-04 | S1        | Implementation gates complete                         | All six required gates passed; slice is awaiting Tier-A substantive review and sign-off.                                              |
 | 2026-08-04 | S1        | **Tier-A slice review — ACCEPTED**                    | Supervisor read the diff and re-ran every gate independently. One cosmetic finding, no blocking findings. Sign-off commit follows.    |
+| 2026-08-04 | S2        | Resolved R-2 against the real public binary           | `--no-cache` exited 2; `--cache=false` and `--cache false` both exited 0. The single-argv `--cache=false` spelling was selected. Dry-run reported two Aspire resources. Materialized config had `Cache: {}` and no `PrimaryCache`; the probe directory was removed. |
+| 2026-08-04 | S2        | Implementation and generator gates complete           | Added the default-true cache axis, CLI negation, exact init forwarding, workspace-builder plumbing, and focused regression tests. All six required gates passed; Tier-A review is pending. |
+| 2026-08-04 | S2        | Resumed after external timeout                         | Re-read the partial diff, repeated all three public-binary spelling probes under a fresh `/tmp` directory, cleaned it, and independently re-ran all six required gates. The only correction was the second accepted false spelling, recorded as D-6. |
 
 ## Slice Review — S1 (Tier-A, supervisor)
 
@@ -179,6 +182,32 @@ than accepting the implementer's report (`lane-policy.md` invariant 2 — no lan
 
 ## Gate Results
 
+### S2 Slice Gates
+
+| Gate | Command | Raw result |
+| ---- | ------- | ---------- |
+| E2E tests | `deno test --no-lock -A packages/cli/e2e/` | exit 0; 97 passed, 0 failed |
+| type-check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/cli --ext ts,tsx` | exit 0; 786 files, 7 batches, 0 failed batches, 0 findings |
+| lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/cli --ext ts,tsx` | exit 0; 786 files, 4 batches, 0 findings |
+| format | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/cli --ext ts,tsx` | exit 0; 786 files, 4 batches, 0 failed batches, 0 findings |
+| quality | `deno task quality:scan` | exit 0; `ok: true`, 0 findings, 7 pre-existing allowances |
+| doctrine | `deno task arch:check` | exit 0; existing out-of-scope dependency/doctrine warnings only |
+
+**R-2 empirical evidence.** The public binary rejects `--no-cache` and accepts both
+`--cache=false` and `--cache false`. `scaffold.init` emits the single-argv `--cache=false` spelling
+only when `RunOptions.cache === false`; omitting the E2E option remains byte-identical by golden
+argv assertion. The accepted probe's dry-run reported two Aspire resources; a materialized probe
+confirmed no cache resource (`Cache: {}`) and no `PrimaryCache`. The product CLI fallback in
+`init-command.ts` was not needed. The resumed probe used `/tmp/ns-cache-probe.<random>` and verified
+its removal afterward.
+
+**Post-slice reconcile note.** S2 remains partial work on #1158 / draft PR #1220, so the existing
+PR closing keyword remains appropriate but no acceptance box can be completed yet. The sweep found
+both the issue and PR still carrying stale `status:plan-eval`; the S2 phase comment reconciles them
+to `status:impl`. No new reviewer findings appeared after the S1 sign-off comment. S2 is
+implementation-complete with green automated gates but remains explicitly pending Tier-A review;
+S3 has not started.
+
 ### Static Gates
 
 | Gate         | Command or check                                                | Result | Notes                                        |
@@ -222,5 +251,5 @@ than accepting the implementer's report (`lane-policy.md` invariant 2 — no lan
   executable arm under `NETSCRIPT_CACHE_MODE=Executable` on CI, and (b) that S1's permission change
   leaves every non-sqlite scaffold byte-identical.
 - No product code exists at PLAN-EVAL time. Implementation begins only on `PASS`.
-- S1 implementation is complete with green automated gates but is **not self-certified**. Tier-A
-  must review the slice before sign-off; do not start S2 from this handoff.
+- S2 implementation is complete with green automated gates but is **not self-certified**. Tier-A
+  must review the slice before sign-off; do not start S3 from this handoff.

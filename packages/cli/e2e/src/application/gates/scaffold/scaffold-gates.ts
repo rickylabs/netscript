@@ -6,6 +6,8 @@ import type { PluginSuiteState } from '../../builders/scaffold/plugin-suite-stat
 import { cli, commandGate } from './gate-factory.ts';
 import { createPluginInstallGates } from './plugin-install-gates.ts';
 
+const DISABLE_CACHE_ARGUMENT = '--cache=false';
+
 /** Create preflight gates for required CLI tooling. */
 export function createPreflightGates(): readonly GateDefinition[] {
   return [
@@ -32,6 +34,8 @@ function scaffoldInitCommand(context: RunContext): readonly string[] {
     );
   }
 
+  const cacheArgs = context.request.options.cache ? [] : [DISABLE_CACHE_ARGUMENT];
+
   return cli(
     context,
     'init',
@@ -40,6 +44,7 @@ function scaffoldInitCommand(context: RunContext): readonly string[] {
     context.project.smokeRoot,
     '--db',
     context.request.options.database,
+    ...cacheArgs,
     '--service',
     '--service-name',
     'users',

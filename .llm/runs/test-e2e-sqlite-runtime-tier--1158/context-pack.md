@@ -6,7 +6,7 @@
 | -------------- | ------------------------------------- |
 | Run ID         | `test-e2e-sqlite-runtime-tier--1158`  |
 | Branch         | `test/e2e-sqlite-runtime-tier-1158`   |
-| Current phase  | `implement` — S1 gates green; supervisor review pending |
+| Current phase  | `implement` — S2 gates green; supervisor review pending |
 | Archetype      | `6 - CLI / Tooling`                   |
 | Scope overlays | `service`                             |
 
@@ -19,9 +19,11 @@ services, background processors, and plugin services; the pipeline threads the p
 all three. Apps remain unchanged because they launch through `deno task`, and their generated task
 already uses `deno run --allow-all`.
 
-The carried-in draft from the failed Copilot/Grok run was re-derived against `main` @ `c6f243da` and
-**corrected in four places**; two corrections are blockers. The plan's D2/D3/D4/E5 deliberately
-supersede the draft's decisions of the same names.
+S2 now adds the default-true `RunOptions.cache` axis, `--cache` / `--no-cache` parsing, workspace
+builder plumbing, and conditional `scaffold.init` forwarding. The real public binary rejects
+`--no-cache` but accepts both `--cache=false` and `--cache false`; the E2E uses the single-argv
+`--cache=false` spelling. No fallback edit under `packages/cli/src/**` was needed. The default init
+argv remains byte-identical by golden assertion.
 
 ## Completed
 
@@ -37,18 +39,23 @@ supersede the draft's decisions of the same names.
 - Rescoped S1 implemented with exact-once SQLite FFI, explicit-permission deduplication, pipeline
   propagation, and byte-identical non-SQLite assertions.
 - All six S1 gates passed: helper tests, scoped check/lint/fmt, `quality:scan`, and `arch:check`.
+- S1 received Tier-A substantive review and sign-off at `d06e7c94`.
+- S2 R-2 probe completed: `--no-cache` exit 2; `--cache=false` and `--cache false` exit 0. The
+  materialized no-cache config retained only the empty schema section `Cache: {}` and omitted
+  `PrimaryCache`.
+- S2 implementation completed with 97 E2E tests passing and all scoped/fitness gates green.
 
 ## In Progress
 
-- **S1 awaiting Tier-A slice review.** Automated gates are green; the implementation lane does not
-  self-certify or begin S2.
+- **S2 awaiting Tier-A slice review.** Automated gates are green; the implementation lane does not
+  self-certify or begin S3.
 
 ## Next Steps
 
-1. Tier-A supervisor substantively reviews the landed S1 implementation and evidence.
-2. Supervisor records the S1 sign-off or returns findings. Do not encode `--allow-ffi` as a
-   `deno task` argument or generated comment.
-3. Only after supervisor sign-off may the run proceed to S2.
+1. Tier-A supervisor substantively reviews the landed S2 implementation and reproduces its evidence.
+2. Supervisor records the S2 sign-off or returns findings; the implementation lane does not
+   self-certify.
+3. Only after supervisor sign-off may the run proceed to S3.
 4. Gate phase: scoped wrappers + `quality:scan` + `arch:check` + `publish:dry-run`, then the
    postgres `scaffold.runtime` regression run.
 5. IMPL-EVAL in a third session.
@@ -71,25 +78,31 @@ supersede the draft's decisions of the same names.
 
 | Path                                                                           | Status   | Notes                                                          |
 | ------------------------------------------------------------------------------ | -------- | -------------------------------------------------------------- |
-| `.llm/runs/test-e2e-sqlite-runtime-tier--1158/{worklog,context-pack}.md` | modified | S1 evidence and handoff state. |
-| `packages/cli/src/kernel/templates/aspire/helpers/register/{database-permissions,generate-register-services,generate-register-background,generate-register-plugins}.ts` | modified/new | Shared SQLite permission policy and three consumers. |
-| `packages/cli/src/kernel/templates/aspire/helpers/{types,helpers-generator-pipeline}.ts` | modified | Optional engine contracts and call-site threading. |
-| `packages/cli/src/kernel/templates/aspire/helpers/tests/*` | modified | Semantic permission and non-SQLite invariance coverage. |
+| `.llm/runs/test-e2e-sqlite-runtime-tier--1158/{worklog,context-pack}.md` | modified | S2 evidence and Tier-A handoff state. |
+| `packages/cli/e2e/src/domain/run-context.ts` | modified | Required boolean `RunOptions.cache` axis. |
+| `packages/cli/e2e/src/{create-default-runner,application/builders/workspace/suite-builder-options}.ts` | modified | Both default factories preserve cache-on behavior. |
+| `packages/cli/e2e/src/presentation/cli/{commands,options}/**` | modified | `--cache` / `--no-cache` declaration and mapping. |
+| `packages/cli/e2e/src/application/{builders/workspace,gates/scaffold}/**` | modified | Builder plumbing and conditional `--cache=false` forwarding. |
+| `packages/cli/e2e/suites/scaffold/capability-suites.ts` | modified | Cache override threaded beside cleanup. |
+| `packages/cli/e2e/tests/**` | modified | Golden default argv, exact-once no-cache, parse tests, and typed fixtures. |
 
-No app generator, `RegisterAppsOptions`, E2E, GitHub, cache, or embedded-template file was touched.
+No `packages/cli/src/**`, suite id, per-suite default, GitHub, cleanup, product cache default, or
+embedded-template file was touched.
 
 ## Gates
 
 | Gate family | Current status | Evidence                                            |
 | ----------- | -------------- | --------------------------------------------------- |
-| Static      | `PASS`         | Scoped check/lint/fmt wrappers: 0 findings.         |
-| Fitness     | `PASS`         | `quality:scan` and `arch:check` exited 0.           |
+| Static      | `PASS`         | S2 scoped check/lint/fmt: 786 files, 0 findings.    |
+| Fitness     | `PASS`         | S2 `quality:scan` and `arch:check` exited 0.        |
 | Runtime     | `NOT_RUN`      | S7 is the first live sqlite run.                    |
-| Consumer    | `PASS`         | Semantic tests prove non-SQLite output invariance. |
+| Consumer    | `PASS`         | S2: 97 E2E tests; default init argv byte-identical. |
 
 ## Open Questions
 
-1. Exact init spelling to disable the cache (`--cache false` vs a declared `--no-cache`) — S2; not started.
+1. Exact init spelling is resolved: both `--cache=false` and `--cache false` are accepted;
+   `--no-cache` is rejected. S2 uses the single-argv equals spelling, and no product-command fallback
+   was required.
 2. Does the Garnet dotnet-tool executable arm start on `ubuntu-latest`? — S7, with a pre-agreed
    downgrade path.
 3. Any silently postgres-shaped behavior gate? — S7.
@@ -98,7 +111,8 @@ No app generator, `RegisterAppsOptions`, E2E, GitHub, cache, or embedded-templat
 
 - **Drift:** D-1 supervisor lane override (minor); D-2 carried-in root cause wrong (significant);
   D-3 #1191 fix is services-only, new blocker (significant); D-4 CI "no docker service" framing
-  (minor). All in `drift.md`.
+  (minor); D-5 apps have no permission-bearing command (significant); D-6 resumed cache-spelling
+  probe corrected the partial handoff evidence (minor). All in `drift.md`.
 - **Debt:** two entries to create at Close — the unreachable `Mode: 'Local'` cache arm, and
   `SCAFFOLD_DEFAULTS.CACHE_BACKEND: 'redis'` forcing a container on every scaffold.
 
