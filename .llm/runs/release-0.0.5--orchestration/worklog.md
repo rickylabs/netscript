@@ -831,3 +831,26 @@ shipping); divergence is the alarm.
   member scope (import maps are member-scoped); dropped from the docs lane with evidence
   preserved, permanent docs-side fixture tooling routed to #1210. deno.lock reverted. Merge
   armed on green contexts.
+
+## 2026-08-04 — docs orchestrator follow-up on #1209
+
+Post-ready hardening complete: owner-granted fixture exception applied (package-scoped fixture
+restored), full quality lane green on the fixture (no suppressions), and the opposite-family
+Sol docs_audit ran a full gate log — first pass FAIL_FIX (2 findings), fixed in ae2944908,
+**re-audit PASS**. CI rerunning at HEAD ae2944908 (scaffold-runtime cancel at 30894413918 is
+the global-mutex supersede, not a failure). #1209 remains ready; merge at your discretion.
+
+## 2026-08-04 — Canary points 2 + 3: full stage-E record; GREEN PAIR restored
+
+- **canary.2** (`0.0.5-canary.2`): published by the cancelled first dispatch (cancel-race);
+  reconciled via standalone `release:canary-label --head origin/main` — 8 PRs / 7 issues,
+  15 items labeled, prerelease note, **drift PASS**. No pinned pair (superseded by canary.3).
+- **canary.3** (`0.0.5-canary.3`): payload = #1212 alone (merge-aware note: "1 commit
+  inspected; outcome: populated" — content-derivation exact); labels applied (2 items);
+  rerun job green end-to-end; pinned `e2e-cli-prod` success @08:49:10Z; workflow steps
+  `Record green canary pair=success` + `Write green-pair summary=success` — **the 0.0.5 train
+  holds a green canary pair again; the stable-cut precondition is satisfiable.**
+- The prod E2E ran the published-CLI scaffold suite against canary.3 — a scaffolded project
+  from published packages passed, which includes the sagas-glue startup surface (#1184 class);
+  noted as partial published-artifact evidence on #1190 (its full both-backends lifecycle
+  protocol remains the open evidence).
