@@ -57,8 +57,15 @@ at the exported helper boundary.
 | --- | --- | --- | --- |
 | 2026-08-04 | research | Read live issue first; body is literally `(see above)` | `gh`, connector, REST agree |
 | 2026-08-04 | plan | Locked core-owned delegation and production-default test | plan D1–D4 |
+| 2026-08-04 | 1 | RED | Real-provider test failed 0/1 because no child span was exported by the stubs. |
+| 2026-08-04 | 1 | GREEN | Same production-default test passed 1/1; focused core/workers/triggers check passed. |
+| 2026-08-04 | 1 | review | Core delegates to existing telemetry primitives; both plugin files are thin re-exports; no new backend or fake-only seam. |
+| 2026-08-04 | 1 | reconcile | #1228 remains open; draft PR #1281 carries `Closes #1228`, milestone 0.0.5, and `status:plan`. |
 
 ## Gates
 
-Pending implementation.
-
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| No-op-resistant RED | EXPECTED FAIL | 0/1: child span absent from exporter. |
+| Job-tools telemetry GREEN | PASS | 1/1: parent events, progress, callback, child span and parenting exported. |
+| Focused check | PASS | workers-core root/telemetry plus both scaffold re-exports. |
