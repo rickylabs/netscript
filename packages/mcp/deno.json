@@ -5,7 +5,8 @@
   "license": "Apache-2.0",
   "exports": {
     ".": "./mod.ts",
-    "./cli": "./cli.ts"
+    "./cli": "./cli.ts",
+    "./openapi-projection": "./openapi-projection.ts"
   },
   "imports": {
     "@netscript/aspire": "jsr:@netscript/aspire@0.0.4",
@@ -16,7 +17,7 @@
     "@std/path": "jsr:@std/path@^1"
   },
   "tasks": {
-    "check": "deno check mod.ts cli.ts",
+    "check": "deno check mod.ts cli.ts openapi-projection.ts",
     "test": "deno test --allow-env --allow-net --allow-run --allow-read --allow-write tests/",
     "publish:dry-run": "deno publish --dry-run --allow-dirty"
   },
