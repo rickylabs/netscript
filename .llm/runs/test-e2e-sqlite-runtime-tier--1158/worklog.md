@@ -100,17 +100,17 @@ No gate-filtering logic to touch: waits are derived from the suite's resolved op
 
 ## Progress Log
 
-| Time       | Slice     | Step                                                  | Notes                                                                                                                                 |
-| ---------- | --------- | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-08-04 | bootstrap | Research pass re-derived against `main` @ `c6f243da`  | 5 corrections to the carried-in draft, 2 of them blockers. See `research.md` § Re-baseline.                                           |
-| 2026-08-04 | bootstrap | Run dir authored; branch + draft PR opened            | Harness artifacts only — no product code (D9).                                                                                        |
-| 2026-08-04 | S1        | Pre-implementation trace stopped on app-command drift | `generate-register-apps.ts` launches `deno task` and owns no permission list; recorded as significant drift D-5 before product edits. |
-| 2026-08-04 | S1        | Resumed after supervisor D-5 ruling                   | Implemented the three-generator rescope; apps were not touched and receive neither task arguments nor generated comments.             |
-| 2026-08-04 | S1        | Implementation gates complete                         | All six required gates passed; slice is awaiting Tier-A substantive review and sign-off.                                              |
-| 2026-08-04 | S1        | **Tier-A slice review — ACCEPTED**                    | Supervisor read the diff and re-ran every gate independently. One cosmetic finding, no blocking findings. Sign-off commit follows.    |
+| Time       | Slice     | Step                                                  | Notes                                                                                                                                                                                                                                                               |
+| ---------- | --------- | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-08-04 | bootstrap | Research pass re-derived against `main` @ `c6f243da`  | 5 corrections to the carried-in draft, 2 of them blockers. See `research.md` § Re-baseline.                                                                                                                                                                         |
+| 2026-08-04 | bootstrap | Run dir authored; branch + draft PR opened            | Harness artifacts only — no product code (D9).                                                                                                                                                                                                                      |
+| 2026-08-04 | S1        | Pre-implementation trace stopped on app-command drift | `generate-register-apps.ts` launches `deno task` and owns no permission list; recorded as significant drift D-5 before product edits.                                                                                                                               |
+| 2026-08-04 | S1        | Resumed after supervisor D-5 ruling                   | Implemented the three-generator rescope; apps were not touched and receive neither task arguments nor generated comments.                                                                                                                                           |
+| 2026-08-04 | S1        | Implementation gates complete                         | All six required gates passed; slice is awaiting Tier-A substantive review and sign-off.                                                                                                                                                                            |
+| 2026-08-04 | S1        | **Tier-A slice review — ACCEPTED**                    | Supervisor read the diff and re-ran every gate independently. One cosmetic finding, no blocking findings. Sign-off commit follows.                                                                                                                                  |
 | 2026-08-04 | S2        | Resolved R-2 against the real public binary           | `--no-cache` exited 2; `--cache=false` and `--cache false` both exited 0. The single-argv `--cache=false` spelling was selected. Dry-run reported two Aspire resources. Materialized config had `Cache: {}` and no `PrimaryCache`; the probe directory was removed. |
-| 2026-08-04 | S2        | Implementation and generator gates complete           | Added the default-true cache axis, CLI negation, exact init forwarding, workspace-builder plumbing, and focused regression tests. All six required gates passed; Tier-A review is pending. |
-| 2026-08-04 | S2        | Resumed after external timeout                         | Re-read the partial diff, repeated all three public-binary spelling probes under a fresh `/tmp` directory, cleaned it, and independently re-ran all six required gates. The only correction was the second accepted false spelling, recorded as D-6. |
+| 2026-08-04 | S2        | Implementation and generator gates complete           | Added the default-true cache axis, CLI negation, exact init forwarding, workspace-builder plumbing, and focused regression tests. All six required gates passed; Tier-A review is pending.                                                                          |
+| 2026-08-04 | S2        | Resumed after external timeout                        | Re-read the partial diff, repeated all three public-binary spelling probes under a fresh `/tmp` directory, cleaned it, and independently re-ran all six required gates. The only correction was the second accepted false spelling, recorded as D-6.                |
 
 ## Slice Review — S1 (Tier-A, supervisor)
 
@@ -162,6 +162,56 @@ than accepting the implementer's report (`lane-policy.md` invariant 2 — no lan
 
 **Verdict: ACCEPTED.** S1 proves what it claims. Proceed to S2.
 
+## Slice Review — S2 (Tier-A, supervisor)
+
+Reviewed at `8d960571`. Gates re-run independently; the load-bearing behavioural claim was verified
+against the real binary rather than accepted from the implementer's report.
+
+**Independent verification of the claim the slice rests on**
+
+Ran `netscript init … --db sqlite --cache=false --ci --yes --no-git --force` and read the generated
+`appsettings.json`:
+
+```
+Cache           : {}
+PrimaryCache    : None
+Databases       : ['sqlite']
+PrimaryDatabase : sqlite
+```
+
+That is exactly the no-Docker profile D2 requires — no `redis` container resource, and sqlite
+contributes no Aspire DB resource. R-2 is closed empirically: `--no-cache` exits 2, `--cache=false`
+and `--cache false` exit 0, so the single-argv `--cache=false` form is used and **no product CLI
+fallback was needed** — `init-command.ts` is untouched.
+
+**Reproduced gate results**
+
+| Gate                                       | Verdict                          |
+| ------------------------------------------ | -------------------------------- |
+| `deno test --no-lock -A packages/cli/e2e/` | 97 passed, 0 failed              |
+| `run-deno-check.ts --root packages/cli`    | 786 files, 7 batches, 0 findings |
+| `run-deno-lint.ts --root packages/cli`     | 786 files, 4 batches, 0 findings |
+| `deno task quality:scan`                   | exit 0                           |
+| `deno task arch:check`                     | exit 0                           |
+
+**Substantive review**
+
+- The golden test `scaffold init default command remains byte-identical` pins the full default argv
+  as a literal array — the regression guard for `scaffold.runtime` is a real assertion, not a smoke
+  test.
+- `DISABLE_CACHE_ARGUMENT` is a named constant; the flag is spread from an array that is empty on
+  the default path, so the default argv is provably unchanged by construction as well as by test.
+- `RunOptions.cache` defaults to `true` in **both** `defaultRunOptions` factories, so every existing
+  suite and the `full` command keep today's behaviour.
+- `withCache` follows the existing `withCleanup` shape exactly, and `createScaffoldCapabilitySuite`
+  threads it with the same `!== undefined` guard — `false` is not swallowed as falsy.
+- Commit body uses real newlines (the S1 cosmetic finding did not recur).
+- No `any`, no `as unknown as`, no new lint-ignore.
+
+**Findings:** none.
+
+**Verdict: ACCEPTED.** Proceed to S3.
+
 ## Decisions
 
 | Decision                                              | Reason                                                                                    | Source                                               |
@@ -184,29 +234,29 @@ than accepting the implementer's report (`lane-policy.md` invariant 2 — no lan
 
 ### S2 Slice Gates
 
-| Gate | Command | Raw result |
-| ---- | ------- | ---------- |
-| E2E tests | `deno test --no-lock -A packages/cli/e2e/` | exit 0; 97 passed, 0 failed |
-| type-check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/cli --ext ts,tsx` | exit 0; 786 files, 7 batches, 0 failed batches, 0 findings |
-| lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/cli --ext ts,tsx` | exit 0; 786 files, 4 batches, 0 findings |
-| format | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/cli --ext ts,tsx` | exit 0; 786 files, 4 batches, 0 failed batches, 0 findings |
-| quality | `deno task quality:scan` | exit 0; `ok: true`, 0 findings, 7 pre-existing allowances |
-| doctrine | `deno task arch:check` | exit 0; existing out-of-scope dependency/doctrine warnings only |
+| Gate       | Command                                                                                           | Raw result                                                      |
+| ---------- | ------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| E2E tests  | `deno test --no-lock -A packages/cli/e2e/`                                                        | exit 0; 97 passed, 0 failed                                     |
+| type-check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/cli --ext ts,tsx` | exit 0; 786 files, 7 batches, 0 failed batches, 0 findings      |
+| lint       | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/cli --ext ts,tsx`  | exit 0; 786 files, 4 batches, 0 findings                        |
+| format     | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/cli --ext ts,tsx`   | exit 0; 786 files, 4 batches, 0 failed batches, 0 findings      |
+| quality    | `deno task quality:scan`                                                                          | exit 0; `ok: true`, 0 findings, 7 pre-existing allowances       |
+| doctrine   | `deno task arch:check`                                                                            | exit 0; existing out-of-scope dependency/doctrine warnings only |
 
-**R-2 empirical evidence.** The public binary rejects `--no-cache` and accepts both
-`--cache=false` and `--cache false`. `scaffold.init` emits the single-argv `--cache=false` spelling
-only when `RunOptions.cache === false`; omitting the E2E option remains byte-identical by golden
-argv assertion. The accepted probe's dry-run reported two Aspire resources; a materialized probe
+**R-2 empirical evidence.** The public binary rejects `--no-cache` and accepts both `--cache=false`
+and `--cache false`. `scaffold.init` emits the single-argv `--cache=false` spelling only when
+`RunOptions.cache === false`; omitting the E2E option remains byte-identical by golden argv
+assertion. The accepted probe's dry-run reported two Aspire resources; a materialized probe
 confirmed no cache resource (`Cache: {}`) and no `PrimaryCache`. The product CLI fallback in
 `init-command.ts` was not needed. The resumed probe used `/tmp/ns-cache-probe.<random>` and verified
 its removal afterward.
 
-**Post-slice reconcile note.** S2 remains partial work on #1158 / draft PR #1220, so the existing
-PR closing keyword remains appropriate but no acceptance box can be completed yet. The sweep found
-both the issue and PR still carrying stale `status:plan-eval`; the S2 phase comment reconciles them
-to `status:impl`. No new reviewer findings appeared after the S1 sign-off comment. S2 is
-implementation-complete with green automated gates but remains explicitly pending Tier-A review;
-S3 has not started.
+**Post-slice reconcile note.** S2 remains partial work on #1158 / draft PR #1220, so the existing PR
+closing keyword remains appropriate but no acceptance box can be completed yet. The sweep found both
+the issue and PR still carrying stale `status:plan-eval`; the S2 phase comment reconciles them to
+`status:impl`. No new reviewer findings appeared after the S1 sign-off comment. S2 is
+implementation-complete with green automated gates but remains explicitly pending Tier-A review; S3
+has not started.
 
 ### Static Gates
 
