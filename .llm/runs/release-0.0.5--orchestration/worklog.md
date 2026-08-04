@@ -1334,3 +1334,11 @@ green-pair precondition now held by canary.8.** Remaining before cut considerati
 #1239 (#1234 mirror), #1266 (#1251), #1269 (#1248), #1265 (#1252), #1264 (#1246 Refs,
 upstream-classified), then the caveat kill-list + reframe program and the cut-time
 checklist (stage F).
+
+## 2026-08-04 — MERGE #1264 (Refs #1246); #1246 → 0.0.6 with mitigation landed
+
+All four green first read, threads 0/0, refs [] (deliberate — Refs #1246 only). The lane's
+classification: upstream Deno defect (deno/deno#35804); 0.0.5 ships the detection +
+remediation mitigation with a fails-if-silent test; the full fix is 0.0.6 scope tracked
+against upstream. #1246 milestone moved with reasoned comment — the one honest move of the
+owner's eleven, exactly as scoped at dispatch. Rides canary.9.
