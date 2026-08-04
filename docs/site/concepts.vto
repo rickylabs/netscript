@@ -6,7 +6,7 @@ templateEngine: [vento, md]
 
 {{ comp.hero({
   tagline: "A NetScript app is five connected layers.",
-  subhead: "Contracts define the boundaries. Everything else — services, plugin runtimes, the web layer, the observed resource graph — carries them somewhere.",
+  subhead: "Contracts define the boundaries. Services serve them at request time, plugins extend them across processes, the web layer brings them to the browser, and the observed resource graph keeps the whole system visible.",
   ctas: [
     { label: "Start a workspace", href: "/quickstart/", primary: true },
     { label: "Build the Storefront", href: "/tutorials/storefront/" }
@@ -17,21 +17,20 @@ templateEngine: [vento, md]
 
 ## 1. Contracts define the boundary
 
-The contract is the source of truth for an operation's input and output. A service implements that
-oRPC contract, while `@netscript/sdk` derives clients and query helpers from the same contract map.
-The service runtime also uses its contract router for OpenAPI, so the TypeScript caller and the HTTP
-description do not need parallel hand-written shapes.
+A contract describes behavior, not just data: `checkout.start` is as natural a boundary as a list
+or update operation. It is the source of truth for an operation's input and output. A service
+implements the oRPC contract, `@netscript/sdk` derives clients and query helpers from the same
+contract map, and the service runtime generates OpenAPI from the contract router. The TypeScript
+caller and the HTTP description share one definition, not two hand-written shapes.
 
-Contracts describe behavior, not just entity CRUD: `checkout.start` is as natural a boundary as a
-list or update operation. Read [contracts and type flow](/explanation/contracts/) for the schemas
-and router mechanics.
+Read [contracts and type flow](/explanation/contracts/) for the schemas and router mechanics.
 
 ## 2. Services execute request-time behavior
 
-`defineService()` turns a router into a running Hono and oRPC service with request logging, OpenAPI,
-Scalar docs, RPC, service information, and health endpoints configured by the preset. SDK clients
-resolve service URLs lazily from Aspire-injected environment values, so callers do not pin a
-local port into application code.
+Contracts need a runtime. `defineService()` turns a contract router into a running Hono and oRPC
+service. The preset wires in request logging, OpenAPI generation, a Scalar docs UI, RPC, health
+endpoints, and service-info metadata. SDK clients resolve service URLs lazily from Aspire-injected
+environment values, so callers do not pin a local port into application code.
 
 A service owns the request boundary. Work that must resume after the process exits belongs in a
 durable runtime, not in a longer request handler. Go deeper in [Services & SDK](/services-sdk/) and
@@ -39,21 +38,23 @@ durable runtime, not in a longer request handler. Go deeper in [Services & SDK](
 
 ## 3. Plugins add runtime capabilities
 
-The host is empty; plugins fill it. A plugin manifest is validated data that declares services,
-background processors, schemas, topics, configuration, and telemetry contributions. The CLI turns
-those declarations into static workspace wiring, and Aspire can materialize a plugin's API and
-background processors as separate resources.
+Services handle the request; plugins handle work that outlives one. The host is empty; plugins fill
+it. A plugin manifest is validated data that declares services, background processors, schemas,
+topics, configuration, and telemetry contributions. The CLI turns those declarations into static
+workspace wiring.
 
-“One plugin” is a packaging unit, not a runtime unit. Workers, sagas, triggers, and streams are the
-durable examples; the full manifest and registry mechanics live in
+“One plugin” is a packaging unit, not a runtime unit. Aspire can materialize a plugin's API and
+background processors as separate resources. Workers, sagas, triggers, and streams are the durable
+examples; the full manifest and registry mechanics live in
 [the plugin-system explanation](/explanation/plugin-system/).
 
 ## 4. The web layer carries the boundary to the user
 
-`@netscript/fresh` builds on Fresh 2 and Preact. Typed route contracts and `definePage()` connect
-paths, search parameters, metadata, handlers, data layers, and forms. A server page can call the
-contract-derived SDK, hydrate TanStack Query state, and hand interactive work to islands; routes
-that need no island ship no island JavaScript.
+The contract reaches the browser through the web layer. `@netscript/fresh` builds on Fresh 2 and
+Preact. Typed route contracts and `definePage()` connect paths, search parameters, metadata,
+handlers, data layers, and forms. A server page can call the contract-derived SDK, hydrate TanStack
+Query state, and hand interactive work to islands; routes that need no island ship no island
+JavaScript.
 
 Use [the web-layer overview](/web-layer/) for the complete model, then follow the focused guides for
 [server rendering](/web-layer/server/), [page builders](/web-layer/builders/), and
@@ -61,10 +62,11 @@ Use [the web-layer overview](/web-layer/) for the complete model, then follow th
 
 ## 5. Observability connects the resource graph
 
-One runtime, many resources. The generated AppHost composes apps, services, plugin processors,
-databases, and cache resources, then injects service-discovery and OTLP configuration into their
-processes. The Aspire dashboard reads health, logs, traces, and metrics from that running graph;
-trace context carried by SDK calls keeps client and service spans connected.
+Every layer above runs inside a resource graph. The generated AppHost composes apps, services,
+plugin processors, databases, and cache resources, then injects service-discovery and OTLP
+configuration into their processes. The Aspire dashboard reads health, logs, traces, and metrics
+from that running graph; trace context carried by SDK calls keeps client and service spans
+connected.
 
 Aspire is the default local orchestration layer, not part of every package API. Without it, the Deno
 packages remain usable, but resource startup, discovery values, and telemetry wiring become the
