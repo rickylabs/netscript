@@ -10,8 +10,8 @@ Stop PR label metadata from respawning and canceling the expensive e2e-cli workf
 ## Slices
 
 - [x] S0 Issue-first research and draft surface — `79ada2deb`
-- [x] S1 Event policy and regression matrix — pending implementation commit
-- [x] S2 Targeted validation and ready handoff — pending implementation commit
+- [x] S1 Event policy and regression matrix — `c70e24442`
+- [x] S2 Targeted validation and ready handoff — `c70e24442`
 
 ## Validation
 
