@@ -38,3 +38,17 @@ Confirmed findings:
    drop unless the type fixture genuinely requires it.
 6. **Measured gaps stand.** traces 0 occurrences; withForm 1 (token); Partials 1 (token); no
    out-of-scope note on the PR for workspace/erp-sync tutorials.
+
+- **D-5 (blocked launch, 2026-08-04 10:32).** agy S1 launch failed: "Individual quota
+  reached… resets in 1h38m". Judged by artifact (`agy-launch.json` status ERROR, no
+  outline-agy.md). Codex half of the pair delivered `outline-codex.md` (34KB). Retry
+  scheduled ~10:35+105min; the adversarial cross-critique waits for the agy artifact —
+  the pair protocol is not degraded to single-generator without owner say-so.
+
+- **D-6 (owner exception, 2026-08-04).** Owner reviewed PR #1209 change 5d75c07f (the 0.0.5
+  orchestrator's gate-driven removal of the package-scoped type fixture from the docs lane)
+  and granted an explicit exception: the fixture is genuinely useful and may live at
+  packages/fresh/tests/type-fixtures/. Restored at 2706fdb53's content, re-verified green,
+  pushed as e6ba61690. Lock churn kept out (deno.lock reset to HEAD before commit). The
+  docs-lane no-packages boundary otherwise stands; permanent fixture tooling still routes
+  to #1210.
