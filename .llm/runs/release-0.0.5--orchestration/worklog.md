@@ -673,3 +673,16 @@ per launch; base = current main (`3ff18a8ad`, post-merge-14). Three slices live,
 matched: S6 `019fcb61-6d1d` (Sol·high), S7-rescoped `019fcb61-764c` (Sol·high, F1(b) arm,
 expensive gate queued behind the sagas joint run), #1187 `019fcb61-8dfe` (Sol·medium). Wave-3b
 (#1119, #1196, agy #1109) dispatches as lanes free.
+
+## 2026-08-04 — Merge 15 (#1198); joint verification green-lit
+
+- **PR #1198 merged** (p0 engine fix: HTTP publish awaits durable queue acceptance, runner owns
+  dequeue + scheduled delivery, transitions project to the query surface; both queue adapters
+  touched). #1190 verified OPEN post-merge — the evidence gate held, including through a new
+  parser-trap variant: the slice HTML-encoded "hand-clo&#115;es #1190" and GitHub decoded the
+  entity before keyword parsing (finding 16, second confirmation, deeper layer). Reworded;
+  refs [] verified before merge. Gate record: contexts green (after waiting out a live ci run
+  misread as a zombie), 0 ignores, files = sagas-core runtime + both adapters + tests,
+  HTTP-boundary RED→GREEN test independently 2/2.
+- **#1193 green-lit** for the joint verification: rebase → exclusive expensive-gate slot →
+  one-pass suite + seven-point protocol on BOTH backends → ready. Canary.2's centerpiece.
