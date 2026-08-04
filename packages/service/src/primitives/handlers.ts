@@ -22,7 +22,7 @@
 import { RPCHandler } from '@orpc/server/fetch';
 import { OpenAPIHandler } from '@orpc/openapi/fetch';
 import { CORSPlugin } from '@orpc/server/plugins';
-import { ZodSmartCoercionPlugin } from '@orpc/zod';
+import { experimental_ZodSmartCoercionPlugin as ZodSmartCoercionPlugin } from '@orpc/zod/zod4';
 import { createServiceLogger } from '@netscript/logger';
 import { LoggingPlugin } from '@netscript/logger/orpc';
 import { ErrorHandlingPlugin, TracingPlugin } from '@netscript/telemetry/orpc';
