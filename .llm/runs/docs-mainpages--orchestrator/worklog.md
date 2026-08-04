@@ -145,3 +145,14 @@
 - Draft PR #1241 opened (batch 1; Refs #1210, no closing keyword; ci:skip-e2e; 0.0.6).
 - Batch 2 (D6 route contracts + D7 query bridge) dispatched to a fresh Opus docs-exception
   agent on the same branch; audits follow per batch.
+
+## 2026-08-04 — P3 batch 2 authored; two issues filed from its findings
+
+- D6 (route.md rewritten in place, 13 runtime controls) + D7 (new query-bridge.md, three
+  checker-proven compile boundaries) landed on docs/web-layer-deep-dives → PR #1241.
+- Filed from batch-2 findings: query-type defects issue (island types reject the package's
+  own documented patterns; ch.4 snippets fail deno check against real types — the phase-1
+  fixture passed only because it mocked the SDK) and #1244 (root docs:links does not scan
+  docs/site; correct site gate is docs/site check:links — batch-1 link evidence was vacuous,
+  re-evidenced by batch 2's run of the real gate).
+- Batch-2 Sol audit dispatched on the established auditor thread.

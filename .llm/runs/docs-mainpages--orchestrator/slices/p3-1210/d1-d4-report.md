@@ -159,3 +159,117 @@ the real files, so the findings stand.
 | Lock hygiene | `git checkout HEAD -- deno.lock`; final `git status` | Clean — only the four intended docs files; the stray `jsr:@netscript/queue@0.0.4` lock line is not in either commit |
 
 All scratch fixtures were deleted; nothing was added under `packages/`.
+
+---
+
+## Batch 2 (D6+D7)
+
+Worktree `/home/codex/repos/ns-deepdives`, branch `docs/web-layer-deep-dives`.
+Commits `903538321` (D6) and `df1327f5e` (D7), pushed. Draft PR #1241 carries them.
+
+### D6 — route contracts (`903538321`)
+
+`docs/site/web-layer/route.md` rewritten in place from a reference listing into the
+resources.md/partials.md deep-dive shape. `builders.md` and `web-layer/index.md` re-pointed.
+
+Closes the three helpers the inventory recorded as undocumented anywhere (`fallback`,
+`enumPathParamSchema`, `defineEnumPathParam`) and replaces implied semantics with verified ones:
+
+| Claim | Verified how |
+|---|---|
+| Every `paginationSearchSchema` base field is `.catch()`-wrapped, so the base parse has no failure path | `search-params.ts:135-152`; runtime control: `parse({page:'banana',limit:'-4',sortOrder:'sideways'})` → `{page:1,limit:25,sortBy:'',sortOrder:'desc',offset:0}` |
+| Extended fields are *not* caught — the one way the schema throws — which is what `fallback()` is for | runtime control: `.extend({status: z.enum([...])}).safeParse({status:'nope'}).success === false`; with `fallback(...)` → `status:'open'` |
+| `offset` is derived output, `Math.max(page-1,0)*limit` | `addPaginationOffset`, `search-params.ts:48-55` |
+| Repeated params take the first value | `firstSearchParamValue` preprocess; control: `{page:['2','9']}` → `page:2` |
+| `enumPathParamSchema` narrows the parsed path to its one key and drops other segments | `contract-runtime.ts:126-149`; control: `safeParse({status:'open',id:'42'})` → `{status:'open'}` |
+| `href()` serializes the whole parsed search state, including derived `offset` and empty `sortBy` | `normalizeBaseSearch` uses `searchSchema.safeParse({})` as the base (`link.tsx:124-142`); control: `href({path:{status:'open'},search:{page:2}})` → `/orders/open?page=2&limit=25&sortBy=&sortOrder=desc&offset=25` |
+| `preserveSearchParams` only preserves when the rendering route pattern matches the target | `link.tsx:130` — guarded on `navigationContext?.routePattern === routePattern` |
+| A contract-free `createRouteReference` does **not** validate search | `contract-runtime.ts:367-372` — `parseSearch` is `toSearchParamInput`, `safeParseSearch` always `{success:true}`; control confirmed `?page=banana` parses clean |
+| `$href` is `undefined` for any pattern containing `[` | `hasDynamicRouteSegments`; control: `/orders` → `/orders`, `/orders/[id]` → `undefined` |
+| Routes-tree accessor derivation (`$id`, `$slugAll`, `$pathOptional`, skipped `index`/`_app`/`_layout`/`(group)`, trailing `$route`) | `manifest.ts:120-200` (`toRouteKeySegment`, `inferRouteKeyPath`) |
+| Rename safety is scoped to generated accessors only | `renderNetScriptRoutesModule` + `writeNetScriptRouteManifestSync`; the page states a hand-written pattern literal is **not** rename-tracked (consistent with the audited partials.md wording) |
+| Form A/B/C conflict messages quoted verbatim | `manifest.ts:373-379` (build error), `manifest-page-module.ts:372-375` (warning), `route-support.ts:77-83` (`$route` throw) |
+| `$route` and `withRoute()`'s reference check are runtime guards that fire **at module load** | `DefinePageRouteContractInput.$route?: string` (`types.ts:139`) is optional; `builder/mod.tsx:448-461` promotes eagerly in the chain |
+
+### D7 — the query bridge (`df1327f5e`)
+
+New page `docs/site/web-layer/query-bridge.md` (order 15). `query.md` gains a pointer plus one
+correction; `web-layer/index.md` gains the leaf.
+
+New page rather than a query.md deepening because query.md (463 lines) documents the
+`createServiceQueryUtils` client-only path and explicitly punts the cache-first
+`createQueryFactories` variant to the SDK pillar — that punt is exactly D7's subject. Matches the
+D1/D4 precedent of carving a deep-dive out rather than growing a 700-line page.
+
+Undocumented material now covered: the factory's five provider-backed vs four pure methods (with the
+`getCacheProvider()` error message quoted, which itself names the split); the two key tiers and the
+`cache_query` KV prefix; `getCachedEntry` as a pure read against the callable's SWR path; and the
+`import '@netscript/sdk/cache'` in `define-fresh-app.ts:6` that makes any of it work.
+
+**Three compile-time boundaries established by running the type checker, not by reading types:**
+
+| Boundary | Control |
+|---|---|
+| `initialDataUpdatedAt` is documented in `query-client/types.ts` as the route for `cachedAt`, but is absent from `IslandQueryOptions` | `TS2353: … 'initialDataUpdatedAt' does not exist in type 'IslandQueryOptions<…>'`. The same literal without that line checks clean. Consequence stated on the page: a KV entry's real age cannot age the hydrated entry. |
+| `createNetScriptQueryClient()` returns a real `QueryClient` typed as the narrower `QueryClientPort` | `TS2551` (no `prefetchQuery`, only `fetchQuery`) and `TS2345` (not assignable to `dehydrateQueryClient`). The page shows the working form **with** the `as unknown as IslandQueryClient` bridge and names the cost. |
+| `IslandQueryResult` declares seven members; `isRefetching`/`isFetching` exist at runtime only | `TS2339: Property 'isRefetching' does not exist on type 'IslandQueryResult<…>'` |
+| Dehydrated state *does* carry per-query age | ran `dehydrateQueryClient` on a seeded client → each query carries `dataUpdatedAt` plus a `dehydratedAt` stamp. This is the mechanical basis for the dehydrate-vs-props table rather than a restatement of the JSDoc. |
+
+Honest guidance the page lands on — "props by default; dehydrate when one island needs several
+prefetched queries, or when entry age has to survive the trip" — is grounded in `hydration.ts` and
+`hydration-script.tsx` module docs *plus* the three boundaries above, and in the `HydrationBoundary`
+`useEffect` timing vs the tutorial's render-time `hydrateFromDehydrated` call.
+
+Benchmark citation: none. SvelteKit's confirmed `load`/`$types` story is a peer for the *loader*
+half, but the two-tier cache handoff has no confirmed peer claim in `benchmark-verification.md`, so
+nothing was cited rather than reaching for the WRONG-marked sections.
+
+### Source-side defects found (docs lane — recorded, not fixed)
+
+1. `getIslandQueryClient()` (`query-client.ts`) carries `@throws {Error} If called during
+   server-side rendering outside island hydration`, but the body has no throw — it lazily constructs
+   a module-scoped client. `query.md` had repeated the JSDoc in prose **and** in a callout; both are
+   corrected to describe the real behaviour (no guard exists; the per-request-client guidance
+   stands). The JSDoc itself is a framework-source fix and stays out of this lane.
+2. `initialDataUpdatedAt` is a documented contract (`query-client/types.ts`) with no typed path
+   through `@netscript/fresh/query`. Either `IslandQueryOptions` should declare it or the SDK
+   comment should stop promising it.
+3. `createNetScriptQueryClient()`'s `QueryClientPort` return type makes the package's own
+   dehydration recipe untypeable without a cast.
+4. Cross-page drift: live-dashboard ch.4's island snippet destructures `isRefetching`, and its
+   `dehydratedQuery` resource calls `prefetchQuery` on the port — both fail `deno check` against the
+   declared types. Not touched (phase-2 tutorial prose, outside this batch's scope); flagged for the
+   audit.
+
+### Gate results
+
+| Gate | Command | Result |
+|---|---|---|
+| Site build | `cd docs/site && deno task build` | PASS — 606 files (was 603; +1 page, +2 derived) |
+| Site links | `cd docs/site && deno task check:links` | PASS — 31659 internal links across 217 pages, all resolve |
+| Caveat refs | `cd docs/site && deno task check:caveats` | PASS — 27 markers across 22 pages, all resolve |
+| Repo doc links | `deno task docs:links` | PASS — `docs=102 broken-links=0 broken-anchors=0 orphans=0` |
+| D6 examples | `deno check --unstable-kv --no-lock ./scratch-d6.tsx` | PASS (contract+bind+parse, pagination, `fallback`+`extend`, `defineEnumPathParam`, `href` with a function search update, bound `Link`) |
+| D6 runtime controls | `deno run ./scratch-verify-d6.ts` | 13 controls, all as documented (table above) |
+| D7 examples | `deno check --unstable-kv --no-lock ./scratch-d7b.tsx` | PASS (factory over a structural contract, `withResource`+`getCachedEntry` page, island `queryOptions`+`initialData`, dehydration resource with the bridge, `bridgeInvalidation`) |
+| D7 negative controls | same file, three variants | Expected FAIL — TS2353, TS2551+TS2345, TS2339 (table above) |
+| Lock hygiene | `git checkout HEAD -- deno.lock`; `git status` | Clean — only the intended docs files in both commits; the pre-existing stray `jsr:@netscript/queue@0.0.4` lock line is in neither |
+
+All scratch fixtures deleted; nothing added under `packages/`.
+
+**Gate note for the evaluator.** `deno task docs:links` scans `.llm/harness`,
+`docs/architecture/doctrine`, `.agents/skills`, and the four root surface files — it does **not**
+cover `docs/site/`. Its `docs=102` is unchanged by any web-layer page and is therefore not evidence
+about this batch. The load-bearing link gate for these pages is `cd docs/site && deno task
+check:links` (against the built `_site`), recorded above. The Batch 1 report cites `docs:links` as
+its link evidence; that citation is vacuous for the same reason, though the Batch-1 pages do pass
+the site checker in the current build.
+
+### Notes for the evaluator
+
+- Validation is generator-side only per the CLAUDE.md documentation-authoring exception; a separate
+  opposite-family session still owes a per-page verdict.
+- Two Vento collisions were hit and worked around rather than escaped: `templateEngine: [vento, md]`
+  parses `{{` inside fenced code, so JSX attribute object literals (`path={{ … }}`,
+  `dangerouslySetInnerHTML={{ … }}`) break the build. Both examples were rewritten to hoist the
+  object into a const. There is no `{{ echo }}` precedent anywhere in `docs/site/`.
