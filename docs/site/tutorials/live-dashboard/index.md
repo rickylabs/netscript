@@ -33,7 +33,7 @@ orders.
 
 ## What you will build
 
-A `my-dashboard/` Fresh workspace whose home screen is the live order queue described above. You
+A `my-dashboard/` Fresh workspace whose home screen is the order queue described above, fed by a live stream subscription. You
 scaffold a fresh NetScript project, expose an `orders` read-model through a typed oRPC service, wire
 a cache-first SDK query layer, render the queue with NetScript's `definePage` page builder and a
 hydrated TanStack Query island, then subscribe it to a durable change-stream so the server can push
@@ -90,7 +90,7 @@ in the browser, type-checked at every hop. Each chapter adds exactly one link:
   },
   {
     title: "5 · Go live with StreamDB",
-    body: "Replace polling with a durable change-stream: <code>createSagasStreamDB</code> feeds <code>useLiveQuery</code> so rows update the instant state changes on the server.",
+    body: "Replace polling with a durable change-stream: <code>createSagasStreamDB</code> feeds <code>useLiveQuery</code>, and rows arrive over the open subscription whenever the sagas mirror publishes — today, once per service start.",
     href: "/tutorials/live-dashboard/05-live-stream/"
   },
   {

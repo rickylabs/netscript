@@ -32,7 +32,7 @@ where the seam ends.
 
 ## What you will build
 
-A live monitor island that subscribes to a durable StreamDB and re-renders when the server pushes.
+A live monitor island that subscribes to a durable StreamDB and re-renders when new events arrive.
 You will open a `StreamDB` handle pointed at the streams runtime, drive a table with `useLiveQuery`,
 and mount it from a `definePage` page that resolves the stream address on the server. The worked
 example is the **sagas** stream — the durable change-stream the sagas plugin ships with a ready-made
@@ -59,7 +59,7 @@ sagas plugin (which brings the stream) is not installed or Aspire has not finish
 the [dashboard](/explanation/aspire/) resource list at `:18888`.
 
 {{ comp callout { type: "note", title: "HTTP/2 is opt-in for live subscriptions" } }}
-The live subscription runs over plaintext <strong>HTTP/1.1</strong> by default, which caps how many concurrent SSE connections a browser opens per origin. HTTP/2 lifts that cap but is opt-in and requires TLS — via <code>ServiceTlsOptions</code> or the <code>NETSCRIPT_TLS_CERT_FILE</code> / <code>NETSCRIPT_TLS_KEY_FILE</code> environment variables. See {{ comp.xref({ key: "cap:streams" }) }} for the connection-limit detail.
+The live subscription is <strong>long-poll by default</strong> (SSE is opt-in) and runs over plaintext <strong>HTTP/1.1</strong>, which caps how many long-lived connections a browser opens per origin. HTTP/2 lifts that cap but is opt-in and requires TLS — via <code>ServiceTlsOptions</code> or the <code>NETSCRIPT_TLS_CERT_FILE</code> / <code>NETSCRIPT_TLS_KEY_FILE</code> environment variables. See {{ comp.xref({ key: "cap:streams" }) }} for the connection-limit detail.
 {{ /comp }}
 
 ## Step 1 — Open a StreamDB handle
@@ -211,7 +211,7 @@ import { createDurableStream, defineStreamSchema } from '@netscript/plugin-strea
 ```
 
 The producer publishes with `upsert(collection, row)` and `await flush()`; a browser consumes a
-user-defined stream over HTTP/SSE at its `streamPath`. The full producer surface, URL resolution,
+user-defined stream over HTTP at its `streamPath` (long-poll subscription by default, SSE available). The full producer surface, URL resolution,
 and current limitations are on {{ comp.xref({ key: "cap:streams", text: "the Durable streams page" }) }} —
 when you outgrow the sagas monitor, that is where your own `order-events` stream starts.
 

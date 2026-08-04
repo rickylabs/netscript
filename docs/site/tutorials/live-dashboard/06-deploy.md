@@ -35,7 +35,7 @@ a running live dashboard you can open, watch, and trust you understand.
 ## Before you begin
 
 You should have completed [chapter 5](/tutorials/live-dashboard/05-live-stream/): the live monitor
-updating in real time. The AppHost was scaffolded back in chapter 1 (you did not pass `--no-aspire`),
+receiving mirrored saga state over its open subscription. The AppHost was scaffolded back in chapter 1 (you did not pass `--no-aspire`),
 so confirm the orchestration entry points are on disk — from the workspace root:
 
 ```sh
