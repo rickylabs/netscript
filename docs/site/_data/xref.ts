@@ -177,6 +177,7 @@ export const xref: Record<string, XrefTarget> = {
   "explain:contracts": { href: "/explanation/contracts/", label: "Contracts & type flow" },
   "explain:plugin-model": { href: "/explanation/plugin-system/", label: "The plugin system" },
   "explain:auth-model": { href: "/explanation/auth-model/", label: "Auth model" },
+  "explain:auth-session-lifecycles": { href: "/identity-access/session-lifecycles/", label: "Session lifecycles" },
   "explain:durable-workflows": { href: "/explanation/durability-model/", label: "The durability model" },
   "explain:observability": { href: "/explanation/observability/", label: "Observability" },
   "explain:aspire": { href: "/explanation/aspire/", label: "Orchestration with Aspire" },

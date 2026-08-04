@@ -2,6 +2,8 @@
 layout: layouts/base.vto
 title: better-auth plugins
 templateEngine: [vento, md]
+prev: { label: "Authentication", href: "/identity-access/auth/" }
+next: { label: "Session lifecycles", href: "/identity-access/session-lifecycles/" }
 order: 2
 ---
 
@@ -166,3 +168,5 @@ API route follows the identical shape: swap the redirect for `throw new HttpErro
 - {{ comp.xref({ key: "cap:auth" }) }} — the authentication capability overview.
 - [Reference: auth-better-auth](/reference/auth-better-auth/) — generated symbols for every export
   shown here.
+
+{{ comp.nextPrev({ prev: { label: "Authentication", href: "/identity-access/auth/" }, next: { label: "Session lifecycles", href: "/identity-access/session-lifecycles/" } }) }}

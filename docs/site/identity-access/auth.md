@@ -3,7 +3,7 @@ layout: layouts/base.vto
 title: Authentication
 templateEngine: [vento, md]
 prev: { label: "Fresh UI & design", href: "/web-layer/fresh-ui/" }
-next: null
+next: { label: "better-auth plugins", href: "/identity-access/better-auth-plugins/" }
 order: 1
 ---
 
@@ -393,6 +393,6 @@ adapters now have dedicated generated reference pages.
   }
 ] }) }}
 
-{{ comp.nextPrev({ prev: { label: "Fresh UI & design", href: "/web-layer/fresh-ui/" }, next: null }) }}
+{{ comp.nextPrev({ prev: { label: "Fresh UI & design", href: "/web-layer/fresh-ui/" }, next: { label: "better-auth plugins", href: "/identity-access/better-auth-plugins/" } }) }}
 </content>
 </invoke>
