@@ -1499,3 +1499,21 @@ executing; the reframe pass (6 debts, 18 markers) follows once these land.
   viewport-width layout bound, neither observable in raw HTML. The right instrument was a real
   browser at the reported viewport with JS disabled/enabled. When a user reports a visual
   defect, reproduce in the medium they used before reporting non-reproduction.
+
+## 2026-08-04 — CAVEAT KILL-LIST COMPLETE (5/5); reframe pass dispatched (#1288)
+
+- **#1283 merged → #1229 closed.** Kill list fully retired in one evening: #1228 (workers
+  job-tools telemetry), #1225 (sagas per-transition mirror), #1229 (triggers defer scheduler),
+  #1230 (fresh telemetry defaults), #1231 (app-wide shutdown orchestrator).
+- **#1286 merged** (owner's docs-site render fix — the defect behind finding 33).
+- **Census proof the kill-list did its caveat half:** `origin/main` now carries exactly 18
+  `caveat: arch-debt:` markers across 6 debt ids — precisely the reframe list, with every
+  kill-list marker gone (workers-scaffold-job-tools-noop, triggers-defer-unsupported,
+  fresh-app-telemetry-defaults, runtime-app-wide-shutdown-orchestrator all absent).
+- **#1288 filed + dispatched** on the documentation-authoring lane (agy · low per lane-policy,
+  worktree ns005-reframe): rewrite the 18 true-boundary call-outs from apologies into design
+  statements — marker and debt link preserved (the marker is the audit trail), no deletion
+  while true, no new capability claims, per-page voice respected, and "left as is because I
+  could not state it accurately" is an allowed verdict. Brief mandates **box-index** evidence
+  entries per finding 32.
+- Canary.9 dispatch chained on the #1283 merge (caveat burn-down as one coherent train, D16).
