@@ -30,26 +30,16 @@ over a durable-stream server that runs as an Aspire resource on its assigned por
 The producer runtime in `@netscript/plugin-streams-core` writes through
 `@durable-streams/client` with idempotent delivery. The topic-centric
 **manifest sugar** in `@netscript/plugin-streams`
-(`defineStreamProducer` / `defineStreamConsumer`) is **not** wired to a
-transport: a producer's `publish()` returns a **rejected** promise and a
-consumer's `subscribe()` **throws** synchronously — both with
-`StreamUnsupportedOperationError`, pointing you at the core package. There is
-also no in-process consumer `subscribe()` yet — consumption is over the
-durable-stream server's HTTP/SSE protocol, which Fresh clients read. Build
-against the core producer package, not the manifest helpers.
+(`defineStreamProducer` / `defineStreamConsumer`) operates as a design boundary;
+because a broker-agnostic topic transport is deferred, these helpers are stubs
+whose endpoints reject (`publish()`) or throw (`subscribe()`) with
+`StreamUnsupportedOperationError`. Similarly, in-process subscription handling
+is deferred; consumption is routed over the durable-stream server's HTTP/SSE
+protocol (which Fresh clients read to materialize state). Applications must wire
+against the core producer package directly.
 
-{{ comp callout { type: "important", title: "Status — producers write via the core package; manifest helpers fail loud" } }}
-The producer is implemented: <code>createDurableStream(...)</code> from
-<code>@netscript/plugin-streams-core</code> writes <code>upsert</code>/<code>delete</code>/<code>flush</code>
-through <code>@durable-streams/client</code> to the streams Aspire service (on its assigned port), and workers,
-sagas, and auth already mirror their state through it. What is <strong>not</strong> supported: the
-manifest helpers <code>defineStreamProducer</code>/<code>defineStreamConsumer</code> in
-<code>@netscript/plugin-streams</code> fail loud — a producer's <code>publish()</code> returns a
-<strong>rejected</strong> promise and a consumer's <code>subscribe()</code> <strong>throws</strong>
-synchronously, both with <code>StreamUnsupportedOperationError</code> — use
-<code>@netscript/plugin-streams-core</code> instead. There is also no
-in-process consumer <code>subscribe()</code>; consumption is via the durable-stream HTTP/SSE server
-(read by Fresh clients).
+{{ comp callout { type: "important", title: "Stream Manifest and Pub/Sub Design Boundary" } }}
+NetScript's stream architecture separates entity-state change replication from generic message topic publishing. The active stream engine is accessed via <code>createDurableStream(...)</code> in <code>@netscript/plugin-streams-core</code> (writing <code>upsert</code>/<code>delete</code>/<code>flush</code> events to the streams service). Consequently, the manifest-layer topic helpers (<code>defineStreamProducer</code>/<code>defineStreamConsumer</code> in <code>@netscript/plugin-streams</code>) throw a <code>StreamUnsupportedOperationError</code>. This boundary is drawn because a unified, broker-agnostic topic routing transport is a future feature-scale design. Today, you must utilize the core package for state-change publishing, and read events over the durable-stream service's HTTP/SSE endpoint.
 {{ /comp }}
 
 ## What it is
@@ -301,6 +291,10 @@ When <code>STREAMS_DATA_DIR</code> is unset, the streams service uses <strong>in
 
 Be deliberate about what the alpha producer does and does not guarantee.
 <!-- caveat: arch-debt:streams-manifest-helpers-unsupported -->
+
+{{ comp callout { type: "warning", title: "Stream Manifest and Pub/Sub Design Boundary" } }}
+The topic-centric helpers (<code>defineStreamProducer</code> / <code>defineStreamConsumer</code>) in <code>@netscript/plugin-streams</code> are unsupported stub APIs that throw a <code>StreamUnsupportedOperationError</code> at runtime. A broker-agnostic topic pub/sub model is a future roadmap design; today, you must implement state-change replication using <code>@netscript/plugin-streams-core</code> and consume streams via HTTP/SSE.
+{{ /comp }}
 
 {{ comp callout { type: "warning", title: "Writes are dropped after a connect failure (no reconnect)" } }}
 If the producer cannot reach the durable-stream server (on its assigned port) at startup, it logs a

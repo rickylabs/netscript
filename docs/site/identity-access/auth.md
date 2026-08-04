@@ -231,13 +231,8 @@ The plugin's service is named `auth-api` and is built with `@netscript/service`'
   ]
 }) }}
 
-{{ comp callout { type: "note", title: "Backend selection is one env var" } }}
-The service picks <strong>one</strong> active backend from <code>NETSCRIPT_AUTH_BACKEND</code>
-(or appsettings <code>auth.backend</code>): valid values are <code>kv-oauth</code> |
-<code>workos</code> | <code>better-auth</code>, defaulting to <strong><code>kv-oauth</code></strong>.
-This is the <strong>single-active-backend</strong> boundary — there is no multi-active routing,
-cross-backend account linking, or global logout across backends in v1. Switching providers means
-changing the env var and the backend's credentials, not running two backends at once.
+{{ comp callout { type: "note", title: "Single Active Backend Design Boundary" } }}
+NetScript's authentication plugin is architected around a single active backend configuration per deployment, resolved at startup via the <code>NETSCRIPT_AUTH_BACKEND</code> environment variable (or <code>auth.backend</code> settings). This design boundary prioritizes clean, isolated runtime execution for individual identity providers. Consequently, features such as dynamic multi-backend routing, cross-backend account linking, and global multi-store session revocation are not supported in this version. For complex multi-tenant or federated identity requirements, routing must be managed upstream or via an external aggregator, as swapping providers requires redeployment with updated credentials.
 <!-- caveat: arch-debt:auth-single-active-backend-boundary -->
 {{ /comp }}
 

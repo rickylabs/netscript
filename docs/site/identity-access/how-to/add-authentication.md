@@ -72,12 +72,8 @@ glue barrel, and registers it. The plugin package composes **one active backend*
 `auth-api` oRPC service and contributes the Prisma schema (`auth.prisma`), service entry, and
 `/api/v1/auth/*` routes.
 
-{{ comp callout { type: "note", title: "One plugin, one active backend" } }}
-<code>@netscript/plugin-auth</code> is a thin composition layer. The real authentication logic lives
-in a <em>backend adapter</em> — one of <code>@netscript/auth-kv-oauth</code>,
-<code>@netscript/auth-workos</code>, or <code>@netscript/auth-better-auth</code>. The plugin selects
-<strong>exactly one</strong> active backend at runtime; there is no multi-active routing or
-cross-backend account linking in v1. You pick the backend in Step 2.
+{{ comp callout { type: "note", title: "Single Active Backend Design Boundary" } }}
+<code>@netscript/plugin-auth</code> is designed as a single-backend runtime composition layer. The active implementation (selected from <code>@netscript/auth-kv-oauth</code>, <code>@netscript/auth-workos</code>, or <code>@netscript/auth-better-auth</code>) is resolved statically at startup. This boundary ensures session isolation and keeps the validation path predictable, meaning that multi-active routing, cross-backend account linking, and global multi-store logout are not supported in the core runtime. Complex multi-tenant scenarios must be coordinated via an upstream identity router or external identity aggregator.
 <!-- caveat: arch-debt:auth-single-active-backend-boundary -->
 {{ /comp }}
 
@@ -95,15 +91,8 @@ The active backend is selected by the `NETSCRIPT_AUTH_BACKEND` environment varia
   ]
 }) }}
 
-{{ comp callout { type: "warning", title: "Only kv-oauth is interactive — choose accordingly" } }}
-The <code>signin</code> and <code>callback</code> endpoints require a backend that implements the
-optional <code>InteractiveFlowPort</code>. <strong>Only <code>kv-oauth</code> does.</strong> On
-<code>workos</code> and <code>better-auth</code>, calling <code>POST /api/v1/auth/signin</code> or
-<code>POST /api/v1/auth/callback</code> returns a typed <code>AUTH_PROVIDER_ERROR</code> (502)
-explaining the backend "does not expose an interactive flow." Those backends are for environments
-where sign-in already happened elsewhere and you only need NetScript to <em>validate</em> the session
-(<code>session</code>/<code>me</code>). If you need NetScript to drive the login redirect, use
-<code>kv-oauth</code>.
+{{ comp callout { type: "warning", title: "Interactive Authentication Boundary" } }}
+Only the <code>kv-oauth</code> backend implements the <code>InteractiveFlowPort</code> required to drive login redirects directly via NetScript's <code>signin</code> and <code>callback</code> endpoints. Under <code>workos</code> and <code>better-auth</code>, these routes intentionally return a <code>AUTH_PROVIDER_ERROR</code> (502). This boundary exists because these backends are designed for external verification models where authentication is completed by a frontend client or parent application. In this architecture, you must initiate the authentication flow using the provider's direct SDK or login page, using NetScript to validate the resulting session tokens. Implementing a native <code>InteractiveFlowPort</code> for <code>better-auth</code> is tracked under roadmap item R2.
 <!-- caveat: arch-debt:seamless-auth-roadmap -->
 {{ /comp }}
 

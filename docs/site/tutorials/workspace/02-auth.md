@@ -78,12 +78,8 @@ endpoint off the dashboard. Confirm it landed:
 netscript plugin list
 ```
 
-{{ comp callout { type: "note", title: "One plugin, one active backend" } }}
-<code>@netscript/plugin-auth</code> is a thin composition layer. The real authentication logic lives in
-a <em>backend adapter</em> — one of <code>@netscript/auth-kv-oauth</code>,
-<code>@netscript/auth-workos</code>, or <code>@netscript/auth-better-auth</code>. The plugin selects
-<strong>exactly one</strong> active backend at runtime; there is no multi-active routing or
-cross-backend account linking in v1. You pick the backend in Step 2.
+{{ comp callout { type: "note", title: "Single Active Backend Design Boundary" } }}
+The <code>@netscript/plugin-auth</code> plugin composes a single active backend adapter at runtime (configured via <code>NETSCRIPT_AUTH_BACKEND</code>). By design, the NetScript runtime isolates identity provider environments to keep session verification simple and predictable, so running multiple active backends simultaneously or linking accounts across them is not supported. For this tutorial, we will configure a single provider, but in production, any provider swapping is performed at the environment level rather than through runtime routing.
 <!-- caveat: arch-debt:auth-single-active-backend-boundary -->
 {{ /comp }}
 

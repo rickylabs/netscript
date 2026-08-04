@@ -246,13 +246,8 @@ The process contract is unchanged — argv + env in, one JSON object on the last
 and they are why this step is a **read-now, run-on-your-own-host** capability rather than part of
 this chapter's checkpoint:
 
-{{ comp callout { type: "danger", title: "Only the deno runtime is sandboxed" } }}
-For <code>python</code>, <code>shell</code>, <code>powershell</code>, <code>cmd</code>,
-<code>dotnet</code>, and <code>executable</code> tasks, the <code>.permissions({...})</code> keys
-are <strong>ignored</strong> — the subprocess inherits the worker process's full OS-level access.
-A non-Deno task is a trust boundary: pin the entrypoint to a known script, prefer a pinned
-interpreter or venv (<code>pythonConfig.venvPath</code>) over <code>$PATH</code> discovery, never
-interpolate untrusted input into <code>args</code>, and gate access at the OS layer.
+{{ comp callout { type: "danger", title: "Non-Deno Runtime Sandboxing Boundary" } }}
+For non-Deno task runtimes (including <code>python</code>, <code>shell</code>, <code>powershell</code>, <code>cmd</code>, <code>dotnet</code>, and <code>executable</code>), NetScript enforces a sandboxing boundary: the <code>.permissions({...})</code> keys are ignored, and subprocesses inherit the worker host's full OS-level permissions. This boundary exists because OS-level process isolation for arbitrary third-party environments is decoupled from NetScript's core application runtime. Today, you must treat these runtimes as a trust boundary: secure execution by pinning entrypoints to known local scripts, preferring a pinned interpreter or venv (<code>pythonConfig.venvPath</code>), and applying OS-level containerization or process group restrictions.
 <!-- caveat: arch-debt:workers-non-deno-task-sandbox-boundary -->
 {{ /comp }}
 

@@ -213,15 +213,8 @@ framework-managed notion of an organization that owns many workspaces. NetScript
 tenants, or RBAC roles — if you want multi-tenant scoping, you add it yourself, in your own schema and
 your own queries.
 
-{{ comp callout { type: "note", title: "Org scoping is your code, not a framework primitive" } }}
-To scope data to an organization, add an <code>orgId</code> column to your own models and filter every
-query by it — for example <code>workspaceDb.workspace.findMany(&#123; where: &#123; orgId &#125; &#125;)</code>.
-NetScript has <strong>no</strong> first-class organization, tenant, or role primitive: the
-<code>auth</code> plugin resolves an identity (a <code>Principal</code> with a <code>subject</code>),
-and the route-authz seam in <a href="/tutorials/workspace/05-route-authz/">chapter 5</a> checks
-<em>scopes</em>, not org membership. Multi-tenant isolation, role hierarchies, and per-org access
-control are <strong>application logic you own</strong> — treat any <code>orgId</code> here as a column
-you maintain, not a behavior the framework enforces.
+{{ comp callout { type: "note", title: "Multi-Tenancy and Org Scoping Design Boundary" } }}
+NetScript's identity system provides authentication (resolving a <code>Principal</code> with a <code>subject</code> and claims), but does not natively enforce organization boundaries or multi-tenant database scoping in the core runtime. This design boundary keeps authentication decoupled from application-level data isolation patterns. Today, multi-tenant scoping (such as filtering by <code>orgId</code> or managing role hierarchies) must be implemented in your application logic. Adding first-class, typed organization and multi-tenancy primitives is planned under roadmap item R3.
 <!-- caveat: arch-debt:seamless-auth-roadmap -->
 {{ /comp }}
 

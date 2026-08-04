@@ -278,15 +278,8 @@ An empty `members` array is still a `200` — it means the guard passed and the 
 yet (provision one with the [chapter 4](/tutorials/workspace/04-provision-job/) job). A `401` or `403`
 means the request never reached the query at all.
 
-{{ comp callout { type: "warning", title: "Scope: route-level authz, not org/role RBAC" } }}
-<code>.withAuthz()</code> decides from a <code>Principal</code>'s <strong>scopes</strong> on a matched
-route. It is <strong>not</strong> organization-aware or role-hierarchy-aware: there is no
-framework-managed notion of "this user belongs to that org" or "admins inherit member permissions."
-A scope is a flat string the authenticator attached to the principal. The <code>{ workspace }</code>
-path param tells you <em>which</em> team was requested, but confirming the caller may see
-<em>that</em> team is app-level logic from
-<a href="/tutorials/workspace/03-workspace-data/">chapter 3</a> — you filter your own queries by your
-own <code>orgId</code> and derive your own roles. The seam gates the route; the tenancy is yours.
+{{ comp callout { type: "warning", title: "Route-Level Scope Authorization Boundary" } }}
+The <code>.withAuthz()</code> helper acts as a route-level filter that evaluates flat scope strings attached to the <code>Principal</code>. This design boundary separates HTTP route gating from complex tenant-ownership check logic. Consequently, the framework does not automatically evaluate role hierarchies (such as admin permission inheritance) or verify organization-specific boundaries (such as confirming the caller is a member of the requested <code>workspace</code>). Currently, you must perform tenant-membership checks manually within your queries. Integrating typed organization helpers and plugin-aware principal mapping is planned under roadmap items R3 and R5.
 <!-- caveat: arch-debt:seamless-auth-roadmap -->
 {{ /comp }}
 

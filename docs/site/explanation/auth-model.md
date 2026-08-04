@@ -128,15 +128,8 @@ WorkOS *owns* the sign-in page and session lifecycle; asking NetScript to also m
 would be wrong, so the backend declines it loudly rather than pretending. The next section explains
 exactly how it declines.
 
-{{ comp callout { type: "warning", title: "What non-interactive means at runtime" } }}
-On a non-interactive backend (WorkOS or better-auth), the two interactive endpoints behave
-predictably and visibly: <code>/api/v1/auth/signin</code> and <code>/api/v1/auth/callback</code>
-return a typed <code>AUTH_PROVIDER_ERROR</code> (HTTP 502, "does not expose an interactive flow"),
-and any direct session mutation throws <code>AuthBackendOperationUnsupportedError</code>. The
-<code>session</code>, <code>me</code>, and <code>signout</code> endpoints still work — you verify and
-read the session the hosted provider established. Choose kv-oauth when you want NetScript to drive
-the full redirect; choose WorkOS/better-auth when the provider owns sign-in and NetScript only
-verifies.
+{{ comp callout { type: "warning", title: "Non-Interactive Adapter Design Boundary" } }}
+Under non-interactive backends (WorkOS and better-auth), NetScript enforces a strict verification-only boundary: the runtime verifies existing sessions via the <code>session</code>, <code>me</code>, and <code>signout</code> endpoints, but does not drive user-facing sign-in redirects or execute session mutations. This design isolates redirect-based authentication from core verification logic. Consequently, calling <code>/api/v1/auth/signin</code> or <code>/api/v1/auth/callback</code> returns a typed <code>AUTH_PROVIDER_ERROR</code> (HTTP 502), and mutations throw <code>AuthBackendOperationUnsupportedError</code>. For direct redirect management, use the <code>kv-oauth</code> backend, or implement sign-in client-side using your provider's SDK before verification. Extending interactive flow capability to the better-auth backend is tracked under roadmap item R2.
 <!-- caveat: arch-debt:seamless-auth-roadmap -->
 {{ /comp }}
 
@@ -192,23 +185,19 @@ the `auth-api` oRPC service on **:8094** with five endpoints under `/api/v1/auth
 ```
 
 **Single-active-backend is a deliberate v1 boundary**, not an incidental limitation. It means there
-is exactly one authenticator answering at a time. The following are explicitly **out of scope** for
-v1 — do not design against them yet:
+is exactly one authenticator answering at a time. This boundary is drawn to keep the identity model coherent: a single `Principal` source, a single session authority, and a single place to reason about who is signed in. Multi-backend identity synchronization (e.g. cross-provider logout, account linking, conflicting session lifetimes) requires a complex state orchestrator that is decoupled from NetScript's core validation layer.
+
+The following table details what lies on either side of this v1 deployment boundary:
 
 {{ comp.apiTable({
-  caption: "Out of scope in v1 (single-active-backend boundary)",
+  caption: "V1 Boundary Mapping (single-active-backend)",
   rows: [
-    { name: "Multi-active routing", type: "not supported", desc: "You cannot run kv-oauth and WorkOS simultaneously and route requests between them. One backend is active per deployment." },
-    { name: "Cross-backend account linking", type: "not supported", desc: "There is no linking of a kv-oauth identity to a WorkOS identity. Each backend owns its own identities." },
-    { name: "Global logout", type: "not supported", desc: "No fan-out logout across backends or across a user's sessions in other backends." },
-    { name: "Historical replay / paged session mirror", type: "not supported", desc: "No replay of past auth events into a backend, and no paged mirror of every session across backends." }
+    { name: "Multi-active routing", type: "Out of scope", desc: "Routing requests across multiple backends simultaneously is not supported. Use a single active backend configuration per deployment." },
+    { name: "Cross-backend account linking", type: "Out of scope", desc: "Identity association between separate providers must be handled upstream; each adapter manages its own independent identities." },
+    { name: "Global logout", type: "Out of scope", desc: "Session revocation is local to the active backend store. Cross-backend token revocation must be handled by the provider's management console." },
+    { name: "Historical replay / session mirroring", type: "Out of scope", desc: "Synchronizing historical login logs or mirroring session state between backends is deferred to future identity orchestration layers." }
   ]
 }) }}
-
-Choosing one active backend keeps the model coherent: a single `Principal` source, a single session
-authority, and a single place to reason about who is signed in. Multi-backend identity is a hard
-problem (consistent logout, link reconciliation, conflicting session lifetimes); v1 declines it on
-purpose rather than ship a half-correct version.
 <!-- caveat: arch-debt:auth-single-active-backend-boundary -->
 
 ## Why this seam — the design in one sentence
