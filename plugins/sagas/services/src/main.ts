@@ -20,31 +20,15 @@ import '@netscript/kv/redis';
 import type { PluginServiceContext } from '@netscript/plugin/sdk';
 import type { RunningService } from '@netscript/service';
 import { createPluginService } from '@netscript/plugin/service';
-import type { SagaRuntime } from '@netscript/plugin-sagas-core/runtime';
-import {
-  KvSagaAppliedKeyStore,
-  KvSagaIdempotencyStore,
-  openSagaRuntimeKv,
-  type PrismaSagaStoreClient,
-  resolveSagaStoreBackend,
-} from '@netscript/plugin-sagas-core/stores';
 import { type SagaStreamPrismaClient, startSagasStreamMirror } from '../../streams/server.ts';
-import { createDurableSagaRuntime, type DurableSagaRuntime } from '../../src/runtime/mod.ts';
-import { createSagaTelemetry } from '../../src/telemetry/otel-saga-tracer.ts';
+import { createSagaDeliveryPublisher } from '../../src/runtime/saga-delivery.ts';
 import { router } from './router.ts';
 import { registerSagas } from './init.ts';
 import type { SagaServiceDatabaseClient } from './routers/v1-types.ts';
 
 export type { PluginServiceContext } from '@netscript/plugin/sdk';
 
-type ServiceDatabaseClient =
-  & SagaServiceDatabaseClient
-  & PrismaSagaStoreClient
-  & SagaStreamPrismaClient;
-type SagaServiceContextSettings = Readonly<{
-  sagas?: { store?: { backend?: string } };
-  Sagas?: { Store?: { Backend?: string } };
-}>;
+type ServiceDatabaseClient = SagaServiceDatabaseClient & SagaStreamPrismaClient;
 type PluginServiceBootstrap = {
   createPluginServiceContext(pluginName: string): Promise<PluginServiceContext>;
 };
@@ -58,13 +42,9 @@ export default async function createSagasService(
   ctx: PluginServiceContext,
 ): Promise<RunningService> {
   const port = parseInt(ctx.env.PORT ?? Deno.env.get('PORT') ?? '8092');
-  const sagaStoreBackend = resolveSagaStoreBackend({
-    env: { ...Deno.env.toObject(), ...ctx.env },
-    appsettings: serviceAppsettings(ctx),
-  });
   let dbClient: SagaServiceDatabaseClient = emptySagaDatabaseClient;
-  let sagaRuntime: SagaRuntime | undefined;
-  let durableRuntime: DurableSagaRuntime | undefined;
+  let useKvProjection = true;
+  const sagaPublisher = createSagaDeliveryPublisher();
 
   const service = await createPluginService(router, {
     name: 'sagas',
@@ -74,19 +54,8 @@ export default async function createSagasService(
       title: 'Sagas API',
       description: 'Sagas service for workflow orchestration and management',
     },
-    context: () => ({ db: dbClient, sagaRuntime }),
-    // Graceful shutdown: stop the saga runtime, then dispose the durable
-    // runtime. This preserves the previous `stop()` wrapper's stop→dispose order
-    // (the previous code stopped the runtime in a `try` and disposed in
-    // `finally`); a single hook keeps that ordering deterministic rather than
-    // relying on reverse-order hook execution.
-    onShutdown: [async () => {
-      try {
-        await sagaRuntime?.stop('sagas-service-stop');
-      } finally {
-        await durableRuntime?.dispose();
-      }
-    }],
+    context: () => ({ db: dbClient, sagaRuntime: sagaPublisher, useKvProjection }),
+    onShutdown: [() => sagaPublisher.stop()],
   }).serve();
 
   queueMicrotask(async () => {
@@ -94,23 +63,8 @@ export default async function createSagasService(
       const resolvedDbClient = await ctx.db.getClient();
       assertServiceDatabaseClient(resolvedDbClient);
       dbClient = resolvedDbClient;
-      const definitions = await registerSagas();
-      const kv = await openSagaRuntimeKv();
-      durableRuntime = await createDurableSagaRuntime({
-        backend: sagaStoreBackend,
-        kv,
-        prisma: sagaStoreBackend === 'prisma' ? resolvedDbClient : undefined,
-        native: {
-          idempotency: new KvSagaIdempotencyStore({ kv }),
-          instrumentation: createSagaTelemetry(),
-          engineOptions: {
-            appliedKeys: new KvSagaAppliedKeyStore({ kv }),
-          },
-        },
-      });
-      sagaRuntime = durableRuntime.runtime;
-      await sagaRuntime.register(definitions);
-      await sagaRuntime.start();
+      useKvProjection = false;
+      await registerSagas();
       void startSagasStreamMirror({ prisma: resolvedDbClient })
         .catch((error) => {
           console.warn('[Sagas API] Durable stream hook skipped:', error);
@@ -181,15 +135,6 @@ function hasMethod(value: object, key: string): boolean {
 
 function isObject(value: unknown): value is object {
   return typeof value === 'object' && value !== null;
-}
-
-function serviceAppsettings(ctx: PluginServiceContext): SagaServiceContextSettings | undefined {
-  const candidate = ctx as PluginServiceContext & {
-    readonly appsettings?: SagaServiceContextSettings;
-    readonly settings?: SagaServiceContextSettings;
-    readonly config?: SagaServiceContextSettings;
-  };
-  return candidate.appsettings ?? candidate.settings ?? candidate.config;
 }
 
 async function loadSagasServiceContext(): Promise<PluginServiceContext> {

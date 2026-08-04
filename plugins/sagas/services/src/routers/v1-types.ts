@@ -6,6 +6,10 @@ export type SagaServiceContext = Readonly<{
   db: SagaServiceDatabaseClient;
   /** Started saga runtime used by publish endpoints. */
   sagaRuntime?: SagaServiceRuntime;
+  /** Maximum time an HTTP request may wait for durable publish acceptance. */
+  publishTimeoutMs?: number;
+  /** Read instances from the KV projection when Prisma saga delegates are unavailable. */
+  useKvProjection?: boolean;
 }>;
 
 /** Minimal saga runtime message shape used by the service publish endpoint. */
@@ -78,6 +82,8 @@ export type PublishSagaMessageOptions = Readonly<{
   writeEvent?: SagaPublishEventWriter;
   /** Trace headers propagated from the active request span. */
   traceHeaders?: Readonly<Record<string, string>>;
+  /** Maximum time to wait for the runtime/publisher boundary. */
+  timeoutMs?: number;
 }>;
 
 /** Input accepted by the V1 publish helper. */

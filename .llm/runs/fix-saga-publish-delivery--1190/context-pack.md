@@ -12,10 +12,10 @@
 
 ## Current State
 
-Research and design are locked under the milestone PLAN-EVAL waiver. Current code has API-local
-engine execution, an idle runner, and a disconnected `saga_instances` read model. Implementation
-will use the existing traced, provider-neutral queue between API and runner, then project after
-successful engine persistence.
+Research and design are locked under the milestone PLAN-EVAL waiver. The implementation now uses
+the existing traced, provider-neutral queue between API and runner, supplies delayed cascades from
+the same queue, and projects successful engine persistence into Prisma `saga_instances` or a named
+KV fallback. Focused package/plugin/queue suites are green; real scaffold protocols remain.
 
 ## Completed
 
@@ -27,14 +27,14 @@ successful engine persistence.
 
 ## In Progress
 
-- Slice 1: HTTP-boundary RED regression and first implementation commit/draft PR.
+- Slice 4: rebase onto current main, reconcile #1193, and run static/quality/JSR gates.
 
 ## Next Steps
 
-1. Add and demonstrate the HTTP RED fixture against the old runtime-bound handler.
-2. Implement bounded queue publisher and runner delivery ownership.
-3. Add projection and public lifecycle/scheduler contract coverage.
-4. Run scoped gates, reconcile #1193, then perform both serialized scaffold protocols.
+1. Commit and push the green delivery/projection slice.
+2. Rebase onto current main and reconcile #1193 when its integration SHA is available.
+3. Run quality/architecture/JSR gates.
+4. Perform both serialized scaffold protocols with artifact/restart/OTEL evidence.
 
 ## Key Decisions
 
@@ -50,19 +50,24 @@ successful engine persistence.
 | Path | Status | Notes |
 | ---- | ------ | ----- |
 | `.llm/runs/fix-saga-publish-delivery--1190/*` | new | Activated harness run and locked design. |
+| `plugins/sagas/src/runtime/saga-{delivery,instance-projection}.ts` | new | Queue delivery, delayed scheduler, and read-model projection. |
+| `plugins/sagas/services/src/**` | changed | Bounded durable enqueue and KV projection reads. |
+| `packages/plugin-sagas-core/src/runtime/**` | changed | Structural scheduler port for queue-backed scheduling. |
+| `packages/queue/adapters/deno-kv.adapter.ts` | changed | Await durable enqueue. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | ----------- | -------------- | -------- |
-| Static | plan PASS; implementation NOT_RUN | `worklog.md` |
-| Fitness | PENDING_SCRIPT | `plan.md` |
-| Runtime | RED carried; GREEN NOT_RUN | issue #1190 / failed scaffold |
+| Static | scoped check/lint PASS; fmt corrected | `worklog.md` |
+| Fitness | focused F13 PASS; F19 pending | package/plugin/queue suites |
+| Runtime | HTTP RED/GREEN PASS; scaffold GREEN NOT_RUN | `publish-http-boundary_test.ts` |
 | Consumer | NOT_RUN | foreign AppHost currently active |
 
 ## Open Questions
 
 - Exact #1193 integration SHA and when its AppHost is released.
+- Whether the fresh generated client has Prisma saga delegates (both Prisma and KV projection paths are implemented).
 
 ## Drift and Debt
 
@@ -72,4 +77,3 @@ successful engine persistence.
 ## Commits
 
 - See the draft PR's commit list + per-slice PR comments (V3 retired `commits.md`).
-

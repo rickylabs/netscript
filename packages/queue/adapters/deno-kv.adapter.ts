@@ -187,7 +187,7 @@ export class DenoKvAdapter<T = unknown> implements MessageQueue<T> {
     try {
       await this.ensureKv();
       const envelope = createEnvelope(message, options);
-      this.queue.enqueue(envelope, {
+      await this.queue.enqueue(envelope, {
         delay: options?.delay ? Temporal.Duration.from({ milliseconds: options.delay }) : undefined,
       });
     } catch (error) {

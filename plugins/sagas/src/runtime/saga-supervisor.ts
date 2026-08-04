@@ -12,6 +12,8 @@ import {
 } from '@netscript/plugin-sagas-core/stores';
 import { createSagaTelemetry } from '../telemetry/otel-saga-tracer.ts';
 import { createDurableSagaRuntime } from './create-durable-saga-runtime.ts';
+import type { SagaRuntimeDeliveryPort } from './saga-delivery.ts';
+import type { SagaInstanceProjectionPort } from './saga-instance-projection.ts';
 
 /** Lifecycle status exposed by the saga runtime supervisor. */
 export type SagaRuntimeSupervisorStatus =
@@ -36,6 +38,8 @@ export type SagaRuntimeSupervisorOptions = Readonly<{
   loadDefinitions?: SagaDefinitionRegistryLoader;
   runtimeOptions?: CreateSagaRuntimeOptions;
   createRuntime?: SagaRuntimeFactory;
+  delivery?: SagaRuntimeDeliveryPort;
+  projection?: SagaInstanceProjectionPort;
 }>;
 
 /** Immutable runtime supervisor state snapshot. */
@@ -72,11 +76,15 @@ export class SagaRuntimeSupervisor {
 
     try {
       const definitions = await this.resolveDefinitions();
-      const runtime = await (this.options.createRuntime ?? createDefaultRuntime)(
-        this.options.runtimeOptions ?? {},
-      );
+      const runtime = this.options.createRuntime
+        ? await this.options.createRuntime(this.options.runtimeOptions ?? {})
+        : await createDefaultRuntime(
+          this.options.runtimeOptions ?? {},
+          this.options.projection,
+        );
       await runtime.register(definitions);
       await runtime.start();
+      await this.options.delivery?.start(runtime);
       this.definitions = definitions;
       this.runtime = runtime;
       this.status = 'running';
@@ -96,9 +104,18 @@ export class SagaRuntimeSupervisor {
     }
 
     this.status = 'stopping';
-    await this.runtime.stop(reason);
-    this.status = 'stopped';
+    try {
+      await this.options.delivery?.stop();
+    } finally {
+      await this.runtime.stop(reason);
+      this.status = 'stopped';
+    }
     return this.snapshot();
+  }
+
+  /** Wait for the owned delivery listener to stop or fail. */
+  waitForDelivery(): Promise<void> {
+    return this.options.delivery?.wait() ?? new Promise<void>(() => undefined);
   }
 
   /** Return the current immutable supervisor state. */
@@ -127,7 +144,10 @@ function formatFailure(cause: unknown): string {
   return cause instanceof Error ? cause.message : String(cause);
 }
 
-async function createDefaultRuntime(options: CreateSagaRuntimeOptions): Promise<SagaRuntime> {
+async function createDefaultRuntime(
+  options: CreateSagaRuntimeOptions,
+  projection?: SagaInstanceProjectionPort,
+): Promise<SagaRuntime> {
   if (hasInjectedNativeEngine(options)) {
     return createSagaRuntime({
       ...options,
@@ -141,6 +161,7 @@ async function createDefaultRuntime(options: CreateSagaRuntimeOptions): Promise<
   const durable = await createDurableSagaRuntime({
     backend: 'kv',
     kv,
+    projection,
     native: {
       ...native,
       idempotency: native.idempotency ?? new KvSagaIdempotencyStore({ kv }),

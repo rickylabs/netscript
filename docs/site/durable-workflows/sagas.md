@@ -336,21 +336,25 @@ You select the backend with the `NETSCRIPT_SAGA_STORE` environment variable (`kv
   ]
 }) }}
 
-The factory that owns these resources is `createDurableSagaRuntime(...)` from the
-`@netscript/plugin-sagas/runtime` subpath. It resolves a `SagaStorePort`, builds the
-native runtime over it, and hands you back a `dispose()` that closes the store (and the
-KV handle it opened).
+The low-level factory that owns these resources is `createDurableSagaRuntime(...)` from the
+`@netscript/plugin-sagas/runtime` subpath. It resolves a `SagaStorePort`, builds an
+**unstarted** native runtime over it, and hands you back a `dispose()` that closes the store (and
+the KV handle it opened). It is deprecated as a single-point composition surface: use the
+scaffolded `startSagaRunner(...)` path for registry loading, queue delivery, delayed cascades,
+projection, and lifecycle ownership. If you deliberately use the low-level factory, you must
+register definitions, inject a scheduler for `schedule()` cascades, and call `runtime.start()`
+before publishing.
 
 {{ comp.tabbedCode({ tabs: [
   {
     label: "kv backend",
     lang: "ts",
-    code: "import { createDurableSagaRuntime } from '@netscript/plugin-sagas/runtime';\n\n// Deno KV durable store — the default for local/single-service apps.\n// Selected at deploy time by NETSCRIPT_SAGA_STORE=kv (or appsettings sagas.store.backend=kv).\nconst { runtime, store, dispose } = await createDurableSagaRuntime({\n  backend: 'kv',\n  // kv is opened for you if you don't inject one (openSagaRuntimeKv()).\n});\n\n// ... register saga definitions on `runtime`, process messages ...\n\nawait dispose(); // closes the KV-backed store + handle"
+    code: "import { createDurableSagaRuntime } from '@netscript/plugin-sagas/runtime';\n\n// Low-level Deno KV construction. Prefer startSagaRunner() for the complete process.\nconst { runtime, store, dispose } = await createDurableSagaRuntime({ backend: 'kv' });\nawait runtime.register(definitions);\nawait runtime.start();\ntry {\n  await runtime.publish(message);\n} finally {\n  await runtime.stop('application shutdown');\n  await dispose();\n}"
   },
   {
     label: "prisma backend",
     lang: "ts",
-    code: "import { createDurableSagaRuntime } from '@netscript/plugin-sagas/runtime';\nimport { PrismaClient } from './generated/prisma/client.ts';\n\n// Postgres/Prisma durable store — writes saga_runtime_* tables.\n// Selected at deploy time by NETSCRIPT_SAGA_STORE=prisma.\nconst prisma = new PrismaClient();\nconst { runtime, store, dispose } = await createDurableSagaRuntime({\n  backend: 'prisma',\n  prisma, // REQUIRED for prisma — omitting it throws.\n});\n\n// ... register saga definitions, process messages — transitions land in\n// saga_runtime_state / saga_runtime_transition / saga_runtime_correlation ...\n\nawait dispose();"
+    code: "import { createDurableSagaRuntime } from '@netscript/plugin-sagas/runtime';\nimport { PrismaClient } from './generated/prisma/client.ts';\n\n// Low-level Prisma construction. Prefer startSagaRunner() for complete delivery + lifecycle.\nconst prisma = new PrismaClient();\nconst { runtime, dispose } = await createDurableSagaRuntime({ backend: 'prisma', prisma });\nawait runtime.register(definitions);\nawait runtime.start();\n// A definition that emits schedule() also requires an injected scheduler on this low-level path.\nawait runtime.publish(message);\nawait runtime.stop('application shutdown');\nawait dispose();"
   },
   {
     label: "resolve from env / appsettings",
@@ -383,6 +387,11 @@ A message reaches a saga through a **publisher**. `createSagaPublisher` (from
 to the sagas API publish endpoint, discovering the service URL from the Aspire environment
 by default. The workers `create-user-settings` job uses exactly this to emit
 `UserSettingsCreated` across the plugin boundary.
+
+The HTTP response acknowledges a durable enqueue, not completion of the saga transition. The
+background saga runner consumes that queue, persists engine state, and updates the
+`saga_instances` read model. Queue/provider failures and the publish deadline return a non-2xx
+response; the endpoint never treats an indefinitely pending publish as success.
 
 {{ comp.apiTable({
   caption: "createSagaPublisher(options) — HttpSagaPublisherOptions",
@@ -456,7 +465,7 @@ generated surface.
     { name: "GET /health/live", type: "liveness", desc: "Liveness probe for the sagas API service." },
     { name: "GET /api/v1/sagas/sagas", type: "registry", desc: "List the saga definitions registered into KV (id, name, topic, handled message types, enabled)." },
     { name: "GET /api/v1/sagas/instances", type: "instances", desc: "List running and completed saga instances. Inspect one with /instances/{sagaName}/{correlationId}." },
-    { name: "POST /api/v1/sagas/publish", type: "publish", desc: "Publish a message to the saga bus — the same path createSagaPublisher POSTs to and the workers create-user-settings job uses." },
+    { name: "POST /api/v1/sagas/publish", type: "publish", desc: "Durably enqueue a saga message for the background runner. Returns non-2xx when enqueue fails or exceeds the publish deadline." },
     { name: "GET /api/v1/sagas/subscribe", type: "stream (SSE)", desc: "Server-sent-events stream of saga activity (saga:started / state_changed / completed / failed / compensating), KV-watch backed." }
   ]
 }) }}

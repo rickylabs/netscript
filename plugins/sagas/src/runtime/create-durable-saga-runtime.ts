@@ -16,6 +16,10 @@ import {
   PrismaSagaStore,
   type PrismaSagaStoreClient,
 } from '@netscript/plugin-sagas-core/stores';
+import {
+  ProjectingSagaStore,
+  type SagaInstanceProjectionPort,
+} from './saga-instance-projection.ts';
 
 /** Options for the plugin-layer durable saga runtime factory. */
 export type DurableSagaRuntimeOptions = Readonly<{
@@ -23,6 +27,7 @@ export type DurableSagaRuntimeOptions = Readonly<{
   kv?: KvStore;
   prisma?: PrismaSagaStoreClient;
   store?: SagaStorePort;
+  projection?: SagaInstanceProjectionPort;
   native?: SagaRuntimeNativeOptions;
 }>;
 
@@ -34,16 +39,24 @@ export type DurableSagaRuntime = Readonly<{
   dispose(): Promise<void>;
 }>;
 
-/** Create a native saga runtime backed by a durable saga store. */
+/**
+ * Create an unstarted native saga runtime backed by a durable saga store.
+ *
+ * @deprecated Prefer `startSagaRunner` for the complete delivery, scheduler, registration, and
+ * lifecycle composition. Low-level callers must still register definitions and call `start()`.
+ */
 export async function createDurableSagaRuntime(
   options: DurableSagaRuntimeOptions = {},
 ): Promise<DurableSagaRuntime> {
   const resources = await resolveStoreResources(options);
+  const store = options.projection
+    ? new ProjectingSagaStore(resources.store, options.projection)
+    : resources.store;
   const runtime = createSagaRuntime({
     adapter: 'native',
     native: {
       ...options.native,
-      store: resources.store,
+      store,
       compensator: options.native?.compensator ?? new SagaCompensator({
         clock: systemSagaClock,
       }),
@@ -52,7 +65,7 @@ export async function createDurableSagaRuntime(
 
   return Object.freeze({
     runtime,
-    store: resources.store,
+    store,
     kv: resources.kv,
     dispose: resources.dispose,
   });

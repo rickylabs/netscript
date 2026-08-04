@@ -9,12 +9,12 @@ import { SagasError } from '@netscript/plugin-sagas-core/domain';
 import { router, type SagasHandlers } from './router-context.ts';
 import {
   buildSagaInstanceWhere,
-  getSagaDb,
+  findSagaInstanceKv,
   hasPrismaSagaInstanceClient,
+  listSagaInstanceKv,
   mapHistoryEntry,
   mapPrismaRecordToInstance,
   mapSagaToResponse,
-  parseSagaInstanceKv,
 } from './v1-helpers.ts';
 import type { SagaInstanceKv } from './v1-helpers.ts';
 import type {
@@ -25,6 +25,8 @@ import type {
   SagaRuntimeMessage,
   SagaServiceContext,
 } from './v1-types.ts';
+
+const DEFAULT_SAGA_PUBLISH_TIMEOUT_MS = 5_000;
 
 /**
  * Capabilities document advertised by the running sagas service.
@@ -93,7 +95,7 @@ export const sagasV1: SagasHandlers<SagasV1RouteKey> = {
     const { db } = context;
     const { limit, offset, sagaName, status } = input;
 
-    if (hasPrismaSagaInstanceClient(db)) {
+    if (context.useKvProjection !== true && hasPrismaSagaInstanceClient(db)) {
       const whereClause = buildSagaInstanceWhere(sagaName, status);
       const [records, total] = await Promise.all([
         db.sagaInstance.findMany({
@@ -113,25 +115,10 @@ export const sagasV1: SagasHandlers<SagasV1RouteKey> = {
       };
     }
 
-    const kvDb = await getSagaDb();
-    const sagaColl = kvDb.sagaInstances;
-    let instances: SagaInstanceKv[];
-
-    if (sagaName && status) {
-      const { result } = await sagaColl.findBySecondaryIndex('sagaName', sagaName, {
-        filter: (doc) => parseSagaInstanceKv(doc.value).status === status,
-      });
-      instances = result.map((doc) => parseSagaInstanceKv(doc.value));
-    } else if (sagaName) {
-      const { result } = await sagaColl.findBySecondaryIndex('sagaName', sagaName);
-      instances = result.map((doc) => parseSagaInstanceKv(doc.value));
-    } else if (status) {
-      const { result } = await sagaColl.findBySecondaryIndex('status', status);
-      instances = result.map((doc) => parseSagaInstanceKv(doc.value));
-    } else {
-      const { result } = await sagaColl.getMany();
-      instances = result.map((doc) => parseSagaInstanceKv(doc.value));
-    }
+    const instances: SagaInstanceKv[] = (await listSagaInstanceKv()).filter((instance) =>
+      (sagaName === undefined || instance.sagaName === sagaName) &&
+      (status === undefined || status === null || instance.status === status)
+    );
 
     const total = instances.length;
     return {
@@ -145,6 +132,14 @@ export const sagasV1: SagasHandlers<SagasV1RouteKey> = {
   /** Get a specific saga instance by name and correlation ID. */
   getInstance: router.getInstance.handler(async ({ input, errors, path, context }) => {
     const { sagaName, correlationId } = input;
+    if (context.useKvProjection === true || !hasPrismaSagaInstanceClient(context.db)) {
+      const instance = await findSagaInstanceKv(sagaName, correlationId);
+      if (!instance) {
+        notFound({ errors, path, resourceId: `${sagaName}/${correlationId}` });
+        throw new Error('Not found');
+      }
+      return instance;
+    }
     const records = await context.db.sagaInstance.findMany({
       where: { sagaName, correlationId },
       orderBy: { createdAt: 'desc' },
@@ -166,6 +161,7 @@ export const sagasV1: SagasHandlers<SagasV1RouteKey> = {
     return await publishSagaMessage(input, {
       runtime: contextSagaRuntime(context),
       traceHeaders: traceContextToHeaders(traceContext),
+      timeoutMs: context.publishTimeoutMs,
     });
   }),
 
@@ -255,11 +251,14 @@ export async function publishSagaMessage(
     tracestate: options.traceHeaders?.tracestate,
   });
 
-  await options.runtime.publish(message, {
-    idempotencyKey,
-    traceparent: message.traceparent,
-    tracestate: message.tracestate,
-  });
+  await publishWithinDeadline(
+    options.runtime.publish(message, {
+      idempotencyKey,
+      traceparent: message.traceparent,
+      tracestate: message.tracestate,
+    }),
+    options.timeoutMs ?? DEFAULT_SAGA_PUBLISH_TIMEOUT_MS,
+  );
 
   const event: SagaPublishEvent = {
     type: 'saga:message_received',
@@ -274,6 +273,26 @@ export async function publishSagaMessage(
     messageType: type,
     correlationId,
   };
+}
+
+async function publishWithinDeadline(publish: Promise<unknown>, timeoutMs: number): Promise<void> {
+  if (!Number.isFinite(timeoutMs) || timeoutMs <= 0) {
+    throw SagasError.validationFailed('Saga publish timeout must be a positive number.');
+  }
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const timeout = new Promise<never>((_resolve, reject) => {
+    timer = setTimeout(
+      () => reject(SagasError.retryable(`Saga publish did not settle within ${timeoutMs}ms.`)),
+      timeoutMs,
+    );
+  });
+  try {
+    await Promise.race([publish, timeout]);
+  } finally {
+    if (timer !== undefined) {
+      clearTimeout(timer);
+    }
+  }
 }
 
 function contextSagaRuntime(context: SagaServiceContext) {

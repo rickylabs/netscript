@@ -26,6 +26,7 @@
     "@netscript/plugin": "jsr:@netscript/plugin@0.0.4",
     "@netscript/plugin-sagas-core": "jsr:@netscript/plugin-sagas-core@0.0.4",
     "@netscript/plugin-streams-core": "jsr:@netscript/plugin-streams-core@0.0.4",
+    "@netscript/queue": "jsr:@netscript/queue@0.0.4",
     "@netscript/service": "jsr:@netscript/service@0.0.4",
     "@netscript/telemetry": "jsr:@netscript/telemetry@0.0.4",
     "hono": "jsr:@hono/hono@4.12.24",

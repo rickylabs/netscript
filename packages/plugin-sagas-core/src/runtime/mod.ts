@@ -98,5 +98,6 @@ export type {
   SagaSchedulerDrainFailure,
   SagaSchedulerDrainResult,
   SagaSchedulerOptions,
+  SagaSchedulerPort,
   SagaSchedulerStorePort,
 } from './saga-scheduler.ts';

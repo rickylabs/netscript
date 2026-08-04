@@ -38,3 +38,25 @@ documentation.
 - **Action:** accept
 - **Evidence:** `supervisor.md` distinguishes canonical requested route from observed surface.
 
+## 2026-08-04 — Deno KV queue enqueue was not awaited
+
+- **What:** The selected cross-backend queue seam called Fedify's Deno KV `enqueue()` without
+  awaiting its promise, so HTTP could acknowledge before durable acceptance and async failures
+  escaped the queue error boundary.
+- **Source:** `packages/queue/adapters/deno-kv.adapter.ts`.
+- **Expected:** `MessageQueue.enqueue()` resolves only after the provider accepts the message.
+- **Actual:** The adapter returned after invoking the promise.
+- **Severity:** significant
+- **Action:** fix
+- **Evidence:** Added `await`; the full queue suite passes 35/35.
+
+## 2026-08-04 — main advanced after plan lock
+
+- **What:** `origin/main` advanced from `f7f7cc718` to `6821545af` through PR #1194 before the
+  implementation commit.
+- **Source:** `git fetch origin main` and PR #1198 base SHA.
+- **Expected:** Plan baseline remained current through the first slice.
+- **Actual:** One unrelated MCP feature PR landed.
+- **Severity:** minor
+- **Action:** rescope
+- **Evidence:** Rebase the implementation branch before the integration gates.

@@ -15,7 +15,7 @@ import { createSagaEngine, type SagaEngine, type SagaEngineOptions } from './sag
 import type { SagaCompensator } from './saga-compensator.ts';
 import type { SagaIdempotencyDedupTable } from './saga-idempotency.ts';
 import { type LoggerPort, NoopLogger } from './logger.ts';
-import type { SagaScheduler } from './saga-scheduler.ts';
+import type { SagaSchedulerPort } from './saga-scheduler.ts';
 import type { SagaInstrumentation } from '../telemetry/mod.ts';
 
 /** Adapter selected by the saga runtime composition root. */
@@ -26,7 +26,7 @@ export type SagaRuntimeNativeOptions = Readonly<{
   id?: string;
   engine?: SagaEngine;
   engineOptions?: SagaEngineOptions;
-  scheduler?: SagaScheduler;
+  scheduler?: SagaSchedulerPort;
   compensator?: SagaCompensator;
   store?: SagaStorePort;
   resolveCompensation?: SagaBridgeCompensationResolver;

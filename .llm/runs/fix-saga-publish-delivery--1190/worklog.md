@@ -67,6 +67,10 @@ the standard runner consumes the shared `sagas` queue and projects transitions a
 | 2026-08-04 | 1 | environment | Found one foreign #1193 `aspire/db-operation` AppHost; reported and left untouched. |
 | 2026-08-04 | 1 | design | Locked queue-backed API→runner delivery and projection seam. |
 | 2026-08-04 | 1 | PLAN-EVAL | composed per milestone-run.md (orchestrator waiver) |
+| 2026-08-04 | 1 | RED | Real router request with a never-settling publisher exceeded the 100ms harness deadline: `Expected actual: "request-timed-out" not to be: "request-timed-out"`. |
+| 2026-08-04 | 2 | delivery | HTTP now awaits traced durable enqueue with a finite deadline; runner owns queue listener and queue-backed delayed cascades. |
+| 2026-08-04 | 3 | projection | Runner store decorator mirrors persisted transitions to Prisma `saga_instances` or the named KV fallback when delegates are unavailable. |
+| 2026-08-04 | 3 | focused gates | Queue 35/35, saga core 69 pass (2 ignored integrations), sagas plugin 44/44; HTTP GREEN completed in 26–39ms and two transitions projected. |
 
 ## Decisions
 
@@ -83,6 +87,7 @@ the standard runner consumes the shared `sagas` queue and projects transitions a
 | ----- | -------- | ------------------ |
 | #1193 protocol did not capture #1190 publish-hang RED | minor | yes |
 | Foreign `aspire/db-operation` host blocks a fresh AppHost now | significant | yes |
+| Deno KV queue did not await the Fedify enqueue promise | significant | yes |
 
 ## Gate Results
 
@@ -92,14 +97,16 @@ the standard runner consumes the shared `sagas` queue and projects transitions a
 | ---- | ---------------- | ------ | ----- |
 | Plan-Gate | manual checklist | PASS | All rows present; evaluator composition waiver recorded. |
 | PLAN-EVAL | milestone composition | PASS | composed per milestone-run.md (orchestrator waiver) |
-| check/lint/fmt | scoped wrappers | NOT_RUN | implementation not started |
+| check | scoped wrapper over core/queue/plugin | PASS | 230 TS/TSX files selected. |
+| lint | scoped wrapper over core/queue/plugin | PASS | 230 files, 0 findings. |
+| fmt | scoped wrapper over core/queue/plugin plus focused Markdown | PASS | Four implementation files formatted; focused recheck pending after final edits. |
 | quality/arch/JSR | repo-native gates | NOT_RUN | implementation not started |
 
 ### Fitness Gates
 
 | Gate | Result | Evidence | Notes |
 | ---- | ------ | -------- | ----- |
-| `F13` | PENDING_SCRIPT | `plan.md` validation 1–8 | Runtime protocol required. |
+| `F13` | PASS | 69 core tests + 44 plugin tests + 35 queue tests | Fresh scaffold runtime protocol still required separately. |
 | `F19` | PENDING_SCRIPT | `research.md` JSR scan | Public-surface verdict after implementation. |
 
 ### Runtime Gates
@@ -107,6 +114,8 @@ the standard runner consumes the shared `sagas` queue and projects transitions a
 | Gate | Result | Evidence | Notes |
 | ---- | ------ | -------- | ----- |
 | 0.0.4 RED | FAIL | issue #1190 + failed scaffold drift/worklog | No HTTP status in 15s; no instance; runner only started. |
+| HTTP-boundary RED | FAIL | `publish-http-boundary_test.ts` before implementation | Actual router request exceeded 100ms and failed its assertion. |
+| HTTP-boundary GREEN | PASS | `publish-http-boundary_test.ts` | Deadline returned non-2xx in ~10ms; enqueue→runner→persist→project→scheduled follow-up passed in 26–39ms. |
 | Redis/Garnet GREEN | NOT_RUN | pending | Serialized AppHost required. |
 | Deno KV GREEN | NOT_RUN | pending | Separate serialized AppHost required. |
 | OTEL traces/spans | NOT_RUN | pending | Must quote path and correlation. |
@@ -121,4 +130,3 @@ the standard runner consumes the shared `sagas` queue and projects transitions a
 
 - Inspect the HTTP→queue→runner ownership boundary first, then projection write ordering.
 - Reject any claim that HTTP 2xx alone proves runner delivery; require GET/persistence/spans.
-
