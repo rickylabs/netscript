@@ -83,6 +83,8 @@ at the exported helper boundary.
 | Doc lint | BASELINE DEBT | No missing JSDoc; existing private-type-reference findings remain (13/24/24). |
 | Publish dry-run | PASS | workers-core, workers, and triggers all simulate publish successfully. |
 | Lock hygiene | PASS | Pre-existing `deno.lock` modification remains unstaged and uncommitted. |
+| Acceptance mirror | PASS | Live #1228 has no close-gated boxes; fenced evidence block validates with no changes. |
+| Review threads | PASS | 0 threads; 0 unanswered. |
 
 ## Composed IMPL-EVAL
 
