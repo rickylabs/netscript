@@ -948,3 +948,27 @@ the global-mutex supersede, not a failure). #1209 remains ready; merge at your d
   compensating control, first execution): `closingIssuesReferences` = [] — clean.**
 - Full ci rerun (30899643898) fired for the close-gate flip; merge armed on green. #1201 slice
   launch + fleet watchers unaffected.
+
+## 2026-08-04 — docs orchestrator: #1216 merged into 0.0.5
+
+Main-pages revamp (homepage/why/quickstart/concepts) squash-merged on owner authorization,
+milestone 0.0.5, CI fully green incl. a real scaffold-runtime pass. Full adversarial trail on
+PR #1215. FYI for the release cut: four docs/site pages changed, no packages/ source.
+
+## 2026-08-04 — MERGE #1211 (squash); S7 + sagas lanes fired; #1218 identified
+
+- **Merge: PR #1211** — gate record: rerun 30899643898 latest-per-name quality ✓ check-test ✓
+  deps-report ✓ **close-gate ✓**; e2e-cli 30901864277 concluded success (scaffold-runtime
+  skip-proof under the owner's `ci:skip-e2e`/`ci:skip-scaffold` labels; local 70/70 stands as
+  the runtime evidence); review-threads gate 0/0; sidebar closingIssuesReferences = [];
+  refs `Refs #1202` only (no auto-close — Windows-service box stays owner-owned). Every red on
+  the head at merge time: none current (all non-green check-runs were superseded attempts,
+  named in the body's drift section). #1202 remains open as designed.
+- **S7 steered** (thread `019fcb61-764c`, ns005-s7): rebase onto main, capture box-43 live-ports
+  evidence via `list_api_services` on a working local scaffold, tick, push. Explicitly told the
+  6-minute draft-matrix scaffold-runtime green is NOT box-43 evidence.
+- **Sagas steered** (thread `019fc9c3-2d9f`, ns005-sagas): seven-point both-backends protocol on
+  a fresh main scaffold; evidence comment on the #1190 thread; orchestrator hand-closes.
+- **#1218** = the #1201 corpus slice's draft PR (opened 10:42:59Z by the launched Sol·high
+  agent, labeled + milestoned correctly). Wave-4 lane live. #1216 merged by the docs lane
+  (`c6f243dac`) — rides canary.6's content-derived train.
