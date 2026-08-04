@@ -1483,3 +1483,19 @@ executing; the reframe pass (6 debts, 18 markers) follows once these land.
   acceptance-evidence YAML — text keys are self-invalidating for exactly the boxes that carry
   citations, which is all of them by the end.** Rewrote #1282's four entries to box-index;
   `mirror-acceptance-evidence --dry-run` clean; gate rerun + merge armed.
+
+## 2026-08-04 — Kill-list 4/5 landed (#1230, #1231 closed); docs-render defect was real
+
+- **#1282 merged → #1230 closed** (Fresh telemetry defaults activated; close-gate cured via
+  the finding-32 box-index rewrite).
+- **#1285 merged → #1231 closed** (app-wide shutdown orchestrator).
+- Kill-list state: #1228, #1225, #1230, #1231 CLOSED; only #1229 (defer scheduler, PR #1283)
+  remains — canary.9's slice completes on its merge.
+- **Owner PR #1286** (docs-site: dead tab bar without JS + wide viewports stranded at 80ch)
+  confirms the render defect the owner reported earlier today and I could not reproduce.
+  **Finding 33 (for #1163): a server-rendered-HTML fetch cannot falsify a client-side render
+  complaint.** My check pulled the page HTML, found no unrendered template syntax, and
+  reported "not reproducing" — but the failure was JS-dependent interactivity (tab bar) and a
+  viewport-width layout bound, neither observable in raw HTML. The right instrument was a real
+  browser at the reported viewport with JS disabled/enabled. When a user reports a visual
+  defect, reproduce in the medium they used before reporting non-reproduction.
