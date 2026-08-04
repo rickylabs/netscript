@@ -702,3 +702,15 @@ expensive gate queued behind the sagas joint run), #1187 `019fcb61-8dfe` (Sol·m
   agy's exit status is now 0-for-2 against its artifacts; gate judges artifacts.
 - Sagas thread re-issued the final scope: both-backends protocol on the rebased branch, then
   ready. Canary.2 = merge #1193 + hand-complete #1184/#1190 on its recording.
+
+## 2026-08-04 — Docs-leverage program (owner waves): #1208 P1 in flight, #1210 filed
+
+Owner direction crystallized into a three-phase docs program: P1 (#1208, p0, agy running at
+effort high): tutorials demonstrate the page builder, discovered from the real `deno doc`
+surface. P2 (post-P1): inconsistency/underleverage sweep. P3 (#1210, p1): competitive tutorial
+benchmark vs major frameworks + per-API differentiator deep-dive sub-pages (owner exemplars:
+`withResource` — cross-layer request dedup, per-layer refinement, idiomatic auth/context-aware
+queries; Partials — bare-Fresh ceremony made seamless, deferred-loader composition; explicitly
+not limited to those two). Insight recorded: the docs gap and the #1197 tool-adoption gap are
+the same underleverage phenomenon at two layers, and #1201's MCP corpus will multiply whichever
+version of the docs ships — which is why P1 gates the waiting agent launch behind canary.2.
