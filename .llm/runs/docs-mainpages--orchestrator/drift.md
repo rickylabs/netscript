@@ -73,3 +73,9 @@ Confirmed findings:
   (`review_codex` ladder), which the Opus FIX_FIRST review already performed. Final audit
   runs on Opus (Claude family), not Sol. The launcher's duplicate-sender guard on
   ns-mainpages surfaced this before a same-family audit happened.
+
+- **D-10 (owner fallback, 2026-08-04).** Owner directed Kimi K3 as the S5 fallback. OpenCode
+  transport remains down for Kimi too (err_a96367fc — transport-level, model-agnostic), so S5
+  runs Kimi K3 (`moonshotai/kimi-k3` · high) over the proven claude-openrouter transport
+  (`claude-print`). Same brief and artifact path (slices/mainpages-s5/grok-eval.md name kept
+  for continuity of the slice, content authored by Kimi).
