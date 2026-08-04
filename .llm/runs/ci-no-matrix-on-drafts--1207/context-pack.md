@@ -4,5 +4,6 @@
 `ready_for_review` and later non-draft events run required core contexts and the capability-scoped
 matrix. No package code or lockfile is owned. Focused policy tests (3/3), classifier and close-gate
 tests (58/58), targeted fmt, and diff-check pass. Live draft/ready Actions evidence remains to
-record. Draft evidence on PR #1212 shows core/e2e/surface workflow runs all skipped with no jobs;
-the ready transition remains.
+record. PR #1212 draft runs skipped every job; the ready transition materialized required core
+contexts plus the capability-selected scaffold/runtime/desktop matrix. The evidence commit also
+exercises a subsequent non-draft push.

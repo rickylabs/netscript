@@ -29,7 +29,12 @@
   e2e [run 30891563314](https://github.com/rickylabs/netscript/actions/runs/30891563314), and surface
   [run 30891563153](https://github.com/rickylabs/netscript/actions/runs/30891563153) all completed
   `skipped`; no jobs ran. This is the same pull-request push shape with `draft: true`.
-- AFTER ready-flip run URLs: to be added after transitioning PR #1212.
+- AFTER ready flip: core CI [run 30891612271](https://github.com/rickylabs/netscript/actions/runs/30891612271)
+  materialized `deps-report` (success), `check-test` (running), `quality` (running), and
+  `close-gate` (ran; expected lifecycle failure because the live-evidence DoD box was unchecked at
+  event time). E2E [run 30891611877](https://github.com/rickylabs/netscript/actions/runs/30891611877)
+  materialized classifier, scaffold-static, scaffold-runtime, and desktop. This proves required
+  contexts and the full matrix appear on `ready_for_review`.
 
 ## Validation
 
