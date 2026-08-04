@@ -1183,3 +1183,14 @@ pending, canary.7's green pair holds the stable-cut precondition meanwhile.
   `localhost:4437/auth/sessions` — a legacy pin pointing at a port no scaffold binds
   post-#1211; same class as the dead servicePort values in scaffold.plugin.json. Product
   code, so routed as an issue, not absorbed into the docs lane.
+
+## 2026-08-04 — MERGE #1242 (#1240 closed): full fixed-port docs sweep landed
+
+Gate record: head `493bf2062`, quality/check-test/deps-report/close-gate all green (fresh
+gate run via ready-merge label; acceptance-evidence YAML mirror), zero other reds on head,
+threads 0/0, refs [1240] verified after final body edit; **#1240 auto-closed, verified.**
+Content: two-pass sweep (pass 1 issue-named ports; pass 2 source-constant-derived widening
+to 4437/8010/3001 after finding 27), ~25 files, transcript rule applied to tutorials.
+The #1211 row of the fix-driven caveat program is done; #1206/#1218/#1224 rows were already
+clean per the inventory. Rides canary.8. Remaining program debt: reframe pass (6 debts, 18
+markers) after the kill-list slices land; #1243 (0.0.6) tracks the auth CLI legacy pin.
