@@ -1830,3 +1830,32 @@ Recovery executed, all standalone: `release:canary-label --published-version 0.0
 canary label on 21 items; prerelease note created; drift 14 labels vs 25 published versions).
 Then dispatched `e2e-cli-prod.yml` at 0.0.5-canary.10 (run 30959439986) — the first execution
 of #1294's `quickstart.walk` against a published CLI. Its verdicts answer the owner's bar.
+
+## 2026-08-05 — FIRST QUICKSTART WALK against a published CLI: 6/7 green, step 6 unproven
+
+Run 30959430176 (`e2e-cli-prod` @ 0.0.5-canary.10) executed #1294's `quickstart.walk` for the
+first time. **Summary: passed=7 failed=1** across the seven verdicts + cleanup.
+
+| # | Step | Verdict | Time |
+| --- | --- | --- | --- |
+| 1 | install published CLI | PASS | 328ms |
+| 2 | `netscript init` | PASS | 537ms |
+| 3 | **add a service afterwards** (#1290's path) | **PASS** | 9.3s |
+| 4 | **`aspire restore` + `start`** (#1227's path) | **PASS** | 22.3s |
+| 5 | `db init` → `generate` → `seed` | PASS | 73.9s |
+| 6 | documented project check | **FAILED (gate bug)** | 18ms |
+| 7 | example service answers | PASS | 1.0s |
+
+Steps 3 and 4 are the decisive ones: the two defects that made the pilot impossible are
+verifiably fixed on a published artifact, on a clean runner — not merely merged.
+
+**Step 6 is a defect in the GATE, not the product.** `quickstart-walk-suite.ts` builds
+`['deno','task','--minimum-dependency-age=0','check']`; that flag belongs to `deno run`, and
+`deno task` rejects it. The step died in 18ms on argument parsing without executing anything,
+so the box "deno task check passes with zero errors" is **UNPROVEN, not red** — the distinction
+matters and I will not report a verdict on it until the gate runs the documented command.
+**Finding 41 (for #1163): a new gate's first red is more likely to be the gate than the system
+under test — an implausibly short failure (18ms) that exits on argument parsing is the tell.
+Read the failure before believing the verdict, and build the harness so parse-failure and
+product-failure are distinguishable, because an unattended agent cannot tell them apart.**
+Fix dispatched to the lane that authored the suite, including that distinguishability guard.
