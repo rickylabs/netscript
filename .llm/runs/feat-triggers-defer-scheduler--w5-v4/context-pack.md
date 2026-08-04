@@ -18,4 +18,6 @@ then compose it through the public plugin runtime. Plan is locked under D6 compo
 
 Draft PR #1283 is open; S0 and the explicit failing S1 RED proof are pushed. S2 now has a core-owned
 port, KV adapter, deterministic memory helper, and GREEN fire/cancel/past-due/restart tests. Commit
-S2 without staging plugin S3 edits, then finish S3 and the S4 gates.
+S2 is pushed. S3 plugin composition is now GREEN through the public processor path and the full
+plugin test task. Commit/push S3, then remove the two invalid caveats, close the debt entry, and run
+the S4 archetype/JSR/quality gates.

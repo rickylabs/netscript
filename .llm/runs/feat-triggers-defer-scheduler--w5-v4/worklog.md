@@ -30,3 +30,13 @@
 - Live #1229 remains open; PR #1283 remains draft with exactly one `status:impl` label.
 - No new review/evaluator comments changed the locked contract. S2 stays within the core-owned port
   and adapter boundary; plugin composition remains S3.
+
+| 2026-08-04 | S3 GREEN | full `plugins/triggers` package task | 35 passed (9 steps), 0 failed, 12 environment-gated ignored |
+| 2026-08-04 | S3 lifecycle | focused public runtime + trace-parenting tests | 4 passed, 0 failed; fake clock, no real sleeps |
+| 2026-08-04 | S3 static | scoped check/lint/fmt wrappers for `plugins/triggers` | zero findings after formatting two owned files |
+
+### S3 reconcile
+
+- The full #1229 contract remains achievable; closing keyword stays `Closes #1229`.
+- Runtime composition registers live definitions, uses distinct replay event/idempotency ids, and
+  aborts/drains the scheduler wake loop on processor stop. No unrelated issue scope was absorbed.

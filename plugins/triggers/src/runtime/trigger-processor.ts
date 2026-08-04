@@ -36,7 +36,10 @@ export async function startTriggerProcessorRuntime(
   }
 
   const definitions = options.definitions ?? await loadProjectTriggerDefinitions();
-  const processor = options.processor ?? await createRuntimeTriggerProcessor({ kv: options.kv });
+  const processor = options.processor ?? await createRuntimeTriggerProcessor({
+    kv: options.kv,
+    definitions,
+  });
   const scheduler = options.scheduler ?? new CronTriggerSchedulerAdapter();
   const fileWatcher = options.fileWatcher ?? new WatchersFileWatcherAdapter();
 
