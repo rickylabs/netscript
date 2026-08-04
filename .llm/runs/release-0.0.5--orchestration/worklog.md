@@ -1137,3 +1137,12 @@ They ride whichever canary follows their merges (content-derived membership).
   S11/S12 at wave 7.
 - **#1236 slice dispatched** (ns005-plugrm, Sol·medium) — all three verified defects now have
   live lanes (#1234 ns005-genjobs, #1235 ns005-streamdb, #1236 ns005-plugrm).
+
+## 2026-08-04 — MERGE #1232 (#1135 closed): S9 activation lands — W4-B/C/D complete
+
+Gate record: head `f6d3fcb96`, quality/check-test/deps-report/close-gate all green (first
+read), refs `Closes #1135` sidebar [1135] exact, threads 0/0; #1135 auto-closed, verified.
+OMB epic now waits only on S11/S12 (wave 7). Rides canary.8 with #1226 + #1233.
+Canary.8 plan: dispatch after the verified-defect triad (#1239/#1238/#1237) merges — a
+canary train of three user-facing fixes plus the S9/S10/cron surfaces; no owner deadline
+pending, canary.7's green pair holds the stable-cut precondition meanwhile.
