@@ -1041,3 +1041,18 @@ feed — unless a later change makes it so). Sweeps owed once their fixes land:
 Execution lane: focused docs slice(s) after #1224 merges (docs-authoring exception applies);
 overlap with docsorch P2 sweep coordinated via its brief — fix-driven caveat corrections stay
 with this run so release notes and docs agree at cut time.
+
+## 2026-08-04 — CANARY.6 stage-E record: published + labeled, pair RED (infra class); fix-forward
+
+- **canary.6** (run 30906410487): publish through the production path ✓, label/drift/note steps ✓
+  (in-run canary-label all PASS), pinned prod E2E run 30906657319 **FAILED on
+  `runtime.aspire-restore`** — the identical NuGet-hang signature as this morning's local runs
+  (2×900.1s, exit 6, 29/1), now on a cloud runner: an intermittent upstream/feed issue, not
+  train-attributable (restore precedes any NetScript code; the train is docs+ports+S7).
+  `Record failed canary pair` executed as designed. Filed **#1227** (p1, gate:e2e; plan row
+  added — retry budget + pinned-package cache + infra-vs-product classification).
+- Disposition per cadence doctrine + finding 26: **fix forward** — no cancel, no re-mint of .6;
+  the E2E run was re-run once for an informational fresh roll (published-artifact proof); the
+  ledger's next green pair comes from **canary.7's full chain** (train: #1221, #1218, #1224 on
+  merge). Stable-cut precondition still held by canary.5's green pair; the cut itself waits for
+  a green pair on the final train as always.
