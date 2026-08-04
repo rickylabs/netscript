@@ -101,6 +101,7 @@ export async function scaffoldServices(
     targetPath: options.targetPath,
     serviceName: options.serviceName,
     servicePort: options.servicePort,
+    hostPort: options.serviceHostPort,
     importMode: options.importMode,
     localBase: options.localBase ? adjustLocalBase(options.localBase, 2) : undefined,
     packagesAsWorkspaceMembers: context.packagesAsWorkspaceMembers(options),

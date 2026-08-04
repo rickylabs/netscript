@@ -1,7 +1,9 @@
 const projectRoot = Deno.args[0];
 if (!projectRoot) throw new Error('project root argument is required');
 
-const baseUrl = 'http://127.0.0.1:8091/api/v1/workers/jobs/health-check';
+const port = Number(Deno.args[1]);
+if (!Number.isInteger(port)) throw new Error('workers API port argument is required');
+const baseUrl = `http://127.0.0.1:${port}/api/v1/workers/jobs/health-check`;
 const getResponse = await fetch(baseUrl);
 if (!getResponse.ok) throw new Error(`Flow-B job read failed: HTTP ${getResponse.status}`);
 const current = await getResponse.json();

@@ -207,7 +207,7 @@ describe('generateAppDenoJson', () => {
 
 describe('generateAppViteConfig', () => {
   it('should include the NetScript Vite plugin and workspace watch paths', () => {
-    const output = generateAppViteConfig({ appName: 'dashboard' });
+    const output = generateAppViteConfig({ appName: 'dashboard', appPort: 50_123 });
     assertStringIncludes(output, 'createNetScriptVitePlugin');
     assertStringIncludes(output, "resolve(workspaceRoot, 'packages')");
     assertStringIncludes(output, "resolve(workspaceRoot, 'contracts')");
@@ -215,7 +215,7 @@ describe('generateAppViteConfig', () => {
   });
 
   it('should include all @app aliases mirrored from the playground', () => {
-    const output = generateAppViteConfig({ appName: 'dashboard' });
+    const output = generateAppViteConfig({ appName: 'dashboard', appPort: 50_123 });
     assertStringIncludes(output, '@app/assets');
     assertStringIncludes(output, '@app/components');
     assertStringIncludes(output, '@app/islands');
@@ -224,7 +224,7 @@ describe('generateAppViteConfig', () => {
   });
 
   it('keeps alias and plugin ordering stable in the vite config', () => {
-    const output = generateAppViteConfig({ appName: 'dashboard' });
+    const output = generateAppViteConfig({ appName: 'dashboard', appPort: 50_123 });
 
     assert(
       output.indexOf("{ find: '@app/assets'") < output.indexOf("{ find: '@app/components'") &&
@@ -236,9 +236,8 @@ describe('generateAppViteConfig', () => {
       output.indexOf('fresh(),') < output.indexOf('tailwindCSS(),') &&
         output.indexOf('tailwindCSS(),') < output.indexOf('createNetScriptVitePlugin({'),
     );
-    assertStringIncludes(
-      output,
-      "port: Number.parseInt(env.NETSCRIPT_VITE_PORT ?? process.env.PORT ?? '5173', 10)",
-    );
+    const fallback = /process\.env\.PORT \?\? '(\d+)'/.exec(output);
+    assertEquals(fallback?.[1] !== undefined, true);
+    assertEquals(Number(fallback?.[1]) >= 49_152, true);
   });
 });

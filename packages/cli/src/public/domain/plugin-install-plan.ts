@@ -80,6 +80,9 @@ export interface PluginInstallPlan extends Omit<PluginInstallRequest, 'kind'> {
 
   /** Resolved database intent for this plugin. */
   readonly dbDetection: PluginDbDetectionResult;
+
+  /** Listener ports already pinned in the generated workspace. */
+  readonly configuredListenerPorts?: ReadonlySet<number>;
 }
 
 /** Files and resources produced while rendering the plugin workspace. */

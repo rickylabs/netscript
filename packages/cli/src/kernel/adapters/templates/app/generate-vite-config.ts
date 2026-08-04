@@ -16,6 +16,8 @@ import { readTemplateAssetSync } from '../../templates/template-asset.ts';
 export interface AppViteConfigOptions {
   /** App name reserved for future path-shape variations. */
   readonly appName: string;
+  /** Stable standalone listener fallback. */
+  readonly appPort: number;
 }
 
 /**
@@ -28,6 +30,11 @@ export interface AppViteConfigOptions {
  * @param options - App-specific generation options.
  * @returns Rendered Vite config source with trailing newline.
  */
-export function generateAppViteConfig({ appName: _appName }: AppViteConfigOptions): string {
-  return readTemplateAssetSync(TEMPLATE_KEYS.appViteConfig);
+export function generateAppViteConfig(
+  { appName: _appName, appPort }: AppViteConfigOptions,
+): string {
+  return readTemplateAssetSync(TEMPLATE_KEYS.appViteConfig).replace(
+    "process.env.PORT ?? '5173'",
+    `process.env.PORT ?? '${appPort}'`,
+  );
 }

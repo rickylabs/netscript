@@ -43,8 +43,6 @@ function scaffoldInitCommand(context: RunContext): readonly string[] {
     '--service',
     '--service-name',
     'users',
-    '--service-port',
-    '3001',
     '--ci',
     '--yes',
     '--no-git',

@@ -189,22 +189,21 @@ describe('allocatePort', () => {
   it('returns preferred port when available', async () => {
     // Spy echoes back whatever preferredPort is requested, simulating the port
     // being free on the host. Injected as the third DI argument.
-    const getPortSpy = spy((opts?: { preferredPort?: number }) => opts?.preferredPort ?? 3000);
+    const getPortSpy = spy((opts?: { preferredPort?: number }) => opts?.preferredPort ?? 49_152);
     const port = await allocatePort('SERVICE', new Set(), getPortSpy);
-    assertEquals(port, 3000); // first port in the SERVICE range (3000–3099)
+    assertEquals(port, 49_152);
     assertSpyCalls(getPortSpy, 1);
   });
 
   it('skips already used ports', async () => {
-    // Spy: if the candidate is 3000 (taken at the OS level) it hands back 3001;
+    // Spy: if the first candidate is taken at the OS level it hands back the next port;
     // otherwise the requested port is available and echoed straight back.
     const getPortSpy = spy((opts?: { preferredPort?: number }) => {
-      const p = opts?.preferredPort ?? 3000;
-      return p === 3000 ? 3001 : p;
+      const p = opts?.preferredPort ?? 49_152;
+      return p === 49_152 ? 49_153 : p;
     });
-    // 3000 is already claimed → allocator skips it and probes 3001 instead.
-    const port = await allocatePort('SERVICE', new Set([3000]), getPortSpy);
-    assertEquals(port, 3001);
+    const port = await allocatePort('SERVICE', new Set([49_152]), getPortSpy);
+    assertEquals(port, 49_153);
     assertSpyCalls(getPortSpy, 1);
   });
 
@@ -212,11 +211,11 @@ describe('allocatePort', () => {
     // All ports in the SERVICE range are pre-marked as used, so the allocator
     // exhausts the range without ever calling getPort — confirmed below.
     const getPortSpy = spy((opts?: { preferredPort?: number }) => {
-      const p = opts?.preferredPort ?? 3000;
+      const p = opts?.preferredPort ?? 49_152;
       return p + 1000; // always a different port
     });
     const usedPorts = new Set<number>();
-    for (let p = 3000; p <= 3099; p++) usedPorts.add(p);
+    for (let p = 49_152; p <= 53_247; p++) usedPorts.add(p);
 
     await assertRejects(
       () => allocatePort('SERVICE', usedPorts, getPortSpy),
