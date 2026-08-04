@@ -110,46 +110,30 @@ from the `sagaInstance` collection. When the server pushes a change for any of t
 `useLiveQuery` returns the new array and the table re-renders. That is the entire real-time path on
 the client.
 
-{{ comp callout { type: "tip", title: "Live vs. fetched, side by side" } }}
-A live island typically runs <strong>both</strong> kinds of read: a <code>useQuery</code> for the slow-changing inventory (the list of sagas), and a <code>useLiveQuery</code> for the fast-changing instance rows. The first is cache-first and revalidated; the second is pushed in real time. The showcase island does exactly this — the inventory comes from <code>useQuery</code>, the live rows from <code>useLiveQuery</code>.
+{{ comp callout { type: "tip", title: "Live vs. fetched — when you would run both" } }}
+A mature live island often runs <strong>two</strong> kinds of read side by side: a <code>useQuery</code> against a typed service contract for slow-changing reference data, and a <code>useLiveQuery</code> against a StreamDB collection for the fast-changing rows. This chapter builds only the second. The first would need a sagas <em>service</em> client — a <code>createServiceClient</code> + <code>createQueryFactories</code> pair like chapter 3 built for <code>orders</code> — and this track never creates one, so no snippet here pretends to. Chapter 4's orders island is the worked example of the cache-first half.
 {{ /comp }}
 
 ## Step 3 — Seed the island from the server
 
-Real time should not mean a blank first paint. Seed the island on the server: resolve the streams
-URL, pre-warm the SDK cache, and dehydrate a TanStack Query client so the island hydrates with data
-already in hand. That is the same shape as chapter 4 — a `definePage` page with a
-request-scoped `.withResource` feeding a `.withLayer` loader — so the live monitor gets a page, not a
-loose helper function. `getStreamsUrl` from `@netscript/plugin-streams-core` resolves the runtime
-address:
+The island needs one thing from the server before it can subscribe: the streams runtime's address.
+Resolve it in a `definePage` page — the same shape as chapter 4, a request-scoped `.withResource`
+feeding a `.withLayer` loader — so the live monitor gets a real page rather than a loose helper
+function. `getStreamsUrl` from `@netscript/plugin-streams-core` resolves the runtime address:
 
 ```tsx
 // apps/dashboard/routes/(dashboard)/dashboard/sagas/index.tsx
 import { definePage } from '@app/utils.ts';
-import { dehydrateQueryClient } from '@netscript/fresh/query';
-import { createNetScriptQueryClient } from '@netscript/sdk/query-client';
 import { getStreamsUrl } from '@netscript/plugin-streams-core';
-import { sagasQueryUtils } from '@app/lib/api-clients.ts';
 import SagasLiveIsland from './(_islands)/SagasLiveIsland.tsx';
-
-const INVENTORY_INPUT = { limit: '12', offset: '0' } as const;
 
 export const sagasMonitorPage = definePage()
   .withTelemetry({ enabled: true, spanName: 'dashboard.sagas.live' })
-  // Read once per request: fetch through the SDK (which also warms the KV cache
-  // for getCachedEntry hits), then dehydrate a client for the island.
-  .withResource('sagasSeed', async () => {
-    const sagasData = await sagasQueryUtils.listSagas(INVENTORY_INPUT);
-
-    const queryClient = createNetScriptQueryClient();
-    queryClient.setQueryData(sagasQueryUtils.listSagas.clientKey(INVENTORY_INPUT), sagasData);
-    return dehydrateQueryClient(queryClient);
-  })
+  // Resolved once per request; the layer loader below awaits it.
+  .withResource('streamsBaseUrl', () => getStreamsUrl())
   .withLayer('monitor', SagasLiveIsland, {
     loader: async (ctx) => ({
-      inventoryInput: INVENTORY_INPUT,
-      streamsBaseUrl: getStreamsUrl(),
-      dehydratedState: await ctx.resource('sagasSeed'),
+      streamsBaseUrl: await ctx.resource('streamsBaseUrl'),
     }),
   })
   .withLayout((slots) => <main class='ns-page'>{slots.monitor()}</main>)
@@ -160,48 +144,49 @@ export const { handler, default: page } = sagasMonitorPage;
 export { page as default };
 ```
 
-The layer loader hands the island `streamsBaseUrl` (for Step 1's StreamDB handle), `inventoryInput`
-(for the `useQuery` inventory read), and `dehydratedState` (the pre-warmed TanStack cache). On mount
-the island rehydrates from `dehydratedState`, so the inventory is present immediately and the live
-rows stream in on top. Note what is *not* here: no `withPolicy`, no `partial`, no `staleTime`. The
-live rows arrive by push, so the cache-first refresh machinery chapter 4 needed for the orders table
-would be dead weight on this page — the resource exists only to kill the first-paint flash.
+The layer loader hands the island the one prop Step 1's StreamDB handle needs. Note what is *not*
+here: no `withPolicy`, no `partial`, no `staleTime`, and no dehydrated query cache. Chapter 4 needed
+all of that because its rows arrive by request and must survive a cold cache; these rows arrive by
+**push**, so the same machinery would be dead weight. A live page is the lighter of the two — the
+builder does not force you to carry what you are not using.
+
+{{ comp callout { type: "note", title: "Why no dehydrated seed here" } }}
+Chapter 4 seeded its island with <code>dehydrateQueryClient</code> because <code>useQuery</code> reads through a query key that the server can pre-populate. <code>useLiveQuery</code> reads from a StreamDB collection instead, and <code>preload()</code> — Step 1 — is its equivalent warm-up: it fills the first frame from the stream itself. Adding a dehydrated TanStack cache here would seed a cache nothing on this page reads.
+{{ /comp }}
 
 {{ comp callout { type: "warning", title: "Streams is its own runtime — and it must be up" } }}
-The durable-streams producer is a <strong>separate Aspire service</strong> with its own allocated port, not part of your orders service. <code>getStreamsUrl()</code> resolves its address from the environment the same way <code>getServiceUrl</code> does for services — so it only works when <code>aspire start</code> has brought the streams runtime up. With no streams runtime, <code>useLiveQuery</code> has nothing to subscribe to and the live table stays empty (the <code>useQuery</code> inventory still renders from cache). See {{ comp.xref({ key: "cap:streams" }) }}.
+The durable-streams producer is a <strong>separate Aspire service</strong> with its own allocated port, not part of your orders service. <code>getStreamsUrl()</code> resolves its address from the environment the same way <code>getServiceUrl</code> does for services — so it only works when <code>aspire start</code> has brought the streams runtime up. With no streams runtime, <code>useLiveQuery</code> has nothing to subscribe to and the live table stays empty. See {{ comp.xref({ key: "cap:streams" }) }}.
 {{ /comp }}
 
 ## Step 4 — Wrap the island in QueryIsland
 
-`useLiveQuery` and `useQuery` both need the TanStack Query context, so the live monitor lives inside
-a `QueryIsland` exactly like chapter 4's orders island. Hydrate the dehydrated state on first render:
+`useLiveQuery` needs the TanStack Query context, so the live monitor lives inside a `QueryIsland`
+exactly like chapter 4's orders island:
 
 ```tsx
 // apps/dashboard/routes/(dashboard)/dashboard/sagas/(_islands)/SagasLiveIsland.tsx (the island boundary)
-import { getIslandQueryClient, hydrateFromDehydrated, QueryIsland } from '@netscript/fresh/query';
+import { QueryIsland } from '@netscript/fresh/query';
 
-export default function SagasLiveIsland(props) {
+export default function SagasLiveIsland(props: { streamsBaseUrl: string }) {
   return (
     <QueryIsland>
-      <SagasLiveInner {...props} />
+      <SagasLiveInner streamsBaseUrl={props.streamsBaseUrl} />
     </QueryIsland>
   );
 }
 
-// Inside SagasLiveInner, once, before the queries:
-//   const islandQueryClient = getIslandQueryClient();
-//   if (props.dehydratedState) hydrateFromDehydrated(islandQueryClient, props.dehydratedState);
+// SagasLiveInner holds Step 1's StreamDB handle and Step 2's useLiveQuery.
 ```
 
-`getIslandQueryClient()` returns the island's QueryClient; `hydrateFromDehydrated` seeds it from the
-server's `dehydratedState`. After that, `useQuery` reads the seeded inventory and `useLiveQuery`
-takes over the live rows. The island is now complete — prove it compiles as a unit:
+The boundary is deliberately thin: `QueryIsland` supplies the context, and `SagasLiveInner` does the
+work — open the handle, `preload()`, subscribe with `useLiveQuery`, `close()` on unmount. The island
+is now complete — prove it compiles as a unit:
 
 ```sh
-deno check apps/dashboard/routes/(dashboard)/dashboard/sagas/(_islands)/SagasLiveIsland.tsx --unstable-kv
+deno check 'apps/dashboard/routes/(dashboard)/dashboard/sagas/(_islands)/SagasLiveIsland.tsx' --unstable-kv
 ```
 
-A clean check confirms the StreamDB handle, both query hooks, and the hydration wiring line up.
+A clean check confirms the StreamDB handle and the live query line up.
 
 ## Point it at your own stream
 
@@ -228,18 +213,26 @@ when you outgrow the sagas monitor, that is where your own `order-events` stream
 With `aspire start` up, open the live monitor at `/dashboard/sagas/` — the route Step 3's page
 declares. Get the app's host from the [Aspire dashboard](/explanation/aspire/) resource list rather
 than a memorized port; a scaffolded Fresh app pins no host port, so Aspire allocates one at each
-start. To *see* it move, trigger a saga — creating an order publishes an `OrderCreated`
-saga message (chapter 2's service does this), which advances a saga instance and pushes a change down
-the stream:
+start.
+
+The table starts empty, because nothing in this track has created a saga instance yet — chapter 2
+built a plain oRPC read-model, not a saga producer, so posting an order does **not** publish a saga
+message. To *see* rows move you publish one yourself, through the sagas plugin's CLI. Register a
+throwaway saga and send it a message:
 
 ```sh
-curl -X POST http://localhost:3002/api/v1/orders/create \
-  -H 'content-type: application/json' \
-  -d '{ "userId": 1, "total": 49.9, "status": "pending", "shippingStreet": "1 Main", "shippingCity": "Berlin", "shippingCountry": "DE", "shippingZipCode": "10115", "items": [{ "productId": 1, "quantity": 1 }] }'
+# Install the shorthand once (see the storefront track for the full form):
+#   deno install -gArf -n ns-sagas jsr:@netscript/plugin-sagas{{ releaseSpecifier }}/cli
+ns-sagas add saga demo --message-type=DemoStarted --durability=t1 --topic=demo
+ns-sagas publish DemoStarted --payload='{ "id": "demo_1" }' --correlation-key=demo_1
 ```
 
-Within a moment a new saga instance row should appear and advance through its steps **without a page
-reload**. Type-check the new files:
+`add saga` writes the definition and refreshes the saga registry, so restart `aspire start` once
+before publishing — the sagas processor loads its registry at boot. `publish` then writes a message
+onto the saga bus; the engine starts an instance for it and mirrors that instance into the
+`sagaInstance` stream collection your island is subscribed to. Within a moment a
+new row appears and advances through its steps **without a page reload** — that is the push path,
+proven with the only mechanism this track actually wires. Type-check the new files:
 
 ```sh
 deno task check
@@ -247,22 +240,21 @@ deno task check
 
 - [ ] `curl <streams-endpoint>/health` (endpoint from the Aspire resource list) returns healthy.
 - [ ] The live island opens a `createSagasStreamDB` handle and queries it with `useLiveQuery`.
-- [ ] A `definePage` page at `dashboard/sagas/index.tsx` seeds the island through a
-      `.withResource` (`getStreamsUrl` + `dehydrateQueryClient`) and it hydrates on mount.
-- [ ] Creating an order makes a row appear/advance live, with no reload.
+- [ ] A `definePage` page at `dashboard/sagas/index.tsx` resolves `getStreamsUrl()` in a
+      `.withResource` and hands it to the island through a `.withLayer` loader.
+- [ ] `ns-sagas publish` makes a row appear and advance live, with no reload.
 - [ ] `deno task check` is clean.
 
-{{ comp callout { type: "tip", title: "Nothing moves when you create an order?" } }}
-Two usual causes: the sagas plugin (and its streams runtime) is not installed/booted — check the <a href="/explanation/aspire/">dashboard</a> resource list; or <code>getStreamsUrl()</code> resolved nothing because <code>aspire start</code> is down. The <code>useQuery</code> inventory still renders from cache, which is why the panel looks alive but never moves.
+{{ comp callout { type: "tip", title: "Nothing moves after you publish?" } }}
+Three usual causes: the sagas plugin (and its streams runtime) is not installed/booted — check the <a href="/explanation/aspire/">dashboard</a> resource list; <code>getStreamsUrl()</code> resolved nothing because <code>aspire start</code> is down; or the saga never registered, which <code>ns-sagas list --registered --json</code> tells you immediately. An empty table with a healthy streams runtime means no instance exists yet, not that the subscription is broken.
 {{ /comp }}
 
 ## What you built
 
 A real-time table: a durable StreamDB handle (`createSagasStreamDB`) driving `useLiveQuery`, wrapped
-in a `QueryIsland` and mounted by a `definePage` page whose `.withResource` seeds it from the server
-with `getStreamsUrl` + dehydration. The refresh button is
-now irrelevant: the moment an order's state changes on the server, the row your operations team is
-looking at changes with it — the full contract → client → query → island → stream spine, end to end.
+in a `QueryIsland` and mounted by a `definePage` page whose `.withResource` resolves the streams
+address. The refresh button is now irrelevant: the moment a saga advances on the server, the row your
+operations team is looking at changes with it — no polling, no refetch, no reload.
 Next you run the whole graph locally under Aspire.
 
 {{ comp.nextPrev({ prev: { label: "4 · definePage + island", href: "/tutorials/live-dashboard/04-definePage-QueryIsland/" }, next: { label: "6 · Deploy", href: "/tutorials/live-dashboard/06-deploy/" } }) }}
