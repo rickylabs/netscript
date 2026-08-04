@@ -31,7 +31,7 @@ with no Aspire up and it fails — there is no Postgres for it to reach. See
     { name: "A scaffolded workspace", type: "netscript init", desc: "Created WITHOUT --no-aspire, so the aspire/ AppHost folder exists. See the CLI reference for init flags." },
     { name: "Docker daemon running", type: "container engine", desc: "Aspire provisions Postgres and Redis as local Docker containers. No daemon = the default workflow does not start." },
     { name: "The Aspire CLI", type: "aspire (external)", desc: "The aspire restore / aspire start commands are the external .NET Aspire CLI, run from inside aspire/ — not netscript subcommands." },
-    { name: "A reachable port range", type: "ports", desc: "Dashboard :18888 (HTTPS) / :18889 (HTTP), OTLP :4318, services from :3000, plugin APIs :8091–8099, the Fresh app :8010." }
+    { name: "A reachable port range", type: "ports", desc: "Dashboard :18888 (HTTPS) / :18889 (HTTP), OTLP :4318, and randomized high-range ports (49152–65535) allocated per project at scaffold time for services, plugin APIs, and frontend apps." }
   ]
 }) }}
 
@@ -102,20 +102,15 @@ graph a single run stands up:
     { name: "OTLP collector", type: "http://localhost:4318", desc: "OpenTelemetry endpoint (http/protobuf) the dashboard runs; framework spans and structured logs land here automatically." },
     { name: "postgres", type: "Container", desc: "Provisioned via Docker. The database `netscript db` commands target — reachable only once Aspire is up. Postgres is the recommended engine — pass `--db postgres` at init; `--db mysql` or `--db mssql` select those engines (each also an Aspire container), or `--db sqlite` for a file-backed database with no container." },
     { name: "redis", type: "Container (cache)", desc: "Redis cache — the default `--cache-backend`; Redis-compatible. Backs KV/queue workloads for the runtime plugins. Swap it for `garnet` (also a container) or app-level `deno-kv` via `--cache-backend`." },
-    { name: "users (example service)", type: ":3000+ (SERVICE range, OS-allocated from 3000)", desc: "The scaffolded oRPC service, when you init with --service. OpenAPI at /api/v1/users/* and RPC at /api/rpc/*." },
-    { name: "plugin APIs", type: ":8091–8099 (PLUGIN_API range)", desc: "Each installed runtime plugin's HTTP API (workers, sagas, triggers, auth). Ports are allocated from the plugin range, not hardcoded." },
+    { name: "users (example service)", type: ":49152–65535 (seeded high-range, allocated per project)", desc: "The scaffolded oRPC service, when you init with --service. OpenAPI at /api/v1/users/* and RPC at /api/rpc/*." },
+    { name: "plugin APIs", type: ":49152–65535 (seeded high-range, allocated per project)", desc: "Each installed runtime plugin's HTTP API (workers, sagas, triggers, auth). Ports are allocated from the high-range to avoid collisions, not hardcoded." },
     { name: "background processors", type: "executables (no port)", desc: "Each plugin's isolated runners (workers, sagas, triggers) — separate processes, not threads inside the API." },
     { name: "dashboard (Fresh app)", type: ":8010", desc: "The scaffolded Fresh frontend, when present (the app range start 8000 + 10)." }
   ]
 }) }}
 
-{{ comp callout { type: "note", title: "Plugin API ports are range-allocated, not fixed" } }}
-The runtime plugins publish their APIs from the <code>:8091–8099</code>
-<strong>PLUGIN_API</strong> range, and services from the <code>:3000–3099</code>
-<strong>SERVICE</strong> range. The conventional assignments (workers <code>:8091</code>, sagas
-<code>:8092</code>, triggers <code>:8093</code>, auth <code>:8094</code>) are what a default
-four-plugin workspace lands on — but the dashboard's resource list is the authority for the exact
-port each resource bound, not a memorized number. Read it from there.
+{{ comp callout { type: "note", title: "Listener ports are randomized at scaffold time" } }}
+Stand-alone services, plugin APIs, and frontend apps are assigned stable, high-range ports (between <code>49152</code> and <code>65535</code>) at scaffold time. These are seeded by your project name to avoid conflict with other workspaces. The Aspire dashboard's resource list is the authority for the exact port each resource bound, or you can check your scaffold console output or the generated <code>appsettings.json</code>.
 {{ /comp }}
 
 ## Step 4 — Initialize the database (through the running AppHost)
@@ -178,8 +173,7 @@ from inside <code>aspire/</code>. <code>netscript db</code> commands run from th
 command needs a live Postgres. Run it with no Aspire up and it fails fast — bring the graph up
 first.</li>
 <li><strong>Ports in use.</strong> The dashboard wants <code>:18888</code>/<code>:18889</code> and
-OTLP <code>:4318</code>; services and plugin APIs claim the <code>:3000+</code> and
-<code>:8091–8099</code> ranges. A stale prior run holding a port blocks boot — check the dashboard
+OTLP <code>:4318</code>; services and plugin APIs claim their assigned high-range ports (49152–65535) allocated at scaffold time. A stale prior run holding a port blocks boot — check the dashboard
 resource list (or your process table) and free it.</li>
 <li><strong>The AppHost is Node, your app is Deno.</strong> The two runtimes are isolated on
 purpose; an <code>aspire restore</code> failure is a Node/SDK problem in <code>aspire/</code>, not

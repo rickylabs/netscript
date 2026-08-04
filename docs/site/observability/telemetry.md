@@ -149,7 +149,7 @@ spans *inside* a job handler — and even there the `@netscript/telemetry` helpe
   },
   {
     title: "Per-resource health",
-    body: "Each plugin API exposes a liveness probe — workers :8091 GET /health, sagas :8092 GET /health/live, triggers :8093 GET /health, auth :8094 — surfaced as resource state in the dashboard.",
+    body: "Each plugin API exposes a liveness probe — workers GET /health, sagas GET /health/live, triggers GET /health, auth GET /health/live (on their scaffold-assigned ports) — surfaced as resource state in the dashboard.",
     icon: "✚"
   }
 ] }) }}
@@ -385,8 +385,8 @@ by Aspire. These are the real addresses you interact with, validated by the CLI 
   rows: [
     { name: "https://localhost:18888", type: "dashboard", desc: "Aspire dashboard — traces, structured logs, metrics, and resource state for the whole app graph. Auth token printed by `aspire start`." },
     { name: "http://localhost:4318", type: "OTLP/HTTP", desc: "OTLP ingest endpoint the AppHost configures (aspire.config.json https profile). Runtimes export spans and logs here; the dashboard reads them back. This is the seam you point at a hosted backend." },
-    { name: "GET :8091/health", type: "liveness", desc: "Workers API health probe — reported as resource health in the dashboard." },
-    { name: "GET :8092/health/live", type: "liveness", desc: "Sagas API liveness route." },
+    { name: "GET /health", type: "Workers API", desc: "Workers API health probe — reported as resource health in the dashboard (on its assigned port)." },
+    { name: "GET /health/live", type: "Sagas API", desc: "Sagas API liveness route (on its assigned port)." },
     { name: "GET :8093/health", type: "liveness", desc: "Triggers API health probe (Hono service)." },
     { name: ":8094", type: "service", desc: "Auth API (auth-api) — its request spans propagate trace context like any other service." }
   ]

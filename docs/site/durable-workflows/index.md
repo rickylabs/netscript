@@ -21,7 +21,7 @@ exactly that scenario; the pages in this pillar cover each piece it composes.
 
 The scaffold ships the whole chain running, not as separate demos. A webhook lands on the triggers
 service (`:8093`) and enqueues a [workers](/background-processing/workers/) job; the job publishes a
-`UserSettingsCreated` message; a saga on `:8092` consumes it and records completion in the durable
+`UserSettingsCreated` message; a saga consumes it and records completion in the durable
 store you chose. Every link is scaffold code that compiles, and every runtime exposes an HTTP
 surface you can query to confirm a message actually crossed — which is what makes the chain
 verifiable step by step instead of trusted end to end.

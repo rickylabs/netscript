@@ -136,7 +136,7 @@ somewhere to land. Without it, handlers still execute; they simply export into t
     { name: "OTLP receiver", type: "http://localhost:4318", desc: "Where processes export OpenTelemetry traces, logs, and metrics. Configured by the generated Aspire AppHost and handed to resources via env vars." },
     { name: "Service trace context", type: "traceparent", desc: "Continued by defineService RPC handling on /api/rpc/* (withRPC traceContext) so a downstream call is a child span of its caller, not an orphan." },
     { name: "Subprocess env", type: "OTEL_* + traceparent", desc: "Injected into a worker subprocess by createJobSubprocessEnv so an out-of-process job continues the SAME trace as the request that dispatched it." },
-    { name: "Workers health", type: "GET :8091/health", desc: "Liveness for the workers API. The cheapest signal: is this capability up?" },
+    { name: "Workers health", type: "GET /health (on assigned port)", desc: "Liveness for the workers API. The cheapest signal: is this capability up?" },
     { name: "Auth health", type: "GET :8094/health/live", desc: "Liveness for the auth-api service (also exposes /health/ready)." }
   ]
 }) }}

@@ -58,7 +58,7 @@ the callee's name to that resource's `ServiceReferences` array.
       "web": {
         "Runtime": "deno",
         "Type": "app",
-        "Port": 3000,
+        "Port": 3000, // Note: Port values will differ based on the ports allocated at scaffold time.
         "ServiceReferences": ["users"]
       }
     }

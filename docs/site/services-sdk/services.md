@@ -145,7 +145,7 @@ the same Hono + oRPC runtime; `defineService` is a curated preset over the same 
   {
     label: "Advanced — createService().serve() (fluent)",
     lang: "ts",
-    code: "// plugins/workers/services/src/main.ts — step-by-step composition\nimport { createService } from '@netscript/service';\nimport { router } from './router.ts';\n\nawait createService(router, { name: 'workers', version: '1.0.0', port: 8091 })\n  .withCors()\n  .withLogger()\n  .withOpenAPI({ title: 'Workers API' })\n  .withDocs()\n  .withDatabase(dbClient)\n  .withContext(() => ({ workers: runtime }))\n  .withRPC({ traceContext: true })\n  .withHealth()\n  .withServiceInfo()\n  .onStartup(async () => {/* seed, warm caches */})\n  .serve();"
+    code: "// plugins/workers/services/src/main.ts — step-by-step composition\nimport { createService } from '@netscript/service';\nimport { router } from './router.ts';\n\nawait createService(router, { name: 'workers', version: '1.0.0', port: 8091 }) // note: your scaffold's port will differ\n  .withCors()\n  .withLogger()\n  .withOpenAPI({ title: 'Workers API' })\n  .withDocs()\n  .withDatabase(dbClient)\n  .withContext(() => ({ workers: runtime }))\n  .withRPC({ traceContext: true })\n  .withHealth()\n  .withServiceInfo()\n  .onStartup(async () => {/* seed, warm caches */})\n  .serve();"
   }
 ] }) }}
 
@@ -357,7 +357,7 @@ import { router } from './router.ts';
 
 await defineService(router, {
   name: 'users',
-  port: 3000,
+  port: 3000, // note: your scaffold's port will differ
   tls: {
     cert: await Deno.readTextFile('cert.pem'), // PEM contents
     key: await Deno.readTextFile('key.pem'),   // PEM contents

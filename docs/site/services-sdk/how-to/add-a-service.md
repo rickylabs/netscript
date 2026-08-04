@@ -46,7 +46,7 @@ context step by step. Both stand up the same Hono + oRPC runtime and advertise t
     { name: "A NetScript workspace", type: "netscript init", desc: "An existing project on disk. If you do not have one, scaffold it first — see the tutorials. Run commands from the workspace root." },
     { name: "The netscript CLI", type: "on your PATH", desc: "Install globally with: deno install --global --allow-all --name netscript jsr:@netscript/cli" + releaseSpecifier + " — then confirm with netscript --help." },
     { name: "A contracts workspace", type: "contracts/", desc: "The init scaffold ships a shared contracts/ workspace exposed as the @<project>/contracts import alias. New services add their contract here so clients can import it." },
-    { name: "A free port", type: ":3001 by default", desc: "The example users service listens on :3001. Pick an unused port per service; it is read from the PORT env var with a literal fallback. Plugin API ports are already claimed (workers :8091, sagas :8092, triggers :8093, auth :8094)." }
+    { name: "A free port", type: "Randomized by default", desc: "Standalone services, plugin APIs, and apps are allocated stable high-range ports (>= 49152) at scaffold time to avoid collision. The exact ports are written to your appsettings.json." }
   ]
 }) }}
 
@@ -298,10 +298,7 @@ and the seeded `items` array from `list`. A typed client imports `UsersContractV
 no drift.
 
 {{ comp callout { type: "warning", title: "Production pitfalls" } }}
-<strong>Port collisions.</strong> Every service needs a distinct port; the workers
-(<code>:8091</code>), sagas (<code>:8092</code>), triggers (<code>:8093</code>), and auth
-(<code>:8094</code>) plugins already claim theirs. Read the port from <code>PORT</code> and let
-Aspire assign it in orchestrated runs rather than hard-coding.<br>
+<strong>Port collisions.</strong> Every service needs a distinct port. The scaffolder automatically allocates unique, high-range ports (>= 49152) at scaffold time. Read the port from <code>PORT</code> and let Aspire resolve it dynamically in orchestrated runs rather than hard-coding.<br>
 <strong>RPC lives under <code>/api/rpc/*</code>.</strong> The typed-client surface is
 <code>/api/rpc/&lt;version&gt;/&lt;router&gt;/&lt;procedure&gt;</code>, not a bare <code>/rpc</code>.
 The REST/OpenAPI surface is <code>/api/*</code>. Point clients and smoke tests at the right one.<br>

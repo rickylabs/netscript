@@ -21,10 +21,10 @@ running system instead of treating it as a black box.
 Picture what "run my app locally" really means for a multi-plugin NetScript project. It is not a
 single server. It is a small fleet:
 
-- An example oRPC **service** (`defineService`) at `:3001`.
+- An example oRPC **service** (`defineService`) on its assigned port.
 - A **Fresh** dashboard app.
-- Each runtime plugin's **HTTP API** — `workers-api` (`:8091`), `sagas-api` (`:8092`),
-  `triggers-api` (`:8093`), `auth-api` (`:8094`), the durable-`streams` runtime (`:4437`).
+- Each runtime plugin's **HTTP API** — `workers-api`, `sagas-api`,
+  `triggers-api`, `auth-api` (on their assigned high-range ports), the durable-`streams` runtime (`:4437`).
 - Each plugin's **isolated background processors** — the workers and sagas runners, the triggers
   processor — running as separate executables, not threads inside the API.
 - The **infrastructure** all of those depend on: a database — Postgres (the recommended engine; or `mysql` /
@@ -293,13 +293,13 @@ is exactly why there is no service-registry client in your handler code.
    ┌─────────────────────────────┼─────────────────────────────────────┐
    ▼                             ▼                                       ▼
 (1) dashboard OTLP        (2) infrastructure                   (4) services
-    :18888 + :4318            ├─ postgres  (Container)              └─ users  :3001
+    :18888 + :4318            ├─ postgres  (Container)           └─ users (service)
                               └─ redis     (Container, cache)
                                  │
                                  ▼  pass 2: resolve references → inject env
    ┌──────────────────────────────────────────────────────────────────────────────┐
-   │ (5) plugin APIs  workers-api :8091  sagas-api :8092  triggers-api :8093          │
-   │     auth-api :8094   streams :4437                                              │
+   │ (5) plugin APIs  workers-api        sagas-api        triggers-api               │
+   │     auth-api         streams :4437                                              │
    │ (6) background processors: workers, sagas (bin/combined.ts);                     │
    │     triggers (src/runtime/trigger-processor.ts)                                 │
    │ (7) apps:  dashboard (Fresh)        (8) tools                                   │
@@ -317,11 +317,11 @@ treat that as canonical and this essay as the orientation.
     { name: "aspire (dashboard)", type: "https://localhost:18888", desc: "The Aspire dashboard. `aspire start` prints a login token. Live resource list, logs, structured traces, and the OTLP collector (:4318) surface here." },
     { name: "postgres", type: "Container", desc: "Provisioned via Docker. The recommended engine is Postgres (swap to `mysql` / `mssql` — also Containers — or file-backed `sqlite`, which has no container, via `--db`), persistent (DataPath .data/postgres). The database that `netscript db` commands target — reachable only once Aspire is up." },
     { name: "redis", type: "Container (cache)", desc: "Redis cache — the default `--cache-backend`; Redis-compatible. Backs KV/queue workloads for the runtime plugins. Swap to `garnet` (also a Container) or app-level `deno-kv` via `--cache-backend`." },
-    { name: "users", type: ":3001", desc: "Example oRPC service (defineService). Routes /api/v1/users/* and the RPC surface at /api/rpc/*." },
-    { name: "workers-api", type: ":8091", desc: "Workers plugin API. /api/v1/workers/{jobs,executions,tasks,seed}; trigger via POST /api/v1/workers/jobs/{id}/trigger." },
-    { name: "sagas-api", type: ":8092", desc: "Sagas plugin API. /api/v1/sagas/{sagas,instances,publish} plus liveness at /health/live." },
-    { name: "triggers-api", type: ":8093", desc: "Triggers plugin API (raw Hono, not oRPC). POST /api/v1/webhooks/inbound/generic, GET /api/v1/events." },
-    { name: "auth-api", type: ":8094", desc: "Auth plugin oRPC service. /api/v1/auth/{signin,callback,signout,session,me} with one active backend (NETSCRIPT_AUTH_BACKEND)." },
+    { name: "users", type: "assigned port", desc: "Example oRPC service (defineService). Routes /api/v1/users/* and the RPC surface at /api/rpc/*." },
+    { name: "workers-api", type: "assigned port", desc: "Workers plugin API. /api/v1/workers/{jobs,executions,tasks,seed}; trigger via POST /api/v1/workers/jobs/{id}/trigger." },
+    { name: "sagas-api", type: "assigned port", desc: "Sagas plugin API. /api/v1/sagas/{sagas,instances,publish} plus liveness at /health/live." },
+    { name: "triggers-api", type: "assigned port", desc: "Triggers plugin API (raw Hono, not oRPC). POST /api/v1/webhooks/inbound/generic, GET /api/v1/events." },
+    { name: "auth-api", type: "assigned port", desc: "Auth plugin oRPC service. /api/v1/auth/{signin,callback,signout,session,me} with one active backend (NETSCRIPT_AUTH_BACKEND)." },
     { name: "streams", type: ":4437", desc: "Durable-streams producer runtime. Served as its own Aspire Deno service; workers/auth/sagas mirror execution state into it." },
     { name: "workers / sagas / triggers", type: "background processors", desc: "Separate from the APIs: workers and sagas run from bin/combined.ts; triggers from src/runtime/trigger-processor.ts. Declared under appsettings BackgroundProcessors." }
   ]

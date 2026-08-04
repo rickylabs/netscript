@@ -25,7 +25,7 @@ you want to build a durable workflow with your own hands, follow the
 {{ comp callout { type: "note", title: "What is live today" } }}
 The saga builder, its persisted state model, the message-handler effects, and the
 <strong>durable store</strong> behind them are all <strong>implemented and they compile</strong> — the
-scaffold ships a working <code>defineSaga(...)</code> sample, a registry API at <code>:8092</code>,
+scaffold ships a working <code>defineSaga(...)</code> sample, a registry API on its assigned port,
 and a durable runtime that persists every transition to either <strong>Deno KV</strong> or
 <strong>Prisma/Postgres</strong>. Two builder methods are reserved: <code>.onSignal(...)</code> and
 <code>.onQuery(...)</code> compile and register, but their runtime dispatch is explicitly deferred
@@ -246,7 +246,7 @@ the registry API. The registry stores saga metadata in Deno KV, and the API serv
 definitions and live instances:
 
 {{ comp.apiTable({
-  caption: "Sagas API — registry and instances (port :8092)",
+  caption: "Sagas API — registry and instances (on its assigned port)",
   rows: [
     { name: "GET /api/v1/sagas/sagas", type: "list definitions", desc: "Every registered saga definition and its handled message types — this is where your built saga shows up." },
     { name: "GET /api/v1/sagas/instances", type: "list instances", desc: "Live saga instances. Each instance carries its own persisted state." },
@@ -270,7 +270,7 @@ Follow one user-onboarding flow through three plugins:
 
 ```text
   Inbound HTTP                Background job              Durable saga
-  (triggers :8093)            (workers :8091)            (sagas :8092)
+  (triggers API)              (workers API)              (sagas API)
   ────────────────           ────────────────           ────────────────
   POST /api/v1/webhooks ───▶  create-user-settings ───▶  user-onboarding
   /inbound/generic            job runs:                  saga handles:
@@ -394,7 +394,7 @@ will meet:
   the full picture — including the one known gap (the scaffold `createJobTools(ctx)` handler helpers
   are no-op stubs, a tracked limitation; call `@netscript/telemetry` helpers directly for custom
   spans).
-- Its API surfaces (`:8091`, `:8092`, `:8093`) and the Postgres/Redis backing store — including the
+- Its API surfaces (assigned dynamically per project) and the Postgres/Redis backing store — including the
   Postgres tables behind the `prisma` saga store — are brought up by Aspire. Remember the ordering:
   `cd aspire && aspire start` is what makes the durable infrastructure available **before** any
   `netscript db` command. See {{ comp.xref({ key: "cap:kv-queues-cron" }) }} for the KV/queue
@@ -406,7 +406,7 @@ will meet:
 - **Do it:** [Build a durable workflow](/tutorials/storefront/04-checkout-saga/) — the hands-on tutorial that
   adds the saga and consumes `UserSettingsCreated` end to end.
 - **See the capability:** {{ comp.xref({ key: "cap:durable-sagas" }) }} — the headline `defineSaga`
-  API, the `:8092` endpoints, the `kv | prisma` store switch, and the Learn / Do / Reference triplet.
+  API, the sagas endpoints, the `kv | prisma` store switch, and the Learn / Do / Reference triplet.
 - **Look it up:** {{ comp.xref({ key: "ref:sagas" }) }} for the full generated API surface, and
   {{ comp.xref({ key: "ref:queue" }) }} for the queue layer underneath message delivery.
 

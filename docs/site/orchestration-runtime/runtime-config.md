@@ -82,7 +82,7 @@ export default defineConfig({
     config: [{ provider: 'postgres', schema: 'database/postgres/schema' }],
   },
   services: {
-    api: { port: 3000 },
+    api: { port: 3000 }, // note: your scaffold's ports will differ
   },
   plugins: ['@netscript/plugin-workers'],
 });
@@ -216,7 +216,7 @@ The runtime override directory is resolved from the environment, then read throu
   {
     label: "Typed env reads",
     lang: "ts",
-    code: "// src/env.ts\nimport { getEnv, resolveEnv } from '@netscript/config';\n\nconst port = getEnv('PORT', { type: 'number', default: 3000 });\n\nconst env = resolveEnv({\n  DATABASE_URL: { env: 'DB_URL', required: true },\n  DEBUG: { type: 'boolean', default: false },\n});"
+    code: "// src/env.ts\nimport { getEnv, resolveEnv } from '@netscript/config';\n\nconst port = getEnv('PORT', { type: 'number', default: 3000 }); // note: your scaffold's ports will differ\n\nconst env = resolveEnv({\n  DATABASE_URL: { env: 'DB_URL', required: true },\n  DEBUG: { type: 'boolean', default: false },\n});"
   }
 ] }) }}
 

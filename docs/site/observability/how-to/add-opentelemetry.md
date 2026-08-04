@@ -91,10 +91,10 @@ expected. Leave it open; it updates live.
 
 {{ comp callout { type: "note", title: "Resources you should see" } }}
 The Aspire resource graph lists <code>postgres</code>, <code>redis</code>,
-<code>workers-api</code> (<code>:8091</code>), <code>workers</code>,
-<code>sagas-api</code> (<code>:8092</code>), <code>sagas</code>,
-<code>triggers-api</code> (<code>:8093</code>), <code>triggers</code>, the
-<code>auth-api</code> (<code>:8094</code>), and the durable-streams service
+<code>workers-api</code> (on its assigned port), <code>workers</code>,
+<code>sagas-api</code> (on its assigned port), <code>sagas</code>,
+<code>triggers-api</code> (on its assigned port), <code>triggers</code>, the
+<code>auth-api</code> (on its assigned port), and the durable-streams service
 (<code>:4437</code>). Each resource exports telemetry to the OTLP endpoint at
 <code>http://localhost:4318</code>; the dashboard reads from there.
 {{ /comp }}
@@ -118,12 +118,12 @@ that full form instead.
   {
     label: "Trigger a worker job",
     lang: "bash",
-    code: "# Workers API on :8091 — enqueue the sample health-check job by id.\n# Dispatch + execution + scheduler spans are emitted automatically.\nns-workers trigger workers-plugin-health-check\n\n# then list recent executions\nns-workers executions --limit=10 --json"
+    code: "# Workers API — enqueue the sample health-check job by id (on its assigned port).\n# Dispatch + execution + scheduler spans are emitted automatically.\nns-workers trigger workers-plugin-health-check\n\n# then list recent executions\nns-workers executions --limit=10 --json"
   },
   {
     label: "Hit the users service",
     lang: "bash",
-    code: "# Users oRPC service on :3001 — the request is traced at the service layer.\n# oRPC services are served under /api/rpc/* (not /rpc).\ncurl -s -X POST http://localhost:3001/api/v1/users/list \\\n  -H 'content-type: application/json' \\\n  -d '{}'"
+    code: "# Users oRPC service — the request is traced at the service layer.\n# Replace <users-port> with the port assigned to your users service.\n# oRPC services are served under /api/rpc/* (not /rpc).\ncurl -s -X POST http://localhost:<users-port>/api/v1/users/list \\\n  -H 'content-type: application/json' \\\n  -d '{}'"
   },
   {
     label: "POST an inbound webhook",
@@ -208,17 +208,17 @@ app with the fluent builder and opts the RPC layer into trace context explicitly
   {
     label: "Enable RPC trace context",
     lang: "ts",
-    code: "import { createService } from '@netscript/service';\nimport { router } from './router.ts';\n\n// The plugin API services use the fluent builder. withRPC({ traceContext: true })\n// threads the incoming traceparent through to handlers. oRPC is served under\n// /api/rpc/* by default.\nawait createService(router, { name: 'workers', version: '1.0.0', port: 8091 })\n  .withCors()\n  .withLogger()\n  .withOpenAPI({ title: 'Workers API' })\n  .withDatabase(dbClient)\n  .withRPC({ traceContext: true })\n  .withHealth()\n  .serve();"
+    code: "import { createService } from '@netscript/service';\nimport { router } from './router.ts';\n\n// The plugin API services use the fluent builder. withRPC({ traceContext: true })\n// threads the incoming traceparent through to handlers. oRPC is served under\n// /api/rpc/* by default.\nawait createService(router, { name: 'workers', version: '1.0.0', port: 8091 }) // note: your scaffold's port will differ\n  .withCors()\n  .withLogger()\n  .withOpenAPI({ title: 'Workers API' })\n  .withDatabase(dbClient)\n  .withRPC({ traceContext: true })\n  .withHealth()\n  .serve();"
   },
   {
     label: "One-shot service (defineService)",
     lang: "ts",
-    code: "import { defineService } from '@netscript/service';\nimport { router } from './router.ts';\n\n// Local services use the one-call form. Tracing is enabled by the framework;\n// debug: true surfaces verbose request/trace logs while you wire things up.\nawait defineService(router, {\n  name: 'users',\n  version: '1.0.0',\n  port: parseInt(Deno.env.get('PORT') || '3001'),\n  openapi: { title: 'Users API', description: 'users service' },\n  debug: true,\n});"
+    code: "import { defineService } from '@netscript/service';\nimport { router } from './router.ts';\n\n// Local services use the one-call form. Tracing is enabled by the framework;\n// debug: true surfaces verbose request/trace logs while you wire things up.\nawait defineService(router, {\n  name: 'users',\n  version: '1.0.0',\n  port: parseInt(Deno.env.get('PORT') || '3001'), // note: your scaffold's port will differ\n  openapi: { title: 'Users API', description: 'users service' },\n  debug: true,\n});"
   },
   {
     label: "Propagate across a call",
     lang: "bash",
-    code: "# When one service calls another over HTTP, forward the W3C traceparent\n# header so both spans land in ONE trace in the dashboard.\ncurl -s http://localhost:3001/api/v1/users/list \\\n  -X POST -H 'content-type: application/json' \\\n  -H 'traceparent: 00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01' \\\n  -d '{}'"
+    code: "# When one service calls another over HTTP, forward the W3C traceparent\n# header so both spans land in ONE trace in the dashboard.\n# Replace <users-port> with your service's assigned port.\ncurl -s http://localhost:<users-port>/api/v1/users/list \\\n  -X POST -H 'content-type: application/json' \\\n  -H 'traceparent: 00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01' \\\n  -d '{}'"
   }
 ] }) }}
 
@@ -251,10 +251,11 @@ Back in the dashboard at [https://localhost:18888](https://localhost:18888):
 Confirm liveness independently of the UI by hitting the per-capability health endpoints:
 
 ```bash
-curl -s http://localhost:8091/health        # workers
-curl -s http://localhost:8092/health/live   # sagas
-curl -s http://localhost:8093/health        # triggers
-curl -s http://localhost:8094/health        # auth
+# Replace ports with the ones dynamically assigned to your services:
+curl -s http://localhost:<workers-port>/health        # workers
+curl -s http://localhost:<sagas-port>/health/live   # sagas
+curl -s http://localhost:<triggers-port>/health        # triggers
+curl -s http://localhost:<auth-port>/health        # auth
 ```
 
 ## Production pitfalls
