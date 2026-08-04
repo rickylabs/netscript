@@ -52,6 +52,11 @@ construction alone is not sufficient evidence.
 | Time | Slice | Step | Notes |
 | --- | --- | --- | --- |
 | 2026-08-04 | 0 | bootstrap | Issue body read first; baseline, doctrine, upstream API, and inherited lock change recorded. |
+| 2026-08-04 | 0 | draft | Bootstrap commit `cf773ec38` pushed explicitly; draft PR #1256 opened with milestone and taxonomy. |
+| 2026-08-04 | 1 | RED | Focused test matched the route but received HTTP 400 with the Zod-3 plugin. |
+| 2026-08-04 | 1 | GREEN | Zod-4 adapter alias made the unchanged request return HTTP 200 and numeric `cycleId: 1`. |
+| 2026-08-04 | 1 | introspection | Generated OpenAPI declares `cycleId` as a numeric query parameter; #1204 read-tool suite is 5/5 green. |
+| 2026-08-04 | 2 | gates | Scoped/package/doctrine/JSR gates completed; no new lock delta or debt. |
 
 ## Decisions
 
@@ -74,28 +79,34 @@ construction alone is not sufficient evidence.
 
 | Gate | Command or check | Result | Notes |
 | --- | --- | --- | --- |
-| scoped check/lint/fmt | planned | NOT_RUN | Pending implementation. |
-| doc-lint / publish dry-run | planned | NOT_RUN | Pending implementation. |
+| scoped check | `run-deno-check.ts --root packages/service --ext ts,tsx` | PASS | 42 files, 0 findings; uses `--unstable-kv`. |
+| scoped lint | `run-deno-lint.ts --root packages/service --ext ts,tsx` | PASS | 42 files, 0 findings. |
+| scoped fmt | `run-deno-fmt.ts --root packages/service --ext ts,tsx` | PASS | 42 files, 0 findings. |
+| doc-lint | `deno task doc:lint --root packages/service --pretty` | PASS | 3 entrypoints, 0 diagnostics. |
+| publish dry-run | `deno task --cwd packages/service publish:dry-run` | PASS | No slow types; intended publish set only. |
 
 ### Fitness Gates
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| Archetype-4 F-set | NOT_RUN | planned gates | Pending implementation. |
+| code quality | PASS | scanner `--root packages/service --max-allow 0` | 0 findings, 0 allowances. |
+| doctrine | PASS with baseline warnings | `check-doctrine.ts --root packages/service --text` | 0 FAIL; existing Scalar-generated inheritance and builder-size warnings only. |
+| repository `quality:gate` | PASS | task exit 0 | Existing repository dependency/doctrine warnings only. |
 
 ### Runtime Gates
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| docs-shaped numeric GET | NOT_RUN | focused test | Pending implementation. |
+| pre-fix negative control | PASS | focused test before source edit | Route matched and returned 400 instead of expected 200. |
+| docs-shaped numeric GET | PASS | `handlers_test.ts` | Generated schema says numeric query; HTTP string `1` reaches handler as number `1`. |
 
 ### Consumer Gates
 
 | Consumer | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| `packages/service` suite | NOT_RUN | package task | Pending implementation. |
+| `packages/service` suite | PASS | `deno task --cwd packages/service test` | 87 passed, 0 failed. |
+| MCP OpenAPI read tools | PASS | `openapi-read-tools_test.ts` | 5 passed, 0 failed; schema projection and curl template remain green. |
 
 ## Handoff Notes
 
 - Review the test's observable numeric value first; it is the decisive acceptance property.
-
