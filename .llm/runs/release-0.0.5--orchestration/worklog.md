@@ -1307,3 +1307,11 @@ false-positive class as soon as slices start pinning published versions in test 
 Fix: #1267 filed; PR #1268 (fixtures/type-fixtures exemption + both-direction regression
 test, suite 10/0, real-repo scan clean of both files); box 3 marked [post-merge]. On merge:
 re-dispatch canary.8 (same train + today's later merges — content-derived membership).
+
+## 2026-08-04 — MERGE #1261 (#1247 closed): editor-aware agent init
+
+All four contexts green first read, threads 0/0, refs [1247]; #1247 auto-closed. Owner-wave
+scoreboard: **6 of 11 closed** (#1250/#1253/#1254/#1235/#1236/#1247); #1234 pending #1239's
+box mirror; #1251 at draft #1266; #1248 next in batch 2; #1252 at draft #1265 (iterating);
+#1246 at draft #1264 (refs pending its classification verdict). Rides the canary.8
+re-dispatch train.
