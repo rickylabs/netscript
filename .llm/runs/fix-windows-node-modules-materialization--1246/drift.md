@@ -42,3 +42,14 @@
   completed the direct evaluation and recorded `PASS`. A narrow follow-up corrected non-gating
   folder-cardinality wording in the artifact.
 - **Scope impact:** none; evaluator independence and the required open-model route were preserved.
+
+### Evaluation publication raced merge
+
+- **Expected:** commit and publish the formal IMPL-EVAL artifact before merge authority acts.
+- **Actual:** the evaluator recorded `PASS` at 18:00:07Z; the repository owner merged PR #1264 at
+  18:00:53Z, before the supervisor's evidence commit and PR phase comment.
+- **Disposition:** pushed the evidence commit to the explicit source branch, posted the formal
+  IMPL-EVAL comment on the merged PR, normalized its label to `status:shipped`, and retained the
+  exact chronology here. Issue #1246 remains open under 0.0.6 as intended.
+- **Scope impact:** the product implementation is merged and its checks are green, but merge commit
+  `0b25f3bfb4ccb339c2df49d4d9a2631259d9ab0a` does not contain the evaluation artifact.

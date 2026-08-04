@@ -82,3 +82,11 @@ WSL/Linux consumer proof is green, but it is not native Windows evidence. The PR
   evaluator session corrected F-16/AP-16 to the actual folder cardinality and retained `PASS`.
 - No evaluator source mutation occurred. The unrelated pre-existing `deno.lock` change remains
   unstaged and untouched by this run.
+- The evaluator wrote `PASS` at 18:00:07Z. PR #1264 merged at 18:00:53Z, before the supervisor
+  committed and published the evaluation artifact. The implementation merge therefore predates
+  publication of the formal evidence even though the verdict itself predates the merge.
+- The evaluation evidence was pushed explicitly to the source branch as `3771c0459` and posted as
+  the formal IMPL-EVAL PR comment. The merged PR status label was normalized to `status:shipped`.
+- Final live gates: review threads `PASS` (`threads=0`, `unanswered=0`); PR checks `PASS` with zero
+  current failures on the merged implementation head. Issue #1246 remains open and is assigned to
+  milestone 0.0.6 for native Windows/upstream completion.

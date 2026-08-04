@@ -31,4 +31,5 @@ ready augmentation, OpenHands evaluation, and orchestrator pre-merge gate descri
 - Evaluator route: `qwen/qwen3.7-max`, high effort, session
   `ef9775bb-95fe-422c-9507-602dba016727`
 - Next: publish the IMPL-EVAL phase comment and hand the ready PR to the milestone orchestrator
-- Merge authority: milestone orchestrator
+- Merge state: PR #1264 merged as `0b25f3bfb4ccb339c2df49d4d9a2631259d9ab0a`
+- Merge authority: exercised externally by the repository owner

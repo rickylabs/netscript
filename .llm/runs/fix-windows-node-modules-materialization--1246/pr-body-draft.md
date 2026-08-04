@@ -29,7 +29,7 @@ frontend starts without manual repair, and Windows CI covering init â†’ Aspire â
 - Run: `.llm/runs/fix-windows-node-modules-materialization--1246/`
 - Archetype: 6 (CLI/tooling), frontend consumer overlay
 - PLAN-EVAL: `COMPOSED_WAIVER` per milestone ruling D6; no local evaluator verdict is claimed
-- Status: implementation and WSL consumer proof complete; composed milestone evaluation pending
+- Status: implementation and WSL consumer proof complete; formal separate-session IMPL-EVAL `PASS`
 
 ## Validation
 
