@@ -805,3 +805,29 @@ candidate): a 5-minute milestone-PR-state poll — ready flips, head movement, a
 (draft head unmoved ≥30min = the working-but-not-shipping signal that rollout-age watching
 alone cannot see). Double verification: rollout-age (agent alive) × PR-head-age (work
 shipping); divergence is the alarm.
+
+## 2026-08-04 — Canary 2/3 incident + reconciliation; #1205 merged; #1209 shipped clean
+
+- **Merge: PR #1205 (`d6375d557`, #1187 auto-closed)** — cross-attempt supersede fixed; the
+  merge tax ends.
+- **Accountability note (owner catch):** #1193 was merged while its PR rollup showed a red ✗ —
+  my gate read the four required latest-per-name contexts (all green incl. close-gate) but did
+  not re-verify the non-required e2e-cli suite job on THAT head before merging; the red was the
+  suite's baseline #1202 failure class, covered by owner ruling D13, but the gate record should
+  have named it explicitly pre-merge rather than post-hoc. Gate row added: name every red on
+  the head at merge time, required or not, with its attribution.
+- **Canary 2/3 incident (the richest #1149 evidence yet):** my cancel of the first canary.2
+  dispatch raced its publish — canary.2 reached JSR unlabeled; the re-dispatch minted canary.3
+  and **the drift gate fired exactly as designed** (`drift FAIL: missing labels=0.0.5-canary.2`),
+  failing the run rather than passing silently. Reconciliation per cadence doctrine: standalone
+  `release:canary-label --published-version 0.0.5-canary.2 --head origin/main` → all five
+  checks PASS (8 PRs/7 issues, 15 items labeled, prerelease note, drift PASS). Two tool
+  findings en route: the CLI's explicit NOT_RUN rows behaved as documented, and the derivation
+  requires pristine-main history (`--head`) — a local-commit-polluted worktree 422s. canary.3's
+  failed job re-run for its own label/E2E/pair chain. **Lesson (finding 26): never cancel a
+  canary workflow post-dispatch — the publish step is not atomic with the label step; fix
+  forward with the next N instead.**
+- **#1209 shipped clean:** the package-scoped type fixture cannot type-check outside its
+  member scope (import maps are member-scoped); dropped from the docs lane with evidence
+  preserved, permanent docs-side fixture tooling routed to #1210. deno.lock reverted. Merge
+  armed on green contexts.
