@@ -28,8 +28,9 @@ module that:
   the `Partial` boundary already present in the page you are replacing content inside;
 - is targeted by an anchor or form carrying `f-partial="/partials/orders/list?limit=20"`, with an
   ancestor marked `f-client-nav` so Fresh intercepts the navigation;
-- catches its own loader errors and renders whatever error markup you invent, since a broken region
-  otherwise takes down the response it was rendered into.
+- decides its own error surface: a partial is its own response, so an uncaught loader failure takes
+  Fresh's normal route error path. If the region needs a fallback of its own, this route is where you
+  catch and render it — and every partial that wants one invents it again.
 
 ```tsx
 // routes/partials/orders/list.tsx — bare Fresh
@@ -61,11 +62,12 @@ Then, in the page:
 <a href='/orders?limit=20' f-partial='/partials/orders/list?limit=20'>Next page</a>
 ```
 
-Count the couplings. The string `'orders-list'` appears in the partial and in the page, and nothing
-checks that they agree. The `f-partial` URL is built by concatenation, so a renamed route file fails
-silently — Fresh falls back to a full navigation, or the region simply never updates, and neither is
-a compile error. The error shell is per-file, so twelve partials drift into twelve error designs. The
-loader's params come out of `URLSearchParams` as `string | null`.
+This version has four independent couplings. The string `'orders-list'` appears in the partial and in
+the page, and nothing checks that they agree. The `f-partial` URL is built by concatenation, so a
+renamed route file fails silently — Fresh falls back to a full navigation, or the region simply never
+updates, and neither is a compile error. The error surface is per-file, so twelve partials that each
+want a fallback drift into twelve error designs. The loader's params come out of `URLSearchParams` as
+`string | null`.
 
 ## `definePartial`: the route in one definition
 
@@ -97,8 +99,9 @@ swap, not a broken region. `errorTitle` overrides the default, which is literall
 `isRetryable`, and the utility classes the default renderer uses).
 
 The two things `definePartial` does **not** do: it does not type `ctx` for you — `TContext` is
-whatever your app's route context is — and it does not know the partial's URL. Its `name` and its
-route path are still two facts; what makes them safe is the next section.
+whatever your app's route context is — and it does not know the partial's own URL. The `name` and the
+route path remain two independently supplied facts; the next section is about giving the path a
+single typed source, and the name coupling survives it.
 
 ### `defineStatsPartial` for context-free regions
 
@@ -138,9 +141,15 @@ Path and search params are supplied once and applied to both sides, with `partia
 `partialSearch`, and `partialPreserveSearchParams` available when the partial's params legitimately
 differ from the page's.
 
-This is the rename-safety story: move the partial route file, update the reference, and every link
-that targeted it moves with it — or fails `deno check`. Route references, contracts, and the schema
-helpers behind them are covered in [Routing and route contracts](/web-layer/route/).
+What this buys is centralized URL construction with typed params: one reference owns the pattern,
+and every link that targets the partial is built from it. It is not automatic rename tracking — the
+`createRouteReference` calls above still hold route-pattern literals, and moving the route file
+leaves them stale. That job belongs to the generated accessors: with the Vite plugin, the app's
+`routes` tree is derived from the filesystem, so `routes.partials.dashboard.orders.list` stops
+existing when the file moves and every call site fails `deno check`. Prefer the generated accessor
+where rename tracking matters, and keep `createRouteReference` for routes outside the generated tree.
+Route references, contracts, and the schema helpers behind them are covered in
+[Routing and route contracts](/web-layer/route/).
 
 ## Deferred-loader composition: the page runtime drives the partial
 
@@ -175,9 +184,11 @@ What the runtime derives from that config, verbatim from
 | `policy` | falls back to the page's `withPolicy()` when the layer omits it |
 | `params` | the partial-only search params, merged over the request's |
 
-So the layer id, the partial name, and the partial URL converge on one declaration, and the region
-gains cache-aware refresh behaviour without a `DeferPage` ever appearing in your page module. A layer
-with `delivery: 'stream'` opts out of this path; a layer with no `partial` renders inline as usual.
+The layer id, the partial name, and the route reference are colocated in one layer configuration,
+and the region gains cache-aware refresh behaviour without a `DeferPage` ever appearing in your page
+module. Colocated is not verified, though: nothing checks that `partialName` matches the `name` you
+passed to `definePartial`. A layer with `delivery: 'stream'` opts out of this path; a layer with no
+`partial` renders inline as usual.
 
 The freshness half — the four policy profiles, `resolveDeferPolicy`, and the submit/skip decision
 matrix in `decideDeferClientAction` — is documented in
@@ -188,8 +199,7 @@ purpose.
 
 ## What the runtime actually does today
 
-Two boundaries are worth stating plainly, because the surrounding vocabulary suggests more than is
-currently delivered.
+Two runtime boundaries prevent "deferred" from implying server push or progressive delivery.
 
 **Deferral is Suspense-ready, not streaming.** `Deferred` wraps a promise in a Suspense boundary; in
 the current non-streaming Fresh runtime it behaves as a Suspense-ready boundary and becomes fully

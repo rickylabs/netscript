@@ -155,7 +155,9 @@ The layer loader hands the island the one prop Step 1's StreamDB handle needs. N
 here: no `withPolicy`, no `partial`, no `staleTime`, and no dehydrated query cache. Chapter 4 needed
 all of that because its rows arrive by request and must survive a cold cache; these rows arrive by
 **push**, so the same machinery would be dead weight. A live page is the lighter of the two — the
-builder does not force you to carry what you are not using.
+builder does not force you to carry what you are not using. [Partials](/web-layer/partials/) covers
+the other side of that choice: what a `partial` layer buys a region whose data arrives by request,
+and why a pushed region does not want it.
 
 {{ comp callout { type: "note", title: "Why no dehydrated seed here" } }}
 Chapter 4 seeded its island with <code>dehydrateQueryClient</code> because <code>useQuery</code> reads through a query key that the server can pre-populate. <code>useLiveQuery</code> reads from a StreamDB collection instead, and <code>preload()</code> — Step 1 — is its equivalent warm-up: it fills the first frame from the stream itself. Adding a dehydrated TanStack cache here would seed a cache nothing on this page reads.
