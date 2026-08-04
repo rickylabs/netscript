@@ -9,3 +9,4 @@
 - Lock hygiene: inherited `deno.lock` change is excluded.
 - S1 implemented: per-gate timeout, 3 × 180-second restore budget, infrastructure classification,
   and pretty-report rendering.
+- S2 implemented: exact 13.4.6 NuGet package cache across two PR runtime jobs and both canary workflows.

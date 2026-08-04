@@ -24,3 +24,11 @@
 - Pretty reports now print the final failure class beside all attempt durations.
 - Focused command/runtime/reporter tests passed.
 - Reconcile: #1227 remains the sole closing issue; scope and milestone are unchanged.
+
+### S2 — exact pinned package cache
+
+- Added `actions/cache@v4` for `~/.nuget/packages` to both PR runtime jobs and the published/prod-local canary jobs.
+- The cache key includes runner OS and exact Aspire 13.4.6 train; there is no cross-version restore key.
+- Added a workflow policy regression asserting all four runtime jobs carry the same exact cache contract.
+- Focused workflow policy test passed.
+- Reconcile: the fresh canary evidence changes urgency, not scope; #1227 remains p1 in 0.0.5.
