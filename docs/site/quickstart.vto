@@ -4,93 +4,274 @@ title: Quickstart
 templateEngine: [vento, md]
 ---
 
-From an empty directory to a running workspace: scaffold a typed example service, a Fresh app that
-consumes it through a derived client, Postgres, a shared cache, and the Aspire dashboard that
-observes those resources. This page runs one instance of the model described in
-[Core concepts](/concepts/).
+Scaffold a Fresh app, a typed oRPC service, Postgres, Redis, and the Aspire resource graph that
+runs and observes them. At the end you will know which files are yours, which files the CLI owns,
+and which generators to reach for before writing a feature by hand.
 
 {{ comp callout { type: "note", title: "Prerequisites" } }}
 Install <strong><a href="https://docs.deno.com">Deno 2.x</a></strong> and the
-<strong><a href="https://learn.microsoft.com/dotnet/aspire/">.NET Aspire CLI</a></strong>, and have
-Docker running before continuing. Aspire orchestrates the local resource graph; Postgres and the
-shared cache run in containers it starts for you. The .NET dependency is the orchestrator only —
-your application code is Deno throughout. <a href="/quickstart/aspire/">Why Aspire, and how to opt
-out</a>.
+<strong><a href="https://aspire.dev">Aspire CLI</a></strong>, and have Docker running. Aspire is
+the local orchestrator; your application code remains Deno and TypeScript. See
+<a href="/quickstart/aspire/">why NetScript uses Aspire</a> and the opt-out path.
 {{ /comp }}
 
 ## 1. Install the CLI
 
-```bash
-deno install --global --allow-all --name netscript jsr:@netscript/cli{{ releaseSpecifier }}
+```sh
+deno install -g -A -f -n netscript --minimum-dependency-age=0 jsr:@netscript/cli{{ releaseSpecifier }}
+netscript --help
 ```
+
+`--minimum-dependency-age=0` lets the exact NetScript release install on publication day. `-f`
+replaces an older global `netscript` executable. The same command works in Bash and PowerShell;
+Deno prints the executable directory to add to `PATH` if `netscript` is not found.
 
 ## 2. Scaffold the workspace
 
-```bash
+```sh
 netscript init my-app --db postgres --service --yes
+cd my-app
 ```
 
-The `--service` flag scaffolds the example oRPC service alongside the workspace. `--yes` accepts
-the remaining defaults without prompts, including the `dashboard` app name and shared Redis cache
-used below.
+`--service` includes an example typed service. `--yes` accepts the remaining defaults, including
+the `dashboard` Fresh app and Redis cache. Add `--editor zed`, `--editor vscode`, or
+`--editor none` when you want the scaffold to apply an editor choice explicitly; inspect every
+option with `netscript init --help`.
 
-What lands on disk is the meta-framework as a directory layout:
+The CLI prints the real file and directory totals for the options you selected. Those totals vary
+with the database, service, editor, and agent tooling, so treat the printed result—not a number in
+this guide—as the authority.
 
-- `contracts/` — the typed boundary. One versioned definition of every operation;
-  [how contracts work](/explanation/contracts/).
-- `services/users/` — implements the contract with handlers that are type-locked to it;
-  [Services & SDK](/services-sdk/).
-- `apps/dashboard/` — the Fresh app, consuming the same contract through a derived client;
-  [the web layer](/web-layer/).
-- `aspire/` — the generated AppHost that runs everything above as one observed graph;
-  [orchestration & runtime](/orchestration-runtime/).
+### Know what you own
+
+The scaffold is deliberately navigable. `[owned]` files are where product work belongs.
+`[generated]` files are replaced by a generator; do not patch them. `[guidance]` files explain the
+local conventions to humans and coding agents.
+
+```text
+my-app/
+├── AGENTS.md                              # [guidance] added by `agent init`
+├── .mcp.json                              # [generated] agent-host MCP wiring
+├── .netscript/                            # [generated] CLI/runtime support
+├── apps/dashboard/
+│   ├── AGENTS.md                          # [guidance] app-specific agent rules
+│   ├── WEB-LAYER.md                       # [guidance] contract → page → island map
+│   ├── routes/                            # [owned] Fresh pages and route handlers
+│   ├── islands/                           # [owned] interactive Preact boundaries
+│   ├── components/ui/                     # [owned] copied UI registry source
+│   └── .generated/                        # [generated] Fresh manifest and route types
+├── contracts/versions/v1/                 # [owned] oRPC routes and Zod boundaries
+├── services/users/src/routers/            # [owned] contract-bound handler logic
+├── database/postgres/
+│   ├── schema/schema.prisma               # [owned] persistence models
+│   ├── migrations/                        # [generated history] review and commit
+│   └── schema/.generated/                 # [generated] Prisma client + Zod schemas
+├── plugins/                               # [CLI-managed] installed capability workspaces
+├── aspire/
+│   ├── apphost.mts                        # [generated] resource-graph entry point
+│   └── .helpers/                          # [generated] services/plugins/infrastructure
+├── appsettings.json                       # [owned config] resource declarations
+├── netscript.config.ts                    # [owned config] framework paths and wiring
+└── deno.json                              # [owned config] workspace, imports, and tasks
+```
+
+The CLI decides placement. Use its `contract`, `service`, `db`, `plugin`, and `ui:*` generators so
+new files land where the rest of the workspace and Aspire already expect them.
+
+If a coding agent will work in the project, install its local guidance and MCP configuration now:
+
+```sh
+netscript agent init
+```
+
+Use `--host claude|vscode|all`, `--editor none|zed|vscode`, and `--with-docs` as needed. Re-running
+the command preserves unrelated host configuration.
 
 ## 3. Start the resource graph
 
-**Nothing runs until this step.**
+Nothing runs until Aspire starts. From the project root:
 
-```bash
-cd my-app/aspire
-aspire restore   # first run only
+```sh
+cd aspire
+aspire restore   # once per machine
 aspire start
 ```
 
-Open the dashboard URL with the one-time login token that `aspire start` prints. Wait until all
-four resources report healthy — the Fresh app, the example service, Postgres, and the shared
-cache — then open the Fresh app from its resource link. The page heading should read `my-app`.
+In PowerShell the path step is `Set-Location .\aspire`; the Aspire commands are unchanged. Leave
+this terminal running and open the dashboard URL and one-time login token that `aspire start`
+prints.
 
-The dashboard is the operational view of the workspace. Open a resource to inspect its logs;
-after exercising an instrumented path, use the trace view to follow work across processes. See
-[Observability](/observability/) for the telemetry model.
+Aspire is the resource graph for local development. It starts Postgres and Redis, injects service
+discovery, assigns free ports at runtime, runs health checks, and collects logs and distributed
+traces. There is no application or service port to memorise: use the URLs beside each resource in
+the dashboard. The dashboard is the authority when a copied port, an old terminal, and the running
+system disagree.
 
-{{ comp callout { type: "note", title: "Aspire comes before any database command" } }}
-The AppHost must start Postgres before a migration, generation, or seed command can connect to it.
-Continue with <a href="/data-persistence/how-to/database-migration/">Database migrations</a> when
-you need the database workflow.
-{{ /comp }}
+Wait until the Fresh app, example service, Postgres, and Redis report healthy. Open a resource to
+read its console logs; after making a request, open the trace view to follow that request across
+processes. See [Aspire & the AppHost](/explanation/aspire/) and
+[Observability](/observability/) for the full model.
 
-## 4. Make your first change
+## 4. Prepare the database
 
-Open `apps/dashboard/routes/(_components)/home-view.tsx`. Find the wrapped introductory sentence
-that starts with `A generated NetScript workspace` and replace that sentence with
-`This checkout dashboard is ours.` Save the file, then refresh the Fresh app URL from Aspire. The
-new sentence appears below the `my-app` heading while every resource stays healthy.
+Open a second terminal at `my-app/` and keep Aspire running in the first:
 
-A one-line edit is deliberately unspectacular. The point is what you edited: a server-rendered
-Fresh view inside a workspace whose service, database, and cache kept running around it. The
-interesting changes — adding an operation to the contract and watching its types reach this page —
-are the first thing [the Storefront tutorial](/tutorials/storefront/) makes you do.
-
-When you are finished, stop the AppHost from the `aspire/` directory:
-
-```bash
-aspire stop --apphost ./apphost.mts
+```sh
+netscript db init --name init
+netscript db generate
+netscript db seed
 ```
 
-## Where to go next
+This order is mandatory for an Aspire-managed database. `db init` creates and applies the first
+Prisma migration; without it the scaffold has no tables. `db generate` then produces both the
+Prisma client and the Zod model schemas, and `db seed` runs the workspace seed script.
 
-- [The Storefront tutorial](/tutorials/storefront/) — build a real system on this scaffold:
-  contract changes, durable work, and a UI that survives them.
-- [Core concepts](/concepts/) — the five-layer model you just ran, explained once.
-- [Why NetScript](/why/) — the argument and the trade-offs, for the colleague who asks why this
-  is not just Fresh plus a queue.
+`db init` is the first end-to-end checkpoint: success proves the AppHost resource, connection
+string, Prisma schema, and migration path agree before product code can obscure the failure.
+
+## Verify your progress
+
+Use the resource links from the Aspire dashboard rather than substituting a remembered port. From
+the project root, also run:
+
+```sh
+deno task check
+```
+
+- [ ] `netscript --help` lists the public command groups.
+- [ ] `my-app/` contains `apps/`, `contracts/`, `services/`, `database/`, `plugins/`, and `aspire/`.
+- [ ] Aspire is running; the dashboard shows the Fresh app, service, Postgres, and Redis healthy.
+- [ ] `netscript db init --name init` succeeded and the initial migration exists.
+- [ ] The Fresh app answers at the URL shown in the dashboard.
+- [ ] Opening `<fresh-app-url>/design` renders the generated design reference.
+- [ ] `deno task check` passes with no errors.
+
+**Do not begin customising until every box is ticked.** An unverified base makes every later
+failure look like your code.
+
+{{ comp callout { type: "tip", title: "If something is not green" } }}
+Three checks cover most first-run snags: is <code>aspire start</code> still running with its
+resources healthy; is Docker running (<code>docker info</code>); and did you enter
+<code>aspire/</code> before starting, so Aspire found <code>apphost.mts</code>? Read the failing
+resource's dashboard logs before changing source. On Windows, a generated
+<code>deno task deps:verify</code> error names an incomplete project-local npm materialisation and
+prints the PowerShell recovery command; follow that diagnostic rather than patching a transitive
+package.
+{{ /comp }}
+
+## Take the first tour
+
+Two generated pages are worth opening before you edit anything:
+
+- **`<fresh-app-url>/design`** renders the tokens, components, and composition rules already in
+  the app. Read `/design/composition` before deciding what belongs on the server or in an island.
+- **`<service-url>/api/docs`** is the service's Scalar API reference, generated from the same
+  contract the handler implements. Use it to inspect and exercise the running OpenAPI surface.
+
+Both base URLs come from the Aspire dashboard and can change on the next start.
+
+## Build a feature through the CLI
+
+The first feature is a loop, not a hunt for folders. From the workspace root, add an `orders`
+contract, one route, a service, and its compiling handler stub:
+
+```sh
+netscript contract add orders
+netscript contract add-route orders recent --method GET --path /orders/recent
+netscript service add --name orders
+netscript service add-handler orders recent
+```
+
+`contract add` seeds the v1 contract; `add-route` appends the `recent` procedure. `service add`
+creates the service workspace and registers it with Aspire. `service add-handler` binds that exact
+procedure in the correct router and emits a stub that compiles while throwing `Not implemented`
+at runtime. Replace the throw with business logic; do not hand-write a parallel router.
+
+When the feature needs a new table, edit `database/postgres/schema/schema.prisma`, then keep the
+database and generated types in lockstep:
+
+```sh
+netscript db migrate --name add_orders
+netscript db generate
+```
+
+Finally scaffold the Fresh page, colocated island, and query-loader seam into the app workspace:
+
+```sh
+netscript ui:add page orders --island --project-root apps/dashboard
+```
+
+The generator supplies a compiling composition and the correct locations; you still connect its
+query loader to the contract-derived client and implement the feature's behavior. For later
+breaking contract evolution, start with `netscript contract version --help`. To add a background
+capability, use `netscript plugin install <kind>`—for example,
+`netscript plugin install worker --name workers` scaffolds the plugin workspace and registers it
+with Aspire.
+
+### Derive contracts from the generated database schemas
+
+After `db generate`, import database model schemas through `@database/zod`. Select the fields that
+belong on the API and layer API-specific validation on top instead of copying the Prisma model into
+a second `z.object(...)`:
+
+```ts
+import { OrderSchema as DatabaseOrderSchema } from '@database/zod';
+import { z } from 'zod';
+
+export const OrderSchemaV1 = DatabaseOrderSchema
+  .pick({ id: true, name: true, status: true, createdAt: true })
+  .extend({
+    name: z.string().min(1).max(120),
+    status: z.enum(['draft', 'active', 'archived']),
+  });
+```
+
+The database generator remains the source for column types and nullability; the contract owns what
+crosses the boundary and its stricter public rules. That distinction is the contract register bar
+described in [Contracts & type flow](/explanation/contracts/).
+
+Current scaffolds map `@database/zod` to the complete generated model barrel. If an older project
+maps it to `.generated/zod/crud.ts`, that legacy alias exposes only the primary CRUD model; update
+the scaffold/import mapping before deriving contracts for additional models.
+
+## Give agents the framework surface
+
+`netscript agent init` configures a client to launch `netscript agent mcp`. That command is a
+standard-input/output server launched by the client—not a process to run and watch by hand.
+
+The current server exposes 21 bounded tools in seven task families:
+
+| Family | Tools |
+| --- | --- |
+| Running app | `get_app_status`, `list_runs`, `get_run`, `get_recent_errors`, `get_last_job_result`, `analyze_service_performance`, `analyze_db_bottlenecks` |
+| Project diagnosis | `doctor` |
+| Documentation | `search_docs`, `list_docs`, `get_doc` |
+| Export discovery | `find_export`, `list_package_exports`, `get_export`, `search_exports` |
+| Live service APIs | `list_api_services`, `list_service_operations`, `get_operation_schema` |
+| CLI bridge | `list_commands`, `execute_command` |
+| Evidence | `record_drift` |
+
+Reach for `doctor` first when the stack is red, `find_export` before guessing a package subpath,
+and `get_operation_schema` before inventing a request with `curl`. The complete schemas and safety
+policy live in [Agent tooling](/ai/agent-tooling/) and the
+[`@netscript/mcp` reference](/reference/mcp/).
+
+## What next, by intent
+
+- **Add a service:** [Add a service](/services-sdk/how-to/add-a-service/) for the CLI-to-contract,
+  handler, discovery, and client path.
+- **Add a background job:** [Background jobs](/background-processing/workers/) and
+  [add a plugin](/orchestration-runtime/how-to/add-a-plugin/) for workers and their Aspire wiring.
+- **Add a screen:** [Customize Fresh UI](/web-layer/how-to/customize-fresh-ui/) and the
+  [Fresh page model](/web-layer/server/) for `ui:add`, `definePage`, loaders, and islands.
+- **Secure a route:** [Add authentication](/identity-access/how-to/add-authentication/) and the
+  [authorization chapter](/tutorials/workspace/05-route-authz/).
+- **Go to production:** [Deploy](/orchestration-runtime/how-to/deploy/) for deployable units,
+  managed backing services, and the boundary between local Aspire and a remote target.
+
+For a continuous build, continue with the [Storefront tutorial](/tutorials/storefront/). When you
+are finished locally, stop the exact AppHost from `aspire/`:
+
+```sh
+aspire stop --apphost ./apphost.mts
+```
