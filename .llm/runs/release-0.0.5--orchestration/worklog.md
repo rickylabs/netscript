@@ -1552,3 +1552,22 @@ Close-gate green on rerun (its red was my own duplicate box-5 in a pre-rewrite r
 - Net effect: warning-flavoured debt call-outs on main went from 27 tagged occurrences to
   **zero**; what remains is 18 honest design statements, each pointing at an open debt entry.
 Cut-time checklist gains its satisfied caveat gate.
+
+## 2026-08-04 — MERGE #1291 (owner mobile-card fix); canary.10 slices dispatched
+
+- **#1291 merged** — owner's second docs-site render fix (standalone cards inflated to full page
+  height on mobile). Both owner render fixes (#1286, #1291) now on main.
+- **Canary.9** published through label/drift; awaiting the pinned production E2E.
+- **Canary.10's slices dispatched** on the freed lanes, chosen as coherent bodies of work per D16:
+  - **CI/release reliability trio** (quickwins lane, sequential): #1188 (close-gate misses
+    manually-linked closing issues — a hole in the merge gate itself, so ordered first), #1219
+    (e2e-cli respawn on label events — mirror #1214's ci.yml fix), #1227 (aspire-restore hang:
+    retry budget, pinned cache, infra-vs-product classification).
+  - **#1196** (genjobs lane): ephemeral db-operation AppHost outliving `netscript db`. Brief
+    carries my own reproduction from tonight's #1250 verification — `aspire ps` showed the
+    project AppHost plus `<project>/aspire/db-operation/apphost.mts`, which I had to stop by
+    path. Orchestrator-observed evidence beats a restated issue body.
+  - **Docs p1 accuracy batch** (agy lane): #1110, #1112, #1108, #1116 — one PR, four
+    `Closes`, per-issue evidence blocks; brief mandates verifying every claim against the
+    shipped surface via `deno doc` (a non-running example is the very defect #1112 fixes) and
+    forbids invented sections and the slop register.
