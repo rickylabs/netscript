@@ -77,6 +77,10 @@ See `plan.md` S0–S4. Each slice updates this worklog and `context-pack.md` bef
 | Research / plan | complete | Live #1236, doctrine/debt, and focused code inspection recorded. |
 | PLAN-EVAL | composed | `plan-eval.md`; milestone-run + D6 row. |
 | S1 RED | expected failure | `deno test --unstable-kv -A packages/cli/src/public/features/plugins/remove/remove-plugin_test.ts` exited 1. The diff showed `Plugins.sagas-api` and `BackgroundProcessors.sagas` had become empty after dispatch failure; the later assertion also requires dispatch package `@netscript/plugin-sagas`, while baseline sends `sagas`. |
+| S2 atomic removal | complete | Commit `fba403646`; installed metadata resolves the package before dispatch, owned paths are snapshotted before mutation, and injected post-mutation failure restores them byte-for-byte. |
+| S3 lifecycle | complete | Public command tests: install → bare-name remove restores config/shared/generated state and `plugin doctor` exits clean. Combined install/remove suite: 4 passed (26 steps), 0 failed. |
+| Package quality | complete | Scoped check/lint/fmt: zero findings; `quality:gate` exit 0 with zero scanner findings/no new allowances; CLI `doc:lint` and package publish dry-run exit 0. |
+| Full CLI E2E | complete | First real run passed 33 gates, then transiently timed out at `runtime.wait.workers-api`; cleanup/leak-check were clean. One identical clean retry passed all 71 gates, including workers readiness, live plugin/service behavior, OTEL, and cleanup (`passed=71 failed=0`). |
 
 ## Reconcile notes
 
@@ -85,3 +89,8 @@ See `plan.md` S0–S4. Each slice updates this worklog and `context-pack.md` bef
 - S1: issue/PR now carry `status:plan-eval`; no new reviewer comments. RED failure is the verified
   defect, not an infrastructure failure. Main advanced by unrelated MCP PR #1233 after bootstrap;
   no touched-path overlap, so implementation continues and will rebase before ready if required.
+- S2/S3: implementation and lifecycle proof are in `fba403646` and explicitly pushed. The public
+  argument contract did not change, so the existing bare-name help remains correct. `deno.lock`
+  remains modified and unstaged as pre-existing user-owned state.
+- S4: exact full-suite retry passed 71/71 after the first run's isolated readiness timeout. The
+  scoped uninstall debt gate is satisfied and the debt row is closed with #1236/PR #1237 evidence.

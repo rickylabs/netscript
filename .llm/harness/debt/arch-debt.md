@@ -179,9 +179,12 @@ finding into a debt entry.
 - **Linked plan:** `.llm/tmp/run/issue-167-marketplace-plugin-install/plan.md` (Non-Scope, D5,
   S12).
 - **Created:** 2026-06-28
-- **Status:** open, DEBT_ACCEPTED.
+- **Status:** closed by #1236 / PR #1237 (2026-08-04).
 - **Gate:** New uninstall contract and `e2e:cli` add/remove/re-add suite pass without orphaned
   generated artifacts or user-authored file deletion.
+- **Closure evidence:** Installed package metadata now drives a preflight removal plan; host cleanup
+  is rollback-safe, and the public install/remove/doctor lifecycle test restores owned config and
+  generated wiring. The full `scaffold.runtime` retry passed 71/71 with cleanup.
 
 ## marketplace — ISSUE-167-MARKETPLACE-PORTAL-SIGNATURES
 
