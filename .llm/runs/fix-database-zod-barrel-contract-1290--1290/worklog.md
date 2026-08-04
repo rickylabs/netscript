@@ -71,6 +71,8 @@ consumer through the scaffold compile test rather than editing template imports.
 | 2026-08-05 | 3 | artifact inspection | Root alias, generated aggregate, and rendered users contract agree symbol-for-symbol; hashes retained in evidence. |
 | 2026-08-05 | 3 | acceptance dependency | Full app-inclusive check remains blocked only by separately owned #1287; box 1 is not claimed. |
 | 2026-08-05 | 3 | Quickstart | Added the missing derivation explanation: stable alias, aggregate location, regeneration law, no deep imports. |
+| 2026-08-05 | 4 | dependency resolved | Rebasing onto `18b5b2bbf` brought in merged #1300; the foreign lock diff was preserved byte-for-byte. |
+| 2026-08-05 | 4 | pristine acceptance | Repeated canonical scaffold runtime 71/71, then the exact generated workspace passed full root `deno task check` with zero diagnostics. |
 
 ## Gates
 
@@ -95,3 +97,5 @@ consumer through the scaffold compile test rather than editing template imports.
 | Database publish dry-run | PASS | No slow-type or file-list failure; publish simulation complete. |
 | Docs accuracy | PASS | Repository accuracy/discoverability gate. |
 | Docs verify | PASS | Site built (617 files), 32,770 internal links resolve, 18 caveat references resolve. |
+| Rebased full workspace check | PASS | Pristine `plugin-smoke-20260805-004502`; apps, services, and contracts checked with zero diagnostics. |
+| Rebased example service boot | PASS | Canonical runtime users service health passed after Aspire startup on the rebased head. |
