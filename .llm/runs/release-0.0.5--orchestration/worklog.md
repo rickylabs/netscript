@@ -1022,3 +1022,22 @@ PR #1215. FYI for the release cut: four docs/site pages changed, no packages/ so
   (quality flip verified: 277→228 bytes), refs `Refs #1201` + sidebar clean, threads 0/0 —
   but merge blocked on real conflicts with today's MCP merges (S7 registry union). Rebase
   steer fired; re-gate on the new head; rides canary.7 with the sagas #1223 fix.
+
+## 2026-08-04 — Owner directive: post-fix docs-caveat sweep (standing rule, cut-gated)
+
+Owner (with docs-site screenshot of the sagas mirror caveat box): once the sagas fix lands,
+update all docs occurrences that mention the caveats; apply the same for other fixes. Recorded
+as a **standing rule + cut-time checklist item**: every merged fix triggers a docs sweep that
+re-judges related caveat/limitation prose — update what the fix invalidates, keep what remains
+true (the screenshot's mirror-cadence caveat is NOT invalidated by #1224 — projection ≠ mirror
+feed — unless a later change makes it so). Sweeps owed once their fixes land:
+- #1224 (projection date revival): sagas docs caveats about instances not appearing /
+  Redis-path reliability; `saga_instances` visibility prose.
+- #1211 (randomized ports): any docs asserting fixed listener defaults (8091/8092, 3000, 5173),
+  port-collision caveats, tutorial port prose.
+- #1206 (S7 discovery): aspire-cli/manifest discovery caveats about unresolved live ports.
+- #1218 (export corpus): shipped its own docs; verify no stale "no MCP path for exports" prose
+  remains elsewhere.
+Execution lane: focused docs slice(s) after #1224 merges (docs-authoring exception applies);
+overlap with docsorch P2 sweep coordinated via its brief — fix-driven caveat corrections stay
+with this run so release notes and docs agree at cut time.
