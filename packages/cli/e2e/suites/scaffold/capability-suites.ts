@@ -10,6 +10,7 @@ import { DATABASE } from '../../src/domain/extension-axes.ts';
 import type { RunOptions } from '../../src/domain/run-context.ts';
 import type { SuiteDefinition } from '../../src/domain/suite-definition.ts';
 
+/** Process-level cache mode used by the Docker-less runtime suite. */
 export const SQLITE_RUNTIME_CACHE_MODE = {
   environmentVariable: 'NETSCRIPT_CACHE_MODE',
   value: 'Executable',

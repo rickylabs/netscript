@@ -326,7 +326,7 @@ invariant, recorded as drift **D-7**. This is the supervisor's own review, perfo
 | Boolean `cache` axis instead of a `cacheBackend` axis   | `--cache-backend deno-kv` yields `Mode: 'External'`, and plugin-add re-adds garnet anyway | code (`generate-appsettings.ts:251-259`)             |
 | S1 (`--allow-ffi`) precedes every E2E slice             | Non-service resources exit 1 on sqlite without it                                         | code (`generate-register-services.ts:32-38`)         |
 | Per-suite `defaults` merged **under** overrides         | A suite id alone cannot pin an engine today                                               | code (`capability-suites.ts:168-192`)                |
-| Generic `run` supplies only explicit db/cache overrides | Cliffy defaults otherwise mask capability defaults; `full` keeps its explicit D6 defaults | code (`run-command.ts`, drift D-9)                   |
+| Generic `run` supplies only explicit db/cache overrides | Cliffy defaults otherwise mask capability defaults; `full` keeps its explicit D6 defaults | code (`run-command.ts`, drift D-10)                  |
 
 ## Drift
 
@@ -336,7 +336,8 @@ invariant, recorded as drift **D-7**. This is the supervisor's own review, perfo
 | Carried-in draft's root-cause analysis was wrong     | significant | yes (D-2)          |
 | #1191's fix is services-only — new blocker           | significant | yes (D-3)          |
 | Apps own no permission-bearing command               | significant | yes (D-5 + ruling) |
-| Generic `run` defaults masked suite defaults         | significant | yes (D-9)          |
+| Generic `run` defaults masked suite defaults         | significant | yes (D-10)         |
+| Concurrent supervisor commit swept S4 worktree      | significant | yes (D-11)         |
 
 ## Gate Results
 
@@ -361,9 +362,10 @@ unchanged runtime suite has postgres and neither mysql nor mssql.
 
 **Post-slice reconcile note.** S4 remains partial work on #1158 / draft PR #1220. No closing
 relationship, labels, milestone, `.github/**`, Docker cleanup, live runtime, or
-`packages/cli/src/**` surface changed. Drift D-9 records the generic CLI defaults that masked the
-new capability defaults. S4 is implementation-complete with green automated gates and remains
-explicitly pending Tier-A review; S5 has not started.
+`packages/cli/src/**` surface changed. Drift D-10 records the generic CLI defaults that masked the
+new capability defaults; D-11 records the concurrently pushed supervisor commit that swept the S4
+worktree before the implementation commit. S4 is implementation-complete with green automated
+gates and remains explicitly pending Tier-A review; S5 has not started.
 
 ### S3 Slice Gates
 
@@ -461,5 +463,5 @@ has not started.
 - S1 and S2 are signed off. S3 implementation is complete with green automated gates but is **not
   self-certified**. Tier-A review subsequently signed off S3. S4 is implementation-complete with
   green automated gates but is **not self-certified**. Tier-A must review the additive constants,
-  environment precedence, generic-run drift D-9, and wait/resource matrix before sign-off; do not
+  environment precedence, generic-run drift D-10, and wait/resource matrix before sign-off; do not
   start S5 from this handoff.

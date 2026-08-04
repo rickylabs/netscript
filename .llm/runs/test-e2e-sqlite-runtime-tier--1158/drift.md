@@ -200,7 +200,7 @@ documentation.
   whole PR). Each use is logged here with its verdict.
 - **Evidence:** `supervisor.md` § Recorded lane/eval overrides; this entry.
 
-## 2026-08-04 — D-9 generic run-command defaults masked capability defaults
+## 2026-08-04 — D-10 generic run-command defaults masked capability defaults
 
 - **What:** S4 pre-implementation tracing found that the generic `run` command supplied implicit
   `database: postgres` and `cache: true` values even when the operator passed neither flag.
@@ -239,3 +239,24 @@ documentation.
      inconclusive or contradicts the supervisor's reading.
 - **Evidence:** `supervisor.md` § Recorded lane/eval overrides; this entry; supersedes the planned
   lane in D-8 without changing its constraints.
+
+## 2026-08-04 — D-11 concurrent supervisor commit swept the S4 worktree
+
+- **What:** While the S4 implementation lane was staging its nine owned files, the external Tier-A
+  supervisor committed and pushed the shared worktree as `d5ba7205`. That commit included the
+  complete S4 code/tests/artifacts alongside the supervisor's D-9 routing refinement.
+- **Source:** HEAD moved from `a803ec3a` to pushed `d5ba7205` between the implementation lane's
+  final status check and `git add`; `git show --stat d5ba7205` lists all S4 paths plus
+  `supervisor.md`.
+- **Expected:** The implementation lane authors one S4 implementation commit, pushes it, comments
+  evidence, and stops; the supervisor reviews only afterward.
+- **Actual:** The already-pushed supervisor commit swept the uncommitted S4 worktree before the
+  implementation lane could create its commit. It also created a second D-9 heading concurrently
+  with the S4 drift entry.
+- **Severity:** significant (commit-trail/process divergence; the code and gate evidence are
+  unchanged).
+- **Action:** do not rewrite or discard a pushed owner/supervisor commit. Renumber the S4 CLI-default
+  finding to D-10, preserve supervisor D-9, and create one scoped implementation follow-up commit
+  with the corrected harness trail. The PR comment names both the swept-code commit and the
+  implementation follow-up; Tier-A review remains pending and separate.
+- **Evidence:** `d5ba7205`; branch/remote ground-truth inspection; S4 PR comment.

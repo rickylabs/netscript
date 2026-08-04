@@ -35,7 +35,7 @@ resolved engine. No existing built-in capability has a defaults object.
 S4 adds the `scaffold.runtime.sqlite` capability with sqlite/cache-off defaults and reuses
 `RUNTIME_GATES` by reference. Resolution pins `NETSCRIPT_CACHE_MODE=Executable` only when the
 operator has not set it. The generic `run` command no longer supplies implicit db/cache overrides,
-because those masked capability defaults (drift D-9); unchanged suite defaults keep
+because those masked capability defaults (drift D-10); unchanged suite defaults keep
 `scaffold.runtime` postgres/cache-on, and `full` retains its explicit postgres/cache-on defaults.
 Wait gates are tested against `runtimeResources()` for sqlite and postgres, with Garnet retained in
 both and no database resource wait on sqlite.
@@ -99,7 +99,7 @@ both and no database resource wait on sqlite.
 
 | Path                                                                           | Status   | Notes                                                                 |
 | ------------------------------------------------------------------------------ | -------- | --------------------------------------------------------------------- |
-| `.llm/runs/test-e2e-sqlite-runtime-tier--1158/{worklog,context-pack,drift}.md` | modified | S4 evidence, handoff state, and D-9 CLI-default drift.                |
+| `.llm/runs/test-e2e-sqlite-runtime-tier--1158/{worklog,context-pack,drift}.md` | modified | S4 evidence, handoff state, and D-10/D-11 drift.                     |
 | `packages/cli/e2e/src/domain/cli-surface.ts`                                   | modified | Additive sqlite runtime id and title.                                 |
 | `packages/cli/e2e/suites/scaffold/capability-suites.ts`                        | modified | SQLite/cache-off profile and operator-first executable-cache seam.    |
 | `packages/cli/e2e/src/application/gates/scaffold/runtime-gates.ts`             | modified | Exported documented resource list for cross-site consistency testing. |
@@ -133,8 +133,9 @@ embedded-template file was touched.
   D-3 #1191 fix is services-only, new blocker (significant); D-4 CI "no docker service" framing
   (minor); D-5 apps have no permission-bearing command (significant); D-6 resumed cache-spelling
   probe corrected the partial handoff evidence (minor); D-7 self-certification breach (significant);
-  D-8 owner-authorized supplementary verification lane (minor); D-9 generic `run` defaults masked
-  capability defaults (significant). All in `drift.md`.
+  D-8 owner-authorized supplementary verification lane (minor); D-9 adversarial-check escalation
+  order (minor); D-10 generic `run` defaults masked capability defaults (significant); D-11
+  concurrent supervisor commit swept the S4 worktree (significant). All in `drift.md`.
 - **Debt:** two entries to create at Close — the unreachable `Mode: 'Local'` cache arm, and
   `SCAFFOLD_DEFAULTS.CACHE_BACKEND: 'redis'` forcing a container on every scaffold.
 
