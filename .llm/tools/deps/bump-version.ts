@@ -60,6 +60,11 @@ export async function findVersionResidue(root: string, oldVersion: string): Prom
         // were taken at (the baseline the NEXT release diffs against); they are
         // not live version manifests and must not be treated as bump residue.
         /(?:^|[/\\])\.llm[/\\]tools[/\\]release[/\\]baselines(?:[/\\]|$)/,
+        // Test fixtures pin prior published releases on purpose (a prior-release
+        // config capture, a consumer control that isolates a wrapper against the
+        // published package). The bump never rewrites them, so the residue scan
+        // must not flag them either.
+        /(?:^|[/\\])(?:fixtures|type-fixtures)(?:[/\\]|$)/,
       ],
     })
   ) {

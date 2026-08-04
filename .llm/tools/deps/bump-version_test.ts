@@ -346,3 +346,28 @@ Deno.test('findVersionResidue excludes captured public-surface baseline snapshot
     await Deno.remove(root, { recursive: true });
   }
 });
+
+Deno.test('findVersionResidue excludes test fixtures that pin prior published releases', async () => {
+  const { findVersionResidue } = await import('./bump-version.ts');
+  const root = await Deno.makeTempDir({ prefix: 'ns-fixture-residue-' });
+  try {
+    await Deno.mkdir(`${root}/packages/cli/src/agent/init/fixtures`, { recursive: true });
+    await Deno.mkdir(`${root}/packages/fresh/tests/type-fixtures`, { recursive: true });
+    await Deno.writeTextFile(`${root}/deno.json`, '{"version":"0.0.5"}\n');
+    await Deno.writeTextFile(
+      `${root}/packages/cli/src/agent/init/fixtures/prior-release.mcp.json`,
+      '{"specifier":"jsr:@netscript/cli@0.0.4"}\n',
+    );
+    await Deno.writeTextFile(
+      `${root}/packages/fresh/tests/type-fixtures/streamdb-consumer-deno.json`,
+      '{"imports":{"@netscript/fresh":"jsr:@netscript/fresh@0.0.4"}}\n',
+    );
+    assertEquals(await findVersionResidue(root, '0.0.4'), []);
+
+    // The same pin OUTSIDE a fixtures directory is still residue.
+    await Deno.writeTextFile(`${root}/stale.json`, '{"specifier":"jsr:@netscript/cli@0.0.4"}\n');
+    assertEquals(await findVersionResidue(root, '0.0.4'), [`${root}/stale.json`]);
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
