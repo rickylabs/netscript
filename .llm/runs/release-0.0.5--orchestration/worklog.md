@@ -1315,3 +1315,9 @@ scoreboard: **6 of 11 closed** (#1250/#1253/#1254/#1235/#1236/#1247); #1234 pend
 box mirror; #1251 at draft #1266; #1248 next in batch 2; #1252 at draft #1265 (iterating);
 #1246 at draft #1264 (refs pending its classification verdict). Rides the canary.8
 re-dispatch train.
+
+## 2026-08-04 — MERGE #1268; CANARY.8 RE-DISPATCHED
+
+#1268 merged (all four green first read, threads 0/0, refs [1267] — box 3 completes
+post-merge on the canary verdict). Canary.8 attempt 2 dispatched immediately; train now
+additionally carries #1261 (#1247) and #1268 itself. Stage-E verification on completion.
