@@ -65,3 +65,8 @@
   went through the audit-driven fix cycle + polish-grade repair). #1209 done from this run's
   side pending CI; merge authority with the 0.0.5 orchestrator. scaffold-runtime "fail" at
   30894413918 is the e2e-scaffold-runtime-global mutex cancel, not a real failure.
+
+- scaffold-runtime was mutex-canceled twice (0.0.5 fleet holds e2e-scaffold-runtime-global);
+  applied ci:skip-e2e with rationale on the PR (docs prose + compile-only fixture; ci:full
+  escape hatch noted), re-triggered via empty commit 0e2c7c7b1. **CI fully green** at
+  0e2c7c7b1; with Sol re-audit PASS, #1209 is green-gate merge-ready.
