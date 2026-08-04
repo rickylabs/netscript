@@ -78,7 +78,10 @@ describe('generateDbCliMode', () => {
     assertStringIncludes(output, ".withEnvironment('DATABASE_URL', sqliteUrl)")
     assertStringIncludes(output, '.withEnvironment(target.envKey, sqliteUrl);')
     assertStringIncludes(output, 'resource = await resource')
-    assertStringIncludes(output, 'if (!offlineGenerateUrl && target.resource)')
+    assertStringIncludes(
+      output,
+      "if (!offlineGenerateUrl && target.engine !== 'Sqlite' && target.resource)",
+    )
     assertStringIncludes(
       output,
       ".withEnvironment('DATABASE_URL', target.resource)",

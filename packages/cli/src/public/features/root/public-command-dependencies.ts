@@ -97,7 +97,10 @@ export interface PublicCommandDependencies {
     readonly fs: DenoFileSystem;
   };
   /** Dependencies for DB lifecycle commands. */
-  readonly dbOperationDependencies: { readonly cwd: () => string };
+  readonly dbOperationDependencies: {
+    readonly cwd: () => string;
+    readonly workspaceMutator: DatabaseWorkspaceMutator;
+  };
   /** Dependencies for DB add. */
   readonly dbAddDependencies: {
     readonly fs: DenoFileSystem;
@@ -229,6 +232,11 @@ export function createPublicCommandDependencies(
     };
   };
   const initContext = createInitContext(fs);
+  const databaseWorkspaceMutator = new DatabaseWorkspaceMutator(
+    fs,
+    scaffolder,
+    templateAdapter,
+  );
 
   return {
     fs,
@@ -248,12 +256,15 @@ export function createPublicCommandDependencies(
         dryRun ? createInitContext(new DryRunFileSystemAdapter(fs)) : initContext,
     },
     uiInstallDependencies: { fs },
-    dbOperationDependencies: { cwd: host.cwd },
+    dbOperationDependencies: {
+      cwd: host.cwd,
+      workspaceMutator: databaseWorkspaceMutator,
+    },
     dbAddDependencies: {
       fs,
       registry: dbRegistry,
       databaseScaffolder: new DatabaseScaffolder(scaffolder, fs, templateAdapter, dbRegistry),
-      workspaceMutator: new DatabaseWorkspaceMutator(fs, scaffolder, templateAdapter),
+      workspaceMutator: databaseWorkspaceMutator,
     },
     serviceAddDependencies,
     pluginInstallDependencies: {

@@ -16,25 +16,22 @@ const appHostPath = await canonicalPath(appHostArgument);
 const before = await findResident(appHostPath);
 await runDbStatus(projectRoot, repoRoot, database);
 const after = await findResident(appHostPath);
+const operationAppHostPath = resolve(projectRoot, 'aspire', 'db-operation', 'apphost.mts');
 
 assertStable('appHostPid', before.appHostPid, after.appHostPid);
 assertStable('cliPid', before.cliPid, after.cliPid);
 assertStable('dashboardUrl', before.dashboardUrl, after.dashboardUrl);
 await assertResidentBackchannel(appHostPath);
+await assertOperationAppHostRetired(operationAppHostPath);
+await assertPathAbsent(resolve(projectRoot, 'aspire', 'db-operation'));
+await assertPathAbsent(resolve(operationAppHostPath, '..', '.netscript-db-operation.json'));
 
 console.info(
   `db status preserved resident AppHost pid=${after.appHostPid} cliPid=${after.cliPid} dashboard=${after.dashboardUrl}`,
 );
 
 async function findResident(path: string): Promise<AspireProcess> {
-  const output = await run('aspire', [
-    'ps',
-    '--format',
-    'Json',
-    '--non-interactive',
-    '--nologo',
-  ]);
-  const processes = JSON.parse(output) as AspireProcess[];
+  const { output, processes } = await listAppHosts();
   let resident: AspireProcess | undefined;
   for (const entry of processes) {
     if (
@@ -54,6 +51,42 @@ async function findResident(path: string): Promise<AspireProcess> {
     );
   }
   return resident;
+}
+
+async function listAppHosts(): Promise<{ output: string; processes: AspireProcess[] }> {
+  const output = await run('aspire', [
+    'ps',
+    '--format',
+    'Json',
+    '--non-interactive',
+    '--nologo',
+  ]);
+  const processes = JSON.parse(output) as AspireProcess[];
+  return { output, processes };
+}
+
+async function assertOperationAppHostRetired(path: string): Promise<void> {
+  const { output, processes } = await listAppHosts();
+  for (const entry of processes) {
+    if (
+      typeof entry.appHostPath === 'string' &&
+      await canonicalPath(entry.appHostPath) === path
+    ) {
+      throw new Error(
+        `db-operation AppHost survived db status: ${JSON.stringify(entry)}; aspire ps: ${output}`,
+      );
+    }
+  }
+}
+
+async function assertPathAbsent(path: string): Promise<void> {
+  try {
+    await Deno.stat(path);
+  } catch (error) {
+    if (error instanceof Deno.errors.NotFound) return;
+    throw error;
+  }
+  throw new Error(`db-operation artifact survived db status: ${path}`);
 }
 
 async function runDbStatus(root: string, repository: string, target: string): Promise<void> {

@@ -78,7 +78,7 @@ export async function tryHandleDbCliMode(
         .withEnvironment(target.envKey, sqliteUrl);
     }
 
-    if (!offlineGenerateUrl && target.resource) {
+    if (!offlineGenerateUrl && target.engine !== 'Sqlite' && target.resource) {
       resource = await resource
         .withEnvironment('DATABASE_URL', target.resource)
         .withEnvironment(target.envKey, target.resource)
