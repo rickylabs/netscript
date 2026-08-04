@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `fix-pr-checks-cross-attempt--w3` |
 | Branch | `fix/pr-checks-cross-attempt` |
-| Current phase | impl-eval handoff |
+| Current phase | ready-merge handoff |
 | Archetype | N/A — repository tooling |
 | Scope overlays | none |
 
@@ -27,13 +27,13 @@ remain pending and genuinely failing latest attempts exit 1.
 
 ## In Progress
 
-- Composed GitHub evaluator/reviewer handoff on draft PR #1205.
+- Close-gate evidence mirroring and milestone merge handoff for PR #1205.
 
 ## Next Steps
 
-1. Commit and explicitly push S1.
-2. Update PR evidence/checklists and post the implementation phase comment.
-3. Trigger composed evaluation and reconcile findings.
+1. Commit and explicitly push the composed evaluator record.
+2. Tick the final truthful PR DoD box and apply `status:ready-merge`.
+3. Let close-gate mirror the four acceptance entries into the issue before merge.
 
 ## Key Decisions
 

@@ -58,6 +58,7 @@ existing classifier cases in `pr-checks_test.ts`, then run the three scoped wrap
 | 2026-08-04T09:29+02:00 | S1 | implementation | Added latest-attempt workflow jobs, check-run URL correlation, explicit attempt precedence, queued-job fallback, and exit-code seam. |
 | 2026-08-04T09:33+02:00 | S1 | slice review | Opus opposite-family review found 2 high, 2 medium, and 2 low issues; all were addressed. Re-review session `833cdc49-8d3f-42ea-a8a9-0f9416d5aef2` returned PASS. |
 | 2026-08-04T09:39+02:00 | S1 | CI reconcile | Repo volatile-value guard found the GitHub API base hardcoded in the new test fixture. Replaced it with `GITHUB_API_BASE_URL` from canonical config; source behavior and DoD claims remain unchanged. |
+| 2026-08-04T09:42+02:00 | close | composed verdict | Owner/milestone reviewer confirmed all other gates independently green and identified the guard as the sole blocker. After `b3e5c7132`, exact guard 4/4 PASS; composed IMPL-EVAL recorded PASS. |
 
 ## RED→GREEN Evidence
 
