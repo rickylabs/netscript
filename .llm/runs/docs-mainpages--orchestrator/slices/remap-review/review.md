@@ -380,3 +380,35 @@ Approval is blocked by the false handler-derivation claim and the non-hydrating,
 homepage page tab. Correct those, align Concepts and Why to one technically honest meta-framework
 definition, and make the Aspire visual describe what it actually shows. The remaining prose fixes
 are narrow and should not require another structural rewrite.
+
+## Re-verdict
+
+**Commit re-reviewed:** `ccad29c3c8ad83fa8f7973abf1ded7a79811f29f`  
+**Final re-verdict:** **FIX_FIRST**
+
+| Finding | Status | Verification |
+| --- | --- | --- |
+| **B1 — handler logic presented as derived** | **FIXED** | `index.vto` now distinguishes hand-written business logic from contract-derived OpenAPI/client surfaces. `_diagrams/contract-flow.mmd` labels the handler “hand-written logic” inside “typed from the contract,” removes the handler → page arrow, and the committed SVG contains the same corrected nodes and edges. |
+| **B2 — cache read presented as fetch/hydration** | **FIXED** | The page loader now returns a cache hit or calls `queryOptions(input).queryFn()` on a miss, describes island layer props rather than TanStack hydration, and exports the built Fresh page as the route default. |
+| **M1 — every seam called a typed contract** | **FIXED** | The Concepts lede now assigns distinct boundary roles to contracts, services, plugin manifests, the web layer, and Aspire; the “always the same thing” and “never need this page again” claims are gone. |
+| **M2 — Aspire diagram narration did not match the visual** | **FIXED** | The alt text and caption now describe the pictured orders API/worker/saga slice, Postgres, Redis, and dashboard. The following paragraph explicitly transitions from that plugin zoom to the workspace-scale claim. |
+| **M3 — Why narrows the meta-framework to two decisions** | **NOT-FIXED** | The replacement paragraph correctly names contracts, durable runtimes, and resource/telemetry wiring, and the logging contrast is gone. The very next paragraph still begins, “The rest of NetScript makes **those two decisions** operational” (`why.vto:44`), restoring the count and contradicting the new three-part account. Replace it with: “NetScript makes those boundaries operational. Services serve the contract at request time, plugin runtimes own the work that outlives a request, and Aspire brings up the resources with their telemetry connected.” |
+| **M4 — unsupported first-screen absolutes/duration** | **NOT-FIXED** | The homepage lede, Quickstart promise, and trace guidance were corrected. However, the homepage exit strip still says “Run a workspace in **ten minutes**” (`index.vto:79`), preserving the same unmeasured duration elsewhere in the four-page set. Replace it with “Scaffold and run a workspace.” |
+| **m1 — tab introduction erases authored code** | **FIXED** | It now says “three authored points” and explicitly states that handler and page remain application code. |
+| **m2 — invented five-tool count** | **FIXED** | The count is gone; the prose names disconnected logs, resource state, and traces instead. |
+| **m3 — database edge conflates connection and service discovery** | **FIXED** | All three Mermaid edges now say `database connection`, and the regenerated Aspire SVG carries the same labels. |
+
+### Gates and hygiene
+
+- `cd docs/site && deno task build` — **PASS**, exit 0; 596 files generated and all 21 diagram asset references verified.
+- `deno task docs:links` — **PASS**, exit 0; 102 docs, 0 broken links, 0 broken anchors, 0 orphans.
+- The build caused Deno to add one dependency entry to the root `deno.lock`; that build-only insertion was removed. The reviewed worktree is again clean, and neither lock file has a diff.
+
+### Final re-verdict
+
+**FIX_FIRST.** Seven findings are fully fixed, including both original blockers and both rendered
+diagram corrections. M3 and M4 each retain one direct textual residue. The M3 residue is a major
+cross-page definition contradiction, so this cannot be approved as-is. Both remaining corrections
+are single-line prose changes; no structural or API work remains.
+
+**Final verdict after `b89eeba793a4e463b9209dd80c4a1e07305206a4`: APPROVE — M3 and M4 are now fixed at `why.vto:44–46` and `index.vto:79`; all nine findings are resolved.**
