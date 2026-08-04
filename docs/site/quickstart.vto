@@ -10,7 +10,8 @@ and makes one visible edit.
 {{ comp callout { type: "note", title: "Prerequisites" } }}
 Install <strong><a href="https://docs.deno.com">Deno 2.x</a></strong>, the
 <strong><a href="https://learn.microsoft.com/dotnet/aspire/">.NET Aspire CLI</a></strong>, and start
-Docker before continuing. The default Postgres and cache resources run in containers.
+Docker before continuing. Aspire orchestrates the local resource graph; Postgres and the shared
+cache run in Docker containers that Aspire starts for you.
 {{ /comp }}
 
 ## 1. Install the CLI
@@ -25,9 +26,9 @@ deno install --global --allow-all --name netscript jsr:@netscript/cli{{ releaseS
 netscript init my-app --db postgres --service --yes
 ```
 
-The `--service` flag is explicit: without it, `netscript init` does not scaffold the example oRPC
-service. `--yes` accepts the remaining defaults without prompts, including the `dashboard` app name
-and shared Redis cache used below.
+The `--service` flag scaffolds the example oRPC service alongside the workspace. `--yes` accepts
+the remaining defaults without prompts, including the `dashboard` app name and shared Redis cache
+used below.
 
 ## 3. Start the resource graph
 
@@ -39,9 +40,9 @@ aspire restore   # first run only
 aspire start
 ```
 
-Use the dashboard URL and one-time login token printed by `aspire start`. Wait until the Fresh app,
-example service, Postgres, and shared cache report healthy, then open the Fresh app from its resource
-link. The page heading should read `my-app`.
+Use the dashboard URL and one-time login token printed by `aspire start`. Wait until all four
+resources report healthy — the Fresh app, example service, Postgres, and shared cache — then open
+the Fresh app from its resource link. The page heading should read `my-app`.
 
 {{ comp callout { type: "note", title: "Aspire comes before any database command" } }}
 The AppHost must start Postgres before a migration, generation, or seed command can connect to it.
