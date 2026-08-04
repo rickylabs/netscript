@@ -64,6 +64,7 @@ run the same test matrix against both provider factories.
 | --- | --- | --- | --- |
 | 2026-08-04 14:12 +02:00 | S0 | research/design | Live issue, consumers, doctrine A2, baseline JSR surface, and contract decision re-derived. |
 | 2026-08-04 14:12 +02:00 | S0 | plan gate | Composed per `milestone-run.md` (orchestrator waiver); plan locked for same-run implementation. |
+| 2026-08-04 14:23 +02:00 | S1 | RED provider contract | Added one fake-time retry contract applied to memory and captured native Deno callbacks; both providers expose only attempt `0`. |
 
 ## Decisions
 
@@ -88,6 +89,7 @@ run the same test matrix against both provider factories.
 | --- | --- | --- | --- |
 | Baseline doc-lint | `deno task doc:lint --root packages/cron --pretty` | PASS | combined diagnostics 0 across four exports |
 | Baseline publish dry-run | `deno task --cwd packages/cron publish:dry-run` | PASS | 11 publish files; no failure |
+| S1 test formatting | `run-deno-fmt.ts --file packages/cron/tests/retry-backoff_test.ts --ext ts --pretty` | PASS | 1 file selected; 0 findings |
 
 ### Fitness Gates
 
@@ -100,7 +102,7 @@ run the same test matrix against both provider factories.
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| RED retry behavior | NOT_RUN | S1 pending | Must demonstrate today's single attempt. |
+| RED retry behavior | EXPECTED FAIL (exit 1) | `rtk proxy deno test --unstable-cron packages/cron/tests/retry-backoff_test.ts` | `0 passed | 2 failed`; both `MemoryCronAdapter` and `DenoCronAdapter` produced actual attempts `[0]` where `[0, 1]` was expected after advancing fake time by 25 ms. Native coverage used a captured `Deno.cron` callback and registered no real work. |
 
 ### Consumer Gates
 
@@ -110,5 +112,8 @@ run the same test matrix against both provider factories.
 
 ## Handoff Notes
 
-- Review aggregate event semantics and abort-during-backoff first.
+- S1 is ready for supervisor review/replay from local branch `fix/cron-retry-backoff-contract-impl`.
+- The RED assertion is identical for both providers: configured `maxRetries: 1` plus fixed nonzero
+  backoff must produce handler attempts `[0, 1]`; current source terminates at `[0]`.
+- No retry implementation or documentation changed in S1.
 - Never stage the pre-existing `deno.lock` edit.

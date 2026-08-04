@@ -6,15 +6,17 @@
 | --- | --- |
 | Run ID | `fix-cron-retry-backoff-contract--w4-d` |
 | Branch | `fix/cron-retry-backoff-contract` |
-| Current phase | `plan-eval (composed waiver) → implement` |
+| Current phase | `implement — S1 RED ready for supervisor review` |
 | Archetype | `2 — Integration` |
 | Scope overlays | `docs` |
 
 ## Current State
 
-Research and design are locked. The retained public contract will be implemented in the shared cron
-execution path for `MemoryCronAdapter` and native `DenoCronAdapter`. Listener/history semantics stay
-aggregate. No implementation file has been changed yet.
+S1 now proves the retained public contract is dead on both existing providers. One deterministic
+fake-time test configures one retry with a 25 ms fixed backoff; both `MemoryCronAdapter` and the
+captured native `DenoCronAdapter` callback expose only attempt `[0]` instead of `[0, 1]`. No retry
+implementation or documentation has changed. Listener/history semantics remain aggregate and are
+reserved for S2.
 
 ## Completed
 
@@ -23,16 +25,20 @@ aggregate. No implementation file has been changed yet.
 - Traced published types, docs, both adapters, shared executor, and scheduled-trigger consumer.
 - Ran baseline full export-map doc-lint, JSR audit, and package publish dry-run.
 - Locked the implement decision and milestone PLAN-EVAL waiver.
+- Added the S1 RED fake-time contract for memory and stubbed native Deno providers.
+- Ran the focused test: raw exit `1`, `0 passed | 2 failed`; both assertions report actual `[0]`
+  versus expected `[0, 1]`.
 
 ## In Progress
 
-- S0 bootstrap commit and draft PR creation.
+- Supervisor review/replay of the local S1 RED commit.
 
 ## Next Steps
 
-1. Commit S0 with explicit paths; push explicit refspec; open draft PR with `Closes #1104`.
-2. Launch the attached complex implementation lane for S1 RED only.
-3. Supervisor-review, commit, push, and comment S1; then steer the same thread to S2.
+1. Review the S1 test and exact expected-failure evidence without treating RED as a green gate.
+2. Replay the local slice commit into the supervisor worktree, then create the supervisor-owned
+   sign-off commit/push/comment trail.
+3. Steer the same attached thread to S2 only after supervisor review.
 
 ## Key Decisions
 
@@ -46,7 +52,10 @@ aggregate. No implementation file has been changed yet.
 
 | Path | Status | Notes |
 | --- | --- | --- |
-| `.llm/runs/fix-cron-retry-backoff-contract--w4-d/*` | new | S0 harness artifacts only |
+| `packages/cron/tests/retry-backoff_test.ts` | new | S1 fake-time defect proof for both providers |
+| `.llm/runs/fix-cron-retry-backoff-contract--w4-d/worklog.md` | updated | exact RED exit/assertion evidence |
+| `.llm/runs/fix-cron-retry-backoff-contract--w4-d/context-pack.md` | updated | S1 supervisor handback |
+| `.llm/runs/fix-cron-retry-backoff-contract--w4-d/codex-thread-ids.md` | generated | attached-thread identity and steering evidence |
 | `deno.lock` | foreign pre-existing | never stage or commit |
 
 ## Gates
@@ -55,7 +64,7 @@ aggregate. No implementation file has been changed yet.
 | --- | --- | --- |
 | Static | baseline PASS | worklog baseline doc-lint/publish dry-run |
 | Fitness | baseline PASS with known warning | JSR audit; full gates pending S4 |
-| Runtime | RED pending | S1 |
+| Runtime | RED proven (expected exit 1) | focused dual-provider test; actual `[0]`, expected `[0, 1]` |
 | Consumer | pending | S3 |
 
 ## Open Questions
