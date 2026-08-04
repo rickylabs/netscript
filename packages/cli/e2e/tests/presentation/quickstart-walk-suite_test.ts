@@ -43,6 +43,18 @@ Deno.test('quickstart service-add verdict initializes first, adds users, and che
   assertEquals(add.join(' ').includes('check'), true);
 });
 
+Deno.test('quickstart project-check verdict runs the documented command exactly', () => {
+  const suite = createQuickstartWalkSuite({
+    packageSource: PACKAGE_SOURCE.JSR,
+    cliEntrypoint: EXACT_CLI,
+  });
+
+  assertEquals(
+    command(suite, GATE.QUICKSTART_CHECK, contextFor(suite.defaultOptions)),
+    ['deno', 'task', 'check'],
+  );
+});
+
 Deno.test('quickstart commands reject a local CLI entrypoint', () => {
   const suite = createQuickstartWalkSuite({
     packageSource: PACKAGE_SOURCE.LOCAL,
