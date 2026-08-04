@@ -1090,3 +1090,12 @@ tagged occurrences across 10 debt ids + untagged tutorial caveats. Full classifi
   #1218 (export corpus), #1222 (docsorch P2 sweep), #1224 (sagas projection fix). This chain
   carries the next green-pair attempt after canary.6's #1227 infra red (its artifacts since
   proven by the successful pinned rerun).
+
+## 2026-08-04 — CANARY.7: full stage-E record — GREEN PAIR RESTORED on the newest train
+
+Run 30910860367 end-to-end success. Payload `f710421e9..f7bcf77f0`: #1221, #1218, #1222, #1224
+(#1223 closed). In-run canary-label: all five checks PASS incl. drift (11 labels / 22 published
+versions); labels on 5 items; prerelease note. Pinned prod E2E success — including the
+runtime.aspire-restore gate that infra-killed canary.6's pair (#1227 still open for hardening).
+`Record green canary pair` + summary success. **Stable-cut green-pair precondition now held by
+canary.7** — the freshest possible train minus #1226 (in gate).
