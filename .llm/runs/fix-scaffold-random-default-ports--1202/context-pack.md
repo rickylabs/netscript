@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `fix-scaffold-random-default-ports--1202` |
 | Branch | `fix/scaffold-random-default-ports` |
-| Current phase | IMPL-EVAL passed; cloud runtime runner unavailable |
+| Current phase | Post-evaluation correction; orchestrator proof pending |
 | Archetype | `6 — CLI / Tooling` |
 | Scope overlays | service |
 
@@ -15,24 +15,30 @@
 The fixed 3001 failure is a host-port collision, not stale Prisma wiring. Generated app/service
 Aspire resources now omit automatic host pins, standalone fallbacks are seeded in 49152–65535,
 and plugin APIs use seeded high-range pins where direct endpoint consumers still require them. The
-clean local runtime one-pass is green (70/70), and the formal open-model IMPL-EVAL passed. Cloud CI
-remains the owner-declared verdict source; the Windows-service identification remains owner-owned.
+earlier local runtime one-pass was green (70/70), but the executing repo-wide cloud test exposed
+three missed CLI regressions after that evaluation. The correction restores plugin service `Port`
+emission alongside the seeded high-range `HostPort` and makes the durable-parity test use the
+project seed. The orchestrator owns the new runtime/cloud proof; the Windows-service identification
+remains owner-owned.
 
 ## Completed
 
 - RED-first generated-output contract and seeded high-range allocator implemented.
 - Focused suites, scoped check/lint/fmt, quality/architecture, and CLI publish dry-run passed.
 - Clean serialized `scaffold.runtime` passed 70/70 with cleanup and zero survivors.
-- Separate-session Qwen 3.7 Max IMPL-EVAL passed with no blocking findings.
+- The prior IMPL-EVAL passed before the three repo-wide regressions were exposed; this correction
+  supersedes that implementation snapshot.
+- Focused regression files now pass (28 passed, 3 Redis integration tests ignored without an
+  endpoint); scoped CLI check/fmt, quality scan, and architecture check pass.
 
 ## Next Steps
 
-1. Obtain an executing cloud `scaffold-runtime` verdict when GitHub assigns a runner.
-2. Require that green verdict before checking S3/cloud DoD or promoting to ready-to-merge.
+1. Push the correction with the explicit branch refspec and post its gate evidence.
+2. Leave the clean runtime/cloud DoD unchecked for the orchestrator-owned proof run.
 
 ## Drift and Debt
 
 - Authorized composed PLAN-EVAL; live comment-count discrepancy; inherited lockfile modification.
-- Cloud runtime job and one retry were cancelled before runner assignment (`runner_id: 0`, zero
-  steps/logs); static and other executing cloud lanes passed.
+- An executing cloud test later exposed three CLI regressions; the earlier evaluator snapshot was
+  therefore insufficient and is not treated as the current-head verdict.
 - No new architecture debt planned.

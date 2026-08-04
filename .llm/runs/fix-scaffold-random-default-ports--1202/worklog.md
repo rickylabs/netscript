@@ -81,6 +81,10 @@ default, and extend the semantic generated-output table.
 | 2026-08-04 | 3 | impl-eval | Separate Claude Code + OpenRouter Qwen 3.7 Max session inspected commit `2046e2af2`; verdict PASS with no blocking findings. The open-model guard rejected an attempted default closed-model child before execution; evaluation resumed in the same Qwen session without delegation. |
 | 2026-08-04 | 3 | cloud dispatch | PR marked ready to trigger hosted gates. Cloud scaffold-static, surface-diff, code-quality, classification, and packaging passed. `scaffold-runtime` was cancelled twice after roughly two minutes without a runner (`runner_id: 0`, empty runner name, zero steps/logs), including one explicit failed-job retry; no test executed, so the cloud runtime verdict remains unavailable. |
 | 2026-08-04 | 3 | review threads | Read-only review-thread gate passed: 0 threads, 0 unanswered. |
+| 2026-08-04 | 4 | repo-wide regression RED | Reproduced the current-head failures: companion plugin API entries omitted `Port`, and the durable CLI parity fixture lacked the project seed required by allocator-backed endpoints. Focused result: 23 passed, 3 failed. |
+| 2026-08-04 | 4 | correction GREEN | Restored `Port: servicePort` while retaining optional seeded `HostPort`; durable parity now asserts allocator-derived worker/saga endpoints from an explicit project seed. Focused CLI plus Redis files: 28 passed, 0 failed, 3 Redis integration tests ignored because no local endpoint was configured. |
+| 2026-08-04 | 4 | Redis diagnosis | No `packages/kv` or `packages/plugin-sagas-core` diff exists in this PR. Both integration tests already use UUID namespaces, and Redis list matches `<namespace>:<prefix>:*`; the executing b334 repo-wide log ended with only the three CLI failures. The reported 12-entry Redis observations are not causally connected to port seeding on available evidence. |
+| 2026-08-04 | 4 | correction gates | Scoped CLI check: 787 files, 7 batches, zero diagnostics. Scoped fmt: 787 files, zero findings. `quality:scan` and `arch:check` exited 0 with no new findings/allowances. Orchestrator owns the fresh runtime/cloud proof and DoD box. |
 
 ## Gate Results
 
@@ -96,3 +100,6 @@ default, and extend the semantic generated-output table.
 | Cloud static/supporting lanes | pass | scaffold-static, surface-diff, code-quality, classification, packaging |
 | Cloud `scaffold-runtime` | infrastructure-blocked | Two pre-run cancellations; `runner_id: 0`, zero steps/logs |
 | Review threads | pass | 0 threads, 0 unanswered |
+| Correction focused tests | pass | 28 passed, 0 failed, 3 Redis integrations ignored without endpoint |
+| Correction scoped check/fmt | pass | 787 selected; zero diagnostics/findings |
+| Correction quality/architecture | pass | `quality:scan` and `arch:check`, exit 0 |

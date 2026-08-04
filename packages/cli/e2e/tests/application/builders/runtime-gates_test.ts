@@ -2,6 +2,7 @@ import { assertEquals } from '@std/assert';
 
 import { ASPIRE_RESOURCE, GATE } from '../../../src/domain/cli-surface.ts';
 import { PORT_RANGES } from '../../../../src/kernel/constants/port-ranges.ts';
+import { allocateScaffoldDefaultPort } from '../../../../src/kernel/domain/scaffold/default-port-allocation.ts';
 import type { RunContext } from '../../../src/domain/run-context.ts';
 import { DATABASE } from '../../../src/domain/extension-axes.ts';
 import { createRuntimeGates } from '../../../src/application/gates/scaffold/runtime-gates.ts';
@@ -95,14 +96,18 @@ Deno.test('runtime gates include durable workers and sagas CLI parity', () => {
   if (gate?.kind !== 'command') {
     throw new Error('Expected durable CLI parity gate to be a command gate.');
   }
+  const projectName = 'runtime-gates-test';
   const context = {
     project: { repoRoot: '/repo', projectRoot: '/workspace/app' },
+    request: { options: { projectName } },
   } as RunContext;
+  const workersPort = allocateScaffoldDefaultPort(projectName, 'plugin:workers-api');
+  const sagasPort = allocateScaffoldDefaultPort(projectName, 'plugin:sagas-api');
   assertEquals(gate.cwd(context), '/workspace/app');
   assertEquals(gate.command(context), [
     'deno',
     'run',
-    '--allow-net=127.0.0.1:8091,127.0.0.1:8092',
+    `--allow-net=127.0.0.1:${workersPort},127.0.0.1:${sagasPort}`,
     '--allow-read',
     '/repo/packages/cli/e2e/src/application/gates/scaffold/durable-cli-parity.ts',
   ]);
