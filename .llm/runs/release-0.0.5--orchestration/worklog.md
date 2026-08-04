@@ -783,3 +783,12 @@ worktree) and the PR comment trail.
 #1204 (S6) merge armed on its live ci. #1209: docsorch's slop repair verified genuine (zero
 auth refs remain) but bounced with request-changes: packages/fresh type-fixture on the docs
 lane (check-6), deno.lock churn, quality red. #1193 ready, contexts running — canary.2 next.
+
+## 2026-08-04 — Merge: PR #1212 (#1207 auto-closed) — draft-CI economy live
+
+The owner's top-priority unlocker merged (`15ae68cbd`): draft PRs no longer fire the expensive
+matrix; ready_for_review triggers the full set; required contexts preserved; policy test
+shipped alongside (.github/scripts/draft-workflow-policy.test.ts). Every remaining slice's
+draft pushes stop burning cloud compute from this merge forward. Gate record: 4/4 contexts
+green first read, threads 0, files exactly the workflow surface, 0 ignores, refs [1207],
+auto-close verified.
