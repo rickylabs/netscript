@@ -48,8 +48,8 @@ Expected: `workers` and `triggers` both appear. Also confirm Aspire is up — th
 and the workers runtime both depend on it:
 
 ```sh
-curl http://localhost:8091/health   # workers API, healthy JSON
-curl http://localhost:8093/health   # triggers API, healthy JSON
+curl <workers-endpoint>/health    # workers API, healthy JSON
+curl <triggers-endpoint>/health   # triggers API, healthy JSON
 ```
 
 If either is missing, return to Chapter 1 — do not start over.
@@ -238,10 +238,10 @@ Moving the finished file into the watched folder fires a single `create` event (
 watcher seeing a half-written file). Now confirm both sides of the hand-off:
 
 ```sh
-# 1. The trigger recorded the inbound file event (:8093).
-curl 'http://localhost:8093/api/v1/events?limit=10'
+# 1. The trigger recorded the inbound file event.
+curl '<triggers-endpoint>/api/v1/events?limit=10'
 
-# 2. The job it enqueued executed (:8091).
+# 2. The job it enqueued executed.
 ns-workers executions --limit=10 --json
 ```
 

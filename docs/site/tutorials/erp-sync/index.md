@@ -59,7 +59,7 @@ schedule; and nothing is lost across a restart.
 SAP export job drops products_2024.csv     (a file lands in .data/incoming/products)
         │  defineFileWatch trigger fires on 'create'
         ▼
-enqueueJob('import-products')              (a durable worker job, :8091)
+enqueueJob('import-products')              (a durable worker job)
         │  the job parses + records the raw SAP rows
         ▼
 normalize-sap transform task               (sandboxed deno subprocess: SAP shape → Dynamics shape)

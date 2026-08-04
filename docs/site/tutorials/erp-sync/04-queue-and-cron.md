@@ -38,7 +38,7 @@ You need the `my-erp/` workspace from [Chapter 2](/tutorials/erp-sync/02-import-
 is registered:
 
 ```sh
-curl 'http://localhost:8091/api/v1/workers/jobs'
+curl '<workers-endpoint>/api/v1/workers/jobs'
 ```
 
 Expected: `import-products` appears in the list. If not, return to Chapter 2 and re-run

@@ -26,8 +26,8 @@ Aspire so the rest of the track has something real to build on.
 ## What you will build
 
 By the end of this chapter you will have `my-erp/` on disk — a NetScript workspace with a Postgres
-database, the **workers** plugin at `plugins/workers/` (the background-job engine on `:8091`), and
-the **triggers** plugin at `plugins/triggers/` (the ingress engine on `:8093`) — all running
+database, the **workers** plugin at `plugins/workers/` (the background-job engine), and the **triggers**
+plugin at `plugins/triggers/` (the ingress engine) — all running
 together under one `aspire start`, with the Aspire dashboard live on `:18888`.
 
 ## Before you begin
@@ -109,7 +109,7 @@ netscript plugin install worker --name workers --samples
 
 This lands the plugin at **`plugins/workers/`** — the canonical, config-referenced install location
 — and registers it in `netscript.config.ts` (`./plugins/workers/mod.ts`) and `appsettings.json`. The
-workers plugin ships an API service on `:8091` and a separate background processor that drains the
+workers plugin ships an API service and a separate background processor that drains the
 job queue.
 
 ## Step 4 — Add the triggers plugin
@@ -122,8 +122,7 @@ netscript plugin install trigger --name triggers --samples
 ```
 
 This lands a workspace at `plugins/triggers/` and registers it in `netscript.config.ts`
-(`./plugins/triggers/mod.ts`) and `appsettings.json`. The triggers API runs on `:8093`. Confirm both
-plugins registered:
+(`./plugins/triggers/mod.ts`) and `appsettings.json`. Confirm both plugins registered:
 
 ```sh
 netscript plugin list
@@ -159,9 +158,11 @@ aspire start       # starts the AppHost and every declared resource
 https://localhost:18888
 ```
 
-The dashboard's **Resources** tab is the authority for which port each resource bound — the
-conventional assignments (workers `:8091`, triggers `:8093`) are what this two-plugin workspace lands
-on, allocated from the `:8091–8099` plugin range. Leave `aspire start` going in this terminal; it is
+The dashboard's **Resources** tab is the authority for which port each resource bound, and there is
+no shortcut around it: a plugin runtime takes a port derived from your *project name* out of the IANA
+dynamic range (`49152–65535`), so `my-erp`'s workers API and yours land on different numbers. Copy
+the `workers-api` and `triggers-api` endpoints from that tab now — the rest of the track writes them
+as `<workers-endpoint>` and `<triggers-endpoint>`. Leave `aspire start` going in this terminal; it is
 your control plane for the rest of the track.
 
 {{ comp callout { type: "important", title: "Aspire is step 2 — database commands need it running" } }}
@@ -176,8 +177,8 @@ The Postgres container only exists while <code>aspire start</code> is up. So
 In a second terminal (leave `aspire start` going in the first), confirm both plugin APIs are alive:
 
 ```sh
-curl http://localhost:8091/health   # workers API
-curl http://localhost:8093/health   # triggers API
+curl <workers-endpoint>/health    # workers API
+curl <triggers-endpoint>/health   # triggers API
 ```
 
 Both should return a healthy JSON response. Then type-check the whole workspace from the project
@@ -193,7 +194,7 @@ line up.
 - [ ] `my-erp/` exists with `plugins/workers/` and `plugins/triggers/` on disk.
 - [ ] `netscript plugin list` shows both `workers` and `triggers`.
 - [ ] `aspire start` is up; the dashboard on `:18888` lists `postgres`, `redis`, and both plugin APIs.
-- [ ] `curl :8091/health` and `curl :8093/health` both return healthy.
+- [ ] `curl <workers-endpoint>/health` and `curl <triggers-endpoint>/health` both return healthy.
 - [ ] `deno task check` is clean.
 
 {{ comp callout { type: "tip", title: "If something is not green" } }}
