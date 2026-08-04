@@ -76,8 +76,12 @@ See `plan.md` S0–S4. Each slice updates this worklog and `context-pack.md` bef
 | --- | --- | --- |
 | Research / plan | complete | Live #1236, doctrine/debt, and focused code inspection recorded. |
 | PLAN-EVAL | composed | `plan-eval.md`; milestone-run + D6 row. |
+| S1 RED | expected failure | `deno test --unstable-kv -A packages/cli/src/public/features/plugins/remove/remove-plugin_test.ts` exited 1. The diff showed `Plugins.sagas-api` and `BackgroundProcessors.sagas` had become empty after dispatch failure; the later assertion also requires dispatch package `@netscript/plugin-sagas`, while baseline sends `sagas`. |
 
 ## Reconcile notes
 
 - S0: issue #1236 is open, milestone 0.0.5, with required type/area/priority labels and
   `status:triage`; draft PR will move the single lifecycle label to `status:plan-eval`.
+- S1: issue/PR now carry `status:plan-eval`; no new reviewer comments. RED failure is the verified
+  defect, not an infrastructure failure. Main advanced by unrelated MCP PR #1233 after bootstrap;
+  no touched-path overlap, so implementation continues and will rebase before ready if required.
