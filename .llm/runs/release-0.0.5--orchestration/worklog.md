@@ -1007,3 +1007,18 @@ PR #1215. FYI for the release cut: four docs/site pages changed, no packages/ so
   box-45 edit and also caught the #1133 issue box (now ticked). Full rerun fires once
   check-test completes; merge + canary.6 on green.
 - Wave5 foreign resources untouched by every lane throughout.
+
+## 2026-08-04 — MERGE #1206 (#1133 closed); CANARY.6 DISPATCHED; #1218 gate green but conflicted
+
+- **Merge: PR #1206** (squash) — gate record: rerun 30905002209 all four contexts green
+  (close-gate green after the box-45 race + #1133 issue-gate-box tick, both cited);
+  review-threads 0/0; sidebar = [1133] matching `Closes #1133` exactly; **#1133 auto-closed,
+  verified.** The openapi-mcp S7 slice is done; epic #1126 advances (S9/S10 queued wave 4,
+  S11/S12 wave 7).
+- **CANARY.6 dispatched:** run 30906410487 (11:49:18Z, target 0.0.5). Train since canary.5:
+  #1216 (docs main pages), #1211 (randomized ports), #1206 (S7 manifest + aspire-cli
+  discovery). Terminal monitor armed; stage-E verification at completion.
+- **#1218 (export corpus): all four contexts green** on the tagline-fixed head `7051bdc07`
+  (quality flip verified: 277→228 bytes), refs `Refs #1201` + sidebar clean, threads 0/0 —
+  but merge blocked on real conflicts with today's MCP merges (S7 registry union). Rebase
+  steer fired; re-gate on the new head; rides canary.7 with the sagas #1223 fix.
