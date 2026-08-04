@@ -53,6 +53,8 @@ order:
   per request and shared by every layer, layout, and metadata resolver on the page.
 - **[Layers, layout, and slots](/web-layer/layers/)** — `withLayer()` and `withLayout()`: named
   regions that resolve concurrently, each with its own loader, fallback, and freshness window.
+- **[Response shaping](/web-layer/response/)** — `withMeta()`, `withHeader()`, `withStatus()`, and
+  the `GET` handler `build()` synthesises from them.
 - **[Route contracts](/web-layer/route/)** — `defineRouteContract()`, schema helpers such as
   `paginationSearchSchema()` and `defineEnumPathParam()`, and the generated `routes` tree that turns
   a moved route file into a compile error.

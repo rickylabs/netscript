@@ -343,7 +343,7 @@ the props type describes the rendered case rather than the empty one.
   { title: "Request-scoped resources", body: "The sequential half: values layers share.", href: "/web-layer/resources/" },
   { title: "Partials", body: "What a layer's partial config actually builds.", href: "/web-layer/partials/" },
   { title: "Deferred and streaming UI", body: "Policies, stale windows, and the refresh decision.", href: "/web-layer/defer-streaming-ui/" },
-  { title: "Data loading and the query cache", body: "Where a layer's cached data comes from.", href: "/web-layer/query/" },
+  { title: "Response shaping", body: "withMeta, withHeader, and withStatus after the layers resolve.", href: "/web-layer/response/" },
   { title: "Live dashboard tutorial", body: "Three layers and a layout, end to end.", href: "/tutorials/live-dashboard/04-definePage-QueryIsland/" }
 ] }) }}
 
