@@ -6,7 +6,7 @@
 | -------------- | ------------------------------------- |
 | Run ID         | `test-e2e-sqlite-runtime-tier--1158`  |
 | Branch         | `test/e2e-sqlite-runtime-tier-1158`   |
-| Current phase  | `implement` — S3 gates green; supervisor review pending |
+| Current phase  | `implement` — S3 signed off; stop before S4 |
 | Archetype      | `6 - CLI / Tooling`                   |
 | Scope overlays | `service`                             |
 
@@ -54,18 +54,18 @@ resolved engine. No existing built-in capability has a defaults object.
 - S2 received Tier-A substantive review with no findings and sign-off at `47caa6bb`.
 - S3 implementation completed with precedence, database-gate filtering, and exact built-in options
   regression coverage; 99 E2E tests and all five static/fitness commands passed.
+- S3 received Tier-A substantive review with no findings; all six required gates were reproduced
+  independently. Sign-off recorded in `worklog.md`.
 
 ## In Progress
 
-- **S3 awaiting Tier-A slice review.** Automated gates are green; the implementation lane does not
-  self-certify or begin S4.
+- **None.** S3 received Tier-A substantive review (Claude `review_codex` lane, Opus 4.8 fallback per
+  D-7) with independently reproduced gates and no findings; sign-off is recorded in `worklog.md`
+  § Slice Review — S3. The run is stopped after S3 by instruction.
 
 ## Next Steps
 
-1. Tier-A supervisor substantively reviews the landed S3 implementation and reproduces its evidence.
-2. Supervisor records the S3 sign-off or returns findings; the implementation lane does not
-   self-certify.
-3. Stop after S3 sign-off; S4 requires a new slice instruction.
+1. **Stop before S4.** S4 requires a new slice instruction; do not start it from this handoff.
 4. Gate phase: scoped wrappers + `quality:scan` + `arch:check` + `publish:dry-run`, then the
    postgres `scaffold.runtime` regression run.
 5. IMPL-EVAL in a third session.

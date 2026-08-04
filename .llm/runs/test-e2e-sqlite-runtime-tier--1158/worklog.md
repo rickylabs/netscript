@@ -164,6 +164,62 @@ than accepting the implementer's report (`lane-policy.md` invariant 2 — no lan
 
 **Verdict: ACCEPTED.** S1 proves what it claims. Proceed to S2.
 
+## Slice Review — S3 (Tier-A, supervisor)
+
+Reviewed at `945f926c`. This is the Claude-family `review_codex` lane (Opus 4.8 fallback per
+drift D-7; the canonical Fable 5 · low primary returned `model_not_found`). Gates were re-run
+independently rather than accepted from the implementer's report (`lane-policy.md` invariant 2 — no
+lane self-certifies). The exact diff reviewed is `47caa6bb..945f926c`.
+
+**Independently reproduced gate results**
+
+| Gate         | Command                                                          | Verdict                                                       |
+| ------------ | --------------------------------------------------------------- | ------------------------------------------------------------ |
+| E2E tests    | `deno test --no-lock -A packages/cli/e2e/`                      | 99 passed, 0 failed                                          |
+| type-check   | `.llm/tools/run-deno-check.ts --root packages/cli --ext ts,tsx` | 786 files, 7 batches, 0 failed, 0 findings                  |
+| lint         | `.llm/tools/run-deno-lint.ts --root packages/cli --ext ts,tsx`  | 786 files, 4 batches, 0 findings                            |
+| format       | `.llm/tools/run-deno-fmt.ts --root packages/cli --ext ts,tsx`   | 786 files, 4 batches, 0 failed, 0 findings                  |
+| quality:scan | `deno task quality:scan`                                         | `ok: true`, 0 findings (7 pre-existing allowances, none new) |
+| arch:check   | `deno task arch:check`                                           | exit 0; warnings are pre-existing `ai`-plugin/out-of-scope   |
+
+**Substantive review (each required verification)**
+
+1. **`ScaffoldCapabilitySuite` adds only `readonly defaults?: Partial<RunOptions>`.** Confirmed —
+   `capability-suites.ts:17` is the sole interface addition; the diff touches no other field.
+2. **One defaults-under-overrides merge; every former `overrides` read uses the resolved object.**
+   Confirmed — `const resolved = { ...capability.defaults, ...overrides };`
+   (`capability-suites.ts:173`) is the single merge, at the top. Every workspace/scaffold/reporting
+   read (`resolved.repoRoot`, `resolved.database`, `resolved.cache`, `resolved.samples`,
+   `resolved.format`, …) now reads `resolved`. The only remaining `overrides` reference in the
+   function is the parameter feeding line 173. Merge order (`defaults` first, `overrides` last)
+   gives caller precedence.
+3. **`resolveSuite` keeps suite defaults under explicit caller overrides.** Confirmed —
+   `registry.ts:55` returns `{ ...suite, defaultOptions: { ...suite.defaultOptions, ...overrides } }`.
+   `suite.defaultOptions` already carries the resolved capability default (baked in by
+   `createScaffoldCapabilitySuite(capability, overrides)`), and the final spread re-applies the
+   *same* caller overrides idempotently. A capability default absent from `overrides` is never
+   overwritten, so it cannot be discarded by the final spread.
+4. **A sqlite capability default resolves sqlite without overrides, postgres under an explicit
+   override, and `runtimeGateIds` follows the resolved database.** Confirmed by code and test —
+   `suite.defaultOptions.database` (the resolved value) is passed to `runtimeGateIds`
+   (`capability-suites.ts:225`); the new test `capability defaults are a baseline and caller
+   overrides select database gates` asserts sqlite→`[garnet]` with no override and
+   postgres→`[postgres, garnet]` under `{ database: POSTGRES }`.
+5. **Every existing built-in suite remains default-free and resolves to exactly its prior options.**
+   Confirmed — the five `scaffoldCapabilitySuites` entries carry no `defaults`; the test asserts all
+   five `defaults === undefined` and pins the complete `RunOptions` for all eight `builtInSuites`
+   under deterministic overrides.
+6. **No out-of-scope surface, no `any`/cast/ignore.** Confirmed — the diff touches only
+   `capability-suites.ts`, `suite-registry_test.ts`, and run artifacts. No suite id, `.github/**`,
+   cleanup adapter, or `packages/cli/src/**` file changed; no `any`, `as unknown as`, or new
+   `// deno-lint-ignore`.
+
+**Findings:** none.
+
+**Verdict: ACCEPTED.** S3 proves a capability suite can pin its own default options while a CLI
+override still wins, without disturbing any existing suite's resolved options. Stop after S3; S4
+requires a new slice instruction.
+
 ## Slice Review — S2 (Tier-A, supervisor)
 
 Reviewed at `8d960571`. Gates re-run independently; the load-bearing behavioural claim was verified

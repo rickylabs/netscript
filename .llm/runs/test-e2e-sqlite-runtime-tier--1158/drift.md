@@ -135,3 +135,19 @@ documentation.
   and `context-pack.md`. No edit to `packages/cli/src/public/features/init/init-command.ts`.
 - **Evidence:** resumed probe output in the S2 session; golden and exact-once assertions in
   `packages/cli/e2e/tests/application/gates/scaffold-gates_test.ts`.
+
+## 2026-08-04 — D-7 Fable 5 review route was unavailable; used its in-plan Opus fallback
+
+- **What:** The S3 `review_codex` launch on the canonical Claude Fable 5 · low primary failed before
+  beginning review work.
+- **Source:** Agentic `claude-print` session `229e6d98-1667-46bc-9173-637fe636587e` returned
+  `model_not_found` for `fable-5`, exit 1, with zero input/output tokens and zero cost.
+- **Expected:** `.llm/harness/workflow/lane-policy.md` binds `review_codex` to Claude · Anthropic ·
+  Fable 5 · low.
+- **Actual:** The native Claude client did not expose that model to this account/session.
+- **Severity:** minor (route availability only; no review or implementation work occurred).
+- **Action:** use the same lane's declared token-limit/unavailable-primary fallback, Claude ·
+  Anthropic · Opus 4.8 · low. The opposite-family review invariant is preserved; no OpenRouter
+  evaluator transport or paid escalation is involved.
+- **Evidence:** failed session id above; `lane-policy.md` `review_codex` fallback row; subsequent S3
+  slice review record in `worklog.md`.
