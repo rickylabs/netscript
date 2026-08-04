@@ -15,8 +15,8 @@ is worth stating rather than leaving you to discover it halfway through the
 [quickstart](/quickstart/).
 
 This page does three things. It reads the canonical getting-started flows of **Next.js**,
-**Nuxt**, **SvelteKit**, and the batteries-included class (**Laravel**, **Rails**) on their
-own terms. It then says where NetScript's path diverges from all four, and what that ordering
+**Nuxt**, **SvelteKit**, and the batteries-included pair **Laravel** and **Rails** on their
+own terms. It then says where NetScript's path diverges from all five, and what that ordering
 buys. And it closes with the part comparisons usually omit: where those frameworks give you a
 better first hour than NetScript does today.
 
@@ -36,7 +36,7 @@ the longer one.
 builds a single dashboard application. It moves through project setup, CSS styling, font and
 image optimization, layouts and pages, client-side navigation, setting up a database, fetching
 data, static versus dynamic rendering, streaming, search and pagination, mutating data, error
-handling, accessibility, authentication, metadata, and a closing deployment chapter.
+handling, accessibility, authentication, metadata, and a closing next-steps chapter.
 
 Two properties characterize that shape. The screen exists before the data does — styling, fonts,
 layouts, and navigation all land before the database chapter. And once data arrives, the server
@@ -96,7 +96,7 @@ JavaScript, testing, RuboCop, security, continuous integration with GitHub Actio
 deployment with Kamal. Breadth is the lesson. The guide's implicit promise is that the framework
 already has an answer for each of these, and its job is to show you where that answer lives.
 
-### The property all four share
+### The property all five share
 
 {{ comp.apiTable({
   caption: "What each canonical flow teaches first",
@@ -105,7 +105,7 @@ already has an answer for each of these, and its job is to show you where that a
     { name: "Nuxt", type: "An eighteen-section topic track", desc: "Presentation and convention first — views, assets, styling, routing, SEO — with data fetching and state arriving later in the sequence." },
     { name: "SvelteKit", type: "Reference topics plus an in-browser tutorial", desc: "Routing conventions immediately, then the server/universal load boundary and per-route generated types, then server-validated form actions." },
     { name: "Laravel", type: "Thirteen lessons building Chirper", desc: "A route, then a deployed URL, then MVC, the database, CRUD, and basic registration and login." },
-    { name: "Rails", type: "A twenty-three-section product-store guide", desc: "Generators produce the model, controller, and views early; the remaining sections tour the framework's breadth, ending at Kamal deployment." }
+    { name: "Rails", type: "A twenty-three-section product-store guide", desc: "Generators produce the model, controller, and views early; the remaining sections tour the framework's breadth, including Kamal deployment before a closing what's-next section." }
   ]
 }) }}
 
@@ -214,8 +214,9 @@ Measured on the first hour, several of the frameworks above are ahead:
   before it ends. NetScript's path covers none of those, and they remain library choices you make
   yourself.
 - **Deployment has a day-one answer elsewhere.** Laravel's course deploys in its fourth lesson;
-  Rails ships Kamal inside the guide. NetScript is not a hosted platform and does not ship a
-  deployment story — the workspace and its hosting are yours.
+  Rails ships Kamal inside the guide. NetScript is not a hosted platform: it ships
+  [deployment commands](/orchestration-runtime/how-to/deploy/), starter workflows, and recipes, but
+  choosing and provisioning the hosting platform remains yours.
 - **The ecosystems are older and deeper.** React and Next, Vue and Nuxt, Laravel, and Rails each
   have years of components, integrations, and answered questions behind them. On a pre-1.0
   Deno-native stack you are more likely to be the first person to hit a given edge.
