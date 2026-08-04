@@ -7,6 +7,7 @@ import {
 import { DATABASE, type DatabaseEngine, PACKAGE_SOURCE } from '../../../domain/extension-axes.ts';
 import type { GateDefinition } from '../../../domain/gate-definition.ts';
 import type { RunContext } from '../../../domain/run-context.ts';
+import { resolve } from '@std/path';
 import { commandGate, denoCommand, httpGate } from './gate-factory.ts';
 import { allocateScaffoldDefaultPort } from '../../../../../src/kernel/domain/scaffold/default-port-allocation.ts';
 
@@ -143,6 +144,9 @@ export function createRuntimeGates(
         'packages/cli/e2e/src/application/gates/scaffold/prepare-flow-b-fixture.ts',
         context.project.projectRoot,
         context.request.options.packageSource === PACKAGE_SOURCE.JSR ? 'published' : 'local',
+        context.project.cliEntrypoint.startsWith('jsr:')
+          ? context.project.cliEntrypoint
+          : resolve(context.project.repoRoot, context.project.cliEntrypoint),
       ],
     ),
     commandGate(

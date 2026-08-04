@@ -210,9 +210,12 @@ that maps each `id` to its handler. Generate the plugin registries:
 netscript generate plugins
 ```
 
-This scans `plugins/workers/jobs` (and the triggers plugin) and writes a registry the running
-services load. After this, `import-products` is addressable, and `product-import-trigger` is loaded
-by the file-watch processor.
+For workers, this structurally scans the project's top-level `workers/jobs/*.ts` modules and skips
+declared helpers such as `job-tools.ts`; it does not require an official sample filename. The
+command also discovers plugin-contributed jobs and triggers, then writes the generated registries
+the running services load. After this, `import-products` is addressable, and
+`product-import-trigger` is loaded by the file-watch processor. Regenerate after adding or replacing
+a job—do not edit `.netscript/generated/**` by hand.
 
 {{ comp callout { type: "note", title: "Restart the processors after generating" } }}
 If <code>aspire start</code> was up before you generated the registry, restart it (or let it

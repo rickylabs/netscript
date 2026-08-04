@@ -7,6 +7,10 @@ if (!projectRoot) {
 }
 
 const mode = Deno.args[1] === 'published' ? 'published' : 'local';
+const cliEntrypoint = Deno.args[2];
+if (!cliEntrypoint) {
+  throw new Error('CLI entrypoint argument is required');
+}
 const flowBJobId = 'flow-b-callback';
 const flowBJobPath = `${projectRoot}/workers/jobs/${flowBJobId}.ts`;
 
@@ -66,7 +70,7 @@ const localSourcePackages = [
   ['@netscript/telemetry/tracer', 'packages/telemetry/tracer.ts'],
 ].map(([specifier, entrypoint]) => ({ specifier, entrypoint }));
 const flowBConfigPath = `${projectRoot}/.netscript-flow-b-deno.json`;
-const flowBImportMapPath = `${projectRoot}/.netscript/e2e/flow-b-import-map.json`;
+await Deno.mkdir(`${projectRoot}/.netscript/e2e`, { recursive: true });
 if (mode === 'local') {
   await prepareLocalSourceFixture({
     projectRoot,
@@ -74,20 +78,20 @@ if (mode === 'local') {
     packages: localSourcePackages,
     imports: sharedNpmImports,
     targets: [
+      { path: 'deno.json', includeConfig: true },
       { path: '.netscript-flow-b-deno.json', includeConfig: true },
-      { path: '.netscript/e2e/flow-b-import-map.json' },
     ],
   });
 } else {
   const flowBImports = { ...denoConfig.imports, ...sharedNpmImports, ...publishedImports };
-  await Deno.mkdir(`${projectRoot}/.netscript/e2e`, { recursive: true });
+  const flowBConfig = { ...denoConfig, imports: flowBImports };
   await Deno.writeTextFile(
     flowBConfigPath,
-    `${JSON.stringify({ ...denoConfig, imports: flowBImports }, null, 2)}\n`,
+    `${JSON.stringify(flowBConfig, null, 2)}\n`,
   );
   await Deno.writeTextFile(
-    flowBImportMapPath,
-    `${JSON.stringify({ imports: flowBImports }, null, 2)}\n`,
+    denoConfigPath,
+    `${JSON.stringify(flowBConfig, null, 2)}\n`,
   );
 }
 
@@ -259,6 +263,21 @@ if (updatedTriggerSource === triggerSource && !triggerSource.includes(`id: '${fl
 }
 await Deno.writeTextFile(triggerPath, updatedTriggerSource);
 
+await runDeno(
+  [
+    'run',
+    '-A',
+    ...(mode === 'published' ? ['--minimum-dependency-age=0'] : []),
+    cliEntrypoint,
+    'generate',
+    'plugins',
+    '--project-root',
+    projectRoot,
+  ],
+  projectRoot,
+  'netscript generate plugins',
+);
+
 const registryPath = `${projectRoot}/.netscript/generated/plugin-workers/job-registry.ts`;
 const registrySource = await Deno.readTextFile(registryPath);
 const flowBEntrypoint = `./${flowBJobId}.ts`;
@@ -270,26 +289,6 @@ const flowBDefinitionLine = registrySource.split('\n').find((line) =>
 if (!flowBDefinitionLine) {
   throw new Error('generated workers registry did not contain the Flow-B callback job');
 }
-const configuredDefinitionLine = flowBDefinitionLine.replace(
-  'createLocalJobDefinition(',
-  'createFlowBJobDefinition(',
-);
-const configuredRegistrySource = registrySource.replace(
-  flowBDefinitionLine,
-  configuredDefinitionLine,
-) + [
-  '',
-  'function createFlowBJobDefinition(id: string, entrypoint: string): RegisterJobInput {',
-  '  return {',
-  '    ...createLocalJobDefinition(id, entrypoint),',
-  '    importMapUrl: new URL("../../e2e/flow-b-import-map.json", import.meta.url).href,',
-  '    permissions: { net: true, read: true, env: true },',
-  '    tags: ["flow-b", "e2e"],',
-  '  };',
-  '}',
-  '',
-].join('\n');
-await Deno.writeTextFile(registryPath, configuredRegistrySource);
 
 console.info('Flow-B generated callback fixture wired');
 
