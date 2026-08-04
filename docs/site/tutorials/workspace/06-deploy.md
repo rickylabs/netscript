@@ -93,7 +93,7 @@ graph your complete app stands up:
     { name: "postgres", type: "Container", desc: "The primary datasource — the auth.prisma migration from chapter 2 lives here." },
     { name: "workspace (second db)", type: "Container", desc: "The isolated workspace datasource from chapter 3, provisioned alongside the primary." },
     { name: "redis", type: "Container (cache)", desc: "Redis cache — the default `--cache-backend`; Redis-compatible. Backs KV/queue workloads and the kv-oauth session store." },
-    { name: "workspace (service)", type: ":3001", desc: "Your guarded oRPC service from chapter 5 — /api/workspace requires a scoped principal, /health stays public." },
+    { name: "workspace (service)", type: ":3001", desc: "Your guarded oRPC service from chapter 5 (note: this tutorial assumes port 3001; in unpinned scaffolds, each project is allocated its own randomized high-range ports) — /api/workspace requires a scoped principal, /health stays public." },
     { name: "auth-api", type: ":8094 (pinned in chapter 2)", desc: "The auth plugin's service from chapter 2 — /api/v1/auth/* (signin, callback, signout, session, me)." },
     { name: "workers-api", type: "allocated port", desc: "The Workers API from chapter 4 — triggers and inspects the provision-member job." },
     { name: "background processors", type: "executables (no port)", desc: "The workers processor that drains the job queue — a separate process, not a thread in the API." }

@@ -83,7 +83,7 @@ so it has no Aspire container).
 ## Step 2 — Create `my-workspace/`
 
 Run the same command without `--dry-run`. This track uses an example service named `workspace` on port
-`3001` and a Postgres database, so you have something real to authenticate and protect later:
+`3001` (note: this tutorial pins the port to 3001; in unpinned scaffolds, each project is allocated its own randomized high-range ports) and a Postgres database, so you have something real to authenticate and protect later:
 
 ```sh
 netscript init my-workspace --service --service-name workspace --service-port 3001 --db postgres

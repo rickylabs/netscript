@@ -43,7 +43,7 @@ typed end to end against the cart contract from chapter 3.
 
 ## Prerequisites
 
-- The `products` service on `:3001` (from [chapter 2](/tutorials/storefront/02-catalog-service/)) and
+- The `products` service on `:3001` (note: this tutorial pins the port to 3001; in unpinned scaffolds, each project is allocated its own randomized high-range ports) (from [chapter 2](/tutorials/storefront/02-catalog-service/)) and
   the `cart` contract and its typed client (from
   [chapter 3](/tutorials/storefront/03-cart-contracts/)).
 - `aspire start` up, so the `products` service is discoverable by name (the dashboard answers at

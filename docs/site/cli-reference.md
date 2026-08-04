@@ -117,7 +117,7 @@ so in the final column; a filesystem-only `--dry-run` would not safely model tho
   rows: [
     { name: "Create a workspace", type: "netscript init my-app", desc: "Scaffold everything — contracts, plugin registry, Fresh app, a default Redis cache, and the Aspire layer. On a terminal it prompts for whatever you omit (name, database, service, cache)." },
     { name: "Preview first", type: "netscript init my-app --dry-run", desc: "Print every file and directory the scaffold would create, and write nothing." },
-    { name: "Fully specified, no prompts", type: "netscript init my-app --db postgres --service --service-name users --service-port 3001 --yes", desc: "Postgres database support, an example oRPC <code>users</code> service on port 3001, defaults for the rest. <code>--yes</code> accepts defaults, <code>--ci</code> is non-interactive; both engage automatically when stdin is not a terminal." },
+    { name: "Fully specified, no prompts", type: "netscript init my-app --db postgres --service --service-name users --yes", desc: "Postgres database support, an example oRPC <code>users</code> service on its assigned port, defaults for the rest. <code>--yes</code> accepts defaults, <code>--ci</code> is non-interactive; both engage automatically when stdin is not a terminal." },
     { name: "Pick a database engine", type: "netscript init my-app --db postgres", desc: "<code>postgres</code> (recommended), <code>mysql</code>, <code>mssql</code>, <code>sqlite</code>, or <code>none</code> — the default is no database unless you pass <code>--db</code>." },
     { name: "Skip Aspire", type: "netscript init my-app --no-aspire", desc: "Scaffold without the .NET Aspire footprint; start the Fresh app directly with <code>deno task --cwd apps/dashboard dev</code>." },
     { name: "Tune the rest", type: "--cache-backend garnet · --model-name Product · --path ./apps · --editor zed", desc: "Cache backend (<code>redis</code> default, <code>garnet</code>, or app-level <code>deno-kv</code>; <code>--cache=false</code> for none), the Prisma model name for the scaffolded CRUD surface, the target directory, and editor settings." }
@@ -137,7 +137,7 @@ the scaffold exists.
   rows: [
     { name: "Orchestrate everything", type: "cd aspire && aspire start", desc: "Bring up the database, Redis, services, and plugin processors, with the dashboard at :18888." },
     { name: "Run the dashboard alone", type: "deno task --cwd apps/dashboard dev", desc: "Start the Fresh frontend directly (or let <code>aspire start</code> orchestrate it)." },
-    { name: "Run a service alone", type: "deno task --cwd services/users dev", desc: "Start the example <code>users</code> oRPC service on port 3001." },
+    { name: "Run a service alone", type: "deno task --cwd services/users dev", desc: "Start the example <code>users</code> oRPC service on its assigned port." },
     { name: "Check, lint, test", type: "deno task check · deno task lint · deno task fmt · deno task test", desc: "Type-check, lint, format, and test the whole workspace." }
   ]
 }) }}

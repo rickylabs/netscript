@@ -50,7 +50,7 @@ context step by step. Both stand up the same Hono + oRPC runtime and advertise t
   ]
 }) }}
 
-This recipe adds a service named `users` on port `3001`, mirroring the example the
+This recipe adds a service named `users` on its assigned port, mirroring the example the
 scaffold ships, so every path and code shape below matches a real generated workspace.
 Substitute your own name and port where you see them.
 
@@ -60,7 +60,7 @@ The fastest path is to let the CLI scaffold a service workspace for you. If you 
 creating a brand-new project, pass the service flags straight to `netscript init`:
 
 ```bash
-netscript init my-app --db postgres --service --service-name users --service-port 3001 --yes
+netscript init my-app --db postgres --service --service-name users --yes
 ```
 
 `--db postgres` is the recommended default; swap it for `mysql`, `mssql`, or `sqlite` to scaffold a different Prisma-backed engine (`sqlite` is file-backed and runs without an Aspire container).
@@ -71,7 +71,7 @@ subcommand with the `--name` and `--port` flags (the `service` group also has `l
 
 ```bash
 # from the workspace root
-netscript service add --name users --port 3001
+netscript service add --name users
 ```
 
 Either path lays down a `services/users/` workspace member with this shape:
@@ -235,7 +235,7 @@ import { router } from './router.ts';
 await defineService(router, {
   name: 'users',
   version: '1.0.0',
-  port: parseInt(Deno.env.get('PORT') || '3001'),
+  port: parseInt(Deno.env.get('PORT') || '3001'), // note: your scaffold's port will differ
   openapi: { title: 'Users API', description: 'users service' },
   debug: true,
 });
@@ -264,7 +264,7 @@ builder. Each step returns the builder, so you compose only what you need before
   .withAuthn({ authenticator })
   .withAuthz({ authorizer })
   .withRPC();
-await app.serve({ port: 3001 });</code></pre>
+await app.serve({ port: 3001 }); // note: your scaffold's port will differ</code></pre>
 The authn/authz seam (<code>@netscript/service/auth</code>) is provider-agnostic — static-credential
 and trusted-header authenticators plus a scope authorizer ship built in. It is distinct from
 the auth <strong>plugin</strong> backends; see <a href="/capabilities/auth/">Authentication</a>.
@@ -280,15 +280,15 @@ the rest of your resources:
 deno task --cwd services/users dev
 ```
 
-You should see it bind on `:3001`. Confirm the runtime answers — the health route over
+You should see it bind on its assigned port. Confirm the runtime answers — the health route over
 HTTP, and the RPC surface that typed clients call:
 
 ```bash
-# OpenAPI / HTTP surface
-curl http://localhost:3001/api/v1/users/health
+# OpenAPI / HTTP surface (replace <port> with your assigned port)
+curl http://localhost:<port>/api/v1/users/health
 
-# RPC surface (what the generated typed client uses)
-curl -X POST http://localhost:3001/api/rpc/v1/users/list \
+# RPC surface (replace <port> with your assigned port, what the generated typed client uses)
+curl -X POST http://localhost:<port>/api/rpc/v1/users/list \
   -H 'content-type: application/json' -d '{"limit":10}'
 ```
 

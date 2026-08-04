@@ -47,7 +47,7 @@ import { router } from './router.ts';
 await defineService(router, {
   name: 'users',
   version: '1.0.0',
-  port: parseInt(Deno.env.get('PORT') || '3001'),
+  port: parseInt(Deno.env.get('PORT') || '3001'), // note: your scaffold's port will differ
   openapi: {
     title: 'Users API',
     description: 'User management service',
@@ -77,9 +77,9 @@ under `aspire start` for DB-backed services), open the docs UI and fetch the raw
 spec:
 
 ```sh
-# from a shell — confirm both surfaces answer
-curl http://localhost:3001/api/openapi.json   # raw OpenAPI document
-open http://localhost:3001/api/docs           # Scalar reference UI in a browser
+# from a shell — confirm both surfaces answer (replace <port> with your assigned port)
+curl http://localhost:<port>/api/openapi.json   # raw OpenAPI document
+open http://localhost:<port>/api/docs           # Scalar reference UI in a browser
 ```
 
 The REST surface generated from the same contract is served under `/api/*`, and
@@ -97,12 +97,12 @@ bundled runtime so the UI loads offline.
   {
     label: "Preset — defineService({ openapi })",
     lang: "ts",
-    code: "// services/users/src/main.ts\nimport { defineService } from '@netscript/service';\nimport { router } from './router.ts';\n\n// One option turns on the spec, the Scalar UI, and the bundled JS.\nawait defineService(router, {\n  name: 'users',\n  version: '1.0.0',\n  port: 3001,\n  openapi: {\n    title: 'Users API',\n    description: 'User management service',\n  },\n});"
+    code: "// services/users/src/main.ts\nimport { defineService } from '@netscript/service';\nimport { router } from './router.ts';\n\n// One option turns on the spec, the Scalar UI, and the bundled JS.\nawait defineService(router, {\n  name: 'users',\n  version: '1.0.0',\n  port: 3001, // note: your scaffold's port will differ\n  openapi: {\n    title: 'Users API',\n    description: 'User management service',\n  },\n});"
   },
   {
     label: "Builder — createService().withDocs()",
     lang: "ts",
-    code: "// services/users/src/main.ts — step-by-step, with a custom spec URL\nimport { createService } from '@netscript/service';\nimport { router } from './router.ts';\n\nawait createService(router, { name: 'users', version: '1.0.0', port: 3001 })\n  .withCors()\n  .withLogger()\n  .withOpenAPI({ title: 'Users API', description: 'User management service' })\n  .withDocs() // optional: .withDocs({ specUrl: '/api/openapi.json' })\n  .withRPC()\n  .withHealth()\n  .serve();"
+    code: "// services/users/src/main.ts — step-by-step, with a custom spec URL\nimport { createService } from '@netscript/service';\nimport { router } from './router.ts';\n\nawait createService(router, { name: 'users', version: '1.0.0', port: 3001 }) // note: your scaffold's port will differ\n  .withCors()\n  .withLogger()\n  .withOpenAPI({ title: 'Users API', description: 'User management service' })\n  .withDocs() // optional: .withDocs({ specUrl: '/api/openapi.json' })\n  .withRPC()\n  .withHealth()\n  .serve();"
   },
   {
     label: "Primitives — mount on any Hono app",

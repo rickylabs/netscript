@@ -239,7 +239,7 @@ chapter while <code>/api/workspace/:workspace/members</code> is now guarded.
 
 The guard produces three distinct responses, each a real assertion in the framework's
 `builder-auth_test.ts`. Drive them against the running service — start it under Aspire
-(`aspire start` from `aspire/`), then call the route for team `ws-1`:
+(`aspire start` from `aspire/`), then call the route for team `ws-1` (note: this tutorial assumes port 3001; in unpinned scaffolds, each project is allocated its own randomized high-range ports):
 
 {{ comp.tabbedCode({ tabs: [
   {

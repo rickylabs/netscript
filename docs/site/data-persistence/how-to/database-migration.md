@@ -142,8 +142,8 @@ no local Postgres install required. When it settles you'll have:
   `redis` resources are green.
 - Resources named `postgres`, `redis`, and the per-capability services/processors
   (`workers-api`, `workers`, `sagas-api`, `sagas`, `triggers-api`, `triggers`). If you also
-  scaffolded auth and streams, you'll see `auth-api` (:8094) and the streams service
-  (:4437) join the graph.
+  scaffolded auth and streams, you'll see `auth-api` and the streams service
+  join the graph on their assigned ports.
 
 {{ comp callout { type: "warning", title: "If db commands fail with \"aspire start failed\"" } }}
 That error means the AppHost is not running, or you ran the <code>db</code> command from a

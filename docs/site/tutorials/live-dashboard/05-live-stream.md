@@ -274,7 +274,7 @@ deno task check
 - [ ] `deno task check` is clean.
 
 {{ comp callout { type: "tip", title: "No row after the restart?" } }}
-Work down the path in order. <code>ns-sagas list --instances --json</code> tells you whether the instance exists at all — if it does not, the saga never registered (<code>ns-sagas list --registered --json</code>) or the publish failed. If the instance exists but no row arrives, the usual cause is the store backend: on KV the sagas service logs <code>Saga Prisma delegates unavailable</code> at startup and the mirror is skipped entirely. After that, check that the streams runtime is up and that <code>getStreamsUrl()</code> resolved — a dead <code>:4437</code>-class endpoint means the producer could not connect, which it logs as a skipped event.
+Work down the path in order. <code>ns-sagas list --instances --json</code> tells you whether the instance exists at all — if it does not, the saga never registered (<code>ns-sagas list --registered --json</code>) or the publish failed. If the instance exists but no row arrives, the usual cause is the store backend: on KV the sagas service logs <code>Saga Prisma delegates unavailable</code> at startup and the mirror is skipped entirely. After that, check that the streams runtime is up and that <code>getStreamsUrl()</code> resolved — a dead streams endpoint (such as the <code>:4437</code> port assigned in this tutorial's scaffold; note that each scaffold allocates its own randomized ports) means the producer could not connect, which it logs as a skipped event.
 {{ /comp }}
 
 ## What you built

@@ -41,7 +41,7 @@ directly — shown in Step 3. Structured logging via <code>log.*</code> is real 
   { name: "netscript workspace", type: "netscript init", desc: "An existing workspace. If you have none, scaffold one first — see the tutorials." },
   { name: "Start Aspire", type: "cd aspire && aspire start", desc: "The AppHost provisions Postgres, Redis, the OTLP collector, and the dashboard. Start it BEFORE you expect traces. Dashboard at https://localhost:18888." },
   { name: "@netscript/telemetry", type: "OTel facade", desc: "Wraps @opentelemetry/api and ships the worker/scheduler/queue/SSE instrumentation. Already wired into the generated handlers — no install step." },
-  { name: "A service or plugin to trace", type: "services/users or plugins/workers", desc: "The users service (:3001) and the workers/sagas/triggers/auth plugins all emit health + trace data once running." }
+  { name: "A service or plugin to trace", type: "services/users or plugins/workers", desc: "The users service (on its assigned port) and the workers/sagas/triggers/auth plugins all emit health + trace data once running." }
 ] }) }}
 
 {{ comp callout { type: "warning", title: "Aspire first, always" } }}
@@ -94,8 +94,7 @@ The Aspire resource graph lists <code>postgres</code>, <code>redis</code>,
 <code>workers-api</code> (on its assigned port), <code>workers</code>,
 <code>sagas-api</code> (on its assigned port), <code>sagas</code>,
 <code>triggers-api</code> (on its assigned port), <code>triggers</code>, the
-<code>auth-api</code> (on its assigned port), and the durable-streams service
-(<code>:4437</code>). Each resource exports telemetry to the OTLP endpoint at
+<code>auth-api</code> (on its assigned port), and the durable-streams service (on its assigned port). Each resource exports telemetry to the OTLP endpoint at
 <code>http://localhost:4318</code>; the dashboard reads from there.
 {{ /comp }}
 

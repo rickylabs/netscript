@@ -105,7 +105,7 @@ graph a single run stands up:
     { name: "users (example service)", type: ":49152–65535 (seeded high-range, allocated per project)", desc: "The scaffolded oRPC service, when you init with --service. OpenAPI at /api/v1/users/* and RPC at /api/rpc/*." },
     { name: "plugin APIs", type: ":49152–65535 (seeded high-range, allocated per project)", desc: "Each installed runtime plugin's HTTP API (workers, sagas, triggers, auth). Ports are allocated from the high-range to avoid collisions, not hardcoded." },
     { name: "background processors", type: "executables (no port)", desc: "Each plugin's isolated runners (workers, sagas, triggers) — separate processes, not threads inside the API." },
-    { name: "dashboard (Fresh app)", type: ":8010", desc: "The scaffolded Fresh frontend, when present (the app range start 8000 + 10)." }
+    { name: "dashboard (Fresh app)", type: "Assigned (>= 53248)", desc: "The scaffolded Fresh frontend, when present (allocated dynamically from the APP range at scaffold time)." }
   ]
 }) }}
 

@@ -72,7 +72,7 @@ registries, ports, and docs all assume it.
     ["<code>saga</code>", "<code>sagas</code>", "<code>@netscript/plugin-sagas</code>", "Randomized (>= 49152)", "<a href=\"/reference/sagas/\">sagas</a>"],
     ["<code>trigger</code>", "<code>triggers</code>", "<code>@netscript/plugin-triggers</code>", "Randomized (>= 49152)", "<a href=\"/reference/triggers/\">triggers</a>"],
     ["<code>auth</code>", "<code>auth</code>", "<code>@netscript/plugin-auth</code>", "Randomized (>= 49152)", "<a href=\"/capabilities/auth/\">auth</a>"],
-    ["<code>stream</code>", "<code>streams</code>", "<code>@netscript/plugin-streams</code>", "4437 (Deterministic)", "<a href=\"/reference/streams/\">streams</a>"]
+    ["<code>stream</code>", "<code>streams</code>", "<code>@netscript/plugin-streams</code>", "Randomized (>= 49152)", "<a href=\"/reference/streams/\">streams</a>"]
   ]
 } /}}
 

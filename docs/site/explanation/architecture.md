@@ -176,7 +176,7 @@ first-party plugin enabled.
    └────────┬──────────────────────────────────────────────────────────┬──────────┘
             │ produces durable change-data events                       │
    ┌────────▼─────────┐                                      ┌──────────▼─────────┐
-   │  streams  :4437   │  durable-stream service             │  Postgres / Redis   │
+   │  streams  (port)  │  durable-stream service             │  Postgres / Redis   │
    │  HTTP / SSE       │  workers · auth · sagas mirror here  │  (relational + KV)  │
    └───────────────────┘                                      └────────────────────┘
 ```
@@ -202,7 +202,7 @@ control-plane detail.
     ["Sagas", "Assigned (>= 49152)", "oRPC", "<code>@netscript/plugin-sagas</code>"],
     ["Triggers", "Assigned (>= 49152)", "oRPC (raw webhook ingress)", "<code>@netscript/plugin-triggers</code>"],
     ["Auth", "Assigned (>= 49152)", "oRPC over <code>/api/rpc/v1/auth/*</code>", "<code>@netscript/plugin-auth</code>"],
-    ["Streams", ":4437", "durable-stream HTTP / SSE", "<code>@netscript/plugin-streams</code>"]
+    ["Streams", "Assigned (>= 57344)", "durable-stream HTTP / SSE", "<code>@netscript/plugin-streams</code>"]
   ]
 }) }}
 

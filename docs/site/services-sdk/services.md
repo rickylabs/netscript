@@ -17,7 +17,7 @@ A NetScript **service** is a typed HTTP runtime that *implements* an
 (route + zod input/output), `implement()` it, bind `.handler()`s, and serve the resulting
 router on a Hono + oRPC runtime. The contract object is the single source of truth: the
 same object a typed client imports is the one the server implements, so caller and server
-**cannot drift**. The example `users` service answers on port **3001** with both an
+**cannot drift**. The example `users` service answers on its assigned port with both an
 OpenAPI surface (`/api/v1/users/*`) and a typed oRPC endpoint (`/api/rpc/*`).
 
 {{ comp.diagram({
@@ -79,7 +79,7 @@ type story is in [Contracts](/explanation/contracts/).
 {{ comp.featureGrid({ items: [
   {
     title: "Learn — Build a service",
-    body: "Track A 02: author a contract, stand up the users service on :3001, call it from a typed client.",
+    body: "Track A 02: author a contract, stand up the users service, call it from a typed client.",
     href: "/tutorials/storefront/02-catalog-service/",
     icon: "→"
   },
@@ -140,7 +140,7 @@ the same Hono + oRPC runtime; `defineService` is a curated preset over the same 
   {
     label: "Simple — defineService (one-shot)",
     lang: "ts",
-    code: "// services/users/src/main.ts\nimport { defineService } from '@netscript/service';\nimport { router } from './router.ts';\n\n// One call wires CORS, request logging, OpenAPI, RPC, and health endpoints.\nawait defineService(router, {\n  name: 'users',\n  version: '1.0.0',\n  port: parseInt(Deno.env.get('PORT') || '3001'),\n  openapi: { title: 'Users API', description: 'users service' },\n  debug: true,\n});"
+    code: "// services/users/src/main.ts\nimport { defineService } from '@netscript/service';\nimport { router } from './router.ts';\n\n// One call wires CORS, request logging, OpenAPI, RPC, and health endpoints.\nawait defineService(router, {\n  name: 'users',\n  version: '1.0.0',\n  port: parseInt(Deno.env.get('PORT') || '3001'), // note: your scaffold's port will differ\n  openapi: { title: 'Users API', description: 'users service' },\n  debug: true,\n});"
   },
   {
     label: "Advanced — createService().serve() (fluent)",
@@ -164,7 +164,7 @@ package surface — nothing is omitted.
   rows: [
     { name: "name", type: "string (required)", desc: "Service name used for logging, telemetry, and health-check labels." },
     { name: "version", type: "string?", desc: "Service version (e.g. '1.0.0'); surfaced on /health and the OpenAPI spec." },
-    { name: "port", type: "number?", desc: "Default listener port if serve() is not passed an explicit port. The generated entrypoint reads Deno.env.get('PORT') || '3001'." },
+    { name: "port", type: "number?", desc: "Default listener port if serve() is not passed an explicit port. The generated entrypoint reads Deno.env.get('PORT') (allocated dynamically per project at scaffold time)." },
     { name: "db", type: "DbContext?", desc: "Database context injected as context.db. Accepts a single Prisma client (with $queryRaw) or a multi-db record like { netscript, mdb, prosco, prev }; the first value exposing $queryRaw is auto-wired as the /health and /health/ready probe client." },
     { name: "openapi", type: "{ title?; description? }?", desc: "Turns on the generated OpenAPI spec endpoint and the Scalar docs UI with this title/description." },
     { name: "debug", type: "boolean?", desc: "Enables verbose oRPC logging. Defaults to the NETSCRIPT_DEBUG env var." },
@@ -190,12 +190,12 @@ A `defineService` runtime exposes its OpenAPI routes, a typed oRPC endpoint moun
 with `deno task --cwd services/users dev`.
 
 {{ comp.apiTable({
-  caption: "Users service surface (port 3001)",
+  caption: "Users service surface",
   rows: [
     { name: "/api/v1/users/*", type: "HTTP/OpenAPI", desc: "REST surface generated from the contract (list, updateStatus, health)." },
     { name: "/api/rpc/*", type: "oRPC", desc: "Typed RPC endpoint a generated client calls — same contract object, no drift. This is the served default path (not /rpc)." },
     { name: "/health", type: "HTTP", desc: "Liveness/readiness check; anonymous by default (excluded from authn)." },
-    { name: ":3001", type: "port", desc: "Default service port; read from Deno.env.get('PORT') || '3001'." }
+    { name: "Assigned", type: "port", desc: "The service port allocated at scaffold time (read from Deno.env.get('PORT'))." }
   ]
 }) }}
 
@@ -250,7 +250,7 @@ so query-string values coerce to their schema types automatically).
   {
     label: "Preset — defineService({ openapi })",
     lang: "ts",
-    code: "// services/users/src/main.ts\nimport { defineService } from '@netscript/service';\nimport { router } from './router.ts';\n\n// Turns on the OpenAPI spec + Scalar docs UI in one option.\nawait defineService(router, {\n  name: 'users',\n  version: '1.0.0',\n  port: 3001,\n  openapi: {\n    title: 'Users API',\n    description: 'User management service',\n  },\n});"
+    code: "// services/users/src/main.ts\nimport { defineService } from '@netscript/service';\nimport { router } from './router.ts';\n\n// Turns on the OpenAPI spec + Scalar docs UI in one option.\nawait defineService(router, {\n  name: 'users',\n  version: '1.0.0',\n  port: 3001, // note: your scaffold's port will differ\n  openapi: {\n    title: 'Users API',\n    description: 'User management service',\n  },\n});"
   },
   {
     label: "Primitives — mount in a host app",
@@ -336,7 +336,7 @@ the same drain manually (reason `'manual'`).
   {
     label: "onShutdown teardown",
     lang: "ts",
-    code: "// services/users/src/main.ts — drain + teardown on signal or manual stop\nimport { createService } from '@netscript/service';\nimport { router } from './router.ts';\nimport { db } from '@database';\n\nconst running = await createService(router, { name: 'users', version: '1.0.0' })\n  .withRPC()\n  .withHealth()\n  .onShutdown(async ({ reason, signal }) => {\n    // reason: 'signal' | 'manual' | 'startup-failure'\n    audit.record({ event: 'shutdown', reason, signal });\n    await db.$disconnect();\n  })\n  .serve({\n    port: 3001,\n    drainTimeoutMs: 10_000, // wait up to 10s for in-flight work\n    handleSignals: true,    // SIGINT/SIGTERM/SIGBREAK\n  });\n\n// Later, in tests or a supervisor: trigger the same drain manually.\nawait running.stop();"
+    code: "// services/users/src/main.ts — drain + teardown on signal or manual stop\nimport { createService } from '@netscript/service';\nimport { router } from './router.ts';\nimport { db } from '@database';\n\nconst running = await createService(router, { name: 'users', version: '1.0.0' })\n  .withRPC()\n  .withHealth()\n  .onShutdown(async ({ reason, signal }) => {\n    // reason: 'signal' | 'manual' | 'startup-failure'\n    audit.record({ event: 'shutdown', reason, signal });\n    await db.$disconnect();\n  })\n  .serve({\n    port: 3001, // note: your scaffold's port will differ\n    drainTimeoutMs: 10_000, // wait up to 10s for in-flight work\n    handleSignals: true,    // SIGINT/SIGTERM/SIGBREAK\n  });\n\n// Later, in tests or a supervisor: trigger the same drain manually.\nawait running.stop();"
   }
 ] }) }}
 
@@ -411,7 +411,7 @@ Two stages wrap the request: `.withAuthn()` resolves a `Principal` (authenticati
   {
     label: "Fluent — withAuthn / withAuthz",
     lang: "ts",
-    code: "// Gate a service with a static credential + scope check\nimport { createService } from '@netscript/service';\nimport {\n  createStaticCredentialAuthenticator,\n  createScopeAuthorizer,\n} from '@netscript/service/auth';\nimport { router } from './router.ts';\n\nconst authenticator = createStaticCredentialAuthenticator({\n  credentials: {\n    [Deno.env.get('SERVICE_API_KEY') ?? '']: {\n      subject: 'service:ci',\n      scopes: ['users:write'],\n    },\n  },\n});\nconst authorizer = createScopeAuthorizer({\n  rules: [{ match: () => true, requireScopes: ['users:write'] }],\n  denyByDefault: true,\n});\n\nawait createService(router, { name: 'users', version: '1.0.0', port: 3001 })\n  .withRPC()\n  .withAuthn({ authenticator })\n  .withAuthz({ authorizer })\n  .withHealth() // /health stays anonymous\n  .serve();"
+    code: "// Gate a service with a static credential + scope check\nimport { createService } from '@netscript/service';\nimport {\n  createStaticCredentialAuthenticator,\n  createScopeAuthorizer,\n} from '@netscript/service/auth';\nimport { router } from './router.ts';\n\nconst authenticator = createStaticCredentialAuthenticator({\n  credentials: {\n    [Deno.env.get('SERVICE_API_KEY') ?? '']: {\n      subject: 'service:ci',\n      scopes: ['users:write'],\n    },\n  },\n});\nconst authorizer = createScopeAuthorizer({\n  rules: [{ match: () => true, requireScopes: ['users:write'] }],\n  denyByDefault: true,\n});\n\nawait createService(router, { name: 'users', version: '1.0.0', port: 3001 }) // note: your scaffold's port will differ\n  .withRPC()\n  .withAuthn({ authenticator })\n  .withAuthz({ authorizer })\n  .withHealth() // /health stays anonymous\n  .serve();"
   },
   {
     label: "Trusted-header (behind a gateway)",
@@ -476,7 +476,7 @@ This hub is intentionally thin — the full generated API lives in the reference
   },
   {
     title: "Learn — Build a service",
-    body: "Guided tutorial: contract → users service on :3001 → typed client → island, built from scratch.",
+    body: "Guided tutorial: contract → users service → typed client → island, built from scratch.",
     href: "/tutorials/storefront/02-catalog-service/",
     icon: "→"
   }
