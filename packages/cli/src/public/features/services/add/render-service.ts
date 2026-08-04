@@ -34,6 +34,7 @@ export async function renderService(
     targetPath: plan.projectRoot,
     serviceName: plan.serviceName,
     servicePort: plan.allocation.port,
+    hostPort: plan.allocation.source === 'user' ? plan.allocation.port : undefined,
     importMode: 'jsr',
     serviceReferences: plan.serviceReferences,
     force: plan.overwrite,

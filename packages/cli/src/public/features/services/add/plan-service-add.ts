@@ -40,7 +40,12 @@ export async function planServiceAdd(
   }
 
   const projectName = await readProjectName(dependencies.fs, request.projectRoot);
-  const allocation = await dependencies.portAllocator.allocate(request.projectRoot, request.port);
+  const allocation = await dependencies.portAllocator.allocate(
+    request.projectRoot,
+    projectName,
+    request.serviceName,
+    request.port,
+  );
 
   return {
     ...request,

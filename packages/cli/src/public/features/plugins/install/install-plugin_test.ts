@@ -484,6 +484,9 @@ describe('public install plugin flow', () => {
         await Deno.readTextFile(join(projectRoot, 'appsettings.json')),
         '"Workdir": "."',
       );
+      assertGeneratedListenerPortsAreHigh(
+        await Deno.readTextFile(join(projectRoot, 'appsettings.json')),
+      );
     } finally {
       await Deno.remove(projectRoot, { recursive: true });
     }
@@ -1222,6 +1225,19 @@ async function writeProjectFiles(fs: MemoryFileSystemAdapter): Promise<void> {
     '/workspace/alpha/deno.json',
     JSON.stringify({ workspace: ['apps/web'] }, null, 2) + '\n',
   );
+}
+
+function assertGeneratedListenerPortsAreHigh(content: string): void {
+  const parsed = JSON.parse(content) as {
+    NetScript?: Record<string, Record<string, { HostPort?: unknown; Port?: unknown }>>;
+  };
+  for (const sectionName of ['Services', 'Plugins', 'BackgroundProcessors', 'Apps']) {
+    for (const entry of Object.values(parsed.NetScript?.[sectionName] ?? {})) {
+      for (const port of [entry.HostPort, entry.Port]) {
+        if (typeof port === 'number') assertEquals(port >= 49_152, true);
+      }
+    }
+  }
 }
 
 async function writeConfiguredPostgres(fs: MemoryFileSystemAdapter): Promise<void> {

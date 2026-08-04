@@ -28,7 +28,7 @@ and generated-output tests reject any default listener below 49152.
 
 | ID | Decision | Rationale |
 | --- | --- | --- |
-| D1 | Default Aspire host endpoints omit `HostPort` and legacy `Port`; explicit user `--port`/`--service-port` still pins. | Uses the endpoint-directory/discovery path that already exists and avoids host collisions entirely. |
+| D1 | App/service Aspire host endpoints omit `HostPort` and legacy `Port`; plugin APIs receive their deterministic high-range port because current plugin runtime consumers still address those endpoints directly. Explicit user pins remain supported. | Uses discovery where the consuming path already supports it, while moving every remaining generated pin out of the Windows-conflicted low/common ranges. |
 | D2 | Standalone fallbacks use a deterministic project/resource hash over the inclusive range 49152–65535, with wraparound linear probing for occupied emitted ports. | Meets randomized high-range intent while keeping one scaffold stable across restarts and additions collision-free. |
 | D3 | One pure allocator owns init service/app, service-add, and plugin default selection. | Prevents another set of sibling hardcoded ranges and gives the RED/GREEN test one contract. |
 | D4 | Protocol-owned database/cache/OTLP target ports are excluded. | They are internal protocol contracts, not generated host listener defaults, and randomizing them would break upstream integrations. |
@@ -90,4 +90,3 @@ and generated-output tests reject any default listener below 49152.
 
 - A required public API/export change, dependency change, plugin package source change, or endpoint
   directory redesign is significant drift and requires re-scope before proceeding.
-

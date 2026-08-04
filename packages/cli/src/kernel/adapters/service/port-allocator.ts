@@ -5,13 +5,14 @@
  */
 
 import { join } from '@std/path';
-import { PORT_RANGES } from '../../constants/port-ranges.ts';
+import { USER_PORT_RANGE } from '../../constants/port-ranges.ts';
 import { SCAFFOLD_FILES } from '../../constants/scaffold/scaffold-files.ts';
 import { ScaffoldValidationError } from '../../domain/errors.ts';
 import type { FileSystemPort } from '../../ports/file-system-port.ts';
 import type { PortAllocation } from '../../domain/service-shape.ts';
+import { allocateScaffoldDefaultPort } from '../../domain/scaffold/default-port-allocation.ts';
 
-/** Allocates ports inside `PORT_RANGES.SERVICE`. */
+/** Allocates deterministic standalone service fallbacks and validates explicit pins. */
 export class PortAllocator {
   /** Create a service port allocator. */
   constructor(private readonly fs: FileSystemPort) {}
@@ -25,6 +26,8 @@ export class PortAllocator {
    */
   async allocate(
     projectRoot: string,
+    projectName: string,
+    serviceName: string,
     requestedPort?: number,
   ): Promise<PortAllocation> {
     const usedPorts = await this.discoverUsedPorts(projectRoot);
@@ -35,7 +38,10 @@ export class PortAllocator {
       return { port: requestedPort, source: 'user' };
     }
 
-    return { port: this.findNextAvailable(usedPorts), source: 'auto' };
+    return {
+      port: allocateScaffoldDefaultPort(projectName, `service:${serviceName}`, usedPorts),
+      source: 'auto',
+    };
   }
 
   /**
@@ -50,37 +56,35 @@ export class PortAllocator {
 
     const raw = JSON.parse(await this.fs.readFile(configPath)) as {
       NetScript?: {
-        Services?: Record<string, { Port?: unknown }>;
+        Services?: Record<string, { HostPort?: unknown; Port?: unknown }>;
+        Plugins?: Record<string, { HostPort?: unknown; Port?: unknown }>;
+        BackgroundProcessors?: Record<string, { HostPort?: unknown; Port?: unknown }>;
+        Apps?: Record<string, { HostPort?: unknown; Port?: unknown }>;
       };
     };
-    const services = raw.NetScript?.Services ?? {};
     const ports = new Set<number>();
 
-    for (const entry of Object.values(services)) {
-      if (typeof entry.Port === 'number') {
-        ports.add(entry.Port);
+    for (const section of [
+      raw.NetScript?.Services,
+      raw.NetScript?.Plugins,
+      raw.NetScript?.BackgroundProcessors,
+      raw.NetScript?.Apps,
+    ]) {
+      for (const entry of Object.values(section ?? {})) {
+        for (const value of [entry.HostPort, entry.Port]) {
+          if (typeof value === 'number') ports.add(value);
+        }
       }
     }
 
     return ports;
   }
 
-  private findNextAvailable(usedPorts: Set<number>): number {
-    const { start, end } = PORT_RANGES.SERVICE;
-    for (let port = start; port <= end; port++) {
-      if (!usedPorts.has(port)) return port;
-    }
-    throw new ScaffoldValidationError(
-      `Service port range exhausted (${start}-${end}).`,
-      { start, end },
-    );
-  }
-
   private validateInRange(port: number): void {
-    const { start, end } = PORT_RANGES.SERVICE;
+    const { start, end } = USER_PORT_RANGE;
     if (port < start || port > end) {
       throw new ScaffoldValidationError(
-        `Port ${port} is outside SERVICE range (${start}-${end}).`,
+        `Port ${port} is outside the user port range (${start}-${end}).`,
         { port, start, end },
       );
     }

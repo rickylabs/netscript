@@ -37,7 +37,8 @@ describe('public add service flow', () => {
     });
 
     assertEquals(plan.projectName, 'alpha-app');
-    assertEquals(plan.allocation.port, 3000);
+    assertEquals(plan.allocation.port >= 49_152, true);
+    assertEquals(plan.allocation.source, 'auto');
   });
 
   it('writes service and contract files with JSR imports', async () => {

@@ -6,10 +6,10 @@ export interface PortRange {
 
 /** Port allocation ranges for scaffolded resources. */
 export const PORT_RANGES = {
-  SERVICE: { start: 3000, end: 3099 } as PortRange,
-  APP: { start: 8000, end: 8099 } as PortRange,
-  PLUGIN_API: { start: 8091, end: 8099 } as PortRange,
-  INFRA_PLUGIN: { start: 4400, end: 4499 } as PortRange,
+  SERVICE: { start: 49_152, end: 53_247 } as PortRange,
+  APP: { start: 53_248, end: 57_343 } as PortRange,
+  PLUGIN_API: { start: 57_344, end: 61_439 } as PortRange,
+  INFRA_PLUGIN: { start: 61_440, end: 65_535 } as PortRange,
   ASPIRE_DASHBOARD: 18888,
   OTEL_COLLECTOR: 4318,
 } as const;
@@ -29,8 +29,7 @@ export const USER_PORT_RANGE: PortRange = { start: 1024, end: 65535 };
  * Fallback port baked into a scaffolded Fresh app's own source, for running it
  * **outside** the AppHost (`deno task dev` in `apps/<name>/`).
  *
- * Deliberately offset from `PORT_RANGES.APP.start` so it never collides with Vite's own
- * default of 8000 when a contributor runs the app standalone. This is the app's *target*
+ * Deliberately offset from `PORT_RANGES.APP.start`. This is the app's *target*
  * port — the one the process itself binds — and it is the exact counterpart of
  * `PORT_RANGES.SERVICE` for services.
  *

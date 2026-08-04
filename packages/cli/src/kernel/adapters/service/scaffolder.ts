@@ -116,7 +116,7 @@ export class ServiceScaffolder {
       configEntry: {
         Enabled: true,
         Runtime: 'deno',
-        Port: options.servicePort,
+        ...(options.hostPort !== undefined ? { HostPort: options.hostPort } : {}),
         Entrypoint: 'src/main.ts',
         Workdir: `${SCAFFOLD_DIRS.SERVICES}/${options.serviceName}`,
         ...(options.serviceReferences?.length

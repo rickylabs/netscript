@@ -1,10 +1,11 @@
 import { basename, resolve } from '@std/path';
-import { PORT_RANGES, USER_PORT_RANGE } from '../../constants/port-ranges.ts';
+import { USER_PORT_RANGE } from '../../constants/port-ranges.ts';
 import { SCAFFOLD_DEFAULTS } from '../../constants/scaffold/scaffold-defaults.ts';
 import { SCAFFOLD_VALIDATION } from '../../constants/scaffold/scaffold-validation.ts';
 import { ScaffoldDirExistsError, ScaffoldValidationError } from '../../domain/errors.ts';
 import type { InitOptions, ValidatedInitOptions } from '../../domain/scaffold/scaffold-options.ts';
 import type { InitPipelineContext } from './context.ts';
+import { allocateScaffoldDefaultPort } from '../../domain/scaffold/default-port-allocation.ts';
 
 const PRISMA_MODEL_NAME_PATTERN = /^[A-Z][A-Za-z0-9]*$/;
 
@@ -127,7 +128,10 @@ export async function validateOptions(
         );
       }
     }
-    servicePort = serviceHostPort ?? PORT_RANGES.SERVICE.start;
+    servicePort = serviceHostPort ?? allocateScaffoldDefaultPort(
+      options.name,
+      `service:${serviceName}`,
+    );
   }
   const modelName = options.modelName ?? toPascalName(singularize(
     serviceName ?? options.serviceName ?? SCAFFOLD_DEFAULTS.SERVICE_NAME,

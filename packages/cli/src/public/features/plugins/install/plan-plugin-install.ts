@@ -55,6 +55,10 @@ export async function planPluginInstall(
     dependencies.fs,
   );
   const sagaStoreBackend = resolveSagaStoreBackendOption(provider.kind, request.sagaStoreBackend);
+  const configuredListenerPorts = await readConfiguredListenerPorts(
+    dependencies.fs,
+    request.projectRoot,
+  );
 
   return {
     ...request,
@@ -63,7 +67,28 @@ export async function planPluginInstall(
     projectName,
     dbDetection,
     sagaStoreBackend,
+    configuredListenerPorts,
   };
+}
+
+async function readConfiguredListenerPorts(
+  fs: FileSystemPort,
+  projectRoot: string,
+): Promise<ReadonlySet<number>> {
+  const path = join(projectRoot, SCAFFOLD_FILES.APPSETTINGS);
+  if (!await fs.exists(path)) return new Set();
+  const parsed = JSON.parse(await fs.readFile(path)) as unknown;
+  const netScript = asRecord(asRecord(parsed).NetScript);
+  const ports = new Set<number>();
+  for (const sectionName of ['Services', 'Plugins', 'BackgroundProcessors', 'Apps']) {
+    for (const entry of Object.values(asRecord(netScript[sectionName]))) {
+      const resource = asRecord(entry);
+      for (const value of [resource.HostPort, resource.Port]) {
+        if (typeof value === 'number') ports.add(value);
+      }
+    }
+  }
+  return ports;
 }
 
 function parsePluginKind(rawKind: string, registry: PluginKindRegistry): PluginKind {

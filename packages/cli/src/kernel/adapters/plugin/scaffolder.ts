@@ -12,7 +12,7 @@ import {
 } from '../../domain/plugin-kind.ts';
 import { PluginKindRegistry } from '../../application/registries/plugin-kind-registry.ts';
 import { DEFAULT_TEMPLATE_REGISTRY } from '../../application/registries/template-registry.ts';
-import { PORT_RANGES } from '../../constants/port-ranges.ts';
+import { USER_PORT_RANGE } from '../../constants/port-ranges.ts';
 import { SCAFFOLD_DIRS } from '../../constants/scaffold/scaffold-dirs.ts';
 import { SCAFFOLD_FILES } from '../../constants/scaffold/scaffold-files.ts';
 import { ScaffoldValidationError } from '../../domain/errors.ts';
@@ -29,6 +29,7 @@ import {
   generatePluginSampleFiles,
   generatePluginService,
 } from '../../templates/plugins/plugin-generators.ts';
+import { allocateScaffoldDefaultPort } from '../../domain/scaffold/default-port-allocation.ts';
 
 /** Either spelling of a pinned host port in a raw `appsettings.json` entry. */
 interface AppsettingsPortEntry {
@@ -67,11 +68,20 @@ export class PluginScaffolder {
     const provider = this.registry.get(options.kind);
     const usedPorts = await this.getUsedPorts(options.targetPath);
     const port = options.port !== undefined
-      ? this.validateRequestedPort(provider.portRangeKey, options.port, usedPorts)
-      : this.allocatePort(provider.portRangeKey, usedPorts);
+      ? this.validateRequestedPort(options.port, usedPorts)
+      : allocateScaffoldDefaultPort(
+        options.projectName,
+        `plugin:${options.pluginName}:${provider.category}`,
+        usedPorts,
+      );
+    usedPorts.add(port);
     const servicePort = provider.category === 'plugin'
       ? port
-      : this.allocatePort('PLUGIN_API', usedPorts);
+      : allocateScaffoldDefaultPort(
+        options.projectName,
+        `plugin:${options.pluginName}:api`,
+        usedPorts,
+      );
     const serviceEntrypoint = provider.defaultServiceEntrypoint;
     const requiresDb = options.requiresDb ?? provider.defaultRequiresDb;
     const includeSamples = options.includeSamples ?? true;
@@ -198,6 +208,7 @@ export class PluginScaffolder {
       kind: options.kind,
       port,
       servicePort,
+      hostPort: servicePort,
       configSection: PLUGIN_CONFIG_SECTION_MAP[provider.category],
       configKey: options.pluginName,
       serviceConfigKey: provider.category === 'plugin'
@@ -291,38 +302,23 @@ export class PluginScaffolder {
     }
   }
 
-  private allocatePort(rangeKey: 'PLUGIN_API' | 'INFRA_PLUGIN', usedPorts: Set<number>): number {
-    const range = PORT_RANGES[rangeKey];
-    for (let port = range.start; port <= range.end; port++) {
-      if (!usedPorts.has(port)) {
-        return port;
-      }
-    }
-
-    throw new ScaffoldValidationError(
-      `Plugin port range exhausted for ${rangeKey} (${range.start}-${range.end}).`,
-      { rangeKey, start: range.start, end: range.end },
-    );
-  }
-
   private validateRequestedPort(
-    rangeKey: 'PLUGIN_API' | 'INFRA_PLUGIN',
     port: number,
     usedPorts: Set<number>,
   ): number {
-    const range = PORT_RANGES[rangeKey];
+    const range = USER_PORT_RANGE;
 
     if (!Number.isInteger(port) || port < range.start || port > range.end) {
       throw new ScaffoldValidationError(
-        `Port ${port} is outside ${rangeKey} range (${range.start}-${range.end}).`,
-        { port, rangeKey, start: range.start, end: range.end },
+        `Port ${port} is outside the user port range (${range.start}-${range.end}).`,
+        { port, start: range.start, end: range.end },
       );
     }
 
     if (usedPorts.has(port)) {
       throw new ScaffoldValidationError(
         `Port ${port} is already allocated in appsettings.json.`,
-        { port, rangeKey },
+        { port },
       );
     }
 

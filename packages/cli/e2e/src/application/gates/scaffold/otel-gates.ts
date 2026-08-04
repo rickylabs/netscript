@@ -1,8 +1,8 @@
 import { GATE, GATE_PHASE } from '../../../domain/cli-surface.ts';
 import type { GateDefinition } from '../../../domain/gate-definition.ts';
 import { commandGate } from './gate-factory.ts';
+import { allocateScaffoldDefaultPort } from '../../../../../src/kernel/domain/scaffold/default-port-allocation.ts';
 
-const WEBHOOK_URL = 'http://127.0.0.1:8093/api/v1/webhooks/inbound/generic';
 const LEGACY_DASHBOARD_TRACES_URL = 'https://localhost:18888/api/telemetry/traces';
 
 export function createOtelGates(): readonly GateDefinition[] {
@@ -11,12 +11,14 @@ export function createOtelGates(): readonly GateDefinition[] {
       GATE.BEHAVIOR_OTEL_WEBHOOK,
       'Fire webhook for OTEL trace capture',
       GATE_PHASE.BEHAVIOR,
-      () => [
+      (context) => [
         'curl',
         '-sf',
         '-X',
         'POST',
-        WEBHOOK_URL,
+        `http://127.0.0.1:${
+          pluginPort(context.request.options.projectName, 'triggers-api')
+        }/api/v1/webhooks/inbound/generic`,
         '-H',
         'Content-Type: application/json',
         '-d',
@@ -37,6 +39,7 @@ export function createOtelGates(): readonly GateDefinition[] {
         '--unsafely-ignore-certificate-errors=localhost',
         'packages/cli/e2e/src/application/gates/scaffold/consume-flow-b-stream.ts',
         context.project.projectRoot,
+        String(pluginPort(context.request.options.projectName, 'streams')),
       ],
     ),
     commandGate(
@@ -65,13 +68,18 @@ export function createOtelGates(): readonly GateDefinition[] {
         'run',
         '--allow-run',
         '--allow-read',
-        '--allow-net=127.0.0.1:8093',
+        `--allow-net=127.0.0.1:${pluginPort(context.request.options.projectName, 'triggers-api')}`,
         new URL('./validate-aspire-task-traces.ts', import.meta.url).pathname,
         context.project.projectRoot,
         'workers',
+        String(pluginPort(context.request.options.projectName, 'triggers-api')),
       ],
     ),
   ];
+}
+
+function pluginPort(projectName: string, resourceName: string): number {
+  return allocateScaffoldDefaultPort(projectName, `plugin:${resourceName}`);
 }
 
 // Retained temporarily as a compatibility export for downstream gate builders

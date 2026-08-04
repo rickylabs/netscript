@@ -36,6 +36,7 @@ import type {
   ValidatedPluginDescriptor,
 } from './jsr-plugin-validator-port.ts';
 import { planPluginInstall } from './plan-plugin-install.ts';
+import { allocateScaffoldDefaultPort } from '../../../../kernel/domain/scaffold/default-port-allocation.ts';
 import { type RenderPluginDependencies, renderPluginSupport } from './render-plugin.ts';
 import {
   BARE_PLUGIN_PACKAGE_ALIASES,
@@ -439,11 +440,21 @@ export function createPluginOwnedPluginResult(
 ): PluginScaffoldResult {
   const officialSource = descriptor.manifest.officialSource;
   const pluginDir = resolvePluginRuntimeDirectory(plan);
-  const servicePort = plan.port ?? officialSource?.servicePort ?? 0;
-  const backgroundPort = plan.port ?? officialSource?.backgroundPort ?? servicePort;
   const serviceConfigKey = plan.provider.category === 'plugin'
     ? plan.pluginName
     : officialSource?.serviceConfigKey ?? `${plan.pluginName}-api`;
+  const usedPorts = new Set(plan.configuredListenerPorts ?? []);
+  const servicePort = plan.port ?? allocateScaffoldDefaultPort(
+    plan.projectName,
+    `plugin:${serviceConfigKey}`,
+    usedPorts,
+  );
+  usedPorts.add(servicePort);
+  const backgroundPort = plan.port ?? allocateScaffoldDefaultPort(
+    plan.projectName,
+    `plugin:${plan.pluginName}:background`,
+    usedPorts,
+  );
 
   return {
     scaffoldResult: {
@@ -457,6 +468,7 @@ export function createPluginOwnedPluginResult(
     kind: plan.kind,
     port: backgroundPort,
     servicePort,
+    hostPort: servicePort,
     configSection: plan.provider.category === 'plugin' ? 'Plugins' : 'BackgroundProcessors',
     configKey: plan.pluginName,
     serviceConfigKey,

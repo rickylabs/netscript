@@ -23,6 +23,15 @@ Deno.test('--source jsr accepts the local public CLI binary', () => {
   assertEquals(command.slice(0, 4), ['deno', 'run', '-A', '/repo/packages/cli/bin/netscript.ts']);
 });
 
+Deno.test('scaffold runtime exercises the generated service port default', () => {
+  const command = scaffoldInitGate().command(
+    createContext('/repo/packages/cli/bin/netscript.ts', PACKAGE_SOURCE.JSR),
+  );
+
+  assertEquals(command.includes('--service-port'), false);
+  assertEquals(command.includes('3001'), false);
+});
+
 Deno.test('--source jsr rejects the local contributor CLI binary', () => {
   assertThrows(
     () =>

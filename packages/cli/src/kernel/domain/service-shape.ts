@@ -34,6 +34,8 @@ export interface ServiceScaffoldOptions {
   readonly serviceName: string;
   /** Allocated service port. */
   readonly servicePort: number;
+  /** Explicit Aspire host-port pin; omitted for automatic defaults. */
+  readonly hostPort?: number;
   /** Import mode for NetScript package references. */
   readonly importMode: PackageSourceMode;
   /** Depth-adjusted local base path for local imports. */

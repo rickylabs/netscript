@@ -32,7 +32,9 @@ await provider.register();
 
 try {
   const flowBCorrelationId = await readJobExecuteCorrelation(metadata.dashboardUrl);
-  const streamUrl = 'http://127.0.0.1:4437/v1/stream/netscript/workers/executions';
+  const streamPort = Number(Deno.args[1]);
+  if (!Number.isInteger(streamPort)) throw new Error('streams port argument is required');
+  const streamUrl = `http://127.0.0.1:${streamPort}/v1/stream/netscript/workers/executions`;
   let response = await fetch(
     `${streamUrl}?offset=-1`,
     {

@@ -30,3 +30,13 @@
 - **Action:** preserve and exclude from every commit; verify no run-caused delta is added.
 - **Evidence:** bootstrap raw `git status --short --branch`.
 
+## 2026-08-04 — Plugin endpoints use high-range pins
+
+- **What:** Plugin API endpoints use the shared deterministic high-range allocator and retain a
+  generated host pin; app and service endpoints remain fully dynamic under Aspire.
+- **Expected:** Prefer endpoint-directory discovery wherever the consumer supports it.
+- **Actual:** Current plugin runtime consumers still directly address stable endpoints, so this path
+  takes the brief's permitted scaffold-time high-range allocation rather than claiming unsupported
+  discovery.
+- **Severity:** minor / design selection
+- **Action:** accept; keep every emitted plugin listener at or above `49152`.

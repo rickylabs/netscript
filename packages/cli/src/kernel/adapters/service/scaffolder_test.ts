@@ -46,7 +46,8 @@ Deno.test('ServiceScaffolder creates a contract-bound service workspace', async 
 
   assertEquals(result.scaffoldResult.filesCreated.length, 5);
   assertEquals(result.scaffoldResult.directoriesCreated.length, 3);
-  assertEquals(result.configEntry.Port, 3000);
+  assertEquals(result.configEntry.Port, undefined);
+  assertEquals(result.configEntry.HostPort, undefined);
   assertEquals(result.configEntry.Workdir, 'services/orders');
 
   const denoJson = JSON.parse(await fs.readFile('/project/services/orders/deno.json'));
@@ -139,8 +140,9 @@ Deno.test('PortAllocator assigns next available service port', async () => {
     }),
   );
 
-  const allocation = await new PortAllocator(fs).allocate('/project');
-  assertEquals(allocation, { port: 3002, source: 'auto' });
+  const allocation = await new PortAllocator(fs).allocate('/project', 'shop', 'orders');
+  assertEquals(allocation.source, 'auto');
+  assertEquals(allocation.port >= 49_152, true);
 });
 
 Deno.test('PortAllocator rejects out-of-range and duplicate requested ports', async () => {
@@ -151,11 +153,11 @@ Deno.test('PortAllocator rejects out-of-range and duplicate requested ports', as
   );
 
   await assertRejects(
-    () => new PortAllocator(fs).allocate('/project', 2999),
+    () => new PortAllocator(fs).allocate('/project', 'shop', 'orders', 1000),
     ScaffoldValidationError,
   );
   await assertRejects(
-    () => new PortAllocator(fs).allocate('/project', 3000),
+    () => new PortAllocator(fs).allocate('/project', 'shop', 'orders', 3000),
     ScaffoldValidationError,
   );
 });
