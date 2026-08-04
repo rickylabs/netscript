@@ -1517,3 +1517,23 @@ executing; the reframe pass (6 debts, 18 markers) follows once these land.
   could not state it accurately" is an allowed verdict. Brief mandates **box-index** evidence
   entries per finding 32.
 - Canary.9 dispatch chained on the #1283 merge (caveat burn-down as one coherent train, D16).
+
+## 2026-08-04 — Reframe (#1288/#1289) reviewed hard: three real defects caught pre-merge
+
+The agy reframe was substantively right (18 markers preserved, information retained verbatim)
+but needed three orchestrator corrections before it could pass:
+1. **Stale base** — branch cut at #1281's merge, before three kill-list merges. Rebased.
+   (Two-dot `git diff origin/main..HEAD` made it look like the branch deleted 2432 lines of
+   source; the three-dot diff showed the truth: 14 files, all docs/. **Finding 34: use
+   three-dot when asking "what did this branch change".**)
+2. **Register drift** — 5× "Consequently", 1× "you must utilize". Rewritten to plain English.
+3. **Incomplete reframe** — prose was rewritten but four call-outs kept `type: "warning"`
+   while their titles already read "…Design Boundary". Flipped to `type: "important"`;
+   zero debt markers now sit in warning call-outs.
+**Finding 35: my own dry-run instrument was stale.** `mirror-acceptance-evidence` run from the
+orchestrator worktree used an older `acceptance-evidence.ts` (map keyed by text) and reported
+four phantom "Missing evidence" errors; run from a main-based tree it is clean. Validation
+tooling must be executed from a tree at the ref CI will use — same class as finding 33
+(wrong instrument), and it cost three false debugging cycles here.
+Evidence block rewritten with box-index entries carrying my own verification (marker census,
+1:1 debt-entry pairing, callout-type audit) rather than the agent's restatements.
