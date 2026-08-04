@@ -302,9 +302,13 @@ id and requesting session. This child-surface policy is configuration, not promp
 
 `claude/openrouter-run.ts` is the first-class Claude-over-OpenRouter transport — the OpenCode
 alternative for local evaluator and review turns. It wraps `claude-print.ts` and performs the three
-steps that were previously manual: it resolves the OpenRouter credential, maps it into the child
-only as `ANTHROPIC_AUTH_TOKEN` (emptying `ANTHROPIC_API_KEY`), and always enables the evaluator
-model guard.
+steps that were previously manual: it resolves the OpenRouter credential, applies the canonical
+`claude-openrouter` provider profile, and always enables the evaluator model guard.
+
+Because it is a credential-owning boundary it does not define its own environment rules. It
+materializes the profile policy from `runtime/provider-profiles.ts` and spawns with `clearEnv`, so
+the child keeps only `ANTHROPIC_AUTH_TOKEN`, has every rival provider/route key cleared, and runs
+under an isolated `CLAUDE_CONFIG_DIR` — a cached native Claude login cannot override the gateway.
 
 ```bash
 deno task agentic:claude-openrouter --model <openrouter-id> --effort xhigh \
@@ -314,9 +318,11 @@ deno task agentic:claude-openrouter --model <openrouter-id> --effort xhigh \
 **Open models only.** The guard is not switchable on this route: a closed model id is denied with
 403, terminates the turn, and exits `78`. An already-exported `OPENROUTER_API_KEY` wins; otherwise
 only that assignment is read from the configured credential file (see
-`OPENROUTER_ENV_RELATIVE_PATH` in `config/versions.ts`). The key is never printed. `--output` tees
-the stream-JSON result to a file while still streaming to stdout; the launcher exits with the
-child's exit code.
+`OPENROUTER_ENV_RELATIVE_PATH` in `config/versions.ts`). The key is never printed and never reaches
+argv. Unknown, duplicate, or value-less flags are rejected before any request can spend credit, and
+`--output` is opened before the child is spawned so an unwritable destination cannot fail behind a
+live turn. `--output` tees the stream-JSON result to a file while still streaming to stdout; the
+launcher exits with the child's exit code.
 
 Preset capability is data in `runtime/provider-profiles.ts`: the Claude GLM design preset is
 live-agentic supported, while the legacy Codex GLM design preset is explicitly unsupported because
