@@ -76,6 +76,7 @@ adapter validator, real deno-doc fixtures, and schema version together.
 | 2026-08-04 | gates | Archetype-2 column | Focused check/lint/fmt, 105 MCP tests, generator freshness/tests, quality gate, doctrine check, doc lint, package/root publish dry-runs, and publish-asset check passed. |
 | 2026-08-04 | gates | CLI E2E | 51/52 gates passed; unrelated generated users-service database health probe failed after successful scaffold, DB init/generate/seed, workspace checks, Aspire start, and MCP-related gates. Cleanup passed; leak check found no run-owned survivors. |
 | 2026-08-04 | CI follow-up | JSR tagline | Trimmed the MCP README tagline from 277 to 228 bytes while retaining the accurate 21-tool count; tagline check, `quality:gate`, and publish-asset freshness pass. |
+| 2026-08-04 | rebase | current main | Rebased onto `f710421e9`; preserved S7 endpoint/run-manifest discovery plus all four export tools, retained the truthful 21-tool registry/docs count and 228-byte tagline, and regenerated the embedded README asset. Focused MCP check (103 files), registry tests, publish-asset freshness, tagline gate, and `quality:gate` pass. |
 
 ## RED Evidence
 
