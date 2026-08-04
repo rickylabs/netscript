@@ -54,10 +54,13 @@ name: e2e-cli
 # classify (the pre-existing applicability gate) skips them, as before.
 # Rename-aware diff: `--name-status -M` feeds BOTH sides of renames/copies so a
 # source->docs rename can never classify docs-only.
+# Draft PR pushes schedule no classifier, scaffold, runtime, desktop, or
+# visibility jobs. Capability-vector and label policy resumes unchanged on
+# `ready_for_review` and later non-draft events.
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened, labeled, unlabeled]
+    types: [opened, synchronize, reopened, ready_for_review, labeled, unlabeled]
   workflow_dispatch:
 
 permissions:
@@ -74,6 +77,7 @@ jobs:
     # `e2e-cli-gate`-labeled PRs, or manual dispatch exercise this workflow.
     if: >-
       (github.event_name != 'pull_request' || github.event.pull_request.merged != true) &&
+      (github.event_name != 'pull_request' || github.event.pull_request.draft == false) &&
       (github.event_name == 'workflow_dispatch' ||
        github.event.pull_request.base.ref == 'main' ||
        startsWith(github.event.pull_request.base.ref, 'feat/') ||
@@ -394,7 +398,7 @@ jobs:
   lane-visibility:
     name: scaffold CI lane visibility
     needs: [classify, scaffold-static, scaffold-runtime, desktop-native-linux]
-    if: ${{ always() && github.event_name == 'pull_request' }}
+    if: ${{ always() && github.event_name == 'pull_request' && github.event.pull_request.draft == false }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:

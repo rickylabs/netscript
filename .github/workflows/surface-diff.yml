@@ -6,9 +6,12 @@ name: public-surface-diff
 # exactly (any `packages/**` change, plus the conservative unrecognised-path
 # escalation); the job now always starts and reports, short-circuiting to a
 # skipped-by-policy step. FAIL-CLOSED: a failed classify forces a full run.
+# Draft PR pushes schedule no surface analysis; ready and later non-draft
+# events retain the existing fail-closed vector behavior.
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
 
 permissions:
   contents: read
@@ -18,6 +21,7 @@ jobs:
     name: classify changes
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    if: github.event.pull_request.draft == false
     outputs:
       needs_surface: ${{ steps.decide.outputs.needs_surface }}
       reason: ${{ steps.decide.outputs.reason }}
@@ -69,7 +73,7 @@ jobs:
     needs: classify
     # Job always starts (so its status reports); FAIL-CLOSED on classify
     # failure, same pattern as the other classifier consumers.
-    if: ${{ !cancelled() }}
+    if: ${{ !cancelled() && github.event.pull_request.draft == false }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
