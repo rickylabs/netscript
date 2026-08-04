@@ -1571,3 +1571,29 @@ Cut-time checklist gains its satisfied caveat gate.
     `Closes`, per-issue evidence blocks; brief mandates verifying every claim against the
     shipped surface via `deno doc` (a non-running example is the very defect #1112 fixes) and
     forbids invented sections and the slop register.
+
+## 2026-08-04 — #1290 p0 accepted into 0.0.5 and dispatched; my gate let the regression through
+
+Owner raised #1290 (p0, milestoned 0.0.6): a fresh `init --service` workspace fails
+`deno task check` with three errors and its example service crashes — because #1257's
+`@database/zod` alias repoint targets a barrel exporting only model schemas while the
+scaffold's own generated contract imports CreateInput/UpdateInput. Accepted immediately:
+milestone → 0.0.5, dispatched on the streamdb lane (its #1235 work was exactly this
+generated-types/barrel domain), against the owner's CORRECTED acceptance.
+
+**Accountability — this passed my gate.** I merged #1257 tonight after verifying its stated
+acceptance ("a barrel exporting every generated model schema") was met. It was. What I did
+not do was check the scaffold's own contract template against the new target. Timeline shows
+why nothing else caught it either: #1257 merged 17:15Z; my full scaffold.runtime run
+(69/0) executed against PR #1256's BRANCH head, cut before #1257 landed, so it tested a tree
+without the regression. **Finding 36 (for #1163): when a change repoints an alias/barrel/entry
+that generated code consumes, verifying the new target's exports is not sufficient — the gate
+must compile a consumer. "Target exists and exports X" and "every consumer still resolves" are
+different claims, and only the second is the acceptance.** The owner's corrected criterion
+(assert imports RESOLVE, not that the alias string matches) encodes this permanently.
+
+**canary.9 knowingly ships the regression** (dispatched 21:01Z with #1257 aboard). Canaries
+are immutable and finding 26 forbids cancelling a dispatched one; the fix rides canary.10.
+Recorded so canary.9's green pair is never read as proof the `init --service` path works —
+the pinned E2E does not cover it, the same blind spot the alias-string test had.
+**No displacement:** canary.10's three slices hold three lanes; four were free.
