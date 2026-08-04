@@ -71,3 +71,37 @@ Evidence:
 **FAIL_FIX**
 
 The fixture, link gate, site build, symbol existence, route-contract propagation, narrative ordering, and cross-page naming all pass at local HEAD `949a572e1`. The changeset is not ready to polish/merge because it still makes one false runtime-behavior claim and fails the requested prose-quality bar. Return these findings to the same generator session, then re-audit the repaired changeset.
+
+## Re-audit @ae2944908
+
+- Re-audited local HEAD: `ae2944908a0c788cb20fe26ed33c2ee164d22d73`
+- Fix commits inspected: `5b3ff38bf` (fixture quality cleanup) and `ae2944908` (A1/P1 repair)
+- Scope: direct verification of findings A1 and P1, the package-scoped fixture quality lane, and affected docs build/link gates
+
+### Finding verification
+
+| Finding | Evidence | Result |
+|---|---|---|
+| A1 — false current streaming claim | Compared `docs/site/tutorials/live-dashboard/04-definePage-QueryIsland.md:234-235` with `packages/fresh/src/application/defer/Deferred.tsx:79-84`. The tutorial now states that `Deferred` is a Suspense-ready boundary in the current non-streaming Fresh runtime and becomes fully progressive only once streaming delivery lands, matching the exported component's own documentation. | FIXED / PASS |
+| P1 — filler, redundant recap, incorrect `initialData` provenance, and whitespace | Inspected tutorial lines 302-307 and the repair diff `949a572e1..ae2944908`. “Seamlessly” and “The key moves” are gone. The replacement explains the exact server/client query-key matching constraint, identifies `initialData` as coming from `props.initialOrders`, and relates `clientKey(input)` to the optimistic cache target. `git diff --check f7558aa1c..HEAD` is clean; the `<Deferred>` example has no trailing whitespace. | FIXED / PASS |
+
+### Re-run gate evidence
+
+| Gate | Command | Result |
+|---|---|---|
+| Fixture type-check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/fresh/tests/type-fixtures --ext tsx` | PASS — 1 file, 1 batch, 0 failed batches, 0 diagnostics. Non-fatal existing peer-dependency warnings were emitted. |
+| Fixture lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/fresh/tests/type-fixtures --ext tsx` | PASS — 1 file, 0 findings. |
+| Fixture format | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/fresh/tests/type-fixtures --ext tsx` | PASS — 1 file, 0 failed batches, 0 findings. |
+| Suppression/cast scan | `rg -n "deno-(lint-ignore|fmt-ignore)|@ts-ignore|@ts-expect-error|as unknown as|as any|:[[:space:]]*any\\b|<any>" packages/fresh/tests/type-fixtures/tutorial-examples_type.tsx` | PASS — no matches. |
+| Diff whitespace | `git diff --check f7558aa1c..HEAD` | PASS — no output. |
+| A1/P1 wording scan | `rg -n "seamlessly|The key moves|initialData|non-streaming|fully progressive|streaming delivery|cache key|query key" docs/site/tutorials/live-dashboard/04-definePage-QueryIsland.md packages/fresh/src/application/defer/Deferred.tsx` plus line-by-line inspection | PASS — repaired claims align with source and explicit prop flow. |
+| Site build | `(cd docs/site && deno task build)` | PASS — exit 0; 595 files generated. Workspace-membership warnings remain non-fatal. |
+| Documentation links | `deno task docs:links` | PASS — 102 docs, 0 broken links, 0 broken anchors, 0 orphans. |
+
+No new finding was introduced by either repair. The original PASS results for narrative consistency, contract fidelity, and cross-page consistency remain valid; the repaired text preserves those contracts.
+
+### Re-audit final verdict
+
+**PASS**
+
+Both blocking findings are resolved at `ae2944908`, and every affected gate independently re-run by the auditor is green. The changeset may proceed to the separate `docs_polish` lane.

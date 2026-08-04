@@ -59,3 +59,9 @@
   Deferred streaming claim vs non-streaming runtime) + P1 (filler/imprecise hydration recap,
   trailing whitespace). Both fixed in ae2944908; wording mirrors Deferred.tsx source doc.
 - Re-audit at ae2944908 requested from the same Sol thread; CI watcher running.
+
+- Sol re-audit @ae2944908: **PASS** — both findings verified fixed, affected gates re-run
+  green by the auditor. Relayed on the PR. No separate docs_polish pass (changeset already
+  went through the audit-driven fix cycle + polish-grade repair). #1209 done from this run's
+  side pending CI; merge authority with the 0.0.5 orchestrator. scaffold-runtime "fail" at
+  30894413918 is the e2e-scaffold-runtime-global mutex cancel, not a real failure.
