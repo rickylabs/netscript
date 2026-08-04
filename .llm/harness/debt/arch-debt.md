@@ -416,7 +416,8 @@ finding into a debt entry.
 - **Target:** Before advertising deferred trigger action dispatch as supported.
 - **Linked plan:** `.llm/tmp/run/cap-s2-defer/brief.md`
 - **Created:** 2026-06-19
-- **Status:** open
+- **Status:** closed 2026-08-04 by #1283. The core now publishes a one-shot defer/replay port and
+  KV-backed scheduler; the plugin composes durable replay through the live definition registry.
 - **Gate:** Replace the S2 DLQ rejection test with a deferred-dispatch test after a package-owned
   scheduler/replay port is designed.
 

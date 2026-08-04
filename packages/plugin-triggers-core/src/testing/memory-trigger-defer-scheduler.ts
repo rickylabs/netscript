@@ -19,6 +19,7 @@ export class MemoryTriggerDeferScheduler implements TriggerDeferSchedulerPort {
     this.#clock = clock;
   }
 
+  /** Store one deferred event in memory. */
   schedule(input: TriggerDeferScheduleInput): Promise<TriggerDeferRecord> {
     this.#sequence += 1;
     const record: TriggerDeferRecord = Object.freeze({
@@ -32,18 +33,23 @@ export class MemoryTriggerDeferScheduler implements TriggerDeferSchedulerPort {
     return Promise.resolve(record);
   }
 
+  /** Cancel a pending in-memory replay. */
   cancel(id: string): Promise<boolean> {
     return Promise.resolve(this.#records.delete(id));
   }
 
+  /** List pending records in due-time order. */
   list(): Promise<readonly TriggerDeferRecord[]> {
     return Promise.resolve(
-      Object.freeze([...this.#records.values()].sort((left, right) =>
-        Date.parse(left.until) - Date.parse(right.until)
-      )),
+      Object.freeze(
+        [...this.#records.values()].sort((left, right) =>
+          Date.parse(left.until) - Date.parse(right.until)
+        ),
+      ),
     );
   }
 
+  /** Replay records due at the current test-clock time. */
   async replayDue(
     replay: (record: TriggerDeferRecord) => Promise<void>,
   ): Promise<readonly TriggerDeferReplayResult[]> {
@@ -65,6 +71,7 @@ export class MemoryTriggerDeferScheduler implements TriggerDeferSchedulerPort {
     return Object.freeze(results);
   }
 
+  /** Register the runtime replay callback until aborted. */
   async run(
     replay: (record: TriggerDeferRecord) => Promise<void>,
     options: TriggerDeferRunOptions = {},

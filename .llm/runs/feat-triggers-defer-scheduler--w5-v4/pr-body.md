@@ -20,7 +20,7 @@ Closes #1229
 - [x] S1 RED proof through the public plugin runtime
 - [x] S2 Core scheduler/replay contract and durable adapter
 - [x] S3 Plugin scheduling/replay lifecycle
-- [ ] S4 Caveat/debt burn-down and archetype gates
+- [x] S4 Caveat/debt burn-down and archetype gates
 
 ## Harness
 
@@ -31,13 +31,21 @@ Closes #1229
 
 ## Validation
 
-- [ ] RED/GREEN defer lifecycle tests (fake clock; no real sleeps)
-- [ ] Scoped check/lint/fmt wrappers
-- [ ] Core/plugin JSR, doc, and publish dry-run gates
-- [ ] Quality, architecture, consumer, and plugin verification gates
+- [x] RED/GREEN defer lifecycle tests (fake clock; no real sleeps)
+- [x] Scoped check/lint/fmt wrappers
+- [x] Core/plugin JSR, doc, and publish dry-run gates
+- [x] Quality, architecture, consumer, and plugin verification gates
 - [ ] Composed implementation evaluation
 
 ```acceptance-evidence
 issue: 1229
-entries: []
+entries:
+  - box-index: 1
+    evidence: "Core KV scheduler and public plugin runtime tests prove one-shot fire, cancellation, past-due replay, adapter reconstruction, and worker dispatch using TriggerTestClock."
+  - box-index: 2
+    evidence: "Commit 0e8135f81 records RED on the existing public path (actual dlq vs expected deferred); focused and full package tasks are GREEN after S2/S3."
+  - box-index: 3
+    evidence: "Both arch-debt:triggers-defer-unsupported markers and adjacent unsupported call-outs are removed; the matching debt registry entry is closed."
+  - box-index: 4
+    evidence: "Port contract landed before plugin composition; scoped wrappers, full package tests, quality:gate, JSR audits, doc lint, publish dry runs, docs gates, and verify-plugin are green."
 ```

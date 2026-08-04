@@ -34,6 +34,11 @@ export type {
   TriggerPayload,
 } from '../domain/mod.ts';
 export type {
+  TriggerDeferRecord,
+  TriggerDeferReplayResult,
+  TriggerDeferRunOptions,
+  TriggerDeferScheduleInput,
+  TriggerDeferSchedulerPort,
   TriggerDlqEntry,
   TriggerDlqListOptions,
   TriggerDlqPort,
@@ -44,9 +49,4 @@ export type {
   TriggerIdempotencyClaim,
   TriggerIdempotencyKeyInput,
   TriggerIdempotencyPort,
-  TriggerDeferRecord,
-  TriggerDeferReplayResult,
-  TriggerDeferRunOptions,
-  TriggerDeferScheduleInput,
-  TriggerDeferSchedulerPort,
 } from '../ports/mod.ts';

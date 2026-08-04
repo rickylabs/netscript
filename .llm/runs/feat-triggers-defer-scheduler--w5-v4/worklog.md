@@ -40,3 +40,20 @@
 - The full #1229 contract remains achievable; closing keyword stays `Closes #1229`.
 - Runtime composition registers live definitions, uses distinct replay event/idempotency ids, and
   aborts/drains the scheduler wake loop on processor stop. No unrelated issue scope was absorbed.
+
+| 2026-08-04 | S4 docs | caveat/debt scan, docs links, docs accuracy | zero remaining defer-unsupported markers; links/accuracy PASS |
+| 2026-08-04 | S4 JSR | core/plugin audit + full export-map doc lint + publish dry runs | audits/dry runs PASS; inherited cardinality/private-type/slow-type advisories recorded |
+| 2026-08-04 | S4 fitness | `deno task quality:gate` | exit 0; quality scan clean, doctrine FAIL=0 on both touched surfaces |
+| 2026-08-04 | S4 runtime | core full task + plugin full task + focused lifecycle | core green; plugin 35 passed/0 failed; focused 5 passed/0 failed |
+| 2026-08-04 | S4 static | combined scoped check/lint/fmt wrappers | check/lint clean; fmt clean after formatting owned files |
+| 2026-08-04 | S4 plugin | `deno run -A --unstable-kv plugins/triggers/verify-plugin.ts` | `ok: true`, zero findings |
+
+### S4 reconcile
+
+- All four live #1229 acceptance boxes are earned. The two marker-bearing caveats and every adjacent
+  stale unsupported call-out were removed; the debt entry is closed.
+- The initial core JSR audit exposed a pre-existing missing module tag on the contracts entrypoint;
+  the one-line tag was added, then the audit passed with advisory-only existing cardinality and
+  sanctioned slow-type notes.
+- Validation re-resolved the inherited uncommitted lockfile. It remains entirely unstaged and
+  excluded from the PR; no source or package manifest dependency changed.
