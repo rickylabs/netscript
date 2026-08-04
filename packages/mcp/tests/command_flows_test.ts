@@ -1,8 +1,8 @@
 import { assert, assertEquals } from '@std/assert';
 import { createExecuteCommandFlow } from '../src/application/flows/execute-command-flow.ts';
 import { createListCommandsFlow } from '../src/application/flows/list-commands-flow.ts';
-import type { CommandExecutorPort } from '../src/domain/command/command-executor-port.ts';
-import { decideCommand, DEFAULT_COMMAND_POLICY } from '../src/domain/command/command-policy.ts';
+import type { CommandExecutorPort } from '../src/domain/command-executor-port.ts';
+import { decideCommand, DEFAULT_COMMAND_POLICY } from '../src/domain/command-policy.ts';
 
 Deno.test('default command policy is deny-wins with default deny', () => {
   const cases: Array<[string[], boolean, string]> = [

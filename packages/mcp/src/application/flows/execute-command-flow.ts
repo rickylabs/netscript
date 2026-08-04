@@ -1,9 +1,9 @@
-import type { CommandExecutorPort } from '../../domain/command/command-executor-port.ts';
+import type { CommandExecutorPort } from '../../domain/command-executor-port.ts';
 import {
   type CommandPolicy,
   decideCommand,
   DEFAULT_COMMAND_POLICY,
-} from '../../domain/command/command-policy.ts';
+} from '../../domain/command-policy.ts';
 import { isRecord } from '../../domain/schema.ts';
 import type { ToolExecutionResult, ToolFlow } from '../../domain/tool-types.ts';
 

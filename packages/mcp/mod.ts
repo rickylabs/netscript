@@ -34,21 +34,18 @@ export type {
   DoctorFamilyResult,
 } from './src/domain/doctor-check-family.ts';
 export type { ProjectDoctorPort } from './src/domain/project-doctor-port.ts';
-export type {
-  CommandCatalogPort,
-  CommandDescriptor,
-} from './src/domain/command/command-catalog-port.ts';
+export type { CommandCatalogPort, CommandDescriptor } from './src/domain/command-catalog-port.ts';
 export type {
   CommandExecutionRequest,
   CommandExecutionResult,
   CommandExecutorPort,
-} from './src/domain/command/command-executor-port.ts';
-export { decideCommand, DEFAULT_COMMAND_POLICY } from './src/domain/command/command-policy.ts';
+} from './src/domain/command-executor-port.ts';
+export { decideCommand, DEFAULT_COMMAND_POLICY } from './src/domain/command-policy.ts';
 export type {
   CommandPolicy,
   CommandPolicyDecision,
   CommandPolicyRule,
-} from './src/domain/command/command-policy.ts';
+} from './src/domain/command-policy.ts';
 export { createDoctorFlow } from './src/application/flows/doctor-flow.ts';
 export { createListCommandsFlow } from './src/application/flows/list-commands-flow.ts';
 export { createExecuteCommandFlow } from './src/application/flows/execute-command-flow.ts';
