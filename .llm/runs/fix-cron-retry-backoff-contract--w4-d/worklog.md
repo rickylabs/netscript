@@ -68,6 +68,7 @@ run the same test matrix against both provider factories.
 | 2026-08-04 14:34 +02:00 | S2 | shared retry runtime | Retained adapter policy snapshots, added the shared abortable retry loop, and turned the dual-provider fake-time matrix green. |
 | 2026-08-04 14:38 +02:00 | S2 | supervisor review | Centralized policy snapshots, added explicit stop-during-backoff coverage for both providers, and independently reran the slice gates. |
 | 2026-08-04 14:44 +02:00 | S3 | public contract + consumer | Locked exact JSDoc/manual semantics and proved the scheduled-trigger event retains cron attempt `2`. |
+| 2026-08-04 14:48 +02:00 | S4 | merge-readiness | Full A2/static/runtime/consumer/publication and hygiene gates passed; issue wording reconciled. |
 
 ## Decisions
 
@@ -103,6 +104,9 @@ run the same test matrix against both provider factories.
 | S3 publish dry-run | `deno task --cwd packages/cron publish:dry-run` | PASS (exit 0) | 11 files; stable package surface simulates successfully |
 | S3 docs links | `deno task docs:links` | PASS (exit 0) | 102 docs; zero broken links/anchors |
 | S3 docs accuracy | `deno task docs:accuracy` | PASS (exit 0) | repository accuracy/discoverability checks pass |
+| S4 final scoped check/lint/fmt | wrappers over cron + consumer test | PASS (exit 0) | 15 files; zero diagnostics/findings; check includes `--unstable-kv` + `--unstable-cron` |
+| S4 public surface | `deno doc --no-lock packages/cron/mod.ts`; full export-map doc-lint | PASS (exit 0) | four-entrypoint combined diagnostics 0 |
+| S4 package publish | `deno task --cwd packages/cron publish:dry-run` | PASS (exit 0) | 11 files; dry-run complete |
 
 ### Fitness Gates
 
@@ -112,6 +116,8 @@ run the same test matrix against both provider factories.
 | PLAN-EVAL | COMPOSED | `plan-eval.md` | composed per milestone-run.md (orchestrator waiver) |
 | S2 code-quality scan | PASS (exit 0) | `deno run --no-lock --allow-read .llm/tools/quality/scan-code-quality.ts --root packages/cron` | no findings or allowances |
 | S2 doctrine readiness | PASS (exit 0) | `deno run --no-lock --allow-read .llm/tools/fitness/check-doctrine.ts --root packages/cron` | no failures; one pre-existing README example warning and one architecture-doc info item |
+| S4 `quality:gate` | PASS (exit 0) | `deno task quality:gate` | quality scan and `arch:check` pass; broad repository warnings are pre-existing and outside this package slice |
+| S4 JSR audit | PASS with known warning (exit 0) | `audit-jsr-package.ts --root packages/cron --text` | 14 files, four exports, dry-run OK; only the known slow-types banner warning |
 
 ### Runtime Gates
 
@@ -120,12 +126,14 @@ run the same test matrix against both provider factories.
 | RED retry behavior | EXPECTED FAIL (exit 1) | `rtk proxy deno test --unstable-cron packages/cron/tests/retry-backoff_test.ts` | `0 passed | 2 failed`; both `MemoryCronAdapter` and `DenoCronAdapter` produced actual attempts `[0]` where `[0, 1]` was expected after advancing fake time by 25 ms. Native coverage used a captured `Deno.cron` callback and registered no real work. |
 | S2 retry matrix | PASS (exit 0) | `rtk proxy deno test --no-lock --unstable-cron packages/cron/tests/retry-backoff_test.ts` | Supervisor rerun: `12 passed | 0 failed (235ms)`; both providers cover success, exhaustion, fixed/exponential/linear sequences, max cap, registration abort, shutdown, and aggregate accounting. |
 | S2 cron suite | PASS (exit 0) | `rtk proxy deno test --no-lock --unstable-cron packages/cron/tests/` | Supervisor rerun: `22 passed | 0 failed (702ms)` |
+| S4 retry matrix | PASS (exit 0) | `deno test --no-lock --unstable-cron packages/cron/tests/retry-backoff_test.ts` | `12 passed | 0 failed`; fake-time only |
 
 ### Consumer Gates
 
 | Consumer | Result | Evidence | Notes |
 | --- | --- | --- | --- |
 | `plugin-triggers-core` attempt mapping | PASS (exit 0) | `deno test --no-lock --unstable-kv packages/plugin-triggers-core/src/adapters/cron-trigger-scheduler-adapter_test.ts` | 1 passed; runtime cron attempt `2` is copied unchanged to the scheduled trigger event. |
+| PR review threads | PASS (exit 0) | `agentic:review-threads --repo rickylabs/netscript --pr 1226 --pretty` | threads 0; unanswered 0 |
 
 ## Handoff Notes
 
@@ -142,3 +150,7 @@ run the same test matrix against both provider factories.
   published `BackoffStrategy` type; doc-lint reports zero combined diagnostics.
 - The manual and JSDoc now agree on `maxRetries`, attempt numbering, all three formulas, capping,
   cancellation, and one aggregate terminal event/run-count update per invocation.
+- `origin/main` (`8dbc16bee`) is an ancestor of the PR head. The commit range contains no
+  `deno.lock`, dependency-manifest, new lint-ignore, `@ts-ignore`, or unsafe double-cast change.
+- The sole local `deno.lock` edit predates the run and remains unstaged; explicit-path staging keeps
+  it outside every commit and push.

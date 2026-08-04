@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `fix-cron-retry-backoff-contract--w4-d` |
 | Branch | `fix/cron-retry-backoff-contract` |
-| Current phase | `implement — S3 complete; S4 merge-readiness next` |
+| Current phase | `evaluation handoff — local gates green; draft→ready augment next` |
 | Archetype | `2 — Integration` |
 | Scope overlays | `docs` |
 
@@ -42,16 +42,20 @@ that a cron retry attempt is forwarded unchanged.
 - Corrected the manual's lifecycle example and documented exact retry math and aggregation.
 - Added and passed the scheduled-trigger attempt-forwarding consumer test.
 - Reran doc-lint, docs links, and docs accuracy successfully.
+- Passed the full repository `quality:gate`, final scoped wrappers, JSR audit, publish dry-run,
+  runtime/consumer tests, public-surface inspection, and review-thread gate.
+- Reconciled issue #1104 to the actual `JobContext` and native `Deno.cron` provider names.
+- Audited the commit range: no dependency/lock change, no new lint escape, and no diff-check finding.
 
 ## In Progress
 
-- S4 full Archetype 2 merge-readiness gate column and PR evaluation handoff.
+- Draft→ready augment and milestone orchestrator pre-merge gate (composed evaluator rule).
 
 ## Next Steps
 
-1. Run the full package/publication/fitness/consumer gate set and hygiene scan.
-2. Reconcile issue wording and acceptance evidence.
-3. Push S4 evidence, mark the draft ready, and wait for the milestone-composed augment gate.
+1. Commit and push S4 evidence with an explicit refspec.
+2. Mark PR #1226 ready so the augment gate runs.
+3. Address every current review thread and leave the PR ready for milestone orchestration.
 
 ## Key Decisions
 
@@ -88,7 +92,7 @@ that a cron retry attempt is forwarded unchanged.
 
 ## Open Questions
 
-- None blocking.
+- External composed evaluation has not run yet; no local formal verdict is self-issued.
 
 ## Drift and Debt
 
