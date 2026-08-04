@@ -57,7 +57,7 @@ Build the page using NetScript's fluent `definePage` page builder. Materialize t
 
 ```tsx
 // apps/dashboard/routes/chat/[sessionId].tsx
-import { definePage } from '@netscript/fresh/builders';
+import { definePage } from '@app/utils.ts';
 import { resolveChatSnapshot } from '@netscript/fresh/ai';
 import { z } from 'zod';
 import Chat from '../../islands/Chat.tsx';
@@ -84,6 +84,10 @@ const chatPage = definePage()
 
 export default chatPage.default;
 ```
+
+Note where `definePage` comes from: `@app/utils.ts`, the module your scaffold wrote in chapter 1. It
+re-exports the builder bound to the app's `State` type, so every page in the app shares one typed
+context — importing straight from `@netscript/fresh/builders` drops that binding.
 
 This registers the path parameter (`sessionId`) and exposes `ctx.path.sessionId` typed in resources, loaders, and layout. The `resolveChatSnapshot` returns `{ messages, renderParts, offset }` where `offset` seeds the live subscription so seed and live read one continuous log.
 

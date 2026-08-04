@@ -100,7 +100,7 @@ can check.
   },
   {
     title: "5 · Shipping webhook",
-    body: "Accept an HMAC-verified shipping/payment webhook with <code>defineWebhook</code> and hand each inbound event to a background job with <code>enqueueJob</code>. Triggers API on :8093.",
+    body: "Accept an HMAC-verified shipping/payment webhook with <code>defineWebhook</code> and hand each inbound event to a background job with <code>enqueueJob</code>.",
     href: "/tutorials/storefront/05-shipping-webhook/"
   },
   {

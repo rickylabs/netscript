@@ -34,7 +34,7 @@ checkout from `OrderCreated` through payment toward fulfillment. You will also a
 `process-payment` worker job that a checkout trigger enqueues, and you will wire the **failure path** so a
 declined payment cancels the order instead of stranding it. By the end you can drive a checkout to a
 **paid** order and watch a failed payment **compensate to cancelled** — both observable on the Sagas
-API at `:8092`.
+API.
 
 ## Before you begin
 
@@ -333,7 +333,8 @@ message types.
 
 ## Verify your progress
 
-With Aspire up, confirm the saga registered through the **Sagas API on `:8092`**:
+With Aspire up, confirm the saga registered through the **Sagas API** (the CLI resolves its
+allocated endpoint for you):
 
 ```sh
 ns-sagas list --registered --json
@@ -351,7 +352,8 @@ ns-sagas publish OrderCreated \
   --correlation-key=ord_1001
 
 # 2. Enqueue the process-payment worker through the supported triggers ingress.
-curl -X POST http://localhost:8093/api/v1/webhooks/checkout/payment \
+#    Take <triggers-endpoint> from the Aspire resource list.
+curl -X POST <triggers-endpoint>/api/v1/webhooks/checkout/payment \
   -H 'content-type: application/json' \
   -d '{ "orderId": "ord_1001", "amount": 4999 }'
 ```
@@ -411,7 +413,7 @@ The durability tier persists instance state so a workflow survives a restart, bu
   the order. Inventory and shipping remain explicit future trigger/job legs.
 - A `process-payment` worker job (`defineJobHandler`, `createSuccessResult` / `createFailureResult`)
   that publishes results back to the saga with `createSagaPublisher`, closing the choreography.
-- A workflow observable as instances on the Sagas API at `:8092`.
+- A workflow observable as instances on the Sagas API.
 
 Checkout now survives restarts and records a durable cancellation when payment fails. The next
 chapter adds a verified webhook for outside providers.

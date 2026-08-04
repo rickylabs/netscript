@@ -54,8 +54,9 @@ deno install --global --allow-all --name netscript jsr:@netscript/cli{{ releaseS
 netscript --help
 ```
 
-`netscript --help` should list the command groups `init`, `contract`, `db`, `deploy`, `generate`,
-`marketplace`, `plugin`, `service`, `ui:add`, and `ui:init`. If `netscript` is not found, make sure
+`netscript --help` should list the command groups `agent`, `config`, `deploy`, `init`, `contract`,
+`db`, `generate`, `marketplace`, `plugin`, `service`, `ui:add`, `ui:init`, `ui:list`, `ui:update`,
+and `ui:remove`. If `netscript` is not found, make sure
 Deno's install directory (printed by `deno install`) is on your `PATH`, then open a fresh terminal.
 
 {{ comp callout { type: "tip", title: "Prefer not to install globally?" } }}
