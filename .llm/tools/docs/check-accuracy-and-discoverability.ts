@@ -175,6 +175,17 @@ export async function runAccuracyCheck(): Promise<void> {
 
   const checkedFreshRootImports = await checkFreshRootImports('docs');
 
+  // Run the exports & symbols drift check as part of the accuracy verification
+  const checkExportsCmd = new Deno.Command('deno', {
+    args: ['run', '--allow-all', '.llm/tools/docs/check-exports-drift.ts'],
+  });
+  const { code: driftCode, stderr: driftStderr, stdout: driftStdout } = await checkExportsCmd.output();
+  if (driftCode !== 0) {
+    console.error(new TextDecoder().decode(driftStdout));
+    console.error(new TextDecoder().decode(driftStderr));
+    throw new Error('Documentation exports/symbols drift check failed');
+  }
+
   console.log(
     `docs accuracy: PASS (${publicDocs.length} saga pages, storefront worker boundary, spawn contract, 8 preferred paths, ${requiredMutationFamilies.length} CLI mutation families, ${checkedFreshRootImports} valid @netscript/fresh root imports checked)`,
   );

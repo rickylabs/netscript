@@ -259,6 +259,8 @@ exposed by the root for narrow imports.
 | Export | Entrypoint | Purpose |
 | --- | --- | --- |
 | `@netscript/sdk` | `./mod.ts` | High-level composition preset (`defineServices`) plus all surfaces below. |
+| `@netscript/sdk/auto-update` | `./src/auto-update/mod.ts` | Auto-update client-side primitives. |
+| `@netscript/sdk/desktop` | `./src/desktop/mod.ts` | Native desktop capability helpers and bindings. |
 | `@netscript/sdk/client` | `./src/client/mod.ts` | `createServiceClient` and the contract algebra. |
 | `@netscript/sdk/query` | `./src/query/mod.ts` | Server-side cache-aware query factories. |
 | `@netscript/sdk/query-client` | `./src/query-client/mod.ts` | TanStack Query integration for browser/island code. |

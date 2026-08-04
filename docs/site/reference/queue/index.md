@@ -121,6 +121,10 @@ documented in the sections above.
 | `@netscript/queue/adapters/deno-kv` | `./adapters/deno-kv.adapter.ts` | Deno KV adapter. |
 | `@netscript/queue/adapters/redis` | `./adapters/redis.adapter.ts` | Redis adapter. |
 | `@netscript/queue/adapters/amqp` | `./adapters/amqp.adapter.ts` | RabbitMQ (AMQP) adapter. |
+| `@netscript/queue/adapters/postgres` | `./adapters/postgres.adapter.ts` | Postgres adapter. |
+| `@netscript/queue/adapters/kv-dead-letter-store` | `./adapters/kv-dead-letter-store.ts` | Deno KV dead-letter store. |
+| `@netscript/queue/adapters/postgres-dead-letter-store` | `./adapters/postgres-dead-letter-store.ts` | Postgres dead-letter store. |
+| `@netscript/queue/adapters/redis-dead-letter-store` | `./adapters/redis-dead-letter-store.ts` | Redis dead-letter store. |
 | `@netscript/queue/adapters/kv-polling` | `./adapters/kv-polling.adapter.ts` | KV-polling adapter for KV Connect. |
 
 ## Durable DLQ Inspection and Reprocessing
