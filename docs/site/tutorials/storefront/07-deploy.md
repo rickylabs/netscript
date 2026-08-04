@@ -109,7 +109,7 @@ graph a single run stands up for the storefront:
   { name: "OTLP collector", type: "http://localhost:4318", desc: "OpenTelemetry endpoint the dashboard runs; framework spans and structured logs land here automatically." },
   { name: "postgres", type: "Container", desc: "Provisioned via Docker. The database your products handlers and saga store target — reachable only while Aspire is up." },
   { name: "redis", type: "Container (cache)", desc: "Redis cache — the default `--cache-backend`; Redis-compatible. Backs KV/queue workloads for the runtime plugins." },
-  { name: "products (service)", type: ":3001 (pinned in chapter 1)", desc: "Your catalog service. OpenAPI at /api/products/* and RPC at /api/rpc/*." },
+  { name: "products (service)", type: ":3001 (pinned in chapter 1)", desc: "Your catalog service (note: this tutorial pins the port to 3001; in unpinned scaffolds, each project is allocated its own randomized high-range ports). OpenAPI at /api/products/* and RPC at /api/rpc/*." },
   { name: "sagas API", type: "allocated port", desc: "Lists sagas and instances — where you watched CheckoutSaga in chapter 4." },
   { name: "triggers API", type: "allocated port", desc: "The Hono webhook ingress from chapter 5 — /api/v1/webhooks/shipping/status." },
   { name: "workers API", type: "allocated port", desc: "Lists job executions — where the enqueued shipping and payment jobs run." },

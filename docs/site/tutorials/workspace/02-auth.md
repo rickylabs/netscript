@@ -32,7 +32,7 @@ you carry through every route.
 
 A working sign-in surface for `my-workspace/`: the `auth` plugin installed, the interactive
 `kv-oauth` backend selected, the `auth.prisma` migration applied, and the `auth-api` service answering
-on `:8094`. By the end you can hit `GET /api/v1/auth/session` and `GET /api/v1/auth/me` and watch the
+on `:8094` (note: this tutorial uses port 8094 for the auth-api; in unpinned scaffolds, each project is allocated its own randomized high-range ports). By the end you can hit `GET /api/v1/auth/session` and `GET /api/v1/auth/me` and watch the
 service correctly report "no session yet" before login — proof the backend is composed and the session
 endpoints are wired.
 

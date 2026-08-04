@@ -41,7 +41,7 @@ Be clear-eyed about what is happening: unlike <code>products</code>, there is no
 
 You should have finished [chapter 2](/tutorials/storefront/02-catalog-service/), so:
 
-- `my-shop/` has a working `products` service on `:3001` and a `contracts/versions/v1/` directory
+- `my-shop/` has a working `products` service on `:3001` (note: this tutorial pins the port to 3001; in unpinned scaffolds, each project is allocated its own randomized high-range ports) and a `contracts/versions/v1/` directory
   with `products.contract.ts` in it.
 - `aspire start` is up (the dashboard answers at [https://localhost:18888](https://localhost:18888)).
 

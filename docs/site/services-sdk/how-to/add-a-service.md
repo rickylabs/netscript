@@ -46,11 +46,11 @@ context step by step. Both stand up the same Hono + oRPC runtime and advertise t
     { name: "A NetScript workspace", type: "netscript init", desc: "An existing project on disk. If you do not have one, scaffold it first — see the tutorials. Run commands from the workspace root." },
     { name: "The netscript CLI", type: "on your PATH", desc: "Install globally with: deno install --global --allow-all --name netscript jsr:@netscript/cli" + releaseSpecifier + " — then confirm with netscript --help." },
     { name: "A contracts workspace", type: "contracts/", desc: "The init scaffold ships a shared contracts/ workspace exposed as the @<project>/contracts import alias. New services add their contract here so clients can import it." },
-    { name: "A free port", type: ":3001 by default", desc: "The example users service listens on :3001. Pick an unused port per service; it is read from the PORT env var with a literal fallback. Plugin API ports are already claimed (workers :8091, sagas :8092, triggers :8093, auth :8094)." }
+    { name: "A free port", type: "Randomized by default", desc: "Standalone services, plugin APIs, and apps are allocated stable high-range ports (>= 49152) at scaffold time to avoid collision. The exact ports are written to your appsettings.json." }
   ]
 }) }}
 
-This recipe adds a service named `users` on port `3001`, mirroring the example the
+This recipe adds a service named `users` on its assigned port, mirroring the example the
 scaffold ships, so every path and code shape below matches a real generated workspace.
 Substitute your own name and port where you see them.
 
@@ -60,7 +60,7 @@ The fastest path is to let the CLI scaffold a service workspace for you. If you 
 creating a brand-new project, pass the service flags straight to `netscript init`:
 
 ```bash
-netscript init my-app --db postgres --service --service-name users --service-port 3001 --yes
+netscript init my-app --db postgres --service --service-name users --yes
 ```
 
 `--db postgres` is the recommended default; swap it for `mysql`, `mssql`, or `sqlite` to scaffold a different Prisma-backed engine (`sqlite` is file-backed and runs without an Aspire container).
@@ -71,7 +71,7 @@ subcommand with the `--name` and `--port` flags (the `service` group also has `l
 
 ```bash
 # from the workspace root
-netscript service add --name users --port 3001
+netscript service add --name users
 ```
 
 Either path lays down a `services/users/` workspace member with this shape:
@@ -235,7 +235,7 @@ import { router } from './router.ts';
 await defineService(router, {
   name: 'users',
   version: '1.0.0',
-  port: parseInt(Deno.env.get('PORT') || '3001'),
+  port: parseInt(Deno.env.get('PORT') || '3001'), // note: your scaffold's port will differ
   openapi: { title: 'Users API', description: 'users service' },
   debug: true,
 });
@@ -264,7 +264,7 @@ builder. Each step returns the builder, so you compose only what you need before
   .withAuthn({ authenticator })
   .withAuthz({ authorizer })
   .withRPC();
-await app.serve({ port: 3001 });</code></pre>
+await app.serve({ port: 3001 }); // note: your scaffold's port will differ</code></pre>
 The authn/authz seam (<code>@netscript/service/auth</code>) is provider-agnostic — static-credential
 and trusted-header authenticators plus a scope authorizer ship built in. It is distinct from
 the auth <strong>plugin</strong> backends; see <a href="/capabilities/auth/">Authentication</a>.
@@ -280,15 +280,15 @@ the rest of your resources:
 deno task --cwd services/users dev
 ```
 
-You should see it bind on `:3001`. Confirm the runtime answers — the health route over
+You should see it bind on its assigned port. Confirm the runtime answers — the health route over
 HTTP, and the RPC surface that typed clients call:
 
 ```bash
-# OpenAPI / HTTP surface
-curl http://localhost:3001/api/v1/users/health
+# OpenAPI / HTTP surface (replace <port> with your assigned port)
+curl http://localhost:<port>/api/v1/users/health
 
-# RPC surface (what the generated typed client uses)
-curl -X POST http://localhost:3001/api/rpc/v1/users/list \
+# RPC surface (replace <port> with your assigned port, what the generated typed client uses)
+curl -X POST http://localhost:<port>/api/rpc/v1/users/list \
   -H 'content-type: application/json' -d '{"limit":10}'
 ```
 
@@ -298,10 +298,7 @@ and the seeded `items` array from `list`. A typed client imports `UsersContractV
 no drift.
 
 {{ comp callout { type: "warning", title: "Production pitfalls" } }}
-<strong>Port collisions.</strong> Every service needs a distinct port; the workers
-(<code>:8091</code>), sagas (<code>:8092</code>), triggers (<code>:8093</code>), and auth
-(<code>:8094</code>) plugins already claim theirs. Read the port from <code>PORT</code> and let
-Aspire assign it in orchestrated runs rather than hard-coding.<br>
+<strong>Port collisions.</strong> Every service needs a distinct port. The scaffolder automatically allocates unique, high-range ports (>= 49152) at scaffold time. Read the port from <code>PORT</code> and let Aspire resolve it dynamically in orchestrated runs rather than hard-coding.<br>
 <strong>RPC lives under <code>/api/rpc/*</code>.</strong> The typed-client surface is
 <code>/api/rpc/&lt;version&gt;/&lt;router&gt;/&lt;procedure&gt;</code>, not a bare <code>/rpc</code>.
 The REST/OpenAPI surface is <code>/api/*</code>. Point clients and smoke tests at the right one.<br>

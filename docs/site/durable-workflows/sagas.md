@@ -13,8 +13,8 @@ A saga is the answer to the question every retry loop dodges: *what happens betw
 step three and step four when the process dies?* In NetScript a saga is an explicit,
 message-driven state machine — you declare the state it carries, the messages it
 reacts to, and the effects each handler emits. It is authored with a single fluent
-builder, persisted to a durable store, and served by the **sagas plugin** on port
-`:8092`. The model is closer to Temporal than to a job queue, but it lives in plain
+builder, persisted to a durable store, and served by the **sagas plugin** on its
+assigned port. The model is closer to Temporal than to a job queue, but it lives in plain
 TypeScript inside your workspace — no separate cluster to operate.
 
 The stakes are easiest to see in the [storefront checkout saga](/tutorials/storefront/04-checkout-saga/):
@@ -24,7 +24,7 @@ moved; the code that knew why is gone. A saga makes that in-between state durabl
 reconstructing intent. And because the definition *is* data (typed state, enumerable handlers,
 enumerable compensations), the workflow is legible to more than the runtime: a coding agent asked to
 add a step can read the whole lifecycle from the builder chain, and verify the result against the
-`:8092` instances API instead of guessing.
+instances API (discover the port in your console output or Aspire dashboard) instead of guessing.
 
 {{ comp.diagram({
   src: "/assets/diagrams/saga-state-machine.svg",
@@ -81,7 +81,7 @@ process and how effect-based outcomes differ from a retry loop.
     { icon: "◆", title: "Fluent builder", body: "defineSaga(id).durability().state().on().compensate().build() — id, durability tier, typed state, message handlers, compensations, then build(). One chain, fully type-checked." },
     { icon: "▣", title: "Durable store backend", body: "Runtime state persists to kv or prisma, chosen by NETSCRIPT_SAGA_STORE / appsettings. createDurableSagaRuntime({ backend, prisma }) owns the resources." },
     { icon: "≋", title: "Effect-based outcomes", body: "Every handler returns an array of effects — sagaComplete, sagaFail, sagaCompensate, send, and schedule are named outcomes. spawn is exported only to fail immediately with SAGA_NOT_IMPLEMENTED." },
-    { icon: "⊡", title: "Served on :8092", body: "An oRPC API lists registered sagas, inspects running instances, publishes messages, and streams activity over SSE." },
+    { icon: "⊡", title: "Introspection endpoints", body: "An oRPC API (served on the plugin's assigned port) lists registered sagas, inspects running instances, publishes messages, and streams activity over SSE." },
     { icon: "⇄", title: "Cross-plugin choreography", body: "The workers create-user-settings job publishes UserSettingsCreated; this saga consumes it — one message crossing the plugin boundary, type-checked on both sides." },
     { icon: "◷", title: "Crash-survivable", body: "State checkpoints between messages, so an instance picks up exactly where it left off after a restart. That survival is the entire point of a saga." }
   ]
@@ -454,13 +454,13 @@ process is no longer enough; the KV path covers local and single-service apps.
 
 ## Endpoints and ports
 
-The sagas plugin runs an oRPC API service on `:8092`. It lists registered sagas and
+The sagas plugin runs an oRPC API service on its assigned port. It lists registered sagas and
 inspects running instances; the registry is backed by Deno KV. These are the routes
 the live scaffold serves — see {{ comp.xref({ key: "ref:sagas" }) }} for the full
 generated surface.
 
 {{ comp.apiTable({
-  caption: "Sagas plugin — runtime endpoints (port :8092)",
+  caption: "Sagas plugin — runtime endpoints (on its assigned port)",
   rows: [
     { name: "GET /health/live", type: "liveness", desc: "Liveness probe for the sagas API service." },
     { name: "GET /api/v1/sagas/sagas", type: "registry", desc: "List the saga definitions registered into KV (id, name, topic, handled message types, enabled)." },
@@ -479,8 +479,8 @@ it and emits `sagaComplete(...)`. One message crosses the plugin boundary, and b
 halves are type-checked against the same message type.
 
 After both plugins are running under Aspire, trigger the workers job
-(`POST :8091/api/v1/workers/jobs/create-user-settings/trigger`) and watch the saga
-appear at `GET :8092/api/v1/sagas/instances` — the message crossed the boundary and a
+(`POST /api/v1/workers/jobs/create-user-settings/trigger` on the workers API port) and watch the saga
+appear at `GET /api/v1/sagas/instances` (on the sagas API port) — the message crossed the boundary and a
 durable instance recorded its completion. Whether that durable instance lives in Deno
 KV or in your `saga_runtime_*` Postgres tables is exactly the `NETSCRIPT_SAGA_STORE`
 choice above.
@@ -554,7 +554,7 @@ so a saga is not a substitute for a database transaction within one handler.
 {{ comp.featureGrid({
   columns: 2,
   items: [
-    { icon: "≡", title: "Look up — sagas reference", body: "The full generated @netscript/plugin-sagas API: the defineSaga builder, durability tiers, createDurableSagaRuntime, the kv/prisma store backends, effect helpers, presets/middleware/transports seams, and every :8092 route.", href: "/reference/sagas/" },
+    { icon: "≡", title: "Look up — sagas reference", body: "The full generated @netscript/plugin-sagas API: the defineSaga builder, durability tiers, createDurableSagaRuntime, the kv/prisma store backends, effect helpers, presets/middleware/transports seams, and every API route.", href: "/reference/sagas/" },
     { icon: "✲", title: "Understand — the durability model", body: "Why a saga's state must outlive the process, how effect-based outcomes differ from a retry loop, and where the kv vs prisma backends fit.", href: "/explanation/durability-model/" },
     { icon: "◆", title: "Learn — Storefront checkout saga", body: "Build the order/checkout saga with a compensation branch as part of the storefront tutorial track.", href: "/tutorials/storefront/04-checkout-saga/" },
     { icon: "▣", title: "Look up — queue reference", body: "createParallelQueue, createQueue, providers, and connection options for the fan-out concurrency primitive.", href: "/reference/queue/" }

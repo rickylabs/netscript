@@ -134,10 +134,10 @@ plugin should pick the closest match:
 {{ comp.apiTable({
   caption: "provider.kind by archetype (from the official scaffold.plugin.json files)",
   rows: [
-    { name: "worker", type: "background-processor", desc: "Job handlers run by a worker processor. defaultEntrypoint bin/combined.ts, concurrencyEnvVar WORKER_CONCURRENCY (default 2) in current Aspire metadata; runtime entrypoints read WORKERS_CONCURRENCY, servicePort 8091." },
-    { name: "saga", type: "background-processor", desc: "Durable message-driven sagas. defaultPermissions ['--unstable-kv','--allow-all'], concurrencyEnvVar SAGA_CONCURRENCY, servicePort 8092." },
-    { name: "trigger", type: "ingress", desc: "Webhooks / schedules / file-watchers. defaultEntrypoint src/runtime/trigger-processor.ts, concurrencyEnvVar TRIGGER_CONCURRENCY (default 10), servicePort 8093." },
-    { name: "stream", type: "utility / plugin", desc: "Infra/utility plugin. requiresDb=false, requiresKv=false, portRangeKey PLUGIN_API, servicePort 4437." }
+    { name: "worker", type: "background-processor", desc: "Job handlers run by a worker processor. defaultEntrypoint bin/combined.ts, concurrencyEnvVar WORKER_CONCURRENCY (default 2) in current Aspire metadata; runtime entrypoints read WORKERS_CONCURRENCY, servicePort is dynamically assigned (allocated from the high-range 49152+ at scaffold time)." },
+    { name: "saga", type: "background-processor", desc: "Durable message-driven sagas. defaultPermissions ['--unstable-kv','--allow-all'], concurrencyEnvVar SAGA_CONCURRENCY, servicePort is dynamically assigned (allocated from the high-range 49152+ at scaffold time)." },
+    { name: "trigger", type: "ingress", desc: "Webhooks / schedules / file-watchers. defaultEntrypoint src/runtime/trigger-processor.ts, concurrencyEnvVar TRIGGER_CONCURRENCY (default 10), servicePort is dynamically assigned (allocated from the high-range 49152+ at scaffold time)." },
+    { name: "stream", type: "utility / plugin", desc: "Infra/utility plugin. requiresDb=false, requiresKv=false, portRangeKey PLUGIN_API (the manifest field contains servicePort 4437, but the installer allocates a randomized port from the portRangeKey range, >= 57344, at scaffold time)." }
   ]
 }) }}
 
@@ -159,10 +159,7 @@ A worker-archetype descriptor looks like this — copy the shape and change the 
 ] }) }}
 
 {{ comp callout { type: "warning", title: "Pick a free port" } }}
-The official plugins claim <code>:8091</code> (workers), <code>:8092</code> (sagas),
-<code>:8093</code> (triggers), <code>:8094</code> (<strong>auth</strong>), and <code>:4437</code>
-(streams). Choose a <strong>different</strong> port for your custom plugin's service (for example
-<code>:8095</code>) so it does not collide in the Aspire graph.
+The framework allocates stable, high-range ports (>= 49152) for official and custom plugins at scaffold time. Ensure your custom plugin specifies a unique port if configuring one manually, or let the scaffolder allocate one automatically to avoid collision in the Aspire graph.
 {{ /comp }}
 
 ## Step 3 — Export the manifest from `mod.ts`
@@ -228,7 +225,7 @@ API the official workers plugin uses — drop the file in `plugins/notifier/jobs
   {
     label: "Stream producer (real runtime)",
     lang: "ts",
-    code: "import { createDurableStream, defineStreamSchema } from '@netscript/plugin-streams-core';\n\n// The producer runtime is REAL. createDurableStream serves a durable\n// stream (an Aspire service on :4437) you can upsert/delete/flush against.\nconst schema = defineStreamSchema({ /* topic entity schema */ });\nconst producer = createDurableStream({\n  streamPath: '/notifier/events',\n  schema,\n  producerId: 'notifier-service',\n});\nproducer.upsert('event', { id: 'evt-1', status: 'sent' });"
+    code: "import { createDurableStream, defineStreamSchema } from '@netscript/plugin-streams-core';\n\n// The producer runtime is REAL. createDurableStream serves a durable\n// stream (an Aspire service on its assigned port) you can upsert/delete/flush against.\nconst schema = defineStreamSchema({ /* topic entity schema */ });\nconst producer = createDurableStream({\n  streamPath: '/notifier/events',\n  schema,\n  producerId: 'notifier-service',\n});\nproducer.upsert('event', { id: 'evt-1', status: 'sent' });"
   }
 ] }) }}
 
@@ -243,7 +240,7 @@ client) POST to that plain URL; the supported action is <code>enqueueJob</code> 
 deferred replay). <strong>Streams</strong> are
 split: the <strong>producer runtime is real</strong> via
 <code>@netscript/plugin-streams-core</code>'s <code>createDurableStream</code> (served as an Aspire
-service on <code>:4437</code> and used by the workers, auth, and sagas plugins). Only the
+service on its assigned port and used by the workers, auth, and sagas plugins). Only the
 <code>@netscript/plugin-streams</code> manifest helpers
 (<code>defineStreamProducer</code> / <code>defineStreamConsumer</code>) are unsupported — they
 <strong>fail loud</strong>, throwing <code>StreamUnsupportedOperationError</code>, and redirect you
@@ -364,9 +361,7 @@ is almost always the cause. DB-backed plugins also need it up before <code>netsc
 <li><strong>Stale registry</strong> — the runtime reads a generated registry, not your source tree.
 Forgetting <code>netscript generate</code> after adding a contribution is the most common "my job
 isn't registered" bug. Regenerate, then restart Aspire.</li>
-<li><strong>Port collision</strong> — do not reuse <code>:8091</code>/<code>:8092</code>/<code>:8093</code>/<code>:8094</code>/<code>:4437</code>.
-Set a free <code>servicePort</code> in both <code>scaffold.plugin.json</code> and
-<code>mod.ts</code>.</li>
+<li><strong>Port collision</strong> — do not reuse ports that have already been allocated. The framework allocates high-range ports (>= 49152) per project at scaffold time; check your <code>appsettings.json</code> or the Aspire dashboard to verify active ports.</li>
 <li><strong>Wrong canonical directory</strong> — author in <code>plugins/&lt;name&gt;/</code>, the
 directory <code>netscript.config.ts</code> references. Edits to a top-level staging copy are not the
 source of truth.</li>

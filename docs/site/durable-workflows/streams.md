@@ -15,8 +15,8 @@ materialize the latest value per key. {{ comp.badge({ status: "alpha" }) }}
 
 {{ comp.diagram({
   src: "/assets/diagrams/streams-pipeline.svg",
-  alt: "A producer defines a typed stream schema and writes upsert/delete operations into the durable-stream server on port 4437; the durable log fans out over HTTP/SSE to Fresh consumers that materialize the latest value per key.",
-  caption: "Streams pipeline: producer (defineStreamSchema + createDurableStream) → durable log on :4437 → HTTP/SSE → Fresh consumers (latest value per key)."
+  alt: "A producer defines a typed stream schema and writes upsert/delete operations into the durable-stream server on its assigned port; the durable log fans out over HTTP/SSE to Fresh consumers that materialize the latest value per key.",
+  caption: "Streams pipeline: producer (defineStreamSchema + createDurableStream) → durable log on its assigned port → HTTP/SSE → Fresh consumers (latest value per key)."
 }) }}
 
 NetScript's streams capability is the typed, change-data backbone the other
@@ -25,7 +25,7 @@ state through it. The producer half is implemented: you define a
 typed stream schema with [`defineStreamSchema`](/reference/streams/), open a
 producer with `createDurableStream` (or the Service-facing
 `createServiceStreamProducer`), and `upsert`/`delete`/`flush` entity state
-over a durable-stream server that runs as an Aspire resource on port **:4437**.
+over a durable-stream server that runs as an Aspire resource on its assigned port.
 
 The producer runtime in `@netscript/plugin-streams-core` writes through
 `@durable-streams/client` with idempotent delivery. The topic-centric
@@ -41,7 +41,7 @@ against the core producer package, not the manifest helpers.
 {{ comp callout { type: "important", title: "Status — producers write via the core package; manifest helpers fail loud" } }}
 The producer is implemented: <code>createDurableStream(...)</code> from
 <code>@netscript/plugin-streams-core</code> writes <code>upsert</code>/<code>delete</code>/<code>flush</code>
-through <code>@durable-streams/client</code> to the <code>:4437</code> Aspire service, and workers,
+through <code>@durable-streams/client</code> to the streams Aspire service (on its assigned port), and workers,
 sagas, and auth already mirror their state through it. What is <strong>not</strong> supported: the
 manifest helpers <code>defineStreamProducer</code>/<code>defineStreamConsumer</code> in
 <code>@netscript/plugin-streams</code> fail loud — a producer's <code>publish()</code> returns a
@@ -107,8 +107,7 @@ report, which is as useful to a CLI doctor or a coding agent as it is to a test.
 ## Minimal example — produce, then consume
 
 The producer side is two calls: freeze a typed schema, open a stream, write
-entity state. The consumer side is an HTTP/SSE read of the same `:4437` stream
-path — there is no in-process `subscribe()` handle, so a Fresh island (or any
+entity state. The consumer side is an HTTP/SSE read of the same stream path — there is no in-process `subscribe()` handle, so a Fresh island (or any
 SSE client) reads the durable log directly and materializes the latest value per
 key. This is deliberate: exposing one HTTP/SSE surface instead of an in-process
 `subscribe()` means a browser island and a server-side consumer read the durable
@@ -124,12 +123,12 @@ subscription API to keep in sync.
   {
     label: "Open a producer & write (real)",
     lang: "ts",
-    code: "// streams/producer.ts\nimport { createDurableStream } from '@netscript/plugin-streams-core';\nimport { executionsSchema } from './executions-schema.ts';\n\n// createDurableStream returns a singleton producer per streamPath and begins\n// connecting to the :4437 durable-stream server immediately.\nconst producer = createDurableStream({\n  streamPath: '/workers/executions',\n  schema: executionsSchema,\n  producerId: 'workers-service',\n});\n\n// upsert/delete are synchronous enqueues keyed by the collection primary key.\nproducer.upsert('execution', {\n  id: 'exec-1',\n  status: 'running',\n  updatedAt: new Date().toISOString(),\n});\nproducer.delete('execution', 'exec-0');\n\n// flush before graceful shutdown; it rethrows the connect error if the\n// producer never connected (see known limitations).\nawait producer.flush();"
+    code: "// streams/producer.ts\nimport { createDurableStream } from '@netscript/plugin-streams-core';\nimport { executionsSchema } from './executions-schema.ts';\n\n// createDurableStream returns a singleton producer per streamPath and begins\n// connecting to the durable-stream server immediately.\nconst producer = createDurableStream({\n  streamPath: '/workers/executions',\n  schema: executionsSchema,\n  producerId: 'workers-service',\n});\n\n// upsert/delete are synchronous enqueues keyed by the collection primary key.\nproducer.upsert('execution', {\n  id: 'exec-1',\n  status: 'running',\n  updatedAt: new Date().toISOString(),\n});\nproducer.delete('execution', 'exec-0');\n\n// flush before graceful shutdown; it rethrows the connect error if the\n// producer never connected (see known limitations).\nawait producer.flush();"
   },
   {
     label: "Consume over HTTP/SSE (Fresh client)",
     lang: "ts",
-    code: "// islands/ExecutionsView.tsx — read the durable log directly\nimport { getStreamsUrl } from '@netscript/plugin-streams-core';\n\n// There is no in-process subscribe(); consumption is an HTTP/SSE read of the\n// same stream path the producer writes to. getStreamsUrl resolves the :4437\n// base from Aspire discovery / VITE env (see runtime resolvers below).\nconst base = getStreamsUrl();\nconst source = new EventSource(`${base}/workers/executions`);\n\nconst latest = new Map<string, unknown>(); // materialize latest value per key\nsource.onmessage = (ev) => {\n  const change = JSON.parse(ev.data) as { key: string; value?: unknown };\n  if (change.value === undefined) latest.delete(change.key);\n  else latest.set(change.key, change.value);\n};"
+    code: "// islands/ExecutionsView.tsx — read the durable log directly\nimport { getStreamsUrl } from '@netscript/plugin-streams-core';\n\n// There is no in-process subscribe(); consumption is an HTTP/SSE read of the\n// same stream path the producer writes to. getStreamsUrl resolves the stream service\n// base from Aspire discovery / VITE env (see runtime resolvers below).\nconst base = getStreamsUrl();\nconst source = new EventSource(`${base}/workers/executions`);\n\nconst latest = new Map<string, unknown>(); // materialize latest value per key\nsource.onmessage = (ev) => {\n  const change = JSON.parse(ev.data) as { key: string; value?: unknown };\n  if (change.value === undefined) latest.delete(change.key);\n  else latest.set(change.key, change.value);\n};"
   },
   {
     label: "Manifest helpers (fail loud)",
@@ -278,7 +277,7 @@ diagnostic report for a schema (handy in tests and CLI doctors).
 {{ comp.apiTable({
   caption: "Environment variables read by the resolvers",
   rows: [
-    { name: "DURABLE_STREAMS_URL", type: "server override", desc: "Explicit base URL; takes precedence over Aspire discovery (e.g. http://localhost:4437)." },
+    { name: "DURABLE_STREAMS_URL", type: "server override", desc: "Explicit base URL; takes precedence over Aspire discovery (e.g. your custom stream server URL)." },
     { name: "services__streams__http__0", type: "Aspire (server)", desc: "Injected by the Aspire resource graph; the default server-side discovery path." },
     { name: "VITE_services__streams__http__0", type: "browser", desc: "Vite-injected reference for browser/Fresh consumers; VITE_STREAMS_URL is the convenience shorthand." },
     { name: "STREAMS_SECRET / DURABLE_STREAMS_SECRET", type: "auth", desc: "Bearer secret for getStreamsAuth(); when set, every connect sends Authorization: Bearer <secret>." }
@@ -304,19 +303,19 @@ Be deliberate about what the alpha producer does and does not guarantee.
 <!-- caveat: arch-debt:streams-manifest-helpers-unsupported -->
 
 {{ comp callout { type: "warning", title: "Writes are dropped after a connect failure (no reconnect)" } }}
-If the producer cannot reach the <code>:4437</code> durable-stream server at startup, it logs a
+If the producer cannot reach the durable-stream server (on its assigned port) at startup, it logs a
 <code>console.warn</code> and then <strong>silently skips every subsequent <code>upsert</code>/<code>delete</code></strong>
 — there is no reconnect loop in the current alpha. <code>flush()</code> rethrows that connect error so a
 graceful shutdown surfaces the failure. (Writes issued <em>before</em> the connection completes are
 buffered and drained once it opens; the drop only applies after a connect <em>error</em>.) Treat a healthy
-<code>:4437</code> service as a hard precondition for durable delivery; do not assume buffered writes will
+streams service as a hard precondition for durable delivery; do not assume buffered writes will
 be replayed once the server returns.
 {{ /comp }}
 
 {{ comp callout { type: "note", title: "No in-process consumer — read over HTTP/SSE" } }}
 There is no in-process <code>subscribe()</code> handle. Consumption happens over the durable-stream
 server's HTTP/SSE protocol, which Fresh clients read to materialize the latest value per key. Model your
-read side as an HTTP/SSE consumer of the <code>:4437</code> stream, not as an in-process callback.
+read side as an HTTP/SSE consumer of the stream, not as an in-process callback.
 {{ /comp }}
 
 {{ comp callout { type: "warning", title: "Local HTTP can limit concurrent stream consumers" } }}
@@ -337,7 +336,7 @@ dropped writes.
 
 The streams plugin is registered as a utility/infra plugin — note it requires
 **neither a database nor KV** (`requiresDb=false`, `requiresKv=false`), unlike
-workers, sagas, and triggers. Its durable-stream service listens on `:4437` and
+workers, sagas, and triggers. Its durable-stream service listens on its assigned port and
 is wired into the Aspire resource graph so workers, sagas, and auth can publish
 through it. The port is overridable via `STREAMS_PORT` or `PORT`.
 
@@ -349,18 +348,18 @@ through it. The port is overridable via `STREAMS_PORT` or `PORT`.
     ["Producer package", "<code>@netscript/plugin-streams-core</code> (<code>createDurableStream</code>, <code>createServiceStreamProducer</code>, <code>defineStreamSchema</code>)"],
     ["Manifest import", "<code>@netscript/plugin-streams</code> — topic helpers <strong>throw</strong> <code>StreamUnsupportedOperationError</code>"],
     ["Transport client", "<code>@durable-streams/client</code> (<code>IdempotentProducer</code>)"],
-    ["Dev service port", "<code>:4437</code> (durable-stream Aspire service; override with <code>STREAMS_PORT</code>/<code>PORT</code>)"],
+    ["Dev service port", "its assigned port (durable-stream Aspire service; override with <code>STREAMS_PORT</code>/<code>PORT</code>)"],
     ["provider.kind", "<code>stream</code> · category <code>plugin</code> · pluginType <code>utility</code>"],
     ["Requires DB / KV", "<code>false</code> / <code>false</code>"],
     ["First-party producers", "workers, sagas, triggers, auth (each <code>streams/producer.ts</code> → <code>createDurableStream</code>)"],
-    ["Consumer surface", "HTTP/SSE from the <code>:4437</code> server (Fresh clients) — <strong>no</strong> in-process <code>subscribe()</code>"]
+    ["Consumer surface", "HTTP/SSE from the server (Fresh clients) — <strong>no</strong> in-process <code>subscribe()</code>"]
   ]
 }) }}
 
 The plugin is referenced from `netscript.config.ts` as
 `./plugins/streams/mod.ts`. Because workers, sagas, and triggers each list
 `streams` in their `dependencies`, it is installed first in the dependency graph
-and its `:4437` service comes up so dependent producers have somewhere to write.
+and its service comes up so dependent producers have somewhere to write.
 
 ## Production notes
 
@@ -372,14 +371,14 @@ and its `:4437` service comes up so dependent producers have somewhere to write.
 <code>defineStreamProducer</code>/<code>defineStreamConsumer</code> helpers in
 <code>@netscript/plugin-streams</code> fail loud with
 <code>StreamUnsupportedOperationError</code>.</li>
-<li><strong>A healthy <code>:4437</code> server is a hard precondition.</strong> A startup connect
+<li><strong>A healthy streams server is a hard precondition.</strong> A startup connect
 failure drops every later write with no reconnect — bring Aspire (or an explicit
 <code>DURABLE_STREAMS_URL</code>) up first, and treat a <code>flush()</code> rejection on shutdown as a
 real delivery failure, not noise.</li>
 <li><strong>Keep <code>producerId</code> stable across restarts.</strong> Idempotent delivery is keyed
 by it; a churning id defeats the duplicate-safety guarantee.</li>
 <li><strong>Model the read side as HTTP/SSE.</strong> There is no in-process <code>subscribe()</code>;
-resolve the base with <code>getStreamsUrl()</code> and consume the <code>:4437</code> stream path
+resolve the base with <code>getStreamsUrl()</code> and consume the stream path
 directly.</li>
 <li><strong>Set the auth secret on both ends.</strong> When the server expects a bearer token, export
 <code>STREAMS_SECRET</code> (or <code>DURABLE_STREAMS_SECRET</code>) wherever the producer runs so
@@ -393,7 +392,7 @@ Convex is the reference point for live client state: sync there is a property of
 database — client queries are reactive subscriptions, and the platform re-runs them when the
 underlying data changes. A NetScript stream scopes the same promise differently: sync is a property
 of a **declared contract**, not of the database. You freeze a schema of collections, a producer
-writes latest-state per key to the `:4437` durable-stream service in your own Aspire graph, and any
+writes latest-state per key to the durable-stream service in your own Aspire graph, and any
 HTTP/SSE consumer materializes that view — independent of which store actually holds your data
 (the plugin itself requires neither a database nor KV). The practical consequence: you choose
 per-collection what becomes live state, and everything outside that schema stays on the

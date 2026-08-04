@@ -21,10 +21,10 @@ running system instead of treating it as a black box.
 Picture what "run my app locally" really means for a multi-plugin NetScript project. It is not a
 single server. It is a small fleet:
 
-- An example oRPC **service** (`defineService`) at `:3001`.
+- An example oRPC **service** (`defineService`) on its assigned port.
 - A **Fresh** dashboard app.
-- Each runtime plugin's **HTTP API** — `workers-api` (`:8091`), `sagas-api` (`:8092`),
-  `triggers-api` (`:8093`), `auth-api` (`:8094`), the durable-`streams` runtime (`:4437`).
+- Each runtime plugin's **HTTP API** — `workers-api`, `sagas-api`,
+  `triggers-api`, `auth-api` (on their assigned high-range ports), the durable-`streams` runtime (on its assigned port).
 - Each plugin's **isolated background processors** — the workers and sagas runners, the triggers
   processor — running as separate executables, not threads inside the API.
 - The **infrastructure** all of those depend on: a database — Postgres (the recommended engine; or `mysql` /
@@ -293,17 +293,17 @@ is exactly why there is no service-registry client in your handler code.
    ┌─────────────────────────────┼─────────────────────────────────────┐
    ▼                             ▼                                       ▼
 (1) dashboard OTLP        (2) infrastructure                   (4) services
-    :18888 + :4318            ├─ postgres  (Container)              └─ users  :3001
+    :18888 + :4318            ├─ postgres  (Container)           └─ users (service)
                               └─ redis     (Container, cache)
                                  │
                                  ▼  pass 2: resolve references → inject env
-   ┌──────────────────────────────────────────────────────────────────────────────┐
-   │ (5) plugin APIs  workers-api :8091  sagas-api :8092  triggers-api :8093          │
-   │     auth-api :8094   streams :4437                                              │
-   │ (6) background processors: workers, sagas (bin/combined.ts);                     │
-   │     triggers (src/runtime/trigger-processor.ts)                                 │
-   │ (7) apps:  dashboard (Fresh)        (8) tools                                   │
-   └──────────────────────────────────────────────────────────────────────────────┘
+    ┌──────────────────────────────────────────────────────────────────────────────┐
+    │ (5) plugin APIs  workers-api        sagas-api        triggers-api               │
+    │     auth-api         streams (port)                                             │
+    │ (6) background processors: workers, sagas (bin/combined.ts);                    │
+    │     triggers (src/runtime/trigger-processor.ts)                                 │
+    │ (7) apps:  dashboard (Fresh)        (8) tools                                   │
+    └──────────────────────────────────────────────────────────────────────────────┘
 ```
 
 The order is not arbitrary. Infrastructure comes up first because everything else depends on it;
@@ -317,12 +317,12 @@ treat that as canonical and this essay as the orientation.
     { name: "aspire (dashboard)", type: "https://localhost:18888", desc: "The Aspire dashboard. `aspire start` prints a login token. Live resource list, logs, structured traces, and the OTLP collector (:4318) surface here." },
     { name: "postgres", type: "Container", desc: "Provisioned via Docker. The recommended engine is Postgres (swap to `mysql` / `mssql` — also Containers — or file-backed `sqlite`, which has no container, via `--db`), persistent (DataPath .data/postgres). The database that `netscript db` commands target — reachable only once Aspire is up." },
     { name: "redis", type: "Container (cache)", desc: "Redis cache — the default `--cache-backend`; Redis-compatible. Backs KV/queue workloads for the runtime plugins. Swap to `garnet` (also a Container) or app-level `deno-kv` via `--cache-backend`." },
-    { name: "users", type: ":3001", desc: "Example oRPC service (defineService). Routes /api/v1/users/* and the RPC surface at /api/rpc/*." },
-    { name: "workers-api", type: ":8091", desc: "Workers plugin API. /api/v1/workers/{jobs,executions,tasks,seed}; trigger via POST /api/v1/workers/jobs/{id}/trigger." },
-    { name: "sagas-api", type: ":8092", desc: "Sagas plugin API. /api/v1/sagas/{sagas,instances,publish} plus liveness at /health/live." },
-    { name: "triggers-api", type: ":8093", desc: "Triggers plugin API (raw Hono, not oRPC). POST /api/v1/webhooks/inbound/generic, GET /api/v1/events." },
-    { name: "auth-api", type: ":8094", desc: "Auth plugin oRPC service. /api/v1/auth/{signin,callback,signout,session,me} with one active backend (NETSCRIPT_AUTH_BACKEND)." },
-    { name: "streams", type: ":4437", desc: "Durable-streams producer runtime. Served as its own Aspire Deno service; workers/auth/sagas mirror execution state into it." },
+    { name: "users", type: "assigned port", desc: "Example oRPC service (defineService). Routes /api/v1/users/* and the RPC surface at /api/rpc/*." },
+    { name: "workers-api", type: "assigned port", desc: "Workers plugin API. /api/v1/workers/{jobs,executions,tasks,seed}; trigger via POST /api/v1/workers/jobs/{id}/trigger." },
+    { name: "sagas-api", type: "assigned port", desc: "Sagas plugin API. /api/v1/sagas/{sagas,instances,publish} plus liveness at /health/live." },
+    { name: "triggers-api", type: "assigned port", desc: "Triggers plugin API (raw Hono, not oRPC). POST /api/v1/webhooks/inbound/generic, GET /api/v1/events." },
+    { name: "auth-api", type: "assigned port", desc: "Auth plugin oRPC service. /api/v1/auth/{signin,callback,signout,session,me} with one active backend (NETSCRIPT_AUTH_BACKEND)." },
+    { name: "streams", type: "assigned port", desc: "Durable-streams producer runtime. Served as its own Aspire Deno service; workers/auth/sagas mirror execution state into it." },
     { name: "workers / sagas / triggers", type: "background processors", desc: "Separate from the APIs: workers and sagas run from bin/combined.ts; triggers from src/runtime/trigger-processor.ts. Declared under appsettings BackgroundProcessors." }
   ]
 }) }}
@@ -432,7 +432,7 @@ There are two ways to do that, and both flip the listener banner from `http` to 
   {
     label: "Inline TLS on serve()",
     lang: "ts",
-    code: "// Pass cert/key PEM material as ServeOptions.tls. Deno then negotiates HTTP/2\n// over ALPN for clients that support it (HTTP/1.1 stays available as fallback).\nimport { createService } from '@netscript/service';\nimport type { ServiceTlsOptions } from '@netscript/service';\n\nconst tls: ServiceTlsOptions = {\n  cert: await Deno.readTextFile('cert.pem'), // PEM certificate chain\n  key: await Deno.readTextFile('key.pem'),   // PEM private key\n};\n\nawait createService(router, { name: 'users' })\n  .withHealth()\n  .serve({ port: 3001, tls }); // banner now reports https://…"
+    code: "// Pass cert/key PEM material as ServeOptions.tls. Deno then negotiates HTTP/2\n// over ALPN for clients that support it (HTTP/1.1 stays available as fallback).\nimport { createService } from '@netscript/service';\nimport type { ServiceTlsOptions } from '@netscript/service';\n\nconst tls: ServiceTlsOptions = {\n  cert: await Deno.readTextFile('cert.pem'), // PEM certificate chain\n  key: await Deno.readTextFile('key.pem'),   // PEM private key\n};\n\nawait createService(router, { name: 'users' })\n  .withHealth()\n  .serve({ port: 3001, tls }); // note: your scaffold's port will differ"
   },
   {
     label: "Env pair (no code change)",
@@ -465,7 +465,7 @@ connection strings.
   {
     label: "Default — with Aspire",
     lang: "bash",
-    code: "netscript init my-app --db postgres --service --service-name users --service-port 3001 --yes\n\n# Step 2: orchestration brings up Postgres + Redis + every process.\ncd aspire && aspire restore   # once\naspire start                    # dashboard at https://localhost:18888\n\n# Step 3: database commands now work (provisioned through Aspire).\nnetscript db init --name init"
+    code: "netscript init my-app --db postgres --service --service-name users --yes\n\n# Step 2: orchestration brings up Postgres + Redis + every process.\ncd aspire && aspire restore   # once\naspire start                    # dashboard at https://localhost:18888\n\n# Step 3: database commands now work (provisioned through Aspire).\nnetscript db init --name init"
   },
   {
     label: "Escape hatch — --no-aspire",
