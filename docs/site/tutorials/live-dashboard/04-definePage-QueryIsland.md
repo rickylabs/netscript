@@ -232,7 +232,7 @@ The layer config carries a lot: a <code>loader</code> (cache-first server read),
 {{ /comp }}
 
 {{ comp callout { type: "tip", title: "Deferred-loader composition" } }}
-Returning a promise like <code>statsPromise</code> allows the page's shell to paint instantly. The stats section remains suspended with a placeholder until the promise resolves, at which point the partial streams the completed block to the browser.
+Returning a promise like <code>statsPromise</code> lets the page's shell paint without waiting for stats. The stats region shows its fallback until the promise resolves. In the current non-streaming Fresh runtime, <code>Deferred</code> behaves as a Suspense-ready boundary; it becomes fully progressive — streaming the resolved block into the response — only once streaming delivery lands in Fresh.
 {{ /comp }}
 
 ## Step 4 — Hydrate the QueryIsland client-side
@@ -299,11 +299,12 @@ export default function OrdersQueryIsland(props) {
 }
 ```
 
-The key moves:
-
-- **`dehydrateQueryClient` / `hydrateFromDehydrated`** pass query state seamlessly from server to browser, warming the cache before first render.
-- **`initialData`** seeds `useQuery` from the hydrated cache, ensuring instant first paint.
-- **`clientKey(input)`** allows `useMutation` to target cache slots predictably.
+One constraint makes this work: the hydrated entries land in the island's shared QueryClient under
+the exact query keys the server used, so `useQuery` only benefits if `queryOptions(props.input)`
+produces the same key the server prefetched. `initialData` itself comes from the explicit
+`initialOrders` prop — it is the belt to hydration's suspenders, covering the case where the
+dehydrated payload is absent. `clientKey(input)` is that same stable key, which is why the
+mutation's optimistic writes land on exactly the rows the query is showing.
 
 ## Step 5 — Render the Deferred stats layer
 
@@ -319,8 +320,8 @@ interface StatsProps {
 
 export default function StatsLayer(props: StatsProps) {
   return (
-    <Deferred 
-      promise={props.statsPromise} 
+    <Deferred
+      promise={props.statsPromise}
       fallback={<div class="ns-skeleton">Loading statistics...</div>}
     >
       {(data) => (
