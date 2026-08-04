@@ -451,3 +451,29 @@ documentation.
   that is at parity with a broken gate.
 - **Evidence:** `pg-retry.log` (branch, isolated), `pg-baseline.log` (merge-base), both retained;
   `.llm/tmp/e2e-report-postgres-retry.json` and the baseline report.
+
+## 2026-08-04 — D-17 (correction) D-16's conclusion was narrower than stated
+
+- **What:** D-16 concluded "the postgres merge-bar failure is **pre-existing on `main`**". That
+  overstates the evidence. Owner correction: the host is an end-of-day WSL workstation with dangling
+  postgres/docker resources and several concurrent e2e worktrees.
+- **What the baseline comparison actually establishes:** it controlled for **one** variable — the
+  branch changes — by running the identical suite at `c6f243da` and at branch HEAD **on the same
+  host**. That supports **"not a regression from #1220"** and nothing more. A stale container, a
+  leftover bind mount, or accumulated host clutter would poison both runs identically, so the
+  comparison **cannot** separate "defect in `main`" from "fault on this machine".
+- **Supporting detail already in this run's own evidence:** `leak-report.md` recorded a **stale
+  `postgres-*` container ~4h old** owned by a different worktree, plus foreign apphosts — exactly
+  the state that survives an `--isolated` start.
+- **Source of truth:** **cloud CI**, not this workstation. PR #1220 is marked ready for review, so
+  `scaffold-runtime` runs on a clean GitHub runner.
+  - passes on cloud → local environment clutter; the postgres half of #1259 is withdrawn and the
+    issue narrows to the sqlite/libSQL failure (which reproduces independently).
+  - fails on cloud → stale cache or a true gate defect, investigated with cloud logs as evidence.
+- **Severity:** significant — it corrects a claim I published on a `priority:p1` issue and in the PR
+  summary.
+- **Action:** correction posted to #1259; the p1 label and the "merge gate broken for everyone"
+  framing are marked **provisional** pending the cloud run. D-16's narrow finding (**not a
+  regression from this branch**) stands unchanged.
+- **Lesson:** a controlled comparison is only controlled for the variable it varies. Same-host A/B
+  rules out the code delta; it does not rule out the host.
