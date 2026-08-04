@@ -10,8 +10,8 @@ Gate every issue GitHub will close—including Development-sidebar and commit-me
 ## Slices
 
 - [x] S0 Issue-first research and draft surface — `cce241f60`
-- [x] S1 Authoritative closing-reference discovery and provenance — pending implementation commit
-- [x] S2 Negative/compatibility regressions and ready handoff — pending implementation commit
+- [x] S1 Authoritative closing-reference discovery and provenance — `6b8706f3e`
+- [x] S2 Negative/compatibility regressions and ready handoff — `6b8706f3e`
 
 ## Validation
 
