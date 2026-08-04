@@ -514,3 +514,176 @@ was deliberately left.
 The G1 fixes were prose-only, so no previously-checked NetScript example changed; the D3/D5 example
 fixtures from the first round remain valid. Scratch fixtures deleted; nothing added under
 `packages/`.
+
+## Batch 4 (D2+D8+D9)
+
+Final phase-3 batch. Three slices, three commits, pushed to `docs/web-layer-deep-dives`.
+
+| Slice | Commit | Touches |
+|---|---|---|
+| D2 — layers, layout, slots | `929372637` | **new** `web-layer/layers.md`; `builders.md`, `index.md`, `live-dashboard/04` |
+| D8 — response shaping | `d140195e3` | **new** `web-layer/response.md`; `builders.md`, `index.md`, `layers.md` |
+| D9 — the app seam | `927ca34aa` | `web-layer/server.md` (deepened); `live-dashboard/01` |
+
+Per the S1 inventory verdicts: D2 and D8 are net-new content carved out of `builders.md` (which keeps
+its chain overview and gains two pointers), D9 is a deepening of `server.md` in place. Sidebar order
+16 and 17, continuing the 13/14/15 deep-dive block.
+
+### What each page carries that nothing else did
+
+**D2 — `/web-layer/layers/`.** The thesis is the resource/layer split: resources are a sequential
+`for…of`, layers are a `Promise.all`. Everything else follows from that one contrast — layers cannot
+read each other (`ctx.layerData` is `{}` for the whole of a layer loader), a page costs its slowest
+region rather than the sum, and shared values belong in the resource store. Then the loader return
+contract (`TProps | CacheEntryLike<TProps> | null | undefined`), the automatic cache-entry unwrap, the
+12-field layer config table, slot placement, `slots.<id>.data`, the four layer hooks, and
+`InferDefinePageLayerLoaderProps` including its cache-entry-aware inference. Deferred-region config
+(`partial`, `staleTime`, `staleReloadMode`, `policy`, `params`) is named and delegated to
+`partials.md#deferred-loader-composition-…` and `defer-streaming-ui.md` rather than restated.
+
+**D8 — `/web-layer/response/`.** Framed as *what `build()` synthesises*, not as five method
+descriptions: three page shapes (no handler / a `ctx.render()` GET / a streaming GET), the three
+verbatim guard errors, and the trap that `withForm` appends a CSRF header resolver — so every form
+page has a synthesised GET requiring `ctx.render()`, and adding `withHandler('GET')` to one reports a
+`withHeader()` conflict for a method the author never called. Plus `withMeta` as a post-layer resolver
+with its 7-field descriptor, the three `withHeader` overloads and their per-name merge order,
+`withStatus` being per-page rather than per-request, `withPolicy` as a layer-overridable default, and
+the three `build()` shapes.
+
+**D9 — `/web-layer/server/`.** The bootstrap becomes an order rather than an option list:
+app → `preConfigure` → static files → middleware → `configure` → fs routes, with all ten options
+tabulated and both reserved ones (`telemetry`, `name`) marked. Three facts that were documented
+nowhere: `configure` is *not* last (fs routes come after it), `app.fsRoutes()` inserts what the Fresh
+**builder** collected — so islands/route discovery is `vite.config.ts`, not `main.ts` — and the
+`@app/utils.ts` re-export is what binds `State` to every page. The `@netscript/sdk/cache` side effect
+is referenced to `query-bridge.md#the-import-that-makes-any-of-this-work`, not restated.
+
+### Bare-Fresh contrasts
+
+All three are type-checked, and all three credit Fresh with what Fresh actually does — the batch-2/3
+audit failure mode.
+
+- **D2**: `define.handlers` with a `Promise.all`, `define.page` composing three regions. The prose
+  states outright that `Promise.all` is the right tool and that nothing in the snippet is wrong; the
+  costs claimed are the ones that appear as the page grows — no per-region identity to hang a
+  fallback/stale window/refresh URL on, a three-file edit to add a region, concurrency as manual
+  bookkeeping with no per-region spans to check it, and one slow region gating the paint. It also
+  states that `routes/_layout.tsx` receives a single `{ Component }` (verified against the scaffold
+  template), so it is chrome and not a placement grid.
+- **D8**: `ctx.render(vnode, init)` with a `ResponseInit` — explicitly called "direct and, for one
+  page, entirely adequate". The three costs are structural, not ergonomic: shaping forces
+  `define.page` → `define.handlers`, headers have no merge point for a region to contribute to, and
+  `<Head>` is placement rather than resolution. The builder's guard errors are presented as a
+  consequence of synthesising GET, **not** as a bare-Fresh deficit — in bare Fresh no combination is
+  illegal.
+- **D9**: `new App().use(staticFiles()).use(mw).fsRoutes()`, with the lead-in conceding the hand-rolled
+  version is also short. The argument is that the ordering rules live only in whoever wrote the file,
+  plus the one genuinely missing thing (the cache-provider registration).
+
+### Source verification
+
+Every claim was read from `packages/**` on this branch, and the behavioural ones were executed. Two
+scratch runtime probes (16 + 25 controls) and a scratch consumer app for type-checking; all three
+removed, nothing added under `packages/`.
+
+| Control | Result | Used on |
+|---|---|---|
+| `.withLayer('x', C)` with no loader | renders **empty string** | D2 warning callout |
+| same, with a `fallback` | renders the fallback, not the component | D2 |
+| loader returns `{}` | renders `<C />` with no props | D2 ("an empty object is data") |
+| loader returns `null` | renders nothing | D2 |
+| two loaders, 40 ms and 10 ms | `a:start,b:start,b:end,a:end` — overlap | D2 "layers run concurrently" |
+| two resources, same timings | `r1:start,r1:end,r2:start,r2:end` — serial | D2 contrast paragraph |
+| loader returns `{ data, cachedAt }` | component receives `data`'s shape | D2 cache-entry section |
+| `staleReloadMode:'blocking'` + stale entry | renders the **fallback** | D2 stale table |
+| same, entry still fresh | renders the data | D2 stale table |
+| no `withLayout` | layers emit in declaration order | D2 |
+| `withLayout` + `slots.a.data` | placement is independent; `.data` carries props | D2 |
+| `ctx.layerData` inside a layer loader | `{}` | D2 "layers cannot read each other" |
+| `delivery:'stream'` without `withStreaming()` | renders **inline**, does not defer | D2 |
+| `delivery:'blocking'` with a `partial` | renders inline | D2 |
+| duplicate layer id | second loader never runs; first element emitted twice | D2 watch-for |
+| `withMeta` descriptor | exactly the 7 documented tags; resolver sees full `layerData` | D8 meta table |
+| plain page | `{ page, default, handler }`, `handler === undefined` | D8 build table |
+| three `withHeader` overloads + `withStatus(207)` | status 207; `x-one` = the later map's value | D8 merge order |
+| `withStatus` without `ctx.render` | `definePage() requires ctx.render() when withHeader() or withStatus() is used.` | D8 verbatim |
+| `withHandler('GET')` + `withStatus` | `…cannot combine withHandler("GET") with withHeader() or withStatus().` | D8 verbatim |
+| `withHandler('GET')` + `withStreaming` | `…cannot combine withHandler("GET") with withStreaming().` | D8 verbatim |
+| all three at once | the **streaming** message wins | D8 watch-for |
+| `withHandler('POST')` + `withStatus` | handlers `["POST","GET"]`, no throw | D8 "only GET is affected" |
+| `withForm` alone | handlers `["POST","GET"]`; GET throws without `ctx.render` | D8 callout |
+| `withForm` + `withHandler('GET')` | reports the **withHeader/withStatus** conflict | D8 callout |
+| custom handler | `ctx.resource()` resolves; `ctx.layerData` `{}`; no layer loader fires | D8 custom-handler section |
+| `build()` / `build('/p')` / `build({routePattern})` | `{page,default,handler}` vs `+ nav, route, hooks`; `route.href({path:{id:'7'}})` → `/orders/7` | D8 build section |
+| `defineFreshApp` hook order | `preConfigure > use > use > configure > fsRoutes()` | D9 numbered list |
+| `app` + `createApp` both passed | `createApp` called **0** times | D9 watch-for |
+| `staticFiles:false`, `fsRoutes:'/mount'` | only `fsRoutes(/mount)` | D9 options table |
+| `fsRoutes` as a function | second argument is always `undefined` | D9 watch-for |
+| `middleware: []` | no middleware `use` | D9 step 4 |
+
+Source-only (read, not executed): the streaming GET passes the page's headers and status to
+`createStreamingResponse` (`builder/mod.tsx`); `promoteRouteConfig` / `promoteRouteContractConfig`
+both set `defaultRoutePattern`, so a routed page's bare `build()` returns the routed shape
+(`builder/route-support.ts:50,93`); `gcTime` appears on `DefinePageLayerConfigFor` and in no runtime
+read path; `App.fsRoutes` is documented as *"Insert file routes collected in `Builder` at this point"*
+(`deno doc jsr:@fresh/core`); the `@app/utils.ts` and `main.ts` shapes are the CLI scaffold templates
+verbatim.
+
+### One claim withdrawn during authoring
+
+An early D8 draft said a single-argument `withHeader('x-thing')` silently sets an empty value, based on
+`resolveHeaderDescriptor`'s `value ?? ''`. A negative control showed the public overload set makes that
+call a **compile error** (`TS2769`, no overload matches — a bare string is neither `HeadersInit` nor a
+resolver), so the fallback is unreachable from typed code. The page now states the opposite: the
+overloads are declared separately, so the string form requires its value. The watch-for bullet was
+replaced with the per-name merge hazard, which is real.
+
+### Gate results
+
+| Gate | Command | Result |
+|---|---|---|
+| Site build | `cd docs/site && deno task build` | PASS — 613 files |
+| Site links | `cd docs/site && deno task check:links` | PASS — 32387 internal links across 219 pages, all resolve |
+| Caveat refs | `cd docs/site && deno task check:caveats` | PASS — 27 markers across 22 pages |
+| Extracted D2 examples | `deno check --unstable-kv --no-lock --config <scratch>/deno.json ex.tsx` | PASS — layered page + layout, `slots.data` layout, hooks, both `InferDefinePageLayerLoaderProps` forms, cache-entry loader, shorthand vs config form, `loader: () => ({})` |
+| Extracted D8 examples | same | PASS — meta/header/status page, 404 page, POST + shaping, three-overload page, `build()` shapes, export destructuring |
+| Extracted D9 examples | `deno check … d9.tsx` | PASS — bare-Fresh `main.ts`, mounted app, concise-arrow `preConfigure`/`configure`, the `@app/utils.ts` module, generated `main.ts` |
+| Bare-Fresh contrasts | same config | PASS — `define.middleware` / `define.handlers` / `define.page`, `ctx.render(vnode, init)` with `<Head>`, `new App().use(staticFiles()).fsRoutes()` |
+| Negative control | `deno check` on `withHeader('x-thing')` | fails as documented (TS2769) |
+| Vento leakage | grep for unrendered `{{` in all three built pages | 0 |
+| Anchors | verified against built ids, not guessed | `#the-import-that-makes-any-of-this-work`, `#the-loader-half-a-read-not-a-fetch`, `#the-policy-engine`, `#three-authoring-forms-one-generated-binding`, `#deferred-loader-composition-the-page-runtime-drives-the-partial`, `#composing-the-runtime-server` |
+| Lock hygiene | `git checkout HEAD -- deno.lock` before each commit; `git status` | clean — docs files only in all three commits |
+
+The scratch consumer used `jsx: "precompile"` / `jsxImportSource: "preact"`, matching
+`packages/fresh/deno.json` and the scaffolded app, so the results are consumer-facing rather than
+config artifacts. `packages/fresh`'s own `isolatedDeclarations` setting was deliberately *not* applied —
+it is a publish constraint on the package, not on app code, and applying it would have failed examples
+that are correct in an app.
+
+### Cross-links added
+
+- `builders.md` — a layers pointer beside the existing resources pointer, and a response-shaping
+  pointer under "Handlers and methods"; both added to its Related grid.
+- `index.md` — layers and response bullets in the leaf list.
+- `layers.md` ↔ `response.md` mutual Related cards.
+- `server.md` — a query-bridge Related card (the cache registration link).
+- `live-dashboard/04` step 3 — first tutorial contact for layers now links `/web-layer/layers/`, with
+  the concurrency fact stated inline.
+- `live-dashboard/01` — the `defineFreshApp` link was pointing at the pillar hub `/web-layer/`; it now
+  targets `/web-layer/server/#composing-the-runtime-server`, the section that explains it.
+
+Main pages (quickstart, concepts) untouched, as scoped.
+
+### Open items for the evaluator
+
+- **Observability defect worth a fix, not a doc.** The layer span records
+  `delivery ?? 'blocking'` while the defer decision reads `delivery ?? 'defer'`, so a layer that omits
+  `delivery` and declares a `partial` **defers but traces as `blocking`**
+  (`runtime/mod.tsx` — attribute at the span call, decision at `shouldDefer`). D2 documents the
+  discrepancy in "What to watch for" and points readers at `page.layer.has_partial` instead. Not filed
+  as an issue this batch; flagging for triage alongside #1249.
+- **`gcTime` is accepted and inert** on `DefinePageLayerConfigFor`. Documented as such rather than
+  silently omitted, since the type invites it.
+- Validation here is generator-side only per the CLAUDE.md documentation-authoring exception; a
+  separate opposite-family session still owes a per-page verdict for `layers.md`, `response.md`, and
+  the `server.md` deepening.

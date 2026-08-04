@@ -164,3 +164,13 @@
   previously-shipped docs corrected; framework pair filed as #1249. 13+4 runtime controls and
   3 negative controls back the tables; real site link gate cited (31,662 links). Batch-3 Sol
   audit dispatched. Remaining: D2 layers, D8 response shaping, D9 defineFreshApp.
+
+## 2026-08-04 — P3 batch 4 (final) authored
+
+- D2 /web-layer/layers/ (new), D8 /web-layer/response/ (new), D9 server.md deepened; pointers
+  + first-contact tutorial links. Load-bearing claims executed (layer Promise.all vs resource
+  sequencing probed with timing; withForm synthesised-GET conflict; defineFreshApp hook order);
+  one own claim withdrawn via negative control (withHeader single-arg is a compile error).
+  Gates green (613 files, 32,387 links). Observability defect filed (page.layer.delivery
+  reports 'blocking' for deferring regions). Batch-4 audit dispatched — last cycle before
+  #1241 ready/merge.
