@@ -91,7 +91,7 @@ The active backend is selected by the `NETSCRIPT_AUTH_BACKEND` environment varia
   ]
 }) }}
 
-{{ comp callout { type: "warning", title: "Interactive Authentication Boundary" } }}
+{{ comp callout { type: "important", title: "Interactive Authentication Boundary" } }}
 Only the <code>kv-oauth</code> backend implements the <code>InteractiveFlowPort</code> required to drive login redirects directly via NetScript's <code>signin</code> and <code>callback</code> endpoints. Under <code>workos</code> and <code>better-auth</code>, these routes intentionally return a <code>AUTH_PROVIDER_ERROR</code> (502). This boundary exists because these backends are designed for external verification models where authentication is completed by a frontend client or parent application. In this architecture, you must initiate the authentication flow using the provider's direct SDK or login page, using NetScript to validate the resulting session tokens. Implementing a native <code>InteractiveFlowPort</code> for <code>better-auth</code> is tracked under roadmap item R2.
 <!-- caveat: arch-debt:seamless-auth-roadmap -->
 {{ /comp }}

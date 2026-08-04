@@ -66,7 +66,7 @@ further setup.
 
 ### Table-backed plugins need a schema migration
 
-{{ comp callout { type: "warning", title: "Manual Schema Integration Boundary" } }}
+{{ comp callout { type: "important", title: "Manual Schema Integration Boundary" } }}
 Database schema management for table-backed plugins (`organization`, `twoFactor`, `admin`, `apiKey`) is currently decoupled from NetScript's automatic scaffolding. This boundary exists because automated schema discovery for dynamic third-party extensions requires a dedicated CLI integration step. Today, you must generate and apply the required database tables manually using your primary database/Prisma tools. A unified `netscript db` scaffold integration that automates this step is tracked under roadmap item R1.
 <!-- caveat: arch-debt:seamless-auth-roadmap -->
 {{ /comp }}

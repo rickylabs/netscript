@@ -278,7 +278,7 @@ An empty `members` array is still a `200` — it means the guard passed and the 
 yet (provision one with the [chapter 4](/tutorials/workspace/04-provision-job/) job). A `401` or `403`
 means the request never reached the query at all.
 
-{{ comp callout { type: "warning", title: "Route-Level Scope Authorization Boundary" } }}
+{{ comp callout { type: "important", title: "Route-Level Scope Authorization Boundary" } }}
 The <code>.withAuthz()</code> helper acts as a route-level filter that evaluates flat scope strings attached to the <code>Principal</code>. This design boundary separates HTTP route gating from complex tenant-ownership check logic. The framework does not automatically evaluate role hierarchies (such as admin permission inheritance) or verify organization-specific boundaries (such as confirming the caller is a member of the requested <code>workspace</code>). Currently, you must perform tenant-membership checks manually within your queries. Integrating typed organization helpers and plugin-aware principal mapping is planned under roadmap items R3 and R5.
 <!-- caveat: arch-debt:seamless-auth-roadmap -->
 {{ /comp }}
