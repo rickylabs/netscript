@@ -2,7 +2,7 @@
  * @module templates/aspire/helpers/generate-register-infrastructure_test
  */
 
-import { assert, assertStringIncludes } from 'jsr:@std/assert@^1'
+import { assert, assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1'
 import { describe, it } from 'jsr:@std/testing@^1/bdd'
 
 import { generateRegisterInfrastructure } from '../register/generate-register-infrastructure.ts'
@@ -12,6 +12,10 @@ import { DEFAULT_TEMPLATE_REGISTRY } from '../../../../application/registries/te
 // previously-awaited registry hydration. The tests exercise it directly (outside
 // the CLI dispatch path), so hydrate at module load.
 await DEFAULT_TEMPLATE_REGISTRY.hydrate()
+
+function countOccurrences(value: string, needle: string): number {
+  return value.split(needle).length - 1
+}
 
 describe('generateRegisterInfrastructure', () => {
   it('uses session lifetime for configured-persistent databases only under isolated starts', () => {
@@ -290,7 +294,7 @@ describe('generateRegisterInfrastructure', () => {
     assertStringIncludes(output, "cacheWiring.set('deno-kv', deno_kv_wiring);")
   })
 
-  it('skips sqlite Aspire resource registration entirely', () => {
+  it('registers sqlite as a resolved file-backed Aspire resource', () => {
     const output = generateRegisterInfrastructure({
       databases: {
         sqlite: {
@@ -305,14 +309,49 @@ describe('generateRegisterInfrastructure', () => {
       primaryDatabase: 'sqlite',
     })
 
+    assertStringIncludes(output, 'Sqlite, resolved file-backed resource')
+    assertStringIncludes(output, "builder.addParameter('sqlite', {")
     assertStringIncludes(
       output,
-      'Sqlite, file-backed — no Aspire resource needed',
+      "value: resolveDataPath(appHostDir, 'app.sqlite', 'sqlite'),",
     )
+    assertStringIncludes(output, 'secret: false,')
     assert(!output.includes("builder.addConnectionString('sqlite')"))
-    assert(!output.includes("databases.set('sqlite', sqlite);"))
+    assertStringIncludes(output, "databases.set('sqlite', sqlite);")
     assert(!output.includes('sqlite_server.addDatabase('))
     assert(!output.includes('const sqlite_server'))
+  })
+
+  it('generates one resolved graph resource per scaffolded backing service', () => {
+    const output = generateRegisterInfrastructure({
+      databases: {
+        sqlite: {
+          Enabled: true,
+          Engine: 'Sqlite',
+          Mode: 'External',
+          DatabaseName: 'app.sqlite',
+          Persistent: false,
+        },
+      },
+      caches: {
+        'deno-kv': {
+          Enabled: true,
+          Engine: 'DenoKv',
+          Mode: 'Container',
+          DataPath: 'data/kv',
+        },
+      },
+      primaryDatabase: 'sqlite',
+      primaryCache: 'deno-kv',
+    })
+
+    assertEquals(countOccurrences(output, "builder.addParameter('sqlite'"), 1)
+    assertEquals(countOccurrences(output, "builder.addContainer('deno-kv'"), 1)
+    assert(!output.includes("builder.addConnectionString('deno-kv')"))
+    assertStringIncludes(
+      output,
+      'deno_kv_httpEndpoint.property(EndpointProperty.Url)',
+    )
   })
 
   it('registers SQL Server containers with explicit image and password policy env', () => {

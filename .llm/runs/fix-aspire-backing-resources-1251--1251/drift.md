@@ -15,3 +15,9 @@ with a real readiness check likewise needs a deliberate probe-resource design, n
 parameter node.
 
 Per lane instructions, implementation stopped rather than shipping a unit-test-only health claim.
+
+## Owner rescope
+
+The blocked health-check row moved to #1280 for milestone 0.0.6. The remaining #1251 rows are
+deliverable without making a health claim, so PR #1266 resumed. The research above remains as the
+two-part proof for #1280; no false `/health` probe was added.
