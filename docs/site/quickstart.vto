@@ -45,6 +45,15 @@ What lands on disk is the meta-framework as a directory layout:
 - `aspire/` — the generated AppHost that runs everything above as one observed graph;
   [orchestration & runtime](/orchestration-runtime/).
 
+### How the database contract is derived
+
+The example contract does not duplicate the Prisma model. It imports `UserSchema`,
+`UserCreateInput`, and `UserUpdateInput` from `@database/zod`. That alias resolves to the generated
+database aggregate at `database/postgres/schema/.generated/zod/crud.ts`; `netscript db generate`
+rebuilds the aggregate for every model in `schema.prisma`. Treat `.generated/` as generator-owned:
+change the Prisma schema, rerun generation, and keep application contracts on the stable
+`@database/zod` boundary rather than importing a generated deep path.
+
 ## 3. Start the resource graph
 
 **Nothing runs until this step.**

@@ -10,3 +10,8 @@ RED/GREEN landed locally: the rendered generated contract failed TS2307 against 
 then passed against the complete `crud.ts`; a two-model writer fixture proves all three symbols per
 model. Focused tests and scoped/quality gates pass. Next: commit/push slice, then clean-scaffold DB
 lifecycle and service boot artifacts.
+
+Canonical `scaffold.runtime` subsequently passed 71/71. The generated alias, complete barrel,
+rendered contract, live users health result, and cleanup records are retained in
+`evidence/scaffold-runtime.md`. Quickstart now explains the stable contract-derivation boundary.
+Full app-inclusive check remains dependent on #1287, so #1290 box 1 is intentionally unearned.

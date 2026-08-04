@@ -47,8 +47,8 @@ duplicate local formal evaluator is spawned.
 
 ## Open-decision sweep
 
-- Must resolve now: exact test location after tracing existing scaffold test helpers; it must run in
-  the ordinary CI lane and compile real generated contract content.
+- Resolved: the compile oracle lives beside the service scaffolder test, where it consumes the real
+  rendered contract plus the real root alias generator in the ordinary test lane.
 - Safe to defer: removal of the legacy public `runWriteCrudZodBarrel` name; broader generated-Zod
   API cleanup; #1287; #1274 documentation expansion.
 
@@ -85,4 +85,3 @@ duplicate local formal evaluator is spawned.
 ## Debt
 
 No new architecture debt is planned. Existing CLI/database verdicts are not deepened.
-

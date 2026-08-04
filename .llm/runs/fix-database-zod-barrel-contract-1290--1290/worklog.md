@@ -67,6 +67,10 @@ consumer through the scaffold compile test rather than editing template imports.
 | 2026-08-05 | 2 | multi-model proof | Database writer test found Product and Warehouse and emitted Schema/CreateInput/UpdateInput for both. |
 | 2026-08-05 | 2 | review | NetScript now owns the aggregate; upstream models barrel remains generator-owned; generated contract stays on `@database/zod`. |
 | 2026-08-05 | 2 | reconcile | Draft PR #1299 carries `Closes #1290`, milestone 0.0.5, p0 CLI/database labels, and `status:plan`. |
+| 2026-08-05 | 3 | scaffold runtime | Canonical one-pass suite passed 71/71: Postgres lifecycle, generated compile, users health, OTEL, cleanup. |
+| 2026-08-05 | 3 | artifact inspection | Root alias, generated aggregate, and rendered users contract agree symbol-for-symbol; hashes retained in evidence. |
+| 2026-08-05 | 3 | acceptance dependency | Full app-inclusive check remains blocked only by separately owned #1287; box 1 is not claimed. |
+| 2026-08-05 | 3 | Quickstart | Added the missing derivation explanation: stable alias, aggregate location, regeneration law, no deep imports. |
 
 ## Gates
 
@@ -81,3 +85,13 @@ consumer through the scaffold compile test rather than editing template imports.
 | Scoped fmt | PASS | 60 files selected; zero findings. |
 | Quality gate | PASS | code-quality scan clean; architecture gate exit 0 with baseline warnings only. |
 | Lock hygiene | PASS | Foreign `deno.lock` remains modified but unstaged. |
+| Canonical `scaffold.runtime` | PASS | 71 passed, 0 failed, 0 skipped; `evidence/scaffold-runtime.md`. |
+| Postgres lifecycle | PASS | Real migration applied, client/Zod generated, seed completed. |
+| Generated contract artifacts | PASS | Alias → aggregate → rendered import inspected and hashed. |
+| Example service boot | PASS | Live Aspire-resolved users `/health` probe returned healthy with database check. |
+| Owned cleanup | PASS | Exact AppHost stopped; suite-created containers pruned. |
+| Database package tests | PASS | 7 tests / 9 steps, 0 failed. |
+| Database doc lint | PASS | Full export map; scripts entrypoint has zero diagnostics. |
+| Database publish dry-run | PASS | No slow-type or file-list failure; publish simulation complete. |
+| Docs accuracy | PASS | Repository accuracy/discoverability gate. |
+| Docs verify | PASS | Site built (617 files), 32,770 internal links resolve, 18 caveat references resolve. |
