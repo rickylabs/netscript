@@ -155,7 +155,8 @@ and partial hrefs together. It exposes the underlying `route` and `partialRoute`
 references, an `href(...)` for the page, a `partialHref(...)` for the partial,
 and `getLinkProps(input)` that materializes `FreshPartialLinkAttributes` with
 both `href` and `f-partial` set — the attributes Fresh uses to drive partial
-navigation.
+navigation. See [Partials](/web-layer/partials/) for the partial route on the
+other end of that link.
 
 ## API summary
 

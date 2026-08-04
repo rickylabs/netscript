@@ -53,6 +53,8 @@ order:
   per request and shared by every layer, layout, and metadata resolver on the page.
 - **[Route contracts](/web-layer/route/)** — `defineRouteContract()`, schema helpers such as
   `paginationSearchSchema()`, and `createRouteReference()` for typed links.
+- **[Partials](/web-layer/partials/)** — `definePartial()`, paired route references, and the layer
+  config that turns a region into a cache-aware deferred partial.
 - **[Data loading & the query cache](/web-layer/query/)** — `QueryIsland`, `useQuery`,
   `useMutation`, and `useLiveQuery`: the TanStack-Query bridge that shares one cache between
   server render and island hydration.

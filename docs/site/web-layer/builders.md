@@ -222,6 +222,10 @@ and a `component`. It also accepts an optional `errorComponent`, `errorTitle`,
 `handler`, and Fresh `config`. `DefineStatsPartialOptions` omits `loader` and instead
 requires a `query` `() => Promise<TProps>`.
 
+The error shell, the paired route reference that types the `f-partial` link, and the
+layer config that turns a region into a deferred partial are covered in
+[Partials](/web-layer/partials/).
+
 ```ts
 import { definePartial } from "@netscript/fresh/builders";
 

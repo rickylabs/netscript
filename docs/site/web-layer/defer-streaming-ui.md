@@ -68,7 +68,8 @@ delivery path is enabled.
 hooks. Where `Deferred` wraps a promise, `DeferPage` coordinates the full lifecycle
 of a cached region: it renders `component` when cached data exists, `fallback` until
 the region resolves, and uses a Fresh partial (`name`, `partial`, `action`) to
-refresh the region on the client.
+refresh the region on the client. A page layer declared with a `partial` URL gets this
+wrapper generated for it — see [Partials](/web-layer/partials/).
 
 The props are described by `DeferPageProps`:
 
