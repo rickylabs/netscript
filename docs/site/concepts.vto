@@ -2,85 +2,73 @@
 layout: layouts/base.vto
 title: Core concepts
 templateEngine: [vento, md]
-next: { label: "Quickstart — 5 min", href: "/quickstart/" }
 ---
 
 {{ comp.hero({
-  tagline: "Three ideas explain almost everything in NetScript.",
-  subhead: "The contract is the source of truth, the host is empty until plugins fill it, and one runtime brings up many resources together. Hold these three and the rest of the docs read as detail.",
+  tagline: "A NetScript app is five connected layers.",
+  subhead: "Contracts define the boundaries. Services serve them at request time, plugins extend them across processes, the web layer brings them to the browser, and the observed resource graph keeps the whole system visible.",
   ctas: [
-    { label: "Quickstart — 5 min", href: "/quickstart/", primary: true },
-    { label: "Why NetScript", href: "/why/" }
+    { label: "Start a workspace", href: "/quickstart/", primary: true },
+    { label: "Build the Storefront", href: "/tutorials/storefront/" }
   ]
 }) }}
 
-{{ comp callout { type: "tip", title: "Read this once" } }}
-This is the five-minute mental model — what talks to what, and nothing deeper; the *why* behind this shape lives in the {{ comp.xref({ key: "explain:architecture", text: "architecture essay" }) }}. Every capability hub, tutorial, and reference page assumes the three ideas below — so the time you spend here is paid back on every other page. Nothing here is aspirational: each claim links to the published surface that proves it.
-{{ /comp }}
+{{ comp.diagram({ src: "/assets/diagrams/architecture-overview.svg", alt: "A NetScript workspace: contracts define services; services and plugin runtimes connect to the Fresh web app; the AppHost materializes the resources and their infrastructure as one observed graph.", caption: "The mental model: contracts → services → plugins → web layer, with Aspire and telemetry connecting the running resources." }) }}
 
-NetScript is a Deno-native backend framework that generates a workspace you own and run yourself. It is not a hosted service and not a single library — it is a coordinated package family plus a CLI that wires the boring seams together. To reason about *any* part of it, you only need three ideas.
+## 1. Contracts define the boundary
 
-{{ comp.diagram({ src: "/assets/diagrams/architecture-overview.svg", alt: "A NetScript workspace: contracts define services; services, workers, sagas, triggers, streams, and auth plugins register against a host; the AppHost materializes each as an Aspire resource alongside Postgres, Redis, and the dashboard.", caption: "The whole system in one picture: contracts at the center, plugins contributing to a host, and the AppHost bringing every resource up together." }) }}
+A contract describes behavior, not just data: `checkout.start` is as natural a boundary as a list
+or update operation. It is the source of truth for an operation's input and output. A service
+implements the oRPC contract, `@netscript/sdk` derives clients and query helpers from the same
+contract map, and the service runtime generates OpenAPI from the contract router. The TypeScript
+caller and the HTTP description share one definition, not two hand-written shapes.
 
-## Idea 1 — The contract is the source of truth
+Read [contracts and type flow](/explanation/contracts/) for the schemas and router mechanics.
 
-Most type drift in a TypeScript backend comes from having *two* sources of truth: the shape a service returns, and the shape the client believes it returns. NetScript removes the second one. You define an oRPC **contract** once; the typed client is *derived* from it, not generated alongside it. There is no codegen step to fall out of sync, and the type checker becomes your integration test — change the contract and every caller that no longer matches fails to compile.
+## 2. Services execute request-time behavior
 
-{{ comp.tabbedCode({ tabs: [
-  { label: "Define the contract", lang: "ts", code: "// One source of truth — imported, not duplicated.\nimport { baseContract, OffsetPaginationQuerySchema } from '@netscript/contracts';\nimport { z } from 'zod';\n\nexport const usersContract = {\n  list: baseContract\n    .route({ method: 'GET', path: '/users' })\n    .input(OffsetPaginationQuerySchema)\n    .output(z.object({ items: z.array(z.object({ id: z.string(), email: z.string() })) })),\n};" },
-  { label: "Call the derived client", lang: "ts", code: "// `clients.users.list` is typed FROM the contract above — no second definition.\nimport { defineServices } from '@netscript/sdk';\nimport { usersContract } from './contracts/users.ts';\n\nconst { clients } = defineServices({ users: { contract: usersContract } });\n\nconst result = await clients.users.list({ limit: 20, offset: 0 });\nconsole.log(result.items); // fully typed end to end" }
-] }) }}
+Contracts need a runtime. `defineService()` turns a contract router into a running Hono and oRPC
+service. The preset wires in request logging, OpenAPI generation, a Scalar docs UI, RPC, health
+endpoints, and service-info metadata. SDK clients resolve service URLs lazily from Aspire-injected
+environment values, so callers do not pin a local port into application code.
 
-The same contract that types the client also drives the service router, the OpenAPI document, the Scalar docs, and — because every handler is span-wrapped — the traces. One definition, many consumers, zero hand-maintained duplicates. That is what "the contract is the product" means in practice. Go deeper in {{ comp.xref({ key: "explain:contracts", text: "contracts & type flow" }) }} or the {{ comp.xref({ key: "cap:services", text: "services capability hub" }) }}.
+A service owns the request boundary. Work that must resume after the process exits belongs in a
+durable runtime, not in a longer request handler. Go deeper in [Services & SDK](/services-sdk/) and
+[service discovery](/services-sdk/how-to/discover-services/).
 
-## Idea 2 — The host is empty; plugins fill it
+## 3. Plugins add runtime capabilities
 
-A NetScript application is a **host** that, on its own, does almost nothing. Capabilities — workers, sagas, triggers, streams, auth — arrive as **plugins**, and each plugin *registers* what it contributes rather than asking you to edit a central wiring file. Three nouns carry the whole model: a plugin declares a **manifest**, the manifest names a set of **contributions** against a fixed set of axes, and a generated **registry** turns those declarations into static modules the runtime imports.
+Services handle the request; plugins handle work that outlives one. The host is empty; plugins fill
+it. A plugin manifest is validated data that declares services, background processors, schemas,
+topics, configuration, and telemetry contributions. The CLI turns those declarations into static
+workspace wiring.
 
-{{ comp.tabbedCode({ tabs: [
-  { label: "A plugin manifest", lang: "ts", code: "// definePlugin(name, version) returns a builder. No behavior runs here —\n// each .with*() call only NAMES a contribution against a fixed axis.\nimport { definePlugin } from '@netscript/plugin';\n\nexport const workersManifest = definePlugin('@netscript/plugin-workers', '" + releaseVersion + "')\n  .withService({ name: 'workers-api', entrypoint: './services/src/main.ts', port: 8091 })\n  .withBackgroundProcessor({ name: 'workers-worker', entrypoint: './bin/worker.ts', concurrency: 2 })\n  .withDbSchemas([{ path: './database/workers.prisma', engine: 'postgres' }])\n  .build();" }
-] }) }}
+“One plugin” is a packaging unit, not a runtime unit. Aspire can materialize a plugin's API and
+background processors as separate resources. Workers, sagas, triggers, and streams are the durable
+examples; the full manifest and registry mechanics live in
+[the plugin-system explanation](/explanation/plugin-system/).
 
-Because the host only understands a *fixed* set of contribution shapes — a service, a background processor, a schema fragment, a stream topic, a config topic — but *any number* of plugins may contribute against them, capabilities compose without the host ever growing new code. Adding one is a regeneration step (`netscript plugin install …` then regenerate the registry), never an edit to someone else's boundary. And because a plugin's HTTP API and its background work are materialized as *separate* resources, a crash in a worker never takes down the API.
+## 4. The web layer carries the boundary to the user
 
-{{ comp.diagram({ src: "/assets/diagrams/plugin-thread-isolation.svg", alt: "A single plugin splits into an HTTP API service resource and one or more isolated background-processor resources, each started by the AppHost as a separate Aspire resource with its own permissions.", caption: "\"One plugin\" is a packaging unit, not a runtime unit: at runtime it fans out into one API service and N isolated background resources." }) }}
+The contract reaches the browser through the web layer. `@netscript/fresh` builds on Fresh 2 and
+Preact. Typed route contracts and `definePage()` connect paths, search parameters, metadata,
+handlers, data layers, and forms. A server page can call the contract-derived SDK, hydrate TanStack
+Query state, and hand interactive work to islands; routes that need no island ship no island
+JavaScript.
 
-The full walkthrough — core/plugin split, the contribution axes, and why the registry is generated rather than scanned — is in {{ comp.xref({ key: "explain:plugin-system", text: "the plugin system" }) }}. The auth plugin is the model at its richest: see {{ comp.xref({ key: "explain:auth-model", text: "the auth model" }) }}.
+Use [the web-layer overview](/web-layer/) for the complete model, then follow the focused guides for
+[server rendering](/web-layer/server/), [page builders](/web-layer/builders/), and
+[queries and islands](/web-layer/query/).
 
-## Idea 3 — One runtime, many resources
+## 5. Observability connects the resource graph
 
-The third idea is what turns a pile of packages into a system you can *run*. NetScript is Deno-native and distributed on JSR — you import from `jsr:@netscript/*` and use Web Platform APIs you already know. But a real backend is never one process, so the generated workspace ships an **AppHost** that brings every resource up together through .NET Aspire: your database, your cache (`redis` by default, or `garnet` / `deno-kv` via `--cache-backend`), each plugin's service and background processors, and a real dashboard — locally and on the way to deploy.
+Every layer above runs inside a resource graph. The generated AppHost composes apps, services,
+plugin processors, databases, and cache resources, then injects service-discovery and OTLP
+configuration into their processes. The Aspire dashboard reads health, logs, traces, and metrics
+from that running graph; trace context carried by SDK calls keeps client and service spans
+connected.
 
-{{ comp.diagram({ src: "/assets/diagrams/aspire-resource-graph.svg", alt: "The AppHost graph: Postgres and Redis at the base; service, workers-api, sagas, triggers, auth-api, and streams resources above them; the Aspire dashboard observing all of them.", caption: "One command brings up the whole graph: data stores first, then every service and background resource, with the dashboard wired in for traces and logs." }) }}
-
-The flow is two commands — `cd aspire && aspire start` brings up your database and Redis *before* any `netscript db` command touches the database — and you watch the result in the Aspire dashboard at `:18888`. Postgres is the recommended default; pass `--db mysql`, `--db mssql`, or `--db sqlite` at scaffold time to pick another engine (Postgres, MySQL, and SQL Server run as Aspire container resources, while SQLite is file-backed).
-
-{{ comp.apiTable({
-  caption: "What comes up when you run the workspace (ports are range-allocated conventions; the dashboard is the authority)",
-  rows: [
-    { name: "Aspire dashboard", type: ":18888", desc: "Every resource, trace, and log in one place — you don't stand up your own observability stack." },
-    { name: "Your service", type: "port assigned by Aspire", desc: "The oRPC API the contract drives, served at /api/rpc/* with OpenAPI and health wired in. The scaffold pins no host port so two workspaces can run side by side — the dashboard shows the URL. Pin one with netscript init --service-port if you need a stable address." },
-    { name: "Plugin services", type: ":8091–:8094", desc: "Each plugin's API runs as its own resource — workers :8091, sagas :8092, triggers :8093, auth :8094." },
-    { name: "Data stores", type: "Postgres · Redis", desc: "Brought up first, before migrations run; provisioned by the AppHost, not a hand-written compose file. Postgres is the recommended engine — pass --db postgres; mysql / mssql / sqlite / none are the other choices." }
-  ]
-}) }}
-
-The whole runtime is opt-out, not lock-in: {{ comp.xref({ key: "concept:quickstart", text: "scaffold with" }) }} `netscript init my-app --no-aspire` and the .NET footprint is gone, leaving the Deno workspace you own. How the AppHost reads manifests and materializes resources is covered in {{ comp.xref({ key: "explain:aspire", text: "orchestration with Aspire" }) }} and the {{ comp.xref({ key: "cap:runtime-config", text: "runtime configuration hub" }) }}.
-
-## How the three ideas connect
-
-They are one idea seen from three angles. The **contract** defines what a capability exposes; a **plugin** packages that capability and declares how it contributes; the **runtime** materializes every contribution as an isolated resource and traces it end to end. Drift can't open up between layers because each layer derives from the one before it — the client from the contract, the registry from the manifests, the resource graph from the registry.
-
-{{ comp.featureGrid({ items: [
-  { title: "Learn it by building", body: "Pick a track and ship one complete app end to end — the fastest way to feel all three ideas at once.", href: "/tutorials/", icon: "🛠️" },
-  { title: "Map the capabilities", body: "Every feature, hub by hub, each with a Learn / Do / Reference triplet.", href: "/capabilities/", icon: "🧭" },
-  { title: "Read the architecture", body: "The deep why behind the three ideas — the full essay this page is the five-minute version of.", href: "/explanation/architecture/", icon: "🏛️" }
-] }) }}
-
-{{ comp callout { type: "note", title: "Pre-1.0" } }}
-NetScript is <strong>pre-1.0</strong>. The published package surface is the contract: what you import from <code>jsr:@netscript/*</code> is what's documented and type-checked. Every <code>@netscript/*</code> package shares one aligned version (<code>{{ releaseVersion }}</code>) and releases move in lockstep. Scaffolded JSR imports use exact <code>{{ releaseSpecifier }}</code> pins. Build with us — but pin your versions.
-{{ /comp }}
-
-{{ comp.nextPrev({
-  next: { label: "Quickstart — 5 minutes", href: "/quickstart/" }
-}) }}
+Aspire is the default local orchestration layer, not part of every package API. Without it, the Deno
+packages remain usable, but resource startup, discovery values, and telemetry wiring become the
+application's responsibility. Read [Orchestration & runtime](/orchestration-runtime/),
+[Observability](/observability/), or [the Aspire boundary](/explanation/aspire/) for mechanics.
