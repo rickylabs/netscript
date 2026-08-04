@@ -42,7 +42,9 @@ function formatVerdict(
     const previous = result.attempts[result.attempts.length - 2];
     return `  ${verdict} (attempt ${result.attempts.length}/${result.attempts.length} after ${previous.failureClass} attempt ${previous.attempt}, ${durations})\n`;
   }
-  return `  ${verdict} ${result.durationMs}ms (attempt durations: ${durations})\n`;
+  const failureClass = result.attempts.at(-1)?.failureClass;
+  const classification = failureClass ? `; failure class: ${failureClass}` : '';
+  return `  ${verdict} ${result.durationMs}ms (attempt durations: ${durations}${classification})\n`;
 }
 
 function formatDuration(durationMs: number): string {

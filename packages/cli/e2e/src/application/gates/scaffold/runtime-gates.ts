@@ -20,6 +20,10 @@ const ASPIRE_RESOURCE_WAIT_TIMEOUT_SECONDS: Partial<
   [ASPIRE_RESOURCE.APP]: 300,
 };
 
+/** A feed stall gets three short chances instead of consuming two suite-wide 15-minute budgets. */
+export const ASPIRE_RESTORE_ATTEMPT_TIMEOUT_MS = 180_000;
+export const ASPIRE_RESTORE_MAX_RETRIES = 2;
+
 /**
  * Why the probe takes a project root and an AppHost instead of a URL: since #952 the pristine
  * scaffold pins **no** host port, so that two workspaces on one machine — and
@@ -127,7 +131,12 @@ export function createRuntimeGates(
       undefined,
       undefined,
       undefined,
-      { classes: ['timeout', 'canceled'], maxRetries: 1 },
+      {
+        classes: ['timeout', 'canceled', 'infrastructure'],
+        maxRetries: ASPIRE_RESTORE_MAX_RETRIES,
+      },
+      ASPIRE_RESTORE_ATTEMPT_TIMEOUT_MS,
+      'infrastructure',
     ),
     commandGate(
       GATE.RUNTIME_AUTH_SMOKE_ENV,

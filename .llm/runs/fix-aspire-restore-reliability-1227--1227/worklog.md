@@ -16,3 +16,11 @@
 - Confirmed the 2 × 900-second behavior in code.
 - Selected a 3 × 180-second bounded restore budget and an exact-version NuGet cache.
 
+### S1 — bounded restore and classification
+
+- Added opt-in per-gate command timeouts and a three-attempt ceiling.
+- Configured only `runtime.aspire-restore` for 3 × 180 seconds and the stable
+  `infrastructure` failure class.
+- Pretty reports now print the final failure class beside all attempt durations.
+- Focused command/runtime/reporter tests passed.
+- Reconcile: #1227 remains the sole closing issue; scope and milestone are unchanged.

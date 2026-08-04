@@ -7,4 +7,5 @@
 - Surface: `packages/cli/e2e`, runtime E2E workflows
 - D6: composed evaluation; no local PLAN-EVAL
 - Lock hygiene: inherited `deno.lock` change is excluded.
-
+- S1 implemented: per-gate timeout, 3 × 180-second restore budget, infrastructure classification,
+  and pretty-report rendering.

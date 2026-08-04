@@ -4,6 +4,7 @@ import { PACKAGE_SOURCE } from '../../../domain/extension-axes.ts';
 import { resolve } from '@std/path';
 import type {
   CommandFactory,
+  GateFailureClass,
   CommandGateRetryPolicy,
   GateDefinition,
   HttpGateDefinition,
@@ -53,6 +54,8 @@ export function commandGate(
   outputMode: CommandOutputMode = 'capture',
   failureHint?: string,
   retry?: CommandGateRetryPolicy,
+  timeoutMs?: number,
+  failureClass?: GateFailureClass,
 ): GateDefinition {
   return {
     id,
@@ -65,6 +68,8 @@ export function commandGate(
     outputMode,
     failureHint,
     retry,
+    timeoutMs,
+    failureClass,
   };
 }
 
