@@ -303,7 +303,8 @@ or when entry age has to survive the trip.**
 
 `getCachedEntry` reaches `getCacheProvider()`, and the provider is `null` until something registers
 it. Nothing in a scaffolded app appears to do that — and yet it works, because
-`defineFreshApp` performs a bare side-effect import:
+`@netscript/fresh/server` performs a bare side-effect import in the module that defines
+`defineFreshApp`:
 
 ```ts
 // packages/fresh/src/runtime/server/define-fresh-app.ts
@@ -312,10 +313,10 @@ it. Nothing in a scaffolded app appears to do that — and yet it works, because
 import '@netscript/sdk/cache';
 ```
 
-`@netscript/sdk/cache`'s module body calls `setCacheProvider(cacheQuery)` at import time. So bringing
-up the app through `defineFreshApp` registers the KV-backed engine as a side effect of the
-bootstrap — which is why a page loader can call `getCachedEntry()` with no visible wiring anywhere in
-the app. The scaffold also emits the same import into the generated entrypoint when the app is
+`@netscript/sdk/cache`'s module body calls `setCacheProvider(cacheQuery)` at import time. So merely
+evaluating the `/server` subpath — importing it for anything, not calling `defineFreshApp` —
+registers the KV-backed engine, which is why a page loader can call `getCachedEntry()` with no
+visible wiring anywhere in the app. The scaffold also emits the same import into the generated entrypoint when the app is
 created with caching, so the registration survives even if the bootstrap is later restructured.
 
 Two consequences follow from it being an import side effect rather than a call you make:
@@ -366,7 +367,7 @@ Two consequences follow from it being an import side effect rather than a call y
   { title: "Data loading and the query cache", body: "QueryIsland, the island hooks, and mutations.", href: "/web-layer/query/" },
   { title: "Request-scoped resources", body: "Read the cache entry once, share it across layers.", href: "/web-layer/resources/" },
   { title: "Typed SDK & client", body: "createServiceClient and the contract the factory is built from.", href: "/services-sdk/sdk/" },
-  { title: "The Fresh page model", body: "defineFreshApp and the bootstrap that registers the cache.", href: "/web-layer/server/" },
+  { title: "The Fresh page model", body: "defineFreshApp and the server subpath whose evaluation registers the cache.", href: "/web-layer/server/" },
   { title: "Interactive islands", body: "Where island code runs and what it may import.", href: "/web-layer/interactive/" },
   { title: "Live dashboard tutorial", body: "A loader, a dehydrated prefetch, and a hydrated island.", href: "/tutorials/live-dashboard/04-definePage-QueryIsland/" }
 ] }) }}
