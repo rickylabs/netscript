@@ -67,3 +67,9 @@ Confirmed findings:
   (precedent D-7 suggests a Codex/Opus substitute is acceptable, but S5 was owner-routed to
   Grok explicitly — not substituting without say-so). Sol docs_audit (S6) proceeds in
   parallel; it does not depend on the polish verdict.
+
+- **D-9 (lane correction, 2026-08-04).** Planned "Sol docs_audit" for PR #1216 was wrong:
+  the pages are Codex-authored, so opposite-family review is Claude-family
+  (`review_codex` ladder), which the Opus FIX_FIRST review already performed. Final audit
+  runs on Opus (Claude family), not Sol. The launcher's duplicate-sender guard on
+  ns-mainpages surfaced this before a same-family audit happened.
