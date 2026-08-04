@@ -66,6 +66,8 @@ fixture that proves both accepted drift and rejection of an adjacent torn/ambigu
 | 2026-08-04 | 3 | baseline failures | Full one-pass attempts later stopped at existing `behavior.service-health` DB health and `runtime.wait.workers-api` gates before S7. Cleanup passed and leak checks found no survivors. |
 | 2026-08-04 | 3 | serialized CI proof | After the baseline holder released the global slot, e2e-cli attempt 2 passed the named MCP gate in 4.896s and the canonical suite completed 71/71 with cleanup. |
 | 2026-08-04 | 3 | S6 reconcile | Main gained S6/#1204 before handoff, so the named gate was upgraded from the permitted directory fallback to `createListApiServicesFlow`; current-head CI must repeat the live proof. |
+| 2026-08-04 | 3 | D15 live capture | On the #1211-rebased head, a fresh `s7-box43-live` scaffold ran beside foreign AppHosts. Exact-path `aspire describe` exposed `users` proxy `45889` and allocated target `PORT=45253`; the public MCP `list_api_services` tool returned `users` running from `aspire-cli` at `http://127.0.0.1:45253` with 3 operations. |
+| 2026-08-04 | 3 | cleanup | Stopped only the exact S7 AppHost. A foreign sagas AppHost remained live before, during, and after the capture; no foreign AppHost/container was touched. |
 
 ## Decisions
 
@@ -74,6 +76,7 @@ fixture that proves both accepted drift and rejection of an adjacent torn/ambigu
 | Qualified F1(b), no template emission | P1 locked verdict | #1123 §F1 / P1 verdict / owner brief |
 | CLI run binding is exact AppHost path + stable PID | Facts exposed by real Aspire 13.4.6 `ps` | research D1-D3 |
 | PLAN-EVAL is composed/not-local | Milestone evaluator rule | owner brief / milestone-run D6 |
+| Adapter capture may coexist with foreign AppHosts | Exact-path/run/service identity is the subject under test; full suite remains serialized | orchestrator ruling D15 |
 
 ## Drift
 
@@ -112,12 +115,13 @@ fixture that proves both accepted drift and rejection of an adjacent torn/ambigu
 | `scaffold.runtime` infrastructure | FAIL (baseline) | canonical one-pass command | independent pre-S7 failures: users DB-health aggregate; workers-api timeout |
 | `behavior.mcp-endpoint-directory` negative case | PASS | canonical one-pass named gate | contested proxy identified as `products`; adapter returned `identity_mismatch` |
 | `behavior.mcp-endpoint-directory` target-port case | PASS | [e2e-cli attempt 2](https://github.com/rickylabs/netscript/actions/runs/30895255613/job/91950747988) | named live gate passed in 4.896s; canonical suite 71/71 with cleanup |
+| box-43 `list_api_services` positive capture | PASS | [PR #1206 evidence](https://github.com/rickylabs/netscript/pull/1206#issuecomment-5178346127) | fresh randomized-port scaffold; describe target `45253` matched tool base URL; foreign AppHost stayed live |
 
 ### Consumer Gates
 
 | Consumer | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| scaffolded app | PENDING_CURRENT_HEAD | [pre-S6-reconcile scaffold-runtime CI](https://github.com/rickylabs/netscript/actions/runs/30895255613/job/91950747988) | direct directory fallback passed live; S6 has since landed and the gate now calls `list_api_services`, requiring one current-head rerun. |
+| scaffolded app | PASS | [PR #1206 box-43 evidence](https://github.com/rickylabs/netscript/pull/1206#issuecomment-5178346127) | public `tools/call` → `list_api_services` selected this AppHost's randomized allocated target port and returned the live `users` service from `aspire-cli`. |
 
 ## Handoff Notes
 

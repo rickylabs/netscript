@@ -55,3 +55,16 @@
 - **Severity:** minor
 - **Action:** leave `status:impl-eval` and request an eligible composed/owner review; never self-certify.
 - **Evidence:** PR #1206 timeline and OpenHands Agent check on head `dfcf2b23a`.
+
+## 2026-08-04 — D15 waives serialization for adapter-level capture only
+
+- **What:** The box-43 adapter capture ran alongside foreign AppHosts; the full `scaffold.runtime`
+  suite remains serialized.
+- **Source:** Written orchestrator ruling D15.
+- **Expected:** Earlier expensive-gate law blocked any local AppHost while another was live.
+- **Actual:** #1211 randomizes listener defaults, while S7 exact-path project/run binding and
+  service identity checks discriminate the selected AppHost. Coexistence is the strongest identity
+  proof for this adapter-level capture.
+- **Severity:** minor
+- **Action:** accept for box 43 only; leave foreign resources untouched and stop only the exact S7 AppHost.
+- **Evidence:** Fresh `s7-box43-live` describe/tool correlation recorded in `worklog.md` and PR #1206.

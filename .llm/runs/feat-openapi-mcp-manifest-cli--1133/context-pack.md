@@ -15,8 +15,8 @@
 The identity-bound F1(b) adapter and scaffold named gate are implemented. A real proxy collision
 proved the identity guard and added allocated target-PORT selection. Package/static gates pass;
 pre-reconcile branch CI passed the named live adapter gate and the canonical suite 71/71 with
-cleanup. S6 then landed on main, so the rebased gate now invokes `list_api_services` and awaits a
-current-head repeat.
+cleanup. After S6 and #1211 landed, a fresh randomized-port scaffold passed the public
+`list_api_services` capture against its exact AppHost while a foreign AppHost remained live.
 
 ## Completed
 
@@ -27,17 +27,17 @@ current-head repeat.
   project resources, and AppHost restart races.
 - Package check/tests, scoped lint/fmt, quality/architecture, docs, and publish dry-run gates pass.
 - Canonical S7 negative case rejected a foreign service on the fixed proxy port.
+- Box-43 positive case correlated `aspire describe` target `PORT=45253` to the tool's live
+  `users` base URL `http://127.0.0.1:45253`, source `aspire-cli`, with 3 operations.
 
 ## In Progress
 
-- Current-head scaffold runtime after upgrading the live gate to S6's `list_api_services` flow.
 - Composed implementation review/sign-off under milestone ruling D6.
 
 ## Next Steps
 
-1. Repeat serialized scaffold runtime on the S6-rebased head.
-2. Obtain separate composed implementation review/sign-off.
-3. Move to `status:ready-merge` only after the evaluator comment and complete DoD.
+1. Obtain separate composed implementation review/sign-off.
+2. Move to `status:ready-merge` only after the evaluator comment and complete DoD.
 
 ## Key Decisions
 
@@ -64,8 +64,8 @@ current-head repeat.
 | --- | --- | --- |
 | Static | pass | check + scoped lint/fmt |
 | Fitness | pass | focused/package tests, quality scan, arch check, JSR dry run |
-| Runtime | pending current head | [pre-reconcile CI attempt 2](https://github.com/rickylabs/netscript/actions/runs/30895255613/job/91950747988): canonical suite 71/71 with cleanup |
-| Consumer | pending current head | directory fallback passed live; rebased gate now invokes S6 `list_api_services` flow |
+| Runtime | pass | pre-reconcile suite 71/71 plus D15 exact-path adapter capture on #1211-rebased head |
+| Consumer | pass | public MCP `list_api_services` returned live `users` at the describe-correlated target port |
 
 ## Open Questions
 
