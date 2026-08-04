@@ -2,10 +2,12 @@ import {
   assert,
   assertEquals,
   assertFalse,
+  assertMatch,
   assertRejects,
   assertStringIncludes,
 } from "@std/assert";
 import { dirname, join } from "@std/path";
+import { format, increment, parse } from "@std/semver";
 import { NETSCRIPT_RELEASE_VERSION } from "../../../../kernel/constants/jsr-specifiers.ts";
 import { EMBEDDED_SKILL_FILES } from "../../../../kernel/assets/skills.generated.ts";
 import { DenoAgentInitFileSystem } from "./agent-init-file-system.ts";
@@ -16,6 +18,14 @@ import type { AgentDocsGenerator } from "./agent-docs-generator.ts";
 const SUCCESSFUL_ASPIRE_INITIALIZER: AspireAgentInitializer = {
   initialize: () => Promise.resolve({ ok: true }),
 };
+
+const OPENAPI_TOOL_TRIAD = [
+  "list_api_services",
+  "list_service_operations",
+  "get_operation_schema",
+] as const;
+const MIGRATION_TARGET_SPECIFIER =
+  `jsr:@netscript/cli@${format(increment(parse(NETSCRIPT_RELEASE_VERSION), "patch", {}))}`;
 
 const FIXTURE_DOCS_GENERATOR: AgentDocsGenerator = {
   generate: () =>
@@ -134,6 +144,121 @@ Deno.test("agent init selects VS Code and detect-or-all host table", async () =>
     } finally {
       await Deno.remove(only, { recursive: true });
     }
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+Deno.test('agent init applies native editor configuration for none, Zed, and VS Code', async () => {
+  const fs = new DenoAgentInitFileSystem();
+  const roots = await Promise.all([
+    Deno.makeTempDir(),
+    Deno.makeTempDir(),
+    Deno.makeTempDir(),
+  ]);
+  const [noneRoot, zedRoot, vscodeRoot] = roots;
+  try {
+    await initAgent({ projectRoot: noneRoot, host: 'claude', editor: 'none' }, {
+      fs,
+      aspireAgentInitializer: SUCCESSFUL_ASPIRE_INITIALIZER,
+    });
+    assertFalse(await fs.exists(join(noneRoot, '.zed')));
+    assertFalse(await fs.exists(join(noneRoot, '.vscode')));
+
+    await fs.writeText(
+      join(zedRoot, '.zed/settings.json'),
+      '{"custom":true,"context_servers":{"other":{"command":"other"}}}\n',
+    );
+    await initAgent({ projectRoot: zedRoot, host: 'claude', editor: 'zed' }, {
+      fs,
+      aspireAgentInitializer: SUCCESSFUL_ASPIRE_INITIALIZER,
+    });
+    const zed = JSON.parse(await Deno.readTextFile(join(zedRoot, '.zed/settings.json')));
+    assertEquals(zed.custom, true);
+    assertEquals(zed.context_servers.other.command, 'other');
+    assertEquals(zed.context_servers.netscript.command, 'deno');
+    assertEquals(zed.context_servers.aspire.command, 'aspire');
+    assert(zed.lsp.deno.settings.deno.enable);
+    assert(await fs.exists(join(zedRoot, '.zed/debug.json')));
+    assertFalse(await fs.exists(join(zedRoot, '.vscode/mcp.json')));
+
+    await initAgent({ projectRoot: vscodeRoot, host: 'claude', editor: 'vscode' }, {
+      fs,
+      aspireAgentInitializer: SUCCESSFUL_ASPIRE_INITIALIZER,
+    });
+    const vscode = JSON.parse(
+      await Deno.readTextFile(join(vscodeRoot, '.vscode/mcp.json')),
+    );
+    assertEquals(vscode.servers.netscript.command, 'deno');
+    assertEquals(vscode.servers.aspire.command, 'aspire');
+    assert(await fs.exists(join(vscodeRoot, '.vscode/settings.json')));
+    assertFalse(await fs.exists(join(vscodeRoot, '.zed/settings.json')));
+  } finally {
+    await Promise.all(roots.map((root) => Deno.remove(root, { recursive: true })));
+  }
+});
+
+Deno.test('agent init detects one existing editor and rejects an ambiguous project', async () => {
+  const detectedRoot = await Deno.makeTempDir();
+  const ambiguousRoot = await Deno.makeTempDir();
+  const fs = new DenoAgentInitFileSystem();
+  try {
+    await Deno.mkdir(join(detectedRoot, '.zed'));
+    await initAgent({ projectRoot: detectedRoot, host: 'claude' }, {
+      fs,
+      aspireAgentInitializer: SUCCESSFUL_ASPIRE_INITIALIZER,
+    });
+    assert(await fs.exists(join(detectedRoot, '.zed/settings.json')));
+
+    await Deno.mkdir(join(ambiguousRoot, '.zed'));
+    await Deno.mkdir(join(ambiguousRoot, '.vscode'));
+    await assertRejects(
+      () =>
+        initAgent({ projectRoot: ambiguousRoot, host: 'claude' }, {
+          fs,
+          aspireAgentInitializer: SUCCESSFUL_ASPIRE_INITIALIZER,
+        }),
+      Error,
+      'pass --editor zed, --editor vscode, or --editor none',
+    );
+  } finally {
+    await Deno.remove(detectedRoot, { recursive: true });
+    await Deno.remove(ambiguousRoot, { recursive: true });
+  }
+});
+
+Deno.test("S-18 prior-release host stays pinned until agent init and restart exposes the tool triad", async () => {
+  const root = await Deno.makeTempDir();
+  try {
+    const fs = new DenoAgentInitFileSystem();
+    const fixtureRoot = new URL("./fixtures/", import.meta.url);
+    await fs.writeText(
+      join(root, ".mcp.json"),
+      await Deno.readTextFile(new URL("prior-release.mcp.json", fixtureRoot)),
+    );
+    await fs.writeText(join(root, "deno.json"), '{"workspace":[]}\n');
+    const priorTools = JSON.parse(
+      await Deno.readTextFile(new URL("prior-release-tools.json", fixtureRoot)),
+    ) as readonly string[];
+    const before = JSON.parse(await Deno.readTextFile(join(root, ".mcp.json")));
+    const priorSpecifier = before.mcpServers.netscript.args[4] as string;
+    assertMatch(priorSpecifier, /^jsr:@netscript\/cli@\d+\.\d+\.\d+$/);
+    assertFalse(priorSpecifier === MIGRATION_TARGET_SPECIFIER);
+    for (const tool of OPENAPI_TOOL_TRIAD) assertFalse(priorTools.includes(tool));
+
+    await initAgent({ projectRoot: root, host: "claude" }, {
+      fs,
+      aspireAgentInitializer: SUCCESSFUL_ASPIRE_INITIALIZER,
+      cliSpecifier: MIGRATION_TARGET_SPECIFIER,
+    });
+    const after = JSON.parse(await Deno.readTextFile(join(root, ".mcp.json")));
+    assertEquals(after.project, "prior-release-fixture");
+    assertEquals(after.mcpServers.other.command, "other");
+    assertEquals(after.mcpServers.netscript.args[4], MIGRATION_TARGET_SPECIFIER);
+
+    const restartedTools = await listToolsAfterHostRestart(root);
+    assertEquals(restartedTools.length, 21);
+    for (const tool of OPENAPI_TOOL_TRIAD) assert(restartedTools.includes(tool));
   } finally {
     await Deno.remove(root, { recursive: true });
   }
@@ -566,6 +691,38 @@ Deno.test("offline docs failure occurs before any project write", async () => {
     await Deno.remove(root, { recursive: true });
   }
 });
+
+async function listToolsAfterHostRestart(projectRoot: string): Promise<readonly string[]> {
+  const cliPath = new URL("../../../../../bin/netscript.ts", import.meta.url).pathname;
+  const child = new Deno.Command(Deno.execPath(), {
+    args: [
+      "run",
+      "-A",
+      cliPath,
+      "agent",
+      "mcp",
+      "--project-root",
+      projectRoot,
+      "--endpoint",
+      "http://127.0.0.1:1",
+    ],
+    cwd: projectRoot,
+    stdin: "piped",
+    stdout: "piped",
+    stderr: "piped",
+  }).spawn();
+  const writer = child.stdin.getWriter();
+  await writer.write(new TextEncoder().encode(
+    `${JSON.stringify({ jsonrpc: "2.0", id: 1, method: "tools/list" })}\n`,
+  ));
+  await writer.close();
+  const output = await child.output();
+  assertEquals(output.code, 0, new TextDecoder().decode(output.stderr));
+  const response = JSON.parse(new TextDecoder().decode(output.stdout)) as {
+    readonly result: { readonly tools: readonly { readonly name: string }[] };
+  };
+  return response.result.tools.map((tool) => tool.name);
+}
 
 function extractSkillReferences(markdown: string): ReadonlySet<string> {
   const references = new Set<string>();

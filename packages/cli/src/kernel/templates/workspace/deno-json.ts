@@ -43,7 +43,8 @@ export function generateDenoJson(options: WorkspaceDenoJsonOptions): string {
   const dbEngine = options.dbEngines?.[0];
   const generatedImports = dbEngine
     ? {
-      '@database/zod': `./${SCAFFOLD_DIRS.DATABASE}/${dbEngine}/schema/.generated/zod/crud.ts`,
+      '@database/zod':
+        `./${SCAFFOLD_DIRS.DATABASE}/${dbEngine}/schema/.generated/zod/schemas/models/index.ts`,
     }
     : {};
   const jsrImports = options.importMode === 'jsr'
@@ -78,7 +79,10 @@ export function generateDenoJson(options: WorkspaceDenoJsonOptions): string {
     // - `kv`: `@netscript/kv` depends on the unstable `Deno.Kv` API.
     unstable: ['raw-imports', 'kv'],
     tasks: {
-      dev: `deno run --allow-all ${SCAFFOLD_DIRS.APPS}/${options.appName}/main.ts`,
+      dev:
+        `deno task deps:verify && deno run --allow-all ${SCAFFOLD_DIRS.APPS}/${options.appName}/main.ts`,
+      'deps:verify':
+        'deno run --allow-read --allow-env=DENO_DIR,LOCALAPPDATA,XDG_CACHE_HOME,HOME,USERPROFILE .netscript/verify-node-modules.ts',
       ...(!options.noAspire
         ? {
           'aspire:start': 'cd aspire && ASPIRE_CLI_START_TIMEOUT=300 aspire start',

@@ -6,7 +6,9 @@ import {
 } from '../../../domain/cli-surface.ts';
 import { DATABASE, type DatabaseEngine, PACKAGE_SOURCE } from '../../../domain/extension-axes.ts';
 import type { GateDefinition } from '../../../domain/gate-definition.ts';
+import type { RunContext } from '../../../domain/run-context.ts';
 import { commandGate, denoCommand, httpGate } from './gate-factory.ts';
+import { allocateScaffoldDefaultPort } from '../../../../../src/kernel/domain/scaffold/default-port-allocation.ts';
 
 const ASPIRE_RESOURCE_WAIT_TIMEOUT_SECONDS: Partial<
   Record<AspireResource, number>
@@ -36,6 +38,27 @@ const AI_CHAT_ROUTE_FAILURE_HINT =
   'The generated AI chat route or composition could not be imported, or the self-wired ' +
   '`e2e-tool` was absent or not callable after plugin registry generation. Inspect the captured ' +
   'stderr for the failing generated module and registry path.';
+
+function pluginUrl(resourceName: string, path: string): (context: RunContext) => string {
+  return (context) =>
+    `http://127.0.0.1:${
+      allocateScaffoldDefaultPort(
+        context.request.options.projectName,
+        `plugin:${resourceName}`,
+      )
+    }${path}`;
+}
+
+function pluginPort(context: RunContext, resourceName: string): number {
+  return allocateScaffoldDefaultPort(
+    context.request.options.projectName,
+    `plugin:${resourceName}`,
+  );
+}
+
+function withPluginPort(script: string, previousPort: number, port: number): string {
+  return script.replaceAll(String(previousPort), String(port));
+}
 
 function runtimeWaitGate(resource: AspireResource): GateDefinition {
   if (resource === ASPIRE_RESOURCE.WORKERS) {
@@ -112,7 +135,11 @@ export function createRuntimeGates(
       (context) => [
         'deno',
         'eval',
-        AUTH_SMOKE_ENV_SCRIPT,
+        withPluginPort(
+          AUTH_SMOKE_ENV_SCRIPT,
+          8094,
+          pluginPort(context, 'auth'),
+        ),
         context.project.projectRoot,
         context.project.repoRoot,
       ],
@@ -205,6 +232,24 @@ export function createRuntimeGates(
       (context) => context.project.projectRoot,
     ),
     commandGate(
+      GATE.BEHAVIOR_MCP_ENDPOINT_DIRECTORY,
+      'Resolve live service ports through MCP Aspire adapter',
+      GATE_PHASE.BEHAVIOR,
+      (context) => [
+        'deno',
+        'run',
+        '--config',
+        `${context.project.repoRoot}/packages/mcp/deno.json`,
+        '--allow-read',
+        '--allow-run=aspire',
+        '--allow-net=127.0.0.1,localhost',
+        `${context.project.repoRoot}/packages/cli/e2e/src/application/gates/scaffold/verify-mcp-endpoint-directory.ts`,
+        context.project.projectRoot,
+        context.project.appHost,
+      ],
+      (context) => context.project.projectRoot,
+    ),
+    commandGate(
       GATE.BEHAVIOR_SERVICE_HEALTH,
       'Users service health',
       GATE_PHASE.BEHAVIOR,
@@ -222,22 +267,22 @@ export function createRuntimeGates(
     httpGate(
       GATE.BEHAVIOR_WORKERS_HEALTH,
       'Workers API health',
-      'http://127.0.0.1:8091/health/live',
+      pluginUrl('workers-api', '/health/live'),
     ),
     httpGate(
       GATE.BEHAVIOR_WORKERS_JOBS,
       'List worker jobs',
-      'http://127.0.0.1:8091/api/v1/workers/jobs',
+      pluginUrl('workers-api', '/api/v1/workers/jobs'),
     ),
     httpGate(
       GATE.BEHAVIOR_WORKERS_TASKS,
       'List worker tasks',
-      'http://127.0.0.1:8091/api/v1/workers/tasks',
+      pluginUrl('workers-api', '/api/v1/workers/tasks'),
     ),
     httpGate(
       GATE.BEHAVIOR_WORKERS_SEED,
       'Seed worker demo data through API',
-      'http://127.0.0.1:8091/api/v1/workers/seed',
+      pluginUrl('workers-api', '/api/v1/workers/seed'),
       'POST',
     ),
     commandGate(
@@ -248,31 +293,40 @@ export function createRuntimeGates(
         'deno',
         'run',
         '--allow-read',
-        '--allow-net=127.0.0.1:8091',
+        `--allow-net=127.0.0.1:${pluginPort(context, 'workers-api')}`,
         'packages/cli/e2e/src/application/gates/scaffold/configure-flow-b-job.ts',
         context.project.projectRoot,
+        String(pluginPort(context, 'workers-api')),
       ],
     ),
     commandGate(
       GATE.BEHAVIOR_WORKERS_EXECUTIONS,
       'List recent worker executions',
       GATE_PHASE.BEHAVIOR,
-      () => ['deno', 'eval', VALIDATE_WORKER_EXECUTIONS_SCRIPT],
+      (context) => [
+        'deno',
+        'eval',
+        withPluginPort(
+          VALIDATE_WORKER_EXECUTIONS_SCRIPT,
+          8091,
+          pluginPort(context, 'workers-api'),
+        ),
+      ],
     ),
     httpGate(
       GATE.BEHAVIOR_SAGAS_HEALTH,
       'Sagas API health',
-      'http://127.0.0.1:8092/health/live',
+      pluginUrl('sagas-api', '/health/live'),
     ),
     httpGate(
       GATE.BEHAVIOR_SAGAS_LIST,
       'List saga definitions',
-      'http://127.0.0.1:8092/api/v1/sagas/sagas',
+      pluginUrl('sagas-api', '/api/v1/sagas/sagas'),
     ),
     httpGate(
       GATE.BEHAVIOR_SAGAS_INSTANCES,
       'List saga instances',
-      'http://127.0.0.1:8092/api/v1/sagas/instances',
+      pluginUrl('sagas-api', '/api/v1/sagas/instances'),
     ),
     commandGate(
       GATE.BEHAVIOR_DURABLE_CLI_PARITY,
@@ -281,7 +335,9 @@ export function createRuntimeGates(
       (context) => [
         'deno',
         'run',
-        '--allow-net=127.0.0.1:8091,127.0.0.1:8092',
+        `--allow-net=127.0.0.1:${pluginPort(context, 'workers-api')},127.0.0.1:${
+          pluginPort(context, 'sagas-api')
+        }`,
         '--allow-read',
         `${context.project.repoRoot}/packages/cli/e2e/src/application/gates/scaffold/durable-cli-parity.ts`,
       ],
@@ -290,34 +346,50 @@ export function createRuntimeGates(
     httpGate(
       GATE.BEHAVIOR_TRIGGERS_HEALTH,
       'Triggers API health',
-      'http://127.0.0.1:8093/health',
+      pluginUrl('triggers-api', '/health'),
     ),
     commandGate(
       GATE.BEHAVIOR_TRIGGERS_WEBHOOK,
       'Accept generic trigger webhook',
       GATE_PHASE.BEHAVIOR,
-      () => ['deno', 'eval', ACCEPT_TRIGGER_WEBHOOK_SCRIPT],
+      (context) => [
+        'deno',
+        'eval',
+        withPluginPort(
+          ACCEPT_TRIGGER_WEBHOOK_SCRIPT,
+          8093,
+          pluginPort(context, 'triggers-api'),
+        ),
+      ],
     ),
     commandGate(
       GATE.BEHAVIOR_TRIGGERS_EVENTS,
       'List trigger events',
       GATE_PHASE.BEHAVIOR,
-      () => ['deno', 'eval', VALIDATE_TRIGGER_EVENTS_SCRIPT],
+      (context) => [
+        'deno',
+        'eval',
+        withPluginPort(
+          VALIDATE_TRIGGER_EVENTS_SCRIPT,
+          8093,
+          pluginPort(context, 'triggers-api'),
+        ),
+      ],
     ),
     httpGate(
       GATE.BEHAVIOR_AUTH_LIVE,
       'Auth API liveness',
-      'http://127.0.0.1:8094/health/live',
+      pluginUrl('auth', '/health/live'),
     ),
     httpGate(
       GATE.BEHAVIOR_AUTH_READY,
       'Auth API readiness',
-      'http://127.0.0.1:8094/health/ready',
+      pluginUrl('auth', '/health/ready'),
     ),
     httpGate(
       GATE.BEHAVIOR_AUTH_SESSION,
       'Read auth session route',
-      'http://127.0.0.1:8094/api/v1/auth/session',
+      pluginUrl('auth', '/api/v1/auth/session'),
     ),
     commandGate(
       GATE.BEHAVIOR_APP_HOME,

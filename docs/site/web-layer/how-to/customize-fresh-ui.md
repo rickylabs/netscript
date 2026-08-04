@@ -94,7 +94,7 @@ and components:
   {
     label: "apps/dashboard/main.ts",
     lang: "ts",
-    code: "import { defineFreshApp } from '@netscript/fresh/server';\nimport type { State } from '@app/utils.ts';\n\nexport const app = defineFreshApp<State>({ name: 'dashboard' });\n\n// PORT is supplied by Aspire; defaults locally. The banner shows in `aspire start` logs.\nconst port = parseInt(Deno.env.get('PORT') || '8010');\nconsole.log(`[dashboard] listening on http://localhost:${port}`);"
+    code: "import { defineFreshApp } from '@netscript/fresh/server';\nimport type { State } from '@app/utils.ts';\n\nexport const app = defineFreshApp<State>({ name: 'dashboard' });\n\n// PORT is supplied by Aspire; defaults locally. The banner shows in `aspire start` logs.\nconst port = parseInt(Deno.env.get('PORT') || '8010'); // note: your scaffold's port will differ\nconsole.log(`[dashboard] listening on http://localhost:${port}`);"
   }
 ] }) }}
 

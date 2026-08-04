@@ -54,7 +54,7 @@ const running = await createService(router, { name: 'users', version: '1.0.0' })
     await db.$disconnect();
   })
   .serve({
-    port: 3001,
+    port: 3001, // note: your scaffold's port will differ
     drainTimeoutMs: 10_000, // wait up to 10s for in-flight work
     handleSignals: true,    // SIGINT/SIGTERM (SIGBREAK on Windows) — the default
   });
@@ -101,7 +101,7 @@ const controller = new AbortController();
 
 const running = await createService(router, { name: 'users' })
   .withRPC()
-  .serve({ port: 3001, signal: controller.signal, drainTimeoutMs: 15_000 });
+  .serve({ port: 3001, signal: controller.signal, drainTimeoutMs: 15_000 }); // note: your scaffold's port will differ
 
 // Anywhere in the parent: triggers the same bounded drain.
 controller.abort();

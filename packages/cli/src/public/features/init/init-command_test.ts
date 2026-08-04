@@ -61,6 +61,28 @@ Deno.test('init derives Prisma model name from service name', async () => {
   assertEquals(validated.modelName, 'Product');
 });
 
+Deno.test('init generates a stable high-range standalone service port', async () => {
+  const options = {
+    name: 'high-port-defaults',
+    importMode: 'jsr' as const,
+    force: true,
+    ci: true,
+    yes: false,
+    dryRun: true,
+    noGit: true,
+    noAspire: false,
+    dbEngine: 'postgres' as const,
+    includeExampleService: true,
+    serviceName: 'users',
+  };
+
+  const first = await validateOptions(fakeInitContext(), options);
+  const second = await validateOptions(fakeInitContext(), options);
+
+  assertEquals(first.servicePort, second.servicePort);
+  assertEquals((first.servicePort ?? 0) >= 49_152, true);
+});
+
 Deno.test('init accepts validated Prisma model name override', async () => {
   const validated = await validateOptions(fakeInitContext(), {
     name: 'crud-override',

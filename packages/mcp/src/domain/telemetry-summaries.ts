@@ -60,6 +60,8 @@ export interface ErrorGroupSummary {
   readonly sampleMessage: string;
   readonly relatedRunIds: readonly string[];
   readonly relatedTraceIds: readonly string[];
+  /** Next diagnostic step before constructing an HTTP request. */
+  readonly operationSchemaHint: string;
 }
 
 /** Most recent completed job execution. */

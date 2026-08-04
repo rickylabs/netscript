@@ -1,6 +1,7 @@
 const MAX_ATTEMPTS = 10;
 const RETRY_DELAY_MS = 2_000;
-const WEBHOOK_URL = 'http://127.0.0.1:8093/api/v1/webhooks/inbound/generic';
+const triggersPort = Number(Deno.args[2]);
+const WEBHOOK_URL = `http://127.0.0.1:${triggersPort}/api/v1/webhooks/inbound/generic`;
 
 /** Extract the first non-empty JSON array from generated task output. */
 export function parseNonEmptyTraceArray(output: string): unknown[] {
@@ -79,6 +80,7 @@ async function resolveResourceCandidates(
 }
 
 async function main(): Promise<void> {
+  if (!Number.isInteger(triggersPort)) throw new Error('triggers API port argument is required');
   const [projectRoot, resourceDisplayName = 'workers'] = Deno.args;
   if (!projectRoot) throw new Error('generated project root is required');
   const candidates = await resolveResourceCandidates(projectRoot, resourceDisplayName);

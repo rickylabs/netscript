@@ -67,5 +67,10 @@ export function createRemovePluginCommand(
       print(`Removed plugin "${name}".`);
       print(`Removed ${appsettingsCount} appsettings entries.`);
       print(`Removed ${result.removedGeneratedDirs.length} generated directories.`);
+      print(result.removedPluginDir
+        ? `Removed plugin directory for "${name}".`
+        : `Plugin directory for "${name}" was already absent.`);
+      print(`Removed ${result.removedSchemaDirs.length} plugin schema directories.`);
+      print(`Regenerated ${result.helperFiles.length} Aspire helper files.`);
     });
 }

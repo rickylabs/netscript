@@ -15,7 +15,7 @@ function contractDatabaseImports(options: ValidatedInitOptions): Record<string, 
   }
   return {
     '@database/zod':
-      `../${SCAFFOLD_DIRS.DATABASE}/${options.dbEngine}/schema/.generated/zod/crud.ts`,
+      `../${SCAFFOLD_DIRS.DATABASE}/${options.dbEngine}/schema/.generated/zod/schemas/models/index.ts`,
   };
 }
 
@@ -101,6 +101,7 @@ export async function scaffoldServices(
     targetPath: options.targetPath,
     serviceName: options.serviceName,
     servicePort: options.servicePort,
+    hostPort: options.serviceHostPort,
     importMode: options.importMode,
     localBase: options.localBase ? adjustLocalBase(options.localBase, 2) : undefined,
     packagesAsWorkspaceMembers: context.packagesAsWorkspaceMembers(options),

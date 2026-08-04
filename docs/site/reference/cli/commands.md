@@ -54,7 +54,7 @@ the [quickstart](/quickstart/); every flag is:
 
 | Command | Description |
 | --- | --- |
-| `netscript agent init` | Install NetScript MCP, consumer diagnostic tools, and skills for detected agent hosts. The Claude Code host path writes `.mcp.json`, installs the `netscript` / `netscript-build` / `netscript-operate` / `aspire` / `deno` skills plus `help.md` under `.claude/skills/`, and updates the marked NetScript section in `AGENTS.md`; the VS Code host path writes `.vscode/mcp.json`. Flags: `--host <host>` (`claude`, `vscode`, or `all` — `all` runs both host paths); `--with-docs` opts into a several-megabyte expanded offline prose corpus plus API docs generated for every export subpath of the exact installed NetScript package versions. |
+| `netscript agent init` | Install NetScript MCP, consumer diagnostic tools, and skills for detected agent hosts, and apply editor setup to a new or existing project. Claude Code writes `.mcp.json` and installs the skill bundle; VS Code writes `.vscode/mcp.json`; Zed writes `.zed/settings.json` `context_servers`. Flags: `--host <host>` (`claude`, `vscode`, or `all`); `--editor <editor>` (`none`, `zed`, or `vscode`, inferred from one existing editor directory when omitted); `--with-docs` installs the expanded exact-version corpus. Unsupported editors fail with manual-configuration guidance. |
 | `netscript agent mcp` | Start the NetScript MCP server over standard input/output. Flags: `--endpoint <url>` (telemetry endpoint), `--project-root <path>`, `--docs-root <path>` (public documentation root). |
 
 ## `config` — inspect and mutate configuration

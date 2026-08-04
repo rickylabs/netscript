@@ -4,9 +4,9 @@
 [![CI](https://github.com/rickylabs/netscript/actions/workflows/ci.yml/badge.svg)](https://github.com/rickylabs/netscript/actions/workflows/ci.yml)
 [![Docs](https://img.shields.io/badge/docs-rickylabs.github.io-blue)](https://rickylabs.github.io/netscript/)
 
-**The Model Context Protocol server for NetScript: 17 token-bounded tools that let a coding agent
-monitor a running app, debug a correlated execution, read framework-semantic telemetry, run the
-doctor, and search the docs — all over stdio.**
+**The Model Context Protocol server for NetScript: 21 token-bounded tools for app health, correlated
+execution debugging, framework telemetry, CLI diagnostics, documentation search, and first-party
+export discovery over stdio.**
 
 Point Claude Code or VS Code at a running NetScript app and the agent can ask _"is the app
 healthy?"_, _"why did the last import job fail?"_, and _"what is slowing down `checkout`?"_ — and
@@ -24,7 +24,7 @@ Aspire's own MCP server: Aspire speaks resources and containers; this server spe
 
 ## Why agents like it
 
-- **17 token-bounded tools** — every successful result is capped server-side (50 array items, 2,000
+- **21 token-bounded tools** — every successful result is capped server-side (50 array items, 2,000
   characters per string) before it reaches the model; the analytics tools never return raw spans at
   all.
 - **Framework-semantic trace intelligence** — tools classify telemetry into `worker`, `saga`,
@@ -45,9 +45,10 @@ Aspire's own MCP server: Aspire speaks resources and containers; this server spe
 
 ```mermaid
 flowchart LR
-    A["Agent host<br/>(Claude Code, VS Code, ...)"] <-- "JSON-RPC / stdio" --> S["netscript agent mcp<br/>17 tools · bounded results"]
+    A["Agent host<br/>(Claude Code, VS Code, ...)"] <-- "JSON-RPC / stdio" --> S["netscript agent mcp<br/>21 tools · bounded results"]
     S --> T["Telemetry endpoint<br/>(OTLP read model)"]
     S --> D["Docs corpus<br/>(public Markdown)"]
+    S --> E["Export corpus<br/>(pinned deno doc JSON)"]
     S --> P["Command policy<br/>(default-deny allowlist)"]
     T --> R["Running NetScript app"]
     P --> C["netscript CLI"]
@@ -133,21 +134,25 @@ results, and `get_run` returns a structured `run_not_found` error the agent can 
 
 ## Tool catalog
 
-| Tool                          | Required input    | Bounded result                                                               |
-| ----------------------------- | ----------------- | ---------------------------------------------------------------------------- |
-| `get_app_status`              | —                 | Health verdict, counts, per-domain summaries                                 |
-| `list_runs`                   | —                 | Recent executions filtered by domain, status, service, time                  |
-| `get_run`                     | `id`              | One correlated execution with bounded spans and logs                         |
-| `get_recent_errors`           | —                 | Recent errors grouped by service and domain                                  |
-| `get_last_job_result`         | —                 | The latest matching job outcome                                              |
-| `analyze_service_performance` | `service`         | Duration percentiles, throughput, error rate                                 |
-| `analyze_db_bottlenecks`      | —                 | Ranked database and KV operations                                            |
-| `doctor`                      | —                 | Telemetry, Aspire, wiring, and plugin checks; suggested fixes on problems    |
-| `search_docs`                 | `query`           | Ranked public-document matches with snippets                                 |
-| `list_docs`                   | —                 | Public-document summaries                                                    |
-| `get_doc`                     | `slug`            | One public document, or one named section of it                              |
-| `list_commands`               | —                 | Live CLI command descriptors                                                 |
-| `execute_command`             | `command`         | Exit code, duration, and bounded output tail; structured denial when blocked |
+| Tool                          | Required input        | Bounded result                                                               |
+| ----------------------------- | --------------------- | ---------------------------------------------------------------------------- |
+| `get_app_status`              | —                     | Health verdict, counts, per-domain summaries                                 |
+| `list_runs`                   | —                     | Recent executions filtered by domain, status, service, time                  |
+| `get_run`                     | `id`                  | One correlated execution with bounded spans and logs                         |
+| `get_recent_errors`           | —                     | Recent errors grouped by service and domain                                  |
+| `get_last_job_result`         | —                     | The latest matching job outcome                                              |
+| `analyze_service_performance` | `service`             | Duration percentiles, throughput, error rate                                 |
+| `analyze_db_bottlenecks`      | —                     | Ranked database and KV operations                                            |
+| `doctor`                      | —                     | Telemetry, Aspire, wiring, and plugin checks; suggested fixes on problems    |
+| `search_docs`                 | `query`               | Ranked public-document matches with snippets                                 |
+| `list_docs`                   | —                     | Public-document summaries                                                    |
+| `get_doc`                     | `slug`                | One public document, or one named section of it                              |
+| `find_export`                 | `symbol`              | Exact symbol locations as package and export subpath                         |
+| `list_package_exports`        | `package`             | Paginated declarations grouped by export subpath                             |
+| `get_export`                  | `symbol`              | One bounded declaration signature and JSDoc block                            |
+| `search_exports`              | `query`               | Ranked partial-name and declaration-shape matches                            |
+| `list_commands`               | —                     | Live CLI command descriptors                                                 |
+| `execute_command`             | `command`             | Exit code, duration, and bounded output tail; structured denial when blocked |
 | `record_drift`                | `resource`, `summary` | Evidence-gated drift entry appended to project drift log                     |
 | `list_api_services`           | —                 | Discovered services, live spec status, source outcomes, and operation counts  |
 | `list_service_operations`     | `service`         | Bounded OpenAPI operation rows with honest truncation metadata                |
@@ -160,13 +165,22 @@ contracts are published as `TOOL_INPUT_SCHEMAS` / `TOOL_OUTPUT_SCHEMAS` and retu
 
 ## Record drift
 
-`record_drift` is an evidence-gated mutating tool that records verified architecture or runtime drift into `.netscript/agent/drift.jsonl`.
+`record_drift` is an evidence-gated mutating tool that records verified architecture or runtime
+drift into `.netscript/agent/drift.jsonl`.
 
-- **Required evidence**: Requires a fresh successful diagnostic receipt (timestamped within 15 minutes, `exitStatus: 0`) for the target resource. Receipts are automatically produced when calling `doctor`, telemetry tools, or `netscript plugin doctor --resource <resource>`.
-- **Target & Scope**: The `resource` argument targets a specific plugin, service, or `'project'`. Receipts live at `.netscript/agent/diagnostics/<resource>.json`.
-- **Mutation behavior**: Appends a single JSON line to `.netscript/agent/drift.jsonl` under the project root containing `timestamp`, `resource`, `summary`, optional `details`, and the attached evidence receipt.
-- **Failure modes**: If no receipt exists, if the receipt is older than 15 minutes, or if the receipt recorded a non-zero exit status, `record_drift` refuses with structured error code `diagnostic_evidence_required`.
-- **Dry-run / Preview**: Inspecting receipts or running `doctor` / telemetry tools previews current diagnostic state without mutating `drift.jsonl`.
+- **Required evidence**: Requires a fresh successful diagnostic receipt (timestamped within 15
+  minutes, `exitStatus: 0`) for the target resource. Receipts are automatically produced when
+  calling `doctor`, telemetry tools, or `netscript plugin doctor --resource <resource>`.
+- **Target & Scope**: The `resource` argument targets a specific plugin, service, or `'project'`.
+  Receipts live at `.netscript/agent/diagnostics/<resource>.json`.
+- **Mutation behavior**: Appends a single JSON line to `.netscript/agent/drift.jsonl` under the
+  project root containing `timestamp`, `resource`, `summary`, optional `details`, and the attached
+  evidence receipt.
+- **Failure modes**: If no receipt exists, if the receipt is older than 15 minutes, or if the
+  receipt recorded a non-zero exit status, `record_drift` refuses with structured error code
+  `diagnostic_evidence_required`.
+- **Dry-run / Preview**: Inspecting receipts or running `doctor` / telemetry tools previews current
+  diagnostic state without mutating `drift.jsonl`.
 
 ## Embedding as a library
 
@@ -189,16 +203,16 @@ stdin or terminates the process; callers do not need to reach into an internal t
 
 Three entrypoints carry the package:
 
-| Entry                  | What it gives you                                                                                                                    |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| `.`                    | Tool contracts and schemas, the tool registry, protocol runner, service endpoint directory ports, and default adapters               |
-| `./cli`                | The executable composition plus every export from `.`, including the service endpoint directory surface                              |
-| `./openapi-projection` | Pure OpenAPI operation indexing and schema projections, with no discovery, filesystem, network, or runtime work                      |
+| Entry                  | What it gives you                                                                                                      |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `.`                    | Tool contracts and schemas, the tool registry, protocol runner, service endpoint directory ports, and default adapters |
+| `./cli`                | The executable composition plus every export from `.`, including the service endpoint directory surface                |
+| `./openapi-projection` | Pure OpenAPI operation indexing and schema projections, with no discovery, filesystem, network, or runtime work        |
 
-The projection subpath accepts an already-loaded OpenAPI document. It keeps discovery and I/O at
-the caller's boundary:
+The projection subpath accepts an already-loaded OpenAPI document. It keeps discovery and I/O at the
+caller's boundary:
 
-```ts
+````ts
 import { indexOpenApiOperations } from '@netscript/mcp/openapi-projection';
 
 const index = indexOpenApiOperations(openApiDocument);
@@ -207,6 +221,12 @@ Every tool flow depends on a port interface, so embedders and tests supply their
 assert against the published schemas. The always-current symbol list is
 [`deno doc jsr:@netscript/mcp@<version>`](https://jsr.io/@netscript/mcp/doc) (pin `<version>` on the
 pre-release line, as above).
+
+The four export tools use a distinct generated corpus, not the Markdown docs corpus. Its payload is
+derived from Deno 2.9 `deno doc --json` for every publishable first-party export map and pinned by
+framework version, SHA-256, compressed/uncompressed byte sizes, and exact package/subpath/symbol
+counts. `EmbeddedExportSurfaceCorpus` verifies those values lazily and performs no project or docs
+filesystem reads.
 
 ### Discover service OpenAPI endpoints
 
@@ -221,15 +241,23 @@ const endpoints = createServiceEndpointDirectory({
 });
 
 const { entries, sources } = await endpoints.list();
-```
+````
 
 The effective per-service precedence is `override > aspire-cli > run-manifest > appsettings`. Every
 source remains visible as `used`, `absent`, or `failed`; a failed Aspire CLI query or a stale
-manifest is never rendered as healthy absence. The manifest at `.netscript/run/endpoints.json` is
-eligible only when its real project root and `runId` match the supplied current run. `appHostPath`
-defaults to `./aspire/apphost.mts`; override it when the active AppHost lives elsewhere. Supply
-`expectedRunId` only when the host owns the current AppHost run token; without that identity proof,
-a present run manifest is reported as failed and does not contribute endpoints.
+manifest is never rendered as healthy absence. The Aspire adapter brackets its machine-readable
+`describe` query with `ps` snapshots: the exact real AppHost path must belong to the project, its
+process identity must remain stable across the read, and any executable resource working directory
+must remain inside that same real project root. For executable services, the adapter prefers the
+allocated target `PORT` from the described resource environment over a fixed proxy URL; this keeps
+discovery live when a stale foreign process occupies the requested proxy port. CLI absence, non-zero
+exit, identity drift, and partial JSON are distinct failed source rows. Benign CLI banners,
+trailers, and casing changes are accepted without weakening those checks. The manifest at
+`.netscript/run/endpoints.json` is eligible only when its real project root and `runId` match the
+supplied current run. `appHostPath` defaults to `./aspire/apphost.mts`; override it when the active
+AppHost lives elsewhere. Supply `expectedRunId` only when the host owns the current AppHost run
+token; without that identity proof, a present run manifest is reported as failed and does not
+contribute endpoints.
 
 Explicit operator endpoints and exclusions live only in the S5-owned subsection of
 `.netscript/agent-mcp.json`; sibling settings are ignored:
@@ -253,8 +281,9 @@ JSON containing its selected service name, for example `{ "service": "orders" }`
 base path; this second request prevents a reused port from being mistaken for the intended service.
 
 The default library composition needs `--allow-read` for carriers and real-path checks,
-`--allow-run` for `aspire describe`, and `--allow-net` for bounded spec/identity requests. Tests and
-custom hosts can replace every source and the probe through `ServiceEndpointDirectoryOptions`.
+`--allow-run` for `aspire ps` plus `aspire describe`, and `--allow-net` for bounded spec/identity
+requests. Tests and custom hosts can replace every source and the probe through
+`ServiceEndpointDirectoryOptions`.
 
 ## Configuration at a glance
 
@@ -276,7 +305,7 @@ The full flag reference, policy table, and composition options are on the docs s
 
 ## Docs
 
-- **MCP reference — the 17-tool field overview, policy, and exports**:
+- **MCP reference — the 21-tool field overview, policy, and exports**:
   [rickylabs.github.io/netscript/reference/mcp/](https://rickylabs.github.io/netscript/reference/mcp/)
 - **Agent tooling — install, flags, troubleshooting, CLI × skills × MCP**:
   [rickylabs.github.io/netscript/capabilities/agent-tooling/](https://rickylabs.github.io/netscript/capabilities/agent-tooling/)

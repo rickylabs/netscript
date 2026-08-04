@@ -77,7 +77,7 @@ dry run is your green light to scaffold for real.
 
 ## Step 2 — Create the workspace
 
-Scaffold `my-shop/` with an example service named `products` on port **3001** and a Postgres
+Scaffold `my-shop/` with an example service named `products` on port **3001** (note: this tutorial pins the port to 3001 for consistency; in unpinned scaffolds, each project is allocated its own randomized high-range ports) and a Postgres
 database, so you have something real to run and a place for the catalog you build next chapter:
 
 ```sh

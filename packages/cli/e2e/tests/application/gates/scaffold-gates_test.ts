@@ -42,14 +42,21 @@ Deno.test('scaffold init default command remains byte-identical', () => {
       '--service',
       '--service-name',
       'users',
-      '--service-port',
-      '3001',
       '--ci',
       '--yes',
       '--no-git',
       '--force',
     ],
   );
+});
+
+Deno.test('scaffold runtime exercises the generated service port default', () => {
+  const command = scaffoldInitGate().command(
+    createContext('/repo/packages/cli/bin/netscript.ts', PACKAGE_SOURCE.JSR),
+  );
+
+  assertEquals(command.includes('--service-port'), false);
+  assertEquals(command.includes('3001'), false);
 });
 
 Deno.test('scaffold init disables the cache exactly once', () => {

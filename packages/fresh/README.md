@@ -145,8 +145,8 @@ sides reuse the same oRPC contract instead of a hand-maintained bindings declara
 | `./route`       | `defineRouteContract`, `bindRoutePattern`, `paginationSearchSchema`, route references |
 | `./form`        | The `Form` component, Standard Schema adapter, CSRF and intent helpers                |
 | `./defer`       | `DeferPage`, `Deferred`, defer policies and decision helpers                          |
-| `./query`       | `QueryIsland`, hydration helpers, TanStack Query island hooks                         |
-| `./server`      | `defineFreshApp`, `renderToStream`, `createStreamingResponse`                         |
+| `./query`       | `QueryIsland`, hydration, query hooks, server-cache invalidation helper               |
+| `./server`      | `defineFreshApp`, standard cache route, streaming response helpers                    |
 | `./desktop`     | `bindDesktopRpcWindow` — oRPC over one Deno Desktop window, inert elsewhere           |
 | `./streams`     | `createNetScriptStreamDB`, `useLiveQuery`, `useLiveSuspenseQuery`                     |
 | `./ai`          | Chat connection and stream-proxy helpers for AI-backed pages                          |

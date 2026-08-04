@@ -61,10 +61,10 @@ netscript db seed
 ```
 
 The payoff: the Aspire dashboard shows every resource, trace, and log in one place, and your typed
-service answers on its health probe:
+service answers on its health probe (replace `<port>` with the port assigned to your service in the scaffold console output or Aspire dashboard):
 
 ```bash
-curl http://localhost:3000/health
+curl http://localhost:<port>/health
 # {"status":"healthy","timestamp":"…","checks":[{"name":"database","healthy":true,"latency":2}],…}
 ```
 
@@ -125,7 +125,7 @@ four plugin files scaffolded and twelve Aspire helpers regenerated:
 
 ```bash
 netscript plugin install worker --name workers
-# Installed worker plugin "workers" on port 8091.
+# Installed worker plugin "workers" on port 49152. (Note: your scaffold's port will differ)
 # Created 4 plugin files.
 # Regenerated 12 Aspire helper files.
 ```

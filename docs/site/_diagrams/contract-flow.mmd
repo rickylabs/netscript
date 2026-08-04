@@ -1,0 +1,16 @@
+%% Source for assets/diagrams/contract-flow.svg
+%% Rendered to a committed static SVG by the SEPARATE dev task in render.ts.
+%% This file is NOT consumed by `deno task build`; the site ships the SVG only.
+flowchart LR
+  schema["zod schema + oc.route<br/><b>the boundary shape you write</b>"]
+  subgraph typed["typed from the contract"]
+    direction TB
+    handler["service handler<br/><b>hand-written logic</b><br/>contract-locked input/output"]
+    openapi["OpenAPI document<br/>generated"]
+    sdk["SDK client + query keys<br/>derived"]
+  end
+  page["page loader + island<br/>consume contract-derived types"]
+  schema --> handler
+  schema --> openapi
+  schema --> sdk
+  sdk --> page

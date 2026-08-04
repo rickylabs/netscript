@@ -400,16 +400,21 @@ For streaming SSR, prefetch on the server and hand the cache to the island:
    `state` prop or a script tag by `id`) or call `hydrateFromDehydrated` against
    the island client.
 
-`getIslandQueryClient()` returns the shared singleton (it throws if called
-during SSR outside island hydration — use a per-request client for prefetch).
-`useQueryClient` returns the active handle inside an island, and
-`resetIslandQueryClient()` clears the singleton, primarily for tests.
+`getIslandQueryClient()` returns the shared singleton. `useQueryClient` returns
+the active handle inside an island, and `resetIslandQueryClient()` clears the
+singleton, primarily for tests.
 
 {{ comp callout { type: "note" } }}
-`getIslandQueryClient()` throws when called during server-side rendering outside
-island hydration. For SSR prefetch, build a per-request `QueryClient`, dehydrate
-it, and hydrate inside the island.
+The island <code>QueryClient</code> is a module-scoped singleton, and nothing
+prevents server code from creating it — calling
+<code>getIslandQueryClient()</code> outside the browser lazily constructs a
+client that would then be shared across requests. Build a per-request client for
+SSR prefetch instead, and treat the singleton as browser-only.
 {{ /comp }}
+
+The cache-first variant of this handoff — SDK query factories, the server and
+client key tiers, `getCachedEntry()` at the loader, and when to dehydrate rather
+than pass `initialData` — is [The query bridge](/web-layer/query-bridge/).
 
 ## API summary
 
@@ -453,6 +458,7 @@ Query subpath (`@netscript/fresh/query`):
 {{ comp.cardsGrid({ columns: 3, cards: [
   { title: "The Fresh page model", body: "How server pages compose and load.", href: "/web-layer/server/" },
   { title: "Routing and route contracts", body: "Route definitions and loaders.", href: "/web-layer/route/" },
+  { title: "The query bridge", body: "SDK factories, key tiers, and server-to-island hydration.", href: "/web-layer/query-bridge/" },
   { title: "Typed SDK & client", body: "The contract → client → query-utils bridge queryFn is built on.", href: "/services-sdk/sdk/" },
   { title: "Interactive islands", body: "Where query hooks run on the client.", href: "/web-layer/interactive/" },
   { title: "Deferred and streaming UI", body: "Stream data into hydrating islands.", href: "/web-layer/defer-streaming-ui/" },

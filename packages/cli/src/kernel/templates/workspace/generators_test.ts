@@ -6,18 +6,14 @@
 
 import { assert, assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
 import { DEFAULT_TEMPLATE_REGISTRY } from '../../application/registries/template-registry.ts';
-import {
-  SCAFFOLD_JSR_RELEASE_PACKAGES,
-} from '../../constants/scaffold/scaffold-workspace-packages.ts';
+import { SCAFFOLD_JSR_RELEASE_PACKAGES } from '../../constants/scaffold/scaffold-workspace-packages.ts';
 import { netscriptJsrSpecifier } from '../../constants/jsr-specifiers.ts';
 import { generateAppTsConfig } from '../../adapters/templates/app/generate-app-tsconfig.ts';
 import { generateDenoJson } from './deno-json.ts';
-import {
-  formatAspireDashboardResolutionFailure,
-  generateAspireCliTaskRunner,
-} from './aspire-cli-task.ts';
+import { formatAspireDashboardResolutionFailure, generateAspireCliTaskRunner } from './aspire-cli-task.ts';
 import { generateNetScriptConfig } from './netscript-config.ts';
 import { generateReadme } from './generate-readme.ts';
+import { generatePackageJson } from './package-json.ts';
 import { generateTsConfig } from './tsconfig.ts';
 
 // `generateNetScriptConfig` reads templates synchronously, which requires a
@@ -63,13 +59,21 @@ Deno.test('generateDenoJson emits the expected root workspace shape in JSR mode'
     'aspire/.helpers',
     '**/.generated',
   ]);
-  assertEquals(result.tasks.dev, 'deno run --allow-all apps/dashboard/main.ts');
+  assertEquals(
+    result.tasks.dev,
+    'deno task deps:verify && deno run --allow-all apps/dashboard/main.ts',
+  );
+  assertEquals(
+    result.tasks['deps:verify'],
+    'deno run --allow-read --allow-env=DENO_DIR,LOCALAPPDATA,XDG_CACHE_HOME,HOME,USERPROFILE .netscript/verify-node-modules.ts',
+  );
   assertEquals(
     result.tasks.check,
     'deno check apps/**/*.ts services/**/*.ts contracts/**/*.ts',
   );
   assertEquals(Object.keys(result.tasks), [
     'dev',
+    'deps:verify',
     'aspire:start',
     'aspire:start:isolated',
     'aspire:otel',
@@ -86,6 +90,13 @@ Deno.test('generateDenoJson emits the expected root workspace shape in JSR mode'
     'semiColons',
     'singleQuote',
   ]);
+});
+
+Deno.test('generatePackageJson pins the pre-window Deno runtime', () => {
+  assertEquals(JSON.parse(generatePackageJson()), {
+    private: true,
+    engines: { deno: '2.9.0' },
+  });
 });
 
 Deno.test('generateDenoJson emits detached Aspire telemetry task routes', () => {
@@ -112,10 +123,16 @@ Deno.test('generateAspireCliTaskRunner emits bare-first fallback and actionable 
     source,
     "const forwardedArgs = rawForwardedArgs[0] === '--' ? rawForwardedArgs.slice(1) : rawForwardedArgs;",
   );
-  assertStringIncludes(source, "primary = await runAspire([mode, ...forwardedArgs])");
+  assertStringIncludes(
+    source,
+    'primary = await runAspire([mode, ...forwardedArgs])',
+  );
   assertStringIncludes(source, 'aspire command failed to start');
-  assertStringIncludes(source, "if (hasOption(forwardedArgs, '--dashboard-url'))");
-  assertStringIncludes(source, "arg === name || arg.startsWith(`${name}=`)");
+  assertStringIncludes(
+    source,
+    "if (hasOption(forwardedArgs, '--dashboard-url'))",
+  );
+  assertStringIncludes(source, 'arg === name || arg.startsWith(`${name}=`)');
   assertStringIncludes(source, "'--dashboard-url', dashboardUrl");
   assertStringIncludes(source, "await Deno.realPath('aspire/apphost.mts')");
   assertEquals(
@@ -157,10 +174,14 @@ Deno.test('generateDenoJson scopes the minimum dependency age exception to NetSc
     ...SCAFFOLD_JSR_RELEASE_PACKAGES.map((packageName) => `jsr:@netscript/${packageName}`),
   ]);
   assertEquals(new Set(exclusions).size, exclusions.length);
-  assert(exclusions.every((specifier) => specifier.startsWith('jsr:@netscript/')));
+  assert(
+    exclusions.every((specifier) => specifier.startsWith('jsr:@netscript/')),
+  );
   // Do not append a version here. Deno's minimum-age matcher did not exempt exact specifiers,
   // causing every freshly published scaffold to fail dependency resolution for about 24 hours.
-  assert(exclusions.every((specifier) => /^jsr:@netscript\/[^@]+$/.test(specifier)));
+  assert(
+    exclusions.every((specifier) => /^jsr:@netscript\/[^@]+$/.test(specifier)),
+  );
   assert(!exclusions.some((specifier) => specifier.includes('@std/')));
 });
 
@@ -190,7 +211,7 @@ Deno.test('generateDenoJson maps @database/zod for the selected database engine'
 
   assertEquals(
     result.imports['@database/zod'],
-    './database/postgres/schema/.generated/zod/crud.ts',
+    './database/postgres/schema/.generated/zod/schemas/models/index.ts',
   );
 });
 
@@ -205,7 +226,7 @@ Deno.test('generateDenoJson keeps generated database aliases in local mode', () 
   }));
 
   assertEquals(result.imports, {
-    '@database/zod': './database/sqlite/schema/.generated/zod/crud.ts',
+    '@database/zod': './database/sqlite/schema/.generated/zod/schemas/models/index.ts',
   });
 });
 
@@ -219,7 +240,10 @@ Deno.test('generateDenoJson keeps the same root-only shape in local mode', () =>
   }));
 
   assertEquals(result.workspace, ['./contracts', './plugins']);
-  assertEquals(result.tasks.dev, 'deno run --allow-all apps/dashboard/main.ts');
+  assertEquals(
+    result.tasks.dev,
+    'deno task deps:verify && deno run --allow-all apps/dashboard/main.ts',
+  );
   assert(!('imports' in result), 'root deno.json must not carry import maps');
   assert(
     !('minimumDependencyAge' in result),
@@ -323,6 +347,10 @@ Deno.test('generateReadme — TS AppHost with service + postgres', () => {
   assertStringIncludes(md, 'aspire restore');
   assertStringIncludes(md, 'aspire start');
   assertStringIncludes(md, 'deno task aspire:start');
+  assertStringIncludes(md, 'deno install');
+  assertStringIncludes(md, 'deno task deps:verify');
+  assertStringIncludes(md, 'Deno 2.9.0');
+  assertStringIncludes(md, 'deno/deno#35804');
   assertStringIncludes(md, 'ASPIRE_CLI_START_TIMEOUT');
   assertStringIncludes(md, '300 seconds');
   assertStringIncludes(md, 'deno task aspire:start:isolated');

@@ -159,6 +159,9 @@ export interface PluginScaffoldResult {
   /** Port used by the generated service entrypoint. */
   readonly servicePort: number;
 
+  /** Explicit Aspire host-port pin for the service entrypoint. */
+  readonly hostPort?: number;
+
   /** Root config section targeted by this plugin. */
   readonly configSection: PluginConfigSection;
 

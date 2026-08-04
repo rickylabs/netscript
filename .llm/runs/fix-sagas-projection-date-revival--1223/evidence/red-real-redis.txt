@@ -1,0 +1,25 @@
+Check plugins/sagas/src/runtime/saga-instance-projection_redis_test.ts
+running 1 test from ./plugins/sagas/src/runtime/saga-instance-projection_redis_test.ts
+projection revives date strings from real Redis-persisted saga state ... FAILED (94ms)
+
+ ERRORS 
+
+projection revives date strings from real Redis-persisted saga state => ./plugins/sagas/src/runtime/saga-instance-projection_redis_test.ts:18:6
+error: TypeError: metadata.createdAt.toISOString is not a function
+      createdAt: metadata.createdAt.toISOString(),
+                                    ^
+    at projectionState (file:///home/codex/repos/ns005-sagas/plugins/sagas/src/runtime/saga-instance-projection.ts:199:37)
+    at readModel (file:///home/codex/repos/ns005-sagas/plugins/sagas/src/runtime/saga-instance-projection.ts:216:12)
+    at KvSagaInstanceProjection.upsert (file:///home/codex/repos/ns005-sagas/plugins/sagas/src/runtime/saga-instance-projection.ts:60:7)
+    at ProjectingSagaStore.appendTransition (file:///home/codex/repos/ns005-sagas/plugins/sagas/src/runtime/saga-instance-projection.ts:154:28)
+    at processTicksAndRejections (ext:core/01_core.js:404:7)
+    at drainTicks (ext:core/01_core.js:431:5)
+    at async fn (file:///home/codex/repos/ns005-sagas/plugins/sagas/src/runtime/saga-instance-projection_redis_test.ts:62:7)
+
+ FAILURES 
+
+projection revives date strings from real Redis-persisted saga state => ./plugins/sagas/src/runtime/saga-instance-projection_redis_test.ts:18:6
+
+FAILED | 0 passed | 1 failed (109ms)
+
+error: Test failed

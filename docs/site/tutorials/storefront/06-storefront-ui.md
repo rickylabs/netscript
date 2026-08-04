@@ -43,7 +43,7 @@ typed end to end against the cart contract from chapter 3.
 
 ## Prerequisites
 
-- The `products` service on `:3001` (from [chapter 2](/tutorials/storefront/02-catalog-service/)) and
+- The `products` service on `:3001` (note: this tutorial pins the port to 3001; in unpinned scaffolds, each project is allocated its own randomized high-range ports) (from [chapter 2](/tutorials/storefront/02-catalog-service/)) and
   the `cart` contract and its typed client (from
   [chapter 3](/tutorials/storefront/03-cart-contracts/)).
 - `aspire start` up, so the `products` service is discoverable by name (the dashboard answers at
@@ -249,6 +249,12 @@ The moves that make this typed end to end:
 - **Invalidation is keyed off the contract too.** `cartQueries.list.key({ type: 'query' })` is the
   prefix-matchable cache key for every cart list query, so one line refetches the cart after checkout.
 
+Adding to a cart is a widget event, which is why it lives in the island. A checkout that collects an
+address and then navigates is a page event, and that is the other half of the decision —
+`definePage().withForm()` owns the validation, the error round trip, and the CSRF token so the page
+still works without JavaScript. [Server-validated forms](/web-layer/form/) covers the split and the
+pipeline behind it.
+
 {{ comp callout { type: "note", title: "Why the queryFn wraps the client instead of spreading queryOptions" } }}
 The island hooks (<code>useIslandQuery</code>/<code>useIslandMutation</code>) take a deliberately
 small option surface with a zero-argument <code>queryFn</code>. The SDK's
@@ -260,11 +266,11 @@ typed client be the function body. Same type source, honest seam.
 
 ## Step 4 — Wire the route to the page
 
-The page is built using NetScript's fluent `definePage` page builder. By binding to the `cartRoute` contract, the page gains access to type-safe path and search schemas so `ctx.path` and `ctx.search` are fully typed throughout the pipeline:
+The page is built using NetScript's fluent `definePage` page builder. By binding to the `cartRoute` contract, the page gains access to type-safe path and search schemas so `ctx.path` and `ctx.search` are fully typed throughout the pipeline. `.withResource()` then registers a value resolved once per request — see [Request-scoped resources](/web-layer/resources/) for what "once" guarantees:
 
 ```tsx
 // apps/storefront/routes/cart/[customer].tsx
-import { definePage } from '@netscript/fresh/builders';
+import { definePage } from '@app/utils.ts';
 import { cartRoute } from '../../../contracts/routes/cart-page.ts';
 import CheckoutIsland from '../../islands/CheckoutIsland.tsx';
 import { productsClient } from '../../lib/api-clients.ts';
@@ -293,6 +299,9 @@ const cartPage = definePage()
 
 export default cartPage.default;
 ```
+
+`definePage` is imported from `@app/utils.ts` — the module chapter 1's scaffold wrote, which
+re-exports the builder bound to your app's `State` type so every page shares one typed context.
 
 `.withRoute(cartRoute)` hands the contract's schemas to the builder, so the parsing you would
 otherwise write by hand happens before your loader runs: `ctx.path.customer` is a typed string and

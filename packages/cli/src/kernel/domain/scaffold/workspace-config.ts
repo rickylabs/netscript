@@ -8,6 +8,8 @@ import type { ScaffoldResult } from '../core-types.ts';
 
 /** Optional editor config scaffolded into the workspace root. */
 export type EditorChoice = 'none' | 'zed' | 'vscode';
+/** Editor targets supported by scaffold and agent initialization. */
+export const EDITOR_CHOICES = ['none', 'zed', 'vscode'] as const satisfies readonly EditorChoice[];
 
 /** Aggregated result of the full `init` pipeline execution. */
 export interface InitResult {

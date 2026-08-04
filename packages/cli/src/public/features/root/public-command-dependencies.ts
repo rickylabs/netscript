@@ -277,6 +277,8 @@ export function createPublicCommandDependencies(
     },
     pluginRemoveDependencies: {
       fs,
+      scaffolder,
+      templateAdapter,
       workspaceMutator: new PluginWorkspaceMutator(fs),
       dispatchPort: createPluginDispatchPort(process),
       processRunner: process,

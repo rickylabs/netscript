@@ -161,11 +161,11 @@ first-party plugin enabled.
             │                                  │                                 │
    ┌────────▼────────┐                ┌────────▼─────────────────────────┐
    │  example service │                │      PLUGIN SERVICES (oRPC)      │
-   │   users :3001    │                ├──────────────────────────────────┤
-   │  /api/rpc/*      │                │  workers  :8091   (jobs/tasks)   │
-   │  oRPC contract   │                │  sagas    :8092   (durable flows)│
-   └────────┬─────────┘                │  triggers :8093   (raw ingress)  │
-            │                          │  auth     :8094   (oRPC /api/rpc)│
+   │   users (service)│                ├──────────────────────────────────┤
+   │  /api/rpc/*      │                │  workers (jobs/tasks)            │
+   │  oRPC contract   │                │  sagas (durable flows)           │
+   └────────┬─────────┘                │  triggers (raw ingress)          │
+            │                          │  auth (oRPC /api/rpc)            │
             │ contracts                └────────┬─────────────────────────┘
             │ (@orpc/contract + zod)            │
             │                          ┌────────▼─────────┐
@@ -176,7 +176,7 @@ first-party plugin enabled.
    └────────┬──────────────────────────────────────────────────────────┬──────────┘
             │ produces durable change-data events                       │
    ┌────────▼─────────┐                                      ┌──────────▼─────────┐
-   │  streams  :4437   │  durable-stream service             │  Postgres / Redis   │
+   │  streams  (port)  │  durable-stream service             │  Postgres / Redis   │
    │  HTTP / SSE       │  workers · auth · sagas mirror here  │  (relational + KV)  │
    └───────────────────┘                                      └────────────────────┘
 ```
@@ -197,12 +197,12 @@ control-plane detail.
   columns: ["Surface", "Port", "Protocol", "Owner"],
   rows: [
     ["Aspire dashboard", ":18888", "HTTP (UI)", "Aspire AppHost"],
-    ["Example service (users)", ":3001", "oRPC over <code>/api/rpc/*</code>", "your service"],
-    ["Workers", ":8091", "oRPC", "<code>@netscript/plugin-workers</code>"],
-    ["Sagas", ":8092", "oRPC", "<code>@netscript/plugin-sagas</code>"],
-    ["Triggers", ":8093", "oRPC (raw webhook ingress)", "<code>@netscript/plugin-triggers</code>"],
-    ["Auth", ":8094", "oRPC over <code>/api/rpc/v1/auth/*</code>", "<code>@netscript/plugin-auth</code>"],
-    ["Streams", ":4437", "durable-stream HTTP / SSE", "<code>@netscript/plugin-streams</code>"]
+    ["Example service (users)", "Assigned (>= 49152)", "oRPC over <code>/api/rpc/*</code>", "your service"],
+    ["Workers", "Assigned (>= 49152)", "oRPC", "<code>@netscript/plugin-workers</code>"],
+    ["Sagas", "Assigned (>= 49152)", "oRPC", "<code>@netscript/plugin-sagas</code>"],
+    ["Triggers", "Assigned (>= 49152)", "oRPC (raw webhook ingress)", "<code>@netscript/plugin-triggers</code>"],
+    ["Auth", "Assigned (>= 49152)", "oRPC over <code>/api/rpc/v1/auth/*</code>", "<code>@netscript/plugin-auth</code>"],
+    ["Streams", "Assigned (>= 57344)", "durable-stream HTTP / SSE", "<code>@netscript/plugin-streams</code>"]
   ]
 }) }}
 

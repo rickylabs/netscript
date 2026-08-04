@@ -39,7 +39,7 @@ export interface ScheduledJob {
   nextRun: Date | null;
   /** Last run time */
   lastRun: Date | null;
-  /** Number of times the job has run */
+  /** Number of completed scheduled or manual invocations; retries do not increment this count. */
   runCount: number;
   /** Last error if any */
   lastError?: string;
@@ -51,13 +51,13 @@ export interface ScheduledJob {
  * Backoff strategy for retry logic
  */
 export type BackoffStrategy = {
-  /** Type of backoff */
+  /** Delay policy applied before each retry. */
   type: 'fixed' | 'exponential' | 'linear';
-  /** Initial delay in ms */
+  /** Base delay in milliseconds. */
   initialDelay: number;
-  /** Maximum delay in ms */
+  /** Optional cap applied to every computed delay. */
   maxDelay?: number;
-  /** Multiplier for exponential backoff */
+  /** Exponential multiplier. Defaults to 2 and is ignored by other policies. */
   multiplier?: number;
 };
 
@@ -71,18 +71,9 @@ export interface ScheduleOptions {
   runOnInit?: boolean;
   /** Whether the job starts enabled (default: true) */
   enabled?: boolean;
-  /** Backoff strategy for retries */
-  backoff?: {
-    /** Type of backoff. */
-    type: 'fixed' | 'exponential' | 'linear';
-    /** Initial delay in ms. */
-    initialDelay: number;
-    /** Maximum delay in ms. */
-    maxDelay?: number;
-    /** Multiplier for exponential backoff. */
-    multiplier?: number;
-  };
-  /** Maximum retries on failure */
+  /** Optional delay policy between retries. Retries are immediate when omitted. */
+  backoff?: BackoffStrategy;
+  /** Retries after the initial attempt. Defaults to 0; total attempts are maxRetries + 1. */
   maxRetries?: number;
   /** Job metadata */
   metadata?: Record<string, unknown>;
@@ -103,7 +94,7 @@ export interface JobContext {
   scheduledTime: Date;
   /** Actual run time */
   actualTime: Date;
-  /** Run attempt number (0 = first attempt) */
+  /** Zero-based handler attempt within this invocation; increments once per retry. */
   attempt: number;
   /** Abort signal for cancellation */
   signal: AbortSignal;
@@ -128,7 +119,7 @@ export interface JobExecutionResult {
   duration: number;
   /** Error if failed */
   error?: Error;
-  /** Attempt number */
+  /** Zero-based terminal handler attempt for this aggregate invocation result. */
   attempt: number;
 }
 
@@ -158,9 +149,9 @@ export interface JobLifecycleEvent {
 
 /** Typed scheduler event payload map. */
 export interface SchedulerEventMap {
-  /** Emitted after a job handler completes successfully or unsuccessfully. */
+  /** Emitted once after an invocation succeeds, including any retries. */
   jobRun: JobRunEvent;
-  /** Emitted when a job handler reports a failed execution. */
+  /** Emitted once after retries are exhausted or retry backoff is aborted. */
   jobError: JobRunEvent;
   /** Emitted when a job is registered with the scheduler. */
   jobScheduled: JobLifecycleEvent;

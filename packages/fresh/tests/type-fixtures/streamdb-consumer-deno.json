@@ -1,0 +1,24 @@
+{
+  "workspace": [],
+  "imports": {
+    "@durable-streams/client": "npm:@durable-streams/client@0.2.6",
+    "@durable-streams/state": "npm:@durable-streams/state@0.3.1",
+    "@durable-streams/state/db": "npm:@durable-streams/state@0.3.1/db",
+    "@netscript/fresh/streams": "../../src/runtime/streams/mod.ts",
+    "@netscript/plugin-streams-core": "jsr:@netscript/plugin-streams-core@0.0.4",
+    "@opentelemetry/api": "npm:@opentelemetry/api@1.9.1",
+    "@tanstack/db": "npm:@tanstack/db@0.6.17",
+    "@tanstack/react-db": "npm:@tanstack/react-db@0.1.95",
+    "zod": "jsr:@zod/zod@4.4.3"
+  },
+  "compilerOptions": {
+    "isolatedDeclarations": true,
+    "lib": [
+      "dom",
+      "dom.asynciterable",
+      "dom.iterable",
+      "deno.ns",
+      "deno.unstable"
+    ]
+  }
+}

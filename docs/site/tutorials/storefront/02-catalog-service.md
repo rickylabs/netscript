@@ -9,7 +9,7 @@ next: { label: "3 · Cart contracts", href: "/tutorials/storefront/03-cart-contr
 # A typed catalog service
 
 In [chapter 1](/tutorials/storefront/01-scaffold/) you scaffolded `my-shop/` and watched it boot
-under Aspire, with a `products` service answering on `:3001`. That service is not a placeholder — when
+under Aspire, with a `products` service answering on `:3001` (note: this tutorial pins the port to 3001; in unpinned scaffolds, each project is allocated its own randomized high-range ports). That service is not a placeholder — when
 you passed `--service --db postgres`, the scaffold generated a **complete, typed CRUD catalog**: a
 contract whose schemas come from your Prisma model, Prisma-backed handlers, and a `defineService`
 entry point. In this chapter you read what was generated, prove it does real work over its OpenAPI

@@ -1,5 +1,6 @@
 import { assertEquals, assertRejects } from 'jsr:@std/assert@^1';
 import { PUBLISH_ASSET_OUTPUTS } from '../generate-publish-assets.ts';
+import { EXPORT_SURFACE_CORPUS_OUTPUT } from '../docs/generate-export-surface-corpus.ts';
 import { prepareRelease, type PrepareReleaseDependencies } from './prepare-release.ts';
 
 Deno.test('shared release preparation runs the stable gate sequence in order', async () => {
@@ -34,10 +35,12 @@ Deno.test('shared release preparation runs the stable gate sequence in order', a
   assertEquals(result.files, [
     '/repo/deno.json',
     ...PUBLISH_ASSET_OUTPUTS.map((path) => `/repo/${path}`),
+    `/repo/${EXPORT_SURFACE_CORPUS_OUTPUT}`,
   ]);
   assertEquals(calls, [
     'bump:0.0.1-canary.1:canary',
     'deno task gen:publish-assets',
+    'deno task gen:mcp-export-corpus',
     'deno task gen:assets-barrel',
     'residue:0.0.1-beta.10',
     'deno task publish:readiness',
@@ -66,5 +69,9 @@ Deno.test('shared release preparation regenerates assets then stops when residue
     Error,
     'Version residue remains',
   );
-  assertEquals(calls, ['deno task gen:publish-assets', 'deno task gen:assets-barrel']);
+  assertEquals(calls, [
+    'deno task gen:publish-assets',
+    'deno task gen:mcp-export-corpus',
+    'deno task gen:assets-barrel',
+  ]);
 });

@@ -25,9 +25,9 @@ flowchart TB
   AppHost -->|starts| Worker
   AppHost -->|starts| Saga
 
-  Postgres -->|connection string / service discovery| API
-  Postgres -->|connection string / service discovery| Worker
-  Postgres -->|connection string / service discovery| Saga
+  Postgres -->|database connection| API
+  Postgres -->|database connection| Worker
+  Postgres -->|database connection| Saga
 
   Redis -->|KV cache connection| API
   Redis -->|KV cache connection| Worker

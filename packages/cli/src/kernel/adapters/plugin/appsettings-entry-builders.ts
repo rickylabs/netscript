@@ -102,6 +102,9 @@ function buildBasePluginEntry(
     Enabled: options.enabled ?? true,
     Runtime: 'deno',
     Port: scaffoldResult.servicePort,
+    ...(scaffoldResult.hostPort !== undefined
+      ? { HostPort: scaffoldResult.hostPort }
+      : {}),
     Entrypoint: resolveServiceEntrypoint(scaffoldResult, provider, options),
     Workdir: scaffoldResult.serviceWorkdir ?? PROJECT_ROOT_WORKDIR,
     RequiresKv: provider.defaultRequiresKv,

@@ -324,7 +324,7 @@ not replace it. For general tracing and structured logs see
 {{ comp.apiTable({
   caption: "Authentication runtime surface",
   rows: [
-    { name: ":8094", type: "port", desc: "auth-api default port (AUTH_API_DEFAULT_PORT). Family: workers :8091, sagas :8092, triggers :8093, auth :8094." },
+    { name: "dynamic", type: "port", desc: "auth-api default port fallback (AUTH_API_DEFAULT_PORT is 8094). Note: your scaffold's ports will differ as they are allocated from the high-range (49152+) at scaffold time." },
     { name: "auth-api", type: "service name", desc: "AUTH_API_SERVICE_NAME — the service contribution the auth plugin (AUTH_PLUGIN_ID 'auth') adds." },
     { name: "/api/v1/auth/*", type: "REST", desc: "Public REST surface: signin, callback, signout, session, me." },
     { name: "/api/rpc/v1/auth/*", type: "oRPC", desc: "The oRPC surface for the same five operations, for typed NetScript clients." },

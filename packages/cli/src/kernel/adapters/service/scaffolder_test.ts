@@ -46,7 +46,8 @@ Deno.test('ServiceScaffolder creates a contract-bound service workspace', async 
 
   assertEquals(result.scaffoldResult.filesCreated.length, 5);
   assertEquals(result.scaffoldResult.directoriesCreated.length, 3);
-  assertEquals(result.configEntry.Port, 3000);
+  assertEquals(result.configEntry.Port, undefined);
+  assertEquals(result.configEntry.HostPort, undefined);
   assertEquals(result.configEntry.Workdir, 'services/orders');
 
   const denoJson = JSON.parse(await fs.readFile('/project/services/orders/deno.json'));
@@ -81,7 +82,8 @@ Deno.test('shared contract scaffolder creates service contracts and aggregates v
       importMode: 'jsr',
       force: false,
       imports: {
-        '@database/zod': '../database/postgres/schema/.generated/zod/crud.ts',
+        '@database/zod':
+          '../database/postgres/schema/.generated/zod/schemas/models/index.ts',
       },
     },
   });
@@ -103,12 +105,36 @@ Deno.test('shared contract scaffolder creates service contracts and aggregates v
     },
     { serviceName: 'payments', version: DEFAULT_CONTRACT_VERSION },
   );
+  await contractScaffolder.addServiceContract(
+    {
+      projectName: 'my-app',
+      targetPath: '/project',
+      importMode: 'jsr',
+      force: false,
+    },
+    {
+      serviceName: 'cycles',
+      version: DEFAULT_CONTRACT_VERSION,
+      modelName: 'Cycle',
+      hasDatabase: true,
+    },
+  );
 
   const modContent = await fs.readFile('/project/contracts/versions/v1/mod.ts');
   assertStringIncludes(modContent, "from './orders.contract.ts'");
   assertStringIncludes(modContent, "from './payments.contract.ts'");
+  assertStringIncludes(modContent, "from './cycles.contract.ts'");
   assertStringIncludes(modContent, 'orders: OrdersV1');
   assertStringIncludes(modContent, 'payments: PaymentsV1');
+  assertStringIncludes(modContent, 'cycles: CyclesV1');
+
+  const cycleContract = await fs.readFile(
+    '/project/contracts/versions/v1/cycles.contract.ts',
+  );
+  assertStringIncludes(cycleContract, 'CycleCreateInput');
+  assertStringIncludes(cycleContract, 'CycleSchema');
+  assertStringIncludes(cycleContract, 'CycleUpdateInput');
+  assertStringIncludes(cycleContract, "from '@database/zod'");
 
   const contractsDenoJson = JSON.parse(await fs.readFile('/project/contracts/deno.json'));
   assertEquals(contractsDenoJson.exports, {
@@ -121,7 +147,7 @@ Deno.test('shared contract scaffolder creates service contracts and aggregates v
   );
   assertEquals(
     contractsDenoJson.imports['@database/zod'],
-    '../database/postgres/schema/.generated/zod/crud.ts',
+    '../database/postgres/schema/.generated/zod/schemas/models/index.ts',
   );
 });
 
@@ -139,8 +165,9 @@ Deno.test('PortAllocator assigns next available service port', async () => {
     }),
   );
 
-  const allocation = await new PortAllocator(fs).allocate('/project');
-  assertEquals(allocation, { port: 3002, source: 'auto' });
+  const allocation = await new PortAllocator(fs).allocate('/project', 'shop', 'orders');
+  assertEquals(allocation.source, 'auto');
+  assertEquals(allocation.port >= 49_152, true);
 });
 
 Deno.test('PortAllocator rejects out-of-range and duplicate requested ports', async () => {
@@ -151,11 +178,11 @@ Deno.test('PortAllocator rejects out-of-range and duplicate requested ports', as
   );
 
   await assertRejects(
-    () => new PortAllocator(fs).allocate('/project', 2999),
+    () => new PortAllocator(fs).allocate('/project', 'shop', 'orders', 1000),
     ScaffoldValidationError,
   );
   await assertRejects(
-    () => new PortAllocator(fs).allocate('/project', 3000),
+    () => new PortAllocator(fs).allocate('/project', 'shop', 'orders', 3000),
     ScaffoldValidationError,
   );
 });

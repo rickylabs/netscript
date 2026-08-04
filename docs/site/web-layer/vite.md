@@ -103,7 +103,7 @@ const envMappings: NetScriptViteEnvMapping[] = [
   {
     source: "PUBLIC_API_URL",
     target: "VITE_API_URL",
-    fallback: "http://localhost:3000",
+    fallback: "http://localhost:3000", // note: your scaffold's ports will differ
   },
 ];
 

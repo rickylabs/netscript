@@ -114,19 +114,19 @@ every process you would deploy by hand — is described there. From a workspace 
 first-party plugins installed, the graph looks like this:
 
 {{ comp.apiTable({ caption: "Resources declared in appsettings.json (verified from a scaffolded workspace)", rows: [
-  { name: "users", type: "service · :3000 (the scaffold default; the exact port is OS-allocated from the SERVICE range starting at 3000)", desc: "Example oRPC service. Entrypoint <code>src/main.ts</code>, runtime <code>deno</code>. RPC mounts under <code>/api/rpc/*</code>." },
-  { name: "streams", type: "plugin · :4437", desc: "durable-streams runtime service. <code>RequiresDb=false</code>, <code>RequiresKv=false</code>. Real producer runtime — see Step 6." },
-  { name: "workers-api", type: "plugin · :8091", desc: "Workers API. Requires DB + KV. References <code>streams</code>." },
-  { name: "sagas-api", type: "plugin · :8092", desc: "Sagas API. Requires DB + KV. References <code>workers-api</code>, <code>streams</code>." },
-  { name: "triggers-api", type: "plugin · :8093", desc: "Triggers API. Typed v1 oRPC contract for trigger/event introspection + management; the webhook ingress endpoint <code>POST /api/v1/webhooks/:triggerId</code> stays a raw HMAC-verifying route by design. Requires DB + KV. References <code>workers-api</code>, <code>streams</code>." },
+  { name: "users", type: "service · dynamic port (assigned at scaffold time)", desc: "Example oRPC service. Entrypoint <code>src/main.ts</code>, runtime <code>deno</code>. RPC mounts under <code>/api/rpc/*</code>; check your scaffold console output, appsettings.json, or the Aspire dashboard for the exact port." },
+  { name: "streams", type: "plugin · dynamic port (assigned at scaffold time)", desc: "durable-streams runtime service. <code>RequiresDb=false</code>, <code>RequiresKv=false</code>. Real producer runtime — see Step 6. Check your scaffold console output, appsettings.json, or the Aspire dashboard for the exact port." },
+  { name: "workers-api", type: "plugin · dynamic port (assigned at scaffold time)", desc: "Workers API. Requires DB + KV. References <code>streams</code>; check your scaffold console output, appsettings.json, or the Aspire dashboard for the exact port." },
+  { name: "sagas-api", type: "plugin · dynamic port (assigned at scaffold time)", desc: "Sagas API. Requires DB + KV. References <code>workers-api</code>, <code>streams</code>; check your scaffold console output, appsettings.json, or the Aspire dashboard for the exact port." },
+  { name: "triggers-api", type: "plugin · dynamic port (assigned at scaffold time)", desc: "Triggers API. Typed v1 oRPC contract for trigger/event introspection + management; the webhook ingress endpoint <code>POST /api/v1/webhooks/:triggerId</code> stays a raw HMAC-verifying route by design. Requires DB + KV. References <code>workers-api</code>, <code>streams</code>; check your scaffold console output, appsettings.json, or the Aspire dashboard for the exact port." },
   { name: "workers / sagas", type: "background processor", desc: "Entrypoint <code>bin/combined.ts</code>. Watch mode + telemetry on. Workers runtime pool via <code>WORKERS_CONCURRENCY</code>; sagas via <code>SAGA_CONCURRENCY</code>." },
   { name: "triggers", type: "background processor", desc: "Entrypoint <code>src/runtime/trigger-processor.ts</code>. Concurrency 10 via <code>TRIGGER_CONCURRENCY</code>." },
-  { name: "dashboard", type: "app · :8010", desc: "Fresh frontend. References service <code>users</code>." },
+  { name: "dashboard", type: "app · dynamic port (assigned at scaffold time)", desc: "Fresh frontend. References service <code>users</code>. Check your scaffold console output, appsettings.json, or the Aspire dashboard for the exact port." },
   { name: "postgres / redis", type: "infrastructure", desc: "<code>Mode=Container</code> in dev. <code>PrimaryDatabase=postgres</code>, <code>PrimaryCache=redis</code> (the default; <code>garnet</code> via <code>--cache-backend garnet</code>)." }
 ] }) }}
 
-{{ comp callout { type: "note", title: "Auth service is opt-in (port :8094)" } }}
-If you add the auth plugin, a fifth API service — <code>auth-api</code> on <strong>:8094</strong>
+{{ comp callout { type: "note", title: "Auth service is opt-in (on its assigned port)" } }}
+If you add the auth plugin, a fifth API service — <code>auth-api</code> (on its assigned port)
 — joins the graph. It is an oRPC service exposing five endpoints under
 <code>/api/v1/auth/{signin,callback,signout,session,me}</code>, backed by one active backend
 selected via <code>NETSCRIPT_AUTH_BACKEND</code> (default <code>kv-oauth</code>). Treat it as
@@ -195,7 +195,7 @@ handled in `database/postgres/prisma.config.ts`.
 {{ comp.apiTable({ caption: "Production environment a NetScript deployment expects", rows: [
   { name: "POSTGRES_URI", type: "string (url)", desc: "Primary Postgres connection. <code>DATABASE_URL</code> is the accepted fallback. Read by Prisma config." },
   { name: "REDIS_URI / cache url", type: "string", desc: "Redis-compatible cache endpoint for the <code>redis</code> KV/cache resource (the default backend). With <code>--cache-backend garnet</code> the key is <code>GARNET_URI</code> for the <code>garnet</code> resource (managed Redis or Garnet in prod)." },
-  { name: "PORT", type: "number", desc: "Per-process listen port. Each service reads it (e.g. <code>Deno.env.get('PORT') ?? '8091'</code>) and falls back to its default." },
+  { name: "PORT", type: "number", desc: "Per-process listen port. Each service reads it and falls back to its default (assigned dynamically per project at scaffold time)." },
   { name: "OTEL_EXPORTER_OTLP_ENDPOINT", type: "string (url)", desc: "OTLP collector. Dev defaults to <code>http://localhost:4318</code> (http/protobuf) via the Aspire dashboard." },
   { name: "NETSCRIPT_SAGA_STORE", type: "kv | prisma", desc: "Durable saga store backend (mandatory when sagas run). Also settable via appsettings <code>sagas.store.backend</code>." },
   { name: "NETSCRIPT_AUTH_BACKEND", type: "string", desc: "Active auth backend if the auth plugin is installed. Default <code>kv-oauth</code>." },
@@ -341,12 +341,12 @@ your platform's secret manager, not in the Aspire deployment cache.
 
 Under every option above, the atomic unit is the same: one Deno process started from an
 entrypoint with the exact permission set from `appsettings.json`. This is what a container
-`CMD`, a systemd `ExecStart`, or a PaaS start command ultimately becomes. For the workers API
-(`:8091`), it is:
+`CMD`, a systemd `ExecStart`, or a PaaS start command ultimately becomes. For the workers API (on its assigned port, e.g., `49152`), it is:
 
 ```bash
 # Run from the workspace root. Flags and entrypoint come straight from appsettings.json.
-PORT=8091 \
+# Replace 49152 with the port assigned to your workers-api service.
+PORT=49152 \
 deno run \
   --unstable-kv --allow-net --allow-env --allow-read --allow-write --allow-run \
   plugins/workers/services/src/main.ts
@@ -374,7 +374,7 @@ deployment. To containerize, each process becomes one image whose `CMD` is the m
 <li>Cloud Run uses the Docker-image provider lane (<code>docker build</code>, <code>docker push</code>, <code>gcloud run deploy</code>) and requires <code>registry</code> plus <code>imageName</code> in config.</li>
 <li><code>netscript.config.ts</code> ships an empty <code>deploy: {}</code> block unless you configure a target. Generated workflows are starter CI definitions; you still provide registry, host, cloud, and secret-manager configuration before they are production release jobs.</li>
 <li>Cluster/cloud auth, registry access, RBAC, subscriptions, regions, and provider quotas are operator prerequisites. The CLI shells to Aspire, Docker, or gcloud; it does not create credentials.</li>
-<li>The <code>streams</code> service runs a <strong>real producer runtime</strong> (durable-streams over <code>@netscript/plugin-streams-core</code>, served on :4437) — deploy it as a first-class service. What is <em>not</em> production-ready is the manifest-helper layer: <code>@netscript/plugin-streams</code>'s <code>defineStreamProducer</code>/<code>defineStreamConsumer</code> <strong>throw <code>StreamUnsupportedOperationError</code></strong> by design (use <code>@netscript/plugin-streams-core</code> directly), and there is no in-process consumer <code>subscribe()</code> — consumption is HTTP/SSE.</li>
+<li>The <code>streams</code> service runs a <strong>real producer runtime</strong> (durable-streams over <code>@netscript/plugin-streams-core</code>, served on its assigned port) — deploy it as a first-class service. What is <em>not</em> production-ready is the manifest-helper layer: <code>@netscript/plugin-streams</code>'s <code>defineStreamProducer</code>/<code>defineStreamConsumer</code> <strong>throw <code>StreamUnsupportedOperationError</code></strong> by design (use <code>@netscript/plugin-streams-core</code> directly), and there is no in-process consumer <code>subscribe()</code> — consumption is HTTP/SSE.</li>
 <li>The scaffold worker <code>createJobTools(ctx)</code> handler helpers (<code>trace.addEvent</code>, <code>withChildSpan</code>, <code>progress</code>) are still no-op stubs (tracked debt, fix planned). Job dispatch/execution traces still appear in Aspire automatically; for custom handler spans call <code>@netscript/telemetry</code> helpers directly.</li>
 <li>DB commands assume a reachable Postgres — in CI/containers without Aspire, inject <code>POSTGRES_URI</code> yourself or the command fails fast.</li>
 </ul>
@@ -390,23 +390,23 @@ the graph is wired. These are the exact routes the local runtime exposes (substi
 production host):
 
 {{ comp.apiTable({ caption: "Health and liveness endpoints (verified live)", rows: [
-  { name: "GET /health", type: ":8091", desc: "Workers API health." },
-  { name: "GET /health/live", type: ":8092", desc: "Sagas API liveness." },
-  { name: "GET /health", type: ":8093", desc: "Triggers API health (Hono)." },
-  { name: "GET /api/v1/workers/jobs", type: ":8091", desc: "Lists registered worker jobs — proves the jobs registry generated." },
-  { name: "GET /api/v1/sagas/sagas", type: ":8092", desc: "Lists registered sagas — proves saga metadata is in KV." },
-  { name: "POST /api/v1/webhooks/inbound/generic", type: ":8093", desc: "Inbound webhook → enqueues the workers health-check job (end-to-end proof)." },
-  { name: "GET /api/v1/events?limit=10", type: ":8093", desc: "Recent trigger events." },
-  { name: "GET /api/v1/auth/session", type: ":8094", desc: "Auth session probe (only if the auth plugin is installed)." },
+  { name: "GET /health", type: "Workers API", desc: "Workers API health (on its assigned port)." },
+  { name: "GET /health/live", type: "Sagas API", desc: "Sagas API liveness (on its assigned port)." },
+  { name: "GET /health", type: "Triggers API", desc: "Triggers API health (on its assigned port)." },
+  { name: "GET /api/v1/workers/jobs", type: "Workers API", desc: "Lists registered worker jobs — proves the jobs registry generated (on its assigned port)." },
+  { name: "GET /api/v1/sagas/sagas", type: "Sagas API", desc: "Lists registered sagas — proves saga metadata is in KV (on its assigned port)." },
+  { name: "POST /api/v1/webhooks/inbound/generic", type: "Triggers API", desc: "Inbound webhook → enqueues the workers health-check job (on its assigned port)." },
+  { name: "GET /api/v1/events?limit=10", type: "Triggers API", desc: "Recent trigger events (on its assigned port)." },
+  { name: "GET /api/v1/auth/session", type: "Auth API", desc: "Auth session probe (only if the auth plugin is installed; on its assigned port)." },
   { name: "(dashboard)", type: "https://localhost:18888", desc: "Aspire dashboard: every resource, health, logs, distributed traces (Aspire path only)." }
 ] }) }}
 
 ```bash
-# Smoke a deployed graph (replace localhost with your host).
-curl -fsS http://localhost:8091/health
-curl -fsS http://localhost:8092/health/live
-curl -fsS http://localhost:8093/health
-curl -fsS "http://localhost:8091/api/v1/workers/jobs"
+# Smoke a deployed graph (replace ports with the ones assigned to your services).
+curl -fsS http://localhost:<workers-port>/health
+curl -fsS http://localhost:<sagas-port>/health/live
+curl -fsS http://localhost:<triggers-port>/health
+curl -fsS "http://localhost:<workers-port>/api/v1/workers/jobs"
 ```
 
 If every health endpoint returns and `/api/v1/workers/jobs` lists your jobs, the processes are

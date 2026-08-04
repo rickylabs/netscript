@@ -1,0 +1,41 @@
+{
+  "resources": [
+    {
+      "name": "sagas-smzwxgcs",
+      "displayName": "sagas",
+      "resourceType": "Executable",
+      "state": "Waiting",
+      "waitingFor": [
+        "postgres-2cb8c222",
+        "saga-1223-denokv-db"
+      ],
+      "source": "deno",
+      "dashboardUrl": "https://localhost:45979/?resource=sagas-smzwxgcs",
+      "relationships": [],
+      "urls": [],
+      "volumes": [],
+      "properties": {
+        "executable.args": null,
+        "executable.path": "deno",
+        "executable.pid": null,
+        "executable.workDir": "/home/codex/repos/ns005-sagas/.llm/tmp/1223-protocol/denokv/saga-1223-denokv",
+        "resource.appArgs": null,
+        "resource.appArgsSensitivity": null,
+        "resource.waitingFor": [
+          "postgres-2cb8c222",
+          "saga-1223-denokv-db"
+        ]
+      },
+      "environment": {},
+      "healthReports": {
+        "sagas_http_/health_200_check": {}
+      },
+      "commands": {
+        "start": {
+          "displayName": "Start",
+          "description": "Start resource"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+[
+  "get_app_status",
+  "list_runs",
+  "get_run",
+  "get_recent_errors",
+  "get_last_job_result",
+  "analyze_service_performance",
+  "analyze_db_bottlenecks",
+  "doctor",
+  "search_docs",
+  "list_docs",
+  "get_doc",
+  "list_commands",
+  "execute_command",
+  "record_drift"
+]

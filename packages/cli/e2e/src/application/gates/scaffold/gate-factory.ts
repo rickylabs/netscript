@@ -8,6 +8,7 @@ import type {
   GateDefinition,
   HttpGateDefinition,
 } from '../../../domain/gate-definition.ts';
+import type { UrlFactory } from '../../../domain/gate-definition.ts';
 import type { RunContext } from '../../../domain/run-context.ts';
 import type { CommandOutputMode } from '../../../ports/command-executor.ts';
 
@@ -71,7 +72,7 @@ export function commandGate(
 export function httpGate(
   id: GateId,
   title: string,
-  url: string,
+  url: string | UrlFactory,
   method: 'GET' | 'POST' = 'GET',
 ): HttpGateDefinition {
   return {
@@ -81,6 +82,6 @@ export function httpGate(
     kind: 'http',
     critical: true,
     method,
-    url: () => url,
+    url: typeof url === 'string' ? () => url : url,
   };
 }

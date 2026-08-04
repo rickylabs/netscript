@@ -49,11 +49,23 @@ order:
   starts from.
 - **[The define-page builder](/web-layer/builders/)** — `definePage()` and `definePartial()`
   (`@netscript/fresh/builders`): typed layers, defer policies, and per-layer partial refresh.
+- **[Request-scoped resources](/web-layer/resources/)** — `withResource()`: one value resolved once
+  per request and shared by every layer, layout, and metadata resolver on the page.
+- **[Layers, layout, and slots](/web-layer/layers/)** — `withLayer()` and `withLayout()`: named
+  regions that resolve concurrently, each with its own loader, fallback, and freshness window.
+- **[Response shaping](/web-layer/response/)** — `withMeta()`, `withHeader()`, `withStatus()`, and
+  the `GET` handler `build()` synthesises from them.
 - **[Route contracts](/web-layer/route/)** — `defineRouteContract()`, schema helpers such as
-  `paginationSearchSchema()`, and `createRouteReference()` for typed links.
+  `paginationSearchSchema()` and `defineEnumPathParam()`, and the generated `routes` tree that turns
+  a moved route file into a compile error.
+- **[Partials](/web-layer/partials/)** — `definePartial()`, paired route references, and the layer
+  config that turns a region into a cache-aware deferred partial.
 - **[Data loading & the query cache](/web-layer/query/)** — `QueryIsland`, `useQuery`,
   `useMutation`, and `useLiveQuery`: the TanStack-Query bridge that shares one cache between
   server render and island hydration.
+- **[The query bridge](/web-layer/query-bridge/)** — SDK query factories from loader to island: the
+  two key tiers, `getCachedEntry()` as a read rather than a fetch, and when to dehydrate instead of
+  passing `initialData`.
 - **[Server-validated forms](/web-layer/form/)** — typed, contract-aware form handling declared as
   a page layer.
 - **[Deferred & streaming UI](/web-layer/defer-streaming-ui/)** — stream a fallback now, swap in

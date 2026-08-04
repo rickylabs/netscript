@@ -1,4 +1,4 @@
-import { assert, assertEquals } from '@std/assert';
+import { assert, assertEquals, assertStringIncludes } from '@std/assert';
 import { MCP_PACKAGE_VERSION } from '../src/publish-assets.generated.ts';
 
 Deno.test('stdio initialize, list, and unreachable doctor round trip', async () => {
@@ -41,9 +41,21 @@ Deno.test('stdio initialize, list, and unreachable doctor round trip', async () 
     );
     assertEquals(responses[0].result.serverInfo.name, '@netscript/mcp');
     assertEquals(responses[0].result.serverInfo.version, MCP_PACKAGE_VERSION);
-    assertEquals(responses[1].result.tools.length, 17);
+    assertEquals(responses[1].result.tools.length, 21);
     assert(typeof responses[0].result.instructions === 'string');
-    for (const name of ['doctor', 'get_app_status', 'get_recent_errors', 'record_drift']) {
+    assertStringIncludes(
+      responses[0].result.instructions,
+      'When debugging or calling a service HTTP API, use list_service_operations and get_operation_schema before hand-rolling requests with curl.',
+    );
+    for (
+      const name of [
+        'doctor',
+        'find_export',
+        'get_app_status',
+        'get_recent_errors',
+        'record_drift',
+      ]
+    ) {
       assert(responses[0].result.instructions.includes(name));
     }
     assertEquals(responses[2].result.structuredContent.status, 'warn');

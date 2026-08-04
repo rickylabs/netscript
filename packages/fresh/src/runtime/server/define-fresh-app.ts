@@ -4,6 +4,10 @@ import { App, type FreshConfig, type Middleware, staticFiles as freshStaticFiles
 // This import is safe here because defineFreshApp is never bundled for
 // the client environment.
 import '@netscript/sdk/cache';
+import {
+  type FreshQueryCacheInvalidationOptions,
+  registerQueryCacheInvalidationRoute,
+} from './query-cache-invalidation.ts';
 
 /** Attribute value accepted by Fresh app telemetry bootstrap options. */
 export type FreshAppTelemetryAttribute = string | number | boolean;
@@ -67,6 +71,11 @@ export interface DefineFreshAppOptions<State> {
    * Reserved telemetry bootstrap seam for NetScript Fresh adapters.
    */
   telemetry?: boolean | FreshAppTelemetryOptions;
+  /**
+   * Configure the standard server query-cache invalidation route. `false`
+   * disables it; the route is registered at its default path when omitted.
+   */
+  queryCacheInvalidation?: FreshQueryCacheInvalidationOptions | false;
 }
 
 /**
@@ -91,6 +100,10 @@ export function defineFreshApp<State>(options: DefineFreshAppOptions<State> = {}
 
   if (options.middleware && options.middleware.length > 0) {
     app.use(...options.middleware);
+  }
+
+  if (options.queryCacheInvalidation !== false) {
+    registerQueryCacheInvalidationRoute(app, options.queryCacheInvalidation);
   }
 
   options.configure?.(app);

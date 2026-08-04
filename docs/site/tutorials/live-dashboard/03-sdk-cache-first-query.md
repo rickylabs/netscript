@@ -94,13 +94,13 @@ each a small object of typed helpers. The four you will use across the next chap
   rows: [
     { name: ".queryOptions(input)", type: "(input) => options", desc: "A TanStack Query options object (queryKey + queryFn) for the client island — chapter 4 passes it straight to useQuery." },
     { name: ".clientKey(input?)", type: "(input?) => key", desc: "The stable query key the client uses to read, write, and invalidate this procedure's cache." },
-    { name: ".getCachedEntry(input)", type: "(input) => entry | undefined", desc: "Server-side cache-first read: returns { data, cachedAt } from the KV cache, or undefined on a cold cache. This is the page loader's fast path." },
-    { name: ".key(input?)", type: "(input?) => key", desc: "The server-side KV cache key for the entry." }
+    { name: ".getCachedEntry(input)", type: "(input) => Promise<entry | null>", desc: "Server-side cache-first read: resolves to { data, cachedAt } from the KV cache, or null on a cold cache. This is the page loader's fast path." },
+    { name: ".key(input)", type: "(input) => key", desc: "The server-side KV cache key for the entry." }
   ]
 }) }}
 
 {{ comp callout { type: "tip", title: "Why KV, and why cache-first" } }}
-The cache is backed by KV (Redis in your Aspire stack — the default <code>--cache-backend</code>, registered at the top of <code>main.ts</code> in chapter 1; <code>garnet</code> and <code>deno-kv</code> are alternatives). Cache-first means a page render does not block on the service: <code>getCachedEntry</code> returns immediately from KV when warm, and the stale entry refreshes in the background. A cold cache returns <code>undefined</code>, which the page handles with a skeleton — you wire that in chapter 4.
+The cache is backed by KV (Redis in your Aspire stack — the default <code>--cache-backend</code>, registered at the top of <code>main.ts</code> in chapter 1; <code>garnet</code> and <code>deno-kv</code> are alternatives). Cache-first means a page render does not block on the service: <code>getCachedEntry</code> returns immediately from KV when warm, and the stale entry refreshes in the background. A cold cache resolves to <code>null</code>, which the page handles with a skeleton — you wire that in chapter 4.
 {{ /comp }}
 
 ## Step 3 — Understand the calling shapes
@@ -108,7 +108,7 @@ The cache is backed by KV (Redis in your Aspire stack — the default <code>--ca
 You now have two ways to read orders, for two different places in the stack:
 
 - **Server, cache-first** — `await ordersQueryUtils.list.getCachedEntry(input)` inside a page loader.
-  Returns `{ data, cachedAt }` from KV, or `undefined`. Used in chapter 4's `definePage` loaders.
+  Resolves to `{ data, cachedAt }` from KV, or `null`. Used in chapter 4's `definePage` loaders.
 - **Client, in an island** — `useQuery(ordersQueryUtils.list.queryOptions(input))` inside a Fresh
   island. Used in chapter 4's `QueryIsland` for client-side reads and refetch.
 

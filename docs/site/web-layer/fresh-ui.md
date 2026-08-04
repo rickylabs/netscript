@@ -102,7 +102,7 @@ The Fresh-side <code>@netscript/fresh/streams</code> client <em>consumes</em> du
 HTTP/SSE in the browser. The <strong>producer</strong> runtime — the thing that writes stream state
 — is real and lives server-side in <code>@netscript/plugin-streams-core</code>
 (<code>createDurableStream</code>), served as an Aspire service on
-<a href="http://localhost:4437">:4437</a>. See <a href="/durable-workflows/streams/">Streams</a> for the
+its assigned port. See <a href="/durable-workflows/streams/">Streams</a> for the
 producer/consumer split.
 {{ /comp }}
 
@@ -119,7 +119,7 @@ service the back end implements.
 {{ comp.apiTable({
   caption: "apps/dashboard layout (verbatim from a fresh scaffold)",
   rows: [
-    { name: "main.ts", type: "entry", desc: "App entry: export const app = defineFreshApp<State>({ name: 'dashboard' }). Reads PORT (default 8010) and logs a startup banner." },
+    { name: "main.ts", type: "entry", desc: "App entry: export const app = defineFreshApp<State>({ name: 'dashboard' }). Reads PORT (assigned per-project at scaffold time) and logs a startup banner." },
     { name: "router.ts", type: "routing", desc: "Stable route entrypoint. Re-exports generated routePatterns + routes and builds typed appRoutes via createRouteReference." },
     { name: "routes/", type: "pages", desc: "File-system routes: index.tsx, dashboard.tsx, health.tsx, examples/service/, examples/telemetry/, the (design) system pages, plus _app.tsx / _layout.tsx shells." },
     { name: "islands/", type: "interactivity", desc: "Client-hydrated Preact islands (e.g. ThemeToggle, SidebarToggle, Toast under islands/ui/)." },
@@ -131,8 +131,7 @@ service the back end implements.
 }) }}
 
 {{ comp callout { type: "note", title: "Two ports, one app" } }}
-The dashboard's own dev server reads <code>PORT</code> and defaults to <strong>8010</strong>
-(<code>http://localhost:8010</code>, health at <code>/health</code>). That is distinct from the
+The dashboard's own dev server reads <code>PORT</code> and binds to its assigned port (health at <code>/health</code>). That is distinct from the
 <strong>Aspire dashboard</strong> at <a href="https://localhost:18888">https://localhost:18888</a>,
 which orchestrates the whole resource graph. Bring the platform up first with
 <code>cd aspire &amp;&amp; aspire start</code> (Postgres/Redis + every service), or run the app
@@ -265,11 +264,11 @@ durable surface — the app is one application of it.
 {{ comp.apiTable({
   caption: "Fresh UI runtime surface",
   rows: [
-    { name: ":8010", type: "port", desc: "Dashboard dev server (Deno.env.get('PORT') || '8010'). Standalone: deno task --cwd apps/dashboard dev." },
-    { name: "/health", type: "HTTP", desc: "App health route logged at startup (http://localhost:8010/health)." },
+    { name: "Assigned", type: "port", desc: "Dashboard dev server (reads Deno.env.get('PORT')). Standalone: deno task --cwd apps/dashboard dev." },
+    { name: "/health", type: "HTTP", desc: "App health route logged at startup (e.g. /health on its assigned port)." },
     { name: ":18888", type: "Aspire", desc: "Aspire dashboard that orchestrates the dashboard alongside services/plugins; token printed by aspire start." },
-    { name: ":3001", type: "upstream", desc: "The users service the dashboard's typed client calls — same UsersContractV1, no drift." },
-    { name: ":4437", type: "streams", desc: "The durable-streams Aspire service the @netscript/fresh/streams client consumes over HTTP/SSE (producer runtime in @netscript/plugin-streams-core)." }
+    { name: "Assigned", type: "upstream", desc: "The users service the dashboard's typed client calls — same UsersContractV1, no drift." },
+    { name: "Assigned", type: "streams", desc: "The durable-streams Aspire service the @netscript/fresh/streams client consumes over HTTP/SSE (producer runtime in @netscript/plugin-streams-core)." }
   ]
 }) }}
 
@@ -281,7 +280,7 @@ matches what you're doing.
 {{ comp.featureGrid({ items: [
   {
     title: "Learn — Build a service",
-    body: "Guided tutorial: contract → users service on :3001 → typed client → the island that renders it in the dashboard.",
+    body: "Guided tutorial: contract → users service on its assigned port → typed client → the island that renders it in the dashboard.",
     href: "/tutorials/storefront/02-catalog-service/",
     icon: "→"
   },

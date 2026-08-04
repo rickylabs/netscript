@@ -263,6 +263,11 @@ single-scheduler apps, `getScheduler()` returns a shared singleton (`stopSchedul
 The handler may be a bare `JobHandler` or a `ContextualJobHandler` that receives a `JobContext`
 (`jobId`, `scheduledTime`, `actualTime`, `attempt`, `signal`).
 
+Retry behavior is identical for the memory and native `Deno.cron()` providers. `maxRetries` counts
+retries after the initial handler call, so attempts are numbered `0..maxRetries` and the maximum
+number of handler calls is `maxRetries + 1`. The default is zero retries. When `backoff` is omitted,
+configured retries run immediately.
+
 {{ comp.apiTable({
   caption: "CreateSchedulerOptions — passed to createScheduler / getScheduler",
   rows: [
@@ -277,11 +282,22 @@ The handler may be a bare `JobHandler` or a `ContextualJobHandler` that receives
     { name: "timezone", type: "string? = 'UTC'", desc: "IANA timezone the cron expression is evaluated against, e.g. 'America/New_York'." },
     { name: "runOnInit", type: "boolean?", desc: "Run the handler once immediately on registration, in addition to the schedule." },
     { name: "enabled", type: "boolean? = true", desc: "Whether the job starts enabled. Register a job disabled and turn it on later." },
-    { name: "backoff", type: "object?", desc: "Retry backoff: { type: 'fixed' | 'exponential' | 'linear', initialDelay, maxDelay?, multiplier? }. Delays are milliseconds." },
-    { name: "maxRetries", type: "number?", desc: "Maximum retries on handler failure before the run is recorded as failed." },
+    { name: "backoff", type: "BackoffStrategy?", desc: "Optional delay policy between retries: fixed, exponential, or linear. Delays are milliseconds; maxDelay caps every computed delay." },
+    { name: "maxRetries", type: "number? = 0", desc: "Retries after attempt 0. Total handler calls are at most maxRetries + 1." },
     { name: "metadata", type: "Record<string, unknown>?", desc: "Arbitrary metadata stored with the job and surfaced on its ScheduledJob record." }
   ]
 }) }}
+
+For retry number `r` (the one-based retry after handler attempt `r - 1`), fixed backoff waits
+`initialDelay`; exponential waits `initialDelay * (multiplier ?? 2)^(r - 1)`; and linear waits
+`initialDelay * r`. `maxDelay`, when present, caps the result for every policy. `unschedule()` and
+`stop()` abort an in-progress backoff wait and do not start another handler attempt.
+
+Lifecycle reporting stays aggregate for compatibility. Each scheduled or manual invocation updates
+`ScheduledJob.runCount` once and emits exactly one terminal event: `jobRun` after eventual success,
+or `jobError` after the retry budget is exhausted or backoff is aborted. The event's
+`result.attempt` is the terminal zero-based handler attempt; intermediate failures do not emit
+additional terminal events.
 
 {{ comp.tabbedCode({ tabs: [
   {
@@ -297,7 +313,7 @@ The handler may be a bare `JobHandler` or a `ContextualJobHandler` that receives
   {
     label: "Lifecycle events",
     lang: "ts",
-    code: "// observe-jobs.ts\nimport { createScheduler } from '@netscript/cron';\n\nconst scheduler = createScheduler({ provider: 'memory' });\n\n// Observe jobRun / jobError / jobScheduled / jobUnscheduled.\nscheduler.on('jobRun', (event) => {\n  if (!event.result.success) {\n    console.error(`Job ${event.jobId} failed`, event.result.error);\n  }\n});"
+    code: "// observe-jobs.ts\nimport { createScheduler } from '@netscript/cron';\n\nconst scheduler = createScheduler({ provider: 'memory' });\n\n// Observe one terminal event per invocation, even when retries occur.\nscheduler.on('jobRun', (event) => {\n  console.log(`Job ${event.jobId} succeeded on attempt ${event.result.attempt}`);\n});\nscheduler.on('jobError', (event) => {\n  console.error(`Job ${event.jobId} failed on attempt ${event.result.attempt}`, event.result.error);\n});"
   },
   {
     label: "Validate expressions",

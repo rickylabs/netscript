@@ -32,7 +32,7 @@ you carry through every route.
 
 A working sign-in surface for `my-workspace/`: the `auth` plugin installed, the interactive
 `kv-oauth` backend selected, the `auth.prisma` migration applied, and the `auth-api` service answering
-on `:8094`. By the end you can hit `GET /api/v1/auth/session` and `GET /api/v1/auth/me` and watch the
+on `:8094` (note: this tutorial uses port 8094 for the auth-api; in unpinned scaffolds, each project is allocated its own randomized high-range ports). By the end you can hit `GET /api/v1/auth/session` and `GET /api/v1/auth/me` and watch the
 service correctly report "no session yet" before login — proof the backend is composed and the session
 endpoints are wired.
 
@@ -60,12 +60,19 @@ The `auth` plugin is a first-class official plugin, installed the same way as `w
 `triggers`. From the workspace root:
 
 ```sh
-netscript plugin install @netscript/plugin-auth
+netscript plugin install @netscript/plugin-auth --port 8094
 ```
 
 This scaffolds the unified `@netscript/plugin-auth` plugin into `plugins/`, registers it, and
 contributes three things to your workspace: a Prisma schema (`auth.prisma`), a service entry that
-becomes the `auth-api` service, and the `/api/v1/auth/*` routes. Confirm it landed:
+becomes the `auth-api` service, and the `/api/v1/auth/*` routes.
+
+`--port 8094` is what makes the rest of this chapter's `curl`s work. Without it the installer picks a
+port for you and writes it as the resource's `HostPort`, so `auth-api` would answer on some number
+this page cannot print. Pinning has a cost — a pinned host port is a machine-global reservation, so
+`aspire start --isolated` can no longer randomise it away and a second workspace pinning 8094 will
+collide. That is an acceptable trade for a tutorial; for real work, omit `--port` and read the
+endpoint off the dashboard. Confirm it landed:
 
 ```sh
 netscript plugin list
@@ -158,9 +165,12 @@ export NETSCRIPT_AUTH_REDIRECT_URI=http://localhost:8094/api/v1/auth/callback
 
 # Required for kv-oauth: missing key material is a startup error
 export NETSCRIPT_AUTH_KV_OAUTH_KEY=<base64url-encoded-32-byte-secret>
-
-export PORT=8094
 ```
+
+Note there is no `PORT` here. Under `aspire start`, Aspire injects `PORT` into the service — that is
+the port the process binds inside the graph, and it is not the `:8094` you browse to. `:8094` is the
+**host** port, pinned by the `--port 8094` you passed at install; Aspire proxies it to whatever
+`PORT` it handed the process.
 
 {{ comp callout { type: "note", title: "Provider presets fill the OIDC endpoints for you" } }}
 You rarely hand-type issuer/authorization/token/userinfo URLs. The <code>kv-oauth</code> package ships
@@ -208,8 +218,8 @@ the auth plugin composes against, confirmed on the package's public surface:
 
 ## Step 6 — Verify a session
 
-With Aspire running, the `auth-api` service binds **port 8094** and mounts the five auth endpoints
-under `/api/v1/auth/*`. On a fresh, unauthenticated request, `session` reports no active session —
+With Aspire running, the `auth-api` service is reachable on its pinned host port **`:8094`** and
+mounts the five auth endpoints under `/api/v1/auth/*`. On a fresh, unauthenticated request, `session` reports no active session —
 which proves the endpoint is wired even before you complete a login:
 
 ```sh

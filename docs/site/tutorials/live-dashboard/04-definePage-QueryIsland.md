@@ -97,15 +97,16 @@ and `offset` through it rather than reading `searchParams` by hand.
 ## Step 2 — Define the page and cache-first resource pipeline
 
 The page reads data through request-scoped **resource factories**. `.withResource(name, factory)`
-registers a value that is computed at most once per request, no matter how many layers ask for it.
+registers a value that is computed once while the page renders, no matter how many layers ask for it.
 That matters here because two layers want the same cached orders slice: the server-rendered `list`
 table and the `ordersQuery` island seed. Declared as a resource, the KV read happens once and both
 layers share it. Downstream resources may await upstream ones, so the prefetch step below builds on
-the same typed search input:
+the same typed search input — the resolution order, the shared store, and the dedup spans behind that
+are in [Request-scoped resources](/web-layer/resources/):
 
 ```tsx
 // apps/dashboard/routes/(dashboard)/dashboard/orders/index.tsx
-import { definePage } from '@netscript/fresh/builders';
+import { definePage } from '@app/utils.ts';
 import { dehydrateQueryClient } from '@netscript/fresh/query';
 import { createNetScriptQueryClient } from '@netscript/sdk/query-client';
 import { baseQueries, ordersQueryUtils } from '@app/lib/api-clients.ts';
@@ -137,6 +138,11 @@ export const ordersListPage = definePage()
   })
 ```
 
+`definePage` comes from `@app/utils.ts`, not straight from `@netscript/fresh/builders`. Your scaffold
+wrote that module in chapter 1 — a thin wrapper that calls the package builder with the app's `State`
+type applied (`export function definePage() { return createDefinePage<State>(); }`), so every page in
+the app shares one typed context. Import the package builder directly and you lose that binding.
+
 `spanName: 'dashboard.orders.list'` is not decoration: every render of this page emits a span under
 that name, and it shows up in the Aspire dashboard's traces view alongside the service call the
 loader made. When the table feels slow, that trace is where you find out whether the time went to KV,
@@ -148,7 +154,12 @@ the cache. It is sent to the client alongside the initial HTML, eliminating the 
 ## Step 3 — Add layers and partials
 
 Now compose the visual regions. You add the server-rendered table, the interactive query island, and
-a stats panel loaded asynchronously through a deferred partial — then lay them out and `build()`:
+a stats panel loaded asynchronously through a deferred partial — then lay them out and `build()`. The
+three layers resolve concurrently, so the page costs its slowest region rather than the sum — the
+loader contract, the full layer config, and slot placement are in
+[Layers, layout, and slots](/web-layer/layers/). The `partial` and `partialName` entries below are
+what turn a layer into a refreshable region; [Partials](/web-layer/partials/) covers the partial route
+on the other end:
 
 ```tsx
 // apps/dashboard/routes/(dashboard)/dashboard/orders/index.tsx (continued)
@@ -219,7 +230,7 @@ Read the builder one call at a time:
     { name: ".withRoute(route)", type: "route contract", desc: "Binds the typed search schema from Step 1. The loaders receive a typed search object." },
     { name: ".withPolicy('balanced')", type: "caching policy", desc: "The page's caching posture. 'balanced' serves cache-first and revalidates in the background." },
     { name: ".withTelemetry({ enabled, spanName })", type: "tracing", desc: "Wraps the page render in a named span that surfaces in the Aspire dashboard traces." },
-    { name: ".withResource(name, factory)", type: "request-scoped value", desc: "Computes a value at most once per request. Layers await it with ctx.resource(name), so two layers reading the same slice cost one fetch." },
+    { name: ".withResource(name, factory)", type: "request-scoped value", desc: "Computes a value once per page render. Layers read it with ctx.resource(name), so two layers reading the same slice cost one fetch." },
     { name: ".withLayer(name, Component, config)", type: "a named region", desc: "Adds a layer with its own loader, partial, fallback, and staleTime. Call it once per region." },
     { name: ".withLayout(slots => …)", type: "layout callback", desc: "Places each layer by calling slots.<name>(). The layout is plain JSX." },
     { name: ".withMeta(() => …)", type: "head metadata", desc: "Page title and description." },
@@ -228,7 +239,7 @@ Read the builder one call at a time:
 }) }}
 
 {{ comp callout { type: "note", title: "This is the dense part — and it earns its weight" } }}
-The layer config carries a lot: a <code>loader</code> (cache-first server read), a <code>partial</code> + <code>partialName</code> (the refresh route), a <code>fallback</code> (cold-cache skeleton), and <code>staleTime</code> + <code>staleReloadMode</code> (the staleness window and how it refreshes). It is more upfront ceremony than a plain Fresh route — the payoff is that each region renders from cache independently and refreshes without a full navigation. If you only need a static page, a plain Fresh route is lighter; reach for <code>definePage</code> when a region must be cache-first and self-refreshing, which a live table is. See <a href="/web-layer/">the Fresh meta-framework</a>.
+The layer config carries a lot: a <code>loader</code> (cache-first server read), a <code>partial</code> + <code>partialName</code> (the refresh route), a <code>fallback</code> (cold-cache skeleton), and <code>staleTime</code> + <code>staleReloadMode</code> (the staleness window and how it refreshes). It is more upfront ceremony than a plain Fresh route — the payoff is that each region renders from cache independently and refreshes without a full navigation. If you only need a static page, a plain Fresh route is lighter; reach for <code>definePage</code> when a region must be cache-first and self-refreshing, which a live table is. See <a href="/web-layer/">the Fresh meta-framework</a>. What <code>'balanced'</code>, <code>staleTime</code>, and <code>staleReloadMode</code> decide between them — prewarm on the server, refresh on the client, or neither — is <a href="/web-layer/defer-streaming-ui/">Deferred and streaming UI</a>.
 {{ /comp }}
 
 {{ comp callout { type: "tip", title: "Deferred-loader composition" } }}
@@ -245,6 +256,7 @@ import { useRef } from 'preact/hooks';
 import {
   getIslandQueryClient,
   hydrateFromDehydrated,
+  invalidateServerQueryCache,
   QueryIsland,
   useMutation,
   useQuery,
@@ -254,7 +266,8 @@ import { ordersQueryUtils } from '@app/lib/api-clients.ts';
 
 function OrdersQueryInner(props) {
   const queryClient = useQueryClient();
-  const currentKey = ordersQueryUtils.list.clientKey(props.input);
+  const listOptions = ordersQueryUtils.list.queryOptions(props.input);
+  const currentKey = listOptions.queryKey;
   const hydratedRef = useRef(false);
 
   // Warm the client cache from the server-dehydrated state, once, before first render.
@@ -265,8 +278,9 @@ function OrdersQueryInner(props) {
 
   // Resolves instantly from the hydrated cache (no spinner, no flash)
   const { data: orders, isRefetching } = useQuery({
-    ...ordersQueryUtils.list.queryOptions(props.input),
+    ...listOptions,
     initialData: props.initialOrders,
+    initialDataUpdatedAt: props.cachedAt,
     staleTime: 15_000,
   });
 
@@ -282,8 +296,11 @@ function OrdersQueryInner(props) {
     onError: (_e, _v, ctx) => {
       if (ctx?.previous) queryClient.setQueryData(currentKey, ctx.previous);
     },
-    onSettled: () =>
-      queryClient.invalidateQueries({ queryKey: ordersQueryUtils.list.clientKey() }),
+    onSuccess: async () => {
+      // Invalidate the server tier first, so a reload cannot repaint stale KV data.
+      await invalidateServerQueryCache(ordersQueryUtils.list.key(props.input));
+      await queryClient.invalidateQueries({ queryKey: ordersQueryUtils.list.clientKey() });
+    },
   });
 
   const items = orders?.items ?? [];
@@ -301,10 +318,15 @@ export default function OrdersQueryIsland(props) {
 
 One constraint makes this work: the hydrated entries land in the island's shared QueryClient under
 the exact query keys the server used, so `useQuery` only benefits if `queryOptions(props.input)`
-produces the same key the server prefetched. `initialData` itself comes from the explicit
-`initialOrders` prop — it is the belt to hydration's suspenders, covering the case where the
-dehydrated payload is absent. `clientKey(input)` is that same stable key, which is why the
-mutation's optimistic writes land on exactly the rows the query is showing.
+produces the same key the server prefetched. `initialData` comes from the explicit `initialOrders`
+prop and wins the mount-time handoff even if the shared client already contains an older entry;
+`initialDataUpdatedAt` preserves the KV entry's real age. Later optimistic writes and refetches win
+over that seed.
+
+The mutation clears two distinct tiers. `invalidateServerQueryCache()` reaches the JSON-only route
+that `defineFreshApp()` registers automatically, using `.key(props.input)` for the serialized KV
+key. Only after that succeeds does `invalidateQueries()` refresh the browser tier. No product-owned
+API route is required, and a reload between the two cannot read around the entry just invalidated.
 
 ## Step 5 — Render the Deferred stats layer
 
@@ -343,14 +365,12 @@ export default function StatsLayer(props: StatsProps) {
 
 ## Verify your progress
 
-Make sure `aspire start` is up, then open the route in a browser:
+Make sure `aspire start` is up, then open the route in a browser at `/dashboard/orders/`.
 
-```
-http://localhost:8010/dashboard/orders/
-```
-
-(The Fresh app's port is `:8010` in the Aspire stack; confirm the exact port in the
-[dashboard](/explanation/aspire/) resource list.) You should see the orders table render
+You need the app's port to do that, and there is no number to memorize: a scaffolded Fresh app pins
+no host port, so Aspire allocates one at runtime. The [Aspire dashboard](/explanation/aspire/)
+resource list is the authority — find the `dashboard` resource, click its endpoint, and append `/dashboard/orders/`.
+You should see the orders table render
 immediately — populated from KV cache, not a spinner — and a "Refreshing" indicator flicker as it
 revalidates. Advancing an order's status should update its badge instantly. Type-check too:
 
@@ -374,6 +394,6 @@ A perpetually empty table usually means the KV cache is cold and the loader retu
 A `definePage` orders page that renders cache-first through the layer/partial/island triad, plus a
 hydrated `QueryIsland` that reads with `useQuery` and mutates optimistically with `useMutation` —
 all keyed off the same contract-derived helpers. The table is live on the client. Next you make it
-live from the *server*: real-time row updates over a durable StreamDB.
+live from the *server*: rows pushed into an open page over a durable StreamDB.
 
 {{ comp.nextPrev({ prev: { label: "3 · Cache-first query", href: "/tutorials/live-dashboard/03-sdk-cache-first-query/" }, next: { label: "5 · Live stream", href: "/tutorials/live-dashboard/05-live-stream/" } }) }}

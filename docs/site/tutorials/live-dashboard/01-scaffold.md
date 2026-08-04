@@ -38,8 +38,9 @@ This is the first chapter; the only prerequisite is the toolchain from the
 netscript --help
 ```
 
-You should see the public command groups: `init`, `contract`, `db`, `deploy`, `generate`,
-`marketplace`, `plugin`, `service`, `ui:add`, and `ui:init`. If `netscript` is not found, make sure
+You should see the public command groups: `agent`, `config`, `deploy`, `init`, `contract`, `db`,
+`generate`, `marketplace`, `plugin`, `service`, `ui:add`, `ui:init`, `ui:list`, `ui:update`, and
+`ui:remove`. If `netscript` is not found, make sure
 Deno's install directory is on your `PATH` and open a fresh terminal.
 
 ## Step 1 — Preview the scaffold with a dry run
@@ -106,7 +107,8 @@ Open `my-dashboard/`. The shape that matters for this track:
 The two directories this track lives in:
 
 - **`apps/dashboard/`** — your Fresh app. Its entry point is `main.ts`, which calls
-  [`defineFreshApp`](/web-layer/); its build is configured by `vite.config.ts`.
+  [`defineFreshApp`](/web-layer/server/#composing-the-runtime-server); its build is configured by
+  `vite.config.ts`.
   Chapters 4 and 5 add routes and islands here. This is the heart of the track.
 - **`services/orders/`** and **`contracts/`** — the typed read-model your dashboard reads. You shape
   these in chapter 2, then consume them from the Fresh app in chapters 3–5.

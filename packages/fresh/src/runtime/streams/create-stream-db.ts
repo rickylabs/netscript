@@ -15,21 +15,19 @@
 
 import { createStreamDB } from '@durable-streams/state/db';
 import type { StateSchema, StreamStateDefinition } from '@durable-streams/state';
+import type { StreamDB } from '@durable-streams/state/db';
 import { buildStreamUrl, getStreamsAuth, getStreamsUrl } from '@netscript/plugin-streams-core';
 
 /** NetScript-owned durable stream state definition. */
-export type NetScriptStreamStateDefinition = Record<string, unknown>;
+export type NetScriptStreamStateDefinition = StreamStateDefinition;
 
 /** NetScript-owned state schema accepted by the stream DB factory. */
-export type NetScriptStateSchema<TDef extends NetScriptStreamStateDefinition> = Record<
-  keyof TDef,
-  unknown
->;
+export type NetScriptStateSchema<TDef extends NetScriptStreamStateDefinition> = StateSchema<TDef>;
 
 /** NetScript-owned stream database handle returned by the factory. */
 export interface NetScriptStreamDB<TDef extends NetScriptStreamStateDefinition> {
   /** Reactive collections keyed by schema collection name. */
-  readonly collections: Record<keyof TDef & string, unknown>;
+  readonly collections: StreamDB<StateSchema<TDef>>['collections'];
   /** Optional stop hook exposed by compatible stream DB adapters. */
   readonly stop?: () => void | Promise<void>;
   /** Optional dispose hook exposed by compatible stream DB adapters. */

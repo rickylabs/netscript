@@ -56,20 +56,20 @@ Deno.test('docs drift proof: documentation reflects registered tool surface and 
     new URL('../../../docs/site/ai/agent-tooling.md', import.meta.url),
   );
 
-  assertEquals(TOOL_NAMES.length, 17);
+  assertEquals(TOOL_NAMES.length, 21);
   assertEquals(TOOL_NAMES.includes('record_drift'), true);
 
   assert(
-    readme.includes('17 token-bounded tools'),
-    'README.md does not state 17 token-bounded tools',
+    readme.includes('21 token-bounded tools'),
+    'README.md does not state 21 token-bounded tools',
   );
   assert(
-    refMcp.includes('17 token-bounded tools') || refMcp.includes('17 tools'),
-    'reference/mcp/index.md missing 17 tools count',
+    refMcp.includes('21 token-bounded tools') || refMcp.includes('21 tools'),
+    'reference/mcp/index.md missing 21 tools count',
   );
   assert(
-    agentTooling.includes('Seventeen tools') || agentTooling.includes('17 tools'),
-    'agent-tooling.md missing 17 tools count',
+    agentTooling.includes('Twenty-one tools') || agentTooling.includes('21 tools'),
+    'agent-tooling.md missing 21 tools count',
   );
 
   for (const toolName of TOOL_NAMES) {

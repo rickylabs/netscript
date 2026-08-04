@@ -85,7 +85,7 @@ can check.
   },
   {
     title: "2 · Catalog service",
-    body: "Define a typed <code>products</code> contract whose schemas come from Prisma, implement the handlers against a Postgres-backed database client, and serve it with <code>defineService</code> on :3001.",
+    body: "Define a typed <code>products</code> contract whose schemas come from Prisma, implement the handlers against a Postgres-backed database client, and serve it with <code>defineService</code> (on port 3001 in this tutorial; note that each scaffolded project is allocated its own randomized high-range ports).",
     href: "/tutorials/storefront/02-catalog-service/"
   },
   {
@@ -100,7 +100,7 @@ can check.
   },
   {
     title: "5 · Shipping webhook",
-    body: "Accept an HMAC-verified shipping/payment webhook with <code>defineWebhook</code> and hand each inbound event to a background job with <code>enqueueJob</code>. Triggers API on :8093.",
+    body: "Accept an HMAC-verified shipping/payment webhook with <code>defineWebhook</code> and hand each inbound event to a background job with <code>enqueueJob</code>.",
     href: "/tutorials/storefront/05-shipping-webhook/"
   },
   {

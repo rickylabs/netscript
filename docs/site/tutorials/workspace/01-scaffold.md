@@ -54,8 +54,9 @@ deno install --global --allow-all --name netscript jsr:@netscript/cli{{ releaseS
 netscript --help
 ```
 
-`netscript --help` should list the command groups `init`, `contract`, `db`, `deploy`, `generate`,
-`marketplace`, `plugin`, `service`, `ui:add`, and `ui:init`. If `netscript` is not found, make sure
+`netscript --help` should list the command groups `agent`, `config`, `deploy`, `init`, `contract`,
+`db`, `generate`, `marketplace`, `plugin`, `service`, `ui:add`, `ui:init`, `ui:list`, `ui:update`,
+and `ui:remove`. If `netscript` is not found, make sure
 Deno's install directory (printed by `deno install`) is on your `PATH`, then open a fresh terminal.
 
 {{ comp callout { type: "tip", title: "Prefer not to install globally?" } }}
@@ -82,7 +83,7 @@ so it has no Aspire container).
 ## Step 2 — Create `my-workspace/`
 
 Run the same command without `--dry-run`. This track uses an example service named `workspace` on port
-`3001` and a Postgres database, so you have something real to authenticate and protect later:
+`3001` (note: this tutorial pins the port to 3001; in unpinned scaffolds, each project is allocated its own randomized high-range ports) and a Postgres database, so you have something real to authenticate and protect later:
 
 ```sh
 netscript init my-workspace --service --service-name workspace --service-port 3001 --db postgres

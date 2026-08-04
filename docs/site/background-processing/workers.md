@@ -82,7 +82,7 @@ as a <a href="/durable-workflows/sagas/">durable saga</a>; jobs and sagas compos
 {{ comp.featureGrid({ items: [
   {
     title: "Learn — ERP Sync, lesson 02",
-    body: "The tutorial rung: add the worker plugin to the running app, author an import job, and trigger it over :8091 as part of the ERP-sync narrative.",
+    body: "The tutorial rung: add the worker plugin to the running app, author an import job, and trigger it over its assigned port (allocated at scaffold time) as part of the ERP-sync narrative.",
     href: "/tutorials/erp-sync/02-import-job/",
     icon: "→"
   },
@@ -125,8 +125,7 @@ deno run -A packages/cli/bin/netscript-dev.ts plugin install worker --name worke
 
 That local path lands real, compiling modules you can read and trigger immediately — including
 `plugins/workers/jobs/health-check.ts` (a job handler) and
-`plugins/workers/tasks/validate-payload.ts` (a polyglot task). The plugin's API service comes up
-on **port 8091**.
+`plugins/workers/tasks/validate-payload.ts` (a polyglot task). The plugin's API service comes up on the port assigned to it at scaffold time (stable high-range, >= 49152; discover yours in the console output, appsettings.json, or Aspire dashboard).
 
 A job handler is an async callable over a `ctx` object that returns a `JobResult`. Parse the
 payload with a Zod schema, do the work, and return `createSuccessResult(...)` or
@@ -393,12 +392,12 @@ Deno.addSignalListener('SIGTERM', async () => {
 
 ## Workers API & where jobs come from
 
-Once Aspire is up and the schema is wired, the workers API on **`:8091`** registers your job
+Once Aspire is up and the schema is wired, the workers API service (on its assigned port) registers your job
 by `id` and exposes HTTP endpoints to seed, trigger, and inspect runs. These are the
 endpoints the CLI E2E suite validates live.
 
 {{ comp.apiTable({
-  caption: "Workers API — port 8091 (full generated surface in the workers reference)",
+  caption: "Workers API — Port Surface (allocated per project; full generated surface in the workers reference)",
   rows: [
     { name: "GET /health", type: "liveness", desc: "Health probe for the workers API service." },
     { name: "GET /api/v1/workers/jobs", type: "list", desc: "All registered job definitions (id, name, topic) discovered from the jobs directories." },
@@ -415,7 +414,7 @@ Each handler file under your jobs directory (<code>workers/jobs</code> by defaul
 <code>*.ts</code>) is discovered and compiled into one generated registry at
 <code>.netscript/generated/plugin-workers/job-registry.ts</code>, keyed by the source filename —
 so <code>workers/jobs/process-payment.ts</code> registers as <code>process-payment</code>. Both
-the <code>:8091</code> API service <em>and</em> the background runner load that single registry at
+the API service <em>and</em> the background runner load that single registry at
 startup: the API service registers the generated user job definitions <em>before it serves</em>,
 so your jobs — not just the built-in <code>workers-plugin-health-check</code> — appear in
 <code>GET /api/v1/workers/jobs</code> and resolve on trigger. Registration order decides id
@@ -468,7 +467,7 @@ documentation (as of mid-2026), not rankings.
 | Determinism constraint on orchestration code | None — handlers may call `Date.now()`, `Math.random()`, and do direct I/O | Not required | Required in workflow code: no `Date.now()`, `Math.random()`, or direct I/O |
 | Where handlers execute | Your own processes: in-process, web-worker, or subprocess runner | Managed cloud; self-hosting via Docker Compose | Self-hosted cluster or Temporal Cloud |
 | Backing stores | Pluggable queue (`deno-kv`, `redis`, `postgres`, `amqp`); Deno KV execution state; Postgres job definitions | Platform-managed | Database, Elasticsearch, server, and workers (self-hosted) |
-| Control plane | None separate — the workers API is one of your services (`:8091`) | The Trigger.dev platform | The Temporal cluster |
+| Control plane | None separate — the workers API is one of your services (running on its scaffold-assigned port) | The Trigger.dev platform | The Temporal cluster |
 
 The practical consequence of the first two rows: a NetScript job handler is ordinary
 TypeScript with no replay-safety rules to learn, so code an agent writes for a service
@@ -482,7 +481,7 @@ The workers plugin persists job definitions to Postgres and uses Deno KV for exe
 so bring orchestration up before you exercise it. Step&nbsp;1 is the database service;
 step&nbsp;2 is Aspire: <code>cd aspire &amp;&amp; aspire start</code> provisions Postgres and
 Redis, then <code>netscript db init --name init</code> / <code>netscript db generate</code>
-wire the schema. Only after Aspire is up will <code>:8091</code> resolve jobs and record
+wire the schema. Only after Aspire is up will the workers API service resolve jobs and record
 executions. See <a href="/data-persistence/how-to/database-migration/">Database &amp; migration</a>.
 {{ /comp }}
 
@@ -522,7 +521,7 @@ exported type and subpath) lives in the reference.
 {{ comp.featureGrid({ items: [
   {
     title: "Learn — ERP Sync, lesson 02",
-    body: "Author an import job and trigger it over :8091 as part of the continuous ERP-sync tutorial narrative.",
+    body: "Author an import job and trigger it over its assigned port as part of the continuous ERP-sync tutorial narrative.",
     href: "/tutorials/erp-sync/02-import-job/",
     icon: "→"
   },

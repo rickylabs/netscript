@@ -8,6 +8,11 @@
  * - package-owned live query hooks (`useLiveQuery`, `useLiveSuspenseQuery`)
  * - Hydration utilities for streaming SSR
  *
+ * When a hook receives `initialData`, the server snapshot is seeded into the
+ * shared client once before the query observer reads it. That mount-time seed
+ * wins over an older tab entry; later optimistic writes and refetches win over
+ * the original snapshot.
+ *
  * **Import discipline:** Island code should import from `@netscript/fresh/query`,
  * NOT from `@tanstack/preact-query` directly. This centralizes the dependency
  * and enables framework-level enhancements.
@@ -20,6 +25,15 @@ export { QueryIsland, type QueryIslandProps } from './query-island.tsx';
 
 // === QueryClient singleton ===
 export { getIslandQueryClient, resetIslandQueryClient } from './query-client.ts';
+
+// === Server cache invalidation edge ===
+export {
+  DEFAULT_QUERY_CACHE_INVALIDATION_PATH,
+  invalidateServerQueryCache,
+  type InvalidateServerQueryCacheOptions,
+  type ServerQueryCacheKey,
+  type ServerQueryCacheKeyPart,
+} from './cache-invalidation/mod.ts';
 
 // === Package-owned query types ===
 export type {

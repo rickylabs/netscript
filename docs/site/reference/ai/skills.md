@@ -25,7 +25,9 @@ of three ready-made skills that teach an agent the NetScript vocabulary.
 
 `netscript agent init` installs five first-party skills and a symptom playbook on the **Claude Code host path**
 (under `.claude/skills/`, alongside `.mcp.json` and the marked `AGENTS.md` section); the
-VS Code host path writes `.vscode/mcp.json` only, with no skills. They share one vocabulary with the
+VS Code editor path writes `.vscode/mcp.json`; Zed writes native `context_servers` into
+`.zed/settings.json`. Select with `netscript agent init --editor none|zed|vscode`, including on a
+cloned existing project. They share one vocabulary with the
 `netscript` CLI and the [NetScript MCP tools](/ai/agent-tooling/#what-the-server-exposes),
 so an agent routes to a workflow and then reaches for the matching CLI verb or MCP tool.
 

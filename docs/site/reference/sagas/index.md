@@ -45,7 +45,7 @@ is provided by `inspectPlugin` from `@netscript/plugin`.
 | `SAGAS_PLUGIN_ID` | variable | `"sagas"` | Stable plugin identifier used by manifests, scaffolding, and runtime ownership checks. |
 | `SAGAS_PLUGIN_VERSION` | variable | `"1.0.0"` | Plugin manifest version advertised to the NetScript host. |
 | `SAGAS_API_SERVICE_NAME` | variable | `"sagas-api"` | Service contribution name for the sagas API process. |
-| `SAGAS_API_DEFAULT_PORT` | variable | `8092` | Default HTTP port for the sagas API process. |
+| `SAGAS_API_DEFAULT_PORT` | variable | `8092` | Default HTTP fallback port for the sagas API process (note: your scaffold's port will differ as the scaffolder allocates randomized high-range ports at init/install time). |
 
 
 ## Runtime (`@netscript/plugin-sagas/runtime`)

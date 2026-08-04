@@ -418,7 +418,7 @@ that full form instead.
   {
     label: "Simple — generic-webhook.ts",
     lang: "ts",
-    code: "// plugins/triggers/generic-webhook.ts\nimport { defineWebhook, enqueueJob } from '@netscript/plugin-triggers-core/builders';\nimport type { JobDefinition } from '@netscript/plugin-workers-core';\n\n// A reference to the workers job this webhook will enqueue.\nconst healthCheckJob = {\n  id: 'workers-plugin-health-check' as JobDefinition<'workers-plugin-health-check'>['id'],\n  name: 'Workers Health Check',\n  topic: 'default',\n} satisfies JobDefinition<'workers-plugin-health-check'>;\n\n// Inbound POST -> enqueue a workers job. The HTTP call returns immediately;\n// the job runs durably on the workers plugin (:8091).\nexport const genericInboundWebhook = defineWebhook(\n  () => Promise.resolve([\n    enqueueJob(healthCheckJob, { payload: { verbose: false }, priority: 50 }),\n  ]),\n  {\n    id: 'generic-inbound-webhook',\n    path: 'inbound/generic',\n    verifier: 'memory',\n    description: 'Open webhook that enqueues the workers plugin health-check job.',\n    tags: ['webhook', 'runtime-task', 'health-check'],\n  },\n);\n\nexport default genericInboundWebhook;"
+    code: "// plugins/triggers/generic-webhook.ts\nimport { defineWebhook, enqueueJob } from '@netscript/plugin-triggers-core/builders';\nimport type { JobDefinition } from '@netscript/plugin-workers-core';\n\n// A reference to the workers job this webhook will enqueue.\nconst healthCheckJob = {\n  id: 'workers-plugin-health-check' as JobDefinition<'workers-plugin-health-check'>['id'],\n  name: 'Workers Health Check',\n  topic: 'default',\n} satisfies JobDefinition<'workers-plugin-health-check'>;\n\n// Inbound POST -> enqueue a workers job. The HTTP call returns immediately;\n// the job runs durably on the workers plugin (assigned port).\nexport const genericInboundWebhook = defineWebhook(\n  () => Promise.resolve([\n    enqueueJob(healthCheckJob, { payload: { verbose: false }, priority: 50 }),\n  ]),\n  {\n    id: 'generic-inbound-webhook',\n    path: 'inbound/generic',\n    verifier: 'memory',\n    description: 'Open webhook that enqueues the workers plugin health-check job.',\n    tags: ['webhook', 'runtime-task', 'health-check'],\n  },\n);\n\nexport default genericInboundWebhook;"
   },
   {
     label: "Advanced — validate + enqueue",
@@ -428,7 +428,7 @@ that full form instead.
   {
     label: "Call it — curl",
     lang: "bash",
-    code: "# Triggers API runs on :8093. POST to the webhook's resolved path.\ncurl -X POST http://localhost:8093/api/v1/webhooks/inbound/generic \\\n  -H 'content-type: application/json' \\\n  -d '{\"verbose\": false}'\n\n# Watch the resulting ingress events:\ncurl 'http://localhost:8093/api/v1/events?limit=10'\n\n# The enqueued job lands on the workers plugin (:8091):\nns-workers executions --limit=10 --json"
+    code: "# Triggers API runs on its assigned port. POST to the webhook's resolved path.\n# Replace <triggers-port> with your assigned triggers API port.\ncurl -X POST http://localhost:<triggers-port>/api/v1/webhooks/inbound/generic \\\n  -H 'content-type: application/json' \\\n  -d '{\"verbose\": false}'\n\n# Watch the resulting ingress events:\ncurl 'http://localhost:<triggers-port>/api/v1/events?limit=10'\n\n# The enqueued job lands on the workers plugin (on its assigned port):\nns-workers executions --limit=10 --json"
   }
 ] }) }}
 

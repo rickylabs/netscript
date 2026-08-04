@@ -1,5 +1,4 @@
 import { join } from '@std/path';
-import { SCAFFOLD_APP_PORT } from '../../../constants/port-ranges.ts';
 import { SCAFFOLD_DEFAULTS } from '../../../constants/scaffold/scaffold-defaults.ts';
 import { SCAFFOLD_FILES } from '../../../constants/scaffold/scaffold-files.ts';
 import type { ValidatedInitOptions } from '../../../domain/scaffold/scaffold-options.ts';
@@ -20,6 +19,7 @@ import {
   buildAppAgentsMarkdown,
   buildWebLayerMarkdown,
 } from '../../../templates/app/agent-conventions.ts';
+import { allocateScaffoldDefaultPort } from '../../../domain/scaffold/default-port-allocation.ts';
 
 export async function writeNormalizedAppFiles(
   context: InitPipelineContext,
@@ -30,7 +30,7 @@ export async function writeNormalizedAppFiles(
   filesSkipped: string[],
   directoriesCreated: string[],
 ): Promise<void> {
-  const appPort = SCAFFOLD_APP_PORT;
+  const appPort = allocateScaffoldDefaultPort(options.name, `app:${options.appName}`);
   const plan = createScaffoldPlan(options, {
     useWorkspacePackages: context.packagesAsWorkspaceMembers(options),
   });
@@ -305,7 +305,7 @@ export async function writeNormalizedAppFiles(
   }
   await write(
     join(appDir, 'vite.config.ts'),
-    generateAppViteConfig({ appName: options.appName }),
+    generateAppViteConfig({ appName: options.appName, appPort }),
   );
 }
 
