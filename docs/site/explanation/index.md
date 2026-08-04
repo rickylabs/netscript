@@ -25,11 +25,12 @@ These pages are <strong>understanding-oriented</strong>. For a guided first path
 
 ## The concept map
 
-Seven topics, ordered from the broadest framing down to the individual subsystems.
+Eight topics, ordered from the broadest framing down to the individual subsystems.
 The first two explain the framework as a whole; the next two cover the durable
-runtime model; the last three explain the cross-cutting concerns every plugin
+runtime model; the following three explain the cross-cutting concerns every plugin
 shares — the local orchestrator, the telemetry it emits, and the pure-backend
-authentication seam.
+authentication seam. The last one steps outside the framework and compares its
+path to the frameworks you may be arriving from.
 
 {{ comp.featureGrid({ items: [
   { title: "The NetScript architecture", icon: "🏛️", href: "/explanation/architecture/", body: "The published-surface thesis, the contracts-first workflow, the six package archetypes, and the publish gate that enforces all of it." },
@@ -38,7 +39,8 @@ authentication seam.
   { title: "Durability model", icon: "🔁", href: "/explanation/durability-model/", body: "Sagas as explicit state machines: correlation, the kv or prisma durable store, and compensation modeled as message-handler effects." },
   { title: "Observability", icon: "📡", href: "/explanation/observability/", body: "Where OpenTelemetry traces are real and automatic, where the scaffold handler helpers are still no-op stubs, and how Aspire collects it all." },
   { title: "The Aspire orchestrator", icon: "🛰️", href: "/explanation/aspire/", body: "The generated TypeScript AppHost, the resource graph (the Postgres container (the recommended engine) — or mysql / mssql via --db; sqlite is file-backed with no container — plus Redis and every *-api service), and the dashboard on :18888." },
-  { title: "The pure-backend auth model", icon: "🔐", href: "/explanation/auth-model/", body: "Core defines the AuthBackendPort; backends are pure adapters; the plugin composes exactly one active backend. Why only kv-oauth is interactive." }
+  { title: "The pure-backend auth model", icon: "🔐", href: "/explanation/auth-model/", body: "Core defines the AuthBackendPort; backends are pure adapters; the plugin composes exactly one active backend. Why only kv-oauth is interactive." },
+  { title: "How NetScript's path compares", icon: "🧭", href: "/explanation/compared/", body: "What the canonical getting-started flows of Next.js, Nuxt, SvelteKit, Laravel, and Rails teach first, where NetScript's ordering diverges and why, and where those peers are ahead today." }
 ] }) }}
 
 ## A suggested reading order
@@ -54,7 +56,8 @@ auth model is easiest to grasp once you already understand plugins and ports.
   { label: "Durability model", href: "/explanation/durability-model/" },
   { label: "Observability", href: "/explanation/observability/" },
   { label: "Aspire", href: "/explanation/aspire/" },
-  { label: "Auth model", href: "/explanation/auth-model/" }
+  { label: "Auth model", href: "/explanation/auth-model/" },
+  { label: "How the path compares", href: "/explanation/compared/" }
 ] }) }}
 
 ## Themes that recur across every page
