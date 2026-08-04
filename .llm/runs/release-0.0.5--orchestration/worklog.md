@@ -657,3 +657,11 @@ receipts) is now fully on main — wave 3's S6 read tools unblock.
 
 #1200 (docs): full-rerun success still left shadowed contexts; fresh-SHA cure applied
 (`0b3c1ff13`), merge armed on green. #1187 recurrence count this run: five.
+
+## 2026-08-04 — Merge 14: PR #1200 (#1106) — docs lane complete
+
+Fresh-SHA contexts green → merged; #1106 auto-closed. Docs-lane arc for the #1163 record:
+agy authored (317s) → orchestrator box-audit found real gaps (+ its own grep false-negative,
+finding 22) → agy round 2 fixed (236s) → evidence-verified ticks → gate → merge. Wave 2 is
+now fully landed except the sagas pair (#1198 endgame in flight, #1193 holding for joint
+verification).
