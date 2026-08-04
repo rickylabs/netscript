@@ -290,7 +290,7 @@ function appendJobDefinitions(
   if (target.kind !== 'workers-job') return;
 
   lines.push('const jobDefinitionEntries: readonly [string, RegisterJobInput][] = [');
-  files.forEach((file, index) => {
+  files.forEach((file) => {
     const jobId = JSON.stringify(basename(file, '.ts'));
     lines.push(
       `  [${jobId}, createLocalJobDefinition(${jobId}, './${file}')],`,
