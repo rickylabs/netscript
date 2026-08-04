@@ -36,7 +36,7 @@ export class InitDbCommand extends CliCommand<CliffyCommand> {
         const code = await runDbOperation('init', {
           ...options,
           migrationName: options.name ?? 'init',
-        }, this.dependencies.cwd);
+        }, this.dependencies);
         exitWithCode(code);
       });
   }

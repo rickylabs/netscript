@@ -44,6 +44,8 @@ interface DbOperationRunnerOptions {
   readonly writeOperationRequest?: (path: string, env: Record<string, string>) => Promise<void>;
   readonly removeOperationRequest?: (path: string) => Promise<void>;
   readonly ensureProcessStopped?: (pid: number) => Promise<void>;
+  readonly verifyAppHostAbsent?: (apphostPath: string, aspireDir: string) => Promise<void>;
+  readonly registerSignalAbort?: (abort: () => void) => () => void;
 }
 
 /** Executes database operations by delegating to Aspire AppHost CLI mode. */
@@ -56,6 +58,8 @@ export class DbOperationRunner {
   private readonly writeOperationRequest: (path: string, env: Record<string, string>) => Promise<void>;
   private readonly removeOperationRequest: (path: string) => Promise<void>;
   private readonly ensureProcessStopped: (pid: number) => Promise<void>;
+  private readonly verifyAppHostAbsent: (apphostPath: string, aspireDir: string) => Promise<void>;
+  private readonly registerSignalAbort: (abort: () => void) => () => void;
 
   constructor(options: DbOperationRunnerOptions = {}) {
     this.executor = options.executor ?? new DenoAspireCommandExecutor();
@@ -74,6 +78,9 @@ export class DbOperationRunner {
       }
     });
     this.ensureProcessStopped = options.ensureProcessStopped ?? ensureProcessStopped;
+    this.verifyAppHostAbsent = options.verifyAppHostAbsent ??
+      ((apphostPath, aspireDir) => this.waitForAppHostAbsence(apphostPath, aspireDir));
+    this.registerSignalAbort = options.registerSignalAbort ?? registerSignalAbort;
   }
 
   /**
@@ -87,11 +94,21 @@ export class DbOperationRunner {
       ? request.target.databases
       : [request.target.database];
 
-    for (const database of databases) {
-      const code = await this.executeOne(request, database);
-      if (code !== 0) {
-        return code;
+    if (request.operation === 'studio') {
+      return await this.executeOne(request, databases[0]);
+    }
+
+    const controller = new AbortController();
+    const unregisterSignals = this.registerSignalAbort(() => controller.abort());
+    try {
+      for (const database of databases) {
+        const code = await this.executeOne(request, database, controller.signal);
+        if (code !== 0) {
+          return code;
+        }
       }
+    } finally {
+      unregisterSignals();
     }
 
     return 0;
@@ -101,6 +118,7 @@ export class DbOperationRunner {
   private async executeOne(
     request: DbOperationRequest,
     database: DiscoveredDatabase,
+    signal?: AbortSignal,
   ): Promise<number> {
     const aspireDir = join(request.projectRoot, SCAFFOLD_DIRS.ASPIRE_TS);
     const residentAppHostPath = join(aspireDir, SCAFFOLD_FILES.APPHOST_MTS);
@@ -118,6 +136,9 @@ export class DbOperationRunner {
       aspireDir,
       SCAFFOLD_FILES.DB_OPERATION_APPHOST_MTS,
     );
+    if (!signal) {
+      throw new Error('Database operation cancellation signal is required.');
+    }
 
     return await this.executeDetached(
       request.operation,
@@ -125,6 +146,7 @@ export class DbOperationRunner {
       operationAppHostPath,
       aspireDir,
       env,
+      signal,
     );
   }
 
@@ -151,6 +173,7 @@ export class DbOperationRunner {
     apphostPath: string,
     aspireDir: string,
     env: Record<string, string>,
+    signal: AbortSignal,
   ): Promise<number> {
     const displayName = buildExecutableDisplayName(operation, configKey);
     const operationRequestPath = join(apphostPath, '..', '.netscript-db-operation.json');
@@ -162,12 +185,14 @@ export class DbOperationRunner {
     });
 
     try {
+      if (await this.hasRunningAppHost(apphostPath, aspireDir, signal)) {
+        await this.stopDetached(apphostPath, aspireDir, undefined);
+      }
       await this.writeOperationRequest(operationRequestPath, env);
-      const startedByInvocation = !(await this.hasRunningAppHost(apphostPath, aspireDir));
 
       const start = await this.runAspire(
         buildAspireArgs('start', apphostPath),
-        { cwd: aspireDir, env },
+        { cwd: aspireDir, env, signal },
       );
       const startedPid = readStartedAppHostPid(start.stdout);
 
@@ -177,9 +202,10 @@ export class DbOperationRunner {
           configKey,
           apphostPath,
           aspireDir,
+          signal,
         );
 
-        await this.printResourceLogs(displayName, apphostPath, aspireDir);
+        await this.printResourceLogs(displayName, apphostPath, aspireDir, signal);
 
         if (code === 0) {
           outputText(`db ${operation} completed successfully.`);
@@ -189,9 +215,7 @@ export class DbOperationRunner {
 
         return code;
       } finally {
-        if (startedByInvocation) {
-          await this.stopDetached(apphostPath, aspireDir, startedPid);
-        }
+        await this.stopDetached(apphostPath, aspireDir, startedPid);
       }
     } finally {
       await this.removeOperationRequest(operationRequestPath);
@@ -211,7 +235,11 @@ export class DbOperationRunner {
     }
   }
 
-  private async hasRunningAppHost(apphostPath: string, aspireDir: string): Promise<boolean> {
+  private async hasRunningAppHost(
+    apphostPath: string,
+    aspireDir: string,
+    signal: AbortSignal,
+  ): Promise<boolean> {
     const args = [
       'describe',
       '--apphost',
@@ -221,7 +249,7 @@ export class DbOperationRunner {
       '--non-interactive',
       '--nologo',
     ];
-    const output = await this.executor.output(args, { cwd: aspireDir });
+    const output = await this.executor.output(args, { cwd: aspireDir, signal });
     if (output.code === 0) {
       return true;
     }
@@ -238,6 +266,7 @@ export class DbOperationRunner {
     resourceName: string,
     apphostPath: string,
     aspireDir: string,
+    signal: AbortSignal,
   ): Promise<void> {
     try {
       const output = await this.executor.output(
@@ -249,7 +278,7 @@ export class DbOperationRunner {
           '--non-interactive',
           '--nologo',
         ],
-        { cwd: aspireDir },
+        { cwd: aspireDir, signal },
       );
       const logs = output.stdout.trim();
       if (logs) {
@@ -269,6 +298,7 @@ export class DbOperationRunner {
     configKey: string,
     apphostPath: string,
     aspireDir: string,
+    signal: AbortSignal,
   ): Promise<number> {
     const displayName = buildExecutableDisplayName(operation, configKey);
     const deadline = Date.now() + this.timeoutMs;
@@ -284,7 +314,7 @@ export class DbOperationRunner {
           '--non-interactive',
           '--nologo',
         ],
-        { cwd: aspireDir },
+        { cwd: aspireDir, signal },
       );
       const resource = findExecutableStatus(output.stdout, apphostPath, displayName);
       if (resource && resource.state && TERMINAL_RESOURCE_STATES.has(resource.state)) {
@@ -335,7 +365,48 @@ export class DbOperationRunner {
     if (startedPid !== undefined) {
       await this.ensureProcessStopped(startedPid);
     }
+    await this.verifyAppHostAbsent(apphostPath, aspireDir);
   }
+
+  private async waitForAppHostAbsence(apphostPath: string, aspireDir: string): Promise<void> {
+    for (let attempt = 0; attempt < 50; attempt++) {
+      const output = await this.executor.output(
+        ['ps', '--format', 'Json', '--non-interactive', '--nologo'],
+        { cwd: aspireDir },
+      );
+      if (output.code !== 0) {
+        throw new Error(`aspire ps failed with exit code ${output.code}: ${
+          output.stderr.trim() || output.stdout.trim() || 'unknown Aspire error'
+        }`);
+      }
+      const processes = JSON.parse(output.stdout) as Array<{
+        readonly appHostPath?: string;
+        readonly appHostPid?: number;
+      }>;
+      const operationHost = processes.find((entry) =>
+        typeof entry.appHostPath === 'string' &&
+        normaliseAppHostPath(entry.appHostPath) === normaliseAppHostPath(apphostPath)
+      );
+      if (!operationHost) return;
+      if (typeof operationHost.appHostPid === 'number') {
+        await this.ensureProcessStopped(operationHost.appHostPid);
+      }
+      await this.sleep(100);
+    }
+    throw new Error(`Aspire AppHost ${apphostPath} survived database command cleanup.`);
+  }
+}
+
+function registerSignalAbort(abort: () => void): () => void {
+  const signals: Deno.Signal[] = Deno.build.os === 'windows' ? ['SIGINT'] : ['SIGINT', 'SIGTERM'];
+  for (const signal of signals) Deno.addSignalListener(signal, abort);
+  return () => {
+    for (const signal of signals) Deno.removeSignalListener(signal, abort);
+  };
+}
+
+function normaliseAppHostPath(path: string): string {
+  return path.replaceAll('\\', '/').toLowerCase();
 }
 
 function readStartedAppHostPid(stdout: string): number | undefined {

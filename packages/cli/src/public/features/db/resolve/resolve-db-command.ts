@@ -37,7 +37,7 @@ export function createDbResolveCommand(
       const code = await runDbOperation(operation, {
         ...options,
         migrationName: options.applied ?? options.rolledBack,
-      }, dependencies.cwd);
+      }, dependencies);
       exitWithCode(code);
     });
 }

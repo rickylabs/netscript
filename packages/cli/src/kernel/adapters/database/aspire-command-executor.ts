@@ -6,6 +6,7 @@ export interface AspireCommandOptions {
   readonly stdin?: CommandStdio;
   readonly stdout?: CommandStdio;
   readonly stderr?: CommandStdio;
+  readonly signal?: AbortSignal;
 }
 
 export interface CommandOutput {
@@ -31,6 +32,7 @@ export class DenoAspireCommandExecutor implements AspireCommandExecutor {
       stdin: options.stdin ?? 'null',
       stdout: options.stdout ?? 'piped',
       stderr: options.stderr ?? 'piped',
+      signal: options.signal,
     }).output();
 
     return {
@@ -51,6 +53,7 @@ export class DenoAspireCommandExecutor implements AspireCommandExecutor {
       stdin: options.stdin ?? 'inherit',
       stdout: options.stdout ?? 'inherit',
       stderr: options.stderr ?? 'inherit',
+      signal: options.signal,
     }).spawn();
 
     const status = await child.status;

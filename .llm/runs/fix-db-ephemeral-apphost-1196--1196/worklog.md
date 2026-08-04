@@ -59,7 +59,18 @@ existing resident-preservation scaffold gate.
 | --- | --- | --- | --- |
 | 2026-08-05 | S0 | Live issue read first and baseline created | issue #1196; `6c3b534fc` |
 | 2026-08-05 | S0 | Research/design locked | plan D1–D5 |
+| 2026-08-05 | S1 | RED captured | focused runner suite failed because a pre-existing exact-path operation AppHost was not stopped |
+| 2026-08-05 | S1 | Exact-path ownership implemented | stale host retired before start; invocation host stopped and verified absent on success/failure |
+| 2026-08-05 | S2 | Signal and artifact lifecycle implemented | AbortSignal propagation plus command-scoped materialize/remove wrapper; studio remains resident |
+| 2026-08-05 | S2 | Focused GREEN | 4 tests / 13 BDD steps pass; scoped check selected 17 files with zero findings |
 
 ## Gates
 
-Pending implementation.
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| RED-first | PASS | `retires a pre-existing DB-operation AppHost before returning success` failed on missing `stop` before implementation |
+| Focused lifecycle tests | PASS | operation runner + command wrapper: 4 tests / 13 steps |
+| Scoped check | PASS | 17 selected CLI/E2E files; zero findings |
+| Lock hygiene | PASS | pre-existing `deno.lock` modification remains unstaged |
+
+Merge-readiness gates pending.

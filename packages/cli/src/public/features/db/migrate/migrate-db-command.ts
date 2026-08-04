@@ -36,7 +36,7 @@ export class MigrateDbCommand extends CliCommand<CliffyCommand> {
           db: options.db,
           projectRoot: options.projectRoot,
           migrationName: options.name,
-        }, this.dependencies.cwd);
+        }, this.dependencies);
         exitWithCode(code);
       });
   }
