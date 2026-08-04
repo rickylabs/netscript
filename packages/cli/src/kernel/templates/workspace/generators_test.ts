@@ -190,7 +190,7 @@ Deno.test('generateDenoJson maps @database/zod for the selected database engine'
 
   assertEquals(
     result.imports['@database/zod'],
-    './database/postgres/schema/.generated/zod/crud.ts',
+    './database/postgres/schema/.generated/zod/schemas/models/index.ts',
   );
 });
 
@@ -205,7 +205,7 @@ Deno.test('generateDenoJson keeps generated database aliases in local mode', () 
   }));
 
   assertEquals(result.imports, {
-    '@database/zod': './database/sqlite/schema/.generated/zod/crud.ts',
+    '@database/zod': './database/sqlite/schema/.generated/zod/schemas/models/index.ts',
   });
 });
 
