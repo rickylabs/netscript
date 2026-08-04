@@ -1429,3 +1429,24 @@ agent prototyped and discarded on exactly this basis: correct engineering judgme
 **Finding 31 (for #1163): an agent's honest stop must be verified in BOTH directions — is the
 blocker real (here: yes), and does it actually block everything claimed (here: no). Accepting
 an over-broad stop silently converts one blocked requirement into a whole missed issue.**
+
+## 2026-08-04 — MERGE #1266 (#1251 closed): OWNER ONBOARDING WAVE COMPLETE (11/11 dispositioned)
+
+All four green, threads 0/0, refs [1251]; #1251 auto-closed with its four in-scope rows
+delivered (SQLite in the graph, deno-kv resolved value+URL, banner truthfulness, per-service
+graph test) and the health-check row split to #1280 with proof.
+
+**Wave final disposition — all eleven, honestly:**
+- **Fixed and closed in 0.0.5 (10):** #1250 (Zod-4 coercion), #1253 (export corpus), #1254
+  (@database/zod barrel), #1247 (editor-aware agent init), #1248 (MCP affordance), #1252
+  (cache-tier convergence), #1234 (custom job registry), #1235 (StreamDB types), #1236
+  (plugin-remove rollback), #1251 (aspire graph, scoped).
+- **Mitigated in 0.0.5, issue moved to 0.0.6 (1):** #1246 — detection + remediation shipped
+  (#1264); full fix gated on upstream deno/deno#35804.
+- **Split as genuinely blocked (1 row):** #1280 — TS AppHosts cannot register custom health
+  checks and Deno KV Connect has no health endpoint; refused to ship a false probe.
+- **Refuted, never scheduled:** withForm hydrated-POST value loss (owner-excluded).
+Byproducts filed from verification work: #1262 (seed placebo), #1263 (by-id 500 vs 404),
+#1267 (residue scan, fixed same day), #1278 (type-soundness umbrella), #1279 (migration
+chapter), #1280.
+Everything merged post-canary.8 rides canary.9.
