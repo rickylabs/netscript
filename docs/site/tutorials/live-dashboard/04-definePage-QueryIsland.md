@@ -138,9 +138,9 @@ export const ordersListPage = definePage()
 ```
 
 `definePage` comes from `@app/utils.ts`, not straight from `@netscript/fresh/builders`. Your scaffold
-wrote that module in chapter 1 — it is a two-line re-export that binds the builder to the app's
-`State` type (`export function definePage() { return createDefinePage<State>(); }`), so every page in
-the app shares one typed context. Import it from anywhere else and you lose that binding.
+wrote that module in chapter 1 — a thin wrapper that calls the package builder with the app's `State`
+type applied (`export function definePage() { return createDefinePage<State>(); }`), so every page in
+the app shares one typed context. Import the package builder directly and you lose that binding.
 
 `spanName: 'dashboard.orders.list'` is not decoration: every render of this page emits a span under
 that name, and it shows up in the Aspire dashboard's traces view alongside the service call the
@@ -350,10 +350,9 @@ export default function StatsLayer(props: StatsProps) {
 
 Make sure `aspire start` is up, then open the route in a browser at `/dashboard/orders/`.
 
-You need the app's port to do that, and there is no number to memorize: scaffolded apps and plugin
-runtimes take a port derived from your project name out of the high `49152–65535` range, so every
-workspace lands somewhere different. The [Aspire dashboard](/explanation/aspire/) resource list is
-the authority — find the `dashboard` resource, click its endpoint, and append `/dashboard/orders/`.
+You need the app's port to do that, and there is no number to memorize: a scaffolded Fresh app pins
+no host port, so Aspire allocates one at runtime. The [Aspire dashboard](/explanation/aspire/)
+resource list is the authority — find the `dashboard` resource, click its endpoint, and append `/dashboard/orders/`.
 You should see the orders table render
 immediately — populated from KV cache, not a spinner — and a "Refreshing" indicator flicker as it
 revalidates. Advancing an order's status should update its badge instantly. Type-check too:

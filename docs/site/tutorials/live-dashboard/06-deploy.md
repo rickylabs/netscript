@@ -87,7 +87,7 @@ up for this track:
 }) }}
 
 {{ comp callout { type: "note", title: "Only pinned ports are predictable — read the dashboard for the rest" } }}
-<code>orders</code> answers on <code>:3002</code> because you pinned it with <code>--service-port</code> in chapter 1. Nothing else in this graph has a memorizable number: scaffolded apps and plugin runtimes take a port derived from your <em>project name</em> out of the IANA dynamic range (<code>49152–65535</code>), so two workspaces on one machine never collide — and no tutorial can print the number yours landed on. The Aspire dashboard's resource list is the authority; read every unpinned port from there.
+<code>orders</code> answers on <code>:3002</code> because you pinned it with <code>--service-port</code> in chapter 1. Nothing else in this graph has a memorizable number, for two different reasons. The Fresh <code>dashboard</code> app pins no host port, so <strong>Aspire allocates one at runtime</strong> — a fresh number each start. A plugin runtime installed without <code>--port</code> does get a pinned host port, but the installer picks it: a hash of your project name over the IANA dynamic range (<code>49152–65535</code>), probing past ports already claimed in this workspace. That spreads projects apart in practice; it is not a guarantee, since the range is finite and workspaces cannot see each other's allocations. The Aspire dashboard's resource list is the authority for both — read every unpinned port from there.
 {{ /comp }}
 
 ## Step 3 — Open the live dashboard
@@ -161,7 +161,7 @@ Both should return healthy responses, and the dashboard at `:18888` should list 
 <li><strong>Docker not running.</strong> Aspire provisions Postgres + Redis through Docker; no daemon means the happy path does not start. Start Docker, or take the <code>--no-aspire</code> path with your own infrastructure.</li>
 <li><strong>Wrong directory.</strong> <code>aspire restore</code> and <code>aspire start</code> run from inside <code>aspire/</code>; <code>netscript db</code> commands run from the workspace root. Mixing them up is the most common first-run error.</li>
 <li><strong>db command before <code>aspire start</code>.</strong> Every <code>netscript db</code> command needs a live Postgres — bring the graph up first.</li>
-<li><strong>Ports in use.</strong> The dashboard wants <code>:18888</code>/<code>:18889</code> and OTLP <code>:4318</code>; the pinned <code>orders</code> service claims <code>:3002</code>, and the Fresh app and streams claim allocated ports in <code>49152–65535</code>. A stale prior run holding a port blocks boot — free it.</li>
+<li><strong>Ports in use.</strong> The dashboard wants <code>:18888</code>/<code>:18889</code> and OTLP <code>:4318</code>; the pinned <code>orders</code> service claims <code>:3002</code>, the streams runtime claims an installer-allocated port in <code>49152–65535</code>, and the Fresh app claims whatever Aspire hands it at start. A stale prior run holding a port blocks boot — free it.</li>
 </ul>
 {{ /comp }}
 

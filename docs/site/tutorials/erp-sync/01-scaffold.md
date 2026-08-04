@@ -159,8 +159,10 @@ https://localhost:18888
 ```
 
 The dashboard's **Resources** tab is the authority for which port each resource bound, and there is
-no shortcut around it: a plugin runtime takes a port derived from your *project name* out of the IANA
-dynamic range (`49152–65535`), so `my-erp`'s workers API and yours land on different numbers. Copy
+no shortcut around it: because you installed these plugins without `--port`, the installer picked
+their host ports — a hash of your *project name* over the IANA dynamic range (`49152–65535`), probing
+past ports this workspace already claimed. Two of your own projects land apart in practice, though
+nothing guarantees it across machines or pins. Copy
 the `workers-api` and `triggers-api` endpoints from that tab now — the rest of the track writes them
 as `<workers-endpoint>` and `<triggers-endpoint>`. Leave `aspire start` going in this terminal; it is
 your control plane for the rest of the track.

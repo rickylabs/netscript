@@ -172,7 +172,7 @@ so the Workers API and its background processor pick up the new job.
 
 ## Step 5 — Trigger the job
 
-With Aspire up, the Workers API is live. Its port is allocated from your project name, so copy the
+With Aspire up, the Workers API is live. Its host port was picked by the installer, so copy the
 `workers-api` endpoint from the [dashboard](/explanation/aspire/) resource list. Confirm the service
 is healthy and the job is registered, then trigger it by its `id`. You need a real `workspaceId` — create a `Workspace` row
 first (or use one your seed created) and pass its id:

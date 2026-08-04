@@ -94,19 +94,22 @@ graph your complete app stands up:
     { name: "workspace (second db)", type: "Container", desc: "The isolated workspace datasource from chapter 3, provisioned alongside the primary." },
     { name: "redis", type: "Container (cache)", desc: "Redis cache — the default `--cache-backend`; Redis-compatible. Backs KV/queue workloads and the kv-oauth session store." },
     { name: "workspace (service)", type: ":3001", desc: "Your guarded oRPC service from chapter 5 — /api/workspace requires a scoped principal, /health stays public." },
-    { name: "auth-api", type: ":8094 (PORT set in chapter 2)", desc: "The auth plugin's service from chapter 2 — /api/v1/auth/* (signin, callback, signout, session, me)." },
+    { name: "auth-api", type: ":8094 (pinned in chapter 2)", desc: "The auth plugin's service from chapter 2 — /api/v1/auth/* (signin, callback, signout, session, me)." },
     { name: "workers-api", type: "allocated port", desc: "The Workers API from chapter 4 — triggers and inspects the provision-member job." },
     { name: "background processors", type: "executables (no port)", desc: "The workers processor that drains the job queue — a separate process, not a thread in the API." }
   ]
 }) }}
 
 {{ comp callout { type: "note", title: "Only pinned ports are predictable" } }}
-Two ports here are predictable because <em>you</em> pinned them: <code>workspace</code> on
+Two host ports here are predictable because <em>you</em> pinned them: <code>workspace</code> on
 <code>:3001</code> (chapter 1's <code>--service-port</code>) and <code>auth-api</code> on
-<code>:8094</code> (chapter 2's <code>PORT</code>). Everything else — the Workers API and each
-background runtime — takes a port derived from your <em>project name</em> out of the IANA dynamic
-range (<code>49152–65535</code>), so two workspaces on one machine never collide and no tutorial can
-print the number yours landed on. The dashboard's resource list is the authority for those.
+<code>:8094</code> (chapter 2's <code>--port</code>). The Workers API you installed without a
+<code>--port</code>, so the installer chose its host port for you — deterministically, from a hash of
+your project name over the IANA dynamic range <code>49152–65535</code>, then probing upward past
+ports already taken <em>in this workspace</em>. That spreads projects apart well enough to be
+practical, but it is not a guarantee: the range is finite, workspaces do not see each other's
+allocations, and any pin can land on top of one. Read the actual number from the dashboard's resource
+list rather than assuming.
 {{ /comp }}
 
 ## Step 3 — Use the dashboard

@@ -47,7 +47,7 @@ streams runtime reachable. With `aspire start` up, find the `streams` resource i
 curl <streams-endpoint>/health
 ```
 
-Its port is allocated from your project name, not fixed — the resource list is the only place to
+Its host port was picked by the installer, not fixed by you — the resource list is the only place to
 read it. A healthy response means the durable-streams producer runtime is live. If it is dead, the
 sagas plugin (which brings the stream) is not installed or Aspire has not finished booting it — check
 the [dashboard](/explanation/aspire/) resource list at `:18888`.
@@ -227,8 +227,8 @@ when you outgrow the sagas monitor, that is where your own `order-events` stream
 
 With `aspire start` up, open the live monitor at `/dashboard/sagas/` — the route Step 3's page
 declares. Get the app's host from the [Aspire dashboard](/explanation/aspire/) resource list rather
-than a memorized port; scaffolded apps take a project-derived port from the high `49152–65535` range,
-so yours differs from anyone else's. To *see* it move, trigger a saga — creating an order publishes an `OrderCreated`
+than a memorized port; a scaffolded Fresh app pins no host port, so Aspire allocates one at each
+start. To *see* it move, trigger a saga — creating an order publishes an `OrderCreated`
 saga message (chapter 2's service does this), which advances a saga instance and pushes a change down
 the stream:
 
