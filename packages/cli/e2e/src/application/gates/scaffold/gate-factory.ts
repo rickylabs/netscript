@@ -4,9 +4,9 @@ import { PACKAGE_SOURCE } from '../../../domain/extension-axes.ts';
 import { resolve } from '@std/path';
 import type {
   CommandFactory,
-  GateFailureClass,
   CommandGateRetryPolicy,
   GateDefinition,
+  GateFailureClass,
   HttpGateDefinition,
 } from '../../../domain/gate-definition.ts';
 import type { UrlFactory } from '../../../domain/gate-definition.ts';

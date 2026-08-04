@@ -32,3 +32,14 @@
 - Added a workflow policy regression asserting all four runtime jobs carry the same exact cache contract.
 - Focused workflow policy test passed.
 - Reconcile: the fresh canary evidence changes urgency, not scope; #1227 remains p1 in 0.0.5.
+
+### S3 — validation and handoff
+
+- E2E unit surface plus cache policy: 108 passed.
+- Focused changed-surface regressions: 24 passed.
+- Scoped check: 122 files; lint: 122 files; fmt: 126 files; all clean.
+- Three workflow YAML files parse successfully. `actionlint` was unavailable locally; the cache
+  policy regression validates the owned semantic invariant.
+- `quality:scan` passed. `arch:check` passed with pre-existing repository warnings only.
+- No live scaffold runtime was launched; the orchestrator pre-merge gate owns expensive runtime proof.
+- Reconcile: issue acceptance and PR body align; all three boxes are earned.
