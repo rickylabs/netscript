@@ -26,6 +26,9 @@ Refs #1202
 - Scoped check/lint/fmt, quality/architecture, and CLI JSR dry-run: pass
 - One-pass `scaffold.runtime`: pass (70 passed, 0 failed, cleanup green); cloud CI remains the owner-declared verdict source
 - IMPL-EVAL: pass (separate-session Qwen 3.7 Max; no blocking findings)
+- Cloud scaffold-static/supporting lanes: pass; cloud scaffold-runtime was cancelled twice before
+  runner assignment (zero steps/logs), so its verdict remains pending
+- Review-thread gate: pass (0 threads, 0 unanswered)
 
 ## Harness
 
@@ -38,6 +41,8 @@ Refs #1202
 - The worktree arrived with an unrelated `deno.lock` modification, which is excluded from this PR.
 - Plugin API resources use deterministic high-range host pins because current behavior/telemetry
   consumers require stable direct endpoints; app/service Aspire endpoints remain dynamic.
+- GitHub cancelled the cloud runtime job and its retry before assigning a runner; neither attempt
+  executed a test, so the cloud DoD remains unchecked.
 
 ## Definition of Done
 

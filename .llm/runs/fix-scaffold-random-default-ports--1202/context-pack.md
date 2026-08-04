@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `fix-scaffold-random-default-ports--1202` |
 | Branch | `fix/scaffold-random-default-ports` |
-| Current phase | IMPL-EVAL passed; cloud verdict pending |
+| Current phase | IMPL-EVAL passed; cloud runtime runner unavailable |
 | Archetype | `6 — CLI / Tooling` |
 | Scope overlays | service |
 
@@ -27,11 +27,12 @@ remains the owner-declared verdict source; the Windows-service identification re
 
 ## Next Steps
 
-1. Commit and push the formal evaluation artifacts.
-2. Mark PR #1211 ready so hosted cloud lanes run.
-3. Require green cloud and review-thread gates before final close-gate synchronization.
+1. Obtain an executing cloud `scaffold-runtime` verdict when GitHub assigns a runner.
+2. Require that green verdict before checking S3/cloud DoD or promoting to ready-to-merge.
 
 ## Drift and Debt
 
 - Authorized composed PLAN-EVAL; live comment-count discrepancy; inherited lockfile modification.
+- Cloud runtime job and one retry were cancelled before runner assignment (`runner_id: 0`, zero
+  steps/logs); static and other executing cloud lanes passed.
 - No new architecture debt planned.
