@@ -1387,3 +1387,23 @@ closed with reasons, #1271 carries the work.
   #1248, #1252, #1234, #1235, #1236 + #1246's mitigation landed with the issue honestly
   moved to 0.0.6 against upstream deno/deno#35804). Remaining: **#1251** (PR #1266, still
   draft — the aspire backing-resources fix). All merged work rides canary.9.
+
+## 2026-08-04 — Owner directives filed: #1278 type-soundness ratification, #1279 migration chapter
+
+- **#1278 (p1, umbrella, 0.0.6)** — every unsound/arbitrary-type concession ratified into one
+  tracked surface with measured inventory: (A) docs that teach or concede unsoundness — the
+  exemplar is `query-bridge.md`'s documented `as unknown as IslandQueryClient` with its
+  TS2551/TS2345 concession block on a path we RECOMMEND (a documented cast is a framework bug
+  with a paragraph attached), plus `as any` in a chat tutorial, `~orpc: any` published in the
+  contracts reference, `any[]` in triggers; (B) 12 production-surface assertion sites, the
+  largest cluster being public-api.ts's 5 "pending package-boundary unification" allowances;
+  (C) a fail-closed regression gate covering docs snippets as well as source; (D) explicit
+  out-of-scope: the ~19 `*-contract-soundness_test.ts` `@ts-expect-error`s ARE the soundness
+  assertions and must not be flagged. Checkboxes so deferrals are visible.
+- **#1279 (p2, umbrella, 0.0.6)** — migration chapter: compatibility matrix as the spine
+  (honest verdicts incl. "deliberately not" rows sourced from the caveat reframe list, every
+  "not yet" linked to a real issue), per-source guides (Next.js/Express+BullMQ first;
+  Remix/Nest/Temporal marked defer candidates), two e2e recipes verified against a real
+  scaffold at a published canary, and a mandatory "what you give up" section per page.
+- Both milestoned 0.0.6 deliberately: they are chapter/program scale, and 0.0.5's cut is
+  gated on the wave + caveat work already in flight. Owner can pull either into 0.0.5.
