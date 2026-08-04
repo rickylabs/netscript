@@ -1,6 +1,7 @@
 import { assert, assertEquals, assertStringIncludes } from '@std/assert';
 import { DIAGNOSTIC_RECEIPT_TTL_MS, recordDrift } from '../mod.ts';
 import type { DiagnosticEvidencePort, DiagnosticEvidenceReceipt } from '../mod.ts';
+import type { ServiceEndpointDirectoryPort } from '../mod.ts';
 import { FilesystemDiagnosticEvidence } from '../mod.ts';
 import { createMcpCliServer } from '../cli.ts';
 import { createMcpServer } from '../mod.ts';
@@ -31,6 +32,7 @@ Deno.test('record drift refuses without a diagnostic receipt', async () => {
   assertEquals(result.error.code, 'diagnostic_evidence_required');
   assertStringIncludes(result.error.message, 'netscript plugin doctor --resource api');
   assertStringIncludes(result.error.message, 'MCP "doctor" or telemetry tools');
+  assertStringIncludes(result.error.message, 'API introspection tools');
 });
 
 Deno.test('record drift refuses a stale diagnostic receipt', async () => {
@@ -122,6 +124,129 @@ Deno.test('MCP record_drift refuses and accepts through the shared gate', async 
   } finally {
     await Deno.remove(root, { recursive: true });
   }
+});
+
+Deno.test('a public introspection receipt satisfies the shared drift gate', async () => {
+  const evidence = new MemoryEvidence();
+  const serviceEndpointDirectory: ServiceEndpointDirectoryPort = {
+    list: () => Promise.resolve({ entries: [], sources: [] }),
+  };
+  const server = createMcpCliServer({
+    projectRoot: '/fixture',
+    diagnosticEvidence: evidence,
+    serviceEndpointDirectory,
+  });
+
+  const introspection = await server.handle({
+    jsonrpc: '2.0',
+    id: 2,
+    method: 'tools/call',
+    params: { name: 'list_api_services', arguments: {} },
+  });
+  assertEquals(introspection?.result?.isError, false);
+  assertEquals(evidence.receipt?.command, 'mcp list_api_services');
+  assertEquals(evidence.receipt?.resource, 'project');
+  assertEquals(evidence.receipt?.exitStatus, 0);
+
+  const accepted = await server.handle({
+    jsonrpc: '2.0',
+    id: 3,
+    method: 'tools/call',
+    params: {
+      name: 'record_drift',
+      arguments: { resource: 'project', summary: 'service contract drift' },
+    },
+  });
+  assertEquals(accepted?.result?.isError, false);
+  assertEquals((accepted?.result?.structuredContent as { recorded?: boolean }).recorded, true);
+  assertStringIncludes(evidence.entries[0]!, 'mcp list_api_services');
+});
+
+Deno.test('a public introspection output rejection cannot leave green evidence', async () => {
+  const properties = Object.fromEntries(
+    Array.from({ length: 4_000 }, (_, index) => [
+      `field_${index}`,
+      { type: 'string', description: `Field ${index}` },
+    ]),
+  );
+  const serviceEndpointDirectory: ServiceEndpointDirectoryPort = {
+    list: () =>
+      Promise.resolve({
+        sources: [],
+        entries: [{
+          name: 'catalog',
+          status: 'running',
+          source: 'aspire-cli',
+          conflicts: [],
+          baseUrl: 'http://127.0.0.1:4200',
+          spec: {
+            openapi: '3.1.0',
+            paths: {
+              '/items': {
+                get: {
+                  operationId: 'items.list',
+                  responses: {
+                    200: {
+                      description: 'OK',
+                      content: {
+                        'application/json': {
+                          schema: { type: 'object', properties },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        }],
+      }),
+  };
+  const evidence = new MemoryEvidence();
+  const server = createMcpCliServer({
+    projectRoot: '/fixture',
+    diagnosticEvidence: evidence,
+    serviceEndpointDirectory,
+  });
+
+  const green = await server.handle({
+    jsonrpc: '2.0',
+    id: 4,
+    method: 'tools/call',
+    params: { name: 'list_service_operations', arguments: { service: 'catalog' } },
+  });
+  assertEquals(green?.result?.isError, false);
+  assertEquals(evidence.receipt?.exitStatus, 0);
+
+  const rejected = await server.handle({
+    jsonrpc: '2.0',
+    id: 5,
+    method: 'tools/call',
+    params: {
+      name: 'get_operation_schema',
+      arguments: { service: 'catalog', operation: 'items.list', view: 'response' },
+    },
+  });
+  assertEquals(rejected?.error?.code, -32603);
+  assertEquals((rejected?.error?.data as { code?: string }).code, 'tool_result_too_large');
+  assertEquals(evidence.receipt?.command, 'mcp get_operation_schema');
+  assertEquals(evidence.receipt?.resource, 'catalog');
+  assertEquals(evidence.receipt?.exitStatus, 1);
+
+  const refused = await server.handle({
+    jsonrpc: '2.0',
+    id: 6,
+    method: 'tools/call',
+    params: {
+      name: 'record_drift',
+      arguments: { resource: 'catalog', summary: 'service contract drift' },
+    },
+  });
+  assertEquals(refused?.result?.isError, true);
+  assertEquals(
+    (refused?.result?.structuredContent as { code?: string }).code,
+    'diagnostic_evidence_required',
+  );
 });
 
 Deno.test('an actual MCP doctor call writes a diagnostic receipt', async () => {

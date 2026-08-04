@@ -11,7 +11,12 @@ the existing #1078 gate, while a result rejected after flow execution cannot lea
 - Pre-existing unrelated `deno.lock` diff: one added line; preserve and never stage.
 - S8 hard dependency: PASS, 14 focused tests green.
 - Plan: locked; PLAN-EVAL row composed per milestone-run waiver.
-- Implementation: pending S1.
+- S0: committed as `1282ee551`; draft PR #1233 open with required taxonomy and milestone.
+- Implementation: complete and locally green; opposite-family S1 review PASS.
+- Tests: focused 11/0; package 109/0; configured scoped check/lint/fmt all 0 findings.
+- Quality/JSR: focused MCP scan 0 findings/0 allowances; doc-lint and raw publish dry-run pass.
+- Doctrine reporter baseline note: local fixture function `describe` is misread as a Jest global;
+  changed files introduce no doctrine violation.
 
 ## Locked decisions
 
@@ -25,8 +30,7 @@ the existing #1078 gate, while a result rejected after flow execution cannot lea
 
 ## Resume next
 
-1. Commit/push S0 and open the draft PR with required labels/milestone.
-2. Implement S1 tests and bounded guidance change.
-3. Run focused, package, scoped wrapper, quality, doctrine, doc/JSR, and publish gates.
-4. Obtain composed milestone evaluation/review, reconcile issue/PR evidence, mark ready when green.
-
+1. Recheck the reviewer-requested hand-authored site-reference update.
+2. Commit S1 with updated run evidence, excluding the pre-existing `deno.lock` diff.
+3. Push by explicit refspec and update PR #1233 phase/acceptance evidence.
+4. Complete composed milestone evaluation, review-thread/check gates, and mark ready when green.

@@ -51,12 +51,37 @@ typed evidence-class contract.
 | 2026-08-04 | dependency | PASS | `origin/main` `3677973b`; focused S8 suite 14 passed / 0 failed |
 | 2026-08-04 | JSR baseline | PASS | doc-lint wrapper exit 0; publish dry-run success; no slow types |
 | 2026-08-04 | plan-gate | COMPOSED | composed per `milestone-run.md` (orchestrator waiver); plan locked |
+| 2026-08-04 | S0 | PASS | `1282ee551`; explicit-refspec push; draft PR #1233 opened |
+| 2026-08-04 | implementation | PASS | Public JSON-RPC proves acceptance and post-execution rejection replaces stale green evidence |
+| 2026-08-04 | focused tests | PASS | `drift-evidence_test.ts`: 11 passed / 0 failed |
+| 2026-08-04 | package tests | PASS | `packages/mcp` `deno task test`: 109 passed / 0 failed |
+| 2026-08-04 | static | PASS | configured scoped check/lint/fmt: 103 files each, 0 findings |
+| 2026-08-04 | quality | PASS | root `quality:gate` exit 0; focused MCP scan: 0 findings / 0 allowances |
+| 2026-08-04 | doctrine | PASS WITH BASELINE NOTE | no changed-file violation; focused reporter only flags existing cardinality and a local fixture function named `describe` |
+| 2026-08-04 | JSR final | PASS | doc-lint exit 0; raw publish dry-run succeeds; public surface unchanged |
+| 2026-08-04 | opposite-family review | PASS | Claude Opus ordinary slice review; F1 documentation gap actioned before sign-off |
 
 ## Gate results
 
-Pending S1 implementation.
+- **Contract / public API:** unchanged. No export, schema, dependency, receipt key, or evidence-class
+  discriminator was added.
+- **Runtime + consumer path:** public `createMcpCliServer()` JSON-RPC calls demonstrate both sides
+  of F4a. A successful `list_api_services` receipt authorizes `record_drift`; an oversized
+  `get_operation_schema` result is rejected by the shipped central runner, replaces an earlier
+  green receipt with exit status 1, and leaves `record_drift` refused.
+- **Check / lint / fmt:** all pass with `packages/mcp/deno.json`; the unconfigured wrapper attempts
+  could not parse the root workspace form and are tooling invocations rather than verdicts.
+- **Quality / doctrine:** changed code adds no ignore, cast workaround, allowance, or debt. The
+  focused doctrine reporter's A14 failure is a baseline regex false positive on a local
+  `const describe = ...` fixture in `service-endpoint-sources_test.ts`, not a Jest global.
+- **JSR:** raw `deno publish --dry-run --allow-dirty` is authoritative and succeeds. The audit
+  helper mistakes its informational `Checking for slow types...` banner for a warning; no actual
+  slow-type warning is present.
+- **Lock hygiene:** the pre-existing one-line `deno.lock` diff remains unstaged and untouched.
+- **F4b exclusion:** no per-evidence-class receipt keys or endpoint-shape drift predicate exists.
 
 ## Reconcile notes
 
-- S0 pending commit/push/PR opening.
-
+- S0 committed and pushed; PR #1233 remains draft until independent review and S1 sign-off.
+- S1 opposite-family review: PASS. Its F1 finding was actioned by updating the hand-authored site
+  reference; the package README mirror remains deferred with its generated publish asset.
