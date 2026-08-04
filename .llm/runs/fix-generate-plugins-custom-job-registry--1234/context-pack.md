@@ -6,17 +6,16 @@
 | --- | --- |
 | Run ID | `fix-generate-plugins-custom-job-registry--1234` |
 | Branch | `fix/generate-plugins-custom-job-registry` |
-| Current phase | `implement` |
+| Current phase | `evaluate / close` |
 | Archetype | `5 - Plugin Package` + `6 - CLI and Tooling` |
 | Scope overlays | `docs` |
 
 ## Current State
 
 The plan is locked and PR #1239 is draft with `status:impl`. Public structural discovery and the E2E
-registry regeneration path are implemented. Full runtime evaluation exposed and now fixed the
-manifest generator's default-import mismatch with real scaffolded named handler exports; targeted
-coverage is GREEN. A second runtime detail—local IDs belong to filenames, not handler properties—is
-also fixed and directly proven through service startup. A complete runtime rerun remains.
+registry regeneration path are implemented. Gate-discovered named-export and filename-ID contract
+gaps are fixed. Targeted integration is 9/9, full `scaffold.runtime` is 71/71, and current-head
+publication dry-run succeeds. Final PR metadata and ready-for-review transition remain.
 
 ## Completed
 
@@ -36,8 +35,8 @@ also fixed and directly proven through service startup. A complete runtime rerun
 
 ## In Progress
 
-- Commit and push the gate-discovered fix, rerun current-head static/publication gates, then rerun
-  the full one-pass runtime suite.
+- Record composed implementation evaluation, push the evidence commit, and transition PR #1239 to
+  ready for review.
 
 ## Next Steps
 
@@ -74,7 +73,7 @@ also fixed and directly proven through service startup. A complete runtime rerun
 | ----------- | -------------- | -------- |
 | Static | targeted GREEN | Installed-registry integration: 9 passed, 0 failed |
 | Fitness | selected | A5 + A6 + docs overlay in `plan.md` |
-| Runtime | focused GREEN | Flow B modules check; full `scaffold.runtime` pending |
+| Runtime | GREEN | Full `scaffold.runtime`: 71 passed, 0 failed, cleanup passed |
 | Consumer | GREEN | Fresh custom-only public regeneration writes the expected registry |
 
 ## Open Questions

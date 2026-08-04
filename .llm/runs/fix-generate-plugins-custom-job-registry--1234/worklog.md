@@ -81,6 +81,8 @@ exclusions.
 | 2026-08-04 18:22 CEST | 3 | named-export RED/GREEN | Real scaffold-shaped custom test failed 0/1 on default import, then passed 1/1 after generator handler resolution; full installed-registry file passed 9/9. |
 | 2026-08-04 18:43 CEST | 3 | filename-ID RED/GREEN | Removed the test-only handler `id`; reproduced `toJobName(undefined)`, then derived local IDs from filenames like the established compiler. Targeted 1/1 and full 9/9 passed. |
 | 2026-08-04 18:44 CEST | 3 | service diagnostic | Regenerated the failed suite project through the public CLI; workers service loaded 2 generated jobs and reached `Service listening`. |
+| 2026-08-04 19:00 CEST | 3 | merge readiness | An unchanged rerun proved the prior Aspire health timeout transient: full `scaffold.runtime` passed 71/71 with cleanup. |
+| 2026-08-04 19:03 CEST | 3 | publication | Current-head workspace publish dry-run completed successfully with only established warnings. |
 
 ## Decisions
 
@@ -113,17 +115,17 @@ exclusions.
 | Scaffold-shaped filename ID GREEN | local IDs derived from discovered filenames | PASS | 1 passed, 0 failed; full file again 9/9. |
 | E2E fixture check | `deno check --unstable-kv` on Flow B and runtime gates | PASS | Both modules checked. |
 | Focused lint/fmt | direct lint and fmt check on touched source/docs | PASS | No new ignore; touched files formatted. |
-| Scoped check/lint/fmt | repo wrappers | NOT_RUN | Pending implementation. |
-| Quality and architecture | `quality:gate`, `arch:check` | NOT_RUN | Pending implementation. |
-| Docs/publish | doc-lint, JSR audit, publish dry-run | NOT_RUN | Pending implementation. |
+| Scoped check/lint/fmt | repo wrappers for touched CLI/workers roots | PASS | Check, lint, and source-format wrappers passed; no new ignores. |
+| Quality and architecture | `quality:gate`, `arch:check` | PASS | Quality scan found no findings; architecture check passed with baseline warnings only. |
+| Docs/publish | package doc-lint + workspace publish dry-run | PASS | CLI doc-lint clean; workers had only established private-type warnings; current-head dry-run exit 0. |
 
 ### Fitness Gates
 
 | Gate | Result | Evidence | Notes |
 | ---- | ------ | -------- | ----- |
-| A5 universal set | PENDING_SCRIPT | Plan gate selection | Evidence after implementation. |
-| A6 universal + F-CLI-1…31 | PENDING_SCRIPT | Plan gate selection | Production CLI structure is not changed; manual plus `arch:check` evidence required. |
-| Docs overlay | PENDING_SCRIPT | Plan gate selection | Source alignment and links checked with docs gates. |
+| A5 universal set | PASS | Quality, scoped wrappers, publication, runtime | Published plugin manifest and generator remain archetype-conformant. |
+| A6 universal + F-CLI-1…31 | PASS | Quality, scoped wrappers, `arch:check`, full CLI E2E | Public command contract is proven without adding a parallel CLI surface. |
+| Docs overlay | PASS | Updated command reference/tutorial + doc-lint | Documentation matches structural discovery and regenerate-only ownership. |
 
 ### Runtime Gates
 
@@ -134,6 +136,8 @@ exclusions.
 | `scaffold.runtime` attempt 2 | FAIL | 33 passed, 1 failed | Flow B gate passed; `workers-api` exposed the generated default-import/named-export mismatch. Contract fix applied; full rerun required. |
 | `scaffold.runtime` attempt 3 | FAIL | 33 passed, 1 failed | Named import succeeded; `workers-api` exposed that scaffold handlers have no runtime `id`. Filename-ID fix applied; full rerun required. |
 | Failed-project workers service diagnostic | PASS | Public regeneration + direct service command | Loaded 2 generated jobs and reached `Service listening`; missing stream env was expected outside Aspire. |
+| `scaffold.runtime` attempt 4 | FAIL (transient) | 33 passed, 1 failed | Generated registries passed; Aspire workers health wait timed out. The exact service then loaded both jobs and returned HTTP 200 from `/health` and `/health/live`. |
+| `scaffold.runtime` final | PASS | raw exit 0; 71 passed, 0 failed | Unchanged one-pass rerun passed generation, Flow B, all Aspire behavior, and cleanup. |
 
 ### Consumer Gates
 
