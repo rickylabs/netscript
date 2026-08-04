@@ -122,8 +122,12 @@ netscript agent init --with-docs
 ```
 
 Claude Code receives `.mcp.json`, the NetScript skill bundle, and a marked section in `AGENTS.md`;
-VS Code receives `.vscode/mcp.json`. Hosts are auto-detected, or select them with
-`--host claude|vscode|all`. The installed server entry runs `netscript agent mcp`
+VS Code receives `.vscode/mcp.json`, and Zed receives `context_servers` in
+`.zed/settings.json`. Apply or re-apply editor setup to any existing project with
+`--editor none|zed|vscode`; when omitted, a single existing `.zed` or `.vscode` directory selects
+the target. Unsupported editors fail with the supported list and may use `--editor none` plus a
+manual MCP configuration. Agent hosts remain selectable with `--host claude|vscode|all`. The
+installed server entry runs `netscript agent mcp`
 ([`@netscript/mcp`](https://jsr.io/@netscript/mcp)); its data boundary covers telemetry, project
 metadata, generated registries, and public docs — never project source, environment values,
 credentials, or secrets.

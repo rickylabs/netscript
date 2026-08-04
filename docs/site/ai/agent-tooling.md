@@ -49,9 +49,12 @@ in, client out. The server's full per-tool contracts live in the
 netscript agent init
 ```
 
-Host detection installs the matching files. If neither host directory exists,
-NetScript prepares both hosts. Use `--host claude`, `--host vscode`, or
-`--host all` to select explicitly.
+Host detection installs the matching files. Use `--host claude`, `--host vscode`, or `--host all`
+to select an agent host explicitly. Editor configuration is a separate, shared target:
+`--editor none|zed|vscode` applies the same Deno editor setup available during `netscript init` to
+an existing project and adds native MCP wiring. When omitted, one existing `.zed` or `.vscode`
+directory is honoured; if both exist, select explicitly. Unsupported editor names fail with the
+supported list and instructions to use `--editor none` plus a manual MCP configuration.
 
 If network lookup is unavailable or the framework is unfamiliar, add `--with-docs`. This opt-in
 expands a several-megabyte local corpus containing the release-built prose and task router plus
@@ -63,11 +66,16 @@ is written; without the flag, no offline corpus is installed.
 | ----------- | ---------------------------------------------------------------------------------------------------- |
 | Claude Code | `.mcp.json`, NetScript skills under `.claude/skills/`, and a marked NetScript section in `AGENTS.md` |
 | VS Code     | `.vscode/mcp.json`                                                                                   |
+| Zed         | `.zed/settings.json` with `context_servers` (plus Deno settings, tasks, and debug configuration)     |
 
 The generated MCP configuration runs `netscript agent mcp` for the current
 project. Re-running `agent init` is idempotent: unchanged files are left alone,
 and existing host configuration is preserved alongside the `netscript` server
 entry.
+
+Zed project MCP configuration runs only after the worktree is trusted; review the generated
+commands before enabling project settings. Re-running with the same editor is idempotent and keeps
+unrelated MCP servers/settings alongside the NetScript entries.
 
 The host command includes the absolute project `deno.json` path. Deno 2.9
 normally holds newly published registry versions behind a 24-hour minimum
