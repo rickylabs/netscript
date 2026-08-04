@@ -591,3 +591,20 @@ at "deliver HTTP publishes through runner") lands first; #1193 rebases and runs 
 verification — full suite + seven-point protocol on BOTH backends — closing both issues'
 protocol requirements, per the owner's same-train directive. A recurring churn on the clean
 rerun becomes captured #1196-family evidence, not a retry.
+
+## 2026-08-04 — S4 event-stream wedge → successor PR #1199; #1190 PR #1198 open
+
+- Two background wrappers were killed by the harness (the #1190 launcher and an S4 CI watcher);
+  both underlying processes verified alive/complete by artifact — the #1190 Codex turn kept
+  working through the kill (rollout hot, commits advancing) and opened **PR #1198**.
+- **S4 branch stopped receiving workflow events after the scope-split push**: pushes,
+  close/reopen, and manual dispatch (ci.yml has no workflow_dispatch) all failed to produce
+  the required contexts; only OpenHands and a manually-dispatched e2e-cli fired. Deterministic
+  recovery: identical head pushed as `feat/openapi-mcp-projection-domain-v2`, successor
+  **PR #1199** opened with the same body (+ restored `Closes #1130` — finding-19's second live
+  strip, caught at the refs row), #1195 closed as superseded. Fresh contexts watcher armed.
+
+21. **[branch-event-stream-wedge]** A branch's pull_request/push workflow delivery can wedge
+    entirely (cause unestablished — began immediately after a push that only removed files);
+    the only reliable recovery found was a successor branch + PR. Cost: one PR number, ~40 min.
+    Watch for recurrence; if it repeats, file with reproduction data.
