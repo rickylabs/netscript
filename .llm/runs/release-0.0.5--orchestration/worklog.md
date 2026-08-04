@@ -1711,3 +1711,25 @@ zero `zod@3` in the lock, and a guard test that fails if a second instance reapp
 is invisible without one — same lesson as #1290's alias-string test). **Sequenced after
 canary.10**: a graph-wide dep change across 18 packages must not land under the wave-6 pilot
 gate. Recorded as a structural instance of #1278.
+
+## 2026-08-05 — #1292 honest closing set settled: 1 of 4, remainder split to #1296
+
+Working the close-gate's unchecked list box-by-box exposed that the docs batch was claiming
+four closures it had not earned. Verified each remaining box against the branch rather than
+trusting the PR body:
+- **#1116 CLOSES** — all five boxes verified in artifacts: tokenBudgetHistory agent-loop
+  example (index + examples_test), RetrieverPort with normalized score/matchedBy, ollama
+  subpath with reachability preflight and `ReasoningEffort` documenting `"off"`, a rebuilt
+  135-row inventory, and the retry-semantics prose (Retry-After incl. HTTP-date, maxDelayMs
+  cap, never-replay-after-first-chunk). Example tests: 7 passed / 0 failed.
+- **#1110 → Refs** — one acceptance row requires fixing JSDoc imports in
+  `packages/contracts/src/application/contract-primitives.ts` (framework source, lane-forbidden).
+- **#1112 → Refs** — blocked on #1293.
+- **#1108 → Refs** — nine surfaces repaired but not Fresh UI; two rows undelivered.
+- **#1296 filed** (0.0.6) carrying every source-side remainder with its own acceptance.
+Also fixed a real defect my restore introduced: `docs:accuracy` spawns the drift checker, so
+the task needed `--allow-run=deno`; granted and verified PASS locally before pushing.
+**Finding 38 (for #1163): a multi-issue docs PR will over-claim closures, because the docs
+half of an issue always lands first and looks complete. The close-gate's unchecked list is the
+authority — work it box-by-box against artifacts before accepting any `Closes`.** Tonight that
+turned 4 claimed closures into 1 earned one plus a properly-scoped follow-up.
