@@ -96,3 +96,9 @@ Confirmed findings:
   consistency prose gate on #1216: Minimax M3. OpenCode transport still down (err_be8ff72e on
   a trivial probe), so M3 runs over claude-print (OpenRouter), effort high — an approved open
   model on the proven transport. Merge of #1216 waits on this pass + CI settle.
+
+- **D-14 (owner correction, 2026-08-04).** The M3 anti-slop pass was word/terminology-level
+  only; owner requires WHOLE-text review — page-level prose architecture, full-set
+  consistency, syntactic craft, structural AI tells — on **Qwen 3.7 Max at highest effort**.
+  S8 launched over the new agentic:claude-openrouter transport (its first production use),
+  effort max. #1216 merge waits on S8 + CI.
