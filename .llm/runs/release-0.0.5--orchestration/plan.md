@@ -163,3 +163,24 @@ queue-jumps land when they unblock a lane; `cut-trace.md` records what actually 
 stage-B dispatch preconditions (provider quota + paid-transport) are checked and recorded in
 `worklog.md` immediately before **every** wave dispatch — the PLAN-EVAL dispatch record
 (2026-08-03) is the template.
+
+## Owner onboarding-verification wave (added 2026-08-04, evening)
+
+Eleven issues named by the owner; #1234/#1235/#1236 were already the in-flight W5-V triad.
+Eight new rows, all milestoned 0.0.5, sourced from a real Windows/Zed onboarding against
+canary.7 + an independent Codex verification pass (exact command/output/root-cause/acceptance
+in every body). Owner route directive for this wave: Codex GPT-5.6 Sol · **medium**.
+
+| Row | Issue | Pri | Disposition |
+| --- | --- | --- | --- |
+| W6-Q | #1250 zod-3 coercion no-op | p1 | quickwins lane (ns005-quickwins), fix 1 of 3 |
+| W6-Q | #1254 @database/zod single-model map | p1 | quickwins lane, fix 2 of 3 |
+| W6-Q | #1253 search_exports corpus error | p1 | quickwins lane, fix 3 of 3 (owner: prioritise above label — only MCP tool with no bash equivalent) |
+| W6-R | #1247 editor config init-only / VS Code hard-code | p1 | next free lane, Sol medium |
+| W6-R | #1251 aspire graph omits sqlite / deno-kv param | p1 | next free lane, Sol medium |
+| W6-R | #1248 agent mcp silent-command affordance | p2 | rides with W6-R capacity |
+| W6-S | #1252 cache-tier divergence | p1 | dedicated lane; pulseboard 56accbb is the spec; 0.0.5 if it lands before cut-time checklist opens, else 0.0.6 with reason |
+| W6-S | #1246 windows node_modules/.deno materialization | p1 | decision slice: reproduce, classify (ours vs upstream Deno), then pin/detect/document; 0.0.5 carries the mitigation, the full fix moves to 0.0.6 if upstream |
+
+Excluded per owner: withForm hydrated-POST value loss — independently refuted (form modules
+byte-identical 0.0.4→canary.2); never schedule.

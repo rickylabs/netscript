@@ -1209,3 +1209,21 @@ note naming the death as environmental — genjobs resumed first and pushed with
 actionable — the actionable signal is unchanged diffstat fingerprint ACROSS cycles plus
 rollout mtime; and simultaneous multi-lane death points at the daemon/host, not the agents,
 so resume all victims rather than debugging any one of them.**
+
+## 2026-08-04 — Onboarding wave dispatched; #1241 merged (docsorch); streamdb iterating under gate
+
+- **Owner onboarding-verification wave recorded** (plan rows W6-Q/R/S): eight new 0.0.5
+  issues from real Windows/Zed onboarding + independent Codex verification. Quickwins lane
+  launched per owner route (Sol · medium, ns005-quickwins, thread in slice dir): #1250 →
+  #1254 → #1253, one PR each. **First delivery already up: PR #1256 (Closes #1250, Zod-4
+  coercion restore).** Queued next lanes: #1247/#1251/#1248; #1252 dedicated (pulseboard
+  56accbb as spec); #1246 decision slice (mitigation in 0.0.5, upstream-class fix may move).
+  withForm claim stays excluded (refuted).
+- **#1241 merged by docsorch** (16:41Z, clean head — zero non-green contexts verified;
+  refs [] correct for umbrella-partial work). Joins canary.8 train: #1226, #1233, #1232,
+  #1242, #1241.
+- **#1238 (streamdb) gate loop:** ready-flip was premature (real TS2322 in its own fixture);
+  steer 1 fixed types but exposed catalog drift — its @tanstack/react-db bump to ^0.1.95
+  left scaffold output at ^0.1.86 and the lockstep test caught it (2763 passed / 1 failed).
+  Steer 2 sent: lockstep or revert, plus acceptance-evidence mirror for close-gate. The
+  gate is doing exactly its job: two real defects stopped pre-merge.
