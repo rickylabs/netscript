@@ -1,4 +1,4 @@
-import { createQueue, type MessageContext, type MessageQueue } from '@netscript/queue';
+import { createQueue } from '@netscript/queue';
 import type { CascadedMessage, SagaMessage } from '@netscript/plugin-sagas-core/domain';
 import { SagasError } from '@netscript/plugin-sagas-core/domain';
 import type {
@@ -24,6 +24,43 @@ export type SagaDeliveryMessage = Readonly<{
   tracestate?: string;
 }>;
 
+/** Queue metadata made available while the runner handles one delivery. */
+export type SagaDeliveryContext = Readonly<{
+  /** Provider-assigned message identifier. */
+  messageId: string;
+  /** Number of times the provider has delivered this message. */
+  deliveryCount: number;
+  /** Time at which the provider accepted the message. */
+  enqueuedAt: Date;
+  /** Propagated application and trace headers. */
+  headers: Record<string, string>;
+}>;
+
+/** Provider-neutral queue subset required by saga delivery. */
+export interface SagaDeliveryQueuePort {
+  /** Whether the provider owns retry/redelivery behavior. */
+  readonly nativeRetrial: boolean;
+  /** Durably accept one saga delivery, optionally after a delay. */
+  enqueue(
+    message: SagaDeliveryMessage,
+    options?: Readonly<{
+      delay?: number;
+      deduplicationId?: string;
+      headers?: Record<string, string>;
+    }>,
+  ): Promise<void>;
+  /** Consume messages until stopped or aborted. */
+  listen(
+    handler: (
+      message: SagaDeliveryMessage,
+      context: SagaDeliveryContext,
+    ) => Promise<void>,
+    options?: Readonly<{ signal?: AbortSignal }>,
+  ): Promise<void>;
+  /** Stop listening and close provider resources. */
+  stop(): Promise<void>;
+}
+
 /** Runtime publisher plus owned delivery-resource shutdown. */
 export interface SagaDeliveryPublisher {
   /** Durably enqueue one saga message. */
@@ -44,11 +81,11 @@ export interface SagaRuntimeDeliveryPort {
 
 /** Options for queue-backed saga publishing. */
 export type SagaDeliveryPublisherOptions = Readonly<{
-  queue?: MessageQueue<SagaDeliveryMessage>;
+  queue?: SagaDeliveryQueuePort;
 }>;
 
 /** Create the default provider-neutral queue used for saga delivery. */
-export function createSagaDeliveryQueue(): MessageQueue<SagaDeliveryMessage> {
+export function createSagaDeliveryQueue(): SagaDeliveryQueuePort {
   return createQueue<SagaDeliveryMessage>(SAGA_DELIVERY_QUEUE);
 }
 
@@ -71,12 +108,12 @@ export function createSagaDeliveryPublisher(
 
 /** Queue listener that delivers accepted API messages to the saga engine. */
 export class SagaQueueDelivery implements SagaRuntimeDeliveryPort {
-  readonly #queue: MessageQueue<SagaDeliveryMessage>;
+  readonly #queue: SagaDeliveryQueuePort;
   #controller?: AbortController;
   #completion?: Promise<void>;
 
   /** Create delivery around a queue owned by this component. */
-  constructor(queue: MessageQueue<SagaDeliveryMessage>) {
+  constructor(queue: SagaDeliveryQueuePort) {
     this.#queue = queue;
   }
 
@@ -118,12 +155,13 @@ export class SagaQueueDelivery implements SagaRuntimeDeliveryPort {
 
 /** Scheduler adapter that uses the delivery queue's native delayed-message support. */
 export class SagaQueueScheduler implements SagaSchedulerPort {
+  /** Stable identifier used by runtime diagnostics. */
   readonly id = 'saga-delivery-queue-scheduler';
-  readonly #queue: MessageQueue<SagaDeliveryMessage>;
+  readonly #queue: SagaDeliveryQueuePort;
   #running = false;
 
   /** Create a scheduler that shares the runner delivery queue. */
-  constructor(queue: MessageQueue<SagaDeliveryMessage>) {
+  constructor(queue: SagaDeliveryQueuePort) {
     this.#queue = queue;
   }
 
@@ -175,7 +213,7 @@ function toDeliveryMessage(
 async function deliver(
   runtime: SagaRuntime,
   deliveryMessage: SagaDeliveryMessage,
-  _context: MessageContext,
+  _context: SagaDeliveryContext,
 ): Promise<void> {
   const activeTrace = getTraceContext();
   await runtime.publish(

@@ -101,9 +101,11 @@ export type {
   SagaStoreWriteOptions,
 } from '@netscript/plugin-sagas-core/runtime';
 export type {
+  SagaDeliveryContext,
   SagaDeliveryMessage,
   SagaDeliveryPublisher,
   SagaDeliveryPublisherOptions,
+  SagaDeliveryQueuePort,
   SagaRuntimeDeliveryPort,
 } from './saga-delivery.ts';
 export type {

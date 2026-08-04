@@ -112,6 +112,7 @@ export class PrismaSagaInstanceProjection implements SagaInstanceProjectionPort 
 
 /** Store decorator that projects only after the engine transition ledger persists. */
 export class ProjectingSagaStore implements SagaStorePort {
+  /** Stable decorated-store identifier. */
   readonly id: string;
   readonly #delegate: SagaStorePort;
   readonly #projection: SagaInstanceProjectionPort;
@@ -124,12 +125,14 @@ export class ProjectingSagaStore implements SagaStorePort {
     this.#projection = projection;
   }
 
+  /** Load canonical engine state from the decorated store. */
   load<TState extends SagaState>(
     instanceId: SagaInstanceId,
   ): Promise<SagaStateEnvelope<TState> | undefined> {
     return this.#delegate.load<TState>(instanceId);
   }
 
+  /** Save canonical engine state to the decorated store. */
   save<TState extends SagaState>(
     envelope: SagaStateEnvelope<TState>,
     options?: SagaStoreWriteOptions,
@@ -137,6 +140,7 @@ export class ProjectingSagaStore implements SagaStorePort {
     return this.#delegate.save(envelope, options);
   }
 
+  /** Persist a transition before updating the query projection. */
   async appendTransition<TState extends SagaState>(
     instanceId: SagaInstanceId,
     record: SagaTransitionRecord<TState>,
@@ -156,6 +160,7 @@ export class ProjectingSagaStore implements SagaStorePort {
     });
   }
 
+  /** Resolve a canonical instance through the decorated correlation index. */
   findByCorrelation(
     sagaId: Parameters<SagaStorePort['findByCorrelation']>[0],
     correlationKey: Parameters<SagaStorePort['findByCorrelation']>[1],
@@ -163,11 +168,13 @@ export class ProjectingSagaStore implements SagaStorePort {
     return this.#delegate.findByCorrelation(sagaId, correlationKey);
   }
 
+  /** Persist and retain correlation context for the following transition projection. */
   async saveCorrelation(entry: SagaCorrelationIndexEntry): Promise<void> {
     await this.#delegate.saveCorrelation(entry);
     this.#correlations.set(entry.instanceId, entry);
   }
 
+  /** Delete canonical state and local projection context. */
   delete(instanceId: SagaInstanceId): Promise<void> {
     this.#correlations.delete(instanceId);
     return this.#delegate.delete(instanceId);

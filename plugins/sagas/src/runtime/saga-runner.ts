@@ -4,7 +4,6 @@ import type {
   CreateSagaRuntimeOptions,
   SagaRuntimeAdapter,
 } from '@netscript/plugin-sagas-core/runtime';
-import type { MessageQueue } from '@netscript/queue';
 
 import {
   SagaRuntimeSupervisor,
@@ -16,6 +15,7 @@ import { resolveProjectRegistryModule } from './project-registry-module.ts';
 import {
   createSagaDeliveryQueue,
   type SagaDeliveryMessage,
+  type SagaDeliveryQueuePort,
   SagaQueueDelivery,
   SagaQueueScheduler,
 } from './saga-delivery.ts';
@@ -39,7 +39,7 @@ export type StartSagaRunnerOptions = Readonly<{
   importer?: SagaRuntimeModuleImporter;
   readEnv?: SagaRunnerEnvReader;
   cwd?: () => string;
-  deliveryQueue?: MessageQueue<SagaDeliveryMessage>;
+  deliveryQueue?: SagaDeliveryQueuePort;
   projection?: SagaInstanceProjectionPort | false;
   supervisor?: Omit<SagaRuntimeSupervisorOptions, 'loadDefinitions' | 'runtimeOptions'>;
   runtimeOptions?: Omit<CreateSagaRuntimeOptions, 'adapter'>;
