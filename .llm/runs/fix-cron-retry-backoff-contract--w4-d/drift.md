@@ -32,3 +32,16 @@ Drift is append-only.
 - **Severity:** minor
 - **Action:** accept and exclude
 - **Evidence:** bootstrap terminal record; explicit-path staging required for every slice.
+
+## 2026-08-04 — Resumed implementation effort mismatch
+
+- **What:** The attached S2 turn resumed the verified implementation thread at low reasoning effort.
+- **Source:** `codex-resume.ts` streamed session header for thread
+  `019fccb6-7be4-7bb2-b5c1-858fea155edf`.
+- **Expected:** The complex-implementation route remains GPT-5.6 Sol / high effort.
+- **Actual:** Provider and model remained OpenAI / GPT-5.6 Sol, but the resumed turn reported low
+  effort even though the initial launch matched high.
+- **Severity:** minor/process
+- **Action:** accept with mitigation
+- **Evidence:** Supervisor performed substantive source review, added missing shutdown coverage, and
+  independently reran focused/full tests plus scoped check/lint/fmt before S2 sign-off.

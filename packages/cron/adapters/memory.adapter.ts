@@ -26,7 +26,13 @@ import type {
 } from '../ports/types.ts';
 import { isValidCronExpression, parseCronExpression } from '../ports/types.ts';
 import type { CronScheduler, JobEventListener, SchedulerEvent } from '../ports/scheduler.ts';
-import { createLifecycleEvent, emitSchedulerEvent, executeScheduledJob } from './_shared.ts';
+import {
+  createLifecycleEvent,
+  emitSchedulerEvent,
+  executeScheduledJob,
+  retainRetryOptions,
+  type RetryOptions,
+} from './_shared.ts';
 
 /**
  * Internal job registration data
@@ -35,6 +41,7 @@ interface RegisteredJob {
   job: ScheduledJob;
   handler: JobHandler | ContextualJobHandler;
   abortController: AbortController;
+  retryOptions: RetryOptions;
   timerId?: ReturnType<typeof setInterval>;
 }
 
@@ -128,7 +135,13 @@ export class MemoryCronAdapter implements CronScheduler {
     }
 
     // Store job registration
-    this.jobs.set(id, { job, handler, abortController, timerId });
+    this.jobs.set(id, {
+      job,
+      handler,
+      abortController,
+      retryOptions: retainRetryOptions(options),
+      timerId,
+    });
 
     // Emit scheduled event
     await this.emit('jobScheduled', createLifecycleEvent(job, job.nextRun));
@@ -349,11 +362,12 @@ export class MemoryCronAdapter implements CronScheduler {
       return Promise.resolve(false);
     }
 
-    const { job, handler, abortController } = registration;
+    const { job, handler, abortController, retryOptions } = registration;
     return executeScheduledJob(
       job,
       handler,
       abortController.signal,
+      retryOptions,
       (expression) => this.calculateNextRun(expression),
       (event, data) => this.emit(event, data),
     );

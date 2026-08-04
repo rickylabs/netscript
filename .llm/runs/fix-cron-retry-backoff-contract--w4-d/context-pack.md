@@ -6,17 +6,17 @@
 | --- | --- |
 | Run ID | `fix-cron-retry-backoff-contract--w4-d` |
 | Branch | `fix/cron-retry-backoff-contract` |
-| Current phase | `implement — S1 RED ready for supervisor review` |
+| Current phase | `implement — S2 supervisor-approved; S3 next` |
 | Archetype | `2 — Integration` |
 | Scope overlays | `docs` |
 
 ## Current State
 
-S1 now proves the retained public contract is dead on both existing providers. One deterministic
-fake-time test configures one retry with a 25 ms fixed backoff; both `MemoryCronAdapter` and the
-captured native `DenoCronAdapter` callback expose only attempt `[0]` instead of `[0, 1]`. No retry
-implementation or documentation has changed. Listener/history semantics remain aggregate and are
-reserved for S2.
+S2 turns the retained contract green through one internal retry executor shared by both existing
+providers. Each adapter snapshots `maxRetries` and `backoff`; the executor applies zero-based
+attempts, the three capped delay policies, abortable `@std/async` waits, and one aggregate terminal
+event/history update per invocation. The provider-parity matrix uses fake time and captures
+`Deno.cron`, so it registers no native cron work and uses no wall-clock sleeps.
 
 ## Completed
 
@@ -28,17 +28,24 @@ reserved for S2.
 - Added the S1 RED fake-time contract for memory and stubbed native Deno providers.
 - Ran the focused test: raw exit `1`, `0 passed | 2 failed`; both assertions report actual `[0]`
   versus expected `[0, 1]`.
+- Retained retry policy snapshots in memory and native Deno registrations.
+- Added the internal shared retry/backoff/abort loop without adding a public export or clock.
+- Expanded deterministic parity coverage to success, exhaustion, all delay policies, max capping,
+  registration abort and shutdown, terminal attempts, listener cardinality, and aggregate `runCount`.
+- Ran the supervisor-reviewed focused matrix (`12 passed | 0 failed`) and full cron suite
+  (`22 passed | 0 failed`).
+- Ran scoped check/lint/fmt and cron quality/doctrine gates successfully.
 
 ## In Progress
 
-- Supervisor review/replay of the local S1 RED commit.
+- S3 public documentation and consumer-contract evidence.
 
 ## Next Steps
 
-1. Review the S1 test and exact expected-failure evidence without treating RED as a green gate.
-2. Replay the local slice commit into the supervisor worktree, then create the supervisor-owned
-   sign-off commit/push/comment trail.
-3. Steer the same attached thread to S2 only after supervisor review.
+1. Clarify exact retry, backoff, attempt, cancellation, and aggregate-event semantics in public JSDoc
+   and the manual.
+2. Prove the scheduled-trigger consumer still receives the cron attempt.
+3. Run documentation/public-surface gates and prepare S4 merge-readiness evidence.
 
 ## Key Decisions
 
@@ -52,7 +59,10 @@ reserved for S2.
 
 | Path | Status | Notes |
 | --- | --- | --- |
-| `packages/cron/tests/retry-backoff_test.ts` | new | S1 fake-time defect proof for both providers |
+| `packages/cron/adapters/_shared.ts` | updated | internal shared retry/backoff/abort execution |
+| `packages/cron/adapters/memory.adapter.ts` | updated | retained schedule retry policy |
+| `packages/cron/adapters/deno.adapter.ts` | updated | retained native schedule retry policy |
+| `packages/cron/tests/retry-backoff_test.ts` | updated | deterministic twelve-case dual-provider matrix |
 | `.llm/runs/fix-cron-retry-backoff-contract--w4-d/worklog.md` | updated | exact RED exit/assertion evidence |
 | `.llm/runs/fix-cron-retry-backoff-contract--w4-d/context-pack.md` | updated | S1 supervisor handback |
 | `.llm/runs/fix-cron-retry-backoff-contract--w4-d/codex-thread-ids.md` | generated | attached-thread identity and steering evidence |
@@ -62,9 +72,9 @@ reserved for S2.
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | baseline PASS | worklog baseline doc-lint/publish dry-run |
-| Fitness | baseline PASS with known warning | JSR audit; full gates pending S4 |
-| Runtime | RED proven (expected exit 1) | focused dual-provider test; actual `[0]`, expected `[0, 1]` |
+| Static | PASS | scoped check/lint/fmt plus baseline doc-lint/publish dry-run |
+| Fitness | PASS with known documentation observations | scoped quality/doctrine; baseline JSR audit |
+| Runtime | PASS | focused `12/12`; full cron suite `22/22` |
 | Consumer | pending | S3 |
 
 ## Open Questions
@@ -73,7 +83,8 @@ reserved for S2.
 
 ## Drift and Debt
 
-- Drift: Deno KV wording mismatch and milestone PLAN-EVAL composition recorded.
+- Drift: Deno KV wording mismatch, milestone PLAN-EVAL composition, and resumed-turn effort mismatch
+  recorded.
 - Debt: no new/deepened entry expected; cron AP-17 debt is already closed.
 
 ## Commits

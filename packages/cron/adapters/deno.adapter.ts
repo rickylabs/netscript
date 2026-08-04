@@ -25,7 +25,13 @@ import type {
 } from '../ports/types.ts';
 import { isValidCronExpression } from '../ports/types.ts';
 import type { CronScheduler, JobEventListener, SchedulerEvent } from '../ports/scheduler.ts';
-import { createLifecycleEvent, emitSchedulerEvent, executeScheduledJob } from './_shared.ts';
+import {
+  createLifecycleEvent,
+  emitSchedulerEvent,
+  executeScheduledJob,
+  retainRetryOptions,
+  type RetryOptions,
+} from './_shared.ts';
 
 /**
  * Internal job registration data
@@ -34,6 +40,7 @@ interface RegisteredJob {
   job: ScheduledJob;
   handler: JobHandler | ContextualJobHandler;
   abortController: AbortController;
+  retryOptions: RetryOptions;
 }
 
 /**
@@ -85,6 +92,7 @@ export class DenoCronAdapter implements CronScheduler {
     const abortController = new AbortController();
     const timezone = options?.timezone ?? 'UTC';
     const enabled = options?.enabled ?? true;
+    const retryOptions = retainRetryOptions(options);
 
     const job: ScheduledJob = {
       id,
@@ -112,6 +120,7 @@ export class DenoCronAdapter implements CronScheduler {
           job,
           handler,
           abortController.signal,
+          retryOptions,
           (expression) => this.calculateNextRun(expression),
           (event, data) => this.emit(event, data),
         );
@@ -119,7 +128,7 @@ export class DenoCronAdapter implements CronScheduler {
     );
 
     // Store job registration
-    this.jobs.set(id, { job, handler, abortController });
+    this.jobs.set(id, { job, handler, abortController, retryOptions });
 
     // Emit scheduled event
     await this.emit('jobScheduled', createLifecycleEvent(job, job.nextRun));
@@ -193,11 +202,12 @@ export class DenoCronAdapter implements CronScheduler {
       return Promise.resolve(false);
     }
 
-    const { job, handler, abortController } = registration;
+    const { job, handler, abortController, retryOptions } = registration;
     return executeScheduledJob(
       job,
       handler,
       abortController.signal,
+      retryOptions,
       (expression) => this.calculateNextRun(expression),
       (event, data) => this.emit(event, data),
     );
