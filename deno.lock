@@ -4155,7 +4155,6 @@
           "jsr:@netscript/plugin-sagas-core@0.0.4",
           "jsr:@netscript/plugin-streams-core@0.0.4",
           "jsr:@netscript/plugin@0.0.4",
-          "jsr:@netscript/queue@0.0.4",
           "jsr:@netscript/service@0.0.4",
           "jsr:@netscript/telemetry@0.0.4",
           "jsr:@std/async@1",
