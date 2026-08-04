@@ -57,6 +57,9 @@ never hand-copy generic method signatures.
 | 2026-08-05 | 3 | implementation | Factory now returns `QueryClient`; narrow port derives its methods; generated gate delegates to the workspace task. |
 | 2026-08-05 | 3 | focused GREEN | SDK type fixture, SDK query-client test, and scaffold gate regression pass. |
 | 2026-08-05 | 4 | fresh consumer proof | Generated 218-file Postgres/service workspace, ran normal DB codegen, and checked 24 artefacts including the showcase with zero diagnostics. |
+| 2026-08-05 | 4 | documentation debt | Removed the query-bridge double cast and error concession; reconciled only inventory A.1 on #1278. |
+| 2026-08-05 | 4 | quality gates | SDK 39 tests, Fresh 216 tests, CLI E2E 105 tests, scoped fmt/lint, and SDK publish dry-run pass. |
+| 2026-08-05 | 4 | lock hygiene | Reverted resolver churn twice; preserved only the inherited unowned `jsr:@netscript/queue@0.0.4` row. |
 
 ## Decisions
 
@@ -80,6 +83,11 @@ never hand-copy generic method signatures.
 | ---- | ---------------- | ------ | ----- |
 | RED type contract | `deno check --unstable-kv tests/type-fixtures/sdk-assignability_type.ts` | PASS | Failed before implementation with TS2740 and TS2551; passes after. |
 | RED scaffold contract | focused `scaffold-gates_test.ts` | PASS | Failed before gate change because the command omitted `apps`; passes after. |
+| SDK check + test | `packages/sdk: deno task check && deno task test` | PASS | 39 tests. |
+| Fresh check + test | `packages/fresh: deno task check && deno task test` | PASS | 216 tests. |
+| CLI E2E tests | `packages/cli/e2e: deno task test` | PASS | 105 tests. |
+| Touched fmt/lint | explicit six TypeScript files | PASS | No findings. |
+| JSR package audit | `packages/sdk: deno publish --dry-run --allow-dirty` | PASS | Slow-type check and publish simulation complete. |
 
 ### Fitness Gates
 
