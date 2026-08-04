@@ -1237,3 +1237,16 @@ close-gate green on job rerun after the orchestrator gate box was ticked with ev
 matches the "reruns also work now" contract). Threads 0/0, refs [1235] verified post-edit.
 **#1235 auto-closed, verified.** Second of the verified-defect triad lands; rides canary.8.
 Remaining triad: #1237 (version-drift steer in), #1239 (genjobs, suite running).
+
+## 2026-08-04 — Owner onboarding wave: all eleven issues have live execution
+
+- **W6-Q complete at PR level in ~40 min:** #1256 (Closes #1250), #1257 (Closes #1254,
+  ready), #1258 (Closes #1253, draft) — one lane, three sequential PRs, exactly per brief.
+- **W6-R handed to the same proven thread** (batch-2 resume): #1247 → #1251 → #1248.
+- **W6-S launched as dedicated Sol·medium lanes:** ns005-cachetiers (#1252; brief mandates
+  reading pulseboard 56accbb as spec and choosing framework seams over userland transplant)
+  and ns005-winmat (#1246; classification ours-vs-upstream is a deliverable, mitigation
+  detect/pin/document lands in 0.0.5 either way, Closes only if honestly earned).
+- Triad status: #1235 MERGED; #1237 (version-drift fix pushed) and #1239 (ready, suite
+  evidence captured) in gate waits. #1250 live-verification suite queued behind genjobs'
+  AppHost slot for the two seeded-scaffold acceptance rows on #1256.
