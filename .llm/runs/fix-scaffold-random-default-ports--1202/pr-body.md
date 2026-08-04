@@ -16,32 +16,34 @@ Refs #1202
 ## Slices
 
 - [x] S1 Lock evidence/design and open the draft review surface
-- [ ] S2 Land RED-first listener-default contract and implementation
+- [x] S2 Land RED-first listener-default contract and implementation
 - [ ] S3 Complete framework/runtime/cloud/evaluation gates
 
 ## Validation
 
 - Plan-Gate: composed per milestone-run.md (orchestrator waiver)
-- Generated-output RED/GREEN: pending
-- Scoped check/lint/fmt and quality gate: pending
-- One-pass `scaffold.runtime`: pending; cloud CI is the owner-declared verdict source
+- Generated-output RED/GREEN: pass (baseline rejected service `3000` and Vite `5173`)
+- Scoped check/lint/fmt, quality/architecture, and CLI JSR dry-run: pass
+- One-pass `scaffold.runtime`: pass (70 passed, 0 failed, cleanup green); cloud CI remains the owner-declared verdict source
 
 ## Harness
 
 - Run dir: `.llm/runs/fix-scaffold-random-default-ports--1202/`
-- Phase: plan; implementation not started
+- Phase: implementation; serialized runtime/evaluation pending
 
 ## Drift / Debt
 
 - Live API returns two issue comments although the brief names three; both live comments were read.
 - The worktree arrived with an unrelated `deno.lock` modification, which is excluded from this PR.
-- No new architecture debt planned.
+- Plugin API resources use deterministic high-range host pins because current behavior/telemetry
+  consumers require stable direct endpoints; app/service Aspire endpoints remain dynamic.
 
 ## Definition of Done
 
-- [ ] Automatic Aspire resources omit fixed host ports; explicit user pins remain supported.
-- [ ] Standalone generated app/service/plugin listeners are stable per project and at least 49152.
-- [ ] A generated-output test is RED on the baseline and rejects default listener ports below 49152.
-- [ ] Prisma/DB endpoint wiring passes a clean local one-pass or any unrelated local residual is recorded without changing scope; cloud CI is green.
-- [ ] Scoped wrappers, quality/architecture, JSR static gates, and lock hygiene pass with no new lint ignores.
-- [ ] The owner-owned Windows-service identification is left explicitly routed on the issue and is not claimed by this PR.
+- [x] App/service Aspire defaults omit host pins; plugin API defaults use seeded high-range pins;
+      explicit user pins remain supported.
+- [x] Standalone generated app/service/plugin listeners are stable per project and at least 49152.
+- [x] A generated-output test is RED on the baseline and rejects default listener ports below 49152.
+- [ ] Prisma/DB endpoint wiring passes a clean local one-pass (70/70); cloud CI is green.
+- [x] Scoped wrappers, quality/architecture, JSR static gates, and lock hygiene pass with no new lint ignores.
+- [x] The owner-owned Windows-service identification is left explicitly routed on the issue and is not claimed by this PR.

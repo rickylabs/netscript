@@ -76,6 +76,8 @@ default, and extend the semantic generated-output table.
 | 2026-08-04 | 2 | focused gates | Generator/service/plugin/E2E gate suites green; related E2E set green (45 tests plus 26 nested steps). Scoped check selected 776 files with zero diagnostics; lint/fmt selected 776 with zero findings. |
 | 2026-08-04 | 2 | framework gates | `quality:gate` exit 0 with no quality findings/new allowances; CLI `publish:dry-run` exit 0. |
 | 2026-08-04 | 3 | runtime queue | Read-only leak check found the serialized slot owned by active `ns005-s7` AppHosts/containers; left untouched and queued behind. |
+| 2026-08-04 | 3 | runtime one-pass | `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` exited 0: 70 passed, 0 failed. Prisma init/generate/seed, `behavior.service-health`, project-seeded plugin endpoints, app, Flow-B, and OTEL all passed. |
+| 2026-08-04 | 3 | cleanup audit | Post-run leak check reports zero survivors. Inherited `deno.lock` diff remains exactly one excluded line. |
 
 ## Gate Results
 
@@ -86,4 +88,4 @@ default, and extend the semantic generated-output table.
 | Scoped wrappers | pass | check/lint/fmt: 776 selected, zero findings |
 | Quality/architecture | pass | `deno task quality:gate`, exit 0; no new allowances |
 | JSR static audit | pass | CLI `publish:dry-run`, exit 0 |
-| `scaffold.runtime` | pending / serialized | Slice 3; cloud CI is verdict source |
+| `scaffold.runtime` | pass | One clean local pass: 70 passed, 0 failed; cleanup pass and zero survivors |
