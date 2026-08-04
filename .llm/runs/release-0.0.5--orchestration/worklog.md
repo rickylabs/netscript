@@ -1074,3 +1074,19 @@ tagged occurrences across 10 debt ids + untagged tutorial caveats. Full classifi
   canary.7.
 - Cut-time checklist gains a caveat gate: no warning-type call-out on main without a matching
   open debt entry; markers ≤ reframe list.
+
+## 2026-08-04 — MERGE #1224 (#1223 closed); #1190 HAND-CLOSED; CANARY.7 DISPATCHED
+
+- **Merge: PR #1224** (squash) — rerun 30908434339 all four green (close-gate green after the
+  #1223 acceptance-box evidence mirror); refs `Closes #1223` + `Refs #1190`; sidebar = [1223]
+  exact; threads 0/0. **#1223 auto-closed, verified.** Gate-monitor defect noted: my ALL-GREEN
+  glob assumed unsorted job order and could never match sorted output — caught by proactive
+  check; pattern fixed for future monitors (match each context independently, not an ordered
+  glob).
+- **#1190 hand-closed** on the accumulated chain (#1198 runner delivery → #1193 generated-glue
+  KV adapter → #1224 projection date revival) with the seven-point both-backends protocol GREEN;
+  all five acceptance boxes ticked with citations. A major cut-time evidence item clears.
+- **CANARY.7 dispatched:** run 30910860367. Train since canary.6: #1221 (main-pages remap),
+  #1218 (export corpus), #1222 (docsorch P2 sweep), #1224 (sagas projection fix). This chain
+  carries the next green-pair attempt after canary.6's #1227 infra red (its artifacts since
+  proven by the successful pinned rerun).
