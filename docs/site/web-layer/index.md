@@ -59,6 +59,9 @@ order:
 - **[Data loading & the query cache](/web-layer/query/)** — `QueryIsland`, `useQuery`,
   `useMutation`, and `useLiveQuery`: the TanStack-Query bridge that shares one cache between
   server render and island hydration.
+- **[The query bridge](/web-layer/query-bridge/)** — SDK query factories from loader to island: the
+  two key tiers, `getCachedEntry()` as a read rather than a fetch, and when to dehydrate instead of
+  passing `initialData`.
 - **[Server-validated forms](/web-layer/form/)** — typed, contract-aware form handling declared as
   a page layer.
 - **[Deferred & streaming UI](/web-layer/defer-streaming-ui/)** — stream a fallback now, swap in
