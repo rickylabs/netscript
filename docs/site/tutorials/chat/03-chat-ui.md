@@ -53,22 +53,39 @@ edit — see [Customize Fresh UI](/web-layer/how-to/customize-fresh-ui/) for the
 
 ## Step 2 — Seed the first paint
 
-In the page that hosts the chat, materialize the transcript so far and pass it into the
-island. `resolveChatSnapshot` returns `{ messages, renderParts, offset }`; the `offset`
-seeds the live subscription so seed and live read one continuous log:
+Build the page using NetScript's fluent `definePage` page builder. Materialize the transcript so far via `resolveChatSnapshot` as a request-scoped resource, then pass it to the island layer:
 
-```ts
-// In your chat page route (server side)
+```tsx
+// apps/dashboard/routes/chat/[sessionId].tsx
+import { definePage } from '@netscript/fresh/builders';
 import { resolveChatSnapshot } from '@netscript/fresh/ai';
+import { z } from 'zod';
+import Chat from '../../islands/Chat.tsx';
 
-const sessionId = 'demo-1'; // from the route params / the signed-in user's session
-const seed = await resolveChatSnapshot({ target: { sessionId } });
-// Render <Chat sessionId={sessionId} seed={seed} /> as an island.
+const chatPage = definePage()
+  .withRouteContract({
+    pathSchema: z.object({ sessionId: z.string() }),
+  })
+  .withResource('chatSeed', async (ctx) => {
+    return await resolveChatSnapshot({ target: { sessionId: ctx.path.sessionId } });
+  })
+  .withLayer('chatWindow', Chat, {
+    loader: async (ctx) => ({
+      sessionId: ctx.path.sessionId,
+      seed: await ctx.resource('chatSeed'),
+    }),
+  })
+  .withLayout((slots) => (
+    <main class='ns-page'>
+      {slots.chatWindow()}
+    </main>
+  ))
+  .build();
+
+export default chatPage.default;
 ```
 
-Wire `seed` into your page with the scaffold's page builder the same way the dashboard
-passes data to a view — see [Customize Fresh UI](/web-layer/how-to/customize-fresh-ui/) for the
-`definePage` pattern. The important part is that the island receives `seed` as a prop.
+This registers the path parameter (`sessionId`) and exposes `ctx.path.sessionId` typed in resources, loaders, and layout. The `resolveChatSnapshot` returns `{ messages, renderParts, offset }` where `offset` seeds the live subscription so seed and live read one continuous log.
 
 {{ comp callout { type: "note", title: "The one-projection law, in one sentence" } }}
 <code>resolveChatSnapshot</code> reduces the session through <code>projectChatSnapshot</code> — the <strong>same</strong> reducer the live path uses. That is why a tool card rendered at first paint does not jump or vanish when the first live chunk arrives: seed and live never disagree about intermediate state.
@@ -210,7 +227,7 @@ deno task --cwd apps/dashboard check
 
 ## What you built
 
-A working chat UI: copied, app-owned components; an SSR-seeded island that sends through the
+A working chat UI: a chat page built with `definePage()` that seeds the transcript snapshot on the server side and wires the interactive Chat island; copied, app-owned components; an SSR-seeded island that sends through the
 durable connection and re-renders on settle; and `chat-render` turning assistant markdown
 into rich blocks. Next you give the model a tool to call — and render its result as a
 tool-call card with citation chips.

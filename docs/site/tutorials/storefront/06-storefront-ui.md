@@ -260,32 +260,41 @@ typed client be the function body. Same type source, honest seam.
 
 ## Step 4 — Wire the route to the page
 
-The page reads its params **through the contract** and hands the island a typed slice. The route the
-Fresh app registers (`/cart/:customer`) and the contract's pattern (`/cart/[customer]`) name the same
-segment — `cartRoute.parsePath` bridges them:
+The page is built using NetScript's fluent `definePage` page builder. By binding to the `cartRoute` contract, the page gains access to type-safe path and search schemas so `ctx.path` and `ctx.search` are fully typed throughout the pipeline:
 
 ```tsx
 // apps/storefront/routes/cart/[customer].tsx
+import { definePage } from '@netscript/fresh/builders';
 import { cartRoute } from '../../../contracts/routes/cart-page.ts';
 import CheckoutIsland from '../../islands/CheckoutIsland.tsx';
+import { productsClient } from '../../lib/api-clients.ts';
 
-export default function CartPage(props: { params: { customer: string }; url: URL }) {
-  // Typed off the ONE route contract — no hand-parsing the URL.
-  const { customer } = cartRoute.parsePath(props.params);
-  const { limit, offset } = cartRoute.parseSearch(props.url.searchParams);
-
-  return (
+const cartPage = definePage()
+  .withRoute(cartRoute)
+  .withResource('initialProducts', async (ctx) => {
+    // Resolve the first page of products on the server side
+    const input = { limit: ctx.search.limit, offset: ctx.search.offset };
+    return await productsClient.list(input);
+  })
+  .withLayer('checkout', CheckoutIsland, {
+    loader: async (ctx) => ({
+      customer: ctx.path.customer,
+      input: { limit: ctx.search.limit, offset: ctx.search.offset },
+      initialProducts: await ctx.resource('initialProducts'),
+    }),
+  })
+  .withLayout((slots, ctx) => (
     <main class='ns-page'>
-      <h1>Cart for {customer}</h1>
-      <CheckoutIsland customer={customer} input={{ limit, offset }} />
+      <h1>Cart for {ctx.path.customer}</h1>
+      {slots.checkout()}
     </main>
-  );
-}
+  ))
+  .build();
+
+export default cartPage.default;
 ```
 
-`cartRoute.parseSearch` applies the `paginationSearchSchema` defaults, so `/cart/cust_1001` with no
-query string still yields a typed `{ limit: 12, offset: 0 }`. A link elsewhere builds the URL with
-`cartRoute.href({ path: { customer: 'cust_1001' } })` — the pattern is written once, in the contract.
+Binding the route to `cartRoute` automatically registers the contract-derived schemas. `cartRoute.parseSearch` applies the `paginationSearchSchema` defaults, so `/cart/cust_1001` with no query string still yields a typed `{ limit: 12, offset: 0 }` inside the page builder context. A link elsewhere builds the URL with `cartRoute.href({ path: { customer: 'cust_1001' } })` — the pattern is written once, in the contract.
 
 ## Test it out
 
@@ -316,16 +325,13 @@ product carries an **Add to cart** button wired to the typed checkout mutation.
       and `cartQueries`, each derived from a contract.
 - [ ] `CheckoutIsland.tsx` reads with `useIslandQuery` and mutates with `useIslandMutation`, keyed off
       the contract-derived helpers.
-- [ ] The page reads `customer`, `limit`, and `offset` via `cartRoute.parsePath` / `.parseSearch`, not
-      by hand.
+- [ ] The page binds to the contract and loads initial products using `definePage` and a layer loader.
 - [ ] `deno task check` passes.
 - [ ] `curl` against `:3001/api/products` returns the catalog the island renders.
 
 ## What you built
 
-- A `GET /cart/[customer]` page whose route is a **bound route contract**: one object owns the pattern,
-  the typed `{ customer }` path param, and the pagination search, and it produces both the page's typed
-  params and the URL a link would call.
+- A `GET /cart/[customer]` page built with `definePage()`, binding to the contract, loading resource data on the server, and wiring the checkout island as a component layer.
 - A single clients module with one typed `createServiceClient` per service, each wrapped in
   `createServiceQueryUtils` — the contract-derived query and mutation helpers.
 - An island that **reads** the catalog with `useIslandQuery` and **begins checkout** with
