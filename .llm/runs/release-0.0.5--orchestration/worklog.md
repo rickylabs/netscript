@@ -1468,3 +1468,18 @@ Every brief pairs the code fix with a caveat re-judgment (remove what the fix in
 keep what stays true) and a fails-if-silently-inert test where the defect class is a dead
 seam — the #1250 law generalized. This is the owner's "most call-outs gone by 0.0.5" goal
 executing; the reframe pass (6 debts, 18 markers) follows once these land.
+
+## 2026-08-04 — Kill-list landing: #1281 (#1228) + #1284 (#1225) merged; finding 32
+
+- **#1281 merged → #1228 closed** (workers job-tools telemetry, the 5-marker surface).
+- **#1284 merged → #1225 closed** (sagas per-transition mirror — the owner-screenshotted
+  tutorial caveat's root cause).
+- **#1282 (#1230) close-gate cure + finding 32:** the mirror failed with "no acceptance box
+  matched exact box text" even though the PR's YAML quoted the box text verbatim. Root cause
+  read from `acceptance-evidence.ts`: `resolveEvidenceBox` matches `box.text.trim() ===
+  entry.text.trim()` against the CURRENT issue body — and ticking a box with an appended
+  " — [citation]" changes `box.text`, so any text-keyed entry breaks the moment its own
+  evidence citation is added. **Finding 32 (for #1163): prefer `box-index` over `box:` text in
+  acceptance-evidence YAML — text keys are self-invalidating for exactly the boxes that carry
+  citations, which is all of them by the end.** Rewrote #1282's four entries to box-index;
+  `mirror-acceptance-evidence --dry-run` clean; gate rerun + merge armed.
