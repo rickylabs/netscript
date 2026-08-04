@@ -26,6 +26,23 @@ export interface SagaInstanceProjectionPort {
   upsert(projection: SagaInstanceProjection): Promise<void>;
 }
 
+/** Projection fan-out that preserves the existing read model and emits secondary views. */
+export class CompositeSagaInstanceProjection implements SagaInstanceProjectionPort {
+  readonly #projections: readonly SagaInstanceProjectionPort[];
+
+  /** Compose projection adapters in durable-write order. */
+  constructor(projections: readonly SagaInstanceProjectionPort[]) {
+    this.#projections = Object.freeze([...projections]);
+  }
+
+  /** Upsert every configured view after the canonical transition is durable. */
+  async upsert(projection: SagaInstanceProjection): Promise<void> {
+    for (const target of this.#projections) {
+      await target.upsert(projection);
+    }
+  }
+}
+
 /** KV-backed read-model document consumed by the sagas HTTP API fallback. */
 export type SagaInstanceReadModel = Readonly<{
   sagaName: string;

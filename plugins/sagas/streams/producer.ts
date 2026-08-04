@@ -1,4 +1,9 @@
 import { createDurableStream, type DurableStreamProducer } from '@netscript/plugin-streams-core';
+import type { StreamProducerPort } from '@netscript/plugin-streams-core';
+import type {
+  SagaInstanceProjection,
+  SagaInstanceProjectionPort,
+} from '../src/runtime/saga-instance-projection.ts';
 import { type SagasStreamDefinition, sagasStreamSchema } from './schema.ts';
 
 export type { DurableStreamProducer, StreamProducerPort } from '@netscript/plugin-streams-core';
@@ -68,6 +73,22 @@ export function getSagasStreamProducer(): DurableStreamProducer<SagasStreamDefin
     });
   }
   return producer;
+}
+
+/** Emits the post-transition saga projection into the durable stream transport. */
+export class SagaStreamInstanceProjection implements SagaInstanceProjectionPort {
+  readonly #producer: StreamProducerPort;
+
+  /** Create a transition projector around the existing stream producer port. */
+  constructor(streamProducer: StreamProducerPort = getSagasStreamProducer()) {
+    this.#producer = streamProducer;
+  }
+
+  /** Upsert the latest saga state after each durable transition. */
+  upsert(projection: SagaInstanceProjection): Promise<void> {
+    this.#producer.upsert('sagaInstance', mapSagaProjectionToEntity(projection));
+    return Promise.resolve();
+  }
 }
 
 /** Mirror existing saga state snapshots into the durable streams server. */
@@ -147,7 +168,7 @@ function mapSagaRecordToEntity(record: SagaInstanceRecord): Record<string, unkno
     instanceId: `${record.sagaName}:${record.correlationId}`,
     sagaId: record.sagaName,
     correlationKey: record.correlationId,
-    status: isCompleted ? 'completed' : 'active',
+    status: isCompleted ? 'completed' : 'running',
     state,
     version,
     messageCount: version,
@@ -155,6 +176,31 @@ function mapSagaRecordToEntity(record: SagaInstanceRecord): Record<string, unkno
     startedAt: createdAt,
     updatedAt,
     completedAt: isCompleted ? updatedAt : undefined,
+  };
+}
+
+function mapSagaProjectionToEntity(
+  projection: SagaInstanceProjection,
+): Record<string, unknown> {
+  const { metadata } = projection.envelope;
+  const updatedAt = toISOString(metadata.updatedAt);
+  const completedAt = metadata.completedAt === undefined
+    ? undefined
+    : toISOString(metadata.completedAt);
+  return {
+    instanceId: `${projection.sagaId}:${projection.correlationKey}`,
+    sagaId: projection.sagaId,
+    correlationKey: projection.correlationKey,
+    status: metadata.status,
+    state: projection.envelope.state,
+    version: metadata.version,
+    messageCount: metadata.version,
+    lastMessageType: projection.transition.transition.message.type,
+    startedAt: toISOString(metadata.createdAt),
+    updatedAt,
+    completedAt,
+    traceparent: metadata.traceparent,
+    tracestate: metadata.tracestate,
   };
 }
 

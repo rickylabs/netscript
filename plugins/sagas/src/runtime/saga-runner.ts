@@ -19,11 +19,13 @@ import {
   SagaQueueScheduler,
 } from './saga-delivery.ts';
 import {
+  CompositeSagaInstanceProjection,
   KvSagaInstanceProjection,
   PrismaSagaInstanceProjection,
   type PrismaSagaInstanceProjectionClient,
   type SagaInstanceProjectionPort,
 } from './saga-instance-projection.ts';
+import { getSagasStreamProducer, SagaStreamInstanceProjection } from '../../streams/producer.ts';
 
 /** Module importer boundary used by the runtime registry loader. */
 export type SagaRuntimeModuleImporter = (specifier: string) => Promise<unknown>;
@@ -167,14 +169,31 @@ async function resolveProjection(
   }
   const bootstrapModule = readEnv('NETSCRIPT_PLUGIN_SERVICE_BOOTSTRAP_MODULE');
   if (!bootstrapModule) {
-    return new KvSagaInstanceProjection();
+    return withStreamProjection(new KvSagaInstanceProjection());
   }
   const imported = await import(bootstrapModule) as SagaRunnerBootstrap;
   const context = await imported.createPluginServiceContext('sagas');
   const client = await context.db.getClient();
-  return isProjectionClient(client)
+  const readModelProjection = isProjectionClient(client)
     ? new PrismaSagaInstanceProjection(client)
     : new KvSagaInstanceProjection();
+  return withStreamProjection(readModelProjection);
+}
+
+function withStreamProjection(
+  readModelProjection: SagaInstanceProjectionPort,
+): SagaInstanceProjectionPort {
+  let streamProjection: SagaStreamInstanceProjection;
+  try {
+    streamProjection = new SagaStreamInstanceProjection(getSagasStreamProducer());
+  } catch (cause) {
+    console.warn('[Sagas Runner] Durable stream projection unavailable:', cause);
+    return readModelProjection;
+  }
+  return new CompositeSagaInstanceProjection([
+    readModelProjection,
+    streamProjection,
+  ]);
 }
 
 function isProjectionClient(
