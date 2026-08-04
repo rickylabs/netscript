@@ -41,7 +41,7 @@ Deno.test('stdio initialize, list, and unreachable doctor round trip', async () 
     );
     assertEquals(responses[0].result.serverInfo.name, '@netscript/mcp');
     assertEquals(responses[0].result.serverInfo.version, MCP_PACKAGE_VERSION);
-    assertEquals(responses[1].result.tools.length, 14);
+    assertEquals(responses[1].result.tools.length, 17);
     assert(typeof responses[0].result.instructions === 'string');
     for (const name of ['doctor', 'get_app_status', 'get_recent_errors', 'record_drift']) {
       assert(responses[0].result.instructions.includes(name));

@@ -11,7 +11,7 @@ surface and is maintained by hand; the authoritative, always-current symbol list
 [`deno doc jsr:@netscript/mcp{{ releaseSpecifier }}`](https://jsr.io/@netscript/mcp/doc). For the
 full index of packages and plugins return to the [reference overview](/reference/).
 
-`@netscript/mcp` publishes 14 token-bounded MCP tools that let a coding agent monitor a running app,
+`@netscript/mcp` publishes 17 token-bounded MCP tools that let a coding agent monitor a running app,
 debug a correlated execution, read framework-semantic telemetry, run the doctor, search the public
 documentation, and trigger allowlisted CLI commands — over newline-delimited JSON-RPC on stdio, with
 no npm MCP SDK on the dependency graph.
@@ -31,7 +31,7 @@ Two entrypoints carry the surface:
 | Symbol                 | Kind      | Summary                                                                        |
 | ---------------------- | --------- | ------------------------------------------------------------------------------ |
 | `createMcpServer`      | function  | Create the MCP server with `initialize` / `tools/list` / `tools/call` support. |
-| `createToolRegistry`   | function  | Immutable, enumerable definitions of the 14 tools.                             |
+| `createToolRegistry`   | function  | Immutable, enumerable definitions of the 17 tools.                             |
 | `McpServer`            | interface | Callable server subset: `handle(message)` plus the registered `tools`.         |
 | `McpServerOptions`     | interface | Composition seams: `probe`, `environment`, `flows`, `truncation`.              |
 | `MCP_PROTOCOL_VERSION` | const     | The MCP protocol version the runner implements (`2025-11-25`).                 |
@@ -73,6 +73,9 @@ input caps the result count server-side before truncation applies.
 | `list_commands`               | `filter`, `limit`                                     | `count`, `commands`                                                                                                                                               |
 | `execute_command`             | **`command`**, `args`                                 | `exitCode`, `durationMs`, `outputTail`, `truncated`, `timedOut`                                                                                                   |
 | `record_drift`                | **`resource`**, **`summary`**, `details`              | `recorded`, `resource`, `receipt`                                                                                                                                 |
+| `list_api_services`           | —                                                     | Service status, URLs, optional operation count, conflicts, and verbatim discovery source outcomes                                                                 |
+| `list_service_operations`     | **`service`**, `filter`, `limit`                      | Bounded operation rows and `truncated` metadata                                                                                                                    |
+| `get_operation_schema`        | **`service`**, **`operation`**, `view`                | Projected schema view, operation identity, unauthenticated `curlExample`, and `authNote`                                                                            |
 
 **Truncation semantics.** After a flow succeeds, `truncateResult` recursively bounds the result
 using `DEFAULT_TRUNCATION_POLICY` — arrays are capped at 50 elements and strings at 2,000 UTF-16

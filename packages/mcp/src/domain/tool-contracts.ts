@@ -103,6 +103,17 @@ const inputShapes: Record<ToolName, Readonly<Record<string, unknown>>> = {
     summary: stringProperty,
     details: stringProperty,
   }, ['resource', 'summary']),
+  list_api_services: objectSchema(),
+  list_service_operations: objectSchema({
+    service: stringProperty,
+    filter: stringProperty,
+    limit: limitProperty,
+  }, ['service']),
+  get_operation_schema: objectSchema({
+    service: stringProperty,
+    operation: stringProperty,
+    view: { enum: ['request', 'response', 'errors', 'all'] },
+  }, ['service', 'operation']),
 };
 
 const outputShapes: Record<ToolName, Readonly<Record<string, unknown>>> = {
@@ -239,6 +250,26 @@ const outputShapes: Record<ToolName, Readonly<Record<string, unknown>>> = {
     resource: stringProperty,
     receipt: { type: 'object' },
   }, ['recorded', 'resource', 'receipt']),
+  list_api_services: objectSchema({
+    services: { type: 'array', maxItems: 49 },
+    sources: { type: 'array', maxItems: 4 },
+    truncated: { type: 'boolean' },
+  }, ['services', 'sources', 'truncated']),
+  list_service_operations: objectSchema({
+    service: stringProperty,
+    operations: { type: 'array', maxItems: 49 },
+    truncated: { type: 'boolean' },
+  }, ['service', 'operations', 'truncated']),
+  get_operation_schema: objectSchema({
+    service: stringProperty,
+    operation: stringProperty,
+    method: stringProperty,
+    path: stringProperty,
+    view: { enum: ['request', 'response', 'errors', 'all'] },
+    schema: { type: 'object' },
+    curlExample: stringProperty,
+    authNote: stringProperty,
+  }, ['service', 'operation', 'method', 'path', 'view', 'schema', 'curlExample', 'authNote']),
 };
 
 /** Standard-Schema input contracts for the complete v1 tool surface. */

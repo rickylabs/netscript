@@ -44,6 +44,11 @@ import { createRecordDriftFlow } from './src/application/flows/record-drift-flow
 import type { ToolFlow } from './src/domain/tool-types.ts';
 import type { DiagnosticEvidencePort } from './src/domain/diagnostic-evidence-port.ts';
 import { withFlowReceipt } from './src/application/runner/receipt-lifecycle.ts';
+import { createListApiServicesFlow } from './src/application/flows/list-api-services-flow.ts';
+import { createListServiceOperationsFlow } from './src/application/flows/list-service-operations-flow.ts';
+import { createGetOperationSchemaFlow } from './src/application/flows/get-operation-schema-flow.ts';
+import { createServiceEndpointDirectory } from './src/application/service-endpoint-directory.ts';
+import type { ServiceEndpointDirectoryPort } from './src/ports/service-endpoint-directory-port.ts';
 
 export * from './mod.ts';
 
@@ -65,6 +70,8 @@ export interface McpCliOptions {
   /** Report a non-fatal failure to persist diagnostic evidence. */ readonly onEvidenceWarning?: (
     message: string,
   ) => void;
+  /** Override service discovery and probing for embedders and fixtures. */ readonly serviceEndpointDirectory?:
+    ServiceEndpointDirectoryPort;
 }
 
 /** Resolve an explicit public documentation override from flags or environment. */
@@ -112,6 +119,9 @@ export function createMcpCliServer(options: McpCliOptions = {}): McpServer {
   const probe = new FetchTelemetryProbe((endpoint) =>
     createAspireDashboardFetch(endpoint, {}) ?? fetch
   );
+  const serviceDirectory = options.serviceEndpointDirectory ?? createServiceEndpointDirectory({
+    projectRoot,
+  });
   return createMcpServer({
     probe,
     environment,
@@ -169,6 +179,24 @@ export function createMcpCliServer(options: McpCliOptions = {}): McpServer {
         warnEvidence,
       ),
       record_drift: createRecordDriftFlow(evidence),
+      list_api_services: withReceipt(
+        createListApiServicesFlow(serviceDirectory),
+        evidence,
+        'mcp list_api_services',
+        warnEvidence,
+      ),
+      list_service_operations: withReceipt(
+        createListServiceOperationsFlow(serviceDirectory),
+        evidence,
+        'mcp list_service_operations',
+        warnEvidence,
+      ),
+      get_operation_schema: withReceipt(
+        createGetOperationSchemaFlow(serviceDirectory),
+        evidence,
+        'mcp get_operation_schema',
+        warnEvidence,
+      ),
     },
   });
 }

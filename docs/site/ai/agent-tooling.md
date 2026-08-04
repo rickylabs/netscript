@@ -90,7 +90,7 @@ server over standard input/output. Its flags:
 
 ## What the server exposes
 
-Fourteen tools, every one returning a bounded structured result. Grouped by what
+Seventeen tools, every one returning a bounded structured result. Grouped by what
 an agent is trying to do:
 
 - **Read the running app** — seven telemetry read models: `get_app_status`,
@@ -108,6 +108,8 @@ an agent is trying to do:
   and a bounded output tail.
 - **Record drift** — `record_drift` appends an evidence-gated entry to the project
   drift log (`.netscript/agent/drift.jsonl`) when authorized by a fresh successful diagnostic receipt.
+- **Inspect service APIs** — `list_api_services`, `list_service_operations`, and
+  `get_operation_schema` expose live OpenAPI contracts before an agent guesses with curl.
 
 We keep the per-tool schemas, output bounds, and the full `execute_command`
 policy in the [`@netscript/mcp` reference]({{ "ref:mcp" |> xref |> url }}) rather
@@ -206,7 +208,7 @@ deno test --allow-all packages/cli/e2e/tests/agent/agent-mcp-stdio_test.ts
 ```
 
 The smoke starts the public CLI binary, initializes MCP over stdio, verifies the
-14-tool catalog, and checks docs, diagnostics, unreachable telemetry, and command
+17-tool catalog, and checks docs, diagnostics, unreachable telemetry, and command
 denial behavior.
 
 ## Where to go next
