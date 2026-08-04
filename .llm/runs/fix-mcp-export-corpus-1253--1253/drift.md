@@ -11,6 +11,8 @@ The CLI currently supplies MCP README plus `help.md`; SDK cache/hydration/optimi
 is not present. This is distinct from the export corpus runtime defect and will be stated/tracked
 rather than silently claimed as fixed.
 
+Tracked as #1260 with the required taxonomy and milestone `0.0.5`.
+
 ## Inherited worktree state
 
 The one-line `deno.lock` addition for `jsr:@netscript/queue@0.0.4` predates this branch and remains

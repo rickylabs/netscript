@@ -3,10 +3,10 @@
 import { dirname, fromFileUrl, join, resolve, toFileUrl } from '@std/path';
 
 const REPO_ROOT = resolve(dirname(fromFileUrl(import.meta.url)), '../../..');
-const OUTPUT_PATH = join(
-  REPO_ROOT,
-  'packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts',
-);
+/** Repository-relative generated corpus staged by release preparation. */
+export const EXPORT_SURFACE_CORPUS_OUTPUT =
+  'packages/mcp/src/infrastructure/export-surfaces/export-surface-corpus.generated.ts';
+const OUTPUT_PATH = join(REPO_ROOT, EXPORT_SURFACE_CORPUS_OUTPUT);
 
 interface PackageManifest {
   readonly name?: unknown;

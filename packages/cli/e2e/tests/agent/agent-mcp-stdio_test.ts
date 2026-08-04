@@ -1,5 +1,6 @@
 import { assert, assertEquals } from '@std/assert';
 import { fromFileUrl, join } from '@std/path';
+import { createPublicCommandTree } from '../../../src/public/features/root/public-command-tree.ts';
 
 interface RpcResponse {
   readonly id: number;
@@ -17,7 +18,27 @@ const cliEntrypoint = fromFileUrl(
 );
 
 Deno.test('agent mcp real CLI stdio smoke', async () => {
-  const projectRoot = await Deno.makeTempDir({ prefix: 'netscript-agent-mcp-' });
+  const parent = await Deno.makeTempDir({ prefix: 'netscript-agent-mcp-' });
+  const projectName = 'stdio-scaffold';
+  const projectRoot = join(parent, projectName);
+  const scaffold = createPublicCommandTree({
+    cwd: () => parent,
+    resolvePath: (path) => path === undefined ? parent : join(parent, path),
+  });
+  await scaffold.parse([
+    'init',
+    projectName,
+    '--path',
+    parent,
+    '--app-name',
+    'dashboard',
+    '--db',
+    'none',
+    '--ci',
+    '--yes',
+    '--no-aspire',
+    '--no-git',
+  ]);
   const docsRoot = join(projectRoot, 'docs', 'site');
   await Deno.mkdir(docsRoot, { recursive: true });
   await Deno.writeTextFile(
@@ -78,6 +99,12 @@ Deno.test('agent mcp real CLI stdio smoke', async () => {
         method: 'tools/call',
         params: { name: 'execute_command', arguments: { command: 'deploy' } },
       },
+      {
+        jsonrpc: '2.0',
+        id: 7,
+        method: 'tools/call',
+        params: { name: 'search_exports', arguments: { query: 'definePage' } },
+      },
     ];
     const writer = child.stdin.getWriter();
     await writer.write(
@@ -98,7 +125,7 @@ Deno.test('agent mcp real CLI stdio smoke', async () => {
 
     assertEquals(responses[0].result?.serverInfo?.name, '@netscript/mcp');
     const tools = responses[1].result?.tools ?? [];
-      assertEquals(tools.length, 21);
+    assertEquals(tools.length, 21);
     assert(tools.some((tool) => tool.name === 'record_drift'));
 
     const doctor = responses[2].result?.structuredContent;
@@ -121,8 +148,18 @@ Deno.test('agent mcp real CLI stdio smoke', async () => {
     assertEquals(responses[5].result?.isError, true);
     assertEquals(denied.code, 'command_denied');
     assertEquals(denied.status, 'deny_deploy');
+
+    const exports = responses[6].result?.structuredContent;
+    assert(exports);
+    assertEquals(responses[6].result?.isError, false);
+    assert(Number(exports.total) > 0);
+    assert(
+      (exports.matches as readonly Record<string, unknown>[]).some((match) =>
+        match.symbol === 'definePage'
+      ),
+    );
   } finally {
     if (!completed) child.kill('SIGKILL');
-    await Deno.remove(projectRoot, { recursive: true });
+    await Deno.remove(parent, { recursive: true });
   }
 });
