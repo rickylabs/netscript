@@ -6,16 +6,16 @@
 | --- | --- |
 | Run ID | `fix-fresh-cache-tier-convergence--1252` |
 | Branch | `fix/fresh-cache-tier-convergence` |
-| Current phase | `plan` |
+| Current phase | `implement` |
 | Archetype | `4 — Public DSL / Builder` |
 | Scope overlays | `frontend` |
 
 ## Current State
 
-Issue #1252 and Pulseboard `56accbb` have been read. Current main is re-baselined, the contract and
-four green commit slices are locked, and no implementation source has been edited. D6 explicitly
-composes evaluation through draft→ready augment/OpenHands/orchestrator gates instead of local
-PLAN-EVAL.
+S1 is implemented and locally green: server-side generated query options share the action's
+CacheQuery entry and browser query options remain direct when no provider is registered. D6
+explicitly composes evaluation through draft→ready augment/OpenHands/orchestrator gates instead of
+local PLAN-EVAL.
 
 ## Completed
 
@@ -25,17 +25,18 @@ PLAN-EVAL.
 - Fast-forwarded, then rebased branch to current `origin/main` `26fe0da9b`.
 - Recorded pre-existing `deno.lock` ownership and JSR/doc baseline findings.
 - Locked research, plan, Design checkpoint, and composed-waiver artifact.
+- S1 RED reproduced the bypass at the second read, then 3 focused tests and the 77-file SDK scoped
+  check passed after implementation.
 
 ## In Progress
 
-- S0 baseline reconciliation after draft PR creation.
+- S1 sign-off commit, push, and PR slice evidence.
 
 ## Next Steps
 
-1. Write S1 SDK RED test, capture failure, implement cache-aware server `queryOptions`, and green it.
-2. Write S2 Fresh timestamp/first-paint RED tests, implement mount reconciliation, and green them.
-3. Write S3 standard invalidation endpoint RED integration, implement server/client seam, and green it.
-4. Run S4 scoped/quality/JSR no-deepening gates and prepare draft→ready evaluation handoff.
+1. Write S2 Fresh timestamp/first-paint RED tests, implement mount reconciliation, and green them.
+2. Write S3 standard invalidation endpoint RED integration, implement server/client seam, and green it.
+3. Run S4 scoped/quality/JSR no-deepening gates and prepare draft→ready evaluation handoff.
 
 ## Key Decisions
 
@@ -51,13 +52,18 @@ PLAN-EVAL.
 | Path | Status | Notes |
 | --- | --- | --- |
 | `.llm/runs/fix-fresh-cache-tier-convergence--1252/*` | new | S0 harness artifacts |
+| `packages/sdk/src/query-client/types.ts` | changed | cache-policy contract for query options |
+| `packages/sdk/src/query/query-factory.ts` | changed | cache-aware server/direct browser queryFn selection |
+| `packages/sdk/src/query/mod.ts` | changed | public environment-aware semantics |
+| `packages/sdk/src/ports/query-factory.ts` | changed | public action method documentation |
+| `packages/sdk/tests/query/query-factory_test.ts` | changed | RED regression + browser safeguard |
 | `deno.lock` | pre-existing/unowned | never stage, revert, or attribute |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | baseline recorded | structured Fresh/SDK doc lint |
+| Static | S1 PASS | SDK focused tests + 77-file scoped check |
 | Fitness | baseline recorded | Fresh/SDK JSR audits |
 | Runtime | pending | S2/S3 RED-first tests |
 | Consumer | pending | targeted package checks/tests |

@@ -1,4 +1,4 @@
-import { setCacheProvider } from '../../src/cache/cache-provider.ts';
+import { resetCacheProvider, setCacheProvider } from '../../src/cache/cache-provider.ts';
 import { CacheQuery } from '../../src/cache/cache-query.ts';
 import { createQueryFactory } from '../../src/query/query-factory.ts';
 import type {
@@ -54,4 +54,55 @@ Deno.test('createQueryFactory builds stable action keys and query options', asyn
   assertEquals(options.queryKey[0], 'orders');
   assertEquals(options.queryKey[1], 'list');
   assertEquals(result.items[0], '20:0');
+  resetCacheProvider();
+});
+
+Deno.test('queryOptions shares the server CacheQuery entry and action invalidation', async () => {
+  const store = new MemoryCacheStore();
+  setCacheProvider(new CacheQuery(store));
+
+  let currentItem = 'before-mutation';
+  let clientCalls = 0;
+  const client = {
+    list: (_input: ListInput): Promise<ListOutput> => {
+      clientCalls += 1;
+      return Promise.resolve({ items: [currentItem] });
+    },
+  } as unknown as ServiceClient<typeof contract>;
+
+  const factory = createQueryFactory('orders', contract, client);
+  const input = { limit: 20, offset: 0 };
+  const options = factory.list.queryOptions(input);
+
+  assertEquals((await options.queryFn()).items[0], 'before-mutation');
+
+  currentItem = 'after-mutation';
+  assertEquals((await options.queryFn()).items[0], 'before-mutation');
+
+  await factory.list.invalidate();
+  assertEquals((await options.queryFn()).items[0], 'after-mutation');
+  assertEquals(clientCalls, 2);
+  resetCacheProvider();
+});
+
+Deno.test('queryOptions remains a direct service query when no server cache is registered', async () => {
+  resetCacheProvider();
+
+  let clientCalls = 0;
+  const client = {
+    list: (_input: ListInput): Promise<ListOutput> => {
+      clientCalls += 1;
+      return Promise.resolve({ items: [`call-${clientCalls}`] });
+    },
+  } as unknown as ServiceClient<typeof contract>;
+
+  const options = createQueryFactory('orders', contract, client).list.queryOptions({
+    limit: 20,
+    offset: 0,
+  }, {
+    preferFreshOnStale: true,
+  });
+
+  assertEquals((await options.queryFn()).items[0], 'call-1');
+  assertEquals((await options.queryFn()).items[0], 'call-2');
 });

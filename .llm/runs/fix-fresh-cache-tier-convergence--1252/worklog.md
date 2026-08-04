@@ -73,6 +73,8 @@ hydration in `packages/fresh/src/application/query/`; extend the HTTP edge in
 | 2026-08-04 | S0 | re-baseline | Fast-forwarded branch from `3a267aef1` to current `origin/main` `9bcfd18f2`; preserved user-owned lock edit. |
 | 2026-08-04 | S0 | design | Locked Archetype 4 + frontend contract and recorded D6 composed waiver. |
 | 2026-08-04 | S0 | reconcile | Rebasing onto new main `26fe0da9b` changed the bootstrap commit to `e39c9c4d7`; explicit lease/refspec push preserved the remote commit trail and lock edit. |
+| 2026-08-04 | S1 | RED | Corrected assertion compared item values; current direct queryFn then failed at the second read: `Expected before-mutation, got after-mutation` (2 pass, 1 fail). |
+| 2026-08-04 | S1 | GREEN | Server query options now select the registered CacheProvider; browser/no-provider calls remain direct. Focused tests 3/3 and scoped SDK check pass. |
 
 ## Decisions
 
@@ -100,6 +102,8 @@ hydration in `packages/fresh/src/application/query/`; extend the HTTP edge in
 | Baseline branch/status | raw git commands | PASS | no upstream; one excluded user lock edit |
 | Fresh structured doc lint | `run-deno-doc-lint.ts --root packages/fresh` | BASELINE_FAIL | 44 pre-existing diagnostics |
 | SDK structured doc lint | `run-deno-doc-lint.ts --root packages/sdk` | BASELINE_FAIL | one transitive pre-existing diagnostic |
+| S1 SDK focused tests | `deno test --allow-all packages/sdk/tests/query/query-factory_test.ts` | PASS | 3 passed; RED proof recorded above |
+| S1 SDK scoped check | `run-deno-check.ts --root packages/sdk --ext ts` | PASS | 77 files; zero diagnostics |
 
 ### Fitness Gates
 
@@ -120,6 +124,7 @@ hydration in `packages/fresh/src/application/query/`; extend the HTTP edge in
 | Consumer | Result | Evidence | Notes |
 | --- | --- | --- | --- |
 | Pulseboard pattern | RESEARCHED | exact commit patch | behavioral specification only |
+| Browser queryOptions fallback | PASS | focused SDK test | two calls hit the typed client directly with no registered provider |
 
 ## Handoff Notes
 

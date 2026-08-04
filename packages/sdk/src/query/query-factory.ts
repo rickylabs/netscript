@@ -26,7 +26,7 @@ import type {
   QueryOptionsWithInitialData,
 } from '../query-client/types.ts';
 
-import { getCacheProvider } from '../cache/cache-provider.ts';
+import { getCacheProvider, hasCacheProvider } from '../cache/cache-provider.ts';
 import { DEFAULT_QUERY_CACHE_TIME, DEFAULT_QUERY_STALE_TIME } from '../cache/defaults.ts';
 
 /**
@@ -145,7 +145,10 @@ export function createQueryFactory<TContract extends ContractLike>(
 
       return {
         queryKey: [resource, action, { input: props }] as const,
-        queryFn: () => invokeClientProcedure(client, action, props),
+        queryFn: () =>
+          hasCacheProvider()
+            ? actionMethod(props, options)
+            : invokeClientProcedure(client, action, props),
         staleTime: clientStaleTime,
       };
     };
