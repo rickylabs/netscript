@@ -17,7 +17,7 @@ corpus. Canary.7 therefore ships an expected version of canary.7 with corpus pro
 
 1. Commit and explicitly push the verified implementation.
 2. Post acceptance evidence and mark PR ready.
-3. Continue the onboarding lane with #1247 from fresh `origin/main`.
+3. Hand the completed three-PR onboarding lane to the milestone orchestrator.
 
 ## Delivered behavior
 

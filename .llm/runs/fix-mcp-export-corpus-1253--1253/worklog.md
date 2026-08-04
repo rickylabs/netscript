@@ -22,3 +22,7 @@
 ## Lock hygiene
 
 - The inherited `deno.lock` addition for `@netscript/queue@0.0.4` is user-owned and excluded.
+
+## Tracked follow-up
+
+- #1260 tracks the distinct shipped SDK prose corpus gap required by acceptance box 4.
