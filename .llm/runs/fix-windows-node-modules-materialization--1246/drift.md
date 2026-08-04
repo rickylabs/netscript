@@ -12,4 +12,12 @@
 
 ## Open drift
 
-None.
+### Verifier identity source
+
+- **Plan risk note:** derive package identity from the local package's `package.json`.
+- **Actual:** parse the primary Deno `.deno/<encoded-name>@<version>[_peer...]` directory, then
+  require a matching shared-cache version directory.
+- **Reason:** a corrupt materialization may omit `package.json` itself; requiring local metadata
+  would skip the exact package the detector must report. The parser handles scoped names and peer
+  suffixes, while cache existence prevents unmatched directories from counting as verification.
+- **Scope impact:** none; detection is stricter and the fail-closed law is unchanged.

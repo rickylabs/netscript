@@ -8,6 +8,8 @@ import { generateTsConfig } from '../../templates/workspace/tsconfig.ts';
 import { generateNetScriptConfig } from '../../templates/workspace/netscript-config.ts';
 import { generateReadme } from '../../templates/workspace/generate-readme.ts';
 import { generateAspireCliTaskRunner } from '../../templates/workspace/aspire-cli-task.ts';
+import { generateNodeModulesVerifier } from '../../templates/workspace/node-modules-verifier.ts';
+import { generatePackageJson } from '../../templates/workspace/package-json.ts';
 import { generateEditorConfigFiles } from '../../adapters/scaffold/editor-config.ts';
 import { loadRootScaffoldTemplateAssets } from '../../adapters/templates/scaffold-template-assets.ts';
 import { generateAppsettings } from '../../templates/aspire/generate-appsettings.ts';
@@ -100,6 +102,19 @@ export async function scaffoldRoot(
     filesCreated.push(denoJsonPath);
   } else {
     filesSkipped.push(denoJsonPath);
+  }
+
+  const packageJsonPath = join(targetPath, SCAFFOLD_FILES.PACKAGE_JSON);
+  if (
+    await context.scaffolder.writeFile(
+      packageJsonPath,
+      generatePackageJson(),
+      options.force,
+    )
+  ) {
+    filesCreated.push(packageJsonPath);
+  } else {
+    filesSkipped.push(packageJsonPath);
   }
 
   // TypeScript project boundary (Tier 1 — programmatic). Deno continues to
@@ -206,6 +221,24 @@ export async function scaffoldRoot(
     filesSkipped.push(readmePath);
   }
 
+  const netscriptDir = join(targetPath, SCAFFOLD_DIRS.NETSCRIPT);
+  if (!directoriesCreated.includes(netscriptDir)) {
+    await context.scaffolder.createDir(netscriptDir);
+    directoriesCreated.push(netscriptDir);
+  }
+  const verifierPath = join(netscriptDir, SCAFFOLD_FILES.NODE_MODULES_VERIFIER);
+  if (
+    await context.scaffolder.writeFile(
+      verifierPath,
+      generateNodeModulesVerifier(),
+      options.force,
+    )
+  ) {
+    filesCreated.push(verifierPath);
+  } else {
+    filesSkipped.push(verifierPath);
+  }
+
   // 7. appsettings.json (Tier 1 — NetScript infrastructure config)
   //    Always generated at project root — consumed by helpers generator
   //    regardless of C# vs TS AppHost mode.
@@ -214,11 +247,6 @@ export async function scaffoldRoot(
   //    port and the target port, which is what `aspire start --isolated` needs
   //    to place two workspaces on one machine (#952).
   if (!options.noAspire) {
-    const netscriptDir = join(targetPath, SCAFFOLD_DIRS.NETSCRIPT);
-    if (!directoriesCreated.includes(netscriptDir)) {
-      await context.scaffolder.createDir(netscriptDir);
-      directoriesCreated.push(netscriptDir);
-    }
     const aspireCliTaskPath = join(netscriptDir, SCAFFOLD_FILES.ASPIRE_CLI_TASK);
     if (
       await context.scaffolder.writeFile(

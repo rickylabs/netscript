@@ -20,3 +20,28 @@
 - Closest upstream: https://github.com/denoland/deno/issues/35804
 - Direct affected evidence: 2.9.1, 2.9.3 (upstream), 2.9.4 (NetScript incident)
 - Pre-window pin: Deno 2.9.0, already used throughout NetScript CI
+
+## 2026-08-04 — S1 verifier contract and scaffold integration
+
+- Opened draft PR #1264 with the requested labels, milestone, `Refs #1246`, and acceptance-evidence
+  scaffold; posted RESEARCH, PLAN, and D6 composed-waiver phase comments.
+- Linked the independent Deno 2.9.4 evidence to `deno/deno#35804`.
+- Added a generated fail-closed cache-vs-local npm materialization verifier for both Aspire and
+  `--no-aspire` projects.
+- Added root `deps:verify`, wired root and Fresh dev paths to run it before application/Vite startup,
+  and generated a private root `package.json` with `engines.deno: 2.9.0`.
+- Added generated README install/preflight/recovery instructions and upstream link.
+- Added an executable strict-TypeScript regression fixture: incomplete local materialization fails
+  with exact remediation; complete materialization passes.
+
+### Focused gate evidence
+
+- Focused tests: `33 passed (19 steps), 0 failed`.
+- Scoped check: 14 files, 1 batch, 0 occurrences.
+- Scoped lint: 14 files, 1 batch, 0 occurrences.
+- Scoped fmt: 14 files, 1 batch, 0 findings.
+- `quality:scan`: no findings; seven pre-existing allowlisted findings reported.
+- Root `arch:check`: completed with repository-baseline warnings only.
+- Focused `packages/cli` doctrine reporter remains baseline-red (`FAIL=50 WARN=50`) and initially
+  surfaced the generated `Deno.exit` text; implementation changed to thrown failures so this slice
+  adds no new exit-boundary warning. Existing CLI doctrine debt remains unchanged.

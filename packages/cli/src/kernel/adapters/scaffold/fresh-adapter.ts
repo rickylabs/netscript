@@ -135,7 +135,7 @@ export async function normalizeFreshOutput(
 
       // Replace @fresh/init tasks with Vite-based workflow
       config.tasks = {
-        dev: 'deno run -A npm:vite --configLoader native',
+        dev: 'deno task --cwd ../.. deps:verify && deno run -A npm:vite --configLoader native',
         build: 'deno run -A npm:vite build',
         serve: 'deno run -A npm:vite preview',
       };
