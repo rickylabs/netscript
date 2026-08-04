@@ -530,7 +530,7 @@ function databaseRuntimeResources(
   }
 }
 
-const PROBE_SERVICE_HEALTH_SCRIPT = [
+export const PROBE_SERVICE_HEALTH_SCRIPT = [
   'const appHost = Deno.args[0];',
   'const resourceName = Deno.args[1] ?? "users";',
   'const database = Deno.args[2] ?? "postgres";',

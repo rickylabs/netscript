@@ -20,6 +20,7 @@ out</a>.
 
 ## 1. Install the CLI
 
+<!-- quickstart-walk:start -->
 ```bash
 deno install --global --allow-all --name netscript jsr:@netscript/cli{{ releaseSpecifier }}
 ```
@@ -27,12 +28,17 @@ deno install --global --allow-all --name netscript jsr:@netscript/cli{{ releaseS
 ## 2. Scaffold the workspace
 
 ```bash
-netscript init my-app --db postgres --service --yes
+netscript init my-app --db postgres --yes
 ```
 
-The `--service` flag scaffolds the example oRPC service alongside the workspace. `--yes` accepts
-the remaining defaults without prompts, including the `dashboard` app name and shared Redis cache
-used below.
+`--yes` accepts the remaining defaults without prompts, including the `dashboard` app name and
+shared Redis cache used below. Add the example oRPC service as a separate step so the same command
+works when you add the second service to a real workspace:
+
+```bash
+cd my-app
+netscript service add --name users
+```
 
 What lands on disk is the meta-framework as a directory layout:
 
@@ -50,7 +56,7 @@ What lands on disk is the meta-framework as a directory layout:
 **Nothing runs until this step.**
 
 ```bash
-cd my-app/aspire
+cd aspire
 aspire restore   # first run only
 aspire start
 ```
@@ -69,6 +75,21 @@ Continue with <a href="/data-persistence/how-to/database-migration/">Database mi
 you need the database workflow.
 {{ /comp }}
 
+With Postgres healthy, return to the workspace root and run the first migration, generate the
+client, seed the example data, and check every generated workspace:
+
+```bash
+cd ..
+netscript db init --db postgres --name init
+netscript db generate --db postgres
+netscript db seed --db postgres
+deno task check
+```
+<!-- quickstart-walk:end -->
+
+Open the `users` resource from the Aspire dashboard and request its health endpoint. A successful
+response proves the example service is answering, rather than merely reported as a running process.
+
 ## 4. Make your first change
 
 Open `apps/dashboard/routes/(_components)/home-view.tsx`. Find the wrapped introductory sentence
@@ -81,10 +102,10 @@ Fresh view inside a workspace whose service, database, and cache kept running ar
 interesting changes — adding an operation to the contract and watching its types reach this page —
 are the first thing [the Storefront tutorial](/tutorials/storefront/) makes you do.
 
-When you are finished, stop the AppHost from the `aspire/` directory:
+When you are finished, stop the exact AppHost:
 
 ```bash
-aspire stop --apphost ./apphost.mts
+aspire stop --apphost ./aspire/apphost.mts
 ```
 
 ## Where to go next

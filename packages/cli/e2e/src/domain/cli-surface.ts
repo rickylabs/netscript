@@ -11,10 +11,21 @@ export const SCAFFOLD = {
   USERLAND_INSTALL: 'scaffold.userland-install',
 } as const;
 
+/** Documentation-walk suites. */
+export const QUICKSTART = {
+  WALK: 'quickstart.walk',
+} as const;
+
+/** Stable titles for documentation-walk suites. */
+export const QUICKSTART_TITLE = {
+  WALK: 'Published CLI Quickstart walk',
+} as const;
+
 /** Suite ids that require exclusive access to the expensive runtime path. */
 export const EXPENSIVE_RUNTIME_SUITE_IDS = [
   SCAFFOLD.RUNTIME,
   SCAFFOLD.RUNTIME_SQLITE,
+  QUICKSTART.WALK,
 ] as const;
 
 /** Stable titles for built-in suites. */
@@ -140,6 +151,13 @@ export const GATE = {
   CLEANUP_USERLAND_SMOKE_ROOT: 'cleanup.userland-smoke-root',
   CLEANUP_ASPIRE_STOP: 'cleanup.aspire-stop',
   CLEANUP_DOCKER_CREATED_CONTAINERS: 'cleanup.docker-created-containers',
+  QUICKSTART_INSTALL: 'quickstart.1-install-cli',
+  QUICKSTART_INIT: 'quickstart.2-init-workspace',
+  QUICKSTART_SERVICE_ADD: 'quickstart.3-add-service',
+  QUICKSTART_ASPIRE: 'quickstart.4-aspire-restore-start',
+  QUICKSTART_DATABASE: 'quickstart.5-database-workflow',
+  QUICKSTART_CHECK: 'quickstart.6-project-check',
+  QUICKSTART_SERVICE_RESPONSE: 'quickstart.7-service-response',
 } as const;
 
 /** Generated Aspire resource ids waited on by the scaffold plugin suite. */
@@ -164,7 +182,8 @@ export type ScaffoldSuiteId = typeof SCAFFOLD[keyof typeof SCAFFOLD];
 /** Built-in suites that require exclusive access to the expensive runtime path. */
 export type ExpensiveRuntimeSuiteId = typeof EXPENSIVE_RUNTIME_SUITE_IDS[number];
 export type DeploySuiteId = typeof DEPLOY[keyof typeof DEPLOY];
-export type SuiteId = ScaffoldSuiteId | DeploySuiteId;
+export type QuickstartSuiteId = typeof QUICKSTART[keyof typeof QUICKSTART];
+export type SuiteId = ScaffoldSuiteId | DeploySuiteId | QuickstartSuiteId;
 export type GatePhase = typeof GATE_PHASE[keyof typeof GATE_PHASE];
 export type StaticGateId = typeof GATE[keyof typeof GATE];
 export type AspireResource = typeof ASPIRE_RESOURCE[keyof typeof ASPIRE_RESOURCE];
