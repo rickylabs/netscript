@@ -405,6 +405,43 @@ Both are logged as follow-ups at Close rather than silently dropped.
 
 ## Gate Results
 
+### S5 Docker-less Cleanup
+
+`DockerCliResourceCleaner` now treats Docker discovery as an optional cleanup capability. Its
+private list path catches `Deno.errors.NotFound` from a missing executable and converts a non-zero
+`docker ps` result into the same empty container set. Both paths emit a visible warning through a
+small injected writer whose production default writes directly to `Deno.stderr`; this mirrors the
+existing reporter output seam without adding a reporter dependency or using `console.warn`.
+
+The tolerance ends at discovery. `docker rm -f` still runs for every container absent from the
+snapshot, and a non-zero removal result still throws with the container id and stderr. The
+`DockerResourceCleaner` port is unchanged. The runner call site is also unchanged by design: a
+runner-level regression uses `cleanup: true` and the real adapter configured to raise `NotFound` on
+both list calls, then proves the runner returns an `ok` report with no steps rather than leaking the
+raw exception.
+
+| Gate       | Command                                                                                           | Raw result                                                                 |
+| ---------- | ------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| E2E tests  | `deno test --no-lock -A packages/cli/e2e/`                                                        | exit 0; 110 passed, 0 failed                                               |
+| type-check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/cli --ext ts,tsx` | exit 0; 787 files, 7 batches, 0 failed batches, 0 findings                 |
+| lint       | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/cli --ext ts,tsx`  | exit 0; 787 files, 4 batches, 0 findings                                   |
+| format     | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/cli --ext ts,tsx`   | exit 0; 787 files, 4 batches, 0 failed batches, 0 findings                 |
+| quality    | `deno task quality:scan`                                                                          | exit 0; `ok: true`, 0 findings, 7 pre-existing allowances                  |
+| doctrine   | `deno task arch:check`                                                                            | exit 0; existing out-of-scope dependency/doctrine warnings only           |
+
+**Focused assertions.** Adapter tests cover missing-binary `NotFound`, non-zero `docker ps`, an
+unchanged snapshot returning `[]` without invoking removal, and a created container whose failed
+`docker rm -f` still rejects. The runner regression observes two warnings — snapshot and prune — so
+both formerly intolerant list calls are exercised through the `cleanup: true` call path.
+
+**Post-slice reconcile note.** Issue #1158 and PR #1220 remain open at `status:impl`, assigned to
+milestone 23; the PR retains `Closes #1158` for the full seven-slice outcome and its taxonomy. The
+latest PR comment is the Tier-A S4/S4a sign-off explicitly authorizing S5, and there are no review
+threads or newer findings. S5 touches no `.github/**`, live runtime, `packages/cli/src/**`, port
+contract, labels, or milestone. No plan/doctrine divergence occurred, so `drift.md` is unchanged.
+This lane hands off one implementation commit and does not review, self-certify, dispatch a
+reviewer, author a sign-off, or start S6.
+
 ### S4a Lease-Contention Correction
 
 `EXPENSIVE_RUNTIME_SUITE_IDS` is the single finite vocabulary for suites that share the expensive
@@ -556,6 +593,7 @@ has not started.
 - No product code exists at PLAN-EVAL time. Implementation begins only on `PASS`.
 - S1 and S2 are signed off. S3 implementation is complete with green automated gates but is **not
   self-certified**. Tier-A review subsequently signed off S3. S4 is implementation-complete with
-  green automated gates but is **not self-certified**. Tier-A must review the additive constants,
-  environment precedence, generic-run drift D-10, and wait/resource matrix before sign-off; do not
-  start S5 from this handoff.
+  green automated gates and Tier-A subsequently signed off S4/S4a. S5 is implementation-complete
+  with all six requested gates green but is **not self-certified**. Tier-A must review the adapter
+  tolerance boundary, warning seam, strict removal behavior, and runner regression before sign-off;
+  do not start S6 from this handoff.

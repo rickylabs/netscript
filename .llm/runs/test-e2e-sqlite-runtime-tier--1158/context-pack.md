@@ -6,7 +6,7 @@
 | -------------- | ---------------------------------------------- |
 | Run ID         | `test-e2e-sqlite-runtime-tier--1158`           |
 | Branch         | `test/e2e-sqlite-runtime-tier-1158`            |
-| Current phase  | `implement` — S4a correction complete; handoff |
+| Current phase  | `implement` — S5 complete; review handoff      |
 | Archetype      | `6 - CLI / Tooling`                            |
 | Scope overlays | `service`                                      |
 
@@ -48,6 +48,14 @@ prove postgres-held→sqlite and sqlite-held→postgres contention both raise
 `suite-lease.ts` remains unchanged because its `isSuiteId` parser already accepts every `SCAFFOLD`
 value. The built-in suites table now discovers the container-free sqlite tier.
 
+S5 makes Docker resource discovery tolerant without weakening resource removal. The adapter's
+private list path turns a missing Docker executable (`Deno.errors.NotFound`) or non-zero
+`docker ps` into an empty container set and emits a warning through an injected writer that defaults
+to direct `Deno.stderr` output. The port contract and suite runner stay unchanged. Adapter tests
+cover both discovery failures, a no-new-container prune, and strict failed removal; a runner test
+uses `cleanup: true` with the real adapter raising `NotFound` on snapshot and prune and returns an
+`ok` report.
+
 ## Completed
 
 - Skills activated: `netscript-harness`, `netscript-doctrine` (archetype + verdict),
@@ -78,16 +86,20 @@ value. The built-in suites table now discovers the container-free sqlite tier.
 - S4a lease correction completed with bidirectional runtime-tier contention coverage and the cheap
   suite negative control. All six requested gates passed: 105 E2E tests, scoped check/lint/fmt,
   `quality:scan`, and `arch:check`; `e2e:cli suites` listed both runtime tiers.
+- S5 implementation completed with both Docker discovery failures tolerated, direct-stderr warning
+  visibility, no-container pruning, strict failed-removal preservation, and runner-level
+  `cleanup: true` coverage. All six requested gates passed: 110 E2E tests; 787-file scoped
+  check/lint/fmt scans; `quality:scan`; and `arch:check`.
 
 ## In Progress
 
-- **S4a is ready for its one-commit implementation handoff.** This lane does not review,
+- **S5 is ready for its one-commit implementation handoff.** This lane does not review,
   self-certify, dispatch a reviewer, or author a sign-off commit.
 
 ## Next Steps
 
-1. Supervisor resumes from the S4a commit and PR evidence under the owner-defined review boundary.
-2. **Stop before S5.** S5 remains separately planned; do not start it from this handoff.
+1. Supervisor reviews the S5 commit and PR evidence under the owner-defined review boundary.
+2. **Stop before S6.** S6 remains separately planned; do not start it from this handoff.
 3. Later gate phase: scoped wrappers + `quality:scan` + `arch:check` + `publish:dry-run`, then the
    postgres `scaffold.runtime` regression run.
 4. IMPL-EVAL in a third session.
@@ -106,27 +118,26 @@ value. The built-in suites table now discovers the container-free sqlite tier.
 | `D6` merge-readiness stays postgres                                                  | issue #1158 constraints                              | No change to `full-command.ts`.                              |
 | `D8` Docker cleanup tolerant on both failure paths                                   | code — `docker-resource-cleaner.ts:9-43`             | Missing binary **and** non-zero `docker ps`.                 |
 
-## S4a Files Changed
+## S5 Files Changed
 
-| Path                                                                           | Notes                                                                 |
-| ------------------------------------------------------------------------------ | --------------------------------------------------------------------- |
-| `.llm/runs/test-e2e-sqlite-runtime-tier--1158/{worklog,context-pack,drift}.md` | S4a evidence, handoff state, supervisor D-12, and defect drift D-13.  |
-| `packages/cli/e2e/src/domain/cli-surface.ts`                                   | Shared expensive-runtime tuple and derived union.                     |
-| `packages/cli/e2e/src/application/runner/suite-runner.ts`                      | Lease acquisition by shared-set membership.                           |
-| `packages/cli/e2e/tests/application/runner/suite-runner_test.ts`               | Bidirectional contention plus retained cheap-suite coverage.          |
-| `packages/cli/e2e/README.md`                                                   | Discoverable container-free sqlite tier in the built-in suites table. |
+| Path                                                                                  | Notes                                                                                   |
+| ------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| `.llm/runs/test-e2e-sqlite-runtime-tier--1158/{worklog,context-pack}.md`              | S5 evidence and review handoff; no drift divergence.                                    |
+| `packages/cli/e2e/src/adapters/commands/docker-resource-cleaner.ts`                   | Tolerant list boundary, direct-stderr warning seam, strict removal retained.            |
+| `packages/cli/e2e/tests/adapters/commands/docker-resource-cleaner_test.ts`            | Both discovery failures, empty delta, and strict removal regressions.                   |
+| `packages/cli/e2e/tests/application/runner/suite-runner_test.ts`                      | `cleanup: true` completes when both Docker list calls raise `NotFound`.                 |
 
-No `suite-lease.ts`, `packages/cli/src/**`, `.github/**`, cleanup adapter/call site, live runtime,
+No runner implementation, port contract, `packages/cli/src/**`, `.github/**`, live runtime,
 product cache default, or embedded-template file was touched.
 
 ## Gates
 
 | Gate family | Current status | Evidence                                          |
 | ----------- | -------------- | ------------------------------------------------- |
-| Static      | `PASS`         | S4a scoped check/lint/fmt: 786 files, 0 findings. |
-| Fitness     | `PASS`         | S4a `quality:scan` and `arch:check` exited 0.     |
+| Static      | `PASS`         | S5 scoped check/lint/fmt: 787 files, 0 findings. |
+| Fitness     | `PASS`         | S5 `quality:scan` and `arch:check` exited 0.     |
 | Runtime     | `NOT_RUN`      | S7 is the first live sqlite run.                  |
-| Consumer    | `PASS`         | S4a: 105 E2E tests; bidirectional contention.     |
+| Consumer    | `PASS`         | S5: 110 E2E tests; tolerant discovery + strict removal. |
 
 ## Open Questions
 

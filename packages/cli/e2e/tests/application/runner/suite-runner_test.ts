@@ -13,6 +13,7 @@ import type { HttpClient, HttpRequest, HttpResult } from '../../../src/ports/htt
 import type { Reporter } from '../../../src/ports/reporter.ts';
 import type { PlatformPort } from '../../../src/ports/platform.ts';
 import { createSuiteRunner } from '../../../src/application/runner/suite-runner.ts';
+import { DockerCliResourceCleaner } from '../../../src/adapters/commands/docker-resource-cleaner.ts';
 import {
   type SuiteLease,
   SuiteLeaseContentionError,
@@ -117,6 +118,39 @@ Deno.test('suite runner skips cleanup phase when cleanup is disabled', async () 
   assertEquals(report.ok, true);
   assertEquals(cleaner.snapshots, 0);
   assertEquals(commands.some((request) => request.command.includes('stop')), false);
+});
+
+Deno.test('suite runner completes cleanup with a Docker-less cleaner', async () => {
+  const warnings: string[] = [];
+  const cleaner = new DockerCliResourceCleaner(
+    () => Promise.reject(new Deno.errors.NotFound('docker')),
+    (warning) => {
+      warnings.push(warning);
+      return Promise.resolve();
+    },
+  );
+  const runtimeSuite = createScaffoldRuntimeSuite({
+    repoRoot: '.',
+    projectName: 'runner-docker-less-cleanup-test',
+    cleanup: true,
+    format: 'json',
+  });
+  const suite = { ...runtimeSuite, gates: [] };
+  const options = { ...suite.defaultOptions, cleanup: true };
+
+  const report = await createSuiteRunner({
+    clock: new FakeClock(),
+    commandExecutor: new SuccessfulCommandExecutor(),
+    httpClient: new FakeHttpClient(),
+    dockerCleaner: cleaner,
+    reporter: new NullReporter(),
+    platform: new FakePlatform(),
+    suiteLeaseManager: new RecordingSuiteLeaseManager(),
+  }).run(suite, { suiteId: suite.id, options });
+
+  assertEquals(report.ok, true);
+  assertEquals(report.steps, []);
+  assertEquals(warnings.length, 2);
 });
 
 Deno.test('suite runner cleans up after a targeted non-cleanup gate when cleanup is enabled', async () => {
