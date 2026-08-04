@@ -2,13 +2,13 @@
 
 ## Run Metadata
 
-| Field          | Value                                     |
-| -------------- | ----------------------------------------- |
-| Run ID         | `test-e2e-sqlite-runtime-tier--1158`      |
-| Branch         | `test/e2e-sqlite-runtime-tier-1158`       |
+| Field          | Value                                      |
+| -------------- | ------------------------------------------ |
+| Run ID         | `test-e2e-sqlite-runtime-tier--1158`       |
+| Branch         | `test/e2e-sqlite-runtime-tier-1158`        |
 | Current phase  | `implement` — S6a complete; review handoff |
-| Archetype      | `6 - CLI / Tooling`                       |
-| Scope overlays | `service`                                 |
+| Archetype      | `6 - CLI / Tooling`                        |
+| Scope overlays | `service`                                  |
 
 ## Current State
 
@@ -70,8 +70,8 @@ S6a closes the adversarial diagnostics/test gap without changing that boolean. E
 branch now contributes an explicit reason: skipped by `ci:skip-e2e`, skipped because the static
 signal is off (including `ci:skip-scaffold`), forced by `ci:full`, or selected by the scaffold
 signal. Workflow-source coverage pins non-PR `ci:skip-scaffold`, lane visibility, concurrency and
-artifact distinctness, auxiliary report globs, and the suite id exported from `cli-surface.ts`.
-The workflow and classifier prose now state the derived `ci:skip-scaffold` effect, and only the two
+artifact distinctness, auxiliary report globs, and the suite id exported from `cli-surface.ts`. The
+workflow and classifier prose now state the derived `ci:skip-scaffold` effect, and only the two
 stale label descriptions changed; the frozen label set remains exactly three.
 
 ## Completed
@@ -145,12 +145,12 @@ stale label descriptions changed; the frozen label set remains exactly three.
 
 ## S6 Files Changed
 
-| Path                                                                     | Notes                                                                     |
-| ------------------------------------------------------------------------ | ------------------------------------------------------------------------- |
-| `.llm/runs/test-e2e-sqlite-runtime-tier--1158/{worklog,context-pack}.md` | S6 evidence and review handoff; no drift divergence.                      |
-| `.github/scripts/ci-classify-changes.ts`                                 | `run_runtime_sqlite` decision, output, log, and fail-closed default.      |
+| Path                                                                     | Notes                                                                    |
+| ------------------------------------------------------------------------ | ------------------------------------------------------------------------ |
+| `.llm/runs/test-e2e-sqlite-runtime-tier--1158/{worklog,context-pack}.md` | S6 evidence and review handoff; no drift divergence.                     |
+| `.github/scripts/ci-classify-changes.ts`                                 | `run_runtime_sqlite` decision, output, log, and fail-closed default.     |
 | `.github/scripts/ci-classify-changes.test.ts`                            | Policy matrix plus workflow guard/output assertions.                     |
-| `.github/workflows/e2e-cli.yml`                                         | New runtime job, independent concurrency, and lane-visibility reporting. |
+| `.github/workflows/e2e-cli.yml`                                          | New runtime job, independent concurrency, and lane-visibility reporting. |
 | `.github/labels.yml`                                                     | Description-only corrections for `ci:full` and `ci:skip-e2e`.            |
 
 No label was added, renamed, or removed. No draft guard, postgres runtime job, `packages/**`,
@@ -161,7 +161,7 @@ No label was added, renamed, or removed. No draft guard, postgres runtime job, `
 | Gate family | Current status | Evidence                                                        |
 | ----------- | -------------- | --------------------------------------------------------------- |
 | Static      | `PASS`         | 56 tests; scoped check/lint/fmt over 3 `.github` TS files.      |
-| YAML        | `PASS`         | `@std/yaml` parsed `.github/workflows/e2e-cli.yml`.              |
+| YAML        | `PASS`         | `@std/yaml` parsed `.github/workflows/e2e-cli.yml`.             |
 | Fitness     | `N/A`          | No `packages/**` or `plugins/**`; quality/architecture omitted. |
 | Runtime     | `NOT_RUN`      | Forbidden for S6; S7 is the first live sqlite run.              |
 | Consumer    | `PASS`         | Classifier matrix and workflow fail-closed source assertions.   |

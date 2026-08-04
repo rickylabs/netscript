@@ -434,6 +434,65 @@ this slice exists to prevent.
 
 **Verdict: ACCEPTED.** Proceed to S6.
 
+## Slice Review — S6 + S6a (Tier-A, supervisor)
+
+Reviewed at `fafbe2b1` (S6) and `6728529f` (S6a). Because **draft PRs run no CI** (#1212), this
+slice cannot be validated by observation before merge — a wrong boolean would ship silently. It
+therefore received the supervisor's review **plus** a supervisor-dispatched Opus 5 adversarial
+sub-agent (drift D-9 step 2) briefed to refute.
+
+**Reproduced gate results (supervisor-run)**
+
+| Gate                                        | Verdict                                                                          |
+| ------------------------------------------- | -------------------------------------------------------------------------------- |
+| `deno test --no-lock -A .github/scripts/`   | 56 passed, 0 failed                                                              |
+| `run-deno-check.ts --root .github --ext ts` | 0 findings                                                                       |
+| `run-deno-lint.ts --root .github --ext ts`  | 0 findings                                                                       |
+| `quality:scan` / `arch:check`               | **N/A** — no `packages/**` or `plugins/**` change (stated, not silently skipped) |
+
+**Adversarial verdict on S6: ACCEPT-WITH-FINDING — no shipping defect.** It executed `decide()`
+across the full matrix rather than reading the diff narrative, and byte-diffed the preserved job:
+
+| Checked                                                                                                                                              | Result                                                                                                                                                                                                                                                                               |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `run_runtime_sqlite` in every branch (`ci:full`, both skips, docs-only, empty diff, unrecognised path, non-PR, `diff_unavailable`, classify-failure) | **SAFE** — matches E5 in all cases; no case runs when it should skip or skips when it should run                                                                                                                                                                                     |
+| `ci:skip-e2e` skips **both** tiers                                                                                                                   | **SAFE** — classifier and workflow `RUN` expression                                                                                                                                                                                                                                  |
+| New job vs `scaffold-runtime`                                                                                                                        | **SAFE** — identical `if:`, fail-closed `RUN`, **all 10 steps guarded**, `printf`-quoted `$SKIP_REASON` (no injection), distinct concurrency group, distinct artifact name, correct suite id, `NETSCRIPT_CACHE_MODE: Executable` verified against `shouldUseContainerCache()` casing |
+| Preservation                                                                                                                                         | **SAFE** — `scaffold-runtime` **byte-identical**; #1212 draft guards intact; `lane-visibility` wired in `needs:`, env, and table; `labels.yml` structurally untouched                                                                                                                |
+
+**The finding it did surface was real and operator-facing, and S6a fixes it.** The classifier gained
+an _output_ but no _reason clause_: under `ci:skip-scaffold` the sqlite job's skip notice printed a
+reason whose only runtime clause affirmatively said a runtime tier **was** running, with no
+explanation for the sqlite skip. Since drafts run no CI, that notice is the first and only
+diagnostic on the first live run.
+
+**Verified the fix empirically** by calling `decide()` directly:
+
+```
+ci:skip-scaffold  sqlite=false  … scaffold-runtime-sqlite skipped: scaffold-static signal is off …
+ci:skip-e2e       sqlite=false  … scaffold-runtime-sqlite skipped by ci:skip-e2e …
+ci:full           sqlite=true   … scaffold-runtime-sqlite forced by ci:full
+(none)            sqlite=true   … scaffold-runtime-sqlite: scaffold-static signal is on …
+```
+
+**Also in S6a**
+
+- `labels.yml`: **`description:` text only** — `ci:skip-e2e` now says it skips both tiers, `ci:full`
+  says "all". No label added, renamed, or removed; the frozen three stay three (verified by diff).
+- `ci:skip-scaffold` prose corrected in both the classifier header and the workflow: because
+  `run_runtime_sqlite` derives from `run_static`, it also drops the sqlite tier. E5-conformant and
+  now stated rather than left to be re-derived.
+- Four test holes closed, each of which the review proved was a mutation that left all 54 tests
+  green: the `!skipScaffold` conjunct on the non-PR path, `lane-visibility`'s `needs:`/table row,
+  concurrency-group and artifact-name distinctness (R-8), and the workflow's suite-id string — now
+  asserted against the constant exported from `cli-surface.ts` rather than a duplicated literal, so
+  a typo is a test failure instead of a runtime-only failure nobody sees until merge.
+- Artifact collection aligned with the postgres job's JSON/NDJSON globs.
+
+**Findings: none outstanding.**
+
+**Verdict: ACCEPTED.** Proceed to S7 — the live run.
+
 ## Decisions
 
 | Decision                                                | Reason                                                                                    | Source                                               |
@@ -646,21 +705,21 @@ false, so the derived sqlite result is explicitly false. Docs-only changes are f
 scaffold-impacting changes are true, and conservative unrecognised/empty-diff decisions are true.
 
 `scaffold-runtime-sqlite` copies the existing runtime job's applicability, failed-classifier,
-skipped-by-policy, toolchain setup, Aspire preflight, failed-report evidence, and artifact structure.
-It keys `RUN` on the new output, sets `NETSCRIPT_CACHE_MODE=Executable` at job scope, invokes
-`scaffold.runtime.sqlite --cleanup` with a distinct report path/artifact name, and uses
+skipped-by-policy, toolchain setup, Aspire preflight, failed-report evidence, and artifact
+structure. It keys `RUN` on the new output, sets `NETSCRIPT_CACHE_MODE=Executable` at job scope,
+invokes `scaffold.runtime.sqlite --cleanup` with a distinct report path/artifact name, and uses
 `e2e-scaffold-runtime-sqlite-global` so it never queues behind postgres. The 40-minute timeout is 20
 minutes below postgres while retaining headroom for Deno install, .NET/Aspire setup, Garnet tool
 restore, and the full behavior suite. `lane-visibility` now needs and renders the sqlite job. The
 existing draft guards, `scaffold-runtime` job, and `.github/labels.yml` are unchanged.
 
-| Gate       | Command                                                                                         | Raw result                                    |
-| ---------- | ----------------------------------------------------------------------------------------------- | --------------------------------------------- |
-| classifier | `deno test --no-lock -A .github/scripts/`                                                       | exit 0; 54 passed, 0 failed                   |
-| type-check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root .github --ext ts`        | exit 0; 3 files, 1 batch, 0 findings          |
-| lint       | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root .github --ext ts`         | exit 0; 3 files, 1 batch, 0 findings          |
-| format     | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root .github --ext ts`          | exit 0; 3 files, 1 batch, 0 findings          |
-| YAML       | `deno eval --no-lock` with `jsr:@std/yaml@^1.0.0` over `.github/workflows/e2e-cli.yml`          | exit 0; parsed to a mapping                   |
+| Gate       | Command                                                                                  | Raw result                           |
+| ---------- | ---------------------------------------------------------------------------------------- | ------------------------------------ |
+| classifier | `deno test --no-lock -A .github/scripts/`                                                | exit 0; 54 passed, 0 failed          |
+| type-check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root .github --ext ts` | exit 0; 3 files, 1 batch, 0 findings |
+| lint       | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root .github --ext ts`  | exit 0; 3 files, 1 batch, 0 findings |
+| format     | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root .github --ext ts`   | exit 0; 3 files, 1 batch, 0 findings |
+| YAML       | `deno eval --no-lock` with `jsr:@std/yaml@^1.0.0` over `.github/workflows/e2e-cli.yml`   | exit 0; parsed to a mapping          |
 
 The first lint iteration found two `no-regex-spaces` findings in the new workflow-source test. The
 test now uses a line-based job extractor; the complete final matrix above was rerun and passed.
@@ -671,9 +730,9 @@ sqlite execution.
 **Post-slice reconcile note.** Issue #1158 and draft PR #1220 remain open at `status:impl` and
 milestone 23; the PR retains `Closes #1158`. The latest PR comment is the Tier-A S5 sign-off that
 explicitly authorizes S6, and there are no review threads. No labels or milestone require a change.
-S6 matches locked decision E5 and risks R-6/R-7/R-8 without plan/doctrine divergence, so
-`drift.md` is unchanged. This implementation lane hands off one commit and does not review,
-self-certify, dispatch a reviewer, author a sign-off, or start S7.
+S6 matches locked decision E5 and risks R-6/R-7/R-8 without plan/doctrine divergence, so `drift.md`
+is unchanged. This implementation lane hands off one commit and does not review, self-certify,
+dispatch a reviewer, author a sign-off, or start S7.
 
 ### S6a Adversarial Diagnostics Follow-up
 
@@ -683,8 +742,8 @@ states whether `ci:skip-e2e` skipped the tier, the `scaffold-static` signal is o
 `runRuntimeSqlite = runStatic && !skipE2e` policy is unchanged. Non-PR coverage now pins the
 `!skipScaffold` conjunct that was previously mutation-survivable.
 
-The workflow-source test now pins the sqlite job's `lane-visibility` dependency and summary row,
-its concurrency group, its distinct artifact name, and its report globs. It reads the exported
+The workflow-source test now pins the sqlite job's `lane-visibility` dependency and summary row, its
+concurrency group, its distinct artifact name, and its report globs. It reads the exported
 `RUNTIME_SQLITE` value from `packages/cli/e2e/src/domain/cli-surface.ts` and asserts the workflow
 invocation against that value, so the test contains no duplicate suite-id literal and no
 `packages/**` edit. The sqlite artifact upload now uses the postgres sibling's three report globs,
@@ -694,20 +753,20 @@ Only the requested policy prose changed: `ci:skip-scaffold` now plainly document
 sqlite tier also drops, and the two stale `ci:*` label descriptions now describe all expensive jobs
 and both runtime tiers. The frozen label names/count remain unchanged.
 
-| Gate       | Command                                                                                         | Raw result                                    |
-| ---------- | ----------------------------------------------------------------------------------------------- | --------------------------------------------- |
-| classifier | `deno test --no-lock -A .github/scripts/`                                                       | exit 0; 56 passed, 0 failed                   |
-| type-check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root .github --ext ts`        | exit 0; 3 files, 1 batch, 0 findings          |
-| lint       | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root .github --ext ts`         | exit 0; 3 files, 1 batch, 0 findings          |
-| format     | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root .github --ext ts`          | exit 0; 3 files, 1 batch, 0 findings          |
-| YAML       | `deno eval --no-lock` with `jsr:@std/yaml@^1.0.0` over `.github/workflows/e2e-cli.yml`          | exit 0; parsed to a mapping                   |
+| Gate       | Command                                                                                  | Raw result                           |
+| ---------- | ---------------------------------------------------------------------------------------- | ------------------------------------ |
+| classifier | `deno test --no-lock -A .github/scripts/`                                                | exit 0; 56 passed, 0 failed          |
+| type-check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root .github --ext ts` | exit 0; 3 files, 1 batch, 0 findings |
+| lint       | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root .github --ext ts`  | exit 0; 3 files, 1 batch, 0 findings |
+| format     | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root .github --ext ts`   | exit 0; 3 files, 1 batch, 0 findings |
+| YAML       | `deno eval --no-lock` with `jsr:@std/yaml@^1.0.0` over `.github/workflows/e2e-cli.yml`   | exit 0; parsed to a mapping          |
 
 `quality:scan` and `arch:check` are **N/A** because S6a changes no `packages/**` or `plugins/**`
 source. The package file is read-only test input. No live runtime gate was run; S7 still owns the
 first sqlite execution.
 
-**Post-slice reconcile note.** S6a is the owner-requested remediation for issue #1158 / PR #1220.
-It stays inside E5 and risks R-6/R-8, changes no labels or milestone state, and introduces no plan,
+**Post-slice reconcile note.** S6a is the owner-requested remediation for issue #1158 / PR #1220. It
+stays inside E5 and risks R-6/R-8, changes no labels or milestone state, and introduces no plan,
 doctrine, or scope divergence; `drift.md` is unchanged. This implementation lane will push one
 commit, post its evidence comment, and stop without review or sign-off.
 
@@ -719,7 +778,7 @@ commit, post its evidence comment, and stop without review or sign-off.
   executable arm under `NETSCRIPT_CACHE_MODE=Executable` on CI, and (b) that S1's permission change
   leaves every non-sqlite scaffold byte-identical.
 - No product code exists at PLAN-EVAL time. Implementation begins only on `PASS`.
-- S1–S5 are signed off. S6 + S6a are implementation-complete with green automated gates but are **not
-  self-certified**. Tier-A must review the classifier conjunction, workflow fail-closed guards,
-  reason clauses, artifact collection, independent concurrency, and lane visibility before sign-off;
-  do not start S7 from this handoff.
+- S1–S5 are signed off. S6 + S6a are implementation-complete with green automated gates but are
+  **not self-certified**. Tier-A must review the classifier conjunction, workflow fail-closed
+  guards, reason clauses, artifact collection, independent concurrency, and lane visibility before
+  sign-off; do not start S7 from this handoff.
