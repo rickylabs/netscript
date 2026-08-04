@@ -2,6 +2,13 @@
 
 export type { FileWatcherHandle, FileWatcherPort } from './file-watcher-port.ts';
 export type { TriggerClockPort } from './trigger-clock-port.ts';
+export type {
+  TriggerDeferRecord,
+  TriggerDeferReplayResult,
+  TriggerDeferRunOptions,
+  TriggerDeferScheduleInput,
+  TriggerDeferSchedulerPort,
+} from './trigger-defer-scheduler-port.ts';
 export type { TriggerDlqEntry, TriggerDlqListOptions, TriggerDlqPort } from './trigger-dlq-port.ts';
 export type { TriggerEventListOptions, TriggerEventStorePort } from './trigger-event-store-port.ts';
 export type {

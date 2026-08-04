@@ -332,27 +332,21 @@ export default nightlyReconcile;
 
 Every trigger handler returns **actions** — declarative descriptions of what should
 happen after the event is accepted. The runtime processor reads each action and
-dispatches it. Exactly one action is wired end-to-end today; a second is *defined in the
-type surface* but not executable, and it now **fails loud** rather than silently dropping.
+dispatches it. Both action variants are wired end-to-end: jobs enqueue immediately, while deferred
+events are persisted and replayed once their due time arrives.
 
 {{ comp.apiTable({
   caption: "Trigger actions — what the runtime processor actually does",
   rows: [
     { name: "enqueueJob(job, opts)", type: "✅ live", desc: "Hands the payload to the workers plugin. The supported, end-to-end path — it closes the continuous-app loop (event → job → saga). opts: { payload?, idempotencyKey?, concurrencyKey?, priority? }." },
-    { name: "defer(...)", type: "⛔ unsupported", desc: "Defined in the action union (DeferAction) but NOT executable. The processor throws an unsupportedOperation error and routes the message to the dead-letter queue (DLQ). There is no deferred replay — do not author a trigger that relies on defer." }
+    { name: "defer({ until })", type: "✅ live", desc: "Persists the processed event for one-shot replay at or after the ISO timestamp. Pending records survive runtime restarts; successful replay removes the record." }
   ]
 }) }}
 
-{{ comp callout { type: "warning", title: "defer is defined-but-unsupported — it fails loud" } }}
-The <code>defer</code> action exists in the trigger action union, but the runtime processor does
-<strong>not</strong> implement deferred replay. When a handler emits a <code>defer</code> action, the
-processor throws an <code>unsupportedOperation</code> error and routes the message to the
-<strong>dead-letter queue (DLQ)</strong> — it does not silently swallow it. Build ingress flows on
-<code>enqueueJob</code> only; if you need delayed work, schedule it on the
-<a href="/background-processing/workers/">workers</a> plugin from the enqueued job, or use a
-<code>defineScheduledTrigger</code> cron rather than deferring at the trigger edge.
-<!-- caveat: arch-debt:triggers-defer-unsupported -->
-{{ /comp }}
+Deferred replay is durable and at-least-once. The runtime persists the event before reporting
+<code>deferred</code>, resolves its current trigger definition after restart, and deletes the record
+only after successful replay. Keep handlers idempotent because a crash after dispatch but before
+record deletion can replay the event again.
 
 ## Runtime — ingress, processor, retry
 
@@ -459,9 +453,9 @@ stable field) to <code>enqueueJob</code> so a retried POST collapses to one job.
 <li><strong>File watches need stability on network shares.</strong> Set
 <code>stabilityThreshold</code> so a half-written CSV does not fire mid-copy; use
 <code>forcePolling</code> on the underlying watcher for network filesystems that miss native events.</li>
-<li><strong>Do not reach for <code>defer</code>.</strong> It is defined-but-unsupported, throws, and
-routes to the DLQ. Schedule delayed work from the enqueued workers job, or use a
-<code>defineScheduledTrigger</code> instead.</li>
+<li><strong>Use <code>defer</code> for one-shot event replay, not recurring schedules.</strong> The
+record survives restart and re-runs the handler at or after <code>until</code>; use a
+<code>defineScheduledTrigger</code> cron for recurring work.</li>
 </ul>
 {{ /comp }}
 

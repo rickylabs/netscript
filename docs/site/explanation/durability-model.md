@@ -288,8 +288,8 @@ Step by step, in the real code:
 1. **A trigger turns an inbound webhook into a job.** The triggers plugin exposes raw Hono routes
    (not oRPC). The webhook handler returns an array of `enqueueJob(jobRef, { payload, priority })`
    effects, so a `POST` to `:8093/api/v1/webhooks/inbound/generic` enqueues a worker job — the
-   *ingress* of the durable flow. (`enqueueJob` is the one live trigger action; the `defer` action is
-   defined but unsupported — it throws and routes to the DLQ, so do not build on deferred replay.)
+   *ingress* of the durable flow. A handler can also return `defer({ until })`; the runtime persists
+   the event and replays it once at or after that timestamp, including after a process restart.
    See {{ comp.xref({ key: "cap:triggers" }) }}.
 2. **A worker job publishes the saga message.** The workers plugin's `create-user-settings` sample is
    an ordinary `defineJobHandler(async (ctx) => ...)` that, on success, **publishes the
@@ -352,15 +352,12 @@ The durability story is real but young, and a few edges are worth naming so you 
 
 - **Reserved builder hooks.** `.onSignal(...)` and `.onQuery(...)` compile and register, but their
   runtime dispatch is explicitly deferred. Treat them as forward-declared surface, not live features.
-- **Trigger `defer` is unsupported.** The `defer` trigger action throws and routes to the DLQ — only
-  `enqueueJob` is a live ingress for durable flows today.
 - **Two stores, same port, different operational maturity.** `kv` is the path the scaffold and tests
   exercise most; `prisma` is real and tested but assumes you bring and manage the Postgres + Prisma
   client yourself.
 
 None of these undermine the core guarantee — a built `defineSaga(...)` survives restarts on either
 store — but they shape what you should and should not design around right now.
-<!-- caveat: arch-debt:triggers-defer-unsupported -->
 
 ## Why the model looks like this — the design trade-offs
 

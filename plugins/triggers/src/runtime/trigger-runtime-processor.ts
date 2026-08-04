@@ -4,10 +4,14 @@ import type {
   EnqueueJobAction,
   TriggerActionResult,
   TriggerEvent,
+  TriggerEventId,
 } from '@netscript/plugin-triggers-core/domain';
 import { TriggersError } from '@netscript/plugin-triggers-core/domain';
 import type {
   ProcessableTriggerDefinition,
+  TriggerClockPort,
+  TriggerDeferRecord,
+  TriggerDeferSchedulerPort,
   TriggerDlqPort,
   TriggerEnabledStatePort,
   TriggerEventSubscriptionPort,
@@ -18,6 +22,7 @@ import type {
 } from '@netscript/plugin-triggers-core/ports';
 import { createTriggerProcessor } from '@netscript/plugin-triggers-core/runtime';
 import {
+  KvTriggerDeferScheduler,
   KvTriggerDlqStore,
   KvTriggerIdempotencyStore,
   openTriggerRuntimeKv,
@@ -52,6 +57,9 @@ export type RuntimeTriggerProcessorOptions = Readonly<{
   jobQueue?: ReturnType<typeof createQueue<JobMessage>>;
   eventSubscription?: TriggerEventSubscriptionPort;
   enabledState?: TriggerEnabledStatePort;
+  deferScheduler?: TriggerDeferSchedulerPort;
+  definitions?: readonly ProcessableTriggerDefinition[];
+  clock?: TriggerClockPort;
   /** Tracer override; defaults to the shared trigger-domain facade tracer. */
   tracer?: Tracer;
 }>;
@@ -60,22 +68,32 @@ export type RuntimeTriggerProcessorOptions = Readonly<{
 export async function createRuntimeTriggerProcessor(
   options: RuntimeTriggerProcessorOptions = {},
 ): Promise<TriggerProcessorPort> {
-  const needsKv = options.idempotency === undefined || options.dlq === undefined;
+  const needsKv = options.idempotency === undefined || options.dlq === undefined ||
+    options.deferScheduler === undefined;
   const kv = needsKv ? options.kv ?? await openTriggerRuntimeKv() : options.kv;
   const queue = options.jobQueue ?? createQueue<JobMessage>('jobs');
+  const deferScheduler = options.deferScheduler ??
+    new KvTriggerDeferScheduler({ kv: requireKv(kv), clock: options.clock });
   const processor = createTriggerProcessor({
     idempotency: options.idempotency ?? new KvTriggerIdempotencyStore({ kv: requireKv(kv) }),
     dlq: options.dlq ?? new KvTriggerDlqStore({ kv: requireKv(kv) }),
     dispatchAction: async (action, event, definition) => {
-      await dispatchTriggerAction(action, event, definition, queue);
+      await dispatchTriggerAction(action, event, definition, queue, deferScheduler);
     },
     eventSubscription: options.eventSubscription,
+    now: options.clock === undefined ? undefined : () => options.clock?.now() ?? new Date(),
   });
 
   const traced = new TracedTriggerProcessor(processor, options.tracer);
-  return options.enabledState === undefined
+  const enabled = options.enabledState === undefined
     ? traced
     : createEnabledTriggerProcessor(traced, options.enabledState);
+  return new DeferredTriggerProcessor(
+    enabled,
+    deferScheduler,
+    options.definitions ?? [],
+    options.clock,
+  );
 }
 
 /** Decorate a trigger processor with authoritative enabled-state enforcement. */
@@ -107,6 +125,71 @@ class EnabledTriggerProcessor implements TriggerProcessorPort {
 
   stop(options?: TriggerProcessorStopOptions): Promise<void> {
     return this.#processor.stop(options);
+  }
+}
+
+class DeferredTriggerProcessor implements TriggerProcessorPort {
+  readonly #processor: TriggerProcessorPort;
+  readonly #scheduler: TriggerDeferSchedulerPort;
+  readonly #definitions = new Map<string, ProcessableTriggerDefinition>();
+  readonly #clock: TriggerClockPort | undefined;
+  readonly #controller = new AbortController();
+  readonly #run: Promise<void>;
+  #runError: unknown;
+
+  constructor(
+    processor: TriggerProcessorPort,
+    scheduler: TriggerDeferSchedulerPort,
+    definitions: readonly ProcessableTriggerDefinition[],
+    clock?: TriggerClockPort,
+  ) {
+    this.#processor = processor;
+    this.#scheduler = scheduler;
+    this.#clock = clock;
+    for (const definition of definitions) this.#definitions.set(definition.id, definition);
+    this.#run = scheduler.run((record) => this.#replay(record), {
+      signal: this.#controller.signal,
+    }).catch((error) => {
+      if (!this.#controller.signal.aborted) this.#runError = error;
+    });
+  }
+
+  process<TDefinition extends ProcessableTriggerDefinition>(
+    event: TriggerEvent,
+    definition: TDefinition,
+  ): Promise<TriggerProcessResult> {
+    if (this.#runError !== undefined) return Promise.reject(this.#runError);
+    this.#definitions.set(definition.id, definition);
+    return this.#processor.process(event, definition);
+  }
+
+  async stop(options?: TriggerProcessorStopOptions): Promise<void> {
+    this.#controller.abort();
+    await this.#run;
+    await this.#processor.stop(options);
+  }
+
+  async #replay(record: TriggerDeferRecord): Promise<void> {
+    const definition = this.#definitions.get(record.triggerId);
+    if (definition === undefined) {
+      throw TriggersError.validationFailed(
+        `Deferred trigger definition ${record.triggerId} is not registered.`,
+      );
+    }
+    const now = (this.#clock?.now() ?? new Date()).toISOString();
+    const replayId = `${record.event.id}:defer:${record.id}` as TriggerEventId;
+    await this.process(
+      {
+        ...record.event,
+        id: replayId,
+        status: 'pending',
+        attempt: record.event.attempt + 1,
+        detectedAt: now,
+        updatedAt: now,
+        idempotencyKey: replayId,
+      },
+      definition,
+    );
   }
 }
 
@@ -222,12 +305,11 @@ async function dispatchTriggerAction(
   event: TriggerEvent,
   definition: Readonly<{ id: string }>,
   queue: ReturnType<typeof createQueue<JobMessage>>,
+  deferScheduler: TriggerDeferSchedulerPort,
 ): Promise<void> {
   if (action.kind === 'defer') {
-    throw TriggersError.unsupportedOperation(
-      'trigger-action.defer',
-      `Deferred trigger action dispatch is not implemented for ${definition.id}; until=${action.until}.`,
-    );
+    await deferScheduler.schedule({ action, event });
+    return;
   }
 
   await enqueueWorkerJob(action, event, definition, queue);

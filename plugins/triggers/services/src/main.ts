@@ -175,7 +175,12 @@ export async function createTriggersServiceContext(
     createKvTriggerEnabledStateStore({ kv: requireKv(kv) });
   const eventSubscription = options.eventSubscription ?? createEventSubscription();
   const processor = options.processor ??
-    await createRuntimeTriggerProcessor({ kv, eventSubscription, enabledState });
+    await createRuntimeTriggerProcessor({
+      kv,
+      eventSubscription,
+      enabledState,
+      definitions,
+    });
   const manualDispatcher = options.manualDispatcher ??
     createManualDispatcher({ eventStore, processor });
   const hmacVerifier = new HmacSha256WebhookVerifier({
