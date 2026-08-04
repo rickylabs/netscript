@@ -516,3 +516,82 @@ Additional scope checks:
 **Final Batch 4 verdict after `cf21cb52c`: FAIL_FIX.** G1-F1, G1-F2, G2-F1, G2-F2, and G4-F1 are fixed. The `query-bridge.md` scope extension remains partially inconsistent at lines 304-319 and 369; correct those remaining call-trigger formulations before PASS.
 
 **Final Batch 4 verdict after `f8e21635a`: PASS.** The three residual `query-bridge.md` formulations now consistently attribute cache-provider registration to evaluation of the `@netscript/fresh/server` subpath, not invocation of `defineFreshApp`; all Batch 4 findings and the scope extension are fixed.
+
+## Benchmark page audit
+
+- **Changeset:** `c33f633a2^..c33f633a2` on `docs/tutorial-benchmark`
+- **Audit mode:** opposite-family `docs_audit`, evidence-only. The auditor fetched every cited external URL and judged the live pages rather than relying on the generator's refresh report.
+
+### Gate 1 — external claim accuracy: FAIL
+
+All eleven unique external URLs present in `compared.md` returned HTTP 200 through `curl -L --compressed` (the unversioned Nuxt introduction is a small client redirect to `/docs/4.x/getting-started/introduction`). Live-source inspection confirmed the load-bearing claims named in the brief:
+
+- Nuxt 4.5.1 exposes eighteen Getting Started topics in exactly the documented order; Views, Assets, Styling, Routing, SEO and Meta, and Transitions precede Data Fetching and State Management. Its installation page provides a StackBlitz browser starter and `npm create nuxt@latest`.
+- Laravel's current official course has thirteen lessons, builds Chirper, and places “Deploying your app” fourth—after the first route and before MVC/database/model work. Registration, login/logout, and the closing next-steps lesson are present.
+- Rails' current Getting Started guide builds a product store across twenty-three numbered sections. It separately runs `bin/rails generate model Product name:string`, `bin/rails generate controller Products index --skip-routes`, and `bin/rails generate authentication`; the authentication generator creates User and Session models plus the required controllers and views.
+- SvelteKit's live docs establish filesystem routing, generated `$types`, universal versus server-only `load`, server form actions, validation, and `use:enhance`; its browser tutorial exposes Basic and Advanced tracks for both Svelte and SvelteKit.
+- Next's live dashboard course teaches direct database queries from Server Components, React Server Actions, and links its API-layer discussion to Route Handlers.
+
+Findings:
+
+- **G1-F1 — the current Next.js course does not close with deployment.** `compared.md:35-39` calls the dashboard course sixteen chapters but replaces its actual final chapter, Chapter 16 “Next Steps,” with “a closing deployment chapter.” The live sequence is Chapters 1–15 from Getting Started through Adding Metadata, followed by Next Steps. Deployment belongs to the separate Pages Router course surfaced elsewhere in the page data. Replace the end of the sequence with “metadata, and a closing next-steps chapter.”
+- **G1-F2 — the current Rails guide does not end at Kamal deployment.** `compared.md:108` says the remaining sections end at Kamal deployment. Deployment is section 22; section 23 is “What's Next?”. Replace “ending at Kamal deployment” with “including Kamal deployment before a closing what's-next section.” The surrounding Product-store, generator, authentication, and breadth claims are accurate.
+
+### Gate 2 — fairness: FAIL
+
+The comparison is otherwise notably fair. It limits the benchmark to canonical learning flows, explicitly rejects capability-based superiority claims, concedes the peers' browser learning, first-screen speed, generators, breadth, deployment guidance, and ecosystem depth, and states when a peer is the better choice. NetScript's four divergences link to their full internal explanations instead of re-presenting them as unsupported comparison copy.
+
+One claim undercuts that fairness:
+
+- **G2-F1 — “NetScript … does not ship a deployment story” is both obsolete and harsher than the evidence.** `compared.md:216-218` contrasts Laravel Cloud/Kamal with an assertion that NetScript ships no deployment story. NetScript is correctly described as not being a hosted platform, but the repository now documents and ships `netscript deploy deno-deploy <op>`, generated Deno Deploy/Compose/bare-metal workflow starters, Aspire-backed target routers, and manual deployment recipes. Replace the sentence with: “NetScript is not a hosted platform: it ships deployment commands, starter workflows, and recipes, but choosing and provisioning the hosting platform remains yours.” Link “deployment commands” to `/orchestration-runtime/how-to/deploy/` (or the narrower Deno Deploy how-to).
+
+### Gate 3 — internal accuracy, cross-links, and nav: FAIL
+
+The four principal divergence claims match the current internal docs and source:
+
+- `explanation/contracts.md` confirms that one contract projects handler input/output, the derived client, OpenAPI, and UI consumption without a separate generator step; the quickstart inspects the contract before the page.
+- `netscript init` scaffolds the Deno workspace containing contracts, `services/<name>`, `apps/<name>`, plugin workspace/runtime surfaces, and Aspire orchestration; `--no-aspire` is a real public CLI option.
+- The saga/workflow material models checkpointed state and compensation as first-class runtime behavior.
+- The generated AppHost supplies the resource graph, OTLP endpoint, and Aspire dashboard from the first orchestrated run, while the linked observability page accurately separates automatic runtime spans from the scaffold's no-op custom job-tool helpers.
+
+The web-layer summary also agrees with the already-audited resources, parallel layers, server forms, partial/defer policy, and query-bridge pages. Nav/front matter is coherent: `compared.md` is explanation order 8; the hub now lists eight topics; the reading path includes it; both front matter and `nextPrev` move Aspire → Compared → Capabilities; `/why/` links back to it.
+
+Automated evidence:
+
+- `cd docs/site && deno task build`: **PASS**, 617 files generated.
+- `cd docs/site && deno task check:links`: **PASS**, 32,773 internal links across 220 pages.
+- Changed-line scans found no versionless pinnable `jsr:@netscript/*` specifier and no issue/PR/harness/generator/process vocabulary leakage.
+
+Gate 3 nevertheless fails on the same internally false deployment statement recorded as G2-F1. The source worktree retained only its pre-existing `deno.lock` modification; the audit introduced no source change.
+
+### Gate 4 — prose register: FAIL
+
+The page otherwise matches the explanation siblings: it opens with a bounded thesis, interprets evidence rather than dumping a checklist, gives each divergence a named conceptual consequence, acknowledges costs, and closes with useful onward paths. One counting inconsistency breaks the register:
+
+- **G4-F1 — “all four” refers to five frameworks.** `compared.md:17-20` names Next.js, Nuxt, SvelteKit, Laravel, and Rails and then says NetScript diverges from “all four”; `compared.md:99` heads a five-row table “The property all four share.” If the intended unit is five frameworks, replace both with “all five.” If the intended unit is four flow families, explicitly name that grouping before using the count; the current table still needs a five-framework heading.
+
+### Benchmark gate log
+
+| Gate | Command(s) | Scope | Result | Findings | Proceeded |
+|---|---|---|---|---|---|
+| External claim accuracy | `curl -L --compressed --max-time 40 -A 'Mozilla/5.0 docs-audit' -sS -o <file> -w '%{http_code}' <url>` over all eleven unique URLs; focused live-page reads of the resulting HTML and canonical pages | Next.js Learn + installation; Nuxt introduction + installation; SvelteKit routing/load/form actions/tutorial; Laravel course + installation; Rails Getting Started | **FAIL** | Next ends with Next Steps, not deployment; Rails has What's Next after Kamal deployment | Flagged with exact replacements |
+| Fairness | Comparative read against each live peer flow and the page's own strengths/cost sections | Full `compared.md` | **FAIL** | NetScript's shipped deployment surfaces are denied | Flagged with fair replacement and internal link |
+| Internal accuracy / links / nav | Focused reads of contracts, quickstart, CLI scaffold/source, durability, Aspire, observability, and web-layer pages; `cd docs/site && deno task build`; `cd docs/site && deno task check:links`; changed-line leakage/specifier scans | Four divergences, web-layer paragraph, new page/front matter, explanation hub, Aspire chain, `/why/` link | **FAIL** | Core claims/nav pass; deployment statement contradicts shipped docs/source | Flagged; no source edits |
+| Prose register | Comparison with `docs/site/explanation/contracts.md` and explanation siblings | New page and hub transition | **FAIL** | “all four” used for five frameworks in two places | Flagged with exact normalization |
+
+### Benchmark page verdict
+
+**FAIL_FIX.** Correct G1-F1, G1-F2, G2-F1/G3-F1, and G4-F1. The Laravel, Nuxt, SvelteKit, Rails generator/authentication, Next server-data, four internal-divergence, strengths/concessions, navigation, build, link, specifier, and leakage checks otherwise pass.
+
+### Benchmark page re-audit
+
+- **Fix commit:** `260201d32`
+
+| Benchmark finding | Status | Re-audit evidence |
+|---|---|---|
+| G1-F1 — Next.js dashboard course said to close with deployment | **FIXED** | `compared.md:35-39` now ends the sixteen-chapter sequence with “a closing next-steps chapter.” A fresh fetch of `/learn/dashboard-app/next-steps` returned 200 and identifies the page as “Next Steps” / “Next.js Dashboard Course Conclusion.” No unsupported Pages Router explanation was added. |
+| G1-F2 — Rails guide said to end at Kamal deployment | **FIXED** | `compared.md:108` now says the guide includes Kamal deployment before a closing what's-next section, accurately preserving section 22 followed by section 23. A fresh fetch of the canonical Rails guide returned 200. |
+| G2-F1/G3-F1 — NetScript said not to ship a deployment story | **FIXED** | `compared.md:216-219` now draws the accurate boundary: NetScript is not a hosted platform, but ships deployment commands, starter workflows, and recipes; platform choice and provisioning remain user-owned. “deployment commands” links to `/orchestration-runtime/how-to/deploy/`, whose current text documents the shipped surfaces and the honest limit that NetScript does not directly generate a Dockerfile, Compose file, or finished cloud stack. |
+| G4-F1 — “all four” used for five frameworks | **FIXED** | `compared.md:17-20` explicitly names Laravel and Rails as the batteries-included pair and says “all five”; the five-row table heading at line 99 also says “all five.” The separate “Four consequences” count correctly refers to NetScript's four divergences and remains unchanged. |
+
+**Final Benchmark page verdict after `260201d32`: PASS.** All four findings are fixed; no external-accuracy, fairness, internal-accuracy/navigation, or prose-register finding remains.

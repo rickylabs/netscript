@@ -842,3 +842,44 @@ specifiers at all — the page carries no code; no filler ("simply" removed on r
   the "what peers do better" and "where NetScript diverges" sections; per the verification's own
   bottom line those general characterizations hold, and no §1.4 or §1.2 detail was cited from the
   benchmark without re-fetching.
+
+## Benchmark page fix round
+
+Audit: `.llm/runs/docs-mainpages--orchestrator/slices/deepdives-audit/audit.md` `## Benchmark page
+audit` — verdict FAIL_FIX, four findings. The auditor fetched every cited external URL itself, so its
+external findings were treated as live-page evidence; each was still re-verified against the same
+live pages before being applied. **Nothing was rebutted** — two findings were confirmed by fetches I
+had already run and misread, and one was worse than the audit framed it.
+
+Commit `260201d32`, pushed to `docs/tutorial-benchmark`.
+
+### Per-finding disposition
+
+| Finding | Verified how | Disposition |
+|---|---|---|
+| **G1-F1** the Next.js course does not close with deployment | Fetched `nextjs.org/learn/dashboard-app/next-steps`: chapter title **"Next Steps"**, `og:image` carries `chapter=16`, description "Next.js Dashboard Course Conclusion", final chapter confirmed. The source benchmark's own §1.1 also lists item 16 as *Next Steps*, and `benchmark-verification.md` CONFIRMED the order ending "→ Metadata → Next Steps" | **Accepted.** "a closing deployment chapter" → "a closing next-steps chapter". This was my own paraphrase error: the benchmark glossed chapter 16 as "Deployment on Vercel and production checklist" and I promoted that gloss into the chapter's title. The audit's narrower point stands on the live page. I did not adopt the audit's added claim that deployment "belongs to the separate Pages Router course" — I did not verify that, and the fix does not need it. |
+| **G1-F2** the Rails guide does not end at Kamal deployment | My **own** earlier fetch of the guide already listed "22. Deploying to Production" followed by "23. What's Next?" — the table row contradicted evidence I had in hand | **Accepted.** "ending at Kamal deployment" → "including Kamal deployment before a closing what's-next section". The adjacent prose paragraph lists the guide's topics without claiming an endpoint, so it needed no change. |
+| **G2-F1 / G3-F1** "NetScript … does not ship a deployment story" is obsolete and harsher than the evidence | Read `docs/site/orchestration-runtime/how-to/deploy.md` on this branch: it documents `netscript deploy deno-deploy <op>` (`plan`/`up`/…), routers for `docker\|compose\|kubernetes\|azure-aca\|azure-app-service\|azure-aks\|cloud-run`, and generated starters `deploy-compose-ghcr.yml` / `deploy-deno-deploy.yml` | **Accepted; the audit understated it.** This was not merely obsolete — it was **false against a page on this same site**, which is the worse failure for a docs page that exists to be fair. Replaced with the accurate boundary and linked to `/orchestration-runtime/how-to/deploy/`. The replacement deliberately keeps the limit the how-to states about itself (no generated `Dockerfile`, `docker-compose.yml`, or finished cloud stack) by saying platform choice and provisioning remain yours — so the concession stays honest rather than swinging into a capability boast. |
+| **G4-F1** "all four" used for five frameworks | `grep` found "all four" at the intro and at the five-row table heading, while the synthesis two lines below the table already said "all five" — the page contradicted itself | **Accepted.** Root cause was the intro grouping Laravel and Rails into one "batteries-included class", making the unit ambiguous. Intro now names "the batteries-included pair **Laravel** and **Rails**" so five is countable, and both sites read "all five". The unrelated "**Four** consequences follow" (NetScript's four divergences) is correct and was left alone. |
+
+### Gate results after the fix
+
+| Gate | Command | Result |
+|---|---|---|
+| Site build | `cd docs/site && deno task build` | PASS — 617 files |
+| Site links | `cd docs/site && deno task check:links` | PASS — 32774 internal links across 220 pages, all resolve (+1 vs. the audited build: the new deploy how-to link) |
+| Caveat refs | `cd docs/site && deno task check:caveats` | PASS — 27 markers across 22 pages |
+| Touched URLs re-curled | `curl -sL --compressed` on `/learn/dashboard-app`, `/learn/dashboard-app/next-steps`, Rails Getting Started | all **200** |
+| New internal link | rendered href + target dir | `/netscript/orchestration-runtime/how-to/deploy/` (the site applies a `/netscript` base path at render), target `_site/orchestration-runtime/how-to/deploy/index.html` exists |
+| Vento leakage | grep `{{` in the built page | 0 |
+| Lock hygiene | `git checkout HEAD -- deno.lock`; `git status` | clean — only `compared.md` in the commit |
+
+### Notes
+
+- The fix round changed prose only; no external URL was added or removed, so the original ten-URL
+  200 sweep still holds, and the three URLs behind changed claims were re-curled anyway.
+- Two of the four findings (G1-F2, G4-F1) were checkable against material already in this session —
+  a fetch result and the page's own text. Both were self-inflicted consistency failures rather than
+  source drift, which is the lesson worth carrying: the external re-fetch discipline was sound, but
+  the prose was not re-read against the fetch output or against itself before commit.
+- Validation remains generator-side per the CLAUDE.md documentation-authoring exception.

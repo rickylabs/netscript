@@ -189,3 +189,12 @@
   P1 #1209, P2 #1222, P3 #1241 — plus Charter A (#1221 owner-merged) and the
   claude-openrouter launcher (#1217). Status comment left on #1210; closing decision
   owner's. Run remains open for the owner's promised Charter A fix list.
+
+## 2026-08-04 — benchmark page published (owner-approved)
+
+- explanation/compared.md authored from the verified benchmark (WRONG-graded claims re-fetched
+  and rewritten; auditor independently fetched all 10 external URLs). Audit FAIL_FIX (4) →
+  fixed (1 auditor suggestion declined as unverified; the deployment concession was false
+  against this site's own deploy how-to — corrected) → re-audit PASS at 260201d32.
+- PR #1272 opened → ready → merge on green settle. Closes the last open program task; only
+  the owner's Charter A fix list remains parked.
