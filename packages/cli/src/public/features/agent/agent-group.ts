@@ -30,6 +30,8 @@ export function createAgentCommand(
       createAgentMcpCommand({
         resolvePath: host.resolvePath,
         run: (input) => runAgentMcp(input, dependencies),
+        isInteractive: () => Deno.stdin.isTerminal(),
+        writeGuidance: (message) => console.error(message),
       }),
     )
     .command(
