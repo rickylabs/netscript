@@ -120,3 +120,64 @@ Acceptance-criteria checks from the audit's fix-cycle list:
 
 Changed-file audit (fix round): 12 files, all under `docs/site/tutorials/`. No `packages/`, no
 `plugins/`, and `git log --name-only 1bf5345f6^..HEAD` shows zero `deno.lock` occurrences.
+
+---
+
+## Fix round 2 — response to re-audit FAIL (ch.5 live proof)
+
+Single remaining FAIL from the re-audit at `547456b3c`. Fixed in one commit, `95e6493d3`.
+
+### What the source actually supports
+
+Verified before writing, not taken from the audit:
+
+| Claim | Source | Verdict |
+| --- | --- | --- |
+| The mirror runs once, at startup | `plugins/sagas/services/src/main.ts:80` calls `startSagasStreamMirror({ prisma: sagaDbClient })` inside the post-listen `queueMicrotask` — the only call site | Confirmed |
+| It is a finite reconciliation, not a feed | `plugins/sagas/streams/producer.ts:82-124` — paged `findMany` loop that `break`s on a short/empty page and returns | Confirmed |
+| Nothing else writes the collection | `grep -rn "upsert('sagaInstance'" --include=*.ts` → exactly one hit, that reconciliation | Confirmed |
+| Not a sagas-specific quirk | `plugins/workers/streams/producer.ts` — `upsert('execution', …)` appears only in a doc comment, no live call site | Confirmed; this is a plugin-producer gap framework-wide |
+| **Producer→server delivery is a real push** | `create-durable-stream.ts:167-195` `upsert()` → `#appendEvent()` → `IdempotentProducer(handle, …, { autoClaim: true, lingerMs: 10 })` streams to the durable-streams service | Confirmed |
+| **Connected clients receive post-connect events** | `docs/site/durable-workflows/streams.md:40-52` — producers write through to the `:4437` service and "consumption is via the durable-stream HTTP/SSE server (read by Fresh clients)"; readers "observe a live, replayable view". `plugins/sagas/streams/factory.ts` builds the client with `createStreamDB` over that URL | Confirmed — so the without-reload claim is keepable, for the reconciliation upsert |
+| The mirror needs Prisma delegates | `plugins/sagas/services/src/database-client.ts:21-32` returns `undefined` on the KV backend; `main.ts` then logs `Saga Prisma delegates unavailable` and skips the mirror | Confirmed — a precondition the chapter had not stated |
+
+So the coordinator's conditional resolved in favour of keeping "without a reload": StreamDB
+subscriptions **do** deliver reconciliation upserts to connected clients. What is *not* supported is
+continuous per-transition streaming.
+
+### What I wrote
+
+The verify step is now ordered so the push is genuinely observable:
+
+1. `ns-sagas add saga demo …`, then restart — the processor loads its registry at boot.
+2. `ns-sagas publish DemoStarted …` — the engine writes a durable instance to the saga database.
+3. `ns-sagas list --instances --json` — confirm the instance exists.
+4. Open the monitor page and **leave it open**, then restart the sagas service once more. Its
+   post-listen mirror reconciles every instance into the stream, and the already-subscribed page
+   receives that upsert over its open connection — the row appears with no reload.
+
+Added a `--saga-store-backend prisma` + `netscript db init` precondition, and a warning callout in
+the ch.4/ch.5 honest-seam style naming the limitation outright: reconciliation happens once per
+sagas-service start, not per saga step, so a saga advancing while the service runs will not move the
+row until the next restart — the client half (StreamDB, subscription, `useLiveQuery`) is fully live;
+it is the plugin's producer that has room to grow.
+
+Over-promising claims pulled back to match, in ch.5 (intro, "What you will build", the Step 2 code
+comment and prose, checklist item, troubleshooting callout, recap) and in three neighbours that
+inherited the old promise: ch.4's hand-off line, ch.6's deploy line, and the track index. The
+troubleshooting callout now walks the real failure path in order — instance exists? backend on KV?
+streams runtime reachable? The chapter title stays, since the mechanism demonstrated *is* server
+push; the callout carries the frequency nuance.
+
+### Gate evidence (fix round 2)
+
+| Gate | Result |
+| --- | --- |
+| `cd docs/site && deno task build` | **exit 0** |
+| `docs/site` `deno task check:links` | **30579 links / 214 pages, all resolve** |
+| `docs/site` `deno task check:caveats` | **27 markers / 22 pages, all resolve** |
+| root `deno task docs:links` | **docs=102, 0 broken links/anchors/orphans — OK** |
+| root `deno task docs:accuracy` | **PASS** |
+
+Changed files: 4, all `docs/site/tutorials/live-dashboard/`. `deno.lock` untouched (reverted before
+commit; absent from the commit's file list). Pushed `547456b3c..95e6493d3` → `docs/tutorials-sweep`.
