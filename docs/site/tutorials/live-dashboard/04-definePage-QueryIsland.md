@@ -94,59 +94,67 @@ instead of throwing, so a hand-edited URL never 500s the page. This is the same
 `paginationSearchSchema()` the framework uses site-wide — every route that paginates parses `limit`
 and `offset` through it rather than reading `searchParams` by hand.
 
-## Step 2 — Write the cache-first page loader
+## Step 2 — Define the page and cache-first resource pipeline
 
-The page reads the cache, not the service. Add a small loader that pulls the orders island's initial
-data from KV through the chapter-3 helpers. Because the page binds the Step 1 contract, the loader is
-handed a typed `search` object — `limit`, `offset`, and `status` are already parsed and defaulted, so
-there is no `searchParams.get(...)` to write. A cold cache returns `undefined`, which the page renders
-as a skeleton:
-
-```ts
-// apps/dashboard/routes/(dashboard)/dashboard/orders/(_shared)/query-loaders.ts
-import { baseQueries } from '@app/lib/api-clients.ts';
-import type { OrdersSearch } from '../index.route.ts';
-
-export async function ordersQueryLoader({ search }: { search: OrdersSearch }) {
-  const input = { limit: search.limit, offset: search.offset, status: search.status };
-  const entry = await baseQueries.orders.list.getCachedEntry(input);
-
-  return {
-    initialOrders: entry?.data,
-    cachedAt: entry?.cachedAt,
-    input,
-  };
-}
-```
-
-The loader returns three things the island needs: the cached `data`, the `cachedAt` timestamp (so
-the client knows how stale the seed is), and the `input` (so the client can refetch the same slice).
-The `search` object is the contract's payoff — the same typed slice the Step 3 layer loader reads, so
-both loaders agree on what `limit`/`offset` mean without either one touching the raw query string.
-
-## Step 3 — Compose the page with definePage
-
-`definePage` from `@netscript/fresh/builders` is a fluent builder. You bind the route, set a caching
-policy, add layers, lay them out, and `build()`. Here is the orders page reduced to the live-table
-spine:
+The page reads data through request-scoped **resource factories**. `.withResource(name, factory)`
+registers a value that is computed at most once per request, no matter how many layers ask for it.
+That matters here because two layers want the same cached orders slice: the server-rendered `list`
+table and the `ordersQuery` island seed. Declared as a resource, the KV read happens once and both
+layers share it. Downstream resources may await upstream ones, so the prefetch step below builds on
+the same typed search input:
 
 ```tsx
 // apps/dashboard/routes/(dashboard)/dashboard/orders/index.tsx
 import { definePage } from '@netscript/fresh/builders';
+import { dehydrateQueryClient } from '@netscript/fresh/query';
+import { createNetScriptQueryClient } from '@netscript/sdk/query-client';
+import { baseQueries, ordersQueryUtils } from '@app/lib/api-clients.ts';
 import { routes } from '@app/router.ts';
 import OrdersQueryIsland from './(_islands)/OrdersQueryIsland.tsx';
-import { ordersQueryLoader } from './(_shared)/query-loaders.ts';
+import StatsLayer from './(_components)/StatsLayer.tsx';
 import { PlaygroundOrdersList, PlaygroundOrdersListSkeleton } from './(_components)/list.tsx';
-import { baseQueries } from '@app/lib/api-clients.ts';
 
 export const ordersListPage = definePage()
   .withRoute(routes.dashboard.orders.$route)
   .withPolicy('balanced')
   .withTelemetry({ enabled: true, spanName: 'dashboard.orders.list' })
+  // Read once per request; the list layer and the island layer both consume this.
+  .withResource('ordersData', async (ctx) => {
+    return await baseQueries.orders.list.getCachedEntry({
+      limit: ctx.search.limit,
+      offset: ctx.search.offset,
+      status: ctx.search.status,
+    });
+  })
+  .withResource('dehydratedQuery', async (ctx) => {
+    const queryClient = createNetScriptQueryClient();
+    await queryClient.prefetchQuery(ordersQueryUtils.list.queryOptions({
+      limit: ctx.search.limit,
+      offset: ctx.search.offset,
+      status: ctx.search.status,
+    }));
+    return dehydrateQueryClient(queryClient);
+  })
+```
+
+`spanName: 'dashboard.orders.list'` is not decoration: every render of this page emits a span under
+that name, and it shows up in the Aspire dashboard's traces view alongside the service call the
+loader made. When the table feels slow, that trace is where you find out whether the time went to KV,
+to the orders service, or to the render itself.
+
+By defining `dehydratedQuery` as a shared resource, you prefetch orders on the server and serialise
+the cache. It is sent to the client alongside the initial HTML, eliminating the browser refetch flash.
+
+## Step 3 — Add layers and partials
+
+Now compose the visual regions. You add the server-rendered table, the interactive query island, and
+a stats panel loaded asynchronously through a deferred partial — then lay them out and `build()`:
+
+```tsx
+// apps/dashboard/routes/(dashboard)/dashboard/orders/index.tsx (continued)
   .withLayer('list', PlaygroundOrdersList, {
-    loader: async ({ url, search }) => {
-      const input = { limit: search.limit, offset: search.offset, status: search.status };
-      const cachedEntry = await baseQueries.orders.list.getCachedEntry(input);
+    loader: async (ctx) => {
+      const cachedEntry = await ctx.resource('ordersData');
       if (!cachedEntry) return undefined; // cold cache → fallback skeleton
       return { data: cachedEntry.data, cachedAt: cachedEntry.cachedAt };
     },
@@ -157,13 +165,37 @@ export const ordersListPage = definePage()
     staleReloadMode: 'background',
   })
   .withLayer('ordersQuery', OrdersQueryIsland, {
-    loader: ordersQueryLoader,
+    loader: async (ctx) => {
+      // Same resource the list layer read — resolved once, shared here.
+      const entry = await ctx.resource('ordersData');
+      const dehydratedState = await ctx.resource('dehydratedQuery');
+      return {
+        dehydratedState,
+        input: {
+          limit: ctx.search.limit,
+          offset: ctx.search.offset,
+          status: ctx.search.status,
+        },
+        initialOrders: entry?.data,
+        cachedAt: entry?.cachedAt,
+      };
+    },
     staleTime: 15_000,
     staleReloadMode: 'background',
+  })
+  .withLayer('stats', StatsLayer, {
+    loader: (ctx) => {
+      // Not awaited: the promise is handed to the layer and resolves in the background.
+      const statsPromise = baseQueries.orders.getStats({ status: ctx.search.status });
+      return { statsPromise };
+    },
+    partial: routes.partials.dashboard.orders.stats.$route.href(),
+    partialName: 'orders-stats',
   })
   .withLayout((slots) => (
     <main class='ns-page-end'>
       <div class='ns-stack ns-stack--lg'>
+        {slots.stats()}
         {slots.list()}
         {slots.ordersQuery()}
       </div>
@@ -187,6 +219,7 @@ Read the builder one call at a time:
     { name: ".withRoute(route)", type: "route contract", desc: "Binds the typed search schema from Step 1. The loaders receive a typed search object." },
     { name: ".withPolicy('balanced')", type: "caching policy", desc: "The page's caching posture. 'balanced' serves cache-first and revalidates in the background." },
     { name: ".withTelemetry({ enabled, spanName })", type: "tracing", desc: "Wraps the page render in a named span that surfaces in the Aspire dashboard traces." },
+    { name: ".withResource(name, factory)", type: "request-scoped value", desc: "Computes a value at most once per request. Layers await it with ctx.resource(name), so two layers reading the same slice cost one fetch." },
     { name: ".withLayer(name, Component, config)", type: "a named region", desc: "Adds a layer with its own loader, partial, fallback, and staleTime. Call it once per region." },
     { name: ".withLayout(slots => …)", type: "layout callback", desc: "Places each layer by calling slots.<name>(). The layout is plain JSX." },
     { name: ".withMeta(() => …)", type: "head metadata", desc: "Page title and description." },
@@ -198,27 +231,42 @@ Read the builder one call at a time:
 The layer config carries a lot: a <code>loader</code> (cache-first server read), a <code>partial</code> + <code>partialName</code> (the refresh route), a <code>fallback</code> (cold-cache skeleton), and <code>staleTime</code> + <code>staleReloadMode</code> (the staleness window and how it refreshes). It is more upfront ceremony than a plain Fresh route — the payoff is that each region renders from cache independently and refreshes without a full navigation. If you only need a static page, a plain Fresh route is lighter; reach for <code>definePage</code> when a region must be cache-first and self-refreshing, which a live table is. See <a href="/web-layer/">the Fresh meta-framework</a>.
 {{ /comp }}
 
-## Step 4 — Hydrate the QueryIsland
+{{ comp callout { type: "tip", title: "Deferred-loader composition" } }}
+Returning a promise like <code>statsPromise</code> lets the page's shell paint without waiting for stats. The stats region shows its fallback until the promise resolves. In the current non-streaming Fresh runtime, <code>Deferred</code> behaves as a Suspense-ready boundary; it becomes fully progressive — streaming the resolved block into the response — only once streaming delivery lands in Fresh.
+{{ /comp }}
 
-The server shell paints from cache; the island makes it interactive. `QueryIsland` from
-`@netscript/fresh/query` provides the TanStack Query context; inside it, `useQuery` reads through the
-chapter-3 `queryOptions`, seeded with the loader's `initialData` so there is no client refetch flash.
-`useMutation` advances an order's status optimistically:
+## Step 4 — Hydrate the QueryIsland client-side
+
+The client-side island receives the server-prefetched query state as props. You call `hydrateFromDehydrated` during mount to warm up the client cache, allowing `useQuery` to resolve without hitting the network:
 
 ```tsx
 // apps/dashboard/routes/(dashboard)/dashboard/orders/(_islands)/OrdersQueryIsland.tsx
-import { QueryIsland, useMutation, useQuery, useQueryClient } from '@netscript/fresh/query';
+import { useRef } from 'preact/hooks';
+import {
+  getIslandQueryClient,
+  hydrateFromDehydrated,
+  QueryIsland,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from '@netscript/fresh/query';
 import { ordersQueryUtils } from '@app/lib/api-clients.ts';
 
 function OrdersQueryInner(props) {
   const queryClient = useQueryClient();
   const currentKey = ordersQueryUtils.list.clientKey(props.input);
+  const hydratedRef = useRef(false);
 
-  // Server-seeded read: no client refetch flash on first paint.
+  // Warm the client cache from the server-dehydrated state, once, before first render.
+  if (!hydratedRef.current && props.dehydratedState) {
+    hydrateFromDehydrated(getIslandQueryClient(), props.dehydratedState);
+    hydratedRef.current = true;
+  }
+
+  // Resolves instantly from the hydrated cache (no spinner, no flash)
   const { data: orders, isRefetching } = useQuery({
     ...ordersQueryUtils.list.queryOptions(props.input),
     initialData: props.initialOrders,
-    initialDataUpdatedAt: props.cachedAt,
     staleTime: 15_000,
   });
 
@@ -251,15 +299,47 @@ export default function OrdersQueryIsland(props) {
 }
 ```
 
-The key moves:
+One constraint makes this work: the hydrated entries land in the island's shared QueryClient under
+the exact query keys the server used, so `useQuery` only benefits if `queryOptions(props.input)`
+produces the same key the server prefetched. `initialData` itself comes from the explicit
+`initialOrders` prop — it is the belt to hydration's suspenders, covering the case where the
+dehydrated payload is absent. `clientKey(input)` is that same stable key, which is why the
+mutation's optimistic writes land on exactly the rows the query is showing.
 
-- **`initialData` + `initialDataUpdatedAt`** seed `useQuery` from the server loader, so the table is
-  populated on first paint and TanStack treats it as fresh until `staleTime` elapses.
-- **`clientKey(input)`** is the same stable key from chapter 3 — `useMutation` reads, writes, and
-  invalidates the cache through it, so the optimistic update lands on exactly the rows `useQuery`
-  is showing.
-- **`onMutate` / `onError`** are the optimistic pattern: apply the change immediately, snapshot the
-  previous data, and roll back if the server rejects it.
+## Step 5 — Render the Deferred stats layer
+
+To display the stats layer that loaded asynchronously, use the `<Deferred>` component. It acts as a suspense boundary, wrapping the promise and rendering a fallback placeholder while it resolves:
+
+```tsx
+// apps/dashboard/routes/(dashboard)/dashboard/orders/(_components)/StatsLayer.tsx
+import { Deferred } from '@netscript/fresh/defer';
+
+interface StatsProps {
+  statsPromise: Promise<{ totalRevenue: number; ordersCount: number }>;
+}
+
+export default function StatsLayer(props: StatsProps) {
+  return (
+    <Deferred
+      promise={props.statsPromise}
+      fallback={<div class="ns-skeleton">Loading statistics...</div>}
+    >
+      {(data) => (
+        <div class="ns-stats-grid">
+          <div class="ns-card">
+            <h4>Total Revenue</h4>
+            <p>${data.totalRevenue}</p>
+          </div>
+          <div class="ns-card">
+            <h4>Orders Count</h4>
+            <p>{data.ordersCount}</p>
+          </div>
+        </div>
+      )}
+    </Deferred>
+  );
+}
+```
 
 ## Verify your progress
 
@@ -278,8 +358,9 @@ revalidates. Advancing an order's status should update its badge instantly. Type
 deno task check
 ```
 
-- [ ] `index.route.ts`, `(_shared)/query-loaders.ts`, `index.tsx`, and `(_islands)/OrdersQueryIsland.tsx`
-      all exist under `apps/dashboard/routes/(dashboard)/dashboard/orders/`.
+- [ ] `index.route.ts`, `index.tsx`, `(_components)/StatsLayer.tsx`, and
+      `(_islands)/OrdersQueryIsland.tsx` all exist under
+      `apps/dashboard/routes/(dashboard)/dashboard/orders/`.
 - [ ] The page renders the orders table from cache on first paint (no spinner flash).
 - [ ] Advancing a status updates the row optimistically.
 - [ ] `deno task check` is clean.
