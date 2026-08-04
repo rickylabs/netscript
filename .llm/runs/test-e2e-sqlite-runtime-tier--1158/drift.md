@@ -477,3 +477,35 @@ documentation.
   regression from this branch**) stands unchanged.
 - **Lesson:** a controlled comparison is only controlled for the variable it varies. Same-host A/B
   rules out the code delta; it does not rule out the host.
+
+## 2026-08-04 — D-18 cloud CI green; the compute saving is NOT delivered by this PR alone
+
+- **What:** First real cloud CI run for this branch ([30941839021]) — **overall success**, all six
+  jobs green including `scaffold-runtime-sqlite` and `scaffold-runtime`. Both runtime jobs genuinely
+  executed (their `Skipped by policy` steps are `skipped`).
+- **Why there had been no CI at all:** two independent suppressors stacked. Draft PRs run no CI
+  (#1212), and after the PR was marked ready it was `CONFLICTING`/`DIRTY` — GitHub could not compute
+  a merge ref, so no `pull_request` workflow was scheduled. Push-triggered workflows kept running,
+  which made the branch look alive. Fixed by merging `main` (22 commits behind).
+- **D-16/D-17 resolved:** the postgres `behavior.service-health` failure was **local environment
+  state**, not a defect in `main`. `scaffold-runtime` is green on a clean runner. The postgres half
+  of #1259 is withdrawn and the issue restored to `priority:p2`, scoped to the sqlite/libSQL failure
+  which reproduces independently.
+- **The finding that matters more than the green:** measured on the same runner, the sqlite tier's
+  E2E step is **4m 12s** vs postgres **4m 24s** — **12 seconds, 4.5%**. Eliminating postgres and
+  redis is nearly free on cloud infrastructure; the heavy cost is a local-WSL phenomenon. And both
+  tiers currently fire on the **same signal** for every non-docs change (verified by calling
+  `decide()` directly), so on cloud this PR **adds** a ~5-minute parallel job rather than replacing
+  anything.
+- **Consequence for the issue's premise:** #1158 was motivated by "it is costing us a lot of compute
+  power and time". This PR delivers the **mechanism** (a working, CI-wired container-reduced tier)
+  and real **local** value, plus a genuine defect fix (sqlite `--allow-ffi` never reached background
+  processors or plugin services). It does **not** deliver the cloud compute saving, because that
+  requires _reserving_ the docker tier — narrowing `run_runtime` — which #1152 left deliberately
+  wide and this run's plan put in Non-Scope (D6).
+- **Severity:** significant — it qualifies the headline benefit of the issue.
+- **Action:** report plainly rather than let the green CI imply the goal was met. Follow-up
+  **#1273** filed to narrow `run_runtime`, with this run's first green sqlite CI as the "observed
+  green history" #1152 required before tightening.
+- **Evidence:** run 30941839021 job/step timings; `decide()` signal matrix; PR #1220 cloud verdict
+  comment.
