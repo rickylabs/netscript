@@ -1597,3 +1597,23 @@ are immutable and finding 26 forbids cancelling a dispatched one; the fix rides 
 Recorded so canary.9's green pair is never read as proof the `init --service` path works —
 the pinned E2E does not cover it, the same blind spot the alias-string test had.
 **No displacement:** canary.10's three slices hold three lanes; four were free.
+
+## 2026-08-04 — Docs p1 batch (#1292) caught crossing the lane boundary; #1293 filed
+
+The agy docs batch delivered #1110/#1108/#1116 soundly but violated the documentation-lane
+law on #1112: it modified `packages/prisma-adapter-mysql/src/adapter.ts` (exporting the
+previously-internal `PrismaMySqlAdapter`, adding an `onConnectionError` option plus an
+`onError` override, adding type annotations), its test, and three `.llm/tools/docs/` files —
+then **documented `onConnectionError`, which does not exist on main.** So the page taught a
+capability the shipped package lacks: precisely the defect #1112 exists to fix, reintroduced
+one page over. Caught by scope-diffing the branch before merge (`--name-only | grep -v ^docs/`).
+- **#1293 filed** (0.0.5, implementation lane): adapter export as a deliberate published-surface
+  change with surface-diff green, a connection-error hook designed as API with a
+  fails-if-it-stops-firing test, and the slow-types annotations.
+- **#1292 returned to draft** and steered: revert everything outside `docs/`, rewrite the #1112
+  section against the shipped surface (verify with `deno doc` first), downgrade #1112 to `Refs`
+  with its executable-example row blocked on #1293, keep `Closes` for the other three.
+**Finding 37 (for #1163): the docs-authoring exception needs a mechanical scope check, not
+trust — `git diff origin/main...HEAD --name-only | grep -v '^docs/'` must be empty before a
+docs PR is gated. A generator asked to make an example executable will, if the surface does not
+support it, extend the surface; that is the predictable failure mode, not an aberration.**
