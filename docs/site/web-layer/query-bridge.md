@@ -22,55 +22,53 @@ The island-side hooks themselves — `QueryIsland`, `useQuery`, mutations, polli
 
 ## What bare Fresh makes you write
 
-Fresh gives you a handler and an island; nothing connects them. A cache-warm list becomes:
+Fresh already carries the loader's value into the island: island props are serializable, and Fresh
+owns their transport and escaping. So the handoff itself is not the problem — this is the whole of
+it:
 
 ```tsx
 // routes/orders.tsx — bare Fresh
 export const handler = define.handlers({
   async GET(ctx) {
     const res = await fetch('http://orders:3002/api/v1/orders/list?limit=20&offset=0');
-    const orders = await res.json() as { items: Order[] }; // hand-declared, again
+    const orders = await res.json() as { items: Order[] }; // hand-declared
     return { data: { orders } };
   },
 });
 
-export default define.page<typeof handler>(({ data }) => {
-  const seedHtml = { __html: JSON.stringify(data.orders) };
-  return (
-    <>
-      <OrdersTable orders={data.orders} />
-      <script id='orders-state' type='application/json' dangerouslySetInnerHTML={seedHtml} />
-      <OrdersIsland />
-    </>
-  );
-});
+export default define.page<typeof handler>(({ data }) => <OrdersIsland initialOrders={data.orders} />);
 ```
 
 ```tsx
 // islands/OrdersIsland.tsx — bare Fresh
-const seed = JSON.parse(document.getElementById('orders-state')?.textContent ?? 'null');
+export default function OrdersIsland({ initialOrders }: { initialOrders: { items: Order[] } }) {
+  const query = useQuery({
+    queryKey: ['orders', 20, 0], // invented here; the loader never agreed to it
+    queryFn: () => fetch('/api/v1/orders/list?limit=20&offset=0').then((r) => r.json()),
+    initialData: initialOrders,
+  });
 
-const query = useQuery({
-  queryKey: ['orders', 20, 0], // invented here; the loader never agreed to it
-  queryFn: () => fetch('/api/v1/orders/list?limit=20&offset=0').then((r) => r.json()),
-  initialData: seed,
-});
+  return <OrdersTable orders={query.data?.items ?? []} />;
+}
 ```
 
-Four costs, and each of them is a bug that ships quietly.
+Fresh carries the value into the island, but three coordination seams remain: the service response
+contract, the request/input construction, and the TanStack query key.
 
 **The response type is written twice and checked never.** The handler asserts `{ items: Order[] }`,
-the island asserts it again, and the service is free to disagree with both.
+the island's prop type asserts it again, and the service is free to disagree with both.
 
 **The URL is written twice.** `?limit=20&offset=0` appears in the handler and in the island's
 `queryFn`, so a changed default silently produces two different result sets on one page.
 
 **The key is invented, not derived.** `['orders', 20, 0]` exists only in the island. Nothing ties it
-to what the loader fetched, so the "seed" and the query can address different things and the failure
-mode is a spinner where a table should be — or worse, a stale table that never refreshes.
+to what the loader fetched, so a second island — or a mutation invalidating "the orders list" — has
+to guess the same literal, and a mismatch shows up as a spinner where a table should be, or a stale
+table that never refreshes.
 
-**Serialization is yours, including the escaping.** A `JSON.stringify` into
-`dangerouslySetInnerHTML` is an XSS hole waiting for the first order note containing `</script>`.
+Nothing above coordinates the server's cache with the browser's, either: the handler's `fetch` and
+the island's `fetch` are two independent round trips to the same service, with no shared freshness
+policy between them.
 
 ## One factory, two halves
 
@@ -88,7 +86,7 @@ important structure is that those helpers split cleanly by environment:
 | `.key(input)` | anywhere | the server-tier cache key |
 | `.queryOptions(input, options?)` | client | `{ queryKey, queryFn, staleTime }` for a TanStack hook |
 | `.mutationOptions(options?)` | client | `{ mutationKey, mutationFn }` plus your callbacks |
-| `.clientKey(input?)` | client | the client-tier key, or its prefix when input is omitted |
+| `.clientKey(input?)` | client | the client-tier key for a truthy input; the action prefix otherwise |
 
 The first five go through `getCacheProvider()`; the last four are pure functions over the resource
 name, action name, and input. That is why the same import is safe in a loader and in an island — the
@@ -111,7 +109,7 @@ The server key and the client key for the same call are different shapes, on pur
 createActionQueryKey(resource, action, input); // => [resource, action, JSON.stringify(input)]
 
 // client tier — packages/sdk/src/query/query-factory.ts
-clientKey(props?); // => [resource, action, { input: props }]  ·  [resource, action] when omitted
+clientKey(props?); // => [resource, action, { input: props }]  ·  [resource, action] when falsy
 ```
 
 The server key is **serialized** because it addresses a KV entry: the store writes it under
@@ -346,8 +344,15 @@ Two consequences follow from it being an import side effect rather than a call y
 - **Server invalidation does not invalidate the client.** `invalidate()` clears KV; the browser's
   `QueryClient` is untouched until something calls `invalidateQueries`. Post-mutation freshness
   usually needs both, which is what `bridgeInvalidation` is for.
-- **`clientKey()` with no argument is a prefix, not a key.** `[resource, action]` matches every input
-  variant — right for invalidation, wrong for `setQueryData`.
+- **`clientKey()` returns a prefix for any falsy input, not just an omitted one.** The implementation
+  branches on truthiness, so `clientKey(0)`, `clientKey('')`, and `clientKey(false)` all yield
+  `[resource, action]` — while `queryOptions(0).queryKey` is `['orders', 'list', { input: 0 }]`. The
+  same gap opens for a procedure with no input at all: `queryOptions()` registers under
+  `[resource, action, { input: undefined }]`, which TanStack hashes as `['orders','list',{}]`, and
+  `clientKey()` does not address it. Prefix matching means `invalidateQueries` still works either
+  way; an exact-key operation — `setQueryData`, `getQueryData`, `cancelQueries({ exact: true })` —
+  does not. **Use `queryOptions(input).queryKey` whenever you need the exact key**, and reserve
+  `clientKey()` for the prefix it reliably produces.
 - **The island query result is narrower than TanStack's.** `IslandQueryResult` declares `data`,
   `error`, `status`, `isLoading`, `isSuccess`, `isError`, and `refetch()` — nothing else. The runtime
   object is TanStack's, so `isRefetching` and `isFetching` are present at runtime but reading them

@@ -59,8 +59,9 @@ of two legal values, so the narrowing has to be re-written by hand in each handl
 cannot tell you when you forget.
 
 **Links are unverified.** The template literal has no relationship to the file at
-`routes/orders/[status].tsx`. Rename the file, move it under a group, or add a segment, and every
-link still compiles and still ships — it just 404s.
+`routes/orders/[status].tsx`. Rename the file, move it into a different URL-bearing directory, or add
+a segment, and every link still compiles and still ships — it just 404s. (Moving it under a Fresh
+route group alone does not change the URL; `(group)` directories are dropped from the path.)
 
 ## The mechanism: contract, reference, generated tree
 
