@@ -58,3 +58,12 @@ Confirmed findings:
   outline-codex.md, the rival lane is a **Claude Opus subagent** (keeps the pair cross-family).
   Scheduled agy retry killed; Opus subagent dispatched blind to the Codex outline, writing
   outline-opus.md.
+
+- **D-8 (blocked launch, 2026-08-04 ~12:00).** The owner-directed S5 evaluator lane
+  (OpenCode · Grok 4.5 max) is down: `opencode run` returns "Unexpected server error"
+  (refs err_03f344ae / err_dd874a3b / err_0c20fb8f) for the full brief, without --variant,
+  and for a trivial probe alike — transport failure, not brief-related. The agentic wrapper
+  additionally crashes on an internal Node assert. S5 waits for owner fallback direction
+  (precedent D-7 suggests a Codex/Opus substitute is acceptable, but S5 was owner-routed to
+  Grok explicitly — not substituting without say-so). Sol docs_audit (S6) proceeds in
+  parallel; it does not depend on the polish verdict.
