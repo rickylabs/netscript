@@ -27,6 +27,6 @@ ready augmentation, OpenHands evaluation, and orchestrator pre-merge gate descri
 
 ## Current state
 
-- Phase: research / plan locked
-- Next slice: S1 — generated verification contract and scaffold integration
+- Phase: implementation complete; draft-to-ready evaluation handoff
+- Next: augment/OpenHands/orchestrator review composed per milestone D6
 - Merge authority: milestone orchestrator

@@ -133,6 +133,7 @@ export function generateNodeModulesVerifier(): string {
     '  for await (const entry of Deno.readDir(root)) {',
     '    const path = join(root, entry.name);',
     '    if (entry.isDirectory) yield* regularFiles(path);',
+    "    else if (entry.isFile && entry.name.startsWith('.scripts-warned-')) continue;",
     '    else if (entry.isFile) yield path;',
     '  }',
     '}',

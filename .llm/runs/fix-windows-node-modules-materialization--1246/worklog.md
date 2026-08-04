@@ -45,3 +45,26 @@
 - Focused `packages/cli` doctrine reporter remains baseline-red (`FAIL=50 WARN=50`) and initially
   surfaced the generated `Deno.exit` text; implementation changed to thrown failures so this slice
   adds no new exit-boundary warning. Existing CLI doctrine debt remains unchanged.
+
+## 2026-08-04 — S2 consumer/runtime evidence
+
+- Full CLI package suite: `595 passed (484 steps), 0 failed`.
+- First canonical `scaffold.runtime` attempt was correctly refused because another live worktree
+  held the global lease; the holder and foreign resources were left untouched.
+- First acquired `scaffold.runtime` run reached the real generated Fresh dev boundary and failed
+  because Deno-owned `.scripts-warned-*` cache metadata is intentionally absent from the local
+  package copy. This was a detector false positive, not product corruption.
+- Narrowed comparison to exclude exactly `.scripts-warned-*`, retained all package-owned dotfiles,
+  and added the marker to both executable fixtures. The incomplete Babel fixture still fails; the
+  complete fixture passes with two verified package files.
+- Corrected canonical command completed `passed=71 failed=0`, including project-boundary Fresh dev,
+  generated type checks, Aspire restore/start, dashboard readiness, app-home serving, plugin/runtime
+  behavior, telemetry, and cleanup.
+- Post-run leak reporter found no resources owned by this worktree; all listed survivors belonged
+  to foreign worktrees and were left untouched.
+- Final focused check/lint/fmt on the corrected generator and test: 2 files, zero findings.
+
+### Platform limitation
+
+WSL/Linux consumer proof is green, but it is not native Windows evidence. The PR therefore retains
+`Refs #1246` and defers native Windows no-intervention startup plus Windows CI to 0.0.6/upstream.

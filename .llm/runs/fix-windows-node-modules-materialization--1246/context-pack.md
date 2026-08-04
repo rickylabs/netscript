@@ -16,6 +16,19 @@
 - Use `Refs #1246`; native Windows start/CI remain unclaimed 0.0.6 work.
 - No local PLAN-EVAL per D6.
 - Do not stage the unrelated dirty `deno.lock`.
+
+## Implementation state
+
+- Draft PR: https://github.com/rickylabs/netscript/pull/1264
+- Implementation commit: `671f0ad41`
+- Generated verifier is wired into root and Fresh dev tasks.
+- Strict executable detector fixtures pass for incomplete and complete trees.
+- Full CLI unit suite: 595 passed / 484 steps / 0 failed.
+- First `scaffold.runtime` run found the `.scripts-warned-*` cache-marker false positive at the
+  actual Fresh boundary; the narrowed marker exclusion is regression-tested.
+- Corrected `scaffold.runtime`: 71 passed / 0 failed, including Fresh dev, Aspire, app serving, and
+  cleanup. Leak check found no resources owned by this worktree.
+- Native Windows proof remains unavailable and is intentionally unclaimed.
 ## Focused code
 
 - `packages/cli/src/kernel/application/scaffold/plan-init.ts`

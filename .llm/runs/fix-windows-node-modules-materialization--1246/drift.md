@@ -21,3 +21,14 @@
   would skip the exact package the detector must report. The parser handles scoped names and peer
   suffixes, while cache existence prevents unmatched directories from counting as verification.
 - **Scope impact:** none; detection is stricter and the fail-closed law is unchanged.
+
+### Deno cache bookkeeping exclusion
+
+- **Plan expectation:** every shared-cache regular file should exist in the local package copy.
+- **Actual:** the first full runtime smoke proved Deno adds `.scripts-warned-*` lifecycle bookkeeping
+  to cache package roots without materializing it. The verifier now excludes exactly that Deno-owned
+  marker prefix and continues comparing all package-owned dotfiles and regular files.
+- **Evidence:** initial `scaffold.runtime` reached the generated Fresh dev boundary and failed only
+  on `msgpackr-extract@3.0.4/.scripts-warned-*`; executable fixtures now include the marker while
+  still failing for a missing real Babel file.
+- **Scope impact:** no acceptance reduction; removes a false positive discovered by consumer proof.

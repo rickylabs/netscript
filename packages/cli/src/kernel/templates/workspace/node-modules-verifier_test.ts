@@ -95,6 +95,8 @@ async function createFixture(complete: boolean): Promise<VerifierFixture> {
     recursive: true,
   });
   await Deno.writeTextFile(join(cachePackage, missingRelative), 'export {};\n');
+  // Deno owns this cache bookkeeping marker and intentionally does not materialize it.
+  await Deno.writeTextFile(join(cachePackage, '.scripts-warned-12345'), '');
   if (complete) {
     await Deno.mkdir(join(localPackage, 'lib', 'transformation', 'file'), {
       recursive: true,
