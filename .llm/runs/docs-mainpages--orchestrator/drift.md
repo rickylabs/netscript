@@ -125,3 +125,8 @@ Confirmed findings:
   and does not author. Supersedes the Opus docs-exception authoring used for #1222/#1241/#1272.
   Opposite-family review invariant unchanged: a Codex-authored page is reviewed Claude-family
   or by agy; the orchestrator owns the final gate.
+
+- **D-17 (owner authorization, 2026-08-04 evening).** "merge all you need to merge I grant you
+  full authorization you're the orchestrator." The run now merges its own PRs on green CI +
+  audit PASS without asking. Bar unchanged: a red gate or open audit finding still stops the
+  merge. Charter A entry-point pages remain the one surface preferred for owner review.
