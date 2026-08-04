@@ -52,7 +52,8 @@ order:
 - **[Request-scoped resources](/web-layer/resources/)** — `withResource()`: one value resolved once
   per request and shared by every layer, layout, and metadata resolver on the page.
 - **[Route contracts](/web-layer/route/)** — `defineRouteContract()`, schema helpers such as
-  `paginationSearchSchema()`, and `createRouteReference()` for typed links.
+  `paginationSearchSchema()` and `defineEnumPathParam()`, and the generated `routes` tree that turns
+  a moved route file into a compile error.
 - **[Partials](/web-layer/partials/)** — `definePartial()`, paired route references, and the layer
   config that turns a region into a cache-aware deferred partial.
 - **[Data loading & the query cache](/web-layer/query/)** — `QueryIsland`, `useQuery`,

@@ -193,6 +193,10 @@ sidecar is left in place). `.withRoute` and `.withRouteContract` in the same pag
 a build error. Set `pageModuleRouteBinding: false` on the Vite plugin to disable
 page-module rewriting and keep hand-written `.withRoute(...)` lines.
 
+How the `routes.<key>` accessor is derived from a file path, the exact conflict
+messages, and what a moved route file costs at compile time are covered in
+[Routing and route contracts](/web-layer/route/#the-generated-routes-tree).
+
 ### Defer policy and streaming
 
 `withPolicy` accepts a `PageDeferPolicyInput` or a `PageDeferPolicyProfile`. The
