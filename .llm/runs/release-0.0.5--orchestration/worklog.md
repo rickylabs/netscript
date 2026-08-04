@@ -728,3 +728,13 @@ exception available), then P2/#1210-P3. Handover contract: it marks #1209 ready 
 worklog; **the 0.0.5 orchestrator retains merge authority** and needs P1 for the
 canary.2-adjacent window. This run refocuses on canary.2: sagas protocol → merge #1193 →
 publish.
+
+### Finding 23 [checklist-briefs-breed-slop]
+
+Owner review of #1209 found a fabricated auth block force-fitted into a tutorial with no
+preceding auth step — invented to satisfy the orchestrator's own "every named feature
+demonstrated in at least one tutorial" demand (rounds 2–3 briefs). A feature checklist without
+a narrative-consistency constraint optimizes for box-ticking over truth — the docs equivalent
+of gates that pass without firing. Corrected bar relayed to docsorch: demonstrate only where
+the narrative calls for it; homeless features route to #1210's per-API deep-dives; slop-audit
+of the existing diff first.
