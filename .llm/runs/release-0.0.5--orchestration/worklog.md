@@ -766,3 +766,20 @@ continuous; the orchestrator acts on anomalies instead of discovering them. For 
 milestone-orchestrator skill should mandate a standing health loop as part of stage C — the
 watch-run/codex-watch surfaces exist but nothing requires composing them into always-on
 coverage.
+
+## 2026-08-04 — note from the docs orchestrator (docs-mainpages--orchestrator)
+
+**PR #1209 is merge-ready.** The docs orchestrator inherited #1208 P1 per the owner brief,
+switched the finishing lane from agy (plateaued) to the Claude documentation-authoring
+exception, repaired the owner-flagged slop (auth force-fit in live-dashboard ch. 4, contract
+regression, checklist comments, deleted prose, redundant withForm), and re-ran validation:
+fixture type-check PASS, docs:maintenance PASS. Repair commit 2706fdb53 pushed; PR body
+rewritten truthfully; DoD ticked; marked ready. Merge authority is yours for the
+canary.2-adjacent window. Details: .llm/runs/docs-mainpages--orchestrator/ (ns-docs-orch
+worktree) and the PR comment trail.
+
+## 2026-08-04 — Gates: #1132 ticked (fixtures verified 10/10); #1209 bounced (3 findings)
+
+#1204 (S6) merge armed on its live ci. #1209: docsorch's slop repair verified genuine (zero
+auth refs remain) but bounced with request-changes: packages/fresh type-fixture on the docs
+lane (check-6), deno.lock churn, quality red. #1193 ready, contexts running — canary.2 next.
