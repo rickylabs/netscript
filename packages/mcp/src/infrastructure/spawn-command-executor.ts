@@ -2,7 +2,7 @@ import type {
   CommandExecutionRequest,
   CommandExecutionResult,
   CommandExecutorPort,
-} from '../domain/command/command-executor-port.ts';
+} from '../domain/command-executor-port.ts';
 import { MCP_PACKAGE_VERSION } from '../publish-assets.generated.ts';
 
 /** Public CLI invocation used when an outer composition does not inject one. */

@@ -79,3 +79,20 @@ Drift is append-only.
 - **Severity:** minor
 - **Action:** accept
 - **Evidence:** PR comment `5172543505`; `evaluate.md` External Composed-Path Evidence.
+
+## 2026-08-04 — Stage-D undeclared command-surface correction
+
+- **What:** The changed-file audit found a command policy/port directory regroup and its dependent
+  import edits in the lane diff without an acceptance-row declaration.
+- **Source:** Milestone orchestrator Stage-D ruling on PR 1195.
+- **Expected:** This lane ships only the S4 OpenAPI projection domain; command execution remains in
+  the separately gated execution fork.
+- **Actual:** The first implementation head also moved the existing command policy, catalog port,
+  executor port, and their consumers into `domain/command/` to reduce doctrine cardinality.
+- **Severity:** significant
+- **Action:** unwind
+- **Boundary:** The OpenAPI projection imports none of the command surface. The exact rejected head
+  is preserved on remote branch `feat/mcp-command-policy-parked`; the PR restores every command
+  file and consumer to the fixed base before re-running gates.
+- **Evidence:** parked head `c0aae1a40bcd6a5a42afb9f282ff39b7ac3dce3a`; reduced-diff audit and
+  gate rows in `worklog.md`.

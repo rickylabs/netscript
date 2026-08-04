@@ -42,7 +42,7 @@ Recorded before implementation files were created.
 
 | # | Slice | Gate | Files |
 | --- | --- | --- | --- |
-| 1 | Cardinality-safe public index contract | command + index tests; scoped check | command-domain moves/imports; entrypoint; index; metadata/docs/test; run artifacts |
+| 1 | Public operation-index contract | index tests; scoped check | entrypoint; index; metadata/docs/test; run artifacts |
 | 2 | Exact canonical identity | ambiguity test | identity module + fixtures/test; entrypoint; run artifacts |
 | 3 | Four-rung descriptions | ladder test | ladder module + fixtures incl. exact no-DB spec; entrypoint; run artifacts |
 | 4 | Declared schema views | schema-view + package tests | views module + fixtures/test; entrypoint; run artifacts |
@@ -65,7 +65,7 @@ they do not add parser strategies or I/O.
 | Time | Slice | Step | Notes |
 | --- | --- | --- | --- |
 | 2026-08-04 | bootstrap | research/plan | Live issue/RFC, doctrine, package surface, and P2 proof/evidence consumed; plan locked. |
-| 2026-08-04 | 1 | implementation | Regrouped the command-domain triplet without changing the root exports; added the documented projection subpath, deterministic operation index, public-import tests, and README entry. |
+| 2026-08-04 | 1 | implementation | Added the documented projection subpath, deterministic operation index, public-import tests, and README entry. An initially bundled command-domain regroup was later removed by the Stage-D scope correction below. |
 | 2026-08-04 | 1 | review | Verified source-order indexing, dotted ids, method-path fallback, ignored Path Item metadata, unchanged 14-tool claims, pure-domain imports, and empty lock diff. |
 | 2026-08-04 | 2 | implementation/review | Added exact identity resolution and a committed ambiguity fixture. Verified id precedence, uppercase method-path fallback, case-variant refusal, duplicate-id ambiguity candidates, and non-executing substring suggestions. |
 | 2026-08-04 | 3 | implementation/review | Added the four-rung description ladder, a per-rung fixture, and the byte-identical 3657-byte generated no-DB spec. Verified the real operations have no operation summary/description and fire rung 3; nested schema property `summary` does not leak into operation descriptions. |
@@ -75,6 +75,7 @@ they do not add parser strategies or I/O.
 | 2026-08-04 | 5 | composed evaluation | The first OpenHands dispatch reached the runner but produced no verdict because LiteLLM rejected the unprefixed `qwen/qwen3.7-max` model identifier. A single corrected `openrouter/qwen/qwen3.7-max` retry completed successfully and committed `evaluate.md` with `IMPL-EVAL: PASS`. |
 | 2026-08-04 | 5 | close-gate review | The current review-thread gate passed with 0 threads and 0 unanswered. Fresh CI correctly reported the self-referential DoD/closing-keyword metadata still pending and found the MCP generated publish-asset manifest stale after the new subpath export. Regenerated only that manifest with the repo-native task. |
 | 2026-08-04 | 5 | merge-readiness handoff | Corrected the PR's structured acceptance block to the repo's constrained `issue`/`entries`/`box-index` schema, then observed authoritative close-gate, full scaffold runtime, scaffold static, desktop-native, surface-diff, repo check/test, quality, and lane-visibility checks pass. GitHub reports the ready-merge PR `MERGEABLE` / `CLEAN`; merge authority remains with the milestone orchestrator. |
+| 2026-08-04 | Stage-D | scope correction | Parked the exact pre-correction head `c0aae1a40…` on remote branch `feat/mcp-command-policy-parked`. Restored the command policy, catalog/executor ports, both command flows, adapters, tests, CLI imports, and root exports byte-for-byte to the PR base; the remaining diff is the OpenAPI projection subpath, fixtures/tests, package metadata/docs, generated manifests, and harness evidence. Projection code had no dependency on the parked command surface. |
 
 ## Decisions
 
@@ -135,6 +136,11 @@ they do not add parser strategies or I/O.
 | Generated publish assets | `deno task gen:publish-assets`; `deno task check:publish-assets`; package publish dry-run | PASS | CI found the new `./openapi-projection` public subpath absent from the checked-in MCP publish manifest; regeneration changed only `packages/mcp/src/publish-assets.generated.ts`, the check passed, and all 3 entrypoints dry-ran successfully. |
 | PR close gate | Actions run `30862374051`; job `91846994088` | PASS | Structured acceptance mirror, referenced issue acceptance, and answered review-thread checks all passed against the live ready-merge body. |
 | Current PR check rollup | `deno task agentic:pr-checks -- --repo rickylabs/netscript --pr 1195 --pretty` | PASS | Head `0094071a9…`: 0 current failures; scaffold runtime/static, desktop native, surface diff, core CI, quality, and close-gate all current-pass. |
+| Stage-D reduced scoped check | `run-deno-check.ts --root packages/mcp --ext ts,tsx` | PASS | 77 files, zero diagnostics after restoring all command paths and consumers to the fixed PR base. |
+| Stage-D reduced scoped lint | `run-deno-lint.ts --root packages/mcp --ext ts,tsx --config packages/mcp/deno.json --pretty` | PASS | 77 files, zero findings. |
+| Stage-D reduced doc-lint | `deno task doc:lint --root packages/mcp --pretty` | PASS | Three public entrypoints, zero diagnostics. |
+| Stage-D reduced quality/package gates | `deno task quality:gate`; package test; publish dry-run; generated-asset checks | PASS | Quality passed; 78 tests passed; 3-entrypoint publish dry-run passed; publish and CLI asset freshness passed. |
+| Stage-D command-surface audit | fixed-base diff and byte comparison | PASS | No command policy/port, flow, adapter, test, CLI, or root-export difference remains against `2c8865e8…`; projection code has no command dependency. |
 
 ### Fitness Gates
 
