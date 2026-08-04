@@ -14,7 +14,9 @@
 
 The identity-bound F1(b) adapter and scaffold named gate are implemented. A real proxy collision
 proved the identity guard and added allocated target-PORT selection. Package/static gates pass;
-fresh branch CI passed the named live adapter gate and the canonical suite 71/71 with cleanup.
+pre-reconcile branch CI passed the named live adapter gate and the canonical suite 71/71 with
+cleanup. S6 then landed on main, so the rebased gate now invokes `list_api_services` and awaits a
+current-head repeat.
 
 ## Completed
 
@@ -28,12 +30,14 @@ fresh branch CI passed the named live adapter gate and the canonical suite 71/71
 
 ## In Progress
 
+- Current-head scaffold runtime after upgrading the live gate to S6's `list_api_services` flow.
 - Composed implementation review/sign-off under milestone ruling D6.
 
 ## Next Steps
 
-1. Obtain separate composed implementation review/sign-off.
-2. Move to `status:ready-merge` only after the evaluator comment and complete DoD.
+1. Repeat serialized scaffold runtime on the S6-rebased head.
+2. Obtain separate composed implementation review/sign-off.
+3. Move to `status:ready-merge` only after the evaluator comment and complete DoD.
 
 ## Key Decisions
 
@@ -60,8 +64,8 @@ fresh branch CI passed the named live adapter gate and the canonical suite 71/71
 | --- | --- | --- |
 | Static | pass | check + scoped lint/fmt |
 | Fitness | pass | focused/package tests, quality scan, arch check, JSR dry run |
-| Runtime | pass | [CI attempt 2](https://github.com/rickylabs/netscript/actions/runs/30895255613/job/91950747988): canonical suite 71/71 with cleanup |
-| Consumer | pass | named live directory gate passed in 4.896s after the earlier foreign-port refusal drove the fix |
+| Runtime | pending current head | [pre-reconcile CI attempt 2](https://github.com/rickylabs/netscript/actions/runs/30895255613/job/91950747988): canonical suite 71/71 with cleanup |
+| Consumer | pending current head | directory fallback passed live; rebased gate now invokes S6 `list_api_services` flow |
 
 ## Open Questions
 

@@ -65,6 +65,7 @@ fixture that proves both accepted drift and rejection of an adjacent torn/ambigu
 | 2026-08-04 | 3 | hardening | Adapter now prefers the real CLI-described executable target `PORT`, retaining declared URL host/protocol normalization. |
 | 2026-08-04 | 3 | baseline failures | Full one-pass attempts later stopped at existing `behavior.service-health` DB health and `runtime.wait.workers-api` gates before S7. Cleanup passed and leak checks found no survivors. |
 | 2026-08-04 | 3 | serialized CI proof | After the baseline holder released the global slot, e2e-cli attempt 2 passed the named MCP gate in 4.896s and the canonical suite completed 71/71 with cleanup. |
+| 2026-08-04 | 3 | S6 reconcile | Main gained S6/#1204 before handoff, so the named gate was upgraded from the permitted directory fallback to `createListApiServicesFlow`; current-head CI must repeat the live proof. |
 
 ## Decisions
 
@@ -116,7 +117,7 @@ fixture that proves both accepted drift and rejection of an adjacent torn/ambigu
 
 | Consumer | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| scaffolded app | PASS | [scaffold-runtime CI](https://github.com/rickylabs/netscript/actions/runs/30895255613/job/91950747988) | direct directory-call fallback selected because S6 is not landed; live `users` row resolved through `aspire-cli`. |
+| scaffolded app | PENDING_CURRENT_HEAD | [pre-S6-reconcile scaffold-runtime CI](https://github.com/rickylabs/netscript/actions/runs/30895255613/job/91950747988) | direct directory fallback passed live; S6 has since landed and the gate now calls `list_api_services`, requiring one current-head rerun. |
 
 ## Handoff Notes
 
