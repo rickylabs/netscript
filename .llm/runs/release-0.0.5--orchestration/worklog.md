@@ -1272,3 +1272,10 @@ Remaining triad: #1237 (version-drift steer in), #1239 (genjobs, suite running).
   both; boxes ticked; PR evidence YAML appended; close-gate rerun + merge armed.
 - Verification AppHosts (main + db-operation) stopped scoped; #1261 (Closes #1247,
   editor-aware agent init) is batch-2's first delivery, in draft.
+
+## 2026-08-04 — MERGE #1256 (#1250 closed): Zod-4 coercion restored with composed live evidence
+
+Gate record: all four contexts green (close-gate on rerun after the evidence YAML + box
+edits), threads 0/0 (JSON output — waiter's *PASS* glob missed it, merge completed manually;
+monitor-pattern note: match the JSON `"ok":true` field, not the pretty string), refs [1250].
+**#1250 auto-closed.** Quick-wins 2/3 merged (#1253 rides #1258's gate).
