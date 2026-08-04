@@ -686,3 +686,19 @@ expensive gate queued behind the sagas joint run), #1187 `019fcb61-8dfe` (Sol·m
   HTTP-boundary RED→GREEN test independently 2/2.
 - **#1193 green-lit** for the joint verification: rebase → exclusive expensive-gate slot →
   one-pass suite + seven-point protocol on BOTH backends → ready. Canary.2's centerpiece.
+
+## 2026-08-04 — Quota restored; red-attribution complete; sagas endgame re-issued
+
+- **Quota redemption executed** (D12): tmux-driven Codex TUI, soonest-expiring reset redeemed
+  (1 remains, expires 12 Aug); CLI updated to 0.146.0 on owner instruction. Verified by real
+  calls: S6 resumed and streaming; S7/#1187 resumed after correcting two thread ids I had
+  wrongly reconstructed from prefixes (the authoritative ids live in codex-thread-ids.md —
+  lesson noted).
+- **#1202 red-attribution decisive**: pristine-main, clean-machine baseline = 51/1 with the
+  identical `users` DB-health failure (third repro; stale-container hypothesis retired;
+  constant observed: the unhealthy instance always sits on fixed port 3001). #1193's suite red
+  is provably baseline.
+- **agy delivered #1109 → PR #1203** (runtime worked examples) while reporting status=ERROR —
+  agy's exit status is now 0-for-2 against its artifacts; gate judges artifacts.
+- Sagas thread re-issued the final scope: both-backends protocol on the rebased branch, then
+  ready. Canary.2 = merge #1193 + hand-complete #1184/#1190 on its recording.
