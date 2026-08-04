@@ -121,6 +121,23 @@ The KV OAuth adapter (`@netscript/auth-kv-oauth`) is NetScript's default interac
 3. **Session Verification**: Subsequent requests carry the session cookie. `backend.authenticate` verifies the session ID against Deno KV, automatically handles refresh-on-read, and returns the mapped `Principal`.
 4. **Sign-Out**: `backend.signOut` deletes the session from Deno KV and returns a response that clears the `__Host-ns_session` cookie.
 
+### Sign-in redirect and Location-header propagation
+When initiating a sign-in flow via `backend.signIn(request, options)`, the adapter returns an HTTP `302 Found` redirect response. This response is critical for:
+- **Location-Header Propagation**: The framework or hosting server must propagate the `Location` header to redirect the user's browser to the Identity Provider's authorize endpoint.
+- **Transaction Cookie Propagation**: The response contains `Set-Cookie` headers for temporary transaction state (e.g., PKCE verifiers and state tokens) which must be sent to the browser.
+
+### Callback exchange and cookie/Location propagation
+Upon successful authorization, the Identity Provider redirects the user back to the registered `/auth/callback` endpoint with a temporary authorization `code` and `state`.
+Calling `backend.handleCallback(request)` performs the secure token exchange and returns a redirect response to the validated `returnTo` target. The server must propagate:
+- **Location Redirect**: The `Location` header guiding the user back to the application (e.g., `/dashboard`).
+- **Session Cookie**: The `Set-Cookie` header establishing the `__Host-ns_session` cookie (and clearing the temporary transaction cookie).
+
+### Sign-out, session teardown, and cookie clearing
+To log a user out of the application:
+1. **Endpoint**: Mount a dedicated sign-out route (e.g., `GET /auth/signout`).
+2. **Session Teardown**: Invoke `backend.signOut(request)` inside this endpoint. This deletes the active session record from Deno KV, immediately invalidating subsequent request authentications using this session ID.
+3. **Cookie Clearing**: The returned response contains a `Set-Cookie` header setting `__Host-ns_session` to expire immediately (e.g., `Max-Age=0`), along with a `Location` header redirecting the user back to a safe public route (like the landing or login page). Both must be propagated to the client.
+
 ### Return target and identity normalization
 - **`allowedReturnTo`**: To prevent open-redirect vulnerabilities, the backend restricts post-login redirects. It validates the target against a preset array of URL prefixes or a custom evaluation function. If validation fails, it throws a `return_to_not_allowed` error.
 - **`normalizePrincipal`**: Customizes how user claims and tokens map to a NetScript `Principal` (subject, scopes, and roles).
@@ -178,18 +195,20 @@ function toAuthnRequest(req: Request): AuthnRequest {
   };
 }
 
-// 2. Sign-in: begins flow, redirects browser to GitHub
+// 2. Sign-in: begins flow, redirects browser to GitHub via Location header propagation
 app.get("/auth/signin", async (c) => {
   const returnTo = c.req.query("returnTo") ?? undefined;
   const response = await backend.signIn(c.req.raw, { returnTo });
+  // Propagates the redirect Location and transaction cookies to the browser
   return response;
 });
 
-// 3. Callback: exchanges code, creates session, redirects user to returnTo
+// 3. Callback: exchanges code, creates session, and redirects to returnTo via Location/Cookie propagation
 app.get("/auth/callback", async (c) => {
   try {
     const { response, sessionId, principal } = await backend.handleCallback(c.req.raw);
     console.log(`Session ${sessionId} established for user ${principal.subject}`);
+    // Propagates the redirect Location header and set-cookies (session cookie)
     return response;
   } catch (error) {
     return c.text(`Authentication failed: ${error}`, 400);
@@ -218,9 +237,10 @@ app.get("/auth/me", async (c) => {
   });
 });
 
-// 5. Sign-out: deletes session from KV, clears browser cookie
+// 5. Sign-out: deletes session from KV (teardown), clears browser cookie, and redirects
 app.get("/auth/signout", async (c) => {
   const response = await backend.signOut(c.req.raw);
+  // Propagates the cookie-clearing header and redirect Location
   return response;
 });
 ```
@@ -232,7 +252,7 @@ app.get("/auth/signout", async (c) => {
 The WorkOS adapter (`@netscript/auth-workos`) provides a dedicated `createWorkosAccessTokenAuthenticator` to verify stateless Bearer JWTs issued by WorkOS. This is ideal when the client handles sign-in through WorkOS AuthKit and NetScript only serves as a protected API gateway.
 
 ### How it works
-1. **JWKS Verification**: The authenticator reads the `Authorization: Bearer <token>` header, fetches the WorkOS public keys (JWKS) to confirm signature authenticity, and caches them locally.
+1. **JWKS Verification**: The authenticator reads the `Authorization: Bearer <token>` header and fetches the WorkOS public keys (JWKS) from the key-set URL (`https://api.workos.com/sso/jwks/<clientId>`) to verify the signature. Keys are cached locally, and rotation is handled automatically (the JWKS client refreshes the cache when signature verification fails on an unknown key).
 2. **Audience & Issuer Claims**: It asserts that the token's audience (`aud`) matches the WorkOS `clientId` and that the issuer (`iss`) matches your WorkOS domain.
 3. **Principal Mapping**: It maps standard WorkOS JWT claims (`sub`, `org_id`, `role`, `roles`, `permissions`) to the neutral NetScript `Principal` (scheme `"custom"`).
 4. **Named Failure Outcomes**: Rejections are explicitly returned via `ok: false` with specific codes rather than thrown, allowing developers to handle missing versus malformed tokens differently.
@@ -244,8 +264,13 @@ import type { AuthnRequest } from "@netscript/service/auth";
 
 // 1. Create a stateless WorkOS bearer authenticator
 const authenticator = createWorkosAccessTokenAuthenticator({
-  clientId: "client_01H...", // Your WorkOS Client ID
-  jwksUrl: "https://api.workos.com/sso/jwks/client_01H...", // Optional custom JWKS
+  clientId: "client_01H...", // Your WorkOS Client ID (asserted as expected audience)
+  // JWKS Key-Set Configuration:
+  // WorkOS hosts public keys at https://api.workos.com/sso/jwks/<clientId>.
+  // The authenticator fetches and caches keys from this URL. WorkOS handles key
+  // rotation automatically; the underlying jose library refreshes the key-set
+  // cache on signature verification failures.
+  jwksUrl: "https://api.workos.com/sso/jwks/client_01H...", 
   issuer: "https://api.workos.com", // Expected JWT issuer
 });
 

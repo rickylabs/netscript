@@ -57,18 +57,17 @@ We are adding manual coverage of operational session lifecycles for the three au
 | -------- | ---------------- | ------------------------- | --------- |
 | Compile  | `deno check examples/auth-lifecycles/*.ts` | PASS | Verified target codes compilation |
 | Lint     | `deno lint examples/auth-lifecycles/` | PASS | All files lint green |
-| Links    | `deno task docs:links` | PASS | Link sanity checks before edits |
+| Links    | `deno task docs:links` | PASS | Link sanity checks before and after edits |
+| Accuracy | `deno task docs:accuracy` | PASS | Verified accuracy and discoverability gates pass |
 
 ## Handoff Notes
 
-- Inspect the new manual page: [session-lifecycles.md](file:///home/codex/repos/ns005-authdocs/docs/site/identity-access/session-lifecycles.md).
-- Compilation Command & Result:
-  Command: `deno check examples/auth-lifecycles/*.ts`
-  Result:
-  ```
-  Check examples/auth-lifecycles/better_auth.ts
-  Check examples/auth-lifecycles/kv_oauth.ts
-  Check examples/auth-lifecycles/workos.ts
-  ```
-  Lint: `deno lint examples/auth-lifecycles/` passed cleanly (Checked 3 files).
+- Inspect the updated manual page: [session-lifecycles.md](file:///home/codex/repos/ns005-authdocs/docs/site/identity-access/session-lifecycles.md).
+- Follow-up Verification Commands & Results:
+  - Links Verification: `deno task docs:links`
+    - Result: `PASS` (102 docs checked, 0 broken links, 0 broken anchors, 0 orphans)
+  - Accuracy Verification: `deno task docs:accuracy`
+    - Result: `PASS`
+  - Diff Check: `git diff docs/`
+    - Result: `PASS` (verified only documentation-related files modified)
 
