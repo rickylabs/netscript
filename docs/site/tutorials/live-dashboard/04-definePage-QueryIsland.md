@@ -377,6 +377,6 @@ A perpetually empty table usually means the KV cache is cold and the loader retu
 A `definePage` orders page that renders cache-first through the layer/partial/island triad, plus a
 hydrated `QueryIsland` that reads with `useQuery` and mutates optimistically with `useMutation` —
 all keyed off the same contract-derived helpers. The table is live on the client. Next you make it
-live from the *server*: real-time row updates over a durable StreamDB.
+live from the *server*: rows pushed into an open page over a durable StreamDB.
 
 {{ comp.nextPrev({ prev: { label: "3 · Cache-first query", href: "/tutorials/live-dashboard/03-sdk-cache-first-query/" }, next: { label: "5 · Live stream", href: "/tutorials/live-dashboard/05-live-stream/" } }) }}

@@ -9,11 +9,17 @@ next: { label: "6 · Deploy", href: "/tutorials/live-dashboard/06-deploy/" }
 # Real-time updates with durable streams
 
 In chapter 4 the table was live on the *client* — it refetched and mutated without a navigation.
-But it still only knows what it fetched: between revalidations, a cancelled order sits on the screen
-looking shippable. This chapter closes that gap from the *server* side: a durable change-stream
-pushes state changes to the browser, and a `useLiveQuery` hook re-renders rows the instant they
-change — no polling loop, no refresh button, no window where the screen and the database disagree.
-This is the payoff of the whole track: a table that updates by itself.
+But it still only knows what it fetched, and it only learns anything by asking. This chapter builds
+the other direction: a durable change-stream that the **server** pushes into an open page, read by a
+`useLiveQuery` hook that re-renders when data arrives — no polling loop, no refresh button, no
+refetch.
+
+Be clear-eyed about how far the shipped plumbing carries that today. The subscription half is
+complete: a StreamDB handle, a live query, and rows that appear in an already-open page without a
+reload. The *producer* half is where the current runtime stops short — the sagas plugin mirrors its
+instances into the stream once, when its service starts, rather than on every transition. So you will
+build a genuinely live view and drive a genuinely pushed update through it, and you will see exactly
+where the seam ends.
 
 {{ comp.learningPath({ steps: [
   { label: "1 · Scaffold", href: "/tutorials/live-dashboard/01-scaffold/" },
@@ -26,11 +32,11 @@ This is the payoff of the whole track: a table that updates by itself.
 
 ## What you will build
 
-A live monitor island that subscribes to a durable StreamDB and renders rows that update in
-real time. You will open a `StreamDB` handle pointed at the streams runtime, drive a
-table with `useLiveQuery`, and seed the island from the server so the first paint is instant. The
-worked example is the **sagas** stream — the durable change-stream the showcase ships and the same
-mechanism your order dashboard uses to go live.
+A live monitor island that subscribes to a durable StreamDB and re-renders when the server pushes.
+You will open a `StreamDB` handle pointed at the streams runtime, drive a table with `useLiveQuery`,
+and mount it from a `definePage` page that resolves the stream address on the server. The worked
+example is the **sagas** stream — the durable change-stream the sagas plugin ships with a ready-made
+typed collection.
 
 {{ comp callout { type: "note", title: "Why the example uses the sagas stream" } }}
 NetScript's durable-streams runtime mirrors execution state — saga instances, worker executions — into change-streams that the frontend can subscribe to. The sagas plugin ships the ready-made <em>typed</em> collection for this: <code>createSagasStreamDB</code> gives <code>useLiveQuery</code> a StreamDB it can query with full types, which is why this chapter's worked live table grounds there. The pattern is identical for any StreamDB collection; once you have it, pointing a live table at your own stream is the same three moves — and the producer half of that story is already in reach, because the streams plugin scaffolds a user-owned durable stream into your workspace (see the closing section). To follow this chapter against running data, the workspace needs the <strong>sagas</strong> plugin and its streams runtime — add the published package with <code>netscript plugin install @netscript/plugin-sagas</code> if it is not already installed.
@@ -102,13 +108,14 @@ const { data: instanceRows = [] } = useLiveQuery(
 );
 
 const instances = instanceRows as SagaInstance[];
-// Render `instances` as a table — each row updates the moment its saga advances.
+// Render `instances` as a table — the array is replaced whenever the stream
+// pushes a change for one of these rows, and the table re-renders.
 ```
 
 The callback shape is a tiny query builder: `query.from({ instance: <collection> })` selects rows
 from the `sagaInstance` collection. When the server pushes a change for any of those rows,
-`useLiveQuery` returns the new array and the table re-renders. That is the entire real-time path on
-the client.
+`useLiveQuery` returns the new array and the table re-renders. That is the entire push path on the
+client — it reacts to whatever the producer sends, as soon as it arrives.
 
 {{ comp callout { type: "tip", title: "Live vs. fetched — when you would run both" } }}
 A mature live island often runs <strong>two</strong> kinds of read side by side: a <code>useQuery</code> against a typed service contract for slow-changing reference data, and a <code>useLiveQuery</code> against a StreamDB collection for the fast-changing rows. This chapter builds only the second. The first would need a sagas <em>service</em> client — a <code>createServiceClient</code> + <code>createQueryFactories</code> pair like chapter 3 built for <code>orders</code> — and this track never creates one, so no snippet here pretends to. Chapter 4's orders island is the worked example of the cache-first half.
@@ -217,22 +224,42 @@ start.
 
 The table starts empty, because nothing in this track has created a saga instance yet — chapter 2
 built a plain oRPC read-model, not a saga producer, so posting an order does **not** publish a saga
-message. To *see* rows move you publish one yourself, through the sagas plugin's CLI. Register a
-throwaway saga and send it a message:
+message. You create one yourself, and the order of the steps is what makes the push observable.
+
+**Precondition.** The mirror that fills this stream reads saga instances through Prisma delegates, so
+the sagas plugin must be installed on the Prisma store backend with its migration applied
+(`netscript plugin install @netscript/plugin-sagas --saga-store-backend prisma`, then
+`netscript db init`). On the KV backend the sagas service logs `Saga Prisma delegates unavailable`
+and never mirrors anything — the table stays empty no matter what you publish.
 
 ```sh
 # Install the shorthand once (see the storefront track for the full form):
 #   deno install -gArf -n ns-sagas jsr:@netscript/plugin-sagas{{ releaseSpecifier }}/cli
+
+# 1. Register a throwaway saga, then restart the graph — the processor loads
+#    its registry at boot, so a saga added while it runs is not yet known.
 ns-sagas add saga demo --message-type=DemoStarted --durability=t1 --topic=demo
+
+# 2. With the graph back up, publish a message. The engine starts a durable
+#    saga instance and writes it to the saga database.
 ns-sagas publish DemoStarted --payload='{ "id": "demo_1" }' --correlation-key=demo_1
+
+# 3. Confirm the instance exists in the durable store.
+ns-sagas list --instances --saga=DemoSaga --json
 ```
 
-`add saga` writes the definition and refreshes the saga registry, so restart `aspire start` once
-before publishing — the sagas processor loads its registry at boot. `publish` then writes a message
-onto the saga bus; the engine starts an instance for it and mirrors that instance into the
-`sagaInstance` stream collection your island is subscribed to. Within a moment a
-new row appears and advances through its steps **without a page reload** — that is the push path,
-proven with the only mechanism this track actually wires. Type-check the new files:
+Now open the monitor page in the browser and **leave it open**. With the page connected and its
+subscription live, restart the sagas service one more time. As it finishes starting, its stream
+mirror reconciles every saga instance out of the database and upserts each one into the
+`sagaInstance` collection — and because your page is already subscribed, that upsert arrives over the
+open connection and the row appears **without a page reload**. That is the push path, end to end,
+proven with the only mechanism the runtime actually wires today.
+
+{{ comp callout { type: "warning", title: "The sagas mirror reconciles at startup — it is not yet a change feed" } }}
+This is the seam this chapter is honest about. <code>startSagasStreamMirror()</code> runs <strong>once</strong>, during the sagas service's post-listen startup, and performs a finite paged reconciliation: it reads saga instances from the database, upserts each into the stream, and returns. No publish or state-transition path writes to the stream afterwards. So an open page receives a genuine server push — the arrival really is unsolicited and reload-free — but it arrives <strong>once per sagas-service start</strong>, not on every saga step. A saga that advances while the service keeps running will not move the row until the next restart reconciles it. The client half you built (StreamDB, subscription, <code>useLiveQuery</code>) is fully live and needs no change; it is the plugin's producer that has room to grow into a per-transition feed.
+{{ /comp }}
+
+Type-check the new files:
 
 ```sh
 deno task check
@@ -242,19 +269,23 @@ deno task check
 - [ ] The live island opens a `createSagasStreamDB` handle and queries it with `useLiveQuery`.
 - [ ] A `definePage` page at `dashboard/sagas/index.tsx` resolves `getStreamsUrl()` in a
       `.withResource` and hands it to the island through a `.withLayer` loader.
-- [ ] `ns-sagas publish` makes a row appear and advance live, with no reload.
+- [ ] With the page open, restarting the sagas service makes the published instance's row appear
+      through the subscription, with no reload.
 - [ ] `deno task check` is clean.
 
-{{ comp callout { type: "tip", title: "Nothing moves after you publish?" } }}
-Three usual causes: the sagas plugin (and its streams runtime) is not installed/booted — check the <a href="/explanation/aspire/">dashboard</a> resource list; <code>getStreamsUrl()</code> resolved nothing because <code>aspire start</code> is down; or the saga never registered, which <code>ns-sagas list --registered --json</code> tells you immediately. An empty table with a healthy streams runtime means no instance exists yet, not that the subscription is broken.
+{{ comp callout { type: "tip", title: "No row after the restart?" } }}
+Work down the path in order. <code>ns-sagas list --instances --json</code> tells you whether the instance exists at all — if it does not, the saga never registered (<code>ns-sagas list --registered --json</code>) or the publish failed. If the instance exists but no row arrives, the usual cause is the store backend: on KV the sagas service logs <code>Saga Prisma delegates unavailable</code> at startup and the mirror is skipped entirely. After that, check that the streams runtime is up and that <code>getStreamsUrl()</code> resolved — a dead <code>:4437</code>-class endpoint means the producer could not connect, which it logs as a skipped event.
 {{ /comp }}
 
 ## What you built
 
-A real-time table: a durable StreamDB handle (`createSagasStreamDB`) driving `useLiveQuery`, wrapped
-in a `QueryIsland` and mounted by a `definePage` page whose `.withResource` resolves the streams
-address. The refresh button is now irrelevant: the moment a saga advances on the server, the row your
-operations team is looking at changes with it — no polling, no refetch, no reload.
-Next you run the whole graph locally under Aspire.
+A server-pushed table: a durable StreamDB handle (`createSagasStreamDB`) driving `useLiveQuery`,
+wrapped in a `QueryIsland` and mounted by a `definePage` page whose `.withResource` resolves the
+streams address. You proved the push end to end — state that entered the database through a saga
+publish arrived in an already-open browser page with no polling, no refetch and no reload — and you
+saw precisely how far the shipped producer carries it: one reconciliation per sagas-service start.
+The client half is the durable part; when a plugin's producer grows a per-transition feed, this page
+gets finer-grained updates without a line of change. Next you run the whole graph locally under
+Aspire.
 
 {{ comp.nextPrev({ prev: { label: "4 · definePage + island", href: "/tutorials/live-dashboard/04-definePage-QueryIsland/" }, next: { label: "6 · Deploy", href: "/tutorials/live-dashboard/06-deploy/" } }) }}

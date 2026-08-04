@@ -100,7 +100,7 @@ append the orders route you built:
 ```
 
 The table renders cache-first (chapter 4), refetches on the client, and — if the streams runtime is
-up — the live monitor updates in real time (chapter 5). Then open the Aspire dashboard to watch the
+up — the saga monitor receives pushed updates over its subscription (chapter 5). Then open the Aspire dashboard to watch the
 system behind it:
 
 ```

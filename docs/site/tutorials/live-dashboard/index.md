@@ -36,8 +36,8 @@ orders.
 A `my-dashboard/` Fresh workspace whose home screen is the live order queue described above. You
 scaffold a fresh NetScript project, expose an `orders` read-model through a typed oRPC service, wire
 a cache-first SDK query layer, render the queue with NetScript's `definePage` page builder and a
-hydrated TanStack Query island, then upgrade it to push real-time updates over a durable
-change-stream — the point where the refresh button stops mattering. The final chapter runs the whole
+hydrated TanStack Query island, then subscribe it to a durable change-stream so the server can push
+updates into an open page — the point where the refresh button stops mattering. The final chapter runs the whole
 graph locally under Aspire. This is a learning track: the same project grows chapter by chapter, so
 do them in order.
 
