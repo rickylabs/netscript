@@ -227,3 +227,112 @@ Those citation errors did not change the initial mechanism findings, but these c
 **FAIL_FIX.** Change the single remaining phrase in `resources.md:195-198` from “resolved once at the top of the request” to “resolved once during the page-pipeline preparation.” No other prior finding remains open. Because this is the second audit FAIL cycle, the harness doc-audit profile's supervisor-escalation rule now applies.
 
 **Final verdict after supervisor fix `05e0581d6`: PASS.** `resources.md:196` now says “resolved once during the page-pipeline preparation,” closing G1-F2 and the final open finding.
+
+## Batch 2 audit
+
+- **Audit changeset:** `903538321` + `df1327f5e` on `docs/web-layer-deep-dives`
+- **Scope:** rewritten `web-layer/route.md`, new `web-layer/query-bridge.md`, the `query.md` JSDoc-drift correction, and their nav/cross-links.
+- **Method:** opposite-family evidence-only audit. Public surfaces were inspected with `deno doc`, runtime claims were compared with `packages/fresh` and `packages/sdk`, focused tests and type controls were executed independently, and the site-local build/link gates were rerun. No docs or product source was edited.
+- **Verdict:** **FAIL_FIX**
+
+### Gate 1 — mechanism and API accuracy: FAIL
+
+Most of both pages is unusually well aligned with the implementation. D6's contract/reference/generated-tree model, pagination fallbacks, derived offset, enum helpers, href serialization, same-route preservation rule, manifest accessor derivation, three authoring forms, runtime guards, and paired partial references all match source. D7's provider-backed versus pure helpers, separate server/client key tiers, cache-only `getCachedEntry`, SWR behavior, hydration timestamp limitation, narrow `QueryClientPort`, hydration timing, process-global cache registration, and `getIslandQueryClient()` JSDoc drift also match source.
+
+Independent controls:
+
+- `deno doc --filter` was run for `defineRouteContract`, `createRouteReference`, `paginationSearchSchema`, `defineEnumPathParam`, `createQueryFactories`, `createNetScriptQueryClient`, `IslandQueryOptions`, and `IslandQueryResult`.
+- Route controls: `contract.test.ts` (11 pass); `search-params.test.tsx` (7 pass); `manifest.test.ts` + `manifest-page-module.test.ts` (22 pass); `navigation.test.tsx` + builder tests (22 pass). The first builder-test attempt lacked Fresh's required `DENO_DEPLOYMENT_ID` env permission; the evidence rerun used `--allow-env` and passed.
+- Query/cache controls: `cache-query_test.ts` + `cache-provider_test.ts` (4 pass); `hydration-script.test.tsx` (2 pass).
+- D7 negative control 1: adding `initialDataUpdatedAt` to `IslandQueryOptions<number>` failed as claimed with `TS2353`.
+- D7 negative control 2: calling `prefetchQuery` on `createNetScriptQueryClient()` failed with `TS2551`, and passing the returned `QueryClientPort` to `dehydrateQueryClient` failed with `TS2345`.
+- D7 negative control 3: reading `isRefetching` and `isFetching` from `IslandQueryResult<number>` failed with two `TS2339` diagnostics.
+- All temporary type fixtures were removed.
+
+#### Finding
+
+1. **Blocking — `clientKey(input?)` does not distinguish every supplied input from omission.** `query-bridge.md:91,349-350` says a supplied input produces `[resource, action, { input }]` and only an omitted input produces the prefix. The implementation at `packages/sdk/src/query/query-factory.ts:171-175` uses `props ? ... : ...`, so any falsy procedure input is treated as omitted. An independent runtime control produced:
+
+   ```text
+   clientKey(0)     -> ["orders","list"]
+   clientKey(false) -> ["orders","list"]
+   queryOptions(0).queryKey -> ["orders","list",{"input":0}]
+   ```
+
+   Until the SDK implementation is fixed, replace the table/bullet wording with:
+
+   > `clientKey(input?)` returns the full structured key for truthy inputs and the action prefix when input is omitted or otherwise falsy. For procedures accepting `0`, `false`, or `''`, use `queryOptions(input).queryKey` when an exact key is required.
+
+   This is an SDK behavior defect exposed by the docs, not merely a prose preference. If the implementation is corrected to test `props === undefined`, the page's intended wording becomes accurate.
+
+### Gate 2 — bare-Fresh contrast fairness: FAIL
+
+#### Findings
+
+1. **Blocking — D7 invents manual island serialization and attributes the resulting XSS risk to bare Fresh.** `query-bridge.md:23-73,296-299` inserts a hand-written JSON `<script>`, reads it with `document.getElementById`, and calls that “what bare Fresh makes you write.” Fresh islands already accept serializable props from a server-rendered page; Fresh owns their transport and escaping. The native comparison is `<OrdersIsland initialOrders={data.orders} />`, not a manual script bridge. NetScript's real added value here is the contract-derived service client/query factory, shared key construction, cache policy, and hydration helpers—not basic server-to-island prop serialization.
+
+   Replace the bare-Fresh example and cost setup with a normal island prop:
+
+   ```tsx
+   export default define.page<typeof handler>(({ data }) => (
+     <OrdersIsland initialOrders={data.orders} />
+   ));
+
+   // islands/OrdersIsland.tsx
+   export default function OrdersIsland(
+     { initialOrders }: { initialOrders: { items: Order[] } },
+   ) {
+     const query = useQuery({
+       queryKey: ['orders', 20, 0],
+       queryFn: () => fetch('/api/v1/orders/list?limit=20&offset=0').then((r) => r.json()),
+       initialData: initialOrders,
+     });
+     return <OrdersTable orders={query.data?.items ?? []} />;
+   }
+   ```
+
+   Then state the fair remaining seams:
+
+   > Fresh transports serializable island props for you. What it does not provide is a service-contract-derived response type and query function, a shared query-key factory, or coordination between the server cache and the browser QueryClient.
+
+   Remove the claim that the manual script's escaping failure is a bare-Fresh cost.
+
+2. **Material — moving a Fresh route under a route group does not make its links 404.** `route.md:61-63` lists “move it under a group” among URL-breaking changes, while the same page correctly says at `route.md:231-240` that `(group)` directories are dropped from generated paths. Fresh route groups are URL-neutral.
+
+   Replace the sentence with:
+
+   > Rename the file, move it into a different URL-bearing directory, or add a segment, and every hand-written link still compiles and ships—it just 404s. Moving it under a Fresh route group alone does not change the URL.
+
+### Gate 3 — cross-links, navigation, and site gates: PASS
+
+Evidence:
+
+- `cd docs/site && rtk proxy deno task build` — **PASS**, exit 0, 606 files generated; `/web-layer/route/` and `/web-layer/query-bridge/` were emitted.
+- `cd docs/site && rtk proxy deno task check:links` — **PASS**, exit 0: `31659 internal links across 217 pages — all resolve`.
+- The site-local `check:links` task is the verdict source for this batch. Root `deno task docs:links` was intentionally not used because it does not scan the built site; that coverage gap should remain recorded in the run.
+- `query-bridge.md` uses the sibling front-matter convention and follows resources/partials at navigation order 15. The Web Layer hub links it; `query.md` links to it and back through the related cards; the new page links to query, resources, SDK, server, islands, and the live-dashboard chapter. `builders.md` links into the rewritten generated-routes section.
+- Changed-line scans found no leaked issue/PR/harness vocabulary and no bare `jsr:@netscript/*` specifiers.
+- The audit build briefly added an exact `jsr:@fresh/core@2.3.3` lock entry; it was removed while preserving the pre-existing `jsr:@netscript/queue@0.0.4` change.
+
+### Gate 4 — prose register: FAIL
+
+`route.md` is otherwise close to the thesis → mechanism → boundary register of `explanation/contracts.md`: it distinguishes the three route objects, develops observable behavior, and ends with precise limitations. `query-bridge.md` is strongest after its bare-Fresh section, especially where it names the cache tiers and compile boundaries.
+
+The opening contrast is both technically unfair and more prosecutorial than the reference register: “Four costs, and each of them is a bug that ships quietly” and “an XSS hole waiting” turn an invented mechanism into sales copy. Apply the Gate 2 replacement, then replace the transition at `query-bridge.md:60` with:
+
+> Fresh carries the value into the island, but three coordination seams remain: the service response contract, the request/input construction, and the TanStack query key.
+
+No rewrite of either page is warranted; this is a focused correction to one opening section plus the two precise API statements above.
+
+### Batch 2 gate log
+
+| Gate | Commands / source | Scope | Result | Findings | Proceeded |
+|---|---|---|---|---|---|
+| Mechanism/API accuracy | `deno doc --filter ...`; focused Fresh route/builder tests; SDK cache tests; Fresh hydration tests; three negative type fixtures; direct `clientKey` runtime control | D6 + D7 + `query.md` correction | **FAIL** | D6 mechanisms and all three claimed D7 compile boundaries verified; falsy `clientKey` inputs contradict the documented exact-key rule | Flagged for generator/SDK owner |
+| Bare-Fresh fairness | Fresh 2 island/route mechanics; source and existing consumer patterns | Both deep-dives' comparison sections | **FAIL** | Manual island JSON transport is invented; Fresh route groups do not change URL paths | Flagged with exact replacements |
+| Cross-links/nav | `cd docs/site && deno task build`; `cd docs/site && deno task check:links`; generated output and front matter | Full site and changed cross-links | **PASS** | 606 files; 31,659 links across 217 pages resolve; nav order 15 correct | Proceeded |
+| Prose register | Comparison with `docs/site/explanation/contracts.md` | `route.md`, `query-bridge.md`, changed `query.md` prose | **FAIL** | D7's opening is checklist-like and accusatory; focused replacement supplied | Flagged for generator |
+
+### Batch 2 verdict
+
+**FAIL_FIX.** Correct the `clientKey` falsy-input boundary (in docs or, preferably, SDK source), replace the invented bare-Fresh island serialization with ordinary serializable island props, remove the route-group 404 claim, and normalize the D7 opening transition. The remaining route, query-factory, cache, hydration, compile-boundary, JSDoc-drift, link, and navigation claims pass this audit.
