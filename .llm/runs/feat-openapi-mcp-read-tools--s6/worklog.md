@@ -47,8 +47,8 @@ Start at `tool-contracts.ts` for wire shape, follow the named flow in
 | Plan | complete |
 | PLAN-EVAL | composed per milestone-run.md (orchestrator waiver) |
 | Implement | complete |
-| Gate | in progress |
-| IMPL-EVAL | composed per milestone-run.md (orchestrator waiver) |
+| Gate | complete |
+| IMPL-EVAL | composed per milestone-run.md (orchestrator waiver) — PASS |
 
 ## Implementation evidence
 
@@ -101,3 +101,11 @@ Start at `tool-contracts.ts` for wire shape, follow the named flow in
 - Three non-blocking observations were accepted into the sign-off slice: bound failure suggestions
   to three, align the public limit schema (1–100) with the flow's 49-row self-cap, and narrow the
   S6 receipt fixture name to its actual success-path assertion.
+
+## Composed evaluator result
+
+- OpenHands run `30891416446` returned **IMPL-EVAL PASS** in PR comment `5176464319`.
+- The evaluator independently verified all three issue contracts, S4/S5 composition, S8 receipt
+  settlement, the truthful 14→17 registry delta, 98/98 MCP tests, and lint/lock hygiene.
+- PR 1204 is ready for review with `status:impl-eval`; the orchestrator retains merge authority and
+  the pre-merge gate.
