@@ -84,6 +84,36 @@ migration behavior.
 
 Full static, quality, JSR, consumer, and formal evaluator gates remain pending.
 
+### Static Gates
+
+| Gate | Command or check | Result | Notes |
+| --- | --- | --- | --- |
+| MCP check | scoped check wrapper, `--config=packages/mcp/deno.json` | PASS | 103 files, 0 diagnostics |
+| owned CLI check | scoped check wrapper, `--config=packages/cli/deno.json` | PASS | 16 files, 0 diagnostics |
+| MCP lint | scoped lint wrapper with package config | PASS | 103 files, 0 occurrences |
+| owned CLI lint | scoped lint wrapper with package config | PASS | 16 files, 0 occurrences |
+| MCP format | scoped fmt wrapper with package config | PASS | 103 files, 0 findings |
+| owned CLI format | scoped fmt wrapper with package config | PASS | 16 files, 0 findings |
+| root wrapper attempt | scoped fmt wrapper without explicit config | NOT_RUN | Deno 2.9.3 rejected baseline array-form root `workspace` before scanning; explicit package-config reruns are the verdicts above |
+| diff hygiene | `git diff --check`; changed-line ignore/cast scan | PASS after run-artifact EOF cleanup | no new lint ignores, `as unknown as`, `as any`, or `@ts-ignore` |
+
+### Fitness / JSR Gates
+
+| Gate | Result | Evidence | Notes |
+| --- | --- | --- | --- |
+| `deno task quality:gate` | PASS | exit 0 | repo task passed; warnings are baseline-only |
+| targeted MCP quality scan | PASS | `scan-code-quality.ts --root packages/mcp` | 0 findings, 0 allowances |
+| targeted MCP doctrine | BASELINE_FAIL | `check-doctrine.ts --root packages/mcp` | unchanged test-style false positive plus two existing folder-cardinality warnings; changed-file scan introduces none |
+| doc-lint | PASS | `deno task doc:lint --root packages/mcp --pretty` | combined total 0 across 3 entrypoints |
+| publish dry-run | PASS | package-local `deno publish --dry-run --allow-dirty --no-check=remote` | success, no slow types |
+| lock hygiene | PASS | `git diff -- deno.lock` | only the pre-existing queue entry; never staged |
+
+### Runtime / Consumer Gates
+
+| Gate | Result | Evidence | Notes |
+| --- | --- | --- | --- |
+| `scaffold.runtime` | PASS | 71 passed, 0 failed | one-pass command with `--cleanup --format pretty`; MCP endpoint-directory behavior passed and cleanup succeeded |
+
 ### Post-slice reconcile
 
 - #1135 remains open with two unticked acceptance boxes; draft PR #1232 carries `Closes #1135`,

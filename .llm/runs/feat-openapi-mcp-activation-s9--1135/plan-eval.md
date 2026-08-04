@@ -31,4 +31,3 @@ current release constant without altering the accepted behavior.
 
 Owner directive explicitly waives a local formal PLAN-EVAL and locks this composed plan before
 same-run implementation.
-

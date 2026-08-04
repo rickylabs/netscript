@@ -124,4 +124,3 @@ migration from prior-release configuration to the current 21-tool server.
 
 - A tool count other than 21, any export change, inability to model exact-pin migration locally, or
   required scope beyond the two acceptance boxes must be logged before continuing.
-

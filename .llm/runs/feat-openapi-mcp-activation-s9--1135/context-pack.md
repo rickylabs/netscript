@@ -12,9 +12,11 @@
 
 ## Current State
 
-Both planned implementation slices are present in the worktree and focused tests pass 29/29. The
-configured Claude review identities were unavailable pre-inference, so this is a WIP implementation
-state, not supervisor sign-off. The pre-existing `deno.lock` change remains user-owned.
+Both planned implementation slices are committed and all applicable automated gates are green:
+focused tests 29/29 and `scaffold.runtime` 71/71, plus scoped static, quality, doc-lint, and publish
+checks. The configured Claude ordinary-review identities were unavailable pre-inference, so the
+separate local open-model IMPL-EVAL remains mandatory before sign-off. The pre-existing `deno.lock`
+change remains user-owned.
 
 ## Completed
 
@@ -24,16 +26,17 @@ state, not supervisor sign-off. The pre-existing `deno.lock` change remains user
 - Plan-Gate composed under the owner-authorized milestone waiver.
 - Activation byte fixtures and S-18 migration fixture implemented and focused-green.
 - Draft PR #1232 opened with required labels/milestone/closing keyword.
+- Scoped static/quality/JSR gates and the full consumer runtime smoke completed.
 
 ## In Progress
 
-- WIP implementation commit/push, then full gates and milestone IMPL-EVAL.
+- Gate-evidence commit, then local open-model milestone IMPL-EVAL.
 
 ## Next Steps
 
-1. Commit/push the WIP implementation without claiming sign-off.
-2. Run scoped static, quality, JSR, and scaffold consumer gates.
-3. Trigger the milestone open-model IMPL-EVAL; fix findings before readiness.
+1. Commit/push gate evidence without claiming sign-off.
+2. Run local Qwen IMPL-EVAL in a separate session; fix findings before readiness.
+3. On PASS, update acceptance evidence, transition to ready, and verify CI/review threads.
 
 ## Key Decisions
 
@@ -56,15 +59,15 @@ state, not supervisor sign-off. The pre-existing `deno.lock` change remains user
 | --- | --- | --- |
 | Plan | WAIVED-COMPOSED | `plan-eval.md` |
 | Focused | PASS | 29 passed, 0 failed |
-| Static | NOT_RUN | full wrappers pending |
-| Fitness | NOT_RUN | quality/JSR pending |
-| Runtime | NOT_RUN | implementation pending |
-| Consumer | NOT_RUN | implementation pending |
+| Static | PASS | scoped check/lint/fmt over MCP + owned CLI files |
+| Fitness | PASS_WITH_BASELINE | quality gate + targeted clean scan; unrelated doctrine baseline retained |
+| Runtime | PASS | `scaffold.runtime`: 71 passed, 0 failed |
+| Consumer | PASS | restarted-host 21-tool fixture + scaffold runtime |
 
 ## Open Questions
 
-- Canonical Claude review transport is unavailable; milestone IMPL-EVAL must supply independent
-  review before readiness.
+- Canonical Claude ordinary-review identities are unavailable; local open-model formal evaluator is
+  the remaining independent review before readiness.
 
 ## Drift and Debt
 

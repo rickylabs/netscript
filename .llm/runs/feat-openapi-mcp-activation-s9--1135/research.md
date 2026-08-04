@@ -32,4 +32,3 @@
 ## Open questions
 
 - None that force implementation rework. The exact failure-pointer shape is locked in `plan.md`.
-

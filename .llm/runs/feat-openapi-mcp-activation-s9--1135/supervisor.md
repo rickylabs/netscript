@@ -24,4 +24,3 @@
 - Formal local PLAN-EVAL is waived by the owner prompt under `milestone-run.md` ruling D6. The
   Plan-Gate is composed and locked in this run as `composed per milestone-run.md (orchestrator
   waiver)`; implementation proceeds in the same run.
-
