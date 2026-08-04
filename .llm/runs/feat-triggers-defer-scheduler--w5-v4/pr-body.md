@@ -35,7 +35,7 @@ Closes #1229
 - [x] Scoped check/lint/fmt wrappers
 - [x] Core/plugin JSR, doc, and publish dry-run gates
 - [x] Quality, architecture, consumer, and plugin verification gates
-- [ ] Composed implementation evaluation
+- [x] Composed implementation evaluation
 
 ```acceptance-evidence
 issue: 1229

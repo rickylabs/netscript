@@ -57,3 +57,13 @@
   sanctioned slow-type notes.
 - Validation re-resolved the inherited uncommitted lockfile. It remains entirely unstaged and
   excluded from the PR; no source or package manifest dependency changed.
+
+| 2026-08-04 | composed evaluation | draft→ready CI/review surface | COMPOSED PASS: 13 success, 4 intentional skips, 0 failures; runtime smoke cancelled after classification and lane visibility passed |
+
+### Final reconcile
+
+- PR #1283 is ready (not draft), all four issue boxes are checked, close-gate is green, and the
+  closing keyword remains `Closes #1229`.
+- Required checks are complete with zero failures. The path-classified full scaffold runtime job was
+  cancelled while scaffold-static and the scaffold lane-visibility check succeeded; this matches the
+  locked smallest-proving gate decision.
