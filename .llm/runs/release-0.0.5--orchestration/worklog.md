@@ -714,3 +714,17 @@ queries; Partials — bare-Fresh ceremony made seamless, deferred-loader composi
 not limited to those two). Insight recorded: the docs gap and the #1197 tool-adoption gap are
 the same underleverage phenomenon at two layers, and #1201's MCP corpus will multiply whichever
 version of the docs ships — which is why P1 gates the waiting agent launch behind canary.2.
+
+## 2026-08-04 — Docs program handed to a separate self-managed orchestrator (owner-commissioned)
+
+agy round 3 on #1208-P1 plateaued (816s ERROR, diff identical to round 2; traces still 0).
+Per owner directive: a **separate Claude Fable 5 orchestrator** launched in tmux session
+`docsorch` (worktree `ns-docs-orch`, brief `.llm/tmp/BRIEF-docs-orchestrator.md`) owning
+(A) the main-pages revamp — homepage / why-netscript / quickstart / core-concepts, Sol·low +
+agy-flash·high adversarial generator pair, OpenCode Grok 4.5 max final eval/polish
+(owner-routed lanes), anti-slop bar, lands anytime; and (B) the inherited docs-leverage
+program — finishing #1208-P1 (gap list + agy history handed over; Claude-workflow docs
+exception available), then P2/#1210-P3. Handover contract: it marks #1209 ready and notes this
+worklog; **the 0.0.5 orchestrator retains merge authority** and needs P1 for the
+canary.2-adjacent window. This run refocuses on canary.2: sagas protocol → merge #1193 →
+publish.
