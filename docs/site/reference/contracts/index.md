@@ -25,11 +25,9 @@ sub-path exports add higher-level builders:
 | Symbol | Kind | Signature | Description |
 | --- | --- | --- | --- |
 | `baseContract` | const | `const baseContract: BaseContract` | Common oRPC contract primitive with NetScript's standard error map applied. |
-| `BaseContract` | type alias | `type BaseContract = Readonly<{ route(options): BaseContractRouteBuilder; }>` | Common oRPC contract primitive with NetScript's standard error map applied. |
-| `BaseContractRouteOptions` | type alias | `type BaseContractRouteOptions = Readonly<{ method: "HEAD" \| "GET" \| "POST" \| "PUT" \| "DELETE" \| "PATCH"; path: string; }>` | HTTP route options accepted by the base contract. |
-| `BaseContractRouteBuilder` | type alias | `type BaseContractRouteBuilder = Readonly<{ input(schema); output(schema); }>` | Builder returned after binding a route to the base contract. |
-| `BaseContractOutputBuilder` | type alias | `type BaseContractOutputBuilder<TInput> = Readonly<{ output(schema): BaseContractProcedure; }>` | Builder returned after binding input to the base contract. |
-| `BaseContractProcedure` | type alias | `type BaseContractProcedure = Readonly<{ ~orpc: any; }>` | Opaque procedure returned by oRPC after contract composition. |
+| `BaseContract` | type alias | `type BaseContract = ReturnType<typeof oc.errors>` | Common oRPC contract primitive with NetScript's standard error map applied. |
+| `BaseContractRoute` | type alias | `type BaseContractRoute<TIn, TOut> = ContractProcedureBuilderWithInputOutput<...>` | Sound type of a route built via baseContract.route(...).input(TIn).output(TOut). |
+| `BaseContractOutputRoute` | type alias | `type BaseContractOutputRoute<TOut> = ContractProcedureBuilderWithOutput<...>` | Sound type of an output-only route built via baseContract.route(...).output(TOut) (no .input(...)). |
 
 ## Schema helper factories
 
@@ -50,6 +48,7 @@ sub-path exports add higher-level builders:
 | Symbol | Kind | Signature | Description |
 | --- | --- | --- | --- |
 | `notFound` | function | `function notFound(options: NotFoundOptions): never` | Throws the contract `NOT_FOUND` oRPC error with inferred resource context. |
+| `validationFailed` | function | `function validationFailed(options: ValidationFailedOptions): never` | Throws the contract `VALIDATION_ERROR` oRPC error. |
 | `getResourceType` | function | `function getResourceType(options: { path?: readonly string[]; }): string` | Resolves a singular resource name from an oRPC handler path. |
 | `COMMON_ERROR_CODES` | const | `const COMMON_ERROR_CODES: Readonly<{ notFound; validationError; unauthorized; forbidden; rateLimited; serviceUnavailable; }>` | Common oRPC error codes shared by NetScript service contracts. |
 | `NotFoundErrorSchema` | const | `const NotFoundErrorSchema: ContractSchema<NotFoundError>` | Common not-found error schema. |
@@ -59,6 +58,7 @@ sub-path exports add higher-level builders:
 | `RateLimitErrorSchema` | const | `const RateLimitErrorSchema: ContractSchema<RateLimitError>` | Common rate-limit error schema. |
 | `ServiceUnavailableErrorSchema` | const | `const ServiceUnavailableErrorSchema: ContractSchema<ServiceUnavailableError>` | Common service-unavailable error schema. |
 | `SuccessSchema` | const | `const SuccessSchema: ContractSchema<SuccessResponse>` | Common success response schema. |
+| `ValidationFailedOptions` | type alias | `type ValidationFailedOptions = Readonly<{ errors: unknown; message: string; fieldErrors?: Record<string, string[]>; formErrors?: string[]; }>` | Options for throwing a contract `VALIDATION_ERROR` oRPC error. |
 
 ## Pagination schemas
 
@@ -111,6 +111,10 @@ sub-path exports add higher-level builders:
 | `ContractNumberSchema` | `type ContractNumberSchema = ContractDefaultableSchema<number>` | Numeric schema contract. |
 | `ContractStringSchema` | `type ContractStringSchema = ContractDefaultableSchema<string>` | String schema contract. |
 | `ContractParseResult` | `type ContractParseResult<TOutput>` | Result returned by `safeParse`. |
+| `ContractSchemaInput` | `type ContractSchemaInput<T>` | Infer the accepted input value type from a Zod-compatible schema. |
+| `ContractSchemaOutput` | `type ContractSchemaOutput<T>` | Infer the parsed output value type from a Zod-compatible schema. |
+| `ContractSchemaLike` | `type ContractSchemaLike` | Cross-resolution schema constraint used at consumer-supplied boundaries. |
+| `ContractObjectSchemaLike` | `type ContractObjectSchemaLike` | Cross-resolution object-schema constraint for consumer-supplied shapes. |
 | `OffsetPaginationQuery` | `type OffsetPaginationQuery = Readonly<{ limit: number; offset: number; }>` | Offset pagination query shape. |
 | `OffsetPaginationInput` | `type OffsetPaginationInput = Readonly<{ limit: number; offset: number; }>` | Offset pagination input shape. |
 | `OffsetPaginationMeta` | `type OffsetPaginationMeta = Readonly<{ total: number; limit: number; offset: number; hasMore: boolean; }>` | Offset pagination response metadata. |
@@ -153,11 +157,21 @@ from their own `deno doc` surface.
 | `CrudContract` | type alias | `type CrudContract = Readonly<{ list?; getById?; create?; update?; delete?; }>` | The generated CRUD contract map of operations. |
 | `CrudContractOperation` | type alias | `type CrudContractOperation = BaseContractProcedure` | A single generated CRUD operation procedure. |
 | `CrudContractOptions` | interface | `interface CrudContractOptions<TEntity, TCreate, TUpdate>` | Options accepted by `createCrudContract`. |
+| `CrudRoute` | type alias | `type CrudRoute` | Concrete sound route type produced by every CRUD operation builder. |
+| `CrudOperationDisable` | type alias | `type CrudOperationDisable` | Operation flags used when generating partial CRUD contracts. |
+| `CrudIdInput` | type alias | `type CrudIdInput` | Input schema shape for CRUD operations addressed by identifier. |
+| `CrudListInput` | type alias | `type CrudListInput` | Input schema shape for list operations with pagination and filters. |
+| `CrudListOutput` | type alias | `type CrudListOutput` | Output schema shape for list operations with paginated entities. |
+| `CrudUpdateInput` | type alias | `type CrudUpdateInput` | Input schema shape for update operations addressed by identifier. |
+| `PartialCrudContract` | type alias | `type PartialCrudContract` | Generated CRUD contract shape when selected operations are disabled. |
 
 ### `@netscript/contracts/query`
 
 | Symbol | Kind | Signature | Description |
 | --- | --- | --- | --- |
+| `paginatedQuery` | function | `function paginatedQuery<T>(model: PrismaModelDelegate, options?: PaginatedQueryOptions): Promise<PaginatedResult<T>>` | Executes a page-based paginated query on a Prisma model. |
+| `offsetPaginatedQuery` | function | `function offsetPaginatedQuery<T>(model: PrismaModelDelegate, options?: OffsetPaginatedQueryOptions): Promise<{ data: T[]; total: number; hasMore: boolean; }>` | Executes an offset-based paginated query on a Prisma model. |
+| `cursorPaginatedQuery` | function | `function cursorPaginatedQuery<T extends { id: string \| number }>(model: PrismaModelDelegate, options?: CursorPaginatedQueryOptions): Promise<{ data: T[]; nextCursor: string \| null; hasMore: boolean; }>` | Executes a cursor-based paginated query on a Prisma model. |
 | `buildPrismaWhere` | function | `function buildPrismaWhere(filters: FilterCondition[]): Record<string, unknown>` | Builds a Prisma `where` clause from filter conditions. |
 | `buildSearchCondition` | function | `function buildSearchCondition(query: string, fields: string[]): Record<string, unknown> \| null` | Builds a Prisma search condition across the given fields. |
 | `combineConditions` | function | `function combineConditions(options: { filters?; search?; searchFields?; }): Record<string, unknown>` | Combines filter and search conditions into one Prisma clause. |
@@ -187,6 +201,100 @@ from their own `deno doc` surface.
 | `OffsetPaginatedQueryOptions` | interface | `interface OffsetPaginatedQueryOptions` | Options for an offset-paginated query. |
 | `CursorPaginatedQueryOptions` | interface | `interface CursorPaginatedQueryOptions` | Options for a cursor-paginated query. |
 | `PrismaModelDelegate` | interface | `interface PrismaModelDelegate` | Minimal Prisma delegate contract used by query helpers. |
+
+#### Pagination Executors
+
+The `@netscript/contracts/query` subpath exports three typed executors to apply validated pagination parameters to a Prisma query:
+
+- `paginatedQuery`: Page-based pagination (page, limit) returning total count and pages.
+- `offsetPaginatedQuery`: Offset-based pagination (offset, limit) returning total count and a boolean indicating if more items exist.
+- `cursorPaginatedQuery`: Cursor-based pagination (cursor, limit, direction) returning the next cursor.
+
+##### Page Pagination (page + limit)
+Shows schema, contract, validated input, typed Prisma execution, and response metadata.
+
+```typescript
+import { z } from 'zod';
+import { baseContract, type BaseContractRoute } from '@netscript/contracts';
+import {
+  paginatedQuery,
+  PaginationInputSchema,
+  createPaginatedOutput,
+} from '@netscript/contracts/query';
+
+const UserSchema = z.object({ id: z.number(), name: z.string() });
+
+export const listUsersContract = baseContract
+  .route({ method: 'GET', path: '/users' })
+  .input(PaginationInputSchema)
+  .output(createPaginatedOutput(UserSchema));
+
+export async function handleListUsers(input: z.infer<typeof PaginationInputSchema>) {
+  const result = await paginatedQuery(db.user, input);
+  return result;
+}
+```
+
+##### Offset Pagination (offset + limit)
+Useful for infinite scrolls or simple pagination that doesn't need total pages.
+
+```typescript
+import { z } from 'zod';
+import { baseContract } from '@netscript/contracts';
+import {
+  offsetPaginatedQuery,
+  OffsetPaginationInputSchema,
+} from '@netscript/contracts/query';
+
+const UserSchema = z.object({ id: z.number(), name: z.string() });
+
+export const listUsersOffsetContract = baseContract
+  .route({ method: 'GET', path: '/users/offset' })
+  .input(OffsetPaginationInputSchema)
+  .output(z.object({
+    data: z.array(UserSchema),
+    total: z.number(),
+    hasMore: z.boolean(),
+  }));
+
+export async function handleListUsersOffset(input: z.infer<typeof OffsetPaginationInputSchema>) {
+  const result = await offsetPaginatedQuery(db.user, input);
+  return result;
+}
+```
+
+##### Cursor Pagination
+Ideal for large datasets and active feeds.
+
+```typescript
+import { z } from 'zod';
+import { baseContract } from '@netscript/contracts';
+import {
+  cursorPaginatedQuery,
+  CursorPaginationInputSchema,
+} from '@netscript/contracts/query';
+
+const UserSchema = z.object({ id: z.number(), name: z.string() });
+
+export const listUsersCursorContract = baseContract
+  .route({ method: 'GET', path: '/users/cursor' })
+  .input(CursorPaginationInputSchema)
+  .output(z.object({
+    data: z.array(UserSchema),
+    nextCursor: z.string().nullable(),
+    hasMore: z.boolean(),
+  }));
+
+export async function handleListUsersCursor(input: z.infer<typeof CursorPaginationInputSchema>) {
+  const { data, nextCursor, hasMore } = await cursorPaginatedQuery<{ id: number; name: string }>(db.user, {
+    cursor: input.cursor,
+    limit: input.limit,
+    direction: input.direction,
+    cursorField: 'id',
+  });
+  return { data, nextCursor, hasMore };
+}
+```
 
 ### `@netscript/contracts/transform`
 

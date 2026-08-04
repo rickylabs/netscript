@@ -169,7 +169,6 @@ Span builders and recorders for workers, queues, schedulers, SSE, and job dispat
 | `runTracedJob`                                        | `async function runTracedJob<T>(jobId, fn): Promise<T>`                          | Wrap a job main with tracing.                      |
 | `addJobStepEvent`                                     | `function addJobStepEvent(stepName, attributes?): void`                          | Add a step event to the active job span.           |
 | `recordJobProgress`                                   | `function recordJobProgress(current, total, unit): void`                         | Record job progress on the active span.            |
-| `createJobLinkAttributes`                             | `function createJobLinkAttributes(traceContext): Attributes`                     | Build span-link attributes for a job.              |
 | `startJobDispatchSpan`                                | `function startJobDispatchSpan(context, options)`                                | Start a job-dispatch span and propagation headers. |
 | `traceJobDispatch`                                    | `async function traceJobDispatch(context, fn, options): Promise<void>`           | Trace a job dispatch.                              |
 | `isTracedQueue`                                       | `function isTracedQueue<T>(queue): queue is TracedQueue<T>`                      | Type guard for a traced queue.                     |
@@ -177,11 +176,6 @@ Span builders and recorders for workers, queues, schedulers, SSE, and job dispat
 | `createSchedulerStartSpan`, `createSchedulerStopSpan` | functions returning `Span`                                                       | Spans for scheduler start/stop.                    |
 | `createScheduleJobSpan`, `createUnscheduleJobSpan`    | functions returning `Span`                                                       | Root spans for scheduling/unscheduling a job.      |
 | `recordCronJobRun`, `recordSchedulerReload`           | functions returning `void`                                                       | Record scheduler run/reload outcomes.              |
-| `startSSEConnection`                                  | `function startSSEConnection(context, options): TracedSSEConnection`             | Start a traced SSE connection.                     |
-| `createSSEEventSpan`, `createSSESubscribeSpan`        | functions returning `Span`                                                       | Spans for SSE events and subscribe.                |
-| `generateSSEClientId`                                 | `function generateSSEClientId(): string`                                         | Generate an SSE client id.                         |
-| `recordSSEMetrics`                                    | `function recordSSEMetrics(metrics): void`                                       | Record SSE metrics.                                |
-| `extractTraceContextFromRecord`                       | `function extractTraceContextFromRecord(record): SerializedTraceContext \| null` | Extract trace context from a queue record.         |
 
 ## Registry (`@netscript/telemetry/registry`)
 
@@ -226,8 +220,13 @@ The following entrypoints are published alongside the root export. Each is gener
 | `@netscript/telemetry/context`         | `./context.ts`         | W3C trace-context propagation.                                      |
 | `@netscript/telemetry/attributes`      | `./attributes.ts`      | Semantic attribute and span-name constants.                         |
 | `@netscript/telemetry/instrumentation` | `./instrumentation.ts` | Worker/queue/scheduler/SSE instrumentation.                         |
-| `@netscript/telemetry/registry`        | `./src/runtime/mod.ts` | Instrumentation lifecycle registry.                                 |
+| `@netscript/telemetry/registry`        | `./registry.ts`        | Instrumentation lifecycle registry.                                 |
 | `@netscript/telemetry/orpc`            | `./orpc.ts`            | oRPC tracing and error-handling plugins.                            |
+| `@netscript/telemetry/hono`            | `./hono.ts`            | Hono request and response tracing middleware.                       |
+| `@netscript/telemetry/ai`              | `./ai.ts`              | GenAI request, token, and chat-client metrics and tracing.          |
+| `@netscript/telemetry/otel`            | `./src/adapters/otel/mod.ts` | OpenTelemetry Deno provider adapters.                               |
+| `@netscript/telemetry/query`           | `./query.ts`           | Telemetry query capabilities and filters.                           |
+| `@netscript/telemetry/testing`         | `./src/testing/mod.ts` | In-memory span recorder for test verification.                      |
 
 ---
 

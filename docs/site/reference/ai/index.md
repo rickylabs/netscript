@@ -73,6 +73,10 @@ self-register independently of runtime construction.
 | `AiError` | class | - | Base error for the AI stack. |
 | `AiNotConfiguredError` | class | - | Thrown when a capability/provider is used without required configuration. |
 | `ModelProviderNotFoundError` | class | - | Thrown when a ref names an unregistered provider id. |
+| `withRetryingChatClient` | function | `withRetryingChatClient(client, policy): ChatClientPort` | Wrap a chat client with opt-in rate-limit retries. |
+| `withRetryingEmbeddingProvider` | function | `withRetryingEmbeddingProvider(provider, policy): EmbeddingProviderPort` | Wrap an embedding provider with opt-in rate-limit retries. |
+| `AiRetryPolicy` | interface | - | Opt-in retry config (maxAttempts, delays, factor, classifiers). |
+
 
 ### Runtime capability ports and their defaults
 
@@ -120,6 +124,7 @@ model/embedding/vision registries. Primary surface:
 | Agent | `AgentLoopPort`, `AgentLoopInput`, `AgentLoopOptions`, `AgentMemoryPort`, `MemoryRecord`, `RecallQuery`, `RecallResult` |
 | Tools / skills / telemetry | `ToolRegistryPort`, `ToolHandler`, `SkillLoaderPort`, `SkillDescriptor`, `TelemetryPort`, `TelemetrySpan`, `TelemetryAttributes`, `TelemetryAttributeValue` |
 | MCP | `McpTransportPort`, `McpTransportKind`, `McpConnectorConfig`, `McpClientConnection`, `McpConnectOptions`, `McpConnectionState`, `McpAuthConfig`, `McpAuthMode`, `McpToolRegistry`, `McpToolDescriptor`, `McpToolResult` |
+| Retrieval | `RetrieverPort`, `RetrievalResult`, `CitationProvenance`, `CitationSpan`, `RetrievalMatchKind`, `RETRIEVAL_MATCH_KINDS` |
 | Reachability | `ReachabilityPort`, `ReachabilityCheckOptions`, `ReachabilityResult`, `createAssumeReachablePort` |
 | Default factories | `createNoopTelemetryPort`, `createNoopToolRegistry`, `createNoopSkillLoader`, `createNoopAgentMemory`, `createUnconfiguredAgentLoop`, `createUnconfiguredEmbeddingProvider`, `createUnconfiguredVisionProvider`, `createUnconfiguredMcpTransport` |
 
@@ -183,14 +188,13 @@ one wire divergence being reasoning: OpenRouter expects a top-level `reasoning: 
 | `OPENROUTER_API_KEY_ENV` | variable | `"OPENROUTER_API_KEY"` — the env var read when `apiKey` is omitted. |
 | `openRouterReasoningModelOptions` | function | Pure normalizer: `ReasoningEffort` → `{ reasoning: { effort } }` (or `undefined`). |
 | `OpenRouterModelProviderConfig` | interface | Provider configuration (below). |
-| `ReasoningEffort` | type alias | `"low" \| "medium" \| "high"`. |
+| `ReasoningEffort` | type alias | `"off" \| "low" \| "medium" \| "high"`. |
 
 | Config field | Type | Default |
 | --- | --- | --- |
 | `apiKey` | `string` | Falls back to the `OPENROUTER_API_KEY` environment variable. `createChatClient` throws `AiNotConfiguredError` when neither is present. |
-| `baseURL` | `string` | `https://openrouter.ai/api/v1`. |
-| `models` | `readonly string[]` | Empty; optimistic `supports` when unset. |
-| `reasoningEffort` | `ReasoningEffort` | Unset — no reasoning object emitted. |
+| `baseURL` | `string` | Falls back to the OpenRouter gateway URL (above). |
+| `models` | `readonly string[]` | List of models to advertise via `listModels` / `supports` (none by default). |
 
 ### `@netscript/ai/ollama`
 
@@ -271,6 +275,9 @@ provider SDK.
 | `slidingWindowHistory` | function | A `HistoryStrategy` that keeps the last N messages. |
 | `DEFAULT_HISTORY_WINDOW` | variable | Default window used by `slidingWindowHistory`. |
 | `SlidingWindowOptions` | interface | `{ maxMessages }` for the sliding-window strategy. |
+| `tokenBudgetHistory` | function | A `HistoryStrategy` that keeps system messages and truncates older messages by token budget. |
+| `TokenBudgetHistoryOptions` | interface | `{ budget, estimator }` for the token-budget strategy. |
+| `TokenEstimator` | type alias | Estimator signature: `(message: Readonly<Message>) => number`. |
 | `HistoryStrategy` | interface | History-trimming seam. |
 | `isTerminalState` | function | Narrow an `AgentLoopState` to a terminal state. |
 | `AgentLoopState` | type alias | `"idle" \| "running" \| "awaiting-tool" \| "done" \| "aborted" \| "errored"`. |
@@ -386,10 +393,10 @@ const provider = getModelProvider("openrouter", {
 ### Preflight a local Ollama daemon
 
 ```ts
-import "@netscript/ai/ollama"; // self-registers the provider
 import { getModelProvider } from "@netscript/ai";
+import { OllamaModelProvider } from "@netscript/ai/ollama"; // self-registers the provider
 
-const provider = getModelProvider("ollama", { models: ["llama3.2"] });
+const provider = getModelProvider("ollama", { models: ["llama3.2"] }) as OllamaModelProvider;
 const health = await provider.checkReachable();
 if (!health.reachable) {
   console.warn(`Ollama is down: ${health.detail}`);
@@ -446,6 +453,131 @@ const transport = createMcpTransport({
 
 const registry = createToolRegistry();
 await registerMcpTools(registry, transport);
+```
+
+### Opt-in Rate-Limit Retries
+
+Wrap any concrete `ChatClientPort` or `EmbeddingProviderPort` with `withRetryingChatClient` / `withRetryingEmbeddingProvider` to add automatic exponential backoff with full jitter for rate limits.
+
+> **Failure & Replay Contract:**
+> - Only rate limit failures (HTTP `429` status code, `AiRateLimitError`, or errors classified by `isRateLimitError`) trigger a retry.
+> - Bounded delays respect `Retry-After` headers (in seconds or HTTP date formats) or fallback to exponential delay, capped by `maxDelayMs`.
+> - **Chat Stream Safety:** Chat streams are never replayed/retried after the first chunk has been successfully yielded to the caller. This ensures that half-written responses are not duplicated or restarted mid-stream.
+
+```ts
+import { getModelProvider, AiRateLimitError } from "@netscript/ai";
+import { withRetryingChatClient, type AiRetryPolicy } from "@netscript/ai";
+
+const baseProvider = getModelProvider("openrouter");
+const baseClient = baseProvider.createChatClient("anthropic/claude-3-5-sonnet");
+
+const retryPolicy: AiRetryPolicy = {
+  maxAttempts: 3,
+  initialDelayMs: 200,
+  maxDelayMs: 3000,
+  factor: 2,
+};
+
+const retryingClient = withRetryingChatClient(baseClient, retryPolicy);
+
+try {
+  const stream = retryingClient.stream({
+    model: "anthropic/claude-3-5-sonnet",
+    messages: [{ role: "user", content: "Hello!" }],
+  }, {
+    signal: new AbortController().signal,
+  });
+  
+  for await (const event of stream) {
+    if (event.type === "text") {
+      console.log(event.delta);
+    }
+  }
+} catch (error) {
+  if (error instanceof AiRateLimitError) {
+    console.error(`Rate limits exhausted after ${error.attempts} attempts.`);
+  } else {
+    throw error;
+  }
+}
+```
+
+### Manage Token Budgets in Agent Loops
+
+The `tokenBudgetHistory` strategy is a token-aware alternative to a simple sliding message window. It keeps the context window bounded by evaluating message token sizes and trimming the history.
+
+> **Trimming Logic:**
+> - **Preserved System Messages:** All leading system messages are always retained, even if their size alone exceeds the budget.
+> - **Contiguous Suffix:** The strategy scans backwards from the most recent message, keeping the newest contiguous suffix of messages that fits within the remaining token budget.
+> - **Estimator:** The default estimator assumes 1 token per 4 characters. You can supply a custom model-specific token estimator to precisely calculate tokens.
+
+```ts
+import { createAgentLoop, tokenBudgetHistory } from "@netscript/ai/agent";
+import type { Message } from "@netscript/ai";
+
+// 1. Choose budget (e.g., 4000 tokens) and define loop
+const loop = createAgentLoop({
+  modelProvider,
+  tools,
+  history: tokenBudgetHistory({
+    budget: 4000,
+    // Optional: a custom estimator using a model-specific tokenizer
+    estimator: (message: Readonly<Message>) => {
+      const text = typeof message.content === "string" 
+        ? message.content 
+        : JSON.stringify(message.content);
+      return Math.ceil(text.length / 3.8); // approximate token count
+    },
+  }),
+});
+```
+
+### Citation-Ready RAG Retrieval
+
+`RetrieverPort` provides a provider-neutral interface for retrieval augmented generation (RAG) that emits structured, citation-ready provenance details.
+
+> **Key Requirements:**
+> - **Normalized Score:** The relevance score is normalized to the range `0.0` to `1.0` (descending order).
+> - **Matched By:** The retrieval match channel must be one of `"vector"`, `"keyword"`, or `"hybrid"`.
+> - **Stable Source:** Provenance must specify a stable `sourceId` to correctly associate the citation.
+> - **Citation Span:** Character spans use zero-based offsets with an exclusive end offset (`span.end`).
+
+```ts
+import type { RetrieverPort, RetrievalResult } from "@netscript/ai";
+
+// 1. Implement RetrieverPort
+class LocalDocumentRetriever implements RetrieverPort {
+  async retrieve(query: string, k: number): Promise<readonly RetrievalResult[]> {
+    const textSegment = "NetScript is built on Deno and uses V8 sandboxing.";
+    const score = 0.89; // Normalized score [0-1]
+    
+    return [{
+      id: "doc-v8-segment-1",
+      content: textSegment,
+      score,
+      matchedBy: "hybrid",
+      provenance: {
+        sourceId: "netscript-sandbox-docs", // Stable source identity
+        title: "NetScript Sandboxing Architecture",
+        span: {
+          start: 27,
+          end: 48, // Exclusive end index (points to "V8 sandboxing.")
+          text: "V8 sandboxing",
+        },
+      },
+    }];
+  }
+}
+
+// 2. Consume RetrieverPort
+const retriever = new LocalDocumentRetriever();
+const docs = await retriever.retrieve("sandboxing", 1);
+for (const doc of docs) {
+  console.log(`Matched by: ${doc.matchedBy} with score ${doc.score}`);
+  console.log(`Source: ${doc.provenance.title} (ID: ${doc.provenance.sourceId})`);
+  console.log(`Passage: "${doc.content}"`);
+  console.log(`Exact Match span [${doc.provenance.span.start}-${doc.provenance.span.end}]: "${doc.provenance.span.text}"`);
+}
 ```
 
 ---
