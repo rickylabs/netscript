@@ -1279,3 +1279,17 @@ Gate record: all four contexts green (close-gate on rerun after the evidence YAM
 edits), threads 0/0 (JSON output — waiter's *PASS* glob missed it, merge completed manually;
 monitor-pattern note: match the JSON `"ok":true` field, not the pretty string), refs [1250].
 **#1250 auto-closed.** Quick-wins 2/3 merged (#1253 rides #1258's gate).
+
+## 2026-08-04 — MERGE #1258 (#1253 closed); CANARY.8 DISPATCHED
+
+- **#1258 merged** (all four green first read, threads 0/0, refs [1253]); #1253 auto-closed.
+  **W6-Q complete: all three owner one-liners landed** (#1250, #1254, #1253) within ~3h of
+  the directive.
+- **CANARY.8 dispatched** (run 30933957346). Train since canary.7 (content-derived, to
+  verify at stage-E): #1226, #1233, #1232, #1242, #1241, #1238, #1257, #1237, #1256, #1258 —
+  the S9/S10/cron surfaces, the port-prose sweep, docsorch deep-dives batch 1, and five
+  onboarding/verified-defect fixes. This is the canary the maintainer can re-run the Windows
+  onboarding against. Stage-E verification on completion; remaining wave items ride canary.9.
+- Owner-wave scoreboard: closed #1250/#1254/#1253/#1235/#1236; #1234 pending #1239's
+  close-gate mirror; #1247 at draft PR #1261; #1251/#1248 queued in batch 2; #1252/#1246
+  dedicated lanes running.
