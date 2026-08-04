@@ -989,3 +989,21 @@ PR #1215. FYI for the release cut: four docs/site pages changed, no packages/ so
   verified fresh rollout writes ~30s post-fire on every thread. Sagas told to leak-check its own
   orphaned scaffold resources (nuget-search processes, postgres container) before resuming the
   protocol; wave5 untouched throughout.
+
+## 2026-08-04 — #1190 protocol: RED verdict → #1223 filed; fix slice dispatched; #1206 endgame
+
+- **Sagas protocol run (Redis/Garnet branch) BLOCKED honestly with a real product defect:**
+  publish 200 + OTEL enqueue/dequeue confirmed, then `saga.handle` dies on
+  `metadata.createdAt.toISOString is not a function` — unrevived date strings at the projection
+  boundary (`plugins/sagas/src/runtime/saga-instance-projection.ts`); state persists,
+  `saga_instances` never projects, queue stalls, instances endpoint empty. The richest kind of
+  finding: an app that LOOKS healthy with a silently-dead saga surface. Evidence on #1190
+  (comment 5178360059, no closing keywords); filed **#1223** (p1, 0.0.5, plan row added).
+  Fix slice dispatched to the same thread (branch `fix/sagas-projection-date-revival`,
+  RED-first, #1184 closure bar, Closes #1223 / Refs #1190). #1190's hand-close now waits on
+  #1223's GREEN protocol re-run — it precedes the cut-time checklist.
+- **S7/#1206 endgame:** evidence pushed (`14db53ace`, DONE), box 43 + issue #1133's gate box
+  ticked with citations, box 45 ticked (composed evaluation). First close-gate read raced the
+  box-45 edit and also caught the #1133 issue box (now ticked). Full rerun fires once
+  check-test completes; merge + canary.6 on green.
+- Wave5 foreign resources untouched by every lane throughout.
