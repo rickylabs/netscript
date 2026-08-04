@@ -575,3 +575,19 @@ present at merge (finding-19 row) — **#1191 auto-closed by the merge** (`f7f7c
   The #1079 incident class, caught live by the gate; also adjacent to the F2-gated execution
   fork. Slice steered: split to a parked branch, unwind, re-gate the reduced surface. The
   projection module itself is aligned — the RED is the undeclared extras only.
+
+## 2026-08-04 — Sagas protocol GREEN; joint-verification sequencing set
+
+The #1193 slice completed the owner's seven-point protocol end to end on the default backend:
+fresh scaffold, populated healthReports, full lifecycle incl. the version-1 compensating
+envelope, OTEL traceparents held across steps, RED captured pre-fix, restart durability across
+PID changes with envelope preservation, artefact-first verification, and a clean scoped
+teardown (owned Postgres removed, two foreign containers correctly untouched). It then blocked
+honestly at merge-readiness: scaffold.runtime 51 pass / 1 fail on environmental DB endpoint
+churn (live Postgres 44973 vs Prisma bound to 50564).
+
+Orchestrator sequencing (steered to the slice): #1193 holds at draft; #1190's slice (already
+at "deliver HTTP publishes through runner") lands first; #1193 rebases and runs ONE joint
+verification — full suite + seven-point protocol on BOTH backends — closing both issues'
+protocol requirements, per the owner's same-train directive. A recurring churn on the clean
+rerun becomes captured #1196-family evidence, not a retry.
