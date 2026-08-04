@@ -44,9 +44,11 @@ export function createGetOperationSchemaFlow(directory: ServiceEndpointDirectory
     const index = indexOpenApiOperations(row.spec);
     const resolution = resolveCanonicalOperation(index, parsed.operation);
     if (resolution.status !== 'resolved') {
-      const candidates = resolution.status === 'ambiguous'
-        ? resolution.candidates
-        : resolution.suggestions.slice(0, 3);
+      const candidates =
+        (resolution.status === 'ambiguous' ? resolution.candidates : resolution.suggestions).slice(
+          0,
+          3,
+        );
       return failure(
         resolution.status === 'ambiguous' ? 'operation_ambiguous' : 'operation_unknown',
         `Operation "${parsed.operation}" was not resolved. Candidates: ${

@@ -82,3 +82,10 @@ Start at `tool-contracts.ts` for wire shape, follow the named flow in
 - Issue 1132 remains open with three acceptance boxes; PR 1204 is draft with `status:plan` and
   milestone 0.0.5. Closing keyword is intentionally deferred until all evidence and checkboxes are
   truthful.
+
+## Opposite-family slice review
+
+- Claude Fable 5 low session `07579130-6ba6-47f0-9b01-3ad758e50b4c` returned **PASS**.
+- Three non-blocking observations were accepted into the sign-off slice: bound failure suggestions
+  to three, align the public limit schema (1–100) with the flow's 49-row self-cap, and narrow the
+  S6 receipt fixture name to its actual success-path assertion.

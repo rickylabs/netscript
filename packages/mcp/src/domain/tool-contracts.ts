@@ -107,7 +107,7 @@ const inputShapes: Record<ToolName, Readonly<Record<string, unknown>>> = {
   list_service_operations: objectSchema({
     service: stringProperty,
     filter: stringProperty,
-    limit: { type: 'integer', minimum: 1, maximum: 49 },
+    limit: limitProperty,
   }, ['service']),
   get_operation_schema: objectSchema({
     service: stringProperty,

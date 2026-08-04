@@ -39,7 +39,7 @@ export function createListServiceOperationsFlow(directory: ServiceEndpointDirect
       return serviceFailure(
         'service_unknown',
         parsed.service,
-        result.entries.map((x) => x.name),
+        result.entries.slice(0, 3).map((candidate) => candidate.name),
       );
     }
     if (row.status !== 'running') return serviceFailure(`service_${row.status}`, parsed.service);

@@ -155,7 +155,7 @@ Deno.test('get_operation_schema composes S4 views and an unauthenticated curl te
   assert((result.value as { authNote: string }).authNote.includes('Unauthenticated'));
 });
 
-Deno.test('CLI settles an S6 receipt only after the result passes its output contract', async () => {
+Deno.test('CLI settles a successful S6 receipt through the S8 lifecycle', async () => {
   let receipt: DiagnosticEvidenceReceipt | undefined;
   const evidence: DiagnosticEvidencePort = {
     read: () => Promise.resolve(undefined),
