@@ -665,3 +665,11 @@ agy authored (317s) → orchestrator box-audit found real gaps (+ its own grep f
 finding 22) → agy round 2 fixed (236s) → evidence-verified ticks → gate → merge. Wave 2 is
 now fully landed except the sagas pair (#1198 endgame in flight, #1193 holding for joint
 verification).
+
+## 2026-08-04 — Wave-3a dispatched
+
+Pre-dispatch: routing-state clean at last read; transport = managed app-server, route validated
+per launch; base = current main (`3ff18a8ad`, post-merge-14). Three slices live, routes
+matched: S6 `019fcb61-6d1d` (Sol·high), S7-rescoped `019fcb61-764c` (Sol·high, F1(b) arm,
+expensive gate queued behind the sagas joint run), #1187 `019fcb61-8dfe` (Sol·medium). Wave-3b
+(#1119, #1196, agy #1109) dispatches as lanes free.
