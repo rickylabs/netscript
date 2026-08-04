@@ -133,3 +133,19 @@ Drift is append-only.
 - **Evidence:** If DB endpoint churn recurs on that single clean rerun, capture ports, both AppHost
   identities, and `aspire describe` output as possible #1196-family evidence; do not retry. Only
   after the joint run is green may this slice complete draft→ready and hand off.
+
+## 2026-08-04 — Joint-verification resume found branch and slot lag
+
+- **What:** At green-light resume, the local rewritten branch and its remote still derived from
+  `3ff18a8ad`, while the #1198 engine fix was the next `origin/main` commit (`f7558aa1c`). A foreign
+  pristine-baseline DB-operation AppHost also remained registered in the exclusive runtime slot.
+- **Source:** Raw `git rev-parse`/`merge-base`/`ls-remote`, `git log origin/main`, `aspire ps`, and
+  ownership-aware leak-check.
+- **Expected:** The orchestrator-provided rebase includes #1198 and the exclusive slot is physically
+  empty before either backend proof starts.
+- **Actual:** A second clean rebase onto current `origin/main` is required; runtime work must wait
+  for the foreign `/home/codex/repos/ns005-baseline` AppHost to exit.
+- **Severity:** procedural
+- **Action:** reconcile without touching foreign resources
+- **Evidence:** Preserve the preflight leak report, rebase only the clean feature branch, and start
+  no AppHost until `aspire ps --format Json` returns `[]`.

@@ -80,6 +80,7 @@ semantic install-artifact assertions live in the adjacent `resources.test.ts`.
 | 2026-08-04 | 4 | blocker proved | Live healthy Postgres moved to port 44973 while the users Prisma client still queried port 50564; direct `/health` returned the full 503 artefact. This is outside #1184 and the PR remains draft/CI-fail. |
 | 2026-08-04 | 4 | final hygiene | `aspire ps` returned `[]`; final leak-check reports no owned survivor and leaves two foreign wave-4 Postgres containers untouched. |
 | 2026-08-04 | 4 | orchestrator steer acknowledged | Hold PR #1193 draft; do not rerun the expensive gate. Wait for #1190 to merge, rebase onto `main`, then perform one joint `scaffold.runtime` + seven-point lifecycle verification on Redis/Garnet and Deno KV before draft→ready. |
+| 2026-08-04 | 4 | joint resume preflight | Raw git showed #1198 at `origin/main` but absent from the local/remote feature ancestry; leak-check found one foreign pristine-baseline DB-operation AppHost. Recorded both, left the foreign host untouched, and queued a clean rebase before runtime proof. |
 
 ## Decisions
 
