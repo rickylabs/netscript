@@ -273,3 +273,49 @@ the site checker in the current build.
   parses `{{` inside fenced code, so JSX attribute object literals (`path={{ … }}`,
   `dangerouslySetInnerHTML={{ … }}`) break the build. Both examples were rewritten to hoist the
   object into a const. There is no `{{ echo }}` precedent anywhere in `docs/site/`.
+
+## Batch 2 fix round
+
+Audit: `.llm/runs/docs-mainpages--orchestrator/slices/deepdives-audit/audit.md` `## Batch 2 audit` —
+verdict FAIL_FIX, four items. Each was re-verified against source before being applied; none was
+rebutted, and item 1 was found to understate the defect.
+
+Commit `24dbcaaa7`, pushed to `docs/web-layer-deep-dives`.
+
+### Per-finding disposition
+
+| Finding | Verified how | Disposition |
+|---|---|---|
+| **G1-F1** `clientKey(input?)` does not distinguish supplied-from-omitted | `query-factory.ts:171-175` uses `props ? … : …`. Own runtime control against a stub-client factory: `clientKey(0)`, `clientKey('')`, `clientKey(false)` → `["orders","list"]`; `clientKey({limit:20})` → full key; `queryOptions(0).queryKey` → `["orders","list",{"input":0}]` | **Accepted, and extended.** The audit frames this as falsy inputs. The control also showed the **no-input** case diverges: `queryOptions(undefined).queryKey` hashes as `["orders","list",{}]` while `clientKey()` returns `["orders","list"]` — so the gap hits the ordinary case, not just `0`/`false`/`''`. The page now states the truthiness rule, separates prefix-matching (`invalidateQueries` — still correct) from exact-key operations (`setQueryData`/`getQueryData`/`cancelQueries({exact:true})` — silently wrong), and directs readers to `queryOptions(input).queryKey` for an exact key. Table row and key-tier code comment corrected to match. |
+| **G2-F1** D7 invents manual island serialization | Fresh transports serializable island props itself; the manual `<script>` + `getElementById` bridge was mine, not something a bare-Fresh author writes | **Accepted.** Bare-Fresh example replaced with `<OrdersIsland initialOrders={data.orders} />` and a normal island prop signature. The invented XSS cost is deleted. The remaining three seams are stated as the audit specifies (service response contract, request/input construction, query key), plus one fair addition kept: the handler's `fetch` and the island's `fetch` are two independent round trips with no shared freshness policy — that is the cache-coordination gap the rest of the page is about, and it is not an artifact of the invented mechanism. |
+| **G2-F2** route-group 404 claim unsupported | `manifest.ts:161` `shouldSkipRouteSegment` drops `/^\(.*\)$/` segments from `inferRoutePattern`, which the same page already documented at the routes-tree table | **Accepted.** Sentence now reads "move it into a different URL-bearing directory", with an explicit parenthetical that a Fresh route group alone does not change the URL. Self-contradiction removed. |
+| **G4** D7 opening transition prosecutorial | — | **Accepted.** "Four costs, and each of them is a bug that ships quietly" replaced with the audit's transition; "an XSS hole waiting" removed with the example it belonged to. The three remaining cost paragraphs were left in the page's own register rather than pasted verbatim. |
+
+Nothing was rebutted.
+
+### SDK escalation
+
+G1-F1 is an SDK behaviour defect the docs merely expose, and the audit noted an SDK-side fix would be
+preferable. Agreed and filed as a comment on
+[#1245](https://github.com/rickylabs/netscript/issues/1245#issuecomment-5181005061) (the existing
+"island query types reject the package's own documented patterns" issue — same family, so no fourth
+issue was opened). The comment carries the runtime control, the asymmetric impact, a
+`props === undefined` fix, and the `toClientKeyPrefix()` migration for the prefix call sites that
+would lose `clientKey()`'s current no-argument behaviour. It also records that this page's wording
+should be simplified back once the SDK is corrected.
+
+No shipped example is currently broken by the defect: the live-dashboard tutorial uses
+`clientKey()` only for prefix invalidation and `clientKey(input)` only with object inputs.
+
+### Gate results after the fix
+
+| Gate | Command | Result |
+|---|---|---|
+| Site build | `cd docs/site && deno task build` | PASS — 606 files |
+| Site links | `cd docs/site && deno task check:links` | PASS — 31659 internal links across 217 pages, all resolve |
+| Caveat refs | `cd docs/site && deno task check:caveats` | PASS — 27 markers across 22 pages |
+| Changed example | `deno check --unstable-kv --no-lock ./scratch-fix2.tsx` (rewritten bare-Fresh island prop + `useQuery` with `initialData`) | PASS |
+| `clientKey` control | `deno run ./scratch-clientkey.ts` | 8 controls, results in the table above |
+| Lock hygiene | `git checkout HEAD -- deno.lock`; `git status` | Clean — only the two intended docs files in the commit |
+
+Scratch fixtures deleted; nothing added under `packages/`.

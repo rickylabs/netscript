@@ -336,3 +336,17 @@ No rewrite of either page is warranted; this is a focused correction to one open
 ### Batch 2 verdict
 
 **FAIL_FIX.** Correct the `clientKey` falsy-input boundary (in docs or, preferably, SDK source), replace the invented bare-Fresh island serialization with ordinary serializable island props, remove the route-group 404 claim, and normalize the D7 opening transition. The remaining route, query-factory, cache, hydration, compile-boundary, JSDoc-drift, link, and navigation claims pass this audit.
+
+### Batch 2 re-audit
+
+- **Fix commit:** `24dbcaaa7`
+- **Per-finding disposition:**
+
+| Batch 2 finding | Status | Re-audit evidence |
+|---|---|---|
+| G1-F1 — `clientKey(input?)` documented as an exact key for every supplied input | **FIXED** | `query-bridge.md:89,112,347-355` now states the implementation's truthiness boundary, separates prefix invalidation from exact-key operations, and directs exact-key callers to `queryOptions(input).queryKey`. The runtime control reproduced every documented shape: `clientKey()` / `clientKey(0)` / `clientKey(false)` → `['orders','list']`; `queryOptions(undefined).queryKey` → `['orders','list',{}]`; `queryOptions(0).queryKey` → `['orders','list',{input:0}]`. The page also identifies the SDK-side correction path; issue `#1245` owns that source fix. |
+| G2-F1 — invented manual JSON script presented as bare-Fresh island transport | **FIXED** | `query-bridge.md:25-71` now uses ordinary serializable island props, explicitly credits Fresh with transport and escaping, removes the invented script/XSS cost, and retains the real distinction: the server and client fetches remain independent and have no shared freshness policy. |
+| G2-F2 — moving a route under a Fresh route group claimed to cause a 404 | **FIXED** | `route.md:61-64` now limits breakage to URL-bearing moves and explicitly says `(group)` directories are dropped from the URL, matching the manifest's `shouldSkipRouteSegment` behavior and the page's generated-tree table. |
+| G4-F1 — D7 opening used checklist-like, accusatory framing | **FIXED** | `query-bridge.md:55-71` now uses the requested mechanism-led transition (“three coordination seams remain”) and follows it with the response-contract, request/input, query-key, and freshness boundaries without the prior sales-copy language. |
+
+**Final Batch 2 verdict after `24dbcaaa7`: PASS.** All four Batch 2 findings are fixed; no open accuracy, bare-Fresh fairness, cross-link/navigation, or prose-register finding remains.
