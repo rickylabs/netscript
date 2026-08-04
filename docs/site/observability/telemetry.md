@@ -106,7 +106,7 @@ NetScript-owned keys under the single proprietary root `netscript.*` — correla
   },
   {
     title: "Understand — Observability",
-    body: "The mental model: how spans, structured logs, health endpoints, and Aspire traces fit together — and the precise framework-vs-scaffold map of what is real (traceJobExecution, task.execute) versus the tracked createJobTools(ctx) stub.",
+    body: "The mental model: how automatic framework spans, createJobTools(ctx) handler telemetry, console logs, health endpoints, and Aspire traces fit together.",
     href: "/explanation/observability/",
     icon: "◎"
   },
@@ -339,12 +339,9 @@ durations, status, and lifecycle events — no scaffold changes required.
 
 ## Instrument a handler
 
-The two tabs below show the two emission paths a developer touches: structured logging
-through the framework logger, and **custom** spans inside a job handler. For custom spans,
-call the `@netscript/telemetry` helpers (`traceJobExecution`, `withChildSpan`,
-`recordJobProgress`) directly — they are the real, supported surface. Read the
-callout under the tabs to understand why you reach for the telemetry package rather than the
-scaffold's `createJobTools(ctx)` trace helpers.
+The two tabs below show the two emission paths a developer touches: console-backed logging and
+**custom** spans inside a job handler. The scaffold's `createJobTools(ctx)` surface records events,
+progress, and child spans through the same telemetry machinery used by the runtime.
 
 {{ comp.tabbedCode({ tabs: [
   {
@@ -353,27 +350,11 @@ scaffold's `createJobTools(ctx)` trace helpers.
     code: "// netscript.config.ts — declare the logging contract for the whole workspace.\nimport { defineConfig } from '@netscript/config';\n\nexport default defineConfig({\n  name: 'my-app',\n  version: '1.0.0',\n  // level: 'debug' | 'info' | 'warn' | 'error'; format: 'text' | 'json'\n  logging: { level: 'info', format: 'text' },\n  plugins: ['./plugins/workers/mod.ts', './plugins/sagas/mod.ts'],\n});\n\n// Inside a job handler, the logger comes from the job tools (console-backed today,\n// and surfaced under the resource's Console logs view in the Aspire dashboard).\n// import { createJobTools } from './job-tools.ts';\nconst emit = (log) => {\n  log.info('user provisioned', { userId: 'u_123', source: 'scaffold' });\n  log.warn('rate limit approaching', { remaining: 4 });\n};"
   },
   {
-    label: "Custom spans via @netscript/telemetry",
+    label: "Custom spans via createJobTools",
     lang: "ts",
-    code: "// plugins/workers/jobs/health-check.ts — real custom spans inside a handler.\n// The dispatcher already wraps this job in traceJobExecution automatically;\n// withChildSpan + recordJobProgress let you add detail under that parent span.\nimport { createSuccessResult, createFailureResult, defineJobHandler } from '@netscript/plugin-workers-core';\nimport { withChildSpan, recordJobProgress } from '@netscript/telemetry/instrumentation';\n\nconst handler = defineJobHandler(async (ctx) => {\n  const { log } = ctx;\n  log.info('Starting workers plugin health check');\n\n  // Real progress event — 3rd arg is a UNIT label, not a message.\n  recordJobProgress(1, 2, 'steps');\n\n  // withChildSpan opens a real child span under the job-execution span.\n  const envCheck = await withChildSpan('check.environment', async (span) => {\n    span.setAttribute('check.name', 'environment');\n    return { ok: true };\n  });\n\n  recordJobProgress(2, 2, 'steps');\n  if (!envCheck.ok) return createFailureResult('environment check failed');\n  return createSuccessResult({ status: 'healthy' });\n});\n\nexport default Object.assign(handler, { id: 'workers-plugin-health-check' as const });"
+    code: "// plugins/workers/jobs/health-check.ts — real custom spans inside a handler.\n// The dispatcher wraps this job automatically; createJobTools adds detail beneath it.\nimport { createSuccessResult, createFailureResult, defineJobHandler } from '@netscript/plugin-workers-core';\nimport { createJobTools } from './job-tools.ts';\n\nconst handler = defineJobHandler(async (ctx) => {\n  const { log, progress, trace } = createJobTools(ctx);\n  log.info('Starting workers plugin health check');\n  await progress(50, 'checking environment');\n\n  const envCheck = await trace.withChildSpan('check.environment', async (span) => {\n    span.setAttribute('check.name', 'environment');\n    return { ok: true };\n  });\n\n  trace.recordProgress(2, 2, 'steps');\n  if (!envCheck.ok) return createFailureResult('environment check failed');\n  return createSuccessResult({ status: 'healthy' });\n});\n\nexport default Object.assign(handler, { id: 'workers-plugin-health-check' as const });"
   }
 ] }) }}
-
-{{ comp callout { type: "warning", title: "Known gap: the scaffold createJobTools(ctx) trace/progress helpers are no-op stubs" } }}
-Job dispatch and execution are instrumented with <strong>real OTel spans</strong> — traces
-show up in Aspire automatically (<code>traceJobExecution</code>, <code>recordJobProgress</code>,
-scheduler spans, and subprocess traceparent propagation are all live in the runtime). The one
-remaining gap is narrow and specific: the <code>trace.{addEvent,withChildSpan,recordProgress}</code>
-and <code>progress(...)</code> helpers returned by the scaffold's <code>createJobTools(ctx)</code>
-are currently <strong>no-op stubs</strong> in the generated copy. <code>log</code> writes to the
-console; those particular trace/progress helpers do nothing. This is a <strong>known, tracked
-limitation with a fix planned</strong> (debt <code>workers-scaffold-job-tools-noop</code>), not a
-permanent design choice. <strong>Workaround:</strong> for custom spans and progress, call the
-<code>@netscript/telemetry</code> helpers directly (as in the tab above) rather than the scaffold
-<code>createJobTools</code> trace surface — those are real today. See
-<a href="/explanation/observability/">Observability</a> for the full framework-vs-scaffold map.
-<!-- caveat: arch-debt:workers-scaffold-job-tools-noop -->
-{{ /comp }}
 
 ## Endpoints & ports
 
@@ -470,10 +451,9 @@ in <code>span.setAttribute</code> explode index cardinality on the backend.<br>
 there inflates cardinality and misreads the API.<br>
 <strong>✅ Pass a stable unit label.</strong> <code>'steps'</code> / <code>'items'</code> — the
 argument is a unit, not a description.</p>
-<p><strong>❌ Ship code that relies on the scaffold <code>createJobTools(ctx)</code> trace/progress
-helpers.</strong> Those are no-op stubs today (debt <code>workers-scaffold-job-tools-noop</code>).<br>
-<strong>✅ Call the <code>@netscript/telemetry</code> helpers directly</strong> for real spans and
-progress, as in the handler tab above.</p>
+<p><strong>❌ Treat <code>progress(percent, message)</code> as only a log line.</strong><br>
+<strong>✅ Use it for both telemetry and runtime progress delivery.</strong> It emits a
+<code>job.progress</code> event and forwards the percentage/message to the workers channel.</p>
 {{ /comp }}
 
 ## Reference
@@ -491,7 +471,7 @@ This hub is intentionally thin — the full generated API lives in the reference
   },
   {
     title: "Understand — Observability",
-    body: "The mental model: how spans, structured logs, health endpoints, and Aspire traces fit together — and the precise framework-vs-scaffold map of what is real (traceJobExecution, task.execute) versus the tracked createJobTools(ctx) stub.",
+    body: "The mental model: how automatic framework spans, createJobTools(ctx) handler telemetry, console logs, health endpoints, and Aspire traces fit together.",
     href: "/explanation/observability/",
     icon: "◎"
   },

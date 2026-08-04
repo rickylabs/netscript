@@ -21,6 +21,7 @@ export { cron, permissions } from './src/public/root.ts';
 export { defineJobHandler } from './src/public/root.ts';
 export { createWorkersRuntime } from './src/public/root.ts';
 export { createFailureResult, createSuccessResult } from './src/public/root.ts';
+export { createJobTools } from './src/telemetry/job-tools.ts';
 export { startWorkers } from './src/public/root.ts';
 export { inspectJob, inspectTask, inspectWorkflow } from './src/public/root.ts';
 export type { JobId, TaskId } from './src/public/root.ts';
@@ -31,6 +32,7 @@ export type {
   WorkerIdempotencyPort,
   WorkerIdempotencySource,
 } from './src/public/root.ts';
+export type { JobTools, JobToolSpan } from './src/telemetry/job-tools.ts';
 export type {
   JobBuilder,
   JobDefinition,

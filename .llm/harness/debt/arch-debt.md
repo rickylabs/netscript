@@ -1439,26 +1439,6 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Gate:** Close when non-Deno task runtimes have a documented, enforced per-task sandbox or the
   public task runtime API explicitly models this as a permanent trust boundary.
 
-## packages/plugin-workers-core — scaffold createJobTools handler helpers are no-op stubs (`workers-scaffold-job-tools-noop`)
-
-- **Reason:** The scaffold-generated worker handler toolkit `createJobTools(ctx)` exposes
-  `trace.addEvent`, `withChildSpan`, and `progress` helpers that are currently no-op stubs.
-  Job-level telemetry is real — dispatch, execution, step events, progress, scheduler runs, and
-  subprocess trace continuation emit OpenTelemetry spans visible in Aspire (OTLP
-  `http://localhost:4318`). Only these in-handler scaffold helpers do not yet emit; their signatures
-  are stable, so handler code written against them keeps compiling and will start emitting once the
-  helpers are implemented. For custom handler spans today, call `@netscript/telemetry` helpers
-  directly.
-- **Owner:** `@netscript/plugin-workers-core` / scaffold telemetry follow-up.
-- **Target:** Before advertising in-handler `createJobTools` span/event/progress emission as
-  supported.
-- **Linked plan:** `.llm/tmp/run/docs-v4-ia-deepening/caveat-inventory.md` (Cluster C).
-- **Created:** 2026-06-22
-- **Status:** open.
-- **Gate:** Close when `trace.addEvent` / `withChildSpan` / `progress` from `createJobTools(ctx)`
-  emit real spans/events and a runtime test proves a handler-emitted child span reaches the OTLP
-  collector.
-
 ## packages/auth-{better-auth,workos} — Archetype-2 folder layout + WorkOS feature-surface parity (`AUTH-ARCHETYPE-LAYOUT`)
 
 - **Reason:** A user review (2026-06-22) flagged two related gaps in the landed auth backends that

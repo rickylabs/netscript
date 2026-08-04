@@ -375,12 +375,11 @@ deployment. To containerize, each process becomes one image whose `CMD` is the m
 <li><code>netscript.config.ts</code> ships an empty <code>deploy: {}</code> block unless you configure a target. Generated workflows are starter CI definitions; you still provide registry, host, cloud, and secret-manager configuration before they are production release jobs.</li>
 <li>Cluster/cloud auth, registry access, RBAC, subscriptions, regions, and provider quotas are operator prerequisites. The CLI shells to Aspire, Docker, or gcloud; it does not create credentials.</li>
 <li>The <code>streams</code> service runs a <strong>real producer runtime</strong> (durable-streams over <code>@netscript/plugin-streams-core</code>, served on its assigned port) — deploy it as a first-class service. What is <em>not</em> production-ready is the manifest-helper layer: <code>@netscript/plugin-streams</code>'s <code>defineStreamProducer</code>/<code>defineStreamConsumer</code> <strong>throw <code>StreamUnsupportedOperationError</code></strong> by design (use <code>@netscript/plugin-streams-core</code> directly), and there is no in-process consumer <code>subscribe()</code> — consumption is HTTP/SSE.</li>
-<li>The scaffold worker <code>createJobTools(ctx)</code> handler helpers (<code>trace.addEvent</code>, <code>withChildSpan</code>, <code>progress</code>) are still no-op stubs (tracked debt, fix planned). Job dispatch/execution traces still appear in Aspire automatically; for custom handler spans call <code>@netscript/telemetry</code> helpers directly.</li>
+<li>The scaffold worker <code>createJobTools(ctx)</code> handler helpers add events, progress, and child spans to the automatic job dispatch/execution trace in Aspire. The <code>log.*</code> helpers remain console-backed.</li>
 <li>DB commands assume a reachable Postgres — in CI/containers without Aspire, inject <code>POSTGRES_URI</code> yourself or the command fails fast.</li>
 </ul>
 <!-- caveat: arch-debt:cli-deploy-artifacts-missing -->
 <!-- caveat: arch-debt:streams-manifest-helpers-unsupported -->
-<!-- caveat: arch-debt:workers-scaffold-job-tools-noop -->
 {{ /comp }}
 
 ## Step 7 — Verify the deployment

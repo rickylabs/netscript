@@ -23,16 +23,12 @@ For the generated API surface, follow the [`telemetry`](/reference/telemetry/) a
 [`logger`](/reference/logger/) reference pages, and the
 [Telemetry capability](/capabilities/telemetry/) hub for the Learn / Do / Reference triplet.
 
-{{ comp callout { type: "important", title: "What works today, and the one gap" } }}
+{{ comp callout { type: "important", title: "Worker telemetry is wired end to end" } }}
 <strong>Worker tracing is built in and real.</strong> Job dispatch, job execution, the
 scheduler, and the task subprocess all emit real OpenTelemetry spans automatically — they
 appear in the Aspire dashboard with no code from you. <code>task.execute</code> spans are
-real too. The <strong>only</strong> gap is the scaffold's <code>createJobTools(ctx)</code>
-handler helpers: <code>trace.addEvent</code>, <code>trace.withChildSpan</code>, and
-<code>trace.recordProgress</code> are currently <strong>no-op stubs</strong> in the generated
-<code>job-tools.ts</code> (a tracked debt with a fix planned). To emit custom spans from
-inside a handler today, call the <code>@netscript/telemetry</code> instrumentation helpers
-directly — shown in Step 3. Structured logging via <code>log.*</code> is real now.
+real too. Inside a handler, <code>createJobTools(ctx)</code> records exact events, progress, and real
+child spans beneath the active job span. Its <code>log.*</code> helpers remain console-backed.
 {{ /comp }}
 
 ## Prerequisites
@@ -61,17 +57,14 @@ spans for free and where you add your own.
 {{ comp.apiTable({ caption: "Where instrumentation lives", rows: [
   { name: "Service layer (real spans)", type: "@netscript/service", desc: "RPC trace context (header extraction into ctx.traceHeaders) is ON by default — traceContext defaults to true when withRPC() is called without arguments. The OTel TracingPlugin that creates real spans is also always active; it is independent of the traceContext option." },
   { name: "Worker runtime (real spans)", type: "job dispatcher + scheduler", desc: "Job dispatch and execution, scheduler runs, and the task subprocess emit real OTel spans automatically via @netscript/telemetry — traceJobExecution, scheduler spans, task.execute. Traces show up in Aspire with no handler code." },
-  { name: "Scaffold job tools (stub spans today)", type: "createJobTools(ctx)", desc: "log / progress / trace handed to defineJobHandler bodies. log.* is REAL; trace.addEvent / withChildSpan / recordProgress are no-op stubs in the scaffold (tracked debt, fix planned). For custom handler spans, call @netscript/telemetry helpers directly." },
+  { name: "Scaffold job tools", type: "createJobTools(ctx)", desc: "log / progress / trace handed to defineJobHandler bodies. trace.addEvent records on the active job span, withChildSpan exports child work, and progress emits telemetry while forwarding to the runtime channel. log.* remains console-backed." },
   { name: "OTLP export + UI", type: "http://localhost:4318 → :18888", desc: "The Aspire profile points OTLP at http://localhost:4318; the dashboard renders the collected traces and correlated structured logs at :18888." }
 ] }) }}
 
-{{ comp callout { type: "note", title: "Two senses of \"worker tracing\"" } }}
-The framework/dispatcher layer emits real spans — <code>traceJobExecution</code>,
-scheduler spans, and subprocess <code>traceparent</code> propagation are all live, so you get
-job traces in Aspire automatically. The <em>scaffold-facing</em>
-<code>createJobTools(ctx)</code> helpers your handler calls are the only stubs. Never read
-"the job-tools helpers are stubs" as "worker tracing is a no-op" — the runtime around your
-handler is fully instrumented.
+{{ comp callout { type: "note", title: "Two layers of worker tracing" } }}
+The framework/dispatcher layer emits lifecycle spans automatically. The scaffold-facing
+<code>createJobTools(ctx)</code> helpers add handler events, progress, and child spans beneath that
+active context; use direct telemetry imports only when you need the lower-level API.
 {{ /comp }}
 
 ## Step 1 — Bring up Aspire and confirm the collector
@@ -162,13 +155,11 @@ with the matching `dashboardUrl` from `aspire ps --format Json` if needed. If ba
 `The dashboard is not available`, use these task routes—the collector and dashboard data may still
 be healthy.
 
-## Step 3 — Add your own spans in a job handler (the real way today)
+## Step 3 — Add your own spans in a job handler
 
 The scaffold hands you `createJobTools(ctx)` so you can author against `log`, `progress`, and
-`trace`. `log.*` is real today. The `trace.*` helpers are **no-op stubs in the scaffold** — if
-you want a real custom span around a unit of work right now, call the `@netscript/telemetry`
-instrumentation helpers directly. Keep the `trace.*` calls if you like authoring against the
-forward-compatible shape, but do not rely on them for live spans yet.
+`trace`. The trace and progress helpers emit through the active job telemetry context; direct
+`@netscript/telemetry/instrumentation` imports remain available for lower-level composition.
 
 {{ comp.tabbedCode({ tabs: [
   {
@@ -177,9 +168,9 @@ forward-compatible shape, but do not rely on them for live spans yet.
     code: "import {\n  createFailureResult,\n  createSuccessResult,\n  defineJobHandler,\n} from '@netscript/plugin-workers-core';\n// Call the instrumentation helpers directly for a REAL child span today.\nimport {\n  recordJobProgress,\n  withChildSpan,\n} from '@netscript/telemetry/instrumentation';\nimport { createJobTools } from './job-tools.ts';\n\nconst handler = defineJobHandler(async (ctx) => {\n  const { log } = createJobTools(ctx); // log.* is real today\n  log.info('Starting workers plugin health check');\n\n  // withChildSpan opens a real span as a child of the active job span\n  // and gives you a handle to attach queryable attributes.\n  const envOk = await withChildSpan('check.environment', async (span) => {\n    span.setAttribute('check.name', 'environment');\n    return Boolean(Deno.env.get('PORT'));\n  });\n\n  if (!envOk) return createFailureResult('environment check failed');\n\n  // Emit a real job.progress event (current / total / percentage).\n  recordJobProgress(1, 1);\n  return createSuccessResult({ status: 'healthy' });\n});\n\nexport default Object.assign(handler, {\n  id: 'workers-plugin-health-check' as const,\n});"
   },
   {
-    label: "Forward-compatible scaffold shape",
+    label: "Scaffold job-tools shape",
     lang: "ts",
-    code: "import { defineJobHandler } from '@netscript/plugin-workers-core';\nimport { createJobTools } from './job-tools.ts';\n\n// createJobTools(ctx) returns:\n//   log          -> console.* wrappers: info/warn/error/debug (plain stdout today, NOT trace-correlated)\n//   progress     -> progress(percent, message) (forwards to ctx.reportProgress)\n//   trace        -> { addEvent, recordProgress, withChildSpan } (STUB spans today)\n//   traceContext -> { traceparent, tracestate } for manual propagation\n//\n// Authoring against trace.* is fine — your code is ready for when the\n// scaffold helpers are upgraded — but these calls emit NO real spans today.\n// Prefer @netscript/telemetry helpers (other tab) for spans you need now.\nconst handler = defineJobHandler(async (ctx) => {\n  const { log, trace, traceContext } = createJobTools(ctx);\n  log.info('health check', { traceparent: traceContext.traceparent });\n  trace.addEvent('health_check.started'); // no-op in the scaffold today\n  return { ok: true } as const;\n});\n\nexport default handler;"
+    code: "import { defineJobHandler } from '@netscript/plugin-workers-core';\nimport { createJobTools } from './job-tools.ts';\n\n// createJobTools(ctx) returns:\n//   log          -> console.* wrappers: info/warn/error/debug (plain stdout, NOT trace-correlated)\n//   progress     -> emits job.progress and forwards to ctx.reportProgress\n//   trace        -> real addEvent, recordProgress, and withChildSpan helpers\n//   traceContext -> { traceparent, tracestate } for manual propagation\nconst handler = defineJobHandler(async (ctx) => {\n  const { log, progress, trace, traceContext } = createJobTools(ctx);\n  log.info('health check', { traceparent: traceContext.traceparent });\n  trace.addEvent('health_check.started');\n  await progress(50, 'half complete');\n  await trace.withChildSpan('health_check.verify', async (span) => {\n    span.setAttribute('check.kind', 'health');\n  });\n  return { ok: true } as const;\n});\n\nexport default handler;"
   },
   {
     label: "Instrumentation helper map",
@@ -258,16 +249,6 @@ curl -s http://localhost:<auth-port>/health        # auth
 ```
 
 ## Production pitfalls
-
-{{ comp callout { type: "warning", title: "Custom handler spans: use the helpers, not the stubs" } }}
-The scaffold <code>createJobTools(ctx)</code> <code>trace.addEvent</code>,
-<code>trace.withChildSpan</code>, and <code>trace.recordProgress</code> are <strong>no-op
-stubs</strong> today (tracked debt, fix planned). The dispatcher, scheduler, and task
-subprocess spans around your handler are real and need nothing from you — but for a
-<em>custom</em> span inside the handler, call <code>@netscript/telemetry/instrumentation</code>
-helpers (<code>withChildSpan</code>, <code>recordJobProgress</code>,
-<code>addJobStepEvent</code>) directly so the span actually emits.
-{{ /comp }}
 
 {{ comp callout { type: "warning", title: "No collector, no traces" } }}
 Spans are only collected while Aspire is running and the OTLP endpoint
