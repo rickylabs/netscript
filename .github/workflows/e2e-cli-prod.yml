@@ -77,12 +77,14 @@ jobs:
           sleep 120
 
       - name: Install published CLI from JSR
+        id: install_published_cli
         run: |
           echo "$HOME/.deno/bin" >> "$GITHUB_PATH"
           deno install -g -A --minimum-dependency-age=0 -n netscript "jsr:@netscript/cli@${{ steps.version.outputs.version }}"
           netscript --help
 
       - name: Install workspace dependencies
+        id: install_workspace_dependencies
         run: deno install
 
       - name: Public init smoke from JSR CLI
@@ -108,6 +110,7 @@ jobs:
             --log-file .llm/tmp/cli-e2e-prod.ndjson
 
       - name: Quickstart walk E2E (published CLI, seven verdicts)
+        if: ${{ always() && steps.install_published_cli.outcome == 'success' && steps.install_workspace_dependencies.outcome == 'success' }}
         run: |
           deno task e2e:cli run quickstart.walk \
             --source jsr \

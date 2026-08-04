@@ -30,3 +30,5 @@
 - Quickstart uses distinct JSON/NDJSON artifacts; failure reporting scans both reports so the numbered failed step reaches the workflow summary.
 - `@std/yaml` parse: PASS.
 - Reconcile: the workflow still installs the exact CLI before either suite; no release sequencing or lockfile change was introduced.
+- Full E2E harness tests: 112 passed, 0 failed.
+- The Quickstart step uses `always()` gated only by successful shared setup, so a failing `scaffold.runtime` does not silently skip the independent walk.
