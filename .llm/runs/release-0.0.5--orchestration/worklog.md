@@ -1293,3 +1293,17 @@ monitor-pattern note: match the JSON `"ok":true` field, not the pretty string), 
 - Owner-wave scoreboard: closed #1250/#1254/#1253/#1235/#1236; #1234 pending #1239's
   close-gate mirror; #1247 at draft PR #1261; #1251/#1248 queued in batch 2; #1252/#1246
   dedicated lanes running.
+
+## 2026-08-04 — CANARY.8 attempt 1 REFUSED PRE-PUBLISH (residue false positive); fix PR #1268
+
+Run 30933957346 failed at the cut step — nothing minted (no reconciliation debt). Root
+cause: `findVersionResidue` flagged two test fixtures merged today that pin prior releases
+on purpose (#1258's prior-release.mcp.json, #1238's streamdb-consumer control). The bump
+never rewrites them (not in discoverVersionFiles), so the scan flagging them contradicted
+its own bump — the same class the baselines exemption already documents. **Finding 29 (for
+#1163): the residue guard's skip list must mirror discoverVersionFiles' scope — anything the
+bump deliberately leaves alone cannot be residue; fixtures directories are the recurring
+false-positive class as soon as slices start pinning published versions in test controls.**
+Fix: #1267 filed; PR #1268 (fixtures/type-fixtures exemption + both-direction regression
+test, suite 10/0, real-repo scan clean of both files); box 3 marked [post-merge]. On merge:
+re-dispatch canary.8 (same train + today's later merges — content-derived membership).
