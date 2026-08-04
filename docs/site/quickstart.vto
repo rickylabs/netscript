@@ -33,7 +33,7 @@ and shared Redis cache used below.
 
 ## 3. Start the resource graph
 
-**This is the step that actually starts your stack.**
+**Nothing runs until this step.**
 
 ```bash
 cd my-app/aspire
@@ -51,15 +51,14 @@ Continue with <a href="/data-persistence/how-to/database-migration/">Database mi
 you need the database workflow.
 {{ /comp }}
 
-## 4. Make the first change
+## 4. Make your first change
 
 Open `apps/dashboard/routes/(_components)/home-view.tsx`. Find the wrapped introductory sentence
 that starts with `A generated NetScript workspace` and replace that sentence with
 `This checkout dashboard is ours.` Save the file, then refresh the Fresh app URL from Aspire. The
 new sentence should appear below the `my-app` heading while the app remains healthy.
 
-This file is always written by the app scaffold; it does not depend on the optional example-service
-templates. [See how the web layer is structured](/web-layer/).
+[See how the web layer is structured](/web-layer/).
 
 When you are finished, stop the AppHost from the `aspire/` directory:
 
