@@ -1733,3 +1733,22 @@ the task needed `--allow-run=deno`; granted and verified PASS locally before pus
 half of an issue always lands first and looks complete. The close-gate's unchecked list is the
 authority — work it box-by-box against artifacts before accepting any `Closes`.** Tonight that
 turned 4 claimed closures into 1 earned one plus a properly-scoped follow-up.
+
+## 2026-08-05 — Silent lane death diagnosed as quota exhaustion; last reset redeemed; all re-dispatched
+
+Five lanes showed the stall signature (rollouts stopped 23:19–23:50 local, worktrees still on
+their PREVIOUS slice's branch, no new dirty files). The decisive check was the branch, not the
+rollout: **every worktree was still on its old branch, so the new slices never began.** Reading
+the dispatch logs gave the cause outright — `ERROR: You've hit your usage limit ... try again at
+Aug 11th, 2026 9:22 AM` on all five, at 1.1–2.0M tokens each.
+- **Last reset redeemed** (see D17). Not a close call: the natural reset (11 Aug) precedes the
+  credit's expiry (12 Aug), so holding it would have wasted it.
+- **Verified by a real resumed call returning its branch name** — the TUI's "Usage reset"
+  message is a status, and statuses lie (the standing rule).
+- All five re-dispatched with the same briefs plus a note that nothing was lost.
+**Finding 39 (for #1163): when several lanes stall together, check the WORKTREE BRANCH before
+the rollout mtime. A rollout that wrote briefly then stopped looks identical for "agent is
+thinking", "agent died mid-work" and "agent never started"; the branch distinguishes them in one
+command — still on the old branch means the dispatch never took, which points at the launcher or
+the account, not the agent.** This is the second quota exhaustion (D11 was the first) and the
+last reset is now spent; a third has no local cure.
