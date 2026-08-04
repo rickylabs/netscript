@@ -125,7 +125,6 @@ function createQuickstartGates(): readonly GateDefinition[] {
       (context) => [
         'deno',
         'eval',
-        '--allow-run=deno',
         sequenceScript([
           [...cli(context, 'service', 'add', '--name', 'users', '--project-root', '.')],
           ['deno', 'task', 'check'],
@@ -158,7 +157,6 @@ function createQuickstartGates(): readonly GateDefinition[] {
       (context) => [
         'deno',
         'eval',
-        '--allow-run=deno',
         sequenceScript([
           [...cli(
             context,
@@ -191,8 +189,6 @@ function createQuickstartGates(): readonly GateDefinition[] {
       (context) => [
         'deno',
         'eval',
-        '--allow-run=aspire',
-        '--allow-net',
         PROBE_SERVICE_HEALTH_SCRIPT,
         context.project.appHost,
         'users',

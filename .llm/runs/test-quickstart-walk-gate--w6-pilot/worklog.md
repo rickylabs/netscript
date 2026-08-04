@@ -32,3 +32,4 @@
 - Reconcile: the workflow still installs the exact CLI before either suite; no release sequencing or lockfile change was introduced.
 - Full E2E harness tests: 112 passed, 0 failed.
 - The Quickstart step uses `always()` gated only by successful shared setup, so a failing `scaffold.runtime` does not silently skip the independent walk.
+- Supervisor review caught and removed obsolete permission flags from `deno eval` invocations; Deno 2.9 eval is permission-implicit and rejects those flags. Focused tests were rerun after correction.
