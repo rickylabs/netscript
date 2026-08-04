@@ -175,3 +175,55 @@ The repository pins `jsr:@fresh/core@2.3.3`. The installed package was inspected
 ## Worktree hygiene
 
 No commits were created. Temporary audit fixtures were removed. The audited worktree remains modified only by the pre-existing `deno.lock` addition of `jsr:@netscript/queue@0.0.4`; the audit did not alter it.
+
+## Re-audit
+
+- **Re-audit changeset:** `0fc50f7cf` + `99c62f27b` on `docs/web-layer-deep-dives`
+- **Method:** current prose was re-read against the live source; focused type controls, the docs build, and the link gate were rerun independently. Temporary type fixtures were removed after use.
+- **Final verdict:** **FAIL_FIX**
+
+The fixes close twelve of the thirteen numbered findings. One sentence still contradicts the newly documented page-pipeline lifetime, so the accuracy gate remains narrowly red.
+
+### Evidence-path corrections
+
+The generator's cosmetic corrections are valid. Three paths in the initial audit omitted their real subdirectories; the authoritative files are:
+
+- `packages/fresh/src/application/builders/define-page/builder/mod.tsx` — not `define-page/mod.tsx` for the `withResource` / `withResources` builder implementation.
+- `packages/fresh/src/application/defer/DeferPage.tsx` — not `application/components/DeferPage.tsx`.
+- `packages/fresh/src/application/defer/policy.ts` — not `application/policy.ts`.
+
+Those citation errors did not change the initial mechanism findings, but these corrected paths supersede the earlier evidence paths.
+
+### Per-finding disposition
+
+| Prior finding | Status | Re-audit evidence |
+|---|---|---|
+| G1-F1 — declaration-order failure described as runtime-only | **FIXED** | `resources.md:109-113,125-126,159-160,190-193,256-257` now distinguishes the typed and runtime boundaries. Three focused controls confirmed it: passing a misspelled-key `never` through untouched passed (exit 0); reading `.tenantId` from that misspelled value failed with `TS2339` (exit 1); and reading `.tenantId` from a known-but-later `session` resource also failed with `TS2339` (exit 1). This precisely covers both sides of the boundary. |
+| G1-F2 — unconditional once-per-request and span claims | **NOT-FIXED** | Span gating is fixed at `resources.md:115-117`; custom-handler/page-pipeline lifetime is correctly explained at `resources.md:128-132` and summarized at `resources.md:251-257`; live-dashboard ch.4 is corrected at `04-definePage-QueryIsland.md:99-105,230`. However, `resources.md:195-198` still says the authoritative value is “resolved once at the top of the request.” A request can run handler preparation and page preparation separately, as the page now explains itself. Replace that phrase with “resolved once during the page-pipeline preparation.” |
+| G1-F3 — literal route references claimed automatic rename safety | **FIXED** | `partials.md:144-152` explicitly says manual `createRouteReference` literals remain stale after a move, then limits rename tracking to Vite-generated accessors. `application/vite/README.md:62-82` and `application/route/manifest.ts:415-489` confirm the generated `routes` tree is derived from discovered filesystem routes. |
+| G1-F4 — three partial identifiers claimed to converge on one verified declaration | **FIXED** | `partials.md:187-191` says the values are colocated but not verified and explicitly preserves the `partialName` ↔ `definePartial` name coupling. |
+| G1-F5 — URL change described as cache invalidation | **FIXED** | `resources.md:209-212` now states that every page-pipeline preparation rebuilds the store and that a URL change causes another request/store rather than invalidating a URL-keyed cache. |
+| G2-F1 — bare Fresh described as `ctx.render({ data })` | **FIXED** | `resources.md:34-38` now uses a `{ data: ... }` handler return and explicitly says `Context.render()` accepts a VNode, matching Fresh 2.3.3. |
+| G2-F2 — `WeakMap<Request, ...>` claimed to span a partial request | **FIXED** | `resources.md:66-71` confines request-keyed memoization to one request and explicitly requires a cross-request cache/session store for separately fetched partials. |
+| G2-F3 — local partial error shell described as mandatory Fresh mechanics | **FIXED** | `partials.md:31-33,65-70` now distinguishes Fresh's normal route error path from an optional region-specific fallback. |
+| G3-F1 — live-dashboard chapter 5 contextual cross-link missing | **FIXED** | `05-live-stream.md:154-160` now links to `/web-layer/partials/` and explains why request-driven regions use partials while pushed regions do not. Chapter 4 retains both deep-dive links. |
+| G4-F1 — numbered “Pattern 1–4” checklist framing | **FIXED** | `resources.md:15-20` now leads with the lifecycle contract; headings at `134`, `167`, `200`, and `217` are mechanism-led rather than numbered patterns. |
+| G4-F2 — filler “four facts ... whole contract” transition | **FIXED** | `resources.md:98` now says “The loop establishes four observable properties,” followed by the corrected properties. |
+| G4-F3 — “Count the couplings” flourish | **FIXED** | `partials.md:65` now introduces the four independent couplings directly. |
+| G4-F4 — indirect deferred-boundary setup | **FIXED** | `partials.md:200-207` now opens directly with the two runtime boundaries and preserves the current non-streaming qualification. |
+
+### Re-run commands
+
+| Check | Command | Result |
+|---|---|---|
+| Misspelled key, `never` passed through untouched | `deno check --unstable-kv --config packages/fresh/deno.json packages/fresh/tests/type-fixtures/deepdives_reaudit_never_passthrough_type.ts` | **PASS**, exit 0 |
+| Misspelled key, first property access | `deno check --unstable-kv --config packages/fresh/deno.json packages/fresh/tests/type-fixtures/deepdives_reaudit_never_property_type.ts` | **Expected failure**, exit 1, `TS2339: Property 'tenantId' does not exist on type 'never'` |
+| Known-but-later resource, first property access | `deno check --unstable-kv --config packages/fresh/deno.json packages/fresh/tests/type-fixtures/deepdives_reaudit_swapped_property_type.ts` | **Expected failure**, exit 1, `TS2339: Property 'tenantId' does not exist on type 'never'` |
+| Site build | `cd docs/site && rtk proxy deno task build` | **PASS**, exit 0, 603 files generated |
+| Documentation links | `rtk proxy deno task docs:links` | **PASS**, exit 0, zero broken links, anchors, or orphans |
+
+### Final disposition
+
+**FAIL_FIX.** Change the single remaining phrase in `resources.md:195-198` from “resolved once at the top of the request” to “resolved once during the page-pipeline preparation.” No other prior finding remains open. Because this is the second audit FAIL cycle, the harness doc-audit profile's supervisor-escalation rule now applies.
+
+**Final verdict after supervisor fix `05e0581d6`: PASS.** `resources.md:196` now says “resolved once during the page-pipeline preparation,” closing G1-F2 and the final open finding.

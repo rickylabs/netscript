@@ -136,3 +136,12 @@
   (Sonnet, real fetches) graded claims: Next.js/SvelteKit confirmed, Nuxt ordering and
   Laravel/Rails specifics WRONG; benchmark-verification.md is the correction layer authoring
   must cite. Authoring (D1 withResource + D4 Partials first) dispatches after #1222 merges.
+
+## 2026-08-04 — P3 batch 1 PASS, PR #1241 open, batch 2 dispatched
+
+- D1/D4 audit cycle closed: FAIL_FIX (13 findings) → fix round (all accepted; generator
+  extended G1-F1 with a negative type-control the audit missed) → re-audit 12/13 →
+  supervisor-applied residual (05e0581d6) → **final PASS**.
+- Draft PR #1241 opened (batch 1; Refs #1210, no closing keyword; ci:skip-e2e; 0.0.6).
+- Batch 2 (D6 route contracts + D7 query bridge) dispatched to a fresh Opus docs-exception
+  agent on the same branch; audits follow per batch.
