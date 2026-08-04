@@ -645,3 +645,15 @@ the shared instrumented agent run on the canary.3 train measures both (#1197's t
 comparison and #1201's MCP-nonzero/deno-doc-zero verdict). Separate PR from #1102, sequenced
 before it. Brief committed (`slices/export-surface-mcp/`); wave 4 becomes #1135, #1136,
 #1104, #1201.
+
+## 2026-08-04 — Merge 13: PR #1199 (#1130) — OMB spine complete
+
+**PR #1199 merged; #1130 auto-closed** (verified). The S4 saga in full: check-6 caught 104
+lines of undeclared command-execution surface (parked on a side branch); the original branch's
+event stream wedged (finding 21 — resolved by fresh SHAs via rebase onto main); union
+conflicts resolved with regenerated (not hand-merged) publish assets; 93/93 combined tests;
+refs verified through every body edit. The OMB spine (S4 projection + S5 directory + S8
+receipts) is now fully on main — wave 3's S6 read tools unblock.
+
+#1200 (docs): full-rerun success still left shadowed contexts; fresh-SHA cure applied
+(`0b3c1ff13`), merge armed on green. #1187 recurrence count this run: five.
