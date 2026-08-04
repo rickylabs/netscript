@@ -95,6 +95,28 @@ export type {
   ToolName,
   ToolSuccess,
 } from './src/domain/tool-types.ts';
+export {
+  createExportSurfaceFlows,
+  EXPORT_JSDOC_CHARACTER_LIMIT,
+  EXPORT_SIGNATURE_CHARACTER_LIMIT,
+  FIND_EXPORT_RESULT_LIMIT,
+  LIST_PACKAGE_EXPORT_RESULT_LIMIT,
+  SEARCH_EXPORT_RESULT_LIMIT,
+} from './src/application/export-surfaces/export-surface-flows.ts';
+export type { ExportSurfaceToolName } from './src/application/export-surfaces/export-surface-flows.ts';
+export { EXPORT_SURFACE_SCHEMA_VERSION } from './src/ports/export-surface-corpus-port.ts';
+export type {
+  ExportSurfaceCorpus,
+  ExportSurfaceCorpusPort,
+  ExportSurfaceCorpusProvenance,
+  ExportSurfaceEntry,
+  ExportSurfaceSubpath,
+} from './src/ports/export-surface-corpus-port.ts';
+export { EmbeddedExportSurfaceCorpus } from './src/infrastructure/export-surfaces/embedded-export-surface-corpus.ts';
+export type {
+  EmbeddedExportSurfaceCorpusOptions,
+  EmbeddedExportSurfaceSource,
+} from './src/infrastructure/export-surfaces/embedded-export-surface-corpus.ts';
 export type { JsonRpcError, JsonRpcRequest, JsonRpcResponse } from './src/domain/json-rpc.ts';
 export type {
   TelemetryProbePort,

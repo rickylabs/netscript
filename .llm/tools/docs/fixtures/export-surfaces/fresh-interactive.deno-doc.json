@@ -1,0 +1,137 @@
+{
+  "version": 2,
+  "nodes": {
+    "file:///workspace/packages/fresh/src/runtime/interactive/mod.ts": {
+      "module_doc": {
+        "doc": "Browser-facing interactive helpers for `@netscript/fresh`.\n\nThis entrypoint is intentionally limited to package-owned interactive seams.\nRoute builders, server helpers, and copy-based UI registry code stay on\nexplicit subpaths.\n",
+        "tags": [{ "kind": "module" }]
+      },
+      "symbols": [
+        {
+          "name": "resolvedPromise",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///workspace/packages/fresh/src/runtime/interactive-hooks/use-promise.ts",
+                "line": 37,
+                "col": 0,
+                "byteIndex": 1011
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Create a promise already primed as fulfilled for `usePromise()`."
+              },
+              "kind": "function",
+              "def": {
+                "params": [
+                  {
+                    "kind": "identifier",
+                    "name": "value",
+                    "optional": false,
+                    "tsType": {
+                      "repr": "T",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "T",
+                        "resolution": {
+                          "kind": "typeParam",
+                          "declaringName": "resolvedPromise",
+                          "declaringKind": "function"
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType": {
+                  "repr": "Promise",
+                  "kind": "typeRef",
+                  "value": {
+                    "typeParams": [
+                      {
+                        "repr": "T",
+                        "kind": "typeRef",
+                        "value": {
+                          "typeName": "T",
+                          "resolution": {
+                            "kind": "typeParam",
+                            "declaringName": "resolvedPromise",
+                            "declaringKind": "function"
+                          }
+                        }
+                      }
+                    ],
+                    "typeName": "Promise"
+                  }
+                },
+                "hasBody": true,
+                "typeParams": [{ "name": "T" }]
+              }
+            }
+          ]
+        },
+        {
+          "name": "usePromise",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///workspace/packages/fresh/src/runtime/interactive-hooks/use-promise.ts",
+                "line": 8,
+                "col": 0,
+                "byteIndex": 302
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Read a promise using the Suspense throw-promise protocol."
+              },
+              "kind": "function",
+              "def": {
+                "params": [
+                  {
+                    "kind": "identifier",
+                    "name": "promise",
+                    "optional": false,
+                    "tsType": {
+                      "repr": "Promise",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeParams": [
+                          {
+                            "repr": "T",
+                            "kind": "typeRef",
+                            "value": {
+                              "typeName": "T",
+                              "resolution": {
+                                "kind": "typeParam",
+                                "declaringName": "usePromise",
+                                "declaringKind": "function"
+                              }
+                            }
+                          }
+                        ],
+                        "typeName": "Promise"
+                      }
+                    }
+                  }
+                ],
+                "returnType": {
+                  "repr": "T",
+                  "kind": "typeRef",
+                  "value": {
+                    "typeName": "T",
+                    "resolution": {
+                      "kind": "typeParam",
+                      "declaringName": "usePromise",
+                      "declaringKind": "function"
+                    }
+                  }
+                },
+                "hasBody": true,
+                "typeParams": [{ "name": "T" }]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -49,6 +49,9 @@ import { createListServiceOperationsFlow } from './src/application/flows/list-se
 import { createGetOperationSchemaFlow } from './src/application/flows/get-operation-schema-flow.ts';
 import { createServiceEndpointDirectory } from './src/application/service-endpoint-directory.ts';
 import type { ServiceEndpointDirectoryPort } from './src/ports/service-endpoint-directory-port.ts';
+import type { ExportSurfaceCorpusPort } from './src/ports/export-surface-corpus-port.ts';
+import { createExportSurfaceFlows } from './src/application/export-surfaces/export-surface-flows.ts';
+import { EmbeddedExportSurfaceCorpus } from './src/infrastructure/export-surfaces/embedded-export-surface-corpus.ts';
 
 export * from './mod.ts';
 
@@ -72,6 +75,8 @@ export interface McpCliOptions {
   ) => void;
   /** Override service discovery and probing for embedders and fixtures. */ readonly serviceEndpointDirectory?:
     ServiceEndpointDirectoryPort;
+  /** Override the generated first-party export corpus for embedders and fixtures. */ readonly exportSurfaceCorpus?:
+    ExportSurfaceCorpusPort;
 }
 
 /** Resolve an explicit public documentation override from flags or environment. */
@@ -122,11 +127,38 @@ export function createMcpCliServer(options: McpCliOptions = {}): McpServer {
   const serviceDirectory = options.serviceEndpointDirectory ?? createServiceEndpointDirectory({
     projectRoot,
   });
+  const exportSurfaceFlows = createExportSurfaceFlows(
+    options.exportSurfaceCorpus ?? new EmbeddedExportSurfaceCorpus(),
+  );
   return createMcpServer({
     probe,
     environment,
     flows: {
       ...createDocsFlows(docsCorpus),
+      find_export: withReceipt(
+        exportSurfaceFlows.find_export,
+        evidence,
+        'mcp find_export',
+        warnEvidence,
+      ),
+      list_package_exports: withReceipt(
+        exportSurfaceFlows.list_package_exports,
+        evidence,
+        'mcp list_package_exports',
+        warnEvidence,
+      ),
+      get_export: withReceipt(
+        exportSurfaceFlows.get_export,
+        evidence,
+        'mcp get_export',
+        warnEvidence,
+      ),
+      search_exports: withReceipt(
+        exportSurfaceFlows.search_exports,
+        evidence,
+        'mcp search_exports',
+        warnEvidence,
+      ),
       get_app_status: withReceipt(
         createGetAppStatusFlow(query),
         evidence,

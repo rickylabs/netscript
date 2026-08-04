@@ -90,7 +90,7 @@ server over standard input/output. Its flags:
 
 ## What the server exposes
 
-Seventeen tools, every one returning a bounded structured result. Grouped by what
+Twenty-one tools, every one returning a bounded structured result. Grouped by what
 an agent is trying to do:
 
 - **Read the running app** — seven telemetry read models: `get_app_status`,
@@ -102,6 +102,9 @@ an agent is trying to do:
   slice has a direct twin in `netscript plugin doctor`.
 - **Search the docs** — `search_docs`, `list_docs`, and `get_doc` form a
   search-to-get funnel over the documentation corpus (next section).
+- **Discover exports** — `find_export`, `list_package_exports`, `get_export`, and
+  `search_exports` locate package subpaths, page through package surfaces, return one bounded
+  signature/JSDoc block, and find related helpers by partial name or declaration shape.
 - **Bridge to the CLI** — `list_commands` discovers the current command tree
   (the machine-readable twin of `netscript --help`), and `execute_command` runs
   an allowlisted `netscript …` command with policy checking, timeout handling,
@@ -126,6 +129,12 @@ folder or a checkout of this site — with `--docs-root <path>` or the
 returns a structured `docs_corpus_not_found` error naming the missing path; the
 server never silently reports an empty corpus.
 
+The export tools use a different, package-embedded corpus generated from Deno 2.9
+`deno doc --json`. It is version- and hash-pinned, needs no project `docs/` directory, and returns
+only bounded symbol records rather than generated files. Start with `find_export` when you know the
+exact symbol, `list_package_exports` when exploring a package, `get_export` for one declaration,
+or `search_exports` when you only know part of the helper name or its shape.
+
 ## Token-efficient use
 
 Tool inputs cap result counts, and the server truncates oversized results and
@@ -136,7 +145,8 @@ then call `get_doc` for that document or section.
 ## Data boundary
 
 The MCP server reads NetScript telemetry, project metadata and generated
-registries used for diagnostics, and public documentation. It does not return
+registries used for diagnostics, public documentation, and the package-embedded public export
+corpus. It does not return
 project source code, environment-variable values, credentials, or secrets.
 
 Telemetry requests go only to the resolved dashboard endpoint. Discovery uses, in
@@ -208,7 +218,7 @@ deno test --allow-all packages/cli/e2e/tests/agent/agent-mcp-stdio_test.ts
 ```
 
 The smoke starts the public CLI binary, initializes MCP over stdio, verifies the
-17-tool catalog, and checks docs, diagnostics, unreachable telemetry, and command
+21-tool catalog, and checks docs, exports, diagnostics, unreachable telemetry, and command
 denial behavior.
 
 ## Where to go next
