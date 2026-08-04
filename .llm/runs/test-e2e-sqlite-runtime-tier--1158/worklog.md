@@ -117,7 +117,7 @@ No gate-filtering logic to touch: waits are derived from the suite's resolved op
 | 2026-08-04 | S2        | **Tier-A slice review — ACCEPTED**                    | Supervisor reproduced the six gates, verified the no-cache materialized config, and found no issues. Sign-off commit `47caa6bb`.                                                                                                                                    |
 | 2026-08-04 | S3        | Implementation and generator gates complete           | Added the optional capability defaults contract, one top-level defaults-under-overrides merge, precedence + database-gate tests, and an exact options baseline for all eight existing built-ins. All six required gates passed; Tier-A review is pending.           |
 | 2026-08-04 | S4        | Implementation and generator gates complete           | Added the sqlite runtime id/profile, inherited executable Garnet mode, registry/CLI precedence coverage, and wait/resource consistency checks. All six required gates passed; Tier-A review is pending.                                                             |
-| 2026-08-04 | S4a       | Expensive-suite lease correction complete              | Centralized both runtime ids in one derived finite vocabulary, made sqlite and postgres contend in both directions, retained the cheap-suite negative control, and documented the sqlite tier. All six requested gates passed.                                      |
+| 2026-08-04 | S4a       | Expensive-suite lease correction complete             | Centralized both runtime ids in one derived finite vocabulary, made sqlite and postgres contend in both directions, retained the cheap-suite negative control, and documented the sqlite tier. All six requested gates passed.                                      |
 
 ## Slice Review — S1 (Tier-A, supervisor)
 
@@ -322,6 +322,65 @@ invariant, recorded as drift **D-7**. This is the supervisor's own review, perfo
 
 **Verdict on the code: ACCEPTED** — S3 proves what it claims. Proceed to S4.
 
+## Slice Review — S4 + S4a (Tier-A, supervisor)
+
+Reviewed at `b0c6ef89` (S4, plus the swept `d5ba7205`) and `8e78dee6` (S4a). This slice carries the
+PR's value, so it received the supervisor's own review **plus** a supervisor-dispatched Claude Opus
+5 adversarial sub-agent (drift D-9 escalation step 2) briefed to refute rather than agree.
+
+**Reproduced gate results (supervisor-run)**
+
+| Gate                                       | Verdict                                              |
+| ------------------------------------------ | ---------------------------------------------------- |
+| `deno test --no-lock -A packages/cli/e2e/` | 105 passed, 0 failed                                 |
+| `run-deno-check.ts --root packages/cli`    | 786 files, 0 findings                                |
+| `run-deno-lint.ts --root packages/cli`     | 786 files, 0 findings                                |
+| `deno task quality:scan`                   | exit 0                                               |
+| `deno task arch:check`                     | exit 0                                               |
+| `deno task e2e:cli suites`                 | lists `scaffold.runtime.sqlite` with its exact title |
+
+**Adversarial sub-agent verdict: ACCEPT-WITH-FINDING.** It probed the real Cliffy program rather
+than trusting the tests. Results:
+
+| Question                                            | Verdict                                                                                                                                                                                                                                                                                                |
+| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `run-command.ts` default removal changes behaviour? | **SAFE** — `compactOptions` drops `undefined`, so the suite baseline applies; both `defaultRunOptions` copies are already postgres/cache-on, and `full` keeps its explicit postgres default (D6 holds). Probed: every pre-existing suite still resolves `postgres/true`.                               |
+| `Deno.env.set` in the suite factory                 | **TASTE-ONLY** — listing suites does not trigger it (the registry stores closures); it cannot leak into a postgres run (one suite resolved per process, and `Deno.env.set` cannot escape to the parent shell); test-process residue is real but inert because nothing reads the variable at test time. |
+| Gate-list correctness                               | **SAFE** — sqlite resolves with `runtime.wait.garnet` and none of postgres/mysql/mssql; `scaffold.runtime` is byte-identical; the wait matrix cross-checks `RUNTIME_GATES` against `runtimeResources(db)` rather than restating the implementation.                                                    |
+| Other runtime risks                                 | **DEFECT ×2** — see below.                                                                                                                                                                                                                                                                             |
+
+**Defect 1 — fixed in S4a (this is why S4 was not signed off as landed).** `suite-runner.ts:61`
+gated the expensive-suite lease on a literal `suite.id === SCAFFOLD.RUNTIME`.
+`scaffold.runtime.sqlite` runs the same 68-gate runtime path against the same `.llm/tmp/cli-e2e`
+smoke root, so it neither took the lease nor was blocked by one — the cheap tier, the one most
+likely to be run alongside the postgres tier, would collide silently instead of producing the honest
+`SuiteLeaseContentionError`. Confirmed at source by the supervisor before acting. S4a replaces it
+with `EXPENSIVE_RUNTIME_SUITE_IDS` (constant + derived `ExpensiveRuntimeSuiteId`), adds
+**bidirectional** postgres↔sqlite contention tests, and preserves the cheap-suite no-lease
+regression. `suite-lease.ts`'s `isSuiteId` already accepted the new id and was correctly left alone.
+
+**Defect 2 — routed to S5, not fixed here.** `suite-runner.ts:69-71` calls
+`dockerCleaner.captureSnapshot()` whenever `cleanup` is true, **outside any gate**, so a missing
+`docker` binary throws a raw exception and kills the run. That is S5's scope (D8); the S5 brief was
+amended to cover the **runner call site**, not just the adapter, and to require a runner-level test
+with a Docker-less cleaner.
+
+**Also fixed in S4a:** `packages/cli/e2e/README.md` Built-in Suites table now lists the new tier —
+an operator reading that table previously could not discover it.
+
+**Recorded, not fixed (accepted):**
+
+- The `Deno.env.set` call site is impure for a definition factory and fires before overrides are
+  considered, so `run scaffold.runtime.sqlite --cache` honours the operator's cache request in
+  appsettings while still forcing the Docker-less Garnet arm. Both arms are Redis-compatible, so no
+  wrong verdict is possible. Not worth destabilising the suite seam at this point in the run.
+- The `run`-command equivalence now rests on two separate `defaultRunOptions` copies both staying at
+  postgres/cache-on, and nothing tests that invariant.
+
+Both are logged as follow-ups at Close rather than silently dropped.
+
+**Verdict: ACCEPTED** (S4 with S4a as its required fix). Proceed to S5.
+
 ## Decisions
 
 | Decision                                                | Reason                                                                                    | Source                                               |
@@ -341,7 +400,7 @@ invariant, recorded as drift **D-7**. This is the supervisor's own review, perfo
 | #1191's fix is services-only — new blocker           | significant | yes (D-3)          |
 | Apps own no permission-bearing command               | significant | yes (D-5 + ruling) |
 | Generic `run` defaults masked suite defaults         | significant | yes (D-10)         |
-| Concurrent supervisor commit swept S4 worktree      | significant | yes (D-11)         |
+| Concurrent supervisor commit swept S4 worktree       | significant | yes (D-11)         |
 | S4 omitted sqlite from the expensive-suite lease set | significant | yes (D-13)         |
 
 ## Gate Results
@@ -355,9 +414,9 @@ that constant. `suite-runner.ts` now acquires the lease when the suite id is a m
 all `SCAFFOLD` and `DEPLOY` values, so `scaffold.runtime.sqlite` is valid lease metadata.
 
 The runner test holds a postgres lease and starts sqlite, then holds sqlite and starts postgres. In
-both directions the contender raises `SuiteLeaseContentionError` and identifies the held suite.
-The existing `scaffold.service` test still records zero acquisitions. No Docker cleanup code or
-snapshot call site changed.
+both directions the contender raises `SuiteLeaseContentionError` and identifies the held suite. The
+existing `scaffold.service` test still records zero acquisitions. No Docker cleanup code or snapshot
+call site changed.
 
 | Gate       | Command                                                                                           | Raw result                                                      |
 | ---------- | ------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
@@ -368,13 +427,12 @@ snapshot call site changed.
 | quality    | `deno task quality:scan`                                                                          | exit 0; `ok: true`, 0 findings, 7 pre-existing allowances       |
 | doctrine   | `deno task arch:check`                                                                            | exit 0; existing out-of-scope dependency/doctrine warnings only |
 
-**Discovery evidence.** `deno task e2e:cli suites` exited 0 and listed both
-`scaffold.runtime` and `scaffold.runtime.sqlite`. Per the owner boundary, no runtime suite was
-started.
+**Discovery evidence.** `deno task e2e:cli suites` exited 0 and listed both `scaffold.runtime` and
+`scaffold.runtime.sqlite`. Per the owner boundary, no runtime suite was started.
 
-**Post-slice reconcile note.** S4a changes only the shared E2E vocabulary, runner predicate,
-runner regressions, README suite table, and harness evidence. It does not touch `suite-lease.ts`,
-Docker cleanup, `.github/**`, or `packages/cli/src/**`. The implementation lane performs one
+**Post-slice reconcile note.** S4a changes only the shared E2E vocabulary, runner predicate, runner
+regressions, README suite table, and harness evidence. It does not touch `suite-lease.ts`, Docker
+cleanup, `.github/**`, or `packages/cli/src/**`. The implementation lane performs one
 commit/push/PR-comment handoff and stops without dispatching a reviewer or authoring a sign-off.
 
 ### S4 Slice Gates
@@ -400,8 +458,8 @@ unchanged runtime suite has postgres and neither mysql nor mssql.
 relationship, labels, milestone, `.github/**`, Docker cleanup, live runtime, or
 `packages/cli/src/**` surface changed. Drift D-10 records the generic CLI defaults that masked the
 new capability defaults; D-11 records the concurrently pushed supervisor commit that swept the S4
-worktree before the implementation commit. S4 is implementation-complete with green automated
-gates and remains explicitly pending Tier-A review; S5 has not started.
+worktree before the implementation commit. S4 is implementation-complete with green automated gates
+and remains explicitly pending Tier-A review; S5 has not started.
 
 ### S3 Slice Gates
 

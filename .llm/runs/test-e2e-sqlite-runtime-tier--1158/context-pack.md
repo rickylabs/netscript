@@ -2,13 +2,13 @@
 
 ## Run Metadata
 
-| Field          | Value                                             |
-| -------------- | ------------------------------------------------- |
-| Run ID         | `test-e2e-sqlite-runtime-tier--1158`              |
-| Branch         | `test/e2e-sqlite-runtime-tier-1158`               |
-| Current phase  | `implement` — S4a correction complete; handoff   |
-| Archetype      | `6 - CLI / Tooling`                               |
-| Scope overlays | `service`                                         |
+| Field          | Value                                          |
+| -------------- | ---------------------------------------------- |
+| Run ID         | `test-e2e-sqlite-runtime-tier--1158`           |
+| Branch         | `test/e2e-sqlite-runtime-tier-1158`            |
+| Current phase  | `implement` — S4a correction complete; handoff |
+| Archetype      | `6 - CLI / Tooling`                            |
+| Scope overlays | `service`                                      |
 
 ## Current State
 
@@ -45,8 +45,8 @@ S4a corrects the adversarial-review finding in S4's lease surface. A shared
 the expensive-suite lease by membership rather than a literal postgres id comparison. Runner tests
 prove postgres-held→sqlite and sqlite-held→postgres contention both raise
 `SuiteLeaseContentionError`; the existing cheap `scaffold.service` path still takes no lease.
-`suite-lease.ts` remains unchanged because its `isSuiteId` parser already accepts every
-`SCAFFOLD` value. The built-in suites table now discovers the container-free sqlite tier.
+`suite-lease.ts` remains unchanged because its `isSuiteId` parser already accepts every `SCAFFOLD`
+value. The built-in suites table now discovers the container-free sqlite tier.
 
 ## Completed
 
@@ -108,25 +108,25 @@ prove postgres-held→sqlite and sqlite-held→postgres contention both raise
 
 ## S4a Files Changed
 
-| Path                                                                            | Notes                                                                  |
-| ------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
-| `.llm/runs/test-e2e-sqlite-runtime-tier--1158/{worklog,context-pack,drift}.md`  | S4a evidence, handoff state, supervisor D-12, and defect drift D-13.    |
-| `packages/cli/e2e/src/domain/cli-surface.ts`                                    | Shared expensive-runtime tuple and derived union.                       |
-| `packages/cli/e2e/src/application/runner/suite-runner.ts`                       | Lease acquisition by shared-set membership.                             |
-| `packages/cli/e2e/tests/application/runner/suite-runner_test.ts`                | Bidirectional contention plus retained cheap-suite coverage.            |
-| `packages/cli/e2e/README.md`                                                    | Discoverable container-free sqlite tier in the built-in suites table.   |
+| Path                                                                           | Notes                                                                 |
+| ------------------------------------------------------------------------------ | --------------------------------------------------------------------- |
+| `.llm/runs/test-e2e-sqlite-runtime-tier--1158/{worklog,context-pack,drift}.md` | S4a evidence, handoff state, supervisor D-12, and defect drift D-13.  |
+| `packages/cli/e2e/src/domain/cli-surface.ts`                                   | Shared expensive-runtime tuple and derived union.                     |
+| `packages/cli/e2e/src/application/runner/suite-runner.ts`                      | Lease acquisition by shared-set membership.                           |
+| `packages/cli/e2e/tests/application/runner/suite-runner_test.ts`               | Bidirectional contention plus retained cheap-suite coverage.          |
+| `packages/cli/e2e/README.md`                                                   | Discoverable container-free sqlite tier in the built-in suites table. |
 
 No `suite-lease.ts`, `packages/cli/src/**`, `.github/**`, cleanup adapter/call site, live runtime,
 product cache default, or embedded-template file was touched.
 
 ## Gates
 
-| Gate family | Current status | Evidence                                           |
-| ----------- | -------------- | -------------------------------------------------- |
-| Static      | `PASS`         | S4a scoped check/lint/fmt: 786 files, 0 findings.  |
-| Fitness     | `PASS`         | S4a `quality:scan` and `arch:check` exited 0.      |
-| Runtime     | `NOT_RUN`      | S7 is the first live sqlite run.                   |
-| Consumer    | `PASS`         | S4a: 105 E2E tests; bidirectional contention.      |
+| Gate family | Current status | Evidence                                          |
+| ----------- | -------------- | ------------------------------------------------- |
+| Static      | `PASS`         | S4a scoped check/lint/fmt: 786 files, 0 findings. |
+| Fitness     | `PASS`         | S4a `quality:scan` and `arch:check` exited 0.     |
+| Runtime     | `NOT_RUN`      | S7 is the first live sqlite run.                  |
+| Consumer    | `PASS`         | S4a: 105 E2E tests; bidirectional contention.     |
 
 ## Open Questions
 
