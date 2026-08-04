@@ -22,3 +22,11 @@
 | 2026-08-04 | S0 | Live #1229, source/debt/caveat re-baseline at `c384013662` | complete |
 | 2026-08-04 | PLAN-EVAL | milestone-run D6 composed rule | COMPOSED; plan locked, same-run implementation authorized |
 | 2026-08-04 | S1 RED | `deno test --allow-all --unstable-kv plugins/triggers/src/runtime/trigger-runtime-processor_test.ts` | exit 1; 2 passed, 1 failed: actual `dlq`, expected `deferred` |
+| 2026-08-04 | S2 GREEN | Core defer scheduler test + full `plugin-triggers-core` package task | 2 focused durability tests green; full package green |
+| 2026-08-04 | S2 static | scoped check/lint/fmt wrappers for `packages/plugin-triggers-core` | zero findings |
+
+### S2 reconcile
+
+- Live #1229 remains open; PR #1283 remains draft with exactly one `status:impl` label.
+- No new review/evaluator comments changed the locked contract. S2 stays within the core-owned port
+  and adapter boundary; plugin composition remains S3.

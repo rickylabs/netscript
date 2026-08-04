@@ -18,7 +18,7 @@ Closes #1229
 
 - [x] S0 Live-issue research, locked contract plan, and D6 composed Plan-Gate — `db5023295`
 - [x] S1 RED proof through the public plugin runtime
-- [ ] S2 Core scheduler/replay contract and durable adapter
+- [x] S2 Core scheduler/replay contract and durable adapter
 - [ ] S3 Plugin scheduling/replay lifecycle
 - [ ] S4 Caveat/debt burn-down and archetype gates
 

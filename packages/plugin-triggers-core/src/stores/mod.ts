@@ -5,6 +5,8 @@ export {
   KvTriggerEnabledStateStore,
 } from './kv-trigger-enabled-state-store.ts';
 export type { KvTriggerEnabledStateStoreOptions } from './kv-trigger-enabled-state-store.ts';
+export { KvTriggerDeferScheduler } from './kv-trigger-defer-scheduler.ts';
+export type { KvTriggerDeferSchedulerOptions } from './kv-trigger-defer-scheduler.ts';
 export {
   KvTriggerDlqStore,
   KvTriggerEventStore,
@@ -42,4 +44,9 @@ export type {
   TriggerIdempotencyClaim,
   TriggerIdempotencyKeyInput,
   TriggerIdempotencyPort,
+  TriggerDeferRecord,
+  TriggerDeferReplayResult,
+  TriggerDeferRunOptions,
+  TriggerDeferScheduleInput,
+  TriggerDeferSchedulerPort,
 } from '../ports/mod.ts';
