@@ -83,3 +83,27 @@
   2e3b3e550ca0, route matched. Completion artifact: slices/mainpages-s2/draft-report.md.
   Next: per-page Opus adversarial review → orchestrator slice review → draft PR → S5
   OpenCode·Grok eval → Sol docs_audit.
+
+## 2026-08-04 — S8 deep review (Tier-A supervisor whole-text quality pass)
+
+- Read all four pages (index.vto, why.vto, quickstart.vto, concepts.vto) twice — once per-page,
+  once across the set.
+- Deliverable: `slices/mainpages-s8/deep-review.md`. 16 findings with full replacement text,
+  per-page paragraph-level keep/rewrite/delete maps, whole-set voice/sequencing/rhythm analysis,
+  prioritized 10-item fix list.
+- Verdicts: index SOUND (4 targeted rewrites), why SOUND (5 fixes, none structural), quickstart
+  SOUND (3 minor fixes), concepts RESTRUCTURE (5 findings, several structural — transitions
+  missing, best sentences buried, overloaded enumerations, uniform section shape).
+- Overall: SOUND with one RESTRUCTURE. Highest-leverage fix: concepts page transitions (F16) —
+  five connective sentences transform the page from reference index to guided tour.
+- No files edited; review file is the deliverable per brief.
+
+## 2026-08-04 — Charter A shipped
+
+- Prose round 2 (Qwen S8 whole-text review, max effort): concepts restructured, targeted
+  rewrites applied on the other three, five review proposals rejected for technical accuracy
+  (each with recorded reasoning). Gates re-verified by orchestrator: build exit 0, links clean.
+- **PR #1216 squash-merged into main (milestone 0.0.5)**; branch deleted. #1209 was merged
+  earlier by the 0.0.5 orchestrator — both docs work PRs of this run are on main.
+- Still open: PR #1217 (claude-openrouter launcher) awaiting Sol review verdict; Charter B
+  phases 2 (#1208 sweep) and 3 (#1210 deep-dives) not yet dispatched.

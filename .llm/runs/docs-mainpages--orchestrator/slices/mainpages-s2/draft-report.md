@@ -186,3 +186,76 @@ Commit: `a119599c5` — `docs(site): clarify adoption tradeoffs and next steps`
 Round-1 head: `a119599c5`. Explicit-refspec push succeeded, and the remote branch resolves to
 `a119599c58d36f5052c3f51b3fc519e97a18eadc`. The pre-existing unstaged `deno.lock` change
 remains uncommitted.
+
+## Prose round 2
+
+Applied the whole-text editorial review from `slices/mainpages-s8/deep-review.md` while retaining
+the locked heroes, homepage one-screen structure, technical accuracy fixes, and ban list.
+
+### Applied
+
+- **Homepage (F1–F4):** replaced the generic category subhead; led the durability proof with the
+  retry-loop contrast; varied the repeated “One X” title rhythm; removed the fleet pronoun
+  ambiguity; and rebuilt the post-code close around correlation → compensation request → configured
+  runtime → refund. F2 and F4 were adapted to retain the configured store, saga bus bridge, and
+  compensator boundaries established in fix round 1.
+- **Why (F5–F8):** split the hero's two claims into scannable sentences; promoted retrofit cost to
+  the thesis of section 2; made the Encore row introduce .NET Aspire and its adapter role; replaced
+  “budget for upgrades” with a direct pre-1.0 disqualification; and stated the one-process trade-off
+  in terms of unused structure.
+- **Quickstart (F9–F11):** explained why .NET Aspire and Docker appear in a Deno quickstart; framed
+  `--service` by what it creates; and recast the health check so the four-resource set is explicit.
+- **Concepts (F12–F16):** rewrote the hero subhead with one specific verb per downstream layer;
+  promoted behavioral contracts to section 1's opening; split the service preset enumeration;
+  preserved the terse plugin contrasts; and added causal transitions from contracts → services →
+  plugins → web layer → observed graph. The restructure retains every prior technical claim,
+  including SDK query helpers, OpenAPI generation, RPC, service-info metadata, validated manifests,
+  static workspace wiring, separate plugin resources, Fresh/Preact behavior, OTLP injection, and
+  trace propagation.
+- **Whole set:** Concepts now picks up Why's architecture handoff instead of restarting as a
+  reference index. Its sentence lengths and paragraph openings vary, while Quickstart keeps the
+  shorter procedural voice. Homepage previews outcomes; Concepts owns the implementation-level
+  connective explanation.
+
+### Rejected or adapted
+
+- **F2 exact replacement rejected:** “a crash resumes, not restarts” omits the durable-store
+  condition and would turn a configured runtime behavior into an unconditional homepage claim.
+- **F4 exact replacement rejected:** “the runtime resolves it” and “the saga store records” omit the
+  required configured saga bus bridge, compensator, and durable store, contradicting verified
+  `SagaEngine` and bus-bridge behavior.
+- **F6 absolute wording rejected:** “decisions you cannot retrofit” overstates the locked
+  “expensive to retrofit” argument; the revision keeps the cost claim without declaring
+  impossibility.
+- **F6 telemetry addition rejected:** the reviewed paragraph established only that logging can be
+  added later; adding telemetry there would broaden the claim without source verification.
+- **F15 exact compression adapted:** removing “validated data,” static CLI wiring, or separate
+  Aspire resources would weaken existing technical claims, so those details remain in a less
+  uniform paragraph shape.
+- **Homepage exit-nav reorder rejected:** the proposed Why → Quickstart → Concepts sequence conflicts
+  with the locked one-screen exit strip and its `Run it / Understand it / Decide whether it fits`
+  destinations.
+
+### Commits
+
+- `5ceab35b4ab4c0a231835fdcf7045bb0c3cebed6` —
+  `docs(site): sharpen the homepage proof arc`
+- `7d2fc1a8ea96d9a965ea8b314d48123c92e8e9f3` —
+  `docs(site): tighten the adoption argument`
+- `3700253dc2de9e95f231f54318cdd387fb4f24cd` —
+  `docs(site): clarify the quickstart path`
+- `52a40fa0805986af9c0ab9514a7cd0f9849d80ea` —
+  `docs(site): connect the five-layer concepts arc`
+
+### Gates
+
+| Gate | Result |
+| --- | --- |
+| `cd docs/site && deno task build` | PASS — exit 0; 595 files generated |
+| `deno task docs:links` | PASS — 102 docs, 0 broken links, 0 broken anchors, 0 orphans |
+| Hard-ban scan on the four pages | PASS |
+| `git diff --check` before page commits | PASS |
+| `deno.lock` hygiene | PASS — gate-added lock entry removed; worktree clean |
+
+Prose-round head: `52a40fa0805986af9c0ab9514a7cd0f9849d80ea`. Explicit-refspec push
+succeeded; the remote `docs/main-pages-revamp` branch resolves to the same commit.
