@@ -82,6 +82,7 @@ hydration in `packages/fresh/src/application/query/`; extend the HTTP edge in
 | 2026-08-04 | S3 | GREEN | Fresh now owns the same-origin JSON endpoint and browser helper; the mutate→invalidate→reload integration test observes the committed value. Focused tests 13/13, scoped check, and source-format gate pass. |
 | 2026-08-04 | S4 | audit correction | The first final Fresh audit exposed a slice-owned query-directory cardinality warning (13 > 12). Moved the helper/test into one focused submodule; rerun returned exactly the four recorded baseline findings. |
 | 2026-08-04 | S4 | validation | Fresh package tests pass 215/215; Fresh/SDK scoped checks, lint and format pass; `quality:gate` exits 0; doc-lint/audit counts do not deepen. |
+| 2026-08-04 | S4 | close-gate reconcile | Quality/check-test/deps-report are green. Checked all six earned #1252 acceptance boxes with per-box citations and mirrored the exact mappings into PR #1265 before the `status:ready-merge` retrigger. |
 
 ## Decisions
 
