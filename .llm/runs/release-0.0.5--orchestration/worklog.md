@@ -1633,3 +1633,30 @@ lane firing on a changeset that cannot affect it. Both live occurrences were cit
 steer as evidence rather than restating the issue bodies.
 Per finding 26 canary.9 is NOT cancelled; if its pair fails it is recorded as a failed pair
 and the ledger's next green pair comes from canary.10's full chain.
+
+## 2026-08-04 — Wave-6 pilot bar accepted; canary.9 pair FAILED (#1227 again); #1294 filed
+
+**Owner set canary.10 as the wave-6 pilot release** with an outcome bar (clean machine →
+Quickstart end to end → verified working state, unattended). Recorded as the acceptance for
+canary.10; I own deciding the train.
+
+- **canary.9 = FAILED PAIR.** Published clean; pinned prod E2E (30950885499) died on
+  `runtime.aspire-restore` with 2×900.1s / 1800181ms, "Failed to prepare AppHost server",
+  29/1 — byte-identical to canary.6. **#1227 has now destroyed two pairs.** Stage-E recorded
+  on #1149 with the train and the known-broken `init --service` caveat.
+- **Answer to "is the hang reachable outside CI": YES.** It reproduced locally on this machine
+  this morning at the same 2×900.1s before ever appearing on a runner. So an unattended agent
+  following the Quickstart can halt at `aspire start` on a clean machine — the pilot cannot
+  run until #1227 lands. That is the decisive fact for the go/no-go.
+- **Answer to "does a Quickstart walk gate exist": no, and #1294 (p0) now specifies it.**
+  Closest is `e2e-cli-prod.yml`, which runs exactly one suite (`scaffold.runtime`) against the
+  published CLI — real coverage of install/init/db/aspire/check/endpoints, and the reason
+  canary.6 and canary.9 were caught. Its three gaps: it never adds a service after init (which
+  is why #1290 was invisible to every canary — the pilot hits that at ~minute twenty), it is
+  not derived from the Quickstart page's own commands (page and gate can drift silently), and
+  it starts warm rather than cold. #1294 dispatched (plugrm lane): seven independent verdicts,
+  the service-add step non-negotiable, bounded restore that fails-with-classification instead
+  of hanging, plus a page↔suite drift check.
+- Near-miss worth recording: I nearly reported "the #1240 port sweep missed .vto templates"
+  from my local tree. On `origin/main` zero .vto files carry stale ports — my worktree was
+  stale again (finding 35 class). Verified before reporting; no defect.
