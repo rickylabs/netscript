@@ -1,4 +1,4 @@
-import { assertEquals, assertRejects, assertStringIncludes } from '@std/assert';
+import { assertEquals, assertRejects } from '@std/assert';
 import { defineWebhook, enqueueJob } from '@netscript/plugin-triggers-core/builders';
 import { defineJob } from '@netscript/plugin-workers-core';
 import type { JobMessage } from '@netscript/plugin-workers-core/runtime';
@@ -18,7 +18,7 @@ import type {
 import { createRuntimeTriggerProcessor } from './trigger-runtime-processor.ts';
 import { MemoryTriggerEnabledStateStore } from '@netscript/plugin-triggers-core/testing';
 
-Deno.test('runtime processor rejects defer actions instead of silently dropping them', async () => {
+Deno.test('runtime processor schedules defer actions without routing them to DLQ', async () => {
   const idempotency = new MemoryIdempotency();
   const dlq = new MemoryDlq();
   const processor = await createRuntimeTriggerProcessor({ idempotency, dlq });
@@ -29,13 +29,9 @@ Deno.test('runtime processor rejects defer actions instead of silently dropping 
 
   const result = await processor.process(webhookEvent(), definition);
 
-  assertEquals(result.status, 'dlq');
-  assertEquals(result.actionsDispatched, 0);
-  assertEquals(dlq.entries.length, 1);
-  assertStringIncludes(
-    dlq.entries[0].reason,
-    'Deferred trigger action dispatch is not implemented',
-  );
+  assertEquals(result.status, 'deferred');
+  assertEquals(result.actionsDispatched, 1);
+  assertEquals(dlq.entries.length, 0);
   assertEquals(idempotency.completed, ['evt_1']);
   assertEquals(idempotency.released.length, 0);
 });

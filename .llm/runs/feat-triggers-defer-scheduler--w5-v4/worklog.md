@@ -21,3 +21,4 @@
 | --- | --- | --- | --- |
 | 2026-08-04 | S0 | Live #1229, source/debt/caveat re-baseline at `c384013662` | complete |
 | 2026-08-04 | PLAN-EVAL | milestone-run D6 composed rule | COMPOSED; plan locked, same-run implementation authorized |
+| 2026-08-04 | S1 RED | `deno test --allow-all --unstable-kv plugins/triggers/src/runtime/trigger-runtime-processor_test.ts` | exit 1; 2 passed, 1 failed: actual `dlq`, expected `deferred` |

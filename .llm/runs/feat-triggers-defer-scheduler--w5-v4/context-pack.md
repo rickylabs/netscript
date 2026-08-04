@@ -16,5 +16,5 @@ then compose it through the public plugin runtime. Plan is locked under D6 compo
 
 ## Next
 
-Commit/push S0 and open the draft PR, land explicit RED proof, implement S2/S3, then run S4 gates and
-hand the ready PR to composed evaluation.
+Draft PR #1283 is open and S0 is pushed. Commit the explicit failing S1 RED proof, implement S2/S3,
+then run S4 gates and hand the ready PR to composed evaluation.
