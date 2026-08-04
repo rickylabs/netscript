@@ -178,3 +178,24 @@ documentation.
   in `drift.md`. That fallback is legitimate in `lane-policy.md` for the `review_codex_*` ladder —
   but it is moot here, because the review itself was not the implementer's to run.
 - **Evidence:** `d7460d76`; this ruling; `worklog.md` § Slice Review — S3.
+
+## 2026-08-04 — D-8 owner-authorized ad-hoc adversarial-check lane
+
+- **What:** The owner authorized ad-hoc adversarial verification through the agentic toolchain
+  (`claude-print` / `opencode`), beyond the canonical route table: `qwen/qwen3.7-max` for quick
+  checks, `x-ai/grok-4.5` (`codex-long-medium-grok-4-5`) for complex ones needing verification on
+  top of the supervisor and Codex.
+- **Source:** owner directive, this session.
+- **Expected:** `lane-policy.md` binds review to the opposite-family `review_codex_*` ladder and the
+  formal evaluator lane to open models only.
+- **Actual:** an additional, explicitly approved verification lane is available at the supervisor's
+  discretion.
+- **Severity:** minor (lane addition, no invariant weakened)
+- **Action:** accept and record. Constraints held: the **formal** PLAN-EVAL / IMPL-EVAL lane is
+  unchanged (open-models-only, bound Qwen preset); this lane is supplementary verification, never a
+  substitute for the Tier-A slice review; and because the approval is explicit, invariant 4 (no
+  _implicit_ paid escalation) is not breached. Planned use in this run: **S6** (the `ci:skip-e2e` /
+  `run_runtime_sqlite` policy semantics, where a wrong conjunction silently disables a tier) and
+  **S7** (the zero-container claim and the Garnet-executable arm — the load-bearing claims of the
+  whole PR). Each use is logged here with its verdict.
+- **Evidence:** `supervisor.md` § Recorded lane/eval overrides; this entry.

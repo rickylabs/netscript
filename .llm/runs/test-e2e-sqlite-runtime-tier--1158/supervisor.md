@@ -33,6 +33,18 @@ Reference `.llm/harness/workflow/lane-policy.md`; do not copy its complete route
 
 ## Recorded lane/eval overrides
 
+- **Owner-authorized adversarial-check lane (2026-08-04).** In addition to the canonical routes, the
+  owner authorized ad-hoc adversarial verification through the agentic toolchain (`claude-print` /
+  `opencode`):
+  - **`qwen/qwen3.7-max`** — quick checks (already the bound open evaluator preset; no change).
+  - **`x-ai/grok-4.5`** (`codex-long-medium-grok-4-5` preset) — **complex** checks where extra
+    verification on top of the supervisor _and_ Codex is warranted.
+
+  This is an **explicit** owner approval, so it does not violate `lane-policy.md` invariant 4 (no
+  _implicit_ paid or higher-effort escalation). It does **not** widen the **formal** PLAN-EVAL /
+  IMPL-EVAL lane, which stays open-models-only on the bound Qwen preset. Owner's framing: "in
+  principle you two should be enough — I let you judge." Judgement recorded per use in `drift.md`.
+
 - **Supervisor model is Opus 5, not the canonical Fable 5 `planning_decisions` primary.** The owner
   started this session on Opus 5 through Remote Control after a GitHub Copilot cloud agent (Grok
   4.5) failed to produce anything on disk. Authorization: owner directive (session start). Mirrored
