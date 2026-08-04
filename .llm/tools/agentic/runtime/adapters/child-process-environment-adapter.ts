@@ -42,7 +42,14 @@ function diagnostic(
   return { code, category, retryable: false, message };
 }
 
-function childEnvironment(
+/**
+ * Materializes a child environment from a provider policy: rival keys cleared,
+ * declared keys emptied, fixed route values applied, and the credential bound
+ * late from the reader. Returns `null` when the bound credential is unavailable
+ * or conflicts with explicit clearing. Exported so credential-owning launchers
+ * outside this adapter apply the same canonical policy rather than a parallel one.
+ */
+export function applyChildEnvironmentPolicy(
   policy: ChildEnvironmentPolicy | undefined,
   reader: EnvironmentReader,
 ): Record<string, string> | null {
@@ -102,7 +109,7 @@ export class ChildProcessEnvironmentAdapter implements ChildProcessPort {
   }
 
   async run(request: AgentProcessRequest): Promise<ChildProcessOutcome> {
-    const environment = childEnvironment(request.environment, this.#environment);
+    const environment = applyChildEnvironmentPolicy(request.environment, this.#environment);
     if (!environment) {
       return {
         exitCode: 1,

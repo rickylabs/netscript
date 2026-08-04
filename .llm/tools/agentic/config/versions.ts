@@ -65,3 +65,12 @@ export const OPENCODE_TOOL = {
   webDefaultHostname: '127.0.0.1',
   webDefaultPort: 0,
 } as const;
+
+/**
+ * Canonical `$HOME`-relative OpenRouter credential file, shared by every
+ * launcher that needs `OPENROUTER_API_KEY` (OpenCode and the
+ * Claude-over-OpenRouter transport). Derived from `OPENCODE_TOOL` rather than
+ * restated, and annotated because `--isolatedDeclarations` cannot infer a
+ * cross-const reference.
+ */
+export const OPENROUTER_ENV_RELATIVE_PATH: string = OPENCODE_TOOL.openRouterEnvRelativePath;
