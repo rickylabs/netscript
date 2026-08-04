@@ -107,14 +107,14 @@ Browser- and island-facing TanStack Query integration.
 
 | Symbol | Kind | Signature / Description |
 | --- | --- | --- |
-| `createNetScriptQueryClient` | function | TanStack QueryClient with server-first defaults. Signature: `createNetScriptQueryClient(options): QueryClientPort`. |
+| `createNetScriptQueryClient` | function | TanStack QueryClient with server-first defaults. Signature: `createNetScriptQueryClient(options): QueryClient`. |
 | `createServiceQueryUtils` | function | TanStack Query utils from an oRPC service client. Signature: `createServiceQueryUtils<TContract>(client, options?): ServiceQueryUtils<TContract>`. |
 | `createKvCachePersister` | function | KV-backed async storage adapter for TanStack Query persistence. |
 | `bridgeInvalidation` | function | Build a client-side invalidation filter from a resource and optional action. |
 | `toClientKeyPrefix` | function | Convert an SDK resource/action pair to a client-side TanStack key prefix. |
 | `DEFAULT_STALE_TIME` | variable | Default stale time (30 s) matching the server-first philosophy. |
 | `DEFAULT_GC_TIME` | variable | Default garbage-collection time (5 min) matching the server KV cache TTL. |
-| `QueryClientPort` | interface | Structural query-client port used by SDK factories and collection adapters. |
+| `QueryClientPort` | type | Narrow TanStack QueryClient capability set used by SDK collection and query adapters. |
 | `QueryClientFilters` | interface | Cache selector for invalidation and lookup operations. |
 | `QueryClientFetchOptions` | interface | Options accepted by query fetch operations. |
 | `QueryClientSetOptions` | interface | Options accepted by cache write operations. |
@@ -229,7 +229,7 @@ without pulling in the concrete client, query, or cache engines.
 
 | Representative symbol | Kind | Description |
 | --- | --- | --- |
-| `QueryClientPort` | interface | Structural query-client port used by SDK factories and collection adapters. |
+| `QueryClientPort` | type | Narrow TanStack QueryClient capability set used by SDK collection and query adapters. |
 | `CacheStore` | interface | Structural cache store contract. |
 | `CacheStoreEntry` | interface | Entry shape stored by a `CacheStore`. |
 | `CacheKey` | type alias | Structural cache key contract. |

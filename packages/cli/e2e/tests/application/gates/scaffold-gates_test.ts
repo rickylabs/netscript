@@ -78,23 +78,15 @@ Deno.test('--source jsr rejects the local contributor CLI binary', () => {
   );
 });
 
-Deno.test('--source jsr generated check targets prod workspace members', () => {
+Deno.test('generated check runs the fresh scaffold workspace check task', () => {
   const gate = createGeneratedCheckGates().find((entry) => entry.id === GATE.GENERATED_DENO_CHECK);
   if (!gate || gate.kind !== 'command') {
     throw new Error('Expected generated check gate to be a command gate.');
   }
 
   assertEquals(
-    gate.command(createContext('/repo/packages/cli/bin/netscript.ts', PACKAGE_SOURCE.JSR)),
-    [
-      'deno',
-      'check',
-      '--minimum-dependency-age=0',
-      '--unstable-kv',
-      './contracts',
-      './database',
-      './services/users',
-    ],
+    gate.command(createContext('/repo/packages/cli/bin/netscript.ts', PACKAGE_SOURCE.LOCAL)),
+    ['deno', 'task', 'check'],
   );
 });
 

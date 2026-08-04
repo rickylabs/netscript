@@ -6,7 +6,6 @@
 
 import { QueryClient } from '@tanstack/query-core';
 import { DEFAULT_QUERY_CACHE_TIME, DEFAULT_QUERY_STALE_TIME } from '../cache/defaults.ts';
-import type { QueryClientPort } from '../ports/query-client.ts';
 
 /** Default stale time matching NetScript's server-first philosophy (30 s). */
 export const DEFAULT_STALE_TIME: number = DEFAULT_QUERY_STALE_TIME;
@@ -44,7 +43,7 @@ export interface NetScriptQueryClientOptions {
  */
 export function createNetScriptQueryClient(
   options: NetScriptQueryClientOptions = {},
-): QueryClientPort {
+): QueryClient {
   const {
     staleTime = DEFAULT_STALE_TIME,
     gcTime = DEFAULT_GC_TIME,
@@ -62,8 +61,5 @@ export function createNetScriptQueryClient(
       },
     },
   });
-  // TanStack's concrete QueryClient keeps generic updater return types wider
-  // than the SDK port. The runtime object implements the structural methods
-  // the port documents, so the upstream boundary stays internal here.
-  return queryClient as QueryClientPort;
+  return queryClient;
 }

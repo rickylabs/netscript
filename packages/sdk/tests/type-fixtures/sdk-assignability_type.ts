@@ -12,6 +12,7 @@ import type {
   ServiceClient,
 } from '../../src/ports/service-client.ts';
 import type { ServiceQueryUtils } from '../../src/ports/service-query-utils.ts';
+import type { QueryClient } from '@tanstack/query-core';
 
 interface ListOrdersInput {
   readonly page: number;
@@ -79,7 +80,12 @@ const listFromUtils: Promise<ListOrdersOutput> | ListOrdersOutput = queryOptions
 );
 
 const queryClient = createNetScriptQueryClient();
+const concreteQueryClient: QueryClient = queryClient;
 const typedQueryClient: QueryClientPort = queryClient;
+const prefetched: Promise<void> = queryClient.prefetchQuery({
+  queryKey: ['orders', 'list'],
+  queryFn: () => Promise.resolve({ items: [] }),
+});
 const cached: ListOrdersOutput | undefined = typedQueryClient.getQueryData<ListOrdersOutput>([
   'orders',
   'list',
@@ -109,5 +115,7 @@ void mutationResult;
 void listFromUtils;
 void cached;
 void fetched;
+void concreteQueryClient;
+void prefetched;
 void totals;
 void collectionItem;

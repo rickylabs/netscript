@@ -1,6 +1,5 @@
 import { join } from '@std/path';
 import { GATE, GATE_PHASE } from '../../../domain/cli-surface.ts';
-import { PACKAGE_SOURCE } from '../../../domain/extension-axes.ts';
 import type { GateDefinition } from '../../../domain/gate-definition.ts';
 import type { RunContext } from '../../../domain/run-context.ts';
 import { cli, commandGate, denoCommand } from './gate-factory.ts';
@@ -189,32 +188,9 @@ export function createGeneratedCheckGates(): readonly GateDefinition[] {
     ),
     commandGate(
       GATE.GENERATED_DENO_CHECK,
-      'Type-check generated workspaces',
+      'Run the generated workspace type-check task',
       GATE_PHASE.DATABASE,
-      (context) => {
-        if (context.request.options.packageSource === PACKAGE_SOURCE.JSR) {
-          return denoCommand(
-            context,
-            'check',
-            '--unstable-kv',
-            './contracts',
-            './database',
-            './services/users',
-          );
-        }
-        return denoCommand(
-          context,
-          'check',
-          '--unstable-kv',
-          './packages',
-          './plugins',
-          './workers',
-          './sagas',
-          './triggers',
-          './services',
-          './database',
-        );
-      },
+      () => ['deno', 'task', 'check'],
       (context) => context.project.projectRoot,
     ),
   ];
