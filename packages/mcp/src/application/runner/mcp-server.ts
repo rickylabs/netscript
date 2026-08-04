@@ -22,7 +22,7 @@ import { settleFlowReceipt } from './receipt-lifecycle.ts';
 export const MCP_PROTOCOL_VERSION = '2025-11-25';
 /** Instructions injected by MCP hosts into every driving agent context. */
 export const MCP_AGENT_INSTRUCTIONS =
-  `Use doctor to check NetScript, Aspire, project wiring, and plugins. Use get_app_status and get_recent_errors for live telemetry symptoms, and the analyze_* tools for performance or database evidence. Search help.md with search_docs when something hangs, is Healthy but does not respond, or leaves a dangling AppHost. record_drift is gated: it refuses unless the same resource has a successful diagnostic receipt from the last 15 minutes.`;
+  `Use doctor to check NetScript, Aspire, project wiring, and plugins. Use find_export, list_package_exports, get_export, and search_exports to discover first-party package APIs before guessing symbol names or import subpaths. Use get_app_status and get_recent_errors for live telemetry symptoms, and the analyze_* tools for performance or database evidence. Search help.md with search_docs when something hangs, is Healthy but does not respond, or leaves a dangling AppHost. record_drift is gated: it refuses unless the same resource has a successful diagnostic receipt from the last 15 minutes.`;
 /** Server dependencies and policy. */
 export interface McpServerOptions {
   /** Telemetry reachability adapter. */

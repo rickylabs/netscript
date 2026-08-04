@@ -4,9 +4,9 @@
 [![CI](https://github.com/rickylabs/netscript/actions/workflows/ci.yml/badge.svg)](https://github.com/rickylabs/netscript/actions/workflows/ci.yml)
 [![Docs](https://img.shields.io/badge/docs-rickylabs.github.io-blue)](https://rickylabs.github.io/netscript/)
 
-**The Model Context Protocol server for NetScript: 17 token-bounded tools that let a coding agent
-monitor a running app, debug a correlated execution, read framework-semantic telemetry, run the
-doctor, and search the docs — all over stdio.**
+**The Model Context Protocol server for NetScript: 21 token-bounded tools for app health, correlated
+execution debugging, framework telemetry, CLI diagnostics, documentation search, and first-party
+export discovery over stdio.**
 
 Point Claude Code or VS Code at a running NetScript app and the agent can ask _"is the app
 healthy?"_, _"why did the last import job fail?"_, and _"what is slowing down `checkout`?"_ — and
@@ -24,7 +24,7 @@ Aspire's own MCP server: Aspire speaks resources and containers; this server spe
 
 ## Why agents like it
 
-- **17 token-bounded tools** — every successful result is capped server-side (50 array items, 2,000
+- **21 token-bounded tools** — every successful result is capped server-side (50 array items, 2,000
   characters per string) before it reaches the model; the analytics tools never return raw spans at
   all.
 - **Framework-semantic trace intelligence** — tools classify telemetry into `worker`, `saga`,
@@ -45,9 +45,10 @@ Aspire's own MCP server: Aspire speaks resources and containers; this server spe
 
 ```mermaid
 flowchart LR
-    A["Agent host<br/>(Claude Code, VS Code, ...)"] <-- "JSON-RPC / stdio" --> S["netscript agent mcp<br/>17 tools · bounded results"]
+    A["Agent host<br/>(Claude Code, VS Code, ...)"] <-- "JSON-RPC / stdio" --> S["netscript agent mcp<br/>21 tools · bounded results"]
     S --> T["Telemetry endpoint<br/>(OTLP read model)"]
     S --> D["Docs corpus<br/>(public Markdown)"]
+    S --> E["Export corpus<br/>(pinned deno doc JSON)"]
     S --> P["Command policy<br/>(default-deny allowlist)"]
     T --> R["Running NetScript app"]
     P --> C["netscript CLI"]
@@ -146,6 +147,10 @@ results, and `get_run` returns a structured `run_not_found` error the agent can 
 | `search_docs`                 | `query`               | Ranked public-document matches with snippets                                 |
 | `list_docs`                   | —                     | Public-document summaries                                                    |
 | `get_doc`                     | `slug`                | One public document, or one named section of it                              |
+| `find_export`                 | `symbol`              | Exact symbol locations as package and export subpath                         |
+| `list_package_exports`        | `package`             | Paginated declarations grouped by export subpath                             |
+| `get_export`                  | `symbol`              | One bounded declaration signature and JSDoc block                            |
+| `search_exports`              | `query`               | Ranked partial-name and declaration-shape matches                            |
 | `list_commands`               | —                     | Live CLI command descriptors                                                 |
 | `execute_command`             | `command`             | Exit code, duration, and bounded output tail; structured denial when blocked |
 | `record_drift`                | `resource`, `summary` | Evidence-gated drift entry appended to project drift log                     |
@@ -216,6 +221,12 @@ Every tool flow depends on a port interface, so embedders and tests supply their
 assert against the published schemas. The always-current symbol list is
 [`deno doc jsr:@netscript/mcp@<version>`](https://jsr.io/@netscript/mcp/doc) (pin `<version>` on the
 pre-release line, as above).
+
+The four export tools use a distinct generated corpus, not the Markdown docs corpus. Its payload is
+derived from Deno 2.9 `deno doc --json` for every publishable first-party export map and pinned by
+framework version, SHA-256, compressed/uncompressed byte sizes, and exact package/subpath/symbol
+counts. `EmbeddedExportSurfaceCorpus` verifies those values lazily and performs no project or docs
+filesystem reads.
 
 ### Discover service OpenAPI endpoints
 
@@ -294,7 +305,7 @@ The full flag reference, policy table, and composition options are on the docs s
 
 ## Docs
 
-- **MCP reference — the 17-tool field overview, policy, and exports**:
+- **MCP reference — the 21-tool field overview, policy, and exports**:
   [rickylabs.github.io/netscript/reference/mcp/](https://rickylabs.github.io/netscript/reference/mcp/)
 - **Agent tooling — install, flags, troubleshooting, CLI × skills × MCP**:
   [rickylabs.github.io/netscript/capabilities/agent-tooling/](https://rickylabs.github.io/netscript/capabilities/agent-tooling/)
