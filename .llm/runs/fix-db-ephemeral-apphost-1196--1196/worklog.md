@@ -78,5 +78,6 @@ existing resident-preservation scaffold gate.
 | Publish dry-run | PASS | `@netscript/cli@0.0.4` simulation completed successfully; known dynamic-import warnings only |
 | Full scaffold runtime | PASS | `scaffold.runtime`: 71 passed, 0 failed; live DB-status lifecycle gate passed |
 | Resource hygiene | PASS | leak-check reports Aspire/Docker probes OK; only foreign/unproven containers listed and left untouched |
+| Hosted SQLite diagnosis | RED→GREEN | CI exposed invalid SQLite `withReference`; focused generator/embedded-asset tests pass after engine guard |
 
 Composed evaluator/check evidence and acceptance mirror remain pending after draft-to-ready.
