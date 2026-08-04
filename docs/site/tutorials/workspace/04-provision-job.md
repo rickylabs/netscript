@@ -14,8 +14,8 @@ admin who pages them should get an instant "done" — not sit on a request that 
 membership row, warming a cache, and sending a welcome email before it answers. Provisioning is real
 work, and none of it should block the request that triggered it. This chapter moves that work off
 the request path: you add the **workers** plugin and author a `defineJobHandler` job that provisions
-a member into the workspace database from chapter 3, then trigger it over the Workers API on
-`:8091`. This is the same background-work seam a real NetScript app leans on — a production chat
+a member into the workspace database from chapter 3, then trigger it over the Workers API.
+ This is the same background-work seam a real NetScript app leans on — a production chat
 application built on NetScript runs its embedding and vision jobs through the same `workers` plugin.
 
 {{ comp.learningPath({ steps: [
@@ -46,7 +46,7 @@ netscript db status --db workspace   # the workspace datasource from chapter 3
 ```
 
 {{ comp callout { type: "important", title: "Aspire first, then everything else" } }}
-The Workers API on <code>:8091</code> and its background processor are resources in the Aspire graph,
+The Workers API and its background processor are resources in the Aspire graph,
 and so is the <a href="https://localhost:18888">dashboard on <code>:18888</code></a> where you read job
 traces. Start <code>aspire start</code> from <code>aspire/</code> <strong>before</strong> you add the
 plugin or trigger a job, and leave it running.
@@ -63,7 +63,7 @@ netscript plugin list
 
 The local-source contributor command lands the plugin at **`plugins/workers/`** — the canonical, config-referenced install location —
 and registers it in `netscript.config.ts`. On disk you get a `jobs/` directory (the job-authoring
-surface), a `services/src/` API on `:8091`, and `bin/combined.ts` (the background processor
+surface), a `services/src/` API, and `bin/combined.ts` (the background processor
 entrypoint).
 
 {{ comp callout { type: "note", title: "Author jobs in plugins/workers/" } }}
@@ -172,13 +172,14 @@ so the Workers API and its background processor pick up the new job.
 
 ## Step 5 — Trigger the job
 
-With Aspire up, the Workers API is live on **`:8091`**. Confirm the service is healthy and the job is
-registered, then trigger it by its `id`. You need a real `workspaceId` — create a `Workspace` row
+With Aspire up, the Workers API is live. Its port is allocated from your project name, so copy the
+`workers-api` endpoint from the [dashboard](/explanation/aspire/) resource list. Confirm the service
+is healthy and the job is registered, then trigger it by its `id`. You need a real `workspaceId` — create a `Workspace` row
 first (or use one your seed created) and pass its id:
 
 ```sh
 # Health is still a plain liveness probe.
-curl http://localhost:8091/health
+curl <workers-endpoint>/health
 
 # Inspect metadata, then enqueue through the durable workers API.
 ns-workers show-job provision-member --json
@@ -201,12 +202,12 @@ carrying the new `memberId`. Then watch the same run in the Aspire **Traces** vi
 automatically.
 
 {{ comp.apiTable({
-  caption: "Workers API · :8091 (endpoints used here)",
+  caption: "Workers API (endpoints used here)",
   rows: [
     { name: "GET /health", type: "HTTP", desc: "Liveness check for the Workers API service." },
     { name: "ns-workers show-job {id} --json", type: "CLI", desc: "Inspect local job metadata by id." },
-    { name: "ns-workers trigger {id} --payload=…", type: "CLI → :8091", desc: "Enqueue an execution through the durable workers API." },
-    { name: "ns-workers executions --limit=10 --json", type: "CLI → :8091", desc: "Recent executions and their result payloads." }
+    { name: "ns-workers trigger {id} --payload=…", type: "CLI", desc: "Enqueue an execution through the durable workers API." },
+    { name: "ns-workers executions --limit=10 --json", type: "CLI", desc: "Recent executions and their result payloads." }
   ]
 }) }}
 
@@ -230,7 +231,7 @@ resource. Start <code>aspire start</code> from <code>aspire/</code> and retry.</
 ## What you built
 
 A `provision-member` background job that writes a workspace membership off the request path, triggered
-over the Workers API on `:8091` and observable in the Aspire dashboard. The caller gets an instant
+over the Workers API and observable in the Aspire dashboard. The caller gets an instant
 acknowledgment; the membership write happens reliably in the background. One gap remains, and it is
 the serious one: the `workspace` service itself still answers anyone who asks. Next you close the
 loop and make its routes fail closed.

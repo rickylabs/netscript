@@ -110,7 +110,7 @@ it assumes you can scaffold and boot, then layers authentication on top. If `net
   },
   {
     title: "4 · Provision job",
-    body: "Move member provisioning off the request path: author a <code>defineJobHandler</code> job that creates a workspace membership, and trigger it over the Workers API at :8091.",
+    body: "Move member provisioning off the request path: author a <code>defineJobHandler</code> job that creates a workspace membership, and trigger it over the Workers API.",
     href: "/tutorials/workspace/04-provision-job/"
   },
   {
