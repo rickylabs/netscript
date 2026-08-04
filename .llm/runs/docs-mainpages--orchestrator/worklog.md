@@ -174,3 +174,11 @@
   Gates green (613 files, 32,387 links). Observability defect filed (page.layer.delivery
   reports 'blocking' for deferring regions). Batch-4 audit dispatched — last cycle before
   #1241 ready/merge.
+
+## 2026-08-04 — P3 complete: all four batches PASS, #1241 to ready/merge
+
+- Batch 4 closed (fix round + supervisor residual f8e21635a → final PASS). Nine deep-dives
+  audited across four FAIL_FIX→PASS cycles; five framework/tooling issues filed from program
+  findings (#1225, #1244, #1245, #1249, #1255). #1241 body finalized, DoD ticked, ready;
+  auto-merge on green settle per standing authorization. #1210 per-API acceptance item done;
+  issue closing decision left to owner.

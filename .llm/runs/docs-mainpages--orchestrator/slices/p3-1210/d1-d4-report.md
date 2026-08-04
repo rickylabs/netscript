@@ -687,3 +687,64 @@ Main pages (quickstart, concepts) untouched, as scoped.
 - Validation here is generator-side only per the CLAUDE.md documentation-authoring exception; a
   separate opposite-family session still owes a per-page verdict for `layers.md`, `response.md`, and
   the `server.md` deepening.
+
+## Batch 4 fix round
+
+Audit: `.llm/runs/docs-mainpages--orchestrator/slices/deepdives-audit/audit.md` `## Batch 4 audit` —
+verdict FAIL_FIX, five findings (G1-F1, G1-F2, G2-F1, G2-F2, G4-F1). Each was re-verified against
+source before being applied; none was rebutted. All five were prose defects — **no code fence
+changed**, so the batch-4 example fixtures remain valid.
+
+Commit `cf21cb52c`, pushed to `docs/web-layer-deep-dives`.
+
+### Per-finding disposition
+
+| Finding | Verified how | Disposition |
+|---|---|---|
+| **G1-F1** cache registration is triggered by the module import, not by calling `defineFreshApp` | `runtime/server/mod.ts` re-exports `./define-fresh-app.ts`, whose module body has `import '@netscript/sdk/cache'`; `packages/sdk/src/cache/mod.ts` calls `setCacheProvider(cacheQuery)` at evaluation. So importing `/server` for *anything* — `createStreamingResponse`, a type — registers the provider, and a module that hand-rolls `new App()` while importing `/server` still has it | **Accepted.** Both `server.md` sites rewritten: the contrast now ends "A bare Fresh entry point that never imports `@netscript/fresh/server` bypasses it. Calling `defineFreshApp` is not itself the trigger; evaluating the `/server` module is." The watch-for bullet now names the subpath evaluation as the trigger and states that `new App()` in a `/server`-importing module keeps the registration. |
+| **G1-F2** `withMeta` accepts a sync **or** async resolver | `DefinePageMetaResolverFor` (`catalog.ts:244-249`) returns `DefinePageMetaDescriptor \| Promise<DefinePageMetaDescriptor>`. Runtime control: a synchronous resolver rendered `<title>Orders (A)</title>`, an async one `<title>Async (A)</title>` — both read `ctx.layerData` | **Accepted.** "registers an async function" → "registers a resolver — synchronous or asynchronous". The page's own example was already synchronous, so the text had contradicted its own fence. The after-layers claim was confirmed correct and is unchanged. |
+| **G2-F1** Fresh middleware **is** a header composition point | `Context.next: () => Promise<Response>`. Three runtime controls on a real `App`: middleware added `x-tenant` alongside the handler's own header; middleware replaced the handler's `cache-control: max-age=60` with `no-store`; middleware appended `set-cookie: csrf=abc; Path=/`. My "Headers have no merge point" was simply wrong | **Accepted.** Replaced with "**Headers do not merge at the component-region level.**" — the handler assembles them in `ResponseInit`, middleware adds or replaces them around `await ctx.next()`, and the only thing no seam reaches is a rendered component. The `Set-Cookie` example is kept but re-attributed to needing an agreed handler or middleware seam rather than to an absent one. |
+| **G2-F2** the reserved `name` option is not a present-day advantage | `define-fresh-app.ts` never reads `options.name`; `server.md` itself marks it **Reserved** in the options table and the callout. Counting it as a bare-Fresh cost contradicted the page two screens later. (The sentence also carried a drafting error — "no `Set-Cookie`-free way" was nonsense in that position) | **Accepted.** Sentence removed; "Two things are also silently absent" → "One thing is also silently absent", leaving the cache registration as the single genuine gap. `name` remains documented as a reserved seam in the options table and the callout only. |
+| **G4-F1** "Adding a region is a three-file edit" is unsupported | `layers.md`'s bare-Fresh example is one route module showing a handler and a page component; nothing in it identifies three files | **Accepted.** Replaced with "**Adding a region couples several sites in the route module.**" — the `Promise.all`, the returned data shape, and the JSX change together, with the type inferred from the whole handler rather than declared per region. |
+
+Nothing was rebutted.
+
+### One scope extension, deliberate
+
+G1-F1 was scoped to `server.md`, but `query-bridge.md:325` (batch 3, previously PASS) carried the
+same claim — *"Bypassing `defineFreshApp` bypasses the registration. Hand-rolling `new App()` … leaves
+the provider unset"* — and is the page `server.md` cross-links **on exactly this point**. Fixing only
+one would have left two mutually-referential pages asserting opposites, so the query-bridge bullet was
+corrected identically: the trigger is the import; what loses the registration is an entry point that
+never imports the subpath, or a test exercising a loader in isolation. The bullet's test-setup remedy
+(`import '@netscript/sdk/cache'`, `setCacheProvider`, `resetCacheProvider`) is unchanged and was
+already correct. Flagging for the auditor since it touches a previously-passed page.
+
+### Issue #1255 (span-attribute defect)
+
+Not linked from the page. No page in `docs/site/web-layer/` links a GitHub issue (verified by grep
+across all 16), batch 3 handled #1249 the same way — behaviour described in prose, defect tracked in
+the issue — and Gate 3 of this batch explicitly scans changed lines for issue/PR/harness vocabulary
+leakage. Instead the `layers.md` watch-for bullet was sharpened to carry the honest boundary without
+the reference: "**The `delivery` span attribute currently misreports its default.** … That is a
+reporting discrepancy rather than a difference in behaviour, and it is expected to be corrected —
+until it is, read `page.layer.has_partial` alongside it." That marks it as a defect in flight rather
+than designed semantics, which was the intent of the request.
+
+### Gate results after the fix
+
+| Gate | Command | Result |
+|---|---|---|
+| Site build | `cd docs/site && deno task build` | PASS — 613 files |
+| Site links | `cd docs/site && deno task check:links` | PASS — 32387 internal links across 219 pages, all resolve |
+| Caveat refs | `cd docs/site && deno task check:caveats` | PASS — 27 markers across 22 pages |
+| Meta-resolver control | `deno run` on a scratch fixture in `packages/fresh` | sync and async resolvers both render, both read `layerData` |
+| Middleware header controls | same fixture, real `App().handler()` | add, replace, and `Set-Cookie` append all succeed around `await ctx.next()` |
+| Changed examples | `git diff -U0` over `docs/site/web-layer/` | no code fence changed — the four `definePage`/`new App` hits in the diff are inline backticked prose. Batch-4 `deno check` fixtures remain valid, so they were not re-run |
+| Vento leakage | grep for unrendered `{{` in all four built pages | 0 |
+| Removed-claim sweep | grep across `_site/web-layer/` for each withdrawn phrase | "three-file edit", "Headers have no merge point", "registers an async function", "bypassing", "Set-Cookie-free" — **0 pages each** |
+| Fixed-wording sweep | grep for each replacement in the built HTML | all five present on their pages |
+| Lock hygiene | `git checkout HEAD -- deno.lock`; `git status` | clean — only the four intended docs files in the commit |
+
+Scratch fixture under `.llm/tmp/p3b4fix/` and its `packages/fresh` copy removed; nothing added under
+`packages/`.

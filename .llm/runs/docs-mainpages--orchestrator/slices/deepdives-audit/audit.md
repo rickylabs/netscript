@@ -433,3 +433,86 @@ Test note: the first combined focused test command passed all 29 form/Deferred t
 | G2-F1 — bare-Fresh contrast invented raw HTML fetch/swap work | **FIXED** | `defer-streaming-ui.md:25-78` now credits Fresh for the transport, renders a hidden GET form with `f-partial` / `f-client-nav`, and calls `requestSubmit()` on staleness—the same shape used in `DeferIsland.tsx`. An independent fixture passed `deno check --no-lock` with Fresh's JSX augmentation (an explicit return type was added only to satisfy this repository's unrelated workspace-wide `isolatedDeclarations` rule). The remaining contrast is fair: freshness and server/client coordination are still application policy. |
 
 **Final Batch 3 verdict after `445dfbf37`: PASS.** All five Batch 3 findings are fixed; no open mechanism/API-accuracy, bare-Fresh fairness, cross-link/navigation, or prose-register finding remains.
+
+## Batch 4 audit
+
+- **Changeset:** `445dfbf37..927ca34aa` (`929372637` + `d140195e3` + `927ca34aa`)
+- **Audit mode:** opposite-family `docs_audit`, evidence-only; every load-bearing control was rerun independently.
+
+### Gate 1 — mechanism/API accuracy: FAIL
+
+Independent source inspection and a four-control runtime fixture confirmed the central claims:
+
+- Resources resolve through the sequential `for…of` in `runtime/handlers.ts`; layers start through `Promise.all` in `runtime/mod.tsx`. The timing trace showed resource 2 starting only after resource 1 ended, while the fast layer started and ended before the slow layer ended.
+- `.withLayer('static', Component)` with no loader emitted no component markup. The runtime's `data ? renderLayerComponent(...) : null` boundary is accurately documented, including `{}` versus `null`/`undefined`.
+- A CSRF-enabled `withForm` appends a header resolver, causes `build()` to synthesize `GET`, and conflicts with an explicit `withHandler('GET')` using the documented `withHeader() or withStatus()` error.
+- With both `app` and `createApp`, the existing app won and the factory was not called. `configure` ran before the custom `fsRoutes` callback, and the callback's pattern argument was `undefined`.
+- The negative checker control `definePage().withHeader('x-thing')` produced `TS2769`, exactly matching the corrected overload claim at `response.md:170-172`.
+- The rest of the layer, layout/slot, header ordering, status, streaming, build-result, prepared-handler, app-option, and route/cache surfaces match the implementation. The focused package suites also passed all 29 tests.
+
+Findings:
+
+- **G1-F1 — cache registration is caused by the module import, not by invoking `defineFreshApp`.** `server.md:83-87` says registration is an import side effect, then concludes “bypassing `defineFreshApp` bypasses it.” `server.md:199-201` likewise says importing `@netscript/fresh/server` registers it, then says constructing the app another way is what breaks it. `runtime/server/define-fresh-app.ts` imports `@netscript/sdk/cache` at module evaluation; `runtime/server/mod.ts` re-exports that module. A caller can import `/server` and construct `new App()` manually while still receiving the registration. Replace both conclusions with: “A bare Fresh entry point that never imports `@netscript/fresh/server` bypasses the registration. Calling `defineFreshApp` is not itself the trigger; evaluating the `/server` module is.”
+- **G1-F2 — `withMeta` accepts a synchronous or asynchronous resolver.** `response.md:121` says it “registers an async function.” `PageMetaResolver` returns `PageMetaDescriptor | Promise<PageMetaDescriptor>`, and the page's own example is synchronous. Replace “registers an async function” with “registers a resolver—synchronous or asynchronous.” The claim that it runs after layers is correct.
+
+### Gate 2 — bare-Fresh contrast fairness: FAIL
+
+All three contrasts type-check under a consumer-style Fresh 2 config. An independent fixture checked the layers handler/page, the `ctx.render(vnode, ResponseInit)` response example, and the `App().use(...).fsRoutes()` bootstrap together with Fresh's JSX augmentation. The layers comparison is mechanically fair, and the server comparison fairly identifies application-owned ordering and the missing `/server` import side effect. Two contrast claims still overreach:
+
+- **G2-F1 — Fresh middleware is a header composition point.** `response.md:60-63` says everything contributing a header must be assembled by the same handler and “Headers have no merge point.” Fresh middleware can `await ctx.next()`, then set or clone/replace response headers; app/route middleware is the ordinary cross-route composition seam for cache directives, tenant tags, and cookies. It is fair to say that component regions cannot directly contribute response headers, but not that Fresh has no merge point. Replace the paragraph with: “**Headers do not merge at the component-region level.** The handler can assemble them in `ResponseInit`, and Fresh middleware can add or replace headers around `await ctx.next()`. A rendered component itself cannot contribute a response header, so region-owned concerns need an agreed handler or middleware seam.”
+- **G2-F2 — the reserved `name` option is not a current advantage over bare Fresh.** `server.md:82-84` counts the absence of a way to say the app is `dashboard` as a bare-Fresh cost, while `server.md:110,140-145` correctly says `defineFreshApp.name` is accepted but unread. Bare Fresh can also hold an application name in a constant/config value; neither path currently changes logging. Remove that sentence from the contrast and leave `name` documented as a reserved compatibility seam, not present-day functionality.
+
+### Gate 3 — cross-links and navigation: PASS
+
+- `/web-layer/layers/` and `/web-layer/response/` are linked from the Web Layer hub and `builders.md`; their related cards cross-link the relevant resources, partials, defer, form, route, and tutorial pages.
+- Live-dashboard chapter 4 lands at `/web-layer/layers/`; chapter 1 lands at the `#composing-the-runtime-server` anchor on `/web-layer/server/`.
+- New pages follow sibling front matter and occupy the next navigation orders, 16 and 17.
+- `cd docs/site && deno task build`: **PASS**, 613 files generated.
+- `cd docs/site && deno task check:links`: **PASS**, 32,387 internal links across 219 pages all resolve.
+- Changed-line scans found no issue/PR/harness vocabulary leakage and no new bare pinnable `jsr:@netscript/*` specifier.
+
+### Gate 4 — prose register: FAIL
+
+The three pages mostly match `explanation/contracts.md`: they lead with a concrete boundary, expose implementation consequences, distinguish current behavior from reserved seams, and use “What to watch for” as compact failure guidance rather than filler. One conspicuous sentence is both inaccurate and checklist-like:
+
+- **G4-F1 — “Adding a region is a three-file edit” is unsupported by the example.** `layers.md:64-66` shows the handler data shape and JSX in one route module and does not identify three files. Replace the heading and sentence with: “**Adding a region couples several sites in the route module.** The handler's `Promise.all`, returned data shape, and JSX must change together; the type tying them together is inferred from the whole handler rather than declared per region.”
+
+No broader prose rewrite is warranted.
+
+### Batch 4 gate log
+
+| Gate | Commands / source | Scope | Result | Findings | Proceeded |
+|---|---|---|---|---|---|
+| Mechanism/API accuracy | Focused reads of define-page builder/runtime/types/rendering, form synthesis, `define-fresh-app.ts`, server barrel, and SDK cache registration; four independent runtime controls; `withHeader` negative `deno check`; focused package tests | D2, D8, D9 and changed pointers | **FAIL** | Module-import trigger misstated; `withMeta` sync resolver excluded by wording | Flagged with exact replacements |
+| Bare-Fresh fairness | Three consumer-config `deno check --no-lock` fixtures; Fresh `Context.next`/render surface; contrasts against current NetScript behavior | Layers, response, and server contrasts | **FAIL** | Middleware omitted as a header seam; reserved app name presented as present-day value | Flagged with exact replacements |
+| Cross-links/nav | `cd docs/site && deno task build`; `cd docs/site && deno task check:links`; generated targets/anchor, front matter, orders, changed-line scans | Full changed set and generated site | **PASS** | 613 files; 32,387 links across 219 pages resolve; orders 16/17 | Proceeded |
+| Prose register | Comparison with `docs/site/explanation/contracts.md` | `layers.md`, `response.md`, `server.md`, and changed transitions | **FAIL** | Unsupported “three-file edit” checklist claim | Flagged with exact replacement |
+
+Validation hygiene: the independent fixtures were removed after execution. Validation added no new source change. The source worktree retains only its pre-existing `deno.lock` addition for `jsr:@netscript/queue@0.0.4`.
+
+### Batch 4 verdict
+
+**FAIL_FIX.** Correct G1-F1, G1-F2, G2-F1, G2-F2, and G4-F1. The load-bearing layer/resource concurrency, empty-layer, form/GET conflict, header-overload, app-construction/order, function-form `fsRoutes`, consumer type-check, cross-link/navigation, and remaining prose claims pass.
+
+### Batch 4 re-audit
+
+- **Fix commit:** `cf21cb52c`
+- **Per-finding disposition:**
+
+| Batch 4 finding / extension | Status | Re-audit evidence |
+|---|---|---|
+| G1-F1 — cache registration attributed to invoking `defineFreshApp` | **FIXED** | `server.md:82-88,200-204` now says evaluation of `@netscript/fresh/server` is the trigger, explicitly distinguishes the module import from the function call, and correctly notes that hand-rolling `new App()` while still importing `/server` keeps the registration. |
+| G1-F2 — `withMeta` described as async-only | **FIXED** | `response.md:121-124` now says the resolver may be synchronous or asynchronous and retains the correct after-layers timing. |
+| G2-F1 — bare Fresh said to have no header merge point | **FIXED** | `response.md:60-65` now credits handler `ResponseInit` and Fresh middleware around `await ctx.next()` as header-composition seams, while limiting the real gap to rendered component regions. |
+| G2-F2 — reserved `name` option presented as current value over bare Fresh | **FIXED** | `server.md:82-88` removes the app-name contrast entirely; `name` remains accurately documented later as accepted but unread. |
+| G4-F1 — unsupported “three-file edit” claim | **FIXED** | `layers.md:64-66` now describes the actual coupling among the handler's `Promise.all`, returned data shape, and JSX within the route module. |
+| Scope extension — identical call-trigger claim in `query-bridge.md` | **NOT-FIXED** | `query-bridge.md:325-331` now has the correct import-trigger boundary and agrees with `server.md`, but its lead-in at `query-bridge.md:304-319` still says “`defineFreshApp` performs a bare side-effect import” and that bringing up the app “through `defineFreshApp` registers” the provider “as a side effect of the bootstrap.” The function performs no import when called; its containing module imports `@netscript/sdk/cache` during evaluation. The related-card text at `query-bridge.md:369` also says the `defineFreshApp` bootstrap registers the cache. Replace those remaining call/bootstrap formulations with module-evaluation language so the section does not contradict its own corrected bullet. |
+
+Additional scope checks:
+
+- `layers.md:334-338` accurately labels the delivery-span default as a reporting discrepancy, states that behavior is unaffected, and gives `page.layer.has_partial` as the current trace workaround.
+- No `#1255` reference or other new issue/PR/process vocabulary appears in the public changes; the defect remains described as product behavior without internal tracker leakage.
+
+**Final Batch 4 verdict after `cf21cb52c`: FAIL_FIX.** G1-F1, G1-F2, G2-F1, G2-F2, and G4-F1 are fixed. The `query-bridge.md` scope extension remains partially inconsistent at lines 304-319 and 369; correct those remaining call-trigger formulations before PASS.
+
+**Final Batch 4 verdict after `f8e21635a`: PASS.** The three residual `query-bridge.md` formulations now consistently attribute cache-provider registration to evaluation of the `@netscript/fresh/server` subpath, not invocation of `defineFreshApp`; all Batch 4 findings and the scope extension are fixed.
