@@ -12,77 +12,18 @@
 
 ## Current State
 
-Bootstrap, Research, Plan & Design, and PLAN-EVAL are complete; `plan-eval.md` records `PASS` at
-commit `dd178da7`. The Tier-A supervisor narrowed S1 under drift D-5 to the three permission-bearing
-generators. The implementation now shares the database permission rule across services, background
-processors, and plugin services; the pipeline threads the primary engine to all three. Apps remain
-unchanged because they launch through `deno task`, and their generated task already uses
-`deno run --allow-all`.
+**Complete.** All slices (S1–S7, plus review-driven S4a and S6a) landed and Tier-A signed off.
+PLAN-EVAL `PASS`; IMPL-EVAL `PASS` on re-check after its `FAIL_DEBT` conditions were met.
 
-S2 adds the default-true `RunOptions.cache` axis, `--cache` / `--no-cache` parsing, workspace
-builder plumbing, and conditional `scaffold.init` forwarding. The public binary rejects `--no-cache`
-but accepts both `--cache=false` and `--cache false`; the E2E uses the single-argv `--cache=false`
-spelling. S7 exposed a verification gap: the live E2E resolves `bin/netscript-dev.ts`, whose
-maintainer init command did not accept `--cache`. That maintainer-only command now declares and
-forwards the option (D-16); the public CLI remains unchanged.
+The `scaffold.runtime.sqlite` tier is green: **68 passed, 0 failed**, cleanup PASS, **net-zero
+container delta**. Postgres and Redis are eliminated; one Garnet container is created and removed by
+cleanup (the R-3 downgrade — the claim is "reduced containers", not "no docker", everywhere).
 
-S3 adds `ScaffoldCapabilitySuite.defaults?: Partial<RunOptions>` and resolves capability defaults
-under caller overrides once at the top of `createScaffoldCapabilitySuite`. Every builder and
-reporting read now uses that resolved object. The existing `resolveSuite` caller-wins spread is
-unchanged, so a sqlite capability default survives an empty override and an explicit postgres
-override still wins. Database wait filtering reads the materialized default options and follows the
-resolved engine. No existing built-in capability has a defaults object.
-
-S4 adds the `scaffold.runtime.sqlite` capability with sqlite/cache-off defaults. The generic `run`
-command no longer supplies implicit db/cache overrides, because those masked capability defaults
-(drift D-10); unchanged suite defaults keep `scaffold.runtime` postgres/cache-on, and `full` retains
-its explicit postgres/cache-on defaults. S7 removed the experimental executable-Garnet pin after
-cross-process state visibility failed (D-14), so ambient container-backed Garnet is retained. The
-sqlite gate list now differs from `RUNTIME_GATES` by exactly `behavior.service-health`, whose tagged
-Prisma raw query is libSQL-incompatible (D-15); the Postgres suite remains unchanged.
-
-S4a corrects the adversarial-review finding in S4's lease surface. A shared
-`EXPENSIVE_RUNTIME_SUITE_IDS` tuple now contains both runtime tiers, and the suite runner acquires
-the expensive-suite lease by membership rather than a literal postgres id comparison. Runner tests
-prove postgres-held→sqlite and sqlite-held→postgres contention both raise
-`SuiteLeaseContentionError`; the existing cheap `scaffold.service` path still takes no lease.
-`suite-lease.ts` remains unchanged because its `isSuiteId` parser already accepts every `SCAFFOLD`
-value. The built-in suites table now discovers the reduced-container sqlite tier.
-
-S5 makes Docker resource discovery tolerant without weakening resource removal. The adapter's
-private list path turns a missing Docker executable (`Deno.errors.NotFound`) or non-zero `docker ps`
-into an empty container set and emits a warning through an injected writer that defaults to direct
-`Deno.stderr` output. The port contract and suite runner stay unchanged. Adapter tests cover both
-discovery failures, a no-new-container prune, and strict failed removal; a runner test uses
-`cleanup: true` with the real adapter raising `NotFound` on snapshot and prune and returns an `ok`
-report.
-
-S6 extends the classifier with `run_runtime_sqlite`, derived as `run_static && !ci:skip-e2e` after
-the precedence-winning `ci:full` path. The new `scaffold-runtime-sqlite` workflow job uses the same
-draft, `diff_unavailable`, skipped-by-policy, and failed-classifier guards as its siblings; installs
-Deno 2.9.0, .NET 10, and Aspire CLI 13.4.6; and invokes the sqlite suite with cleanup plus a
-distinct report artifact. S7 removed its executable-Garnet environment pin, leaving the default
-container-backed Garnet arm. Its 40-minute timeout remains 20 minutes shorter than the Postgres job.
-An independent concurrency group prevents either runtime tier from queueing behind the other.
-`lane-visibility` reports the sqlite result. The three frozen `ci:*` labels and the existing
-postgres/draft jobs are unchanged.
-
-S6a closes the adversarial diagnostics/test gap without changing that boolean. Every sqlite policy
-branch now contributes an explicit reason: skipped by `ci:skip-e2e`, skipped because the static
-signal is off (including `ci:skip-scaffold`), forced by `ci:full`, or selected by the scaffold
-signal. Workflow-source coverage pins non-PR `ci:skip-scaffold`, lane visibility, concurrency and
-artifact distinctness, auxiliary report globs, and the suite id exported from `cli-surface.ts`. The
-workflow and classifier prose now state the derived `ci:skip-scaffold` effect, and only the two
-stale label descriptions changed; the frozen label set remains exactly three.
-
-S7 completes the live tier. Three instrumented executable-Garnet attempts proved healthy processes
-but inconsistent cross-process job/queue/execution visibility, resolving R-3 negatively and taking
-the pre-agreed D2 downgrade. The first container-backed run passed all workers gates and then
-isolated the sole provider-specific `behavior.service-health` failure, resolving R-4 through the
-locked one-gate sqlite exclusion. The final run passed 68/68 selected gates and cleanup. The
-before/after container snapshots contain the same foreign Postgres container and `comm -13` is
-empty: Garnet was created during the run and removed by cleanup, so the honest net container delta
-is zero.
+**One open, non-attributable item:** the postgres merge bar (`scaffold.runtime`) fails at
+`behavior.service-health`. Proven **pre-existing on `main`** by running the identical suite at
+`c6f243da` in a clean worktree — same `passed=51 failed=1`, same gate, same `$queryRaw` error. This
+branch neither causes it nor can fix it. Tracked as issue **#1259** (raised to `priority:p1`; the
+repo's merge gate is red for everyone) and closed in `drift.md` as D-16 not-a-regression.
 
 ## Completed
 
