@@ -6,7 +6,7 @@
 | -------------- | ------------------------------------- |
 | Run ID         | `test-e2e-sqlite-runtime-tier--1158`  |
 | Branch         | `test/e2e-sqlite-runtime-tier-1158`   |
-| Current phase  | `implement` — S2 gates green; supervisor review pending |
+| Current phase  | `implement` — S3 gates green; supervisor review pending |
 | Archetype      | `6 - CLI / Tooling`                   |
 | Scope overlays | `service`                             |
 
@@ -24,6 +24,13 @@ builder plumbing, and conditional `scaffold.init` forwarding. The real public bi
 `--no-cache` but accepts both `--cache=false` and `--cache false`; the E2E uses the single-argv
 `--cache=false` spelling. No fallback edit under `packages/cli/src/**` was needed. The default init
 argv remains byte-identical by golden assertion.
+
+S3 adds `ScaffoldCapabilitySuite.defaults?: Partial<RunOptions>` and resolves capability defaults
+under caller overrides once at the top of `createScaffoldCapabilitySuite`. Every builder and
+reporting read now uses that resolved object. The existing `resolveSuite` caller-wins spread is
+unchanged, so a sqlite capability default survives an empty override and an explicit postgres
+override still wins. Database wait filtering reads the materialized default options and follows the
+resolved engine. No existing built-in capability has a defaults object.
 
 ## Completed
 
@@ -44,18 +51,21 @@ argv remains byte-identical by golden assertion.
   materialized no-cache config retained only the empty schema section `Cache: {}` and omitted
   `PrimaryCache`.
 - S2 implementation completed with 97 E2E tests passing and all scoped/fitness gates green.
+- S2 received Tier-A substantive review with no findings and sign-off at `47caa6bb`.
+- S3 implementation completed with precedence, database-gate filtering, and exact built-in options
+  regression coverage; 99 E2E tests and all five static/fitness commands passed.
 
 ## In Progress
 
-- **S2 awaiting Tier-A slice review.** Automated gates are green; the implementation lane does not
-  self-certify or begin S3.
+- **S3 awaiting Tier-A slice review.** Automated gates are green; the implementation lane does not
+  self-certify or begin S4.
 
 ## Next Steps
 
-1. Tier-A supervisor substantively reviews the landed S2 implementation and reproduces its evidence.
-2. Supervisor records the S2 sign-off or returns findings; the implementation lane does not
+1. Tier-A supervisor substantively reviews the landed S3 implementation and reproduces its evidence.
+2. Supervisor records the S3 sign-off or returns findings; the implementation lane does not
    self-certify.
-3. Only after supervisor sign-off may the run proceed to S3.
+3. Stop after S3 sign-off; S4 requires a new slice instruction.
 4. Gate phase: scoped wrappers + `quality:scan` + `arch:check` + `publish:dry-run`, then the
    postgres `scaffold.runtime` regression run.
 5. IMPL-EVAL in a third session.
@@ -78,25 +88,21 @@ argv remains byte-identical by golden assertion.
 
 | Path                                                                           | Status   | Notes                                                          |
 | ------------------------------------------------------------------------------ | -------- | -------------------------------------------------------------- |
-| `.llm/runs/test-e2e-sqlite-runtime-tier--1158/{worklog,context-pack}.md` | modified | S2 evidence and Tier-A handoff state. |
-| `packages/cli/e2e/src/domain/run-context.ts` | modified | Required boolean `RunOptions.cache` axis. |
-| `packages/cli/e2e/src/{create-default-runner,application/builders/workspace/suite-builder-options}.ts` | modified | Both default factories preserve cache-on behavior. |
-| `packages/cli/e2e/src/presentation/cli/{commands,options}/**` | modified | `--cache` / `--no-cache` declaration and mapping. |
-| `packages/cli/e2e/src/application/{builders/workspace,gates/scaffold}/**` | modified | Builder plumbing and conditional `--cache=false` forwarding. |
-| `packages/cli/e2e/suites/scaffold/capability-suites.ts` | modified | Cache override threaded beside cleanup. |
-| `packages/cli/e2e/tests/**` | modified | Golden default argv, exact-once no-cache, parse tests, and typed fixtures. |
+| `.llm/runs/test-e2e-sqlite-runtime-tier--1158/{worklog,context-pack}.md` | modified | S3 evidence and Tier-A handoff state. |
+| `packages/cli/e2e/suites/scaffold/capability-suites.ts` | modified | Optional defaults contract and single defaults-under-overrides resolution. |
+| `packages/cli/e2e/tests/presentation/suite-registry_test.ts` | modified | Precedence, gate-filtering, and exact existing-suite option regressions. |
 
-No `packages/cli/src/**`, suite id, per-suite default, GitHub, cleanup, product cache default, or
-embedded-template file was touched.
+No `packages/cli/src/**`, suite id, built-in per-suite default, GitHub, cleanup, product cache
+default, or embedded-template file was touched.
 
 ## Gates
 
 | Gate family | Current status | Evidence                                            |
 | ----------- | -------------- | --------------------------------------------------- |
-| Static      | `PASS`         | S2 scoped check/lint/fmt: 786 files, 0 findings.    |
-| Fitness     | `PASS`         | S2 `quality:scan` and `arch:check` exited 0.        |
+| Static      | `PASS`         | S3 scoped check/lint/fmt: 786 files, 0 findings.    |
+| Fitness     | `PASS`         | S3 `quality:scan` and `arch:check` exited 0.        |
 | Runtime     | `NOT_RUN`      | S7 is the first live sqlite run.                    |
-| Consumer    | `PASS`         | S2: 97 E2E tests; default init argv byte-identical. |
+| Consumer    | `PASS`         | S3: 99 E2E tests; all built-in options pinned.      |
 
 ## Open Questions
 

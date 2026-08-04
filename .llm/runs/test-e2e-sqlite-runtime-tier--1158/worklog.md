@@ -111,6 +111,8 @@ No gate-filtering logic to touch: waits are derived from the suite's resolved op
 | 2026-08-04 | S2        | Resolved R-2 against the real public binary           | `--no-cache` exited 2; `--cache=false` and `--cache false` both exited 0. The single-argv `--cache=false` spelling was selected. Dry-run reported two Aspire resources. Materialized config had `Cache: {}` and no `PrimaryCache`; the probe directory was removed. |
 | 2026-08-04 | S2        | Implementation and generator gates complete           | Added the default-true cache axis, CLI negation, exact init forwarding, workspace-builder plumbing, and focused regression tests. All six required gates passed; Tier-A review is pending.                                                                          |
 | 2026-08-04 | S2        | Resumed after external timeout                        | Re-read the partial diff, repeated all three public-binary spelling probes under a fresh `/tmp` directory, cleaned it, and independently re-ran all six required gates. The only correction was the second accepted false spelling, recorded as D-6.                |
+| 2026-08-04 | S2        | **Tier-A slice review — ACCEPTED**                    | Supervisor reproduced the six gates, verified the no-cache materialized config, and found no issues. Sign-off commit `47caa6bb`.                                                                                                                                   |
+| 2026-08-04 | S3        | Implementation and generator gates complete           | Added the optional capability defaults contract, one top-level defaults-under-overrides merge, precedence + database-gate tests, and an exact options baseline for all eight existing built-ins. All six required gates passed; Tier-A review is pending.            |
 
 ## Slice Review — S1 (Tier-A, supervisor)
 
@@ -232,6 +234,30 @@ fallback was needed** — `init-command.ts` is untouched.
 
 ## Gate Results
 
+### S3 Slice Gates
+
+| Gate       | Command                                                                                           | Raw result                                                      |
+| ---------- | ------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| E2E tests  | `deno test --no-lock -A packages/cli/e2e/`                                                        | exit 0; 99 passed, 0 failed                                     |
+| type-check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/cli --ext ts,tsx` | exit 0; 786 files, 7 batches, 0 failed batches, 0 findings      |
+| lint       | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/cli --ext ts,tsx`  | exit 0; 786 files, 4 batches, 0 findings                        |
+| format     | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/cli --ext ts,tsx`   | exit 0; 786 files, 4 batches, 0 failed batches, 0 findings      |
+| quality    | `deno task quality:scan`                                                                          | exit 0; `ok: true`, 0 findings, 7 pre-existing allowances       |
+| doctrine   | `deno task arch:check`                                                                            | exit 0; existing out-of-scope dependency/doctrine warnings only |
+
+**Precedence evidence.** A synthetic runtime capability with
+`defaults: { database: DATABASE.SQLITE }` resolves to sqlite with no caller overrides and filters
+all database waits. Passing `{ database: DATABASE.POSTGRES }` resolves to postgres and selects the
+postgres wait while retaining the garnet wait. A separate golden options table resolves every
+existing built-in suite under deterministic path overrides and asserts the complete `RunOptions`
+object; every existing scaffold capability also asserts `defaults === undefined`.
+
+**Post-slice reconcile note.** S3 remains partial work on #1158 / draft PR #1220, so it does not
+change the PR closing relationship or begin S4. No existing capability received a `defaults`
+object, and no suite id, `.github/**`, cleanup adapter, or `packages/cli/src/**` file changed. The
+run stays at `status:impl`; S3 is implementation-complete with green automated gates but pending
+Tier-A review.
+
 ### S2 Slice Gates
 
 | Gate       | Command                                                                                           | Raw result                                                      |
@@ -301,5 +327,6 @@ has not started.
   executable arm under `NETSCRIPT_CACHE_MODE=Executable` on CI, and (b) that S1's permission change
   leaves every non-sqlite scaffold byte-identical.
 - No product code exists at PLAN-EVAL time. Implementation begins only on `PASS`.
-- S2 implementation is complete with green automated gates but is **not self-certified**. Tier-A
-  must review the slice before sign-off; do not start S3 from this handoff.
+- S1 and S2 are signed off. S3 implementation is complete with green automated gates but is **not
+  self-certified**. Tier-A must review the defaults merge, registry precedence, gate filtering, and
+  exact built-in options baseline before sign-off; do not start S4 from this handoff.

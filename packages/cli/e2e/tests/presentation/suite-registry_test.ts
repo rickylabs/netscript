@@ -1,7 +1,18 @@
 import { assertEquals } from '@std/assert';
 import { DEPLOY, GATE, SCAFFOLD } from '../../src/domain/cli-surface.ts';
-import { DATABASE } from '../../src/domain/extension-axes.ts';
+import {
+  DATABASE,
+  PACKAGE_SOURCE,
+  PLUGIN,
+  REPORT_FORMAT,
+} from '../../src/domain/extension-axes.ts';
+import type { RunOptions } from '../../src/domain/run-context.ts';
 import { builtInSuites, resolveSuite } from '../../src/presentation/cli/suites/registry.ts';
+import {
+  createScaffoldCapabilitySuite,
+  type ScaffoldCapabilitySuite,
+  scaffoldCapabilitySuites,
+} from '../../suites/scaffold/capability-suites.ts';
 
 Deno.test('registry exposes scaffold capability suites from constants', () => {
   assertEquals(builtInSuites.map((suite) => suite.id), [
@@ -164,4 +175,92 @@ Deno.test('runtime suite selects mssql database resource wait for mssql', () => 
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.RUNTIME_WAIT_POSTGRES), false);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.RUNTIME_WAIT_MYSQL), false);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.RUNTIME_WAIT_MSSQL), true);
+});
+
+Deno.test('capability defaults are a baseline and caller overrides select database gates', () => {
+  const capability: ScaffoldCapabilitySuite = {
+    id: SCAFFOLD.RUNTIME,
+    title: 'Synthetic runtime default precedence',
+    gates: [
+      GATE.RUNTIME_WAIT_POSTGRES,
+      GATE.RUNTIME_WAIT_MYSQL,
+      GATE.RUNTIME_WAIT_MSSQL,
+      GATE.RUNTIME_WAIT_GARNET,
+    ],
+    defaults: { database: DATABASE.SQLITE },
+  };
+
+  const defaulted = createScaffoldCapabilitySuite(capability);
+  assertEquals(defaulted.defaultOptions.database, DATABASE.SQLITE);
+  assertEquals(defaulted.gates.map((gate) => gate.id), [GATE.RUNTIME_WAIT_GARNET]);
+
+  const overridden = createScaffoldCapabilitySuite(capability, {
+    database: DATABASE.POSTGRES,
+  });
+  assertEquals(overridden.defaultOptions.database, DATABASE.POSTGRES);
+  assertEquals(overridden.gates.map((gate) => gate.id), [
+    GATE.RUNTIME_WAIT_POSTGRES,
+    GATE.RUNTIME_WAIT_GARNET,
+  ]);
+});
+
+Deno.test('existing built-in suites preserve their exact resolved options', () => {
+  assertEquals(
+    scaffoldCapabilitySuites.map((suite) => suite.defaults),
+    [undefined, undefined, undefined, undefined, undefined],
+  );
+
+  const overrides: Partial<RunOptions> = {
+    repoRoot: '/repo',
+    cliEntrypoint: '/cli.ts',
+    smokeRoot: '/smoke',
+    projectName: 'existing-suite-baseline',
+    logFile: '/log.ndjson',
+  };
+  const common: RunOptions = {
+    ...overrides,
+    repoRoot: '/repo',
+    cliEntrypoint: '/cli.ts',
+    smokeRoot: '/smoke',
+    projectName: 'existing-suite-baseline',
+    database: DATABASE.POSTGRES,
+    packageSource: PACKAGE_SOURCE.LOCAL,
+    plugins: [PLUGIN.WORKER, PLUGIN.SAGA, PLUGIN.TRIGGER, PLUGIN.STREAM, PLUGIN.AUTH],
+    samples: true,
+    cache: true,
+    cleanup: false,
+    format: REPORT_FORMAT.NDJSON,
+    reportPath: undefined,
+    logFile: '/log.ndjson',
+    commandTimeoutMs: 900_000,
+    httpTimeoutMs: 30_000,
+  };
+  const expected = new Map([
+    [SCAFFOLD.SERVICE, common],
+    [SCAFFOLD.CONTRACTS, common],
+    [SCAFFOLD.INFRASTRUCTURE, common],
+    [SCAFFOLD.PLUGIN, common],
+    [SCAFFOLD.RUNTIME, common],
+    [
+      SCAFFOLD.USERLAND_INSTALL,
+      {
+        ...common,
+        packageSource: PACKAGE_SOURCE.AUTO,
+        plugins: [PLUGIN.WORKER, PLUGIN.SAGA, PLUGIN.TRIGGER, PLUGIN.STREAM],
+        samples: false,
+      },
+    ],
+    [DEPLOY.TARGETS, { ...common, plugins: [...common.plugins, PLUGIN.AI], samples: false }],
+    [DEPLOY.DESKTOP_NATIVE, {
+      ...common,
+      plugins: [...common.plugins, PLUGIN.AI],
+      samples: false,
+    }],
+  ]);
+
+  for (const suite of builtInSuites) {
+    const options = expected.get(suite.id);
+    if (!options) throw new Error(`Missing options baseline for "${suite.id}".`);
+    assertEquals(resolveSuite(suite.id, overrides).defaultOptions, options, suite.id);
+  }
 });
