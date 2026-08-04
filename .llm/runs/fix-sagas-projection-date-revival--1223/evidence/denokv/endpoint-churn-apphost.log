@@ -1,0 +1,211 @@
+﻿[2026-08-04 12:05:49.608] [INFO] [Cli] Aspire CLI version: 13.4.6+87fe259e4fc244c599019a7b1304c85a1488f248
+[2026-08-04 12:05:49.609] [INFO] [Cli] Aspire CLI build ID: 13.400.626.31906
+[2026-08-04 12:05:49.609] [INFO] [Cli] Working directory: /home/codex/repos/ns005-sagas/.llm/tmp/1223-protocol/denokv/saga-1223-denokv/aspire
+[2026-08-04 12:05:49.609] [INFO] [Cli] Log file: /home/codex/.aspire/logs/cli_20260804T120549_8744494f.log
+[2026-08-04 12:05:49.609] [INFO] [Cli] CLI process ID: 1335208
+[2026-08-04 12:05:49.612] [DBUG] [Host] Hosting starting
+[2026-08-04 12:05:49.621] [DBUG] [Host] Hosting started
+[2026-08-04 12:05:49.635] [DBUG] [Features] Feature aspireSkillsRemoteFetchEnabled = False (default: False)
+[2026-08-04 12:05:49.635] [DBUG] [Features] Feature defaultWatchEnabled = False (default: False)
+[2026-08-04 12:05:49.635] [DBUG] [Features] Feature experimentalPolyglot:go = False (default: False)
+[2026-08-04 12:05:49.635] [DBUG] [Features] Feature experimentalPolyglot:java = False (default: False)
+[2026-08-04 12:05:49.635] [DBUG] [Features] Feature experimentalPolyglot:python = False (default: False)
+[2026-08-04 12:05:49.635] [DBUG] [Features] Feature experimentalPolyglot:rust = False (default: False)
+[2026-08-04 12:05:49.635] [DBUG] [Features] Feature nugetSignatureVerificationEnabled = True (default: True)
+[2026-08-04 12:05:49.635] [DBUG] [Features] Feature showAllTemplates = False (default: False)
+[2026-08-04 12:05:49.635] [DBUG] [Features] Feature showDeprecatedPackages = False (default: False)
+[2026-08-04 12:05:49.635] [DBUG] [Features] Feature stagingChannelEnabled = False (default: False)
+[2026-08-04 12:05:49.635] [DBUG] [Features] Feature updateNotificationsEnabled = True (default: True)
+[2026-08-04 12:05:49.656] [INFO] [Cli] Command: aspire run --non-interactive
+[2026-08-04 12:05:49.656] [DBUG] [Cli] Parsing arguments: run --non-interactive
+[2026-08-04 12:05:49.657] [DBUG] [Cli] Executing command: aspire run
+[2026-08-04 12:05:49.657] [DBUG] [AuxiliaryBackchannelMonitor] Current command is not MCP start command. Auxiliary backchannel monitoring disabled.
+[2026-08-04 12:05:49.657] [DBUG] [ProjectLocator] Finding project file in /home/codex/repos/ns005-sagas/.llm/tmp/1223-protocol/denokv/saga-1223-denokv/aspire
+[2026-08-04 12:05:49.657] [DBUG] [LayoutDiscovery] TryDiscoverRelativeLayout: CLI at /home/codex/.dotnet/tools/.store/aspire.cli/13.4.6/aspire.cli.linux-x64/13.4.6/tools/net10.0/linux-x64, checking for layout...
+[2026-08-04 12:05:49.657] [DBUG] [LayoutDiscovery] TryInferLayout: Checking layout at /home/codex/.dotnet/tools/.store/aspire.cli/13.4.6/aspire.cli.linux-x64/13.4.6/tools/net10.0/linux-x64
+[2026-08-04 12:05:49.657] [DBUG] [LayoutDiscovery]   bundle/managed/: exists
+[2026-08-04 12:05:49.657] [DBUG] [LayoutDiscovery]   bundle/dcp/: exists
+[2026-08-04 12:05:49.657] [DBUG] [LayoutDiscovery]   bundle/managed/aspire-managed: exists
+[2026-08-04 12:05:49.657] [DBUG] [LayoutDiscovery] TryInferLayout: New bundle/ layout is valid
+[2026-08-04 12:05:49.657] [DBUG] [LayoutDiscovery] Discovered layout relative to CLI: /home/codex/.dotnet/tools/.store/aspire.cli/13.4.6/aspire.cli.linux-x64/13.4.6/tools/net10.0/linux-x64
+[2026-08-04 12:05:49.657] [DBUG] [BundleService] Bundle already extracted and up to date (version: 13.4.6+87fe259e4fc244c599019a7b1304c85a1488f248|144826904|639174968440000000).
+[2026-08-04 12:05:49.658] [INFO] [ProjectLocator] Found AppHost path 'apphost.mts' from config file in /home/codex/repos/ns005-sagas/.llm/tmp/1223-protocol/denokv/saga-1223-denokv/aspire
+[2026-08-04 12:05:49.658] [DBUG] [AppHostProjectFactory] TryGetProject called for file: /home/codex/repos/ns005-sagas/.llm/tmp/1223-protocol/denokv/saga-1223-denokv/aspire/apphost.mts
+[2026-08-04 12:05:49.658] [DBUG] [AppHostProjectFactory] Language detected: typescript/nodejs for file: /home/codex/repos/ns005-sagas/.llm/tmp/1223-protocol/denokv/saga-1223-denokv/aspire/apphost.mts
+[2026-08-04 12:05:49.659] [DBUG] [GuestAppHostProject] Validated TypeScript (Node.js) AppHost: /home/codex/repos/ns005-sagas/.llm/tmp/1223-protocol/denokv/saga-1223-denokv/aspire/apphost.mts
+[2026-08-04 12:05:49.659] [DBUG] [ProjectLocator] Using AppHost path from settings without scanning: /home/codex/repos/ns005-sagas/.llm/tmp/1223-protocol/denokv/saga-1223-denokv/aspire/apphost.mts
+[2026-08-04 12:05:49.659] [DBUG] [ProjectLocator] Config at /home/codex/repos/ns005-sagas/.llm/tmp/1223-protocol/denokv/saga-1223-denokv/aspire/aspire.config.json already references apphost /home/codex/repos/ns005-sagas/.llm/tmp/1223-protocol/denokv/saga-1223-denokv/aspire/apphost.mts, skipping creation
+[2026-08-04 12:05:49.659] [DBUG] [AppHostProjectFactory] TryGetProject called for file: /home/codex/repos/ns005-sagas/.llm/tmp/1223-protocol/denokv/saga-1223-denokv/aspire/apphost.mts
+[2026-08-04 12:05:49.659] [DBUG] [AppHostProjectFactory] Language detected: typescript/nodejs for file: /home/codex/repos/ns005-sagas/.llm/tmp/1223-protocol/denokv/saga-1223-denokv/aspire/apphost.mts
+[2026-08-04 12:05:49.662] [DBUG] [BundleNuGetPackageCache] Running NuGet search via aspire-managed: Aspire.Cli
+[2026-08-04 12:05:49.662] [DBUG] [BundleNuGetPackageCache] aspire-managed path: /home/codex/.dotnet/tools/.store/aspire.cli/13.4.6/aspire.cli.linux-x64/13.4.6/tools/net10.0/linux-x64/versions/13.4.6_87fe259e4fc244c599019a7b1304c85a1488f248-4f822d9f05017331/managed/aspire-managed
+[2026-08-04 12:05:49.662] [DBUG] [BundleNuGetPackageCache] NuGet search args: nuget search --query Aspire.Cli --take 1000 --format json --prerelease --working-dir /home/codex/repos/ns005-sagas/.llm/tmp/1223-protocol/denokv/saga-1223-denokv/aspire --verbose
+[2026-08-04 12:05:49.662] [DBUG] [BundleNuGetPackageCache] Working directory: /home/codex/repos/ns005-sagas/.llm/tmp/1223-protocol/denokv/saga-1223-denokv/aspire
+[2026-08-04 12:05:49.673] [DBUG] [LayoutDiscovery] TryDiscoverRelativeLayout: CLI at /home/codex/.dotnet/tools/.store/aspire.cli/13.4.6/aspire.cli.linux-x64/13.4.6/tools/net10.0/linux-x64, checking for layout...
+[2026-08-04 12:05:49.673] [DBUG] [LayoutDiscovery] TryInferLayout: Checking layout at /home/codex/.dotnet/tools/.store/aspire.cli/13.4.6/aspire.cli.linux-x64/13.4.6/tools/net10.0/linux-x64
+[2026-08-04 12:05:49.673] [DBUG] [LayoutDiscovery]   bundle/managed/: exists
+[2026-08-04 12:05:49.673] [DBUG] [LayoutDiscovery]   bundle/dcp/: exists
+[2026-08-04 12:05:49.673] [DBUG] [LayoutDiscovery]   bundle/managed/aspire-managed: exists
+[2026-08-04 12:05:49.673] [DBUG] [LayoutDiscovery] TryInferLayout: New bundle/ layout is valid
+[2026-08-04 12:05:49.673] [DBUG] [LayoutDiscovery] Discovered layout relative to CLI: /home/codex/.dotnet/tools/.store/aspire.cli/13.4.6/aspire.cli.linux-x64/13.4.6/tools/net10.0/linux-x64
+[2026-08-04 12:05:49.673] [DBUG] [BundleService] Bundle already extracted and up to date (version: 13.4.6+87fe259e4fc244c599019a7b1304c85a1488f248|144826904|639174968440000000).
+[2026-08-04 12:05:49.677] [DBUG] [GuestAppHostProject] Running TypeScript (Node.js) AppHost: /home/codex/repos/ns005-sagas/.llm/tmp/1223-protocol/denokv/saga-1223-denokv/aspire/apphost.mts
+[2026-08-04 12:05:49.677] [INFO] [Stdout] [yellow]:locked_with_key:[/] Trusting certificates...
+[2026-08-04 12:05:49.809] [WARN] [NativeCertificateToolRunner] The certutil command is unavailable.  It is required for querying and updating NSS databases, which are chiefly used to trust certificates in browsers.
+[2026-08-04 12:05:49.809] [WARN] [NativeCertificateToolRunner] Failed to trust the certificate in the NSS database in '/home/codex/.pki/nssdb'. This will likely affect the Chromium family of browsers.
+[2026-08-04 12:05:49.809] [WARN] [NativeCertificateToolRunner] The certificate is only partially trusted - some clients will not accept it.
+[2026-08-04 12:05:49.812] [INFO] [NativeCertificateToolRunner] For OpenSSL trust to take effect, '$HOME/.aspnet/dev-certs/trust' must be listed in the SSL_CERT_DIR environment variable. For example, `export SSL_CERT_DIR="$HOME/.aspnet/dev-certs/trust:/usr/lib/ssl/certs"`. See https://aka.ms/dev-certs-trust for more information.
+[2026-08-04 12:05:49.848] [WARN] [NativeCertificateToolRunner] Failed to trust the certificate in the Windows certificate store via WSL: An error occurred trying to start process '/mnt/c/WINDOWS/System32/WindowsPowerShell/v1.0/powershell.exe' with working directory '/home/codex/repos/ns005-sagas/.llm/tmp/1223-protocol/denokv/saga-1223-denokv/aspire'. Exec format error.
+[2026-08-04 12:05:49.848] [INFO] [Stdout] ⚠️ Developer certificates may not be fully trusted (trust exit code was: PartiallyFailedToTrustTheCertificate).
+[2026-08-04 12:05:49.947] [WARN] [NativeCertificateToolRunner] The certificate is not trusted by OpenSSL.  Ensure that the SSL_CERT_DIR environment variable is set correctly.
+[2026-08-04 12:05:49.947] [WARN] [NativeCertificateToolRunner] The certutil command is unavailable.  It is required for querying and updating NSS databases, which are chiefly used to trust certificates in browsers.
+[2026-08-04 12:05:49.951] [DBUG] [LayoutDiscovery] TryDiscoverRelativeLayout: CLI at /home/codex/.dotnet/tools/.store/aspire.cli/13.4.6/aspire.cli.linux-x64/13.4.6/tools/net10.0/linux-x64, checking for layout...
+[2026-08-04 12:05:49.951] [DBUG] [LayoutDiscovery] TryInferLayout: Checking layout at /home/codex/.dotnet/tools/.store/aspire.cli/13.4.6/aspire.cli.linux-x64/13.4.6/tools/net10.0/linux-x64
+[2026-08-04 12:05:49.951] [DBUG] [LayoutDiscovery]   bundle/managed/: exists
+[2026-08-04 12:05:49.951] [DBUG] [LayoutDiscovery]   bundle/dcp/: exists
+[2026-08-04 12:05:49.952] [DBUG] [LayoutDiscovery]   bundle/managed/aspire-managed: exists
+[2026-08-04 12:05:49.952] [DBUG] [LayoutDiscovery] TryInferLayout: New bundle/ layout is valid
+[2026-08-04 12:05:49.952] [DBUG] [LayoutDiscovery] Discovered layout relative to CLI: /home/codex/.dotnet/tools/.store/aspire.cli/13.4.6/aspire.cli.linux-x64/13.4.6/tools/net10.0/linux-x64
+[2026-08-04 12:05:49.952] [DBUG] [BundleService] Bundle already extracted and up to date (version: 13.4.6+87fe259e4fc244c599019a7b1304c85a1488f248|144826904|639174968440000000).
+[2026-08-04 12:05:49.956] [DBUG] [GuestAppHostProject] Using SDK version from configuration: 13.4.6
+[2026-08-04 12:05:49.956] [INFO] [GuestAppHostProject] Loaded config from /home/codex/repos/ns005-sagas/.llm/tmp/1223-protocol/denokv/saga-1223-denokv/aspire (file exists: True)
+[2026-08-04 12:05:49.956] [DBUG] [GuestAppHostProject] Using SDK version from configuration: 13.4.6
+[2026-08-04 12:05:49.956] [DBUG] [GuestAppHostProject] Using SDK version from configuration: 13.4.6
+[2026-08-04 12:05:49.956] [INFO] [Stdout] :gear: Preparing Aspire server...
+[2026-08-04 12:05:49.957] [DBUG] [PrebuiltAppHostServer] Restoring 5 integration packages via bundled NuGet
+[2026-08-04 12:05:49.957] [DBUG] [LayoutDiscovery] TryDiscoverRelativeLayout: CLI at /home/codex/.dotnet/tools/.store/aspire.cli/13.4.6/aspire.cli.linux-x64/13.4.6/tools/net10.0/linux-x64, checking for layout...
+[2026-08-04 12:05:49.957] [DBUG] [LayoutDiscovery] TryInferLayout: Checking layout at /home/codex/.dotnet/tools/.store/aspire.cli/13.4.6/aspire.cli.linux-x64/13.4.6/tools/net10.0/linux-x64
+[2026-08-04 12:05:49.957] [DBUG] [LayoutDiscovery]   bundle/managed/: exists
+[2026-08-04 12:05:49.957] [DBUG] [LayoutDiscovery]   bundle/dcp/: exists
+[2026-08-04 12:05:49.957] [DBUG] [LayoutDiscovery]   bundle/managed/aspire-managed: exists
+[2026-08-04 12:05:49.957] [DBUG] [LayoutDiscovery] TryInferLayout: New bundle/ layout is valid
+[2026-08-04 12:05:49.957] [DBUG] [LayoutDiscovery] Discovered layout relative to CLI: /home/codex/.dotnet/tools/.store/aspire.cli/13.4.6/aspire.cli.linux-x64/13.4.6/tools/net10.0/linux-x64
+[2026-08-04 12:05:49.957] [DBUG] [BundleService] Bundle already extracted and up to date (version: 13.4.6+87fe259e4fc244c599019a7b1304c85a1488f248|144826904|639174968440000000).
+[2026-08-04 12:05:49.961] [DBUG] [BundleNuGetService] Using cached package manifest at /home/codex/repos/ns005-sagas/.llm/tmp/1223-protocol/denokv/saga-1223-denokv/aspire/.aspire/integrations/package-restore/20B4B80F832F59C1/integration-package-probe-manifest.json
+[2026-08-04 12:05:49.962] [INFO] [Stdout] Connecting to AppHost...
+[2026-08-04 12:05:49.963] [DBUG] [GuestAppHostProject] Read 5 environment variables from aspire.config.json
+[2026-08-04 12:05:49.963] [DBUG] [PrebuiltAppHostServer] Setting ASPIRE_INTEGRATION_PROBE_MANIFEST_PATH to /home/codex/repos/ns005-sagas/.llm/tmp/1223-protocol/denokv/saga-1223-denokv/aspire/.aspire/integrations/package-restore/20B4B80F832F59C1/integration-package-probe-manifest.json
+[2026-08-04 12:05:50.232] [DBUG] [PrebuiltAppHostServer] PrebuiltAppHostServer(1335240) stdout: info: Aspire.Hosting.RemoteHost.JsonRpcServer[0]
+[2026-08-04 12:05:50.232] [DBUG] [PrebuiltAppHostServer] PrebuiltAppHostServer(1335240) stdout:       Starting RemoteAppHost JsonRpc Server on /home/codex/.aspire/cli/bch/hatYboed_...
+[2026-08-04 12:05:50.232] [DBUG] [PrebuiltAppHostServer] PrebuiltAppHostServer(1335240) stdout: info: Microsoft.Hosting.Lifetime[0]
+[2026-08-04 12:05:50.232] [DBUG] [PrebuiltAppHostServer] PrebuiltAppHostServer(1335240) stdout:       Application started. Press Ctrl+C to shut down.
+[2026-08-04 12:05:50.232] [DBUG] [PrebuiltAppHostServer] PrebuiltAppHostServer(1335240) stdout: info: Microsoft.Hosting.Lifetime[0]
+[2026-08-04 12:05:50.232] [DBUG] [PrebuiltAppHostServer] PrebuiltAppHostServer(1335240) stdout:       Hosting environment: Development
+[2026-08-04 12:05:50.232] [DBUG] [PrebuiltAppHostServer] PrebuiltAppHostServer(1335240) stdout: info: Microsoft.Hosting.Lifetime[0]
+[2026-08-04 12:05:50.232] [DBUG] [PrebuiltAppHostServer] PrebuiltAppHostServer(1335240) stdout:       Content root path: /home/codex/repos/ns005-sagas/.llm/tmp/1223-protocol/denokv/saga-1223-denokv/aspire/.aspire/integrations/apphosts/aea158665cd0
+[2026-08-04 12:05:50.234] [DBUG] [PrebuiltAppHostServer] PrebuiltAppHostServer(1335240) stdout: info: Aspire.Hosting.RemoteHost.JsonRpcServer[0]
+[2026-08-04 12:05:50.234] [DBUG] [PrebuiltAppHostServer] PrebuiltAppHostServer(1335240) stdout:       Starting JsonRpc server on Unix domain socket: /home/codex/.aspire/cli/bch/hatYboed_
+[2026-08-04 12:05:51.169] [DBUG] [BundleNuGetPackageCache] NuGetHelper stderr: Using source from config: nuget.org (https://api.nuget.org/v3/index.json)
+Searching 1 source(s) for 'Aspire.Cli'
+Searching nuget.org (https://api.nuget.org/v3/index.json)...
+Found 2 search endpoints.
+Querying https://azuresearch-usnc.nuget.org/query?q=Aspire.Cli&skip=0&take=1000&prerelease=true&semVerLevel=2.0.0
+
+[2026-08-04 12:05:51.169] [DBUG] [BundleNuGetPackageCache] NuGet search returned 131118 bytes
+[2026-08-04 12:05:52.900] [DBUG] [GuestAppHostProject] Generating TypeScript code via RPC for 5 packages
+[2026-08-04 12:05:53.209] [INFO] [GuestAppHostProject] Generated 3 TypeScript files in /home/codex/repos/ns005-sagas/.llm/tmp/1223-protocol/denokv/saga-1223-denokv/aspire/.aspire/modules
+[2026-08-04 12:05:53.225] [DBUG] [GuestAppHostProject] Selected TypeScript AppHost package manager 'npm' because package-lock.json found in /home/codex/repos/ns005-sagas/.llm/tmp/1223-protocol/denokv/saga-1223-denokv/aspire.
+[2026-08-04 12:05:53.225] [DBUG] [GuestAppHostProject] Created GuestRuntime for TypeScript (Node.js): Execute=npx --no-install tsx --tsconfig tsconfig.apphost.json {appHostFile}
+[2026-08-04 12:05:53.225] [DBUG] [GuestAppHostProject] No initialization configured for typescript/nodejs
+[2026-08-04 12:05:53.225] [DBUG] [GuestAppHostProject] Executing: /home/codex/.local/bin/npm install
+[2026-08-04 12:05:53.225] [DBUG] [GuestAppHostProject] typescript/nodejs guest process 1335400 started: /home/codex/.local/bin/npm
+[2026-08-04 12:05:54.012] [INFO] [AppHost] 
+[2026-08-04 12:05:54.012] [INFO] [AppHost] up to date, audited 10 packages in 697ms
+[2026-08-04 12:05:54.012] [INFO] [AppHost] 
+[2026-08-04 12:05:54.013] [INFO] [AppHost] 2 packages are looking for funding
+[2026-08-04 12:05:54.013] [INFO] [AppHost]   run `npm fund` for details
+[2026-08-04 12:05:54.021] [INFO] [AppHost] 
+[2026-08-04 12:05:54.022] [INFO] [AppHost] 1 low severity vulnerability
+[2026-08-04 12:05:54.022] [INFO] [AppHost] 
+[2026-08-04 12:05:54.022] [INFO] [AppHost] To address all issues, run:
+[2026-08-04 12:05:54.022] [INFO] [AppHost]   npm audit fix
+[2026-08-04 12:05:54.022] [INFO] [AppHost] 
+[2026-08-04 12:05:54.022] [INFO] [AppHost] Run `npm audit` for details.
+[2026-08-04 12:05:54.023] [FAIL] [AppHost] npm warn allow-scripts 1 package has install scripts not yet covered by allowScripts:
+[2026-08-04 12:05:54.023] [FAIL] [AppHost] npm warn allow-scripts   esbuild@0.27.7 (postinstall: node install.js)
+[2026-08-04 12:05:54.024] [FAIL] [AppHost] npm warn allow-scripts
+[2026-08-04 12:05:54.024] [FAIL] [AppHost] npm warn allow-scripts Run `npm approve-scripts --allow-scripts-pending` to review, or `npm approve-scripts <pkg>` to allow.
+[2026-08-04 12:05:54.035] [DBUG] [GuestAppHostProject] typescript/nodejs guest process 1335400 exited with code 0
+[2026-08-04 12:05:54.035] [DBUG] [GuestAppHostProject] Launching pre-execution command: npx --no-install tsc --noEmit -p tsconfig.apphost.json
+[2026-08-04 12:05:54.035] [DBUG] [GuestAppHostProject] Executing: /home/codex/.local/bin/npx --no-install tsc --noEmit -p tsconfig.apphost.json
+[2026-08-04 12:05:54.036] [DBUG] [GuestAppHostProject] typescript/nodejs guest process 1335476 started: /home/codex/.local/bin/npx
+[2026-08-04 12:05:59.124] [DBUG] [GuestAppHostProject] typescript/nodejs guest process 1335476 exited with code 0
+[2026-08-04 12:05:59.124] [DBUG] [GuestAppHostProject] Launching: npx --no-install tsx --tsconfig tsconfig.apphost.json /home/codex/repos/ns005-sagas/.llm/tmp/1223-protocol/denokv/saga-1223-denokv/aspire/apphost.mts
+[2026-08-04 12:05:59.125] [DBUG] [GuestAppHostProject] Executing: /home/codex/.local/bin/npx --no-install tsx --tsconfig tsconfig.apphost.json /home/codex/repos/ns005-sagas/.llm/tmp/1223-protocol/denokv/saga-1223-denokv/aspire/apphost.mts
+[2026-08-04 12:05:59.125] [DBUG] [GuestAppHostProject] typescript/nodejs guest process 1335766 started: /home/codex/.local/bin/npx
+[2026-08-04 12:05:59.125] [DBUG] [GuestAppHostProject] Starting backchannel connection to AppHost server at /home/codex/.aspire/cli/bch/cAn8uw3yX
+[2026-08-04 12:05:59.125] [DBUG] [AppHostCliBackchannel] Connecting to AppHost backchannel at /home/codex/.aspire/cli/bch/cAn8uw3yX (autoReconnect=False, retryCount=0)
+[2026-08-04 12:05:59.659] [DBUG] [AppHostCliBackchannel] Connecting to AppHost backchannel at /home/codex/.aspire/cli/bch/cAn8uw3yX (autoReconnect=False, retryCount=10)
+[2026-08-04 12:05:59.919] [FAIL] [AppHost] (node:1335840) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+[2026-08-04 12:05:59.919] [FAIL] [AppHost] (Use `node --trace-deprecation ...` to show where the warning was created)
+[2026-08-04 12:06:00.179] [DBUG] [AppHostCliBackchannel] Connecting to AppHost backchannel at /home/codex/.aspire/cli/bch/cAn8uw3yX (autoReconnect=False, retryCount=20)
+[2026-08-04 12:06:00.699] [DBUG] [AppHostCliBackchannel] Connecting to AppHost backchannel at /home/codex/.aspire/cli/bch/cAn8uw3yX (autoReconnect=False, retryCount=30)
+[2026-08-04 12:06:01.220] [DBUG] [AppHostCliBackchannel] Connecting to AppHost backchannel at /home/codex/.aspire/cli/bch/cAn8uw3yX (autoReconnect=False, retryCount=40)
+[2026-08-04 12:06:01.741] [DBUG] [AppHostCliBackchannel] Connecting to AppHost backchannel at /home/codex/.aspire/cli/bch/cAn8uw3yX (autoReconnect=False, retryCount=50)
+[2026-08-04 12:06:02.260] [DBUG] [AppHostCliBackchannel] Connecting to AppHost backchannel at /home/codex/.aspire/cli/bch/cAn8uw3yX (autoReconnect=False, retryCount=60)
+[2026-08-04 12:06:02.324] [DBUG] [PrebuiltAppHostServer] PrebuiltAppHostServer(1335240) stdout: warn: Microsoft.AspNetCore.Server.Kestrel.Core.KestrelServer[9]
+[2026-08-04 12:06:02.324] [DBUG] [PrebuiltAppHostServer] PrebuiltAppHostServer(1335240) stdout:       The ASP.NET Core developer certificate is only trusted by some clients. For information about trusting the ASP.NET Core developer certificate, see https://aka.ms/aspnet/https-trust-dev-cert
+[2026-08-04 12:06:02.538] [DBUG] [PrebuiltAppHostServer] PrebuiltAppHostServer(1335240) stdout: info: Aspire.Hosting.DistributedApplication[0]
+[2026-08-04 12:06:02.538] [DBUG] [PrebuiltAppHostServer] PrebuiltAppHostServer(1335240) stdout:       Aspire AppHost version: 13.4.6+87fe259e4fc244c599019a7b1304c85a1488f248
+[2026-08-04 12:06:02.538] [DBUG] [PrebuiltAppHostServer] PrebuiltAppHostServer(1335240) stdout: info: Aspire.Hosting.DistributedApplication[0]
+[2026-08-04 12:06:02.538] [DBUG] [PrebuiltAppHostServer] PrebuiltAppHostServer(1335240) stdout:       Distributed application starting.
+[2026-08-04 12:06:02.538] [DBUG] [PrebuiltAppHostServer] PrebuiltAppHostServer(1335240) stdout: info: Aspire.Hosting.DistributedApplication[0]
+[2026-08-04 12:06:02.538] [DBUG] [PrebuiltAppHostServer] PrebuiltAppHostServer(1335240) stdout:       Application host directory is: /home/codex/repos/ns005-sagas/.llm/tmp/1223-protocol/denokv/saga-1223-denokv/aspire
+[2026-08-04 12:06:02.572] [DBUG] [AppHostCliBackchannel] Connected to AppHost backchannel at /home/codex/.aspire/cli/bch/cAn8uw3yX (retryCount=66)
+[2026-08-04 12:06:02.760] [DBUG] [AppHostCliBackchannel] Requesting AppHost log entries
+[2026-08-04 12:06:02.760] [INFO] [Stdout] Starting dashboard...
+[2026-08-04 12:06:02.760] [DBUG] [AppHostCliBackchannel] Requesting dashboard URL
+[2026-08-04 12:06:02.760] [DBUG] [GuestAppHostProject] Connected to AppHost server backchannel at /home/codex/.aspire/cli/bch/cAn8uw3yX
+[2026-08-04 12:06:02.781] [DBUG] [AppHostCliBackchannel] Received AppHost log entries async enumerable
+[2026-08-04 12:06:02.325] [WARN] [AppHost/KestrelServer] The ASP.NET Core developer certificate is only trusted by some clients. For information about trusting the ASP.NET Core developer certificate, see https://aka.ms/aspnet/https-trust-dev-cert
+[2026-08-04 12:06:02.538] [INFO] [AppHost/DistributedApplication] Aspire AppHost version: 13.4.6+87fe259e4fc244c599019a7b1304c85a1488f248
+[2026-08-04 12:06:02.538] [INFO] [AppHost/DistributedApplication] Distributed application starting.
+[2026-08-04 12:06:02.538] [INFO] [AppHost/DistributedApplication] Application host directory is: /home/codex/repos/ns005-sagas/.llm/tmp/1223-protocol/denokv/saga-1223-denokv/aspire
+[2026-08-04 12:06:05.326] [DBUG] [PrebuiltAppHostServer] PrebuiltAppHostServer(1335240) stdout: info: Aspire.Hosting.DistributedApplication[0]
+[2026-08-04 12:06:05.326] [DBUG] [PrebuiltAppHostServer] PrebuiltAppHostServer(1335240) stdout:       Now listening on: https://localhost:45979
+[2026-08-04 12:06:05.326] [INFO] [AppHost/DistributedApplication] Now listening on: https://localhost:45979
+[2026-08-04 12:06:05.341] [DBUG] [PrebuiltAppHostServer] PrebuiltAppHostServer(1335240) stdout: info: Aspire.Hosting.DistributedApplication[0]
+[2026-08-04 12:06:05.341] [DBUG] [PrebuiltAppHostServer] PrebuiltAppHostServer(1335240) stdout:       Aspire Dashboard
+[2026-08-04 12:06:05.341] [DBUG] [PrebuiltAppHostServer] PrebuiltAppHostServer(1335240) stdout:       
+[2026-08-04 12:06:05.341] [DBUG] [PrebuiltAppHostServer] PrebuiltAppHostServer(1335240) stdout:             - Dashboard:  https://localhost:45979
+[2026-08-04 12:06:05.341] [DBUG] [PrebuiltAppHostServer] PrebuiltAppHostServer(1335240) stdout:             - OTLP/HTTP:  http://localhost:44751
+[2026-08-04 12:06:05.341] [DBUG] [PrebuiltAppHostServer] PrebuiltAppHostServer(1335240) stdout:       
+[2026-08-04 12:06:05.340] [INFO] [AppHost/DistributedApplication] Aspire Dashboard
+
+      - Dashboard:  https://localhost:45979
+      - OTLP/HTTP:  http://localhost:44751
+
+[2026-08-04 12:06:05.373] [DBUG] [AppHostCliBackchannel] Notifying AppHost startup readiness
+[2026-08-04 12:07:23.893] [INFO] [Cli] Termination signal received, requesting cancellation.
+[2026-08-04 12:07:23.893] [INFO] [GuestAppHostProject] Cancellation requested while waiting for typescript/nodejs guest process 1335766 to exit
+[2026-08-04 12:07:23.894] [INFO] [GuestAppHostProject] Killing typescript/nodejs guest process tree 1335766
+[2026-08-04 12:07:23.923] [DBUG] [PrebuiltAppHostServer] PrebuiltAppHostServer(1335240) stdout: fail: Microsoft.Extensions.Hosting.Internal.Host[11]
+[2026-08-04 12:07:23.923] [DBUG] [PrebuiltAppHostServer] PrebuiltAppHostServer(1335240) stdout:       Hosting failed to start
+[2026-08-04 12:07:23.923] [DBUG] [PrebuiltAppHostServer] PrebuiltAppHostServer(1335240) stdout:       System.Threading.Tasks.TaskCanceledException: A task was canceled.
+[2026-08-04 12:07:23.923] [DBUG] [PrebuiltAppHostServer] PrebuiltAppHostServer(1335240) stdout:          at Aspire.Hosting.Dcp.DcpExecutor.CreateRenderedResourcesAsync[TDcpResource,TContext](IObjectCreator`2 creator, IEnumerable`1 resources, TContext context, CancellationToken cancellationToken) in /_/src/Aspire.Hosting/Dcp/DcpExecutor.cs:line 762
+[2026-08-04 12:07:23.923] [DBUG] [PrebuiltAppHostServer] PrebuiltAppHostServer(1335240) stdout:          at Aspire.Hosting.Dcp.DcpExecutor.<>c__DisplayClass33_1.<<RunApplicationAsync>b__4>d.MoveNext() in /_/src/Aspire.Hosting/Dcp/DcpExecutor.cs:line 218
+[2026-08-04 12:07:23.923] [DBUG] [PrebuiltAppHostServer] PrebuiltAppHostServer(1335240) stdout:       --- End of stack trace from previous location ---
+[2026-08-04 12:07:23.923] [DBUG] [PrebuiltAppHostServer] PrebuiltAppHostServer(1335240) stdout:          at Aspire.Hosting.Dcp.DcpExecutor.RunApplicationAsync(CancellationToken ct) in /_/src/Aspire.Hosting/Dcp/DcpExecutor.cs:line 244
+[2026-08-04 12:07:23.923] [DBUG] [PrebuiltAppHostServer] PrebuiltAppHostServer(1335240) stdout:          at Aspire.Hosting.Orchestrator.ApplicationOrchestrator.RunApplicationAsync(CancellationToken cancellationToken) in /_/src/Aspire.Hosting/Orchestrator/ApplicationOrchestrator.cs:line 555
+[2026-08-04 12:07:23.923] [DBUG] [PrebuiltAppHostServer] PrebuiltAppHostServer(1335240) stdout:          at Aspire.Hosting.Orchestrator.OrchestratorHostService.StartAsync(CancellationToken cancellationToken) in /_/src/Aspire.Hosting/Orchestrator/OrchestratorHostService.cs:line 41
+[2026-08-04 12:07:23.923] [DBUG] [PrebuiltAppHostServer] PrebuiltAppHostServer(1335240) stdout:          at Microsoft.Extensions.Hosting.Internal.Host.<StartAsync>b__14_1(IHostedService service, CancellationToken token)
+[2026-08-04 12:07:23.923] [DBUG] [PrebuiltAppHostServer] PrebuiltAppHostServer(1335240) stdout:          at Microsoft.Extensions.Hosting.Internal.Host.ForeachService[T](IEnumerable`1 services, CancellationToken token, Boolean concurrent, Boolean abortOnFirstException, List`1 exceptions, Func`3 operation)
+[2026-08-04 12:07:23.930] [DBUG] [PrebuiltAppHostServer] PrebuiltAppHostServer(1335240) stdout: info: Microsoft.Hosting.Lifetime[0]
+[2026-08-04 12:07:23.930] [DBUG] [PrebuiltAppHostServer] PrebuiltAppHostServer(1335240) stdout:       Application is shutting down...
+[2026-08-04 12:07:23.933] [DBUG] [PrebuiltAppHostServer] PrebuiltAppHostServer(1335240) stdout: info: Aspire.Hosting.RemoteHost.JsonRpcServer[0]
+[2026-08-04 12:07:23.933] [DBUG] [PrebuiltAppHostServer] PrebuiltAppHostServer(1335240) stdout:       Server shutdown requested
+[2026-08-04 12:07:23.933] [DBUG] [PrebuiltAppHostServer] PrebuiltAppHostServer(1335240) stdout: info: Aspire.Hosting.RemoteHost.JsonRpcServer[0]
+[2026-08-04 12:07:23.933] [DBUG] [PrebuiltAppHostServer] PrebuiltAppHostServer(1335240) stdout:       Server stopped
+[2026-08-04 12:07:23.935] [DBUG] [PrebuiltAppHostServer] PrebuiltAppHostServer(1335240) stdout: info: Aspire.Hosting.RemoteHost.JsonRpcServer[0]
+[2026-08-04 12:07:23.935] [DBUG] [PrebuiltAppHostServer] PrebuiltAppHostServer(1335240) stdout:       Goodbye!
+[2026-08-04 12:07:23.963] [DBUG] [GuestAppHostProject] Waiting for typescript/nodejs guest process 1335766 to exit after kill
+[2026-08-04 12:07:23.963] [DBUG] [GuestAppHostProject] typescript/nodejs guest process 1335766 exited with code 130
+[2026-08-04 12:07:23.974] [DBUG] [AppHostCliBackchannel] Backchannel disconnected: RemotePartyTerminated
+[2026-08-04 12:07:24.004] [INFO] [Stdout] 🛑 Stopping Aspire.
+[2026-08-04 12:07:24.004] [DBUG] [CliUpdateNotifier] Current version: 13.4.6
+Newest stable version: 13.4.6
+Newest prerelease version: (null)
+[2026-08-04 12:07:24.004] [DBUG] [CliUpdateNotifier] No newer version for the current version 13.4.6.
+[2026-08-04 12:07:24.004] [INFO] [Cli] Exit code: 0
+[2026-08-04 12:07:24.004] [DBUG] [Host] Hosting stopping
+[2026-08-04 12:07:24.004] [DBUG] [Host] Hosting stopped

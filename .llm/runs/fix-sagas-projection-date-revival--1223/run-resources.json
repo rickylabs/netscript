@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 2,
+  "worktreeRoot": "/home/codex/repos/ns005-sagas",
+  "appHosts": [],
+  "containers": [],
+  "ownedRoots": [
+    "/home/codex/repos/ns005-sagas/.llm/tmp/1223-protocol/redis/saga-1223-redis",
+    "/home/codex/repos/ns005-sagas/.llm/tmp/1223-protocol/denokv/saga-1223-denokv",
+    "/home/codex/repos/ns005-sagas/.llm/tmp/1223-protocol"
+  ]
+}

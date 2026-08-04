@@ -28,4 +28,3 @@ invalid persisted values still fail loudly.
 - GREEN: same integration test plus focused plugin tests.
 - Closure: fresh user scaffolds on Redis/Garnet and Deno KV, full publish/runner/query lifecycle,
   compensation, restart durability, populated health reports, and Aspire OTEL correlation.
-

@@ -6,4 +6,3 @@
 - Archetype: 5 (plugin package), with runtime subsystem behavior
 - Owner: Codex implementation supervisor
 - Merge authority: milestone orchestrator
-

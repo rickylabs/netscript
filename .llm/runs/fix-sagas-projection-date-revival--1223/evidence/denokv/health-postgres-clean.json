@@ -1,0 +1,64 @@
+{
+  "resources": [
+    {
+      "name": "postgres-2cb8c222",
+      "displayName": "postgres",
+      "resourceType": "Container",
+      "state": "Running",
+      "creationTimestamp": "2026-08-04T12:08:05+00:00",
+      "startTimestamp": "2026-08-04T12:08:15.121352+00:00",
+      "source": "docker.io/library/postgres:18.3",
+      "healthStatus": "Healthy",
+      "dashboardUrl": "https://localhost:46365/?resource=postgres-2cb8c222",
+      "relationships": [],
+      "urls": [
+        {
+          "name": "tcp",
+          "url": "tcp://localhost:45033"
+        }
+      ],
+      "volumes": [
+        {
+          "source": "/home/codex/repos/ns005-sagas/.llm/tmp/1223-protocol/denokv/saga-1223-denokv/.data/postgres",
+          "target": "/var/lib/postgresql",
+          "mountType": "bind"
+        }
+      ],
+      "properties": {
+        "container.args": null,
+        "container.command": null,
+        "container.id": "cc2944ceeab6a807abf60d47fe7eef8fd245bffce15bba27afe327fe17eb5550",
+        "container.image": "docker.io/library/postgres:18.3",
+        "container.lifetime": "Persistent",
+        "container.ports": [
+          5432
+        ],
+        "resource.appArgs": [],
+        "resource.appArgsSensitivity": [],
+        "resource.connectionString": null
+      },
+      "environment": {
+        "POSTGRES_HOST_AUTH_METHOD": "scram-sha-256",
+        "POSTGRES_INITDB_ARGS": "--auth-host=scram-sha-256 --auth-local=scram-sha-256",
+        "POSTGRES_PASSWORD": "0cac2c8e80e145bb9eae347d453a4da8",
+        "POSTGRES_USER": "postgres",
+        "SSL_CERT_DIR": "/usr/lib/ssl/aspire/certs:/etc/ssl/certs:/usr/local/share/ca-certificates:/etc/pki/tls/certs"
+      },
+      "healthReports": {
+        "postgres_check": {
+          "status": "Healthy"
+        }
+      },
+      "commands": {
+        "restart": {
+          "displayName": "Restart",
+          "description": "Restart resource"
+        },
+        "stop": {
+          "displayName": "Stop",
+          "description": "Stop resource"
+        }
+      }
+    }
+  ]
+}
