@@ -151,7 +151,8 @@ The handler `withForm` installs runs a fixed sequence, from
 3. **CSRF verify** — unless `csrf: false`. A mismatch returns immediately with the form-level message
    `Your form session expired. Reload the page and try again.` and no mutation runs.
 4. **`intent`** — if the payload carries a non-`submit` intent *and* the config supplies `onIntent`,
-   the intent handler runs and the request returns here. Validation never runs for this branch.
+   the intent handler runs and the request returns here. The schema has already been evaluated
+   during parsing, but this branch returns before the validation result is enforced.
 5. **Validation gate.** On failure the reply carries the submitted values plus `fieldErrors` and
    `formErrors`. Still no mutation.
 6. **`mutate`** — with the parsed `z.output` of your schema.
@@ -172,7 +173,7 @@ storage and no flash cookie involved.
 ## `RuntimeFormState`: the props contract
 
 Your component's props type is `RuntimeFormState<TValues>` — importable from
-`@netscript/fresh/builders` or `@netscript/fresh/form`. Seventeen readonly members, grouped by what
+`@netscript/fresh/builders` or `@netscript/fresh/form`. Sixteen readonly members, grouped by what
 they are for:
 
 | Group | Members |
@@ -188,8 +189,11 @@ what `dirty` is computed against, and it is *rebased* after a successful submit 
 just saved become the new baseline. `submitted` is true on any render that followed a submission,
 including an intent round trip.
 
-Note what is **not** there: no `status`, no `pending`, no `success` flag. Success feedback comes back
-through `onSuccess`'s `message`, which you render yourself; pending state is a client concern and
+Note what is **not** there. `RuntimeFormState` exposes no success flag and no success message today:
+`onSuccess` may return a `message`, and the reply carries it, but `resolveRuntimeFormState` does not
+copy `message`, `status`, or `output` into the component's props. What *does* survive is
+`nextValues`, which rebases the rendered values after a success. For visible success feedback, redirect
+or use an application-owned channel. Pending state is likewise absent — that is a client concern and
 belongs to `useFormEnhancement`.
 
 ## Fields, constraints, and the markup they generate

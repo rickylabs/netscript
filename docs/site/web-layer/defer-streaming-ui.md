@@ -24,21 +24,35 @@ page.
 
 ## What bare Fresh makes you write
 
-Fresh 2 gives you `<Suspense>` through `preact/compat`, and partial routes with `f-partial` /
-`f-client-nav`. Neither knows anything about freshness. To get "show the cache now, refresh it if it
-is old" you write the decision yourself, in each page:
+Fresh 2 gives you the transport. `<Suspense>` through `preact/compat` covers a pending promise, and
+partial routes with `f-partial` / `f-client-nav` swap a named region without a navigation — the same
+mechanism `DeferPage` uses. What Fresh does not give you is the *decision*, so you write that
+yourself, in each page:
 
 ```tsx
 // islands/OrdersRefresh.tsx — bare Fresh
+const hidden = { display: 'none' };
+
 export default function OrdersRefresh({ cachedAt }: { cachedAt?: number }) {
+  const formRef = useRef<HTMLFormElement>(null);
+
   useEffect(() => {
-    if (cachedAt === undefined) return;
+    if (cachedAt === undefined) return; // your rule for "no timestamp"
     if (Date.now() - cachedAt <= 30_000) return; // your stale window, typed nowhere
-    fetch('/partials/orders/list')
-      .then((res) => res.text())
-      .then((html) => {/* … and now you own the swap, too */});
+    formRef.current?.requestSubmit();
   }, [cachedAt]);
-  return null;
+
+  return (
+    <form
+      ref={formRef}
+      method='GET'
+      action='/orders'
+      f-partial='/partials/orders/list'
+      f-client-nav
+      style={hidden}
+      aria-hidden='true'
+    />
+  );
 }
 ```
 
@@ -49,15 +63,15 @@ const isStale = entry && Date.now() - entry.cachedAt > 30_000;
 if (isStale) void fetch(new URL('/partials/orders/list', url.origin)); // fire and forget
 ```
 
-Three costs follow.
+The swap itself is fine — Fresh owns it. Three costs sit above it.
 
 **The stale window is a magic number in two files.** The server's `30_000` and the island's `30_000`
 have to agree, and nothing checks that they do. When the second one drifts, the region refreshes
 twice or never.
 
-**The server prewarm and the client refetch do not know about each other.** Both fire on a stale
-hit, so a stale region costs two requests. Suppressing one means passing a flag from the server
-render into the island and remembering to check it.
+**The server prewarm and the client partial submission do not know about each other.** Both fire on
+a stale hit, so a stale region costs two requests. Suppressing one means passing a flag from the
+server render into the island and remembering to check it.
 
 **"How should this region behave?" has no name.** There is no vocabulary for "cached first paint,
 refresh in the background" versus "cheap on mobile" — only a fresh set of `if`s per page, which is
@@ -184,10 +198,12 @@ request for a shorter path to correct content.
 precedence is not left-to-right:
 
 - `staleTimeOverrideMs` beats the policy object's `staleTimeMs`, which beats the profile's.
-- **A legacy `staleStrategy` overrides both prewarm fields**, whatever the profile says. Passing
-  `'server-prewarm'` with `low-bandwidth` produces `prewarmOnStale: true` — the profile's `false` is
-  discarded. This is the path a layer's `staleReloadMode: 'background'` takes, so a layer can silently
-  contradict the profile it names.
+- **The legacy `staleStrategy: 'server-prewarm'` value overrides both prewarm fields**; `'none'`
+  (the default) leaves the policy and profile values intact. When it does apply, it wins over both
+  the profile and an explicitly-set `prewarmOnMiss` / `prewarmOnStale`: `'server-prewarm'` with
+  `low-bandwidth` produces `prewarmOnStale: true`, discarding the profile's `false`. This is the path
+  a layer's `staleReloadMode: 'background'` takes, so a layer can silently contradict the profile it
+  names.
 - Everything else falls through profile defaults.
 
 The package also ships the conventions generated pages use: `DEFER_POLICY`
