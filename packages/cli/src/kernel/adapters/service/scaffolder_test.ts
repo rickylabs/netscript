@@ -82,7 +82,8 @@ Deno.test('shared contract scaffolder creates service contracts and aggregates v
       importMode: 'jsr',
       force: false,
       imports: {
-        '@database/zod': '../database/postgres/schema/.generated/zod/crud.ts',
+        '@database/zod':
+          '../database/postgres/schema/.generated/zod/schemas/models/index.ts',
       },
     },
   });
@@ -104,12 +105,36 @@ Deno.test('shared contract scaffolder creates service contracts and aggregates v
     },
     { serviceName: 'payments', version: DEFAULT_CONTRACT_VERSION },
   );
+  await contractScaffolder.addServiceContract(
+    {
+      projectName: 'my-app',
+      targetPath: '/project',
+      importMode: 'jsr',
+      force: false,
+    },
+    {
+      serviceName: 'cycles',
+      version: DEFAULT_CONTRACT_VERSION,
+      modelName: 'Cycle',
+      hasDatabase: true,
+    },
+  );
 
   const modContent = await fs.readFile('/project/contracts/versions/v1/mod.ts');
   assertStringIncludes(modContent, "from './orders.contract.ts'");
   assertStringIncludes(modContent, "from './payments.contract.ts'");
+  assertStringIncludes(modContent, "from './cycles.contract.ts'");
   assertStringIncludes(modContent, 'orders: OrdersV1');
   assertStringIncludes(modContent, 'payments: PaymentsV1');
+  assertStringIncludes(modContent, 'cycles: CyclesV1');
+
+  const cycleContract = await fs.readFile(
+    '/project/contracts/versions/v1/cycles.contract.ts',
+  );
+  assertStringIncludes(cycleContract, 'CycleCreateInput');
+  assertStringIncludes(cycleContract, 'CycleSchema');
+  assertStringIncludes(cycleContract, 'CycleUpdateInput');
+  assertStringIncludes(cycleContract, "from '@database/zod'");
 
   const contractsDenoJson = JSON.parse(await fs.readFile('/project/contracts/deno.json'));
   assertEquals(contractsDenoJson.exports, {
@@ -122,7 +147,7 @@ Deno.test('shared contract scaffolder creates service contracts and aggregates v
   );
   assertEquals(
     contractsDenoJson.imports['@database/zod'],
-    '../database/postgres/schema/.generated/zod/crud.ts',
+    '../database/postgres/schema/.generated/zod/schemas/models/index.ts',
   );
 });
 

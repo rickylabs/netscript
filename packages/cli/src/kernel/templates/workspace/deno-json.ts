@@ -43,7 +43,8 @@ export function generateDenoJson(options: WorkspaceDenoJsonOptions): string {
   const dbEngine = options.dbEngines?.[0];
   const generatedImports = dbEngine
     ? {
-      '@database/zod': `./${SCAFFOLD_DIRS.DATABASE}/${dbEngine}/schema/.generated/zod/crud.ts`,
+      '@database/zod':
+        `./${SCAFFOLD_DIRS.DATABASE}/${dbEngine}/schema/.generated/zod/schemas/models/index.ts`,
     }
     : {};
   const jsrImports = options.importMode === 'jsr'
