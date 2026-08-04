@@ -608,3 +608,15 @@ rerun becomes captured #1196-family evidence, not a retry.
     entirely (cause unestablished — began immediately after a push that only removed files);
     the only reliable recovery found was a successor branch + PR. Cost: one PR number, ~40 min.
     Watch for recurrence; if it repeats, file with reproduction data.
+
+## 2026-08-04 — Docs lane delivers (#1106 → PR #1200); S4 wedge broken
+
+- **agy docs lane, first permitted run** (D10 grant): one 317s turn authored
+  `docs/site/identity-access/session-lifecycles.md` (303 lines) + 5 integration edits, committed,
+  pushed via explicit refspec, **opened PR #1200 itself** — full contract compliance
+  (conversation `6890911f`). Gate pending CI; check-6 (no `packages/**`) is the decisive row.
+- **S4 wedge root refined (finding 21):** check suites bound to the wedge-era SHAs never
+  trigger; a rebase onto main (fresh SHAs) restored the full check landscape within one
+  minute. Rebase itself: 12 commits replayed, two mechanical union conflicts (deno.json tasks,
+  README surface table) resolved as supersets, generated publish assets **regenerated not
+  hand-merged**, 93/93 combined S4+S5 tests green, pushed to PR #1199.
