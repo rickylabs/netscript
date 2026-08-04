@@ -53,7 +53,7 @@ edit — see [Customize Fresh UI](/web-layer/how-to/customize-fresh-ui/) for the
 
 ## Step 2 — Seed the first paint
 
-Build the page using NetScript's fluent `definePage` page builder. Materialize the transcript so far via `resolveChatSnapshot` as a request-scoped resource, then pass it to the island layer:
+Build the page using NetScript's fluent `definePage` page builder. Materialize the transcript so far via `resolveChatSnapshot` as a [request-scoped resource](/web-layer/resources/), then pass it to the island layer:
 
 ```tsx
 // apps/dashboard/routes/chat/[sessionId].tsx

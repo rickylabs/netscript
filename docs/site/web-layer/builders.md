@@ -158,6 +158,14 @@ handlers, and response shaping. Each returns a `PageBuilder` for continued chain
 `withHeader` is overloaded: it accepts a single `name`/`value` pair, a `HeadersInit`
 map, or a `PageHeaderResolver` that computes headers per request.
 
+Resources resolve sequentially, before any layer, into a store every loader shares —
+the mechanism, its ordering contract, and the dedup patterns it enables are covered in
+[Request-scoped resources](/web-layer/resources/).
+
+Layers then resolve concurrently, each into its own named region. The loader contract,
+the full layer config, slot placement with `withLayout`, and the typed layer hooks are
+covered in [Layers, layout, and slots](/web-layer/layers/).
+
 ### Params and route state
 
 `withPathParams`, `withSearchParams`, and the combined `withParams` apply typed
@@ -189,6 +197,10 @@ sidecar is left in place). `.withRoute` and `.withRouteContract` in the same pag
 a build error. Set `pageModuleRouteBinding: false` on the Vite plugin to disable
 page-module rewriting and keep hand-written `.withRoute(...)` lines.
 
+How the `routes.<key>` accessor is derived from a file path, the exact conflict
+messages, and what a moved route file costs at compile time are covered in
+[Routing and route contracts](/web-layer/route/#the-generated-routes-tree).
+
 ### Defer policy and streaming
 
 `withPolicy` accepts a `PageDeferPolicyInput` or a `PageDeferPolicyProfile`. The
@@ -206,6 +218,11 @@ one of `"GET"`, `"POST"`, `"PUT"`, `"PATCH"`, `"DELETE"`, `"OPTIONS"`, or `"HEAD
 handler, CSRF headers, and form metadata; its component receives `RuntimeFormState`
 props. Forms are covered in [Server-validated forms](/web-layer/form/).
 
+Which combination of `withHandler`, `withHeader`, `withStatus`, and `withStreaming`
+produces which handler — and the three build-time errors that guard them — is covered in
+[Response shaping](/web-layer/response/), along with `withMeta` and the `build()`
+overloads.
+
 ## Partials
 
 `definePartial()` defines a framework-owned partial route backed by an async loader,
@@ -217,6 +234,10 @@ optional `handler`, a `page` renderer, and a `default` export-compatible rendere
 and a `component`. It also accepts an optional `errorComponent`, `errorTitle`,
 `handler`, and Fresh `config`. `DefineStatsPartialOptions` omits `loader` and instead
 requires a `query` `() => Promise<TProps>`.
+
+The error shell, the paired route reference that types the `f-partial` link, and the
+layer config that turns a region into a deferred partial are covered in
+[Partials](/web-layer/partials/).
 
 ```ts
 import { definePartial } from "@netscript/fresh/builders";
@@ -253,6 +274,6 @@ export const liveCount = definePartial({
 
 ## Related
 
-{{ comp.cardsGrid({ columns: 3, cards: [ { title: "The Fresh page model", body: "How a NetScript Fresh page is structured.", href: "/web-layer/server/" }, { title: "Routing and route contracts", body: "Generated route references for withRoute().", href: "/web-layer/route/" }, { title: "Data loading and the query cache", body: "Resolve resources and cache data.", href: "/web-layer/query/" }, { title: "Server-validated forms", body: "withForm and RuntimeFormState.", href: "/web-layer/form/" }, { title: "Deferred and streaming UI", body: "withPolicy, withStreaming, and defer profiles.", href: "/web-layer/defer-streaming-ui/" }, { title: "Live dashboard tutorial", body: "Build a page end to end.", href: "/tutorials/live-dashboard/" } ] }) }}
+{{ comp.cardsGrid({ columns: 3, cards: [ { title: "The Fresh page model", body: "How a NetScript Fresh page is structured.", href: "/web-layer/server/" }, { title: "Request-scoped resources", body: "withResource, ordering, and cross-layer dedup.", href: "/web-layer/resources/" }, { title: "Layers, layout, and slots", body: "withLayer, withLayout, and the loader contract.", href: "/web-layer/layers/" }, { title: "Routing and route contracts", body: "Generated route references for withRoute().", href: "/web-layer/route/" }, { title: "Data loading and the query cache", body: "Resolve resources and cache data.", href: "/web-layer/query/" }, { title: "Server-validated forms", body: "withForm and RuntimeFormState.", href: "/web-layer/form/" }, { title: "Response shaping", body: "withMeta, withHeader, withStatus, and build().", href: "/web-layer/response/" }, { title: "Deferred and streaming UI", body: "withPolicy, withStreaming, and defer profiles.", href: "/web-layer/defer-streaming-ui/" }, { title: "Live dashboard tutorial", body: "Build a page end to end.", href: "/tutorials/live-dashboard/" } ] }) }}
 
 See the [Web Layer overview](/web-layer/) for the full pillar map.

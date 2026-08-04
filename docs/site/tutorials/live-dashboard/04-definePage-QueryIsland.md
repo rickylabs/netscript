@@ -97,11 +97,12 @@ and `offset` through it rather than reading `searchParams` by hand.
 ## Step 2 — Define the page and cache-first resource pipeline
 
 The page reads data through request-scoped **resource factories**. `.withResource(name, factory)`
-registers a value that is computed at most once per request, no matter how many layers ask for it.
+registers a value that is computed once while the page renders, no matter how many layers ask for it.
 That matters here because two layers want the same cached orders slice: the server-rendered `list`
 table and the `ordersQuery` island seed. Declared as a resource, the KV read happens once and both
 layers share it. Downstream resources may await upstream ones, so the prefetch step below builds on
-the same typed search input:
+the same typed search input — the resolution order, the shared store, and the dedup spans behind that
+are in [Request-scoped resources](/web-layer/resources/):
 
 ```tsx
 // apps/dashboard/routes/(dashboard)/dashboard/orders/index.tsx
@@ -153,7 +154,12 @@ the cache. It is sent to the client alongside the initial HTML, eliminating the 
 ## Step 3 — Add layers and partials
 
 Now compose the visual regions. You add the server-rendered table, the interactive query island, and
-a stats panel loaded asynchronously through a deferred partial — then lay them out and `build()`:
+a stats panel loaded asynchronously through a deferred partial — then lay them out and `build()`. The
+three layers resolve concurrently, so the page costs its slowest region rather than the sum — the
+loader contract, the full layer config, and slot placement are in
+[Layers, layout, and slots](/web-layer/layers/). The `partial` and `partialName` entries below are
+what turn a layer into a refreshable region; [Partials](/web-layer/partials/) covers the partial route
+on the other end:
 
 ```tsx
 // apps/dashboard/routes/(dashboard)/dashboard/orders/index.tsx (continued)
@@ -224,7 +230,7 @@ Read the builder one call at a time:
     { name: ".withRoute(route)", type: "route contract", desc: "Binds the typed search schema from Step 1. The loaders receive a typed search object." },
     { name: ".withPolicy('balanced')", type: "caching policy", desc: "The page's caching posture. 'balanced' serves cache-first and revalidates in the background." },
     { name: ".withTelemetry({ enabled, spanName })", type: "tracing", desc: "Wraps the page render in a named span that surfaces in the Aspire dashboard traces." },
-    { name: ".withResource(name, factory)", type: "request-scoped value", desc: "Computes a value at most once per request. Layers await it with ctx.resource(name), so two layers reading the same slice cost one fetch." },
+    { name: ".withResource(name, factory)", type: "request-scoped value", desc: "Computes a value once per page render. Layers read it with ctx.resource(name), so two layers reading the same slice cost one fetch." },
     { name: ".withLayer(name, Component, config)", type: "a named region", desc: "Adds a layer with its own loader, partial, fallback, and staleTime. Call it once per region." },
     { name: ".withLayout(slots => …)", type: "layout callback", desc: "Places each layer by calling slots.<name>(). The layout is plain JSX." },
     { name: ".withMeta(() => …)", type: "head metadata", desc: "Page title and description." },
@@ -233,7 +239,7 @@ Read the builder one call at a time:
 }) }}
 
 {{ comp callout { type: "note", title: "This is the dense part — and it earns its weight" } }}
-The layer config carries a lot: a <code>loader</code> (cache-first server read), a <code>partial</code> + <code>partialName</code> (the refresh route), a <code>fallback</code> (cold-cache skeleton), and <code>staleTime</code> + <code>staleReloadMode</code> (the staleness window and how it refreshes). It is more upfront ceremony than a plain Fresh route — the payoff is that each region renders from cache independently and refreshes without a full navigation. If you only need a static page, a plain Fresh route is lighter; reach for <code>definePage</code> when a region must be cache-first and self-refreshing, which a live table is. See <a href="/web-layer/">the Fresh meta-framework</a>.
+The layer config carries a lot: a <code>loader</code> (cache-first server read), a <code>partial</code> + <code>partialName</code> (the refresh route), a <code>fallback</code> (cold-cache skeleton), and <code>staleTime</code> + <code>staleReloadMode</code> (the staleness window and how it refreshes). It is more upfront ceremony than a plain Fresh route — the payoff is that each region renders from cache independently and refreshes without a full navigation. If you only need a static page, a plain Fresh route is lighter; reach for <code>definePage</code> when a region must be cache-first and self-refreshing, which a live table is. See <a href="/web-layer/">the Fresh meta-framework</a>. What <code>'balanced'</code>, <code>staleTime</code>, and <code>staleReloadMode</code> decide between them — prewarm on the server, refresh on the client, or neither — is <a href="/web-layer/defer-streaming-ui/">Deferred and streaming UI</a>.
 {{ /comp }}
 
 {{ comp callout { type: "tip", title: "Deferred-loader composition" } }}

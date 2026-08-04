@@ -44,42 +44,168 @@ middlewares and routes, exposes verb helpers (`get`, `post`, `patch`, `put`, `de
 `all`), a WebSocket endpoint helper (`ws`), file-system route insertion (`fsRoutes`), and produces a
 handler for `Deno.serve` via `handler()` or starts a server directly with `listen()`.
 
-`defineFreshApp<State>(options)` is the NetScript-managed entry point for building that app. It keeps
-the default Fresh bootstrap unchanged while exposing optional adapter seams — app construction
-(`createApp`), static-file middleware (`staticFiles`), app-level `middleware`, lifecycle hooks
-(`preConfigure`, `configure`), file-system route registration (`fsRoutes`), and reserved telemetry
-defaults (`telemetry`). It returns a ready `App<State>`.
+`defineFreshApp<State>(options)` is the NetScript-managed entry point for building that app:
 
 ```ts
+// apps/dashboard/main.ts
 import { defineFreshApp } from "@netscript/fresh/server";
+import type { State } from "@app/utils.ts";
 
-interface State {
-  requestId: string;
-}
+export const app = defineFreshApp<State>({ name: "dashboard" });
+```
 
-const app = defineFreshApp<State>({
-  name: "dashboard",
-  middleware: [
-    (ctx) => {
-      ctx.state.requestId = crypto.randomUUID();
-      return ctx.next();
-    },
-  ],
+That is the entire generated entry point, and the ratio matters more than the line count.
+
+### What bare Fresh makes you write
+
+The hand-rolled equivalent is short too — that is not the argument:
+
+```ts
+// main.ts — bare Fresh
+import { App, staticFiles } from "fresh";
+
+export const app = new App<State>()
+  .use(staticFiles())
+  .use((ctx) => {
+    ctx.state.requestId = crypto.randomUUID();
+    return ctx.next();
+  })
+  .fsRoutes();
+```
+
+What this file does not say is why the calls are in that order. Static files before your middleware
+means asset requests skip work meant for pages; `fsRoutes()` last means the file-system routes are
+inserted after everything registered above them. Those rules are real and they live nowhere except in
+whoever wrote the file. Copy it into a second app, add an app-level middleware in the wrong place, and
+the failure is a slow asset path or an unreachable explicit route — not an error.
+
+One thing is also silently absent: the SDK's KV cache provider is never registered, so
+`getCachedEntry()` throws at the first loader that calls it. That registration is an import side
+effect — `@netscript/fresh/server` re-exports the module whose body imports `@netscript/sdk/cache` —
+and it is documented in
+[The query bridge](/web-layer/query-bridge/#the-import-that-makes-any-of-this-work). A bare Fresh
+entry point that never imports `@netscript/fresh/server` bypasses it. Calling `defineFreshApp` is not
+itself the trigger; evaluating the `/server` module is.
+
+### The bootstrap order
+
+`defineFreshApp` runs a fixed sequence, and every option is a seam in it:
+
+1. **Obtain the app** — `options.app`, else `options.createApp(options.freshConfig)`, else
+   `new App(options.freshConfig)`. The first match wins, so passing `app` means `createApp` is never
+   called.
+2. **`preConfigure(app)`** — before anything is registered. This is where a route or middleware that
+   must precede the static-file handler goes.
+3. **Static files** — `app.use(staticFiles())` unless `staticFiles` is `false`; pass your own
+   `Middleware` to replace Fresh's.
+4. **App middleware** — `app.use(...options.middleware)`, skipped entirely when the array is empty.
+5. **`configure(app)`** — after middleware, **before** file-system routes. Explicit routes registered
+   here are inserted ahead of the generated ones.
+6. **File-system routes** — `app.fsRoutes()`, or `app.fsRoutes(pattern)` when `fsRoutes` is a string,
+   or your own callback when it is a function. `false` skips the step.
+
+The returned value is the `App<State>` itself, so `app.use(...)`, `app.get(...)`, and `app.listen(...)`
+remain available afterwards for anything the options do not cover.
+
+| Option | Type | Effect |
+| --- | --- | --- |
+| `name` | `string` | Stable app identifier. **Reserved** — accepted and not yet read. |
+| `app` | `App<State>` | Reuse an existing instance; wins over `createApp`. |
+| `freshConfig` | `FreshConfig` | Passed to `createApp` or to `new App()`. |
+| `createApp` | `(freshConfig?) => App<State>` | Replace app construction. |
+| `staticFiles` | `Middleware<State> \| false` | Replace or disable the static-file middleware. |
+| `middleware` | `Middleware<State>[]` | Registered in order, after static files. |
+| `preConfigure` | `(app) => void` | Runs first, before static files. |
+| `configure` | `(app) => void` | Runs after middleware, before file-system routes. |
+| `fsRoutes` | `((app, pattern?) => void) \| false \| string` | Mount at a pattern, replace, or disable. |
+| `telemetry` | `boolean \| FreshAppTelemetryOptions` | **Reserved** — accepted and not yet read. |
+
+```ts
+// mount an app's file routes under a prefix and serve assets elsewhere
+export const admin = defineFreshApp<State>({
+  name: "admin",
+  staticFiles: false,
+  fsRoutes: "/admin",
 });
 
-await app.listen({ port: 8000 });
+// register a health endpoint ahead of the static handler, and a version
+// endpoint ahead of the file-system routes
+export const dashboard = defineFreshApp<State>({
+  name: "dashboard",
+  preConfigure: (app) => app.get("/healthz", () => new Response("ok")),
+  configure: (app) => app.get("/version", () => new Response("0.0.4")),
+});
 ```
+
+{{ comp callout { type: "note" } }}
+The `telemetry` option and `FreshAppTelemetryOptions` (`serviceName`, `attributes`) are reserved
+bootstrap seams for future Fresh app telemetry defaults. They are accepted today and wired for
+forward compatibility. `name` is reserved in the same way — nothing reads it yet.
+<!-- caveat: arch-debt:fresh-app-telemetry-defaults -->
+{{ /comp }}
 
 The `Middleware<State>` type is the basic building block: a function that receives a `Context<State>`
 and returns a `Response` (or a promise of one), or calls `ctx.next()` to continue the chain. Register
 app-level middleware through the `middleware` option above or directly with `app.use(...)`.
 
-{{ comp callout { type: "note" } }}
-The `telemetry` option and `FreshAppTelemetryOptions` (`serviceName`, `attributes`) are reserved
-bootstrap seams for future Fresh app telemetry defaults. They are accepted today and wired for
-forward compatibility.
-<!-- caveat: arch-debt:fresh-app-telemetry-defaults -->
-{{ /comp }}
+### What it does not wire
+
+`app.fsRoutes()` does not scan the file system at request time — it inserts the routes and islands the
+Fresh **builder** collected, which is why a NetScript app's discovery is configured in
+`vite.config.ts` rather than in `main.ts`. The `fresh()` Vite plugin finds `routes/` and `islands/`;
+`createNetScriptVitePlugin` adds the route manifest, workspace aliases, and watch paths. See
+[Build and Vite integration](/web-layer/vite/).
+
+The consequence for the bootstrap is that `fsRoutes` in the options controls *where* those collected
+routes land — under a prefix, replaced by your own callback, or not at all — not *what* is in them.
+
+### The State binding
+
+`defineFreshApp<State>` takes the same `State` every page and middleware in the app is typed against,
+and the scaffold gives that type one home. `app/utils.ts` declares it and re-exports the two builders
+already bound to it:
+
+```ts
+// apps/dashboard/utils.ts
+import { createDefine } from "fresh";
+import { definePage as createDefinePage } from "@netscript/fresh/builders";
+
+export type State = Record<string, never>;
+
+export const define = createDefine<State>();
+
+export function definePage() {
+  return createDefinePage<State>();
+}
+```
+
+Route modules then import `definePage` from `@app/utils.ts` rather than from
+`@netscript/fresh/builders`, and `main.ts` imports `type { State }` from the same module. One
+declaration binds the app, its middleware, and every page context to the same shape; importing the
+package builder directly in a route silently opts that page out of the binding, and `ctx.state` there
+types as an empty record.
+
+Widen `State` in that one file — adding `requestId`, a session, a tenant — and every page's `ctx.state`
+widens with it, along with the `middleware` array's `ctx`.
+
+### What to watch for
+
+- **`app` and `createApp` are not both used.** Passing an existing `app` short-circuits the factory;
+  `createApp` only runs when `app` is absent.
+- **`configure` is not the last hook.** Its name suggests final customization, but file-system routes
+  are registered after it. Anything that must come after them goes on the returned `app`.
+- **A custom `fsRoutes` callback never receives a pattern.** Its second parameter exists in the type,
+  but the runtime only computes a pattern from the string form — which does not take the callback
+  branch. Close over the pattern you want instead of reading the argument.
+- **The KV cache provider is registered by the import, not by the call.** Evaluating
+  `@netscript/fresh/server` — for `defineFreshApp`, `createStreamingResponse`, or anything else on the
+  subpath — registers it. Constructing the app with `new App()` in a module that still imports
+  `/server` keeps the registration; only an entry point that never touches the subpath loses it, and
+  the failure then surfaces in a loader, far from `main.ts`.
+- **Adapter imports with their own ordering rules still go above everything.** The scaffolded
+  dashboard puts `import '@netscript/kv/redis';` at the top of `main.ts` because that registration has
+  to precede the first `getKv()` call — `defineFreshApp` does not sequence module-level side effects
+  for you.
 
 ## Pages connect to typed route contracts
 
@@ -157,6 +283,9 @@ detailed on the deferred-and-streaming-UI leaf.
 | `DefineFreshAppOptions` | `/server` | Options contract for `defineFreshApp` (app, middleware, static files, lifecycle hooks, fs routes, telemetry). |
 | `App` | `/server` | Fresh application instance: middleware, verb routing, `ws`, `fsRoutes`, `handler()`, `listen()`. |
 | `Middleware` | `/server` | Request-handling building block receiving a `Context<State>`. |
+| `FreshAppFactory` | `/server` | `createApp` seam: `(freshConfig?) => App<State>`. |
+| `FreshAppFsRoutes` | `/server` | `fsRoutes` seam: `(app, pattern?) => void`. |
+| `FreshAppTelemetryOptions` | `/server` | Reserved telemetry bootstrap options (`serviceName`, `attributes`). |
 | `createStreamingResponse` | `/server` | Build a streaming HTML `Response` from a Preact VNode tree. |
 | `renderToStream` | `/server` | Render a VNode tree to a `ReadableStream` with Suspense streaming. |
 | `StreamErrorBoundary` | `/server` | Boundary that catches rendering errors in a streaming subtree. |
@@ -173,6 +302,7 @@ detailed on the deferred-and-streaming-UI leaf.
 
 {{ comp.cardsGrid({ columns: 3, cards: [
   { title: "Pages and the define-page builder", body: "Author server-rendered pages with the page builder.", href: "/web-layer/builders/" },
+  { title: "The query bridge", body: "The cache registration this bootstrap performs.", href: "/web-layer/query-bridge/" },
   { title: "Routing and route contracts", body: "Typed path and search contracts in depth.", href: "/web-layer/route/" },
   { title: "Data loading and the query cache", body: "Load data and share the page-loader cache.", href: "/web-layer/query/" },
   { title: "Server-validated forms", body: "Validate form submissions on the server.", href: "/web-layer/form/" },
