@@ -182,3 +182,10 @@
   findings (#1225, #1244, #1245, #1249, #1255). #1241 body finalized, DoD ticked, ready;
   auto-merge on green settle per standing authorization. #1210 per-API acceptance item done;
   issue closing decision left to owner.
+
+## 2026-08-04 — program complete
+
+- **#1241 merged** (16:41Z, zero CI fails). All three docs-leverage phases shipped:
+  P1 #1209, P2 #1222, P3 #1241 — plus Charter A (#1221 owner-merged) and the
+  claude-openrouter launcher (#1217). Status comment left on #1210; closing decision
+  owner's. Run remains open for the owner's promised Charter A fix list.
