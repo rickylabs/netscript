@@ -16,7 +16,7 @@
 | Task lane | Route | Role |
 | --- | --- | --- |
 | `normal_implementation` | Current Codex implementation session | Generator and implementation supervisor |
-| milestone composed evaluation | draft→ready review, OpenHands open-model evaluation, orchestrator pre-merge gate | Independent evaluation surface |
+| milestone composed evaluation | Local Claude Code harness session routed to OpenRouter `qwen/qwen3.7-max` at high effort; orchestrator pre-merge gate | Independent evaluation surface |
 
 ## Recorded lane/eval overrides
 
@@ -25,3 +25,6 @@
   composed, not self-certified.
 - This is one PR-sized Archetype-6 phase group, so `phase-registry.md` is not required.
 - The pre-existing `deno.lock` modification is user-owned and excluded from all commits.
+- The automatic OpenHands evaluator check skipped. Per the harness handoff policy, the supervisor
+  did not manually dispatch the cloud workflow and instead launched the canonical separate local
+  evaluator session. Its formal verdict is recorded in `evaluate.md`.

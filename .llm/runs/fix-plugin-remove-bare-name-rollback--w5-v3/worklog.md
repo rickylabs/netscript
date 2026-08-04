@@ -81,6 +81,7 @@ See `plan.md` S0–S4. Each slice updates this worklog and `context-pack.md` bef
 | S3 lifecycle | complete | Public command tests: install → bare-name remove restores config/shared/generated state and `plugin doctor` exits clean. Combined install/remove suite: 4 passed (26 steps), 0 failed. |
 | Package quality | complete | Scoped check/lint/fmt: zero findings; `quality:gate` exit 0 with zero scanner findings/no new allowances; CLI `doc:lint` and package publish dry-run exit 0. |
 | Full CLI E2E | complete | First real run passed 33 gates, then transiently timed out at `runtime.wait.workers-api`; cleanup/leak-check were clean. One identical clean retry passed all 71 gates, including workers readiness, live plugin/service behavior, OTEL, and cleanup (`passed=71 failed=0`). |
+| IMPL-EVAL | PASS | Separate Claude Code harness session using OpenRouter `qwen/qwen3.7-max` at high effort independently verified all five contract criteria, the Archetype-6 gates, debt closure, lock hygiene, and the issue/PR close-gate. See `evaluate.md`. |
 
 ## Reconcile notes
 
@@ -94,3 +95,6 @@ See `plan.md` S0–S4. Each slice updates this worklog and `context-pack.md` bef
   remains modified and unstaged as pre-existing user-owned state.
 - S4: exact full-suite retry passed 71/71 after the first run's isolated readiness timeout. The
   scoped uninstall debt gate is satisfied and the debt row is closed with #1236/PR #1237 evidence.
+- IMPL-EVAL: automatic OpenHands evaluation skipped, so the supervisor used the policy-compliant
+  separate local evaluator route. Verdict PASS with no findings; PR and issue moved to
+  `status:ready-merge` and the PR was marked ready.

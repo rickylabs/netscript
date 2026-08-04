@@ -33,3 +33,13 @@
 - **Resolution:** after that lease cleared, the identical clean retry passed all 71 gates, including
   `runtime.wait.workers-api` in 10 seconds and run-owned cleanup. The first timeout is recorded as
   transient infrastructure behavior, not waived product evidence.
+
+## D5 — evaluator route fallback
+
+- **Severity:** procedural / tool availability.
+- **Observed:** the automatic OpenHands evaluation check skipped instead of producing an evaluator
+  transcript.
+- **Decision:** do not manually dispatch the cloud workflow. Launch the canonical separate local
+  Claude Code harness evaluator routed to OpenRouter `qwen/qwen3.7-max` at high effort.
+- **Resolution:** the independent session completed successfully and wrote `evaluate.md` with a
+  PASS verdict and no findings.
