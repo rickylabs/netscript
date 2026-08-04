@@ -41,9 +41,9 @@ runtimes make long-running work explicit, and generated resource wiring keeps pr
 dependencies, and telemetry in one operational model. These constraints cost flexibility; their
 value is that a team does not redesign the same seams independently in every service.
 
-The rest of NetScript makes those two decisions operational. Services serve the contract at request
-time, plugin runtimes own the work that outlives a request, and Aspire brings up the resources with
-their telemetry connected. The implementation details live in [Core concepts](/concepts/).
+NetScript makes those boundaries operational. Services serve the contract at request time, plugin
+runtimes own the work that outlives a request, and Aspire brings up the resources with their
+telemetry connected. The implementation details live in [Core concepts](/concepts/).
 
 ## 3. Compare the center of gravity
 
