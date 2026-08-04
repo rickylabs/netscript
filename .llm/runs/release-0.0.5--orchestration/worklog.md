@@ -1688,3 +1688,26 @@ canary.10; I own deciding the train.
 - **Owner: docsorch already owns the Quickstart page** (#1274 rewrite, PR #1215). No overlap —
   #1294 is the executable walk *gate* against the published CLI, and its page↔suite drift check
   is precisely what binds the two halves. Recorded so the split stays explicit.
+
+## 2026-08-04 — Owner directive: eradicate Zod 3, align on npm → #1295 filed with deno-info proof
+
+Owner recalled raising this before; it was not previously filed as a standalone issue (search
+found only symptoms: #1250 closed, #1249 backlog). Investigated with `deno info` (owner's
+prompt — it is the right instrument and gave the decisive line):
+
+- **`peer zod@^4.0.0: resolved to 3.25.76`** on `@modelcontextprotocol/sdk`, `@anthropic-ai/sdk`
+  and `openai` (×2 paths). That is a VIOLATED peer constraint, not a preference.
+- **Three Zod instances in one lock:** `jsr:@zod/zod@4.4.3` (all 18 workspace deno.json files),
+  `npm:zod@4.4.3` (better-call), `npm:zod@3.25.76` (the AI SDK cluster + zod-to-json-schema).
+- **No upstream blocker exists.** Every v3-bound package already accepts v4:
+  anthropic `^3.25.0 || ^4.0.0`, mcp-sdk `^3.25 || ^4.0`, openai `^3.25 || ^4.0`,
+  zod-to-json-schema@3.25.2 (latest) `^3.25.28 || ^4`. The v3 cluster exists because our own
+  code supplies Zod from JSR, leaving the npm subgraph nothing to dedupe onto.
+- Catalog law consequence: `catalog:` is npm-only, so while Zod is JSR it cannot be catalogued —
+  no single source of version truth for the most cross-cutting dependency in the repo.
+
+**#1295 filed** (0.0.5, p1) with acceptance requiring exactly one Zod instance in `deno info`,
+zero `zod@3` in the lock, and a guard test that fails if a second instance reappears (this class
+is invisible without one — same lesson as #1290's alias-string test). **Sequenced after
+canary.10**: a graph-wide dep change across 18 packages must not land under the wave-6 pilot
+gate. Recorded as a structural instance of #1278.
