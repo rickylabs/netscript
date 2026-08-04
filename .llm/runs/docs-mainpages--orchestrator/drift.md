@@ -52,3 +52,9 @@ Confirmed findings:
   pushed as e6ba61690. Lock churn kept out (deno.lock reset to HEAD before commit). The
   docs-lane no-packages boundary otherwise stands; permanent fixture tooling still routes
   to #1210.
+
+- **D-7 (owner override, 2026-08-04 ~11:15).** agy quota block persists; owner directed
+  replacing the blocked pair half with "codex or claude opus sub agent". Since Codex authored
+  outline-codex.md, the rival lane is a **Claude Opus subagent** (keeps the pair cross-family).
+  Scheduled agy retry killed; Opus subagent dispatched blind to the Codex outline, writing
+  outline-opus.md.
