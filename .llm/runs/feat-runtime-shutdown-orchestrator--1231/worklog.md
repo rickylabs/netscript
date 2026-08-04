@@ -43,3 +43,38 @@ four named phases. New phases require changing the single phase tuple plus contr
 Signal listener abstraction, forced drain cancellation, new drain implementations, and Aspire
 process control are intentionally absent.
 
+## 2026-08-04 — S1 host contract and behavior
+
+- Added `createRuntimeHost()` to the `@netscript/service` root surface.
+- The host accepts structural callbacks over existing drain handles and owns only phase ordering,
+  one shared timer, idempotency, and aggregate reporting.
+- Fixed order is service → workers → queue → database, stable within each phase.
+- A timed-out active drain cannot hold the returned promise beyond the controlled budget; remaining
+  resources are reported as skipped. Rejections are normalized and later drains continue.
+- Real timer effects live in an adapter; tests inject a controlled timer and contain no sleeps.
+- Updated the package README with the primary composition example and exact timeout semantics.
+
+### S1 gate evidence
+
+- Focused tests: 3 passed, 0 failed.
+- Scoped check: 45 files, 0 occurrences.
+- Scoped lint: 45 files, 0 occurrences.
+- Scoped fmt: 45 files, 0 findings.
+- Full-export doc lint: 3 entrypoints, 0 diagnostics.
+- `quality:gate`: exit 0; quality scan clean with seven unrelated existing allowances; root
+  doctrine sweep completed with repository-baseline warnings.
+- Focused service doctrine: `FAIL=0 WARN=3 INFO=1`, all pre-existing (two generated Scalar
+  inheritance warnings, one 531-line builder warning, existing architecture-doc info).
+
+### S1 supervisor review
+
+- Contract contains no service/worker/queue/database teardown implementation; every resource owns
+  its existing callback.
+- Timer side effects stay in `src/adapters`; runtime logic has no direct clock/process/global access.
+- Controlled-timer budget test proves return without resolving the slow drain.
+- No dependency or lockfile change belongs to this slice.
+
+### S1 reconcile
+
+PR #1285 remains draft with `Closes #1231`; issue acceptance stays open until S2 closes the caveat,
+debt, and final gates. No new comments changed scope.

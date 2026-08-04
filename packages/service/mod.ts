@@ -140,6 +140,19 @@ export type {
   ShutdownReport,
 } from './src/types.ts';
 
+export {
+  createRuntimeHost,
+  RUNTIME_HOST_SHUTDOWN_PHASES,
+  type RuntimeHost,
+  type RuntimeHostDrain,
+  type RuntimeHostDrainOutcome,
+  type RuntimeHostDrainStatus,
+  type RuntimeHostOptions,
+  type RuntimeHostShutdownPhase,
+  type RuntimeHostShutdownReport,
+  type RuntimeHostState,
+} from './src/runtime/runtime-host.ts';
+
 // Layer 2: Builders
 export {
   createService,

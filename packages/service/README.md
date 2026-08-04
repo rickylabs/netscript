@@ -28,6 +28,8 @@ not.
   `healthChecks.database`, `.kv`, `.service`, and `.custom` cover common dependencies.
 - **Graceful lifecycle** — `onShutdown()` registers LIFO teardown hooks; `serve()` drains in-flight
   requests, installs `SIGINT`/`SIGTERM` handlers, and accepts an external `AbortSignal`.
+- **One app-wide budget** — `createRuntimeHost()` invokes existing service, worker, queue, and
+  database drains in deterministic phase order and returns one aggregate report.
 - **Tracing on every request** — the builder registers tracing middleware as the outermost layer on
   every service, so each request gets a server span with W3C propagation and the service name
   recorded, with no per-service wiring.
@@ -73,6 +75,29 @@ const service = await defineService(router, {
 console.log(`listening on :${service.addr.port}`);
 await service.stop();
 ```
+
+Compose every in-process runtime behind one bounded shutdown handle without replacing its own drain:
+
+```ts
+import { createRuntimeHost } from '@netscript/service';
+
+const host = createRuntimeHost({
+  timeoutMs: 15_000,
+  drains: [
+    { id: 'api', phase: 'service', drain: () => service.stop() },
+    { id: 'jobs', phase: 'workers', drain: () => workers.stop('shutdown') },
+    { id: 'messages', phase: 'queue', drain: () => queue.stop() },
+    { id: 'primary-db', phase: 'database', drain: () => database.disconnect() },
+  ],
+});
+
+const report = await host.shutdown('SIGTERM');
+```
+
+The host drains `service → workers → queue → database`, preserving registration order inside each
+phase. Rejected drains are reported and do not prevent later phases. If the one shared budget
+expires, the active outcome is `timed-out`, remaining drains are `skipped`, and `shutdown()` returns
+without waiting indefinitely for the slow resource.
 
 Reach for `createService()` when a service needs explicit, stage-by-stage composition — and pull in
 `./auth` to guard it:
@@ -142,7 +167,7 @@ await running.stop();
 
 | Entry    | What it gives you                                                                                                                                     |
 | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `.`      | `defineService`, `createService`, `healthChecks`, `HEALTH_STATUS`, handler factories (`createRPCHandler`, `createOpenAPISpec`, `createScalarDocs`, …) |
+| `.`      | `defineService`, `createService`, `createRuntimeHost`, `healthChecks`, `HEALTH_STATUS`, handler factories (`createRPCHandler`, `createOpenAPISpec`, `createScalarDocs`, …) |
 | `./auth` | `createStaticCredentialAuthenticator`, `createTrustedHeaderAuthenticator`, `createScopeAuthorizer`, and the authn/authz port types                    |
 
 The always-current symbol list is

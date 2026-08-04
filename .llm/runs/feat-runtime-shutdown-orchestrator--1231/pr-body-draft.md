@@ -11,13 +11,13 @@ database drain paths. One deterministic order and one deadline now govern the wh
 ## Slices
 
 - [x] S0 research and locked design
-- [ ] S1 host contract, one-budget orchestration, and deterministic tests
+- [x] S1 host contract, one-budget orchestration, and deterministic tests
 - [ ] S2 caveat/debt burn-down and final evidence
 
 ## Validation
 
-- Focused runtime-host tests — pending
-- Scoped check/lint/fmt — pending
+- Focused runtime-host tests — 3 passed, 0 failed
+- Scoped check/lint/fmt — 45 files, zero findings
 - `packages/service` tests — pending
 - JSR/doc/publish gates — pending
 - Archetype quality gates — pending
@@ -34,8 +34,8 @@ database drain paths. One deterministic order and one deadline now govern the wh
 
 ## Definition of Done
 
-- [ ] Existing service, worker, queue, and database drains compose under one host budget.
-- [ ] Deterministic tests prove ordering, budget exhaustion, and partial-failure reporting.
+- [x] Existing service, worker, queue, and database drains compose under one host budget.
+- [x] Deterministic tests prove ordering, budget exhaustion, and partial-failure reporting.
 - [ ] The invalidated caveat marker/call-out and debt entry are removed; remaining warnings stay.
 - [ ] Required Archetype-3, service, docs, JSR, and consumer gates pass.
 
@@ -43,12 +43,11 @@ database drain paths. One deterministic order and one deadline now govern the wh
 issue: 1231
 entries:
   - box: "A composed shutdown orchestrator drains all app resources under a single budget, wrapping the existing per-resource drains (no new drain logic)."
-    evidence: "Pending S1 implementation and focused tests."
+    evidence: "createRuntimeHost root export; runtime-host_test.ts ordering and controlled-budget tests."
   - box: "Deterministic tests: ordering, budget exhaustion, partial-failure reporting."
-    evidence: "Pending S1 controlled-timer test evidence."
+    evidence: "runtime-host_test.ts: 3 passed, covering stable phase order, unresolved-drain budget exhaustion, and failure continuation/reporting."
   - box: "Caveat marker + call-out removed; debt entry closed."
     evidence: "Pending S2 marker/debt search."
   - box: "Archetype gates green."
     evidence: "Pending final gate table and IMPL-EVAL."
 ```
-
