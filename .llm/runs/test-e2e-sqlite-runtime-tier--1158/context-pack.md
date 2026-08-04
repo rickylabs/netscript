@@ -6,7 +6,7 @@
 | -------------- | ----------------------------------------- |
 | Run ID         | `test-e2e-sqlite-runtime-tier--1158`      |
 | Branch         | `test/e2e-sqlite-runtime-tier-1158`       |
-| Current phase  | `implement` — S6 complete; review handoff |
+| Current phase  | `implement` — S6a complete; review handoff |
 | Archetype      | `6 - CLI / Tooling`                       |
 | Scope overlays | `service`                                 |
 
@@ -66,6 +66,14 @@ job. An independent concurrency group prevents either runtime tier from queueing
 `lane-visibility` now reports the sqlite result. The three frozen `ci:*` labels and the existing
 postgres/draft jobs are unchanged.
 
+S6a closes the adversarial diagnostics/test gap without changing that boolean. Every sqlite policy
+branch now contributes an explicit reason: skipped by `ci:skip-e2e`, skipped because the static
+signal is off (including `ci:skip-scaffold`), forced by `ci:full`, or selected by the scaffold
+signal. Workflow-source coverage pins non-PR `ci:skip-scaffold`, lane visibility, concurrency and
+artifact distinctness, auxiliary report globs, and the suite id exported from `cli-surface.ts`.
+The workflow and classifier prose now state the derived `ci:skip-scaffold` effect, and only the two
+stale label descriptions changed; the frozen label set remains exactly three.
+
 ## Completed
 
 - Skills activated: `netscript-harness`, `netscript-doctrine` (archetype + verdict),
@@ -104,10 +112,13 @@ postgres/draft jobs are unchanged.
 - S6 implementation completed with the full classifier matrix, failed-classifier and
   `diff_unavailable` workflow assertions, lane visibility, and an explicit YAML parse. All four
   requested gates passed; 54 classifier/draft-policy tests passed.
+- S6a diagnostics remediation completed with all reason branches and named mutation holes pinned,
+  sibling-aligned report collection, explicit `@std/yaml` parsing, and all gates green: 56 tests
+  plus scoped check/lint/fmt with zero findings.
 
 ## In Progress
 
-- **S6 is ready for its one-commit implementation handoff.** This lane does not review,
+- **S6a is ready for its one-commit implementation handoff.** This lane does not review,
   self-certify, dispatch a reviewer, author a sign-off commit, or start S7.
 
 ## Next Steps
@@ -140,15 +151,16 @@ postgres/draft jobs are unchanged.
 | `.github/scripts/ci-classify-changes.ts`                                 | `run_runtime_sqlite` decision, output, log, and fail-closed default.      |
 | `.github/scripts/ci-classify-changes.test.ts`                            | Policy matrix plus workflow guard/output assertions.                     |
 | `.github/workflows/e2e-cli.yml`                                         | New runtime job, independent concurrency, and lane-visibility reporting. |
+| `.github/labels.yml`                                                     | Description-only corrections for `ci:full` and `ci:skip-e2e`.            |
 
-No `labels.yml`, draft guard, postgres runtime job, `packages/**`, `plugins/**`, live runtime,
-product cache default, or embedded-template file was touched.
+No label was added, renamed, or removed. No draft guard, postgres runtime job, `packages/**`,
+`plugins/**`, live runtime, product cache default, or embedded-template file was touched.
 
 ## Gates
 
 | Gate family | Current status | Evidence                                                        |
 | ----------- | -------------- | --------------------------------------------------------------- |
-| Static      | `PASS`         | 54 tests; scoped check/lint/fmt over 3 `.github` TS files.      |
+| Static      | `PASS`         | 56 tests; scoped check/lint/fmt over 3 `.github` TS files.      |
 | YAML        | `PASS`         | `@std/yaml` parsed `.github/workflows/e2e-cli.yml`.              |
 | Fitness     | `N/A`          | No `packages/**` or `plugins/**`; quality/architecture omitted. |
 | Runtime     | `NOT_RUN`      | Forbidden for S6; S7 is the first live sqlite run.              |

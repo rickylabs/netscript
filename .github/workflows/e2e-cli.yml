@@ -48,8 +48,9 @@ name: e2e-cli
 #     workflows, toolchain config (#1151/#1152).
 #   - Only `e2e-cli.yml` and `ci.yml` escalate the scaffold tiers; other
 #     workflow edits and tasks-only root `deno.json` diffs do not (#1122).
-#   - `ci:skip-scaffold` -> skip scaffold-static; `ci:skip-e2e` -> skip both
-#     runtime tiers; `ci:full` -> force everything regardless.
+#   - `ci:skip-scaffold` -> skip scaffold-static and its derived sqlite runtime
+#     tier; `ci:skip-e2e` -> skip both runtime tiers; `ci:full` -> force
+#     everything regardless.
 #
 # The jobs run + report SUCCESS rather than using `paths-ignore`/job-level `if`,
 # so they never strand a required status check if promoted to one later. ci.yml
@@ -395,7 +396,10 @@ jobs:
         uses: actions/upload-artifact@v5
         with:
           name: e2e-cli-scaffold-runtime-sqlite-report
-          path: .llm/tmp/e2e-report-scaffold-runtime-sqlite.json
+          path: |
+            .llm/tmp/**/report*.json
+            .llm/tmp/**/report*.ndjson
+            **/e2e-report*.json
           if-no-files-found: ignore
 
   desktop-native-linux:

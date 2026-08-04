@@ -675,6 +675,42 @@ S6 matches locked decision E5 and risks R-6/R-7/R-8 without plan/doctrine diverg
 `drift.md` is unchanged. This implementation lane hands off one commit and does not review,
 self-certify, dispatch a reviewer, author a sign-off, or start S7.
 
+### S6a Adversarial Diagnostics Follow-up
+
+The sqlite classifier branch now contributes its own operator-facing reason clause. The clause
+states whether `ci:skip-e2e` skipped the tier, the `scaffold-static` signal is off (including
+`ci:skip-scaffold`), `ci:full` forced it, or the scaffold signal selected it. The existing
+`runRuntimeSqlite = runStatic && !skipE2e` policy is unchanged. Non-PR coverage now pins the
+`!skipScaffold` conjunct that was previously mutation-survivable.
+
+The workflow-source test now pins the sqlite job's `lane-visibility` dependency and summary row,
+its concurrency group, its distinct artifact name, and its report globs. It reads the exported
+`RUNTIME_SQLITE` value from `packages/cli/e2e/src/domain/cli-surface.ts` and asserts the workflow
+invocation against that value, so the test contains no duplicate suite-id literal and no
+`packages/**` edit. The sqlite artifact upload now uses the postgres sibling's three report globs,
+including auxiliary `report*.ndjson` output.
+
+Only the requested policy prose changed: `ci:skip-scaffold` now plainly documents that the derived
+sqlite tier also drops, and the two stale `ci:*` label descriptions now describe all expensive jobs
+and both runtime tiers. The frozen label names/count remain unchanged.
+
+| Gate       | Command                                                                                         | Raw result                                    |
+| ---------- | ----------------------------------------------------------------------------------------------- | --------------------------------------------- |
+| classifier | `deno test --no-lock -A .github/scripts/`                                                       | exit 0; 56 passed, 0 failed                   |
+| type-check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root .github --ext ts`        | exit 0; 3 files, 1 batch, 0 findings          |
+| lint       | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root .github --ext ts`         | exit 0; 3 files, 1 batch, 0 findings          |
+| format     | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root .github --ext ts`          | exit 0; 3 files, 1 batch, 0 findings          |
+| YAML       | `deno eval --no-lock` with `jsr:@std/yaml@^1.0.0` over `.github/workflows/e2e-cli.yml`          | exit 0; parsed to a mapping                   |
+
+`quality:scan` and `arch:check` are **N/A** because S6a changes no `packages/**` or `plugins/**`
+source. The package file is read-only test input. No live runtime gate was run; S7 still owns the
+first sqlite execution.
+
+**Post-slice reconcile note.** S6a is the owner-requested remediation for issue #1158 / PR #1220.
+It stays inside E5 and risks R-6/R-8, changes no labels or milestone state, and introduces no plan,
+doctrine, or scope divergence; `drift.md` is unchanged. This implementation lane will push one
+commit, post its evidence comment, and stop without review or sign-off.
+
 ## Handoff Notes
 
 - **Read `research.md` § Re-baseline first.** The carried-in draft's stated blocker was wrong; the
@@ -683,6 +719,7 @@ self-certify, dispatch a reviewer, author a sign-off, or start S7.
   executable arm under `NETSCRIPT_CACHE_MODE=Executable` on CI, and (b) that S1's permission change
   leaves every non-sqlite scaffold byte-identical.
 - No product code exists at PLAN-EVAL time. Implementation begins only on `PASS`.
-- S1–S5 are signed off. S6 is implementation-complete with green automated gates but is **not
+- S1–S5 are signed off. S6 + S6a are implementation-complete with green automated gates but are **not
   self-certified**. Tier-A must review the classifier conjunction, workflow fail-closed guards,
-  independent concurrency, and lane visibility before sign-off; do not start S7 from this handoff.
+  reason clauses, artifact collection, independent concurrency, and lane visibility before sign-off;
+  do not start S7 from this handoff.
