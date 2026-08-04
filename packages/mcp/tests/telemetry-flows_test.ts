@@ -1,4 +1,4 @@
-import { assert, assertEquals } from '@std/assert';
+import { assert, assertEquals, assertStringIncludes } from '@std/assert';
 import {
   NetScriptExecutionAttributes,
   NetScriptJobAttributes,
@@ -42,7 +42,13 @@ Deno.test('all four telemetry flows return bounded semantic summaries', async ()
   assertEquals((run.value as { spans: unknown[] }).spans.length, 1);
   const errors = await createGetRecentErrorsFlow(query)({ limit: 1 });
   assert(errors.ok);
-  assertEquals((errors.value as { groups: unknown[] }).groups.length, 1);
+  const errorGroups = (errors.value as {
+    groups: { service: string; operationSchemaHint: string }[];
+  }).groups;
+  assertEquals(errorGroups.length, 1);
+  assertEquals(errorGroups[0]?.service, 'worker');
+  assertStringIncludes(errorGroups[0]?.operationSchemaHint ?? '', 'get_operation_schema');
+  assertStringIncludes(errorGroups[0]?.operationSchemaHint ?? '', 'worker');
 });
 
 Deno.test('trace intelligence flows apply windows and return structured empty summaries', async () => {

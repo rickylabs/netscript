@@ -98,6 +98,15 @@ Deno.test('doctor aggregation counts severities and isolates family failures', a
   assertEquals(doctor.status, 'fail');
   assertEquals(doctor.counts, { pass: 1, warn: 1, fail: 1 });
   assertEquals(doctor.families.map((family) => family.status), ['pass', 'warn', 'fail']);
+  assertStringIncludes(
+    doctor.families[1]?.checks[0]?.operationSchemaHint ?? '',
+    'get_operation_schema',
+  );
+  assertStringIncludes(
+    doctor.families[2]?.checks[0]?.operationSchemaHint ?? '',
+    'get_operation_schema',
+  );
+  assertEquals(doctor.families[0]?.checks[0]?.operationSchemaHint, undefined);
 });
 
 Deno.test('real doctor flow stays within its advertised schema for large families', async () => {

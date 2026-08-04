@@ -1,0 +1,22 @@
+{
+  "project": "prior-release-fixture",
+  "mcpServers": {
+    "other": {
+      "command": "other"
+    },
+    "netscript": {
+      "command": "deno",
+      "args": [
+        "run",
+        "--config",
+        "/workspace/prior-release/deno.json",
+        "-A",
+        "jsr:@netscript/cli@0.0.4",
+        "agent",
+        "mcp",
+        "--project-root",
+        "/workspace/prior-release"
+      ]
+    }
+  }
+}
