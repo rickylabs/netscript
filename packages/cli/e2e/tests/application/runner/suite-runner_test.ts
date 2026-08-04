@@ -13,9 +13,14 @@ import type { HttpClient, HttpRequest, HttpResult } from '../../../src/ports/htt
 import type { Reporter } from '../../../src/ports/reporter.ts';
 import type { PlatformPort } from '../../../src/ports/platform.ts';
 import { createSuiteRunner } from '../../../src/application/runner/suite-runner.ts';
-import type { SuiteLease, SuiteLeaseManager } from '../../../src/application/runner/suite-lease.ts';
+import {
+  type SuiteLease,
+  SuiteLeaseContentionError,
+  type SuiteLeaseManager,
+  type SuiteLeaseRecord,
+} from '../../../src/application/runner/suite-lease.ts';
 import { GATE, SCAFFOLD } from '../../../src/domain/cli-surface.ts';
-import type { SuiteId } from '../../../src/domain/cli-surface.ts';
+import type { ExpensiveRuntimeSuiteId, SuiteId } from '../../../src/domain/cli-surface.ts';
 import type { RunOptions } from '../../../src/domain/run-context.ts';
 import {
   createScaffoldCapabilitySuite,
@@ -216,6 +221,40 @@ Deno.test('suite runner releases the expensive-suite lease when suite execution 
   await nextLease.release();
 });
 
+Deno.test('expensive runtime suites contend for one lease in both directions', async () => {
+  const cases = [
+    [SCAFFOLD.RUNTIME, SCAFFOLD.RUNTIME_SQLITE],
+    [SCAFFOLD.RUNTIME_SQLITE, SCAFFOLD.RUNTIME],
+  ] as const;
+
+  for (const [holderId, contenderId] of cases) {
+    const leaseManager = new RecordingSuiteLeaseManager();
+    const heldLease = await leaseManager.acquire(holderId, '/worktrees/holder');
+    const suite = createScaffoldRuntimeSuite(
+      { repoRoot: '/worktrees/contender', format: 'json' },
+      contenderId,
+    );
+    const runner = createSuiteRunner({
+      clock: new FakeClock(),
+      commandExecutor: new SuccessfulCommandExecutor(),
+      httpClient: new FakeHttpClient(),
+      reporter: new NullReporter(),
+      platform: new FakePlatform(),
+      suiteLeaseManager: leaseManager,
+    });
+
+    try {
+      const error = await assertRejects(
+        () => runner.run(suite, { suiteId: suite.id, options: suite.defaultOptions }),
+        SuiteLeaseContentionError,
+      );
+      assertEquals(error.holder.suiteId, holderId);
+    } finally {
+      await heldLease.release();
+    }
+  }
+});
+
 Deno.test('suite runner does not interact with the lease for a cheap suite', async () => {
   const leaseManager = new RecordingSuiteLeaseManager();
   const capability = scaffoldCapabilitySuites.find((suite) => suite.id === SCAFFOLD.SERVICE);
@@ -251,9 +290,12 @@ class FakePlatform implements PlatformPort {
   }
 }
 
-function createScaffoldRuntimeSuite(overrides: Partial<RunOptions>) {
-  const capability = scaffoldCapabilitySuites.find((suite) => suite.id === SCAFFOLD.RUNTIME);
-  if (!capability) throw new Error('scaffold.runtime suite is not registered.');
+function createScaffoldRuntimeSuite(
+  overrides: Partial<RunOptions>,
+  suiteId: ExpensiveRuntimeSuiteId = SCAFFOLD.RUNTIME,
+) {
+  const capability = scaffoldCapabilitySuites.find((suite) => suite.id === suiteId);
+  if (!capability) throw new Error(`${suiteId} suite is not registered.`);
   return createScaffoldCapabilitySuite(capability, overrides);
 }
 
@@ -285,15 +327,24 @@ class SuccessfulCommandExecutor implements CommandExecutor {
 class RecordingSuiteLeaseManager implements SuiteLeaseManager {
   acquisitions = 0;
   releases = 0;
-  #held = false;
+  #holder: SuiteLeaseRecord | undefined;
 
-  acquire(_suiteId: SuiteId, _worktree: string): Promise<SuiteLease> {
-    if (this.#held) return Promise.reject(new Error('lease already held'));
-    this.#held = true;
+  acquire(suiteId: SuiteId, worktree: string): Promise<SuiteLease> {
+    if (this.#holder) {
+      return Promise.reject(
+        new SuiteLeaseContentionError(this.#holder, '/tmp/netscript-e2e-runner-test.lease'),
+      );
+    }
+    this.#holder = {
+      pid: 4242,
+      startedAt: '2026-08-04T00:00:00.000Z',
+      suiteId,
+      worktree,
+    };
     this.acquisitions += 1;
     return Promise.resolve({
       release: () => {
-        this.#held = false;
+        this.#holder = undefined;
         this.releases += 1;
         return Promise.resolve();
       },

@@ -6,7 +6,7 @@
 | -------------- | ------------------------------------------------- |
 | Run ID         | `test-e2e-sqlite-runtime-tier--1158`              |
 | Branch         | `test/e2e-sqlite-runtime-tier-1158`               |
-| Current phase  | `implement` — S4 complete; awaiting Tier-A review |
+| Current phase  | `implement` — S4a correction complete; handoff   |
 | Archetype      | `6 - CLI / Tooling`                               |
 | Scope overlays | `service`                                         |
 
@@ -40,6 +40,14 @@ because those masked capability defaults (drift D-10); unchanged suite defaults 
 Wait gates are tested against `runtimeResources()` for sqlite and postgres, with Garnet retained in
 both and no database resource wait on sqlite.
 
+S4a corrects the adversarial-review finding in S4's lease surface. A shared
+`EXPENSIVE_RUNTIME_SUITE_IDS` tuple now contains both runtime tiers, and the suite runner acquires
+the expensive-suite lease by membership rather than a literal postgres id comparison. Runner tests
+prove postgres-held→sqlite and sqlite-held→postgres contention both raise
+`SuiteLeaseContentionError`; the existing cheap `scaffold.service` path still takes no lease.
+`suite-lease.ts` remains unchanged because its `isSuiteId` parser already accepts every
+`SCAFFOLD` value. The built-in suites table now discovers the container-free sqlite tier.
+
 ## Completed
 
 - Skills activated: `netscript-harness`, `netscript-doctrine` (archetype + verdict),
@@ -67,17 +75,20 @@ both and no database resource wait on sqlite.
 - S4 implementation completed with the additive suite profile, operator-first cache-mode seam, real
   CLI default/override coverage, and wait/resource consistency assertions. All six required gates
   passed: 104 E2E tests plus scoped check/lint/fmt, `quality:scan`, and `arch:check`.
+- S4a lease correction completed with bidirectional runtime-tier contention coverage and the cheap
+  suite negative control. All six requested gates passed: 105 E2E tests, scoped check/lint/fmt,
+  `quality:scan`, and `arch:check`; `e2e:cli suites` listed both runtime tiers.
 
 ## In Progress
 
-- **S4 awaits Tier-A substantive review.** The implementation lane has not reviewed, dispatched a
-  reviewer, self-certified, or authored a sign-off commit.
+- **S4a is ready for its one-commit implementation handoff.** This lane does not review,
+  self-certify, dispatch a reviewer, or author a sign-off commit.
 
 ## Next Steps
 
-1. Tier-A supervisor reviews S4 and authors any sign-off commit.
-2. **Stop before S5.** S5 requires a new slice instruction; do not start it from this handoff.
-3. Gate phase: scoped wrappers + `quality:scan` + `arch:check` + `publish:dry-run`, then the
+1. Supervisor resumes from the S4a commit and PR evidence under the owner-defined review boundary.
+2. **Stop before S5.** S5 remains separately planned; do not start it from this handoff.
+3. Later gate phase: scoped wrappers + `quality:scan` + `arch:check` + `publish:dry-run`, then the
    postgres `scaffold.runtime` regression run.
 4. IMPL-EVAL in a third session.
 
@@ -95,28 +106,27 @@ both and no database resource wait on sqlite.
 | `D6` merge-readiness stays postgres                                                  | issue #1158 constraints                              | No change to `full-command.ts`.                              |
 | `D8` Docker cleanup tolerant on both failure paths                                   | code — `docker-resource-cleaner.ts:9-43`             | Missing binary **and** non-zero `docker ps`.                 |
 
-## Files Changed
+## S4a Files Changed
 
-| Path                                                                           | Status   | Notes                                                                 |
-| ------------------------------------------------------------------------------ | -------- | --------------------------------------------------------------------- |
-| `.llm/runs/test-e2e-sqlite-runtime-tier--1158/{worklog,context-pack,drift}.md` | modified | S4 evidence, handoff state, and D-10/D-11 drift.                     |
-| `packages/cli/e2e/src/domain/cli-surface.ts`                                   | modified | Additive sqlite runtime id and title.                                 |
-| `packages/cli/e2e/suites/scaffold/capability-suites.ts`                        | modified | SQLite/cache-off profile and operator-first executable-cache seam.    |
-| `packages/cli/e2e/src/application/gates/scaffold/runtime-gates.ts`             | modified | Exported documented resource list for cross-site consistency testing. |
-| `packages/cli/e2e/src/presentation/cli/commands/run-command.ts`                | modified | Generic run no longer masks per-suite db/cache defaults.              |
-| `packages/cli/e2e/tests/presentation/{suite-registry,cli-program}_test.ts`     | modified | Registry, CLI precedence, environment, and wait/resource regressions. |
+| Path                                                                            | Notes                                                                  |
+| ------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| `.llm/runs/test-e2e-sqlite-runtime-tier--1158/{worklog,context-pack,drift}.md`  | S4a evidence, handoff state, supervisor D-12, and defect drift D-13.    |
+| `packages/cli/e2e/src/domain/cli-surface.ts`                                    | Shared expensive-runtime tuple and derived union.                       |
+| `packages/cli/e2e/src/application/runner/suite-runner.ts`                       | Lease acquisition by shared-set membership.                             |
+| `packages/cli/e2e/tests/application/runner/suite-runner_test.ts`                | Bidirectional contention plus retained cheap-suite coverage.            |
+| `packages/cli/e2e/README.md`                                                    | Discoverable container-free sqlite tier in the built-in suites table.   |
 
-No `packages/cli/src/**`, `.github/**`, cleanup adapter, live runtime, product cache default, or
-embedded-template file was touched.
+No `suite-lease.ts`, `packages/cli/src/**`, `.github/**`, cleanup adapter/call site, live runtime,
+product cache default, or embedded-template file was touched.
 
 ## Gates
 
 | Gate family | Current status | Evidence                                           |
 | ----------- | -------------- | -------------------------------------------------- |
-| Static      | `PASS`         | S4 scoped check/lint/fmt: 786 files, 0 findings.   |
-| Fitness     | `PASS`         | S4 `quality:scan` and `arch:check` exited 0.       |
+| Static      | `PASS`         | S4a scoped check/lint/fmt: 786 files, 0 findings.  |
+| Fitness     | `PASS`         | S4a `quality:scan` and `arch:check` exited 0.      |
 | Runtime     | `NOT_RUN`      | S7 is the first live sqlite run.                   |
-| Consumer    | `PASS`         | S4: 104 E2E tests; suite list and CLI path proven. |
+| Consumer    | `PASS`         | S4a: 105 E2E tests; bidirectional contention.      |
 
 ## Open Questions
 
@@ -135,7 +145,9 @@ embedded-template file was touched.
   probe corrected the partial handoff evidence (minor); D-7 self-certification breach (significant);
   D-8 owner-authorized supplementary verification lane (minor); D-9 adversarial-check escalation
   order (minor); D-10 generic `run` defaults masked capability defaults (significant); D-11
-  concurrent supervisor commit swept the S4 worktree (significant). All in `drift.md`.
+  concurrent supervisor commit swept the S4 worktree (significant); D-12 assigns that sweep to the
+  supervisor (significant); D-13 records S4's omitted sqlite lease membership (significant). All in
+  `drift.md`.
 - **Debt:** two entries to create at Close — the unreachable `Mode: 'Local'` cache arm, and
   `SCAFFOLD_DEFAULTS.CACHE_BACKEND: 'redis'` forcing a container on every scaffold.
 

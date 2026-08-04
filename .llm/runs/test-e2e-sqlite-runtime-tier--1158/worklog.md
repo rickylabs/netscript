@@ -57,6 +57,8 @@ speculative port for a need this run does not have.
 
 - `SCAFFOLD.RUNTIME_SQLITE = 'scaffold.runtime.sqlite'` (`e2e/src/domain/cli-surface.ts`)
 - `SCAFFOLD_TITLE.RUNTIME_SQLITE = 'Runtime scaffold capability smoke (sqlite, no docker)'`
+- `EXPENSIVE_RUNTIME_SUITE_IDS` — the shared tuple containing both runtime tiers, with the
+  `ExpensiveRuntimeSuiteId` union derived from it.
 - `NETSCRIPT_CACHE_MODE` value `'Executable'` — referenced through one named constant in the sqlite
   suite module, not as a bare string at two call sites.
 - Gate ids: **none added**. The sqlite suite reuses `RUNTIME_GATES` verbatim (D4 filters nothing);
@@ -94,7 +96,8 @@ To add another container-free tier (say mysql-less, or a bare-runtime tier), a c
 1. adds the id + title to `SCAFFOLD` / `SCAFFOLD_TITLE` in `e2e/src/domain/cli-surface.ts`;
 2. appends one entry to `scaffoldCapabilitySuites` in `suites/scaffold/capability-suites.ts` with a
    `gates` list and a `defaults` object;
-3. adds a CI job by copying the `scaffold-runtime-sqlite` block and its classifier output.
+3. adds the id to `EXPENSIVE_RUNTIME_SUITE_IDS` when it shares the runtime smoke root and resources;
+4. adds a CI job by copying the `scaffold-runtime-sqlite` block and its classifier output.
 
 No gate-filtering logic to touch: waits are derived from the suite's resolved options.
 
@@ -114,6 +117,7 @@ No gate-filtering logic to touch: waits are derived from the suite's resolved op
 | 2026-08-04 | S2        | **Tier-A slice review — ACCEPTED**                    | Supervisor reproduced the six gates, verified the no-cache materialized config, and found no issues. Sign-off commit `47caa6bb`.                                                                                                                                    |
 | 2026-08-04 | S3        | Implementation and generator gates complete           | Added the optional capability defaults contract, one top-level defaults-under-overrides merge, precedence + database-gate tests, and an exact options baseline for all eight existing built-ins. All six required gates passed; Tier-A review is pending.           |
 | 2026-08-04 | S4        | Implementation and generator gates complete           | Added the sqlite runtime id/profile, inherited executable Garnet mode, registry/CLI precedence coverage, and wait/resource consistency checks. All six required gates passed; Tier-A review is pending.                                                             |
+| 2026-08-04 | S4a       | Expensive-suite lease correction complete              | Centralized both runtime ids in one derived finite vocabulary, made sqlite and postgres contend in both directions, retained the cheap-suite negative control, and documented the sqlite tier. All six requested gates passed.                                      |
 
 ## Slice Review — S1 (Tier-A, supervisor)
 
@@ -338,8 +342,40 @@ invariant, recorded as drift **D-7**. This is the supervisor's own review, perfo
 | Apps own no permission-bearing command               | significant | yes (D-5 + ruling) |
 | Generic `run` defaults masked suite defaults         | significant | yes (D-10)         |
 | Concurrent supervisor commit swept S4 worktree      | significant | yes (D-11)         |
+| S4 omitted sqlite from the expensive-suite lease set | significant | yes (D-13)         |
 
 ## Gate Results
+
+### S4a Lease-Contention Correction
+
+`EXPENSIVE_RUNTIME_SUITE_IDS` is the single finite vocabulary for suites that share the expensive
+runtime path and lease. Its derived `ExpensiveRuntimeSuiteId` union keeps future additions tied to
+that constant. `suite-runner.ts` now acquires the lease when the suite id is a member. The existing
+`isSuiteId` parser in `suite-lease.ts` was verified unchanged: it already derives accepted ids from
+all `SCAFFOLD` and `DEPLOY` values, so `scaffold.runtime.sqlite` is valid lease metadata.
+
+The runner test holds a postgres lease and starts sqlite, then holds sqlite and starts postgres. In
+both directions the contender raises `SuiteLeaseContentionError` and identifies the held suite.
+The existing `scaffold.service` test still records zero acquisitions. No Docker cleanup code or
+snapshot call site changed.
+
+| Gate       | Command                                                                                           | Raw result                                                      |
+| ---------- | ------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| E2E tests  | `deno test --no-lock -A packages/cli/e2e/`                                                        | exit 0; 105 passed, 0 failed                                    |
+| type-check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/cli --ext ts,tsx` | exit 0; 786 files, 7 batches, 0 failed batches, 0 findings      |
+| lint       | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/cli --ext ts,tsx`  | exit 0; 786 files, 4 batches, 0 findings                        |
+| format     | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/cli --ext ts,tsx`   | exit 0; 786 files, 4 batches, 0 failed batches, 0 findings      |
+| quality    | `deno task quality:scan`                                                                          | exit 0; `ok: true`, 0 findings, 7 pre-existing allowances       |
+| doctrine   | `deno task arch:check`                                                                            | exit 0; existing out-of-scope dependency/doctrine warnings only |
+
+**Discovery evidence.** `deno task e2e:cli suites` exited 0 and listed both
+`scaffold.runtime` and `scaffold.runtime.sqlite`. Per the owner boundary, no runtime suite was
+started.
+
+**Post-slice reconcile note.** S4a changes only the shared E2E vocabulary, runner predicate,
+runner regressions, README suite table, and harness evidence. It does not touch `suite-lease.ts`,
+Docker cleanup, `.github/**`, or `packages/cli/src/**`. The implementation lane performs one
+commit/push/PR-comment handoff and stops without dispatching a reviewer or authoring a sign-off.
 
 ### S4 Slice Gates
 

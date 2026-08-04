@@ -3,7 +3,7 @@ import type { StepResult } from '../../domain/report.ts';
 import type { GateDefinition } from '../../domain/gate-definition.ts';
 import type { RunRequest } from '../../domain/run-context.ts';
 import type { SuiteDefinition } from '../../domain/suite-definition.ts';
-import { GATE, SCAFFOLD } from '../../domain/cli-surface.ts';
+import { EXPENSIVE_RUNTIME_SUITE_IDS, GATE } from '../../domain/cli-surface.ts';
 import type { Clock } from '../../ports/clock.ts';
 import type { CommandExecutor } from '../../ports/command-executor.ts';
 import type { DockerResourceCleaner } from '../../ports/docker-resource-cleaner.ts';
@@ -58,7 +58,7 @@ export interface SuiteRunner {
 export function createSuiteRunner(options: SuiteRunnerOptions): SuiteRunner {
   return {
     async run(suite, request) {
-      const lease = suite.id === SCAFFOLD.RUNTIME
+      const lease = EXPENSIVE_RUNTIME_SUITE_IDS.some((suiteId) => suiteId === suite.id)
         ? await options.suiteLeaseManager.acquire(suite.id, request.options.repoRoot)
         : undefined;
       try {

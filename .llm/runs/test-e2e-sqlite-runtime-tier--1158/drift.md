@@ -255,8 +255,51 @@ documentation.
   with the S4 drift entry.
 - **Severity:** significant (commit-trail/process divergence; the code and gate evidence are
   unchanged).
-- **Action:** do not rewrite or discard a pushed owner/supervisor commit. Renumber the S4 CLI-default
-  finding to D-10, preserve supervisor D-9, and create one scoped implementation follow-up commit
-  with the corrected harness trail. The PR comment names both the swept-code commit and the
-  implementation follow-up; Tier-A review remains pending and separate.
+- **Action:** do not rewrite or discard a pushed owner/supervisor commit. Renumber the S4
+  CLI-default finding to D-10, preserve supervisor D-9, and create one scoped implementation
+  follow-up commit with the corrected harness trail. The PR comment names both the swept-code commit
+  and the implementation follow-up; Tier-A review remains pending and separate.
 - **Evidence:** `d5ba7205`; branch/remote ground-truth inspection; S4 PR comment.
+
+## 2026-08-04 — D-12 (supervisor ruling) the D-11 sweep was the supervisor's fault
+
+- **What:** Root-cause ownership for D-11. The implementation lane's account is accurate, but the
+  cause was **the supervisor's**, not the lane's: the supervisor ran
+  `git add .llm/runs/test-e2e-sqlite-runtime-tier--1158/` and committed while a Tier-D lane was
+  actively working in the **same worktree**, sweeping the lane's uncommitted S4 source and tests
+  into `d5ba7205` — a commit whose stated purpose was only the D-9 routing refinement.
+- **Source:** `git show --stat d5ba7205` lists nine `packages/cli/e2e/**` paths that the commit
+  message does not mention.
+- **Expected:** harness artifact commits by the supervisor touch only the run dir, and the
+  implementation lane authors its own implementation commit.
+- **Actual:** a supervisor commit carries S4's implementation, and its message under-describes it.
+- **Severity:** significant (commit trail; no product effect — the code and gate evidence are
+  identical either way)
+- **Action:** accept the history as-is; do **not** rewrite a pushed commit to make the trail look
+  tidier. The corrective is procedural and applies for the rest of this run: **the supervisor does
+  not commit while an implementation lane is live in the worktree.** Run-dir updates by the
+  supervisor either wait for the lane to finish, or are staged with explicit per-file pathspecs
+  after confirming no lane is active. The PR comment for S4 names both commits so a reader is not
+  misled by `d5ba7205`'s message.
+- **Note:** the lane's response was correct — it preserved the pushed commit, renumbered its own
+  drift entry to avoid colliding with the supervisor's D-9, and landed a scoped follow-up
+  (`b0c6ef89`) instead of rewriting history.
+- **Evidence:** `d5ba7205`, `b0c6ef89`, D-11 above.
+
+## 2026-08-04 — D-13 S4 omitted sqlite from the expensive-suite lease
+
+- **What:** adversarial review found that `scaffold.runtime.sqlite` reused the full 68-gate runtime
+  path and smoke root but the suite runner acquired the exclusive lease only for the literal
+  `scaffold.runtime` id.
+- **Source:** `packages/cli/e2e/src/application/runner/suite-runner.ts`; owner S4a correction brief.
+- **Expected:** every suite that starts the shared Aspire/runtime resource graph contends for the
+  same expensive-suite lease and reports honest contention before touching the smoke root.
+- **Actual:** sqlite could run beside postgres, another sqlite run, or another worktree without
+  raising `SuiteLeaseContentionError`.
+- **Severity:** significant (runtime-suite isolation and verdict integrity)
+- **Action:** add one shared `EXPENSIVE_RUNTIME_SUITE_IDS` constant with a derived union in the E2E
+  domain vocabulary; make the runner acquire by membership; prove postgres→sqlite and
+  sqlite→postgres contention while retaining the cheap-suite negative control; document the sqlite
+  tier. Leave `suite-lease.ts` and Docker cleanup unchanged.
+- **Evidence:** S4a runner tests; 105-test E2E pass; scoped check/lint/fmt, `quality:scan`, and
+  `arch:check` passes recorded in `worklog.md`.

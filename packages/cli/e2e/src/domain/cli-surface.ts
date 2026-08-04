@@ -11,6 +11,12 @@ export const SCAFFOLD = {
   USERLAND_INSTALL: 'scaffold.userland-install',
 } as const;
 
+/** Suite ids that require exclusive access to the expensive runtime path. */
+export const EXPENSIVE_RUNTIME_SUITE_IDS = [
+  SCAFFOLD.RUNTIME,
+  SCAFFOLD.RUNTIME_SQLITE,
+] as const;
+
 /** Stable titles for built-in suites. */
 export const SCAFFOLD_TITLE = {
   SERVICE: 'Service scaffold capability smoke',
@@ -154,6 +160,8 @@ export const ASPIRE_RESOURCE = {
 } as const;
 
 export type ScaffoldSuiteId = typeof SCAFFOLD[keyof typeof SCAFFOLD];
+/** Built-in suites that require exclusive access to the expensive runtime path. */
+export type ExpensiveRuntimeSuiteId = typeof EXPENSIVE_RUNTIME_SUITE_IDS[number];
 export type DeploySuiteId = typeof DEPLOY[keyof typeof DEPLOY];
 export type SuiteId = ScaffoldSuiteId | DeploySuiteId;
 export type GatePhase = typeof GATE_PHASE[keyof typeof GATE_PHASE];
