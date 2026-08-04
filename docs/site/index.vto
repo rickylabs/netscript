@@ -1,53 +1,83 @@
 ---
 layout: layouts/base.vto
-title: NetScript — durable, typed applications on Deno
+title: NetScript — the Deno meta-framework for typed, observable systems
 ---
 
 {{ comp.hero({
-  tagline: "Your checkout survives the crash. Your types survive the refactor.",
-  subhead: "NetScript gives you durable state machines, one typed contract across the stack, and an observed resource graph — on Deno, without a hosted platform.",
+  tagline: "Define the boundary once. NetScript carries it through the stack.",
+  subhead: "NetScript is a meta-framework for Deno. It composes Fresh, Hono, oRPC, and .NET Aspire into one workspace, where a typed contract flows from schema to service to rendered page — and the whole system runs as one observed resource graph.",
   ctas: [
-    { label: "Start a workspace", href: "/quickstart/", primary: true }
+    { label: "Start a workspace", href: "/quickstart/", primary: true },
+    { label: "Why NetScript", href: "/why/" }
   ]
 }) }}
 
+<p class="ns-lede">
+Frameworks give you a web layer, or a service layer, or an orchestrator — and leave the seams
+between them to you. Those seams are where types drift, where background work gets faked with
+retry loops, and where an incident turns into an archaeology session across five tools. NetScript
+exists to own the seams. You describe an operation once, as a contract; the meta-framework carries
+that single definition into the service that implements it, the OpenAPI document that describes it,
+the SDK client that calls it, and the page that renders it. What you did not write cannot drift.
+</p>
+
 {{ comp.featureGrid({ items: [
   {
-    title: "Durability is a state machine",
-    body: "A multi-step flow is not a retry loop. Define each step and its rollback in TypeScript; the runtime can record progress through its saga store.",
+    title: "The contract is the spine",
+    body: "A zod schema and an oRPC route, written once. Service handlers are type-locked to it, the OpenAPI document is generated from it, and the SDK client is derived from it — three surfaces you never write by hand.",
+    href: "/explanation/contracts/"
+  },
+  {
+    title: "The workspace is the unit",
+    body: "Apps, services, databases, cache, and background processors form one generated Aspire graph. One command starts it; one dashboard carries its health, logs, and traces.",
+    href: "/orchestration-runtime/"
+  },
+  {
+    title: "Runtimes for work that outlives a request",
+    body: "Workers, sagas, triggers, and streams plug into the same workspace and the same telemetry, so durable work is part of the system rather than a sidecar you integrate yourself.",
     href: "/durable-workflows/"
-  },
-  {
-    title: "One contract crosses the stack",
-    body: "Write one oRPC contract to power your service handlers, drive the OpenAPI document, and type the SDK calls your Fresh page loaders make.",
-    href: "/services-sdk/"
-  },
-  {
-    title: "The traced fleet starts with one command",
-    body: "aspire start brings up every generated resource; the dashboard shows health, logs, and traces for the whole graph from one page.",
-    href: "/observability/"
   }
 ] }) }}
 
+## One definition, carried end to end
+
+{{ comp.diagram({ src: "/assets/diagrams/contract-flow.svg", alt: "One zod schema and oRPC route feed a type-locked service handler, a generated OpenAPI document, and a derived SDK client with query keys; the SDK feeds the page loader and island, so server and callers cannot drift.", caption: "The principle in one picture: you write the shape once; the handler, the OpenAPI document, the client, and the page are typed from it." }) }}
+
+The same operation at three points in the stack. Tab 1 is the only shape you write — everything in
+tabs 2 and 3 is typed from it.
+
 {{ comp.tabbedCode({ tabs: [
   {
-    label: "A checkout with a real refund path",
+    label: "1 · The contract",
     lang: "ts",
-    code: "import { defineSaga, sagaCompensate, send } from '@netscript/plugin-sagas-core';\nimport type { SagaCorrelationKey } from '@netscript/plugin-sagas-core';\n\ntype Checkout = { status: 'pending' | 'paid' };\ntype Failure = { orderId: string; reason: string };\ntype CheckoutEvent =\n  | { type: 'payment.captured'; payload: { orderId: string } }\n  | { type: 'inventory.failed'; payload: Failure };\n\nconst checkout = defineSaga('checkout')\n  .state<Checkout>({ status: 'pending' })\n  .correlate<CheckoutEvent>((event) => event.payload.orderId as SagaCorrelationKey)\n  .on<'payment.captured', { orderId: string }>(\n    'payment.captured',\n    (saga, event) => {\n      saga.state.status = 'paid';\n      return [send('inventory.reserve', { orderId: event.payload.orderId })];\n    },\n  )\n  .on<'inventory.failed', Failure>('inventory.failed', (_saga, event) => [\n    sagaCompensate(\n      { type: 'payment.captured', payload: { orderId: event.payload.orderId } },\n      event.payload.reason,\n    ),\n  ])\n  .compensate<'payment.captured', { orderId: string }>(\n    'payment.captured',\n    (_saga, event) => [send('payment.refund', { orderId: event.payload.orderId })],\n  )\n  .build();"
+    code: "// contracts/versions/v1/users.contract.ts\nimport { z } from 'zod';\nimport { oc } from '@orpc/contract';\nimport { implement } from '@orpc/server';\n\nexport const UsersListInputSchemaV1 = z.object({\n  limit: z.number().int().positive().max(100).default(20),\n});\nexport const UsersListItemSchemaV1 = z.object({\n  id: z.number().int().positive(),\n  name: z.string().min(1),\n  status: z.enum(['active', 'invited']),\n});\n\n// The contract binds method + input + output. No handler yet.\nexport const UsersContractV1 = {\n  list: oc.route({ method: 'POST' })\n    .input(UsersListInputSchemaV1)\n    .output(z.object({ items: z.array(UsersListItemSchemaV1) })),\n};\n\nexport const UsersV1 = implement(UsersContractV1);"
+  },
+  {
+    label: "2 · The service",
+    lang: "ts",
+    code: "// services/users/src/routers/v1.ts\nimport { v1 } from '@my-app/contracts';\n\n// `input` is typed from the contract. The return value must\n// satisfy the contract's output schema — or it does not compile.\nexport const UsersV1 = {\n  list: v1.users.list.handler(async ({ input }) => {\n    const items = await listUsers({ limit: input.limit });\n    return { items };\n  }),\n};\n\n// services/users/src/main.ts\n// defineService() serves the router with OpenAPI, typed RPC,\n// health endpoints, and request logging wired in.\nimport { defineService } from '@netscript/service';\nimport { router } from './router.ts';\n\nawait defineService(router, { name: 'users', version: '1.0.0' });"
+  },
+  {
+    label: "3 · The page",
+    lang: "tsx",
+    code: "// apps/dashboard/routes/users/index.tsx\nimport { definePage } from '@netscript/fresh/builders';\nimport { api } from '@app/lib/api-clients.ts'; // derived from the contract\nimport { routes } from '@app/router.ts';\nimport UsersTable from './(_islands)/UsersTable.tsx';\n\nexport const usersPage = definePage()\n  .withRoute(routes.users.$route)\n  .withLayer('users', UsersTable, {\n    loader: async (ctx) => {\n      // Same contract action, same types, and the same query key\n      // the island hydrates from. No hand-written client.\n      const entry = await api.users.list.getCachedEntry({\n        limit: ctx.search.limit,\n      });\n      return { users: entry?.data, cachedAt: entry?.cachedAt };\n    },\n  })\n  .withLayout((slots) => <main class='ns-page'>{slots.users()}</main>)\n  .build();"
   }
 ] }) }}
 
 <p class="ns-lede">
-Both events correlate by <code>orderId</code>. When <code>inventory.failed</code> arrives, its
-handler returns a compensation request for <code>payment.captured</code>. A saga bus bridge
-configured with a compensator resolves that request, and a durable store records progress across
-restarts. With those runtime pieces in place, the registered handler emits
-<code>payment.refund</code>.
-<a href="{{ '/durable-workflows/' |> url }}">See the durability model</a>.
+Change the schema in tab 1 and the handler in tab 2 stops compiling, the OpenAPI document updates,
+and the loader in tab 3 sees the new types — before anything reaches a browser. That propagation is
+the meta-framework: not a bigger library, but ownership of the seams between the libraries you
+already know. <a href="{{ '/explanation/contracts/' |> url }}">How the type flow works</a> ·
+<a href="{{ '/web-layer/' |> url }}">how pages consume it</a>.
 </p>
 
+## Where to go
+
 <nav class="ns-cluster" aria-label="Choose the next page">
-  <a href="{{ '/quickstart/' |> url }}">Run it</a> ·
-  <a href="{{ '/concepts/' |> url }}">Understand it</a> ·
-  <a href="{{ '/why/' |> url }}">Decide whether it fits</a>
+  <a href="{{ '/quickstart/' |> url }}">Run a workspace in ten minutes</a> ·
+  <a href="{{ '/concepts/' |> url }}">The five-layer mental model</a> ·
+  <a href="{{ '/why/' |> url }}">The argument, with trade-offs</a> ·
+  <a href="{{ '/tutorials/storefront/' |> url }}">Build a real system</a> ·
+  <a href="{{ '/reference/' |> url }}">Package reference</a>
 </nav>

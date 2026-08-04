@@ -13,7 +13,13 @@ templateEngine: [vento, md]
   ]
 }) }}
 
-{{ comp.diagram({ src: "/assets/diagrams/architecture-overview.svg", alt: "A NetScript workspace: contracts define services; services and plugin runtimes connect to the Fresh web app; the AppHost materializes the resources and their infrastructure as one observed graph.", caption: "The mental model: contracts → services → plugins → web layer, with Aspire and telemetry connecting the running resources." }) }}
+<p class="ns-lede">
+The layers are not five features; they are one principle applied five times. NetScript is a
+meta-framework: it does not replace Fresh, Hono, or your database — it owns the seams between
+them, and the seam is always the same thing, a typed contract. Read the five sections in order
+once; after that, each links into its own part of the documentation and you should never need
+this page again.
+</p>
 
 ## 1. Contracts define the boundary
 
@@ -61,6 +67,8 @@ Use [the web-layer overview](/web-layer/) for the complete model, then follow th
 [queries and islands](/web-layer/query/).
 
 ## 5. Observability connects the resource graph
+
+{{ comp.diagram({ src: "/assets/diagrams/aspire-resource-graph.svg", alt: "The Aspire AppHost declares and starts the resource graph: the Fresh app, services, plugin processors, Postgres, and the cache, with service discovery and OTLP configuration injected into each process.", caption: "The AppHost starts the workspace as one graph and injects discovery and telemetry into every process." }) }}
 
 Every layer above runs inside a resource graph. The generated AppHost composes apps, services,
 plugin processors, databases, and cache resources, then injects service-discovery and OTLP

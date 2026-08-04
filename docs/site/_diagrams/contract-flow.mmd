@@ -1,0 +1,17 @@
+%% Source for assets/diagrams/contract-flow.svg
+%% Rendered to a committed static SVG by the SEPARATE dev task in render.ts.
+%% This file is NOT consumed by `deno task build`; the site ships the SVG only.
+flowchart LR
+  schema["zod schema + oc.route<br/><b>the one shape you write</b>"]
+  subgraph derived["derived — never written by hand"]
+    direction TB
+    handler["service handler<br/>type-locked input/output"]
+    openapi["OpenAPI document"]
+    sdk["SDK client + query keys"]
+  end
+  page["page loader + island<br/>hydrates on the same types"]
+  schema --> handler
+  schema --> openapi
+  schema --> sdk
+  sdk --> page
+  handler -. "one definition: server and callers cannot drift" .-> page
