@@ -13,3 +13,8 @@
 - RED real-Redis integration artifact: `evidence/red-real-redis.txt` reports `FAILED | 0 passed |
   1 failed` and `TypeError: metadata.createdAt.toISOString is not a function` from
   `projectionState()` after asserting Redis returned `createdAt` as a string.
+- Implemented private `projectionDates`/`revivePersistedDate` normalization. It accepts only valid
+  runtime `Date` values or persisted date strings, supplies actual Dates to Prisma, serializes ISO
+  strings for the KV read model, and leaves the exported projection contract unchanged.
+- GREEN real-Redis artifact: `evidence/green-real-redis.txt` reports `1 passed | 0 failed` for the
+  identical Redis round-trip and projection.
