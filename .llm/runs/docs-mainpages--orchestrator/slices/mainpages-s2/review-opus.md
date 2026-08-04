@@ -4,10 +4,14 @@ Reviewed: `docs/main-pages-revamp` @ `a7a09c54c` in worktree `/home/codex/repos/
 (commits `bc0b32415`, `1dbdd44a8`, `9de02346c`, `a7a09c54c`).
 Binding spec: `slices/mainpages-s1/synthesis.md`. Claims under test: `slices/mainpages-s2/draft-report.md`.
 
-**Verdict: FIX_FIRST** — 3 blocking, 3 major, 6 minor.
+**Verdict: FIX_FIRST** — 3 blocking, 3 major, 7 minor.
 
 Line references are to the `.vto` sources in `/home/codex/repos/ns-mainpages/docs/site/`;
 package references are to the same worktree.
+
+**Provenance:** every line citation below was opened and confirmed first-hand in this session; the
+build gate was re-run rather than taken from the draft report. Nothing here is inherited from the
+generator's own verification notes.
 
 ---
 
@@ -35,8 +39,8 @@ The gates are honest. The failures below are all in dimension 2 (technical truth
 
 `resolveCorrelationKey` resolves in order: a `correlations` rule for the message type, a `'*'` rule,
 `message.correlationKey`, then the fallback `` `${definition.id}:${message.type}` `` —
-`packages/plugin-sagas-core/src/runtime/saga-engine.ts:456-464`. The instance id is
-`` `${sagaId}:${correlationKey}` `` (`saga-engine.ts:439-444`).
+`packages/plugin-sagas-core/src/runtime/saga-engine.ts:456-463`. The instance id is
+`` `${sagaId}:${correlationKey}` `` (`saga-engine.ts:441-443`, via `#resolveInstanceId` at `:332-335`).
 
 With no `.correlate(...)` and no `correlationKey` on the published messages, `payment.captured` and
 `inventory.failed` derive **different correlation keys → different instance ids → different state**.
@@ -57,25 +61,28 @@ is the line that makes the example true.
 
 `index.vto:43-44`.
 
-- `SagaEngine.handle` returns cascaded effects but never acts on them
-  (`packages/plugin-sagas-core/src/runtime/saga-engine.ts:280-317`).
-- `SagaEngine.dispatchCascaded` **throws `SAGA_NOT_IMPLEMENTED` for any kind other than `send`** —
-  `saga-engine.ts:119-132`. A `compensate` cascade dies there.
-- Compensation dispatch exists only in the bus bridge:
-  `src/adapters/saga-bus-bridge.ts:160-177` → `#compensate` at `:190-227` →
-  `compensator.compensateCascaded(...)` at `:211-216`.
-- The bridge **throws unless a `compensator` is supplied** (`saga-bus-bridge.ts:194-198`), and
-  `createSagaRuntime` passes one through only if the caller provides it — it is *not* defaulted
-  (`src/runtime/create-saga-runtime.ts:99`).
+- `SagaEngine.handle` returns `cascaded` in its result but never acts on it
+  (`packages/plugin-sagas-core/src/runtime/saga-engine.ts:280`, returned at `:309-317`).
+- `SagaEngine.dispatchCascaded` **throws `SagasError.notImplemented` for any kind other than
+  `send`** — `saga-engine.ts:119-124` ("Native engine cascaded ${kind} dispatch deferred to
+  scheduler/compensator slices"). A `compensate` cascade dies there.
+- Compensation dispatch exists only in the bus bridge: `src/adapters/saga-bus-bridge.ts:98`
+  (dispatch switch) → `case 'compensate'` at `:146-147` → `#compensate` at `:190` →
+  `compensator.compensateCascaded(...)` at `:211-213`.
+- The bridge **throws unless a `compensator` is supplied** — `compensator?` is optional
+  (`saga-bus-bridge.ts:36, 48, 59`) and `:194-196` throws "compensation cascades require the
+  compensator option." `createSagaRuntime` only forwards a caller-supplied one; it is *not*
+  defaulted (`src/runtime/create-saga-runtime.ts:30, 99`).
 
 The caption already carries one honest hedge (the store), so the omission reads as selective: the
 sentence names the store as configuration-dependent while asserting the compensation routing as
 automatic, when routing is the *more* configuration-dependent of the two.
 
 Verified correct in the snippet, for the record: `sagaCompensate(message, reason)` arg order
-(`src/public/messages.ts:98-107`), and the compensate handler does receive the message passed to
-`sagaCompensate` as `event` (`src/runtime/saga-compensator.ts:57, 83, 103-115`). The draft report's
-type-check claim also holds — the snippet checks clean under a strict config.
+(`src/public/messages.ts:98-104`), the handler lookup is keyed on the **compensated** message's type
+(`src/runtime/saga-compensator.ts:57`), and the compensate handler does receive that message as its
+second argument (`saga-compensator.ts:83`) — so the snippet's `.compensate('payment.captured', …)`
+pairing with `sagaCompensate({ type: 'payment.captured', … })` is internally correct.
 
 **Fix:** one clause — e.g. "wired through the saga bus with a compensator, the runtime routes that
 cascade…" — or link the caption's "durability model" phrase to the runtime-wiring page.
@@ -85,13 +92,17 @@ cascade…" — or link the caption's "durability model" phrase to the runtime-w
 `quickstart.vto:27` (`netscript init my-app --db postgres --service`), `:31`
 ("Accept the remaining defaults if the CLI prompts for them"), `:43`, `:55`.
 
-On a TTY without `--yes`/`--ci`, `resolveInteractiveInitInput` **always** prompts, because the
-relevant options are undefined:
+Prompts are skipped only when `options.ci === true || options.yes === true || !isTerminal` —
+`packages/cli/src/public/features/init/init-interactive.ts:23`. The page passes neither `--yes` nor
+`--ci`, so on a TTY the reader is prompted **four** times, because those options are undefined
+(`--db postgres --service` correctly suppress two others):
 
-- frontend application name — `packages/cli/src/public/features/init/init-interactive.ts:43-45`
-  (default `dashboard`)
-- shared cache + cache backend — `init-interactive.ts:46-55` (defaults `true` / `redis`)
+- example service name — `init-interactive.ts:39-40` (default `users`)
+- frontend application name — `init-interactive.ts:42-44` (default `dashboard`)
+- shared cache — `init-interactive.ts:45-49` (default `true`)
+- cache backend — `init-interactive.ts:50-54` (default `redis`)
 
+Defaults confirmed at `packages/cli/src/kernel/constants/scaffold/scaffold-defaults.ts:8-12`.
 So the two later claims are conditional on prompt answers the page treats as given:
 `apps/dashboard/routes/(_components)/home-view.tsx` (`:55`) holds only if the app-name prompt is
 accepted unchanged, and "shared cache report healthy" (`:43`) only if the cache prompt is accepted.
@@ -107,17 +118,24 @@ the conditional "if".
 
 ## MAJOR
 
-### M1 — `aspire stop` in the bare form contradicts this repo's own doctrine
+### M1 — the quickstart introduces a bare `aspire stop` that no other repo doc prescribes
 
 `quickstart.vto:63-67`.
 
-`.agents/skills/aspire/SKILL.md:18,43` prescribes `aspire stop --apphost <exact-AppHost-path>` and
-records that the host-wide mode reported `No running AppHost found`, **exited 0, and left processes
-alive**. The quickstart's last instruction is therefore the one most likely to silently fail, on the
-page whose whole job is "it works." Same guidance in
-`.agents/generated/consumer-skills/.claude/skills/help.md:41,52`.
+A grep across `docs/site/**` finds **no other page** that documents `aspire stop` at all — including
+`docs/site/quickstart/aspire.md`, the canonical Aspire page, which covers `restore`/`start` and stops
+there. Meanwhile repo doctrine prescribes the **`--apphost`-scoped** form:
+`.agents/skills/aspire/SKILL.md:18` ("Stop the exact AppHost | `aspire stop --apphost
+<exact-AppHost-path>`") and `:40-43`, which records that the host-wide `--all` mode reported
+`No running AppHost found`, **exited 0, and left processes rooted at the AppHost alive**. Same
+guidance in `.agents/generated/consumer-skills/.claude/skills/help.md:41,52`.
 
-**Fix:** `aspire stop --apphost ./apphost.mts`.
+To be precise about the evidence: the observed silent failure is documented for `--all`, not for the
+bare form, so this is an unverified-instruction finding rather than a proven-broken one. But the
+quickstart's *last* instruction should not be the only teardown command in the docs that no other
+page or skill endorses.
+
+**Fix:** `aspire stop --apphost ./apphost.mts`, matching the skill's scoped form.
 
 ### M2 — The dashboard login token is omitted
 
@@ -147,11 +165,17 @@ act on from the page that makes it.
 
 ## MINOR
 
-- **Step-4 target is a wrapped three-line sentence.** `quickstart.vto:55-58` says "find the
-  introductory sentence that starts with `A generated NetScript workspace`". In the template it spans
-  three source lines inside `<p class='ns-lede'>` —
-  `packages/cli/src/kernel/assets/app/routes/(_components)/home-view.tsx.template:29-32`. A reader
-  searching for a one-line sentence will miss it. Quote the three lines, or say "the wrapped sentence".
+- **Step-4 target is a wrapped two-line sentence.** `quickstart.vto:55-58` says "find the
+  introductory sentence that starts with `A generated NetScript workspace`". In the template it wraps
+  across two source lines inside `<p class='ns-lede'>` —
+  `packages/cli/src/kernel/assets/app/routes/(_components)/home-view.tsx.template:29-30`
+  ("A generated NetScript workspace with app-owned UI copies, design reference routes, / and
+  operational examples ready to adapt."). A reader grepping the full sentence on one line gets no hit.
+  Say "the wrapped sentence" or quote only the first fragment.
+- **Two step-3/4 claims verified TRUE, for the record.** The heading really is the project name —
+  `<h1>{projectName}</h1>` in the same template (`:27`) — and the file is written by the app scaffold
+  independently of the example-service templates, so `quickstart.vto:43` ("heading should read
+  `my-app`") and `:60-61` are both accurate once B3's app-name prompt is pinned.
 - **Funnel backtracking.** S1 §7 item 1 says "no backtracking". `concepts.vto:12` sends the reader
   from *understand it* back to `/why/` (*choose it*), and `index.vto:53` repeats `/why/` in the exit
   strip when the hero already CTAs it at `:11`. The exit strip then has only two genuinely new doors.
