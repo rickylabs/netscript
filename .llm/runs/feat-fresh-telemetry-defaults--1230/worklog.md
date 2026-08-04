@@ -44,7 +44,7 @@
 | Scoped fmt | PASS, 180 files / 0 findings |
 | `deno task quality:gate` | PASS; repository warnings are pre-existing |
 | Structured doc lint | no new server-entrypoint diagnostics; 44 pre-existing query/route/streams diagnostics reported |
-| JSR audit | no deepening; existing two module-tag failures, cardinality warning, and slow-type banner remain outside this diff |
+| JSR audit | PASS after moving/adding two public-entrypoint `@module` tags; two pre-existing warnings remain non-blocking |
 
 ## Reconcile
 
