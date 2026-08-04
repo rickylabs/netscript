@@ -890,3 +890,26 @@ the global-mutex supersede, not a failure). #1209 remains ready; merge at your d
   (2) fleet 5-min milestone PR poll — MOVED/READY/PR-STALE(30min)/GONE events, state under the
   session scratchpad; (3) ports-agent steered turn completion (background codex-resume). Sagas
   thread stays intentionally idle until #1211 lands (both-backends protocol next).
+
+## 2026-08-04 — Numbering correction (owner catch): the running canary is .5, canary.4 already shipped
+
+- Owner clarified mid-run: the in-flight canary action publishes **0.0.5-canary.5**, not .4;
+  nothing stopped. Verified against JSR (`@netscript/cli` meta lists canary.1–.5) and run logs.
+- **Correction to the pre-clear stage-E record:** run **30892876892** (08:39:28Z, success) —
+  filed pre-clear as "canary.3's failed-job re-run" — actually minted and published
+  **0.0.5-canary.4** (399 log mentions; content derivation listed .1–.3 as prior). The pinned
+  `e2e-cli-prod` success @08:49:10Z and the `Record green canary pair` steps therefore attach to
+  **canary.4**. The green-pair stable-cut precondition remains satisfied — held by canary.4.
+  canary.3's own publish/labels stand as recorded.
+- **The run this session dispatched (30899202735) is CANARY.5**: publish step already through
+  (canary.5 on JSR), prove phase (pinned prod E2E + pair) in flight under the terminal monitor.
+  Payload = content-derived merges since canary.4's head (expect #1203, #1209 at minimum;
+  the workflow note is authoritative). Stage-E verification (labels/note/drift/pair + #1149
+  comment) runs at completion. My previous entry's "CANARY.4 dispatched" phrasing is superseded
+  by this one.
+- Lesson for #1163 (extends finding 26): a full re-RUN of a canary workflow run re-derives the
+  next free version — it cannot "re-prove" the version it originally published. Proving an
+  existing canary N is the standalone `release:verify-canary-pair`/label tooling's job; a rerun
+  always mints N+1. The pre-clear session's "canary.3 rerun" belief and today's stale ".4"
+  numbering are the same error class: version identity must be read from the registry/run logs,
+  never inferred from dispatch intent.
