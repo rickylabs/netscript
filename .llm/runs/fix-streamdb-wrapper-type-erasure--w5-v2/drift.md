@@ -21,3 +21,13 @@ Drift is append-only.
 - **Severity:** minor
 - **Action:** accept and exclude
 - **Evidence:** Explicit-path staging is required for every slice; final commit-range audit must show no lock change.
+
+## 2026-08-04 — Consumer fixture package identity
+
+- **What:** The compile-only consumer fixture uses its own no-workspace config and pins the TanStack DB versions consumed by `@tanstack/react-db`.
+- **Source:** S1 RED-first execution and `deno task deps:why` inspection.
+- **Expected:** The direct upstream control compiles while only the framework wrapper fails.
+- **Actual:** The package-root config resolved two nominal TanStack DB identities (`0.6.8` and `0.6.17`), causing an unrelated control failure; the isolated consumer config removes that false signal.
+- **Severity:** minor
+- **Action:** fix
+- **Evidence:** `tests/type-fixtures/streamdb-consumer-deno.json`; valid RED contains exactly the two wrapper `unknown` diagnostics and the direct control compiles.

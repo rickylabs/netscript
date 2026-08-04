@@ -1,5 +1,6 @@
 import { assertEquals } from '@std/assert';
 import { createStateSchema } from '@durable-streams/state';
+import { createStreamDB } from '@durable-streams/state/db';
 import { z } from 'zod';
 import { createNetScriptStreamDB, type NetScriptStreamDBFactoryInput } from './create-stream-db.ts';
 
@@ -23,14 +24,11 @@ Deno.test('createNetScriptStreamDB wires stream URL, schema, and lifecycle handl
     schema,
     createStreamDB(input) {
       captured = input;
-      return {
-        collections: {
-          events: { name: 'events' },
-        },
+      return Object.assign(createStreamDB(input), {
         stop() {
           stopped = true;
         },
-      };
+      });
     },
   });
 
@@ -42,6 +40,6 @@ Deno.test('createNetScriptStreamDB wires stream URL, schema, and lifecycle handl
   );
   assertEquals(captured?.streamOptions.contentType, 'application/json');
   assertEquals(captured?.state, schema);
-  assertEquals(db.collections.events, { name: 'events' });
+  assertEquals(Object.keys(db.collections), ['events']);
   assertEquals(stopped, true);
 });
