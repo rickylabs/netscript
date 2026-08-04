@@ -38,3 +38,14 @@
   `agentic:launch-codex-slice`; thread `019fcbdd-c605-7f70-a047-da28692d9573`, route matched
   (judged by codex-thread-ids.md artifact, not exit code — launcher foreground wait timed out
   as expected). Watching for `slices/pr1209-audit/audit.md`.
+
+## 2026-08-04 — owner steering: fixture exception + quality gate
+
+- Owner granted exception on PR #1209 change 5d75c07f: the package-scoped type fixture is
+  genuinely useful → restored at packages/fresh/tests/type-fixtures (e6ba61690), drift D-6.
+- Owner reported quality-gate failure: CI changed-files scan found `dehydratedState?: any` in
+  the restored fixture. Fixed with the exported `DehydratedState` type (78edb11d6). Honest
+  incident note: my comment-cleanup sed stripped `//` markers and pushed a syntactically broken
+  fixture; caught by re-verification (failedBatches=1 with 0 diagnostics → bare deno check),
+  repaired in 949a572e1, bare check exit 0. Lesson: never trust wrapper "0 occurrences" when
+  failedBatches>0; verify with the bare command before push.
