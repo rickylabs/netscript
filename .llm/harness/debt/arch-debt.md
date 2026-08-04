@@ -1415,16 +1415,6 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Gate:** Close when a Linux CI job (or containerized systemd harness) runs the bare-metal deploy
   lifecycle against a real systemd and asserts unit install/enable/status/logs.
 
-## packages/fresh — Fresh app telemetry defaults reserved (`fresh-app-telemetry-defaults`)
-
-- **Reason:** `defineFreshApp` accepts `telemetry` / `FreshAppTelemetryOptions` as a forward
-  compatibility seam, but Fresh app bootstrap telemetry defaults are not active yet.
-- **Owner:** Fresh telemetry follow-up.
-- **Created:** 2026-06-22.
-- **Status:** open, DEBT_ACCEPTED.
-- **Gate:** Close when Fresh app bootstrap telemetry is implemented and the Web Layer server docs
-  describe emitted spans rather than reserved options.
-
 ## packages/plugin-workers-core — non-Deno task runtimes are not permission-sandboxed (`workers-non-deno-task-sandbox-boundary`)
 
 - **Reason:** `.permissions(...)` compiles into Deno `--allow-*` flags only for `runtime("deno")`.
