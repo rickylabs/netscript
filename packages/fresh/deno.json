@@ -22,7 +22,8 @@
   },
   "tasks": {
     "test": "deno test --allow-all ./src ./tests",
-    "check": "deno check --unstable-kv ./mod.ts ./src/runtime/server/mod.ts ./src/runtime/desktop/mod.ts ./src/application/builders/mod.ts ./src/application/route/mod.ts ./src/application/query/mod.ts ./src/application/vite/vite.ts ./src/runtime/interactive/mod.ts ./src/application/defer/mod.ts ./src/application/form/mod.ts ./src/diagnostics/error/mod.ts ./src/runtime/streams/mod.ts ./src/runtime/ai/mod.ts ./src/runtime/ai/sandbox.ts ./src/testing/mod.ts ./tests/type-fixtures/desktop-consumer_type.ts",
+    "check": "deno check --unstable-kv ./mod.ts ./src/runtime/server/mod.ts ./src/runtime/desktop/mod.ts ./src/application/builders/mod.ts ./src/application/route/mod.ts ./src/application/query/mod.ts ./src/application/vite/vite.ts ./src/runtime/interactive/mod.ts ./src/application/defer/mod.ts ./src/application/form/mod.ts ./src/diagnostics/error/mod.ts ./src/runtime/streams/mod.ts ./src/runtime/ai/mod.ts ./src/runtime/ai/sandbox.ts ./src/testing/mod.ts ./tests/type-fixtures/desktop-consumer_type.ts && deno task check:streams-types",
+    "check:streams-types": "deno check --no-lock --config ./tests/type-fixtures/streamdb-consumer-deno.json --unstable-kv ./tests/type-fixtures/streamdb-wrapper_type.ts",
     "doc-lint": "deno doc --lint ./mod.ts ./src/runtime/server/mod.ts ./src/runtime/desktop/mod.ts ./src/application/builders/mod.ts ./src/application/route/mod.ts ./src/application/defer/mod.ts ./src/application/form/mod.ts ./src/diagnostics/error/mod.ts ./src/runtime/streams/mod.ts ./src/runtime/ai/mod.ts ./src/runtime/ai/sandbox.ts ./src/application/query/mod.ts ./src/runtime/interactive/mod.ts ./src/application/vite/vite.ts ./src/testing/mod.ts",
     "fmt": "deno fmt ./mod.ts ./src ./tests/_fixtures",
     "fmt:check": "deno fmt --check ./mod.ts ./src ./tests/_fixtures",
@@ -49,7 +50,7 @@
     "@tanstack/ai-preact": "npm:@tanstack/ai-preact@^0.10.1",
     "@tanstack/preact-query": "npm:@tanstack/preact-query@^5.101.0",
     "@tanstack/query-core": "npm:@tanstack/query-core@^5.101.0",
-    "@tanstack/react-db": "npm:@tanstack/react-db@^0.1.86",
+    "@tanstack/react-db": "npm:@tanstack/react-db@^0.1.95",
     "vite": "npm:vite@7.2.2"
   },
   "publish": {
