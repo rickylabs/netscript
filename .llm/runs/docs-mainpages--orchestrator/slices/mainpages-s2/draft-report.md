@@ -117,3 +117,72 @@ Commit: `a7a09c54c118aaac1435fcd52acf389a577654cb` —
 - Head: `a7a09c54c118aaac1435fcd52acf389a577654cb`
 - Push: `git push origin HEAD:refs/heads/docs/main-pages-revamp` — succeeded
 - PR: not opened; orchestration handoff retained as requested
+
+## Fix round 1
+
+Applied every blocking and major finding from `review-opus.md`; all six were confirmed against
+workspace source.
+
+### Blocking fixes
+
+- **B1 — correlated saga events.** Added a typed `.correlate<CheckoutEvent>(...)` rule that returns
+  the shared `orderId` as a `SagaCorrelationKey`. This makes `payment.captured` and
+  `inventory.failed` resolve to the same saga instance instead of the engine's per-message-type
+  fallback. Verified against `define-saga.ts`, `saga-correlation.ts`, `saga-engine.ts`, and
+  `deno doc --filter SagaBuilder|SagaCorrelationKey`. The corrected snippet passes
+  `deno check` against the local package root.
+- **B2 — bounded the compensation claim.** Replaced the automatic-runtime claim with the exact
+  configuration boundary: the definition returns a compensation request; executing it requires a
+  saga bus bridge configured with a compensator, and restart recovery requires a durable store.
+  The caption now ends on the configured handler's `payment.refund` effect. Verified against
+  `saga-engine.ts`, `saga-bus-bridge.ts`, `create-saga-runtime.ts`, and
+  `saga-compensator.ts`.
+- **B3 — deterministic scaffold.** Added `--yes` and documented the defaults that the later checks
+  rely on: app name `dashboard` and a shared Redis cache. Verified against `init-command.ts`,
+  `init-interactive.ts`, and `scaffold-defaults.ts`.
+
+Commit: `a2609018f` — `docs(site): make saga proof runtime-accurate`
+
+Commit: `39242bb75` — `docs(site): make quickstart deterministic`
+
+### Major fixes
+
+- **M1 — exact AppHost shutdown.** Replaced bare `aspire stop` with
+  `aspire stop --apphost ./apphost.mts`, valid from the page's retained `my-app/aspire`
+  directory. This matches `.agents/skills/aspire/SKILL.md`.
+- **M2 — dashboard authentication.** The success check now tells the reader to use both the
+  dashboard URL and the one-time login token printed by `aspire start`, matching
+  `docs/site/quickstart/aspire.md`.
+- **M3 — prerequisite and escape hatch.** Quickstart and Why now identify the external dependency
+  as the **.NET Aspire CLI**. Why names the actionable `--no-aspire` scaffold flag and states which
+  wiring the application then owns, matching `init-command.ts` and
+  `docs/site/explanation/aspire.md`.
+
+Commit: `a119599c5` — `docs(site): clarify adoption tradeoffs and next steps`
+
+### Minor findings
+
+- Clarified that the first-change target is a wrapped introductory sentence.
+- Removed the homepage's duplicate Why CTA and changed Concepts' backward Why CTA to the Storefront
+  tutorial.
+- Re-angled the homepage observability proof around the operator outcome; Concepts remains the sole
+  owner of service-discovery and OTLP injection mechanics.
+- Added existing `ns-lede` and `ns-cluster` classes to the homepage's raw caption and exit strip.
+- The reported Storefront tutorial description of `.compensate(type)` is a real cross-doc drift,
+  but that file is outside this slice's locked four-file scope. No page change was made; the
+  homepage continues to follow `saga-compensator.ts`, whose handler lookup uses the compensated
+  message type.
+
+### Round-1 gates and publication
+
+| Gate | Result |
+| --- | --- |
+| Homepage saga snippet `deno check` against local source | PASS — exit 0 |
+| `cd docs/site && deno task build` | PASS — exit 0; 595 files generated |
+| `deno task docs:links` | PASS — 102 docs, 0 broken links, 0 broken anchors, 0 orphans |
+| Hard-ban scan on the four pages | PASS — no banned link, port, adjectives, or issue reference |
+| `git diff --check` per fix commit | PASS |
+
+Round-1 head: `a119599c5`. Explicit-refspec push succeeded, and the remote branch resolves to
+`a119599c58d36f5052c3f51b3fc519e97a18eadc`. The pre-existing unstaged `deno.lock` change
+remains uncommitted.
