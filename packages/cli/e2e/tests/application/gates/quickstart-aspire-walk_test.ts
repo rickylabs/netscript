@@ -1,0 +1,53 @@
+import { assertEquals, assertRejects } from '@std/assert';
+import {
+  ASPIRE_TIMEOUT_CLASSIFICATION,
+  type AspireCommandResult,
+  runBoundedAspireWalk,
+} from '../../../src/application/gates/quickstart/aspire-walk.ts';
+
+const PASS: AspireCommandResult = { code: 0, stdout: '', stderr: '', timedOut: false };
+
+Deno.test('bounded Aspire walk runs restore, start, then waits for postgres', async () => {
+  const commands: readonly string[][] = [];
+  const mutable = commands as string[][];
+  await runBoundedAspireWalk('/project/aspire/apphost.mts', '/project', 42_000, (command) => {
+    mutable.push([...command]);
+    return Promise.resolve(PASS);
+  });
+
+  assertEquals(commands.map((command) => command.slice(0, 2)), [
+    ['aspire', 'restore'],
+    ['aspire', 'start'],
+    ['aspire', 'wait'],
+  ]);
+  assertEquals(commands[2].includes('42'), true);
+});
+
+Deno.test('bounded Aspire walk classifies restore timeout with #1227 and stops', async () => {
+  let calls = 0;
+  const error = await assertRejects(
+    () =>
+      runBoundedAspireWalk('/project/aspire/apphost.mts', '/project', 1, () => {
+        calls++;
+        return Promise.resolve({ ...PASS, code: 124, timedOut: true });
+      }),
+    Error,
+    ASPIRE_TIMEOUT_CLASSIFICATION.RESTORE,
+  );
+  assertEquals(error.message, ASPIRE_TIMEOUT_CLASSIFICATION.RESTORE);
+  assertEquals(calls, 1);
+});
+
+Deno.test('bounded Aspire walk classifies start timeout independently', async () => {
+  let calls = 0;
+  await assertRejects(
+    () =>
+      runBoundedAspireWalk('/project/aspire/apphost.mts', '/project', 1, () => {
+        calls++;
+        return Promise.resolve(calls === 2 ? { ...PASS, code: 124, timedOut: true } : PASS);
+      }),
+    Error,
+    ASPIRE_TIMEOUT_CLASSIFICATION.START,
+  );
+  assertEquals(calls, 2);
+});

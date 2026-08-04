@@ -1,5 +1,5 @@
 import { assertEquals } from '@std/assert';
-import { DEPLOY, GATE, SCAFFOLD } from '../../src/domain/cli-surface.ts';
+import { DEPLOY, GATE, QUICKSTART, SCAFFOLD } from '../../src/domain/cli-surface.ts';
 import {
   DATABASE,
   PACKAGE_SOURCE,
@@ -26,6 +26,7 @@ Deno.test('registry exposes scaffold capability suites from constants', () => {
     SCAFFOLD.USERLAND_INSTALL,
     DEPLOY.TARGETS,
     DEPLOY.DESKTOP_NATIVE,
+    QUICKSTART.WALK,
   ]);
 });
 
@@ -326,7 +327,7 @@ Deno.test('existing built-in suites preserve their exact resolved options', () =
     commandTimeoutMs: 900_000,
     httpTimeoutMs: 30_000,
   };
-  const expected = new Map([
+  const expected = new Map<string, RunOptions>([
     [SCAFFOLD.SERVICE, common],
     [SCAFFOLD.CONTRACTS, common],
     [SCAFFOLD.INFRASTRUCTURE, common],
@@ -355,6 +356,7 @@ Deno.test('existing built-in suites preserve their exact resolved options', () =
       plugins: [...common.plugins, PLUGIN.AI],
       samples: false,
     }],
+    [QUICKSTART.WALK, { ...common, packageSource: PACKAGE_SOURCE.JSR }],
   ]);
 
   for (const suite of builtInSuites) {

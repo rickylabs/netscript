@@ -9,6 +9,8 @@ import {
 import { createDeployTargetsSuite } from '../../../../suites/deploy/deploy-targets-suite.ts';
 import { createDesktopNativeDeploySuite } from '../../../../suites/deploy/desktop-native-suite.ts';
 import { createTrueUserlandInstallSuite } from '../../../../suites/scaffold/true-userland-install-suite.ts';
+import { createQuickstartWalkSuite } from '../../../../suites/quickstart/quickstart-walk-suite.ts';
+import { QUICKSTART, QUICKSTART_TITLE } from '../../../domain/cli-surface.ts';
 
 /** Built-in suite descriptor. */
 export interface BuiltInSuite {
@@ -42,6 +44,11 @@ export const builtInSuites: readonly BuiltInSuite[] = [
     id: DEPLOY.DESKTOP_NATIVE,
     title: DEPLOY_TITLE.DESKTOP_NATIVE,
     create: createDesktopNativeDeploySuite,
+  },
+  {
+    id: QUICKSTART.WALK,
+    title: QUICKSTART_TITLE.WALK,
+    create: createQuickstartWalkSuite,
   },
 ];
 
