@@ -27,6 +27,7 @@ export const SOURCE_FAILURE_CODES = [
   'command_not_found',
   'command_failed',
   'parse_failed',
+  'run_id_mismatch',
   'source_failed',
 ] as const;
 

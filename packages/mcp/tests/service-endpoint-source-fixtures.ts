@@ -5,10 +5,12 @@ export const ASPIRE_DESCRIBE_FIXTURE = `Aspire CLI 13.4.6
     {
       "name": "users-yqkcrqst",
       "displayName": "users",
+      "properties": { "executable.workDir": "/project/services/users" },
       "urls": [{ "name": "http", "url": "http://localhost:43127" }]
     },
     {
       "name": "billing-abcdefgh",
+      "properties": { "executable.workDir": "/project/services/billing" },
       "urls": [{ "name": "http", "url": "http://127.0.0.2:43128" }]
     },
     {
