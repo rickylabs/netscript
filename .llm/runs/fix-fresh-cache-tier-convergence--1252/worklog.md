@@ -76,6 +76,8 @@ hydration in `packages/fresh/src/application/query/`; extend the HTTP edge in
 | 2026-08-04 | S1 | RED | Corrected assertion compared item values; current direct queryFn then failed at the second read: `Expected before-mutation, got after-mutation` (2 pass, 1 fail). |
 | 2026-08-04 | S1 | GREEN | Server query options now select the registered CacheProvider; browser/no-provider calls remain direct. Focused tests 3/3 and scoped SDK check pass. |
 | 2026-08-04 | S1 | reconcile | Issue #1252 still has exactly the four specification comments already researched; PR #1265 has no external review/evaluator comment. Labels/milestone/closing keyword remain correct. |
+| 2026-08-04 | S2 | RED | `initialDataUpdatedAt` failed type-check as an unknown option; a pre-populated shared client rendered `stale shared-client snapshot` instead of the server snapshot. |
+| 2026-08-04 | S2 | GREEN | Fresh now seeds hydration data once before observer creation, preserves its server timestamp, and exposes fetching/refetching state. Focused tests 5/5 and scoped Fresh check pass. |
 
 ## Decisions
 
@@ -105,6 +107,8 @@ hydration in `packages/fresh/src/application/query/`; extend the HTTP edge in
 | SDK structured doc lint | `run-deno-doc-lint.ts --root packages/sdk` | BASELINE_FAIL | one transitive pre-existing diagnostic |
 | S1 SDK focused tests | `deno test --allow-all packages/sdk/tests/query/query-factory_test.ts` | PASS | 3 passed; RED proof recorded above |
 | S1 SDK scoped check | `run-deno-check.ts --root packages/sdk --ext ts` | PASS | 77 files; zero diagnostics |
+| S2 Fresh focused tests | `deno test -A ...query-options.test.ts ...initial-data.test.tsx` | PASS | 5 passed; both RED proofs recorded above |
+| S2 Fresh scoped check | `run-deno-check.ts --root packages/fresh --ext ts,tsx` | PASS | zero diagnostics |
 
 ### Fitness Gates
 
@@ -117,7 +121,7 @@ hydration in `packages/fresh/src/application/query/`; extend the HTTP edge in
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| First paint with pre-populated client | NOT_RUN | planned S2 test | RED-first required |
+| First paint with pre-populated client | PASS | `initial-data.test.tsx` | server snapshot wins once; timestamp and active revalidation state preserved |
 | Mutate → server invalidation → reload | NOT_RUN | planned S3 integration test | RED-first required |
 
 ### Consumer Gates

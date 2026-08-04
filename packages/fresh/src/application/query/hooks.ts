@@ -14,6 +14,7 @@ import {
   useSuspenseInfiniteQuery as useTanStackSuspenseInfiniteQuery,
   useSuspenseQuery as useTanStackSuspenseQuery,
 } from '@tanstack/preact-query';
+import { useRef } from 'preact/hooks';
 import {
   useLiveQuery as useTanStackLiveQuery,
   useLiveSuspenseQuery as useTanStackLiveSuspenseQuery,
@@ -41,6 +42,7 @@ import type {
 export function useIslandQuery<TData = unknown, TError = unknown, TSelected = TData>(
   options: IslandQueryOptions<TData, TError, TSelected>,
 ): IslandQueryResult<TSelected, TError> {
+  useInitialQueryData(options);
   return useTanStackQuery<TData, TError, TSelected, QueryKey>(options);
 }
 
@@ -48,6 +50,7 @@ export function useIslandQuery<TData = unknown, TError = unknown, TSelected = TD
 export function useIslandSuspenseQuery<TData = unknown, TError = unknown, TSelected = TData>(
   options: IslandQueryOptions<TData, TError, TSelected>,
 ): IslandSuspenseQueryResult<TSelected, TError> {
+  useInitialQueryData(options);
   return useTanStackSuspenseQuery<TData, TError, TSelected, QueryKey>(options);
 }
 
@@ -59,6 +62,7 @@ export function useIslandInfiniteQuery<
 >(
   options: IslandInfiniteQueryOptions<TData, TError, TPageParam>,
 ): IslandInfiniteQueryResult<TData, TError, TPageParam> {
+  useInitialQueryData(options);
   const { queryFn, ...upstreamOptions } = options;
 
   return useTanStackInfiniteQuery<
@@ -88,6 +92,7 @@ export function useIslandSuspenseInfiniteQuery<
 >(
   options: IslandInfiniteQueryOptions<TData, TError, TPageParam>,
 ): IslandInfiniteQueryResult<TData, TError, TPageParam> {
+  useInitialQueryData(options);
   const { queryFn, ...upstreamOptions } = options;
 
   return useTanStackSuspenseInfiniteQuery<
@@ -115,6 +120,27 @@ function typedPageParam<TPageParam>(
   // TanStack's conditional context retains its `never` branch for an open
   // generic even though the same page-param type is supplied to the hook.
   return context.pageParam as TPageParam;
+}
+
+function useInitialQueryData<TData>(
+  options: Pick<
+    IslandQueryOptions<TData>,
+    'queryKey' | 'initialData' | 'initialDataUpdatedAt'
+  >,
+): void {
+  const queryClient = useTanStackQueryClient();
+  const hasSeededInitialData = useRef(false);
+
+  if (!hasSeededInitialData.current && options.initialData !== undefined) {
+    queryClient.setQueryData(
+      options.queryKey,
+      options.initialData,
+      options.initialDataUpdatedAt === undefined
+        ? undefined
+        : { updatedAt: options.initialDataUpdatedAt },
+    );
+    hasSeededInitialData.current = true;
+  }
 }
 
 /** Run an island mutation through the shared NetScript Fresh QueryClient. */

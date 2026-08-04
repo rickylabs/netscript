@@ -53,3 +53,19 @@ Deno.test('IslandQueryOptions leaves refetchInterval unset when omitted', () => 
 
   assertEquals(observer.options.refetchInterval, undefined);
 });
+
+Deno.test('IslandQueryOptions forwards the server data timestamp', () => {
+  const queryClient = new QueryClient();
+  const initialDataUpdatedAt = 1_725_000_000_000;
+
+  const options: IslandQueryOptions<string, Error> = {
+    queryKey: ['hydrated'],
+    queryFn: () => 'refetched',
+    initialData: 'server snapshot',
+    initialDataUpdatedAt,
+  };
+
+  const observer = createQueryObserver(queryClient, options);
+
+  assertEquals(observer.options.initialDataUpdatedAt, initialDataUpdatedAt);
+});

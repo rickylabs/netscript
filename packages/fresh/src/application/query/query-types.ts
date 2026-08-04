@@ -48,6 +48,10 @@ export interface IslandQueryResult<TData = unknown, TError = unknown> {
   readonly status: 'pending' | 'error' | 'success';
   /** Whether the query is still loading its first value. */
   readonly isLoading: boolean;
+  /** Whether any initial load or refetch is currently in flight. */
+  readonly isFetching: boolean;
+  /** Whether a background refetch is running after the first value was loaded. */
+  readonly isRefetching: boolean;
   /** Whether the query currently has a successful value. */
   readonly isSuccess: boolean;
   /** Whether the query currently has an error. */
@@ -128,6 +132,8 @@ export interface IslandQueryOptions<TData = unknown, TError = unknown, TSelected
   queryFn: () => Promise<TData> | TData;
   /** Initial data supplied from a Fresh server loader. */
   initialData?: TData;
+  /** Timestamp when the server loaded `initialData`, used to preserve its cache age. */
+  initialDataUpdatedAt?: number;
   /** Whether the query should run automatically. */
   enabled?: boolean;
   /** Cache freshness duration in milliseconds. */
