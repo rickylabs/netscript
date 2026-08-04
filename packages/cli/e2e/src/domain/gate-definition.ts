@@ -8,7 +8,12 @@ import type { ExecutionPlatform } from './platform.ts';
 export type GateVerdict = 'passed' | 'failed' | 'skipped';
 
 /** Stable classification used to decide whether a command attempt may be retried. */
-export type GateFailureClass = 'timeout' | 'canceled' | 'infrastructure' | 'assertion';
+export type GateFailureClass =
+  | 'timeout'
+  | 'canceled'
+  | 'infrastructure'
+  | 'harness-invocation'
+  | 'assertion';
 
 /** Result of one execution attempt within a gate. */
 export type GateAttempt = {

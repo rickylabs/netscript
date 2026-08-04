@@ -179,7 +179,7 @@ function createQuickstartGates(): readonly GateDefinition[] {
       GATE.QUICKSTART_CHECK,
       'Quickstart step 6/7 — run the documented project check',
       GATE_PHASE.BEHAVIOR,
-      () => ['deno', 'task', '--minimum-dependency-age=0', 'check'],
+      () => ['deno', 'task', 'check'],
       (context) => context.project.projectRoot,
     ),
     commandGate(

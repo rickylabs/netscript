@@ -15,6 +15,9 @@ export const RETRYABLE_COMMAND_FAILURE_CLASSES = [
 export const MAX_COMMAND_GATE_ATTEMPTS = 3;
 const CANCELED_EXIT_CODE = 6;
 const CANCELED_MARKER = /task was canceled/i;
+const DENO_USAGE_MARKER = /(?:^|\n)Usage:\s+deno(?:\s|$)/i;
+const ARGUMENT_PARSER_MARKER =
+  /unexpected argument|unexpected option|invalid value .* for|required arguments were not provided/i;
 
 /** Gate that succeeds when command exit and output expectations are satisfied. */
 export class CommandGate {
@@ -74,6 +77,8 @@ export class CommandGate {
         ? undefined
         : missingOutput.length > 0
         ? `Command output omitted: ${missingOutput.join(', ')}.`
+        : failureClass === 'harness-invocation'
+        ? 'Harness command invocation failed before product execution.'
         : `Command exited ${result.code}; expected ${expectedExitCode}.`;
 
       if (passed) {
@@ -91,6 +96,9 @@ function classifyFailure(
 ): GateFailureClass {
   if (result.timedOut) return 'timeout';
   if (result.code === CANCELED_EXIT_CODE && CANCELED_MARKER.test(result.stderr)) return 'canceled';
+  if (DENO_USAGE_MARKER.test(result.stderr) && ARGUMENT_PARSER_MARKER.test(result.stderr)) {
+    return 'harness-invocation';
+  }
   return 'assertion';
 }
 
@@ -98,7 +106,9 @@ function shouldRetry(
   failureClass: GateFailureClass,
   configuredClasses: readonly GateFailureClass[] | undefined,
 ): boolean {
-  if (failureClass === 'assertion' || !configuredClasses) return false;
+  if (
+    failureClass === 'assertion' || failureClass === 'harness-invocation' || !configuredClasses
+  ) return false;
   return RETRYABLE_COMMAND_FAILURE_CLASSES.includes(failureClass) &&
     configuredClasses.includes(failureClass);
 }
