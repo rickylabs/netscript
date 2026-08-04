@@ -107,7 +107,8 @@ Open `my-dashboard/`. The shape that matters for this track:
 The two directories this track lives in:
 
 - **`apps/dashboard/`** — your Fresh app. Its entry point is `main.ts`, which calls
-  [`defineFreshApp`](/web-layer/); its build is configured by `vite.config.ts`.
+  [`defineFreshApp`](/web-layer/server/#composing-the-runtime-server); its build is configured by
+  `vite.config.ts`.
   Chapters 4 and 5 add routes and islands here. This is the heart of the track.
 - **`services/orders/`** and **`contracts/`** — the typed read-model your dashboard reads. You shape
   these in chapter 2, then consume them from the Fresh app in chapters 3–5.
