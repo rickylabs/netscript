@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `feat-openapi-mcp-manifest-cli--1133` |
 | Branch | `feat/openapi-mcp-manifest-cli` |
-| Current phase | `gate` |
+| Current phase | `implementation evaluation` |
 | Archetype | `2 - Integration` |
 | Scope overlays | `none` |
 
@@ -14,7 +14,7 @@
 
 The identity-bound F1(b) adapter and scaffold named gate are implemented. A real proxy collision
 proved the identity guard and added allocated target-PORT selection. Package/static gates pass;
-fresh branch CI must provide the final canonical runtime verdict.
+fresh branch CI passed the named live adapter gate and the canonical suite 71/71 with cleanup.
 
 ## Completed
 
@@ -28,13 +28,12 @@ fresh branch CI must provide the final canonical runtime verdict.
 
 ## In Progress
 
-- Commit/push S3, then watch fresh branch CI and composed evaluation.
+- Composed implementation review/sign-off under milestone ruling D6.
 
 ## Next Steps
 
-1. Push explicit refspec and watch fresh scaffold-runtime CI.
-2. Update acceptance evidence/DoD only if the named gate passes.
-3. Hand to composed implementation evaluation.
+1. Obtain separate composed implementation review/sign-off.
+2. Move to `status:ready-merge` only after the evaluator comment and complete DoD.
 
 ## Key Decisions
 
@@ -61,12 +60,12 @@ fresh branch CI must provide the final canonical runtime verdict.
 | --- | --- | --- |
 | Static | pass | check + scoped lint/fmt |
 | Fitness | pass | focused/package tests, quality scan, arch check, JSR dry run |
-| Runtime | pending fresh CI | local attempts hit unrelated baseline failures; cleanup clean |
-| Consumer | negative case pass / positive pending | named gate proved foreign-port refusal; target-port fix awaits CI |
+| Runtime | pass | [CI attempt 2](https://github.com/rickylabs/netscript/actions/runs/30895255613/job/91950747988): canonical suite 71/71 with cleanup |
+| Consumer | pass | named live directory gate passed in 4.896s after the earlier foreign-port refusal drove the fix |
 
 ## Open Questions
 
-- Will S6 land before the serialized runtime gate?
+- Which composed reviewer surface will supply the separate IMPL-EVAL verdict after the automatic OpenHands job was policy-skipped?
 
 ## Drift and Debt
 

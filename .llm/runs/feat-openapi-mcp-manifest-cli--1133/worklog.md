@@ -64,6 +64,7 @@ fixture that proves both accepted drift and rejection of an adjacent torn/ambigu
 | 2026-08-04 | 3 | negative E2E | Named MCP gate rejected fixed proxy port 3001 because it identified as foreign service `products`; no false live row escaped. |
 | 2026-08-04 | 3 | hardening | Adapter now prefers the real CLI-described executable target `PORT`, retaining declared URL host/protocol normalization. |
 | 2026-08-04 | 3 | baseline failures | Full one-pass attempts later stopped at existing `behavior.service-health` DB health and `runtime.wait.workers-api` gates before S7. Cleanup passed and leak checks found no survivors. |
+| 2026-08-04 | 3 | serialized CI proof | After the baseline holder released the global slot, e2e-cli attempt 2 passed the named MCP gate in 4.896s and the canonical suite completed 71/71 with cleanup. |
 
 ## Decisions
 
@@ -109,13 +110,13 @@ fixture that proves both accepted drift and rejection of an adjacent torn/ambigu
 | live current-run query | PASS | direct adapter read | current baseline DB-operation AppHost produced `used` |
 | `scaffold.runtime` infrastructure | FAIL (baseline) | canonical one-pass command | independent pre-S7 failures: users DB-health aggregate; workers-api timeout |
 | `behavior.mcp-endpoint-directory` negative case | PASS | canonical one-pass named gate | contested proxy identified as `products`; adapter returned `identity_mismatch` |
-| `behavior.mcp-endpoint-directory` target-port case | PENDING_CI | fresh branch run | local static fixture passes; host slot is now held by foreign `wave5-deepseek` AppHost |
+| `behavior.mcp-endpoint-directory` target-port case | PASS | [e2e-cli attempt 2](https://github.com/rickylabs/netscript/actions/runs/30895255613/job/91950747988) | named live gate passed in 4.896s; canonical suite 71/71 with cleanup |
 
 ### Consumer Gates
 
 | Consumer | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| scaffolded app | NOT_RUN | queued | S6 currently not landed; directory fixture fallback selected. |
+| scaffolded app | PASS | [scaffold-runtime CI](https://github.com/rickylabs/netscript/actions/runs/30895255613/job/91950747988) | direct directory-call fallback selected because S6 is not landed; live `users` row resolved through `aspire-cli`. |
 
 ## Handoff Notes
 

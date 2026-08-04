@@ -43,3 +43,15 @@
 - **Severity:** minor
 - **Action:** defer to fresh branch CI verdict
 - **Evidence:** `worklog.md`; GitHub scaffold-runtime was green on the prior adapter commit.
+
+## 2026-08-04 — composed evaluator surface did not auto-start
+
+- **What:** Draft-to-ready fired repository review workflows, but the OpenHands job was policy-skipped
+  and no separate review verdict was posted automatically.
+- **Source:** Milestone-run evaluator protocol / orchestrator ruling D6 and PR #1206 checks.
+- **Expected:** Ready transition plus label surface composes a separate review/evaluation.
+- **Actual:** Automated implementation and runtime gates passed; separate reviewer sign-off remains
+  pending. Cloud OpenHands cannot be forced for this local run under its routing policy.
+- **Severity:** minor
+- **Action:** leave `status:impl-eval` and request an eligible composed/owner review; never self-certify.
+- **Evidence:** PR #1206 timeline and OpenHands Agent check on head `dfcf2b23a`.
