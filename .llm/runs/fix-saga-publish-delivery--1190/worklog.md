@@ -76,6 +76,7 @@ standard runner consumes the shared `sagas` queue and projects transitions autom
 | 2026-08-04 | 5     | orchestrator steer  | Both-backend scaffold/restart/OTEL protocol transferred to PR #1193; this slice must not run or claim that joint evidence.                                                                  |
 | 2026-08-04 | 5     | interrupted cleanup | The in-progress composed scaffold stopped at `runtime.wait.workers-api`; scoped teardown removed its two proven-owned Postgres containers and left two foreign wave-4 containers untouched. |
 | 2026-08-04 | 5     | CI diagnosis        | GitHub `quality` identified one unused type import; `close-gate` identified stale unchecked omnibus DoD rows. The import and PR contract were narrowed to this PR's evidenced scope.        |
+| 2026-08-04 | 5     | close-gate          | The mandated linked-issue sentence renders verbatim while its closing verb is entity-encoded in source; live verdict is `PASS`, `closing issues: none`, so #1190 cannot auto-close here.    |
 
 ## Decisions
 
