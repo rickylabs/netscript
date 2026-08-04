@@ -71,6 +71,10 @@ adapter validator, real deno-doc fixtures, and schema version together.
 | 2026-08-04 | bootstrap | deno-doc research | Confirmed JSON v2 nodes/symbol/declaration shape and `definePage` at `@netscript/fresh` `./builders`. |
 | 2026-08-04 | bootstrap | JSR baseline | Doc lint PASS (3 entrypoints, 0 combined diagnostics); package dry-run PASS; audit exit 0 with pre-existing cardinality warnings. |
 | 2026-08-04 | plan-gate | waiver | Plan locked; PLAN-EVAL row recorded as composed per milestone-run.md (orchestrator waiver). |
+| 2026-08-04 | slice 1 | contracts + flows | Added the generated-corpus port, four priority-ordered bounded flows, schemas, registry rows, deterministic query behavior, and real `deno doc --json` fixtures. |
+| 2026-08-04 | slice 2 | embedded corpus + MCP | Generated and pinned the 35-package corpus, wired the lazy hash-verified adapter and receipts, and proved mirror-free JSON-RPC discovery in an empty workspace. |
+| 2026-08-04 | gates | Archetype-2 column | Focused check/lint/fmt, 105 MCP tests, generator freshness/tests, quality gate, doctrine check, doc lint, package/root publish dry-runs, and publish-asset check passed. |
+| 2026-08-04 | gates | CLI E2E | 51/52 gates passed; unrelated generated users-service database health probe failed after successful scaffold, DB init/generate/seed, workspace checks, Aspire start, and MCP-related gates. Cleanup passed; leak check found no run-owned survivors. |
 
 ## RED Evidence
 
@@ -108,6 +112,7 @@ Command: real `createMcpCliServer` in a fresh temp directory, then JSON-RPC `too
 | --- | --- | --- |
 | Issue says 36 flat files; current publishable package set is 35 with 268 subpaths. | minor | yes |
 | Worktree arrived with unrelated one-line `deno.lock` queue addition. | minor | yes |
+| Application owns corpus query semantics behind a narrow `load()` port rather than four behavior-specific port methods. | minor | yes |
 
 ## Gate Results
 
@@ -124,19 +129,30 @@ Command: real `createMcpCliServer` in a fresh temp directory, then JSON-RPC `too
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
 | Plan-Gate | composed waiver | `plan-eval.md` | Milestone-run owner ruling; plan locked before implementation |
-| Archetype-2 full column | NOT_RUN | plan gate table | Run after implementation |
+| Scoped check/lint/fmt | PASS | 101 TypeScript files, zero findings | Package config supplied to wrappers |
+| MCP package tests | PASS | 105 passed, 0 failed | Includes all four flows, adapter, receipts, registry, and stdio |
+| Corpus generator | PASS | 3 tests + `--check` | 35 packages, 268 subpaths, 7,278 symbols |
+| Corpus provenance | PASS | generated asset | SHA-256 `fa0a56beaa7e83ba59d9f553e71ca4ab4d5dec118926fa8475b6796a24cdcdd1`; 2,042,704 raw / 295,041 gzip bytes |
+| `quality:gate` | PASS | package task | Existing repository warnings only |
+| Doctrine check | PASS | scoped `packages/mcp` | Existing cardinality warnings only; no new file-size warning |
+| Documentation lint | PASS | 3 entrypoints | 0 combined diagnostics, 0 private refs, 0 missing docs |
+| Package publish dry-run | PASS | package task | No slow types; generated corpus included |
+| Root publish dry-run | PASS | root task | Existing dynamic-import warnings only |
+| Publish assets | PASS | `check:publish-assets` | Generated catalog current |
+| CLI E2E | FAIL (unrelated) | `scaffold.runtime`: 51 passed, 1 failed | Generated users-service Prisma database health returned 503; cleanup passed |
 
 ### Runtime Gates
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| Mirror-free RED | PASS (negative demonstrated) | RED JSON above | GREEN pending slice 2 |
+| Mirror-free RED | PASS (negative demonstrated) | RED JSON above | 17 tools; `find_export` absent |
+| Mirror-free GREEN | PASS | `export-surface-mirror-free_test.ts` | Empty workspace with no `docs/` resolves `definePage` to `@netscript/fresh` `./builders`; receipt resource is `project` |
 
 ### Consumer Gates
 
 | Consumer | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| MCP host / public exports | NOT_RUN | planned slice 2 | Requires implemented tool contracts |
+| MCP host / public exports | PASS | package tests + doc/publish gates | 21-tool registry and exported contracts verified |
 
 ## Handoff Notes
 

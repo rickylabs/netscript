@@ -31,3 +31,23 @@ Drift is append-only.
 - **Severity:** minor
 - **Action:** accept authorized workflow override; retain draft→ready augment, OpenHands, and orchestrator pre-merge evaluation composition.
 - **Evidence:** `supervisor.md`; `plan-eval.md`.
+
+## 2026-08-04 — Query behavior remains in the application layer
+
+- **What:** The locked risk text anticipated four behavior-specific methods on the corpus port.
+- **Source:** Contract-first implementation and Archetype-2 port review.
+- **Expected:** A port method corresponding to each MCP question form.
+- **Actual:** `ExportSurfaceCorpusPort` exposes one narrow `load()` boundary; the four bounded query behaviors remain application flows over immutable corpus data.
+- **Severity:** minor
+- **Action:** accept; this prevents MCP query policy from coupling the generated-corpus adapter and keeps the port technology-facing.
+- **Evidence:** `src/ports/export-surface-corpus-port.ts`; `src/application/export-surfaces/export-surface-flows.ts`.
+
+## 2026-08-04 — Merge-readiness E2E exposed an unrelated generated database-health failure
+
+- **What:** The required full CLI E2E did not produce a wholly green suite.
+- **Source:** `deno task e2e:cli` after the complete MCP gate column.
+- **Expected:** 52 passing `scaffold.runtime` gates.
+- **Actual:** 51 passed; the generated users service returned HTTP 503 because its Prisma raw database query failed. Scaffold, DB init/generate/seed, generated checks, Aspire topology, worker behavior, cleanup, and all slice-specific gates passed.
+- **Severity:** minor (external to changed surface)
+- **Action:** record without modifying unrelated CLI/database code; cleanup passed and the leak reporter found no run-owned survivors.
+- **Evidence:** suite end summary at 606,622 ms; `behavior.service-health` failure; `cleanup.aspire-stop` and container cleanup PASS.
