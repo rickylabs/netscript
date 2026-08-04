@@ -7,9 +7,9 @@
  * `createKvCachePersister()` for persisted query cache storage, and key helpers
  * that map server invalidation keys to client query prefixes.
  *
- * The public `QueryClientPort` and `ServiceQueryUtils<TContract>` types are
- * package-owned structural mirrors. They preserve contract inference while
- * keeping upstream TanStack and oRPC helper types behind internal boundaries.
+ * The public `QueryClientPort` selects the capabilities SDK adapters require
+ * from TanStack's `QueryClient`; `ServiceQueryUtils<TContract>` preserves
+ * contract inference for the oRPC query helpers.
  *
  * @module
  */

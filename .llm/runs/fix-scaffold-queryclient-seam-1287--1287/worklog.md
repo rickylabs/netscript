@@ -52,6 +52,11 @@ never hand-copy generic method signatures.
 | Time | Slice | Step | Notes |
 | ---- | ----- | ---- | ----- |
 | 2026-08-05 | 1 | research | Confirmed factory type erasure and missing `apps` gate coverage. |
+| 2026-08-05 | 2 | RED type contract | TS2740 proved the factory result was not assignable to `QueryClient`; TS2551 proved `prefetchQuery` was erased. |
+| 2026-08-05 | 2 | RED scaffold contract | Expected `deno task check`; actual duplicated command omitted `apps`. |
+| 2026-08-05 | 3 | implementation | Factory now returns `QueryClient`; narrow port derives its methods; generated gate delegates to the workspace task. |
+| 2026-08-05 | 3 | focused GREEN | SDK type fixture, SDK query-client test, and scaffold gate regression pass. |
+| 2026-08-05 | 4 | fresh consumer proof | Generated 218-file Postgres/service workspace, ran normal DB codegen, and checked 24 artefacts including the showcase with zero diagnostics. |
 
 ## Decisions
 
@@ -73,27 +78,27 @@ never hand-copy generic method signatures.
 
 | Gate | Command or check | Result | Notes |
 | ---- | ---------------- | ------ | ----- |
-| RED type contract | pending | NOT_RUN | Before implementation. |
-| RED scaffold contract | pending | NOT_RUN | Before gate change. |
+| RED type contract | `deno check --unstable-kv tests/type-fixtures/sdk-assignability_type.ts` | PASS | Failed before implementation with TS2740 and TS2551; passes after. |
+| RED scaffold contract | focused `scaffold-gates_test.ts` | PASS | Failed before gate change because the command omitted `apps`; passes after. |
 
 ### Fitness Gates
 
 | Gate | Result | Evidence | Notes |
 | ---- | ------ | -------- | ----- |
-| Type surface | PENDING_SCRIPT | pending | — |
-| Scaffold output | PENDING_SCRIPT | pending | — |
+| Type surface | PASS | `packages/sdk/tests/type-fixtures/sdk-assignability_type.ts` | Concrete assignment and `prefetchQuery` compile. |
+| Scaffold output | PASS | `evidence/fresh-scaffold-check.md` | Workspace task checked the generated showcase with zero diagnostics. |
 
 ### Runtime Gates
 
 | Gate | Result | Evidence | Notes |
 | ---- | ------ | -------- | ----- |
-| Fresh scaffold check | NOT_RUN | pending | Artifact evidence required. |
+| Fresh scaffold check | PASS | `evidence/fresh-scaffold-check.md` | Fresh Postgres/service scaffold; normal DB generation prerequisite; no source edits. |
 
 ### Consumer Gates
 
 | Consumer | Result | Evidence | Notes |
 | -------- | ------ | -------- | ----- |
-| Fresh catalog showcase | NOT_RUN | pending | Must type-check unedited. |
+| Fresh catalog showcase | PASS | SHA-256 and compiler artefact list in evidence | Uncast factory-to-dehydration boundary compiled. |
 
 ## Handoff Notes
 
