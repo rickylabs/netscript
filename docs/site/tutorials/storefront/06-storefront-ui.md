@@ -260,7 +260,7 @@ typed client be the function body. Same type source, honest seam.
 
 ## Step 4 — Wire the route to the page
 
-The page is built using NetScript's fluent `definePage` page builder. By binding to the `cartRoute` contract, the page gains access to type-safe path and search schemas so `ctx.path` and `ctx.search` are fully typed throughout the pipeline:
+The page is built using NetScript's fluent `definePage` page builder. By binding to the `cartRoute` contract, the page gains access to type-safe path and search schemas so `ctx.path` and `ctx.search` are fully typed throughout the pipeline. `.withResource()` then registers a value resolved once per request — see [Request-scoped resources](/web-layer/resources/) for what "once" guarantees:
 
 ```tsx
 // apps/storefront/routes/cart/[customer].tsx

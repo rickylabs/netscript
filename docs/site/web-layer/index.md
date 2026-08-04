@@ -49,6 +49,8 @@ order:
   starts from.
 - **[The define-page builder](/web-layer/builders/)** — `definePage()` and `definePartial()`
   (`@netscript/fresh/builders`): typed layers, defer policies, and per-layer partial refresh.
+- **[Request-scoped resources](/web-layer/resources/)** — `withResource()`: one value resolved once
+  per request and shared by every layer, layout, and metadata resolver on the page.
 - **[Route contracts](/web-layer/route/)** — `defineRouteContract()`, schema helpers such as
   `paginationSearchSchema()`, and `createRouteReference()` for typed links.
 - **[Data loading & the query cache](/web-layer/query/)** — `QueryIsland`, `useQuery`,

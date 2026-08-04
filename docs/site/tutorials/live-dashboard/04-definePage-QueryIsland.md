@@ -101,7 +101,8 @@ registers a value that is computed at most once per request, no matter how many 
 That matters here because two layers want the same cached orders slice: the server-rendered `list`
 table and the `ordersQuery` island seed. Declared as a resource, the KV read happens once and both
 layers share it. Downstream resources may await upstream ones, so the prefetch step below builds on
-the same typed search input:
+the same typed search input — the resolution order, the shared store, and the dedup spans behind that
+are in [Request-scoped resources](/web-layer/resources/):
 
 ```tsx
 // apps/dashboard/routes/(dashboard)/dashboard/orders/index.tsx
