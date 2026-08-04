@@ -75,6 +75,10 @@ semantic install-artifact assertions live in the adjacent `resources.test.ts`.
 | 2026-08-04 | 4 | scoped quality | Check/lint/fmt wrappers passed for 79 saga files and 22 touched CLI-helper files with zero findings; focused suites passed 48 total test/BDD steps. |
 | 2026-08-04 | 4 | framework law | `deno task quality:gate` passed; quality scan had zero findings and doctrine had zero failures. |
 | 2026-08-04 | 4 | package surface | Doc-lint stayed at its 15-private-ref/0-missing-JSDoc baseline; targeted `deno publish --dry-run --allow-dirty` completed successfully. |
+| 2026-08-04 | 4 | full-suite infrastructure RED | First `scaffold.runtime` attempt passed 29 gates, then both configured `runtime.aspire-restore` attempts timed out at 900s; cleanup passed. Exact scratch restore subsequently passed in 5.9s. |
+| 2026-08-04 | 4 | full-suite downstream RED | Clean reruns passed every saga wait and reached 51 passing gates, then failed only `behavior.service-health` after DB/AppHost endpoint churn. |
+| 2026-08-04 | 4 | blocker proved | Live healthy Postgres moved to port 44973 while the users Prisma client still queried port 50564; direct `/health` returned the full 503 artefact. This is outside #1184 and the PR remains draft/CI-fail. |
+| 2026-08-04 | 4 | final hygiene | `aspire ps` returned `[]`; final leak-check reports no owned survivor and leaves two foreign wave-4 Postgres containers untouched. |
 
 ## Decisions
 
@@ -117,6 +121,7 @@ semantic install-artifact assertions live in the adjacent `resources.test.ts`.
 | Framework quality | `deno task quality:gate` | PASS | 0 quality findings; 0 doctrine failures; warnings are baseline. |
 | Doc-lint | `deno task doc:lint --root plugins/sagas --pretty` | BASELINE | 15 private refs, 0 missing JSDoc, unchanged. |
 | Publish dry-run | `plugins/sagas: deno publish --dry-run --allow-dirty` | PASS | Pack manifest inspected; dry run complete. |
+| Full scaffold runtime | `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | BLOCKED | Final: 51 passed, 1 failed (`behavior.service-health`); all saga waits passed. |
 
 ### Fitness Gates
 
@@ -136,6 +141,43 @@ semantic install-artifact assertions live in the adjacent `resources.test.ts`.
 | Fixed process health | PASS | populated `sagas_http_/health_200_check` plus HTTP body | Supervisor snapshot, not process-liveness fallback. |
 | Lifecycle + compensation | PASS | four 200 publishes; Redis envelopes; OTEL spans | Completed and compensated outcomes use separate correlation keys/instances. |
 | Restart durability | PASS | changed process PIDs; unchanged durable envelopes | Both API and background runner restarted. |
+| Full-suite saga readiness | PASS | `runtime.wait.sagas-api`, `runtime.wait.sagas` | Downstream failure occurs later in unrelated users DB health. |
+
+### Merge-readiness blocker artefact
+
+The required command was run from an empty `aspire ps` preflight. Its first attempt exposed an
+Aspire/NuGet stall (`runtime.aspire-restore`, two 900-second attempts, `passed=29 failed=1`); an
+exact restore against the owned scratch AppHost then succeeded in 5.9 seconds. Clean reruns reached
+the product/runtime gates. The final report is:
+
+```text
+runtime.wait.postgres ... PASSED
+runtime.wait.sagas-api ... PASSED
+runtime.wait.sagas ... PASSED
+behavior.db-status-preserves-apphost ... PASSED
+behavior.service-health ... FAILED 117513ms
+cleanup.aspire-stop ... PASSED
+Summary: passed=51 failed=1
+```
+
+Live artifact inspection during the failure showed a healthy current database:
+
+```text
+postgres healthStatus=Healthy, postgres_check=Healthy, tcp://localhost:44973
+```
+
+but the generated users service returned:
+
+```text
+HTTP/1.1 503 Service Unavailable
+{"status":"unhealthy","checks":[{"name":"database","healthy":false,
+"message":"... Can't reach database server at 127.0.0.1:50564"}]}
+```
+
+The endpoint changed after the nominal preserve-AppHost gate while the resident users process kept
+its old Prisma target. This is deterministic DB/AppHost lifecycle scope, not saga glue. Per the
+honesty rule, the expensive gate remains red and the PR must not transition to ready/IMPL-EVAL until
+the owner/orchestrator resolves or explicitly re-scopes this blocker.
 
 ### Consumer Gates
 

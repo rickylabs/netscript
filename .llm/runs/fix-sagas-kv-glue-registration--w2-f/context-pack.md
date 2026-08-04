@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `fix-sagas-kv-glue-registration--w2-f` |
 | Branch | `fix/sagas-kv-glue-registration` |
-| Current phase | `implement` |
+| Current phase | `ci-fail` |
 | Archetype | `5 — Plugin Package` |
 | Scope overlays | `service` |
 
@@ -14,7 +14,9 @@
 
 Implementation and the owner runtime protocol are green. The final fresh scaffold under
 `.llm/tmp/1184-final/saga-kv-final` proved populated background health, full terminal and
-compensating lifecycles, correlation, OTEL traces/spans/logs, and restart durability.
+compensating lifecycles, correlation, OTEL traces/spans/logs, and restart durability. Merge
+readiness is blocked by an unrelated deterministic `scaffold.runtime` database endpoint-churn
+failure after all saga readiness gates pass.
 
 ## Completed
 
@@ -26,17 +28,21 @@ compensating lifecycles, correlation, OTEL traces/spans/logs, and restart durabi
 - Added saga-only supervisor health endpoint/probe after the empty-report verifier RED.
 - Allowed KV runtime startup without optional Prisma projection delegates; Prisma remains strict.
 - Completed all seven owner runtime evidence steps and cleaned owned resources.
+- Passed scoped wrappers, `quality:gate`, doc-lint baseline, and publish dry-run.
+- Ran the required full `scaffold.runtime` command from an empty AppHost preflight; final artifact
+  passed 51 gates and failed only `behavior.service-health` after DB endpoint churn.
 
 ## In Progress
 
-- Slice 4: framework gates, serialized `scaffold.runtime`, composed review, PR evidence, hygiene.
+- Slice 4 blocked: `scaffold.runtime` is red outside saga scope; composed review/ready transition
+  must not start until the required gate is green or the owner explicitly re-scopes it.
 
 ## Next Steps
 
-1. Commit/push the completed implementation and runtime evidence.
-2. Run scoped check/lint/fmt, `quality:gate`, doc/publish gates.
-3. Serialize and run the one-pass `scaffold.runtime` merge-readiness gate.
-4. Complete composed draft→ready review and update PR/issue evidence.
+1. Owner/orchestrator decides whether the DB/AppHost endpoint-churn defect is repaired separately or
+   explicitly waived for this slice.
+2. Re-run the exact one-pass `scaffold.runtime` command after that blocker is resolved.
+3. Complete the composed draft→ready review and close-gate evidence only after a green gate.
 
 ## Key Decisions
 
@@ -60,19 +66,20 @@ compensating lifecycles, correlation, OTEL traces/spans/logs, and restart durabi
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | in progress | focused tests/check green; full framework gates pending |
+| Static | PASS | focused suites, scoped wrappers, quality, doc-lint, publish dry-run |
 | Fitness | runtime PASS | owner protocol fully evidenced |
 | Runtime | PASS | populated health, lifecycle, OTEL, restart |
-| Consumer | PASS local | fresh scaffold; published confirmation at canary point 2 |
+| Consumer | BLOCKED | local owner protocol passes; full suite 51 pass/1 unrelated DB failure |
 
 ## Open Questions
 
-- No implementation blocker. Shared expensive-gate slot must be empty before `scaffold.runtime`.
+- Required full-suite gate is blocked by DB/AppHost endpoint churn: live Postgres `44973`, users
+  Prisma still bound to `50564` after the nominal preserve-AppHost gate.
 
 ## Drift and Debt
 
 - Drift: milestone artifacts/legacy docs absent; detached starts exited without attached PTY; empty
-  health and KV/Prisma coupling required explicit rescope.
+  health and KV/Prisma coupling required explicit rescope; full-suite DB endpoint churn is escalated.
 - Debt: #1093 remains untouched; no generated schema hand-edit was used.
 
 ## Commits

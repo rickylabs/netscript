@@ -96,3 +96,21 @@ Drift is append-only.
 - **Action:** rescope
 - **Evidence:** Add an internal backend-aware resolver with unit coverage. This deliberately leaves
   #1093 schema extraction untouched and introduces no package export.
+
+## 2026-08-04 — Merge-readiness suite blocked by unrelated DB/AppHost endpoint churn
+
+- **What:** The required one-pass `scaffold.runtime` suite reaches every saga readiness gate, then
+  fails `behavior.service-health` after `behavior.db-status-preserves-apphost` changes the live
+  Postgres endpoint without restarting the generated `users` process.
+- **Source:** Retained suite JSONL under `.llm/tmp/cli-e2e/plugin-smoke-20260804-021113.log`, live
+  `aspire describe postgres|users`, and the users `/health` response.
+- **Expected:** The database-status gate preserves the resident AppHost and all dependent endpoint
+  bindings; the later users health check connects to the live database.
+- **Actual:** `behavior.db-status-preserves-apphost` passes, the healthy Postgres resource is exposed
+  at `localhost:44973`, but the already-running Prisma client continues querying
+  `127.0.0.1:50564`. `/health` returns 503 with `Can't reach database server` and the suite reports
+  `passed=51 failed=1`; saga waits passed before this failure.
+- **Severity:** blocking / out of slice scope
+- **Action:** escalate
+- **Evidence:** Do not mark the PR ready or claim a green expensive gate. Fixing DB-operation AppHost
+  resource churn is materially outside #1184 and requires owner/orchestrator direction.
