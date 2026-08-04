@@ -172,3 +172,21 @@ Re-audit should require all of the following before PASS:
 **FAIL_FIX**
 
 All original FAIL findings except the live-stream proof are fixed. To reach PASS, wire saga instance mutations into the `sagaInstance` durable stream (and verify the documented post-start `ns-sagas publish` flow), or change ch.5 to demonstrate a source-supported refresh/restart path without claiming immediate push. This is the second audit FAIL cycle and therefore requires supervisor escalation under the `docs_audit` profile rather than another unbounded audit loop.
+
+### Supervisor-authorized final pass — `95e6493d3`
+
+Scope was limited to the remaining live-stream finding: the reordered verification sequence, its Prisma prerequisite, and inherited continuous-update claims.
+
+| Scoped check | Status | Independent evidence |
+| --- | --- | --- |
+| Restart reconciliation reaches an already-open subscriber | **FIXED (functional path)** | The documented order is now viable: `ns-sagas publish` persists the instance; the page calls `preload()` before the second restart; `createStreamDB()` defaults `live = true`, starts `stream.stream({ live, json: true })`, and dispatches later batches through `subscribeJson()`; service startup calls the finite `startSagasStreamMirror()` reconciliation; and each database row is sent through `DurableStreamProducer.upsert()`. The streams proxy regression test independently proves that a live read already in flight receives a later producer write. Thus the restart reconciliation upsert can make the row appear in the open page without a page reload. **Transport correction:** this default connection is long-poll, not SSE: `@durable-streams/client` maps `live === true` to `?live=long-poll`; SSE requires the explicit `live: 'sse'` mode. Ch.5 line 62 still describes the default as concurrent SSE connections, so the transport wording remains inaccurate even though delivery is supported. |
+| Prisma-backend prerequisite | **FIXED** | `--saga-store-backend prisma` is a live public plugin-install option and is written into the sagas store configuration. `resolveSagaServicePrismaClient()` requires the saga Prisma delegates for that backend; `startSagasStreamMirror()` is invoked only when those delegates resolve. The sagas plugin contributes `database/sagas.prisma`, so applying database setup is required. On KV without those delegates, `services/src/main.ts` logs `Saga Prisma delegates unavailable` and skips the mirror, matching the new warning. |
+| No remaining per-step / continuous-live over-promise | **NOT-FIXED** | Ch.5 now states the once-per-service-start limitation accurately, but contradictory inherited claims remain in the same track. `live-dashboard/index.md:93` still promises that StreamDB rows “update the instant state changes on the server,” and the index introduction/recap still presents an always-current live order queue. `live-dashboard/06-deploy.md:38` still calls the prerequisite “the live monitor updating in real time.” These claims imply per-change behavior that the only sagas stream producer cannot provide. The updated ch.5 itself also calls the default connection SSE at line 62, while source uses long-poll by default. |
+
+#### Scoped final verdict
+
+**FAIL_FIX**
+
+The reordered restart proof and Prisma prerequisite are supported by source, but the scoped acceptance condition that no continuous/per-step over-promise remain is not met. Remove or qualify the residual index and ch.6 claims, and describe the default StreamDB transport as live long-poll (or explicitly configure `live: 'sse'`) before PASS.
+
+**Final line check (`0d178018b`): PASS** — the five scoped residual lines now describe once-per-start mirror delivery, event-driven re-rendering, and long-poll-by-default transport with SSE opt-in; the previously identified index and ch.6 per-change over-promises are removed.

@@ -124,3 +124,15 @@
   page fixes will arrive as owner steering. Program continues autonomously: P2 (#1222)
   re-audit in flight (detached Codex process, wakeup scheduled), then ready/merge on PASS;
   P3 (#1210) scoping follows from the sweep's deferred list.
+
+## 2026-08-04 — #1222 audit PASS; P3 analysis complete
+
+- #1222: 2 fix rounds + supervisor-applied residuals → final line check **PASS** at 0d178018b.
+  Ready + auto-merge on CI settle. Framework gap filed as #1225 (saga stream mirror
+  reconciles only at service start; Prisma-delegate precondition).
+- P3 (#1210): S1 api-inventory.md delivered (19-method definePage chain verified from source;
+  9 deep-dives / 10 slices; forms+partials half has zero tutorial coverage). S2
+  competitive-benchmark.md delivered by agy but single-turn (unfetched) — verification pass
+  (Sonnet, real fetches) graded claims: Next.js/SvelteKit confirmed, Nuxt ordering and
+  Laravel/Rails specifics WRONG; benchmark-verification.md is the correction layer authoring
+  must cite. Authoring (D1 withResource + D4 Partials first) dispatches after #1222 merges.
