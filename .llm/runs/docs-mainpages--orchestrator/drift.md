@@ -79,3 +79,8 @@ Confirmed findings:
   runs Kimi K3 (`moonshotai/kimi-k3` · high) over the proven claude-openrouter transport
   (`claude-print`). Same brief and artifact path (slices/mainpages-s5/grok-eval.md name kept
   for continuity of the slice, content authored by Kimi).
+
+- **D-11 (owner redirect, 2026-08-04 ~12:15).** Kimi K3 is unavailable on OpenRouter via
+  claude-print (404 model not found). Owner redirected S5 to Gemini (agy) as its quota resets.
+  S5 evaluator: agy · gemini-3.6-flash · effort high, same brief; artifact
+  slices/mainpages-s5/gemini-eval.md. Opus final audit (D-9) continues unaffected.
