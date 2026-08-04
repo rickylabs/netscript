@@ -10,18 +10,20 @@ Explain `netscript agent mcp` when a developer launches it interactively while p
 ## Slices
 
 - [x] S0 Issue-first research, locked plan, draft surface — `9dd3e82cd`
-- [ ] S1 TTY affordance and editor snippets
-- [ ] S2 Help/docs and targeted gates
+- [x] S1 TTY affordance and editor snippets — pending implementation commit
+- [x] S2 Help/docs and targeted gates — pending implementation commit
 
 ## Validation
 
-- Pending implementation.
+- Focused MCP command/adapters: 4 passed
+- CLI package: 597 passed / 484 steps
+- Scoped check/lint/fmt and diff hygiene: pass
 
 ## Harness
 
 - Run dir: `.llm/runs/fix-agent-mcp-affordance-1248--1248/`
 - Route: openai / gpt-5.6-sol / medium
-- Phase: implementation
+- Phase: implementation evaluation / orchestrator pre-merge gate
 
 ## Drift / Debt
 
@@ -32,11 +34,11 @@ Explain `netscript agent mcp` when a developer launches it interactively while p
 issue: 1248
 entries:
   - box-index: 1
-    evidence: "Pending implementation."
+    evidence: "Interactive command regression proves guidance is emitted and server startup is skipped; text explains stdio and copyable setup."
   - box-index: 2
-    evidence: "Pending implementation."
+    evidence: "Piped-stdin regression proves zero guidance writes and unchanged server input dispatch; existing real stdio E2E remains green in the CLI package task."
   - box-index: 3
-    evidence: "Pending implementation."
+    evidence: "Command help regression asserts the stdio transport and https://netscript.dev/ai/agent-tooling/ link."
   - box-index: 4
-    evidence: "Pending implementation."
+    evidence: "Interactive regression asserts native .zed/settings.json context_servers and .vscode/mcp.json servers snippets, aligned with #1247."
 ```

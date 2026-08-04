@@ -80,7 +80,10 @@ dependencies.
 ## Run the server
 
 The generated host configuration runs `netscript agent mcp`, which starts the MCP
-server over standard input/output. Its flags:
+server over standard input/output. An MCP client launches this command and communicates over
+stdin/stdout; do not run it by hand. When stdin is an interactive terminal, the command exits after
+showing copyable Zed and VS Code configuration. When stdin is piped, it writes no human-facing
+output that could corrupt the JSON-RPC stream. Its flags:
 
 | Flag                    | Purpose                                                                                       |
 | ----------------------- | --------------------------------------------------------------------------------------------- |
