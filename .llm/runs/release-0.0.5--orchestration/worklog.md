@@ -1106,3 +1106,23 @@ Gate record: rerun 30910826721 all four green (close-gate green after the #1104 
 evidence mirror — decision **implement**, rationale: trigger adapter consumes `attempt`;
 removal breaks real consumers); refs `Closes #1104`, sidebar [1104] exact; threads 0/0;
 **#1104 auto-closed, verified.** Rides canary.8. W4-D done; W4-B/C (S9/S10) dispatching now.
+
+## 2026-08-04 — Verified-defect triad folded in: #1234/#1235/#1236 dispositioned; two dispatched
+
+Owner handoff: three p2 issues independently verified by a separate Codex reviewer from clean
+scaffolds on 0.0.4 / canary.2 / canary.6 (transcripts in the bodies; no regressions — all
+long-standing). Priority call (mine): verified user-facing defects on the published surface
+outrank the caveat kill-list; nothing in-flight displaced. Plan rows added (total 51).
+- **#1234** (custom-job registry generation impossible; E2E fixtures hand-edit around it) —
+  W5-V1 Sol·high, **dispatched** (ns005-genjobs). Acceptance includes killing the repo's own
+  hand-edit workaround.
+- **#1235** (createNetScriptStreamDB type erasure; control isolates the wrapper) — W5-V2
+  Sol·high, **dispatched** (ns005-streamdb). Brief carries the binding scope guard: the
+  multi-from flat-union claim was REFUTED and is excluded.
+- **#1236** (plugin remove half-removes then fails; no rollback) — W5-V3 Sol·medium, queued on
+  the first free lane (S9/S10 finishing).
+- **Refuted, not filed, recorded so it never gets scheduled:** withForm hydrated-POST
+  value/error loss — Playwright-verified preserved on both versions; form modules
+  byte-identical 0.0.4→canary.2. The adjacent REAL failure mode is passing method-bearing
+  RuntimeFormState into an island instead of its serializable snapshot (misuse).
+They ride whichever canary follows their merges (content-derived membership).
