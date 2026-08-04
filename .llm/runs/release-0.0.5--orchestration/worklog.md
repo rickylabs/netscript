@@ -1194,3 +1194,18 @@ to 4437/8010/3001 after finding 27), ~25 files, transcript rule applied to tutor
 The #1211 row of the fix-driven caveat program is done; #1206/#1218/#1224 rows were already
 clean per the inventory. Rides canary.8. Remaining program debt: reframe pass (6 debts, 18
 markers) after the kill-list slices land; #1243 (0.0.6) tracks the auth CLI legacy pin.
+
+## 2026-08-04 — Triad common-cause silent kill (16:10-16:11 local) detected and cured
+
+All three verified-defect lanes' Codex turns died silently within the same minute
+(~14:11Z), ~17 min after launch — genjobs mid-tool-result, streamdb and plugrm mid-work.
+No error surfaced anywhere; PR heads froze and local diffs stopped moving. Detection chain
+that worked: watcher STALE-DRAFT (45-min head threshold) → local diffstat fingerprint
+comparison across two cycles (identical bytes = not "working locally") → rollout mtime
+check (the artifact-level truth). Cure: `codex exec resume <thread>` with a continuation
+note naming the death as environmental — genjobs resumed first and pushed within minutes
+(#1239 heads bbb3ad80→fe644c65); streamdb + plugrm resumed the same way once the shared
+16:10 cluster was visible. **Finding 28 (for #1163): a single STALE-DRAFT cycle is not
+actionable — the actionable signal is unchanged diffstat fingerprint ACROSS cycles plus
+rollout mtime; and simultaneous multi-lane death points at the daemon/host, not the agents,
+so resume all victims rather than debugging any one of them.**
