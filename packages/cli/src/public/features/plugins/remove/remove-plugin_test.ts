@@ -10,6 +10,7 @@ import { StringTemplateAdapter } from '../../../../kernel/adapters/scaffold/temp
 import { PluginWorkspaceMutator } from '../../../../kernel/adapters/plugin/workspace-mutator.ts';
 import { PluginRegistryScaffolder } from '../../../../kernel/adapters/plugin/registry-scaffolder.ts';
 import { PluginKindRegistry } from '../../../../kernel/application/registries/plugin-kind-registry.ts';
+import { netscriptJsrSpecifier } from '../../../../kernel/constants/jsr-specifiers.ts';
 import { IoError, RemoteError } from '../../../../kernel/domain/errors/cli-exit-error.ts';
 import type { PluginDispatchOptions } from '../dispatch/plugin-dispatch-port.ts';
 import { createDoctorPluginCommand } from '../doctor/doctor-plugin-command.ts';
@@ -83,7 +84,7 @@ Deno.test('plugin remove rolls back every owned path when regeneration fails aft
   const denoBefore = JSON.stringify({ workspace: ['./apps/web'], imports: { keep: './keep.ts' } }, null, 2) + '\n';
   const denoAfter = JSON.stringify({
     workspace: ['./apps/web', './plugins', './plugins/*'],
-    imports: { keep: './keep.ts', managed: 'jsr:@netscript/plugin-sagas@0.0.5' },
+    imports: { keep: './keep.ts', managed: netscriptJsrSpecifier('plugin-sagas') },
   }, null, 2) + '\n';
   const files = new Map<string, string>([
     [`${projectRoot}/appsettings.json`, JSON.stringify({
