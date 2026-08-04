@@ -16,6 +16,7 @@ export {
   type FreshAppTelemetryAttribute,
   type FreshAppTelemetryOptions,
 } from './define-fresh-app.ts';
+export { type FreshQueryCacheInvalidationOptions } from './query-cache-invalidation.ts';
 
 // Streaming SSR
 export {

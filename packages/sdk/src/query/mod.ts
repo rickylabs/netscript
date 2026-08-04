@@ -10,6 +10,10 @@
  * `defineServices()` preset when a contract map should create clients,
  * factories, and frontend query utils together.
  *
+ * Generated `queryOptions()` are environment-aware: their query function uses
+ * the same CacheQuery entry as the action on a server with a registered cache
+ * provider, while browser execution calls the typed service client directly.
+ *
  * @module
  */
 

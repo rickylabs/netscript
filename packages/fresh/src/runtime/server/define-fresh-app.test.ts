@@ -136,3 +136,52 @@ Deno.test('defineFreshApp can override file-system route registration', () => {
   assert(receivedPattern === undefined, `Unexpected fsRoutes pattern: ${receivedPattern}`);
   assert(app.fsRouteCalls.length === 0, 'Expected default fsRoutes not to run');
 });
+
+Deno.test('defineFreshApp registers the standard server-query invalidation route', async () => {
+  const app = defineFreshApp({ staticFiles: false, fsRoutes: false });
+
+  const response = await app.handler()(
+    new Request(
+      'http://localhost/_netscript/query-cache/invalidate',
+      {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ queryKey: ['boards', 'board', 'acme'] }),
+      },
+    ),
+  );
+
+  assert(response.status === 204, `Expected 204 response, received ${response.status}`);
+});
+
+Deno.test('defineFreshApp can disable or move the server-query invalidation route', async () => {
+  const disabled = defineFreshApp({
+    staticFiles: false,
+    fsRoutes: false,
+    queryCacheInvalidation: false,
+  });
+  const disabledResponse = await disabled.handler()(
+    new Request(
+      'http://localhost/_netscript/query-cache/invalidate',
+      { method: 'POST' },
+    ),
+  );
+  assert(disabledResponse.status === 404, 'Expected the disabled route to return 404');
+
+  const moved = defineFreshApp({
+    staticFiles: false,
+    fsRoutes: false,
+    queryCacheInvalidation: { path: '/internal/cache/invalidate' },
+  });
+  const movedResponse = await moved.handler()(
+    new Request(
+      'http://localhost/internal/cache/invalidate',
+      {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ queryKey: ['boards'] }),
+      },
+    ),
+  );
+  assert(movedResponse.status === 204, `Expected moved route 204, got ${movedResponse.status}`);
+});
