@@ -12,9 +12,9 @@
 
 ## Current State
 
-The plan is locked and PR #1239 is draft with `status:impl`. The custom-only installed-plugin test
-reproduced the missing-registry RED, then passed after the workers scaffold include overlay was
-removed. The full installed-registry integration file passes 9/9.
+The plan is locked and PR #1239 is draft with `status:impl`. The RED/GREEN manifest slice is pushed.
+The original fresh custom-only scaffold now writes a registry containing its job. Flow B no longer
+writes registry source: it configures imports, calls the selected public CLI, and asserts the result.
 
 ## Completed
 
@@ -25,10 +25,12 @@ removed. The full installed-registry integration file passes 9/9.
 - Recorded the milestone D6 composed-evaluation waiver.
 - Captured the targeted custom-only test RED before changing the manifest.
 - Proved the manifest change GREEN through the same targeted test and the full integration file.
+- Proved the original fresh scaffold GREEN through the public command.
+- Removed Flow B's generated-registry mutation and documented structural discovery.
 
 ## In Progress
 
-- Commit and push slice 1, then migrate Flow B to public regeneration and update docs.
+- Commit and push slice 2, then run scoped, package, publication, and full runtime gates.
 
 ## Next Steps
 
@@ -53,6 +55,10 @@ removed. The full installed-registry integration file passes 9/9.
 | `.llm/runs/fix-generate-plugins-custom-job-registry--1234/` | new | Harness research, locked plan, supervisor identity, worklog, drift, and context. |
 | `plugins/workers/scaffold.runtime.json` | changed | Removed the closed scaffold sample include overlay. |
 | `packages/cli/src/public/features/generate/plugins/installed-runtime-registry-integration_test.ts` | changed | Custom-only RED/GREEN contract coverage. |
+| `packages/cli/e2e/src/application/gates/scaffold/prepare-flow-b-fixture.ts` | changed | Public regeneration and read-only registry assertion. |
+| `packages/cli/e2e/src/application/gates/scaffold/runtime-gates.ts` | changed | Passes the runner-selected CLI entrypoint to Flow B. |
+| `docs/site/reference/cli/commands.md` | changed | Documents custom structural job discovery and regeneration. |
+| `docs/site/tutorials/erp-sync/02-import-job.md` | changed | Corrects source paths and generated-registry guidance. |
 
 ## Gates
 
@@ -60,8 +66,8 @@ removed. The full installed-registry integration file passes 9/9.
 | ----------- | -------------- | -------- |
 | Static | targeted GREEN | Installed-registry integration: 9 passed, 0 failed |
 | Fitness | selected | A5 + A6 + docs overlay in `plan.md` |
-| Runtime | RED reproduced | Fresh custom-only scaffold exits 1 on missing registry |
-| Consumer | RED reproduced | Public `generate plugins` installed-plugin path |
+| Runtime | focused GREEN | Flow B modules check; full `scaffold.runtime` pending |
+| Consumer | GREEN | Fresh custom-only public regeneration writes the expected registry |
 
 ## Open Questions
 
