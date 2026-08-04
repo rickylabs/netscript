@@ -228,11 +228,11 @@ The table starts empty, because nothing in this track has created a saga instanc
 built a plain oRPC read-model, not a saga producer, so posting an order does **not** publish a saga
 message. You create one yourself, and the order of the steps is what makes the push observable.
 
-**Precondition.** The mirror that fills this stream reads saga instances through Prisma delegates, so
-the sagas plugin must be installed on the Prisma store backend with its migration applied
-(`netscript plugin install @netscript/plugin-sagas --saga-store-backend prisma`, then
-`netscript db init`). On the KV backend the sagas service logs `Saga Prisma delegates unavailable`
-and never mirrors anything — the table stays empty no matter what you publish.
+The live producer runs in the saga processor after each durable transition, on either the Prisma or
+KV store backend. Prisma additionally enables startup reconciliation of instances created before the
+stream producer was available; install it with
+`netscript plugin install @netscript/plugin-sagas --saga-store-backend prisma`, then
+`netscript db init`, when you need that historical backfill.
 
 ```sh
 # Install the shorthand once (see the storefront track for the full form):
@@ -242,24 +242,21 @@ and never mirrors anything — the table stays empty no matter what you publish.
 #    its registry at boot, so a saga added while it runs is not yet known.
 ns-sagas add saga demo --message-type=DemoStarted --durability=t1 --topic=demo
 
-# 2. With the graph back up, publish a message. The engine starts a durable
-#    saga instance and writes it to the saga database.
+# 2. With the graph back up, open the monitor page and leave it connected.
+
+# 3. Publish a message. The engine durably records the transition and then
+#    upserts the latest instance state into the live stream.
 ns-sagas publish DemoStarted --payload='{ "id": "demo_1" }' --correlation-key=demo_1
 
-# 3. Confirm the instance exists in the durable store.
+# 4. Confirm the instance exists in the durable store.
 ns-sagas list --instances --saga=DemoSaga --json
 ```
 
-Now open the monitor page in the browser and **leave it open**. With the page connected and its
-subscription live, restart the sagas service one more time. As it finishes starting, its stream
-mirror reconciles every saga instance out of the database and upserts each one into the
-`sagaInstance` collection — and because your page is already subscribed, that upsert arrives over the
-open connection and the row appears **without a page reload**. That is the push path, end to end,
-proven with the only mechanism the runtime actually wires today.
-
-{{ comp callout { type: "warning", title: "The sagas mirror reconciles at startup — it is not yet a change feed" } }}
-This is the seam this chapter is honest about. <code>startSagasStreamMirror()</code> runs <strong>once</strong>, during the sagas service's post-listen startup, and performs a finite paged reconciliation: it reads saga instances from the database, upserts each into the stream, and returns. No publish or state-transition path writes to the stream afterwards. So an open page receives a genuine server push — the arrival really is unsolicited and reload-free — but it arrives <strong>once per sagas-service start</strong>, not on every saga step. A saga that advances while the service keeps running will not move the row until the next restart reconciles it. The client half you built (StreamDB, subscription, <code>useLiveQuery</code>) is fully live and needs no change; it is the plugin's producer that has room to grow into a per-transition feed.
-{{ /comp }}
+With the subscription live, the first transition upsert arrives over the open connection and the row
+appears **without a page reload**. Every later step—including failure and compensation steps—updates
+the same `sagaInstance` row after its transition is durable. Restarting the saga processor does not
+erase canonical progress; on Prisma, the service's startup reconciliation also backfills historical
+rows into the stream.
 
 Type-check the new files:
 
@@ -271,12 +268,12 @@ deno task check
 - [ ] The live island opens a `createSagasStreamDB` handle and queries it with `useLiveQuery`.
 - [ ] A `definePage` page at `dashboard/sagas/index.tsx` resolves `getStreamsUrl()` in a
       `.withResource` and hands it to the island through a `.withLayer` loader.
-- [ ] With the page open, restarting the sagas service makes the published instance's row appear
-      through the subscription, with no reload.
+- [ ] With the page open, publishing and advancing a saga updates its row through the subscription,
+      with no reload.
 - [ ] `deno task check` is clean.
 
 {{ comp callout { type: "tip", title: "No row after the restart?" } }}
-Work down the path in order. <code>ns-sagas list --instances --json</code> tells you whether the instance exists at all — if it does not, the saga never registered (<code>ns-sagas list --registered --json</code>) or the publish failed. If the instance exists but no row arrives, the usual cause is the store backend: on KV the sagas service logs <code>Saga Prisma delegates unavailable</code> at startup and the mirror is skipped entirely. After that, check that the streams runtime is up and that <code>getStreamsUrl()</code> resolved — a dead streams endpoint (such as the <code>:4437</code> port assigned in this tutorial's scaffold; note that each scaffold allocates its own randomized ports) means the producer could not connect, which it logs as a skipped event.
+Work down the path in order. <code>ns-sagas list --instances --json</code> tells you whether the instance exists at all — if it does not, the saga never registered (<code>ns-sagas list --registered --json</code>) or the publish failed. If the instance exists but no row arrives, check that the streams runtime is up and that both the processor's durable-stream producer and the page's <code>getStreamsUrl()</code> resolved the streams service. A dead streams endpoint (such as the <code>:4437</code> port assigned in this tutorial's scaffold; note that each scaffold allocates its own randomized ports) means no transition event can reach the stream. The Prisma-only <code>Saga Prisma delegates unavailable</code> startup warning means historical reconciliation is skipped; it does not disable live per-transition upserts on KV.
 {{ /comp }}
 
 ## What you built
