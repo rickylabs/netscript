@@ -26,6 +26,15 @@ export { QueryIsland, type QueryIslandProps } from './query-island.tsx';
 // === QueryClient singleton ===
 export { getIslandQueryClient, resetIslandQueryClient } from './query-client.ts';
 
+// === Server cache invalidation edge ===
+export {
+  DEFAULT_QUERY_CACHE_INVALIDATION_PATH,
+  invalidateServerQueryCache,
+  type InvalidateServerQueryCacheOptions,
+  type ServerQueryCacheKey,
+  type ServerQueryCacheKeyPart,
+} from './query-cache-invalidation.ts';
+
 // === Package-owned query types ===
 export type {
   DehydratedState,

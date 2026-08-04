@@ -78,6 +78,8 @@ hydration in `packages/fresh/src/application/query/`; extend the HTTP edge in
 | 2026-08-04 | S1 | reconcile | Issue #1252 still has exactly the four specification comments already researched; PR #1265 has no external review/evaluator comment. Labels/milestone/closing keyword remain correct. |
 | 2026-08-04 | S2 | RED | `initialDataUpdatedAt` failed type-check as an unknown option; a pre-populated shared client rendered `stale shared-client snapshot` instead of the server snapshot. |
 | 2026-08-04 | S2 | GREEN | Fresh now seeds hydration data once before observer creation, preserves its server timestamp, and exposes fetching/refetching state. Focused tests 5/5 and scoped Fresh check pass. |
+| 2026-08-04 | S3 | RED | A POST to the planned standard invalidation path returned 404 from current `defineFreshApp` (7 pass, 1 fail). |
+| 2026-08-04 | S3 | GREEN | Fresh now owns the same-origin JSON endpoint and browser helper; the mutate→invalidate→reload integration test observes the committed value. Focused tests 13/13, scoped check, and source-format gate pass. |
 
 ## Decisions
 
@@ -86,6 +88,7 @@ hydration in `packages/fresh/src/application/query/`; extend the HTTP edge in
 | Framework owns endpoint rather than product route | The reference route contains no product behavior. | issue #1252 + Pulseboard patch + plan D5 |
 | Mount seed wins once | Fixes first paint without clobbering optimistic/refetched state. | issue correction + plan D2 |
 | Server queryOptions selects registered provider | Aligns read/invalidation targets without breaking browser bundles. | SDK cache-provider design + plan D1 |
+| General endpoint replaces Pulseboard's product route | The reusable seam accepts canonical exact keys/prefixes, is middleware-protected and configurable, while product-specific mutation behavior remains userland. | reference patch + plan D5 |
 
 ## Drift
 
@@ -109,6 +112,9 @@ hydration in `packages/fresh/src/application/query/`; extend the HTTP edge in
 | S1 SDK scoped check | `run-deno-check.ts --root packages/sdk --ext ts` | PASS | 77 files; zero diagnostics |
 | S2 Fresh focused tests | `deno test -A ...query-options.test.ts ...initial-data.test.tsx` | PASS | 5 passed; both RED proofs recorded above |
 | S2 Fresh scoped check | `run-deno-check.ts --root packages/fresh --ext ts,tsx` | PASS | zero diagnostics |
+| S3 Fresh focused tests | three invalidation/bootstrapping test files | PASS | 13 passed; default/override/disable, request validation, browser helper, and reload path |
+| S3 Fresh scoped check | `run-deno-check.ts --root packages/fresh --ext ts,tsx` | PASS | 179 selected files; zero diagnostics |
+| S3 Fresh source format | `run-deno-fmt.ts --root packages/fresh --ext ts,tsx` | PASS | 179 selected files; zero findings after formatting owned files |
 
 ### Fitness Gates
 
@@ -122,7 +128,7 @@ hydration in `packages/fresh/src/application/query/`; extend the HTTP edge in
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
 | First paint with pre-populated client | PASS | `initial-data.test.tsx` | server snapshot wins once; timestamp and active revalidation state preserved |
-| Mutate → server invalidation → reload | NOT_RUN | planned S3 integration test | RED-first required |
+| Mutate → server invalidation → reload | PASS | `query-cache-invalidation.test.ts` | stale read before endpoint; committed value on next server read after endpoint |
 
 ### Consumer Gates
 
