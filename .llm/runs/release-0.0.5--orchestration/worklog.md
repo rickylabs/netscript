@@ -1161,3 +1161,25 @@ pending, canary.7's green pair holds the stable-cut precondition meanwhile.
   `slices/caveat-burndown/portdocs-brief.md` (judgment-first narrative brief per finding 23 —
   kept-accurate is a valid verdict; per-file judgment table is the deliverable). Draft PR will
   carry `Closes #1240`.
+
+## 2026-08-04 — #1240 pass 1 audited: correct but under-scoped; pass 2 dispatched; #1243 filed
+
+- agy pass 1 (PR #1242, draft): 25 files, surgical edits, per-file judgment table delivered.
+  Audit verdict: everything it touched is accurate (aspire.md checked hunk-by-hunk against
+  #1211 semantics; no boilerplate paste — phrasing varies; kept 18888/4318 correctly).
+- **Finding 27 (for #1163): a fix-driven docs sweep's search set must be derived from the
+  fix's source constants, not from the ports the issue names.** Pass 1 swept 8091/8092/3000/
+  5173 (the issue's famous defaults) and missed that #1211 randomized EVERY fixed port:
+  ~95 residual occurrences of 4437 (streams), 8010 (app dev fallback), 3001 (example service)
+  across ~25 files — including inconsistencies inside tables pass 1 half-edited
+  (add-a-plugin.md official-plugins table: 4 rows modernized, streams row still
+  "4437 (Deterministic)"). Caught by orchestrator ground-truth check against
+  port-ranges.ts + install-plugin.ts + write-app-files.ts before advancing the PR.
+- Pass 2 dispatched to the same branch (brief `portdocs-brief-2.md`): carries the verified
+  port ground truth (gone: 3001/8010/8091-94/4437; fixed: 18888/4318/5432), the allocator
+  ranges, and a transcript rule — tutorial captures keep their recorded numbers (rewriting
+  them falsifies a capture) and get a one-line "your scaffold assigns its own ports" note.
+- **#1243 filed** (0.0.6, p3): `auth session list --stream-url` defaults to
+  `localhost:4437/auth/sessions` — a legacy pin pointing at a port no scaffold binds
+  post-#1211; same class as the dead servicePort values in scaffold.plugin.json. Product
+  code, so routed as an issue, not absorbed into the docs lane.
