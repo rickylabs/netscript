@@ -913,3 +913,23 @@ the global-mutex supersede, not a failure). #1209 remains ready; merge at your d
   always mints N+1. The pre-clear session's "canary.3 rerun" belief and today's stale ".4"
   numbering are the same error class: version identity must be read from the registry/run logs,
   never inferred from dispatch intent.
+
+## 2026-08-04 — CANARY.5: full stage-E record — GREEN PAIR; #1211 proof run CLEAN (70/70)
+
+- **canary.5** (`0.0.5-canary.5`, run 30899202735, dispatched this session 10:05:55Z):
+  every step success — publish through the production OIDC path; in-run
+  `release:canary-label --published-version 0.0.5-canary.5 --head a194d5a03` verdicts:
+  published-version PASS (on @netscript/cli), **merge-history-payload PASS** (4 commits
+  inspected `d6375d557..a194d5a03` → 4 PRs #1214/#1204/#1203/#1209 + 2 closed issues),
+  label-application PASS (`canary:0.0.5-canary.5` on 6 items), release-note-publication PASS
+  (prerelease, make_latest=false), **drift PASS** (9 labels match 20 published versions).
+  Pinned prod E2E `e2e-cli-prod` run 30899420836 ✓; `Record green canary pair` +
+  `Write green-pair summary` success; `release/canary-pair` status on `a194d5a03`:
+  "Canary 0.0.5-canary.5 publish + pinned production E2E passed". **Green pair now held by
+  canary.5 (freshest) — canary.4's pair stands beneath it.** #1205 rode canary.4 (its head).
+- **#1211 proof run #3 on fixed head `095663e49`: Summary passed=70 failed=0** — the clean
+  local one-pass DoD box 53 demands, first ever on this host (historic 51/1 port-collision
+  class eliminated by the fix; the aspire-restore NuGet hang was transient — feeds probed
+  sub-second before launch). Cloud on the same head: quality ✓, deps-report ✓, check-test
+  pending, close-gate red until box 53 ticks. Merge path: check-test green → tick box 53
+  citing both halves → rerun close-gate → merge.
