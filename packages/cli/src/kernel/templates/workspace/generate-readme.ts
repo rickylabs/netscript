@@ -55,6 +55,11 @@ export function generateReadme(options: ReadmeOptions): string {
   lines.push('## Quick Start');
   lines.push('');
   lines.push('```bash');
+  lines.push(
+    '# Materialize npm dependencies and verify the project-local copy',
+  );
+  lines.push('deno install');
+  lines.push('deno task deps:verify');
   if (!options.noAspire) {
     lines.push('# Restore Aspire SDK modules (once), then start orchestration');
     lines.push(
@@ -111,6 +116,9 @@ export function generateReadme(options: ReadmeOptions): string {
     );
   }
   lines.push('├── deno.json         # Workspace root configuration');
+  lines.push(
+    '├── package.json      # Deno runtime pin for npm materialization stability',
+  );
   lines.push('└── netscript.config.ts  # NetScript framework configuration');
   lines.push('```');
   lines.push('');
@@ -123,6 +131,9 @@ export function generateReadme(options: ReadmeOptions): string {
   lines.push('');
   lines.push('| Command | Description |');
   lines.push('| --- | --- |');
+  lines.push(
+    "| `deno task deps:verify` | Verify project-local npm materialization against Deno's shared cache |",
+  );
   lines.push(
     `| \`deno task --cwd apps/${options.appName} dev\` | Start the Fresh app (Vite dev server) |`,
   );
@@ -137,6 +148,7 @@ export function generateReadme(options: ReadmeOptions): string {
     lines.push('| `deno task aspire:otel -- traces <resource>` | Query detached AppHost telemetry with automatic dashboard fallback |');
     lines.push('| `deno task aspire:export -- -o telemetry.zip` | Export detached AppHost telemetry with automatic dashboard fallback |');
   }
+
   lines.push('| `deno task check` | Type-check all workspace members |');
   lines.push('| `deno task lint`  | Run linter |');
   lines.push('| `deno task fmt`   | Format code |');
@@ -146,6 +158,30 @@ export function generateReadme(options: ReadmeOptions): string {
   );
   lines.push(
     '| `deno run -A packages/cli/bin/netscript.ts --help` | Show public CLI commands |',
+  );
+  lines.push('');
+
+  lines.push('## Windows dependency recovery');
+  lines.push('');
+  lines.push(
+    'The scaffold pins Deno 2.9.0 because an upstream Windows defect can leave ' +
+      '`node_modules/.deno` incomplete even when the shared npm cache is intact. The generated ' +
+      '`deps:verify` preflight stops before Vite and reports every missing file.',
+  );
+  lines.push('');
+  lines.push(
+    "If verification fails, rebuild only this project's materialization:",
+  );
+  lines.push('');
+  lines.push('```powershell');
+  lines.push('Remove-Item -Recurse -Force node_modules');
+  lines.push('deno install');
+  lines.push('deno task deps:verify');
+  lines.push('```');
+  lines.push('');
+  lines.push(
+    'If the failure recurs, use Deno 2.9.0 and follow ' +
+      '[deno/deno#35804](https://github.com/denoland/deno/issues/35804).',
   );
   lines.push('');
 
