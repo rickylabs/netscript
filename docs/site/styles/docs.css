@@ -449,8 +449,14 @@ html[data-theme="light"] .ns-theme-toggle .ns-icon-moon {
 
 @media (min-width: 1100px) {
   .ns-content-rail {
-    grid-template-columns: minmax(0, 1fr) 15rem;
+    grid-template-columns: minmax(0, 1fr) 16rem;
     align-items: start;
+  }
+}
+
+@media (min-width: 1600px) {
+  .ns-content-rail {
+    grid-template-columns: minmax(0, 1fr) 18rem;
   }
 }
 
@@ -509,7 +515,7 @@ html[data-theme="light"] .ns-theme-toggle .ns-icon-moon {
 /* ─── Prose / markdown content ───────────────────────────────── */
 
 .ns-prose {
-  max-width: 80ch;
+  max-width: var(--ns-measure, 80ch);
   font-size: 0.95rem;
   line-height: var(--ns-leading-relaxed);
   color: var(--ns-fg);
@@ -1199,6 +1205,13 @@ a.ns-card:focus-visible {
 }
 
 .ns-tabbed__tablist {
+  /* Progressive enhancement: the tab bar is inert until script.js confirms it can
+     run and adds .is-enhanced. Without this gate a no-JS (or pre-JS) reader gets a
+     fully styled, non-functional tab bar with every panel stacked underneath it. */
+  display: none;
+}
+
+.ns-tabbed.is-enhanced .ns-tabbed__tablist {
   display: flex;
   flex-wrap: wrap;
   gap: 0.15rem;
@@ -1767,4 +1780,39 @@ a.ns-cards-grid__card:focus-visible {
   margin-left: var(--ns-space-3);
   padding-left: var(--ns-space-2);
   border-left: 1px solid var(--ns-border);
+}
+
+
+/* ─── Reading measure scales with the viewport ─────────────────
+   The prose measure used to be a flat 80ch, so on a wide monitor the content
+   column stopped around 610px and everything to its right was dead space. The
+   measure now steps up with available width, and full-bleed elements (tables,
+   tabbed code, diagrams, card grids) use the whole content column rather than
+   being held to the text measure. */
+
+:root {
+  --ns-measure: 80ch;
+}
+
+@media (min-width: 1400px) {
+  :root {
+    --ns-measure: 88ch;
+  }
+}
+
+@media (min-width: 1800px) {
+  :root {
+    --ns-measure: 96ch;
+  }
+}
+
+.ns-prose > .ns-tabbed,
+.ns-prose > .ns-table-wrap,
+.ns-prose > table,
+.ns-prose > figure,
+.ns-prose > .ns-cards-grid,
+.ns-prose > .ns-feature-grid,
+.ns-prose > .ns-learning-path {
+  max-width: none;
+  width: 100%;
 }
