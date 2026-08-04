@@ -1,5 +1,13 @@
 import { assertEquals } from '@std/assert';
-import { buildPrCheckReport, type CheckRun, classifyCheckRuns } from './pr-checks.ts';
+import { GITHUB_API_BASE_URL } from '../config/endpoints.ts';
+import {
+  buildPrCheckReport,
+  type CheckRun,
+  classifyCheckRuns,
+  exitCodeForPrCheckReport,
+  mergeLatestWorkflowJobs,
+  type WorkflowJob,
+} from './pr-checks.ts';
 
 function checkRun(values: Partial<CheckRun> = {}): CheckRun {
   return {
@@ -13,6 +21,102 @@ function checkRun(values: Partial<CheckRun> = {}): CheckRun {
     ...values,
   };
 }
+
+function workflowJob(values: Partial<WorkflowJob> = {}): WorkflowJob {
+  return {
+    id: 200,
+    name: 'test',
+    status: 'completed',
+    conclusion: 'success',
+    started_at: '2026-08-03T10:02:00Z',
+    completed_at: '2026-08-03T10:03:00Z',
+    check_run_url: `${GITHUB_API_BASE_URL}/repos/rickylabs/netscript/check-runs/2`,
+    run_id: 10,
+    run_attempt: 2,
+    ...values,
+  };
+}
+
+Deno.test('latest workflow attempt supersedes a stale failed check-run', () => {
+  const runs = mergeLatestWorkflowJobs(
+    [checkRun({ id: 1, conclusion: 'failure' })],
+    [workflowJob()],
+    'head-sha',
+  );
+  const checks = classifyCheckRuns(runs, 'head-sha');
+  const report = buildPrCheckReport('rickylabs/netscript', 1181, 'head-sha', 'now', checks);
+
+  assertEquals(checks.map((check) => check.classification), ['superseded', 'current-pass']);
+  assertEquals(report.ok, true);
+});
+
+Deno.test('latest successful workflow attempt supersedes a stale cancellation', () => {
+  const runs = mergeLatestWorkflowJobs(
+    [checkRun({ id: 1, conclusion: 'cancelled' })],
+    [workflowJob()],
+    'head-sha',
+  );
+  const checks = classifyCheckRuns(runs, 'head-sha');
+
+  assertEquals(checks.map((check) => check.classification), ['superseded', 'current-pass']);
+  assertEquals(checks.some((check) => check.classification === 'cancelled'), false);
+});
+
+Deno.test('genuinely failed latest workflow attempt remains exit-relevant', () => {
+  const runs = mergeLatestWorkflowJobs(
+    [checkRun({ id: 1 })],
+    [workflowJob({ conclusion: 'failure' })],
+    'head-sha',
+  );
+  const checks = classifyCheckRuns(runs, 'head-sha');
+  const report = buildPrCheckReport('rickylabs/netscript', 1181, 'head-sha', 'now', checks);
+
+  assertEquals(checks.map((check) => check.classification), ['superseded', 'current-fail']);
+  assertEquals(report.ok, false);
+  assertEquals(exitCodeForPrCheckReport(report), 1);
+});
+
+Deno.test('job id cannot overwrite an unrelated check-run id', () => {
+  const unrelated = checkRun({
+    id: 200,
+    name: 'external security scan',
+    conclusion: 'failure',
+  });
+  const runs = mergeLatestWorkflowJobs([unrelated], [workflowJob()], 'head-sha');
+
+  assertEquals(runs.map((run) => [run.id, run.name]), [
+    [200, 'external security scan'],
+    [2, 'test'],
+  ]);
+});
+
+Deno.test('latest-attempt identity wins a timestamp tie', () => {
+  const runs = mergeLatestWorkflowJobs(
+    [checkRun({ id: 9, conclusion: 'failure', started_at: '2026-08-03T10:02:00Z' })],
+    [workflowJob()],
+    'head-sha',
+  );
+  const checks = classifyCheckRuns(runs, 'head-sha');
+
+  assertEquals(checks.map((check) => check.classification), ['superseded', 'current-pass']);
+});
+
+Deno.test('queued latest-attempt job is pending instead of exposing stale failure', () => {
+  const runs = mergeLatestWorkflowJobs(
+    [checkRun({ id: 1, conclusion: 'failure' })],
+    [workflowJob({
+      status: 'queued',
+      conclusion: null,
+      started_at: null,
+      completed_at: null,
+      workflow_run_started_at: '2026-08-03T10:02:00Z',
+    })],
+    'head-sha',
+  );
+  const checks = classifyCheckRuns(runs, 'head-sha');
+
+  assertEquals(checks.map((check) => check.classification), ['superseded', 'pending']);
+});
 
 Deno.test('cancelled run with newer green sibling is superseded and clean', () => {
   const checks = classifyCheckRuns([
