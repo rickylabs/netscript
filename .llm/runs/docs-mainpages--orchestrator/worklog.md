@@ -117,3 +117,10 @@
   tracks in /home/codex/repos/ns-tutsweep (branch docs/tutorials-sweep off post-merge main)
   for post-rewrite inconsistencies, underleverage, and cross-track drift; findings-first
   method, deferred items route to #1210. P3 (#1210 deep-dives) follows after P2 review.
+
+## 2026-08-04 — Charter A remap merged by owner
+
+- Owner merged #1221 (main-pages remap) directly after the Sol·high APPROVE and left; further
+  page fixes will arrive as owner steering. Program continues autonomously: P2 (#1222)
+  re-audit in flight (detached Codex process, wakeup scheduled), then ready/merge on PASS;
+  P3 (#1210) scoping follows from the sweep's deferred list.

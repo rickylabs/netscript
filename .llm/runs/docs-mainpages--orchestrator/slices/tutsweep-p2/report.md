@@ -62,3 +62,61 @@ Pushed with `git push origin HEAD:refs/heads/docs/tutorials-sweep` — new branc
 Changed-file audit: 21 files, all under `docs/site/tutorials/`. No `packages/`, no `plugins/`.
 Lock hygiene: `deno.lock` reverted with `git checkout HEAD -- deno.lock` before each commit;
 `git log --name-only 8949cedd6^..HEAD` confirms no commit touches it.
+
+---
+
+## Fix round 1 — response to `docs_audit` FAIL_FIX
+
+Audit: `.llm/runs/docs-mainpages--orchestrator/slices/tutsweep-audit/audit.md`
+(opposite-family Codex audit of PR #1222 at `b9ff199d1`). Every FAIL fixed; three commits.
+
+### Disposition per finding
+
+| Audit finding | Disposition | What changed |
+| --- | --- | --- |
+| **Gate 2 / port-drift FAIL — `:8094` unreachable** — workspace ch.2 installed auth without a host-port pin, so `install-plugin.ts` allocated one; `export PORT=8094` is the in-graph target port Aspire injects, not an appsettings `HostPort` | **FIXED** (pin, not placeholder) | `plugin install --help` confirms a real `--port` option, and `appsettings-entry-builders.ts:105` writes `HostPort` from it — so ch.2 now installs with `--port 8094`, making all ten `:8094` curls genuinely reachable. The chapter explains PORT-vs-host-port, and states the cost the source itself documents: a pinned host port is a machine-global reservation that `aspire start --isolated` cannot randomise away. `export PORT=8094` removed. ch.6 re-attributes the pin from `PORT` to `--port` |
+| **Gate 2 FAIL — app host allocation misstated** | **FIXED** | `render-http-endpoint.ts` emits `withHttpEndpoint({ env: 'PORT' })` with no `port` unless a config entry pins `HostPort`, and `generate-register-apps.ts` never pins for `type: 'app'`. Every place I had called a scaffolded app's endpoint "project-derived" now says Aspire allocates the app host port at runtime. FNV attribution is kept only where it is true — plugin host ports (`scaffolder.ts:211` sets `hostPort: servicePort`) and the standalone target fallback |
+| **Gate 2 FAIL — absolute collision promise** | **FIXED** | "never collide" / "no two workspaces collide" removed from all four occurrences. Replaced with the actual behaviour: deterministic FNV distribution plus linear probing over *this workspace's* used-port set, explicitly not a guarantee — finite range, no cross-workspace visibility, and pins can land on top |
+| **Gate 3 FAIL — `sagasQueryUtils` undefined in the track** | **FIXED** (rewrote to established symbols) | ch.3 creates only `ordersClient` / `baseQueries` / `ordersQueryUtils`; the symbol exists nowhere in the repo. Rather than invent a sagas service client the track has no reason to build, the ch.5 page drops the dehydrated seed entirely — `useLiveQuery` reads a StreamDB collection, not a query key, and `preload()` is its warm-up, so the seed was populating a cache nothing on the page reads. `.withResource` now resolves `getStreamsUrl()`, keeping the builder demonstration honest. A new callout explains why chapter 4 seeds and chapter 5 does not |
+| **Gate 3 FAIL — false `OrderCreated` causal claim** | **FIXED** | ch.2 has no saga, publish, or `OrderCreated` wiring. The order-create curl is replaced by `ns-sagas add saga demo --message-type=DemoStarted …` + `ns-sagas publish DemoStarted …` — verbs verified in `plugins/sagas/src/cli/command-types.ts:4-13` and `commands.ts:80-84`, and already used by storefront ch.4. Added the registry-reload restart note, and the troubleshooting callout now says an empty table means no instance exists yet |
+| **Gate 3 FAIL — island claimed a `useQuery` never shown** | **FIXED** | The "live vs fetched" callout no longer asserts the island runs both. It states that this chapter builds only the live half, that the cache-first half would need a `createServiceClient` + `createQueryFactories` pair this track never creates, and points at ch.4 as the worked example. The Step 4 boundary snippet drops the unused `getIslandQueryClient`/`hydrateFromDehydrated` imports and types its props |
+| **Gate 3 FAIL — incomplete `--help` listings** | **FIXED** | Verified against live `deno run -A packages/cli/bin/netscript.ts --help`. Both lists now carry all fifteen groups in CLI print order, including the `ui:list` / `ui:update` / `ui:remove` I had missed |
+| **Gate 4 FAIL — track not executable chapter-to-chapter** | **RESOLVED** | Consequence of the two ch.5 findings above; ch.5 now depends only on what chs.1–4 build |
+| Gate 1 minor — `utils.ts` called a "two-line re-export" | **FIXED** | It is a typed wrapper/factory. ch.4 now says "a thin wrapper that calls the package builder with the app's `State` type applied" |
+
+Nothing was declined.
+
+### Commits (fix round)
+
+```
+547456b3c docs(tutorials): ch.5 builds only from symbols the track creates (Refs #1208)
+716581854 docs(tutorials): make the port narrative match the allocator (Refs #1208)
+1bf5345f6 docs(tutorials): complete the --help command-group lists (Refs #1208)
+```
+
+Pushed: `b9ff199d1..547456b3c` → `docs/tutorials-sweep`.
+
+### Gate evidence (fix round)
+
+| Gate | Result |
+| --- | --- |
+| `cd docs/site && deno task build` | **exit 0** |
+| `docs/site` `deno task check:links` | **30580 links / 214 pages, all resolve** |
+| `docs/site` `deno task check:caveats` | **27 markers / 22 pages, all resolve** |
+| root `deno task docs:links` | **docs=102, 0 broken links/anchors/orphans — OK** |
+| root `deno task docs:accuracy` | **PASS** |
+
+Acceptance-criteria checks from the audit's fix-cycle list:
+
+| Criterion | Evidence |
+| --- | --- |
+| no `localhost:8094` unless auth is installed on host port 8094 | ten `:8094` references, all downstream of `netscript plugin install @netscript/plugin-auth --port 8094` (02-auth.md:63) |
+| no unpinned Aspire app endpoint claimed FNV/project-derived | both surviving allocation callouts state the app pins no host port and Aspire allocates at runtime |
+| no absolute cross-workspace collision-free promise | `grep -rni "never collide\|no two workspaces\|cannot collide"` over the tutorials returns only an unrelated MCP tool-name line in chat/05 |
+| ch.5 uses only established symbols | `grep -rn sagasQueryUtils docs/site --include=*.md` → no hits |
+| a real action produces the saga instance used as proof | `ns-sagas add saga` + `ns-sagas publish`, verbs verified in the sagas plugin CLI source |
+| `--help` prose complete | both lists match live `--help` output, fifteen groups |
+| fresh build + `docs:links` evidence | above, both exit 0 |
+
+Changed-file audit (fix round): 12 files, all under `docs/site/tutorials/`. No `packages/`, no
+`plugins/`, and `git log --name-only 1bf5345f6^..HEAD` shows zero `deno.lock` occurrences.

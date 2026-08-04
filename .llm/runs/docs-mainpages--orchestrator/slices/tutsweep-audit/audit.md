@@ -139,3 +139,36 @@ Re-audit should require all of the following before PASS:
 - an actually wired action that produces the saga instance used for the live proof;
 - changed `--help` prose either complete or explicitly non-exhaustive;
 - fresh exit-0 site build and `docs:links` evidence.
+
+## Re-audit
+
+- **Re-audit target:** `docs/tutorials-sweep` at `547456b3ce4750b78408e130322d52d9940d23ab`
+- **Method:** acceptance-list recheck against current tutorial files and CLI/plugin source, plus fresh build and link executions. Generator assertions were not accepted as evidence.
+
+### Per-finding status
+
+| Original acceptance finding | Status | Re-audit evidence |
+| --- | --- | --- |
+| Ch.5 must use only symbols established by the track (or define a sagas query client). | **FIXED** | `rg -n 'sagasQueryUtils' docs/site/tutorials/live-dashboard` returned no matches. Ch.5 now constructs `createSagasStreamDB`, calls `preload()`, reads `sagasDb.collections.sagaInstance` with `useLiveQuery`, and closes the handle; the dead TanStack dehydration/query seed was removed. |
+| The live proof must use an actually wired action that produces the saga instance it claims to show. | **NOT-FIXED** | The replacement commands themselves are real: `plugins/sagas/src/cli/commands.ts` defines `add saga`/`publish`; `LocalSagasRuntimeBackend.writeArtifactsAndGenerate()` writes the saga and regenerates its registry; `publish()` posts the message to the running sagas API; and `publishSagaMessage()` awaits the durable runtime. This can create a saga instance. However, the claimed live result is not wired end-to-end: `plugins/sagas/services/src/main.ts` calls `startSagasStreamMirror()` only once during post-listen startup, and `plugins/sagas/streams/producer.ts` performs a finite paged reconciliation then returns. Repository search finds the only `upsert('sagaInstance', ...)` in that startup reconciliation; no publish or transition path updates the stream after `ns-sagas publish`. Consequently ch.5's claims that a post-restart `publish` causes a row to appear/advance “without a page reload” and that the engine “mirrors that instance” into the subscribed collection are unsupported by current source. The acceptance item requires a wired action producing the instance **used for the live proof**, not merely a DB instance invisible to the already-running stream mirror. |
+| `localhost:8094` instructions require auth to be configured with host port 8094. | **FIXED** | Workspace ch.2 now runs `netscript plugin install @netscript/plugin-auth --port 8094`. `install-plugin.ts` assigns `plan.port` to `servicePort`/`hostPort`, and `appsettings-entry-builders.ts` emits that value as `HostPort`; the documented `:8094` curls are therefore Aspire-reachable. The stale ambient `export PORT=8094` instruction was removed and host-vs-process-port wording is explicit. |
+| Unpinned Aspire app endpoints must not be described as FNV/project-derived. | **FIXED** | Live-dashboard ch.4/ch.5/ch.6 and the other affected deployment prose now state that Fresh apps pin no host port and Aspire allocates it at runtime. This matches `render-ts-apphost.ts`, which omits `HostPort` by default. Plugin installer-selected ports remain accurately distinguished from app endpoints. |
+| Remove absolute cross-workspace collision-free promises. | **FIXED** | Focused corpus searches found no remaining tutorial claim that workspaces “never collide” or that no two workspaces collide. Updated callouts explicitly say the finite range and workspace-local used-port set cannot guarantee cross-workspace uniqueness. |
+| Changed root `--help` prose must be complete or explicitly non-exhaustive. | **FIXED** | The exhaustive live-dashboard and workspace lists now contain all 15 public groups registered by `createPublicCommandRegistry()`: `agent`, `config`, `deploy`, `init`, `contract`, `db`, `generate`, `marketplace`, `plugin`, `service`, `ui:add`, `ui:init`, `ui:list`, `ui:update`, and `ui:remove`. Other track wording remains explicitly illustrative (for example, “including”). |
+| Fresh site build and link gates must pass. | **FIXED** | `cd docs/site && rtk proxy deno task build` exited 0 and generated 595 files in 18.49 seconds. `rtk proxy deno task docs:links` exited 0 with `docs=102 broken-links=0 broken-anchors=0 orphans=0`. |
+
+### Re-audit gate result
+
+| Gate | Commands | Result | Finding |
+| --- | --- | --- | --- |
+| Ch.5/API/live-path accuracy | Focused `rg` over ch.5 and `plugins/sagas`; source reads of sagas CLI backend, publish handler, service startup, and stream producer | **FAIL** | Missing query/dehydration symbols are fixed, and the new CLI verbs are valid, but no post-start saga mutation is propagated into the `sagaInstance` stream. The advertised live proof remains non-executable as written. |
+| Port accuracy and corpus consistency | Focused `rg` over tutorial port/collision claims; source reads of plugin install/AppHost generation | **PASS** | Auth is genuinely pinned at host `:8094`; app allocation and collision language now match source. |
+| Root CLI help accuracy | Tutorial list comparison with `createPublicCommandRegistry()` and live CLI command-tree inspection | **PASS** | All 15 public groups are present in the exhaustive changed lists. |
+| Site build | `cd docs/site && rtk proxy deno task build` | **PASS** | Exit 0; 595 files generated. |
+| Internal links | `rtk proxy deno task docs:links` | **PASS** | Exit 0; no broken links, anchors, or orphans. |
+
+### Final verdict
+
+**FAIL_FIX**
+
+All original FAIL findings except the live-stream proof are fixed. To reach PASS, wire saga instance mutations into the `sagaInstance` durable stream (and verify the documented post-start `ns-sagas publish` flow), or change ch.5 to demonstrate a source-supported refresh/restart path without claiming immediate push. This is the second audit FAIL cycle and therefore requires supervisor escalation under the `docs_audit` profile rather than another unbounded audit loop.
