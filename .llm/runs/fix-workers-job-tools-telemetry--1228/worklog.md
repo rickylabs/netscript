@@ -75,3 +75,22 @@ at the exported helper boundary.
 | Caveat reference check | PASS | `check-caveat-refs.ts docs/site`: 22 markers across 18 pages resolve. |
 | Docs accuracy | PASS | `deno task docs:accuracy`. |
 | Docs links | PASS | 102 docs; zero broken links or anchors. |
+| Core package check/test | PASS | 17 entrypoints checked; 25 tests passed. |
+| Workers/triggers package check | PASS | Both package entrypoint sets checked. |
+| Official plugin copy | PASS | 4/4 focused copy/rewrite tests. |
+| Scoped lint/fmt | PASS | workers-core, workers, triggers source TS; zero findings; no ignores added. |
+| Quality gate | PASS | repository scan clean; architecture gate exits zero. |
+| Doc lint | BASELINE DEBT | No missing JSDoc; existing private-type-reference findings remain (13/24/24). |
+| Publish dry-run | PASS | workers-core, workers, and triggers all simulate publish successfully. |
+| Lock hygiene | PASS | Pre-existing `deno.lock` modification remains unstaged and uncommitted. |
+
+## Composed IMPL-EVAL
+
+| Row | Result | Evidence |
+| --- | --- | --- |
+| Evaluator protocol | composed per milestone-run.md (orchestrator waiver) | owner directive; ruling D6 |
+| Contract and implementation | PASS | core-owned public helper composes existing telemetry primitives; scaffold-local compatibility preserved |
+| Silent no-op regression law | PASS | real provider/exporter test asserts observable events, progress, child span, trace ID, and parent span ID |
+| Caveat/debt judgment | PASS | five structured markers and satisfied debt removed; independent caveats retained |
+| Selected gates | PASS | focused runtime/copy proof, package checks/tests, wrappers, quality, docs, publish dry-runs |
+| Verdict | PASS | ready for PR evidence reconciliation |

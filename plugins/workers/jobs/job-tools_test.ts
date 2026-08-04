@@ -34,9 +34,10 @@ Deno.test('createJobTools exports handler events, progress, and child spans', as
       tools.trace.addEvent('handler.started', { source: 'fixture' });
       tools.trace.recordProgress(2, 4, 'items');
       await tools.progress(25, 'quarter complete');
-      await tools.trace.withChildSpan('handler.child', async (span) => {
+      await tools.trace.withChildSpan('handler.child', (span) => {
         span.setAttribute('child.kind', 'fixture');
         span.addEvent('child.work');
+        return Promise.resolve();
       });
     });
     await provider.forceFlush();
