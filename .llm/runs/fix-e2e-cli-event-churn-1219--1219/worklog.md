@@ -13,4 +13,7 @@
 ## 2026-08-05
 
 - Read #1219 first and confirmed drift from the #1214 `ci.yml` pattern.
-
+- Removed `labeled` and `unlabeled` from the workflow trigger set while retaining code/lifecycle events and ref-scoped cancellation.
+- Added a policy matrix proving metadata events are absent and both skip labels still suppress all expensive tiers on the next pull-request trigger.
+- Focused event/classifier/draft policy: 58 passed; workflow YAML parse, scoped lint, and scoped fmt passed.
+- Reconcile: #1219 remains the sole closing issue; labels and 0.0.5 milestone remain correct.

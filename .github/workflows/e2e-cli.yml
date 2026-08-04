@@ -27,8 +27,10 @@ name: e2e-cli
 #     avoiding Postgres and Redis containers. The postgres tier above remains
 #     the merge-readiness bar.
 #
-# Triggers: every PR to main or an integration branch (`feat/**`, `epic/**`), PLUS
-# any other PR carrying the `e2e-cli-gate` label, PLUS manual dispatch.
+# Triggers: PR code/lifecycle events for main or an integration branch (`feat/**`, `epic/**`),
+# PLUS any other eligible PR carrying the `e2e-cli-gate` label, PLUS manual dispatch.
+# Label metadata does not trigger this workflow: adding/removing a label must not cancel an
+# executing expensive run. The complete live label set is honored on the next normal trigger.
 #
 # Skip policy (see `.github/scripts/ci-classify-changes.ts`): the `classify` job
 # emits the #1152 capability vector (`run_static`, `run_runtime_sqlite`,
@@ -70,7 +72,7 @@ name: e2e-cli
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened, ready_for_review, labeled, unlabeled]
+    types: [opened, synchronize, reopened, ready_for_review]
   workflow_dispatch:
 
 permissions:
