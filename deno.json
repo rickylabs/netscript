@@ -76,7 +76,7 @@
     "agentic:rollout-canary": "deno run --no-lock --allow-read --allow-write --allow-run --allow-env .llm/tools/agentic/runtime/cli/rollout-canary-cli.ts",
     "design:sync": "deno run --no-lock --allow-read --allow-write --allow-run --allow-env tools/design-sync/mod.ts",
     "docs:links": "deno run --no-lock --allow-read .llm/tools/validation/check-internal-doc-links.ts --pretty",
-    "docs:accuracy": "deno run --no-lock --allow-read .llm/tools/docs/check-accuracy-and-discoverability.ts",
+    "docs:accuracy": "deno run --no-lock --allow-read --allow-env --allow-run=deno .llm/tools/docs/check-accuracy-and-discoverability.ts",
     "docs:maintenance": "deno task docs:links && deno task docs:accuracy && deno task agentic:sync-claude:check && deno task agentic:check-claude",
     "agentic:smoke-claude-remote": "deno run --no-lock --allow-read --allow-run .llm/tools/agentic/claude/claude-remote-smoke.ts --env-aware --pretty",
     "agentic:codex-resume": "deno run --no-lock --allow-read --allow-run .llm/tools/agentic/codex/codex-resume.ts",
