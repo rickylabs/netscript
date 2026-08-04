@@ -4,7 +4,7 @@
 | --- | --- |
 | Branch | `fix/workers-job-tools-telemetry` |
 | Baseline | `c384013662169046106ee9dd193ab8972beab3b4` |
-| Phase | implementation slice 1 green |
+| Phase | implementation and caveat closure green; merge-readiness gates pending |
 | Profile | Archetype 5 + docs overlay |
 
 The live issue body contains only `(see above)`; the owner's dispatch supplies the operative two
@@ -20,7 +20,11 @@ progress events, and real child spans while preserving the runtime progress call
 plugin scaffold files are thin core re-exports. The focused test is GREEN 1/1 and focused check
 passes.
 
-Next: commit/push slice 1, audit and update every false no-op caveat, remove the satisfied debt row,
-then run merge-readiness gates.
+Slice 2 judged the documentation claims individually: all five structured no-op caveats, the
+satisfied debt entry, and additional unstructured no-op claims were removed or rewritten. The
+console-backed logging limitation and unrelated deployment/stream caveats remain. Caveat-reference,
+docs-accuracy, and internal-link gates pass.
+
+Next: commit/push caveat closure, then run merge-readiness gates and composed evaluation.
 
 Foreign state: pre-existing `deno.lock` modification; never stage it.

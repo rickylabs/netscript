@@ -145,20 +145,15 @@ somewhere to land. Without it, handlers still execute; they simply export into t
 
 Two layers, stated precisely so you never over- or under-claim.
 
-{{ comp callout { type: "important", title: "Real OTel vs. scaffold stubs" } }}
+{{ comp callout { type: "important", title: "Framework and handler telemetry" } }}
 <strong>Framework / dispatcher layer = real OTel.</strong> <code>traceJobExecution</code>, scheduler
 spans, subprocess <code>traceparent</code> propagation, and <code>task.execute</code> spans are
 live. A user gets job traces in Aspire <em>automatically</em>, with zero handler code.
 <br><br>
-<strong>Scaffold <code>createJobTools(ctx)</code> tracing helpers = still no-op stubs.</strong> The
-<code>trace.addEvent</code> and <code>trace.withChildSpan</code> helpers the generated sample hands
-<em>into your handler</em> are placeholders — your callback runs and returns normally, but no extra
-span is exported. This is a <strong>known, tracked limitation with a fix planned</strong> (debt
-<code>workers-scaffold-job-tools-noop</code>), not a permanent design choice. The workaround
-today: call <code>@netscript/telemetry/instrumentation</code> helpers directly from your handler for
-custom spans — because the dispatcher already opened the parent job span, your child span nests
-under it automatically.
-<!-- caveat: arch-debt:workers-scaffold-job-tools-noop -->
+<strong>Scaffold <code>createJobTools(ctx)</code> tracing helpers add handler detail.</strong>
+<code>trace.addEvent</code> records on the active job span, <code>trace.withChildSpan</code> exports a
+proper child, and progress records <code>job.progress</code> events while forwarding updates to the
+workers runtime channel.
 {{ /comp }}
 
 ```ts
@@ -251,10 +246,9 @@ The trade-offs, because instrumentation-at-the-boundary is an opinion.
   framework propagates it across the service boundary and into worker subprocesses so you don't have
   to; custom fan-out (your own `fetch`, your own spawned process) is where you reintroduce the
   responsibility.
-- **The scaffold helpers are a known, bounded gap.** The job lifecycle, scheduler, subprocess, and
-  `task.execute` spans are real — but the scaffolded `createJobTools(ctx)` `trace` helpers are no-op
-  stubs (fix planned). Their shapes are stable, so code you write against them keeps working when the
-  runtime fills them in. Until then, use `@netscript/telemetry/instrumentation` directly.
+- **The scaffold helpers extend the active job trace.** `createJobTools(ctx)` records exact handler
+  events, progress, and child spans beneath the job lifecycle span. Direct
+  `@netscript/telemetry/instrumentation` imports remain available for advanced composition.
 
 The OpenTelemetry dependency is pinned in the workspace catalog (`@opentelemetry/api` at `^1.9`) and
 imported through the catalog, never de-catalogued, so every workspace member shares one telemetry API

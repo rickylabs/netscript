@@ -89,20 +89,17 @@ shows the shape and the `createJobTools(ctx)` helper surface:
   {
     label: "The tool surface",
     lang: "ts",
-    code: "// createJobTools(ctx) returns three helpers:\n//\n//   log.info / log.warn / log.error  — structured logging (REAL)\n//   progress(percent, message)        — handler-side progress hook\n//   trace.addEvent / trace.withChildSpan\n//\n// `id` is attached to the handler with Object.assign so the runtime\n// registry can address the job by a stable string."
+    code: "// createJobTools(ctx) returns three helpers:\n//\n//   log.info / log.warn / log.error  — console-backed logging\n//   progress(percent, message)        — telemetry + runtime progress hook\n//   trace.addEvent / trace.withChildSpan — active-span event + real child span\n//\n// `id` is attached to the handler with Object.assign so the runtime\n// registry can address the job by a stable string."
   }
 ] }) }}
 
-{{ comp callout { type: "tip", title: "How tracing actually works here (read this once)" } }}
-Two layers, and they behave differently. <strong>The framework instruments the job for you.</strong>
-When the background processor dispatches your handler it wraps the whole execution in real
-OpenTelemetry spans — dispatch, execution, duration, status — which show up in the
-<a href="https://localhost:18888">Aspire dashboard</a> automatically. What is <em>not</em> yet wired are
-the <code>createJobTools(ctx)</code> helpers you call <em>inside</em> the handler:
-<code>trace.addEvent</code>, <code>trace.withChildSpan</code>, and <code>progress(...)</code> are
-currently no-op stubs in the scaffold (tracked debt). They will not throw and your code keeps working;
-they just do not yet add custom spans. <code>log.*</code> emits real structured logs in every case. For
-custom spans today, import from <code>@netscript/telemetry</code> directly.
+{{ comp callout { type: "tip", title: "How tracing works here" } }}
+The framework wraps the whole execution in OpenTelemetry spans — dispatch, execution, duration,
+and status show up in the <a href="https://localhost:18888">Aspire dashboard</a> automatically.
+The <code>createJobTools(ctx)</code> helpers add handler detail to that active trace:
+<code>trace.addEvent</code> records events, <code>trace.withChildSpan</code> records timed child work,
+and <code>progress(...)</code> records progress while forwarding it to the workers runtime.
+<code>log.*</code> remains console-backed.
 {{ /comp }}
 
 ## Step 3 — Scaffold the provision-member job

@@ -61,6 +61,8 @@ at the exported helper boundary.
 | 2026-08-04 | 1 | GREEN | Same production-default test passed 1/1; focused core/workers/triggers check passed. |
 | 2026-08-04 | 1 | review | Core delegates to existing telemetry primitives; both plugin files are thin re-exports; no new backend or fake-only seam. |
 | 2026-08-04 | 1 | reconcile | #1228 remains open; draft PR #1281 carries `Closes #1228`, milestone 0.0.5, and `status:plan`. |
+| 2026-08-04 | 2 | caveat audit | Removed all five structured no-op markers, the satisfied debt entry, and additional false unstructured no-op claims; retained console-backed logging and unrelated caveats. |
+| 2026-08-04 | 2 | docs gates | Scoped caveat references resolve (22 markers / 18 pages), docs accuracy passes, and internal links/anchors pass. |
 
 ## Gates
 
@@ -69,3 +71,7 @@ at the exported helper boundary.
 | No-op-resistant RED | EXPECTED FAIL | 0/1: child span absent from exporter. |
 | Job-tools telemetry GREEN | PASS | 1/1: parent events, progress, callback, child span and parenting exported. |
 | Focused check | PASS | workers-core root/telemetry plus both scaffold re-exports. |
+| False-claim sweep | PASS | No job-tools no-op marker, debt ID, stub claim, or `still no-op` claim remains in docs/debt. |
+| Caveat reference check | PASS | `check-caveat-refs.ts docs/site`: 22 markers across 18 pages resolve. |
+| Docs accuracy | PASS | `deno task docs:accuracy`. |
+| Docs links | PASS | 102 docs; zero broken links or anchors. |

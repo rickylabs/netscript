@@ -334,13 +334,9 @@ dispatch, execution, scheduler, and subprocess continuation — emits **real
 OpenTelemetry spans automatically**, so job traces appear in the Aspire dashboard
 without any handler code.
 
-{{ comp callout { type: "warning", title: "Limitation" } }}
-The scaffold <code>createJobTools(ctx)</code> helpers handed to your job handler
-(<code>trace.addEvent</code>, <code>withChildSpan</code>, <code>progress</code>)
-are currently no-op stubs — a tracked limitation with a fix planned. For custom
-handler spans today, call <code>@netscript/telemetry</code> helpers directly.
-<!-- caveat: arch-debt:workers-scaffold-job-tools-noop -->
-{{ /comp }}
+The scaffold <code>createJobTools(ctx)</code> surface adds handler events and child spans to that
+active job trace. Its <code>progress</code> helper emits a <code>job.progress</code> event and forwards
+the same update to the workers runtime progress channel.
 
 The full picture is in
 [Observability]({{ comp.xref({ key: "explain:observability" }) }}).

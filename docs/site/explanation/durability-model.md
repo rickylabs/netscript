@@ -390,10 +390,9 @@ will meet:
 - It is delivered as **plugins** — workers, sagas, triggers — through the plugin model's
   contribution/registry mechanism.
 - Its messages and effects are **observable**: job dispatch and execution emit real OpenTelemetry
-  spans that show up in Aspire automatically. See [observability](/explanation/observability/) for
-  the full picture — including the one known gap (the scaffold `createJobTools(ctx)` handler helpers
-  are no-op stubs, a tracked limitation; call `@netscript/telemetry` helpers directly for custom
-  spans).
+  spans that show up in Aspire automatically, while the scaffold `createJobTools(ctx)` helpers add
+  handler events, progress, and child spans. See [observability](/explanation/observability/) for
+  the full picture.
 - Its API surfaces (assigned dynamically per project) and the Postgres/Redis backing store — including the
   Postgres tables behind the `prisma` saga store — are brought up by Aspire. Remember the ordering:
   `cd aspire && aspire start` is what makes the durable infrastructure available **before** any

@@ -151,13 +151,11 @@ Because Aspire starts each resource with an OTLP endpoint pointed at `http://loc
 framework-level spans (job dispatch, job execution, scheduler runs) surface in the **Traces** view on
 their own.
 
-{{ comp callout { type: "note", title: "Which spans you see vs. don't" } }}
-The <strong>dispatch/execution trace appears automatically</strong> — that is the framework
-instrumenting the run end to end, and <code>log.*</code> emits real structured logs. What is
-<em>not</em> yet wired are the custom-span helpers some scaffold samples call inside a handler
-(<code>trace.withChildSpan</code> via <code>createJobTools</code>) — those are no-op stubs today
-(tracked debt). For custom spans now, import from <code>@netscript/telemetry</code> directly. See
-<a href="/explanation/observability/">Observability</a> for the framework-vs-scaffold span boundary.
+{{ comp callout { type: "note", title: "Which spans you see" } }}
+The <strong>dispatch/execution trace appears automatically</strong> as the framework instruments the
+run end to end. Handler calls through <code>createJobTools</code>, including
+<code>trace.withChildSpan</code>, add custom detail beneath that trace. <code>log.*</code> remains
+console-backed. See <a href="/explanation/observability/">Observability</a> for the complete path.
 {{ /comp }}
 
 ## Verify your progress
