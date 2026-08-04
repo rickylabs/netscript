@@ -1537,3 +1537,18 @@ tooling must be executed from a tree at the ref CI will use — same class as fi
 (wrong instrument), and it cost three false debugging cycles here.
 Evidence block rewritten with box-index entries carrying my own verification (marker census,
 1:1 debt-entry pairing, callout-type audit) rather than the agent's restatements.
+
+## 2026-08-04 — MERGE #1289 (#1288 closed): CAVEAT BURN-DOWN PROGRAM COMPLETE
+
+Close-gate green on rerun (its red was my own duplicate box-5 in a pre-rewrite run), threads
+0/0, refs [1288]; #1288 auto-closed. Verified on main after merge: **18 caveat markers, all
+6 debt ids, zero debt markers inside warning-type call-outs** (boundary call-outs now
+`type: "important"`; the 75 remaining warnings elsewhere are operational notices).
+
+**Owner goal "most call-outs gone by end of 0.0.5" — delivered:**
+- Kill list (5/5 fixed + markers deleted): #1228, #1225, #1229, #1230, #1231.
+- Reframe (18 markers, 6 debts): #1288 — apologies rewritten as v1 design statements with
+  markers and debt links preserved as the audit trail.
+- Net effect: warning-flavoured debt call-outs on main went from 27 tagged occurrences to
+  **zero**; what remains is 18 honest design statements, each pointing at an open debt entry.
+Cut-time checklist gains its satisfied caveat gate.
