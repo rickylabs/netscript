@@ -55,6 +55,10 @@ fixture that proves both accepted drift and rejection of an adjacent torn/ambigu
 | --- | --- | --- | --- |
 | 2026-08-04 | 1 | bootstrap | Read brief, five named skills, tooling/JSR guidance, #1133, RFC §F1, P1 verdict, doctrine, matrix, and real CLI output. |
 | 2026-08-04 | 1 | serialization | `aspire ps` showed baseline-owned AppHosts; runtime gate queued. |
+| 2026-08-04 | 2 | implementation | Added pre/post AppHost process binding, real project ownership checks, balanced/case-tolerant JSON parsing, and explicit identity failures. |
+| 2026-08-04 | 2 | review | Split spawn and output parsing from the 370-line draft; final files are 36/282/64 lines. |
+| 2026-08-04 | 2 | live fault proof | A removed baseline AppHost returned `run_id_mismatch` with zero candidates; a current baseline AppHost returned `used`. |
+| 2026-08-04 | 2 | reconcile | S6 still open; no E2E tool-path dependency absorbed. AppHost gate remains serialized. |
 
 ## Decisions
 
@@ -77,18 +81,27 @@ fixture that proves both accepted drift and rejection of an adjacent torn/ambigu
 | Gate | Command or check | Result | Notes |
 | --- | --- | --- | --- |
 | plan gate | composed milestone ruling | PASS | `plan-eval.md` is explicitly not a local formal eval. |
+| package check | `deno task --config packages/mcp/deno.json check` | PASS | all three entrypoints checked |
+| scoped lint | run-deno-lint with package config | PASS | 90 files, zero findings |
+| scoped fmt | run-deno-fmt with package config | PASS | 90 files, zero findings |
 
 ### Fitness Gates
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| Archetype-2 | NOT_RUN | queued | implementation not started |
+| focused fault/integration tests | PASS | 17/17 | source and directory suites |
+| package tests | PASS | 95/95 | `packages/mcp` task |
+| quality scan | PASS | repository scanner | zero findings |
+| arch check | PASS with baseline warnings | root task | zero failures; unrelated existing warnings only |
+| F-5/F-6 JSR | PASS | `deno doc --lint` + `deno publish --dry-run --allow-dirty` | 3 exports checked; no slow types; dry run success |
 
 ### Runtime Gates
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
 | AppHost serialization | PASS | `aspire ps --format Json` | Baseline owns slot; this run did not start resources. |
+| live stale-run refusal | PASS | direct adapter read | removed AppHost produced `run_id_mismatch`, no candidates |
+| live current-run query | PASS | direct adapter read | current baseline DB-operation AppHost produced `used` |
 | `scaffold.runtime` | NOT_RUN | queued | wait for baseline slot release |
 
 ### Consumer Gates
@@ -100,4 +113,3 @@ fixture that proves both accepted drift and rejection of an adjacent torn/ambigu
 ## Handoff Notes
 
 - Evaluator should inspect identity rejection fixtures and the post-describe run-stability check first.
-

@@ -225,7 +225,12 @@ const { entries, sources } = await endpoints.list();
 
 The effective per-service precedence is `override > aspire-cli > run-manifest > appsettings`. Every
 source remains visible as `used`, `absent`, or `failed`; a failed Aspire CLI query or a stale
-manifest is never rendered as healthy absence. The manifest at `.netscript/run/endpoints.json` is
+manifest is never rendered as healthy absence. The Aspire adapter brackets its machine-readable
+`describe` query with `ps` snapshots: the exact real AppHost path must belong to the project, its
+process identity must remain stable across the read, and any executable resource working directory
+must remain inside that same real project root. CLI absence, non-zero exit, identity drift, and
+partial JSON are distinct failed source rows. Benign CLI banners, trailers, and casing changes are
+accepted without weakening those checks. The manifest at `.netscript/run/endpoints.json` is
 eligible only when its real project root and `runId` match the supplied current run. `appHostPath`
 defaults to `./aspire/apphost.mts`; override it when the active AppHost lives elsewhere. Supply
 `expectedRunId` only when the host owns the current AppHost run token; without that identity proof,
@@ -253,7 +258,7 @@ JSON containing its selected service name, for example `{ "service": "orders" }`
 base path; this second request prevents a reused port from being mistaken for the intended service.
 
 The default library composition needs `--allow-read` for carriers and real-path checks,
-`--allow-run` for `aspire describe`, and `--allow-net` for bounded spec/identity requests. Tests and
+`--allow-run` for `aspire ps` plus `aspire describe`, and `--allow-net` for bounded spec/identity requests. Tests and
 custom hosts can replace every source and the probe through `ServiceEndpointDirectoryOptions`.
 
 ## Configuration at a glance

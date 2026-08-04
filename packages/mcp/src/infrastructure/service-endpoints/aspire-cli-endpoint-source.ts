@@ -1,11 +1,20 @@
-import { join } from '@std/path';
+import { isAbsolute, join, relative } from '@std/path';
 import type {
   EndpointCandidate,
   EndpointSourceContext,
   EndpointSourcePort,
+  FailedSourceOutcome,
   SourceFailureCode,
   SourceOutcome,
 } from '../../ports/service-endpoint-directory-port.ts';
+import { executeAspireCliCommand } from './aspire-cli-command.ts';
+import {
+  aspireField,
+  aspireIdentityField,
+  aspireStringField,
+  extractAspireJson,
+  isAspireRecord,
+} from './aspire-cli-output.ts';
 import { normalizeDiscoveredEndpointUrl } from './endpoint-url.ts';
 
 /** Captured result of one Aspire CLI invocation. */
@@ -31,23 +40,55 @@ export interface AspireCliEndpointSourceOptions {
   readonly command?: string;
   /** Override the process boundary for deterministic tests. */
   readonly execute?: AspireCliCommand;
+  /** Override real-path resolution for deterministic identity tests. */
+  readonly realPath?: (path: string) => Promise<string>;
+}
+
+interface AspireAppHostRun {
+  readonly appHostPath: string;
+  readonly runId: string;
 }
 
 /** Queries the running AppHost through Aspire's machine-readable describe surface. */
 export class AspireCliEndpointSource implements EndpointSourcePort {
   readonly #command: string;
   readonly #execute: AspireCliCommand;
+  readonly #realPath: (path: string) => Promise<string>;
 
   /** Create an Aspire source with an injectable command boundary. */
   constructor(options: AspireCliEndpointSourceOptions = {}) {
     this.#command = options.command ?? 'aspire';
-    this.#execute = options.execute ?? executeCommand;
+    this.#execute = options.execute ?? executeAspireCliCommand;
+    this.#realPath = options.realPath ?? Deno.realPath;
   }
 
   /** Report command absence, non-zero exits, and parse failures as distinct failed outcomes. */
   async read(context: EndpointSourceContext, signal?: AbortSignal): Promise<SourceOutcome> {
     signal?.throwIfAborted();
     const appHostPath = context.appHostPath ?? join(context.projectRoot, 'aspire', 'apphost.mts');
+    let projectIdentity: { readonly root: string; readonly appHost: string };
+    try {
+      projectIdentity = {
+        root: await this.#realPath(context.projectRoot),
+        appHost: await this.#realPath(appHostPath),
+      };
+    } catch (error) {
+      if (error instanceof DOMException && error.name === 'AbortError') throw error;
+      return failed(
+        'project_root_mismatch',
+        `Aspire project identity could not be resolved: ${describe(error)}`,
+      );
+    }
+    if (!isWithin(projectIdentity.root, projectIdentity.appHost)) {
+      return failed(
+        'project_root_mismatch',
+        `AppHost path is outside the requested project root: ${projectIdentity.appHost}`,
+      );
+    }
+
+    const before = await this.#readRun(projectIdentity.appHost, signal);
+    if (before.outcome === 'failed') return before;
+
     let result: AspireCliCommandResult;
     try {
       result = await this.#execute(this.#command, [
@@ -76,76 +117,125 @@ export class AspireCliEndpointSource implements EndpointSourcePort {
 
     let parsed: unknown;
     try {
-      parsed = JSON.parse(extractJson(result.stdout));
+      parsed = JSON.parse(extractAspireJson(result.stdout));
     } catch (error) {
       return failed('parse_failed', `aspire describe JSON could not be parsed: ${describe(error)}`);
     }
-    if (!isRecord(parsed) || !Array.isArray(parsed['resources'])) {
-      return failed('parse_failed', 'aspire describe output did not contain top-level resources[]');
+    const resources = aspireField(parsed, 'resources');
+    if (!Array.isArray(resources)) {
+      return failed(
+        'parse_failed',
+        'aspire describe output did not contain top-level resources[]',
+      );
     }
 
     const candidates: EndpointCandidate[] = [];
-    for (const rawResource of parsed['resources']) {
-      if (!isRecord(rawResource)) continue;
+    for (const rawResource of resources) {
+      if (!isAspireRecord(rawResource)) continue;
       const name = resourceName(rawResource);
-      const baseUrl = firstHttpUrl(rawResource['urls']);
+      const baseUrl = firstHttpUrl(aspireField(rawResource, 'urls', 'endpoints'));
       if (!name || !baseUrl) continue;
+      const workDir = resourceWorkDir(rawResource);
+      if (workDir) {
+        let realWorkDir: string;
+        try {
+          realWorkDir = await this.#realPath(workDir);
+        } catch (error) {
+          return failed(
+            'project_root_mismatch',
+            `Resource ${name} working directory could not be resolved: ${describe(error)}`,
+          );
+        }
+        if (!isWithin(projectIdentity.root, realWorkDir)) {
+          return failed(
+            'project_root_mismatch',
+            `Resource ${name} belongs to a foreign project root: ${realWorkDir}`,
+          );
+        }
+      }
       candidates.push({ name, baseUrl, source: 'aspire-cli', operatorTrusted: false });
+    }
+
+    const after = await this.#readRun(projectIdentity.appHost, signal);
+    if (after.outcome === 'failed') return after;
+    if (after.run.runId !== before.run.runId) {
+      return failed(
+        'run_id_mismatch',
+        `AppHost restarted while aspire describe was read (${before.run.runId} -> ${after.run.runId})`,
+      );
     }
     candidates.sort((left, right) => left.name.localeCompare(right.name));
     return { source: 'aspire-cli', outcome: 'used', candidates, excludedServices: [] };
   }
-}
 
-async function executeCommand(
-  command: string,
-  args: readonly string[],
-  signal?: AbortSignal,
-): Promise<AspireCliCommandResult> {
-  signal?.throwIfAborted();
-  const child = new Deno.Command(command, {
-    args: [...args],
-    stdout: 'piped',
-    stderr: 'piped',
-  }).spawn();
-  let aborted = false;
-  const abort = (): void => {
-    aborted = true;
+  async #readRun(
+    appHostPath: string,
+    signal?: AbortSignal,
+  ): Promise<
+    { readonly outcome: 'current'; readonly run: AspireAppHostRun } | FailedSourceOutcome
+  > {
+    let result: AspireCliCommandResult;
     try {
-      child.kill('SIGTERM');
+      result = await this.#execute(this.#command, [
+        'ps',
+        '--format',
+        'Json',
+        '--non-interactive',
+        '--nologo',
+      ], signal);
     } catch (error) {
-      if (!(error instanceof Deno.errors.NotFound)) throw error;
+      if (error instanceof Deno.errors.NotFound) {
+        return failed('command_not_found', `Aspire CLI executable was not found: ${this.#command}`);
+      }
+      if (error instanceof DOMException && error.name === 'AbortError') throw error;
+      return failed('command_failed', describe(error));
     }
-  };
-  signal?.addEventListener('abort', abort, { once: true });
-  let output: Deno.CommandOutput;
-  try {
-    output = await child.output();
-  } finally {
-    signal?.removeEventListener('abort', abort);
-  }
-  if (aborted) throw new DOMException('Aspire CLI query was aborted', 'AbortError');
-  const decoder = new TextDecoder();
-  return {
-    code: output.code,
-    stdout: decoder.decode(output.stdout),
-    stderr: decoder.decode(output.stderr),
-  };
-}
+    if (result.code !== 0) {
+      return failed('command_failed', commandFailure('aspire ps', result));
+    }
 
-function extractJson(text: string): string {
-  const trimmed = text.trim();
-  if (trimmed.startsWith('{') || trimmed.startsWith('[')) return trimmed;
-  const positions = [trimmed.indexOf('{'), trimmed.indexOf('[')].filter((index) => index >= 0);
-  if (positions.length === 0) throw new SyntaxError('no JSON object or array was emitted');
-  return trimmed.slice(Math.min(...positions));
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(extractAspireJson(result.stdout));
+    } catch (error) {
+      return failed('parse_failed', `aspire ps JSON could not be parsed: ${describe(error)}`);
+    }
+    const rawRuns = Array.isArray(parsed) ? parsed : aspireField(parsed, 'appHosts', 'items');
+    if (!Array.isArray(rawRuns)) {
+      return failed('parse_failed', 'aspire ps output did not contain an AppHost array');
+    }
+
+    const runs: AspireAppHostRun[] = [];
+    for (const rawRun of rawRuns) {
+      if (!isAspireRecord(rawRun)) continue;
+      const rawPath = aspireStringField(rawRun, 'appHostPath');
+      const rawPid = aspireIdentityField(rawRun, 'appHostPid');
+      if (!rawPath || rawPid === undefined) continue;
+      let realRunPath: string;
+      try {
+        realRunPath = await this.#realPath(rawPath);
+      } catch {
+        continue;
+      }
+      if (realRunPath === appHostPath) {
+        runs.push({ appHostPath: realRunPath, runId: String(rawPid) });
+      }
+    }
+    if (runs.length !== 1) {
+      return failed(
+        'run_id_mismatch',
+        `aspire ps identified ${runs.length} current runs for AppHost ${appHostPath}`,
+      );
+    }
+    return { outcome: 'current', run: runs[0]! };
+  }
 }
 
 function resourceName(resource: Record<string, unknown>): string | undefined {
-  const displayName = resource['displayName'];
-  if (typeof displayName === 'string' && displayName) return displayName;
-  const name = resource['name'];
-  if (typeof name !== 'string' || !name) return undefined;
+  const displayName = aspireStringField(resource, 'displayName');
+  if (displayName) return displayName;
+  const name = aspireStringField(resource, 'name');
+  if (!name) return undefined;
   return name.replace(/-[a-z0-9]{8}$/i, '');
 }
 
@@ -153,18 +243,30 @@ function firstHttpUrl(value: unknown): string | undefined {
   if (!Array.isArray(value)) return undefined;
   const urls: string[] = [];
   for (const entry of value) {
-    const rawUrl = isRecord(entry) ? entry['url'] : entry;
+    const rawUrl = isAspireRecord(entry) ? aspireField(entry, 'url') : entry;
     const normalized = normalizeDiscoveredEndpointUrl(rawUrl, false);
     if (normalized) urls.push(normalized);
   }
   return urls.find((url) => url.startsWith('http://')) ?? urls[0];
 }
 
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
+function resourceWorkDir(resource: Record<string, unknown>): string | undefined {
+  const properties = aspireField(resource, 'properties');
+  if (!isAspireRecord(properties)) return undefined;
+  return aspireStringField(properties, 'executable.workDir', 'workDir');
 }
 
-function failed(code: SourceFailureCode, reason: string): SourceOutcome {
+function isWithin(root: string, target: string): boolean {
+  const path = relative(root, target);
+  return path === '' || (!path.startsWith('..') && !isAbsolute(path));
+}
+
+function commandFailure(command: string, result: AspireCliCommandResult): string {
+  const detail = (result.stderr || result.stdout).trim().slice(0, 500);
+  return `${command} exited ${result.code}${detail ? `: ${detail}` : ''}`;
+}
+
+function failed(code: SourceFailureCode, reason: string): FailedSourceOutcome {
   return {
     source: 'aspire-cli',
     outcome: 'failed',
