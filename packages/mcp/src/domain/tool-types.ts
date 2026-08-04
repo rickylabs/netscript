@@ -16,6 +16,9 @@ export const TOOL_NAMES = [
   'list_commands',
   'execute_command',
   'record_drift',
+  'list_api_services',
+  'list_service_operations',
+  'get_operation_schema',
 ] as const;
 
 /** Name of a registered v1 tool. */

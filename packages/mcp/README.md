@@ -4,7 +4,7 @@
 [![CI](https://github.com/rickylabs/netscript/actions/workflows/ci.yml/badge.svg)](https://github.com/rickylabs/netscript/actions/workflows/ci.yml)
 [![Docs](https://img.shields.io/badge/docs-rickylabs.github.io-blue)](https://rickylabs.github.io/netscript/)
 
-**The Model Context Protocol server for NetScript: 14 token-bounded tools that let a coding agent
+**The Model Context Protocol server for NetScript: 17 token-bounded tools that let a coding agent
 monitor a running app, debug a correlated execution, read framework-semantic telemetry, run the
 doctor, and search the docs — all over stdio.**
 
@@ -24,7 +24,7 @@ Aspire's own MCP server: Aspire speaks resources and containers; this server spe
 
 ## Why agents like it
 
-- **14 token-bounded tools** — every successful result is capped server-side (50 array items, 2,000
+- **17 token-bounded tools** — every successful result is capped server-side (50 array items, 2,000
   characters per string) before it reaches the model; the analytics tools never return raw spans at
   all.
 - **Framework-semantic trace intelligence** — tools classify telemetry into `worker`, `saga`,
@@ -45,7 +45,7 @@ Aspire's own MCP server: Aspire speaks resources and containers; this server spe
 
 ```mermaid
 flowchart LR
-    A["Agent host<br/>(Claude Code, VS Code, ...)"] <-- "JSON-RPC / stdio" --> S["netscript agent mcp<br/>14 tools · bounded results"]
+    A["Agent host<br/>(Claude Code, VS Code, ...)"] <-- "JSON-RPC / stdio" --> S["netscript agent mcp<br/>17 tools · bounded results"]
     S --> T["Telemetry endpoint<br/>(OTLP read model)"]
     S --> D["Docs corpus<br/>(public Markdown)"]
     S --> P["Command policy<br/>(default-deny allowlist)"]
@@ -149,6 +149,9 @@ results, and `get_run` returns a structured `run_not_found` error the agent can 
 | `list_commands`               | —                 | Live CLI command descriptors                                                 |
 | `execute_command`             | `command`         | Exit code, duration, and bounded output tail; structured denial when blocked |
 | `record_drift`                | `resource`, `summary` | Evidence-gated drift entry appended to project drift log                     |
+| `list_api_services`           | —                 | Discovered services, live spec status, source outcomes, and operation counts  |
+| `list_service_operations`     | `service`         | Bounded OpenAPI operation rows with honest truncation metadata                |
+| `get_operation_schema`        | `service`, `operation` | Request, response, and error views plus an unauthenticated curl template   |
 
 A top-level input/result field overview for every tool is on the
 [MCP reference](https://rickylabs.github.io/netscript/reference/mcp/); the complete Standard Schema
@@ -273,7 +276,7 @@ The full flag reference, policy table, and composition options are on the docs s
 
 ## Docs
 
-- **MCP reference — the 14-tool field overview, policy, and exports**:
+- **MCP reference — the 17-tool field overview, policy, and exports**:
   [rickylabs.github.io/netscript/reference/mcp/](https://rickylabs.github.io/netscript/reference/mcp/)
 - **Agent tooling — install, flags, troubleshooting, CLI × skills × MCP**:
   [rickylabs.github.io/netscript/capabilities/agent-tooling/](https://rickylabs.github.io/netscript/capabilities/agent-tooling/)

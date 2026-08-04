@@ -16,6 +16,27 @@ export {
   recordDrift,
 } from './src/application/flows/record-drift-flow.ts';
 export type { RecordDriftInput } from './src/application/flows/record-drift-flow.ts';
+export {
+  API_SERVICE_RESULT_LIMIT,
+  createListApiServicesFlow,
+} from './src/application/flows/list-api-services-flow.ts';
+export type {
+  ApiServiceSummary,
+  ListApiServicesResult,
+} from './src/application/flows/list-api-services-flow.ts';
+export {
+  createListServiceOperationsFlow,
+  SERVICE_OPERATION_RESULT_LIMIT,
+} from './src/application/flows/list-service-operations-flow.ts';
+export type {
+  ListServiceOperationsResult,
+  ServiceOperationSummary,
+} from './src/application/flows/list-service-operations-flow.ts';
+export {
+  createGetOperationSchemaFlow,
+  OPENAPI_CURL_AUTH_NOTE,
+} from './src/application/flows/get-operation-schema-flow.ts';
+export type { GetOperationSchemaResult } from './src/application/flows/get-operation-schema-flow.ts';
 export type {
   DiagnosticEvidencePort,
   DiagnosticEvidenceReceipt,

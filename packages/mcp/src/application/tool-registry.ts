@@ -23,6 +23,9 @@ const kinds: Readonly<Record<ToolName, ToolKind>> = {
   list_commands: 'meta',
   execute_command: 'mutate',
   record_drift: 'mutate',
+  list_api_services: 'read',
+  list_service_operations: 'read',
+  get_operation_schema: 'read',
 };
 const summaries: Readonly<Record<ToolName, string>> = {
   get_app_status: 'Summarize NetScript app health.',
@@ -41,6 +44,12 @@ const summaries: Readonly<Record<ToolName, string>> = {
     'Execute one CLI command through an explicit allowlist gate and return only a bounded combined output tail.',
   record_drift:
     'Record drift only after a fresh successful diagnostic receipt for the same resource.',
+  list_api_services:
+    'List discovered API services and live OpenAPI status instead of guessing endpoints with curl.',
+  list_service_operations:
+    'List bounded operations for one service instead of guessing endpoint contracts with curl.',
+  get_operation_schema:
+    'Get one operation request, response, and error schema before constructing a curl request.',
 };
 
 /** Build the immutable enumerable v1 tool registry. */
