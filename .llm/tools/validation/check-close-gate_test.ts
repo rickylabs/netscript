@@ -50,6 +50,17 @@ Deno.test('body-keyword-only closing behavior is unchanged without external refe
   ]);
 });
 
+Deno.test('closing-keyword prose inside acceptance-evidence fences is ignored', () => {
+  assertEquals(
+    resolveClosingIssueReferences(
+      [1188],
+      'Closes #1188\n\n```acceptance-evidence\nevidence: "fixture resolves #1166"\n```',
+      [],
+    ),
+    [{ issue: 1188, sources: ['body keyword'] }],
+  );
+});
+
 Deno.test('close-gate retries transient GitHub failures before returning JSON', async () => {
   const statuses = [503, 502, 200];
   const delays: number[] = [];
