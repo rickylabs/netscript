@@ -103,11 +103,11 @@ Deno.test('workspace import resolves the on-disk trigger manifest without fetchi
   });
 });
 
-Deno.test('generated workers registry loads jobs and excludes job tools', async () => {
+Deno.test('generated workers registry loads a custom-only job and excludes job tools', async () => {
   await withTempProject(async (projectRoot) => {
     await writeWorkspaceProject(projectRoot, ['plugin-workers'], {
-      'workers/jobs/example-job.ts': `
-const handler = Object.assign(async () => undefined, { id: 'example-job' });
+      'workers/jobs/custom-claim-job.ts': `
+const handler = Object.assign(async () => undefined, { id: 'custom-claim-job' });
 export default handler;
 `,
       'workers/jobs/job-tools.ts': `
@@ -125,7 +125,7 @@ export default handler;
 
     const module = await import(`${toFileUrl(join(projectRoot, WORKERS_REGISTRY_PATH)).href}?workers`);
     assert(module.registry instanceof Map);
-    assertEquals(module.registry.has('example-job'), true);
+    assertEquals(module.registry.has('custom-claim-job'), true);
     assertEquals(module.registry.has('excluded-job-tools'), false);
     assertEquals(module.registry.size, 1);
   });

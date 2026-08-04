@@ -6,15 +6,15 @@
 | --- | --- |
 | Run ID | `fix-generate-plugins-custom-job-registry--1234` |
 | Branch | `fix/generate-plugins-custom-job-registry` |
-| Current phase | `plan` |
+| Current phase | `implement` |
 | Archetype | `5 - Plugin Package` + `6 - CLI and Tooling` |
 | Scope overlays | `docs` |
 
 ## Current State
 
-The live issue and current-main RED agree. Research and design are complete; the plan locks the
-existing scaffold public path to structural project-job discovery by removing its closed sample
-include overlay. No implementation source has changed.
+The plan is locked and PR #1239 is draft with `status:impl`. The custom-only installed-plugin test
+reproduced the missing-registry RED, then passed after the workers scaffold include overlay was
+removed. The full installed-registry integration file passes 9/9.
 
 ## Completed
 
@@ -23,10 +23,12 @@ include overlay. No implementation source has changed.
 - Reproduced the custom-only missing-registry failure.
 - Mapped plugin/CLI archetypes, doctrine rationale, public contract, E2E workaround, docs, and gates.
 - Recorded the milestone D6 composed-evaluation waiver.
+- Captured the targeted custom-only test RED before changing the manifest.
+- Proved the manifest change GREEN through the same targeted test and the full integration file.
 
 ## In Progress
 
-- Commit and push the locked plan artifacts; open the required draft PR.
+- Commit and push slice 1, then migrate Flow B to public regeneration and update docs.
 
 ## Next Steps
 
@@ -49,12 +51,14 @@ include overlay. No implementation source has changed.
 | Path | Status | Notes |
 | ---- | ------ | ----- |
 | `.llm/runs/fix-generate-plugins-custom-job-registry--1234/` | new | Harness research, locked plan, supervisor identity, worklog, drift, and context. |
+| `plugins/workers/scaffold.runtime.json` | changed | Removed the closed scaffold sample include overlay. |
+| `packages/cli/src/public/features/generate/plugins/installed-runtime-registry-integration_test.ts` | changed | Custom-only RED/GREEN contract coverage. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | ----------- | -------------- | -------- |
-| Static | plan only | `plan-eval.md`; implementation gates pending |
+| Static | targeted GREEN | Installed-registry integration: 9 passed, 0 failed |
 | Fitness | selected | A5 + A6 + docs overlay in `plan.md` |
 | Runtime | RED reproduced | Fresh custom-only scaffold exits 1 on missing registry |
 | Consumer | RED reproduced | Public `generate plugins` installed-plugin path |

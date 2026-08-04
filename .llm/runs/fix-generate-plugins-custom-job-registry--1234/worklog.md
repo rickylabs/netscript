@@ -72,6 +72,8 @@ exclusions.
 | 2026-08-04 15:42 CEST | research | RED | Fresh custom-only scaffold failed exit 1 on missing declared workers registry. |
 | 2026-08-04 15:50 CEST | research | re-baseline | Fast-forwarded to `origin/main` `681fc94a`; the same RED remained. |
 | 2026-08-04 16:06 CEST | 0 | design lock | Chose structural discovery by removing the entire scaffold include overlay; planned public E2E regeneration. |
+| 2026-08-04 16:18 CEST | 1 | test RED | Custom-only installed-registry test failed as designed: 0 passed, 1 failed; missing declared workers registry. |
+| 2026-08-04 16:20 CEST | 1 | contract GREEN | Removed the scaffold include overlay; targeted test passed 1/1 and the full integration file passed 9/9. |
 
 ## Decisions
 
@@ -95,7 +97,9 @@ exclusions.
 | Gate | Command or check | Result | Notes |
 | ---- | ---------------- | ------ | ----- |
 | Plan-Gate | `plan-eval.md` checklist | PASS | Composed per milestone waiver; plan locked before source changes. |
-| Targeted test | installed runtime registry integration test | NOT_RUN | RED/GREEN slice follows bootstrap commit. |
+| Targeted test RED | `deno test --unstable-kv -A ...installed-runtime-registry-integration_test.ts --filter "custom-only job"` | FAIL | Expected RED: generator wrote no declared workers registry. |
+| Targeted test GREEN | same command after manifest fix | PASS | 1 passed, 0 failed. |
+| Installed registry integration | full integration test file | PASS | 9 passed, 0 failed. |
 | Scoped check/lint/fmt | repo wrappers | NOT_RUN | Pending implementation. |
 | Quality and architecture | `quality:gate`, `arch:check` | NOT_RUN | Pending implementation. |
 | Docs/publish | doc-lint, JSR audit, publish dry-run | NOT_RUN | Pending implementation. |
@@ -119,7 +123,7 @@ exclusions.
 | Consumer | Result | Evidence | Notes |
 | -------- | ------ | -------- | ----- |
 | Fresh custom-only scaffold | FAIL | issue reproduction | Authoritative RED before fix. |
-| Installed workers generator | NOT_RUN | targeted integration | Pending implementation. |
+| Installed workers generator | PASS | targeted + full integration test | Custom-only job registered; helper excluded. |
 
 ## Handoff Notes
 

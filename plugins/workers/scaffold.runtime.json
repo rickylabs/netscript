@@ -37,21 +37,6 @@
       },
       "mapValueType": "JobHandler<any>",
       "preamble": ["// deno-lint-ignore-file no-explicit-any"],
-      "profiles": {
-        "scaffold": {
-          "include": ["example-job.ts", "health-check.ts"],
-          "includeWhenPresent": [
-            {
-              "dir": "sagas",
-              "files": ["send-welcome-email.ts", "process-payment-webhook.ts"]
-            },
-            {
-              "dir": "plugins/triggers",
-              "files": ["process-webhook-payload.ts"]
-            }
-          ]
-        }
-      },
       "pluginDirs": [
         {
           "dir": "plugins/workers/jobs",
