@@ -26,3 +26,20 @@ documentation.
 - **Action:** accept
 - **Evidence:** Baseline diff adds `jsr:@netscript/queue@0.0.4`; every commit and final PR diff must
   exclude `deno.lock`.
+
+## 2026-08-04 — Scaffolded named job exports reached by public regeneration
+
+- **What:** Once Flow B regenerated through the fixed public path, the workers service imported the
+  new registry and exposed a second incompatibility: the manifest generator emitted default imports,
+  while workers `add job` scaffolds named handler exports.
+- **Source:** Full `scaffold.runtime` rerun and direct reproduction of the generated workers service
+  command.
+- **Expected:** Structural discovery alone would make the existing generated registry runnable.
+- **Actual:** Discovery succeeded and Flow B's fixture gate passed, but `workers-api` stopped because
+  `flow-b-callback.ts` did not provide a default export.
+- **Severity:** significant
+- **Action:** fix
+- **Evidence:** Strengthen the custom-only integration test to the real scaffold export shape and
+  reuse the established workers compiler resolution contract (`default`, `handler`, then first
+  function export) in the manifest generator. This remains structural module discovery; it does not
+  add source parsing or a new profile/metadata API.

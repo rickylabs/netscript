@@ -12,9 +12,10 @@
 
 ## Current State
 
-The plan is locked and PR #1239 is draft with `status:impl`. The RED/GREEN manifest slice is pushed.
-The original fresh custom-only scaffold now writes a registry containing its job. Flow B no longer
-writes registry source: it configures imports, calls the selected public CLI, and asserts the result.
+The plan is locked and PR #1239 is draft with `status:impl`. Public structural discovery and the E2E
+registry regeneration path are implemented. Full runtime evaluation exposed and now fixed the
+manifest generator's default-import mismatch with real scaffolded named handler exports; targeted
+coverage is GREEN and a complete runtime rerun remains.
 
 ## Completed
 
@@ -27,10 +28,13 @@ writes registry source: it configures imports, calls the selected public CLI, an
 - Proved the manifest change GREEN through the same targeted test and the full integration file.
 - Proved the original fresh scaffold GREEN through the public command.
 - Removed Flow B's generated-registry mutation and documented structural discovery.
+- Logged significant gate-discovered drift and aligned manifest output with the established workers
+  handler resolution contract.
 
 ## In Progress
 
-- Commit and push slice 2, then run scoped, package, publication, and full runtime gates.
+- Commit and push the gate-discovered fix, rerun current-head static/publication gates, then rerun
+  the full one-pass runtime suite.
 
 ## Next Steps
 
@@ -59,6 +63,7 @@ writes registry source: it configures imports, calls the selected public CLI, an
 | `packages/cli/e2e/src/application/gates/scaffold/runtime-gates.ts` | changed | Passes the runner-selected CLI entrypoint to Flow B. |
 | `docs/site/reference/cli/commands.md` | changed | Documents custom structural job discovery and regeneration. |
 | `docs/site/tutorials/erp-sync/02-import-job.md` | changed | Corrects source paths and generated-registry guidance. |
+| `plugins/workers/src/cli/runtime-registry-generator.ts` | changed | Resolves default, `handler`, or first named function exports for structurally discovered jobs. |
 
 ## Gates
 

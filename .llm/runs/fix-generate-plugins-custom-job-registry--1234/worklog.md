@@ -76,6 +76,9 @@ exclusions.
 | 2026-08-04 16:20 CEST | 1 | contract GREEN | Removed the scaffold include overlay; targeted test passed 1/1 and the full integration file passed 9/9. |
 | 2026-08-04 16:27 CEST | 2 | public regeneration | The original fresh custom-only scaffold regenerated successfully: 1 registry written containing `custom-claim-job`. |
 | 2026-08-04 16:30 CEST | 2 | workaround removal | Flow B now merges aliases into `deno.json`, invokes the selected public CLI, and only reads/asserts the registry. |
+| 2026-08-04 17:59 CEST | 3 | runtime gate fix | First full smoke passed 27 gates, then exposed an omitted local `.netscript/e2e` directory creation before warmup; made that prerequisite explicit. |
+| 2026-08-04 18:14 CEST | 3 | runtime contract drift | Second full smoke passed Flow B, then workers startup exposed named-export incompatibility in the public manifest generator; logged significant drift and strengthened RED coverage. |
+| 2026-08-04 18:22 CEST | 3 | named-export RED/GREEN | Real scaffold-shaped custom test failed 0/1 on default import, then passed 1/1 after generator handler resolution; full installed-registry file passed 9/9. |
 
 ## Decisions
 
@@ -102,6 +105,8 @@ exclusions.
 | Targeted test RED | `deno test --unstable-kv -A ...installed-runtime-registry-integration_test.ts --filter "custom-only job"` | FAIL | Expected RED: generator wrote no declared workers registry. |
 | Targeted test GREEN | same command after manifest fix | PASS | 1 passed, 0 failed. |
 | Installed registry integration | full integration test file | PASS | 9 passed, 0 failed. |
+| Scaffold-shaped named export RED | targeted custom-only integration test | FAIL | Expected second RED: generated default import rejected the named handler export. |
+| Scaffold-shaped named export GREEN | same targeted test after generator fix | PASS | 1 passed, 0 failed; full file again 9/9. |
 | E2E fixture check | `deno check --unstable-kv` on Flow B and runtime gates | PASS | Both modules checked. |
 | Focused lint/fmt | direct lint and fmt check on touched source/docs | PASS | No new ignore; touched files formatted. |
 | Scoped check/lint/fmt | repo wrappers | NOT_RUN | Pending implementation. |
@@ -121,6 +126,8 @@ exclusions.
 | Gate | Result | Evidence | Notes |
 | ---- | ------ | -------- | ----- |
 | `scaffold.runtime` | NOT_RUN | planned one-pass command | Run only after targeted/static green. |
+| `scaffold.runtime` attempt 1 | FAIL | 27 passed, 1 failed | Flow B public regeneration succeeded; fixture warmup failed because its directory no longer had an implicit creator. Scoped fix applied; full rerun required. |
+| `scaffold.runtime` attempt 2 | FAIL | 33 passed, 1 failed | Flow B gate passed; `workers-api` exposed the generated default-import/named-export mismatch. Contract fix applied; full rerun required. |
 
 ### Consumer Gates
 

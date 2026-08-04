@@ -55,6 +55,7 @@ interface ConditionalRuntimeInclude {
 
 interface PluginEntry {
   readonly file: string;
+  readonly path: string;
   readonly pluginId: string;
   readonly registryKey: string;
   readonly varName: string;
@@ -166,24 +167,42 @@ async function generateRuntimeRegistry(
   const lines = createRegistryHeader(target);
   const registryDir = relative(projectRoot, dirname(registryPath)).replaceAll('\\', '/');
   files.forEach((file, index) => {
+    const alias = `${target.varPrefix}${index}`;
+    const importBinding = target.kind === 'workers-job' ? `* as ${alias}` : alias;
     lines.push(
-      `import ${target.varPrefix}${index} from '${
-        toRelativeImport(registryDir, `${target.dir}/${file}`)
-      }';`,
+      `import ${importBinding} from '${toRelativeImport(registryDir, `${target.dir}/${file}`)}';`,
     );
   });
 
   const pluginEntries = await appendPluginImports(projectRoot, target, registryDir, lines);
   const valueType = target.mapValueType ?? target.typeImport.name;
-  lines.push('', `export const registry = new Map<string, ${valueType}>([`);
-  files.forEach((_file, index) => {
-    lines.push(
-      `  [${target.varPrefix}${index}.${target.registryKey}, ${target.varPrefix}${index}],`,
-    );
-  });
-  pluginEntries.forEach((entry) => {
-    lines.push(`  [${entry.varName}.${entry.registryKey}, ${entry.varName}],`);
-  });
+  if (target.kind === 'workers-job') {
+    lines.push('', `const jobHandlers: readonly ${valueType}[] = [`);
+    files.forEach((file, index) => {
+      lines.push(
+        `  resolveJobHandler(${target.varPrefix}${index}, ${
+          JSON.stringify(`${target.dir}/${file}`)
+        }),`,
+      );
+    });
+    pluginEntries.forEach((entry) => {
+      lines.push(`  resolveJobHandler(${entry.varName}, ${JSON.stringify(entry.path)}),`);
+    });
+    lines.push('];', '', `export const registry = new Map<string, ${valueType}>([`);
+    [...files, ...pluginEntries].forEach((_entry, index) => {
+      lines.push(`  [jobHandlers[${index}].${target.registryKey}, jobHandlers[${index}]],`);
+    });
+  } else {
+    lines.push('', `export const registry = new Map<string, ${valueType}>([`);
+    files.forEach((_file, index) => {
+      lines.push(
+        `  [${target.varPrefix}${index}.${target.registryKey}, ${target.varPrefix}${index}],`,
+      );
+    });
+    pluginEntries.forEach((entry) => {
+      lines.push(`  [${entry.varName}.${entry.registryKey}, ${entry.varName}],`);
+    });
+  }
   lines.push(']);', '');
 
   appendJobDefinitions(target, files, pluginEntries, lines);
@@ -238,11 +257,15 @@ async function appendPluginImports(
     );
     for (const file of pluginFiles) {
       const varName = `${pluginDir.varPrefix}${toExportName(basename(file, '.ts'))}Handler`;
+      const importBinding = target.kind === 'workers-job' ? `* as ${varName}` : varName;
       lines.push(
-        `import ${varName} from '${toRelativeImport(registryDir, `${pluginDir.dir}/${file}`)}';`,
+        `import ${importBinding} from '${
+          toRelativeImport(registryDir, `${pluginDir.dir}/${file}`)
+        }';`,
       );
       pluginEntries.push({
         file,
+        path: `${pluginDir.dir}/${file}`,
         pluginId: pluginDir.pluginId,
         registryKey: target.registryKey,
         varName,
@@ -263,12 +286,13 @@ function appendJobDefinitions(
   lines.push('const jobDefinitionEntries: readonly [string, RegisterJobInput][] = [');
   files.forEach((file, index) => {
     lines.push(
-      `  [${target.varPrefix}${index}.${target.registryKey}, createLocalJobDefinition(${target.varPrefix}${index}.${target.registryKey}, './${file}')],`,
+      `  [jobHandlers[${index}].${target.registryKey}, createLocalJobDefinition(jobHandlers[${index}].${target.registryKey}, './${file}')],`,
     );
   });
-  pluginEntries.forEach((entry) => {
+  pluginEntries.forEach((entry, index) => {
+    const handlerIndex = files.length + index;
     lines.push(
-      `  [${entry.varName}.id, createPluginJobDefinition(${entry.varName}.id, '${entry.pluginId}', './plugins/${entry.pluginId}/jobs/${entry.file}')],`,
+      `  [jobHandlers[${handlerIndex}].id, createPluginJobDefinition(jobHandlers[${handlerIndex}].id, '${entry.pluginId}', './plugins/${entry.pluginId}/jobs/${entry.file}')],`,
     );
   });
   lines.push('];', '');
@@ -312,6 +336,23 @@ function appendJobDefinitions(
   lines.push('  return id.split("-").filter(Boolean).map((part) =>');
   lines.push('    `${part.slice(0, 1).toUpperCase()}${part.slice(1)}`');
   lines.push('  ).join(" ");');
+  lines.push('}', '');
+  const handlerType = target.mapValueType ?? target.typeImport.name;
+  lines.push(
+    `function resolveJobHandler(module: Record<string, unknown>, path: string): ${handlerType} {`,
+  );
+  lines.push(
+    '  const candidate = module.default ?? module.handler ?? firstFunctionExport(module);',
+  );
+  lines.push('  if (typeof candidate !== "function") {');
+  lines.push(
+    '    throw new Error(`Worker job module ${path} does not export a function handler.`);',
+  );
+  lines.push('  }');
+  lines.push(`  return candidate as ${handlerType};`);
+  lines.push('}', '');
+  lines.push('function firstFunctionExport(module: Record<string, unknown>): unknown {');
+  lines.push('  return Object.values(module).find((value) => typeof value === "function");');
   lines.push('}', '');
 }
 

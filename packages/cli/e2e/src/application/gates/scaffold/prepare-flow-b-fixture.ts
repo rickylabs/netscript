@@ -70,6 +70,7 @@ const localSourcePackages = [
   ['@netscript/telemetry/tracer', 'packages/telemetry/tracer.ts'],
 ].map(([specifier, entrypoint]) => ({ specifier, entrypoint }));
 const flowBConfigPath = `${projectRoot}/.netscript-flow-b-deno.json`;
+await Deno.mkdir(`${projectRoot}/.netscript/e2e`, { recursive: true });
 if (mode === 'local') {
   await prepareLocalSourceFixture({
     projectRoot,
@@ -84,7 +85,6 @@ if (mode === 'local') {
 } else {
   const flowBImports = { ...denoConfig.imports, ...sharedNpmImports, ...publishedImports };
   const flowBConfig = { ...denoConfig, imports: flowBImports };
-  await Deno.mkdir(`${projectRoot}/.netscript/e2e`, { recursive: true });
   await Deno.writeTextFile(
     flowBConfigPath,
     `${JSON.stringify(flowBConfig, null, 2)}\n`,
