@@ -8,15 +8,16 @@ import {
   type FreshQueryCacheInvalidationOptions,
   registerQueryCacheInvalidationRoute,
 } from './query-cache-invalidation.ts';
+import { createFreshAppTelemetryMiddleware } from './fresh-app-telemetry.ts';
 
 /** Attribute value accepted by Fresh app telemetry bootstrap options. */
 export type FreshAppTelemetryAttribute = string | number | boolean;
 
-/** Telemetry bootstrap options reserved for `defineFreshApp` defaults. */
+/** Telemetry bootstrap options applied to `defineFreshApp` request spans. */
 export interface FreshAppTelemetryOptions {
-  /** Service name used by future Fresh app telemetry defaults. */
+  /** Service name attached to Fresh app request spans. */
   serviceName?: string;
-  /** Static attributes attached to future Fresh app bootstrap spans. */
+  /** Static attributes attached to Fresh app request spans. */
   attributes?: Record<string, FreshAppTelemetryAttribute>;
 }
 
@@ -31,7 +32,7 @@ export type FreshAppFactory<State> = (freshConfig?: FreshConfig) => App<State>;
  */
 export interface DefineFreshAppOptions<State> {
   /**
-   * Stable app identifier reserved for future logger/telemetry defaults.
+   * Stable app identifier used as the default telemetry service name.
    */
   name?: string;
   /**
@@ -68,7 +69,7 @@ export interface DefineFreshAppOptions<State> {
    */
   fsRoutes?: FreshAppFsRoutes<State> | false | string;
   /**
-   * Reserved telemetry bootstrap seam for NetScript Fresh adapters.
+   * Configure request telemetry defaults. `false` disables request spans.
    */
   telemetry?: boolean | FreshAppTelemetryOptions;
   /**
@@ -83,7 +84,7 @@ export interface DefineFreshAppOptions<State> {
  *
  * This function keeps the default Fresh bootstrap unchanged while exposing
  * optional adapter seams for app construction, static middleware, lifecycle
- * setup, file-system routes, and future telemetry defaults.
+ * setup, file-system routes, and request telemetry defaults.
  */
 export function defineFreshApp<State>(options: DefineFreshAppOptions<State> = {}): App<State> {
   const app = options.app ?? options.createApp?.(options.freshConfig) ??
@@ -96,6 +97,10 @@ export function defineFreshApp<State>(options: DefineFreshAppOptions<State> = {}
       ? freshStaticFiles<State>()
       : options.staticFiles;
     app.use(staticMiddleware);
+  }
+
+  if (options.telemetry !== false) {
+    app.use(createFreshAppTelemetryMiddleware(options));
   }
 
   if (options.middleware && options.middleware.length > 0) {

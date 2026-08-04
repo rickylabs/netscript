@@ -19,4 +19,36 @@
 ## Progress
 
 - Bootstrap and contract research recorded.
+- RED: focused `define-fresh-app.test.ts` failed 9/10 because configured telemetry registered no
+  request middleware (`Expected telemetry defaults to activate a request span`).
+- GREEN: `defineFreshApp` now installs one request telemetry middleware by default/configuration and
+  none for `telemetry: false`; the full Fresh package passes 216/216 tests.
+- The request middleware emits `fresh.request` through the existing package helper with SERVER kind,
+  service-name precedence, caller attributes, request method/path, response status, and normalized
+  exception reporting.
+- Scaffold/Aspire composition is proven without duplicate code: scaffold main passes `name`, while
+  the existing app generator's focused 22-step test proves full OTEL env and exporter wiring.
+- Caveat judgment: fully false after composition, so the docs marker/call-out and matching debt row
+  were removed; emitted-span documentation replaces them.
 
+## Gate evidence
+
+| Gate | Result |
+| --- | --- |
+| Fresh focused RED | expected FAIL, 9 passed / 1 failed before implementation |
+| `packages/fresh` test task | PASS, 216 passed / 0 failed |
+| `packages/fresh` check task | PASS |
+| Aspire `generateRegisterApps` focus | PASS, 22 steps |
+| Scoped check | PASS, 180 files / 0 findings |
+| Scoped lint | PASS, 180 files / 0 findings after one type-only import correction |
+| Scoped fmt | PASS, 180 files / 0 findings |
+| `deno task quality:gate` | PASS; repository warnings are pre-existing |
+| Structured doc lint | no new server-entrypoint diagnostics; 44 pre-existing query/route/streams diagnostics reported |
+| JSR audit | no deepening; existing two module-tag failures, cardinality warning, and slow-type banner remain outside this diff |
+
+## Reconcile
+
+- #1230 remains the sole closing issue; PR #1282 is the draft commit trail.
+- No issue or PR comment changed scope.
+- D6 continues to replace local evaluator files with draft→ready augmentation plus the orchestrator
+  pre-merge gate.

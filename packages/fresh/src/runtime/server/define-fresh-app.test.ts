@@ -16,6 +16,26 @@ class TrackingApp extends App<Record<string, never>> {
   }
 }
 
+type TrackingMiddleware = NonNullable<
+  Parameters<App<Record<string, never>>['use']>[1]
+>;
+
+class TelemetryTrackingApp extends App<Record<string, never>> {
+  useCalls = 0;
+
+  override use(...middleware: TrackingMiddleware[]): this;
+  override use(path: string, ...middleware: TrackingMiddleware[]): this;
+  override use(
+    pathOrMiddleware: string | TrackingMiddleware,
+    ...middleware: TrackingMiddleware[]
+  ): this {
+    this.useCalls += typeof pathOrMiddleware === 'string'
+      ? middleware.length
+      : middleware.length + 1;
+    return this;
+  }
+}
+
 Deno.test('defineFreshApp reuses a provided app instance', () => {
   const app = new TrackingApp();
   const result = defineFreshApp({ app, staticFiles: false, fsRoutes: false });
@@ -40,6 +60,31 @@ Deno.test('defineFreshApp can construct through an adapter factory', () => {
 
   assert(result === app, 'Expected defineFreshApp to return the factory app instance');
   assert(receivedConfig === freshConfig, 'Expected factory to receive Fresh config');
+});
+
+Deno.test('defineFreshApp activates request telemetry unless explicitly disabled', () => {
+  const enabled = new TelemetryTrackingApp();
+  defineFreshApp({
+    app: enabled,
+    name: 'dashboard',
+    telemetry: {
+      serviceName: 'dashboard-web',
+      attributes: { 'deployment.environment.name': 'test' },
+    },
+    staticFiles: false,
+    fsRoutes: false,
+  });
+
+  const disabled = new TelemetryTrackingApp();
+  defineFreshApp({
+    app: disabled,
+    telemetry: false,
+    staticFiles: false,
+    fsRoutes: false,
+  });
+
+  assert(enabled.useCalls === 1, 'Expected telemetry defaults to register request middleware');
+  assert(disabled.useCalls === 0, 'Expected telemetry false to skip request middleware');
 });
 
 Deno.test('defineFreshApp applies lifecycle hooks before request middleware runs', async () => {
