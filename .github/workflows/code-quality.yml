@@ -1,7 +1,11 @@
 name: Code quality
 
+# Draft PR pushes schedule no quality work. The ready flip and subsequent
+# non-draft pushes materialize the gate.
+
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'packages/**'
       - 'plugins/**'
@@ -20,7 +24,7 @@ permissions:
 jobs:
   # PR gate — blocking. Scans only the files the PR changed.
   code-quality:
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request' && github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5

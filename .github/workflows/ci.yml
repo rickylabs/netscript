@@ -25,6 +25,8 @@ name: ci
 # failed classify forces a full run. Push events (no diff) always run in
 # full. `ci:full` forces everything; the skip labels do NOT extend here.
 # `close-gate` and `deps-report` are never gated.
+# Draft PR pushes schedule no jobs. The full required-context set materializes
+# on `ready_for_review` and every later non-draft PR event.
 #
 # Still out of scope here (deferred Phase-2 "repo process automation" umbrella):
 # the toolchain-heavy CLI runtime e2e (`deno task e2e:cli` / scaffold.runtime,
@@ -36,7 +38,7 @@ on:
     branches: [main, 'feat/package-quality']
   pull_request:
     branches: [main, "feat/**", "epic/**"]
-    types: [opened, synchronize, reopened, edited, labeled, unlabeled]
+    types: [opened, synchronize, reopened, ready_for_review, edited, labeled, unlabeled]
 
 permissions:
   contents: read
@@ -51,7 +53,7 @@ jobs:
   close-gate:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request' && github.event.pull_request.draft == false
     permissions:
       contents: read
       issues: write
@@ -104,6 +106,7 @@ jobs:
     name: classify changes
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     outputs:
       needs_deno: ${{ steps.decide.outputs.needs_deno }}
       needs_docs: ${{ steps.decide.outputs.needs_docs }}
@@ -175,7 +178,7 @@ jobs:
     needs: classify
     # Required check: always starts and reports (see the skip-policy header).
     # FAIL-CLOSED: a failed classify forces RUN=true.
-    if: ${{ !cancelled() }}
+    if: ${{ !cancelled() && (github.event_name != 'pull_request' || github.event.pull_request.draft == false) }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
@@ -239,7 +242,7 @@ jobs:
     # Required check: always starts and reports. Runs for toolchain-relevant
     # diffs AND docs diffs (fmt/docs-accuracy/taglines validate Markdown), so
     # the gate is `needs_deno || needs_docs`. FAIL-CLOSED on classify failure.
-    if: ${{ !cancelled() }}
+    if: ${{ !cancelled() && (github.event_name != 'pull_request' || github.event.pull_request.draft == false) }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
@@ -312,6 +315,7 @@ jobs:
         run: deno task audit:critical
 
   deps-report:
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -333,7 +337,7 @@ jobs:
   lane-visibility:
     name: core CI lane visibility
     needs: [close-gate, classify, check-test, quality, deps-report]
-    if: ${{ always() && github.event_name == 'pull_request' }}
+    if: ${{ always() && github.event_name == 'pull_request' && github.event.pull_request.draft == false }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
