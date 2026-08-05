@@ -77,6 +77,7 @@ typed identifier; do not add endpoint or model literals to the launcher.
 | live inference canary | PASS | tmux `loopback-deepseek-openrouter`; exact `OPENROUTER_CANARY_OK` through DeepSeek |
 | Remote Control compatibility | UNSUPPORTED | Claude 2.1.222 daemon exits; interactive registry lacks `bridgeSessionId` |
 | formal local IMPL-EVAL | PASS | separate OpenCode/Qwen session independently verified tests, static gates, docs, PR trail, and live sentinel |
+| GitHub required checks | PASS | `code-quality`, `surface-diff`, and change classification passed; non-applicable expensive lanes skipped by path policy |
 
 ## Handoff Notes
 

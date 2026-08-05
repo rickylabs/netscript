@@ -6,7 +6,7 @@
 | -------------- | ------------------------------------------------ |
 | Run ID         | `feat-agentic-remote-model-proxy--split-gateway` |
 | Branch         | `feat/agentic-remote-model-proxy`                |
-| Current phase  | `close`                                          |
+| Current phase  | `close — merge-ready`                            |
 | Archetype      | `6 - CLI / tooling`                              |
 | Scope overlays | `docs`                                           |
 
@@ -25,13 +25,11 @@ live DeepSeek sentinel pass, and separate local OpenCode/Qwen IMPL-EVAL returned
 
 ## In Progress
 
-- Final evaluator artifact commit and GitHub checks.
+- All implementation, review, evaluation, and GitHub gates.
 
 ## Next Steps
 
-1. Commit and push formal evaluator evidence.
-2. Verify required GitHub checks.
-3. Mark the PR ready for review/merge when green.
+1. Merge PR #1314 when desired.
 
 ## Key Decisions
 
@@ -63,6 +61,7 @@ live DeepSeek sentinel pass, and separate local OpenCode/Qwen IMPL-EVAL returned
 | Runtime canary                           | PASS | exact sentinel in `loopback-deepseek-openrouter` |
 | Remote Control | UNSUPPORTED | current Claude custom-base guard; no attachment claim |
 | Formal IMPL-EVAL | PASS | separate local OpenCode/Qwen evaluator artifact `evaluate.md` |
+| GitHub CI | PASS | applicable required jobs green; path-inapplicable lanes skipped |
 
 ## Open Questions
 
