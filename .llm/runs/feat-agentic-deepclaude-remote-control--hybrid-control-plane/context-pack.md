@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `feat-agentic-deepclaude-remote-control--hybrid-control-plane` |
 | Branch | `feat/agentic-deepclaude-remote-control` |
-| Current phase | `plan` |
+| Current phase | `implement` |
 | Archetype | N/A — internal tooling |
 | Scope overlays | docs |
 
@@ -22,16 +22,17 @@ tasks to credential-isolated OpenRouter workers.
 - Official compatibility boundary and upstream DeepClaude source inspected.
 - Version 2.1.91 live probe confirmed Remote Control minimum-version rejection.
 - Plan/design locked; no implementation started.
+- Separate OpenCode/OpenRouter Minimax PLAN-EVAL passed after two Qwen transport failures.
 
 ## In Progress
 
-- Bootstrap commit, early draft PR, then separate OpenCode/Qwen PLAN-EVAL.
+- Slice 1 implementation: bounded delegation contract and OpenCode adapter.
 
 ## Next Steps
 
-1. Commit/push run bootstrap and open the draft PR.
-2. Run formal PLAN-EVAL in a separate session.
-3. Implement only after `PASS`.
+1. Implement slice 1 and run its focused/static gates.
+2. Supervisor review, commit, push, and PR comment.
+3. Continue with launcher/MCP slice and live canary.
 
 ## Key Decisions
 

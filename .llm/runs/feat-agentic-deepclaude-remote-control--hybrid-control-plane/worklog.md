@@ -58,6 +58,7 @@ protocol tests, then run the documented canary; never add credentials or endpoin
 | Time | Slice | Step | Notes |
 | --- | --- | --- | --- |
 | 2026-08-05 | Plan | Research | Confirmed no official version overlap for custom gateway + Remote Control. |
+| 2026-08-05 | Plan-Gate | Evaluation | OpenCode/Minimax separate session returned `PASS`; Qwen transport failures recorded in drift. |
 
 ## Gate Results
 

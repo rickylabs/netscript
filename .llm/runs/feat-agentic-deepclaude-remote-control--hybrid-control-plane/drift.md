@@ -13,3 +13,15 @@
 - **Severity:** architectural
 - **Action:** rescope
 - **Evidence:** `research.md` findings 2–6 and merged PR #1314.
+
+## 2026-08-05 — bound Qwen PLAN-EVAL transport failed twice
+
+- **What:** OpenCode/Qwen emitted unavailable `unknown` tool calls on two formal evaluator launches;
+  the no-tool attachment retry returned no verdict.
+- **Source:** local `deno task agentic:opencode` PLAN-EVAL attempts.
+- **Expected:** Bound Qwen writes `plan-eval.md` through the local OpenCode transport.
+- **Actual:** The approved Minimax M3 fallback completed the same separate-session protocol and
+  wrote `PASS`.
+- **Severity:** minor
+- **Action:** accept
+- **Evidence:** `plan-eval.md`; evaluator model is in `OPEN_EVALUATOR_MODEL_IDS`.

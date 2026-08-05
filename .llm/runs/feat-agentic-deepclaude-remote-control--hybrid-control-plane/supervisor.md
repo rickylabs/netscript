@@ -16,7 +16,7 @@
 | Task lane | Provider / model / effort | Role in this run |
 | --- | --- | --- |
 | planning_decisions | Codex · OpenAI · GPT-5.6 Sol | Supervisor and plan generator |
-| formal_evaluation | OpenCode · OpenRouter · Qwen 3.7 Max · high | Separate PLAN-EVAL and IMPL-EVAL sessions |
+| formal_evaluation | OpenCode · OpenRouter · Minimax M3 · high | Separate PLAN-EVAL session fallback after bound Qwen transport failure |
 | adversarial review | OpenCode · OpenRouter · Grok 4.5 · high | Reference-claim and security review |
 
 ## Recorded lane/eval overrides
@@ -24,3 +24,7 @@
 - Owner previously required OpenCode for evaluations and excluded OpenHands because this local
   Remote Control/toolchain behavior cannot be reproduced by cloud agents. Formal evaluation stays
   open-model-only and session-separated.
+- The bound Qwen evaluator failed twice by emitting unavailable `unknown` tool calls; an
+  attachment-only retry returned no output. Minimax M3 is the other policy-approved open evaluator
+  and produced the separate-session `PASS`. IMPL-EVAL will prefer Qwen again and fall back only if
+  the same transport defect recurs.
