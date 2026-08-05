@@ -43,7 +43,9 @@ const services = await callTool('list_api_services', {});
 const serviceRows = recordArray(services, 'services');
 const users = serviceRows.find((entry) => entry.name === 'users');
 if (users?.status !== 'running' || users.source !== 'aspire-cli') {
-  throw new Error(`users endpoint did not resolve live through aspire-cli: ${JSON.stringify(users)}`);
+  throw new Error(
+    `users endpoint did not resolve live through aspire-cli: ${JSON.stringify(users)}`,
+  );
 }
 const serviceName = stringField(users, 'name');
 const operations = await callTool('list_service_operations', { service: serviceName });
@@ -63,7 +65,10 @@ console.log(
   `documented MCP path resolved ${serviceName} through aspire-cli, enumerated ${operationRows.length} operations, and retrieved ${operationName}`,
 );
 
-async function callTool(name: string, args: Record<string, unknown>): Promise<Record<string, unknown>> {
+async function callTool(
+  name: string,
+  args: Record<string, unknown>,
+): Promise<Record<string, unknown>> {
   const response = await server.handle({
     jsonrpc: '2.0',
     id: name,
@@ -78,7 +83,10 @@ async function callTool(name: string, args: Record<string, unknown>): Promise<Re
   return structured;
 }
 
-function recordArray(record: Record<string, unknown>, key: string): readonly Record<string, unknown>[] {
+function recordArray(
+  record: Record<string, unknown>,
+  key: string,
+): readonly Record<string, unknown>[] {
   const value = record[key];
   if (!Array.isArray(value) || !value.every(isRecord)) {
     throw new Error(`MCP result field ${key} is not an object array`);
@@ -88,7 +96,9 @@ function recordArray(record: Record<string, unknown>, key: string): readonly Rec
 
 function stringField(record: Record<string, unknown>, key: string): string {
   const value = record[key];
-  if (typeof value !== 'string' || !value) throw new Error(`MCP result field ${key} is not a string`);
+  if (typeof value !== 'string' || !value) {
+    throw new Error(`MCP result field ${key} is not a string`);
+  }
   return value;
 }
 
