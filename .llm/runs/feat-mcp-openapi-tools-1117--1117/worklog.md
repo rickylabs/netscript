@@ -16,3 +16,13 @@
 - The MCP stdio instruction regression also failed pre-fix (`stdio_test.ts`: 0 passed / 1 failed):
   the server-injected agent context omits `list_api_services` in the same way as the scaffolded
   convention. Both user-facing activation seams are therefore held RED before their implementation.
+
+## Ordered activation implementation
+
+- Both agent-facing instruction surfaces now expose the complete ordered funnel:
+  `list_api_services → list_service_operations → get_operation_schema`.
+- The existing scaffold runtime verifier now reads the generated app `AGENTS.md`, rejects a missing
+  or reordered funnel, and then calls all three tools through the MCP JSON-RPC server. It discovers
+  `users` from the first result, selects an operation from the second, and supplies both to the
+  third; no endpoint, port, or operation id is hardcoded.
+- Focused convention + stdio tests: 4 passed / 0 failed. Targeted E2E verifier type-check: passed.

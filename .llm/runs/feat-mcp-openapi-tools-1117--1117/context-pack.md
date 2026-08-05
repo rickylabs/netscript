@@ -7,3 +7,6 @@ runtime gate proves only the first tool in isolation. Locked fix: document and l
 `list_api_services → list_service_operations → get_operation_schema` funnel. `deno.lock` entered the
 branch modified and must remain unstaged.
 
+Implementation now updates both the scaffold convention and MCP server instructions. The runtime
+verifier follows the generated instruction through JSON-RPC and chains discovered service and
+operation identities into schema retrieval. Focused tests are green; full gates remain pending.
