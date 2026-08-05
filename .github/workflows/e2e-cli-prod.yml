@@ -92,7 +92,10 @@ jobs:
 
       - name: Materialize pinned Aspire local package source
         run: |
-          aspire --version
+          warmup=0
+          timeout 5s aspire restore \
+            --apphost .github/aspire-cache/apphost.mts --non-interactive --nologo || warmup=$?
+          test "$warmup" -eq 0 -o "$warmup" -eq 6 -o "$warmup" -eq 124
           mkdir -p .llm/tmp/aspire-nuget-source
           find "$HOME/.nuget/packages" -name '*.nupkg' \
             -exec cp --update=none '{}' .llm/tmp/aspire-nuget-source/ \;

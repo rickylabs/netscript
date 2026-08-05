@@ -1,0 +1,14 @@
+{
+  "appHost": {
+    "path": "apphost.mts",
+    "language": "typescript/nodejs"
+  },
+  "sdk": {
+    "version": "13.4.6"
+  },
+  "packages": {
+    "Aspire.Hosting.PostgreSQL": "13.4.6",
+    "Aspire.Hosting.Redis": "13.4.6",
+    "Aspire.Hosting.Browsers": "13.4.6-preview.1.26319.6"
+  }
+}
