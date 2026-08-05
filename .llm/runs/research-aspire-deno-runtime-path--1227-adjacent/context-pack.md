@@ -12,25 +12,27 @@
 
 ## Current State
 
-Harness bootstrap is complete. The branch is based exactly on `origin/main` at `00f96af76`; no
-remote branch existed at activation. The only pre-existing worktree change is `deno.lock`, which is
-out of scope and must remain uncommitted.
+Research is complete. The branch began exactly at `origin/main` `00f96af76`; the draft PR is #1307.
+The only pre-existing worktree change is `deno.lock`, which remains out of scope and uncommitted.
 
 ## Completed
 
 - Required skills and harness/doctrine routing references read.
 - Issue #1227 and its reopening evidence re-baselined.
 - Archetype 6 + docs overlay, owner route, D6 waiver, and two-slice evidence design recorded.
+- Both live upstream PRs and all current review threads/review summaries inspected.
+- Seven isolated restore graphs measured; external export and a real Deno resource tested.
+- Evidence-backed verdict and exact upstream watch signal written in `research.md`.
 
 ## In Progress
 
-- S0 first commit, explicit-refspec push, and draft PR opening.
+- S1 validation, commit, explicit-refspec push, and PR handoff.
 
 ## Next Steps
 
-1. Run isolated Aspire 13.4.6 fixtures.
-2. Verify upstream issues/PRs/releases and Toolkit package support.
-3. Complete `research.md`, gates, independent milestone-composed review handoff, and PR metadata.
+1. Run scoped documentation gates.
+2. Commit and push S1 without `deno.lock`.
+3. Complete the milestone-composed implementation evaluation and PR metadata.
 
 ## Key Decisions
 
@@ -53,12 +55,12 @@ out of scope and must remain uncommitted.
 | ---------------- | -------------- | ----------------------------------------------- |
 | Static/docs      | pending        | S1                                              |
 | Fitness          | N/A            | No package/source change.                       |
-| Runtime research | pending        | S1 fixtures.                                    |
+| Runtime research | pass           | Seven restores; Toolkit generation/run/wait.    |
 | Consumer/release | N/A            | No scaffold output or published surface change. |
 
 ## Open Questions
 
-- The five questions in `research.md` remain open until S1.
+- None for the research verdict; upstream merge/release state remains intentionally conditional.
 
 ## Drift and Debt
 

@@ -56,10 +56,14 @@ using its recorded command/configuration and follow the exact upstream watch sig
 
 ## Progress Log
 
-| Time                  | Slice | Step      | Notes                                                                                                        |
-| --------------------- | ----- | --------- | ------------------------------------------------------------------------------------------------------------ |
-| 2026-08-05 03:02 CEST | S0    | bootstrap | Branch equals `origin/main`; remote branch absent; inherited `deno.lock` modification recorded and excluded. |
-| 2026-08-05 03:08 CEST | S0    | re-baseline | Live #1227 is reopened; current default pins SDK 13.4.6, always adds Browsers NuGet, and consumes neither CommunityToolkit Deno constant. |
+| Time                  | Slice | Step        | Notes                                                                                                                                                                  |
+| --------------------- | ----- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-08-05 03:02 CEST | S0    | bootstrap   | Branch equals `origin/main`; remote branch absent; inherited `deno.lock` modification recorded and excluded.                                                           |
+| 2026-08-05 03:08 CEST | S0    | re-baseline | Live #1227 is reopened; current default pins SDK 13.4.6, always adds Browsers NuGet, and consumes neither CommunityToolkit Deno constant.                              |
+| 2026-08-05 03:42 CEST | S1    | upstream    | Read #18627/#18628 including current review threads: first-party Deno lands in `Aspire.Hosting.JavaScript`; resolver changes the guest runtime, not the managed probe. |
+| 2026-08-05 04:18 CEST | S1    | experiments | Seven cold restore variants measured: empty TypeScript floor 75 libraries; representative current graph 83; either Deno package path 84.                               |
+| 2026-08-05 04:24 CEST | S1    | runtime     | Toolkit 13.4.0 exported `addDenoApp`; Deno 2.9.3 resource reached `up (running)` on Aspire 13.4.6 and stopped cleanly.                                                 |
+| 2026-08-05 04:36 CEST | S1    | verdict     | Completed research: do not adopt as #1227 mitigation; conditionally reassess first-party Deno after merged/stable 13.5 and exact-version fixture.                      |
 
 ## Decisions
 
@@ -76,7 +80,12 @@ using its recorded command/configuration and follow the exact upstream watch sig
 
 ## Gate Results
 
-Pending S1.
+| Gate            | Result  | Evidence                                                    |
+| --------------- | ------- | ----------------------------------------------------------- |
+| External export | pass    | generated Toolkit methods and successful Deno resource wait |
+| Restore graph   | pass    | seven isolated `project.assets.json` counts                 |
+| Scope           | pending | final raw diff/status before S1 commit                      |
+| Documentation   | pending | scoped format and link checks                               |
 
 ## Handoff Notes
 
