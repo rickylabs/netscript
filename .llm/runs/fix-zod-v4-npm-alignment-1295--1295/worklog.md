@@ -53,11 +53,16 @@ Change Zod only in the root catalog, run `deno task deps:check`, and inspect the
 | Time | Slice | Step | Notes |
 | --- | --- | --- | --- |
 | 2026-08-05 | 0 | research | Reproduced three instances, violated peers, 18 member specifiers, and one non-v4 oRPC import. |
-| 2026-08-05 | 1 | negative controls | Four tests prove the aligned case and reject a second/v3 instance, JSR member specifier, and oRPC compatibility root. |
+| 2026-08-05 | 1 | negative controls | Six tests prove the documented boundary and reject unknown v3 parents, JSR member/source specifiers, AI/MCP v3 resolution, and the oRPC compatibility root. |
 | 2026-08-05 | 1 | RED | Live guard failed with 21 findings: catalog 1, member specifier 18, lock instance 1, oRPC surface 1. |
 | 2026-08-05 | 1 | reconcile | Draft PR #1315 targets `canary/0.0.5-canary.13`; issue scope and labels remain current. |
 | 2026-08-05 | 2 | GREEN attempt | Catalog/member/oRPC alignment removed measured MCP peer-to-3 warnings, but guard still found Zod 3. |
 | 2026-08-05 | 2 | drift | Native provenance found hard v3 paths through kvdex and AG-UI; exact-one-instance acceptance remains unearned. |
+| 2026-08-05 | 2 | rescope | Owner rewrote #1295 to align workspace/AI/MCP v4 while documenting the exact residual boundary; full collapse moved to #1320. |
+| 2026-08-05 | 2 | GREEN | Guard passes with npm Zod 4 for AI/MCP and only the exact `@ag-ui/core@0.0.52` / `@olli/kvdex@3.6.7` v3 parents. |
+| 2026-08-05 | 2 | focused proof | 977-file targeted check and 27 CLI/service/streams tests pass, including the generated workspace compile fixture. |
+| 2026-08-05 | 3 | publish proof | Repository publish dry-run exits 0; `deno doc --lint` passes all exports for the 19 affected package/plugin roots. |
+| 2026-08-05 | 3 | architecture proof | `quality:gate`, dependency checks, docs accuracy, and focused lint/format all pass; doctrine reports baseline warnings only. |
 
 ## Decisions
 
@@ -70,5 +75,12 @@ Change Zod only in the root catalog, run `deno task deps:check`, and inspect the
 
 | Gate | Result | Evidence |
 | --- | --- | --- |
-| Guard predicate tests | PASS | 4 passed, 0 failed |
-| Live graph guard | EXPECTED FAIL | 21 precise findings on baseline graph |
+| Guard predicate tests | PASS | 6 passed, 0 failed |
+| Live graph guard | PASS | two instances, with residual v3 restricted to `@ag-ui/core@0.0.52` and `@olli/kvdex@3.6.7` |
+| Targeted check | PASS | 977 files, 9 batches, 0 diagnostics |
+| Focused tests | PASS | 27 passed, 0 failed |
+| Dependency / architecture | PASS | `deps:check` and `quality:gate`; baseline warnings only |
+| Documentation accuracy | PASS | repository docs accuracy gate |
+| Publish dry-run | PASS | full workspace simulation completed successfully |
+| `deno doc --lint` | PASS | all exports across 19 affected package/plugin roots |
+| Focused lint / format | PASS | changed TypeScript and boundary documentation |
