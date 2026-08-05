@@ -30,16 +30,26 @@ Runs: 30959430176 (step 4 PASS 22.3s), 30961102523 (step 4 FAIL 180.1s).
 
 ## Immediate actions
 
-1. **#1227 (p0, REOPENED) is the pilot's only blocker.** PR **#1305** is deliberately draft:
-   S1 (capture Aspire CLI logs) done; S2 (signature retry + pinned cache) and S3 (**N
-   consecutive green published-canary walks**) open. **Do not merge on a single green CI run** —
-   for an intermittent defect that is indistinguishable from luck (finding 42). Read the
-   captured `~/.aspire/logs/cli_*.log` diagnosis first.
-2. **#1274 rewrite** — the pilot is also gated on it; owned by **docsorch** (session
-   `763d39f5`, PR #1215). Coordinate, do not duplicate: docsorch owns the page, #1294 owns the
-   executable walk, and the drift check binds them.
-3. When #1227 is genuinely proven, dispatch the next canary (D16: dispatch when a *named* slice
-   completes and the train reads as one release-note line) and re-run the walk.
+1. **#1227 ROOT-CAUSED — it is upstream, not ours.** `microsoft/aspire#18958` ("Stop leaking
+   orphaned aspire-managed NuGet search helpers"), merged 2026-08-03, milestone 13.5. Our pinned
+   CLI **13.4.6 (2026-06-20) predates it by 44 days**. Leaked NuGet helper processes accumulate
+   and starve the restore → "Failed to prepare: A task was canceled", exit 6. Explains the
+   intermittency, local+cloud repro, and why it worsened over a long session. Verified: 13.4.6
+   SDK restore through the fixed daily CLI = **exit 0 in 13.06s, no helper leaked**.
+   **PR #1308** pins that daily build and is DRAFT until **five consecutive published-canary
+   workflows** pass. That proof is the pilot's last gate. #1305 closed as superseded.
+2. **Do not re-open the Deno path as a #1227 cure.** #1307 (merged) measured it: CommunityToolkit
+   Deno grows the graph 83→84 packages; #18627 removes Node/npm reliance but not the 75-library
+   managed restore floor. **Recommendation: one stable 13.5 upgrade** if #18627+#18628 merge
+   before the cut (combining them with #18958); otherwise take #18958 alone and keep
+   `addExecutable('deno', ...)`.
+3. **Possible high-leverage work**: #1307 enumerated the five maintainer threads blocking the
+   owner's `microsoft/aspire#18628` — polyglot AppHost exercise coverage (TS/Java/Python/Go),
+   OTLP protocol preservation in K8s publishing, Docker package-script alignment, native-OTLP
+   gating when no endpoint is injected, and README consistency. Awaiting owner direction before
+   dispatching; #18628 landing is what converts our daily-build pin into a stable upgrade.
+4. **#1274 rewrite: DONE** (#1309 merged 01:43Z). Both owner-named pilot gates are now down to
+   item 1 alone.
 
 ## Scoreboard
 
