@@ -66,6 +66,7 @@ file changes are needed for a new plugin.
 | 2026-08-05 | 3 | uninstall | Real CLI removal deleted both producer entries and pruned both consumer references. |
 | 2026-08-05 | 3 | safety | Fixture post-script now writes inside its declared third-party writable subtree; dispatch regression updated and green. |
 | 2026-08-05 | 3 | runtime block | Live start/OTEL deferred: leak reporter found three foreign AppHosts, so the one-AppHost rule forbids another start. |
+| 2026-08-05 | 4 | D6 augmentation | PR moved draft→ready with seven earned box-index entries; box 5 and its live/OTEL proof remain explicitly open for the orchestrator gate. |
 
 ## Gate Results
 
