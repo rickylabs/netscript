@@ -2119,3 +2119,29 @@ instead of connecting to the running database. That decision is reversed.
 #1307 (Deno research), #1304 (walk-gate invocation + harness-invocation classification), #1303
 (#1188), #1301 (#1196), #1302 (#1219), #1299 (#1290), #1300 (#1287), #1298 (#1294), #1292.
 This is the first canary whose walk gate both runs the documented flow AND asserts it is safe.
+
+## 2026-08-05 — CANARY.11 PARTIAL: JSR weekly publish limit (1000/scope) exhausted — #1312 p0
+
+Run 30976915354 failed on `weeklyPublishAttemptsLimitExceeded` — an external hard limit, hit
+for the first time. Applied finding 40 immediately (check the registry, not the exit code):
+**25 of 31 packages carry `0.0.5-canary.11`**; missing `plugin-sagas`, `plugin-workers`,
+`plugin-triggers`, `plugin-auth`, `plugin-sagas-core`, `plugin-triggers-core` (4 failed on the
+limit, 2 skipped as dependents).
+
+**Consequences, stated plainly:**
+- Canary.11 is **unusable as the wave-6 pilot release** — a scaffold adding sagas/workers/
+  triggers/auth cannot resolve them at that version, and the pilot's premise is a clean machine.
+- Canary versions are immutable, so canary.11 **can never be completed**.
+- The limit is per-scope-per-week and spent, so **the next canary fails the same way** until the
+  window rolls. Reset semantics unknown; JSR does not return them.
+- The train's CONTENT is safe on main (#1308, #1311, #1309 et al). Only publishing is blocked.
+- **Green-pair ledger unchanged: canary.8 still holds the stable-cut precondition.**
+
+**Finding 48 (for #1163): the cadence I was delegated (D16 — a canary per meaningful slice) was
+unbounded by any resource budget, and I never asked what publishing costs. Eleven canaries ×31
+packages in ~36 hours is ~340 attempts before retries. Nothing in the lane measures remaining
+budget, so the first signal was a half-published release. A cadence policy needs a cost model,
+not just a quality trigger — and the tell was available all along: every canary republishes
+every package whether or not it changed.**
+#1312 filed p0 with acceptance covering budget pre-checks, partial-publish detection distinct
+from test failure, reset semantics, and a revised cadence. #1149 stage-E recorded.
