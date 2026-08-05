@@ -5,6 +5,7 @@ import {
   parseCodexSessionIdentity,
   resolveCodexRollout,
 } from './codex-rollout-live.ts';
+import { NATIVE_CANARY_MODEL_ARGS } from '../config/models.ts';
 
 const id = '019fcd0e-126a-7ed0-9464-936575286cf3';
 const path = `/sessions/rollout-2026-08-04T15-54-39-${id}.jsonl`;
@@ -92,12 +93,12 @@ Deno.test('session identity uses rollout metadata and filename fallback', () => 
     JSON.stringify({ type: 'session_meta', payload: { id, cwd: '/repo/one' } }),
     JSON.stringify({
       type: 'turn_context',
-      payload: { model: 'gpt-5.6', effort: 'high', cwd: '/repo/two' },
+      payload: { model: NATIVE_CANARY_MODEL_ARGS.codex, effort: 'high', cwd: '/repo/two' },
     }),
   ].join('\n');
   assertEquals(parseCodexSessionIdentity(rollout, path), {
     threadId: id,
-    model: 'gpt-5.6',
+    model: NATIVE_CANARY_MODEL_ARGS.codex,
     effort: 'high',
     cwd: '/repo/two',
   });
