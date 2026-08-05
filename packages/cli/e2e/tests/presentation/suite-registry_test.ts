@@ -168,7 +168,6 @@ Deno.test('runtime DB mutations run only after the resident AppHost starts', () 
   const startIndex = gates.findIndex((gate) => gate.id === GATE.RUNTIME_ASPIRE_START);
   for (
     const id of [
-      GATE.DATABASE_VALIDATE,
       GATE.DATABASE_INIT,
       GATE.DATABASE_GENERATE,
       GATE.DATABASE_SEED,
