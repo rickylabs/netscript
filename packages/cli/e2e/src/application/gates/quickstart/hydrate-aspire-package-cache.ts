@@ -19,6 +19,7 @@ export const ASPIRE_PACKAGE_CACHE = {
 } as const;
 
 export type AspirePackageSet = 'five' | 'four';
+const HYDRATION_TIMEOUT_MS = 30_000;
 
 /** Hydrate Aspire's project-local restore cache from the workflow's pinned local NuGet source. */
 export async function hydrateAspirePackageCache(
@@ -58,11 +59,31 @@ export async function hydrateAspirePackageCache(
     '--working-dir',
     packageSet === 'five' ? aspireRoot : join(aspireRoot, 'db-operation'),
   ];
-  const result = await new Deno.Command(managedPath, {
-    args,
-    stdout: 'piped',
-    stderr: 'piped',
-  }).output();
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), HYDRATION_TIMEOUT_MS);
+  let result: Deno.CommandOutput;
+  try {
+    result = await new Deno.Command(managedPath, {
+      args,
+      env: {
+        // Acquisition was already audited by the prerequisite `dotnet restore`.
+        // Keep this local-source materialization fully offline.
+        NuGetAudit: 'false',
+      },
+      stdout: 'piped',
+      stderr: 'piped',
+      signal: controller.signal,
+    }).output();
+  } catch (error) {
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      throw new Error(
+        'pinned Aspire package-cache hydration exceeded its 30s infrastructure bound',
+      );
+    }
+    throw error;
+  } finally {
+    clearTimeout(timeout);
+  }
   if (result.code !== 0) {
     throw new Error(
       `pinned Aspire package-cache hydration failed (${result.code}): ${

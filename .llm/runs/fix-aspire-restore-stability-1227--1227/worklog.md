@@ -55,3 +55,7 @@
 - 2026-08-05: run 30966559521 proved `aspire --version` does not extract the bundle either. Replaced
   it with a five-second, externally bounded restore against a checked-in fixture; only exit 0, 6,
   or GNU timeout 124 is accepted before discovering the now-materialized payload. Proof 0/3.
+- 2026-08-05: run 30966638003 was canceled after offline hydration exceeded three minutes. Local
+  verbose output had shown NuGet still querying its online vulnerability feed even with a local
+  package source. Hydration now sets `NuGetAudit=false` (the prerequisite acquisition remains
+  audited) and has its own 30s abort bound. Proof streak remains 0/3.
