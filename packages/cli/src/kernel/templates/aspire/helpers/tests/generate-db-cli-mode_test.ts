@@ -67,6 +67,7 @@ describe('generateDbCliMode', () => {
     assertStringIncludes(output, 'let resource = await builder.addExecutable(')
     assertStringIncludes(output, '`netscript-db-${target.configKey}`')
     assertStringIncludes(output, 'DB_OPERATION_RUNNER')
+    assertStringIncludes(output, "'eval',\n        DB_OPERATION_RUNNER,")
     assertStringIncludes(output, '.withExplicitStart()')
     assertStringIncludes(
       output,

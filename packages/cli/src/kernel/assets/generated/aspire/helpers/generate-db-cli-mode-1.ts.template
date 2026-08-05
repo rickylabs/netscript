@@ -45,9 +45,6 @@ export async function tryHandleDbCliMode(
       target.workdir,
       [
         'eval',
-        '--allow-read',
-        '--allow-run',
-        '--allow-env',
         DB_OPERATION_RUNNER,
         requestPath,
         target.taskSuffix,
