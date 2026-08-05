@@ -55,6 +55,19 @@ Deno.test('quickstart project-check verdict runs the documented command exactly'
   );
 });
 
+Deno.test('quickstart service-response verdict accepts service health without a database assertion', () => {
+  const suite = createQuickstartWalkSuite({
+    packageSource: PACKAGE_SOURCE.JSR,
+    cliEntrypoint: EXACT_CLI,
+  });
+  const response = command(
+    suite,
+    GATE.QUICKSTART_SERVICE_RESPONSE,
+    contextFor(suite.defaultOptions),
+  );
+  assertEquals(response.slice(-2), ['/repo/.llm/tmp/my-app/aspire/apphost.mts', 'users']);
+});
+
 Deno.test('quickstart commands reject a local CLI entrypoint', () => {
   const suite = createQuickstartWalkSuite({
     packageSource: PACKAGE_SOURCE.LOCAL,

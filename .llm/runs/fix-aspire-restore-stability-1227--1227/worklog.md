@@ -21,3 +21,6 @@
   Both cloud evidence runs missed the v1 cache and ended before Actions could save it.
 - 2026-08-05: S2 adds a prerequisite cache-population job with five exact package assertions and a
   two-attempt predicate restricted to exit 6 plus both preparation-cancellation markers.
+- 2026-08-05: proof run 30962998528: cache seed saved 170,799,714 bytes; dependent job restored a
+  163 MB hit; Quickstart Aspire step passed in 22.58s. Later step 7 found a pre-existing assertion
+  mismatch, corrected without weakening `scaffold.runtime` database-health coverage.
