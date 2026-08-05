@@ -141,7 +141,18 @@ export function generateRegisterPlugins(options: RegisterPluginsOptions): string
       lines.push(`    for (const [key, value] of Object.entries(databaseProviderEnv)) {`);
       lines.push(`      await resource.withEnvironment(key, value);`);
       lines.push(`    }`);
-      lines.push(`    if (infrastructure.primaryDatabase) {`);
+      lines.push(
+        `    const sqliteDatabase = config.PrimaryDatabase ? config.Databases[config.PrimaryDatabase] : undefined;`,
+      );
+      lines.push(`    if (sqliteDatabase?.Engine === 'Sqlite' && config.PrimaryDatabase) {`);
+      lines.push(
+        `      const sqliteUrl = buildSqliteDatabaseUrl(appHostDir, config.PrimaryDatabase, sqliteDatabase.DatabaseName ?? \`\${config.PrimaryDatabase}.db\`);`,
+      );
+      lines.push(`      await resource.withEnvironment('DATABASE_URL', sqliteUrl);`);
+      lines.push(`      if (databaseEnvKey) {`);
+      lines.push(`        await resource.withEnvironment(databaseEnvKey, sqliteUrl);`);
+      lines.push(`      }`);
+      lines.push(`    } else if (infrastructure.primaryDatabase) {`);
       lines.push(
         `      let databaseBinding = resource.withEnvironment('DATABASE_URL', infrastructure.primaryDatabase);`,
       );
@@ -153,19 +164,6 @@ export function generateRegisterPlugins(options: RegisterPluginsOptions): string
       lines.push(`      await databaseBinding`);
       lines.push(`        .withReference(infrastructure.primaryDatabase)`);
       lines.push(`        .waitFor(infrastructure.primaryDatabase);`);
-      lines.push(`    } else {`);
-      lines.push(
-        `      const sqliteDatabase = config.PrimaryDatabase ? config.Databases[config.PrimaryDatabase] : undefined;`,
-      );
-      lines.push(`      if (sqliteDatabase?.Engine === 'Sqlite' && config.PrimaryDatabase) {`);
-      lines.push(
-        `        const sqliteUrl = buildSqliteDatabaseUrl(appHostDir, config.PrimaryDatabase, sqliteDatabase.DatabaseName ?? \`\${config.PrimaryDatabase}.db\`);`,
-      );
-      lines.push(`        await resource.withEnvironment('DATABASE_URL', sqliteUrl);`);
-      lines.push(`        if (databaseEnvKey) {`);
-      lines.push(`          await resource.withEnvironment(databaseEnvKey, sqliteUrl);`);
-      lines.push(`        }`);
-      lines.push(`      }`);
       lines.push(`    }`);
     }
 

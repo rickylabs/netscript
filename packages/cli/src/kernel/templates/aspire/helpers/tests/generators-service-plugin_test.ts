@@ -185,7 +185,7 @@ describe('generateRegisterServices', () => {
       services: { users: fixtures.MINIMAL_SERVICE },
     });
     assertStringIncludes(output, '// Database dependency');
-    assertStringIncludes(output, 'if (infrastructure.primaryDatabase)');
+    assertStringIncludes(output, 'else if (infrastructure.primaryDatabase)');
     assertStringIncludes(
       output,
       "resource.withEnvironment('DATABASE_URL', infrastructure.primaryDatabase)",
@@ -200,6 +200,11 @@ describe('generateRegisterServices', () => {
     assertStringIncludes(output, 'buildDatabaseProviderEnvVars(config)');
     assertStringIncludes(output, 'Object.entries(databaseProviderEnv)');
     assertStringIncludes(output, 'buildSqliteDatabaseUrl(appHostDir');
+    assert(
+      output.indexOf("sqliteDatabase?.Engine === 'Sqlite'") <
+        output.indexOf('else if (infrastructure.primaryDatabase)'),
+      'SQLite must bind by file URL before the server-database Aspire reference branch',
+    );
     assert(!output.includes('file:./database/${config.PrimaryDatabase}/'));
   });
 
@@ -425,6 +430,12 @@ describe('generateRegisterPlugins', () => {
     assertStringIncludes(output, "sqliteDatabase?.Engine === 'Sqlite'");
     assertStringIncludes(output, 'buildDatabaseProviderEnvVars(config)');
     assertStringIncludes(output, 'buildSqliteDatabaseUrl(appHostDir');
+    assertStringIncludes(output, 'else if (infrastructure.primaryDatabase)');
+    assert(
+      output.indexOf("sqliteDatabase?.Engine === 'Sqlite'") <
+        output.indexOf('else if (infrastructure.primaryDatabase)'),
+      'SQLite plugins must not enter the Aspire reference branch',
+    );
     assert(!output.includes('file:./database/${config.PrimaryDatabase}/'));
   });
 

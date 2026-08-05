@@ -174,6 +174,12 @@ describe('generateRegisterBackground', () => {
     assertStringIncludes(output, "workers_sqliteDatabase?.Engine === 'Sqlite'");
     assertStringIncludes(output, 'buildDatabaseProviderEnvVars(config)');
     assertStringIncludes(output, 'buildSqliteDatabaseUrl(appHostDir');
+    assertStringIncludes(output, 'else if (infrastructure.primaryDatabase)');
+    assert(
+      output.indexOf("workers_sqliteDatabase?.Engine === 'Sqlite'") <
+        output.indexOf('else if (infrastructure.primaryDatabase)'),
+      'SQLite background resources must not enter the Aspire reference branch',
+    );
     assert(!output.includes('file:./database/${config.PrimaryDatabase}/'));
   });
 
