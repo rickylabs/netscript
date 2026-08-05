@@ -55,8 +55,8 @@ Confirm it resolves and inspect the command groups:
 netscript --help
 ```
 
-You should see the public groups: `init`, `contract`, `db`, `deploy`, `generate`, `marketplace`,
-`plugin`, `service`, `ui:add`, and `ui:init`. If `netscript` is not found, make sure Deno's install
+You should see the public groups: `agent`, `config`, `contract`, `db`, `deploy`, `generate`, `init`,
+`marketplace`, `plugin`, `service`, and the `ui:*` group (`ui:list`, `ui:add`, `ui:update`, `ui:remove`). If `netscript` is not found, make sure Deno's install
 directory (printed by `deno install`) is on your `PATH`, then open a fresh terminal.
 
 ## Step 1 — Preview the scaffold with a dry run
@@ -167,12 +167,11 @@ aspire start       # starts the AppHost and every declared resource
 ```
 
 `aspire start` brings up the Postgres database, the Redis cache, and your `products` service
-together, then prints a URL and a one-time login token for the **Aspire dashboard**:
+together, then prints a URL and a one-time login token for the **Aspire dashboard**.
 
-The dashboard lists every resource (`postgres`, `redis`, your service), live console logs, and
-distributed traces. Leave `aspire start` running in this terminal — it is your storefront's control
-plane for the rest of the track. Aspire assigns free ports at runtime, so use the URLs in the
-dashboard instead of memorising a dashboard or app port.
+In an interactive terminal, leave `aspire start` running in this terminal — it is your storefront's control
+plane for the rest of the track. (If your terminal is not interactive, `aspire start` detaches in the background without printing a login token; use the MCP `get_app_status` or `doctor` tools to inspect resource status headlessly.) Aspire assigns free ports at runtime, so use the URLs in the
+dashboard (or MCP `get_app_status`) instead of memorising a dashboard or app port.
 
 ### Initialize the database before customising
 
@@ -212,21 +211,21 @@ deno task check
 
 A clean check, plus a healthy `curl`, means the scaffold is sound.
 
-- [ ] `netscript --help` lists the public command groups.
-- [ ] `my-shop/` exists with `contracts/`, `services/products/`, `database/`, and `aspire/`.
-- [ ] `aspire start` is up; its printed dashboard URL shows `products`, `postgres`, and `redis`
+- [ ] `netscript --help` lists the public command groups (`agent`, `config`, `contract`, `db`, `deploy`, `generate`, `init`, `marketplace`, `plugin`, `service`, `ui:*`).
+- [ ] `my-shop/` exists with `contracts/`, `services/products/`, `database/`, `plugins/`, `aspire/`, and `tests/`.
+- [ ] `aspire start` is up; its printed dashboard URL (or MCP `get_app_status`) shows `products`, `postgres`, and `redis`
       healthy.
 - [ ] `netscript db init --name init` succeeded and the initial migration exists.
 - [ ] `curl http://localhost:3001/health` returns healthy JSON.
-- [ ] Opening the Fresh app URL from the dashboard with `/design` appended renders the generated
-      design reference.
+- [ ] Opening the Fresh app URL from the dashboard (or MCP status) with `/design` appended renders the generated
+      design reference (it returns an HTTP 302 redirect to `/design/composition`, so scripted checks require `curl -L`).
 - [ ] `deno task check` passes with no errors.
 
 **Do not begin customising until every box is ticked.** An unverified base makes every later failure
 look like your code.
 
 {{ comp callout { type: "tip", title: "If something is not green" } }}
-Three quick checks cover most first-run snags: (1) is <code>aspire start</code> still up in its terminal, with <code>postgres</code> and <code>redis</code> healthy in the <a href="/explanation/aspire/">dashboard</a>? (2) is Docker running (<code>docker info</code>)? (3) did you <code>cd aspire</code> before <code>aspire start</code>, so it found <code>apphost.mts</code>? A failed <code>curl</code> usually means the service has not finished starting — give it a few seconds and retry.
+Three quick checks cover most first-run snags: (1) is <code>aspire start</code> still up in its terminal, with <code>postgres</code> and <code>redis</code> healthy in the <a href="/explanation/aspire/">dashboard</a>? (2) is Docker running (<code>docker info</code>)? (3) did you <code>cd aspire</code> before <code>aspire start</code>, so it found <code>apphost.mts</code>? Note that <code>aspire restore</code> / <code>start</code> can occasionally time out under heavy system load with <code>Failed to prepare: A task was canceled</code>; re-running the start command usually succeeds. If operating headlessly without a browser, inspect failure diagnostics via the MCP <code>get_recent_errors</code> or <code>get_app_status</code> tools rather than guessing process state.
 {{ /comp }}
 
 ## What you built
