@@ -2243,3 +2243,30 @@ honestly unticked.
 whole-cluster claim from a partial sample, then putting it in an issue body that a lane then
 had to disprove. The slice's `deno why` was the correct instrument and I had it available; I
 used `npm view` on four names instead.
+
+## 2026-08-05 — #1310 observed LIVE on the owner's wave-6 planning board
+
+While diagnosing why #1189's slice could not earn its runtime evidence, found the cause and a
+much bigger fact. Two AppHosts are running on `/home/codex/repos/w6-planning-board/w6-board/`:
+- PID 931458 `aspire/db-operation/apphost.mts` — up **5h59m**
+- PID 973901 `aspire/apphost.mts` — up 5h45m (started ~14 min AFTER the ephemeral one)
+
+And `docker inspect` confirms the corruption configuration itself:
+```
+postgres-750e2409 -> /home/codex/repos/w6-planning-board/w6-board/.data/postgres
+postgres-45ba5b03 -> /home/codex/repos/w6-planning-board/w6-board/.data/postgres
+```
+**Two postmasters, one PGDATA — #1310 happening in production on the board the wave-6 pilot
+depends on.** That project was scaffolded with a pre-#1311 CLI, so it does not carry the fix.
+Reported to the owner with a suggested scoped stop by exact apphost path and a
+`invalid xl_info in checkpoint record` log check before trusting its data. **Touched nothing** —
+foreign to this run, resource doctrine applies.
+
+**#1189's slice was right to stop.** Its leak report found three foreign AppHosts and the
+one-AppHost rule prohibited starting another, so box 5 (live catalog→fixture request +
+correlated OTEL) is honestly unticked and the PR carries `status:impl-eval`. Boxes 1–4 and 6–8
+are ticked with citations. The close gate holds it until the runtime evidence is earned — which
+needs a free AppHost slot, i.e. the owner's board releasing one, or an `--isolated` run.
+**Finding 51 (for #1163): a blocked slice is a diagnostic signal, not just an obstacle. This
+one could not run because of a defect we had shipped, sitting live on the owner's own project —
+and chasing "why is this lane stuck" surfaced a corruption in progress that nobody was watching.**
