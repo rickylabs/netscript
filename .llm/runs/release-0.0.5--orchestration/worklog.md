@@ -2170,3 +2170,28 @@ costs only *publication latency*, not throughput.
 Consequence to watch: issues merged into a train stay OPEN until the train reaches main
 (GitHub auto-closes only on the default branch), so the milestone's open count will lag reality
 while trains are in flight — not a stall.
+
+## 2026-08-05 — CORRECTION: "six evidence-held issues, closeable on records" was wrong
+
+I told the owner ~6 of the 29 open 0.0.5 issues were evidence-held and closeable cheaply.
+Checking each acceptance list before acting shows that is false — only ONE is even arguable:
+- **#1090** requires an agent run with **non-zero** MCP tool usage, a `ui:add` decision record,
+  and the #1071 falsifiable A/B (same brief/version/bundle/budget, varying only the app-scoped
+  surface). That is a real measurement exercise. Not evidence-held.
+- **#1166** — criterion 1 (payload derivation includes merge-commit PRs, not only first-parent)
+  IS satisfied: `rangeCommits` uses `rev-list --topo-order --reverse previous..head` with no
+  `--first-parent`. But criteria 2 and 3 need specific demonstrations (a cut after
+  `gh pr update-branch`; a genuinely-empty canary distinguishable from a broken derivation)
+  that I do not have. Not closeable.
+- **#1202** requires a fresh scaffold with matching Prisma endpoint, a RED-first test on the
+  stale-write path, and a second consecutive AppHost start. Real work.
+- **#1004** and **#1148** are defects needing fixes, not records. I mislabelled them.
+- **#1149** is the only arguable one, and its criteria name `0.0.4-canary.1/.2` while my
+  evidence is five 0.0.5 canaries. Posted the full criterion-by-criterion evidence and
+  **explicitly did not close it** — swapping the milestone out from under an owner-written
+  acceptance list is exactly the dishonesty the close-gate exists to prevent. Owner decides
+  whether to accept the substitution or rewrite the criteria.
+**Finding 49 (for #1163): "evidence-held" is a claim about an acceptance list, and it must be
+checked against that list before being reported as a number. I produced a count from memory of
+which issues *felt* administrative, and it was wrong by a factor of six. The count went into a
+status report the owner could have planned against.**
