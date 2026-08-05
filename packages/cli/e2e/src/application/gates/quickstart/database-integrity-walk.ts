@@ -2,7 +2,10 @@ import { join, resolve } from '@std/path';
 
 interface ContainerInspect {
   readonly Id: string;
-  readonly Config: { readonly Image: string };
+  readonly Config: {
+    readonly Image: string;
+    readonly Env?: readonly string[];
+  };
   readonly Mounts: readonly { readonly Source: string; readonly Destination: string }[];
 }
 
@@ -52,10 +55,17 @@ export async function runDatabaseIntegrityWalk(
     }
   }
   const mount = resident.Mounts.find((candidate) => resolve(candidate.Source) === expectedSource)!;
-  // Postgres 18+ nests the cluster under <mount>/<major>/docker when the bind target is the
-  // image volume root (/var/lib/postgresql). Older images keep pg_control at the mount root.
-  // Discover the real PGDATA from the host tree so verify can point pg_controldata at it.
-  const pgDataPath = resolvePgDataPath(mount.Source, mount.Destination);
+  // Postgres 18 nests the cluster under <mount>/<major>/docker when the bind target is the
+  // image volume root (/var/lib/postgresql). The real PGDATA directory is mode 700 (postgres),
+  // so host-side walks from the runner user cannot see global/pg_control. Prefer the container's
+  // own PGDATA env, then a root one-shot find on the bind mount.
+  const pgDataPath = await resolvePgDataPath({
+    containerId: resident.Id,
+    image: resident.Config.Image,
+    source: mount.Source,
+    destination: mount.Destination,
+    env: resident.Config.Env ?? [],
+  });
   const state: IntegrityState = {
     containerId: resident.Id,
     image: resident.Config.Image,
@@ -71,8 +81,12 @@ export async function verifyPgDataAfterTeardown(projectRoot: string): Promise<vo
   const statePath = resolve(projectRoot, STATE_FILE);
   const state = JSON.parse(await Deno.readTextFile(statePath)) as IntegrityState;
   const pgDataPath = state.pgDataPath ??
-    // Backward-compat for state written before the nested-PGDATA discovery landed.
-    resolvePgDataPath(state.source, state.destination);
+    await resolvePgDataPath({
+      image: state.image,
+      source: state.source,
+      destination: state.destination,
+      env: [],
+    });
   try {
     await run([
       'docker',
@@ -92,23 +106,100 @@ export async function verifyPgDataAfterTeardown(projectRoot: string): Promise<vo
   }
 }
 
+export interface ResolvePgDataOptions {
+  readonly containerId?: string;
+  readonly image: string;
+  readonly source: string;
+  readonly destination: string;
+  readonly env: readonly string[];
+}
+
 /**
- * Map a host bind source + container mount destination to the absolute container path that
- * holds `global/pg_control`.
+ * Resolve the absolute container path that holds `global/pg_control`.
  *
- * Walks a shallow host tree under `source` looking for `global/pg_control`, then rewrites the
- * relative path onto `destination`. Prefer the shallowest match so a mount that already points
- * at PGDATA wins over a nested leftover.
+ * Order:
+ * 1. `PGDATA=...` from the running container's env (authoritative while the postmaster is up).
+ * 2. Root one-shot `find` on the bind mount (works after teardown; host user cannot read mode 700).
+ * 3. Host tree walk (only when the runner can read the cluster — flat layouts / loosened perms).
  */
-export function resolvePgDataPath(source: string, destination: string): string {
-  const hostPgData = findHostPgData(source);
-  if (!hostPgData) {
-    throw new Error(
-      `no global/pg_control under ${source}; cannot locate PGDATA for pg_controldata`,
-    );
+export async function resolvePgDataPath(options: ResolvePgDataOptions): Promise<string> {
+  const fromEnv = pgDataFromEnv(options.env);
+  if (fromEnv) return fromEnv;
+
+  if (options.containerId) {
+    const fromExec = await pgDataFromContainerExec(options.containerId);
+    if (fromExec) return fromExec;
   }
-  const relative = hostPgData.slice(resolve(source).length).replace(/^[/\\]+/, '');
-  return relative.length === 0 ? destination : join(destination, relative).replaceAll('\\', '/');
+
+  const fromFind = await pgDataFromMountFind(options.image, options.source, options.destination);
+  if (fromFind) return fromFind;
+
+  const hostPgData = findHostPgData(options.source);
+  if (hostPgData) {
+    const relative = hostPgData.slice(resolve(options.source).length).replace(/^[/\\]+/, '');
+    return relative.length === 0
+      ? options.destination
+      : join(options.destination, relative).replaceAll('\\', '/');
+  }
+
+  throw new Error(
+    `no global/pg_control under ${options.source}; cannot locate PGDATA for pg_controldata`,
+  );
+}
+
+/** Pure helper for tests — parse PGDATA out of a docker inspect Env array. */
+export function pgDataFromEnv(env: readonly string[]): string | undefined {
+  for (const entry of env) {
+    if (entry.startsWith('PGDATA=')) {
+      const value = entry.slice('PGDATA='.length).trim();
+      if (value.length > 0) return value;
+    }
+  }
+  return undefined;
+}
+
+async function pgDataFromContainerExec(containerId: string): Promise<string | undefined> {
+  try {
+    const value = (await output(['docker', 'exec', containerId, 'printenv', 'PGDATA'])).trim();
+    return value.length > 0 ? value : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+async function pgDataFromMountFind(
+  image: string,
+  source: string,
+  destination: string,
+): Promise<string | undefined> {
+  try {
+    const raw = await output([
+      'docker',
+      'run',
+      '--rm',
+      '--entrypoint',
+      'find',
+      '--mount',
+      `type=bind,source=${source},target=${destination},readonly`,
+      image,
+      destination,
+      '-path',
+      '*/global/pg_control',
+      '-type',
+      'f',
+      '-print',
+    ]);
+    const controls = raw.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+    if (controls.length === 0) return undefined;
+    // Prefer the shallowest control file (fewest path segments after the mount destination).
+    controls.sort((a, b) => a.split('/').length - b.split('/').length);
+    const control = controls[0]!;
+    const suffix = '/global/pg_control';
+    if (!control.endsWith(suffix)) return undefined;
+    return control.slice(0, -suffix.length);
+  } catch {
+    return undefined;
+  }
 }
 
 function findHostPgData(source: string): string | undefined {
@@ -124,7 +215,6 @@ function findHostPgData(source: string): string | undefined {
       const stat = Deno.statSync(control);
       if (stat.isFile) {
         if (!best || current.depth < best.depth) best = current;
-        // Found at this depth; no need to descend further from here.
         continue;
       }
     } catch (error) {
