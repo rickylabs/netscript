@@ -2270,3 +2270,32 @@ needs a free AppHost slot, i.e. the owner's board releasing one, or an `--isolat
 **Finding 51 (for #1163): a blocked slice is a diagnostic signal, not just an obstacle. This
 one could not run because of a defect we had shipped, sitting live on the owner's own project —
 and chasing "why is this lane stuck" surfaced a corruption in progress that nobody was watching.**
+
+## 2026-08-05 — Live #1310 remediated on w6-board; #1149 closed; #1295 rescoped; #1320 filed
+
+**Live corruption cleared (owner-authorised).** Stopping the orphaned `db-operation` AppHost was
+necessary but NOT sufficient — its Postgres container is `Persistent: true` and survived, so two
+postmasters still shared the PGDATA. Identified the orphan's container by connection evidence
+rather than guesswork: `postgres-45ba5b03` (port 44874) had multiple established connections;
+`postgres-750e2409` (44876) had none, and container creation times/process trees were useless
+because both predate the current AppHosts and sit under containerd-shim. **Stopped (not removed)
+`postgres-750e2409`**; verified afterwards that one postmaster owns the PGDATA and the board is
+still serving (6 live connections on 44874). Nothing destroyed.
+**Finding 52 (for #1163): stopping an Aspire AppHost does not stop its persistent containers.
+A remediation that targets the host leaves the data-layer duplicate running — for #1310 that
+means the corruption window stays open after the "fix". The discriminator that worked was
+established TCP connections, not creation time, labels, or process ancestry.**
+
+**#1149 CLOSED** — owner delegated. Criteria were written against `0.0.4-canary.1/.2`; the
+surface was actually exercised across five 0.0.5 canaries. Rewrote the criteria to name what was
+tested rather than closing against untested wording, ticked all six with citations, and recorded
+the scope note in the issue. The pass-vs-did-not-run criterion is the one that earned its keep:
+canary.10 reported publish FAILURE while all 25 packages were live (finding 40).
+
+**#1295 RESCOPED, #1320 filed (0.0.6, blocked).** Owner delegated. Decision: do NOT take the
+TanStack 0.39→0.43 upgrade (drags in a **canary** AG-UI — trading a type split for a pre-release
+dep immediately before a cut), and do NOT force Zod 4 through hard `^3` paths. #1295 now targets
+what is verifiable (AI/MCP cluster on npm Zod 4, catalog single-source, the split-graph guard
+test, `@orpc/zod` v4 surface, and the boundary DOCUMENTED with its blockers). Single-instance
+collapse → #1320 with explicit watch signals. Slice redirected accordingly.
+JSR ticket watcher re-armed (owner asked to be notified on closure).
