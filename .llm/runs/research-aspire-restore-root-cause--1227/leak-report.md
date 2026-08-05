@@ -1,8 +1,6 @@
 # Run resource leak report
 
-Generated: 2026-08-05T01:05:56.297Z
-Worktree: `/home/codex/repos/ns005-aspireroot`
-Aspire probe: ok
+Generated: 2026-08-05T01:05:56.297Z Worktree: `/home/codex/repos/ns005-aspireroot` Aspire probe: ok
 Docker probe: ok
 
 ## container: postgres-94cd7cfd (1435604a30f544c4e39c607a316a898d9842ecd097a86e6ce812cb6610cfd3b3)

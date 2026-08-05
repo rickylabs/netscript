@@ -2,13 +2,13 @@
 
 ## Run Metadata
 
-| Field | Value |
-| --- | --- |
-| Run ID | `research-aspire-restore-root-cause--1227` |
-| Branch | `research/aspire-restore-root-cause` |
-| Current phase | `impl` |
-| Archetype | `6 — CLI / Tooling` (workflow-only implementation) |
-| Scope overlays | none |
+| Field          | Value                                              |
+| -------------- | -------------------------------------------------- |
+| Run ID         | `research-aspire-restore-root-cause--1227`         |
+| Branch         | `research/aspire-restore-root-cause`               |
+| Current phase  | `impl`                                             |
+| Archetype      | `6 — CLI / Tooling` (workflow-only implementation) |
+| Scope overlays | none                                               |
 
 ## Current State
 
@@ -18,10 +18,10 @@ the actor that finally terminates the waiting Aspire process and produces the se
 `TaskCanceledException`/exit 6. Existing upstream issue microsoft/aspire#18948 and merged PR #18958
 match the exact version, WSL state, component, and outcome.
 
-The branch pins the published-canary workflow to exact fixed daily CLI
-`13.5.0-preview.1.26404.10`, keeps the AppHost SDK at 13.4.6, adds exact-version/doctor preflight,
-reuses PR #1305 S1 log capture, and rejects its S2 cache/retry as insufficient. Local/static gates
-are green. Five consecutive published-canary workflows remain.
+The branch pins the published-canary workflow to exact fixed daily CLI `13.5.0-preview.1.26404.10`,
+keeps the AppHost SDK at 13.4.6, adds exact-version/doctor preflight, reuses PR #1305 S1 log
+capture, and rejects its S2 cache/retry as insufficient. Local/static gates are green. Five
+consecutive published-canary workflows remain.
 
 ## Evidence index
 
@@ -41,8 +41,8 @@ are green. Five consecutive published-canary workflows remain.
 ## Drift and Debt
 
 - Owner override: OpenAI GPT-5.6 Sol xhigh; D6 waives local PLAN-EVAL.
-- Plan narrowing: `/dev/null` hypothesis was superseded by the retained log/source/upstream process
-  trace; it is not used as acceptance evidence.
+- Plan narrowing: `/dev/null` and PTY controls both completed quickly and did not distinguish the
+  intermittent failure; stdin behavior is not used as acceptance evidence.
 - Operational debt: exact daily preview pin until fixed 13.5 stable ships.
 - Lock hygiene: inherited `deno.lock` modification is user-owned and excluded.
 

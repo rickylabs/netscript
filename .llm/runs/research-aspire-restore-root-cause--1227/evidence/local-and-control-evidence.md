@@ -16,8 +16,8 @@ or killed.
 
 Two local failing 13.4.6 logs show the same wait and termination sequence:
 
-| Log | SHA-256 |
-| --- | --- |
+| Log                                               | SHA-256                                                            |
+| ------------------------------------------------- | ------------------------------------------------------------------ |
 | `~/.aspire/logs/cli_20260804T092654_7dc37fe7.log` | `84f12b311074cd014392d884d770b887dd604904857c0690db1ab51c707af36b` |
 | `~/.aspire/logs/cli_20260804T094300_8a06ef75.log` | `368651882884438e1bcb516b2025ebc5436afc023b98dae93cd91162f0c20341` |
 
@@ -35,17 +35,25 @@ falsified by the PR branch's own next control run:
 - In the red run the package-cache prerequisite was a verified hit, Quickstart step 4 restore/start
   passed in 21.362 seconds, then step 5's nested `aspire start` hung for its full 300-second command
   deadline.
-- Child log `cli_20260805T005338525_detach-child_19780408a8c749ff93cea7432377c3be.log`
-  starts `aspire-managed nuget search`, begins `BundleNuGetService` restore of four already-cached
-  packages at 00:53:38.983, makes no progress, and receives the parent termination signal at
-  00:58:38.744.
-- Child-log SHA-256:
-  `cf5dc02d92223213ade7d63ebf5738459cb8ee46c43db7a2a4e3db92b4f1832c`.
+- Child log `cli_20260805T005338525_detach-child_19780408a8c749ff93cea7432377c3be.log` starts
+  `aspire-managed nuget search`, begins `BundleNuGetService` restore of four already-cached packages
+  at 00:53:38.983, makes no progress, and receives the parent termination signal at 00:58:38.744.
+- Child-log SHA-256: `cf5dc02d92223213ade7d63ebf5738459cb8ee46c43db7a2a4e3db92b4f1832c`.
 
-Package availability therefore does not remove NuGet scratch/global lock starvation; it merely
-moved the observed hang. An exit-6-only retry also misses the `aspire start` deadline form. PR #1305
-S2 is mitigation-only and is superseded by the fixed-CLI pin. S1 log retention is reused unchanged;
-the unrelated later response-probe correction is not part of this diagnosis.
+Package availability therefore does not remove NuGet scratch/global lock starvation; it merely moved
+the observed hang. An exit-6-only retry also misses the `aspire start` deadline form. PR #1305 S2 is
+mitigation-only and is superseded by the fixed-CLI pin. S1 log retention is reused unchanged; the
+unrelated later response-probe correction is not part of this diagnosis.
+
+Run <https://github.com/rickylabs/netscript/actions/runs/30965320792> strengthened the negative
+control: after the exact cache was restored and verified, the new bounded database-retry code made
+two consecutive `aspire restore` attempts. Both waited exactly 180 seconds and failed with exit 6
+from `BundleNuGetService.RestorePackagesAsync`. The complete retained logs are:
+
+- `proof-failure-attempt1_20260805T011257.log` — SHA-256
+  `03994aae2756ec40250c08b1c91fe643c2d6d63a727f3656bed99c4fd9f5df54`.
+- `proof-failure-attempt2_20260805T011557.log` — SHA-256
+  `d8c672897b12b7b529da4ee14267be04b5f376b7c9dc6ffd70a41793a685ad51`.
 
 ## Fixed daily compatibility probe
 
@@ -61,5 +69,6 @@ Exit:       0
 Output:     .aspire/modules/aspire.mts rebuilt (3,833,237 bytes)
 ```
 
-The six pre-existing stopped 13.4.6 helpers were still the only `aspire-managed nuget
+The six pre-existing stopped 13.4.6 helpers were still the only
+`aspire-managed nuget
 search|restore` processes afterward: the daily probe left no new child behind.

@@ -25,21 +25,24 @@ state, NuGet-lock consequence, and merged repair, no duplicate upstream issue dr
 
 ## Stable and daily currency
 
-| Channel | Exact version/build | State |
-| --- | --- | --- |
-| stable | `13.4.6+87fe259e4fc244c599019a7b1304c85a1488f248` | Released 2026-06-20; affected; predates #18958 |
-| daily/dev | `13.5.0-preview.1.26404.10+1f098dffe7e143c18f5a79c37218718f822415ed` | Installed/tested 2026-08-05; contains #18958 |
+| Channel   | Exact version/build                                                  | State                                          |
+| --------- | -------------------------------------------------------------------- | ---------------------------------------------- |
+| stable    | `13.4.6+87fe259e4fc244c599019a7b1304c85a1488f248`                    | Released 2026-06-20; affected; predates #18958 |
+| daily/dev | `13.5.0-preview.1.26404.10+1f098dffe7e143c18f5a79c37218718f822415ed` | Installed/tested 2026-08-05; contains #18958   |
 
 Primary sources:
 
 - Stable release: <https://github.com/microsoft/aspire/releases/tag/v13.4.6>
-- Official daily-build instructions: <https://github.com/microsoft/aspire/blob/main/docs/using-latest-daily.md>
-- Fix-to-daily comparison: <https://github.com/microsoft/aspire/compare/7921e8689f5f6cec0fa4f815f9c4a04f7b875264...1f098dffe7e143c18f5a79c37218718f822415ed>
+- Official daily-build instructions:
+  <https://github.com/microsoft/aspire/blob/main/docs/using-latest-daily.md>
+- Fix-to-daily comparison:
+  <https://github.com/microsoft/aspire/compare/7921e8689f5f6cec0fa4f815f9c4a04f7b875264...1f098dffe7e143c18f5a79c37218718f822415ed>
 
 GitHub reports the daily commit as 25 commits ahead and zero behind the #18958 merge commit. The
-official installer also resolves the exact version when passed `--version
-13.5.0-preview.1.26404.10`, so the workflow can pin the tested build instead of following a moving
-`dev` channel.
+official installer also resolves the exact version when passed
+`--version
+13.5.0-preview.1.26404.10`, so the workflow can pin the tested build instead of following
+a moving `dev` channel.
 
 ## Doctor results
 
@@ -48,6 +51,6 @@ Both `aspire doctor --non-interactive --nologo` runs completed with zero failed 
 - Stable 13.4.6: Docker 29.1.3, WSL2, .NET/DCP, and TypeScript tooling healthy.
 - Daily 13.5.0 preview: the same checks healthy; channel reported as `daily`.
 
-Warnings were limited to local developer-certificate trust and VS Code extension availability.
-They occur after/beside package restore and do not explain a NuGet child waiting before any AppHost
-or container starts.
+Warnings were limited to local developer-certificate trust and VS Code extension availability. They
+occur after/beside package restore and do not explain a NuGet child waiting before any AppHost or
+container starts.
