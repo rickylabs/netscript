@@ -2039,3 +2039,33 @@ workflows pass, and stays as the fallback if they do not.
 acceptance. I closed the mitigation the moment I had a better theory, before the theory's proof
 had run — the sequencing the lane proposed ("close if the proof passes") was correct and I
 overrode it without noticing I was overriding anything.**
+
+## 2026-08-05 — #1310 (p0 PGDATA corruption) CONFIRMED on main, scheduled canary.11, gate defect owned
+
+Owner filed #1310 and asked me to confirm rather than assume whether #1196 closed it. **It does
+not.** Structural proof from `origin/main` post-#1301:
+1. `operation-runner.ts` `executeOne()` still builds `operationAppHostPath` from
+   `DB_OPERATION_APPHOST_MTS` and calls `executeDetached` for every non-`studio` operation —
+   #1196 retired the LINGERING host (teardown + absence verification), not its creation.
+2. `helpers-generator-pipeline.ts` renders the db-operation AppHost from the **same
+   `../appsettings.json`** as the resident host.
+3. `generate-appsettings.ts` emits `Persistent: true, DataPath: '.data/postgres'` — one fixed path.
+→ Two postmasters, one PGDATA, exactly as filed. Scheduled **0.0.5 / p0 / canary.11**;
+**displaces nothing** (the pilot-blocker lanes freed when #1227 resolved).
+
+**Lineage the owner drew, and it is the important part:** #1011 (db command killed the resident
+AppHost, 0.0.4) and #1196 (ephemeral host masked the resident one, 0.0.5) are the same cause —
+the db command **rebuilds the whole resource graph instead of connecting to the database already
+running**. #1310 is the third and worst consequence. Brief targets the cause; a fourth symptom
+fix is explicitly out of scope.
+
+**My own defect, admitted on the issue:** `quickstart.walk` step 5 encodes the corrupting order
+(`db init`/`generate`/`seed` AFTER `aspire start`) because I transcribed it from the Quickstart.
+So the gate built to protect the pilot has been EXECUTING the corrupting sequence every run, and
+a green step 5 was reported to the owner as evidence the documented flow is safe. Fixed inside
+this slice: the gate must assert the resident Postgres is the only postmaster on that DataPath
+and the data directory survives teardown — the issue's own regression criterion.
+**Finding 47 (for #1163): a gate transcribed from documentation inherits the documentation's
+defects, and then launders them as evidence. Step 5 passed because the commands exited 0; it
+never asked whether the thing it just did was safe. When a gate's steps come from prose, each
+step needs an assertion about resulting STATE, not just exit status.**
