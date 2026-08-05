@@ -47,13 +47,13 @@ tasks to credential-isolated OpenRouter workers.
 
 ## In Progress
 
-- Slice 3 operator documentation and independent adversarial implementation evaluation.
+- Final repository gates and GitHub check convergence after independent IMPL-EVAL PASS.
 
 ## Next Steps
 
-1. Document the operator workflow, security model, and zero-quota limitation.
-2. Run the requested OpenCode/Grok 4.5 high adversarial review and address findings.
-3. Run IMPL-EVAL, repository gates, and GitHub checks before marking the PR ready.
+1. Run final repository and documentation gates.
+2. Refresh the PR checklist and phase labels from durable evidence.
+3. Mark ready only after required GitHub checks are green.
 
 ## Key Decisions
 

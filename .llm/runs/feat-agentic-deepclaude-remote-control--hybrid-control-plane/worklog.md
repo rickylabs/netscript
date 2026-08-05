@@ -73,6 +73,7 @@ protocol tests, then run the documented canary; never add credentials or endpoin
 | 2026-08-05 | Slice 2 | Live canary | Claude Code 2.1.222 attached native Remote Control with bypass permissions; `/mcp` reported `netscript-hybrid` connected with one tool. One `delegate_openrouter` call returned exact `HYBRID_REMOTE_DEEPSEEK_OK`; requested and argv-observed routes both resolved to `openrouter` / `deepseek/deepseek-v4-flash-0731` / `high` in 6109 ms. The tmux session remains live for inspection. |
 | 2026-08-05 | Slice 3 | Grok adversarial review | OpenCode/Grok 4.5 high reproduced a merge-blocking sandbox mismatch: scoped `--allow-run=setsid` permits worker spawn but denies the adapter's `Deno.kill(-pid, signal)`, so deployed cancellation/timeout cleanup was not guaranteed despite unit-fake coverage. Remediation and an exact-permissions orphan test are required before IMPL-EVAL. The review process later exited 143 while probing signals, so no unsupported PASS verdict was recorded. |
 | 2026-08-05 | Slice 3 | Grok finding remediation | Replaced forbidden `Deno.kill` with the explicitly permitted `kill` executable while retaining scoped `--allow-run=setsid,kill`. A TERM-resistant leader/descendant fixture now runs through the exact generated MCP argv; cancellation returns `cancelled`, escalates TERM→KILL, and the descendant PID disappears. Supervisor independently reran 34 focused/volatile tests with zero failures. |
+| 2026-08-05 | IMPL-EVAL | Evaluation | Separate OpenCode/OpenRouter Minimax M3 high evaluation returned `PASS` with no blockers. It independently reran 34 focused tests, the exact-permissions orphan test, and agentic-wide check/lint/fmt across 147 files; skill parity and lock hygiene also passed. |
 
 ## Gate Results
 
@@ -91,6 +92,7 @@ protocol tests, then run the documented canary; never add credentials or endpoin
 | Slice 2 scoped format | PASS | Wrapper selected 8 hybrid files; 0 findings / 0 failed batches. |
 | Native Remote Control → MCP → DeepSeek canary | PASS | Claude 2.1.222 proved a non-empty bridge session, MCP connected, and one delegated call returned exact `HYBRID_REMOTE_DEEPSEEK_OK` with matching requested/argv-observed route identity. |
 | Exact-permissions process-group cancellation | PASS | Real MCP subprocess under `--allow-run=setsid,kill` cancelled a TERM-resistant worker group and left no descendant orphan. |
+| Separate IMPL-EVAL | PASS | OpenCode/OpenRouter Minimax M3 high; no blockers. See `impl-eval.md`. |
 
 ## Handoff Notes
 
