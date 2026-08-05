@@ -2,9 +2,9 @@
 
 ## Scope
 
-Add a read-only `agentic:codex-follow` stream and upgrade `agentic:codex-status` into a per-session
-triage surface that answers whether an agent is working, idle, stalled, dead, or refused and what
-its most recent activity/artifact is.
+Add a read-only `agentic:codex-follow` stream and upgrade `agentic:codex-status` into a mixed Codex
+and agy per-session triage surface that answers whether an agent is working, idle, stalled, dead, or
+refused and what its most recent activity/artifact is.
 
 ## Locked decisions
 
@@ -27,6 +27,9 @@ its most recent activity/artifact is.
 7. All behavior is read-only. No polling sleep is introduced; follow uses filesystem events and
    exits on terminal success or failure.
 8. Preserve the pre-existing `deno.lock` change and never stage it.
+9. Read agy's worktree→conversation index and transcript JSONL directly; report it through the same
+   session vocabulary, include current step/dispatch issue/non-zero command exit, and let
+   `--worktree` resolve/filter either runtime without consulting process state.
 
 ## Commit slices
 
@@ -34,8 +37,8 @@ its most recent activity/artifact is.
 2. **Rollout contract** — shared resolver/parser/state reducer with fake-clock fixtures.
 3. **Follow + status** — public tasks, readable/JSON output, filesystem-follow behavior, session
    inventory, and artifact evidence.
-4. **Discovery + evaluation** — README/tooling index, focused gates, separate IMPL-EVAL,
-   acceptance evidence, and ready transition.
+4. **Discovery + evaluation** — README/tooling index, focused gates, separate IMPL-EVAL, acceptance
+   evidence, and ready transition.
 
 ## Gate set
 
@@ -60,6 +63,4 @@ its most recent activity/artifact is.
 
 - Resolved now: state vocabulary, evidence hierarchy, terminal semantics, shared resolver, and
   public command shapes.
-- Safe to defer: cross-provider Antigravity rollout support; #1115's acceptance contract and the
-  named public commands are Codex-specific, while provider-neutral aggregation needs a separate
-  schema contract.
+- Safe to defer: none of the live issue's Codex or agy acceptance surface.

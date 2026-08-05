@@ -44,7 +44,7 @@ token. It is safe to read any one of them in isolation.
 | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `runtime/`     | The desired-state controller: `contract.ts`, `state.ts`, `ports.ts`, pure `planner.ts`, `controller.ts`, `output.ts`, the routing/rollout policy, provider profiles, and `adapters/` (the only home for `Deno.env`/`Deno.Command`). |
 | `runtime/cli/` | Entry points over the brain: the canonical `agentic-runtime` doctor/status/repair, routing-state, Antigravity evidence, and the provider + rollout canaries.                                                                        |
-| `codex/`       | The WSL Codex lane: launch a slice, watch it, steer it, inspect the daemon.                                                                                                                                                         |
+| `codex/`       | The WSL agent lane: launch/watch/steer Codex, follow live rollouts, and triage Codex plus agy transcript state.                                                                                                                     |
 | `opencode/`    | The native WSL OpenCode lane: run general terminal turns, capture Kimi vision evaluations, or host the browser UI.                                                                                                                  |
 | `openhands/`   | The OpenHands lane: dispatch an evaluator, read its status, watch for the verdict.                                                                                                                                                  |
 | `github/`      | The GitHub REST lane: leaf-PR lifecycle, background CI/verdict watch, durable token resolution.                                                                                                                                     |
@@ -112,7 +112,29 @@ Use both together: `git` to surface each commit, `turn` to know when to step bac
 the awaited event · `2` on the timeout heartbeat (slice may be hung) · `1` bad args / missing
 worktree, logs dir, or rollout.
 
-### 3. Steer it — `codex/codex-resume.ts`
+### 3. Follow it live — `codex/codex-follow.ts`
+
+**When:** you need to know whether a session is progressing and what it is doing without reading raw
+JSONL. It resolves `--thread-id` through the same shared resolver as `codex-watch`, prints only
+reasoning, messages, commands/results, file writes, and terminal events, then exits when the turn
+completes or fails.
+
+```bash
+deno task agentic:codex-follow --thread-id <uuid> --since 5m --format pretty
+```
+
+Use `--format json` for line-delimited machine-readable events. `--rollout <path>` is available for
+direct inspection. User prompts and token bookkeeping are never streamed.
+
+Mixed-fleet status also reads agy's existing worktree index at
+`~/.gemini/antigravity-cli/cache/last_conversations.json` and each conversation's
+`brain/<conversation-id>/.system_generated/logs/transcript.jsonl`. Its `USER_INPUT`,
+`PLANNER_RESPONSE`, `RUN_COMMAND`, and `CODE_ACTION` records provide the dispatch issue, current
+step, non-zero exit codes, and file evidence. This is transcript evidence only; `ps` is never used
+to claim agy progress. Pass `--worktree <path>` to resolve and filter either runtime by the handle a
+supervisor normally has.
+
+### 4. Steer it — `codex/codex-resume.ts`
 
 **When:** the agent is idle and you want to send a follow-up. This tool issues _exactly one_
 `codex exec resume` against an explicit `--thread-id`; it never fires a second send at a worktree,
@@ -126,18 +148,20 @@ deno run --allow-read --allow-run .llm/tools/agentic/codex/codex-resume.ts \
 `--dry-run` prints the exact command and sends nothing. Exit: `0` ok/dry-run · `1` resume failed ·
 `2` usage error.
 
-### 4. Check the daemon anytime — `codex/codex-status.ts`
+### 5. Check live state anytime — `codex/codex-status.ts`
 
-**When:** you want a read-only snapshot — daemon version and app-server process count, a worktree's
-git state and logs path, and the recent session rollouts. Safe to run at any time.
+**When:** you want the one-command triage answer. Each recent session reports thread id, model,
+effort, worktree, current activity/reasoning, last commit or file write, and an evidence-derived
+state: `working`, `idle`, `stalled-for-N`, `dead`, or `refused`. Quiet incomplete sessions become
+stalled; process presence alone never makes them dead.
 
 ```bash
-deno run --allow-read --allow-run .llm/tools/agentic/codex/codex-status.ts --worktree <wsl-path> --pretty
+deno task agentic:codex-status --sessions 10 --stalled-after 5m --pretty
 ```
 
 Exit: `0` ok · `2` daemon unreachable · `5` worktree not found.
 
-### 5. Run a complete multi-turn slice — `codex/run-codex-slice.ts`
+### 6. Run a complete multi-turn slice — `codex/run-codex-slice.ts`
 
 The runner delegates a new thread to `launch-codex-slice.ts`, or attaches only when the durable
 sender registry already maps the requested worktree to the requested thread. It then issues one
@@ -317,12 +341,12 @@ deno task agentic:claude-openrouter --model <openrouter-id> --effort xhigh \
 
 **Open models only.** The guard is not switchable on this route: a closed model id is denied with
 403, terminates the turn, and exits `78`. An already-exported `OPENROUTER_API_KEY` wins; otherwise
-only that assignment is read from the configured credential file (see
-`OPENROUTER_ENV_RELATIVE_PATH` in `config/versions.ts`). The key is never printed and never reaches
-argv. Unknown, duplicate, or value-less flags are rejected before any request can spend credit, and
-`--output` is opened before the child is spawned so an unwritable destination cannot fail behind a
-live turn. `--output` tees the stream-JSON result to a file while still streaming to stdout; the
-launcher exits with the child's exit code.
+only that assignment is read from the configured credential file (see `OPENROUTER_ENV_RELATIVE_PATH`
+in `config/versions.ts`). The key is never printed and never reaches argv. Unknown, duplicate, or
+value-less flags are rejected before any request can spend credit, and `--output` is opened before
+the child is spawned so an unwritable destination cannot fail behind a live turn. `--output` tees
+the stream-JSON result to a file while still streaming to stdout; the launcher exits with the
+child's exit code.
 
 Preset capability is data in `runtime/provider-profiles.ts`: the Claude GLM design preset is
 live-agentic supported, while the legacy Codex GLM design preset is explicitly unsupported because
@@ -464,16 +488,16 @@ the one obvious place and every doctor, probe, installer, and test picks it up. 
 (`config/no-hardcoded-volatile_test.ts`) fails the suite if any of these values is ever hardcoded
 again outside `config/`.
 
-| To change a…                                        | Edit                                                   | Notes                                                                                                                                                                                 |
-| --------------------------------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Model id**                                        | `config/models.ts`                                     | `MODEL_IDS` (native), `OPENROUTER_MODEL_IDS` (presets), and `OPENCODE_MODEL_IDS` (native OpenCode lane). These are the only model-id string literals.                                 |
-| **Routing binding** (lane → agent → model → effort) | `runtime/routing-policy.ts` (`CANONICAL_ROUTE_POLICY`) | The lane authority, rendered by `.llm/harness/workflow/lane-policy.md`; it references `config/models.ts` for the ids.                                                                 |
-| **Tool version**                                    | `config/versions.ts`                                   | Runtime version sets plus `OPENCODE_TOOL` for the pinned OpenCode version, binary name, auth-file location, variant, and web defaults.                                                |
+| To change a…                                        | Edit                                                   | Notes                                                                                                                                                                                            |
+| --------------------------------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Model id**                                        | `config/models.ts`                                     | `MODEL_IDS` (native), `OPENROUTER_MODEL_IDS` (presets), and `OPENCODE_MODEL_IDS` (native OpenCode lane). These are the only model-id string literals.                                            |
+| **Routing binding** (lane → agent → model → effort) | `runtime/routing-policy.ts` (`CANONICAL_ROUTE_POLICY`) | The lane authority, rendered by `.llm/harness/workflow/lane-policy.md`; it references `config/models.ts` for the ids.                                                                            |
+| **Tool version**                                    | `config/versions.ts`                                   | Runtime version sets plus `OPENCODE_TOOL` for the pinned OpenCode version, binary name, auth-file location, variant, and web defaults.                                                           |
 | **Endpoint / host / installer URL**                 | `config/endpoints.ts`                                  | Node dist host, npm registry, Antigravity host + installer, OpenRouter base URLs, GitHub REST + GraphQL APIs. Keep the `agentic:wsl-foundation` `--allow-net=` allowlist in `deno.json` in sync. |
-| **Provider profile / OpenRouter preset**            | `runtime/provider-profiles.ts`                         | Credential-key wiring and preset effort/purpose; model ids come from `config/models.ts`.                                                                                              |
-| **Fallback / lane policy**                          | `runtime/routing-policy.ts`                            | Fallback candidate rules, subscription/approval gates, dated transitions.                                                                                                             |
-| **Agent / provider vocabulary**                     | `runtime/contract.ts`                                  | `AGENT_KINDS`, `PROVIDER_KINDS`, `EFFORTS`, diagnostic codes, `EXIT_CODES`.                                                                                                           |
-| **Deps**                                            | root `deno.json` import map + `deno.lock`              | The suite has no third-party deps of its own; it uses `Deno.*` and Web APIs by design.                                                                                                |
+| **Provider profile / OpenRouter preset**            | `runtime/provider-profiles.ts`                         | Credential-key wiring and preset effort/purpose; model ids come from `config/models.ts`.                                                                                                         |
+| **Fallback / lane policy**                          | `runtime/routing-policy.ts`                            | Fallback candidate rules, subscription/approval gates, dated transitions.                                                                                                                        |
+| **Agent / provider vocabulary**                     | `runtime/contract.ts`                                  | `AGENT_KINDS`, `PROVIDER_KINDS`, `EFFORTS`, diagnostic codes, `EXIT_CODES`.                                                                                                                      |
+| **Deps**                                            | root `deno.json` import map + `deno.lock`              | The suite has no third-party deps of its own; it uses `Deno.*` and Web APIs by design.                                                                                                           |
 
 ## Environment overrides
 
