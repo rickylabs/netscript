@@ -15,20 +15,30 @@ privileged scrub after the second Postgres corrupted the shared data directory.
 ## Slices
 
 - [x] S0 — live research and locked D6 plan — `c3b65a698`
-- [ ] S1 — RED and resident-operation resource contract
-- [ ] S2 — runner and obsolete fallback removal
-- [ ] S3 — quickstart corruption regression and docs
-- [ ] S4 — merge-readiness and composed evaluation
+- [x] S1 — RED and resident-operation resource contract — `3efb1052d`
+- [x] S2 — runner and obsolete fallback removal — `3efb1052d`, `94da16a9b`
+- [x] S3 — quickstart corruption regression and docs — `3efb1052d`
+- [x] S4 — merge-readiness and composed evaluation — `18910bd52`
 
 ## Validation
 
-- Planned: no-second-AppHost RED→GREEN, explicit-start generator tests, resident discovery and
-  signal/failure coverage, quickstart unique-postmaster/bind + PGDATA teardown probe, scoped
-  wrappers, quality, docs, publish, full relevant E2E, and lock hygiene.
+- GREEN: focused runner/generator/pipeline/quickstart tests; scoped check/lint/fmt; `quality:gate`;
+  CLI doc-lint and publish dry-run.
+- Full `scaffold.runtime`: resident start → db init → generate → seed all passed; the run later
+  timed out at unrelated `runtime.wait.workers-api`; cleanup passed. See worklog for raw gate names.
+- Lock hygiene: pre-existing `deno.lock` modification remains unstaged.
 
 ```acceptance-evidence
 issue: 1310
 entries:
+  - box-index: 0
+    evidence: "3efb1052d: runner starts netscript-db-<key> in the exact resident apphost; focused test forbids aspire start and nested apphost paths."
+  - box-index: 1
+    evidence: "3efb1052d: transient db-operation project and mutator were removed; absent resident AppHost now fails closed, so no standalone stateful fallback exists."
+  - box-index: 2
+    evidence: "3efb1052d + 18910bd52: quickstart holds one PGDATA bind owner across init/generate/seed and runs read-only pg_controldata after teardown; full runtime passed all three DB gates."
+  - box-index: 3
+    evidence: "3efb1052d: quickstart, migration guide, and storefront tutorial document resident explicit resources and no second Postgres."
 ```
 
 ## Harness
@@ -38,8 +48,9 @@ entries:
 
 ## Definition of Done
 
-- [ ] Running-resident DB commands address a resident explicit-start resource and start no AppHost.
-- [ ] No standalone stateful fallback can mount resident DataPath.
-- [ ] Quickstart proves one Postgres on the bind source and intact PGDATA after teardown.
-- [ ] Second-terminal documentation matches the fixed resident-first contract.
-- [ ] Required gates, acceptance mirror, review threads, and composed evaluation pass.
+- [x] Running-resident DB commands address a resident explicit-start resource and start no AppHost.
+- [x] No standalone stateful fallback can mount resident DataPath.
+- [x] Quickstart proves one Postgres on the bind source and intact PGDATA after teardown.
+- [x] Second-terminal documentation matches the fixed resident-first contract.
+- [ ] Required gates, acceptance mirror, review threads, and composed evaluation pass — CI and
+  review-thread verdicts pending after the implementation push.
