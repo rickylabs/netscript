@@ -12,15 +12,16 @@
 
 ## Current State
 
-The graph guard is implemented and its negative controls pass. Against the unchanged train graph it
-fails with 21 findings: missing catalog, 18 inline JSR members, two lock instances, and the SDK's
-non-v4 oRPC import.
+The graph guard is implemented and its negative controls pass. The planned catalog alignment fixes
+the measured MCP/AI peer warnings, but the train has two unreported hard Zod 3 paths:
+`@olli/kvdex@3.6.7` and `@tanstack/ai@0.39 -> @ag-ui/core@0.0.52`. Exactly-one-instance acceptance
+cannot be earned without expanding into upstream replacement/upgrade/override decisions.
 
 ## Next Steps
 
-1. Commit and push the RED guard slice.
-2. Align root/member manifests and oRPC source.
-3. Regenerate the lock once and prove the same guard GREEN.
+1. Obtain owner rescope decision for the TanStack AI cluster and kvdex.
+2. Resume the preserved partial alignment only after that decision.
+3. Keep the graph guard strict; do not tick graph/lock acceptance meanwhile.
 
 ## Key Decisions
 

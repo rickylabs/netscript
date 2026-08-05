@@ -56,6 +56,8 @@ Change Zod only in the root catalog, run `deno task deps:check`, and inspect the
 | 2026-08-05 | 1 | negative controls | Four tests prove the aligned case and reject a second/v3 instance, JSR member specifier, and oRPC compatibility root. |
 | 2026-08-05 | 1 | RED | Live guard failed with 21 findings: catalog 1, member specifier 18, lock instance 1, oRPC surface 1. |
 | 2026-08-05 | 1 | reconcile | Draft PR #1315 targets `canary/0.0.5-canary.13`; issue scope and labels remain current. |
+| 2026-08-05 | 2 | GREEN attempt | Catalog/member/oRPC alignment removed measured MCP peer-to-3 warnings, but guard still found Zod 3. |
+| 2026-08-05 | 2 | drift | Native provenance found hard v3 paths through kvdex and AG-UI; exact-one-instance acceptance remains unearned. |
 
 ## Decisions
 
