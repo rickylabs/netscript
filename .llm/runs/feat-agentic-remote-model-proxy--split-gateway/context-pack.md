@@ -6,15 +6,15 @@
 | -------------- | ------------------------------------------------ |
 | Run ID         | `feat-agentic-remote-model-proxy--split-gateway` |
 | Branch         | `feat/agentic-remote-model-proxy`                |
-| Current phase  | `implement`                                      |
+| Current phase  | `close`                                          |
 | Archetype      | `6 - CLI / tooling`                              |
 | Scope overlays | `docs`                                           |
 
 ## Current State
 
 The original Remote Control goal was rescoped after a live failure and Grok `FAIL_RESCOPE`.
-The branch now provides a truthful inference-only OpenRouter launcher; 26 tests and static gates
-pass, and a live DeepSeek sentinel canary succeeded.
+The branch now provides a truthful inference-only OpenRouter launcher; tests/static gates and the
+live DeepSeek sentinel pass, and separate local OpenCode/Qwen IMPL-EVAL returned `PASS`.
 
 ## Completed
 
@@ -25,13 +25,13 @@ pass, and a live DeepSeek sentinel canary succeeded.
 
 ## In Progress
 
-- Revised Plan-Gate and post-rescope commit.
+- Final evaluator artifact commit and GitHub checks.
 
 ## Next Steps
 
-1. Run revised local Plan-Gate through OpenCode/Qwen.
-2. Commit and push rescope/docs/canary evidence.
-3. Run formal local IMPL-EVAL and GitHub checks.
+1. Commit and push formal evaluator evidence.
+2. Verify required GitHub checks.
+3. Mark the PR ready for review/merge when green.
 
 ## Key Decisions
 
@@ -62,6 +62,7 @@ pass, and a live DeepSeek sentinel canary succeeded.
 | Volatile/config and provider regressions | PASS           | 4 + 13 tests passed                                       |
 | Runtime canary                           | PASS | exact sentinel in `loopback-deepseek-openrouter` |
 | Remote Control | UNSUPPORTED | current Claude custom-base guard; no attachment claim |
+| Formal IMPL-EVAL | PASS | separate local OpenCode/Qwen evaluator artifact `evaluate.md` |
 
 ## Open Questions
 

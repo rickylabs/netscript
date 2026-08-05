@@ -76,6 +76,7 @@ typed identifier; do not add endpoint or model literals to the launcher.
 | OpenCode/Grok 4.5 high adversarial review | FAIL_RESCOPE → addressed | Remote Control claim removed; inference-only contract and explicit rejection implemented |
 | live inference canary | PASS | tmux `loopback-deepseek-openrouter`; exact `OPENROUTER_CANARY_OK` through DeepSeek |
 | Remote Control compatibility | UNSUPPORTED | Claude 2.1.222 daemon exits; interactive registry lacks `bridgeSessionId` |
+| formal local IMPL-EVAL | PASS | separate OpenCode/Qwen session independently verified tests, static gates, docs, PR trail, and live sentinel |
 
 ## Handoff Notes
 
