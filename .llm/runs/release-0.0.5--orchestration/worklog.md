@@ -2092,3 +2092,30 @@ i.e. targeting the cause rather than a fourth symptom. Deliberately NOT auto-mer
 how every `db` command reaches the database, and its acceptance includes the state-asserting
 regression test (resident Postgres is the ONLY postmaster on that DataPath) that my own walk
 gate failed to have. I read this diff before it lands.
+
+## 2026-08-05 — MERGE #1311 (#1310 CLOSED): the db-corruption lineage is retired; CANARY.11 dispatched
+
+All four contexts green on `c08099d7a`, threads 0/0, refs [1310]. **#1310 closed.**
+The fix is at the cause, verified by reading the diff before merge:
+- `DB_OPERATION_APPHOST_MTS` no longer appears in the generator pipeline — the second-AppHost
+  machinery is DELETED, not mitigated (net −350 lines).
+- `executeDetached` now takes `residentAppHostPath`; when no resident host is running it fails
+  honestly ("Start <apphost> before running netscript db <op>") instead of silently starting a
+  second Postgres on the resident PGDATA.
+- `createPgDataIntegrityGate` added: proves one container owns the canonical PGDATA and
+  validates PGDATA after teardown. Its own drift note states the principle — "Exit 0 is not
+  corruption evidence; the gate must fail on the old two-postmaster mechanism."
+- **My walk-gate defect (finding 47) repaired inside the slice**: step 5 now snapshots the
+  resident container, runs init→generate→seed, and proves it is still the only postmaster.
+- Latent bug flushed out by the change: SQLite consumers had been binding through invalid
+  Aspire resource references (only visible once db routed through the resident host); they now
+  bind their file URL. Both PostgreSQL and SQLite runtimes green.
+**Owner's lineage retired**: #1011 (killed the resident host), #1196 (masked it), #1310
+(corrupted PGDATA) were three symptoms of one decision — db rebuilding the resource graph
+instead of connecting to the running database. That decision is reversed.
+
+**CANARY.11 dispatched** (run 30976915354) — the wave-6 pilot release. Train since canary.10:
+#1308 (upstream Aspire CLI fix for #1227), #1311 (#1310), #1309 (#1274 Quickstart rewrite),
+#1307 (Deno research), #1304 (walk-gate invocation + harness-invocation classification), #1303
+(#1188), #1301 (#1196), #1302 (#1219), #1299 (#1290), #1300 (#1287), #1298 (#1294), #1292.
+This is the first canary whose walk gate both runs the documented flow AND asserts it is safe.
