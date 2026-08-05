@@ -47,10 +47,28 @@ jobs:
 
       - name: Install Aspire CLI
         env:
-          ASPIRE_CLI_VERSION: '13.4.6'
+          # 13.4.6 can orphan stopped NuGet prefetch helpers that deadlock later
+          # restores (microsoft/aspire#18948). This is the first daily build we
+          # verified contains the merged lifecycle fix (microsoft/aspire#18958).
+          ASPIRE_CLI_VERSION: '13.5.0-preview.1.26404.10'
         run: |
-          dotnet tool install Aspire.Cli --tool-path "$HOME/.aspire/bin" --version "$ASPIRE_CLI_VERSION"
+          curl -fsSL https://aspire.dev/install.sh | bash -s -- \
+            --version "$ASPIRE_CLI_VERSION" \
+            --install-path "$HOME/.aspire/bin" \
+            --skip-path
           echo "$HOME/.aspire/bin" >> "$GITHUB_PATH"
+
+      - name: Aspire CLI preflight
+        env:
+          ASPIRE_CLI_VERSION: '13.5.0-preview.1.26404.10'
+        run: |
+          aspire_version="$(aspire --version)"
+          echo "$aspire_version"
+          case "$aspire_version" in
+            "$ASPIRE_CLI_VERSION"|"$ASPIRE_CLI_VERSION"+*) ;;
+            *) echo "Expected Aspire CLI $ASPIRE_CLI_VERSION, got $aspire_version" >&2; exit 1 ;;
+          esac
+          aspire doctor --non-interactive --nologo
 
       - name: Download published version
         if: github.event_name == 'workflow_run'
@@ -153,4 +171,5 @@ jobs:
             .llm/tmp/cli-e2e-prod.ndjson
             .llm/tmp/quickstart-walk-prod-report.json
             .llm/tmp/quickstart-walk-prod.ndjson
+            ~/.aspire/logs/cli_*.log
           if-no-files-found: ignore

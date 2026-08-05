@@ -6,6 +6,8 @@ const POLICY = {
   key: 'key: nuget-aspire-${{ runner.os }}-13.4.6-v1',
 } as const;
 
+const FIXED_PUBLISHED_E2E_CLI = '13.5.0-preview.1.26404.10';
+
 Deno.test('every Aspire runtime workflow persists the exact pinned NuGet package train', async () => {
   for (
     const [path, expectedCaches] of [
@@ -21,6 +23,14 @@ Deno.test('every Aspire runtime workflow persists the exact pinned NuGet package
     assertStringIncludes(source, 'ASPIRE_CLI_VERSION:');
     assertStringIncludes(source, '13.4.6');
   }
+});
+
+Deno.test('published E2E uses the fixed Aspire CLI and retains CLI diagnostics', async () => {
+  const source = await Deno.readTextFile('.github/workflows/e2e-cli-prod.yml');
+  assertStringIncludes(source, `ASPIRE_CLI_VERSION: '${FIXED_PUBLISHED_E2E_CLI}'`);
+  assertStringIncludes(source, 'https://aspire.dev/install.sh');
+  assertStringIncludes(source, 'aspire doctor --non-interactive --nologo');
+  assertStringIncludes(source, '~/.aspire/logs/cli_*.log');
 });
 
 function count(source: string, needle: string): number {

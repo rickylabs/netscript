@@ -192,7 +192,6 @@ function createQuickstartGates(): readonly GateDefinition[] {
         PROBE_SERVICE_HEALTH_SCRIPT,
         context.project.appHost,
         'users',
-        'postgres',
       ],
     ),
   ];
