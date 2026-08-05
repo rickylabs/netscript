@@ -95,10 +95,10 @@ jobs:
           mkdir -p .llm/tmp/aspire-nuget-source
           find "$HOME/.nuget/packages" -name '*.nupkg' \
             -exec cp --update=none '{}' .llm/tmp/aspire-nuget-source/ \;
-          aspire_path="$(readlink -f "$HOME/.aspire/bin/aspire")"
-          find "$(dirname "$aspire_path")" -type f -name aspire-managed -print -quit \
+          find "$HOME" -type f -name aspire-managed -print -quit \
             > .llm/tmp/aspire-managed-path.txt
           test -s .llm/tmp/aspire-managed-path.txt
+          sed 's|^|aspire-managed: |' .llm/tmp/aspire-managed-path.txt
 
       - name: Download published version
         if: github.event_name == 'workflow_run'

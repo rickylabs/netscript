@@ -46,3 +46,6 @@
 - 2026-08-05: run 30966339570 failed before E2E because the cloud `dotnet tool --tool-path`
   launcher does not keep its `.store` beneath `~/.aspire/bin`. Corrected discovery to resolve the
   launcher target and search beside the installed bundle. Proof streak remains 0/3.
+- 2026-08-05: run 30966413382 showed the cloud launcher is a real shim rather than a symlink, so
+  resolving it still did not expose the payload. Replaced layout inference with an exact filename
+  search bounded to `$HOME`; the job prints the discovered path. Proof streak remains 0/3.
