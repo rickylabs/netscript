@@ -2013,3 +2013,29 @@ been fixed and machine-verified on published canary.10.
   until **five consecutive published-canary workflows** pass.
 - #1274 rewrite: **DONE**.
 So the pilot is gated on exactly one thing now: #1308's five-run proof.
+
+## 2026-08-05 — CORRECTIONS to the #1227 root-cause report (my summary was imprecise)
+
+The lane's own findings on #1305 are more precise than the summary I circulated. Three fixes to
+the record:
+1. **The canceller is OURS.** I wrote that Aspire cancels itself. The log read says the
+   **NetScript command timeout** fires while Aspire is blocked inside
+   `BundleNuGetService.RestorePackagesAsync`. "A task was canceled" is our timeout landing on an
+   already-stuck restore — a materially better description, and it explains why bounding changed
+   the number (180s) without changing the outcome.
+2. **Defect vs fix conflated.** `microsoft/aspire#18948` is the DEFECT (`aspire ls` leaks
+   orphaned `aspire-managed nuget search` helpers); **#18958** is the merged FIX. I cited only
+   #18958 as "the root cause".
+3. **The cache preseed is disproven, and that is load-bearing evidence.** Run 30964226683 hung
+   after a verified cache; run 30965320792 made two consecutive preseeded retries that both
+   failed at 180s exit 6. That independently rules out cold-feed latency and corroborates the
+   helper-lock mechanism — stronger evidence than the single fixed-daily green run.
+**I also closed #1305 prematurely.** The lane explicitly recommended closing it *if* the
+five-run proof passes, and noted it had not modified the PR itself. Closing before the
+replacement is proven discards the fallback while the substitute is unverified. Reopened
+condition recorded on the PR: it closes when #1308's five consecutive published-canary
+workflows pass, and stays as the fallback if they do not.
+**Finding 46 (for #1163): do not retire the fallback until the replacement has passed its own
+acceptance. I closed the mitigation the moment I had a better theory, before the theory's proof
+had run — the sequencing the lane proposed ("close if the proof passes") was correct and I
+overrode it without noticing I was overriding anything.**
