@@ -200,6 +200,18 @@ export function createRuntimeGates(
         context.project.projectRoot,
       ],
     ),
+    commandGate(
+      GATE.RUNTIME_ASPIRE_RESTART_AFTER_DB,
+      'Restart resident AppHost after database preparation',
+      GATE_PHASE.RUNTIME,
+      (context) => [
+        'deno',
+        'eval',
+        ASPIRE_RESTART_SCRIPT,
+        context.project.appHost,
+        context.project.projectRoot,
+      ],
+    ),
     ...runtimeResources(database).map(runtimeWaitGate),
     commandGate(
       GATE.RUNTIME_ASPIRE_DESCRIBE,
@@ -486,6 +498,16 @@ const ASPIRE_START_SCRIPT = [
   '  if (objectIndex < 0) throw new Error("aspire start did not emit JSON");',
   '  return trimmed.slice(objectIndex);',
   '}',
+].join('\n');
+
+const ASPIRE_RESTART_SCRIPT = [
+  'const stop = await new Deno.Command("aspire", {',
+  '  args: ["stop", "--apphost", Deno.args[0], "--non-interactive", "--nologo"],',
+  '  stdout: "inherit",',
+  '  stderr: "inherit",',
+  '}).spawn().status;',
+  'if (!stop.success) throw new Error(`aspire stop failed with code ${stop.code}`);',
+  ASPIRE_START_SCRIPT,
 ].join('\n');
 /** List the Aspire resources that a runtime suite waits for. */
 export function runtimeResources(database: DatabaseEngine): readonly AspireResource[] {

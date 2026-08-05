@@ -69,10 +69,10 @@ export function buildAspireArgs(
 }
 
 export function buildExecutableDisplayName(
-  operation: DbOperationRequest['operation'],
+  _operation: DbOperationRequest['operation'],
   configKey: string,
 ): string {
-  return `prisma-${operation}-${configKey}`;
+  return `netscript-db-${configKey}`;
 }
 
 export function findExecutableStatus(

@@ -198,20 +198,14 @@ describe('generateDbCliMode', () => {
     assert(!output.includes('--minimum-dependency-age=0'));
   });
 
-  it('should short-circuit AppHost startup when a Prisma operation is present', () => {
+  it('registers explicit DB resources without short-circuiting the resident graph', () => {
     const output = generateDbCliMode({ databases: {} });
 
     assertStringIncludes(output, 'export async function tryHandleDbCliMode(');
-    assertStringIncludes(output, 'const configuration = await builder.getConfiguration();');
-    assertStringIncludes(output, 'const configured = await configuration.getConfigValue(key);');
-    assertStringIncludes(output, "'prisma-operation',");
-    assertStringIncludes(output, 'await configuration.getConfigValue(key)');
-    assertStringIncludes(output, 'configured ?? process.env[envName]');
-    assertStringIncludes(output, "'NETSCRIPT_PRISMA_OPERATION'");
-    assertStringIncludes(output, "'NETSCRIPT_PRISMA_TARGET'");
-    assertStringIncludes(output, "'NETSCRIPT_PRISMA_NAME'");
+    assertStringIncludes(output, '`netscript-db-${target.configKey}`');
+    assertStringIncludes(output, 'await resource.withExplicitStart();');
+    assertStringIncludes(output, 'request.NETSCRIPT_PRISMA_OPERATION');
     assertStringIncludes(output, 'return false;');
-    assertStringIncludes(output, 'return true;');
   });
 });
 // generateIndex

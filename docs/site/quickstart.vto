@@ -144,7 +144,9 @@ Wait until the Fresh app, example service (`users`), Postgres, and Redis report 
 
 ## 4. Prepare the database
 
-Open a second terminal at `my-app/` while Aspire runs in the background:
+Open a second terminal at `my-app/` while Aspire runs in the background. Each `netscript db`
+command starts an explicit operation resource inside that resident AppHost and receives its existing
+Postgres connection; it does not provision another database or mount `.data/postgres` again:
 
 ```bash
 cd ..
@@ -156,7 +158,10 @@ deno task check
 
 <!-- quickstart-walk:end -->
 
-This order is mandatory for an Aspire-managed database. `db init` creates and applies the first Prisma migration; without it the scaffold has no tables. `db generate` then produces both the Prisma client and the Zod model schemas in `crud.ts`, and `db seed` runs the workspace seed script.
+This order is mandatory for an Aspire-managed database. If the resident AppHost is stopped, the DB
+command fails fast instead of reconstructing the resource graph. `db init` creates and applies the
+first Prisma migration; without it the scaffold has no tables. `db generate` then produces both the
+Prisma client and the Zod model schemas in `crud.ts`, and `db seed` runs the workspace seed script.
 
 `db init` is the first end-to-end checkpoint: success proves the AppHost resource, connection string, Prisma schema, and migration path agree before product code can obscure the failure.
 

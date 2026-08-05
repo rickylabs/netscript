@@ -97,6 +97,7 @@ export const GATE = {
   RUNTIME_READINESS_FIXTURE: 'runtime.readiness-fixture',
   RUNTIME_ASPIRE_RESTORE: 'runtime.aspire-restore',
   RUNTIME_ASPIRE_START: 'runtime.aspire-start',
+  RUNTIME_ASPIRE_RESTART_AFTER_DB: 'runtime.aspire-restart-after-db',
   RUNTIME_WAIT_DATABASE: 'runtime.wait.database',
   RUNTIME_WAIT_POSTGRES: 'runtime.wait.postgres',
   RUNTIME_WAIT_MYSQL: 'runtime.wait.mysql',
@@ -156,6 +157,7 @@ export const GATE = {
   QUICKSTART_SERVICE_ADD: 'quickstart.3-add-service',
   QUICKSTART_ASPIRE: 'quickstart.4-aspire-restore-start',
   QUICKSTART_DATABASE: 'quickstart.5-database-workflow',
+  QUICKSTART_DATABASE_INTEGRITY: 'quickstart.pgdata-integrity-after-teardown',
   QUICKSTART_CHECK: 'quickstart.6-project-check',
   QUICKSTART_SERVICE_RESPONSE: 'quickstart.7-service-response',
 } as const;

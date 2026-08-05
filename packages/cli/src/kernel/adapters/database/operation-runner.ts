@@ -43,8 +43,6 @@ interface DbOperationRunnerOptions {
   readonly sleep?: (ms: number) => Promise<void>;
   readonly writeOperationRequest?: (path: string, env: Record<string, string>) => Promise<void>;
   readonly removeOperationRequest?: (path: string) => Promise<void>;
-  readonly ensureProcessStopped?: (pid: number) => Promise<void>;
-  readonly verifyAppHostAbsent?: (apphostPath: string, aspireDir: string) => Promise<void>;
   readonly registerSignalAbort?: (abort: () => void) => () => void;
 }
 
@@ -57,8 +55,6 @@ export class DbOperationRunner {
   private readonly sleep: (ms: number) => Promise<void>;
   private readonly writeOperationRequest: (path: string, env: Record<string, string>) => Promise<void>;
   private readonly removeOperationRequest: (path: string) => Promise<void>;
-  private readonly ensureProcessStopped: (pid: number) => Promise<void>;
-  private readonly verifyAppHostAbsent: (apphostPath: string, aspireDir: string) => Promise<void>;
   private readonly registerSignalAbort: (abort: () => void) => () => void;
 
   constructor(options: DbOperationRunnerOptions = {}) {
@@ -77,9 +73,6 @@ export class DbOperationRunner {
         if (!(error instanceof Deno.errors.NotFound)) throw error;
       }
     });
-    this.ensureProcessStopped = options.ensureProcessStopped ?? ensureProcessStopped;
-    this.verifyAppHostAbsent = options.verifyAppHostAbsent ??
-      ((apphostPath, aspireDir) => this.waitForAppHostAbsence(apphostPath, aspireDir));
     this.registerSignalAbort = options.registerSignalAbort ?? registerSignalAbort;
   }
 
@@ -132,10 +125,6 @@ export class DbOperationRunner {
       return await this.executeInteractive(residentAppHostPath, aspireDir, env);
     }
 
-    const operationAppHostPath = join(
-      aspireDir,
-      SCAFFOLD_FILES.DB_OPERATION_APPHOST_MTS,
-    );
     if (!signal) {
       throw new Error('Database operation cancellation signal is required.');
     }
@@ -143,7 +132,7 @@ export class DbOperationRunner {
     return await this.executeDetached(
       request.operation,
       database.configKey,
-      operationAppHostPath,
+      residentAppHostPath,
       aspireDir,
       env,
       signal,
@@ -175,8 +164,9 @@ export class DbOperationRunner {
     env: Record<string, string>,
     signal: AbortSignal,
   ): Promise<number> {
-    const displayName = buildExecutableDisplayName(operation, configKey);
-    const operationRequestPath = join(apphostPath, '..', '.netscript-db-operation.json');
+    const resourceName = `netscript-db-${configKey}`;
+    const displayName = resourceName;
+    const operationRequestPath = join(aspireDir, `.netscript-db-operation-${configKey}.json`);
     outputText(`Starting db ${operation} for ${configKey}...`);
     const lease = await this.lifecycleLock.acquire(apphostPath, {
       timeoutMs: this.timeoutMs,
@@ -185,18 +175,26 @@ export class DbOperationRunner {
     });
 
     try {
-      if (await this.hasRunningAppHost(apphostPath, aspireDir, signal)) {
-        await this.stopDetached(apphostPath, aspireDir, undefined);
+      if (!(await this.hasRunningAppHost(apphostPath, aspireDir, signal))) {
+        throw new Error(
+          `The resident Aspire AppHost is not running. Start ${apphostPath} before running netscript db ${operation}.`,
+        );
       }
       await this.writeOperationRequest(operationRequestPath, env);
 
-      const start = await this.runAspire(
-        buildAspireArgs('start', apphostPath),
-        { cwd: aspireDir, env, signal },
-      );
-      const startedPid = readStartedAppHostPid(start.stdout);
-
       try {
+        await this.runAspire(
+          [
+            'resource',
+            resourceName,
+            'start',
+            '--apphost',
+            apphostPath,
+            '--non-interactive',
+            '--nologo',
+          ],
+          { cwd: aspireDir, signal },
+        );
         const code = await this.waitForExecutableCompletion(
           operation,
           configKey,
@@ -215,11 +213,37 @@ export class DbOperationRunner {
 
         return code;
       } finally {
-        await this.stopDetached(apphostPath, aspireDir, startedPid);
+        await this.stopResource(resourceName, apphostPath, aspireDir);
       }
     } finally {
       await this.removeOperationRequest(operationRequestPath);
       await this.releaseLease(lease, apphostPath);
+    }
+  }
+
+  private async stopResource(
+    resourceName: string,
+    apphostPath: string,
+    aspireDir: string,
+  ): Promise<void> {
+    const output = await this.executor.output(
+      [
+        'resource',
+        resourceName,
+        'stop',
+        '--apphost',
+        apphostPath,
+        '--non-interactive',
+        '--nologo',
+      ],
+      { cwd: aspireDir },
+    );
+    if (output.code !== 0) {
+      outputWarning(
+        `Failed to stop database operation resource ${resourceName}: ${
+          output.stderr.trim() || output.stdout.trim() || output.code
+        }`,
+      );
     }
   }
 
@@ -346,55 +370,6 @@ export class DbOperationRunner {
     return output;
   }
 
-  private async stopDetached(
-    apphostPath: string,
-    aspireDir: string,
-    startedPid: number | undefined,
-  ): Promise<void> {
-    const output = await this.executor.output(
-      ['stop', '--apphost', apphostPath, '--non-interactive', '--nologo'],
-      { cwd: aspireDir },
-    );
-    if (output.code !== 0) {
-      outputWarning(
-        `Failed to stop detached Aspire apphost ${apphostPath}: ${
-          output.stderr.trim() || output.stdout.trim() || output.code
-        }`,
-      );
-    }
-    if (startedPid !== undefined) {
-      await this.ensureProcessStopped(startedPid);
-    }
-    await this.verifyAppHostAbsent(apphostPath, aspireDir);
-  }
-
-  private async waitForAppHostAbsence(apphostPath: string, aspireDir: string): Promise<void> {
-    for (let attempt = 0; attempt < 50; attempt++) {
-      const output = await this.executor.output(
-        ['ps', '--format', 'Json', '--non-interactive', '--nologo'],
-        { cwd: aspireDir },
-      );
-      if (output.code !== 0) {
-        throw new Error(`aspire ps failed with exit code ${output.code}: ${
-          output.stderr.trim() || output.stdout.trim() || 'unknown Aspire error'
-        }`);
-      }
-      const processes = JSON.parse(output.stdout) as Array<{
-        readonly appHostPath?: string;
-        readonly appHostPid?: number;
-      }>;
-      const operationHost = processes.find((entry) =>
-        typeof entry.appHostPath === 'string' &&
-        normaliseAppHostPath(entry.appHostPath) === normaliseAppHostPath(apphostPath)
-      );
-      if (!operationHost) return;
-      if (typeof operationHost.appHostPid === 'number') {
-        await this.ensureProcessStopped(operationHost.appHostPid);
-      }
-      await this.sleep(100);
-    }
-    throw new Error(`Aspire AppHost ${apphostPath} survived database command cleanup.`);
-  }
 }
 
 function registerSignalAbort(abort: () => void): () => void {
@@ -403,42 +378,4 @@ function registerSignalAbort(abort: () => void): () => void {
   return () => {
     for (const signal of signals) Deno.removeSignalListener(signal, abort);
   };
-}
-
-function normaliseAppHostPath(path: string): string {
-  return path.replaceAll('\\', '/').toLowerCase();
-}
-
-function readStartedAppHostPid(stdout: string): number | undefined {
-  const start = stdout.indexOf('{');
-  if (start < 0) return undefined;
-  try {
-    const value = JSON.parse(stdout.slice(start)) as { appHostPid?: unknown };
-    return typeof value.appHostPid === 'number' && Number.isSafeInteger(value.appHostPid) &&
-        value.appHostPid > 0
-      ? value.appHostPid
-      : undefined;
-  } catch {
-    return undefined;
-  }
-}
-
-async function ensureProcessStopped(pid: number): Promise<void> {
-  if (!processIsAlive(pid)) return;
-  Deno.kill(pid, 'SIGTERM');
-  for (let attempt = 0; attempt < 50; attempt++) {
-    await new Promise((resolve) => setTimeout(resolve, 100));
-    if (!processIsAlive(pid)) return;
-  }
-  Deno.kill(pid, 'SIGKILL');
-}
-
-function processIsAlive(pid: number): boolean {
-  try {
-    Deno.kill(pid, 0);
-    return true;
-  } catch (error) {
-    if (error instanceof Deno.errors.NotFound) return false;
-    throw error;
-  }
 }

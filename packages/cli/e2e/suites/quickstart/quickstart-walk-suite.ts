@@ -41,7 +41,11 @@ export function createQuickstartWalkSuite(
     title: QUICKSTART_TITLE.WALK,
     description: 'Walk the documented Quickstart against an exact published JSR CLI.',
     defaultOptions: Object.freeze(options),
-    gates: Object.freeze([...createQuickstartGates(), ...createCleanupGates()]),
+    gates: Object.freeze([
+      ...createQuickstartGates(),
+      ...createCleanupGates(),
+      createPgDataIntegrityGate(),
+    ]),
   });
 }
 
@@ -156,22 +160,17 @@ function createQuickstartGates(): readonly GateDefinition[] {
       GATE_PHASE.DATABASE,
       (context) => [
         'deno',
-        'eval',
-        sequenceScript([
-          [...cli(
-            context,
-            'db',
-            'init',
-            '--project-root',
-            '.',
-            '--db',
-            'postgres',
-            '--name',
-            'init',
-          )],
-          [...cli(context, 'db', 'generate', '--project-root', '.', '--db', 'postgres')],
-          [...cli(context, 'db', 'seed', '--project-root', '.', '--db', 'postgres')],
-        ]),
+        'run',
+        '--allow-run=deno,docker',
+        '--allow-read',
+        '--allow-write',
+        resolve(
+          context.project.repoRoot,
+          'packages/cli/e2e/src/application/gates/quickstart/database-integrity-walk.ts',
+        ),
+        'run',
+        context.project.projectRoot,
+        requirePublishedCli(context),
       ],
       (context) => context.project.projectRoot,
     ),
@@ -195,4 +194,26 @@ function createQuickstartGates(): readonly GateDefinition[] {
       ],
     ),
   ];
+}
+
+function createPgDataIntegrityGate(): GateDefinition {
+  return commandGate(
+    GATE.QUICKSTART_DATABASE_INTEGRITY,
+    'Validate resident Postgres PGDATA after Aspire teardown',
+    GATE_PHASE.CLEANUP,
+    (context) => [
+      'deno',
+      'run',
+      '--allow-run=docker',
+      '--allow-read',
+      '--allow-write',
+      resolve(
+        context.project.repoRoot,
+        'packages/cli/e2e/src/application/gates/quickstart/database-integrity-walk.ts',
+      ),
+      'verify',
+      context.project.projectRoot,
+    ],
+    (context) => context.project.projectRoot,
+  );
 }

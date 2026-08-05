@@ -65,12 +65,10 @@ describe('generateDbCliMode', () => {
     assertStringIncludes(output, "envKey: 'SQLITE_URI'")
     assertStringIncludes(output, "taskSuffix: 'sqlite'")
     assertStringIncludes(output, 'let resource = await builder.addExecutable(')
-    assertStringIncludes(output, 'const offlineGenerateUrl = operation ===')
-    assertStringIncludes(output, 'buildOfflineGenerateUrl(target)')
-    assertStringIncludes(
-      output,
-      ".withEnvironment('DATABASE_URL', offlineGenerateUrl)",
-    )
+    assertStringIncludes(output, '`netscript-db-${target.configKey}`')
+    assertStringIncludes(output, 'DB_OPERATION_RUNNER')
+    assertStringIncludes(output, "'eval',\n        DB_OPERATION_RUNNER,")
+    assertStringIncludes(output, '.withExplicitStart()')
     assertStringIncludes(
       output,
       'const sqliteUrl = `file:./${target.databaseName}`;',
@@ -80,40 +78,31 @@ describe('generateDbCliMode', () => {
     assertStringIncludes(output, 'resource = await resource')
     assertStringIncludes(
       output,
-      "if (!offlineGenerateUrl && target.engine !== 'Sqlite' && target.resource)",
+      "if (target.engine !== 'Sqlite' && target.resource)",
     )
     assertStringIncludes(
       output,
       ".withEnvironment('DATABASE_URL', target.resource)",
     )
     assertStringIncludes(output, '.withReference(target.resource)')
-    assertStringIncludes(
-      output,
-      'function buildOfflineGenerateUrl(target: DbCliTarget)',
-    )
-    assertStringIncludes(output, 'sqlserver://localhost:1433;database=')
-    assertStringIncludes(output, 'password=NetscriptE2e!Sql2026')
+    assertStringIncludes(output, '.withReference(target.resource)')
+    assertStringIncludes(output, '.waitFor(target.resource)')
   })
 
-  it('supports env-based DB CLI activation for detached Aspire runs', () => {
+  it('registers operation resources without short-circuiting the resident graph', () => {
     const output = generateDbCliMode({ databases: {} })
 
     assertStringIncludes(output, 'export async function tryHandleDbCliMode(')
     assertStringIncludes(
       output,
-      'const configuration = await builder.getConfiguration();',
+      "`.netscript-db-operation-${target.configKey}.json`",
     )
     assertStringIncludes(
       output,
-      'const configured = await configuration.getConfigValue(key);',
+      "const request = JSON.parse(await Deno.readTextFile(Deno.args[0]));",
     )
-    assertStringIncludes(output, "'prisma-operation',")
-    assertStringIncludes(output, 'await configuration.getConfigValue(key)')
-    assertStringIncludes(output, 'configured ?? process.env[envName]')
-    assertStringIncludes(output, "'NETSCRIPT_PRISMA_OPERATION'")
-    assertStringIncludes(output, "'NETSCRIPT_PRISMA_TARGET'")
-    assertStringIncludes(output, "'NETSCRIPT_PRISMA_NAME'")
+    assertStringIncludes(output, 'request.NETSCRIPT_PRISMA_OPERATION')
+    assertStringIncludes(output, "args: ['task', task]")
     assertStringIncludes(output, 'return false;')
-    assertStringIncludes(output, 'return true;')
   })
 })

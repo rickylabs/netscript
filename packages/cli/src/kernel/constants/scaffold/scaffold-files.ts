@@ -12,7 +12,6 @@ export const SCAFFOLD_FILES = {
   MAIN: 'main.ts',
   README: 'README.md',
   APPHOST_MTS: 'apphost.mts',
-  DB_OPERATION_APPHOST_MTS: 'db-operation/apphost.mts',
   ASPIRE_CLI_TASK: 'aspire-cli.ts',
   NODE_MODULES_VERIFIER: 'verify-node-modules.ts',
   SOURCE_ROOT_MARKER: '.netscript-source-root',

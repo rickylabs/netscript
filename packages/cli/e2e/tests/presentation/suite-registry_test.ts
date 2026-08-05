@@ -163,6 +163,24 @@ Deno.test('runtime suite waits for the generated app and requests its home page'
   assertEquals(waitIndex < homeIndex, true);
 });
 
+Deno.test('runtime DB mutations run only after the resident AppHost starts', () => {
+  const gates = resolveSuite(SCAFFOLD.RUNTIME).gates;
+  const startIndex = gates.findIndex((gate) => gate.id === GATE.RUNTIME_ASPIRE_START);
+  for (
+    const id of [
+      GATE.DATABASE_INIT,
+      GATE.DATABASE_GENERATE,
+      GATE.DATABASE_SEED,
+    ]
+  ) {
+    assertEquals(startIndex < gates.findIndex((gate) => gate.id === id), true);
+  }
+  const seedIndex = gates.findIndex((gate) => gate.id === GATE.DATABASE_SEED);
+  const restartIndex = gates.findIndex((gate) => gate.id === GATE.RUNTIME_ASPIRE_RESTART_AFTER_DB);
+  const waitIndex = gates.findIndex((gate) => gate.id === GATE.RUNTIME_WAIT_POSTGRES);
+  assertEquals(seedIndex < restartIndex && restartIndex < waitIndex, true);
+});
+
 Deno.test('runtime suite omits database resource wait for sqlite', () => {
   const runtime = resolveSuite(SCAFFOLD.RUNTIME, { database: DATABASE.SQLITE });
   assertEquals(runtime.defaultOptions.database, DATABASE.SQLITE);
