@@ -82,12 +82,13 @@ using its recorded command/configuration and follow the exact upstream watch sig
 
 ## Gate Results
 
-| Gate            | Result  | Evidence                                                    |
-| --------------- | ------- | ----------------------------------------------------------- |
-| External export | pass    | generated Toolkit methods and successful Deno resource wait |
-| Restore graph   | pass    | seven isolated `project.assets.json` counts                 |
-| Scope           | pending | final raw diff/status before S1 commit                      |
-| Documentation   | pending | scoped format and link checks                               |
+| Gate            | Result | Evidence                                                    |
+| --------------- | ------ | ----------------------------------------------------------- |
+| External export | pass   | generated Toolkit methods and successful Deno resource wait |
+| Restore graph   | pass   | seven isolated `project.assets.json` counts                 |
+| Scope           | pass   | baseline diff contains harness research artifacts only      |
+| Documentation   | pass   | scoped format and internal-link checks                      |
+| IMPL-EVAL       | pass   | separate session `019fcf85-364e-72d2-a1ea-bdb507850da1`     |
 
 ## Handoff Notes
 
