@@ -6,11 +6,20 @@ Scope: evidence only; no scaffold-output change
 
 ## Verdict
 
-**Do not adopt either Deno integration as a mitigation for #1227.** Deno hosting does not remove the
-NuGet-shaped integration probe behind `aspire restore`. On Aspire 13.4.6, even a TypeScript AppHost
-with no configured integration packages restores a 75-library NuGet graph. Adding the stable
-CommunityToolkit Deno integration makes that 76. Adding it to today's representative NetScript
-PostgreSQL + Redis + Browsers graph makes 83 become 84. The first-party implementation in
+**Upgrade the Aspire CLI for #1227; do not make Deno adoption part of that fix.** The root cause is
+the Aspire CLI lifecycle defect fixed by
+[microsoft/aspire#18958](https://github.com/microsoft/aspire/pull/18958), not the size or Deno shape
+of NetScript's resource graph. That PR stopped leaking orphaned Aspire-managed NuGet search helper
+processes and merged on 2026-08-03 for milestone 13.5. NetScript
+[#1308](https://github.com/rickylabs/netscript/pull/1308) independently proved the diagnosis by
+running the 13.4.6 SDK restore through the fixed daily CLI: exit 0 in 13.06 seconds, with no new
+helper leaked. This supersedes the original premise that a Deno runtime path might cure #1227.
+
+As an architectural question, Deno hosting still does not reduce the NuGet-shaped integration probe
+used by `aspire restore`. On Aspire 13.4.6, even a TypeScript AppHost with no configured integration
+packages restores a 75-library NuGet graph. Adding the stable CommunityToolkit Deno integration
+makes that 76. Adding it to today's representative NetScript PostgreSQL + Redis + Browsers graph
+makes 83 become 84. The first-party implementation in
 [microsoft/aspire#18628](https://github.com/microsoft/aspire/pull/18628) is housed in the existing
 `Aspire.Hosting.JavaScript` **NuGet package**, so it has the same 84-library shape, not a zero-NuGet
 shape.
@@ -20,15 +29,17 @@ The stale source comment is wrong in a second, independent way: external `[Aspir
 `.aspire/modules/aspire.mts`, and a real resource reached Aspire's `up (running)` state. The Toolkit
 is viable now, but adopting it would slightly **increase** the restore surface implicated by #1227.
 
-The appropriate conditional recommendation is therefore:
+The recommendation is therefore:
 
-- For **#1227 / restore reliability**: do not adopt; continue treating the NuGet restore as an
-  unavoidable Aspire TypeScript AppHost bootstrap and fix or harden that path directly.
+- For **#1227 / restore reliability**: take the CLI containing #18958. Do not wait for either Deno
+  PR, add retries around the leak, or present a Deno migration as its mitigation.
 - For a **better first-party Deno resource model**: reconsider after both
   [#18627](https://github.com/microsoft/aspire/pull/18627) and
   [#18628](https://github.com/microsoft/aspire/pull/18628) merge, a stable 13.5 package/CLI pair is
   published, and a fresh TypeScript fixture proves `addDenoApp` plus the Deno AppHost resolver. That
   is a feature-quality decision, not a NuGet-elimination decision.
+- For **release coordination**: prefer one 13.5 upgrade if all three changes ship together, but do
+  not hold the #1227 CLI fix if either Deno PR misses the release cut.
 
 ## 1. External `[AspireExport]` works in 13.4.6
 
@@ -133,8 +144,9 @@ Consequently:
 - CommunityToolkit Deno increases today's measured surface from 83 to 84.
 - First-party Deno in `Aspire.Hosting.JavaScript` also increases it from 83 to 84.
 - Neither changes the mandatory 75-library TypeScript SDK/code-generation floor.
-- Replacing `addExecutable('deno', ...)` with either `addDenoApp(...)` therefore cannot dissolve the
-  #1227 restore failure class.
+- Replacing `addExecutable('deno', ...)` with either `addDenoApp(...)` therefore increases rather
+  than reduces the measured NuGet graph. That is not the cause of #1227, but it is marginally more
+  exposure to feed, cache, and CLI restore defects than the current primitive.
 
 ### Why #18627 does not change this graph
 
@@ -171,7 +183,28 @@ A C# AppHost is not an escape hatch: it consumes the same hosting integrations t
 NuGet PackageReferences. For a Deno-only graph, the useful optimization boundary is therefore
 **fewer optional integrations**, not zero NuGet.
 
-## 5. What the 13.5 PRs deliver, what blocks them, and when to expect them
+## 5. What Aspire 13.5 can deliver as one upgrade
+
+Three independent changes line up on the 13.5 milestone:
+
+| Change                                                   | Layer                                   | Current state         | Effect for NetScript                                                                              |
+| -------------------------------------------------------- | --------------------------------------- | --------------------- | ------------------------------------------------------------------------------------------------- |
+| [#18958](https://github.com/microsoft/aspire/pull/18958) | Aspire CLI NuGet helper lifecycle       | merged 2026-08-03     | fixes the diagnosed #1227 failure mechanism                                                       |
+| [#18627](https://github.com/microsoft/aspire/pull/18627) | TypeScript AppHost toolchain resolver   | open; review required | lets a Deno workspace initialize, validate, and run its AppHost through Deno rather than Node/npm |
+| [#18628](https://github.com/microsoft/aspire/pull/18628) | first-party `Aspire.Hosting.JavaScript` | open; review required | supplies `AddDenoApp` / `DenoAppResource` and their polyglot projection                           |
+
+If both open PRs merge before the stable cut, a matching stable 13.5 CLI, SDK, and
+`Aspire.Hosting.JavaScript` package is the cleanest single upgrade moment: it removes the helper
+leak, makes Deno a supported AppHost toolchain, and makes the Deno workload resource first-party in
+one compatibility-tested version family. This is coordination value, **not** NuGet elimination; the
+first-party resource still adds `Aspire.Hosting.JavaScript` to restore.
+
+Only the CLI fix is presently assured by merged code. If either Deno PR misses the cut, NetScript
+should upgrade to stable 13.5 for #18958 immediately, keep the generated
+`builder.addExecutable('deno', ...)` path, and adopt the Deno features in a later release. There is
+no reason to couple a p0 reliability fix to two unapproved feature PRs.
+
+The detailed state of the two Deno PRs follows.
 
 ### #18627 — Deno as the TypeScript AppHost runtime
 
@@ -249,30 +282,33 @@ a guessed date.
 
 Do not use milestone percentage alone. The actionable signal is all of:
 
-1. #18627 merged;
-2. #18628 merged with the polyglot call-site and OTLP publish concerns resolved;
-3. stable (not preview) Aspire CLI, `Aspire.Hosting`, and `Aspire.Hosting.JavaScript` 13.5 versions
+1. #18958 appears in the stable 13.5 CLI/release provenance, not only a daily build;
+2. #18627 is merged;
+3. #18628 is merged with the real polyglot call-site and OTLP publish concerns resolved;
+4. stable (not preview) matching Aspire CLI, SDK, and `Aspire.Hosting.JavaScript` 13.5 versions are
    published; and
-4. a cold TypeScript+Deno fixture on those exact versions generates `addDenoApp`, runs under the
-   Deno resolver, and records the NuGet graph.
+5. a cold TypeScript+Deno fixture on those exact versions leaks no helper across repeated restores,
+   selects the Deno resolver, generates and runs `addDenoApp`, and records the NuGet graph.
 
-Even when that signal fires, it changes the first-party Deno feature recommendation, **not** the
-#1227 verdict, unless upstream separately removes the managed integration-probe restore. The exact
-signal for NuGet elimination would be a released TypeScript AppHost path whose empty fixture no
-longer restores `Aspire.Hosting` and `Aspire.Hosting.CodeGeneration.TypeScript`; neither live PR
-claims or implements that.
+When all five fire, use one coordinated 13.5 upgrade. If only the first fires before the stable cut,
+upgrade for #1227 anyway and keep Deno hosting unchanged. The exact signal for NuGet elimination
+would instead be a released TypeScript AppHost path whose empty fixture no longer restores
+`Aspire.Hosting` and `Aspire.Hosting.CodeGeneration.TypeScript`; neither Deno PR claims or
+implements that.
 
 ## Recommendation on a 0.0.6 epic
 
-**Do not create a 0.0.6 epic for “Deno removes NuGet”**: the premise is disproved, and an epic would
-misdirect work away from the p0 restore failure. Track the 13.5 first-party integration with a small
-conditional follow-up issue or dependency-watch item. Create an epic only if the desired scope is
-broader—adopting first-party Deno resource semantics, telemetry, debugging, and publishing after
-13.5—not as a #1227 mitigation.
+**Do not create a 0.0.6 epic for “Deno removes NuGet.”** The premise is disproved. #1227 belongs to
+the CLI upgrade carrying #18958, already being implemented by #1308. Track #18627 and #18628 with a
+small conditional dependency-watch item unless product scope expands to adopting and validating
+first-party Deno resource semantics, telemetry, debugging, and publishing. That broader feature
+could justify an epic, but not as restore remediation.
 
-For #1227, prioritize direct restore-path evidence and mitigations: feed/timeout behavior, caching,
-bounded retries if justified, and reducing optional generated integrations where product semantics
-allow it. The 75-library floor means that shrinking from 83 does not eliminate the failure class.
+Architectural restore reduction remains possible only by omitting optional integrations where
+product semantics permit it: the representative graph falls from 83 to the 75-library core floor (or
+76 with the generator's always-present Browsers package). Adopting either Deno hosting package moves
+in the opposite direction by one library. The durable reliability action is therefore the fixed CLI;
+package trimming is a secondary exposure reduction, not a cure.
 
 ## Reproduction record
 
