@@ -10,3 +10,7 @@ branch modified and must remain unstaged.
 Implementation now updates both the scaffold convention and MCP server instructions. The runtime
 verifier follows the generated instruction through JSON-RPC and chains discovered service and
 operation identities into schema retrieval. Focused tests are green; full gates remain pending.
+
+Merge-readiness is locally green: MCP tests 110/0, scoped wrappers, quality gate, doc-lint, publish
+dry-run, and full scaffold runtime 73/0. The decisive live MCP path gate passed. Remaining work is
+the composed hosted evaluation/CI, acceptance mirror, and PR ready transition.

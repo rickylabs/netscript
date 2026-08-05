@@ -26,3 +26,25 @@
   `users` from the first result, selects an operation from the second, and supplies both to the
   third; no endpoint, port, or operation id is hardcoded.
 - Focused convention + stdio tests: 4 passed / 0 failed. Targeted E2E verifier type-check: passed.
+
+## Gate evidence
+
+| Gate | Result |
+| --- | --- |
+| MCP full package tests | PASS — 110 passed / 0 failed |
+| Scoped check | PASS — MCP 103 files; CLI touched verifier/template/runtime files |
+| Scoped lint | PASS with package configs — 0 findings; the no-config wrapper attempt was a did-not-run because canary.13's root glob workspace is rejected by Deno 2.9.3 lint |
+| Scoped format | PASS after formatting the owned verifier; 0 findings |
+| `quality:gate` | PASS — code-quality scan has 0 findings; doctrine gate has baseline warnings only |
+| MCP doc-lint | PASS — 3 entrypoints, 0 combined errors |
+| MCP publish dry-run | PASS |
+| New-ignore diff audit | PASS — no added `deno-lint-ignore`, `as unknown as`, or `@ts-ignore` |
+| Full `scaffold.runtime` | PASS — 73 passed / 0 failed with cleanup |
+
+The decisive runtime gate `behavior.mcp-endpoint-directory` passed in 11.258s under its truthful
+description, “Follow the documented MCP OpenAPI discovery path.” It read the generated app-scoped
+convention and completed all three JSON-RPC tool calls against the live Aspire-assigned `users`
+service. No hosted dependency, credential, fixed port, endpoint, service id, or operation id was
+introduced.
+
+`deno.lock` remains the pre-existing modified file and is unstaged.
