@@ -290,7 +290,29 @@ OpenRouter Claude routes run with an isolated `CLAUDE_CONFIG_DIR`, explicitly em
 `ANTHROPIC_API_KEY`, late-bound `ANTHROPIC_AUTH_TOKEN`, and the Anthropic-skin base URL from
 `config/endpoints.ts`. This prevents a cached native Claude login from silently overriding the
 gateway. `claude/claude-print.ts` is the launch/resume wrapper for non-mobile gateway sessions.
-Native Claude remote control remains a different surface.
+Native Claude Remote Control remains a different surface.
+
+For interactive OpenRouter work, `agentic:claude-openrouter` starts a loopback-only split gateway.
+Exact `/v1/messages` requests receive the configured OpenRouter credential and forced model; other
+Claude API traffic is passed to the configured Anthropic endpoint without the OpenRouter key. The
+Claude child receives neither provider API key and runs with `bypassPermissions`. The key is read
+from `OPENROUTER_API_KEY` or the same configured user env file as OpenCode and is never printed.
+
+```bash
+# New inference-only DeepSeek session.
+deno task agentic:claude-openrouter -- --cwd /home/me/repo
+
+# Fork an existing conversation without changing the original.
+deno task agentic:claude-openrouter -- \
+  --cwd /home/me/repo --resume <conversation-id> --fork-session --effort xhigh
+```
+
+This surface is deliberately **not Remote Control/mobile-visible**. Claude Code 2.1.196 and newer
+disable Remote Control when `ANTHROPIC_BASE_URL` is not `api.anthropic.com`; on 2.1.222 the daemon
+exits before making a request, while interactive `--remote-control` can stay alive without creating
+a `bridgeSessionId`. The launcher therefore rejects `--remote-control` and `--remote-session-id`
+instead of fabricating attachment. Do not work around this with TLS interception, a trusted local
+root, binary patching, or provider-managed-host flags that disable subscription login.
 
 The formal-evaluator preset additionally replaces `ANTHROPIC_BASE_URL` in the spawned evaluator
 environment with a loopback request guard. Every model-bearing request must name a model in
