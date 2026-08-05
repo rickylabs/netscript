@@ -31,13 +31,13 @@ privileged scrub after the second Postgres corrupted the shared data directory.
 ```acceptance-evidence
 issue: 1310
 entries:
-  - box-index: 0
-    evidence: "3efb1052d: runner starts netscript-db-<key> in the exact resident apphost; focused test forbids aspire start and nested apphost paths."
   - box-index: 1
-    evidence: "3efb1052d: transient db-operation project and mutator were removed; absent resident AppHost now fails closed, so no standalone stateful fallback exists."
+    evidence: "3efb1052d: runner starts netscript-db-<key> in the exact resident apphost; focused test forbids aspire start and nested apphost paths."
   - box-index: 2
-    evidence: "3efb1052d + 18910bd52: quickstart holds one PGDATA bind owner across init/generate/seed and runs read-only pg_controldata after teardown; full runtime passed all three DB gates."
+    evidence: "3efb1052d: transient db-operation project and mutator were removed; absent resident AppHost now fails closed, so no standalone stateful fallback exists."
   - box-index: 3
+    evidence: "3efb1052d + 18910bd52: quickstart holds one PGDATA bind owner across init/generate/seed and runs read-only pg_controldata after teardown; full runtime passed all three DB gates."
+  - box-index: 4
     evidence: "3efb1052d: quickstart, migration guide, and storefront tutorial document resident explicit resources and no second Postgres."
 ```
 
