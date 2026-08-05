@@ -78,6 +78,12 @@ blast radius is 18 packages + lock), #1293, #1296, #1262, #1263, #1243.
 
 ## Key mechanics (do not relearn)
 
+- **TRAIN PRs (base `canary/**`): `closingIssuesReferences` is ALWAYS `[]`** — GitHub only
+  computes closing refs for PRs targeting the default branch. Do NOT read that as a missing
+  keyword; check the PR body for `Closes #N` instead. The close-gate itself is unaffected:
+  `resolveClosingIssueReferences` unions the API set with body keywords and commit messages
+  (this is #1188, merged 2026-08-05 — it is what makes the train strategy safe; without it a
+  train PR would have an empty closing set and the acceptance gate would pass vacuously).
 - Required contexts: quality, check-test, deps-report, close-gate. Latest-per-name via
   `commits/<sha>/check-runs?filter=latest`; job truth via `runs/<id>/jobs?filter=latest`.
 - **Acceptance evidence: use `box-index`, never `box:` text** — ticking a box appends a
