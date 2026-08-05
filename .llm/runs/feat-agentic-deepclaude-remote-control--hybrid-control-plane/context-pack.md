@@ -30,16 +30,21 @@ tasks to credential-isolated OpenRouter workers.
   `deno.lock` is unchanged.
 - Real OpenCode JSON and production-adapter DeepSeek canaries returned exact
   `HYBRID_JSON_SHAPE_OK` and `HYBRID_ADAPTER_OK` sentinels.
+- Slice 2 implements a minimal standalone MCP stdio server with cancellation ownership and the
+  native interactive Remote Control launcher with credential stripping, mode-0600 ephemeral
+  config, bounded process cleanup, and fail-closed session-registry bridge evidence.
+- Slice 2 focused protocol/lifecycle plus existing hybrid/volatile tests pass (32/32); scoped
+  check/lint/fmt are clean and `deno.lock` remains unchanged.
 
 ## In Progress
 
-- Slice 2: MCP protocol server and native interactive Remote Control lifecycle.
+- Slice 2 sign-off commit, then coordinated live hybrid Remote Control canary.
 
 ## Next Steps
 
-1. Implement MCP initialize/list/call/cancellation protocol over newline stdio.
-2. Implement the native `claude --remote-control` launcher with ephemeral config and cleanup.
-3. Run protocol/lifecycle tests and a native bridge plus delegated DeepSeek canary.
+1. Commit/push/comment the reviewed Slice 2.
+2. Start one tmux-hosted native hybrid session and prove bridge plus MCP tool availability.
+3. Send a mobile-visible delegation prompt and verify the exact DeepSeek sentinel.
 
 ## Key Decisions
 

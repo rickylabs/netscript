@@ -5,7 +5,12 @@ import {
   HYBRID_DELEGATION_MODEL_IDS,
   type HybridDelegationModelId,
 } from '../config/models.ts';
+import { HYBRID_MCP_PROTOCOL_VERSION, HYBRID_MCP_SERVER_VERSION } from '../config/versions.ts';
 import { type Effort, EFFORTS } from '../runtime/contract.ts';
+
+export const HYBRID_MCP_SERVER_NAME = 'netscript-hybrid';
+export const HYBRID_MCP_TOOL_NAME = 'delegate_openrouter';
+export { HYBRID_MCP_PROTOCOL_VERSION, HYBRID_MCP_SERVER_VERSION };
 
 export interface HybridDelegationLimits {
   readonly taskBytes: number;
