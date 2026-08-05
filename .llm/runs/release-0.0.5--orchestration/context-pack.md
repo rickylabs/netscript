@@ -28,6 +28,36 @@ independent verdicts against the **published** CLI inside `e2e-cli-prod.yml`.
 
 Runs: 30959430176 (step 4 PASS 22.3s), 30961102523 (step 4 FAIL 180.1s).
 
+
+## PAUSED 2026-08-05 11:05 CEST — owner called a usage pause. Resume on their word.
+
+**Nothing is mid-flight that breaks.** All watchers stopped (PR watcher, JSR ticket poll, gate
+waiters) so nothing wakes this session. Codex lanes keep working independently.
+
+**On resume, in order:**
+1. Gate the four train PRs — **#1315** (#1295 Zod), **#1316** (#1189 plugin seam),
+   **#1317** (#1117 MCP OpenAPI), **#1318** (#1115 agent follow) — all based on
+   `canary/0.0.5-canary.13`. **Remember: `closingIssuesReferences` is `[]` on train PRs; read
+   the body for `Closes #N`.** These are the FIRST train merges — confirm the close-gate really
+   resolves acceptance from the body keyword before trusting it.
+2. **#1316 carries an honestly-unticked box 5** (live catalog→fixture request + OTEL) — the
+   slice refused to start a third AppHost while foreign ones ran. Needs a free slot or
+   `--isolated`; do not tick it without the runtime evidence.
+3. Re-arm the JSR ticket poll (token at `~/.config/jsr-ticket-token`, curl config at
+   `~/.config/jsr-curl.cfg`) — **and remind the owner to revoke that token**, it was pasted in
+   chat.
+4. Two owner decisions outstanding: **#1295** rescope (TanStack cluster upgrade vs kvdex vs a
+   documented two-instance boundary — I advise against the canary-AG-UI trade), and **#1149**
+   (accept 0.0.5 evidence against 0.0.4-worded criteria, or rewrite the criteria).
+
+**LIVE ISSUE the owner must decide on, not me:** two Postgres containers share one PGDATA at
+`/home/codex/repos/w6-planning-board/w6-board/.data/postgres` (`postgres-750e2409`,
+`postgres-45ba5b03`), with an orphaned `db-operation` AppHost up 6h — **#1310 in the wild** on
+the wave-6 board. The owner authorised killing stale parallel-agent processes; I was stopping
+ONLY the orphan (`aspire stop --apphost .../aspire/db-operation/apphost.mts`) and left the
+resident host alone, when the pause landed. Not done. That project predates #1311 so it does
+not carry the fix.
+
 ## Immediate actions
 
 1. **#1227 ROOT-CAUSED — it is upstream, not ours.** `microsoft/aspire#18958` ("Stop leaking
