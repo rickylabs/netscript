@@ -5,6 +5,14 @@ export const ASPIRE_TIMEOUT_CLASSIFICATION = {
   WAIT: 'quickstart.aspire.wait.timeout:#1227',
 } as const;
 
+/** Maximum attempts for the observed Aspire bundled-NuGet cancellation. */
+export const ASPIRE_RESTORE_MAX_ATTEMPTS = 2;
+
+const ASPIRE_RESTORE_CANCELED_MARKERS = [
+  'Failed to prepare: A task was canceled.',
+  'Failed to prepare AppHost server.',
+] as const;
+
 /** Minimal subprocess result consumed by the bounded Aspire walk. */
 export interface AspireCommandResult {
   readonly code: number;
@@ -28,7 +36,7 @@ export async function runBoundedAspireWalk(
   run: AspireCommandRunner = runAspireCommand,
 ): Promise<void> {
   const aspireRoot = `${projectRoot}/aspire`;
-  await requireAspireSuccess(
+  await requireAspireRestoreSuccess(
     ['aspire', 'restore', '--apphost', appHost, '--non-interactive', '--nologo'],
     aspireRoot,
     timeoutMs,
@@ -61,6 +69,37 @@ export async function runBoundedAspireWalk(
     ASPIRE_TIMEOUT_CLASSIFICATION.WAIT,
     run,
   );
+}
+
+/** Identifies the exit-6 failure emitted by Aspire's bundled NuGet restore. */
+export function isRetryableAspireRestoreCancellation(result: AspireCommandResult): boolean {
+  return result.code === 6 &&
+    ASPIRE_RESTORE_CANCELED_MARKERS.every((marker) => result.stderr.includes(marker));
+}
+
+async function requireAspireRestoreSuccess(
+  command: readonly string[],
+  cwd: string,
+  timeoutMs: number,
+  timeoutClassification: string,
+  run: AspireCommandRunner,
+): Promise<void> {
+  for (let attempt = 1; attempt <= ASPIRE_RESTORE_MAX_ATTEMPTS; attempt++) {
+    const result = await run(command, cwd, timeoutMs);
+    if (result.timedOut) throw new Error(timeoutClassification);
+    if (result.code === 0) {
+      if (result.stdout) console.info(result.stdout);
+      return;
+    }
+    if (!isRetryableAspireRestoreCancellation(result) || attempt === ASPIRE_RESTORE_MAX_ATTEMPTS) {
+      throw new Error(`${command[0]} ${command[1]} failed (${result.code}): ${result.stderr}`);
+    }
+    console.warn(
+      `Aspire bundled NuGet restore canceled; retrying (${
+        attempt + 1
+      }/${ASPIRE_RESTORE_MAX_ATTEMPTS}).`,
+    );
+  }
 }
 
 async function requireAspireSuccess(

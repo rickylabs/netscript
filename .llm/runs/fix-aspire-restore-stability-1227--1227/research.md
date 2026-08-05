@@ -28,3 +28,12 @@ attempts, infrastructure classification, and an exact Aspire 13.4.6 NuGet cache 
   feed?
 - What consecutive-run count is feasible and sufficient? Lock after observing the diagnostic run.
 
+## Root-cause evidence
+
+The two retained local Aspire logs for the byte-identical signature
+(`cli_20260804T092654_7dc37fe7.log` and `cli_20260804T094300_8a06ef75.log`) both stop inside
+`BundleNuGetService.RestorePackagesAsync`. The command is the bundled `aspire-managed nuget restore`
+for five exact packages: Hosting, PostgreSQL, Redis, Browsers preview, and TypeScript codegen. No
+container operation has begun. Runs 30959430176 and 30961102523 both report a cache miss for the v1
+key; because each overall job failed, the cache post-save never established that key. Classification:
+NuGet/feed latency amplified by a cache lifecycle defect.

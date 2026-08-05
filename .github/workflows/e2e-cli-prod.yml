@@ -20,8 +20,46 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  prepare-aspire-sdk-cache:
+    name: prepare pinned Aspire SDK cache
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore pinned Aspire SDK cache
+        id: aspire-sdk-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-aspire-${{ runner.os }}-13.4.6-v2
+
+      - name: Populate exact Aspire SDK packages
+        if: steps.aspire-sdk-cache.outputs.cache-hit != 'true'
+        run: >-
+          dotnet restore .github/aspire-cache/AspireSdkCache.csproj
+          --packages "$HOME/.nuget/packages"
+          --source https://api.nuget.org/v3/index.json
+          --source https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet9/nuget/v3/index.json
+
+      - name: Verify exact Aspire SDK packages
+        run: |
+          test -f "$HOME/.nuget/packages/aspire.hosting/13.4.6/aspire.hosting.13.4.6.nupkg"
+          test -f "$HOME/.nuget/packages/aspire.hosting.postgresql/13.4.6/aspire.hosting.postgresql.13.4.6.nupkg"
+          test -f "$HOME/.nuget/packages/aspire.hosting.redis/13.4.6/aspire.hosting.redis.13.4.6.nupkg"
+          test -f "$HOME/.nuget/packages/aspire.hosting.browsers/13.4.6-preview.1.26319.6/aspire.hosting.browsers.13.4.6-preview.1.26319.6.nupkg"
+          test -f "$HOME/.nuget/packages/aspire.hosting.codegeneration.typescript/13.4.6/aspire.hosting.codegeneration.typescript.13.4.6.nupkg"
+
   scaffold-runtime-jsr:
     name: scaffold-runtime (published JSR CLI)
+    needs: prepare-aspire-sdk-cache
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     timeout-minutes: 75
@@ -43,7 +81,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.nuget/packages
-          key: nuget-aspire-${{ runner.os }}-13.4.6-v1
+          key: nuget-aspire-${{ runner.os }}-13.4.6-v2
 
       - name: Install Aspire CLI
         env:

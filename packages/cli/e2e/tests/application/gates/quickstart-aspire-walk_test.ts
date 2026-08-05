@@ -1,7 +1,9 @@
 import { assertEquals, assertRejects } from '@std/assert';
 import {
+  ASPIRE_RESTORE_MAX_ATTEMPTS,
   ASPIRE_TIMEOUT_CLASSIFICATION,
   type AspireCommandResult,
+  isRetryableAspireRestoreCancellation,
   runBoundedAspireWalk,
 } from '../../../src/application/gates/quickstart/aspire-walk.ts';
 
@@ -50,4 +52,36 @@ Deno.test('bounded Aspire walk classifies start timeout independently', async ()
     ASPIRE_TIMEOUT_CLASSIFICATION.START,
   );
   assertEquals(calls, 2);
+});
+
+Deno.test('bounded Aspire walk retries only the observed exit-6 restore cancellation', async () => {
+  let calls = 0;
+  await runBoundedAspireWalk('/project/aspire/apphost.mts', '/project', 42_000, (command) => {
+    calls++;
+    if (command[1] === 'restore' && calls === 1) {
+      return Promise.resolve({
+        ...PASS,
+        code: 6,
+        stderr: 'Failed to prepare: A task was canceled.\nFailed to prepare AppHost server.',
+      });
+    }
+    return Promise.resolve(PASS);
+  });
+  assertEquals(ASPIRE_RESTORE_MAX_ATTEMPTS, 2);
+  assertEquals(calls, 4);
+});
+
+Deno.test('Aspire restore retry predicate rejects product and partial failures', () => {
+  assertEquals(
+    isRetryableAspireRestoreCancellation({ ...PASS, code: 1, stderr: 'product red' }),
+    false,
+  );
+  assertEquals(
+    isRetryableAspireRestoreCancellation({
+      ...PASS,
+      code: 6,
+      stderr: 'Failed to prepare: A task was canceled.',
+    }),
+    false,
+  );
 });

@@ -35,10 +35,17 @@
 
 ## Open-decision sweep
 
-- Exact retry signature/package paths/N: must resolve from the diagnostic run before slice 2.
+- Consecutive-run count: three; enough to reject the observed alternating/lucky-single-pass pattern
+  while keeping the p0 proof bounded.
 - Log retention duration: safe to defer to Actions defaults.
 
 ## Deferred scope
 
 - Aspire CLI upstream repair; this lane makes the NetScript quickstart resilient and diagnosable.
 
+## Slice 2 decision
+
+- Cache preparation is a separate prerequisite job so its post-save completes before product E2E
+  begins. It restores and verifies all five exact packages under a new v2 key.
+- Quickstart restore retries once only when exit code is 6 and stderr contains both observed Aspire
+  preparation-cancellation markers. Timeouts, product exit codes, and partial matches do not retry.

@@ -17,4 +17,7 @@
 
 - 2026-08-05: re-baselined issue comment, PR #1297, failed run 30961102523, and artifact 8913213616.
 - D6 owner ruling composes evaluation; no local PLAN-EVAL was spawned.
-
+- 2026-08-05: local logs for the same signature identify bundled NuGet restore, before containers.
+  Both cloud evidence runs missed the v1 cache and ended before Actions could save it.
+- 2026-08-05: S2 adds a prerequisite cache-population job with five exact package assertions and a
+  two-attempt predicate restricted to exit 6 plus both preparation-cancellation markers.
