@@ -9,7 +9,7 @@ import {
   runRemoteModelLauncher,
 } from './remote-model-launcher.ts';
 
-Deno.test('new remote daemon uses the supported subcommand without model or effort flags', () => {
+Deno.test('new inference session uses the configured model and mandatory bypass mode', () => {
   const options = parseRemoteModelLaunchOptions([
     '--',
     '--cwd',
@@ -19,9 +19,10 @@ Deno.test('new remote daemon uses the supported subcommand without model or effo
   ]);
   assertEquals(options.model, OPENROUTER_MODEL_IDS.deepseekV4Flash0731);
   assertEquals(remoteModelClaudeArguments(options), [
-    'remote-control',
-    '--spawn',
-    'same-dir',
+    '--model',
+    OPENROUTER_MODEL_IDS.deepseekV4Flash0731,
+    '--effort',
+    'xhigh',
     '--permission-mode',
     'bypassPermissions',
     '--name',
@@ -29,18 +30,7 @@ Deno.test('new remote daemon uses the supported subcommand without model or effo
   ]);
 });
 
-Deno.test('remote daemon session resume omits incompatible spawn flags', () => {
-  const options = parseRemoteModelLaunchOptions(['--remote-session-id', 'remote-session']);
-  assertEquals(remoteModelClaudeArguments(options), [
-    'remote-control',
-    '--permission-mode',
-    'bypassPermissions',
-    '--session-id',
-    'remote-session',
-  ]);
-});
-
-Deno.test('conversation fork uses interactive remote control with model and effort', () => {
+Deno.test('conversation fork uses inference-only resume with model and effort', () => {
   const options = parseRemoteModelLaunchOptions([
     '--resume',
     'conversation-id',
@@ -60,7 +50,7 @@ Deno.test('conversation fork uses interactive remote control with model and effo
     'high',
     '--permission-mode',
     'bypassPermissions',
-    '--remote-control',
+    '--name',
     'fork name',
   ]);
 });
@@ -68,9 +58,9 @@ Deno.test('conversation fork uses interactive remote control with model and effo
 Deno.test('launcher rejects unsafe or contradictory session combinations', () => {
   assertThrows(() => parseRemoteModelLaunchOptions(['--fork-session']), Error, 'requires --resume');
   assertThrows(
-    () => parseRemoteModelLaunchOptions(['--resume', 'one', '--remote-session-id', 'two']),
+    () => parseRemoteModelLaunchOptions(['--remote-control']),
     Error,
-    'cannot be combined',
+    'unsupported',
   );
   assertThrows(
     () => parseRemoteModelLaunchOptions(['--name', 'line\nbreak']),

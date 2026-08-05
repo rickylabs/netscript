@@ -20,3 +20,17 @@
 - **Severity:** minor
 - **Action:** accept
 - **Evidence:** `supervisor.md` recorded lane constraint.
+
+## 2026-08-05 — Remote Control goal rescoped to inference-only
+
+- **What:** Remove Remote Control daemon/attachment modes and rename the task to
+  `agentic:claude-openrouter`.
+- **Source:** Claude 2.1.222 live daemon exit, missing interactive `bridgeSessionId`, and independent
+  OpenCode/Grok 4.5 high `FAIL_RESCOPE`.
+- **Expected:** Split loopback gateway would preserve Anthropic control traffic while routing model
+  inference to OpenRouter.
+- **Actual:** Claude rejects a custom base before daemon startup; interactive mode silently omits
+  attachment. Path routing beneath the official hostname requires forbidden TLS interception.
+- **Severity:** architectural
+- **Action:** rescope
+- **Evidence:** `grok-review.md`, live registry comparison, official Remote Control contract.

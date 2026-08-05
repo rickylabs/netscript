@@ -76,6 +76,26 @@ Deno.test('malformed exact model requests fail closed without an upstream fetch'
   assertEquals(seen, []);
 });
 
+Deno.test('oversized exact model requests fail closed before buffering', async () => {
+  const seen: Request[] = [];
+  const response = await handler(seen)(
+    new Request(`${localBase}/v1/messages`, {
+      method: 'POST',
+      headers: { 'content-length': String(16 * 1024 * 1024 + 1) },
+      body: '{}',
+    }),
+  );
+  assertEquals(response.status, 413);
+  assertEquals(seen, []);
+});
+
+Deno.test('trailing-slash messages path is not classified as model inference', async () => {
+  const seen: Request[] = [];
+  await handler(seen)(new Request(`${localBase}/v1/messages/`));
+  assertEquals(seen[0].url, `${ANTHROPIC_API_BASE_URL}/v1/messages/`);
+  assertEquals(seen[0].headers.has('authorization'), false);
+});
+
 Deno.test('gateway returns the upstream streaming response without rebuilding it', async () => {
   const seen: Request[] = [];
   const stream = new ReadableStream({

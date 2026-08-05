@@ -1,4 +1,9 @@
-# Plan: Claude Remote Control split model gateway
+# Plan: Claude OpenRouter inference gateway
+
+> **Rescope addendum (2026-08-05):** Grok's independent runtime review proved Remote Control plus a
+> custom inference endpoint impossible on Claude Code 2.1.222 within the security contract. This
+> addendum supersedes earlier Remote Control goals and daemon modes. The product is an
+> inference-only new/resume/fork launcher that explicitly rejects Remote Control flags.
 
 ## Run Metadata
 
@@ -24,24 +29,25 @@ the governing contracts.
 
 ## Goal
 
-Provide a first-class NetScript command that starts Claude Code with Anthropic Remote Control while
-routing model inference to an explicitly selected OpenRouter model, including safe fork/resume,
-bypass-permission launch, credential isolation, cleanup, and auditable tests.
+Provide a first-class NetScript command that starts an inference-only Claude Code session with an
+explicit OpenRouter model, including safe new/resume/fork modes, bypass permissions, credential
+isolation, cleanup, and auditable rejection of unsupported Remote Control.
 
 ## Scope
 
 - Add the DeepSeek V4 Flash 0731 model identifier to central configuration.
 - Add a split gateway with exact request classification, forced model selection, upstream-specific
-  authentication, streamed response forwarding, loopback-only binding, and secret-blind evidence.
-- Add a lifecycle launcher for resume/fork, bypass permissions, effort, working directory, and
-  Remote Control.
+  authentication, streamed response forwarding, and loopback-only binding.
+- Add a lifecycle launcher for new/resume/fork, bypass permissions, effort, and working directory.
+- Reject Remote Control options with the versioned platform constraint instead of claiming mobile
+  attachment.
 - Add focused unit/integration tests, a root task, and operator/Claude-manager documentation.
 - Run a live forked canary without mutating the original conversation.
 
 ## Non-Scope
 
 - No third-party proxy installation or copied implementation.
-- No transcript synchronization outside Claude's supported Remote Control channel.
+- No Remote Control/mobile attachment while Claude rejects custom model endpoints.
 - No LAN listener, model hot-switching, cost accounting, or generic arbitrary upstream URL.
 - No mutation or termination of the existing `loopback-deepseek-0731` canary.
 
@@ -62,7 +68,7 @@ bypass-permission launch, credential isolation, cleanup, and auditable tests.
 | D3 | Hold the OpenRouter key only in the gateway process; child Claude receives no alternate-provider key. | credential non-interference |
 | D4 | Bind `127.0.0.1` on an ephemeral port and allow only configured upstreams. | least exposure and no SSRF surface |
 | D5 | Separate pure routing/launch planning from Deno network/process adapters. | SOLID testability and lifecycle clarity |
-| D6 | Use `claude remote-control` for new sessions and the interactive `--remote-control` path for fork/resume if required by Claude's CLI contract. | preserve supported session semantics |
+| D6 | Launch inference-only sessions and fail closed on Remote Control options. | current Claude cannot combine subscription attachment with a custom model base safely |
 
 ## Open-Decision Sweep
 
@@ -115,7 +121,7 @@ bypass-permission launch, credential isolation, cleanup, and auditable tests.
 | 3 | volatile values | `deno test .../config/no-hardcoded-volatile_test.ts` | pass |
 | 4 | agentic regression | relevant Claude/runtime/config tests | pass |
 | 5 | docs/tasks | docs maintenance and task invocation smoke | pass |
-| 6 | runtime | launch a forked DeepSeek session with bypass and Remote Control | attached URL or precisely classified blocker |
+| 6 | runtime | resume the forked DeepSeek session with bypass and request an exact sentinel | OpenRouter response plus no Remote Control claim |
 | 7 | adversarial | OpenCode `openrouter/x-ai/grok-4.5`, variant high | findings addressed or recorded |
 | 8 | IMPL-EVAL | formal Qwen evaluator in a separate session | PASS |
 

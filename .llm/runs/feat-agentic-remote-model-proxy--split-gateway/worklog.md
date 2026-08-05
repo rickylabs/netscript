@@ -13,20 +13,21 @@
 
 ### Public Surface
 
-- Root task launching a Claude Remote Control session through a split model gateway.
+- Root task launching an inference-only Claude OpenRouter session through a split model gateway
+  (supersedes the pre-rescope Remote Control surface).
 - Pure handler and launch-plan functions exported for focused tests and reuse.
 
 ### Domain Vocabulary
 
-- `ModelGatewayPolicy` — immutable path/upstream/model routing authority.
-- `ModelGatewayPorts` — fetch, credential, time, and audit boundaries.
-- `ClaudeRemoteLaunchPlan` — validated argv and child environment without secrets in evidence.
-- `ClaudeRemoteGateway` — loopback server lifecycle handle.
+- `RemoteModelGatewayOptions` — immutable model and privately held credential inputs.
+- `RemoteModelGatewayPorts` — upstream fetch boundary.
+- `RemoteModelLaunchOptions` — validated inference-only argv inputs.
+- `RemoteModelGateway` — loopback server lifecycle handle.
 
 ### Ports
 
 - upstream fetch port — streams requests and responses without coupling policy to `fetch`.
-- credential resolver port — obtains only the OpenRouter key at the gateway edge.
+- shared credential resolver — obtains only the OpenRouter key at the gateway edge.
 - child process port — owns Claude spawn/status/signal lifecycle.
 
 ### Constants
@@ -58,6 +59,8 @@ typed identifier; do not add endpoint or model literals to the launcher.
 | 2026-08-05 | pre-implementation | research/design | no implementation files changed; awaiting PLAN-EVAL                                                                                                                                     |
 | 2026-08-05 | slice 1            | implementation  | Added the split gateway, validated Remote Control launcher, shared credential resolver, central configuration, root task, and focused tests. Awaiting Tier-A slice review and sign-off. |
 | 2026-08-05 | slice 1 | Tier-A review | Found and fixed API-auth precedence leaking into the OAuth-only child; independently reran 25 tests and scoped check/lint/fmt with zero findings. Slice accepted for commit. |
+| 2026-08-05 | slice 2 | live canary | Remote Control daemon exited on the custom-base guard; interactive fork had no `bridgeSessionId`. OpenCode/Grok returned `FAIL_RESCOPE`. |
+| 2026-08-05 | slice 2 | rescope canary | Renamed/restricted the launcher to inference-only, added size/route guards and docs, then resumed fork `9863df69-98b0-4d11-b15d-9bb0115f9301`; DeepSeek returned exact sentinel `OPENROUTER_CANARY_OK` with bypass active. |
 
 ## Gate Results
 
@@ -70,6 +73,9 @@ typed identifier; do not add endpoint or model literals to the launcher.
 | volatile-value guard                               | PASS   | included in focused run; 4 passed, 0 failed                                              |
 | provider/task regressions                          | PASS   | 13 passed, 0 failed                                                                      |
 | root task invalid-input smoke                      | PASS   | rejected an unconfigured model with exit code 2 before credential/network/process access |
+| OpenCode/Grok 4.5 high adversarial review | FAIL_RESCOPE → addressed | Remote Control claim removed; inference-only contract and explicit rejection implemented |
+| live inference canary | PASS | tmux `loopback-deepseek-openrouter`; exact `OPENROUTER_CANARY_OK` through DeepSeek |
+| Remote Control compatibility | UNSUPPORTED | Claude 2.1.222 daemon exits; interactive registry lacks `bridgeSessionId` |
 
 ## Handoff Notes
 

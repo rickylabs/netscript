@@ -1,4 +1,4 @@
-/** Launches Claude Remote Control behind the credential-isolated model gateway. */
+/** Launches an inference-only Claude session behind the credential-isolated model gateway. */
 
 import { OPENROUTER_MODEL_IDS } from '../config/models.ts';
 import { type Effort, EFFORTS } from '../runtime/contract.ts';
@@ -12,7 +12,6 @@ export interface RemoteModelLaunchOptions {
   readonly name?: string;
   readonly resume?: string;
   readonly forkSession: boolean;
-  readonly remoteSessionId?: string;
 }
 
 interface ManagedClaudeProcess {
@@ -59,7 +58,6 @@ export function parseRemoteModelLaunchOptions(args: readonly string[]): RemoteMo
   let effort: Effort = 'xhigh';
   let name: string | undefined;
   let resume: string | undefined;
-  let remoteSessionId: string | undefined;
   let forkSession = false;
   for (let index = 0; index < args.length; index++) {
     const argument = args[index];
@@ -71,10 +69,12 @@ export function parseRemoteModelLaunchOptions(args: readonly string[]): RemoteMo
       name = safeText(requiredValue(args, index++, argument), argument);
     } else if (argument === '--resume') {
       resume = safeText(requiredValue(args, index++, argument), argument);
-    } else if (argument === '--remote-session-id') {
-      remoteSessionId = safeText(requiredValue(args, index++, argument), argument);
     } else if (argument === '--fork-session') forkSession = true;
-    else throw new Error(`Unknown argument: ${argument}`);
+    else if (argument === '--remote-control' || argument === '--remote-session-id') {
+      throw new Error(
+        'Remote Control with a custom model endpoint is unsupported by Claude Code >=2.1.196',
+      );
+    } else throw new Error(`Unknown argument: ${argument}`);
   }
   const configuredModels = Object.values(OPENROUTER_MODEL_IDS) as readonly string[];
   if (!configuredModels.includes(model)) {
@@ -82,9 +82,6 @@ export function parseRemoteModelLaunchOptions(args: readonly string[]): RemoteMo
   }
   if (!EFFORTS.includes(effort)) throw new Error('--effort is invalid');
   if (forkSession && !resume) throw new Error('--fork-session requires --resume');
-  if (remoteSessionId && (resume || forkSession)) {
-    throw new Error('--remote-session-id cannot be combined with --resume or --fork-session');
-  }
   return {
     model: model as RemoteModelLaunchOptions['model'],
     cwd,
@@ -92,25 +89,13 @@ export function parseRemoteModelLaunchOptions(args: readonly string[]): RemoteMo
     ...(name ? { name } : {}),
     ...(resume ? { resume } : {}),
     forkSession,
-    ...(remoteSessionId ? { remoteSessionId } : {}),
   };
 }
 
-/** Builds supported Claude argv for new-daemon and conversation resume/fork modes. */
+/** Builds supported inference-only Claude argv for new, resume, and fork modes. */
 export function remoteModelClaudeArguments(options: RemoteModelLaunchOptions): string[] {
-  if (!options.resume) {
-    return [
-      'remote-control',
-      ...(options.remoteSessionId ? [] : ['--spawn', 'same-dir']),
-      '--permission-mode',
-      'bypassPermissions',
-      ...(options.name ? ['--name', options.name] : []),
-      ...(options.remoteSessionId ? ['--session-id', options.remoteSessionId] : []),
-    ];
-  }
   return [
-    '--resume',
-    options.resume,
+    ...(options.resume ? ['--resume', options.resume] : []),
     ...(options.forkSession ? ['--fork-session'] : []),
     '--model',
     options.model,
@@ -118,7 +103,7 @@ export function remoteModelClaudeArguments(options: RemoteModelLaunchOptions): s
     options.effort,
     '--permission-mode',
     'bypassPermissions',
-    ...(options.name ? ['--remote-control', options.name] : ['--remote-control']),
+    ...(options.name ? ['--name', options.name] : []),
   ];
 }
 

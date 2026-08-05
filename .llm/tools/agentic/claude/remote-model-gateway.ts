@@ -8,6 +8,7 @@ import {
 } from '../config/endpoints.ts';
 
 const MODEL_PATH = '/v1/messages';
+const MAX_MODEL_REQUEST_BYTES = 16 * 1024 * 1024;
 const HOP_BY_HOP_HEADERS = new Set([
   'connection',
   'keep-alive',
@@ -78,14 +79,27 @@ function malformedModelResponse(): Response {
   }, { status: 400 });
 }
 
+function oversizedModelResponse(): Response {
+  return Response.json({
+    error: {
+      type: 'model_request_too_large',
+      message: 'model request exceeds the gateway limit',
+    },
+  }, { status: 413 });
+}
+
 async function openRouterRequest(
   request: Request,
   options: RemoteModelGatewayOptions,
 ): Promise<Request | null> {
   if (request.method === 'GET' || request.method === 'HEAD') return null;
+  const declaredLength = Number(request.headers.get('content-length'));
+  if (Number.isFinite(declaredLength) && declaredLength > MAX_MODEL_REQUEST_BYTES) return null;
   let body: unknown;
   try {
-    body = await request.arrayBuffer().then((bytes) => JSON.parse(new TextDecoder().decode(bytes)));
+    const bytes = await request.arrayBuffer();
+    if (bytes.byteLength > MAX_MODEL_REQUEST_BYTES) return null;
+    body = JSON.parse(new TextDecoder().decode(bytes));
   } catch {
     return null;
   }
@@ -112,6 +126,10 @@ export function createRemoteModelGatewayHandler(
     const incoming = new URL(request.url);
     let upstream: Request;
     if (incoming.pathname === MODEL_PATH) {
+      const declaredLength = Number(request.headers.get('content-length'));
+      if (Number.isFinite(declaredLength) && declaredLength > MAX_MODEL_REQUEST_BYTES) {
+        return oversizedModelResponse();
+      }
       const modelRequest = await openRouterRequest(request, options);
       if (!modelRequest) return malformedModelResponse();
       upstream = modelRequest;

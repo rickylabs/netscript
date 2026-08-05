@@ -12,8 +12,9 @@
 
 ## Current State
 
-Slice 1 passed Tier-A substantive review after fixing child auth-source scrubbing. Focused/static
-gates pass. No live Remote Control canary has run.
+The original Remote Control goal was rescoped after a live failure and Grok `FAIL_RESCOPE`.
+The branch now provides a truthful inference-only OpenRouter launcher; 26 tests and static gates
+pass, and a live DeepSeek sentinel canary succeeded.
 
 ## Completed
 
@@ -24,13 +25,13 @@ gates pass. No live Remote Control canary has run.
 
 ## In Progress
 
-- Slice 1 commit, explicit-refspec push, and draft PR opening.
+- Revised Plan-Gate and post-rescope commit.
 
 ## Next Steps
 
-1. Review, commit, and push slice 1; open the draft PR and record the slice comment.
-2. Integrate docs and run the live forked canary.
-3. Run the owner-requested Grok/OpenCode adversarial review.
+1. Run revised local Plan-Gate through OpenCode/Qwen.
+2. Commit and push rescope/docs/canary evidence.
+3. Run formal local IMPL-EVAL and GitHub checks.
 
 ## Key Decisions
 
@@ -59,7 +60,8 @@ gates pass. No live Remote Control canary has run.
 | Focused tests                            | PASS           | 25 passed, 0 failed                                       |
 | Scoped check/lint/fmt                    | PASS           | 12 files, 0 findings each                                 |
 | Volatile/config and provider regressions | PASS           | 4 + 13 tests passed                                       |
-| Runtime canary                           | not run        | supervisor-owned slice 2 action                           |
+| Runtime canary                           | PASS | exact sentinel in `loopback-deepseek-openrouter` |
+| Remote Control | UNSUPPORTED | current Claude custom-base guard; no attachment claim |
 
 ## Open Questions
 
