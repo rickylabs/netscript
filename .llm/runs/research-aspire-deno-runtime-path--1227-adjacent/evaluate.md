@@ -1,219 +1,177 @@
 **[PHASE: IMPL-EVAL] [VERDICT: PASS]**
 
-# IMPL-EVAL — Aspire Deno runtime / NuGet research
+# IMPL-EVAL cycle 2 — Aspire Deno runtime / NuGet research
 
 ## Metadata
 
-| Field               | Value                                                                                 |
-| ------------------- | ------------------------------------------------------------------------------------- |
-| Run                 | `research-aspire-deno-runtime-path--1227-adjacent`                                    |
-| Target              | Draft PR [rickylabs/netscript#1307](https://github.com/rickylabs/netscript/pull/1307) |
-| Baseline            | `00f96af76e5825422e8bc716a9c27d4c13e16f7f`                                            |
-| Inspected commit    | `e20940838f2c55a65d27445d2e26f04919bffec0`                                            |
-| Archetype / overlay | Archetype 6 subject; `docs`-only changeset                                            |
-| Evaluator route     | `openai / gpt-5.6-sol / xhigh`                                                        |
-| Evaluator session   | `019fcf85-364e-72d2-a1ea-bdb507850da1`                                                |
-| Evaluation date     | 2026-08-05                                                                            |
+| Field                    | Value                                                                                  |
+| ------------------------ | -------------------------------------------------------------------------------------- |
+| Run                      | `research-aspire-deno-runtime-path--1227-adjacent`                                     |
+| Target                   | Draft PR [rickylabs/netscript#1307](https://github.com/rickylabs/netscript/pull/1307)  |
+| Baseline                 | `00f96af76e5825422e8bc716a9c27d4c13e16f7f`                                             |
+| Requested inspected head | `c3a454da60f03b275eb2ed21b73d71dabbc983e7`                                             |
+| Corrected research head  | `e20940838f2c55a65d27445d2e26f04919bffec0`                                             |
+| Correction commits       | `9c4f29a5c85bbc950a42cec8c32092ebc0f265ed`, `e20940838f2c55a65d27445d2e26f04919bffec0` |
+| Research blob            | `9d3f3f84336845a13c93389818e8b4566000f8fb` at both `e20940838...` and `c3a454da...`    |
+| Archetype / overlay      | Archetype 6 subject; `docs`-only changeset                                             |
+| Evaluator route          | `openai / gpt-5.6-sol / xhigh`                                                         |
+| Evaluator session        | `019fcf98-e1a7-78d2-8066-54076d83d01a`                                                 |
+| Evaluation date          | 2026-08-05                                                                             |
+| Check mode               | Bounded and read-only except replacement of this verdict artifact                      |
 
-The implementation/research author and evaluator are separate sessions. This re-evaluation is
-commit-pinned to `e20940838...`; a later PR-head commit containing the previous evaluator artifact
-does not change the primary `research.md` evaluated here.
+This evaluator session is distinct from the research author/supervisor session
+`019fcf6d-f2d4-7fa1-b97a-a50bdd98ec0c`. The requested head adds the cycle-one evaluator artifact
+after `e20940838...`; it does not change the corrected `research.md` blob.
 
-## Blocking findings
+During the read-only PR metadata check, the live PR head had advanced to
+`d3deb1ccececdebe8db5ffd233360c2cc342d09b`. The intervening commits add the cycle-two brief and
+replace evaluator/worklog artifacts only; they do not change `research.md`. This verdict remains
+commit-pinned to the user-requested `c3a454da...` head and its `e20940838...` research blob rather
+than silently retargeting the evaluation.
 
-None. No further correction to `research.md` is required.
+## Verdict summary
 
-## Prior finding closure
+No blocking findings remain. Both bounded corrections requested after cycle one are present,
+accurate, and limited to evidence qualification. No further correction to `research.md` is required.
 
-### #1308 evidence strength — resolved
+## Disposition of cycle-one blockers
 
-`research.md:14-18` now says that PR #1308 **corroborated** the #18958 diagnosis and proved only the
-specific compatibility result: the unchanged Aspire 13.4.6 SDK graph restored through the fixed
-daily CLI in 13.06 seconds with no newly leaked helper. It explicitly preserves five consecutive
-published-canary runs as the reliability completion gate and says that one green restore cannot
-prove an intermittent failure absent.
+### B1 — strength of #1308 evidence: RESOLVED
 
-That is faithful to the retained #1308 evidence and no longer overstates a one-run compatibility
-probe as independent causal or reliability proof.
+`research.md:14-18` now describes NetScript PR #1308's single fixed-daily restore as
+**corroboration** of the #18958 diagnosis and **compatibility** evidence for running the unchanged
+13.4.6 SDK graph through the repaired CLI. It retains the actual observation—exit 0 in 13.06 seconds
+with no newly leaked helper—without converting that one result into reliability proof.
 
-### First-party 84-library evidence — resolved
+The same paragraph explicitly keeps five consecutive published-canary runs as the reliability
+completion gate and states that one green restore cannot prove an intermittent failure absent. The
+research therefore no longer overstates the fixed-daily probe, and #1227 remains open pending the
+separate canary evidence owned by #1308.
 
-`research.md:24-28` now identifies 84 as the current `Aspire.Hosting.JavaScript@13.4.6`
-package-identity proxy for unreleased #18628, not a prediction of the 13.5 transitive graph. The
-table labels that row explicitly at `research.md:131`, and `research.md:147-150` limits the
-conclusion to one additional direct integration package while requiring the exact 13.5 total to be
-remeasured after release.
+### B2 — meaning of the 84-library first-party result: RESOLVED
 
-The corrected claim matches the evidence: the published 13.4.6 proxy proves that selecting
-`Aspire.Hosting.JavaScript` grows the current graph from 83 to 84 and cannot create a zero-NuGet
-path; it does not claim the future stable graph will retain the same absolute count.
+`research.md:24-28`, the table at `research.md:123-131`, and the conclusions at
+`research.md:145-150` consistently label 84 as the current `Aspire.Hosting.JavaScript@13.4.6`
+**package-identity proxy** for the unreleased #18628 placement. They do not predict the exact stable
+13.5 transitive graph.
 
-## Load-bearing claim assessment
+The supported conclusion is narrower and correct: selecting the currently published JavaScript
+package adds one direct integration package to the measured representative 13.4.6 graph, moving it
+from 83 to 84 and therefore not creating a zero-NuGet path. The exact 13.5 total is explicitly
+reserved for a cold fixture after matching stable CLI, SDK, and package versions are released
+(`research.md:286-302`).
 
-### 1. External `[AspireExport]` and runtime viability — PASS
+## Required acceptance checks
 
-The 13.4.6 Toolkit fixture proves more than code generation (`research.md:47-83`). The external
-`CommunityToolkit.Aspire.Hosting.Deno@13.4.0` assembly generated `addDenoApp`, `addDenoTask`, and
-`withDenoPackageInstallation`, and its RPC handle named the external package export. The fixture
-then called `addDenoApp`; Aspire started the Deno 2.9.3 resource, and `aspire wait` observed it up
-before the exact AppHost was stopped.
+### 1. #18958 lifecycle fix versus Deno feature PRs — PASS
 
-Independent evaluator repetition also observed the resource as running and healthy in
-`aspire describe`, with executable `deno` and the expected `run --allow-net --allow-env main.ts`
-arguments. This is executed runtime viability rather than generated-code inspection alone.
+Live primary GitHub metadata on 2026-08-05 confirms:
 
-Residual risk: this proves local 13.4.6 Toolkit viability, not first-party feature parity for
-publishing, telemetry, or debugging. The research does not claim otherwise.
+- [microsoft/aspire#18958](https://github.com/microsoft/aspire/pull/18958) merged on 2026-08-03 and
+  fixes the Aspire CLI's orphaned NuGet-search-helper lifecycle;
+- [microsoft/aspire#18627](https://github.com/microsoft/aspire/pull/18627) remains open and concerns
+  the TypeScript AppHost Deno toolchain resolver; and
+- [microsoft/aspire#18628](https://github.com/microsoft/aspire/pull/18628) remains open and places
+  first-party `AddDenoApp` / `DenoAppResource` support in `Aspire.Hosting.JavaScript`.
 
-### 2. NuGet counts and dependency trade-off — PASS
+`research.md:9-18`, `research.md:191-210`, and `research.md:286-310` preserve those independent
+lifecycles. The #1227 recommendation takes the CLI containing #18958 without waiting for either Deno
+feature PR. A coordinated stable 13.5 upgrade is presented only as compatibility value if all three
+changes ship, not as a prerequisite for the p0 reliability fix.
 
-`research.md:116-154` uses one coherent unit: unique `.libraries` entries in each generated NuGet
-`project.assets.json`, with direct dependencies reported separately. Seven fixtures used distinct
-empty package and HTTP-cache roots. Independent parsing reproduced:
+### 2. Deno export and runtime evidence — PASS
 
-| Comparison                                   | Resolved libraries | Exact added identity                          |
-| -------------------------------------------- | -----------------: | --------------------------------------------- |
-| empty/core TypeScript probe                  |                 75 | baseline                                      |
-| core + Toolkit Deno                          |                 76 | `CommunityToolkit.Aspire.Hosting.Deno/13.4.0` |
-| core + JavaScript 13.4.6                     |                 76 | `Aspire.Hosting.JavaScript/13.4.6`            |
-| representative Browsers + PostgreSQL + Redis |                 83 | representative baseline                       |
-| representative + Toolkit Deno                |                 84 | Toolkit package only                          |
-| representative + JavaScript 13.4.6 proxy     |                 84 | JavaScript package only                       |
+The corrections leave the validated Aspire 13.4.6 experiment intact (`research.md:47-83`): the
+external `CommunityToolkit.Aspire.Hosting.Deno@13.4.0` export generated `addDenoApp`, `addDenoTask`,
+and `withDenoPackageInstallation`; the fixture restored successfully; and a Deno 2.9.3 resource
+reached Aspire's `up (running)` state.
 
-The exact set difference is one library in every added-package comparison. The evidence supports the
-architectural conclusion that Toolkit Deno and the current first-party package proxy grow, rather
-than shrink, the restore surface. Approximate cold-cache sizes are correctly labelled as
-illustrative rather than a stable package-size contract.
+Cycle two did not start or mutate an AppHost because the brief permits read-only checks only. The
+runtime conclusion remains accepted because cycle one independently executed and inspected the
+fixture, the correction commits do not alter that evidence, and the reproduction record remains at
+`research.md:318-334`. The absent scratch cache in this evaluator worktree is retained as a residual
+risk rather than papered over with a new mutable run.
 
-Under the Doctrine's upstream-first and dependency-justification rules, the conclusion is sound: do
-not add a third-party Toolkit dependency to solve a failure it cannot remove; reconsider the
-first-party integration later for feature/support value, not NuGet reduction.
+### 3. NuGet package/version evidence and Archetype-6 conclusion — PASS
 
-Residual risk: exact stable 13.5 transitive identities remain volatile. The release-time cold
-fixture at `research.md:286-302` is the correct closing measurement.
+The official NuGet surface confirms `Aspire.Hosting.JavaScript` is a published 13.4.6 NuGet package
+whose dependency list includes `Aspire.Hosting >= 13.4.6`. The seven recorded isolated assets graphs
+define their metric precisely as unique `.libraries` identities and distinguish direct dependencies,
+transitive identities, and illustrative cache sizes (`research.md:116-154`).
 
-### 3. #18627 and #18628 placement — PASS
+The `netscript-deno-toolchain` workspace dependency wrappers are `N/A` here: this run changes no
+npm/JSR dependency, workspace import, package export, or published NetScript surface. The evaluated
+dependency is a NuGet integration in an isolated Aspire-generated probe, so the retained
+`project.assets.json` identities and official NuGet/first-party Aspire sources are the relevant
+version evidence. No “latest stable” decision is inferred from `deno outdated --latest` or an ad hoc
+registry query.
 
-[microsoft/aspire#18627](https://github.com/microsoft/aspire/pull/18627) changes the TypeScript
-AppHost guest toolchain resolver: Deno project-file detection, install/check/run/watch/task
-commands, and associated CLI/scaffolding tests. It does not replace the managed integration probe or
-its `Aspire.Hosting` and `Aspire.Hosting.CodeGeneration.TypeScript` restore floor. The distinction
-at `research.md:156-167` is accurate.
+Under Doctrine A6/A7 and the Archetype-6 thin-router/upstream-first boundary, the dependency
+conclusion is sound: do not add a third-party Toolkit package to solve a reliability failure it
+cannot remove; retain the direct upstream primitive for #1227; reconsider the first-party package
+later for feature/support value after released evidence. This avoids AP-2 helper renaming and AP-9
+speculative integration seams. No architecture debt is introduced or deepened by the docs-only
+changeset.
 
-[microsoft/aspire#18628](https://github.com/microsoft/aspire/pull/18628) places `DenoAppResource`,
-`AddDenoApp`, and the `WithDeno*` APIs in the packable first-party `Aspire.Hosting.JavaScript`
-project. Its playground selects that NuGet package. The research correctly distinguishes first-party
-ownership from being built into the CLI with no NuGet.
+### 4. Scope, lock hygiene, citations, and PR semantics — PASS
 
-Residual risk: both Deno PRs remain open and review-required. Only merged code and released stable
-artifacts can establish the final shipped surface.
+| Check                         | Result  | Evidence                                                                                          |
+| ----------------------------- | ------- | ------------------------------------------------------------------------------------------------- |
+| Requested-head research blob  | PASS    | `e20940838...:research.md` and `c3a454da...:research.md` both resolve to blob `9d3f3f843...`      |
+| Merge base                    | PASS    | `git merge-base 00f96af... c3a454da...` returned the requested baseline                           |
+| Target diff scope             | PASS    | Baseline-to-`c3a454da...` paths are confined to the run directory                                 |
+| Patch integrity               | PASS    | `git diff --check 00f96af... c3a454da...` exited 0 with no output                                 |
+| Committed lock hygiene        | PASS    | Baseline-to-`c3a454da...` contains no `deno.lock` path                                            |
+| Inherited local lock change   | PASS    | Existing modified `deno.lock` remains present and untouched                                       |
+| Citation preservation         | PASS    | Corrections retain the primary GitHub, NuGet, Microsoft documentation, and review links           |
+| PR file scope                 | PASS    | Live PR file list contains only `.llm/runs/...` artifacts                                         |
+| Non-closing semantics         | PASS    | PR body uses `Refs #1227`; it contains no `Closes`, `Fixes`, or `Resolves` keyword for #1227      |
+| PR taxonomy                   | PASS    | Exactly one `status:research`, namespaced type/area/priority labels, and explicit milestone 0.0.5 |
+| Product/scaffold gates        | N/A     | No product source, scaffold output, manifest, public API, or generated consumer output changed    |
+| Full CLI/scaffold runtime E2E | NOT_RUN | Explicitly prohibited and disproportionate for evidence-only research                             |
 
-### 4. Current blockers and proposed upstream contribution — PASS
+The user-owned `deno.lock` modification and pre-existing untracked evaluator-session record are
+outside this verdict artifact. Neither was inspected as research evidence, modified, staged, or
+included in the target commit.
 
-The live #18628 snapshot has six unresolved current threads matching `research.md:228-250`: real
-polyglot call sites, Kubernetes OTLP HTTP/protobuf, package-script Docker initialization/caching,
-endpoint-conditional native OTLP, README consistency, and NetScript's Deno-version recommendation.
-The linked exact-head review additionally supports the task-argument, debugger-warning,
-cache-permission, endpoint-ownership, and deploy-telemetry findings.
+## Process verification
 
-The proposed contribution order at `research.md:252-270` is faithful to those blockers: reproduce
-and repair the debugger E2E, add a real TypeScript polyglot call site, then address Kubernetes OTLP
-projection. It explicitly requires separate authority and exact-head validation before upstream
-work.
-
-Residual risk: review state is volatile; any contribution must re-read the live head and threads.
-
-### 5. Timeline and actionable watch signal — PASS
-
-The 13.5 snapshot is qualified: 787 closed / 71 open, no due date, and two unapproved Deno PRs.
-“Plausibly weeks rather than quarters” is presented as an inference, not a schedule
-(`research.md:272-284`).
-
-The watch signal at `research.md:286-302` is exact and actionable: stable provenance for merged
-#18958; both Deno merges with named concerns resolved; matching stable CLI, SDK, and JavaScript
-package versions; and a cold repeated fixture proving no leaked helper, Deno resolver selection,
-generated/running `addDenoApp`, and the actual NuGet graph. It separately defines the stronger
-signal required for genuine NuGet elimination.
-
-Crucially, the research does not gate #1227 on the Deno feature PRs: if stable 13.5 contains #18958
-and either Deno PR misses the cut, NetScript takes the CLI fix and retains
-`builder.addExecutable('deno', ...)` (`research.md:207-210,298-302`).
-
-### 6. Zero-NuGet/loss analysis, #1227 verdict, and 0.0.6 recommendation — PASS
-
-The empty TypeScript fixture still restores the managed host and TypeScript code generator. The
-literal zero-NuGet alternatives at `research.md:169-189` require leaving or bypassing the supported
-TypeScript AppHost pipeline, placing versioned SDK generation, the resource/DCP lifecycle, service
-discovery, ordering, telemetry/health, publishing, and compatibility outside the supported path. A
-C# AppHost still consumes NuGet PackageReferences.
-
-The corrected conclusions follow without overclaiming:
-
-- #1227 belongs to the CLI containing merged #18958, with #1308's five-canary gate still pending.
-- Deno adoption is neither the cause nor cure for #1227.
-- One coordinated stable 13.5 upgrade is preferable only if both Deno features also ship; otherwise
-  the p0 CLI fix proceeds alone.
-- Optional integration trimming can reduce architectural exposure but is not a leak cure.
-- No 0.0.6 epic should be created on the false premise that Deno removes NuGet. A broader future
-  Deno feature epic remains an owner/product choice, separate from restore remediation
-  (`research.md:304-316`).
-
-### 7. Research-only scope, lock hygiene, and PR metadata — PASS
-
-Baseline through `e20940838...` contains eight added files, all under the run directory: 787
-insertions and no product, scaffold, package manifest, workflow, test, or lockfile path.
-`git diff --check` passed, and the merge base is the requested baseline. `deno.lock` has no
-baseline-to-target diff. The inherited worktree modification remains present and was neither
-restored nor included (`research.md:336-337`).
-
-Draft PR #1307 remains research-only. Its body uses `Refs #1227`, not a closing keyword; that is
-correct because #1308 owns the restore fix and this research does not resolve #1227. It has exactly
-one `status:research`, namespaced type/area/priority labels, and an explicit 0.0.5 milestone. Its
-slice and substantive Definition-of-Done items are complete; the independent-evaluation checkbox
-appropriately remains pending until this verdict is incorporated.
-
-The PLAN-EVAL artifact records the owner-authorized D6 `COMPOSED_WAIVER` and does not claim a
-self-issued PASS. The worklog contains the Design contract and both planned slices. Its final gate
-rows are stale at commit `e20940838...`, but the PR body records the completed format, link, diff,
-runtime, and restore-graph evidence. This ledger cleanup is administrative and does not require a
-correction to the primary `research.md`.
-
-## Validation record
-
-| Check                                | Result  | Evidence                                                                                      |
-| ------------------------------------ | ------- | --------------------------------------------------------------------------------------------- |
-| Exact correction delta               | PASS    | `9c4f29a...e20940838` changes only `research.md` and `worklog.md`; 13 insertions, 7 deletions |
-| Complete target scope                | PASS    | Eight run artifacts only; no product/scaffold/lock path                                       |
-| Merge base                           | PASS    | `00f96af76e5825422e8bc716a9c27d4c13e16f7f`                                                    |
-| Patch integrity                      | PASS    | `git diff --check 00f96af... e20940838`                                                       |
-| Lock hygiene                         | PASS    | No committed `deno.lock` delta; inherited working-tree delta preserved                        |
-| Toolkit export/runtime               | PASS    | Generated export plus healthy running Deno resource                                           |
-| NuGet graph                          | PASS    | Seven isolated assets graphs and exact package-identity deltas                                |
-| Upstream state                       | PASS    | Primary PR/issue/source/review and milestone inspection on 2026-08-05                         |
-| Full CLI E2E                         | NOT RUN | Explicitly prohibited and disproportionate for docs-only research                             |
-| Product typecheck/lint/publish gates | N/A     | No product/package source or public surface changed                                           |
+| Check                                | Result                  | Evidence                                                                                      |
+| ------------------------------------ | ----------------------- | --------------------------------------------------------------------------------------------- |
+| Separate evaluator session           | PASS                    | Evaluator `019fcf98...` differs from research supervisor `019fcf6d...`                        |
+| Plan-Gate                            | N/A — authorized waiver | `plan-eval.md` records D6 `COMPOSED_WAIVER` and explicitly does not claim evaluator PASS      |
+| Design evidence contract             | PASS                    | `worklog.md` names the evidence vocabulary, ports, constants, S0/S1, and deferred source work |
+| Correction delta                     | PASS                    | `e20940838...` changes qualification prose plus one worklog entry; no product file            |
+| Applicable source/product gate suite | N/A                     | Evidence-only run artifact; no package/plugin implementation or public surface changed        |
 
 ## Residual risks
 
-1. PR #1308's five consecutive published-canary proof is still required before #1227 reliability is
-   considered complete.
-2. Stable 13.5 package counts and Deno behavior must be measured from the exact released versions;
-   the 13.4.6 JavaScript package is intentionally only a package-identity proxy.
-3. #18627/#18628 review and merge state can change; re-read their exact heads before contribution or
-   adoption.
-4. Milestone percentage has no scheduling force because 13.5 has no due date.
+1. #1308 still requires five consecutive published-canary runs before #1227 reliability can be
+   considered proven; the one fixed-daily restore remains compatibility evidence only.
+2. The exact stable 13.5 transitive package graph and Deno behavior remain unknown until matching
+   released artifacts are exercised in a cold fixture.
+3. #18627 and #18628 remain open and can change before merge; their exact heads and review threads
+   must be re-read before contribution or adoption.
+4. The original scratch fixture/caches are intentionally absent from this evaluator worktree.
+   Reproduction against a future release must recreate them rather than relying on retained cache.
+5. The live PR head advanced beyond the requested pin during evaluation. The later changes are
+   evaluator/worklog administration only, but the supervisor should reconcile the recorded PASS and
+   session provenance before changing lifecycle status.
 
-None of these risks requires another correction to `research.md`; each is already represented by the
-artifact's conditions and watch signal.
+These are bounded follow-up conditions already represented by `research.md`; none requires another
+correction to that artifact.
 
 ## PR recommendation
 
-Approve the research content at `e20940838f2c55a65d27445d2e26f04919bffec0`. The supervisor may
-record this PASS, refresh the remaining phase/gate ledger, and advance the draft through the normal
-harness close process. Keep `Refs #1227`; do not couple the #18958 reliability fix to either Deno
-feature PR, and do not run the full scaffold E2E for this docs-only research change.
+Approve the research content represented by `e20940838f2c55a65d27445d2e26f04919bffec0` and the
+requested inspected head `c3a454da60f03b275eb2ed21b73d71dabbc983e7`. The supervisor may reconcile
+this PASS and advance PR #1307 through the normal harness review/close process. Retain `Refs #1227`
+and the docs-only gate selection; do not couple the #18958 reliability fix to either Deno feature
+PR, do not claim the five-canary reliability gate is complete, and do not run full scaffold E2E for
+this research-only changeset.
 
 ## Verdict
 
-`PASS` — both requested evidence qualifications are correct, every load-bearing claim remains
-supported, and no further correction to `research.md` is required.
+`PASS` — both cycle-one evidence blockers are resolved, the #18958/#18627/#18628 lifecycle split is
+accurate, all previously validated Deno/runtime and package evidence remains intact, and no further
+correction to `research.md` is required.

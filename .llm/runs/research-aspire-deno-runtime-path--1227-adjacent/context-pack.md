@@ -12,8 +12,9 @@
 
 ## Current State
 
-Research is complete. The branch began exactly at `origin/main` `00f96af76`; the draft PR is #1307.
-The only pre-existing worktree change is `deno.lock`, which remains out of scope and uncommitted.
+Research and cycle-two IMPL-EVAL are complete. The branch began exactly at `origin/main`
+`00f96af76`; the draft PR is #1307. The only pre-existing worktree change is `deno.lock`, which
+remains out of scope and uncommitted.
 
 ## Completed
 
@@ -23,16 +24,16 @@ The only pre-existing worktree change is `deno.lock`, which remains out of scope
 - Both live upstream PRs and all current review threads/review summaries inspected.
 - Seven isolated restore graphs measured; external export and a real Deno resource tested.
 - Evidence-backed verdict and exact upstream watch signal written in `research.md`.
+- Separate evaluator passed the corrected artifact after two bounded precision fixes.
 
 ## In Progress
 
-- S1 validation, commit, explicit-refspec push, and PR handoff.
+- Final verdict commit, explicit-refspec push, and PR handoff.
 
 ## Next Steps
 
-1. Run scoped documentation gates.
-2. Commit and push S1 without `deno.lock`.
-3. Complete the milestone-composed implementation evaluation and PR metadata.
+1. Commit and explicitly push the passing evaluator artifact without `deno.lock`.
+2. Refresh PR body/status metadata and post the research/evaluation summary.
 
 ## Key Decisions
 
@@ -53,7 +54,7 @@ The only pre-existing worktree change is `deno.lock`, which remains out of scope
 
 | Gate family      | Current status | Evidence                                        |
 | ---------------- | -------------- | ----------------------------------------------- |
-| Static/docs      | pending        | S1                                              |
+| Static/docs      | pass           | scoped Markdown format and patch checks         |
 | Fitness          | N/A            | No package/source change.                       |
 | Runtime research | pass           | Seven restores; Toolkit generation/run/wait.    |
 | Consumer/release | N/A            | No scaffold output or published surface change. |
