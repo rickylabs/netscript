@@ -2145,3 +2145,28 @@ not just a quality trigger — and the tell was available all along: every canar
 every package whether or not it changed.**
 #1312 filed p0 with acceptance covering budget pre-checks, partial-publish detection distinct
 from test failure, reset semantics, and a revised cadence. #1149 stage-E recorded.
+
+## 2026-08-05 — Release-train strategy live (D19): #1313 merged, canary.13 train open
+
+Owner overrode my D18 hold with a better structure and I adopted it. Setup complete:
+- **#1313 merged** — `ci.yml` now fires on `pull_request` targeting `canary/**`. Without this
+  every PR into a train would have run **zero** required contexts (quality, check-test,
+  deps-report, close-gate all silently absent) and the train would have accumulated ungated
+  work. `e2e-cli.yml` needed no change (no branch filter).
+- **`canary/0.0.5-canary.13`** created and re-pointed at current main `44d2635e1` so the train
+  starts from a base that includes the trigger fix.
+- **canary.12 needs no branch**: its content (#1308, #1311, #1309, #1307, #1304, #1303, #1301,
+  #1302, #1299, #1300, #1298, #1292) is already on main — canary.11 was the run that
+  half-published it. When quota returns, main publishes as canary.12 first.
+
+**Release sequence when the JSR quota lands:** publish main as canary.12 → verify pair → merge
+`canary/0.0.5-canary.13` to main → publish → verify → repeat per train → stable cut from the
+final state with all `netscript-release` gates green (D7).
+
+**Correction recorded (D19):** my hold-merges reading of the block was too conservative. The
+worry was that merging accumulates an undifferentiated delta on main; the umbrella structure
+removes exactly that by pre-partitioning the delta into discrete gated trains. The JSR block now
+costs only *publication latency*, not throughput.
+Consequence to watch: issues merged into a train stay OPEN until the train reaches main
+(GitHub auto-closes only on the default branch), so the milestone's open count will lag reality
+while trains are in flight — not a stall.
