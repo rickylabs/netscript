@@ -1859,3 +1859,31 @@ under test — an implausibly short failure (18ms) that exits on argument parsin
 Read the failure before believing the verdict, and build the harness so parse-failure and
 product-failure are distinguishable, because an unattended agent cannot tell them apart.**
 Fix dispatched to the lane that authored the suite, including that distinguishability guard.
+
+## 2026-08-05 — Walk re-run: step 6 fixed, but step 4 is INTERMITTENT — #1227 reopened p0
+
+#1304 merged (gate runs the documented `deno task check`; adds a `harness-invocation` failure
+class detecting argument-parser errors so a broken harness can never read as a broken product).
+Re-ran the walk at 0.0.5-canary.10 (run 30961102523). New result:
+
+| # | Step | Run 30959430176 | Run 30961102523 |
+| --- | --- | --- | --- |
+| 1 | install | PASS 328ms | PASS 226ms |
+| 2 | init | PASS 537ms | PASS 586ms |
+| 3 | add service | PASS 9.3s | **PASS 11.4s** |
+| 4 | aspire restore+start | PASS 22.3s | **FAIL 180.1s** |
+| 5-7 | db / check / service | PASS | not reached |
+
+**The decisive finding: step 4 is intermittent — two runs, same published version, same runner
+class, opposite outcomes.** #1227's bounding works (the 2×900.1s / 30-min hang is gone; it now
+fails in 3 bounded minutes with `aspire restore failed (6): Failed to prepare: A task was
+canceled`), but the underlying restore failure still occurs ~1 run in 2.
+**Reopened #1227 as p0 into 0.0.5** with both run ids as evidence, and re-dispatched with the
+part that was never delivered: surface `~/.aspire/logs/cli_*.log` as a CI artifact and diagnose
+rather than guess; retry on this signature; pin/cache the Aspire SDK; **and prove it by N
+consecutive green walks — one green run cannot distinguish a fix from the lucky half of a coin
+flip.** That last clause is the acceptance.
+**Finding 42 (for #1163): bounding a hang changes its failure mode, not its rate. A fix that
+converts a 30-minute hang into a 3-minute failure is real progress and must not be mistaken for
+resolution — for an unattended consumer, a bounded halt is still a halt. Intermittent defects
+need repeated-run acceptance; single-pass evidence cannot distinguish a fix from luck.**
