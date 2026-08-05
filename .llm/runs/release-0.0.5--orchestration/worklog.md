@@ -2221,3 +2221,25 @@ base the PR on the train, not main; issues will not auto-close until the train r
 **Finding 50 (for #1163): a blocked release channel is not a blocked milestone. I let a
 publication constraint stall implementation for several turns, and it took the owner asking
 "what exactly prevents you" to surface that the answer was nothing.**
+
+## 2026-08-05 — #1295 rescoped: my "nothing pins v3" claim was wrong (finding 49, second instance)
+
+The Zod slice stopped and escalated instead of forcing the change, and its reason exposed an
+error in the issue body **I wrote**. I claimed "nothing pins v3 deliberately — every package in
+that cluster already accepts ^4", having sampled four packages (`@anthropic-ai/sdk`,
+`@modelcontextprotocol/sdk`, `openai`, `zod-to-json-schema`). The slice ran
+`deno why npm:zod@3.25.76` and found two hard paths I never checked:
+- **`@ag-ui/core@0.0.52` hard-depends on `zod: ^3.22.4`** — no `|| ^4`, unsatisfiable by Zod 4.
+- **`jsr:@olli/kvdex@3.6.7`** materialises Zod 3, and 3.6.7 is the latest release.
+The AI/MCP peer cluster DOES dedupe onto npm Zod 4 — that half of my measurement held — but
+"exactly one instance" needs either a TanStack AI 0.39→0.43 cluster upgrade (which currently
+drags in a **canary** AG-UI, trading a type split for a pre-release dep) or a kvdex
+replace/fork/remove/override decision. Escalated to the owner; my recommendation is against the
+canary-AG-UI trade in a release we are about to cut.
+**Landing regardless:** the slice's guard test (`test(deps): make split zod graphs fail CI`),
+which makes the split visible and blocks silent regression. The "one instance" criterion stays
+honestly unticked.
+**This is finding 49's exact failure mode, twice in one session** — generalising a
+whole-cluster claim from a partial sample, then putting it in an issue body that a lane then
+had to disprove. The slice's `deno why` was the correct instrument and I had it available; I
+used `npm view` on four names instead.
