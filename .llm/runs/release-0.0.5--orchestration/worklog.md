@@ -1931,3 +1931,37 @@ flaky step is neither decorative nor a trap. Also told it to FILE, not just docu
 best find: `aspire start` detaches with no TTY and prints no login token, so "the dashboard is
 the authority" fails for a consumer with neither TTY nor browser — the primary consumer being
 agents.
+
+## 2026-08-05 — CORRECTION: the Aspire repo is microsoft/aspire; the Deno path is IN FLIGHT upstream
+
+**My error, caught by the owner:** I searched `dotnet/aspire`. The repo is **microsoft/aspire**.
+Every upstream conclusion I drew an hour ago was drawn against the wrong repository, and both
+xhigh agents were dispatched with that instruction in their briefs. Corrected in both threads.
+
+**What the right repo shows — this reframes #1227 entirely:**
+- **The owner has two OPEN PRs against milestone 13.5**: #18627 "Add Deno support to the
+  TypeScript AppHost toolchain resolver" (area-cli) and #18628 "Add Deno hosting: AddDenoApp /
+  DenoAppResource in **Aspire.Hosting.JavaScript**" (151 review comments, mergeable=blocked).
+  **13.5 is 91% complete** (71 open / 787 closed, updated today). So the Deno path is not a
+  future maybe — it is in flight and near a release boundary, and #18628 landing in a
+  FIRST-PARTY assembly (`Aspire.Hosting.JavaScript`) rather than the CommunityToolkit NuGet our
+  code comment rejected would change the NuGet-surface question that decides whether it helps
+  #1227 at all.
+- **Restore hangs are a known upstream class**: #16791 "aspire init/add/restore can hang
+  silently when stdin is a TTY (macOS)" — open, Backlog, with a `< /dev/null` workaround.
+  macOS/TTY-shaped and our signature differs (exit 6, "Failed to prepare AppHost server / A task
+  was canceled", Linux CI + WSL), so same family, not obviously the same bug — but the workaround
+  is cheap to test against our repro and is strong evidence either way.
+- Adjacent open items: #16704 "Optimize aspire start performance for TypeScript AppHosts",
+  #17758 "Resource waiting on itself deadlocks, and breaks `aspire start`". Closed but
+  mechanism-relevant: #15222 "Aspire polyglot doesn't work with
+  DOTNET_NUGET_SIGNATURE_VERIFICATION".
+- No upstream report matches our exact signature → filing upstream stays a deliverable.
+**Finding 44 (for #1163): verify the upstream coordinates before searching them. I spent a
+round concluding "nothing upstream" from a repo that was not theirs, and dispatched two agents
+on it. A zero-result search is evidence only after the target is confirmed to exist — the tell
+was `gh search issues --repo dotnet/aspire` returning a permissions/not-found error, which I
+read as "no matches" instead of "wrong repo".**
+Also re-scoped the Deno agent: read both PRs INCLUDING #18628's 151 review comments (the
+objections are the real signal about what ships), and identify whether we can unblock it —
+contributing upstream may be the shortest path to our own p0.
