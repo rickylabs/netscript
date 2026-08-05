@@ -1,0 +1,111 @@
+[2026-08-05 01:12:57.795] [INFO] [Cli] Aspire CLI version: 13.4.6+87fe259e4fc244c599019a7b1304c85a1488f248
+[2026-08-05 01:12:57.795] [INFO] [Cli] Aspire CLI build ID: 13.400.626.31906
+[2026-08-05 01:12:57.795] [INFO] [Cli] Working directory: /home/runner/work/netscript/netscript/.llm/tmp/cli-e2e/plugin-smoke-20260805-011242/aspire
+[2026-08-05 01:12:57.795] [INFO] [Cli] Log file: /home/runner/.aspire/logs/cli_20260805T011257_a27c0343.log
+[2026-08-05 01:12:57.795] [INFO] [Cli] CLI process ID: 18646
+[2026-08-05 01:12:57.799] [DBUG] [Host] Hosting starting
+[2026-08-05 01:12:57.809] [DBUG] [Host] Hosting started
+[2026-08-05 01:12:57.824] [DBUG] [Features] Feature aspireSkillsRemoteFetchEnabled = False (default: False)
+[2026-08-05 01:12:57.824] [DBUG] [Features] Feature defaultWatchEnabled = False (default: False)
+[2026-08-05 01:12:57.824] [DBUG] [Features] Feature experimentalPolyglot:go = False (default: False)
+[2026-08-05 01:12:57.824] [DBUG] [Features] Feature experimentalPolyglot:java = False (default: False)
+[2026-08-05 01:12:57.824] [DBUG] [Features] Feature experimentalPolyglot:python = False (default: False)
+[2026-08-05 01:12:57.824] [DBUG] [Features] Feature experimentalPolyglot:rust = False (default: False)
+[2026-08-05 01:12:57.824] [DBUG] [Features] Feature nugetSignatureVerificationEnabled = True (default: True)
+[2026-08-05 01:12:57.824] [DBUG] [Features] Feature showAllTemplates = False (default: False)
+[2026-08-05 01:12:57.824] [DBUG] [Features] Feature showDeprecatedPackages = False (default: False)
+[2026-08-05 01:12:57.824] [DBUG] [Features] Feature stagingChannelEnabled = False (default: False)
+[2026-08-05 01:12:57.824] [DBUG] [Features] Feature updateNotificationsEnabled = True (default: True)
+[2026-08-05 01:12:57.842] [INFO] [Cli] Command: aspire restore --apphost /home/runner/work/netscript/netscript/.llm/tmp/cli-e2e/plugin-smoke-20260805-011242/aspire/apphost.mts --non-interactive --nologo
+[2026-08-05 01:12:57.842] [DBUG] [Cli] Parsing arguments: restore --apphost /home/runner/work/netscript/netscript/.llm/tmp/cli-e2e/plugin-smoke-20260805-011242/aspire/apphost.mts --non-interactive --nologo
+[2026-08-05 01:12:57.842] [DBUG] [Cli] Executing command: aspire restore
+[2026-08-05 01:12:57.842] [DBUG] [AuxiliaryBackchannelMonitor] Current command is not MCP start command. Auxiliary backchannel monitoring disabled.
+[2026-08-05 01:12:57.842] [DBUG] [ProjectLocator] Finding project file in /home/runner/work/netscript/netscript/.llm/tmp/cli-e2e/plugin-smoke-20260805-011242/aspire
+[2026-08-05 01:12:57.842] [DBUG] [AppHostProjectFactory] TryGetProject called for file: /home/runner/work/netscript/netscript/.llm/tmp/cli-e2e/plugin-smoke-20260805-011242/aspire/apphost.mts
+[2026-08-05 01:12:57.843] [DBUG] [AppHostProjectFactory] Language detected: typescript/nodejs for file: /home/runner/work/netscript/netscript/.llm/tmp/cli-e2e/plugin-smoke-20260805-011242/aspire/apphost.mts
+[2026-08-05 01:12:57.843] [DBUG] [LayoutDiscovery] TryDiscoverRelativeLayout: CLI at /home/runner/.aspire/bin/.store/aspire.cli/13.4.6/aspire.cli.linux-x64/13.4.6/tools/net10.0/linux-x64, checking for layout...
+[2026-08-05 01:12:57.843] [DBUG] [LayoutDiscovery] TryInferLayout: Checking layout at /home/runner/.aspire/bin/.store/aspire.cli/13.4.6/aspire.cli.linux-x64/13.4.6/tools/net10.0/linux-x64
+[2026-08-05 01:12:57.843] [DBUG] [LayoutDiscovery]   bundle/managed/: exists
+[2026-08-05 01:12:57.843] [DBUG] [LayoutDiscovery]   bundle/dcp/: exists
+[2026-08-05 01:12:57.843] [DBUG] [LayoutDiscovery]   bundle/managed/aspire-managed: exists
+[2026-08-05 01:12:57.843] [DBUG] [LayoutDiscovery] TryInferLayout: New bundle/ layout is valid
+[2026-08-05 01:12:57.843] [DBUG] [LayoutDiscovery] Discovered layout relative to CLI: /home/runner/.aspire/bin/.store/aspire.cli/13.4.6/aspire.cli.linux-x64/13.4.6/tools/net10.0/linux-x64
+[2026-08-05 01:12:57.843] [DBUG] [BundleService] Bundle already extracted and up to date (version: 13.4.6+87fe259e4fc244c599019a7b1304c85a1488f248|144826904|639174968440000000).
+[2026-08-05 01:12:57.843] [DBUG] [GuestAppHostProject] Validated TypeScript (Node.js) AppHost: /home/runner/work/netscript/netscript/.llm/tmp/cli-e2e/plugin-smoke-20260805-011242/aspire/apphost.mts
+[2026-08-05 01:12:57.843] [DBUG] [ProjectLocator] Using TypeScript (Node.js) apphost /home/runner/work/netscript/netscript/.llm/tmp/cli-e2e/plugin-smoke-20260805-011242/aspire/apphost.mts
+[2026-08-05 01:12:57.843] [DBUG] [AppHostProjectFactory] TryGetProject called for file: /home/runner/work/netscript/netscript/.llm/tmp/cli-e2e/plugin-smoke-20260805-011242/aspire/apphost.mts
+[2026-08-05 01:12:57.843] [DBUG] [AppHostProjectFactory] Language detected: typescript/nodejs for file: /home/runner/work/netscript/netscript/.llm/tmp/cli-e2e/plugin-smoke-20260805-011242/aspire/apphost.mts
+[2026-08-05 01:12:57.843] [DBUG] [RestoreCommand] Restoring SDK code for /home/runner/work/netscript/netscript/.llm/tmp/cli-e2e/plugin-smoke-20260805-011242/aspire/apphost.mts in /home/runner/work/netscript/netscript/.llm/tmp/cli-e2e/plugin-smoke-20260805-011242/aspire
+[2026-08-05 01:12:57.844] [INFO] [Stdout] :gear: Restoring SDK code...
+[2026-08-05 01:12:57.844] [DBUG] [GuestAppHostProject] Using SDK version from configuration: 13.4.6
+[2026-08-05 01:12:57.844] [INFO] [GuestAppHostProject] Loaded config from /home/runner/work/netscript/netscript/.llm/tmp/cli-e2e/plugin-smoke-20260805-011242/aspire (file exists: True)
+[2026-08-05 01:12:57.845] [DBUG] [BundleNuGetPackageCache] Running NuGet search via aspire-managed: Aspire.ProjectTemplates
+[2026-08-05 01:12:57.845] [DBUG] [BundleNuGetPackageCache] aspire-managed path: /home/runner/.aspire/bin/.store/aspire.cli/13.4.6/aspire.cli.linux-x64/13.4.6/tools/net10.0/linux-x64/versions/13.4.6_87fe259e4fc244c599019a7b1304c85a1488f248-4f822d9f05017331/managed/aspire-managed
+[2026-08-05 01:12:57.845] [DBUG] [BundleNuGetPackageCache] NuGet search args: nuget search --query Aspire.ProjectTemplates --take 1000 --format json --working-dir /home/runner/work/netscript/netscript/.llm/tmp/cli-e2e/plugin-smoke-20260805-011242/aspire --verbose
+[2026-08-05 01:12:57.845] [DBUG] [BundleNuGetPackageCache] Working directory: /home/runner/work/netscript/netscript/.llm/tmp/cli-e2e/plugin-smoke-20260805-011242/aspire
+[2026-08-05 01:12:57.847] [DBUG] [LayoutDiscovery] TryDiscoverRelativeLayout: CLI at /home/runner/.aspire/bin/.store/aspire.cli/13.4.6/aspire.cli.linux-x64/13.4.6/tools/net10.0/linux-x64, checking for layout...
+[2026-08-05 01:12:57.847] [DBUG] [LayoutDiscovery] TryInferLayout: Checking layout at /home/runner/.aspire/bin/.store/aspire.cli/13.4.6/aspire.cli.linux-x64/13.4.6/tools/net10.0/linux-x64
+[2026-08-05 01:12:57.847] [DBUG] [LayoutDiscovery]   bundle/managed/: exists
+[2026-08-05 01:12:57.847] [DBUG] [LayoutDiscovery]   bundle/dcp/: exists
+[2026-08-05 01:12:57.847] [DBUG] [LayoutDiscovery]   bundle/managed/aspire-managed: exists
+[2026-08-05 01:12:57.847] [DBUG] [LayoutDiscovery] TryInferLayout: New bundle/ layout is valid
+[2026-08-05 01:12:57.847] [DBUG] [LayoutDiscovery] Discovered layout relative to CLI: /home/runner/.aspire/bin/.store/aspire.cli/13.4.6/aspire.cli.linux-x64/13.4.6/tools/net10.0/linux-x64
+[2026-08-05 01:12:57.847] [DBUG] [BundleService] Bundle already extracted and up to date (version: 13.4.6+87fe259e4fc244c599019a7b1304c85a1488f248|144826904|639174968440000000).
+[2026-08-05 01:12:57.849] [DBUG] [BundleNuGetPackageCache] Running NuGet search via aspire-managed: Aspire.ProjectTemplates
+[2026-08-05 01:12:57.849] [DBUG] [BundleNuGetPackageCache] aspire-managed path: /home/runner/.aspire/bin/.store/aspire.cli/13.4.6/aspire.cli.linux-x64/13.4.6/tools/net10.0/linux-x64/versions/13.4.6_87fe259e4fc244c599019a7b1304c85a1488f248-4f822d9f05017331/managed/aspire-managed
+[2026-08-05 01:12:57.849] [DBUG] [BundleNuGetPackageCache] NuGet search args: nuget search --query Aspire.ProjectTemplates --take 1000 --format json --prerelease --working-dir /home/runner/work/netscript/netscript/.llm/tmp/cli-e2e/plugin-smoke-20260805-011242/aspire --verbose
+[2026-08-05 01:12:57.849] [DBUG] [BundleNuGetPackageCache] Working directory: /home/runner/work/netscript/netscript/.llm/tmp/cli-e2e/plugin-smoke-20260805-011242/aspire
+[2026-08-05 01:12:57.853] [DBUG] [LayoutDiscovery] TryDiscoverRelativeLayout: CLI at /home/runner/.aspire/bin/.store/aspire.cli/13.4.6/aspire.cli.linux-x64/13.4.6/tools/net10.0/linux-x64, checking for layout...
+[2026-08-05 01:12:57.853] [DBUG] [LayoutDiscovery] TryInferLayout: Checking layout at /home/runner/.aspire/bin/.store/aspire.cli/13.4.6/aspire.cli.linux-x64/13.4.6/tools/net10.0/linux-x64
+[2026-08-05 01:12:57.853] [DBUG] [LayoutDiscovery]   bundle/managed/: exists
+[2026-08-05 01:12:57.853] [DBUG] [LayoutDiscovery]   bundle/dcp/: exists
+[2026-08-05 01:12:57.853] [DBUG] [LayoutDiscovery]   bundle/managed/aspire-managed: exists
+[2026-08-05 01:12:57.853] [DBUG] [LayoutDiscovery] TryInferLayout: New bundle/ layout is valid
+[2026-08-05 01:12:57.853] [DBUG] [LayoutDiscovery] Discovered layout relative to CLI: /home/runner/.aspire/bin/.store/aspire.cli/13.4.6/aspire.cli.linux-x64/13.4.6/tools/net10.0/linux-x64
+[2026-08-05 01:12:57.853] [DBUG] [BundleService] Bundle already extracted and up to date (version: 13.4.6+87fe259e4fc244c599019a7b1304c85a1488f248|144826904|639174968440000000).
+[2026-08-05 01:12:57.855] [DBUG] [BundleNuGetPackageCache] Running NuGet search via aspire-managed: Aspire.Cli
+[2026-08-05 01:12:57.855] [DBUG] [BundleNuGetPackageCache] aspire-managed path: /home/runner/.aspire/bin/.store/aspire.cli/13.4.6/aspire.cli.linux-x64/13.4.6/tools/net10.0/linux-x64/versions/13.4.6_87fe259e4fc244c599019a7b1304c85a1488f248-4f822d9f05017331/managed/aspire-managed
+[2026-08-05 01:12:57.855] [DBUG] [BundleNuGetPackageCache] NuGet search args: nuget search --query Aspire.Cli --take 1000 --format json --prerelease --working-dir /home/runner/work/netscript/netscript/.llm/tmp/cli-e2e/plugin-smoke-20260805-011242/aspire --verbose
+[2026-08-05 01:12:57.855] [DBUG] [BundleNuGetPackageCache] Working directory: /home/runner/work/netscript/netscript/.llm/tmp/cli-e2e/plugin-smoke-20260805-011242/aspire
+[2026-08-05 01:12:57.857] [DBUG] [LayoutDiscovery] TryDiscoverRelativeLayout: CLI at /home/runner/.aspire/bin/.store/aspire.cli/13.4.6/aspire.cli.linux-x64/13.4.6/tools/net10.0/linux-x64, checking for layout...
+[2026-08-05 01:12:57.857] [DBUG] [LayoutDiscovery] TryInferLayout: Checking layout at /home/runner/.aspire/bin/.store/aspire.cli/13.4.6/aspire.cli.linux-x64/13.4.6/tools/net10.0/linux-x64
+[2026-08-05 01:12:57.857] [DBUG] [LayoutDiscovery]   bundle/managed/: exists
+[2026-08-05 01:12:57.857] [DBUG] [LayoutDiscovery]   bundle/dcp/: exists
+[2026-08-05 01:12:57.857] [DBUG] [LayoutDiscovery]   bundle/managed/aspire-managed: exists
+[2026-08-05 01:12:57.857] [DBUG] [LayoutDiscovery] TryInferLayout: New bundle/ layout is valid
+[2026-08-05 01:12:57.857] [DBUG] [LayoutDiscovery] Discovered layout relative to CLI: /home/runner/.aspire/bin/.store/aspire.cli/13.4.6/aspire.cli.linux-x64/13.4.6/tools/net10.0/linux-x64
+[2026-08-05 01:12:57.857] [DBUG] [BundleService] Bundle already extracted and up to date (version: 13.4.6+87fe259e4fc244c599019a7b1304c85a1488f248|144826904|639174968440000000).
+[2026-08-05 01:12:57.858] [DBUG] [GuestAppHostProject] Using SDK version from configuration: 13.4.6
+[2026-08-05 01:12:57.858] [DBUG] [GuestAppHostProject] Using SDK version from configuration: 13.4.6
+[2026-08-05 01:12:57.858] [DBUG] [PrebuiltAppHostServer] Restoring 5 integration packages via bundled NuGet
+[2026-08-05 01:12:57.858] [DBUG] [LayoutDiscovery] TryDiscoverRelativeLayout: CLI at /home/runner/.aspire/bin/.store/aspire.cli/13.4.6/aspire.cli.linux-x64/13.4.6/tools/net10.0/linux-x64, checking for layout...
+[2026-08-05 01:12:57.858] [DBUG] [LayoutDiscovery] TryInferLayout: Checking layout at /home/runner/.aspire/bin/.store/aspire.cli/13.4.6/aspire.cli.linux-x64/13.4.6/tools/net10.0/linux-x64
+[2026-08-05 01:12:57.858] [DBUG] [LayoutDiscovery]   bundle/managed/: exists
+[2026-08-05 01:12:57.858] [DBUG] [LayoutDiscovery]   bundle/dcp/: exists
+[2026-08-05 01:12:57.858] [DBUG] [LayoutDiscovery]   bundle/managed/aspire-managed: exists
+[2026-08-05 01:12:57.858] [DBUG] [LayoutDiscovery] TryInferLayout: New bundle/ layout is valid
+[2026-08-05 01:12:57.858] [DBUG] [LayoutDiscovery] Discovered layout relative to CLI: /home/runner/.aspire/bin/.store/aspire.cli/13.4.6/aspire.cli.linux-x64/13.4.6/tools/net10.0/linux-x64
+[2026-08-05 01:12:57.858] [DBUG] [BundleService] Bundle already extracted and up to date (version: 13.4.6+87fe259e4fc244c599019a7b1304c85a1488f248|144826904|639174968440000000).
+[2026-08-05 01:12:57.861] [DBUG] [BundleNuGetService] Restoring 5 packages
+[2026-08-05 01:12:57.861] [DBUG] [BundleNuGetService] aspire-managed path: /home/runner/.aspire/bin/.store/aspire.cli/13.4.6/aspire.cli.linux-x64/13.4.6/tools/net10.0/linux-x64/versions/13.4.6_87fe259e4fc244c599019a7b1304c85a1488f248-4f822d9f05017331/managed/aspire-managed
+[2026-08-05 01:12:57.861] [DBUG] [BundleNuGetService] NuGet restore args: nuget restore --output /home/runner/work/netscript/netscript/.llm/tmp/cli-e2e/plugin-smoke-20260805-011242/aspire/.aspire/integrations/package-restore/20B4B80F832F59C1/obj --framework net10.0 --runtime-identifier linux-x64 --package Aspire.Hosting,13.4.6 --package Aspire.Hosting.PostgreSQL,13.4.6 --package Aspire.Hosting.Redis,13.4.6 --package Aspire.Hosting.Browsers,13.4.6-preview.1.26319.6 --package Aspire.Hosting.CodeGeneration.TypeScript,13.4.6 --source https://api.nuget.org/v3/index.json --source https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet9/nuget/v3/index.json --working-dir /home/runner/work/netscript/netscript/.llm/tmp/cli-e2e/plugin-smoke-20260805-011242/aspire --verbose
+[2026-08-05 01:15:57.765] [INFO] [Cli] Termination signal received, requesting cancellation.
+[2026-08-05 01:15:57.861] [FAIL] [PrebuiltAppHostServer] Failed to prepare prebuilt AppHost server
+System.Threading.Tasks.TaskCanceledException: A task was canceled.
+   at System.Diagnostics.Process.<WaitForExitAsync>d__186.MoveNext() + 0x2f7
+--- End of stack trace from previous location ---
+   at Aspire.Cli.DotNet.ProcessExecution.<WaitForExitAsync>d__22.MoveNext() + 0x822
+--- End of stack trace from previous location ---
+   at Aspire.Cli.Layout.LayoutProcessRunner.<RunAsync>d__2.MoveNext() + 0x20e
+--- End of stack trace from previous location ---
+   at Aspire.Cli.NuGet.BundleNuGetService.<RestorePackagesAsync>d__7.MoveNext() + 0x442
+--- End of stack trace from previous location ---
+   at Aspire.Cli.Projects.PrebuiltAppHostServer.<RestoreNuGetPackagesAsync>d__36.MoveNext() + 0x298
+--- End of stack trace from previous location ---
+   at Aspire.Cli.Projects.PrebuiltAppHostServer.<PrepareAsync>d__34.MoveNext() + 0x224
+[2026-08-05 01:15:57.882] [INFO] [Stderr] ❌ Failed to prepare: A task was canceled.
+[2026-08-05 01:15:57.894] [INFO] [Stderr] ❌ Failed to prepare AppHost server.
+[2026-08-05 01:15:57.895] [INFO] [Stderr] 📄 See logs at /home/runner/.aspire/logs/cli_20260805T011257_a27c0343.log
+[2026-08-05 01:15:57.895] [INFO] [Cli] Exit code: 6
+[2026-08-05 01:15:57.895] [DBUG] [Host] Hosting stopping
+[2026-08-05 01:15:57.895] [DBUG] [Host] Hosting stopped
