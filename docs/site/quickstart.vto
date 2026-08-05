@@ -93,8 +93,10 @@ To derive API contracts without duplicating Prisma models:
 import { UserSchema as DatabaseUserSchema } from '@database/zod';
 import { z } from 'zod';
 
+// The scaffolded User model has id, name, createdAt, updatedAt. Pick only fields
+// that exist in schema.prisma; introduce new public fields with .extend().
 export const UserSchemaV1 = DatabaseUserSchema
-  .pick({ id: true, name: true, status: true, createdAt: true })
+  .pick({ id: true, name: true, createdAt: true })
   .extend({
     name: z.string().min(1).max(120),
     status: z.enum(['draft', 'active', 'archived']),
@@ -116,9 +118,15 @@ deno task aspire:start
 
 `deno task aspire:start` is what the CLI's own printed "next steps" recommends. It wraps `aspire start` with `ASPIRE_CLI_START_TIMEOUT=300`, providing a 300-second cold-start budget while container images download on first run. In PowerShell the path step is `Set-Location .\aspire` before restoring; the remaining commands are unchanged.
 
-When run interactively in a TTY, leave the terminal running and open the dashboard URL and login token printed by `aspire start`. If your terminal is not interactive (such as a CI job or an agent tool call), `aspire start` detaches in the background and prints no login token. In headless mode, query app status using the MCP `get_app_status` or `doctor` tools (below) to verify running resources and discover allocated URLs.
+When run interactively in a TTY, leave the terminal running and open the dashboard URL and login token printed by `aspire start`. If your terminal is not interactive (a CI job or an agent tool call), `aspire start` detaches, prints the AppHost PID and dashboard URL, and returns; the resources keep running. The dashboard itself needs a browser and a login token, so read the running graph from the shell instead:
 
-Aspire is the resource graph for local development. It starts Postgres and Redis, injects service discovery, assigns free ports at runtime, runs health checks, and collects logs and distributed traces. There is no application or service port to memorise: use the URLs beside each resource in the dashboard (or returned by `get_app_status`). The dashboard (or MCP tool output) is the authority when a copied port, an old terminal, and the running system disagree.
+```sh
+aspire describe --apphost ./aspire/apphost.mts --format Json --non-interactive --nologo
+```
+
+That prints every resource with its allocated endpoint — the Fresh app URL, the service URL, Postgres, and Redis. From an agent host, the MCP equivalent is `list_api_services`, which returns `baseUrl`, `specUrl`, and `docsUrl` per resource. Do **not** use `get_app_status` or `doctor` for this: `get_app_status` returns only a health verdict and aggregate counts — no names, no URLs — and reads a telemetry endpoint that defaults to a port Aspire did not allocate; `doctor` checks project files on disk, not running processes.
+
+Aspire is the resource graph for local development. It starts Postgres and Redis, injects service discovery, assigns free ports at runtime, runs health checks, and collects logs and distributed traces. There is no application or service port to memorise: use the URLs beside each resource in the dashboard (or the `baseUrl` of each row returned by `list_api_services`). The dashboard (or `aspire describe` / `list_api_services` output) is the authority when a copied port, an old terminal, and the running system disagree.
 
 Wait until the Fresh app, example service (`users`), Postgres, and Redis report healthy. Open a resource in the dashboard to read its console logs; after making a request, open the trace view to follow that request across processes. See [Aspire & the AppHost](/explanation/aspire/) and [Observability](/observability/) for the full model.
 
@@ -138,7 +146,7 @@ This order is mandatory for an Aspire-managed database. `db init` creates and ap
 
 ## Verify your progress
 
-Use the resource links from the Aspire dashboard (or MCP `get_app_status`) rather than substituting a remembered port. From the project root, run:
+Use the resource links from the Aspire dashboard (or `aspire describe` / MCP `list_api_services`) rather than substituting a remembered port. From the project root, run:
 
 ```sh
 deno task check
@@ -146,16 +154,16 @@ deno task check
 
 - [ ] `netscript --help` lists the public command groups (`agent`, `config`, `contract`, `db`, `deploy`, `generate`, `init`, `marketplace`, `plugin`, `service`, `ui:*`).
 - [ ] `my-app/` contains `apps/`, `contracts/`, `services/`, `database/`, `plugins/`, `aspire/`, and `tests/`.
-- [ ] Aspire is running; the dashboard (or MCP `get_app_status`) shows the Fresh app, example service (`users`), Postgres, and Redis healthy.
+- [ ] Aspire is running; the dashboard — or `aspire describe --format Json`, or MCP `list_api_services` — shows the Fresh app, example service (`users`), Postgres, and Redis with endpoints.
 - [ ] `netscript db init --name init` succeeded and the initial migration exists.
-- [ ] The Fresh app answers at the URL shown in the dashboard / MCP status.
-- [ ] Opening `<fresh-app-url>/design` renders the generated design reference (it returns an HTTP 302 redirect to `/design/composition`, so scripted checks require `curl -L`).
+- [ ] The Fresh app answers at the URL shown in the dashboard / `aspire describe` output.
+- [ ] Opening `<fresh-app-url>/design` renders the generated design reference (it returns an HTTP 302 redirect to `/design/tokens`, so scripted checks require `curl -L`).
 - [ ] `deno task check` passes with no errors.
 
 **Do not begin customising until every box is ticked.** An unverified base makes every later failure look like your code.
 
 {{ comp callout { type: "tip", title: "If something is not green" } }}
-Three checks cover most first-run snags: is Aspire still running with its resources healthy; is Docker running (<code>docker info</code>); and did you run <code>aspire restore</code> from <code>aspire/</code> before launching <code>deno task aspire:start</code>? Note that <code>aspire restore</code> / <code>start</code> can occasionally time out under heavy system load with <code>Failed to prepare: A task was canceled</code>; re-running the start command usually succeeds. If operating headlessly without a browser, inspect failure diagnostics via the MCP <code>get_recent_errors</code> or <code>get_app_status</code> tools rather than guessing process state. On Windows, a generated <code>deno task deps:verify</code> error names an incomplete project-local npm materialisation and prints the PowerShell recovery command; follow that diagnostic rather than patching a package.
+Three checks cover most first-run snags: is Aspire still running with its resources healthy; is Docker running (<code>docker info</code>); and did you run <code>aspire restore</code> from <code>aspire/</code> before launching <code>deno task aspire:start</code>? Note that <code>aspire restore</code> / <code>start</code> can occasionally time out under heavy system load with <code>Failed to prepare: A task was canceled</code>; re-running the start command usually succeeds. If operating headlessly without a browser, inspect failure diagnostics via the MCP <code>get_recent_errors</code> tool, and resolve resource endpoints with <code>aspire describe --format Json</code>, rather than guessing process state. On Windows, a generated <code>deno task deps:verify</code> error names an incomplete project-local npm materialisation and prints the PowerShell recovery command; follow that diagnostic rather than patching a package.
 {{ /comp }}
 
 ## Take the first tour
@@ -165,7 +173,7 @@ Two generated pages are worth opening before you edit anything:
 - **`<fresh-app-url>/design`** renders the tokens, components, and composition rules already in the app. Read `/design/composition` before deciding what belongs on the server or in an island.
 - **`<service-url>/api/docs`** is the service's Scalar API reference, generated from the same contract the handler implements. Use it to inspect and exercise the running oRPC/OpenAPI surface.
 
-Base URLs are allocated dynamically by Aspire. Inspect them via the Aspire dashboard or by calling MCP `get_app_status` / `list_api_services`.
+Base URLs are allocated dynamically by Aspire. Inspect them via the Aspire dashboard, `aspire describe --format Json`, or MCP `list_api_services`.
 
 ## Build a feature through the CLI
 
@@ -196,10 +204,17 @@ Your application workspace comes pre-populated with a full component registry un
 Use the `ui:*` family to list, copy, update, or manage UI registry items:
 
 ```sh
-netscript ui:list
+netscript ui:list --project-root apps/dashboard
 ```
 
-Run `netscript ui:list` to inspect every available component and its local copy status. Reach for an existing registry item before building UI components by hand. Use `netscript ui:add <item>` to copy additional registry items, `netscript ui:update` to sync unmodified copies, and `netscript ui:remove` to clean up unused components.
+Every `ui:*` command needs `--project-root apps/dashboard`. Without it they resolve to the
+workspace root — where `components/ui/` does not exist — so `ui:list` reports the components the
+scaffold already copied as if they were missing, and `ui:add` writes a second copy into the
+workspace root and edits the root `deno.json`.
+
+Reach for an existing registry item before building UI by hand: `netscript ui:add <item>
+--project-root apps/dashboard` copies one, `ui:update --project-root apps/dashboard` syncs
+unmodified copies, and `ui:remove <item> --project-root apps/dashboard` removes one.
 
 To scaffold a new Fresh page, colocated island, and query loader:
 
@@ -233,7 +248,7 @@ The current server exposes 21 bounded tools in seven task families:
 | CLI bridge | `list_commands`, `execute_command` |
 | Evidence | `record_drift` |
 
-Reach for `doctor` first when the stack is red, `find_export` before guessing a package subpath, `get_app_status` or `list_api_services` to resolve runtime URLs headlessly, and `get_operation_schema` before inventing a request with `curl`. The complete schemas and safety policy live in [Agent tooling](/ai/agent-tooling/) and the [`@netscript/mcp` reference](/reference/mcp/).
+Reach for `doctor` first when the stack is red, `find_export` before guessing a package subpath, `list_api_services` to resolve runtime URLs headlessly, and `get_operation_schema` before inventing a request with `curl`. The complete schemas and safety policy live in [Agent tooling](/ai/agent-tooling/) and the [`@netscript/mcp` reference](/reference/mcp/).
 
 ## First-hour CLI command reference
 
@@ -272,4 +287,4 @@ aspire stop --apphost ./aspire/apphost.mts
 
 The Postgres container is declared `Persistent` in `appsettings.json`, so it deliberately survives AppHost shutdown. Use Docker (`docker stop` / `docker rm`) when you want to remove the database container and free up disk space.
 
-*Note: All commands, flags, and paths on this page have been verified against NetScript CLI source and live `--help` output on Deno 2.x (Linux and Windows).*
+*Note: every command, flag, and path on this page is verified against NetScript CLI source and live `--help` output, and the flow was walked end to end on Linux with Deno 2.x. The Windows guidance is source-derived and has not been executed on Windows.*

@@ -163,15 +163,15 @@ before any `netscript db` command.** Run it from the `aspire/` subfolder so the 
 ```sh
 cd aspire
 aspire restore   # once per machine: restores the Aspire SDK modules into .aspire/
-aspire start       # starts the AppHost and every declared resource
+deno task aspire:start   # starts the AppHost and every declared resource
 ```
 
-`aspire start` brings up the Postgres database, the Redis cache, and your `products` service
+`deno task aspire:start` — the wrapper the CLI's own printed next steps recommend, which sets a 300-second cold-start budget while container images download on first run — brings up the Postgres database, the Redis cache, and your `products` service
 together, then prints a URL and a one-time login token for the **Aspire dashboard**.
 
-In an interactive terminal, leave `aspire start` running in this terminal — it is your storefront's control
-plane for the rest of the track. (If your terminal is not interactive, `aspire start` detaches in the background without printing a login token; use the MCP `get_app_status` or `doctor` tools to inspect resource status headlessly.) Aspire assigns free ports at runtime, so use the URLs in the
-dashboard (or MCP `get_app_status`) instead of memorising a dashboard or app port.
+In an interactive terminal, leave it running in this terminal — it is your storefront's control
+plane for the rest of the track. (If your terminal is not interactive, it detaches without printing a login token; resolve resource endpoints with `aspire describe --apphost ./aspire/apphost.mts --format Json --non-interactive --nologo`, or MCP `list_api_services`, rather than the dashboard.) Aspire assigns free ports at runtime, so use the URLs in the
+dashboard (or MCP `list_api_services`) instead of memorising a dashboard or app port.
 
 ### Initialize the database before customising
 
@@ -213,7 +213,7 @@ A clean check, plus a healthy `curl`, means the scaffold is sound.
 
 - [ ] `netscript --help` lists the public command groups (`agent`, `config`, `contract`, `db`, `deploy`, `generate`, `init`, `marketplace`, `plugin`, `service`, `ui:*`).
 - [ ] `my-shop/` exists with `contracts/`, `services/products/`, `database/`, `plugins/`, `aspire/`, and `tests/`.
-- [ ] `aspire start` is up; its printed dashboard URL (or MCP `get_app_status`) shows `products`, `postgres`, and `redis`
+- [ ] `aspire start` is up; its printed dashboard URL (or MCP `list_api_services`) shows `products`, `postgres`, and `redis`
       healthy.
 - [ ] `netscript db init --name init` succeeded and the initial migration exists.
 - [ ] `curl http://localhost:3001/health` returns healthy JSON.
@@ -225,7 +225,7 @@ A clean check, plus a healthy `curl`, means the scaffold is sound.
 look like your code.
 
 {{ comp callout { type: "tip", title: "If something is not green" } }}
-Three quick checks cover most first-run snags: (1) is <code>aspire start</code> still up in its terminal, with <code>postgres</code> and <code>redis</code> healthy in the <a href="/explanation/aspire/">dashboard</a>? (2) is Docker running (<code>docker info</code>)? (3) did you <code>cd aspire</code> before <code>aspire start</code>, so it found <code>apphost.mts</code>? Note that <code>aspire restore</code> / <code>start</code> can occasionally time out under heavy system load with <code>Failed to prepare: A task was canceled</code>; re-running the start command usually succeeds. If operating headlessly without a browser, inspect failure diagnostics via the MCP <code>get_recent_errors</code> or <code>get_app_status</code> tools rather than guessing process state.
+Three quick checks cover most first-run snags: (1) is <code>aspire start</code> still up in its terminal, with <code>postgres</code> and <code>redis</code> healthy in the <a href="/explanation/aspire/">dashboard</a>? (2) is Docker running (<code>docker info</code>)? (3) did you <code>cd aspire</code> before <code>aspire start</code>, so it found <code>apphost.mts</code>? Note that <code>aspire restore</code> / <code>start</code> can occasionally time out under heavy system load with <code>Failed to prepare: A task was canceled</code>; re-running the start command usually succeeds. If operating headlessly without a browser, inspect failure diagnostics via the MCP <code>get_recent_errors</code> or <code>list_api_services</code> tools rather than guessing process state.
 {{ /comp }}
 
 ## What you built
