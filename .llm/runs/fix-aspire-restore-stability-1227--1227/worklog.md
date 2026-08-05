@@ -62,3 +62,6 @@
 - 2026-08-05: added a manual-dispatch-only `quickstart-only` proof mode. It leaves canary and normal
   production behavior unchanged while omitting the unrelated scaffold suite and propagation sleep
   for repeated clean-run proof against an already-published exact version.
+- 2026-08-05: canceled run 30966638003 remained `in_progress` even after the force-cancel endpoint
+  and held the ref-wide concurrency lock. Manual `quickstart-only` proofs now key concurrency by
+  run id; normal canary/production dispatches retain ref serialization.
