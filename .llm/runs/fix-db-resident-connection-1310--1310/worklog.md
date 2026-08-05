@@ -36,3 +36,13 @@ Pending RED-first implementation.
 - A same-shell live probe showed `db init` receiving the resident Postgres connection string and
   completing successfully through `netscript-db-postgres`, with no nested AppHost generation.
 - `deno.lock` remains pre-existing, modified, and unstaged.
+
+## Hosted merge gates
+
+- Hosted SQLite runtime initially exposed that generated SQLite consumers entered the server-only
+  Aspire `withReference` branch once the full resident graph was no longer short-circuited. Commit
+  `91c4bae7b` makes services, plugin services, and background processors bind SQLite by file URL
+  before considering the server-database reference branch; focused generator tests lock the order.
+- On `91c4bae7b`, hosted quality, check-test, deps-report, static scaffold, PostgreSQL runtime, and
+  SQLite runtime all passed. The acceptance mirror and review-thread gate passed, so the PR's final
+  Definition-of-Done box was earned and checked before the close-gate retrigger push.
