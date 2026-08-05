@@ -542,7 +542,7 @@ function databaseRuntimeResources(
 export const PROBE_SERVICE_HEALTH_SCRIPT = [
   'const appHost = Deno.args[0];',
   'const resourceName = Deno.args[1] ?? "users";',
-  'const database = Deno.args[2] ?? "postgres";',
+  'const database = Deno.args[2];',
   'if (!appHost) throw new Error("apphost argument is required");',
   'const command = new Deno.Command("aspire", {',
   '  args: ["describe", "--apphost", appHost, "--format", "Json"],',
@@ -586,6 +586,7 @@ export const PROBE_SERVICE_HEALTH_SCRIPT = [
   '  if (!isRecord(health) || health.status !== "healthy" || !Array.isArray(health.checks)) {',
   '    return false;',
   '  }',
+  '  if (expectedDatabase === undefined) return true;',
   '  const databaseChecks = health.checks',
   '    .filter(isRecord)',
   '    .map((check) => check.name)',
