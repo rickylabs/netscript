@@ -11,9 +11,11 @@ the Aspire CLI lifecycle defect fixed by
 [microsoft/aspire#18958](https://github.com/microsoft/aspire/pull/18958), not the size or Deno shape
 of NetScript's resource graph. That PR stopped leaking orphaned Aspire-managed NuGet search helper
 processes and merged on 2026-08-03 for milestone 13.5. NetScript
-[#1308](https://github.com/rickylabs/netscript/pull/1308) independently proved the diagnosis by
-running the 13.4.6 SDK restore through the fixed daily CLI: exit 0 in 13.06 seconds, with no new
-helper leaked. This supersedes the original premise that a Deno runtime path might cure #1227.
+[#1308](https://github.com/rickylabs/netscript/pull/1308) corroborated that diagnosis and proved
+compatibility by running the unchanged 13.4.6 SDK graph through the fixed daily CLI: exit 0 in 13.06
+seconds, with no new helper leaked. Its required five consecutive published-canary runs remain the
+reliability completion gate; one green restore alone cannot prove an intermittent failure absent.
+This supersedes the original premise that a Deno runtime path might cure #1227.
 
 As an architectural question, Deno hosting still does not reduce the NuGet-shaped integration probe
 used by `aspire restore`. On Aspire 13.4.6, even a TypeScript AppHost with no configured integration
@@ -21,8 +23,9 @@ packages restores a 75-library NuGet graph. Adding the stable CommunityToolkit D
 makes that 76. Adding it to today's representative NetScript PostgreSQL + Redis + Browsers graph
 makes 83 become 84. The first-party implementation in
 [microsoft/aspire#18628](https://github.com/microsoft/aspire/pull/18628) is housed in the existing
-`Aspire.Hosting.JavaScript` **NuGet package**, so it has the same 84-library shape, not a zero-NuGet
-shape.
+`Aspire.Hosting.JavaScript` **NuGet package**. The current 13.4.6 assembly is an 84-library proxy
+for that package identity, not a prediction of the unreleased 13.5 transitive count; either way, it
+adds a direct integration package rather than producing a zero-NuGet shape.
 
 The stale source comment is wrong in a second, independent way: external `[AspireExport]` works in
 13.4.6. `CommunityToolkit.Aspire.Hosting.Deno@13.4.0` generated `addDenoApp(...)` in
@@ -125,7 +128,7 @@ allocation and are included only to show scale, not as a stable package-size con
 | core + `Aspire.Hosting.JavaScript` 13.4.6                       |                   3 |                 76 |   ~419 MiB |
 | current representative NetScript: Browsers + PostgreSQL + Redis |                   5 |                 83 |   ~464 MiB |
 | current representative + CommunityToolkit Deno                  |                   6 |                 84 |   ~465 MiB |
-| current representative + first-party JavaScript assembly        |                   6 |                 84 |   ~465 MiB |
+| current representative + JavaScript 13.4.6 proxy for #18628     |                   6 |                 84 |   ~465 MiB |
 
 The unavoidable two direct dependencies in both “empty” variants were:
 
@@ -142,7 +145,9 @@ increase from 75 to 83. Both Deno integration choices add exactly one resolved l
 Consequently:
 
 - CommunityToolkit Deno increases today's measured surface from 83 to 84.
-- First-party Deno in `Aspire.Hosting.JavaScript` also increases it from 83 to 84.
+- The current `Aspire.Hosting.JavaScript@13.4.6` proxy increases it from 83 to 84. #18628 therefore
+  adds one direct integration package, but the exact 13.5 transitive total must be remeasured after
+  release.
 - Neither changes the mandatory 75-library TypeScript SDK/code-generation floor.
 - Replacing `addExecutable('deno', ...)` with either `addDenoApp(...)` therefore increases rather
   than reduces the measured NuGet graph. That is not the cause of #1227, but it is marginally more

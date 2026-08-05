@@ -65,6 +65,7 @@ using its recorded command/configuration and follow the exact upstream watch sig
 | 2026-08-05 04:24 CEST | S1    | runtime     | Toolkit 13.4.0 exported `addDenoApp`; Deno 2.9.3 resource reached `up (running)` on Aspire 13.4.6 and stopped cleanly.                                                 |
 | 2026-08-05 04:36 CEST | S1    | verdict     | Completed research: do not adopt as #1227 mitigation; conditionally reassess first-party Deno after merged/stable 13.5 and exact-version fixture.                      |
 | 2026-08-05 05:20 CEST | S1    | correction  | Incorporated sibling diagnosis: #18958 fixes leaked NuGet search helpers; reframed Deno as architectural surface and 13.5 coordination, not #1227 remediation.         |
+| 2026-08-05 05:50 CEST | S1    | eval-fix    | IMPL-EVAL requested two precision fixes: daily proof is corroboration pending five canaries; 84 is a 13.4.6 JavaScript-package proxy, not a 13.5 prediction.           |
 
 ## Decisions
 
