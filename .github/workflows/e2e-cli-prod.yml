@@ -95,7 +95,8 @@ jobs:
           mkdir -p .llm/tmp/aspire-nuget-source
           find "$HOME/.nuget/packages" -name '*.nupkg' \
             -exec cp --update=none '{}' .llm/tmp/aspire-nuget-source/ \;
-          find "$HOME/.aspire/bin" -type f -name aspire-managed -print -quit \
+          aspire_path="$(readlink -f "$HOME/.aspire/bin/aspire")"
+          find "$(dirname "$aspire_path")" -type f -name aspire-managed -print -quit \
             > .llm/tmp/aspire-managed-path.txt
           test -s .llm/tmp/aspire-managed-path.txt
 

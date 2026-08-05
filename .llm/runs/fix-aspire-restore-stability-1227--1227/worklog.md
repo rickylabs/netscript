@@ -43,3 +43,6 @@
   production (five-package `20B4B80F832F59C1`, DB four-package `F7BD251A60347D74`). A local cold
   fixture hydrated from that source and `aspire restore` then completed in 7.10s without a network
   NuGet restore. The classified retry remains as a bounded fallback.
+- 2026-08-05: run 30966339570 failed before E2E because the cloud `dotnet tool --tool-path`
+  launcher does not keep its `.store` beneath `~/.aspire/bin`. Corrected discovery to resolve the
+  launcher target and search beside the installed bundle. Proof streak remains 0/3.
