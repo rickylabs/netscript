@@ -2069,3 +2069,26 @@ and the data directory survives teardown — the issue's own regression criterio
 defects, and then launders them as evidence. Step 5 passed because the commands exited 0; it
 never asked whether the thing it just did was safe. When a gate's steps come from prose, each
 step needs an assertion about resulting STATE, not just exit status.**
+
+## 2026-08-05 — MERGE #1308 (#1227 CLOSED): the pilot's last technical blocker clears
+
+All four contexts green, threads 0/0, refs [1227]. **#1227 closed** — the defect that destroyed
+canary.6 and canary.9 pairs, survived three mitigation rounds, and was never ours.
+
+**Independently verified before merging** (the agent had finished but stalled an hour without
+flipping ready, so I did not take its summary on trust): `gh run list` filtered to headSha
+`5c9a6567a` returns **total=5, success=5, zero failures** — against a defect that had been
+failing ~50% of runs. The diff pins `ASPIRE_CLI_VERSION: 13.5.0-preview.1.26404.10` with the
+reason inline ("13.4.6 can orphan stopped NuGet prefetch helpers that deadlock later") and also
+touches the walk suite and runtime gates.
+
+Pilot bar status: **six of seven boxes proven; step 4 now fixed at the cause**. Step 5's verdict
+is compromised by my own gate defect (finding 47) and is being repaired inside #1311.
+
+## 2026-08-05 — #1311 up for #1310, gated report-only
+
+`fix/db-resident-connection-1310` — title reads "run database commands through resident AppHost",
+i.e. targeting the cause rather than a fourth symptom. Deliberately NOT auto-merging: it changes
+how every `db` command reaches the database, and its acceptance includes the state-asserting
+regression test (resident Postgres is the ONLY postmaster on that DataPath) that my own walk
+gate failed to have. I read this diff before it lands.
