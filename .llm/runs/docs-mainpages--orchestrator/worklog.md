@@ -246,3 +246,27 @@
   Together with #1287 this is why 3 of the Quickstart's 7 verify boxes are red today.
 - Fix round dispatched; first resume returned empty and changed nothing (judged by artifacts,
   not exit code) — re-dispatched detached.
+
+## 2026-08-05 — #1274 Quickstart merged; issue closed
+
+- **PR #1309 merged 01:43Z; #1274 auto-closed.** Four executed audit cycles. What execution
+  caught that reading could not: the derivation sample crashed (Zod 4 rejects an unknown key in
+  .pick() and the scaffolded User has no `status`); the headless path pointed at
+  get_app_status/doctor, which return counts and a file stat respectively; the replacement,
+  list_api_services, silently drops Postgres/Redis (tcp:// filtered) so an agent would tick an
+  unverified box; every ui:* command resolved to the workspace root.
+- **Walk-gate reconciliation:** main's #1298/#1299 added machine-parsed quickstart-walk markers
+  plus a CI test pinning the command sequence while the rewrite was in flight. Marker block
+  carries main's exact sequence (verified locally against QUICKSTART_DOCUMENTED_COMMANDS) so no
+  packages/ fixture was edited from the docs lane; the two correctness deltas (release-day
+  install flags, deno task aspire:start + 300s budget) are adjacent guidance, with the fixture
+  change proposed to the gate owner.
+- **close-gate** refused the merge until every #1274 acceptance box had a structured
+  acceptance-evidence entry — recorded honestly, including MCP = 21 tools (issue said 24) and
+  Windows guidance as source-derived, not executed.
+- Upstream defects found by executing this page and fixed first: #1290 (p0), #1287. Remaining
+  agent-facing gap tracked as #1306.
+- Lane note: Codex hit a hard usage limit until Aug 11 mid-round; agy authored but single-turn
+  and unverified (it produced both the crashing sample and the dead-end tool path), so the
+  orchestrator applied the audit's supplied replacements as validator. Recorded as a deviation
+  from D-16.
