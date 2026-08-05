@@ -1887,3 +1887,47 @@ flip.** That last clause is the acceptance.
 converts a 30-minute hang into a 3-minute failure is real progress and must not be mistaken for
 resolution — for an unattended consumer, a bounded halt is still a halt. Intermittent defects
 need repeated-run acceptance; single-pass evidence cannot distinguish a fix from luck.**
+
+## 2026-08-05 — Owner correction: stop working around #1227, understand it. Two xhigh investigations
+
+Owner's criticism is accepted and correct: two rounds on #1227 (bounding, then retry+cache)
+both treated the symptom. **Neither asked what `aspire restore` does or why a task is
+cancelled.** Ground truth gathered before dispatching, so the agents start from facts:
+- **Aspire CLI 13.4.6 is what we pin AND is the newest stable** (13.4.1→13.4.6, released
+  2026-06-20, ~6 weeks old). No stable upgrade available — the daily/canary channel is unchecked
+  and is now in scope.
+- **What restore does** (our own source): downloads the TypeScript AppHost SDK modules and
+  rebuilds `.aspire/modules/aspire.mts` from the NuGet packages declared in `aspire.config.json`
+  — a NuGet-restore-shaped, feed-dependent operation. Exit code 6, `OperationCanceledException`
+  surfacing as "A task was canceled".
+- **The Deno thread the owner pointed at is already written in our own code.**
+  `generate-aspire-config.ts` says we deliberately omit `CommunityToolkit.Aspire.Hosting.Deno`
+  because in 13.2 `[AspireExport]` was only honoured for AppHost-local types, and — verbatim —
+  "**Revisit when Aspire 13.3 lands (GH aspire#15119 / aspire#16220)**". We are on 13.4.6, so
+  the version condition is met and **nobody revisited**. But I checked both upstream issues and
+  **both are still OPEN**, so the dependency condition is not obviously met. That nuance went
+  into the brief rather than a conclusion.
+- Upstream search for the cancellation signature found nothing matching → if that holds, **we
+  should file it upstream**; the root-cause brief makes drafting that issue a deliverable.
+**Dispatched two Sol · xhigh slices** (owner-specified effort): `ns005-aspireroot` (read the
+discarded `~/.aspire/logs/cli_*.log`, name the cancelling component with evidence, establish
+upstream state incl. the canary channel, then and only then choose a fix; acceptance is N
+consecutive green walks) and `ns005-denohost` (research-only verdict on whether the Deno path
+shrinks or grows the NuGet surface restore must fetch — if it adds a NuGet it makes #1227
+worse, which is the load-bearing question).
+**Finding 43 (for #1163): when a defect survives two fix rounds, stop fixing and start
+explaining. Both rounds here produced plausible mitigations because the brief asked for a fix;
+neither asked "what is this command doing". The tell is a fix whose acceptance is 'the symptom
+got smaller' rather than 'the cause is named'.**
+
+## 2026-08-05 — docsorch unblocked with a decision (owner flagged it stuck)
+
+Its dilemma ("three of seven verify boxes red → the checklist is either a halt or decorative")
+was written when #1290 and #1287 were open. Both are now CLOSED and machine-verified on
+published canary.10 (step 3 PASSED twice). Told it to write the page for a passing checklist
+with ONE honest exception — name `aspire restore` as the known-flaky step, say to re-run, say
+that repeated failure is #1227 and not the reader's environment. A checklist that names its own
+flaky step is neither decorative nor a trap. Also told it to FILE, not just document, its own
+best find: `aspire start` detaches with no TTY and prints no login token, so "the dashboard is
+the authority" fails for a consumer with neither TTY nor browser — the primary consumer being
+agents.
