@@ -139,7 +139,8 @@ function createQuickstartGates(): readonly GateDefinition[] {
       (context) => [
         'deno',
         'run',
-        '--allow-run=aspire',
+        '--allow-read',
+        '--allow-run',
         resolve(
           context.project.repoRoot,
           'packages/cli/e2e/src/application/gates/quickstart/aspire-walk.ts',
@@ -147,6 +148,7 @@ function createQuickstartGates(): readonly GateDefinition[] {
         context.project.appHost,
         context.project.projectRoot,
         String(ASPIRE_STEP_TIMEOUT_MS),
+        context.project.repoRoot,
       ],
       (context) => context.project.projectRoot,
     ),
@@ -157,13 +159,15 @@ function createQuickstartGates(): readonly GateDefinition[] {
       (context) => [
         'deno',
         'run',
-        '--allow-run=deno',
+        '--allow-read',
+        '--allow-run',
         resolve(
           context.project.repoRoot,
           'packages/cli/e2e/src/application/gates/quickstart/database-walk.ts',
         ),
         requirePublishedCli(context),
         context.project.projectRoot,
+        context.project.repoRoot,
       ],
       (context) => context.project.projectRoot,
     ),

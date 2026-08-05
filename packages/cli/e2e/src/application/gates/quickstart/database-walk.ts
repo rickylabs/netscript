@@ -1,3 +1,5 @@
+import { hydrateAspirePackageCache } from './hydrate-aspire-package-cache.ts';
+
 const DB_APPHOST_START_TIMEOUT_SECONDS = '90';
 const DB_COMMAND_TIMEOUT_MS = 120_000;
 export const DB_RESTORE_MAX_ATTEMPTS = 2;
@@ -111,7 +113,10 @@ async function runDatabaseCommand(
 }
 
 if (import.meta.main) {
-  const [cliSpecifier, projectRoot] = Deno.args;
-  if (!cliSpecifier || !projectRoot) throw new Error('cliSpecifier and projectRoot are required');
+  const [cliSpecifier, projectRoot, repoRoot] = Deno.args;
+  if (!cliSpecifier || !projectRoot || !repoRoot) {
+    throw new Error('cliSpecifier, projectRoot, and repoRoot are required');
+  }
+  await hydrateAspirePackageCache(repoRoot, `${projectRoot}/aspire`, 'four');
   await runBoundedDatabaseWalk(cliSpecifier, projectRoot);
 }

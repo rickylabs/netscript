@@ -34,3 +34,12 @@
   wrapper. It sets Aspire's internal start bound to 90s and retries only the two production restore
   surfaces (exit 6 cancellation with both preparation markers, or exit 2 start timeout with the
   AppHost-log marker). Product failures remain single-attempt and distinctly classified.
+- 2026-08-05: proof run 30965320792 failed step 4 after two clean 180s attempts; both logs show the
+  five-package bundled restore stalled despite a hit in `~/.nuget/packages`. This disproves the
+  assumption that Aspire consumes the ordinary NuGet global cache on its TypeScript integration
+  path. No proof credit earned; streak remains 0/3.
+- 2026-08-05: S5 materializes cached `.nupkg` files as a local source, then invokes Aspire's own
+  pinned `aspire-managed` restore into the two exact project-local cache identities observed in
+  production (five-package `20B4B80F832F59C1`, DB four-package `F7BD251A60347D74`). A local cold
+  fixture hydrated from that source and `aspire restore` then completed in 7.10s without a network
+  NuGet restore. The classified retry remains as a bounded fallback.

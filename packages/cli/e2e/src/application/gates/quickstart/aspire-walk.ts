@@ -1,3 +1,5 @@
+import { hydrateAspirePackageCache } from './hydrate-aspire-package-cache.ts';
+
 /** Failure classifications emitted when a Quickstart Aspire command exceeds its bound. */
 export const ASPIRE_TIMEOUT_CLASSIFICATION = {
   RESTORE: 'quickstart.aspire.restore.timeout:#1227',
@@ -149,7 +151,9 @@ async function runAspireCommand(
 }
 
 if (import.meta.main) {
-  const [appHost, projectRoot, timeout] = Deno.args;
+  const [appHost, projectRoot, timeout, repoRoot] = Deno.args;
   if (!appHost || !projectRoot) throw new Error('appHost and projectRoot are required');
+  if (!repoRoot) throw new Error('repoRoot is required');
+  await hydrateAspirePackageCache(repoRoot, `${projectRoot}/aspire`, 'five');
   await runBoundedAspireWalk(appHost, projectRoot, Number(timeout));
 }

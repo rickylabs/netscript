@@ -90,6 +90,15 @@ jobs:
           dotnet tool install Aspire.Cli --tool-path "$HOME/.aspire/bin" --version "$ASPIRE_CLI_VERSION"
           echo "$HOME/.aspire/bin" >> "$GITHUB_PATH"
 
+      - name: Materialize pinned Aspire local package source
+        run: |
+          mkdir -p .llm/tmp/aspire-nuget-source
+          find "$HOME/.nuget/packages" -name '*.nupkg' \
+            -exec cp --update=none '{}' .llm/tmp/aspire-nuget-source/ \;
+          find "$HOME/.aspire/bin" -type f -name aspire-managed -print -quit \
+            > .llm/tmp/aspire-managed-path.txt
+          test -s .llm/tmp/aspire-managed-path.txt
+
       - name: Download published version
         if: github.event_name == 'workflow_run'
         uses: actions/download-artifact@v5

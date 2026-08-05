@@ -68,6 +68,20 @@ Deno.test('quickstart service-response verdict accepts service health without a 
   assertEquals(response.slice(-2), ['/repo/.llm/tmp/my-app/aspire/apphost.mts', 'users']);
 });
 
+Deno.test('quickstart Aspire gates hydrate the pinned project-local package cache', () => {
+  const suite = createQuickstartWalkSuite({
+    packageSource: PACKAGE_SOURCE.JSR,
+    cliEntrypoint: EXACT_CLI,
+  });
+  const context = contextFor(suite.defaultOptions);
+  const aspire = command(suite, GATE.QUICKSTART_ASPIRE, context);
+  const database = command(suite, GATE.QUICKSTART_DATABASE, context);
+  assertEquals(aspire.includes('/repo'), true);
+  assertEquals(database.includes('/repo'), true);
+  assertEquals(aspire.includes('--allow-read'), true);
+  assertEquals(database.includes('--allow-read'), true);
+});
+
 Deno.test('quickstart commands reject a local CLI entrypoint', () => {
   const suite = createQuickstartWalkSuite({
     packageSource: PACKAGE_SOURCE.LOCAL,
