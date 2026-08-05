@@ -1965,3 +1965,36 @@ read as "no matches" instead of "wrong repo".**
 Also re-scoped the Deno agent: read both PRs INCLUDING #18628's 151 review comments (the
 objections are the real signal about what ships), and identify whether we can unblock it —
 contributing upstream may be the shortest path to our own p0.
+
+## 2026-08-05 — #1227 ROOT CAUSE: upstream Aspire process leak (microsoft/aspire#18958)
+
+The xhigh investigation found it in one pass, once pointed at the right repo and told to
+explain rather than fix.
+
+**Cause: `microsoft/aspire#18958` — "Stop leaking orphaned aspire-managed NuGet search helpers"**,
+merged upstream **2026-08-03**, milestone 13.5. Our pinned **CLI 13.4.6 was published
+2026-06-20 — 44 days earlier**, so every run we have ever made carries the defect. Leaked NuGet
+search helper processes accumulate and eventually starve/cancel the restore →
+`Failed to prepare: A task was canceled / Failed to prepare AppHost server`, exit 6.
+
+One mechanism explains every previously unaccountable observation: the intermittency (depends on
+contention, not our code), local AND cloud reproduction (it is the CLI), **and why it worsened
+across long sessions — leaked helpers accumulate, and this milestone has been running scaffold
+suites all night**. It also explains why three rounds of mitigation failed: bounding, retry
+budgets and pinned caches all modelled contention as environmental when it was a process leak.
+
+**Verified:** isolated 13.4.6 SDK restore through the fixed daily CLI — **exit 0 in 13.06s, no
+helper leaked.**
+
+Disposition: **#1308** pins the published-canary workflow to the exact tested daily build
+containing #18958, recorded as temporary operational debt until a stable release carries it
+(13.5 is 91% complete). **#1305 closed as superseded**, with credit — its S1 log capture is what
+made the diagnosis possible. No upstream filing needed: already reported and fixed; we were
+simply behind on a channel with no newer stable to move to.
+
+**Finding 45 (for #1163): "we are current on the stable channel" is not the same as "we are
+current". 13.4.6 was both our pin and the newest stable, which I reported as version currency
+established — but the fix had been merged 44 days later on main and was available on the daily
+channel. When a defect is suspected upstream, check the DEFAULT BRANCH and the pre-release
+channel, not just the latest release. The owner had to say "check their canary channel" twice
+before it happened.**
