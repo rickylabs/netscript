@@ -59,7 +59,7 @@ Deno.test('public init emits resolvable app conventions with and without the exa
       includeExampleService: true,
       serviceName: 'users',
     }),
-    'Before hand-writing a service request or probing it with curl, call MCP `list_service_operations` and `get_operation_schema` for the live contract.',
+    'Before hand-writing a service request or probing it with curl, follow the MCP path: `list_api_services` to discover the live service name, `list_service_operations` to select an operation, then `get_operation_schema` for its request and response contract.',
   );
   const parent = await Deno.makeTempDir({
     prefix: 'netscript-app-conventions-',
