@@ -26,3 +26,12 @@
 - **Actual:** Extend the existing ACME third-party fixture with linking and runnable entrypoints.
 - **Severity:** minor
 - **Action:** fix plan implementation shape; no parallel fixture created
+
+## 2026-08-05 — live runtime proof blocked by foreign AppHosts
+
+- **What:** The brief requires exactly one AppHost at a time for runtime and OTEL evidence.
+- **Source:** `agentic:leak-check` found two foreign planning-board AppHosts and one foreign CLI E2E AppHost.
+- **Expected:** Start the fresh ACME fixture scaffold, call catalog→fixture, and capture telemetry.
+- **Actual:** Starting another AppHost would violate resource safety; foreign resources were not touched.
+- **Severity:** blocking for acceptance box 5 only
+- **Action:** keep box 5 unticked and state the precise missing live evidence

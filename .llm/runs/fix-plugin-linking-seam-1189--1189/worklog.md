@@ -62,6 +62,10 @@ file changes are needed for a new plugin.
 | 2026-08-05 | 2 | reconciliation | Generic manifest scan and four-surface reconciliation pass; `-api` discovery heuristic removed. |
 | 2026-08-05 | 2 | symmetry | Consumer-later and uninstall cleanup fixture converges; ACME local-path install wires both consumers. |
 | 2026-08-05 | 2 | runtime seam | Plugin-owned created entrypoints now select generated workdirs without plugin identity branches. |
+| 2026-08-05 | 3 | fresh install | Real CLI installed the ACME fixture into a fresh scaffold; persisted manifest stayed third-party-only and catalog/dashboard received `fixture-api`. |
+| 2026-08-05 | 3 | uninstall | Real CLI removal deleted both producer entries and pruned both consumer references. |
+| 2026-08-05 | 3 | safety | Fixture post-script now writes inside its declared third-party writable subtree; dispatch regression updated and green. |
+| 2026-08-05 | 3 | runtime block | Live start/OTEL deferred: leak reporter found three foreign AppHosts, so the one-AppHost rule forbids another start. |
 
 ## Gate Results
 
@@ -71,8 +75,13 @@ file changes are needed for a new plugin.
 | Reconciler RED→GREEN | PASS | 4 tests, including third-party, both order, and cleanup. |
 | Third-party install | PASS | `install-plugin_test.ts`, 27 steps; ACME manifest has no `officialSource`. |
 | Fixture dispatch | PASS | 11 steps; generated runtime entrypoint artifacts included. |
+| Fresh CLI install | PASS | `Installed fixture plugin`; appsettings contains `fixture-api` in catalog/dashboard and no persisted `officialSource`. |
+| Fresh CLI remove | PASS | Empty Plugins/BackgroundProcessors; catalog/dashboard `PluginReferences` absent. |
+| Fresh scaffold check | BLOCKED | Scaffold requires `netscript db generate`; that command requires an AppHost and three foreign AppHosts are active. |
+| Live service/OTEL | BLOCKED | Safety rule prohibits starting a fourth AppHost; foreign owners left untouched. |
 
-D6 PLAN-EVAL is composed per milestone ruling. Runtime/OTEL and full quality gates remain pending.
+D6 PLAN-EVAL is composed per milestone ruling. Full quality gates remain pending; runtime acceptance
+is explicitly unearned until the shared-host AppHost slot clears.
 
 ## Handoff Notes
 

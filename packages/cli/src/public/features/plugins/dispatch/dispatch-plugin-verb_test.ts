@@ -203,7 +203,10 @@ describe('plugin scaffold dispatch', () => {
         await Deno.readTextFile(join(projectRoot, 'plugins/fixture/generated.txt')),
         'plugin=fixture\n',
       );
-      assertEquals(await Deno.readTextFile(join(projectRoot, 'post-script-ran.txt')), 'ok\n');
+      assertEquals(
+        await Deno.readTextFile(join(projectRoot, 'plugins', 'fixture', 'post-script-ran.txt')),
+        'ok\n',
+      );
     } finally {
       await Deno.remove(projectRoot, { recursive: true });
     }
