@@ -154,7 +154,7 @@ deno task check
 
 - [ ] `netscript --help` lists the public command groups (`agent`, `config`, `contract`, `db`, `deploy`, `generate`, `init`, `marketplace`, `plugin`, `service`, `ui:*`).
 - [ ] `my-app/` contains `apps/`, `contracts/`, `services/`, `database/`, `plugins/`, `aspire/`, and `tests/`.
-- [ ] Aspire is running; the dashboard — or `aspire describe --format Json`, or MCP `list_api_services` — shows the Fresh app, example service (`users`), Postgres, and Redis with endpoints.
+- [ ] Aspire is running; the dashboard — or `aspire describe --apphost ./aspire/apphost.mts --format Json` — shows the Fresh app, example service (`users`), Postgres, and Redis with endpoints. (MCP `list_api_services` covers the HTTP resources only: the Fresh app and the service. Postgres and Redis publish `tcp://` endpoints and do not appear there.)
 - [ ] `netscript db init --name init` succeeded and the initial migration exists.
 - [ ] The Fresh app answers at the URL shown in the dashboard / `aspire describe` output.
 - [ ] Opening `<fresh-app-url>/design` renders the generated design reference (it returns an HTTP 302 redirect to `/design/tokens`, so scripted checks require `curl -L`).
@@ -163,7 +163,7 @@ deno task check
 **Do not begin customising until every box is ticked.** An unverified base makes every later failure look like your code.
 
 {{ comp callout { type: "tip", title: "If something is not green" } }}
-Three checks cover most first-run snags: is Aspire still running with its resources healthy; is Docker running (<code>docker info</code>); and did you run <code>aspire restore</code> from <code>aspire/</code> before launching <code>deno task aspire:start</code>? Note that <code>aspire restore</code> / <code>start</code> can occasionally time out under heavy system load with <code>Failed to prepare: A task was canceled</code>; re-running the start command usually succeeds. If operating headlessly without a browser, inspect failure diagnostics via the MCP <code>get_recent_errors</code> tool, and resolve resource endpoints with <code>aspire describe --format Json</code>, rather than guessing process state. On Windows, a generated <code>deno task deps:verify</code> error names an incomplete project-local npm materialisation and prints the PowerShell recovery command; follow that diagnostic rather than patching a package.
+Three checks cover most first-run snags: is Aspire still running with its resources healthy; is Docker running (<code>docker info</code>); and did you run <code>aspire restore</code> from <code>aspire/</code> before launching <code>deno task aspire:start</code>? Note that <code>aspire restore</code> / <code>start</code> can occasionally time out under heavy system load with <code>Failed to prepare: A task was canceled</code>; re-running the start command usually succeeds. If operating headlessly without a browser, inspect failure diagnostics via the MCP <code>get_recent_errors</code> tool, and resolve resource endpoints with <code>aspire describe --apphost ./aspire/apphost.mts --format Json</code>, rather than guessing process state. On Windows, a generated <code>deno task deps:verify</code> error names an incomplete project-local npm materialisation and prints the PowerShell recovery command; follow that diagnostic rather than patching a package.
 {{ /comp }}
 
 ## Take the first tour
@@ -173,7 +173,7 @@ Two generated pages are worth opening before you edit anything:
 - **`<fresh-app-url>/design`** renders the tokens, components, and composition rules already in the app. Read `/design/composition` before deciding what belongs on the server or in an island.
 - **`<service-url>/api/docs`** is the service's Scalar API reference, generated from the same contract the handler implements. Use it to inspect and exercise the running oRPC/OpenAPI surface.
 
-Base URLs are allocated dynamically by Aspire. Inspect them via the Aspire dashboard, `aspire describe --format Json`, or MCP `list_api_services`.
+Base URLs are allocated dynamically by Aspire. Inspect them via the Aspire dashboard, `aspire describe --apphost ./aspire/apphost.mts --format Json`, or MCP `list_api_services`.
 
 ## Build a feature through the CLI
 
@@ -264,7 +264,7 @@ Common CLI commands for your first hour in a NetScript workspace:
 | Add contract route | `netscript contract add-route <contract> <procedure> --method GET --path /<route>` |
 | Add oRPC service | `netscript service add --name <name>` |
 | Bind handler stub | `netscript service add-handler <service> <procedure>` |
-| Inspect UI component registry | `netscript ui:list` |
+| Inspect UI component registry | `netscript ui:list --project-root apps/dashboard` |
 | Scaffold Fresh page & island | `netscript ui:add page <name> --island --project-root apps/dashboard` |
 | Type-check workspace | `deno task check` |
 | Stop local stack | `aspire stop --apphost ./aspire/apphost.mts` |

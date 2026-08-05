@@ -170,7 +170,7 @@ deno task aspire:start   # starts the AppHost and every declared resource
 together, then prints a URL and a one-time login token for the **Aspire dashboard**.
 
 In an interactive terminal, leave it running in this terminal — it is your storefront's control
-plane for the rest of the track. (If your terminal is not interactive, it detaches without printing a login token; resolve resource endpoints with `aspire describe --apphost ./aspire/apphost.mts --format Json --non-interactive --nologo`, or MCP `list_api_services`, rather than the dashboard.) Aspire assigns free ports at runtime, so use the URLs in the
+plane for the rest of the track. (If your terminal is not interactive, it detaches without printing a login token; resolve resource endpoints with `aspire describe --apphost ./apphost.mts --format Json --non-interactive --nologo`, or MCP `list_api_services`, rather than the dashboard.) Aspire assigns free ports at runtime, so use the URLs in the
 dashboard (or MCP `list_api_services`) instead of memorising a dashboard or app port.
 
 ### Initialize the database before customising
