@@ -37,7 +37,7 @@ on:
   push:
     branches: [main, 'feat/package-quality']
   pull_request:
-    branches: [main, "feat/**", "epic/**"]
+    branches: [main, "feat/**", "epic/**", "canary/**"]
     types: [opened, synchronize, reopened, ready_for_review]
 
 permissions:
