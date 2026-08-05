@@ -24,3 +24,15 @@ Pending RED-first implementation.
   The filter-wide test invocation exposed a pre-existing package-CWD failure in
   `quickstart-command-drift_test.ts`; the same test passes from repository root. One stale generator
   assertion was updated and its focused rerun is green.
+
+## Merge-readiness validation
+
+- Full `scaffold.runtime` RED after the first implementation exposed invalid permission flags after
+  `deno eval`; the generated dispatcher argv was corrected and its generator test now locks the
+  accepted form.
+- The next two full runtime runs proved the p0 sequence GREEN: a single resident AppHost started,
+  then `database.init`, `database.generate`, and `database.seed` all passed. The suite subsequently
+  failed at the unrelated `runtime.wait.workers-api` health gate after 120 seconds; cleanup passed.
+- A same-shell live probe showed `db init` receiving the resident Postgres connection string and
+  completing successfully through `netscript-db-postgres`, with no nested AppHost generation.
+- `deno.lock` remains pre-existing, modified, and unstaged.
