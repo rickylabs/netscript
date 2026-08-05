@@ -11,6 +11,8 @@ export {
 } from './manifest.ts';
 export type {
   PluginInstallerManifest,
+  PluginInstallerManifestSchemaIssue,
+  PluginInstallerManifestValidator,
   PluginManifestCapabilities,
   PluginManifestOfficialSource,
   PluginManifestParseError,

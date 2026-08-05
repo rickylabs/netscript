@@ -63,6 +63,7 @@ Change Zod only in the root catalog, run `deno task deps:check`, and inspect the
 | 2026-08-05 | 2 | focused proof | 977-file targeted check and 27 CLI/service/streams tests pass, including the generated workspace compile fixture. |
 | 2026-08-05 | 3 | publish proof | Repository publish dry-run exits 0; `deno doc --lint` passes all exports for the 19 affected package/plugin roots. |
 | 2026-08-05 | 3 | architecture proof | `quality:gate`, dependency checks, docs accuracy, and focused lint/format all pass; doctrine reports baseline warnings only. |
+| 2026-08-05 | 3 | cloud repair | Canary code-quality exposed a Zod 4 `private-type-ref` in the plugin manifest schema; a local public validator contract preserves the runtime Zod object and makes the exact cloud doc-lint command green. |
 
 ## Decisions
 
@@ -84,3 +85,4 @@ Change Zod only in the root catalog, run `deno task deps:check`, and inspect the
 | Publish dry-run | PASS | full workspace simulation completed successfully |
 | `deno doc --lint` | PASS | all exports across 19 affected package/plugin roots |
 | Focused lint / format | PASS | changed TypeScript and boundary documentation |
+| Plugin publish surface | PASS | exact cloud `deno doc --lint` command; 63 plugin tests, including 5 manifest tests |
