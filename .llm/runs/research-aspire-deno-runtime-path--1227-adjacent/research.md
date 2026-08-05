@@ -16,6 +16,21 @@ Pending controlled Aspire 13.4.6 experiments and upstream verification.
   aspire#16220 are reported open; the version threshold in the comment is met but its capability
   threshold may not be.
 
+## Opening facts (verified before the draft PR)
+
+- [NetScript #1227](https://github.com/rickylabs/netscript/issues/1227) is open/reopened at the
+  branch baseline. Its latest owner evidence records one published `0.0.5-canary.10` quickstart
+  passing restore/start in 22.3 seconds and the next failing after 180.1 seconds with
+  `Failed to prepare: A task was canceled`; the bounded timeout improved the symptom but did not
+  remove the failure class.
+- `generateTsAspireConfig()` pins SDK `13.4.6` and emits
+  `Aspire.Hosting.Browsers@13.4.6-preview.1.26319.6` even with no database/cache integration. The
+  current Deno resource generators use the SDK's `addExecutable(...)` primitive; neither of the two
+  existing CommunityToolkit Deno version constants is consumed by the config generator.
+- Therefore today's nominal “Deno-only” graph is not yet a zero-NuGet graph: at minimum it has the
+  TypeScript AppHost SDK bootstrap plus the Browsers integration. The experiment must quantify the
+  resolved graph rather than equating a one-entry `packages` object with one restored package.
+
 ## Questions and evidence ledger
 
 | # | Question                                                                             | Required proof                                                                       |

@@ -59,6 +59,7 @@ using its recorded command/configuration and follow the exact upstream watch sig
 | Time                  | Slice | Step      | Notes                                                                                                        |
 | --------------------- | ----- | --------- | ------------------------------------------------------------------------------------------------------------ |
 | 2026-08-05 03:02 CEST | S0    | bootstrap | Branch equals `origin/main`; remote branch absent; inherited `deno.lock` modification recorded and excluded. |
+| 2026-08-05 03:08 CEST | S0    | re-baseline | Live #1227 is reopened; current default pins SDK 13.4.6, always adds Browsers NuGet, and consumes neither CommunityToolkit Deno constant. |
 
 ## Decisions
 
