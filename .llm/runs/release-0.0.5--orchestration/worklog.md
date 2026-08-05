@@ -1998,3 +1998,18 @@ established — but the fix had been merged 44 days later on main and was availa
 channel. When a defect is suspected upstream, check the DEFAULT BRANCH and the pre-release
 channel, not just the latest release. The owner had to say "check their canary channel" twice
 before it happened.**
+
+## 2026-08-05 — #1309 merged (#1274 CLOSED): the second pilot gate clears
+
+docsorch delivered the Quickstart rewrite and it merged at 01:43Z with zero non-green checks on
+the merge commit. **#1274 closed** — that was the owner's second stated gate on the wave-6
+pilot (alongside the walk bar). It landed after I unblocked its stuck decision with current
+facts: it had been writing around three red verify boxes, two of which (#1290, #1287) had since
+been fixed and machine-verified on published canary.10.
+
+**Pilot gate status:**
+- Bar (seven-box Quickstart walk): six boxes proven green on published canary.10; step 4 was
+  never ours — upstream aspire#18958 — and **#1308** pins the fixed daily build, held in draft
+  until **five consecutive published-canary workflows** pass.
+- #1274 rewrite: **DONE**.
+So the pilot is gated on exactly one thing now: #1308's five-run proof.
