@@ -16,9 +16,11 @@ locally Claude Code + OpenRouter with an open model, and OpenHands for automated
 ## Workflow
 
 Native Claude sessions authenticated through the Anthropic client are the mobile-visible operator
-surface. Experimental Claude sessions launched through OpenRouter/custom gateways are separate
-provider-runner sessions: they may be supervised and recorded, but must never be described as native
-Claude mobile-visible sessions.
+surface. Claude sessions launched through `agentic:claude-openrouter` or another custom gateway are
+separate inference-only provider-runner sessions: they may be forked, supervised, and recorded, but
+must never be described as Remote Control or mobile-visible sessions. Claude Code 2.1.196 and newer
+enforce this boundary by rejecting Remote Control when `ANTHROPIC_BASE_URL` is custom; an
+interactive process staying alive is not attachment proof.
 
 1. Re-baseline the worktree and branch first.
 2. If the user says `use harness`, read `.agents/skills/netscript-harness/SKILL.md`. If a native
@@ -33,6 +35,8 @@ Claude mobile-visible sessions.
 5. Keep wrappers and `.llm/tools` as deterministic fallbacks, not as competing sources of truth.
 6. For implementation slices that need Codex mobile visibility, use the WSL Codex daemon path from
    `.agents/skills/codex-wsl-remote/SKILL.md`.
+7. Use `deno task agentic:claude-openrouter -- --resume <id> --fork-session` for an isolated
+   alternate-model fork. The launcher rejects Remote Control flags by design.
 
 ## Delegation Contract
 
@@ -81,6 +85,7 @@ outcome.
 ```powershell
 deno task agentic:check-claude
 deno task agentic:smoke-claude-remote -- --pretty
+deno task agentic:claude-openrouter -- --cwd <path> [--resume <id> --fork-session]
 deno task agentic:sync-claude
 ```
 

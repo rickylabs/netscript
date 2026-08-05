@@ -52,6 +52,7 @@ export const OPENROUTER_MODEL_IDS = {
   qwen: 'qwen/qwen3.7-max',
   glm: 'z-ai/glm-5.2',
   grok: 'x-ai/grok-4.5',
+  deepseekV4Flash0731: 'deepseek/deepseek-v4-flash-0731',
 } as const;
 
 /** Open models approved for formal evaluation without paid closed-model routing. */
