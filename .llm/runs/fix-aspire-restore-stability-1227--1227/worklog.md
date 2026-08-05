@@ -59,3 +59,6 @@
   verbose output had shown NuGet still querying its online vulnerability feed even with a local
   package source. Hydration now sets `NuGetAudit=false` (the prerequisite acquisition remains
   audited) and has its own 30s abort bound. Proof streak remains 0/3.
+- 2026-08-05: added a manual-dispatch-only `quickstart-only` proof mode. It leaves canary and normal
+  production behavior unchanged while omitting the unrelated scaffold suite and propagation sleep
+  for repeated clean-run proof against an already-published exact version.

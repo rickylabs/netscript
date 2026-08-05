@@ -10,6 +10,11 @@ on:
         description: Published @netscript/cli version to validate
         required: true
         type: string
+      quickstart-only:
+        description: Run only the published Quickstart walk (manual repeated-proof lane)
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   actions: read
@@ -130,6 +135,7 @@ jobs:
           echo "version=$version" >> "$GITHUB_OUTPUT"
 
       - name: Wait for JSR propagation
+        if: ${{ github.event_name != 'workflow_dispatch' || inputs.quickstart-only != true }}
         run: |
           echo "sleeping 120s so just-published @netscript/cli@${{ steps.version.outputs.version }} and deps become resolvable on JSR before install."
           sleep 120
@@ -158,6 +164,7 @@ jobs:
           test -f .llm/tmp/cli-prod-init-smoke/deno.json
 
       - name: Full scaffold runtime E2E (published CLI, one pass)
+        if: ${{ github.event_name != 'workflow_dispatch' || inputs.quickstart-only != true }}
         run: |
           deno task e2e:cli run scaffold.runtime \
             --source jsr \

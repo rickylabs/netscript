@@ -48,6 +48,7 @@ Deno.test('production E2E seeds and verifies every exact Aspire integration pack
   assertStringIncludes(workflow, "-name '*.nupkg'");
   assertStringIncludes(workflow, '-name aspire-managed');
   assertStringIncludes(workflow, 'find "$HOME" -type f -name aspire-managed');
+  assertStringIncludes(workflow, 'quickstart-only:');
 });
 
 Deno.test('published E2E artifacts retain Aspire CLI diagnostics', async () => {
