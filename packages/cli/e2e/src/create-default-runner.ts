@@ -61,6 +61,7 @@ export function defaultRunOptions(overrides: Partial<RunOptions> = {}): RunOptio
     packageSource: overrides.packageSource ?? PACKAGE_SOURCE.LOCAL,
     plugins: [PLUGIN.WORKER, PLUGIN.SAGA, PLUGIN.TRIGGER, PLUGIN.STREAM, PLUGIN.AUTH, PLUGIN.AI],
     samples: true,
+    cache: true,
     cleanup: false,
     format: REPORT_FORMAT.NDJSON,
     reportPath: undefined,

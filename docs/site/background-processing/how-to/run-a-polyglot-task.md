@@ -156,15 +156,8 @@ are platform-specific. A task that exceeds its <code>timeout</code> resolves wit
 <code>signal</code> yields status <code>cancelled</code> before any process starts.
 {{ /comp }}
 
-{{ comp callout { type: "important", title: "Non-Deno runtimes are a trust boundary — there is no per-task sandbox" } }}
-A <code>python</code>/<code>shell</code>/<code>executable</code> task spawns an arbitrary
-process with the worker's OS privileges; <code>.permissions(...)</code> does nothing there.
-Pin entrypoints to known scripts, prefer a pinned interpreter or venv
-(<code>pythonConfig.venvPath</code>) over <code>$PATH</code> discovery, and never interpolate
-untrusted input into <code>args</code> or the entrypoint path. Trace context
-(<code>TRACEPARENT</code>/<code>TRACESTATE</code>/<code>CORRELATION_ID</code>) is injected
-into the subprocess environment so cross-runtime spans stitch together; env precedence is
-<code>Deno.env</code> &lt; task <code>env</code> &lt; call <code>options.env</code>.
+{{ comp callout { type: "important", title: "Non-Deno Runtime Sandboxing Boundary" } }}
+For non-Deno runtimes (such as Python, shell, or custom executables), NetScript does not enforce runtime-level sandboxing: subprocesses execute with the full OS privileges of the parent worker host, and Deno's <code>.permissions(...)</code> configurator has no effect. This boundary exists because arbitrary process sandboxing is delegated to the underlying operating system or container platform. Today, you must secure these runtimes by pinning entrypoints to verified scripts, using isolated virtual environments (e.g., <code>pythonConfig.venvPath</code>), and securing the host environment or container runtime. Note that trace context (<code>TRACEPARENT</code>/<code>TRACESTATE</code>/<code>CORRELATION_ID</code>) is still injected into the subprocess environment so cross-runtime spans stitch together; env precedence is <code>Deno.env</code> &lt; task <code>env</code> &lt; call <code>options.env</code>.
 <!-- caveat: arch-debt:workers-non-deno-task-sandbox-boundary -->
 {{ /comp }}
 

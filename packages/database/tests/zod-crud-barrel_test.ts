@@ -5,6 +5,19 @@ import { fixZodImports, runWriteCrudZodBarrel } from '../scripts/mod.ts';
 Deno.test('runWriteCrudZodBarrel emits scaffold CRUD aliases', async () => {
   const dir = await Deno.makeTempDir();
   try {
+    await Deno.mkdir(join(dir, 'schemas', 'models'), { recursive: true });
+    await Deno.mkdir(join(dir, 'schemas', 'variants', 'input'), { recursive: true });
+    await Deno.mkdir(join(dir, 'schemas', 'objects'), { recursive: true });
+    await Promise.all(
+      ['Product', 'Warehouse'].flatMap((modelName) => [
+        Deno.writeTextFile(join(dir, 'schemas', 'models', `${modelName}.schema.ts`), ''),
+        Deno.writeTextFile(join(dir, 'schemas', 'variants', 'input', `${modelName}.input.ts`), ''),
+        Deno.writeTextFile(
+          join(dir, 'schemas', 'objects', `${modelName}UpdateInput.schema.ts`),
+          '',
+        ),
+      ]),
+    );
     const barrelPath = await runWriteCrudZodBarrel(dir, 'Product');
     const content = await Deno.readTextFile(join(dir, 'crud.ts'));
 
@@ -21,12 +34,18 @@ Deno.test('runWriteCrudZodBarrel emits scaffold CRUD aliases', async () => {
       content,
       'ProductUpdateInputObjectZodSchema as ProductUpdateInput',
     );
+    assertStringIncludes(content, 'WarehouseSchema');
+    assertStringIncludes(content, 'WarehouseInputSchema as WarehouseCreateInput');
+    assertStringIncludes(
+      content,
+      'WarehouseUpdateInputObjectZodSchema as WarehouseUpdateInput',
+    );
   } finally {
     await Deno.remove(dir, { recursive: true });
   }
 });
 
-Deno.test('fixZodImports makes every generated model importable from the complete barrel', async () => {
+Deno.test('fixZodImports leaves the upstream model barrel generator-owned', async () => {
   const root = await Deno.makeTempDir();
   const zodDir = join(root, 'schema', '.generated', 'zod');
   const modelsDir = join(zodDir, 'schemas', 'models');
@@ -63,34 +82,11 @@ Deno.test('fixZodImports makes every generated model importable from the complet
         '',
       ].join('\n'),
     );
-    await Deno.writeTextFile(
-      join(root, 'deno.json'),
-      JSON.stringify({
-        imports: {
-          '@database/zod': './schema/.generated/zod/schemas/models/index.ts',
-          zod: 'jsr:@zod/zod@4.4.3',
-        },
-      }),
-    );
-
     await fixZodImports(zodDir, { verbose: false, fixDecimalImports: false });
     const firstPass = await Deno.readTextFile(join(modelsDir, 'index.ts'));
     await fixZodImports(zodDir, { verbose: false, fixDecimalImports: false });
     assertEquals(await Deno.readTextFile(join(modelsDir, 'index.ts')), firstPass);
-
-    const consumer = await new Deno.Command(Deno.execPath(), {
-      cwd: root,
-      args: [
-        'eval',
-        '--config',
-        'deno.json',
-        "import { CycleCreateInput, CycleSchema, CycleUpdateInput, IssueSchema } from '@database/zod'; if (!CycleSchema.safeParse({ id: 1 }).success || !IssueSchema.safeParse({ id: 2 }).success || !CycleCreateInput.safeParse({ id: 3 }).success || !CycleUpdateInput.safeParse({}).success) Deno.exit(1);",
-      ],
-      stdout: 'piped',
-      stderr: 'piped',
-    }).output();
-
-    assertEquals(consumer.code, 0, new TextDecoder().decode(consumer.stderr));
+    assertEquals(firstPass.includes('CreateInput'), false);
   } finally {
     await Deno.remove(root, { recursive: true });
   }

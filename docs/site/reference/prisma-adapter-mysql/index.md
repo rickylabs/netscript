@@ -5,9 +5,57 @@ title: "@netscript/prisma-adapter-mysql"
 
 # `@netscript/prisma-adapter-mysql`
 
-Prisma driver adapter for MySQL and MariaDB on Deno. This page is generated from the
-package's public surface with `deno doc` (US-2). For the full index of packages and plugins
-return to the [reference overview](/reference/).
+Prisma driver adapter for MySQL and MariaDB on Deno. Rather than using Deno-native TCP sockets directly, this adapter dynamically imports the npm `mysql2/promise` driver to handle connection pooling, query execution, and Node.js-compatible socket streams.
+
+For the full index of packages and plugins return to the [reference overview](/reference/).
+
+## Runtime and Deployment Constraints
+
+- **Dependency**: Dynamically imports `mysql2/promise` from npm at runtime.
+- **Node Compatibility**: Fully compatible with Deno's Node.js compatibility layer and npm package resolution.
+- **Pooling Ownership**: The constructed `PrismaMySqlConnectedAdapter` owns the underlying `mysql2` connection pool. Call `dispose()` to close the pool and release resources deterministically.
+- **Timeout**: The `timeout` configuration option controls connection establishment timeouts (mapped to `connectTimeout` in `mysql2`).
+- **Connection Strings**: Not parsed directly by the factory; use individual connection configuration fields.
+
+## Usage Example
+
+> [!NOTE]
+> Connection error hooks (such as `onConnectionError`) are not supported by the shipped adapter and are blocked on #1293.
+
+```typescript
+import { PrismaClient } from "@prisma/client";
+import { PrismaMySql } from "@netscript/prisma-adapter-mysql";
+
+// 1. Connection configuration
+const config = {
+  hostname: "localhost",
+  port: 3306,
+  username: "root",
+  password: "password",
+  db: "mydb",
+  poolSize: 5,
+  timeout: 10000,
+};
+
+// 2. Construct the adapter factory with options
+const adapterFactory = new PrismaMySql(config, {
+  database: "mydb",
+});
+
+// 3. Connect to database and construct Prisma Client
+const adapter = await adapterFactory.connect();
+const prisma = new PrismaClient({ adapter });
+
+try {
+  // 4. Run a query
+  const result = await prisma.$queryRawUnsafe("SELECT 1 + 1");
+  console.log("Query Result:", result);
+} finally {
+  // 5. Deterministically disconnect Prisma and close the connection pool
+  await prisma.$disconnect();
+  await adapter.dispose();
+}
+```
 
 The package exposes a single root entrypoint (`@netscript/prisma-adapter-mysql` → `./mod.ts`).
 `PrismaMySql` is the factory you construct with a connection configuration; `connect()`
@@ -44,7 +92,7 @@ returns a [`PrismaMySqlConnectedAdapter`](#connected-adapter) that you pass to a
 | Symbol | Kind | Description |
 | --- | --- | --- |
 | `MySqlConnectionConfig` | interface | MySQL connection configuration: `hostname?`, `port?`, `username?`, `password?`, `db?`, `poolSize?`, `timeout?`, and `tls?`. |
-| `PrismaMySqlOptions` | interface | Adapter options: `database?` (schema name) and `onConnectionError?` callback. |
+| `PrismaMySqlOptions` | interface | Adapter options: `database?` (schema name). |
 | `MySqlCapabilities` | interface | Capabilities of the connected MySQL server (`supportsRelationJoins`). |
 
 ## Driver interfaces

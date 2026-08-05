@@ -25,6 +25,8 @@ export {
   TaskExecuteInstrumentation,
   WorkerInstrumentation,
 } from './instrumentation.ts';
+export { createJobTools } from './job-tools.ts';
+export type { JobTools, JobToolSpan } from './job-tools.ts';
 export { TaskInstrumentation } from '../abstracts/task-instrumentation.ts';
 export { WorkerInstrumentation as AbstractWorkerInstrumentation } from '../abstracts/worker-instrumentation.ts';
 export type {

@@ -10,6 +10,14 @@ Deno.test('mapRunOptions accepts sqlite database axis', () => {
   assertEquals(mapRunOptions({ db: DATABASE.SQLITE }), { database: DATABASE.SQLITE });
 });
 
+Deno.test('mapRunOptions maps --no-cache', () => {
+  assertEquals(mapRunOptions({ cache: false }), { cache: false });
+});
+
+Deno.test('mapRunOptions maps --cache', () => {
+  assertEquals(mapRunOptions({ cache: true }), { cache: true });
+});
+
 Deno.test('mapRunOptions rejects unsupported database values', () => {
   assertThrows(
     () => mapRunOptions({ db: 'oracle' }),

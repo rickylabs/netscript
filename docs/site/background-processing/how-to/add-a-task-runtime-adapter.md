@@ -174,9 +174,7 @@ adapter, which spawns `node ./tasks/render-invoice.mjs --invoice inv_123`, strea
   runtimes.
 - The host binary is missing: return a failed `TaskResult` with stderr or an error message.
 - Timeout handling is adapter-owned. Respect `options.timeout` and `options.signal` in your adapter.
-- Permission sandboxing is Deno-specific. Python, .NET, shell, PowerShell, cmd, executable, and
-  custom adapters inherit the worker process OS permissions unless your adapter adds its own
-  sandbox.
+- **OS Permission Sandbox Boundary**: NetScript enforces fine-grained permission sandboxing (using `.permissions(...)` mapped to Deno `--allow-*` flags) only for Deno tasks (`runtime("deno")`). Non-Deno task runtimes (Python, .NET, shell, PowerShell, cmd, executable, and custom subprocess adapters) execute with the full OS permissions of the host worker process. This boundary is drawn because OS-level sandboxing of arbitrary external binaries is outside the runtime's core scope. To run untrusted polyglot code safely, you must implement sandboxing at the adapter level (e.g., using container isolation or restricted OS users) or configure OS-level process restrictions.
 <!-- caveat: arch-debt:workers-non-deno-task-sandbox-boundary -->
 
 ## Next steps

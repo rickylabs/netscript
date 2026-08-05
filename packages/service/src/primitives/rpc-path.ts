@@ -1,3 +1,9 @@
+/**
+ * Canonical versioned RPC path construction for NetScript services.
+ *
+ * @module
+ */
+
 /** Default base path for NetScript oRPC endpoints. */
 export const DEFAULT_RPC_API_PATH = '/api/rpc' as const;
 

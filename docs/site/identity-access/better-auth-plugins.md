@@ -66,22 +66,15 @@ further setup.
 
 ### Table-backed plugins need a schema migration
 
-{{ comp callout { type: "warning", title: "Generate and migrate the plugin schema first" } }}
-`organization`, `twoFactor`, `admin`, and `apiKey` store state in their own better-auth tables.
-Enabling them through the passthrough mounts them at the better-auth layer, but they fail at runtime
-until their better-auth schema has been generated and migrated into your database. A turnkey
-schema-generation path is on the roadmap; until it lands, generate and apply the better-auth schema
-for these plugins before depending on them.
+{{ comp callout { type: "important", title: "Manual Schema Integration Boundary" } }}
+Database schema management for table-backed plugins (`organization`, `twoFactor`, `admin`, `apiKey`) is currently decoupled from NetScript's automatic scaffolding. This boundary exists because automated schema discovery for dynamic third-party extensions requires a dedicated CLI integration step. Today, you must generate and apply the required database tables manually using your primary database/Prisma tools. A unified `netscript db` scaffold integration that automates this step is tracked under roadmap item R1.
 <!-- caveat: arch-debt:seamless-auth-roadmap -->
 {{ /comp }}
 
 ### Interactive plugins are driven by better-auth directly
 
-{{ comp callout { type: "note", title: "Interactive sign-in is owned by better-auth" } }}
-`magicLink` and `passkey` sign-in are interactive flows. NetScript's better-auth backend is
-non-interactive, so its `/signin` and `/callback` endpoints return `AUTH_PROVIDER_ERROR`. Drive those
-flows against better-auth's own handler and let NetScript verify the resulting session. An
-interactive-flow seam for the better-auth backend is tracked on the roadmap.
+{{ comp callout { type: "note", title: "Session Verification Trust Boundary" } }}
+NetScript's Better-Auth backend adapter operates as a non-interactive session-verification layer, meaning core endpoints like `/signin` and `/callback` reject interactive flows with `AUTH_PROVIDER_ERROR`. This design boundary separates runtime verification from dynamic redirection flows to optimize session-validation path simplicity. Today, interactive authentication (such as magic links or passkeys) must be driven directly via Better-Auth's own handlers, leaving NetScript to verify the established session cookie. Implementing a first-class `InteractiveFlowPort` for the Better-Auth adapter is tracked under roadmap item R2.
 <!-- caveat: arch-debt:seamless-auth-roadmap -->
 {{ /comp }}
 

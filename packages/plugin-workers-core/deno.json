@@ -30,6 +30,7 @@
     "zod": "jsr:@zod/zod@4.4.3",
     "@netscript/kv": "jsr:@netscript/kv@0.0.4",
     "@netscript/plugin": "jsr:@netscript/plugin@0.0.4",
+    "@netscript/telemetry": "jsr:@netscript/telemetry@0.0.4",
     "@orpc/contract": "npm:@orpc/contract@^1.14.6",
     "@orpc/server": "npm:@orpc/server@^1.14.6"
   },

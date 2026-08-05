@@ -24,15 +24,18 @@ interface RecordedCall {
   readonly options: {
     readonly cwd: string;
     readonly env?: Record<string, string>;
+    readonly signal?: AbortSignal;
   };
 }
+
+type OutputStep = CommandOutput | ((options: RecordedCall['options']) => Promise<CommandOutput>);
 
 class FakeAspireExecutor {
   readonly outputCalls: RecordedCall[] = [];
   readonly spawnCalls: RecordedCall[] = [];
 
   constructor(
-    private readonly outputs: CommandOutput[] = [],
+    private readonly outputs: OutputStep[] = [],
     private readonly spawnCodes: number[] = [],
     private readonly events?: string[],
   ) {}
@@ -47,7 +50,7 @@ class FakeAspireExecutor {
     if (!next) {
       throw new Error(`Unexpected output() call: ${args.join(' ')}`);
     }
-    return Promise.resolve(next);
+    return typeof next === 'function' ? next(options) : Promise.resolve(next);
   }
 
   spawn(
@@ -233,36 +236,52 @@ describe('DbOperationRunner', () => {
     });
   });
 
-  it('never stops a DB-operation AppHost that was already running', async () => {
+  it('retires a pre-existing DB-operation AppHost before returning success', async () => {
     const apphostPath = join(PROJECT_ROOT, 'aspire', 'db-operation', 'apphost.mts');
     const executor = new FakeAspireExecutor([
       { code: 0, stdout: JSON.stringify([{ appHostPath: apphostPath }]), stderr: '' },
+      { code: 0, stdout: 'stopped stale host', stderr: '' },
       { code: 0, stdout: '{"appHostPid":123}', stderr: '' },
       finishedResource(apphostPath, 0),
       { code: 0, stdout: 'Database is up to date.', stderr: '' },
+      { code: 0, stdout: 'stopped', stderr: '' },
     ]);
 
     const code = await createFastRunner(executor).execute(createRequest('status'));
 
     assertEquals(code, 0);
-    assertEquals(commandNames(executor), ['describe', 'start', 'describe', 'logs']);
-    assertEquals(executor.outputCalls.some((call) => call.args[0] === 'stop'), false);
+    assertEquals(commandNames(executor), [
+      'describe',
+      'stop',
+      'start',
+      'describe',
+      'logs',
+      'stop',
+    ]);
   });
 
-  it('never stops an existing DB-operation AppHost when the operation fails', async () => {
+  it('retires a pre-existing DB-operation AppHost when the operation fails', async () => {
     const apphostPath = join(PROJECT_ROOT, 'aspire', 'db-operation', 'apphost.mts');
     const executor = new FakeAspireExecutor([
       { code: 0, stdout: JSON.stringify([{ appHostPath: apphostPath }]), stderr: '' },
+      { code: 0, stdout: 'stopped stale host', stderr: '' },
       { code: 0, stdout: '{"appHostPid":123}', stderr: '' },
       finishedResource(apphostPath, 1),
       { code: 0, stdout: 'No migration history.', stderr: '' },
+      { code: 0, stdout: 'stopped', stderr: '' },
     ]);
 
     const code = await createFastRunner(executor).execute(createRequest('status'));
 
     assertEquals(code, 1);
-    assertEquals(commandNames(executor), ['describe', 'start', 'describe', 'logs']);
-    assertEquals(executor.outputCalls.some((call) => call.args[0] === 'stop'), false);
+    assertEquals(commandNames(executor), [
+      'describe',
+      'stop',
+      'start',
+      'describe',
+      'logs',
+      'stop',
+    ]);
   });
 
   it('stops an AppHost started by this invocation after an operation failure', async () => {
@@ -279,6 +298,47 @@ describe('DbOperationRunner', () => {
 
     assertEquals(code, 1);
     assertEquals(commandNames(executor), ['describe', 'start', 'describe', 'logs', 'stop']);
+  });
+
+  it('stops the operation AppHost when a process signal aborts the command', async () => {
+    const apphostPath = join(PROJECT_ROOT, 'aspire', 'db-operation', 'apphost.mts');
+    let abortCommand: (() => void) | undefined;
+    let unregistered = false;
+    let verifiedAbsent = false;
+    const executor = new FakeAspireExecutor([
+      noRunningAppHost(),
+      { code: 0, stdout: '{"appHostPid":123}', stderr: '' },
+      (options) => {
+        abortCommand?.();
+        assertEquals(options.signal?.aborted, true);
+        return Promise.reject(new DOMException('Signal received', 'AbortError'));
+      },
+      { code: 0, stdout: 'stopped', stderr: '' },
+    ]);
+    const runner = new DbOperationRunner({
+      executor,
+      lifecycleLock: new FakeAppHostLifecycleLock(),
+      sleep: () => Promise.resolve(),
+      writeOperationRequest: () => Promise.resolve(),
+      removeOperationRequest: () => Promise.resolve(),
+      ensureProcessStopped: () => Promise.resolve(),
+      verifyAppHostAbsent: () => {
+        verifiedAbsent = true;
+        return Promise.resolve();
+      },
+      registerSignalAbort: (abort) => {
+        abortCommand = abort;
+        return () => {
+          unregistered = true;
+        };
+      },
+    });
+
+    await assertRejects(() => runner.execute(createRequest('status')), DOMException, 'Signal received');
+
+    assertEquals(commandNames(executor), ['describe', 'start', 'describe', 'stop']);
+    assertEquals(verifiedAbsent, true);
+    assertEquals(unregistered, true);
   });
 
   it('fails closed when the AppHost ownership probe is ambiguous', async () => {
@@ -382,6 +442,8 @@ function createFastRunner(
     writeOperationRequest: () => Promise.resolve(),
     removeOperationRequest: () => Promise.resolve(),
     ensureProcessStopped: () => Promise.resolve(),
+    verifyAppHostAbsent: () => Promise.resolve(),
+    registerSignalAbort: () => () => {},
   });
 }
 

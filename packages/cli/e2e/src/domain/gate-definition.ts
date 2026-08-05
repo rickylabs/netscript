@@ -8,7 +8,12 @@ import type { ExecutionPlatform } from './platform.ts';
 export type GateVerdict = 'passed' | 'failed' | 'skipped';
 
 /** Stable classification used to decide whether a command attempt may be retried. */
-export type GateFailureClass = 'timeout' | 'canceled' | 'assertion';
+export type GateFailureClass =
+  | 'timeout'
+  | 'canceled'
+  | 'infrastructure'
+  | 'harness-invocation'
+  | 'assertion';
 
 /** Result of one execution attempt within a gate. */
 export type GateAttempt = {
@@ -22,7 +27,7 @@ export type GateAttempt = {
 /** Opt-in retry policy for command gates. */
 export interface CommandGateRetryPolicy {
   readonly classes: readonly GateFailureClass[];
-  readonly maxRetries: 1;
+  readonly maxRetries: 1 | 2;
 }
 
 /** Build a command from the current run context. */
@@ -67,6 +72,10 @@ export interface CommandGateDefinition extends BaseGateDefinition {
   /** Substrings that must all appear in captured standard output. */
   readonly stdoutIncludes?: readonly string[];
   readonly retry?: CommandGateRetryPolicy;
+  /** Gate-specific timeout override; defaults to the suite command timeout. */
+  readonly timeoutMs?: number;
+  /** Stable failure class for commands whose boundary is known before execution. */
+  readonly failureClass?: GateFailureClass;
 }
 
 /** Semantic gate backed by an HTTP health probe. */

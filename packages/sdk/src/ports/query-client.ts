@@ -4,6 +4,8 @@
  * @module
  */
 
+import type { QueryClient } from '@tanstack/query-core';
+
 /** Predicate filters query cache operations by key or implementation-specific metadata. */
 export type QueryClientPredicate = (query: unknown) => boolean;
 
@@ -30,34 +32,20 @@ export interface QueryClientSetOptions {
 }
 
 /**
- * Structural query-client port used by sdk factories and collection adapters.
+ * Narrow query-client port used by SDK collection and query adapters.
+ *
+ * The method signatures are selected from TanStack's concrete client instead
+ * of being copied, so a `QueryClient` always satisfies this port as upstream
+ * generic signatures evolve.
  */
-export interface QueryClientPort {
-  /** Read cached data; driven by sdk query helpers and TanStack DB collection reads. */
-  getQueryData<TData = unknown>(queryKey: readonly unknown[]): TData | undefined;
-
-  /** Write cached data; driven by TanStack DB optimistic collection updates. */
-  setQueryData<TData = unknown>(
-    queryKey: readonly unknown[],
-    updater: TData | ((oldData: TData | undefined) => TData | undefined),
-    options?: QueryClientSetOptions,
-  ): TData | undefined;
-
-  /** Invalidate cache entries; driven by sdk query factories and Fresh island mutations. */
-  invalidateQueries(filters?: QueryClientFilters): Promise<void>;
-
-  /** Fetch and cache query data; driven by server prefetch and collection loading. */
-  fetchQuery<TData = unknown>(options: QueryClientFetchOptions<TData>): Promise<TData>;
-
-  /** Expose the underlying query cache; driven by TanStack DB collection synchronization. */
-  getQueryCache(): unknown;
-
-  /** Attach focus/online listeners; driven by Fresh island QueryClient lifecycle. */
-  mount(): void;
-
-  /** Detach focus/online listeners; driven by Fresh island QueryClient lifecycle. */
-  unmount(): void;
-
-  /** Clear cached data; driven by Fresh test and reset helpers. */
-  clear(): void;
-}
+export type QueryClientPort = Pick<
+  QueryClient,
+  | 'getQueryData'
+  | 'setQueryData'
+  | 'invalidateQueries'
+  | 'fetchQuery'
+  | 'getQueryCache'
+  | 'mount'
+  | 'unmount'
+  | 'clear'
+>;

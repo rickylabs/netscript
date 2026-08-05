@@ -14,6 +14,10 @@ import type {
   TriggerIdempotencyKeyInput,
   TriggerIdempotencyPort,
 } from '@netscript/plugin-triggers-core/ports';
+import {
+  MemoryTriggerDeferScheduler,
+  TriggerTestClock,
+} from '@netscript/plugin-triggers-core/testing';
 import { SpanNames } from '@netscript/telemetry/attributes';
 import { getSpanFromContext } from '@netscript/telemetry/context';
 import {
@@ -36,11 +40,14 @@ Deno.test(
     const idempotency = new MemoryIdempotency();
     const dlq = new MemoryDlq();
     const queue = new RecordingJobQueue();
+    const clock = new TriggerTestClock(new Date('2026-05-17T00:00:00.000Z'));
     const processor = await createRuntimeTriggerProcessor({
       idempotency,
       dlq,
       jobQueue: queue as never,
       tracer: recorder,
+      deferScheduler: new MemoryTriggerDeferScheduler(clock),
+      clock,
     });
     const job = defineJob('send-receipt').handler(() => ({ success: true })).build();
     const definition = defineWebhook(
@@ -66,6 +73,7 @@ Deno.test(
     assertEquals(detect.traceId, INBOUND_TRACE_ID);
     assertEquals(process.traceId, INBOUND_TRACE_ID);
     assertEquals(process.traceId, ingress.traceId);
+    await processor.stop();
   },
 );
 

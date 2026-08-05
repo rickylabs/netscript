@@ -125,12 +125,8 @@ from.
 Unix-epoch timestamp in milliseconds. `CachedListEntryLike<TItem>` is the same
 shape over a `{ items: TItem[] }` payload.
 
-{{ comp callout { type: "note" } }}
-**StackBlitz sandboxes**
-
-Hosted, one-click sandboxes for the Web Layer examples are a planned addition.
-Until they ship, clone the tutorial source and run it locally with the
-project's build task.
+{{ comp callout { type: "note", title: "Hosted Sandbox Boundary" } }}
+Hosted, one-click playground environments (such as StackBlitz) are currently out of scope for these Web Layer examples. This design boundary allows our documentation to focus on local project and toolchain fidelity. To run these examples, clone the tutorial source repository and execute it locally using the project's build tasks. Interactive, hosted sandboxes are tracked as a future documentation experience enhancement.
 <!-- caveat: arch-debt:fresh-hosted-example-sandboxes -->
 {{ /comp }}
 

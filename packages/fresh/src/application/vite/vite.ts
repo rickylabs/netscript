@@ -1,3 +1,9 @@
+/**
+ * Vite integration for Fresh route manifests, aliases, and Preact resolution.
+ *
+ * @module
+ */
+
 import { resolve } from '@std/path';
 import {
   type ConfigEnv,

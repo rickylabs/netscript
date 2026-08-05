@@ -6,6 +6,7 @@ import type {
   CommandFactory,
   CommandGateRetryPolicy,
   GateDefinition,
+  GateFailureClass,
   HttpGateDefinition,
 } from '../../../domain/gate-definition.ts';
 import type { UrlFactory } from '../../../domain/gate-definition.ts';
@@ -53,6 +54,8 @@ export function commandGate(
   outputMode: CommandOutputMode = 'capture',
   failureHint?: string,
   retry?: CommandGateRetryPolicy,
+  timeoutMs?: number,
+  failureClass?: GateFailureClass,
 ): GateDefinition {
   return {
     id,
@@ -65,6 +68,8 @@ export function commandGate(
     outputMode,
     failureHint,
     retry,
+    timeoutMs,
+    failureClass,
   };
 }
 

@@ -7,6 +7,7 @@ import {
 import { DATABASE, type DatabaseEngine, PACKAGE_SOURCE } from '../../../domain/extension-axes.ts';
 import type { GateDefinition } from '../../../domain/gate-definition.ts';
 import type { RunContext } from '../../../domain/run-context.ts';
+import { resolve } from '@std/path';
 import { commandGate, denoCommand, httpGate } from './gate-factory.ts';
 import { allocateScaffoldDefaultPort } from '../../../../../src/kernel/domain/scaffold/default-port-allocation.ts';
 
@@ -18,6 +19,10 @@ const ASPIRE_RESOURCE_WAIT_TIMEOUT_SECONDS: Partial<
   // server's cold start and first render — not just the process reaching `Running`.
   [ASPIRE_RESOURCE.APP]: 300,
 };
+
+/** A feed stall gets three short chances instead of consuming two suite-wide 15-minute budgets. */
+export const ASPIRE_RESTORE_ATTEMPT_TIMEOUT_MS = 180_000;
+export const ASPIRE_RESTORE_MAX_RETRIES = 2;
 
 /**
  * Why the probe takes a project root and an AppHost instead of a URL: since #952 the pristine
@@ -61,6 +66,21 @@ function withPluginPort(script: string, previousPort: number, port: number): str
 }
 
 function runtimeWaitGate(resource: AspireResource): GateDefinition {
+  if (resource === ASPIRE_RESOURCE.WORKERS) {
+    return commandGate(
+      `runtime.wait.${resource}`,
+      `Wait for ${resource}`,
+      GATE_PHASE.RUNTIME,
+      (context) => [
+        'deno',
+        'run',
+        '--allow-run=aspire',
+        `${context.project.repoRoot}/packages/cli/e2e/src/application/gates/scaffold/wait-for-workers-runtime.ts`,
+        context.project.appHost,
+      ],
+    );
+  }
+
   return commandGate(
     `runtime.wait.${resource}`,
     `Wait for ${resource}`,
@@ -111,7 +131,12 @@ export function createRuntimeGates(
       undefined,
       undefined,
       undefined,
-      { classes: ['timeout', 'canceled'], maxRetries: 1 },
+      {
+        classes: ['timeout', 'canceled', 'infrastructure'],
+        maxRetries: ASPIRE_RESTORE_MAX_RETRIES,
+      },
+      ASPIRE_RESTORE_ATTEMPT_TIMEOUT_MS,
+      'infrastructure',
     ),
     commandGate(
       GATE.RUNTIME_AUTH_SMOKE_ENV,
@@ -143,6 +168,9 @@ export function createRuntimeGates(
         'packages/cli/e2e/src/application/gates/scaffold/prepare-flow-b-fixture.ts',
         context.project.projectRoot,
         context.request.options.packageSource === PACKAGE_SOURCE.JSR ? 'published' : 'local',
+        context.project.cliEntrypoint.startsWith('jsr:')
+          ? context.project.cliEntrypoint
+          : resolve(context.project.repoRoot, context.project.cliEntrypoint),
       ],
     ),
     commandGate(
@@ -459,7 +487,8 @@ const ASPIRE_START_SCRIPT = [
   '  return trimmed.slice(objectIndex);',
   '}',
 ].join('\n');
-function runtimeResources(database: DatabaseEngine): readonly AspireResource[] {
+/** List the Aspire resources that a runtime suite waits for. */
+export function runtimeResources(database: DatabaseEngine): readonly AspireResource[] {
   return [
     ...databaseRuntimeResources(database),
     ASPIRE_RESOURCE.GARNET,
@@ -510,7 +539,7 @@ function databaseRuntimeResources(
   }
 }
 
-const PROBE_SERVICE_HEALTH_SCRIPT = [
+export const PROBE_SERVICE_HEALTH_SCRIPT = [
   'const appHost = Deno.args[0];',
   'const resourceName = Deno.args[1] ?? "users";',
   'const database = Deno.args[2] ?? "postgres";',

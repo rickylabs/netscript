@@ -98,13 +98,16 @@ itself the trigger; evaluating the `/server` module is.
    must precede the static-file handler goes.
 3. **Static files** — `app.use(staticFiles())` unless `staticFiles` is `false`; pass your own
    `Middleware` to replace Fresh's.
-4. **App middleware** — `app.use(...options.middleware)`, skipped entirely when the array is empty.
-5. **Query-cache invalidation** — register the JSON-only POST route at
+4. **Request telemetry** — register a `fresh.request` server span unless `telemetry` is `false`.
+   Static attributes come from `telemetry.attributes`; service-name precedence is
+   `telemetry.serviceName`, then `name`, then `fresh-app`.
+5. **App middleware** — `app.use(...options.middleware)`, skipped entirely when the array is empty.
+6. **Query-cache invalidation** — register the JSON-only POST route at
    `/_netscript/query-cache/invalidate`, unless `queryCacheInvalidation` is `false`; an object can
    override its path. The middleware above protects this route too.
-6. **`configure(app)`** — after middleware, **before** file-system routes. Explicit routes registered
+7. **`configure(app)`** — after middleware, **before** file-system routes. Explicit routes registered
    here are inserted ahead of the generated ones.
-7. **File-system routes** — `app.fsRoutes()`, or `app.fsRoutes(pattern)` when `fsRoutes` is a string,
+8. **File-system routes** — `app.fsRoutes()`, or `app.fsRoutes(pattern)` when `fsRoutes` is a string,
    or your own callback when it is a function. `false` skips the step.
 
 The returned value is the `App<State>` itself, so `app.use(...)`, `app.get(...)`, and `app.listen(...)`
@@ -112,7 +115,7 @@ remain available afterwards for anything the options do not cover.
 
 | Option | Type | Effect |
 | --- | --- | --- |
-| `name` | `string` | Stable app identifier. **Reserved** — accepted and not yet read. |
+| `name` | `string` | Stable app identifier and default telemetry service name. |
 | `app` | `App<State>` | Reuse an existing instance; wins over `createApp`. |
 | `freshConfig` | `FreshConfig` | Passed to `createApp` or to `new App()`. |
 | `createApp` | `(freshConfig?) => App<State>` | Replace app construction. |
@@ -121,7 +124,7 @@ remain available afterwards for anything the options do not cover.
 | `preConfigure` | `(app) => void` | Runs first, before static files. |
 | `configure` | `(app) => void` | Runs after middleware, before file-system routes. |
 | `fsRoutes` | `((app, pattern?) => void) \| false \| string` | Mount at a pattern, replace, or disable. |
-| `telemetry` | `boolean \| FreshAppTelemetryOptions` | **Reserved** — accepted and not yet read. |
+| `telemetry` | `boolean \| FreshAppTelemetryOptions` | Configure request-span service identity/static attributes; `false` disables it. |
 | `queryCacheInvalidation` | `FreshQueryCacheInvalidationOptions \| false` | Configure the standard server-cache invalidation path or disable it. |
 
 ```ts
@@ -141,12 +144,11 @@ export const dashboard = defineFreshApp<State>({
 });
 ```
 
-{{ comp callout { type: "note" } }}
-The `telemetry` option and `FreshAppTelemetryOptions` (`serviceName`, `attributes`) are reserved
-bootstrap seams for future Fresh app telemetry defaults. They are accepted today and wired for
-forward compatibility. `name` is reserved in the same way — nothing reads it yet.
-<!-- caveat: arch-debt:fresh-app-telemetry-defaults -->
-{{ /comp }}
+Every non-static request runs inside a `fresh.request` server span emitted through
+`@netscript/telemetry/tracer`. The span includes `service.name`, `http.request.method`, `url.path`,
+`http.response.status_code`, and `netscript.operation`, plus the caller's static attributes. A
+scaffolded app needs no telemetry code in `main.ts`: its `name` supplies the service identity and
+the generated Aspire resource supplies Deno's OTEL environment and HTTP/protobuf exporter.
 
 The `Middleware<State>` type is the basic building block: a function that receives a `Context<State>`
 and returns a `Response` (or a promise of one), or calls `ctx.next()` to continue the chain. Register

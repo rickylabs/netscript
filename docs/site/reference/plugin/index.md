@@ -89,11 +89,16 @@ generated separately from their own `deno doc` output and summarized below.
 | `@netscript/plugin` | `./mod.ts` | Plugin authoring contract (documented above). |
 | `@netscript/plugin/config` | `./src/config/mod.ts` | Builder, manifest schema, and contribution type contracts. |
 | `@netscript/plugin/abstracts` | `./src/abstracts/mod.ts` | Abstract contribution base classes per axis. |
+| `@netscript/plugin/adapter` | `./src/adapter/mod.ts` | Local host command adapters. |
 | `@netscript/plugin/cli` | `./src/cli/mod.ts` | Plugin CLI base classes, command mounting, and doctor reports. |
 | `@netscript/plugin/sdk` | `./src/sdk/mod.ts` | Discovery ports, alpha adapters, and runtime host stubs. |
 | `@netscript/plugin/loader` | `./loader.ts` | Host-side plugin service bootstrap helpers. |
+| `@netscript/plugin/protocol` | `./src/protocol/mod.ts` | Plugin manifest schemas and installer protocol definitions. |
+| `@netscript/plugin/scaffold` | `./src/scaffold/mod.ts` | Template generators and registry emitters. |
 | `@netscript/plugin/testing` | `./src/testing/mod.ts` | In-memory adapters, fixtures, and the CLI contract harness. |
 | `@netscript/plugin/templates` | `./src/templates/mod.ts` | Plugin skeleton template asset paths. |
+| `@netscript/plugin/contract-base` | `./src/contract-base/mod.ts` | Standard plugin capability checks. |
+| `@netscript/plugin/service` | `./src/service/mod.ts` | Out-of-process plugin service binders. |
 
 ### `@netscript/plugin/config`
 

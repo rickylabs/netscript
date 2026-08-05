@@ -111,11 +111,13 @@ oRPC handlers internally. `LoggerMiddlewareOptions` is re-exported from the sibl
 
 ## Exports
 
-`@netscript/service` publishes a single root entrypoint. There are no sub-path exports.
+The following entrypoints are published alongside the root export:
 
 | Export | Entrypoint | Purpose |
 | --- | --- | --- |
 | `@netscript/service` | `./mod.ts` | Full service surface (documented above). |
+| `@netscript/service/auth` | `./src/auth/mod.ts` | Service authentication and authorization handlers. |
+| `@netscript/service/rpc-path` | `./src/primitives/rpc-path.ts` | Type-safe RPC route mapping utilities. |
 
 ---
 

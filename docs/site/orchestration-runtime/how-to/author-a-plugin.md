@@ -235,9 +235,8 @@ Two reality checks the official plugins make explicit. <strong>Triggers</strong>
 <strong>webhook ingress endpoint</strong> (<code>POST /api/v1/webhooks/:triggerId</code>) stays a
 <strong>raw signature-verifying route</strong> by design — it verifies an HMAC signature over the raw
 request bytes, which oRPC's schema parsing cannot do, so third-party senders (with no NetScript
-client) POST to that plain URL; the supported action is <code>enqueueJob</code> (live), while
-<code>defer</code> is defined-but-unsupported (it <strong>throws</strong> and routes to the DLQ — no
-deferred replay). <strong>Streams</strong> are
+client) POST to that plain URL. Trigger handlers may <code>enqueueJob</code> immediately or
+<code>defer</code> a durable one-shot replay until a future timestamp. <strong>Streams</strong> are
 split: the <strong>producer runtime is real</strong> via
 <code>@netscript/plugin-streams-core</code>'s <code>createDurableStream</code> (served as an Aspire
 service on its assigned port and used by the workers, auth, and sagas plugins). Only the

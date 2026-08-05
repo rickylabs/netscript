@@ -153,8 +153,8 @@ configuration you add once there is something to debug. A NetScript workspace st
 database, cache, services, and plugin processors together under an orchestrator that already
 carries their traces, so the graph is visible before the first bug.
 [Orchestration with Aspire](/explanation/aspire/) explains why an orchestrator is required at
-all, and [Observability](/observability/) is the working surface — including the honest line
-between traces that are real today and scaffold helpers that are still stubs.
+all, and [Observability](/observability/) is the working surface — including automatic framework
+spans, handler events/progress/child spans, and the separate console-backed logging path.
 
 ### The web layer inherits the same ordering
 

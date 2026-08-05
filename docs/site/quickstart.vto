@@ -17,23 +17,36 @@ the local orchestrator; your application code remains Deno and TypeScript. See
 
 ## 1. Install the CLI
 
-```sh
-deno install -g -A -f -n netscript --minimum-dependency-age=0 jsr:@netscript/cli{{ releaseSpecifier }}
-netscript --help
+<!-- quickstart-walk:start -->
+
+```bash
+deno install --global --allow-all --name netscript jsr:@netscript/cli{{ releaseSpecifier }}
 ```
 
-`--minimum-dependency-age=0` allows the pinned release to install on publication day (note: Deno marks this flag as `(Unstable)` on Deno 2.x). `-f` replaces an older global `netscript` executable. The same command works in Bash and PowerShell; Deno prints the executable directory to add to `PATH` if `netscript` is not found.
+The same command works in Bash and PowerShell; Deno prints the executable directory to add to `PATH` if `netscript` is not found.
+
+{{ comp callout { type: "note", title: "Installing on a release day or a canary" } }}
+Deno refuses dependencies published in the last ~24 hours, so on the day a version ships the command above fails. Add <code>--minimum-dependency-age=0</code> to override the policy, and <code>-f</code> to replace an existing global executable:
+<code>deno install -g -A -f -n netscript --minimum-dependency-age=0 jsr:@netscript/cli{{ releaseSpecifier }}</code>
+{{ /comp }}
+
+Then confirm the CLI is on your path:
+
+```sh
+netscript --help
+```
 
 Confirm `netscript --help` lists the public command groups: `agent`, `config`, `contract`, `db`, `deploy`, `generate`, `init`, `marketplace`, `plugin`, `service`, and the `ui:*` family (`ui:list`, `ui:add`, `ui:update`, `ui:remove`).
 
 ## 2. Scaffold the workspace
 
-```sh
-netscript init my-app --db postgres --service --yes
+```bash
+netscript init my-app --db postgres --yes
 cd my-app
+netscript service add --name users
 ```
 
-`--service` includes an example typed oRPC service (`users`). `--yes` accepts the remaining defaults without prompts, including the `dashboard` Fresh app and shared Redis cache. Add `--editor zed`, `--editor vscode`, or `--editor none` when you want the scaffold to apply an editor choice explicitly; inspect every option with `netscript init --help`.
+`service add` is a separate step so the same command works later when you add a second service to a real workspace. `--yes` accepts the remaining defaults without prompts, including the `dashboard` Fresh app and shared Redis cache. Add `--editor zed`, `--editor vscode`, or `--editor none` when you want the scaffold to apply an editor choice explicitly; inspect every option with `netscript init --help`.
 
 The CLI prints the real file and directory totals for the options you selected. Those totals vary with the database, service, editor, and agent tooling, so treat the printed result—not a static number in this guide—as the authority.
 
@@ -109,14 +122,13 @@ The database generator remains the source for column types and nullability; the 
 
 Nothing runs until Aspire starts. From the workspace root:
 
-```sh
+```bash
 cd aspire
-aspire restore   # once per machine
-cd ..
-deno task aspire:start
+aspire restore
+aspire start
 ```
 
-`deno task aspire:start` is what the CLI's own printed "next steps" recommends. It wraps `aspire start` with `ASPIRE_CLI_START_TIMEOUT=300`, providing a 300-second cold-start budget while container images download on first run. In PowerShell the path step is `Set-Location .\aspire` before restoring; the remaining commands are unchanged.
+The CLI's own printed next steps recommend `deno task aspire:start` instead of a bare `aspire start`: it is the same command wrapped with `ASPIRE_CLI_START_TIMEOUT=300`, which gives container images a 300-second cold-start budget on first run. Use the wrapper unless you are reproducing this walk exactly. In PowerShell the path step is `Set-Location .\aspire`; the remaining commands are unchanged.
 
 When run interactively in a TTY, leave the terminal running and open the dashboard URL and login token printed by `aspire start`. If your terminal is not interactive (a CI job or an agent tool call), `aspire start` detaches, prints the AppHost PID and dashboard URL, and returns; the resources keep running. The dashboard itself needs a browser and a login token, so read the running graph from the shell instead:
 
@@ -134,11 +146,15 @@ Wait until the Fresh app, example service (`users`), Postgres, and Redis report 
 
 Open a second terminal at `my-app/` while Aspire runs in the background:
 
-```sh
-netscript db init --name init
-netscript db generate
-netscript db seed
+```bash
+cd ..
+netscript db init --db postgres --name init
+netscript db generate --db postgres
+netscript db seed --db postgres
+deno task check
 ```
+
+<!-- quickstart-walk:end -->
 
 This order is mandatory for an Aspire-managed database. `db init` creates and applies the first Prisma migration; without it the scaffold has no tables. `db generate` then produces both the Prisma client and the Zod model schemas in `crud.ts`, and `db seed` runs the workspace seed script.
 

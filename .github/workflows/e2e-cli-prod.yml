@@ -39,6 +39,12 @@ jobs:
         with:
           dotnet-version: '10.0.x'
 
+      - name: Restore pinned Aspire NuGet package cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-aspire-${{ runner.os }}-13.4.6-v1
+
       - name: Install Aspire CLI
         env:
           ASPIRE_CLI_VERSION: '13.4.6'
@@ -77,12 +83,14 @@ jobs:
           sleep 120
 
       - name: Install published CLI from JSR
+        id: install_published_cli
         run: |
           echo "$HOME/.deno/bin" >> "$GITHUB_PATH"
           deno install -g -A --minimum-dependency-age=0 -n netscript "jsr:@netscript/cli@${{ steps.version.outputs.version }}"
           netscript --help
 
       - name: Install workspace dependencies
+        id: install_workspace_dependencies
         run: deno install
 
       - name: Public init smoke from JSR CLI
@@ -107,14 +115,29 @@ jobs:
             --report .llm/tmp/cli-e2e-prod-report.json \
             --log-file .llm/tmp/cli-e2e-prod.ndjson
 
+      - name: Quickstart walk E2E (published CLI, seven verdicts)
+        if: ${{ always() && steps.install_published_cli.outcome == 'success' && steps.install_workspace_dependencies.outcome == 'success' }}
+        run: |
+          deno task e2e:cli run quickstart.walk \
+            --source jsr \
+            --cli "jsr:@netscript/cli@${{ steps.version.outputs.version }}" \
+            --cleanup \
+            --format pretty \
+            --report .llm/tmp/quickstart-walk-prod-report.json \
+            --log-file .llm/tmp/quickstart-walk-prod.ndjson
+
       - name: Report production E2E failure
         if: failure()
         run: |
-          report=.llm/tmp/cli-e2e-prod-report.json
-          if [ -f "$report" ]; then
-            deno run --allow-read --allow-env=GITHUB_STEP_SUMMARY --allow-write="$GITHUB_STEP_SUMMARY" \
-              .llm/tools/e2e/print-failed-report-steps.ts --github "$report" || true
-          else
+          found=false
+          for report in .llm/tmp/cli-e2e-prod-report.json .llm/tmp/quickstart-walk-prod-report.json; do
+            if [ -f "$report" ]; then
+              found=true
+              deno run --allow-read --allow-env=GITHUB_STEP_SUMMARY --allow-write="$GITHUB_STEP_SUMMARY" \
+                .llm/tools/e2e/print-failed-report-steps.ts --github "$report" || true
+            fi
+          done
+          if [ "$found" = false ]; then
             message="Production CLI E2E failed for @netscript/cli@${{ steps.version.outputs.version }}; no JSON report was produced."
             echo "::error::$message"
             printf '## Production CLI E2E failure\n\n%s\n' "$message" >> "$GITHUB_STEP_SUMMARY"
@@ -128,4 +151,6 @@ jobs:
           path: |
             .llm/tmp/cli-e2e-prod-report.json
             .llm/tmp/cli-e2e-prod.ndjson
+            .llm/tmp/quickstart-walk-prod-report.json
+            .llm/tmp/quickstart-walk-prod.ndjson
           if-no-files-found: ignore

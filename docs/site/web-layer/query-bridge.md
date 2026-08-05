@@ -256,7 +256,7 @@ On the server, dehydration means building a per-request client, prefetching into
 
 ```tsx
 .withResource('dehydratedQuery', async (ctx) => {
-  const queryClient = createNetScriptQueryClient() as unknown as IslandQueryClient;
+  const queryClient = createNetScriptQueryClient();
   await queryClient.prefetchQuery(ordersQueryUtils.list.queryOptions({
     limit: ctx.search.limit,
     offset: ctx.search.offset,
@@ -265,22 +265,11 @@ On the server, dehydration means building a per-request client, prefetching into
 })
 ```
 
-**That cast is not decoration, and it is the sharpest edge on this page.**
-`createNetScriptQueryClient()` constructs a real TanStack `QueryClient` — with NetScript's defaults
-of 30 s stale, 5 min gc, no focus refetch, one retry — but returns it typed as `QueryClientPort`, the
-SDK's narrow structural port. That port declares `fetchQuery`, not `prefetchQuery`, and it is not
-assignable to `dehydrateQueryClient`'s parameter, which is TanStack's `QueryClient` itself. Written
-without the bridge, the resource fails `deno check` twice:
-
-```text
-TS2551: Property 'prefetchQuery' does not exist on type 'QueryClientPort'. Did you mean 'fetchQuery'?
-TS2345: Argument of type 'QueryClientPort' is not assignable to parameter of type 'QueryClient'.
-```
-
-The runtime object satisfies both calls; only the declared type is narrower. So the server half of
-the dehydration path currently costs you one deliberate type bridge, which is a further reason to
-treat `initialData` props as the default and reach for dehydration only when the table above says you
-need it.
+`createNetScriptQueryClient()` returns the real TanStack `QueryClient` it constructs, with
+NetScript's defaults of 30 s stale, 5 min gc, no focus refetch, and one retry. Its full contract
+therefore includes both `prefetchQuery` and the type Fresh accepts for dehydration. SDK internals
+that need fewer capabilities depend on a narrower `QueryClientPort`, derived from that same client
+type so the two contracts cannot drift apart.
 
 On the server, that prefetch runs `queryOptions().queryFn` through the registered CacheProvider, so
 it reads and revalidates the same KV entry as the generated action. In the browser, where no provider

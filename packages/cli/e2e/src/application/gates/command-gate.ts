@@ -7,10 +7,17 @@ import type {
 } from '../../domain/gate-definition.ts';
 import type { RunContext } from '../../domain/run-context.ts';
 
-export const RETRYABLE_COMMAND_FAILURE_CLASSES = ['timeout', 'canceled'] as const;
-export const MAX_COMMAND_GATE_ATTEMPTS = 2;
+export const RETRYABLE_COMMAND_FAILURE_CLASSES = [
+  'timeout',
+  'canceled',
+  'infrastructure',
+] as const;
+export const MAX_COMMAND_GATE_ATTEMPTS = 3;
 const CANCELED_EXIT_CODE = 6;
 const CANCELED_MARKER = /task was canceled/i;
+const DENO_USAGE_MARKER = /(?:^|\n)Usage:\s+deno(?:\s|$)/i;
+const ARGUMENT_PARSER_MARKER =
+  /unexpected argument|unexpected option|invalid value .* for|required arguments were not provided/i;
 
 /** Gate that succeeds when command exit and output expectations are satisfied. */
 export class CommandGate {
@@ -34,7 +41,7 @@ export class CommandGate {
       const result = await this.executor.run({
         cwd: this.definition.cwd(context),
         command: this.definition.command(context),
-        timeoutMs: context.request.options.commandTimeoutMs,
+        timeoutMs: this.definition.timeoutMs ?? context.request.options.commandTimeoutMs,
         outputMode: this.definition.outputMode,
         failureHint: this.definition.failureHint,
       });
@@ -44,7 +51,9 @@ export class CommandGate {
       );
       const passed = result.code === expectedExitCode && !result.timedOut &&
         missingOutput.length === 0;
-      const failureClass = passed ? undefined : classifyFailure(result);
+      const failureClass = passed
+        ? undefined
+        : this.definition.failureClass ?? classifyFailure(result);
       attempts.push({
         attempt,
         verdict: passed ? 'passed' : 'failed',
@@ -68,6 +77,8 @@ export class CommandGate {
         ? undefined
         : missingOutput.length > 0
         ? `Command output omitted: ${missingOutput.join(', ')}.`
+        : failureClass === 'harness-invocation'
+        ? 'Harness command invocation failed before product execution.'
         : `Command exited ${result.code}; expected ${expectedExitCode}.`;
 
       if (passed) {
@@ -85,6 +96,9 @@ function classifyFailure(
 ): GateFailureClass {
   if (result.timedOut) return 'timeout';
   if (result.code === CANCELED_EXIT_CODE && CANCELED_MARKER.test(result.stderr)) return 'canceled';
+  if (DENO_USAGE_MARKER.test(result.stderr) && ARGUMENT_PARSER_MARKER.test(result.stderr)) {
+    return 'harness-invocation';
+  }
   return 'assertion';
 }
 
@@ -92,7 +106,9 @@ function shouldRetry(
   failureClass: GateFailureClass,
   configuredClasses: readonly GateFailureClass[] | undefined,
 ): boolean {
-  if (failureClass === 'assertion' || !configuredClasses) return false;
+  if (
+    failureClass === 'assertion' || failureClass === 'harness-invocation' || !configuredClasses
+  ) return false;
   return RETRYABLE_COMMAND_FAILURE_CLASSES.includes(failureClass) &&
     configuredClasses.includes(failureClass);
 }

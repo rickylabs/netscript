@@ -70,7 +70,7 @@ Server-only utilities: the NetScript-managed Fresh app factory and Preact stream
 | `FreshAppFactory`            | typeAlias | Factory callback that constructs the Fresh app instance.                  |
 | `FreshAppFsRoutes`           | typeAlias | Adapter callback that registers file-system routes on a Fresh app.        |
 | `FreshAppTelemetryAttribute` | typeAlias | Attribute value accepted by Fresh app telemetry bootstrap options.        |
-| `FreshAppTelemetryOptions`   | interface | Telemetry bootstrap options reserved for `defineFreshApp` defaults.       |
+| `FreshAppTelemetryOptions`   | interface | Service identity and static attributes for `defineFreshApp` request spans. |
 | `FreshConfig`                | interface |                                                                           |
 | `Middleware`                 | typeAlias | A middleware function is the basic building block of Fresh. It allows you |
 | `StreamBoundaryRenderable`   | typeAlias | Renderable content accepted by streaming error boundaries.                |

@@ -143,8 +143,8 @@ finding into a debt entry.
 
 ## packages/cli — CommunityToolkit Deno/SQLite TypeScript AppHost re-enable deferred
 
-- **Reason:** The scaffold still uses `_aspire-compat.mjs` plus generated `builder.addExecutable(...)`
-  registrations for Deno resources. Current Aspire 13.4 docs state
+- **Reason:** The scaffold still uses `_aspire-compat.mjs` plus generated
+  `builder.addExecutable(...)` registrations for Deno resources. Current Aspire 13.4 docs state
   `CommunityToolkit.Aspire.Hosting.Deno` does not expose `addDenoApp` or `addDenoTask` APIs in the
   TypeScript SDK, and SQLite hosting is C#-only for AppHost APIs with TypeScript directed to
   `builder.addConnectionString(...)`.
@@ -176,8 +176,7 @@ finding into a debt entry.
   design for ownership, conflict handling, generated DB artifacts, and user-edited files.
 - **Owner:** Future CLI plugin lifecycle program.
 - **Target:** Before marketplace uninstall is documented or exposed as supported.
-- **Linked plan:** `.llm/tmp/run/issue-167-marketplace-plugin-install/plan.md` (Non-Scope, D5,
-  S12).
+- **Linked plan:** `.llm/tmp/run/issue-167-marketplace-plugin-install/plan.md` (Non-Scope, D5, S12).
 - **Created:** 2026-06-28
 - **Status:** closed by #1236 / PR #1237 (2026-08-04).
 - **Gate:** New uninstall contract and `e2e:cli` add/remove/re-add suite pass without orphaned
@@ -190,13 +189,13 @@ finding into a debt entry.
 
 - **ID:** `ISSUE-167-MARKETPLACE-PORTAL-SIGNATURES`
 - **Title:** Marketplace portal and publisher-signature curation are future work.
-- **Context:** Issue #167 establishes the JSR package scope, static plugin protocol, trust tiers, and
-  confirmation boundary needed for a marketplace, but it does not build `market.netscript.dev`,
+- **Context:** Issue #167 establishes the JSR package scope, static plugin protocol, trust tiers,
+  and confirmation boundary needed for a marketplace, but it does not build `market.netscript.dev`,
   `plugin search`, curated registry metadata, publisher signatures, provenance attestations, or
   verified publisher workflows.
-- **Why deferred:** The approved slice set was the install foundation. Portal discovery and signature
-  curation require product, trust, release, and governance decisions that should be user-gated and
-  evaluated separately from the installer mechanics.
+- **Why deferred:** The approved slice set was the install foundation. Portal discovery and
+  signature curation require product, trust, release, and governance decisions that should be
+  user-gated and evaluated separately from the installer mechanics.
 - **Trigger to revisit:** Marketplace roadmap Phase 2/3 or any plan to advertise curated third-party
   plugin discovery; require a publisher trust model, provenance gate, registry ingestion policy, and
   UI/API ownership decision.
@@ -214,7 +213,8 @@ finding into a debt entry.
 ## plugins/* — ISSUE-167-OPTION-B-PACKAGE-RENAME
 
 - **ID:** `ISSUE-167-OPTION-B-PACKAGE-RENAME`
-- **Title:** Option B package rename from `@netscript/plugin-<kind>` to `@netscript/<kind>` deferred.
+- **Title:** Option B package rename from `@netscript/plugin-<kind>` to `@netscript/<kind>`
+  deferred.
 - **Context:** D1 kept the existing published package names and added a bare-kind alias map
   (`workers` -> `@netscript/plugin-workers`, etc.) as the verified-scope guard. The cleaner
   marketplace identity of `@netscript/<kind>` was considered and explicitly deferred.
@@ -252,8 +252,8 @@ finding into a debt entry.
   `@netscript/plugin`; standalone extraction is future work.
 - **Owner:** Plugin platform maintainers.
 - **Target:** Before protocol versioning needs an independent release cadence.
-- **Linked plan:** `.llm/tmp/run/issue-167-marketplace-plugin-install/plan.md` (D8, D3 backlog,
-  S1 drift).
+- **Linked plan:** `.llm/tmp/run/issue-167-marketplace-plugin-install/plan.md` (D8, D3 backlog, S1
+  drift).
 - **Created:** 2026-06-28
 - **Status:** open, DEBT_ACCEPTED.
 - **Gate:** New package plan proves export compatibility, migration path, publish dry-run, and
@@ -264,9 +264,9 @@ finding into a debt entry.
 - **ID:** `ISSUE-167-PROD-JSR-SCAFFOLD-E2E`
 - **Title:** Production `deno x jsr:<pkg>/scaffold` validation is post-publish.
 - **Context:** S4 drift established that local files must run with `deno run`, not `deno x`; S11
-  therefore validates a true userland project outside the checkout with explicit `--local-path`.
-  The production JSR command shape remains `deno x <flags> jsr:@netscript/plugin-<kind>/scaffold`
-  and cannot be fully exercised until the new `./scaffold` exports are published.
+  therefore validates a true userland project outside the checkout with explicit `--local-path`. The
+  production JSR command shape remains `deno x <flags> jsr:@netscript/plugin-<kind>/scaffold` and
+  cannot be fully exercised until the new `./scaffold` exports are published.
 - **Why deferred:** Pre-merge validation cannot execute unpublished JSR package exports. Claiming
   prod-JSR green before alpha.13 would overstate the evidence.
 - **Trigger to revisit:** Immediately after alpha.13 publication; run `e2e-cli-prod` against the
@@ -275,14 +275,14 @@ finding into a debt entry.
   gates; the post-publish production JSR leg remains a release validation item.
 - **Owner:** Release / e2e-cli-prod owner for alpha.13.
 - **Target:** Alpha.13 post-publish verification.
-- **Linked plan:** `.llm/tmp/run/issue-167-marketplace-plugin-install/plan.md` (Hidden Scope,
-  Risk Register, S11 Scope Boundary); `.llm/tmp/run/issue-167-marketplace-plugin-install/drift.md`
-  (S4 local-path drift).
+- **Linked plan:** `.llm/tmp/run/issue-167-marketplace-plugin-install/plan.md` (Hidden Scope, Risk
+  Register, S11 Scope Boundary); `.llm/tmp/run/issue-167-marketplace-plugin-install/drift.md` (S4
+  local-path drift).
 - **Created:** 2026-06-28
 - **Status:** open, DEBT_ACCEPTED until alpha.13 post-publish smoke passes.
 - **Gate:** `e2e-cli-prod` proves official plugin install through
-  `deno x jsr:@netscript/plugin-<kind>/scaffold` after alpha.13; close by recording raw exit code and
-  suite/test counts.
+  `deno x jsr:@netscript/plugin-<kind>/scaffold` after alpha.13; close by recording raw exit code
+  and suite/test counts.
 
 ## packages/cli — Deno KV cache backend TypeScript AppHost resource emission deferred
 
@@ -372,8 +372,8 @@ finding into a debt entry.
     11-entrypoint export set.
   - **F-6 (JSR publishability):** `deno publish --dry-run` green; `workspace-mutator` JSR
     rewrite-map covers every telemetry subpath (root, `/orpc`, `/otel`, `/query`, `/registry`,
-    `/testing`). Env config validated with Standard Schema. All consumers in `packages/` + `plugins/`
-    still compile; T1 TC-1..14 convention contract preserved.
+    `/testing`). Env config validated with Standard Schema. All consumers in `packages/` +
+    `plugins/` still compile; T1 TC-1..14 convention contract preserved.
 
 ## packages/triggers — doctrine verdict Restructure
 
@@ -386,9 +386,9 @@ finding into a debt entry.
   this heading no longer exists; it was superseded by `packages/plugin-triggers-core` (plus the
   `plugins/triggers` connector) during the plugin re-architecture. The successor package carries a
   doctrine-compliant role-named layout (`domain/`, `ports/`, `runtime/`, `adapters/`, `stores/`,
-  `builders/`, `config/`, `contracts/`, `telemetry/`, `testing/`, `public/`) with no flat
-  root-level source files, so the Restructure concern (lift flat files into role folders) is fully
-  addressed by the successor rather than relocated. Heading retained as the historical record.
+  `builders/`, `config/`, `contracts/`, `telemetry/`, `testing/`, `public/`) with no flat root-level
+  source files, so the Restructure concern (lift flat files into role folders) is fully addressed by
+  the successor rather than relocated. Heading retained as the historical record.
 - **Gate:** F-3, F-11, F-13
 
 ## packages/plugin-triggers-core — T4 slow-type publish carve-out
@@ -416,7 +416,8 @@ finding into a debt entry.
 - **Target:** Before advertising deferred trigger action dispatch as supported.
 - **Linked plan:** `.llm/tmp/run/cap-s2-defer/brief.md`
 - **Created:** 2026-06-19
-- **Status:** open
+- **Status:** closed 2026-08-04 by #1283. The core now publishes a one-shot defer/replay port and
+  KV-backed scheduler; the plugin composes durable replay through the live definition registry.
 - **Gate:** Replace the S2 DLQ rejection test with a deferred-dispatch test after a package-owned
   scheduler/replay port is designed.
 
@@ -430,10 +431,9 @@ finding into a debt entry.
   oRPC's Zod input parsing, which would consume and transform the body and break signature
   verification. Converging it to the `createPluginService` + contract-bound-implementer shape (as
   workers/sagas/auth now do) requires implementing the 8 missing routes AND adding a new
-  `createPluginService` raw-route escape hatch in `@netscript/plugin/service` for HMAC webhooks —
-  a feature build + package-core change, not a soundness refactor. Split out per user decision
-  ("Defer to planned slice"); the other four plugins (workers/sagas/triggers-core/auth) are now
-  SOUND.
+  `createPluginService` raw-route escape hatch in `@netscript/plugin/service` for HMAC webhooks — a
+  feature build + package-core change, not a soundness refactor. Split out per user decision ("Defer
+  to planned slice"); the other four plugins (workers/sagas/triggers-core/auth) are now SOUND.
 - **Owner:** #172 plugin convergence — triggers connector slice.
 - **Target:** Before #172 is considered fully converged (all five plugins on the canonical
   thin-connector shape).
@@ -443,9 +443,9 @@ finding into a debt entry.
 - **Status:** open
 - **Gate:** triggers connector assembled via `triggersContractV1.$context<...>().router()` with all
   10 business routes + describe implemented, the raw-body webhook served through a sanctioned
-  `createPluginService` raw-route capability, `main.ts` migrated to `createPluginService(...).serve()`,
-  zero `any` / `Record<string,unknown>` handler maps; scoped check/lint/test green and
-  `deno publish --dry-run` Success without `--allow-slow-types`.
+  `createPluginService` raw-route capability, `main.ts` migrated to
+  `createPluginService(...).serve()`, zero `any` / `Record<string,unknown>` handler maps; scoped
+  check/lint/test green and `deno publish --dry-run` Success without `--allow-slow-types`.
 
 ## plugins/streams — connector SOUND convergence deferred (`streams-connector-sound-deferred`)
 
@@ -456,22 +456,22 @@ finding into a debt entry.
   workers/sagas/triggers-core/auth). The streams connector (`plugins/streams/services/src/main.ts`)
   is a **pure transparent proxy**: it starts the upstream `@durable-streams/server`
   `DurableStreamTestServer` on an internal port and fronts it with a Hono app that serves
-  `/health[/live|/ready]` and then `app.all('/*')` proxies every other request (including the
-  raw streaming body, via `c.req.raw.body` + `duplex: 'half'`) to the upstream. That catch-all
+  `/health[/live|/ready]` and then `app.all('/*')` proxies every other request (including the raw
+  streaming body, via `c.req.raw.body` + `duplex: 'half'`) to the upstream. That catch-all
   passthrough cannot be expressed as an oRPC router, and `createPluginService`
   (`@netscript/plugin/service`) is entirely `withRPC`-driven — so migrating the connector to the
   canonical `createPluginService(...).serve()` shape requires the **same raw-route escape hatch**
   the deferred triggers connector needs (see `triggers-connector-sound-deferred`). The connector
-  itself has no `any` / `Record<string,unknown>` handler maps; its only escapes are a
-  platform-gap `@ts-ignore` for `RequestInit.duplex` (not yet in Deno's lib types) in the proxy
-  body. Pre-existing minor `-core` casts unrelated to service-typesafety: `import.meta.env as any`
+  itself has no `any` / `Record<string,unknown>` handler maps; its only escapes are a platform-gap
+  `@ts-ignore` for `RequestInit.duplex` (not yet in Deno's lib types) in the proxy body.
+  Pre-existing minor `-core` casts unrelated to service-typesafety: `import.meta.env as any`
   cross-runtime env probe in `stream-url-resolver.ts` and two `as unknown as` bridges to the
   upstream `@durable-streams` generic types in `define-stream-schema.ts` — neither is an oRPC
   Hole-A/Hole-B hole; left as-is pending the connector slice.
 - **Owner:** #172 plugin convergence — proxy-connector slice (fold with
-  `triggers-connector-sound-deferred`: both connectors are blocked on the one
-  `createPluginService` raw-route capability and should land in the same PLAN-EVAL-gated,
-  daemon-attached WSL Codex slice that builds it once).
+  `triggers-connector-sound-deferred`: both connectors are blocked on the one `createPluginService`
+  raw-route capability and should land in the same PLAN-EVAL-gated, daemon-attached WSL Codex slice
+  that builds it once).
 - **Target:** Before #172 is considered fully converged (all five plugins on the canonical
   thin-connector shape).
 - **Linked plan:** to be authored jointly with the triggers connector slice — framework-source +
@@ -479,9 +479,9 @@ finding into a debt entry.
 - **Created:** 2026-06-30
 - **Status:** open
 - **Gate:** streams connector `main.ts` migrated to `createPluginService(...).serve()` with the
-  upstream proxy served through the sanctioned `createPluginService` raw-route capability,
-  base-meta (`describe` + health) preserved, the `duplex` platform escape kept only if no typed
-  Deno equivalent exists; scoped check/lint/test green and `deno publish --dry-run` Success without
+  upstream proxy served through the sanctioned `createPluginService` raw-route capability, base-meta
+  (`describe` + health) preserved, the `duplex` platform escape kept only if no typed Deno
+  equivalent exists; scoped check/lint/test green and `deno publish --dry-run` Success without
   `--allow-slow-types`.
 
 ## plugins/sagas — deferred Prisma SagaIdempotencyPort parity
@@ -560,10 +560,10 @@ finding into a debt entry.
 - **Created:** 2026-04-29
 - **Status:** RESOLVED 2026-07-06 (superseded) — the top-level `packages/workers` package named in
   this heading no longer exists; it was superseded by `packages/plugin-workers-core` (plus the
-  `plugins/workers` connector) during the plugin re-architecture. The 1,287 LOC monolith is gone: the
-  successor `packages/plugin-workers-core/src/abstracts/task-executor.ts` is a 26 LOC abstract, so the
-  supervisor/executor/dispatcher split concern is fully addressed by the successor rather than
-  relocated. Heading retained as the historical record.
+  `plugins/workers` connector) during the plugin re-architecture. The 1,287 LOC monolith is gone:
+  the successor `packages/plugin-workers-core/src/abstracts/task-executor.ts` is a 26 LOC abstract,
+  so the supervisor/executor/dispatcher split concern is fully addressed by the successor rather
+  than relocated. Heading retained as the historical record.
 - **Gate:** F-1, F-3, F-13
 
 ## packages/sagas — AP-1 / doctrine verdict Refactor (list-transport.ts 847 LOC)
@@ -835,11 +835,11 @@ finding into a debt entry.
 - **Linked plan:** `.llm/tmp/run/doc-harness-doctrine-refactor--harness-v2-plan/plan.md`
 - **Created:** 2026-04-29
 - **Status:** RESOLVED 2026-07-06 (superseded) — the `packages/shared` package named in this heading
-  no longer exists; the whole package was removed during the re-architecture. `utils/datetime.ts` was
-  already deleted in Wave 0, and with the package itself gone the "shrink `shared` to cross-package
-  identifiers" concern and the residual `@shared/utils` compatibility tracking are both moot. Heading
-  retained as the historical record. (Prior note, retained: partially closed 2026-06-05 — datetime
-  helper deleted; published surface free of generic datetime helpers.)
+  no longer exists; the whole package was removed during the re-architecture. `utils/datetime.ts`
+  was already deleted in Wave 0, and with the package itself gone the "shrink `shared` to
+  cross-package identifiers" concern and the residual `@shared/utils` compatibility tracking are
+  both moot. Heading retained as the historical record. (Prior note, retained: partially closed
+  2026-06-05 — datetime helper deleted; published surface free of generic datetime helpers.)
 - **Gate:** F-1 and F-2 closed for datetime; residual F-11 concern moot now that `packages/shared`
   is deleted
 
@@ -1307,8 +1307,8 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   alpha-1 train.
 - **Created:** 2026-06-22.
 - **Status:** open, DEBT_ACCEPTED.
-- **Gate:** Close when `deno task publish:dry-run` passes for the alpha-1 train after PR1 merges, and
-  scaffold output no longer emits forward-looking stable ranges.
+- **Gate:** Close when `deno task publish:dry-run` passes for the alpha-1 train after PR1 merges,
+  and scaffold output no longer emits forward-looking stable ranges.
 
 ## plugins/auth — single active backend v1 boundary (`auth-single-active-backend-boundary`)
 
@@ -1332,17 +1332,6 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Status:** open, DEBT_ACCEPTED.
 - **Gate:** Close when the Web Layer examples page links to maintained hosted sandboxes or removes
   the planned-sandbox statement.
-
-## runtime — app-wide shutdown orchestrator missing (`runtime-app-wide-shutdown-orchestrator`)
-
-- **Reason:** Services, worker runtimes, queues, and database teardown each expose their own drain
-  path, but there is no single top-level `host.shutdown()` that orchestrates all app resources under
-  one budget.
-- **Owner:** Runtime orchestration follow-up.
-- **Created:** 2026-06-22.
-- **Status:** open, DEBT_ACCEPTED.
-- **Gate:** Close when the runtime exposes a documented app-wide shutdown orchestrator and the
-  graceful-shutdown guide uses it as the primary path.
 
 ## packages/cli — deployment artifacts are not generated (`cli-deploy-artifacts-missing`)
 
@@ -1379,13 +1368,14 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 ## packages/cli — bare-metal deploy targets ship without rollback/secrets bodies (`cli-deploy-target-rollback-secrets-deferred`)
 
 - **Reason:** The canonical `DeployTargetPort` contract declares seven operations; the bare-metal
-  service targets (`WindowsServiceDeployTarget`, `LinuxServiceDeployTarget`) implement six
-  (`plan` / `emit` / `up` / `down` / `status` / `logs`) and leave `rollback?` / `secrets?`
+  service targets (`WindowsServiceDeployTarget`, `LinuxServiceDeployTarget`) implement six (`plan` /
+  `emit` / `up` / `down` / `status` / `logs`) and leave `rollback?` / `secrets?`
   declared-unsupported (omitted from the shared `ServiceDeployTarget` base per LD-4). The
   kernel-domain `DeployTargetRegistry` descriptors are also not yet wired to inject the public
   `OsServicePort` + compile pipeline (a kernel→public import would violate hexagonal layering — see
   worklog drift D-S8); the live deploy path runs `deploy-group.ts` → `install-service-deploy` /
-  `buildWindowsDeployment` directly, so the descriptors are scaffolding consumed only by tests today.
+  `buildWindowsDeployment` directly, so the descriptors are scaffolding consumed only by tests
+  today.
 - **Owner:** Deployment-hardening follow-up (#341).
 - **Created:** 2026-07-03 (#339/#340).
 - **Update (2026-07-04, #341 / PR #374):** the operation bodies + delegation seam landed. Deploy-S5
@@ -1393,8 +1383,8 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   `LinuxServiceDeployTarget` now advertise `rollback`/`secrets` and delegate to the shipped
   deploy-core primitives (`secrets-convention`/`rollback-convention`/`health-gate`/
   `activation-convention`), with `up` health-gated, when the core ports are injected. The one
-  residual — composing the registry descriptors onto the public `OsServicePort` + compile pipeline so
-  `deploy <target> up|rollback|secrets` executes end-to-end off the descriptor path — is a
+  residual — composing the registry descriptors onto the public `OsServicePort` + compile pipeline
+  so `deploy <target> up|rollback|secrets` executes end-to-end off the descriptor path — is a
   kernel→public layering boundary and is now tracked distinctly by `DEPLOY-BAREMETAL-PUBLIC-WIRING`.
 - **Status:** RESOLVED 2026-07-04 (superseded) — the `rollback`/`secrets` (+ health/OTEL) bodies and
   the injected execution-delegation seam landed in #341/#374; superseded by
@@ -1408,22 +1398,13 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Reason:** The systemd adapter, unit renderer, and OS-routing are covered by unit + OS-routing
   e2e-lite tests, but the implementation host is Windows-only, so the end-to-end Linux systemd
   install/start/status path is not exercised against a live `systemctl`/`journalctl`. The
-  merge-readiness `scaffold.runtime` gate likewise runs on Windows and does not touch the Linux lane.
+  merge-readiness `scaffold.runtime` gate likewise runs on Windows and does not touch the Linux
+  lane.
 - **Owner:** Deployment CI follow-up.
 - **Created:** 2026-07-03 (#339/#340).
 - **Status:** open, DEBT_ACCEPTED.
 - **Gate:** Close when a Linux CI job (or containerized systemd harness) runs the bare-metal deploy
   lifecycle against a real systemd and asserts unit install/enable/status/logs.
-
-## packages/fresh — Fresh app telemetry defaults reserved (`fresh-app-telemetry-defaults`)
-
-- **Reason:** `defineFreshApp` accepts `telemetry` / `FreshAppTelemetryOptions` as a forward
-  compatibility seam, but Fresh app bootstrap telemetry defaults are not active yet.
-- **Owner:** Fresh telemetry follow-up.
-- **Created:** 2026-06-22.
-- **Status:** open, DEBT_ACCEPTED.
-- **Gate:** Close when Fresh app bootstrap telemetry is implemented and the Web Layer server docs
-  describe emitted spans rather than reserved options.
 
 ## packages/plugin-workers-core — non-Deno task runtimes are not permission-sandboxed (`workers-non-deno-task-sandbox-boundary`)
 
@@ -1438,26 +1419,6 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Status:** open, DEBT_ACCEPTED.
 - **Gate:** Close when non-Deno task runtimes have a documented, enforced per-task sandbox or the
   public task runtime API explicitly models this as a permanent trust boundary.
-
-## packages/plugin-workers-core — scaffold createJobTools handler helpers are no-op stubs (`workers-scaffold-job-tools-noop`)
-
-- **Reason:** The scaffold-generated worker handler toolkit `createJobTools(ctx)` exposes
-  `trace.addEvent`, `withChildSpan`, and `progress` helpers that are currently no-op stubs.
-  Job-level telemetry is real — dispatch, execution, step events, progress, scheduler runs, and
-  subprocess trace continuation emit OpenTelemetry spans visible in Aspire (OTLP
-  `http://localhost:4318`). Only these in-handler scaffold helpers do not yet emit; their signatures
-  are stable, so handler code written against them keeps compiling and will start emitting once the
-  helpers are implemented. For custom handler spans today, call `@netscript/telemetry` helpers
-  directly.
-- **Owner:** `@netscript/plugin-workers-core` / scaffold telemetry follow-up.
-- **Target:** Before advertising in-handler `createJobTools` span/event/progress emission as
-  supported.
-- **Linked plan:** `.llm/tmp/run/docs-v4-ia-deepening/caveat-inventory.md` (Cluster C).
-- **Created:** 2026-06-22
-- **Status:** open.
-- **Gate:** Close when `trace.addEvent` / `withChildSpan` / `progress` from `createJobTools(ctx)`
-  emit real spans/events and a runtime test proves a handler-emitted child span reaches the OTLP
-  collector.
 
 ## packages/auth-{better-auth,workos} — Archetype-2 folder layout + WorkOS feature-surface parity (`AUTH-ARCHETYPE-LAYOUT`)
 
@@ -1590,8 +1551,8 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Why it is debt:** The repo still has multiple cron-related surfaces (`@netscript/cron`, workers
   `.schedule()`, trigger scheduler adapters, and this preview helper). Follow-up should either
   upstream the preview semantics into the canonical cron primitive or replace this helper with an
-  equivalent shared engine once the cron subsystem decision is made, without regressing the #181
-  DST table.
+  equivalent shared engine once the cron subsystem decision is made, without regressing the #181 DST
+  table.
 - **Owner:** `@netscript/plugin-triggers-core` runtime + cron subsystem maintainers.
 - **Target:** Cron subsystem unification follow-up after #181.
 - **Linked plan:** `.llm/tmp/run/feat-triggers-feature-backing--181/plan.md` Slice 5 / L6.
@@ -1700,10 +1661,9 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   island into generated projects with no companion lockfile (`package-lock.json` / `deno.lock`).
   Consumers must run a manual `npm install` in `aspire/` before the AppHost resolves, and the
   install is unpinned. This is a pre-existing generated-project DX gap, unrelated to the Deno 2.9
-  toolchain adoption — Deno 2.9's lock/install changes do not seed a lock for an emitted npm
-  package that has no foreign lock to import. The Deno 2.9 adoption plan (D5) decided this gap
-  out-of-scope; this entry makes that "pre-existing arch-debt" citation verifiable per PLAN-EVAL
-  finding F-3.
+  toolchain adoption — Deno 2.9's lock/install changes do not seed a lock for an emitted npm package
+  that has no foreign lock to import. The Deno 2.9 adoption plan (D5) decided this gap out-of-scope;
+  this entry makes that "pre-existing arch-debt" citation verifiable per PLAN-EVAL finding F-3.
 - **Owner:** CLI scaffold / Aspire AppHost generator maintainers.
 - **Target:** Before advertising the generated TS AppHost as zero-manual-step; revisit alongside the
   generated-project task DX follow-up (Deno 2.9 plan C6).
@@ -1727,9 +1687,9 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   backing" message that oRPC maps to a server error (`subscribeEvents` is an async generator that
   throws immediately and never yields, so its SSE output schema is never violated). No backing was
   fabricated and no triggers-core capability was invented in this slice.
-- **Why it is debt:** the deferred routes have no sound runtime seam in `@netscript/plugin-triggers-core`
-  yet, and two backed routes synthesize/omit fields because the domain lacks them. The net-new
-  triggers-core surface required to fully back the contract:
+- **Why it is debt:** the deferred routes have no sound runtime seam in
+  `@netscript/plugin-triggers-core` yet, and two backed routes synthesize/omit fields because the
+  domain lacks them. The net-new triggers-core surface required to fully back the contract:
   1. **Manual / test-fire helper** — a runtime entrypoint to dispatch a trigger on demand (backs
      `fireTrigger`) and a webhook test-delivery helper (backs `testWebhook`).
   2. **Persistent enabled-state store** — there is no enabled/disabled store, so `listTriggers`/
@@ -1767,27 +1727,26 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 
 - **ID:** `DEPLOY-S7-APPHOST-COMPOSE-GEN`
 - **Title:** Aspire AppHost compose-publishing generation (compose environment + Deno
-  `denoland/deno:2` Dockerfile weave + config→`Parameters__*`) is deferred as a shared,
-  cross-slice primitive.
-- **Context:** Deploy-S7 (#343) shipped the config member (S1), the Aspire compose/docker
-  adapter (S5, `aspire-compose-deploy-target.ts`), and the thin `deploy docker|compose` router
-  (S6). The adapter delegates `plan`→`aspire publish`. For `aspire publish` to actually emit a
-  docker-compose artifact, the generated `aspire/apphost.mts` must (a) declare the official
-  `Aspire.Hosting.Docker` NuGet in `aspire.config.json` and (b) call
-  `await builder.addDockerComposeEnvironment("compose")`. Aspire then auto-publishes all
-  resources as compose services. **But** NetScript registers Deno resources as
-  `builder.addExecutable('deno', …)` (see `generate-aspire-config.ts` L44-56); executables are
-  not containers, so publishing them to compose requires a `denoland/deno:2`
+  `denoland/deno:2` Dockerfile weave + config→`Parameters__*`) is deferred as a shared, cross-slice
+  primitive.
+- **Context:** Deploy-S7 (#343) shipped the config member (S1), the Aspire compose/docker adapter
+  (S5, `aspire-compose-deploy-target.ts`), and the thin `deploy docker|compose` router (S6). The
+  adapter delegates `plan`→`aspire publish`. For `aspire publish` to actually emit a docker-compose
+  artifact, the generated `aspire/apphost.mts` must (a) declare the official `Aspire.Hosting.Docker`
+  NuGet in `aspire.config.json` and (b) call `await builder.addDockerComposeEnvironment("compose")`.
+  Aspire then auto-publishes all resources as compose services. **But** NetScript registers Deno
+  resources as `builder.addExecutable('deno', …)` (see `generate-aspire-config.ts` L44-56);
+  executables are not containers, so publishing them to compose requires a `denoland/deno:2`
   `addDockerfileBuilder` / container-resource weave across the shared `register-services` /
   `register-apps` / `register-background` generators, plus config→`Parameters__*` mapping.
 - **Why deferred:** (1) Runtime correctness — whether `aspire publish` emits a valid compose for
-  NetScript's Deno executable resources — cannot be validated without the Aspire .NET SDK + a
-  Docker daemon (`aspire restore`→`aspire publish`→`docker compose config`), i.e. the S8/S9
-  merge-readiness environment; a snapshot test would lock the string but not prove Aspire
-  accepts it. (2) The per-resource compose-publishing generation is a SHARED publishing
-  convention (R-DEPLOY-3 / core-centralization law), and the concurrent #342 Deno Deploy adapter
-  needs the same apphost-publishing surface — forking it per-target on one branch would violate
-  the centralization law and risk a merge collision with the live deployment-epic agents.
+  NetScript's Deno executable resources — cannot be validated without the Aspire .NET SDK + a Docker
+  daemon (`aspire restore`→`aspire publish`→`docker compose config`), i.e. the S8/S9 merge-readiness
+  environment; a snapshot test would lock the string but not prove Aspire accepts it. (2) The
+  per-resource compose-publishing generation is a SHARED publishing convention (R-DEPLOY-3 /
+  core-centralization law), and the concurrent #342 Deno Deploy adapter needs the same
+  apphost-publishing surface — forking it per-target on one branch would violate the centralization
+  law and risk a merge collision with the live deployment-epic agents.
 - **Owner:** NetScript deployment epic (#327) coordinator; implement once as a shared
   apphost-publishing primitive in coordination with #342.
 - **Target:** Deployment-epic merge-readiness pass, before the Docker/Compose target is declared
@@ -1797,8 +1756,8 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   `addDockerComposeEnvironment`, `publishAsDockerComposeService`, `addParameterFromConfiguration`,
   `addDockerfileBuilder`).
 - **Created:** 2026-07-03.
-- **Status:** open — S5 adapter + S6 router shipped and work unchanged the moment the apphost
-  gains the compose environment; the generation is cleanly separable.
+- **Status:** open — S5 adapter + S6 router shipped and work unchanged the moment the apphost gains
+  the compose environment; the generation is cleanly separable.
 - **Gate:** Close when scaffolded `apphost.mts` emits the compose environment + Deno
   `denoland/deno:2` service, `deno task e2e:cli run scaffold.runtime` stays green, and
   `netscript deploy compose plan` produces a `docker-compose.yaml` that passes
@@ -1809,17 +1768,18 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **ID:** `DEPLOY-SECRETS-ROLLBACK-CORE`
 - **Title:** Centralized `secrets` + `rollback` deploy-convention primitives are not yet on main;
   adapters declare them unsupported until the core lands.
-- **Context:** The 7-op `DeployTargetPort` (landed by S0/#370) includes `rollback` and `secrets`
-  as optional ops. Doctrine R-DEPLOY-3 requires both to be centralized in the deploy core
-  (shared, restricted-perm secret env-file backed by Aspire `Parameters__*`; rollback = redeploy
-  the last-good emitted artifact/image), never re-implemented per adapter. Those core primitives
-  do not exist on main yet — they are the #341 deployment-hardening work (PR #364). Per the port
-  doc comment, adapters may omit the two methods (declare unsupported) rather than provide silent
+- **Context:** The 7-op `DeployTargetPort` (landed by S0/#370) includes `rollback` and `secrets` as
+  optional ops. Doctrine R-DEPLOY-3 requires both to be centralized in the deploy core (shared,
+  restricted-perm secret env-file backed by Aspire `Parameters__*`; rollback = redeploy the
+  last-good emitted artifact/image), never re-implemented per adapter. Those core primitives do not
+  exist on main yet — they are the #341 deployment-hardening work (PR #364). Per the port doc
+  comment, adapters may omit the two methods (declare unsupported) rather than provide silent
   no-ops.
 - **Why deferred:** Cross-slice dependency — forking secrets/rollback inside the Aspire adapter
   would violate R-DEPLOY-3. The Deploy-S7 adapter therefore ships the supported subset
   (`plan`/`emit`/`up`/`down`/`status`/`logs`) and omits `rollback`/`secrets`.
-- **Owner:** #341 deployment-hardening core (deploy core in `packages/cli/src/kernel/domain/deploy`).
+- **Owner:** #341 deployment-hardening core (deploy core in
+  `packages/cli/src/kernel/domain/deploy`).
 - **Target:** When #341/#364 lands the shared primitives; adapters then advertise the ops and call
   the core.
 - **Linked plan:** `.llm/tmp/run/deploy-s7-aspire/plan.md` (S3); drift `D2`.
@@ -1838,12 +1798,13 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   delegating to them.
 - **Gate:** Close when the Aspire compose/docker adapter advertises both ops by delegating to the
   now-shipped deploy-core `secrets`/`rollback` primitives.
-- **Gate:** Close each route as its triggers-core seam lands (manual/test-fire helper -> `fireTrigger`
-  + `testWebhook`; enabled-state store + `enabled`/`name` fields -> `enableTrigger`/`disableTrigger`
-  + un-synthesized `listTriggers`/`getTrigger`; cron preview engine -> `previewSchedule`; event SSE
-  seam -> `subscribeEvents`), each with its own contract-route assertion and the connector smoke
-  test extended to assert the now-backed behavior. Remove the webhook brand cast when a public brand
-  constructor lands.
+- **Gate:** Close each route as its triggers-core seam lands (manual/test-fire helper ->
+  `fireTrigger`
+  - `testWebhook`; enabled-state store + `enabled`/`name` fields -> `enableTrigger`/`disableTrigger`
+  - un-synthesized `listTriggers`/`getTrigger`; cron preview engine -> `previewSchedule`; event SSE
+    seam -> `subscribeEvents`), each with its own contract-route assertion and the connector smoke
+    test extended to assert the now-backed behavior. Remove the webhook brand cast when a public
+    brand constructor lands.
 - **Closing evidence:** #181 per-slice gates passed with scoped core/connector check/lint/fmt,
   focused contract/connector tests, `deno publish --dry-run --allow-dirty` for
   `@netscript/plugin-triggers-core` and `@netscript/plugin-triggers`, and `deno task arch:check`
@@ -1872,14 +1833,15 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 
 - **Reason:** Two coupled defects in three connectors that still ship runtime stores/adapters under
   `plugins/<kind>/src/runtime/`. (1) **Placement:** by the #157→#172 thin-connector law these
-  port→backend adapters belong in `@netscript/plugin-<kind>-core` (`adapters/`/`stores/`), leaving the
-  connector with specifics only. (2) **Primitive-bypass / engine lock:** the **sagas** and **triggers**
-  KV stores hardwire raw `Deno.Kv`/`Deno.openKv` + the Deno-native fluent atomic, bypassing the
-  engine-agnostic `@netscript/kv` primitive — locking them to Deno KV and forfeiting Redis / in-memory /
-  kvdex / reactive-watch. The **workers** `KvWorkerIdempotencyStore` already does it right (depends on
-  `@netscript/kv` types + a `KvStore`-shaped structural port) and is the reference. The PASSed
-  `feat/scaffold-surface-167` plan covered the scaffold-surface contract (S1–S7), not runtime-store
-  placement or engine choice — so this is net-new scope, PLAN-EVAL-gated separately.
+  port→backend adapters belong in `@netscript/plugin-<kind>-core` (`adapters/`/`stores/`), leaving
+  the connector with specifics only. (2) **Primitive-bypass / engine lock:** the **sagas** and
+  **triggers** KV stores hardwire raw `Deno.Kv`/`Deno.openKv` + the Deno-native fluent atomic,
+  bypassing the engine-agnostic `@netscript/kv` primitive — locking them to Deno KV and forfeiting
+  Redis / in-memory / kvdex / reactive-watch. The **workers** `KvWorkerIdempotencyStore` already
+  does it right (depends on `@netscript/kv` types + a `KvStore`-shaped structural port) and is the
+  reference. The PASSed `feat/scaffold-surface-167` plan covered the scaffold-surface contract
+  (S1–S7), not runtime-store placement or engine choice — so this is net-new scope, PLAN-EVAL-gated
+  separately.
 - **Relocation + migration set (grounded against the worktree):**
   - **sagas (#172b):** `prisma-saga-store.ts` (dep-free structural Prisma delegate, relocate as-is),
     `kv-saga-store.ts`, `kv-saga-runtime-stores.ts` (**relocate + migrate `Deno.openKv` →
@@ -1887,36 +1849,44 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
     `@netscript/kv` dep — desired.**
   - **triggers (#172c):** `kv-trigger-runtime-stores.ts` (**relocate + migrate `Deno.openKv` →
     `@netscript/kv`**) + `cron-trigger-scheduler-adapter.ts` / `watchers-file-watcher-adapter.ts` →
-    `packages/plugin-triggers-core/src/{stores,adapters}/`. Adds **`@netscript/kv` + `@netscript/cron`
-    + `@netscript/watchers`** to triggers-core (currently `@std/assert`+`zod` only).
+    `packages/plugin-triggers-core/src/{stores,adapters}/`. Adds **`@netscript/kv` +
+    `@netscript/cron`
+    - `@netscript/watchers`** to triggers-core (currently `@std/assert`+`zod` only).
   - **workers (#172d):** `worker/worker-idempotency-store.ts` (already on `@netscript/kv`, relocate
     only) → `packages/plugin-workers-core/src/{stores,adapters}/`. Adds the `@netscript/kv` dep to
     workers-core.
-- **Why it is debt (open):** authored but PLAN-EVAL-gated and not yet implemented. Decisions deferred to
-  PLAN-EVAL: (D-KV) migrate sagas+triggers KV stores onto `@netscript/kv` (`KvStore` + `AtomicCheck/
-  Mutation/Result`, injected handle, workers structural-port pattern), preserving optimistic-concurrency
-  + idempotency semantics; (D2) the zero-compat public-surface break — stores move from
-  `@netscript/plugin-<kind>/runtime` to `@netscript/plugin-<kind>-core/{stores,adapters}` with no shim.
-  **Note:** an earlier draft framed a "D1" decision over whether `-core` may take `@netscript/*` deps;
-  that was removed — `-core` depending on NetScript primitives is the **encouraged** direction (the
-  reference behavior for community plugin/plugin-core authors), not a tradeoff to weigh.
+- **Why it is debt (open):** authored but PLAN-EVAL-gated and not yet implemented. Decisions
+  deferred to PLAN-EVAL: (D-KV) migrate sagas+triggers KV stores onto `@netscript/kv` (`KvStore` +
+  `AtomicCheck/
+  Mutation/Result`, injected handle, workers structural-port pattern), preserving
+  optimistic-concurrency
+  - idempotency semantics; (D2) the zero-compat public-surface break — stores move from
+    `@netscript/plugin-<kind>/runtime` to `@netscript/plugin-<kind>-core/{stores,adapters}` with no
+    shim. **Note:** an earlier draft framed a "D1" decision over whether `-core` may take
+    `@netscript/*` deps; that was removed — `-core` depending on NetScript primitives is the
+    **encouraged** direction (the reference behavior for community plugin/plugin-core authors), not
+    a tradeoff to weigh.
 - **Owner:** Plugin connectors + `@netscript/plugin-<kind>-core` (framework architecture).
 - **Target:** PLAN-EVAL-gated relocation slices under #172; close when all three merge.
-- **Linked plan:** `.llm/tmp/run/feat-scaffold-surface-167--adapter-relocation/plan.md` (+ `research.md`).
+- **Linked plan:** `.llm/tmp/run/feat-scaffold-surface-167--adapter-relocation/plan.md` (+
+  `research.md`).
 - **Created:** 2026-06-30.
-- **Status:** open, PLAN-EVAL pending — research + plan authored; no implementation slice before PASS.
-- **Gate:** per touched package scoped check/lint/fmt (`--ext ts,tsx`) + targeted `deno test
-  --unstable-kv` + `deno publish --dry-run --allow-dirty` (no new slow types) + `deno task arch:check`
-  (no connector→core leak); new workspace deps land via normal resolution, no `deno.lock` hand-edit.
+- **Status:** open, PLAN-EVAL pending — research + plan authored; no implementation slice before
+  PASS.
+- **Gate:** per touched package scoped check/lint/fmt (`--ext ts,tsx`) + targeted
+  `deno test
+  --unstable-kv` + `deno publish --dry-run --allow-dirty` (no new slow types) +
+  `deno task arch:check` (no connector→core leak); new workspace deps land via normal resolution, no
+  `deno.lock` hand-edit.
 
 ## packages/plugin-auth-core — AUTH-FITNESS-GATE-OVERFLAG
 
 - **ID:** `AUTH-FITNESS-GATE-OVERFLAG`
-- **Reason:** `AS7/F-AUTH-CAST` over-flagged two sanctioned auth type-soundness sites: the centralized
-  oRPC error-map contract cast in `src/contracts/v1/auth.contract.ts`, and test-only
-  `@ts-expect-error` / `as unknown` guards in `tests/contracts/auth-contract-soundness_test.ts`.
-  The production auth code was already type-sound; the fitness gate was stricter than the AS7 intent
-  and stricter than the equivalent sagas/workers contract soundness test treatment.
+- **Reason:** `AS7/F-AUTH-CAST` over-flagged two sanctioned auth type-soundness sites: the
+  centralized oRPC error-map contract cast in `src/contracts/v1/auth.contract.ts`, and test-only
+  `@ts-expect-error` / `as unknown` guards in `tests/contracts/auth-contract-soundness_test.ts`. The
+  production auth code was already type-sound; the fitness gate was stricter than the AS7 intent and
+  stricter than the equivalent sagas/workers contract soundness test treatment.
 - **Fix:** Narrowed `.llm/tools/fitness/check-doctrine.ts` so the auth scanner recognizes the exact
   centralized `Parameters<typeof oc.errors>[0]` contract cast, keeps the router `any` exemplar as
   the only router exception, and exempts test paths (`tests/`, `_test.ts`, `.test.ts`) from the auth
@@ -1932,10 +1902,10 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 ## packages/cli — PLUGIN-LIST-MANIFEST-REGISTRATION-BLOCKER
 
 - **ID:** `PLUGIN-LIST-MANIFEST-REGISTRATION-BLOCKER`
-- **Reason:** After the centralized scaffold-CLI bridge restored execution of all five official plugin
-  scaffolders, `scaffold.runtime` advanced past every `scaffold.plugin.*` install gate and failed at
-  `scaffold.plugin-list`. The generated project contains the plugin sample files under `workers/`,
-  `sagas/`, `triggers/`, `streams/`, and `auth/`, but `netscript plugin list` reads
+- **Reason:** After the centralized scaffold-CLI bridge restored execution of all five official
+  plugin scaffolders, `scaffold.runtime` advanced past every `scaffold.plugin.*` install gate and
+  failed at `scaffold.plugin-list`. The generated project contains the plugin sample files under
+  `workers/`, `sagas/`, `triggers/`, `streams/`, and `auth/`, but `netscript plugin list` reads
   `plugins/<name>/scaffold.plugin.json`; the install path does not materialize that manifest under
   the generated `plugins/` registry tree.
 - **Why deferred:** This is a distinct host install/list registration defect, not the S-f scaffold
@@ -1956,27 +1926,26 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 ## plugin packages — PLUGIN-RUNTIME-DEPENDENCY-ENTRYPOINT-EXPORTS
 
 - **ID:** `PLUGIN-RUNTIME-DEPENDENCY-ENTRYPOINT-EXPORTS`
-- **Reason:** The #157 thin-dependency model forbids copying official plugin internals into generated
-  projects. After S-g reconciled config registration and `plugin list`, the full runtime E2E fails at
-  `runtime.wait.workers-api` because appsettings runtime resources still point at copied-package
-  workdirs such as `plugins/workers`, which are intentionally absent. Moving runtime resources to
-  package-spec execution requires an explicit public plugin executable-entrypoint contract for both
-  service and background processes. Service packages already expose `./services`; background
-  executables such as `@netscript/plugin-workers/bin/combined.ts` are not exported today.
+- **Reason:** The #157 thin-dependency model forbids copying official plugin internals into
+  generated projects. After S-g reconciled config registration and `plugin list`, the full runtime
+  E2E fails at `runtime.wait.workers-api` because appsettings runtime resources still point at
+  copied-package workdirs such as `plugins/workers`, which are intentionally absent. Moving runtime
+  resources to package-spec execution requires an explicit public plugin executable-entrypoint
+  contract for both service and background processes. Service packages already expose `./services`;
+  background executables such as `@netscript/plugin-workers/bin/combined.ts` are not exported today.
 - **Why deferred:** Adding exported runtime executable subpaths is a new public package-surface
   contract, not an install/register/list reconciliation. S-g's escape hatch required stopping rather
   than folding that contract into this slice.
 - **Owner:** CLI plugin runtime / official plugin package maintainers.
 - **Linked evidence:** `.llm/tmp/run/feat-scaffold-surface-167--adapter-relocation/worklog.md` S-g.
-- **Status:** closed by PR #172 runtime-launch finalization
-  (`8aaddbc1`, `4a991d16`).
+- **Status:** closed by PR #172 runtime-launch finalization (`8aaddbc1`, `4a991d16`).
 - **Gate:** Close when official plugin packages expose supported executable entrypoints for the
   thin-dependency runtime and `deno task e2e:cli run scaffold.runtime --cleanup --format pretty`
   reaches `failed=0` without copying plugin internals into generated user projects.
-- **Closing evidence:** `deno task e2e:cli run scaffold.runtime --cleanup --format pretty`
-  exited 0 on 2026-06-30 with `Summary: passed=48 failed=0`. The run used package-launched
-  service/background plugin resources, passed every service/background wait gate, accepted the
-  generic trigger webhook, listed trigger events, and validated the cross-service OTEL trace.
+- **Closing evidence:** `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` exited 0
+  on 2026-06-30 with `Summary: passed=48 failed=0`. The run used package-launched service/background
+  plugin resources, passed every service/background wait gate, accepted the generic trigger webhook,
+  listed trigger events, and validated the cross-service OTEL trace.
 
 ## packages/cli — DB-GENERATE-ASPIRE-COUPLING
 
@@ -1993,13 +1962,14 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   in 243ms while passing on aspire-equipped boxes and in `scaffold-runtime`. The scaffolded project
   already ships a standalone Aspire-less path — the db-workspace `deno task db:generate`
   (`prisma generate --generator client` + `scripts/generate-zod.ts` + `scripts/fix-zod-imports.ts`
-  + `patch-prisma-client.ts`), which C14 wired into the static suites via the new `database.codegen`
-  gate. That harness workaround unblocks CI but does not remove the coupling from the CLI command.
+  - `patch-prisma-client.ts`), which C14 wired into the static suites via the new `database.codegen`
+    gate. That harness workaround unblocks CI but does not remove the coupling from the CLI command.
 - **Why deferred:** Decoupling `db generate` from Aspire is a cross-package refactor of the CLI
   database kernel (`DbOperationRunner` / operation classification): pure-codegen operations must run
   their prisma/zod pipeline directly (as the scaffolded `db:generate` task already does) without
   booting the AppHost, while connect-requiring operations (`init`/`migrate`/`seed`) keep the Aspire
-  path. That is a distinct DX slice from the #153 scaffold-surface work and out of scope for PR #208.
+  path. That is a distinct DX slice from the #153 scaffold-surface work and out of scope for PR
+  #208.
 - **Owner:** CLI database kernel maintainers.
 - **Target:** Follow-up DX slice (aspire-less `db generate`).
 - **Linked evidence:** `.llm/tmp/run/feat-scaffold-crud-surface--impl/drift.md` (2026-07-01
@@ -2048,16 +2018,16 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Linked plan:** `.llm/tmp/run/deploy-s2-doctrine/plan.md` (Slice 3);
   `docs/architecture/doctrine/06-archetypes.md#archetype-7--deployment-target-adapter`.
 - **Created:** 2026-07-03
-- **Update (2026-07-04, #341 / PR #374):** the core-centralization obligation is materially advanced.
-  The convention-bearing primitives (health gating, OTEL, secrets, rollback) now live in the deploy
-  core `packages/cli/src/kernel/domain/deploy/` as pure, target-agnostic modules with injected ports
-  (`secrets-convention.ts`, `rollback-convention.ts`, `health-gate.ts`, `activation-convention.ts`,
-  `observability-convention.ts`), and the bare-metal reference binding proves them against systemd +
-  SERVY (see `DEPLOY-SECRETS-ROLLBACK-CORE`). The `windows-service`/`linux-service`
-  `ServiceDeployTarget` is now a genuine 7-op adapter (rollback/secrets advertised + delegated when
-  the core ports are injected). Still open for full closure: the primitives live in `packages/cli`
-  (not a standalone deployment core package), the target registry is CLI-local, and
-  `F-DEPLOY-1`/`F-DEPLOY-2` remain `reviewed` (not `gated`).
+- **Update (2026-07-04, #341 / PR #374):** the core-centralization obligation is materially
+  advanced. The convention-bearing primitives (health gating, OTEL, secrets, rollback) now live in
+  the deploy core `packages/cli/src/kernel/domain/deploy/` as pure, target-agnostic modules with
+  injected ports (`secrets-convention.ts`, `rollback-convention.ts`, `health-gate.ts`,
+  `activation-convention.ts`, `observability-convention.ts`), and the bare-metal reference binding
+  proves them against systemd + SERVY (see `DEPLOY-SECRETS-ROLLBACK-CORE`). The
+  `windows-service`/`linux-service` `ServiceDeployTarget` is now a genuine 7-op adapter
+  (rollback/secrets advertised + delegated when the core ports are injected). Still open for full
+  closure: the primitives live in `packages/cli` (not a standalone deployment core package), the
+  target registry is CLI-local, and `F-DEPLOY-1`/`F-DEPLOY-2` remain `reviewed` (not `gated`).
 - **Status:** open, DEBT_ACCEPTED — convention primitives centralized (#341/#374); `F-DEPLOY-1/2`
   remain `reviewed` pending a standalone deployment core package + full adapter matrix.
 - **Gate:** Close when the deployment core owns the centralized health/OTEL/secrets/rollback
@@ -2078,12 +2048,12 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   only the 6-op subset. The production composition that constructs a fully-wired target — resolving
   the release candidate + probe spec + secret bundle and injecting the real `OsServicePort`-backed
   activation store on the public deploy path — is intentionally not built here.
-- **Why deferred:** The activation adapters depend on the public `OsServicePort` seam, so the
-  wiring is a public-layer composition concern (`public/adapters/**` + the deploy command
-  dependencies), out of the kernel-domain S5/S6 scope (hexagonal boundary; see run drift `D-S8`).
-  Wiring it also needs a release-id/candidate resolution + secret-source pipeline that has no
-  first-party caller yet. The delegation seam is fully unit-proven with fake ports; only the
-  composition root is missing.
+- **Why deferred:** The activation adapters depend on the public `OsServicePort` seam, so the wiring
+  is a public-layer composition concern (`public/adapters/**` + the deploy command dependencies),
+  out of the kernel-domain S5/S6 scope (hexagonal boundary; see run drift `D-S8`). Wiring it also
+  needs a release-id/candidate resolution + secret-source pipeline that has no first-party caller
+  yet. The delegation seam is fully unit-proven with fake ports; only the composition root is
+  missing.
 - **Owner:** Deployment epic #327 — public deploy composition slice (systemd/#339, servy).
 - **Target:** When the public deploy path constructs `ServiceDeployTarget` with the real bare-metal
   ports so `deploy <target> up|rollback|secrets` executes end-to-end.
@@ -2123,11 +2093,11 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Reason:** The doctrine-06 "Archetype 5 — Plugin Package" Minimum shape nests contribution
   folders (`services/`, `database/`, `jobs/`, `streams/`, `verify-plugin.ts`) under `src/` and names
   sibling contract packages `@netscript/sagas` / `@netscript/workers`. Neither matches reality: real
-  first-party `plugins/*` place those contribution folders at the **top level** as siblings of `src/`
-  (with top-level `contracts.ts`/`mod.ts`/`verify-plugin.ts`), and the sibling contract packages were
-  renamed to `@netscript/plugin-*-core` during the plugin re-architecture. The harness archetype-5
-  profile already treats the observed `plugins/*` layout as authoritative until this chapter is
-  reconciled.
+  first-party `plugins/*` place those contribution folders at the **top level** as siblings of
+  `src/` (with top-level `contracts.ts`/`mod.ts`/`verify-plugin.ts`), and the sibling contract
+  packages were renamed to `@netscript/plugin-*-core` during the plugin re-architecture. The harness
+  archetype-5 profile already treats the observed `plugins/*` layout as authoritative until this
+  chapter is reconciled.
 - **Why deferred:** Reconciling the doctrine chapter is a rewrite that must land coherently with the
   plugin-v2 folder conventions (AI-stack #238 / plugin re-architecture sequencing), not a drive-by
   edit inside a chore run. The #306 harness/skills revamp is doc-and-spec scope; a doctrine
@@ -2136,7 +2106,8 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Target:** When plugin-v2 folder conventions are frozen; reconcile the doctrine-06 Minimum shape
   (top-level contribution folders + `@netscript/plugin-*-core` sibling names) and drop the
   "authoritative until reconciled" note from `ARCHETYPE-5-plugin.md`.
-- **Linked plan:** `.llm/harness/archetypes/ARCHETYPE-5-plugin.md` § Minimum Folder Shape; issue #306.
+- **Linked plan:** `.llm/harness/archetypes/ARCHETYPE-5-plugin.md` § Minimum Folder Shape; issue
+  #306.
 - **Created:** 2026-07-06
 - **Status:** open, DEBT_ACCEPTED (assessed and deferred during the #306 remainder run).
 - **Gate:** Close when doctrine-06 Archetype 5 Minimum shape matches the observed authoritative
@@ -2160,25 +2131,26 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 ## documentation lane authored framework source (`docs-lane-framework-source-1020`)
 
 - **Reason:** PR #1079 (documentation-sequencing slice, `docs/1068-task-routing`) landed framework
-  source on the documentation lane. Commit `fb5d7a0de` added `plugins/streams/services/src/durability.ts`
-  (new `describeStorageDurability` module, 29 lines), `durability_test.ts` (38 lines), a startup
-  warning wired into `plugins/streams/services/src/main.ts`, and a `plugins/streams/deno.json` task
-  change — plus JSDoc in `packages/fresh`, `packages/plugin-workers-core` and `packages/sdk`.
-  `CLAUDE.md`'s documentation-authoring exception is explicit that authoring touches **no
-  `packages/`/`plugins/` source code**, and that any framework-source change stays a WSL Codex
-  daemon-attached slice. This crossed that boundary.
+  source on the documentation lane. Commit `fb5d7a0de` added
+  `plugins/streams/services/src/durability.ts` (new `describeStorageDurability` module, 29 lines),
+  `durability_test.ts` (38 lines), a startup warning wired into
+  `plugins/streams/services/src/main.ts`, and a `plugins/streams/deno.json` task change — plus JSDoc
+  in `packages/fresh`, `packages/plugin-workers-core` and `packages/sdk`. `CLAUDE.md`'s
+  documentation-authoring exception is explicit that authoring touches **no `packages/`/`plugins/`
+  source code**, and that any framework-source change stays a WSL Codex daemon-attached slice. This
+  crossed that boundary.
 - **Root cause is upstream of the slice:** issue #1020 is labelled `type:docs`, but its acceptance
   ("the non-durable in-memory default is unsurfaced" → a startup warning) **requires code**. A
-  `type:docs` issue whose acceptance cannot be met by prose should not be routed to the documentation
-  lane. The slice followed its brief; the routing decision was wrong, and the orchestrator's
-  pre-merge review checked the router change (#1068) without auditing the changed-file list for
-  framework paths.
+  `type:docs` issue whose acceptance cannot be met by prose should not be routed to the
+  documentation lane. The slice followed its brief; the routing decision was wrong, and the
+  orchestrator's pre-merge review checked the router change (#1068) without auditing the
+  changed-file list for framework paths.
 - **Owner:** 0.0.4 release orchestrator (routing + merge review).
 - **Decision:** **DEBT_ACCEPTED, not reverted.** The change is small, additive, unit-tested, and was
-  required by the issue's own acceptance; it passed the full CI surface including `scaffold-runtime`,
-  `quality:scan` (byte-identical to the pre-change baseline) and `arch:check` (FAIL=0). Reverting
-  green, tested, required work to satisfy a lane boundary would cost more than it protects. The
-  deviation is recorded rather than buried.
+  required by the issue's own acceptance; it passed the full CI surface including
+  `scaffold-runtime`, `quality:scan` (byte-identical to the pre-change baseline) and `arch:check`
+  (FAIL=0). Reverting green, tested, required work to satisfy a lane boundary would cost more than
+  it protects. The deviation is recorded rather than buried.
 - **Created:** 2026-08-03
 - **Status:** open, DEBT_ACCEPTED — **owner-reviewed 2026-08-03**: content assessed directly and
   judged acceptable ("mostly comments and test"). The code stands as merged. The **process** finding
@@ -2188,3 +2160,47 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   review step for any documentation-lane PR audits the changed-file list for `packages/**` and
   `plugins/**` paths before merge. Until then, assume the docs lane can silently acquire source
   scope.
+
+## `@netscript/cli` scaffold — unreachable `Mode: 'Local'` cache arm (`cache-local-arm-unreachable-1158`)
+
+- **Reason:** `generate-register-infrastructure.ts:164-171` implements a `DenoKv` + `Mode: 'Local'`
+  arm that registers **no Aspire resource** (in-process `Deno.openKv()`), but **nothing in the
+  scaffold ever emits `Mode: 'Local'`**. `buildCacheBlock('deno-kv')`
+  (`generate-appsettings.ts:251-259`) emits `Mode: 'External'`, and plugin install's
+  `ensureSharedCache` writes `Mode: 'Auto'`. So the only genuinely container-free cache path in the
+  generator is dead code, reachable solely by hand-editing `appsettings.json`.
+- **Why it matters, discovered by #1158:** the sqlite runtime tier set out to eliminate every
+  container. Because `Local` is unreachable, the tier had to fall back to the `Auto` arm, and when
+  the Docker-less Garnet **executable** sub-arm proved unreliable (drift D-14/R-3), the tier settled
+  for one Garnet container. A reachable `Local` arm would plausibly have delivered the original
+  zero-container goal.
+- **Owner:** CLI scaffold / Aspire generator.
+- **Target:** Revisit when the reduced-container tier is promoted, or when a consumer needs an
+  in-process KV cache.
+- **Linked plan:** `.llm/runs/test-e2e-sqlite-runtime-tier--1158/plan.md` (§ Arch-Debt
+  Implications); issue #1158; PR #1220.
+- **Created:** 2026-08-04
+- **Status:** open — recorded, not fixed. #1158 deliberately did not change scaffold cache defaults.
+- **Gate:** Close when either (a) a scaffold flag emits `Mode: 'Local'` and an E2E tier proves a
+  genuinely container-free cache, or (b) the arm is judged unwanted and removed so the generator
+  carries no unreachable branch.
+
+## `@netscript/cli` scaffold — default cache backend forces a container (`scaffold-default-cache-container-1158`)
+
+- **Reason:** `SCAFFOLD_DEFAULTS.CACHE_BACKEND` is `'redis'`
+  (`constants/scaffold/scaffold-defaults.ts:12`), and `buildCacheBlock('redis')` emits
+  `{ Engine: 'Redis', Mode: 'Container' }` — a hard Docker container with **no** Auto/Executable
+  fallback, unlike the `Garnet`/`Auto` entry plugin install adds. Every `netscript init` that does
+  not pass `--cache=false` therefore commits the user to Docker for the cache alone.
+- **Why it matters, discovered by #1158:** this — not garnet — was the cache-side Docker cost the
+  research pass had to correct the carried-in plan about (research findings 3–5). The E2E works
+  around it per-suite with `--cache=false`; **users have no such default**.
+- **Owner:** CLI scaffold defaults.
+- **Target:** Consider alongside the `Local` arm above; a default change affects every scaffold, so
+  it needs its own decision and canary.
+- **Linked plan:** `.llm/runs/test-e2e-sqlite-runtime-tier--1158/plan.md` (§ Non-Scope, § Arch-Debt
+  Implications); issue #1158; PR #1220.
+- **Created:** 2026-08-04
+- **Status:** open — explicitly out of scope for #1158, which must not change product defaults.
+- **Gate:** Close when the default cache backend either gains a Docker-less fallback arm (as
+  `Garnet`/`Auto` has) or is changed with a recorded owner decision and a release canary.

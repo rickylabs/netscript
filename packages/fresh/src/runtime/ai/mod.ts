@@ -1,6 +1,8 @@
 /**
  * `@netscript/fresh/ai` — durable-chat runtime plane for NetScript Fresh apps.
  *
+ * @module
+ *
  * This subpath is the server + island seam that turns a Fresh route into a
  * **durable** AI chat surface: a chat whose message history and in-flight tool
  * calls survive reload, reconnect, and multi-tab replay because they are backed
@@ -68,8 +70,6 @@
  *   proxy handler; body in `./stream-proxy.ts`, re-exported below).
  * - **FA3**: MCP sandbox helpers live on `@netscript/fresh/ai/sandbox` so the
  *   chat-session surface stays within the F-5 export cap.
- *
- * @module
  */
 
 // FA1 — durable chat connection, response, and the one-projection snapshot.

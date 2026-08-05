@@ -5,9 +5,11 @@
  * `.github/workflows/ci.yml`, and `.github/workflows/surface-diff.yml`
  * (#1152; paths are the mechanism, labels are the override):
  *
- *   - `run_static`    -> scaffold-static (any scaffold-impacting change)
- *   - `run_runtime`   -> scaffold-runtime; docker is the exception tier,
- *                        reached on the docker signal (v1: deliberately wide)
+ *   - `run_static`         -> scaffold-static (any scaffold-impacting change)
+ *   - `run_runtime_sqlite` -> scaffold-runtime-sqlite (the cheap runtime tier,
+ *                             reached when static runs unless e2e is skipped)
+ *   - `run_runtime`        -> scaffold-runtime; docker is the exception tier,
+ *                             reached on the docker signal (v1: deliberately wide)
  *   - `needs_deno`    -> check-test / quality: any change the Deno toolchain
  *                        checks or tests (root `deno test` discovers
  *                        `.llm/tools` and `.github/scripts` tests, so code
@@ -30,8 +32,9 @@
  *
  * Label precedence (highest first) — the set is frozen at exactly three:
  *   1. `ci:full`          -> force EVERY output true.
- *   2. `ci:skip-scaffold` -> skip `scaffold-static`.
- *      `ci:skip-e2e`      -> skip `scaffold-runtime`.
+ *   2. `ci:skip-scaffold` -> skip `scaffold-static` and its derived
+ *                            `scaffold-runtime-sqlite` tier.
+ *      `ci:skip-e2e`      -> skip both runtime tiers.
  *      (Skip labels keep their scaffold-tier-only semantics; they never
  *      widen to the required trio or desktop.)
  *   3. otherwise          -> paths decide.
@@ -258,6 +261,7 @@ export interface DecisionInput {
 
 export interface Decision {
   runStatic: boolean;
+  runRuntimeSqlite: boolean;
   runRuntime: boolean;
   docsOnly: boolean;
   needsDeno: boolean;
@@ -268,9 +272,10 @@ export interface Decision {
   reason: string;
 }
 
-function fullDecision(docsOnly: boolean, reason: string): Decision {
+function fullDecision(docsOnly: boolean, reason: string, sqliteReason: string): Decision {
   return {
     runStatic: true,
+    runRuntimeSqlite: true,
     runRuntime: true,
     docsOnly,
     needsDeno: true,
@@ -278,7 +283,7 @@ function fullDecision(docsOnly: boolean, reason: string): Decision {
     needsDesktop: true,
     needsDocs: true,
     needsSurface: true,
-    reason,
+    reason: `${reason}. ${sqliteReason}`,
   };
 }
 
@@ -297,21 +302,38 @@ export function decide(input: DecisionInput): Decision {
   // unless an explicit skip label is present. `ci:full` still wins.
   if (input.eventName !== 'pull_request') {
     if (forceFull) {
-      return fullDecision(false, `${input.eventName}: ci:full -> run everything`);
+      return fullDecision(
+        false,
+        `${input.eventName}: ci:full -> run everything`,
+        'scaffold-runtime-sqlite forced by ci:full',
+      );
     }
+    const runStatic = !skipScaffold;
+    const runRuntimeSqlite = !skipScaffold && !skipE2e;
+    const sqliteReason = skipE2e
+      ? 'scaffold-runtime-sqlite skipped by ci:skip-e2e'
+      : !runStatic
+      ? 'scaffold-runtime-sqlite skipped: scaffold-static signal is off'
+      : 'scaffold-runtime-sqlite: scaffold-static signal is on';
     return {
       ...fullDecision(
         false,
         `${input.eventName}: no diff to classify -> run (skip labels honoured)`,
+        sqliteReason,
       ),
-      runStatic: !skipScaffold,
+      runStatic,
+      runRuntimeSqlite,
       runRuntime: !skipE2e,
     };
   }
 
   const changed = input.files.map(normalise).filter((p) => p.length > 0);
   if (changed.length === 0) {
-    return fullDecision(false, 'empty diff: nothing to classify -> run everything');
+    return fullDecision(
+      false,
+      'empty diff: nothing to classify -> run everything',
+      'scaffold-runtime-sqlite: scaffold-static signal is on',
+    );
   }
 
   const rootConfigChanged = changed.some((p) => p === 'deno.json' || p === 'deno.jsonc');
@@ -334,7 +356,11 @@ export function decide(input: DecisionInput): Decision {
   const docsOnly = impacting.length === 0;
 
   if (forceFull) {
-    return fullDecision(docsOnly, 'ci:full label present -> force everything');
+    return fullDecision(
+      docsOnly,
+      'ci:full label present -> force everything',
+      'scaffold-runtime-sqlite forced by ci:full',
+    );
   }
 
   // scaffold-static
@@ -365,6 +391,15 @@ export function decide(input: DecisionInput): Decision {
     runtimeReason = 'scaffold-runtime: docker-tier change detected';
   }
 
+  // scaffold-runtime-sqlite (the cheap runtime tier follows the static
+  // scaffold signal; ci:skip-e2e remains authoritative over both runtimes).
+  const runRuntimeSqlite = runStatic && !skipE2e;
+  const sqliteReason = skipE2e
+    ? 'scaffold-runtime-sqlite skipped by ci:skip-e2e'
+    : !runStatic
+    ? 'scaffold-runtime-sqlite skipped: scaffold-static signal is off'
+    : 'scaffold-runtime-sqlite: scaffold-static signal is on';
+
   const impactingNote = docsOnly
     ? `${changed.length} file(s), all docs-only`
     : `${impacting.length}/${changed.length} impacting file(s), e.g. ${
@@ -375,6 +410,7 @@ export function decide(input: DecisionInput): Decision {
 
   return {
     runStatic,
+    runRuntimeSqlite,
     runRuntime,
     docsOnly,
     needsDeno: caps.deno,
@@ -382,7 +418,7 @@ export function decide(input: DecisionInput): Decision {
     needsDesktop: caps.desktop,
     needsDocs: caps.docs,
     needsSurface: caps.surface,
-    reason: `${impactingNote}. ${staticReason}; ${runtimeReason}. ${vectorNote}`,
+    reason: `${impactingNote}. ${staticReason}; ${sqliteReason}; ${runtimeReason}. ${vectorNote}`,
   };
 }
 
@@ -484,6 +520,7 @@ async function main(): Promise<void> {
 
   const lines = [
     `run_static=${decision.runStatic}`,
+    `run_runtime_sqlite=${decision.runRuntimeSqlite}`,
     `run_runtime=${decision.runRuntime}`,
     `docs_only=${decision.docsOnly}`,
     `needs_deno=${decision.needsDeno}`,
@@ -500,6 +537,7 @@ async function main(): Promise<void> {
   console.log(`  labels:        ${labels.join(', ') || '(none)'}`);
   console.log(`  changed:       ${files.length} file(s)`);
   console.log(`  run_static:    ${decision.runStatic}`);
+  console.log(`  run_runtime_sqlite: ${decision.runRuntimeSqlite}`);
   console.log(`  run_runtime:   ${decision.runRuntime}`);
   console.log(`  docs_only:     ${decision.docsOnly}`);
   console.log(`  needs_deno:    ${decision.needsDeno}`);

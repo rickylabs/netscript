@@ -1,3 +1,5 @@
+/** @module @netscript/plugin-triggers-core/contracts/v1 */
+
 export {
   EventFiltersSchema,
   OffsetPaginationQuerySchema,

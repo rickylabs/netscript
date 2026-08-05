@@ -41,7 +41,11 @@ const LEGACY_WARNING =
 export function extractClosingIssues(body: string): number[] {
   const pattern =
     /\b(?:close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved)\s+(?:(?:https:\/\/github\.com\/[^/\s]+\/[^/\s]+\/issues\/)|#)(\d+)\b/gi;
-  return [...new Set([...body.matchAll(pattern)].map((match) => Number(match[1])))];
+  // GitHub does not interpret closing keywords inside fenced code blocks. Structured
+  // acceptance evidence commonly contains prose such as "resolves #123", so scan
+  // only the Markdown text that GitHub itself treats as closing-keyword syntax.
+  const githubClosingText = body.replace(/^\s*```[^\n]*\n[\s\S]*?^\s*```\s*$/gm, '');
+  return [...new Set([...githubClosingText.matchAll(pattern)].map((match) => Number(match[1])))];
 }
 
 export function acceptanceCheckboxes(body: string): AcceptanceCheckbox[] {

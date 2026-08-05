@@ -23,6 +23,8 @@ export function createFullCommand(createRunner: CliRunnerFactory) {
     .option('--plugins <list:string>', 'Comma-separated plugin kinds')
     .option('--samples', 'Include generated samples', { default: true })
     .option('--no-samples', 'Skip generated samples')
+    .option('--cache', 'Scaffold a shared cache resource', { default: true })
+    .option('--no-cache', 'Skip the shared cache resource')
     .option('--cleanup', 'Stop Aspire and remove suite-created Docker containers', {
       default: true,
     })

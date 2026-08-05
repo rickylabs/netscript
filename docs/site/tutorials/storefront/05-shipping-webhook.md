@@ -193,20 +193,19 @@ Three things to read off this:
 A webhook handler does not write an HTTP response itself — it returns the <em>effects</em> to run. Returning <code>[]</code> accepts the request but enqueues nothing; returning one or more <code>enqueueJob(...)</code> entries hands that many jobs to the workers runtime. This keeps inbound HTTP thin and pushes the real work onto the durable background queue.
 {{ /comp }}
 
-## Step 3 — Know which trigger actions are supported
+## Step 3 — Choose immediate work or one-shot replay
 
 A handler returns an array of **trigger actions** (effects). Be precise about which ones the runtime
-actually dispatches today, so you do not author against a stub:
+dispatches:
 
 {{ comp.apiTable({ caption: "Trigger actions", rows: [
   { name: "enqueueJob(jobRef, opts)", type: "Live", desc: "Places a worker job on the queue. The supported way to turn an inbound event into durable background work." },
-  { name: "defer({ until })", type: "Defined, not yet supported", desc: "The action type exists in the builder surface, but the runtime processor throws on dispatch and routes the event to the dead-letter queue. There is no deferred replay yet — do not rely on it." }
+  { name: "defer({ until })", type: "Live", desc: "Persists the event and replays its handler once at or after the ISO timestamp, surviving runtime restarts." }
 ] }) }}
 
-In other words: build with `enqueueJob(...)`. If you return a `defer(...)` action, the trigger runtime
-raises an unsupported-operation error and the event lands in the DLQ rather than being scheduled —
-reach for the scheduling features of the [triggers capability](/durable-workflows/triggers/) (cron and
-file-watch triggers) when you need time-based work, not `defer`.
+Use `enqueueJob(...)` when work is ready now. Use `defer({ until })` when the same event should be
+processed again once at a future instant. Deferred delivery is at-least-once, so keep the handler
+idempotent; use cron scheduling for recurring work.
 
 ## Step 4 — Route shape (raw webhook ingress)
 

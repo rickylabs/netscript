@@ -23,6 +23,33 @@ Deno.test('--source jsr accepts the local public CLI binary', () => {
   assertEquals(command.slice(0, 4), ['deno', 'run', '-A', '/repo/packages/cli/bin/netscript.ts']);
 });
 
+Deno.test('scaffold init default command remains byte-identical', () => {
+  assertEquals(
+    scaffoldInitGate().command(
+      createContext('/repo/packages/cli/bin/netscript.ts', PACKAGE_SOURCE.LOCAL),
+    ),
+    [
+      'deno',
+      'run',
+      '-A',
+      '/repo/packages/cli/bin/netscript.ts',
+      'init',
+      'prod-local-test',
+      '--path',
+      '/repo/.llm/tmp/cli-e2e',
+      '--db',
+      'postgres',
+      '--service',
+      '--service-name',
+      'users',
+      '--ci',
+      '--yes',
+      '--no-git',
+      '--force',
+    ],
+  );
+});
+
 Deno.test('scaffold runtime exercises the generated service port default', () => {
   const command = scaffoldInitGate().command(
     createContext('/repo/packages/cli/bin/netscript.ts', PACKAGE_SOURCE.JSR),
@@ -30,6 +57,14 @@ Deno.test('scaffold runtime exercises the generated service port default', () =>
 
   assertEquals(command.includes('--service-port'), false);
   assertEquals(command.includes('3001'), false);
+});
+
+Deno.test('scaffold init disables the cache exactly once', () => {
+  const command = scaffoldInitGate().command(
+    createContext('/repo/packages/cli/bin/netscript.ts', PACKAGE_SOURCE.LOCAL, false),
+  );
+
+  assertEquals(command.filter((argument) => argument === '--cache=false'), ['--cache=false']);
 });
 
 Deno.test('--source jsr rejects the local contributor CLI binary', () => {
@@ -43,23 +78,15 @@ Deno.test('--source jsr rejects the local contributor CLI binary', () => {
   );
 });
 
-Deno.test('--source jsr generated check targets prod workspace members', () => {
+Deno.test('generated check runs the fresh scaffold workspace check task', () => {
   const gate = createGeneratedCheckGates().find((entry) => entry.id === GATE.GENERATED_DENO_CHECK);
   if (!gate || gate.kind !== 'command') {
     throw new Error('Expected generated check gate to be a command gate.');
   }
 
   assertEquals(
-    gate.command(createContext('/repo/packages/cli/bin/netscript.ts', PACKAGE_SOURCE.JSR)),
-    [
-      'deno',
-      'check',
-      '--minimum-dependency-age=0',
-      '--unstable-kv',
-      './contracts',
-      './database',
-      './services/users',
-    ],
+    gate.command(createContext('/repo/packages/cli/bin/netscript.ts', PACKAGE_SOURCE.LOCAL)),
+    ['deno', 'task', 'check'],
   );
 });
 
@@ -124,6 +151,7 @@ function scaffoldInitGate(): CommandGateDefinition {
 function createContext(
   cliEntrypoint: string,
   packageSource: RunOptions['packageSource'],
+  cache = true,
 ): RunContext {
   const options: RunOptions = {
     repoRoot: '/repo',
@@ -134,6 +162,7 @@ function createContext(
     packageSource,
     plugins: [],
     samples: false,
+    cache,
     cleanup: true,
     format: REPORT_FORMAT.PRETTY,
     commandTimeoutMs: 1,

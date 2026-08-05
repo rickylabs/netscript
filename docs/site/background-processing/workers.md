@@ -494,21 +494,10 @@ not double-charge. For the full recipe see
 <a href="/background-processing/how-to/tune-worker-runtime/">Tune the worker runtime</a>.
 {{ /comp }}
 
-{{ comp.badge({ status: "partial" }) }}
-
-{{ comp callout { type: "note", title: "Deferred: the scaffold createJobTools helper is a no-op" } }}
-The scaffold's <code>createJobTools(ctx)</code> helper (in
-<code>plugins/workers/jobs/job-tools.ts</code>) exposes <code>log</code>,
-<code>progress</code>, and <code>trace</code> shims — but in the generated copy its
-<strong>progress and trace methods are no-op stubs</strong> (only <code>log</code> writes to
-the console), and it is <em>not</em> a published <code>@netscript/plugin-workers-core</code>
-export. This is a known, tracked limitation with a fix planned, not a permanent design choice,
-and it is <em>only</em> in that scaffold-facing helper: job dispatch and execution themselves
-emit real spans automatically (above). For custom handler spans today, call
-<code>@netscript/telemetry</code> helpers directly. Do not say "worker tracing is a no-op" —
-that is false for the framework layer.
-<!-- caveat: arch-debt:workers-scaffold-job-tools-noop -->
-{{ /comp }}
+The scaffold's <code>createJobTools(ctx)</code> helper is backed by the published
+<code>@netscript/plugin-workers-core</code> implementation. Its trace helpers add events and child
+spans beneath the active job span; progress emits telemetry and forwards to the runtime channel.
+The <code>log.*</code> helpers remain console-backed.
 
 ## Reference →
 

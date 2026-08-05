@@ -25,6 +25,20 @@ function vector(d: Decision) {
 const ALL_TRUE = { deno: true, docker: true, desktop: true, docs: true, surface: true };
 const ALL_FALSE = { deno: false, docker: false, desktop: false, docs: false, surface: false };
 
+function workflowJob(source: string, id: string): string | undefined {
+  const lines = source.split('\n');
+  const start = lines.indexOf(`  ${id}:`);
+  if (start < 0) return undefined;
+  let end = lines.length;
+  for (let index = start + 1; index < lines.length; index++) {
+    if (/^ {2}[a-z][a-z0-9-]*:$/.test(lines[index])) {
+      end = index;
+      break;
+    }
+  }
+  return lines.slice(start + 1, end).join('\n');
+}
+
 // ── rename-hole regression (adversarial review, defect 1) ────────────────────
 
 Deno.test('regression: packages/cli/a.ts -> docs/a.md rename is NOT docs-only', () => {
@@ -184,6 +198,7 @@ Deno.test('SAFETY: an unrecognised path forces EVERY output true', () => {
     }, `expected full escalation for: ${p}`);
     const d = decide({ eventName: 'pull_request', files: [p], labels: [] });
     assertEquals(d.runStatic, true, p);
+    assertEquals(d.runRuntimeSqlite, true, p);
     assertEquals(d.runRuntime, true, p);
     assertEquals(vector(d), ALL_TRUE, p);
   }
@@ -196,6 +211,7 @@ Deno.test('SAFETY: the classifier own sources force everything (.github/scripts)
     labels: [],
   });
   assertEquals(d.runStatic, true);
+  assertEquals(d.runRuntimeSqlite, true);
   assertEquals(d.runRuntime, true);
   assertEquals(vector(d), ALL_TRUE);
 });
@@ -446,6 +462,7 @@ Deno.test('decide: docs-only PR skips both jobs', () => {
   });
   assertEquals(d.docsOnly, true);
   assertEquals(d.runStatic, false);
+  assertEquals(d.runRuntimeSqlite, false);
   assertEquals(d.runRuntime, false);
 });
 
@@ -490,6 +507,7 @@ Deno.test('decide: one code file forces both jobs', () => {
   });
   assertEquals(d.docsOnly, false);
   assertEquals(d.runStatic, true);
+  assertEquals(d.runRuntimeSqlite, true);
   assertEquals(d.runRuntime, true);
 });
 
@@ -497,6 +515,7 @@ Deno.test('decide: empty diff runs EVERYTHING (cannot classify)', () => {
   const d = decide({ eventName: 'pull_request', files: [], labels: [] });
   assertEquals(d.docsOnly, false);
   assertEquals(d.runStatic, true);
+  assertEquals(d.runRuntimeSqlite, true);
   assertEquals(d.runRuntime, true);
   assertEquals(vector(d), ALL_TRUE);
 });
@@ -508,7 +527,12 @@ Deno.test('decide: ci:skip-e2e skips runtime only', () => {
     labels: ['ci:skip-e2e'],
   });
   assertEquals(d.runStatic, true);
+  assertEquals(d.runRuntimeSqlite, false);
   assertEquals(d.runRuntime, false);
+  assertEquals(
+    d.reason.includes('scaffold-runtime-sqlite skipped by ci:skip-e2e'),
+    true,
+  );
 });
 
 Deno.test('decide: ci:skip-scaffold skips static only', () => {
@@ -518,7 +542,14 @@ Deno.test('decide: ci:skip-scaffold skips static only', () => {
     labels: ['ci:skip-scaffold'],
   });
   assertEquals(d.runStatic, false);
+  // ci:skip-scaffold is not an independent sqlite-runtime override. The
+  // derived tier is false here because its run_static prerequisite is false.
+  assertEquals(d.runRuntimeSqlite, false);
   assertEquals(d.runRuntime, true);
+  assertEquals(
+    d.reason.includes('scaffold-runtime-sqlite skipped: scaffold-static signal is off'),
+    true,
+  );
 });
 
 Deno.test('decide: both skip labels skip both jobs', () => {
@@ -528,6 +559,7 @@ Deno.test('decide: both skip labels skip both jobs', () => {
     labels: ['ci:skip-scaffold', 'ci:skip-e2e'],
   });
   assertEquals(d.runStatic, false);
+  assertEquals(d.runRuntimeSqlite, false);
   assertEquals(d.runRuntime, false);
 });
 
@@ -551,8 +583,13 @@ Deno.test('decide: ci:full overrides docs-only and forces the ENTIRE vector', ()
     labels: ['ci:full'],
   });
   assertEquals(d.runStatic, true);
+  assertEquals(d.runRuntimeSqlite, true);
   assertEquals(d.runRuntime, true);
   assertEquals(vector(d), ALL_TRUE);
+  assertEquals(
+    d.reason.includes('scaffold-runtime-sqlite forced by ci:full'),
+    true,
+  );
 });
 
 Deno.test('decide: ci:full overrides skip labels', () => {
@@ -562,12 +599,14 @@ Deno.test('decide: ci:full overrides skip labels', () => {
     labels: ['ci:full', 'ci:skip-e2e', 'ci:skip-scaffold'],
   });
   assertEquals(d.runStatic, true);
+  assertEquals(d.runRuntimeSqlite, true);
   assertEquals(d.runRuntime, true);
 });
 
 Deno.test('decide: workflow_dispatch runs everything (no diff)', () => {
   const d = decide({ eventName: 'workflow_dispatch', files: [], labels: [] });
   assertEquals(d.runStatic, true);
+  assertEquals(d.runRuntimeSqlite, true);
   assertEquals(d.runRuntime, true);
   assertEquals(vector(d), ALL_TRUE);
 });
@@ -579,7 +618,121 @@ Deno.test('decide: workflow_dispatch honours skip labels', () => {
     labels: ['ci:skip-e2e'],
   });
   assertEquals(d.runStatic, true);
+  assertEquals(d.runRuntimeSqlite, false);
   assertEquals(d.runRuntime, false);
+});
+
+Deno.test('decide: workflow_dispatch honours ci:skip-scaffold for sqlite runtime', () => {
+  const d = decide({
+    eventName: 'workflow_dispatch',
+    files: [],
+    labels: ['ci:skip-scaffold'],
+  });
+  assertEquals(d.runStatic, false);
+  assertEquals(d.runRuntimeSqlite, false);
+  assertEquals(d.runRuntime, true);
+  assertEquals(
+    d.reason.includes('scaffold-runtime-sqlite skipped: scaffold-static signal is off'),
+    true,
+  );
+});
+
+Deno.test('decide: sqlite runtime reason follows the scaffold signal', () => {
+  const d = decide({
+    eventName: 'pull_request',
+    files: ['packages/cli/mod.ts'],
+    labels: [],
+  });
+  assertEquals(d.runRuntimeSqlite, true);
+  assertEquals(
+    d.reason.includes('scaffold-runtime-sqlite: scaffold-static signal is on'),
+    true,
+  );
+});
+
+Deno.test('workflow: sqlite runtime uses sibling diff guard and fails closed', async () => {
+  const workflow = await Deno.readTextFile('.github/workflows/e2e-cli.yml');
+  const cliSurface = await Deno.readTextFile(
+    'packages/cli/e2e/src/domain/cli-surface.ts',
+  );
+  const suiteId = /RUNTIME_SQLITE:\s*'([^']+)'/.exec(cliSurface)?.[1];
+  assertEquals(typeof suiteId, 'string');
+  const sqliteJob = workflowJob(workflow, 'scaffold-runtime-sqlite');
+  assertEquals(typeof sqliteJob, 'string');
+  assertEquals(
+    sqliteJob!.includes(
+      "if: ${{ !cancelled() && needs.classify.result != 'skipped' && needs.classify.outputs.diff_unavailable != 'true' }}",
+    ),
+    true,
+  );
+  assertEquals(
+    sqliteJob!.includes(
+      "RUN: ${{ needs.classify.result != 'success' || needs.classify.outputs.run_runtime_sqlite == 'true' }}",
+    ),
+    true,
+  );
+
+  const classifyJob = workflowJob(workflow, 'classify');
+  assertEquals(typeof classifyJob, 'string');
+  assertEquals(
+    classifyJob!.includes(
+      'run_runtime_sqlite: ${{ steps.decide.outputs.run_runtime_sqlite }}',
+    ),
+    true,
+  );
+
+  assertEquals(
+    sqliteJob!.includes(
+      `deno task e2e:cli run ${suiteId} --cleanup --format pretty`,
+    ),
+    true,
+  );
+  assertEquals(
+    sqliteJob!.includes('group: e2e-scaffold-runtime-sqlite-global'),
+    true,
+  );
+  assertEquals(
+    sqliteJob!.includes('name: e2e-cli-scaffold-runtime-sqlite-report'),
+    true,
+  );
+  assertEquals(
+    sqliteJob!.includes('.llm/tmp/**/report*.ndjson'),
+    true,
+  );
+
+  const postgresJob = workflowJob(workflow, 'scaffold-runtime');
+  assertEquals(typeof postgresJob, 'string');
+  assertEquals(
+    postgresJob!.includes('group: e2e-scaffold-runtime-global'),
+    true,
+  );
+  assertEquals(
+    postgresJob!.includes('name: e2e-cli-scaffold-runtime-report'),
+    true,
+  );
+  assertEquals(
+    sqliteJob!.includes('group: e2e-scaffold-runtime-global\n'),
+    false,
+  );
+  assertEquals(
+    sqliteJob!.includes('name: e2e-cli-scaffold-runtime-report\n'),
+    false,
+  );
+
+  const visibilityJob = workflowJob(workflow, 'lane-visibility');
+  assertEquals(typeof visibilityJob, 'string');
+  assertEquals(
+    visibilityJob!.includes(
+      'needs: [classify, scaffold-static, scaffold-runtime, scaffold-runtime-sqlite, desktop-native-linux]',
+    ),
+    true,
+  );
+  assertEquals(
+    visibilityJob!.includes(
+      'printf \'| `scaffold-runtime-sqlite` | %s |\\n\' "$runtime_sqlite_outcome"',
+    ),
+    true,
+  );
 });
 
 Deno.test('parseLabels: JSON array and comma forms', () => {

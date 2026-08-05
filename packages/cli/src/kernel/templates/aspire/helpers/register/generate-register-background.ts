@@ -21,6 +21,7 @@ import { SCAFFOLD_ASPIRE_MODULES } from '../../../../constants/scaffold/scaffold
 import { RESOURCE_DEFAULTS } from '@netscript/aspire/constants';
 import { TEMPLATE_KEYS } from '../../../../assets/manifest.ts';
 import { renderTemplateAssetSync } from '../../../../adapters/templates/template-asset.ts';
+import { withDatabasePermissions } from './database-permissions.ts';
 
 /**
  * Generates the register-background.mts file content.
@@ -29,7 +30,7 @@ import { renderTemplateAssetSync } from '../../../../adapters/templates/template
  * @returns Generated TypeScript source as a string
  */
 export function generateRegisterBackground(options: RegisterBackgroundOptions): string {
-  const { processors, version: _version, denoDefaults } = options;
+  const { processors, version: _version, denoDefaults, databaseEngine } = options;
   const entries = Object.entries(processors);
 
   const registrationBlocks: string[] = [];
@@ -40,6 +41,12 @@ export function generateRegisterBackground(options: RegisterBackgroundOptions): 
     const entrypoint = entry.Entrypoint ?? `${name}/runtime.ts`;
     const telemetry = entry.Telemetry !== false;
     const watchMode = entry.WatchMode ?? false;
+    const entryPermissions = entry.Permissions
+      ? withDatabasePermissions(entry.Permissions, databaseEngine)
+      : undefined;
+    const defaultPermissions = entryPermissions
+      ? denoDefaults.Permissions
+      : withDatabasePermissions(denoDefaults.Permissions, databaseEngine);
 
     const lines: string[] = [];
     lines.push(`  // --- ${name} ---`);
@@ -49,12 +56,12 @@ export function generateRegisterBackground(options: RegisterBackgroundOptions): 
 
     // Resolve permissions — background uses --watch (NOT --watch-hmr)
     lines.push(`    const ${id}_perms = resolvePermissions(`);
-    if (entry.Permissions) {
-      lines.push(`      ${JSON.stringify(entry.Permissions)},`);
+    if (entryPermissions) {
+      lines.push(`      ${JSON.stringify(entryPermissions)},`);
     } else {
       lines.push(`      undefined,`);
     }
-    lines.push(`      ${JSON.stringify(denoDefaults.Permissions)},`);
+    lines.push(`      ${JSON.stringify(defaultPermissions)},`);
     lines.push(`      ${watchMode},`);
     lines.push(`      '${RESOURCE_DEFAULTS.WatchFlag}',`);
     lines.push(`    );`);

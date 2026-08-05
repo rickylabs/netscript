@@ -1,8 +1,9 @@
-import { assertEquals, assertRejects, assertStringIncludes } from '@std/assert';
+import { assertEquals, assertRejects } from '@std/assert';
 import { defineWebhook, enqueueJob } from '@netscript/plugin-triggers-core/builders';
 import { defineJob } from '@netscript/plugin-workers-core';
 import type { JobMessage } from '@netscript/plugin-workers-core/runtime';
 import type {
+  TriggerActionResult,
   TriggerEvent,
   TriggerEventId,
   TriggerId,
@@ -16,38 +17,68 @@ import type {
   TriggerIdempotencyPort,
 } from '@netscript/plugin-triggers-core/ports';
 import { createRuntimeTriggerProcessor } from './trigger-runtime-processor.ts';
-import { MemoryTriggerEnabledStateStore } from '@netscript/plugin-triggers-core/testing';
+import {
+  MemoryTriggerDeferScheduler,
+  MemoryTriggerEnabledStateStore,
+  TriggerTestClock,
+} from '@netscript/plugin-triggers-core/testing';
 
-Deno.test('runtime processor rejects defer actions instead of silently dropping them', async () => {
+Deno.test('runtime processor schedules defer actions without routing them to DLQ', async () => {
   const idempotency = new MemoryIdempotency();
   const dlq = new MemoryDlq();
-  const processor = await createRuntimeTriggerProcessor({ idempotency, dlq });
+  const queue = new RecordingJobQueue();
+  const clock = new TriggerTestClock(fixedNow());
+  const deferScheduler = new MemoryTriggerDeferScheduler(clock);
+  const job = defineJob('send-receipt')
+    .handler(() => ({ success: true }))
+    .build();
   const definition = defineWebhook(
-    () => Promise.resolve([{ kind: 'defer', until: '2026-05-17T00:05:00.000Z' }]),
+    (event): Promise<readonly TriggerActionResult[]> =>
+      Promise.resolve(
+        event.attempt === 0
+          ? [{ kind: 'defer', until: '2026-05-17T00:05:00.000Z' }]
+          : [enqueueJob(job, { payload: { replayed: true } })],
+      ),
     { id: 'stripe-payments', path: '/webhooks/stripe', verifier: 'memory' },
   );
+  const processor = await createRuntimeTriggerProcessor({
+    idempotency,
+    dlq,
+    jobQueue: queue as never,
+    deferScheduler,
+    definitions: [definition],
+    clock,
+  });
 
   const result = await processor.process(webhookEvent(), definition);
 
-  assertEquals(result.status, 'dlq');
-  assertEquals(result.actionsDispatched, 0);
-  assertEquals(dlq.entries.length, 1);
-  assertStringIncludes(
-    dlq.entries[0].reason,
-    'Deferred trigger action dispatch is not implemented',
-  );
-  assertEquals(idempotency.completed, ['evt_1']);
+  assertEquals(result.status, 'deferred');
+  assertEquals(result.actionsDispatched, 1);
+  assertEquals(dlq.entries.length, 0);
+  assertEquals((await deferScheduler.list()).length, 1);
+  assertEquals(queue.messages.length, 0);
+  clock.advanceTo(new Date('2026-05-17T00:05:00.000Z'));
+  assertEquals((await deferScheduler.fireDue()).map((entry) => entry.status), ['replayed']);
+  assertEquals((await deferScheduler.list()).length, 0);
+  assertEquals(queue.messages.length, 1);
+  assertEquals(queue.messages[0].payload, { replayed: true });
+  assertEquals(idempotency.completed[0], 'evt_1');
+  assertEquals(idempotency.completed.length, 2);
   assertEquals(idempotency.released.length, 0);
+  await processor.stop();
 });
 
 Deno.test('runtime processor stamps idempotency key onto enqueued worker job body', async () => {
   const idempotency = new MemoryIdempotency();
   const dlq = new MemoryDlq();
   const queue = new RecordingJobQueue();
+  const clock = new TriggerTestClock(fixedNow());
   const processor = await createRuntimeTriggerProcessor({
     idempotency,
     dlq,
     jobQueue: queue as never,
+    deferScheduler: new MemoryTriggerDeferScheduler(clock),
+    clock,
   });
   const job = defineJob('send-receipt')
     .handler(() => ({ success: true }))
@@ -69,6 +100,7 @@ Deno.test('runtime processor stamps idempotency key onto enqueued worker job bod
   assertEquals(queue.messages.length, 1);
   assertEquals(queue.messages[0].idempotencyKey, 'action-key');
   assertEquals(queue.options[0]?.deduplicationId, 'action-key');
+  await processor.stop();
 });
 
 Deno.test('runtime processor rejects a trigger disabled in the authoritative state store', async () => {
@@ -78,10 +110,13 @@ Deno.test('runtime processor rejects a trigger disabled in the authoritative sta
     { id: 'stripe-payments', path: '/webhooks/stripe', verifier: 'memory' },
   );
   await enabledState.setEnabled(definition.id, false);
+  const clock = new TriggerTestClock(fixedNow());
   const processor = await createRuntimeTriggerProcessor({
     idempotency: new MemoryIdempotency(),
     dlq: new MemoryDlq(),
     enabledState,
+    deferScheduler: new MemoryTriggerDeferScheduler(clock),
+    clock,
   });
 
   await assertRejects(
@@ -89,6 +124,7 @@ Deno.test('runtime processor rejects a trigger disabled in the authoritative sta
     TriggersError,
     'Trigger stripe-payments is disabled.',
   );
+  await processor.stop();
 });
 
 class MemoryIdempotency implements TriggerIdempotencyPort {

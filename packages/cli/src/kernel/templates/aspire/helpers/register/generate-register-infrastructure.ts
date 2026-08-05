@@ -67,9 +67,13 @@ export function generateRegisterInfrastructure(
     const mode = entry.Mode ?? 'Container'
 
     if (entry.Engine === 'Sqlite') {
-      dbBlocks.push(
-        `  // ${name} (Sqlite, file-backed — no Aspire resource needed)`,
-      )
+      const sqlitePath = entry.DataPath ?? entry.DatabaseName ?? `${name}.sqlite`
+      dbBlocks.push(`  // ${name} (Sqlite, resolved file-backed resource)
+  const ${id} = await builder.addParameter('${name}', {
+    value: resolveDataPath(appHostDir, '${sqlitePath}', '${name}'),
+    secret: false,
+  });
+  databases.set('${name}', ${id});`)
       continue
     }
 

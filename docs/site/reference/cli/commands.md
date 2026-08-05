@@ -55,7 +55,7 @@ the [quickstart](/quickstart/); every flag is:
 | Command | Description |
 | --- | --- |
 | `netscript agent init` | Install NetScript MCP, consumer diagnostic tools, and skills for detected agent hosts, and apply editor setup to a new or existing project. Claude Code writes `.mcp.json` and installs the skill bundle; VS Code writes `.vscode/mcp.json`; Zed writes `.zed/settings.json` `context_servers`. Flags: `--host <host>` (`claude`, `vscode`, or `all`); `--editor <editor>` (`none`, `zed`, or `vscode`, inferred from one existing editor directory when omitted); `--with-docs` installs the expanded exact-version corpus. Unsupported editors fail with manual-configuration guidance. |
-| `netscript agent mcp` | Start the NetScript MCP server over standard input/output. Flags: `--endpoint <url>` (telemetry endpoint), `--project-root <path>`, `--docs-root <path>` (public documentation root). |
+| `netscript agent mcp` | Start the stdio MCP server for an MCP client. Interactive use prints Zed/VS Code setup guidance; see [Agent tooling](/ai/agent-tooling/). Flags: `--endpoint <url>` (telemetry endpoint), `--project-root <path>`, `--docs-root <path>` (public documentation root). |
 
 ## `config` — inspect and mutate configuration
 
@@ -104,7 +104,11 @@ helper layer.
 | --- | --- |
 | `netscript generate aspire` | Regenerate Aspire AppHost helpers from `appsettings.json`. Flag: `--project-root <path>`. |
 | `netscript generate runtime-schemas` | Generate JSON Schema files for runtime config topics. Flags: `--project-root <path>`, `--dry-run`, `--force`, `--verbose`. |
-| `netscript generate plugins` | Authoritative command: run each installed plugin's declared runtime registry generator under the project configuration. Flags: `--project-root <path>`, `--dry-run`, `--verbose`. |
+| `netscript generate plugins` | Authoritative command: run each installed plugin's declared runtime registry generator under the project configuration. The workers generator discovers project-authored top-level `workers/jobs/*.ts` modules independently of official samples, excluding declared helper files such as `job-tools.ts`. Flags: `--project-root <path>`, `--dry-run`, `--verbose`. |
+
+Generated registries are derived artifacts. Add or replace job modules in `workers/jobs/`, then run
+`netscript generate plugins`; do not hand-edit `.netscript/generated/**`. Removing the official
+workers samples does not disable custom-job discovery.
 
 ## `plugin` — extended verbs
 

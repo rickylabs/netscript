@@ -412,14 +412,10 @@ stitch telemetry into that topology for free. Concretely, each resource is start
 subprocess task continuation all emit real OpenTelemetry spans that surface here with **no extra
 wiring** — the trace context propagates into worker subprocesses over W3C `traceparent`.
 
-{{ comp callout { type: "note", title: "Known gap" } }}
-The scaffold <code>createJobTools(ctx)</code> helpers you call <em>inside</em> a handler —
-<code>trace.addEvent</code>, <code>withChildSpan</code>, <code>progress</code> — are still no-op
-stubs. For custom <em>handler-level</em> spans, call <code>@netscript/telemetry</code> helpers
-directly. The framework-level spans above are real; see
-{{ comp.xref({ key: "explain:observability", text: "Observability" }) }} for the precise
-framework-vs-scaffold boundary.
-{{ /comp }}
+Inside a handler, the scaffold's <code>createJobTools(ctx)</code> helpers add events, progress, and
+child spans to the active job trace. See
+{{ comp.xref({ key: "explain:observability", text: "Observability" }) }} for the full
+framework-and-handler trace path.
 
 ## HTTP/2 and TLS: opt-in today
 

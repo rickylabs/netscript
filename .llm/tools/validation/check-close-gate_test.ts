@@ -9,7 +9,57 @@ import {
   formatPrettyReport,
   type PrFinding,
   type Report,
+  resolveClosingIssueReferences,
 } from './check-close-gate.ts';
+
+Deno.test('close-gate resolves body, commit, and manual closing-reference sources', () => {
+  assertEquals(
+    resolveClosingIssueReferences(
+      [1166, 1171, 1188],
+      'Closes #1171',
+      ['fix: finish work\n\nFixes #1188'],
+    ),
+    [
+      { issue: 1166, sources: ['manual link'] },
+      { issue: 1171, sources: ['body keyword'] },
+      { issue: 1188, sources: ['commit message'] },
+    ],
+  );
+});
+
+Deno.test('manual closing link gates unchecked acceptance and removing the link passes', () => {
+  const issue = {
+    number: 1166,
+    title: 'manual close target',
+    body: '## Acceptance\n- [ ] prove the result',
+    updated_at: '2026-08-03T19:00:00Z',
+    labels: [],
+  };
+  const linked = resolveClosingIssueReferences([1166], 'Refs #1166', []);
+  const removed = resolveClosingIssueReferences([], 'Refs #1166', []);
+
+  assertEquals(linked, [{ issue: 1166, sources: ['manual link'] }]);
+  assertEquals(closeGatePasses(false, findUncheckedAcceptance(issue).findings, []), false);
+  assertEquals(removed, []);
+  assertEquals(closeGatePasses(false, [], []), true);
+});
+
+Deno.test('body-keyword-only closing behavior is unchanged without external references', () => {
+  assertEquals(resolveClosingIssueReferences([], 'Closes #1171', []), [
+    { issue: 1171, sources: ['body keyword'] },
+  ]);
+});
+
+Deno.test('closing-keyword prose inside acceptance-evidence fences is ignored', () => {
+  assertEquals(
+    resolveClosingIssueReferences(
+      [1188],
+      'Closes #1188\n\n```acceptance-evidence\nevidence: "fixture resolves #1166"\n```',
+      [],
+    ),
+    [{ issue: 1188, sources: ['body keyword'] }],
+  );
+});
 
 Deno.test('close-gate retries transient GitHub failures before returning JSON', async () => {
   const statuses = [503, 502, 200];
@@ -156,6 +206,7 @@ Deno.test('close-gate pretty log carries rebuilt provenance and PR findings', ()
     overrideLabel: 'status:close-gate-override',
     overrideActive: false,
     closingIssues: [1171],
+    closingIssueReferences: [{ issue: 1171, sources: ['body keyword'] }],
     issues: [{
       number: 1171,
       updatedAt: '2026-08-03T19:00:00Z',
@@ -172,6 +223,7 @@ Deno.test('close-gate pretty log carries rebuilt provenance and PR findings', ()
     'snapshot: #1171 updated=2026-08-03T19:00:00Z bodySha256=deadbeef',
   );
   assertStringIncludes(output, 'unchecked PR body: #1181 line 10 [Definition of Done]');
+  assertStringIncludes(output, 'closing reference: #1171 source: body keyword');
 });
 
 Deno.test('close-gate workflow guard accepts live reads and fires on frozen label regression', async () => {

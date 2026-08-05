@@ -12,6 +12,7 @@ export interface RunOptions {
   readonly packageSource: PackageSource;
   readonly plugins: readonly PluginKind[];
   readonly samples: boolean;
+  readonly cache: boolean;
   readonly cleanup: boolean;
   readonly format: ReportFormat;
   readonly reportPath?: string;

@@ -253,7 +253,7 @@ export function buildCacheBlock(
         key: 'deno-kv',
         block: {
           Engine: 'DenoKv',
-          Mode: 'External',
+          Mode: 'Container',
           DataPath: 'data/kv',
         },
       }

@@ -6,6 +6,7 @@ import {
   SCAFFOLD_TITLE,
   type SuiteId,
 } from '../../src/domain/cli-surface.ts';
+import { DATABASE } from '../../src/domain/extension-axes.ts';
 import type { RunOptions } from '../../src/domain/run-context.ts';
 import type { SuiteDefinition } from '../../src/domain/suite-definition.ts';
 
@@ -14,6 +15,7 @@ export interface ScaffoldCapabilitySuite {
   readonly id: SuiteId;
   readonly title: string;
   readonly gates: readonly GateId[];
+  readonly defaults?: Partial<RunOptions>;
 }
 
 const SERVICE_GATES = [
@@ -117,6 +119,12 @@ const RUNTIME_GATES = [
   GATE.CLEANUP_ASPIRE_STOP,
 ] as const;
 
+// The generated users service currently probes Prisma with a tagged raw query that
+// is not supported by the libSQL adapter. Keep that product-health assertion in
+// the Postgres merge-readiness suite while the reduced-container tier exercises
+// every provider-neutral runtime behavior.
+const RUNTIME_SQLITE_GATES = RUNTIME_GATES.filter((gate) => gate !== GATE.BEHAVIOR_SERVICE_HEALTH);
+
 const PLUGIN_GATES = [
   GATE.PREFLIGHT_DENO,
   GATE.SCAFFOLD_INIT,
@@ -163,6 +171,12 @@ export const scaffoldCapabilitySuites: readonly ScaffoldCapabilitySuite[] = [
     title: SCAFFOLD_TITLE.RUNTIME,
     gates: RUNTIME_GATES,
   },
+  {
+    id: SCAFFOLD.RUNTIME_SQLITE,
+    title: SCAFFOLD_TITLE.RUNTIME_SQLITE,
+    gates: RUNTIME_SQLITE_GATES,
+    defaults: { database: DATABASE.SQLITE, cache: false },
+  },
 ];
 
 /** Build one scaffold capability smoke suite. */
@@ -170,45 +184,49 @@ export function createScaffoldCapabilitySuite(
   capability: ScaffoldCapabilitySuite,
   overrides: Partial<RunOptions> = {},
 ): SuiteDefinition {
+  const resolved = { ...capability.defaults, ...overrides };
   const suite = defineCliE2eSuite()
     .withId(capability.id)
     .withTitle(capability.title)
     .withWorkspace((workspace) => {
       let next = workspace;
-      if (overrides.repoRoot) next = next.withRepoRoot(overrides.repoRoot);
-      if (overrides.cliEntrypoint) {
-        next = next.withCliEntrypoint(overrides.cliEntrypoint);
+      if (resolved.repoRoot) next = next.withRepoRoot(resolved.repoRoot);
+      if (resolved.cliEntrypoint) {
+        next = next.withCliEntrypoint(resolved.cliEntrypoint);
       }
-      if (overrides.smokeRoot) next = next.withSmokeRoot(overrides.smokeRoot);
-      if (overrides.projectName) {
-        next = next.withProjectName(overrides.projectName);
+      if (resolved.smokeRoot) next = next.withSmokeRoot(resolved.smokeRoot);
+      if (resolved.projectName) {
+        next = next.withProjectName(resolved.projectName);
       }
-      if (overrides.database) next = next.withDatabase(overrides.database);
-      if (overrides.packageSource) {
-        next = next.withPackageSource(overrides.packageSource);
+      if (resolved.database) next = next.withDatabase(resolved.database);
+      if (resolved.packageSource) {
+        next = next.withPackageSource(resolved.packageSource);
       }
-      if (overrides.cleanup !== undefined) {
-        next = next.withCleanup(overrides.cleanup);
+      if (resolved.cache !== undefined) {
+        next = next.withCache(resolved.cache);
+      }
+      if (resolved.cleanup !== undefined) {
+        next = next.withCleanup(resolved.cleanup);
       }
       return next;
     })
     .withScaffold((scaffold) =>
       scaffold.withOfficialPluginSuite((plugins) => {
-        let next = plugins.withSamples(overrides.samples ?? true);
-        if (overrides.plugins) {
-          next = next.withSamples(overrides.samples ?? true);
-          for (const kind of overrides.plugins) next = next.withOfficial(kind);
+        let next = plugins.withSamples(resolved.samples ?? true);
+        if (resolved.plugins) {
+          next = next.withSamples(resolved.samples ?? true);
+          for (const kind of resolved.plugins) next = next.withOfficial(kind);
         }
         return next;
       })
     )
     .withReporting((reporting) => {
       let next = reporting;
-      if (overrides.format === 'pretty') next = next.withPretty();
-      if (overrides.format === 'json') next = next.withJson();
-      if (overrides.format === 'ndjson') next = next.withNdjson();
-      if (overrides.reportPath) next = next.withReport(overrides.reportPath);
-      if (overrides.logFile) next = next.withLogFile(overrides.logFile);
+      if (resolved.format === 'pretty') next = next.withPretty();
+      if (resolved.format === 'json') next = next.withJson();
+      if (resolved.format === 'ndjson') next = next.withNdjson();
+      if (resolved.reportPath) next = next.withReport(resolved.reportPath);
+      if (resolved.logFile) next = next.withLogFile(resolved.logFile);
       return next;
     })
     .build();

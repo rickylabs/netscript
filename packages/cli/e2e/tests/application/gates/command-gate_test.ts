@@ -72,6 +72,31 @@ Deno.test('command gate treats exit 6 without the cancellation marker as an asse
   assertEquals(result.retried, false);
 });
 
+Deno.test('command gate distinguishes Deno argument parsing from a product assertion', async () => {
+  const executor = new SequenceCommandExecutor([
+    failure(
+      1,
+      false,
+      "error: unexpected argument '--minimum-dependency-age' found\n\nUsage: deno task [OPTIONS] [TASK]",
+    ),
+  ]);
+  const result = await execute(executor);
+
+  assertEquals(executor.requests.length, 1);
+  assertEquals(result.attempts[0].failureClass, 'harness-invocation');
+  assertEquals(
+    result.error,
+    'Harness command invocation failed before product execution.',
+  );
+});
+
+Deno.test('command gate keeps an immediate non-parser failure classified as a product assertion', async () => {
+  const executor = new SequenceCommandExecutor([failure(1, false, 'Project check failed')]);
+  const result = await execute(executor);
+
+  assertEquals(result.attempts[0].failureClass, 'assertion');
+});
+
 Deno.test('command gate preserves both timeout durations after retries are exhausted', async () => {
   const executor = new SequenceCommandExecutor([failure(1, true), failure(1, true)]);
   const result = await execute(executor, RETRY);
@@ -92,9 +117,36 @@ Deno.test('command gate without retry configuration executes once', async () => 
   assertEquals(result.retried, false);
 });
 
+Deno.test('command gate honors a per-gate timeout and three-attempt infrastructure budget', async () => {
+  const executor = new SequenceCommandExecutor([
+    failure(6, false, 'Failed to prepare AppHost server'),
+    failure(6, false, 'Failed to prepare AppHost server'),
+    failure(6, false, 'Failed to prepare AppHost server'),
+  ]);
+  const result = await execute(
+    executor,
+    { classes: ['infrastructure'], maxRetries: 2 },
+    180_000,
+    'infrastructure',
+  );
+
+  assertEquals(executor.requests.map((request) => request.timeoutMs), [
+    180_000,
+    180_000,
+    180_000,
+  ]);
+  assertEquals(result.attempts.map((attempt) => attempt.failureClass), [
+    'infrastructure',
+    'infrastructure',
+    'infrastructure',
+  ]);
+});
+
 function execute(
   executor: CommandExecutor,
-  retry?: { readonly classes: readonly GateFailureClass[]; readonly maxRetries: 1 },
+  retry?: { readonly classes: readonly GateFailureClass[]; readonly maxRetries: 1 | 2 },
+  timeoutMs?: number,
+  failureClass?: GateFailureClass,
 ) {
   const definition: CommandGateDefinition = {
     kind: 'command',
@@ -105,6 +157,8 @@ function execute(
     cwd: () => '/workspace',
     command: () => ['aspire', 'restore'],
     retry,
+    timeoutMs,
+    failureClass,
   };
   return new CommandGate(definition, executor).execute(createContext());
 }
@@ -122,6 +176,7 @@ function createContext(): RunContext {
         packageSource: 'local',
         plugins: [],
         samples: true,
+        cache: true,
         cleanup: true,
         format: 'json',
         commandTimeoutMs: 30_000,

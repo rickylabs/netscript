@@ -1,7 +1,19 @@
 import { assertEquals } from '@std/assert';
-import { DEPLOY, GATE, SCAFFOLD } from '../../src/domain/cli-surface.ts';
-import { DATABASE } from '../../src/domain/extension-axes.ts';
+import { DEPLOY, GATE, QUICKSTART, SCAFFOLD } from '../../src/domain/cli-surface.ts';
+import {
+  DATABASE,
+  PACKAGE_SOURCE,
+  PLUGIN,
+  REPORT_FORMAT,
+} from '../../src/domain/extension-axes.ts';
+import type { RunOptions } from '../../src/domain/run-context.ts';
+import { runtimeResources } from '../../src/application/gates/scaffold/runtime-gates.ts';
 import { builtInSuites, resolveSuite } from '../../src/presentation/cli/suites/registry.ts';
+import {
+  createScaffoldCapabilitySuite,
+  type ScaffoldCapabilitySuite,
+  scaffoldCapabilitySuites,
+} from '../../suites/scaffold/capability-suites.ts';
 
 Deno.test('registry exposes scaffold capability suites from constants', () => {
   assertEquals(builtInSuites.map((suite) => suite.id), [
@@ -10,9 +22,11 @@ Deno.test('registry exposes scaffold capability suites from constants', () => {
     SCAFFOLD.INFRASTRUCTURE,
     SCAFFOLD.PLUGIN,
     SCAFFOLD.RUNTIME,
+    SCAFFOLD.RUNTIME_SQLITE,
     SCAFFOLD.USERLAND_INSTALL,
     DEPLOY.TARGETS,
     DEPLOY.DESKTOP_NATIVE,
+    QUICKSTART.WALK,
   ]);
 });
 
@@ -158,10 +172,196 @@ Deno.test('runtime suite omits database resource wait for sqlite', () => {
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.RUNTIME_WAIT_GARNET), true);
 });
 
+Deno.test('sqlite runtime suite resolves its reduced-container defaults without mutating cache mode', () => {
+  const environmentVariable = 'NETSCRIPT_CACHE_MODE';
+  const previous = Deno.env.get(environmentVariable);
+  const operatorCacheMode = 'Container';
+  try {
+    Deno.env.delete(environmentVariable);
+    const sqlite = resolveSuite(SCAFFOLD.RUNTIME_SQLITE);
+    assertEquals(sqlite.defaultOptions.database, DATABASE.SQLITE);
+    assertEquals(sqlite.defaultOptions.cache, false);
+    assertEquals(Deno.env.get(environmentVariable), undefined);
+
+    Deno.env.set(environmentVariable, operatorCacheMode);
+    resolveSuite(SCAFFOLD.RUNTIME_SQLITE);
+    assertEquals(Deno.env.get(environmentVariable), operatorCacheMode);
+  } finally {
+    if (previous === undefined) Deno.env.delete(environmentVariable);
+    else Deno.env.set(environmentVariable, previous);
+  }
+});
+
+Deno.test('sqlite runtime suite excludes only the libSQL-incompatible users health gate', () => {
+  const sqlite = resolveSuite(SCAFFOLD.RUNTIME_SQLITE);
+  const postgres = resolveSuite(SCAFFOLD.RUNTIME);
+  const runtimeCapability = scaffoldCapabilitySuites.find((suite) => suite.id === SCAFFOLD.RUNTIME);
+  const sqliteCapability = scaffoldCapabilitySuites.find((suite) =>
+    suite.id === SCAFFOLD.RUNTIME_SQLITE
+  );
+  if (!runtimeCapability || !sqliteCapability) {
+    throw new Error('Runtime capability suites are not registered.');
+  }
+
+  assertEquals(sqlite.gates.some((gate) => gate.id === GATE.BEHAVIOR_SERVICE_HEALTH), false);
+  assertEquals(postgres.gates.some((gate) => gate.id === GATE.BEHAVIOR_SERVICE_HEALTH), true);
+  assertEquals(
+    sqliteCapability.gates,
+    runtimeCapability.gates.filter((gate) => gate !== GATE.BEHAVIOR_SERVICE_HEALTH),
+  );
+});
+
+Deno.test('sqlite runtime suite keeps explicit database overrides above suite defaults', () => {
+  const sqlite = resolveSuite(SCAFFOLD.RUNTIME_SQLITE, {
+    database: DATABASE.POSTGRES,
+  });
+  assertEquals(sqlite.defaultOptions.database, DATABASE.POSTGRES);
+  assertEquals(sqlite.defaultOptions.cache, false);
+});
+
+Deno.test('runtime suite wait matrices match runtime resources for postgres and sqlite', () => {
+  const runtimeCapability = scaffoldCapabilitySuites.find((suite) => suite.id === SCAFFOLD.RUNTIME);
+  const sqliteCapability = scaffoldCapabilitySuites.find((suite) =>
+    suite.id === SCAFFOLD.RUNTIME_SQLITE
+  );
+  if (!runtimeCapability || !sqliteCapability) {
+    throw new Error('Runtime capability suites are not registered.');
+  }
+  assertEquals(
+    sqliteCapability.gates,
+    runtimeCapability.gates.filter((gate) => gate !== GATE.BEHAVIOR_SERVICE_HEALTH),
+  );
+
+  const cases = [
+    [resolveSuite(SCAFFOLD.RUNTIME), DATABASE.POSTGRES],
+    [resolveSuite(SCAFFOLD.RUNTIME_SQLITE), DATABASE.SQLITE],
+  ] as const;
+  for (const [suite, database] of cases) {
+    const waitGateIds = suite.gates
+      .map((gate) => gate.id)
+      .filter((id) => id.startsWith('runtime.wait.'));
+    assertEquals(
+      waitGateIds,
+      runtimeResources(database).map((resource) => `runtime.wait.${resource}`),
+      suite.id,
+    );
+  }
+
+  const sqliteGateIds = cases[1][0].gates.map((gate) => gate.id);
+  assertEquals(sqliteGateIds.includes(GATE.RUNTIME_WAIT_GARNET), true);
+  assertEquals(sqliteGateIds.includes(GATE.RUNTIME_WAIT_POSTGRES), false);
+  assertEquals(sqliteGateIds.includes(GATE.RUNTIME_WAIT_MYSQL), false);
+  assertEquals(sqliteGateIds.includes(GATE.RUNTIME_WAIT_MSSQL), false);
+
+  const runtimeGateIds = cases[0][0].gates.map((gate) => gate.id);
+  assertEquals(runtimeGateIds.includes(GATE.RUNTIME_WAIT_POSTGRES), true);
+  assertEquals(runtimeGateIds.includes(GATE.RUNTIME_WAIT_MYSQL), false);
+  assertEquals(runtimeGateIds.includes(GATE.RUNTIME_WAIT_MSSQL), false);
+});
+
 Deno.test('runtime suite selects mssql database resource wait for mssql', () => {
   const runtime = resolveSuite(SCAFFOLD.RUNTIME, { database: DATABASE.MSSQL });
   assertEquals(runtime.defaultOptions.database, DATABASE.MSSQL);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.RUNTIME_WAIT_POSTGRES), false);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.RUNTIME_WAIT_MYSQL), false);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.RUNTIME_WAIT_MSSQL), true);
+});
+
+Deno.test('capability defaults are a baseline and caller overrides select database gates', () => {
+  const capability: ScaffoldCapabilitySuite = {
+    id: SCAFFOLD.RUNTIME,
+    title: 'Synthetic runtime default precedence',
+    gates: [
+      GATE.RUNTIME_WAIT_POSTGRES,
+      GATE.RUNTIME_WAIT_MYSQL,
+      GATE.RUNTIME_WAIT_MSSQL,
+      GATE.RUNTIME_WAIT_GARNET,
+    ],
+    defaults: { database: DATABASE.SQLITE },
+  };
+
+  const defaulted = createScaffoldCapabilitySuite(capability);
+  assertEquals(defaulted.defaultOptions.database, DATABASE.SQLITE);
+  assertEquals(defaulted.gates.map((gate) => gate.id), [GATE.RUNTIME_WAIT_GARNET]);
+
+  const overridden = createScaffoldCapabilitySuite(capability, {
+    database: DATABASE.POSTGRES,
+  });
+  assertEquals(overridden.defaultOptions.database, DATABASE.POSTGRES);
+  assertEquals(overridden.gates.map((gate) => gate.id), [
+    GATE.RUNTIME_WAIT_POSTGRES,
+    GATE.RUNTIME_WAIT_GARNET,
+  ]);
+});
+
+Deno.test('existing built-in suites preserve their exact resolved options', () => {
+  assertEquals(
+    scaffoldCapabilitySuites
+      .filter((suite) => suite.id !== SCAFFOLD.RUNTIME_SQLITE)
+      .map((suite) => suite.defaults),
+    [undefined, undefined, undefined, undefined, undefined],
+  );
+
+  const overrides: Partial<RunOptions> = {
+    repoRoot: '/repo',
+    cliEntrypoint: '/cli.ts',
+    smokeRoot: '/smoke',
+    projectName: 'existing-suite-baseline',
+    logFile: '/log.ndjson',
+  };
+  const common: RunOptions = {
+    ...overrides,
+    repoRoot: '/repo',
+    cliEntrypoint: '/cli.ts',
+    smokeRoot: '/smoke',
+    projectName: 'existing-suite-baseline',
+    database: DATABASE.POSTGRES,
+    packageSource: PACKAGE_SOURCE.LOCAL,
+    plugins: [PLUGIN.WORKER, PLUGIN.SAGA, PLUGIN.TRIGGER, PLUGIN.STREAM, PLUGIN.AUTH],
+    samples: true,
+    cache: true,
+    cleanup: false,
+    format: REPORT_FORMAT.NDJSON,
+    reportPath: undefined,
+    logFile: '/log.ndjson',
+    commandTimeoutMs: 900_000,
+    httpTimeoutMs: 30_000,
+  };
+  const expected = new Map<string, RunOptions>([
+    [SCAFFOLD.SERVICE, common],
+    [SCAFFOLD.CONTRACTS, common],
+    [SCAFFOLD.INFRASTRUCTURE, common],
+    [SCAFFOLD.PLUGIN, common],
+    [SCAFFOLD.RUNTIME, common],
+    [
+      SCAFFOLD.RUNTIME_SQLITE,
+      {
+        ...common,
+        database: DATABASE.SQLITE,
+        cache: false,
+      },
+    ],
+    [
+      SCAFFOLD.USERLAND_INSTALL,
+      {
+        ...common,
+        packageSource: PACKAGE_SOURCE.AUTO,
+        plugins: [PLUGIN.WORKER, PLUGIN.SAGA, PLUGIN.TRIGGER, PLUGIN.STREAM],
+        samples: false,
+      },
+    ],
+    [DEPLOY.TARGETS, { ...common, plugins: [...common.plugins, PLUGIN.AI], samples: false }],
+    [DEPLOY.DESKTOP_NATIVE, {
+      ...common,
+      plugins: [...common.plugins, PLUGIN.AI],
+      samples: false,
+    }],
+    [QUICKSTART.WALK, { ...common, packageSource: PACKAGE_SOURCE.JSR }],
+  ]);
+
+  for (const suite of builtInSuites) {
+    const options = expected.get(suite.id);
+    if (!options) throw new Error(`Missing options baseline for "${suite.id}".`);
+    assertEquals(resolveSuite(suite.id, overrides).defaultOptions, options, suite.id);
+  }
 });

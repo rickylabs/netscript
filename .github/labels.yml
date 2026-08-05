@@ -154,10 +154,10 @@
 # release gates (publish / e2e-cli-prod*).
 - name: "ci:full"
   color: "d4c5f9"
-  description: "Force both expensive e2e-cli jobs to run (overrides docs-only + skip labels)"
+  description: "Force all expensive e2e-cli jobs to run (overrides docs-only + skip labels)"
 - name: "ci:skip-e2e"
   color: "d4c5f9"
-  description: "Skip the scaffold-runtime (aspire/docker/postgres) e2e job"
+  description: "Skip both scaffold-runtime e2e tiers (sqlite and aspire/docker/postgres)"
 - name: "ci:skip-scaffold"
   color: "d4c5f9"
   description: "Skip the scaffold-static (deno-only) scaffold gate"

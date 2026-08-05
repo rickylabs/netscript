@@ -5,7 +5,27 @@ import { PORT_RANGES } from '../../../../src/kernel/constants/port-ranges.ts';
 import { allocateScaffoldDefaultPort } from '../../../../src/kernel/domain/scaffold/default-port-allocation.ts';
 import type { RunContext } from '../../../src/domain/run-context.ts';
 import { DATABASE } from '../../../src/domain/extension-axes.ts';
-import { createRuntimeGates } from '../../../src/application/gates/scaffold/runtime-gates.ts';
+import {
+  ASPIRE_RESTORE_ATTEMPT_TIMEOUT_MS,
+  ASPIRE_RESTORE_MAX_RETRIES,
+  createRuntimeGates,
+} from '../../../src/application/gates/scaffold/runtime-gates.ts';
+
+Deno.test('runtime Aspire restore has a bounded infrastructure retry budget', () => {
+  const gate = createRuntimeGates().find((entry) => entry.id === GATE.RUNTIME_ASPIRE_RESTORE);
+
+  assertEquals(gate?.kind, 'command');
+  if (gate?.kind !== 'command') throw new Error('Expected a command gate.');
+
+  assertEquals(ASPIRE_RESTORE_ATTEMPT_TIMEOUT_MS, 180_000);
+  assertEquals(ASPIRE_RESTORE_MAX_RETRIES, 2);
+  assertEquals(gate.timeoutMs, ASPIRE_RESTORE_ATTEMPT_TIMEOUT_MS);
+  assertEquals(gate.failureClass, 'infrastructure');
+  assertEquals(gate.retry, {
+    classes: ['timeout', 'canceled', 'infrastructure'],
+    maxRetries: 2,
+  });
+});
 
 Deno.test('runtime aspire start gate captures detached endpoint metadata', () => {
   const gate = createRuntimeGates().find((entry) => entry.id === GATE.RUNTIME_ASPIRE_START);
@@ -141,6 +161,31 @@ Deno.test('runtime gates prove MCP Aspire endpoint discovery against the live Ap
     '/workspace/app',
     '/workspace/app/aspire/apphost.mts',
   ]);
+});
+
+Deno.test('workers wait gate requires runtime startup evidence before behavior gates', () => {
+  const gate = createRuntimeGates(DATABASE.SQLITE).find((entry) =>
+    entry.id === GATE.RUNTIME_WAIT_WORKERS
+  );
+  if (gate?.kind !== 'command') {
+    throw new Error('Expected workers wait gate to be a command gate.');
+  }
+
+  assertEquals(
+    gate.command({
+      project: {
+        repoRoot: '/repo',
+        appHost: '/workspace/app/aspire/apphost.mts',
+      },
+    } as RunContext),
+    [
+      'deno',
+      'run',
+      '--allow-run=aspire',
+      '/repo/packages/cli/e2e/src/application/gates/scaffold/wait-for-workers-runtime.ts',
+      '/workspace/app/aspire/apphost.mts',
+    ],
+  );
 });
 
 Deno.test('AI chat route gate captures generated registry import failures', () => {

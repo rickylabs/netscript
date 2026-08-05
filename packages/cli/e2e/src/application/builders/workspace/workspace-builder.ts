@@ -11,6 +11,7 @@ export interface WorkspaceBuilder {
   withProjectName(name: string): WorkspaceBuilder;
   withDatabase(database: DatabaseEngine): WorkspaceBuilder;
   withPackageSource(source: PackageSource): WorkspaceBuilder;
+  withCache(enabled?: boolean): WorkspaceBuilder;
   withCleanup(enabled?: boolean): WorkspaceBuilder;
   buildOptions(): RunOptions;
 }
@@ -42,6 +43,10 @@ export function createWorkspaceBuilder(initial: RunOptions): WorkspaceBuilder {
     },
     withPackageSource(source) {
       options = { ...options, packageSource: source };
+      return this;
+    },
+    withCache(enabled = true) {
+      options = { ...options, cache: enabled };
       return this;
     },
     withCleanup(enabled = true) {

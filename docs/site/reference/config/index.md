@@ -82,7 +82,14 @@ Core authoring/validation contract and per-section configuration shapes exported
 | `SdkConfig` | interface | SDK generation configuration section. |
 | `AspireConfig` | interface | Aspire orchestration settings for generated AppHost projects. |
 | `DeployConfig` | interface | Top-level deployment configuration type. |
-| `WindowsDeployConfig` | interface | Windows-specific deployment configuration type. |
+| `DeployTargetBase` | interface | Fields shared by every `deploy.targets.*` deployment target. |
+| `WindowsDeployTarget` | interface | Windows Services deployment target (`deploy.targets.windows`). |
+| `DockerComposeDeployTarget` | interface | Docker / Compose deployment target (`deploy.targets.docker` and `deploy.targets.compose`). |
+| `LinuxDeployTarget` | interface | Linux systemd deployment target (`deploy.targets.linux`). |
+| `DenoDeployTarget` | interface | Deno Deploy cloud deployment target (`deploy.targets['deno-deploy']`). |
+| `AspireAppHostDeployTarget` | interface | Aspire AppHost cloud deployment target (`deploy.targets.kubernetes`, `deploy.targets['azure-aca']`, etc.). |
+| `CloudRunDeployTarget` | interface | Google Cloud Run Docker-image provider target (`deploy.targets['cloud-run']`). |
+| `AspireCloudDeployTarget` | type alias | Back-compat alias for the AppHost-backed S10 cloud targets. |
 | `WebhookConfig` | interface | Webhook configuration type. |
 | `PermissionConfig` | interface | Permission flags for jobs and task execution. |
 | `PermissionValue` | type alias | Permission value accepted by Deno-style runtime permission fields. |
