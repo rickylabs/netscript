@@ -57,10 +57,22 @@ file changes are needed for a new plugin.
 | Date | Slice | Step | Notes |
 | ---- | ----- | ---- | ----- |
 | 2026-08-05 | 1 | research | Confirmed three gaps and existing shared lifecycle call sites. |
+| 2026-08-05 | 1 | RED | Protocol fixture failed with missing `linking`; ACME manifest left service/app references absent. |
+| 2026-08-05 | 1 | contract | Added documented optional linking types/schema independent of `officialSource`. |
+| 2026-08-05 | 2 | reconciliation | Generic manifest scan and four-surface reconciliation pass; `-api` discovery heuristic removed. |
+| 2026-08-05 | 2 | symmetry | Consumer-later and uninstall cleanup fixture converges; ACME local-path install wires both consumers. |
+| 2026-08-05 | 2 | runtime seam | Plugin-owned created entrypoints now select generated workdirs without plugin identity branches. |
 
 ## Gate Results
 
-All gates pending implementation. D6 PLAN-EVAL is composed per milestone ruling.
+| Gate | Result | Evidence |
+| ---- | ------ | -------- |
+| Protocol RED→GREEN | PASS | 6 parser tests; RED was TS2339 before contract. |
+| Reconciler RED→GREEN | PASS | 4 tests, including third-party, both order, and cleanup. |
+| Third-party install | PASS | `install-plugin_test.ts`, 27 steps; ACME manifest has no `officialSource`. |
+| Fixture dispatch | PASS | 11 steps; generated runtime entrypoint artifacts included. |
+
+D6 PLAN-EVAL is composed per milestone ruling. Runtime/OTEL and full quality gates remain pending.
 
 ## Handoff Notes
 

@@ -415,11 +415,81 @@ describe('public install plugin flow', () => {
       });
 
       assertEquals(result.pluginOwnedScaffold?.status, 'planned');
-      assertEquals(result.pluginOwnedScaffold?.createdFiles, ['plugins/fixture/generated.txt']);
+      assertEquals(result.pluginOwnedScaffold?.createdFiles, [
+        'plugins/fixture/generated.txt',
+        'plugins/fixture/deno.json',
+        'plugins/fixture/services/src/main.ts',
+        'plugins/fixture/bin/combined.ts',
+      ]);
       await assertFalseExists(join(projectRoot, 'plugins/fixture/generated.txt'));
       await assertFalseExists(join(projectRoot, 'post-script-ran.txt'));
     } finally {
       await Deno.remove(projectRoot, { recursive: true });
+    }
+  });
+
+  it('installs and links the fixture third-party plugin without officialSource or CLI branches', async () => {
+    const projectRoot = await Deno.makeTempDir();
+    const fixtureRoot = repoPath('packages/cli/tests/fixtures/plugin-scaffolder');
+    const fixtureCopyRoot = await Deno.makeTempDir();
+    try {
+      const fixtureManifest = JSON.parse(
+        await Deno.readTextFile(join(fixtureRoot, 'scaffold.plugin.json')),
+      );
+      delete fixtureManifest.postScripts;
+      await Deno.writeTextFile(
+        join(fixtureCopyRoot, 'scaffold.plugin.json'),
+        `${JSON.stringify(fixtureManifest, null, 2)}\n`,
+      );
+      await Deno.copyFile(join(fixtureRoot, 'scaffold.ts'), join(fixtureCopyRoot, 'scaffold.ts'));
+      await writeRealProjectFiles(projectRoot);
+      const initial = JSON.parse(await Deno.readTextFile(join(projectRoot, 'appsettings.json')));
+      initial.NetScript.Services.catalog = { Enabled: true };
+      initial.NetScript.Apps = { dashboard: { Type: 'app' } };
+      await Deno.writeTextFile(
+        join(projectRoot, 'appsettings.json'),
+        `${JSON.stringify(initial, null, 2)}\n`,
+      );
+      const fs = new DenoFileSystem();
+      const templateAdapter = new StringTemplateAdapter(fs);
+      const scaffolder = new Scaffolder(templateAdapter, fs);
+
+      await installPlugin({
+        kind: 'fixture',
+        pluginName: 'fixture',
+        serviceReferences: [],
+        pluginReferences: [],
+        noDb: true,
+        includeSamples: false,
+        skipConfirmation: true,
+        localPath: fixtureCopyRoot,
+        projectRoot,
+        overwrite: false,
+      }, {
+        fs,
+        scaffolder,
+        templateAdapter,
+        registry: new PluginKindRegistry(),
+        registryScaffolder: new PluginRegistryScaffolder(scaffolder),
+        workspaceMutator: new PluginWorkspaceMutator(fs),
+        processRunner: new DenoProcess(),
+        regenerateHelpers: () => Promise.resolve([]),
+      });
+
+      const appsettings = JSON.parse(await Deno.readTextFile(join(projectRoot, 'appsettings.json')))
+        .NetScript;
+      assertEquals(appsettings.Plugins['fixture-api'] !== undefined, true);
+      assertEquals(appsettings.BackgroundProcessors.fixture !== undefined, true);
+      assertEquals(appsettings.Services.catalog.PluginReferences, ['fixture-api']);
+      assertEquals(appsettings.Apps.dashboard.PluginReferences, ['fixture-api']);
+      const persisted = JSON.parse(
+        await Deno.readTextFile(join(projectRoot, 'plugins/fixture/scaffold.plugin.json')),
+      );
+      assertEquals(persisted.linking.resourceConfigKey, 'fixture-api');
+      assertEquals(persisted.officialSource, undefined);
+    } finally {
+      await Deno.remove(projectRoot, { recursive: true });
+      await Deno.remove(fixtureCopyRoot, { recursive: true });
     }
   });
 

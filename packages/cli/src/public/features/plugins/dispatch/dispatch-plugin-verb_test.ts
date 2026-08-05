@@ -193,7 +193,12 @@ describe('plugin scaffold dispatch', () => {
       });
 
       assertEquals(result.status, 'applied');
-      assertEquals(result.createdFiles, ['plugins/fixture/generated.txt']);
+      assertEquals(result.createdFiles, [
+        'plugins/fixture/generated.txt',
+        'plugins/fixture/deno.json',
+        'plugins/fixture/services/src/main.ts',
+        'plugins/fixture/bin/combined.ts',
+      ]);
       assertEquals(
         await Deno.readTextFile(join(projectRoot, 'plugins/fixture/generated.txt')),
         'plugin=fixture\n',
@@ -225,7 +230,12 @@ describe('plugin scaffold dispatch', () => {
       });
 
       assertEquals(result.status, 'planned');
-      assertEquals(result.createdFiles, ['plugins/fixture/generated.txt']);
+      assertEquals(result.createdFiles, [
+        'plugins/fixture/generated.txt',
+        'plugins/fixture/deno.json',
+        'plugins/fixture/services/src/main.ts',
+        'plugins/fixture/bin/combined.ts',
+      ]);
       await assertRejects(
         () => Deno.stat(join(projectRoot, 'plugins/fixture/generated.txt')),
         Deno.errors.NotFound,

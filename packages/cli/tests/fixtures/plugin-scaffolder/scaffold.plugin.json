@@ -14,8 +14,8 @@
     "export": "./scaffold",
     "requiredPermissions": {
       "net": [],
-      "read": [],
-      "write": []
+      "read": ["<workspaceRoot>"],
+      "write": ["<workspaceRoot>"]
     }
   },
   "postScripts": [
@@ -41,5 +41,14 @@
     "defaultTelemetry": false,
     "infrastructureRequires": [],
     "infrastructureOptionalDeps": []
+  },
+  "linking": {
+    "canonicalName": "acme-fixture",
+    "resourceConfigKey": "fixture-api",
+    "backgroundConfigKey": "fixture",
+    "consumers": {
+      "services": ["catalog"],
+      "apps": ["dashboard"]
+    }
   }
 }

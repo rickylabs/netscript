@@ -17,3 +17,12 @@
 - **Actual:** #1189 must carry one fixture third-party plugin of its own.
 - **Severity:** minor
 - **Action:** accept
+
+## 2026-08-05 — reusable generic dispatch fixture found
+
+- **What:** Source research found an existing `@acme/plugin-fixture` unrelated to #1093.
+- **Source:** `packages/cli/tests/fixtures/plugin-scaffolder/` and dispatch tests.
+- **Expected:** Carry one new #1189 fixture because #1093 had not landed.
+- **Actual:** Extend the existing ACME third-party fixture with linking and runnable entrypoints.
+- **Severity:** minor
+- **Action:** fix plan implementation shape; no parallel fixture created

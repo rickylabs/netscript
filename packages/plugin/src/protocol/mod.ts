@@ -12,6 +12,8 @@ export {
 export type {
   PluginInstallerManifest,
   PluginManifestCapabilities,
+  PluginManifestLinking,
+  PluginManifestLinkingConsumers,
   PluginManifestOfficialSource,
   PluginManifestParseError,
   PluginManifestParseIssue,

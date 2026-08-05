@@ -19,7 +19,8 @@
 | 4 | Reconciler mutates only `Plugins` and `BackgroundProcessors`; `Services` and `Apps` are absent. | `AppsettingsShape` and writeback |
 | 5 | Install, remove, and Aspire helper regeneration already call the same reconciler. | public/local install, remove, service workspace mutator |
 | 6 | Service lifecycle regeneration calls reconciliation, providing the late-consumer convergence hook. | `regenerateAspireHelpers()` |
-| 7 | Existing tests prove official plugin-to-plugin behavior only. | `plugin-reference-reconciler_test.ts` |
+| 7 | Existing reconciler tests prove official plugin-to-plugin behavior only. | `plugin-reference-reconciler_test.ts` |
+| 8 | A pre-existing `@acme/plugin-fixture` exercises third-party scaffold dispatch, though it was not created by #1093 and had no linking/runtime surface. | `packages/cli/tests/fixtures/plugin-scaffolder/` |
 
 ## jsr-audit surface scan
 
@@ -32,5 +33,5 @@
 
 ## Open questions
 
-- None before implementation. The fixture owns arbitrary identifiers and both service/app consumer
-  names; wildcard semantics are intentionally not invented.
+- None. The existing ACME fixture is extended rather than forking a parallel fixture tree; it owns
+  arbitrary identifiers and both service/app consumer names. Wildcard semantics are not invented.
