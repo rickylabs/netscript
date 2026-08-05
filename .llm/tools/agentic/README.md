@@ -49,7 +49,7 @@ token. It is safe to read any one of them in isolation.
 | `openhands/`   | The OpenHands lane: dispatch an evaluator, read its status, watch for the verdict.                                                                                                                                                  |
 | `github/`      | The GitHub REST lane: leaf-PR lifecycle, background CI/verdict watch, durable token resolution.                                                                                                                                     |
 | `wsl/`         | The WSL foundation: a native doctor and a reversible bootstrap/rollback planner.                                                                                                                                                    |
-| `claude/`      | The Claude surface: the hook logger, remote-control smoke, skill-mirror sync, and surface validator.                                                                                                                                |
+| `claude/`      | Claude hooks, Remote Control smoke and bounded OpenRouter delegation, skill-mirror sync, and surface validation.                                                                                                                    |
 | `config/`      | **The single source for everything volatile** — model ids, tool versions, endpoints. See [Maintenance map](#maintenance-map-change-one-thing-in-one-place).                                                                         |
 | `lib/`         | Shared pure + impure primitives (all the landmine logic), its unit suite, and real fixtures.                                                                                                                                        |
 
@@ -314,6 +314,50 @@ a `bridgeSessionId`. The launcher therefore rejects `--remote-control` and `--re
 instead of fabricating attachment. Do not work around this with TLS interception, a trusted local
 root, binary patching, or provider-managed-host flags that disable subscription login.
 
+For a mobile-visible session with an alternate-model worker, use `agentic:claude-hybrid`. This is an
+explicit delegation bridge, not a transparent replacement for Claude inference:
+
+```bash
+deno task agentic:claude-hybrid -- --cwd /home/me/repo --name netscript-hybrid
+```
+
+The launcher starts the installed `claude` binary with native Anthropic authentication, Remote
+Control, `bypassPermissions`, and a generated stdio MCP config. Claude remains the supervisor seen
+by the web/mobile client. When Claude calls the `netscript-hybrid` MCP tool `delegate_openrouter`,
+the MCP server validates a bounded task and optional context, then launches an isolated OpenCode
+process for the approved OpenRouter worker. The response includes requested and observed route
+identity; “observed” means the exact OpenCode argv constructed by this bridge, not provider-side
+attestation. The default and allowlist are centralized in `config/models.ts`
+(`HYBRID_DELEGATION_DEFAULT_MODEL` and `HYBRID_DELEGATION_MODEL_IDS`).
+
+This preserves the boundary Claude Code enforces: the Claude child receives no Anthropic API-key,
+auth-token, custom-base-URL, or OpenRouter-key override, while only the short-lived OpenCode worker
+receives the resolved OpenRouter key. The generated MCP configuration is mode `0600` inside a mode
+`0700` temporary directory, contains no credential, grants the MCP process read access only to the
+configured credential file, and is removed when the launcher exits. Worker requests have bounded
+input, output, diagnostic output, timeout, and concurrency; cancellation or timeout terminates the
+isolated process group with bounded TERM-to-KILL escalation.
+
+Remote Control must be available to the natively authenticated Claude installation. The launcher
+does not treat a living process or a requested session name as proof: it waits for Claude's session
+registry to match the child PID and cwd and to contain a non-empty `bridgeSessionId`, otherwise it
+terminates the child and fails closed. The requested `--name` is only a label because Claude may
+derive a different registry name.
+
+> **Quota limitation.** Claude must still have enough native allowance to take a turn and choose to
+> call `delegate_openrouter`. The OpenRouter worker can do the delegated reasoning, but this bridge
+> cannot make a zero-Claude-quota Remote Control session progress. For work that needs no Claude
+> turn, use the non-Remote-Control `agentic:claude-openrouter` surface or OpenCode directly.
+
+If launch fails, diagnose the boundary reported by the error: confirm `--cwd` is an existing
+absolute directory, `HOME` is set, native `claude --remote-control` works with the current login,
+and the OpenRouter credential is either exported or present in OpenCode's configured user env file.
+An attachment timeout means native bridge evidence was absent or mismatched; an MCP connection
+failure usually means the generated Deno permission set, OpenCode binary, or credential file is
+unavailable. A delegated call can also fail closed as `invalid_request`, `cancelled`, `timed_out`,
+`result_too_large`, or `worker_failed`; reduce caller-selected context before increasing the bounded
+timeout. Do not add provider credentials to Claude's environment to repair the worker.
+
 The formal-evaluator preset additionally replaces `ANTHROPIC_BASE_URL` in the spawned evaluator
 environment with a loopback request guard. Every model-bearing request must name a model in
 `OPEN_EVALUATOR_MODEL_IDS`; a denial returns 403, terminates the evaluator, exits non-zero, and
@@ -486,16 +530,16 @@ the one obvious place and every doctor, probe, installer, and test picks it up. 
 (`config/no-hardcoded-volatile_test.ts`) fails the suite if any of these values is ever hardcoded
 again outside `config/`.
 
-| To change a…                                        | Edit                                                   | Notes                                                                                                                                                                                 |
-| --------------------------------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Model id**                                        | `config/models.ts`                                     | `MODEL_IDS` (native), `OPENROUTER_MODEL_IDS` (presets), and `OPENCODE_MODEL_IDS` (native OpenCode lane). These are the only model-id string literals.                                 |
-| **Routing binding** (lane → agent → model → effort) | `runtime/routing-policy.ts` (`CANONICAL_ROUTE_POLICY`) | The lane authority, rendered by `.llm/harness/workflow/lane-policy.md`; it references `config/models.ts` for the ids.                                                                 |
-| **Tool version**                                    | `config/versions.ts`                                   | Runtime version sets plus `OPENCODE_TOOL` for the pinned OpenCode version, binary name, auth-file location, variant, and web defaults.                                                |
+| To change a…                                        | Edit                                                   | Notes                                                                                                                                                                                            |
+| --------------------------------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Model id**                                        | `config/models.ts`                                     | `MODEL_IDS` (native), `OPENROUTER_MODEL_IDS` (presets), and `OPENCODE_MODEL_IDS` (native OpenCode lane). These are the only model-id string literals.                                            |
+| **Routing binding** (lane → agent → model → effort) | `runtime/routing-policy.ts` (`CANONICAL_ROUTE_POLICY`) | The lane authority, rendered by `.llm/harness/workflow/lane-policy.md`; it references `config/models.ts` for the ids.                                                                            |
+| **Tool version**                                    | `config/versions.ts`                                   | Runtime version sets plus `OPENCODE_TOOL` for the pinned OpenCode version, binary name, auth-file location, variant, and web defaults.                                                           |
 | **Endpoint / host / installer URL**                 | `config/endpoints.ts`                                  | Node dist host, npm registry, Antigravity host + installer, OpenRouter base URLs, GitHub REST + GraphQL APIs. Keep the `agentic:wsl-foundation` `--allow-net=` allowlist in `deno.json` in sync. |
-| **Provider profile / OpenRouter preset**            | `runtime/provider-profiles.ts`                         | Credential-key wiring and preset effort/purpose; model ids come from `config/models.ts`.                                                                                              |
-| **Fallback / lane policy**                          | `runtime/routing-policy.ts`                            | Fallback candidate rules, subscription/approval gates, dated transitions.                                                                                                             |
-| **Agent / provider vocabulary**                     | `runtime/contract.ts`                                  | `AGENT_KINDS`, `PROVIDER_KINDS`, `EFFORTS`, diagnostic codes, `EXIT_CODES`.                                                                                                           |
-| **Deps**                                            | root `deno.json` import map + `deno.lock`              | The suite has no third-party deps of its own; it uses `Deno.*` and Web APIs by design.                                                                                                |
+| **Provider profile / OpenRouter preset**            | `runtime/provider-profiles.ts`                         | Credential-key wiring and preset effort/purpose; model ids come from `config/models.ts`.                                                                                                         |
+| **Fallback / lane policy**                          | `runtime/routing-policy.ts`                            | Fallback candidate rules, subscription/approval gates, dated transitions.                                                                                                                        |
+| **Agent / provider vocabulary**                     | `runtime/contract.ts`                                  | `AGENT_KINDS`, `PROVIDER_KINDS`, `EFFORTS`, diagnostic codes, `EXIT_CODES`.                                                                                                                      |
+| **Deps**                                            | root `deno.json` import map + `deno.lock`              | The suite has no third-party deps of its own; it uses `Deno.*` and Web APIs by design.                                                                                                           |
 
 ## Environment overrides
 
