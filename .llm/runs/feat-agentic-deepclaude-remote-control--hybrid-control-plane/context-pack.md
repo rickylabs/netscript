@@ -23,16 +23,23 @@ tasks to credential-isolated OpenRouter workers.
 - Version 2.1.91 live probe confirmed Remote Control minimum-version rejection.
 - Plan/design locked; no implementation started.
 - Separate OpenCode/OpenRouter Minimax PLAN-EVAL passed after two Qwen transport failures.
+- Slice 1 implemented the bounded delegation contract and credential-isolated OpenCode adapter.
+- DeepSeek is the sole approved worker model and the centralized default; evaluator/design models
+  are intentionally excluded from this task lane.
+- Focused tests plus the volatile guard pass (18/18), scoped check/lint/fmt have zero findings, and
+  `deno.lock` is unchanged.
+- Real OpenCode JSON and production-adapter DeepSeek canaries returned exact
+  `HYBRID_JSON_SHAPE_OK` and `HYBRID_ADAPTER_OK` sentinels.
 
 ## In Progress
 
-- Slice 1 implementation: bounded delegation contract and OpenCode adapter.
+- Slice 2: MCP protocol server and native interactive Remote Control lifecycle.
 
 ## Next Steps
 
-1. Implement slice 1 and run its focused/static gates.
-2. Supervisor review, commit, push, and PR comment.
-3. Continue with launcher/MCP slice and live canary.
+1. Implement MCP initialize/list/call/cancellation protocol over newline stdio.
+2. Implement the native `claude --remote-control` launcher with ephemeral config and cleanup.
+3. Run protocol/lifecycle tests and a native bridge plus delegated DeepSeek canary.
 
 ## Key Decisions
 

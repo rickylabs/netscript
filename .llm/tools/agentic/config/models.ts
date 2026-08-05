@@ -55,6 +55,16 @@ export const OPENROUTER_MODEL_IDS = {
   deepseekV4Flash0731: 'deepseek/deepseek-v4-flash-0731',
 } as const;
 
+/** OpenRouter models approved for explicit Claude hybrid delegation. */
+export type HybridDelegationModelId = typeof OPENROUTER_MODEL_IDS.deepseekV4Flash0731;
+export const HYBRID_DELEGATION_MODEL_IDS: readonly HybridDelegationModelId[] = [
+  OPENROUTER_MODEL_IDS.deepseekV4Flash0731,
+] as const;
+
+/** Default OpenRouter worker for Claude hybrid delegation. */
+export const HYBRID_DELEGATION_DEFAULT_MODEL: HybridDelegationModelId =
+  OPENROUTER_MODEL_IDS.deepseekV4Flash0731;
+
 /** Open models approved for formal evaluation without paid closed-model routing. */
 export const OPEN_EVALUATOR_MODEL_IDS: readonly [
   typeof OPENROUTER_MODEL_IDS.minimax,
