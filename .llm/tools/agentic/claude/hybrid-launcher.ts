@@ -7,6 +7,7 @@ import {
   HYBRID_CLAUDE_TERMINATION_GRACE_MS,
 } from '../config/versions.ts';
 import { OPENCODE_TOOL } from '../config/versions.ts';
+import { HYBRID_MCP_ENVIRONMENT_NAMES } from './hybrid-opencode-adapter.ts';
 
 const STRIPPED_CLAUDE_ENV = new Set([
   'ANTHROPIC_API_KEY',
@@ -26,6 +27,14 @@ export interface HybridBridgeEvidence {
   readonly bridgeSessionId: string;
   readonly cwd: string;
   readonly name?: string;
+}
+
+export interface HybridBridgeDiagnostic {
+  readonly recordParsed: boolean;
+  readonly pidMatch: boolean;
+  readonly cwdMatch: boolean;
+  readonly bridgePresent: boolean;
+  readonly nameMatch: boolean;
 }
 
 export interface HybridClaudeProcess {
@@ -98,7 +107,7 @@ export function hybridMcpConfig(
           '--no-lock',
           `--allow-read=${credentialFile}`,
           '--allow-run=setsid',
-          '--allow-env=HOME,PATH,TMPDIR,TEMP,TMP,XDG_CONFIG_HOME,XDG_CACHE_HOME,XDG_DATA_HOME,OPENCODE_BIN,OPENCODE_CONFIG,OPENROUTER_API_KEY',
+          `--allow-env=${HYBRID_MCP_ENVIRONMENT_NAMES.join(',')}`,
           serverPath,
           '--cwd',
           cwd,
@@ -118,8 +127,7 @@ export function parseHybridBridgeEvidence(
     if (
       value.pid !== expected.pid || value.cwd !== expected.cwd ||
       typeof value.sessionId !== 'string' || !value.sessionId ||
-      typeof value.bridgeSessionId !== 'string' || !value.bridgeSessionId ||
-      (expected.name !== undefined && value.name !== expected.name)
+      typeof value.bridgeSessionId !== 'string' || !value.bridgeSessionId
     ) return undefined;
     return {
       pid: expected.pid,
@@ -133,6 +141,31 @@ export function parseHybridBridgeEvidence(
   }
 }
 
+/** Reports only non-secret match booleans for an unattached registry record. */
+export function diagnoseHybridBridgeRecord(
+  source: string,
+  expected: { readonly pid: number; readonly cwd: string; readonly name?: string },
+): HybridBridgeDiagnostic {
+  try {
+    const value = JSON.parse(source) as Record<string, unknown>;
+    return {
+      recordParsed: true,
+      pidMatch: value.pid === expected.pid,
+      cwdMatch: value.cwd === expected.cwd,
+      bridgePresent: typeof value.bridgeSessionId === 'string' && value.bridgeSessionId.length > 0,
+      nameMatch: expected.name === undefined || value.name === expected.name,
+    };
+  } catch {
+    return {
+      recordParsed: false,
+      pidMatch: false,
+      cwdMatch: false,
+      bridgePresent: false,
+      nameMatch: false,
+    };
+  }
+}
+
 async function waitForAttachment(
   process: HybridClaudeProcess,
   options: HybridLaunchOptions,
@@ -142,10 +175,17 @@ async function waitForAttachment(
   if (!home) throw new Error('HOME is required to verify Remote Control attachment');
   const path = `${home}/.claude/sessions/${process.pid}.json`;
   const attempts = Math.ceil(HYBRID_ATTACHMENT_TIMEOUT_MS / HYBRID_ATTACHMENT_POLL_MS);
+  let diagnostic: HybridBridgeDiagnostic | undefined;
   for (let attempt = 0; attempt < attempts; attempt++) {
     try {
+      const source = await dependencies.readTextFile(path);
+      diagnostic = diagnoseHybridBridgeRecord(source, {
+        pid: process.pid,
+        cwd: options.cwd,
+        name: options.name,
+      });
       const evidence = parseHybridBridgeEvidence(
-        await dependencies.readTextFile(path),
+        source,
         { pid: process.pid, cwd: options.cwd, name: options.name },
       );
       if (evidence) return evidence;
@@ -160,7 +200,13 @@ async function waitForAttachment(
       throw new Error('Claude exited before Remote Control attachment was proven');
     }
   }
-  throw new Error('Claude stayed alive without matching bridgeSessionId attachment evidence');
+  throw new Error(
+    `Claude stayed alive without matching bridge attachment evidence: ${
+      JSON.stringify(
+        diagnostic ?? { recordParsed: false },
+      )
+    }`,
+  );
 }
 
 async function terminateClaude(

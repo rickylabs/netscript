@@ -29,7 +29,7 @@ export interface HybridWorkerPort {
   spawn(invocation: HybridWorkerInvocation): HybridWorkerProcess;
 }
 
-const ENVIRONMENT_ALLOWLIST = [
+export const HYBRID_WORKER_ENVIRONMENT_NAMES = [
   'HOME',
   'PATH',
   'TMPDIR',
@@ -40,6 +40,11 @@ const ENVIRONMENT_ALLOWLIST = [
   'XDG_DATA_HOME',
   'OPENCODE_BIN',
   'OPENCODE_CONFIG',
+] as const;
+
+export const HYBRID_MCP_ENVIRONMENT_NAMES: readonly string[] = [
+  ...HYBRID_WORKER_ENVIRONMENT_NAMES,
+  'OPENROUTER_API_KEY',
 ] as const;
 
 class DenoHybridWorkerPort implements HybridWorkerPort {
@@ -109,7 +114,7 @@ export async function hybridWorkerEnvironment(
   readTextFile: (path: string) => Promise<string> = Deno.readTextFile,
 ): Promise<Record<string, string>> {
   const child: Record<string, string> = {};
-  for (const name of ENVIRONMENT_ALLOWLIST) {
+  for (const name of HYBRID_WORKER_ENVIRONMENT_NAMES) {
     const value = env[name]?.trim();
     if (value) child[name] = value;
   }

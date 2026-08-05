@@ -9,7 +9,7 @@ import {
   type HybridDelegationRequest,
   type HybridDelegationResult,
 } from './hybrid-delegation.ts';
-import { HybridOpenCodeAdapter } from './hybrid-opencode-adapter.ts';
+import { HYBRID_MCP_ENVIRONMENT_NAMES, HybridOpenCodeAdapter } from './hybrid-opencode-adapter.ts';
 
 type RequestId = string | number;
 
@@ -212,8 +212,20 @@ function parseCwd(args: readonly string[]): string {
   throw new Error('usage: hybrid-mcp-server.ts --cwd <absolute-path>');
 }
 
+/** Reads only environment names granted by the generated MCP permission set. */
+export function hybridMcpEnvironment(): Record<string, string> {
+  const environment: Record<string, string> = {};
+  for (const name of HYBRID_MCP_ENVIRONMENT_NAMES) {
+    const value = Deno.env.get(name);
+    if (value !== undefined) environment[name] = value;
+  }
+  return environment;
+}
+
 if (import.meta.main) {
   const cwd = parseCwd(Deno.args);
-  const server = new HybridMcpServer(new HybridOpenCodeAdapter({ cwd }));
+  const server = new HybridMcpServer(
+    new HybridOpenCodeAdapter({ cwd, env: hybridMcpEnvironment() }),
+  );
   await runHybridMcpStdio(server, Deno.stdin.readable, Deno.stdout.writable);
 }

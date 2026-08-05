@@ -57,7 +57,46 @@ Deno.test('MCP config is stdio-only, credential-free, and minimally permissioned
   assert(!server.args.includes('--allow-sys'));
 });
 
-Deno.test('bridge evidence requires matching pid, cwd, name, and bridge id', () => {
+Deno.test('generated MCP permission argv starts the real stdio server', async () => {
+  const credentialFile = await Deno.makeTempFile({ dir: '/tmp', prefix: 'hybrid-credential-' });
+  try {
+    await Deno.writeTextFile(credentialFile, 'OPENROUTER_API_KEY=test-only-not-used\n');
+    const config = JSON.parse(hybridMcpConfig(
+      new URL('./hybrid-launcher.ts', import.meta.url).pathname,
+      Deno.cwd(),
+      Deno.execPath(),
+      credentialFile,
+    ));
+    const definition = config.mcpServers['netscript-hybrid'];
+    const child = new Deno.Command(definition.command, {
+      args: definition.args,
+      env: { HOME: '/home/test', PATH: Deno.env.get('PATH') ?? '/usr/bin' },
+      clearEnv: true,
+      stdin: 'piped',
+      stdout: 'piped',
+      stderr: 'piped',
+    }).spawn();
+    const writer = child.stdin.getWriter();
+    await writer.write(new TextEncoder().encode(
+      `${JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'tools/list' })}\n`,
+    ));
+    await writer.close();
+    const [status, stdout, stderr] = await Promise.all([
+      child.status,
+      new Response(child.stdout).text(),
+      new Response(child.stderr).text(),
+    ]);
+    assertEquals(status.success, true, stderr);
+    const response = JSON.parse(stdout.trim());
+    assertEquals(response.result.tools.map((tool: { name: string }) => tool.name), [
+      'delegate_openrouter',
+    ]);
+  } finally {
+    await Deno.remove(credentialFile);
+  }
+});
+
+Deno.test('bridge evidence requires pid, cwd, and bridge id but preserves derived registry name', () => {
   const valid = JSON.stringify({
     pid: 42,
     cwd: '/repo',
@@ -73,6 +112,11 @@ Deno.test('bridge evidence requires matching pid, cwd, name, and bridge id', () 
   assertEquals(
     parseHybridBridgeEvidence(valid.replace('session_remote', ''), { pid: 42, cwd: '/repo' }),
     undefined,
+  );
+  assertEquals(
+    parseHybridBridgeEvidence(valid, { pid: 42, cwd: '/repo', name: 'different-display-label' })
+      ?.name,
+    'hybrid',
   );
 });
 

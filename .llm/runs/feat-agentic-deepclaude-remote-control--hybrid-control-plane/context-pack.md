@@ -33,8 +33,12 @@ tasks to credential-isolated OpenRouter workers.
 - Slice 2 implements a minimal standalone MCP stdio server with cancellation ownership and the
   native interactive Remote Control launcher with credential stripping, mode-0600 ephemeral
   config, bounded process cleanup, and fail-closed session-registry bridge evidence.
-- Slice 2 focused protocol/lifecycle plus existing hybrid/volatile tests pass (32/32); scoped
+- Slice 2 focused protocol/lifecycle plus existing hybrid/volatile tests pass (33/33), including
+  a real stdio subprocess under the exact generated permission argv; scoped
   check/lint/fmt are clean and `deno.lock` remains unchanged.
+- First live canary found and drove fixes for partial-env access and derived registry names. Bridge
+  proof remains exact PID + cwd + non-empty `bridgeSessionId`; the requested CLI label is not a
+  registry-name equality invariant in Claude 2.1.222.
 
 ## In Progress
 
