@@ -70,6 +70,9 @@ protocol tests, then run the documented canary; never add credentials or endpoin
 | 2026-08-05 | Slice 2 | Reconcile | Scope remains the approved native-control/delegated-worker design. Supervisor pre-review findings (OAuth preservation, no strict MCP mode, injected lifecycle seams, bounded escalation, trusted Deno path, duplicate request ownership, and centralized volatile values) were incorporated before handoff. |
 | 2026-08-05 | Slice 2 | Canary repair | Supervisor's first live canary exposed two real integration mismatches: partial `--allow-env` cannot call `Deno.env.toObject()`, and Claude's session registry derives its own `name` even when a Remote Control display label is requested. The MCP entrypoint now snapshots only its centralized permitted names with `Deno.env.get`; an exact generated-permissions subprocess test boots the real stdio server. Attachment continues to require exact PID, cwd, and non-empty bridge ID but treats registry name as observed metadata, with boolean-only mismatch diagnostics on failure. |
 | 2026-08-05 | Slice 2 | Tier-A review | Supervisor inspected JSON-RPC concurrency/cancellation ownership, stdio write serialization, credential-free config generation, exact credential-file read permission, OAuth preservation, registry attachment proof, signal seams, and bounded termination. Independently reran 32 tests and scoped check/lint/fmt across ten owned TypeScript files; accepted the slice for commit. |
+| 2026-08-05 | Slice 2 | Live canary | Claude Code 2.1.222 attached native Remote Control with bypass permissions; `/mcp` reported `netscript-hybrid` connected with one tool. One `delegate_openrouter` call returned exact `HYBRID_REMOTE_DEEPSEEK_OK`; requested and argv-observed routes both resolved to `openrouter` / `deepseek/deepseek-v4-flash-0731` / `high` in 6109 ms. The tmux session remains live for inspection. |
+| 2026-08-05 | Slice 3 | Grok adversarial review | OpenCode/Grok 4.5 high reproduced a merge-blocking sandbox mismatch: scoped `--allow-run=setsid` permits worker spawn but denies the adapter's `Deno.kill(-pid, signal)`, so deployed cancellation/timeout cleanup was not guaranteed despite unit-fake coverage. Remediation and an exact-permissions orphan test are required before IMPL-EVAL. The review process later exited 143 while probing signals, so no unsupported PASS verdict was recorded. |
+| 2026-08-05 | Slice 3 | Grok finding remediation | Replaced forbidden `Deno.kill` with the explicitly permitted `kill` executable while retaining scoped `--allow-run=setsid,kill`. A TERM-resistant leader/descendant fixture now runs through the exact generated MCP argv; cancellation returns `cancelled`, escalates TERM→KILL, and the descendant PID disappears. Supervisor independently reran 34 focused/volatile tests with zero failures. |
 
 ## Gate Results
 
@@ -86,6 +89,8 @@ protocol tests, then run the documented canary; never add credentials or endpoin
 | Slice 2 scoped check | PASS | Wrapper selected 8 hybrid files; 0 findings / 0 failed batches. |
 | Slice 2 scoped lint | PASS | Wrapper selected 8 hybrid files; 0 findings. |
 | Slice 2 scoped format | PASS | Wrapper selected 8 hybrid files; 0 findings / 0 failed batches. |
+| Native Remote Control → MCP → DeepSeek canary | PASS | Claude 2.1.222 proved a non-empty bridge session, MCP connected, and one delegated call returned exact `HYBRID_REMOTE_DEEPSEEK_OK` with matching requested/argv-observed route identity. |
+| Exact-permissions process-group cancellation | PASS | Real MCP subprocess under `--allow-run=setsid,kill` cancelled a TERM-resistant worker group and left no descendant orphan. |
 
 ## Handoff Notes
 

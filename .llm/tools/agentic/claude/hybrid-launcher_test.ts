@@ -9,6 +9,7 @@ import {
   parseHybridBridgeEvidence,
   parseHybridLaunchOptions,
 } from './hybrid-launcher.ts';
+import { HYBRID_PROCESS_GROUP_BINARIES } from './hybrid-opencode-adapter.ts';
 
 Deno.test('hybrid launcher parses only absolute cwd and bounded name', () => {
   assertEquals(parseHybridLaunchOptions(['--cwd', '/repo', '--name', 'loopback']), {
@@ -47,7 +48,9 @@ Deno.test('MCP config is stdio-only, credential-free, and minimally permissioned
   const server = config.mcpServers['netscript-hybrid'];
   assertEquals(Object.keys(config.mcpServers), ['netscript-hybrid']);
   assertEquals(server.command, '/trusted/deno');
-  assert(server.args.includes('--allow-run=setsid'));
+  assert(server.args.includes(
+    `--allow-run=${HYBRID_PROCESS_GROUP_BINARIES.session},${HYBRID_PROCESS_GROUP_BINARIES.signal}`,
+  ));
   assert(
     server.args.includes(`--allow-read=/home/test/${OPENCODE_TOOL.openRouterEnvRelativePath}`),
   );
@@ -93,6 +96,90 @@ Deno.test('generated MCP permission argv starts the real stdio server', async ()
     ]);
   } finally {
     await Deno.remove(credentialFile);
+  }
+});
+
+Deno.test('exact MCP permissions cancel a stubborn worker group without an orphan', async () => {
+  const credentialFile = await Deno.makeTempFile({ dir: '/tmp', prefix: 'hybrid-credential-' });
+  const pidFile = await Deno.makeTempFile({ dir: '/tmp', prefix: 'hybrid-worker-pid-' });
+  const fixture = new URL('./__fixtures__/hybrid-stubborn-worker.sh', import.meta.url).pathname;
+  try {
+    await Deno.writeTextFile(credentialFile, 'OPENROUTER_API_KEY=test-only-not-used\n');
+    await Deno.writeTextFile(pidFile, '');
+    const config = JSON.parse(hybridMcpConfig(
+      new URL('./hybrid-launcher.ts', import.meta.url).pathname,
+      Deno.cwd(),
+      Deno.execPath(),
+      credentialFile,
+    ));
+    const definition = config.mcpServers['netscript-hybrid'];
+    const child = new Deno.Command(definition.command, {
+      args: definition.args,
+      env: {
+        HOME: '/home/test',
+        PATH: Deno.env.get('PATH') ?? '/usr/bin',
+        OPENROUTER_API_KEY: 'test-only-not-used',
+        OPENCODE_BIN: fixture,
+        OPENCODE_CONFIG: pidFile,
+      },
+      clearEnv: true,
+      stdin: 'piped',
+      stdout: 'piped',
+      stderr: 'piped',
+    }).spawn();
+    const writer = child.stdin.getWriter();
+    await writer.write(new TextEncoder().encode(`${
+      JSON.stringify({
+        jsonrpc: '2.0',
+        id: 71,
+        method: 'tools/call',
+        params: { name: 'delegate_openrouter', arguments: { task: 'wait' } },
+      })
+    }\n`));
+    let descendantPid = 0;
+    for (let attempt = 0; attempt < 100; attempt++) {
+      descendantPid = Number((await Deno.readTextFile(pidFile)).trim());
+      if (Number.isSafeInteger(descendantPid) && descendantPid > 0) break;
+      await new Promise((resolve) => setTimeout(resolve, 10));
+    }
+    assert(descendantPid > 0, 'fixture did not publish its descendant pid');
+    await writer.write(new TextEncoder().encode(`${
+      JSON.stringify({
+        jsonrpc: '2.0',
+        method: 'notifications/cancelled',
+        params: { requestId: 71 },
+      })
+    }\n`));
+    await writer.close();
+    const [status, stdout, stderr] = await Promise.all([
+      child.status,
+      new Response(child.stdout).text(),
+      new Response(child.stderr).text(),
+    ]);
+    assertEquals(status.success, true, stderr);
+    const response = stdout.trim().split('\n').map((line) => JSON.parse(line)).find((line) =>
+      line.id === 71
+    );
+    assertEquals(response.result.structuredContent.error.code, 'cancelled');
+    let alive = true;
+    for (let attempt = 0; attempt < 100; attempt++) {
+      try {
+        Deno.kill(descendantPid, 0);
+      } catch (error) {
+        if (error instanceof Deno.errors.NotFound) {
+          alive = false;
+          break;
+        }
+        throw error;
+      }
+      await new Promise((resolve) => setTimeout(resolve, 10));
+    }
+    assertEquals(alive, false, `worker descendant ${descendantPid} survived cancellation`);
+  } finally {
+    await Promise.all([
+      Deno.remove(credentialFile).catch(() => {}),
+      Deno.remove(pidFile).catch(() => {}),
+    ]);
   }
 });
 

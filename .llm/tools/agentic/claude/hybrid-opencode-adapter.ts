@@ -47,9 +47,15 @@ export const HYBRID_MCP_ENVIRONMENT_NAMES: readonly string[] = [
   'OPENROUTER_API_KEY',
 ] as const;
 
+/** Executables granted to the MCP for isolated worker-group lifecycle control. */
+export const HYBRID_PROCESS_GROUP_BINARIES = {
+  session: 'setsid',
+  signal: 'kill',
+} as const;
+
 class DenoHybridWorkerPort implements HybridWorkerPort {
   spawn(invocation: HybridWorkerInvocation): HybridWorkerProcess {
-    const child = new Deno.Command('setsid', {
+    const child = new Deno.Command(HYBRID_PROCESS_GROUP_BINARIES.session, {
       args: ['--', invocation.command, ...invocation.args],
       cwd: invocation.cwd,
       env: { ...invocation.env },
@@ -63,7 +69,17 @@ class DenoHybridWorkerPort implements HybridWorkerPort {
       stderr: child.stderr,
       status: child.status,
       killProcessGroup(signal: Deno.Signal): void {
-        Deno.kill(-child.pid, signal);
+        // Scoped `--allow-run` does not authorize Deno.kill. Route group signals
+        // through the one explicitly permitted process-control executable.
+        const result = new Deno.Command(HYBRID_PROCESS_GROUP_BINARIES.signal, {
+          args: [`-${signal}`, '--', `-${child.pid}`],
+          stdin: 'null',
+          stdout: 'null',
+          stderr: 'null',
+        }).outputSync();
+        if (!result.success) {
+          throw new Error(`failed to send ${signal} to worker process group`);
+        }
       },
     };
   }

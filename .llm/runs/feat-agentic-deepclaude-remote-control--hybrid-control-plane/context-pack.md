@@ -39,16 +39,21 @@ tasks to credential-isolated OpenRouter workers.
 - First live canary found and drove fixes for partial-env access and derived registry names. Bridge
   proof remains exact PID + cwd + non-empty `bridgeSessionId`; the requested CLI label is not a
   registry-name equality invariant in Claude 2.1.222.
+- The repaired end-to-end canary passed under Claude Code 2.1.222: native Remote Control attached,
+  bypass permissions were active, `netscript-hybrid` connected with one MCP tool, and one delegated
+  call returned exact `HYBRID_REMOTE_DEEPSEEK_OK`. Requested and argv-observed identity both resolved
+  to OpenRouter / DeepSeek V4 Flash 0731 / high. The tmux session `netscript-hybrid-canary` remains
+  available for inspection.
 
 ## In Progress
 
-- Slice 2 sign-off commit, then coordinated live hybrid Remote Control canary.
+- Slice 3 operator documentation and independent adversarial implementation evaluation.
 
 ## Next Steps
 
-1. Commit/push/comment the reviewed Slice 2.
-2. Start one tmux-hosted native hybrid session and prove bridge plus MCP tool availability.
-3. Send a mobile-visible delegation prompt and verify the exact DeepSeek sentinel.
+1. Document the operator workflow, security model, and zero-quota limitation.
+2. Run the requested OpenCode/Grok 4.5 high adversarial review and address findings.
+3. Run IMPL-EVAL, repository gates, and GitHub checks before marking the PR ready.
 
 ## Key Decisions
 
@@ -60,6 +65,10 @@ tasks to credential-isolated OpenRouter workers.
 ## Drift and Debt
 
 - Drift: transparent DeepClaude claim is not reproducible on supported Claude releases.
+- Resolved finding: OpenCode/Grok 4.5 high proved `Deno.kill` was denied by the deployed scoped
+  `--allow-run=setsid` sandbox. The adapter now invokes the explicitly permitted `kill` executable,
+  retains scoped `--allow-run=setsid,kill`, and a real exact-argv test proves cancellation escalates
+  against a TERM-resistant process group without leaving its descendant alive.
 - Debt: none accepted.
 
 ## Commits

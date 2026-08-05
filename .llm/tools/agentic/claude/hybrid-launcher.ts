@@ -7,7 +7,10 @@ import {
   HYBRID_CLAUDE_TERMINATION_GRACE_MS,
 } from '../config/versions.ts';
 import { OPENCODE_TOOL } from '../config/versions.ts';
-import { HYBRID_MCP_ENVIRONMENT_NAMES } from './hybrid-opencode-adapter.ts';
+import {
+  HYBRID_MCP_ENVIRONMENT_NAMES,
+  HYBRID_PROCESS_GROUP_BINARIES,
+} from './hybrid-opencode-adapter.ts';
 
 const STRIPPED_CLAUDE_ENV = new Set([
   'ANTHROPIC_API_KEY',
@@ -106,7 +109,7 @@ export function hybridMcpConfig(
           'run',
           '--no-lock',
           `--allow-read=${credentialFile}`,
-          '--allow-run=setsid',
+          `--allow-run=${HYBRID_PROCESS_GROUP_BINARIES.session},${HYBRID_PROCESS_GROUP_BINARIES.signal}`,
           `--allow-env=${HYBRID_MCP_ENVIRONMENT_NAMES.join(',')}`,
           serverPath,
           '--cwd',
