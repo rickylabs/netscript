@@ -13,3 +13,6 @@
 - RED command: `deno test --allow-all packages/cli/src/public/features/root/public-command-tree_test.ts`
 - Result: exit 1; 2 passed / 1 failed. The failure prints the current two-tool instruction and the
   expected ordered three-tool funnel, proving the activation defect before implementation.
+- The MCP stdio instruction regression also failed pre-fix (`stdio_test.ts`: 0 passed / 1 failed):
+  the server-injected agent context omits `list_api_services` in the same way as the scaffolded
+  convention. Both user-facing activation seams are therefore held RED before their implementation.
