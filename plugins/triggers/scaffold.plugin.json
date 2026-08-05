@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
   "name": "@netscript/plugin-triggers",
-  "version": "0.0.4",
+  "version": "0.0.5-canary.13",
   "displayName": "Trigger Processor",
   "description": "NetScript plugin for trigger ingress, scheduling, file watching, and trigger runtime APIs.",
   "peerDependencies": {
-    "@netscript/plugin": "0.0.4"
+    "@netscript/plugin": "0.0.5-canary.13"
   },
   "capabilities": {
     "hasDatabaseMigrations": true,

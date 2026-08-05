@@ -8,7 +8,7 @@ export const EMBEDDED_AGENT_DOCS_GZIP_BASE64: string =
 /** Release-build provenance for the embedded prose bundle. */
 export const EMBEDDED_AGENT_DOCS_PROVENANCE = {
   'schemaVersion': 1,
-  'version': '0.0.4',
+  'version': '0.0.5-canary.13',
   'sourceCommit': 'd6265fa52',
   'extractionTimestamp': '2026-08-03T10:09:58Z',
   'files': [
