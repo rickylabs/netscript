@@ -114,10 +114,7 @@ export function resolveDataPath(
 }
 
 /**
- * Returns one project-scoped database password shared by every AppHost identity.
- * Aspire stores generated parameter values per AppHost project, so the resident
- * and short-lived database-operation projects cannot rely on its implicit value
- * when they attach to the same persistent data directory.
+ * Returns one project-scoped database password for the resident AppHost graph.
  */
 export function ensureDatabasePassword(appHostDir: string, resourceName: string): string {
   const secretsDir = resolveWorkspacePath(appHostDir, join('.data', 'aspire-secrets'));

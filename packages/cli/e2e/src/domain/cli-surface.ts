@@ -156,6 +156,7 @@ export const GATE = {
   QUICKSTART_SERVICE_ADD: 'quickstart.3-add-service',
   QUICKSTART_ASPIRE: 'quickstart.4-aspire-restore-start',
   QUICKSTART_DATABASE: 'quickstart.5-database-workflow',
+  QUICKSTART_DATABASE_INTEGRITY: 'quickstart.pgdata-integrity-after-teardown',
   QUICKSTART_CHECK: 'quickstart.6-project-check',
   QUICKSTART_SERVICE_RESPONSE: 'quickstart.7-service-response',
 } as const;

@@ -12,7 +12,6 @@ import { DbOperationRunner } from '../../../../kernel/adapters/database/operatio
 import { DbWorkspaceResolver } from '../../../../kernel/adapters/database/workspace-resolver.ts';
 import { RemoteError } from '../../../../kernel/domain/errors/cli-exit-error.ts';
 import type { DbOperation } from '../../../../kernel/domain/db-engine.ts';
-import type { DatabaseWorkspaceMutator } from '../../../../kernel/adapters/database/workspace-mutator.ts';
 
 /** Common options for database operation commands. */
 export interface DbOperationCommandOptions {
@@ -27,8 +26,6 @@ export interface DbOperationCommandOptions {
 export interface DbOperationCommandDependencies {
   /** Return the current working directory. */
   readonly cwd: () => string;
-  /** Materializes and removes the one-shot DB-operation AppHost. */
-  readonly workspaceMutator: DatabaseWorkspaceMutator;
 }
 
 /** Shared public database operation command owner. */
@@ -78,37 +75,12 @@ export async function runDbOperation(
   const databases = await resolver.discoverDatabases(projectRoot);
   const target = resolver.resolveTarget(databases, options.db);
   const runner = new DbOperationRunner();
-  return await executeWithDbOperationAppHost(
+  return await runner.execute({
     operation,
+    target,
+    migrationName: options.migrationName,
     projectRoot,
-    dependencies.workspaceMutator,
-    () =>
-      runner.execute({
-        operation,
-        target,
-        migrationName: options.migrationName,
-        projectRoot,
-      }),
-  );
-}
-
-/** Scope one-shot AppHost files to the command that owns their process lifecycle. */
-export async function executeWithDbOperationAppHost(
-  operation: DbOperation,
-  projectRoot: string,
-  workspaceMutator: Pick<
-    DatabaseWorkspaceMutator,
-    'materializeDbOperationAppHost' | 'removeDbOperationAppHost'
-  >,
-  execute: () => Promise<number>,
-): Promise<number> {
-  if (operation === 'studio') return await execute();
-  await workspaceMutator.materializeDbOperationAppHost(projectRoot);
-  try {
-    return await execute();
-  } finally {
-    await workspaceMutator.removeDbOperationAppHost(projectRoot);
-  }
+  });
 }
 
 /** Raise a typed exit error when the operation fails. */

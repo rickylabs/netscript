@@ -11,7 +11,6 @@ export const SCAFFOLD_DIRS = {
   SAGAS: 'sagas',
   TRIGGERS: 'triggers',
   DATABASE: 'database',
-  DB_OPERATION: 'db-operation',
   ASPIRE_TS: 'aspire',
   CONFIG: 'config',
   NETSCRIPT: '.netscript',

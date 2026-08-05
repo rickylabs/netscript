@@ -99,7 +99,6 @@ export interface PublicCommandDependencies {
   /** Dependencies for DB lifecycle commands. */
   readonly dbOperationDependencies: {
     readonly cwd: () => string;
-    readonly workspaceMutator: DatabaseWorkspaceMutator;
   };
   /** Dependencies for DB add. */
   readonly dbAddDependencies: {
@@ -258,7 +257,6 @@ export function createPublicCommandDependencies(
     uiInstallDependencies: { fs },
     dbOperationDependencies: {
       cwd: host.cwd,
-      workspaceMutator: databaseWorkspaceMutator,
     },
     dbAddDependencies: {
       fs,

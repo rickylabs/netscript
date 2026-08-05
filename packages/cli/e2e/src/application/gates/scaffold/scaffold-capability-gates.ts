@@ -1,5 +1,6 @@
 import type { PluginSuiteState } from '../../builders/scaffold/plugin-suite-state.ts';
 import { DATABASE, type DatabaseEngine } from '../../../domain/extension-axes.ts';
+import { GATE } from '../../../domain/cli-surface.ts';
 import type { GateDefinition } from '../../../domain/gate-definition.ts';
 import {
   createBehaviorPluginHealthGates,
@@ -22,17 +23,30 @@ export function createScaffoldCapabilityGates(
   state: PluginSuiteState,
   database: DatabaseEngine = DATABASE.POSTGRES,
 ): readonly GateDefinition[] {
+  const databaseGates = createDatabaseGates();
+  const offlineDatabaseGates = databaseGates.filter((gate) =>
+    gate.id === GATE.DATABASE_LIST || gate.id === GATE.DATABASE_CODEGEN
+  );
+  const residentDatabaseGates = databaseGates.filter((gate) =>
+    !offlineDatabaseGates.includes(gate)
+  );
+  const runtimeGates = createRuntimeGates(database);
+  const startIndex = runtimeGates.findIndex((gate) => gate.id === GATE.RUNTIME_ASPIRE_START);
+  if (startIndex < 0) throw new Error('runtime gates must include Aspire start');
+
   return [
     ...createPreflightGates(),
     ...createScaffoldGates(state),
     ...createUiAiGates(),
-    ...createDatabaseGates(),
+    ...offlineDatabaseGates,
     ...createGeneratedCheckGates(),
     ...createProjectBoundaryGates(),
     ...createBehaviorPluginUnhealthyGates(),
     ...createGeneratedPluginCheckGates(),
     ...createPluginRegistryGenerationGates(),
-    ...createRuntimeGates(database),
+    ...runtimeGates.slice(0, startIndex + 1),
+    ...residentDatabaseGates,
+    ...runtimeGates.slice(startIndex + 1),
     ...createBehaviorPluginHealthGates(),
     ...createOtelGates(),
     ...createCleanupGates(),

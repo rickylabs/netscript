@@ -390,7 +390,7 @@ describe('generateRegisterInfrastructure', () => {
     assertStringIncludes(output, "databases.set('mssql', mssql);")
   })
 
-  it('shares container database credentials across AppHost identities', () => {
+  it('persists container database credentials for resident AppHost restarts', () => {
     for (const Engine of ['Postgres', 'Mysql'] as const) {
       const name = Engine.toLowerCase()
       const output = generateRegisterInfrastructure({

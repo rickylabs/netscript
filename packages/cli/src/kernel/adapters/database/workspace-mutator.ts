@@ -207,36 +207,6 @@ export class DatabaseWorkspaceMutator {
     return written;
   }
 
-  /** Materialize the command-scoped AppHost used by one-shot DB operations. */
-  async materializeDbOperationAppHost(projectRoot: string): Promise<readonly string[]> {
-    const aspireDir = join(projectRoot, SCAFFOLD_DIRS.ASPIRE_TS);
-    if (!(await this.fs.exists(aspireDir))) return [];
-
-    const { config } = await parseAppSettings(join(projectRoot, SCAFFOLD_FILES.APPSETTINGS));
-    const files = await new HelpersGeneratorPipeline(this.templateAdapter).execute({
-      config,
-      configPath: `../${SCAFFOLD_FILES.APPSETTINGS}`,
-      generateAppHost: true,
-    });
-    const operationPrefix = `${SCAFFOLD_DIRS.DB_OPERATION}/`;
-    const written: string[] = [];
-    for (const file of files) {
-      if (!file.path.startsWith(operationPrefix)) continue;
-      const path = join(aspireDir, file.path);
-      if (await this.scaffolder.writeFile(path, file.content, true)) written.push(path);
-    }
-    return written;
-  }
-
-  /** Remove every command-scoped DB-operation AppHost artifact. */
-  async removeDbOperationAppHost(projectRoot: string): Promise<void> {
-    const operationDir = join(
-      projectRoot,
-      SCAFFOLD_DIRS.ASPIRE_TS,
-      SCAFFOLD_DIRS.DB_OPERATION,
-    );
-    if (await this.fs.exists(operationDir)) await this.fs.remove(operationDir);
-  }
 }
 
 function toConfigEngine(engine: DbEngine): 'Postgres' | 'Mysql' | 'Mssql' | 'Sqlite' {
