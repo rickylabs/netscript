@@ -6,19 +6,21 @@
 | --- | --- |
 | Run ID | `fix-zod-v4-npm-alignment-1295--1295` |
 | Branch | `fix/zod-v4-npm-alignment-1295` |
-| Current phase | `plan` |
+| Current phase | `implement` |
 | Archetype | cross-cutting manifests + Archetype 6 guard |
 | Scope overlays | none |
 
 ## Current State
 
-Live #1295 is reproduced on train baseline `44d2635e1`; plan is locked for RED guard then alignment.
+The graph guard is implemented and its negative controls pass. Against the unchanged train graph it
+fails with 21 findings: missing catalog, 18 inline JSR members, two lock instances, and the SDK's
+non-v4 oRPC import.
 
 ## Next Steps
 
-1. Commit/push plan and open draft PR against `canary/0.0.5-canary.13`.
-2. Record composed D6 PLAN-EVAL.
-3. Implement RED guard, then catalog/lock alignment.
+1. Commit and push the RED guard slice.
+2. Align root/member manifests and oRPC source.
+3. Regenerate the lock once and prove the same guard GREEN.
 
 ## Key Decisions
 

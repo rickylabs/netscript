@@ -53,6 +53,9 @@ Change Zod only in the root catalog, run `deno task deps:check`, and inspect the
 | Time | Slice | Step | Notes |
 | --- | --- | --- | --- |
 | 2026-08-05 | 0 | research | Reproduced three instances, violated peers, 18 member specifiers, and one non-v4 oRPC import. |
+| 2026-08-05 | 1 | negative controls | Four tests prove the aligned case and reject a second/v3 instance, JSR member specifier, and oRPC compatibility root. |
+| 2026-08-05 | 1 | RED | Live guard failed with 21 findings: catalog 1, member specifier 18, lock instance 1, oRPC surface 1. |
+| 2026-08-05 | 1 | reconcile | Draft PR #1315 targets `canary/0.0.5-canary.13`; issue scope and labels remain current. |
 
 ## Decisions
 
@@ -63,4 +66,7 @@ Change Zod only in the root catalog, run `deno task deps:check`, and inspect the
 
 ## Gate Results
 
-Pending implementation.
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| Guard predicate tests | PASS | 4 passed, 0 failed |
+| Live graph guard | EXPECTED FAIL | 21 precise findings on baseline graph |
