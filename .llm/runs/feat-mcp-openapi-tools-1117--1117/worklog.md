@@ -48,3 +48,13 @@ service. No hosted dependency, credential, fixed port, endpoint, service id, or 
 introduced.
 
 `deno.lock` remains the pre-existing modified file and is unstaged.
+
+## Composed evaluation
+
+- Hosted canary applicability required both `e2e-cli-gate` and `ci:full`; after the post-label push,
+  every substantive core and scaffold lane executed.
+- Hosted check-test, quality, deps-report, code-quality, surface diff, static scaffold, PostgreSQL
+  runtime, SQLite runtime, and desktop-native contexts passed.
+- `evaluate.md` records PASS composed per `milestone-run.md` (orchestrator waiver). Acceptance box 6
+  uses its issue-authored routing alternative: uncontrolled adoption remains #1140/#1090, while
+  this PR supplies a deterministic follow-the-generated-path runtime gate.
