@@ -153,4 +153,5 @@ jobs:
             .llm/tmp/cli-e2e-prod.ndjson
             .llm/tmp/quickstart-walk-prod-report.json
             .llm/tmp/quickstart-walk-prod.ndjson
+            ~/.aspire/logs/cli_*.log
           if-no-files-found: ignore

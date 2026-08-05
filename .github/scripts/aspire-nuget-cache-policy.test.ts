@@ -23,6 +23,11 @@ Deno.test('every Aspire runtime workflow persists the exact pinned NuGet package
   }
 });
 
+Deno.test('published E2E artifacts retain Aspire CLI diagnostics', async () => {
+  const workflow = await Deno.readTextFile('.github/workflows/e2e-cli-prod.yml');
+  assertStringIncludes(workflow, '~/.aspire/logs/cli_*.log');
+});
+
 function count(source: string, needle: string): number {
   return source.split(needle).length - 1;
 }
