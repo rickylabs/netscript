@@ -28,7 +28,7 @@ the Redis cache, and an example service all running together behind one dashboar
 By the end of this chapter you will have a real NetScript workspace named `my-shop/` on disk — with a
 shared `contracts/` workspace, a `products` service, a Fresh app, and a Postgres database — and you
 will have watched it boot under a single `aspire start`, with the Aspire dashboard live on
-`https://localhost:18888` and Postgres plus Redis reporting healthy.
+the runtime URL printed by Aspire and Postgres plus Redis reporting healthy.
 
 ## Before you begin
 
@@ -43,8 +43,11 @@ This is the first chapter, so the only prerequisites are a working local toolcha
 Install the NetScript CLI from JSR once:
 
 ```sh
-deno install --global --allow-all --name netscript jsr:@netscript/cli{{ releaseSpecifier }}
+deno install -g -A -f -n netscript --minimum-dependency-age=0 jsr:@netscript/cli{{ releaseSpecifier }}
 ```
+
+`--minimum-dependency-age=0` allows the pinned release to install on publication day, and `-f`
+replaces an older global `netscript` executable.
 
 Confirm it resolves and inspect the command groups:
 
@@ -52,13 +55,9 @@ Confirm it resolves and inspect the command groups:
 netscript --help
 ```
 
-You should see the public groups: `init`, `contract`, `db`, `deploy`, `generate`, `marketplace`,
-`plugin`, `service`, `ui:add`, and `ui:init`. If `netscript` is not found, make sure Deno's install
+You should see the public groups: `agent`, `config`, `contract`, `db`, `deploy`, `generate`, `init`,
+`marketplace`, `plugin`, `service`, and the `ui:*` group (`ui:list`, `ui:add`, `ui:update`, `ui:remove`). If `netscript` is not found, make sure Deno's install
 directory (printed by `deno install`) is on your `PATH`, then open a fresh terminal.
-
-{{ comp callout { type: "tip", title: "Prefer not to install globally?" } }}
-Run any command ad-hoc with <code>deno x jsr:@netscript/cli{{ releaseSpecifier }} &lt;command&gt;</code>. The rest of this track assumes the installed <code>netscript</code> form.
-{{ /comp }}
 
 ## Step 1 — Preview the scaffold with a dry run
 
@@ -113,7 +112,7 @@ Open `my-shop/` and you will find this shape:
     { name: "contracts/", comment: "Shared oRPC contracts, versioned under versions/v1/" },
     { name: "services/products/", comment: "The example oRPC service (src/main.ts, router.ts, routers/)" },
     { name: "plugins/", comment: "Plugin registry + manifests — empty until chapter 4" },
-    { name: "database/", comment: "Postgres workspace (Prisma schema + migrations) — initialized in chapter 2" },
+    { name: "database/", comment: "Postgres workspace (Prisma schema + migrations) — initialize before editing" },
     { name: "tests/", comment: "Workspace-level test suite scaffolded alongside the project" },
     { name: "aspire/", children: [
       { name: "apphost.mts", comment: "Entry point for aspire start" },
@@ -140,8 +139,7 @@ What each piece is for:
 - **`plugins/`** — where background capabilities (workers, sagas, triggers, streams) register. Empty
   until you add the sagas plugin in [chapter 4](/tutorials/storefront/04-checkout-saga/).
 - **`database/`** — the Postgres-backed database workspace: the Prisma schema and migrations that back
-  `context.db` in your handlers. You initialize it in
-  [chapter 2](/tutorials/storefront/02-catalog-service/) with `netscript db init`.
+  `context.db` in your handlers. You initialize it below before changing the catalog.
 - **`tests/`** — the workspace-level test suite scaffolded alongside the project. Extend it as you add
   handlers and contracts.
 - **`aspire/`** — the orchestrator. `aspire start` reads `apphost.mts` and starts every resource your
@@ -165,23 +163,31 @@ before any `netscript db` command.** Run it from the `aspire/` subfolder so the 
 ```sh
 cd aspire
 aspire restore   # once per machine: restores the Aspire SDK modules into .aspire/
-aspire start       # starts the AppHost and every declared resource
+deno task aspire:start   # starts the AppHost and every declared resource
 ```
 
-`aspire start` brings up the Postgres database, the Redis cache, and your `products` service
-together, then prints a URL and a one-time login token for the **Aspire dashboard**:
+`deno task aspire:start` — the wrapper the CLI's own printed next steps recommend, which sets a 300-second cold-start budget while container images download on first run — brings up the Postgres database, the Redis cache, and your `products` service
+together, then prints a URL and a one-time login token for the **Aspire dashboard**.
 
+In an interactive terminal, leave it running in this terminal — it is your storefront's control
+plane for the rest of the track. (If your terminal is not interactive, it detaches without printing a login token; resolve resource endpoints with `aspire describe --apphost ./apphost.mts --format Json --non-interactive --nologo`, or MCP `list_api_services`, rather than the dashboard.) Aspire assigns free ports at runtime, so use the URLs in the
+dashboard (or MCP `list_api_services`) instead of memorising a dashboard or app port.
+
+### Initialize the database before customising
+
+The Postgres container only exists while `aspire start` is running. Open a second terminal at the
+`my-shop/` project root and run:
+
+```sh
+netscript db init --name init
+netscript db generate
+netscript db seed
 ```
-https://localhost:18888
-```
 
-The dashboard lists every resource (`postgres`, `redis`, your service), live console logs, and
-distributed traces. Leave `aspire start` running in this terminal — it is your storefront's control
-plane for the rest of the track.
-
-{{ comp callout { type: "important", title: "Aspire is step 2 — database commands need it running" } }}
-The Postgres container only exists while <code>aspire start</code> is up. So <code>netscript db init</code>, <code>db generate</code>, and <code>db seed</code> must be run <strong>after</strong> Aspire has started — never before. You use them in <a href="/tutorials/storefront/02-catalog-service/">chapter 2</a>.
-{{ /comp }}
+`db init` creates and applies the initial migration, `db generate` produces the Prisma client and
+Zod model schemas, and `db seed` runs the generated seed script. A successful initialization proves
+the resource graph, connection string, Prisma schema, and migration path agree before chapter 2
+adds catalog behavior.
 
 ## Verify your progress
 
@@ -205,15 +211,21 @@ deno task check
 
 A clean check, plus a healthy `curl`, means the scaffold is sound.
 
-- [ ] `netscript --help` lists the public command groups.
-- [ ] `my-shop/` exists with `contracts/`, `services/products/`, `database/`, and `aspire/`.
-- [ ] `aspire start` is up; the dashboard at `https://localhost:18888` shows `postgres` and `redis`
+- [ ] `netscript --help` lists the public command groups (`agent`, `config`, `contract`, `db`, `deploy`, `generate`, `init`, `marketplace`, `plugin`, `service`, `ui:*`).
+- [ ] `my-shop/` exists with `contracts/`, `services/products/`, `database/`, `plugins/`, `aspire/`, and `tests/`.
+- [ ] `aspire start` is up; its printed dashboard URL (or MCP `list_api_services`) shows `products`, `postgres`, and `redis`
       healthy.
+- [ ] `netscript db init --name init` succeeded and the initial migration exists.
 - [ ] `curl http://localhost:3001/health` returns healthy JSON.
+- [ ] Opening the Fresh app URL from the dashboard (or MCP status) with `/design` appended renders the generated
+      design reference (it returns an HTTP 302 redirect to `/design/composition`, so scripted checks require `curl -L`).
 - [ ] `deno task check` passes with no errors.
 
+**Do not begin customising until every box is ticked.** An unverified base makes every later failure
+look like your code.
+
 {{ comp callout { type: "tip", title: "If something is not green" } }}
-Three quick checks cover most first-run snags: (1) is <code>aspire start</code> still up in its terminal, with <code>postgres</code> and <code>redis</code> healthy in the <a href="/explanation/aspire/">dashboard</a>? (2) is Docker running (<code>docker info</code>)? (3) did you <code>cd aspire</code> before <code>aspire start</code>, so it found <code>apphost.mts</code>? A failed <code>curl</code> usually means the service has not finished starting — give it a few seconds and retry.
+Three quick checks cover most first-run snags: (1) is <code>aspire start</code> still up in its terminal, with <code>postgres</code> and <code>redis</code> healthy in the <a href="/explanation/aspire/">dashboard</a>? (2) is Docker running (<code>docker info</code>)? (3) did you <code>cd aspire</code> before <code>aspire start</code>, so it found <code>apphost.mts</code>? Note that <code>aspire restore</code> / <code>start</code> can occasionally time out under heavy system load with <code>Failed to prepare: A task was canceled</code>; re-running the start command usually succeeds. If operating headlessly without a browser, inspect failure diagnostics via the MCP <code>get_recent_errors</code> or <code>list_api_services</code> tools rather than guessing process state.
 {{ /comp }}
 
 ## What you built
