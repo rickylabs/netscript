@@ -43,6 +43,8 @@ failing log, upstream trace, version comparison, and PR #1305 control evidence.
   versioned installer.
 - Assert exact CLI version, run doctor, and retain `~/.aspire/logs/cli_*.log`.
 - Extend the existing workflow semantic policy test.
+- Carry PR #1305 commit `cfce70af7` unchanged so its unrelated service-response assertion cannot
+  mask the five-run restore proof.
 - Push with an explicit refspec, dispatch five published-canary.10 workflows, and inspect all
   verdicts/logs.
 
@@ -82,6 +84,10 @@ failing log, upstream trace, version comparison, and PR #1305 control evidence.
 | Scoped TypeScript formatting       | PASS     | `.llm/tools/run-deno-fmt.ts` over the policy test |
 | Workflow syntax/Actions validation | PENDING  | GitHub workflow dispatch on pushed branch         |
 | Runtime acceptance                 | PENDING  | five consecutive published-canary greens          |
+
+The immutable-head proof is recorded in PR #1308's final structured IMPL comment instead of by a
+post-proof artifact commit: changing this run directory after the streak would itself change the
+head and invalidate the locked-head premise.
 
 ## Arch-Debt Implications
 

@@ -20,8 +20,9 @@ match the exact version, WSL state, component, and outcome.
 
 The branch pins the published-canary workflow to exact fixed daily CLI `13.5.0-preview.1.26404.10`,
 keeps the AppHost SDK at 13.4.6, adds exact-version/doctor preflight, reuses PR #1305 S1 log
-capture, and rejects its S2 cache/retry as insufficient. Local/static gates are green. Five
-consecutive published-canary workflows remain.
+capture, and rejects its S2 cache/retry as insufficient. Its independent service-response correction
+is carried unchanged so it cannot mask acceptance. Local/static gates are green. Five consecutive
+published-canary workflows remain.
 
 ## Evidence index
 
@@ -34,9 +35,10 @@ consecutive published-canary workflows remain.
 
 1. Commit owned files without `deno.lock`; explicit-refspec push the research branch.
 2. Open/update the harness draft PR as partial work referencing #1227 and superseding PR #1305 S2.
-3. Dispatch five `e2e-cli-prod` runs for published `0.0.5-canary.10` at one head.
+3. Dispatch five `e2e-cli-prod` runs serially for published `0.0.5-canary.10` at one head.
 4. Inspect exact version, both runtime suites, retained Aspire logs, and leak/termination behavior.
-5. Record run IDs/verdicts; only then mark implementation complete and hand to external IMPL-EVAL.
+5. Record run IDs/verdicts in PR #1308 without changing the tested head; only then mark
+   implementation complete and hand to external IMPL-EVAL.
 
 ## Drift and Debt
 
@@ -48,4 +50,6 @@ consecutive published-canary workflows remain.
 
 ## Commits
 
-- Pending first diagnosis/fix commit and explicit-refspec push.
+- `6c1cd6039` — root-cause evidence, fixed daily pin, and S1 log retention.
+- `94b23bf40` — reconcile final root-cause/handoff evidence.
+- `d985785ab` — carry PR #1305 service-scoped response correction without its cache/retry work.

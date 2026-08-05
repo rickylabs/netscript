@@ -73,3 +73,5 @@ N/A. This changes CI workflow infrastructure and harness evidence, not a package
 - Five consecutive workflow-dispatch runs of published `0.0.5-canary.10` on the fixed branch head.
 - Inspect every run's exact Aspire version, full scaffold verdict, Quickstart verdict, and retained
   Aspire logs/process termination evidence before calling the streak green.
+- Record the five IDs and verdicts in the final PR #1308 phase comment without changing the tested
+  branch head.
