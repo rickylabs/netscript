@@ -92,6 +92,7 @@ jobs:
 
       - name: Materialize pinned Aspire local package source
         run: |
+          aspire --version
           mkdir -p .llm/tmp/aspire-nuget-source
           find "$HOME/.nuget/packages" -name '*.nupkg' \
             -exec cp --update=none '{}' .llm/tmp/aspire-nuget-source/ \;

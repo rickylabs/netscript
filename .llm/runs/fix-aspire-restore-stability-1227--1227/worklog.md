@@ -49,3 +49,6 @@
 - 2026-08-05: run 30966413382 showed the cloud launcher is a real shim rather than a symlink, so
   resolving it still did not expose the payload. Replaced layout inference with an exact filename
   search bounded to `$HOME`; the job prints the discovered path. Proof streak remains 0/3.
+- 2026-08-05: run 30966481611 proved the managed bundle is not extracted at install time anywhere
+  under `$HOME`. Added an explicit pinned Aspire invocation before discovery so the self-extracting
+  tool materializes its bundled payload. Proof streak remains 0/3.

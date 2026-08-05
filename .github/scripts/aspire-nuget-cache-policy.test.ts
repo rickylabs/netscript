@@ -44,6 +44,7 @@ Deno.test('production E2E seeds and verifies every exact Aspire integration pack
   assertStringIncludes(workflow, 'needs: prepare-aspire-sdk-cache');
   assertStringIncludes(workflow, "steps.aspire-sdk-cache.outputs.cache-hit != 'true'");
   assertStringIncludes(workflow, 'Materialize pinned Aspire local package source');
+  assertStringIncludes(workflow, 'aspire --version');
   assertStringIncludes(workflow, "-name '*.nupkg'");
   assertStringIncludes(workflow, '-name aspire-managed');
   assertStringIncludes(workflow, 'find "$HOME" -type f -name aspire-managed');
