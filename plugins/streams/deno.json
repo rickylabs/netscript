@@ -22,7 +22,7 @@
     "@standard-schema/spec": "jsr:@standard-schema/spec@1.1.0",
     "hono": "jsr:@hono/hono@4.12.24",
     "hono/cors": "jsr:@hono/hono@4.12.24/cors",
-    "zod": "jsr:@zod/zod@4.4.3"
+    "zod": "catalog:"
   },
   "tasks": {
     "check": "deno check --unstable-kv mod.ts scaffold.ts cli.ts src/adapter/plugin.ts src/adapter/resources/mod.ts src/cli/composition/main.ts src/cli/adapters/*.ts src/e2e/mod.ts src/e2e/probes/*.ts src/aspire/mod.ts verify-plugin.ts services/src/main.ts services/src/proxy-headers.ts services/src/proxy.ts services/src/durability.ts",

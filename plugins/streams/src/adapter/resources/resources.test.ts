@@ -143,6 +143,9 @@ Deno.test({
         `${root}/deno.json`,
         JSON.stringify(
           {
+            catalog: {
+              zod: '^4.4.3',
+            },
             imports: {
               '@durable-streams/client': 'npm:@durable-streams/client@^0.2.6',
               '@durable-streams/state': 'npm:@durable-streams/state@^0.3.1',
@@ -156,7 +159,7 @@ Deno.test({
               '@tanstack/react-db': 'npm:@tanstack/react-db@^0.1.86',
               fresh: 'jsr:@fresh/core@^2.3.3',
               preact: 'npm:preact@^10.29.2',
-              zod: 'jsr:@zod/zod@4.4.3',
+              zod: 'catalog:',
             },
             compilerOptions: {
               strict: true,

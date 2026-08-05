@@ -17,7 +17,7 @@
     "@std/fs": "jsr:@std/fs@^1",
     "@std/path": "jsr:@std/path@^1",
     "@std/streams": "jsr:@std/streams@^1",
-    "zod": "jsr:@zod/zod@4.4.3"
+    "zod": "catalog:"
   },
   "compilerOptions": {
     "strict": true,

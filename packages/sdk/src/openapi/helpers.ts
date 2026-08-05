@@ -7,7 +7,7 @@
  */
 
 import { OpenAPIGenerator } from '@orpc/openapi';
-import { ZodToJsonSchemaConverter } from '@orpc/zod';
+import { ZodToJsonSchemaConverter } from '@orpc/zod/zod4';
 
 /**
  * Public OpenAPI document shape returned by the SDK.
