@@ -1,4 +1,4 @@
-# Context Pack: canonical Qwen 3.8 formal evaluator
+# Context Pack: phase-specific formal evaluator defaults
 
 ## Run Metadata
 
@@ -12,10 +12,11 @@
 
 ## Current State
 
-Issue #1331 is re-baselined against `origin/main` at `57c9b5ab3`. Research, plan, Design checkpoint,
-supervisor identity, context, and drift artifacts are complete. No implementation/config/model file
-has been edited. The run is at the hard PLAN-EVAL stop and requires a separate OpenRouter
-`qwen/qwen3.8-max` session.
+Issue #1331 is re-baselined against `origin/main` at `57c9b5ab3`, including the owner's later
+routing correction: canonical PLAN-EVAL remains Minimax M3 and canonical IMPL-EVAL moves to Qwen
+3.8. This run retains its explicitly allowed Qwen 3.8 PLAN-EVAL override. Research, revised plan,
+Design checkpoint, supervisor identity, context, and drift artifacts are complete. No
+implementation/config/model file has been edited. The run is at the hard PLAN-EVAL stop.
 
 ## Completed
 
@@ -26,17 +27,18 @@ has been edited. The run is at the hard PLAN-EVAL stop and requires a separate O
 - Audited tracked 3.7/Qwen references and canonical generation paths.
 - Locked three implementation slices and their focused/full/generated/live gates.
 - Recorded exact requested/observed Codex launch identity and owner-authorized route overrides.
+- Opened draft PR #1336 with labels, milestone 0.0.5, `Closes #1331`, and the planning phase comment.
+- Reconciled the post-bootstrap owner routing correction before PLAN-EVAL.
 
 ## In Progress
 
-- Draft PR creation and transition to formal PLAN-EVAL.
+- Formal PLAN-EVAL handoff.
 
 ## Next Steps
 
-1. Commit only `.llm/runs/chore-qwen-3-8-evaluator--1331/**`; exclude `deno.lock`.
-2. Push explicit refspec and open draft PR to `main` with `Closes #1331`, labels, milestone 0.0.5,
-   and plan phase comment.
-3. Launch a separate OpenRouter `qwen/qwen3.8-max` PLAN-EVAL session and require `PASS` in
+1. Commit and push the planning reconcile; exclude `deno.lock`.
+2. Update draft PR #1336 to reflect the corrected phase defaults.
+3. Launch the owner-overridden separate OpenRouter `qwen/qwen3.8-max` PLAN-EVAL session and require `PASS` in
    `plan-eval.md` before S1.
 4. After PASS, implement S1–S3 with gate → ordinary review → supervisor sign-off → push/comment per
    slice.
@@ -45,7 +47,8 @@ has been edited. The run is at the hard PLAN-EVAL stop and requires a separate O
 
 | Decision | Source | Notes |
 | -------- | ------ | ----- |
-| Exact formal evaluator id is `qwen/qwen3.8-max` | owner / issue #1331 | Both formal passes; separate sessions. |
+| Canonical phase defaults are PLAN→Minimax M3 and IMPL→Qwen 3.8 | latest owner correction | Requires phase-specific routing/presets. |
+| This run's PLAN-EVAL override is Qwen 3.8 | initial owner directive + correction | Separate from the later Qwen 3.8 IMPL-EVAL session. |
 | Generator is Codex GPT-5.6 Sol low/full access | owner / launch record | Observed identity matches request. |
 | Ordinary review temporarily uses Kimi K3 or Grok 4.5 | owner | Anthropic subscription exhausted until Saturday. |
 | Three sequential slices | `plan.md` / `worklog.md` | Shared central config makes parallel edits conflict-prone. |
@@ -64,7 +67,7 @@ has been edited. The run is at the hard PLAN-EVAL stop and requires a separate O
 | Plan | READY_FOR_PLAN_EVAL | `research.md`, `plan.md`, `worklog.md#design` |
 | Static | Planned | Concrete commands in `plan.md` |
 | Fitness | N/A unless package/plugin scope appears | Current non-package scope |
-| Runtime | Planned | Exact bounded Qwen 3.8 canary in S2 |
+| Runtime | Planned | Exact bounded Minimax and Qwen 3.8 canaries in S2 |
 | Consumer | Planned | Canonical Claude/consumer generators and checks in S3 |
 
 ## Open Questions
@@ -73,8 +76,8 @@ has been edited. The run is at the hard PLAN-EVAL stop and requires a separate O
 
 ## Drift and Debt
 
-- Drift: owner-authorized evaluator/reviewer overrides and unrelated dirty lockfile are recorded in
-  `drift.md`.
+- Drift: owner-authorized evaluator/reviewer overrides, the reconciled phase-default correction,
+  and unrelated dirty lockfile are recorded in `drift.md`.
 - Debt: none created; historical 3.7 debt/run attributions will be classified during final audit.
 
 ## Commits

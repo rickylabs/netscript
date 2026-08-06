@@ -1,4 +1,4 @@
-# Plan: canonical Qwen 3.8 formal evaluator
+# Plan: phase-specific formal evaluator defaults
 
 ## Run Metadata
 
@@ -27,15 +27,16 @@ no implementation lane self-certifies.
 
 ## Goal
 
-Make `qwen/qwen3.8-max` the single canonical formal PLAN-EVAL and IMPL-EVAL model across executable
-routing, allowlists, presets, guards, canaries, tests, harness/operator documentation, canonical
-skills, and generated mirrors, while rejecting stale 3.7 configuration and retaining the old id
-only in explicitly justified migration/history fixtures.
+Make formal evaluation phase-specific across executable routing, allowlists, presets, guards,
+canaries, tests, harness/operator documentation, canonical skills, and generated mirrors:
+PLAN-EVAL defaults to `minimax/minimax-m3`, IMPL-EVAL defaults to `qwen/qwen3.8-max`, and stale Qwen
+3.7 configuration is rejected. Retain the old id only in explicitly justified
+migration/history/rejection fixtures.
 
 ## Scope
 
 - Central Qwen/OpenRouter model id and approved-open-evaluator allowlist.
-- Formal evaluator preset identity and canonical route resolution.
+- Phase-specific formal evaluator preset identities and canonical route resolution.
 - Provider profile/runner/runtime guards and focused contract tests.
 - Static and bounded live provider-canary evidence for exact `qwen/qwen3.8-max`.
 - Harness evaluator/workflow docs, operator docs, canonical skills, and generated mirrors.
@@ -52,8 +53,8 @@ only in explicitly justified migration/history fixtures.
 
 ## Hidden Scope
 
-- Rename the versioned preset id as well as changing its model value; update all typed preset-id
-  unions and route assertions.
+- Add a Minimax evaluation preset distinct from its workflow-fanout preset, rename the Qwen
+  evaluator preset to 3.8, and update typed preset/lane unions and route assertions.
 - Update tests that intentionally pin literals, README illustrative allowlists, and runtime runner
   request guards.
 - Regenerate `.claude/skills` from `.agents/skills`; never edit the mirror directly.
@@ -66,13 +67,13 @@ only in explicitly justified migration/history fixtures.
 
 | ID | Decision | Rationale |
 | --- | -------- | --------- |
-| D1 | Canonical formal evaluator is exactly OpenRouter `qwen/qwen3.8-max`. | Owner decision and issue #1331 acceptance. |
+| D1 | Canonical PLAN-EVAL defaults to OpenRouter `minimax/minimax-m3`; canonical IMPL-EVAL defaults to OpenRouter `qwen/qwen3.8-max`. | Latest owner correction on issue #1331. |
 | D2 | Rename the formal preset to `claude-evaluator-qwen-3-8-max`; do not leave an active 3.7-named alias. | A stale versioned preset id is an active binding even if its model field changes. |
-| D3 | Keep Minimax M3 in the approved open-model set but bind formal evaluation only to Qwen 3.8. | Preserves current open-only policy while making Qwen 3.8 canonical. |
-| D4 | Stale `qwen/qwen3.7-max` must be rejected by formal route/preset guards and proven by a negative test. | Acceptance explicitly requires rejection, not merely absence. |
+| D3 | Introduce phase-specific canonical lanes (`formal_plan_evaluation`, `formal_impl_evaluation`) and a dedicated `claude-evaluator-minimax-m3` evaluation preset; do not overload the workflow-fanout preset. | The current phase-agnostic lane cannot encode two defaults; purpose/capability data must remain explicit. |
+| D4 | Stale `qwen/qwen3.7-max` must be rejected by IMPL-EVAL route/preset guards and proven by a negative test; cross-phase preset use must also fail. | Acceptance requires rejection and phase-safe defaults, not merely absence. |
 | D5 | Canonical skill sources change first; `.claude/skills` changes only via `agentic:sync-claude`. | Generated-mirror ownership contract. |
 | D6 | Dogfood consumer output is regenerated via `agentic:dogfood-skills` and audited, not hand-edited. | Generated-surface acceptance and repo tooling rules. |
-| D7 | Formal PLAN-EVAL and IMPL-EVAL are different OpenRouter Qwen 3.8 sessions; neither is this generator session. | Owner decision and hard harness invariant. |
+| D7 | This run uses the owner-authorized Qwen 3.8 PLAN-EVAL override and a separate Qwen 3.8 IMPL-EVAL session; repository defaults remain Minimax/Qwen by phase. Neither evaluator is this generator session. | Initial owner run directive, later issue correction, and hard harness invariant. |
 | D8 | Ordinary slice review uses owner-authorized OpenRouter Kimi K3 or Grok 4.5 while Anthropic is unavailable. | Temporary explicit routing override; formal evaluator route remains unchanged. |
 | D9 | The pre-existing `deno.lock` diff remains unstaged and unmodified. | Unrelated user state and lock hygiene. |
 
@@ -125,7 +126,7 @@ only in explicitly justified migration/history fixtures.
 
 | # | Slice and proof | Primary files | Proving gates |
 | - | --------------- | ------------- | ------------- |
-| S1 | Canonical model/preset/route contract: Qwen 3.8 is the only bound formal evaluator; stale 3.7 route/preset is rejected. | `.llm/tools/agentic/config/models.ts`; `runtime/provider-profiles.ts`; `runtime/routing-policy.ts`; `config/no-hardcoded-volatile_test.ts`; focused provider/routing tests; run artifacts | Focused Deno tests for config, provider profiles, routing policy, runner provider profiles; scoped check/lint/fmt wrappers for `.llm/tools/agentic`; raw Qwen/preset search; ordinary slice review |
+| S1 | Phase-specific model/preset/route contract: PLAN-EVAL resolves to Minimax M3, IMPL-EVAL resolves to Qwen 3.8, stale 3.7 and cross-phase presets are rejected. | `.llm/tools/agentic/config/models.ts`; `runtime/provider-profiles.ts`; `runtime/routing-policy.ts`; `config/no-hardcoded-volatile_test.ts`; focused provider/routing tests; run artifacts | Focused Deno tests for config, provider profiles, routing policy, runner provider profiles; scoped check/lint/fmt wrappers for `.llm/tools/agentic`; raw Qwen/preset search; ordinary slice review |
 | S2 | Runtime/canary/fixture proof: launch planners and provider canary accept exact 3.8 and current-output fixtures no longer assert active 3.7. | `runtime/cli/provider-canary*`; affected runner/canary/rollout tests; relevant `lib/__fixtures__`; run artifacts | Focused canary/runner tests; static provider canary; full agentic suite; bounded live exact-model canary; ordinary slice review |
 | S3 | Harness/docs/generated convergence: every canonical description and relevant generated mirror names 3.8, with only explicit migration/history exceptions. | `AGENTS.md`; `.llm/harness/**` evaluator/workflow/lesson/debt files as classified; `.llm/tools/agentic/README.md`; `.llm/tools/harness/extract-verdict.ts`; `.agents/skills/{netscript-harness,openhands-handoff}`; generated `.claude/skills/**`; audited `.agents/generated/consumer-skills/**`; run artifacts | `agentic:sync-claude`; `agentic:sync-claude:check`; `agentic:check-claude`; `agentic:dogfood-skills`; docs maintenance/focused checks; scoped wrapper gates; exact residue audit + exception ledger; ordinary slice review |
 
@@ -133,7 +134,7 @@ only in explicitly justified migration/history fixtures.
 
 | Order | Gate | Command or check | Expected result |
 | ----- | ---- | ---------------- | --------------- |
-| 1 | Focused config/policy | `deno test --no-lock -A .llm/tools/agentic/config/no-hardcoded-volatile_test.ts .llm/tools/agentic/runtime/provider-profiles_test.ts .llm/tools/agentic/runtime/routing-policy_test.ts .llm/tools/agentic/runtime/runner-provider-profiles_test.ts` | Exit 0; 3.8 accepted; stale 3.7 rejected. |
+| 1 | Focused config/policy | `deno test --no-lock -A .llm/tools/agentic/config/no-hardcoded-volatile_test.ts .llm/tools/agentic/runtime/provider-profiles_test.ts .llm/tools/agentic/runtime/routing-policy_test.ts .llm/tools/agentic/runtime/runner-provider-profiles_test.ts` | Exit 0; PLAN→Minimax and IMPL→3.8; stale 3.7 and cross-phase routes rejected. |
 | 2 | Focused canary | `deno test --no-lock -A .llm/tools/agentic/runtime/cli/provider-canary_test.ts` plus any affected rollout/provider tests | Exit 0 with exact preset/model identity. |
 | 3 | Agentic static quality | Scoped `run-deno-check.ts`, `run-deno-lint.ts`, and `run-deno-fmt.ts` over `.llm/tools/agentic --ext ts,tsx` | Exit 0 from mandatory wrapper verdict sources. |
 | 4 | Agentic suite | `deno test --no-lock -A .llm/tools/agentic/` | Exit 0. |
@@ -141,9 +142,9 @@ only in explicitly justified migration/history fixtures.
 | 6 | Generated Claude surface | `deno task agentic:sync-claude`; `deno task agentic:sync-claude:check`; `deno task agentic:check-claude` | Generated mirrors byte-current and Claude surface valid. |
 | 7 | Consumer generation | `deno task agentic:dogfood-skills`, then raw status/diff and Qwen audit of `.agents/generated/consumer-skills` | Canonical output regenerated; no unexplained Qwen 3.7. |
 | 8 | Docs | `deno task docs:maintenance` or the smallest equivalent focused docs/sync gates if unrelated baseline failures exist | Owned documentation and links/surfaces pass; any unrelated failure attributed. |
-| 9 | Exact live model | `deno task agentic:provider-canary --live --profile claude-openrouter --model qwen/qwen3.8-max --effort high --worktree /home/codex/repos/ns1331-qwen-evaluator` | Bounded turn succeeds and reports the exact requested/observed model. |
+| 9 | Exact live models | Run bounded `agentic:provider-canary --live` turns with explicit `claude-openrouter` profile, exact Minimax M3 and Qwen 3.8 model ids, high effort, and this worktree | Both phase-default models succeed and report exact requested/observed identity. |
 | 10 | Residue audit | Exact `git grep`/`rg` for `qwen/qwen3.7-max`, Qwen 3.7 prose, and `qwen-3-7` preset slug across tracked/current surfaces | Only explicit rejection/migration/history exceptions remain, each listed. |
-| 11 | Formal evaluation | Separate Qwen 3.8 PLAN-EVAL before S1; separate Qwen 3.8 IMPL-EVAL after all gates | `PASS` artifacts with distinct session ids and exact observed identity. |
+| 11 | Formal evaluation | This run: separate owner-overridden Qwen 3.8 PLAN-EVAL before S1; separate Qwen 3.8 IMPL-EVAL after all gates. Tests/canaries independently prove the canonical Minimax PLAN default. | `PASS` artifacts with distinct session ids and exact observed identity; phase-default route tests green. |
 
 `deno task quality:gate` is conditional and currently N/A; it becomes mandatory if any
 `packages/**` or `plugins/**` publishable code is touched, which requires rescope first.

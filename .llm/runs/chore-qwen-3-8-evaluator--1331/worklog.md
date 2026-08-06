@@ -1,4 +1,4 @@
-# Worklog: canonical Qwen 3.8 formal evaluator
+# Worklog: phase-specific formal evaluator defaults
 
 ## Run Metadata
 
@@ -17,18 +17,19 @@
 - `OPEN_EVALUATOR_MODEL_IDS` — approved open-only formal evaluator models.
 - `OPENROUTER_PRESET_IDS` / `OPENROUTER_PRESETS` — finite provider preset identity and capability
   contract.
-- `CANONICAL_ROUTE_POLICY` / `resolveCanonicalFormalEvaluatorRoute()` — formal evaluator binding
-  and enforcement.
+- `CANONICAL_ROUTE_POLICY` / phase-aware formal route resolver — PLAN/IMPL evaluator bindings and
+  enforcement.
 - `agentic:provider-canary` — static and explicitly opted-in live provider proof.
 - Harness evaluator protocols, lane policy, canonical skills, and generated mirrors — operator
   contract describing the executable route.
 
 ### Domain Vocabulary
 
-- `qwen/qwen3.8-max` — sole canonical Qwen formal evaluator id.
+- `minimax/minimax-m3` — canonical PLAN-EVAL default.
+- `qwen/qwen3.8-max` — canonical IMPL-EVAL default and this run's explicit PLAN-EVAL override.
 - `qwen/qwen3.7-max` — stale id permitted only in an explicit rejection/migration/history fixture.
 - `claude-evaluator-qwen-3-8-max` — canonical formal evaluator preset id.
-- `formal_evaluation` — canonical PLAN-EVAL/IMPL-EVAL lane.
+- `formal_plan_evaluation` / `formal_impl_evaluation` — phase-specific canonical lanes.
 - `open_only` — cost-protection policy for formal evaluator transports.
 - PLAN-EVAL / IMPL-EVAL / ordinary slice review — distinct session roles.
 
@@ -49,7 +50,7 @@
 
 | # | Slice | Gate | Files |
 | - | ----- | ---- | ----- |
-| 1 | Canonical model/preset/route contract and stale-value rejection | Focused config/provider/routing tests + scoped wrappers + review | Central config, provider profiles, routing policy, focused tests, run artifacts |
+| 1 | Phase-specific model/preset/route contract and stale/cross-phase rejection | Focused config/provider/routing tests + scoped wrappers + review | Central config, provider profiles, routing policy, focused tests, run artifacts |
 | 2 | Runtime/canary/current-fixture exact-model proof | Focused runner/canary tests + full agentic suite + static/live canary + review | Canary/runner modules and tests, current-output fixtures, run artifacts |
 | 3 | Harness/docs/skills/generated convergence and exact residue audit | Sync/Claude/consumer/docs gates + exact audit + review | Harness/operator docs, canonical skills, generated mirrors, classified history, run artifacts |
 
@@ -74,12 +75,14 @@ mirrors. Never patch generated mirrors or duplicate model literals in executable
 | 2026-08-06 | Bootstrap | Issue audit | Issue #1331 live scope/acceptance verified; milestone id 23. |
 | 2026-08-06 | Plan | Search audit | Found 30 direct 3.7 spellings in 17 tracked files plus active hyphenated preset ids. |
 | 2026-08-06 | Plan | Design checkpoint | Locked three test/generation-aware implementation slices; implementation not started. |
+| 2026-08-06 | Plan | Reconcile | Owner corrected canonical routing to PLAN→Minimax and IMPL→Qwen 3.8; plan revised before PLAN-EVAL. |
 
 ## Decisions
 
 | Decision | Reason | Source |
 | -------- | ------ | ------ |
-| Use Qwen 3.8 for both formal passes in distinct sessions | Owner directive and issue acceptance | mission / issue #1331 |
+| Canonical PLAN defaults to Minimax; canonical IMPL defaults to Qwen 3.8 | Latest owner correction | issue #1331 comment 5204854699 |
+| This run still uses separate Qwen 3.8 sessions for both passes | Explicit per-run override remains allowed by the correction | initial owner mission + correction |
 | Use Codex Sol low generator with full access | Owner directive and observed launch identity | `supervisor.md`; `codex-thread-ids.md` |
 | Use Kimi K3 or Grok 4.5 only for ordinary adversarial review | Anthropic subscription temporarily exhausted | owner directive |
 | Preserve unrelated lockfile diff | Worktree hygiene | raw Git status/diff |
@@ -89,6 +92,7 @@ mirrors. Never patch generated mirrors or duplicate model literals in executable
 | Drift | Severity | Logged in drift.md |
 | ----- | -------- | ------------------ |
 | Run routing differs from stale lane policy because #1331 changes that policy and Anthropic is unavailable | significant, owner-authorized | yes |
+| Owner corrected the canonical defaults after bootstrap to PLAN→Minimax and IMPL→Qwen 3.8 | significant, reconciled before PLAN-EVAL | yes |
 | Pre-existing `deno.lock` modification is unrelated | minor | yes |
 
 ## Gate Results
