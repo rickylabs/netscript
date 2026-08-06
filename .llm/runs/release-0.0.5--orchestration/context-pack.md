@@ -17,14 +17,14 @@ publish run 31051176983 and pinned E2E 31051492054, pending live re-verification
 as a current gate.
 
 The development train is `canary/0.0.5-canary.14`; #1315–#1318 target it. T1-A repaired #1315 at
-head `9f5ef7dcb`; its current-SHA hosted CI is green, while its implementation thread finishes the
-terminal handoff. Two premature Qwen attempts are ineligible under C-D10, so a single fresh formal
-evaluation remains pending. T1-B has the generic empty-Apps repair and isolated OTEL live proof in
+head `9f5ef7dcb`; its terminal implementation handoff is complete and current-SHA hosted CI is green.
+Two premature Qwen attempts are ineligible under C-D10; corrected formal Qwen session
+`f516aada-2a74-4dad-821e-b20963fe2983` is now evaluating that exact clean head. T1-B has the generic
+empty-Apps repair and isolated OTEL live proof in
 its worktree. Its first full runtime smoke reached Aspire cleanup but has no captured exit due C-D11,
 so the durable T1-B thread is rerunning the exact one-pass gate under C-D12. #1317/#1318 roll up
 green but require current-base merge gates after T1. Planned cuts are canary.14/.15/.16. Minimax
 PLAN and Qwen IMPL paid-transport canaries passed; routing state has no persisted fallback.
 
-Immediate next action: obtain terminal pushed handoffs from both T1 supervisors, launch one fresh
-Qwen evaluator per PR, record both IMPL-EVAL artifacts, then run the milestone pre-merge gate before
-either draft PR can advance.
+Immediate next action: record T1-A's formal verdict, obtain T1-B's terminal pushed handoff, launch
+its fresh Qwen evaluator, then run the milestone pre-merge gate before either draft PR can advance.
