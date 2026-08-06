@@ -41,6 +41,40 @@ Deno.test('parsePluginManifest accepts a known-good installer manifest', () => {
   assertEquals(result.manifest.scaffolder.export, './scaffold');
 });
 
+Deno.test('parsePluginManifest accepts third-party linking without officialSource', () => {
+  const result = parsePluginManifest({
+    schemaVersion: PLUGIN_MANIFEST_SCHEMA_VERSION,
+    name: '@acme/deploy-events',
+    version: '1.0.0',
+    displayName: 'Deploy events',
+    description: 'Fixture third-party plugin for declared host linking.',
+    peerDependencies: {},
+    capabilities: {
+      hasDatabaseMigrations: false,
+      hasRoutes: true,
+      hasBackgroundWorkers: false,
+    },
+    scaffolder: {
+      export: './scaffold',
+      requiredPermissions: { net: [], read: ['<workspaceRoot>'], write: ['<workspaceRoot>'] },
+    },
+    linking: {
+      canonicalName: 'deploy-events',
+      resourceConfigKey: 'event-relay',
+      consumers: {
+        services: ['catalog'],
+        apps: ['dashboard'],
+      },
+    },
+  });
+
+  assertEquals(result.ok, true);
+  if (!result.ok) return;
+  assertEquals(result.manifest.linking?.resourceConfigKey, 'event-relay');
+  assertEquals(result.manifest.linking?.consumers.services, ['catalog']);
+  assertEquals(result.manifest.officialSource, undefined);
+});
+
 Deno.test('parsePluginManifest accepts all shipped plugin manifests', async () => {
   for (const path of shippedManifestPaths) {
     const manifest = JSON.parse(await Deno.readTextFile(new URL(path, import.meta.url)));

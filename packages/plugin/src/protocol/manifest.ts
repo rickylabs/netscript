@@ -111,6 +111,30 @@ export interface PluginManifestOfficialSource {
   readonly pluginReferences?: readonly string[];
 }
 
+/** Named host resources that consume a plugin producer. */
+export interface PluginManifestLinkingConsumers {
+  /** Service configuration keys that receive the plugin reference. */
+  readonly services?: readonly string[];
+  /** App configuration keys that receive the plugin reference. */
+  readonly apps?: readonly string[];
+}
+
+/** Declarative resource-linking contract shared by first- and third-party plugins. */
+export interface PluginManifestLinking {
+  /** Stable plugin identity used to resolve declared plugin dependencies. */
+  readonly canonicalName: string;
+  /** Plugin resource configuration key exposed to consumers. */
+  readonly resourceConfigKey: string;
+  /** Optional background-processor configuration key owned by the plugin. */
+  readonly backgroundConfigKey?: string;
+  /** Canonical plugin dependencies resolved to their installed resource keys. */
+  readonly dependencies?: readonly string[];
+  /** Explicit plugin resource keys referenced by this producer. */
+  readonly pluginReferences?: readonly string[];
+  /** Named service and app resources that consume this producer. */
+  readonly consumers: PluginManifestLinkingConsumers;
+}
+
 /** Published `scaffold.plugin.json` contract consumed by NetScript installers. */
 export interface PluginInstallerManifest {
   /** Published protocol schema version. */
@@ -135,6 +159,8 @@ export interface PluginInstallerManifest {
   readonly provider?: PluginManifestProvider;
   /** Existing source metadata retained for first-party compatibility. */
   readonly officialSource?: PluginManifestOfficialSource;
+  /** Resource links reconciled generically for first- and third-party plugins. */
+  readonly linking?: PluginManifestLinking;
 }
 
 const permissionValuesSchema: z.ZodType<readonly string[]> = z.array(z.string().min(1)).readonly();
@@ -203,6 +229,22 @@ const officialSourceSchema: z.ZodType<PluginManifestOfficialSource> = z.object({
   pluginReferences: z.array(z.string().min(1)).readonly().optional(),
 }).strict();
 
+const linkingIdentifierSchema = z.string().min(1);
+
+const linkingConsumersSchema: z.ZodType<PluginManifestLinkingConsumers> = z.object({
+  services: z.array(linkingIdentifierSchema).readonly().optional(),
+  apps: z.array(linkingIdentifierSchema).readonly().optional(),
+}).strict();
+
+const linkingSchema: z.ZodType<PluginManifestLinking> = z.object({
+  canonicalName: linkingIdentifierSchema,
+  resourceConfigKey: linkingIdentifierSchema,
+  backgroundConfigKey: linkingIdentifierSchema.optional(),
+  dependencies: z.array(linkingIdentifierSchema).readonly().optional(),
+  pluginReferences: z.array(linkingIdentifierSchema).readonly().optional(),
+  consumers: linkingConsumersSchema,
+}).strict();
+
 /** Validation issue exposed by the plugin installer manifest schema. */
 export interface PluginInstallerManifestSchemaIssue {
   /** Path segments locating the invalid value. */
@@ -237,6 +279,7 @@ export const PluginInstallerManifestSchema: PluginInstallerManifestValidator = z
   postScripts: z.array(postScriptSchema).readonly().optional(),
   provider: providerSchema.optional(),
   officialSource: officialSourceSchema.optional(),
+  linking: linkingSchema.optional(),
 }).strict();
 
 /** Single validation issue returned by plugin manifest parsing. */

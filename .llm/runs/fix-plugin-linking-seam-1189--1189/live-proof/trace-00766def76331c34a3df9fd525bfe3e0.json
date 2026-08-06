@@ -1,0 +1,29 @@
+{
+  "traceId": "00766def76331c34a3df9fd525bfe3e0",
+  "hasError": false,
+  "request": {
+    "source": "catalog",
+    "kind": "Server",
+    "spanId": "819231b2d77516fb",
+    "url": "http://localhost:45965/api/v1/catalog/health/check",
+    "status": "200 OK"
+  },
+  "crossResourceClient": {
+    "source": "catalog",
+    "kind": "Client",
+    "spanId": "9c22af7526ff564a",
+    "parentSpanId": "4b09f9b23e1395bb",
+    "url": "http://localhost:46283/ping",
+    "status": "200 OK"
+  },
+  "crossResourceServer": {
+    "source": "fixture-api",
+    "kind": "Server",
+    "spanId": "c7935b1b03518da5",
+    "parentSpanId": "9c22af7526ff564a",
+    "url": "http://localhost:46283/ping",
+    "status": "200 OK"
+  },
+  "captureCommand": "aspire otel traces --dashboard-url https://localhost:44879 --trace-id 00766def76331c34a3df9fd525bfe3e0 --format json --limit 10",
+  "dashboardUrl": "https://localhost:44879/traces/detail/00766def76331c34a3df9fd525bfe3e0"
+}

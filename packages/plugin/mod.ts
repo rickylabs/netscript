@@ -94,6 +94,8 @@ export type {
   PluginInstallerManifestSchemaIssue,
   PluginInstallerManifestValidator,
   PluginManifestCapabilities,
+  PluginManifestLinking,
+  PluginManifestLinkingConsumers,
   PluginManifestOfficialSource,
   PluginManifestParseError,
   PluginManifestParseIssue,

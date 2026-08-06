@@ -1,1 +1,1 @@
-await Deno.writeTextFile(`${Deno.cwd()}/post-script-ran.txt`, 'ok\n');
+await Deno.writeTextFile(`${Deno.cwd()}/plugins/fixture/post-script-ran.txt`, 'ok\n');
