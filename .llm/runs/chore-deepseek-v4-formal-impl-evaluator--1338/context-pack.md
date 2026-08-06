@@ -8,7 +8,7 @@
 | Issue | #1338 |
 | Branch | `chore/deepseek-v4-formal-impl-evaluator-1338` |
 | Base | `canary/0.0.5-canary.14` @ `2508eb8c99c9cfc55e0c9f1d7ab72fea745db492` |
-| Phase | plan locked; awaiting independent PLAN-EVAL |
+| Phase | PLAN-EVAL passed; S1 implementation next |
 | Archetype | N/A — maintainer agentic tooling |
 | Overlay | docs / generated skills |
 
@@ -47,6 +47,9 @@ Make pending/future formal IMPL-EVAL resolve `deepseek/deepseek-v4-flash-0731` a
 
 ## Next gate
 
-The milestone orchestrator launches a fresh separate Minimax M3 high PLAN-EVAL against the exact
-pushed planning head using `plan-eval-prompt.md`. No implementation before `PASS`; this generator
-does not self-certify.
+Formal PLAN-EVAL passed in fresh separate Minimax M3 high session
+`a583f0da-69b3-4717-8271-bca95d9cd2db` against exact clean planning head
+`258034b1f9842bae781ca7e5eecffc2c61af13e4`; its complete verdict is `plan-eval.md`.
+Resume the same Codex GPT-5.6 Sol low supervisor thread for S1 only. The supervisor may implement
+and prove the typed preset/route slice but cannot certify its own work, launch formal evaluation,
+merge, publish, or touch `deno.lock`.

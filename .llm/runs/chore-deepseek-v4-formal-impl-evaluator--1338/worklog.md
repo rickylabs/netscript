@@ -57,3 +57,23 @@ Status: **LOCKED BY GENERATOR; NOT APPROVED**.
   `ef28b1b056705b456a66601ceeb46eede9def7b0`. Root and T1-B protected lock states were untouched.
 - Promoted launcher-owned `codex-thread-ids.md` into the planning evidence set. No route code or
   evaluator phase work was performed.
+
+## 2026-08-06 — Formal PLAN-EVAL PASS
+
+- Verified exact clean target `258034b1f9842bae781ca7e5eecffc2c61af13e4` across local HEAD,
+  authoritative remote branch, and PR #1339; base remained
+  `2508eb8c99c9cfc55e0c9f1d7ab72fea745db492` and `deno.lock` remained exact HEAD blob
+  `ef28b1b056705b456a66601ceeb46eede9def7b0`.
+- Launched a fresh, separate formal PLAN-EVAL session through the canonical OpenRouter runner:
+  session `a583f0da-69b3-4717-8271-bca95d9cd2db`, requested/observed model
+  `minimax/minimax-m3`, effort `high`, permission mode `bypassPermissions`, transport
+  `claude-openrouter`; provider-reported cost was not exposed and is `unavailable`.
+- The evaluator returned `PASS` and authorized implementation. Its complete stdout-authored body
+  is recorded verbatim in `plan-eval.md`; raw stream JSON remains in the gitignored
+  `.llm/tmp/ns1338-plan-eval-raw.txt`.
+- Lifecycle labels had already advanced from `status:plan` to `status:plan-eval` immediately before
+  evaluation; the evaluator's immutable body reflects the earlier planning metadata. This does not
+  alter its exact-head identity or verdict.
+- Next: advance issue/PR #1338/#1339 to `status:impl` and resume the same Codex supervisor thread
+  for S1 only. PLAN-EVAL remains Minimax M3 high; IMPL-EVAL remains pending as a future fresh
+  DeepSeek V4 Flash 0731 max session.

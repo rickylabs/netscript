@@ -30,7 +30,9 @@
 
 ## Formal gates
 
-- PLAN-EVAL: fresh separate OpenRouter Minimax M3 high session; pending.
+- PLAN-EVAL: **PASS** — fresh separate OpenRouter Minimax M3 high session
+  `a583f0da-69b3-4717-8271-bca95d9cd2db` against exact clean planning head
+  `258034b1f9842bae781ca7e5eecffc2c61af13e4`; bypass permissions; cost `unavailable`.
 - IMPL-EVAL: fresh separate OpenRouter DeepSeek V4 Flash 0731 max session; pending after implementation.
 - Merge and canary authority: milestone orchestrator only.
 
