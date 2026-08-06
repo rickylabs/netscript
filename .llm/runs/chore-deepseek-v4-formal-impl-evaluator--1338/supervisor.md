@@ -12,10 +12,26 @@
 | Branch | `chore/deepseek-v4-formal-impl-evaluator-1338` |
 | Baseline | `2508eb8c99c9cfc55e0c9f1d7ab72fea745db492` |
 
-Observed thread, route, remote-control proof, same-thread steering command, draft PR, cost, and tmux attach evidence are pending launch and must be appended from runtime evidence.
+## Observed supervisor launch
+
+| Field | Evidence |
+| --- | --- |
+| Thread/session | `019fd897-cf69-75d3-9e46-bb87cc62c226` |
+| Requested / observed route | OpenAI · `gpt-5.6-sol` · `low` / exact match |
+| Runtime | approval `never`; sandbox `dangerFullAccess`; native ext4 worktree |
+| Rollout | `/home/codex/.codex/sessions/2026/08/06/rollout-2026-08-06T21-40-55-019fd897-cf69-75d3-9e46-bb87cc62c226.jsonl` |
+| Same-thread steer | `codex exec resume 019fd897-cf69-75d3-9e46-bb87cc62c226 -- "<follow-up>"` |
+| Draft PR | #1339; `canary/0.0.5-canary.14` ← `chore/deepseek-v4-formal-impl-evaluator-1338` |
+| Bootstrap head | `cd3dc77cea5d9053d0b0a17b1d08121a67a36fa1` |
+| Remote/tmux | This app-server thread is observable by rollout/thread id. No tmux evidence was supplied. Formal Claude OpenRouter evaluator sessions are non-Remote-Control by design; no attachment is claimed. |
+| Cost | Not exposed to this supervisor session; recorded as `unavailable`, not inferred as zero. |
 
 ## Formal gates
 
 - PLAN-EVAL: fresh separate OpenRouter Minimax M3 high session; pending.
 - IMPL-EVAL: fresh separate OpenRouter DeepSeek V4 Flash 0731 max session; pending after implementation.
 - Merge and canary authority: milestone orchestrator only.
+
+No lane override or fallback is active. Ordinary opposite-family review remains separate from both
+formal evaluator sessions. This supervisor may generate the plan and later supervise slices, but it
+may not certify PLAN-EVAL or IMPL-EVAL.
