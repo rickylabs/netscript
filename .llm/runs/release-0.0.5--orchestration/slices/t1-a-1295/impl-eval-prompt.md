@@ -28,6 +28,10 @@ artifact on stdout for the orchestrator to record verbatim.
 - Train merge: `c1fb3bb6e5a421fb0db6393ac1b350e38441bd91`, integrating
   `canary/0.0.5-canary.14@2508eb8c99c9cfc55e0c9f1d7ab72fea745db492`
 - PR: #1315, draft, current lifecycle `status:impl-eval`
+- Generator terminal handoff: `task_complete` at 2026-08-06T15:47:57Z, exact clean local/remote/PR
+  head, all current-SHA hosted contexts terminal green, final line `DONE`
+- Ineligible prior evaluator attempts: `b329c804-2b7b-47b3-b109-84895f66f01d` and
+  `4b004c60-acae-4373-b7f7-56956b191156`; do not reuse or cite either partial trace
 - Issue: #1295; full one-instance collapse remains honestly deferred to #1320 because AG-UI and
   kvdex still require Zod 3
 - The milestone wave plan received separate Minimax M3 PLAN-EVAL PASS before this repair.

@@ -30,4 +30,6 @@
   unproven resources untouched.
 - Recovery brief: `recovery.md`, resumed on the same durable thread; the exact one-pass gate must be
   rerun before handoff.
+- C-D13 sender guard: an earlier supported recovery send already owned the rerun E2E tree; the later
+  redundant `recovery.md` sender was terminated without interrupting the owner or its subprocesses.
 - Status: implementation recovery active through supported same-thread resume

@@ -135,6 +135,19 @@ files.
   a single fresh Qwen evaluator may launch only after the implementation thread reaches a terminal
   handoff.
 
+## 2026-08-06 — T1-A terminal handoff and canonical IMPL-EVAL
+
+- The supported same-thread steering turn finished with `DONE`, clean local/remote/PR head
+  `9f5ef7dcb55668a6649c5451266908ad8e29b15c`, and current-SHA `SUCCESS` for close-gate,
+  check-test, quality, deps-report, code-quality, surface-diff, core CI lane visibility, and scaffold
+  lane visibility. No product change or evaluator launch occurred in that terminal verification.
+- Reconciled issue #1295 and PR #1315 to exactly one lifecycle label, `status:impl-eval`, retaining
+  `wave:v1` and their approved taxonomy.
+- Launched exactly one fresh corrected formal evaluator from the T1-A worktree through the supported
+  OpenRouter route: Qwen 3.8 Max high, bypass, session
+  `f516aada-2a74-4dad-821e-b20963fe2983`. The evaluator is read-only and targets exact clean head
+  `9f5ef7dcb55668a6649c5451266908ad8e29b15c`.
+
 ## 2026-08-06 — Single-writer and T1 recovery
 
 - Runtime inspection proved the initial app-server launch and the later tmux resume were concurrent
@@ -150,3 +163,6 @@ files.
 - Resumed T1-B's exact durable thread with `recovery.md`. It must rerun the complete one-pass
   `scaffold.runtime --cleanup --format pretty` command and finish its pushed implementation handoff
   before separate Qwen evaluation.
+- A preceding supported recovery send was already active on T1-B and owned the rerun E2E process
+  tree. Detected the redundant `recovery.md` sender, retained the earlier owner, and terminated only
+  the redundant sender process group without touching E2E or product state (C-D13).
