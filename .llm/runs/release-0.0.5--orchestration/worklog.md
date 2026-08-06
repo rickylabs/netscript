@@ -402,3 +402,19 @@ files.
   the colliding Windows service/port and three consecutive clean runtime passes remain an
   orchestrator evidence closure. Migration success must prove created files and applied DB state in
   TTY/headless modes rather than exit zero.
+
+## 2026-08-06 — W3 live preflight preparation
+
+- Re-read live #1326, #1102, #1197, and #1119 including #1197's owner measurement, hand-close, and
+  Wave 6 mechanical-attachment comments. Prepared non-dispatchable W3-A/B/C supervisor/preflight
+  artifacts; no implementation or GitHub state was created.
+- W3-A is held on W2-B's envelope and specifies a deterministic finite reconnect state machine,
+  bounded buffer/overflow/loss semantics, injected clock/backoff, real outage/recovery, and standard
+  OTEL rather than the current impossible “until reconnect” promise.
+- W3-B is held on W1-C attachment. Its code PR may close #1102 but only reference #1197; intent corpus
+  product acceptance and real-agent adoption measurement remain distinct. Available-tool count,
+  discovery-source calls, built-in-vs-hand-rolled ledger, and the 0.0.4 baseline comparison are
+  required before the orchestrator hand-closes #1197.
+- W3-C inventories active/generated/compatibility/history references before renaming AI provider
+  canaries to model-rollout terminology, preserving immutable historical evidence while reserving
+  unqualified canary language for release cuts.

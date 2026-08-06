@@ -80,3 +80,8 @@ W2 current-evidence preflights now live under `slices/w2-a-1325/`, `slices/w2-b-
 W2-B is the contract dependency for W3-A. W2-C explicitly prevents a code PR from closing #1202's
 owner-machine observational acceptance; it may close #1327 and reference #1202 while the
 orchestrator later captures the collision and three consecutive clean runtime passes.
+
+W3 preflights now live under `slices/w3-a-1326/`, `slices/w3-b-1102-1197/`, and
+`slices/w3-c-1119/`. W3-A remains held on W2-B; W3-B remains held on W1-C and reserves #1197 for an
+instrumented post-publish hand-close rather than a code PR; W3-C preserves active-versus-historical
+provenance during the model-rollout canary rename. None is dispatched.
