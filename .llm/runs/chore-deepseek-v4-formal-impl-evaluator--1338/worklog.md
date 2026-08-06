@@ -19,8 +19,8 @@
 - Inspected the active milestone artifacts read-only through branch
   `orchestrator/0.0.5-continuation` at `81d32354d...`: preserved T1-B Qwen PASS and locked a
   prospective fresh DeepSeek max handoff for pending T1-A after prerequisite landing.
-- Recorded the pre-existing foreign `deno.lock` diff. No planning command intentionally wrote it;
-  it will be excluded from staging and compared before/after the planning commit.
+- Initial lock provenance was recorded incorrectly and is superseded by the same-thread correction
+  below.
 - Wrote `research.md`, `plan.md`, and `plan-eval-prompt.md`; updated the resumable identity/state
   artifacts. No route code, tests, generated mirror, package/plugin source, evaluator launch,
   release action, or merge was performed.
@@ -38,3 +38,22 @@ Status: **LOCKED BY GENERATOR; NOT APPROVED**.
 - Package/plugin doctrine, JSR, release publication, and full CLI E2E are N/A unless scope drifts;
   drift requires a stop and rescope, not silent gate expansion.
 - A fresh separate Minimax M3 high PLAN-EVAL is the next hard gate. This session cannot approve it.
+
+## 2026-08-06 — Same-thread launch evidence correction
+
+- Corrected the first-launch account: it explicitly emitted Remote Control status `disabled`, so
+  thread `019fd897-cf69-75d3-9e46-bb87cc62c226` was phone-not-attached. No phone attachment is
+  claimed.
+- The milestone orchestrator ran the supported agentic runtime repair dry-run. It safely refused
+  mutation with status `blocked`, state `disconnected`, diagnostic `active_session`, because
+  foreign/other active sessions made repair unsafe.
+- Continued the same thread through the repository `codex-resume` tool and actual Codex CLI in tmux
+  session `ns1338-deepseek-supervisor`. Attach command:
+  `tmux attach-session -t ns1338-deepseek-supervisor`.
+- Cost remains `unavailable`, not zero.
+- Corrected lock provenance: this worktree was clean before launcher execution; the app-server
+  launch subprocess caused `deno.lock` resolution churn. After the supervisor turn, the milestone
+  orchestrator verified it unstaged and restored only this worktree lock to exact HEAD blob
+  `ef28b1b056705b456a66601ceeb46eede9def7b0`. Root and T1-B protected lock states were untouched.
+- Promoted launcher-owned `codex-thread-ids.md` into the planning evidence set. No route code or
+  evaluator phase work was performed.

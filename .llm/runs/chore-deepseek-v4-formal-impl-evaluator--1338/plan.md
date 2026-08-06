@@ -52,7 +52,7 @@ formal IMPL preset/default, and prove the exact DeepSeek route live before forma
 | D7 | Canonical code and prose change before generated mirrors. `.claude/skills` and consumer bundle are generator-owned and never hand-edited. | Repository ownership contract. |
 | D8 | Completed Qwen PASS evidence—including T1-B session `abe31571-0fa1-4ea4-9085-1c36ea14a5c7`—is immutable history. Active T1-A future prompt/default changes to fresh DeepSeek max only after this PR lands; previous Qwen attempts remain historical and ineligible/valid exactly as recorded. | A route policy change is prospective, not retroactive evidence invalidation. |
 | D9 | The active milestone artifacts live on a different orchestrator branch. This PR must not edit that worktree. S3 produces the exact convergence ledger; the orchestrator applies it after landing and owns all evaluator/merge/canary actions. | Cluster ownership and exclusive authority. |
-| D10 | `deno.lock` is excluded from every command’s intended writes and every pathspec staged. Snapshot its hash/diff before and after each mutating generator/gate. Any change from the opening foreign diff is a hard stop. | Explicit owner lock requirement. |
+| D10 | `deno.lock` is excluded from every command’s intended writes and every pathspec staged. Its clean baseline is exact HEAD blob `ef28b1b056705b456a66601ceeb46eede9def7b0`; snapshot identity before and after each mutating generator/gate and stop on any delta. | The launcher previously caused accidental resolution churn, which the orchestrator restored only in this worktree. |
 
 ## Open-decision sweep
 
@@ -74,7 +74,7 @@ formal IMPL preset/default, and prove the exact DeepSeek route live before forma
 | Broad replacement corrupts historical evidence. | Immutable path exclusions plus an exact retained-Qwen ledger reviewed before S3 sign-off. |
 | Generated surfaces drift or are hand-edited. | Canonical-first commits, repo-native sync/dogfood commands, parity checks, and generated diff audit. |
 | Other-branch milestone artifacts silently remain stale. | Exact path/line/action handoff recorded and acknowledged by the orchestrator before DeepSeek formal launch. |
-| Tests or generators mutate the foreign lock diff. | Hash/diff snapshots around each command; stop on delta; explicit pathspec staging excludes `deno.lock`. |
+| Tests, generators, or launchers mutate the clean lock. | Blob/hash snapshots around each command; stop on delta; explicit pathspec staging excludes `deno.lock`. |
 | A green suite is mistaken for review/evaluation. | Separate opposite-family slice review, fresh Minimax PLAN-EVAL, fresh DeepSeek IMPL-EVAL, and orchestrator-only launch records. |
 
 ## Commit slices
@@ -202,8 +202,9 @@ After S3, rerun the full focused/agentic/scoped/generated/docs gates above at th
    checked with linked evidence; prohibited-diff scan excluding run artifacts; named expensive
    gates `SUCCESS` rather than silence/skip/cancel; independent re-verification of the decisive
    route/canary claim; package/plugin changed-file audit; PR body matches shipped scope.
-4. Verify exact base/head/local/remote/PR equality, clean owned paths, zero `deno.lock` delta from the
-   opening foreign patch, no package/plugin changes, and a complete residue ledger.
+4. Verify exact base/head/local/remote/PR equality, clean owned paths, `deno.lock` still equals exact
+   HEAD blob `ef28b1b056705b456a66601ceeb46eede9def7b0`, no package/plugin changes, and a complete
+   residue ledger.
 5. A fresh separate DeepSeek max IMPL-EVAL reads the exact clean target and writes the formal verdict.
    The implementation supervisor does not launch or self-certify it.
 6. Only after IMPL-EVAL PASS may the orchestrator complete evidence mirroring, update PR lifecycle

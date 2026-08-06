@@ -23,7 +23,9 @@
 | Same-thread steer | `codex exec resume 019fd897-cf69-75d3-9e46-bb87cc62c226 -- "<follow-up>"` |
 | Draft PR | #1339; `canary/0.0.5-canary.14` ← `chore/deepseek-v4-formal-impl-evaluator-1338` |
 | Bootstrap head | `cd3dc77cea5d9053d0b0a17b1d08121a67a36fa1` |
-| Remote/tmux | This app-server thread is observable by rollout/thread id. No tmux evidence was supplied. Formal Claude OpenRouter evaluator sessions are non-Remote-Control by design; no attachment is claimed. |
+| Phone / Remote Control | **FAILED / NOT ATTACHED.** First launch explicitly emitted Remote Control status `disabled`. The supported agentic runtime repair dry-run returned status `blocked`, state `disconnected`, diagnostic `active_session`; foreign/other active sessions made repair unsafe. No phone attachment is claimed. |
+| Same-thread correction | Repository `codex-resume` tool driving actual Codex CLI, same thread `019fd897-cf69-75d3-9e46-bb87cc62c226`. |
+| tmux proof | Session `ns1338-deepseek-supervisor`; attach with `tmux attach-session -t ns1338-deepseek-supervisor`. |
 | Cost | Not exposed to this supervisor session; recorded as `unavailable`, not inferred as zero. |
 
 ## Formal gates
