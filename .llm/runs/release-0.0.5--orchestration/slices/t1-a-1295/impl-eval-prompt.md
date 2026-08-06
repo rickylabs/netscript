@@ -2,73 +2,92 @@ use harness
 
 ## SKILL
 
-Read the evaluated worktree's root `AGENTS.md`, `netscript-harness`, `netscript-pr`,
+Read and follow the current worktree root `AGENTS.md`, `netscript-harness`, `netscript-pr`,
 `netscript-tools`, `netscript-deno-toolchain`, `jsr-audit`, and `netscript-doctrine` completely.
-Read `.llm/harness/evaluator/protocol.md`, `evaluator/verdict-definitions.md`, the applicable A6 and
-package/dependency doctrine and gates, issue #1295, PR #1315, and every artifact under
-`.llm/runs/fix-zod-v4-npm-alignment-1295--1295/` before deciding a verdict.
+Read `.llm/harness/evaluator/protocol.md`, `verdict-definitions.md`, the A6/package-quality and
+applicable gate documents, issue #1295, PR #1315, and every tracked artifact in
+`.llm/runs/fix-zod-v4-npm-alignment-1295--1295/` before judging the change.
 
 ## Role
 
-You are the separate formal IMPL-EVAL session for NetScript milestone cluster T1-A. Run as
-OpenRouter `qwen/qwen3.8-max`, high effort, through the canonical `formal_impl_evaluation` route.
-The implementation author was Codex; you did not generate this patch. Work read-only: do not edit
-files, commit, push, comment, change labels, change issue acceptance, merge, publish, or start a
-second implementation agent. Emit the proposed tracked `evaluate.md` artifact on stdout for the
-milestone orchestrator to record verbatim.
+You are the formal separate-session IMPL-EVAL for milestone cluster T1-A. Run read-only as the
+canonical `formal_impl_evaluation` route: OpenRouter `qwen/qwen3.8-max`, high effort. The generator
+was Codex Sol low in thread `019fcd0c-9cda-7641-9479-3d1c72358154`; you are neither that generator
+nor the milestone orchestrator. Do not modify files, GitHub state, branches, issues, or PRs. You may
+run read-only and validation commands. Emit the proposed `evaluate.md` artifact on stdout for the
+orchestrator to record verbatim.
 
-## Evaluation target
+## Exact target
 
 - Worktree: `/home/codex/repos/ns005-streamdb`
 - Branch: `fix/zod-v4-npm-alignment-1295`
-- Expected evaluation head: `9f5ef7dcb55668a6649c5451266908ad8e29b15c`
-- Implementation commit: `ecd224243ea373e803c5165ba607f235d438f9c8`
-- Train integration commit: `c1fb3bb6e5a421fb0db6393ac1b350e38441bd91`
-- Base: `origin/canary/0.0.5-canary.14@2508eb8c99c9cfc55e0c9f1d7ab72fea745db492`
-- PR: <https://github.com/rickylabs/netscript/pull/1315>
-- Issue: <https://github.com/rickylabs/netscript/issues/1295>
-- Milestone wave PLAN-EVAL: PASS in separate Minimax session `567e3125-0fe9-4637-b0bb-30c20f9d3c26`
+- Expected head: `9f5ef7dcb55668a6649c5451266908ad8e29b15c`
+- Product repair commit: `ecd224243ea373e803c5165ba607f235d438f9c8`
+- Train merge: `c1fb3bb6e5a421fb0db6393ac1b350e38441bd91`, integrating
+  `canary/0.0.5-canary.14@2508eb8c99c9cfc55e0c9f1d7ab72fea745db492`
+- PR: #1315, draft, current lifecycle `status:impl-eval`
+- Issue: #1295; full one-instance collapse remains honestly deferred to #1320 because AG-UI and
+  kvdex still require Zod 3
+- The milestone wave plan received separate Minimax M3 PLAN-EVAL PASS before this repair.
 
-Fail closed if the checked-out or remote PR head differs from the expected head, the worktree is
-dirty, the branch is not the named PR branch, or current GitHub state cannot be read.
+Fail closed if the checked-out head/branch differs or the worktree is dirty before your own
+validation commands.
 
-## Required independent verification
+## Evaluation mission
 
-1. Audit the complete base-to-head diff and commit sequence. Confirm the repair is scoped to the
-   generic generated-root/catalog boundary and run evidence; `deno.lock` has no repair-slice diff;
-   no unrelated dependency/version churn, cache reload, force push, new ignore, `as unknown as`, or
-   `@ts-ignore` entered publishable source.
-2. Reproduce the decisive contract independently:
-   - standalone generated roots own the Zod catalog required by local-source packages;
-   - workspace members still use the single root npm catalog authority;
-   - portable member output does not emit a parent-only `catalog:` reference;
-   - the guard prevents the scaffold catalog from drifting from the repository root catalog.
-3. Re-run the emitted-sample gate and focused generator/project-loader/runtime-registry tests named
-   in the worklog. Verify the negative case is the original `Package 'zod' not found in catalog`,
-   not an unrelated failure, and that the GREEN covers every emitted sample/child-process path.
-4. Re-run scoped check, lint, and formatting wrappers for the changed CLI/tooling surface. Re-run
-   all six Zod guard controls plus the live guard, `deps:why`/`deno info` evidence, `deps:check`,
-   `quality:gate`, and docs accuracy. Confirm Anthropic, MCP, OpenAI, and zod-to-json-schema bind to
-   npm Zod 4.4.3 with no Zod-4 peer resolving to v3; the only remaining v3 parents are exactly the
-   documented AG-UI/kvdex boundary deferred to #1320.
-5. Run publish validation serially because it materializes catalogs temporarily: full
-   `publish:dry-run`, verify manifests/lock restore, then full-export `deno doc --lint` for every
-   affected published root. A static dry-run is package evidence, never canary publication.
-6. Re-query PR #1315 and issue #1295. Require all issue boxes and PR-delivered boxes to be supported
-   by cited evidence, latest current-SHA `close-gate` to exist and pass, required non-skipped gates
-   to report `SUCCESS`, zero unanswered review threads, and the PR body to match what shipped.
-   Pending GitHub checks mean the verdict cannot be `PASS` yet.
-7. Inspect orchestration drift C-D9: the inherited sender was created Sol low, but the active resume
-   turn ran Sol medium because the supported resume surface lacks an effort option. Report this
-   process drift explicitly. Judge the implementation against the approved plan and gates; do not
-   silently describe the author turn as low.
+Apply the evaluator protocol, not the generator's claims. Independently inspect the full PR diff
+against `origin/canary/0.0.5-canary.14`, current issue/PR bodies, acceptance evidence, run history,
+and current GitHub checks. Re-run the smallest complete set that proves the decisive claim, plus
+every package-quality/publish gate required by the approved plan. At minimum independently verify:
+
+1. `deno task check:emitted-samples` genuinely compiles every emitted sample and its negative case
+   was the missing child-root catalog, not a truncated/log-only inference.
+2. Focused generator/catalog/config/runtime-registry tests cover both generated standalone roots and
+   temporary consumer roots. Name the exact test counts.
+3. Scoped check/lint/fmt wrappers cover every changed TypeScript path with zero findings.
+4. Zod guard predicate tests and the live guard preserve exactly the documented residual v3 parents;
+   independently inspect `deno info`/`deno why` evidence so Anthropic, MCP, zod-to-json-schema, and
+   OpenAI do not bind a Zod-4 peer to Zod 3.
+5. `quality:gate`, docs accuracy, full affected export-map `deno doc --lint`, and `publish:dry-run`
+   are real passes. Run catalog-sensitive/publish simulation serially and confirm it restores
+   manifests and leaves no `deno.lock` diff.
+6. The PR diff introduces no publishable-source `deno-lint-ignore`, `@ts-ignore`, or
+   `as unknown as`; run artifacts are excluded from that scan.
+7. Every #1295 acceptance row and every PR checklist claim is backed by current evidence. Required
+   hosted contexts may remain pending while the PR is draft, but no failure may be hidden as
+   pending.
+
+## Adversarial focus
+
+- Decide whether `SCAFFOLD_WORKSPACE_CATALOG` is the honest generation seam or a second ungoverned
+  Zod version authority. The sync test must actually bind it to the repository authority.
+- Inspect `.llm/tools/validation/check-emitted-samples.ts`: copying catalog state into a test root
+  must not mask a product generator that omits required entries or falsely prove arbitrary catalog
+  dependencies.
+- Confirm standalone resource/member manifests remain portable and do not consume `catalog:` where
+  no generated root owns it.
+- Confirm no fixture-specific exception was added where a generic emitted-workspace seam owns the
+  behavior.
+- Judge whether the full `scaffold.runtime` smoke is genuinely non-applicable to this dependency/
+  generated-compile repair; if a changed path affects runnable scaffold output beyond manifest
+  compilation, require it rather than accepting a narrow substitute.
+- Reconcile any stale/inconsistent run metadata (including old D6 language or outdated next steps)
+  as a process finding if it would mislead the next operator.
 
 ## Output contract
 
-Use `.llm/harness/templates/evaluate.md`. Every PASS row needs concrete evidence: exact command and
-result, file/line or diff fact, GitHub check/review state, consumer path, or accepted debt entry.
-Include process verification, plan/slice alignment, doctrine/anti-pattern/fitness gates, testing,
-JSR/publishability, issue/PR closure truth, residual risk, and C-D9. End with exactly one formal
-verdict token: `PASS`, `FAIL_FIX`, `FAIL_RESCOPE`, or `FAIL_DEBT`, using the canonical definitions.
-Empty output or output without a verdict is a hard evaluator failure. Return only the proposed
-fenced Markdown artifact plus a one-line verdict summary; make no filesystem or GitHub mutations.
+Return exactly one verdict from `PASS`, `FAIL_FIX`, `FAIL_RESCOPE`, or `FAIL_DEBT`, with numbered
+findings and evidence for every PASS row. Empty output or output without a verdict token is a hard
+evaluator error. Provide a complete proposed Markdown artifact:
+
+```markdown
+# IMPL-EVAL — fix-zod-v4-npm-alignment-1295--1295
+
+...
+
+## Verdict
+
+`PASS|FAIL_FIX|FAIL_RESCOPE|FAIL_DEBT`
+```
+
+Do not write the file yourself. After the artifact, repeat the verdict token on the final line.
