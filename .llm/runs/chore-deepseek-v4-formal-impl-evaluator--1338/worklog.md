@@ -77,3 +77,68 @@ Status: **LOCKED BY GENERATOR; NOT APPROVED**.
 - Next: advance issue/PR #1338/#1339 to `status:impl` and resume the same Codex supervisor thread
   for S1 only. PLAN-EVAL remains Minimax M3 high; IMPL-EVAL remains pending as a future fresh
   DeepSeek V4 Flash 0731 max session.
+
+## 2026-08-06 — S1 typed formal-route contract
+
+### Preflight
+
+- Verified local HEAD, authoritative remote branch, and PR #1339 head were identical at
+  `3b5cfbc45298f62da5f2d354c375fc01c989c3ea`; PR base remained
+  `canary/0.0.5-canary.14`.
+- Verified HEAD, index, and worktree `deno.lock` all resolved exact blob
+  `ef28b1b056705b456a66601ceeb46eede9def7b0`; worktree was clean before S1 edits.
+
+### Implementation
+
+- Replaced the active formal IMPL evaluator preset with
+  `claude-evaluator-deepseek-v4-flash-0731` on `claude-openrouter`, model
+  `deepseek/deepseek-v4-flash-0731`, effort `max`, purpose `evaluation`.
+- Replaced Qwen with DeepSeek in `OPEN_EVALUATOR_MODEL_IDS`; formal PLAN remains exactly
+  `claude-evaluator-minimax-m3`, `minimax/minimax-m3`, effort `high`.
+- Updated the canonical routing-state renderer fixture and focused provider/routing contracts.
+- Added an explicit fail-closed regression for an otherwise canonical formal IMPL route whose
+  model is retired Qwen 3.8; retained the existing stale-Qwen-3.7 and cross-phase rejection tests.
+
+### Qwen S1 occurrence decisions
+
+- **Retain** `OPENROUTER_MODEL_IDS.qwen` in `config/models.ts`: current non-formal consumers still
+  use it for generic OpenHands dispatch/help and agentic command/fixture coverage. S1 does not
+  remove a valid generic model id.
+- **Remove** Qwen from `OPENROUTER_PRESET_MODELS`: no current non-formal consumer requires Qwen
+  membership in this finite active-preset registry, and the sole Qwen preset was the retired formal
+  evaluator. DeepSeek replaces that active preset-model slot.
+- **Retain rejection-only test occurrences**: `provider-profiles_test.ts` keeps Qwen as an
+  intentionally mismatched Minimax-preset model; `routing-policy_test.ts` keeps stale Qwen 3.7 and
+  retired Qwen 3.8 solely as fail-closed inputs. No active S1 route/preset resolves Qwen.
+- The complete repository-wide historical/generic residue ledger remains S3 scope and was not
+  started here.
+
+### Gate evidence and lock stop
+
+- Focused contracts:
+  `deno test --no-lock -A .llm/tools/agentic/config/no-hardcoded-volatile_test.ts .llm/tools/agentic/runtime/provider-profiles_test.ts .llm/tools/agentic/runtime/routing-policy_test.ts .llm/tools/agentic/runtime/cli/routing-state_test.ts`
+  → exit 0, 46 passed, 0 failed; lock unchanged.
+- First scoped check invocation omitted the wrapper child argument:
+  `deno run --no-lock --allow-read --allow-run .llm/tools/run-deno-check.ts --root .llm/tools/agentic --ext ts,tsx`
+  → type verdict green (149 files, 2 batches, 0 failed), but its spawned `deno check` resolved the
+  lock from `ef28b1b...` to `e66d0339...`. The supervisor stopped immediately; lint/fmt, artifact
+  edits, staging, commit, and push did not run.
+- The milestone orchestrator inspected and attributed the unstaged delta to that scoped-check
+  subprocess, then restored only this prerequisite worktree lock to exact HEAD blob `ef28b1b...`.
+  Root and T1-B protected locks remained untouched.
+- Corrected scoped check:
+  `deno run --no-lock --allow-read --allow-run .llm/tools/run-deno-check.ts --root .llm/tools/agentic --ext ts,tsx --deno-arg --no-lock`
+  → spawned `deno check --unstable-kv --no-lock`; exit 0, 149 files, 2 batches, 0 failed, 0
+  occurrences; lock unchanged.
+- Scoped lint:
+  `deno run --no-lock --allow-read --allow-run .llm/tools/run-deno-lint.ts --root .llm/tools/agentic --ext ts,tsx`
+  → exit 0, 149 files, 1 batch, 0 findings; lock unchanged.
+- Scoped fmt first reported one owned formatting finding in `runtime/routing-policy.ts`; a
+  mechanical line-wrap repair was applied. Rerun:
+  `deno run --no-lock --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root .llm/tools/agentic --ext ts,tsx`
+  → exit 0, 149 files, 1 batch, 0 failed, 0 findings; lock unchanged.
+- Final S1 lock identity before staging: HEAD/index/worktree
+  `ef28b1b056705b456a66601ceeb46eede9def7b0`.
+
+S1 automated gates are green, but S1 is **not reviewed or self-certified**. No ordinary review,
+formal evaluation, Actions, S2/S3, merge, canary, publication, or issue closure was launched.

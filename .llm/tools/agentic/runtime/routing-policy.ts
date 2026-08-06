@@ -89,7 +89,9 @@ export interface EffortEscalation {
 
 const MAJOR_UI_UX_PRESET = OPENROUTER_PRESETS['claude-design-glm-5-2'];
 const FORMAL_PLAN_EVALUATOR_PRESET = OPENROUTER_PRESETS['claude-evaluator-minimax-m3'];
-const FORMAL_IMPL_EVALUATOR_PRESET = OPENROUTER_PRESETS['claude-evaluator-qwen-3-8-max'];
+const FORMAL_IMPL_EVALUATOR_PRESET = OPENROUTER_PRESETS[
+  'claude-evaluator-deepseek-v4-flash-0731'
+];
 
 /** Canonical machine-readable route bindings rendered by the harness lane-policy document. */
 export const CANONICAL_ROUTE_POLICY: readonly CanonicalRoutePolicy[] = [

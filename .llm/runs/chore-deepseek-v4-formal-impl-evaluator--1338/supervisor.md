@@ -36,6 +36,21 @@
 - IMPL-EVAL: fresh separate OpenRouter DeepSeek V4 Flash 0731 max session; pending after implementation.
 - Merge and canary authority: milestone orchestrator only.
 
+## S1 implementation handoff
+
+- Exact starting local/remote/PR head: `3b5cfbc45298f62da5f2d354c375fc01c989c3ea`.
+- Scope: six typed source/focused-test files plus owned run evidence; no S2/S3 surface.
+- Automated evidence: focused tests 46 passed/0 failed; lockless scoped check 149 files/2 green
+  batches; scoped lint 149 files/0 findings; scoped fmt 149 files/0 findings after one owned
+  mechanical repair.
+- Lock incident: the first scoped-check child lacked `--no-lock` and changed the unstaged lock. The
+  supervisor stopped; the milestone orchestrator attributed the delta and restored only this
+  worktree. Corrected check spawned `deno check --unstable-kv --no-lock`.
+- Current required lock identity: HEAD/index/worktree
+  `ef28b1b056705b456a66601ceeb46eede9def7b0`.
+- Review status: pending. No ordinary review or formal evaluation was launched, and this supervisor
+  does not self-certify S1.
+
 No lane override or fallback is active. Ordinary opposite-family review remains separate from both
 formal evaluator sessions. This supervisor may generate the plan and later supervise slices, but it
 may not certify PLAN-EVAL or IMPL-EVAL.

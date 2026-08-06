@@ -45,3 +45,16 @@ Prior #1331 run artifacts and completed 0.0.5 Qwen evaluator evidence are immuta
   repository `codex-resume` and actual Codex CLI in tmux session `ns1338-deepseek-supervisor`.
   Attach with `tmux attach-session -t ns1338-deepseek-supervisor`. Cost remains `unavailable`, not
   zero.
+
+## D-6 — Scoped check child resolved the lock without `--no-lock`
+
+- Date: 2026-08-06
+- Observation: the wrapper invocation itself used `deno run --no-lock`, but its spawned
+  `deno check --unstable-kv` did not. The type verdict was green while the subprocess changed this
+  worktree lock from `ef28b1b...` to `e66d0339...`.
+- Resolution: the supervisor stopped before further gates or staging. The milestone orchestrator
+  inspected/attributed the delta and restored only this prerequisite worktree lock to exact HEAD
+  blob `ef28b1b056705b456a66601ceeb46eede9def7b0`; root and T1-B protected lock states were
+  untouched. The supported rerun added `--deno-arg --no-lock`, visibly spawned
+  `deno check --unstable-kv --no-lock`, passed, and preserved lock identity. All later S1 gates also
+  preserved it.
