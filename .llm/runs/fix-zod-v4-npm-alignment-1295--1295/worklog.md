@@ -95,3 +95,39 @@ Change Zod only in the root catalog, run `deno task deps:check`, and inspect the
 | Canary.14 RED evidence | PASS | pre-repair `check:emitted-samples` exit 1: standalone temp root lacked the catalog required by local workspace sources |
 | Canary.14 child-project proof | PASS | 40 emitted samples from 30 artifact paths compile after the generic root-catalog repair |
 | Lock hygiene | PASS | publish simulator restored manifests; `deno.lock` has no repair-slice diff |
+
+## Implementation Handoff — 2026-08-06
+
+- Commits: train merge `c1fb3bb6e5a421fb0db6393ac1b350e38441bd91`; repair
+  `ecd224243ea373e803c5165ba607f235d438f9c8` (`fix(cli): give child workspaces a zod catalog`).
+- Repair files:
+  - `.llm/tools/validation/check-emitted-samples.ts`
+  - `packages/cli/src/kernel/adapters/config/project-config-loader_test.ts`
+  - `packages/cli/src/kernel/constants/scaffold/scaffold-app-catalog.ts`
+  - `packages/cli/src/kernel/constants/scaffold/scaffold-app-catalog_test.ts`
+  - `packages/cli/src/kernel/templates/workspace/deno-json.ts`
+  - `packages/cli/src/kernel/templates/workspace/generators_test.ts`
+  - `packages/cli/src/public/features/generate/plugins/installed-runtime-registry-integration_test.ts`
+  - this run's `context-pack.md`, `drift.md`, and `worklog.md`
+- Local gates:
+  - `deno task check:emitted-samples`: PASS, 40 samples / 30 artifact paths
+  - focused four-file `deno test --allow-all`: PASS, 37/37
+  - scoped check/lint/fmt wrappers over `packages/cli` and `.llm/tools/validation`: PASS,
+    824 files, zero diagnostics/findings
+  - Zod guard tests/live task: PASS, 6/6 and only the documented AG-UI/kvdex v3 parents
+  - three `deno info` adapter graphs: PASS, Anthropic/MCP/OpenAI/zod-to-json-schema bind to
+    Zod 4.4.3 with no peer-to-3 warning
+  - `quality:gate`, `docs:accuracy`, full 19-root export-map doc-lint, and
+    `publish:dry-run`: PASS; accepted baseline warnings only
+  - acceptance mirror dry-run, close-gate, and review-thread gate: PASS/no changes, PASS, PASS
+  - lock hygiene: PASS, no `deno.lock` repair diff
+- PR state observed at repair SHA `ecd224243ea373e803c5165ba607f235d438f9c8`: #1315 is
+  ready (not draft), targets `canary/0.0.5-canary.14`, and has exactly one lifecycle label,
+  `status:impl-eval`. Current-SHA code-quality, close-gate, classify, deps-report, and lane visibility
+  jobs were running; no current-SHA failure was reported. Required contexts remain honestly pending
+  in the PR checklist.
+- Remaining risk: GitHub's required current-SHA contexts and the orchestrator-owned formal Qwen
+  IMPL-EVAL have not completed. No local functional, dependency-graph, publish, documentation, or
+  lock-hygiene risk remains known.
+
+READY_FOR_QWEN_IMPL_EVAL
