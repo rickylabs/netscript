@@ -117,5 +117,5 @@ Preservation note for resume: T1-B remains at exact local/remote/PR head `31b898
 worktree currently contains the old 20-add/25-delete `deno.lock` patch. The working patch and
 protected stash `7eb4ed16d...` are byte-identical at hash `cfc68984...`. Treat both as unowned; do
 not stage, restore, pop, drop, or overwrite either. T1-A is clean at exact local/remote/PR head
-`18c7a7e79`; the orchestration branch is pushed at `48b1e5eac` with only root's unrelated
-`deno.lock` unstaged.
+`18c7a7e79`; the blocked-state audit base was pushed at `48b1e5eac`. In the orchestration worktree,
+only root's unrelated `deno.lock` remains unstaged after the harness-only preservation record.
