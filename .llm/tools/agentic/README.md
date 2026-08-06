@@ -166,7 +166,7 @@ POSTs it. Dispatch exactly one trigger per intended run — OpenHands cancels ov
 ```bash
 # Dry-run (no token, no network) — see the exact comment that would post:
 deno run --allow-read .llm/tools/agentic/openhands/dispatch-openhands.ts \
-  --pr 86 --prompt-file <win-path> --model openrouter/qwen/qwen3.7-max \
+  --pr 86 --prompt-file <win-path> --model openrouter/qwen/qwen3.8-max \
   --output pr-comment --provider openrouter --effort xhigh --dry-run --pretty
 ```
 

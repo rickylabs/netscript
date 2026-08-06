@@ -84,6 +84,10 @@ mirrors. Never patch generated mirrors or duplicate model literals in executable
 | 2026-08-06 | S2 | Gate | Corrected focused set passed 98/98; full agentic suite passed 416/416; scoped check/lint/fmt reported zero findings; static canary passed all six presets. |
 | 2026-08-06 | S2 | Live canary | Separate exact Minimax PLAN and Qwen 3.8 IMPL routes passed bounded live provider canaries with explicit evaluator presets. |
 | 2026-08-06 | S2 | Review | OpenRouter Grok 4.5 identified a residual direct-canary proof gap; pre-spawn mismatch rejection and `presetId` evidence were added; re-review `PASS` with no remaining findings. |
+| 2026-08-06 | S3 | Converge | Updated harness/evaluator/lane/docs/skills to PLAN→Minimax and IMPL→Qwen 3.8; regenerated canonical Claude mirrors; audited the consumer dogfood surface. |
+| 2026-08-06 | S3 | Gate | Docs maintenance, Claude sync/surface checks, 417/417 agentic tests, 149-file scoped wrappers, static provider canary, and diff check passed. |
+| 2026-08-06 | S3 | Residue audit | Widened slash/space/hyphen audit leaves exactly seven 3.7 occurrences across five paths, all explicit rejection or historical evidence. |
+| 2026-08-06 | S3 | Review | OpenRouter Grok 4.5 found one missed hyphenated active site-plan reference; migrated it and widened the audit; re-review `PASS` with complete exception ledger. |
 
 ## Decisions
 
@@ -124,6 +128,9 @@ mirrors. Never patch generated mirrors or duplicate model literals in executable
 | S2 focused runtime set | focused runtime/provider/canary/fixture modules, `deno test --no-lock -A` | PASS (98/98) | Includes no-spawn mismatch rejection and exact `presetId` evidence. |
 | Agentic suite | `deno task agentic:test` | PASS (416/416) | First run exposed one hardcoded model literal; fixed before the passing rerun. |
 | Agentic scoped check/lint/fmt | repo wrappers over `.llm/tools/agentic` | PASS | 149 files; zero failures or findings. |
+| Final agentic suite | `deno test --no-lock -A .llm/tools/agentic/` | PASS (417/417) | Includes all final routing, guard, canary, and stale-route tests. |
+| Generated/docs convergence | sync/check/Claude surface/docs maintenance | PASS | 18 skills, 22 mirrors; 102 docs, zero broken links/anchors; docs accuracy PASS. |
+| Exact residue audit | tracked slash/space/hyphen Qwen 3.7 plus old preset/lane patterns | PASS_WITH_EXCEPTIONS | Seven occurrences/five paths, all itemized in `s3-evidence.md`. |
 
 ### Fitness Gates
 
@@ -143,7 +150,7 @@ mirrors. Never patch generated mirrors or duplicate model literals in executable
 | Consumer | Result | Evidence | Notes |
 | -------- | ------ | -------- | ----- |
 | Claude skill mirror | NOT_RUN | Planned S3 | Generator-owned. |
-| Dogfood consumer bundle | NOT_RUN | Planned S3 | Currently contains no formal evaluator binding. |
+| Dogfood consumer bundle | PASS (audited) | `s3-evidence.md` | Generator completed; no evaluator/Qwen binding; unrelated environment/version churn excluded. |
 
 ## Handoff Notes
 

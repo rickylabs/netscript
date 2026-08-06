@@ -33,13 +33,13 @@ is cleared to implement S1–S3. No implementation/config/model file has yet bee
 
 ## In Progress
 
-- S3 canonical documentation, skill, generated-mirror, and exact residue convergence.
+- Final commit/push/PR handoff at `READY_FOR_IMPL_EVAL`.
 
 ## Next Steps
 
-1. Complete S3 docs/skills/generated convergence and exact 3.7 residue classification.
-2. Run final gates and ordinary adversarial review.
-3. Commit/push/comment S3 and stop at `READY_FOR_IMPL_EVAL`; formal IMPL-EVAL remains separate.
+1. Commit and explicitly push the reviewed S3 slice without `deno.lock`.
+2. Update PR #1336 phase evidence and move issue/PR status to IMPL-EVAL.
+3. Stop at `READY_FOR_IMPL_EVAL`; formal IMPL-EVAL remains a separate Qwen 3.8 session.
 
 ## Key Decisions
 
@@ -63,10 +63,10 @@ is cleared to implement S1–S3. No implementation/config/model file has yet bee
 | Gate family | Current status | Evidence |
 | ----------- | -------------- | -------- |
 | Plan | PASS | `plan-eval.md`, raw transcript, session `815534c7-6c02-4aa5-ab86-a905a0bade6f` |
-| Static | S1/S2 PASS; final S3 rerun pending | S1 52/52; S2 98/98; agentic 416/416; scoped wrappers clean |
+| Static | PASS | S1 52/52; S2 98/98; final agentic 417/417; scoped wrappers clean |
 | Fitness | N/A unless package/plugin scope appears | Current non-package scope |
 | Runtime | PASS | Exact bounded Minimax and Qwen 3.8 canaries in `s2-evidence.md` |
-| Consumer | Planned | Canonical Claude/consumer generators and checks in S3 |
+| Consumer | PASS | Claude mirrors synchronized/validated; consumer dogfood audited with no evaluator binding |
 
 ## Open Questions
 

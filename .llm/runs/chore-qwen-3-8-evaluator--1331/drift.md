@@ -38,3 +38,17 @@ Drift is append-only.
   has started, so no rescope or code rework is required.
 - **Evidence:** issue comment URL `https://github.com/rickylabs/netscript/issues/1331#issuecomment-5204854699`;
   planning reconcile commit following `708e3d55b`.
+
+## 2026-08-06 — Consumer dogfood refresh produced unrelated generated churn
+
+- **What:** The required `agentic:dogfood-skills` audit refreshed tracked consumer documentation,
+  CLI version/worktree-specific MCP configuration, and a newly generated consumer tool bundle.
+- **Source:** Current local CLI dogfood generator output.
+- **Expected:** Audit the consumer surface for evaluator/Qwen bindings and synchronize any relevant
+  canonical mirror.
+- **Actual:** The consumer surface has no evaluator/Qwen binding; all generated differences were
+  unrelated to issue #1331 and included absolute worktree/version churn.
+- **Severity:** minor
+- **Action:** Exclude the unrelated consumer-generated differences from S3; retain the successful
+  dogfood execution and zero-binding audit as evidence.
+- **Evidence:** `s3-evidence.md`; raw Git status/diff immediately after dogfood generation.
