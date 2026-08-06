@@ -39,4 +39,6 @@
 - Terminal implementation handoff: clean local/remote/PR head
   `53d6c278d01a1b7ce967078ce94db619a5d8f4a8`; product/evidence commit
   `e6c429f4527e02f1dfa8886f0ff66311bbc5a299`
-- Status: corrected separate-session IMPL-EVAL pending launch
+- Formal IMPL-EVAL route: OpenRouter `qwen/qwen3.8-max`, high, bypass
+- Canonical evaluator session: `bd9e6431-23ac-4473-b331-3bc22333bf2e`
+- Status: corrected separate-session IMPL-EVAL active

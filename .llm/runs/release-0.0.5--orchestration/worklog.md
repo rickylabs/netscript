@@ -181,3 +181,7 @@ files.
   `scaffold.runtime --cleanup --format pretty` rerun at 73 passed / 0 failed / raw exit 0.
 - Worktree and root lock are clean; protected stash `7eb4ed16d...` remains unchanged; no owned
   AppHost/container survived and foreign/unproven resources were untouched. PR #1316 remains draft.
+- Reconciled issue #1189 and PR #1316 to exactly one lifecycle label, `status:impl-eval`, without
+  mutating the issue's observational checkbox. Launched the fresh read-only Qwen 3.8 Max high
+  evaluator at exact clean head `53d6c278d...`, session
+  `bd9e6431-23ac-4473-b331-3bc22333bf2e`.
