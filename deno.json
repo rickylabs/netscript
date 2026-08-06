@@ -80,6 +80,8 @@
     "docs:accuracy": "deno run --no-lock --allow-read --allow-env --allow-run=deno .llm/tools/docs/check-accuracy-and-discoverability.ts",
     "docs:maintenance": "deno task docs:links && deno task docs:accuracy && deno task agentic:sync-claude:check && deno task agentic:check-claude",
     "agentic:smoke-claude-remote": "deno run --no-lock --allow-read --allow-run .llm/tools/agentic/claude/claude-remote-smoke.ts --env-aware --pretty",
+    "agentic:claude-openrouter": "deno run --no-lock --allow-read --allow-run --allow-env --allow-sys --allow-net=127.0.0.1,api.anthropic.com,openrouter.ai .llm/tools/agentic/claude/remote-model-launcher.ts",
+    "agentic:claude-hybrid": "deno run --no-lock --allow-read --allow-write=/tmp --allow-run=claude --allow-env .llm/tools/agentic/claude/hybrid-launcher.ts",
     "agentic:codex-resume": "deno run --no-lock --allow-read --allow-run .llm/tools/agentic/codex/codex-resume.ts",
     "agentic:codex-status": "deno run --no-lock --allow-run .llm/tools/agentic/codex/codex-status.ts",
     "agentic:codex-watch": "deno run --no-lock --allow-read --allow-run --allow-env .llm/tools/agentic/codex/codex-watch.ts",

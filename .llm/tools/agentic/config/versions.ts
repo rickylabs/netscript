@@ -13,6 +13,12 @@
  *  - TEST    — value-only expected versions used by controller unit tests.
  */
 
+export const HYBRID_MCP_PROTOCOL_VERSION = '2025-06-18';
+export const HYBRID_MCP_SERVER_VERSION = 'hybrid-v1';
+export const HYBRID_ATTACHMENT_TIMEOUT_MS = 20_000;
+export const HYBRID_ATTACHMENT_POLL_MS = 100;
+export const HYBRID_CLAUDE_TERMINATION_GRACE_MS = 1_000;
+
 /** TARGET: Node.js version the WSL foundation installs and the doctor expects. */
 export const NODE_TARGET_VERSION = '26.5.0';
 

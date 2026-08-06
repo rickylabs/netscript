@@ -49,10 +49,21 @@ export const NATIVE_CANARY_MODEL_ARGS = {
  */
 export const OPENROUTER_MODEL_IDS = {
   minimax: 'minimax/minimax-m3',
-  qwen: 'qwen/qwen3.7-max',
+  qwen: 'qwen/qwen3.8-max',
   glm: 'z-ai/glm-5.2',
   grok: 'x-ai/grok-4.5',
+  deepseekV4Flash0731: 'deepseek/deepseek-v4-flash-0731',
 } as const;
+
+/** OpenRouter models approved for explicit Claude hybrid delegation. */
+export type HybridDelegationModelId = typeof OPENROUTER_MODEL_IDS.deepseekV4Flash0731;
+export const HYBRID_DELEGATION_MODEL_IDS: readonly HybridDelegationModelId[] = [
+  OPENROUTER_MODEL_IDS.deepseekV4Flash0731,
+] as const;
+
+/** Default OpenRouter worker for Claude hybrid delegation. */
+export const HYBRID_DELEGATION_DEFAULT_MODEL: HybridDelegationModelId =
+  OPENROUTER_MODEL_IDS.deepseekV4Flash0731;
 
 /** Open models approved for formal evaluation without paid closed-model routing. */
 export const OPEN_EVALUATOR_MODEL_IDS: readonly [

@@ -9,15 +9,15 @@ against the changed state, not to continue implementation.
 **Evaluator surface (local vs cloud).** The invariant never changes: the generator session is never
 the evaluator session, and no lane self-certifies. The transport is how that invariant is realized.
 
-- **Local run (the default for harness work).** PLAN-EVAL/IMPL-EVAL runs in a separate **local**
-  session on the **Claude Code + OpenRouter** transport (`claude-openrouter` provider profile,
-  driven via `claude-print`) with the bound **OPEN-model Qwen evaluation preset** —
-  `qwen/qwen3.7-max`. Minimax M3 remains in the approved open-model set but its current local preset
-  is workflow-fanout, not evaluation. An open model is neither Claude-family nor Codex-family, so it is adversarial to **both** generators.
+- **Local run (the default for harness work).** PLAN-EVAL and IMPL-EVAL run in separate **local**
+  sessions on the **Claude Code + OpenRouter** transport (`claude-openrouter` provider profile,
+  driven via `claude-print`). PLAN-EVAL binds `claude-evaluator-minimax-m3`
+  (`minimax/minimax-m3`); IMPL-EVAL binds `claude-evaluator-qwen-3-8-max`
+  (`qwen/qwen3.8-max`). An open model is neither Claude-family nor Codex-family, so it is adversarial to **both** generators.
   **Closed/paid models (Claude/GPT/Gemini) are prohibited on this lane** — they burn paid OpenRouter
   credit. The **supervisor** triggers it; a sub-agent never auto-dispatches an evaluator.
 - **Cloud run.** OpenHands remains the default automated cloud agent, under its existing rules:
-  **open models only (minimax M3 / Qwen 3.7), cloud-driven runs only; dispatching it with a closed
+  **open models only (Minimax M3 / Qwen 3.8 Max), cloud-driven runs only; dispatching it with a closed
   model (Claude/GPT/Gemini) is prohibited — it burns paid OpenRouter credit.**
 - **Ordinary (non-formal) review** — the slice review gate, code/PR review — remains
   **opposite-family Claude ⇄ Codex**: a Codex session reviews Claude-authored work, a Claude session
@@ -29,13 +29,13 @@ by both transports.
 
 **Capability (verified, drift D-4 amended).** The evaluator lane is fully capable on this transport:
 both approved open models return a **real reasoning trace** and have a **verified agentic turn**
-(they make real tool calls through Claude Code), so the bound Qwen evaluator **can run gates** and
-its `effort` is genuine — not nominal.
+(they make real tool calls through Claude Code), so both phase-bound evaluators **can run gates**
+and their `effort` is genuine — not nominal.
 
 | Model on Claude Code + OpenRouter | Reasoning trace | Agentic turn |
 | --------------------------------- | --------------- | ------------ |
 | `minimax/minimax-m3`              | yes             | supported    |
-| `qwen/qwen3.7-max`                | yes             | supported    |
+| `qwen/qwen3.8-max`                | yes             | supported    |
 | `z-ai/glm-5.2` (design lane only) | **none**        | —            |
 
 The missing-reasoning problem is **GLM-specific, not a client-wide gap**: only GLM 5.2 over
