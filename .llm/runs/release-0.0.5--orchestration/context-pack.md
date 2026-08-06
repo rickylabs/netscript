@@ -24,9 +24,11 @@ generic empty-Apps repair and isolated OTEL live proof at clean pushed head `53d
 one-pass runtime rerun is 73/73 with raw exit 0, while the first interrupted attempt remains
 diagnostic-only under C-D12. T1-B Qwen session `bd9e6431-23ac-4473-b331-3bc22333bf2e` launched from a
 stale pre-adjudication prompt and is permanently ineligible under C-D15; its exact process group was
-terminated before verdict. Corrected formal Qwen session
-`228b3382-c868-472b-8066-0af93d2ed01e` is evaluating exact clean head `53d6c278d` from the pushed
-checked-row contract. #1317/#1318 roll up green but require current-base merge gates after T1.
+terminated before verdict. Corrected session `228b3382-c868-472b-8066-0af93d2ed01e` was later
+failed closed under C-D17 when duplicate-root consolidation severed its output wrapper. The sole
+admissible T1-B evaluator is Qwen high session `abe31571-0fa1-4ea4-9085-1c36ea14a5c7`, launched
+from exact clean head `53d6c278d` through checked-in `openrouter-run.ts` with `deno run --no-lock`.
+#1317/#1318 roll up green but require current-base merge gates after T1.
 Planned cuts are canary.14/.15/.16. Minimax PLAN and Qwen IMPL paid-transport canaries passed;
 routing state has no persisted fallback.
 

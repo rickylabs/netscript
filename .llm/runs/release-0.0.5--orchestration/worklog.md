@@ -213,3 +213,18 @@ files.
   acceptance rows, and both review-thread gates pass with 0 unanswered. #1315's executed current-SHA
   hosted contexts are green; #1316's hosted contexts remain draft-policy skipped, so its independent
   local runtime evaluation is still the decisive gate.
+
+## 2026-08-06 — single-writer enforcement and T1-B evaluator restart
+
+- Detected the retained tmux root client issuing evaluator polls concurrently with this app-server
+  turn. Terminated only that duplicate Codex client. The tmux/phone surface no longer displays an
+  actual Codex CLI, so root observability is recorded failed/not-attached rather than substituted.
+- The client termination severed T1-B evaluator `228b3382-c868-472b-8066-0af93d2ed01e`'s wrapper
+  and orphaned its Claude process. Failed that session closed, terminated its exact process group,
+  and excluded its partial output from verdict evidence under C-D17.
+- The interrupted evaluator had caused a 20-add/25-delete `deno.lock` diff. Re-verified branch
+  `fix/plugin-linking-seam-1189`, head `53d6c278d...`, protected stash `7eb4ed16d...`, and patch hash
+  `6f706f8f...`; restored only that evaluator-caused worktree diff and confirmed zero status entries.
+- Relaunched the exact corrected prompt once through the checked-in agentic OpenRouter runner with
+  `deno run --no-lock`: Qwen 3.8 Max high, bypass, session
+  `abe31571-0fa1-4ea4-9085-1c36ea14a5c7`. This is the sole admissible T1-B evaluator session.
