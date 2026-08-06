@@ -170,3 +170,14 @@ files.
   Terminated only that newest process group before it could own work (C-D14). The original recovery
   sender remains the sole T1-B writer; #1189's observational runtime checkbox stays unchecked until
   orchestrator adjudication after separate evaluation.
+
+## 2026-08-06 — T1-B terminal implementation handoff
+
+- The recovered durable thread completed with `DONE` at clean local/remote/PR head
+  `53d6c278d01a1b7ce967078ce94db619a5d8f4a8`; product/runtime evidence is commit
+  `e6c429f4527e02f1dfa8886f0ff66311bbc5a299`.
+- Decisive generator evidence: real HTTP 500 RED, HTTP 200 catalog→fixture GREEN, correlated trace
+  `00766def76331c34a3df9fd525bfe3e0`, focused 17 tests / 42 steps, and the exact one-pass
+  `scaffold.runtime --cleanup --format pretty` rerun at 73 passed / 0 failed / raw exit 0.
+- Worktree and root lock are clean; protected stash `7eb4ed16d...` remains unchanged; no owned
+  AppHost/container survived and foreign/unproven resources were untouched. PR #1316 remains draft.

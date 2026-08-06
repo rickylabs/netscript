@@ -26,7 +26,8 @@ stdout for the orchestrator to record verbatim.
 
 - Worktree: `/home/codex/repos/ns005-cachetiers`
 - Branch: `fix/plugin-linking-seam-1189`
-- Expected head: `e6c429f4527e02f1dfa8886f0ff66311bbc5a299`
+- Expected head: `53d6c278d01a1b7ce967078ce94db619a5d8f4a8`
+- Product and runtime-evidence commit: `e6c429f4527e02f1dfa8886f0ff66311bbc5a299`
 - Train merge: `ca8f1c76b`, integrating
   `canary/0.0.5-canary.14@2508eb8c99c9cfc55e0c9f1d7ab72fea745db492`
 - PR: #1316, draft, lifecycle must be `status:impl-eval` before launch
