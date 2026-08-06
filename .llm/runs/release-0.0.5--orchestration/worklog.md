@@ -382,3 +382,23 @@ files.
   fail-closed measurement, discovery-source telemetry, provider-valid history normalization, and
   real OpenRouter attachment/resume. Its real-provider gates and formal evaluator remain additionally
   held by the same external OpenRouter limit.
+
+## 2026-08-06 — W2 live preflight preparation
+
+- Re-read live #1325, #1329, #1202, and #1327 including #1202's owner diagnosis/scope amendment.
+  Prepared non-dispatchable supervisor/preflight artifacts for W2-A/B/C; no branch, worktree,
+  lifecycle, PR, resource, or agent mutation occurred. Every lane is held behind the verified C14
+  green pair and the fresh canary.15 train.
+- Applied the Aspire operating contract to require isolated AppHosts, exact resource/health/log/OTEL
+  evidence, exact-AppHost cleanup, and no foreign-resource mutation. Applied Fresh 2.x guidance to
+  W2-B's generated/native EventSource consumer rather than allowing deprecated or parallel consumer
+  conventions.
+- W2-A carries RED generated-output behavior, both Redis/Garnet and Deno KV, real background health,
+  and a shared/enumerated KV-runtime invariant rather than another triggers-only import patch.
+- W2-B is contract-first: one exported versioned SSE envelope governs server, generated/Fresh
+  consumer, docs, replay/error semantics, and W3C/correlation propagation, with a real end-to-end
+  Aspire trace and public package gates. W3-A remains dependent on it.
+- W2-C separates code and observational authority. Its PR may close #1327 but only reference #1202;
+  the colliding Windows service/port and three consecutive clean runtime passes remain an
+  orchestrator evidence closure. Migration success must prove created files and applied DB state in
+  TTY/headless modes rather than exit zero.

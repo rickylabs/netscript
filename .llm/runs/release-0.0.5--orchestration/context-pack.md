@@ -74,3 +74,9 @@ W1 live issue and code-surface preflights are also prepared under `slices/w1-a-1
 cap and post-inherited-train dependency. No W1 branch/worktree/lifecycle/PR/agent mutation has been
 performed. W1-C's real OpenRouter MCP/resume receipts and every cluster's formal Qwen evaluator are
 explicitly held by the current provider limit rather than weakened to mocks or substituted routes.
+
+W2 current-evidence preflights now live under `slices/w2-a-1325/`, `slices/w2-b-1329/`, and
+`slices/w2-c-1202-1327/`. They are held behind the verified C14 green pair and fresh canary.15 train.
+W2-B is the contract dependency for W3-A. W2-C explicitly prevents a code PR from closing #1202's
+owner-machine observational acceptance; it may close #1327 and reference #1202 while the
+orchestrator later captures the collision and three consecutive clean runtime passes.
