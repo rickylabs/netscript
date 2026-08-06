@@ -2,39 +2,51 @@
 
 ## Run Metadata
 
-| Field | Value |
-| --- | --- |
-| Run ID | `fix-zod-v4-npm-alignment-1295--1295` |
-| Branch | `fix/zod-v4-npm-alignment-1295` |
-| Current phase | `implement` |
-| Archetype | cross-cutting manifests + Archetype 6 guard |
-| Scope overlays | none |
+| Field          | Value                                       |
+| -------------- | ------------------------------------------- |
+| Run ID         | `fix-zod-v4-npm-alignment-1295--1295`       |
+| Branch         | `fix/zod-v4-npm-alignment-1295`             |
+| Current phase  | `implement`                                 |
+| Archetype      | cross-cutting manifests + Archetype 6 guard |
+| Scope overlays | none                                        |
 
 ## Current State
 
-The branch is integrated with `canary/0.0.5-canary.14@2508eb8c9`. Standalone generated workspace
-roots now own the Zod catalog required by local-source packages, while portable generated member
-manifests keep explicit npm specifiers. The former `check:emitted-samples` RED is green, the focused
-child-process suite passes, and the rescoped two-instance graph remains unchanged.
+The branch is integrated with `canary/0.0.5-canary.14@2508eb8c99c9cfc55e0c9f1d7ab72fea745db492`.
+Formal Qwen IMPL-EVAL session `f516aada-2a74-4dad-821e-b20963fe2983` returned `FAIL_FIX` against
+product head `9f5ef7dcb55668a6649c5451266908ad8e29b15c`: npm Zod exposed 70 new `private-type-ref`
+diagnostics and the detached Fresh streams fixture could not resolve `catalog:zod`. Repair commit
+`b29879e9468d4c154bc67beb1cbe430984f8290c` keeps concrete Zod schemas private for composition and
+publishes package-owned structural validators. The exact 19-root comparison is now at or below
+canary.14 for every root, `check:streams-types` is green through a fixture-owned npm catalog and is
+a root CI dependency, and the rescoped two-instance Zod boundary is unchanged.
 
 ## Next Steps
 
-1. Commit and explicitly push the coherent child-workspace repair.
-2. Reconcile PR #1315 metadata and record current-SHA check state.
-3. Hand off for the orchestrator-owned Qwen IMPL-EVAL.
+1. Commit the corrected run/PR evidence and push both repair commits by explicit refspec.
+2. Reconcile draft PR #1315 at `status:impl`; required current-SHA contexts remain pending until
+   GitHub reports them.
+3. Hand off for a fresh orchestrator-owned Qwen IMPL-EVAL session.
 
 ## Key Decisions
 
-| Decision | Source | Notes |
-| --- | --- | --- |
-| root npm catalog | plan D1 | one Zod version home |
-| D6 composed evaluation | owner rule | no duplicate local evaluator |
+| Decision                     | Source                            | Notes                                                                           |
+| ---------------------------- | --------------------------------- | ------------------------------------------------------------------------------- |
+| root npm catalog             | plan D1                           | one Zod version home                                                            |
+| D6 composed evaluation       | owner rule                        | no duplicate local evaluator                                                    |
+| public structural validators | evaluator finding 1 / doctrine A2 | preserve concrete Zod only behind package-owned public contracts                |
+| detached fixture catalog     | evaluator finding 2               | a foreign config owns the catalog it activates; root CI invokes the member gate |
 
 ## Drift and Debt
 
-- Drift: none.
-- Debt: no new debt planned; publication blocked externally by #1312.
+- Drift: evaluator-found doc-lint and detached-consumer regressions are repaired and recorded in
+  `drift.md`.
+- Debt: the doc-lint wrapper exit-code trap and emitted-sample full-root-catalog limitation remain
+  recorded tool limitations; this product repair does not broaden into those tools. Publication is
+  blocked externally by #1312.
 
 ## Commits
 
-- See draft PR commit list and per-slice comments.
+- `b29879e9468d4c154bc67beb1cbe430984f8290c` — portable public schema contracts and detached Fresh
+  fixture/root-CI repair.
+- See draft PR #1315 for the inherited implementation commits and this handoff's evidence commit.
