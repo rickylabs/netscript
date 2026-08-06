@@ -107,7 +107,8 @@ export const PROVIDER_PROFILES: Readonly<Record<ProviderProfileId, ProviderProfi
 
 export const OPENROUTER_PRESET_IDS = [
   'claude-fanout-minimax-m3',
-  'claude-evaluator-qwen-3-7-max',
+  'claude-evaluator-minimax-m3',
+  'claude-evaluator-qwen-3-8-max',
   'claude-design-glm-5-2',
   'codex-design-glm-5-2',
   'codex-long-medium-grok-4-5',
@@ -166,8 +167,19 @@ export const OPENROUTER_PRESETS: Readonly<Record<OpenRouterPresetId, OpenRouterP
       reasoningTrace: 'present',
       incompatibility: null,
     }),
-    'claude-evaluator-qwen-3-7-max': Object.freeze({
-      id: 'claude-evaluator-qwen-3-7-max',
+    'claude-evaluator-minimax-m3': Object.freeze({
+      id: 'claude-evaluator-minimax-m3',
+      profileId: 'claude-openrouter',
+      model: OPENROUTER_MODEL_IDS.minimax,
+      effort: 'high',
+      purpose: 'evaluation',
+      agenticTurn: 'supported',
+      transport: 'anthropic-messages',
+      reasoningTrace: 'present',
+      incompatibility: null,
+    }),
+    'claude-evaluator-qwen-3-8-max': Object.freeze({
+      id: 'claude-evaluator-qwen-3-8-max',
       profileId: 'claude-openrouter',
       model: OPENROUTER_MODEL_IDS.qwen,
       effort: 'high',
@@ -271,10 +283,14 @@ export function resolveProviderProfile(route: RouteIdentity): ProviderProfile | 
   return null;
 }
 
-/** Returns the preset only when its route profile, model, and effort match exactly. */
+/** Returns the explicit preset only when every route field matches, otherwise the unique match. */
 export function matchOpenRouterPreset(route: RouteIdentity): OpenRouterPreset | null {
-  return Object.values(OPENROUTER_PRESETS).find((preset) =>
+  const matches = Object.values(OPENROUTER_PRESETS).filter((preset) =>
     route.profileId === preset.profileId && route.model === preset.model &&
     route.effort === preset.effort
-  ) ?? null;
+  );
+  if (route.presetId) {
+    return matches.find((preset) => preset.id === route.presetId) ?? null;
+  }
+  return matches.length === 1 ? matches[0] : null;
 }

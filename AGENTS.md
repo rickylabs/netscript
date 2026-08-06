@@ -221,7 +221,7 @@ doctor.
 OpenHands PR trigger template for this gate:
 
 ```text
-@openhands-agent model=openrouter/qwen/qwen3.7-max output=pr-comment run the full scaffold runtime E2E smoke for this PR.
+@openhands-agent model=openrouter/qwen/qwen3.8-max output=pr-comment run the full scaffold runtime E2E smoke for this PR.
 
 Use this single one-pass command from the repository root:
 

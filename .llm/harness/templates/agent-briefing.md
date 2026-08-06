@@ -3,6 +3,10 @@
 Paste this when starting a new agent session for a phase group (see `workflow/supervisor.md` § 2).
 Fill every `<…>` before sending.
 
+The opening contract also applies when the brief is only an ordinary/adversarial review prompt,
+evaluation prompt, or side-fix prompt: retain `use harness` and a `## SKILL` chapter naming the
+skills that govern that lane, even when the phase-group sections below do not apply.
+
 ```text
 use harness
 
