@@ -251,7 +251,8 @@ supersede the GLM 5.2 requirement for major UI/UX work.
 - Record the selected lane and any owner override in `supervisor.md` and `drift.md`.
 - Source-code work uses a daemon-attached native-WSL session when mobile supervision is required.
 - Batch workflows persist and commit `workflow.js` before execution.
-- Every brief starts with `use harness` and includes a `## SKILL` section.
+- Every brief — including ordinary/adversarial review, formal evaluation, implementation, and
+  side-fix prompts — starts with `use harness` and includes a `## SKILL` section.
 - Native Claude mobile sessions and experimental provider-gateway sessions are different surfaces;
   never claim gateway output is mobile-visible native Claude.
 - #582 owns rollout, promotion, and production canaries. This policy selects and validates routes

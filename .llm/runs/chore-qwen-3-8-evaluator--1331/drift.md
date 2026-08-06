@@ -52,3 +52,19 @@ Drift is append-only.
 - **Action:** Exclude the unrelated consumer-generated differences from S3; retain the successful
   dogfood execution and zero-binding audit as evidence.
 - **Evidence:** `s3-evidence.md`; raw Git status/diff immediately after dogfood generation.
+
+## 2026-08-06 — Ordinary review briefs omitted the SKILL chapter
+
+- **What:** Six ordinary-review prompt artifacts omitted the `## SKILL` chapter required for agent
+  briefs by evaluator protocol rule 13.
+- **Source:** Separate Qwen 3.8 IMPL-EVAL finding, severity LOW.
+- **Expected:** Every implementation, evaluation, side-fix, and ordinary-review brief starts with
+  `use harness` and names the governing skills under `## SKILL`.
+- **Actual:** The S1/S2/S3 review and re-review prompts omitted the chapter, while their reviews
+  remained genuine, identity-recorded, substantive, and independently re-run after fixes.
+- **Severity:** minor
+- **Action:** Preserve the historical prompts as evaluated evidence; clarify the canonical
+  `agent-briefing.md` template and lane-policy wording for future ordinary-review prompts. No run
+  rework required by the evaluator.
+- **Evidence:** `evaluate.md`; `.llm/harness/templates/agent-briefing.md`;
+  `.llm/harness/workflow/lane-policy.md`.

@@ -88,6 +88,10 @@ mirrors. Never patch generated mirrors or duplicate model literals in executable
 | 2026-08-06 | S3 | Gate | Docs maintenance, Claude sync/surface checks, 417/417 agentic tests, 149-file scoped wrappers, static provider canary, and diff check passed. |
 | 2026-08-06 | S3 | Residue audit | Widened slash/space/hyphen audit leaves exactly seven 3.7 occurrences across five paths, all explicit rejection or historical evidence. |
 | 2026-08-06 | S3 | Review | OpenRouter Grok 4.5 found one missed hyphenated active site-plan reference; migrated it and widened the audit; re-review `PASS` with complete exception ledger. |
+| 2026-08-06 | IMPL-EVAL | Formal gate | Separate OpenRouter Qwen 3.8 Max session `039835cf-151b-4152-98b8-1037f8c6330c` returned `PASS`; prompt, raw transcript, provenance, and verbatim report recorded. |
+| 2026-08-06 | Close | LOW lesson | Clarified the canonical agent-brief template and lane-policy invariant: ordinary/adversarial review prompts also require `use harness` and a `## SKILL` chapter. Historical prompts remain unchanged as evaluator evidence. |
+| 2026-08-06 | Close | Merge-readiness E2E | `deno task e2e:cli` completed with 73 passed, 0 failed, 0 skipped; its generated Aspire and Docker resources were cleaned up successfully. |
+| 2026-08-06 | Close | Final hygiene | Exact residue ledger reverified at seven occurrences/five paths; `git diff --check` and PR review-thread gate passed; leak-check found no run-owned survivors and left all foreign/unproven resources untouched. |
 
 ## Decisions
 
@@ -114,8 +118,8 @@ mirrors. Never patch generated mirrors or duplicate model literals in executable
 | Gate | Result | Evidence | Notes |
 | ---- | ------ | -------- | ----- |
 | Re-baseline | PASS | `origin/main` and HEAD `57c9b5ab3`; issue fetched live | Current as of 2026-08-06. |
-| Research | PASS (generator evidence) | `research.md` | Awaits independent PLAN-EVAL. |
-| Design checkpoint | PASS (generator evidence) | this `## Design` | Awaits independent PLAN-EVAL. |
+| Research | PASS | `research.md`; `plan-eval.md` | Independently accepted by PLAN-EVAL. |
+| Design checkpoint | PASS | this `## Design`; `evaluate.md` | Followed by S1–S3 and independently verified by IMPL-EVAL. |
 | PLAN-EVAL | PASS | `plan-eval.md`, `plan-eval-raw.txt`, session `815534c7-6c02-4aa5-ab86-a905a0bade6f` | Separate OpenRouter `minimax/minimax-m3`; implementation may begin. |
 
 ### Static Gates
@@ -123,7 +127,7 @@ mirrors. Never patch generated mirrors or duplicate model literals in executable
 | Gate | Command or check | Result | Notes |
 | ---- | ---------------- | ------ | ----- |
 | Raw Git baseline | direct Deno-spawned `git status --short --branch` | PASS_WITH_UNRELATED_DIRTY | Only run dir plus pre-existing `deno.lock`; lock excluded from staging. |
-| Implementation tests | See `plan.md` | NOT_RUN | Post-PLAN-EVAL only. |
+| Implementation tests | Focused and full commands in `plan.md` | PASS | S1 52/52; S2 98/98; final/evaluator full suite 417/417. |
 | S1 focused contract set | five focused test modules, `deno test --no-lock -A` | PASS (52/52) | Includes phase routes, runner guard, routing state, stale/cross-phase rejection, volatile guard. |
 | S2 focused runtime set | focused runtime/provider/canary/fixture modules, `deno test --no-lock -A` | PASS (98/98) | Includes no-spawn mismatch rejection and exact `presetId` evidence. |
 | Agentic suite | `deno task agentic:test` | PASS (416/416) | First run exposed one hardcoded model literal; fixed before the passing rerun. |
@@ -131,6 +135,7 @@ mirrors. Never patch generated mirrors or duplicate model literals in executable
 | Final agentic suite | `deno test --no-lock -A .llm/tools/agentic/` | PASS (417/417) | Includes all final routing, guard, canary, and stale-route tests. |
 | Generated/docs convergence | sync/check/Claude surface/docs maintenance | PASS | 18 skills, 22 mirrors; 102 docs, zero broken links/anchors; docs accuracy PASS. |
 | Exact residue audit | tracked slash/space/hyphen Qwen 3.7 plus old preset/lane patterns | PASS_WITH_EXCEPTIONS | Seven occurrences/five paths, all itemized in `s3-evidence.md`. |
+| Full CLI E2E | `deno task e2e:cli` | PASS (73/73) | Merge-readiness `scaffold.runtime` suite; zero failed/skipped, Aspire stopped, three suite-created containers removed. |
 
 ### Fitness Gates
 
@@ -149,12 +154,20 @@ mirrors. Never patch generated mirrors or duplicate model literals in executable
 
 | Consumer | Result | Evidence | Notes |
 | -------- | ------ | -------- | ----- |
-| Claude skill mirror | NOT_RUN | Planned S3 | Generator-owned. |
+| Claude skill mirror | PASS | `s3-evidence.md`; `evaluate.md` | 18 skills / 22 mirrors synchronized and validated; affected mirrors byte-identical. |
 | Dogfood consumer bundle | PASS (audited) | `s3-evidence.md` | Generator completed; no evaluator/Qwen binding; unrelated environment/version churn excluded. |
+
+### Formal Evaluation
+
+| Gate | Result | Evidence | Notes |
+| ---- | ------ | -------- | ----- |
+| IMPL-EVAL | PASS | `evaluate.md`, `impl-eval-raw.txt`, `impl-eval-prompt.md` | Separate OpenRouter `qwen/qwen3.8-max` session `039835cf-151b-4152-98b8-1037f8c6330c`; exact requested/observed identity. |
+| Evaluator LOW | ADDRESSED | `.llm/harness/templates/agent-briefing.md`; `workflow/lane-policy.md` | Forward guidance only; evaluator required no rework of the six historical review prompts. |
 
 ## Handoff Notes
 
-- PLAN-EVAL should first spot-check `OPENROUTER_MODEL_IDS.qwen`, the versioned preset id, and the
-  formal route guard against the baseline findings.
-- Confirm stale-3.7 negative coverage and generated-surface commands are explicit before PASS.
-- Do not inspect implementation: none exists. `deno.lock` is unrelated and must remain excluded.
+- Formal PLAN-EVAL and IMPL-EVAL both passed in separate sessions with exact canonical identities.
+- Issue #1331 acceptance and PR #1336 Definition of Done must be evidence-mirrored before applying
+  `status:ready-merge`.
+- Merge authority remains with the milestone orchestrator. Do not merge or publish from this run.
+- `deno.lock` is unrelated launcher churn and must remain excluded from staging and commits.

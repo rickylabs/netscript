@@ -38,6 +38,17 @@ Launch evidence: `codex-thread-ids.md`; rollout:
 Reference `.llm/harness/workflow/lane-policy.md`; the owner-authorized overrides below supersede
 its stale 3.7 evaluator binding and temporarily unavailable Anthropic review lanes for this run.
 
+## Observed evaluator identities
+
+| Gate | Model | Session | Result |
+| ---- | ----- | ------- | ------ |
+| PLAN-EVAL | OpenRouter `minimax/minimax-m3` | `815534c7-6c02-4aa5-ab86-a905a0bade6f` | `PASS` |
+| IMPL-EVAL | OpenRouter `qwen/qwen3.8-max` | `039835cf-151b-4152-98b8-1037f8c6330c` | `PASS` |
+
+Both evaluator sessions used the `claude-openrouter` profile through `claude-print`, were distinct
+from each other and from the Codex generator, and recorded `bypassPermissions` in their raw init
+events.
+
 ## Recorded lane/eval overrides
 
 1. Owner correction (2026-08-06): this run's formal PLAN-EVAL uses the canonical OpenRouter
