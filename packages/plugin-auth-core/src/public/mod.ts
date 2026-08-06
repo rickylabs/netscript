@@ -17,6 +17,8 @@ export type {
   AuthenticatorPort,
   AuthnRequest,
   AuthnResult,
+  AuthSchema,
+  AuthSchemaResult,
   AuthSession,
   AuthSessionPrincipalMapping,
   AuthSessionState,

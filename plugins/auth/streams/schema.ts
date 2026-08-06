@@ -5,16 +5,17 @@
  */
 
 import type { StateSchema, StreamStateDefinition } from '@netscript/plugin-streams-core';
-import type { z } from 'zod';
 import {
   AUTH_STREAM_EVENT_TYPES as CORE_AUTH_STREAM_EVENT_TYPES,
   AuthStreamEventSchema as CoreAuthStreamEventSchema,
   authStreamSchema as coreAuthStreamSchema,
   AuthStreamSessionSchema as CoreAuthStreamSessionSchema,
 } from '@netscript/plugin-auth-core/streams';
+import type { AuthSchema } from '@netscript/plugin-auth-core/streams';
 
 export type { CollectionDefinition, CollectionEventHelpers } from '@netscript/plugin-streams-core';
 export type { StateSchema, StreamStateDefinition };
+export type { AuthSchema, AuthSchemaResult } from '@netscript/plugin-auth-core/streams';
 
 /** Auth session states projected into the `authSession` stream entity. */
 export type AuthSessionState = 'active' | 'expired' | 'revoked';
@@ -56,7 +57,7 @@ export type AuthStreamSchemaResult<TOutput> =
   | { readonly success: false; readonly error: unknown };
 
 /** Package-owned structural schema surface for auth stream validation. */
-export type AuthStreamSchema<TOutput = unknown, TInput = unknown> = z.ZodType<TOutput, TInput>;
+export type AuthStreamSchema<TOutput = unknown, TInput = unknown> = AuthSchema<TOutput, TInput>;
 
 /** Auth stream event payload shared by the plugin service and subscribers. */
 export type AuthStreamEvent = Readonly<{

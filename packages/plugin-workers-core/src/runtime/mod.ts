@@ -20,7 +20,12 @@ export { DEFAULT_TOPIC, SSEEventTypes };
 // re-exported so wire-message consumers can narrow an untyped `triggeredBy`
 // string back to the enum at the deserialization boundary.
 export { TriggerTypeSchema };
-export type { ExecutionStatus, TriggerType, TriggerTypeSchemaValues } from '../domain/constants.ts';
+export type {
+  ExecutionStatus,
+  TriggerType,
+  TriggerTypeSchemaValues,
+  WorkerEnumSchema,
+} from '../domain/constants.ts';
 export type {
   JobContext as RuntimeDomainJobContext,
   JobDefinition as RuntimeDomainJobDefinition,

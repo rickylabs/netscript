@@ -5,7 +5,11 @@ import {
   DEFAULT_PAGINATION_LIMIT_MAX,
   DEFAULT_PAGINATION_OFFSET,
 } from '../domain/constants.ts';
-import type { ContractNumberSchema, ContractStringSchema } from '../domain/schema-types.ts';
+import type {
+  ContractNumberSchema,
+  ContractSchema,
+  ContractStringSchema,
+} from '../domain/schema-types.ts';
 
 /** Options accepted by contract integer schema factories. */
 export type IntegerSchemaOptions = Readonly<{
@@ -104,8 +108,8 @@ export function nonNegativeNumber(options: StringSchemaOptions = {}): ContractNu
 /** Coerces a numeric string into a number and validates it with `outputSchema`. */
 export function stringToNumber(
   outputSchema: ContractNumberSchema,
-): z.ZodCodec<z.ZodString, ContractNumberSchema> {
-  return z.codec(z.string().regex(z.regexes.number), outputSchema, {
+): ContractSchema<number, string> {
+  return z.codec(z.string().regex(z.regexes.number), asZodNumberSchema(outputSchema), {
     decode: (value: string) => Number.parseFloat(value),
     encode: (value: number | undefined) => (value ?? 0).toString(),
   });
@@ -114,9 +118,13 @@ export function stringToNumber(
 /** Coerces an integer string into a number and validates it with `outputSchema`. */
 export function stringToInt(
   outputSchema: ContractNumberSchema,
-): z.ZodCodec<z.ZodString, ContractNumberSchema> {
-  return z.codec(z.string().regex(z.regexes.integer), outputSchema, {
+): ContractSchema<number, string> {
+  return z.codec(z.string().regex(z.regexes.integer), asZodNumberSchema(outputSchema), {
     decode: (value: string) => Number.parseInt(value, 10),
     encode: (value: number | undefined) => (value ?? 0).toString(),
   });
+}
+
+function asZodNumberSchema(schema: ContractNumberSchema): z.ZodType<number, number | undefined> {
+  return schema as z.ZodType<number, number | undefined>;
 }

@@ -1,5 +1,8 @@
 {
   "workspace": [],
+  "catalog": {
+    "zod": "^4.4.3"
+  },
   "imports": {
     "@durable-streams/client": "npm:@durable-streams/client@0.2.6",
     "@durable-streams/state": "npm:@durable-streams/state@0.3.1",
@@ -9,7 +12,7 @@
     "@opentelemetry/api": "npm:@opentelemetry/api@1.9.1",
     "@tanstack/db": "npm:@tanstack/db@0.6.17",
     "@tanstack/react-db": "npm:@tanstack/react-db@0.1.95",
-    "zod": "jsr:@zod/zod@4.4.3"
+    "zod": "catalog:"
   },
   "compilerOptions": {
     "isolatedDeclarations": true,

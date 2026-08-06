@@ -53,6 +53,19 @@ import {
 } from './ai.contract-schemas.ts';
 import { toContractErrorDefinition } from './base-error-adapter.ts';
 
+/** Result returned by a public AI contract schema validation. */
+export type AiContractSchemaResult<TOutput> =
+  | { readonly success: true; readonly data: TOutput }
+  | { readonly success: false; readonly error: unknown };
+
+/** Package-owned structural schema surface for AI contract inputs and outputs. */
+export interface AiContractSchema<TOutput, TInput = unknown> {
+  /** Parse an input value or throw a validation error. */
+  parse(input: TInput): TOutput;
+  /** Parse an input value without throwing. */
+  safeParse(input: TInput): AiContractSchemaResult<TOutput>;
+}
+
 // --- Message-body type re-exports --------------------------------------------
 // Plugin IO derives from the engine vocabulary rather than redeclaring it.
 
@@ -231,23 +244,23 @@ const chatInputZodSchema: z.ZodObject<{
 });
 
 /** Schema for `chat` endpoint input. */
-export const ChatInputSchema: z.ZodType<ChatInput> = chatInputZodSchema;
+export const ChatInputSchema: AiContractSchema<ChatInput> = chatInputZodSchema;
 
 /** Schema for a single streamed `chat` chunk. */
-export const ChatChunkSchema: z.ZodType<ChatChunk> = chatChunkZodSchema;
+export const ChatChunkSchema: AiContractSchema<ChatChunk> = chatChunkZodSchema;
 
 const modelsInputZodSchema: z.ZodOptional<z.ZodObject<{ provider: z.ZodOptional<z.ZodString> }>> = z
   .object({ provider: z.string().optional() }).optional();
 
 /** Schema for `models` endpoint input. */
-export const ModelsInputSchema: z.ZodType<ModelsInput> = modelsInputZodSchema;
+export const ModelsInputSchema: AiContractSchema<ModelsInput> = modelsInputZodSchema;
 
 const modelsResponseZodSchema: z.ZodObject<{
   models: z.ZodArray<typeof modelDescriptorZodSchema>;
 }> = z.object({ models: z.array(modelDescriptorZodSchema) });
 
 /** Schema for `models` endpoint responses. */
-export const ModelsResponseSchema: z.ZodType<ModelsResponse> = modelsResponseZodSchema;
+export const ModelsResponseSchema: AiContractSchema<ModelsResponse> = modelsResponseZodSchema;
 
 const toolInvokeInputZodSchema: z.ZodObject<{
   name: z.ZodString;
@@ -255,7 +268,7 @@ const toolInvokeInputZodSchema: z.ZodObject<{
 }> = z.object({ name: z.string(), arguments: z.record(z.string(), z.unknown()).optional() });
 
 /** Schema for `tools/:name` endpoint input. */
-export const ToolInvokeInputSchema: z.ZodType<ToolInvokeInput> = toolInvokeInputZodSchema;
+export const ToolInvokeInputSchema: AiContractSchema<ToolInvokeInput> = toolInvokeInputZodSchema;
 
 const toolInvokeResponseZodSchema: z.ZodObject<{
   toolCallId: z.ZodOptional<z.ZodString>;
@@ -270,7 +283,8 @@ const toolInvokeResponseZodSchema: z.ZodObject<{
 });
 
 /** Schema for `tools/:name` endpoint responses. */
-export const ToolInvokeResponseSchema: z.ZodType<ToolInvokeResponse> = toolInvokeResponseZodSchema;
+export const ToolInvokeResponseSchema: AiContractSchema<ToolInvokeResponse> =
+  toolInvokeResponseZodSchema;
 
 const embedInputZodSchema: z.ZodObject<{
   model: typeof modelRefZodSchema;
@@ -278,7 +292,7 @@ const embedInputZodSchema: z.ZodObject<{
 }> = z.object({ model: modelRefZodSchema, input: z.union([z.string(), z.array(z.string())]) });
 
 /** Schema for `embed` endpoint input. */
-export const EmbedInputSchema: z.ZodType<EmbedInput> = embedInputZodSchema;
+export const EmbedInputSchema: AiContractSchema<EmbedInput> = embedInputZodSchema;
 
 const embedResponseZodSchema: z.ZodObject<{
   model: z.ZodOptional<z.ZodString>;
@@ -291,7 +305,7 @@ const embedResponseZodSchema: z.ZodObject<{
 });
 
 /** Schema for `embed` endpoint responses. */
-export const EmbedResponseSchema: z.ZodType<EmbedResponse> = embedResponseZodSchema;
+export const EmbedResponseSchema: AiContractSchema<EmbedResponse> = embedResponseZodSchema;
 
 const transcribeInputZodSchema: z.ZodObject<{
   model: z.ZodOptional<typeof modelRefZodSchema>;
@@ -304,7 +318,7 @@ const transcribeInputZodSchema: z.ZodObject<{
 });
 
 /** Schema for `transcribe` endpoint input. */
-export const TranscribeInputSchema: z.ZodType<TranscribeInput> = transcribeInputZodSchema;
+export const TranscribeInputSchema: AiContractSchema<TranscribeInput> = transcribeInputZodSchema;
 
 const transcribeResponseZodSchema: z.ZodObject<{
   text: z.ZodString;
@@ -312,7 +326,8 @@ const transcribeResponseZodSchema: z.ZodObject<{
 }> = z.object({ text: z.string(), usage: usageZodSchema.optional() });
 
 /** Schema for `transcribe` endpoint responses. */
-export const TranscribeResponseSchema: z.ZodType<TranscribeResponse> = transcribeResponseZodSchema;
+export const TranscribeResponseSchema: AiContractSchema<TranscribeResponse> =
+  transcribeResponseZodSchema;
 
 // --- chat route (SSE) --------------------------------------------------------
 // Built via `oc.route` (not `baseContract`), so its error map is an empty

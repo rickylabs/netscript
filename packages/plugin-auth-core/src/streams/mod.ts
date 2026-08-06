@@ -10,11 +10,12 @@ import {
   type StreamStateDefinition,
 } from '@netscript/plugin-streams-core';
 import { z } from 'zod';
-import { AuthSessionSchema } from '../domain/mod.ts';
+import { type AuthSchema, AuthSessionSchema } from '../domain/mod.ts';
 
 export type { CollectionDefinition, CollectionEventHelpers } from '@netscript/plugin-streams-core';
 export { AUTH_SESSION_STATES, AuthSessionSchema } from '../domain/mod.ts';
 export type { AuthSession, AuthSessionState } from '../domain/mod.ts';
+export type { AuthSchema, AuthSchemaResult } from '../domain/mod.ts';
 export type { StateSchema, StreamStateDefinition };
 
 /** Auth event names emitted by the auth plugin stream producer. */
@@ -66,7 +67,7 @@ const AuthStreamEventZodSchema: z.ZodType<AuthStreamEvent> = z.object({
 });
 
 /** Schema for auth stream event payloads. */
-export const AuthStreamEventSchema: z.ZodType<AuthStreamEvent> = AuthStreamEventZodSchema;
+export const AuthStreamEventSchema: AuthSchema<AuthStreamEvent> = AuthStreamEventZodSchema;
 
 /** Durable stream schema definition for auth session entities. */
 export type AuthStreamDefinition = Readonly<{
