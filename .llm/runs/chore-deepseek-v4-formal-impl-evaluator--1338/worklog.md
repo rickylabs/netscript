@@ -215,8 +215,9 @@ formal evaluation, Actions, S2/S3, merge, canary, publication, or issue closure 
   `d452f1fa514af3e98066dd6aeaa69aaf3e3355f0` in a fresh independent local session
   `504a078c-5ed6-4891-8c7a-00aa41abd78f`.
 - Requested/observed route: OpenRouter/DeepInfra `deepseek/deepseek-v4-flash-0731`, effort `max`,
-  `bypassPermissions`; implementation supervisor thread remained separate. Cost was not exposed and
-  is recorded as `unavailable`.
+  `bypassPermissions`; implementation supervisor thread remained separate. The terminal transport
+  result reported cost `$2.623356` (`302657` input, `1299712` cache-read input, `18005` output
+  tokens); this corrects the earlier lifecycle draft that treated cost as unavailable.
 - Verdict: **PASS**. Independent gates confirmed 47 focused tests, scoped check/lint/fmt across 149
   files, generated mirror parity, zero unanswered review threads, exact DeepSeek provider canary,
   immutable #1331 evidence, and no package/plugin/release scope.
