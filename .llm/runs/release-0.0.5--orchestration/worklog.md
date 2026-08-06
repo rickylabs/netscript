@@ -498,3 +498,32 @@ files.
   the runner-capacity hold and exhausted independent preflight work, the milestone is at a genuine
   external-state impasse. The goal transitions to `blocked` without changing T1 lifecycle, merging,
   publishing, or substituting an unapproved evaluator route.
+
+## 2026-08-06 — Owner-authorized DeepSeek route prerequisite resumed
+
+- Owner raised the OpenRouter limit and explicitly replaced the pending/future formal IMPL-EVAL
+  default with `deepseek/deepseek-v4-flash-0731` at `max`; formal PLAN-EVAL remains
+  `minimax/minimax-m3` at `high`. Completed valid Qwen evidence, including T1-B session
+  `abe31571-0fa1-4ea4-9085-1c36ea14a5c7`, remains immutable and accepted.
+- Created scoped prerequisite issue #1338 and draft PR #1339 against
+  `canary/0.0.5-canary.14`. A dedicated Codex GPT-5.6 Sol low supervisor generated the locked
+  three-slice plan. Fresh separate Minimax session `a583f0da-69b3-4717-8271-bca95d9cd2db`
+  returned PLAN-EVAL `PASS` against exact clean planning head `258034b1f...` with bypass; cost was
+  unavailable and is not inferred as zero.
+- Prerequisite S1 is clean and pushed: implementation commit `22d7d980f...`, current review-launch
+  head `45b099e60...`. Focused contracts passed 46/46; lockless scoped check covered 149 files in
+  two green batches; scoped lint/fmt covered 149 files with zero findings. The prerequisite lock is
+  exact HEAD blob `ef28b1b...`; root and T1-B protected locks were untouched.
+- The first scoped-check child omitted its own `--no-lock` and rewrote only the prerequisite
+  worktree lock. The supervisor stopped without staging. After exact attribution, the orchestrator
+  restored only that run-owned lock delta and the corrected child command
+  `deno check --unstable-kv --no-lock` stayed byte-stable.
+- Because the Claude plan remains exhausted until Saturday, dispatched the separate owner-authorized
+  ordinary S1 review through the agentic OpenHands workflow with requested OpenRouter
+  `x-ai/grok-4.5`, effort `medium`, PR-comment output. This is temporary REVIEW drift only, never a
+  formal evaluator substitute. S2/S3 and the live DeepSeek proof remain pending review outcome.
+- Re-queried T1-B Actions run `31121552268`: attempt 2 is current-head
+  `31b8982123fda57294f4f7bf438c1157a622a41c` but still top-level `queued`. `deps-report` and
+  `close-gate` executed successfully; `classify changes` remains queued, so the downstream required
+  product jobs have not executed. This is partial current-head evidence, not the required executed
+  green rollup; T1-B does not advance or merge.

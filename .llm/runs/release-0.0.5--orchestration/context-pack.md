@@ -119,3 +119,14 @@ protected stash `7eb4ed16d...` are byte-identical at hash `cfc68984...`. Treat b
 not stage, restore, pop, drop, or overwrite either. T1-A is clean at exact local/remote/PR head
 `18c7a7e79`; the blocked-state audit base was pushed at `48b1e5eac`. In the orchestration worktree,
 only root's unrelated `deno.lock` remains unstaged after the harness-only preservation record.
+
+Owner-resume delta: OpenRouter capacity is raised and the pending/future formal IMPL-EVAL default is
+now explicitly `deepseek/deepseek-v4-flash-0731` at `max`; Minimax M3 high PLAN-EVAL is unchanged.
+Scoped prerequisite #1338 / draft PR #1339 is active. Its independent Minimax PLAN-EVAL passed in
+session `a583f0da-69b3-4717-8271-bca95d9cd2db`; S1 typed route/tests are clean and pushed at
+implementation commit `22d7d980f...` with current review-launch head `45b099e60...`; separate
+owner-authorized OpenRouter Grok 4.5 ordinary review is pending. Do not launch T1-A until #1339
+lands and its exact live DeepSeek max canary passes; then launch a fresh separate DeepSeek session
+against clean target `18c7a7e79...`, never resume/relabel Qwen. Preserve T1-B Qwen PASS. Actions run
+`31121552268` attempt 2 has executed green `deps-report` and `close-gate`, but its classifier remains
+queued and the required downstream product jobs have not executed, so T1-B remains held.
