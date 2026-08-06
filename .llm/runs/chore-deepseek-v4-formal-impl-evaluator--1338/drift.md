@@ -58,3 +58,15 @@ Prior #1331 run artifacts and completed 0.0.5 Qwen evaluator evidence are immuta
   untouched. The supported rerun added `--deno-arg --no-lock`, visibly spawned
   `deno check --unstable-kv --no-lock`, passed, and preserved lock identity. All later S1 gates also
   preserved it.
+
+## D-7 — Owner-authorized temporary ordinary-review route
+
+- Date: 2026-08-06
+- Observation: the canonical Claude-family ordinary review route is unavailable because the owner
+  reported the Claude plan exhausted until Saturday.
+- Authorized drift: use OpenRouter `x-ai/grok-4.5` at the existing `medium` Grok preset effort for
+  the separate S1 adversarial review, dispatched through the agentic OpenHands workflow. This is an
+  explicit owner-authorized route, not a silent fallback.
+- Boundary: the Grok review is advisory `REVIEW` evidence only. It cannot certify PLAN-EVAL or
+  IMPL-EVAL, alter the DeepSeek max formal route, merge, publish, or replace the later fresh formal
+  DeepSeek evaluator.
