@@ -68,3 +68,9 @@ wording, and fresh-gate missions are now recorded under `slices/t2-a-1117/` and
 `slices/t2-b-1115/`; they are explicitly non-dispatchable until T1 opens. No merge is authorized
 until T1-A passes, both T1 PRs have current green required contexts outside draft policy, and the
 complete milestone pre-merge gate passes.
+
+W1 live issue and code-surface preflights are also prepared under `slices/w1-a-1312-1148/`,
+`slices/w1-b-1024-1328/`, and `slices/w1-c-1324-1330/`. They preserve the approved three-supervisor
+cap and post-inherited-train dependency. No W1 branch/worktree/lifecycle/PR/agent mutation has been
+performed. W1-C's real OpenRouter MCP/resume receipts and every cluster's formal Qwen evaluator are
+explicitly held by the current provider limit rather than weakened to mocks or substituted routes.

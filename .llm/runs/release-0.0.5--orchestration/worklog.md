@@ -362,3 +362,23 @@ files.
   `cfc68984...`. Created non-mutating recovery commits `b7b335566...` for T2-A and `d953769b0...`
   for T2-B; left both worktrees unchanged and instructed future supervisors never to stage, restore,
   pop, drop, or overwrite that unowned state.
+
+## 2026-08-06 — W1 live preflight preparation
+
+- Re-read live #1312, #1148, #1024, #1328, #1324, and #1330 including owner comments and current
+  lifecycle/milestone state. No new product PR exists for any W1 cluster; the orchestration PR only
+  references them.
+- Prepared non-dispatchable supervisor/preflight artifacts for W1-A, W1-B, and W1-C. Each records a
+  planned worktree/branch, Sol-low bypass route, exact dependency hold, relevant skill set, decisive
+  negative/runtime gates, separate Qwen evaluator requirement, and orchestrator-only merge/publish
+  authority. No branch, worktree, label, PR, or agent session was created.
+- W1-A now carries the unresolved authenticated publish-budget/reset/report decision, fail-before-
+  mint side-effect contract, full/partial classification, same-semver policy, generated-TypeScript
+  residue negative, exclusions, and scan-cost evidence required before canary.14.
+- W1-B preserves the five #1024 criteria already delivered in merged PR #1092 and scopes only the
+  remaining clone-independent consumer smoke plus #1328's owned TS/TSX/plugin/background quality
+  surface. The historical `feat/1024-agent-tooling-bundle` worktree is evidence, not a branch seed.
+- W1-C requires generated project MCP attachment, a pre-code tools/list + harmless lookup receipt,
+  fail-closed measurement, discovery-source telemetry, provider-valid history normalization, and
+  real OpenRouter attachment/resume. Its real-provider gates and formal evaluator remain additionally
+  held by the same external OpenRouter limit.
