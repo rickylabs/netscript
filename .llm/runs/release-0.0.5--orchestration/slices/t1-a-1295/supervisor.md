@@ -8,4 +8,15 @@
 - Merge/canary authority: milestone orchestrator only
 - Mobile/tmux evidence before launch: failed/not-attached; supported runtime repair dry-run refused
   with `active_session`, so no background-shell substitute is advertised as observable.
-- Status: prepared for supported agentic dry-run
+- Durable thread: `019fcd0c-9cda-7641-9479-3d1c72358154` (existing worktree owner; resumed, never
+  forked)
+- Observed route: `openai` / `gpt-5.6-sol` / `low`, approval `never`, sandbox `danger-full-access`,
+  from the thread rollout
+- App-server proof: managed Codex 0.146.1 daemon running; worktree status resolved through
+  `agentic:codex-status`
+- Same-thread steering:
+  `deno task agentic:codex-resume --thread-id 019fcd0c-9cda-7641-9479-3d1c72358154 --message-file <file> --worktree /home/codex/repos/ns005-streamdb`
+- Draft PR: <https://github.com/rickylabs/netscript/pull/1315>
+- Tmux attach command: unavailable — failed/not-attached; no shell surrogate is recorded as the
+  Codex CLI
+- Status: active through supported same-thread resume

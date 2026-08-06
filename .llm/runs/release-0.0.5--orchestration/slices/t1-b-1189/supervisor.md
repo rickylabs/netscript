@@ -12,4 +12,15 @@
   `6f706f8fbaa20262600f625665eabd5610aa4acc`
 - Mobile/tmux evidence before launch: failed/not-attached; supported runtime repair dry-run refused
   with `active_session`, so no background-shell substitute is advertised as observable.
-- Status: prepared for supported agentic dry-run
+- Durable thread: `019fcdc4-d0e7-7431-9e30-8eb35360c3f9` (existing worktree owner; resumed, never
+  forked)
+- Observed route: `openai` / `gpt-5.6-sol` / `low`, approval `never`, sandbox `danger-full-access`,
+  from the thread rollout
+- App-server proof: managed Codex 0.146.1 daemon running; worktree status resolved through
+  `agentic:codex-status`
+- Same-thread steering:
+  `deno task agentic:codex-resume --thread-id 019fcdc4-d0e7-7431-9e30-8eb35360c3f9 --message-file <file> --worktree /home/codex/repos/ns005-cachetiers`
+- Draft PR: <https://github.com/rickylabs/netscript/pull/1316>
+- Tmux attach command: unavailable — failed/not-attached; no shell surrogate is recorded as the
+  Codex CLI
+- Status: active through supported same-thread resume

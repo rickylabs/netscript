@@ -89,3 +89,18 @@ files.
 - Replaced `status:ready-merge` with terminal `status:shipped` on closed issue #1331 and merged PR
   #1336. Updated PR #1337 to `status:impl`, refreshed its checklist, and posted the formal PLAN-EVAL
   summary. No closing keyword was introduced.
+
+## 2026-08-06 — T1 supervisors dispatched
+
+- Prepared and dry-ran bypass-enabled Sol-low briefs for T1-A (#1295/PR #1315) and T1-B (#1189/PR
+  #1316). Both briefs passed the handoff, exact-head, no-upstream, and route checks.
+- Real new-thread launch failed closed with `duplicate_sender_risk` because both inherited worktrees
+  already had durable Codex owners. Resumed exactly those owner threads through
+  `agentic:codex-resume`: T1-A `019fcd0c-9cda-7641-9479-3d1c72358154`; T1-B
+  `019fcdc4-d0e7-7431-9e30-8eb35360c3f9`. Rollouts prove OpenAI Sol low, bypass permissions, and the
+  correct worktrees.
+- The managed app-server daemon is running. Phone/tmux remains failed/not-attached; supported
+  runtime repair dry-run refused with `active_session`, and no background shell is presented as
+  observability.
+- Preserved T1-B's unrelated lock churn in stash commit `7eb4ed16d6944c1d1c904895bcb76b4361ad8a57`.
+  The current leak reporter found foreign/unproven survivors only; none were mutated.
