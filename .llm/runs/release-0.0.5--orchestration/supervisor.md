@@ -47,7 +47,7 @@ steering command, draft PR, and tmux attach command.
 
 ## Plan-Gate handoff
 
-Plan commit: `a463f0766`. Draft PR #1337 carries `status:plan-eval`, milestone 23, and no closing
+Plan commit: `a463f0766`. Draft PR #1337 now carries `status:impl`, milestone 23, and no closing
 keyword. Minimax and Qwen live provider canaries passed before evaluator launch. Separate Minimax M3
 high evaluator session `567e3125-0fe9-4637-b0bb-30c20f9d3c26` ran through the supported
 `formal_plan_evaluation` route and returned `PASS` in 247,552 ms. Its prompt is

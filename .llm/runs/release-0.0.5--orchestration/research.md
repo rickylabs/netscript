@@ -15,8 +15,8 @@ PR #1336 merged as current `origin/main`. Issue #1331 is closed with all nine ac
 checked and mirrored evidence. Separate evaluator sessions are recorded: Minimax M3 PLAN-EVAL
 `815534c7-6c02-4aa5-ab86-a905a0bade6f` and Qwen 3.8 IMPL-EVAL
 `039835cf-151b-4152-98b8-1037f8c6330c`. The merged run records 417/417 agentic tests and 73/73 CLI
-E2E. The remaining defect is lifecycle bookkeeping: PR/issue labels still say `status:ready-merge`
-instead of terminal `status:shipped`.
+E2E. Lifecycle bookkeeping was reconciled after PLAN-EVAL: both the closed issue and merged PR now
+carry terminal `status:shipped` instead of `status:ready-merge`.
 
 ## Live 0.0.5 inventory
 
@@ -122,10 +122,20 @@ publishable packages. GitHub history contains no later canary publish at plan ti
 all-package cuts therefore cost 105 base attempts, but arithmetic is not the gate: #1312 must land
 an authenticated fail-before-mint preflight before canary.14.
 
-## Final 0.0.5 re-triage proposal
+## Final 0.0.5 re-triage execution
 
-Thirty issues remain planned for 0.0.5. Eight move to milestone 25 after PLAN-EVAL: #1085, #1093,
-#1112, #1139, #1201, #1210, #1260, and #1293. #1112 and #1293 move together because the honest MySQL
-example needs a net-new exported adapter/error-hook contract; #1139 remains F2-gated; #1210 is the
-broad competitive/deep-dive program while the focused p0 tutorial #1208 remains in 0.0.5. The
-complete one-class-per-issue disposition and issue-specific rationale are in `plan.md`.
+After separate Minimax M3 PLAN-EVAL returned `PASS`, moved exactly #1085, #1093, #1112, #1139,
+#1201, #1210, #1260, and #1293 directly from milestone 23 to new milestone 25. Every issue received
+its reviewed, issue-specific reason. #1112 and #1293 remain coupled because the honest MySQL example
+needs a net-new exported adapter/error-hook contract; #1139 remains F2-gated; #1210 is the broad
+competitive/deep-dive program while focused p0 tutorial #1208 stays in 0.0.5.
+
+Post-mutation REST pagination verified:
+
+- milestone 23: 30 open product issues, four open train PRs (#1315–#1318), plus orchestration draft
+  PR #1337 — 35 open rows total;
+- milestone 25: 21 open issues plus retained historical open PR #1215 — 22 open rows total;
+- milestone 24 remains unchanged at the twenty open frontend-contribution rows and six closed
+  historical assignments.
+
+No issue traversed an intermediate future milestone and no closed historical assignment moved.

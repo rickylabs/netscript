@@ -78,3 +78,14 @@ files.
   gates, route separation, and the affordable three-cut cadence guarded by #1312.
 - Recorded the evaluator's proposed `plan-eval.md` artifact verbatim. Implementation is now
   authorized; the next state mutation is the eight reviewed moves to milestone 25.
+
+## 2026-08-06 — Reviewed scope boundary applied
+
+- Moved #1085, #1093, #1112, #1139, #1201, #1210, #1260, and #1293 directly from milestone 23 to new
+  milestone 25. Posted the PLAN-EVAL-approved reason on every issue; no closed assignment or
+  intermediate future milestone changed.
+- Paginated post-mutation verification found milestone 23 at 30 product issues + four train PRs +
+  orchestration PR #1337, and milestone 25 at 21 issues + existing PR #1215.
+- Replaced `status:ready-merge` with terminal `status:shipped` on closed issue #1331 and merged PR
+  #1336. Updated PR #1337 to `status:impl`, refreshed its checklist, and posted the formal PLAN-EVAL
+  summary. No closing keyword was introduced.
