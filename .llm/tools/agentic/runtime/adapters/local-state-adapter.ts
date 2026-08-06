@@ -1,5 +1,6 @@
 // deno-fmt-ignore-file
 import { ACTION_EFFECTS, ACTION_KINDS, ADAPTER_KINDS, AGENT_KINDS, type AgentKind, type ContentReference, EFFORTS, INSTALLABLE_FOUNDATION_COMPONENTS, PROVIDER_KINDS, RUNTIME_SCHEMA_VERSION, type RuntimeAction, STATE_DIRECTORY_IDS } from '../contract.ts';
+import { OPENROUTER_PRESET_IDS } from '../provider-profiles.ts';
 import type {
   CheckpointReaderPort,
   CheckpointWriterPort,
@@ -53,11 +54,12 @@ function member<T extends readonly unknown[]>(value: unknown, values: T, label: 
 }
 function parseRoute(value: unknown, strict: boolean) {
   const route = object(value, 'route');
-  known(route, 'agent provider profileId baseUrl model effort worktree sessionId mobileRequired', 'route', strict);
+  known(route, 'agent provider profileId presetId baseUrl model effort worktree sessionId mobileRequired', 'route', strict);
   return {
     agent: member(route.agent === 'gemini' ? 'antigravity' : route.agent, AGENT_KINDS, 'route agent'),
     provider: member(route.provider, PROVIDER_KINDS, 'route provider'),
     ...(route.profileId === undefined ? {} : { profileId: string(route.profileId, 'route profile id') as import('../provider-profiles.ts').ProviderProfileId }),
+    ...(route.presetId === undefined ? {} : { presetId: member(route.presetId, OPENROUTER_PRESET_IDS, 'route preset id') }),
     ...(route.baseUrl === undefined ? {} : { baseUrl: string(route.baseUrl, 'route base URL') }),
     model: string(route.model, 'route model'),
     effort: member(route.effort, EFFORTS, 'route effort'),

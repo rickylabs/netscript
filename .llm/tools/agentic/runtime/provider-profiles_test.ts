@@ -139,6 +139,18 @@ Deno.test('profile mismatch and rival credential presence fail explicitly by key
     requireSession: false,
   });
   assertEquals(mismatch.diagnostics.map((entry) => entry.code), ['route_conflict']);
+  const presetMismatch = validateProviderRoute({
+    route: route({
+      agent: 'claude',
+      profileId: 'claude-openrouter',
+      presetId: 'claude-evaluator-minimax-m3',
+      model: 'qwen/qwen3.8-max',
+      effort: 'high',
+    }),
+    nativeExt4: true,
+    requireSession: false,
+  });
+  assertEquals(presetMismatch.diagnostics.map((entry) => entry.code), ['route_conflict']);
   const conflict = validateProviderRoute({
     route: route(),
     nativeExt4: true,

@@ -80,6 +80,10 @@ mirrors. Never patch generated mirrors or duplicate model literals in executable
 | 2026-08-06 | S1 | Implement | Split formal lanes and presets, migrated Qwen to 3.8, added typed preset identity, and rejected cross-phase/stale routes. |
 | 2026-08-06 | S1 | Gate | Focused config/provider/routing/runner/state set passed 52/52; volatile-value guard passed. |
 | 2026-08-06 | S1 | Review | OpenRouter Grok 4.5 found preset shadowing and two missed tests; fixes applied; re-review `PASS` with no remaining findings. |
+| 2026-08-06 | S2 | Implement | Persisted exact preset identity through desired state and live canary evidence; mismatched preset/model/effort routes now block before spawn; migrated the current OpenHands output fixture. |
+| 2026-08-06 | S2 | Gate | Corrected focused set passed 98/98; full agentic suite passed 416/416; scoped check/lint/fmt reported zero findings; static canary passed all six presets. |
+| 2026-08-06 | S2 | Live canary | Separate exact Minimax PLAN and Qwen 3.8 IMPL routes passed bounded live provider canaries with explicit evaluator presets. |
+| 2026-08-06 | S2 | Review | OpenRouter Grok 4.5 identified a residual direct-canary proof gap; pre-spawn mismatch rejection and `presetId` evidence were added; re-review `PASS` with no remaining findings. |
 
 ## Decisions
 
@@ -117,6 +121,9 @@ mirrors. Never patch generated mirrors or duplicate model literals in executable
 | Raw Git baseline | direct Deno-spawned `git status --short --branch` | PASS_WITH_UNRELATED_DIRTY | Only run dir plus pre-existing `deno.lock`; lock excluded from staging. |
 | Implementation tests | See `plan.md` | NOT_RUN | Post-PLAN-EVAL only. |
 | S1 focused contract set | five focused test modules, `deno test --no-lock -A` | PASS (52/52) | Includes phase routes, runner guard, routing state, stale/cross-phase rejection, volatile guard. |
+| S2 focused runtime set | focused runtime/provider/canary/fixture modules, `deno test --no-lock -A` | PASS (98/98) | Includes no-spawn mismatch rejection and exact `presetId` evidence. |
+| Agentic suite | `deno task agentic:test` | PASS (416/416) | First run exposed one hardcoded model literal; fixed before the passing rerun. |
+| Agentic scoped check/lint/fmt | repo wrappers over `.llm/tools/agentic` | PASS | 149 files; zero failures or findings. |
 
 ### Fitness Gates
 
@@ -128,7 +135,8 @@ mirrors. Never patch generated mirrors or duplicate model literals in executable
 
 | Gate | Result | Evidence | Notes |
 | ---- | ------ | -------- | ----- |
-| Exact live Qwen 3.8 canary | NOT_RUN | Planned S2 | Requires explicit live opt-in after implementation. |
+| Exact live Minimax PLAN canary | PASS | `s2-evidence.md` | `claude-evaluator-minimax-m3`, `minimax/minimax-m3`, high; bounded provider call. |
+| Exact live Qwen 3.8 IMPL canary | PASS | `s2-evidence.md` | `claude-evaluator-qwen-3-8-max`, `qwen/qwen3.8-max`, high; bounded provider call. |
 
 ### Consumer Gates
 

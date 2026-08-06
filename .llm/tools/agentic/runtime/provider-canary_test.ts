@@ -59,6 +59,32 @@ Deno.test('absent credentials are structured blocked diagnostics and never fabri
   assertEquals(JSON.stringify([...parent]), before);
 });
 
+Deno.test('preset identity is reported and a mismatched preset fails before spawn', async () => {
+  const exact = evaluateProviderCanary(
+    route({
+      presetId: 'claude-evaluator-minimax-m3',
+    }),
+    supported,
+  );
+  assertEquals(exact.evidence?.presetId, 'claude-evaluator-minimax-m3');
+
+  let spawned = false;
+  const adapter = new ProviderCanaryAdapter(
+    { get: () => crypto.randomUUID(), toObject: () => ({ PATH: '/usr/bin' }) },
+    () => {
+      spawned = true;
+      throw new Error('mismatched preset must not spawn');
+    },
+  );
+  const mismatch = await adapter.run(route({
+    presetId: 'claude-evaluator-minimax-m3',
+    model: 'qwen/qwen3.8-max',
+  }));
+  assertEquals(spawned, false);
+  assertEquals(mismatch.status, 'blocked');
+  assertEquals(mismatch.diagnostics.map((entry) => entry.code), ['route_conflict']);
+});
+
 Deno.test('unsupported, malformed, and timeout evidence fail closed with actionable diagnostics', () => {
   const unsupported = evaluateProviderCanary(route(), {
     ...supported,

@@ -33,14 +33,13 @@ is cleared to implement S1–S3. No implementation/config/model file has yet bee
 
 ## In Progress
 
-- S2 runtime/canary/current-fixture exact-model proof.
+- S3 canonical documentation, skill, generated-mirror, and exact residue convergence.
 
 ## Next Steps
 
-1. Commit/push/comment the reviewed S1 contract; exclude `deno.lock`.
-2. Implement S2 runtime/canary/current-fixture proof, including `presetId` persistence/canary flow.
-3. Complete S3 docs/skills/generated convergence and exact 3.7 residue classification.
-4. Run final gates and stop at `READY_FOR_IMPL_EVAL`; formal IMPL-EVAL remains separate.
+1. Complete S3 docs/skills/generated convergence and exact 3.7 residue classification.
+2. Run final gates and ordinary adversarial review.
+3. Commit/push/comment S3 and stop at `READY_FOR_IMPL_EVAL`; formal IMPL-EVAL remains separate.
 
 ## Key Decisions
 
@@ -64,9 +63,9 @@ is cleared to implement S1–S3. No implementation/config/model file has yet bee
 | Gate family | Current status | Evidence |
 | ----------- | -------------- | -------- |
 | Plan | PASS | `plan-eval.md`, raw transcript, session `815534c7-6c02-4aa5-ab86-a905a0bade6f` |
-| Static | Planned | Concrete commands in `plan.md` |
+| Static | S1/S2 PASS; final S3 rerun pending | S1 52/52; S2 98/98; agentic 416/416; scoped wrappers clean |
 | Fitness | N/A unless package/plugin scope appears | Current non-package scope |
-| Runtime | Planned | Exact bounded Minimax and Qwen 3.8 canaries in S2 |
+| Runtime | PASS | Exact bounded Minimax and Qwen 3.8 canaries in `s2-evidence.md` |
 | Consumer | Planned | Canonical Claude/consumer generators and checks in S3 |
 
 ## Open Questions
