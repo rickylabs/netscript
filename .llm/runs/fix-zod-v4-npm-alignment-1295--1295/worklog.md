@@ -160,3 +160,18 @@ verdict because the evaluator proved that exit status can be green while diagnos
   product, graph, publish, lock, or current-run resource leak remains.
 
 READY_FOR_FRESH_QWEN_IMPL_EVAL
+
+## Fresh DeepSeek repair IMPL-EVAL — 2026-08-06
+
+- Fresh independent local session `d1fddd8c-12c9-4a44-9bbd-b07207d3db65` evaluated exact clean
+  local/remote/PR head `18c7a7e791552c6f346ef07a77a741dd70b058d6` with requested/observed
+  `deepseek/deepseek-v4-flash-0731`, effort `max`, and bypass permissions. It did not resume or
+  relabel the prior Qwen session. Cost: `$3.565048`.
+- Verdict: **PASS**. The evaluator independently confirmed the 19-root doc-lint regression is
+  eliminated (287 baseline → 279 repair), detached Fresh consumer is green and root-CI wired,
+  exact one-pass scaffold runtime evidence is 73/73 with raw exit 0 and cleanup, all six #1295
+  acceptance rows hold, no new suppressions/debt exist, and lock SHA-256 stayed
+  `d32ef0c1f2b9256e05cf7339c452bd8cf6addeb9a4b433d38abcee992651b529`.
+- Complete evaluator-authored artifact: `evaluate-repair-deepseek.md`. The earlier Qwen
+  `FAIL_FIX` artifact remains immutable history. Current-head Actions and milestone pre-merge gates
+  remain separate and mandatory before merge.

@@ -6,7 +6,7 @@
 | -------------- | ------------------------------------------- |
 | Run ID         | `fix-zod-v4-npm-alignment-1295--1295`       |
 | Branch         | `fix/zod-v4-npm-alignment-1295`             |
-| Current phase  | `implement`                                 |
+| Current phase  | `ready-merge`                               |
 | Archetype      | cross-cutting manifests + Archetype 6 guard |
 | Scope overlays | none                                        |
 
@@ -23,10 +23,11 @@ a root CI dependency, and the rescoped two-instance Zod boundary is unchanged.
 
 ## Next Steps
 
-1. Preserve draft PR #1315 at `status:impl`. At evidence head
-   `91bc68099285b2c322fd895c25bca34ec3c0c99b`, GitHub reported 13 terminal `skipped` checks,
-   including core and scaffold lane visibility; no green current-SHA train verdict is claimed.
-2. Hand off for a fresh orchestrator-owned Qwen IMPL-EVAL session.
+Fresh local DeepSeek V4 Flash 0731 max IMPL-EVAL passed in independent bypass session
+`d1fddd8c-12c9-4a44-9bbd-b07207d3db65` against exact clean local/remote/PR head
+`18c7a7e791552c6f346ef07a77a741dd70b058d6`; cost `$3.565048`. Complete repair verdict is
+`evaluate-repair-deepseek.md`. Commit this evidence-only handoff, mark PR #1315 ready, require
+executed current-head green contexts plus the milestone pre-merge gate, then merge into the train.
 
 ## Key Decisions
 
