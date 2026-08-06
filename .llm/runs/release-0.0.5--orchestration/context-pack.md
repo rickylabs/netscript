@@ -19,9 +19,14 @@ as a current gate.
 The development train is `canary/0.0.5-canary.14`; #1315–#1318 target it. T1-A formal Qwen session
 `f516aada-2a74-4dad-821e-b20963fe2983` returned `FAIL_FIX` at evaluated head `9f5ef7dcb`: 70 new
 private-type-ref errors across eight publish roots, a baseline-green/head-red Fresh detached
-consumer gate, unsupported PASS claims, and a mandatory unproven `scaffold.runtime` gate. The
-verbatim artifact is committed on PR #1315 at `d0aa6a22d`; issue and PR are back at `status:impl`
-for the bounded repair. Two premature Qwen attempts remain ineligible under C-D10. T1-B completed its
+consumer gate, unsupported PASS claims, and a mandatory unproven `scaffold.runtime` gate. Its
+bounded repair is now clean and pushed at `18c7a7e79`: product `b29879e94`, corrected evidence
+`91bc68099`, terminal handoff `18c7a7e79`. The repair reports every one of 19 parsed export roots at
+or below canary.14 (287 to 279 root sum), Fresh detached/member checks green through fixture-owned
+catalog plus root-CI wiring, serial publish dry-run green, and exact one-pass runtime 73/73 raw exit
+0 with zero smoke-owned leaks. PR #1315 remains draft; issue/PR advance from `status:impl` to
+`status:impl-eval` only for a fresh Qwen high repair evaluation. Two premature Qwen attempts remain
+ineligible under C-D10. T1-B completed its
 generic empty-Apps repair and isolated OTEL live proof at clean pushed head `53d6c278d`; its admissible
 one-pass runtime rerun is 73/73 with raw exit 0, while the first interrupted attempt remains
 diagnostic-only under C-D12. T1-B Qwen session `bd9e6431-23ac-4473-b331-3bc22333bf2e` launched from a
@@ -41,6 +46,6 @@ require current-base merge gates after T1.
 Planned cuts are canary.14/.15/.16. Minimax PLAN and Qwen IMPL paid-transport canaries passed;
 routing state has no persisted fallback.
 
-Immediate next action: supervise T1-A's sole durable repair turn and T1-B's current-head ready-merge
-CI. T1-B remains held outside the train until the complete milestone pre-merge gate passes; T1-A
-requires a fresh separate Qwen evaluation after repair.
+Immediate next action: launch and supervise T1-A's fresh separate Qwen repair evaluation while
+holding T1-B outside the train. No T1 merge is authorized until T1-A passes, both PRs have current
+green required contexts outside draft policy, and the complete milestone pre-merge gate passes.

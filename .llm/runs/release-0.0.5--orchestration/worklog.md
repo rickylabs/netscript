@@ -277,3 +277,24 @@ files.
   review, and triggered fresh current-head CI by the live label event. PR is mergeable but held
   outside the train until named checks report current-head success and the milestone pre-merge gate
   is re-run.
+
+## 2026-08-06 — T1-A bounded repair terminal handoff
+
+- The sole implementation thread finished cleanly with `READY_FOR_FRESH_QWEN_IMPL_EVAL` and `DONE`.
+  Exact local/remote/PR head is `18c7a7e791552c6f346ef07a77a741dd70b058d6`; PR #1315 remains
+  draft with exactly `status:impl` at handoff.
+- Repair commits are product/config `b29879e9468d4c154bc67beb1cbe430984f8290c`, corrected evidence
+  `91bc68099285b2c322fd895c25bca34ec3c0c99b`, and terminal train visibility `18c7a7e79...`.
+- Reported decisive repair evidence: root check 2,630 files / 22 batches / zero diagnostics;
+  focused check 635 files / six batches / zero; 46 focused tests / zero failures; detached Fresh
+  consumer and full Fresh check pass; 40 emitted samples across 30 artifact paths compile; graph
+  guard six tests pass with only the documented AG-UI/kvdex Zod 3 boundary.
+- Parsed full-export comparison is at or below canary.14 for every one of 19 roots, with summed
+  diagnostics 287 baseline to 279 repair. Serial `publish:dry-run` passes and restores manifests.
+  Exact one-pass `scaffold.runtime --cleanup --format pretty` exits 0 at 73 passed / 0 failed with
+  endpoint, background, OTEL, and cleanup proof; read-only leak report finds no smoke-owned survivor.
+- `deno.lock` is restored to branch hash `d32ef0c1...`; target worktree is clean. Current-head hosted
+  contexts are 17 terminal skipped because the PR remains draft and are explicitly not a green train
+  verdict. Review-thread gate is 0/0.
+- Prepared `slices/t1-a-1295/impl-eval-repair-1-prompt.md` for a new sender-free, read-only Qwen 3.8
+  Max high session on exact head `18c7a7e79...`; prior evaluator sessions are not resumed.
