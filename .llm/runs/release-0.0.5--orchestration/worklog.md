@@ -204,3 +204,12 @@ files.
   clean head `53d6c278d...`: Qwen 3.8 Max high, bypass, session
   `228b3382-c868-472b-8066-0af93d2ed01e`. The live process command contains the corrected checked-row
   contract; this is the only admissible T1-B evaluator session.
+- C-D16: the root `deno task` launcher transiently changed the T1-B worktree lock while resolving
+  the older target graph. Restored only that launcher-caused diff before the evaluator's own target
+  preflight. Re-verified branch `fix/plugin-linking-seam-1189`, head `53d6c278d...`, zero worktree
+  status entries, protected stash commit `7eb4ed16d...`, and stash patch hash `6f706f8f...`.
+- Re-queried live GitHub state while both evaluators ran: PRs #1315 and #1316 exactly match their
+  target heads, remain mergeable drafts on `canary/0.0.5-canary.14`, both issues have zero unchecked
+  acceptance rows, and both review-thread gates pass with 0 unanswered. #1315's executed current-SHA
+  hosted contexts are green; #1316's hosted contexts remain draft-policy skipped, so its independent
+  local runtime evaluation is still the decisive gate.
