@@ -151,11 +151,12 @@ verdict because the evaluator proved that exit status can be green while diagnos
 - Artefacts corrected: `context-pack.md`, `supervisor.md`, `drift.md`, `research.md`, `worklog.md`,
   and generated `leak-report.md`; formal `evaluate.md` remains immutable.
 - PR #1315 remains draft at `status:impl` and targets `canary/0.0.5-canary.14`. The closing keyword
-  remains because the issue's six boxes were already accepted; current-SHA train contexts are not
-  claimed until GitHub reports them.
-- Remaining risk: required GitHub contexts and a fresh orchestrator-owned Qwen IMPL-EVAL are still
-  pending. Tool limitations (doc wrapper exit semantics and the emitted-sample full-catalog fixture)
-  are recorded, not silently treated as fixed. No known product, graph, publish, lock, or
-  current-run resource leak remains.
+  remains because the issue's six boxes were already accepted. At pushed evidence head
+  `91bc68099285b2c322fd895c25bca34ec3c0c99b`, GitHub reported 13 terminal `skipped` checks,
+  including core and scaffold lane visibility; no green current-SHA train verdict is claimed.
+- Remaining risk: a fresh orchestrator-owned Qwen IMPL-EVAL and a later green required-context run
+  remain outside this implementation session. Tool limitations (doc wrapper exit semantics and the
+  emitted-sample full-catalog fixture) are recorded, not silently treated as fixed. No known
+  product, graph, publish, lock, or current-run resource leak remains.
 
 READY_FOR_FRESH_QWEN_IMPL_EVAL

@@ -22,6 +22,10 @@
 | formal implementation evaluation    | Qwen high / separate session     | completed `FAIL_FIX`; a fresh session is orchestrator-owned after this handoff |
 | required train contexts             | GitHub Actions on current PR SHA | evidence only; acceptance and merge remain orchestrator-owned                  |
 
+At pushed evidence head `91bc68099285b2c322fd895c25bca34ec3c0c99b`, the Checks API reported 13
+terminal `skipped` checks, including `core CI lane visibility` and `scaffold CI lane visibility`.
+This is recorded as draft/`status:impl` observability, not as a green train verdict.
+
 ## Recorded lane/eval overrides
 
 The owner requires D6 composed milestone evaluation. The formal Qwen evaluator was a separate

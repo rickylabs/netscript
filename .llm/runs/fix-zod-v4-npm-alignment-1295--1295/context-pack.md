@@ -23,10 +23,10 @@ a root CI dependency, and the rescoped two-instance Zod boundary is unchanged.
 
 ## Next Steps
 
-1. Commit the corrected run/PR evidence and push both repair commits by explicit refspec.
-2. Reconcile draft PR #1315 at `status:impl`; required current-SHA contexts remain pending until
-   GitHub reports them.
-3. Hand off for a fresh orchestrator-owned Qwen IMPL-EVAL session.
+1. Preserve draft PR #1315 at `status:impl`. At evidence head
+   `91bc68099285b2c322fd895c25bca34ec3c0c99b`, GitHub reported 13 terminal `skipped` checks,
+   including core and scaffold lane visibility; no green current-SHA train verdict is claimed.
+2. Hand off for a fresh orchestrator-owned Qwen IMPL-EVAL session.
 
 ## Key Decisions
 
