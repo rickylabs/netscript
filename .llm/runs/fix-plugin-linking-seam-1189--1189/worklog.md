@@ -178,3 +178,15 @@ milestone orchestrator.
   orchestrator-owned.
 
 READY_FOR_QWEN_IMPL_EVAL
+
+## Current-head CI retrigger — 2026-08-06
+
+- Formal Qwen IMPL-EVAL already passed in independent session
+  `abe31571-0fa1-4ea4-9085-1c36ea14a5c7` against unchanged product head `53d6c278d...`; the
+  existing artifact-only head before this note was `31b8982123fda57294f4f7bf438c1157a622a41c`.
+- GitHub Actions run `31121552268` attempt 2 remained indefinitely queued while the cancel API
+  classified it as completed and the rerun API classified it as running. Neither attempt produced
+  the required executed current-head green rollup.
+- This evidence-only commit deliberately triggers a new `synchronize` event. It changes no product,
+  package, plugin, manifest, dependency, evaluator artifact, or `deno.lock`; merge remains held
+  until the new exact head has executed green required contexts and the milestone pre-merge gate.
