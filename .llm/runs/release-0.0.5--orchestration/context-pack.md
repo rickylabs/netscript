@@ -112,3 +112,10 @@ dependency-independent cluster and final-closure preflights are complete. Resume
 canonical OpenRouter key has Qwen capacity and GitHub-hosted runners can execute #1316's current
 head; then finish T1-A's exact same-session verdict before triggering fresh current-head CI or any
 merge.
+
+Preservation note for resume: T1-B remains at exact local/remote/PR head `31b898212`, but its
+worktree currently contains the old 20-add/25-delete `deno.lock` patch. The working patch and
+protected stash `7eb4ed16d...` are byte-identical at hash `cfc68984...`. Treat both as unowned; do
+not stage, restore, pop, drop, or overwrite either. T1-A is clean at exact local/remote/PR head
+`18c7a7e79`; the orchestration branch is pushed at `48b1e5eac` with only root's unrelated
+`deno.lock` unstaged.

@@ -489,6 +489,11 @@ files.
   `ubuntu-latest` jobs were canceled, every job has an empty step list, and none received a runner.
   Repo-native `agentic:pr-checks` still reports zero current product failures while classifying the
   canceled contexts separately; canceled is not green. No cancel/retry was issued.
+- Exact-head verification confirmed root/local/remote orchestration at `48b1e5eac`, T1-A
+  local/remote/PR at clean `18c7a7e79`, and T1-B local/remote/PR at `31b898212`. T1-B's old 45-line
+  `deno.lock` patch is present in the worktree and byte-identical to protected stash `7eb4ed16d...`,
+  patch hash `cfc68984...`; it is unowned preservation state and was not restored, staged, popped,
+  dropped, or overwritten. Root's unrelated `deno.lock` also remains unstaged.
 - This is the third consecutive goal continuation with the same Qwen capacity blocker. Combined with
   the runner-capacity hold and exhausted independent preflight work, the milestone is at a genuine
   external-state impasse. The goal transitions to `blocked` without changing T1 lifecycle, merging,
