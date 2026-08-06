@@ -77,6 +77,9 @@ mirrors. Never patch generated mirrors or duplicate model literals in executable
 | 2026-08-06 | Plan | Design checkpoint | Locked three test/generation-aware implementation slices; implementation not started. |
 | 2026-08-06 | Plan | Reconcile | Owner corrected canonical routing to PLAN→Minimax and IMPL→Qwen 3.8; plan revised before PLAN-EVAL. |
 | 2026-08-06 | PLAN-EVAL | Formal gate | Separate OpenRouter Minimax M3 session `815534c7-6c02-4aa5-ab86-a905a0bade6f` returned `PASS`; prompt, raw transcript, and verbatim verdict recorded. |
+| 2026-08-06 | S1 | Implement | Split formal lanes and presets, migrated Qwen to 3.8, added typed preset identity, and rejected cross-phase/stale routes. |
+| 2026-08-06 | S1 | Gate | Focused config/provider/routing/runner/state set passed 52/52; volatile-value guard passed. |
+| 2026-08-06 | S1 | Review | OpenRouter Grok 4.5 found preset shadowing and two missed tests; fixes applied; re-review `PASS` with no remaining findings. |
 
 ## Decisions
 
@@ -113,6 +116,7 @@ mirrors. Never patch generated mirrors or duplicate model literals in executable
 | ---- | ---------------- | ------ | ----- |
 | Raw Git baseline | direct Deno-spawned `git status --short --branch` | PASS_WITH_UNRELATED_DIRTY | Only run dir plus pre-existing `deno.lock`; lock excluded from staging. |
 | Implementation tests | See `plan.md` | NOT_RUN | Post-PLAN-EVAL only. |
+| S1 focused contract set | five focused test modules, `deno test --no-lock -A` | PASS (52/52) | Includes phase routes, runner guard, routing state, stale/cross-phase rejection, volatile guard. |
 
 ### Fitness Gates
 

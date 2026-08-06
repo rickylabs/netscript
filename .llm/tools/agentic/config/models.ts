@@ -49,7 +49,7 @@ export const NATIVE_CANARY_MODEL_ARGS = {
  */
 export const OPENROUTER_MODEL_IDS = {
   minimax: 'minimax/minimax-m3',
-  qwen: 'qwen/qwen3.7-max',
+  qwen: 'qwen/qwen3.8-max',
   glm: 'z-ai/glm-5.2',
   grok: 'x-ai/grok-4.5',
   deepseekV4Flash0731: 'deepseek/deepseek-v4-flash-0731',

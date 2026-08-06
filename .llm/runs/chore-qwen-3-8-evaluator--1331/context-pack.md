@@ -33,14 +33,14 @@ is cleared to implement S1–S3. No implementation/config/model file has yet bee
 
 ## In Progress
 
-- S1 phase-specific model/preset/route contract.
+- S2 runtime/canary/current-fixture exact-model proof.
 
 ## Next Steps
 
-1. Commit and push the PLAN-EVAL gate artifacts; exclude `deno.lock`.
-2. Update draft PR #1336 to record `PASS` and move to implementation.
-3. Implement S1–S3 with gate → ordinary review → supervisor sign-off → push/comment per slice.
-4. Stop at `READY_FOR_IMPL_EVAL`; formal IMPL-EVAL remains a separate Qwen 3.8 session.
+1. Commit/push/comment the reviewed S1 contract; exclude `deno.lock`.
+2. Implement S2 runtime/canary/current-fixture proof, including `presetId` persistence/canary flow.
+3. Complete S3 docs/skills/generated convergence and exact 3.7 residue classification.
+4. Run final gates and stop at `READY_FOR_IMPL_EVAL`; formal IMPL-EVAL remains separate.
 
 ## Key Decisions
 
