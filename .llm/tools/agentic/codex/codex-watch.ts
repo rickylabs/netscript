@@ -44,6 +44,7 @@
 
 import { parseTurnComplete, requireValue, runBin, UUID, wslHome } from '../lib/agentic-lib.ts';
 import { dirname } from '@std/path';
+import { readCodexRolloutTail, resolveCodexRollout } from './codex-rollout-live.ts';
 
 type Mode = 'git' | 'turn';
 
@@ -134,54 +135,6 @@ function emit(quiet: boolean, payload: Record<string, unknown>): void {
   if (!quiet) console.log(JSON.stringify(payload));
 }
 
-/** Recursively find the newest rollout file for a thread id under sessionsDir. */
-async function resolveRollout(sessionsDir: string, threadId: string): Promise<string | null> {
-  const suffix = `-${threadId}.jsonl`;
-  let best: { path: string; mtime: number } | null = null;
-  async function walk(dir: string): Promise<void> {
-    let entries: Deno.DirEntry[] = [];
-    try {
-      entries = [...Deno.readDirSync(dir)];
-    } catch {
-      return;
-    }
-    for (const e of entries) {
-      const full = `${dir}/${e.name}`;
-      if (e.isDirectory) {
-        await walk(full);
-      } else if (e.isFile && e.name.startsWith('rollout-') && e.name.endsWith(suffix)) {
-        try {
-          const st = await Deno.stat(full);
-          const mtime = st.mtime?.getTime() ?? 0;
-          if (!best || mtime > best.mtime) best = { path: full, mtime };
-        } catch { /* race: file vanished */ }
-      }
-    }
-  }
-  await walk(sessionsDir);
-  return best ? (best as { path: string }).path : null;
-}
-
-/** Read the last `maxBytes` of a file as text (whole-line boundaries not required). */
-async function readTail(path: string, maxBytes = 65536): Promise<string> {
-  const f = await Deno.open(path, { read: true });
-  try {
-    const { size } = await f.stat();
-    const start = size > maxBytes ? size - maxBytes : 0;
-    if (start > 0) await f.seek(start, Deno.SeekMode.Start);
-    const buf = new Uint8Array(size - start);
-    let pos = 0;
-    while (pos < buf.length) {
-      const n = await f.read(buf.subarray(pos));
-      if (n === null) break;
-      pos += n;
-    }
-    return new TextDecoder().decode(buf.subarray(0, pos));
-  } finally {
-    f.close();
-  }
-}
-
 async function watchGit(o: Options): Promise<never> {
   // Resolve the gitdir logs path with plain git (we are inside WSL).
   const gd = await runBin('git', ['rev-parse', '--absolute-git-dir'], { cwd: o.worktree });
@@ -237,7 +190,7 @@ async function watchGit(o: Options): Promise<never> {
 async function watchTurn(o: Options): Promise<never> {
   let rollout = o.rollout ?? null;
   if (!rollout && o.threadId) {
-    rollout = await resolveRollout(o.sessionsDir, o.threadId);
+    rollout = await resolveCodexRollout(o.sessionsDir, o.threadId);
   }
   if (!rollout) {
     console.error(
@@ -255,7 +208,7 @@ async function watchTurn(o: Options): Promise<never> {
 
   const check = async (): Promise<boolean> => {
     try {
-      const state = parseTurnComplete(await readTail(resolved));
+      const state = parseTurnComplete(await readCodexRolloutTail(resolved));
       return state.turnComplete;
     } catch {
       return false;

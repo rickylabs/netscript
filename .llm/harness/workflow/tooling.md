@@ -71,7 +71,8 @@ answered, UI resolution is irrelevant, and outdated threads are listed but do no
 | -------------------------------- | ----------------------------------------- | -------------------------------------------------------------------------------------------------- |
 | `agentic:launch-codex-slice`     | `launch-codex-slice.ts`                   | stage + safety-check + launch a WSL Codex slice; records the thread id                             |
 | `agentic:codex-resume`           | `codex-resume.ts`                         | steer an existing Codex thread (never a rival second send)                                         |
-| `agentic:codex-status`           | `codex-status.ts`                         | read-only daemon / worktree / session snapshot                                                     |
+| `agentic:codex-follow`           | `codex-follow.ts`                         | readable live rollout stream by thread id; exits on completion/failure                             |
+| `agentic:codex-status`           | `codex-status.ts`                         | per-session working/idle/stalled/dead/refused state plus activity and artifact evidence            |
 | `agentic:codex-watch`            | `codex-watch.ts`                          | event-driven wake on a slice's git progress or turn completion (run inside WSL)                    |
 | `agentic:dispatch-openhands`     | `dispatch-openhands.ts`                   | validate + post an `@openhands-agent` trigger (enforces the handoff contract)                      |
 | `agentic:openhands-status`       | `openhands-status.ts`                     | read an OpenHands run's verdict (local trace or remote comment)                                    |
