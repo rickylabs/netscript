@@ -44,4 +44,5 @@
 - Formal IMPL-EVAL route: OpenRouter `qwen/qwen3.8-max`, high, bypass
 - Ineligible launch: Qwen session `bd9e6431-23ac-4473-b331-3bc22333bf2e` consumed the stale
   pre-adjudication prompt and was terminated before verdict; never cite it as evidence (C-D15).
-- Status: corrected separate-session IMPL-EVAL pending fresh launch
+- Canonical evaluator session: `228b3382-c868-472b-8066-0af93d2ed01e`
+- Status: corrected separate-session IMPL-EVAL active

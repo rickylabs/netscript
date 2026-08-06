@@ -200,3 +200,7 @@ files.
   Terminated only evaluator process group `203021` before verdict. That session is permanently
   ineligible under C-D15; T1-A was not interrupted. A fresh T1-B evaluator may launch only from the
   corrected pushed prompt.
+- Launched the corrected read-only T1-B evaluator through the supported OpenRouter route at exact
+  clean head `53d6c278d...`: Qwen 3.8 Max high, bypass, session
+  `228b3382-c868-472b-8066-0af93d2ed01e`. The live process command contains the corrected checked-row
+  contract; this is the only admissible T1-B evaluator session.
