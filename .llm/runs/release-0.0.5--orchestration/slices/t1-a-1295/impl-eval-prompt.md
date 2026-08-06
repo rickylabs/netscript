@@ -11,11 +11,13 @@ applicable gate documents, issue #1295, PR #1315, and every tracked artifact in
 ## Role
 
 You are the formal separate-session IMPL-EVAL for milestone cluster T1-A. Run read-only as the
-canonical `formal_impl_evaluation` route: OpenRouter `qwen/qwen3.8-max`, high effort. The generator
-was Codex Sol low in thread `019fcd0c-9cda-7641-9479-3d1c72358154`; you are neither that generator
-nor the milestone orchestrator. Do not modify files, GitHub state, branches, issues, or PRs. You may
-run read-only and validation commands. Emit the proposed `evaluate.md` artifact on stdout for the
-orchestrator to record verbatim.
+canonical `formal_impl_evaluation` route: OpenRouter `qwen/qwen3.8-max`, high effort. The inherited
+generator thread `019fcd0c-9cda-7641-9479-3d1c72358154` was originally Sol low, but the supported
+`agentic:codex-resume` path resumed the active implementation turn as Sol medium because it exposes
+no effort override; this route drift is recorded as C-D9 and must not be relabeled low. You are
+neither that generator nor the milestone orchestrator. Do not modify files, GitHub state, branches,
+issues, or PRs. You may run read-only and validation commands. Emit the proposed `evaluate.md`
+artifact on stdout for the orchestrator to record verbatim.
 
 ## Exact target
 

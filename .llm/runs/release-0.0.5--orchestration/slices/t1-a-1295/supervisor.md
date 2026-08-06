@@ -20,4 +20,7 @@
 - Draft PR: <https://github.com/rickylabs/netscript/pull/1315>
 - Tmux attach command: unavailable — failed/not-attached; no shell surrogate is recorded as the
   Codex CLI
-- Status: active through supported same-thread resume
+- Formal IMPL-EVAL route: OpenRouter `qwen/qwen3.8-max`, high, bypass
+- Inadmissible evaluator attempts: `b329c804-2b7b-47b3-b109-84895f66f01d` and
+  `4b004c60-acae-4373-b7f7-56956b191156`; both were terminated without an accepted verdict (C-D10)
+- Status: implementation thread active; corrected separate-session IMPL-EVAL pending terminal handoff

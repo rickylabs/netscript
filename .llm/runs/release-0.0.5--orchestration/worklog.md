@@ -121,3 +121,16 @@ files.
   supervisors will integrate the content-derived train head after T1 lands and earn new current-SHA
   gates. Both inherited worktrees have unrelated `deno.lock` changes and no upstream; preserve them
   before dispatch as done for T1-B.
+
+## 2026-08-06 — T1-A evaluator launch failed closed
+
+- #1315 reached pushed head `9f5ef7dcb55668a6649c5451266908ad8e29b15c` with product repair
+  `ecd224243ea373e803c5165ba607f235d438f9c8`, but live runtime still reported its generator turn
+  `working`; the PR lifecycle was restored to `status:impl` pending terminal handoff.
+- Detected C-D10: Qwen high evaluator sessions `b329c804-2b7b-47b3-b109-84895f66f01d` and
+  `4b004c60-acae-4373-b7f7-56956b191156` were launched nineteen seconds apart. The second used the
+  same stale prompt as the first, incorrectly describing the resumed generator turn as Sol low.
+- Terminated both exact evaluator process groups without accepting a verdict. Neither session nor
+  either partial output is evidence. Corrected the prompt to record observed Sol-medium C-D9 drift;
+  a single fresh Qwen evaluator may launch only after the implementation thread reaches a terminal
+  handoff.
