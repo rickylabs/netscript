@@ -8,7 +8,7 @@
 | Issue | #1338 |
 | Branch | `chore/deepseek-v4-formal-impl-evaluator-1338` |
 | Base | `canary/0.0.5-canary.14` @ `2508eb8c99c9cfc55e0c9f1d7ab72fea745db492` |
-| Phase | S1 implemented and ordinary REVIEW passed; S2 next |
+| Phase | implementation and formal IMPL-EVAL passed; pre-merge next |
 | Archetype | N/A — maintainer agentic tooling |
 | Overlay | docs / generated skills |
 
@@ -69,7 +69,9 @@ mandatory unless explicitly waived. OpenHands is paused. If OpenRouter is blocke
 limit, use a fresh AGY / Google / `gemini-3.6-flash-high` / high fallback through the checked-in
 toolchain, never OpenRouter.
 
-Completion status: canonical policy/docs/skills/generated mirrors are converged at
-`bac60805a7964b297329daa362271d6b6b89894c`; focused gates are green. The exact local DeepSeek max
-provider canary passed with tools/reasoning/streaming supported and no diagnostics; lock remained
-exact. Mandatory fresh local IMPL-EVAL is next.
+Completion status: canonical policy/docs/skills/generated mirrors are converged; focused gates and
+the exact local DeepSeek max provider canary are green. Formal IMPL-EVAL passed in fresh separate
+session `504a078c-5ed6-4891-8c7a-00aa41abd78f` against exact clean local/remote/PR head
+`d452f1fa514af3e98066dd6aeaa69aaf3e3355f0`, requested/observed DeepSeek V4 Flash 0731 at max,
+`bypassPermissions`, cost `unavailable`. Complete evidence is `evaluate.md`. Ready-for-review and
+the milestone pre-merge gate are next.

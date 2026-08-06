@@ -33,7 +33,11 @@
 - PLAN-EVAL: **PASS** — fresh separate OpenRouter Minimax M3 high session
   `a583f0da-69b3-4717-8271-bca95d9cd2db` against exact clean planning head
   `258034b1f9842bae781ca7e5eecffc2c61af13e4`; bypass permissions; cost `unavailable`.
-- IMPL-EVAL: fresh separate OpenRouter DeepSeek V4 Flash 0731 max session; pending after implementation.
+- IMPL-EVAL: **PASS** — fresh separate local session
+  `504a078c-5ed6-4891-8c7a-00aa41abd78f` against exact clean local/remote/PR head
+  `d452f1fa514af3e98066dd6aeaa69aaf3e3355f0`; requested/observed OpenRouter/DeepInfra
+  `deepseek/deepseek-v4-flash-0731`, effort `max`, `bypassPermissions`, cost `unavailable`.
+  Complete evaluator-authored evidence: `evaluate.md`.
 - Merge and canary authority: milestone orchestrator only.
 
 ## S1 implementation handoff
