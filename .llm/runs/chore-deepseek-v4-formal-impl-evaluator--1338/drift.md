@@ -70,3 +70,10 @@ Prior #1331 run artifacts and completed 0.0.5 Qwen evaluator evidence are immuta
 - Boundary: the Grok review is advisory `REVIEW` evidence only. It cannot certify PLAN-EVAL or
   IMPL-EVAL, alter the DeepSeek max formal route, merge, publish, or replace the later fresh formal
   DeepSeek evaluator.
+
+- Dispatch note: the canonical OpenHands dispatcher posted the validated Grok trigger comment
+  `5208807248`, but GitHub did not materialize an `issue_comment` Actions run or workflow status
+  comment during the bounded observation window. No review evidence exists from that trigger. The
+  orchestrator therefore uses the same owner-authorized Grok 4.5 model/medium effort through the
+  checked-in agentic Codex OpenRouter launcher, with a fresh session and explicit requested/observed
+  identity. This is a supported-runtime transport repair, not a route substitution.
