@@ -1,10 +1,11 @@
 # Wave plan v3 — NetScript 0.0.5 continuation
 
-Status: **READY FOR SEPARATE PLAN-EVAL; IMPLEMENTATION HOLD**.
+Status: **PLAN-EVAL PASS; IMPLEMENTATION AUTHORIZED**.
 
 Baseline: `origin/main` at `2508eb8c99c9cfc55e0c9f1d7ab72fea745db492` on 2026-08-06. The carried
-Claude run is evidence, not an implementation base. No new code lane may launch until Minimax M3
-returns `PASS` against this committed plan.
+Claude run is evidence, not an implementation base. Separate Minimax M3 PLAN-EVAL session
+`567e3125-0fe9-4637-b0bb-30c20f9d3c26` returned `PASS` on 2026-08-06; implementation may proceed
+under the locked wave and merge gates below.
 
 ## Locked decisions
 

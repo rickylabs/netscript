@@ -5,8 +5,9 @@ and independently evaluated. Live 0.0.5 scope is 42 open items (38 issues, PRs #
 milestones were renamed collision-safely through `0.0.13`; new milestone 25 `0.0.6` holds the
 fourteen non-frontend open rows moved from old milestone 24, while renamed milestone 24 `0.0.7`
 retains #922–#941 and all six closed historical assignments. Wave plan v3 now dispositions all 38
-issues: 30 retained and eight proposed moves (#1085, #1093, #1112, #1139, #1201, #1210, #1260,
-#1293) after PLAN-EVAL. No new implementation lane has been dispatched.
+issues: 30 retained and eight approved moves (#1085, #1093, #1112, #1139, #1201, #1210, #1260,
+#1293). Separate Minimax M3 PLAN-EVAL session `567e3125-0fe9-4637-b0bb-30c20f9d3c26` returned
+`PASS`; no new implementation lane has yet been dispatched.
 
 Legacy authoritative evidence remains at local branch `orchestrator/0.0.5@8399126ef` and path
 `/home/codex/repos/ns-005/.llm/runs/release-0.0.5--orchestration/`; do not reconstruct its merge or
@@ -19,6 +20,6 @@ project `catalog:zod`; #1316 is red on empty `Apps: {}` cleanup and missing isol
 #1317/#1318 roll up green but require current-base merge gates. Planned cuts are canary.14/.15/.16.
 Minimax PLAN and Qwen IMPL paid-transport canaries passed; routing state has no persisted fallback.
 
-Immediate next action: commit the run plan, open/update its draft PR, run separate Minimax M3
-PLAN-EVAL, repair any `FAIL_PLAN`, then execute the eight milestone moves and dispatch T1 only after
-`PASS`.
+Immediate next action: record the PASS, execute and verify the eight milestone moves, reconcile
+terminal labels on #1331/#1336, update PR #1337 to `status:impl`, then dispatch T1 through the
+supported agentic runtime.
