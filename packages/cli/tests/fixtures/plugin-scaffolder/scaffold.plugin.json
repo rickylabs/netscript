@@ -28,7 +28,13 @@
     "displayName": "Fixture",
     "category": "background-processor",
     "portRangeKey": "INFRA_PLUGIN",
-    "defaultPermissions": ["--allow-read", "--allow-write"],
+    "defaultPermissions": [
+      "--allow-net",
+      "--allow-env",
+      "--allow-read",
+      "--allow-sys",
+      "--allow-write"
+    ],
     "watchFlag": "--watch",
     "defaultEntrypoint": "bin/combined.ts",
     "defaultServiceEntrypoint": "services/src/main.ts",

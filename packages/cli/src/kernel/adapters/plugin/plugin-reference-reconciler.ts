@@ -94,10 +94,10 @@ export async function reconcilePluginReferences(
   pruneUninstalledReferences(apps, installedKeys);
 
   if (!appsettings.NetScript) return;
-  appsettings.NetScript.Plugins = sortRecord(plugins);
-  appsettings.NetScript.BackgroundProcessors = sortRecord(backgroundProcessors);
-  appsettings.NetScript.Services = sortRecord(services);
-  appsettings.NetScript.Apps = sortRecord(apps);
+  setReconciledRecord(appsettings.NetScript, 'Plugins', plugins);
+  setReconciledRecord(appsettings.NetScript, 'BackgroundProcessors', backgroundProcessors);
+  setReconciledRecord(appsettings.NetScript, 'Services', services);
+  setReconciledRecord(appsettings.NetScript, 'Apps', apps);
   await fs.writeFile(appsettingsPath, `${JSON.stringify(appsettings, null, 2)}\n`);
 }
 
@@ -218,4 +218,14 @@ function pruneUninstalledReferences(
 
 function sortRecord<T>(record: Readonly<Record<string, T>>): Record<string, T> {
   return Object.fromEntries(Object.entries(record).sort(([left], [right]) => left.localeCompare(right)));
+}
+
+function setReconciledRecord(
+  netScript: NonNullable<AppsettingsShape['NetScript']>,
+  key: 'Plugins' | 'BackgroundProcessors' | 'Services' | 'Apps',
+  record: Readonly<Record<string, ReferenceEntry>>,
+): void {
+  if (netScript[key] !== undefined || Object.keys(record).length > 0) {
+    netScript[key] = sortRecord(record);
+  }
 }

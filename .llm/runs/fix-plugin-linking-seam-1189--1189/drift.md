@@ -35,3 +35,35 @@
 - **Actual:** Starting another AppHost would violate resource safety; foreign resources were not touched.
 - **Severity:** blocking for acceptance box 5 only
 - **Action:** keep box 5 unticked and state the precise missing live evidence
+
+## 2026-08-06 — runtime slot became available
+
+- **What:** The earlier resource-safety blocker cleared; no AppHost was active at the new preflight.
+- **Source:** `aspire ps --format json` returned `[]`; refreshed `agentic:leak-check` listed only
+  foreign/unproven containers.
+- **Expected:** Preserve the blocker until a safe one-AppHost proof was possible.
+- **Actual:** A narrow run-owned root could start exactly one isolated AppHost, so the previously
+  deferred live service→fixture call and correlated telemetry were completed.
+- **Severity:** resolves prior acceptance blocker
+- **Action:** replace the obsolete limitation with exact RED/GREEN and trace/span artefacts
+
+## 2026-08-06 — fixture runtime permissions were under-declared
+
+- **What:** The first post-install start reached the generic linking seam, but the third-party
+  fixture process exited because its manifest allowed only read/write and could not read `PORT`.
+- **Source:** Aspire resource log: `NotCapable: Requires env access to "PORT"`.
+- **Expected:** A fixture that declares a runnable HTTP service also declares its runtime needs.
+- **Actual:** The fixture manifest now declares net/env/read/sys/write. No core permission branch or
+  appsettings edit was added.
+- **Severity:** acceptance-relevant fixture defect
+- **Action:** fixed in the third-party declaration and reinstalled through the public CLI path
+
+## 2026-08-06 — interrupted full gate is diagnostic only
+
+- **What:** The first mandatory `scaffold.runtime` invocation reached cleanup but its controlling
+  turn was interrupted before a raw exit/final summary was captured.
+- **Expected:** A complete one-pass verdict with raw exit code.
+- **Actual:** The exact full command was rerun from the repository root; the rerun reported
+  `passed=73 failed=0`, exit `0`.
+- **Severity:** procedural
+- **Action:** cite only the completed rerun as merge-readiness evidence
