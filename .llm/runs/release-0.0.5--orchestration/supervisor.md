@@ -10,6 +10,7 @@
 | Branch           | `orchestrator/0.0.5-continuation`                                                                                                       |
 | Baseline         | `origin/main@2508eb8c99c9cfc55e0c9f1d7ab72fea745db492`                                                                                  |
 | Milestone        | GitHub milestone 23, `0.0.5`                                                                                                            |
+| Draft PR         | #1337, `chore(harness): orchestrate the 0.0.5 continuation`                                                                             |
 | Resumed          | 2026-08-06                                                                                                                              |
 | Profile          | `.llm/harness/workflow/milestone-run.md`                                                                                                |
 | Legacy run       | local `orchestrator/0.0.5@8399126ef74e79e935a5e90b871fadc612c1656b`, `/home/codex/repos/ns-005/.llm/runs/release-0.0.5--orchestration/` |
@@ -43,3 +44,9 @@ tmux pane are therefore **not yet proven**. This is recorded as failed/not-attac
 as observable. Repair must use `agentic:runtime`; every delegated Codex lane must use the agentic
 launcher and record worktree, branch, thread, observed route/effort, connection proof, same-thread
 steering command, draft PR, and tmux attach command.
+
+## Plan-Gate handoff
+
+Plan commit: `a463f0766`. Draft PR #1337 carries `status:plan-eval`, milestone 23, and no closing
+keyword. Minimax and Qwen live provider canaries passed before evaluator launch. The separate
+evaluator prompt is `plan-eval-prompt.md`; implementation remains held pending its verdict.

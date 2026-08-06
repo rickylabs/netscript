@@ -60,3 +60,11 @@ files.
   attempts, with #1312 fail-before-mint preflight mandatory before the next cut.
 - Wave plan v3 is ready to commit and send to a separate Minimax PLAN-EVAL. Implementation remains
   on hold.
+
+## 2026-08-06 — Plan committed and draft PR opened
+
+- Committed the plan-only run state as `a463f0766` and pushed `orchestrator/0.0.5-continuation`.
+- Opened draft PR #1337 to `main` through the GitHub connector. Applied milestone 23 and exactly one
+  lifecycle label, `status:plan-eval`, with `type:chore`, `area:tooling`, `priority:p0`, and
+  `wave:v1`. The body deliberately carries no closing keyword.
+- Prepared the separate Minimax M3 evaluator prompt. No implementation has started.
