@@ -102,3 +102,13 @@ them. A real partial same-semver recovery, unprompted behavioral trial, update-m
 umbrella child reconciliation, or one-pass release cut must be evidenced as applicable. If a
 qualifying event does not naturally occur, the unearned issue moves intact to milestone 25 `0.0.6`;
 the run will not manufacture a failure/topology or coach an agent to make a checkbox pass.
+
+Blocked-state audit: the third exact Qwen continuation attempt reached session
+`4c09a05f-a5da-4794-87e2-29b2d05f67f2` on Qwen 3.8 Max high with bypass, then returned the same
+monthly-limit HTTP 403 before inference with zero token/cost usage. PR #1316 Actions run
+`31121552268` is now terminal failure solely through six canceled, zero-step, unassigned
+`ubuntu-latest` jobs; no current product-failure context exists, but canceled is not green. All
+dependency-independent cluster and final-closure preflights are complete. Resume only when the
+canonical OpenRouter key has Qwen capacity and GitHub-hosted runners can execute #1316's current
+head; then finish T1-A's exact same-session verdict before triggering fresh current-head CI or any
+merge.

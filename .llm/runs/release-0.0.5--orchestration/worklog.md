@@ -469,3 +469,27 @@ files.
   intact. Likewise, no coached retry may turn #1090 into a pass.
 - No GitHub state, product code, branch, worktree, agent, evaluator, merge, release, or resource was
   mutated. Root `deno.lock` remains unrelated user state and was not staged or changed.
+
+## 2026-08-06 — Third external-gate audit and blocked transition
+
+- Pushed the complete cluster and final-closure preparation at `983e741bf`. All eighteen PR clusters
+  plus the five orchestrator-only evidence closures now have current dependency, route, gate, and
+  authority records; no safe dependency-independent implementation lane remains.
+- A generic live provider-canary probe reported `auth_required` because that probe does not resolve
+  the configured user env file. It is not the decisive transport verdict. Re-ran the exact formal
+  evaluator continuation through checked-in `openrouter-run.ts`, which does resolve the canonical
+  credential, with Qwen 3.8 Max high, bypass, session `4c09a05f-a5da-4794-87e2-29b2d05f67f2`, and
+  the supported 16,000-token output cap.
+- The canonical route initialized on the exact target and then returned HTTP 403
+  `Key limit
+  exceeded (monthly limit)` before inference. Usage was zero input/output tokens and
+  zero cost; no evaluator artifact or verdict exists. Raw capture is
+  `.llm/tmp/release-0.0.5--orchestration/t1-a-impl-eval-repair1-resume3-raw.txt`.
+- Re-queried #1316 Actions run `31121552268`. It is now terminal `failure`: all six required
+  `ubuntu-latest` jobs were canceled, every job has an empty step list, and none received a runner.
+  Repo-native `agentic:pr-checks` still reports zero current product failures while classifying the
+  canceled contexts separately; canceled is not green. No cancel/retry was issued.
+- This is the third consecutive goal continuation with the same Qwen capacity blocker. Combined with
+  the runner-capacity hold and exhausted independent preflight work, the milestone is at a genuine
+  external-state impasse. The goal transitions to `blocked` without changing T1 lifecycle, merging,
+  publishing, or substituting an unapproved evaluator route.
