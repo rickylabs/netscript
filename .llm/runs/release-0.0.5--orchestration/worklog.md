@@ -551,3 +551,23 @@ files.
 - T1-B Actions run `31121552268` attempt 2 remains top-level `queued` at exact current head
   `31b8982123fda57294f4f7bf438c1157a622a41c`; required downstream jobs still have no executed
   current-head green verdict. T1-B remains held and its protected lock/stash state is untouched.
+
+## 2026-08-06 — T1 evaluator PASS and fresh workflow heads
+
+- T1-A fresh local DeepSeek V4 Flash 0731 max evaluator session
+  `d1fddd8c-12c9-4a44-9bbd-b07207d3db65` returned **PASS** against exact clean repaired head
+  `18c7a7e791552c6f346ef07a77a741dd70b058d6`, bypass, cost `$3.565048`. It independently
+  confirmed the prior Qwen blockers repaired: 19-root doc-lint 287→279, detached Fresh consumer
+  green and CI-wired, exact runtime smoke 73/73 exit 0 with cleanup, all #1295 rows supported, and
+  lock SHA-256 unchanged. Full artifact is `evaluate-repair-deepseek.md` on T1-A.
+- Recorded the PASS in evidence-only head `1124897105242bcee540ed379dd7d959916b005f`, posted the
+  formal phase comment, updated the PR body, and marked #1315 ready for review. It remains
+  `status:impl-eval` until executed current-head Actions are green.
+- T1-B run `31121552268` remained API-inconsistent: attempt 2 was reported queued, ordinary cancel
+  rejected it as completed, rerun rejected it as already running, and force-cancel rejected it as
+  not yet queued. Draft/ready and label cycles produced no new run. To force a real synchronize
+  event without touching product/evaluator/lock state, pushed one evidence-only worklog commit
+  `ca9f6cd15065f567482ce5a674efcac6c197b0b6`; the completed Qwen PASS remains valid against the
+  unchanged product tree. The protected dirty lock and stash are byte-unchanged.
+- Both PRs are clean/mergeable at their new evidence heads, but GitHub has not yet materialized
+  their new workflow sets. Absence of checks is unproven, not green; neither may merge yet.

@@ -139,3 +139,9 @@ Issue #1338 remains open for T1 observational closure. T1-A is under one fresh D
 evaluation at exact clean head `18c7a7e79`; T1-B run `31121552268` is still queued without a full
 executed green current-head rollup. After both T1 PRs pass the pre-merge gate and land, cut and
 verify the next declared canary before opening the prepared post-T1 wave.
+
+T1 live delta: #1315 now has fresh independent DeepSeek max `PASS` evidence (session
+`d1fddd8c-12c9-4a44-9bbd-b07207d3db65`, target `18c7a7e79...`, cost `$3.565048`) and is ready for
+review at evidence-only head `112489710...`; #1316 remains ready with preserved Qwen PASS at a new
+evidence-only synchronize head `ca9f6cd15...`. GitHub has not materialized current-head workflow
+sets for either new head yet, so both remain held. Do not infer green from empty rollups.
