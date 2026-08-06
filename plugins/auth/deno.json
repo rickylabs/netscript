@@ -25,7 +25,7 @@
     "@netscript/plugin-streams-core": "jsr:@netscript/plugin-streams-core@0.0.4",
     "@netscript/service": "jsr:@netscript/service@0.0.4",
     "@netscript/telemetry": "jsr:@netscript/telemetry@0.0.4",
-    "zod": "jsr:@zod/zod@4.4.3"
+    "zod": "catalog:"
   },
   "tasks": {
     "check": "deno check --unstable-kv mod.ts scaffold.ts cli.ts src/public/mod.ts src/adapter/plugin.ts src/adapter/resources/mod.ts contracts/v1/mod.ts services/src/main.ts streams/mod.ts streams/server.ts",

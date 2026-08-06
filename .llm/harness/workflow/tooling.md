@@ -91,6 +91,7 @@ answered, UI resolution is irrelevant, and outdated threads are listed but do no
 | `agentic:routing-state`          | `runtime/cli/routing-state.ts`            | read-only view of persisted quota-fallback routing state                                           |
 | `agentic:antigravity-evidence`   | `runtime/cli/antigravity-evidence-cli.ts` | run/aggregate bounded Antigravity evidence-lane probes                                             |
 | `agentic:provider-canary`        | `runtime/cli/provider-canary.ts`          | statically validate every OpenRouter preset; `--live` opts into one bounded provider turn          |
+| `agentic:claude-openrouter`      | `claude/remote-model-launcher.ts`         | launch an inference-only Claude OpenRouter session/fork; explicitly not Remote Control             |
 | `agentic:rollout-canary`         | `runtime/cli/rollout-canary-cli.ts`       | rollout canary + report for route promotion (#582)                                                 |
 | `agentic:wsl-foundation`         | `wsl/wsl-foundation.ts`                   | WSL foundation doctor + reversible bootstrap/rollback planner                                      |
 

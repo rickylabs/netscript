@@ -29,6 +29,8 @@ export type {
   AiContract,
   AiContractDefinition,
   AiContractDefinitionShape,
+  AiContractSchema,
+  AiContractSchemaResult,
   AiContractV1,
   AiRouter,
   AudioContentPart,

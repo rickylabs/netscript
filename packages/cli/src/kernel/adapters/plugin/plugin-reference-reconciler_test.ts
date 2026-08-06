@@ -65,6 +65,116 @@ Deno.test('reconcilePluginReferences maps canonical dependencies to renamed inst
   ]);
 });
 
+Deno.test('reconcilePluginReferences wires a fixture third-party plugin to declared services and apps', async () => {
+  const fs = new MemoryFileSystemAdapter();
+  await fs.writeFile(
+    '/project/appsettings.json',
+    `${JSON.stringify({
+      NetScript: {
+        Plugins: { 'event-relay': { Enabled: true } },
+        BackgroundProcessors: {},
+        Services: { catalog: { Enabled: true }, inventory: { Enabled: true } },
+        Apps: { dashboard: { Type: 'app' }, admin: { Type: 'app' } },
+      },
+    }, null, 2)}\n`,
+  );
+  await fs.writeFile(
+    '/project/plugins/acme-deploy-events/scaffold.plugin.json',
+    `${JSON.stringify({
+      schemaVersion: 1,
+      name: '@acme/deploy-events',
+      version: '1.0.0',
+      displayName: 'Deploy events',
+      description: 'Fixture third-party plugin for declared host linking.',
+      peerDependencies: {},
+      capabilities: {
+        hasDatabaseMigrations: false,
+        hasRoutes: true,
+        hasBackgroundWorkers: false,
+      },
+      scaffolder: {
+        export: './scaffold',
+        requiredPermissions: { net: [], read: [], write: [] },
+      },
+      linking: {
+        canonicalName: 'deploy-events',
+        resourceConfigKey: 'event-relay',
+        consumers: { services: ['catalog'], apps: ['dashboard'] },
+      },
+    }, null, 2)}\n`,
+  );
+
+  await reconcilePluginReferences('/project', fs);
+  const appsettings = JSON.parse(await fs.readFile('/project/appsettings.json')).NetScript;
+  assertEquals(appsettings.Services.catalog.PluginReferences, ['event-relay']);
+  assertEquals(appsettings.Services.inventory.PluginReferences, undefined);
+  assertEquals(appsettings.Apps.dashboard.PluginReferences, ['event-relay']);
+  assertEquals(appsettings.Apps.admin.PluginReferences, undefined);
+});
+
+Deno.test('third-party linking converges when consumers arrive later and cleans up after uninstall', async () => {
+  const fs = new MemoryFileSystemAdapter();
+  await fs.writeFile(
+    '/project/appsettings.json',
+    `${JSON.stringify({
+      NetScript: {
+        Plugins: { 'event-relay': { Enabled: true } },
+        BackgroundProcessors: {},
+        Services: {},
+        Apps: {},
+      },
+    }, null, 2)}\n`,
+  );
+  await writeThirdPartyDeclaration(fs);
+
+  await reconcilePluginReferences('/project', fs);
+  const beforeConsumers = JSON.parse(await fs.readFile('/project/appsettings.json'));
+  beforeConsumers.NetScript.Services.catalog = { Enabled: true };
+  beforeConsumers.NetScript.Apps.dashboard = { Type: 'app' };
+  await fs.writeFile('/project/appsettings.json', `${JSON.stringify(beforeConsumers, null, 2)}\n`);
+
+  await reconcilePluginReferences('/project', fs);
+  const linked = JSON.parse(await fs.readFile('/project/appsettings.json')).NetScript;
+  assertEquals(linked.Services.catalog.PluginReferences, ['event-relay']);
+  assertEquals(linked.Apps.dashboard.PluginReferences, ['event-relay']);
+
+  delete linked.Plugins['event-relay'];
+  await fs.writeFile('/project/appsettings.json', `${JSON.stringify({ NetScript: linked }, null, 2)}\n`);
+  await fs.remove('/project/plugins/acme-deploy-events');
+  await reconcilePluginReferences('/project', fs);
+  const removed = JSON.parse(await fs.readFile('/project/appsettings.json')).NetScript;
+  assertEquals(removed.Services.catalog.PluginReferences, undefined);
+  assertEquals(removed.Apps.dashboard.PluginReferences, undefined);
+});
+
+async function writeThirdPartyDeclaration(fs: MemoryFileSystemAdapter): Promise<void> {
+  await fs.writeFile(
+    '/project/plugins/acme-deploy-events/scaffold.plugin.json',
+    `${JSON.stringify({
+      schemaVersion: 1,
+      name: '@acme/deploy-events',
+      version: '1.0.0',
+      displayName: 'Deploy events',
+      description: 'Fixture third-party plugin for declared host linking.',
+      peerDependencies: {},
+      capabilities: {
+        hasDatabaseMigrations: false,
+        hasRoutes: true,
+        hasBackgroundWorkers: false,
+      },
+      scaffolder: {
+        export: './scaffold',
+        requiredPermissions: { net: [], read: [], write: [] },
+      },
+      linking: {
+        canonicalName: 'deploy-events',
+        resourceConfigKey: 'event-relay',
+        consumers: { services: ['catalog'], apps: ['dashboard'] },
+      },
+    }, null, 2)}\n`,
+  );
+}
+
 interface Entry {
   PluginReferences?: string[];
   [key: string]: unknown;

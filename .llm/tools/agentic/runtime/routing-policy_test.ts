@@ -378,38 +378,94 @@ Deno.test('canonical evaluator resolution rejects self-certification', () => {
   );
 });
 
-Deno.test('formal evaluator is Claude OpenRouter with the supported Qwen evaluation preset', () => {
-  const route = resolveCanonicalFormalEvaluatorRoute({
-    authorFamily: 'openai',
-    generatorSession: { ...session, agent: 'codex', sessionId: 'codex-generator' },
-    evaluatorSession: { ...session, agent: 'claude', sessionId: 'open-evaluator' },
-  }, new Date('2026-07-13T00:00:00Z'));
-  equal([
-    route.lane,
-    route.agent,
-    route.provider,
-    route.profileId,
-    route.presetId,
-    route.model,
-    route.evaluatorModelPolicy,
-  ], [
-    'formal_evaluation',
-    'claude',
-    'openrouter',
-    'claude-openrouter',
-    'claude-evaluator-qwen-3-7-max',
-    OPENROUTER_MODEL_IDS.qwen,
-    'open_only',
-  ]);
+Deno.test('formal evaluator resolves Minimax high PLAN and DeepSeek max IMPL routes', () => {
+  for (
+    const [phase, lane, presetId, model, effort] of [
+      [
+        'plan',
+        'formal_plan_evaluation',
+        'claude-evaluator-minimax-m3',
+        OPENROUTER_MODEL_IDS.minimax,
+        'high',
+      ],
+      [
+        'impl',
+        'formal_impl_evaluation',
+        'claude-evaluator-deepseek-v4-flash-0731',
+        OPENROUTER_MODEL_IDS.deepseekV4Flash0731,
+        'max',
+      ],
+    ] as const
+  ) {
+    const route = resolveCanonicalFormalEvaluatorRoute({
+      phase,
+      authorFamily: 'openai',
+      generatorSession: { ...session, agent: 'codex', sessionId: 'codex-generator' },
+      evaluatorSession: { ...session, agent: 'claude', sessionId: `${phase}-open-evaluator` },
+    }, new Date('2026-07-13T00:00:00Z'));
+    equal([
+      route.lane,
+      route.agent,
+      route.provider,
+      route.profileId,
+      route.presetId,
+      route.model,
+      route.effort,
+      route.evaluatorModelPolicy,
+    ], [lane, 'claude', 'openrouter', 'claude-openrouter', presetId, model, effort, 'open_only']);
+  }
+});
+
+Deno.test('formal evaluator falls back to AGY Gemini 3.6 Flash high only on explicit OpenRouter limit', () => {
+  const at = new Date('2026-08-06T00:00:00Z');
+  for (const phase of ['plan', 'impl'] as const) {
+    const route = resolveCanonicalFormalEvaluatorRoute({
+      phase,
+      authorFamily: 'openai',
+      generatorSession: { ...session, agent: 'codex', sessionId: 'codex-generator' },
+      evaluatorSession: {
+        ...session,
+        agent: 'antigravity',
+        sessionId: `${phase}-agy-evaluator`,
+      },
+      fallbackReason: 'openrouter_limit',
+    }, at);
+    equal([
+      route.lane,
+      route.agent,
+      route.provider,
+      route.model,
+      route.effort,
+      route.condition,
+    ], [
+      phase === 'plan' ? 'formal_plan_evaluation' : 'formal_impl_evaluation',
+      'antigravity',
+      'google',
+      MODEL_IDS.antigravityDocs,
+      'high',
+      'fallback_on_openrouter_limit',
+    ]);
+  }
+
+  assertThrows(() =>
+    resolveCanonicalFormalEvaluatorRoute({
+      phase: 'impl',
+      authorFamily: 'openai',
+      generatorSession: { ...session, agent: 'codex', sessionId: 'codex-generator' },
+      evaluatorSession: { ...session, agent: 'claude', sessionId: 'wrong-fallback-agent' },
+      fallbackReason: 'openrouter_limit',
+    }, at)
+  );
 });
 
 Deno.test('formal evaluator rejects closed models and reused generator sessions', () => {
   const at = new Date('2026-07-13T00:00:00Z');
   const generatorSession = { ...session, agent: 'codex', sessionId: 'codex-generator' } as const;
   const evaluatorSession = { ...session, agent: 'claude', sessionId: 'open-evaluator' } as const;
-  const route = resolveCanonicalRoute('formal_evaluation', at);
+  const route = resolveCanonicalRoute('formal_impl_evaluation', at);
   assertThrows(() =>
     resolveCanonicalFormalEvaluatorRoute({
+      phase: 'impl',
       authorFamily: 'openai',
       generatorSession,
       evaluatorSession,
@@ -418,10 +474,68 @@ Deno.test('formal evaluator rejects closed models and reused generator sessions'
   );
   assertThrows(() =>
     resolveCanonicalFormalEvaluatorRoute({
+      phase: 'impl',
       authorFamily: 'openai',
       generatorSession,
       evaluatorSession: generatorSession,
     }, at)
+  );
+});
+
+Deno.test('formal evaluator rejects cross-phase presets', () => {
+  const at = new Date('2026-07-13T00:00:00Z');
+  const common = {
+    authorFamily: 'openai' as const,
+    generatorSession: { ...session, agent: 'codex' as const, sessionId: 'codex-generator' },
+    evaluatorSession: { ...session, agent: 'claude' as const, sessionId: 'open-evaluator' },
+  };
+  assertThrows(() =>
+    resolveCanonicalFormalEvaluatorRoute({
+      ...common,
+      phase: 'plan',
+      route: resolveCanonicalRoute('formal_impl_evaluation', at),
+    }, at)
+  );
+  assertThrows(() =>
+    resolveCanonicalFormalEvaluatorRoute({
+      ...common,
+      phase: 'impl',
+      route: resolveCanonicalRoute('formal_plan_evaluation', at),
+    }, at)
+  );
+});
+
+Deno.test('formal IMPL evaluator rejects the stale Qwen 3.7 model', () => {
+  const at = new Date('2026-07-13T00:00:00Z');
+  const route = resolveCanonicalRoute('formal_impl_evaluation', at);
+  assertThrows(
+    () =>
+      resolveCanonicalFormalEvaluatorRoute({
+        phase: 'impl',
+        authorFamily: 'openai',
+        generatorSession: { ...session, agent: 'codex', sessionId: 'codex-generator' },
+        evaluatorSession: { ...session, agent: 'claude', sessionId: 'open-evaluator' },
+        route: { ...route, model: 'qwen/qwen3.7-max' },
+      }, at),
+    Error,
+    'formal impl evaluator requires its canonical phase route',
+  );
+});
+
+Deno.test('formal IMPL evaluator rejects the retired well-formed Qwen 3.8 route', () => {
+  const at = new Date('2026-08-06T00:00:00Z');
+  const route = resolveCanonicalRoute('formal_impl_evaluation', at);
+  assertThrows(
+    () =>
+      resolveCanonicalFormalEvaluatorRoute({
+        phase: 'impl',
+        authorFamily: 'openai',
+        generatorSession: { ...session, agent: 'codex', sessionId: 'codex-generator' },
+        evaluatorSession: { ...session, agent: 'claude', sessionId: 'open-evaluator' },
+        route: { ...route, model: OPENROUTER_MODEL_IDS.qwen },
+      }, at),
+    Error,
+    'formal impl evaluator requires its canonical phase route',
   );
 });
 
@@ -431,13 +545,14 @@ Deno.test('formal evaluator rejects the Gemini documentation-authoring generator
   assertThrows(
     () =>
       resolveCanonicalFormalEvaluatorRoute({
+        phase: 'impl',
         authorFamily: 'openai',
         generatorSession: { ...session, agent: 'codex', sessionId: 'codex-generator' },
         evaluatorSession: { ...session, agent: 'claude', sessionId: 'open-evaluator' },
         route: geminiGeneratorRoute,
       }, at),
     Error,
-    'formal evaluator requires an evaluation route',
+    'formal impl evaluator requires its canonical phase route',
   );
 });
 

@@ -120,6 +120,12 @@ what lands in your repo is the thin, typed seam you own. After installing, one
 `netscript generate plugins` regenerates the registry so the host discovers the new
 contribution statically.
 
+A plugin that exposes an API declares its exact resource key and named service/app consumers in
+`scaffold.plugin.json` under `linking`. Install reconciles those references into `appsettings.json`
+for first- and third-party packages alike; installing a consumer later converges the same graph,
+and removing the producer prunes its references. Consumer code receives Aspire service-discovery
+environment variables without hand-editing configuration.
+
 Medusa's Agent Skills docs collapse "install a plugin" and "give an agent a
 capability" into the same action — skills are installable units an agent uses
 directly. A NetScript plugin carries the same dual reading, one artifact with two

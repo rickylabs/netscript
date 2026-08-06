@@ -8,6 +8,7 @@ import {
   netscriptJsrSpecifier,
   NETSCRIPT_RELEASE_VERSION,
 } from '../../../../kernel/constants/jsr-specifiers.ts';
+import { SCAFFOLD_WORKSPACE_CATALOG } from '../../../../kernel/constants/scaffold/scaffold-app-catalog.ts';
 import type { ProcessPort, ProcessResult } from '../../../../kernel/ports/process-port.ts';
 import { createInstalledRuntimeRegistryGenerator } from './installed-runtime-registry-generator.ts';
 
@@ -437,7 +438,10 @@ async function writeProjectConfig(
   imports: Readonly<Record<string, string>>,
   workspace?: readonly string[],
 ): Promise<void> {
-  await write(join(projectRoot, 'deno.json'), `${JSON.stringify({ imports, workspace })}\n`);
+  await write(
+    join(projectRoot, 'deno.json'),
+    `${JSON.stringify({ catalog: SCAFFOLD_WORKSPACE_CATALOG, imports, workspace })}\n`,
+  );
 }
 
 async function writeAppSettings(

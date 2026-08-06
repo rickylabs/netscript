@@ -57,7 +57,7 @@ Deno.test('provider profiles are finite, frozen, and clear every rival credentia
 Deno.test('OpenRouter preset slugs and route purposes are locked', () => {
   assertEquals(OPENROUTER_PRESET_MODELS, [
     'minimax/minimax-m3',
-    'qwen/qwen3.7-max',
+    'deepseek/deepseek-v4-flash-0731',
     'z-ai/glm-5.2',
     'x-ai/grok-4.5',
   ]);
@@ -72,11 +72,22 @@ Deno.test('OpenRouter preset slugs and route purposes are locked', () => {
   assertEquals(OPENROUTER_PRESETS['claude-design-glm-5-2'].reasoningTrace, 'absent');
   assertEquals(OPENROUTER_PRESETS['claude-fanout-minimax-m3'].agenticTurn, 'supported');
   assertEquals(OPENROUTER_PRESETS['claude-fanout-minimax-m3'].reasoningTrace, 'present');
-  assertEquals(OPENROUTER_PRESETS['claude-evaluator-qwen-3-7-max'], {
-    id: 'claude-evaluator-qwen-3-7-max',
+  assertEquals(OPENROUTER_PRESETS['claude-evaluator-minimax-m3'], {
+    id: 'claude-evaluator-minimax-m3',
     profileId: 'claude-openrouter',
-    model: 'qwen/qwen3.7-max',
+    model: 'minimax/minimax-m3',
     effort: 'high',
+    purpose: 'evaluation',
+    agenticTurn: 'supported',
+    transport: 'anthropic-messages',
+    reasoningTrace: 'present',
+    incompatibility: null,
+  });
+  assertEquals(OPENROUTER_PRESETS['claude-evaluator-deepseek-v4-flash-0731'], {
+    id: 'claude-evaluator-deepseek-v4-flash-0731',
+    profileId: 'claude-openrouter',
+    model: 'deepseek/deepseek-v4-flash-0731',
+    effort: 'max',
     purpose: 'evaluation',
     agenticTurn: 'supported',
     transport: 'anthropic-messages',
@@ -88,10 +99,20 @@ Deno.test('OpenRouter preset slugs and route purposes are locked', () => {
     matchOpenRouterPreset(route({
       agent: 'claude',
       profileId: 'claude-openrouter',
+      presetId: 'claude-evaluator-minimax-m3',
       model: 'minimax/minimax-m3',
       effort: 'high',
     })),
-    OPENROUTER_PRESETS['claude-fanout-minimax-m3'],
+    OPENROUTER_PRESETS['claude-evaluator-minimax-m3'],
+  );
+  assertEquals(
+    matchOpenRouterPreset(route({
+      agent: 'claude',
+      profileId: 'claude-openrouter',
+      model: 'minimax/minimax-m3',
+      effort: 'high',
+    })),
+    null,
   );
 });
 
@@ -118,6 +139,18 @@ Deno.test('profile mismatch and rival credential presence fail explicitly by key
     requireSession: false,
   });
   assertEquals(mismatch.diagnostics.map((entry) => entry.code), ['route_conflict']);
+  const presetMismatch = validateProviderRoute({
+    route: route({
+      agent: 'claude',
+      profileId: 'claude-openrouter',
+      presetId: 'claude-evaluator-minimax-m3',
+      model: 'qwen/qwen3.8-max',
+      effort: 'high',
+    }),
+    nativeExt4: true,
+    requireSession: false,
+  });
+  assertEquals(presetMismatch.diagnostics.map((entry) => entry.code), ['route_conflict']);
   const conflict = validateProviderRoute({
     route: route(),
     nativeExt4: true,

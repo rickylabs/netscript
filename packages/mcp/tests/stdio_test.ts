@@ -45,7 +45,7 @@ Deno.test('stdio initialize, list, and unreachable doctor round trip', async () 
     assert(typeof responses[0].result.instructions === 'string');
     assertStringIncludes(
       responses[0].result.instructions,
-      'When debugging or calling a service HTTP API, use list_service_operations and get_operation_schema before hand-rolling requests with curl.',
+      'When debugging or calling a service HTTP API, follow the MCP path: list_api_services to discover the live service name, list_service_operations to select an operation, then get_operation_schema for its request and response contract before hand-rolling requests with curl.',
     );
     for (
       const name of [

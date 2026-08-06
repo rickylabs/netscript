@@ -43,7 +43,8 @@ export const ROUTING_LANES = [
   'chore_code',
   'claude_workflow',
   'research_extraction',
-  'formal_evaluation',
+  'formal_plan_evaluation',
+  'formal_impl_evaluation',
   'review_claude',
   'review_codex_light',
   'review_codex',
@@ -87,7 +88,10 @@ export interface EffortEscalation {
 }
 
 const MAJOR_UI_UX_PRESET = OPENROUTER_PRESETS['claude-design-glm-5-2'];
-const FORMAL_EVALUATOR_PRESET = OPENROUTER_PRESETS['claude-evaluator-qwen-3-7-max'];
+const FORMAL_PLAN_EVALUATOR_PRESET = OPENROUTER_PRESETS['claude-evaluator-minimax-m3'];
+const FORMAL_IMPL_EVALUATOR_PRESET = OPENROUTER_PRESETS[
+  'claude-evaluator-deepseek-v4-flash-0731'
+];
 
 /** Canonical machine-readable route bindings rendered by the harness lane-policy document. */
 export const CANONICAL_ROUTE_POLICY: readonly CanonicalRoutePolicy[] = [
@@ -316,15 +320,44 @@ export const CANONICAL_ROUTE_POLICY: readonly CanonicalRoutePolicy[] = [
     effort: 'low',
   },
   {
-    lane: 'formal_evaluation',
+    lane: 'formal_plan_evaluation',
     purpose: 'evaluation',
     agent: 'claude',
     provider: 'openrouter',
-    profileId: FORMAL_EVALUATOR_PRESET.profileId,
-    presetId: FORMAL_EVALUATOR_PRESET.id,
-    model: FORMAL_EVALUATOR_PRESET.model,
-    effort: FORMAL_EVALUATOR_PRESET.effort,
+    profileId: FORMAL_PLAN_EVALUATOR_PRESET.profileId,
+    presetId: FORMAL_PLAN_EVALUATOR_PRESET.id,
+    model: FORMAL_PLAN_EVALUATOR_PRESET.model,
+    effort: FORMAL_PLAN_EVALUATOR_PRESET.effort,
     evaluatorModelPolicy: 'open_only',
+  },
+  {
+    lane: 'formal_plan_evaluation',
+    purpose: 'evaluation',
+    agent: 'antigravity',
+    provider: 'google',
+    model: MODEL_IDS.antigravityDocs,
+    effort: 'high',
+    condition: 'fallback_on_openrouter_limit',
+  },
+  {
+    lane: 'formal_impl_evaluation',
+    purpose: 'evaluation',
+    agent: 'claude',
+    provider: 'openrouter',
+    profileId: FORMAL_IMPL_EVALUATOR_PRESET.profileId,
+    presetId: FORMAL_IMPL_EVALUATOR_PRESET.id,
+    model: FORMAL_IMPL_EVALUATOR_PRESET.model,
+    effort: FORMAL_IMPL_EVALUATOR_PRESET.effort,
+    evaluatorModelPolicy: 'open_only',
+  },
+  {
+    lane: 'formal_impl_evaluation',
+    purpose: 'evaluation',
+    agent: 'antigravity',
+    provider: 'google',
+    model: MODEL_IDS.antigravityDocs,
+    effort: 'high',
+    condition: 'fallback_on_openrouter_limit',
   },
   {
     lane: 'review_claude',
@@ -429,10 +462,13 @@ export interface EvaluatorAssignment {
 }
 
 export interface FormalEvaluatorAssignment {
+  readonly phase: 'plan' | 'impl';
   readonly authorFamily: Exclude<ModelFamily, 'open' | 'other'>;
   readonly generatorSession: SessionIdentity;
   readonly evaluatorSession: SessionIdentity;
   readonly route?: CanonicalRoutePolicy;
+  /** Explicit owner-authorized fallback; absent means the canonical OpenRouter route is required. */
+  readonly fallbackReason?: 'openrouter_limit';
 }
 
 function sessionFamily(session: SessionIdentity): ModelFamily {
@@ -486,14 +522,37 @@ export function resolveCanonicalFormalEvaluatorRoute(
   if (sessionFamily(assignment.generatorSession) !== assignment.authorFamily) {
     throw new Error('generator session family must match the authored slice');
   }
-  const route = assignment.route ?? resolveCanonicalRoute('formal_evaluation', at);
+  const lane = assignment.phase === 'plan' ? 'formal_plan_evaluation' : 'formal_impl_evaluation';
+  const expectedPreset = assignment.phase === 'plan'
+    ? FORMAL_PLAN_EVALUATOR_PRESET
+    : FORMAL_IMPL_EVALUATOR_PRESET;
+  const fallback = assignment.fallbackReason === 'openrouter_limit';
+  const route = assignment.route ??
+    (fallback
+      ? CANONICAL_ROUTE_POLICY.find((entry) =>
+        entry.lane === lane && entry.condition === 'fallback_on_openrouter_limit'
+      )
+      : resolveCanonicalRoute(lane, at));
+  if (!route) throw new Error(`no canonical OpenRouter-limit fallback for ${lane}`);
+  if (fallback) {
+    if (
+      route.lane !== lane || route.purpose !== 'evaluation' ||
+      route.condition !== 'fallback_on_openrouter_limit' || route.agent !== 'antigravity' ||
+      route.provider !== 'google' || route.model !== MODEL_IDS.antigravityDocs ||
+      route.effort !== 'high' || assignment.evaluatorSession.agent !== 'antigravity'
+    ) {
+      throw new Error(`formal ${assignment.phase} evaluator requires the canonical AGY fallback`);
+    }
+    return route;
+  }
   const preset = route.presetId ? OPENROUTER_PRESETS[route.presetId] : undefined;
   if (
     route.purpose !== 'evaluation' || route.agent !== 'claude' ||
     route.provider !== 'openrouter' || route.profileId !== 'claude-openrouter' ||
-    route.evaluatorModelPolicy !== 'open_only'
+    route.evaluatorModelPolicy !== 'open_only' || route.lane !== lane ||
+    route.presetId !== expectedPreset.id || route.model !== expectedPreset.model
   ) {
-    throw new Error('formal evaluator requires an evaluation route on Claude OpenRouter');
+    throw new Error(`formal ${assignment.phase} evaluator requires its canonical phase route`);
   }
   if (!OPEN_EVALUATOR_MODEL_IDS.some((model) => model === route.model)) {
     throw new Error('formal evaluator model is not approved for open-only evaluation');

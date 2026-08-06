@@ -258,7 +258,7 @@ export function createRuntimeGates(
     ),
     commandGate(
       GATE.BEHAVIOR_MCP_ENDPOINT_DIRECTORY,
-      'Resolve live service ports through MCP Aspire adapter',
+      'Follow the documented MCP OpenAPI discovery path',
       GATE_PHASE.BEHAVIOR,
       (context) => [
         'deno',

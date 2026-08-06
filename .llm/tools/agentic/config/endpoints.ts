@@ -22,6 +22,9 @@ export const ANTIGRAVITY_INSTALLER_URL = 'https://antigravity.google/cli/install
 export const OPENROUTER_ANTHROPIC_BASE_URL = 'https://openrouter.ai/api';
 export const OPENROUTER_RESPONSES_BASE_URL = 'https://openrouter.ai/api/v1';
 
+/** Anthropic API base URL used for OAuth and Remote Control passthrough traffic. */
+export const ANTHROPIC_API_BASE_URL = 'https://api.anthropic.com';
+
 /** Loopback binding used by local policy proxies that must never accept remote traffic. */
 export const LOOPBACK_HOST = '127.0.0.1';
 export const LOOPBACK_HTTP_PROTOCOL = 'http:';

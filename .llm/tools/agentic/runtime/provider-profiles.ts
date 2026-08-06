@@ -107,7 +107,8 @@ export const PROVIDER_PROFILES: Readonly<Record<ProviderProfileId, ProviderProfi
 
 export const OPENROUTER_PRESET_IDS = [
   'claude-fanout-minimax-m3',
-  'claude-evaluator-qwen-3-7-max',
+  'claude-evaluator-minimax-m3',
+  'claude-evaluator-deepseek-v4-flash-0731',
   'claude-design-glm-5-2',
   'codex-design-glm-5-2',
   'codex-long-medium-grok-4-5',
@@ -127,12 +128,12 @@ export const OPENROUTER_INCOMPATIBILITIES = ['codex-native-namespace-tool'] as c
 export type OpenRouterIncompatibility = typeof OPENROUTER_INCOMPATIBILITIES[number];
 export const OPENROUTER_PRESET_MODELS: readonly [
   typeof OPENROUTER_MODEL_IDS.minimax,
-  typeof OPENROUTER_MODEL_IDS.qwen,
+  typeof OPENROUTER_MODEL_IDS.deepseekV4Flash0731,
   typeof OPENROUTER_MODEL_IDS.glm,
   typeof OPENROUTER_MODEL_IDS.grok,
 ] = [
   OPENROUTER_MODEL_IDS.minimax,
-  OPENROUTER_MODEL_IDS.qwen,
+  OPENROUTER_MODEL_IDS.deepseekV4Flash0731,
   OPENROUTER_MODEL_IDS.glm,
   OPENROUTER_MODEL_IDS.grok,
 ];
@@ -166,11 +167,22 @@ export const OPENROUTER_PRESETS: Readonly<Record<OpenRouterPresetId, OpenRouterP
       reasoningTrace: 'present',
       incompatibility: null,
     }),
-    'claude-evaluator-qwen-3-7-max': Object.freeze({
-      id: 'claude-evaluator-qwen-3-7-max',
+    'claude-evaluator-minimax-m3': Object.freeze({
+      id: 'claude-evaluator-minimax-m3',
       profileId: 'claude-openrouter',
-      model: OPENROUTER_MODEL_IDS.qwen,
+      model: OPENROUTER_MODEL_IDS.minimax,
       effort: 'high',
+      purpose: 'evaluation',
+      agenticTurn: 'supported',
+      transport: 'anthropic-messages',
+      reasoningTrace: 'present',
+      incompatibility: null,
+    }),
+    'claude-evaluator-deepseek-v4-flash-0731': Object.freeze({
+      id: 'claude-evaluator-deepseek-v4-flash-0731',
+      profileId: 'claude-openrouter',
+      model: OPENROUTER_MODEL_IDS.deepseekV4Flash0731,
+      effort: 'max',
       purpose: 'evaluation',
       agenticTurn: 'supported',
       transport: 'anthropic-messages',
@@ -271,10 +283,14 @@ export function resolveProviderProfile(route: RouteIdentity): ProviderProfile | 
   return null;
 }
 
-/** Returns the preset only when its route profile, model, and effort match exactly. */
+/** Returns the explicit preset only when every route field matches, otherwise the unique match. */
 export function matchOpenRouterPreset(route: RouteIdentity): OpenRouterPreset | null {
-  return Object.values(OPENROUTER_PRESETS).find((preset) =>
+  const matches = Object.values(OPENROUTER_PRESETS).filter((preset) =>
     route.profileId === preset.profileId && route.model === preset.model &&
     route.effort === preset.effort
-  ) ?? null;
+  );
+  if (route.presetId) {
+    return matches.find((preset) => preset.id === route.presetId) ?? null;
+  }
+  return matches.length === 1 ? matches[0] : null;
 }

@@ -1,7 +1,7 @@
-import type { z } from 'zod';
-
 /** Parse result returned by contract schema values. */
-export type ContractParseResult<TOutput> = z.ZodSafeParseResult<TOutput>;
+export type ContractParseResult<TOutput> =
+  | { readonly success: true; readonly data: TOutput }
+  | { readonly success: false; readonly error: unknown };
 
 /** Infer the accepted input value type from a Zod-compatible schema. */
 export type ContractSchemaInput<TSchema> = TSchema extends { readonly _input: infer TInput }
@@ -13,8 +13,43 @@ export type ContractSchemaOutput<TSchema> = TSchema extends { readonly _output: 
   ? TOutput
   : unknown;
 
-/** Zod-backed contract schema retaining both parsed output and accepted input. */
-export type ContractSchema<TOutput = unknown, TInput = unknown> = z.ZodType<TOutput, TInput>;
+/** Package-owned structural validator used by public contract schemas. */
+export interface ContractSchema<TOutput = unknown, TInput = unknown> {
+  /** Standard Schema metadata consumed by oRPC and other validator-neutral callers. */
+  readonly '~standard': {
+    readonly version: 1;
+    readonly vendor: string;
+    readonly validate: (
+      value: unknown,
+      options?: { readonly libraryOptions?: Record<string, unknown> | undefined },
+    ) =>
+      | { readonly value: TOutput; readonly issues?: undefined }
+      | {
+        readonly issues: ReadonlyArray<{
+          readonly message: string;
+          readonly path?: ReadonlyArray<PropertyKey | { readonly key: PropertyKey }> | undefined;
+        }>;
+      }
+      | Promise<
+        | { readonly value: TOutput; readonly issues?: undefined }
+        | {
+          readonly issues: ReadonlyArray<{
+            readonly message: string;
+            readonly path?: ReadonlyArray<PropertyKey | { readonly key: PropertyKey }> | undefined;
+          }>;
+        }
+      >;
+    readonly types?: { readonly input: TInput; readonly output: TOutput } | undefined;
+  };
+  /** Compile-time marker for the accepted input type. */
+  readonly _input: TInput;
+  /** Compile-time marker for the parsed output type. */
+  readonly _output: TOutput;
+  /** Parse an input value or throw a validation error. */
+  parse(input: TInput): TOutput;
+  /** Parse an input value without throwing. */
+  safeParse(input: TInput): ContractParseResult<TOutput>;
+}
 
 /**
  * Cross-resolution schema constraint used at consumer-supplied boundaries.
@@ -36,22 +71,23 @@ export type ContractObjectSchemaLike<TOutput = unknown, TInput = unknown> =
   & Readonly<{ shape: Readonly<Record<string, unknown>> }>;
 
 /** Contract schema value that supports a default output. */
-export type ContractDefaultableSchema<TOutput, TInput = unknown> = z.ZodType<TOutput, TInput>;
+export type ContractDefaultableSchema<TOutput, TInput = unknown> = ContractSchema<
+  TOutput,
+  TInput
+>;
 
 /**
  * Zod-backed object schema retaining parsed output and accepted input.
  *
- * The object operations intentionally use Zod's own signatures so callers do
- * not need to cast a contract schema back into a Zod object before composing
- * it. Generic factories that need exact shape inference accept `z.ZodObject`
- * directly and preserve the concrete schema type.
+ * Generic factories that need exact validator implementation details retain
+ * their concrete schema privately and publish this portable object surface.
  */
 export type ContractObjectSchema<TOutput = unknown, TInput = unknown> =
-  & z.ZodType<TOutput, TInput>
-  & Pick<z.ZodObject, 'shape' | 'extend' | 'merge'>;
+  & ContractSchema<TOutput, TInput>
+  & Readonly<{ shape: Readonly<Record<string, unknown>> }>;
 
 /** Contract number schema returned by the numeric helper factories. */
-export type ContractNumberSchema = z.ZodNumber | z.ZodDefault<z.ZodNumber>;
+export type ContractNumberSchema = ContractSchema<number, unknown>;
 
 /** Contract string schema returned by the string helper factories. */
-export type ContractStringSchema = z.ZodString;
+export type ContractStringSchema = ContractSchema<string, unknown>;

@@ -37,8 +37,8 @@ self-certifies). Everything else is a per-run lane assignment recorded in the ru
 | Concept           | Meaning                                                                                 |
 | ----------------- | --------------------------------------------------------------------------------------- |
 | **9-phase model** | Bootstrap → Research → Plan & Design → Plan-Gate → Implement → Gate → Evaluate → Release → Close. |
-| **PLAN-EVAL**     | First evaluator pass, before implementation. Hard stop.                                 |
-| **IMPL-EVAL**     | Final evaluator pass, after implementation.                                             |
+| **PLAN-EVAL**     | Conditional pre-implementation pass for complex/decision-heavy work; hard stop when selected. |
+| **IMPL-EVAL**     | Mandatory final pass after implementation unless the owner explicitly waives it.       |
 | **Tiered lanes**  | Agent lanes A–E with named model bindings; single source `workflow/lane-policy.md`.     |
 | **Slice review gate** | Tier-A supervisor substantively reviews each landed slice before the sign-off commit; no lane self-certifies (A1). |
 | **Supervisor identity** | Every run dir carries `supervisor.md` (model, session, host, paths, branch, baseline, lanes). |
@@ -76,11 +76,12 @@ intent hint, not the final profile.
 5. Scaffold run artifacts from `templates/`.
 6. Produce `research.md`, then `plan.md` with locked decisions.
 7. Record Design checkpoint in `worklog.md`.
-8. **Run PLAN-EVAL (separate session). No implementation before PASS.**
+8. **For complex/decision-heavy work, run PLAN-EVAL in a separate session before implementation;
+   otherwise record a justified `PLAN-EVAL: N/A`.**
 9. Implement one commit slice at a time; push + comment on the draft PR (the commit trail) and keep
    `worklog.md`/`context-pack.md` current after each.
 10. Run gates; record results in `worklog.md`.
-11. **Run IMPL-EVAL (separate session).**
+11. **Run IMPL-EVAL (separate session) unless the owner explicitly waives it.**
 12. Close: update `context-pack.md`, `arch-debt.md`, and promote lessons if warranted.
 
 When the opening diff is docs-only, proactively apply `ci:skip-e2e` to the draft PR and also apply
@@ -129,23 +130,28 @@ routing here — defer to that file. The items below are the parts of the contra
 
 ## Common Pitfalls
 
-- **Skipping Plan & Design** — The Plan-Gate is a hard stop. Implementation before PLAN-EVAL `PASS`
-  is a process failure.
+- **Skipping a selected Plan-Gate** — for complex/decision-heavy work, implementation before
+  PLAN-EVAL `PASS` is a process failure. Small/mechanical work records `PLAN-EVAL: N/A` first.
 - **Self-evaluation** — The evaluator must be a separate session. The generator does not
   self-certify.
 - **Wrong evaluator surface** — the generator session may never evaluate its own output. For a
-  **local-machine run**, PLAN-EVAL/IMPL-EVAL is a **separate local session on Claude Code +
-  OpenRouter** (`claude-openrouter` profile → `claude-print`) running the bound **OPEN-model Qwen
-  evaluation preset** (`qwen/qwen3.7-max`) — an open model is adversarial to both the Claude and
-  Codex families. Minimax M3 remains in the approved open-model set but is not currently bound to a
-  local evaluation preset. **Ordinary (non-formal) review** — the slice review gate, code/PR review — uses a
+  **local-machine run**, PLAN-EVAL and IMPL-EVAL are **separate local sessions on Claude Code +
+  OpenRouter** (`claude-openrouter` profile → `claude-print`). PLAN-EVAL uses the bound
+  `claude-evaluator-minimax-m3` preset (`minimax/minimax-m3`) at high effort; IMPL-EVAL uses the
+  bound `claude-evaluator-deepseek-v4-flash-0731` preset
+  (`deepseek/deepseek-v4-flash-0731`) at max effort. Both are open models adversarial to
+  the Claude and Codex families. **Ordinary (non-formal) review** — the slice review gate, code/PR review — uses a
   local **opposite-family** session instead (a Codex GPT-5.6 session reviews Claude-authored work; a
   Claude session reviews Codex-authored work). The **supervisor chooses when to trigger** — never
   auto-dispatch a cloud evaluator from a sub-agent. **Both evaluator transports are open-models-only;
   dispatching either with a closed model (Claude/GPT/Gemini) is prohibited
-  (it burns paid OpenRouter credit).** OpenHands remains the default automated **cloud** agent. See
+  (it burns paid OpenRouter credit).** OpenHands is temporarily paused until its trigger path is fixed. See
   `.agents/skills/openhands-handoff/SKILL.md` "Routing policy". If no evaluator surface is available,
   record a blocked launch in `drift.md`.
+  When OpenRouter is blocked by a provider limit, the owner-authorized formal fallback is a fresh
+  separate Antigravity (`agy`) session through the Google subscription using
+  `gemini-3.6-flash-high` at high effort. Record requested/observed identity and never route that
+  fallback through OpenRouter. OpenHands is temporarily paused until its trigger path is fixed.
 - **Self-certifying a slice** — a green automated gate is not a sign-off. The Tier-A supervisor must
   substantively review the slice before the sign-off commit, for every implementation lane
   (`workflow/lane-policy.md` invariant 2). No lane self-certifies.
@@ -287,7 +293,7 @@ User says "use harness"
   -> frontend/service/docs? apply SCOPE-* overlay
   -> two or more phase groups? read workflow/supervisor.md + escalation.md, keep phase-registry.md
   -> read gate matrix + plan-gate.md
-  -> plan committed? run PLAN-EVAL (separate session); no slice before PASS
+  -> complex/decision-heavy plan or genuine need for adversarial advice? run PLAN-EVAL (separate session); otherwise record PLAN-EVAL: N/A
   -> supervised? assign lanes per workflow/lane-policy.md (generator != evaluator session)
   -> slice landed + gates green? Tier-A supervisor reviews before the sign-off commit
   -> OpenHands/local/cloud handoff? read workflow/agent-handoff.md
@@ -324,8 +330,8 @@ User says "use harness"
 - [ ] Lane assignments follow `workflow/lane-policy.md`, or the override is recorded in
       `supervisor.md`/`drift.md`.
 - [ ] Plan-Gate checklist (`gates/plan-gate.md`) was reviewed.
-- [ ] PLAN-EVAL returned `PASS` before any implementation slice.
-- [ ] PLAN-EVAL used the recorded evaluator route (open model), or the blocked launch was recorded.
+- [ ] PLAN-EVAL returned `PASS` before implementation when selected, or a justified `PLAN-EVAL: N/A` was recorded first.
+- [ ] Any PLAN-EVAL used the recorded route, or the owner-authorized fallback was recorded.
 - [ ] Tier-D (WSL Codex) slices recorded daemon-managed proof, thread id, worktree, and steering
       command.
 - [ ] The slice review gate was performed (Tier-A substantive review) before each sign-off commit;

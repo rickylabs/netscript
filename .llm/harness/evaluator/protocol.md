@@ -9,15 +9,17 @@ against the changed state, not to continue implementation.
 **Evaluator surface (local vs cloud).** The invariant never changes: the generator session is never
 the evaluator session, and no lane self-certifies. The transport is how that invariant is realized.
 
-- **Local run (the default for harness work).** PLAN-EVAL/IMPL-EVAL runs in a separate **local**
-  session on the **Claude Code + OpenRouter** transport (`claude-openrouter` provider profile,
-  driven via `claude-print`) with the bound **OPEN-model Qwen evaluation preset** —
-  `qwen/qwen3.7-max`. Minimax M3 remains in the approved open-model set but its current local preset
-  is workflow-fanout, not evaluation. An open model is neither Claude-family nor Codex-family, so it is adversarial to **both** generators.
+- **Local run (the default for harness work).** PLAN-EVAL and IMPL-EVAL run in separate **local**
+  sessions on the **Claude Code + OpenRouter** transport (`claude-openrouter` provider profile,
+  driven via `claude-print`). PLAN-EVAL binds `claude-evaluator-minimax-m3`
+  (`minimax/minimax-m3`) at high effort; IMPL-EVAL binds
+  `claude-evaluator-deepseek-v4-flash-0731` (`deepseek/deepseek-v4-flash-0731`) at max effort. An
+  open model is neither Claude-family nor Codex-family, so it is adversarial to **both** generators.
   **Closed/paid models (Claude/GPT/Gemini) are prohibited on this lane** — they burn paid OpenRouter
   credit. The **supervisor** triggers it; a sub-agent never auto-dispatches an evaluator.
-- **Cloud run.** OpenHands remains the default automated cloud agent, under its existing rules:
-  **open models only (minimax M3 / Qwen 3.7), cloud-driven runs only; dispatching it with a closed
+- **Cloud run.** OpenHands dispatch is temporarily paused by owner direction while its trigger path
+  is repaired. Do not dispatch it; use the local evaluator transport. When restored it remains:
+  **open models only (Minimax M3 / Qwen 3.8 Max), cloud-driven runs only; dispatching it with a closed
   model (Claude/GPT/Gemini) is prohibited — it burns paid OpenRouter credit.**
 - **Ordinary (non-formal) review** — the slice review gate, code/PR review — remains
   **opposite-family Claude ⇄ Codex**: a Codex session reviews Claude-authored work, a Claude session
@@ -27,15 +29,20 @@ Select the route from `workflow/lane-policy.md` and record it in `supervisor.md`
 `.agents/skills/openhands-handoff/SKILL.md` "Routing policy" for the model rules, which are shared
 by both transports.
 
+If the local OpenRouter route is blocked by an OpenRouter limit, use only the explicit
+owner-authorized fallback: a fresh separate Antigravity (`agy`) session on Google subscription,
+model `gemini-3.6-flash-high`, effort `high`. Record the block and requested/observed identity. This
+is not Gemini over OpenRouter and does not weaken evaluator independence.
+
 **Capability (verified, drift D-4 amended).** The evaluator lane is fully capable on this transport:
 both approved open models return a **real reasoning trace** and have a **verified agentic turn**
-(they make real tool calls through Claude Code), so the bound Qwen evaluator **can run gates** and
-its `effort` is genuine — not nominal.
+(they make real tool calls through Claude Code), so both phase-bound evaluators **can run gates**
+and their `effort` is genuine — not nominal.
 
 | Model on Claude Code + OpenRouter | Reasoning trace | Agentic turn |
 | --------------------------------- | --------------- | ------------ |
 | `minimax/minimax-m3`              | yes             | supported    |
-| `qwen/qwen3.7-max`                | yes             | supported    |
+| `deepseek/deepseek-v4-flash-0731` | yes             | supported    |
 | `z-ai/glm-5.2` (design lane only) | **none**        | —            |
 
 The missing-reasoning problem is **GLM-specific, not a client-wide gap**: only GLM 5.2 over
@@ -51,6 +58,7 @@ That caveat is scoped to the design-verification lane and does **not** apply to 
 | selected archetype profile                   | yes for package/plugin work | doctrine gates, concept of done, and false-done states |
 | selected scope overlays                      | when applicable             | frontend/service/docs gates                            |
 | run `plan.md`                                | yes                         | approved scope                                         |
+| run `plan-eval.md`                           | when PLAN-EVAL selected     | conditional planning verdict                           |
 | run `worklog.md`                             | yes                         | design checkpoint and generator evidence               |
 | run `context-pack.md`                        | yes when present            | resumable state                                        |
 | run `drift.md`                               | yes when present            | plan/doctrine drift                                    |
@@ -60,8 +68,9 @@ That caveat is scoped to the design-verification lane and does **not** apply to 
 ## Operating Rules
 
 1. Evaluate against the approved plan and archetype gates.
-2. Verify the Plan-Gate passed before implementation began (`plan-eval.md` = `PASS`). If
-   implementation started without it, record a process failure.
+2. Verify either the selected Plan-Gate passed before implementation (`plan-eval.md` = `PASS`) or
+   the run recorded a justified `PLAN-EVAL: N/A` before implementation. Missing both is a process
+   failure.
 3. Verify the Design checkpoint exists in `worklog.md` and commit slices follow it. Missing design
    evidence is a finding.
 4. Verify each commit slice has its named gate passing.
