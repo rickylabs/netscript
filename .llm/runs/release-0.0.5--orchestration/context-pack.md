@@ -16,10 +16,12 @@ canary history from memory. Latest legacy canary evidence is 0.0.5-canary.13, co
 publish run 31051176983 and pinned E2E 31051492054, pending live re-verification before it is used
 as a current gate.
 
-The development train is `canary/0.0.5-canary.14`; #1315–#1318 target it. T1-A repaired #1315 at
-head `9f5ef7dcb`; its terminal implementation handoff is complete and current-SHA hosted CI is green.
-Two premature Qwen attempts are ineligible under C-D10; corrected formal Qwen session
-`f516aada-2a74-4dad-821e-b20963fe2983` is now evaluating that exact clean head. T1-B completed its
+The development train is `canary/0.0.5-canary.14`; #1315–#1318 target it. T1-A formal Qwen session
+`f516aada-2a74-4dad-821e-b20963fe2983` returned `FAIL_FIX` at evaluated head `9f5ef7dcb`: 70 new
+private-type-ref errors across eight publish roots, a baseline-green/head-red Fresh detached
+consumer gate, unsupported PASS claims, and a mandatory unproven `scaffold.runtime` gate. The
+verbatim artifact is committed on PR #1315 at `d0aa6a22d`; issue and PR are back at `status:impl`
+for the bounded repair. Two premature Qwen attempts remain ineligible under C-D10. T1-B completed its
 generic empty-Apps repair and isolated OTEL live proof at clean pushed head `53d6c278d`; its admissible
 one-pass runtime rerun is 73/73 with raw exit 0, while the first interrupted attempt remains
 diagnostic-only under C-D12. T1-B Qwen session `bd9e6431-23ac-4473-b331-3bc22333bf2e` launched from a
@@ -32,5 +34,6 @@ from exact clean head `53d6c278d` through checked-in `openrouter-run.ts` with `d
 Planned cuts are canary.14/.15/.16. Minimax PLAN and Qwen IMPL paid-transport canaries passed;
 routing state has no persisted fallback.
 
-Immediate next action: record both T1 formal verdicts, then run the milestone pre-merge gate before
-either draft PR can advance.
+Immediate next action: resume T1-A's sole durable implementation owner on the formal findings while
+T1-B finishes its sole admissible evaluation. Neither draft PR may enter the train until its own
+fresh separate evaluation and the milestone pre-merge gate pass.

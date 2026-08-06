@@ -228,3 +228,23 @@ files.
 - Relaunched the exact corrected prompt once through the checked-in agentic OpenRouter runner with
   `deno run --no-lock`: Qwen 3.8 Max high, bypass, session
   `abe31571-0fa1-4ea4-9085-1c36ea14a5c7`. This is the sole admissible T1-B evaluator session.
+
+## 2026-08-06 — T1-A formal IMPL-EVAL `FAIL_FIX`
+
+- Canonical Qwen high session `f516aada-2a74-4dad-821e-b20963fe2983` finished at exact evaluated
+  head `9f5ef7dcb...` with `FAIL_FIX`; both earlier attempts remain ineligible under C-D10.
+- Independently reproduced 70 new private-type-reference errors (55 distinct sites, 14 files) across
+  eight publishable roots versus canary.14, plus `packages/fresh` `check:streams-types` baseline
+  exit 0 / head exit 1 (`Package 'zod' not found in catalog`). The evaluator also held the exact
+  one-pass `scaffold.runtime` smoke as mandatory and unproven.
+- The evaluator verified the graph guard, peer binding, emitted-samples RED/GREEN, focused tests,
+  scoped source gates, quality gates, docs, serial publish dry-run, and lock hygiene. It restored its
+  own lock footprint and left evaluated head `9f5ef7dcb...` clean.
+- Recorded the complete evaluator artifact verbatim at
+  `.llm/runs/fix-zod-v4-npm-alignment-1295--1295/evaluate.md`, committed it in `bcc3432bb`, removed
+  one apply-patch-added blank line in `d0aa6a22d`, and pushed the exact PR branch without force.
+- Posted structured PR phase comment `5207581542`. Reconciled issue #1295 and PR #1315 from
+  `status:impl-eval` to exactly one `status:impl`; the PR remains draft and is not train-eligible.
+- Prepared `slices/t1-a-1295/repair-1.md` for the existing sole owner thread. The supported sender
+  registry requires same-thread resume; Sol-medium route drift remains C-D9 and is justified for
+  the cross-package public-type/foreign-config repair.
