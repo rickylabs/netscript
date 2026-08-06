@@ -28,7 +28,11 @@ export {
   type BasePluginErrorDefinition,
   type InternalErrorData,
 } from './domain/base-errors.ts';
-export { type PluginCapabilities, PluginCapabilitiesSchema } from './domain/capabilities.ts';
+export {
+  type PluginCapabilities,
+  PluginCapabilitiesSchema,
+  type PluginCapabilitiesValidator,
+} from './domain/capabilities.ts';
 export {
   BASE_PLUGIN_CONTRACT_ROUTES,
   type BasePluginContract,

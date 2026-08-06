@@ -9,6 +9,7 @@ import {
 } from '@netscript/plugin/adapter';
 
 type DenoConfig = Readonly<{
+  catalog?: Readonly<Record<string, string>>;
   name?: string;
   exports?: string | Readonly<Record<string, string>>;
   imports?: Readonly<Record<string, string>>;
@@ -118,9 +119,11 @@ async function main(): Promise<void> {
   try {
     await writeHostFixtures(workspace);
     const configPath = join(workspace, 'deno.json');
+    const rootConfig = await readConfig(join(repositoryRoot, 'deno.json'));
     await Deno.writeTextFile(
       configPath,
       JSON.stringify({
+        catalog: rootConfig.catalog,
         imports: await workspaceImports(),
         compilerOptions: {
           strict: true,

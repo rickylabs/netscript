@@ -38,7 +38,7 @@
     "fresh": "jsr:@fresh/core@^2.3.3",
     "preact": "npm:preact@^10.29.2",
     "preact-render-to-string": "npm:preact-render-to-string@^6.7.0",
-    "zod": "jsr:@zod/zod@4.4.3",
+    "zod": "catalog:",
     "@durable-streams/state": "npm:@durable-streams/state@^0.3.1",
     "@durable-streams/tanstack-ai-transport": "npm:@durable-streams/tanstack-ai-transport@^0.0.8",
     "@netscript/ai": "jsr:@netscript/ai@0.0.4",

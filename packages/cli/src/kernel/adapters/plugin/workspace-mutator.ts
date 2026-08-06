@@ -259,7 +259,7 @@ const PLUGIN_SERVICE_SOURCE_IMPORTS: Readonly<Record<string, string>> = {
   '@workos-inc/node': 'npm:@workos-inc/node@^10.4.0',
   'hono': 'jsr:@hono/hono@4.12.24',
   'hono/cors': 'jsr:@hono/hono@4.12.24/cors',
-  'zod': 'jsr:@zod/zod@4.4.3',
+  'zod': 'npm:zod@^4.4.3',
 };
 
 const LOCAL_SOURCE_MARKER = join(SCAFFOLD_DIRS.PACKAGES, 'cli', SCAFFOLD_FILES.DENO_JSON);

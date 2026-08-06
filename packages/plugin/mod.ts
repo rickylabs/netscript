@@ -91,6 +91,8 @@ export {
 } from './src/protocol/mod.ts';
 export type {
   PluginInstallerManifest,
+  PluginInstallerManifestSchemaIssue,
+  PluginInstallerManifestValidator,
   PluginManifestCapabilities,
   PluginManifestOfficialSource,
   PluginManifestParseError,
