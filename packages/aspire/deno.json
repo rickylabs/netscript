@@ -15,7 +15,7 @@
     "./public": "./src/public/mod.ts"
   },
   "imports": {
-    "zod": "jsr:@zod/zod@4.4.3",
+    "zod": "catalog:",
     "@std/path": "jsr:@std/path@^1",
     "@std/fs": "jsr:@std/fs@^1",
     "@std/assert": "jsr:@std/assert@^1"

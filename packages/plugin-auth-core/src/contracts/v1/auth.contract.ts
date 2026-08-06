@@ -13,9 +13,10 @@ import {
   type BasePluginContract,
   type BasePluginDescribeRoute,
 } from '@netscript/plugin/contract-base';
-import { AUTH_SESSION_STATES } from '../../domain/mod.ts';
+import { AUTH_SESSION_STATES, type AuthSchema } from '../../domain/mod.ts';
 import { toContractErrorDefinition } from './base-error-adapter.ts';
 export { AUTH_SESSION_STATES } from '../../domain/mod.ts';
+export type { AuthSchema, AuthSchemaResult } from '../../domain/mod.ts';
 
 /** Input accepted by the signin endpoint. */
 export type SigninInput = Readonly<{
@@ -225,7 +226,7 @@ const SigninInputZodSchema: z.ZodObject<{
 });
 
 /** Schema for signin endpoint input. */
-export const SigninInputSchema: z.ZodType<SigninInput> = SigninInputZodSchema;
+export const SigninInputSchema: AuthSchema<SigninInput> = SigninInputZodSchema;
 
 const SigninResponseZodSchema: z.ZodObject<{
   started: z.ZodBoolean;
@@ -240,7 +241,7 @@ const SigninResponseZodSchema: z.ZodObject<{
 });
 
 /** Schema for signin endpoint responses. */
-export const SigninResponseSchema: z.ZodType<SigninResponse> = SigninResponseZodSchema;
+export const SigninResponseSchema: AuthSchema<SigninResponse> = SigninResponseZodSchema;
 
 const CallbackInputZodSchema: z.ZodObject<{
   providerId: z.ZodOptional<z.ZodString>;
@@ -259,7 +260,7 @@ const CallbackInputZodSchema: z.ZodObject<{
 });
 
 /** Schema for callback endpoint input. */
-export const CallbackInputSchema: z.ZodType<CallbackInput> = CallbackInputZodSchema;
+export const CallbackInputSchema: AuthSchema<CallbackInput> = CallbackInputZodSchema;
 
 const CallbackResponseZodSchema: z.ZodObject<{
   completed: z.ZodBoolean;
@@ -274,7 +275,7 @@ const CallbackResponseZodSchema: z.ZodObject<{
 });
 
 /** Schema for callback endpoint responses. */
-export const CallbackResponseSchema: z.ZodType<CallbackResponse> = CallbackResponseZodSchema;
+export const CallbackResponseSchema: AuthSchema<CallbackResponse> = CallbackResponseZodSchema;
 
 const SignoutInputZodSchema: z.ZodObject<{
   sessionId: z.ZodOptional<z.ZodString>;
@@ -287,7 +288,7 @@ const SignoutInputZodSchema: z.ZodObject<{
 });
 
 /** Schema for signout endpoint input. */
-export const SignoutInputSchema: z.ZodType<SignoutInput> = SignoutInputZodSchema;
+export const SignoutInputSchema: AuthSchema<SignoutInput> = SignoutInputZodSchema;
 
 const SignoutResponseZodSchema: z.ZodObject<{
   signedOut: z.ZodBoolean;
@@ -300,7 +301,7 @@ const SignoutResponseZodSchema: z.ZodObject<{
 });
 
 /** Schema for signout endpoint responses. */
-export const SignoutResponseSchema: z.ZodType<SignoutResponse> = SignoutResponseZodSchema;
+export const SignoutResponseSchema: AuthSchema<SignoutResponse> = SignoutResponseZodSchema;
 
 const SessionInputZodSchema: z.ZodObject<{
   sessionId: z.ZodOptional<z.ZodString>;
@@ -309,7 +310,7 @@ const SessionInputZodSchema: z.ZodObject<{
 });
 
 /** Schema for session endpoint input. */
-export const SessionInputSchema: z.ZodType<SessionInput> = SessionInputZodSchema;
+export const SessionInputSchema: AuthSchema<SessionInput> = SessionInputZodSchema;
 
 const sessionRouteInput: z.ZodOptional<typeof SessionInputZodSchema> = SessionInputZodSchema
   .optional();
@@ -349,7 +350,7 @@ const AuthSessionResponseZodSchema: z.ZodObject<{
 });
 
 /** Schema for public auth session responses. */
-export const AuthSessionResponseSchema: z.ZodType<AuthSessionResponse> =
+export const AuthSessionResponseSchema: AuthSchema<AuthSessionResponse> =
   AuthSessionResponseZodSchema;
 
 const SessionResponseZodSchema: z.ZodObject<{
@@ -361,7 +362,7 @@ const SessionResponseZodSchema: z.ZodObject<{
 });
 
 /** Schema for session endpoint responses. */
-export const SessionResponseSchema: z.ZodType<SessionResponse> = SessionResponseZodSchema;
+export const SessionResponseSchema: AuthSchema<SessionResponse> = SessionResponseZodSchema;
 
 const AuthUserResponseZodSchema: z.ZodObject<{
   id: z.ZodString;
@@ -380,7 +381,7 @@ const AuthUserResponseZodSchema: z.ZodObject<{
 });
 
 /** Schema for public auth user responses. */
-export const AuthUserResponseSchema: z.ZodType<AuthUserResponse> = AuthUserResponseZodSchema;
+export const AuthUserResponseSchema: AuthSchema<AuthUserResponse> = AuthUserResponseZodSchema;
 
 const MeResponseZodSchema: z.ZodObject<{
   authenticated: z.ZodBoolean;
@@ -393,7 +394,7 @@ const MeResponseZodSchema: z.ZodObject<{
 });
 
 /** Schema for me endpoint responses. */
-export const MeResponseSchema: z.ZodType<MeResponse> = MeResponseZodSchema;
+export const MeResponseSchema: AuthSchema<MeResponse> = MeResponseZodSchema;
 
 /**
  * Explicit, precise type of the auth v1 contract definition.

@@ -3,12 +3,13 @@
  *
  * Root workspace `deno.json` generator.
  *
- * The root file is a workspace manifest only. Import maps belong on each
- * resource `deno.json` so direct dependencies stay explicit at the consumer
- * boundary, while the root keeps workspace discovery and shared tasks.
+ * The root owns workspace discovery, shared tasks, and catalog entries used by
+ * local-source packages. Import maps belong on each resource `deno.json` so
+ * direct dependencies stay explicit at the consumer boundary.
  */
 
 import { SCAFFOLD_DEFAULTS } from '../../constants/scaffold/scaffold-defaults.ts';
+import { SCAFFOLD_WORKSPACE_CATALOG } from '../../constants/scaffold/scaffold-app-catalog.ts';
 import { SCAFFOLD_DIRS } from '../../constants/scaffold/scaffold-dirs.ts';
 import {
   SCAFFOLD_ENGINE_WORKSPACE_PACKAGES,
@@ -21,7 +22,7 @@ import type { WorkspaceDenoJsonOptions } from '../../domain/scaffold/scaffold-op
 /**
  * Generates the root `deno.json` workspace configuration file.
  *
- * The root file is a workspace manifest only. Import maps belong on the
+ * The root owns workspace-wide catalog entries. Import maps belong on the
  * resource-level `deno.json` files that directly consume those packages.
  *
  * @param options - Configuration options for the workspace deno.json.
@@ -70,6 +71,7 @@ export function generateDenoJson(options: WorkspaceDenoJsonOptions): string {
 
   const config: Record<string, unknown> = {
     workspace: [...userMembers, ...packageMembers],
+    catalog: SCAFFOLD_WORKSPACE_CATALOG,
     ...(Object.keys(imports).length > 0 ? { imports } : {}),
     ...(minimumDependencyAge ? { minimumDependencyAge } : {}),
     // Single workspace-root node_modules shared across all members.

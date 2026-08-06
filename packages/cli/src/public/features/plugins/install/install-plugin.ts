@@ -260,6 +260,7 @@ export async function persistPluginMetadata(
       ? toFileUrl(resolve(resolvedPlugin.source.path, doctorEntrypoint)).href
       : `${versionedJsrSpecifier(resolvedPlugin.descriptor)}/doctor`)
     : undefined;
+  const officialSource = resolvedPlugin.descriptor.manifest.officialSource;
   const metadata = {
     ...resolvedPlugin.descriptor.manifest,
     netscriptInstall: {
@@ -268,14 +269,18 @@ export async function persistPluginMetadata(
       rootDenoJsonBefore: installState.rootDenoJsonBefore,
       rootDenoJsonAfter: await readOptionalRootDenoJson(plan.projectRoot, fs),
     },
-    officialSource: {
-      ...resolvedPlugin.descriptor.manifest.officialSource,
-      pluginReferences: mergeUniqueReferences(
-        resolvedPlugin.descriptor.manifest.officialSource?.pluginReferences ?? [],
-        plan.pluginReferences,
-      ),
-      ...(doctorSpecifier ? { doctorEntrypoint: doctorSpecifier } : {}),
-    },
+    ...(officialSource || doctorSpecifier
+      ? {
+        officialSource: {
+          ...officialSource,
+          pluginReferences: mergeUniqueReferences(
+            officialSource?.pluginReferences ?? [],
+            plan.pluginReferences,
+          ),
+          ...(doctorSpecifier ? { doctorEntrypoint: doctorSpecifier } : {}),
+        },
+      }
+      : {}),
   };
   const pluginDir = resolvePluginConfigDirectory(plan, scaffold);
   await fs.writeFile(join(pluginDir, 'scaffold.plugin.json'), `${JSON.stringify(metadata, null, 2)}\n`);
@@ -480,10 +485,12 @@ export function createPluginOwnedPluginResult(
   scaffold: PluginOwnedScaffoldResult,
 ): PluginScaffoldResult {
   const officialSource = descriptor.manifest.officialSource;
+  const linking = descriptor.manifest.linking;
   const pluginDir = resolvePluginRuntimeDirectory(plan);
   const serviceConfigKey = plan.provider.category === 'plugin'
-    ? plan.pluginName
-    : officialSource?.serviceConfigKey ?? `${plan.pluginName}-api`;
+    ? linking?.resourceConfigKey ?? plan.pluginName
+    : linking?.resourceConfigKey ?? officialSource?.serviceConfigKey ?? `${plan.pluginName}-api`;
+  const backgroundConfigKey = linking?.backgroundConfigKey ?? plan.pluginName;
   const usedPorts = new Set(plan.configuredListenerPorts ?? []);
   const servicePort = plan.port ?? allocateScaffoldDefaultPort(
     plan.projectName,
@@ -493,9 +500,23 @@ export function createPluginOwnedPluginResult(
   usedPorts.add(servicePort);
   const backgroundPort = plan.port ?? allocateScaffoldDefaultPort(
     plan.projectName,
-    `plugin:${plan.pluginName}:background`,
+    `plugin:${backgroundConfigKey}:background`,
     usedPorts,
   );
+  const serviceWorkdir = scaffoldCreatesEntrypoint(
+      scaffold,
+      plan.pluginName,
+      plan.provider.defaultServiceEntrypoint,
+    )
+    ? toWorkspaceRelativePath(plan.projectRoot, pluginDir)
+    : undefined;
+  const backgroundWorkdir = scaffoldCreatesEntrypoint(
+      scaffold,
+      plan.pluginName,
+      plan.provider.defaultEntrypoint,
+    )
+    ? toWorkspaceRelativePath(plan.projectRoot, pluginDir)
+    : undefined;
 
   return {
     scaffoldResult: {
@@ -511,11 +532,22 @@ export function createPluginOwnedPluginResult(
     servicePort,
     hostPort: servicePort,
     configSection: plan.provider.category === 'plugin' ? 'Plugins' : 'BackgroundProcessors',
-    configKey: plan.pluginName,
+    configKey: plan.provider.category === 'plugin' ? serviceConfigKey : backgroundConfigKey,
     serviceConfigKey,
-    backgroundWorkdir: undefined,
-    serviceWorkdir: undefined,
+    backgroundWorkdir,
+    serviceWorkdir,
   };
+}
+
+function scaffoldCreatesEntrypoint(
+  scaffold: PluginOwnedScaffoldResult,
+  pluginName: string,
+  entrypoint: string | null | undefined,
+): boolean {
+  if (!entrypoint) return false;
+  const expected = `${SCAFFOLD_DIRS.PLUGINS}/${pluginName}/${normalizePath(entrypoint)}`;
+  return [...scaffold.createdFiles, ...scaffold.modifiedFiles]
+    .some((path) => normalizePath(path) === expected);
 }
 
 export function resolvePluginConfigDirectory(

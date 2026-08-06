@@ -6,6 +6,7 @@
 
 import { assert, assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
 import { DEFAULT_TEMPLATE_REGISTRY } from '../../application/registries/template-registry.ts';
+import { SCAFFOLD_WORKSPACE_CATALOG } from '../../constants/scaffold/scaffold-app-catalog.ts';
 import { SCAFFOLD_JSR_RELEASE_PACKAGES } from '../../constants/scaffold/scaffold-workspace-packages.ts';
 import { netscriptJsrSpecifier } from '../../constants/jsr-specifiers.ts';
 import { generateAppTsConfig } from '../../adapters/templates/app/generate-app-tsconfig.ts';
@@ -90,6 +91,17 @@ Deno.test('generateDenoJson emits the expected root workspace shape in JSR mode'
     'semiColons',
     'singleQuote',
   ]);
+});
+
+Deno.test('generateDenoJson gives standalone workspaces their own Zod catalog', () => {
+  const result = JSON.parse(generateDenoJson({
+    name: 'test-project',
+    appName: 'dashboard',
+    workspaceMembers: ['contracts', 'plugins'],
+    importMode: 'local',
+  }));
+
+  assertEquals(result.catalog, SCAFFOLD_WORKSPACE_CATALOG);
 });
 
 Deno.test('generatePackageJson pins the pre-window Deno runtime', () => {

@@ -162,6 +162,16 @@ export type TriggerTypeSchemaValues = { [TValue in TriggerType]: TValue };
 /** Enum value map backing {@link WorkerRuntimeSchema}. */
 export type WorkerRuntimeSchemaValues = { [TValue in WorkerRuntime]: TValue };
 
+/** Package-owned structural surface for public worker enum schemas. */
+export interface WorkerEnumSchema<TValue extends string> {
+  /** Parse an enum value or throw a validation error. */
+  parse(value: unknown): TValue;
+  /** Validate an enum value without throwing. */
+  safeParse(value: unknown):
+    | { readonly success: true; readonly data: TValue }
+    | { readonly success: false; readonly error: unknown };
+}
+
 /** Zod schema for task execution runtimes. */
 export const TaskTypeSchema: z.ZodEnum<TaskTypeSchemaValues> = z.enum(
   TaskTypeSchemaValues,
@@ -192,10 +202,13 @@ export const JobExecutionTypeSchema: z.ZodEnum<JobExecutionTypeSchemaValues> = z
   JobExecutionTypeSchemaValues,
 );
 
-/** Zod schema for trigger sources. */
-export const TriggerTypeSchema: z.ZodEnum<TriggerTypeSchemaValues> = z.enum(
+/** Internal concrete Zod schema for trigger sources. */
+export const TriggerTypeZodSchema: z.ZodEnum<TriggerTypeSchemaValues> = z.enum(
   TriggerTypeSchemaValues,
 );
+
+/** Schema for trigger sources. */
+export const TriggerTypeSchema: WorkerEnumSchema<TriggerType> = TriggerTypeZodSchema;
 
 /** Zod schema for worker runtime modes. */
 export const WorkerRuntimeSchema: z.ZodEnum<WorkerRuntimeSchemaValues> = z.enum(

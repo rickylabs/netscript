@@ -1,6 +1,10 @@
 import { assertEquals } from '@std/assert';
 import { runtimeCatalogDependencies } from '../../../../../fresh/tests/runtime-catalog-dependencies.ts';
-import { SCAFFOLD_APP_IMPORTS } from './scaffold-app-catalog.ts';
+import {
+  SCAFFOLD_APP_CATALOG,
+  SCAFFOLD_APP_IMPORTS,
+  SCAFFOLD_WORKSPACE_CATALOG,
+} from './scaffold-app-catalog.ts';
 
 interface DenoConfig {
   readonly catalog?: Readonly<Record<string, string>>;
@@ -50,4 +54,11 @@ Deno.test('scaffold runtime npm imports match workspace, Fresh, and SDK catalogs
       `${dependency} in scaffold output must match the root catalog`,
     );
   }
+});
+
+Deno.test('standalone workspace Zod catalog matches the repository authority', async () => {
+  const root = await readConfig(new URL('../../../../../../deno.json', import.meta.url));
+
+  assertEquals(root.catalog?.zod, SCAFFOLD_APP_CATALOG.ZOD);
+  assertEquals(SCAFFOLD_WORKSPACE_CATALOG.zod, root.catalog?.zod);
 });

@@ -14,8 +14,8 @@
     "export": "./scaffold",
     "requiredPermissions": {
       "net": [],
-      "read": [],
-      "write": []
+      "read": ["<workspaceRoot>"],
+      "write": ["<workspaceRoot>"]
     }
   },
   "postScripts": [
@@ -28,7 +28,13 @@
     "displayName": "Fixture",
     "category": "background-processor",
     "portRangeKey": "INFRA_PLUGIN",
-    "defaultPermissions": ["--allow-read", "--allow-write"],
+    "defaultPermissions": [
+      "--allow-net",
+      "--allow-env",
+      "--allow-read",
+      "--allow-sys",
+      "--allow-write"
+    ],
     "watchFlag": "--watch",
     "defaultEntrypoint": "bin/combined.ts",
     "defaultServiceEntrypoint": "services/src/main.ts",
@@ -41,5 +47,14 @@
     "defaultTelemetry": false,
     "infrastructureRequires": [],
     "infrastructureOptionalDeps": []
+  },
+  "linking": {
+    "canonicalName": "acme-fixture",
+    "resourceConfigKey": "fixture-api",
+    "backgroundConfigKey": "fixture",
+    "consumers": {
+      "services": ["catalog"],
+      "apps": ["dashboard"]
+    }
   }
 }

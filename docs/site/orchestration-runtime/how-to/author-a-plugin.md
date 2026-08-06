@@ -141,20 +141,20 @@ plugin should pick the closest match:
   ]
 }) }}
 
-A worker-archetype descriptor looks like this — copy the shape and change the names. The
-`officialSource` block is what the official plugins carry; for a custom plugin you set
-`canonicalName`, `servicePort`, and any `dependencies` your plugin needs wired ahead of it:
+A worker-archetype descriptor looks like this — copy the shape and change the names. Declare
+cross-resource wiring in the top-level `linking` block. It is the shared contract for official and
+third-party plugins; eligibility never depends on `officialSource`:
 
 {{ comp.tabbedCode({ tabs: [
   {
     label: "scaffold.plugin.json",
     lang: "json",
-    code: "{\n  \"provider\": {\n    \"kind\": \"worker\",\n    \"category\": \"background-processor\",\n    \"defaultEntrypoint\": \"bin/combined.ts\",\n    \"defaultServiceEntrypoint\": \"services/src/main.ts\",\n    \"defaultRequiresDb\": true,\n    \"defaultRequiresKv\": true,\n    \"concurrencyEnvVar\": \"WORKER_CONCURRENCY\"\n  },\n  \"officialSource\": {\n    \"canonicalName\": \"notifier\",\n    \"servicePort\": 8095,\n    \"dependencies\": [\"streams\"]\n  }\n}"
+    code: "{\n  \"provider\": {\n    \"kind\": \"worker\",\n    \"category\": \"background-processor\",\n    \"defaultEntrypoint\": \"bin/combined.ts\",\n    \"defaultServiceEntrypoint\": \"services/src/main.ts\",\n    \"defaultRequiresDb\": true,\n    \"defaultRequiresKv\": true,\n    \"concurrencyEnvVar\": \"WORKER_CONCURRENCY\"\n  },\n  \"linking\": {\n    \"canonicalName\": \"notifier\",\n    \"resourceConfigKey\": \"notifier-api\",\n    \"backgroundConfigKey\": \"notifier\",\n    \"dependencies\": [\"streams-api\"],\n    \"consumers\": {\n      \"services\": [\"catalog\"],\n      \"apps\": [\"dashboard\"]\n    }\n  }\n}"
   },
   {
     label: "What the kernel reads it for",
     lang: "ts",
-    code: "// provider.kind          -> which contribution category to scan for\n// defaultEntrypoint       -> the background processor aspire starts\n// defaultServiceEntrypoint-> the API service aspire starts (if any)\n// defaultRequiresDb / Kv  -> whether to provision Postgres / Redis for it\n// concurrencyEnvVar       -> env var that caps processor concurrency\n// officialSource.servicePort -> the HTTP port the service binds\n// officialSource.dependencies -> plugins wired BEFORE this one in the graph"
+    code: "// provider.kind             -> which contribution category to scan for\n// defaultEntrypoint          -> the background processor Aspire starts\n// defaultServiceEntrypoint   -> the API service Aspire starts (if any)\n// linking.resourceConfigKey  -> exact plugin API resource identifier\n// linking.backgroundConfigKey-> exact processor identifier, when present\n// linking.dependencies       -> producer plugin keys wired into this plugin\n// linking.consumers          -> exact service/app names that receive the API reference"
   }
 ] }) }}
 
@@ -372,8 +372,9 @@ the <code>@netscript/plugin-streams</code> manifest helpers throw
 <code>StreamUnsupportedOperationError</code>. Match your plugin's behavior to its declared
 <code>provider.kind</code>.</li>
 <li><strong>Unstated dependencies</strong> — if your plugin needs another plugin wired ahead of it,
-declare it with <code>.withDependencies({...})</code> on the manifest and in
-<code>officialSource.dependencies</code> so the Aspire graph orders them correctly.</li>
+declare it with <code>.withDependencies({...})</code> on the runtime manifest and in
+<code>linking.dependencies</code> on <code>scaffold.plugin.json</code> so the shared reconciler and
+Aspire graph use the same explicit resource keys.</li>
 </ul>
 {{ /comp }}
 

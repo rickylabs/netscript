@@ -38,6 +38,7 @@ export type {
   TaskTypeSchemaValues,
   TriggerType,
   TriggerTypeSchemaValues,
+  WorkerEnumSchema,
   WorkerRuntime,
   WorkerRuntimeSchemaValues,
 } from './constants.ts';

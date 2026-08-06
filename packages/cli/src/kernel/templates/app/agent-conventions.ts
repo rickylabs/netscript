@@ -124,7 +124,7 @@ ${localExamples}
 
 ## Default architecture
 
-Before hand-writing a service request or probing it with curl, call MCP \`list_service_operations\` and \`get_operation_schema\` for the live contract.
+Before hand-writing a service request or probing it with curl, follow the MCP path: \`list_api_services\` to discover the live service name, \`list_service_operations\` to select an operation, then \`get_operation_schema\` for its request and response contract.
 
 1. Start from the service contract and derive the client **and query factories** in one app \`lib\` module.
 2. Compose the route with \`definePage\` layers; keep non-interactive regions server-rendered.

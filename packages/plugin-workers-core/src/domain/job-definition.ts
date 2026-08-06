@@ -5,7 +5,7 @@ import {
   ExecutionStatusSchema,
   JobExecutionTypeSchema,
   JobSourceSchema,
-  TriggerTypeSchema,
+  TriggerTypeZodSchema,
 } from './constants.ts';
 import { JobDefinitionPublicBaseSchema } from './public-schema.ts';
 import { TaskPermissionsInputSchema } from './task.ts';
@@ -204,7 +204,7 @@ type ExecutionRecordShape = {
   jobId: z.ZodString;
   topic: z.ZodDefault<z.ZodString>;
   status: typeof ExecutionStatusSchema;
-  triggeredBy: typeof TriggerTypeSchema;
+  triggeredBy: typeof TriggerTypeZodSchema;
   triggeredAt: z.ZodString;
   startedAt: z.ZodNullable<z.ZodString>;
   completedAt: z.ZodNullable<z.ZodString>;
@@ -227,7 +227,7 @@ const ExecutionRecordShapeValue: ExecutionRecordShape = {
   jobId: z.string().min(1).describe('Job or task identifier'),
   topic: z.string().default(DEFAULT_TOPIC).describe('Topic identifier'),
   status: ExecutionStatusSchema.describe('Execution status'),
-  triggeredBy: TriggerTypeSchema.describe('Trigger source'),
+  triggeredBy: TriggerTypeZodSchema.describe('Trigger source'),
   triggeredAt: z.string().datetime().describe('Trigger timestamp'),
   startedAt: z.string().datetime().nullable().describe('Start timestamp'),
   completedAt: z.string().datetime().nullable().describe('Completion timestamp'),
@@ -258,7 +258,7 @@ export type ExecutionRecord = Readonly<
     readonly jobId: string;
     readonly topic: string;
     readonly status: z.output<typeof ExecutionStatusSchema>;
-    readonly triggeredBy: z.output<typeof TriggerTypeSchema>;
+    readonly triggeredBy: z.output<typeof TriggerTypeZodSchema>;
     readonly triggeredAt: string;
     readonly startedAt: string | null;
     readonly completedAt: string | null;

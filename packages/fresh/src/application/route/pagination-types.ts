@@ -5,7 +5,6 @@
  */
 
 import type { SchemaParseResult, SearchParamValue } from './types.ts';
-import type { z } from 'zod';
 export type {
   SchemaParseFailure,
   SchemaParseResult,
@@ -38,9 +37,22 @@ export interface PaginationSearchSchemaOptions {
 }
 
 /** Structural schema contract accepted by pagination search helpers. */
-export interface SchemaField<TOutput = unknown> {
+export interface SchemaField<TOutput = unknown, TInput = unknown> {
+  /** Compile-time marker for the accepted input type. */
+  readonly _input: TInput;
+  /** Compile-time marker for the parsed output type. */
+  readonly _output: TOutput;
+  /** Parse a raw value into typed output. */
+  parse(input: TInput): TOutput;
   /** Safely parse a raw search-param value into typed output. */
   safeParse(input: unknown): SchemaParseResult<TOutput>;
+}
+
+/** Structural schema surface accepted by {@link fallback}. */
+export interface FallbackInputSchema<TOutput = unknown, TInput = unknown>
+  extends SchemaField<TOutput, TInput> {
+  /** Return a schema that substitutes `defaultValue` after failed parsing. */
+  catch(defaultValue: TOutput): SchemaField<TOutput, TInput>;
 }
 
 /** Infer the output carried by a schema-like field. */
@@ -52,23 +64,23 @@ export type SchemaFieldOutput<TSchema> = TSchema extends {
 /** Base schema shape returned by `paginationSearchSchema()`. */
 export type PaginationSearchBaseShape = {
   /** Page field schema. */
-  readonly page: z.ZodType<number>;
+  readonly page: SchemaField<number>;
   /** Limit field schema. */
-  readonly limit: z.ZodType<number>;
+  readonly limit: SchemaField<number>;
   /** Sort key field schema. */
-  readonly sortBy: z.ZodType<string>;
+  readonly sortBy: SchemaField<string>;
   /** Sort direction field schema. */
-  readonly sortOrder: z.ZodType<'asc' | 'desc'>;
+  readonly sortOrder: SchemaField<'asc' | 'desc'>;
 };
 
 /** Public facade for pagination-aware query string parsing. */
 export interface PaginationSearchSchema<
-  TShape extends z.ZodRawShape & PaginationSearchBaseShape,
+  TShape extends Readonly<Record<string, SchemaField>> & PaginationSearchBaseShape,
 > {
   /** Typed input accepted by the schema. */
   readonly _input: Record<string, SearchParamValue>;
   /** Typed output returned by the schema. */
-  readonly _output: z.output<z.ZodObject<TShape>> & PaginationSearchState;
+  readonly _output: ShapeOutput<TShape> & PaginationSearchState;
 
   /**
    * Extend the schema with additional search fields.
@@ -76,7 +88,7 @@ export interface PaginationSearchSchema<
    * @param shape - Additional Zod shape entries.
    * @returns A new pagination schema with the extra fields.
    */
-  extend<TAugmentation extends z.ZodRawShape>(
+  extend<TAugmentation extends Readonly<Record<string, SchemaField>>>(
     shape: TAugmentation,
   ): PaginationSearchSchema<TShape & TAugmentation>;
 
@@ -88,7 +100,7 @@ export interface PaginationSearchSchema<
    */
   safeParse(
     input: Record<string, SearchParamValue>,
-  ): SchemaParseResult<z.output<z.ZodObject<TShape>> & PaginationSearchState>;
+  ): SchemaParseResult<ShapeOutput<TShape> & PaginationSearchState>;
 
   /**
    * Parse raw query params into typed pagination state.
@@ -98,7 +110,7 @@ export interface PaginationSearchSchema<
    */
   parse(
     input: Record<string, SearchParamValue>,
-  ): z.output<z.ZodObject<TShape>> & PaginationSearchState;
+  ): ShapeOutput<TShape> & PaginationSearchState;
 
   /**
    * Async variant of `safeParse()`.
@@ -108,7 +120,7 @@ export interface PaginationSearchSchema<
    */
   safeParseAsync(
     input: Record<string, SearchParamValue>,
-  ): Promise<SchemaParseResult<z.output<z.ZodObject<TShape>> & PaginationSearchState>>;
+  ): Promise<SchemaParseResult<ShapeOutput<TShape> & PaginationSearchState>>;
 
   /**
    * Async variant of `parse()`.
@@ -118,7 +130,7 @@ export interface PaginationSearchSchema<
    */
   parseAsync(
     input: Record<string, SearchParamValue>,
-  ): Promise<z.output<z.ZodObject<TShape>> & PaginationSearchState>;
+  ): Promise<ShapeOutput<TShape> & PaginationSearchState>;
 }
 
 /** Infer the resolved object output carried by a pagination schema shape. */

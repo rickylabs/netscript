@@ -150,7 +150,7 @@ export function createPaginatedOutput<TOutput, TInput>(
 > {
   return z.object({
     data: z.array(asZodSchema<TOutput, TInput>(itemSchema)),
-    pagination: PaginationOutputSchema,
+    pagination: asZodSchema<PaginationOutput, PaginationOutput>(PaginationOutputSchema),
   });
 }
 
@@ -171,7 +171,9 @@ export function createCursorPaginatedOutput<TOutput, TInput>(
 > {
   return z.object({
     data: z.array(asZodSchema<TOutput, TInput>(itemSchema)),
-    pagination: CursorPaginationOutputSchema,
+    pagination: asZodSchema<CursorPaginationOutput, CursorPaginationOutput>(
+      CursorPaginationOutputSchema,
+    ),
   });
 }
 

@@ -26,6 +26,8 @@ export type {
   AuthContractDefinition,
   AuthContractV1,
   AuthRouter,
+  AuthSchema,
+  AuthSchemaResult,
   AuthSessionResponse,
   AuthUserResponse,
   CallbackInput,

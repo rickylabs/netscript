@@ -27,7 +27,7 @@ import type { ContractObjectSchema, ContractSchema } from '../src/domain/schema-
 /**
  * Available filter operators.
  */
-export const FilterOperatorSchema: ContractSchema<FilterOperator, FilterOperator> = z.enum([
+const filterOperatorZodSchema = z.enum([
   'equals',
   'not',
   'contains',
@@ -43,6 +43,10 @@ export const FilterOperatorSchema: ContractSchema<FilterOperator, FilterOperator
   'isNotNull',
 ]);
 
+/** Available filter operator schema. */
+export const FilterOperatorSchema: ContractSchema<FilterOperator, FilterOperator> =
+  filterOperatorZodSchema;
+
 /**
  * Single filter condition schema.
  */
@@ -50,7 +54,7 @@ const filterConditionSchema = z.object({
   /** Field name to filter on */
   field: z.string(),
   /** Filter operator */
-  operator: FilterOperatorSchema,
+  operator: filterOperatorZodSchema,
   /** Value to compare against (not needed for isNull/isNotNull) */
   value: z.unknown().optional(),
 });
