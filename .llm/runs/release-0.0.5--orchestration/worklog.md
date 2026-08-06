@@ -181,6 +181,20 @@ files.
   `scaffold.runtime --cleanup --format pretty` rerun at 73 passed / 0 failed / raw exit 0.
 - Worktree and root lock are clean; protected stash `7eb4ed16d...` remains unchanged; no owned
   AppHost/container survived and foreign/unproven resources were untouched. PR #1316 remains draft.
+
+## 2026-08-06 — T1-B observational acceptance adjudication
+
+- Independently inspected the tracked live proof before mutating the issue: the public local-path
+  install generated producer/consumer references without a manual appsettings edit; catalog changed
+  from HTTP 500 to HTTP 200 after reaching fixture-api `/ping`; trace
+  `00766def76331c34a3df9fd525bfe3e0` links catalog client span `9c22af7526ff564a` to fixture server
+  span `c7935b1b03518da5`, both 200.
+- Checked #1189's final observational acceptance row with that exact evidence. This is an
+  orchestrator evidence adjudication, not code-PR closure; the separate evaluator must still fail
+  the claim if the artifacts do not support it.
+- Reconciled #1189 and PR #1316 to exactly one lifecycle label, `status:impl-eval`, while preserving
+  their approved taxonomy and `wave:v1`. Corrected the evaluator prompt to describe the live checked
+  state before launch.
 - Reconciled issue #1189 and PR #1316 to exactly one lifecycle label, `status:impl-eval`, without
   mutating the issue's observational checkbox. Launched the fresh read-only Qwen 3.8 Max high
   evaluator at exact clean head `53d6c278d...`, session

@@ -34,8 +34,10 @@
   redundant `recovery.md` sender was terminated without interrupting the owner or its subprocesses.
 - C-D14 sender guard: a later acceptance-guard steer also opened a second client instead of queuing;
   that new process group was terminated before competing. Do not steer again until the owner exits.
-- Observational acceptance: leave #1189's runtime checkbox unchecked during the code-PR lane;
-  evidence belongs in the run/PR and the orchestrator adjudicates it after separate evaluation.
+- Observational acceptance: the implementation lane left #1189's runtime checkbox untouched. The
+  orchestrator independently inspected the tracked HTTP 500 RED, HTTP 200 GREEN, and correlated
+  trace evidence, then checked the row before formal evaluation. The evaluator must still reject
+  the checked claim if that evidence is insufficient.
 - Terminal implementation handoff: clean local/remote/PR head
   `53d6c278d01a1b7ce967078ce94db619a5d8f4a8`; product/evidence commit
   `e6c429f4527e02f1dfa8886f0ff66311bbc5a299`

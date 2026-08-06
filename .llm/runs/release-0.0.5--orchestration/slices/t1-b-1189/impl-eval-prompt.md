@@ -31,8 +31,10 @@ stdout for the orchestrator to record verbatim.
 - Train merge: `ca8f1c76b`, integrating
   `canary/0.0.5-canary.14@2508eb8c99c9cfc55e0c9f1d7ab72fea745db492`
 - PR: #1316, draft, lifecycle must be `status:impl-eval` before launch
-- Issue: #1189; its real-runtime row is observational and remains unchecked during the code-PR
-  implementation lane. The orchestrator alone adjudicates that row after your verdict.
+- Issue: #1189; the orchestrator independently adjudicated its observational real-runtime row from
+  the tracked HTTP RED/GREEN and correlated trace evidence, then checked that row before this
+  launch. Treat the checked row as a claim to verify adversarially; fail it if the evidence does not
+  support the acceptance text. Do not edit GitHub state.
 - Protected unrelated lock state: stash commit `7eb4ed16d6944c1d1c904895bcb76b4361ad8a57`, original
   diff hash `6f706f8fbaa20262600f625665eabd5610aa4acc`; do not mutate or apply it.
 - The milestone wave plan received separate Minimax M3 PLAN-EVAL PASS before this repair.
@@ -76,8 +78,8 @@ decisive claim plus all plugin/CLI/package-quality gates required by the approve
    `as any`, host-side plugin-name coupling, placeholder seams, or generated/source churn; exclude
    run artifacts from the source scan.
 9. Verify every #1189 acceptance row and every PR checklist claim is backed by current evidence.
-   Treat the unchecked observational runtime row as yours to judge, but do not edit it. State
-   explicitly whether its evidence is sufficient for the orchestrator to accept after your verdict.
+   Treat the checked observational runtime row as yours to judge, but do not edit it. State
+   explicitly whether the RED/GREEN/trace evidence supports that acceptance claim.
 10. Verify post-run lock hygiene, protected-stash identity, zero run-owned resource leaks, and no
     unanswered current review thread.
 
