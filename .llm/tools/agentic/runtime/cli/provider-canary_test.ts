@@ -1,5 +1,6 @@
 import { assert, assertEquals } from '@std/assert';
 import { parseProviderCanaryArgs } from './provider-canary.ts';
+import { OPENROUTER_MODEL_IDS } from '../../config/models.ts';
 
 const worktree = '/home/codex/repos/provider-canary-test';
 
@@ -16,20 +17,38 @@ Deno.test('provider calls require explicit live mode with complete route identit
     '--live',
     '--profile',
     'claude-openrouter',
+    '--preset',
+    'claude-evaluator-minimax-m3',
     '--model',
-    'caller-model',
+    OPENROUTER_MODEL_IDS.minimax,
     '--effort',
-    'xhigh',
+    'high',
     '--worktree',
     worktree,
   ]);
   assertEquals(live.mode, 'live');
-  if (live.mode === 'live') assertEquals(live.route.provider, 'openrouter');
+  if (live.mode === 'live') {
+    assertEquals(live.route.provider, 'openrouter');
+    assertEquals(live.route.presetId, 'claude-evaluator-minimax-m3');
+  }
   for (
     const args of [
       ['--profile', 'claude-openrouter', '--model', 'caller-model', '--effort', 'xhigh'],
       ['--live', '--all', '--worktree', worktree],
       ['--live', '--profile', 'claude-openrouter', '--worktree', worktree],
+      [
+        '--live',
+        '--profile',
+        'claude-openrouter',
+        '--preset',
+        'stale-preset',
+        '--model',
+        'caller-model',
+        '--effort',
+        'high',
+        '--worktree',
+        worktree,
+      ],
     ]
   ) {
     let rejected = false;

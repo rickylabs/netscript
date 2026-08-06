@@ -63,10 +63,44 @@ export type WorkersStreamSchema<TDefinition extends StreamSchemaDefinition> = St
 >;
 
 /** Worker execution entity stored in the durable stream. */
-export type WorkerExecution = Readonly<z.output<typeof WorkerExecutionZodSchema>>;
+export type WorkerExecution = Readonly<
+  {
+    readonly id: string;
+    readonly jobId: string;
+    readonly status:
+      | 'pending'
+      | 'queued'
+      | 'running'
+      | 'completed'
+      | 'failed'
+      | 'cancelled'
+      | 'timeout';
+    readonly topic?: string;
+    readonly concept?: 'job' | 'task';
+    readonly correlationId?: string;
+    readonly triggeredAt?: string;
+    readonly startedAt?: string | null;
+    readonly completedAt?: string | null;
+    readonly duration?: number | null;
+    readonly exitCode?: number | null;
+    readonly error?: string | null;
+    readonly result?: Record<string, unknown> | null;
+    readonly workerId?: string | null;
+    readonly attempt?: number;
+  }
+>;
 
 /** Worker job entity stored in the durable stream. */
-export type WorkerJob = Readonly<z.output<typeof WorkerJobZodSchema>>;
+export type WorkerJob = Readonly<
+  {
+    readonly id: string;
+    readonly name?: string;
+    readonly topic?: string;
+    readonly enabled?: boolean;
+    readonly schedule?: string;
+    readonly description?: string;
+  }
+>;
 
 type WorkerExecutionShape = {
   id: typeof ExecutionRecordSchema.shape.id;
@@ -118,10 +152,8 @@ const WorkerExecutionZodSchema: z.ZodObject<WorkerExecutionShape> = ExecutionRec
   attempt: true,
 });
 /** Stream entity schema for worker executions. */
-export const WorkerExecutionSchema: WorkerStreamEntitySchema<
-  WorkerExecution,
-  z.input<typeof WorkerExecutionZodSchema>
-> = WorkerExecutionZodSchema;
+export const WorkerExecutionSchema: WorkerStreamEntitySchema<WorkerExecution> =
+  WorkerExecutionZodSchema;
 
 type WorkerJobShape = {
   id: typeof JobResponseSchema.shape.id;
@@ -148,10 +180,7 @@ const WorkerJobZodSchema: z.ZodObject<WorkerJobShape> = JobResponseSchema.pick({
   description: true,
 });
 /** Stream entity schema for worker jobs. */
-export const WorkerJobSchema: WorkerStreamEntitySchema<
-  WorkerJob,
-  z.input<typeof WorkerJobZodSchema>
-> = WorkerJobZodSchema;
+export const WorkerJobSchema: WorkerStreamEntitySchema<WorkerJob> = WorkerJobZodSchema;
 
 /** Durable stream definition for worker execution and job entities. */
 export type WorkersStreamDefinition = Readonly<{

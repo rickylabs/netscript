@@ -24,6 +24,12 @@ export const SCAFFOLD_APP_CATALOG = {
   TAILWINDCSS: '^4.2.2',
   TAILWINDCSS_VITE: '^4.1.12',
   VITE: '7.2.2',
+  ZOD: '^4.4.3',
+} as const;
+
+/** Catalog entries owned by the root of every generated standalone workspace. */
+export const SCAFFOLD_WORKSPACE_CATALOG = {
+  zod: SCAFFOLD_APP_CATALOG.ZOD,
 } as const;
 
 export const SCAFFOLD_APP_IMPORTS = {

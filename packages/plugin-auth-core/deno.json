@@ -18,7 +18,7 @@
     "@orpc/contract": "npm:@orpc/contract@^1.14.6",
     "@orpc/server": "npm:@orpc/server@^1.14.6",
     "@std/assert": "jsr:@std/assert@^1",
-    "zod": "jsr:@zod/zod@4.4.3"
+    "zod": "catalog:"
   },
   "tasks": {
     "check": "deno check --unstable-kv mod.ts src/domain/mod.ts src/ports/mod.ts src/contracts/v1/mod.ts src/telemetry/mod.ts src/streams/mod.ts src/config/mod.ts src/presets/mod.ts src/testing/mod.ts",

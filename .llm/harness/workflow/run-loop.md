@@ -3,9 +3,10 @@
 Harness runs in nine phases: Bootstrap, Research, Plan & Design, Plan-Gate, Implement, Gate,
 Evaluate, Release, Close.
 
-The loop has **two evaluator passes**: a cheap **PLAN-EVAL** at the Plan-Gate, before any
-implementation slice, and the full **IMPL-EVAL** at Evaluate. The Plan-Gate is a hard stop — see
-§ 4. Both evaluator passes are separate sessions.
+The loop has one mandatory evaluator pass and one conditional pass: **PLAN-EVAL** is used before
+implementation when the work is genuinely complex, decision-heavy, or benefits from adversarial
+plan advice; **IMPL-EVAL** runs after implementation unless the owner explicitly waives it. Every
+evaluator pass that runs uses a separate session.
 
 ## 1. Bootstrap
 
@@ -75,13 +76,19 @@ only to satisfy a folder template are speculative seams — they do not belong i
 
 Commit the plan + design artifacts. Put the draft PR into the **"Plan & Design — READY FOR REVIEW"**
 state with a body summarizing findings, locked decisions, commit slices, risk register, and selected
-gates (the PR #95 shape). The body must say: _do not merge until the Plan-Gate and the final
-evaluator pass are complete._
+gates (the PR #95 shape). The body must say: _do not merge until any selected Plan-Gate and the
+mandatory final evaluator pass are complete (unless the owner explicitly waives IMPL-EVAL)._
 
-## 4. Plan-Gate (PLAN-EVAL)
+## 4. Conditional Plan-Gate (PLAN-EVAL)
 
-The Plan-Gate is a **hard stop**. **No implementation slice may be committed until the Plan-Gate
-verdict is `PASS`** — or the user explicitly waives it in writing.
+PLAN-EVAL is required when material architecture, sequencing, scope, risk, or trade-off decisions
+remain; for multi-PR/wave plans; and whenever the supervisor genuinely needs adversarial planning
+advice. When selected, it is a **hard stop**: no implementation slice may be committed until its
+verdict is `PASS`.
+
+Skip PLAN-EVAL for a small/mechanical issue whose issue body and current evidence already provide
+the contract, scope, acceptance criteria, and gates. Record `PLAN-EVAL: N/A` plus the concrete
+reason in `worklog.md`/`phase-registry.md`; do not create a ceremonial evaluator session.
 
 PLAN-EVAL is a **separate session**. The plan evaluator:
 
@@ -176,16 +183,16 @@ Record results as tables in `worklog.md`.
 
 ## 7. Evaluate (IMPL-EVAL)
 
-The final evaluation is a separate session, distinct from PLAN-EVAL. Operating instructions live in
-`evaluator/protocol.md`.
+The final evaluation is mandatory unless the owner explicitly waives it, and always uses a
+separate session. Operating instructions live in `evaluator/protocol.md`.
 
 1. Read `evaluator/protocol.md` and `evaluator/verdict-definitions.md`.
 2. Read the archetype profile, overlays, research, plan, plan-eval, worklog, context pack, drift,
    and the draft-PR commit list + per-slice PR comments (the commit trail).
 3. Verify the Design checkpoint exists and was followed.
 4. Verify commit slices match the Design checkpoint.
-5. Verify the Plan-Gate passed (`plan-eval.md` = `PASS`) before implementation began. Implementation
-   that started without a Plan-Gate `PASS` is a process failure — record it.
+5. Verify either the selected Plan-Gate passed (`plan-eval.md` = `PASS`) before implementation, or
+   the run recorded a justified `PLAN-EVAL: N/A` under §4 before implementation began.
 6. Run the applicable gate set independently.
 7. Fill `evaluate.md` from `templates/evaluate.md`.
 8. Emit `PASS`, `FAIL_FIX`, `FAIL_RESCOPE`, or `FAIL_DEBT`.

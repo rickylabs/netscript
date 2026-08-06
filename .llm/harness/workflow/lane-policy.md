@@ -42,8 +42,9 @@ approval — and each Fable primary carries an in-plan token-limit fallback.
 | Vision-capable adversarial design evidence (`adversarial_design_eval`)                                                                                                                     | OpenCode · OpenRouter · Kimi K2.6 vision · high (`--variant`). Complements — does not replace — the required GLM 5.2 design pass. | —                                    |
 | Claude Code workflows (`claude_workflow`)                                                                                                                                                  | Claude · Anthropic · Opus 4.8 · low                                                                                               | —                                    |
 | Massive external research / extraction (`research_extraction`)                                                                                                                             | Antigravity CLI · Google · `agy` · low                                                                                            | —                                    |
-| **Local evaluator pass — PLAN-EVAL / IMPL-EVAL** (`formal_evaluation`)                                                                                                                     | Claude · OpenRouter · bound **OPEN-model Qwen evaluation preset** (`qwen/qwen3.7-max`) · `claude-openrouter` / `claude-print`    | —                                    |
-| Automated cloud agent (including cloud evaluator runs)                                                                                                                                     | OpenHands · open models only (Minimax M3 / Qwen 3.7), cloud-driven runs only                                                      | —                                    |
+| **Local PLAN-EVAL** (`formal_plan_evaluation`)                                                                                                                                              | Claude · OpenRouter · `claude-evaluator-minimax-m3` · `minimax/minimax-m3` · high · `claude-openrouter` / `claude-print`         | —                                    |
+| **Local IMPL-EVAL** (`formal_impl_evaluation`)                                                                                                                                              | Claude · OpenRouter · `claude-evaluator-deepseek-v4-flash-0731` · `deepseek/deepseek-v4-flash-0731` · max · `claude-openrouter` / `claude-print` | —                                    |
+| Automated cloud agent (including cloud evaluator runs)                                                                                                                                     | **TEMPORARILY PAUSED by owner (2026-08-06)** — use local toolchain until trigger path is fixed                                    | —                                    |
 
 The `major_ui_ux_*` GLM 5.2 lanes and the OpenCode vision-evidence lane are **dormant** while the
 Dev Dashboard is paused (epic #400 moved to `0.0.1-beta.13`); they remain the enforced route for any
@@ -56,6 +57,15 @@ CLI (`agy`) on the owner's Google subscription. Gemini over OpenRouter is **not*
 it spends OpenRouter credit where a subscription already exists. This remains a generator lane
 only; it does not change the formal evaluator lane, its approved open-model set, or the prohibition
 on Gemini over evaluator transports.
+
+**Owner decision (2026-08-06).** PLAN-EVAL is conditional: use it before implementation only for
+genuinely complex/decision-heavy work, multi-PR/wave planning, or when adversarial planning advice
+is useful. Small/mechanical issues with complete contract/scope/acceptance/gates record
+`PLAN-EVAL: N/A`. IMPL-EVAL remains mandatory unless the owner explicitly waives it. OpenHands is
+temporarily paused; use local evaluator transports. If an evaluator's OpenRouter route is blocked
+by an OpenRouter limit, the explicit fallback is Antigravity CLI (`agy`) on Google subscription,
+`gemini-3.6-flash-high`, effort `high`. This fallback must be a fresh separate session, record the
+block and requested/observed identity, and never be invoked through paid OpenRouter.
 
 **Forward rule (not a lane).** Any future **max-effort OpenAI implementation** route pairs with a
 **Claude · Fable 5 · high** adversarial review. This extends the effort-paired ladder above; when
@@ -152,16 +162,25 @@ The doctrine already said the right thing: OpenHands is for **cloud-driven** run
 **local-machine** run must use a local adversarial agent for PLAN-EVAL/IMPL-EVAL. What it lacked was
 a **named local transport** — so it described a gap and told us to log it. The gap is now filled:
 
-**Local PLAN-EVAL / IMPL-EVAL runs on Claude Code + OpenRouter (`claude-openrouter` profile →
-`claude-print`) with the bound open-model Qwen evaluation preset.** An open model is neither Claude-family nor Codex-family, so it
-is adversarial to **both** generators — the generator-≠-evaluator invariant is satisfied more
-robustly than by a family swap alone.
+**Local PLAN-EVAL and IMPL-EVAL run as separate sessions on Claude Code + OpenRouter
+(`claude-openrouter` profile → `claude-print`).** PLAN-EVAL binds the Minimax M3 evaluation preset;
+IMPL-EVAL binds the DeepSeek V4 Flash 0731 max evaluation preset. Each open model is neither Claude-family nor
+Codex-family, so it is adversarial to **both** generators — the generator-≠-evaluator invariant is
+satisfied more robustly than by a family swap alone.
 
-**Nothing about OpenHands changes.** It remains the default automated **cloud** agent, and its model
-rules are inherited **verbatim** by the local lane:
+When OpenRouter is blocked by a provider limit, both formal phase lanes have the owner-authorized
+machine-bound fallback `antigravity` / Google / `gemini-3.6-flash-high` / high with condition
+`fallback_on_openrouter_limit`. The fallback runs only through the checked-in AGY toolchain, never
+OpenRouter, and preserves generator/evaluator session separation.
 
-- **OPEN models only** — the approved set is `minimax/minimax-m3` and `qwen/qwen3.7-max`; the
-  currently bound local evaluation preset is Qwen, while Minimax's current preset is workflow-fanout.
+**OpenHands is temporarily paused by owner direction (2026-08-06).** Keep its model rules intact,
+but do not dispatch it until the trigger path is fixed; use the local lane:
+
+- **OPEN models only** — the approved local formal set is `minimax/minimax-m3` and
+  `deepseek/deepseek-v4-flash-0731`; the phase-bound presets are
+  `claude-evaluator-minimax-m3` for PLAN-EVAL and
+  `claude-evaluator-deepseek-v4-flash-0731` for IMPL-EVAL. The distinct
+  `claude-fanout-minimax-m3` preset remains workflow-fanout only.
 - **Closed/paid models (Claude/`sonnet`, GPT/`gpt`, Gemini) are PROHIBITED** on either evaluator
   transport. They bill the owner's OpenRouter balance and can silently burn it. This is a
   **cost-protection policy, not a runner implementation detail** — it survives the transport change
@@ -170,13 +189,13 @@ rules are inherited **verbatim** by the local lane:
 **Ordinary (non-formal) review** — the slice review gate, code/PR review — remains opposite-family
 Claude ⇄ Codex. Do not conflate it with the formal evaluator pass.
 
-**Machine binding.** This table is the rendered view of `CANONICAL_ROUTE_POLICY`. The evaluator lane
-is backed by data: a companion `routing-policy.ts` slice binds the formal open-model evaluator route
-to the `claude-openrouter` profile, adds `qwen/qwen3.7-max` to `OPENROUTER_MODEL_IDS`, and makes
-`resolveCanonicalFormalEvaluatorRoute()` **throw** unless the route is Claude + OpenRouter +
-`open_only` with an approved open model — so the closed-model prohibition above is enforced **in
-code, not in a comment**. That slice and this document land together; the doc is not a substitute
-for the binding.
+**Machine binding.** This table is the rendered view of `CANONICAL_ROUTE_POLICY`. The evaluator
+lanes are backed by data: `routing-policy.ts` binds the formal PLAN and IMPL routes to their exact
+phase preset/model pairs on the `claude-openrouter` profile, and
+`resolveCanonicalFormalEvaluatorRoute()` **throws** unless the requested phase, lane, preset,
+provider, and approved open model all match — so the closed-model and cross-phase prohibitions above
+are enforced **in code, not in a comment**. That binding and this document move together; the doc is
+not a substitute for the binding.
 
 The evaluator lane was, before this, the one lane in the repo that lived only in prose — which is
 precisely why an unexamined assumption could survive in it for so long. Keep it in the data.
@@ -196,8 +215,8 @@ general-evaluation model.
 
 | Model on Claude Code + OpenRouter | Reasoning trace | Agentic turn | Lane              |
 | --------------------------------- | --------------- | ------------ | ----------------- |
-| `minimax/minimax-m3`              | yes             | supported    | workflow fanout; approved open model |
-| `qwen/qwen3.7-max`                | yes             | supported    | bound formal evaluator |
+| `minimax/minimax-m3`              | yes             | supported    | PLAN-EVAL; workflow fanout uses a distinct preset |
+| `deepseek/deepseek-v4-flash-0731` | yes             | supported    | IMPL-EVAL |
 | `z-ai/glm-5.2`                    | **none**        | —            | design/UI-UX; sole other use: `docs_polish` last-resort fallback |
 
 The **evaluator lane is fully capable**: real reasoning trace, verified agentic turn (real tool
@@ -236,9 +255,9 @@ supersede the GLM 5.2 requirement for major UI/UX work.
 5. **Major UI/UX work requires GLM 5.2.** Design-system work, dashboard/console surfaces, and
    significant frontend UX are either led through the `claude-design-glm-5-2` route or receive its
    adversarial design pass before merge.
-6. **Evaluator lanes run OPEN models only.** `minimax/minimax-m3` and `qwen/qwen3.7-max` are
-   permitted on both the local (Claude Code + OpenRouter) and cloud (OpenHands) evaluator
-   transports. Closed/paid models (Claude/`sonnet`, GPT/`gpt`, Gemini) are **prohibited** on them
+6. **Evaluator lanes run OPEN models only.** The local formal phase routes use
+   `minimax/minimax-m3` and `deepseek/deepseek-v4-flash-0731`. Cloud OpenHands remains governed by
+   its own approved open-model set. Closed/paid models (Claude/`sonnet`, GPT/`gpt`, Gemini) are **prohibited** on them
    because they bill the owner's OpenRouter balance. Cost protection — never weaken it to make a
    route convenient.
 
@@ -247,7 +266,8 @@ supersede the GLM 5.2 requirement for major UI/UX work.
 - Record the selected lane and any owner override in `supervisor.md` and `drift.md`.
 - Source-code work uses a daemon-attached native-WSL session when mobile supervision is required.
 - Batch workflows persist and commit `workflow.js` before execution.
-- Every brief starts with `use harness` and includes a `## SKILL` section.
+- Every brief — including ordinary/adversarial review, formal evaluation, implementation, and
+  side-fix prompts — starts with `use harness` and includes a `## SKILL` section.
 - Native Claude mobile sessions and experimental provider-gateway sessions are different surfaces;
   never claim gateway output is mobile-visible native Claude.
 - #582 owns rollout, promotion, and production canaries. This policy selects and validates routes

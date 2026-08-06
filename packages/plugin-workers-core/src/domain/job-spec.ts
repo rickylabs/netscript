@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import type { JobDefinition } from './job-definition.ts';
 import { JobDefinitionSchema } from './job-definition.ts';
-import { DEFAULT_TOPIC, TriggerTypeSchema } from './constants.ts';
+import { DEFAULT_TOPIC, TriggerTypeZodSchema } from './constants.ts';
 
 /** Public job specification consumed by registries and runtime adapters. */
 export type JobSpec<
@@ -14,7 +14,7 @@ export type JobSpec<
 type JobMessageShape = {
   jobId: z.ZodType<string>;
   topic: z.ZodType<string>;
-  triggeredBy: typeof TriggerTypeSchema;
+  triggeredBy: typeof TriggerTypeZodSchema;
   triggeredAt: z.ZodType<string>;
   payload: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
   correlationId: z.ZodOptional<z.ZodString>;
@@ -27,7 +27,7 @@ type JobMessageShape = {
 const JobMessageShapeValue: JobMessageShape = {
   jobId: z.string().min(1).describe('Job identifier'),
   topic: z.string().default(DEFAULT_TOPIC).describe('Topic identifier'),
-  triggeredBy: TriggerTypeSchema.describe('Trigger source'),
+  triggeredBy: TriggerTypeZodSchema.describe('Trigger source'),
   triggeredAt: z.string().datetime().describe('Trigger timestamp'),
   payload: z.record(z.string(), z.unknown()).optional().describe('Job payload'),
   correlationId: z.string().optional().describe('Correlation ID'),
@@ -48,7 +48,7 @@ export type JobMessage = z.infer<typeof JobMessageSchema>;
 type TaskMessageShape = {
   taskId: z.ZodType<string>;
   topic: z.ZodType<string>;
-  triggeredBy: typeof TriggerTypeSchema;
+  triggeredBy: typeof TriggerTypeZodSchema;
   triggeredAt: z.ZodType<string>;
   payload: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
   correlationId: z.ZodOptional<z.ZodString>;
@@ -61,7 +61,7 @@ type TaskMessageShape = {
 const TaskMessageShapeValue: TaskMessageShape = {
   taskId: z.string().min(1).describe('Task identifier'),
   topic: z.string().default(DEFAULT_TOPIC).describe('Topic identifier'),
-  triggeredBy: TriggerTypeSchema.describe('Trigger source'),
+  triggeredBy: TriggerTypeZodSchema.describe('Trigger source'),
   triggeredAt: z.string().datetime().describe('Trigger timestamp'),
   payload: z.record(z.string(), z.unknown()).optional().describe('Task payload'),
   correlationId: z.string().optional().describe('Correlation ID'),

@@ -7,7 +7,7 @@ import {
 } from '../adapters/codex-profile-adapter.ts';
 import { AGENT_KINDS, EFFORTS, PROVIDER_KINDS, type RouteIdentity } from '../contract.ts';
 import { evaluateOpenRouterPresetCanaries } from '../preset-canary.ts';
-import { PROVIDER_PROFILE_IDS } from '../provider-profiles.ts';
+import { OPENROUTER_PRESET_IDS, PROVIDER_PROFILE_IDS } from '../provider-profiles.ts';
 
 export type ProviderCanaryCliOptions =
   | { readonly mode: 'static'; readonly worktree: string }
@@ -21,7 +21,7 @@ function usage(): string {
   return [
     'Usage:',
     '  deno task agentic:provider-canary [--all] [--worktree <native-ext4-path>]',
-    '  deno task agentic:provider-canary --live --profile <id> --model <id> --effort <effort>',
+    '  deno task agentic:provider-canary --live --profile <id> [--preset <id>] --model <id> --effort <effort>',
     '    --worktree <native-ext4-path> [--base-url <https-url>] [--codex-profile-home <path>]',
     '',
     'Default/--all is credential-free static validation of every OpenRouter preset.',
@@ -31,6 +31,7 @@ function usage(): string {
 
 function route(input: ReadonlyMap<string, string>): RouteIdentity {
   const profileId = input.get('--profile');
+  const presetId = input.get('--preset');
   const model = input.get('--model');
   const effort = input.get('--effort');
   const worktree = input.get('--worktree');
@@ -38,6 +39,7 @@ function route(input: ReadonlyMap<string, string>): RouteIdentity {
     !profileId || !PROVIDER_PROFILE_IDS.includes(profileId as never) || !model || !effort ||
     !EFFORTS.includes(effort as never) || !worktree
   ) throw new Error(usage());
+  if (presetId && !OPENROUTER_PRESET_IDS.includes(presetId as never)) throw new Error(usage());
   const [agent, provider] = profileId === 'claude-anthropic-native'
     ? ['claude', 'anthropic']
     : profileId === 'codex-openai-native'
@@ -54,6 +56,7 @@ function route(input: ReadonlyMap<string, string>): RouteIdentity {
     agent: agent as RouteIdentity['agent'],
     provider: provider as RouteIdentity['provider'],
     profileId: profileId as RouteIdentity['profileId'],
+    ...(presetId ? { presetId: presetId as RouteIdentity['presetId'] } : {}),
     model,
     effort: effort as RouteIdentity['effort'],
     worktree,
@@ -72,6 +75,7 @@ export function parseProviderCanaryArgs(
   let all = false;
   const valueFlags = new Set([
     '--profile',
+    '--preset',
     '--model',
     '--effort',
     '--worktree',

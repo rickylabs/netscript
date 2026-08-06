@@ -30,7 +30,7 @@
     "@fedify/denokv": "jsr:@fedify/denokv@^2.2.5",
     "@fedify/redis": "jsr:@fedify/redis@^2.2.5",
     "@fedify/amqp": "jsr:@fedify/amqp@^2.2.5",
-    "zod": "jsr:@zod/zod@4.4.3",
+    "zod": "catalog:",
     "@std/assert": "jsr:@std/assert@^1",
     "@std/async": "jsr:@std/async@^1"
   },

@@ -22,6 +22,7 @@
       "dependencies": [
         "check",
         "check:emitted-samples",
+        "check:streams-types",
         "lint",
         "fmt:check",
         "deps:check",
@@ -42,6 +43,7 @@
       ]
     },
     "check:emitted-samples": "deno run --allow-read --allow-write --allow-run .llm/tools/validation/check-emitted-samples.ts",
+    "check:streams-types": "deno task --cwd packages/fresh check:streams-types",
     "test": "deno test --allow-all",
     "test:redis-regression": "deno run --allow-env=NETSCRIPT_TEST_REDIS_URL --allow-read --allow-run .llm/tools/validation/redis-regression-gate.ts",
     "test:redis-regression:negative-control": "deno run --allow-env=NETSCRIPT_TEST_REDIS_URL --allow-read --allow-write=packages/kv/adapters/redis.adapter.ts --allow-run .llm/tools/validation/redis-regression-gate.ts --negative-control",
@@ -56,7 +58,8 @@
     "deps:audit": "deno run --allow-read --allow-net --allow-run .llm/tools/deps/audit.ts --level low --pretty",
     "deps:prod-install": "deno run --allow-read --allow-write --allow-net --allow-run --allow-env .llm/tools/deps/prod-install.ts --pretty",
     "deps:census": "deno run --allow-read .llm/tools/deps/census.ts",
-    "deps:check": "deno run --allow-read .llm/tools/deps/scan-jsr-centralization.ts --fail-on-violation && deno run --allow-read .llm/tools/deps/audit-file-link.ts --fail-on-violation && deno run --allow-read .llm/tools/deps/scan-npm-catalog-compliance.ts",
+    "deps:check": "deno run --allow-read .llm/tools/deps/scan-jsr-centralization.ts --fail-on-violation && deno run --allow-read .llm/tools/deps/audit-file-link.ts --fail-on-violation && deno run --allow-read .llm/tools/deps/scan-npm-catalog-compliance.ts && deno task deps:check:zod",
+    "deps:check:zod": "deno run --allow-read .llm/tools/deps/check-zod-alignment.ts",
     "deps:check:npm-catalog": "deno run --allow-read .llm/tools/deps/scan-npm-catalog-compliance.ts",
     "deps:check:jsr-centralization": "deno run --allow-read .llm/tools/deps/scan-jsr-centralization.ts",
     "deps:audit:file-link": "deno run --allow-read .llm/tools/deps/audit-file-link.ts",
@@ -79,6 +82,8 @@
     "docs:accuracy": "deno run --no-lock --allow-read --allow-env --allow-run=deno .llm/tools/docs/check-accuracy-and-discoverability.ts",
     "docs:maintenance": "deno task docs:links && deno task docs:accuracy && deno task agentic:sync-claude:check && deno task agentic:check-claude",
     "agentic:smoke-claude-remote": "deno run --no-lock --allow-read --allow-run .llm/tools/agentic/claude/claude-remote-smoke.ts --env-aware --pretty",
+    "agentic:claude-openrouter": "deno run --no-lock --allow-read --allow-run --allow-env --allow-sys --allow-net=127.0.0.1,api.anthropic.com,openrouter.ai .llm/tools/agentic/claude/remote-model-launcher.ts",
+    "agentic:claude-hybrid": "deno run --no-lock --allow-read --allow-write=/tmp --allow-run=claude --allow-env .llm/tools/agentic/claude/hybrid-launcher.ts",
     "agentic:codex-resume": "deno run --no-lock --allow-read --allow-run .llm/tools/agentic/codex/codex-resume.ts",
     "agentic:codex-status": "deno run --no-lock --allow-run .llm/tools/agentic/codex/codex-status.ts",
     "agentic:codex-watch": "deno run --no-lock --allow-read --allow-run --allow-env .llm/tools/agentic/codex/codex-watch.ts",
@@ -238,6 +243,7 @@
     "preact-render-to-string": "^6.7.0",
     "tailwindcss": "^4.3.1",
     "tailwind-merge": "^3.6.0",
-    "vite": "7.2.2"
+    "vite": "7.2.2",
+    "zod": "^4.4.3"
   }
 }
