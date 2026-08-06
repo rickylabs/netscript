@@ -5,6 +5,8 @@
  */
 
 import { z } from 'zod';
+import type { AuthSchema } from '../domain/mod.ts';
+export type { AuthSchema, AuthSchemaResult } from '../domain/mod.ts';
 
 /** Cookie and session policy knobs consumed by the auth plugin service. */
 export type AuthSessionPolicy = Readonly<{
@@ -57,7 +59,7 @@ const AuthSessionPolicyZodSchema = z.object({
 });
 
 /** Schema for auth cookie and session policy knobs. */
-export const AuthSessionPolicySchema: z.ZodType<AuthSessionPolicy> = AuthSessionPolicyZodSchema;
+export const AuthSessionPolicySchema: AuthSchema<AuthSessionPolicy> = AuthSessionPolicyZodSchema;
 
 const AuthProviderConfigZodSchema: z.ZodType<AuthProviderConfig> = z.object({
   id: z.string().min(1),
@@ -72,7 +74,7 @@ const AuthProviderConfigZodSchema: z.ZodType<AuthProviderConfig> = z.object({
 });
 
 /** Schema for one auth provider configuration entry. */
-export const AuthProviderConfigSchema: z.ZodType<AuthProviderConfig> = AuthProviderConfigZodSchema;
+export const AuthProviderConfigSchema: AuthSchema<AuthProviderConfig> = AuthProviderConfigZodSchema;
 
 const AuthConfigInputZodSchema = z.object({
   backend: z.string().min(1).default('default'),
@@ -81,7 +83,7 @@ const AuthConfigInputZodSchema = z.object({
 });
 
 /** Schema for auth plugin configuration. */
-export const AuthConfigSchema: z.ZodType<AuthConfig> = AuthConfigInputZodSchema
+export const AuthConfigSchema: AuthSchema<AuthConfig> = AuthConfigInputZodSchema
   .transform((raw): AuthConfig => ({
     backend: raw.backend,
     session: AuthSessionPolicyZodSchema.parse(raw.session ?? {}),

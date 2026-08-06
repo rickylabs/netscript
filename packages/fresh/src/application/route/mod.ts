@@ -4,8 +4,6 @@
  * @module
  */
 
-import type { z } from 'zod';
-
 import {
   bindOutputRoutePattern,
   createRouteReference as createRouteReferenceImpl,
@@ -13,7 +11,6 @@ import {
   enumPathParamSchema as enumPathParamSchemaImpl,
 } from './_internal/contract-runtime.ts';
 import {
-  fallback as fallbackImpl,
   paginationSearchSchema as paginationSearchSchemaImpl,
 } from '../builders/define-page/search-params.ts';
 
@@ -24,6 +21,7 @@ import type {
   DefineRouteContractOptions,
   EmptyRecord,
   EnumPathParamDefinition,
+  FallbackInputSchema,
   InferRoutePatternPath,
   PaginationSearchBaseShape,
   PaginationSearchSchema,
@@ -31,6 +29,7 @@ import type {
   PathParamSchema,
   RouteReference,
   RouteReferenceOptions,
+  SchemaField,
   SchemaObjectOutput,
   SearchParamInput,
   SearchParamSchema,
@@ -171,11 +170,11 @@ export function defineEnumPathParam<
  * @param defaultValue - Value returned when parsing fails or the field is missing.
  * @returns A `z.catch()` wrapper suitable for `paginationSearchSchema().extend(...)`.
  */
-export function fallback<TSchema extends z.ZodType>(
+export function fallback<TOutput, TInput, TSchema extends FallbackInputSchema<TOutput, TInput>>(
   schema: TSchema,
-  defaultValue: z.output<TSchema>,
-): z.ZodCatch<TSchema> {
-  return fallbackImpl(schema, defaultValue);
+  defaultValue: TOutput,
+): SchemaField<TOutput, TInput> {
+  return schema.catch(defaultValue);
 }
 
 /**
@@ -187,5 +186,6 @@ export function fallback<TSchema extends z.ZodType>(
 export function paginationSearchSchema(
   options: PaginationSearchSchemaOptions = {},
 ): PaginationSearchSchema<PaginationSearchBaseShape> {
-  return paginationSearchSchemaImpl(options);
+  const schema: object = paginationSearchSchemaImpl(options);
+  return schema as PaginationSearchSchema<PaginationSearchBaseShape>;
 }

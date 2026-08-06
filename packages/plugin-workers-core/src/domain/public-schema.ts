@@ -36,8 +36,20 @@ export interface PublicStandardSchema<TOutput> {
   };
 }
 
+/** Structural validator accepted as a public definition field. */
+export interface PublicDefinitionFieldSchema<TOutput = unknown> {
+  /** Parse an unknown field value. */
+  parse(value: unknown): TOutput;
+  /** Validate an unknown field value without throwing. */
+  safeParse(value: unknown):
+    | { readonly success: true; readonly data: TOutput }
+    | { readonly success: false; readonly error: unknown };
+}
+
 /** Structural object-shape map used by public definition schemas. */
-export type PublicDefinitionSchemaShape = Readonly<Record<string, z.ZodTypeAny>>;
+export type PublicDefinitionSchemaShape = Readonly<
+  Record<string, PublicDefinitionFieldSchema>
+>;
 
 /** Package-owned structural schema surface for public definition schemas. */
 export interface PublicDefinitionSchema<TOutput> extends PublicStandardSchema<TOutput> {

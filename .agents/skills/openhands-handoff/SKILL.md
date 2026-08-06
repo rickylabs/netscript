@@ -8,6 +8,9 @@ description: >
 This skill is the routing card for OpenHands handoffs: comments and labels start cloud work, and the
 required summary artifacts keep local and cloud agents synchronized.
 
+> **Temporary owner hold (2026-08-06):** do not dispatch OpenHands until its trigger path is fixed.
+> Use the checked-in local evaluator toolchain. This hold does not waive mandatory IMPL-EVAL.
+
 ## When to Use
 
 - The user asks to trigger, configure, review, or debug OpenHands in this repo.
@@ -44,8 +47,8 @@ and told you to log it. It is now filled:
 
 **Local PLAN-EVAL / IMPL-EVAL runs on Claude Code + OpenRouter** — the `claude-openrouter` provider
 profile driven via `claude-print` — in separate formal sessions. PLAN-EVAL binds
-`claude-evaluator-minimax-m3` (`minimax/minimax-m3`), while IMPL-EVAL binds
-`claude-evaluator-qwen-3-8-max` (`qwen/qwen3.8-max`). **Rule 1 above
+`claude-evaluator-minimax-m3` (`minimax/minimax-m3`) at high effort, while IMPL-EVAL binds
+`claude-evaluator-deepseek-v4-flash-0731` (`deepseek/deepseek-v4-flash-0731`) at max effort. **Rule 1 above
 applies verbatim to this lane: OPEN models only; closed/paid
 models (Claude/`sonnet`, GPT/`gpt`, Gemini) are PROHIBITED** — they bill the owner's OpenRouter
 balance and can silently burn it. An open model is neither Claude-family nor Codex-family, so it is

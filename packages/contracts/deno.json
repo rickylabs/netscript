@@ -11,7 +11,7 @@
   },
   "imports": {
     "@orpc/contract": "npm:@orpc/contract@^1.14.6",
-    "zod": "jsr:@zod/zod@4.4.3"
+    "zod": "catalog:"
   },
   "tasks": {
     "check": "deno check mod.ts crud.ts query.ts transform.ts",

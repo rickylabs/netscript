@@ -1,7 +1,7 @@
 import { assertEquals } from '@std/assert';
 import { os } from '@orpc/server';
 import { Hono } from 'hono';
-import { z } from 'jsr:@zod/zod@4.4.3';
+import { z } from 'zod';
 import {
   createErrorHandler,
   createNotFoundHandler,

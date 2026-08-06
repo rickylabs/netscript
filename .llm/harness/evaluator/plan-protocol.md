@@ -1,7 +1,9 @@
 # PLAN-EVAL Protocol
 
-PLAN-EVAL is the harness's first evaluator pass. It judges the **plan**, not the code, and runs at
-the Plan-Gate before any implementation slice is committed. PLAN-EVAL is always a **separate
+PLAN-EVAL is the harness's conditional planning evaluator. It judges the **plan**, not the code,
+and runs before implementation only for genuinely complex/decision-heavy work or when adversarial
+planning advice is useful. Small/mechanical issues with complete contract, scope, acceptance, and
+gate information record `PLAN-EVAL: N/A` instead. When PLAN-EVAL runs it is always a **separate
 session** from the generator and from IMPL-EVAL.
 
 On a local-machine run PLAN-EVAL is a separate **local** session on the **Claude Code + OpenRouter**
@@ -9,11 +11,16 @@ transport (`claude-openrouter` profile → `claude-print`) running the bound **O
 evaluation preset** (`claude-evaluator-minimax-m3` → `minimax/minimax-m3`) — an open model is
 adversarial to both the Claude and Codex families. It is triggered by the **supervisor**, never auto-dispatched by a sub-agent, and
 **closed/paid models (Claude/GPT/Gemini) are prohibited on it** (they burn paid OpenRouter credit).
-OpenHands remains the default automated **cloud** agent under the same open-models-only rule. Both
+OpenHands dispatch is temporarily paused by owner direction; use the local transport. Both
 approved open models return a **real reasoning trace** and have a **verified agentic turn** on this
 transport; the bound Minimax preset can run gates and its `effort` is genuine (drift D-4 amended: the
 zero-reasoning behaviour is **GLM-specific**, not a client-wide gap). See `evaluator/protocol.md`,
 `workflow/lane-policy.md`, and `.agents/skills/openhands-handoff/SKILL.md` "Routing policy".
+
+If Minimax cannot run because OpenRouter is blocked by a provider limit, the sole approved fallback
+is a fresh separate Antigravity (`agy`) session on Google subscription using
+`gemini-3.6-flash-high` at high effort. Record the block and route identity; never send that
+fallback through OpenRouter.
 
 ## Inputs
 

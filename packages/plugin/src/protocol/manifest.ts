@@ -245,8 +245,29 @@ const linkingSchema: z.ZodType<PluginManifestLinking> = z.object({
   consumers: linkingConsumersSchema,
 }).strict();
 
-/** Zod schema for the published NetScript plugin installer manifest. */
-export const PluginInstallerManifestSchema: z.ZodType<PluginInstallerManifest> = z.object({
+/** Validation issue exposed by the plugin installer manifest schema. */
+export interface PluginInstallerManifestSchemaIssue {
+  /** Path segments locating the invalid value. */
+  readonly path: readonly PropertyKey[];
+  /** Human-readable validation message. */
+  readonly message: string;
+}
+
+/** Stable public validation surface for the plugin installer manifest schema. */
+export interface PluginInstallerManifestValidator {
+  /** Parse a value or throw when it is not a valid installer manifest. */
+  parse(value: unknown): PluginInstallerManifest;
+  /** Parse a value without throwing. */
+  safeParse(value: unknown):
+    | { readonly success: true; readonly data: PluginInstallerManifest }
+    | {
+      readonly success: false;
+      readonly error: { readonly issues: readonly PluginInstallerManifestSchemaIssue[] };
+    };
+}
+
+/** Zod validator for the published NetScript plugin installer manifest. */
+export const PluginInstallerManifestSchema: PluginInstallerManifestValidator = z.object({
   schemaVersion: z.literal(PLUGIN_MANIFEST_SCHEMA_VERSION),
   name: z.string().min(1),
   version: z.string().min(1),

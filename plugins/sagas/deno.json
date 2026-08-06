@@ -30,7 +30,7 @@
     "@netscript/service": "jsr:@netscript/service@0.0.4",
     "@netscript/telemetry": "jsr:@netscript/telemetry@0.0.4",
     "hono": "jsr:@hono/hono@4.12.24",
-    "zod": "jsr:@zod/zod@4.4.3"
+    "zod": "catalog:"
   },
   "tasks": {
     "check": "deno check --unstable-kv mod.ts cli.ts scaffold.ts src/adapter/plugin.ts src/adapter/resources/mod.ts src/public/mod.ts src/cli/mod.ts src/e2e/mod.ts src/aspire/mod.ts src/runtime/mod.ts contracts/v1/mod.ts services/src/main.ts streams/mod.ts streams/server.ts",
