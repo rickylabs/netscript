@@ -341,3 +341,24 @@ files.
   PR #1316 remains mergeable and `status:ready-merge`; the repo-native latest-run classifier reports
   zero current failures, but its core visibility job is still queued and runner-starved jobs are
   canceled rather than green. It remains unmerged and outside the pre-merge gate.
+
+## 2026-08-06 — repeated external-gate audit and T2 preparation
+
+- Re-attempted the same bounded Qwen session through the canonical checked-in route on a new goal
+  continuation. The provider again rejected the sole configured key at its monthly limit before
+  inference; raw capture is
+  `.llm/tmp/release-0.0.5--orchestration/t1-a-impl-eval-repair1-resume2-raw.txt`. No evidence or
+  verdict was produced, and T1-A remains failed closed at `status:impl-eval`.
+- Inspected PR #1316's exact Actions run `31121552268`. All six jobs require `ubuntu-latest`; five
+  were canceled after waiting without executing a step and report no assigned runner, while `core CI
+  lane visibility` remains queued with no runner. Repository Actions are enabled, but the current
+  token cannot read account billing usage. The run was left untouched because cancel/retrigger would
+  not repair absent capacity and would discard its current provenance.
+- Prepared non-dispatchable T2-A and T2-B supervisor/preflight artifacts from live issues, PRs,
+  worktrees, check rollups, and review-thread gates. They hold the approved post-T1 sequence and
+  require fresh current-base validation plus separate Qwen IMPL-EVAL; neither inherited composed or
+  pending evaluator artifact is accepted as the current formal gate.
+- Both T2 worktrees contain the same pre-existing 45-line `deno.lock` patch, exact patch hash
+  `cfc68984...`. Created non-mutating recovery commits `b7b335566...` for T2-A and `d953769b0...`
+  for T2-B; left both worktrees unchanged and instructed future supervisors never to stage, restore,
+  pop, drop, or overwrite that unowned state.

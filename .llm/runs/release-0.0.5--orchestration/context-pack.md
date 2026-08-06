@@ -61,7 +61,10 @@ terminal verdict. Independent non-merge milestone work may continue meanwhile.
 Immediate next action: hold T1-A's formal gate for approved Qwen transport recovery while preserving
 its exact clean target and lifecycle. Cloud OpenHands is not an admissible substitute for this local
 harness run. T1-B remains outside the train: it has zero classified current failures but a queued
-visibility job and canceled runner-starved jobs, not a complete green current-head rollup. T2 PRs
-#1317/#1318 remain green but are sequenced after T1 train mutations. No merge is authorized until
-T1-A passes, both T1 PRs have current green required contexts outside draft policy, and the complete
-milestone pre-merge gate passes.
+visibility job and five canceled jobs that never received an `ubuntu-latest` runner or executed a
+step, not a complete green current-head rollup. T2 PRs #1317/#1318 remain green but are sequenced
+after T1 train mutations. Their exact worktrees, inherited lock recovery commits, stale canary.13
+wording, and fresh-gate missions are now recorded under `slices/t2-a-1117/` and
+`slices/t2-b-1115/`; they are explicitly non-dispatchable until T1 opens. No merge is authorized
+until T1-A passes, both T1 PRs have current green required contexts outside draft policy, and the
+complete milestone pre-merge gate passes.
