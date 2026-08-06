@@ -26,23 +26,22 @@ or below canary.14 (287 to 279 root sum), Fresh detached/member checks green thr
 catalog plus root-CI wiring, serial publish dry-run green, and exact one-pass runtime 73/73 raw exit
 0 with zero smoke-owned leaks. PR #1315 remains draft; issue/PR advance from `status:impl` to
 `status:impl-eval` only for a fresh Qwen high repair evaluation. Two premature Qwen attempts remain
-ineligible under C-D10. T1-B completed its
-generic empty-Apps repair and isolated OTEL live proof at clean pushed head `53d6c278d`; its admissible
-one-pass runtime rerun is 73/73 with raw exit 0, while the first interrupted attempt remains
-diagnostic-only under C-D12. T1-B Qwen session `bd9e6431-23ac-4473-b331-3bc22333bf2e` launched from a
-stale pre-adjudication prompt and is permanently ineligible under C-D15; its exact process group was
-terminated before verdict. Corrected session `228b3382-c868-472b-8066-0af93d2ed01e` was later
-failed closed under C-D17 when duplicate-root consolidation severed its output wrapper. The sole
-admissible T1-B evaluator is Qwen high session `abe31571-0fa1-4ea4-9085-1c36ea14a5c7`, launched
-from exact clean head `53d6c278d` through checked-in `openrouter-run.ts` with `deno run --no-lock`.
-T1-B canonical Qwen high session `abe31571-0fa1-4ea4-9085-1c36ea14a5c7` returned `PASS` at
-evaluated head `53d6c278d`; its artifact-only head is `31b898212`. All eight #1189 rows are
-independently supported, the exact runtime smoke is 73/73 raw exit 0, post-run ownership is clean,
-and the protected stash is intact. Local evidence-mirror dry-run, close-gate, prohibited-diff scan,
-and review-thread gate pass at the artifact head. Issue/PR are `status:ready-merge`, the PR is no
-longer draft, and the label-triggered current-head CI is pending; no merge is authorized until the
-named contexts finish successfully and T1-A is repaired/evaluated. #1317/#1318 roll up green but
-require current-base merge gates after T1.
+ineligible under C-D10. T1-B completed its generic empty-Apps repair and isolated OTEL live proof at
+clean pushed head `53d6c278d`; its admissible one-pass runtime rerun is 73/73 with raw exit 0, while
+the first interrupted attempt remains diagnostic-only under C-D12. T1-B Qwen session
+`bd9e6431-23ac-4473-b331-3bc22333bf2e` launched from a stale pre-adjudication prompt and is
+permanently ineligible under C-D15; its exact process group was terminated before verdict. Corrected
+session `228b3382-c868-472b-8066-0af93d2ed01e` was later failed closed under C-D17 when
+duplicate-root consolidation severed its output wrapper. The sole admissible T1-B evaluator is Qwen
+high session `abe31571-0fa1-4ea4-9085-1c36ea14a5c7`, launched from exact clean head `53d6c278d`
+through checked-in `openrouter-run.ts` with `deno run --no-lock`. T1-B canonical Qwen high session
+`abe31571-0fa1-4ea4-9085-1c36ea14a5c7` returned `PASS` at evaluated head `53d6c278d`; its
+artifact-only head is `31b898212`. All eight #1189 rows are independently supported, the exact
+runtime smoke is 73/73 raw exit 0, post-run ownership is clean, and the protected stash is intact.
+Local evidence-mirror dry-run, close-gate, prohibited-diff scan, and review-thread gate pass at the
+artifact head. Issue/PR are `status:ready-merge`, the PR is no longer draft, and the label-triggered
+current-head CI is pending; no merge is authorized until the named contexts finish successfully and
+T1-A is repaired/evaluated. #1317/#1318 roll up green but require current-base merge gates after T1.
 Planned cuts are canary.14/.15/.16. Minimax PLAN and Qwen IMPL paid-transport canaries passed;
 routing state has no persisted fallback.
 
@@ -54,8 +53,8 @@ continuation before any verdict because its default output reservation exceeded 
 budget. Under C-D18 that interrupted turn is failed closed. A same-session retry through the same
 checked-in route used a supported 16,000-token output cap and separate raw capture, but the sole
 configured OpenRouter key had reached its monthly limit and inference did not begin. No route was
-substituted and no verdict is inferred. T1-A remains draft at exactly `status:impl-eval`; its gate is
-closed until the approved Qwen transport is funded/reset and emits the complete artifact plus
+substituted and no verdict is inferred. T1-A remains draft at exactly `status:impl-eval`; its gate
+is closed until the approved Qwen transport is funded/reset and emits the complete artifact plus
 terminal verdict. Independent non-merge milestone work may continue meanwhile.
 
 Immediate next action: hold T1-A's formal gate for approved Qwen transport recovery while preserving
@@ -64,10 +63,10 @@ harness run. T1-B remains outside the train: it has zero classified current fail
 visibility job and five canceled jobs that never received an `ubuntu-latest` runner or executed a
 step, not a complete green current-head rollup. T2 PRs #1317/#1318 remain green but are sequenced
 after T1 train mutations. Their exact worktrees, inherited lock recovery commits, stale canary.13
-wording, and fresh-gate missions are now recorded under `slices/t2-a-1117/` and
-`slices/t2-b-1115/`; they are explicitly non-dispatchable until T1 opens. No merge is authorized
-until T1-A passes, both T1 PRs have current green required contexts outside draft policy, and the
-complete milestone pre-merge gate passes.
+wording, and fresh-gate missions are now recorded under `slices/t2-a-1117/` and `slices/t2-b-1115/`;
+they are explicitly non-dispatchable until T1 opens. No merge is authorized until T1-A passes, both
+T1 PRs have current green required contexts outside draft policy, and the complete milestone
+pre-merge gate passes.
 
 W1 live issue and code-surface preflights are also prepared under `slices/w1-a-1312-1148/`,
 `slices/w1-b-1024-1328/`, and `slices/w1-c-1324-1330/`. They preserve the approved three-supervisor
@@ -76,18 +75,18 @@ performed. W1-C's real OpenRouter MCP/resume receipts and every cluster's formal
 explicitly held by the current provider limit rather than weakened to mocks or substituted routes.
 
 W2 current-evidence preflights now live under `slices/w2-a-1325/`, `slices/w2-b-1329/`, and
-`slices/w2-c-1202-1327/`. They are held behind the verified C14 green pair and fresh canary.15 train.
-W2-B is the contract dependency for W3-A. W2-C explicitly prevents a code PR from closing #1202's
-owner-machine observational acceptance; it may close #1327 and reference #1202 while the
+`slices/w2-c-1202-1327/`. They are held behind the verified C14 green pair and fresh canary.15
+train. W2-B is the contract dependency for W3-A. W2-C explicitly prevents a code PR from closing
+#1202's owner-machine observational acceptance; it may close #1327 and reference #1202 while the
 orchestrator later captures the collision and three consecutive clean runtime passes.
 
-W3 preflights now live under `slices/w3-a-1326/`, `slices/w3-b-1102-1197/`, and
-`slices/w3-c-1119/`. W3-A remains held on W2-B; W3-B remains held on W1-C and reserves #1197 for an
-instrumented post-publish hand-close rather than a code PR; W3-C preserves active-versus-historical
-provenance during the model-rollout canary rename. None is dispatched.
+W3 preflights now live under `slices/w3-a-1326/`, `slices/w3-b-1102-1197/`, and `slices/w3-c-1119/`.
+W3-A remains held on W2-B; W3-B remains held on W1-C and reserves #1197 for an instrumented
+post-publish hand-close rather than a code PR; W3-C preserves active-versus-historical provenance
+during the model-rollout canary rename. None is dispatched.
 
-W4 preflights now live under `slices/w4-a-1333/`, `slices/w4-b-1208/`, and `slices/w4-c-1108/`.
-W4-A includes the required GLM design checkpoint and holds #1333's measured-agent acceptance for
+W4 preflights now live under `slices/w4-a-1333/`, `slices/w4-b-1208/`, and `slices/w4-c-1108/`. W4-A
+includes the required GLM design checkpoint and holds #1333's measured-agent acceptance for
 orchestrator hand-close; W4-B is dependency-locked behind W4-A and does not prematurely close
 #1208's unresolved Phase 2; W4-C reuses #1292's live export-map authority. All remain behind C15.
 
@@ -96,3 +95,10 @@ complete first-party contract metadata and live OpenAPI→MCP reference; W5-B co
 generated multi-model schema surface for the final DB/contract/capability story. With these files,
 all 18 approved clusters have tracked current-evidence supervisor preparation or active T1 records;
 only dependency-open exact launch prompts/threads remain to be materialized at their real bases.
+
+The final orchestrator-only evidence lane is prepared at `slices/f-evidence-closures/preflight.md`.
+It records live closure authority for #1004, #1090, #1126, #1166, and #1169. No code PR may close
+them. A real partial same-semver recovery, unprompted behavioral trial, update-merge canary payload,
+umbrella child reconciliation, or one-pass release cut must be evidenced as applicable. If a
+qualifying event does not naturally occur, the unearned issue moves intact to milestone 25 `0.0.6`;
+the run will not manufacture a failure/topology or coach an agent to make a checkbox pass.

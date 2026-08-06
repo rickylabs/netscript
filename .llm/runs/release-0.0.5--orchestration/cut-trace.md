@@ -11,3 +11,9 @@ The pre-continuation trace is preserved at `orchestrator/0.0.5@8399126ef` in
 
 Every later merge is appended from live first-parent `origin/main` history immediately after the
 orchestrator merge gate. No commit-ancestry inference is used to decide PR merge state.
+
+## Current cut state
+
+Re-audited 2026-08-06T18:30:15Z while preparing the final evidence-closure contracts. No
+continuation merge, canary publish, pair verification, stable publication, or cut-owned resource
+mutation has occurred after the baseline row above. Planned boundaries remain C14, C15, and C16.

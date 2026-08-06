@@ -138,15 +138,14 @@ files.
 ## 2026-08-06 — T1-A terminal handoff and canonical IMPL-EVAL
 
 - The supported same-thread steering turn finished with `DONE`, clean local/remote/PR head
-  `9f5ef7dcb55668a6649c5451266908ad8e29b15c`, and current-SHA `SUCCESS` for close-gate,
-  check-test, quality, deps-report, code-quality, surface-diff, core CI lane visibility, and scaffold
-  lane visibility. No product change or evaluator launch occurred in that terminal verification.
+  `9f5ef7dcb55668a6649c5451266908ad8e29b15c`, and current-SHA `SUCCESS` for close-gate, check-test,
+  quality, deps-report, code-quality, surface-diff, core CI lane visibility, and scaffold lane
+  visibility. No product change or evaluator launch occurred in that terminal verification.
 - Reconciled issue #1295 and PR #1315 to exactly one lifecycle label, `status:impl-eval`, retaining
   `wave:v1` and their approved taxonomy.
 - Launched exactly one fresh corrected formal evaluator from the T1-A worktree through the supported
-  OpenRouter route: Qwen 3.8 Max high, bypass, session
-  `f516aada-2a74-4dad-821e-b20963fe2983`. The evaluator is read-only and targets exact clean head
-  `9f5ef7dcb55668a6649c5451266908ad8e29b15c`.
+  OpenRouter route: Qwen 3.8 Max high, bypass, session `f516aada-2a74-4dad-821e-b20963fe2983`. The
+  evaluator is read-only and targets exact clean head `9f5ef7dcb55668a6649c5451266908ad8e29b15c`.
 
 ## 2026-08-06 — Single-writer and T1 recovery
 
@@ -202,8 +201,8 @@ files.
   corrected pushed prompt.
 - Launched the corrected read-only T1-B evaluator through the supported OpenRouter route at exact
   clean head `53d6c278d...`: Qwen 3.8 Max high, bypass, session
-  `228b3382-c868-472b-8066-0af93d2ed01e`. The live process command contains the corrected checked-row
-  contract; this is the only admissible T1-B evaluator session.
+  `228b3382-c868-472b-8066-0af93d2ed01e`. The live process command contains the corrected
+  checked-row contract; this is the only admissible T1-B evaluator session.
 - C-D16: the root `deno task` launcher transiently changed the T1-B worktree lock while resolving
   the older target graph. Restored only that launcher-caused diff before the evaluator's own target
   preflight. Re-verified branch `fix/plugin-linking-seam-1189`, head `53d6c278d...`, zero worktree
@@ -219,15 +218,16 @@ files.
 - Detected the retained tmux root client issuing evaluator polls concurrently with this app-server
   turn. Terminated only that duplicate Codex client. The tmux/phone surface no longer displays an
   actual Codex CLI, so root observability is recorded failed/not-attached rather than substituted.
-- The client termination severed T1-B evaluator `228b3382-c868-472b-8066-0af93d2ed01e`'s wrapper
-  and orphaned its Claude process. Failed that session closed, terminated its exact process group,
-  and excluded its partial output from verdict evidence under C-D17.
+- The client termination severed T1-B evaluator `228b3382-c868-472b-8066-0af93d2ed01e`'s wrapper and
+  orphaned its Claude process. Failed that session closed, terminated its exact process group, and
+  excluded its partial output from verdict evidence under C-D17.
 - The interrupted evaluator had caused a 20-add/25-delete `deno.lock` diff. Re-verified branch
-  `fix/plugin-linking-seam-1189`, head `53d6c278d...`, protected stash `7eb4ed16d...`, and patch hash
-  `6f706f8f...`; restored only that evaluator-caused worktree diff and confirmed zero status entries.
+  `fix/plugin-linking-seam-1189`, head `53d6c278d...`, protected stash `7eb4ed16d...`, and patch
+  hash `6f706f8f...`; restored only that evaluator-caused worktree diff and confirmed zero status
+  entries.
 - Relaunched the exact corrected prompt once through the checked-in agentic OpenRouter runner with
-  `deno run --no-lock`: Qwen 3.8 Max high, bypass, session
-  `abe31571-0fa1-4ea4-9085-1c36ea14a5c7`. This is the sole admissible T1-B evaluator session.
+  `deno run --no-lock`: Qwen 3.8 Max high, bypass, session `abe31571-0fa1-4ea4-9085-1c36ea14a5c7`.
+  This is the sole admissible T1-B evaluator session.
 
 ## 2026-08-06 — T1-A formal IMPL-EVAL `FAIL_FIX`
 
@@ -238,16 +238,16 @@ files.
   exit 0 / head exit 1 (`Package 'zod' not found in catalog`). The evaluator also held the exact
   one-pass `scaffold.runtime` smoke as mandatory and unproven.
 - The evaluator verified the graph guard, peer binding, emitted-samples RED/GREEN, focused tests,
-  scoped source gates, quality gates, docs, serial publish dry-run, and lock hygiene. It restored its
-  own lock footprint and left evaluated head `9f5ef7dcb...` clean.
+  scoped source gates, quality gates, docs, serial publish dry-run, and lock hygiene. It restored
+  its own lock footprint and left evaluated head `9f5ef7dcb...` clean.
 - Recorded the complete evaluator artifact verbatim at
   `.llm/runs/fix-zod-v4-npm-alignment-1295--1295/evaluate.md`, committed it in `bcc3432bb`, removed
   one apply-patch-added blank line in `d0aa6a22d`, and pushed the exact PR branch without force.
 - Posted structured PR phase comment `5207581542`. Reconciled issue #1295 and PR #1315 from
   `status:impl-eval` to exactly one `status:impl`; the PR remains draft and is not train-eligible.
 - Prepared `slices/t1-a-1295/repair-1.md` for the existing sole owner thread. The supported sender
-  registry requires same-thread resume; Sol-medium route drift remains C-D9 and is justified for
-  the cross-package public-type/foreign-config repair.
+  registry requires same-thread resume; Sol-medium route drift remains C-D9 and is justified for the
+  cross-package public-type/foreign-config repair.
 
 ## 2026-08-06 — T1-B formal IMPL-EVAL `PASS` and ready-merge trigger
 
@@ -256,17 +256,17 @@ files.
   ineligible.
 - Independently verified all eight #1189 acceptance rows, including the orchestrator-checked
   observational row: RED HTTP 500, GREEN HTTP 200, and trace `00766def...` containing the correlated
-  catalog client span and fixture-api server span. Focused rerun was 16 tests / 38 steps / 0;
-  exact one-pass `scaffold.runtime` was 73 passed / 0 failed / `RAW-EXIT:0` with endpoint,
-  background, OTEL, and cleanup coverage.
+  catalog client span and fixture-api server span. Focused rerun was 16 tests / 38 steps / 0; exact
+  one-pass `scaffold.runtime` was 73 passed / 0 failed / `RAW-EXIT:0` with endpoint, background,
+  OTEL, and cleanup coverage.
 - Post-smoke leak reporter found zero run-owned resources and zero AppHosts; 15 foreign and 3
   unproven pre-existing containers were untouched. Protected stash commit `7eb4ed16...` and exact
   diff hash `6f706f8f...` remained intact.
 - Evaluator classified the four package-plugin `@module` findings as unchanged canary.14 baseline,
   CLI lint/fmt wrappers as intentionally excluded by repo config with operative check/quality gates
-  green, and canary.14 lock staleness as train-attributed. It restored its run-report/lock footprint;
-  the orchestrator restored the same deterministic 45-line lock rewrite after its own local gate
-  commands. Target tree is clean.
+  green, and canary.14 lock staleness as train-attributed. It restored its run-report/lock
+  footprint; the orchestrator restored the same deterministic 45-line lock rewrite after its own
+  local gate commands. Target tree is clean.
 - Recorded the complete evaluator artifact verbatim in
   `.llm/runs/fix-plugin-linking-seam-1189--1189/evaluate.md`, committed/pushed as `31b898212`, and
   posted structured phase comment `5207616406`.
@@ -281,21 +281,22 @@ files.
 ## 2026-08-06 — T1-A bounded repair terminal handoff
 
 - The sole implementation thread finished cleanly with `READY_FOR_FRESH_QWEN_IMPL_EVAL` and `DONE`.
-  Exact local/remote/PR head is `18c7a7e791552c6f346ef07a77a741dd70b058d6`; PR #1315 remains
-  draft with exactly `status:impl` at handoff.
+  Exact local/remote/PR head is `18c7a7e791552c6f346ef07a77a741dd70b058d6`; PR #1315 remains draft
+  with exactly `status:impl` at handoff.
 - Repair commits are product/config `b29879e9468d4c154bc67beb1cbe430984f8290c`, corrected evidence
   `91bc68099285b2c322fd895c25bca34ec3c0c99b`, and terminal train visibility `18c7a7e79...`.
-- Reported decisive repair evidence: root check 2,630 files / 22 batches / zero diagnostics;
-  focused check 635 files / six batches / zero; 46 focused tests / zero failures; detached Fresh
-  consumer and full Fresh check pass; 40 emitted samples across 30 artifact paths compile; graph
-  guard six tests pass with only the documented AG-UI/kvdex Zod 3 boundary.
+- Reported decisive repair evidence: root check 2,630 files / 22 batches / zero diagnostics; focused
+  check 635 files / six batches / zero; 46 focused tests / zero failures; detached Fresh consumer
+  and full Fresh check pass; 40 emitted samples across 30 artifact paths compile; graph guard six
+  tests pass with only the documented AG-UI/kvdex Zod 3 boundary.
 - Parsed full-export comparison is at or below canary.14 for every one of 19 roots, with summed
   diagnostics 287 baseline to 279 repair. Serial `publish:dry-run` passes and restores manifests.
   Exact one-pass `scaffold.runtime --cleanup --format pretty` exits 0 at 73 passed / 0 failed with
-  endpoint, background, OTEL, and cleanup proof; read-only leak report finds no smoke-owned survivor.
-- `deno.lock` is restored to branch hash `d32ef0c1...`; target worktree is clean. Current-head hosted
-  contexts are 17 terminal skipped because the PR remains draft and are explicitly not a green train
-  verdict. Review-thread gate is 0/0.
+  endpoint, background, OTEL, and cleanup proof; read-only leak report finds no smoke-owned
+  survivor.
+- `deno.lock` is restored to branch hash `d32ef0c1...`; target worktree is clean. Current-head
+  hosted contexts are 17 terminal skipped because the PR remains draft and are explicitly not a
+  green train verdict. Review-thread gate is 0/0.
 - Prepared `slices/t1-a-1295/impl-eval-repair-1-prompt.md` for a new sender-free, read-only Qwen 3.8
   Max high session on exact head `18c7a7e79...`; prior evaluator sessions are not resumed.
 
@@ -313,11 +314,11 @@ files.
 
 ## 2026-08-06 — T1-A evaluator provider-budget recovery
 
-- Qwen session `4c09a05f-a5da-4794-87e2-29b2d05f67f2` independently reproduced the decisive
-  repair evidence through the completed exact one-pass runtime smoke, but its post-compaction
-  continuation was rejected by the provider because the transport's default 32,000-token output
-  reservation exceeded the remaining paid-account budget. The session emitted no verdict, so the
-  interrupted turn is failed closed rather than inferred as PASS.
+- Qwen session `4c09a05f-a5da-4794-87e2-29b2d05f67f2` independently reproduced the decisive repair
+  evidence through the completed exact one-pass runtime smoke, but its post-compaction continuation
+  was rejected by the provider because the transport's default 32,000-token output reservation
+  exceeded the remaining paid-account budget. The session emitted no verdict, so the interrupted
+  turn is failed closed rather than inferred as PASS.
 - Preserved the original raw transcript and its terminal transport error. The transcript contains
   useful independent gate evidence but cannot itself advance the lifecycle without the contracted
   complete Markdown artifact and terminal verdict token.
@@ -325,20 +326,20 @@ files.
   child while still clearing rival credentials and route variables. Resumed the same formal Qwen
   high session through checked-in `openrouter-run.ts`, still bypass-enabled and read-only, with
   `CLAUDE_CODE_MAX_OUTPUT_TOKENS=16000` so the provider can reserve an affordable bounded response.
-  The continuation is limited to the remaining smoke-log adjudication, read-only leak report,
-  final hygiene checks, and artifact/verdict emission; its raw output is captured separately at
+  The continuation is limited to the remaining smoke-log adjudication, read-only leak report, final
+  hygiene checks, and artifact/verdict emission; its raw output is captured separately at
   `.llm/tmp/release-0.0.5--orchestration/t1-a-impl-eval-repair1-resume-raw.txt`.
 - The bounded same-session resume reached the expected Qwen/bypass initialization but was rejected
   before inference with the provider's monthly-limit response. It produced no new evidence or
   verdict and is failed closed. Only the single canonical OpenRouter credential is configured; no
-  alternate approved Qwen credential is present. T1-A stays draft at exactly `status:impl-eval`,
-  and the orchestrator will continue independent non-merge work while holding this gate closed.
+  alternate approved Qwen credential is present. T1-A stays draft at exactly `status:impl-eval`, and
+  the orchestrator will continue independent non-merge work while holding this gate closed.
 - Consulted the canonical OpenHands handoff routing card after the local transport failure. It
   explicitly forbids moving a local harness evaluator into cloud OpenHands, so no cloud trigger or
   fallback evaluator was dispatched and no GitHub state changed for T1-A.
 - Re-queried the inherited train. PRs #1317 and #1318 remain mergeable, current-head green, and
-  `status:ready-merge`, but T2 remains sequenced after T1 train mutations and therefore is held.
-  PR #1316 remains mergeable and `status:ready-merge`; the repo-native latest-run classifier reports
+  `status:ready-merge`, but T2 remains sequenced after T1 train mutations and therefore is held. PR
+  #1316 remains mergeable and `status:ready-merge`; the repo-native latest-run classifier reports
   zero current failures, but its core visibility job is still queued and runner-starved jobs are
   canceled rather than green. It remains unmerged and outside the pre-merge gate.
 
@@ -350,10 +351,11 @@ files.
   `.llm/tmp/release-0.0.5--orchestration/t1-a-impl-eval-repair1-resume2-raw.txt`. No evidence or
   verdict was produced, and T1-A remains failed closed at `status:impl-eval`.
 - Inspected PR #1316's exact Actions run `31121552268`. All six jobs require `ubuntu-latest`; five
-  were canceled after waiting without executing a step and report no assigned runner, while `core CI
-  lane visibility` remains queued with no runner. Repository Actions are enabled, but the current
-  token cannot read account billing usage. The run was left untouched because cancel/retrigger would
-  not repair absent capacity and would discard its current provenance.
+  were canceled after waiting without executing a step and report no assigned runner, while
+  `core CI
+  lane visibility` remains queued with no runner. Repository Actions are enabled, but the
+  current token cannot read account billing usage. The run was left untouched because
+  cancel/retrigger would not repair absent capacity and would discard its current provenance.
 - Prepared non-dispatchable T2-A and T2-B supervisor/preflight artifacts from live issues, PRs,
   worktrees, check rollups, and review-thread gates. They hold the approved post-T1 sequence and
   require fresh current-base validation plus separate Qwen IMPL-EVAL; neither inherited composed or
@@ -380,8 +382,8 @@ files.
   surface. The historical `feat/1024-agent-tooling-bundle` worktree is evidence, not a branch seed.
 - W1-C requires generated project MCP attachment, a pre-code tools/list + harmless lookup receipt,
   fail-closed measurement, discovery-source telemetry, provider-valid history normalization, and
-  real OpenRouter attachment/resume. Its real-provider gates and formal evaluator remain additionally
-  held by the same external OpenRouter limit.
+  real OpenRouter attachment/resume. Its real-provider gates and formal evaluator remain
+  additionally held by the same external OpenRouter limit.
 
 ## 2026-08-06 — W2 live preflight preparation
 
@@ -411,10 +413,10 @@ files.
 - W3-A is held on W2-B's envelope and specifies a deterministic finite reconnect state machine,
   bounded buffer/overflow/loss semantics, injected clock/backoff, real outage/recovery, and standard
   OTEL rather than the current impossible “until reconnect” promise.
-- W3-B is held on W1-C attachment. Its code PR may close #1102 but only reference #1197; intent corpus
-  product acceptance and real-agent adoption measurement remain distinct. Available-tool count,
-  discovery-source calls, built-in-vs-hand-rolled ledger, and the 0.0.4 baseline comparison are
-  required before the orchestrator hand-closes #1197.
+- W3-B is held on W1-C attachment. Its code PR may close #1102 but only reference #1197; intent
+  corpus product acceptance and real-agent adoption measurement remain distinct. Available-tool
+  count, discovery-source calls, built-in-vs-hand-rolled ledger, and the 0.0.4 baseline comparison
+  are required before the orchestrator hand-closes #1197.
 - W3-C inventories active/generated/compatibility/history references before renaming AI provider
   canaries to model-rollout terminology, preserving immutable historical evidence while reserving
   unqualified canary language for release cuts.
@@ -450,3 +452,20 @@ files.
   a compiling DB-generated-schema → narrowed versioned contract fixture, explicit private-field
   omission, DB-less/backed parity, bidirectional links, and a concise outcome-led homepage argument
   with current code/diagrams, one-click task routes, and responsive/accessibility browser proof.
+
+## 2026-08-06 — Final evidence-closure preflight
+
+- Re-read live #1004, #1090, #1126, #1166, and #1169 plus #1126's fourteen-child ledger, #1149, and
+  deferred #1175. Confirmed that none may be auto-closed by a code PR.
+- Recorded cut-time evidence contracts under `slices/f-evidence-closures/preflight.md`. #1004
+  requires a real partial same-semver registry recovery; #1090 requires a single unprompted
+  behavioral observation; #1166 requires a real update-merge topology and correctly derived canary
+  payload; #1169 requires a one-pass OIDC cut with no operator rerun or override.
+- Confirmed PR #1180 already delivered #1166's merge-aware code under `Refs #1166`; its remaining
+  live canary rows stay open. Confirmed #1126 has S1–S10 closed, W5-A owns retained S11/S12, and
+  deferred S13/S14 are now in 0.0.6.
+- Made the no-manufactured-evidence rule explicit: if a genuine partial publish or qualifying merge
+  topology does not occur in C14–C16, move the still-unearned issue to 0.0.6 with its checkbox
+  intact. Likewise, no coached retry may turn #1090 into a pass.
+- No GitHub state, product code, branch, worktree, agent, evaluator, merge, release, or resource was
+  mutated. Root `deno.lock` remains unrelated user state and was not staged or changed.
