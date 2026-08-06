@@ -14,8 +14,9 @@ Harness mode activates when the user says `use harness` or explicitly asks for a
 5. Read `archetypes/README.md` and the chosen profile (including its **Design Checkpoint
    Expectations** and **Concept of Done** sections).
 6. Read `gates/archetype-gate-matrix.md`.
-7. Read `gates/plan-gate.md` and `evaluator/plan-protocol.md`. The Plan-Gate is a hard stop before
-   any implementation slice.
+7. Read `gates/plan-gate.md` and `evaluator/plan-protocol.md`. Select PLAN-EVAL only for
+   complex/decision-heavy work or genuine adversarial planning need; otherwise record a justified
+   `PLAN-EVAL: N/A`. A selected Plan-Gate is a hard stop before implementation.
 8. Instantiate or update the run artifacts from `templates/`.
 9. For a **supervisor / multi-group run** (two or more phase groups), also read
    `workflow/supervisor.md` and `workflow/escalation.md`, and instantiate `phase-registry.md` from

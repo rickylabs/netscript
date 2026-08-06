@@ -1,0 +1,72 @@
+# Supervisor Identity — chore-deepseek-v4-formal-impl-evaluator--1338
+
+## Requested lane
+
+| Field | Value |
+| --- | --- |
+| Provider | OpenAI |
+| Model | `gpt-5.6-sol` |
+| Effort | `low` |
+| Permissions | bypass / full access |
+| Worktree | `/home/codex/repos/ns005-deepseek-evaluator` |
+| Branch | `chore/deepseek-v4-formal-impl-evaluator-1338` |
+| Baseline | `2508eb8c99c9cfc55e0c9f1d7ab72fea745db492` |
+
+## Observed supervisor launch
+
+| Field | Evidence |
+| --- | --- |
+| Thread/session | `019fd897-cf69-75d3-9e46-bb87cc62c226` |
+| Requested / observed route | OpenAI · `gpt-5.6-sol` · `low` / exact match |
+| Runtime | approval `never`; sandbox `dangerFullAccess`; native ext4 worktree |
+| Rollout | `/home/codex/.codex/sessions/2026/08/06/rollout-2026-08-06T21-40-55-019fd897-cf69-75d3-9e46-bb87cc62c226.jsonl` |
+| Same-thread steer | `codex exec resume 019fd897-cf69-75d3-9e46-bb87cc62c226 -- "<follow-up>"` |
+| Draft PR | #1339; `canary/0.0.5-canary.14` ← `chore/deepseek-v4-formal-impl-evaluator-1338` |
+| Bootstrap head | `cd3dc77cea5d9053d0b0a17b1d08121a67a36fa1` |
+| Phone / Remote Control | **FAILED / NOT ATTACHED.** First launch explicitly emitted Remote Control status `disabled`. The supported agentic runtime repair dry-run returned status `blocked`, state `disconnected`, diagnostic `active_session`; foreign/other active sessions made repair unsafe. No phone attachment is claimed. |
+| Same-thread correction | Repository `codex-resume` tool driving actual Codex CLI, same thread `019fd897-cf69-75d3-9e46-bb87cc62c226`. |
+| tmux proof | Session `ns1338-deepseek-supervisor`; attach with `tmux attach-session -t ns1338-deepseek-supervisor`. |
+| Cost | Not exposed to this supervisor session; recorded as `unavailable`, not inferred as zero. |
+
+## Formal gates
+
+- PLAN-EVAL: **PASS** — fresh separate OpenRouter Minimax M3 high session
+  `a583f0da-69b3-4717-8271-bca95d9cd2db` against exact clean planning head
+  `258034b1f9842bae781ca7e5eecffc2c61af13e4`; bypass permissions; cost `unavailable`.
+- IMPL-EVAL: **PASS** — fresh separate local session
+  `504a078c-5ed6-4891-8c7a-00aa41abd78f` against exact clean local/remote/PR head
+  `d452f1fa514af3e98066dd6aeaa69aaf3e3355f0`; requested/observed OpenRouter/DeepInfra
+  `deepseek/deepseek-v4-flash-0731`, effort `max`, `bypassPermissions`, cost `unavailable`.
+  Complete evaluator-authored evidence: `evaluate.md`.
+- Merge and canary authority: milestone orchestrator only.
+
+## S1 implementation handoff
+
+- Exact starting local/remote/PR head: `3b5cfbc45298f62da5f2d354c375fc01c989c3ea`.
+- Scope: six typed source/focused-test files plus owned run evidence; no S2/S3 surface.
+- Automated evidence: focused tests 46 passed/0 failed; lockless scoped check 149 files/2 green
+  batches; scoped lint 149 files/0 findings; scoped fmt 149 files/0 findings after one owned
+  mechanical repair.
+- Lock incident: the first scoped-check child lacked `--no-lock` and changed the unstaged lock. The
+  supervisor stopped; the milestone orchestrator attributed the delta and restored only this
+  worktree. Corrected check spawned `deno check --unstable-kv --no-lock`.
+- Current required lock identity: HEAD/index/worktree
+  `ef28b1b056705b456a66601ceeb46eede9def7b0`.
+- Review status: pending. No ordinary review or formal evaluation was launched, and this supervisor
+  does not self-certify S1.
+
+## S1 independent review handoff
+
+- Advisory verdict: `PASS`, no blocking findings.
+- Fresh reviewer: OpenRouter/xAI `x-ai/grok-4.5`, effort `medium`, bypass session
+  `bad4a807-6399-4af8-b97b-2cbbb8d0cdb5`, exact PR head
+  `f2bc222667b369b1749248a7b74befa2e08e9da8`.
+- Visibility: actual CLI in tmux `ns1338-grok-review-gateway`; attach with
+  `tmux attach-session -t ns1338-grok-review-gateway`. Phone/Remote Control unsupported and
+  **failed/not-attached**. Cost `unavailable`.
+- Complete evidence: `review-s1/{identity,review}.md`. S1 is signed off for S2 only; formal
+  IMPL-EVAL, merge, and canary authority remain with the milestone orchestrator.
+
+No lane override or fallback is active. Ordinary opposite-family review remains separate from both
+formal evaluator sessions. This supervisor may generate the plan and later supervise slices, but it
+may not certify PLAN-EVAL or IMPL-EVAL.

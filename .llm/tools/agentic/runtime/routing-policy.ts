@@ -89,7 +89,9 @@ export interface EffortEscalation {
 
 const MAJOR_UI_UX_PRESET = OPENROUTER_PRESETS['claude-design-glm-5-2'];
 const FORMAL_PLAN_EVALUATOR_PRESET = OPENROUTER_PRESETS['claude-evaluator-minimax-m3'];
-const FORMAL_IMPL_EVALUATOR_PRESET = OPENROUTER_PRESETS['claude-evaluator-qwen-3-8-max'];
+const FORMAL_IMPL_EVALUATOR_PRESET = OPENROUTER_PRESETS[
+  'claude-evaluator-deepseek-v4-flash-0731'
+];
 
 /** Canonical machine-readable route bindings rendered by the harness lane-policy document. */
 export const CANONICAL_ROUTE_POLICY: readonly CanonicalRoutePolicy[] = [
@@ -329,6 +331,15 @@ export const CANONICAL_ROUTE_POLICY: readonly CanonicalRoutePolicy[] = [
     evaluatorModelPolicy: 'open_only',
   },
   {
+    lane: 'formal_plan_evaluation',
+    purpose: 'evaluation',
+    agent: 'antigravity',
+    provider: 'google',
+    model: MODEL_IDS.antigravityDocs,
+    effort: 'high',
+    condition: 'fallback_on_openrouter_limit',
+  },
+  {
     lane: 'formal_impl_evaluation',
     purpose: 'evaluation',
     agent: 'claude',
@@ -338,6 +349,15 @@ export const CANONICAL_ROUTE_POLICY: readonly CanonicalRoutePolicy[] = [
     model: FORMAL_IMPL_EVALUATOR_PRESET.model,
     effort: FORMAL_IMPL_EVALUATOR_PRESET.effort,
     evaluatorModelPolicy: 'open_only',
+  },
+  {
+    lane: 'formal_impl_evaluation',
+    purpose: 'evaluation',
+    agent: 'antigravity',
+    provider: 'google',
+    model: MODEL_IDS.antigravityDocs,
+    effort: 'high',
+    condition: 'fallback_on_openrouter_limit',
   },
   {
     lane: 'review_claude',
@@ -447,6 +467,8 @@ export interface FormalEvaluatorAssignment {
   readonly generatorSession: SessionIdentity;
   readonly evaluatorSession: SessionIdentity;
   readonly route?: CanonicalRoutePolicy;
+  /** Explicit owner-authorized fallback; absent means the canonical OpenRouter route is required. */
+  readonly fallbackReason?: 'openrouter_limit';
 }
 
 function sessionFamily(session: SessionIdentity): ModelFamily {
@@ -504,7 +526,25 @@ export function resolveCanonicalFormalEvaluatorRoute(
   const expectedPreset = assignment.phase === 'plan'
     ? FORMAL_PLAN_EVALUATOR_PRESET
     : FORMAL_IMPL_EVALUATOR_PRESET;
-  const route = assignment.route ?? resolveCanonicalRoute(lane, at);
+  const fallback = assignment.fallbackReason === 'openrouter_limit';
+  const route = assignment.route ??
+    (fallback
+      ? CANONICAL_ROUTE_POLICY.find((entry) =>
+        entry.lane === lane && entry.condition === 'fallback_on_openrouter_limit'
+      )
+      : resolveCanonicalRoute(lane, at));
+  if (!route) throw new Error(`no canonical OpenRouter-limit fallback for ${lane}`);
+  if (fallback) {
+    if (
+      route.lane !== lane || route.purpose !== 'evaluation' ||
+      route.condition !== 'fallback_on_openrouter_limit' || route.agent !== 'antigravity' ||
+      route.provider !== 'google' || route.model !== MODEL_IDS.antigravityDocs ||
+      route.effort !== 'high' || assignment.evaluatorSession.agent !== 'antigravity'
+    ) {
+      throw new Error(`formal ${assignment.phase} evaluator requires the canonical AGY fallback`);
+    }
+    return route;
+  }
   const preset = route.presetId ? OPENROUTER_PRESETS[route.presetId] : undefined;
   if (
     route.purpose !== 'evaluation' || route.agent !== 'claude' ||

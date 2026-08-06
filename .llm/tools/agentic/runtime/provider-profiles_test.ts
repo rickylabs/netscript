@@ -57,7 +57,7 @@ Deno.test('provider profiles are finite, frozen, and clear every rival credentia
 Deno.test('OpenRouter preset slugs and route purposes are locked', () => {
   assertEquals(OPENROUTER_PRESET_MODELS, [
     'minimax/minimax-m3',
-    'qwen/qwen3.8-max',
+    'deepseek/deepseek-v4-flash-0731',
     'z-ai/glm-5.2',
     'x-ai/grok-4.5',
   ]);
@@ -83,11 +83,11 @@ Deno.test('OpenRouter preset slugs and route purposes are locked', () => {
     reasoningTrace: 'present',
     incompatibility: null,
   });
-  assertEquals(OPENROUTER_PRESETS['claude-evaluator-qwen-3-8-max'], {
-    id: 'claude-evaluator-qwen-3-8-max',
+  assertEquals(OPENROUTER_PRESETS['claude-evaluator-deepseek-v4-flash-0731'], {
+    id: 'claude-evaluator-deepseek-v4-flash-0731',
     profileId: 'claude-openrouter',
-    model: 'qwen/qwen3.8-max',
-    effort: 'high',
+    model: 'deepseek/deepseek-v4-flash-0731',
+    effort: 'max',
     purpose: 'evaluation',
     agenticTurn: 'supported',
     transport: 'anthropic-messages',
