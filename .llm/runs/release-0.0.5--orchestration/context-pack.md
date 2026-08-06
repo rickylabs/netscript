@@ -130,3 +130,12 @@ lands and its exact live DeepSeek max canary passes; then launch a fresh separat
 against clean target `18c7a7e79...`, never resume/relabel Qwen. Preserve T1-B Qwen PASS. Actions run
 `31121552268` attempt 2 has executed green `deps-report` and `close-gate`, but its classifier remains
 queued and the required downstream product jobs have not executed, so T1-B remains held.
+
+Current continuation delta: prerequisite PR #1339 is merged to the canary.14 train at
+`10dbea37c09b815f1372a5241b60fdd5d7694652` after fresh local DeepSeek max IMPL-EVAL PASS. The
+canonical rules are now selective PLAN-EVAL, mandatory independent IMPL-EVAL, OpenHands paused,
+and AGY/Google `gemini-3.6-flash-high` high only when an OpenRouter limit blocks an evaluator.
+Issue #1338 remains open for T1 observational closure. T1-A is under one fresh DeepSeek max local
+evaluation at exact clean head `18c7a7e79`; T1-B run `31121552268` is still queued without a full
+executed green current-head rollup. After both T1 PRs pass the pre-merge gate and land, cut and
+verify the next declared canary before opening the prepared post-T1 wave.

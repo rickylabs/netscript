@@ -527,3 +527,27 @@ files.
   `close-gate` executed successfully; `classify changes` remains queued, so the downstream required
   product jobs have not executed. This is partial current-head evidence, not the required executed
   green rollup; T1-B does not advance or merge.
+
+## 2026-08-06 — #1338 landed; T1 resumed under streamlined policy
+
+- Owner policy now makes PLAN-EVAL conditional for genuinely complex/decision-heavy work, keeps
+  independent IMPL-EVAL mandatory absent explicit waiver, pauses OpenHands, and permits only an
+  OpenRouter-limit fallback through the checked-in AGY/Google `gemini-3.6-flash-high` high route.
+- PR #1339 passed its exact local DeepSeek V4 Flash 0731 max IMPL-EVAL in fresh bypass session
+  `504a078c-5ed6-4891-8c7a-00aa41abd78f`; terminal cost `$2.623356`. Focused tests, scoped
+  check/lint/fmt, mirror/docs gates, review-thread gate, current-head close-gate, prohibited-diff
+  scan, and scope audit were green. It squash-merged into `canary/0.0.5-canary.14` as
+  `10dbea37c09b815f1372a5241b60fdd5d7694652`.
+- #1338 deliberately remains open at `status:impl`: its T1-A/T1-B rows are observational and were
+  not closed by the policy PR. The PR used `Refs #1338`, preserving the no-observational-row
+  closure rule.
+- The checked-in leaf merge helper still recognizes only OpenHands status comments. Because
+  OpenHands is owner-paused, its parser gate was explicitly skipped while the actual independent
+  local IMPL-EVAL PASS remained mandatory and was manually verified; mergeability stayed clean and
+  the exact head was pinned. This is recorded tooling drift, not an evaluation waiver.
+- T1-A remains clean at local/remote/PR head `18c7a7e791552c6f346ef07a77a741dd70b058d6`.
+  Launched one fresh local DeepSeek max evaluator against that exact repaired target through
+  checked-in `openrouter-run.ts`; OpenHands was not used and the prior Qwen session was not resumed.
+- T1-B Actions run `31121552268` attempt 2 remains top-level `queued` at exact current head
+  `31b8982123fda57294f4f7bf438c1157a622a41c`; required downstream jobs still have no executed
+  current-head green verdict. T1-B remains held and its protected lock/stash state is untouched.
