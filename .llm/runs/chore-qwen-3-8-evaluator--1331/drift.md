@@ -32,7 +32,7 @@ Drift is append-only.
 - **Source:** Issue #1331 comment `5204854699` and revised issue title.
 - **Expected:** Initial mission made Qwen 3.8 canonical for both PLAN-EVAL and IMPL-EVAL.
 - **Actual:** Canonical PLAN-EVAL must remain Minimax M3; canonical IMPL-EVAL moves to Qwen 3.8.
-  Qwen 3.8 remains explicitly allowed as this run's PLAN-EVAL override.
+  The current owner directive requires this run's separate PLAN-EVAL to use Minimax M3.
 - **Severity:** significant
 - **Action:** fix the research/plan/design and PR description before PLAN-EVAL; no implementation
   has started, so no rescope or code rework is required.

@@ -26,7 +26,7 @@
 ### Domain Vocabulary
 
 - `minimax/minimax-m3` — canonical PLAN-EVAL default.
-- `qwen/qwen3.8-max` — canonical IMPL-EVAL default and this run's explicit PLAN-EVAL override.
+- `qwen/qwen3.8-max` — canonical IMPL-EVAL default.
 - `qwen/qwen3.7-max` — stale id permitted only in an explicit rejection/migration/history fixture.
 - `claude-evaluator-qwen-3-8-max` — canonical formal evaluator preset id.
 - `formal_plan_evaluation` / `formal_impl_evaluation` — phase-specific canonical lanes.
@@ -82,7 +82,7 @@ mirrors. Never patch generated mirrors or duplicate model literals in executable
 | Decision | Reason | Source |
 | -------- | ------ | ------ |
 | Canonical PLAN defaults to Minimax; canonical IMPL defaults to Qwen 3.8 | Latest owner correction | issue #1331 comment 5204854699 |
-| This run still uses separate Qwen 3.8 sessions for both passes | Explicit per-run override remains allowed by the correction | initial owner mission + correction |
+| This run uses a separate Minimax M3 PLAN-EVAL and later Qwen 3.8 IMPL-EVAL | Current owner correction and evaluator separation | issue #1331 correction / current user directive |
 | Use Codex Sol low generator with full access | Owner directive and observed launch identity | `supervisor.md`; `codex-thread-ids.md` |
 | Use Kimi K3 or Grok 4.5 only for ordinary adversarial review | Anthropic subscription temporarily exhausted | owner directive |
 | Preserve unrelated lockfile diff | Worktree hygiene | raw Git status/diff |
@@ -91,7 +91,7 @@ mirrors. Never patch generated mirrors or duplicate model literals in executable
 
 | Drift | Severity | Logged in drift.md |
 | ----- | -------- | ------------------ |
-| Run routing differs from stale lane policy because #1331 changes that policy and Anthropic is unavailable | significant, owner-authorized | yes |
+| Run routing differs from stale phase-agnostic lane policy because #1331 introduces phase defaults and Anthropic is unavailable | significant, owner-authorized | yes |
 | Owner corrected the canonical defaults after bootstrap to PLAN→Minimax and IMPL→Qwen 3.8 | significant, reconciled before PLAN-EVAL | yes |
 | Pre-existing `deno.lock` modification is unrelated | minor | yes |
 

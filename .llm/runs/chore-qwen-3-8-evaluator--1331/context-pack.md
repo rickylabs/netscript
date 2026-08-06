@@ -14,9 +14,9 @@
 
 Issue #1331 is re-baselined against `origin/main` at `57c9b5ab3`, including the owner's later
 routing correction: canonical PLAN-EVAL remains Minimax M3 and canonical IMPL-EVAL moves to Qwen
-3.8. This run retains its explicitly allowed Qwen 3.8 PLAN-EVAL override. Research, revised plan,
-Design checkpoint, supervisor identity, context, and drift artifacts are complete. No
-implementation/config/model file has been edited. The run is at the hard PLAN-EVAL stop.
+3.8. This run requires a separate Minimax M3 PLAN-EVAL. Research, revised plan, Design checkpoint,
+supervisor identity, context, and drift artifacts are complete. No implementation/config/model file
+has been edited. The run is at the hard PLAN-EVAL stop.
 
 ## Completed
 
@@ -38,7 +38,7 @@ implementation/config/model file has been edited. The run is at the hard PLAN-EV
 
 1. Commit and push the planning reconcile; exclude `deno.lock`.
 2. Update draft PR #1336 to reflect the corrected phase defaults.
-3. Launch the owner-overridden separate OpenRouter `qwen/qwen3.8-max` PLAN-EVAL session and require `PASS` in
+3. Launch a separate OpenRouter `minimax/minimax-m3` PLAN-EVAL session and require `PASS` in
    `plan-eval.md` before S1.
 4. After PASS, implement S1–S3 with gate → ordinary review → supervisor sign-off → push/comment per
    slice.
@@ -48,7 +48,7 @@ implementation/config/model file has been edited. The run is at the hard PLAN-EV
 | Decision | Source | Notes |
 | -------- | ------ | ----- |
 | Canonical phase defaults are PLAN→Minimax M3 and IMPL→Qwen 3.8 | latest owner correction | Requires phase-specific routing/presets. |
-| This run's PLAN-EVAL override is Qwen 3.8 | initial owner directive + correction | Separate from the later Qwen 3.8 IMPL-EVAL session. |
+| This run's PLAN-EVAL uses Minimax M3 | current owner correction | Separate from the later Qwen 3.8 IMPL-EVAL session. |
 | Generator is Codex GPT-5.6 Sol low/full access | owner / launch record | Observed identity matches request. |
 | Ordinary review temporarily uses Kimi K3 or Grok 4.5 | owner | Anthropic subscription exhausted until Saturday. |
 | Three sequential slices | `plan.md` / `worklog.md` | Shared central config makes parallel edits conflict-prone. |

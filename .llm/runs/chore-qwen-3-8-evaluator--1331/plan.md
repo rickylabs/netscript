@@ -38,7 +38,8 @@ migration/history/rejection fixtures.
 - Central Qwen/OpenRouter model id and approved-open-evaluator allowlist.
 - Phase-specific formal evaluator preset identities and canonical route resolution.
 - Provider profile/runner/runtime guards and focused contract tests.
-- Static and bounded live provider-canary evidence for exact `qwen/qwen3.8-max`.
+- Static and bounded live provider-canary evidence for exact `minimax/minimax-m3` and
+  `qwen/qwen3.8-max` phase defaults.
 - Harness evaluator/workflow docs, operator docs, canonical skills, and generated mirrors.
 - Current-output fixtures and explicit stale-3.7 rejection/migration coverage.
 - Exact tracked and working-tree residue audit with an exception ledger.
@@ -73,7 +74,7 @@ migration/history/rejection fixtures.
 | D4 | Stale `qwen/qwen3.7-max` must be rejected by IMPL-EVAL route/preset guards and proven by a negative test; cross-phase preset use must also fail. | Acceptance requires rejection and phase-safe defaults, not merely absence. |
 | D5 | Canonical skill sources change first; `.claude/skills` changes only via `agentic:sync-claude`. | Generated-mirror ownership contract. |
 | D6 | Dogfood consumer output is regenerated via `agentic:dogfood-skills` and audited, not hand-edited. | Generated-surface acceptance and repo tooling rules. |
-| D7 | This run uses the owner-authorized Qwen 3.8 PLAN-EVAL override and a separate Qwen 3.8 IMPL-EVAL session; repository defaults remain Minimax/Qwen by phase. Neither evaluator is this generator session. | Initial owner run directive, later issue correction, and hard harness invariant. |
+| D7 | This run uses a separate Minimax M3 PLAN-EVAL session and a later separate Qwen 3.8 IMPL-EVAL session; neither evaluator is this generator session. | Current owner correction and hard harness invariant. |
 | D8 | Ordinary slice review uses owner-authorized OpenRouter Kimi K3 or Grok 4.5 while Anthropic is unavailable. | Temporary explicit routing override; formal evaluator route remains unchanged. |
 | D9 | The pre-existing `deno.lock` diff remains unstaged and unmodified. | Unrelated user state and lock hygiene. |
 
@@ -127,8 +128,8 @@ migration/history/rejection fixtures.
 | # | Slice and proof | Primary files | Proving gates |
 | - | --------------- | ------------- | ------------- |
 | S1 | Phase-specific model/preset/route contract: PLAN-EVAL resolves to Minimax M3, IMPL-EVAL resolves to Qwen 3.8, stale 3.7 and cross-phase presets are rejected. | `.llm/tools/agentic/config/models.ts`; `runtime/provider-profiles.ts`; `runtime/routing-policy.ts`; `config/no-hardcoded-volatile_test.ts`; focused provider/routing tests; run artifacts | Focused Deno tests for config, provider profiles, routing policy, runner provider profiles; scoped check/lint/fmt wrappers for `.llm/tools/agentic`; raw Qwen/preset search; ordinary slice review |
-| S2 | Runtime/canary/fixture proof: launch planners and provider canary accept exact 3.8 and current-output fixtures no longer assert active 3.7. | `runtime/cli/provider-canary*`; affected runner/canary/rollout tests; relevant `lib/__fixtures__`; run artifacts | Focused canary/runner tests; static provider canary; full agentic suite; bounded live exact-model canary; ordinary slice review |
-| S3 | Harness/docs/generated convergence: every canonical description and relevant generated mirror names 3.8, with only explicit migration/history exceptions. | `AGENTS.md`; `.llm/harness/**` evaluator/workflow/lesson/debt files as classified; `.llm/tools/agentic/README.md`; `.llm/tools/harness/extract-verdict.ts`; `.agents/skills/{netscript-harness,openhands-handoff}`; generated `.claude/skills/**`; audited `.agents/generated/consumer-skills/**`; run artifacts | `agentic:sync-claude`; `agentic:sync-claude:check`; `agentic:check-claude`; `agentic:dogfood-skills`; docs maintenance/focused checks; scoped wrapper gates; exact residue audit + exception ledger; ordinary slice review |
+| S2 | Runtime/canary/fixture proof: launch planners and provider canary accept exact Minimax PLAN and Qwen 3.8 IMPL defaults; current-output fixtures no longer assert active Qwen 3.7. | `runtime/cli/provider-canary*`; affected runner/canary/rollout tests; relevant `lib/__fixtures__`; run artifacts | Focused canary/runner tests; static provider canary; full agentic suite; bounded live exact-model canaries for both phase defaults; ordinary slice review |
+| S3 | Harness/docs/generated convergence: every canonical description and relevant generated mirror states PLAN-EVAL → Minimax M3 and IMPL-EVAL → Qwen 3.8, with only explicit Qwen 3.7 migration/history exceptions. | `AGENTS.md`; `.llm/harness/**` evaluator/workflow/lesson/debt files as classified; `.llm/tools/agentic/README.md`; `.llm/tools/harness/extract-verdict.ts`; `.agents/skills/{netscript-harness,openhands-handoff}`; generated `.claude/skills/**`; audited `.agents/generated/consumer-skills/**`; run artifacts | `agentic:sync-claude`; `agentic:sync-claude:check`; `agentic:check-claude`; `agentic:dogfood-skills`; docs maintenance/focused checks; scoped wrapper gates; exact residue audit + exception ledger; ordinary slice review |
 
 ## Validation Plan
 
@@ -144,7 +145,7 @@ migration/history/rejection fixtures.
 | 8 | Docs | `deno task docs:maintenance` or the smallest equivalent focused docs/sync gates if unrelated baseline failures exist | Owned documentation and links/surfaces pass; any unrelated failure attributed. |
 | 9 | Exact live models | Run bounded `agentic:provider-canary --live` turns with explicit `claude-openrouter` profile, exact Minimax M3 and Qwen 3.8 model ids, high effort, and this worktree | Both phase-default models succeed and report exact requested/observed identity. |
 | 10 | Residue audit | Exact `git grep`/`rg` for `qwen/qwen3.7-max`, Qwen 3.7 prose, and `qwen-3-7` preset slug across tracked/current surfaces | Only explicit rejection/migration/history exceptions remain, each listed. |
-| 11 | Formal evaluation | This run: separate owner-overridden Qwen 3.8 PLAN-EVAL before S1; separate Qwen 3.8 IMPL-EVAL after all gates. Tests/canaries independently prove the canonical Minimax PLAN default. | `PASS` artifacts with distinct session ids and exact observed identity; phase-default route tests green. |
+| 11 | Formal evaluation | Separate Minimax M3 PLAN-EVAL before S1; separate Qwen 3.8 IMPL-EVAL after all gates. | `PASS` artifacts with distinct session ids and exact observed identity; phase-default route tests green. |
 
 `deno task quality:gate` is conditional and currently N/A; it becomes mandatory if any
 `packages/**` or `plugins/**` publishable code is touched, which requires rescope first.

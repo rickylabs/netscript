@@ -8,8 +8,8 @@
   commit. No implementation from another branch is carried in.
 - Issue #1331 is open, milestone id `23` (owner-required `0.0.5`), priority P0, and has nine
   unchecked acceptance items. During draft-PR creation, the owner added a routing correction:
-  canonical PLAN-EVAL remains Minimax M3, canonical IMPL-EVAL moves from Qwen 3.7 to Qwen 3.8,
-  and Qwen 3.8 remains allowed as an explicit PLAN-EVAL override for this run.
+  canonical PLAN-EVAL remains Minimax M3 and canonical IMPL-EVAL moves from Qwen 3.7 to Qwen 3.8.
+  The current user directive further requires this run's separate PLAN-EVAL to use Minimax M3.
 
 ## Findings
 
@@ -65,7 +65,7 @@ rejection/migration fixture. The final audit will list every exception; unexplai
 
 - None that force implementation rework. The post-bootstrap owner correction is resolved in the
   revised plan by introducing phase-specific canonical formal-evaluation lanes/presets: Minimax M3
-  for PLAN-EVAL and Qwen 3.8 for IMPL-EVAL. This run's already-authorized Qwen 3.8 PLAN-EVAL remains
-  an explicit override, not the repository default.
+  for PLAN-EVAL and Qwen 3.8 for IMPL-EVAL. This run follows those defaults with a separate Minimax
+  M3 PLAN-EVAL before implementation.
 - Safe-to-defer operational choice: choose Kimi K3 versus Grok 4.5 for each ordinary slice review
   at dispatch time; either route is owner-authorized and neither changes formal evaluation.

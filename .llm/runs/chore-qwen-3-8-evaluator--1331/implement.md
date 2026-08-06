@@ -9,17 +9,20 @@ use harness
 
 ## Mission
 
-Make `qwen/qwen3.8-max` the single canonical formal PLAN-EVAL and IMPL-EVAL model across the
-NetScript harness, agentic tooling, skills, generated mirrors, provider presets, guards, tests, and
-documentation. Remove active 3.7 bindings; retain the old id only in explicit rejection/migration
-fixtures where necessary.
+Keep `minimax/minimax-m3` as the canonical formal PLAN-EVAL default and make
+`qwen/qwen3.8-max` the canonical formal IMPL-EVAL default across the NetScript harness, agentic
+tooling, skills, generated mirrors, provider presets, guards, tests, and documentation. Remove
+active Qwen 3.7 IMPL-EVAL bindings; retain the old id only in explicit rejection/migration fixtures
+where necessary.
 
 ## Owner decisions
 
-- Formal evaluator model: OpenRouter `qwen/qwen3.8-max`.
+- Formal PLAN-EVAL default: OpenRouter `minimax/minimax-m3`.
+- Formal IMPL-EVAL default: OpenRouter `qwen/qwen3.8-max`.
 - Implementation agent: Codex GPT-5.6 Sol low, bypass permissions.
 - Claude subscription is exhausted until Saturday. Do not dispatch an Anthropic-plan reviewer.
-- Formal PLAN-EVAL and IMPL-EVAL are separate OpenRouter Qwen 3.8 sessions.
+- Formal PLAN-EVAL is a separate OpenRouter Minimax M3 session; formal IMPL-EVAL is a separate
+  OpenRouter Qwen 3.8 session.
 - Ordinary adversarial review temporarily uses owner-authorized OpenRouter Kimi K3 or Grok 4.5.
 
 ## First turn — hard stop at planning
@@ -51,8 +54,9 @@ Do not edit implementation/configuration/model files before PLAN-EVAL passes.
 - Agentic suite check and routing-policy tests.
 - Generated-surface synchronization checks.
 - `deno task quality:gate` if package/plugin publishable code is touched.
-- Bounded live provider canary for exact `qwen/qwen3.8-max`.
-- Separate-session formal PLAN-EVAL and IMPL-EVAL on Qwen 3.8.
+- Bounded live provider canaries for exact `minimax/minimax-m3` and `qwen/qwen3.8-max` phase
+  defaults.
+- Separate-session formal PLAN-EVAL on Minimax M3 and IMPL-EVAL on Qwen 3.8.
 - Tier-A substantive slice review before sign-off.
 
 Never self-certify, merge, or publish. The milestone orchestrator retains merge authority.
