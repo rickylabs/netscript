@@ -134,3 +134,19 @@ files.
   either partial output is evidence. Corrected the prompt to record observed Sol-medium C-D9 drift;
   a single fresh Qwen evaluator may launch only after the implementation thread reaches a terminal
   handoff.
+
+## 2026-08-06 — Single-writer and T1 recovery
+
+- Runtime inspection proved the initial app-server launch and the later tmux resume were concurrent
+  writers on the same primary thread. Consolidated onto the actual tmux Codex CLI and terminated
+  only the older root client. The managed daemon and durable child threads remain the supported
+  control surface; C-D11 records the incident.
+- T1-A's pushed product work and current-SHA hosted CI are green, but its implementation thread is
+  still completing the terminal handoff. No Qwen evaluator may launch until that turn finishes.
+- T1-B's interrupted full runtime command had passed through `cleanup.aspire-stop` but returned no
+  captured process exit, so it is not a gate verdict. T1-B leak-check proved one owned survivor;
+  teardown apply removed only `postgres-84ad11ad` (`6b0e09804...`) and left every foreign or
+  unproven resource untouched.
+- Resumed T1-B's exact durable thread with `recovery.md`. It must rerun the complete one-pass
+  `scaffold.runtime --cleanup --format pretty` command and finish its pushed implementation handoff
+  before separate Qwen evaluation.

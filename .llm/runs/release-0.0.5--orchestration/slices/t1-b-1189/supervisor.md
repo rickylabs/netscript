@@ -24,4 +24,10 @@
 - Draft PR: <https://github.com/rickylabs/netscript/pull/1316>
 - Tmux attach command: unavailable — failed/not-attached; no shell surrogate is recorded as the
   Codex CLI
-- Status: active through supported same-thread resume
+- C-D12 recovery: the first one-pass runtime smoke reached `cleanup.aspire-stop` but its turn was
+  interrupted before a captured exit; it is diagnostic only. Teardown removed exactly owned
+  container `6b0e09804bee122c2dacbf00443f3ab449642eea74c64ab4e4434c62b4148ab4` and left all foreign/
+  unproven resources untouched.
+- Recovery brief: `recovery.md`, resumed on the same durable thread; the exact one-pass gate must be
+  rerun before handoff.
+- Status: implementation recovery active through supported same-thread resume

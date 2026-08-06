@@ -39,11 +39,16 @@ orchestrator alone holds merge and release-canary authority.
 ## Primary-session launch evidence
 
 Current Codex thread/goal id: `019fd77c-f583-7b01-aed8-c8665ac09230`. Runtime inspection at
-2026-08-06 reported zero daemon-managed sessions; remote-control/mobile attachment and a real CLI
-tmux pane are therefore **not yet proven**. This is recorded as failed/not-attached, not presented
-as observable. Repair must use `agentic:runtime`; every delegated Codex lane must use the agentic
-launcher and record worktree, branch, thread, observed route/effort, connection proof, same-thread
-steering command, draft PR, and tmux attach command.
+2026-08-06 reported the managed Codex 0.146.1 daemon running but no proven mobile Remote Control
+attachment, so phone state remains failed/not-attached. The actual primary Codex CLI is visible in
+tmux and attaches with `tmux attach -t ns005-milestone-orchestrator`; this is not represented as
+mobile proof. Observed identity is `openai` / `gpt-5.6-sol` / `high`, approval `never`, sandbox
+`danger-full-access`, worktree `/home/codex/repos/ns005-milestone-orchestrator`, branch
+`orchestrator/0.0.5-continuation`, draft PR #1337. Same-thread steering is
+`deno task agentic:codex-resume --thread-id 019fd77c-f583-7b01-aed8-c8665ac09230 --message-file <file> --worktree /home/codex/repos/ns005-milestone-orchestrator`.
+
+C-D11 records that the initial app-server client and tmux resume were briefly concurrent writers.
+The older client was terminated; the tmux client is the sole primary writer.
 
 ## Plan-Gate handoff
 
