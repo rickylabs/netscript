@@ -24,6 +24,7 @@ export interface ProviderCanaryObservation {
 
 export interface ProviderCompatibilityEvidence {
   readonly profileId: import('./provider-profiles.ts').ProviderProfileId;
+  readonly presetId?: import('./provider-profiles.ts').OpenRouterPresetId;
   readonly agent: RouteIdentity['agent'];
   readonly provider: RouteIdentity['provider'];
   readonly model: string;
@@ -58,6 +59,19 @@ export function evaluateProviderCanary(
   route: RouteIdentity,
   observation: ProviderCanaryObservation,
 ): ProviderCanaryResult {
+  if (route.presetId && !matchOpenRouterPreset(route)) {
+    return {
+      status: 'blocked',
+      fanOutEligible: false,
+      evidence: null,
+      diagnostics: [diagnostic(
+        'route_conflict',
+        'policy',
+        'provider canary route conflicts with the selected OpenRouter preset',
+      )],
+      process: { exitCode: observation.exitCode, timedOut: observation.timedOut },
+    };
+  }
   const profile = resolveProviderProfile(route);
   if (!profile) {
     return {
@@ -90,6 +104,7 @@ export function evaluateProviderCanary(
   ])) as Readonly<Record<ProviderCanaryCapability, ProviderCapabilityStatus>>;
   const evidence: ProviderCompatibilityEvidence = {
     profileId: profile.id,
+    ...(route.presetId ? { presetId: route.presetId } : {}),
     agent: route.agent,
     provider: route.provider,
     model: route.model,

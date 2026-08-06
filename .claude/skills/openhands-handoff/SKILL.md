@@ -27,7 +27,7 @@ required summary artifacts keep local and cloud agents synchronized.
 
 OpenHands is **not** the evaluator for local runs. Two hard rules:
 
-1. **OpenHands runs OPEN models only** — e.g. `minimax/minimax-m3`, `qwen/qwen3.7-max`. NEVER
+1. **OpenHands runs OPEN models only** — e.g. `minimax/minimax-m3`, `qwen/qwen3.8-max`. NEVER
    dispatch OpenHands with a closed/paid model (Claude/`sonnet`, GPT/`gpt`, Gemini/`gemini`). Closed
    models on OpenHands route through paid OpenRouter/LiteLLM credit and can silently burn the
    owner's balance — this is prohibited.
@@ -43,9 +43,9 @@ A local run's PLAN-EVAL / IMPL-EVAL used to have no named transport — this ski
 and told you to log it. It is now filled:
 
 **Local PLAN-EVAL / IMPL-EVAL runs on Claude Code + OpenRouter** — the `claude-openrouter` provider
-profile driven via `claude-print` — with the bound **OPEN-model Qwen evaluation preset**
-(`qwen/qwen3.7-max`). Minimax M3 remains in the approved open-model set and is valid for cloud
-evaluation, but its current local preset is workflow-fanout rather than evaluation. **Rule 1 above
+profile driven via `claude-print` — in separate formal sessions. PLAN-EVAL binds
+`claude-evaluator-minimax-m3` (`minimax/minimax-m3`), while IMPL-EVAL binds
+`claude-evaluator-qwen-3-8-max` (`qwen/qwen3.8-max`). **Rule 1 above
 applies verbatim to this lane: OPEN models only; closed/paid
 models (Claude/`sonnet`, GPT/`gpt`, Gemini) are PROHIBITED** — they bill the owner's OpenRouter
 balance and can silently burn it. An open model is neither Claude-family nor Codex-family, so it is
@@ -57,8 +57,8 @@ opposite-family** agent: Codex GPT-5.6 reviews Claude-authored work; a Claude se
 Codex-authored work. Do not conflate it with the formal evaluator pass.
 
 **Capability (verified; drift D-4 amended):** both approved open models return a **real reasoning
-trace** and have a **verified agentic turn** (real tool calls) on this transport. The currently
-bound Qwen evaluation preset can therefore run gates and its `effort` is genuine — not nominal. The zero-reasoning behaviour is
+trace** and have a **verified agentic turn** (real tool calls) on this transport. Both bound
+evaluation presets can therefore run gates and their `effort` is genuine — not nominal. The zero-reasoning behaviour is
 **specific to GLM 5.2** over OpenRouter (a design-lane model), **not** a client-wide gap: never cite
 "GLM 5.2 · xhigh reasoning" as gate evidence, and do not restate that caveat as a property of the
 transport or of the evaluator lane.
@@ -72,7 +72,7 @@ the supervisor decide — never self-certify.
 | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Actions agent    | `.github/workflows/openhands-agent.yml`, used for short cloud runs.                                                                                                          |
 | VPS session      | Long-running OpenHands Web UI/SDK deployment from `ops/openhands/docker-compose.yml`.                                                                                        |
-| Model profile    | OPEN models only (e.g. `minimax/minimax-m3`, `qwen/qwen3.7-max`). Closed models (`sonnet`/`gpt`/`gemini`) are PROHIBITED on OpenHands — see the routing policy above.        |
+| Model profile    | OPEN models only (e.g. `minimax/minimax-m3`, `qwen/qwen3.8-max`). Closed models (`sonnet`/`gpt`/`gemini`) are PROHIBITED on OpenHands — see the routing policy above.        |
 | Literal model    | Any LiteLLM-compatible `provider/model` string supplied with `model=...`.                                                                                                    |
 | Provider secret  | `LLM_API_KEY_<PROVIDER>`, inferred from the model prefix, with `LLM_API_KEY` fallback.                                                                                       |
 | Output mode      | `pr-comment`, `respond-comments`, `thread-replies`, or `summary-only`.                                                                                                       |

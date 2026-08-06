@@ -1,7 +1,7 @@
 <!-- openhands-agent-summary -->
 ## OpenHands Agent — Completed
 
-Model: openrouter/qwen/qwen3.7-max
+Model: openrouter/qwen/qwen3.8-max
 Provider: OPENROUTER
 Job status: success
 Trace: .llm/tmp/run/openhands/pr-86/run-27412819714-1 (committed to the PR branch)

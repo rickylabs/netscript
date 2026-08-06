@@ -30,6 +30,7 @@ import type {
 } from './state.ts';
 import { RUNTIME_TEST_COMPONENT_VERSIONS } from './test-fixtures.ts';
 import { assert, assertEquals } from '@std/assert';
+import { OPENROUTER_MODEL_IDS } from '../config/models.ts';
 
 function assertUnique(values: readonly unknown[], label: string): void {
   assert(new Set(values).size === values.length, `${label} contains duplicates`);
@@ -159,6 +160,23 @@ Deno.test('desired-state source loads a value-free state from a content referenc
   const loaded = await source.loadDesiredState({ path: '/desired.json' });
   assertEquals(loaded, desired);
   assert(!('desiredState' in loaded), 'source reference leaked into desired state');
+});
+
+Deno.test('desired-state routes preserve validated OpenRouter preset identity', () => {
+  const value = structuredClone(desired) as unknown as Record<string, unknown>;
+  const agents = value.agents as Record<string, Record<string, unknown>>;
+  agents.codex.route = {
+    agent: 'claude',
+    provider: 'openrouter',
+    profileId: 'claude-openrouter',
+    presetId: 'claude-evaluator-minimax-m3',
+    model: OPENROUTER_MODEL_IDS.minimax,
+    effort: 'high',
+    worktree: route.worktree,
+    mobileRequired: false,
+  };
+  const parsed = parseDesiredRuntimeState(value);
+  assertEquals(parsed.agents.codex?.route?.presetId, 'claude-evaluator-minimax-m3');
 });
 
 Deno.test('persisted and result contracts expose identifiers and fingerprints only', () => {

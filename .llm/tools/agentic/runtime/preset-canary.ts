@@ -46,6 +46,7 @@ function route(preset: OpenRouterPreset, worktree: string): RouteIdentity {
     agent: preset.profileId.startsWith('claude-') ? 'claude' : 'codex',
     provider: 'openrouter',
     profileId: preset.profileId,
+    presetId: preset.id,
     model: preset.model,
     effort: preset.effort,
     worktree,
@@ -55,6 +56,7 @@ function route(preset: OpenRouterPreset, worktree: string): RouteIdentity {
     agent: profile?.agent ?? 'codex',
     provider: 'openrouter',
     profileId: preset.profileId,
+    presetId: preset.id,
     model: preset.model,
     effort: preset.effort,
     worktree,
@@ -76,9 +78,12 @@ function launchDiagnostics(preset: OpenRouterPreset, worktree: string): readonly
       },
       nativeExt4: true,
     });
+    const guarded = plan.request?.arguments.includes('--enforce-open-evaluator-models') ?? false;
     return [
       ...plan.diagnostics.map((entry) => entry.code),
       ...(plan.request ? [] : ['missing_launch_request']),
+      ...(preset.purpose === 'evaluation' && !guarded ? ['missing_evaluator_model_guard'] : []),
+      ...(preset.purpose !== 'evaluation' && guarded ? ['unexpected_evaluator_model_guard'] : []),
     ];
   }
   const profileHome = `${worktree}/.llm/tmp/codex-openrouter-profile`;

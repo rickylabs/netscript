@@ -7,7 +7,11 @@ import {
   type ProviderCanaryObservation,
   type ProviderCanaryResult,
 } from '../provider-canary.ts';
-import { childEnvironmentPolicyForProfile, resolveProviderProfile } from '../provider-profiles.ts';
+import {
+  childEnvironmentPolicyForProfile,
+  matchOpenRouterPreset,
+  resolveProviderProfile,
+} from '../provider-profiles.ts';
 import type { EnvironmentReader } from './child-process-environment-adapter.ts';
 import type { CodexProfileReference } from './codex-profile-adapter.ts';
 
@@ -180,6 +184,16 @@ export class ProviderCanaryAdapter {
     route: RouteIdentity,
     codexProfile?: CodexProfileReference,
   ): Promise<ProviderCanaryResult> {
+    if (route.presetId && !matchOpenRouterPreset(route)) {
+      return evaluateProviderCanary(route, {
+        credential: 'absent',
+        exitCode: null,
+        timedOut: false,
+        malformed: false,
+        incompatibility: null,
+        eventCounts: { tools: 0, reasoning: 0, streaming: 0 },
+      });
+    }
     const profile = resolveProviderProfile(route);
     if (!profile) {
       return evaluateProviderCanary(route, {

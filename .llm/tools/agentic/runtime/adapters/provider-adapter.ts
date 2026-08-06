@@ -8,7 +8,11 @@ import {
   type RuntimeDiagnostic,
 } from '../contract.ts';
 import type { SessionIdentity } from '../contract.ts';
-import { PROVIDER_CREDENTIAL_KEYS, resolveProviderProfile } from '../provider-profiles.ts';
+import {
+  matchOpenRouterPreset,
+  PROVIDER_CREDENTIAL_KEYS,
+  resolveProviderProfile,
+} from '../provider-profiles.ts';
 
 export const PROVIDER_AGENT_PAIRS = {
   anthropic: 'claude',
@@ -81,6 +85,13 @@ export function validateProviderRoute(input: ProviderValidationInput): ProviderV
     );
   }
   const profile = resolveProviderProfile(route);
+  if (route.presetId && !matchOpenRouterPreset(route)) {
+    diagnostics.push(diagnostic(
+      'route_conflict',
+      'policy',
+      'route identity conflicts with the selected OpenRouter preset',
+    ));
+  }
   const nativeAgent = (PROVIDER_AGENT_PAIRS as Partial<Record<string, string>>)[route.provider];
   if (profile && (profile.agent !== route.agent || profile.provider !== route.provider)) {
     diagnostics.push(diagnostic(
