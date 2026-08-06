@@ -30,10 +30,17 @@ terminated before verdict. Corrected session `228b3382-c868-472b-8066-0af93d2ed0
 failed closed under C-D17 when duplicate-root consolidation severed its output wrapper. The sole
 admissible T1-B evaluator is Qwen high session `abe31571-0fa1-4ea4-9085-1c36ea14a5c7`, launched
 from exact clean head `53d6c278d` through checked-in `openrouter-run.ts` with `deno run --no-lock`.
-#1317/#1318 roll up green but require current-base merge gates after T1.
+T1-B canonical Qwen high session `abe31571-0fa1-4ea4-9085-1c36ea14a5c7` returned `PASS` at
+evaluated head `53d6c278d`; its artifact-only head is `31b898212`. All eight #1189 rows are
+independently supported, the exact runtime smoke is 73/73 raw exit 0, post-run ownership is clean,
+and the protected stash is intact. Local evidence-mirror dry-run, close-gate, prohibited-diff scan,
+and review-thread gate pass at the artifact head. Issue/PR are `status:ready-merge`, the PR is no
+longer draft, and the label-triggered current-head CI is pending; no merge is authorized until the
+named contexts finish successfully and T1-A is repaired/evaluated. #1317/#1318 roll up green but
+require current-base merge gates after T1.
 Planned cuts are canary.14/.15/.16. Minimax PLAN and Qwen IMPL paid-transport canaries passed;
 routing state has no persisted fallback.
 
-Immediate next action: resume T1-A's sole durable implementation owner on the formal findings while
-T1-B finishes its sole admissible evaluation. Neither draft PR may enter the train until its own
-fresh separate evaluation and the milestone pre-merge gate pass.
+Immediate next action: supervise T1-A's sole durable repair turn and T1-B's current-head ready-merge
+CI. T1-B remains held outside the train until the complete milestone pre-merge gate passes; T1-A
+requires a fresh separate Qwen evaluation after repair.

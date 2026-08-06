@@ -248,3 +248,32 @@ files.
 - Prepared `slices/t1-a-1295/repair-1.md` for the existing sole owner thread. The supported sender
   registry requires same-thread resume; Sol-medium route drift remains C-D9 and is justified for
   the cross-package public-type/foreign-config repair.
+
+## 2026-08-06 — T1-B formal IMPL-EVAL `PASS` and ready-merge trigger
+
+- Sole admissible Qwen high session `abe31571-0fa1-4ea4-9085-1c36ea14a5c7` returned `PASS` at exact
+  evaluated head `53d6c278d...`. Invalid sessions `bd9e...` (C-D15) and `228b...` (C-D17) remain
+  ineligible.
+- Independently verified all eight #1189 acceptance rows, including the orchestrator-checked
+  observational row: RED HTTP 500, GREEN HTTP 200, and trace `00766def...` containing the correlated
+  catalog client span and fixture-api server span. Focused rerun was 16 tests / 38 steps / 0;
+  exact one-pass `scaffold.runtime` was 73 passed / 0 failed / `RAW-EXIT:0` with endpoint,
+  background, OTEL, and cleanup coverage.
+- Post-smoke leak reporter found zero run-owned resources and zero AppHosts; 15 foreign and 3
+  unproven pre-existing containers were untouched. Protected stash commit `7eb4ed16...` and exact
+  diff hash `6f706f8f...` remained intact.
+- Evaluator classified the four package-plugin `@module` findings as unchanged canary.14 baseline,
+  CLI lint/fmt wrappers as intentionally excluded by repo config with operative check/quality gates
+  green, and canary.14 lock staleness as train-attributed. It restored its run-report/lock footprint;
+  the orchestrator restored the same deterministic 45-line lock rewrite after its own local gate
+  commands. Target tree is clean.
+- Recorded the complete evaluator artifact verbatim in
+  `.llm/runs/fix-plugin-linking-seam-1189--1189/evaluate.md`, committed/pushed as `31b898212`, and
+  posted structured phase comment `5207616406`.
+- At artifact head `31b898212...`, acceptance mirror dry-run made no changes, close-gate passed for
+  closing issue #1189, review-thread gate passed 0/0, prohibited source diff scan passed, and the
+  only delta from evaluated head is `evaluate.md`.
+- Reconciled issue #1189 and PR #1316 to exactly one `status:ready-merge`, marked the PR ready for
+  review, and triggered fresh current-head CI by the live label event. PR is mergeable but held
+  outside the train until named checks report current-head success and the milestone pre-merge gate
+  is re-run.
