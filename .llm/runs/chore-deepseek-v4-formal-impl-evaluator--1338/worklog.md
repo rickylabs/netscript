@@ -169,6 +169,20 @@ formal evaluation, Actions, S2/S3, merge, canary, publication, or issue closure 
   restored only this known run-owned delta to exact HEAD `ef28b1b...`. Root/T1-B locks were not
   touched.
 
+## 2026-08-06 — Exact local DeepSeek canary PASS
+
+- Static preset canary passed with the new preset present, launch-valid, live-eligible, agentic-turn
+  supported, and no diagnostics.
+- The existing bounded live canary ran locally against exact clean head
+  `bac60805a7964b297329daa362271d6b6b89894c` with profile `claude-openrouter`, preset
+  `claude-evaluator-deepseek-v4-flash-0731`, requested/observed model
+  `deepseek/deepseek-v4-flash-0731`, effort `max`, and canonical credential available.
+- Result: `passed`, fan-out eligible, exit 0, no timeout, tools/reasoning/streaming all supported;
+  event counts 5/13/18; no incompatibility or diagnostics. Remote Control is unavailable on this
+  print transport by design. `deno.lock` remained exact HEAD blob `ef28b1b...`.
+- Next: mandatory fresh local IMPL-EVAL against the exact pushed completion head. The AGY fallback
+  is not used because OpenRouter is healthy.
+
 ## 2026-08-06 — S1 ordinary adversarial REVIEW PASS
 
 - The canonical OpenHands dispatcher posted owner-authorized Grok trigger comment `5208807248`,

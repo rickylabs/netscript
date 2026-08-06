@@ -68,3 +68,8 @@ pre-merge gate. PLAN-EVAL is conditional for future complex/decision-heavy work;
 mandatory unless explicitly waived. OpenHands is paused. If OpenRouter is blocked by a provider
 limit, use a fresh AGY / Google / `gemini-3.6-flash-high` / high fallback through the checked-in
 toolchain, never OpenRouter.
+
+Completion status: canonical policy/docs/skills/generated mirrors are converged at
+`bac60805a7964b297329daa362271d6b6b89894c`; focused gates are green. The exact local DeepSeek max
+provider canary passed with tools/reasoning/streaming supported and no diagnostics; lock remained
+exact. Mandatory fresh local IMPL-EVAL is next.
