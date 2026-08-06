@@ -90,3 +90,9 @@ W4 preflights now live under `slices/w4-a-1333/`, `slices/w4-b-1208/`, and `slic
 W4-A includes the required GLM design checkpoint and holds #1333's measured-agent acceptance for
 orchestrator hand-close; W4-B is dependency-locked behind W4-A and does not prematurely close
 #1208's unresolved Phase 2; W4-C reuses #1292's live export-map authority. All remain behind C15.
+
+W5 preflights now live under `slices/w5-a-1137-1138/` and `slices/w5-b-1332-1334/`. W5-A covers the
+complete first-party contract metadata and live OpenAPI→MCP reference; W5-B consumes W4 plus the
+generated multi-model schema surface for the final DB/contract/capability story. With these files,
+all 18 approved clusters have tracked current-evidence supervisor preparation or active T1 records;
+only dependency-open exact launch prompts/threads remain to be materialized at their real bases.

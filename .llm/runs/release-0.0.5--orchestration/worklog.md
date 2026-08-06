@@ -436,3 +436,17 @@ files.
   unresolved on the same issue.
 - W4-C preserves #1292's export authority and scopes only the eight-package repair, machine-readable
   intentional omissions, update procedure, negative fixtures, and docs-verification integration.
+
+## 2026-08-06 — W5 live preflight preparation
+
+- Re-read live #1137, #1138, #1332, and #1334. Prepared the final two planned cluster supervisor/
+  preflight artifacts, leaving every one of the 18 PLAN-EVAL-approved PR clusters represented by
+  current dependency/route/gate/closure instructions. No W5 branch, worktree, lifecycle, PR, or
+  agent mutation occurred.
+- W5-A derives an exhaustive first-party route inventory from live contract/OpenAPI authorities,
+  requires meaningful summaries/natural tags and a firing guard, and documents every shipped MCP
+  status/input/failure/exclusion seam with full contract/package/docs gates.
+- W5-B consumes W4's design/pattern authority and #1254's generated multi-model barrel. It requires
+  a compiling DB-generated-schema → narrowed versioned contract fixture, explicit private-field
+  omission, DB-less/backed parity, bidirectional links, and a concise outcome-led homepage argument
+  with current code/diagrams, one-click task routes, and responsive/accessibility browser proof.
