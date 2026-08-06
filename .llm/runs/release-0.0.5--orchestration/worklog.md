@@ -195,7 +195,8 @@ files.
 - Reconciled #1189 and PR #1316 to exactly one lifecycle label, `status:impl-eval`, while preserving
   their approved taxonomy and `wave:v1`. Corrected the evaluator prompt to describe the live checked
   state before launch.
-- Reconciled issue #1189 and PR #1316 to exactly one lifecycle label, `status:impl-eval`, without
-  mutating the issue's observational checkbox. Launched the fresh read-only Qwen 3.8 Max high
-  evaluator at exact clean head `53d6c278d...`, session
-  `bd9e6431-23ac-4473-b331-3bc22333bf2e`.
+- A concurrent writer launched Qwen session `bd9e6431-23ac-4473-b331-3bc22333bf2e` from the earlier
+  prompt, which still claimed the observational checkbox was unchecked and pending adjudication.
+  Terminated only evaluator process group `203021` before verdict. That session is permanently
+  ineligible under C-D15; T1-A was not interrupted. A fresh T1-B evaluator may launch only from the
+  corrected pushed prompt.

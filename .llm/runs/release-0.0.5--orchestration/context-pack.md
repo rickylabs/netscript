@@ -22,10 +22,11 @@ Two premature Qwen attempts are ineligible under C-D10; corrected formal Qwen se
 `f516aada-2a74-4dad-821e-b20963fe2983` is now evaluating that exact clean head. T1-B completed its
 generic empty-Apps repair and isolated OTEL live proof at clean pushed head `53d6c278d`; its admissible
 one-pass runtime rerun is 73/73 with raw exit 0, while the first interrupted attempt remains
-diagnostic-only under C-D12. Formal T1-B Qwen session
-`bd9e6431-23ac-4473-b331-3bc22333bf2e` is evaluating exact clean head `53d6c278d`. #1317/#1318 roll up
-green but require current-base merge gates after T1. Planned cuts are canary.14/.15/.16. Minimax
-PLAN and Qwen IMPL paid-transport canaries passed; routing state has no persisted fallback.
+diagnostic-only under C-D12. T1-B Qwen session `bd9e6431-23ac-4473-b331-3bc22333bf2e` launched from a
+stale pre-adjudication prompt and is permanently ineligible under C-D15; its exact process group was
+terminated before verdict. A fresh corrected T1-B evaluator is pending. #1317/#1318 roll up green
+but require current-base merge gates after T1. Planned cuts are canary.14/.15/.16. Minimax PLAN and
+Qwen IMPL paid-transport canaries passed; routing state has no persisted fallback.
 
-Immediate next action: record both T1 formal verdicts, then run the milestone pre-merge gate before
-either draft PR can advance.
+Immediate next action: launch the corrected T1-B evaluator, record both T1 formal verdicts, then run
+the milestone pre-merge gate before either draft PR can advance.
