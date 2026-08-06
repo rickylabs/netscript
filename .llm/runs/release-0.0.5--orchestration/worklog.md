@@ -298,3 +298,15 @@ files.
   verdict. Review-thread gate is 0/0.
 - Prepared `slices/t1-a-1295/impl-eval-repair-1-prompt.md` for a new sender-free, read-only Qwen 3.8
   Max high session on exact head `18c7a7e79...`; prior evaluator sessions are not resumed.
+
+## 2026-08-06 — T1-A repair-cycle formal IMPL-EVAL launch
+
+- Reconciled issue #1295 and PR #1315 from exactly `status:impl` to exactly `status:impl-eval` while
+  preserving all other taxonomy, milestone 0.0.5, draft state, canary.14 base, and head
+  `18c7a7e791552c6f346ef07a77a741dd70b058d6`.
+- Verified exact clean local/origin/PR head and launched once through checked-in
+  `.llm/tools/agentic/claude/openrouter-run.ts` with `deno run --no-lock`: Qwen 3.8 Max high,
+  bypass, separate read-only session `4c09a05f-a5da-4794-87e2-29b2d05f67f2`.
+- The raw stream is captured at
+  `.llm/tmp/release-0.0.5--orchestration/t1-a-impl-eval-repair1-raw.txt`; prior failed/premature
+  evaluator sessions are not resumed and remain historical/ineligible as recorded.

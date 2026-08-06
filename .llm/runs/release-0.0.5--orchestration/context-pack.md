@@ -46,6 +46,11 @@ require current-base merge gates after T1.
 Planned cuts are canary.14/.15/.16. Minimax PLAN and Qwen IMPL paid-transport canaries passed;
 routing state has no persisted fallback.
 
-Immediate next action: launch and supervise T1-A's fresh separate Qwen repair evaluation while
-holding T1-B outside the train. No T1 merge is authorized until T1-A passes, both PRs have current
-green required contexts outside draft policy, and the complete milestone pre-merge gate passes.
+T1-A fresh repair evaluator session `4c09a05f-a5da-4794-87e2-29b2d05f67f2` is live through the
+checked-in `openrouter-run.ts` transport: Qwen 3.8 Max high, bypass, read-only, exact clean head
+`18c7a7e79...`, with issue/PR at exactly `status:impl-eval`. It is the only admissible repair-cycle
+evaluator session.
+
+Immediate next action: supervise that evaluator while holding T1-B outside the train. No T1 merge
+is authorized until T1-A passes, both PRs have current green required contexts outside draft policy,
+and the complete milestone pre-merge gate passes.
