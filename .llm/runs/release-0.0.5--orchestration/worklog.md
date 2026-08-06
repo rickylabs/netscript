@@ -310,3 +310,34 @@ files.
 - The raw stream is captured at
   `.llm/tmp/release-0.0.5--orchestration/t1-a-impl-eval-repair1-raw.txt`; prior failed/premature
   evaluator sessions are not resumed and remain historical/ineligible as recorded.
+
+## 2026-08-06 — T1-A evaluator provider-budget recovery
+
+- Qwen session `4c09a05f-a5da-4794-87e2-29b2d05f67f2` independently reproduced the decisive
+  repair evidence through the completed exact one-pass runtime smoke, but its post-compaction
+  continuation was rejected by the provider because the transport's default 32,000-token output
+  reservation exceeded the remaining paid-account budget. The session emitted no verdict, so the
+  interrupted turn is failed closed rather than inferred as PASS.
+- Preserved the original raw transcript and its terminal transport error. The transcript contains
+  useful independent gate evidence but cannot itself advance the lifecycle without the contracted
+  complete Markdown artifact and terminal verdict token.
+- Confirmed the canonical provider policy copies non-provider runtime variables into the isolated
+  child while still clearing rival credentials and route variables. Resumed the same formal Qwen
+  high session through checked-in `openrouter-run.ts`, still bypass-enabled and read-only, with
+  `CLAUDE_CODE_MAX_OUTPUT_TOKENS=16000` so the provider can reserve an affordable bounded response.
+  The continuation is limited to the remaining smoke-log adjudication, read-only leak report,
+  final hygiene checks, and artifact/verdict emission; its raw output is captured separately at
+  `.llm/tmp/release-0.0.5--orchestration/t1-a-impl-eval-repair1-resume-raw.txt`.
+- The bounded same-session resume reached the expected Qwen/bypass initialization but was rejected
+  before inference with the provider's monthly-limit response. It produced no new evidence or
+  verdict and is failed closed. Only the single canonical OpenRouter credential is configured; no
+  alternate approved Qwen credential is present. T1-A stays draft at exactly `status:impl-eval`,
+  and the orchestrator will continue independent non-merge work while holding this gate closed.
+- Consulted the canonical OpenHands handoff routing card after the local transport failure. It
+  explicitly forbids moving a local harness evaluator into cloud OpenHands, so no cloud trigger or
+  fallback evaluator was dispatched and no GitHub state changed for T1-A.
+- Re-queried the inherited train. PRs #1317 and #1318 remain mergeable, current-head green, and
+  `status:ready-merge`, but T2 remains sequenced after T1 train mutations and therefore is held.
+  PR #1316 remains mergeable and `status:ready-merge`; the repo-native latest-run classifier reports
+  zero current failures, but its core visibility job is still queued and runner-starved jobs are
+  canceled rather than green. It remains unmerged and outside the pre-merge gate.

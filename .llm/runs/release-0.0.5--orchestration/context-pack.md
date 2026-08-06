@@ -46,11 +46,22 @@ require current-base merge gates after T1.
 Planned cuts are canary.14/.15/.16. Minimax PLAN and Qwen IMPL paid-transport canaries passed;
 routing state has no persisted fallback.
 
-T1-A fresh repair evaluator session `4c09a05f-a5da-4794-87e2-29b2d05f67f2` is live through the
+T1-A fresh repair evaluator session `4c09a05f-a5da-4794-87e2-29b2d05f67f2` ran through the
 checked-in `openrouter-run.ts` transport: Qwen 3.8 Max high, bypass, read-only, exact clean head
-`18c7a7e79...`, with issue/PR at exactly `status:impl-eval`. It is the only admissible repair-cycle
-evaluator session.
+`18c7a7e79...`, with issue/PR at exactly `status:impl-eval`. It reproduced nearly all decisive
+gates, including the exact one-pass smoke, but the provider rejected the first post-compaction
+continuation before any verdict because its default output reservation exceeded remaining account
+budget. Under C-D18 that interrupted turn is failed closed. A same-session retry through the same
+checked-in route used a supported 16,000-token output cap and separate raw capture, but the sole
+configured OpenRouter key had reached its monthly limit and inference did not begin. No route was
+substituted and no verdict is inferred. T1-A remains draft at exactly `status:impl-eval`; its gate is
+closed until the approved Qwen transport is funded/reset and emits the complete artifact plus
+terminal verdict. Independent non-merge milestone work may continue meanwhile.
 
-Immediate next action: supervise that evaluator while holding T1-B outside the train. No T1 merge
-is authorized until T1-A passes, both PRs have current green required contexts outside draft policy,
-and the complete milestone pre-merge gate passes.
+Immediate next action: hold T1-A's formal gate for approved Qwen transport recovery while preserving
+its exact clean target and lifecycle. Cloud OpenHands is not an admissible substitute for this local
+harness run. T1-B remains outside the train: it has zero classified current failures but a queued
+visibility job and canceled runner-starved jobs, not a complete green current-head rollup. T2 PRs
+#1317/#1318 remain green but are sequenced after T1 train mutations. No merge is authorized until
+T1-A passes, both T1 PRs have current green required contexts outside draft policy, and the complete
+milestone pre-merge gate passes.
