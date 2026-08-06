@@ -76,6 +76,7 @@ mirrors. Never patch generated mirrors or duplicate model literals in executable
 | 2026-08-06 | Plan | Search audit | Found 30 direct 3.7 spellings in 17 tracked files plus active hyphenated preset ids. |
 | 2026-08-06 | Plan | Design checkpoint | Locked three test/generation-aware implementation slices; implementation not started. |
 | 2026-08-06 | Plan | Reconcile | Owner corrected canonical routing to PLAN→Minimax and IMPL→Qwen 3.8; plan revised before PLAN-EVAL. |
+| 2026-08-06 | PLAN-EVAL | Formal gate | Separate OpenRouter Minimax M3 session `815534c7-6c02-4aa5-ab86-a905a0bade6f` returned `PASS`; prompt, raw transcript, and verbatim verdict recorded. |
 
 ## Decisions
 
@@ -104,7 +105,7 @@ mirrors. Never patch generated mirrors or duplicate model literals in executable
 | Re-baseline | PASS | `origin/main` and HEAD `57c9b5ab3`; issue fetched live | Current as of 2026-08-06. |
 | Research | PASS (generator evidence) | `research.md` | Awaits independent PLAN-EVAL. |
 | Design checkpoint | PASS (generator evidence) | this `## Design` | Awaits independent PLAN-EVAL. |
-| PLAN-EVAL | NOT_RUN | `plan-eval.md` absent | Hard stop; no implementation allowed. |
+| PLAN-EVAL | PASS | `plan-eval.md`, `plan-eval-raw.txt`, session `815534c7-6c02-4aa5-ab86-a905a0bade6f` | Separate OpenRouter `minimax/minimax-m3`; implementation may begin. |
 
 ### Static Gates
 

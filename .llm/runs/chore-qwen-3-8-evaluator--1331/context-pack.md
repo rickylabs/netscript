@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `chore-qwen-3-8-evaluator--1331` |
 | Branch | `chore/qwen-3-8-evaluator` |
-| Current phase | `plan-eval` |
+| Current phase | `implementation` |
 | Archetype | N/A — maintainer harness/tooling/configuration |
 | Scope overlays | docs |
 
@@ -14,9 +14,9 @@
 
 Issue #1331 is re-baselined against `origin/main` at `57c9b5ab3`, including the owner's later
 routing correction: canonical PLAN-EVAL remains Minimax M3 and canonical IMPL-EVAL moves to Qwen
-3.8. This run requires a separate Minimax M3 PLAN-EVAL. Research, revised plan, Design checkpoint,
-supervisor identity, context, and drift artifacts are complete. No implementation/config/model file
-has been edited. The run is at the hard PLAN-EVAL stop.
+3.8. Separate OpenRouter Minimax M3 session `815534c7-6c02-4aa5-ab86-a905a0bade6f` returned
+`PASS`; its prompt, raw transcript, observed provenance, and verbatim verdict are recorded. The run
+is cleared to implement S1–S3. No implementation/config/model file has yet been edited.
 
 ## Completed
 
@@ -29,19 +29,18 @@ has been edited. The run is at the hard PLAN-EVAL stop.
 - Recorded exact requested/observed Codex launch identity and owner-authorized route overrides.
 - Opened draft PR #1336 with labels, milestone 0.0.5, `Closes #1331`, and the planning phase comment.
 - Reconciled the post-bootstrap owner routing correction before PLAN-EVAL.
+- Recorded the separate Minimax M3 PLAN-EVAL `PASS` and exact session provenance.
 
 ## In Progress
 
-- Formal PLAN-EVAL handoff.
+- S1 phase-specific model/preset/route contract.
 
 ## Next Steps
 
-1. Commit and push the planning reconcile; exclude `deno.lock`.
-2. Update draft PR #1336 to reflect the corrected phase defaults.
-3. Launch a separate OpenRouter `minimax/minimax-m3` PLAN-EVAL session and require `PASS` in
-   `plan-eval.md` before S1.
-4. After PASS, implement S1–S3 with gate → ordinary review → supervisor sign-off → push/comment per
-   slice.
+1. Commit and push the PLAN-EVAL gate artifacts; exclude `deno.lock`.
+2. Update draft PR #1336 to record `PASS` and move to implementation.
+3. Implement S1–S3 with gate → ordinary review → supervisor sign-off → push/comment per slice.
+4. Stop at `READY_FOR_IMPL_EVAL`; formal IMPL-EVAL remains a separate Qwen 3.8 session.
 
 ## Key Decisions
 
@@ -64,7 +63,7 @@ has been edited. The run is at the hard PLAN-EVAL stop.
 
 | Gate family | Current status | Evidence |
 | ----------- | -------------- | -------- |
-| Plan | READY_FOR_PLAN_EVAL | `research.md`, `plan.md`, `worklog.md#design` |
+| Plan | PASS | `plan-eval.md`, raw transcript, session `815534c7-6c02-4aa5-ab86-a905a0bade6f` |
 | Static | Planned | Concrete commands in `plan.md` |
 | Fitness | N/A unless package/plugin scope appears | Current non-package scope |
 | Runtime | Planned | Exact bounded Minimax and Qwen 3.8 canaries in S2 |
