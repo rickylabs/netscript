@@ -29,3 +29,13 @@
 - **Severity:** minor
 - **Action:** orchestration-only; reran `quality:gate` serially after publish restoration and it passed.
 - **Evidence:** publish dry-run exit 0; restored member manifests; subsequent live guard and `quality:gate` pass.
+
+## 2026-08-06 — local-source child roots must own the workspace catalog
+
+- **What:** Moving member packages to `catalog:zod` made standalone child processes fail when they import those packages by local file URL.
+- **Source:** `check:emitted-samples` and nine cloud check-test failures under project config/runtime registry child processes.
+- **Expected:** Generated member manifests remain portable through explicit npm imports, and generated workspace roots can consume local NetScript package sources.
+- **Actual:** The child roots had import maps but no catalog, so Deno could not resolve the local source package's `catalog:zod` reference.
+- **Severity:** significant
+- **Action:** repair the generic generated-workspace root contract and shared child-project fixture seams; do not restore JSR Zod or inline workspace package versions.
+- **Evidence:** local RED `Package 'zod' not found in catalog`; cloud run `30994687130`.

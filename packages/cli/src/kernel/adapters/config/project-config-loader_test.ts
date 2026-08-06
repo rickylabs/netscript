@@ -3,6 +3,7 @@ import { dirname, fromFileUrl, join, resolve } from '@std/path';
 import { toFileUrl } from '@std/path/to-file-url';
 
 import type { ProcessPort, ProcessResult } from '../../ports/process-port.ts';
+import { SCAFFOLD_WORKSPACE_CATALOG } from '../../constants/scaffold/scaffold-app-catalog.ts';
 import { createProjectConfigLoader, loadProjectConfig } from './project-config-loader.ts';
 
 const REPO_ROOT = resolve(dirname(fromFileUrl(import.meta.url)), '../../../../../..');
@@ -89,6 +90,7 @@ async function createProject(options?: {
   await Deno.writeTextFile(
     join(projectRoot, 'deno.json'),
     JSON.stringify({
+      catalog: SCAFFOLD_WORKSPACE_CATALOG,
       imports: {
         '@netscript/config': toFileUrl(repoPath('packages/config/mod.ts')).href,
       },

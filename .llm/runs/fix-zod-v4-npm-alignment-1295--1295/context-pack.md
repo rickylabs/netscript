@@ -12,16 +12,16 @@
 
 ## Current State
 
-The graph guard is implemented and its negative controls pass. The planned catalog alignment fixes
-the measured MCP/AI peer warnings, but the train has two unreported hard Zod 3 paths:
-`@olli/kvdex@3.6.7` and `@tanstack/ai@0.39 -> @ag-ui/core@0.0.52`. The owner rescoped #1295 to
-align workspace plus AI/MCP peers and document this boundary; full collapse moved to #1320.
+The branch is integrated with `canary/0.0.5-canary.14@2508eb8c9`. Standalone generated workspace
+roots now own the Zod catalog required by local-source packages, while portable generated member
+manifests keep explicit npm specifiers. The former `check:emitted-samples` RED is green, the focused
+child-process suite passes, and the rescoped two-instance graph remains unchanged.
 
 ## Next Steps
 
-1. Finish static, publish, and doc gates on the resumed alignment.
-2. Commit/push implementation and mirror only the six rewritten boxes.
-3. Run composed D6 readiness and required canary contexts.
+1. Commit and explicitly push the coherent child-workspace repair.
+2. Reconcile PR #1315 metadata and record current-SHA check state.
+3. Hand off for the orchestrator-owned Qwen IMPL-EVAL.
 
 ## Key Decisions
 

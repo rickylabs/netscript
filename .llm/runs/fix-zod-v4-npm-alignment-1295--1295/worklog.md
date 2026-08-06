@@ -64,6 +64,12 @@ Change Zod only in the root catalog, run `deno task deps:check`, and inspect the
 | 2026-08-05 | 3 | publish proof | Repository publish dry-run exits 0; `deno doc --lint` passes all exports for the 19 affected package/plugin roots. |
 | 2026-08-05 | 3 | architecture proof | `quality:gate`, dependency checks, docs accuracy, and focused lint/format all pass; doctrine reports baseline warnings only. |
 | 2026-08-05 | 3 | cloud repair | Canary code-quality exposed a Zod 4 `private-type-ref` in the plugin manifest schema; a local public validator contract preserves the runtime Zod object and makes the exact cloud doc-lint command green. |
+| 2026-08-06 | 4 | canary.14 integration | Merged train base `2508eb8c99c9cfc55e0c9f1d7ab72fea745db492` without rebase/force; merge commit `c1fb3bb6e5a421fb0db6393ac1b350e38441bd91`. |
+| 2026-08-06 | 4 | RED | `deno task check:emitted-samples` exits 1 with `Package 'zod' not found in catalog`; cloud check-test independently reports nine child-process failures with the same cause. |
+| 2026-08-06 | 4 | GREEN | Generated standalone roots and generic child-project seams own the scaffold Zod catalog; `check:emitted-samples` checks all 40 emitted samples from 30 artifact paths. |
+| 2026-08-06 | 4 | focused proof | 37 child-workspace/scaffold tests pass; scoped check/lint/fmt cover 824 files with zero findings. |
+| 2026-08-06 | 4 | dependency proof | Guard tests pass 6/6; live guard retains only the documented AG-UI/kvdex v3 parents; `deno info` binds Anthropic, MCP, OpenAI, and zod-to-json-schema to Zod 4.4.3 without peer-to-3 warnings. |
+| 2026-08-06 | 4 | publish proof | Full workspace publish dry-run succeeds; export-map doc-lint completes for all 19 affected roots; docs accuracy and `quality:gate` pass with baseline warnings only. |
 
 ## Decisions
 
@@ -78,11 +84,14 @@ Change Zod only in the root catalog, run `deno task deps:check`, and inspect the
 | --- | --- | --- |
 | Guard predicate tests | PASS | 6 passed, 0 failed |
 | Live graph guard | PASS | two instances, with residual v3 restricted to `@ag-ui/core@0.0.52` and `@olli/kvdex@3.6.7` |
-| Targeted check | PASS | 977 files, 9 batches, 0 diagnostics |
-| Focused tests | PASS | 27 passed, 0 failed |
+| Targeted check | PASS | current repair: 824 files, 7 batches, 0 diagnostics |
+| Focused tests | PASS | current repair: 37 passed, 0 failed |
 | Dependency / architecture | PASS | `deps:check` and `quality:gate`; baseline warnings only |
 | Documentation accuracy | PASS | repository docs accuracy gate |
 | Publish dry-run | PASS | full workspace simulation completed successfully |
 | `deno doc --lint` | PASS | all exports across 19 affected package/plugin roots |
 | Focused lint / format | PASS | changed TypeScript and boundary documentation |
 | Plugin publish surface | PASS | exact cloud `deno doc --lint` command; 63 plugin tests, including 5 manifest tests |
+| Canary.14 RED evidence | PASS | pre-repair `check:emitted-samples` exit 1: standalone temp root lacked the catalog required by local workspace sources |
+| Canary.14 child-project proof | PASS | 40 emitted samples from 30 artifact paths compile after the generic root-catalog repair |
+| Lock hygiene | PASS | publish simulator restored manifests; `deno.lock` has no repair-slice diff |
