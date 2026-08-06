@@ -166,3 +166,7 @@ files.
 - A preceding supported recovery send was already active on T1-B and owned the rerun E2E process
   tree. Detected the redundant `recovery.md` sender, retained the earlier owner, and terminated only
   the redundant sender process group without touching E2E or product state (C-D13).
+- A later acceptance-guard steer also opened a concurrent same-thread client rather than queuing.
+  Terminated only that newest process group before it could own work (C-D14). The original recovery
+  sender remains the sole T1-B writer; #1189's observational runtime checkbox stays unchecked until
+  orchestrator adjudication after separate evaluation.

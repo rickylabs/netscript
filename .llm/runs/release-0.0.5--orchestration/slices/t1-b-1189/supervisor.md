@@ -32,4 +32,8 @@
   rerun before handoff.
 - C-D13 sender guard: an earlier supported recovery send already owned the rerun E2E tree; the later
   redundant `recovery.md` sender was terminated without interrupting the owner or its subprocesses.
+- C-D14 sender guard: a later acceptance-guard steer also opened a second client instead of queuing;
+  that new process group was terminated before competing. Do not steer again until the owner exits.
+- Observational acceptance: leave #1189's runtime checkbox unchecked during the code-PR lane;
+  evidence belongs in the run/PR and the orchestrator adjudicates it after separate evaluation.
 - Status: implementation recovery active through supported same-thread resume
