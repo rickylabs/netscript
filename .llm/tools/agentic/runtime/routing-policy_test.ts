@@ -416,6 +416,48 @@ Deno.test('formal evaluator resolves Minimax high PLAN and DeepSeek max IMPL rou
   }
 });
 
+Deno.test('formal evaluator falls back to AGY Gemini 3.6 Flash high only on explicit OpenRouter limit', () => {
+  const at = new Date('2026-08-06T00:00:00Z');
+  for (const phase of ['plan', 'impl'] as const) {
+    const route = resolveCanonicalFormalEvaluatorRoute({
+      phase,
+      authorFamily: 'openai',
+      generatorSession: { ...session, agent: 'codex', sessionId: 'codex-generator' },
+      evaluatorSession: {
+        ...session,
+        agent: 'antigravity',
+        sessionId: `${phase}-agy-evaluator`,
+      },
+      fallbackReason: 'openrouter_limit',
+    }, at);
+    equal([
+      route.lane,
+      route.agent,
+      route.provider,
+      route.model,
+      route.effort,
+      route.condition,
+    ], [
+      phase === 'plan' ? 'formal_plan_evaluation' : 'formal_impl_evaluation',
+      'antigravity',
+      'google',
+      MODEL_IDS.antigravityDocs,
+      'high',
+      'fallback_on_openrouter_limit',
+    ]);
+  }
+
+  assertThrows(() =>
+    resolveCanonicalFormalEvaluatorRoute({
+      phase: 'impl',
+      authorFamily: 'openai',
+      generatorSession: { ...session, agent: 'codex', sessionId: 'codex-generator' },
+      evaluatorSession: { ...session, agent: 'claude', sessionId: 'wrong-fallback-agent' },
+      fallbackReason: 'openrouter_limit',
+    }, at)
+  );
+});
+
 Deno.test('formal evaluator rejects closed models and reused generator sessions', () => {
   const at = new Date('2026-07-13T00:00:00Z');
   const generatorSession = { ...session, agent: 'codex', sessionId: 'codex-generator' } as const;

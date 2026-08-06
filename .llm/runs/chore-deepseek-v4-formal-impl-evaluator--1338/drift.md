@@ -78,6 +78,33 @@ Prior #1331 run artifacts and completed 0.0.5 Qwen evaluator evidence are immuta
   checked-in agentic Codex OpenRouter launcher, with a fresh session and explicit requested/observed
   identity. This is a supported-runtime transport repair, not a route substitution.
 
+## D-8 — Owner simplified evaluator policy and prerequisite scope
+
+- Date: 2026-08-06
+- Owner direction: PLAN-EVAL is conditional for genuinely complex/decision-heavy work or useful
+  adversarial planning advice; small/mechanical issues with complete issue contracts record
+  `PLAN-EVAL: N/A`. IMPL-EVAL remains mandatory unless explicitly waived. OpenHands is paused until
+  its trigger path is fixed; use local evaluation. If OpenRouter is blocked by a provider limit,
+  fall back through the checked-in AGY toolchain to Google `gemini-3.6-flash-high` at high effort.
+- Scope correction: keep #1339 a small routing-policy prerequisite. Do not build the planned broad
+  S2 canary-evidence schema. Prove the existing provider canary on the exact DeepSeek max preset,
+  converge canonical policy/docs/skills/generated mirrors, run focused gates and mandatory local
+  IMPL-EVAL, then make ready and merge through the existing pre-merge gate.
+- Aborted review transports: the OpenHands trigger never materialized a workflow run; a later local
+  Grok Codex-profile probe failed before inference because the isolated profile lacked the
+  credential environment and observed read-only/on-request runtime rather than the required bypass
+  contract. Its run-owned review-worktree lock churn was restored to exact HEAD. Neither attempt is
+  review or evaluator evidence. The unused gateway was stopped before a prompt was sent.
+
+## D-9 — Docs accuracy child resolved the prerequisite lock
+
+- Date: 2026-08-06
+- Observation: the direct lockless docs-accuracy wrapper passed, but its child Deno process resolved
+  the same prerequisite-only lock delta (`ef28b1b...` → `e66d0339...`).
+- Resolution: after recording the green docs verdict, the orchestrator restored only this known
+  run-owned prerequisite delta to exact HEAD blob `ef28b1b...`. No root or T1-B lock state was
+  staged, restored, or modified.
+
 ## D-8 — Review transport/lock repair provenance
 
 - Date: 2026-08-06

@@ -143,6 +143,32 @@ Status: **LOCKED BY GENERATOR; NOT APPROVED**.
 S1 automated gates are green, but S1 is **not reviewed or self-certified**. No ordinary review,
 formal evaluation, Actions, S2/S3, merge, canary, publication, or issue closure was launched.
 
+## 2026-08-06 — Owner policy update and direct completion path
+
+- Owner halted OpenHands use until its trigger path is repaired and classified this prerequisite as
+  a simple PR. The earlier PLAN-EVAL remains valid completed evidence but is not a template for
+  future small/mechanical issues.
+- Canonical policy now makes PLAN-EVAL conditional, keeps IMPL-EVAL mandatory absent explicit owner
+  waiver, pauses OpenHands, and machine-binds the OpenRouter-limit fallback for both formal phases
+  to fresh AGY / Google / `gemini-3.6-flash-high` / high sessions.
+- Replaced forward formal IMPL-EVAL prose with the DeepSeek V4 Flash 0731 max preset across harness
+  policy/protocol, canonical skills, generated Claude mirrors, and the authoring index. Historical
+  Qwen evidence and generic cloud-only Qwen examples remain untouched.
+- Owner rescoped the planned broad canary-evidence-envelope S2 out of this prerequisite. The
+  completion path uses the existing bounded provider canary, focused typed/docs/generated gates,
+  one mandatory local IMPL-EVAL, existing pre-merge gate, and merge. No package/plugin or release
+  publication surface is added.
+- Updated the typed policy with two explicit `fallback_on_openrouter_limit` formal routes:
+  Antigravity / Google / `gemini-3.6-flash-high` / high. The formal resolver requires the explicit
+  fallback reason and an Antigravity evaluator session; without it, Minimax high and DeepSeek max
+  remain the canonical primaries.
+- Policy/generator gate set is green: 47 focused tests; lockless scoped check 149 files in two
+  batches; scoped lint/fmt 149 files with zero findings; Claude skill mirror parity and surface
+  validation green; internal links and docs accuracy green. Docs accuracy's child Deno process
+  again resolved the prerequisite lock to `e66d0339...`; after the green verdict the orchestrator
+  restored only this known run-owned delta to exact HEAD `ef28b1b...`. Root/T1-B locks were not
+  touched.
+
 ## 2026-08-06 — S1 ordinary adversarial REVIEW PASS
 
 - The canonical OpenHands dispatcher posted owner-authorized Grok trigger comment `5208807248`,

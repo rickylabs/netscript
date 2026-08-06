@@ -61,6 +61,10 @@ Formal PLAN-EVAL passed in fresh separate Minimax M3 high session
 `258034b1f9842bae781ca7e5eecffc2c61af13e4`; its complete verdict is `plan-eval.md`.
 S1 separately passed owner-authorized OpenRouter Grok 4.5 medium ordinary review in fresh bypass
 session `bad4a807-6399-4af8-b97b-2cbbb8d0cdb5` against exact clean PR head
-`f2bc222667b369b1749248a7b74befa2e08e9da8`. Proceed to S2 bounded canary evidence schema and exact
-live DeepSeek max proof. The advisory review is not formal evaluation; IMPL-EVAL remains pending
-until S1–S3 and the live proof are complete.
+`f2bc222667b369b1749248a7b74befa2e08e9da8`. Owner then simplified this prerequisite: do not build
+the broad S2 evidence-schema expansion. Converge canonical policy/docs/skills/generated mirrors,
+run the existing exact DeepSeek max provider canary, then mandatory local IMPL-EVAL and the existing
+pre-merge gate. PLAN-EVAL is conditional for future complex/decision-heavy work; IMPL-EVAL remains
+mandatory unless explicitly waived. OpenHands is paused. If OpenRouter is blocked by a provider
+limit, use a fresh AGY / Google / `gemini-3.6-flash-high` / high fallback through the checked-in
+toolchain, never OpenRouter.
