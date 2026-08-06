@@ -106,3 +106,75 @@ milestone orchestrator.
   no plugin-specific core branch was introduced.
 - Exact live request/response, resource relationship, and correlated span IDs are under
   `live-proof/`.
+
+## Terminal implementation handoff — 2026-08-06
+
+### Commits
+
+- `ca8f1c76bb8859d8ab5d39db31300a15652ebb3d` — merge exact train base
+  `2508eb8c99c9cfc55e0c9f1d7ab72fea745db492` without rebase/force.
+- `e6c429f4527e02f1dfa8886f0ff66311bbc5a299` — generic empty-surface repair,
+  fixture-declared runtime permissions, and RED/GREEN/live-trace evidence.
+- The terminal handoff update is evidence-only and is the next explicit-refspec push after the
+  product/evidence commit above.
+
+### Exact changed paths in the repair commit
+
+- `packages/cli/src/kernel/adapters/plugin/plugin-reference-reconciler.ts`
+- `packages/cli/tests/fixtures/plugin-scaffolder/scaffold.plugin.json`
+- `.llm/runs/fix-plugin-linking-seam-1189--1189/acceptance-evidence.md`
+- `.llm/runs/fix-plugin-linking-seam-1189--1189/drift.md`
+- `.llm/runs/fix-plugin-linking-seam-1189--1189/leak-report.md`
+- `.llm/runs/fix-plugin-linking-seam-1189--1189/run-resources.json`
+- `.llm/runs/fix-plugin-linking-seam-1189--1189/worklog.md`
+- `.llm/runs/fix-plugin-linking-seam-1189--1189/live-proof/red-before-install.md`
+- `.llm/runs/fix-plugin-linking-seam-1189--1189/live-proof/green-consumer.md`
+- `.llm/runs/fix-plugin-linking-seam-1189--1189/live-proof/trace-00766def76331c34a3df9fd525bfe3e0.json`
+
+### Commands and verdicts
+
+- Focused remove RED: existing lifecycle test failed because actual appsettings retained
+  `Apps: {}`.
+- Focused GREEN: protocol/install/dispatch/reconciler/remove command — 17 tests, 42 steps,
+  0 failures.
+- Scoped check/lint/fmt — zero findings; fixture/run JSON format check passed.
+- `deno task docs:links` — 102 docs, 0 broken links/anchors.
+- `deno task arch:check` — exit 0; warnings are recorded pre-existing doctrine debt.
+- CLI JSR audit — exit 0 and publish dry-run OK.
+- Plugin JSR audit — publish dry-run OK; exit 1 only on four pre-existing missing `@module` tags
+  in unchanged public entrypoints.
+- Fresh consumer `deno task check` — zero diagnostics across generated app/service/contracts.
+- Mandatory one-pass `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` —
+  73 passed, 0 failed, raw exit 0 (the earlier interrupted attempt is not counted).
+- Review-thread gate — PASS, 0 threads / 0 unanswered.
+
+### Owned runtime proof and cleanup
+
+- Owned root:
+  `/home/codex/repos/ns005-cachetiers/.llm/tmp/fix-plugin-linking-seam-1189-live`.
+- RED request: catalog endpoint HTTP 500, endpoint not linked before install.
+- GREEN request: catalog endpoint HTTP 200 after the handler called and validated
+  `fixture-api /ping`.
+- Correlation: trace `00766def76331c34a3df9fd525bfe3e0`; catalog client span
+  `9c22af7526ff564a`; fixture server span `c7935b1b03518da5`, whose parent is that catalog
+  client span.
+- Post-run: `aspire ps` empty; leak reporter found no run-owned AppHost/container. Every listed
+  foreign or unknown-owner survivor was left untouched.
+- Root `deno.lock` matches the branch baseline. Stash
+  `7eb4ed16d6944c1d1c904895bcb76b4361ad8a57` remains `stash@{0}` and was not popped,
+  dropped, rewritten, or committed.
+
+### PR snapshot and remaining authority
+
+- PR #1316 product/evidence head: `e6c429f4527e02f1dfa8886f0ff66311bbc5a299`.
+- PR state: draft; base `canary/0.0.5-canary.14`; label `status:impl`.
+- Draft push checks: all 18 contexts skipped by draft policy; no failing executed context.
+- Local close-gate replay evaluated the exact head and found only authoritative issue #1189 box 5
+  unticked. The PR now carries valid structured box-index 5 evidence, but the supervisor did not
+  apply `status:ready-merge` or mutate the issue because those actions belong to the milestone
+  orchestrator after formal evaluation.
+- Remaining risk: four pre-existing plugin `@module` audit findings are unrelated to this diff;
+  formal Qwen IMPL-EVAL, issue acceptance mutation, draft→ready, merge, and canary remain
+  orchestrator-owned.
+
+READY_FOR_QWEN_IMPL_EVAL
