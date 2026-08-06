@@ -104,3 +104,16 @@ files.
   observability.
 - Preserved T1-B's unrelated lock churn in stash commit `7eb4ed16d6944c1d1c904895bcb76b4361ad8a57`.
   The current leak reporter found foreign/unproven survivors only; none were mutated.
+- Reconciled #1295/#1315 and #1189/#1316 to exactly one active lifecycle label, `status:impl`, and
+  `wave:v1`; stale `status:ready-merge` / `status:impl-eval` labels no longer overstate the live
+  repair phase.
+
+## 2026-08-06 — T2 preflight
+
+- Re-queried #1317 and #1318 while T1 runs. Both current heads remain green with `close-gate`
+  success and zero review threads; #1317 also has both mandatory scaffold runtime lanes reporting
+  `SUCCESS`, not skipped.
+- Their clean verdicts precede T1 train mutations, so neither will merge on that evidence. T2
+  supervisors will integrate the content-derived train head after T1 lands and earn new current-SHA
+  gates. Both inherited worktrees have unrelated `deno.lock` changes and no upstream; preserve them
+  before dispatch as done for T1-B.
