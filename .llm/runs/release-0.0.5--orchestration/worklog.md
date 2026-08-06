@@ -418,3 +418,21 @@ files.
 - W3-C inventories active/generated/compatibility/history references before renaming AI provider
   canaries to model-rollout terminology, preserving immutable historical evidence while reserving
   unqualified canary language for release cuts.
+
+## 2026-08-06 — W4 live preflight preparation
+
+- Re-read live #1333, #1208, and #1108 including the #1335 child-scope note, #1208 Phase 2/Loom
+  comments, and the four #1108 criteria already delivered by #1292. Prepared W4-A/B/C supervisor/
+  preflight artifacts without provisioning or dispatch.
+- Applied the design skill to W4-A: the mandatory pre-code checkpoint now grounds a concrete
+  reference subject/audience/job, inventories live registry/eis-chat/scaffold patterns, requires an
+  intentional token/type/layout/signature system, self-critiques generic defaults, and records the
+  canonical GLM design artifact without misrepresenting GLM's absent reasoning trace.
+- W4-A is held behind C15 and reserves #1333's measured-agent row for orchestrator hand-close. It
+  combines dynamic app naming, executable Fresh 2.x resource architecture, real rendered states,
+  accessibility/responsive/light-dark browser proof, and the exact runtime gate.
+- W4-B is held behind W4-A and uses `deno doc` plus retained executable patterns for a real runnable
+  page-builder tutorial. It does not close #1208 while the owner-directed Phase 2 sweep remains
+  unresolved on the same issue.
+- W4-C preserves #1292's export authority and scopes only the eight-package repair, machine-readable
+  intentional omissions, update procedure, negative fixtures, and docs-verification integration.

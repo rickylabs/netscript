@@ -85,3 +85,8 @@ W3 preflights now live under `slices/w3-a-1326/`, `slices/w3-b-1102-1197/`, and
 `slices/w3-c-1119/`. W3-A remains held on W2-B; W3-B remains held on W1-C and reserves #1197 for an
 instrumented post-publish hand-close rather than a code PR; W3-C preserves active-versus-historical
 provenance during the model-rollout canary rename. None is dispatched.
+
+W4 preflights now live under `slices/w4-a-1333/`, `slices/w4-b-1208/`, and `slices/w4-c-1108/`.
+W4-A includes the required GLM design checkpoint and holds #1333's measured-agent acceptance for
+orchestrator hand-close; W4-B is dependency-locked behind W4-A and does not prematurely close
+#1208's unresolved Phase 2; W4-C reuses #1292's live export-map authority. All remain behind C15.
