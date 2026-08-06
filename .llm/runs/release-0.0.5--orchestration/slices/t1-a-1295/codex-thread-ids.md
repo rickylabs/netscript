@@ -3,7 +3,8 @@
 - thread id: `019fcd0c-9cda-7641-9479-3d1c72358154`
 - worktree: `/home/codex/repos/ns005-streamdb`
 - branch: `fix/zod-v4-npm-alignment-1295`
-- observed provider/model/effort: `openai` / `gpt-5.6-sol` / `low`
+- observed provider/model/effort: inherited thread `openai` / `gpt-5.6-sol` / `low`; resumed active
+  turn `openai` / `gpt-5.6-sol` / `medium` (C-D9)
 - permissions: bypass (`approval=never`, `sandbox=danger-full-access`)
 - ownership: inherited durable sender; new launch refused `duplicate_sender_risk`, then the exact
   owner thread was resumed through `agentic:codex-resume`

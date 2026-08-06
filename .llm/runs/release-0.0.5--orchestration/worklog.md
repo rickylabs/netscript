@@ -102,6 +102,10 @@ files.
 - The managed app-server daemon is running. Phone/tmux remains failed/not-attached; supported
   runtime repair dry-run refused with `active_session`, and no background shell is presented as
   observability.
+- Live post-resume status exposed C-D9: both active implementation turns are Sol medium because
+  `agentic:codex-resume` has no effort override and used the default. Their inherited threads were
+  originally Sol low, but the current turns are not. The mismatch is explicit; separate Qwen
+  IMPL-EVAL remains mandatory, and later lanes will launch as new sender-free Sol-low threads.
 - Preserved T1-B's unrelated lock churn in stash commit `7eb4ed16d6944c1d1c904895bcb76b4361ad8a57`.
   The current leak reporter found foreign/unproven survivors only; none were mutated.
 - Reconciled #1295/#1315 and #1189/#1316 to exactly one active lifecycle label, `status:impl`, and

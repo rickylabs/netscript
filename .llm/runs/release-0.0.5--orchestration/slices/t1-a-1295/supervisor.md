@@ -10,8 +10,9 @@
   with `active_session`, so no background-shell substitute is advertised as observable.
 - Durable thread: `019fcd0c-9cda-7641-9479-3d1c72358154` (existing worktree owner; resumed, never
   forked)
-- Observed route: `openai` / `gpt-5.6-sol` / `low`, approval `never`, sandbox `danger-full-access`,
-  from the thread rollout
+- Observed route at inherited thread creation: `openai` / `gpt-5.6-sol` / `low`, approval `never`,
+  sandbox `danger-full-access`. Live status after `agentic:codex-resume` reports the active turn as
+  `medium`; this unplanned resume drift is C-D9 and is not represented as a low-effort turn.
 - App-server proof: managed Codex 0.146.1 daemon running; worktree status resolved through
   `agentic:codex-status`
 - Same-thread steering:
