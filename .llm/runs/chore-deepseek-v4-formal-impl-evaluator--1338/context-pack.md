@@ -8,7 +8,7 @@
 | Issue | #1338 |
 | Branch | `chore/deepseek-v4-formal-impl-evaluator-1338` |
 | Base | `canary/0.0.5-canary.14` @ `2508eb8c99c9cfc55e0c9f1d7ab72fea745db492` |
-| Phase | S1 implemented and gated; review/sign-off pending |
+| Phase | S1 implemented and ordinary REVIEW passed; S2 next |
 | Archetype | N/A — maintainer agentic tooling |
 | Overlay | docs / generated skills |
 
@@ -59,6 +59,8 @@ Make pending/future formal IMPL-EVAL resolve `deepseek/deepseek-v4-flash-0731` a
 Formal PLAN-EVAL passed in fresh separate Minimax M3 high session
 `a583f0da-69b3-4717-8271-bca95d9cd2db` against exact clean planning head
 `258034b1f9842bae781ca7e5eecffc2c61af13e4`; its complete verdict is `plan-eval.md`.
-S1 awaits separate ordinary review and supervisor sign-off under orchestrator control; this S1 turn
-did not launch them and does not self-certify. S2 canary schema/live proof remains wholly pending.
-Do not begin S2/S3, formal IMPL-EVAL, merge, publish, or touch `deno.lock` in this handoff.
+S1 separately passed owner-authorized OpenRouter Grok 4.5 medium ordinary review in fresh bypass
+session `bad4a807-6399-4af8-b97b-2cbbb8d0cdb5` against exact clean PR head
+`f2bc222667b369b1749248a7b74befa2e08e9da8`. Proceed to S2 bounded canary evidence schema and exact
+live DeepSeek max proof. The advisory review is not formal evaluation; IMPL-EVAL remains pending
+until S1–S3 and the live proof are complete.

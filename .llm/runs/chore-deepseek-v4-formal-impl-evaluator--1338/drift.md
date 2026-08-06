@@ -77,3 +77,15 @@ Prior #1331 run artifacts and completed 0.0.5 Qwen evaluator evidence are immuta
   orchestrator therefore uses the same owner-authorized Grok 4.5 model/medium effort through the
   checked-in agentic Codex OpenRouter launcher, with a fresh session and explicit requested/observed
   identity. This is a supported-runtime transport repair, not a route substitution.
+
+## D-8 — Review transport/lock repair provenance
+
+- Date: 2026-08-06
+- The first local Codex OpenRouter attempt matched Grok/medium identity but failed before inference
+  for missing child credentials and exposed `on-request`/`readOnly`, so it was excluded under the
+  bypass launch contract. The valid fresh review used the checked-in credential-isolated Claude
+  gateway, preserved the same Grok/medium route, and observed `bypassPermissions`.
+- Both launcher initialization and one reviewer scoped-check subprocess resolved the isolated
+  review worktree lock. Each delta was attributed and restored only in that review worktree to
+  exact HEAD blob `ef28b1b...`; implementation, root, and T1-B protected worktrees were untouched.
+  The valid review finished clean and emitted advisory `PASS`.

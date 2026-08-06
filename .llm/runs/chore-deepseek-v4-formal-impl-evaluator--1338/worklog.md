@@ -142,3 +142,29 @@ Status: **LOCKED BY GENERATOR; NOT APPROVED**.
 
 S1 automated gates are green, but S1 is **not reviewed or self-certified**. No ordinary review,
 formal evaluation, Actions, S2/S3, merge, canary, publication, or issue closure was launched.
+
+## 2026-08-06 — S1 ordinary adversarial REVIEW PASS
+
+- The canonical OpenHands dispatcher posted owner-authorized Grok trigger comment `5208807248`,
+  but GitHub materialized no Actions run/status comment during bounded observation. No evidence was
+  accepted from that trigger.
+- A fresh Codex OpenRouter launcher attempt in the isolated review worktree failed before inference:
+  thread `019fd8b7-d5a7-7ec2-a255-0e10276d9ade` lacked child credential injection and observed
+  `on-request`/`readOnly`, so it failed the bypass launch contract and is excluded. Its run-owned
+  lock churn was restored only in that review worktree.
+- Launched the same owner-authorized route through the checked-in credential-isolated gateway in
+  tmux `ns1338-grok-review-gateway`: fresh session
+  `bad4a807-6399-4af8-b97b-2cbbb8d0cdb5`, requested/observed OpenRouter/xAI
+  `x-ai/grok-4.5`, effort `medium`, `bypassPermissions`, exact clean PR head
+  `f2bc222667b369b1749248a7b74befa2e08e9da8`; cost `unavailable`.
+- The reviewer returned advisory `REVIEW PASS` with no blocking findings. It independently verified
+  Minimax PLAN high, DeepSeek IMPL max, active-formal Qwen removal, fail-closed negative coverage,
+  typed guard integrity, and bounded diff scope. The complete evaluator-authored body is
+  `review-s1/review.md`; two trailing Markdown hard breaks were normalized to blank lines so the
+  repository whitespace gate remains clean.
+- Reviewer gates: focused provider/routing/routing-state tests 42 passed/0 failed; scoped check 149
+  files/0 errors. An intermediate review-local check resolved its isolated lock; the reviewer
+  restored only that lock and finished clean at exact blob `ef28b1b...`. Implementation/root/T1-B
+  worktrees were untouched.
+- S1 is signed off for S2. This advisory PASS is not formal IMPL-EVAL and does not authorize merge,
+  lifecycle `ready-merge`, canary publication, or issue closure.
