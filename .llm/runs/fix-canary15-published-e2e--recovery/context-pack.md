@@ -5,6 +5,9 @@
 - Release workflow: https://github.com/rickylabs/netscript/actions/runs/31196590524
 - Pinned E2E: https://github.com/rickylabs/netscript/actions/runs/31196896495
 - Owning issue: https://github.com/rickylabs/netscript/issues/1345
+- Repair PR: https://github.com/rickylabs/netscript/pull/1346
+- Frozen implementation head: `8f1c5785171938583f30c1a0a089bd296fb550d3`
+- Local release gates: published quickstart 10/10 and canonical `scaffold.runtime` 76/76, both exit 0.
 - Deferred external-checkout observation: #1343, milestone 0.0.6, untouched
 - Writer: this sole root thread; no OpenHands or duplicate orchestrator
 - Protected coordination/release locks and foreign worktrees remain untouched.
