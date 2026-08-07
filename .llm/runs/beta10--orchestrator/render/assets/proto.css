@@ -1,0 +1,1107 @@
+/* ---------------------------------------------------------------------------
+ * NetScript Dev Dashboard — prototype pass 1, net-new CSS.
+ *
+ * Tokens only (--ns-*). Theme-blind: light is the unthemed default, dark is
+ * carried entirely by the token overrides under [data-theme='dark'] — nothing
+ * in this file branches on theme. Missing shades derive via color-mix().
+ *
+ * Sync-back candidates (class contract ns-<block>__<part>, state via data-*):
+ *   ns-waterfall · ns-stackmap · ns-step-timeline · ns-log-stream
+ *   ns-entity-rail · ns-tree-nav · ns-connector · ns-activity-feed
+ *   ns-plugin-gated-view
+ * Screen-local glue (NOT sync-back candidates):
+ *   ns-envbar · ns-tabs (skin for the headless Tabs primitive) · ns-rail-grid
+ * ------------------------------------------------------------------------- */
+
+/* ------------------------------------------------------------------ *
+ * ns-envbar — topbar environment identity (glue)
+ * ------------------------------------------------------------------ */
+
+.ns-envbar {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ns-space-2);
+  padding: var(--ns-space-1) var(--ns-space-2-5);
+  border: 1px solid var(--ns-border);
+  border-radius: var(--ns-radius-full);
+  background: var(--ns-surface);
+  font-family: var(--ns-font-mono);
+  font-size: var(--ns-text-2xs);
+  color: var(--ns-muted-fg);
+  white-space: nowrap;
+}
+
+.ns-envbar__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--ns-radius-full);
+  background: var(--ns-success);
+  flex: none;
+}
+
+.ns-envbar[data-state='degraded'] .ns-envbar__dot {
+  background: var(--ns-warning);
+}
+
+.ns-envbar__seg + .ns-envbar__seg::before {
+  content: '·';
+  margin-right: var(--ns-space-2);
+  color: color-mix(in oklab, var(--ns-muted-fg), transparent 55%);
+}
+
+.ns-envbar__seg[data-part='app'] {
+  color: var(--ns-fg);
+  font-weight: 500;
+}
+
+/* ------------------------------------------------------------------ *
+ * ns-tabs — skin for the headless Tabs primitive (glue)
+ * ------------------------------------------------------------------ */
+
+.ns-tabs__list {
+  display: inline-flex;
+  gap: var(--ns-space-1);
+  padding: var(--ns-space-1);
+  background: var(--ns-muted);
+  border-radius: var(--ns-radius-md);
+}
+
+.ns-tabs__trigger {
+  border: 0;
+  background: transparent;
+  padding: var(--ns-space-1) var(--ns-space-3);
+  border-radius: var(--ns-radius-sm);
+  font-family: var(--ns-font-sans);
+  font-size: var(--ns-text-xs);
+  font-weight: 500;
+  color: var(--ns-muted-fg);
+  cursor: pointer;
+  transition: color 120ms var(--ns-ease-fast), background 120ms var(--ns-ease-fast);
+}
+
+.ns-tabs__trigger:hover {
+  color: var(--ns-fg);
+}
+
+.ns-tabs__trigger[data-state='active'] {
+  background: var(--ns-card);
+  color: var(--ns-fg);
+  box-shadow: var(--ns-shadow-xs);
+}
+
+.ns-tabs__trigger:focus-visible {
+  outline: 2px solid var(--ns-ring);
+  outline-offset: 1px;
+}
+
+.ns-tabs__content {
+  min-width: 0;
+}
+
+/* ------------------------------------------------------------------ *
+ * ns-page-header--console — density variant for in-shell console pages
+ * (sync-back candidate as a PageHeader variant)
+ * ------------------------------------------------------------------ */
+
+.ns-page-header--console {
+  padding-block: var(--ns-space-2) var(--ns-space-5);
+}
+
+.ns-page-header--console h1 {
+  font-size: var(--ns-text-2xl);
+}
+
+/* ------------------------------------------------------------------ *
+ * ns-rail-grid — two-column list-rail page layout (glue)
+ * ------------------------------------------------------------------ */
+
+.ns-rail-grid {
+  display: grid;
+  gap: var(--ns-space-6);
+  align-items: start;
+  min-width: 0;
+}
+
+/* Screen glue: StatsGrid uses viewport breakpoints (md:/xl:), which overshoot
+ * inside the rail's ~28rem content column — four columns of clipped labels.
+ * Cap it at two columns here; the component-level container-query fix is
+ * routed to issue 509. */
+.ns-rail-grid [class~='xl:grid-cols-4'] {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (min-width: 1024px) {
+  .ns-rail-grid {
+    grid-template-columns: 18rem minmax(0, 1fr);
+  }
+
+  .ns-rail-grid--sm {
+    grid-template-columns: 15rem minmax(0, 1fr);
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ * ns-entity-rail — generic entity list rail (promote-set)
+ * ------------------------------------------------------------------ */
+
+.ns-entity-rail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ns-space-0-5);
+  min-width: 0;
+}
+
+.ns-entity-rail__item {
+  display: grid;
+  gap: var(--ns-space-0-5);
+  padding: var(--ns-space-2) var(--ns-space-3);
+  border: 1px solid transparent;
+  border-radius: var(--ns-radius-md);
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  min-width: 0;
+}
+
+.ns-entity-rail__item:hover {
+  background: var(--ns-surface-raised);
+}
+
+.ns-entity-rail__item[data-state='selected'] {
+  background: var(--ns-primary-subtle);
+  border-color: var(--ns-primary-border);
+}
+
+.ns-entity-rail__item:focus-visible {
+  outline: 2px solid var(--ns-ring);
+  outline-offset: 1px;
+}
+
+.ns-entity-rail__title {
+  display: flex;
+  align-items: center;
+  gap: var(--ns-space-2);
+  font-size: var(--ns-text-sm);
+  font-weight: 500;
+  color: var(--ns-fg);
+  min-width: 0;
+}
+
+.ns-entity-rail__title > span:first-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.ns-entity-rail__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--ns-space-2);
+  font-family: var(--ns-font-mono);
+  font-size: var(--ns-text-2xs);
+  color: var(--ns-muted-fg);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+/* ------------------------------------------------------------------ *
+ * ns-tree-nav — collapsible two-level tree navigation (promote-set)
+ * ------------------------------------------------------------------ */
+
+.ns-tree-nav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ns-space-1);
+  min-width: 0;
+}
+
+.ns-tree-nav__group > summary {
+  display: flex;
+  align-items: center;
+  gap: var(--ns-space-2);
+  padding: var(--ns-space-1-5) var(--ns-space-2);
+  border-radius: var(--ns-radius-md);
+  font-size: var(--ns-text-sm);
+  font-weight: 500;
+  color: var(--ns-fg);
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+
+.ns-tree-nav__group > summary::-webkit-details-marker {
+  display: none;
+}
+
+.ns-tree-nav__group > summary::before {
+  content: '▸';
+  font-size: var(--ns-text-2xs);
+  color: var(--ns-muted-fg);
+  transition: transform 120ms var(--ns-ease-fast);
+}
+
+.ns-tree-nav__group[open] > summary::before {
+  transform: rotate(90deg);
+}
+
+.ns-tree-nav__group > summary:hover {
+  background: var(--ns-surface-raised);
+}
+
+.ns-tree-nav__count {
+  margin-left: auto;
+  font-family: var(--ns-font-mono);
+  font-size: var(--ns-text-3xs);
+  color: var(--ns-muted-fg);
+}
+
+.ns-tree-nav__items {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  margin: var(--ns-space-0-5) 0 var(--ns-space-1);
+  padding-left: var(--ns-space-4);
+  border-left: 1px solid var(--ns-border);
+  margin-left: var(--ns-space-2-5);
+}
+
+.ns-tree-nav__item {
+  display: flex;
+  align-items: center;
+  gap: var(--ns-space-2);
+  padding: var(--ns-space-1) var(--ns-space-2);
+  border: 0;
+  border-radius: var(--ns-radius-sm);
+  background: transparent;
+  font-family: var(--ns-font-mono);
+  font-size: var(--ns-text-xs);
+  color: var(--ns-muted-fg);
+  text-align: left;
+  cursor: pointer;
+  min-width: 0;
+}
+
+.ns-tree-nav__item:hover {
+  background: var(--ns-surface-raised);
+  color: var(--ns-fg);
+}
+
+.ns-tree-nav__item[data-state='selected'] {
+  background: var(--ns-primary-subtle);
+  color: var(--ns-fg);
+}
+
+.ns-tree-nav__item:focus-visible {
+  outline: 2px solid var(--ns-ring);
+  outline-offset: 1px;
+}
+
+.ns-tree-nav__group[data-state='gated'] > summary {
+  color: var(--ns-muted-fg);
+}
+
+/* ------------------------------------------------------------------ *
+ * ns-connector — connection / probe status unit (promote-set)
+ * ------------------------------------------------------------------ */
+
+.ns-connector {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ns-space-1);
+}
+
+.ns-connector__row {
+  display: flex;
+  align-items: center;
+  gap: var(--ns-space-2);
+  font-family: var(--ns-font-mono);
+  font-size: var(--ns-text-2xs);
+  min-width: 0;
+}
+
+.ns-connector__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--ns-radius-full);
+  background: var(--ns-success);
+  flex: none;
+}
+
+.ns-connector__row[data-state='degraded'] .ns-connector__dot {
+  background: var(--ns-warning);
+}
+
+.ns-connector__row[data-state='failed'] .ns-connector__dot {
+  background: var(--ns-destructive);
+}
+
+.ns-connector__probe {
+  color: var(--ns-fg);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.ns-connector__result {
+  margin-left: auto;
+  color: var(--ns-muted-fg);
+  white-space: nowrap;
+}
+
+.ns-connector__row[data-state='degraded'] .ns-connector__result {
+  color: var(--ns-warning);
+}
+
+.ns-connector__row[data-state='failed'] .ns-connector__result {
+  color: var(--ns-destructive);
+}
+
+/* ------------------------------------------------------------------ *
+ * ns-activity-feed — generic event feed (promote-set)
+ * ------------------------------------------------------------------ */
+
+.ns-activity-feed {
+  display: flex;
+  flex-direction: column;
+}
+
+.ns-activity-feed__item {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: var(--ns-space-3);
+  padding: var(--ns-space-1-5) 0;
+}
+
+.ns-activity-feed__item::before {
+  content: '';
+  position: absolute;
+  left: 3px;
+  top: calc(var(--ns-space-1-5) + 12px);
+  bottom: calc(-1 * var(--ns-space-1-5));
+  width: 1px;
+  background: var(--ns-border);
+}
+
+.ns-activity-feed__item:last-child::before {
+  display: none;
+}
+
+.ns-activity-feed__marker {
+  width: 7px;
+  height: 7px;
+  margin-top: 5px;
+  border-radius: var(--ns-radius-full);
+  background: var(--ns-border-strong);
+  flex: none;
+}
+
+.ns-activity-feed__item[data-tone='success'] .ns-activity-feed__marker {
+  background: var(--ns-success);
+}
+
+.ns-activity-feed__item[data-tone='warning'] .ns-activity-feed__marker {
+  background: var(--ns-warning);
+}
+
+.ns-activity-feed__item[data-tone='destructive'] .ns-activity-feed__marker {
+  background: var(--ns-destructive);
+}
+
+.ns-activity-feed__item[data-tone='primary'] .ns-activity-feed__marker {
+  background: var(--ns-primary);
+}
+
+.ns-activity-feed__body {
+  display: grid;
+  gap: var(--ns-space-0-5);
+  min-width: 0;
+}
+
+.ns-activity-feed__text {
+  font-size: var(--ns-text-xs);
+  color: var(--ns-fg);
+  line-height: var(--ns-leading-snug);
+  overflow-wrap: anywhere;
+}
+
+.ns-activity-feed__time {
+  font-family: var(--ns-font-mono);
+  font-size: var(--ns-text-3xs);
+  color: var(--ns-muted-fg);
+}
+
+/* ------------------------------------------------------------------ *
+ * ns-plugin-gated-view — plugin-availability gate (promote-set)
+ * ------------------------------------------------------------------ */
+
+.ns-plugin-gated-view[data-state='not-installed'] {
+  display: grid;
+  gap: var(--ns-space-3);
+  justify-items: start;
+  padding: var(--ns-space-8) var(--ns-space-6);
+  border: 1px dashed var(--ns-border-strong);
+  border-radius: var(--ns-radius-lg);
+  background: color-mix(in oklab, var(--ns-surface), transparent 40%);
+}
+
+.ns-plugin-gated-view__title {
+  font-size: var(--ns-text-base);
+  font-weight: 600;
+  color: var(--ns-fg);
+}
+
+.ns-plugin-gated-view__desc {
+  font-size: var(--ns-text-sm);
+  color: var(--ns-muted-fg);
+  max-width: 44ch;
+  line-height: var(--ns-leading-relaxed);
+}
+
+.ns-plugin-gated-view__cmd {
+  width: 100%;
+  max-width: 30rem;
+}
+
+/* ------------------------------------------------------------------ *
+ * ns-waterfall — proportional trace waterfall (new-component)
+ * ------------------------------------------------------------------ */
+
+.ns-waterfall {
+  --waterfall-label-col: 19rem;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  container: ns-waterfall / inline-size;
+}
+
+.ns-waterfall__axis {
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--waterfall-label-col) minmax(0, 1fr);
+  gap: var(--ns-space-3);
+  height: var(--ns-space-6);
+  margin-bottom: var(--ns-space-1);
+  border-bottom: 1px solid var(--ns-border);
+}
+
+.ns-waterfall__axis-track {
+  position: relative;
+}
+
+.ns-waterfall__tick {
+  position: absolute;
+  bottom: 0;
+  transform: translateX(-50%);
+  font-family: var(--ns-font-mono);
+  font-size: var(--ns-text-3xs);
+  color: var(--ns-muted-fg);
+  padding-bottom: var(--ns-space-0-5);
+  white-space: nowrap;
+}
+
+.ns-waterfall__tick::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: calc(-1 * var(--ns-space-0-5));
+  width: 1px;
+  height: var(--ns-space-1);
+  background: var(--ns-border-strong);
+}
+
+.ns-waterfall__tick:first-child {
+  transform: none;
+}
+
+.ns-waterfall__tick:first-child::after {
+  left: 0;
+}
+
+/* A narrow waterfall leaves the axis track too tight for five labels — the
+ * quarter ticks collide into a garble. The constraint is the component's own
+ * width (it sits in a three-column shell), so gate on the container: keep
+ * only the 0 / total endpoints and shrink the label column so the track
+ * keeps proportional room. */
+@container ns-waterfall (max-width: 46rem) {
+  .ns-waterfall__axis,
+  .ns-waterfall__row {
+    grid-template-columns: 11rem minmax(0, 1fr);
+  }
+
+  .ns-waterfall__tick:not(:first-child):not(:last-child) {
+    display: none;
+  }
+}
+
+.ns-waterfall__row {
+  display: grid;
+  grid-template-columns: var(--waterfall-label-col) minmax(0, 1fr);
+  gap: var(--ns-space-3);
+  align-items: center;
+  padding: 2px var(--ns-space-1) 2px 0;
+  border: 0;
+  border-radius: var(--ns-radius-sm);
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  min-width: 0;
+}
+
+.ns-waterfall__row:hover {
+  background: var(--ns-surface-raised);
+}
+
+.ns-waterfall__row[aria-selected='true'] {
+  background: var(--ns-primary-subtle);
+  box-shadow: inset 2px 0 0 var(--ns-primary);
+}
+
+.ns-waterfall__row:focus-visible {
+  outline: 2px solid var(--ns-ring);
+  outline-offset: -2px;
+}
+
+.ns-waterfall__label {
+  display: flex;
+  align-items: center;
+  gap: var(--ns-space-2);
+  min-width: 0;
+  font-size: var(--ns-text-xs);
+  color: var(--ns-fg);
+}
+
+.ns-waterfall__label > span:last-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.ns-waterfall__row[data-depth='1'] .ns-waterfall__label { padding-left: var(--ns-space-5); }
+.ns-waterfall__row[data-depth='2'] .ns-waterfall__label { padding-left: var(--ns-space-10); }
+.ns-waterfall__row[data-depth='3'] .ns-waterfall__label { padding-left: var(--ns-space-14); }
+
+.ns-waterfall__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: var(--ns-radius-sm);
+  flex: none;
+}
+
+.ns-waterfall__track {
+  position: relative;
+  height: 20px;
+  min-width: 0;
+}
+
+.ns-waterfall__bar {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  min-width: 2px;
+  border-radius: var(--ns-radius-sm);
+}
+
+.ns-waterfall__row[data-state='running'] .ns-waterfall__bar {
+  animation: ns-waterfall-pulse 1.6s var(--ns-ease-normal) infinite;
+}
+
+.ns-waterfall__duration {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  padding-left: var(--ns-space-1-5);
+  font-family: var(--ns-font-mono);
+  font-size: var(--ns-text-3xs);
+  color: var(--ns-muted-fg);
+  white-space: nowrap;
+}
+
+@keyframes ns-waterfall-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ns-waterfall__row[data-state='running'] .ns-waterfall__bar {
+    animation: none;
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ * ns-stackmap — infrastructure graph (new-component)
+ * ------------------------------------------------------------------ */
+
+.ns-stackmap {
+  position: relative;
+  min-width: 0;
+}
+
+.ns-stackmap__canvas {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--ns-space-8) var(--ns-space-12);
+  align-items: start;
+  padding: var(--ns-space-4) var(--ns-space-2);
+}
+
+.ns-stackmap__edge-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.ns-stackmap__edge {
+  fill: none;
+  stroke: var(--ns-border-strong);
+  stroke-width: 1.5;
+}
+
+.ns-stackmap__edge[data-state='active'] {
+  stroke: var(--ns-primary);
+  stroke-width: 2;
+}
+
+.ns-stackmap__node {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: var(--ns-space-2);
+  padding: var(--ns-space-3) var(--ns-space-4);
+  border: 1px solid var(--ns-border);
+  border-radius: var(--ns-radius-lg);
+  background: var(--ns-card);
+  box-shadow: var(--ns-shadow-xs);
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  min-width: 0;
+}
+
+.ns-stackmap__node:hover {
+  border-color: var(--ns-border-hover);
+  box-shadow: var(--ns-shadow-sm);
+}
+
+.ns-stackmap__node[aria-pressed='true'] {
+  border-color: var(--ns-primary);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--ns-ring), transparent 70%);
+}
+
+.ns-stackmap__node:focus-visible {
+  outline: 2px solid var(--ns-ring);
+  outline-offset: 2px;
+}
+
+.ns-stackmap__node[data-state='degraded'] {
+  border-color: var(--ns-warning-border);
+  background: color-mix(in oklab, var(--ns-card), var(--ns-warning) 3%);
+}
+
+.ns-stackmap__node[data-state='failed'] {
+  border-color: var(--ns-destructive-border);
+  background: color-mix(in oklab, var(--ns-card), var(--ns-destructive) 3%);
+}
+
+.ns-stackmap__node[data-state='stopped'] {
+  border-style: dashed;
+  background: var(--ns-surface);
+  color: var(--ns-muted-fg);
+}
+
+.ns-stackmap__node[data-kind='database'],
+.ns-stackmap__node[data-kind='cache'],
+.ns-stackmap__node[data-kind='container'] {
+  background: var(--ns-surface);
+}
+
+.ns-stackmap__node[data-kind='database'][data-state='degraded'],
+.ns-stackmap__node[data-kind='cache'][data-state='degraded'],
+.ns-stackmap__node[data-kind='container'][data-state='degraded'] {
+  background: color-mix(in oklab, var(--ns-surface), var(--ns-warning) 4%);
+}
+
+.ns-stackmap__node-title {
+  display: flex;
+  align-items: center;
+  gap: var(--ns-space-2);
+  font-size: var(--ns-text-sm);
+  font-weight: 600;
+  color: var(--ns-fg);
+  min-width: 0;
+}
+
+.ns-stackmap__node-title > span:nth-child(2) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.ns-stackmap__node-icon {
+  color: var(--ns-muted-fg);
+  flex: none;
+}
+
+.ns-stackmap__node-state {
+  margin-left: auto;
+  width: 7px;
+  height: 7px;
+  border-radius: var(--ns-radius-full);
+  background: var(--ns-success);
+  flex: none;
+}
+
+.ns-stackmap__node[data-state='degraded'] .ns-stackmap__node-state {
+  background: var(--ns-warning);
+}
+
+.ns-stackmap__node[data-state='failed'] .ns-stackmap__node-state {
+  background: var(--ns-destructive);
+}
+
+.ns-stackmap__node[data-state='starting'] .ns-stackmap__node-state {
+  background: var(--ns-primary);
+}
+
+.ns-stackmap__node[data-state='stopped'] .ns-stackmap__node-state {
+  background: var(--ns-border-strong);
+}
+
+.ns-stackmap__node-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ns-space-1) var(--ns-space-2);
+  font-family: var(--ns-font-mono);
+  font-size: var(--ns-text-2xs);
+  color: var(--ns-muted-fg);
+}
+
+@media (max-width: 860px) {
+  .ns-stackmap__canvas {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--ns-space-5);
+  }
+
+  .ns-stackmap__edge-layer {
+    display: none;
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ * ns-step-timeline — run step timeline (new-block)
+ * ------------------------------------------------------------------ */
+
+.ns-step-timeline {
+  display: flex;
+  flex-direction: column;
+}
+
+.ns-step-timeline__step {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: var(--ns-space-3);
+  padding: var(--ns-space-2) 0;
+}
+
+.ns-step-timeline__step::before {
+  content: '';
+  position: absolute;
+  left: 7px;
+  top: calc(var(--ns-space-2) + 18px);
+  bottom: calc(-1 * var(--ns-space-2));
+  width: 1px;
+  background: var(--ns-border);
+}
+
+.ns-step-timeline__step:last-child::before {
+  display: none;
+}
+
+.ns-step-timeline__marker {
+  width: 15px;
+  height: 15px;
+  margin-top: 2px;
+  border-radius: var(--ns-radius-full);
+  border: 2px solid var(--ns-border-strong);
+  background: var(--ns-bg);
+  flex: none;
+}
+
+.ns-step-timeline__step[data-state='completed'] .ns-step-timeline__marker {
+  border-color: var(--ns-success);
+  background: var(--ns-success-subtle);
+}
+
+.ns-step-timeline__step[data-state='running'] .ns-step-timeline__marker {
+  border-color: var(--ns-primary);
+  background: var(--ns-primary-subtle);
+  animation: ns-step-pulse 1.6s var(--ns-ease-normal) infinite;
+}
+
+.ns-step-timeline__step[data-state='failed'] .ns-step-timeline__marker {
+  border-color: var(--ns-destructive);
+  background: var(--ns-destructive-subtle);
+}
+
+.ns-step-timeline__step[data-state='retrying'] .ns-step-timeline__marker {
+  border-color: var(--ns-warning);
+  background: var(--ns-warning-subtle);
+}
+
+.ns-step-timeline__step[data-state='queued'] .ns-step-timeline__marker {
+  border-style: dashed;
+}
+
+@keyframes ns-step-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in oklab, var(--ns-primary), transparent 60%); }
+  70% { box-shadow: 0 0 0 5px color-mix(in oklab, var(--ns-primary), transparent 100%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ns-step-timeline__step[data-state='running'] .ns-step-timeline__marker {
+    animation: none;
+  }
+}
+
+.ns-step-timeline__main {
+  display: grid;
+  gap: var(--ns-space-1);
+  min-width: 0;
+}
+
+.ns-step-timeline__title {
+  display: flex;
+  align-items: center;
+  gap: var(--ns-space-2);
+  font-size: var(--ns-text-sm);
+  font-weight: 500;
+  color: var(--ns-fg);
+  min-width: 0;
+}
+
+.ns-step-timeline__step[data-state='queued'] .ns-step-timeline__title {
+  color: var(--ns-muted-fg);
+  font-weight: 400;
+}
+
+.ns-step-timeline__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ns-space-2);
+  font-family: var(--ns-font-mono);
+  font-size: var(--ns-text-2xs);
+  color: var(--ns-muted-fg);
+}
+
+.ns-step-timeline__attempts {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 var(--ns-space-1-5);
+  border: 1px solid var(--ns-border);
+  border-radius: var(--ns-radius-full);
+  font-family: var(--ns-font-mono);
+  font-size: var(--ns-text-3xs);
+  line-height: 1.6;
+  color: var(--ns-muted-fg);
+}
+
+.ns-step-timeline__step[data-state='retrying'] .ns-step-timeline__attempts,
+.ns-step-timeline__step[data-state='failed'] .ns-step-timeline__attempts {
+  border-color: var(--ns-warning-border);
+  background: var(--ns-warning-subtle);
+  color: var(--ns-warning);
+}
+
+.ns-step-timeline__body {
+  margin-top: var(--ns-space-1);
+  min-width: 0;
+}
+
+.ns-step-timeline__body > summary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ns-space-1);
+  font-family: var(--ns-font-mono);
+  font-size: var(--ns-text-2xs);
+  color: var(--ns-muted-fg);
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+
+.ns-step-timeline__body > summary::-webkit-details-marker {
+  display: none;
+}
+
+.ns-step-timeline__body > summary::before {
+  content: '▸';
+  font-size: var(--ns-text-3xs);
+}
+
+.ns-step-timeline__body[open] > summary::before {
+  content: '▾';
+}
+
+.ns-step-timeline__body > summary:hover {
+  color: var(--ns-fg);
+}
+
+.ns-step-timeline__io {
+  display: grid;
+  gap: var(--ns-space-2);
+  margin-top: var(--ns-space-2);
+}
+
+/* compact view: hide payload disclosure, tighten rhythm */
+.ns-step-timeline[data-view='compact'] .ns-step-timeline__body {
+  display: none;
+}
+
+.ns-step-timeline[data-view='compact'] .ns-step-timeline__step {
+  padding: var(--ns-space-1) 0;
+}
+
+.ns-step-timeline[data-view='compact'] .ns-step-timeline__step::before {
+  top: calc(var(--ns-space-1) + 18px);
+  bottom: calc(-1 * var(--ns-space-1));
+}
+
+/* ------------------------------------------------------------------ *
+ * ns-log-stream — structured log tail (new-block)
+ * ------------------------------------------------------------------ */
+
+.ns-log-stream {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--ns-border);
+  border-radius: var(--ns-radius-md);
+  background: var(--ns-surface);
+  overflow: hidden;
+}
+
+.ns-log-stream__toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--ns-space-3);
+  padding: var(--ns-space-1-5) var(--ns-space-3);
+  border-bottom: 1px solid var(--ns-border);
+  background: var(--ns-surface-raised);
+}
+
+.ns-log-stream__lines {
+  display: flex;
+  flex-direction: column;
+  padding: var(--ns-space-1) 0;
+  overflow-x: auto;
+}
+
+.ns-log-stream__line {
+  display: grid;
+  grid-template-columns: 7.5rem 5.5rem 3.5rem minmax(0, 1fr);
+  column-gap: var(--ns-space-3);
+  padding: 2px var(--ns-space-3);
+  font-family: var(--ns-font-mono);
+  font-size: var(--ns-text-2xs);
+  line-height: var(--ns-leading-snug);
+}
+
+.ns-log-stream__line:hover {
+  background: var(--ns-surface-raised);
+}
+
+.ns-log-stream__ts {
+  color: var(--ns-muted-fg);
+  white-space: nowrap;
+}
+
+.ns-log-stream__resource {
+  color: var(--ns-fg);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.ns-log-stream__severity {
+  text-transform: uppercase;
+  letter-spacing: var(--ns-label-tracking);
+  white-space: nowrap;
+}
+
+.ns-log-stream__line[data-severity='debug'] .ns-log-stream__severity {
+  color: color-mix(in oklab, var(--ns-muted-fg), transparent 25%);
+}
+
+.ns-log-stream__line[data-severity='info'] .ns-log-stream__severity {
+  color: var(--ns-primary);
+}
+
+.ns-log-stream__line[data-severity='warn'] .ns-log-stream__severity {
+  color: var(--ns-warning);
+}
+
+.ns-log-stream__line[data-severity='error'] .ns-log-stream__severity {
+  color: var(--ns-destructive);
+}
+
+.ns-log-stream__line[data-severity='error'] {
+  background: var(--ns-destructive-subtle);
+}
+
+.ns-log-stream__msg {
+  color: var(--ns-fg);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* ------------------------------------------------------------------ */
+/* Screen-local glue: selectable endpoint rows (catalog DataTable)     */
+/* ------------------------------------------------------------------ */
+
+.ns-ep-row {
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 120ms ease;
+}
+
+.ns-ep-row:hover {
+  background: var(--ns-muted);
+}
+
+.ns-ep-row[aria-selected='true'] {
+  background: var(--ns-primary-subtle);
+  box-shadow: inset 2px 0 0 0 var(--ns-primary);
+}
+
+.ns-ep-row__name {
+  font-family: var(--ns-font-mono);
+  font-size: var(--ns-text-xs);
+  color: var(--ns-fg);
+  overflow-wrap: anywhere;
+}
+
+.ns-ep-row__summary {
+  font-size: var(--ns-text-xs);
+  color: var(--ns-muted-fg);
+}
+
+.ns-ep-row__p95 {
+  font-family: var(--ns-font-mono);
+  font-size: var(--ns-text-2xs);
+  color: var(--ns-muted-fg);
+  text-align: right;
+  align-self: center;
+}
