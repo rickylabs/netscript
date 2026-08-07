@@ -259,3 +259,27 @@ Post-slice trail reconciliation:
   unrelated label preserved;
 - the worktree was clean after the product commit and root `deno.lock` remained absent from status
   and from the base-to-head diff.
+
+## Slice 3 — consumer/runtime closure
+
+Static/package gates at the Slice 2 head passed before the runtime proof: `quality:gate` exited 0
+with no quality or doctrine failures; CLI doc-lint reported zero diagnostics across three exports;
+asset generation was fresh; and the CLI package publish dry-run ended `Success Dry run complete`
+with only its existing dynamic-import warnings.
+
+The first exact released consumer probe exposed two post-#1092 realities and they are recorded in
+`drift.md`. Stable `0.0.4` passed 22 steps but the installed tool rejected the service port it had
+itself requested. After a pre-fix ordering assertion failed, the installed smoke now omits that
+opt-in pin and follows the canonical runtime lifecycle: offline database codegen and registry
+generation precede final-artifact validation, Aspire starts before resident database commands, and
+the AppHost restarts after database preparation. The exact eight-tool manifest, released-CLI
+fallback, critical host-port validator, optional docs behavior, and support-file boundary remain
+unchanged. Focused agent-init and installed-tool tests pass 21/21.
+
+Published-history probes remain explicit rather than waived: `0.0.5-canary.14` contains the resident
+database contract but predates the tool sequencing repair, while `0.0.5-canary.5` passed the same 22
+steps after the self-pin repair but still contains the five historical published plugin host-port
+defaults. No current published version contains this branch's combined generator/tool repairs, and
+this run is not authorized to publish one. Run-owned Postgres containers from each failed diagnostic
+were removed through the ownership-proving teardown; all foreign and unproven resources were left
+untouched.

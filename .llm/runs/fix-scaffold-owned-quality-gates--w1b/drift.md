@@ -59,6 +59,25 @@ so this preserves Deno's recommended lint verdict while preventing the parent wo
 generated dependency graph from silently widening it; actual lint findings in owned AppHost
 templates remain defects to repair.
 
+### Installed smoke self-pinned a host port — Slice 3 repair
+
+The accepted plan expected the installed eight-tool smoke's exact released-CLI fallback to provide
+the clone-independent #1024 proof. The unchanged #1092 tool instead passed `--service-port 3001`
+to `init`, then its own critical host-port boundary rejected that deliberate literal pin. Exact
+stable `0.0.4` reached 22 passing steps before that failure. Exact `0.0.5-canary.14` additionally
+reflects the newer resident-AppHost database contract, while the installed tool predates that
+sequence. Earlier `0.0.5-canary.5` reached the same 22-step boundary after removing the tool's own
+pin, but its published plugin templates still emit the five historical fixed pins.
+
+Disposition: omit the tool's opt-in service-port argument and align its lifecycle with the canonical
+runtime suite: standalone DB codegen and registry generation precede validation, Aspire starts
+before resident DB commands, and the AppHost restarts after database preparation. Dry-run ordering
+assertions lock both repairs. Preserve the exact eight-tool manifest, critical validator,
+released-CLI fallback, and all #1092 docs. Do not weaken the validator, compose release versions,
+publish a canary, or absorb release orchestration. Current-source runtime proof and the independent
+evaluator must see the absence of a published post-fix canary explicitly; this run must not claim an
+older published scaffold is clean.
+
 ## Explicitly not drift
 
 - #1092's eight-tool consumer boundary remains unchanged.

@@ -690,10 +690,12 @@ class SmokeRunner {
       await this.#scaffoldProject();
       await this.#addPlugins();
       await this.#validateGeneratedProject();
-      await this.#runDbWorkflow();
+      await this.#prepareGeneratedProject();
       await this.#typeCheckGeneratedProject();
       await this.#validateGeneratedHostPorts();
       await this.#startAspire();
+      await this.#runDbWorkflow();
+      await this.#restartAspireAfterDb();
       await this.#waitForResources();
       await this.#inspectRuntime();
       await this.#exerciseApis();
@@ -817,8 +819,6 @@ class SmokeRunner {
           '--service',
           '--service-name',
           'users',
-          '--service-port',
-          '3001',
           '--app-name',
           'web',
           '--editor',
@@ -892,13 +892,34 @@ class SmokeRunner {
     });
   }
 
-  async #runDbWorkflow(): Promise<void> {
+  async #prepareGeneratedProject(): Promise<void> {
     await this.#runCommand({
       id: 'aspire-restore',
       title: 'Restore Aspire TypeScript SDK modules',
       cwd: join(this.projectRoot, 'aspire'),
       command: [this.#options.aspireCommand, 'restore'],
     });
+    await this.#runCommand({
+      id: 'db-codegen-offline',
+      title: 'Generate database clients before starting Aspire',
+      cwd: join(this.projectRoot, 'database', this.#options.db),
+      command: ['deno', 'task', 'db:generate'],
+      env: {
+        DATABASE_URL: 'postgres://postgres:postgres@localhost:5432/postgres',
+        POSTGRES_URI: 'postgres://postgres:postgres@localhost:5432/postgres',
+      },
+    });
+    await this.#runCommand({
+      id: 'generate-plugin-registry',
+      title: 'Generate plugin registry',
+      cwd: this.projectRoot,
+      command: ['deno', ...this.#commandArgs('generate', 'plugins', '--project-root', '.')],
+    });
+    await this.#validateAuthGeneratedWiring();
+    await this.#configureAuthSmokeEnvironment();
+  }
+
+  async #runDbWorkflow(): Promise<void> {
     await this.#runCommand({
       id: 'db-init',
       title: 'Create and apply initial migration',
@@ -944,14 +965,6 @@ class SmokeRunner {
         ...this.#commandArgs('db', 'status', '--db', this.#options.db, '--project-root', '.'),
       ],
     });
-    await this.#runCommand({
-      id: 'generate-plugin-registry',
-      title: 'Generate plugin registry',
-      cwd: this.projectRoot,
-      command: ['deno', ...this.#commandArgs('generate', 'plugins', '--project-root', '.')],
-    });
-    await this.#validateAuthGeneratedWiring();
-    await this.#configureAuthSmokeEnvironment();
   }
 
   async #validateAuthGeneratedWiring(): Promise<void> {
@@ -1099,6 +1112,32 @@ class SmokeRunner {
     await this.#runCommand({
       id: 'aspire-start',
       title: 'Start generated Aspire AppHost',
+      cwd: this.projectRoot,
+      command: [
+        this.#options.aspireCommand,
+        'start',
+        '--apphost',
+        this.appHost,
+        '--isolated',
+        '--non-interactive',
+        '--nologo',
+      ],
+      env: authSmokeEnv(),
+    });
+    this.#startedAspire = !this.#options.dryRun;
+  }
+
+  async #restartAspireAfterDb(): Promise<void> {
+    await this.#runCommand({
+      id: 'aspire-stop-after-db',
+      title: 'Stop generated Aspire AppHost after database preparation',
+      cwd: this.projectRoot,
+      command: this.stopCommand,
+    });
+    this.#startedAspire = false;
+    await this.#runCommand({
+      id: 'aspire-restart-after-db',
+      title: 'Restart generated Aspire AppHost after database preparation',
       cwd: this.projectRoot,
       command: [
         this.#options.aspireCommand,
