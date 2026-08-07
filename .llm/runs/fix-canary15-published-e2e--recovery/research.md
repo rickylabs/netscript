@@ -9,8 +9,7 @@
 ## Root causes
 
 1. `configurePublishedWorkersBlock` assumes the generated Deno argument list remains on one line. W1-B deliberately formats generated `.mts`, so the config pair now spans whitespace/newlines and the fixture reports a false missing-argument failure.
-2. The seeded Prisma client exposes `$queryRawUnsafe`, while the shipped seed template calls `$queryRaw`; the honest generated whole-source check now catches the pre-generation mismatch.
-3. Quickstart reaches the generated AppHost TypeScript batch before `aspire restore` provisions its native modules and `node_modules/typescript`.
+2. Quickstart step 3 invokes the new whole-project task before the documented Aspire restore and Prisma generation steps. Its Prisma/AppHost errors are expected pre-generation state reached out of order, not separate product-template defects. Step 3 needs a targeted service check; step 6 remains the authoritative whole-project check after prerequisites.
 
 The missing PGDATA receipt follows the aborted quickstart setup and is not an independent root cause.
 

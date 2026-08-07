@@ -28,7 +28,7 @@ Deno.test('quickstart walk exposes exactly seven independently named verdicts be
   );
 });
 
-Deno.test('quickstart service-add verdict initializes first, adds users, and checks immediately', () => {
+Deno.test('quickstart service-add verdict initializes first, adds users, and checks that service', () => {
   const suite = createQuickstartWalkSuite({
     packageSource: PACKAGE_SOURCE.JSR,
     cliEntrypoint: EXACT_CLI,
@@ -41,6 +41,9 @@ Deno.test('quickstart service-add verdict initializes first, adds users, and che
   assertEquals(add.join(' ').includes('add'), true);
   assertEquals(add.join(' ').includes('deno'), true);
   assertEquals(add.join(' ').includes('check'), true);
+  assertEquals(add.join(' ').includes('--unstable-kv'), true);
+  assertEquals(add.join(' ').includes('services/users'), true);
+  assertEquals(add.join(' ').includes('task'), false);
 });
 
 Deno.test('quickstart project-check verdict runs the documented command exactly', () => {

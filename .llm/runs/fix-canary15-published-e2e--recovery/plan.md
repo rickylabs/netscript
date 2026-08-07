@@ -14,7 +14,7 @@ Closes #1345 by making the existing published production E2E contract compatible
 
 ## Slices
 
-1. Add focused regressions and repair the three exact boundaries: semantic formatted-argument rewrite, seeded Prisma query compatibility, and pre-check Aspire restore in quickstart.
+1. Add focused regressions and repair the two exact boundaries: semantic formatted-argument rewrite and a service-scoped step-3 check that leaves the documented whole-project task at step 6.
 2. Run proportional static/focused gates, then canonical one-pass runtime and quickstart validation; preserve lock/leak evidence.
 3. Obtain mandatory independent IMPL-EVAL PASS, reconcile PR/issue acceptance, and merge only on current-head green CI.
 
