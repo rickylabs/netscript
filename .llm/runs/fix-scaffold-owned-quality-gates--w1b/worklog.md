@@ -435,3 +435,51 @@ DeepSeek IMPL-EVAL for this bounded CI repair. The immutable evaluator PASS rema
 `a02467d8cd28be215855764d163fb60508afe895`; this new head carries focused writer receipts and is not
 represented as independently re-evaluated. PR #1342 stays ready at exactly `status:impl-eval`, and
 #1343 remains non-blocking follow-up scope.
+
+## Post-eval CI repair — SQLite generated lint and route-seed reconciliation
+
+The same ready-head CI run exposed a second genuine failure in
+[`scaffold-runtime-sqlite (aspire + sqlite + garnet)`](https://github.com/rickylabs/netscript/actions/runs/31173542921/job/92850482384).
+`generated.deno-lint` selected 144 files and found four dead generated symbols:
+`ContainerLifetime`, `ensureDatabasePassword`, and `isolatedStart` in
+`aspire/.helpers/register-infrastructure.mts`, plus Prisma's `env` helper in
+`database/sqlite/prisma.config.ts`.
+
+The owning Aspire helper generator now derives its SDK/compat imports and isolated-start local from
+the same database/cache variants that emit their consumers. SQLite therefore omits persistent
+container/password machinery; persistent Postgres/MySQL keeps it. The Prisma template removes the
+universally dead `env` import because URL resolution already uses `Deno.env`. Existing positive
+Postgres/cache tests and new negative SQLite assertions lock both sides of the contract.
+
+The one authorized exact SQLite attempt used the requested report path and exited 1 with 22 passed /
+1 failed. It proved the original repair: the generated AppHost subset, including all 12
+`aspire/apphost.mts` and `.helpers/*.mts` files, checked at exit 0 and none of the four CI lint
+findings recurred. The later restored-baseline portion of `generated.quality-negative` then exposed
+that the prior `96206e119a666a4ac60b6e08f12b1323e0aeabbc` CRUD repair had corrected the page template
+instead of the inconsistent initial route seed. `netscript init` seeded child leaves as bare route
+references, while the canonical Fresh generator emits `{ $route: RouteReference }`; after
+regeneration, the direct page binding became invalid.
+
+The compatibility correction is generator-owned: `generateRoutesSeed()` now emits the canonical
+nested leaf shape for CRUD, telemetry, and design children; the CRUD page template returns to its
+canonical `$route` binding; and the writer/template semantic tests lock both together. The exact
+SQLite suite and the clean-clone verifier were not repeated after this correction, honoring the
+explicit one-run/pace limits. Current-head CI is therefore the next full-suite verdict rather than
+a self-issued replacement receipt.
+
+Focused current-source receipts:
+
+| Gate | Result |
+| --- | --- |
+| five focused generator/template test files | exit 0; 9 passed / 66 steps / 0 failed |
+| scoped check wrapper | exit 0; 7 files / 1 batch / 0 diagnostics |
+| scoped lint wrapper | exit 0; 7 files / 1 batch / 0 findings |
+| scoped format wrapper | exit 0; 7 files / 1 batch / 0 findings |
+| `deno task quality:gate` | exit 0; zero quality/doctrine failures, existing warnings only |
+| exact `scaffold.runtime.sqlite` attempt | exit 1; 22 passed / 1 failed; original AppHost lint subset exit 0; cleanup passed |
+| read-only run/worktree leak check | exit 0; no run-owned survivors; foreign/unproven resources untouched |
+
+The SQLite/route-seed product sign-off is `SQLITE_SIGNOFF_HEAD` (receipt trail follows separately).
+These are post-eval current-head CI repairs, not a repeated evaluation. The immutable DeepSeek V4
+Flash 0731 max PASS remains valid only as recorded on `a02467d8cd28be215855764d163fb60508afe895`;
+PLAN-EVAL and IMPL-EVAL were not rerun.

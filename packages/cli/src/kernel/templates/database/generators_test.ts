@@ -144,6 +144,7 @@ describe('database template generators', () => {
     });
 
     assertStringIncludes(output, "Deno.env.get(envKey) ?? Deno.env.get('DATABASE_URL')");
+    assertEquals(output.includes('defineConfig, env'), false);
     assertStringIncludes(output, "'file:./alpha_app.db'");
     assertStringIncludes(output, 'const databaseUrl = resolveDatabaseUrl(');
     assertStringIncludes(
@@ -164,6 +165,7 @@ describe('database template generators', () => {
     assertStringIncludes(output, 'normalizeSqlServerHost(host.trim())');
     assertStringIncludes(output, "host === '127.0.0.1'");
     assertStringIncludes(output, "return 'localhost'");
+    assertStringIncludes(output, "import { defineConfig } from 'prisma/config'");
   });
 
   it('generates engine modules with adapter setup where required', () => {

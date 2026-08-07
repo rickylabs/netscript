@@ -160,3 +160,27 @@ Do not weaken W1-B selection or suppress/exclude the route. This is a bounded cu
 not architecture debt and not a formal re-evaluation. By explicit owner pace rule, retain the valid
 DeepSeek PASS on immutable `a02467d8cd28be215855764d163fb60508afe895` without rerunning
 PLAN-EVAL, IMPL-EVAL, or the already-green full `scaffold.runtime`.
+
+### SQLite CI exposed variant-insensitive generated imports and corrected the route-seed diagnosis
+
+Ready-head CI run [31173542921](https://github.com/rickylabs/netscript/actions/runs/31173542921),
+job [92850482384](https://github.com/rickylabs/netscript/actions/runs/31173542921/job/92850482384),
+found four dead generated symbols in the SQLite scaffold: three Postgres/persistent-container-only
+symbols in `register-infrastructure.mts` and Prisma's unused `env` import. This is generator drift,
+not a reason to weaken W1-B selection. The helper prelude is now option-derived and the dead Prisma
+import is removed; focused tests preserve persistent Postgres and cache behavior.
+
+The exact SQLite run was executed once as directed. Its AppHost check returned exit 0, proving the
+four original findings absent, but its later restored generated check found the prior CRUD repair
+incompatible with the canonical regenerated routes tree. This supersedes only the prior conclusion
+that `routes.examples.crud` is durably a bare leaf. The actual mismatch was between
+`generateRoutesSeed()` (bare child references) and the Fresh generator (nested child objects with
+`$route`). The owning seed generator now matches the canonical tree and the page template again
+uses `$route`; focused writer and template tests cover the paired contract.
+
+Disposition: retain both facts in the trail—the first clean-clone repair head is
+`96206e119a666a4ac60b6e08f12b1323e0aeabbc`, and the corrected SQLite/seed sign-off is
+`SQLITE_SIGNOFF_HEAD`. Do not replay the exact SQLite suite, clean-clone verifier, Postgres runtime,
+PLAN-EVAL, or IMPL-EVAL. The failed run cleaned up; the read-only leak check found no run-owned
+survivors and all foreign/unproven resources were left untouched. This remains current-head CI
+repair drift, not architecture debt or a new evaluation claim.

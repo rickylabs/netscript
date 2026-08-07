@@ -143,15 +143,18 @@ describe('generateRegisterInfrastructure', () => {
     assertStringIncludes(output, 'readonly primaryCacheEndpoint: EndpointReference | null');
   });
 
-  it('should import ContainerLifetime and resolveDataPath', () => {
-    const output = generateRegisterInfrastructure(emptyOptions);
+  it('should import persistent-container helpers only when generated output uses them', () => {
+    const output = generateRegisterInfrastructure({
+      databases: { main: fixtures.DATABASE_WITH_OPTIONS },
+      caches: {},
+    });
     assertStringIncludes(
       output,
-      "import { ContainerLifetime, EndpointProperty } from '../.aspire/modules/aspire.mts'",
+      "import { ContainerLifetime } from '../.aspire/modules/aspire.mts'",
     );
     assertStringIncludes(
       output,
-      "import { type CacheWiring, ensureDatabasePassword, ensureGarnetToolManifest, generateAccessToken as _generateAccessToken, resolveDataPath, shouldUseContainerCache } from './_aspire-compat.mts'",
+      "import { type CacheWiring, ensureDatabasePassword, resolveDataPath } from './_aspire-compat.mts'",
     );
   });
 

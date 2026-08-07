@@ -59,6 +59,45 @@ export function generateRegisterInfrastructure(
   const { databases, caches, primaryDatabase, primaryCache } = options
   const dbEntries = Object.entries(databases)
   const cacheEntries = Object.entries(caches)
+  const usesDenoKvContainer = cacheEntries.some(([, entry]) =>
+    entry.Engine === 'DenoKv' &&
+    !['External', 'Local'].includes(entry.Mode ?? 'Container')
+  )
+  const hasPersistentContainerDatabase = dbEntries.some(([, entry]) =>
+    entry.Engine !== 'Sqlite' &&
+    (entry.Mode ?? 'Container') === 'Container' &&
+    entry.Persistent === true
+  )
+  const sdkValueImports = [
+    ...(hasPersistentContainerDatabase ? ['ContainerLifetime'] : []),
+    ...(cacheEntries.some(([, entry]) =>
+        !['External', 'Local'].includes(entry.Mode ?? 'Container')
+      )
+      ? ['EndpointProperty']
+      : []),
+  ]
+  const compatImports = [
+    'type CacheWiring',
+    ...(dbEntries.some(([, entry]) =>
+        ['Postgres', 'Mysql'].includes(entry.Engine) &&
+        (entry.Mode ?? 'Container') === 'Container'
+      )
+      ? ['ensureDatabasePassword']
+      : []),
+    ...(cacheEntries.some(([, entry]) =>
+        entry.Mode === 'Auto' ||
+        (entry.Engine === 'Garnet' && entry.Mode === 'Executable')
+      )
+      ? ['ensureGarnetToolManifest']
+      : []),
+    ...(usesDenoKvContainer
+      ? ['generateAccessToken as _generateAccessToken']
+      : []),
+    ...(usesResolvedDataPath(dbEntries, cacheEntries) ? ['resolveDataPath'] : []),
+    ...(cacheEntries.some(([, entry]) => entry.Mode === 'Auto')
+      ? ['shouldUseContainerCache']
+      : []),
+  ]
 
   // Build database registration blocks
   const dbBlocks: string[] = []
@@ -268,8 +307,14 @@ export function generateRegisterInfrastructure(
     {
       __slot0__: String(fileHeader('register-infrastructure.mts')),
       __slot1__: String(SCAFFOLD_ASPIRE_MODULES.SDK_IMPORT_FROM_HELPERS),
-      __slot2__: String(SCAFFOLD_ASPIRE_MODULES.SDK_IMPORT_FROM_HELPERS),
-      __slot3__: String(SCAFFOLD_ASPIRE_MODULES.ASPIRE_COMPAT_IMPORT),
+      __slot2__: String(
+        sdkValueImports.length > 0
+          ? `import { ${sdkValueImports.join(', ')} } from '${SCAFFOLD_ASPIRE_MODULES.SDK_IMPORT_FROM_HELPERS}';`
+          : '',
+      ),
+      __slot3__: String(
+        `import { ${compatImports.join(', ')} } from '${SCAFFOLD_ASPIRE_MODULES.ASPIRE_COMPAT_IMPORT}';`,
+      ),
       __slot4__: String(SCAFFOLD_ASPIRE_MODULES.ASPIRE_COMPAT_IMPORT),
       __slot5__: String(
         dbBlocks.length > 0
@@ -285,7 +330,26 @@ export function generateRegisterInfrastructure(
       __slot8__: String(primaryCacheLine),
       __slot9__: String(primaryCacheEndpointLine),
       __slot10__: String(primaryCacheWiringLine),
+      __slot11__: String(
+        hasPersistentContainerDatabase
+          ? `  const isolatedStart = (await builder.getConfiguration()\n    .getConfigValue('DcpPublisher:RandomizePorts'))?.toLowerCase() === 'true';`
+          : '',
+      ),
     },
+  )
+}
+
+function usesResolvedDataPath(
+  dbEntries: ReadonlyArray<readonly [string, RegisterInfrastructureOptions['databases'][string]]>,
+  cacheEntries: ReadonlyArray<readonly [string, CacheEntry]>,
+): boolean {
+  return dbEntries.some(([, entry]) =>
+    entry.Engine === 'Sqlite' ||
+    ((entry.Mode ?? 'Container') === 'Container' && entry.DataPath !== undefined)
+  ) || cacheEntries.some(([, entry]) =>
+    entry.DataPath !== undefined &&
+    !['External', 'Local'].includes(entry.Mode ?? 'Container') &&
+    !(entry.Engine === 'Garnet' && entry.Mode === 'Executable')
   )
 }
 

@@ -1,6 +1,6 @@
 # Run resource leak report
 
-Generated: 2026-08-07T09:39:58.028Z
+Generated: 2026-08-07T11:43:51.586Z
 Worktree: `/home/codex/repos/ns005-c15-w1b-scaffold-quality`
 Aspire probe: ok
 Docker probe: ok
@@ -9,7 +9,7 @@ Docker probe: ok
 
 - Ownership: `foreign`
 - Apparent owner: `/home/codex/repos/w6-workflow-builder`
-- Age: 84291145 ms
+- Age: 91724703 ms
 - Stale: true
 - User command: `docker rm -f 'e93dc56335664f7cbeac307451efeae29e09151d66385ac0d8e2b265664cf5ce'`
 
@@ -17,7 +17,7 @@ Docker probe: ok
 
 - Ownership: `foreign`
 - Apparent owner: `/home/codex/repos/w6-workflow-builder`
-- Age: 88697199 ms
+- Age: 96130757 ms
 - Stale: true
 - User command: `docker rm -f '16cfeacb20f33ca26acdae71499bb31e3c6082e674142cd793f4a027d7fb7f6a'`
 
@@ -25,7 +25,7 @@ Docker probe: ok
 
 - Ownership: `unproven`
 - Apparent owner: `unknown`
-- Age: 88697590 ms
+- Age: 96131148 ms
 - Stale: true
 - User command: `docker rm -f '2a22778880af32eae03de5b6fc0980a446734e73121ec62bdec21f14b4f7e3dc'`
 
@@ -33,7 +33,7 @@ Docker probe: ok
 
 - Ownership: `foreign`
 - Apparent owner: `/home/codex/repos/w6-review-desk`
-- Age: 104806548 ms
+- Age: 112240106 ms
 - Stale: true
 - User command: `docker rm -f '48c4411a5072b277021396e0acf1dc7666bd44626a1b5ee82d4d7ac169dbd3e4'`
 
@@ -41,7 +41,7 @@ Docker probe: ok
 
 - Ownership: `foreign`
 - Apparent owner: `/home/codex/repos/w6-review-desk`
-- Age: 104865490 ms
+- Age: 112299048 ms
 - Stale: true
 - User command: `docker rm -f '73e282154ba24dc3bac633a5e81c5cedc1afb1b8ebadba1ba24ea53fa33be19e'`
 
@@ -49,7 +49,7 @@ Docker probe: ok
 
 - Ownership: `foreign`
 - Apparent owner: `/home/codex/repos/ns005-genjobs`
-- Age: 191799147 ms
+- Age: 199232705 ms
 - Stale: true
 - User command: `docker rm -f '96c60d5d19c7e0e975b03a91f0c966afc00191e768c30d92f792baf237b3b282'`
 
@@ -57,7 +57,7 @@ Docker probe: ok
 
 - Ownership: `foreign`
 - Apparent owner: `/home/codex/repos/ns005-genjobs`
-- Age: 192685478 ms
+- Age: 200119036 ms
 - Stale: true
 - User command: `docker rm -f '55c0ae9dab8db064c1cec240d0a403c161b23de363497aae85237ffae6dbf49b'`
 
@@ -65,7 +65,7 @@ Docker probe: ok
 
 - Ownership: `foreign`
 - Apparent owner: `/home/codex/repos/w6-planning-board`
-- Age: 196916844 ms
+- Age: 204350402 ms
 - Stale: true
 - User command: `docker rm -f 'bb5da1615b3a2f4f3819ea499ffbee83ba11f0ee250a38bff5a415c85842cc52'`
 
@@ -73,7 +73,7 @@ Docker probe: ok
 
 - Ownership: `foreign`
 - Apparent owner: `/home/codex/repos/w6-planning-board`
-- Age: 197782663 ms
+- Age: 205216221 ms
 - Stale: true
 - User command: `docker rm -f '2925ecf64bcc298052eacce42c88a4f1068e491dccf05fb1b065db7453f84c02'`
 
@@ -81,7 +81,7 @@ Docker probe: ok
 
 - Ownership: `foreign`
 - Apparent owner: `/home/codex/repos/w6-planning-board`
-- Age: 197859506 ms
+- Age: 205293064 ms
 - Stale: true
 - User command: `docker rm -f 'ad7befdea9bd4d7d29fc16bfb716147830a7a9a52614e5b20a7ef4e83ff27c1f'`
 
@@ -89,7 +89,7 @@ Docker probe: ok
 
 - Ownership: `unproven`
 - Apparent owner: `unknown`
-- Age: 201053530 ms
+- Age: 208487088 ms
 - Stale: true
 - User command: `docker rm -f '5b62715e4e85aa1097a3fd85fbd911568f47dad0f8e9b9dd933f19c4f781ad5b'`
 
@@ -97,7 +97,7 @@ Docker probe: ok
 
 - Ownership: `foreign`
 - Apparent owner: `/home/codex/repos/ns005-streamdb`
-- Age: 213521544 ms
+- Age: 220955102 ms
 - Stale: true
 - User command: `docker rm -f '1435604a30f544c4e39c607a316a898d9842ecd097a86e6ce812cb6610cfd3b3'`
 
@@ -105,7 +105,7 @@ Docker probe: ok
 
 - Ownership: `unproven`
 - Apparent owner: `unknown`
-- Age: 218446836 ms
+- Age: 225880394 ms
 - Stale: true
 - User command: `docker rm -f '7697c820d060f8afd530152a510211b9306492a2c95923c9aeb246f3e7961c1a'`
 
@@ -113,7 +113,7 @@ Docker probe: ok
 
 - Ownership: `foreign`
 - Apparent owner: `/home/codex/repos/ns005-streamdb`
-- Age: 220033780 ms
+- Age: 227467338 ms
 - Stale: true
 - User command: `docker rm -f 'ee823623d01dc5125183bf281239270c92f0811dbabed9d890b574e3572cdbe0'`
 
@@ -121,7 +121,7 @@ Docker probe: ok
 
 - Ownership: `foreign`
 - Apparent owner: `/home/codex/repos/ns005-streamdb`
-- Age: 220178698 ms
+- Age: 227612256 ms
 - Stale: true
 - User command: `docker rm -f '02f021f00d4c8d5fb075452ff2254f043d0da3255f3d53104b82111665694241'`
 
@@ -129,7 +129,7 @@ Docker probe: ok
 
 - Ownership: `foreign`
 - Apparent owner: `/home/codex/repos/ns005-verify1250`
-- Age: 232059045 ms
+- Age: 239492603 ms
 - Stale: true
 - User command: `docker rm -f 'cce0d06ff6cabad921c69b154a0bf8d857a19b8e2c085275a2292d1426545edc'`
 
@@ -137,7 +137,7 @@ Docker probe: ok
 
 - Ownership: `foreign`
 - Apparent owner: `/home/codex/repos/ns005-verify1250`
-- Age: 232274666 ms
+- Age: 239708224 ms
 - Stale: true
 - User command: `docker rm -f '8f6d81c711c9ec2b7da67001844d9a9238b5ba8ae867627a8b7a8bddbd100aa5'`
 
@@ -145,6 +145,6 @@ Docker probe: ok
 
 - Ownership: `foreign`
 - Apparent owner: `/home/codex/repos/wave5-deepseek`
-- Age: 258016634 ms
+- Age: 265450192 ms
 - Stale: true
 - User command: `docker rm -f '97b90646098858f6cfe163b470fb9d57ff7033d5661f6fe2390c9300ff1ebaec'`

@@ -100,7 +100,7 @@ lifecycle-only: advance PR #1342 and issues #1024/#1328 to exactly `status:impl-
 acceptance-evidence mirror dry-run, and mark the PR ready only on a green verdict. Do not merge,
 publish, trigger OpenHands, start Billing Run, or alter release order.
 
-## Post-eval current-head CI repair — scaffold-static
+## Post-eval current-head CI repairs
 
 Ready-head CI run [31173542921](https://github.com/rickylabs/netscript/actions/runs/31173542921),
 job [92850482166](https://github.com/rickylabs/netscript/actions/runs/31173542921/job/92850482166),
@@ -110,11 +110,28 @@ exposed one genuine `scaffold-static (deno-only)` defect. The clean-clone README
 confirmed `createRouteReference()` returns the complete reference consumed directly by
 `definePage().withRoute(...)`.
 
-The owning CRUD route template now passes `routes.examples.crud` directly, its semantic assertion
-locks that shape, and the embedded asset is regenerated. Focused proof is green: route-template test
-1/1 with 19/19 steps; exact formerly failing clean-clone gate exit 0; two-file scoped check/lint/fmt
-each exit 0 with zero findings; `quality:gate` exit 0 with existing warnings only; asset freshness
-exit 0. The full `scaffold.runtime`, PLAN-EVAL, and IMPL-EVAL were deliberately not repeated.
+The first repair head `96206e119a666a4ac60b6e08f12b1323e0aeabbc` made the seeded bare CRUD
+reference compile and passed the exact clean-clone verifier. The second current-head CI failure,
+[`scaffold-runtime-sqlite`](https://github.com/rickylabs/netscript/actions/runs/31173542921/job/92850482384),
+then supplied the missing lifecycle evidence: after Fresh regenerates the route tree, the same child
+is canonicalized to `{ $route: RouteReference }`. The durable owning fix is therefore in
+`generateRoutesSeed()`: CRUD, telemetry, and design children now start with the canonical nested
+shape, and the CRUD page template uses `$route` consistently before and after regeneration.
+
+The SQLite job's primary failure was four variant-insensitive generated lint findings:
+`ContainerLifetime`, `ensureDatabasePassword`, `isolatedStart`, and Prisma's `env`. The Aspire
+infrastructure generator now emits SDK/compat imports and `isolatedStart` only for variants that use
+them, preserving persistent Postgres/MySQL and cache behavior. The Prisma template removes its dead
+`env` import.
+
+Focused proof after both corrections is green: five test files report 9 passed / 66 steps / 0
+failed; seven-file scoped check/lint/fmt wrappers report zero diagnostics/findings; `quality:gate`
+exits 0 with existing warnings only. The one authorized exact SQLite attempt exited 1 at 22/1: its
+AppHost subset checked clean at exit 0 (proving the four reported lint defects removed), then the
+later generated baseline exposed the route-seed mismatch described above; cleanup passed. It was
+not repeated, nor was the clean-clone verifier or Postgres `scaffold.runtime`. The read-only leak
+check found no run-owned survivors and left all foreign/unproven resources untouched. The corrected
+product sign-off is `SQLITE_SIGNOFF_HEAD`; current-head CI supplies the next full-suite verdict.
 
 Per owner pace rule, immutable head `a02467d8cd28be215855764d163fb60508afe895` retains its valid
 DeepSeek PASS. This focused product change is a current-head CI repair with new focused receipts,
