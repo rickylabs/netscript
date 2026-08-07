@@ -180,7 +180,7 @@ uses `$route`; focused writer and template tests cover the paired contract.
 
 Disposition: retain both facts in the trail—the first clean-clone repair head is
 `96206e119a666a4ac60b6e08f12b1323e0aeabbc`, and the corrected SQLite/seed sign-off is
-`58fe8b6f2062c678a672e40a59803f38b74b79f6`. Do not replay the exact SQLite suite, clean-clone
+`58fe8b6f2eab3ba084c7f9721af9ed0a4703ffa0`. Do not replay the exact SQLite suite, clean-clone
 verifier, Postgres runtime,
 PLAN-EVAL, or IMPL-EVAL. The failed run cleaned up; the read-only leak check found no run-owned
 survivors and all foreign/unproven resources were left untouched. This remains current-head CI

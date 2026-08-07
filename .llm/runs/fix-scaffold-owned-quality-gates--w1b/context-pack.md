@@ -131,7 +131,7 @@ AppHost subset checked clean at exit 0 (proving the four reported lint defects r
 later generated baseline exposed the route-seed mismatch described above; cleanup passed. It was
 not repeated, nor was the clean-clone verifier or Postgres `scaffold.runtime`. The read-only leak
 check found no run-owned survivors and left all foreign/unproven resources untouched. The corrected
-product sign-off is `58fe8b6f2062c678a672e40a59803f38b74b79f6`; current-head CI supplies the
+product sign-off is `58fe8b6f2eab3ba084c7f9721af9ed0a4703ffa0`; current-head CI supplies the
 next full-suite verdict.
 
 Per owner pace rule, immutable head `a02467d8cd28be215855764d163fb60508afe895` retains its valid
