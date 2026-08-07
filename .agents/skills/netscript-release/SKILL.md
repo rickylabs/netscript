@@ -103,6 +103,19 @@ bump/gates and create the ephemeral branch plus provenance tag without a release
 use `--dry-run` in a disposable checkout to rehearse preparation, but must not run a non-dry canary
 cut or the publisher ad hoc from a local machine.
 
+Before a new canary version, branch, or tag is minted, the workflow reads the authenticated JSR
+scope quota and requires enough remaining attempts for every publishable workspace member. JSR's
+weekly publish-attempt quota is a **rolling seven-day window**: each attempt stops counting seven
+days after it was created; there is no calendar-week reset instant. If the live usage/limit cannot
+be read, or remaining attempts are smaller than the coordinated publish set, the lane fails closed
+before minting and tells the operator to wait for attempts to age out or request a quota increase.
+
+**Cadence response (owner policy, 2026-08-07):** canaries are coordinated release-candidate gates,
+not per-slice checks. Dispatch one canary for a release candidate; after a defect, fix the candidate
+before dispatching the next immutable number. Do not treat the 1000-attempt ceiling as a budget to
+consume. Changed-package-only canaries would alter coordinated publication semantics and remain a
+separate design decision.
+
 After the release content is ready and before creating the stable release:
 
 1. Dispatch `.github/workflows/release-canary.yml` with the target stable version. The workflow runs
@@ -118,6 +131,14 @@ After the release content is ready and before creating the stable release:
    provenance and collision evidence.
 
 Canary versions are immutable. Never delete or reuse a failed canary version.
+
+A partially published canary is reported separately from a complete publish whose pinned production
+E2E failed. Preserve its tag and every published member version. Missing members may be filled at
+the same canary semver only through republish mode from the byte-identical tagged tree, after budget
+is available; already-published members are never overwritten. If tree identity cannot be proven,
+leave the partial canary as audit evidence, fix forward, and mint the next canary. Do not yank a
+partial canary by default; yanking remains an explicit owner decision only for actively harmful
+artifacts.
 
 **A failed canary is not an incident — it is the canary doing its job (owner decision, 2026-08-02).**
 If a canary published and its pinned production E2E then failed, preserve the workflow and tag
@@ -343,7 +364,8 @@ reached the registry, never re-publish over one that did.
 - If GitHub Release publish fails before any JSR package publishes, fix the workflow or gate and
   rerun the release workflow.
 - If a canary publish or its pinned production E2E fails, do not create the stable GitHub Release.
-  Preserve evidence, yank any published canary members, fix forward, and dispatch the next N.
+  Preserve evidence, apply the partial-canary policy above, fix forward, and dispatch the next N
+  when same-semver completion is not safe or appropriate.
 - If publish partially succeeds, do not delete the tag or lockfile. Deno 2.9 skips already-published
   members on retry; rerun after fixing the failing member or gate.
 - If `e2e-cli-prod` fails after publish, keep the release record intact, investigate against the

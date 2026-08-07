@@ -6,8 +6,10 @@ Ship Canary.15 W1-A as one small draft PR directly to `main`, fully resolving #1
 
 ## Current state
 
-Research/design locked against current issues and declared `origin/main`. Bootstrap is ready for
-the required first commit and draft PR. No implementation files have been touched.
+Draft PR #1341 is open against `main`; S0 bootstrap commit `ba862a617` is pushed. S1 implements the
+pre-mint budget guard, post-failure `none|partial|complete` registry observation, truthful workflow
+status wording, generated-TypeScript residue coverage, and release policy docs. Focused tests and
+scoped check/lint/fmt gates are green; S1 is ready to commit/push/comment.
 
 ## Protected state
 
@@ -17,5 +19,5 @@ the required first commit and draft PR. No implementation files have been touche
 
 ## Next
 
-Commit/push the run bootstrap, open and label the draft PR, then land the contract-first focused
-release-tooling slice and hand off for independent IMPL-EVAL.
+Commit/push/comment S1, run the selected release/dependency generator gates once, update PR evidence
+and run artifacts, then hand off without self-certifying.

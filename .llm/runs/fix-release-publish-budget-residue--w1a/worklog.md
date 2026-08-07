@@ -29,4 +29,29 @@
 
 ## Gate evidence
 
-Pending.
+### S1 — publish-budget, truthful outcome, and generated residue safety
+
+- Focused tests: `deno test ... check-jsr-publish-budget_test.ts ... report-jsr-publish-outcome_test.ts ... release-canary-workflow_test.ts ... bump-version_test.ts` — exit 0; 18 passed, 0 failed.
+- Scoped check wrapper (`.llm/tools/release` + `.llm/tools/deps`, 53 files) — exit 0; 0 diagnostics.
+- Scoped lint wrapper (same roots, 53 files) — exit 0; 0 diagnostics.
+- Scoped fmt wrapper initially found five owned formatting findings; focused `deno fmt` changed only
+  the seven owned TS files. Wrapper recheck — exit 0; 0 findings.
+- Residue scan cost over the repository, five runs: 260/246/253/253/282 ms; mean 259 ms, max
+  282 ms. Generated-name-only TS scope adds the required asset coverage while avoiding ordinary TS
+  tests/docs and keeping the bump scan sub-second.
+- JSR rubric: no package export/metadata/include surface changed; OIDC-only real publication remains
+  untouched. The new quota call is authenticated/read-only and fails closed before minting.
+
+### S1 self-inspection
+
+- Budget order is mechanically asserted before `release:canary`.
+- Registry classification cannot write a green pair and runs only after the real Publish step fails.
+- Published-member immutability and identical-tree missing-member recovery stay aligned with the
+  existing republish guard.
+- `deno.lock` remains untouched.
+
+### Post-slice reconcile
+
+PR #1341 and issues #1312/#1148 are open in milestone `0.0.5`, each has exactly one
+`status:impl`, and the resolving PR retains both closing keywords. No new reviewer/evaluator
+comments were present at the slice checkpoint.

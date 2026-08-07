@@ -40,6 +40,12 @@ jobs:
         with:
           deno-version: '2.9.0'
 
+      - name: Check JSR publish-attempt budget before minting
+        if: inputs.republish-version == ''
+        env:
+          JSR_API_TOKEN: ${{ secrets.JSR_API_TOKEN }}
+        run: deno run --allow-net=api.jsr.io --allow-read --allow-env=JSR_API_TOKEN .llm/tools/release/check-jsr-publish-budget.ts
+
       - name: Record content SHA and pending pair
         id: context
         env:
@@ -116,7 +122,25 @@ jobs:
         run: deno run --allow-read --allow-write --allow-run .llm/tools/release/run-publish.ts --preflight
 
       - name: Publish canary through the production path
+        id: publish
         run: deno run --allow-read --allow-write --allow-run .llm/tools/release/run-publish.ts
+
+      - name: Detect exact-version registry outcome after publish failure
+        id: publish-outcome
+        if: failure() && steps.publish.outcome == 'failure' && steps.canary.outputs.version != ''
+        env:
+          CANARY_VERSION: ${{ steps.canary.outputs.version }}
+          OUTCOME_FILE: ${{ runner.temp }}/publish-outcome.json
+        run: |
+          deno run --allow-net=jsr.io --allow-read .llm/tools/release/report-jsr-publish-outcome.ts \
+            --version "$CANARY_VERSION" > "$OUTCOME_FILE"
+          kind="$(jq -er '.kind' "$OUTCOME_FILE")"
+          published="$(jq -er '.published | length' "$OUTCOME_FILE")"
+          missing="$(jq -er '.missing | length' "$OUTCOME_FILE")"
+          echo "kind=$kind" >> "$GITHUB_OUTPUT"
+          echo "published=$published" >> "$GITHUB_OUTPUT"
+          echo "missing=$missing" >> "$GITHUB_OUTPUT"
+          cat "$OUTCOME_FILE"
 
       - name: Label published canary payload and verify drift
         env:
@@ -149,6 +173,7 @@ jobs:
           echo "run_url=$run_url" >> "$GITHUB_OUTPUT"
 
       - name: Await canary-pinned production E2E
+        id: e2e
         env:
           GH_TOKEN: ${{ github.token }}
           E2E_RUN_ID: ${{ steps.dispatch.outputs.run_id }}
@@ -182,11 +207,18 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           SOURCE_SHA: ${{ steps.context.outputs.source_sha }}
         run: |
+          if [[ "${{ steps.publish-outcome.outputs.kind }}" == "partial" ]]; then
+            description="Canary partial publish: ${{ steps.publish-outcome.outputs.published }} live, ${{ steps.publish-outcome.outputs.missing }} missing"
+          elif [[ "${{ steps.publish.outcome }}" == "success" && "${{ steps.e2e.outcome }}" == "failure" ]]; then
+            description='Canary publish complete; pinned production E2E failed'
+          else
+            description='Canary publish failed before pinned production E2E'
+          fi
           gh api --method POST \
             "/repos/${GITHUB_REPOSITORY}/statuses/${SOURCE_SHA}" \
             -f state=failure \
             -f context=release/canary-pair \
-            -f description='Canary publish or pinned production E2E failed' \
+            -f description="$description" \
             -f target_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
 
       - name: Write green-pair summary
@@ -196,6 +228,9 @@ jobs:
           VERSION: ${{ steps.canary.outputs.version }}
           SOURCE_SHA: ${{ steps.context.outputs.source_sha }}
           E2E_URL: ${{ steps.dispatch.outputs.run_url }}
+          PUBLISH_OUTCOME: ${{ steps.publish-outcome.outputs.kind }}
+          PUBLISHED_COUNT: ${{ steps.publish-outcome.outputs.published }}
+          MISSING_COUNT: ${{ steps.publish-outcome.outputs.missing }}
         run: |
           {
             echo '## Canary green-pair verdict'
@@ -203,6 +238,8 @@ jobs:
             echo "- Canary version: ${VERSION:-not-created}"
             echo "- Content SHA: ${SOURCE_SHA:-unknown}"
             echo "- Canary publish + pinned production E2E: ${JOB_STATUS}"
+            echo "- Failed-publish registry outcome: ${PUBLISH_OUTCOME:-not-applicable}"
+            echo "- Exact-version members after failure: ${PUBLISHED_COUNT:-unknown} live / ${MISSING_COUNT:-unknown} missing"
             echo "- Production E2E run: ${E2E_URL:-not-dispatched}"
             echo "- Ephemeral branch cleanup: ${{ steps.cleanup.outcome }}"
           } >> "$GITHUB_STEP_SUMMARY"
