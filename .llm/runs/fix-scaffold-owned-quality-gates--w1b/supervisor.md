@@ -6,10 +6,12 @@
 - Base: `origin/main@7af6d1c02ab3f380dde7354ebac190e67d363db0`
 - Issues: #1024 and #1328
 - PR: [#1342](https://github.com/rickylabs/netscript/pull/1342), draft against `main`
-- Current phase: `plan-eval`
+- Current phase: `impl` (authorized by independent PLAN-EVAL PASS; product edits begin after the
+  verdict commit/comment/label transition)
 - Sole writer thread: `019fdb07-deb8-7971-80aa-d02fb6b56c37`
 - Writer route: OpenAI `gpt-5.6-sol`, high
-- PLAN-EVAL: required, separate session, not yet run
+- PLAN-EVAL: PASS on `045ca6c3262c854f830b428e871ef9ed8730ba10`, separate session
+  `017613f0-c5be-4738-b59c-0bf540202686`
 - IMPL-EVAL: required, separate session, not yet run
 - OpenHands: paused
 - Merge/release: prohibited in this run phase
@@ -41,8 +43,9 @@ Evaluator route: canonical `formal_plan_evaluation` via Claude Code/OpenRouter, 
 The only allowed provider-limit fallback is fresh separate Antigravity/Google
 `gemini-3.6-flash-high`, high.
 
-The evaluator must write its own PLAN-EVAL verdict. The writer must not self-certify, start product
-implementation, or repeat a valid PASS.
+The evaluator PASS is distilled in `plan-eval.md`. Do not repeat PLAN-EVAL. The writer carries all
+seven advisories through the Design checkpoint and slices, but does not self-certify either slice
+review or the final IMPL-EVAL.
 
 ## Protected state
 

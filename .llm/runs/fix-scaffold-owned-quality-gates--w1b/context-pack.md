@@ -47,10 +47,13 @@ no negative selection proof. A fresh diagnostic found five product lint and four
    bundle would regress #1092's explicit boundary.
 5. Clone-independent smoke evidence must use the installed released path, not a local CLI fallback.
 
-## Independent PLAN-EVAL handoff
+## PLAN-EVAL result and next phase
 
-Use canonical `formal_plan_evaluation`: Claude Code/OpenRouter, `claude-openrouter` ->
-`claude-print`, `claude-evaluator-minimax-m3`, `minimax/minimax-m3`, high. OpenHands is paused. Read
-`research.md`, `plan.md`, `supervisor.md`, and `drift.md` plus the current task/E2E/consumer-tool
-files listed in `supervisor.md`. No product edits are authorized before the evaluator's separate
-PASS.
+Independent session `017613f0-c5be-4738-b59c-0bf540202686` returned PASS on exact head
+`045ca6c3262c854f830b428e871ef9ed8730ba10` using the canonical Minimax M3 high route. The tracked
+distillation is `plan-eval.md`; all seven advisories are incorporated into `worklog.md`'s mandatory
+Design checkpoint. Do not rerun PLAN-EVAL.
+
+Next: commit/push the verdict and Design checkpoint, post the structured PLAN-EVAL PASS comment,
+move PR #1342 and issues #1024/#1328 to exactly `status:impl`, then implement the three accepted
+slices. Stop only after current-head gates are green at the independent IMPL-EVAL handoff.

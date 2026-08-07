@@ -49,6 +49,102 @@ and workers generator sources. No scratch output was promoted as a code fix.
   installed consumer smoke, leak-check, and one-pass `scaffold.runtime` as the evidence chain.
 - Recorded #1335/W1-C, publication, release orchestration, and Billing Run as explicit exclusions.
 
+## Design
+
+### Public and generated surface
+
+- No new `@netscript/cli` export, package entry point, or public CLI command is introduced.
+- The generated consumer contract adds `.netscript/quality-runner.ts` and routes root tasks `check`,
+  `lint`, `fmt:check`, and `fmt` through its modes `check`, `lint`, `fmt-check`, and `fmt-write`.
+- #1092's optional `.llm/tools` manifest remains exactly eight tools. Ordinary `netscript init` owns
+  the quality runner independently of `netscript agent init`.
+
+### Domain vocabulary
+
+- `QualityMode`: the four finite runner modes above, derived from a constant tuple rather than
+  repeated string literals.
+- `QualitySurface`: an explicit root/file descriptor for scaffold-owned product TypeScript.
+- `QualitySelection`: deterministic selected paths plus count, extensions, and applied exclusions.
+- `QualityBatchResult`: command, files, raw exit code, and bounded diagnostic output.
+- `QualityReport`: mode, selection, batches, and overall status. An unexpected empty selection exits
+  2; an underlying tool failure remains non-zero.
+
+No speculative abstraction is planned. Types live with the generated runner/template contract and
+exist only where exercised by its focused tests.
+
+### Ports and effects
+
+- The generated runner consumes only Web/Deno platform effects: `Deno.readDir`, `Deno.stat`, and
+  `Deno.Command('deno', ...)`.
+- No framework-layer port or dependency is added. Tests execute the generated source in temporary
+  fixtures and inject only process arguments/filesystem state already owned by the fixture.
+- E2E negative probes own exact paths, run serially, restore preexisting content defensively, and
+  prove final cleanup with a green check.
+
+### Constants
+
+- Add `QUALITY_RUNNER: 'quality-runner.ts'` to `SCAFFOLD_FILES` beside `NODE_MODULES_VERIFIER`
+  (PLAN-EVAL advisory 2).
+- Keep the public task name `fmt:check` and internal mode `fmt-check` (advisory 5).
+- Centralize mode names, selected extensions (`ts`, `tsx`, `mts`), explicit product roots/files,
+  skip directories, and batch size in the generated runner source.
+- Gate IDs added to CLI E2E are declared in `GATE`; fixture surfaces are finite data, not duplicated
+  command branches.
+
+### Commit slices
+
+1. **Quality contract and proving tests** — add the constant, generated runner, colocated
+   `quality-runner_test.ts`, root task wiring, scaffold bookkeeping, and deterministic E2E negative
+   gate. Prove with focused tests, explicit empty-selection tests (including lint/fmt convention
+   comparison), and scoped check/lint/fmt wrappers.
+2. **Clean generator output** — repair only the measured app/service/plugin/background generator
+   defects and their focused tests/assets. Prove with focused generator tests and a generated
+   scaffold whose DB clients and plugin registries exist before check/lint/format evidence.
+3. **Consumer/runtime closure** — run full current-head static/fitness/package gates, the installed
+   released consumer smoke outside a framework checkout, leak-check, and the one-pass
+   `scaffold.runtime`; update acceptance evidence and stop at independent IMPL-EVAL.
+
+Every slice includes `worklog.md` and `context-pack.md`, a substantive sole-supervisor inspection,
+an explicit-refspec push, one structured PR comment, and a post-slice issue/comment/status reconcile
+note.
+
+### PLAN-EVAL advisory ledger
+
+| Advisory                    | Design/implementation disposition                                                                           |
+| --------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| Mandatory Design checkpoint | This section lands before product edits.                                                                    |
+| `QUALITY_RUNNER` constant   | Slice 1 constant and adjacent scaffold write; focused bookkeeping assertion.                                |
+| Colocated runner test       | Slice 1 creates `quality-runner_test.ts` beside the template.                                               |
+| Empty lint/fmt selection    | Slice 1 spot-checks repository wrapper behavior and directly proves generated-runner exit 2 for every mode. |
+| `fmt:check` naming          | Root task uses the colon form; only the runner argument uses `fmt-check`.                                   |
+| Post-codegen diagnostic     | Slice 2/3 diagnostic runs after standalone DB codegen and registry generation, never before.                |
+| Drift and trail discipline  | Append `drift.md` before proceeding on any divergence; push/comment/reconcile after each slice.             |
+
+### Deferred scope
+
+- #1335/W1-C whole-scaffold inventory, new runner/plugin abstractions, expansion of the consumer
+  agent bundle, publication, release orchestration, Billing Run, unrelated formatting, and foreign
+  worktree cleanup remain excluded.
+- `e2e-cli-prod` remains post-publish release authority and is not simulated here.
+
+### Contributor path
+
+A contributor changes the finite owned-source contract in the generated runner template, copies the
+adjacent fixture pattern in `quality-runner_test.ts`, and adds a row to the E2E negative-probe
+table. Generated task wiring stays in `deno-json.ts`; scaffold emission stays next to the
+node-modules verifier in `plan-init.ts`. Generator-output fixes remain in the template/resource that
+owns the emitted file.
+
+## Independent PLAN-EVAL
+
+- Verdict: PASS
+- Evaluated head: `045ca6c3262c854f830b428e871ef9ed8730ba10`
+- Evaluator session: `017613f0-c5be-4738-b59c-0bf540202686`
+- Route: Claude Code/OpenRouter guard, `minimax/minimax-m3`, high, provider Novita
+- Tracked distillation: `plan-eval.md`
+- No PLAN-EVAL rerun is permitted or needed. All seven advisories are incorporated into the Design
+  checkpoint above.
+
 ## Current stop
 
 - Committed the eight-file run bootstrap as `921b1d996` and pushed it only with
@@ -61,5 +157,6 @@ and workers generator sources. No scratch output was promoted as a code fix.
   from `status:in-progress` and #1328 from `status:triage` to `status:plan-eval` while preserving
   every unrelated issue label.
 
-The next allowed action is a separate-session PLAN-EVAL. Product-code implementation remains blocked
-until that evaluator PASS.
+The separate-session PLAN-EVAL passed on the exact recorded head. After the verdict artifact is
+committed/pushed, the structured PASS comment is posted, and PR/issues move together to exactly
+`status:impl`, Slice 1 product implementation may begin.
