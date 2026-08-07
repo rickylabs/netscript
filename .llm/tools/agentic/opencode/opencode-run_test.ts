@@ -44,6 +44,27 @@ Deno.test('OpenCode argv repeats -f and passes variant and JSON format through',
   );
 });
 
+Deno.test('OpenCode argv resumes the exact stored session before provider dispatch', () => {
+  assertEquals(
+    opencodeRunArguments({
+      message: 'continue safely',
+      model: 'caller/model',
+      variant: 'high',
+      session: 'ses_local-42',
+    }),
+    [
+      'run',
+      'continue safely',
+      '-m',
+      'caller/model',
+      '--variant',
+      'high',
+      '--session',
+      'ses_local-42',
+    ],
+  );
+});
+
 Deno.test('OpenCode binary override takes precedence over PATH-resolved name', () => {
   assertEquals(
     resolveOpenCodeBinary({ OPENCODE_BIN: '/custom/opencode', PATH: '/bin' }),

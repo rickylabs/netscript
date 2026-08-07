@@ -51,9 +51,9 @@ Deno.test('MCP config is stdio-only, credential-free, and minimally permissioned
   assert(server.args.includes(
     `--allow-run=${HYBRID_PROCESS_GROUP_BINARIES.session},${HYBRID_PROCESS_GROUP_BINARIES.signal}`,
   ));
-  assert(
-    server.args.includes(`--allow-read=/home/test/${OPENCODE_TOOL.openRouterEnvRelativePath}`),
-  );
+  assert(server.args.includes(
+    `--allow-read=/home/test/${OPENCODE_TOOL.openRouterEnvRelativePath},/repo/.mcp.json`,
+  ));
   assert(!server.args.includes('-A'));
   assert(!server.args.includes('--allow-net'));
   assert(!server.args.includes('--allow-read'));

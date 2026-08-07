@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 2,
+  "worktreeRoot": "/home/codex/repos/ns005-c15-w1c-opencode-host",
+  "appHosts": [],
+  "containers": [],
+  "ownedRoots": [
+    "/home/codex/repos/ns005-c15-w1c-opencode-host/.llm/tmp/w1-c-live"
+  ]
+}

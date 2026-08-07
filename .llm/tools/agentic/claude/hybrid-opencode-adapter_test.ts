@@ -1,4 +1,5 @@
 import { assertEquals, assertRejects } from '@std/assert';
+import { join } from '@std/path';
 import { HYBRID_DELEGATION_DEFAULT_MODEL } from '../config/models.ts';
 import { HYBRID_DELEGATION_LIMITS, HybridDelegationError } from './hybrid-delegation.ts';
 import {
@@ -124,6 +125,42 @@ Deno.test('adapter uses argv without a shell and reports requested/observed rout
   assertEquals(invocation.env.ANTHROPIC_API_KEY, undefined);
   assertEquals(invocation.env.CLAUDE_CODE_OAUTH_TOKEN, undefined);
   assertEquals(invocation.env.OTHER_API_KEY, undefined);
+});
+
+Deno.test('isolated hybrid worker receives current-project MCP overlay without other credentials', async () => {
+  const root = await Deno.makeTempDir();
+  try {
+    await Deno.writeTextFile(
+      join(root, '.mcp.json'),
+      JSON.stringify({
+        mcpServers: {
+          netscript: { command: 'deno', args: ['run', 'mcp.ts'] },
+          aspire: { command: 'aspire', args: ['agent', 'mcp'] },
+        },
+      }),
+    );
+    const worker = new FakeWorker();
+    const subject = new HybridOpenCodeAdapter({
+      cwd: root,
+      env: {
+        HOME: '/home/test',
+        PATH: '/bin',
+        OPENROUTER_API_KEY: 'worker-only',
+        ANTHROPIC_API_KEY: 'must-not-cross',
+      },
+      worker,
+    });
+    await subject.delegate({ task: 'inspect' });
+    const invocation = worker.invocations[0];
+    const inline = JSON.parse(invocation.env.OPENCODE_CONFIG_CONTENT);
+    assertEquals(inline.mcp.netscript.command, ['deno', 'run', 'mcp.ts']);
+    assertEquals(inline.mcp.aspire.command, ['aspire', 'agent', 'mcp']);
+    assertEquals(Array.isArray(inline.plugin), true);
+    assertEquals(invocation.env.ANTHROPIC_API_KEY, undefined);
+    assertEquals(invocation.env.OPENROUTER_API_KEY, 'worker-only');
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
 });
 
 Deno.test('adapter terminates oversized output', async () => {

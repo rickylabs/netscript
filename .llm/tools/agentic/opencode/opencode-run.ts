@@ -3,6 +3,9 @@
 import { OPENCODE_TOOL } from '../config/versions.ts';
 export { parseOpenRouterApiKey } from '../lib/openrouter-credential.ts';
 import { environmentWithOpenRouterApiKey } from '../lib/openrouter-credential.ts';
+import { dirname, resolve } from 'node:path';
+import { prepareOpenCodeProjectEnvironment } from './opencode-project-config.ts';
+import { preflightOpenCodeMcp } from './opencode-preflight.ts';
 
 export type OpenCodeOutputFormat = 'default' | 'json';
 
@@ -12,6 +15,10 @@ export interface OpenCodeRunOptions {
   readonly variant: string;
   readonly files?: readonly string[];
   readonly format?: OpenCodeOutputFormat;
+  readonly session?: string;
+  readonly cwd?: string;
+  readonly requiredMcp?: readonly string[];
+  readonly receiptPath?: string;
 }
 
 export interface OpenCodeRunResult {
@@ -38,6 +45,7 @@ export function opencodeRunArguments(options: OpenCodeRunOptions): string[] {
     options.model,
     '--variant',
     options.variant,
+    ...(options.session ? ['--session', options.session] : []),
     ...(options.files ?? []).flatMap((file) => ['-f', file]),
     ...(options.format === 'json' ? ['--format', 'json'] : []),
   ];
@@ -52,8 +60,13 @@ export function resolveOpenCodeBinary(env: Environment): string {
 export async function openCodeChildEnvironment(
   env: Environment = Deno.env.toObject(),
   readTextFile: (path: string) => Promise<string> = Deno.readTextFile,
+  options: { readonly cwd?: string; readonly receiptPath?: string } = {},
 ): Promise<Record<string, string>> {
-  return await environmentWithOpenRouterApiKey(env, readTextFile);
+  const credentialed = await environmentWithOpenRouterApiKey(env, readTextFile);
+  return await prepareOpenCodeProjectEnvironment(credentialed, {
+    cwd: resolve(options.cwd ?? Deno.cwd()),
+    receiptPath: options.receiptPath,
+  });
 }
 
 /** Executes OpenCode with either inherited output or captured stdout. */
@@ -62,9 +75,31 @@ export async function runOpenCode(
   capture = false,
 ): Promise<OpenCodeRunResult> {
   const processEnv = Deno.env.toObject();
+  const cwd = resolve(options.cwd ?? Deno.cwd());
+  if (options.receiptPath) {
+    await Deno.mkdir(dirname(resolve(cwd, options.receiptPath)), { recursive: true });
+  }
+  const env = await openCodeChildEnvironment(processEnv, Deno.readTextFile, {
+    cwd,
+    receiptPath: options.receiptPath,
+  });
+  if (options.requiredMcp?.length) {
+    if (!options.receiptPath) {
+      throw new Error('--receipt is required when --require-mcp is used');
+    }
+    await preflightOpenCodeMcp({
+      cwd,
+      requiredServers: options.requiredMcp,
+      model: options.model,
+      variant: options.variant,
+      env,
+      receiptPath: options.receiptPath,
+    });
+  }
   const child = new Deno.Command(resolveOpenCodeBinary(processEnv), {
     args: opencodeRunArguments(options),
-    env: await openCodeChildEnvironment(processEnv),
+    cwd,
+    env,
     stdin: 'null',
     stdout: capture ? 'piped' : 'inherit',
     stderr: 'inherit',
@@ -90,6 +125,10 @@ function parse(args: readonly string[]): CliOptions {
   let format: OpenCodeOutputFormat = 'default';
   let capture = false;
   const files: string[] = [];
+  let session: string | undefined;
+  let cwd: string | undefined;
+  let receiptPath: string | undefined;
+  const requiredMcp: string[] = [];
 
   for (let index = 0; index < args.length; index++) {
     const argument = args[index];
@@ -106,17 +145,37 @@ function parse(args: readonly string[]): CliOptions {
       }
       format = value;
     } else if (argument === '--capture') capture = true;
-    else if (!argument.startsWith('-') && !message) message = argument;
+    else if (argument === '-s' || argument === '--session') {
+      session = requiredValue(args, index++, argument);
+    } else if (argument === '--cwd' || argument === '--dir') {
+      cwd = requiredValue(args, index++, argument);
+    } else if (argument === '--require-mcp') {
+      requiredMcp.push(requiredValue(args, index++, argument));
+    } else if (argument === '--receipt') {
+      receiptPath = requiredValue(args, index++, argument);
+    } else if (!argument.startsWith('-') && !message) message = argument;
     else throw new Error(`Unknown or duplicate argument: ${argument}`);
   }
 
   if (!message?.trim() || !model?.trim() || !variant.trim()) {
     throw new Error(
       'Usage: opencode-run <message>|--message <text> --model <provider/model> ' +
-        '[--variant <effort>] [-f <path> ...] [--format default|json] [--capture]',
+        '[--variant <effort>] [-s <session>] [--cwd <project>] [-f <path> ...] ' +
+        '[--require-mcp <server> ...] [--receipt <jsonl>] [--format default|json] [--capture]',
     );
   }
-  return { message, model, variant, files, format, capture };
+  return {
+    message,
+    model,
+    variant,
+    files,
+    format,
+    capture,
+    ...(session ? { session } : {}),
+    ...(cwd ? { cwd } : {}),
+    ...(requiredMcp.length ? { requiredMcp } : {}),
+    ...(receiptPath ? { receiptPath } : {}),
+  };
 }
 
 if (import.meta.main) {

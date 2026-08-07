@@ -1,5 +1,6 @@
 /** Launches native Claude Remote Control with an isolated hybrid MCP worker. */
 
+import { join } from 'node:path';
 import { HYBRID_MCP_SERVER_NAME } from './hybrid-delegation.ts';
 import {
   HYBRID_ATTACHMENT_POLL_MS,
@@ -108,7 +109,7 @@ export function hybridMcpConfig(
         args: [
           'run',
           '--no-lock',
-          `--allow-read=${credentialFile}`,
+          `--allow-read=${credentialFile},${join(cwd, '.mcp.json')}`,
           `--allow-run=${HYBRID_PROCESS_GROUP_BINARIES.session},${HYBRID_PROCESS_GROUP_BINARIES.signal}`,
           `--allow-env=${HYBRID_MCP_ENVIRONMENT_NAMES.join(',')}`,
           serverPath,
