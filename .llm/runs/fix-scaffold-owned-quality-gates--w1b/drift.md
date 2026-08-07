@@ -127,3 +127,18 @@ The authoritative handoff clarifies the release sequence: canary.15 is forbidden
 W1-C merge. Therefore #1024's missing published installed-artifact smoke is a deferred release
 receipt, not implementation drift and not grounds to create an unpublished substitute. The PR must
 reference rather than close #1024 and remain draft at `status:impl` until that later receipt exists.
+
+### Owner relocated the publication observation to milestone 0.0.6
+
+On 2026-08-07 the owner superseded the prior deferred-release disposition. The publication-only
+installed-consumer observation is now focused issue #1343 in milestone 0.0.6, not #1024 acceptance.
+This follows the #1090 pattern: implemented criteria close in their owning issue, while a future
+published-artifact observation remains explicit in a separate verification issue.
+
+Disposition: #1024 retains exactly five completed criteria and links #1343 in non-checkbox
+Follow-up prose. PR #1342 closes #1024 and #1328, references rather than closes #1343, removes the
+publication observation from its authoritative checklists, and treats #1343 as deferred scope rather
+than a merge blocker. This owner-authorized rescope does not alter product code, release order, or
+the formal verdict: immutable implementation head
+`a02467d8cd28be215855764d163fb60508afe895` retains the separate DeepSeek V4 Flash 0731 max PASS
+without a PLAN-EVAL or IMPL-EVAL rerun.

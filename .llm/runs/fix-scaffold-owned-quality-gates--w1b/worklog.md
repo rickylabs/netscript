@@ -362,3 +362,28 @@ It also confirmed clean worktree/lock hygiene and no run-owned survivor. Its #10
 deferred release receipt: canary.15 cannot be published until W1-B and W1-C merge, so the final
 installed clone-independent smoke remains unchecked without weakening the implementation PASS.
 The tracked distillation is `evaluate.md`; neither formal evaluation is to be repeated.
+
+## Owner lifecycle rescope — 2026-08-07
+
+The owner resolved the publication-sequencing deadlock without changing product scope or evidence.
+The exact-canary installed-consumer observation was relocated from #1024 to new issue #1343 in
+milestone 0.0.6, following #1090's observational-verification pattern. #1343 carries `type:test`,
+`area:cli`, `area:tooling`, `area:agentic`, `priority:p1`, `gate:e2e`, and exactly
+`status:triage`, with no wave label.
+
+Live body reconciliation completed through body files:
+
+- #1024's `## Acceptance criteria` now contains exactly its five existing completed boxes; a
+  non-checkbox `## Follow-up` records the 2026-08-07 owner relocation to #1343. Its 0.0.5 milestone
+  is unchanged.
+- PR #1342 now carries `Closes #1024`, `Closes #1328`, and non-closing `Refs #1343` on separate
+  lines. Publication-dependent unchecked boxes and wait language were removed; all remaining PR
+  checkboxes are checked, and the body expressly says the external published observation has not
+  run and is not a merge blocker.
+- The #1024 `acceptance-evidence` block maps only indices 1–5 to the #1092 eight-tool/symptom-led
+  implementation and retained W1-B receipts. The complete #1328 mapping is preserved.
+
+This is a lifecycle ownership change, not an implementation or evaluator change. Immutable head
+`a02467d8cd28be215855764d163fb60508afe895` retains the separate-session DeepSeek V4 Flash 0731 max
+IMPL-EVAL PASS (`49e6c09a-705b-47e4-9598-9b45f932c210`) without rerun. No product file,
+`deno.lock`, foreign worktree, release artifact, Billing Run, or OpenHands surface was touched.

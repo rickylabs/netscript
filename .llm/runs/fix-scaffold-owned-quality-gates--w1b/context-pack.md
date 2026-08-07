@@ -2,9 +2,10 @@
 
 ## Objective
 
-One draft PR directly to `main` closes #1328's scaffold-owned quality implementation and references
-#1024's remaining clone-independent published-smoke receipt. W1-B is a generated-contract repair
-plus proving tests, not a release or whole-scaffold inventory.
+One PR directly to `main` closes #1328's scaffold-owned quality implementation and #1024's five
+already-completed agent-tool criteria. The publication-dependent installed-consumer observation is
+owned by follow-up #1343 in milestone 0.0.6. W1-B is a generated-contract/lifecycle repair plus
+proving tests, not a release or whole-scaffold inventory.
 
 ## State to preserve
 
@@ -34,7 +35,8 @@ no negative selection proof. A fresh diagnostic found five product lint and four
 - E2E injects one deliberate bad fixture per owned surface, including app TSX and AppHost/helper
   MTS, then proves cleanup and a final green check/lint/format-check.
 - Fix generator sources responsible for inherent output findings.
-- Close #1024 with the installed eight-tool smoke running from a real consumer outside any checkout.
+- Preserve #1092's completed five-criterion #1024 contract; #1343 separately owns the later
+  exact-canary installed-consumer observation outside any checkout.
 
 ## Evaluation risks
 
@@ -55,7 +57,8 @@ distillation is `plan-eval.md`; all seven advisories are incorporated into `work
 Design checkpoint. Do not rerun PLAN-EVAL.
 
 The verdict/Design commit is `9ac85e921`; its explicit-refspec push and structured PR comment are
-complete. PR #1342 and both issues are at exactly `status:impl`.
+complete. The formal lifecycle later advanced through implementation evaluation without rerunning
+PLAN-EVAL.
 
 ## Implementation state
 
@@ -81,13 +84,18 @@ Separate session `49e6c09a-705b-47e4-9598-9b45f932c210` returned **PASS** on imm
 independently verified `scaffold.runtime` at 76/0, and ran scoped check/lint/format over 1,195 files
 with zero diagnostics/findings. The tracked verdict is `evaluate.md`.
 
-## Deferred release receipt
+## Owner rescope and lifecycle reconciliation — 2026-08-07
 
-Stable `0.0.4` and published canaries 5 and 14 predate different parts of this branch's combined
-repair. The authoritative handoff forbids canary.15 until W1-B and W1-C merge, so the missing
-published consumer result is sequenced release evidence rather than an implementation defect.
+The owner superseded the deferred-release block: the publication-dependent installed-consumer
+observation moved from #1024 to focused follow-up #1343 in milestone 0.0.6. #1024 now contains
+exactly its five completed acceptance criteria plus a non-checkbox Follow-up link. PR #1342 now uses
+`Closes #1024`, `Closes #1328`, and `Refs #1343`; its completed checklists cover only current W1-B
+scope and its evidence maps #1024 box indices 1–5 plus all eight #1328 boxes. It states explicitly
+that the external published smoke has not run and is not this PR's merge blocker.
 
-Keep PR #1342 draft with `Closes #1328` and `Refs #1024`; keep PR and both issues exactly
-`status:impl`. After both waves merge and the post-fix canary is authorized, run the installed smoke
-outside the framework checkout and use its green receipt to check #1024's final box. Do not rerun
-either formal evaluator, trigger OpenHands, publish from this run, mark ready, or merge.
+The immutable implementation head `a02467d8cd28be215855764d163fb60508afe895` retains the valid
+DeepSeek V4 Flash 0731 max IMPL-EVAL PASS from separate session
+`49e6c09a-705b-47e4-9598-9b45f932c210`; no evaluator was rerun. The remaining workflow is
+lifecycle-only: advance PR #1342 and issues #1024/#1328 to exactly `status:impl-eval`, run the live
+acceptance-evidence mirror dry-run, and mark the PR ready only on a green verdict. Do not merge,
+publish, trigger OpenHands, start Billing Run, or alter release order.
