@@ -479,7 +479,8 @@ Focused current-source receipts:
 | exact `scaffold.runtime.sqlite` attempt | exit 1; 22 passed / 1 failed; original AppHost lint subset exit 0; cleanup passed |
 | read-only run/worktree leak check | exit 0; no run-owned survivors; foreign/unproven resources untouched |
 
-The SQLite/route-seed product sign-off is `SQLITE_SIGNOFF_HEAD` (receipt trail follows separately).
+The SQLite/route-seed product sign-off is
+`58fe8b6f2062c678a672e40a59803f38b74b79f6` (receipt trail follows separately).
 These are post-eval current-head CI repairs, not a repeated evaluation. The immutable DeepSeek V4
 Flash 0731 max PASS remains valid only as recorded on `a02467d8cd28be215855764d163fb60508afe895`;
 PLAN-EVAL and IMPL-EVAL were not rerun.
