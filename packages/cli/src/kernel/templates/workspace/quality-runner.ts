@@ -65,9 +65,16 @@ if (files.length === 0) {
 }
 
 const batches: BatchResult[] = [];
-for (let index = 0; index < files.length; index += BATCH_SIZE) {
-  const batch = files.slice(index, index + BATCH_SIZE);
+const denoFiles = mode === 'check' ? files.filter((file) => !isAppHostSource(file)) : files;
+for (let index = 0; index < denoFiles.length; index += BATCH_SIZE) {
+  const batch = denoFiles.slice(index, index + BATCH_SIZE);
   batches.push(await runBatch(mode, projectRoot, batch));
+}
+if (mode === 'check') {
+  const appHostFiles = files.filter(isAppHostSource);
+  if (appHostFiles.length > 0) {
+    batches.push(await runAppHostCheck(projectRoot, appHostFiles));
+  }
 }
 const ok = batches.every((batch) => batch.exitCode === 0);
 console.log(JSON.stringify(
@@ -140,6 +147,11 @@ function isTypeScript(name: string): boolean {
   return dot >= 0 && EXTENSIONS.has(name.slice(dot + 1).toLowerCase());
 }
 
+function isAppHostSource(path: string): boolean {
+  return path === 'aspire/apphost.mts' ||
+    (path.startsWith('aspire/.helpers/') && path !== 'aspire/.helpers/run-tool.mts');
+}
+
 async function isFile(path: string): Promise<boolean> {
   try {
     return (await Deno.stat(path)).isFile;
@@ -157,12 +169,39 @@ async function runBatch(
   const args = mode === 'check'
     ? ['check', '--unstable-kv', ...files]
     : mode === 'lint'
-    ? ['lint', ...files]
+    ? ['lint', '--no-config', ...files]
     : mode === 'fmt-check'
     ? ['fmt', '--check', ...files]
     : ['fmt', ...files];
   const output = await new Deno.Command('deno', {
     args,
+    cwd: projectRoot,
+    stdout: 'piped',
+    stderr: 'piped',
+  }).output();
+  const decoder = new TextDecoder();
+  return {
+    files,
+    exitCode: output.code,
+    stdout: decoder.decode(output.stdout),
+    stderr: decoder.decode(output.stderr),
+  };
+}
+
+async function runAppHostCheck(
+  projectRoot: string,
+  files: readonly string[],
+): Promise<BatchResult> {
+  const output = await new Deno.Command('deno', {
+    args: [
+      'run',
+      '--allow-read',
+      '--allow-env',
+      'aspire/node_modules/typescript/bin/tsc',
+      '--noEmit',
+      '-p',
+      'aspire/tsconfig.apphost.json',
+    ],
     cwd: projectRoot,
     stdout: 'piped',
     stderr: 'piped',

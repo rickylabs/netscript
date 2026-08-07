@@ -7,6 +7,9 @@ import type { InfrastructureContext } from './register-infrastructure.mts';
 import { buildDatabaseUriEnvKey, resolveWorkspacePath } from '{{__slot3__}}';
 
 type ToolResource = Awaited<ReturnType<DistributedApplicationBuilder['addExecutable']>>;
+type AfterResourcesCreatedEvent = Parameters<
+  Parameters<DistributedApplicationBuilder['subscribeAfterResourcesCreated']>[0]
+>[0];
 type ProcessCommandCapable = {
   readonly withProcessCommand?: (
     name: string,
@@ -51,9 +54,9 @@ function monitorToolFailure(
   resource: ToolResource,
   errorFile: string,
 ): void {
-  builder.subscribeAfterResourcesCreated(async (event) => {
+  builder.subscribeAfterResourcesCreated((event: AfterResourcesCreatedEvent) => {
     const notifications = event.services().getResourceNotificationService();
-    void (async () => {
+    return (async () => {
       const resourceName = await resource.getResourceName();
       await notifications.waitForResourceState(resourceName, { targetState: 'Finished' });
       const detail = (await readFile(errorFile, 'utf8').catch(() => '')).trim();
@@ -102,11 +105,11 @@ async function attachToolDatabase(
   return await databaseBinding.withReference(databaseResource).waitFor(databaseResource);
 }
 
-async function maybeWithProcessCommand(
+function maybeWithProcessCommand(
   resource: ToolResource,
   name: string,
   taskName: string,
-): Promise<ToolResource> {
+): ToolResource {
   if (process.env[PROCESS_COMMANDS_FLAG] !== '1') {
     return resource;
   }

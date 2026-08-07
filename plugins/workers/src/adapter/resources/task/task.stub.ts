@@ -12,7 +12,9 @@ export const denoTaskStub: StubSource<'TASK_ID' | 'TASK_EXPORT'> = defineStub({
 /**
  * Starter workers task definition for %%TASK_ID%%.
  */
-export const %%TASK_EXPORT%%: TaskDefinition<'%%TASK_ID%%'> = defineTask('%%TASK_ID%%')
+export const %%TASK_EXPORT%%: TaskDefinition<'%%TASK_ID%%'> = defineTask(
+  '%%TASK_ID%%',
+)
   .handler((context) => {
     return { payload: context.payload, valid: true };
   })

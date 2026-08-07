@@ -151,7 +151,7 @@ describe('generateRegisterInfrastructure', () => {
     );
     assertStringIncludes(
       output,
-      "import { type CacheWiring, ensureDatabasePassword, ensureGarnetToolManifest, generateAccessToken, resolveDataPath, shouldUseContainerCache } from './_aspire-compat.mts'",
+      "import { type CacheWiring, ensureDatabasePassword, ensureGarnetToolManifest, generateAccessToken as _generateAccessToken, resolveDataPath, shouldUseContainerCache } from './_aspire-compat.mts'",
     );
   });
 

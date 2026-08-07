@@ -1,4 +1,4 @@
-import { assertEquals } from 'jsr:@std/assert@^1';
+import { assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
 import { join } from '@std/path';
 import { generateQualityRunner } from './quality-runner.ts';
 
@@ -149,4 +149,14 @@ Deno.test('generated quality runner is itself lint and format clean in its consu
       ]);
     }
   });
+});
+
+Deno.test('generated quality runner checks AppHost source through its restored TypeScript project', () => {
+  const source = generateQualityRunner();
+  assertStringIncludes(source, "path === 'aspire/apphost.mts'");
+  assertStringIncludes(source, "path.startsWith('aspire/.helpers/')");
+  assertStringIncludes(source, "path !== 'aspire/.helpers/run-tool.mts'");
+  assertStringIncludes(source, "'aspire/node_modules/typescript/bin/tsc'");
+  assertStringIncludes(source, "'aspire/tsconfig.apphost.json'");
+  assertStringIncludes(source, "['lint', '--no-config', ...files]");
 });

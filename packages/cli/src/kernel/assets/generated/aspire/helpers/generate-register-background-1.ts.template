@@ -9,12 +9,9 @@ import {
   buildDatabaseProviderEnvVars,
   buildSqliteDatabaseUrl,
   buildOtelEnvVars,
-  extractDependencies,
-  extractPluginReferences,
-  extractServiceReferences,
   resolvePermissions,
   resolveWorkspacePath,
-  withCacheReference,
+  withCacheReference as _withCacheReference,
 } from '{{__slot3__}}';
 
 type ExecutableResource = ReturnType<DistributedApplicationBuilder['addExecutable']>;
@@ -42,8 +39,8 @@ export async function registerBackgroundProcessors(
   builder: DistributedApplicationBuilder,
   config: NetScriptConfig,
   infrastructure: InfrastructureContext,
-  services: Map<string, ExecutableResource>,
-  plugins: Map<string, ExecutableResource>,
+  _services: Map<string, ExecutableResource>,
+  _plugins: Map<string, ExecutableResource>,
   appHostDir: string,
 ): Promise<Map<string, ExecutableResource>> {
   const backgroundProcessors = new Map<string, ExecutableResource>();

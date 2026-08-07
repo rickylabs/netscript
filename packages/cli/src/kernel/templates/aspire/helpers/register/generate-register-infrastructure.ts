@@ -304,7 +304,7 @@ function denokvContainerSetup(
   const imageRef = `${DENOKV_CONTAINER.image}:${tag}`
   const lines: string[] = []
 
-  lines.push(`  const ${id}_token = generateAccessToken();`)
+  lines.push(`  const ${id}_token = _generateAccessToken();`)
   lines.push(`  const ${id} = await builder.addContainer('${name}', '${imageRef}')`)
   lines.push(
     `    .withEndpoint({ name: 'http', targetPort: ${DENOKV_HTTP_PORT}, scheme: 'http' })`,

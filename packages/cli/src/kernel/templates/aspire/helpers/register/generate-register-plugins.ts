@@ -185,7 +185,7 @@ export function generateRegisterPlugins(options: RegisterPluginsOptions): string
         const refId = safeIdentifier(ref);
         lines.push(`    {`);
         lines.push(
-          `      const ${refId}Endpoint = await services.get('${ref}')?.getEndpoint('http');`,
+          `      const ${refId}Endpoint = await _services.get('${ref}')?.getEndpoint('http');`,
         );
         lines.push(`      if (${refId}Endpoint) {`);
         lines.push(

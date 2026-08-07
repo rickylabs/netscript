@@ -2,6 +2,7 @@ import { join } from '@std/path';
 
 import { reconcilePluginReferences } from '../../../../kernel/adapters/plugin/plugin-reference-reconciler.ts';
 import { regenerateAspireHelpers } from '../../../../kernel/adapters/service/workspace-mutator.ts';
+import { formatGeneratedFiles } from '../../../../kernel/application/scaffold/support/format-generated-files.ts';
 import { IoError } from '../../../../kernel/domain/errors/cli-exit-error.ts';
 import type { FileSystemPort } from '../../../../kernel/ports/file-system-port.ts';
 import type { ProcessPort } from '../../../../kernel/ports/process-port.ts';
@@ -152,12 +153,19 @@ async function regenerateRemovalHelpers(
   if (!dependencies.scaffolder || !dependencies.templateAdapter) {
     throw new Error('Removal wiring regeneration dependencies are unavailable.');
   }
-  return await (dependencies.regenerateHelpers ?? regenerateAspireHelpers)(
+  const helperFiles = await (dependencies.regenerateHelpers ?? regenerateAspireHelpers)(
     projectRoot,
     dependencies.fs,
     dependencies.scaffolder,
     dependencies.templateAdapter,
   );
+  await formatGeneratedFiles(
+    dependencies.processRunner,
+    projectRoot,
+    helperFiles,
+    (path) => dependencies.fs.exists(path),
+  );
+  return helperFiles;
 }
 
 async function reverseManagedRootDenoJson(

@@ -25,7 +25,6 @@ import type {
   TriggerEvent,
 } from '@netscript/plugin-triggers-core/domain';
 %%JOB_IMPORT%%%%JOB_BLOCK%%
-
 /**
  * Starter scheduled trigger for %%TRIGGER_ID%%.
  */

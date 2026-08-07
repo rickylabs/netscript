@@ -212,6 +212,10 @@ describe('HelpersGeneratorPipeline', () => {
     assertStringIncludes(compat!.content, 'DATABASE_PROVIDER: config.PrimaryDatabase');
     assertStringIncludes(compat!.content, 'export function buildSqliteDatabaseUrl(');
     assertStringIncludes(compat!.content, 'pathToFileURL(');
+    assertStringIncludes(compat!.content, 'export const NetScriptConfigSchema =');
+    assertStringIncludes(compat!.content, 'export const AppEntrySchema =');
+    assertStringIncludes(compat!.content, 'export const BackgroundProcessorEntrySchema =');
+    assertStringIncludes(compat!.content, 'export const ToolEntrySchema =');
   });
 
   it('should bound best-effort Garnet tool restore', async () => {

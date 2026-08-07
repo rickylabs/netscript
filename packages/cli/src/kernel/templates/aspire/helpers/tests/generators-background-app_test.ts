@@ -196,7 +196,7 @@ describe('generateRegisterBackground', () => {
     // Single seam over the pre-built primary-cache wiring.
     assertStringIncludes(
       output,
-      'await withCacheReference(triggers, infrastructure.primaryCacheWiring)',
+      'await _withCacheReference(triggers, infrastructure.primaryCacheWiring)',
     );
     assertStringIncludes(output, 'withCacheReference,');
     // EndpointProperty no longer imported — endpoint resolution moved to wiring.
@@ -418,9 +418,9 @@ describe('generateRegisterApps', () => {
     });
 
     assertStringIncludes(output, '// Server-side service-discovery injection');
-    assertStringIncludes(output, "getResourceEndpoint(services.get('users'), 'http')");
+    assertStringIncludes(output, "getResourceEndpoint(_services.get('users'), 'http')");
     assertStringIncludes(output, "dashboard.withEnvironment('services__users__http__0', endpoint)");
-    assertStringIncludes(output, "getResourceEndpoint(plugins.get('workers-api'), 'http')");
+    assertStringIncludes(output, "getResourceEndpoint(_plugins.get('workers-api'), 'http')");
     assertStringIncludes(
       output,
       "dashboard.withEnvironment('services__workers-api__http__0', endpoint)",

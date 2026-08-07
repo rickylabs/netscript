@@ -8,7 +8,7 @@ import { v1 } from '@{{projectName}}/contracts';
 const startTime = Date.now();
 
 export const health = {
-  check: v1.{{serviceName | camelCase}}.health.check.handler(async () => ({
+  check: v1.{{serviceName | camelCase}}.health.check.handler(() => ({
     status: 'healthy' as const,
     service: '{{serviceName}}',
     version: '1.0.0',

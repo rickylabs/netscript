@@ -203,3 +203,49 @@ Post-slice trail reconciliation:
 - PR #1342, #1024, and #1328 each retain exactly one lifecycle label, `status:impl`, with every
   unrelated label preserved;
 - the worktree was clean after the product commit and `deno.lock` remained absent from status.
+
+## Slice 2 — generator-owned clean output
+
+Repaired the measured generated-source defects without weakening the selection contract:
+
+- Fresh layout/telemetry and service templates now emit lint-clean JSX keys, boolean attributes,
+  and synchronous handlers where no asynchronous effect exists.
+- Saga and trigger resource generators use an explicit single-quoted TypeScript literal renderer,
+  including apostrophe escaping; worker and trigger starter output is format-stable.
+- AppHost compatibility output now exports the schemas consumed by `config-schema.mts`, gives the
+  after-resources callback an SDK-derived type, replaces loose `any` seams with named structural
+  types, and removes conditional unused imports/parameters from emitted source.
+- `tsconfig.apphost.json` includes scaffold-owned `.helpers/**/*.mts` but excludes the Deno-only
+  `run-tool.mts`. Generated check classifies that file through Deno and checks the remaining helper
+  graph through the restored project-local TypeScript compiler, keeping Aspire's generated SDK
+  bundle out of the direct product verdict.
+- Plugin/AppHost regeneration formats the exact helper-file result and the generator-mutated
+  `netscript.config.ts` with fixed scaffold style. It filters nonexistent injected test paths,
+  fails on real formatter errors, and never broad-formats a consumer tree.
+- The runtime suite restores Aspire before the negative and positive quality gates, which is the
+  native prerequisite for AppHost compilation.
+
+Drift was recorded before expanding the repair for the missing compatibility schemas, implicit SDK
+event, generated-SDK/native-compiler boundary, Deno-only helper classification, and parent-workspace
+lint widening. The resulting runner uses `deno lint --no-config` with its exact selected paths;
+fresh scaffolds define no custom lint rules, so this preserves the recommended rule set while
+preventing parent configuration and generated Prisma dependencies from escaping the reported
+selection.
+
+Slice 2 evidence before commit:
+
+- focused semantic/generator/install/remove/E2E registry tests: exit 0, 78 passed / 186 steps;
+- deliberate ten-surface negative probe: exit 0 on the post-restore diagnostic scaffold, including
+  TS, TSX, plugin/background, and AppHost helper MTS, followed by cleanup;
+- a second entirely fresh current-source scaffold completed init, seven official plugin mutations,
+  AI lifecycle/list/UI copy, DB codegen, registry generation, and Aspire restore; its generated
+  check, lint, format-check, and UI AI check gates all exited 0 over 144 selected product files;
+- scoped check wrapper: 1,071 files, 9 batches, 0 failed, 0 diagnostics;
+- scoped lint wrapper: 1,071 files, 6 batches, exit 0, 0 findings;
+- scoped format wrapper: 1,071 files, 6 batches, 0 failed, 0 findings;
+- `git diff --check`: exit 0; root `deno.lock` remained absent from status and untouched.
+
+Sole-supervisor inspection traced each emitted finding back to its owning template or resource
+generator, verified the dual Deno/AppHost helper classification, inspected the exact formatter
+boundary and failure propagation, reran the plugin install/remove contract suite, and confirmed the
+optional #1092 agent bundle is unchanged. No architecture debt or deferred W1-C scope was absorbed.

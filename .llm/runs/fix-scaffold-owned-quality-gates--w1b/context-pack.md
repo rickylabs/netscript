@@ -59,11 +59,19 @@ complete. PR #1342 and both issues are at exactly `status:impl`.
 
 ## Implementation state
 
-Slice 1 is ready to commit: the always-generated runner, root task wiring, scaffold bookkeeping,
-colocated semantics, and runtime negative/positive quality gates are implemented. Focused tests are
-58/58 green; scoped CLI check/lint/fmt wrappers are green over 811 TS/TSX files. The runtime gate
-order is codegen, registry generation, ten negative probes, then check/lint/format-check. No lock or
-protected-state change occurred.
+Slice 1 is committed/pushed as `80a5dc07b`; its trail reconciliation is `10a9287ec`, and the
+structured comment is `#issuecomment-5214270787`.
 
-Next: commit/push Slice 1 explicitly, post its structured implementation comment and reconcile
-status, then repair only the measured generator-owned lint/format defects in Slice 2.
+Slice 2 now repairs the measured app/service/plugin/background output plus the AppHost defects
+revealed by the expanded selection. AppHost product MTS is checked with the restored local
+TypeScript project; the Deno-only `run-tool.mts` remains under Deno check; generated Aspire SDK and
+Prisma output remain non-product inputs rather than direct lint/fmt targets. Plugin regeneration
+formats its exact outputs and `netscript.config.ts` at the owning mutation boundary.
+
+Current evidence: 78 focused tests / 186 steps green; fresh generated check/lint/fmt and UI AI gates
+green across 144 selected product files; scoped repo check/lint/fmt wrappers green over 1,071 files.
+The root lock remains untouched and absent from status.
+
+Next: commit/push Slice 2 explicitly, post its structured implementation comment and reconcile
+status, then run the accepted Slice 3 static/package gates, installed released consumer smoke,
+leak-check, and single one-pass `scaffold.runtime` before the independent IMPL-EVAL handoff.

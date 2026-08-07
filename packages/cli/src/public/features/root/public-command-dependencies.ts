@@ -34,6 +34,7 @@ import { ServiceScaffolder } from '../../../kernel/adapters/service/scaffolder.t
 import { ServiceClientScaffolder } from '../../../kernel/adapters/service/client-scaffolder.ts';
 import { ServiceWorkspaceResolver } from '../../../kernel/adapters/service/workspace-resolver.ts';
 import { emptyScaffoldResult } from '../../../kernel/application/scaffold/support/helpers.ts';
+import { formatGeneratedFiles } from '../../../kernel/application/scaffold/support/format-generated-files.ts';
 import { DbEngineRegistry } from '../../../kernel/application/registries/db-engine-registry.ts';
 import { DeployTargetRegistry } from '../../../kernel/application/registries/deploy-target-registry.ts';
 import { PluginKindRegistry } from '../../../kernel/application/registries/plugin-kind-registry.ts';
@@ -302,7 +303,13 @@ export function createPublicCommandDependencies(
     },
     authSessionHttp: new FetchAuthSessionHttp(),
     authRegenerateAspire: async (projectRoot) => {
-      await generateAspire({ projectRoot }, { fs, scaffolder, templateAdapter });
+      const result = await generateAspire({ projectRoot }, { fs, scaffolder, templateAdapter });
+      await formatGeneratedFiles(
+        process,
+        projectRoot,
+        result.helperFiles,
+        (path) => fs.exists(path),
+      );
     },
     pluginScaffoldDependencies: {
       fs,

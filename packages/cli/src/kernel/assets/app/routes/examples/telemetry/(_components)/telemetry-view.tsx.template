@@ -51,7 +51,7 @@ function TraceCard({ trace }: { trace: TelemetryTrace }) {
               </tr>
             </thead>
             <tbody>
-              {trace.spans.map((span) => <SpanRow span={span} />)}
+              {trace.spans.map((span) => <SpanRow key={span.spanId} span={span} />)}
             </tbody>
           </table>
         </div>
@@ -109,7 +109,7 @@ export function TelemetryView({ data, examplesHref }: TelemetryViewProps) {
           )}
 
           <div class='ns-stack ns-stack--sm'>
-            {data.traces.map((trace) => <TraceCard trace={trace} />)}
+            {data.traces.map((trace) => <TraceCard key={trace.traceId} trace={trace} />)}
           </div>
         </div>
       </section>

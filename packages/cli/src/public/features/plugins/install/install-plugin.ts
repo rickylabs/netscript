@@ -8,6 +8,7 @@ import { copyPluginSchemasToRootDb } from '../../../../kernel/adapters/plugin/db
 import { PluginKindRegistry } from '../../../../kernel/application/registries/plugin-kind-registry.ts';
 import { PluginWorkspaceMutator } from '../../../../kernel/adapters/plugin/workspace-mutator.ts';
 import { regenerateAspireHelpers } from '../../../../kernel/adapters/service/workspace-mutator.ts';
+import { formatGeneratedFiles } from '../../../../kernel/application/scaffold/support/format-generated-files.ts';
 import { reconcilePluginReferences } from '../../../../kernel/adapters/plugin/plugin-reference-reconciler.ts';
 import { SCAFFOLD_DIRS } from '../../../../kernel/constants/scaffold/scaffold-dirs.ts';
 import type {
@@ -221,6 +222,12 @@ export async function installPlugin(
     dependencies.scaffolder,
     dependencies.templateAdapter,
   );
+  if (dependencies.processRunner) {
+    await formatGeneratedFiles(dependencies.processRunner, plan.projectRoot, [
+      ...helperFiles,
+      join(plan.projectRoot, 'netscript.config.ts'),
+    ], (path) => dependencies.fs.exists(path));
+  }
   return {
     ...rendered,
     resolvedPlugin: resolvedPlugin?.descriptor,

@@ -88,6 +88,11 @@ Proving gate: focused CLI and plugin generator tests, asset freshness, then a ne
 DB codegen/plugin registries followed by generated check, lint, and format-check. The only direct
 lint/fmt exclusions are documented non-product/generated outputs.
 
+Implementation refinement recorded in `drift.md`: AppHost-owned MTS uses the restored native
+`tsc -p aspire/tsconfig.apphost.json` project, with `.helpers/**/*.mts` included. The Deno-executed
+`run-tool.mts` stays in the same quality selection but is checked by Deno. Aspire's generated SDK
+bundle remains a compiler input, not a scaffold-owned lint/fmt surface.
+
 ### Slice 3 — consumer/runtime closure and evidence
 
 - Run `netscript agent init` in a published scaffold outside this checkout and execute the installed

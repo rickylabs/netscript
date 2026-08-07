@@ -38,7 +38,7 @@ export async function registerPlugins(
   builder: DistributedApplicationBuilder,
   config: NetScriptConfig,
   infrastructure: InfrastructureContext,
-  services: Map<string, ExecutableResource>,
+  _services: Map<string, ExecutableResource>,
   appHostDir: string,
 ): Promise<Map<string, ExecutableResource>> {
   const plugins = new Map<string, ExecutableResource>();
