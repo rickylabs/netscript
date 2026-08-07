@@ -145,3 +145,35 @@ T1 live delta: #1315 now has fresh independent DeepSeek max `PASS` evidence (ses
 review at evidence-only head `112489710...`; #1316 remains ready with preserved Qwen PASS at a new
 evidence-only synchronize head `ca9f6cd15...`. GitHub has not materialized current-head workflow
 sets for either new head yet, so both remain held. Do not infer green from empty rollups.
+
+## Terminal C14 context — 2026-08-07
+
+The stale held state above is superseded. PRs #1315, #1316, #1317, and #1318 merged sequentially,
+then payload PR #1340 landed on `main` as `d6db645a89d830e6c36e838e8e1dac98fc84fde5` and closed
+#1295, #1189, #1117, and #1115. Prerelease
+[`v0.0.5-canary.14`](https://github.com/rickylabs/netscript/releases/tag/v0.0.5-canary.14) was
+published at `2026-08-06T21:39:04Z`; immutable tag content SHA is
+`d405def432b46d8119162a605b7e988db9d3f1fc`.
+
+The first pinned production E2E failed only when JSR returned a transient 502 for an already
+published Fresh file. The supported tag-bound same-semver recovery run
+[`31128595811`](https://github.com/rickylabs/netscript/actions/runs/31128595811) completed success:
+same-tree guard, production-path checks, exact registry verification, and green-pair recording all
+passed. Its exact canary-pinned child
+[`31128614286`](https://github.com/rickylabs/netscript/actions/runs/31128614286) completed success.
+No canary.15 was cut.
+
+Current 0.0.5 queue: orchestration PR #1337 is the only open milestone PR. Twenty-seven issues
+remain: #1338; W1 #1312/#1148, #1024/#1328, #1324/#1330; W2 #1325, #1329, #1202/#1327; W3
+#1326, #1102/#1197, #1119; W4 #1333, #1208, #1108; W5 #1137/#1138, #1332/#1334; and evidence or
+umbrella closures #1004/#1090/#1126/#1166/#1169.
+
+The root's pre-existing unstaged `deno.lock` is protected at the terminal observed SHA-256
+`1c4d59cc38c00742997d3c20dc39ae79b7966891422969b7b444d76642d0ccc1`. Do not stage, restore, or
+overwrite it. Do not clean or reuse quarantined worktrees
+`/home/codex/repos/ns005-t2a-refresh.6hYJaW` and
+`/home/codex/repos/ns005-t2b-refresh.DMBKiM`.
+
+Resume rule: one writer only. Never overlap app-server and CLI/tmux resume for thread
+`019fd77c-f583-7b01-aed8-c8665ac09230` in this worktree. After `/clear`, first re-query
+`origin/main` and #1312/#1148, then start W1-A as a fresh direct-to-main draft PR.

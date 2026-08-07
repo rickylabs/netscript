@@ -191,3 +191,26 @@ The eight named 0.0.6 moves, stable publication itself until canary.16 is green,
 milestone work, broad doctrine remediation unrelated to changed files, and any new capability not
 required by the acceptance above are outside this plan. Findings become linked issues with full
 taxonomy/milestone; they do not expand an active PR silently.
+
+## Post-C14 owner correction — authoritative continuation plan
+
+This section supersedes the earlier train-target, W1-before-C14, always-PLAN-EVAL, Qwen-default,
+and OpenHands statements above. Canary.14 is released and verified. From the first post-C14
+implementation onward:
+
+- Each meaningful, tightly connected issue cluster owns one draft PR directly against `main`, with
+  an independent CI/review lifecycle. The orchestrator branch is coordination history only, never
+  a code aggregation target.
+- W1 is the first canary.15 dependency group: W1-A (#1312 + #1148), W1-B (#1024 + #1328), and W1-C
+  (#1324 + #1330) remain separate direct-to-main PRs. Billing Run waits for canary.15 because
+  canary.14 does not publish W1-B's consumer tooling/quality surface or W1-C's OpenCode MCP attach
+  and provider-valid resume fixes; testing the demo earlier would exercise stale published code.
+- PLAN-EVAL is used only for genuinely complex or decision-heavy work. Independent IMPL-EVAL stays
+  mandatory. Its default is `deepseek/deepseek-v4-flash-0731` at max; only an OpenRouter-blocked
+  lane may fall back through the checked-in AGY/Google toolchain to Gemini 3.6 Flash high.
+- OpenHands remains paused until repaired. Preserve valid evidence, never rerun a valid PASS solely
+  because a default changed, and repair only an actual failing current-head gate.
+- Never overlap app-server and CLI/tmux resume writers for the same thread/worktree.
+
+Exact first action after `/clear`: fetch and re-query `origin/main` plus #1312/#1148, then open the
+W1-A direct-to-main draft PR from a fresh clean worktree; do not implement Billing Run yet.

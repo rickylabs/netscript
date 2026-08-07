@@ -571,3 +571,25 @@ files.
   unchanged product tree. The protected dirty lock and stash are byte-unchanged.
 - Both PRs are clean/mergeable at their new evidence heads, but GitHub has not yet materialized
   their new workflow sets. Absence of checks is unproven, not green; neither may merge yet.
+
+## 2026-08-06/07 — C14 queue shipped and green pair verified
+
+- #1315 merged at `95a60cbaf8384f8c21e822f383dfcab6b8a8c189`; #1316 followed at
+  `51787c3aef48fd6b7fe55005dfe19cd16b141b81`; mechanically refreshed #1317 and #1318 then merged
+  at `765e8b7329bfba6d073791f5e067274349a7653e` and
+  `a5c13ecdd0df3455e5c4ce0f08fcc59dae251826`. Valid prior IMPL-EVAL PASS evidence was preserved.
+- Exact-tree local pre-merge evidence for the payload passed check, lint, fmt, release preflight,
+  publish dry-run, production install, live-Redis controls, and 2,937 repository tests with zero
+  failures. Payload PR #1340 then squash-merged to `main` as
+  `d6db645a89d830e6c36e838e8e1dac98fc84fde5`; #1295/#1189/#1117/#1115 auto-closed and terminal
+  PR/issue labels were reconciled to `status:shipped`.
+- `v0.0.5-canary.14` published at `2026-08-06T21:39:04Z`, tag content
+  `d405def432b46d8119162a605b7e988db9d3f1fc`. The initial pinned E2E hit a transient JSR 502 on
+  `@netscript/fresh`; its separate quickstart walk passed. No code repair was warranted.
+- Documented tag-bound same-semver recovery run `31128595811` completed success and reverified the
+  production path, exact registry membership, and green pair. Exact pinned child E2E run
+  `31128614286` completed success. Canary.14 is terminal green; canary.15 was not cut.
+- Post-C14 workflow is small connected PRs directly to `main`; no aggregate train PR. W1-A/B/C is
+  the first canary.15 group. Billing Run waits for W1-B/W1-C to exist in the published canary.15.
+- Only mandatory terminal artifacts were changed. Root `deno.lock` and both quarantined interrupted
+  worktrees remained untouched.
