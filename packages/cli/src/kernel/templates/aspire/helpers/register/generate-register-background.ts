@@ -172,7 +172,7 @@ export function generateRegisterBackground(options: RegisterBackgroundOptions): 
     if (entry.RequiresKv) {
       lines.push(``);
       lines.push(`    // KV cache dependency`);
-      lines.push(`    await withCacheReference(${id}, infrastructure.primaryCacheWiring);`);
+      lines.push(`    await _withCacheReference(${id}, infrastructure.primaryCacheWiring);`);
     }
 
     // Service references — wired via endpoint env vars (executable→executable)
@@ -186,7 +186,7 @@ export function generateRegisterBackground(options: RegisterBackgroundOptions): 
         const refId = safeIdentifier(ref);
         lines.push(`    {`);
         lines.push(
-          `      const ${refId}Endpoint = await services.get('${ref}')?.getEndpoint('http');`,
+          `      const ${refId}Endpoint = await _services.get('${ref}')?.getEndpoint('http');`,
         );
         lines.push(`      if (${refId}Endpoint) {`);
         lines.push(
@@ -206,7 +206,7 @@ export function generateRegisterBackground(options: RegisterBackgroundOptions): 
         const refId = safeIdentifier(ref);
         lines.push(`    {`);
         lines.push(
-          `      const ${refId}Endpoint = await plugins.get('${ref}')?.getEndpoint('http');`,
+          `      const ${refId}Endpoint = await _plugins.get('${ref}')?.getEndpoint('http');`,
         );
         lines.push(`      if (${refId}Endpoint) {`);
         lines.push(

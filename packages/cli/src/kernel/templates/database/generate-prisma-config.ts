@@ -29,6 +29,7 @@ export function generatePrismaConfig(
   const fallbackUrl = provider.engine === 'sqlite'
     ? `'file:./${options.databaseName ?? `${options.configKey}.db`}'`
     : "env('DATABASE_URL')";
+  const prismaConfigImports = provider.engine === 'sqlite' ? 'defineConfig' : 'defineConfig, env';
 
   return renderTemplateAssetSync(TEMPLATE_KEYS.generatedDatabaseGeneratePrismaConfig1, {
     __slot0__: String(provider.displayName),
@@ -36,6 +37,7 @@ export function generatePrismaConfig(
     __slot2__: String(envKey),
     __slot3__: String(fallbackUrl),
     __slot4__: String(provider.engine),
+    __slot5__: String(prismaConfigImports),
   });
 }
 

@@ -21,6 +21,7 @@ import {
   sagaDirectory,
   type SagaInput,
   stringArrayLiteral,
+  typescriptStringLiteral,
 } from '../input.ts';
 import { sagaConfigStub, sagaDefinitionStub } from './saga.stub.ts';
 
@@ -58,13 +59,13 @@ export const sagaScaffolder: ItemScaffolder<SagaInput> = {
         substituteTokens(sagaConfigStub, {
           CONFIG_EXPORT: `${exportName}Config`,
           DESCRIPTION_LINE: input.description
-            ? `\n  .description(${JSON.stringify(input.description)})`
+            ? `\n  .description(${typescriptStringLiteral(input.description)})`
             : '',
           SAGA_ENTRYPOINT: `${directory}/${stem}-saga.ts`,
           SAGA_ID: input.id,
           SAGA_NAME: displayName(input.id),
           TAGS_LINE: input.tags?.length ? `\n  .tags(...${stringArrayLiteral(input.tags)})` : '',
-          TOPIC_LINE: input.topic ? `\n  .topic(${JSON.stringify(input.topic)})` : '',
+          TOPIC_LINE: input.topic ? `\n  .topic(${typescriptStringLiteral(input.topic)})` : '',
         }),
       ),
     ];

@@ -153,7 +153,7 @@ describe('generateRegisterInfrastructure', () => {
       primaryCache: 'deno-kv',
     })
 
-    assertStringIncludes(output, 'deno_kv_token = generateAccessToken();')
+    assertStringIncludes(output, 'deno_kv_token = _generateAccessToken();')
     assertStringIncludes(
       output,
       "builder.addContainer('deno-kv', 'ghcr.io/denoland/denokv:0.11.0')",
@@ -285,7 +285,7 @@ describe('generateRegisterInfrastructure', () => {
       output,
       "builder.addContainer('deno-kv', 'ghcr.io/denoland/denokv:0.11.0')",
     )
-    assertStringIncludes(output, 'deno_kv_token = generateAccessToken();')
+    assertStringIncludes(output, 'deno_kv_token = _generateAccessToken();')
     // Docker absent → Garnet executable cross-fallback (D6).
     assertStringIncludes(
       output,
@@ -320,6 +320,9 @@ describe('generateRegisterInfrastructure', () => {
     assertStringIncludes(output, "databases.set('sqlite', sqlite);")
     assert(!output.includes('sqlite_server.addDatabase('))
     assert(!output.includes('const sqlite_server'))
+    assert(!output.includes('ContainerLifetime'))
+    assert(!output.includes('ensureDatabasePassword'))
+    assert(!output.includes('const isolatedStart'))
   })
 
   it('generates one resolved graph resource per scaffolded backing service', () => {

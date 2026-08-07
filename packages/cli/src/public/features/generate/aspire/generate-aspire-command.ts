@@ -6,6 +6,7 @@ import { DEFAULT_TEMPLATE_REGISTRY } from '../../../../kernel/application/regist
 import type { PublicCommandDependencies } from '../../root/public-command-dependencies.ts';
 import { requireProjectRoot } from '../../../presentation/support.ts';
 import { generateAspire } from './generate-aspire.ts';
+import { formatGeneratedFiles } from '../../../../kernel/application/scaffold/support/format-generated-files.ts';
 
 /** Create `generate aspire`, regenerating helpers without re-scaffolding. */
 export function createGenerateAspireCommand(
@@ -25,6 +26,12 @@ export function createGenerateAspireCommand(
         scaffolder: dependencies.scaffolder,
         templateAdapter: dependencies.templateAdapter,
       });
+      await formatGeneratedFiles(
+        dependencies.process,
+        projectRoot,
+        result.helperFiles,
+        (path) => dependencies.fs.exists(path),
+      );
       outputText(`Regenerated ${result.helperFiles.length} Aspire helper files.`);
     });
 }

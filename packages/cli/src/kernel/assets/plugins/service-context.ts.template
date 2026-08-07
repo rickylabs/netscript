@@ -105,10 +105,10 @@ class LazyPluginKv implements WatchableKv {
   }
 }
 
-export async function createPluginServiceContext(
+export function createPluginServiceContext(
   pluginName: string,
 ): Promise<PluginServiceContext> {
-  return {
+  return Promise.resolve({
     db: {
       getClient: getDatabaseClient,
     },
@@ -119,5 +119,5 @@ export async function createPluginServiceContext(
     kv: new LazyPluginKv(),
     logger: createPluginLogger(pluginName),
     env: Deno.env.toObject(),
-  };
+  });
 }

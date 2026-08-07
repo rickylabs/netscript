@@ -13,6 +13,7 @@ import {
   createProjectBoundaryGates,
 } from './database-gates.ts';
 import { createGeneratedPluginCheckGates } from './generated-plugins-check-gate.ts';
+import { createGeneratedQualityGates } from './generated-quality-gate.ts';
 import { createOtelGates } from './otel-gates.ts';
 import { createCleanupGates, createRuntimeGates } from './runtime-gates.ts';
 import { createPreflightGates, createScaffoldGates } from './scaffold-gates.ts';
@@ -44,6 +45,7 @@ export function createScaffoldCapabilityGates(
     ...createBehaviorPluginUnhealthyGates(),
     ...createGeneratedPluginCheckGates(),
     ...createPluginRegistryGenerationGates(),
+    ...createGeneratedQualityGates(),
     ...runtimeGates.slice(0, startIndex + 1),
     ...residentDatabaseGates,
     ...runtimeGates.slice(startIndex + 1),

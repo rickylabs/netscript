@@ -2,11 +2,12 @@
 // D-7 workaround: Node.js-compatible copies of @netscript/aspire helpers.
 // Remove when Aspire 13.3 adds Deno runtime support (aspire#15812).
 
-import { join, resolve } from "node:path";
-import { pathToFileURL } from "node:url";
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { execFileSync } from "node:child_process";
-import process from "node:process";
+import { join, resolve } from 'node:path';
+import { pathToFileURL } from 'node:url';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
+import process from 'node:process';
+import { z } from 'zod';
 
 // ============================================================================
 // Types
@@ -22,15 +23,26 @@ export interface NetScriptConfig {
       readonly WatchMode: boolean;
     };
   };
-  readonly Databases: Record<string, any>;
-  readonly Cache: Record<string, any>;
-  readonly Services: Record<string, any>;
-  readonly Plugins: Record<string, any>;
-  readonly BackgroundProcessors: Record<string, any>;
-  readonly Apps: Record<string, any>;
-  readonly Tools: Record<string, any>;
+  readonly Databases: Record<string, NetScriptResourceEntry>;
+  readonly Cache: Record<string, NetScriptResourceEntry>;
+  readonly Services: Record<string, NetScriptResourceEntry>;
+  readonly Plugins: Record<string, NetScriptResourceEntry>;
+  readonly BackgroundProcessors: Record<string, NetScriptResourceEntry>;
+  readonly Apps: Record<string, NetScriptResourceEntry>;
+  readonly Tools: Record<string, NetScriptResourceEntry>;
   readonly PrimaryDatabase?: string;
   readonly PrimaryCache?: string;
+}
+
+export interface NetScriptResourceEntry {
+  readonly [key: string]: unknown;
+  readonly DatabaseName?: string;
+  readonly Enabled?: boolean;
+  readonly Engine?: string;
+  readonly PluginReferences?: readonly string[];
+  readonly RequiresDb?: boolean;
+  readonly RequiresKv?: boolean;
+  readonly ServiceReferences?: readonly string[];
 }
 
 export interface ResourceDependencies {
@@ -39,6 +51,40 @@ export interface ResourceDependencies {
 }
 
 export type OtelMode = 'denoApp' | 'denoTask' | 'executable';
+
+// Project-specific config generation extends these schemas to preserve literal
+// resource names without importing Deno-owned framework modules into AppHost.
+const ResourceEntrySchema = z.looseObject({});
+export const AppEntrySchema = ResourceEntrySchema;
+export const BackgroundProcessorEntrySchema = ResourceEntrySchema;
+export const CacheEntrySchema = ResourceEntrySchema;
+export const DatabaseEntrySchema = ResourceEntrySchema;
+export const PluginEntrySchema = ResourceEntrySchema;
+export const ServiceEntrySchema = ResourceEntrySchema;
+export const ToolEntrySchema = ResourceEntrySchema;
+export const NetScriptConfigSchema = z.looseObject({
+  Name: z.string(),
+  Version: z.string().default('1.0.0'),
+  Otel: z.looseObject({
+    HttpEndpoint: z.string(),
+    Protocol: z.string(),
+  }),
+  Defaults: z.looseObject({
+    Deno: z.looseObject({
+      Permissions: z.array(z.string()),
+      WatchMode: z.boolean(),
+    }),
+  }),
+  Databases: z.record(z.string(), DatabaseEntrySchema).default({}),
+  Cache: z.record(z.string(), CacheEntrySchema).default({}),
+  Services: z.record(z.string(), ServiceEntrySchema).default({}),
+  Plugins: z.record(z.string(), PluginEntrySchema).default({}),
+  BackgroundProcessors: z.record(z.string(), BackgroundProcessorEntrySchema).default({}),
+  Apps: z.record(z.string(), AppEntrySchema).default({}),
+  Tools: z.record(z.string(), ToolEntrySchema).default({}),
+  PrimaryDatabase: z.string().optional(),
+  PrimaryCache: z.string().optional(),
+});
 
 // ============================================================================
 // Constants
@@ -139,7 +185,9 @@ export function ensureDatabasePassword(appHostDir: string, resourceName: string)
 // Database environment helpers
 // ============================================================================
 
-export function buildDatabaseUriEnvKey(config: Pick<NetScriptConfig, 'PrimaryDatabase'>): string | null {
+export function buildDatabaseUriEnvKey(
+  config: Pick<NetScriptConfig, 'PrimaryDatabase'>,
+): string | null {
   if (!config.PrimaryDatabase) {
     return null;
   }
@@ -293,13 +341,19 @@ export function extractDependencies(
  */
 export interface CacheWiring {
   /** Cache resource to await readiness on (null for Local/in-process). */
-  readonly resource: any;
+  readonly resource: unknown;
   /** Passed to withReference — an endpoint reference or the resource (null for Local). */
-  readonly reference: any;
+  readonly reference: unknown;
   /** Explicit env pairs consumers receive (access token, provider, host:port refs). */
-  readonly env: Record<string, any>;
+  readonly env: Record<string, unknown>;
   /** Local mode (DenoKv in-process): consumers inject nothing. */
   readonly local: boolean;
+}
+
+interface CacheConsumerBuilder {
+  withEnvironment(key: string, value: unknown): unknown;
+  withReference(reference: unknown): unknown;
+  waitFor(resource: unknown): unknown;
 }
 
 /**
@@ -325,7 +379,7 @@ export function generateAccessToken(): string {
  */
 export function isDockerAvailable(): boolean {
   try {
-    execFileSync("docker", ["info"], { stdio: "ignore", timeout: 3000 });
+    execFileSync('docker', ['info'], { stdio: 'ignore', timeout: 3000 });
     return true;
   } catch {
     return false;
@@ -340,8 +394,8 @@ export function isDockerAvailable(): boolean {
  */
 export function shouldUseContainerCache(): boolean {
   const override = process.env.NETSCRIPT_CACHE_MODE;
-  if (override === "Container") return true;
-  if (override === "Executable") return false;
+  if (override === 'Container') return true;
+  if (override === 'Executable') return false;
   return isDockerAvailable();
 }
 
@@ -361,8 +415,8 @@ export function ensureGarnetToolManifest(
   appHostDir: string,
   version: string,
 ): string {
-  const configDir = join(appHostDir, ".config");
-  const manifestPath = join(configDir, "dotnet-tools.json");
+  const configDir = join(appHostDir, '.config');
+  const manifestPath = join(configDir, 'dotnet-tools.json');
 
   let manifest: {
     version: number;
@@ -371,7 +425,7 @@ export function ensureGarnetToolManifest(
   };
   if (existsSync(manifestPath)) {
     try {
-      manifest = JSON.parse(readFileSync(manifestPath, "utf-8"));
+      manifest = JSON.parse(readFileSync(manifestPath, 'utf-8'));
       if (!manifest.tools) manifest.tools = {};
     } catch {
       manifest = { version: 1, isRoot: true, tools: {} };
@@ -380,20 +434,20 @@ export function ensureGarnetToolManifest(
     manifest = { version: 1, isRoot: true, tools: {} };
   }
 
-  if (!manifest.tools["garnet-server"]) {
-    manifest.tools["garnet-server"] = {
+  if (!manifest.tools['garnet-server']) {
+    manifest.tools['garnet-server'] = {
       version,
-      commands: ["garnet-server"],
+      commands: ['garnet-server'],
     };
     mkdirSync(configDir, { recursive: true });
-    writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + "\n", "utf-8");
+    writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + '\n', 'utf-8');
   }
 
   // Best-effort restore so `dotnet tool run` resolves offline after first run.
   try {
-    execFileSync("dotnet", ["tool", "restore"], {
+    execFileSync('dotnet', ['tool', 'restore'], {
       cwd: appHostDir,
-      stdio: "ignore",
+      stdio: 'ignore',
       timeout: GARNET_TOOL_RESTORE_TIMEOUT_MS,
     });
   } catch {
@@ -416,7 +470,7 @@ export async function withCacheReference<T>(
   if (!wiring || wiring.local) {
     return builder;
   }
-  const target = builder as any;
+  const target = builder as unknown as CacheConsumerBuilder;
   if (wiring.reference) {
     await target.withReference(wiring.reference);
   }
@@ -438,9 +492,9 @@ export async function withCacheReference<T>(
  * Node.js-compatible replacement for @netscript/aspire's parseAppSettings
  * which uses Deno.readTextFile.
  */
-export async function parseAppSettings(
+export function parseAppSettings(
   filePath: string,
-): Promise<{ config: NetScriptConfig; warnings: string[] }> {
+): { config: NetScriptConfig; warnings: string[] } {
   const text = readFileSync(filePath, 'utf-8');
   const json = JSON.parse(text);
   const netscript = json.NetScript;

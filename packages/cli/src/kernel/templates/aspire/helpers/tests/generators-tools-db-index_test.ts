@@ -40,6 +40,8 @@ describe('generateRegisterTools', () => {
     assertStringIncludes(output, 'buildDatabaseUriEnvKey');
     assertStringIncludes(output, 'resolveWorkspacePath');
     assertStringIncludes(output, "from './_aspire-compat.mts'");
+    assertStringIncludes(output, 'type AfterResourcesCreatedEvent = Parameters<');
+    assertStringIncludes(output, 'event: AfterResourcesCreatedEvent');
   });
 
   it('should register tools via addExecutable with deno task', () => {
@@ -52,7 +54,7 @@ describe('generateRegisterTools', () => {
     );
     assertStringIncludes(
       output,
-      "prisma_studio = await maybeWithProcessCommand(prisma_studio, 'prisma-studio', 'studio');",
+      "prisma_studio = maybeWithProcessCommand(prisma_studio, 'prisma-studio', 'studio');",
     );
     assertStringIncludes(output, "const PROCESS_COMMANDS_FLAG = 'NETSCRIPT_ASPIRE_PROCESS_COMMANDS'");
     assertStringIncludes(output, 'Aspire 13.4 WithProcessCommand seam');

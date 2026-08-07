@@ -1,5 +1,6 @@
 import { assert, assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
 import { generateAppTsConfig } from '../../../adapters/templates/app/generate-app-tsconfig.ts';
+import { generateRoutesSeed } from './app-route-seeds.ts';
 import { emitSelectedBackendImports } from './write-app-files.ts';
 
 Deno.test('selected cache backend is carried into the generated app runtime', () => {
@@ -28,4 +29,17 @@ Deno.test('app tsconfig is self-contained and Vite/Fresh compatible', () => {
     moduleResolution: 'Bundler',
     noEmit: true,
   });
+});
+
+Deno.test('initial route references match the canonical generated leaf shape', () => {
+  const routes = generateRoutesSeed();
+
+  assertStringIncludes(
+    routes,
+    'crud: {\n      $route: createRouteReference(routePatterns.examples.crud.$route, {',
+  );
+  assertStringIncludes(
+    routes,
+    'tokens: {\n      $route: createRouteReference(routePatterns.design.tokens.$route, {',
+  );
 });

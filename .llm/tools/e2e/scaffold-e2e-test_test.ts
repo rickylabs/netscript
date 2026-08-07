@@ -85,12 +85,28 @@ Deno.test('generated host-port validation is critical and inspects the final pre
       (step) => step.id === 'deno-check-generated-workspaces',
     );
     const aspireIndex = report.steps.findIndex((step) => step.id === 'aspire-start');
+    const offlineCodegenIndex = report.steps.findIndex(
+      (step) => step.id === 'db-codegen-offline',
+    );
+    const dbInitIndex = report.steps.findIndex((step) => step.id === 'db-init');
+    const dbStatusIndex = report.steps.findIndex((step) => step.id === 'db-status-after-init');
+    const restartIndex = report.steps.findIndex(
+      (step) => step.id === 'aspire-restart-after-db',
+    );
+    assertEquals(offlineCodegenIndex < typeCheckIndex, true);
     assertEquals(registryIndex < validatorIndex, true);
     assertEquals(typeCheckIndex + 1, validatorIndex);
     assertEquals(validatorIndex + 1, aspireIndex);
+    assertEquals(aspireIndex < dbInitIndex, true);
+    assertEquals(dbStatusIndex < restartIndex, true);
     const validator = report.steps[validatorIndex];
     assertEquals(validator.critical, true);
     assertStringIncludes(JSON.stringify(validator.details), 'check-aspire-host-ports.ts');
+    const init = report.steps.find((step) => step.id === 'init-project');
+    assertEquals(JSON.stringify(init?.details).includes('service-port'), false);
+    const offlineCodegen = report.steps[offlineCodegenIndex];
+    assertStringIncludes(JSON.stringify(offlineCodegen.details), 'deno","task","db:generate');
+    assertEquals(JSON.stringify(offlineCodegen.details).includes('jsr:@netscript/cli'), false);
   } finally {
     await Deno.remove(root, { recursive: true });
   }

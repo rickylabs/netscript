@@ -95,11 +95,12 @@ export async function scaffoldTsAppHost(
       },
       include: [
         SCAFFOLD_FILES.APPHOST_MTS,
+        `${SCAFFOLD_DIRS.HELPERS}/**/*.mts`,
         `${SCAFFOLD_DIRS.ASPIRE_GENERATED}/${SCAFFOLD_DIRS.MODULES}/aspire.mts`,
         `${SCAFFOLD_DIRS.ASPIRE_GENERATED}/${SCAFFOLD_DIRS.MODULES}/base.mts`,
         `${SCAFFOLD_DIRS.ASPIRE_GENERATED}/${SCAFFOLD_DIRS.MODULES}/transport.mts`,
       ],
-      exclude: ['node_modules'],
+      exclude: ['node_modules', `${SCAFFOLD_DIRS.HELPERS}/run-tool.mts`],
     },
     null,
     2,

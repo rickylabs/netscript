@@ -7,11 +7,8 @@ import type { InfrastructureContext } from './register-infrastructure.mts';
 import {
   buildOtelEnvVars,
   buildViteEnvVarName,
-  extractDependencies,
-  extractPluginReferences,
-  extractServiceReferences,
   resolveWorkspacePath,
-  withCacheReference,
+  withCacheReference as _withCacheReference,
 } from '{{__slot3__}}';
 
 interface EndpointProvider {
@@ -49,9 +46,9 @@ async function getResourceEndpoint(resource: unknown, protocol: string): Promise
 export async function registerApps(
   builder: DistributedApplicationBuilder,
   config: NetScriptConfig,
-  infrastructure: InfrastructureContext,
-  services: Map<string, unknown>,
-  plugins: Map<string, unknown>,
+  _infrastructure: InfrastructureContext,
+  _services: Map<string, unknown>,
+  _plugins: Map<string, unknown>,
   appHostDir: string,
 ): Promise<Map<string, unknown>> {
   const apps = new Map<string, unknown>();

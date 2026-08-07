@@ -10,7 +10,14 @@ import {
   substituteTokens,
   textArtifact,
 } from '@netscript/plugin/adapter';
-import { exportStem, parseScheduledInput, type ScheduledInput, triggerPath } from '../input.ts';
+import {
+  exportStem,
+  parseScheduledInput,
+  type ScheduledInput,
+  stringArrayLiteral,
+  triggerPath,
+  typescriptStringLiteral,
+} from '../input.ts';
 import { scheduledStub } from './scheduled.stub.ts';
 
 /** Canonical starter scheduled trigger input emitted during triggers install. */
@@ -37,7 +44,9 @@ export const scheduledScaffolder: ItemScaffolder<ScheduledInput> = {
           JOB_BLOCK: job?.definition ?? '',
           JOB_IMPORT: job?.import ?? '',
           METADATA_LINES: metadataLines(input.description, input.tags),
-          TIMEZONE_LINE: input.timezone ? `,\n    timezone: ${JSON.stringify(input.timezone)}` : '',
+          TIMEZONE_LINE: input.timezone
+            ? `,\n    timezone: ${typescriptStringLiteral(input.timezone)}`
+            : '',
           TRIGGER_EXPORT: `${exportStem(input.id)}Trigger`,
           TRIGGER_ID: input.id,
         }),
@@ -50,7 +59,7 @@ function enqueueJobSource(
   jobId: string,
 ): Readonly<{ import: string; definition: string; handler: string }> {
   const symbol = `${exportStem(jobId)}Job`;
-  const literal = JSON.stringify(jobId);
+  const literal = typescriptStringLiteral(jobId);
   return {
     import: "import type { JobDefinition } from '@netscript/plugin-workers-core';\n",
     definition:
@@ -65,9 +74,9 @@ function emptyHandler(): string {
 }
 
 function metadataLines(description?: string, tags?: readonly string[]): string {
-  return `${description === undefined ? '' : `,\n    description: ${JSON.stringify(description)}`}${
-    tags === undefined ? '' : `,\n    tags: ${JSON.stringify(tags)}`
-  }`;
+  return `${
+    description === undefined ? '' : `,\n    description: ${typescriptStringLiteral(description)}`
+  }${tags === undefined ? '' : `,\n    tags: ${stringArrayLiteral(tags)}`}`;
 }
 
 /** Scheduled trigger plugin resource descriptor. */

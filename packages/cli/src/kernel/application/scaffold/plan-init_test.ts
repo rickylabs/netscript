@@ -240,7 +240,7 @@ Deno.test('scaffoldRoot emits the Aspire CLI task runner only for Aspire workspa
   assertEquals(noAspireScaffolder.files.has(taskPath), false);
 });
 
-Deno.test('scaffoldRoot always emits the npm materialization verifier and Deno pin', async () => {
+Deno.test('scaffoldRoot always emits quality and npm runners with the Deno pin', async () => {
   for (const noAspire of [false, true]) {
     const scaffolder = new InMemoryScaffolder();
     const result = await scaffoldRoot(
@@ -248,12 +248,18 @@ Deno.test('scaffoldRoot always emits the npm materialization verifier and Deno p
       options({ noAspire }),
     );
     const verifierPath = '/workspace/deploy-app/.netscript/verify-node-modules.ts';
+    const qualityRunnerPath = '/workspace/deploy-app/.netscript/quality-runner.ts';
     const packageJsonPath = '/workspace/deploy-app/package.json';
 
     assert(result.filesCreated.includes(verifierPath));
     assertStringIncludes(
       scaffolder.files.get(verifierPath) ?? '',
       'Deno npm materialization is incomplete.',
+    );
+    assert(result.filesCreated.includes(qualityRunnerPath));
+    assertStringIncludes(
+      scaffolder.files.get(qualityRunnerPath) ?? '',
+      "const MODES = ['check', 'lint', 'fmt-check', 'fmt-write'] as const;",
     );
     assert(result.filesCreated.includes(packageJsonPath));
     assertEquals(JSON.parse(scaffolder.files.get(packageJsonPath) ?? '{}'), {

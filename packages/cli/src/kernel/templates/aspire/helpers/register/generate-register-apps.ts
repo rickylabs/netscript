@@ -131,7 +131,7 @@ export function generateRegisterApps(options: RegisterAppsOptions): string {
       for (const ref of serviceRefs) {
         lines.push(`    {`);
         lines.push(
-          `      const endpoint = await getResourceEndpoint(services.get('${ref}'), 'http');`,
+          `      const endpoint = await getResourceEndpoint(_services.get('${ref}'), 'http');`,
         );
         lines.push(`      if (endpoint) {`);
         lines.push(`        await ${id}.withEnvironment('services__${ref}__http__0', endpoint);`);
@@ -142,7 +142,7 @@ export function generateRegisterApps(options: RegisterAppsOptions): string {
       for (const ref of pluginRefs) {
         lines.push(`    {`);
         lines.push(
-          `      const endpoint = await getResourceEndpoint(plugins.get('${ref}'), 'http');`,
+          `      const endpoint = await getResourceEndpoint(_plugins.get('${ref}'), 'http');`,
         );
         lines.push(`      if (endpoint) {`);
         lines.push(`        await ${id}.withEnvironment('services__${ref}__http__0', endpoint);`);
@@ -155,7 +155,7 @@ export function generateRegisterApps(options: RegisterAppsOptions): string {
     if (entry.RequiresKv) {
       lines.push(``);
       lines.push(`    // KV cache dependency`);
-      lines.push(`    await withCacheReference(${id}, infrastructure.primaryCacheWiring);`);
+      lines.push(`    await _withCacheReference(${id}, _infrastructure.primaryCacheWiring);`);
     }
 
     // --- app type: VITE injection ---
@@ -172,7 +172,7 @@ export function generateRegisterApps(options: RegisterAppsOptions): string {
         lines.push(`    {`);
         lines.push(`      const vite = buildViteEnvVarName('${ref}');`);
         lines.push(
-          `      const endpoint = await getResourceEndpoint(services.get('${ref}'), 'http');`,
+          `      const endpoint = await getResourceEndpoint(_services.get('${ref}'), 'http');`,
         );
         lines.push(`      if (endpoint) {`);
         lines.push(`        await ${id}.withEnvironment(vite.full, endpoint);`);
@@ -186,7 +186,7 @@ export function generateRegisterApps(options: RegisterAppsOptions): string {
         lines.push(`    {`);
         lines.push(`      const vite = buildViteEnvVarName('${ref}');`);
         lines.push(
-          `      const endpoint = await getResourceEndpoint(plugins.get('${ref}'), 'http');`,
+          `      const endpoint = await getResourceEndpoint(_plugins.get('${ref}'), 'http');`,
         );
         lines.push(`      if (endpoint) {`);
         lines.push(`        await ${id}.withEnvironment(vite.full, endpoint);`);

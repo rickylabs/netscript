@@ -1,4 +1,4 @@
-import { assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
+import { assertEquals, assertFalse, assertStringIncludes } from 'jsr:@std/assert@^1';
 import { fromFileUrl, join } from '@std/path';
 import { EMBEDDED_TEMPLATE_CONTENT } from '../../assets/embedded.generated.ts';
 import { TEMPLATE_KEYS } from '../../assets/manifest.ts';
@@ -45,4 +45,18 @@ Deno.test('template asset adapter renders existing template pipes', () => {
 
   assertStringIncludes(content, 'UserProfilesV1');
   assertStringIncludes(content, 'v1.userProfiles.health');
+});
+
+Deno.test('app and service templates emit lint-clean generated contracts', () => {
+  const layout = readTemplateAssetSync(TEMPLATE_KEYS.appRoutesLayout);
+  const telemetry = readTemplateAssetSync(
+    TEMPLATE_KEYS.appRoutesExamplesTelemetryComponentsTelemetryView,
+  );
+  const health = readTemplateAssetSync(TEMPLATE_KEYS.serviceRoutersHealth);
+
+  assertStringIncludes(layout, 'f-client-nav class=');
+  assertFalse(layout.includes('f-client-nav={true}'));
+  assertStringIncludes(telemetry, 'key={span.spanId}');
+  assertStringIncludes(telemetry, 'key={trace.traceId}');
+  assertFalse(health.includes('.handler(async'));
 });

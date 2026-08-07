@@ -229,7 +229,7 @@ const workersBackgroundBlock = registerBackground.slice(
 );
 const usersReference = [
   '    {',
-  "      const usersEndpoint = await services.get('users')?.getEndpoint('http');",
+  "      const usersEndpoint = await _services.get('users')?.getEndpoint('http');",
   '      if (usersEndpoint) {',
   "        await workers.withEnvironment('services__users__http__0', usersEndpoint);",
   '      }',

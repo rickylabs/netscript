@@ -61,12 +61,12 @@ Deno.test('add webhook job wiring emits a typed enqueue action and metadata', as
   const source = artifactText(artifact);
 
   assertStringIncludes(source, 'defineWebhook, enqueueJob');
-  assertStringIncludes(source, 'JobDefinition<"process-shipping-update">');
+  assertStringIncludes(source, "JobDefinition<'process-shipping-update'>");
   assertStringIncludes(source, 'enqueueJob(processShippingUpdateJob');
   assertStringIncludes(source, "verifier: 'hmac-sha256'");
-  assertStringIncludes(source, 'secretEnv: "WEBHOOK_SHIPPING_SECRET"');
-  assertStringIncludes(source, 'description: "Processes carrier callbacks."');
-  assertStringIncludes(source, 'tags: ["webhook","shipping"]');
+  assertStringIncludes(source, "secretEnv: 'WEBHOOK_SHIPPING_SECRET'");
+  assertStringIncludes(source, "description: 'Processes carrier callbacks.'");
+  assertStringIncludes(source, "tags: ['webhook', 'shipping']");
 
   const definition = await importGeneratedDefinition(source);
   const actions = await definition.handler({ payload: { body: { shipmentId: 's-1' } } });
@@ -89,7 +89,7 @@ Deno.test('add scheduled job wiring emits a compiling typed enqueue action', asy
   assertStringIncludes(source, 'defineScheduledTrigger, enqueueJob');
   assertStringIncludes(source, 'enqueueJob(rollUpLedgerJob');
   assertStringIncludes(source, "cron: '0 2 * * 1'");
-  assertStringIncludes(source, 'timezone: "Europe/Zurich"');
+  assertStringIncludes(source, "timezone: 'Europe/Zurich'");
 
   const definition = await importGeneratedDefinition(source);
   const payload = { scheduledAt: '2026-07-13T00:00:00.000Z' };
@@ -97,6 +97,19 @@ Deno.test('add scheduled job wiring emits a compiling typed enqueue action', asy
   assertEquals(actions[0]?.kind, 'enqueue-job');
   assertEquals(actions[0]?.jobId, 'roll-up-ledger');
   assertEquals(actions[0]?.options.payload, payload);
+});
+
+Deno.test('triggers install starter sources are format-stable at generator boundaries', () => {
+  const artifacts = collectInstallArtifacts(triggersAdapterPlugin);
+  const scheduled = artifacts.find((artifact) => artifact.path === 'triggers/daily-maintenance.ts');
+  const fileWatch = artifacts.find((artifact) =>
+    artifact.path === 'triggers/incoming-file-watch.ts'
+  );
+
+  assertEquals(artifactText(scheduled!).includes("domain';\n\n\n/**"), false);
+  assertStringIncludes(artifactText(fileWatch!), "paths: ['./shared/incoming']");
+  assertStringIncludes(artifactText(fileWatch!), "patterns: ['*.json', '*.csv']");
+  assertStringIncludes(artifactText(fileWatch!), "ignored: ['*.tmp', '.*']");
 });
 
 Deno.test('triggers install emits only userland glue under triggers', () => {

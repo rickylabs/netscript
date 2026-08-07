@@ -144,6 +144,9 @@ describe('database template generators', () => {
     });
 
     assertStringIncludes(output, "Deno.env.get(envKey) ?? Deno.env.get('DATABASE_URL')");
+    assertStringIncludes(output, "import { defineConfig } from 'prisma/config'");
+    assertEquals(output.includes('defineConfig, env'), false);
+    assertEquals(output.includes("env('DATABASE_URL')"), false);
     assertStringIncludes(output, "'file:./alpha_app.db'");
     assertStringIncludes(output, 'const databaseUrl = resolveDatabaseUrl(');
     assertStringIncludes(
@@ -151,6 +154,16 @@ describe('database template generators', () => {
       'function normalizeDatabaseUrl(provider: string, value: string): string',
     );
     assertStringIncludes(output, "schema: 'schema'");
+  });
+
+  it('generates Prisma config with the env import and fallback for postgres', () => {
+    const postgres = registry.get('postgres');
+    const output = generatePrismaConfig(postgres, {
+      configKey: 'primary-db',
+    });
+
+    assertStringIncludes(output, "import { defineConfig, env } from 'prisma/config'");
+    assertStringIncludes(output, "env('DATABASE_URL')");
   });
 
   it('normalizes mssql Aspire loopback endpoints to hostname URLs', () => {
@@ -164,6 +177,7 @@ describe('database template generators', () => {
     assertStringIncludes(output, 'normalizeSqlServerHost(host.trim())');
     assertStringIncludes(output, "host === '127.0.0.1'");
     assertStringIncludes(output, "return 'localhost'");
+    assertStringIncludes(output, "import { defineConfig, env } from 'prisma/config'");
   });
 
   it('generates engine modules with adapter setup where required', () => {

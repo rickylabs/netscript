@@ -79,4 +79,7 @@ Deno.test('generatePluginServiceContext emits package-resident safe imports', ()
   assertStringIncludes(output, "from '@netscript/contracts'");
   assertFalse(output.includes(netscriptJsrSpecifier('plugin', '/loader')));
   assertFalse(output.includes('../../contracts/versions/v1/mod.ts'));
+  assertStringIncludes(output, 'export function createPluginServiceContext(');
+  assertStringIncludes(output, 'return Promise.resolve({');
+  assertFalse(output.includes('export async function createPluginServiceContext('));
 });

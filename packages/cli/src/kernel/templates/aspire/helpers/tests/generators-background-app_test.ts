@@ -196,11 +196,27 @@ describe('generateRegisterBackground', () => {
     // Single seam over the pre-built primary-cache wiring.
     assertStringIncludes(
       output,
-      'await withCacheReference(triggers, infrastructure.primaryCacheWiring)',
+      'await _withCacheReference(triggers, infrastructure.primaryCacheWiring)',
     );
     assertStringIncludes(output, 'withCacheReference,');
     // EndpointProperty no longer imported — endpoint resolution moved to wiring.
     assertStringIncludes(output, "import { OtlpProtocol } from '../.aspire/modules/aspire.mts'");
+  });
+
+  it('uses the typed service map parameter for background service references', () => {
+    const output = generateRegisterBackground({
+      ...emptyOptions,
+      processors: {
+        workers: {
+          ...fixtures.MINIMAL_BACKGROUND,
+          ServiceReferences: ['users'],
+        },
+      },
+    });
+
+    assertStringIncludes(output, '_services: Map<string, ExecutableResource>');
+    assertStringIncludes(output, "_services.get('users')?.getEndpoint('http')");
+    assert(!output.includes(" services.get('users')"));
   });
 
   it('should pass saga store backend appsettings to background env', () => {
@@ -418,9 +434,9 @@ describe('generateRegisterApps', () => {
     });
 
     assertStringIncludes(output, '// Server-side service-discovery injection');
-    assertStringIncludes(output, "getResourceEndpoint(services.get('users'), 'http')");
+    assertStringIncludes(output, "getResourceEndpoint(_services.get('users'), 'http')");
     assertStringIncludes(output, "dashboard.withEnvironment('services__users__http__0', endpoint)");
-    assertStringIncludes(output, "getResourceEndpoint(plugins.get('workers-api'), 'http')");
+    assertStringIncludes(output, "getResourceEndpoint(_plugins.get('workers-api'), 'http')");
     assertStringIncludes(
       output,
       "dashboard.withEnvironment('services__workers-api__http__0', endpoint)",

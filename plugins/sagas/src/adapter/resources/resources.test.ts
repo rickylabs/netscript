@@ -23,6 +23,26 @@ Deno.test('sagas install starter saga is byte-identical to add saga default emis
 
   assertEquals(installSaga?.path, addSaga.path);
   assertEquals(installSaga ? artifactText(installSaga) : undefined, artifactText(addSaga));
+
+  const config = collectInstallArtifacts(sagasAdapterPlugin).find((artifact) =>
+    artifact.path === 'sagas/user-registration.config.ts'
+  );
+  const source = config ? artifactText(config) : '';
+  assertStringIncludes(
+    source,
+    ".description('Registers a user through the default saga workflow.')",
+  );
+  assertStringIncludes(source, ".topic('users')");
+  assertStringIncludes(source, ".tags(...['sample', 'users'])");
+});
+
+Deno.test('sagas TypeScript literals escape apostrophes without changing values', () => {
+  const config = sagaScaffolder.emit({
+    id: 'customer-welcome',
+    durability: 't1',
+    description: "Registers O'Brien",
+  })[1];
+  assertStringIncludes(artifactText(config), ".description('Registers O\\'Brien')");
 });
 
 Deno.test('sagas add saga emits the same shape at the user-named path', () => {

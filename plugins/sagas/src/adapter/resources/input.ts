@@ -96,7 +96,34 @@ export function sagaDirectory(input: SagaInput): string {
 
 /** Render an array literal for generated TypeScript source. */
 export function stringArrayLiteral(values: readonly string[] = []): string {
-  return `[${values.map((value) => JSON.stringify(value)).join(', ')}]`;
+  return `[${values.map(typescriptStringLiteral).join(', ')}]`;
+}
+
+/** Render a single-quoted string literal for generated TypeScript source. */
+export function typescriptStringLiteral(value: string): string {
+  return `'${[...value].map(escapeTypeScriptCharacter).join('')}'`;
+}
+
+function escapeTypeScriptCharacter(character: string): string {
+  const escapes: Readonly<Record<string, string>> = {
+    '\0': '\\0',
+    '\b': '\\b',
+    '\f': '\\f',
+    '\n': '\\n',
+    '\r': '\\r',
+    '\t': '\\t',
+    '\v': '\\v',
+    "'": "\\'",
+    '\\': '\\\\',
+    '\u2028': '\\u2028',
+    '\u2029': '\\u2029',
+  };
+  const escaped = escapes[character];
+  if (escaped !== undefined) return escaped;
+  const codePoint = character.codePointAt(0);
+  return codePoint !== undefined && codePoint < 0x20
+    ? `\\x${codePoint.toString(16).padStart(2, '0')}`
+    : character;
 }
 
 /** Convert a saga id into a human-readable display name. */

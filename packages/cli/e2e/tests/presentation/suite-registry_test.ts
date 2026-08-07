@@ -115,11 +115,19 @@ Deno.test('runtime suite includes full scaffold, database, runtime, and behavior
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.DATABASE_GENERATE), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.DATABASE_SEED), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.GENERATED_DENO_CHECK), true);
+  assertEquals(runtime.gates.some((gate) => gate.id === GATE.GENERATED_QUALITY_NEGATIVE), true);
+  assertEquals(runtime.gates.some((gate) => gate.id === GATE.GENERATED_DENO_LINT), true);
+  assertEquals(runtime.gates.some((gate) => gate.id === GATE.GENERATED_DENO_FMT_CHECK), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.SCAFFOLD_UI_ADD_AI), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.SCAFFOLD_UI_LOCAL_SOURCE), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.GENERATED_UI_AI_CHECK), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.RUNTIME_AUTH_SMOKE_ENV), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.RUNTIME_ASPIRE_START), true);
+  assertEquals(
+    runtime.gates.findIndex((gate) => gate.id === GATE.RUNTIME_ASPIRE_RESTORE) <
+      runtime.gates.findIndex((gate) => gate.id === GATE.GENERATED_QUALITY_NEGATIVE),
+    true,
+  );
   assertEquals(
     runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_DB_STATUS_PRESERVES_APPHOST),
     true,

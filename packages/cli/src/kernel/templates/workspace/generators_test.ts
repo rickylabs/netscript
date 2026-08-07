@@ -57,7 +57,6 @@ Deno.test('generateDenoJson emits the expected root workspace shape in JSR mode'
     'dotnet',
     '**/.git',
     'aspire/.aspire',
-    'aspire/.helpers',
     '**/.generated',
   ]);
   assertEquals(
@@ -70,7 +69,19 @@ Deno.test('generateDenoJson emits the expected root workspace shape in JSR mode'
   );
   assertEquals(
     result.tasks.check,
-    'deno check apps/**/*.ts services/**/*.ts contracts/**/*.ts',
+    'deno run --allow-read --allow-run=deno .netscript/quality-runner.ts check',
+  );
+  assertEquals(
+    result.tasks.lint,
+    'deno run --allow-read --allow-run=deno .netscript/quality-runner.ts lint',
+  );
+  assertEquals(
+    result.tasks['fmt:check'],
+    'deno run --allow-read --allow-run=deno .netscript/quality-runner.ts fmt-check',
+  );
+  assertEquals(
+    result.tasks.fmt,
+    'deno run --allow-read --allow-run=deno .netscript/quality-runner.ts fmt-write',
   );
   assertEquals(Object.keys(result.tasks), [
     'dev',
@@ -81,6 +92,7 @@ Deno.test('generateDenoJson emits the expected root workspace shape in JSR mode'
     'aspire:export',
     'check',
     'lint',
+    'fmt:check',
     'fmt',
     'test',
   ]);
