@@ -18,19 +18,24 @@ Drift is append-only.
 - **Action:** accept owner-authorized live contract and re-baseline all technical facts.
 - **Evidence:** `research.md`, `supervisor.md`, #1324/#1330 live bodies/comments.
 
-## 2026-08-07 — No managed agentic session identity is attached to this existing writer
+## 2026-08-07 — Runtime status did not surface the managed launcher identity
 
 - **What:** Read-only `agentic:runtime status` found zero sessions and returned `MISSING_IDENTITY`;
-  the worktree itself is clean and the user explicitly designated this current session as the sole
-  writer.
-- **Source:** `deno task agentic:runtime status --worktree ...` and raw `git status`.
-- **Expected:** Prepared notes described launching a new daemon-attached sender thread.
-- **Actual:** The implementation writer is already active; launching another sender would violate
-  the exactly-one-writer rule.
+  the checked-in launcher receipt nevertheless proves that the sole writer was launched through the
+  repo-native managed app-server route as OpenAI `gpt-5.6-sol` at high effort, thread
+  `019fdc4e-476f-7ae2-bfdc-48772775ce70`.
+- **Source:** Checked-in repo-native app-server launcher receipt;
+  `deno task agentic:runtime status --worktree ...`; raw `git status`.
+- **Expected:** Runtime inventory and the authoritative launcher receipt both surface the managed
+  writer identity.
+- **Actual:** The runtime-status query missed the already-active managed writer; it did not prove
+  that the writer lacked an app-server identity. Launching another sender would violate the
+  exactly-one-writer rule.
 - **Severity:** minor
-- **Action:** accept; do not launch a rival app-server sender. Use only separate sequential formal
+- **Action:** Treat the launcher receipt as authoritative, retain the status miss as diagnostic
+  evidence, and do not launch a rival app-server sender. Use only separate sequential formal
   evaluator sessions after writer work is quiescent.
-- **Evidence:** `supervisor.md` route override.
+- **Evidence:** Launcher receipt and corrected `supervisor.md` identity/route fields.
 
 ## 2026-08-07 — Pinned OpenCode does not expose MCP tools through its debug/tool-list seam
 
