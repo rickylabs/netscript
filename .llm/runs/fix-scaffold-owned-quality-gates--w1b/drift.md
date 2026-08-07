@@ -142,3 +142,21 @@ than a merge blocker. This owner-authorized rescope does not alter product code,
 the formal verdict: immutable implementation head
 `a02467d8cd28be215855764d163fb60508afe895` retains the separate DeepSeek V4 Flash 0731 max PASS
 without a PLAN-EVAL or IMPL-EVAL rerun.
+
+### Clean-clone CI disproved the CRUD leaf `$route` assumption
+
+Ready-head CI run [31173542921](https://github.com/rickylabs/netscript/actions/runs/31173542921),
+job [92850482166](https://github.com/rickylabs/netscript/actions/runs/31173542921/job/92850482166),
+reported TS2339 from the clean-clone README scaffold: `routes.examples.crud` had type
+`RouteReference<EmptySegment, SearchParamInput>`, which has no `$route`. This supersedes the earlier
+Slice 3 disposition that treated the CRUD leaf as a directory node. The seeded and regenerated
+route contract makes the distinction explicit: `routes.examples` is a directory node with
+`$route`; `routes.examples.crud` is the complete leaf reference returned by
+`createRouteReference()` and is passed directly to `withRoute()`.
+
+Disposition: correct the owning template and semantic assertion, regenerate the embedded asset, and
+prove the exact clean-clone gate plus only the directly relevant Archetype 6 static/quality gates.
+Do not weaken W1-B selection or suppress/exclude the route. This is a bounded current-head CI repair,
+not architecture debt and not a formal re-evaluation. By explicit owner pace rule, retain the valid
+DeepSeek PASS on immutable `a02467d8cd28be215855764d163fb60508afe895` without rerunning
+PLAN-EVAL, IMPL-EVAL, or the already-green full `scaffold.runtime`.

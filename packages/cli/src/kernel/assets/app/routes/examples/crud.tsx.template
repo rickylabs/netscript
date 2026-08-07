@@ -3,7 +3,7 @@ import { routes } from '@app/router.ts';
 import { definePage } from '@app/utils.ts';
 
 export const crudExamplePage = definePage()
-  .withRoute(routes.examples.crud.$route)
+  .withRoute(routes.examples.crud)
   .withMeta(() => ({
     title: '{{name}} — directory pattern demo',
     description: 'Static registry-block composition demo with app-owned fresh-ui components.',

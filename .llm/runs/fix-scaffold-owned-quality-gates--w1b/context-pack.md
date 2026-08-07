@@ -99,3 +99,24 @@ DeepSeek V4 Flash 0731 max IMPL-EVAL PASS from separate session
 lifecycle-only: advance PR #1342 and issues #1024/#1328 to exactly `status:impl-eval`, run the live
 acceptance-evidence mirror dry-run, and mark the PR ready only on a green verdict. Do not merge,
 publish, trigger OpenHands, start Billing Run, or alter release order.
+
+## Post-eval current-head CI repair — scaffold-static
+
+Ready-head CI run [31173542921](https://github.com/rickylabs/netscript/actions/runs/31173542921),
+job [92850482166](https://github.com/rickylabs/netscript/actions/runs/31173542921/job/92850482166),
+exposed one genuine `scaffold-static (deno-only)` defect. The clean-clone README scaffold selected
+85 files and reported TS2339 because `routes.examples.crud` is already a
+`RouteReference<EmptySegment, SearchParamInput>` and therefore has no `$route` property. `deno doc`
+confirmed `createRouteReference()` returns the complete reference consumed directly by
+`definePage().withRoute(...)`.
+
+The owning CRUD route template now passes `routes.examples.crud` directly, its semantic assertion
+locks that shape, and the embedded asset is regenerated. Focused proof is green: route-template test
+1/1 with 19/19 steps; exact formerly failing clean-clone gate exit 0; two-file scoped check/lint/fmt
+each exit 0 with zero findings; `quality:gate` exit 0 with existing warnings only; asset freshness
+exit 0. The full `scaffold.runtime`, PLAN-EVAL, and IMPL-EVAL were deliberately not repeated.
+
+Per owner pace rule, immutable head `a02467d8cd28be215855764d163fb60508afe895` retains its valid
+DeepSeek PASS. This focused product change is a current-head CI repair with new focused receipts,
+not a claim that the formal evaluator assessed the new head. Keep PR #1342 ready and exactly
+`status:impl-eval`; #1343 remains non-blocking follow-up scope.

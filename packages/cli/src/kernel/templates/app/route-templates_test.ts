@@ -287,7 +287,7 @@ describe('app route template rendering', () => {
     const view = await adapter.render(appCrudExampleViewTemplate, SAMPLE_APP_VARS);
     assertStringIncludes(route, "import CrudExampleView from './(_components)/crud-view.tsx';");
     assertStringIncludes(route, "import { routes } from '@app/router.ts';");
-    assertStringIncludes(route, '.withRoute(routes.examples.crud.$route)');
+    assertStringIncludes(route, '.withRoute(routes.examples.crud)');
     assertStringIncludes(route, "title: 'test-project — directory pattern demo'");
     assertStringIncludes(
       route,

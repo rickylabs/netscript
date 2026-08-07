@@ -387,3 +387,51 @@ This is a lifecycle ownership change, not an implementation or evaluator change.
 `a02467d8cd28be215855764d163fb60508afe895` retains the separate-session DeepSeek V4 Flash 0731 max
 IMPL-EVAL PASS (`49e6c09a-705b-47e4-9598-9b45f932c210`) without rerun. No product file,
 `deno.lock`, foreign worktree, release artifact, Billing Run, or OpenHands surface was touched.
+
+## Post-eval CI repair — clean-clone README route reference
+
+Current-head CI run [31173542921](https://github.com/rickylabs/netscript/actions/runs/31173542921)
+had one genuine failure in `scaffold-static (deno-only)`, job
+[92850482166](https://github.com/rickylabs/netscript/actions/runs/31173542921/job/92850482166).
+`verify-clean-clone-readme.ts` ran the generated README's literal `deno task check`; the W1-B quality
+runner truthfully selected 85 files and reported:
+
+```text
+TS2339: Property '$route' does not exist on type 'RouteReference<EmptySegment, SearchParamInput>'.
+  .withRoute(routes.examples.crud.$route)
+```
+
+Root cause: the generated route seed assigns `routes.examples.crud` directly from
+`createRouteReference(...)`. `deno doc --filter RouteReference` confirms the returned reference
+already owns navigation, href, path/search parsers, and route metadata, with no `$route` member.
+Directory nodes such as `routes.examples` expose a `$route`; this leaf does not. The prior
+merge-readiness repair confused those two shapes.
+
+Focused repair:
+
+- pass `routes.examples.crud` directly in the owning CRUD `.tsx.template`;
+- update the existing semantic template assertion to lock the direct-reference contract;
+- regenerate only the reviewed embedded CLI asset.
+
+Focused gate receipts:
+
+| Gate | Result |
+| --- | --- |
+| `deno test -A packages/cli/src/kernel/templates/app/route-templates_test.ts` | exit 0; 1 passed / 19 steps / 0 failed |
+| `deno run --allow-all packages/cli/e2e/src/application/gates/scaffold/verify-clean-clone-readme.ts` | exit 0; clean clone ran literal `deno task check` |
+| scoped check wrapper, two changed TS files | exit 0; 2 files / 1 batch / 0 diagnostics |
+| scoped lint wrapper, two changed TS files | exit 0; 2 files / 1 batch / 0 findings |
+| scoped format wrapper, two changed TS files | exit 0; 2 files / 1 batch / 0 findings |
+| `deno task quality:gate` | exit 0; zero quality/doctrine failures, existing warnings only |
+| `deno task check:assets-barrel` | exit 0; regenerated asset is fresh |
+
+Sole-supervisor sign-off inspection traced the emitted route through `generateRoutesSeed()` and
+the public `RouteReference` API, confirmed the direct leaf is accepted by `withRoute()`, and found
+no selection weakening, suppression, new abstraction, layering change, or debt. The product diff is
+limited to the owning template, its existing semantic assertion, and the generated asset snapshot.
+
+Pace/ownership rule: do not repeat the already-green full `scaffold.runtime`, PLAN-EVAL, or formal
+DeepSeek IMPL-EVAL for this bounded CI repair. The immutable evaluator PASS remains attached to
+`a02467d8cd28be215855764d163fb60508afe895`; this new head carries focused writer receipts and is not
+represented as independently re-evaluated. PR #1342 stays ready at exactly `status:impl-eval`, and
+#1343 remains non-blocking follow-up scope.
