@@ -59,19 +59,29 @@ complete. PR #1342 and both issues are at exactly `status:impl`.
 
 ## Implementation state
 
-Slice 1 is committed/pushed as `80a5dc07b`; its trail reconciliation is `10a9287ec`, and the
-structured comment is `#issuecomment-5214270787`.
+- Slice 1: `80a5dc07b`, trail `10a9287ec`, comment `#issuecomment-5214270787`.
+- Slice 2: `1ab303975`, trail `760d5f1ad`, comment `#issuecomment-5214946644`.
+- Slice 3 implementation: `21dd6a6c0`; merge-readiness repairs: `f3a4d5d2e` and `3512e1dc4`.
+- Current-source focused tests: 122 passed / 140 steps / 0 failed.
+- Scoped repository wrappers: check 1,197 files / 10 batches / 0 diagnostics; lint 1,197 / 6 /
+  0 findings; format 1,197 / 6 / 0 findings.
+- Quality/doctrine gate, CLI doc-lint, asset freshness, and CLI publish dry-run: exit 0 (existing
+  warnings only).
+- Canonical current-head `scaffold.runtime`: 76 passed / 0 failed, including ten deliberate owned
+  surface failures, restored green generated quality, Aspire/database/plugin/behavior/telemetry,
+  and cleanup.
+- Final leak-check: exit 0, no run-owned survivors; foreign/unproven resources untouched.
+- Root `deno.lock` remains untouched and absent from the base-to-head diff.
 
-Slice 2 now repairs the measured app/service/plugin/background output plus the AppHost defects
-revealed by the expanded selection. AppHost product MTS is checked with the restored local
-TypeScript project; the Deno-only `run-tool.mts` remains under Deno check; generated Aspire SDK and
-Prisma output remain non-product inputs rather than direct lint/fmt targets. Plugin regeneration
-formats its exact outputs and `netscript.config.ts` at the owning mutation boundary.
+## Blocking prerequisite
 
-Current evidence: 78 focused tests / 186 steps green; fresh generated check/lint/fmt and UI AI gates
-green across 144 selected product files; scoped repo check/lint/fmt wrappers green over 1,071 files.
-The root lock remains untouched and absent from status.
+The installed published-consumer gate is not green. Stable `0.0.4` and published canaries 5 and 14
+predate different parts of this branch's host-port and tool-ordering repairs; no
+`0.0.5-canary.15` exists. Publication is protected and forbidden in this run. This disproves the
+PLAN-EVAL assumption that the released fallback could close #1024 without a post-fix publication.
 
-Next: commit/push Slice 2 explicitly, post its structured implementation comment and reconcile
-status, then run the accepted Slice 3 static/package gates, installed released consumer smoke,
-leak-check, and single one-pass `scaffold.runtime` before the independent IMPL-EVAL handoff.
+Do not dispatch IMPL-EVAL or move lifecycle beyond `status:impl` while #1024 box 6 remains
+unchecked: the evaluator protocol makes that unchecked close gate blocking. Once a published
+post-fix CLI exists, rerun only the installed consumer smoke from the owned external consumer root,
+record exit 0, then hand the exact new head to a fresh local DeepSeek V4 Flash 0731 max evaluator
+session. Do not rerun PLAN-EVAL or use OpenHands.

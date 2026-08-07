@@ -297,3 +297,46 @@ Aspire compiled a later Flow-B fixture mutation that still referenced the pre-Sl
 parameter. The fixture now injects through `_services`, matching the generated helper contract; a
 focused populated-service-reference assertion locks that contract alongside the existing empty
 default. The discrepancy and disposition were recorded in `drift.md` before continuing.
+
+### Current-head closure evidence
+
+After pushing the Flow-B repair as `3512e1dc4`, an ownership-aware leak check exited 0 with no
+run-owned survivors. The exact merge-readiness command then exited 0 with `76 passed, 0 failed`:
+
+```text
+deno task e2e:cli run scaffold.runtime --cleanup --format pretty
+```
+
+It passed scaffold/init and all official plugin mutations; DB codegen and registry generation; the
+ten deliberate TS/TSX/plugin/background/AppHost failures plus restored green check/lint/fmt; Aspire
+restore/start/restart; resident DB init/generate/seed; all resource waits; service/plugin/background,
+MCP, UI, telemetry, and Flow-B behavior; and cleanup. A final leak check exited 0 with no run-owned
+survivors. Foreign and unproven containers were reported and left untouched.
+
+Current-head supporting gates are also green:
+
+- focused changed-surface suite: 122 passed / 140 steps / 0 failed;
+- scoped check: 1,197 files / 10 batches / 0 diagnostics;
+- scoped lint: 1,197 files / 6 batches / 0 findings;
+- scoped format: 1,197 files / 6 batches / 0 findings;
+- `quality:gate`: exit 0 with existing warnings only;
+- CLI doc-lint: three exports, zero diagnostics;
+- asset freshness: exit 0;
+- CLI publish dry-run: exit 0, `Success Dry run complete`, existing dynamic-import warnings only;
+- review-thread gate: 0 threads / 0 unanswered;
+- root `deno.lock`: untouched and absent from the base-to-head diff.
+
+### IMPL-EVAL prerequisite — blocked by protected publication boundary
+
+The accepted Slice 3 installed-consumer gate remains red for reasons proven, not inferred. Stable
+`0.0.4` reaches 22 successful smoke steps then fails on its historical service/plugin host-port
+pins. Canary 5 reaches the same boundary after removing the tool self-pin but retains the five
+published plugin pins. Canary 14 contains the resident DB lifecycle but predates the installed-tool
+ordering fix and still emits the historical plugin ports. No `0.0.5-canary.15` is published.
+
+The current branch contains and locally proves the combined repair, but publication, release
+orchestration, and Billing Run are explicitly prohibited. Copying an unpublished tool/CLI payload
+into the external consumer would violate the accepted evidence contract. Therefore #1024 box 6
+remains unchecked and the run stays at exactly `status:impl`. Under the evaluator protocol's
+close-gate rule, independent IMPL-EVAL cannot truthfully PASS until a published post-fix CLI exists;
+do not dispatch it merely to obtain a known failure.
