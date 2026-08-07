@@ -83,6 +83,8 @@ only through the closed `DiscoverySource` classifier and prove the receipt conta
 | 2026-08-07 | S3    | Live MCP             | Generated Aspire project plus agent init: 2/2 servers connected, preflight MCP call 1, product NetScript MCP call 1, launcher exit 0.                   |
 | 2026-08-07 | S3    | Live resume          | Session `ses_023871aaeffehRNSqFc3I43Fvc` resumed through the sole current OpenCode route; `RESUME_OK`, provider-valid receipt, exit 0.                  |
 | 2026-08-07 | S3    | Exact-head gates     | Focused matrix, 455-test agentic suite, scoped check/lint/fmt, volatile guard, and docs links all pass.                                                 |
+| 2026-08-07 | S3    | IMPL-EVAL            | Separate DeepSeek V4 Flash 0731/max session `b332e8ae-d235-4923-80de-82cbb8b016be` independently re-ran the load-bearing gates and returned PASS.       |
+| 2026-08-07 | S3    | Terminal gates       | Review-thread gate: exit 0, 0 threads/unanswered. PR checks: exit 0, 17 current checks, 0 failures at `67a0bf33d`.                                      |
 
 ## Decisions
 
@@ -110,10 +112,13 @@ only through the closed `DiscoverySource` classifier and prove the receipt conta
 - Internal docs links: exit 0, 102 docs, 0 broken links/anchors/orphans.
 - Live MCP: exit 0; 2 connected servers; preflight and product NetScript MCP calls proved.
 - Live resume: exit 0 on 1/1 current policy route; `provider_valid` receipt proved.
-- Independent IMPL-EVAL remains pending.
+- Independent IMPL-EVAL: PASS; DeepSeek V4 Flash 0731/max session
+  `b332e8ae-d235-4923-80de-82cbb8b016be`; artifact commit `67a0bf33d`.
+- Review-thread gate at `67a0bf33d`: exit 0, threads 0, unanswered 0.
+- PR checks at `67a0bf33d`: exit 0, checks 17, current failures 0.
 - `deno.lock` SHA-256 remains `d32ef0c1f2b9256e05cf7339c452bd8cf6addeb9a4b433d38abcee992651b529`.
 
 ## Handoff Notes
 
-- IMPL-EVAL should inspect config/permission isolation, signed-reasoning/tool ordering, the
-  provider-preflight drift, exact-head live receipts, and the protected lock comparison first.
+- Implementation, live acceptance, formal evaluation, and terminal gates are complete. Keep the PR
+  draft and leave ready/merge/release transitions to the milestone orchestrator.

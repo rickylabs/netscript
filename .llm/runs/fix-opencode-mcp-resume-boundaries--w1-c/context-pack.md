@@ -6,17 +6,18 @@
 | -------------- | ------------------------------------------ |
 | Run ID         | `fix-opencode-mcp-resume-boundaries--w1-c` |
 | Branch         | `fix/opencode-mcp-resume-boundaries`       |
-| Current phase  | `impl-eval`                                |
+| Current phase  | `terminal-handoff`                         |
 | Archetype      | N/A — internal agentic infrastructure      |
 | Scope overlays | none                                       |
 
 ## Current State
 
-Implementation and trustworthy gates are complete. The branch contains deterministic generated MCP
-translation/overlay, a bounded provider-visible MCP preflight, privacy-safe discovery/history
-receipts, provider-boundary normalization before every dispatch, explicit session resume, and the
-same attachment/guard in web/eval/hybrid children. Live measured MCP and real OpenRouter resume rows
-pass. Mandatory separate IMPL-EVAL is the remaining hard stop.
+Implementation, trustworthy gates, and independent evaluation are complete. The branch contains
+deterministic generated MCP translation/overlay, a bounded provider-visible MCP preflight,
+privacy-safe discovery/history receipts, provider-boundary normalization before every dispatch,
+explicit session resume, and the same attachment/guard in web/eval/hybrid children. Live measured
+MCP and real OpenRouter resume rows pass. The draft PR remains under milestone-orchestrator
+authority.
 
 ## Completed
 
@@ -33,18 +34,22 @@ pass. Mandatory separate IMPL-EVAL is the remaining hard stop.
   NetScript MCP calls (one preflight, one product).
 - Session `ses_023871aaeffehRNSqFc3I43Fvc` resumed successfully on 1/1 current OpenCode routes and
   emitted `provider_valid` before-dispatch evidence.
+- Separate DeepSeek V4 Flash 0731/max session `b332e8ae-d235-4923-80de-82cbb8b016be` returned PASS;
+  `evaluate.md` is committed at `67a0bf33d`.
+- Review-thread gate passed with 0 threads/unanswered; current-head PR checks passed with 0 current
+  failures.
+- Both live issue acceptance checklists are checked with evidence; PR #1344 remains draft at
+  `status:impl-eval` with milestone `0.0.5`.
 - Root lock is byte-identical to baseline `d32ef0c1…`.
 
 ## In Progress
 
-- Independent DeepSeek V4 Flash 0731/max IMPL-EVAL through the checked-in local route.
+- None in the implementation worktree.
 
 ## Next Steps
 
-1. Commit/push the implementation and evidence slice; move PR/issues to `status:impl-eval`.
-2. Run one separate DeepSeek V4 Flash 0731/max IMPL-EVAL and record `evaluate.md`.
-3. Repair only an exact-head `FAIL_FIX`; never repeat a valid PASS.
-4. Run thread/CI/exact-head/lock terminal gates, update PR/issues, and hand off the draft.
+1. Milestone orchestrator reviews the draft evidence and owns any ready transition.
+2. Do not repeat the valid IMPL-EVAL PASS, mark ready, merge, or start a release from this run.
 
 ## Key Decisions
 
@@ -70,11 +75,11 @@ pass. Mandatory separate IMPL-EVAL is the remaining hard stop.
 | Plan         | PASS           | `plan-eval.md`; separate Minimax session                   |
 | Static       | PASS           | 50 focused; 455 suite; 161-file check/lint/fmt; docs links |
 | Runtime/live | PASS           | `live-acceptance.md`, `live-receipt.jsonl`                 |
-| IMPL-EVAL    | pending        | separate DeepSeek/max session required now                 |
+| IMPL-EVAL    | PASS           | `evaluate.md`; separate DeepSeek/max session               |
 
 ## Open Questions
 
-- None; evaluator adversarial sweep pending.
+- None.
 
 ## Drift and Debt
 
@@ -84,5 +89,5 @@ pass. Mandatory separate IMPL-EVAL is the remaining hard stop.
 
 ## Commits
 
-- S0 `c9a152277`; PLAN-EVAL artifact `bf36fc75b`; implementation/evidence commit is the evaluator
-  target after push.
+- S0 `c9a152277`; PLAN-EVAL artifact `bf36fc75b`; implementation/evidence `219814909`; evaluator
+  brief `c0bbb0863`; IMPL-EVAL PASS artifact `67a0bf33d`.
