@@ -131,7 +131,7 @@ function createQuickstartGates(): readonly GateDefinition[] {
         'eval',
         sequenceScript([
           [...cli(context, 'service', 'add', '--name', 'users', '--project-root', '.')],
-          ['deno', 'task', 'check'],
+          ['deno', 'check', '--unstable-kv', 'services/users'],
         ]),
       ],
       (context) => context.project.projectRoot,
