@@ -2,9 +2,9 @@
 
 ## Objective
 
-One draft PR directly to `main` must close #1024's sole remaining clone-independent full-smoke item
-and all eight #1328 scaffold-owned quality items. W1-B is a generated-contract repair plus proving
-tests, not a release or whole-scaffold inventory.
+One draft PR directly to `main` closes #1328's scaffold-owned quality implementation and references
+#1024's remaining clone-independent published-smoke receipt. W1-B is a generated-contract repair
+plus proving tests, not a release or whole-scaffold inventory.
 
 ## State to preserve
 
@@ -73,15 +73,21 @@ complete. PR #1342 and both issues are at exactly `status:impl`.
 - Final leak-check: exit 0, no run-owned survivors; foreign/unproven resources untouched.
 - Root `deno.lock` remains untouched and absent from the base-to-head diff.
 
-## Blocking prerequisite
+## Independent IMPL-EVAL
 
-The installed published-consumer gate is not green. Stable `0.0.4` and published canaries 5 and 14
-predate different parts of this branch's host-port and tool-ordering repairs; no
-`0.0.5-canary.15` exists. Publication is protected and forbidden in this run. This disproves the
-PLAN-EVAL assumption that the released fallback could close #1024 without a post-fix publication.
+Separate session `49e6c09a-705b-47e4-9598-9b45f932c210` returned **PASS** on immutable head
+`a02467d8cd28be215855764d163fb60508afe895` through the mandated Claude Code/OpenRouter
+`deepseek/deepseek-v4-flash-0731` max route. It found no current-head implementation defects,
+independently verified `scaffold.runtime` at 76/0, and ran scoped check/lint/format over 1,195 files
+with zero diagnostics/findings. The tracked verdict is `evaluate.md`.
 
-Do not dispatch IMPL-EVAL or move lifecycle beyond `status:impl` while #1024 box 6 remains
-unchecked: the evaluator protocol makes that unchecked close gate blocking. Once a published
-post-fix CLI exists, rerun only the installed consumer smoke from the owned external consumer root,
-record exit 0, then hand the exact new head to a fresh local DeepSeek V4 Flash 0731 max evaluator
-session. Do not rerun PLAN-EVAL or use OpenHands.
+## Deferred release receipt
+
+Stable `0.0.4` and published canaries 5 and 14 predate different parts of this branch's combined
+repair. The authoritative handoff forbids canary.15 until W1-B and W1-C merge, so the missing
+published consumer result is sequenced release evidence rather than an implementation defect.
+
+Keep PR #1342 draft with `Closes #1328` and `Refs #1024`; keep PR and both issues exactly
+`status:impl`. After both waves merge and the post-fix canary is authorized, run the installed smoke
+outside the framework checkout and use its green receipt to check #1024's final box. Do not rerun
+either formal evaluator, trigger OpenHands, publish from this run, mark ready, or merge.

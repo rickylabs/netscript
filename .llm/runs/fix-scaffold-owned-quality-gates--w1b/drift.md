@@ -116,3 +116,14 @@ quality gates.
   authorizes static audit only, not publication.
 - No architecture debt is accepted at PLAN-EVAL handoff. Any later divergence must be recorded here
   before implementation continues.
+
+### Formal IMPL-EVAL classified the canary gap as a deferred release receipt
+
+Separate formal session `49e6c09a-705b-47e4-9598-9b45f932c210` evaluated immutable head
+`a02467d8cd28be215855764d163fb60508afe895` and returned PASS with no current-head defects. It
+independently confirmed the 76/0 runtime and 1,195-file scoped zero-diagnostic/finding gates.
+
+The authoritative handoff clarifies the release sequence: canary.15 is forbidden until W1-B and
+W1-C merge. Therefore #1024's missing published installed-artifact smoke is a deferred release
+receipt, not implementation drift and not grounds to create an unpublished substitute. The PR must
+reference rather than close #1024 and remain draft at `status:impl` until that later receipt exists.

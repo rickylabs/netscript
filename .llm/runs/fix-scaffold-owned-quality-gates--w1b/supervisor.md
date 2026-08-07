@@ -11,14 +11,14 @@
 - Writer route: OpenAI `gpt-5.6-sol`, high
 - PLAN-EVAL: PASS on `045ca6c3262c854f830b428e871ef9ed8730ba10`, separate session
   `017613f0-c5be-4738-b59c-0bf540202686`
-- IMPL-EVAL: required, separate session, not yet run
+- IMPL-EVAL: PASS on immutable head `a02467d8cd28be215855764d163fb60508afe895`, separate
+  session `49e6c09a-705b-47e4-9598-9b45f932c210`
 - OpenHands: paused
 - Merge/release: prohibited in this run phase
 
 PR #1342 carries milestone `0.0.5`, `type:fix`, `area:cli`, `area:tooling`, `priority:p1`,
-`wave:v1`, `gate:e2e`, and exactly one lifecycle label: `status:impl`. Its body contains
-`Closes #1024`, `Closes #1328`, truthful unchecked Definition-of-Done boxes, and pending
-`acceptance-evidence` mappings for every unchecked issue item.
+`wave:v1`, `gate:e2e`, and exactly one lifecycle label: `status:impl`. Its live body uses
+`Closes #1328` and `Refs #1024`; #1024's final post-canary acceptance remains explicitly unchecked.
 
 Exactly one implementation writer owns this worktree. No app-server, tmux, CLI, or second Codex
 writer may overlap it. Resume the recorded thread; do not launch another.
@@ -31,18 +31,15 @@ two merge-readiness repairs run through `3512e1dc4`. Current-source focused/stat
 gates are green, including the canonical `scaffold.runtime` verdict (`76 passed, 0 failed`) and a
 final ownership-aware leak check with no run-owned survivors.
 
-IMPL-EVAL is **not dispatchable yet**. The accepted Slice 3 gate requires the installed smoke to run
-from a published consumer without framework source. Stable `0.0.4` and published canaries 5 and 14
-all reach the smoke but fail on historical host-port/tool-ordering artifacts; no canary containing
-this branch's combined fixes exists. Publication is explicitly prohibited. Therefore #1024 box 6
-must remain unchecked, PR/issue lifecycle stays exactly `status:impl`, and an evaluator could not
-truthfully return PASS under the close-gate protocol. The supervisor must supply a published
-post-fix CLI (or explicitly authorize a scope/lifecycle change) before the canonical local
-`formal_impl_evaluation` route is started.
+The separate formal evaluator returned **PASS** for current-source implementation correctness with
+no defects. It independently ran the canonical runtime (`76 passed, 0 failed`) and scoped
+check/lint/format wrappers over 1,195 files with zero diagnostics/findings. The tracked verdict is
+`evaluate.md`.
 
-When that prerequisite exists, the exact evaluator route is Claude Code/OpenRouter,
-`claude-openrouter` → `claude-print`, preset `claude-evaluator-deepseek-v4-flash-0731`, model
-`deepseek/deepseek-v4-flash-0731`, max effort, in a fresh session. OpenHands remains paused.
+Its #1024 disposition is a deferred release receipt, not a code defect: the authoritative release
+order forbids canary.15 until W1-B and W1-C merge. Until the later published post-fix consumer smoke
+passes, #1024's last box stays unchecked, PR and issues stay exactly `status:impl`, and this draft PR
+must not be marked ready or merged by this run.
 
 The independent implementation evaluator should read at least:
 
@@ -59,8 +56,9 @@ The independent implementation evaluator should read at least:
 - the final `scaffold.runtime` and published-consumer evidence in `worklog.md`/`drift.md`;
 - the app/service templates and sagas/triggers/workers resource scaffolders named in `research.md`.
 
-The PLAN-EVAL PASS is distilled in `plan-eval.md`. The writer carried all seven advisories through
-the Design checkpoint and implementation, but does not self-certify the final IMPL-EVAL.
+The PLAN-EVAL PASS is distilled in `plan-eval.md`; the separate IMPL-EVAL PASS is distilled in
+`evaluate.md`. The writer carried all advisories through implementation and did not self-certify
+either verdict.
 
 ## Protected state
 

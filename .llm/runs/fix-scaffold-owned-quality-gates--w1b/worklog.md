@@ -340,3 +340,25 @@ into the external consumer would violate the accepted evidence contract. Therefo
 remains unchecked and the run stays at exactly `status:impl`. Under the evaluator protocol's
 close-gate rule, independent IMPL-EVAL cannot truthfully PASS until a published post-fix CLI exists;
 do not dispatch it merely to obtain a known failure.
+
+## Independent IMPL-EVAL
+
+The authoritative supervisor subsequently dispatched the formal implementation evaluator with an
+explicit rule that the sequenced published-canary receipt is not a current-head code defect.
+Separate session `49e6c09a-705b-47e4-9598-9b45f932c210` used Claude Code through OpenRouter,
+preset `claude-evaluator-deepseek-v4-flash-0731`, model
+`deepseek/deepseek-v4-flash-0731`, max effort, and evaluated immutable head
+`a02467d8cd28be215855764d163fb60508afe895`.
+
+Verdict: **PASS** for current-source implementation correctness; no implementation defects. The
+evaluator independently ran:
+
+- `deno task e2e:cli run scaffold.runtime --cleanup --format pretty`: 76 passed / 0 failed;
+- scoped check: 1,195 files / 10 batches / 0 diagnostics;
+- scoped lint: 1,195 files / 6 batches / 0 findings;
+- scoped format: 1,195 files / 6 batches / 0 findings.
+
+It also confirmed clean worktree/lock hygiene and no run-owned survivor. Its #1024 result is a
+deferred release receipt: canary.15 cannot be published until W1-B and W1-C merge, so the final
+installed clone-independent smoke remains unchecked without weakening the implementation PASS.
+The tracked distillation is `evaluate.md`; neither formal evaluation is to be repeated.
