@@ -154,3 +154,18 @@ SQLite runtime, clean-clone, PLAN-EVAL, or IMPL-EVAL replay occurred. Immutable 
 `a02467d8cd28be215855764d163fb60508afe895` retains its valid separate-session DeepSeek PASS under
 the owner pace rule; current-head CI supplies all remaining lane verdicts. PR #1342 remains ready
 and exactly `status:impl-eval`; #1024/#1328/#1343 scope and closing conventions remain unchanged.
+
+Current-head CI run [31176160602](https://github.com/rickylabs/netscript/actions/runs/31176160602),
+job [92858580129](https://github.com/rickylabs/netscript/actions/runs/31176160602/job/92858580129),
+then found one stale repo-wide assertion after 2,953 passes (1 failed, 14 ignored). The trigger
+lifecycle test still expected a historical double-quoted job-definition prefix, while W1-B's
+format-clean generator intentionally emits the equivalent and more precise single-quoted
+`JobDefinition<'capture-payment'>['id']` plus a `satisfies JobDefinition<'capture-payment'>`
+contract. The generated handler continued to enqueue the same job.
+
+The fourth bounded repair changes only that test to assert the complete current typed contract.
+The lifecycle suite passes 3/3, the owning resource-generator suite passes 8/8, one-file scoped
+check/lint/fmt reports zero diagnostics/findings, and `quality:gate` exits 0 with existing warnings
+only. It was produced from head `ef521e2521411a3a9331a0c479c06ceccc5a87ad`; `deno.lock`, foreign
+worktrees, product generation, PR scope, and the immutable DeepSeek PASS at
+`a02467d8cd28be215855764d163fb60508afe895` remain untouched.

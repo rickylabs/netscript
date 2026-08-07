@@ -165,7 +165,11 @@ Deno.test('local triggers backend updates webhook security fields without changi
     const source = await files.readTextFile('triggers/payment-webhook-trigger.ts');
     assertExists(source);
     assertEquals(source.includes('enqueueJob(capturePaymentJob'), true);
-    assertEquals(source.includes('id: "capture-payment" as JobDefinition'), true);
+    assertEquals(
+      source.includes("id: 'capture-payment' as JobDefinition<'capture-payment'>['id']"),
+      true,
+    );
+    assertEquals(source.includes("satisfies JobDefinition<'capture-payment'>"), true);
   } finally {
     await Deno.remove(root, { recursive: true });
   }

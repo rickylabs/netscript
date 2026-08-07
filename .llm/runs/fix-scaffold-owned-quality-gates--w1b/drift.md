@@ -201,3 +201,20 @@ fallback behavior, new abstraction, or doctrine debt was introduced. The already
 suites, clean-clone verifier, and both formal evaluations were deliberately not repeated. The
 immutable DeepSeek PASS remains recorded only at `a02467d8cd28be215855764d163fb60508afe895`;
 this third repair is current-head CI follow-up evidence, not evaluator provenance.
+
+### Repo-wide CI exposed a stale quote-sensitive trigger lifecycle assertion
+
+Current-head CI run [31176160602](https://github.com/rickylabs/netscript/actions/runs/31176160602),
+job [92858580129](https://github.com/rickylabs/netscript/actions/runs/31176160602/job/92858580129),
+reported the sole repo-wide test failure at
+`plugins/triggers/tests/cli/local-runtime-backend_test.ts`. The test expected the old
+double-quoted generated prefix even though W1-B's format-clean generator contract deliberately
+emits single-quoted TypeScript literals. The generated webhook still narrows the exact job ID,
+checks the whole value with `satisfies JobDefinition<...>`, and enqueues that value.
+
+Disposition: update only the stale lifecycle assertion to prove the current narrowed-ID and
+`satisfies` contracts in addition to the retained enqueue call. The focused lifecycle suite passes
+3/3 and the owning resource-generator suite passes 8/8, including runtime action verification.
+This is test drift caused by an intentional equivalent formatting contract, not a product rollback,
+weakened assertion, new debt, or formal re-evaluation. The DeepSeek PASS remains untouched at
+`a02467d8cd28be215855764d163fb60508afe895`.

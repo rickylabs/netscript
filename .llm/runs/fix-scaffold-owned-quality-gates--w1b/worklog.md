@@ -518,3 +518,40 @@ both passed. Postgres `scaffold.runtime`, SQLite runtime, the clean-clone verifi
 IMPL-EVAL were not repeated. Per the explicit owner pace rule, the immutable DeepSeek PASS remains
 the valid formal verdict at `a02467d8cd28be215855764d163fb60508afe895`; this is a third
 post-eval current-head CI repair with focused writer receipts, not a re-evaluation claim.
+
+## Post-eval CI repair — trigger job-wiring assertion follows canonical emitted source
+
+Current-head CI run [31176160602](https://github.com/rickylabs/netscript/actions/runs/31176160602),
+job [92858580129](https://github.com/rickylabs/netscript/actions/runs/31176160602/job/92858580129),
+failed deterministically in the repo-wide test after 2,953 passes, with 1 failure and 14 ignored.
+`plugins/triggers/tests/cli/local-runtime-backend_test.ts` still searched generated webhook source
+for the historical double-quoted prefix `id: "capture-payment" as JobDefinition`.
+
+The product generator is correct and intentionally stronger. W1-B commit `1ab303975` routed
+generated literals through the format-stable `typescriptStringLiteral()` contract, so the current
+source uses single quotes. It retains the job ID through
+`JobDefinition<'capture-payment'>['id']`, validates the complete object with
+`satisfies JobDefinition<'capture-payment'>`, and enqueues `capturePaymentJob`. The owning resource
+test already proves the same typed source dynamically imports and emits an `enqueue-job` action
+with the expected job ID and payload.
+
+The smallest genuine repair is therefore test-only: the lifecycle assertion now checks both the
+exact narrowed ID declaration and the `satisfies` clause, while retaining its existing enqueue
+assertion. This preserves and strengthens proof that security-field updates do not erase job
+wiring; no generator, public contract, runtime behavior, or plugin architecture changed.
+
+Focused current-head receipts:
+
+| Gate | Result |
+| --- | --- |
+| `deno test --allow-all plugins/triggers/tests/cli/local-runtime-backend_test.ts` | exit 0; 3 passed / 0 failed |
+| `deno test --allow-all plugins/triggers/src/adapter/resources/resources.test.ts` | exit 0; 8 passed / 0 failed |
+| scoped check wrapper | exit 0; 1 file / 1 batch / 0 diagnostics |
+| scoped lint wrapper | exit 0; 1 file / 1 batch / 0 findings |
+| scoped format wrapper | exit 0; 1 file / 1 batch / 0 findings |
+| `deno task quality:gate` | exit 0; zero quality/doctrine failures, existing warnings only |
+
+The valid DeepSeek IMPL-EVAL PASS remains immutable at
+`a02467d8cd28be215855764d163fb60508afe895` and was not repeated. This is a fourth post-eval
+current-head CI repair from head `ef521e2521411a3a9331a0c479c06ceccc5a87ad`, not an evaluator
+claim or permission to widen W1-B scope.
