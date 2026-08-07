@@ -16,3 +16,12 @@
   fill only the missing member versions at the same semver when the tag tree is identical.
 - Decision: preserve immutable published members and document identical-tree completion for missing
   members; otherwise advance to a new canary. This changes no acceptance scope.
+
+## D-003 — publish dry-run snapshot cleanup
+
+- Severity: procedural
+- Source: selected `publish:dry-run` generator gate
+- Observation: the completed helper left catalog-materialized/format-only changes in 19 member
+  manifests despite its snapshot-restoration contract.
+- Decision: inspect and restore exactly those gate-created manifest paths. `deno.lock` and all
+  implementation files remained untouched. The gate was not repeated after its valid completion.

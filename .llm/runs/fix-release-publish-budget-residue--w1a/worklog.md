@@ -55,3 +55,43 @@
 PR #1341 and issues #1312/#1148 are open in milestone `0.0.5`, each has exactly one
 `status:impl`, and the resolving PR retains both closing keywords. No new reviewer/evaluator
 comments were present at the slice checkpoint.
+
+## Generator gate set
+
+| Gate | Raw exit | Receipt |
+| --- | ---: | --- |
+| `check:publish-assets` | 0 | generated publish assets fresh |
+| `release:preflight` | 0 | text imports/import attributes/file-URL/self-imports all PASS |
+| `publish:readiness` | 0 | 35 effective members; every composed check PASS; version 0.0.4 |
+| `publish:dry-run` | 0 | coordinated workspace dry-run completed; no real publish |
+| `deps:audit --level low` | 0 | completed with 26 pre-existing advisory findings |
+
+The dry-run helper left catalog-materialized/format-only changes in 19 member `deno.json` files.
+They were clean immediately before the gate, the diff was inspected as generated churn, and only
+those 19 paths were restored. No source or lockfile was restored; final worktree/lock checks are
+clean.
+
+## Residual risks
+
+- The budget check and real publish are separate JSR operations; workflow concurrency and requiring
+  the full 35-member headroom reduce but cannot make the external quota read transactional.
+- JSR exposes rolling usage/limit, not the expiry timestamp of each attempt; operators must wait for
+  attempts to age out rather than rely on a guessed reset clock.
+- The 26 dependency advisories are baseline graph findings and out of this release-tooling cluster;
+  this change adds no dependency and does not modify `deno.lock`.
+- Formal IMPL-EVAL is deliberately pending in a separate session. No writer PASS is recorded.
+
+## Independent IMPL-EVAL handoff
+
+Run from this native WSL worktree in a fresh session:
+
+```bash
+deno task agentic:claude-openrouter -- --model deepseek/deepseek-v4-flash-0731 --effort max \
+  --prompt .llm/runs/fix-release-publish-budget-residue--w1a/evaluate-prompt.md \
+  --output .llm/tmp/w1a-impl-eval-result.json
+```
+
+Canonical route: `formal_impl_evaluator` via `claude-openrouter`, preset
+`claude-evaluator-deepseek-v4-flash-0731`, DeepSeek V4 Flash 0731 at max effort. If and only if
+OpenRouter reports a provider limit, use the checked-in AGY Google fallback
+`gemini-3.6-flash-high` at high effort. OpenHands remains paused.
