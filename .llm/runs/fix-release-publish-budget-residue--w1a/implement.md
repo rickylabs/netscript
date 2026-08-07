@@ -41,4 +41,3 @@ The owner explicitly authorized proportional pacing: this small W1 cluster may s
 8. Perform a substantive self-inspection but do not self-certify: do not write IMPL-EVAL PASS, do not mark ready for review, and do not merge. Stop only after implementation and generator gates are green, the draft PR/head is current, all run artifacts and slice comments are pushed, and you leave a concise handoff naming PR number, head SHA, changed files, gate receipts, residual risks, and the exact independent IMPL-EVAL command/route the orchestrator should run.
 
 OpenHands is paused. Never trigger it. Repair only an actual current-head failing gate. Never repeat a valid PASS.
-
