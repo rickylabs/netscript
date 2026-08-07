@@ -203,6 +203,22 @@ describe('generateRegisterBackground', () => {
     assertStringIncludes(output, "import { OtlpProtocol } from '../.aspire/modules/aspire.mts'");
   });
 
+  it('uses the typed service map parameter for background service references', () => {
+    const output = generateRegisterBackground({
+      ...emptyOptions,
+      processors: {
+        workers: {
+          ...fixtures.MINIMAL_BACKGROUND,
+          ServiceReferences: ['users'],
+        },
+      },
+    });
+
+    assertStringIncludes(output, '_services: Map<string, ExecutableResource>');
+    assertStringIncludes(output, "_services.get('users')?.getEndpoint('http')");
+    assert(!output.includes(" services.get('users')"));
+  });
+
   it('should pass saga store backend appsettings to background env', () => {
     const sagaProcessor = {
       ...fixtures.MINIMAL_BACKGROUND,

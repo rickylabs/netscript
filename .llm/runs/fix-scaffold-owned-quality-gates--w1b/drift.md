@@ -93,6 +93,19 @@ contract, regenerate the embedded asset, and repeat the one-pass merge-readiness
 focused test and scoped CLI wrappers are green. Preserve `appRoutes.crudExample` as the live
 service-backed CRUD link; changing that public behavior is outside this repair.
 
+### Flow-B runtime fixture used the pre-cleanup service-map name — Slice 3 repair
+
+The repeated one-pass runtime passed the complete negative matrix and generated green quality gates,
+then failed when Aspire compiled the post-quality Flow-B fixture mutation. Slice 2 intentionally
+renamed the generated background helper's service map to `_services` so default scaffolds with no
+service references remain lint-clean. The E2E fixture still injected a reference through the old
+`services` name after the quality gates had completed.
+
+Disposition: make the fixture target the generated `_services` contract and add a focused generator
+assertion that populated `ServiceReferences` use the same typed parameter. This is proving-tool
+drift exposed by the one-pass lifecycle, not a reason to weaken generated checking or reorder the
+quality gates.
+
 ## Explicitly not drift
 
 - #1092's eight-tool consumer boundary remains unchanged.
