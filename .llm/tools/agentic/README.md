@@ -501,6 +501,33 @@ message is swallowed as another filename. Repeating `-f` passes native WSL paths
 Add `--format json` to the general launcher when structured event output is required; the evaluator
 captures default markdown.
 
+Every OpenCode launch discovers the nearest generated `.mcp.json` without crossing the current
+project/git boundary, strictly translates its stdio declarations to OpenCode local MCP entries, and
+adds them through `OPENCODE_CONFIG_CONTENT`. Existing external config and inline provider, model,
+permission, and plugin settings remain intact; current-project MCP names win only same-name MCP
+collisions. Malformed declarations or inline JSON fail closed.
+
+Measured runs can require real attachment before the product prompt:
+
+```bash
+deno task agentic:opencode --message "Inspect the project" --model <provider/model> \
+  --variant <effort> --cwd /path/to/project \
+  --require-mcp netscript --require-mcp aspire \
+  --receipt .netscript/agent/opencode-receipt.jsonl
+```
+
+The loopback-only preflight requires both servers to report connected, checks the host tool catalog,
+then runs a bounded OpenCode preflight turn that must execute exactly one harmless
+`netscript_search_docs` lookup. Its receipt reports the available-tool count separately from
+expected-tool and MCP-call counts. The product turn does not start if any row fails. Receipts
+contain only bounded event identities, reason/category names, and counts—never prompts, tool
+inputs/outputs, paths, config, credentials, or secrets.
+
+Resume an exact stored session with `--session <session-id>`. A checked-in OpenCode plugin runs
+immediately before every provider conversion (including compaction), removes empty unsigned
+assistant text/reasoning fragments, preserves all tool parts and ordering, and is idempotent across
+repeated resume. Unsafe signed-reasoning boundaries fail with only a safe local event identity.
+
 OpenRouter requires `OPENROUTER_API_KEY`. An already-exported value wins; otherwise the launcher
 loads only that assignment from `$HOME/.config/netscript-agentic/openrouter.env` and never prints
 it.

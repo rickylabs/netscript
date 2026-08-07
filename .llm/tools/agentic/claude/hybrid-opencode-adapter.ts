@@ -2,6 +2,7 @@
 
 import { type Environment, resolveOpenRouterApiKey } from '../lib/openrouter-credential.ts';
 import { opencodeRunArguments, resolveOpenCodeBinary } from '../opencode/opencode-run.ts';
+import { prepareOpenCodeProjectEnvironment } from '../opencode/opencode-project-config.ts';
 import {
   HYBRID_DELEGATION_LIMITS,
   HybridDelegationError,
@@ -215,6 +216,7 @@ export class HybridOpenCodeAdapter {
   readonly #env: Environment;
   readonly #readTextFile: (path: string) => Promise<string>;
   readonly #now: () => number;
+  #preparedEnvironment: Promise<Record<string, string>> | undefined;
 
   constructor(readonly options: HybridOpenCodeAdapterOptions) {
     this.#gate = new ConcurrencyGate(HYBRID_DELEGATION_LIMITS.concurrency);
@@ -222,6 +224,17 @@ export class HybridOpenCodeAdapter {
     this.#env = options.env ?? Deno.env.toObject();
     this.#readTextFile = options.readTextFile ?? Deno.readTextFile;
     this.#now = options.now ?? Date.now;
+  }
+
+  #environment(): Promise<Record<string, string>> {
+    this.#preparedEnvironment ??= hybridWorkerEnvironment(this.#env, this.#readTextFile).then(
+      (isolatedEnv) =>
+        prepareOpenCodeProjectEnvironment(isolatedEnv, {
+          cwd: this.options.cwd,
+          projectBoundary: this.options.cwd,
+        }),
+    );
+    return this.#preparedEnvironment;
   }
 
   async delegate(
@@ -235,7 +248,7 @@ export class HybridOpenCodeAdapter {
     let timedOut = false;
     let abortListener: (() => void) | undefined;
     try {
-      const env = await hybridWorkerEnvironment(this.#env, this.#readTextFile);
+      const env = await this.#environment();
       if (signal?.aborted) throw cancelled();
       const cliModel = `openrouter/${request.model}`;
       const args = opencodeRunArguments({

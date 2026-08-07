@@ -1,0 +1,4 @@
+{"kind":"discovery","eventId":"functions.netscript_search_docs:0","toolId":"netscript_search_docs","source":"mcp","callCount":1}
+{"kind":"mcp_preflight","expectedServerCount":2,"connectedServerCount":2,"availableToolCount":14,"expectedToolCount":2,"mcpCallCount":1,"documentationLookup":"passed"}
+{"kind":"discovery","eventId":"functions.netscript_search_docs:0","toolId":"netscript_search_docs","source":"mcp","callCount":1}
+{"kind":"history_validation","eventId":"msg_fdc79062c001DLumSQProCFIc4","reason":"provider_valid","assistantEventCount":2,"removedFragments":0,"removedEvents":0}
