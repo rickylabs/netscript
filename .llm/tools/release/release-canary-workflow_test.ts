@@ -5,6 +5,8 @@ const root = new URL('../../../', import.meta.url);
 Deno.test('canary workflow reuses the publisher and records only an awaited green pair', async () => {
   const source = await Deno.readTextFile(new URL('.github/workflows/release-canary.yml', root));
   const ordered = [
+    'check-jsr-publish-budget.ts',
+    'deno task release:canary -- "$TARGET_VERSION"',
     'deno task publish:readiness',
     '.llm/tools/release/jsr-provision-packages.ts',
     '.llm/tools/release/run-publish.ts --dry-run',
@@ -36,6 +38,10 @@ Deno.test('canary workflow reuses the publisher and records only an awaited gree
   }
   assertStringIncludes(source, 'inputs[published-version]=$CANARY_VERSION');
   assertStringIncludes(source, 'context=release/canary-pair');
+  assertStringIncludes(source, "if: inputs.republish-version == ''");
+  assertStringIncludes(source, 'Canary partial publish:');
+  assertStringIncludes(source, 'Canary publish complete; pinned production E2E failed');
+  assertStringIncludes(source, 'report-jsr-publish-outcome.ts');
   assertStringIncludes(source, 'git push origin --delete "$CANARY_BRANCH"');
   assertStringIncludes(source, 'republish-version:');
   assertStringIncludes(source, "if: inputs.republish-version == ''");

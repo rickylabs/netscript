@@ -68,7 +68,11 @@ export async function findVersionResidue(root: string, oldVersion: string): Prom
       ],
     })
   ) {
-    if (!entry.path.endsWith('.json') && entry.name !== 'deno.lock') continue;
+    const generatedTypeScript = entry.name === 'generated.ts' ||
+      entry.name.endsWith('.generated.ts');
+    if (!entry.path.endsWith('.json') && entry.name !== 'deno.lock' && !generatedTypeScript) {
+      continue;
+    }
     if (containsExactVersion(await Deno.readTextFile(entry.path), oldVersion)) {
       residue.push(normalize(entry.path));
     }

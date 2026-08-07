@@ -371,3 +371,27 @@ Deno.test('findVersionResidue excludes test fixtures that pin prior published re
     await Deno.remove(root, { recursive: true });
   }
 });
+
+Deno.test('findVersionResidue reports stale generated TypeScript and retains deliberate exclusions', async () => {
+  const { findVersionResidue } = await import('./bump-version.ts');
+  const root = await Deno.makeTempDir({ prefix: 'ns-generated-residue-' });
+  try {
+    await Deno.mkdir(`${root}/packages/example/src`, { recursive: true });
+    await Deno.writeTextFile(
+      `${root}/packages/example/src/assets.generated.ts`,
+      "export const pin = 'jsr:@netscript/sdk@0.0.4';\n",
+    );
+    for (const excluded of ['.llm/tmp', '.llm/runs/run', '.data', '.llm/tools/release/baselines']) {
+      await Deno.mkdir(`${root}/${excluded}`, { recursive: true });
+      await Deno.writeTextFile(
+        `${root}/${excluded}/stale.generated.ts`,
+        "export const pin = 'jsr:@netscript/sdk@0.0.4';\n",
+      );
+    }
+    assertEquals(await findVersionResidue(root, '0.0.4'), [
+      `${root}/packages/example/src/assets.generated.ts`,
+    ]);
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
