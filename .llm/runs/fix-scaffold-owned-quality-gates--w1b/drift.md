@@ -185,3 +185,19 @@ verifier, Postgres runtime,
 PLAN-EVAL, or IMPL-EVAL. The failed run cleaned up; the read-only leak check found no run-owned
 survivors and all foreign/unproven resources were left untouched. This remains current-head CI
 repair drift, not architecture debt or a new evaluation claim.
+
+### Service CI exposed a non-SQLite regression in the shared Prisma template
+
+Current-head CI run [31175647444](https://github.com/rickylabs/netscript/actions/runs/31175647444),
+job [92857089666](https://github.com/rickylabs/netscript/actions/runs/31175647444/job/92857089666),
+showed that the SQLite lint correction overgeneralized the Prisma import removal. SQLite never
+uses `env`, but Postgres and every other non-SQLite variant still emit `env('DATABASE_URL')` as a
+fallback. The shared output consequently reached Postgres codegen with `env` undefined.
+
+Disposition: make the existing generator/template import engine-aware, with paired SQLite and
+Postgres semantic tests, and regenerate the embedded asset. The exact formerly red
+`scaffold.service` suite passed once at 5/0 after the repair. No quality selection, lint exception,
+fallback behavior, new abstraction, or doctrine debt was introduced. The already-green runtime
+suites, clean-clone verifier, and both formal evaluations were deliberately not repeated. The
+immutable DeepSeek PASS remains recorded only at `a02467d8cd28be215855764d163fb60508afe895`;
+this third repair is current-head CI follow-up evidence, not evaluator provenance.

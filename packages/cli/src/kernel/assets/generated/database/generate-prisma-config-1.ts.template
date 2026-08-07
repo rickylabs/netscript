@@ -5,7 +5,7 @@
  */
 
 //import 'dotenv/config';
-import { defineConfig } from 'prisma/config';
+import { {{__slot5__}} } from 'prisma/config';
 
 const databaseUrl = resolveDatabaseUrl(
   '{{__slot1__}}',

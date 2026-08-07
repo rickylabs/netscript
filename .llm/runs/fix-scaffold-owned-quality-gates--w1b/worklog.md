@@ -484,3 +484,37 @@ The SQLite/route-seed product sign-off is
 These are post-eval current-head CI repairs, not a repeated evaluation. The immutable DeepSeek V4
 Flash 0731 max PASS remains valid only as recorded on `a02467d8cd28be215855764d163fb60508afe895`;
 PLAN-EVAL and IMPL-EVAL were not rerun.
+
+## Post-eval CI repair — engine-aware Prisma config import
+
+Current-head CI run [31175647444](https://github.com/rickylabs/netscript/actions/runs/31175647444),
+job [92857089666](https://github.com/rickylabs/netscript/actions/runs/31175647444/job/92857089666),
+failed the `scaffold-static (deno-only)` lane's exact
+`deno task e2e:cli run scaffold.service --format pretty` command. Three gates passed before
+Postgres `database.codegen` failed with `ReferenceError: env is not defined` while loading the
+generated Prisma config.
+
+Root cause was bounded to the preceding SQLite lint repair: it removed Prisma's `env` import from
+the shared template for every engine, while the generator still emitted `env('DATABASE_URL')` as
+the fallback for every non-SQLite engine. The owning generator/template now renders
+`defineConfig` alone for SQLite and `defineConfig, env` for Postgres and the other non-SQLite
+engines. Focused semantic assertions lock both the SQLite omission and Postgres retention; no
+selection, suppression, engine behavior, or CLI architecture changed.
+
+Focused current-head receipts:
+
+| Gate | Result |
+| --- | --- |
+| `deno test --allow-read packages/cli/src/kernel/templates/database/generators_test.ts` | exit 0; 1 passed / 11 steps / 0 failed |
+| scoped check wrapper | exit 0; 3 files / 1 batch / 0 diagnostics |
+| scoped lint wrapper | exit 0; 3 files / 1 batch / 0 findings |
+| scoped format wrapper | exit 0; 3 files / 1 batch / 0 findings |
+| `deno task quality:gate` | exit 0; zero quality/doctrine failures, existing warnings only |
+| `deno task check:assets-barrel` | exit 0; regenerated asset is fresh |
+| `deno task e2e:cli run scaffold.service --format pretty` | exit 0; 5 passed / 0 failed |
+
+The exact formerly red service suite was run once. Postgres codegen and the generated service check
+both passed. Postgres `scaffold.runtime`, SQLite runtime, the clean-clone verifier, PLAN-EVAL, and
+IMPL-EVAL were not repeated. Per the explicit owner pace rule, the immutable DeepSeek PASS remains
+the valid formal verdict at `a02467d8cd28be215855764d163fb60508afe895`; this is a third
+post-eval current-head CI repair with focused writer receipts, not a re-evaluation claim.
