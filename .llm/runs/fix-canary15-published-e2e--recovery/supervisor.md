@@ -14,7 +14,7 @@
 
 | Lane | Route | Status |
 | --- | --- | --- |
-| implementation | current Codex writer session | active |
+| implementation | current Codex writer session | complete at `8f1c5785171938583f30c1a0a089bd296fb550d3` |
 | PLAN-EVAL | N/A — the exact failing logs define three mechanical compatibility repairs | recorded before implementation |
-| IMPL-EVAL | DeepSeek V4 Flash 0731, max, checked-in Claude/OpenRouter evaluator route | mandatory after immutable implementation head |
+| IMPL-EVAL | DeepSeek V4 Flash 0731, max, checked-in Claude/OpenRouter evaluator route | PASS; separate session `f990a3c2-a5c4-4684-8a68-554e5b1108a1` |
 | OpenHands | paused by owner instruction | prohibited |

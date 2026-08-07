@@ -41,3 +41,12 @@ Do not weaken file selection, remove the AppHost batch, rerun the already-valid 
 - Resource hygiene: 15 foreign and 3 unproven resources were reported and left untouched.
 - Lock hygiene: repair/release `deno.lock` hashes remain `d32ef0c1f2b9256e05cf7339c452bd8cf6addeb9a4b433d38abcee992651b529`; protected coordination hash remains `1c4d59cc38c00742997d3c20dc39ae79b7966891422969b7b444d76642d0ccc1`.
 - Next hard gate: independent IMPL-EVAL on the frozen current head through the canonical DeepSeek V4 Flash 0731 max route.
+
+## 2026-08-07 — independent evaluation and CI handoff
+
+- Independent IMPL-EVAL: `PASS` on frozen repair head `f33167ca1c023da345aa07e0a895ea68cdb31ac4`.
+- Requested/observed route: DeepSeek V4 Flash 0731, max, checked-in Claude/OpenRouter transport; separate session `f990a3c2-a5c4-4684-8a68-554e5b1108a1`.
+- Evaluator independently reran the two focused files: exit 0, 10 passed / 0 failed.
+- Receipt: `evaluate.md`, committed without product changes at `6adcc6ba8`.
+- PR #1346 marked ready for review while retaining `status:impl-eval`; a receipt-only synchronization commit follows so required CI evaluates a non-draft current head.
+- Canary.15 remains immutable and published-but-red. A fresh next-canary mint and pinned green pair remain post-merge release-orchestrator scope.
