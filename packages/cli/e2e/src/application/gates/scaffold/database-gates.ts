@@ -186,13 +186,6 @@ export function createGeneratedCheckGates(): readonly GateDefinition[] {
         ),
       (context) => context.project.projectRoot,
     ),
-    commandGate(
-      GATE.GENERATED_DENO_CHECK,
-      'Run the generated workspace type-check task',
-      GATE_PHASE.DATABASE,
-      () => ['deno', 'task', 'check'],
-      (context) => context.project.projectRoot,
-    ),
   ];
 }
 

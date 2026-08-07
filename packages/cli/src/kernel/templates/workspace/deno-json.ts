@@ -95,9 +95,14 @@ export function generateDenoJson(options: WorkspaceDenoJsonOptions): string {
             'deno run --allow-run=aspire --allow-read .netscript/aspire-cli.ts export',
         }
         : {}),
-      check: 'deno check apps/**/*.ts services/**/*.ts contracts/**/*.ts',
-      lint: 'deno lint',
-      fmt: 'deno fmt',
+      check:
+        'deno run --allow-read --allow-run=deno .netscript/quality-runner.ts check',
+      lint:
+        'deno run --allow-read --allow-run=deno .netscript/quality-runner.ts lint',
+      'fmt:check':
+        'deno run --allow-read --allow-run=deno .netscript/quality-runner.ts fmt-check',
+      fmt:
+        'deno run --allow-read --allow-run=deno .netscript/quality-runner.ts fmt-write',
       test: 'deno test --allow-all',
     },
   };
@@ -108,7 +113,6 @@ export function generateDenoJson(options: WorkspaceDenoJsonOptions): string {
     'dotnet',
     '**/.git',
     `${SCAFFOLD_DIRS.ASPIRE_TS}/${SCAFFOLD_DIRS.ASPIRE_GENERATED}`,
-    `${SCAFFOLD_DIRS.ASPIRE_TS}/${SCAFFOLD_DIRS.HELPERS}`,
     '**/.generated',
   ];
 

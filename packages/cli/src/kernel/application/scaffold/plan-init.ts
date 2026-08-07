@@ -9,6 +9,7 @@ import { generateNetScriptConfig } from '../../templates/workspace/netscript-con
 import { generateReadme } from '../../templates/workspace/generate-readme.ts';
 import { generateAspireCliTaskRunner } from '../../templates/workspace/aspire-cli-task.ts';
 import { generateNodeModulesVerifier } from '../../templates/workspace/node-modules-verifier.ts';
+import { generateQualityRunner } from '../../templates/workspace/quality-runner.ts';
 import { generatePackageJson } from '../../templates/workspace/package-json.ts';
 import { generateEditorConfigFiles } from '../../adapters/scaffold/editor-config.ts';
 import { loadRootScaffoldTemplateAssets } from '../../adapters/templates/scaffold-template-assets.ts';
@@ -237,6 +238,19 @@ export async function scaffoldRoot(
     filesCreated.push(verifierPath);
   } else {
     filesSkipped.push(verifierPath);
+  }
+
+  const qualityRunnerPath = join(netscriptDir, SCAFFOLD_FILES.QUALITY_RUNNER);
+  if (
+    await context.scaffolder.writeFile(
+      qualityRunnerPath,
+      generateQualityRunner(),
+      options.force,
+    )
+  ) {
+    filesCreated.push(qualityRunnerPath);
+  } else {
+    filesSkipped.push(qualityRunnerPath);
   }
 
   // 7. appsettings.json (Tier 1 — NetScript infrastructure config)

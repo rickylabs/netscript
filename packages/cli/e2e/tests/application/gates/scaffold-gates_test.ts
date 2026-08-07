@@ -1,7 +1,8 @@
 import { assertEquals, assertThrows } from '@std/assert';
 
 import { createSmokeProject } from '../../../src/application/builders/workspace/smoke-project-factory.ts';
-import { createGeneratedCheckGates } from '../../../src/application/gates/scaffold/database-gates.ts';
+import { createGeneratedQualityGates } from '../../../src/application/gates/scaffold/generated-quality-gate.ts';
+import { QUALITY_PROBE_PATHS } from '../../../src/application/gates/scaffold/generated-quality-probes.ts';
 import { createScaffoldGates } from '../../../src/application/gates/scaffold/scaffold-gates.ts';
 import { GATE, SCAFFOLD } from '../../../src/domain/cli-surface.ts';
 import {
@@ -79,7 +80,9 @@ Deno.test('--source jsr rejects the local contributor CLI binary', () => {
 });
 
 Deno.test('generated check runs the fresh scaffold workspace check task', () => {
-  const gate = createGeneratedCheckGates().find((entry) => entry.id === GATE.GENERATED_DENO_CHECK);
+  const gate = createGeneratedQualityGates().find((entry) =>
+    entry.id === GATE.GENERATED_DENO_CHECK
+  );
   if (!gate || gate.kind !== 'command') {
     throw new Error('Expected generated check gate to be a command gate.');
   }
@@ -87,6 +90,30 @@ Deno.test('generated check runs the fresh scaffold workspace check task', () => 
   assertEquals(
     gate.command(createContext('/repo/packages/cli/bin/netscript.ts', PACKAGE_SOURCE.LOCAL)),
     ['deno', 'task', 'check'],
+  );
+});
+
+Deno.test('generated quality probes cover TS, TSX, plugin, background, and AppHost surfaces', () => {
+  assertEquals(QUALITY_PROBE_PATHS, [
+    'apps/__quality_probe__.ts',
+    'apps/__quality_probe__.tsx',
+    'services/__quality_probe__.ts',
+    'contracts/__quality_probe__.ts',
+    'plugins/__quality_probe__.ts',
+    'workers/__quality_probe__.ts',
+    'sagas/__quality_probe__.ts',
+    'triggers/__quality_probe__.ts',
+    'streams/__quality_probe__.ts',
+    'aspire/.helpers/__quality_probe__.mts',
+  ]);
+  assertEquals(
+    createGeneratedQualityGates().map((gate) => gate.id),
+    [
+      GATE.GENERATED_QUALITY_NEGATIVE,
+      GATE.GENERATED_DENO_CHECK,
+      GATE.GENERATED_DENO_LINT,
+      GATE.GENERATED_DENO_FMT_CHECK,
+    ],
   );
 });
 

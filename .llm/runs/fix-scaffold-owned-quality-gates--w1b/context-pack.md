@@ -47,13 +47,23 @@ no negative selection proof. A fresh diagnostic found five product lint and four
    bundle would regress #1092's explicit boundary.
 5. Clone-independent smoke evidence must use the installed released path, not a local CLI fallback.
 
-## PLAN-EVAL result and next phase
+## PLAN-EVAL result
 
 Independent session `017613f0-c5be-4738-b59c-0bf540202686` returned PASS on exact head
 `045ca6c3262c854f830b428e871ef9ed8730ba10` using the canonical Minimax M3 high route. The tracked
 distillation is `plan-eval.md`; all seven advisories are incorporated into `worklog.md`'s mandatory
 Design checkpoint. Do not rerun PLAN-EVAL.
 
-Next: commit/push the verdict and Design checkpoint, post the structured PLAN-EVAL PASS comment,
-move PR #1342 and issues #1024/#1328 to exactly `status:impl`, then implement the three accepted
-slices. Stop only after current-head gates are green at the independent IMPL-EVAL handoff.
+The verdict/Design commit is `9ac85e921`; its explicit-refspec push and structured PR comment are
+complete. PR #1342 and both issues are at exactly `status:impl`.
+
+## Implementation state
+
+Slice 1 is ready to commit: the always-generated runner, root task wiring, scaffold bookkeeping,
+colocated semantics, and runtime negative/positive quality gates are implemented. Focused tests are
+58/58 green; scoped CLI check/lint/fmt wrappers are green over 811 TS/TSX files. The runtime gate
+order is codegen, registry generation, ten negative probes, then check/lint/format-check. No lock or
+protected-state change occurred.
+
+Next: commit/push Slice 1 explicitly, post its structured implementation comment and reconcile
+status, then repair only the measured generator-owned lint/format defects in Slice 2.

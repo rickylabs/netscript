@@ -160,3 +160,37 @@ owns the emitted file.
 The separate-session PLAN-EVAL passed on the exact recorded head. After the verdict artifact is
 committed/pushed, the structured PASS comment is posted, and PR/issues move together to exactly
 `status:impl`, Slice 1 product implementation may begin.
+
+## Slice 1 — generated quality contract and proving tests
+
+Implemented the accepted contract seam:
+
+- every scaffold now receives `.netscript/quality-runner.ts`, registered as
+  `SCAFFOLD_FILES.QUALITY_RUNNER` beside the node-materialization verifier;
+- root `check`, `lint`, `fmt:check`, and `fmt` tasks route to the runner's finite modes without shell
+  globs or optional agent-tool dependencies;
+- deterministic discovery covers scaffold-owned TS, TSX, and executable MTS roots/files, skips
+  offline agent/docs surfaces, caches, dependencies, and direct machine output, batches tools, emits
+  structured results, exits 2 on empty selection, and preserves child failure as exit 1;
+- the colocated runner tests execute generated source in temporary consumers and prove all four
+  empty modes, the full root/extension matrix, exclusions, child failure propagation, and the
+  runner's own lint/format cleanliness in its generated location;
+- `scaffold.runtime` now places a ten-surface serial negative matrix after standalone DB codegen and
+  workers/sagas registry generation, followed by green generated check, lint, and `fmt:check` gates.
+
+Evidence at the uncommitted Slice 1 tree:
+
+- focused semantic tests: exit 0, 58 passed / 0 failed;
+- `deno task e2e:cli gates scaffold.runtime`: exit 0 and confirmed order
+  `database.codegen` → registry gates → negative probes → check/lint/fmt-check;
+- scoped CLI check wrapper: 811 files, 7 batches, 0 failed, 0 diagnostics;
+- scoped CLI lint wrapper: 811 files, 5 batches, exit 0, 0 findings;
+- scoped CLI format wrapper: 811 files, 5 batches, 0 failed, 0 findings;
+- `git diff --check`: exit 0; `deno.lock` absent from status and untouched.
+
+Sole-supervisor inspection checked the emitted runner as consumer code, task/mode naming, explicit
+selection/exclusion boundaries, exact E2E probe ownership and restoration, registry/codegen order,
+suite registration, and #1092 isolation. One inspection finding was fixed before this record: the
+initial generated source was not format-clean when it selected itself. The test now provides the
+generated consumer format policy and the source is clean under it. This was an implementation
+correction inside the locked contract, not plan drift.
