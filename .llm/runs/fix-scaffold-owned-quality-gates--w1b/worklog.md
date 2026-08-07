@@ -51,5 +51,15 @@ and workers generator sources. No scratch output was promoted as a code fix.
 
 ## Current stop
 
-The next allowed actions are bootstrap commit/push, draft PR creation/taxonomy reconciliation, and a
-separate-session PLAN-EVAL. Product-code implementation remains blocked until that evaluator PASS.
+- Committed the eight-file run bootstrap as `921b1d996` and pushed it only with
+  `git push origin HEAD:refs/heads/fix/scaffold-owned-quality-gates`; the local branch still has no
+  upstream.
+- Opened draft PR #1342 directly against `main` with both closing keywords, unchecked DoD, run-dir
+  link, three slices, validation/debt sections, and pending evidence mappings for #1024 box 6 and
+  #1328 boxes 1-8.
+- Applied milestone `0.0.5` and valid PR taxonomy with exactly `status:plan-eval`. Reconciled #1024
+  from `status:in-progress` and #1328 from `status:triage` to `status:plan-eval` while preserving
+  every unrelated issue label.
+
+The next allowed action is a separate-session PLAN-EVAL. Product-code implementation remains blocked
+until that evaluator PASS.

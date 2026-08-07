@@ -5,7 +5,7 @@
 - Branch: `fix/scaffold-owned-quality-gates`
 - Base: `origin/main@7af6d1c02ab3f380dde7354ebac190e67d363db0`
 - Issues: #1024 and #1328
-- PR: pending draft creation after bootstrap push
+- PR: [#1342](https://github.com/rickylabs/netscript/pull/1342), draft against `main`
 - Current phase: `plan-eval`
 - Sole writer thread: `019fdb07-deb8-7971-80aa-d02fb6b56c37`
 - Writer route: OpenAI `gpt-5.6-sol`, high
@@ -13,6 +13,11 @@
 - IMPL-EVAL: required, separate session, not yet run
 - OpenHands: paused
 - Merge/release: prohibited in this run phase
+
+PR #1342 carries milestone `0.0.5`, `type:fix`, `area:cli`, `area:tooling`, `priority:p1`,
+`wave:v1`, `gate:e2e`, and exactly one lifecycle label: `status:plan-eval`. Its body contains
+`Closes #1024`, `Closes #1328`, truthful unchecked Definition-of-Done boxes, and pending
+`acceptance-evidence` mappings for every unchecked issue item.
 
 Exactly one implementation writer owns this worktree. No app-server, tmux, CLI, or second Codex
 writer may overlap it. Resume the recorded thread; do not launch another.
