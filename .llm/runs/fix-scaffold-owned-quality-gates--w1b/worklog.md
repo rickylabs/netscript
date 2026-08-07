@@ -283,3 +283,11 @@ defaults. No current published version contains this branch's combined generator
 this run is not authorized to publish one. Run-owned Postgres containers from each failed diagnostic
 were removed through the ownership-proving teardown; all foreign and unproven resources were left
 untouched.
+
+The first canonical one-pass `scaffold.runtime` completed 22 gates before the negative-quality
+matrix's restored baseline found one more generator defect: the static CRUD route supplied the
+directory node rather than its `$route` target to `withRoute`. The owning template and focused
+assertion now use `routes.examples.crud.$route`; the embedded asset is regenerated. The live
+service-backed `appRoutes.crudExample` alias remains unchanged. Focused route-template tests pass
+19/19 steps, and scoped CLI check/lint/format wrappers are clean over 813 files. This is recorded in
+`drift.md` before the merge-readiness verdict is repeated.

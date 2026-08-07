@@ -78,6 +78,21 @@ publish a canary, or absorb release orchestration. Current-source runtime proof 
 evaluator must see the absence of a published post-fix canary explicitly; this run must not claim an
 older published scaffold is clean.
 
+### Merge-readiness pass exposed a stale generated route-reference shape — Slice 3 repair
+
+The first canonical one-pass `scaffold.runtime` reached the deliberate generated-quality matrix
+after 22 green gates, then its restored baseline check found that the static
+`routes/examples/crud.tsx` template passed the directory node (`routes.examples.crud`) to
+`withRoute`. The current Fresh navigation builder requires the node's typed route target at
+`routes.examples.crud.$route`. This pre-existing template defect was not visible to the string-only
+route-template assertion and surfaced only once the new quality contract checked every generated
+TSX route.
+
+Disposition: repair the owning route template, update its focused assertion to lock the `$route`
+contract, regenerate the embedded asset, and repeat the one-pass merge-readiness verdict after the
+focused test and scoped CLI wrappers are green. Preserve `appRoutes.crudExample` as the live
+service-backed CRUD link; changing that public behavior is outside this repair.
+
 ## Explicitly not drift
 
 - #1092's eight-tool consumer boundary remains unchanged.
