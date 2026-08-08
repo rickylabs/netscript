@@ -116,6 +116,18 @@ docs half was refuted; G8 remote authenticator folded into TA-02. Ownerless find
 checks recorded as the Stage-E ledger (§3.2–3.5). No lane self-certified: all pack output
 supervisor-reviewed before this sign-off commit.
 
+### S5 — Plan lock (Stage E)
+
+- Re-fetched `origin/main` read-only: unchanged at `fac9e339042c` — no re-baseline needed.
+- `MASTER-PLAN.md` (12-fork owner sweep, DAG, risks, exclusions) and
+  `IMPLEMENTATION-HANDOFF.md` (filing gate, groups A–D, profiles, brief skeleton) written by the
+  supervisor. `plan.md` locked; `context-pack.md` finalized as the resume surface.
+- Close-out: no runtime resources were started by this run (no AppHost, no containers) —
+  leak-check N/A. Session record: `.llm/2026-08-08-fable5-remediation-seed-run.md`.
+- Final statement: **no GitHub issue, epic, milestone, project, label-set, or comment mutation
+  occurred in this run** outside draft PR #1347's own body/comments/PR-labels. All deliverables
+  are drafts pending owner ratification.
+
 ### S1 — Bootstrap (Stage A)
 
 - Run dir created; `supervisor.md` written first with identity, lane table, and owner overrides.
