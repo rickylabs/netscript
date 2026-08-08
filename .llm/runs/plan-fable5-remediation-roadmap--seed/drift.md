@@ -29,3 +29,11 @@ Stage F (adversarial) and stages G–H are not executed in this run by owner dir
 at plan-lock + handoff artifacts (stages A–E + I equivalent). The deliverable set is the
 `fable-5-remediation-plan/` subtree requested in the charter, which supersedes the exemplar's
 folder taxonomy (permitted — seed-run.md fixes stage contracts, not folder names).
+
+## D-5 (2026-08-08, significant, owner ratification)
+
+The owner subsequently ratified the locked plan in-turn and explicitly instructed Stage-H board
+filing. This supersedes D-4 only for Stage H: `FILING-MANIFEST.md` was committed before mutation,
+the milestone train was executed, 41 issues were filed, and existing-owner amendments were added.
+PLAN-EVAL and IMPL-EVAL remain owner-waived for this planning/filing run; the waiver does not carry
+into implementation. See `fable-5-remediation-plan/FILING-LOG.md`.

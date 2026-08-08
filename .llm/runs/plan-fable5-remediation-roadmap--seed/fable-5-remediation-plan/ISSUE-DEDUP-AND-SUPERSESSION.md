@@ -1,4 +1,7 @@
-# Issue dedup & supersession — DRAFT (no GitHub mutation; owner ratification pending)
+# Issue dedup & supersession — FILED
+
+> The owner-ratified filing completed on 2026-08-08. GitHub is authoritative; see
+> `FILING-LOG.md` for Draft-ID mappings and live reconciliation receipts.
 
 Disposition of every remediation-relevant existing issue and every proposed new issue.
 Vocabulary: **KEEP** (owner unchanged) · **EXPAND** (additive amendment, text in

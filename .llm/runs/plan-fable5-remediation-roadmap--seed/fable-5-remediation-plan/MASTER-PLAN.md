@@ -1,4 +1,7 @@
-# NetScript long-range remediation — MASTER PLAN — DRAFT (no GitHub mutation; owner ratification pending)
+# NetScript long-range remediation — MASTER PLAN — FILED
+
+> Owner-ratified filing completed 2026-08-08. GitHub is authoritative; see `FILING-LOG.md` for
+> live issue numbers and milestone receipts. This document remains the planning rationale.
 
 Seed run `plan-fable5-remediation-roadmap--seed` · PR #1347 · baseline `origin/main` @
 `fac9e339042c` (re-verified unchanged at plan lock, 2026-08-08). Supervisor: Claude Fable 5 ·

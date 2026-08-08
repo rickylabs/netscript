@@ -135,3 +135,15 @@ supervisor-reviewed before this sign-off commit.
 - Skills activated: `netscript-harness` (+ `activation.md`, `run-loop.md`, `seed-run.md`,
   `lane-policy.md`, `SCOPE-docs.md`, `templates/supervisor.md`), `netscript-pr` (full read).
   Remaining charter skills are read at the stage that needs them; each read is logged here.
+
+### S6 — Owner-ratified filing (Stage H, 2026-08-08)
+
+- Owner explicitly ratified the roadmap and instructed the milestone insertion plus complete issue
+  filing. The one-shot `FILING-MANIFEST.md` was committed before board mutation.
+- Shifted the existing 0.0.6–0.0.13 milestone objects to 0.0.8–0.0.15, created fresh 0.0.6 and
+  0.0.7 milestones, and restored the complete old-0.0.6 membership before applying the explicit
+  move ledger.
+- Filed 41 issues (#1348–#1388), reconciled all internal dependency references to live numbers,
+  and applied 20 additive amendments to existing owner issues. No issue was closed.
+- Post-filing audit: 41/41 new issues open; milestone distribution 10/12/19 for 0.0.6/0.0.7/0.0.8;
+  zero status/type/area/priority/milestone metadata violations. Full receipt: `fable-5-remediation-plan/FILING-LOG.md`.

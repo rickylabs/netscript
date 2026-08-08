@@ -1,4 +1,7 @@
-# Milestone train — DRAFT (no GitHub mutation; owner ratification pending)
+# Milestone train — FILED
+
+> Executed after owner ratification on 2026-08-08. GitHub is authoritative; see `FILING-LOG.md`
+> for the final milestone-object mapping and reconciliation receipts.
 
 Proposed release train for the long-range remediation program. Grounded in the live board
 snapshot (`research/github-board-open.md`, 2026-08-08: 259 open issues, 13 open milestones) and
