@@ -103,6 +103,8 @@ service, generator, or docs file owns a second event-name/payload table.
 | 2026-08-09 | S4    | unchanged docs proof | The gate extracts the official native example verbatim and executes it against both a focused SSE server and, during `scaffold.runtime`, the real generated streams service; the focused proof covers ordered batching and deletion. |
 | 2026-08-09 | S4    | trace verdict strengthened | `stream.subscribe` must be exported by service `flow-b-stream-consumer` in the Deno gate and carry a W3C link whose trace id is the actual producer Flow-B trace id. |
 | 2026-08-09 | S4    | pre-runtime leak check | Exit 0. Only `redis-jfgcbtaf`, proven foreign to `/home/codex/repos/w6-review-desk`, was reported and left untouched. No W2-B AppHost/container was started. |
+| 2026-08-09 | S5    | merge-readiness gates | Final targeted suite, 114-file scoped wrappers, full core export doc lint, workspace publish dry-run, quality/doctrine, docs, JSR audits, and review threads completed. |
+| 2026-08-09 | S6    | EXPENSIVE-GATE-REQUEST | Every cheaper gate is complete. Requesting the serialized `scaffold.runtime` token from the milestone orchestrator; the command has not been started. |
 
 ## Decisions
 
@@ -155,14 +157,24 @@ service, generator, or docs file owns a second event-name/payload table.
 | S4 unchanged-example test | `deno test --no-lock --unstable-kv --allow-all packages/cli/e2e/src/application/gates/scaffold/run-documented-stream-example_test.ts` | PASS (exit 0) | 1 passed; verbatim docs source consumes a named batch and materializes deletion. |
 | S4 scoped check | `run-deno-check.ts --root packages/cli/e2e/src/application/gates/scaffold --ext ts,tsx --deno-arg --no-lock` | PASS (exit 0) | 32 files selected; zero diagnostics. |
 | S4 scoped lint/format | corresponding repo wrappers over the scaffold gate root | PASS (exit 0) | 32 files; zero lint/format findings. |
+| Final focused suite | `deno test --no-lock --unstable-kv --allow-all` over contract/server/Fresh/generator/docs/runtime files | PASS (exit 0) | 28 passed, 0 failed. Initial aggregate invocation exited 1 because it named a nonexistent `packages/fresh/tests/streams`; corrected to the exact two Fresh test files. |
+| Final scoped check | wrappers over core, Fresh streams, streams plugin, and scaffold gates | PASS (exit 0) | 114 selected files; zero diagnostics. |
+| Final scoped lint/format | corresponding repo wrappers over all owned TypeScript roots | PASS (exit 0) | 114 selected files; zero findings. |
+| Final core export doc lint | `deno task doc:lint --root packages/plugin-streams-core --pretty` | PASS (exit 0) | Four entrypoints; combined total/private/missing/other all zero. |
+| JSR audits | `audit-jsr-package.ts` over core and Fresh | PASS with inherited warnings (exit 0) | Dry runs OK. Wrapper counts Deno's informational slow-type heading; Fresh also retains pre-existing AI directory cardinality warning. |
+| Workspace publish dry-run | `deno task publish:dry-run` | PASS (exit 0) | `Success Dry run complete`; only repository-known dynamic-import warnings; no lock/source churn. |
+| Final framework-wave law | `deno task quality:gate` | PASS (exit 0) | Zero quality findings; seven existing explicit allowances; doctrine subgate passed with carried WARN/INFO inventory. |
+| Final doctrine fitness | `deno task arch:check` | PASS (exit 0) | Existing WARN/INFO inventory only; the two exact streams debts remain unchanged. |
+| Final docs links/accuracy | `deno task docs:links`; `deno task docs:accuracy` | PASS (both exit 0) | Zero broken links/anchors/orphans; accuracy/discoverability passed. |
+| Review threads | `deno task agentic:review-threads -- --repo rickylabs/netscript --pr 1395 --pretty` | PASS (exit 0) | 0 threads, 0 unanswered. |
 
 ### Fitness Gates
 
 | Gate                 | Result        | Evidence                         | Notes                                     |
 | -------------------- | ------------- | -------------------------------- | ----------------------------------------- |
-| F-5/F-6/F-7 baseline | FAIL          | full export doc lint + JSR audit | Must be zero before handoff; no waiver.   |
+| F-5/F-6/F-7 final | PASS | full export doc lint + JSR/native publish dry-runs | Combined doc diagnostics zero; native publish bars green; no waiver. |
 | F-14 AP-13           | DEBT_ACCEPTED | exact arch-debt row              | Preserve, do not deepen or claim closure. |
-| Other F-1..F-19      | NOT_RUN       | implementation not started       | Run per plan after slices.                |
+| Other required fitness gates | PASS | final scoped/quality/doctrine/docs gates | No new debt or escape hatch. |
 
 ### Runtime Gates
 
@@ -171,7 +183,7 @@ service, generator, or docs file owns a second event-name/payload table.
 | Focused unchanged docs example | PASS | focused Deno native EventSource test | Exact extracted source; named batch and deletion materialization. |
 | Real generated service/browser | NOT_RUN | implemented; serialized runtime token pending | Full gate executes the same extracted source against the isolated generated streams service. |
 | Correlated OTEL trace          | NOT_RUN | implemented; serialized runtime token pending | Deno consumer service must W3C-link to the actual producer Flow-B trace. |
-| `scaffold.runtime`             | NOT_RUN | serialized; token not requested | Request only after all cheaper gates pass.  |
+| `scaffold.runtime`             | NOT_RUN | `EXPENSIVE-GATE-REQUEST` recorded | Awaiting orchestrator token; do not run before grant. |
 
 ### Consumer Gates
 
