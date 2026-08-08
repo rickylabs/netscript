@@ -2,14 +2,14 @@
 
 ## Run Metadata
 
-| Field          | Value                                                                  |
-| -------------- | ---------------------------------------------------------------------- |
-| Run ID         | `docs-rfc-sdk-client-contribution--rfc`                                |
-| Branch         | `docs/rfc-sdk-client-contribution`                                     |
-| Current phase  | RFC authored; final evidence/reconciliation before `plan-eval` handoff |
-| Archetype      | `2 + 4 + 5 + 6` described; docs-only PR                                |
-| Scope overlays | `SCOPE-docs`                                                           |
-| PR             | `https://github.com/rickylabs/netscript/pull/1390`                     |
+| Field          | Value                                                  |
+| -------------- | ------------------------------------------------------ |
+| Run ID         | `docs-rfc-sdk-client-contribution--rfc`                |
+| Branch         | `docs/rfc-sdk-client-contribution`                     |
+| Current phase  | `plan-eval`; awaiting owner-directed Fable/Qwen review |
+| Archetype      | `2 + 4 + 5 + 6` described; docs-only PR                |
+| Scope overlays | `SCOPE-docs`                                           |
+| PR             | `https://github.com/rickylabs/netscript/pull/1390`     |
 
 ## Current State
 
@@ -69,7 +69,7 @@ primary upstream sources are recorded. No product source is changed.
 | Doc-lint baseline              | baseline finding | combined private refs 9/3/15/4 respectively; RFC adds none                      |
 | Doctrine                       | pass             | `deno task arch:check` exits 0; existing warnings are baseline                  |
 | Plan Gate self-audit           | pass             | complete for external evaluator entry; no evaluator verdict claimed             |
-| Final PR reconciliation        | pending          | slice 3                                                                         |
+| Final PR reconciliation        | pass             | draft, required labels, sole `status:plan-eval`, no milestone/closing keyword   |
 
 ## JSR Consequences
 
@@ -105,4 +105,5 @@ milestones. Findings should cite RFC headings and classify blocking versus safe 
 ## Commits
 
 - Bootstrap: `158849031bba78025d0ec16c8361628211fbc4ed`.
-- Later commits and per-slice PR comments are the authoritative V3 commit record.
+- RFC/research: `89ae608ea935ba8b2776d55e7cb5a09cc29e2520`.
+- The handoff-only commit and per-slice PR comments complete the V3 commit record.

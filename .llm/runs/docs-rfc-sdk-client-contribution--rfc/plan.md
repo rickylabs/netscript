@@ -6,7 +6,7 @@
 | -------------- | ------------------------------------------------------------------------------------------------------------ |
 | Run ID         | `docs-rfc-sdk-client-contribution--rfc`                                                                      |
 | Branch         | `docs/rfc-sdk-client-contribution`                                                                           |
-| Phase          | RFC authored; evidence/gates and external-review handoff remain                                              |
+| Phase          | `plan-eval`; owner-directed external review is the next action                                               |
 | Target         | `rfcs/0000-sdk-client-contributions.md` plus mandatory harness artifacts                                     |
 | Archetype      | `2 Integration`; `4 Public DSL / Builder`; `5 Plugin`; `6 CLI / Tooling` (described implementation surfaces) |
 | Scope overlays | `SCOPE-docs`                                                                                                 |

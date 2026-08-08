@@ -2,24 +2,24 @@
 
 Written at run start per `workflow/lane-policy.md` § Supervisor identity.
 
-| Field | Value |
-| --- | --- |
-| Model | Codex · OpenAI · GPT-5.6 Sol · xhigh |
-| Session | `019fe242-2bd9-7ff3-8044-bd9d09585397` |
-| Host | native WSL Linux · user `codex` · full-access / approval `never` |
-| Checkout | `/home/codex/repos/ns-rfc-sdk-client` |
-| Worktree | `/home/codex/repos/ns-rfc-sdk-client` |
-| Branch | `docs/rfc-sdk-client-contribution` (no upstream by design) |
+| Field    | Value                                                                            |
+| -------- | -------------------------------------------------------------------------------- |
+| Model    | Codex · OpenAI · GPT-5.6 Sol · xhigh                                             |
+| Session  | `019fe242-2bd9-7ff3-8044-bd9d09585397`                                           |
+| Host     | native WSL Linux · user `codex` · full-access / approval `never`                 |
+| Checkout | `/home/codex/repos/ns-rfc-sdk-client`                                            |
+| Worktree | `/home/codex/repos/ns-rfc-sdk-client`                                            |
+| Branch   | `docs/rfc-sdk-client-contribution` (no upstream by design)                       |
 | Baseline | `origin/main` @ `fac9e339042c5394bf882311657d8981d353a1c3` (verified 2026-08-08) |
-| Run ID | `docs-rfc-sdk-client-contribution--rfc` |
+| Run ID   | `docs-rfc-sdk-client-contribution--rfc`                                          |
 
 ## Routes in force
 
-| Task lane | Provider / model / effort | Role in this run |
-| --- | --- | --- |
-| Owner-directed RFC generator | OpenAI / GPT-5.6 Sol / xhigh | Sole researcher and RFC author; daemon-attached session above |
-| Owner-directed cross-RFC review | Existing Anthropic / Claude Fable 5 session; identity to be recorded by root orchestrator | Separate-session RFC/plan review after generator handoff; this session must not launch it |
-| Owner-directed final adversarial pass | Qwen route selected and launched by root orchestrator | Separate-session final review after Fable; this session must not launch it |
+| Task lane                             | Provider / model / effort                                                                 | Role in this run                                                                          |
+| ------------------------------------- | ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| Owner-directed RFC generator          | OpenAI / GPT-5.6 Sol / xhigh                                                              | Sole researcher and RFC author; daemon-attached session above                             |
+| Owner-directed cross-RFC review       | Existing Anthropic / Claude Fable 5 session; identity to be recorded by root orchestrator | Separate-session RFC/plan review after generator handoff; this session must not launch it |
+| Owner-directed final adversarial pass | Qwen route selected and launched by root orchestrator                                     | Separate-session final review after Fable; this session must not launch it                |
 
 ## Recorded lane/eval overrides
 
@@ -33,3 +33,9 @@ Written at run start per `workflow/lane-policy.md` § Supervisor identity.
   `codex-thread-ids.md` and rollout path provide the concrete daemon-attached identity; no daemon
   repair or rival launch is authorized.
 
+## Handoff State
+
+- Generator work is complete at draft PR #1390 and `status:plan-eval`.
+- Reviewable RFC/research commit: `89ae608ea935ba8b2776d55e7cb5a09cc29e2520`.
+- The exact Fable entry point and prohibited mutations are in `final-handoff.md`.
+- No evaluator was launched and no external verdict is claimed by this session.

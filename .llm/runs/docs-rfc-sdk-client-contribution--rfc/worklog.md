@@ -138,7 +138,9 @@ considered complete.
 | 2026-08-08 | 2     | JSR baseline       | Four package dry-runs OK; structured doc-lint/private-type baselines and existing plugin audit failure recorded.                                     |
 | 2026-08-08 | 3     | doctrine           | `deno task arch:check` exits 0; warning-only package debt is pre-existing and remains unwaived.                                                      |
 | 2026-08-08 | 3     | plan gate          | Self-audit covers current state/gap, alternatives, exact surface, laws, failures, migration, slices/issues, and gates; no evaluator verdict claimed. |
-| 2026-08-08 | 3     | final docs/type    | Re-ran exact-shape type proof, six-file format check, 102-document links, docs accuracy, focused RFC links, and diff hygiene; all pass.              |
+| 2026-08-08 | 3     | final docs/type    | Re-ran exact-shape type proof, eight-file format check, 102-document links, docs accuracy, focused RFC links, and diff hygiene; all pass.            |
+| 2026-08-08 | 3     | RFC commit         | Committed/pushed `89ae608ea935ba8b2776d55e7cb5a09cc29e2520`; posted structured research and plan summaries.                                          |
+| 2026-08-08 | 3     | PR reconciliation  | Draft PR has all required labels, sole `status:plan-eval`, no milestone/closing keyword; review-thread gate passes 0/0.                              |
 
 ## Decisions
 
@@ -166,20 +168,23 @@ considered complete.
 
 ## Gate Results
 
-| Gate                  | Command                                                                            | Result                                                                                                             |
-| --------------------- | ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| RFC format            | `deno fmt --check rfcs/0000-sdk-client-contributions.md`                           | PASS after format                                                                                                  |
-| Focused RFC links     | link checker with `--root rfcs/0000-sdk-client-contributions.md`                   | PASS, 0 broken links/anchors                                                                                       |
-| Repository docs links | `deno task docs:links`                                                             | PASS, 102 docs, 0 broken links/anchors                                                                             |
-| Docs accuracy         | `deno task docs:accuracy`                                                          | PASS                                                                                                               |
-| Type proof            | `deno check --config .llm/tmp/deno.json .llm/tmp/sdk-client-contribution-probe.ts` | PASS                                                                                                               |
-| Package audit         | four `audit-jsr-package.ts --text` runs                                            | contracts/sdk/auth-core exit 0; plugin exit 1 on pre-existing 4 module-tag + cardinality findings; all dry-runs OK |
-| Structured doc lint   | four `run-deno-doc-lint.ts` runs                                                   | baseline private refs: contracts 9, SDK 3, plugin 15, auth-core 4; report command exits 0                          |
-| Doctrine              | `deno task arch:check`                                                             | PASS, exit 0; existing warning-only package debt recorded and not waived                                           |
-| Plan Gate self-audit  | checklist against `plan-gate.md` and RFC required sections                         | PASS for evaluator entry; not a PLAN-EVAL verdict                                                                  |
-| Diff hygiene          | `git diff --check`                                                                 | PASS                                                                                                               |
+| Gate                  | Command                                                                             | Result                                                                                                             |
+| --------------------- | ----------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| RFC format            | `deno fmt --check rfcs/0000-sdk-client-contributions.md`                            | PASS after format                                                                                                  |
+| Focused RFC links     | link checker with `--root rfcs/0000-sdk-client-contributions.md`                    | PASS, 0 broken links/anchors                                                                                       |
+| Repository docs links | `deno task docs:links`                                                              | PASS, 102 docs, 0 broken links/anchors                                                                             |
+| Docs accuracy         | `deno task docs:accuracy`                                                           | PASS                                                                                                               |
+| Type proof            | `deno check --config .llm/tmp/deno.json .llm/tmp/sdk-client-contribution-probe.ts`  | PASS                                                                                                               |
+| Package audit         | four `audit-jsr-package.ts --text` runs                                             | contracts/sdk/auth-core exit 0; plugin exit 1 on pre-existing 4 module-tag + cardinality findings; all dry-runs OK |
+| Structured doc lint   | four `run-deno-doc-lint.ts` runs                                                    | baseline private refs: contracts 9, SDK 3, plugin 15, auth-core 4; report command exits 0                          |
+| Doctrine              | `deno task arch:check`                                                              | PASS, exit 0; existing warning-only package debt recorded and not waived                                           |
+| Plan Gate self-audit  | checklist against `plan-gate.md` and RFC required sections                          | PASS for evaluator entry; not a PLAN-EVAL verdict                                                                  |
+| Diff hygiene          | `git diff --check`                                                                  | PASS                                                                                                               |
+| PR metadata           | live `gh pr view`                                                                   | PASS: draft/main, required labels, exactly one `status:plan-eval`, milestone null, #1348 reference only            |
+| Review threads        | `deno task agentic:review-threads -- --repo rickylabs/netscript --pr 1390 --pretty` | PASS, 0 threads / 0 unanswered                                                                                     |
 
-Live PR reconciliation remains pending rather than implied complete.
+Generator gates and PR reconciliation are complete. External Fable/Qwen verdicts remain pending by
+owner instruction.
 
 ## Handoff Notes
 
