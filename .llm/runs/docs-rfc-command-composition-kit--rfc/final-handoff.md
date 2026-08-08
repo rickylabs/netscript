@@ -13,8 +13,8 @@
 
 The immutable final branch HEAD is the commit that contains this handoff. A Git commit cannot embed
 its own not-yet-computed object ID; the exact post-push HEAD is therefore recorded in the final
-`[PHASE: PLAN-EVAL]` PR comment and the root handoff response. `ad16c42f8...` is the reviewed RFC
-content commit; the containing final commit changes harness evidence only.
+non-verdict PLAN-EVAL handoff PR comment and the root handoff response. `ad16c42f8...` is the
+reviewed RFC content commit; the containing final commits change harness evidence only.
 
 ## Locked decisions
 
