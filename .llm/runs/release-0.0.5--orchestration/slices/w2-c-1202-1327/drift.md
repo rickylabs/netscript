@@ -102,3 +102,16 @@
   ignores check details fails the unit contract.
 - Evidence boundary: focused/static/framework gates pass. No runtime pass was attempted while W2-B
   holds the serialized token; a fifth-pass request is pending.
+
+## 2026-08-09 — Aspire telemetry dashboard unavailable (material)
+
+- Expected: after endpoint and health validation, query users structured logs and traces and write a
+  receipt containing their shared trace ID.
+- Observed: endpoint and health validation passed, then
+  `aspire otel logs users --apphost <generated-apphost> --format Json` exited 12 with “Could not
+  fetch telemetry data from the dashboard. The dashboard is not available.”
+- Verdict: fifth serialized run raw exit 1, `passed=61 failed=1`; `behavior.live-db-endpoint` failed
+  in 603 ms. Trace retrieval and correlation were not reached.
+- Boundary: this is a telemetry-stage result, not another payload-shape mismatch. No retry or repair
+  was attempted. #1202 row 4 remains unproven, and rows 1 and 3 remain unchecked pending the
+  required fully green live-endpoint receipt.

@@ -100,6 +100,37 @@ the supervisor must not launch its own evaluator session.
 
 EXPENSIVE-GATE-REQUEST
 
+## Fifth serialized runtime verdict — 2026-08-09
+
+The fifth grant was consumed by exactly one runtime invocation at head `842cd721a`. Endpoint
+authority and the fixture-derived health contract both passed, allowing the gate to reach Aspire
+telemetry retrieval for the first time. There was no retry or code repair after the telemetry
+command failed.
+
+| Step                  | Exact command / artifact                                                                                                                          | Raw exit | Full verdict                                                                                                                        |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | -------: | ----------------------------------------------------------------------------------------------------------------------------------- |
+| Preflight leak check  | `deno task agentic:leak-check -- --slice-dir .llm/runs/release-0.0.5--orchestration/slices/w2-c-1202-1327 --worktree /home/codex/repos/ns005-w2c` |        0 | No W2-C-owned or unknown survivor. Known foreign `redis-jfgcbtaf`, owned by `/home/codex/repos/w6-review-desk`, was left untouched. |
+| Serialized suite      | `deno task e2e:cli run scaffold.runtime --cleanup --format pretty`                                                                                |        1 | `Summary: passed=61 failed=1`; `cleanup.aspire-stop` passed.                                                                        |
+| Postflight leak check | same command as preflight                                                                                                                         |        0 | Artifact proves no W2-C-owned or unknown survivor; only the same untouched foreign container remains. No teardown needed.           |
+| Review threads        | `deno task agentic:review-threads -- --repo rickylabs/netscript --pr 1393 --pretty`                                                               |        0 | `review-threads PASS rickylabs/netscript#1393 threads=0 unanswered=0`                                                               |
+
+### Four decisive gates in the same run
+
+- `database.migration-artifacts` — **PASSED**, 44,554 ms.
+- `runtime.capture-db-allocation-first` — **PASSED**, 393 ms.
+- `runtime.capture-db-allocation-second` — **PASSED**, 512 ms.
+- `behavior.live-db-endpoint` — **FAILED**, 603 ms. Structural endpoint authority and documented
+  health-contract validation passed. The first telemetry command,
+  `aspire otel logs users --apphost <generated-apphost> --format Json`, exited 12 because the Aspire
+  CLI reported that telemetry could not be fetched and the dashboard was unavailable. Trace
+  retrieval and shared-trace-ID comparison were not reached.
+
+The fifth run therefore proves migration artifacts, distinct consecutive allocations, matching live
+endpoint authority, and healthy database JSON. It does not produce the structured-log/OTEL receipt
+required by #1202 row 4. Rows 1 and 3 remain unchecked with row 4 because the orchestrator required
+one fully green `behavior.live-db-endpoint` receipt for those rows. Row 2 remains checked from its
+RED-first mechanism guard. The token is released failing.
+
 ## Fourth serialized runtime verdict — 2026-08-09
 
 The fourth grant was consumed by exactly one runtime invocation at head `720299cb3`. The endpoint

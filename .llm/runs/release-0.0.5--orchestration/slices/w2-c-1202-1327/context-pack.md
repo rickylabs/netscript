@@ -2,13 +2,13 @@
 
 ## Current phase
 
-The live health matcher is now derived from `@netscript/service`'s documented `HealthResponse`
-producer contract and covered by the verbatim fourth-pass response plus an adversarial unhealthy
-database fixture. Focused RED/green, scoped wrappers, `quality:gate`, and `arch:check` pass. Row 2's
-persisting mechanism is explicitly recorded as eager `getEndpoint("tcp")` materialization versus
-lazy `infrastructure.primaryDatabase` resource binding. W2-B holds the serialized token, so no fifth
-runtime pass was attempted. `EXPENSIVE-GATE-REQUEST` is recorded; rows 1, 3, and 4 await the
-complete endpoint/health/log/OTEL receipt.
+Fifth serialized pass completed with raw exit 1 and `passed=61 failed=1`. Migration artifacts, both
+allocation captures, structural endpoint comparison, and documented health-contract validation all
+passed in the same run. `behavior.live-db-endpoint` then reached telemetry retrieval for the first
+time, but `aspire otel logs users` exited 12 because the Aspire CLI reported the dashboard was
+unavailable. No trace retrieval or shared trace receipt followed. Pre/post leak artifacts are clean
+for W2-C and review threads pass 0/0. There was no retry or repair; the token is released failing.
+Only #1202 row 2 remains checked.
 
 ## Identity
 

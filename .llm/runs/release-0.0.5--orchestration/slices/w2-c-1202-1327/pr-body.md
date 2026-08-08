@@ -58,8 +58,12 @@ bind the live Postgres allocation across consecutive AppHost starts.
 - #1202 row 2 mechanism: eager `getEndpoint("tcp")` materialization serializes one AppHost
   allocation into generated `DATABASE_URL`. The RED-first guard forbids it and requires lazy
   `infrastructure.primaryDatabase` resource binding so the endpoint resolves afresh on every start.
-- Fifth serialized pass requested but not run while W2-B holds the token. Rows 1, 3, and 4 remain
-  unchecked until the endpoint/health/structured-log/OTEL receipt completes in one granted pass.
+- Fifth `scaffold.runtime`: raw exit 1, `passed=61 failed=1`. Migration artifacts, both allocation
+  captures, structural endpoint comparison, and documented health validation passed in the same run.
+  `behavior.live-db-endpoint` reached telemetry retrieval, then `aspire otel logs users` exited 12
+  because the Aspire CLI reported the dashboard was unavailable. Trace retrieval and shared-ID
+  correlation were not reached. Cleanup, leak artifacts, and review threads passed; no retry or
+  repair was attempted. Rows 1, 3, and 4 remain unchecked; row 2 remains checked.
 
 ## Harness
 
