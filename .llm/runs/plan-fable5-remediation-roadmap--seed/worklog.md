@@ -42,6 +42,19 @@ sufficient with named amendments; v2-migration RFC epic recommended with exact s
 filed). Evaluator wrote only eval artifacts/comments/labels; no RFC text, product code, or board
 objects touched. Handed back to the root orchestrator; Qwen pass deferred until both APPROVED.
 
+## S7 — PLAN-EVAL cycle 2 (2026-08-08): both RFCs APPROVED / PASS
+
+Same evaluator session. Mechanical re-evaluation of all 17 cycle-1 findings against remediation
+commits `78a7cecd1` (RFC-A, +fixture) and `c98c08ada` (RFC-B); independent fixture `deno check`
+executed (exit 0); every anchor verified at section level. Verdicts appended to each
+`plan-eval.md` and pushed (`14b5c858c`, `57b51128f`); APPROVED comments posted; labels moved to
+`status:augment-review`; `type:test` added to #1390 per the lane-honesty audit (skip labels ruled
+still valid). Accepted SHAs handed to root for the Qwen 3.8 Max pass:
+RFC-A `78a7cecd1d5eaafa7a65bc25a21af497567128dc`, RFC-B
+`c98c08adabbd992a557ff7c596deae68b9c9cd62`. No board objects touched; no RFC/author artifacts
+edited. Note: RFC-A branch carried an author hygiene commit (`9f45404ac`, run artifacts only,
+stat-verified) between handoff and verdict — content SHA unaffected.
+
 ## Slice log
 
 ### S2 — Discovery corpus (Stage B) — in progress

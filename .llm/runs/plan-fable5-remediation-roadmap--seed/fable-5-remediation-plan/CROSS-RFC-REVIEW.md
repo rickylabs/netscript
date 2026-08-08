@@ -1,5 +1,32 @@
 # Cross-RFC PLAN-EVAL review — RFC-A (#1390) × RFC-B (#1389)
 
+## CYCLE 2 OUTCOME (2026-08-08): **BOTH APPROVED / PASS** — handoff to root for the Qwen pass
+
+Same evaluator session re-evaluated every cycle-1 finding mechanically against the remediated
+texts and worktree source; independent evidence executed (RFC-A fixture `deno check` exit 0;
+section-level anchor verification for all 17 findings).
+
+| RFC | Accepted content SHA | Branch HEAD at verdict | Verdict artifact |
+| --- | --- | --- | --- |
+| RFC-A (#1390) | **`78a7cecd1d5eaafa7a65bc25a21af497567128dc`** | `14b5c858c` (atop author hygiene `9f45404ac` — run artifacts only, verified) | `plan-eval.md` @ `14b5c858c` |
+| RFC-B (#1389) | **`c98c08adabbd992a557ff7c596deae68b9c9cd62`** | `57b51128f` (atop author handoff `6c2043d91`) | `plan-eval.md` @ `57b51128f` |
+
+All F-A1–F-A10 and F-B1–F-B7 resolved (several beyond the asked bar: RFC-A's epoch/reconnect law
+with a preparation-count-2 fixture; RFC-B's per-provider claim-algorithm table). Lane audit:
+`type:test` added to #1390 (compile-only fixture in `packages/sdk/tests/`); `ci:skip-*` ruled
+still valid on both. Both PRs moved `status:plan-eval` → `status:augment-review`.
+
+**Qwen 3.8 Max adversarial acceptance brief (root-owned, separately authorized):** evaluate both
+RFCs at the accepted content SHAs above, unoriented; the two `plan-eval.md` files carry the full
+cycle-1 findings + cycle-2 resolution evidence; the remaining decision surface is the FCP
+question sets (8 in RFC-A, 4 in RFC-B — all adjudicated policy-safe) plus the cross-RFC
+obligations below (§2 amendments, §3 v2-migration epic). Unresolved-by-design: RFC-A FCP Q5
+wrapper-vs-memo, Q6 GET preserve-vs-retire (v2 RFC), metadata Stage 1b ownership; RFC-B FCP
+Q1–Q4. One cosmetic cross-RFC inconsistency remains (frontmatter `target-milestone` convention —
+harmonize at numbering). No board object was created/mutated by this evaluator in either cycle.
+
+The cycle-1 record below is retained for provenance; its "stop" handoff is superseded.
+
 Evaluator: Claude Fable 5 · high, owner-designated cross-family PLAN-EVAL authority
 (2026-08-08). Verdicts of record: `plan-eval.md` in each RFC run dir — **both
 CHANGES_REQUESTED (FAIL_PLAN cycle 1)**: RFC-A @ `f1a29fe1a` (F-A1–F-A10), RFC-B @ `122301d25`
