@@ -99,6 +99,10 @@ service, generator, or docs file owns a second event-name/payload table.
 | 2026-08-09 | S2    | service conformance  | Real DurableStreamTestServer output through the NetScript proxy validates only through the exported authority: named arrays, ordered upsert/delete, control commit. |
 | 2026-08-09 | S3    | Fresh/generated      | Fresh helper builds the native `offset` + `live=sse` URL and binds v1 outcomes; generated Fresh 2.x island consumes it inside one effect and seed route retains `createDefine`. |
 | 2026-08-09 | S3    | official example     | Native EventSource docs example uses the exported named-event binding, no `onmessage`/cast, handles ordered batches/deletion/errors, and is extracted/type-checked unchanged. |
+| 2026-08-09 | S4    | named runtime consumer | Flow-B's Deno-side consumer now reads named SSE through the exported parser/binding, commits the opaque control offset, reconnects from it, observes the derived heartbeat, and rejects malformed control without advancing replay. |
+| 2026-08-09 | S4    | unchanged docs proof | The gate extracts the official native example verbatim and executes it against both a focused SSE server and, during `scaffold.runtime`, the real generated streams service; the focused proof covers ordered batching and deletion. |
+| 2026-08-09 | S4    | trace verdict strengthened | `stream.subscribe` must be exported by service `flow-b-stream-consumer` in the Deno gate and carry a W3C link whose trace id is the actual producer Flow-B trace id. |
+| 2026-08-09 | S4    | pre-runtime leak check | Exit 0. Only `redis-jfgcbtaf`, proven foreign to `/home/codex/repos/w6-review-desk`, was reported and left untouched. No W2-B AppHost/container was started. |
 
 ## Decisions
 
@@ -148,6 +152,9 @@ service, generator, or docs file owns a second event-name/payload table.
 | Docs accuracy            | `deno task docs:accuracy`                                                                        | PASS (exit 0)                  | Repository accuracy/discoverability checks pass. |
 | Fresh publish dry-run    | `deno publish --dry-run --allow-dirty` from `packages/fresh`                                   | PASS (exit 0)                  | Published helper surface checks and packages successfully. |
 | Fresh streams doc baseline | `deno doc --lint packages/fresh/src/runtime/streams/mod.ts` in branch and untouched eval tree | BASELINE FAIL (exit 1)         | Exactly 11 both before/after; new SSE helper/core files add zero diagnostics. |
+| S4 unchanged-example test | `deno test --no-lock --unstable-kv --allow-all packages/cli/e2e/src/application/gates/scaffold/run-documented-stream-example_test.ts` | PASS (exit 0) | 1 passed; verbatim docs source consumes a named batch and materializes deletion. |
+| S4 scoped check | `run-deno-check.ts --root packages/cli/e2e/src/application/gates/scaffold --ext ts,tsx --deno-arg --no-lock` | PASS (exit 0) | 32 files selected; zero diagnostics. |
+| S4 scoped lint/format | corresponding repo wrappers over the scaffold gate root | PASS (exit 0) | 32 files; zero lint/format findings. |
 
 ### Fitness Gates
 
@@ -161,8 +168,9 @@ service, generator, or docs file owns a second event-name/payload table.
 
 | Gate                           | Result  | Evidence                        | Notes                                       |
 | ------------------------------ | ------- | ------------------------------- | ------------------------------------------- |
-| Real generated service/browser | NOT_RUN | waiting for implementation      | Isolated Aspire and owned cleanup required. |
-| Correlated OTEL trace          | NOT_RUN | waiting for implementation      | Producer → durable stream → SSE consumer.   |
+| Focused unchanged docs example | PASS | focused Deno native EventSource test | Exact extracted source; named batch and deletion materialization. |
+| Real generated service/browser | NOT_RUN | implemented; serialized runtime token pending | Full gate executes the same extracted source against the isolated generated streams service. |
+| Correlated OTEL trace          | NOT_RUN | implemented; serialized runtime token pending | Deno consumer service must W3C-link to the actual producer Flow-B trace. |
 | `scaffold.runtime`             | NOT_RUN | serialized; token not requested | Request only after all cheaper gates pass.  |
 
 ### Consumer Gates
@@ -170,7 +178,7 @@ service, generator, or docs file owns a second event-name/payload table.
 | Consumer                                  | Result        | Evidence                | Notes                                                       |
 | ----------------------------------------- | ------------- | ----------------------- | ----------------------------------------------------------- |
 | Current generated StreamDB/Fresh consumer | PASS baseline | generator + Fresh tests | Does not yet prove named/schema-validated SSE contract.     |
-| Official native EventSource example       | FAIL baseline | source inspection       | Uses `onmessage`, wrong URL mode/cardinality, untyped cast. |
+| Official native EventSource example       | PASS | copy-exact type check + runtime test | Named schema-validated arrays, deletion, correct URL mode; no `onmessage` or untyped cast. |
 
 ## Handoff Notes
 

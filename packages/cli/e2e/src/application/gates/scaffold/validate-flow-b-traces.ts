@@ -91,6 +91,16 @@ function validateFlowB(traces: readonly TelemetryTrace[]): void {
   tcAssert('TC-14', fanIn !== undefined, 'real streams consumer links to a Flow-B producer');
   tcAssert(
     'TC-14',
+    fanIn.attributes['service.name'] === 'flow-b-stream-consumer',
+    'stream.subscribe is emitted by the Deno-side consumer hosted in the isolated AppHost gate',
+  );
+  tcAssert(
+    'TC-14',
+    fanIn.links.some((link) => link.traceId === main.traceId),
+    'SSE consumer W3C link points into the producer Flow-B trace',
+  );
+  tcAssert(
+    'TC-14',
     fanIn.links.some((link) => Object.keys(link.attributes).length > 0),
     'fan-in link preserves per-message attributes through the SDK provider',
   );
