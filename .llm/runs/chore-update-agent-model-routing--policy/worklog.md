@@ -21,3 +21,10 @@ machine-readable tests.
 - Scoped Deno lint: passed.
 - Claude skill mirror/surface validation: passed.
 - `git diff --check`: passed after EOF cleanup.
+
+## IMPL-EVAL cycle 1
+
+Native Fable 5 medium returned `FAIL_FIX`: two wrapped active startup paragraphs still described
+OpenRouter-first evaluation, and the PR lacked its per-slice evidence comment. Both paragraphs were
+aligned to native-first policy; the historical benchmark description was clarified without changing
+its pinned model or unverified pricing. Claude mirrors were regenerated and gates rerun.

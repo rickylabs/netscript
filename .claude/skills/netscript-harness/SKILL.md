@@ -135,23 +135,13 @@ routing here — defer to that file. The items below are the parts of the contra
 - **Self-evaluation** — The evaluator must be a separate session. The generator does not
   self-certify.
 - **Wrong evaluator surface** — the generator session may never evaluate its own output. For a
-  **local-machine run**, PLAN-EVAL and IMPL-EVAL are **separate local sessions on Claude Code +
-  OpenRouter** (`claude-openrouter` profile → `claude-print`). PLAN-EVAL uses the bound
-  `claude-evaluator-minimax-m3` preset (`minimax/minimax-m3`) at high effort; IMPL-EVAL uses the
-  bound `claude-evaluator-deepseek-v4-flash-0731` preset
-  (`deepseek/deepseek-v4-flash-0731`) at max effort. Both are open models adversarial to
-  the Claude and Codex families. **Ordinary (non-formal) review** — the slice review gate, code/PR review — uses a
-  local **opposite-family** session instead (a Codex GPT-5.6 session reviews Claude-authored work; a
-  Claude session reviews Codex-authored work). The **supervisor chooses when to trigger** — never
-  auto-dispatch a cloud evaluator from a sub-agent. **Both evaluator transports are open-models-only;
-  dispatching either with a closed model (Claude/GPT/Gemini) is prohibited
-  (it burns paid OpenRouter credit).** OpenHands is temporarily paused until its trigger path is fixed. See
-  `.agents/skills/openhands-handoff/SKILL.md` "Routing policy". If no evaluator surface is available,
-  record a blocked launch in `drift.md`.
-  When OpenRouter is blocked by a provider limit, the owner-authorized formal fallback is a fresh
-  separate Antigravity (`agy`) session through the Google subscription using
-  `gemini-3.6-flash-high` at high effort. Record requested/observed identity and never route that
-  fallback through OpenRouter. OpenHands is temporarily paused until its trigger path is fixed.
+  **local-machine run**, PLAN-EVAL and IMPL-EVAL normally use a fresh native opposite-family
+  session: Claude/Fable evaluates Codex-authored work and Codex/Sol evaluates Claude-authored work.
+  Use the phase-bound Minimax/DeepSeek OpenRouter preset only for a genuine third opinion or when
+  the native opposite-family route is quota-blocked. If OpenRouter is then limited, use a fresh AGY
+  Gemini 3.6 Flash high session on the Google subscription. OpenHands is reserved for explicitly
+  cloud-driven work. The **supervisor chooses when to trigger**; never auto-dispatch an evaluator
+  from a sub-agent. Record every blocked route, escalation, and requested/observed identity.
 - **Self-certifying a slice** — a green automated gate is not a sign-off. The Tier-A supervisor must
   substantively review the slice before the sign-off commit, for every implementation lane
   (`workflow/lane-policy.md` invariant 2). No lane self-certifies.
