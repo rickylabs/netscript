@@ -28,6 +28,10 @@ Written at run start per `workflow/lane-policy.md` § Supervisor identity.
 - The owner explicitly reserved cross-RFC review for an existing Claude Fable 5 session and a later
   Qwen adversarial pass. This generator will prepare the artifacts and stop at `status:plan-eval`;
   it will not trigger PLAN-EVAL or IMPL-EVAL.
+- Claude Fable 5 completed formal PLAN-EVAL cycle 1 externally and recorded
+  `FAIL_PLAN / CHANGES_REQUESTED` in `plan-eval.md`. The owner returned this exact generator thread
+  for author remediation. This session accepts F-A1–F-A10 as authoritative but does not evaluate its
+  own corrections; cycle 2 remains on the existing Fable route.
 - `.llm/tools/agentic/runtime status` reported `MISSING_IDENTITY` because the already-active desktop
   thread is not registered as a runtime-controller session. The launch-generated
   `codex-thread-ids.md` and rollout path provide the concrete daemon-attached identity; no daemon
@@ -35,13 +39,15 @@ Written at run start per `workflow/lane-policy.md` § Supervisor identity.
 
 ## Handoff State
 
-- Generator RFC authorship completed at draft PR #1390; this exact thread then resumed for the
-  root-requested post-generator oRPC v2 research amendment.
+- Generator RFC authorship completed at draft PR #1390; this exact thread resumed first for the
+  root-requested post-generator oRPC v2 research amendment and now for formal PLAN-EVAL cycle-1
+  remediation.
 - Pre-amendment RFC/research commit: `89ae608ea935ba8b2776d55e7cb5a09cc29e2520`; pre-amendment
   handoff HEAD: `e78ac0a65f5475ed37152272b16ba7d89deca8c3`.
 - Reviewable amended RFC/research commit: `7a0d398087a6608ff1a55bb9fe4c47158edb72a7`.
-- The amended RFC is returned to `status:plan-eval` only after focused gates, an explicit-refspec
-  push, and a structured PR phase comment.
-- The exact Fable entry point and prohibited mutations are in `final-handoff.md`.
-- The amendment is root-requested research, not a formal evaluator verdict. No evaluator was
-  launched and no external verdict is claimed by this session.
+- Formal evaluator artifact: `f1a29fe1a65d59f71a59bf4b6b2a48fc49e1e86f`; verdict SHA-256
+  `0690af2a2914ad0a9118be04ccebb933af33b2bac8f3f743bc7990f8f5f38cdd`.
+- The remediated RFC returns to `status:plan-eval` only after focused gates, meaningful commits, an
+  explicit-refspec push, and a structured cycle-2 handoff comment.
+- The exact Fable cycle-2 entry point and prohibited mutations are in `final-handoff.md`. No
+  evaluator was launched and no PASS verdict is claimed by this session.

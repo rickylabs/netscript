@@ -20,9 +20,9 @@ serialization, retry, deduplication, tracing, fetch, and transport. Query helper
 context only when each contribution proves that its response cache is invariant or supplies a
 synchronous, non-secret partition; otherwise the contributed client is direct-call-only.
 
-The public protocol and generated declarations are upstream-major-neutral: they contain no oRPC
-types, links, plugins, contexts, interceptors, or metadata accessors. NetScript-owned internal ports
-translate procedure metadata, prepared outbound headers, and transport policy to the supported
+The public protocol and generated client declarations are upstream-major-neutral: they contain no
+oRPC types, links, plugins, contexts, interceptors, or metadata accessors. NetScript-owned internal
+ports translate procedure metadata, prepared outbound headers, and transport policy to the supported
 adapter. The first implementation targets stable oRPC v1; an oRPC v2 migration is a separate,
 coordinated RFC/spike. Bearer credentials in `@netscript/plugin-auth-core` are the first dogfood
 consumer. A locale contribution, which owns `accept-language`, is the required non-auth proof. Trace
@@ -97,8 +97,9 @@ This RFC MUST:
 7. make contributions statically discoverable but explicitly selected; and
 8. retain SDK ownership of the HTTP transport and its observability invariants;
 9. keep every public and generated declaration independent of the selected upstream major; and
-10. prepare contribution output exactly once per logical call and replay one immutable result across
-    transport retries.
+10. prepare contribution output exactly once per logical call epoch, replay one immutable result
+    across that epoch's transport retries, and begin a fresh preparation epoch for every
+    iterator-phase stream reconnect.
 
 ### Non-goals
 
@@ -123,8 +124,10 @@ This RFC does not:
 - **Contribution**: a named, versioned descriptor that owns context keys and possible request header
   names and prepares a header patch for one call.
 - **Contribution tuple**: the literal `readonly` tuple explicitly attached to a service client.
-- **Preparation snapshot**: the immutable context, procedure descriptor, input, and transport
-  descriptor passed independently to every contribution.
+- **Contribution context projection**: only the keys declared by contributions. SDK transport keys
+  such as retry, cache, trace, and signal are not part of it; cancellation is exposed separately.
+- **Preparation snapshot**: the immutable contribution context projection, signal, procedure
+  descriptor, input, and transport descriptor passed independently to every contribution.
 - **Header ownership**: the exclusive right to emit one lower-case request header name.
 - **Response-cache effect**: the contributor's declaration that its header is response-invariant,
   partitionable, or unsafe for generated query helpers.
@@ -132,10 +135,13 @@ This RFC does not:
   credential and is intentionally visible in cache tools.
 - **Transport policy**: discovery, URL/method selection, codec, retry, dedupe, tracing, `fetch`,
   streaming, and dispatch. The SDK owns it for `createServiceClient()`.
-- **Logical call**: one user-visible procedure invocation, including every transport retry required
-  to produce its final result.
-- **Prepared call**: the logical call plus one immutable, validated contributor-header record. Every
-  retry receives the same prepared contributor output and context snapshot.
+- **Logical call epoch**: for a unary call, one user-visible invocation including its transport
+  retries; for a stream, one connection attempt sequence ending when an iterator is returned or a
+  reconnect is exhausted. An iterator-phase reconnect starts a new epoch.
+- **Stream session**: the user-visible async iterator, which may span multiple logical call epochs.
+- **Prepared call**: one logical call epoch plus one immutable, validated contributor-header record.
+  Every transport attempt in that epoch receives the same prepared contributor output and
+  contribution context projection.
 - **Adapter port**: a NetScript-owned, non-exported structural boundary between RFC-A semantics and
   the selected transport/contract implementation. Upstream-specific adapters implement these ports.
 
@@ -298,9 +304,11 @@ runtime; it is not a property containing `undefined`.
 
 ### Async and server-side sources
 
-`prepare` and `resolveCredential` may be async and are invoked exactly once per logical call, before
-any transport retry loop. They are never invoked at module import, client construction, or again for
-a retry attempt. An application may close over a concurrency-safe rotating credential source:
+`prepare` and `resolveCredential` may be async and are invoked exactly once per logical call epoch,
+before that epoch's transport retry loop. They are never invoked at module import, client
+construction, or again for an ordinary retry attempt. Iterator-phase stream reconnects begin a new
+epoch so a rotating credential source is consulted again. An application may close over a
+concurrency-safe rotating credential source:
 
 ```ts
 const bearer = createBearerSdkClientContribution({
@@ -386,7 +394,7 @@ const descriptor: SdkClientProcedureDescriptor = {
 
 This follows the official
 [v2 migration from `.$meta` to `defineMeta`](https://v2.orpc.dev/docs/migrations/from-v1#meta-replaced-by-meta-plugins).
-Neither adapter form appears in the contribution protocol or generated public source.
+Neither adapter form appears in the contribution protocol or generated client public source.
 
 ### Public contribution contract
 
@@ -412,8 +420,11 @@ export interface SdkClientTransportDescriptor {
   readonly secure: boolean;
 }
 
-export interface SdkClientPrepareOptions<TContext extends object> {
-  readonly context: Readonly<ServiceClientContext & TContext>;
+export interface SdkClientPrepareOptions<
+  TContext extends object = Record<never, never>,
+> {
+  readonly context: Readonly<TContext>;
+  readonly signal?: AbortSignal;
   readonly procedure: SdkClientProcedureDescriptor;
   readonly transport: SdkClientTransportDescriptor;
   readonly input: unknown;
@@ -429,8 +440,10 @@ export type SdkClientContextDeclaration<TContext extends object> = {
     : 'required';
 };
 
-export interface SdkClientCachePartitionOptions<TContext extends object> {
-  readonly context: Readonly<ServiceClientContext & TContext>;
+export interface SdkClientCachePartitionOptions<
+  TContext extends object = Record<never, never>,
+> {
+  readonly context: Readonly<TContext>;
   readonly procedure: SdkClientProcedureDescriptor;
 }
 
@@ -463,11 +476,24 @@ export interface SdkClientContribution<
 }
 ```
 
+`context` in `SdkClientPrepareOptions` and `SdkClientCachePartitionOptions` is deliberately the
+contribution-owned projection, not `ServiceClientContext & TContext`. The SDK reserves `signal`,
+`cache`, `retry`, `retryDelay`, `shouldRetry`, `onRetry`, and `traceHeaders` as framework context
+keys, rejects a contribution that declares any of them, and exposes cancellation only through the
+separate `signal` property. A contributor therefore cannot observe or depend on the selected
+upstream retry plugin, cache mode, dedupe context replacement, or trace compatibility bridge.
+`ServiceClientContext` keeps those fields for existing callers, but transport policy alone
+interprets them.
+
 ### Internal adapter ports
 
 The implementation MUST introduce exactly three NetScript-owned internal adapter responsibilities.
-The following structural contract is normative inside `@netscript/sdk`, but the names are not public
-exports and MUST NOT appear in `deno doc` or generated JSR declarations:
+They live under `packages/sdk/src/internal/client-contributions/`; the initial files are
+`adapter-ports.ts`, `prepared-call.ts`, and `stable-v1-adapter.ts`. That directory has no `mod.ts`,
+is absent from `packages/sdk/deno.json` exports, and is imported only by relative package-internal
+paths. The following structural contract is normative inside `@netscript/sdk`, but the names are not
+public exports and MUST NOT appear in any root/client/ports/desktop `deno doc` graph, generated
+declaration, or packed-consumer import:
 
 ```ts
 interface SdkClientLogicalCall<TContext extends object = object> {
@@ -511,15 +537,26 @@ interface ClientTransportPolicyPort {
 
 `ProcedureMetadataPort` is the only component allowed to interpret an upstream procedure node.
 `PreparedOutboundHeadersPort` performs tuple composition and validation exactly once per logical
-call. `ClientTransportPolicyPort` owns every attempt, retry, encoding, trace, and dispatch action
-and MUST accept already prepared output; it MUST NOT invoke contributors. The supported v1 adapter
-and a future v2 adapter may have different private wiring, but both must satisfy these same port
-semantics.
+call epoch. `ClientTransportPolicyPort` owns every attempt, retry, encoding, trace, and dispatch
+action and MUST accept already prepared output; it MUST NOT invoke contributors. The supported v1
+adapter and a future v2 adapter may have different private wiring, but both must satisfy these same
+port semantics.
 
-The prepared call retains one context/snapshot identity and one canonical lower-case header record.
-An adapter creates a fresh transport header container for each attempt, but the contributor-owned
-entries and the preparation-context projection are byte-equivalent across attempts. Trace fields or
-other transport-owned fields are added only after this invariant is established.
+The normative channel is the direct `PreparedSdkClientCall` argument passed from the preparation
+port to the transport port. A stable-v1 realization that must cross an upstream callback MAY also
+store that same object under a package-private `unique symbol` declared in `stable-v1-adapter.ts`.
+The symbol and value are transport context, never contribution-visible context. An upstream callback
+may read only that prepared value; it cannot invoke contributors. If an upstream plugin replaces its
+downstream context, the adapter must explicitly preserve or reattach the private value, or use a
+per-call closure instead. This is why outer wrapper versus memoized realization remains an
+implementation choice but the channel and observable semantics do not.
+
+The prepared call retains one contribution-context projection identity and one canonical lower-case
+header record. An adapter creates a fresh transport header container for each attempt, but the
+contributor-owned entries and projection are byte-equivalent across attempts in one logical call
+epoch. Transport-only signal, cache, retry, and trace context may be replaced or advanced by the
+adapter and are outside this equality assertion. Trace fields or other transport-owned fields are
+added only after the contributor-header invariant is established.
 
 `defineSdkClientContribution<TContext>()(descriptor)` preserves `id`, the context declaration,
 header keys, and cache mode as literals. Its parameter applies these static checks:
@@ -587,14 +624,38 @@ conflict validation only at runtime.
 The client surface becomes context-generic with compatibility defaults:
 
 ```ts
-export type ServiceRequestRest<TContext extends object> = RequiredKeys<TContext> extends never
-  ? [options?: { readonly context?: TContext }]
-  : [options: { readonly context: TContext }];
+export interface ServiceRequestOptions<
+  TContext extends object = ServiceClientContext,
+> {
+  readonly context?: TContext;
+}
 
-export type ServiceClientMethod<TInput, TOutput, TContext extends object> = (
+export type ServiceRequestRest<TContext extends object = ServiceClientContext> =
+  RequiredKeys<TContext> extends never ? [options?: ServiceRequestOptions<TContext>]
+    : [options: { readonly context: TContext }];
+
+export type ServiceClientMethod<
+  TInput,
+  TOutput,
+  TContext extends object = ServiceClientContext,
+> = (
   input: TInput,
   ...request: ServiceRequestRest<TContext>
 ) => Promise<TOutput>;
+
+export type ServiceClientShape<
+  TContract extends ContractLike,
+  TContext extends object = ServiceClientContext,
+> = TContract extends ContractProcedureLike ? ServiceClientMethod<
+    ProcedureInputFromNode<TContract>,
+    ProcedureOutputFromNode<TContract>,
+    TContext
+  >
+  : {
+    [K in keyof TContract]: TContract[K] extends ContractLike
+      ? ServiceClient<TContract[K], TContext>
+      : never;
+  };
 
 export type ServiceClient<
   TContract extends ContractLike,
@@ -617,6 +678,30 @@ export interface CreateServiceClientOptions<
 `createServiceClient()` returns
 `ServiceClient<TContract, ServiceClientContext & SdkClientContributionContext<TContributions>>`. All
 existing single-generic references continue to mean the current `ServiceClientContext`.
+
+Compatibility defaults are normative on every widened public generic. New parameters are appended
+after existing parameters so positional type arguments keep their meaning:
+
+| Surface                                                                                                       | Required default                                                       |
+| ------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| `ServiceRequestOptions<TContext>` / `ServiceRequestRest<TContext>`                                            | `ServiceClientContext`                                                 |
+| `ServiceClientMethod<TInput, TOutput, TContext>`                                                              | `ServiceClientContext`                                                 |
+| `ServiceClientShape<TContract, TContext>` / `ServiceClient<TContract, TContext>`                              | `ServiceClientContext`                                                 |
+| `CreateServiceClientOptions<TContract, TContributions>`                                                       | `readonly []` for `TContributions`                                     |
+| `ActionQueryKey<TAction, TKeySuffix>` / `createActionQueryKey<..., TKeySuffix>()`                             | `readonly []` for `TKeySuffix`                                         |
+| `ActionMethod<TContract, TAction, TContext, TKeySuffix>`                                                      | `ServiceClientContext`, then `readonly []`                             |
+| `QueryFactory<TContract, TContext, TKeySuffix>` / `FactoryConfig<...>`                                        | `ServiceClientContext`, then `readonly []`                             |
+| `ServiceQueryClientContext<TContext>`                                                                         | `Record<never, never>`                                                 |
+| `ServiceQueryKeyOptions<TInput, TContext>`                                                                    | `Record<never, never>`                                                 |
+| `ServiceProcedureQueryOptions<TInput, TContext>`                                                              | `Record<never, never>`                                                 |
+| `ServiceProcedureInfiniteOptions<TInput, TPageParam, TContext>`                                               | existing `unknown` for `TPageParam`, then `Record<never, never>`       |
+| `ServiceProcedureMutationOptions<TInput, TOutput, TMutationContext, TContext>`                                | existing `unknown` for `TMutationContext`, then `Record<never, never>` |
+| `ServiceProcedureStreamedOptions<TInput, TContext>` / `ServiceProcedureQueryUtils<TInput, TOutput, TContext>` | `Record<never, never>`                                                 |
+| `ServiceQueryUtils<TContract, TContext>` / `createServiceQueryUtils<TContract, TContext>()`                   | `Record<never, never>`                                                 |
+| `DefineServiceConfig<TContract, TContributions>`                                                              | `readonly []` for `TContributions`                                     |
+
+The implementation type fixture MUST compile all pre-RFC single-generic/two-generic uses unchanged;
+an omitted tuple cannot require a newly written type argument.
 
 ### Query and generated type propagation
 
@@ -663,15 +748,96 @@ client context itself a safe cache partition.
 This narrow cache-effect declaration is not a query contribution. It cannot set stale times, retry,
 invalidation callbacks, query functions, or arbitrary key fragments.
 
+#### Server key algebra and compatibility
+
+The server cache cannot append the nested TanStack suffix directly: `QueryKeyPart` is primitive and
+`CacheKey` is `Deno.KvKey`. RFC-A therefore uses a two-string server suffix. The first string is a
+stable tag; the second is `JSON.stringify` over the contribution-id-sorted array of validated
+`[id, partition]` pairs. The values are visible, length-bounded, and non-secret by the partition
+law. No partitioned contribution means no suffix at all.
+
+```ts
+export type SdkClientServerKeySuffix =
+  | readonly []
+  | readonly ['$netscript.sdk-context', string];
+
+export type ActionQueryKey<
+  TAction extends string = string,
+  TSuffix extends SdkClientServerKeySuffix = readonly [],
+> = readonly [
+  resource: string,
+  action: TAction,
+  serializedInput: string,
+  ...suffix: TSuffix,
+];
+
+export function createActionQueryKey<
+  const TAction extends string,
+  const TSuffix extends SdkClientServerKeySuffix = readonly [],
+>(
+  resource: string,
+  action: TAction,
+  input: unknown,
+  suffix?: TSuffix,
+): ActionQueryKey<TAction, TSuffix>;
+```
+
+Thus a contribution-free or invariant-only service retains the exact public three-tuple. A
+partitioned `orders.list` call has the full server key:
+
+```ts
+[
+  'orders',
+  'list',
+  '{"page":1}',
+  '$netscript.sdk-context',
+  '[["@netscript/plugin-auth:bearer","principal-7"],["app:locale","de-CH"]]',
+];
+```
+
+`ActionMethod` and `QueryFactory` append `TContext = ServiceClientContext` and
+`TKeySuffix = readonly []` generics. `ActionMethod.key`, its callable operation, `prefetch`,
+`getCachedData`, and `getCachedEntry` accept the same conditional context rest used to compute the
+partition. Resource/action invalidation methods remain prefix-only and accept no partition. The six
+existing server/client bridge surfaces have these normative dispositions:
+
+| Current surface                                             | RFC-A disposition                                                                                                                                                                                                                                                                             |
+| ----------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `createActionQueryKey(): readonly [string, string, string]` | Return `ActionQueryKey<TAction, TSuffix>`; the default stays the exact current three-tuple.                                                                                                                                                                                                   |
+| `ActionMethod.key` and `QueryFactory`                       | Append defaulted context/suffix generics; full-key and cache-access calls compute one suffix from their request context.                                                                                                                                                                      |
+| `CacheKey = Deno.KvKey` and `CacheQuery`                    | No public widening. Both suffix elements are strings; storage remains `['cache_query', ...ActionQueryKey]`.                                                                                                                                                                                   |
+| `query-client/key-bridge.ts`                                | No public change. `toClientKeyPrefix` and `bridgeInvalidation` keep resource/action prefixes and never include a partition suffix.                                                                                                                                                            |
+| `query-client/kv-cache-persister.ts`                        | No public change. Its opaque serialized TanStack key already contains the generated full-key suffix; two partitions must persist under different storage strings.                                                                                                                             |
+| `collections/create-query-collection.ts`                    | The low-level manual `queryKey`/`queryFn` pair remains caller-owned. Generated/scaffolded contribution-aware collections MUST take both from the same generated query-options result; a golden/conformance fixture proves an unsuffixed key is never generated beside a partitioned function. |
+
+TanStack key injection is not a zero-cost type cast. For a context-bearing service,
+`createServiceQueryUtils` MUST recursively wrap the upstream utility tree. At each procedure and
+nesting level it precomputes the contribution partition for each full-key operation kind (`query`,
+`streamed`, `live`, and `infinite`), merges the canonical suffix into the upstream
+`optionsIn.queryKey`, and forwards the same context to the query function. Mutation helpers forward
+context but do not add a response-cache partition. Partial `.key()`/invalidation prefixes remain
+unchanged. The current `return utils as ServiceQueryUtils<TContract>` fast path is permitted only
+for the default empty-context/no-partition specialization.
+
+The checked-in `service-query-utils-upstream_type.ts` assertion remains valid for
+`ServiceQueryUtils<TContract>` because its new context generic defaults to `Record<never, never>`.
+It MUST NOT be generalized to a contributed specialization: that surface is produced by the wrapper
+above and is tested separately. The RFC proof fixture
+`packages/sdk/tests/type-fixtures/sdk-client-contributions-rfc_type.ts` pins the default
+assignability, real `ContractLike` recursion, contribution-aware `defineServices` result, server key
+suffix, and direct-only omission.
+
 ### Composition and ordering law
 
 Construction performs these steps in tuple order:
 
 1. validate the protocol family and major, id grammar, tuple/key limits, and plain-object shape;
-2. canonicalize declared header names to lower case and reject non-canonical input;
-3. reserve framework and Fetch-owned headers;
-4. reject duplicate ids, context keys, and header keys; and
-5. validate query compatibility and generated surface selection.
+2. reject contribution ownership of SDK context keys (`signal`, `cache`, retry fields, and
+   `traceHeaders`);
+3. canonicalize declared header names to lower case and reject non-canonical input;
+4. reserve framework and Fetch-owned headers;
+5. reject duplicate ids, context keys, and header keys; and
+6. validate query compatibility and generated surface selection.
 
 At call time:
 
@@ -721,32 +887,57 @@ trace fields after contribution validation.
 
 ### Async context, retries, and cancellation
 
-Preparation runs exactly once per logical client call, semantically above the adapter's retry loop.
-Retries reuse the same immutable `PreparedSdkClientCall`. This avoids fetching a different
-credential or locale halfway through one retry sequence. Credential refresh after a `401` requires a
-future explicit replay policy; an interceptor hidden in an auth contribution would make side-effect
-replay unsafe.
+Preparation runs exactly once per logical call epoch, semantically above the adapter's retry loop.
+Unary retries reuse the same immutable `PreparedSdkClientCall`. This avoids fetching a different
+credential or locale halfway through one attempt sequence. Credential refresh after a `401` requires
+a future explicit replay policy; an interceptor hidden in an auth contribution would make
+side-effect replay unsafe.
 
 The adapter MUST realize prepare-once with either an outer logical-call wrapper (preferred because
-the lifecycle is explicit) or an immutable per-logical-call memo shared by every attempt. Wiring
+the lifecycle is explicit) or an immutable per-epoch memo shared by every attempt. Wiring
 `prepare()` directly to an upstream link-header callback is non-conforming unless that callback
-reads only such a memo. Official oRPC `v2.0.0-beta.25` source resolves link headers during input
-encoding, while its retry plugin invokes the downstream chain again per attempt; a direct async
-header callback therefore runs once per retry, not once per logical call. The supported v1 adapter
-must be tested rather than assumed to differ.
+reads only such a memo. This behavior is verified, not hypothetical, on the repository's locked oRPC
+v1.14.6 family: `StandardRPCLinkCodec.encode()` resolves `headers` for every downstream entry, and
+`ClientRetryPlugin` re-enters that downstream chain for every retry. The v2 beta.25 source has the
+same relevant lifecycle. Direct async preparation in either link-header callback therefore runs per
+attempt and is non-conforming.
 
-A mandatory conformance fixture forces at least one retry and proves all of the following:
+A mandatory unary conformance fixture explicitly passes `context.retry: 1` because the current
+stable-v1 adapter configures retry off by default (`default.retry = 0`). It proves all of the
+following:
 
 - contributor preparation count is exactly `1`;
 - each attempt receives a freshly materialized transport header container;
 - the canonical contributor-header bytes are identical on every attempt; and
-- the logical-call context/procedure projection observed by the adapter is the same immutable
+- the contribution context/procedure projection observed by the adapter is the same immutable
   snapshot on every attempt.
+
+Streaming has a different boundary. Returning an `AsyncIterator` creates a stream session, not an
+eternally prepared epoch. A failure raised by `iterator.next()` after the iterator was returned
+starts a new reconnect epoch. Before dispatching that reconnect, the SDK MUST rerun contribution
+preparation exactly once against the same borrowed input and current contribution context source.
+All transport attempts inside the reconnect epoch reuse that new prepared call. The stable-v1
+adapter MUST NOT let `ClientRetryPlugin` perform iterator-phase recovery against the old memo
+without this outer re-preparation step. Its existing retry budget and abort signal still bound
+whether another epoch is attempted; retry remains transport policy and is not contributor-visible.
+
+The iterator-phase conformance fixture explicitly enables retry, opens a credential-bearing stream
+with credential `A`, consumes one item, rotates the source to `B`, forces `iterator.next()` to fail,
+and observes the reconnect. Required assertions are: preparation count `2` (one per epoch), initial
+attempts contain `A`, reconnect attempts contain `B`, and every attempt within each epoch is
+byte-equivalent. An aborted stream starts no new epoch. This rule prevents a long-lived stream from
+reconnecting indefinitely with a frozen bearer while preserving prepare-once for ordinary retries.
+
+The stable-v1 dedupe path is header-safe: its request identity includes body, headers, method, and
+URL. Because prepared contributor headers exist before dedupe, calls with different bearer or locale
+values do not coalesce. Dedupe may replace downstream transport context with a group context; that
+does not alter the already prepared header record and is why conformance compares the contribution
+projection rather than the whole `ServiceClientContext` object.
 
 If the call signal is already aborted, no contributor runs. If it aborts during an async resolver,
 the SDK stops awaiting, does not dispatch, and rejects with the platform abort reason. A resolver
-receives the signal through `ServiceClientContext` and SHOULD stop its own work. The SDK cannot
-cancel arbitrary promise side effects.
+receives the signal through `SdkClientPrepareOptions.signal` and SHOULD stop its own work. The SDK
+cannot cancel arbitrary promise side effects.
 
 The snapshot is shallowly read-only at the type level and its top-level records are frozen in
 development/test builds. The SDK does not deep-clone input or context, because that would destroy
@@ -758,8 +949,8 @@ must not mutate them.
 Version 1 contributes only prepared outbound header values and typed per-call context. It does not
 contribute an upstream callback. The initial stable-v1 adapter may map an already prepared record
 into the native link-header facility, provided that preparation occurs above retries or through the
-specified per-call memo. A future v2 adapter may use different private wiring. These are
-non-normative adapter choices; the three NetScript ports and prepare-once behavior are normative.
+specified per-epoch memo. A future v2 adapter may use different private wiring. These are
+non-normative adapter choices; the three NetScript ports and once-per-epoch behavior are normative.
 
 The SDK remains the sole owner of:
 
@@ -789,6 +980,23 @@ reserves `traceparent` and `tracestate`. The W3C
 [Trace Context recommendation](https://www.w3.org/TR/trace-context/) also requires careful mutation
 and calls out correlation/privacy risk.
 
+#### Desktop transport boundary
+
+RFC-A version 1 is an HTTP request-header axis. `@netscript/sdk/desktop` uses an oRPC MessagePort
+link and has no HTTP request or header channel, so it is explicitly out of scope rather than
+silently supported. `CreateDesktopServiceClientOptions` does not gain `contributions`. Its
+TypeScript excess-property check and runtime construction validation MUST reject a supplied
+`contributions` field with `SDK_CONTRIBUTION_TRANSPORT_UNSUPPORTED`; JavaScript/widened input must
+not be accepted and ignored. `SdkClientContributionReference.targets` remains only `browser` and
+`server`, and generators fail if an HTTP contribution is selected for a desktop target.
+
+Consequently, creating a desktop client from the same contract does not send bearer or locale
+headers over MessagePort. Auth-core and desktop docs MUST state this. If a desktop native host later
+calls an HTTP service, the host creates a separate HTTP `createServiceClient()` and supplies its own
+contribution context; the webview credential is never ambiently forwarded across the native bridge.
+A future MessagePort contribution/capability seam requires a separate RFC and cannot reuse
+`headerKeys` as if MessagePort had headers.
+
 #### Optional incoming server companion
 
 oRPC v2's [`RequestHeadersHandlerPlugin`](https://v2.orpc.dev/docs/plugins/request-headers) is an
@@ -805,11 +1013,21 @@ RFC-A client metadata enforce server authorization.
 
 #### Boundaries reserved for the v2 migration
 
-RFC-A does not adopt v2's typed-error/status-map redesign or its `@orpc/opentelemetry` integration.
-It also does not change HTTP method selection: transport owns GET/POST, and any later v2 adapter
-that enables GET must prove an explicit CSRF law. NetScript continues to own its client-span
-topology and final trace injection unless the separate v2 RFC proves that upstream instrumentation
-can replace them without missing spans or emitting duplicates.
+RFC-A does not adopt v2's typed-error/status-map redesign. Stable v1 already enables GET inference
+today through `inferRPCMethodFromContractRouter`, and the SDK's dedupe filter is GET-only. The
+separate v2 migration must choose explicitly between:
+
+1. preserve GET by reimplementing the removed method-inference behavior, enabling GET in the v2
+   server's `allowMethods`, and defining a `Sec-Fetch-Mode`/CSRF law; or
+2. adopt v2's POST-oriented default, explicitly retire current GET behavior, and replace or remove
+   the now-ineffective GET-only dedupe policy.
+
+Silently accepting POST-only behavior while leaving the current dedupe filter installed is not a
+valid migration. The `@orpc/opentelemetry` package name is also not exclusively a v2 concern: that
+package ships on the maintained v1 line. Selecting/renaming the v1 instrumentation dependency
+belongs to transport issue #1351. The v2 spike owns only proof of span topology, execution counts,
+and absence of double spans before any change to NetScript's final trace injection. RFC-A continues
+to own neither typed-error/status migration nor telemetry-package migration.
 
 ### Error and failure model
 
@@ -825,6 +1043,7 @@ export type SdkClientContributionErrorCode =
   | 'SDK_CONTEXT_MISSING'
   | 'SDK_HEADER_INVALID'
   | 'SDK_CACHE_PARTITION_INVALID'
+  | 'SDK_CONTRIBUTION_TRANSPORT_UNSUPPORTED'
   | 'SDK_PREPARATION_FAILED';
 
 export interface SdkClientContributionDiagnostic {
@@ -859,6 +1078,7 @@ that need internal diagnostics must observe and sanitize their own source failur
 | Resolver rejects or throws                                | preparation                               | Throw stable `SDK_PREPARATION_FAILED`; discard the source error from the public failure.                                                       |
 | Undeclared, forbidden, non-string, or CR/LF header        | preparation                               | Throw `SDK_HEADER_INVALID`; do not dispatch.                                                                                                   |
 | Invalid partition syntax                                  | partition                                 | Throw before cache access. First-party tests separately reject known secret sources; arbitrary secrets cannot be detected reliably at runtime. |
+| Contribution supplied to Desktop/unsupported link         | compile when literal; construction always | Reject rather than ignoring it; name the unsupported transport without including context or header values.                                     |
 | Abort before/during preparation                           | preparation                               | Propagate abort reason; do not dispatch.                                                                                                       |
 | Discovery, codec, network, retry, or server-defined error | transport                                 | Preserve the existing SDK/oRPC error path; do not relabel it as a contribution failure.                                                        |
 
@@ -880,6 +1100,12 @@ Allowed diagnostics are the stable code, phase, contribution id, procedure path,
 name, service name, and duration. Debug mode does not relax this list. The
 [OWASP logging guidance](https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html#data-to-exclude)
 specifically excludes access tokens and session identifiers from direct logs.
+
+`prepare` receives raw `input: unknown`, including values owned by application or third-party
+schemas. It is sensitive borrowed data: a contribution may inspect it only to decide its declared
+headers and MUST NOT log, persist, retain, hash for telemetry, copy it into an error, return it from
+the patch, or use it as a cache partition. Installing a third-party contribution grants this
+per-call visibility and must be documented as part of plugin trust review.
 
 Partition values are intentionally visible in query keys and developer tools. The API docs and
 runtime diagnostics MUST say this. First-party auth accepts only an explicitly supplied non-secret
@@ -971,10 +1197,14 @@ Version 1 sets explicit budgets:
 
 The limit applies per service, so a large `defineServices` map does not create one repository-wide
 intersection. The implementation uses tail recursion over literal tuples and named conflict markers.
-A scratch Deno type probe on the RFC branch checked two composed contexts, required call arguments,
-a duplicate-context diagnostic, an accepted 16-element tuple, and a rejected 17-element tuple in
-0.67 seconds with a 225,508 KiB maximum RSS on the authoring host. That timing is evidence, not a
-portable CI threshold.
+The committed compile-only fixture
+[`packages/sdk/tests/type-fixtures/sdk-client-contributions-rfc_type.ts`](../packages/sdk/tests/type-fixtures/sdk-client-contributions-rfc_type.ts)
+models the proposed algebra against the real `ContractLike`, `DefineServiceConfig`/`defineServices`
+result shape, `ServiceClient`, `ServiceQueryUtils`, and server key primitives. It checks two
+composed contexts, default generic assignability, required call/query arguments, direct-only
+omission, a duplicate-context diagnostic, an accepted 16-element tuple, and a rejected 17-element
+tuple. The fixture's measured time/RSS is recorded in the harness worklog and remains informational
+rather than a portable CI threshold.
 
 Raising a budget without changing semantics is a backward-compatible implementation decision after
 type-performance evidence. Removing a limit or accepting a previously invalid descriptor does not
@@ -1003,32 +1233,53 @@ Generated projects change only when the user selects a contributor.
 
 Because this RFC changes public and publish surfaces, implementation packages must bump versions
 according to the release plan and pass JSR isolated-declaration gates. No implementation is allowed
-to publish an `@orpc/*` type in a generated `.d.ts`/JSR declaration. More strongly, the public SDK
-protocol and all generated public declarations MUST contain zero raw oRPC symbols: no upstream
-module specifier, link, plugin, context, interceptor, metadata accessor, or structural alias whose
-meaning depends on an upstream major. NetScript-owned public types may be implemented by an
+to add an `@orpc/*` identity to an RFC-A declaration. The zero-oRPC gate is deliberately scoped to
+(a) every new RFC-A protocol/descriptor/context/cache/error/reference/auth declaration and (b)
+generated client declarations. Those targets MUST contain zero raw upstream module specifiers,
+links, plugins, contexts, interceptors, metadata accessors, or structural aliases whose meaning
+depends on an upstream major. NetScript-owned public types may be implemented by an
 upstream-specific private adapter but cannot inherit its identity.
+
+For public modules, the declaration gate filters `deno doc --json` to the named RFC-A symbols and
+scans those nodes; it does not scan the entire unchanged `@netscript/sdk/ports` graph. Generated
+client files are scanned in full because they have no historical compatibility surface.
+
+The gate does not claim the unchanged SDK/contracts surface is already clean. Current
+`ContractProcedureLike`/`ContractLike` expose the literal `~orpc` structural accessor, and the
+doctrine sanctions real oRPC builder types in `@netscript/contracts`. Those exact pre-existing paths
+are an allowlist tied to type-soundness umbrella #1278 and repair issue #1350; the allowlist may not
+grow and does not exempt a new RFC-A symbol. #1350 may reduce the leak while repairing the base
+error map, but RFC-A does not make its unrelated zero-oRPC scan a prerequisite for the minimal
+client seam.
 
 The first implementation's compatibility target is the supported stable-v1 adapter. A later v2 spike
 must run the same contribution conformance suite against its adapter before any migration RFC can
 propose production adoption. Passing RFC-A on stable v1 does not imply v2 compatibility, and adding
 a v2 adapter must not change the contribution protocol major.
 
+Workspace manifests currently use compatible `^1.14.x` ranges; `deno.lock` is the only exact family
+pin. The separate v1.15.0 decision uses lock-only pinning: keep compatible manifest ranges, update
+the entire oRPC family atomically in the lock, and require `deno ci --frozen` plus dependency-graph
+evidence that no mixed v1 family version resolves. Exact manifest pins are not introduced by RFC-A.
+The fact that v1.15.0 shipped after the then-current v2 beta confirms stable v1 remains maintained;
+staying on v1 for RFC-A is not a migration to an abandoned line.
+
 ### Staged implementation plan and issue decomposition
 
 Implementation remains outside this RFC PR.
 
-| Stage                          | Existing owner                                              | Scope and exit condition                                                                                                                                                                                                |
-| ------------------------------ | ----------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 0. Ratify                      | [#1348](https://github.com/rickylabs/netscript/issues/1348) | Accept this RFC, settle safe FCP questions, and reconcile child issue bodies.                                                                                                                                           |
-| 1. Contract/type repair        | [#1350](https://github.com/rickylabs/netscript/issues/1350) | Preserve the concrete base error map and initialize/export `NetScriptProcedureMeta`; type fixtures prove both.                                                                                                          |
-| 2. Minimal client seam         | [#1349](https://github.com/rickylabs/netscript/issues/1349) | Add descriptor/helper, tuple algebra, context-generic client/query surfaces, the three internal ports, prepare-once stable-v1 composition, cache-effect handling, and failures. Do not expose upstream callback arrays. |
-| 3. Transport consolidation     | [#1351](https://github.com/rickylabs/netscript/issues/1351) | Decide separately whether to move the exact oRPC v1 family to stable v1.15.0, keep one fetch/retry/dedupe/trace path, prove prepare-once across retry, and deprecate current no-op options. No v2 migration.            |
-| 4. Auth dogfood                | [#1352](https://github.com/rickylabs/netscript/issues/1352) | Ship the auth-core bearer factory, access metadata behavior, redaction, cache partition/direct-only modes, manifest reference, docs, and scaffold choice.                                                               |
-| 5. Trace ownership proof       | [#1353](https://github.com/rickylabs/netscript/issues/1353) | Re-scope from “trace contribution” to prove the transport retains the only final trace injection and rejects contributor ownership of trace headers.                                                                    |
-| 6. Non-auth proof              | new child after RFC acceptance                              | Ship/test locale contribution, partitioned keys, header conflicts, and generated use. Do not file during this RFC run.                                                                                                  |
-| 7. Generic discovery           | [#1093](https://github.com/rickylabs/netscript/issues/1093) | Discover third-party module references without hardcoded factories; generated selection remains explicit.                                                                                                               |
-| 8. oRPC v2 migration RFC/spike | new owner after RFC-A review; do not file in this run       | Wait for stable unless the owner explicitly accepts beta; prove a complete, coordinated adapter migration independently of RFC-A.                                                                                       |
+| Stage                          | Existing owner                                              | Scope and exit condition                                                                                                                                                                                                                                                                            |
+| ------------------------------ | ----------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 0. Ratify and reconcile board  | [#1348](https://github.com/rickylabs/netscript/issues/1348) | Accept this RFC, settle safe FCP questions, then align #1349–#1353 bodies before implementation. In particular, decide whether #1350 is explicitly widened to metadata or a dependent metadata child is filed; its current `safe()` title/body do not silently own metadata.                        |
+| 1a. Existing error repair      | [#1350](https://github.com/rickylabs/netscript/issues/1350) | Preserve the concrete base error map and client error channel exactly as filed. This remains a type-soundness #1278 child.                                                                                                                                                                          |
+| 1b. Procedure metadata         | owner selected in Stage 0; do not file in this run          | Initialize/export `NetScriptProcedureMeta` without re-erasing Stage 1a types. Either an amended #1350 or an explicit dependent child owns this before auth dogfood.                                                                                                                                 |
+| 2. Minimal client seam         | [#1349](https://github.com/rickylabs/netscript/issues/1349) | Add descriptor/helper, tuple algebra, defaulted context-generic client/query surfaces, private `src/internal/client-contributions/` ports, server/TanStack key algebra, stable-v1 composition, reconnect preparation, desktop rejection, cache handling, and failures. No upstream callback arrays. |
+| 3. Transport consolidation     | [#1351](https://github.com/rickylabs/netscript/issues/1351) | Decide separately whether to move the lock-pinned whole oRPC v1 family to stable v1.15.0, keep one fetch/retry/dedupe/trace path, prove unary/reconnect semantics and header-safe dedupe, and deprecate current no-op options. Selecting/renaming v1 OTel belongs here; no v2 migration.            |
+| 4. Auth dogfood                | [#1352](https://github.com/rickylabs/netscript/issues/1352) | Ship the auth-core bearer factory, access metadata behavior, redaction, cache partition/direct-only modes, manifest reference, docs, and scaffold choice.                                                                                                                                           |
+| 5. Trace ownership proof       | [#1353](https://github.com/rickylabs/netscript/issues/1353) | Re-scope from “trace contribution” to prove the transport retains the only final trace injection and rejects contributor ownership of trace headers.                                                                                                                                                |
+| 6. Non-auth proof              | new child after RFC acceptance                              | Ship/test locale contribution, partitioned keys, header conflicts, and generated use. Do not file during this RFC run.                                                                                                                                                                              |
+| 7. Generic discovery           | [#1093](https://github.com/rickylabs/netscript/issues/1093) | Discover third-party module references without hardcoded factories; generated selection remains explicit.                                                                                                                                                                                           |
+| 8. oRPC v2 migration RFC/spike | new owner after RFC-A review; do not file in this run       | Wait for stable unless the owner explicitly accepts beta; prove a complete, coordinated adapter migration independently of RFC-A, including the keep-GET versus retire-GET decision.                                                                                                                |
 
 Issue #451 remains the sole future owner of custom links. #928 and #934 consume aligned protocol and
 metadata vocabulary but are not prerequisites for the header seam. The org-aware policy work in
@@ -1044,10 +1295,18 @@ The separate v2 RFC/spike must, at minimum, gate all of the following before pro
 - prove route, metadata, OpenAPI, and Scalar output parity;
 - prove typed-error semantics and HTTP status-map parity without folding the migration into #1350;
 - audit middleware execution counts now that v2 removes automatic deduplication;
-- define the GET/POST/CSRF law;
+- choose and prove a complete GET/POST/CSRF law: either (a) preserve current GET with a NetScript
+  replacement for removed `inferRPCMethodFromContractRouter`, explicit server `allowMethods`, and
+  `Sec-Fetch-Mode`/CSRF behavior, or (b) retire GET, document the selected POST/PUT/PATCH/DELETE
+  methods and CSRF behavior, and update routes/docs;
+- prove request dedupe remains effective under the chosen method policy; a GET-only filter that
+  becomes a silent no-op fails this gate;
 - prove OpenTelemetry topology and absence of double spans before changing final injection
-  ownership;
-- prove Fresh/desktop serializer parity and SSE/stream lifecycle behavior;
+  ownership, while keeping any stable-v1 `@orpc/otel` to `@orpc/opentelemetry` package decision in
+  #1351;
+- prove Fresh and Desktop MessagePort serializer parity, including browser/native framing;
+- prove SSE/stream opening, iterator-phase reconnect, cursor, cancellation, and credential refresh
+  lifecycle behavior;
 - re-run query-key/cache-partition safety because v2 still excludes client context from keys;
 - pass the Deno/browser/server matrix, package checks, full CLI/scaffold E2E, documentation
   snippets, and publish dry-run.
@@ -1064,10 +1323,16 @@ An implementation is not complete until all applicable gates pass.
   17-element tuple have `@ts-expect-error` fixtures;
 - `defineServices`, server query factories, TanStack query/infinite/mutation options, and `.call`
   preserve the per-service context;
+- every widened public generic compiles under its compatibility default; existing single-generic
+  `ServiceClient`/`ServiceQueryUtils` and current upstream-assignability fixtures remain valid;
+- the server key algebra proves the default exact three-tuple and the partitioned five-tuple, while
+  `CacheKey` remains `Deno.KvKey` and invalidation prefixes remain unsuffixed;
 - `direct-only` service keys are absent from query/query-utils mapped types;
 - server-defined error inference remains exact after metadata initialization; and
-- public and generated declarations contain zero raw oRPC module specifiers or symbols, including
-  links, plugins, contexts, interceptors, and metadata accessors.
+- new RFC-A protocol/descriptor/context/cache/error/reference/auth declarations and generated client
+  declarations contain zero raw oRPC module specifiers or symbols. The scan uses a non-growing
+  allowlist for current `ContractLike`/contracts declarations tied to #1350/#1278 rather than
+  scanning those unchanged surfaces as if they were clean.
 
 #### Runtime gates
 
@@ -1075,10 +1340,20 @@ An implementation is not complete until all applicable gates pass.
 - duplicate validation repeated through `unknown`/JavaScript input;
 - undeclared, mixed-case, forbidden, CR/LF, non-string, and duplicate headers rejected;
 - base `Content-Type` and final trace fields cannot be overwritten;
-- a forced retry records preparation count `1` and byte-equivalent prepared contributor
-  headers/context on every attempt;
+- a forced unary retry explicitly sets `context.retry: 1`, records preparation count `1`, and
+  observes byte-equivalent prepared contributor headers/projection on every attempt;
+- an iterator-phase reconnect rotates credential `A` to `B`, records one preparation per epoch,
+  never reuses `A` on the reconnect, and starts no epoch after abort;
+- contribution callbacks cannot observe SDK retry/cache/trace fields; signal is exposed only by the
+  separate preparation option;
+- stable-v1 dedupe identity includes prepared headers, so distinct auth/locale requests do not
+  coalesce even when other request fields match;
 - locale and two auth partitions cannot share cached data, while prefix invalidation still works;
+- persisted TanStack keys and generated collection wiring keep partitioned key/function pairs
+  together; unsuffixed generated goldens fail;
 - direct-only services have no runtime query/query-utils property; and
+- Desktop construction/generation rejects contributions instead of ignoring them, while normal
+  MessagePort calls remain unchanged; and
 - every error/log/span snapshot excludes header values, input, context, partitions' source values,
   source messages, tokens, and session ids.
 
@@ -1086,7 +1361,16 @@ An implementation is not complete until all applicable gates pass.
 
 - the supported stable-v1 adapter passes the entire contribution conformance suite;
 - its upstream link-header callback, if used, consumes only the already prepared per-call record;
-- the package declaration graph and generated client declarations pass the zero-oRPC-symbol scan;
+- implementation files live only under `src/internal/client-contributions/`, with no internal barrel
+  or `deno.json` export;
+- `deno doc --json` for SDK root, `./client`, `./ports`, and `./desktop`, plus a packed-consumer
+  negative import fixture, prove `ProcedureMetadataPort`, `PreparedOutboundHeadersPort`,
+  `ClientTransportPolicyPort`, `PreparedSdkClientCall`, and the private context symbol are absent;
+- that packed fixture specifically rejects `@netscript/sdk/internal/client-contributions`,
+  `@netscript/sdk/internal/client-contributions/adapter-ports`, and
+  `@netscript/sdk/client-contributions` as unexported module specifiers;
+- the scoped new-declaration and generated-client zero-oRPC scan passes with no growth in the
+  #1350/#1278 allowlist;
 - a future v2 spike adapter must pass the same suite before its migration RFC can enter FCP; and
 - v2 typed-error/status-map and OpenTelemetry migration tests remain outside RFC-A.
 
@@ -1096,11 +1380,16 @@ An implementation is not complete until all applicable gates pass.
 - duplicate/mismatched ids and target-incompatible exports fail `plugin doctor`/generation;
 - generated code uses public exports, static imports, `as const`, and explicit service selection;
 - removing auth from generated config removes the context requirement and wire header; and
+- selecting an HTTP contribution for `@netscript/sdk/desktop` is a generator/type/runtime error; it
+  is never silently omitted; and
 - auth and locale scaffold doctests type-check.
 
 #### Repository and publish gates
 
 - scoped check/lint/fmt wrappers for changed TypeScript;
+- `deno check --unstable-kv packages/sdk/tests/type-fixtures/sdk-client-contributions-rfc_type.ts`
+  proves the committed real-surface 16/17 inference model until implementation replaces its local
+  types with public imports;
 - focused package tests, `deno task arch:check`, and docs/RFC link/lint checks;
 - `deno doc --lint` for every affected public module;
 - `deno publish --dry-run --allow-dirty` and the repository JSR audit for `contracts`, `sdk`,
@@ -1119,7 +1408,12 @@ Implementation updates must cover:
 - plugin manifest/config builder documentation;
 - generated service-client templates and embedded CLI assets;
 - query partition visibility, direct-only behavior, and cache invalidation;
-- upstream-major neutrality, the private adapter boundary, and prepare-once retry behavior;
+- exact server/TanStack key suffixes, collection/persister behavior, and default-generic
+  compatibility;
+- upstream-major neutrality, scoped existing `ContractLike` debt, the private adapter location and
+  absence guarantees, unary prepare-once behavior, and fresh preparation on stream reconnect;
+- the HTTP-only contribution boundary for Desktop MessagePort clients and the required rejection
+  behavior;
 - the optional incoming request-header companion and direct-call absence behavior;
 - CORS/preflight, cleartext bearer, cookie, redirect, and retry limitations; and
 - migration notes for manual header wrappers and deprecated `port`/`timeout` fields.
@@ -1241,12 +1535,14 @@ custom-link design gets its own breaking assessment.
 - oRPC v2's
   [TanStack integration](https://v2.orpc.dev/docs/integrations/tanstack-query#client-context)
   explicitly excludes client context from query keys, preserving RFC-A's partition/direct-only law.
-- In oRPC `v2.0.0-beta.25`, the
+- The locked oRPC v1.14.6 package was executed/inspected in-tree: its standard codec resolves
+  headers in `encode`, retry re-enters downstream per attempt and from iterator consumption, and
+  dedupe identity includes headers. The corresponding v2 beta.25
   [standard link codec](https://github.com/middleapi/orpc/blob/v2.0.0-beta.25/packages/client/src/adapters/standard/rpc-link-codec.ts)
-  resolves headers during encoding and the
+  and
   [retry plugin](https://github.com/middleapi/orpc/blob/v2.0.0-beta.25/packages/client/src/plugins/retry.ts)
-  invokes downstream per attempt. This proves that direct link-header preparation is not
-  prepare-once.
+  confirm that these lifecycle assumptions cannot be hidden behind an upstream-major-neutral public
+  callback.
 - Official [oRPC releases](https://github.com/middleapi/orpc/releases) mark v2 beta releases as
   pre-release and v1.15.0 as the latest stable release as of the audit date.
 - The WHATWG [Fetch Standard](https://fetch.spec.whatwg.org/#forbidden-request-header) defines
@@ -1258,8 +1554,8 @@ custom-link design gets its own breaking assessment.
 
 ## Unresolved questions
 
-These are safe for discussion/FCP because the upstream-neutral extension law, prepare-once
-invariant, and separate-v2 boundary remain fixed:
+These are safe for discussion/FCP because the upstream-neutral extension law, unary/reconnect
+preparation invariant, and separate-v2 boundary remain fixed:
 
 1. Should the first implementation reserve exactly 16 contributions, or raise the ceiling if CI type
    fixtures demonstrate equal cost? It must not ship below 16.
@@ -1271,29 +1567,33 @@ invariant, and separate-v2 boundary remain fixed:
 4. Maintainers may refine public names (`responseCache`, `direct-only`, or the access enum) during
    FCP while preserving the specified semantics and defaults.
 5. Should the stable-v1 adapter use an outer logical-call wrapper (the RFC's preference) or
-   immutable per-logical-call memoization? Either choice must pass preparation-count `1` and
-   byte-equivalent retry fixtures; direct unmemoized link-header preparation is not allowed.
+   immutable per-epoch memoization? Either choice must pass preparation-count `1` and
+   byte-equivalent unary retry fixtures, use the specified direct/private-symbol channel, preserve
+   it across context replacement, and start a fresh preparation epoch for iterator reconnect.
 6. Should the semantic procedure-auth metadata requirement be accepted inside RFC-A and implemented
-   through #1350, as written, or ratified in a dependent mini-RFC? The public metadata vocabulary
-   and upstream-neutral metadata port are required before auth dogfood can ship.
+   by explicitly widening #1350 after acceptance, or ratified in a dependent mini-RFC/child? The
+   current #1350 remains the `safe()`/error repair until that Stage-0 board decision. The public
+   metadata vocabulary and upstream-neutral metadata port are required before auth dogfood can ship.
 7. Does the owner want the optional stable-v1 incoming request-header handler installed by default
    in service presets, or explicitly selected? Direct calls must continue to tolerate absent request
    headers under an explicit server policy.
 8. Should the separately reviewed stable-v1.15.0 exact-family upgrade precede the minimal client
    seam, or should RFC-A first implement against the current v1.14.x family? RFC-A supports either
-   stable-v1 baseline and does not authorize v2.
+   stable-v1 baseline, uses the normative lock-only whole-family gate, and does not authorize v2.
 9. For the separate v2 migration RFC, must production support zero-downtime mixed-version clients
    via parallel endpoints, or is a coordinated atomic client/server rollout acceptable?
-10. Does Fable agree that GET enablement and its CSRF law belong exclusively to the transport/v2
-    migration RFC rather than RFC-A contributions?
+10. In the separate v2 migration, should NetScript preserve today's inferred GET behavior by
+    replacing removed method inference plus configuring `allowMethods`/CSRF, or intentionally retire
+    GET and replace the GET-only dedupe policy? RFC-A contributions do not choose either path.
 11. Can v2 OpenTelemetry instrumentation ever replace NetScript's final trace injection without
-    violating NetScript span ownership or creating double spans? This is a v2-spike proof
-    obligation, not an RFC-A implementation choice.
+    violating NetScript span ownership or creating double spans? Stable-v1 package
+    selection/renaming remains #1351; only topology replacement is a v2-spike proof obligation.
 
 The following are not open: duplicate rejection, order independence, per-call async preparation,
-exactly-once preparation per logical call, reserved trace ownership, zero upstream types/symbols in
-public and generated declarations, no upstream callback arrays, explicit plugin selection, cache
-partition/direct-only safety, separation from contract-defined errors, and no production v2 beta
+once-per-epoch preparation plus fresh stream reconnect credentials, reserved trace ownership, zero
+upstream identities in new RFC-A/generated client declarations (under the scoped #1350/#1278
+baseline), no upstream callback arrays, explicit plugin selection, cache partition/direct-only
+safety, Desktop rejection, separation from contract-defined errors, and no production v2 beta
 migration in RFC-A.
 
 ## Future possibilities

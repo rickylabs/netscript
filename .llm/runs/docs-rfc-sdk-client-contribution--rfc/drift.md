@@ -97,3 +97,34 @@ documentation.
 - **Evidence:** amended RFC sections “Procedure metadata,” “Internal adapter ports,” “Async context,
   retries, and cancellation,” “Transport ownership and oRPC alignment,” “Compatibility and
   migration,” and “Staged implementation plan and issue decomposition.”
+
+## 2026-08-08 — Formal PLAN-EVAL cycle 1 found ten completeness defects
+
+- **What:** Claude Fable 5 returned authoritative `FAIL_PLAN / CHANGES_REQUESTED` for cycle 1. The
+  core contribution axis survived, but its gates and compatibility record omitted six
+  implementation-forcing decisions and four evidence/board corrections (F-A1 through F-A10).
+- **Source:** `plan-eval.md`, 159 lines as received at evaluator commit
+  `f1a29fe1a65d59f71a59bf4b6b2a48fc49e1e86f`; SHA-256
+  `0690af2a2914ad0a9118be04ccebb933af33b2bac8f3f743bc7990f8f5f38cdd`.
+- **Expected:** The post-audit RFC would be decision-complete for implementation and have executable
+  gates.
+- **Actual:** A whole-graph zero-oRPC scan could not pass unchanged `ContractLike`; server key
+  algebra and generic defaults were incomplete; retry preparation could freeze stream credentials;
+  Desktop bypass and private port placement were unstated; transport retry fields leaked into the
+  contribution view; the v2 GET direction/gates were incomplete; the inference proof was ignored;
+  and #1350 metadata ownership needed an explicit stage split.
+- **Severity:** authoritative formal evaluator failure, cycle 1 of 2. This supersedes any earlier
+  generator readiness self-audit; it does not overturn the extension-axis design.
+- **Action:** scope zero-upstream inspection to named new RFC-A/generated declaration nodes under a
+  non-growing #1350/#1278 baseline; specify exact default 3-tuple/partitioned 5-tuple algebra across
+  six server/cache surfaces and recursive TanStack wrapping; default every widened generic; make
+  iterator reconnect a fresh preparation epoch; reject HTTP contributions on Desktop; locate and
+  negatively test the private ports; expose only contribution-declared context plus signal; correct
+  the v2 preserve-GET/retire-GET fork and complete its gates; commit a real-surface 16/17 fixture;
+  and split #1350 Stage 1a from metadata Stage 1b ownership.
+- **Evidence:** revised RFC sections “Internal adapter ports,” “Tuple type algebra,” “Query and
+  generated type propagation,” “Server key algebra and compatibility,” “Async context, retries, and
+  cancellation,” “Desktop transport boundary,” “Boundaries reserved for the v2 migration,”
+  “Compatibility and migration,” and “Conformance and fitness gates”; committed fixture
+  `packages/sdk/tests/type-fixtures/sdk-client-contributions-rfc_type.ts`; remediation tables in
+  `research.md` and `worklog.md`.

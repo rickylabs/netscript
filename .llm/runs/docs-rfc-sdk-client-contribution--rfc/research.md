@@ -46,6 +46,12 @@
 - `CreateServiceClientOptions<TContract>`: 9 fields; no headers/context/link/plugin contribution.
 - `ServiceClientContext`: signal/cache/retry/trace fields, all optional.
 - `ServiceClientMethod<TInput,TOutput>`: input plus optional `ServiceRequestOptions`.
+- `createActionQueryKey()` and `ActionMethod.key`: fixed public three-tuples; `CacheKey` remains
+  `Deno.KvKey` and server storage prepends `cache_query`.
+- `ServiceQueryClientContext`: public `Record<never, never>`; the checked-in upstream fixture pins
+  default `ServiceQueryUtils<TContract>` assignability.
+- `@netscript/sdk/desktop`: separate MessagePort client factory with no HTTP header channel or
+  contribution option.
 - `ServiceHandlerPlugin`: structural `order`, `init`, and `initRuntimeAdapter` using `unknown`.
 - `RPCHandlerConfig`: already has `plugins`, tracing/error/dedupe/logging/debug fields.
 - `PluginContributions`: 10 array groups plus `aspire` and `doctor` module strings; no SDK group.
@@ -107,6 +113,26 @@ The amendment locks upstream-major neutrality and three internal NetScript adapt
 procedure metadata, prepared outbound headers, and transport policy. Stable v1 is the implementation
 target. A v2 adapter must be designed and gated in a separate RFC/spike.
 
+### Formal PLAN-EVAL cycle 1 amendment
+
+Claude Fable 5 returned authoritative `FAIL_PLAN / CHANGES_REQUESTED` in `plan-eval.md` at commit
+`f1a29fe1a65d59f71a59bf4b6b2a48fc49e1e86f`. The 159-line verdict was read completely; SHA-256
+`0690af2a2914ad0a9118be04ccebb933af33b2bac8f3f743bc7990f8f5f38cdd`. This section is generator
+remediation of that verdict, not a self-evaluation.
+
+| Finding | Re-baselined evidence                                                                                                                                                                            | Author correction                                                                                                                                                                                    |
+| ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| F-A1    | `deno doc --json packages/sdk/src/ports/mod.ts` reaches `~orpc` through current `ContractProcedureLike`/`ContractLike`; doctrine 02 sanctions builder coupling in contracts.                     | Scope zero-oRPC to named new RFC-A declaration nodes and generated client declarations. Keep a non-growing #1350/#1278 allowlist for unchanged leakage.                                              |
+| F-A2    | Server keys are fixed three-tuples in `query-key.ts`/`query-factory.ts`; `CacheKey`, `CacheQuery`, key bridge, KV persister, collections, and the current query-utils cast constrain the design. | Specify exact empty or two-string server suffix, defaulted 3/5 tuple types, six-surface disposition, recursive TanStack wrapping cost, and upstream-fixture disposition.                             |
+| F-A3    | `ServiceClientMethod`, `ServiceClientShape`, `ServiceQueryClientContext`, and query option types are public.                                                                                     | Append a normative compatibility default to every widened public generic; never insert before an existing positional parameter.                                                                      |
+| F-A4    | Locked v1.14.6 resolves headers in codec `encode`; retry re-enters downstream from both unary failure and iterator consumption.                                                                  | Define stream sessions as multiple preparation epochs: unary retry prepares once, iterator reconnect prepares fresh credentials once per epoch.                                                      |
+| F-A5    | Desktop creates a second client over MessagePort and has no HTTP header channel.                                                                                                                 | Keep RFC-A HTTP-only; type/runtime/generator reject Desktop contributions, and auth/desktop docs state the consequence.                                                                              |
+| F-A6    | `src/ports/` is a public barrel.                                                                                                                                                                 | Place the three ports in `src/internal/client-contributions/`, forbid an internal barrel/export, and add root/subpath doc plus packed-consumer absence gates.                                        |
+| F-A7    | Current retry fields hand-copy stable-v1 retry context; retry defaults to zero; dedupe replaces downstream context but keys include headers.                                                     | Exclude all transport fields from contribution-visible context, expose signal separately, state the private prepared-call channel, drive retry explicitly, and compare only the prepared projection. |
+| F-A8    | Stable v1 enables GET inference now; v2 defaults away from GET, removes `inferRPCMethodFromContractRouter`, and can make GET-only dedupe inert. `@orpc/opentelemetry` also exists on v1.         | Correct keep-GET versus retire-GET direction; add inference, allowMethods/CSRF, dedupe-effectiveness, OTel ownership, lock-only family, desktop, and stream gates to the v2 spike.                   |
+| F-A9    | The old `.llm/tmp` proof was ignored and modeled a stripped context.                                                                                                                             | Commit `packages/sdk/tests/type-fixtures/sdk-client-contributions-rfc_type.ts` against real contract/defineServices/query/key surfaces.                                                              |
+| F-A10   | Dedupe identity includes headers; v1.15.0 shipped after the then-current v2 beta; #1350 is filed as the `safe()` error repair, not metadata.                                                     | Cite verified lifecycle/header safety, classify raw input as sensitive borrowed data, keep stable v1, and split Stage 1a error repair from Stage 1b metadata ownership reconciliation.               |
+
 ## Proposal challenge record
 
 | Starting proposal choice                                                                                    | Verdict              | Reason                                                                                                |
@@ -142,11 +168,12 @@ target. A v2 adapter must be designed and gated in a separate RFC/spike.
    headers are reserved.
 9. Plugin manifests carry static module/export/target references; generators use explicit imports
    and literal tuples. No ambient activation.
-10. Public contribution types and generated declarations are upstream-major-neutral and contain zero
-    raw oRPC symbols. Package-private metadata, prepared-header, and transport-policy ports isolate
-    version-specific adapters.
-11. Preparation runs exactly once per logical call above retry semantics. The immutable prepared
-    header/context snapshot is reused byte-equivalently on every attempt.
+10. Named new RFC-A contribution types and generated client declarations are upstream-major-neutral
+    and contain zero raw oRPC symbols under the non-growing #1350/#1278 baseline. Package-private
+    metadata, prepared-header, and transport-policy ports isolate version-specific adapters.
+11. Preparation runs exactly once per logical-call epoch above ordinary retry semantics. The
+    immutable prepared header/context snapshot is reused byte-equivalently on every attempt in that
+    epoch; iterator reconnect starts a new epoch with fresh preparation.
 12. RFC-A implements on stable v1. A v1.15.0 move needs a separate exact-family decision; v2 beta,
     typed-error/status, OTel, GET/CSRF, protocol rollout, and broad migration work belong to a
     separate RFC/spike.
@@ -154,11 +181,20 @@ target. A v2 adapter must be designed and gated in a separate RFC/spike.
 
 ## Type proof
 
-Ignored scratch proof: `.llm/tmp/sdk-client-contribution-probe.ts` with an isolated local config.
+Committed compile-only proof:
+`packages/sdk/tests/type-fixtures/sdk-client-contributions-rfc_type.ts`. It imports the current real
+`ContractLike`, `DefineServiceConfig`/`defineServices`, `ServiceClient`, `ServiceQueryUtils`, and
+query-key primitives while modeling only the not-yet-implemented RFC types locally.
 
 Checked cases:
 
 - required auth plus optional locale context intersection;
+- current default client/query/`defineServices` assignability;
+- current `ActionMethod`/`QueryFactory` exact three-tuple keys, `FactoryConfig` client default, and
+  `CacheKey` compatibility;
+- contribution-aware `defineServices` client/query results and direct-only omission;
+- default three-segment and partitioned five-segment server keys;
+- current Desktop options rejecting an HTTP contribution field;
 - required request argument and missing-auth `@ts-expect-error`;
 - named duplicate-context conflict at the tuple boundary;
 - accepted 16-element synthetic tuple; and
@@ -167,11 +203,11 @@ Checked cases:
 Command:
 
 ```text
-deno check --config .llm/tmp/deno.json .llm/tmp/sdk-client-contribution-probe.ts
+deno check --unstable-kv packages/sdk/tests/type-fixtures/sdk-client-contributions-rfc_type.ts
 ```
 
-Result: exit 0. The first uncached observation was 0.67 s / 225,508 KiB RSS; a later warm check was
-0.02 s / 27,136 KiB. Timing is informational, not a gate.
+Result after the cycle-1 remediation: exit 0, 0.92 s elapsed, 268,448 KiB maximum RSS under the
+recorded `/usr/bin/time` format. Timing is informational, not a gate.
 
 ## JSR / publish-surface audit
 
@@ -204,10 +240,12 @@ than deepen the contract leak.
 - `@netscript/plugin`: new optional config reference and builder path; no SDK runtime dependency.
 - `@netscript/plugin-auth-core`: new `./sdk` export and optional explicit `./sdk/server` convenience
   export; adds a reviewed SDK dependency.
-- Generated declarations must remain package-owned and isolated-declaration compatible, with zero
-  raw oRPC module specifiers or symbols.
+- Named new RFC-A declarations and generated client declarations must remain package-owned and
+  isolated-declaration compatible, with zero raw oRPC module specifiers or symbols. The gate does
+  not rescan the whole existing ports/contracts graph as if its #1350/#1278 leakage were absent.
 - Required implementation evidence: `deno doc --lint`, package audit, publish dry-run, packed/prod
-  consumer check, docs on every new entrypoint, and no `@orpc/*` type in emitted declarations.
+  consumer check, docs on every new entrypoint, and no `@orpc/*` identity in named new RFC-A or
+  generated client declarations.
 
 ## Remaining safe questions
 
@@ -215,13 +253,13 @@ than deepen the contract leak.
 - Whether a server environment credential convenience export ships in the first auth slice.
 - Whether #451 is rescheduled with this work while remaining independent.
 - Final public naming refinements that preserve the locked semantics.
-- Outer wrapper (preferred) versus immutable per-logical-call memoization for stable-v1
-  prepare-once.
+- Outer wrapper (preferred) versus immutable per-epoch memoization for stable-v1 unary prepare-once;
+  both must use the specified private channel and re-prepare iterator reconnects.
 - Whether procedure-auth metadata is ratified inside RFC-A or as a dependent decision implemented
   through #1350.
 - Whether the incoming stable-v1 request-header handler is preset-default or explicit, with absent
   headers supported for direct calls either way.
 - Whether the stable-v1.15.0 exact-family upgrade precedes or follows the minimal seam.
-- For the separate v2 RFC: GET/CSRF law, zero-downtime parallel endpoints versus coordinated
-  rollout, and whether v2 OTel can replace final injection without violating NetScript span
-  ownership.
+- For the separate v2 RFC: preserve current GET with replacement inference/allowMethods/CSRF or
+  retire GET and replace dedupe; zero-downtime parallel endpoints versus coordinated rollout; and
+  whether v2 OTel can replace final injection without violating NetScript span ownership.
