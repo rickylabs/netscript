@@ -518,3 +518,51 @@ membership and closing keywords above, an ordered commit-slice table with files 
 per slice, the archetype/overlay and JSR surface for the touched packages, and the group's known
 environmental hazards. W2's three briefs already meet this bar and are the template. No group
 dispatches on a v3 brief.
+
+## The #1202 correction — a carried-in framing that the issue does not support
+
+v4 and v4.1 both recorded #1202 as owner-blocked: "owner-machine identification of the colliding
+service on the fixed low port **with it present**, plus three consecutive clean `scaffold.runtime`
+passes". That framing came from the inherited v3 preflight (`slices/w2-c-1202-1327/preflight.md`),
+and this run propagated it into the W2-C brief, the group table, and the closure manifest **without
+reading the issue body**. That is the carried-in-plans-as-ground-truth pitfall, and it cost a p1
+issue its path to closure across two orchestrators.
+
+`gh issue view 1202` shows exactly four acceptance rows, none observational, none naming Windows, a
+colliding service, port 3001, or three consecutive passes:
+
+1. On a fresh scaffold the `users` service's Prisma endpoint matches the live Postgres allocation —
+   health probe green on the first AppHost start, on a clean `scaffold.runtime` one-pass.
+2. Whatever caches/persists the stale endpoint (appsettings write-back, run-manifest, generated env)
+   is identified, and the stale-write path has a **RED-first** test.
+3. A second consecutive AppHost start (fresh allocation, same scaffold) stays green — the
+   re-allocation case is the trigger surface.
+4. Verified artefact-first per the owner's standing bar: health JSON plus OTEL evidence, not exit
+   codes.
+
+The issue mentions `http://localhost:3001/health → 503` only as one of **three disagreeing service
+instances** in the original reproduction. It is a symptom in a log line, not a diagnosis, and
+nothing in the issue attributes it to a Windows service.
+
+**Independent measurement taken 2026-08-09 on the owner's machine**, which is what should have
+happened before the framing was inherited:
+
+- No WSL listener on ports 3000–3009.
+- `Get-NetTCPConnection -LocalPort 3001` returns nothing on the Windows side.
+- `netsh interface ipv4 show excludedportrange protocol=tcp` reserves `80`, `5357`, `5985` and
+  `50000-50059`. **No excluded range covers 3001.**
+- A pristine scaffold pins no host port at all: `pristine-scaffold-ports_test.ts` is the #952
+  regression guard asserting exactly that, and the only remaining `3001` in the scaffold tree is a
+  test-support fixture.
+
+So the collision the preflight required someone to observe is not present, is not reserved, and — on
+current `main` — has no fixed-port default left to collide with. It cannot be identified because it
+is not the defect. The defect is the one the issue names and W2-C is building against: endpoint
+wiring that goes **stale across AppHost allocations**.
+
+**Consequence.** W2-C's PR may carry `Closes #1202` once its four evidence gates
+(`database.migration-artifacts`, both `runtime.capture-db-allocation-*`,
+`behavior.live-db-endpoint`) execute and pass in a granted runtime run, and its RED-first
+stale-write test satisfies row 2. Rows 1, 3 and 4 map onto the two-allocation capture and the
+live-endpoint receipt it already built; row 2 maps onto its stale/persisted-endpoint RED tests. The
+lane was briefed to the opposite and must be re-steered.
