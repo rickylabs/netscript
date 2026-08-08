@@ -56,4 +56,10 @@ the supervisor must not launch its own evaluator session.
 | --- | --- | ---: | --- |
 | Baseline | direct git status/revision | 0 | clean; HEAD equals `origin/main` at `c383b2e84` |
 | Issues | live `gh issue view` for #1202/#1327 | 0 | acceptance and partial-close boundary reverified |
+| RED | `deno test --no-lock --allow-all packages/database/tests/migrate-artifacts_test.ts packages/cli/src/kernel/templates/aspire/pristine-scaffold-ports_test.ts` | 1 | expected TS2305: `runMigrationWithArtifacts` contract is not implemented |
 
+## Slice 1 reconcile
+
+- #1327 remains open with all acceptance rows unchecked; draft PR #1393 carries `Closes #1327`.
+- #1202 remains open and is referenced only. Its owner-observational rows are not claimed.
+- No new review/evaluator comments were present at slice start.

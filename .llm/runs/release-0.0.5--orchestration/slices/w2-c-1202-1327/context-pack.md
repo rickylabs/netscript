@@ -2,14 +2,14 @@
 
 ## Current phase
 
-Plan/design locked; implementation not started.
+RED contract slice landed; migration artifact implementation is next.
 
 ## Identity
 
 - Worktree: `/home/codex/repos/ns005-w2c`
 - Branch: `fix/cli-db-live-endpoint-and-migrate-artifact`
 - Base: `origin/main@c383b2e84`
-- Draft PR: pending first commit
+- Draft PR: #1393
 - Evaluator: orchestrator-launched separate Claude/Fable session per current supervisor prompt
 
 ## Locked boundary
@@ -25,4 +25,3 @@ Plan/design locked; implementation not started.
   injection across two allocations.
 - `runMigration` currently switches to `migrate deploy` whenever a database URI exists, producing
   #1327's false green despite a separate `db deploy` verb.
-

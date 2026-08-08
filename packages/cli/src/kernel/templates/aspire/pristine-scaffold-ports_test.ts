@@ -64,6 +64,25 @@ describe('pristine scaffold host ports (#952)', () => {
     assert(output.includes(".withHttpEndpoint({ env: 'PORT' })"));
   });
 
+  it('resolves the database resource afresh instead of persisting an allocated endpoint (#1202)', () => {
+    const config = pristineConfig();
+    const firstAllocation = 'postgres://localhost:50101/alpha';
+    const secondAllocation = 'postgres://localhost:50202/alpha';
+    const output = generateRegisterServices({
+      services: config.Services,
+      version: config.Version,
+      denoDefaults: DENO_DEFAULTS,
+      databaseEngine: 'Postgres',
+    });
+
+    assert(output.includes("resource.withEnvironment('DATABASE_URL', infrastructure.primaryDatabase)"));
+    assert(output.includes('.withReference(infrastructure.primaryDatabase)'));
+    assert(output.includes('.waitFor(infrastructure.primaryDatabase)'));
+    assert(!output.includes(firstAllocation));
+    assert(!output.includes(secondAllocation));
+    assert(!output.includes("getEndpoint('tcp')"));
+  });
+
   it('should generate an app registration that pins nothing but still serves HTTP', () => {
     const config = pristineConfig();
     const output = generateRegisterApps({
