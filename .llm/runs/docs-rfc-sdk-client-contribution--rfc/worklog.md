@@ -195,6 +195,7 @@ considered complete.
 | 2026-08-08 | 5     | remediation commit | Committed the RFC, in-tree type fixture, and author-owned harness correction as `78a7cecd1d5eaafa7a65bc25a21af497567128dc`.                                                                                                             |
 | 2026-08-08 | 5     | handoff push       | Committed handoff evidence as `bc955459046c19a31fe00195b32f37f25a04e24f` and pushed only with `HEAD:refs/heads/docs/rfc-sdk-client-contribution`; remote advanced from `f1a29fe1a` to `bc9554590`.                                      |
 | 2026-08-08 | 5     | PR reconciliation  | Replaced the stale body with cycle-1 corrections/evidence; preserved draft/main and #1348 reference-only; restored all required labels with exactly one lifecycle `status:plan-eval`; milestone remains null.                           |
+| 2026-08-08 | 5     | aggregate hygiene  | Base-to-HEAD `git diff --check` exposed one trailing blank line in the original run `implement.md`; removed it so the complete RFC branch diff, not only this slice, passes.                                                            |
 
 ## Decisions
 
@@ -265,6 +266,7 @@ considered complete.
 | Cycle-1 repository docs | `deno task docs:links`; `deno task docs:accuracy`                                                | PASS, 102 docs/0 broken; accuracy PASS                                                                             |
 | Cycle-1 doctrine        | `deno task arch:check`                                                                           | PASS, exit 0; warning-only dependency/doctrine baseline unchanged                                                  |
 | Cycle-1 diff hygiene    | `git diff --check`                                                                               | PASS                                                                                                               |
+| Cycle-1 aggregate diff  | `git diff --check origin/main...HEAD` after bootstrap-artifact whitespace correction             | PASS                                                                                                               |
 | Cycle-1 review threads  | `deno task agentic:review-threads -- --repo rickylabs/netscript --pr 1390 --pretty`              | PASS, 0 total / 0 unanswered                                                                                       |
 | Cycle-1 PR metadata     | live `gh pr view 1390`                                                                           | PASS, draft/main, required labels, exactly one `status:plan-eval`, milestone null, #1348 reference only            |
 | Cycle-1 explicit push   | `git push origin HEAD:refs/heads/docs/rfc-sdk-client-contribution`                               | PASS, `f1a29fe1a..bc9554590`                                                                                       |

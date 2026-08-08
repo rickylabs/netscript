@@ -9,21 +9,27 @@ permissions. Do not create a rival session or delegate the core RFC authorship.
 
 ## SKILL
 
-- `netscript-harness` — activate the full harness and RFC/docs design run; maintain every mandatory run artifact.
-- `netscript-doctrine` — evaluate the proposed public SDK/plugin extension seam against axioms, extension-axis law, layering, anti-patterns, and debt.
-- `netscript-pr` — open and maintain a draft RFC PR to `main`, with correct labels, phase comments, and no premature merge/closure.
+- `netscript-harness` — activate the full harness and RFC/docs design run; maintain every mandatory
+  run artifact.
+- `netscript-doctrine` — evaluate the proposed public SDK/plugin extension seam against axioms,
+  extension-axis law, layering, anti-patterns, and debt.
+- `netscript-pr` — open and maintain a draft RFC PR to `main`, with correct labels, phase comments,
+  and no premature merge/closure.
 - `netscript-tools` — use repo-native validation and compact evidence tooling.
-- `netscript-deno-toolchain` — inspect current public APIs through `deno doc` and native dependency/package tools rather than assumptions.
+- `netscript-deno-toolchain` — inspect current public APIs through `deno doc` and native
+  dependency/package tools rather than assumptions.
 - `jsr-audit` — assess export and publish-surface consequences of the proposed SDK seam.
 - `rtk` — reduce read-heavy command output without changing semantics.
-- `codex-wsl-remote` — preserve the daemon-attached, mobile-visible session and explicit-refspec push safety.
+- `codex-wsl-remote` — preserve the daemon-attached, mobile-visible session and explicit-refspec
+  push safety.
 
 ## Objective
 
 Turn Claude Fable 5's RFC-A proposal into the actual lightweight RFC required by `rfcs/README.md`.
 The input is a starting proposal, not ground truth:
 
-- proposal: `/home/codex/repos/netscript-fable5-remediation-plan/.llm/runs/plan-fable5-remediation-roadmap--seed/fable-5-remediation-plan/rfcs/RFC-A-sdk-client-composition.md`
+- proposal:
+  `/home/codex/repos/netscript-fable5-remediation-plan/.llm/runs/plan-fable5-remediation-roadmap--seed/fable-5-remediation-plan/rfcs/RFC-A-sdk-client-composition.md`
 - tracking issue: `#1348`
 - related filed issues: `#1349`–`#1353`, plus live dependencies named by the proposal
 - source roadmap PR: `#1347`
@@ -46,18 +52,18 @@ unhidden or composed.
    plan gate, and evaluator protocol completely.
 2. Produce `rfcs/0000-sdk-client-contributions.md` from `rfcs/0000-template.md`, keeping `0000`
    until maintainer acceptance. The RFC must be decision-complete enough to implement: motivation,
-   terminology, exact public/type-level surface with realistic examples, invariants, composition
-   and ordering law, security/privacy and redaction, compatibility/migration, rejected alternatives,
+   terminology, exact public/type-level surface with realistic examples, invariants, composition and
+   ordering law, security/privacy and redaction, compatibility/migration, rejected alternatives,
    unresolved questions safe for FCP, staged implementation plan, conformance/fitness gates,
    docs/scaffold implications, and issue/epic decomposition.
 3. Treat Claude's prose as a design pack to challenge. Cite repository paths/symbols and primary
    upstream sources where relevant. Use focused type probes or non-product scratch proofs when they
    materially validate inference/ergonomics; do not implement framework code in this RFC PR.
 4. Make an initial harness/bootstrap commit, push only with an explicit refspec, and open a draft PR
-   against `main` in the same session. The PR must reference `#1348` without closing it, carry `rfc`,
-   `type:docs`, `area:sdk`, `area:plugins`, `priority:p1`, `ci:skip-e2e`, `ci:skip-scaffold`, and
-   exactly one lifecycle status. Move it to `status:plan-eval` only when the RFC is ready for Fable
-   review. Never assign an RFC number, merge, create/close issues, or mutate milestones.
+   against `main` in the same session. The PR must reference `#1348` without closing it, carry
+   `rfc`, `type:docs`, `area:sdk`, `area:plugins`, `priority:p1`, `ci:skip-e2e`, `ci:skip-scaffold`,
+   and exactly one lifecycle status. Move it to `status:plan-eval` only when the RFC is ready for
+   Fable review. Never assign an RFC number, merge, create/close issues, or mutate milestones.
 5. Commit in coherent slices with run-artifact updates and PR phase comments. Run the docs/RFC gates
    that actually apply and record exact evidence. Do not trigger PLAN-EVAL/IMPL-EVAL yourself: the
    root orchestrator will steer the existing Claude Fable 5 session for the cross-RFC review, then
@@ -70,4 +76,3 @@ Quality bar: this must be a real architecture RFC that a maintainer can ratify a
 can execute without guessing—not a lightly edited copy of Claude's draft. Preserve NetScript's
 mission: maximum end-to-end type safety, thin composable seams, generated ergonomics, plugin-owned
 extensions, observable failure, and no hidden magic.
-

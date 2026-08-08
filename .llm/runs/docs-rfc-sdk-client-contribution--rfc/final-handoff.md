@@ -62,7 +62,7 @@ implementation, and upstream-major-neutral public/generated RFC-A declarations.
 | Focused RFC links              | PASS — 1 document, 0 broken links/anchors                                                                                |
 | Repository docs links/accuracy | PASS — 102 documents/0 broken; accuracy PASS                                                                             |
 | Doctrine                       | PASS — `deno task arch:check` exit 0; warning-only baseline unchanged                                                    |
-| Diff hygiene                   | PASS — `git diff --check`                                                                                                |
+| Diff hygiene                   | PASS — working-tree and aggregate `origin/main...HEAD`; one original `implement.md` trailing blank corrected             |
 | Review threads                 | PASS — 0 total / 0 unanswered                                                                                            |
 | Git/PR metadata                | PASS — explicit-refspec push; draft/main; required labels; sole `status:plan-eval`; milestone null; #1348 reference only |
 
