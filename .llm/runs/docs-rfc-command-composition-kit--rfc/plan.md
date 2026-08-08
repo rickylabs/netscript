@@ -6,7 +6,7 @@
 | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------- |
 | Run ID                   | `docs-rfc-command-composition-kit--rfc`                                                                                      |
 | Branch                   | `docs/rfc-command-composition-kit`                                                                                           |
-| Phase                    | `plan-eval-remediation-cycle-1`                                                                                              |
+| Phase                    | `plan-eval-ready-cycle-2`                                                                                                    |
 | Target                   | `rfcs/0000-command-composition-kit.md` plus harness evidence                                                                 |
 | Delivery profile         | `SCOPE-docs` with `SCOPE-service` consumer analysis                                                                          |
 | Described implementation | A4 contracts/service DSL, A2 database/telemetry adapters, A3 runtime discipline, A5 thin plugin consumers, A6 CLI generators |
@@ -238,6 +238,7 @@ labels.
 | Are consumers and gates identified?               | Yes; services, contracts, DB adapters, telemetry, workers/sagas, CLI/scaffold.                                                    |
 | Are open questions non-blocking to drafting?      | Yes; idempotency default, SQLite release timing, correlation telemetry, retention durations are isolated FCP policy choices.      |
 
-Cycle-1 `FAIL_PLAN` is not self-overridden. After the RFC/artifacts/gates/commit/PR metadata are
-reconciled, this plan returns to `status:plan-eval` for the root orchestrator to steer the existing
-Fable session through cycle 2. This author does not launch or approve that evaluation.
+Cycle-1 `FAIL_PLAN` is not self-overridden. F-B1–F-B7 and every Required-for-PASS item are now
+addressed in the authored plan/RFC and the remediation gates are green. The draft returns to
+`status:plan-eval` for the root orchestrator to steer the existing Fable session through cycle 2.
+This author does not launch or approve that evaluation.

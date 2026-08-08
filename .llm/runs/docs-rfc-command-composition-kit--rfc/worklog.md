@@ -104,6 +104,9 @@ capabilities.
 | 2026-08-08 | S4    | provider verification  | Re-read doctrine/harness authority; checked queue runtime DDL/lease semantics, service/database dependencies, MySQL isolation, telemetry/worker vocabulary, current CLI `db` help, and primary lock docs.    |
 | 2026-08-08 | S4    | Prisma type probe      | Generated a temporary Prisma 7.8 client, confirmed `Prisma.TransactionClient`, found current deny-list retains `$transaction`, locked the generator-owned explicit `Omit`, and removed the probe.            |
 | 2026-08-08 | S4    | RFC remediation        | Added normative PostgreSQL/MySQL/SQL Server receipt claims/timeouts, relay ownership, queue rejection/reconciliation, identity drift laws, MySQL/SQLite truth, generated typing, and F-B7 batch corrections. |
+| 2026-08-08 | S4    | remediation publish    | Committed `c98c08adabbd992a557ff7c596deae68b9c9cd62`, pushed only as `HEAD:refs/heads/docs/rfc-command-composition-kit`, and posted a non-verdict `[PHASE: PLAN]` remediation comment.                       |
+| 2026-08-08 | S4    | remediation gates      | Scoped authored-Markdown format, 17-claim RFC assertion, public-entrypoint Deno check, docs links/accuracy, diff/lock hygiene, review threads, and PR checks passed.                                         |
+| 2026-08-08 | S4    | cycle-2 handoff        | Reconciled plan/context/final handoff for root-steered re-evaluation; no evaluator was launched and cycle-1 `FAIL_PLAN` remains authoritative until Fable reports cycle 2.                                   |
 
 ## Decisions
 
@@ -139,21 +142,23 @@ capabilities.
 
 ### Static Gates
 
-| Gate                           | Command or check                                                           | Result               | Notes                                                                                                |
-| ------------------------------ | -------------------------------------------------------------------------- | -------------------- | ---------------------------------------------------------------------------------------------------- |
-| Branch/base identity           | raw git `rev-parse`, `merge-base`, `status`                                | PASS                 | Branch and base exactly match the brief.                                                             |
-| Mandatory authority read       | complete file reads                                                        | PASS                 | RFC process, doctrine, gate/evaluator files and selected profiles read before RFC authoring.         |
-| Native public API inspection   | `deno doc --filter` on database, service, SDK, telemetry, workers and oRPC | PASS                 | Exact current signatures and missing subpaths recorded in research.                                  |
-| Focused transaction type probe | `deno check --unstable-kv packages/database/rfc-command-probe.ts`          | EXPECTED_FAIL_MISSED | Exit 0 proves the callback surface is too broad; temporary probe removed.                            |
-| Focused typed-error probe      | `deno check --unstable-kv packages/sdk/rfc-command-probe.ts`               | EXPECTED_FAIL        | Exit 1 with TS2339 on `error.code`; temporary probe removed.                                         |
-| Focused RFC type-shape probe   | `deno check --unstable-kv packages/service/rfc-command-contract-probe.ts`  | PASS_AFTER_FINDING   | First run found missing service Standard Schema mapping; direct locked import passed; probe removed. |
-| Markdown format                | `deno fmt --check rfcs/... .llm/runs/...`                                  | PASS                 | 10 owned Markdown files checked.                                                                     |
-| Diff hygiene                   | `git diff --check` and changed-file audit                                  | PASS                 | Only the RFC and required run directory differ from the pinned base; no lock/product change.         |
-| Docs links                     | `rtk proxy deno task docs:links`                                           | PASS                 | 102 docs; 0 broken links, 0 broken anchors, 0 orphans.                                               |
-| Docs accuracy                  | `rtk proxy deno task docs:accuracy`                                        | PASS                 | Saga/storefront/path/CLI/Fresh accuracy checks passed.                                               |
-| RFC structure/terminology      | focused `deno eval` frontmatter/section/forbidden-term assertion           | PASS                 | Draft/0000/#1361 and all required sections present; forbidden domain vocabulary absent.              |
-| PR review threads              | `rtk proxy deno task agentic:review-threads -- ... --pr 1389 --pretty`     | PASS                 | 0 threads; 0 unanswered.                                                                             |
-| PR checks                      | `rtk proxy deno task agentic:pr-checks -- ... --pr 1389 --pretty`          | PASS                 | 15 reconciled checks; 0 current failures; docs-only CI lanes skipped under explicit labels.          |
+| Gate                           | Command or check                                                                    | Result               | Notes                                                                                                           |
+| ------------------------------ | ----------------------------------------------------------------------------------- | -------------------- | --------------------------------------------------------------------------------------------------------------- |
+| Branch/base identity           | raw git `rev-parse`, `merge-base`, `status`                                         | PASS                 | Branch and base exactly match the brief.                                                                        |
+| Mandatory authority read       | complete file reads                                                                 | PASS                 | RFC process, doctrine, gate/evaluator files and selected profiles read before RFC authoring.                    |
+| Native public API inspection   | `deno doc --filter` on database, service, SDK, telemetry, workers and oRPC          | PASS                 | Exact current signatures and missing subpaths recorded in research.                                             |
+| Focused transaction type probe | `deno check --unstable-kv packages/database/rfc-command-probe.ts`                   | EXPECTED_FAIL_MISSED | Exit 0 proves the callback surface is too broad; temporary probe removed.                                       |
+| Focused typed-error probe      | `deno check --unstable-kv packages/sdk/rfc-command-probe.ts`                        | EXPECTED_FAIL        | Exit 1 with TS2339 on `error.code`; temporary probe removed.                                                    |
+| Focused RFC type-shape probe   | `deno check --unstable-kv packages/service/rfc-command-contract-probe.ts`           | PASS_AFTER_FINDING   | First run found missing service Standard Schema mapping; direct locked import passed; probe removed.            |
+| Focused Prisma generated type  | temporary Prisma 7.8 generate/check probe                                           | PASS                 | Confirmed generated `Prisma.TransactionClient`; current deny-list retains nested `$transaction`; probe removed. |
+| Current public entrypoint type | `deno check --no-lock --unstable-kv` over database/service/contracts/telemetry mods | PASS                 | Existing peer/build-script warnings only; no lock mutation.                                                     |
+| Markdown format                | scoped `deno fmt --check` over authored RFC/remediation/handoff Markdown            | PASS                 | Generated launcher metadata retained in launcher-emitted form and audited separately.                           |
+| Diff hygiene                   | `git diff --check` and changed-file audit                                           | PASS                 | Only the RFC and required run directory differ from the pinned base; no lock/product change.                    |
+| Docs links                     | `rtk proxy deno task docs:links`                                                    | PASS                 | 102 docs; 0 broken links, 0 broken anchors, 0 orphans.                                                          |
+| Docs accuracy                  | `rtk proxy deno task docs:accuracy`                                                 | PASS                 | Saga/storefront/path/CLI/Fresh accuracy checks passed.                                                          |
+| RFC structure/terminology      | focused `deno eval` frontmatter/section/forbidden-term assertion                    | PASS                 | Draft/0000/#1361 and all required sections present; forbidden domain vocabulary absent.                         |
+| PR review threads              | `rtk proxy deno task agentic:review-threads -- ... --pr 1389 --pretty`              | PASS                 | 0 threads; 0 unanswered.                                                                                        |
+| PR checks                      | `rtk proxy deno task agentic:pr-checks -- ... --pr 1389 --pretty`                   | PASS                 | At `c98c08ada`: 15 reconciled checks; 0 current failures; docs-only CI lanes skipped.                           |
 
 ### Fitness Gates
 

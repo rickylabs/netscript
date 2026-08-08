@@ -6,19 +6,19 @@
 | -------------- | --------------------------------------------------------------- |
 | Run ID         | `docs-rfc-command-composition-kit--rfc`                         |
 | Branch         | `docs/rfc-command-composition-kit`                              |
-| Current phase  | `plan-eval-remediation-cycle-1`                                 |
+| Current phase  | `plan-eval-ready-cycle-2`                                       |
 | Archetype      | Docs delivery describing A4/A2/A3/A5/A6 implementation surfaces |
 | Scope overlays | `SCOPE-docs`, `SCOPE-service`                                   |
 
 ## Current State
 
-The run is active on the exact requested branch/base in the sole daemon-attached Codex thread. Draft
-PR #1389 remains open and draft. Fable PLAN-EVAL cycle 1 is preserved at evaluator commit
-`122301d25` with authoritative `FAIL_PLAN` findings F-B1–F-B7. This authoring turn is remediating
-those findings without launching or approving evaluation. The RFC now locks provider receipt-claim
-and timeout algorithms, the service → database relay split, queue non-reuse/runtime-DDL
-reconciliation, identity-drift behavior, MySQL/SQLite capability truth, generated transaction
-typing, and the batch corrections. No product code or export changed.
+The run remains on the requested branch/base in the sole daemon-attached Codex thread. Draft PR
+#1389 is open, draft, and ready for root-steered PLAN-EVAL cycle 2. Fable cycle 1 remains preserved
+at evaluator commit `122301d25` with its authoritative `FAIL_PLAN`; no author verdict overrides it.
+RFC remediation content commit `c98c08ada` resolves F-B1–F-B7 by locking provider claims/timeouts,
+the service → database relay split, queue non-reuse/runtime-DDL reconciliation, identity drift,
+MySQL/SQLite capability truth, generated transaction typing, and the correction batch. Proportionate
+format/type/link/diff/PR gates are green. No product code or export changed.
 
 ## Completed
 
@@ -42,19 +42,22 @@ typing, and the batch corrections. No product code or export changed.
   type, and primary provider-lock surfaces for F-B1–F-B7.
 - Reconciled the plan's open-decision sweep so no provider/package/migration/generator choice is
   silently deferred.
+- Committed and pushed the RFC remediation slice as `c98c08adabbd992a557ff7c596deae68b9c9cd62` using
+  the required explicit refspec.
+- Passed scoped format, RFC assertion, current public-entrypoint Deno check, docs links/accuracy,
+  diff/lock hygiene, review-thread, and PR-check reconciliation for the remediation content.
 
-## In Progress
+## Ready Handoff
 
-- Proportionate remediation validation, commit/push, PR phase comment/body/label reconciliation, and
-  exact cycle-2 handoff.
+- The final evidence commit, PR body, exact `status:plan-eval` label, and non-verdict phase comment
+  are reconciled by the closing commands of this authoring turn. The exact resulting branch HEAD is
+  carried in that PR comment and the root response.
 
 ## Next Steps
 
-1. Run scoped Markdown/RFC/link/type/diff checks and record exact results.
-2. Commit and push only `HEAD:refs/heads/docs/rfc-command-composition-kit`.
-3. Keep the PR draft, restore exactly `status:plan-eval`, and post the remediation phase comment.
-4. Root orchestrator steers the existing Fable session using `final-handoff.md`; this generator does
-   not launch or self-certify cycle 2.
+1. Root orchestrator resumes the existing Fable session with the exact prompt in `final-handoff.md`.
+2. Fable records the formal cycle-2 verdict without changing the authored RFC.
+3. The later independent Qwen adversarial pass remains root-owned; this generator launches neither.
 
 ## Key Decisions
 
