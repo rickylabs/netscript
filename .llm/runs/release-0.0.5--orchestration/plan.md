@@ -194,13 +194,13 @@ taxonomy/milestone; they do not expand an active PR silently.
 
 ## Post-C14 owner correction — authoritative continuation plan
 
-This section supersedes the earlier train-target, W1-before-C14, always-PLAN-EVAL, Qwen-default,
-and OpenHands statements above. Canary.14 is released and verified. From the first post-C14
+This section supersedes the earlier train-target, W1-before-C14, always-PLAN-EVAL, Qwen-default, and
+OpenHands statements above. Canary.14 is released and verified. From the first post-C14
 implementation onward:
 
 - Each meaningful, tightly connected issue cluster owns one draft PR directly against `main`, with
-  an independent CI/review lifecycle. The orchestrator branch is coordination history only, never
-  a code aggregation target.
+  an independent CI/review lifecycle. The orchestrator branch is coordination history only, never a
+  code aggregation target.
 - W1 is the first canary.15 dependency group: W1-A (#1312 + #1148), W1-B (#1024 + #1328), and W1-C
   (#1324 + #1330) remain separate direct-to-main PRs. Billing Run waits for canary.15 because
   canary.14 does not publish W1-B's consumer tooling/quality surface or W1-C's OpenCode MCP attach
@@ -214,3 +214,125 @@ implementation onward:
 
 Exact first action after `/clear`: fetch and re-query `origin/main` plus #1312/#1148, then open the
 W1-A direct-to-main draft PR from a fresh clean worktree; do not implement Billing Run yet.
+
+---
+
+# Wave plan v4 — stable-cut continuation (2026-08-08)
+
+Supersedes v3's remaining wave schedule (W2 onward). Everything v3 records as landed stands; this
+section re-baselines the _undispatched_ remainder against live `origin/main` and adds the strict
+0.0.6/0.0.7 pull-forward sweep required before the plan is frozen.
+
+## Re-baseline
+
+| Fact                              | Value                                                                                                                                                                                                                           |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Baseline                          | `origin/main@6c6044da9` (`chore(agentic): refresh native model routing`, #1391)                                                                                                                                                 |
+| Latest published canary           | `0.0.5-canary.16`, release commit `94feaea3b`, source `fac9e3390`                                                                                                                                                               |
+| Canary.16 pair                    | publish [31201279314](https://github.com/rickylabs/netscript/actions/runs/31201279314) + pinned E2E [31201560939](https://github.com/rickylabs/netscript/actions/runs/31201560939), both success; `release/canary-pair` success |
+| Unshipped on main since canary.16 | exactly one merge: #1391 (`6c6044da9`)                                                                                                                                                                                          |
+| Open 0.0.5 issues                 | 21                                                                                                                                                                                                                              |
+| Open 0.0.5 PRs                    | #1337 only (superseded orchestration artifact PR)                                                                                                                                                                               |
+| Landed since v3 froze             | W1-A #1341 (#1312/#1148), W1-B #1342 (#1024/#1328), W1-C #1344 (#1324/#1330), canary.15 repair #1346 (#1345), routing refresh #1391                                                                                             |
+
+## Strict 0.0.6 / 0.0.7 pull-forward sweep
+
+One sweep, performed 2026-08-08 over all 32 open 0.0.6 and 12 open 0.0.7 issues. Test applied:
+**critical AND bounded AND low-risk AND directly repairs a public surface the stable release depends
+on.** Every candidate examined is dispositioned below; silence is not a disposition.
+
+### Pulled forward into 0.0.5 (5)
+
+| Issue      | From  | Why it crosses the bar                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | Lands in |
+| ---------- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------- |
+| #1373 (p0) | 0.0.6 | The golden path is the stable release's core promise and it is unfollowable: the quickstart's closing instruction sends a first-time reader to `apps/<app>/client.ts`, which is the Fresh **CSS entry**; `lib/api-clients.ts` is taught on 10 published pages and written by no generator; two incompatible query dialects are each taught as "the" spine; `service add <name> --with-client` emits `exampleService*` symbols for every service. Its own Boundaries clause scopes it away from restructuring the default app, so it is bounded to docs + one template + a CLI test + two negative gates. Largest of the five — recorded as such. | W5-A     |
+| #1356 (p1) | 0.0.7 | Every `ui:*` command resolves the **workspace** root while `init` installs the registry into `apps/<app>/`, so the advertised UI surface writes outside the Fresh app; the published how-to documents an `--app` flag that does not exist; the repo's own E2E gate asserts the wrong root, so CI is green _because_ it encodes the defect. Bounded: one shared app-root resolver, `--app` on five commands, fix the gate.                                                                                                                                                                                                                        | W4-B     |
+| #1375 (p1) | 0.0.6 | `agent init --with-docs` installs a docs bundle that the `.mcp.json` it emits cannot reach — no `--docs-root`, no probe — leaving `search_docs` at two documents. This is the _mechanism_ under retained #1197/#1102; without it those two measure a structurally broken surface. Bounded to `writeHostConfig` + a probe + tests.                                                                                                                                                                                                                                                                                                                | W3-B     |
+| #1376 (p1) | 0.0.6 | `execute_command` in the CLI-hosted MCP server spawns `jsr:@netscript/cli@<MCP version>` instead of re-entering the host CLI, and reports `version: "current"`, so an agent scaffolds from a different binary than the one it documents. Published-package correctness on the same surface as #1375.                                                                                                                                                                                                                                                                                                                                             | W3-B     |
+| #1359 (p1) | 0.0.7 | Generated `appRoutes.crudExample` aliases `serviceExample`, so both example cards navigate away from the CRUD page the scaffold also emits, and a template test asserts the alias verbatim. One template line, one test, one structural check — and it sits inside #1333's surface.                                                                                                                                                                                                                                                                                                                                                              | W4-A     |
+
+### Rejected — stay in their milestone (rationale recorded)
+
+| Issue                                                                                                                                              | Rejection rationale                                                                                                                                                                                                                                       |
+| -------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| #1357 (0.0.7, p1)                                                                                                                                  | Its own target contract calls it "the minimal composable core of the #1354 slice". Making `ui:add page --island` emit a real data screen is a **feature** gated on the #1354/#1355 SDK generator design; not quick, not bounded.                          |
+| #1358 (0.0.7, p1)                                                                                                                                  | Gallery lists 50 of 66 registry items. Real, but it needs a registry↔gallery conformance gate that does not exist; not a one-line repair, and not on the golden path.                                                                                     |
+| #1360 (0.0.7, p2)                                                                                                                                  | `initialDataUpdatedAt` depends on #1357's triad. p2.                                                                                                                                                                                                      |
+| #1349–#1355, #1361 (0.0.7)                                                                                                                         | The SDK contribution-chain program, still at RFC/review status (#1348, #1361, draft PRs #1389/#1390). Architectural; explicitly out.                                                                                                                      |
+| #1379 (0.0.6, p1)                                                                                                                                  | Turning root check/lint on for the excluded `packages/fresh-ui` is unbounded — the error count is unknown until it runs, and it overlaps the #1278 type-soundness umbrella.                                                                               |
+| #1378, #1374 (0.0.6, p1)                                                                                                                           | Gate/tooling improvements (`quality:scan` blind spots; `docs:accuracy` is a needle checker). They improve _how we check_, not the shipped surface. #1373's negative gates are implemented on the existing needle infrastructure and do not wait on #1374. |
+| #1377, #1380 (0.0.6, p2)                                                                                                                           | Reference-page IA and doctrine verdict-table drift. Docs debt, not a release blocker.                                                                                                                                                                     |
+| #1343 (0.0.6, p1)                                                                                                                                  | Deliberately deferred at the canary.16 recovery as an _installed-consumer observation_ against a post-fix canary. Correctly placed; closing it needs a canary that does not exist yet.                                                                    |
+| #1373-adjacent #1335                                                                                                                               | Repo-wide generated-surface conformance sweep — out by #1373's own boundary.                                                                                                                                                                              |
+| #1306, #1296, #1293, #1280, #1278, #1263, #1262, #1260, #1246, #1243, #1210, #1201, #1163, #1175, #1140, #1139, #1112, #1093, #1085, #1320 (0.0.6) | p2/p3 hardening, blocked-on-upstream, new-capability, or verification rows with no stable-release dependency. #1163 (verify: 0.0.5 runs on the orchestrator profile) is observational on _this_ run and belongs in 0.0.6 by construction.                 |
+
+**Scope after the sweep: 26 issues** — 21 retained + 5 pulled forward. No 0.0.5 issue is moved out
+by this plan.
+
+## Frozen groups and dependency order
+
+One draft PR per group, **direct to `main`**, independent CI/review lifecycle. The orchestrator
+branch is coordination history only. Max three active supervisors per wave.
+
+| Group    | Issues                                   | Proves                                                                                                                                                                                                   | Route                            | Depends on                                            |
+| -------- | ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------- | ----------------------------------------------------- |
+| **W2-A** | #1325                                    | Generated triggers background runtime registers the configured KV adapter and reaches real health on both Redis/Garnet and Deno KV                                                                       | Sol low                          | —                                                     |
+| **W2-B** | #1329                                    | One exported versioned SSE event envelope governs server, Fresh consumer, docs, offsets and trace context                                                                                                | Sol medium                       | —                                                     |
+| **W2-C** | #1202 + #1327                            | Scaffolded DB binds the live Postgres endpoint, and `db migrate` success proves a created/applied artifact in TTY **and** headless modes                                                                 | Sol low                          | —                                                     |
+| **W3-A** | #1326                                    | `DurableStreamProducer` has bounded reconnect / readiness / buffer / shutdown semantics on W2-B's envelope                                                                                               | Sol medium                       | W2-B                                                  |
+| **W3-B** | #1102 + #1197 + #1375 + #1376            | The agent MCP surface is reachable and honest: emitted config finds the installed corpus, `execute_command` re-enters the host CLI at its real version, and intent-aware discovery is measurably adopted | Sol medium                       | —                                                     |
+| **W3-C** | #1119                                    | AI-rollout "canary" vocabulary no longer collides with release canaries                                                                                                                                  | Sol low                          | —                                                     |
+| **C17**  | —                                        | Canary publish + pinned production E2E green pair                                                                                                                                                        | orchestrator                     | W2, W3                                                |
+| **W4-A** | #1333 + #1359                            | Default scaffolded app is project-named, idiomatic, and every generated link reaches the page it names                                                                                                   | Sol medium + GLM 5.2 design pass | C17                                                   |
+| **W4-B** | #1356                                    | `ui:*` resolves an **app** root, `--app` exists on every `ui:*` command, and the E2E gate asserts the app-relative paths                                                                                 | Sol low                          | C17                                                   |
+| **W4-C** | #1108                                    | Generated package references are mechanically checked against live export maps                                                                                                                           | Sol low                          | C17                                                   |
+| **W5-A** | #1373                                    | Exactly one data-layer module name and one query dialect on the golden path, enforced by negative gates                                                                                                  | Sol medium                       | W4-A (module-name coordination, per #1373 Boundaries) |
+| **W5-B** | #1137 + #1138                            | First-party contract summaries/tags and the agent-facing OpenAPI→MCP reference match the shipped surface                                                                                                 | Sol low                          | —                                                     |
+| **W5-C** | #1332 + #1334                            | Homepage and data docs show the generated-DB-schema → contract flow and the complete capability argument                                                                                                 | Sol low                          | —                                                     |
+| **W5-D** | #1208                                    | A runnable tutorial teaches the page builder on W4-A's reference patterns and W5-A's ratified naming                                                                                                     | Sol low                          | W4-A, W5-A                                            |
+| **C18**  | —                                        | Final canary publish + pinned production E2E green pair; **this pair is the stable-cut prerequisite for the same content**                                                                               | orchestrator                     | W4, W5                                                |
+| **F**    | #1004, #1090, #1126, #1166, #1169, #1338 | Evidence / observational / umbrella hand-closure or move-with-reason                                                                                                                                     | orchestrator                     | C17, C18                                              |
+| **Cut**  | —                                        | `release:cut 0.0.5` → `release:publish v0.0.5`                                                                                                                                                           | orchestrator                     | C18 green pair, no merge after C18                    |
+
+## Canary points — declared
+
+Two remaining boundaries, not three. **C17** at the W3 boundary and **C18** at the W5 boundary; the
+stable cut consumes C18's pair, so **no merge may land between C18 and the cut**
+(`netscript-release`: "no `release:publish` without a green canary pair for the same content").
+Membership at each point is computed from first-parent merge history by `release:canary-label`,
+never from this table — a PR that lands out of plan order is still in the payload. Canary.16's
+payload therefore already excludes #1391, which becomes the first row of C17's payload.
+
+The two owner-undecided cadence questions in `canary-cadence.md` are **not** resolved by this plan.
+This run's recorded decision: canary at every wave boundary where a boundary exists (both of them),
+and a failed canary blocks only the cut, not the next dispatch — recorded as a run decision, not
+promoted to a rule.
+
+## Lane bindings for v4
+
+Superseding v3 rows 6–7. Routes are taken from `lane-policy.md` as rendered by
+`agentic:routing-state` on 2026-08-08 — the OpenRouter formal-evaluator defaults recorded in v3
+(Minimax PLAN / Qwen→DeepSeek IMPL) are now the `open_only` **escalation**, not the default.
+
+| Purpose                                   | Route                                                                                                                                       |
+| ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| Orchestration (`planning_decisions`)      | Claude · Anthropic · Opus 5 · high (this session, `/rc` enabled)                                                                            |
+| Implementation                            | Codex · GPT-5.6 Sol · low/medium per the group table                                                                                        |
+| Ordinary adversarial review of Codex work | Fable 5 · low (Sol·medium impl) / Opus 5 · high (Sol·low impl), per the #794 pairing ladder                                                 |
+| **IMPL-EVAL** (mandatory, every group)    | Native opposite-family: **Fable 5 · medium** evaluates Codex-authored work                                                                  |
+| **IMPL-EVAL** of Claude-authored work     | Codex · GPT-5.6 Sol · xhigh                                                                                                                 |
+| PLAN-EVAL (conditional)                   | Codex · GPT-5.6 Sol · high for Claude-authored plans                                                                                        |
+| Escalation only                           | OpenRouter Minimax M3 high (PLAN) / DeepSeek V4 Flash 0731 max (IMPL) — third opinion or native quota block; then AGY Gemini 3.6 Flash high |
+| Major UI/UX (#1333)                       | GLM 5.2 · `claude-design-glm-5-2` · xhigh design pass — mandatory, not optional                                                             |
+| OpenHands                                 | paused by owner; not in this run                                                                                                            |
+
+## PLAN-EVAL decision for v4
+
+**Selected.** The v3 wave plan passed a separate Minimax M3 PLAN-EVAL, but v4 changes milestone
+scope (five pull-forwards), regroups the undispatched remainder, and reduces three declared canary
+points to two with a stable-cut coupling. That is decision-heavy and wide. Route: **Codex · GPT-5.6
+Sol · high** (opposite family — v4 is Claude-authored), separate session.
+
+W2 is dispatched **without waiting** on that verdict: W2-A/W2-B/W2-C are the three v3 clusters
+already covered by the v3 `PASS`, unchanged in scope, membership and route. Nothing v4 adds touches
+them. The pull-forward milestone moves are applied only after the v4 verdict.

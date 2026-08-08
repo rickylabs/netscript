@@ -505,11 +505,10 @@ files.
   default with `deepseek/deepseek-v4-flash-0731` at `max`; formal PLAN-EVAL remains
   `minimax/minimax-m3` at `high`. Completed valid Qwen evidence, including T1-B session
   `abe31571-0fa1-4ea4-9085-1c36ea14a5c7`, remains immutable and accepted.
-- Created scoped prerequisite issue #1338 and draft PR #1339 against
-  `canary/0.0.5-canary.14`. A dedicated Codex GPT-5.6 Sol low supervisor generated the locked
-  three-slice plan. Fresh separate Minimax session `a583f0da-69b3-4717-8271-bca95d9cd2db`
-  returned PLAN-EVAL `PASS` against exact clean planning head `258034b1f...` with bypass; cost was
-  unavailable and is not inferred as zero.
+- Created scoped prerequisite issue #1338 and draft PR #1339 against `canary/0.0.5-canary.14`. A
+  dedicated Codex GPT-5.6 Sol low supervisor generated the locked three-slice plan. Fresh separate
+  Minimax session `a583f0da-69b3-4717-8271-bca95d9cd2db` returned PLAN-EVAL `PASS` against exact
+  clean planning head `258034b1f...` with bypass; cost was unavailable and is not inferred as zero.
 - Prerequisite S1 is clean and pushed: implementation commit `22d7d980f...`, current review-launch
   head `45b099e60...`. Focused contracts passed 46/46; lockless scoped check covered 149 files in
   two green batches; scoped lint/fmt covered 149 files with zero findings. The prerequisite lock is
@@ -539,15 +538,15 @@ files.
   scan, and scope audit were green. It squash-merged into `canary/0.0.5-canary.14` as
   `10dbea37c09b815f1372a5241b60fdd5d7694652`.
 - #1338 deliberately remains open at `status:impl`: its T1-A/T1-B rows are observational and were
-  not closed by the policy PR. The PR used `Refs #1338`, preserving the no-observational-row
-  closure rule.
+  not closed by the policy PR. The PR used `Refs #1338`, preserving the no-observational-row closure
+  rule.
 - The checked-in leaf merge helper still recognizes only OpenHands status comments. Because
   OpenHands is owner-paused, its parser gate was explicitly skipped while the actual independent
   local IMPL-EVAL PASS remained mandatory and was manually verified; mergeability stayed clean and
   the exact head was pinned. This is recorded tooling drift, not an evaluation waiver.
-- T1-A remains clean at local/remote/PR head `18c7a7e791552c6f346ef07a77a741dd70b058d6`.
-  Launched one fresh local DeepSeek max evaluator against that exact repaired target through
-  checked-in `openrouter-run.ts`; OpenHands was not used and the prior Qwen session was not resumed.
+- T1-A remains clean at local/remote/PR head `18c7a7e791552c6f346ef07a77a741dd70b058d6`. Launched
+  one fresh local DeepSeek max evaluator against that exact repaired target through checked-in
+  `openrouter-run.ts`; OpenHands was not used and the prior Qwen session was not resumed.
 - T1-B Actions run `31121552268` attempt 2 remains top-level `queued` at exact current head
   `31b8982123fda57294f4f7bf438c1157a622a41c`; required downstream jobs still have no executed
   current-head green verdict. T1-B remains held and its protected lock/stash state is untouched.
@@ -556,10 +555,10 @@ files.
 
 - T1-A fresh local DeepSeek V4 Flash 0731 max evaluator session
   `d1fddd8c-12c9-4a44-9bbd-b07207d3db65` returned **PASS** against exact clean repaired head
-  `18c7a7e791552c6f346ef07a77a741dd70b058d6`, bypass, cost `$3.565048`. It independently
-  confirmed the prior Qwen blockers repaired: 19-root doc-lint 287→279, detached Fresh consumer
-  green and CI-wired, exact runtime smoke 73/73 exit 0 with cleanup, all #1295 rows supported, and
-  lock SHA-256 unchanged. Full artifact is `evaluate-repair-deepseek.md` on T1-A.
+  `18c7a7e791552c6f346ef07a77a741dd70b058d6`, bypass, cost `$3.565048`. It independently confirmed
+  the prior Qwen blockers repaired: 19-root doc-lint 287→279, detached Fresh consumer green and
+  CI-wired, exact runtime smoke 73/73 exit 0 with cleanup, all #1295 rows supported, and lock
+  SHA-256 unchanged. Full artifact is `evaluate-repair-deepseek.md` on T1-A.
 - Recorded the PASS in evidence-only head `1124897105242bcee540ed379dd7d959916b005f`, posted the
   formal phase comment, updated the PR body, and marked #1315 ready for review. It remains
   `status:impl-eval` until executed current-head Actions are green.
@@ -575,9 +574,9 @@ files.
 ## 2026-08-06/07 — C14 queue shipped and green pair verified
 
 - #1315 merged at `95a60cbaf8384f8c21e822f383dfcab6b8a8c189`; #1316 followed at
-  `51787c3aef48fd6b7fe55005dfe19cd16b141b81`; mechanically refreshed #1317 and #1318 then merged
-  at `765e8b7329bfba6d073791f5e067274349a7653e` and
-  `a5c13ecdd0df3455e5c4ce0f08fcc59dae251826`. Valid prior IMPL-EVAL PASS evidence was preserved.
+  `51787c3aef48fd6b7fe55005dfe19cd16b141b81`; mechanically refreshed #1317 and #1318 then merged at
+  `765e8b7329bfba6d073791f5e067274349a7653e` and `a5c13ecdd0df3455e5c4ce0f08fcc59dae251826`. Valid
+  prior IMPL-EVAL PASS evidence was preserved.
 - Exact-tree local pre-merge evidence for the payload passed check, lint, fmt, release preflight,
   publish dry-run, production install, live-Redis controls, and 2,937 repository tests with zero
   failures. Payload PR #1340 then squash-merged to `main` as
@@ -593,3 +592,42 @@ files.
   the first canary.15 group. Billing Run waits for W1-B/W1-C to exist in the published canary.15.
 - Only mandatory terminal artifacts were changed. Root `deno.lock` and both quarantined interrupted
   worktrees remained untouched.
+
+---
+
+## Stage A — stable-cut activation, 2026-08-08
+
+Read: `netscript-harness`, `agent-milestone-orchestrator`, `milestone-run.md`, `canary-cadence.md`,
+`lane-policy.md`, `tooling.md`, `netscript-release` prerequisites, the inherited run dir at
+`ac7a4892a`, live milestone 23, and live `origin/main`.
+
+Re-baseline verified live, not recalled:
+
+- `origin/main` = `6c6044da9` at first query; it advanced to `c383b2e84` mid-activation when #1337
+  (the inherited continuation artifact PR) and #1347 (planning-only seed roadmap) merged. This
+  branch was re-based onto `c383b2e84` before its first push, so the imported run dir is `main`'s
+  copy plus this run's v4 sections — not a second copy of the same files.
+- Latest prerelease = `v0.0.5-canary.16`, `2026-08-07T17:16:52Z`; pair recorded in
+  `canary-16-recovery-receipt.md` (publish 31201279314, pinned E2E 31201560939, both success).
+- Merges on `main` after canary.16's source `fac9e3390`: #1391 (`6c6044da9`), #1337 (`bb10be0e2`),
+  #1347 (`c383b2e84`). None touches `packages/**` or `plugins/**`; all three enter C17's payload.
+- Milestone 23 `0.0.5`: 21 open issues; 0 open PRs after #1337 merged.
+- 0.0.6 = 32 open, 0.0.7 = 12 open — both swept in full for pull-forward (plan v4).
+
+## Stage B — dispatch preconditions, 2026-08-08
+
+Recorded before any wave dispatch, per `milestone-run.md` stage B. The proof is the check output,
+not the intention.
+
+| Precondition                    | Command                            | Result                                                                                                                                                                                                                                                                                                                      |
+| ------------------------------- | ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Runtime health                  | `deno task agentic:runtime doctor` | `no_change` (schema 1.0), mode inspect, changed no; observed `foundation:0ea51506…`; components 18                                                                                                                                                                                                                          |
+| Codex daemon                    | `deno task agentic:codex-status`   | daemon `running`, managed codex `0.147.0`, app-server `0.146.1`, 3 app-server processes / 2 anchored                                                                                                                                                                                                                        |
+| Writer conflicts                | same                               | 5 Codex sessions, **all idle**, none in `/home/codex/repos/ns005-stable-opus5`; the two active-recent threads are the RFC worktrees `ns-rfc-sdk-client` / `ns-rfc-command-kit` (PRs #1389/#1390) and are not this run's                                                                                                     |
+| Paid-transport / route identity | `deno task agentic:routing-state`  | canonical native opposite-family formal routes present (`fable-5` medium evaluates openai, `gpt-5.6-sol` xhigh evaluates anthropic); OpenRouter Minimax/DeepSeek present as `policy=open_only` escalation; AGY Gemini as `fallback_on_openrouter_limit`; **no persisted routing transitions** (no silent fallback in force) |
+| GitHub transport                | `deno task agentic:gh-token check` | OK — valid token resolved from `gh:windows` (rickylabs)                                                                                                                                                                                                                                                                     |
+| Publish-side static gate        | `deno task release:preflight`      | PASS on all four checks (text-imports, import-attributes 0, file-url-import-meta 0, self-imports 0)                                                                                                                                                                                                                         |
+
+No provider quota exhaustion is in force: the v3-era OpenRouter monthly limit that blocked T1-A
+(C-D18) is not on this run's critical path, because v4's formal evaluator lane is native
+opposite-family and OpenRouter is escalation-only.
