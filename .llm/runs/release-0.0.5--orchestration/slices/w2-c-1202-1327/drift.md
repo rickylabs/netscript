@@ -52,7 +52,8 @@
 - Behavioral RED raw exit 1 after adding only the seam: the synthetic inherited-stderr getter threw
   the same `TypeError` as the runtime gate.
 - Fix: return the interactive exit code without reading stderr; retain non-interactive capture and
-  mirroring. `runCommandWithTimeout` now documents that only piped non-interactive stderr reaches it.
+  mirroring. `runCommandWithTimeout` now documents that only piped non-interactive stderr reaches
+  it.
 - Focused result: raw exit 0, 5 tests / 10 steps passed.
 
 ## 2026-08-09 — live-endpoint evidence rejects keyword connection syntax (material)
@@ -65,3 +66,14 @@
   allocation captures passed; live endpoint evidence failed.
 - Boundary: no blind retry or repair. Although the failure payload shows matching ports, it does not
   complete the required health/structured-log/OTEL proof, so #1202 acceptance remains unticked.
+
+## 2026-08-09 — live-endpoint comparison made structural (minor)
+
+- Root cause: the validator assumed both endpoint authorities were URL-shaped. Aspire emitted the
+  live resource as `postgres://host:port/db` and the users environment as the Npgsql keyword form
+  `Host=...;Port=...;Database=...`.
+- Repair: explicitly parse those two enumerated dialects, compare validated numeric ports, and name
+  the unparseable side and original value on failure. A negative mismatched-port unit test prevents
+  the evidence gate from degrading into a broad substring match.
+- Evidence boundary: focused/scoped/framework gates pass. No fourth runtime pass was attempted
+  because W2-A holds the serialized token; a new `EXPENSIVE-GATE-REQUEST` is pending.

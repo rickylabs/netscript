@@ -29,23 +29,30 @@ bind the live Postgres allocation across consecutive AppHost starts.
 - Tier-A test restoration: raw exit 0, 3/3 focused helper tests passed, including both restored
   `isNoRunningAppHostOutput` cases.
 - Repaired-selector `scaffold.runtime`: raw exit 1, `passed=33 failed=1`.
-  `database.migration-artifacts` executed and failed after creating/applying its PTY artifact because
-  the spawn adapter accessed inherited (unpiped) stderr. Both allocation gates and
+  `database.migration-artifacts` executed and failed after creating/applying its PTY artifact
+  because the spawn adapter accessed inherited (unpiped) stderr. Both allocation gates and
   `behavior.live-db-endpoint` were not reached. Cleanup passed and postflight leak evidence shows no
   W2-C-owned survivor. No retry was attempted.
 - PTY spawn repair: behavioral RED raw exit 1 reproduced the inherited-stderr getter TypeError;
   focused green raw exit 0, 5 tests / 10 steps passed. Third serialized pass granted at fixed head.
-- Third `scaffold.runtime`: raw exit 1, `passed=61 failed=1`.
-  `database.migration-artifacts` and both allocation captures passed. `behavior.live-db-endpoint`
-  failed because its validator rejected keyword syntax `Port=45103` while the live URL used the same
-  port as `:45103`; it stopped before correlated health/OTEL receipt generation. Cleanup and
-  postflight leak verification passed; no retry was attempted.
+- Third `scaffold.runtime`: raw exit 1, `passed=61 failed=1`. `database.migration-artifacts` and
+  both allocation captures passed. `behavior.live-db-endpoint` failed because its validator rejected
+  keyword syntax `Port=45103` while the live URL used the same port as `:45103`; it stopped before
+  correlated health/OTEL receipt generation. Cleanup and postflight leak verification passed; no
+  retry was attempted.
+- Live-endpoint validator repair: contract RED raw exit 1; focused green raw exit 0 with 28 passed,
+  0 failed. Scoped check/lint/format, `quality:gate`, and `arch:check` all exit 0. The parser now
+  compares validated numeric ports across explicitly enumerated URL and Npgsql keyword dialects;
+  deliberate mismatch and missing-port controls fail with source-specific diagnostics.
+- Fourth serialized pass requested. It was not run because W2-A currently holds the token. Runtime
+  DoD and #1202 acceptance remain unchecked until the four decisive gates pass in one granted run.
 
 ## Harness
 
 - Run dir: `.llm/runs/release-0.0.5--orchestration/slices/w2-c-1202-1327/`
 - Phase: implementation → IMPL-EVAL handoff with disclosed runtime-evidence gap
-- Do not merge until required gates, Tier-A review, and separate-session IMPL-EVAL PASS are complete.
+- Do not merge until required gates, Tier-A review, and separate-session IMPL-EVAL PASS are
+  complete.
 
 ## Drift / Debt
 
@@ -57,7 +64,10 @@ bind the live Postgres allocation across consecutive AppHost starts.
 - [x] `db migrate` success names and verifies created migration files and applied database state.
 - [x] Headless inability to create a migration fails non-zero with an actionable next command.
 - [x] `db deploy` is the only deploy-only verb and output separates created/applied sets.
-- [ ] TTY and non-TTY schema-change E2E proves files and database state, with deploy/no-change controls.
-- [ ] Two consecutive starts prove users receives the live Postgres allocation via health, logs, and OTEL.
-- [ ] Required static, quality, doctrine, publish, resource-health, and serialized runtime gates pass.
+- [ ] TTY and non-TTY schema-change E2E proves files and database state, with deploy/no-change
+      controls.
+- [ ] Two consecutive starts prove users receives the live Postgres allocation via health, logs, and
+      OTEL.
+- [ ] Required static, quality, doctrine, publish, resource-health, and serialized runtime gates
+      pass.
 - [ ] Separate-session IMPL-EVAL passes.

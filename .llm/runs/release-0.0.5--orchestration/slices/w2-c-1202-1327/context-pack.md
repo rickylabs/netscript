@@ -2,12 +2,12 @@
 
 ## Current phase
 
-Third serialized pass completed with raw exit 1 and `passed=61 failed=1`. Migration artifacts and
-both allocation captures passed. `behavior.live-db-endpoint` failed because its authority assertion
-compared only URL-style `:45103` against a users keyword connection string containing the same
-allocation as `Port=45103`. It stopped before the correlated health/OTEL receipt, so #1202
-acceptance remains unticked. Cleanup and postflight leak verification are clean for W2-C; no retry
-or repair was attempted and the token is released failing.
+The live-endpoint validator now structurally parses both explicitly supported connection dialects:
+Postgres URLs and semicolon key/value strings. Focused RED/green, scoped wrappers, `quality:gate`,
+and `arch:check` are green; the negative test deliberately mismatches ports and remains RED-capable.
+W2-A holds the serialized token, so no fourth `scaffold.runtime` pass was attempted. An
+`EXPENSIVE-GATE-REQUEST` is recorded and #1202 acceptance remains unticked until all four decisive
+gates pass together and the health/log/OTEL receipt completes.
 
 ## Identity
 
@@ -20,9 +20,9 @@ or repair was attempted and the token is released failing.
 ## Locked boundary
 
 - Close #1327 only when artifact acceptance is fully evidenced.
-- The orchestrator withdrew the inherited owner-machine boundary for #1202 after re-reading its
-  four actual acceptance rows and measuring the machine. PR #1393 may close #1202 when the four
-  mapped runtime gates provide truthful evidence.
+- The orchestrator withdrew the inherited owner-machine boundary for #1202 after re-reading its four
+  actual acceptance rows and measuring the machine. PR #1393 may close #1202 when the four mapped
+  runtime gates provide truthful evidence.
 - Never run the serialized `scaffold.runtime` gate without a grant.
 
 ## Key facts
@@ -35,5 +35,6 @@ or repair was attempted and the token is released failing.
   belongs to `/home/codex/repos/w6-review-desk` and was deliberately left untouched.
 - The `--name` environment-key repair is required by #1327's named-artifact acceptance, not adjacent
   scope.
-- #1202 contains four code/runtime rows only. The stale-write RED tests map row 2; the two allocation
-  receipts plus live-endpoint health/structured-log/OTEL receipt must prove rows 1, 3, and 4.
+- #1202 contains four code/runtime rows only. The stale-write RED tests map row 2; the two
+  allocation receipts plus live-endpoint health/structured-log/OTEL receipt must prove rows 1, 3,
+  and 4.
