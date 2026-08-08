@@ -68,3 +68,70 @@ current-state documentation.
 - **Action:** make CAS repository-specific with a zero-row typed conflict, and restrict default
   telemetry to stable names, enums, booleans, and counts.
 - **Evidence:** Prisma OCC docs; OTel attribute requirement/convention guidance; `research.md`.
+
+## 2026-08-08 — PLAN-EVAL cycle 1 exposed three undeclared boundary decisions
+
+- **What:** The first RFC draft left receipt duplicate recovery/timeout, relay type ownership, and
+  queue reuse-versus-rejection to implementation inference.
+- **Source:** Authoritative `plan-eval.md` findings F-B1–F-B3; verdict `FAIL_PLAN`.
+- **Expected:** The plan's open-decision sweep should have resolved every choice that could rework
+  provider or package boundaries.
+- **Actual:** The core laws were sound, but these three decisions were absent from both locked plan
+  and FCP questions.
+- **Severity:** critical.
+- **Action:** lock provider-specific claim algorithms, split database raw relay persistence from
+  service decoded runtime/sinks, reject queue-package reuse in v1, and propose queue runtime-DDL
+  reconciliation before future code sharing.
+- **Evidence:** RFC normative claim/relay/queue sections; `research.md` R21–R25; `plan.md` L14–L16.
+
+## 2026-08-08 — Receipt identity drift was described more strongly than the key can enforce
+
+- **What:** The first draft said scope must be stable but did not state that a changed scope or
+  renamed command creates a different unique-key namespace.
+- **Source:** `plan-eval.md` F-B4.
+- **Expected:** Same raw idempotency key would appear protected by the key-reuse law.
+- **Actual:** `(scope, commandName, keyHash)` changes, so no conflicting receipt exists and the
+  handler honestly executes as new.
+- **Severity:** significant.
+- **Action:** add deterministic identity fixtures, execute-as-new negative conformance, and a
+  breaking replay migration/alias rule for scope/name changes.
+- **Evidence:** RFC canonical identity, semantic law 13, conformance items 5–6.
+
+## 2026-08-08 — Isolation vocabulary needs provider allow-lists and default-only truth
+
+- **What:** Existing planning treated MySQL/SQLite capability as a supported-level set only.
+- **Source:** `plan-eval.md` F-B5/F-B7f and current adapter source.
+- **Expected:** MySQL omits unsupported `Snapshot`; SQLite could advertise its serializable engine
+  level directly.
+- **Actual:** The lower MySQL adapter union includes/interpolates `SNAPSHOT`; the evaluator found
+  SQLite's Prisma selection surface unavailable even though its engine default is serializable.
+- **Severity:** significant.
+- **Action:** replace the capability with `selectableIsolationLevels` plus `defaultIsolation`, make
+  MySQL four-level allow-list/removal a Stage-6 gate, and put SQLite's default-only acceptance in
+  FCP Q2.
+- **Evidence:** RFC capability matrix; `research.md` R27/R29; `plan.md` L18/L20.
+
+## 2026-08-08 — Queue runtime DDL is baseline drift, not command-kit precedent
+
+- **What:** `@netscript/queue` already creates PostgreSQL queue/DLQ schema from runtime adapter
+  initialization.
+- **Source:** `packages/queue/adapters/postgres.adapter.ts` and dead-letter adapter; F-B3.
+- **Expected:** The RFC's no-hidden-migration law might read as a repository-wide current invariant.
+- **Actual:** It is a normative rule for new command-kit/relay paths; the sibling queue behavior is
+  existing drift requiring separate reconciliation before reuse.
+- **Severity:** significant.
+- **Action:** scope the immediate law to command-kit paths and propose a migration-free queue slice;
+  create no issue in this RFC run.
+- **Evidence:** RFC queue-decision/rejected-alternative/board sections.
+
+## 2026-08-08 — Launcher metadata formatting arrived with evaluator handoff
+
+- **What:** `.llm/runs/docs-rfc-command-composition-kit--rfc/codex-thread-ids.md` had a pre-existing
+  launcher metadata formatting edit when remediation began.
+- **Source:** worktree at evaluator HEAD `122301d25`.
+- **Expected:** Evaluator commit plus clean authored state.
+- **Actual:** The metadata lines were reflowed without changing thread/session identities.
+- **Severity:** minor.
+- **Action:** preserve and include the formatting reconciliation with run-artifact updates; do not
+  discard or regenerate launcher identity state.
+- **Evidence:** final raw diff and commit slice S4.

@@ -21,6 +21,10 @@ span stores, and network effects inside the transaction are refused rather than 
 This is a command boundary, not an ORM, workflow engine, event-sourcing system, or distributed
 transaction protocol.
 
+The frontmatter `target-milestone: 0.0.6` is the target for **RFC ratification only**. It is not an
+implementation availability date: the implementation umbrella is #1363 in `0.0.8`, and the
+literal-error prerequisite #1350 is currently targeted to `0.0.7`.
+
 ## Motivation
 
 NetScript currently exposes useful pieces but no supported way to compose them into a production
@@ -119,7 +123,7 @@ compare it in memory.
 
 ```ts
 import { type CommandDefinition, defineCommand, jsonCodec } from '@netscript/service/commands';
-import type { PrismaTransactionClient } from '@database';
+import type { CommandTransactionClient } from '@database';
 import { z } from 'zod';
 import { projectOutput, projectRenamedPayload, renameProjectInput } from '../contracts/projects.ts';
 
@@ -184,7 +188,7 @@ export const renameProjectCommand = defineCommand({
   'projects.rename',
   z.infer<typeof renameProjectInput>,
   z.infer<typeof projectOutput>,
-  PrismaTransactionClient
+  CommandTransactionClient
 >;
 ```
 
@@ -299,18 +303,26 @@ exactly-once claim.
 
 ### Package and export placement
 
-| Surface                                | Owner                                                                       | Reason                                                                                                                   |
-| -------------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| `@netscript/service/commands`          | command definition, executor, envelope, context, typed application failures | Commands are a service/application concern. A focused subpath preserves the root export budget.                          |
-| `@netscript/service/commands/testing`  | executor fixtures and fault controls                                        | Testing-only public utilities stay off the production root.                                                              |
-| `@netscript/database/commands`         | transaction-bound store contracts and provider adapters                     | Database owns transaction/isolation vocabulary and the generated-client bridge. Service depends one way on this subpath. |
-| `@netscript/database/commands/testing` | adapter conformance suite                                                   | Provider truth is tested at its owning adapter seam.                                                                     |
-| `@netscript/contracts/commands`        | opt-in Zod schemas and command error map                                    | Transport errors remain contract-first without changing all routes.                                                      |
-| `@netscript/telemetry/attributes`      | command span/attribute constants and builder                                | Extends the existing telemetry vocabulary where job/saga builders already live.                                          |
+| Surface                                            | Owner                                                                          | Reason                                                                                                                    |
+| -------------------------------------------------- | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------- |
+| `@netscript/service/commands`                      | command definition, executor, envelope, context, typed application failures    | Commands are a service/application concern. A focused subpath preserves the root export budget.                           |
+| `@netscript/service/commands/relay`                | relay supervisor, decoded delivery value, sink port, registry, shutdown handle | Runtime delivery policy consumes database persistence; it does not leak service value types into database.                |
+| `@netscript/service/commands/testing`              | executor and relay fixtures plus fault controls                                | Testing-only public utilities stay off production roots.                                                                  |
+| `@netscript/database/commands`                     | transaction-bound command-store and relay-store persistence contracts          | Database owns transaction, isolation, raw persisted-row, claim-token, and release vocabulary. It imports no service type. |
+| `@netscript/database/commands/adapters/<provider>` | PostgreSQL/MySQL/SQL Server command and relay store adapters                   | Technology-specific adapters remain behind database-owned ports and provider subpaths.                                    |
+| `@netscript/database/commands/testing`             | command-store and relay-store adapter conformance suites                       | Provider truth is tested at its owning adapter seam.                                                                      |
+| `@netscript/contracts/commands`                    | opt-in Zod schemas and command error map                                       | Transport errors remain contract-first without changing all routes.                                                       |
+| `@netscript/telemetry/attributes`                  | command span/attribute constants and builder                                   | Extends the existing telemetry vocabulary where job/saga builders already live.                                           |
 
 No `@netscript/commands` package is introduced. None of these symbols is re-exported from an
 existing package root in v1. Internal imports within a package use relative paths, avoiding the
 self-referential JSR subpath trap.
+
+The dependency arrow is exactly `@netscript/service` → `@netscript/database`: the executor and relay
+runtime consume database-owned ports. This is a new direct package edge. The implementation must add
+a pinned `@netscript/database` entry to `packages/service/deno.json`, prove it with
+`deno info`/consumer-import checks, and include it in the service publish surface. Database never
+imports `CommandJson`, `CommandTraceContext`, a sink, a worker, or any other service/runtime type.
 
 ### Value, identity, and envelope contracts
 
@@ -453,7 +465,7 @@ export interface CommandContext<TInput, TTx> {
 export type CommandExecution<TOutput> = Readonly<{
   value: TOutput;
   outcome: 'applied' | 'replayed';
-  idempotency: 'committed' | 'replayed' | 'not_requested';
+  idempotency: 'claimed' | 'replayed' | 'not_requested';
   correlationId: string;
 }>;
 
@@ -505,6 +517,7 @@ export type CommandExecutorOptions<TTx> = Readonly<{
   clock?: CommandClock;
   ids?: CommandIdSource;
   telemetry?: CommandTelemetryPort;
+  receiptClaimWaitMs?: number;
   limits?: Readonly<{
     auditRecords: number;
     outboxRecords: number;
@@ -540,6 +553,11 @@ The exported `CommandDefinition` is read-only and does not expose a public const
 handler remains part of the opaque definition returned by `defineCommand()`, preventing callers from
 bypassing the executor by invoking a public `handle` member.
 
+`receiptClaimWaitMs` is a bounded executor policy, not a caller-controlled envelope value. The
+executor validates it against the store's advertised minimum, maximum, and granularity before
+opening a transaction and passes the normalized value in `CommandTransactionRequest`. An adapter
+must report its effective wait when its engine has coarser units (MySQL rounds up to whole seconds).
+
 ### Transaction-bound store contracts
 
 The database subpath owns the transaction vocabulary and imports no service types. The business
@@ -552,11 +570,18 @@ export type CommandStoreCapabilities = Readonly<{
   sideRecordAtomicity: 'same_commit';
   callbackAttempts: 'one';
   cancellation: 'cooperative' | 'driver';
-  supportedIsolationLevels: readonly IsolationLevel[];
+  selectableIsolationLevels: readonly IsolationLevel[];
+  defaultIsolation: IsolationLevel | 'provider_configured';
+  receiptClaimWait: Readonly<{
+    minimumMs: number;
+    maximumMs: number;
+    granularityMs: number;
+  }>;
 }>;
 
 export type CommandTransactionRequest = Readonly<{
   options?: TransactionOptions;
+  receiptClaimWaitMs: number;
 }>;
 
 export type ReceiptClaim = Readonly<{
@@ -661,6 +686,11 @@ by the side-record bridge.
 busy failures. The adapter may retry connection acquisition before invoking `work`, but once invoked
 the result is commit, rollback, or a surfaced failure.
 
+`ReceiptClaimResult.kind: "busy"` is terminal for the current callback. The executor issues no more
+store query, throws its internal claim-busy sentinel, waits for `transaction()` to report rollback,
+and only then exposes `CommandError({ kind: "in_progress" })`. `retryAfterMs`, when present, is the
+adapter's normalized effective wait/backoff hint, not proof that the leader will finish by then.
+
 `cancellation: "cooperative"` means the adapter checks the signal before beginning and between
 framework-controlled steps but the driver cannot interrupt an already-issued query. Such an adapter
 must also enforce a transaction timeout. `"driver"` may be advertised only when the actual driver
@@ -752,14 +782,36 @@ Provider generators may add efficient native projections, but the portable contr
 
 ### Schema and bridge ownership
 
-`netscript db command-store init --database <config-key>` is the proposed explicit generator. It:
+`netscript db command-store add --database <config-key>` is the proposed explicit generator. The
+sub-noun is deliberate: existing `netscript db init` creates/applies the database's initial Prisma
+migration, while `db command-store add` adds one optional feature to an already configured database.
+It:
 
 1. detects the configured Prisma provider;
 2. appends provider-specific receipt/audit/outbox models using stable `NetScriptCommand*` names;
 3. creates a reviewable migration, including unique/check/index definitions;
 4. emits `database/<config-key>/command-store.ts`, which binds the generated delegates and true
-   transaction client to `CommandStorePort<TTx>`; and
-5. refuses to overwrite edited models or run a migration without the consumer's normal DB command.
+   transaction client to `CommandStorePort<TTx>`;
+5. emits and re-exports the consumer-specific transaction type shown below; and
+6. refuses to overwrite edited models or run a migration without the consumer's normal DB command.
+
+```ts
+// generated in database/<config-key>/command-store.ts
+import type { Prisma } from './schema/.generated/client.ts';
+
+export type CommandTransactionClient = Omit<
+  Prisma.TransactionClient,
+  '$transaction' | '$connect' | '$disconnect' | '$on' | '$use' | '$extends'
+>;
+```
+
+The configured engine module re-exports `CommandTransactionClient` and `commandStore`, so the
+workspace's existing `@database` facade supports the guide import. This alias is generated because
+it depends on the consumer's models. A focused Prisma 7.8 probe at RFC time confirmed that the
+generated client exports `Prisma.TransactionClient`; the explicit `Omit` is still required because
+the current Prisma deny-list does not remove nested `$transaction`. Emitted-sample type tests prove
+that model delegates are present and that every listed root/lifecycle method is rejected. The
+framework packages do not invent a model-agnostic fake transaction-client export.
 
 The package never injects models during import, service startup, `defineService()`, or relay
 startup. The generated bridge is consumer-owned, checked in, and discoverable. Model renames require
@@ -801,10 +853,21 @@ the idempotency key are excluded. The command author must include every input fi
 the effect. Negative conformance mutates each contract field and proves either that the fingerprint
 changes or that the field is explicitly classified transport-only.
 
-`scope()` is equally deterministic: it may use only the supplied input and narrowed actor, performs
-no I/O, and excludes transport-only idempotency, trace, and correlation values. Scope partitions a
-receipt namespace (for example by tenant or aggregate); it must not vary between retries of the same
-intent. The restricted argument deliberately withholds the rest of `CommandEnvelope`.
+`scope()` has the same purity and determinism obligation as `fingerprint()`: for the same deeply
+frozen `{ input, actor }` it returns the same bounded UTF-8 string across processes, retries, and
+deployments. It may use only that argument, performs no I/O, reads no clock/random/global/config
+state, and excludes transport-only idempotency, trace, and correlation values. Scope partitions a
+receipt namespace (for example by tenant or aggregate). The restricted argument deliberately
+withholds the rest of `CommandEnvelope`. `@netscript/service/commands/testing` supplies an identity
+fixture that invokes `scope()` and `fingerprint()` repeatedly with equivalent frozen values and
+fails nondeterministic definitions; production execution still evaluates each exactly once.
+
+The unique key makes the consequence of identity drift explicit. The same raw idempotency key under
+a **different scope** or **different command name** is a different receipt key and therefore
+executes as new. The framework cannot label it reuse because no row exists in that namespace. This
+is not a loophole to exploit: changing scope logic or renaming a command is a breaking replay
+migration. Keep the old definition/name as an alias through the maximum receipt retry window, or
+migrate receipt keys and prove the mapping before deploying the new identity.
 
 `definitionVersion` changes when request identity, response decoding, or command meaning changes.
 Because the receipt unique key does not include that version, a retry crossing a deployment returns
@@ -847,6 +910,46 @@ append and completion still belongs to the same transaction. A business error th
 remains the handler's declared error; the executor does not wrap arbitrary application errors as
 storage failures.
 
+### Normative receipt-claim algorithms
+
+The generated unique key is the concurrency primitive; adapters do not run an unprotected
+select-then-insert and do not retry the transaction callback. `claimReceipt()` is the first
+persistence operation in the callback. Every adapter implements the following state machine:
+
+1. attempt one provider-safe claim for `(scope, commandName, keyHash)` with the bounded claim wait;
+2. if this transaction inserted the row, return `execute`;
+3. if a committed row won, load it and return `replay` or `mismatch` after comparing
+   `requestHash`/`commandVersion` and completeness; and
+4. if lock acquisition times out, terminate the callback, roll back the whole transaction, and map
+   the provider error to `busy`. No query is issued in that transaction after `busy`.
+
+Unexpected constraint/data errors are never treated as duplicates. Serialization/deadlock victims
+surface as retryable `store_failure`; `callbackAttempts: "one"` remains true. At stronger isolation,
+a provider may choose a serialization victim rather than a replay winner, and the caller retries the
+whole request with the same key.
+
+Provider mechanics are normative for v1:
+
+| Provider     | Claim statement/lock                                                                                                                                                                                                                                                                                      | Bounded-wait mechanics                                                                                                                                                                                                                                                                                                                                                                                                              | Leader commits                                                                                                                                                                      | Leader rolls back                                                                           |
+| ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| PostgreSQL   | `INSERT ... ON CONFLICT (scope, command_name, key_hash) DO NOTHING RETURNING id`; empty `RETURNING` is followed by one indexed `SELECT`                                                                                                                                                                   | Save `current_setting('lock_timeout')`; call parameterized `set_config('lock_timeout', '<validated-ms>ms', true)` before the insert and restore the saved value after a successful claim path. SQLSTATE `55P03` becomes `busy` and the outer transaction rolls back.                                                                                                                                                                | The insert waits, returns no row, and the next `READ COMMITTED` statement loads the winner. At `REPEATABLE READ`/`SERIALIZABLE`, a legitimate `40001` is a retryable store failure. | The waiting insert proceeds and returns its generated receipt ID, so the follower executes. |
+| MySQL/InnoDB | `SAVEPOINT netscript_receipt_claim`; plain `INSERT`; only error `1062` rolls back to/releases that savepoint and performs the indexed `SELECT`. `INSERT IGNORE` is forbidden because it can downgrade non-duplicate data errors to warnings.                                                              | On the leased connection, read `@@SESSION.innodb_lock_wait_timeout`, set the validated `ceil(ms / 1000)` whole-second value before claim, and restore it in connection `finally` after commit/rollback. Error `1205` becomes `busy`; error `1213` is a retryable store failure. The outer transaction always rolls back after either, independent of `innodb_rollback_on_timeout`. A failed restore discards the pooled connection. | The waiting insert receives `1062`; savepoint recovery leaves the transaction usable and the indexed select loads the winner.                                                       | The waiting insert succeeds and the follower executes.                                      |
+| SQL Server   | First select the exact generated unique index with `WITH (UPDLOCK, HOLDLOCK, INDEX([UX_NetScriptCommandReceipt_scope_command_key]))`; return replay/mismatch when found, otherwise insert while the serializable key-range update lock is held. `MERGE` and catch-and-continue on 2601/2627 are not used. | Read `@@LOCK_TIMEOUT`, issue `SET LOCK_TIMEOUT <validated-ms>` on the leased connection, and restore the prior integer after commit/rollback. Error `1222` becomes `busy`; deadlock victim `1205` is a retryable store failure. A failed restore discards the pooled connection.                                                                                                                                                    | The follower's range-lock read resumes and observes the committed row.                                                                                                              | The follower's range-lock read resumes, observes no row, inserts, and executes.             |
+
+All identifiers in these statements come from generated, provider-quoted schema constants. Values
+are bound parameters. The timeout literals are adapter-created decimal integers after range
+validation; caller text is never interpolated. PostgreSQL's transaction-local setting resets on
+rollback. MySQL and SQL Server settings are session-scoped, so acquiring one connection for the
+whole transaction and restoring/discarding it before pool return is part of conformance, not an
+optimization.
+
+The PostgreSQL follow-up select is intentionally tied to `READ COMMITTED` replay behavior. At a
+stronger snapshot level, a serialization outcome is safer than executing against an invisible
+winner. The SQL Server query's `HOLDLOCK` gives the receipt lookup serializable range semantics even
+when the surrounding command uses another advertised isolation; `UPDLOCK` also forces locking under
+snapshot modes. Generated migrations must keep the named composite unique index that makes the
+singleton/range lock possible.
+
 ### Semantic laws
 
 Every conforming implementation and adapter satisfies these laws:
@@ -867,7 +970,7 @@ Every conforming implementation and adapter satisfies these laws:
 7. **CAS law.** A command requiring optimistic concurrency performs the version predicate in the
    mutation. Zero matched rows becomes a conflict and rolls back every buffered record.
 8. **No-hidden-retry law.** One executor call invokes the handler no more than once.
-9. **Isolation-refusal law.** A requested level absent from `supportedIsolationLevels` is refused
+9. **Isolation-refusal law.** A requested level absent from `selectableIsolationLevels` is refused
    before opening the transaction.
 10. **Stable-message law.** A committed outbox row retains one `id`/`dedupeKey` across every relay
     claim, lease expiry, retry, and redelivery.
@@ -875,6 +978,9 @@ Every conforming implementation and adapter satisfies these laws:
     but publish-before-crash may result in the same message being observed again.
 12. **Boundary law.** No SQL+KV, SQL+stream, SQL+HTTP, two-database, or other cross-store operation
     is represented as one command transaction.
+13. **Deterministic-identity law.** Equivalent frozen identity values produce identical scope and
+    fingerprint results. A changed scope or command name is explicitly a new receipt namespace and
+    executes as new; a changed definition version under the same receipt key is a mismatch.
 
 “At most one handler commits” is conditional on a supplied idempotency key. An optional attempt
 without one retains only the atomic rollback and same-commit laws.
@@ -890,11 +996,13 @@ result proves whether it matched. A preliminary read may be useful for business 
 replaces the conditional write. The proposal's `expectVersion(current)` is rejected because another
 transaction can write between comparison and mutation.
 
-Isolation is a set, not a scalar “maximum.” The command declares the minimum concrete level its
-algorithm was tested with. Omitting `isolationLevel` uses the database default and records `default`
-in command telemetry; it does not claim a portable effective level. Commands maintaining multi-row
-invariants normally require `Serializable` or another provider-specific locking design and must test
-serialization/deadlock outcomes.
+Isolation is a set, not a scalar “maximum.” `selectableIsolationLevels` means levels the Prisma
+transaction API and configured adapter accept explicitly; `defaultIsolation` separately describes
+the omitted-option path. The command declares the concrete selectable level its algorithm was tested
+with. Omitting `isolationLevel` uses the database default and records `default` in command
+telemetry; it does not claim a portable effective level when the capability says
+`provider_configured`. Commands maintaining multi-row invariants normally require `Serializable` or
+another provider-specific locking design and must test serialization/deadlock outcomes.
 
 The executor does not automatically retry serialization, deadlock, or SQLite busy failures. Those
 become retryable store outcomes. A caller can retry the entire request with the same key, which is
@@ -904,14 +1012,14 @@ safe whether the original attempt rolled back or committed before its response w
 
 “Engine feasible” and “currently integrated by NetScript” are deliberately separate:
 
-| Store                                  | Engine/Prisma transaction facts                                                                                                  | Current NetScript integration at `fac9e339`                  | RFC position                                                                                    |
-| -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ | ----------------------------------------------------------------------------------------------- |
-| PostgreSQL + Prisma                    | interactive transactions; `ReadUncommitted` maps to `ReadCommitted`; `ReadCommitted`, `RepeatableRead`, `Serializable` available | Postgres adapter/root surface exists                         | reference v1 adapter after full conformance                                                     |
-| MySQL + Prisma                         | interactive; `ReadUncommitted`, `ReadCommitted`, `RepeatableRead`, `Serializable`; no `Snapshot`                                 | `@netscript/database/adapters/mysql` exists                  | conforming v1 target; #1293 is adjacent lower-level surface work, not an atomicity prerequisite |
-| SQL Server + Prisma                    | interactive; all five current `IsolationLevel` values; `Snapshot` requires database enablement                                   | `@netscript/database/adapters/mssql` exists                  | conforming v1 target; capability must omit `Snapshot` when not enabled                          |
-| SQLite + Prisma                        | transactions are serializable in Prisma's matrix; multiple readers but one writer; busy/timeout behavior differs                 | provider enum exists, but no NetScript SQLite adapter export | feasible but unsupported/unclaimed until an adapter and real contention/fault suite land        |
-| Deno KV                                | optimistic atomic checks/mutations with operation limits; no interactive callback                                                | `@netscript/kv` and worker idempotency exist                 | not a v1 `CommandStorePort`; no weaker command mode                                             |
-| two SQL stores or SQL + KV/stream/HTTP | no portable shared commit                                                                                                        | components may exist separately                              | refused; commit an outbox intent and continue through a consumer/saga                           |
+| Store                                  | Engine/Prisma transaction facts                                                                                                  | Capability truth required by this RFC                                                                                                              | RFC position                                                                        |
+| -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| PostgreSQL + Prisma                    | interactive transactions; `ReadUncommitted` maps to `ReadCommitted`; `ReadCommitted`, `RepeatableRead`, `Serializable` available | selectable set omits `Snapshot`; provider/configured default recorded separately                                                                   | reference v1 adapter after full conformance                                         |
+| MySQL + Prisma                         | interactive; `ReadUncommitted`, `ReadCommitted`, `RepeatableRead`, `Serializable`; no `Snapshot`                                 | exactly those four selectable values. Current lower adapter's exported `SNAPSHOT` and unchecked SQL interpolation must be fixed before conformance | conforming v1 target; #1293 remains adjacent, not this isolation defect             |
+| SQL Server + Prisma                    | interactive; all five current `IsolationLevel` values; `Snapshot` requires database enablement                                   | selectable set includes `Snapshot` only after an enablement probe; otherwise the four lock-based levels                                            | conforming v1 target after real configuration/conformance                           |
+| SQLite + Prisma                        | engine default is serializable; current generated/Prisma surface does not provide a portable explicit isolation-selection path   | future adapter advertises `selectableIsolationLevels: []`, `defaultIsolation: 'Serializable'`; explicit `Serializable` is still refused            | default-only conformance and release timing remain FCP Q2; no current support claim |
+| Deno KV                                | optimistic atomic checks/mutations with operation limits; no interactive callback                                                | cannot advertise interactive/same-commit SQL capabilities                                                                                          | not a v1 `CommandStorePort`; no weaker command mode                                 |
+| two SQL stores or SQL + KV/stream/HTTP | no portable shared commit                                                                                                        | no capability can make the commits shared                                                                                                          | refused; commit an outbox intent and continue through a consumer/saga               |
 
 Same-commit audit/outbox feasibility follows from using tables in the same database and the exact
 transaction client. It does not follow from the provider name alone. Each provider becomes
@@ -919,8 +1027,11 @@ transaction client. It does not follow from the provider name alone. Each provid
 doc lint, publish gates, and consumer test pass.
 
 The current database helper's `IsolationLevel` vocabulary is reused. The RFC does not introduce a
-second enum. Provider adapters publish the exact supported subset and relevant configuration
-preconditions.
+second enum. Provider adapters publish the exact **selectable** subset and separate default truth.
+Stage 6 cannot pass while `packages/prisma-adapter-mysql` exports `SNAPSHOT` or interpolates an
+unchecked upstream isolation token: it must use a four-value allow-list/mapping before SQL, remove
+`SNAPSHOT` from `PrismaMySqlIsolationLevel`, reject it in positive/negative type/runtime fixtures,
+and prove all four supported values on a real server. This is a distinct prerequisite from #1293.
 
 ### Typed failure model
 
@@ -1019,14 +1130,19 @@ export const commandErrorMap = {
       retryAfterMs: z.number().int().nonnegative().optional(),
     }),
   },
-} as const;
-
-export const commandBaseContract = baseContract.errors(commandErrorMap);
+} as const satisfies ErrorMap;
 
 export type CommandContractErrors = MergedErrorMap<
   BaseContractErrors,
   typeof commandErrorMap
 >;
+
+export const commandBaseContract: ContractBuilder<
+  Schema<unknown, unknown>,
+  Schema<unknown, unknown>,
+  CommandContractErrors,
+  Record<never, never>
+> = baseContract.errors(commandErrorMap);
 
 export type CommandContractRoute<
   TInput extends AnySchema,
@@ -1073,11 +1189,35 @@ through `baseContract`, the service client, `safe()`, and `isDefinedError()`. Ru
 work may be developed behind an unexported seam, but the command subpaths and docs are not released
 as complete until the positive and negative #1350 type fixtures pass.
 
-### Relay, workers, sagas, and remote sinks
-
-The relay has its own ports:
+The annotation above deliberately repeats #1350's literal-preserving form instead of
+`ReturnType<typeof baseContract.errors>` or `ReturnType<typeof oc.errors>`. Stage 0 must first make
+the base spelling equivalent to:
 
 ```ts
+export type BaseContractErrors = MergedErrorMap<
+  Record<never, never>,
+  typeof commonErrorMap
+>;
+
+export const baseContract: ContractBuilder<
+  Schema<unknown, unknown>,
+  Schema<unknown, unknown>,
+  BaseContractErrors,
+  Record<never, never>
+> = oc.errors(commonErrorMap);
+```
+
+The command subpath then imports that exported `BaseContractErrors` and uses the same four generic
+positions. Type fixtures must prove the three command codes and six base codes narrow precisely and
+that an undeclared code is rejected; an open `ErrorMap` index signature is a release blocker.
+
+### Relay, workers, sagas, and remote sinks
+
+Relay persistence stays in the database package. These types contain only raw persisted values and
+database-owned state vocabulary:
+
+```ts
+// @netscript/database/commands
 export type CommandRelayFailureClass =
   | 'rejected'
   | 'rate_limited'
@@ -1086,7 +1226,7 @@ export type CommandRelayFailureClass =
   | 'invalid_response'
   | 'misconfigured';
 
-export type ClaimedCommandOutbox = Readonly<{
+export type ClaimedCommandOutboxRow = Readonly<{
   id: string;
   executionId: string;
   destination: string;
@@ -1099,16 +1239,6 @@ export type ClaimedCommandOutbox = Readonly<{
   attemptCount: number;
   claimToken: string;
   claimUntil: Date;
-}>;
-
-export type CommandOutboxDelivery = Readonly<{
-  id: string;
-  destination: string;
-  topic: string;
-  payload: CommandJson;
-  dedupeKey: string;
-  correlationId: string;
-  trace?: CommandTraceContext;
 }>;
 
 export type CommandOutboxRelease =
@@ -1130,7 +1260,7 @@ export interface CommandOutboxRelayStore {
       now: Date;
     }>,
     signal?: AbortSignal,
-  ): Promise<readonly ClaimedCommandOutbox[]>;
+  ): Promise<readonly ClaimedCommandOutboxRow[]>;
   markPublished(
     request: Readonly<{
       id: string;
@@ -1144,6 +1274,27 @@ export interface CommandOutboxRelayStore {
     signal?: AbortSignal,
   ): Promise<boolean>;
 }
+```
+
+The service relay subpath owns decoding, runtime policy, sinks, and lifecycle:
+
+```ts
+// @netscript/service/commands/relay
+import type {
+  ClaimedCommandOutboxRow,
+  CommandOutboxRelayStore,
+  CommandRelayFailureClass,
+} from '@netscript/database/commands';
+
+export type CommandOutboxDelivery = Readonly<{
+  id: string;
+  destination: string;
+  topic: string;
+  payload: CommandJson;
+  dedupeKey: string;
+  correlationId: string;
+  trace?: CommandTraceContext;
+}>;
 
 export interface CommandOutboxSink {
   readonly id: string;
@@ -1152,7 +1303,35 @@ export interface CommandOutboxSink {
     signal?: AbortSignal,
   ): Promise<void>;
 }
+
+export type CommandOutboxRelayOptions = Readonly<{
+  store: CommandOutboxRelayStore;
+  sinks: ReadonlyMap<string, CommandOutboxSink>;
+  clock: CommandClock;
+  ids: CommandIdSource;
+  batchSize: number;
+  leaseMs: number;
+  maxAttempts: number;
+  classify(error: unknown): CommandRelayFailureClass;
+  retryAt(attempt: number, now: Date): Date;
+}>;
+
+export interface RunningCommandOutboxRelay {
+  drainOnce(signal?: AbortSignal): Promise<number>;
+  stop(): Promise<void>;
+}
+
+export function createCommandOutboxRelay(
+  options: CommandOutboxRelayOptions,
+): RunningCommandOutboxRelay;
 ```
+
+`@netscript/service/commands/relay` parses `payloadJson` with the command I-JSON limits, validates
+W3C fields, constructs `CommandOutboxDelivery`, resolves the configured sink, and maps sink failure
+to the bounded database-owned release class. `@netscript/database/commands` never sees decoded
+`CommandJson` or `CommandTraceContext`; it leases and settles rows. This keeps the only
+cross-package edge `service → database` and gives the database adapter no worker/saga/service
+dependency.
 
 Claims are bounded and leased. `markPublished` and `release` compare the claim token so an expired
 worker cannot acknowledge another worker's lease. Provider adapters choose their correct locking
@@ -1167,6 +1346,11 @@ The explicit generator emits a visible `defineJob("netscript.command-outbox-rela
 sink registry. Deleting or disabling that job visibly stops delivery without affecting command
 commits. The job's own worker idempotency governs a job delivery, not an outbox row's remote effect,
 and therefore does not replace row leases or stable message IDs.
+
+Stage 5 must also correct `WorkerIdempotencyPort`'s current “exactly-once-effective” doc comment.
+Its claim → effect → mark/release window provides at-least-once delivery with an applied-key guard;
+a crash after an external effect and before `markApplied()` can repeat that effect. Worker docs must
+use that wording before they are cited by command/relay guidance.
 
 Sink rules:
 
@@ -1187,6 +1371,32 @@ The existing saga outbox port is not merged into this port. It is reserved for a
 cascade persistence and lacks this command transaction binding. Future implementation may share
 private lease utilities after both contracts exist, but their public semantics remain independently
 owned.
+
+#### Decision: do not wrap `@netscript/queue` in v1
+
+The current PostgreSQL queue adapter is valuable prior art but is not a compatible relay port. Its
+public `MessageQueue.listen()` owns the loop and exposes handler `ack()`/`nack()`; its PostgreSQL
+adapter claims with `FOR UPDATE SKIP LOCKED`, deletes on acknowledgement, moves exhausted messages
+to a queue-specific dead-letter store, and hides claim tokens. The command outbox must retain the
+original row, compare an expiring token on mark/release, preserve `publishedAt`/`terminalAt`, and
+let the service sink registry own publication. More importantly, `ensureClient()` currently calls
+`ensureSchema()` and executes runtime `CREATE TABLE IF NOT EXISTS`, so wrapping it would import the
+hidden-migration behavior this RFC forbids. The transactional insert side also cannot call queue
+enqueue because it must use the business transaction's `TTx`.
+
+V1 therefore rejects a direct `@netscript/queue` dependency or adapter wrapper. It reuses the proven
+algorithmic pattern—bounded `FOR UPDATE SKIP LOCKED` claims, visibility leases, redelivery, attempt
+limits, terminal handling, and the corresponding contention tests—behind the different
+`CommandOutboxRelayStore` contract. This is reuse of verified behavior and test cases, not a false
+type adapter between different durability semantics.
+
+The no-hidden-migration law is normative for every new command-kit/relay path. The queue package's
+existing runtime DDL is acknowledged baseline drift, not precedent and not silently widened into
+this RFC. Before any future implementation sharing is proposed, a separate queue reconciliation
+slice must externalize its schema/migration lifecycle, retain queue compatibility, and expose a
+schema-agnostic lease seam with no runtime DDL. This RFC PR does not create that issue; the board
+proposal below names it for maintainer filing. Until that prerequisite lands, the packages may share
+conformance cases and SQL design only, not code or a dependency edge.
 
 ### Precise refusal boundary
 
@@ -1294,6 +1504,14 @@ arbitrary topic/destination, or correlation ID. Trace IDs already exist in span 
 logs may include a validated correlation ID under their redaction/access policy; telemetry
 inclusion, if ever allowed, is an explicit opt-in FCP policy.
 
+This is intentionally stricter than today's neighboring vocabulary. Messaging currently emits
+`netscript.correlation.id`, and saga telemetry defines `netscript.idempotency.key`. That creates an
+operator-experience asymmetry: a cross-runtime query cannot assume the same identifiers are present
+on command spans. FCP Q3 must choose whether command telemetry remains privacy-first and a separate
+telemetry cleanup deprecates/redacts those existing attributes, or whether a bounded opt-in policy
+is proven for all three domains. Existing emission is not sufficient precedent for putting raw
+command keys or unbounded correlation values into spans.
+
 Metrics may count executions and record duration by command name, outcome, idempotency state, and
 provider only. No unbounded identifier becomes a metric dimension. Errors record `error.type` as the
 stable failure kind, not a driver message or stack-derived value.
@@ -1322,21 +1540,31 @@ The shared suite runs the following positive/negative matrix against every provi
 2. required/forbidden audit and outbox policy failures;
 3. same-key/same-hash sequential replay;
 4. same-key/different-hash rejection without handler invocation;
-5. concurrent identical claims with a barrier around the handler;
-6. leader rollback followed by follower execution;
-7. bounded busy/timeout classification;
-8. CAS zero-match rollback;
-9. requested unsupported isolation refusal before begin;
-10. serialization/deadlock/busy error with handler invocation count exactly one;
-11. invalid/corrupt/incomplete stored receipt refusal without execution;
-12. response/payload/fingerprint codec failures, including `Date`, `BigInt`, non-finite numbers,
+5. same raw key plus a changed scope executes as new in a second receipt namespace, while the
+   deterministic-identity helper rejects time/random/global-dependent scope or fingerprint code;
+6. same raw key plus a renamed command executes as new, while same name/scope/key plus a changed
+   `definitionVersion` is mismatch without handler invocation;
+7. concurrent identical claims with a barrier around the handler: leader commit makes the follower
+   replay and the duplicate-loser path can still execute a harmless subsequent transaction query;
+8. leader rollback followed by follower insertion/execution;
+9. bounded busy/timeout classification at the advertised unit, whole-callback rollback, pooled
+   session-setting restoration, and a clean subsequent transaction;
+10. provider-specific negative controls: PostgreSQL never emits/continues after a unique violation,
+    MySQL swallows only 1062 and never warning-converts another error, and SQL Server uses the named
+    range-locking index rather than catch-and-continue or `MERGE`;
+11. CAS zero-match rollback;
+12. requested unsupported selectable isolation refusal before begin, plus an omitted-isolation
+    default-path fixture;
+13. serialization/deadlock/busy error with handler invocation count exactly one;
+14. invalid/corrupt/incomplete stored receipt refusal without execution;
+15. response/payload/fingerprint codec failures, including `Date`, `BigInt`, non-finite numbers,
     cyclic values, depth, and byte overflow;
-13. abort before begin, during handler, between flush steps, and during relay;
-14. every named command fault seam;
-15. relay lease expiry, stale-token mark/release, publish-then-crash redelivery, terminal failure,
+16. abort before begin, during handler, between flush steps, and during relay;
+17. every named command fault seam;
+18. relay lease expiry, stale-token mark/release, publish-then-crash redelivery, terminal failure,
     and graceful shutdown;
-16. forbidden telemetry fields and exact allowed enum/count attributes; and
-17. a negative control that bypasses the executor or writes one side record with a root client and
+19. forbidden telemetry fields and exact allowed enum/count attributes; and
+20. a negative control that bypasses the executor or writes one side record with a root client and
     proves the same-commit suite fails.
 
 PostgreSQL is the reference real-provider suite. MySQL and SQL Server must run the same semantic
@@ -1369,10 +1597,16 @@ package's transitive resolution. The dependency is already used elsewhere in thi
 not currently declared by the service package. Its exact version follows the normal Deno toolchain
 update policy at implementation time.
 
+The same direct-dependency rule applies to the new `service → database` edge: service declares the
+release-matched `@netscript/database` specifier itself; database declares no reciprocal service
+dependency. Surface fixtures import every commands/relay/provider subpath from a clean consumer, and
+publish dry runs inspect the emitted import specifiers rather than trusting workspace-only
+resolution.
+
 An existing application adopts the seam explicitly:
 
 1. upgrade after #1350 and the command package slices are published;
-2. run `netscript db command-store init --database <config-key>` and review/apply the migration;
+2. run `netscript db command-store add --database <config-key>` and review/apply the migration;
 3. compose one `commandStore` and executor in the service infrastructure layer;
 4. convert one non-CRUD mutation to a command, preserving its existing contract shape;
 5. choose and document idempotency scope, semantic fingerprint, output codec, CAS, audit data, and
@@ -1383,9 +1617,11 @@ An existing application adopts the seam explicitly:
 
 For an existing application-owned receipt or outbox, migration is not an automatic table copy.
 Implement a bridge that satisfies the logical contract, prove it with conformance, and migrate keys
-and encoded responses deliberately. Changing receipt scope, command name, fingerprint, codec, or
-definition version without a retention/retry plan can turn valid retries into conflicts; those
-changes require release notes and compatibility tests.
+and encoded responses deliberately. Changing receipt scope or command name without a migration makes
+an old raw key execute as new; changing fingerprint or definition version under the same receipt key
+produces key-reuse mismatch; changing a response codec can make committed replay undecodable. Each
+is a breaking replay change requiring an old-name/scope compatibility alias or receipt migration,
+release notes, and positive/negative compatibility fixtures through the retained retry window.
 
 Receipt retention must be at least the maximum advertised client retry window. Deleting a receipt
 earlier permits the same key to execute again. Published outbox cleanup must not remove rows still
@@ -1401,10 +1637,15 @@ explicit paths rather than changing every scaffold:
   and requires explicit input/output schemas;
 - `netscript service add-handler <service> <procedure> --command --database <config-key>` emits a
   command definition stub and router binding in the layered service shape owned by #1362;
-- `netscript db command-store init --database <config-key>` emits provider-specific models,
-  migration, and transaction bridge; and
+- `netscript db command-store add --database <config-key>` emits provider-specific models,
+  migration, transaction bridge, `CommandTransactionClient`, and engine-module re-export; and
 - `netscript generate command-relay --database <config-key>` emits the visible worker drain job and
   sink registry.
+
+`command-store` is a nested database feature noun with the verb `add`; it does not overload or alias
+the existing `netscript db init` command. Help and negative CLI tests must show both routes and
+refuse `netscript db command-store init` so scripts cannot accidentally invoke the migration-init
+flow.
 
 The proposed service layout is:
 
@@ -1444,18 +1685,20 @@ Required docs:
 
 No product code belongs in this RFC PR. After acceptance, implementation is staged contract-first:
 
-| Stage | Owning archetype | Deliverable                                                                             | Required gate                                                                                |
-| ----- | ---------------- | --------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| 0     | A1/type repair   | close #1350's literal error-map and client error-generic defects                        | positive/negative typed-error fixtures; contracts/SDK publish gates                          |
-| 1     | A1               | `@netscript/contracts/commands` schemas/map and canonical JSON/codec contracts          | isolated declarations, doc lint, slow-type, runtime codec negatives                          |
-| 2     | A4               | `@netscript/service/commands` definition/executor over an in-memory conformant fake     | semantic law suite, fault seams, forbidden remote/global design review                       |
-| 3     | A2               | `@netscript/database/commands` true `TTx` store and PostgreSQL reference adapter/schema | real PostgreSQL concurrency/fault suite; surface/publish gates                               |
-| 4     | A2               | command telemetry vocabulary and redaction tests                                        | exact span/attribute assertions; forbidden-field tests                                       |
-| 5     | A3/A5            | relay store/sink ports and generated workers/saga/stream bridge                         | lease/crash/redelivery/shutdown tests; no deliver-once claim                                 |
-| 6     | A2               | MySQL and SQL Server adapters                                                           | same semantic suite on each real provider; SQL Server snapshot config negative               |
-| 7     | A2, optional     | SQLite adapter                                                                          | adapter export plus writer contention/crash/reopen conformance; otherwise remain unsupported |
-| 8     | A6               | schema, route, service-command, and relay generators                                    | emitted samples; focused CLI tests; one full `scaffold.runtime` merge-readiness run          |
-| 9     | docs             | guide/reference/operations/security/compatibility and #1364 integration                 | docs links/accuracy, executable snippets, published consumer proof                           |
+| Stage | Owning archetype                             | Deliverable                                                                                                         | Required gate                                                                                                        |
+| ----- | -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| 0     | A4 (`contracts` + `sdk`)                     | land #1350's literal-preserving `ContractBuilder` annotation and client error generic                               | positive/negative real-export type fixtures; contracts/SDK doc lint and publish gates                                |
+| 1     | A4 (`contracts`)                             | `@netscript/contracts/commands` schemas, literal error map, JCS/codec contracts                                     | isolated declarations, exact code-union negatives, slow-type/doc lint, runtime codec negatives                       |
+| 2     | A4 (`service`)                               | `@netscript/service/commands` definition/executor over an in-memory conformant fake; add direct database dependency | semantic/identity laws, fault seams, dependency graph, forbidden remote/global design review                         |
+| 3     | A2 (`database`)                              | true-`TTx` store, generated schema/bridge contract, PostgreSQL receipt-claim reference algorithm                    | real concurrent leader commit/rollback, lock-timeout/no-poisoning, callback-count, surface/publish gates             |
+| 4     | A2 (`telemetry`)                             | command telemetry vocabulary, existing-attribute asymmetry decision, and redaction tests                            | exact span/attribute assertions, bounded-cardinality and forbidden-field tests                                       |
+| 5a    | A2 (`database`)                              | raw relay-store port and PostgreSQL lease/settlement adapter; no queue dependency/runtime DDL                       | token/lease/crash/redelivery tests plus queue-divergence negative control                                            |
+| 5b    | A4 (`service`, A3 runtime discipline folded) | decoded delivery/sink ports, relay supervisor/registry, drain/stop lifecycle                                        | failure classification, shutdown, publish-then-crash, no deliver-once claim                                          |
+| 5c    | A3/A5 (`plugin-*-core` + thin plugins)       | worker/saga/stream integration contracts and correction of `WorkerIdempotencyPort` exactly-once wording             | at-least-once claim-window docs/tests; thin-plugin/dependency gates                                                  |
+| 6     | A2 (`database` adapters)                     | MySQL and SQL Server command/relay adapters                                                                         | same real-provider suite; MySQL four-level allow-list and `SNAPSHOT` removal; SQL Server snapshot-probe negative     |
+| 7     | A2, optional (`database`)                    | default-only SQLite adapter if FCP accepts it                                                                       | `selectableIsolationLevels: []`, serializable default proof, contention/crash/reopen/lease suite                     |
+| 8     | A6 (`cli`)                                   | `db command-store add`, route/service-command, generated transaction-type, and relay generators                     | emitted alias/root-method negatives, migration-no-write previews, focused CLI tests, one full `scaffold.runtime` run |
+| 9     | docs scope                                   | guide/reference/operations/security/compatibility, queue non-reuse/reconciliation, and #1364 integration            | docs links/accuracy, executable snippets, published consumer proof                                                   |
 
 Stages may use separate PRs and can be developed in parallel only where their contracts are already
 merged. The public feature is not announced as complete until stages 0–6 and the required parts of
@@ -1471,24 +1714,26 @@ No issues are created or mutated by this RFC PR. The recommended board reconcili
 - make #1350 a stage-0 dependency, not a vague “RFC-A” reference;
 - let #1362 own generated service layering and make command-handler generation depend on it;
 - let #1364 own the remote HTTP recipe/template and consume the command outbox when available;
-- keep #1293 adjacent: it improves `@netscript/prisma-adapter-mysql` but does not block the current
-  database package's MySQL transaction subpath; and
+- keep #1293 adjacent: its surface work is not the MySQL `SNAPSHOT`/allow-list defect, which must be
+  fixed in the Stage-6 child regardless; propose a separate queue reconciliation child before any
+  future command-relay/queue code sharing; and
 - cross-reference the type-soundness umbrella #1278 without merging its broader scope into this
   implementation.
 
 Suggested PR-sized children under #1363:
 
-| Proposed child                                          | Labels (plus one lifecycle status)                           | Milestone    |
-| ------------------------------------------------------- | ------------------------------------------------------------ | ------------ |
-| command contracts, errors, JCS codecs                   | `type:feat`, `area:contracts`, `area:service`, `priority:p1` | `0.0.8`      |
-| command executor and semantic/fault test kit            | `type:feat`, `area:service`, `priority:p1`                   | `0.0.8`      |
-| true transaction-client port + PostgreSQL command store | `type:feat`, `area:database`, `priority:p1`                  | `0.0.8`      |
-| command OTel vocabulary and privacy tests               | `type:feat`, `area:telemetry`, `priority:p1`                 | `0.0.8`      |
-| outbox relay and worker/saga sink adapters              | `type:feat`, `area:service`, `area:database`, `priority:p1`  | `0.0.8`      |
-| MySQL/SQL Server command-store conformance              | `type:feat`, `area:database`, `priority:p1`                  | `0.0.8`      |
-| optional SQLite adapter/conformance                     | `type:feat`, `area:database`, `priority:p2`                  | FCP decision |
-| explicit CLI generators and scaffold consumer           | `type:feat`, `area:cli`, `area:service`, `priority:p1`       | `0.0.8`      |
-| command/relay docs and executable examples              | `type:docs`, `area:docs`, `area:service`, `priority:p1`      | `0.0.8`      |
+| Proposed child                                               | Labels (plus one lifecycle status)                           | Milestone    |
+| ------------------------------------------------------------ | ------------------------------------------------------------ | ------------ |
+| command contracts, errors, JCS codecs                        | `type:feat`, `area:contracts`, `area:service`, `priority:p1` | `0.0.8`      |
+| command executor and semantic/fault test kit                 | `type:feat`, `area:service`, `priority:p1`                   | `0.0.8`      |
+| true transaction-client port + PostgreSQL command store      | `type:feat`, `area:database`, `priority:p1`                  | `0.0.8`      |
+| command OTel vocabulary and privacy tests                    | `type:feat`, `area:telemetry`, `priority:p1`                 | `0.0.8`      |
+| outbox relay and worker/saga sink adapters                   | `type:feat`, `area:service`, `area:database`, `priority:p1`  | `0.0.8`      |
+| MySQL/SQL Server command-store conformance                   | `type:feat`, `area:database`, `priority:p1`                  | `0.0.8`      |
+| queue runtime-DDL reconciliation (future reuse prerequisite) | `type:fix`, `area:database`, `priority:p2`                   | `0.0.8`      |
+| optional SQLite adapter/conformance                          | `type:feat`, `area:database`, `priority:p2`                  | FCP decision |
+| explicit CLI generators and scaffold consumer                | `type:feat`, `area:cli`, `area:service`, `priority:p1`       | `0.0.8`      |
+| command/relay docs and executable examples                   | `type:docs`, `area:docs`, `area:service`, `priority:p1`      | `0.0.8`      |
 
 Each child PR that fully resolves its child issue uses a closing keyword in its body. Children
 reference #1363 as an umbrella without closing it. The RFC PR references #1361 without a closing
@@ -1589,6 +1834,15 @@ Publishing before commit can announce state that rolls back. Publishing after co
 message if the process crashes. A same-commit outbox plus at-least-once relay is the narrow durable
 answer.
 
+#### Wrap `@netscript/queue` as the command relay
+
+Rejected for v1. Its public handler/ack/nack contract deletes acknowledged queue rows, owns a
+queue-specific DLQ and runtime listener, does not expose the command outbox's compare-token
+settlement, and its PostgreSQL adapter currently creates schema at runtime. The command insert also
+must join the business `TTx`, which queue enqueue cannot do. The relay reuses the queue adapter's
+proven `SKIP LOCKED`/lease/redelivery/attempt test patterns, while code sharing waits for the
+separately proposed migration-free, schema-agnostic queue reconciliation.
+
 #### Weak KV command mode
 
 Rejected because claim → effect → mark has a crash window and cannot replay the relational response
@@ -1646,7 +1900,16 @@ Primary references:
 
 - [Prisma transactions and isolation](https://www.prisma.io/docs/orm/prisma-client/queries/transactions)
 - [PostgreSQL transaction isolation](https://www.postgresql.org/docs/current/transaction-iso.html)
+- [PostgreSQL `INSERT ... ON CONFLICT`](https://www.postgresql.org/docs/current/sql-insert.html)
+- [PostgreSQL `lock_timeout`](https://www.postgresql.org/docs/current/runtime-config-client.html)
+- [PostgreSQL `current_setting` / `set_config`](https://www.postgresql.org/docs/current/functions-admin.html)
+- [MySQL transaction isolation](https://dev.mysql.com/doc/refman/8.4/en/set-transaction.html)
+- [MySQL InnoDB error handling](https://dev.mysql.com/doc/refman/8.4/en/innodb-error-handling.html)
+- [MySQL `innodb_lock_wait_timeout`](https://dev.mysql.com/doc/refman/8.4/en/innodb-parameters.html)
 - [SQL Server transaction isolation](https://learn.microsoft.com/en-us/sql/t-sql/statements/set-transaction-isolation-level-transact-sql?view=sql-server-ver17)
+- [SQL Server `SET LOCK_TIMEOUT`](https://learn.microsoft.com/en-us/sql/t-sql/statements/set-lock-timeout-transact-sql?view=sql-server-ver17)
+- [SQL Server table hints](https://learn.microsoft.com/en-us/sql/t-sql/queries/hints-transact-sql-table?view=sql-server-ver17)
+- [SQL Server key-range locking](https://learn.microsoft.com/en-us/sql/relational-databases/sql-server-transaction-locking-and-row-versioning-guide?view=sql-server-ver17)
 - [SQLite transactions](https://www.sqlite.org/lang_transaction.html)
 - [Deno KV transactions](https://docs.deno.com/deploy/kv/transactions/)
 - [RFC 8785 JSON Canonicalization Scheme](https://www.rfc-editor.org/info/rfc8785/)
@@ -1662,20 +1925,30 @@ contract:
 1. **Idempotency default.** Must every v1 command require a key, or may a definition explicitly
    choose `mode: "optional"` and emit `not_requested`? Recommendation: required by default, explicit
    optional only for controlled internal callers.
-2. **SQLite release timing.** Is a real SQLite adapter and contention suite required for the first
-   stable command-kit release, or does SQLite remain unsupported until a later adapter PR?
-   Recommendation: later; do not delay the reference/client-server adapters or claim current
-   support.
-3. **Correlation telemetry.** Should a validated correlation ID be an opt-in command attribute under
-   an explicit redaction/cardinality policy, or remain durable-row/log-only? Recommendation:
-   durable-row/log-only by default.
+2. **SQLite default-only capability and release timing.** SQLite's engine isolation is serializable,
+   but the current generated/Prisma surface does not expose a portable explicit selection path. A
+   future store would therefore advertise `selectableIsolationLevels: []` and
+   `defaultIsolation: 'Serializable'`: an omitted isolation may run, while an explicitly requested
+   `Serializable` is refused by the isolation law. Does v1 accept that default-only capability, and
+   if so must its real contention/crash/lease suite land in the first stable release?
+   Recommendation: accept the capability shape but release it later; do not delay the client/server
+   adapters or claim current SQLite support.
+3. **Cross-runtime correlation/idempotency telemetry.** Should validated correlation be an opt-in
+   command attribute under a redaction/cardinality policy, or remain durable-row/log-only? Existing
+   messaging spans emit `netscript.correlation.id` and saga vocabulary defines
+   `netscript.idempotency.key`, so either outcome also needs an operator-facing decision: explicitly
+   document the command asymmetry, or schedule a separate deprecation/redaction cleanup of those
+   existing attributes. Raw command idempotency keys remain forbidden. Recommendation: keep command
+   correlation durable-row/log-only by default and reconcile the older telemetry surface separately.
 4. **Retention defaults.** What minimum receipt retry window and published-outbox cleanup defaults
    should generators document? Recommendation: require explicit deployment values until operational
    evidence establishes safe defaults; audit remains application policy.
 
 The following are not open: no hidden schema ownership, no weak KV semantics, no global conflict
 error, no automatic callback retry, no read-then-compare concurrency, no remote I/O in the command
-transaction, and no exactly-once delivery claim.
+transaction, and no exactly-once delivery claim. PostgreSQL/MySQL/SQL Server receipt claims use the
+normative algorithms above; relay runtime ownership is service over database-owned persistence; and
+v1 does not wrap or depend on `@netscript/queue`.
 
 ## Future possibilities
 
