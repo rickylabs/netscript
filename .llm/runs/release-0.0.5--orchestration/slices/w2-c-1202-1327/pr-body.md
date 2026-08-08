@@ -44,8 +44,12 @@ bind the live Postgres allocation across consecutive AppHost starts.
   0 failed. Scoped check/lint/format, `quality:gate`, and `arch:check` all exit 0. The parser now
   compares validated numeric ports across explicitly enumerated URL and Npgsql keyword dialects;
   deliberate mismatch and missing-port controls fail with source-specific diagnostics.
-- Fourth serialized pass requested. It was not run because W2-A currently holds the token. Runtime
-  DoD and #1202 acceptance remain unchecked until the four decisive gates pass in one granted run.
+- Fourth `scaffold.runtime`: raw exit 1, `passed=61 failed=1`. In this single run,
+  `database.migration-artifacts` and both allocation captures passed. `behavior.live-db-endpoint`
+  advanced through structural endpoint comparison, then failed because the health validator expects
+  per-check `status: "healthy"` while the live HTTP 200 payload uses `healthy: true`. It did not
+  reach structured-log/OTEL correlation. Cleanup, postflight leak evidence, and review threads
+  passed; there was no retry or repair.
 
 ## Harness
 

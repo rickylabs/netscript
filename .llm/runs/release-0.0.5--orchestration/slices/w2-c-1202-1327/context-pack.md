@@ -2,12 +2,12 @@
 
 ## Current phase
 
-The live-endpoint validator now structurally parses both explicitly supported connection dialects:
-Postgres URLs and semicolon key/value strings. Focused RED/green, scoped wrappers, `quality:gate`,
-and `arch:check` are green; the negative test deliberately mismatches ports and remains RED-capable.
-W2-A holds the serialized token, so no fourth `scaffold.runtime` pass was attempted. An
-`EXPENSIVE-GATE-REQUEST` is recorded and #1202 acceptance remains unticked until all four decisive
-gates pass together and the health/log/OTEL receipt completes.
+Fourth serialized pass completed with raw exit 1 and `passed=61 failed=1`. Migration artifacts and
+both allocation captures passed in the same run. Structural endpoint comparison also advanced, but
+`behavior.live-db-endpoint` rejected the actual healthy check shape (`healthy: true`) because it
+expects `status: "healthy"`; it stopped before structured-log/OTEL correlation. Pre/post leak
+artifacts show no W2-C-owned or unknown survivor, and review threads pass with zero unanswered.
+There was no retry or repair. The token is released failing and #1202 acceptance remains unticked.
 
 ## Identity
 

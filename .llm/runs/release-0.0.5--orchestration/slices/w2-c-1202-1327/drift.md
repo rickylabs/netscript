@@ -77,3 +77,15 @@
   the evidence gate from degrading into a broad substring match.
 - Evidence boundary: focused/scoped/framework gates pass. No fourth runtime pass was attempted
   because W2-A holds the serialized token; a new `EXPENSIVE-GATE-REQUEST` is pending.
+
+## 2026-08-09 — live health receipt expects the wrong check shape (material)
+
+- Expected: after structural endpoint authority succeeds, the live gate accepts the users health
+  contract and correlates structured logs with OTEL traces.
+- Observed: the service returned HTTP 200 with top-level `status: "healthy"` and database check
+  `{ "name": "database", "healthy": true, "latency": 5 }`. The validator requires the check itself
+  to expose `status: "healthy"`, so it failed before telemetry collection.
+- Verdict: fourth serialized run raw exit 1, `passed=61 failed=1`. Migration artifacts and both
+  allocation captures passed; `behavior.live-db-endpoint` failed in 239 ms.
+- Boundary: no retry or repair. Matching endpoints and healthy JSON do not substitute for the
+  missing correlated logs/OTEL receipt; #1202 acceptance stays unticked.

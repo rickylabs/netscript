@@ -100,6 +100,34 @@ the supervisor must not launch its own evaluator session.
 
 EXPENSIVE-GATE-REQUEST
 
+## Fourth serialized runtime verdict — 2026-08-09
+
+The fourth grant was consumed by exactly one runtime invocation at head `720299cb3`. The endpoint
+authority comparison passed and reached health receipt validation, where the gate failed on a second
+validator-shape mismatch. There was no retry or code repair.
+
+| Step                  | Exact command / artifact                                                                                                                          | Raw exit | Full verdict                                                                                                                        |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | -------: | ----------------------------------------------------------------------------------------------------------------------------------- |
+| Preflight leak check  | `deno task agentic:leak-check -- --slice-dir .llm/runs/release-0.0.5--orchestration/slices/w2-c-1202-1327 --worktree /home/codex/repos/ns005-w2c` |        0 | No W2-C-owned or unknown survivor. Known foreign `redis-jfgcbtaf`, owned by `/home/codex/repos/w6-review-desk`, was left untouched. |
+| Serialized suite      | `deno task e2e:cli run scaffold.runtime --cleanup --format pretty`                                                                                |        1 | `Summary: passed=61 failed=1`; `cleanup.aspire-stop` passed.                                                                        |
+| Postflight leak check | same command as preflight                                                                                                                         |        0 | Artifact proves no W2-C-owned or unknown survivor; only the same untouched foreign container remains. No teardown needed.           |
+| Review threads        | `deno task agentic:review-threads -- --repo rickylabs/netscript --pr 1393 --pretty`                                                               |        0 | `review-threads PASS rickylabs/netscript#1393 threads=0 unanswered=0`                                                               |
+
+### Four decisive gates in the same run
+
+- `database.migration-artifacts` — **PASSED**, 42,401 ms.
+- `runtime.capture-db-allocation-first` — **PASSED**, 491 ms.
+- `runtime.capture-db-allocation-second` — **PASSED**, 653 ms.
+- `behavior.live-db-endpoint` — **FAILED**, 239 ms. Structural endpoint comparison completed, then
+  health validation rejected HTTP 200 JSON containing top-level `status: "healthy"` and a database
+  check shaped as `{ "name": "database", "healthy": true, "latency": 5 }`. The validator currently
+  requires the check to contain `status: "healthy"`, so it stopped before querying structured logs
+  and OTEL traces.
+
+This run does not prove the correlated telemetry receipt and therefore does not satisfy all four
+#1202 rows. They remain unticked. The serialized token is released with a failing verdict; no blind
+retry or implementation repair occurred.
+
 - All required non-runtime gates are green at commit `84c753c20` plus formatter-only pending diff.
 - Requested command: `deno task e2e:cli run scaffold.runtime --cleanup --format pretty`.
 - The supervisor will run leak-check before/after and will not start until the orchestrator grants
