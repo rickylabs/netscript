@@ -128,6 +128,43 @@ This run does not prove the correlated telemetry receipt and therefore does not 
 #1202 rows. They remain unticked. The serialized token is released with a failing verdict; no blind
 retry or implementation repair occurred.
 
+## Health-contract validator repair — pass 5 request
+
+The fourth failure was traced to the producer rather than patched from the observed payload alone.
+`packages/service/src/primitives/health.ts` defines and serializes `HealthResponse`: overall
+`HealthStatus`, with checks shaped as `{ name, healthy, message?, latency? }`. Generated services
+reach that `/health` handler through `defineService`; there is no per-check `status` field.
+
+The fourth-pass HTTP response is checked in verbatim as a fast fixture. A negative fixture retains
+top-level `status: "healthy"` while setting the database check to `healthy: false`, proving the
+matcher must inspect the documented per-check boolean and cannot widen into an aggregate-only pass.
+The matcher accepts only the two names produced by `defineService`: `database` for a single client
+and `database:<provider>` for the configured client in a multi-database context.
+
+| Phase            | Command                                                                                                                                                                                                                               | Raw exit | Result                                                              |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------: | ------------------------------------------------------------------- |
+| Contract RED     | `deno test --no-lock --allow-all packages/cli/e2e/tests/application/gates/verify-live-db-endpoint_test.ts`                                                                                                                            |        1 | `matchesDatabaseHealthContract` did not exist                       |
+| Focused green    | `deno test --no-lock --allow-all packages/cli/e2e/tests/application/gates/verify-live-db-endpoint_test.ts packages/cli/e2e/tests/application/gates/scaffold-gates_test.ts packages/cli/e2e/tests/presentation/suite-registry_test.ts` |        0 | 30 passed, 0 failed                                                 |
+| Scoped check     | CLI E2E wrapper with `--deno-arg --no-lock`                                                                                                                                                                                           |        0 | 135 files, zero diagnostics                                         |
+| Scoped lint      | CLI E2E wrapper                                                                                                                                                                                                                       |        0 | 135 files, zero diagnostics                                         |
+| Scoped format    | CLI E2E wrapper                                                                                                                                                                                                                       |        0 | 135 files, zero findings                                            |
+| Framework law    | `deno task quality:gate`                                                                                                                                                                                                              |        0 | quality scan and doctrine checks passed; pre-existing warnings only |
+| Doctrine fitness | `deno task arch:check`                                                                                                                                                                                                                |        0 | passed; pre-existing warnings only                                  |
+
+### #1202 row 2 — persisting mechanism
+
+The mechanism is eager `getEndpoint("tcp")` materialization: resolving the endpoint and writing that
+string into generated `DATABASE_URL` serializes one AppHost allocation into the generated service
+environment. The RED-first guard forbids that output and requires lazy
+`resource.withEnvironment('DATABASE_URL', infrastructure.primaryDatabase)` binding, plus reference
+and readiness edges, so Aspire resolves the current allocation on each start.
+
+`scaffold.runtime` was not run because W2-B holds the serialized token. Rows 1, 3, and 4 remain
+unproven until `behavior.live-db-endpoint` completes endpoint, health, structured-log, and OTEL
+receipt validation in a granted pass.
+
+EXPENSIVE-GATE-REQUEST
+
 - All required non-runtime gates are green at commit `84c753c20` plus formatter-only pending diff.
 - Requested command: `deno task e2e:cli run scaffold.runtime --cleanup --format pretty`.
 - The supervisor will run leak-check before/after and will not start until the orchestrator grants

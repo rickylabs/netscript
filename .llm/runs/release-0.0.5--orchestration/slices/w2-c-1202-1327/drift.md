@@ -89,3 +89,16 @@
   allocation captures passed; `behavior.live-db-endpoint` failed in 239 ms.
 - Boundary: no retry or repair. Matching endpoints and healthy JSON do not substitute for the
   missing correlated logs/OTEL receipt; #1202 acceptance stays unticked.
+
+## 2026-08-09 — health validation derived from producer contract (minor)
+
+- Authority: `packages/service/src/primitives/health.ts` exports `HealthResponse` and
+  `createHealthHandler`; generated services use it through `defineService`.
+- Repair: validate top-level `status` and the documented per-check `healthy` boolean, accepting only
+  the two database names emitted by single- and multi-client service presets. The invented per-check
+  `status` dialect was removed.
+- Regression evidence: the real fourth-pass HTTP response is checked in as a fixture. A negative
+  fixture keeps aggregate status healthy but makes the database check unhealthy, so a matcher that
+  ignores check details fails the unit contract.
+- Evidence boundary: focused/static/framework gates pass. No runtime pass was attempted while W2-B
+  holds the serialized token; a fifth-pass request is pending.

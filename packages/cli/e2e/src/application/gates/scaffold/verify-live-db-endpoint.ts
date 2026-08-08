@@ -33,7 +33,7 @@ async function verifyLiveDbEndpoint(): Promise<void> {
   const usersUrl = await liveHttpUrl('users');
   const healthResponse = await fetch(new URL('/health', usersUrl));
   const healthBody = await healthResponse.text();
-  if (!healthResponse.ok || !healthMatches(healthBody, database)) {
+  if (!healthResponse.ok || !matchesDatabaseHealthContract(healthBody, database)) {
     throw new Error(
       `users health did not prove database readiness: ${healthResponse.status} ${healthBody}`,
     );
@@ -230,13 +230,33 @@ function environmentValue(resource: Record<string, unknown>, key: string): strin
   throw new Error(`users resource omitted ${key}`);
 }
 
-function healthMatches(body: string, expectedDatabase: string): boolean {
-  const value = JSON.parse(body);
-  return isRecord(value) && value.status === 'healthy' && Array.isArray(value.checks) &&
-    value.checks.filter(isRecord).some((check) =>
-      check.status === 'healthy' &&
-      (check.name === 'database' || check.name === `database:${expectedDatabase}`)
-    );
+/**
+ * Matches the documented `HealthResponse` serialized by
+ * `@netscript/service`'s `createHealthHandler`: overall `status` plus checks
+ * shaped as `{ name, healthy, message?, latency? }`. `defineService` names a
+ * single client `database` and a selected multi-client provider
+ * `database:<provider>`; those are the only two explicitly accepted names.
+ * The contract does not define a per-check `status` dialect.
+ */
+export function matchesDatabaseHealthContract(
+  body: string,
+  expectedDatabase: string,
+): boolean {
+  let value: unknown;
+  try {
+    value = JSON.parse(body);
+  } catch {
+    return false;
+  }
+  if (!isRecord(value) || value.status !== 'healthy' || !Array.isArray(value.checks)) {
+    return false;
+  }
+
+  const expectedNames = new Set(['database', `database:${expectedDatabase}`]);
+  const databaseChecks = value.checks.filter(isRecord).filter((check) =>
+    typeof check.name === 'string' && expectedNames.has(check.name)
+  );
+  return databaseChecks.length === 1 && databaseChecks[0].healthy === true;
 }
 
 function extractJson(text: string): string {

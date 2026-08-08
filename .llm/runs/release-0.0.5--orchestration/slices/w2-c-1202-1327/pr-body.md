@@ -50,6 +50,16 @@ bind the live Postgres allocation across consecutive AppHost starts.
   per-check `status: "healthy"` while the live HTTP 200 payload uses `healthy: true`. It did not
   reach structured-log/OTEL correlation. Cleanup, postflight leak evidence, and review threads
   passed; there was no retry or repair.
+- Health matcher repair: derived from `@netscript/service`'s `HealthResponse` producer contract,
+  with the real fourth-pass HTTP response checked in as a fixture. Contract RED exited 1; focused
+  green exited 0 with 30 passed, 0 failed. The negative fixture retains healthy aggregate status
+  while setting the database check to `healthy: false`, proving check details remain authoritative.
+  Scoped check/lint/format, `quality:gate`, and `arch:check` exit 0.
+- #1202 row 2 mechanism: eager `getEndpoint("tcp")` materialization serializes one AppHost
+  allocation into generated `DATABASE_URL`. The RED-first guard forbids it and requires lazy
+  `infrastructure.primaryDatabase` resource binding so the endpoint resolves afresh on every start.
+- Fifth serialized pass requested but not run while W2-B holds the token. Rows 1, 3, and 4 remain
+  unchecked until the endpoint/health/structured-log/OTEL receipt completes in one granted pass.
 
 ## Harness
 
@@ -64,6 +74,17 @@ bind the live Postgres allocation across consecutive AppHost starts.
 - Existing CLI maintainer/public-mixing and permission-doc debt is accepted and must not deepen.
 
 ## Definition of Done
+
+### #1202 acceptance
+
+- [ ] Fresh users service matches the first live Postgres allocation and reports database health.
+- [x] Persisting mechanism identified RED-first: eager `getEndpoint("tcp")` materialization
+      serializes one allocation into `DATABASE_URL`; the guard requires lazy
+      `infrastructure.primaryDatabase` binding.
+- [ ] A second consecutive AppHost allocation remains matched and healthy.
+- [ ] Health JSON plus a shared trace ID across structured logs and OTEL prove the live receipt.
+
+### Slice completion
 
 - [x] `db migrate` success names and verifies created migration files and applied database state.
 - [x] Headless inability to create a migration fails non-zero with an actionable next command.

@@ -2,12 +2,13 @@
 
 ## Current phase
 
-Fourth serialized pass completed with raw exit 1 and `passed=61 failed=1`. Migration artifacts and
-both allocation captures passed in the same run. Structural endpoint comparison also advanced, but
-`behavior.live-db-endpoint` rejected the actual healthy check shape (`healthy: true`) because it
-expects `status: "healthy"`; it stopped before structured-log/OTEL correlation. Pre/post leak
-artifacts show no W2-C-owned or unknown survivor, and review threads pass with zero unanswered.
-There was no retry or repair. The token is released failing and #1202 acceptance remains unticked.
+The live health matcher is now derived from `@netscript/service`'s documented `HealthResponse`
+producer contract and covered by the verbatim fourth-pass response plus an adversarial unhealthy
+database fixture. Focused RED/green, scoped wrappers, `quality:gate`, and `arch:check` pass. Row 2's
+persisting mechanism is explicitly recorded as eager `getEndpoint("tcp")` materialization versus
+lazy `infrastructure.primaryDatabase` resource binding. W2-B holds the serialized token, so no fifth
+runtime pass was attempted. `EXPENSIVE-GATE-REQUEST` is recorded; rows 1, 3, and 4 await the
+complete endpoint/health/log/OTEL receipt.
 
 ## Identity
 

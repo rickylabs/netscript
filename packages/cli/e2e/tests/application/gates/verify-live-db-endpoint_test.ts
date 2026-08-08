@@ -1,5 +1,15 @@
 import { assertEquals, assertStringIncludes } from '@std/assert';
-import { compareDatabaseEndpointPorts } from '../../../src/application/gates/scaffold/verify-live-db-endpoint.ts';
+import {
+  compareDatabaseEndpointPorts,
+  matchesDatabaseHealthContract,
+} from '../../../src/application/gates/scaffold/verify-live-db-endpoint.ts';
+
+const realHealthResponse = await Deno.readTextFile(
+  new URL('./fixtures/users-health-real-response.json', import.meta.url),
+);
+const unhealthyHealthResponse = await Deno.readTextFile(
+  new URL('./fixtures/users-health-unhealthy-response.json', import.meta.url),
+);
 
 Deno.test('database endpoint ports match across URL and keyword dialects', () => {
   assertEquals(
@@ -38,4 +48,14 @@ Deno.test('database endpoint comparison names an unparseable side and its value'
   assertEquals(usersFailure.ok, false);
   assertStringIncludes(usersFailure.error ?? '', 'users DATABASE_URL');
   assertStringIncludes(usersFailure.error ?? '', 'Host=localhost;Database=app');
+});
+
+Deno.test('database health matcher accepts the captured users response contract', () => {
+  assertEquals(matchesDatabaseHealthContract(realHealthResponse, 'postgres'), true);
+});
+
+Deno.test('database health matcher rejects an unhealthy database fixture', () => {
+  // The fixture deliberately retains a healthy aggregate so this assertion proves
+  // the matcher reads the database check's documented `healthy` boolean too.
+  assertEquals(matchesDatabaseHealthContract(unhealthyHealthResponse, 'postgres'), false);
 });
