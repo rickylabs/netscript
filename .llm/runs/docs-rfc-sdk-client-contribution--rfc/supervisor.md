@@ -47,7 +47,9 @@ Written at run start per `workflow/lane-policy.md` § Supervisor identity.
 - Reviewable amended RFC/research commit: `7a0d398087a6608ff1a55bb9fe4c47158edb72a7`.
 - Formal evaluator artifact: `f1a29fe1a65d59f71a59bf4b6b2a48fc49e1e86f`; verdict SHA-256
   `0690af2a2914ad0a9118be04ccebb933af33b2bac8f3f743bc7990f8f5f38cdd`.
-- The remediated RFC returns to `status:plan-eval` only after focused gates, meaningful commits, an
-  explicit-refspec push, and a structured cycle-2 handoff comment.
+- Reviewable remediation: `78a7cecd1d5eaafa7a65bc25a21af497567128dc`; verified remote handoff HEAD
+  before final metadata: `bc955459046c19a31fe00195b32f37f25a04e24f`.
+- The remediated RFC passed focused gates, was pushed by explicit refspec, and has returned to
+  exactly one `status:plan-eval`; the structured cycle-2 handoff comment records final HEAD.
 - The exact Fable cycle-2 entry point and prohibited mutations are in `final-handoff.md`. No
   evaluator was launched and no PASS verdict is claimed by this session.

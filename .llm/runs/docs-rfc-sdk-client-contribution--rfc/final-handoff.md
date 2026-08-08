@@ -9,9 +9,10 @@
 | Base                          | `origin/main` at `fac9e339042c5394bf882311657d8981d353a1c3`                                   |
 | Formal cycle-1 verdict        | `FAIL_PLAN / CHANGES_REQUESTED`; `plan-eval.md` at `f1a29fe1a65d59f71a59bf4b6b2a48fc49e1e86f` |
 | Reviewable remediation commit | `78a7cecd1d5eaafa7a65bc25a21af497567128dc`                                                    |
+| Verified remote handoff HEAD  | `bc955459046c19a31fe00195b32f37f25a04e24f`                                                    |
 | RFC                           | `rfcs/0000-sdk-client-contributions.md` (`0000`, Draft)                                       |
 | Run dir                       | `.llm/runs/docs-rfc-sdk-client-contribution--rfc/`                                            |
-| Requested lifecycle           | exactly one `status:plan-eval` after push                                                     |
+| Verified lifecycle            | exactly one `status:plan-eval`                                                                |
 
 The PR stays draft. This is author remediation of authoritative Fable findings F-A1 through F-A10,
 not a self-evaluation or PASS claim. No RFC number, issue, milestone, merge, evaluator, or product
@@ -54,16 +55,16 @@ implementation, and upstream-major-neutral public/generated RFC-A declarations.
 
 ## Validation Evidence
 
-| Gate                           | Evidence                                                               |
-| ------------------------------ | ---------------------------------------------------------------------- |
-| Real-surface type fixture      | PASS — Deno check exit 0; 0.92 s/268,448 KiB informational observation |
-| Targeted format/lint           | PASS — 9 files checked; fixture lint 1 file/0 findings                 |
-| Focused RFC links              | PASS — 1 document, 0 broken links/anchors                              |
-| Repository docs links/accuracy | PASS — 102 documents/0 broken; accuracy PASS                           |
-| Doctrine                       | PASS — `deno task arch:check` exit 0; warning-only baseline unchanged  |
-| Diff hygiene                   | PASS — `git diff --check`                                              |
-| Review threads                 | PASS — 0 total / 0 unanswered                                          |
-| Git/PR metadata                | `VALIDATION_PENDING`                                                   |
+| Gate                           | Evidence                                                                                                                 |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
+| Real-surface type fixture      | PASS — Deno check exit 0; 0.92 s/268,448 KiB informational observation                                                   |
+| Targeted format/lint           | PASS — 9 files checked; fixture lint 1 file/0 findings                                                                   |
+| Focused RFC links              | PASS — 1 document, 0 broken links/anchors                                                                                |
+| Repository docs links/accuracy | PASS — 102 documents/0 broken; accuracy PASS                                                                             |
+| Doctrine                       | PASS — `deno task arch:check` exit 0; warning-only baseline unchanged                                                    |
+| Diff hygiene                   | PASS — `git diff --check`                                                                                                |
+| Review threads                 | PASS — 0 total / 0 unanswered                                                                                            |
+| Git/PR metadata                | PASS — explicit-refspec push; draft/main; required labels; sole `status:plan-eval`; milestone null; #1348 reference only |
 
 No CLI/scaffold runtime E2E is appropriate for this RFC-only change; implementation stages retain
 the full runtime gates. Existing JSR/doc-lint baselines remain recorded in `research.md` and are not

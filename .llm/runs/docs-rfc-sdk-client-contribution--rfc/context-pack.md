@@ -2,14 +2,14 @@
 
 ## Run Metadata
 
-| Field          | Value                                                                   |
-| -------------- | ----------------------------------------------------------------------- |
-| Run ID         | `docs-rfc-sdk-client-contribution--rfc`                                 |
-| Branch         | `docs/rfc-sdk-client-contribution`                                      |
-| Current phase  | `plan-eval`; cycle-1 remediation ready for owner-directed Fable cycle 2 |
-| Archetype      | `2 + 4 + 5 + 6` described; docs-only PR                                 |
-| Scope overlays | `SCOPE-docs`                                                            |
-| PR             | `https://github.com/rickylabs/netscript/pull/1390`                      |
+| Field          | Value                                                                    |
+| -------------- | ------------------------------------------------------------------------ |
+| Run ID         | `docs-rfc-sdk-client-contribution--rfc`                                  |
+| Branch         | `docs/rfc-sdk-client-contribution`                                       |
+| Current phase  | `plan-eval`; cycle-1 remediation pushed for owner-directed Fable cycle 2 |
+| Archetype      | `2 + 4 + 5 + 6` described; docs-only PR                                  |
+| Scope overlays | `SCOPE-docs`                                                             |
+| PR             | `https://github.com/rickylabs/netscript/pull/1390`                       |
 
 ## Current State
 
@@ -82,22 +82,22 @@ addition is a compile-only RFC type fixture.
 
 ## Gate Snapshot
 
-| Gate                            | Status             | Evidence                                                                        |
-| ------------------------------- | ------------------ | ------------------------------------------------------------------------------- |
-| RFC formatting                  | pass               | `deno fmt --check`                                                              |
-| RFC internal links              | pass               | focused repo link checker, 0 broken                                             |
-| Repository docs links/accuracy  | pass               | both tasks exit 0                                                               |
-| Type fixture                    | pass               | In-tree Deno check; real defaults/key shapes plus 16 accepted/17 rejected       |
-| Package dry-run baseline        | pass               | contracts/sdk/plugin/auth-core all report dry-run OK                            |
-| JSR package audit               | baseline finding   | plugin audit exit 1 on pre-existing module tags/cardinality; other three exit 0 |
-| Doc-lint baseline               | baseline finding   | combined private refs 9/3/15/4 respectively; RFC adds none                      |
-| Doctrine                        | pass               | `deno task arch:check` exits 0; existing warnings are baseline                  |
-| PLAN-EVAL cycle 1               | fail/remediated    | Fable F-A1–F-A10 accepted; cycle-2 PASS remains external                        |
-| Audit amendment evidence        | pass               | 59-line input hashed; 91/74 file scan; seven v1 dependencies behind to 1.15.0   |
-| Audit amendment gates           | pass               | format, links, accuracy, type proof, doctrine, and diff hygiene                 |
-| Pre-amendment PR reconciliation | pass               | draft, required labels, sole `status:plan-eval`, no milestone/closing keyword   |
-| Cycle-1 remediation gates       | pass               | format/lint/type, RFC/repo links, accuracy, doctrine, and diff hygiene exit 0   |
-| Cycle-2 PR reconciliation       | pending final step | final pushed HEAD and sole `status:plan-eval` will be recorded in phase comment |
+| Gate                            | Status           | Evidence                                                                            |
+| ------------------------------- | ---------------- | ----------------------------------------------------------------------------------- |
+| RFC formatting                  | pass             | `deno fmt --check`                                                                  |
+| RFC internal links              | pass             | focused repo link checker, 0 broken                                                 |
+| Repository docs links/accuracy  | pass             | both tasks exit 0                                                                   |
+| Type fixture                    | pass             | In-tree Deno check; real defaults/key shapes plus 16 accepted/17 rejected           |
+| Package dry-run baseline        | pass             | contracts/sdk/plugin/auth-core all report dry-run OK                                |
+| JSR package audit               | baseline finding | plugin audit exit 1 on pre-existing module tags/cardinality; other three exit 0     |
+| Doc-lint baseline               | baseline finding | combined private refs 9/3/15/4 respectively; RFC adds none                          |
+| Doctrine                        | pass             | `deno task arch:check` exits 0; existing warnings are baseline                      |
+| PLAN-EVAL cycle 1               | fail/remediated  | Fable F-A1–F-A10 accepted; cycle-2 PASS remains external                            |
+| Audit amendment evidence        | pass             | 59-line input hashed; 91/74 file scan; seven v1 dependencies behind to 1.15.0       |
+| Audit amendment gates           | pass             | format, links, accuracy, type proof, doctrine, and diff hygiene                     |
+| Pre-amendment PR reconciliation | pass             | draft, required labels, sole `status:plan-eval`, no milestone/closing keyword       |
+| Cycle-1 remediation gates       | pass             | format/lint/type, RFC/repo links, accuracy, doctrine, and diff hygiene exit 0       |
+| Cycle-2 PR reconciliation       | pass             | draft/main, required labels, sole `status:plan-eval`, milestone null, explicit push |
 
 ## JSR Consequences
 
@@ -155,5 +155,6 @@ milestones. Findings should cite RFC headings and classify blocking versus safe 
 - Audit amendment: `7a0d398087a6608ff1a55bb9fe4c47158edb72a7`.
 - Formal evaluator artifact: `f1a29fe1a65d59f71a59bf4b6b2a48fc49e1e86f`.
 - Cycle-1 remediation: `78a7cecd1d5eaafa7a65bc25a21af497567128dc`.
-- The final handoff commit is recorded here after creation; the PR comment records the final pushed
-  HEAD because an artifact cannot contain its own commit id.
+- Handoff evidence: `bc955459046c19a31fe00195b32f37f25a04e24f`.
+- The final live-reconciliation commit is recorded in the PR phase comment because an artifact
+  cannot contain its own commit id.
