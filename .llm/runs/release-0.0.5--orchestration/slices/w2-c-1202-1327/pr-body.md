@@ -23,12 +23,16 @@ code/evidence slice for #1202; owner-machine collision observation remains separ
 
 - Baseline Git and live issue re-verification — exit 0
 - Focused/scoped/quality/doctrine/doc/publish gates — exit 0
-- `scaffold.runtime` — not requested; serialized token protocol applies
+- Granted one-pass `scaffold.runtime` — raw exit 0, `passed=76 failed=0`; pre/post leak reports show
+  no W2-C-owned survivor and review-thread gate passed with 0 unanswered threads.
+- Coverage limitation: that pass exposed an explicit-suite allowlist omission, so it did not execute
+  the four new W2-C acceptance gates. The selector repair is focused-green (16/16 registry tests),
+  but those four gates still require a fresh serialized grant before merge readiness.
 
 ## Harness
 
 - Run dir: `.llm/runs/release-0.0.5--orchestration/slices/w2-c-1202-1327/`
-- Phase: plan → implementation
+- Phase: implementation → IMPL-EVAL handoff with disclosed runtime-evidence gap
 - Do not merge until required gates, Tier-A review, and separate-session IMPL-EVAL PASS are complete.
 
 ## Drift / Debt
@@ -38,9 +42,9 @@ code/evidence slice for #1202; owner-machine collision observation remains separ
 
 ## Definition of Done
 
-- [ ] `db migrate` success names and verifies created migration files and applied database state.
-- [ ] Headless inability to create a migration fails non-zero with an actionable next command.
-- [ ] `db deploy` is the only deploy-only verb and output separates created/applied sets.
+- [x] `db migrate` success names and verifies created migration files and applied database state.
+- [x] Headless inability to create a migration fails non-zero with an actionable next command.
+- [x] `db deploy` is the only deploy-only verb and output separates created/applied sets.
 - [ ] TTY and non-TTY schema-change E2E proves files and database state, with deploy/no-change controls.
 - [ ] Two consecutive starts prove users receives the live Postgres allocation via health, logs, and OTEL.
 - [ ] Required static, quality, doctrine, publish, resource-health, and serialized runtime gates pass.

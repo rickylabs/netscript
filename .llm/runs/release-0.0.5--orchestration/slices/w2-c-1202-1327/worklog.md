@@ -102,3 +102,48 @@ EXPENSIVE-GATE-REQUEST
 - Requested command: `deno task e2e:cli run scaffold.runtime --cleanup --format pretty`.
 - The supervisor will run leak-check before/after and will not start until the orchestrator grants
   the serialized token.
+
+## Serialized runtime verdict — 2026-08-09
+
+Token grant received from the milestone orchestrator. The required command was run exactly once;
+there was no retry.
+
+| Step | Exact command / artifact | Raw exit | Full verdict |
+| --- | --- | ---: | --- |
+| Preflight leak check | `deno task agentic:leak-check -- --slice-dir .llm/runs/release-0.0.5--orchestration/slices/w2-c-1202-1327 --worktree /home/codex/repos/ns005-w2c` | 0 | No W2-C-owned or unknown survivor. One foreign stale container, `redis-jfgcbtaf` (`48c4411…`), belongs to `/home/codex/repos/w6-review-desk`; left untouched. |
+| Serialized suite | `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | 0 | `Summary: passed=76 failed=0`; all 76 selected gates passed, including `cleanup.aspire-stop`. One pass only. |
+| Postflight leak check | same command as preflight | 0 | Artefact inspection again found no W2-C-owned or unknown survivor and the same untouched foreign container only. No teardown was needed. |
+| Review threads | `deno task agentic:review-threads -- --repo rickylabs/netscript --pr 1393 --pretty` | 0 | `review-threads PASS rickylabs/netscript#1393 threads=0 unanswered=0` |
+
+### Coverage finding after the run
+
+The green 76-gate verdict did **not** execute the four W2-C acceptance gates because the built-in
+suite's explicit allowlist omitted their registered IDs:
+
+- `database.migration-artifacts`
+- `runtime.capture-db-allocation-first`
+- `runtime.capture-db-allocation-second`
+- `behavior.live-db-endpoint`
+
+The allowlist is now repaired and a registry test proves those four gates resolve in the Postgres
+runtime suite and remain excluded from the SQLite tier. Focused follow-up evidence on the repaired
+selector:
+
+| Command | Raw exit | Result |
+| --- | ---: | --- |
+| `deno test -A packages/cli/e2e/tests/presentation/suite-registry_test.ts` | 0 | 16 passed, 0 failed |
+| scoped check over `packages/cli/e2e` with `--no-lock` | 0 | 134 files, zero diagnostics |
+| scoped lint over `packages/cli/e2e` | 0 | 134 files, zero diagnostics |
+| scoped format over `packages/cli/e2e` | 0 | 134 files, zero findings |
+| `deno task quality:gate` | 0 | quality scan and doctrine checks passed; pre-existing warnings only |
+
+No second serialized run was attempted. The four acceptance gates therefore remain missing runtime
+evidence and require a fresh orchestrator-authorized pass after this evidence commit. The serialized
+token is released with that limitation stated explicitly.
+
+### Scope classification: `--name` forwarding
+
+The `NETSCRIPT_PRISMA_NAME` → `PRISMA_MIGRATION_NAME` correction is necessary for #1327, not an
+adjacent repair. `db migrate --name` is the actionable artifact-creation path required by the issue;
+without forwarding the name through the resident AppHost, the requested named migration cannot be
+created and verified.

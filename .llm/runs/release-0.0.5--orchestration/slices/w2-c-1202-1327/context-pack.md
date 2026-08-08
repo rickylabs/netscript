@@ -2,7 +2,10 @@
 
 ## Current phase
 
-Migration and live-endpoint fixtures are implemented and focused-green. Required non-runtime gates are next.
+Implementation handoff with a serialized-suite coverage gap. The granted one-pass runtime command
+returned `passed=76 failed=0`, but its explicit allowlist omitted all four newly registered W2-C
+acceptance gates. The selector is repaired and focused-green; those four gates still need a fresh
+orchestrator-authorized runtime pass before merge readiness.
 
 ## Identity
 
@@ -25,3 +28,7 @@ Migration and live-endpoint fixtures are implemented and focused-green. Required
   injection across two allocations.
 - `runMigration` currently switches to `migrate deploy` whenever a database URI exists, producing
   #1327's false green despite a separate `db deploy` verb.
+- The 2026-08-09 pre/post leak reports contain no W2-C-owned survivor. The sole reported container
+  belongs to `/home/codex/repos/w6-review-desk` and was deliberately left untouched.
+- The `--name` environment-key repair is required by #1327's named-artifact acceptance, not adjacent
+  scope.
