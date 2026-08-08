@@ -66,6 +66,32 @@ exemplar), not `rfcs/NNNN` files; `wave:*` labels dead; `status:close-gate-overr
 `docs-eval:skip` missing from live label set. Notable subagent-report divergence: 0.0.6 open
 count 22 vs 23 between two agents (GH counter includes a PR) — resolved, not a defect.
 
+#### S2b review note (supervisor, slice review gate)
+
+Workflow `wf_03b88126-e7e` completed 11/11 (1.78M subagent tokens, 905 tool calls, all
+`claude-opus-5[1m]`). Supervisor reviewed all 11 files (5,163 lines): citation bar met
+(file:line, executed `deno check`/`deno doc`/`deno eval` probes, live URLs); several defect
+verdicts are execution-verified, not read-only inference (#1249 reproduced byte-identical; the
+`isDefinedError`→`never` type defect proven by an executed `deno check`). Highest-leverage
+findings for the plan: (1) the SDK client is a **closed 9-field record** — no
+headers/interceptors/plugins/link seam, `createHttpClientLink` unexported, so auth composition is
+an absent API (confirms and sharpens pre-plan RFC A); (2) oRPC pin 1.14.6 blocks nothing — every
+extension gap is NetScript wrapper erasure (public export diff vs 1.14.15 identical); oRPC v2
+beta threatens the GET-based method inference; (3) docs' four P0 breaks all sit on the same
+contract→client→page seam, and `docs:accuracy` is a needle-checker that passes through them; (4)
+`ui:add page` emits a counter stub + empty `queryLoaders` while `resolveProjectRoot` targets the
+wrong tree — the generation seams are missing AND the one existing verb is mis-rooted; (5)
+runtime-plugin audit: saga publish receipt discarded in the shipped sample (new uncovered p0),
+`STREAMS_DATA_DIR` referenced by nothing, background children have zero health checks (the root
+enabler of green-but-dead); (6) #1245 is ~75% fixed by merged #1265 — must be RESCOPED not
+re-implemented; #1278's inventory is stale (one `as unknown as` left in web layer); (7) eis-chat
+proves the APIs exist and app-space conventions close the gap — scaffold/generation + discovery
+failure, not missing API; (8) competitive bar: SvelteKit remote functions + TanStack Start
+serialization checks are the typed-data frontier; genuine differentiation = first-party
+saga/compensation + Aspire graph + plugin-seam uniformity + agent-native surface. Divergences
+between agents (e.g. meta-frameworks agent's "MCP tool count not enumerated" vs mcp-cli agent's
+authoritative 21-tool enumeration) resolved in favor of the domain agent with source citations.
+
 ### S1 — Bootstrap (Stage A)
 
 - Run dir created; `supervisor.md` written first with identity, lane table, and owner overrides.
