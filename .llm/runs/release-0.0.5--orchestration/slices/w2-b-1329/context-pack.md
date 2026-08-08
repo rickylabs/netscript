@@ -6,19 +6,17 @@
 | -------------- | ----------------------------------------------- |
 | Run ID         | `release-0.0.5--orchestration/slices/w2-b-1329` |
 | Branch         | `fix/streams-versioned-sse-envelope`            |
-| Current phase  | `impl — S3`                                     |
+| Current phase  | `impl — S6 runtime failure`                     |
 | Archetype      | `3 — Runtime/Behavior`                          |
 | Scope overlays | `frontend`, `service`, `docs`                   |
 
 ## Current State
 
-PLAN-EVAL passed and S1 implements the exported `@netscript/plugin-streams-core/sse` authority.
-Upstream wire names remain exactly `data/control`; validated outcomes add `heartbeat/error`.
-Replay state includes the last committed opaque offset, optional observed cursor, terminal marker,
-and pending batches. Full export-map doc lint is now zero after replacing five private telemetry
-type references with explicit package-owned ports. S2 adds per-write correlation/message context,
-W3C tracestate emission, and real-server/proxy conformance against the same authority. S3 adds the
-Fresh native helper, generated Fresh 2.x island, and copy-exact official example.
+S1–S5 are implemented and every cheaper gate is green. The granted serialized runtime ran once and
+failed 74/75: the real generated streams consumer and verbatim native example passed, but
+`behavior.otel.traces` failed TC-14 because the SSE consumer W3C link trace id did not equal the
+actual Flow-B producer trace id. Cleanup passed and no W2-B resource survived. Seven of issue
+#1329's eight acceptance rows are proven; the end-to-end Aspire trace row is not.
 
 ## Completed
 
@@ -41,14 +39,13 @@ Fresh native helper, generated Fresh 2.x island, and copy-exact official example
 
 ## In Progress
 
-- Final S3 framework gates, commit/push/PR comment, then isolated runtime/OTEL evidence in S4.
+- None. The one-pass failure is handed back without retry or local fix.
 
 ## Next Steps
 
-1. Commit/push/comment S3.
-2. Capture S4 real generated-service/browser behavior and Deno AppHost consumer OTEL span.
-3. Complete S5 gates; request serialized gate only when otherwise green.
-4. Request orchestrator-launched separate IMPL-EVAL after terminal evidence.
+1. Orchestrator decides repair/reschedule after the TC-14 failure.
+2. A future repair must receive a new serialized token before rerunning `scaffold.runtime`.
+3. Do not set `status:impl-eval`, add `Closes #1329`, or launch the evaluator until the trace row is proven.
 
 ## Key Decisions
 
@@ -77,14 +74,15 @@ Fresh native helper, generated Fresh 2.x island, and copy-exact official example
 
 | Gate family | Current status             | Evidence                                                           |
 | ----------- | -------------------------- | ------------------------------------------------------------------ |
-| Static      | S1 green                   | 15 package tests; scoped check/lint/fmt; doc lint 0.                |
-| Fitness     | pending                    | AP-13 exact debt accepted; full gates after implementation.        |
-| Runtime     | not run                    | requires implementation and isolated Aspire.                       |
-| Consumer    | baseline defect reproduced | official example is wrong; generated helper lacks contract parser. |
+| Static      | green | Final focused suite 28/28; 114-file wrappers; doc/publish/quality/docs gates green. |
+| Fitness     | green with exact accepted debts | AP-13 warning and connector convergence remain unchanged. |
+| Runtime     | **failed** | Aggregate 74 passed, 1 failed: TC-14 W3C link/producer trace equality. |
+| Consumer    | green | Generated service and exact documented native example executed successfully. |
 
 ## Open Questions
 
-- None that may force S1 rework; the full `plan-eval.md` is imported and F1/F2 are resolved.
+- Why the live SSE change's traceparent links outside the actual Flow-B producer trace; this is the
+  single observed blocker and was not diagnosed or repaired after the one-pass failure.
 
 ## Drift and Debt
 

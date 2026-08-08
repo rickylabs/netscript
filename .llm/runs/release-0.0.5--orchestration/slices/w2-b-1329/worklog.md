@@ -105,6 +105,10 @@ service, generator, or docs file owns a second event-name/payload table.
 | 2026-08-09 | S4    | pre-runtime leak check | Exit 0. Only `redis-jfgcbtaf`, proven foreign to `/home/codex/repos/w6-review-desk`, was reported and left untouched. No W2-B AppHost/container was started. |
 | 2026-08-09 | S5    | merge-readiness gates | Final targeted suite, 114-file scoped wrappers, full core export doc lint, workspace publish dry-run, quality/doctrine, docs, JSR audits, and review threads completed. |
 | 2026-08-09 | S6    | EXPENSIVE-GATE-REQUEST | Every cheaper gate is complete. Requesting the serialized `scaffold.runtime` token from the milestone orchestrator; the command has not been started. |
+| 2026-08-09 | S6    | serialized runtime | Grant received and exact one-pass command run once. Aggregate exit 1: 74 passed, 1 failed (`behavior.otel.traces` TC-14 link trace id did not equal producer Flow-B trace id). No retry. |
+| 2026-08-09 | S6    | runtime cleanup | `cleanup.aspire-stop` passed; post-run leak artefact reports no W2-B-owned survivor. Known foreign `redis-jfgcbtaf` remains untouched. |
+| 2026-08-09 | S6    | honesty verdict | Seven of eight issue acceptance rows are proven. End-to-end correlated Aspire trace is not; remain `status:impl`, do not add `Closes #1329`, and do not launch IMPL-EVAL. |
+| 2026-08-09 | S6    | post-failure threads | `agentic:review-threads` exit 0: 0 threads, 0 unanswered. |
 
 ## Decisions
 
@@ -181,9 +185,9 @@ service, generator, or docs file owns a second event-name/payload table.
 | Gate                           | Result  | Evidence                        | Notes                                       |
 | ------------------------------ | ------- | ------------------------------- | ------------------------------------------- |
 | Focused unchanged docs example | PASS | focused Deno native EventSource test | Exact extracted source; named batch and deletion materialization. |
-| Real generated service/browser | NOT_RUN | implemented; serialized runtime token pending | Full gate executes the same extracted source against the isolated generated streams service. |
-| Correlated OTEL trace          | NOT_RUN | implemented; serialized runtime token pending | Deno consumer service must W3C-link to the actual producer Flow-B trace. |
-| `scaffold.runtime`             | NOT_RUN | `EXPENSIVE-GATE-REQUEST` recorded | Awaiting orchestrator token; do not run before grant. |
+| Real generated service/browser | PASS | `behavior.otel.stream-consumer` (943 ms) | Generated service and verbatim native example executed. Deletion is focused/real-test-server proof, not observed in generated Flow-B. |
+| Correlated OTEL trace          | FAIL | `behavior.otel.traces` (58,790 ms) | TC-14 consumer W3C link trace id did not equal actual Flow-B producer trace id. |
+| `scaffold.runtime`             | FAIL (exit 1) | aggregate 74 passed, 1 failed | One pass only; no retry. Cleanup passed. Full evidence in `runtime-gate.md`. |
 
 ### Consumer Gates
 
@@ -194,5 +198,6 @@ service, generator, or docs file owns a second event-name/payload table.
 
 ## Handoff Notes
 
-- PLAN-EVAL should inspect D2, D5–D8, and whether the raw-wire/consumer-outcome distinction gives
-  W3-A enough stable reconnect semantics without pulling reconnect implementation into W2-B.
+- Serialized token is released with a failing verdict. The orchestrator owns rescheduling or
+  rescope; implementation must not advance to IMPL-EVAL until TC-14 trace equality is repaired and
+  a newly granted serialized run passes.
