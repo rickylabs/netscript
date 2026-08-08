@@ -64,6 +64,7 @@ shared E2E enumeration so every provider scenario proves real health.
 | 2026-08-09 | S3 | invariant | One domain enumeration now drives KV background waits; focused CLI E2E test passes 14/14. Generated AppHost execution remains NOT_RUN pending the serialized token. |
 | 2026-08-09 | S4 | non-serialized gates | Focused, verify-plugin, scoped wrappers, quality, doctrine, JSR, doc, and publish gates complete. Lock diff clean. |
 | 2026-08-09 | S4 | EXPENSIVE-GATE-REQUEST | Request the serialized token for exact one-pass `deno task e2e:cli run scaffold.runtime --cleanup --format pretty`; do not start until orchestrator grant. |
+| 2026-08-09 | S2 follow-up | Deno KV honesty check | Generated-workspace `CACHE_PROVIDER=denokv` scenario performs real set/get and reports active `deno-kv`; focused suite 10/10. Token request remains pending. |
 
 ## Gate Results
 
@@ -72,7 +73,7 @@ shared E2E enumeration so every provider scenario proves real health.
 | Gate | Command or check | Result | Notes |
 | --- | --- | --- | --- |
 | S1 RED | `deno test --config plugins/triggers/deno.json --allow-all --unstable-kv plugins/triggers/src/adapter/resources/resources.test.ts` | EXPECTED FAIL (exit 1) | 8 passed, behavioral registration test failed before network access. |
-| S2 triggers | same focused triggers command after thin bootstrap | PASS (exit 0) | 9 passed; behavioral registration active. |
+| S2 triggers | same focused triggers command after thin bootstrap | PASS (exit 0) | 10 passed; Redis registration and real Deno KV set/get both active through generated-workspace resolution. |
 | S2 sagas | focused sagas resources test | PASS (exit 0) | 7 passed; sibling seam preserved. |
 | verify-plugin triggers/sagas | both package-owned `verify-plugin.ts` entrypoints | PASS (exit 0 each) | no findings. |
 | S3 CLI E2E unit | focused `runtime-gates_test.ts` | PASS (exit 0) | 14 passed; exact workers/sagas/triggers enumeration and healthy waits asserted. |
@@ -85,6 +86,7 @@ shared E2E enumeration so every provider scenario proves real health.
 | triggers JSR audit | `audit-jsr-package.ts --root plugins/triggers --text` | PASS per audit (exit 0) | existing cardinality and slow-type WARN only. |
 | publish dry-run | `deno task publish:dry-run` | PASS (exit 0) | `Success Dry run complete`. |
 | lock hygiene | raw status + `git diff --exit-code c383b2e84 -- deno.lock` | PASS (exit 0) | no lock or unrelated churn. |
+| post-DenoKV refresh | triggers scoped check/lint/fmt + `quality:gate` | PASS (exit 0 each) | zero scoped findings; repository quality findings remain zero. |
 
 ### Runtime Gates
 

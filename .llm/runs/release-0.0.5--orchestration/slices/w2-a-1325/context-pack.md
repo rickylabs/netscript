@@ -12,7 +12,8 @@
 
 ## Current State
 
-S1–S3 implementation is landed and all non-serialized gates are green. The worklog now carries
+S1–S3 implementation is landed, generated-workspace probes cover Redis registration and real Deno
+KV set/get, and all non-serialized gates are green. The worklog now carries
 `EXPENSIVE-GATE-REQUEST`; no runtime resource has been started and the exact one-pass suite remains
 NOT_RUN pending the orchestrator's serialized token grant.
 

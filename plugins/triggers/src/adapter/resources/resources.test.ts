@@ -171,6 +171,47 @@ Deno.test('generated triggers runtime activates the selected Redis adapter', asy
   }
 });
 
+Deno.test('generated triggers runtime uses Deno KV when CACHE_PROVIDER=denokv', async () => {
+  const runtimeArtifact = collectInstallArtifacts(triggersAdapterPlugin).find((artifact) =>
+    artifact.path === 'triggers/runtime.ts'
+  );
+  if (!runtimeArtifact) {
+    throw new Error('triggers install must emit triggers/runtime.ts');
+  }
+
+  const previousProvider = Deno.env.get('CACHE_PROVIDER');
+  const previousKvUrl = Deno.env.get('DENO_KV_URL');
+  const directory = await Deno.makeTempDir({ prefix: 'generated-triggers-denokv-' });
+  const runtimePath = await Deno.makeTempFile({
+    dir: new URL('.', import.meta.url).pathname,
+    prefix: 'generated-triggers-denokv-runtime-',
+    suffix: '.ts',
+  });
+  const kvPath = `${directory}/runtime.sqlite3`;
+
+  try {
+    await resetKv();
+    Deno.env.set('CACHE_PROVIDER', 'denokv');
+    Deno.env.set('DENO_KV_URL', kvPath);
+    await Deno.writeTextFile(runtimePath, artifactText(runtimeArtifact));
+
+    // The generated source and this assertion both resolve @netscript/kv through the triggers
+    // workspace. The Redis bootstrap may be present, but provider selection must still choose and
+    // operate the built-in Deno KV adapter without manual edits.
+    await import(`${new URL(`file://${runtimePath}`).href}?test=${crypto.randomUUID()}`);
+    const kv = await getKv();
+    await kv.set(['generated-runtime', 'provider'], 'denokv');
+    assertEquals((await kv.get(['generated-runtime', 'provider']))?.value, 'denokv');
+    assertEquals(getActiveProvider(), 'deno-kv');
+  } finally {
+    await resetKv();
+    restoreEnvironment('CACHE_PROVIDER', previousProvider);
+    restoreEnvironment('DENO_KV_URL', previousKvUrl);
+    await Deno.remove(runtimePath);
+    await Deno.remove(directory, { recursive: true });
+  }
+});
+
 Deno.test('triggers resources preserve supported trigger sub-kinds', () => {
   assertStringIncludes(artifactText(webhookScaffolder.emit({ id: 'a' })[0]), 'defineWebhook');
   assertStringIncludes(
