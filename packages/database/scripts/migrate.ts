@@ -61,6 +61,24 @@ export interface MigrationOptions {
    * @default 45000
    */
   attemptTimeoutMs?: number;
+  /** Migration directory to inventory before and after creation. */
+  migrationsPath?: string;
+  /** Override terminal detection for hosts and deterministic tests. */
+  interactive?: boolean;
+  /** Injectable Prisma process boundary. */
+  spawn?: PrismaSpawn;
+  /** Diagnostic sink; defaults to `console.log` when verbose. */
+  log?: (message: string) => void;
+}
+
+/** Verified artifacts produced and applied by one migration invocation. */
+export interface MigrationExecutionResult {
+  /** Process-style exit code. */
+  readonly code: number;
+  /** Migration directory names created by this invocation. */
+  readonly created: readonly string[];
+  /** Created migration names verified as applied to the database. */
+  readonly applied: readonly string[];
 }
 
 /**
@@ -269,6 +287,13 @@ async function writeAllToStderr(bytes: Uint8Array): Promise<void> {
  * @returns Exit code from Prisma CLI
  */
 export async function runMigration(options: MigrationOptions): Promise<number> {
+  return (await runMigrationWithArtifacts(options)).code;
+}
+
+/** Create a migration and verify its filesystem artifact and applied database state. */
+export async function runMigrationWithArtifacts(
+  options: MigrationOptions,
+): Promise<MigrationExecutionResult> {
   const {
     provider,
     configPath = 'prisma.config.ts',
@@ -278,13 +303,16 @@ export async function runMigration(options: MigrationOptions): Promise<number> {
     baseRetryDelayMs = 1_000,
     maxRetryDelayMs = 15_000,
     attemptTimeoutMs = 45_000,
+    migrationsPath = 'migrations',
+    interactive = Deno.stdin.isTerminal(),
+    spawn,
   } = options;
-  const log = verbose ? console.log.bind(console) : () => {};
+  const log = options.log ?? (verbose ? console.log.bind(console) : () => {});
 
   const migrationName = requestedMigrationName ?? Deno.env.get('PRISMA_MIGRATION_NAME');
   const isCI = Deno.env.get('CI') === 'true';
   const hasDbUri = hasDatabaseUri();
-  const nonInteractive = isCI || hasDbUri;
+  const nonInteractive = !interactive;
 
   if (verbose) {
     log('--- ENV VARS FOR PRISMA MIGRATION ---');
@@ -295,40 +323,90 @@ export async function runMigration(options: MigrationOptions): Promise<number> {
     log('-------------------------------------');
   }
 
-  // If migration name is provided, create a new migration
-  if (migrationName) {
-    log(`🔄 Creating migration with name: ${migrationName}`);
-    return await runPrismaWithRetry(
-      {
-        label: 'migrate dev',
-        args: ['migrate', 'dev', '--config', configPath, '--name', migrationName],
-      },
-      {
-        interactive: !nonInteractive,
-        maxAttempts,
-        baseRetryDelayMs,
-        maxRetryDelayMs,
-        attemptTimeoutMs,
-        log,
-      },
-    );
-  }
-
-  // In non-interactive mode (Aspire/CI), use migrate deploy to apply existing migrations
-  if (nonInteractive) {
-    log(`🔄 Non-interactive mode (Aspire: ${hasDbUri}, CI: ${isCI}), using migrate deploy...`);
-    return await runPrismaWithRetry(
-      { label: 'migrate deploy', args: ['migrate', 'deploy', '--config', configPath] },
-      { interactive: false, maxAttempts, baseRetryDelayMs, maxRetryDelayMs, attemptTimeoutMs, log },
-    );
-  }
-
-  // Interactive mode - run prisma migrate dev
-  log('🔄 Running interactive migration...');
-  return await runPrismaWithRetry(
-    { label: 'migrate dev', args: ['migrate', 'dev', '--config', configPath] },
-    { interactive: true, maxAttempts, baseRetryDelayMs, maxRetryDelayMs, attemptTimeoutMs, log },
+  const before = await listMigrationArtifacts(migrationsPath);
+  log(migrationName
+    ? `🔄 Creating migration with name: ${migrationName}`
+    : '🔄 Creating migration from the current schema change...');
+  const args = ['migrate', 'dev', '--config', configPath];
+  if (migrationName) args.push('--name', migrationName);
+  const createCode = await runPrismaWithRetry(
+    { label: 'migrate dev', args },
+    {
+      interactive: !nonInteractive,
+      maxAttempts,
+      baseRetryDelayMs,
+      maxRetryDelayMs,
+      attemptTimeoutMs,
+      log,
+      spawn,
+    },
   );
+  if (createCode !== 0) {
+    if (nonInteractive) log(headlessMigrationGuidance(migrationName));
+    reportMigrationSets(log, [], []);
+    return { code: createCode, created: [], applied: [] };
+  }
+
+  const after = await listMigrationArtifacts(migrationsPath);
+  const created = after.filter((name) => !before.includes(name));
+  if (created.length === 0) {
+    log('Migration creation returned success but created no migration artifact.');
+    if (nonInteractive) log(headlessMigrationGuidance(migrationName));
+    reportMigrationSets(log, [], []);
+    return { code: 1, created: [], applied: [] };
+  }
+
+  const statusCode = await runPrismaWithRetry(
+    {
+      label: 'migrate status',
+      args: ['migrate', 'status', '--config', configPath],
+    },
+    {
+      interactive: false,
+      maxAttempts,
+      baseRetryDelayMs,
+      maxRetryDelayMs,
+      attemptTimeoutMs,
+      log,
+      spawn,
+    },
+  );
+  const applied = statusCode === 0 ? created : [];
+  reportMigrationSets(log, created, applied);
+  return { code: statusCode, created, applied };
+}
+
+async function listMigrationArtifacts(path: string): Promise<string[]> {
+  const names: string[] = [];
+  try {
+    for await (const entry of Deno.readDir(path)) {
+      if (!entry.isDirectory) continue;
+      try {
+        const stat = await Deno.stat(`${path}/${entry.name}/migration.sql`);
+        if (stat.isFile) names.push(entry.name);
+      } catch (error) {
+        if (!(error instanceof Deno.errors.NotFound)) throw error;
+      }
+    }
+  } catch (error) {
+    if (!(error instanceof Deno.errors.NotFound)) throw error;
+  }
+  return names.sort();
+}
+
+function reportMigrationSets(
+  log: (message: string) => void,
+  created: readonly string[],
+  applied: readonly string[],
+): void {
+  log(`Created migrations: ${created.length === 0 ? '(none)' : created.join(', ')}`);
+  log(`Applied migrations: ${applied.length === 0 ? '(none)' : applied.join(', ')}`);
+}
+
+function headlessMigrationGuidance(migrationName: string | undefined): string {
+  const name = migrationName ?? '<migration-name>';
+  return 'This headless session could not create a migration. ' +
+    `Run this command in an interactive terminal: netscript db migrate --name ${name}`;
 }
 
 /**

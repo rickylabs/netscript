@@ -2,7 +2,7 @@
 
 ## Current phase
 
-RED contract slice landed; migration artifact implementation is next.
+Migration artifact implementation is green in focused tests; generated-project E2E fixtures are next.
 
 ## Identity
 
