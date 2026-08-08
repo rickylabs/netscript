@@ -114,6 +114,10 @@ service, generator, or docs file owns a second event-name/payload table.
 | 2026-08-09 | S6-D2 | live trace diagnosis | Retained generated service reproduced TC-14 with producer `36877bd0933da790de3f5f17d7c885dd`, consumer `0a17c1c06c30cada853b5849bea776ba`/`06d3f0d130f712a6`, and three links. All links resolve to unrelated `job` snapshot publications (`flow-b-callback`, `health-check`, `workers-plugin-health-check`), not the Flow-B execution. |
 | 2026-08-09 | S6-D2 | classification | Gate defect: the Deno diagnostic consumes the first SSE batch wholesale, links those job snapshots, then separately labels the consumer span with the real Flow-B `job.execute` correlation. The observed mismatch does not demonstrate a product context drop. No repair implemented before reporting this verdict. |
 | 2026-08-09 | S6-D2 | diagnostic cleanup | Foreground isolated AppHost stopped. Scoped teardown removed owned persistent `postgres-b73d5698`; final leak artefact reports no W2-B survivor. Foreign `redis-jfgcbtaf` was left untouched. |
+| 2026-08-09 | S6-R1 | selection repair | The Deno consumer now reads up to 40 control-delimited batches/20 seconds, skips unrelated snapshots, and selects only the execution whose value/header correlation matches the real Flow-B `job.execute` identity. Exhaustion names expected and observed correlations. |
+| 2026-08-09 | S6-R1 | single identity | The selected record's semantic correlation drives both link attributes and the consumer span. Producer trace id is read with the job correlation; missing, malformed, or different record `traceparent` fails TC-14 before export, while the dashboard equality assertion remains independent. |
+| 2026-08-09 | S6-R1 | repair gates | Seven focused selection/TC-14 tests pass. The 35-file scoped check/lint/fmt wrappers and `quality:gate` pass with only carried repository warnings/allowances. |
+| 2026-08-09 | S6-R1 | EXPENSIVE-GATE-REQUEST | Gate-side repair and all cheaper validation are complete. Requesting a new serialized `scaffold.runtime` grant; the command has not been started. |
 
 ## Decisions
 
@@ -179,6 +183,9 @@ service, generator, or docs file owns a second event-name/payload table.
 | TC-14 diagnostic tests | `deno test --no-lock --unstable-kv --allow-all packages/cli/e2e/src/application/gates/scaffold/validate-flow-b-traces_test.ts` | PASS (exit 0) | 2 passed: explicit zero-link and complete wrong-link identities. |
 | Diagnostic scoped wrappers | wrappers over `packages/cli/e2e/src/application/gates/scaffold` | PASS (all exit 0) | 33 files; zero check/lint/format findings. |
 | Diagnostic framework law | `deno task quality:gate` | PASS (exit 0) | Zero quality findings; carried doctrine inventory only. |
+| TC-14 selection repair tests | `deno test --no-lock --unstable-kv --allow-all` over selection and validator tests | PASS (exit 0) | 7 passed: startup skipping, batch/time bounds, attributable exhaustion, missing/different W3C context, zero/wrong link identities. |
+| Repair scoped wrappers | check/lint/fmt wrappers over `packages/cli/e2e/src/application/gates/scaffold` | PASS (all exit 0) | 35 files; zero diagnostics/findings after targeted format. |
+| Repair framework law | `deno task quality:gate` | PASS (exit 0) | Zero quality findings; seven carried allowances and existing doctrine/dependency warnings only. |
 
 ### Fitness Gates
 
