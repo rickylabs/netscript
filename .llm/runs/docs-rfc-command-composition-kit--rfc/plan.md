@@ -6,7 +6,7 @@
 | ------------------------ | --------------------------------------------------------------------------------------------------------------------------- |
 | Run ID                   | `docs-rfc-command-composition-kit--rfc`                                                                                     |
 | Branch                   | `docs/rfc-command-composition-kit`                                                                                          |
-| Phase                    | `rfc-authoring`                                                                                                             |
+| Phase                    | `plan-eval-ready`                                                                                                           |
 | Target                   | `rfcs/0000-command-composition-kit.md` plus harness evidence                                                                |
 | Delivery profile         | `SCOPE-docs` with `SCOPE-service` consumer analysis                                                                         |
 | Described implementation | A1 contracts, A2 database/telemetry adapters, A3 relay runtime, A4 service DSL, A5 thin plugin consumers, A6 CLI generators |

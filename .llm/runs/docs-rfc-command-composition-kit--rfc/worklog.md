@@ -93,6 +93,9 @@ capabilities.
 | 2026-08-08 | S2    | boundary proof         | Kept remote delivery post-commit and at least once; separated the existing saga outbox and worker delivery claims from the command receipt/store guarantee.                                    |
 | 2026-08-08 | S2    | surface design         | Specified focused service/database/contracts subpaths and telemetry additions, JSR/slow-type/publish consequences, migration ownership, and staged implementation without changing exports.    |
 | 2026-08-08 | S2    | type-shape probe       | Checked a synthetic command definition against current DB types, Zod, and Standard Schema. Initial resolution exposed the missing service dependency; direct JSR import passed; probe removed. |
+| 2026-08-08 | S3    | docs/RFC gates         | Scoped format/diff, repository docs links/accuracy, RFC frontmatter/section/terminology assertions, and docs-only changed-file audit passed.                                                   |
+| 2026-08-08 | S3    | JSR baseline           | Full-entrypoint doc-lint reported service 0, database combined 0, contracts 9 existing private-type findings, and telemetry 7 existing findings; no package file changed.                      |
+| 2026-08-08 | S3    | PR reconciliation      | Review-thread gate passed with 0 threads/unanswered; PR-check gate passed with 15 checks and 0 current failures (docs-only lanes intentionally skipped).                                       |
 
 ## Decisions
 
@@ -128,14 +131,21 @@ capabilities.
 | Focused transaction type probe | `deno check --unstable-kv packages/database/rfc-command-probe.ts`          | EXPECTED_FAIL_MISSED | Exit 0 proves the callback surface is too broad; temporary probe removed.                            |
 | Focused typed-error probe      | `deno check --unstable-kv packages/sdk/rfc-command-probe.ts`               | EXPECTED_FAIL        | Exit 1 with TS2339 on `error.code`; temporary probe removed.                                         |
 | Focused RFC type-shape probe   | `deno check --unstable-kv packages/service/rfc-command-contract-probe.ts`  | PASS_AFTER_FINDING   | First run found missing service Standard Schema mapping; direct locked import passed; probe removed. |
-| Docs/link/format gates         | pending S3                                                                 | NOT_RUN              | RFC drafting begins in S2.                                                                           |
+| Markdown format                | `deno fmt --check rfcs/... .llm/runs/...`                                  | PASS                 | 10 owned Markdown files checked.                                                                     |
+| Diff hygiene                   | `git diff --check` and changed-file audit                                  | PASS                 | Only the RFC and required run directory differ from the pinned base; no lock/product change.         |
+| Docs links                     | `rtk proxy deno task docs:links`                                           | PASS                 | 102 docs; 0 broken links, 0 broken anchors, 0 orphans.                                               |
+| Docs accuracy                  | `rtk proxy deno task docs:accuracy`                                        | PASS                 | Saga/storefront/path/CLI/Fresh accuracy checks passed.                                               |
+| RFC structure/terminology      | focused `deno eval` frontmatter/section/forbidden-term assertion           | PASS                 | Draft/0000/#1361 and all required sections present; forbidden domain vocabulary absent.              |
+| PR review threads              | `rtk proxy deno task agentic:review-threads -- ... --pr 1389 --pretty`     | PASS                 | 0 threads; 0 unanswered.                                                                             |
+| PR checks                      | `rtk proxy deno task agentic:pr-checks -- ... --pr 1389 --pretty`          | PASS                 | 15 reconciled checks; 0 current failures; docs-only CI lanes skipped under explicit labels.          |
 
 ### Fitness Gates
 
-| Gate                              | Result      | Evidence                                   | Notes                                                         |
-| --------------------------------- | ----------- | ------------------------------------------ | ------------------------------------------------------------- |
-| F-5/F-6/F-7 planned surface audit | PASS_DESIGN | `research.md` JSR/public-surface table     | Design-time only; implementation gates specified per subpath. |
-| F-13 runtime invariants           | PASS_DESIGN | `plan.md` semantic laws and relay boundary | RFC must carry the exact injected-failure matrix in S2/S3.    |
+| Gate                              | Result                      | Evidence                                   | Notes                                                                                                         |
+| --------------------------------- | --------------------------- | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------- |
+| F-5/F-6/F-7 planned surface audit | PASS_DESIGN                 | `research.md` JSR/public-surface table     | Design-time only; implementation gates specified per subpath.                                                 |
+| F-13 runtime invariants           | PASS_DESIGN                 | `plan.md` semantic laws and relay boundary | RFC must carry the exact injected-failure matrix in S2/S3.                                                    |
+| Current package doc-lint baseline | PASS_WITH_BASELINE_FINDINGS | structured full-entrypoint reports         | service/database combined 0; contracts 9 and telemetry 7 pre-existing findings; changed surface is docs-only. |
 
 ### Runtime Gates
 
@@ -151,5 +161,6 @@ capabilities.
 
 ## Handoff Notes
 
-- Root orchestrator should inspect the final RFC contracts and capability matrix first, then compare
-  every unresolved question with #1361 acceptance and the final `research.md` evidence table.
+- Final handoff is `final-handoff.md`. The root orchestrator should inspect the RFC's public
+  contracts, semantic laws, adapter matrix, and refusal boundary first, then use the exact Fable
+  prompt there. No evaluator was launched by this generator.

@@ -6,7 +6,7 @@
 | -------------- | --------------------------------------------------------------- |
 | Run ID         | `docs-rfc-command-composition-kit--rfc`                         |
 | Branch         | `docs/rfc-command-composition-kit`                              |
-| Current phase  | `rfc-authoring`                                                 |
+| Current phase  | `plan-eval-ready`                                               |
 | Archetype      | Docs delivery describing Archetypes 1–6 implementation surfaces |
 | Scope overlays | `SCOPE-docs`, `SCOPE-service`                                   |
 
@@ -16,7 +16,8 @@ The run is active on the exact requested branch/base in the sole daemon-attached
 Bootstrap commit `ad643e15...` and research/plan commit `e0b98f289...` were pushed by explicit
 refspec; draft PR #1389 is live at `status:plan`. The full re-baseline and plan gate are complete,
 and the RFC now carries the exact contracts, semantic laws, adapter truth, relay boundary,
-conformance plan, migration, and decomposition. No product code or export changed.
+conformance plan, migration, and decomposition. Final docs/RFC/PR evidence is green. No product code
+or export changed.
 
 ## Completed
 
@@ -33,16 +34,19 @@ conformance plan, migration, and decomposition. No product code or export change
   `Draft` through maintainer discussion.
 - Tightened the S2 surface with attempt identity across receipt/audit/outbox, schema-backed outbox
   codecs, deterministic scope inputs, and explicit relay retry/terminal dispositions.
+- Passed docs links/accuracy, scoped format/diff, RFC structural/terminology, review-thread, and PR
+  check reconciliation; captured current package doc-lint findings as future implementation bars.
 
 ## In Progress
 
-- S2 source-alignment review and coherent RFC commit/push.
+- Final handoff commit/push and PR transition to `status:plan-eval`.
 
 ## Next Steps
 
-1. Commit/push S2 and post its implementation-phase evidence comment without starting evaluation.
-2. Run docs/RFC, source-alignment, JSR-design, diff/lock, and PR/thread gates in S3.
-3. Write `final-handoff.md`, update the PR/body, and stop at `status:plan-eval` for root-led review.
+1. Commit/push the final evidence and handoff by explicit refspec.
+2. Update the draft PR body and replace `status:plan` with `status:plan-eval`.
+3. Root orchestrator steers the existing Fable session using `final-handoff.md`; this generator does
+   not launch or self-certify evaluation.
 
 ## Key Decisions
 
@@ -64,12 +68,12 @@ conformance plan, migration, and decomposition. No product code or export change
 
 ## Gates
 
-| Gate family | Current status                                               | Evidence                    |
-| ----------- | ------------------------------------------------------------ | --------------------------- |
-| Static      | bootstrap/API probes PASS as classified; final pending       | `worklog.md` gate table     |
-| Fitness     | planned-surface and runtime-law design PASS                  | `plan.md` and `research.md` |
-| Runtime     | N/A for docs PR                                              | no product mutation         |
-| Consumer    | current CLI/scaffold analysis PASS; generated proof deferred | S1 re-baseline              |
+| Gate family | Current status                                                | Evidence                    |
+| ----------- | ------------------------------------------------------------- | --------------------------- |
+| Static      | PASS; format/diff/docs/RFC/PR gates green                     | `worklog.md` gate table     |
+| Fitness     | PASS_DESIGN with existing doc-lint baseline findings recorded | `plan.md` and `research.md` |
+| Runtime     | N/A for docs PR                                               | no product mutation         |
+| Consumer    | current CLI/scaffold analysis PASS; generated proof deferred  | S1 re-baseline              |
 
 ## Open Questions
 
