@@ -61,6 +61,7 @@ shared E2E enumeration so every provider scenario proves real health.
 | 2026-08-08 | plan | PLAN-EVAL request | Selected separate native Claude/Fable plan evaluation; implementation paused. |
 | 2026-08-09 | S1 | RED | Generated-workspace behavioral probe failed at the real core registration boundary: exit 1, 8 passed/1 failed, `KvConnectionError: Redis adapter is not registered`. |
 | 2026-08-09 | S2 | GREEN | Trigger glue composes the core Redis entrypoint; triggers 9/9, sagas 7/7, and both verify-plugin runs pass with exit 0. |
+| 2026-08-09 | S3 | invariant | One domain enumeration now drives KV background waits; focused CLI E2E test passes 14/14. Generated AppHost execution remains NOT_RUN pending the serialized token. |
 
 ## Gate Results
 
@@ -72,6 +73,7 @@ shared E2E enumeration so every provider scenario proves real health.
 | S2 triggers | same focused triggers command after thin bootstrap | PASS (exit 0) | 9 passed; behavioral registration active. |
 | S2 sagas | focused sagas resources test | PASS (exit 0) | 7 passed; sibling seam preserved. |
 | verify-plugin triggers/sagas | both package-owned `verify-plugin.ts` entrypoints | PASS (exit 0 each) | no findings. |
+| S3 CLI E2E unit | focused `runtime-gates_test.ts` | PASS (exit 0) | 14 passed; exact workers/sagas/triggers enumeration and healthy waits asserted. |
 
 ## Handoff Notes
 

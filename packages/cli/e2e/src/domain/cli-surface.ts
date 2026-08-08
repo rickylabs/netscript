@@ -192,6 +192,13 @@ export type SuiteId = ScaffoldSuiteId | DeploySuiteId | QuickstartSuiteId;
 export type GatePhase = typeof GATE_PHASE[keyof typeof GATE_PHASE];
 export type StaticGateId = typeof GATE[keyof typeof GATE];
 export type AspireResource = typeof ASPIRE_RESOURCE[keyof typeof ASPIRE_RESOURCE];
+
+/** KV-backed first-party background runtimes that require generated-project health proof. */
+export const KV_BACKGROUND_RUNTIME_RESOURCES = [
+  ASPIRE_RESOURCE.WORKERS,
+  ASPIRE_RESOURCE.SAGAS,
+  ASPIRE_RESOURCE.TRIGGERS,
+] as const satisfies readonly AspireResource[];
 export type PluginGateId = `scaffold.plugin.${PluginKind}`;
 export type RuntimeWaitGateId = `runtime.wait.${AspireResource}`;
 export type GateId = StaticGateId | PluginGateId | RuntimeWaitGateId;

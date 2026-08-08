@@ -13,8 +13,8 @@
 ## Current State
 
 PLAN-EVAL passed in a separate Claude/Fable session. S1 captured the expected pre-fix exit 1; S2
-adds the thin trigger bootstrap and turns the same behavioral gate green. No runtime resource has
-been started.
+adds the thin trigger bootstrap and turns the same behavioral gate green; S3 enumerates all three
+KV background runtimes in the Aspire health gates. No runtime resource has been started.
 
 ## Completed
 
@@ -29,9 +29,9 @@ been started.
 
 ## Next Steps
 
-1. Commit/push/comment S2 green evidence.
-2. Add the shared generated-runtime health enumeration without changing workers bootstrap placement.
-3. Run all non-serialized fitness and runtime gates.
+1. Commit/push/comment S3 invariant evidence.
+2. Run all non-serialized focused, scoped, fitness, architecture, and JSR gates.
+3. Write and push `EXPENSIVE-GATE-REQUEST`; wait for the orchestrator grant.
 
 ## Key Decisions
 
