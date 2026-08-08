@@ -111,8 +111,9 @@ Deno.test('consumer scaffolder emits StreamDB, query island, and Fresh seed load
     'islands/InvoicesStream.tsx',
     'routes/api/streams/invoices/seed.ts',
   ]);
-  assertStringIncludes(artifactText(artifacts[0]), 'createStreamDB');
-  assertStringIncludes(artifactText(artifacts[1]), 'useLiveQuery');
+  assertStringIncludes(artifactText(artifacts[0]), 'createNetScriptStreamEventSourceV1');
+  assertStringIncludes(artifactText(artifacts[1]), "event.event !== 'data'");
+  assertStringIncludes(artifactText(artifacts[1]), "change.headers.operation === 'delete'");
   assertStringIncludes(artifactText(artifacts[2]), "import { createDefine } from 'fresh'");
 });
 
@@ -151,6 +152,10 @@ Deno.test({
               '@durable-streams/state': 'npm:@durable-streams/state@^0.3.1',
               '@netscript/plugin-streams-core':
                 new URL('packages/plugin-streams-core/mod.ts', repoRoot).href,
+              '@netscript/plugin-streams-core/sse':
+                new URL('packages/plugin-streams-core/src/sse/mod.ts', repoRoot).href,
+              '@netscript/fresh/streams':
+                new URL('packages/fresh/src/runtime/streams/mod.ts', repoRoot).href,
               '@netscript/telemetry/context':
                 new URL('packages/telemetry/context.ts', repoRoot).href,
               '@netscript/telemetry/otel':
@@ -159,6 +164,7 @@ Deno.test({
               '@tanstack/react-db': 'npm:@tanstack/react-db@^0.1.86',
               fresh: 'jsr:@fresh/core@^2.3.3',
               preact: 'npm:preact@^10.29.2',
+              'preact/hooks': 'npm:preact@^10.29.2/hooks',
               zod: 'catalog:',
             },
             compilerOptions: {

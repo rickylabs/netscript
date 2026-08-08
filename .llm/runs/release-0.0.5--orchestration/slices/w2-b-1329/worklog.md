@@ -97,6 +97,8 @@ service, generator, or docs file owns a second event-name/payload table.
 | 2026-08-09 | S1    | doc surface repaired | Full export-map diagnostics reduced from five private type refs to zero using explicit package-owned streams telemetry ports; no waiver added.             |
 | 2026-08-09 | S2    | producer identity    | Per-write explicit correlation/message identity wins; empty/absent values fall back to the entity key. Correlation and W3C headers are emitted on every change. |
 | 2026-08-09 | S2    | service conformance  | Real DurableStreamTestServer output through the NetScript proxy validates only through the exported authority: named arrays, ordered upsert/delete, control commit. |
+| 2026-08-09 | S3    | Fresh/generated      | Fresh helper builds the native `offset` + `live=sse` URL and binds v1 outcomes; generated Fresh 2.x island consumes it inside one effect and seed route retains `createDefine`. |
+| 2026-08-09 | S3    | official example     | Native EventSource docs example uses the exported named-event binding, no `onmessage`/cast, handles ordered batches/deletion/errors, and is extracted/type-checked unchanged. |
 
 ## Decisions
 
@@ -140,6 +142,12 @@ service, generator, or docs file owns a second event-name/payload table.
 | S2 scoped lint/format     | corresponding repo wrappers over both roots                                                   | PASS (exit 0)                  | zero lint and format findings. |
 | Framework-wave law       | `deno task quality:gate`                                                                       | PASS (exit 0)                  | quality scan has zero findings; repository has 7 existing explicit allowances. |
 | Doctrine fitness         | `deno task arch:check`                                                                          | PASS (exit 0)                  | Existing WARN/INFO inventory only; streams exact debts remain unchanged. |
+| S3 Fresh/generator/docs tests | focused Fresh helper, generator/type fixture, and copy-exact docs test                      | PASS (exit 0)                  | 10 passed, 0 failed. |
+| S3 scoped check/lint/fmt | wrappers over Fresh streams, generator resources, and docs test                                | PASS (exit 0)                  | 19 files; zero findings. |
+| Docs links               | `deno task docs:links`                                                                           | PASS (exit 0)                  | 0 broken links, anchors, or orphans. |
+| Docs accuracy            | `deno task docs:accuracy`                                                                        | PASS (exit 0)                  | Repository accuracy/discoverability checks pass. |
+| Fresh publish dry-run    | `deno publish --dry-run --allow-dirty` from `packages/fresh`                                   | PASS (exit 0)                  | Published helper surface checks and packages successfully. |
+| Fresh streams doc baseline | `deno doc --lint packages/fresh/src/runtime/streams/mod.ts` in branch and untouched eval tree | BASELINE FAIL (exit 1)         | Exactly 11 both before/after; new SSE helper/core files add zero diagnostics. |
 
 ### Fitness Gates
 

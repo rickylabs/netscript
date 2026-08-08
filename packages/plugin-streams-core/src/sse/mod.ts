@@ -33,6 +33,12 @@ export {
   parseStreamSseEventV1,
   reduceStreamSseReplayStateV1,
 } from '../application/stream-sse-v1.ts';
+export type { Operation } from '../domain/stream-event.ts';
+export type {
+  StreamSchemaIssue,
+  StreamSchemaValidationOptions,
+  StreamSchemaValidationResult,
+} from '../domain/stream-schema.ts';
 export type {
   BindStreamEventSourceOptionsV1,
   StreamEventSourceBindingV1,

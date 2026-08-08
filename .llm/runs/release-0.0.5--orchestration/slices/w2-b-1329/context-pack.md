@@ -6,7 +6,7 @@
 | -------------- | ----------------------------------------------- |
 | Run ID         | `release-0.0.5--orchestration/slices/w2-b-1329` |
 | Branch         | `fix/streams-versioned-sse-envelope`            |
-| Current phase  | `impl — S2`                                     |
+| Current phase  | `impl — S3`                                     |
 | Archetype      | `3 — Runtime/Behavior`                          |
 | Scope overlays | `frontend`, `service`, `docs`                   |
 
@@ -17,7 +17,8 @@ Upstream wire names remain exactly `data/control`; validated outcomes add `heart
 Replay state includes the last committed opaque offset, optional observed cursor, terminal marker,
 and pending batches. Full export-map doc lint is now zero after replacing five private telemetry
 type references with explicit package-owned ports. S2 adds per-write correlation/message context,
-W3C tracestate emission, and real-server/proxy conformance against the same authority.
+W3C tracestate emission, and real-server/proxy conformance against the same authority. S3 adds the
+Fresh native helper, generated Fresh 2.x island, and copy-exact official example.
 
 ## Completed
 
@@ -34,16 +35,19 @@ W3C tracestate emission, and real-server/proxy conformance against the same auth
   doc lint are green.
 - S2 package and real-server conformance tests pass; scoped wrappers, `quality:gate`, `arch:check`,
   full export doc lint, and package publish dry-run are green.
+- S3 focused tests, generated type fixture, docs links/accuracy, and Fresh publish dry-run pass.
+  The Fresh streams entrypoint retains exactly its 11 pre-existing doc diagnostics; new SSE files
+  add zero. This baseline is recorded in `drift.md`, not generalized into connector cleanup.
 
 ## In Progress
 
-- Final S2 review, commit/push/PR comment, then Fresh/generated/docs consumer work in S3.
+- Final S3 framework gates, commit/push/PR comment, then isolated runtime/OTEL evidence in S4.
 
 ## Next Steps
 
-1. Commit/push/comment S2.
-2. Implement Fresh 2.x/generated/native example consumers in S3.
-3. Continue S4–S5; request serialized gate only when otherwise green.
+1. Commit/push/comment S3.
+2. Capture S4 real generated-service/browser behavior and Deno AppHost consumer OTEL span.
+3. Complete S5 gates; request serialized gate only when otherwise green.
 4. Request orchestrator-launched separate IMPL-EVAL after terminal evidence.
 
 ## Key Decisions

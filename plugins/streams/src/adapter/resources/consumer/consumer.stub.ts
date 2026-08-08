@@ -5,6 +5,7 @@ type ConsumerToken =
   | 'FACTORY_FILE'
   | 'ISLAND_EXPORT'
   | 'SCHEMA_EXPORT'
+  | 'SUBSCRIBE_EXPORT'
   | 'STREAM_PATH';
 
 const TOKENS = [
@@ -12,12 +13,17 @@ const TOKENS = [
   'FACTORY_FILE',
   'ISLAND_EXPORT',
   'SCHEMA_EXPORT',
+  'SUBSCRIBE_EXPORT',
   'STREAM_PATH',
 ] as const;
 
 /** Type-checked StreamDB factory template. */
 export const streamConsumerFactoryStub: StubSource<ConsumerToken> = defineStub({
   source: `/** Generated browser StreamDB factory for %%STREAM_PATH%%. */
+import {
+  createNetScriptStreamEventSourceV1,
+  type CreateNetScriptStreamEventSourceOptionsV1,
+} from '@netscript/fresh/streams';
 import { createStreamDB } from '@durable-streams/state/db';
 import {
   buildStreamUrl,
@@ -46,22 +52,54 @@ export function %%DB_EXPORT%%(options: { readonly baseUrl?: string } = {}) {
     state: %%SCHEMA_EXPORT%%,
   });
 }
+
+/** Bind the versioned named-event SSE consumer for %%STREAM_PATH%%. */
+export function %%SUBSCRIBE_EXPORT%%(
+  options: Omit<CreateNetScriptStreamEventSourceOptionsV1, 'streamPath'>,
+) {
+  return createNetScriptStreamEventSourceV1({ ...options, streamPath: '%%STREAM_PATH%%' });
+}
 `,
   tokens: TOKENS,
 });
 
 /** Type-checked Fresh query-island template. */
 export const streamConsumerIslandStub: StubSource<ConsumerToken> = defineStub({
-  source: `/** Generated Fresh query island for %%STREAM_PATH%%. */
-import { useLiveQuery } from '@tanstack/react-db';
-import { %%DB_EXPORT%% } from '../streams/%%FACTORY_FILE%%.ts';
+  source: `/** Generated Fresh named-event island for %%STREAM_PATH%%. */
+import { useEffect, useState } from 'preact/hooks';
+import { %%SUBSCRIBE_EXPORT%% } from '../streams/%%FACTORY_FILE%%.ts';
 
-const streamDb = %%DB_EXPORT%%();
+interface StreamViewItem {
+  readonly key: string;
+  readonly value: unknown;
+}
 
 /** Render the current event collection as inspectable JSON. */
 export default function %%ISLAND_EXPORT%%() {
-  const query = useLiveQuery((q) => q.from({ event: streamDb.collections.event }));
-  return <pre>{JSON.stringify(query.data ?? [], null, 2)}</pre>;
+  const [items, setItems] = useState<readonly StreamViewItem[]>([]);
+  const [error, setError] = useState<string>();
+
+  useEffect(() => {
+    const latest = new Map<string, unknown>();
+    const binding = %%SUBSCRIBE_EXPORT%%({
+      offset: '-1',
+      onEvent(event) {
+        if (event.event === 'error') {
+          setError(event.payload.message);
+          return;
+        }
+        if (event.event !== 'data') return;
+        for (const change of event.payload) {
+          if (change.headers.operation === 'delete') latest.delete(change.key);
+          else latest.set(change.key, change.value);
+        }
+        setItems([...latest].map(([key, value]) => ({ key, value })));
+      },
+    });
+    return () => binding.dispose();
+  }, []);
+
+  return <pre>{error ?? JSON.stringify(items, null, 2)}</pre>;
 }
 `,
   tokens: TOKENS,

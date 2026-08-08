@@ -35,3 +35,19 @@
 - **Severity:** significant.
 - **Action:** fix within this changed published package; no waiver and no unrelated package sweep.
 - **Evidence:** baseline commands and counts in `worklog.md`.
+
+## 2026-08-09 — Fresh streams entrypoint carries eleven pre-existing doc diagnostics
+
+- **What:** Full Fresh export-map lint reports unrelated route/query debt plus eleven diagnostics
+  already present on `@netscript/fresh/streams` before this branch.
+- **Source:** current full Fresh doc lint and the same direct streams-entrypoint command in the
+  untouched PLAN-EVAL checkout.
+- **Expected:** the new Fresh SSE helper must not add private type leakage.
+- **Actual:** both before and after report exactly eleven streams-entrypoint private refs, all in
+  the existing StreamDB/TanStack query surface. The new event-source helper and core SSE files add
+  zero; package publish dry-run passes.
+- **Severity:** significant baseline, no regression.
+- **Action:** do not widen #1329 into the Fresh query/StreamDB public-type cleanup. Keep the active
+  generated SSE island on the versioned authority; preserve the separately accepted streams
+  connector convergence debt for the remaining upstream StreamDB factory.
+- **Evidence:** `deno doc --lint packages/fresh/src/runtime/streams/mod.ts` in both worktrees.
