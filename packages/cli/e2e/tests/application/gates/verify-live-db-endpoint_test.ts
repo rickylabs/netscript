@@ -1,7 +1,9 @@
 import { assertEquals, assertStringIncludes } from '@std/assert';
 import {
   compareDatabaseEndpointPorts,
+  correlateUsersTelemetry,
   matchesDatabaseHealthContract,
+  pollUsersTelemetryCorrelation,
 } from '../../../src/application/gates/scaffold/verify-live-db-endpoint.ts';
 
 const realHealthResponse = await Deno.readTextFile(
@@ -58,4 +60,40 @@ Deno.test('database health matcher rejects an unhealthy database fixture', () =>
   // The fixture deliberately retains a healthy aggregate so this assertion proves
   // the matcher reads the database check's documented `healthy` boolean too.
   assertEquals(matchesDatabaseHealthContract(unhealthyHealthResponse, 'postgres'), false);
+});
+
+Deno.test('users telemetry correlation reports the compared ids and candidate spans', () => {
+  const result = correlateUsersTelemetry(
+    [{ traceId: 'structured-log-trace' }],
+    [{
+      traceId: 'otel-trace',
+      spans: [{ name: 'GET /health' }, { name: 'db.query' }],
+    }],
+  );
+
+  assertEquals(result.ok, false);
+  assertStringIncludes(result.error ?? '', 'structured-log-trace');
+  assertStringIncludes(result.error ?? '', 'otel-trace');
+  assertStringIncludes(result.error ?? '', 'GET /health');
+  assertStringIncludes(result.error ?? '', 'db.query');
+});
+
+Deno.test('users telemetry correlation polls until logs and traces converge', async () => {
+  let logReads = 0;
+  const receipt = await pollUsersTelemetryCorrelation(
+    {
+      queryLogs: () => {
+        logReads++;
+        return Promise.resolve(logReads < 3 ? [] : [{ traceId: 'shared-trace' }]);
+      },
+      queryTraces: () =>
+        Promise.resolve([{
+          traceId: 'shared-trace',
+          spans: [{ name: 'GET /health' }],
+        }]),
+    },
+    { maxAttempts: 3, delayMs: 0 },
+  );
+
+  assertEquals(receipt, { traceId: 'shared-trace', attempts: 3 });
 });

@@ -2,13 +2,12 @@
 
 ## Current phase
 
-Fifth serialized pass completed with raw exit 1 and `passed=61 failed=1`. Migration artifacts, both
-allocation captures, structural endpoint comparison, and documented health-contract validation all
-passed in the same run. `behavior.live-db-endpoint` then reached telemetry retrieval for the first
-time, but `aspire otel logs users` exited 12 because the Aspire CLI reported the dashboard was
-unavailable. No trace retrieval or shared trace receipt followed. Pre/post leak artifacts are clean
-for W2-C and review threads pass 0/0. There was no retry or repair; the token is released failing.
-Only #1202 row 2 remains checked.
+The live-DB telemetry gate now reuses the suite's working detached-dashboard path: start metadata,
+direct dashboard HTTP, the package-owned `AspireTelemetryQuery`, and bounded polling. The OTLP
+trace/log envelope adapter was extracted from the existing Flow-B validator so both gates use one
+implementation. Focused RED/green, scoped wrappers, `quality:gate`, and `arch:check` pass. The
+literal sixth-pass `EXPENSIVE-GATE-REQUEST` is recorded; no AppHost was started. Only #1202 row 2
+remains checked until a granted run produces endpoint, health, structured-log, and OTEL evidence.
 
 ## Identity
 

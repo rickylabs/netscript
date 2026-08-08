@@ -328,6 +328,7 @@ export function createRuntimeGates(
       (context) => [
         'deno',
         'run',
+        '--unsafely-ignore-certificate-errors=localhost',
         '--allow-read',
         '--allow-write',
         '--allow-run=aspire',

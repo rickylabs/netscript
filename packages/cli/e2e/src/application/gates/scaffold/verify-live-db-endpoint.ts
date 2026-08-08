@@ -1,4 +1,5 @@
 import { join } from '@std/path';
+import { createLiveAspireTelemetryQuery } from './aspire-dashboard-telemetry.ts';
 
 interface EndpointReceipt {
   readonly allocation: 'first' | 'second';
@@ -10,6 +11,34 @@ interface DatabaseEndpointPortComparison {
   readonly ok: boolean;
   readonly livePort?: number;
   readonly usersPort?: number;
+  readonly error?: string;
+}
+
+interface TelemetryLogCandidate {
+  readonly traceId?: string;
+}
+
+interface TelemetrySpanCandidate {
+  readonly name: string;
+}
+
+interface TelemetryTraceCandidate {
+  readonly traceId: string;
+  readonly spans: readonly TelemetrySpanCandidate[];
+}
+
+interface UsersTelemetryReader {
+  queryLogs(
+    filter?: { readonly serviceName?: string; readonly limit?: number },
+  ): Promise<readonly TelemetryLogCandidate[]>;
+  queryTraces(
+    filter?: { readonly serviceName?: string; readonly limit?: number },
+  ): Promise<readonly TelemetryTraceCandidate[]>;
+}
+
+interface TelemetryCorrelationResult {
+  readonly ok: boolean;
+  readonly traceId?: string;
   readonly error?: string;
 }
 
@@ -39,15 +68,8 @@ async function verifyLiveDbEndpoint(): Promise<void> {
     );
   }
 
-  const structuredLogs = await aspireOtel('logs');
-  const traces = await aspireOtel('traces');
-  const traceIds = [
-    ...structuredLogs.matchAll(/(?:traceId|trace_id)["':=\s]+([0-9a-f]{16,32})/gi),
-  ].map((match) => match[1]);
-  const traceId = traceIds.find((candidate) => traces.includes(candidate));
-  if (!traceId) {
-    throw new Error('users structured logs and OTEL traces had no shared trace id');
-  }
+  const telemetryQuery = await createLiveAspireTelemetryQuery(projectRoot);
+  const { traceId } = await pollUsersTelemetryCorrelation(telemetryQuery);
 
   const receiptPath = join(projectRoot, '.netscript', 'e2e', 'live-db-endpoint-receipt.json');
   await Deno.writeTextFile(
@@ -170,10 +192,6 @@ async function liveHttpUrl(name: string): Promise<string> {
   throw new Error(`${name} exposed no HTTP URL`);
 }
 
-async function aspireOtel(kind: 'logs' | 'traces'): Promise<string> {
-  return await runAspire(['otel', kind, 'users', '--apphost', appHost, '--format', 'Json']);
-}
-
 async function runAspire(args: string[]): Promise<string> {
   const output = await new Deno.Command('aspire', {
     args: [...args, '--non-interactive', '--nologo'],
@@ -257,6 +275,60 @@ export function matchesDatabaseHealthContract(
     typeof check.name === 'string' && expectedNames.has(check.name)
   );
   return databaseChecks.length === 1 && databaseChecks[0].healthy === true;
+}
+
+/** Compare structured-log trace IDs with normalized Aspire Dashboard traces. */
+export function correlateUsersTelemetry(
+  logs: readonly TelemetryLogCandidate[],
+  traces: readonly TelemetryTraceCandidate[],
+): TelemetryCorrelationResult {
+  const logTraceIds = uniqueStrings(logs.map((log) => log.traceId));
+  const otelTraceIds = uniqueStrings(traces.map((trace) => trace.traceId));
+  const traceId = logTraceIds.find((candidate) => otelTraceIds.includes(candidate));
+  if (traceId) return { ok: true, traceId };
+
+  const candidateSpans = traces.map((trace) =>
+    `${trace.traceId}:[${trace.spans.map((span) => span.name).join(', ')}]`
+  );
+  return {
+    ok: false,
+    error: `users telemetry correlation mismatch: structured-log trace ids=[${
+      logTraceIds.join(', ') || 'none'
+    }]; OTEL trace ids=[${otelTraceIds.join(', ') || 'none'}]; candidate spans=[${
+      candidateSpans.join('; ') || 'none'
+    }]`,
+  };
+}
+
+/** Poll eventually-consistent dashboard logs and traces until their trace IDs correlate. */
+export async function pollUsersTelemetryCorrelation(
+  reader: UsersTelemetryReader,
+  options: { readonly maxAttempts?: number; readonly delayMs?: number } = {},
+): Promise<{ readonly traceId: string; readonly attempts: number }> {
+  const maxAttempts = options.maxAttempts ?? 20;
+  const delayMs = options.delayMs ?? 500;
+  let lastError = 'no telemetry queried';
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    const [logs, traces] = await Promise.all([
+      reader.queryLogs({ serviceName: 'users', limit: 500 }),
+      reader.queryTraces({ serviceName: 'users', limit: 500 }),
+    ]);
+    const correlation = correlateUsersTelemetry(logs, traces);
+    if (correlation.ok && correlation.traceId) {
+      return { traceId: correlation.traceId, attempts: attempt };
+    }
+    lastError = correlation.error ?? 'unknown telemetry mismatch';
+    if (attempt < maxAttempts && delayMs > 0) {
+      await new Promise((resolve) => setTimeout(resolve, delayMs));
+    }
+  }
+  throw new Error(
+    `users telemetry correlation did not converge after ${maxAttempts} attempt(s): ${lastError}`,
+  );
+}
+
+function uniqueStrings(values: readonly (string | undefined)[]): string[] {
+  return [...new Set(values.filter((value): value is string => Boolean(value)))];
 }
 
 function extractJson(text: string): string {

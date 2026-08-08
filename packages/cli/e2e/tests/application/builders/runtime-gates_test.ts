@@ -52,6 +52,35 @@ Deno.test('runtime aspire start gate captures detached endpoint metadata', () =>
   assertEquals(command[2].includes('aspire-start.json'), true);
 });
 
+Deno.test('live DB endpoint gate reads the detached dashboard metadata path', () => {
+  const gate = createRuntimeGates().find((entry) => entry.id === GATE.BEHAVIOR_LIVE_DB_ENDPOINT);
+  if (gate?.kind !== 'command') {
+    throw new Error('Expected live DB endpoint gate to be a command gate.');
+  }
+
+  const command = gate.command({
+    project: {
+      repoRoot: '/repo',
+      projectRoot: '/workspace/app',
+      appHost: '/workspace/app/aspire/apphost.mts',
+    },
+  } as RunContext);
+
+  assertEquals(command, [
+    'deno',
+    'run',
+    '--unsafely-ignore-certificate-errors=localhost',
+    '--allow-read',
+    '--allow-write',
+    '--allow-run=aspire',
+    '--allow-net=localhost,127.0.0.1',
+    '/repo/packages/cli/e2e/src/application/gates/scaffold/verify-live-db-endpoint.ts',
+    '/workspace/app/aspire/apphost.mts',
+    '/workspace/app',
+    'postgres',
+  ]);
+});
+
 // #954 regression: this gate shipped probing a hardcoded `http://127.0.0.1:8000/` while a
 // pinning scaffold published the app on 8010, so all 60 attempts were refused and the failure
 // read exactly like an app that could not render.

@@ -115,3 +115,15 @@
 - Boundary: this is a telemetry-stage result, not another payload-shape mismatch. No retry or repair
   was attempted. #1202 row 4 remains unproven, and rows 1 and 3 remain unchecked pending the
   required fully green live-endpoint receipt.
+
+## 2026-08-09 — detached dashboard path consolidated (minor)
+
+- Existing authority: Flow-B reads `dashboardUrl` from Aspire start metadata and polls the dashboard
+  HTTP telemetry API; `@netscript/telemetry/query` owns the normalized read contract.
+- Repair: extract the existing live OTLP normalization into one module for traces and logs, then use
+  it from both Flow-B trace validation and the live-DB correlation gate. Remove `aspire otel`
+  subprocess discovery from the live-DB path.
+- Correlation evidence: poll 20×500 ms; require a trace ID present in both users structured logs and
+  OTEL traces. Failure prints both ID sets and every candidate span name grouped by trace.
+- Negative boundary: stale endpoint authority still fails before telemetry, and focused mismatch
+  coverage proves non-correlated telemetry cannot pass.

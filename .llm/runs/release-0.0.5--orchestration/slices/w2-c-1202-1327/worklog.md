@@ -365,3 +365,37 @@ still goes RED rather than finding a coincidental substring elsewhere in a paylo
 green from focused evidence, and the #1202 rows remain unticked pending one complete granted pass.
 
 EXPENSIVE-GATE-REQUEST
+
+## Shared dashboard telemetry repair — pass 6 request
+
+The fifth failure was not a telemetry absence verdict: it used `aspire otel` discovery, which cannot
+reach the detached non-TTY dashboard on this host. The working Flow-B path reads `dashboardUrl` from
+`.netscript/e2e/aspire-start.json`, queries the dashboard HTTP API, and polls for eventual
+consistency.
+
+Rather than add another retrieval implementation, the live OTLP-envelope normalizer was extracted
+from `validate-flow-b-traces.ts` into `aspire-dashboard-telemetry.ts`. Both the existing Flow-B
+validator and `behavior.live-db-endpoint` now use one `AspireTelemetryQuery` reader created from
+start metadata. It normalizes both `resourceSpans/scopeSpans` and `resourceLogs/scopeLogs`, while
+the live-DB correlation polls 20 times at 500 ms.
+
+Failure remains self-describing: a non-converging comparison reports structured-log trace IDs, OTEL
+trace IDs, and candidate spans grouped by trace. The existing mismatched-port test still makes a
+stale users binding fail before telemetry, and a new correlation mismatch test proves telemetry
+cannot pass without a shared ID.
+
+| Phase                             | Command                                                                               | Raw exit | Result                                                               |
+| --------------------------------- | ------------------------------------------------------------------------------------- | -------: | -------------------------------------------------------------------- |
+| Contract RED                      | focused dashboard/correlation tests                                                   |        1 | shared adapter and correlation/polling exports absent                |
+| Focused green                     | validator, dashboard adapter, runtime-gates, scaffold-gates, and suite-registry tests |        0 | 47 passed, 0 failed                                                  |
+| First scoped lint                 | CLI E2E wrapper                                                                       |        1 | extraction residue: one type-only import and one unused local helper |
+| Scoped check                      | CLI E2E wrapper with `--deno-arg --no-lock`                                           |        0 | 137 files, zero diagnostics                                          |
+| Scoped lint after residue removal | CLI E2E wrapper                                                                       |        0 | 137 files, zero findings; no suppression added                       |
+| Scoped format                     | CLI E2E wrapper                                                                       |        0 | 137 files, zero findings                                             |
+| Framework law                     | `deno task quality:gate`                                                              |        0 | quality scan and doctrine checks passed; pre-existing warnings only  |
+| Doctrine fitness                  | `deno task arch:check`                                                                |        0 | passed; pre-existing warnings only                                   |
+
+No AppHost or runtime suite was started for this repair. The fifth-pass failure remains historical;
+rows 1, 3, and 4 stay unchecked pending a granted run that produces the correlated receipt.
+
+EXPENSIVE-GATE-REQUEST
