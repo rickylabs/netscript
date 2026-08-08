@@ -84,9 +84,43 @@ N/A — no framework-layer code in scope. Volatile-value single-home rule (repo 
 | ------ | ------- | ---------- | ---------- |
 | Routing migrations need a wrapped-line stale scan | Single-line greps for `Claude Code + OpenRouter` miss prose wrapped across Markdown lines; scan for anchor tokens (`claude-print`, preset ids) too | harness policy migrations | high |
 
+## Cycle 1 verdict (superseded)
+
+| Field     | Value |
+| --------- | ----- |
+| Verdict   | FAIL_FIX (cycle 1, 2026-08-08) |
+| Rationale | Executable policy and tests correct on all eight owner decisions, but two active surfaces (F-1 harness-skill pitfall bullet, F-2 CLAUDE.md supervisor rules) still asserted the retired OpenRouter-first evaluator route, and the per-slice PR comment was missing (F-3). |
+
+## Re-evaluation — cycle 2 (same evaluator session, 2026-08-08)
+
+Coordinator fix commit `8f2bf4052` "fix(harness): remove stale evaluator startup rules". Verified
+the commit is the live PR head: `git ls-remote origin chore/update-agent-model-routing` →
+`8f2bf4052` and `gh pr view 1391 --json headRefOid` → `8f2bf4052` (a locally stale
+`origin/chore/update-agent-model-routing` tracking ref pointing at superseded commit `fff8806f0`
+was ruled out against both live sources; no remote drift exists).
+
+| Finding | Outcome | Evidence |
+| ------- | ------- | -------- |
+| F-1 (harness-skill stale pitfall bullet) | FIXED | `.agents/skills/netscript-harness/SKILL.md:137-144` now states native opposite-family first, Minimax/DeepSeek as third-opinion/quota escalation, AGY on OpenRouter limit; `.claude` mirror byte-identical (`diff` of both blobs at HEAD → identical); `validate-claude-surface.ts` → `ok: true`, `sync-claude OK: 18 skill(s), 22 mirrored file(s)` |
+| F-2 (CLAUDE.md stale supervisor rule) | FIXED | `CLAUDE.md:9-13` now: "native opposite-family sessions are the local default; OpenRouter is explicit third-opinion/native-limit escalation, and OpenHands is for explicitly cloud-driven work" |
+| F-3 (missing per-slice PR comment) | FIXED | PR #1391 comment by `rickylabs` (2026-08-08T21:04Z): slice scope, commit `ebc7ac0d5` + follow-up fix, full gate evidence, and the cycle-1 finding disclosure |
+| N-1 (bench prose) | FIXED, pin preserved | `packages/bench/bench.config.ts:5-7` now says "remains pinned to its historical Claude Opus 4.8 … reference until verified Opus 5 pricing is recorded"; `DEFAULT_MODEL`/`MODEL_PRICING` pins unchanged; `deno check --unstable-kv` clean |
+
+Focused gates re-run by the evaluator in cycle 2:
+
+- Routing + no-hardcoded-volatile tests: `ok | 40 passed | 0 failed`.
+- Stale-prose rescan incl. unfiltered `open-models-only` / `claude-print` grep over `CLAUDE.md`,
+  `.agents/skills`, `.claude/skills`: zero hits (exit 1 = no matches).
+- `git diff --check origin/main...HEAD`: clean.
+- `validate-claude-surface.ts`: green (also confirms deno.lock unchanged across hook runs — no lock
+  churn).
+
+Run-artifact contract: `worklog.md` and this `evaluate.md` were committed with the fix slice;
+`supervisor.md`/`drift.md`/`plan.md`/`research.md` unchanged and consistent.
+
 ## Verdict
 
 | Field     | Value |
 | --------- | ----- |
-| Verdict   | **FAIL_FIX** |
-| Rationale | The executable policy, tests, and nearly all prose surfaces correctly implement all eight owner decisions, and every scoped gate re-ran green under this evaluator. But the migration's own scope ("align protocols/skills/docs and generated Claude mirrors") leaves two high-visibility **active** surfaces asserting the retired OpenRouter-first evaluator route: the `netscript-harness` skill's "Wrong evaluator surface" pitfall bullet (F-1, self-contradictory within the file) and the `CLAUDE.md` supervisor rules (F-2). Both are loaded at session/run start and would steer future supervisors to the wrong formal-evaluator transport. Fixes are small and bounded; no rescope or debt entry is needed. F-3 (missing per-slice PR comment) rides along with the fix commit. |
+| Verdict   | **PASS** |
+| Rationale | All eight owner routing decisions are enforced in `CANONICAL_ROUTE_POLICY` + `resolveCanonicalFormalEvaluatorRoute()` with green machine assertions (40/40), all cycle-1 findings (F-1, F-2, F-3, N-1) are verified fixed on the live PR head `8f2bf4052`, mirrors are regenerated and byte-identical, historical evidence and benchmark pins remain intact, and no active stale routing survives an unfiltered rescan. Evaluated in a separate native Fable 5 medium session per the native-first evaluator route this PR itself codifies. Ready for coordinator sign-off and PR lifecycle. |
