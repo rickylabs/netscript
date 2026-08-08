@@ -27,7 +27,14 @@ code/evidence slice for #1202; owner-machine collision observation remains separ
   no W2-C-owned survivor and review-thread gate passed with 0 unanswered threads.
 - Coverage limitation: that pass exposed an explicit-suite allowlist omission, so it did not execute
   the four new W2-C acceptance gates. The selector repair is focused-green (16/16 registry tests),
-  but those four gates still require a fresh serialized grant before merge readiness.
+  and Tier-A granted a fresh serialized pass.
+- Tier-A test restoration: raw exit 0, 3/3 focused helper tests passed, including both restored
+  `isNoRunningAppHostOutput` cases.
+- Repaired-selector `scaffold.runtime`: raw exit 1, `passed=33 failed=1`.
+  `database.migration-artifacts` executed and failed after creating/applying its PTY artifact because
+  the spawn adapter accessed inherited (unpiped) stderr. Both allocation gates and
+  `behavior.live-db-endpoint` were not reached. Cleanup passed and postflight leak evidence shows no
+  W2-C-owned survivor. No retry was attempted.
 
 ## Harness
 

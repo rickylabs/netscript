@@ -1,6 +1,6 @@
 # Run resource leak report
 
-Generated: 2026-08-08T22:06:57.599Z
+Generated: 2026-08-08T22:20:27.097Z
 Worktree: `/home/codex/repos/ns005-w2c`
 Aspire probe: ok
 Docker probe: ok
@@ -9,7 +9,7 @@ Docker probe: ok
 
 - Ownership: `foreign`
 - Apparent owner: `/home/codex/repos/w6-review-desk`
-- Age: 236026119 ms
+- Age: 236835617 ms
 - Stale: true
 - User command: `docker rm -f '48c4411a5072b277021396e0acf1dc7666bd44626a1b5ee82d4d7ac169dbd3e4'`
 

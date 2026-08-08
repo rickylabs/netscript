@@ -24,3 +24,14 @@
   assert both selections in the suite-registry test (16 passed, 0 failed).
 - Evidence boundary: no blind retry was run. The 76-gate result is green but is not evidence for the
   four omitted acceptance gates. A fresh serialized grant is required before merge readiness.
+
+## 2026-08-09 — PTY migration spawn reads an unpiped stream (material)
+
+- Expected: the repaired runtime selection executes all four W2-C evidence gates.
+- Observed: `database.migration-artifacts` created and applied the PTY migration, then failed when
+  `defaultPrismaSpawn` destructured `stderr` from `command.output()` while PTY mode configured the
+  stream as `inherit`. Deno correctly rejected access to an unpiped stream.
+- Verdict: serialized run raw exit 1, `passed=33 failed=1`. The two allocation captures and
+  live-endpoint gate were not reached.
+- Boundary: Tier-A instructed stop-on-failure. No retry or code repair was attempted; follow-up
+  implementation requires a new steer and a later serialized grant.

@@ -2,10 +2,12 @@
 
 ## Current phase
 
-Tier-A remediation and renewed serialized gate. The two accidentally replaced
+Tier-A remediation is committed and focused-green: the two accidentally replaced
 `isNoRunningAppHostOutput` tests are restored alongside the new environment-forwarding test. The
-selector repair is already focused-green, and Tier-A granted one fresh `scaffold.runtime` pass to
-execute the four previously omitted W2-C acceptance gates.
+renewed serialized pass reached `database.migration-artifacts` but failed in its PTY case because
+`defaultPrismaSpawn` read `stderr` from a command configured with inherited stderr. Aggregate
+verdict: `passed=33 failed=1`, raw exit 1. Both allocation captures and the live-endpoint gate were
+not reached. No retry or repair was attempted; the token is released failing.
 
 ## Identity
 

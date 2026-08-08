@@ -157,3 +157,38 @@ documented diagnostic-prefix behavior and the negative substring-quotation trap 
 
 The reviewer granted one fresh serialized pass after this restoration commit. Focused and runtime
 evidence follow in the next evidence commit; no resources are started before the focused test.
+
+### Restoration evidence
+
+| Command | Raw exit | Result |
+| --- | ---: | --- |
+| `deno test --no-lock --allow-all packages/cli/src/kernel/adapters/database/operation-runner-helpers_test.ts` | 0 | 3 passed, 0 failed; both restored AppHost diagnostic cases and the migration environment case passed |
+
+Restoration commit `e28efad9e` was pushed before the focused suite and before resource startup, as
+required by Tier-A.
+
+## Second serialized runtime verdict — 2026-08-09
+
+Tier-A granted one additional pass at the repaired selector head. The command was run exactly once;
+after failure there was no retry and no implementation repair.
+
+| Step | Exact command / artifact | Raw exit | Full verdict |
+| --- | --- | ---: | --- |
+| Preflight leak check | `deno task agentic:leak-check -- --slice-dir .llm/runs/release-0.0.5--orchestration/slices/w2-c-1202-1327 --worktree /home/codex/repos/ns005-w2c` | 0 | No W2-C-owned or unknown survivor. Known foreign `redis-jfgcbtaf` belongs to `/home/codex/repos/w6-review-desk`; left untouched. |
+| Serialized suite | `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | 1 | `Summary: passed=33 failed=1`; `database.migration-artifacts` executed and failed after 23,799 ms. `cleanup.aspire-stop` then passed. |
+| Postflight leak check | same command as preflight | 0 | Artefact proves no W2-C-owned or unknown survivor; only the same untouched foreign container remains. No teardown needed. |
+| Review threads | `deno task agentic:review-threads -- --repo rickylabs/netscript --pr 1393 --pretty` | 0 | `review-threads PASS rickylabs/netscript#1393 threads=0 unanswered=0` |
+
+### Decisive gate execution
+
+- `database.migration-artifacts` — **FAILED**. Its headless case completed. The PTY case successfully
+  created and applied `20260808222008_w2_tty`, then `defaultPrismaSpawn` accessed
+  `output.stderr` even though PTY mode configured stderr as inherited. Deno raised
+  `TypeError: Cannot get 'stderr': 'stderr' is not piped` at `migrate.ts:153`.
+- `runtime.capture-db-allocation-first` — **NOT EXECUTED** because the suite stopped at the failed
+  migration gate.
+- `runtime.capture-db-allocation-second` — **NOT EXECUTED** for the same reason.
+- `behavior.live-db-endpoint` — **NOT EXECUTED** for the same reason.
+
+The serialized token is released with a failing verdict. Per the grant, no blind retry or repair was
+started in this turn.
