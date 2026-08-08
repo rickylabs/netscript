@@ -6,17 +6,17 @@
 | -------------- | ----------------------------------------------- |
 | Run ID         | `release-0.0.5--orchestration/slices/w2-b-1329` |
 | Branch         | `fix/streams-versioned-sse-envelope`            |
-| Current phase  | `plan-eval`                                     |
+| Current phase  | `impl — S1`                                     |
 | Archetype      | `3 — Runtime/Behavior`                          |
 | Scope overlays | `frontend`, `service`, `docs`                   |
 
 ## Current State
 
-Research and the contract-first Design checkpoint are complete against clean base `c383b2e84`. The
-contract is locked in `plan.md`: upstream wire names remain exactly `data/control`; the single v1
-authority also defines validated `heartbeat/error` consumer outcomes, per-write correlation and W3C
-context, control-committed replay, and non-advancing malformed-frame behavior. Implementation is
-hard-stopped pending a fresh opposite-family PLAN-EVAL.
+PLAN-EVAL passed and S1 implements the exported `@netscript/plugin-streams-core/sse` authority.
+Upstream wire names remain exactly `data/control`; validated outcomes add `heartbeat/error`.
+Replay state includes the last committed opaque offset, optional observed cursor, terminal marker,
+and pending batches. Full export-map doc lint is now zero after replacing five private telemetry
+type references with explicit package-owned ports.
 
 ## Completed
 
@@ -26,17 +26,21 @@ hard-stopped pending a fresh opposite-family PLAN-EVAL.
 - JSR/doc baseline captured: five private-type refs and one slow-type warning are owned hidden
   scope.
 - Exact AP-13 and streams connector-convergence debts cited without generalization.
+- Separate Claude/Fable 5 medium PLAN-EVAL passed; F1/F2 are folded into the run design.
+- S1 contract, runtime schemas, parser, reducer, named EventSource binding, and six focused tests
+  implemented.
+- S1 focused tests, package test suite, scoped check/lint/fmt, direct entry checks, and full export
+  doc lint are green.
 
 ## In Progress
 
-- S0 plan commit, draft PR bootstrap, and separate PLAN-EVAL request.
+- Final S1 review, detached import/publish audit, then S1 commit/push/PR comment.
 
 ## Next Steps
 
-1. Receive separate native Claude/Fable 5 medium PLAN-EVAL `PASS` in `plan-eval.md`.
-2. Implement S1 contract authority only, run its focused gates, then commit/push/comment.
-3. Continue S2–S5 with one slice at a time; request serialized gate only when otherwise green.
-4. Request orchestrator-launched separate IMPL-EVAL after terminal evidence.
+1. Commit/push/comment S1 and immediately notify the orchestrator that W3-A's type is frozen.
+2. Continue S2–S5 with one slice at a time; request serialized gate only when otherwise green.
+3. Request orchestrator-launched separate IMPL-EVAL after terminal evidence.
 
 ## Key Decisions
 
@@ -46,6 +50,9 @@ hard-stopped pending a fresh opposite-family PLAN-EVAL.
 | Wire `data/control`; outcomes add `heartbeat/error` | plan D2/D5  | Honest to upstream and exhaustive for consumers.         |
 | Control commits replay offset                       | plan D6     | Disconnect-before-control replays at least once.         |
 | Correlation explicit or entity key fallback         | plan D3/D4  | Stable for upsert/delete/replay and TC-7.                |
+| Replay retains cursor plus terminal marker          | PLAN-EVAL F1 | Offset remains today's only resume parameter.            |
+| Offset is opaque and never parsed                   | PLAN-EVAL F1 | W3-A stores/replaces server tokens verbatim.              |
+| Deno AppHost consumer hosts the final OTEL span     | PLAN-EVAL F2 | Browser proof remains separate from OTLP trace export.    |
 
 ## Files Changed
 
@@ -62,14 +69,14 @@ hard-stopped pending a fresh opposite-family PLAN-EVAL.
 
 | Gate family | Current status             | Evidence                                                           |
 | ----------- | -------------------------- | ------------------------------------------------------------------ |
-| Static      | baseline mixed             | 17 targeted tests pass; doc lint baseline red (5).                 |
+| Static      | S1 green                   | 15 package tests; scoped check/lint/fmt; doc lint 0.                |
 | Fitness     | pending                    | AP-13 exact debt accepted; full gates after implementation.        |
 | Runtime     | not run                    | requires implementation and isolated Aspire.                       |
 | Consumer    | baseline defect reproduced | official example is wrong; generated helper lacks contract parser. |
 
 ## Open Questions
 
-- None that may force implementation rework; PLAN-EVAL may challenge locked decisions before code.
+- None that may force S1 rework; the full `plan-eval.md` is imported and F1/F2 are resolved.
 
 ## Drift and Debt
 

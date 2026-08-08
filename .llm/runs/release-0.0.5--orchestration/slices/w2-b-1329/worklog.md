@@ -35,7 +35,8 @@
 - `StreamSseErrorPayloadV1` — normalized malformed/transport failure with retryability and last
   committed offset.
 - `StreamSseParseResultV1<T>` — success/error result, never an untyped cast.
-- `StreamSseReplayStateV1` — last committed offset plus pending batch state.
+- `StreamSseReplayStateV1` — last committed opaque offset, optional last-observed cursor, explicit
+  terminal state, plus pending batch state.
 
 ### Ports
 
@@ -61,6 +62,8 @@
 - Delivery: at-least-once across disconnect-before-control. Consumers materialize idempotently by
   entity `type + key`; delete has no value and removes that identity.
 - Ordering: data arrays preserve wire order; a control commits every preceding pending data frame.
+  Offsets are opaque ordered tokens owned by the server. Consumers store/replace them verbatim and
+  never parse them, perform arithmetic on them, or manufacture successor offsets.
 - Cancellation: returned dispose closes EventSource and removes listeners.
 - Diagnostics: malformed frames become typed errors, include event name and last committed offset,
   and never advance replay state.
@@ -88,6 +91,10 @@ service, generator, or docs file owns a second event-name/payload table.
 | 2026-08-08 | S0    | activation/research | Required skills and harness/doctrine references read; issue and current worktree re-verified.                                                           |
 | 2026-08-08 | S0    | baseline gates      | Package 9/9, generator 7/7, Fresh 1/1 tests pass. Full export doc lint baseline fails with five private-type refs; JSR audit has one slow-type warning. |
 | 2026-08-08 | S0    | design checkpoint   | Public surface, domain vocabulary, replay lifecycle, identity, delivery, slices, debts, and gates locked.                                               |
+| 2026-08-09 | S0    | PLAN-EVAL            | PASS authorized by separate Claude/Fable 5 medium session. F1 cursor/terminal replay insurance and opaque offsets folded into S1.                       |
+| 2026-08-09 | S4    | trace-host decision  | The OTEL consumer span is emitted by a Deno-side SSE consumer hosted in the isolated AppHost; the browser island separately proves the unchanged example. |
+| 2026-08-09 | S1    | contract implemented | Exported v1 schemas/parser/reducer/binding include opaque offset, cursor, terminal, malformed-frame, deletion, correlation, and W3C semantics.              |
+| 2026-08-09 | S1    | doc surface repaired | Full export-map diagnostics reduced from five private type refs to zero using explicit package-owned streams telemetry ports; no waiver added.             |
 
 ## Decisions
 
@@ -97,6 +104,8 @@ service, generator, or docs file owns a second event-name/payload table.
 | Offset commits only on control              | Upstream control follows one or more data frames and carries next offset.                              | upstream client response logic         |
 | Correlation falls back to entity key        | Stable, available for delete, durable across replay, satisfies TC-7 without a global.                  | telemetry convention + producer schema |
 | Preserve exact debts                        | AP-13 and connector convergence have accepted owners/closing gates; general cleanup would widen scope. | arch-debt registry                     |
+| Preserve cursor and terminal observations   | Add optional `lastObservedCursor` and explicit `streamClosed`; offset remains today's only resume input. | PLAN-EVAL F1                           |
+| Host consumer OTEL in AppHost                | Browser EventSource does not export OTLP; a Deno-side consumer provides the genuine final trace span.    | PLAN-EVAL F2                           |
 
 ## Drift
 
@@ -117,6 +126,13 @@ service, generator, or docs file owns a second event-name/payload table.
 | Fresh baseline test      | `deno test --no-lock --allow-all packages/fresh/src/runtime/streams/create-stream-db_test.ts` | PASS (exit 0)                  | 1 passed, 0 failed.                                            |
 | Full export doc lint     | `deno task doc:lint --root packages/plugin-streams-core --pretty`                             | FAIL (exit 1 in command chain) | 5 distinct private-type refs; hidden scope owned by this plan. |
 | JSR audit                | `audit-jsr-package.ts --root packages/plugin-streams-core --text`                             | WARN                           | dry-run OK; one slow-type warning.                             |
+| S1 focused tests         | `deno test --no-lock --allow-all packages/plugin-streams-core/tests/application/stream-sse-v1_test.ts` | PASS (exit 0)          | 6 passed, 0 failed.                                           |
+| Package S1 tests         | `deno test --no-lock --allow-all packages/plugin-streams-core/tests`                          | PASS (exit 0)                  | 15 passed, 0 failed.                                          |
+| S1 scoped check          | `run-deno-check.ts --root packages/plugin-streams-core --ext ts,tsx --deno-arg --no-lock`    | PASS (exit 0)                  | 26 selected; zero occurrences.                               |
+| S1 scoped lint           | `run-deno-lint.ts --root packages/plugin-streams-core --ext ts,tsx`                          | PASS (exit 0)                  | zero findings.                                                |
+| S1 scoped format         | `run-deno-fmt.ts --root packages/plugin-streams-core --ext ts,tsx`                           | PASS (exit 0)                  | zero findings after targeted format.                          |
+| Full export doc lint S1  | `deno task doc:lint --root packages/plugin-streams-core --pretty`                            | PASS (exit 0)                  | zero diagnostics across four export entrypoints.              |
+| Native publish dry-run S1 | `deno publish --dry-run --no-check --allow-dirty` from package                              | PASS (exit 0)                  | No slow-type diagnostic; generic audit script counts Deno's informational heading as a warning. |
 
 ### Fitness Gates
 

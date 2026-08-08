@@ -1,14 +1,5 @@
-import {
-  createFanInLinks,
-  createSpan,
-  getTracer,
-  type Span,
-  SpanKind,
-  type SpanLinkPort,
-  SpanStatusCode,
-  type Tracer,
-} from '@netscript/telemetry';
-import { resolveTraceContextFromSpan } from '@netscript/telemetry/context';
+import { createFanInLinks, getTracer, SpanKind, SpanStatusCode } from '@netscript/telemetry';
+import { formatTraceparent } from '@netscript/telemetry/context';
 import { createOtelSdkSpanLink } from '@netscript/telemetry/otel';
 import {
   StreamAttributes,
@@ -28,16 +19,99 @@ export type StreamFanInMessage = Readonly<{
   correlationId?: string;
 }>;
 
+/** Attribute value supported by the streams telemetry ports. */
+export type StreamsSpanAttributeValue =
+  | string
+  | number
+  | boolean
+  | string[]
+  | number[]
+  | boolean[];
+
+/** W3C trace-state surface retained by a streams span context. */
+export interface StreamsTraceState {
+  /** Read a trace-state member. */
+  get(key: string): string | undefined;
+  /** Return a copy without a trace-state member. */
+  unset(key: string): StreamsTraceState;
+  /** Return a copy with a trace-state member. */
+  set(key: string, value: string): StreamsTraceState;
+  /** Serialize the W3C trace-state header. */
+  serialize(): string;
+}
+
+/** W3C identifiers exposed by a streams instrumentation span. */
+export interface StreamsSpanContext {
+  /** W3C trace identifier. */
+  readonly traceId: string;
+  /** W3C span identifier. */
+  readonly spanId: string;
+  /** W3C trace flags byte. */
+  readonly traceFlags: number;
+  /** Whether the context originated outside this process. */
+  readonly isRemote?: boolean;
+  /** Optional W3C vendor trace state. */
+  readonly traceState?: StreamsTraceState;
+}
+
+/** Span link accepted by the streams tracer port. */
+export interface StreamsSpanLink {
+  /** Context linked to the new span. */
+  readonly context: StreamsSpanContext;
+  /** Optional link attributes. */
+  readonly attributes?: Readonly<Record<string, StreamsSpanAttributeValue | undefined>>;
+  /** Number of attributes omitted by the provider. */
+  readonly droppedAttributesCount?: number;
+}
+
+/** Minimal span lifecycle used by stream instrumentation. */
+export interface StreamsSpanPort {
+  /** Read the span's W3C identifiers. */
+  spanContext(): StreamsSpanContext;
+  /** Set one telemetry attribute. */
+  setAttribute(key: string, value: StreamsSpanAttributeValue): this;
+  /** Set the OpenTelemetry status code and optional message. */
+  setStatus(status: Readonly<{ code: 0 | 1 | 2; message?: string }>): this;
+  /** Record an exception on the span. */
+  recordException(exception: Error): void;
+  /** End the span. */
+  end(): void;
+}
+
+/** Minimal tracer dependency used by stream instrumentation. */
+export interface StreamsTracerPort {
+  /** Start a span with stream-owned attributes and fan-in links. */
+  startSpan(
+    name: string,
+    options?: Readonly<{
+      kind?: 0 | 1 | 2 | 3 | 4;
+      attributes?: Readonly<Record<string, StreamsSpanAttributeValue | undefined>>;
+      links?: StreamsSpanLink[];
+    }>,
+  ): StreamsSpanPort;
+}
+
+/** Minimal fan-in link adapter used by stream instrumentation. */
+export interface StreamsSpanLinkPort {
+  /** Whether the adapter preserves link attributes. */
+  readonly supportsLinkAttributes: boolean;
+  /** Create a link to an upstream W3C context. */
+  createLink(
+    context: StreamsSpanContext,
+    attributes?: Readonly<Record<string, StreamsSpanAttributeValue | undefined>>,
+  ): StreamsSpanLink;
+}
+
 /** Dependencies for stream instrumentation. */
 export type StreamsInstrumentationOptions = Readonly<{
-  tracer?: Tracer;
-  spanLinks?: SpanLinkPort;
+  tracer?: StreamsTracerPort;
+  spanLinks?: StreamsSpanLinkPort;
 }>;
 
 /** Real stream telemetry facade backed by `@netscript/telemetry`. */
 export class StreamsInstrumentation {
-  readonly #tracer: Tracer;
-  readonly #spanLinks: SpanLinkPort;
+  readonly #tracer: StreamsTracerPort;
+  readonly #spanLinks: StreamsSpanLinkPort;
 
   /** Create stream instrumentation with optional tracer/link adapter overrides. */
   constructor(options: StreamsInstrumentationOptions = {}) {
@@ -57,7 +131,7 @@ export class StreamsInstrumentation {
       emit: (headers: Record<string, string>) => void;
     }>,
   ): void {
-    const span = createSpan(this.#tracer, StreamSpanNames.PUBLISH, {
+    const span = this.#tracer.startSpan(StreamSpanNames.PUBLISH, {
       kind: SpanKind.PRODUCER,
       attributes: streamAttributes({
         streamPath: input.streamPath,
@@ -69,11 +143,9 @@ export class StreamsInstrumentation {
       }),
     });
     try {
-      const traceContext = resolveTraceContextFromSpan(span);
-      const headers: Record<string, string> = { traceparent: traceContext.traceparent };
-      if (traceContext.tracestate) {
-        headers.tracestate = traceContext.tracestate;
-      }
+      const headers: Record<string, string> = {
+        traceparent: formatTraceparent(span.spanContext()),
+      };
       input.emit(headers);
       span.setAttribute(StreamAttributes.OUTCOME, 'success');
       span.setStatus({ code: SpanStatusCode.OK });
@@ -100,8 +172,8 @@ export class StreamsInstrumentation {
       operation?: string;
       messages: readonly StreamFanInMessage[];
     }>,
-  ): Span {
-    return createSpan(this.#tracer, StreamSpanNames.SUBSCRIBE, {
+  ): StreamsSpanPort {
+    return this.#tracer.startSpan(StreamSpanNames.SUBSCRIBE, {
       kind: SpanKind.CONSUMER,
       attributes: streamAttributes({
         streamPath: input.streamPath,
