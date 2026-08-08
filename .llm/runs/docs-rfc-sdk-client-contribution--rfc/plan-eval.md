@@ -1,5 +1,54 @@
 # PLAN-EVAL — docs-rfc-sdk-client-contribution--rfc (RFC-A, PR #1390)
 
+## CYCLE 2 — VERDICT: **PASS** (PR vocabulary: APPROVED) — 2026-08-08
+
+Evaluator: same owner-designated Fable 5 · high session as cycle 1. Evaluated: RFC @ remediation
+commit `78a7cecd1` (branch HEAD `4978f7d84`), fixture
+`packages/sdk/tests/type-fixtures/sdk-client-contributions-rfc_type.ts`, updated
+research/plan/worklog/drift/final-handoff. Independent evidence executed by the evaluator (not
+taken from the author): `deno check --unstable-kv <fixture>` → exit 0; section-level verification
+of every finding anchor against the amended text and worktree source.
+
+### Mechanical re-evaluation F-A1…F-A10
+
+| # | Cycle-2 status | Evidence (amended RFC) |
+| --- | --- | --- |
+| F-A1 | **RESOLVED** | Declaration gate filters `deno doc --json` to named RFC-A symbols; generated files scanned in full; pre-existing `~orpc`/contracts paths are a **non-growing allowlist tied to #1278/#1350** and explicitly do not exempt new symbols (§Compatibility, L1243-1253) |
+| F-A2 | **RESOLVED** | New §"Server key algebra and compatibility": default exact three-tuple preserved, partitioned five-tuple `['$netscript.sdk-context', serializedPairs]`, all six surfaces dispositioned in a normative table incl. `CacheKey`/key-bridge/persister/collections; recursive TanStack wrapping cost stated (cast fast-path only for the empty specialization); upstream-assignability fixture dispositioned (default `Record<never,never>` keeps it valid) |
+| F-A3 | **RESOLVED** | Compatibility defaults on every widened public generic (`ServiceClientMethod`/`ServiceClient`/`ServiceRequestRest` = `ServiceClientContext`; query/context types = `Record<never,never>`; default table at L680-700) |
+| F-A4 | **RESOLVED** | Logical-call-**epoch** model: iterator-phase reconnect = new epoch, contribution preparation rerun exactly once per epoch; mandatory stream fixture asserts preparation count 2, credential A→B across epochs, byte-equality within each (L917-929). Kills the frozen-credential path while preserving prepare-once |
+| F-A5 | **RESOLVED** | §Desktop transport boundary: explicitly out of scope; `CreateDesktopServiceClientOptions` rejects `contributions` (excess-property + runtime `SDK_CONTRIBUTION_TRANSPORT_UNSUPPORTED`); targets exclude desktop; generators fail; docs obligation stated (L983-995) |
+| F-A6 | **RESOLVED** | Ports live in `packages/sdk/src/internal/client-contributions/` (named files, no barrel, not in exports); absence asserted for every doc graph + a packed-consumer negative that rejects the internal specifier (L491-496, L1364-1369) |
+| F-A7 | **RESOLVED** | Contributions now see only their **declared-context projection** + `signal`; the seven framework keys are reserved and a contribution declaring them is rejected; snapshot gate re-worded to the projection; forced-retry fixture drives `context.retry: 1`; private prepared-call channel named (L478-486) |
+| F-A8 | **RESOLVED** | GET direction corrected: "Stable v1 already infers GET… the v2 spike must preserve GET (replacement inference + `allowMethods` + Sec-Fetch CSRF) or retire GET and replace dedupe; silently accepting POST-only while leaving the GET-only dedupe filter installed is not acceptable" (L1017-1025); `inferRPCMethodFromContractRouter` replacement in the v2 gates (L1299); OTel package selection assigned to #1351 (v1); lock-only family pinning stated (L1260) |
+| F-A9 | **RESOLVED** | Fixture committed in-tree, imports the real `ContractLike`/`defineServices`/`ServiceQueryUtils`/key/desktop surfaces, pins default assignability + contribution inference + 16-accept/17-reject (`@ts-expect-error`); **evaluator re-executed the check: exit 0** |
+| F-A10 | **RESOLVED** | v1.14.6 per-attempt header fact + header-safe dedupe cited (L931-932); raw-input sensitivity stated; #1350 Stage 1a (filed `safe()` scope) / Stage 1b (metadata) split recorded |
+
+### Lane/label honesty audit (evaluator-ordered)
+
+The PR now carries `packages/sdk/tests/type-fixtures/sdk-client-contributions-rfc_type.ts` — a
+compile-only source-tree test fixture. Ruling: `ci:skip-e2e`/`ci:skip-scaffold` **remain valid**
+(no runtime, generator, scaffold, export, or lock change; the proportionate gate is the scoped
+type-check, which both the author and this evaluator executed). `type:docs` alone under-describes
+the diff: the evaluator **adds `type:test`** alongside it (label authority granted). Not a
+blocking finding. Merge-readiness note: the docs-lane CI skip does not itself compile the
+fixture; the fixture check stays a recorded PR-body gate.
+
+### Residual advisories (non-blocking, for FCP/numbering)
+
+1. Frontmatter conventions differ across the pair: RFC-A `target-milestone: 0.0.7`
+   (implementation) vs RFC-B `0.0.6` (ratification, now footnoted). Harmonize at numbering time.
+2. The eight FCP questions are all safe as posed (Q6's GET fork now correctly v2-owned).
+
+**PASS.** The plan is implementable without guessing; auth + locale still require no parallel
+framework. Hard-stop lifted for stages 0–2 pending owner ratification and the root-owned Qwen
+adversarial acceptance pass. Accepted content SHA of record: **`78a7cecd1d5eaafa7a65bc25a21af497567128dc`**
+(branch HEAD `4978f7d844f05dae9c3236cd830a2b3c5b693dda`).
+
+---
+
+# Cycle 1 record (2026-08-08, superseded by the PASS above)
+
 | Field | Value |
 | --- | --- |
 | Verdict | **FAIL_PLAN** (PR-comment vocabulary: CHANGES_REQUESTED) — cycle 1 of 2 |
