@@ -22,6 +22,35 @@
 | Extracted native example | PASS within `behavior.otel.stream-consumer` | `runDocumentedStreamExample()` read the official docs source, appended only the test receipt/cleanup suffix, and imported that exact source against the generated service. A separate focused server test proves its ordered three-change upsert/upsert/delete batch materializes one retained record. |
 | `behavior.otel.traces` | **FAIL (58,790 ms)** | `TC-14 FAIL: SSE consumer W3C link points into the producer Flow-B trace`. The consumer link trace id did not equal the actual Flow-B producer trace id. The ids were not printed; the equality assertion result is the recorded evidence. |
 
+## Post-failure live diagnosis
+
+Diagnostic commit `cb6c95599` made TC-14 print every relevant identity before any selector or
+product repair. A retained generated service reproduced the mismatch with:
+
+- selected Flow-B producer trace: `36877bd0933da790de3f5f17d7c885dd`;
+- consumer trace/span: `0a17c1c06c30cada853b5849bea776ba` / `06d3f0d130f712a6`;
+- link count: 3;
+- linked traces: `a44ea6b1b08b60a32f0c31b24e12432a`,
+  `da802c02af034aac6cf9ac2bb142065b`, and `dc7c11ab60e258dbe898f22b9f32cd49`.
+
+Dashboard attributes resolve the selected producer to the real `flow-b-callback` `job.execute`
+trace with correlation `trg_evt_50c283fa-6224-47ff-ae38-7cd2e1908dda`. The three links instead
+resolve to `stream.publish` spans for collection `job`, with message/correlation ids
+`flow-b-callback`, `health-check`, and `workers-plugin-health-check`. They are startup job snapshots,
+not the Flow-B execution record.
+
+This classifies the failure as a **gate-side record-selection defect**. `createDurableStream`
+creates a publish span and stores its W3C `traceparent`/`tracestate` in each SSE record; the consumer
+correctly reconstructs links from the three records it actually consumed. The diagnostic then
+incorrectly treats the first batch wholesale as Flow-B evidence and separately copies the real
+Flow-B correlation onto that consumer span. The observed mismatch therefore does not identify a
+product context drop. End-to-end propagation remains unproven until the gate selects the actual
+`flow-b-callback` execution record before constructing its span.
+
+No repair was implemented before this classification was reported. The isolated diagnostic AppHost
+was stopped; scoped teardown removed owned `postgres-b73d5698`; the final leak artefact contains only
+the known foreign `redis-jfgcbtaf`.
+
 The malformed control was not injected through the real generated service. It is a synthetic invalid
 `control` payload evaluated by the exported parser inside the real-service consumer gate, using the
 offset committed by that live service. Likewise, ordered deletion is proven by the focused verbatim
@@ -43,7 +72,7 @@ is still the same foreign `redis-jfgcbtaf` container owned by
 | 3 | Official example works unchanged against a real service | PROVEN | Verbatim extraction executed inside the passing generated-service consumer gate. |
 | 4 | Replay/ordering/batching/deletion/reconnect/malformed behavior documented | PROVEN | Task docs plus contract/runtime tests. Runtime provenance is split as disclosed above; malformed/deletion are not injected through the generated service. |
 | 5 | Data carries correlation plus W3C trace context | PROVEN | Producer, schema, telemetry, and real-server conformance tests; live generated consumer accepted schema-valid fields. |
-| 6 | Aspire proves producer → durable stream → SSE consumer as one end-to-end trace | **NOT PROVEN** | Exact TC-14 W3C trace-id equality assertion failed. |
+| 6 | Aspire proves producer → durable stream → SSE consumer as one end-to-end trace | **NOT PROVEN** | TC-14 selected three unrelated startup job records for the consumer links. This is a gate defect, but it leaves the actual Flow-B execution link unobserved and the row unticked. |
 | 7 | Drift tests cover event name/envelope/cardinality/telemetry | PROVEN | Contract negatives and real-server proxy conformance. |
 | 8 | Complete shapes appear in task and generated/reference API docs | PROVEN | Official task docs, exported module/symbol JSDoc, full core export-map doc lint. |
 

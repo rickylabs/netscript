@@ -111,6 +111,9 @@ service, generator, or docs file owns a second event-name/payload table.
 | 2026-08-09 | S6    | post-failure threads | `agentic:review-threads` exit 0: 0 threads, 0 unanswered. |
 | 2026-08-09 | S6-D1 | diagnostic instrumentation | Before any repair, TC-14 now distinguishes absent consumer span, zero links, and wrong links; mismatch output includes selected producer trace id, consumer trace/span ids, every link trace/span id, and link count. |
 | 2026-08-09 | S6-D1 | focused diagnostic gates | Two message-shape tests plus 33-file scoped check/lint/fmt and `quality:gate` pass. No product behavior or trace selector was repaired. |
+| 2026-08-09 | S6-D2 | live trace diagnosis | Retained generated service reproduced TC-14 with producer `36877bd0933da790de3f5f17d7c885dd`, consumer `0a17c1c06c30cada853b5849bea776ba`/`06d3f0d130f712a6`, and three links. All links resolve to unrelated `job` snapshot publications (`flow-b-callback`, `health-check`, `workers-plugin-health-check`), not the Flow-B execution. |
+| 2026-08-09 | S6-D2 | classification | Gate defect: the Deno diagnostic consumes the first SSE batch wholesale, links those job snapshots, then separately labels the consumer span with the real Flow-B `job.execute` correlation. The observed mismatch does not demonstrate a product context drop. No repair implemented before reporting this verdict. |
+| 2026-08-09 | S6-D2 | diagnostic cleanup | Foreground isolated AppHost stopped. Scoped teardown removed owned persistent `postgres-b73d5698`; final leak artefact reports no W2-B survivor. Foreign `redis-jfgcbtaf` was left untouched. |
 
 ## Decisions
 
@@ -191,7 +194,7 @@ service, generator, or docs file owns a second event-name/payload table.
 | ------------------------------ | ------- | ------------------------------- | ------------------------------------------- |
 | Focused unchanged docs example | PASS | focused Deno native EventSource test | Exact extracted source; named batch and deletion materialization. |
 | Real generated service/browser | PASS | `behavior.otel.stream-consumer` (943 ms) | Generated service and verbatim native example executed. Deletion is focused/real-test-server proof, not observed in generated Flow-B. |
-| Correlated OTEL trace          | FAIL | `behavior.otel.traces` (58,790 ms) | TC-14 consumer W3C link trace id did not equal actual Flow-B producer trace id. |
+| Correlated OTEL trace          | FAIL | `behavior.otel.traces` (58,790 ms) + S6-D2 live diagnosis | TC-14 attached the first SSE batch's three unrelated job-snapshot links to the consumer span; the gate did not select the Flow-B execution record, so end-to-end propagation remains unproven rather than disproven. |
 | `scaffold.runtime`             | FAIL (exit 1) | aggregate 74 passed, 1 failed | One pass only; no retry. Cleanup passed. Full evidence in `runtime-gate.md`. |
 
 ### Consumer Gates
@@ -206,3 +209,6 @@ service, generator, or docs file owns a second event-name/payload table.
 - Serialized token is released with a failing verdict. The orchestrator owns rescheduling or
   rescope; implementation must not advance to IMPL-EVAL until TC-14 trace equality is repaired and
   a newly granted serialized run passes.
+- S6-D2 classifies the failure as gate-side record selection. A repair must select the actual
+  `flow-b-callback` execution record and inspect its stored W3C context before constructing the
+  consumer span; it must not compare the Flow-B producer against unrelated startup job snapshots.
