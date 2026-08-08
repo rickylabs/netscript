@@ -6,17 +6,17 @@
 | -------------- | ----------------------------------------------- |
 | Run ID         | `release-0.0.5--orchestration/slices/w2-b-1329` |
 | Branch         | `fix/streams-versioned-sse-envelope`            |
-| Current phase  | `impl — S6 runtime failure`                     |
+| Current phase  | `impl — S6 TC-14 diagnosis`                     |
 | Archetype      | `3 — Runtime/Behavior`                          |
 | Scope overlays | `frontend`, `service`, `docs`                   |
 
 ## Current State
 
 S1–S5 are implemented and every cheaper gate is green. The granted serialized runtime ran once and
-failed 74/75: the real generated streams consumer and verbatim native example passed, but
-`behavior.otel.traces` failed TC-14 because the SSE consumer W3C link trace id did not equal the
-actual Flow-B producer trace id. Cleanup passed and no W2-B resource survived. Seven of issue
-#1329's eight acceptance rows are proven; the end-to-end Aspire trace row is not.
+failed 74/75 at TC-14. Before any behavior repair, the trace validator now prints the selected
+producer trace id, consumer trace/span ids, every link trace/span id, and link count, with a distinct
+zero-link diagnosis. Focused diagnostic gates are green. Runtime diagnosis is next; no selector or
+product propagation behavior has been changed.
 
 ## Completed
 
@@ -39,13 +39,14 @@ actual Flow-B producer trace id. Cleanup passed and no W2-B resource survived. S
 
 ## In Progress
 
-- None. The one-pass failure is handed back without retry or local fix.
+- Reproduce TC-14 through the retained generated workspace and classify gate selection versus real
+  product non-propagation from the new identity output.
 
 ## Next Steps
 
-1. Orchestrator decides repair/reschedule after the TC-14 failure.
-2. A future repair must receive a new serialized token before rerunning `scaffold.runtime`.
-3. Do not set `status:impl-eval`, add `Closes #1329`, or launch the evaluator until the trace row is proven.
+1. Commit/push/comment the diagnostics-only slice.
+2. Run a targeted owned AppHost diagnostic, not `scaffold.runtime`, and report classification before repair.
+3. Request a new serialized token only after an authorized repair exists.
 
 ## Key Decisions
 

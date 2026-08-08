@@ -109,6 +109,8 @@ service, generator, or docs file owns a second event-name/payload table.
 | 2026-08-09 | S6    | runtime cleanup | `cleanup.aspire-stop` passed; post-run leak artefact reports no W2-B-owned survivor. Known foreign `redis-jfgcbtaf` remains untouched. |
 | 2026-08-09 | S6    | honesty verdict | Seven of eight issue acceptance rows are proven. End-to-end correlated Aspire trace is not; remain `status:impl`, do not add `Closes #1329`, and do not launch IMPL-EVAL. |
 | 2026-08-09 | S6    | post-failure threads | `agentic:review-threads` exit 0: 0 threads, 0 unanswered. |
+| 2026-08-09 | S6-D1 | diagnostic instrumentation | Before any repair, TC-14 now distinguishes absent consumer span, zero links, and wrong links; mismatch output includes selected producer trace id, consumer trace/span ids, every link trace/span id, and link count. |
+| 2026-08-09 | S6-D1 | focused diagnostic gates | Two message-shape tests plus 33-file scoped check/lint/fmt and `quality:gate` pass. No product behavior or trace selector was repaired. |
 
 ## Decisions
 
@@ -171,6 +173,9 @@ service, generator, or docs file owns a second event-name/payload table.
 | Final doctrine fitness | `deno task arch:check` | PASS (exit 0) | Existing WARN/INFO inventory only; the two exact streams debts remain unchanged. |
 | Final docs links/accuracy | `deno task docs:links`; `deno task docs:accuracy` | PASS (both exit 0) | Zero broken links/anchors/orphans; accuracy/discoverability passed. |
 | Review threads | `deno task agentic:review-threads -- --repo rickylabs/netscript --pr 1395 --pretty` | PASS (exit 0) | 0 threads, 0 unanswered. |
+| TC-14 diagnostic tests | `deno test --no-lock --unstable-kv --allow-all packages/cli/e2e/src/application/gates/scaffold/validate-flow-b-traces_test.ts` | PASS (exit 0) | 2 passed: explicit zero-link and complete wrong-link identities. |
+| Diagnostic scoped wrappers | wrappers over `packages/cli/e2e/src/application/gates/scaffold` | PASS (all exit 0) | 33 files; zero check/lint/format findings. |
+| Diagnostic framework law | `deno task quality:gate` | PASS (exit 0) | Zero quality findings; carried doctrine inventory only. |
 
 ### Fitness Gates
 

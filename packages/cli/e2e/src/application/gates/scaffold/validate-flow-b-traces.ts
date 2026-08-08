@@ -4,34 +4,38 @@ import {
   type TelemetryTrace,
 } from '@netscript/telemetry/query';
 
-const appHost = Deno.args[0];
-const projectRoot = Deno.args[1];
-if (!appHost || !projectRoot) throw new Error('apphost and project root arguments are required');
+if (import.meta.main) await main();
 
-const metadata = await readObject(`${projectRoot}/.netscript/e2e/aspire-start.json`);
-const dashboardUrl = typeof metadata.dashboardUrl === 'string'
-  ? new URL(metadata.dashboardUrl).origin
-  : 'https://localhost:18888';
-const query = new AspireTelemetryQuery({
-  endpoint: dashboardUrl,
-  fetch: createLiveAspireFetch(fetch),
-});
+async function main(): Promise<void> {
+  const appHost = Deno.args[0];
+  const projectRoot = Deno.args[1];
+  if (!appHost || !projectRoot) throw new Error('apphost and project root arguments are required');
 
-let lastSummary = 'no traces returned';
-for (let attempt = 1; attempt <= 30; attempt++) {
-  const traces = await query.queryTraces({ limit: 500 });
-  try {
-    validateFlowB(traces);
-    console.info(`Flow-B grouped trace passed after ${attempt} attempt(s)`);
-    Deno.exit(0);
-  } catch (error) {
-    lastSummary = error instanceof Error ? error.message : String(error);
-    if (attempt < 30) await new Promise((resolve) => setTimeout(resolve, 2_000));
+  const metadata = await readObject(`${projectRoot}/.netscript/e2e/aspire-start.json`);
+  const dashboardUrl = typeof metadata.dashboardUrl === 'string'
+    ? new URL(metadata.dashboardUrl).origin
+    : 'https://localhost:18888';
+  const query = new AspireTelemetryQuery({
+    endpoint: dashboardUrl,
+    fetch: createLiveAspireFetch(fetch),
+  });
+
+  let lastSummary = 'no traces returned';
+  for (let attempt = 1; attempt <= 30; attempt++) {
+    const traces = await query.queryTraces({ limit: 500 });
+    try {
+      validateFlowB(traces);
+      console.info(`Flow-B grouped trace passed after ${attempt} attempt(s)`);
+      return;
+    } catch (error) {
+      lastSummary = error instanceof Error ? error.message : String(error);
+      if (attempt < 30) await new Promise((resolve) => setTimeout(resolve, 2_000));
+    }
   }
+  throw new Error(`Flow-B trace assertions did not converge: ${lastSummary}`);
 }
-throw new Error(`Flow-B trace assertions did not converge: ${lastSummary}`);
 
-function validateFlowB(traces: readonly TelemetryTrace[]): void {
+export function validateFlowB(traces: readonly TelemetryTrace[]): void {
   const main = traces.find((trace) =>
     hasAny(trace, ['trigger.ingress', 'trigger.detect']) && has(trace, 'queue.enqueue') &&
     has(trace, 'queue.dequeue') &&
@@ -85,20 +89,17 @@ function validateFlowB(traces: readonly TelemetryTrace[]): void {
     'trigger ingress never starts a fresh trace',
   );
 
-  const fanIn = traces.flatMap((trace) => trace.spans).find((span) =>
-    span.name === 'stream.subscribe' && span.links.length > 0
+  const subscribeSpans = traces.flatMap((trace) => trace.spans).filter((span) =>
+    span.name === 'stream.subscribe'
   );
-  tcAssert('TC-14', fanIn !== undefined, 'real streams consumer links to a Flow-B producer');
+  const fanIn = subscribeSpans.find((span) => span.links.length > 0) ?? subscribeSpans[0];
+  tcAssert('TC-14', fanIn !== undefined, 'real streams consumer span exists');
   tcAssert(
     'TC-14',
     fanIn.attributes['service.name'] === 'flow-b-stream-consumer',
     'stream.subscribe is emitted by the Deno-side consumer hosted in the isolated AppHost gate',
   );
-  tcAssert(
-    'TC-14',
-    fanIn.links.some((link) => link.traceId === main.traceId),
-    'SSE consumer W3C link points into the producer Flow-B trace',
-  );
+  assertConsumerLinksProducer(main.traceId, fanIn);
   tcAssert(
     'TC-14',
     fanIn.links.some((link) => Object.keys(link.attributes).length > 0),
@@ -126,6 +127,25 @@ function validateFlowB(traces: readonly TelemetryTrace[]): void {
       `${span.name} carries a netscript.* outcome`,
     );
   }
+}
+
+/** Assert the SSE consumer has a W3C link into the selected Flow-B producer trace. */
+export function assertConsumerLinksProducer(
+  producerTraceId: string,
+  consumerSpan: TelemetrySpan,
+): void {
+  if (consumerSpan.links.length === 0) {
+    throw new Error(
+      `TC-14 FAIL: SSE consumer has zero W3C links; producerTraceId=${producerTraceId} consumerTraceId=${consumerSpan.traceId} consumerSpanId=${consumerSpan.spanId} linkCount=0`,
+    );
+  }
+  if (consumerSpan.links.some((link) => link.traceId === producerTraceId)) return;
+  const links = consumerSpan.links.map((link, index) =>
+    `link[${index}].traceId=${link.traceId} link[${index}].spanId=${link.spanId}`
+  ).join(' ');
+  throw new Error(
+    `TC-14 FAIL: SSE consumer W3C links do not point into the selected Flow-B producer trace; producerTraceId=${producerTraceId} consumerTraceId=${consumerSpan.traceId} consumerSpanId=${consumerSpan.spanId} linkCount=${consumerSpan.links.length} ${links}`,
+  );
 }
 
 function has(trace: TelemetryTrace, name: string): boolean {
