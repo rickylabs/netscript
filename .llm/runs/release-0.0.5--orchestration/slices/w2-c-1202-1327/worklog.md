@@ -58,6 +58,8 @@ the supervisor must not launch its own evaluator session.
 | Issues | live `gh issue view` for #1202/#1327 | 0 | acceptance and partial-close boundary reverified |
 | RED | `deno test --no-lock --allow-all packages/database/tests/migrate-artifacts_test.ts packages/cli/src/kernel/templates/aspire/pristine-scaffold-ports_test.ts` | 1 | expected TS2305: `runMigrationWithArtifacts` contract is not implemented |
 | S2 focused | `deno test --no-lock --allow-all packages/database/tests/migrate-artifacts_test.ts packages/database/tests/migrate-retry_test.ts packages/cli/src/kernel/templates/aspire/pristine-scaffold-ports_test.ts` | 0 | 6 tests / 14 steps passed |
+| S3/S4 check | targeted `deno check --no-lock --unstable-kv` over new migration/endpoint fixtures and gate builders | 0 | all modules checked |
+| S3/S4 tests | focused CLI operation runner + runtime gate/registry suites | 0 | 31 tests then 29 tests passed |
 
 ## Slice 1 reconcile
 
@@ -73,3 +75,14 @@ the supervisor must not launch its own evaluator session.
 - A headless failure or zero-with-no-artifact names the interactive `netscript db migrate --name`
   command and returns non-zero.
 - No issue scope or taxonomy adjustment is required; external CI comments are pending.
+
+## Slice 3/4 reconcile
+
+- Found and fixed the existing `--name` forwarding mismatch (`NETSCRIPT_PRISMA_NAME` writer versus
+  `PRISMA_MIGRATION_NAME` reader); TTY identity now crosses the resident AppHost request explicitly.
+- The runtime suite now creates headless and PTY-backed schema-change migrations, asserts files and
+  created/applied output, runs deploy-only/no-change controls, and inspects applied state via status.
+- The existing two-start sequence now captures both topologies and requires changed Postgres
+  allocation, matching users `DATABASE_URL`, healthy JSON, and a shared structured-log/trace id.
+- #1202 remains partial: this is code-owned two-start evidence, not the owner Windows observation or
+  three full clean passes.

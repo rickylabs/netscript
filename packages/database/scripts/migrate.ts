@@ -304,7 +304,7 @@ export async function runMigrationWithArtifacts(
     maxRetryDelayMs = 15_000,
     attemptTimeoutMs = 45_000,
     migrationsPath = 'migrations',
-    interactive = Deno.stdin.isTerminal(),
+    interactive = migrationInteractiveMode(),
     spawn,
   } = options;
   const log = options.log ?? (verbose ? console.log.bind(console) : () => {});
@@ -450,4 +450,11 @@ function hasDatabaseUri(): boolean {
     }
   }
   return false;
+}
+
+function migrationInteractiveMode(): boolean {
+  const forwarded = Deno.env.get('NETSCRIPT_MIGRATION_INTERACTIVE');
+  if (forwarded === 'true') return true;
+  if (forwarded === 'false') return false;
+  return Deno.stdin.isTerminal();
 }

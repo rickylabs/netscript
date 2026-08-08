@@ -2,7 +2,7 @@
 
 ## Current phase
 
-Migration artifact implementation is green in focused tests; generated-project E2E fixtures are next.
+Migration and live-endpoint fixtures are implemented and focused-green. Required non-runtime gates are next.
 
 ## Identity
 
