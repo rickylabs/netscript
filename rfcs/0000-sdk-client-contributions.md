@@ -20,11 +20,14 @@ serialization, retry, deduplication, tracing, fetch, and transport. Query helper
 context only when each contribution proves that its response cache is invariant or supplies a
 synchronous, non-secret partition; otherwise the contributed client is direct-call-only.
 
-The design composes oRPC's existing async `RPCLink.headers` and client-context mechanisms. It does
-not expose upstream oRPC types or create a second middleware framework. Bearer credentials in
-`@netscript/plugin-auth-core` are the first dogfood consumer. A locale contribution, which owns
-`accept-language`, is the required non-auth proof. Trace propagation remains transport-owned because
-the final `traceparent` must describe the SDK's client span, not an earlier header callback.
+The public protocol and generated declarations are upstream-major-neutral: they contain no oRPC
+types, links, plugins, contexts, interceptors, or metadata accessors. NetScript-owned internal ports
+translate procedure metadata, prepared outbound headers, and transport policy to the supported
+adapter. The first implementation targets stable oRPC v1; an oRPC v2 migration is a separate,
+coordinated RFC/spike. Bearer credentials in `@netscript/plugin-auth-core` are the first dogfood
+consumer. A locale contribution, which owns `accept-language`, is the required non-auth proof. Trace
+propagation remains transport-owned because the final `traceparent` must describe the SDK's client
+span, not an earlier header callback.
 
 ## Motivation
 
@@ -46,12 +49,23 @@ Current `main` does not justify that width:
 | [`baseContract`](../packages/contracts/src/application/contract-primitives.ts) does not initialize typed metadata and is annotated as `ReturnType<typeof oc.errors>`.                                                               | Procedure metadata and the existing error-map erasure need repair, but client preparation errors must not masquerade as server contract errors.                    |
 | The lock resolves the oRPC family to 1.14.6, while the repository's stable-channel tool reported 1.15.0 on 2026-08-08.                                                                                                              | The implementation must re-run the stable check and move the family coherently; this RFC must depend on public behavior rather than copied private upstream types. |
 
-The repository already contains the needed mechanism. In oRPC 1.14.6, `RPCLink` accepts an async
-header resolver whose arguments include client options, procedure path, and input. oRPC's client
-context also makes a non-empty context required at call sites, and TanStack Query utilities already
-thread that context. The official [RPCLink documentation](https://orpc.dev/docs/client/rpc-link)
-shows the same header/context path. NetScript currently hides those capabilities behind a fixed
-context and a hardcoded callback.
+The repository already contains enough stable-v1 behavior to implement an adapter. In oRPC 1.14.6,
+`RPCLink` accepts an async header resolver whose arguments include client options, procedure path,
+and input. oRPC's client context also makes a non-empty context required at call sites, and TanStack
+Query utilities already thread that context. The official
+[v1 RPCLink documentation](https://v1.orpc.dev/docs/client/rpc-link) shows the same header/context
+path. NetScript currently hides those capabilities behind a fixed context and a hardcoded callback.
+Those upstream facilities are implementation evidence, not the RFC-A public seam.
+
+A root-requested post-generator audit on 2026-08-08 found that oRPC v2 was still pre-release
+(`v2.0.0-beta.26` had already superseded `beta.25`), while `v1.15.0` remained the latest stable
+release. The official [v1-to-v2 migration guide](https://v2.orpc.dev/docs/migrations/from-v1) states
+that the wire protocol changed and a v1 client cannot communicate with a v2 server. A focused
+repository scan found 74 non-test files containing `@orpc/*` references (91 including tests), across
+SDK, service, contracts, plugins, telemetry, Fresh/desktop, CLI/scaffold, serialization, OpenAPI,
+errors, and query integration. RFC-A therefore MUST NOT smuggle a beta migration into its
+implementation. A low-risk, exact-family move from v1.14.x to stable v1.15.0 may precede RFC-A after
+a separate upgrade decision; v2 requires its own coordinated migration RFC/spike.
 
 ### User problem
 
@@ -81,7 +95,10 @@ This RFC MUST:
 5. preserve auth, locale, and arbitrary input/context secrecy in errors and telemetry;
 6. keep response caches partitioned when a contributed header can change representation;
 7. make contributions statically discoverable but explicitly selected; and
-8. retain SDK ownership of the HTTP transport and its observability invariants.
+8. retain SDK ownership of the HTTP transport and its observability invariants;
+9. keep every public and generated declaration independent of the selected upstream major; and
+10. prepare contribution output exactly once per logical call and replay one immutable result across
+    transport retries.
 
 ### Non-goals
 
@@ -93,6 +110,9 @@ This RFC does not:
 - make client metadata enforce server authorization;
 - expose a custom transport option (issue [#451](https://github.com/rickylabs/netscript/issues/451)
   owns that independent decision);
+- migrate production to oRPC v2, adopt v2 typed-error/status-map semantics, or replace NetScript's
+  OpenTelemetry span/injection ownership;
+- select GET/POST behavior or CSRF policy through a contribution;
 - redesign the two existing query-key algebras beyond adding a safe partition suffix;
 - fix the `baseContract` error-map erasure tracked by
   [#1350](https://github.com/rickylabs/netscript/issues/1350); or
@@ -112,6 +132,12 @@ This RFC does not:
   credential and is intentionally visible in cache tools.
 - **Transport policy**: discovery, URL/method selection, codec, retry, dedupe, tracing, `fetch`,
   streaming, and dispatch. The SDK owns it for `createServiceClient()`.
+- **Logical call**: one user-visible procedure invocation, including every transport retry required
+  to produce its final result.
+- **Prepared call**: the logical call plus one immutable, validated contributor-header record. Every
+  retry receives the same prepared contributor output and context snapshot.
+- **Adapter port**: a NetScript-owned, non-exported structural boundary between RFC-A semantics and
+  the selected transport/contract implementation. Upstream-specific adapters implement these ports.
 
 ## Guide-level explanation
 
@@ -272,9 +298,9 @@ runtime; it is not a property containing `undefined`.
 
 ### Async and server-side sources
 
-`prepare` and `resolveCredential` may be async and are invoked once for every transport attempt that
-represents a new logical call. They are never invoked at module import or client construction. An
-application may close over a concurrency-safe rotating credential source:
+`prepare` and `resolveCredential` may be async and are invoked exactly once per logical call, before
+any transport retry loop. They are never invoked at module import, client construction, or again for
+a retry attempt. An application may close over a concurrency-safe rotating credential source:
 
 ```ts
 const bearer = createBearerSdkClientContribution({
@@ -294,24 +320,25 @@ cookies. The framework does not guess the runtime from globals.
 
 This RFC spans four existing archetypes and no new package:
 
-| Package/surface                                    | Archetype               | Responsibility                                                                              |
-| -------------------------------------------------- | ----------------------- | ------------------------------------------------------------------------------------------- |
-| `@netscript/contracts`                             | Public DSL/builder      | Own the cross-runtime procedure metadata vocabulary.                                        |
-| `@netscript/sdk/ports` and `@netscript/sdk/client` | Public DSL/builder      | Own upstream-free descriptor types, type algebra, preparation errors, and the HTTP adapter. |
-| `@netscript/sdk`                                   | Public preset           | Preserve tuples through `defineServices()` and expose one-call ergonomics.                  |
-| `@netscript/plugin/config`                         | Plugin protocol/config  | Carry static module references without importing SDK runtime types.                         |
-| `@netscript/plugin-auth-core/sdk`                  | Plugin core/integration | Own the convention-bearing bearer contribution and security policy.                         |
-| `plugins/auth`                                     | Thin plugin delivery    | Declare the module reference and generated/scaffold wiring only.                            |
-| CLI generators                                     | Tooling                 | Generate explicit imports and literal tuples; validate plugin references.                   |
+| Package/surface                                    | Archetype               | Responsibility                                                                                         |
+| -------------------------------------------------- | ----------------------- | ------------------------------------------------------------------------------------------------------ |
+| `@netscript/contracts`                             | Public DSL/builder      | Own the cross-runtime procedure metadata vocabulary.                                                   |
+| `@netscript/sdk/ports` and `@netscript/sdk/client` | Public DSL/builder      | Own upstream-free descriptor types, type algebra, and preparation errors.                              |
+| `@netscript/sdk`                                   | Public preset           | Preserve tuples through `defineServices()`, expose one-call ergonomics, and own private adapter ports. |
+| `@netscript/plugin/config`                         | Plugin protocol/config  | Carry static module references without importing SDK runtime types.                                    |
+| `@netscript/plugin-auth-core/sdk`                  | Plugin core/integration | Own the convention-bearing bearer contribution and security policy.                                    |
+| `plugins/auth`                                     | Thin plugin delivery    | Declare the module reference and generated/scaffold wiring only.                                       |
+| CLI generators                                     | Tooling                 | Generate explicit imports and literal tuples; validate plugin references.                              |
 
 This follows the doctrine's extension-axis law: a cross-package extension is named, registered,
 deterministic, and duplicate-rejecting. It also follows the public-surface law: NetScript owns the
 types and does not re-export `RPCLinkOptions`, `ClientOptions`, `StandardHeaders`, upstream plugin
-types, or interceptor types.
+types, interceptor types, upstream context, or upstream metadata accessors. The three internal
+adapter ports below are package-private and do not enlarge the JSR surface.
 
 ### Procedure metadata
 
-`@netscript/contracts` adds the following root exports and initializes `baseContract` with them:
+`@netscript/contracts` adds the following root exports:
 
 ```ts
 export type NetScriptAuthenticationRequirement =
@@ -324,19 +351,42 @@ export interface NetScriptProcedureMeta {
     readonly authentication?: NetScriptAuthenticationRequirement;
   };
 }
-
-const contractWithMeta = oc.$meta<NetScriptProcedureMeta>({});
-export const baseContract = contractWithMeta.errors(commonErrorMap);
 ```
 
-The implementation MUST use an explicit publishable annotation that preserves both the concrete
-common error map and `NetScriptProcedureMeta`; it MUST NOT retain the erasing
-`ReturnType<typeof oc.errors>` annotation. The exact error-map repair belongs to #1350, but the
-metadata and error work must land coherently so one does not re-erase the other.
+The normative semantic requirement is that `baseContract` and every derived contract accept
+`NetScriptProcedureMeta`, preserve it through the publishable contract declaration, and expose it to
+the SDK metadata port. Missing metadata normalizes to `{}`. The implementation MUST use an explicit
+publishable annotation that preserves both the concrete common error map and
+`NetScriptProcedureMeta`; it MUST NOT retain the erasing `ReturnType<typeof oc.errors>` annotation.
+The exact error-map repair belongs to #1350, but the metadata and error work must land coherently so
+one does not re-erase the other.
 
-`ContractProcedureMetadata` in `@netscript/sdk/ports` gains a package-owned `meta` member and the
-SDK normalizes missing metadata to `{}`. This mirrors the public `procedure['~orpc'].meta` field
-documented by [oRPC metadata](https://orpc.dev/docs/metadata) without exporting an upstream type.
+How an upstream adapter stores or reads this semantic metadata is non-normative. For illustration,
+the supported v1 adapter can initialize its private builder with v1's typed metadata facility:
+
+```ts
+// packages/contracts internal v1 adapter; never emitted in NetScript public declarations
+const v1ContractBuilder = oc.$meta<NetScriptProcedureMeta>({});
+```
+
+A later v2 spike would instead use v2 metadata plugins and synthesize the same NetScript descriptor:
+
+```ts
+// hypothetical internal v2 adapter; not part of RFC-A implementation
+const [accessMeta, readAccessMeta] = defineMeta(
+  'netscript.access',
+  (incoming: NetScriptProcedureMeta['access']) => incoming,
+);
+
+const descriptor: SdkClientProcedureDescriptor = {
+  path,
+  meta: { access: readAccessMeta(procedure) },
+};
+```
+
+This follows the official
+[v2 migration from `.$meta` to `defineMeta`](https://v2.orpc.dev/docs/migrations/from-v1#meta-replaced-by-meta-plugins).
+Neither adapter form appears in the contribution protocol or generated public source.
 
 ### Public contribution contract
 
@@ -412,6 +462,64 @@ export interface SdkClientContribution<
   ) => SdkClientRequestPatch | PromiseLike<SdkClientRequestPatch>;
 }
 ```
+
+### Internal adapter ports
+
+The implementation MUST introduce exactly three NetScript-owned internal adapter responsibilities.
+The following structural contract is normative inside `@netscript/sdk`, but the names are not public
+exports and MUST NOT appear in `deno doc` or generated JSR declarations:
+
+```ts
+interface SdkClientLogicalCall<TContext extends object = object> {
+  readonly context: Readonly<ServiceClientContext & TContext>;
+  readonly procedurePath: readonly string[];
+  readonly procedureNode: unknown;
+  readonly transport: SdkClientTransportDescriptor;
+  readonly input: unknown;
+  readonly signal?: AbortSignal;
+}
+
+interface PreparedOutboundHeaders {
+  readonly values: Readonly<Record<string, string>>;
+}
+
+interface PreparedSdkClientCall<TContext extends object = object> {
+  readonly call: SdkClientLogicalCall<TContext>;
+  readonly procedure: SdkClientProcedureDescriptor;
+  readonly contributedHeaders: PreparedOutboundHeaders;
+}
+
+interface PreparedOutboundHeadersPort {
+  prepare<TContext extends object>(
+    call: SdkClientLogicalCall<TContext>,
+  ): Promise<PreparedSdkClientCall<TContext>>;
+}
+
+interface ProcedureMetadataPort {
+  describe(
+    procedureNode: unknown,
+    procedurePath: readonly string[],
+  ): SdkClientProcedureDescriptor;
+}
+
+interface ClientTransportPolicyPort {
+  dispatch<TOutput, TContext extends object>(
+    call: PreparedSdkClientCall<TContext>,
+  ): Promise<TOutput>;
+}
+```
+
+`ProcedureMetadataPort` is the only component allowed to interpret an upstream procedure node.
+`PreparedOutboundHeadersPort` performs tuple composition and validation exactly once per logical
+call. `ClientTransportPolicyPort` owns every attempt, retry, encoding, trace, and dispatch action
+and MUST accept already prepared output; it MUST NOT invoke contributors. The supported v1 adapter
+and a future v2 adapter may have different private wiring, but both must satisfy these same port
+semantics.
+
+The prepared call retains one context/snapshot identity and one canonical lower-case header record.
+An adapter creates a fresh transport header container for each attempt, but the contributor-owned
+entries and the preparation-context projection are byte-equivalent across attempts. Trace fields or
+other transport-owned fields are added only after this invariant is established.
 
 `defineSdkClientContribution<TContext>()(descriptor)` preserves `id`, the context declaration,
 header keys, and cache mode as literals. Its parameter applies these static checks:
@@ -547,6 +655,11 @@ The cache suffix is appended only to full keys. Resource/procedure prefixes and 
 invalidation helpers remain unchanged. A conformance test MUST prove that two auth partitions with
 identical input cannot observe each other's server or TanStack cached data.
 
+This rule is upstream-major-neutral and cannot be removed during a transport migration. The official
+[oRPC v2 TanStack integration](https://v2.orpc.dev/docs/integrations/tanstack-query#client-context)
+still excludes client context from query keys, so neither stable v1 nor a future v2 adapter can make
+client context itself a safe cache partition.
+
 This narrow cache-effect declaration is not a query contribution. It cannot set stale times, retry,
 invalidation callbacks, query functions, or arbitrary key fragments.
 
@@ -563,13 +676,15 @@ Construction performs these steps in tuple order:
 At call time:
 
 1. resolve the service origin and procedure node;
-2. create one read-only preparation snapshot;
-3. invoke contributors sequentially in tuple order with that same snapshot;
-4. after each await, validate that the patch is a plain record, every header was declared, values
+2. use `ProcedureMetadataPort` to create the NetScript procedure descriptor;
+3. create one read-only logical-call preparation snapshot;
+4. invoke contributors sequentially in tuple order with that same snapshot;
+5. after each await, validate that the patch is a plain record, every header was declared, values
    are valid strings without CR/LF, and the call has not been aborted;
-5. merge the disjoint patches into a new record;
-6. pass that record to the single native oRPC header resolver; and
-7. let the SDK transport encode, trace, retry/dedupe, fetch, and decode the call.
+6. merge the disjoint patches into a new immutable lower-case record;
+7. construct one `PreparedSdkClientCall`; and
+8. pass only that prepared call to `ClientTransportPolicyPort`, which may encode, trace,
+   retry/dedupe, fetch, and decode without invoking preparation again.
 
 Contributions never see accumulated headers or another contribution's result. Valid contributions
 therefore commute: tuple order cannot change a successful request. Order determines only which
@@ -606,10 +721,27 @@ trace fields after contribution validation.
 
 ### Async context, retries, and cancellation
 
-Preparation runs once per logical client call, before oRPC retry machinery. Retries reuse the
-prepared result for that call. This avoids fetching a different credential or locale halfway through
-one retry sequence. Credential refresh after a `401` requires a future explicit replay policy; an
-interceptor hidden in an auth contribution would make side-effect replay unsafe.
+Preparation runs exactly once per logical client call, semantically above the adapter's retry loop.
+Retries reuse the same immutable `PreparedSdkClientCall`. This avoids fetching a different
+credential or locale halfway through one retry sequence. Credential refresh after a `401` requires a
+future explicit replay policy; an interceptor hidden in an auth contribution would make side-effect
+replay unsafe.
+
+The adapter MUST realize prepare-once with either an outer logical-call wrapper (preferred because
+the lifecycle is explicit) or an immutable per-logical-call memo shared by every attempt. Wiring
+`prepare()` directly to an upstream link-header callback is non-conforming unless that callback
+reads only such a memo. Official oRPC `v2.0.0-beta.25` source resolves link headers during input
+encoding, while its retry plugin invokes the downstream chain again per attempt; a direct async
+header callback therefore runs once per retry, not once per logical call. The supported v1 adapter
+must be tested rather than assumed to differ.
+
+A mandatory conformance fixture forces at least one retry and proves all of the following:
+
+- contributor preparation count is exactly `1`;
+- each attempt receives a freshly materialized transport header container;
+- the canonical contributor-header bytes are identical on every attempt; and
+- the logical-call context/procedure projection observed by the adapter is the same immutable
+  snapshot on every attempt.
 
 If the call signal is already aborted, no contributor runs. If it aborts during an async resolver,
 the SDK stops awaiting, does not dispatch, and rejects with the platform abort reason. A resolver
@@ -623,9 +755,11 @@ must not mutate them.
 
 ### Transport ownership and oRPC alignment
 
-Version 1 contributes only the existing oRPC `RPCLink.headers` capability. The adapter supplies one
-composed async resolver. This is the thinnest mapping to an upstream public seam and preserves
-NetScript's ability to replace oRPC without changing public contribution types.
+Version 1 contributes only prepared outbound header values and typed per-call context. It does not
+contribute an upstream callback. The initial stable-v1 adapter may map an already prepared record
+into the native link-header facility, provided that preparation occurs above retries or through the
+specified per-call memo. A future v2 adapter may use different private wiring. These are
+non-normative adapter choices; the three NetScript ports and prepare-once behavior are normative.
 
 The SDK remains the sole owner of:
 
@@ -639,7 +773,8 @@ The SDK remains the sole owner of:
 Accordingly the descriptor has no `fetch`, `link`, `plugins`, `interceptors`, `clientInterceptors`,
 `adapterInterceptors`, serializer, retry, or error-map fields. The transport consolidation issue
 [#1351](https://github.com/rickylabs/netscript/issues/1351) may refactor those internals and update
-oRPC, but it MUST keep one SDK-owned policy path.
+oRPC within stable v1, preferably to the exact v1.15.0 family after a separate upgrade decision, but
+it MUST keep one SDK-owned policy path. It MUST NOT migrate production to v2 as part of RFC-A.
 
 Issue #451 may separately expose a custom transport. If accepted, it MUST adapt the existing
 package-owned `ClientLinkPort`, declare whether it accepts prepared request headers, and reject a
@@ -653,6 +788,28 @@ would be overwritten or would describe the wrong parent. `propagateTraceContext`
 reserves `traceparent` and `tracestate`. The W3C
 [Trace Context recommendation](https://www.w3.org/TR/trace-context/) also requires careful mutation
 and calls out correlation/privacy risk.
+
+#### Optional incoming server companion
+
+oRPC v2's [`RequestHeadersHandlerPlugin`](https://v2.orpc.dev/docs/plugins/request-headers) is an
+optional incoming server companion, not the RFC-A extension seam. It is the renamed v1
+request-header handler facility and makes request headers available to handler context. It does not
+provide outbound contribution ownership, duplicate/conflict policy, async credential resolution,
+redaction, or cache partitioning. When a procedure is called directly without an HTTP request, its
+request-header context is optional and may be absent; server middleware MUST define direct-call
+behavior rather than pretending an outbound client contribution exists.
+
+Whether a stable-v1 server installs the corresponding incoming plugin by default is a service-preset
+decision for implementation review. Either choice MUST preserve direct-call tests and MUST NOT make
+RFC-A client metadata enforce server authorization.
+
+#### Boundaries reserved for the v2 migration
+
+RFC-A does not adopt v2's typed-error/status-map redesign or its `@orpc/opentelemetry` integration.
+It also does not change HTTP method selection: transport owns GET/POST, and any later v2 adapter
+that enables GET must prove an explicit CSRF law. NetScript continues to own its client-span
+topology and final trace injection unless the separate v2 RFC proves that upstream instrumentation
+can replace them without missing spans or emitting duplicates.
 
 ### Error and failure model
 
@@ -846,27 +1003,54 @@ Generated projects change only when the user selects a contributor.
 
 Because this RFC changes public and publish surfaces, implementation packages must bump versions
 according to the release plan and pass JSR isolated-declaration gates. No implementation is allowed
-to publish an `@orpc/*` type in a generated `.d.ts`/JSR declaration.
+to publish an `@orpc/*` type in a generated `.d.ts`/JSR declaration. More strongly, the public SDK
+protocol and all generated public declarations MUST contain zero raw oRPC symbols: no upstream
+module specifier, link, plugin, context, interceptor, metadata accessor, or structural alias whose
+meaning depends on an upstream major. NetScript-owned public types may be implemented by an
+upstream-specific private adapter but cannot inherit its identity.
+
+The first implementation's compatibility target is the supported stable-v1 adapter. A later v2 spike
+must run the same contribution conformance suite against its adapter before any migration RFC can
+propose production adoption. Passing RFC-A on stable v1 does not imply v2 compatibility, and adding
+a v2 adapter must not change the contribution protocol major.
 
 ### Staged implementation plan and issue decomposition
 
 Implementation remains outside this RFC PR.
 
-| Stage                      | Existing owner                                              | Scope and exit condition                                                                                                                                                             |
-| -------------------------- | ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 0. Ratify                  | [#1348](https://github.com/rickylabs/netscript/issues/1348) | Accept this RFC, settle safe FCP questions, and reconcile child issue bodies.                                                                                                        |
-| 1. Contract/type repair    | [#1350](https://github.com/rickylabs/netscript/issues/1350) | Preserve the concrete base error map and initialize/export `NetScriptProcedureMeta`; type fixtures prove both.                                                                       |
-| 2. Minimal client seam     | [#1349](https://github.com/rickylabs/netscript/issues/1349) | Add descriptor/helper, tuple algebra, context-generic client/query surfaces, native header composition, cache-effect handling, and failures. Do not expose upstream callback arrays. |
-| 3. Transport consolidation | [#1351](https://github.com/rickylabs/netscript/issues/1351) | Recheck stable oRPC, update the family coherently, keep one fetch/retry/dedupe/trace path, and deprecate current no-op options.                                                      |
-| 4. Auth dogfood            | [#1352](https://github.com/rickylabs/netscript/issues/1352) | Ship the auth-core bearer factory, access metadata behavior, redaction, cache partition/direct-only modes, manifest reference, docs, and scaffold choice.                            |
-| 5. Trace ownership proof   | [#1353](https://github.com/rickylabs/netscript/issues/1353) | Re-scope from “trace contribution” to prove the transport retains the only final trace injection and rejects contributor ownership of trace headers.                                 |
-| 6. Non-auth proof          | new child after RFC acceptance                              | Ship/test locale contribution, partitioned keys, header conflicts, and generated use. Do not file during this RFC run.                                                               |
-| 7. Generic discovery       | [#1093](https://github.com/rickylabs/netscript/issues/1093) | Discover third-party module references without hardcoded factories; generated selection remains explicit.                                                                            |
+| Stage                          | Existing owner                                              | Scope and exit condition                                                                                                                                                                                                |
+| ------------------------------ | ----------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 0. Ratify                      | [#1348](https://github.com/rickylabs/netscript/issues/1348) | Accept this RFC, settle safe FCP questions, and reconcile child issue bodies.                                                                                                                                           |
+| 1. Contract/type repair        | [#1350](https://github.com/rickylabs/netscript/issues/1350) | Preserve the concrete base error map and initialize/export `NetScriptProcedureMeta`; type fixtures prove both.                                                                                                          |
+| 2. Minimal client seam         | [#1349](https://github.com/rickylabs/netscript/issues/1349) | Add descriptor/helper, tuple algebra, context-generic client/query surfaces, the three internal ports, prepare-once stable-v1 composition, cache-effect handling, and failures. Do not expose upstream callback arrays. |
+| 3. Transport consolidation     | [#1351](https://github.com/rickylabs/netscript/issues/1351) | Decide separately whether to move the exact oRPC v1 family to stable v1.15.0, keep one fetch/retry/dedupe/trace path, prove prepare-once across retry, and deprecate current no-op options. No v2 migration.            |
+| 4. Auth dogfood                | [#1352](https://github.com/rickylabs/netscript/issues/1352) | Ship the auth-core bearer factory, access metadata behavior, redaction, cache partition/direct-only modes, manifest reference, docs, and scaffold choice.                                                               |
+| 5. Trace ownership proof       | [#1353](https://github.com/rickylabs/netscript/issues/1353) | Re-scope from “trace contribution” to prove the transport retains the only final trace injection and rejects contributor ownership of trace headers.                                                                    |
+| 6. Non-auth proof              | new child after RFC acceptance                              | Ship/test locale contribution, partitioned keys, header conflicts, and generated use. Do not file during this RFC run.                                                                                                  |
+| 7. Generic discovery           | [#1093](https://github.com/rickylabs/netscript/issues/1093) | Discover third-party module references without hardcoded factories; generated selection remains explicit.                                                                                                               |
+| 8. oRPC v2 migration RFC/spike | new owner after RFC-A review; do not file in this run       | Wait for stable unless the owner explicitly accepts beta; prove a complete, coordinated adapter migration independently of RFC-A.                                                                                       |
 
 Issue #451 remains the sole future owner of custom links. #928 and #934 consume aligned protocol and
 metadata vocabulary but are not prerequisites for the header seam. The org-aware policy work in
 [#884](https://github.com/rickylabs/netscript/issues/884) may later add a tenant context/header
 contribution, but server authorization and tenant validation remain separate.
+
+The separate v2 RFC/spike must, at minimum, gate all of the following before production adoption:
+
+- wait for the stable dist-tag unless the owner explicitly accepts beta risk, and pin the entire
+  oRPC package family to one exact version;
+- use a coordinated client/server rollout or parallel versioned endpoints because the protocols are
+  incompatible; explicitly decide whether zero-downtime mixed-version service is required;
+- prove route, metadata, OpenAPI, and Scalar output parity;
+- prove typed-error semantics and HTTP status-map parity without folding the migration into #1350;
+- audit middleware execution counts now that v2 removes automatic deduplication;
+- define the GET/POST/CSRF law;
+- prove OpenTelemetry topology and absence of double spans before changing final injection
+  ownership;
+- prove Fresh/desktop serializer parity and SSE/stream lifecycle behavior;
+- re-run query-key/cache-partition safety because v2 still excludes client context from keys;
+- pass the Deno/browser/server matrix, package checks, full CLI/scaffold E2E, documentation
+  snippets, and publish dry-run.
 
 ### Conformance and fitness gates
 
@@ -882,7 +1066,8 @@ An implementation is not complete until all applicable gates pass.
   preserve the per-service context;
 - `direct-only` service keys are absent from query/query-utils mapped types;
 - server-defined error inference remains exact after metadata initialization; and
-- public declarations contain no upstream oRPC type.
+- public and generated declarations contain zero raw oRPC module specifiers or symbols, including
+  links, plugins, contexts, interceptors, and metadata accessors.
 
 #### Runtime gates
 
@@ -890,11 +1075,20 @@ An implementation is not complete until all applicable gates pass.
 - duplicate validation repeated through `unknown`/JavaScript input;
 - undeclared, mixed-case, forbidden, CR/LF, non-string, and duplicate headers rejected;
 - base `Content-Type` and final trace fields cannot be overwritten;
-- a retry reuses one prepared result;
+- a forced retry records preparation count `1` and byte-equivalent prepared contributor
+  headers/context on every attempt;
 - locale and two auth partitions cannot share cached data, while prefix invalidation still works;
 - direct-only services have no runtime query/query-utils property; and
 - every error/log/span snapshot excludes header values, input, context, partitions' source values,
   source messages, tokens, and session ids.
+
+#### Adapter compatibility gates
+
+- the supported stable-v1 adapter passes the entire contribution conformance suite;
+- its upstream link-header callback, if used, consumes only the already prepared per-call record;
+- the package declaration graph and generated client declarations pass the zero-oRPC-symbol scan;
+- a future v2 spike adapter must pass the same suite before its migration RFC can enter FCP; and
+- v2 typed-error/status-map and OpenTelemetry migration tests remain outside RFC-A.
 
 #### Plugin/generated gates
 
@@ -925,6 +1119,8 @@ Implementation updates must cover:
 - plugin manifest/config builder documentation;
 - generated service-client templates and embedded CLI assets;
 - query partition visibility, direct-only behavior, and cache invalidation;
+- upstream-major neutrality, the private adapter boundary, and prepare-once retry behavior;
+- the optional incoming request-header companion and direct-call absence behavior;
 - CORS/preflight, cleartext bearer, cookie, redirect, and retry limitations; and
 - migration notes for manual header wrappers and deprecated `port`/`timeout` fields.
 
@@ -951,9 +1147,11 @@ environment-derived secret.
 ### Why this boundary
 
 Headers plus typed per-call context are the smallest seam proven by two different consumers. They
-map directly to an existing public oRPC callback, can be represented without upstream types, and do
-not grant plugins transport control. The cache-effect field is not another behavior hook; it is the
-minimum declaration needed to keep existing query surfaces safe.
+map through three narrow NetScript-owned ports, can be represented without upstream types, and do
+not grant plugins transport control. Stable v1 supplies a viable first adapter, while the same
+semantic boundary survives v2's different metadata and retry facilities. The cache-effect field is
+not another behavior hook; it is the minimum declaration needed to keep existing query surfaces
+safe.
 
 ### Rejected: the starting “one envelope for everything” proposal
 
@@ -1030,12 +1228,27 @@ custom-link design gets its own breaking assessment.
 
 ## Prior art
 
-- oRPC's [RPCLink](https://orpc.dev/docs/client/rpc-link) provides async headers from typed client
-  context and exposes path/input to the callback. This RFC composes that capability once.
-- oRPC [metadata](https://orpc.dev/docs/metadata) initializes a typed metadata vocabulary with
-  `$meta<T>()` and exposes it on procedures. NetScript owns the narrower cross-package type.
-- oRPC's TanStack integration already requires non-empty client context in query options. NetScript
-  currently erases it; this RFC restores it without exposing upstream utility types.
+- Stable oRPC v1's [RPCLink](https://v1.orpc.dev/docs/client/rpc-link) provides async headers from
+  typed client context and exposes path/input to the callback. It is evidence for the initial
+  private adapter, not the RFC-A public protocol.
+- The official [v1-to-v2 migration guide](https://v2.orpc.dev/docs/migrations/from-v1) documents the
+  incompatible wire protocol, metadata-plugin replacement for `.$meta`, middleware execution change,
+  error/status split, GET/CSRF change, and OpenTelemetry package migration. These are why RFC-A owns
+  semantic ports rather than an upstream-major shape.
+- oRPC v2's [`RequestHeadersHandlerPlugin`](https://v2.orpc.dev/docs/plugins/request-headers) is an
+  incoming, optional handler companion; direct calls can have no request headers. It is not outbound
+  contribution composition.
+- oRPC v2's
+  [TanStack integration](https://v2.orpc.dev/docs/integrations/tanstack-query#client-context)
+  explicitly excludes client context from query keys, preserving RFC-A's partition/direct-only law.
+- In oRPC `v2.0.0-beta.25`, the
+  [standard link codec](https://github.com/middleapi/orpc/blob/v2.0.0-beta.25/packages/client/src/adapters/standard/rpc-link-codec.ts)
+  resolves headers during encoding and the
+  [retry plugin](https://github.com/middleapi/orpc/blob/v2.0.0-beta.25/packages/client/src/plugins/retry.ts)
+  invokes downstream per attempt. This proves that direct link-header preparation is not
+  prepare-once.
+- Official [oRPC releases](https://github.com/middleapi/orpc/releases) mark v2 beta releases as
+  pre-release and v1.15.0 as the latest stable release as of the audit date.
 - The WHATWG [Fetch Standard](https://fetch.spec.whatwg.org/#forbidden-request-header) defines
   request-header ownership that browser code cannot override; runtime validation follows it.
 - W3C [Trace Context](https://www.w3.org/TR/trace-context/) explains why trace headers have
@@ -1045,7 +1258,8 @@ custom-link design gets its own breaking assessment.
 
 ## Unresolved questions
 
-These are safe for discussion/FCP because they do not change the extension law:
+These are safe for discussion/FCP because the upstream-neutral extension law, prepare-once
+invariant, and separate-v2 boundary remain fixed:
 
 1. Should the first implementation reserve exactly 16 contributions, or raise the ceiling if CI type
    fixtures demonstrate equal cost? It must not ship below 16.
@@ -1056,10 +1270,31 @@ These are safe for discussion/FCP because they do not change the extension law:
    exposes nor requires a custom link.
 4. Maintainers may refine public names (`responseCache`, `direct-only`, or the access enum) during
    FCP while preserving the specified semantics and defaults.
+5. Should the stable-v1 adapter use an outer logical-call wrapper (the RFC's preference) or
+   immutable per-logical-call memoization? Either choice must pass preparation-count `1` and
+   byte-equivalent retry fixtures; direct unmemoized link-header preparation is not allowed.
+6. Should the semantic procedure-auth metadata requirement be accepted inside RFC-A and implemented
+   through #1350, as written, or ratified in a dependent mini-RFC? The public metadata vocabulary
+   and upstream-neutral metadata port are required before auth dogfood can ship.
+7. Does the owner want the optional stable-v1 incoming request-header handler installed by default
+   in service presets, or explicitly selected? Direct calls must continue to tolerate absent request
+   headers under an explicit server policy.
+8. Should the separately reviewed stable-v1.15.0 exact-family upgrade precede the minimal client
+   seam, or should RFC-A first implement against the current v1.14.x family? RFC-A supports either
+   stable-v1 baseline and does not authorize v2.
+9. For the separate v2 migration RFC, must production support zero-downtime mixed-version clients
+   via parallel endpoints, or is a coordinated atomic client/server rollout acceptable?
+10. Does Fable agree that GET enablement and its CSRF law belong exclusively to the transport/v2
+    migration RFC rather than RFC-A contributions?
+11. Can v2 OpenTelemetry instrumentation ever replace NetScript's final trace injection without
+    violating NetScript span ownership or creating double spans? This is a v2-spike proof
+    obligation, not an RFC-A implementation choice.
 
 The following are not open: duplicate rejection, order independence, per-call async preparation,
-reserved trace ownership, no upstream callback arrays, explicit plugin selection, cache partition
-safety, and separation from contract-defined errors.
+exactly-once preparation per logical call, reserved trace ownership, zero upstream types/symbols in
+public and generated declarations, no upstream callback arrays, explicit plugin selection, cache
+partition/direct-only safety, separation from contract-defined errors, and no production v2 beta
+migration in RFC-A.
 
 ## Future possibilities
 
@@ -1072,3 +1307,5 @@ safety, and separation from contract-defined errors.
   contribution protocol.
 - Additional `NetScriptProcedureMeta` fields for gateway and org-aware policy, governed by their
   owning RFCs.
+- A separately ratified oRPC v2 adapter/migration after its compatibility, rollout, error,
+  telemetry, serializer, streaming, cache, E2E, and publish gates pass.

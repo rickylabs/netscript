@@ -35,7 +35,12 @@ Written at run start per `workflow/lane-policy.md` § Supervisor identity.
 
 ## Handoff State
 
-- Generator work is complete at draft PR #1390 and `status:plan-eval`.
-- Reviewable RFC/research commit: `89ae608ea935ba8b2776d55e7cb5a09cc29e2520`.
+- Generator RFC authorship completed at draft PR #1390; this exact thread then resumed for the
+  root-requested post-generator oRPC v2 research amendment.
+- Pre-amendment RFC/research commit: `89ae608ea935ba8b2776d55e7cb5a09cc29e2520`; pre-amendment
+  handoff HEAD: `e78ac0a65f5475ed37152272b16ba7d89deca8c3`.
+- The amended RFC is returned to `status:plan-eval` only after focused gates, an explicit-refspec
+  push, and a structured PR phase comment.
 - The exact Fable entry point and prohibited mutations are in `final-handoff.md`.
-- No evaluator was launched and no external verdict is claimed by this session.
+- The amendment is root-requested research, not a formal evaluator verdict. No evaluator was
+  launched and no external verdict is claimed by this session.

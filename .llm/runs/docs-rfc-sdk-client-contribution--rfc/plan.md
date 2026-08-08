@@ -55,6 +55,8 @@ axis, grounded in the current repository and public upstream oRPC behavior.
 - Safe response-cache identity across direct, server-query, and TanStack paths.
 - Board reconciliation against #1348–#1353, #1093, #451, #928, #934, and #884 without mutation.
 - Current oRPC lock/stable state and an explicit inference ceiling.
+- Post-generator v2 audit: incompatible wire major, retry callback lifecycle, metadata API change,
+  incoming request-header companion boundary, and the broad migration blast radius.
 
 ## Locked Decisions
 
@@ -71,6 +73,10 @@ axis, grounded in the current repository and public upstream oRPC behavior.
 | Metadata          | `NetScriptProcedureMeta.access.authentication = "none" \| "optional" \| "required"`; unmarked procedures default to `"none"`.                                              |
 | Trace             | Transport-owned and reserved; #1353 becomes trace-ownership conformance rather than a contribution.                                                                        |
 | Transport         | Discovery/codec/fetch/retry/dedupe/trace/error remain SDK-owned; raw oRPC callbacks and links are not descriptor fields. #451 stays separate.                              |
+| Adapter ports     | Three package-private NetScript responsibilities: procedure metadata, prepared outbound headers, and transport policy. Version-specific wiring is non-normative.           |
+| Retry lifecycle   | Prepare exactly once per logical call above retries; immutable prepared header/context output is replayed byte-equivalently on every attempt.                              |
+| Upstream major    | Public/generated declarations contain zero raw oRPC symbols. Implement against stable v1; v1.15.0 sequencing is separate; v2 requires a separate RFC/spike.                |
+| Server companion  | Incoming request-header handler is optional and separate; direct calls may have no request headers. It is not outbound contribution composition.                           |
 | Query policy      | No arbitrary defaults/invalidation callbacks; only canonical full-key partition suffix and context propagation.                                                            |
 | Plugin discovery  | Optional static module/export/target references; installation exposes availability, explicit generated config activates per service.                                       |
 | Inference budget  | 16 contributions/service, 8 context keys/contributor, 16 header keys/contributor; type proof recorded.                                                                     |
@@ -83,14 +89,21 @@ Every brief-named implementation fork is resolved in the RFC. Remaining question
 
 1. a ceiling may be raised after CI type evidence but not lowered below 16;
 2. server credential convenience export timing;
-3. independent #451 scheduling; and
-4. semantic-preserving public naming refinements.
+3. independent #451 scheduling;
+4. semantic-preserving public naming refinements;
+5. outer wrapper versus immutable per-call memoization for the locked prepare-once invariant;
+6. procedure-auth metadata ratification placement and incoming server-plugin default behavior;
+7. v1.15.0 sequencing; and
+8. questions owned by the separate v2 RFC: GET/CSRF, mixed-version endpoint strategy, and OTel
+   injection ownership.
 
 ## Risk Register
 
 | Risk                                     | Mitigation / RFC gate                                                                                                           |
 | ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| Parallel abstraction or upstream leakage | Descriptor maps only to native async headers; no public oRPC types; doc-lint and declaration inspection.                        |
+| Parallel abstraction or upstream leakage | Three NetScript internal ports; zero raw oRPC symbols in public/generated declarations; doc-lint and declaration inspection.    |
+| Retry refresh within one call            | Prepare-once above retry or immutable per-call memo; forced retry gate asserts count 1 and byte-equivalent output.              |
+| Accidental v2 beta migration             | Stable-v1 implementation boundary; separately owned v2 RFC/spike and atomic rollout/parity gate set.                            |
 | Tuple/context inference cost             | Per-service tail recursion, 16 limit, named markers, type fixtures at 16/17.                                                    |
 | Auth special case                        | Locale consumer and generic header/context/cache law; auth factory is one constrained implementation.                           |
 | Cross-principal cache leak               | Mandatory response-cache effect, id-sorted partition suffix, direct-only omission, two-principal tests.                         |
@@ -121,7 +134,8 @@ Every brief-named implementation fork is resolved in the RFC. Remaining question
 ### Runtime second
 
 1. Construction validation and reserved ownership.
-2. Per-call preparation wrapper over the single oRPC header resolver.
+2. Three internal ports and per-logical-call preparation above retry semantics; stable-v1 adapter
+   consumes only an immutable prepared record.
 3. Canonical cache partitions/direct-only map omission.
 4. Redacted errors, abort/retry behavior, and transport integration.
 
@@ -145,6 +159,8 @@ The RFC contains the full future gate matrix. This docs PR runs:
 
 Framework implementation issues inherit type, runtime, redaction, cache isolation, plugin parity,
 JSR/publish/consumer, CLI/scaffold, architecture, and full runtime E2E gates enumerated in the RFC.
+They also inherit the zero-oRPC-symbol declaration scan and stable-v1 adapter conformance. A later
+v2 spike repeats that suite plus its separate rollout/error/OTel/route/serializer/streaming gates.
 
 ## Arch-Debt Implications
 
@@ -166,12 +182,14 @@ unavoidable new deviation requires a debt entry with owner/exit criteria in its 
 
 ## Plan Gate Self-Audit
 
-The RFC plan is ready for external evaluation: it states the current implementation and gap,
-compares the broad proposal with the existing oRPC seam and narrower alternatives, locks public
+The amended RFC plan is ready for external evaluation: it states the current implementation and gap,
+compares the broad proposal with existing stable-v1 evidence and narrower alternatives, locks public
 placement and composition/failure/security laws, names migration and compatibility behavior, maps
 implementation slices and issues, and defines executable fitness gates. The RFC carries no product
-implementation and leaves only the four explicitly FCP-safe questions open. This is a generator
-self-audit, not a PLAN-EVAL verdict; the owner-designated external reviewer remains authoritative.
+implementation. The post-generator oRPC audit amendment fixes upstream-major neutrality and retry
+lifecycle before exposing its implementation/sequencing questions to Fable. This is a generator
+self-audit and root-requested research amendment, not a PLAN-EVAL verdict; the owner-designated
+external reviewer remains authoritative.
 
 ## Dependencies and Board Reconciliation
 
@@ -182,6 +200,10 @@ self-audit, not a PLAN-EVAL verdict; the owner-designated external reviewer rema
 - #1093 supplies generic discovery.
 - #451 remains the only custom-link issue.
 - #928/#934 align on protocol/metadata vocabulary but do not block the minimal seam.
+- A new oRPC v2 RFC/spike is proposed after RFC-A review; none is filed or mutated in this run. It
+  owns stable/beta policy, atomic family versions, coordinated or parallel endpoints, route/meta/
+  OpenAPI/Scalar, errors/status, middleware counts, GET/CSRF, OTel, desktop serialization, streams,
+  cache keys, runtime matrix, E2E, docs, and publish proof.
 
 ## Drift Watch
 
@@ -190,3 +212,8 @@ self-audit, not a PLAN-EVAL verdict; the owner-designated external reviewer rema
 - Any auth helper placed in the thin plugin rather than auth core.
 - Any trace contributor that can author `traceparent`/`tracestate`.
 - Any generated activation based only on installation or runtime scanning.
+- Any public/generated declaration containing a raw oRPC type, module, callback, context, plugin,
+  interceptor, or metadata accessor.
+- Any adapter that invokes contribution preparation once per retry rather than once per logical
+  call.
+- Any RFC-A implementation PR that bundles an oRPC v2 beta, error/status, or OTel migration.

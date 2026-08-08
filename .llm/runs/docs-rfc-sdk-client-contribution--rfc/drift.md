@@ -73,3 +73,27 @@ documentation.
 - **Action:** record exact baseline, forbid new regressions, and require #1350/contribution work to
   reduce or isolate private upstream refs rather than invoking the current baseline as a waiver.
 - **Evidence:** `research.md` JSR section; `worklog.md` gate table.
+
+## 2026-08-08 — Root oRPC v2 audit invalidated stable-v1-shaped adapter assumptions
+
+- **What:** The finished RFC correctly kept upstream types out of its public descriptor, but still
+  described v1 `RPCLink.headers` and `.$meta<T>` too normatively and assumed link-header preparation
+  naturally occurred once before retries.
+- **Source:** root-requested `.llm/tmp/orpc-v2-audit-followup.md`; official oRPC releases, v1-to-v2
+  migration, request-header plugin, TanStack, error docs, and `v2.0.0-beta.25` codec/retry source.
+- **Expected:** A NetScript-owned extension seam should survive upstream-major changes and preserve
+  one credential/context snapshot across a logical call.
+- **Actual:** v2 replaces typed metadata initialization with `defineMeta` plugins; its protocol is
+  incompatible with v1; direct link headers resolve during encoding and the retry plugin re-enters
+  downstream per attempt. The incoming request-header plugin is optional and does not implement
+  outbound contribution policy. A repository scan found 74 non-test `@orpc/*` files, confirming that
+  migration is substantially broader than RFC-A.
+- **Severity:** significant post-generator design drift; root-requested research amendment, not an
+  evaluator verdict.
+- **Action:** make upstream-major neutrality normative; specify private NetScript metadata,
+  prepared-header, and transport-policy ports; require prepare-once above retry or immutable
+  per-logical-call memoization; implement RFC-A against stable v1; split v2 into a separate
+  RFC/spike with coordinated rollout, parity, telemetry, cache, runtime, E2E, and publish gates.
+- **Evidence:** amended RFC sections “Procedure metadata,” “Internal adapter ports,” “Async context,
+  retries, and cancellation,” “Transport ownership and oRPC alignment,” “Compatibility and
+  migration,” and “Staged implementation plan and issue decomposition.”

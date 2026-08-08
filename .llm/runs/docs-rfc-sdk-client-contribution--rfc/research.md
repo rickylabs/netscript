@@ -78,12 +78,34 @@ No issue, milestone, or lifecycle record was mutated in research. The PR is the 
 | `deno.lock` and Deno cache declarations                       | The workspace resolves the oRPC family to 1.14.6. `ClientOptions<T>` has signal/lastEventId/context; `RPCLinkOptions` composes native headers, link plugins, interceptors, and fetch capabilities. |
 | `deno task deps:latest -- --filter '@orpc/*'`                 | Stable-channel report: seven oRPC packages are behind; `^1.14.6`/`^1.14.7` → `1.15.0` on 2026-08-08. Implementation must recheck rather than hardcode this future value.                           |
 | `deno task deps:why -- @orpc/client`                          | Nine source hits; the dependency is live and not removable.                                                                                                                                        |
-| <https://orpc.dev/docs/client/rpc-link>                       | Official docs show async headers from typed client context and method/fetch decisions from context/path.                                                                                           |
-| <https://orpc.dev/docs/metadata>                              | Official docs show `$meta<T>()` initialization and procedure `~orpc.meta` consumption.                                                                                                             |
+| <https://v1.orpc.dev/docs/client/rpc-link>                    | Official stable-v1 docs show async headers from typed client context and method/fetch decisions from context/path.                                                                                 |
+| <https://v1.orpc.dev/docs/metadata>                           | Official stable-v1 docs show `$meta<T>()` initialization and procedure metadata consumption; this is adapter evidence only.                                                                        |
 | <https://fetch.spec.whatwg.org/#forbidden-request-header>     | Normative forbidden header list plus `proxy-`/`sec-` prefix ownership.                                                                                                                             |
 | <https://www.w3.org/TR/trace-context/>                        | Final trace mutation, privacy, and trust-boundary rules support transport ownership.                                                                                                               |
 | <https://www.rfc-editor.org/rfc/rfc9110.html#section-17.16.1> | HTTP credentials rely on secured transport for confidentiality.                                                                                                                                    |
 | OWASP Logging Cheat Sheet                                     | Access tokens/session identifiers are excluded from direct logging.                                                                                                                                |
+
+### Root-requested post-generator oRPC v2 audit amendment
+
+This is a research amendment requested by the root orchestrator after generator completion. It is
+not a formal PLAN-EVAL verdict and no evaluator was launched. The supplied audit follow-up was read
+in full (59 lines; SHA-256 `fa8b0ab5cd1afd57b8f6c20036a265fa7c8fb48764f88f97f289c44c0737d3d0`). Its
+claims were reconciled against official upstream sources and current repository state:
+
+| Evidence                                                                                                                                                                                                                                                      | Reconciled conclusion                                                                                                                                                                                                                                                              |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Official releases](https://github.com/middleapi/orpc/releases)                                                                                                                                                                                               | `v2.0.0-beta.26` superseded `beta.25` and remains pre-release; `v1.15.0` is latest stable on the audit date. Do not migrate production to beta for RFC-A.                                                                                                                          |
+| [v1-to-v2 migration guide](https://v2.orpc.dev/docs/migrations/from-v1)                                                                                                                                                                                       | The RPC protocol is incompatible across majors; `.$meta<T>` becomes `defineMeta` plugins; middleware deduplication, error/status, GET/CSRF, links, serializers, OpenAPI, TanStack, and OTel all change. A v2 rollout is coordinated migration scope.                               |
+| [Request headers plugin](https://v2.orpc.dev/docs/plugins/request-headers)                                                                                                                                                                                    | `RequestHeadersHandlerPlugin` is an optional incoming server companion and request headers can be absent on direct calls. It does not solve outbound composition.                                                                                                                  |
+| [TanStack integration](https://v2.orpc.dev/docs/integrations/tanstack-query#client-context)                                                                                                                                                                   | v2 still excludes client context from query keys; RFC-A's partition/direct-only law remains necessary.                                                                                                                                                                             |
+| [v2 error handling](https://v2.orpc.dev/docs/error-handling) and [client error handling](https://v2.orpc.dev/docs/client/error-handling)                                                                                                                      | Typed-error factories, HTTP status maps, and client inference changes belong to the v2 migration, not RFC-A contribution failures.                                                                                                                                                 |
+| [`beta.25` standard link codec](https://github.com/middleapi/orpc/blob/v2.0.0-beta.25/packages/client/src/adapters/standard/rpc-link-codec.ts) and [retry plugin](https://github.com/middleapi/orpc/blob/v2.0.0-beta.25/packages/client/src/plugins/retry.ts) | Headers resolve during encoding and retry invokes downstream per attempt. Direct link-header preparation executes per retry; RFC-A must prepare above retry or memoize per logical call.                                                                                           |
+| `rg -l '@orpc/' packages plugins`                                                                                                                                                                                                                             | 91 files contain references; 74 remain after excluding test paths/name patterns. The affected production surface is materially larger than RFC-A and includes SDK, service, contracts, plugins, telemetry, Fresh/desktop, CLI/scaffold, serializers, OpenAPI, errors, and queries. |
+| `deno task deps:latest --filter '@orpc/*'`                                                                                                                                                                                                                    | Seven workspace dependencies on v1.14.x are behind stable v1.15.0. Any exact-family v1 upgrade is a separate low-risk sequencing decision.                                                                                                                                         |
+
+The amendment locks upstream-major neutrality and three internal NetScript adapter responsibilities:
+procedure metadata, prepared outbound headers, and transport policy. Stable v1 is the implementation
+target. A v2 adapter must be designed and gated in a separate RFC/spike.
 
 ## Proposal challenge record
 
@@ -120,7 +142,15 @@ No issue, milestone, or lifecycle record was mutated in research. The PR is the 
    headers are reserved.
 9. Plugin manifests carry static module/export/target references; generators use explicit imports
    and literal tuples. No ambient activation.
-10. No product implementation belongs in this RFC PR.
+10. Public contribution types and generated declarations are upstream-major-neutral and contain zero
+    raw oRPC symbols. Package-private metadata, prepared-header, and transport-policy ports isolate
+    version-specific adapters.
+11. Preparation runs exactly once per logical call above retry semantics. The immutable prepared
+    header/context snapshot is reused byte-equivalently on every attempt.
+12. RFC-A implements on stable v1. A v1.15.0 move needs a separate exact-family decision; v2 beta,
+    typed-error/status, OTel, GET/CSRF, protocol rollout, and broad migration work belong to a
+    separate RFC/spike.
+13. No product implementation belongs in this RFC PR.
 
 ## Type proof
 
@@ -174,7 +204,8 @@ than deepen the contract leak.
 - `@netscript/plugin`: new optional config reference and builder path; no SDK runtime dependency.
 - `@netscript/plugin-auth-core`: new `./sdk` export and optional explicit `./sdk/server` convenience
   export; adds a reviewed SDK dependency.
-- Generated declarations must remain package-owned and isolated-declaration compatible.
+- Generated declarations must remain package-owned and isolated-declaration compatible, with zero
+  raw oRPC module specifiers or symbols.
 - Required implementation evidence: `deno doc --lint`, package audit, publish dry-run, packed/prod
   consumer check, docs on every new entrypoint, and no `@orpc/*` type in emitted declarations.
 
@@ -184,3 +215,13 @@ than deepen the contract leak.
 - Whether a server environment credential convenience export ships in the first auth slice.
 - Whether #451 is rescheduled with this work while remaining independent.
 - Final public naming refinements that preserve the locked semantics.
+- Outer wrapper (preferred) versus immutable per-logical-call memoization for stable-v1
+  prepare-once.
+- Whether procedure-auth metadata is ratified inside RFC-A or as a dependent decision implemented
+  through #1350.
+- Whether the incoming stable-v1 request-header handler is preset-default or explicit, with absent
+  headers supported for direct calls either way.
+- Whether the stable-v1.15.0 exact-family upgrade precedes or follows the minimal seam.
+- For the separate v2 RFC: GET/CSRF law, zero-downtime parallel endpoints versus coordinated
+  rollout, and whether v2 OTel can replace final injection without violating NetScript span
+  ownership.
