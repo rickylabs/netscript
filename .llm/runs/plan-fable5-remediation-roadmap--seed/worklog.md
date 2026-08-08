@@ -27,6 +27,30 @@ This is a planning-only seed run; the "public surface" is the artifact tree, not
 
 ## Slice log
 
+### S2 — Discovery corpus (Stage B) — in progress
+
+- Draft PR #1347 opened (labels `type:docs`, `area:docs`, `status:research`, `ci:skip-e2e`,
+  `ci:skip-scaffold`); charter read-back posted as opening phase comment.
+- Supervisor read the Codex pre-plan package in full; distillation committed at
+  `fable-5-remediation-plan/research/preplan-package.md`.
+- Tier-C workflow scripts committed **before execution** (seed-run hard rule), commit `7f52683e1`:
+  - `workflows/b1-prior-and-board-workflow.js` → run `wf_e2194004-808` (7 Opus subagents:
+    waves:early, waves:wave4, waves:wave5-6-plans, waves:wave6-runs, board:open, board:history,
+    board:conventions).
+  - `workflows/b2-repo-and-external-workflow.js` → run `wf_03b88126-e7e` (11 Opus subagents:
+    repo:docs-quickstart, repo:mcp-cli, repo:web-layer, repo:services-sdk, repo:auth,
+    repo:runtime-plugins, repo:observability-aspire, repo:scaffold-doctrine, ext:eis-chat,
+    ext:meta-frameworks, ext:orpc).
+  - Subagent model: `opus` (resolves to Claude Opus 5, the current Opus generation — owner
+    directive D-3). All agents are read-only outside their single assigned research output file;
+    supervisor reviews and commits their output (no self-certification).
+- Supervisor skill reads this stage: `agent-milestone-orchestrator`, `netscript-doctrine`,
+  `netscript-release` (canary-first + versioning doctrine), `netscript-pr` (S1). Domain skills
+  (`deno-fresh`, `fresh-ui-horizontal`, `aspire`, `jsr-audit`, `netscript-cli`,
+  `netscript-tools`, `netscript-deno-toolchain`, `rtk`, `claude-manager`) are exercised by the
+  domain subagents and consulted by the supervisor at Stage D where an issue draft depends on
+  them.
+
 ### S1 — Bootstrap (Stage A)
 
 - Run dir created; `supervisor.md` written first with identity, lane table, and owner overrides.
