@@ -63,3 +63,26 @@ than a full re-plan.
 **Not recommended: C.** Two evaluation cycles have each found real errors in this plan — including a
 false baseline claim and a p1 issue mis-scoped across three documents. Dropping the gate now would
 discard the mechanism that caught both.
+
+---
+
+## Resolution — owner-ratified 2026-08-09
+
+**Option A ratified.** The Plan-Gate subject in a milestone run is split:
+
+- **The milestone plan** owns clusters, wave sequence, declared canary points, dispatch
+  preconditions, and the closure manifest. That is what a milestone-plan PLAN-EVAL evaluates, and
+  cycle 3's prompt states this scope explicitly so the boundary is a given rather than a finding.
+- **Each group's brief** owns its ordered slice table, touched files, per-slice claim and proving
+  gates, and takes its **own separate-session PLAN-EVAL before that group implements**. No group
+  dispatches on a brief that has not had one.
+
+Slice-level rigour is unchanged in amount; it moves to the point where the group's dependencies are
+actually known. Nothing here weakens the invariants: generator ≠ evaluator, no lane self-certifies,
+and the Tier-A slice review still precedes every sign-off commit.
+
+This resolution is a **run decision recorded here and in `drift.md` C-D42**, not a promotion of
+doctrine. If it holds across this milestone it is a candidate for `milestone-run.md`; until then it
+is one run's ratified practice, and `plan-gate.md` is unchanged.
+
+W3 remains held behind cycle 3 **and** the milestone-move receipt. Escalation closed.
