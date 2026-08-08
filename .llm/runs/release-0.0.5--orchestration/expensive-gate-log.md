@@ -52,3 +52,14 @@ deferred to a post-stable issue; it is not on the 0.0.5 critical path.
 One holder at a time, and the queued lanes are the evidence it is real: W2-A waited through eleven
 green suites without starting a container, and W2-C stopped on release rather than continuing into a
 fourth pass it had not been granted.
+
+## All three lanes are now gate-complete and one holds the token
+
+W2-A holds it. W2-C and W2-B are queued, both having run every cheaper gate to green and both having
+explicitly recorded `scaffold.runtime` as `NOT_RUN` with no AppHost or container started. That is
+three lanes converging on one expensive gate without a single overlapping run — the outcome the
+serialisation exists to produce, achieved on a recorded protocol rather than a lock.
+
+W2-B additionally reported that an initial aggregate test invocation exited 1 because it supplied a
+nonexistent Fresh directory, and recorded the corrected exact-file command rather than quietly
+re-running until green. A self-reported operator error is worth more than a clean-looking log.
