@@ -22,6 +22,14 @@ machine-readable tests.
 - Claude skill mirror/surface validation: passed.
 - `git diff --check`: passed after EOF cleanup.
 
+## CI follow-up
+
+- `check-test` exposed one stale read-only snapshot in
+  `runtime/cli/routing-state_test.ts`: the human routing-state renderer expectation omitted the
+  four new native PLAN/IMPL evaluator rows.
+- Updated only that expected canonical route list. Focused runtime, policy, gateway, launcher, and
+  evaluator-guard suites now pass: 55 passed, 0 failed; format and `git diff --check` pass.
+
 ## IMPL-EVAL cycle 1
 
 Native Fable 5 medium returned `FAIL_FIX`: two wrapped active startup paragraphs still described
