@@ -11,7 +11,8 @@ description: >
 Use this skill when the task involves Claude Code session orchestration rather than package code.
 Claude is the supervisor. WSL Codex implements harness slices that must be visible from Codex
 Desktop/mobile. Evaluation runs on the evaluator lane in `.llm/harness/workflow/lane-policy.md`:
-locally Claude Code + OpenRouter with an open model, and OpenHands for automated cloud runs.
+normally a fresh native opposite-family Claude/Codex session; OpenRouter is reserved for a third
+opinion or native-family quota exhaustion, and OpenHands for explicitly cloud-driven runs.
 
 ## Workflow
 
@@ -82,9 +83,10 @@ outcome.
   preferred implementation lane because it is daemon-attached, mobile-visible, and cheaper to steer
   slice-by-slice.
 - Keep the evaluator a separate session on the evaluator lane from
-  `.llm/harness/workflow/lane-policy.md` — locally Claude Code + OpenRouter with an **open model**,
-  or OpenHands for cloud runs. Claude workflows may prepare evaluator inputs, but they do not
-  replace PLAN-EVAL or IMPL-EVAL, and no session self-certifies.
+  `.llm/harness/workflow/lane-policy.md` — normally native opposite-family Claude ⇄ Codex, with
+  OpenRouter only for a third opinion/native quota limit and OpenHands only for explicitly
+  cloud-driven work. Claude workflows may prepare evaluator inputs, but they do not replace
+  PLAN-EVAL or IMPL-EVAL, and no session self-certifies.
 - Route every Claude workflow, supervisor, and review session through the canonical lane table in
   `.llm/harness/workflow/lane-policy.md`. Do not reproduce model/effort defaults here or infer a
   paid escalation from workflow prose.
@@ -126,8 +128,8 @@ session should be started.
 
 - [ ] Current branch/worktree is verified.
 - [ ] Harness skill was loaded for harnessed work.
-- [ ] Evaluator surface is the lane-policy evaluator route (open model): Claude Code + OpenRouter
-      locally, OpenHands for cloud runs.
+- [ ] Evaluator surface is the lane-policy route: native opposite-family locally; OpenRouter only
+      for third opinion/native quota limit; OpenHands only for explicitly cloud-driven runs.
 - [ ] Implementation surface is WSL Codex when slice work must be mobile-visible.
 - [ ] Claude remote-control or Codex daemon visibility is proven before claiming phone visibility.
 - [ ] Hybrid sessions are described as native Claude supervision plus explicit worker delegation,

@@ -3,8 +3,8 @@
  * weight presets, caps, the framework lane, and the task list.
  *
  * Pricing is grounded in the `claude-api` reference (cached 2026-06-24); the
- * instrument never fabricates cost numbers. The default model is Claude Opus 4.8
- * (`claude-opus-4-8`) — the model the framework's own agents run on.
+ * instrument never fabricates cost numbers. The benchmark remains pinned to its historical
+ * Claude Opus 4.8 (`claude-opus-4-8`) reference until verified Opus 5 pricing is recorded.
  *
  * @module
  */

@@ -7,9 +7,10 @@
 - Treat this file as Claude-specific startup context only. Cross-agent doctrine remains in
   `AGENTS.md`, `.agents/skills/`, and `.llm/harness/`.
 - For harnessed NetScript work, Claude coordinates. WSL Codex implements slice work when a
-  mobile-visible implementation agent is required. Evaluation runs on the evaluator lane in
-  `.llm/harness/workflow/lane-policy.md` — locally Claude Code + OpenRouter with an **open model**,
-  and OpenHands for automated cloud runs. Both evaluator transports are open-models-only.
+  mobile-visible implementation agent is required. Evaluation follows
+  `.llm/harness/workflow/lane-policy.md`: native opposite-family sessions are the local default;
+  OpenRouter is explicit third-opinion/native-limit escalation, and OpenHands is for explicitly
+  cloud-driven work.
 - Before invoking a repo skill by name, check whether it exists in `.claude/skills/`. If it does
   not, read the matching `.agents/skills/<name>/SKILL.md` directly.
 - Use `.llm/tools/agentic/claude/validate-claude-surface.ts` when Claude configuration, skills, hooks, or

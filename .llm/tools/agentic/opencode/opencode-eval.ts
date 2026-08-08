@@ -1,4 +1,4 @@
-/** Captures a Kimi K2.6 vision evaluation through the canonical OpenCode lane. */
+/** Captures a Kimi K3 vision evaluation through the canonical OpenCode lane. */
 
 import { OPENCODE_MODEL_IDS } from '../config/models.ts';
 import { OPENCODE_TOOL } from '../config/versions.ts';
