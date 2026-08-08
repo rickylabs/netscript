@@ -12,9 +12,9 @@
 
 ## Current State
 
-PLAN-EVAL passed in a separate Claude/Fable session. S1 captured the expected pre-fix exit 1; S2
-adds the thin trigger bootstrap and turns the same behavioral gate green; S3 enumerates all three
-KV background runtimes in the Aspire health gates. No runtime resource has been started.
+S1–S3 implementation is landed and all non-serialized gates are green. The worklog now carries
+`EXPENSIVE-GATE-REQUEST`; no runtime resource has been started and the exact one-pass suite remains
+NOT_RUN pending the orchestrator's serialized token grant.
 
 ## Completed
 
@@ -29,9 +29,9 @@ KV background runtimes in the Aspire health gates. No runtime resource has been 
 
 ## Next Steps
 
-1. Commit/push/comment S3 invariant evidence.
-2. Run all non-serialized focused, scoped, fitness, architecture, and JSR gates.
-3. Write and push `EXPENSIVE-GATE-REQUEST`; wait for the orchestrator grant.
+1. Commit/push/comment the non-serialized gate evidence and token request.
+2. Wait for explicit orchestrator grant.
+3. After grant only: leak-check, run exact one-pass suite, verify teardown/leaks, then hand off for IMPL-EVAL.
 
 ## Key Decisions
 
