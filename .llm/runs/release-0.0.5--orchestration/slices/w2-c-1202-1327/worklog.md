@@ -147,3 +147,13 @@ The `NETSCRIPT_PRISMA_NAME` → `PRISMA_MIGRATION_NAME` correction is necessary 
 adjacent repair. `db migrate --name` is the actionable artifact-creation path required by the issue;
 without forwarding the name through the resident AppHost, the requested named migration cannot be
 created and verified.
+
+## Tier-A review remediation — test preservation
+
+Tier-A found that the slice had replaced, rather than extended,
+`operation-runner-helpers_test.ts`. Restored both unchanged behavioral tests for
+`isNoRunningAppHostOutput` alongside the new `buildDbCliEnv` regression test. This preserves the
+documented diagnostic-prefix behavior and the negative substring-quotation trap for live code.
+
+The reviewer granted one fresh serialized pass after this restoration commit. Focused and runtime
+evidence follow in the next evidence commit; no resources are started before the focused test.

@@ -2,10 +2,10 @@
 
 ## Current phase
 
-Implementation handoff with a serialized-suite coverage gap. The granted one-pass runtime command
-returned `passed=76 failed=0`, but its explicit allowlist omitted all four newly registered W2-C
-acceptance gates. The selector is repaired and focused-green; those four gates still need a fresh
-orchestrator-authorized runtime pass before merge readiness.
+Tier-A remediation and renewed serialized gate. The two accidentally replaced
+`isNoRunningAppHostOutput` tests are restored alongside the new environment-forwarding test. The
+selector repair is already focused-green, and Tier-A granted one fresh `scaffold.runtime` pass to
+execute the four previously omitted W2-C acceptance gates.
 
 ## Identity
 
