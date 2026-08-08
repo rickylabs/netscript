@@ -2,72 +2,107 @@
 
 ## Run Metadata
 
-| Field | Value |
-| --- | --- |
-| Run ID | `docs-rfc-sdk-client-contribution--rfc` |
-| Branch | `docs/rfc-sdk-client-contribution` |
-| Current phase | `research` |
-| Archetype | `2 + 4 + 5 + 6` described; docs-only PR |
-| Scope overlays | `SCOPE-docs` |
+| Field          | Value                                                                  |
+| -------------- | ---------------------------------------------------------------------- |
+| Run ID         | `docs-rfc-sdk-client-contribution--rfc`                                |
+| Branch         | `docs/rfc-sdk-client-contribution`                                     |
+| Current phase  | RFC authored; final evidence/reconciliation before `plan-eval` handoff |
+| Archetype      | `2 + 4 + 5 + 6` described; docs-only PR                                |
+| Scope overlays | `SCOPE-docs`                                                           |
+| PR             | `https://github.com/rickylabs/netscript/pull/1390`                     |
 
 ## Current State
 
-The harness run is activated on the exact requested base. Required skills, RFC process, harness
-authorities, doctrine, selected archetypes, relevant debt, and the complete carried-in RFC-A design
-pack have been read. No product code or RFC draft has yet been authored.
+The RFC is authored at `rfcs/0000-sdk-client-contributions.md` and keeps `0000`/Draft. It rejects
+the starting single “everything” envelope and ratifies a narrow, versioned request-header
+preparation axis. Research, type proof, current JSR/doc-lint baselines, live board state, and
+primary upstream sources are recorded. No product source is changed.
 
-## Completed
+## Decision Snapshot
 
-- Exact base/worktree/session/GitHub-auth verification.
-- Harness/doctrine/RFC authority read and archetype/overlay selection.
-- Bootstrap artifact creation while preserving the launch-generated `implement.md` and
-  `codex-thread-ids.md`.
-
-## In Progress
-
-- Initial bootstrap commit, explicit-refspec push, and draft PR opening.
-
-## Next Steps
-
-1. Open the draft PR with the required labels and `status:research`.
-2. Re-baseline live issues/PRs and current public/export/test surfaces through `deno doc` and
-   focused source reads.
-3. Run type probes and upstream primary-source research; lock design and author the RFC.
-
-## Key Decisions
-
-| Decision | Source | Notes |
-| --- | --- | --- |
-| Keep `0000` and Draft state. | `rfcs/README.md` | Maintainer assigns number at acceptance. |
-| Stop at external review handoff. | Owner brief | Generator must not trigger evaluator sessions. |
-| No framework source in this PR. | Owner brief | Type probes live only under ignored/non-product `.llm/tmp/`. |
+- `defineSdkClientContribution<TContext>()` produces a named major-1 descriptor with a runtime
+  required/optional context declaration, exclusive lower-case header ownership, mandatory cache
+  effect, and async `prepare`.
+- Literal tuples intersect context and diagnose duplicate id/context/header ownership; runtime
+  repeats checks. Limit: 16 contributions/service.
+- Each contributor sees the same immutable snapshot; successful composition is order-independent.
+- Query-safe contributions are `invariant` or supply a synchronous non-secret id-sorted partition.
+  `direct-only` service keys are omitted from generated query maps.
+- Bearer auth is the first dogfood in `plugin-auth-core`; locale/`accept-language` is the non-auth
+  proof.
+- `NetScriptProcedureMeta.access.authentication` is `none | optional | required`; unmarked auth
+  defaults to `none`.
+- SDK transport retains discovery/codec/fetch/retry/dedupe/trace/errors. Trace fields are reserved;
+  #1353 is a trace-ownership proof, not a contribution.
+- Plugin discovery registers static module/export/targets; generated/app config explicitly selects
+  contributions per service.
+- Preparation failures are stable local errors, never server-defined contract errors.
 
 ## Files Changed
 
-| Path | Status | Notes |
-| --- | --- | --- |
-| `.llm/runs/docs-rfc-sdk-client-contribution--rfc/` | new | Mandatory run artifacts plus existing launch records |
+| Path                                               | Status          | Notes                                                 |
+| -------------------------------------------------- | --------------- | ----------------------------------------------------- |
+| `rfcs/0000-sdk-client-contributions.md`            | new             | Decision-complete RFC; no product implementation.     |
+| `.llm/runs/docs-rfc-sdk-client-contribution--rfc/` | updated/new     | Mandatory harness evidence plus launch records.       |
+| `.llm/tmp/sdk-client-contribution-probe.ts`        | ignored scratch | Non-product inference/conflict proof; not part of PR. |
 
-## Gates
+## Live Board Snapshot
 
-| Gate family | Current status | Evidence |
-| --- | --- | --- |
-| Static | pending | after RFC draft |
-| Fitness | planning | union selected from Archetypes 2/4/5/6; docs PR gates to be locked |
-| Runtime | N/A for RFC PR | no runtime implementation |
-| Consumer | research pending | API/type probes and current consumers |
+- #1348 is open `status:triage`, milestone 0.0.6; it remains tracking and needs post-FCP body
+  reconciliation.
+- #1349–#1353 are open `status:triage`, milestone 0.0.7.
+- #1093 is generic discovery; #451 remains sole custom-link owner.
+- #928/#934 align protocol/metadata vocabulary at 0.0.9; #884 is a later tenant candidate.
+- PR #1347 remains an open draft planning record and says it must not merge.
+- No issue/milestone was mutated by this run.
 
-## Open Questions
+## Gate Snapshot
 
-- All design forks in the task brief remain open until the re-baseline is complete.
+| Gate                           | Status           | Evidence                                                                        |
+| ------------------------------ | ---------------- | ------------------------------------------------------------------------------- |
+| RFC formatting                 | pass             | `deno fmt --check`                                                              |
+| RFC internal links             | pass             | focused repo link checker, 0 broken                                             |
+| Repository docs links/accuracy | pass             | both tasks exit 0                                                               |
+| Type probe                     | pass             | Deno check; 16 accepted/17 rejected fixture                                     |
+| Package dry-run baseline       | pass             | contracts/sdk/plugin/auth-core all report dry-run OK                            |
+| JSR package audit              | baseline finding | plugin audit exit 1 on pre-existing module tags/cardinality; other three exit 0 |
+| Doc-lint baseline              | baseline finding | combined private refs 9/3/15/4 respectively; RFC adds none                      |
+| Doctrine                       | pass             | `deno task arch:check` exits 0; existing warnings are baseline                  |
+| Plan Gate self-audit           | pass             | complete for external evaluator entry; no evaluator verdict claimed             |
+| Final PR reconciliation        | pending          | slice 3                                                                         |
 
-## Drift and Debt
+## JSR Consequences
 
-- Drift: runtime-controller identity miss recorded in `drift.md`; launch artifact remains the
-  concrete session proof.
-- Debt: no new debt; relevant existing entries are summarized in `plan.md`.
+- No new contracts/SDK/plugin subpaths; root/client/ports/config symbols expand.
+- Auth core adds `./sdk` and possibly a constrained `./sdk/server` export.
+- No oRPC public type may leak into declarations.
+- Implementation must reduce or isolate existing private-type references, preserve precise error and
+  metadata types, and pass doc-lint/publish/consumer gates.
+
+## Board Reconciliation Proposal (no mutation yet)
+
+1. Amend #1348 acceptance to the narrow header/context/cache law after RFC acceptance.
+2. Narrow #1349 to descriptor/composer/context/query-safety work.
+3. Keep #1350 exact error/metadata repair and #1351 SDK-owned transport consolidation.
+4. Place bearer convention in auth core under #1352.
+5. Re-scope #1353 to final trace injection/reserved-key conformance.
+6. File a locale proof child only after acceptance.
+7. Cross-link #1093 and keep #451 independent.
+
+## External Reviewer Entry Point
+
+Read, in order:
+
+1. `rfcs/0000-sdk-client-contributions.md`;
+2. `research.md` proposal challenge and API/board evidence;
+3. `plan.md` locked decisions, gates, and issue reconciliation;
+4. `worklog.md` Design and gate results; and
+5. `drift.md` for owner-authorized evaluator routing and design drift.
+
+The reviewer must not implement product code, assign an RFC number, merge, close issues, or mutate
+milestones. Findings should cite RFC headings and classify blocking versus safe FCP feedback.
 
 ## Commits
 
-- See the draft PR's commit list + per-slice PR comments (V3 retired `commits.md`).
-
+- Bootstrap: `158849031bba78025d0ec16c8361628211fbc4ed`.
+- Later commits and per-slice PR comments are the authoritative V3 commit record.
