@@ -2,10 +2,12 @@
 
 ## Current phase
 
-Third serialized pass preparation. A non-PTY unit seam reproduces the inherited-stderr getter
-failure in `defaultPrismaSpawn`; the focused test went RED on the exact TypeError, then 5 tests / 10
-steps passed after the interactive branch stopped reading unpiped stderr. Tier-A granted one fresh
-`scaffold.runtime` pass at the fixed head.
+Third serialized pass completed with raw exit 1 and `passed=61 failed=1`. Migration artifacts and
+both allocation captures passed. `behavior.live-db-endpoint` failed because its authority assertion
+compared only URL-style `:45103` against a users keyword connection string containing the same
+allocation as `Port=45103`. It stopped before the correlated health/OTEL receipt, so #1202
+acceptance remains unticked. Cleanup and postflight leak verification are clean for W2-C; no retry
+or repair was attempted and the token is released failing.
 
 ## Identity
 

@@ -35,6 +35,11 @@ bind the live Postgres allocation across consecutive AppHost starts.
   W2-C-owned survivor. No retry was attempted.
 - PTY spawn repair: behavioral RED raw exit 1 reproduced the inherited-stderr getter TypeError;
   focused green raw exit 0, 5 tests / 10 steps passed. Third serialized pass granted at fixed head.
+- Third `scaffold.runtime`: raw exit 1, `passed=61 failed=1`.
+  `database.migration-artifacts` and both allocation captures passed. `behavior.live-db-endpoint`
+  failed because its validator rejected keyword syntax `Port=45103` while the live URL used the same
+  port as `:45103`; it stopped before correlated health/OTEL receipt generation. Cleanup and
+  postflight leak verification passed; no retry was attempted.
 
 ## Harness
 

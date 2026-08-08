@@ -54,3 +54,14 @@
 - Fix: return the interactive exit code without reading stderr; retain non-interactive capture and
   mirroring. `runCommandWithTimeout` now documents that only piped non-interactive stderr reaches it.
 - Focused result: raw exit 0, 5 tests / 10 steps passed.
+
+## 2026-08-09 — live-endpoint evidence rejects keyword connection syntax (material)
+
+- Expected: `behavior.live-db-endpoint` compares the authority of the live Postgres URL with the
+  generated users service connection string, then verifies health and correlated telemetry.
+- Observed: the live URL used port `45103` and users used the same `Port=45103`, but the validator
+  searched only for URL-style `:45103` and failed before health/OTEL receipt generation.
+- Verdict: third serialized run raw exit 1, `passed=61 failed=1`. Migration artifacts and both
+  allocation captures passed; live endpoint evidence failed.
+- Boundary: no blind retry or repair. Although the failure payload shows matching ports, it does not
+  complete the required health/structured-log/OTEL proof, so #1202 acceptance remains unticked.

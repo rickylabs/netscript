@@ -217,3 +217,29 @@ explicitly documented as reachable only for non-interactive commands with piped 
 The orchestrator withdrew the inherited owner-machine boundary after re-reading the issue and
 measuring the host. PR #1393 now closes #1202 as well as #1327. The four #1202 acceptance rows are
 not claimed from this focused test; they await the named runtime gates in the third serialized pass.
+
+## Third serialized runtime verdict — 2026-08-09
+
+The command was run exactly once at fixed head `f70a19b3f`. There was no retry or post-failure
+implementation repair.
+
+| Step | Exact command / artifact | Raw exit | Full verdict |
+| --- | --- | ---: | --- |
+| Preflight leak check | `deno task agentic:leak-check -- --slice-dir .llm/runs/release-0.0.5--orchestration/slices/w2-c-1202-1327 --worktree /home/codex/repos/ns005-w2c` | 0 | No W2-C-owned or unknown survivor; known foreign `redis-jfgcbtaf` left untouched. |
+| Serialized suite | `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | 1 | `Summary: passed=61 failed=1`; `cleanup.aspire-stop` passed. |
+| Postflight leak check | same command as preflight | 0 | No W2-C-owned or unknown survivor; only the same untouched foreign container remains. No teardown needed. |
+
+### Four decisive gates
+
+- `database.migration-artifacts` — **PASSED**, 42,808 ms.
+- `runtime.capture-db-allocation-first` — **PASSED**, 394 ms.
+- `runtime.capture-db-allocation-second` — **PASSED**, 836 ms.
+- `behavior.live-db-endpoint` — **FAILED**, 210 ms. The receipt comparison reported live Postgres
+  `postgres://localhost:45103` and users
+  `Host=localhost;Port=45103;…`, then rejected them because the assertion searched only for
+  URL-style `:45103`. It failed before completing the health/structured-log/OTEL receipt.
+
+The actual first-allocation values carry the same host port, and the preceding
+`behavior.service-health` gate passed in 29,899 ms, but silence after the authority assertion is not
+telemetry evidence. Therefore `behavior.live-db-endpoint` and the four #1202 acceptance rows remain
+unticked. The serialized token is released with a failing verdict.
