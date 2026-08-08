@@ -6,21 +6,16 @@ planning advice is useful. Small/mechanical issues with complete contract, scope
 gate information record `PLAN-EVAL: N/A` instead. When PLAN-EVAL runs it is always a **separate
 session** from the generator and from IMPL-EVAL.
 
-On a local-machine run PLAN-EVAL is a separate **local** session on the **Claude Code + OpenRouter**
-transport (`claude-openrouter` profile → `claude-print`) running the bound **OPEN-model Minimax
-evaluation preset** (`claude-evaluator-minimax-m3` → `minimax/minimax-m3`) — an open model is
-adversarial to both the Claude and Codex families. It is triggered by the **supervisor**, never auto-dispatched by a sub-agent, and
-**closed/paid models (Claude/GPT/Gemini) are prohibited on it** (they burn paid OpenRouter credit).
-OpenHands dispatch is temporarily paused by owner direction; use the local transport. Both
-approved open models return a **real reasoning trace** and have a **verified agentic turn** on this
-transport; the bound Minimax preset can run gates and its `effort` is genuine (drift D-4 amended: the
-zero-reasoning behaviour is **GLM-specific**, not a client-wide gap). See `evaluator/protocol.md`,
-`workflow/lane-policy.md`, and `.agents/skills/openhands-handoff/SKILL.md` "Routing policy".
+On a local-machine run PLAN-EVAL normally uses a fresh **native opposite-family session**: native
+Claude/Fable 5 medium evaluates Codex-authored plans, and native Codex GPT-5.6 Sol high evaluates
+Claude-authored plans. It is triggered by the **supervisor**, never auto-dispatched by a sub-agent.
 
-If Minimax cannot run because OpenRouter is blocked by a provider limit, the sole approved fallback
-is a fresh separate Antigravity (`agy`) session on Google subscription using
-`gemini-3.6-flash-high` at high effort. Record the block and route identity; never send that
-fallback through OpenRouter.
+Use the OpenRouter Minimax M3 high preset only for a genuine third opinion or when the native
+opposite-family route is quota-blocked. If that escalation is limited, use a fresh Antigravity
+(`agy`) session on the Google subscription with Gemini 3.6 Flash high. OpenHands is not a normal
+local evaluator and is reserved for explicitly cloud-driven work. Record every escalation reason
+and requested/observed identity. See `evaluator/protocol.md`, `workflow/lane-policy.md`, and
+`.agents/skills/openhands-handoff/SKILL.md`.
 
 ## Inputs
 

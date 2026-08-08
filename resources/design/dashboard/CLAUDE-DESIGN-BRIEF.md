@@ -1,6 +1,6 @@
 # NetScript Dev Dashboard — Claude Design Revamp Brief
 
-> **Audience:** the Opus 4.8 canvas sub-agent executing against the Claude Design project
+> **Audience:** the Opus 5 canvas sub-agent executing against the Claude Design project
 > **NetScript — NS One** (`ec262e10-d4ad-451f-9aeb-e51955db3634`).
 > **Status:** authoring complete; **orchestrator review pending** — no canvas turn is spent until the
 > orchestrator has checked this brief against the ratified IA (§4) and answered the blocking items in

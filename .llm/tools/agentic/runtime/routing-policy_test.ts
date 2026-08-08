@@ -116,18 +116,23 @@ Deno.test('outside-plan and higher-effort Fable-shaped policy requires explicit 
   );
 });
 
-Deno.test('orchestrator + complex-decision lanes default to Fable 5 low, in-plan', () => {
+Deno.test('orchestrator defaults to Opus 5 high and deep analysis to Fable 5 medium', () => {
   const at = new Date('2026-07-16T00:00:00Z');
-  for (const lane of ['planning_decisions', 'deep_analysis'] as const) {
-    const route = resolveCanonicalRoute(lane, at);
-    equal([route.agent, route.provider, route.model, route.effort], [
+  for (
+    const [lane, model, effort] of [
+      ['planning_decisions', 'opus-5', 'high'],
+      ['deep_analysis', 'fable-5', 'medium'],
+    ] as const
+  ) {
+    const selected = resolveCanonicalRoute(lane, at);
+    equal([selected.agent, selected.provider, selected.model, selected.effort], [
       'claude',
       'anthropic',
-      'fable-5',
-      'low',
+      model,
+      effort,
     ]);
-    equal(route.subscriptionState, 'included');
-    equal(route.requiresExplicitApproval ?? false, false);
+    equal(selected.subscriptionState, 'included');
+    equal(selected.requiresExplicitApproval ?? false, false);
   }
 });
 
@@ -188,11 +193,11 @@ Deno.test('adversarial review of Codex work is Fable, opposite-family, paired to
       route.lane === lane && route.condition === 'token_limit_fallback'
     );
     equal(fallback?.provider, 'anthropic');
-    equal(fallback?.model, 'opus-4.8');
+    equal(fallback?.model, 'opus-5');
   }
 });
 
-Deno.test('delegated chores: docs/cleanup on Sonnet 5 high, code chores on Opus 4.8 medium', () => {
+Deno.test('delegated chores: docs/cleanup on Sonnet 5 high, code chores on Opus 5 medium', () => {
   const at = new Date('2026-07-16T00:00:00Z');
   const docs = resolveCanonicalRoute('documentation_review', at);
   equal([docs.agent, docs.provider, docs.model, docs.effort], [
@@ -205,15 +210,20 @@ Deno.test('delegated chores: docs/cleanup on Sonnet 5 high, code chores on Opus 
   equal([code.agent, code.provider, code.model, code.effort], [
     'claude',
     'anthropic',
-    'opus-4.8',
+    'opus-5',
     'medium',
   ]);
 });
 
-Deno.test('orchestrator/decision Fable lanes carry a Codex Sol high token-limit fallback', () => {
-  for (const lane of ['planning_decisions', 'deep_analysis'] as const) {
+Deno.test('orchestrator and deep-analysis lanes carry a Codex Sol high token-limit fallback', () => {
+  for (
+    const [lane, condition] of [
+      ['planning_decisions', 'fallback_on_opus_token_limit'],
+      ['deep_analysis', 'fallback_on_fable_token_limit'],
+    ] as const
+  ) {
     const fallback = CANONICAL_ROUTE_POLICY.find((route) =>
-      route.lane === lane && route.condition === 'fallback_on_fable_token_limit'
+      route.lane === lane && route.condition === condition
     );
     equal([fallback?.agent, fallback?.provider, fallback?.model, fallback?.effort], [
       'codex',
@@ -224,12 +234,12 @@ Deno.test('orchestrator/decision Fable lanes carry a Codex Sol high token-limit 
   }
 });
 
-Deno.test('Claude Code workflow lane stays Opus 4.8 low', () => {
+Deno.test('Claude Code workflow lane stays Opus 5 low', () => {
   const route = resolveCanonicalRoute('claude_workflow', new Date('2026-07-16T00:00:00Z'));
   equal([route.agent, route.provider, route.model, route.effort], [
     'claude',
     'anthropic',
-    'opus-4.8',
+    'opus-5',
     'low',
   ]);
 });
@@ -285,9 +295,13 @@ Deno.test('deep-analysis Fable fallback requires classified Codex quota exhausti
   );
 });
 
-Deno.test('canonical research and documentation-authoring lanes use Antigravity', () => {
+Deno.test('canonical research and documentation-authoring lanes use Gemini 3.6 Flash through Antigravity', () => {
   const route = resolveCanonicalRoute('research_extraction', new Date('2026-07-10T00:00:00Z'));
-  equal([route.agent, route.provider, route.model], ['antigravity', 'google', 'agy']);
+  equal([route.agent, route.provider, route.model], [
+    'antigravity',
+    'google',
+    MODEL_IDS.antigravityDocs,
+  ]);
   const documentationRoute = resolveCanonicalRoute(
     'documentation_authoring',
     new Date('2026-08-03T00:00:00Z'),
@@ -295,7 +309,7 @@ Deno.test('canonical research and documentation-authoring lanes use Antigravity'
   equal([documentationRoute.agent, documentationRoute.provider, documentationRoute.model], [
     'antigravity',
     'google',
-    MODEL_IDS.antigravity,
+    MODEL_IDS.antigravityDocs,
   ]);
 });
 
@@ -319,7 +333,7 @@ Deno.test('documentation authoring is not bound to an OpenRouter provider', () =
     'google',
     undefined,
     undefined,
-    MODEL_IDS.antigravity,
+    MODEL_IDS.antigravityDocs,
     'low',
     undefined,
   ]);
@@ -378,41 +392,74 @@ Deno.test('canonical evaluator resolution rejects self-certification', () => {
   );
 });
 
-Deno.test('formal evaluator resolves Minimax high PLAN and DeepSeek max IMPL routes', () => {
+Deno.test('formal evaluator defaults to a native opposite-family session', () => {
+  for (const phase of ['plan', 'impl'] as const) {
+    const codexAuthored = resolveCanonicalFormalEvaluatorRoute({
+      phase,
+      authorFamily: 'openai',
+      generatorSession: { ...session, agent: 'codex', sessionId: 'codex-generator' },
+      evaluatorSession: { ...session, agent: 'claude', sessionId: `${phase}-claude-evaluator` },
+    }, new Date('2026-08-08T00:00:00Z'));
+    equal([
+      codexAuthored.agent,
+      codexAuthored.provider,
+      codexAuthored.model,
+      codexAuthored.effort,
+      codexAuthored.evaluatesFamily,
+    ], ['claude', 'anthropic', MODEL_IDS.fable, 'medium', 'openai']);
+
+    const claudeAuthored = resolveCanonicalFormalEvaluatorRoute({
+      phase,
+      authorFamily: 'anthropic',
+      generatorSession: { ...session, agent: 'claude', sessionId: 'claude-generator' },
+      evaluatorSession: { ...session, agent: 'codex', sessionId: `${phase}-codex-evaluator` },
+    }, new Date('2026-08-08T00:00:00Z'));
+    equal([
+      claudeAuthored.agent,
+      claudeAuthored.provider,
+      claudeAuthored.model,
+      claudeAuthored.effort,
+      claudeAuthored.evaluatesFamily,
+    ], [
+      'codex',
+      'openai',
+      MODEL_IDS.codexSol,
+      phase === 'plan' ? 'high' : 'xhigh',
+      'anthropic',
+    ]);
+  }
+});
+
+Deno.test('formal evaluator uses Minimax/DeepSeek only for third opinion or native quota limit', () => {
   for (
-    const [phase, lane, presetId, model, effort] of [
-      [
-        'plan',
-        'formal_plan_evaluation',
-        'claude-evaluator-minimax-m3',
-        OPENROUTER_MODEL_IDS.minimax,
-        'high',
-      ],
+    const [phase, presetId, model, effort] of [
+      ['plan', 'claude-evaluator-minimax-m3', OPENROUTER_MODEL_IDS.minimax, 'high'],
       [
         'impl',
-        'formal_impl_evaluation',
         'claude-evaluator-deepseek-v4-flash-0731',
         OPENROUTER_MODEL_IDS.deepseekV4Flash0731,
         'max',
       ],
     ] as const
   ) {
-    const route = resolveCanonicalFormalEvaluatorRoute({
-      phase,
-      authorFamily: 'openai',
-      generatorSession: { ...session, agent: 'codex', sessionId: 'codex-generator' },
-      evaluatorSession: { ...session, agent: 'claude', sessionId: `${phase}-open-evaluator` },
-    }, new Date('2026-07-13T00:00:00Z'));
-    equal([
-      route.lane,
-      route.agent,
-      route.provider,
-      route.profileId,
-      route.presetId,
-      route.model,
-      route.effort,
-      route.evaluatorModelPolicy,
-    ], [lane, 'claude', 'openrouter', 'claude-openrouter', presetId, model, effort, 'open_only']);
+    for (const fallbackReason of ['third_opinion', 'native_quota_limit'] as const) {
+      const route = resolveCanonicalFormalEvaluatorRoute({
+        phase,
+        authorFamily: 'openai',
+        generatorSession: { ...session, agent: 'codex', sessionId: 'codex-generator' },
+        evaluatorSession: { ...session, agent: 'claude', sessionId: `${phase}-open-evaluator` },
+        fallbackReason,
+      }, new Date('2026-08-08T00:00:00Z'));
+      equal([
+        route.agent,
+        route.provider,
+        route.profileId,
+        route.presetId,
+        route.model,
+        route.effort,
+        route.evaluatorModelPolicy,
+      ], ['claude', 'openrouter', 'claude-openrouter', presetId, model, effort, 'open_only']);
+    }
   }
 });
 
@@ -458,10 +505,10 @@ Deno.test('formal evaluator falls back to AGY Gemini 3.6 Flash high only on expl
   );
 });
 
-Deno.test('formal evaluator rejects closed models and reused generator sessions', () => {
+Deno.test('formal evaluator rejects wrong native family and reused generator sessions', () => {
   const at = new Date('2026-07-13T00:00:00Z');
   const generatorSession = { ...session, agent: 'codex', sessionId: 'codex-generator' } as const;
-  const evaluatorSession = { ...session, agent: 'claude', sessionId: 'open-evaluator' } as const;
+  const evaluatorSession = { ...session, agent: 'claude', sessionId: 'claude-evaluator' } as const;
   const route = resolveCanonicalRoute('formal_impl_evaluation', at);
   assertThrows(() =>
     resolveCanonicalFormalEvaluatorRoute({
@@ -469,7 +516,7 @@ Deno.test('formal evaluator rejects closed models and reused generator sessions'
       authorFamily: 'openai',
       generatorSession,
       evaluatorSession,
-      route: { ...route, model: MODEL_IDS.opus },
+      route: { ...route, evaluatesFamily: 'anthropic' },
     }, at)
   );
   assertThrows(() =>
@@ -493,21 +540,32 @@ Deno.test('formal evaluator rejects cross-phase presets', () => {
     resolveCanonicalFormalEvaluatorRoute({
       ...common,
       phase: 'plan',
-      route: resolveCanonicalRoute('formal_impl_evaluation', at),
+      fallbackReason: 'third_opinion',
+      route: CANONICAL_ROUTE_POLICY.find((entry) =>
+        entry.lane === 'formal_impl_evaluation' &&
+        entry.condition === 'third_opinion_or_native_limit'
+      ),
     }, at)
   );
   assertThrows(() =>
     resolveCanonicalFormalEvaluatorRoute({
       ...common,
       phase: 'impl',
-      route: resolveCanonicalRoute('formal_plan_evaluation', at),
+      fallbackReason: 'third_opinion',
+      route: CANONICAL_ROUTE_POLICY.find((entry) =>
+        entry.lane === 'formal_plan_evaluation' &&
+        entry.condition === 'third_opinion_or_native_limit'
+      ),
     }, at)
   );
 });
 
 Deno.test('formal IMPL evaluator rejects the stale Qwen 3.7 model', () => {
   const at = new Date('2026-07-13T00:00:00Z');
-  const route = resolveCanonicalRoute('formal_impl_evaluation', at);
+  const route = CANONICAL_ROUTE_POLICY.find((entry) =>
+    entry.lane === 'formal_impl_evaluation' &&
+    entry.condition === 'third_opinion_or_native_limit'
+  )!;
   assertThrows(
     () =>
       resolveCanonicalFormalEvaluatorRoute({
@@ -515,16 +573,20 @@ Deno.test('formal IMPL evaluator rejects the stale Qwen 3.7 model', () => {
         authorFamily: 'openai',
         generatorSession: { ...session, agent: 'codex', sessionId: 'codex-generator' },
         evaluatorSession: { ...session, agent: 'claude', sessionId: 'open-evaluator' },
+        fallbackReason: 'third_opinion',
         route: { ...route, model: 'qwen/qwen3.7-max' },
       }, at),
     Error,
-    'formal impl evaluator requires its canonical phase route',
+    'formal impl evaluator requires its canonical OpenRouter escalation route',
   );
 });
 
 Deno.test('formal IMPL evaluator rejects the retired well-formed Qwen 3.8 route', () => {
   const at = new Date('2026-08-06T00:00:00Z');
-  const route = resolveCanonicalRoute('formal_impl_evaluation', at);
+  const route = CANONICAL_ROUTE_POLICY.find((entry) =>
+    entry.lane === 'formal_impl_evaluation' &&
+    entry.condition === 'third_opinion_or_native_limit'
+  )!;
   assertThrows(
     () =>
       resolveCanonicalFormalEvaluatorRoute({
@@ -532,10 +594,11 @@ Deno.test('formal IMPL evaluator rejects the retired well-formed Qwen 3.8 route'
         authorFamily: 'openai',
         generatorSession: { ...session, agent: 'codex', sessionId: 'codex-generator' },
         evaluatorSession: { ...session, agent: 'claude', sessionId: 'open-evaluator' },
+        fallbackReason: 'third_opinion',
         route: { ...route, model: OPENROUTER_MODEL_IDS.qwen },
       }, at),
     Error,
-    'formal impl evaluator requires its canonical phase route',
+    'formal impl evaluator requires its canonical OpenRouter escalation route',
   );
 });
 
@@ -549,22 +612,23 @@ Deno.test('formal evaluator rejects the Gemini documentation-authoring generator
         authorFamily: 'openai',
         generatorSession: { ...session, agent: 'codex', sessionId: 'codex-generator' },
         evaluatorSession: { ...session, agent: 'claude', sessionId: 'open-evaluator' },
+        fallbackReason: 'third_opinion',
         route: geminiGeneratorRoute,
       }, at),
     Error,
-    'formal impl evaluator requires its canonical phase route',
+    'formal impl evaluator requires its canonical OpenRouter escalation route',
   );
 });
 
 Deno.test('review-of-Codex ladder is effort-paired and Fable is reserved for medium+', () => {
   const at = new Date('2026-07-16T00:00:00Z');
-  // Small slices → Opus 4.8 high; normal/complex → Fable 5 (low/medium), in-plan and
+  // Small slices → Opus 5 high; normal/complex → Fable 5 (low/medium), in-plan and
   // auto-selectable per PR #784 (Fable 5 restored); fast → Opus medium.
   const expected: Record<string, [string, string]> = {
-    review_codex_light: ['opus-4.8', 'high'],
+    review_codex_light: ['opus-5', 'high'],
     review_codex: ['fable-5', 'low'],
     review_codex_complex: ['fable-5', 'medium'],
-    review_codex_fast: ['opus-4.8', 'medium'],
+    review_codex_fast: ['opus-5', 'medium'],
   };
   for (const [lane, [model, effort]] of Object.entries(expected)) {
     const route = resolveCanonicalRoute(lane as Parameters<typeof resolveCanonicalRoute>[0], at);
@@ -608,8 +672,8 @@ Deno.test('token-limit review fallbacks stay Claude-family and are never primary
   equal(
     fallbacks.map((r) => [r.lane, r.model, r.effort]).toSorted(),
     [
-      ['review_codex', 'opus-4.8', 'low'],
-      ['review_codex_complex', 'opus-4.8', 'medium'],
+      ['review_codex', 'opus-5', 'low'],
+      ['review_codex_complex', 'opus-5', 'medium'],
       ['review_codex_fast', 'sonnet-5', 'high'],
       ['review_codex_light', 'sonnet-5', 'high'],
     ].toSorted(),
@@ -691,7 +755,7 @@ Deno.test('docs_polish is Claude Fable 5 medium edit-only, with an ordered depth
   // The primary is never a fallback route.
   equal(route.condition, 'edit_only_prose_polish_after_audit');
 
-  // Fallback chain, in order: (1) token-limit → Opus 4.8 · xhigh (Claude-family),
+  // Fallback chain, in order: (1) token-limit → Opus 5 · xhigh (Claude-family),
   // (2) no-Claude-surface → GLM 5.2 · xhigh over the claude-openrouter transport.
   const chain = CANONICAL_ROUTE_POLICY.filter((entry) =>
     entry.lane === 'docs_polish' && entry.condition !== 'edit_only_prose_polish_after_audit'
@@ -702,7 +766,7 @@ Deno.test('docs_polish is Claude Fable 5 medium edit-only, with an ordered depth
   equal([tokenLimit.agent, tokenLimit.provider, tokenLimit.model, tokenLimit.effort], [
     'claude',
     'anthropic',
-    'opus-4.8',
+    'opus-5',
     'xhigh',
   ]);
   equal(noClaude.condition, 'fallback_no_claude_surface');

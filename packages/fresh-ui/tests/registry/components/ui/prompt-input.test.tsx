@@ -19,7 +19,7 @@ function classes(value: unknown): string[] {
   return typeof value === 'string' ? value.split(' ').filter(Boolean) : [];
 }
 
-const MODELS = [{ id: 'opus', label: 'Opus 4.8', provider: 'Anthropic' }];
+const MODELS = [{ id: 'opus', label: 'Opus 5', provider: 'Anthropic' }];
 
 Deno.test('PromptInput renders a form with field, capabilities, and send', () => {
   const v = PromptInput({

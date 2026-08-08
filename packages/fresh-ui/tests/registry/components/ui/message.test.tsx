@@ -33,7 +33,7 @@ Deno.test('Message renders assistant prose with author, model, body, follow-ups,
       role: 'assistant',
       author: { name: 'VIF Agent', agent: true },
       time: '12:04',
-      model: 'opus-4.8',
+      model: 'opus-5',
       body: 'Mapped **PROSCO** to the gateway [1].',
       followups: ['Show lineage', 'Replay job'],
     },
@@ -43,7 +43,7 @@ Deno.test('Message renders assistant prose with author, model, body, follow-ups,
   assert(cls.includes('ns-message--assistant'), 'role modifier');
   const json = JSON.stringify(v);
   assert(json.includes('VIF Agent'), 'author');
-  assert(json.includes('opus-4.8'), 'model');
+  assert(json.includes('opus-5'), 'model');
   assert(json.includes('ns-message__body'), 'body');
   assert(json.includes('Show lineage'), 'follow-up chip');
   assert(json.includes('ns-msg-action'), 'hover actions');

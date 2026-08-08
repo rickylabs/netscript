@@ -14,36 +14,36 @@ and endpoints live in `config/versions.ts` and `config/endpoints.ts`. See the "M
 
 ## Canonical routes
 
-Fable 5 is back on the Anthropic subscription (2026-07-16). It is the **default orchestrator** and
-the **default sub-agent for complex architecture / design / technical decisions**; Codex remains the
-default implementer. Every route below is in-plan and auto-selectable — no route requires paid
-approval — and each Fable primary carries an in-plan token-limit fallback.
+Opus 5 high is the **default orchestrator**. Fable 5 medium is the **default sub-agent for complex
+architecture / design / technical decisions**; Codex remains the default implementer. Every native
+route below is in-plan and auto-selectable — no route requires paid approval — and each primary
+carries an in-plan token-limit fallback where declared.
 
 | Task lane (`code lane`)                                                                                                                                                                    | Enforced route                                                                                                                    | Token-limit fallback                 |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------ |
-| Orchestrator — long-running planning & decision intelligence (`planning_decisions`). This is the supervisor session with `/rc` enabled; there is no separate "mobile orchestration" agent. | **Claude · Anthropic · Fable 5 · low**                                                                                            | Codex · OpenAI · GPT-5.6 Sol · high  |
-| Complex architecture / design / technical **decisions** — default sub-agent (`deep_analysis`)                                                                                              | **Claude · Anthropic · Fable 5 · low**                                                                                            | Codex · OpenAI · GPT-5.6 Sol · high  |
+| Orchestrator — long-running planning & decision intelligence (`planning_decisions`). This is the supervisor session with `/rc` enabled; there is no separate "mobile orchestration" agent. | **Claude · Anthropic · Opus 5 · high**                                                                                            | Codex · OpenAI · GPT-5.6 Sol · high  |
+| Complex architecture / design / technical **decisions** — default sub-agent (`deep_analysis`)                                                                                              | **Claude · Anthropic · Fable 5 · medium**                                                                                         | Codex · OpenAI · GPT-5.6 Sol · high  |
 | Implementation — light scoped slices (`light_implementation`)                                                                                                                             | **Codex · OpenAI · GPT-5.6 Sol · low**                                                                                            | —                                    |
 | Implementation — most tasks (`normal_implementation`)                                                                                                                                      | **Codex · OpenAI · GPT-5.6 Sol · medium**                                                                                         | —                                    |
 | Implementation — complex (`complex_implementation`)                                                                                                                                        | **Codex · OpenAI · GPT-5.6 Sol · high**                                                                                           | —                                    |
 | Small fixes / fast iteration (`fast_iteration`)                                                                                                                                            | Codex · OpenAI · GPT-5.6 Luna · max                                                                                               | —                                    |
-| Adversarial review of **Codex** work — normal, paired to Sol·medium impl (`review_codex`)                                                                                                  | **Claude · Anthropic · Fable 5 · low**                                                                                            | Claude · Anthropic · Opus 4.8 · low  |
-| Adversarial review of **Codex** work — light, paired to Sol·low impl (`review_codex_light`)                                                                                                | **Claude · Anthropic · Opus 4.8 · high**                                                                                          | Claude · Anthropic · Sonnet 5 · high |
-| Adversarial review of **Codex** work — complex, paired to Sol·high impl (`review_codex_complex`)                                                                                           | **Claude · Anthropic · Fable 5 · medium**                                                                                         | Claude · Anthropic · Opus 4.8 · medium |
-| Adversarial review of **Codex** work — fast, paired to Luna·max impl (`review_codex_fast`)                                                                                                 | **Claude · Anthropic · Opus 4.8 · medium**                                                                                        | Claude · Anthropic · Sonnet 5 · high |
+| Adversarial review of **Codex** work — normal, paired to Sol·medium impl (`review_codex`)                                                                                                  | **Claude · Anthropic · Fable 5 · low**                                                                                            | Claude · Anthropic · Opus 5 · low  |
+| Adversarial review of **Codex** work — light, paired to Sol·low impl (`review_codex_light`)                                                                                                | **Claude · Anthropic · Opus 5 · high**                                                                                          | Claude · Anthropic · Sonnet 5 · high |
+| Adversarial review of **Codex** work — complex, paired to Sol·high impl (`review_codex_complex`)                                                                                           | **Claude · Anthropic · Fable 5 · medium**                                                                                         | Claude · Anthropic · Opus 5 · medium |
+| Adversarial review of **Codex** work — fast, paired to Luna·max impl (`review_codex_fast`)                                                                                                 | **Claude · Anthropic · Opus 5 · medium**                                                                                        | Claude · Anthropic · Sonnet 5 · high |
 | Review of **Claude** work (`review_claude`)                                                                                                                                                | Codex · OpenAI · GPT-5.6 Sol · xhigh                                                                                              | —                                    |
-| Delegated **code** chores (`chore_code`)                                                                                                                                                   | **Claude · Anthropic · Opus 4.8 · medium**                                                                                        | Codex · OpenAI · GPT-5.6 Luna · max  |
+| Delegated **code** chores (`chore_code`)                                                                                                                                                   | **Claude · Anthropic · Opus 5 · medium**                                                                                        | Codex · OpenAI · GPT-5.6 Luna · max  |
 | Docs / cleanup / easy chores (`documentation_review`)                                                                                                                                      | **Claude · Anthropic · Sonnet 5 · high**                                                                                          | Codex · OpenAI · GPT-5.6 Luna · high |
-| Documentation authoring (`documentation_authoring`)                                                                                                                                        | **Antigravity CLI · Google · `agy` · low**                                                                                        | —                                    |
+| Documentation authoring (`documentation_authoring`)                                                                                                                                        | **Antigravity CLI · Google · Gemini 3.6 Flash · low**                                                                             | —                                    |
 | Opposite-family single-pass audit of a Claude-generated docs changeset (`docs_audit`). Gate set in [`doc-audit.md`](./doc-audit.md).                                                        | **Codex · OpenAI · GPT-5.6 Sol · medium** (`high` for large changesets)                                                          | — (opposite-family by design)        |
-| Final edit-only prose polish after audit + fixes (`docs_polish`). Doctrine in [`doc-audit.md`](./doc-audit.md).                                                                             | **Claude · Anthropic · Fable 5 · medium**                                                                                        | Claude · Anthropic · Opus 4.8 · xhigh → (no Claude surface) Claude · OpenRouter · GLM 5.2 · xhigh |
+| Final edit-only prose polish after audit + fixes (`docs_polish`). Doctrine in [`doc-audit.md`](./doc-audit.md).                                                                             | **Claude · Anthropic · Fable 5 · medium**                                                                                        | Claude · Anthropic · Opus 5 · xhigh → (no Claude surface) Claude · OpenRouter · GLM 5.2 · xhigh |
 | Major UI/UX work — lead route (`major_ui_ux_design`)                                                                                                                                       | Claude · OpenRouter · GLM 5.2 · `claude-design-glm-5-2` preset · xhigh                                                            | —                                    |
 | Major UI/UX work — adversarial minimum when another lane leads (`major_ui_ux_adversarial_review`)                                                                                          | Claude · OpenRouter · GLM 5.2 · `claude-design-glm-5-2` preset · xhigh                                                            | —                                    |
-| Vision-capable adversarial design evidence (`adversarial_design_eval`)                                                                                                                     | OpenCode · OpenRouter · Kimi K2.6 vision · high (`--variant`). Complements — does not replace — the required GLM 5.2 design pass. | —                                    |
-| Claude Code workflows (`claude_workflow`)                                                                                                                                                  | Claude · Anthropic · Opus 4.8 · low                                                                                               | —                                    |
-| Massive external research / extraction (`research_extraction`)                                                                                                                             | Antigravity CLI · Google · `agy` · low                                                                                            | —                                    |
-| **Local PLAN-EVAL** (`formal_plan_evaluation`)                                                                                                                                              | Claude · OpenRouter · `claude-evaluator-minimax-m3` · `minimax/minimax-m3` · high · `claude-openrouter` / `claude-print`         | —                                    |
-| **Local IMPL-EVAL** (`formal_impl_evaluation`)                                                                                                                                              | Claude · OpenRouter · `claude-evaluator-deepseek-v4-flash-0731` · `deepseek/deepseek-v4-flash-0731` · max · `claude-openrouter` / `claude-print` | —                                    |
+| Vision-capable adversarial design evidence (`adversarial_design_eval`)                                                                                                                     | OpenCode · OpenRouter · Kimi K3 vision · high (`--variant`). Complements — does not replace — the required GLM 5.2 design pass. | —                                    |
+| Claude Code workflows (`claude_workflow`)                                                                                                                                                  | Claude · Anthropic · Opus 5 · low                                                                                               | —                                    |
+| Massive external research / extraction (`research_extraction`)                                                                                                                             | Antigravity CLI · Google · Gemini 3.6 Flash · low                                                                                 | —                                    |
+| **Local PLAN-EVAL** (`formal_plan_evaluation`)                                                                                                                                              | Native opposite-family: Fable 5 · medium for Codex plans; Sol · high for Claude plans                                            | Minimax M3 · high for third opinion/native quota limit; AGY Gemini 3.6 Flash · high if OpenRouter is limited |
+| **Local IMPL-EVAL** (`formal_impl_evaluation`)                                                                                                                                              | Native opposite-family: Fable 5 · medium for Codex work; Sol · xhigh for Claude work                                             | DeepSeek V4 Flash 0731 · max for third opinion/native quota limit; AGY Gemini 3.6 Flash · high if OpenRouter is limited |
 | Automated cloud agent (including cloud evaluator runs)                                                                                                                                     | **TEMPORARILY PAUSED by owner (2026-08-06)** — use local toolchain until trigger path is fixed                                    | —                                    |
 
 The `major_ui_ux_*` GLM 5.2 lanes and the OpenCode vision-evidence lane are **dormant** while the
@@ -58,14 +58,15 @@ it spends OpenRouter credit where a subscription already exists. This remains a 
 only; it does not change the formal evaluator lane, its approved open-model set, or the prohibition
 on Gemini over evaluator transports.
 
-**Owner decision (2026-08-06).** PLAN-EVAL is conditional: use it before implementation only for
+**Owner decision (2026-08-08).** PLAN-EVAL is conditional: use it before implementation only for
 genuinely complex/decision-heavy work, multi-PR/wave planning, or when adversarial planning advice
 is useful. Small/mechanical issues with complete contract/scope/acceptance/gates record
-`PLAN-EVAL: N/A`. IMPL-EVAL remains mandatory unless the owner explicitly waives it. OpenHands is
-temporarily paused; use local evaluator transports. If an evaluator's OpenRouter route is blocked
-by an OpenRouter limit, the explicit fallback is Antigravity CLI (`agy`) on Google subscription,
-`gemini-3.6-flash-high`, effort `high`. This fallback must be a fresh separate session, record the
-block and requested/observed identity, and never be invoked through paid OpenRouter.
+`PLAN-EVAL: N/A`. IMPL-EVAL remains mandatory unless the owner explicitly waives it. Both use a
+fresh native opposite-family Claude ⇄ Codex session by default. Use the phase-bound OpenRouter open
+model only for a genuine third opinion or native-family quota limit. If OpenRouter is then limited,
+fall back to a fresh Antigravity CLI (`agy`) Gemini 3.6 Flash high session on the Google
+subscription. OpenHands is not a normal local evaluator and is reserved for explicitly
+cloud-driven work. Record every escalation and requested/observed identity.
 
 **Forward rule (not a lane).** Any future **max-effort OpenAI implementation** route pairs with a
 **Claude · Fable 5 · high** adversarial review. This extends the effort-paired ladder above; when
@@ -78,10 +79,10 @@ lane that produced it, and **Fable 5 is reserved for medium+ pairings**:
 
 | Implementation lane                 | Review pairing (`lane`) | Reviewer                                      |
 | ----------------------------------- | ----------------------- | --------------------------------------------- |
-| `light_implementation` (Sol · low)  | `review_codex_light`    | Opus 4.8 · high (fallback Sonnet 5 · high)    |
-| `normal_implementation` (Sol · med) | `review_codex`          | Fable 5 · low (fallback Opus 4.8 · low)       |
-| `complex_implementation` (Sol · hi) | `review_codex_complex`  | Fable 5 · medium (fallback Opus 4.8 · medium) |
-| `fast_iteration` (Luna · max)       | `review_codex_fast`     | Opus 4.8 · medium (fallback Sonnet 5 · high)  |
+| `light_implementation` (Sol · low)  | `review_codex_light`    | Opus 5 · high (fallback Sonnet 5 · high)    |
+| `normal_implementation` (Sol · med) | `review_codex`          | Fable 5 · low (fallback Opus 5 · low)       |
+| `complex_implementation` (Sol · hi) | `review_codex_complex`  | Fable 5 · medium (fallback Opus 5 · medium) |
+| `fast_iteration` (Luna · max)       | `review_codex_fast`     | Opus 5 · medium (fallback Sonnet 5 · high)  |
 
 **Rationale.** The high volume of Sol-low/medium implementation was consuming Fable capacity through
 review. Fable is reserved for the medium+ pairings (`review_codex`, `review_codex_complex`) where
@@ -110,29 +111,25 @@ These efforts map onto the implementation lanes above (`light_implementation` ·
 review pairing; `max` is the escalation tier and, per the forward rule, pairs with a Fable 5 · high
 adversarial review.
 
-### Fable 5 restored as default (2026-07-16)
+### Native Claude orchestration and analysis defaults (2026-08-08)
 
-Fable 5 returned to the Anthropic subscription. The prior Opus 4.8 subscription workaround on the
-orchestrator lane is **retired**, and the separate `mobile_orchestration` lane is **removed** —
-mobile supervision is the same `planning_decisions` session with the `/rc` command enabled, not a
-distinct agent or route.
+The single mobile-visible `planning_decisions` session is **Claude · Opus 5 · high**. Complex
+architecture, design, and technical decision analysis delegates to **Claude · Fable 5 · medium**.
+There is no separate `mobile_orchestration` lane: enable `/rc` on the orchestrator itself.
 
-- **Orchestrator and complex-decision sub-agent** run **Claude · Fable 5 · low**, in-plan and
-  auto-selected.
-- **Token-limit resilience.** Each Fable primary has an in-plan fallback for when a Fable session
-  hits its token ceiling: the orchestrator and complex-decision lanes fall back to **Codex · GPT-5.6
-  Sol · high**. The Codex-review lanes instead fall back to **Claude · Opus 4.8** (same effort) so
+- **Token-limit resilience.** The orchestrator and complex-decision lanes fall back to **Codex ·
+  GPT-5.6 Sol · high**. The Codex-review lanes instead fall back to **Claude · Opus 5** (same effort) so
   an OpenAI-authored change is never reviewed by an OpenAI-family model — opposite-family review is
   never traded away for a token-limit fallback.
 - **Adversarial pairing.** Codex implementation follows the #794 effort-paired review ladder:
   Sol·low → Opus·high, Sol·medium → Fable·low, Sol·high → Fable·medium, and Luna·max → Opus·medium.
-- **Delegated work.** The Fable orchestrator delegates code chores to **Opus 4.8 · medium** and docs
+- **Delegated work.** The Opus orchestrator delegates deep analysis to **Fable 5 · medium**, code chores to **Opus 5 · medium**, and docs
   / cleanup / easy chores to **Sonnet 5 · high** (Luna fallbacks as above).
 
 ### Doc-audit profile — opposite-family audit + Fable prose polish (2026-07-17)
 
 Docs changesets generated by Claude authoring lanes (single/few **Fable 5 · high** sub-agents, or a
-Claude workflow fleet on **Opus 4.8 · medium** / **Sonnet 5 · high**) run a fixed two-lane pipeline:
+Claude workflow fleet on **Opus 5 · medium** / **Sonnet 5 · high**) run a fixed two-lane pipeline:
 **generate → single-pass Sol audit → fix cycle(s) → single-pass Fable polish → merge**.
 
 - **`docs_audit`** — a single **opposite-family** pass by **Codex · GPT-5.6 Sol · medium** (`high`
@@ -146,7 +143,7 @@ Claude workflow fleet on **Opus 4.8 · medium** / **Sonnet 5 · high**) run a fi
   audit and after fixes land. It edits in place for voice/flow/precision; it does not re-author from
   scratch unless the **audit findings** judged a document's prose bad enough to warrant it, and it
   never changes technical claims (accuracy doubts return to `docs_audit`). Fallback chain (depth 2):
-  token-limit → **Opus 4.8 · xhigh**; and only if **no Claude-agent surface** is available at all →
+  token-limit → **Opus 5 · xhigh**; and only if **no Claude-agent surface** is available at all →
   **GLM 5.2 · xhigh** over the `claude-openrouter` transport the design lanes use. GLM is a
   polish-fallback-of-last-resort **only here** — this does not widen GLM beyond its design scope
   elsewhere.
@@ -156,56 +153,28 @@ lifecycle** live in [`doc-audit.md`](./doc-audit.md) — not restated here. Both
 data by the `docs_audit` / `docs_polish` entries in
 `../../tools/agentic/runtime/routing-policy.ts`.
 
-### The local evaluator now has a named transport (2026-07-13)
+### Native-first formal evaluation (2026-08-08)
 
-The doctrine already said the right thing: OpenHands is for **cloud-driven** runs, and a
-**local-machine** run must use a local adversarial agent for PLAN-EVAL/IMPL-EVAL. What it lacked was
-a **named local transport** — so it described a gap and told us to log it. The gap is now filled:
+PLAN-EVAL and IMPL-EVAL normally run in fresh **native opposite-family sessions**. Fable 5 medium
+evaluates Codex-authored work; Codex GPT-5.6 Sol high (PLAN) or xhigh (IMPL) evaluates
+Claude-authored work. The generator session never evaluates itself.
 
-**Local PLAN-EVAL and IMPL-EVAL run as separate sessions on Claude Code + OpenRouter
-(`claude-openrouter` profile → `claude-print`).** PLAN-EVAL binds the Minimax M3 evaluation preset;
-IMPL-EVAL binds the DeepSeek V4 Flash 0731 max evaluation preset. Each open model is neither Claude-family nor
-Codex-family, so it is adversarial to **both** generators — the generator-≠-evaluator invariant is
-satisfied more robustly than by a family swap alone.
+The phase-bound OpenRouter presets remain available only for a genuine third opinion or when the
+native opposite-family route is quota-blocked: Minimax M3 high for PLAN-EVAL and DeepSeek V4 Flash
+0731 max for IMPL-EVAL. If that escalation hits an OpenRouter limit, the final fallback is a fresh
+AGY Gemini 3.6 Flash high session on the Google subscription. OpenHands is reserved for explicitly
+cloud-driven work.
 
-When OpenRouter is blocked by a provider limit, both formal phase lanes have the owner-authorized
-machine-bound fallback `antigravity` / Google / `gemini-3.6-flash-high` / high with condition
-`fallback_on_openrouter_limit`. The fallback runs only through the checked-in AGY toolchain, never
-OpenRouter, and preserves generator/evaluator session separation.
-
-**OpenHands is temporarily paused by owner direction (2026-08-06).** Keep its model rules intact,
-but do not dispatch it until the trigger path is fixed; use the local lane:
-
-- **OPEN models only** — the approved local formal set is `minimax/minimax-m3` and
-  `deepseek/deepseek-v4-flash-0731`; the phase-bound presets are
-  `claude-evaluator-minimax-m3` for PLAN-EVAL and
-  `claude-evaluator-deepseek-v4-flash-0731` for IMPL-EVAL. The distinct
-  `claude-fanout-minimax-m3` preset remains workflow-fanout only.
-- **Closed/paid models (Claude/`sonnet`, GPT/`gpt`, Gemini) are PROHIBITED** on either evaluator
-  transport. They bill the owner's OpenRouter balance and can silently burn it. This is a
-  **cost-protection policy, not a runner implementation detail** — it survives the transport change
-  and must not be weakened.
-
-**Ordinary (non-formal) review** — the slice review gate, code/PR review — remains opposite-family
-Claude ⇄ Codex. Do not conflate it with the formal evaluator pass.
-
-**Machine binding.** This table is the rendered view of `CANONICAL_ROUTE_POLICY`. The evaluator
-lanes are backed by data: `routing-policy.ts` binds the formal PLAN and IMPL routes to their exact
-phase preset/model pairs on the `claude-openrouter` profile, and
-`resolveCanonicalFormalEvaluatorRoute()` **throws** unless the requested phase, lane, preset,
-provider, and approved open model all match — so the closed-model and cross-phase prohibitions above
-are enforced **in code, not in a comment**. That binding and this document move together; the doc is
-not a substitute for the binding.
-
-The evaluator lane was, before this, the one lane in the repo that lived only in prose — which is
-precisely why an unexamined assumption could survive in it for so long. Keep it in the data.
+**Machine binding.** This table is the rendered view of `CANONICAL_ROUTE_POLICY`.
+`resolveCanonicalFormalEvaluatorRoute()` **throws** unless the requested native family or explicit
+fallback reason matches the phase-bound route. Approved OpenRouter model identities remain
+centralized in `config/models.ts`.
 
 ### OpenRouter through Claude Code
 
-OpenRouter-backed routes driven through Claude Code are a **proven transport** (validated via the
-agentic tooling), not a distinct doctrine — it is the transport the local evaluator lane above runs
-on. The evaluator rules that govern OpenHands govern them identically: the generator session is
-never the evaluator session, and no lane self-certifies. GLM 5.2 remains scoped to **pure design
+OpenRouter-backed routes driven through Claude Code are a **proven escalation transport** (validated
+via the agentic tooling), not the default local evaluator. The generator session is never the
+evaluator session, and no lane self-certifies. GLM 5.2 remains scoped to **pure design
 work** (the `major_ui_ux_*` lanes) **plus exactly one named exception — the `docs_polish`
 no-Claude-surface last-resort fallback (2026-07-17)**; it is not an implementation or
 general-evaluation model.
@@ -237,13 +206,11 @@ supersede the GLM 5.2 requirement for major UI/UX work.
 
 ## Harness invariants
 
-1. **Generator session differs from evaluator session.** The formal evaluator pass (PLAN-EVAL /
-   IMPL-EVAL) runs an **open model** — neither Claude-family nor Codex-family, therefore adversarial
-   to both — locally on Claude Code + OpenRouter, or in the cloud on OpenHands. For ordinary review,
-   GPT-authored work receives Claude-family review through the effort-paired `review_codex*` ladder;
-   Claude-authored work receives GPT-family review through `review_claude`. Mixed work is reviewed
-   per slice by the opposite family or by both. Token-limit fallbacks never cross this line, and a
-   missing evaluator is a recorded blocker rather than a licence to self-review.
+1. **Generator session differs from evaluator session.** Formal evaluation normally uses a fresh
+   native opposite-family Claude ⇄ Codex session. OpenRouter is permitted only for third opinion or
+   native quota exhaustion; OpenHands only for explicitly cloud-driven work. Mixed work is reviewed
+   per slice by the opposite family or by both. A missing evaluator is a recorded blocker rather
+   than a licence to self-review.
 2. **No implementation lane self-certifies.** After automated gates, the coordinator performs a
    substantive review before its sign-off commit.
 3. **Launch identity is data, not prose.** Launch edges require and validate provider, model, and
@@ -255,11 +222,10 @@ supersede the GLM 5.2 requirement for major UI/UX work.
 5. **Major UI/UX work requires GLM 5.2.** Design-system work, dashboard/console surfaces, and
    significant frontend UX are either led through the `claude-design-glm-5-2` route or receive its
    adversarial design pass before merge.
-6. **Evaluator lanes run OPEN models only.** The local formal phase routes use
-   `minimax/minimax-m3` and `deepseek/deepseek-v4-flash-0731`. Cloud OpenHands remains governed by
-   its own approved open-model set. Closed/paid models (Claude/`sonnet`, GPT/`gpt`, Gemini) are **prohibited** on them
-   because they bill the owner's OpenRouter balance. Cost protection — never weaken it to make a
-   route convenient.
+6. **Relay evaluator lanes run OPEN models only.** OpenRouter escalation uses
+   `minimax/minimax-m3` or `deepseek/deepseek-v4-flash-0731`; cloud OpenHands remains governed by
+   its approved open-model set. Closed models are prohibited on those relay surfaces because they
+   burn paid OpenRouter credit. Native Claude/Codex evaluation is not a relay route.
 
 ## Selection and handoff rules
 

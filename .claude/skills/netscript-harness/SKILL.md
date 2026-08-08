@@ -224,11 +224,14 @@ When external docs or examples matter:
 ## Evaluator Separation
 
 There are **two** separate-session evaluator passes. Both run on the evaluator lane selected from
-`workflow/lane-policy.md`: locally on **Claude Code + OpenRouter with an OPEN model**, or in the
-cloud on **OpenHands** (also open-models-only). Closed/paid models are prohibited on both.
+`workflow/lane-policy.md`. The normal local route is a **native opposite-family session**:
+Claude/Fable evaluates Codex-authored work and Codex/Sol evaluates Claude-authored work. OpenRouter
+is an escalation only for a third opinion or when the native evaluator family is quota-blocked;
+OpenHands is reserved for explicitly cloud-driven work. No lane may self-certify.
 
 **PLAN-EVAL** (before implementation):
 
+- Runs only for genuinely complex or decision-heavy work; quick fixes record `PLAN-EVAL: N/A`.
 - Runs in a separate session on the evaluator lane selected from `workflow/lane-policy.md`.
 - Reads `evaluator/plan-protocol.md` + `gates/plan-gate.md`.
 - Reads `research.md`, `plan.md`, and the `## Design` section.

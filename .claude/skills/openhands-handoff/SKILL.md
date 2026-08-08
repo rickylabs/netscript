@@ -40,24 +40,18 @@ OpenHands is **not** the evaluator for local runs. Two hard rules:
    cloud OpenHands at all — use the local evaluator transport named below. The **supervisor chooses
    what to trigger** — sub-agents/implementers must NEVER auto-dispatch a cloud evaluator.
 
-### The local evaluator transport (named, 2026-07-13)
+### Local evaluator transport (owner revision, 2026-08-08)
 
-A local run's PLAN-EVAL / IMPL-EVAL used to have no named transport — this skill described the gap
-and told you to log it. It is now filled:
+The normal local PLAN-EVAL / IMPL-EVAL route is now a fresh **native opposite-family session**:
+Claude/Fable evaluates Codex-authored work and Codex/Sol evaluates Claude-authored work. PLAN-EVAL
+is conditional for complex or decision-heavy work; IMPL-EVAL remains mandatory unless the owner
+explicitly waives it. Generator and evaluator sessions must always differ.
 
-**Local PLAN-EVAL / IMPL-EVAL runs on Claude Code + OpenRouter** — the `claude-openrouter` provider
-profile driven via `claude-print` — in separate formal sessions. PLAN-EVAL binds
-`claude-evaluator-minimax-m3` (`minimax/minimax-m3`) at high effort, while IMPL-EVAL binds
-`claude-evaluator-deepseek-v4-flash-0731` (`deepseek/deepseek-v4-flash-0731`) at max effort. **Rule 1 above
-applies verbatim to this lane: OPEN models only; closed/paid
-models (Claude/`sonnet`, GPT/`gpt`, Gemini) are PROHIBITED** — they bill the owner's OpenRouter
-balance and can silently burn it. An open model is neither Claude-family nor Codex-family, so it is
-adversarial to **both** generators, which satisfies the generator-≠-evaluator invariant more
-robustly than a family swap alone.
-
-**Ordinary (non-formal) review** — the slice review gate, code/PR review — still uses a **local
-opposite-family** agent: Codex GPT-5.6 reviews Claude-authored work; a Claude session reviews
-Codex-authored work. Do not conflate it with the formal evaluator pass.
+OpenRouter is no longer the primary local evaluator. Use the bound Minimax M3 PLAN preset or
+DeepSeek V4 Flash 0731 IMPL preset only when a third opinion is genuinely required or the native
+opposite-family route is quota-blocked. If that OpenRouter escalation is itself limited, use a fresh
+AGY Gemini 3.6 Flash high session on the Google subscription. Rule 1 still applies to OpenRouter and
+OpenHands: only approved open models may use those paid relay surfaces.
 
 **Capability (verified; drift D-4 amended):** both approved open models return a **real reasoning
 trace** and have a **verified agentic turn** (real tool calls) on this transport. Both bound
@@ -66,7 +60,7 @@ evaluation presets can therefore run gates and their `effort` is genuine — not
 "GLM 5.2 · xhigh reasoning" as gate evidence, and do not restate that caveat as a property of the
 transport or of the evaluator lane.
 
-If neither the local transport nor a cloud run can be launched, record the gap in `drift.md` and let
+If neither an approved local route nor an authorized cloud run can be launched, record the gap in `drift.md` and let
 the supervisor decide — never self-certify.
 
 ## Key Concepts

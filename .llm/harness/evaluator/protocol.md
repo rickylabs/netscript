@@ -9,14 +9,14 @@ against the changed state, not to continue implementation.
 **Evaluator surface (local vs cloud).** The invariant never changes: the generator session is never
 the evaluator session, and no lane self-certifies. The transport is how that invariant is realized.
 
-- **Local run (the default for harness work).** PLAN-EVAL and IMPL-EVAL run in separate **local**
-  sessions on the **Claude Code + OpenRouter** transport (`claude-openrouter` provider profile,
-  driven via `claude-print`). PLAN-EVAL binds `claude-evaluator-minimax-m3`
-  (`minimax/minimax-m3`) at high effort; IMPL-EVAL binds
-  `claude-evaluator-deepseek-v4-flash-0731` (`deepseek/deepseek-v4-flash-0731`) at max effort. An
-  open model is neither Claude-family nor Codex-family, so it is adversarial to **both** generators.
-  **Closed/paid models (Claude/GPT/Gemini) are prohibited on this lane** — they burn paid OpenRouter
-  credit. The **supervisor** triggers it; a sub-agent never auto-dispatches an evaluator.
+- **Local run (the default for harness work).** PLAN-EVAL and IMPL-EVAL run in fresh native
+  opposite-family sessions: Claude/Fable evaluates Codex-authored work and Codex/Sol evaluates
+  Claude-authored work. The **supervisor** triggers the evaluator; a sub-agent never
+  auto-dispatches one. PLAN-EVAL is conditional for complex/decision-heavy work, while IMPL-EVAL
+  remains mandatory unless the owner explicitly waives it.
+- **OpenRouter escalation.** Use the bound Minimax M3 high PLAN preset or DeepSeek V4 Flash 0731
+  max IMPL preset only for a genuine third opinion or when the native opposite-family route is
+  quota-blocked. Approved open models only; never send Claude/GPT/Gemini through OpenRouter.
 - **Cloud run.** OpenHands dispatch is temporarily paused by owner direction while its trigger path
   is repaired. Do not dispatch it; use the local evaluator transport. When restored it remains:
   **open models only (Minimax M3 / Qwen 3.8 Max), cloud-driven runs only; dispatching it with a closed
@@ -29,7 +29,7 @@ Select the route from `workflow/lane-policy.md` and record it in `supervisor.md`
 `.agents/skills/openhands-handoff/SKILL.md` "Routing policy" for the model rules, which are shared
 by both transports.
 
-If the local OpenRouter route is blocked by an OpenRouter limit, use only the explicit
+If the OpenRouter escalation is blocked by an OpenRouter limit, use only the explicit
 owner-authorized fallback: a fresh separate Antigravity (`agy`) session on Google subscription,
 model `gemini-3.6-flash-high`, effort `high`. Record the block and requested/observed identity. This
 is not Gemini over OpenRouter and does not weaken evaluator independence.

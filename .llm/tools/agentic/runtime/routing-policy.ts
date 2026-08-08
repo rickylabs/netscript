@@ -135,7 +135,7 @@ export const CANONICAL_ROUTE_POLICY: readonly CanonicalRoutePolicy[] = [
     agent: 'claude',
     provider: 'anthropic',
     model: MODEL_IDS.fable,
-    effort: 'low',
+    effort: 'medium',
     subscriptionState: 'included',
     condition: 'default_complex_decision_subagent',
   },
@@ -153,8 +153,8 @@ export const CANONICAL_ROUTE_POLICY: readonly CanonicalRoutePolicy[] = [
     purpose: 'orchestration',
     agent: 'claude',
     provider: 'anthropic',
-    model: MODEL_IDS.fable,
-    effort: 'low',
+    model: MODEL_IDS.opus,
+    effort: 'high',
     subscriptionState: 'included',
     condition: 'default_orchestrator',
   },
@@ -165,7 +165,7 @@ export const CANONICAL_ROUTE_POLICY: readonly CanonicalRoutePolicy[] = [
     provider: 'openai',
     model: MODEL_IDS.codexSol,
     effort: 'high',
-    condition: 'fallback_on_fable_token_limit',
+    condition: 'fallback_on_opus_token_limit',
   },
   {
     lane: 'major_ui_ux_design',
@@ -222,7 +222,7 @@ export const CANONICAL_ROUTE_POLICY: readonly CanonicalRoutePolicy[] = [
     purpose: 'documentation',
     agent: 'antigravity',
     provider: 'google',
-    model: MODEL_IDS.antigravity,
+    model: MODEL_IDS.antigravityDocs,
     effort: 'low',
     condition: 'documentation_generation',
   },
@@ -249,7 +249,7 @@ export const CANONICAL_ROUTE_POLICY: readonly CanonicalRoutePolicy[] = [
   // Owner-revised 2026-07-17. Runs LAST in the docs pipeline: Claude · Fable 5 ·
   // medium edits prose in place for voice/flow/precision. It must not re-author
   // documents from scratch or change technical claims — any accuracy doubt returns
-  // to the docs_audit lane. Fallback chain (depth 2): token-limit → Opus 4.8 ·
+  // to the docs_audit lane. Fallback chain (depth 2): token-limit → Opus 5 ·
   // xhigh (Claude-family); and only if NO Claude-agent surface is available at all,
   // GLM 5.2 · xhigh over the `claude-openrouter` transport the design lanes use.
   // GLM is a polish-fallback-of-last-resort ONLY here — this does not widen GLM
@@ -316,8 +316,27 @@ export const CANONICAL_ROUTE_POLICY: readonly CanonicalRoutePolicy[] = [
     purpose: 'research_extraction',
     agent: 'antigravity',
     provider: 'google',
-    model: MODEL_IDS.antigravity,
+    model: MODEL_IDS.antigravityDocs,
     effort: 'low',
+  },
+  {
+    lane: 'formal_plan_evaluation',
+    purpose: 'evaluation',
+    agent: 'claude',
+    provider: 'anthropic',
+    model: MODEL_IDS.fable,
+    effort: 'medium',
+    subscriptionState: 'included',
+    evaluatesFamily: 'openai',
+  },
+  {
+    lane: 'formal_plan_evaluation',
+    purpose: 'evaluation',
+    agent: 'codex',
+    provider: 'openai',
+    model: MODEL_IDS.codexSol,
+    effort: 'high',
+    evaluatesFamily: 'anthropic',
   },
   {
     lane: 'formal_plan_evaluation',
@@ -329,6 +348,7 @@ export const CANONICAL_ROUTE_POLICY: readonly CanonicalRoutePolicy[] = [
     model: FORMAL_PLAN_EVALUATOR_PRESET.model,
     effort: FORMAL_PLAN_EVALUATOR_PRESET.effort,
     evaluatorModelPolicy: 'open_only',
+    condition: 'third_opinion_or_native_limit',
   },
   {
     lane: 'formal_plan_evaluation',
@@ -343,12 +363,32 @@ export const CANONICAL_ROUTE_POLICY: readonly CanonicalRoutePolicy[] = [
     lane: 'formal_impl_evaluation',
     purpose: 'evaluation',
     agent: 'claude',
+    provider: 'anthropic',
+    model: MODEL_IDS.fable,
+    effort: 'medium',
+    subscriptionState: 'included',
+    evaluatesFamily: 'openai',
+  },
+  {
+    lane: 'formal_impl_evaluation',
+    purpose: 'evaluation',
+    agent: 'codex',
+    provider: 'openai',
+    model: MODEL_IDS.codexSol,
+    effort: 'xhigh',
+    evaluatesFamily: 'anthropic',
+  },
+  {
+    lane: 'formal_impl_evaluation',
+    purpose: 'evaluation',
+    agent: 'claude',
     provider: 'openrouter',
     profileId: FORMAL_IMPL_EVALUATOR_PRESET.profileId,
     presetId: FORMAL_IMPL_EVALUATOR_PRESET.id,
     model: FORMAL_IMPL_EVALUATOR_PRESET.model,
     effort: FORMAL_IMPL_EVALUATOR_PRESET.effort,
     evaluatorModelPolicy: 'open_only',
+    condition: 'third_opinion_or_native_limit',
   },
   {
     lane: 'formal_impl_evaluation',
@@ -467,8 +507,12 @@ export interface FormalEvaluatorAssignment {
   readonly generatorSession: SessionIdentity;
   readonly evaluatorSession: SessionIdentity;
   readonly route?: CanonicalRoutePolicy;
-  /** Explicit owner-authorized fallback; absent means the canonical OpenRouter route is required. */
-  readonly fallbackReason?: 'openrouter_limit';
+  /**
+   * Explicit escalation/fallback. Absent means the native opposite-family route.
+   * OpenRouter is permitted only as a third opinion or when the native opposite
+   * family is quota-blocked; AGY is the final fallback when OpenRouter is limited.
+   */
+  readonly fallbackReason?: 'third_opinion' | 'native_quota_limit' | 'openrouter_limit';
 }
 
 function sessionFamily(session: SessionIdentity): ModelFamily {
@@ -511,10 +555,10 @@ export function resolveCanonicalOrdinaryReviewRoute(
   return route;
 }
 
-/** Resolves the formal open-model evaluator and rejects paid closed-model routes. */
+/** Resolves native opposite-family formal evaluation and its explicit fallbacks. */
 export function resolveCanonicalFormalEvaluatorRoute(
   assignment: FormalEvaluatorAssignment,
-  at: Date,
+  _at: Date,
 ): CanonicalRoutePolicy {
   if (assignment.generatorSession.sessionId === assignment.evaluatorSession.sessionId) {
     throw new Error('generator and evaluator sessions must differ');
@@ -526,15 +570,17 @@ export function resolveCanonicalFormalEvaluatorRoute(
   const expectedPreset = assignment.phase === 'plan'
     ? FORMAL_PLAN_EVALUATOR_PRESET
     : FORMAL_IMPL_EVALUATOR_PRESET;
-  const fallback = assignment.fallbackReason === 'openrouter_limit';
-  const route = assignment.route ??
-    (fallback
-      ? CANONICAL_ROUTE_POLICY.find((entry) =>
-        entry.lane === lane && entry.condition === 'fallback_on_openrouter_limit'
-      )
-      : resolveCanonicalRoute(lane, at));
-  if (!route) throw new Error(`no canonical OpenRouter-limit fallback for ${lane}`);
-  if (fallback) {
+  const openRouterEscalation = assignment.fallbackReason === 'third_opinion' ||
+    assignment.fallbackReason === 'native_quota_limit';
+  const agyFallback = assignment.fallbackReason === 'openrouter_limit';
+  const route = assignment.route ?? CANONICAL_ROUTE_POLICY.find((entry) => {
+    if (entry.lane !== lane) return false;
+    if (agyFallback) return entry.condition === 'fallback_on_openrouter_limit';
+    if (openRouterEscalation) return entry.condition === 'third_opinion_or_native_limit';
+    return entry.evaluatesFamily === assignment.authorFamily && !entry.condition;
+  });
+  if (!route) throw new Error(`no canonical formal ${assignment.phase} evaluator route`);
+  if (agyFallback) {
     if (
       route.lane !== lane || route.purpose !== 'evaluation' ||
       route.condition !== 'fallback_on_openrouter_limit' || route.agent !== 'antigravity' ||
@@ -545,14 +591,32 @@ export function resolveCanonicalFormalEvaluatorRoute(
     }
     return route;
   }
+  if (!openRouterEscalation) {
+    if (
+      route.lane !== lane || route.purpose !== 'evaluation' || route.condition !== undefined ||
+      route.evaluatesFamily !== assignment.authorFamily ||
+      route.agent !== assignment.evaluatorSession.agent ||
+      !((route.provider === 'anthropic' && route.agent === 'claude') ||
+        (route.provider === 'openai' && route.agent === 'codex')) ||
+      sessionFamily(assignment.evaluatorSession) === assignment.authorFamily
+    ) {
+      throw new Error(
+        `formal ${assignment.phase} evaluator requires the native opposite-family route`,
+      );
+    }
+    return route;
+  }
   const preset = route.presetId ? OPENROUTER_PRESETS[route.presetId] : undefined;
   if (
     route.purpose !== 'evaluation' || route.agent !== 'claude' ||
     route.provider !== 'openrouter' || route.profileId !== 'claude-openrouter' ||
     route.evaluatorModelPolicy !== 'open_only' || route.lane !== lane ||
+    route.condition !== 'third_opinion_or_native_limit' ||
     route.presetId !== expectedPreset.id || route.model !== expectedPreset.model
   ) {
-    throw new Error(`formal ${assignment.phase} evaluator requires its canonical phase route`);
+    throw new Error(
+      `formal ${assignment.phase} evaluator requires its canonical OpenRouter escalation route`,
+    );
   }
   if (!OPEN_EVALUATOR_MODEL_IDS.some((model) => model === route.model)) {
     throw new Error('formal evaluator model is not approved for open-only evaluation');

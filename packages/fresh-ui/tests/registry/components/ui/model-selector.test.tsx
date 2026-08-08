@@ -16,7 +16,7 @@ function classes(value: unknown): string[] {
 }
 
 const MODELS = [
-  { id: 'opus', label: 'Opus 4.8', provider: 'Anthropic', desc: 'Most capable' },
+  { id: 'opus', label: 'Opus 5', provider: 'Anthropic', desc: 'Most capable' },
   { id: 'sonnet', label: 'Sonnet 4.6', provider: 'Anthropic', desc: 'Fast + smart' },
 ];
 
@@ -40,5 +40,5 @@ Deno.test('ModelSelector marks the selected option active + alignment', () => {
 
 Deno.test('ModelSelector falls back to the first model when value is unknown', () => {
   const json = JSON.stringify(ModelSelector({ value: 'nope', models: MODELS }));
-  assert(json.includes('Opus 4.8'), 'first model shown as current');
+  assert(json.includes('Opus 5'), 'first model shown as current');
 });

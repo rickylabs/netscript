@@ -22,8 +22,8 @@ export const MODEL_IDS = {
   codexLuna: 'gpt-5.6-luna',
   /** Anthropic/Claude most-capable model. */
   fable: 'fable-5',
-  /** Anthropic/Claude documentation/workflow model. */
-  opus: 'opus-4.8',
+  /** Anthropic/Claude orchestration, review, documentation, and workflow model. */
+  opus: 'opus-5',
   /** Anthropic/Claude cost-efficient docs, chores, and token-limit review fallback. */
   sonnet: 'sonnet-5',
   /** Google/Antigravity CLI identifier. */
@@ -36,10 +36,10 @@ export const MODEL_IDS = {
  * Native-provider model ids in the CLI-argument spelling the rollout canary
  * passes to `provider-canary` (`claude`/`codex` `--model` args). These use the
  * provider CLIs' own dashed spelling, distinct from the routing ids in
- * `MODEL_IDS` (e.g. `claude-opus-4-8` vs the routing id `opus-4.8`).
+ * `MODEL_IDS` (e.g. `claude-opus-5` vs the routing id `opus-5`).
  */
 export const NATIVE_CANARY_MODEL_ARGS = {
-  claudeOpus: 'claude-opus-4-8',
+  claudeOpus: 'claude-opus-5',
   codex: 'gpt-5.6',
 } as const;
 
@@ -78,5 +78,5 @@ export type OpenEvaluatorModelId = typeof OPEN_EVALUATOR_MODEL_IDS[number];
 /** OpenRouter model ids invoked through the native OpenCode lane. */
 export const OPENCODE_MODEL_IDS = {
   /** Vision-capable adversarial design evaluator. */
-  visionEval: 'openrouter/moonshotai/kimi-k2.6',
+  visionEval: 'openrouter/moonshotai/kimi-k3',
 } as const;

@@ -487,7 +487,7 @@ configured `opencode` binary name on `PATH`; it never uses Windows interop or tr
 
 ```bash
 deno task agentic:opencode --message "Review this implementation" \
-  --model openrouter/moonshotai/kimi-k2.6 --variant high
+  --model openrouter/moonshotai/kimi-k3 --variant high
 
 deno task agentic:opencode-eval --prompt "Adversarially review this design" \
   -f /home/me/screens/dashboard.png -f /home/me/screens/detail.png
