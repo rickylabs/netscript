@@ -6,16 +6,17 @@
 | -------------- | --------------------------------------------------------------- |
 | Run ID         | `docs-rfc-command-composition-kit--rfc`                         |
 | Branch         | `docs/rfc-command-composition-kit`                              |
-| Current phase  | `plan`                                                          |
+| Current phase  | `rfc-authoring`                                                 |
 | Archetype      | Docs delivery describing Archetypes 1–6 implementation surfaces |
 | Scope overlays | `SCOPE-docs`, `SCOPE-service`                                   |
 
 ## Current State
 
-The run is activated on the exact requested branch/base in the sole daemon-attached Codex thread.
-Bootstrap commit `ad643e15...` is pushed by explicit refspec and draft PR #1389 is live. The full
-proposal/API/store/runtime/CLI/board re-baseline and plan gate are complete; no product code or RFC
-file has been created. S2 now authors the locked contract and semantic laws.
+The run is active on the exact requested branch/base in the sole daemon-attached Codex thread.
+Bootstrap commit `ad643e15...` and research/plan commit `e0b98f289...` were pushed by explicit
+refspec; draft PR #1389 is live at `status:plan`. The full re-baseline and plan gate are complete,
+and the RFC now carries the exact contracts, semantic laws, adapter truth, relay boundary,
+conformance plan, migration, and decomposition. No product code or export changed.
 
 ## Completed
 
@@ -28,18 +29,20 @@ file has been created. S2 now authors the locked contract and semantic laws.
 - Proved the transaction callback typing defect and typed-error defect with removed focused probes.
 - Locked future package ownership, logical row ownership, JCS hashing/codec contract, adapter
   refusal rules, worker/saga boundary, telemetry redaction, and implementation decomposition.
+- Authored `rfcs/0000-command-composition-kit.md` from the repository template, keeping `0000` and
+  `Draft` through maintainer discussion.
+- Tightened the S2 surface with attempt identity across receipt/audit/outbox, schema-backed outbox
+  codecs, deterministic scope inputs, and explicit relay retry/terminal dispositions.
 
 ## In Progress
 
-- S1 coherent research/plan commit, explicit-refspec push, plan phase comment, and status
-  transition.
+- S2 source-alignment review and coherent RFC commit/push.
 
 ## Next Steps
 
-1. Commit/push S1 and move the PR from `status:research` to `status:plan`.
-2. Author exact contracts, rows, examples, laws, matrix, failure/security/telemetry model in S2.
-3. Complete relay/conformance/migration/staging/docs/board sections in S3.
-4. Run docs/RFC gates, write `final-handoff.md`, and stop at `status:plan-eval` for root-led review.
+1. Commit/push S2 and post its implementation-phase evidence comment without starting evaluation.
+2. Run docs/RFC, source-alignment, JSR-design, diff/lock, and PR/thread gates in S3.
+3. Write `final-handoff.md`, update the PR/body, and stop at `status:plan-eval` for root-led review.
 
 ## Key Decisions
 
@@ -57,6 +60,7 @@ file has been created. S2 now authors the locked contract and semantic laws.
 | Path                                               | Status | Notes                                                     |
 | -------------------------------------------------- | ------ | --------------------------------------------------------- |
 | `.llm/runs/docs-rfc-command-composition-kit--rfc/` | new    | Mandatory harness artifacts plus staged session receipts. |
+| `rfcs/0000-command-composition-kit.md`             | new    | Draft RFC; no framework/product implementation.           |
 
 ## Gates
 

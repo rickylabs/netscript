@@ -11,8 +11,10 @@
 
 ## Design
 
-The S1 re-baseline locks the RFC contract before prose authoring. This PR remains docs-only; the
-product names below are future surfaces whose implementation is decomposed after ratification.
+The S1 re-baseline locked the RFC contract before prose authoring. S2 has now rendered those
+decisions as exact guide/reference contracts in `rfcs/0000-command-composition-kit.md`. This PR
+remains docs-only; the product names below are future surfaces whose implementation is decomposed
+after ratification.
 
 ### Public Surface
 
@@ -23,6 +25,8 @@ product names below are future surfaces whose implementation is decomposed after
 - Future opt-in `@netscript/contracts/commands` error map and existing telemetry attributes
   extension.
 - Explicit consumer-owned receipt/audit/outbox models and generated relay/command bridge.
+- One attempt-scoped `executionId` joins receipt, audit, and outbox evidence; typed codecs guard
+  replay outputs and outbox payloads.
 
 ### Domain Vocabulary
 
@@ -84,18 +88,25 @@ capabilities.
 | 2026-08-08 | S1    | runtime/store research | Compared Prisma provider isolation, PostgreSQL, SQL Server, SQLite, Deno KV, RFC 8785, W3C Trace Context, and OTel primary documents.                                                          |
 | 2026-08-08 | S1    | proposal challenge     | Found the reserved saga outbox port, dynamic service context, missing SQLite adapter, route-local oRPC error composition, and #1293 package conflation; recorded corrections in `research.md`. |
 | 2026-08-08 | S1    | plan lock              | Locked package ownership, hash/codec rules, no-weak-port/no-hidden-retry laws, telemetry redaction, adapter truth, and board decomposition; plan gate is ready.                                |
+| 2026-08-08 | S2    | RFC contract draft     | Authored the complete template-based RFC with exact service/store/contract/relay types, consumer-owned logical rows, JCS hashing, transaction algorithm, and semantic laws.                    |
+| 2026-08-08 | S2    | production review      | Added an attempt `executionId`, schema-backed outbox payloads, deterministic scope constraints, and an explicit retry/terminal relay release union after reviewing the exact contracts.        |
+| 2026-08-08 | S2    | boundary proof         | Kept remote delivery post-commit and at least once; separated the existing saga outbox and worker delivery claims from the command receipt/store guarantee.                                    |
+| 2026-08-08 | S2    | surface design         | Specified focused service/database/contracts subpaths and telemetry additions, JSR/slow-type/publish consequences, migration ownership, and staged implementation without changing exports.    |
+| 2026-08-08 | S2    | type-shape probe       | Checked a synthetic command definition against current DB types, Zod, and Standard Schema. Initial resolution exposed the missing service dependency; direct JSR import passed; probe removed. |
 
 ## Decisions
 
-| Decision                                                                                                                        | Reason                                                                                                               | Source                                               |
-| ------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
-| Keep this PR docs-only and RFC number `0000`.                                                                                   | RFC lifecycle and issue #1361 scope.                                                                                 | `rfcs/README.md`, #1361                              |
-| Use all Archetypes 1–6 as implementation-surface constraints, with docs/service overlays for this run.                          | The design crosses contracts, adapters, DSL, runtime, plugins, and CLI generators but this PR changes none of them.  | Doctrine chapter 06; harness archetypes              |
-| Do not launch evaluators or a second Codex session.                                                                             | Owner reserves review/evaluation for the root orchestrator; mobile-visible thread must remain singular.              | implementation brief; `codex-wsl-remote`             |
-| Put command semantics in service, transaction persistence in database, opt-in errors in contracts, and attributes in telemetry. | Preserves focused subpaths and one-way service → database dependency without a new package.                          | code/export re-baseline; doctrine A9–A11             |
-| Reject a weak KV command mode and automatic callback retry.                                                                     | Either all local rows share one commit or the adapter does not conform; caller retry is receipt-safe and observable. | Deno KV docs; doctrine A12–A13                       |
-| Reject read-then-compare concurrency and unknown receipt values.                                                                | CAS is repository-specific; explicit JCS fingerprints/codecs prevent races and serialization ambiguity.              | Prisma OCC docs; RFC 8785; focused API analysis      |
-| Keep remote effects outside the callback and relay stable outbox IDs at least once.                                             | SQL cannot roll back network effects; publish-then-crash can duplicate delivery.                                     | worker/saga code; OTel/W3C docs; doctrine chapter 08 |
+| Decision                                                                                                                        | Reason                                                                                                                | Source                                               |
+| ------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| Keep this PR docs-only and RFC number `0000`.                                                                                   | RFC lifecycle and issue #1361 scope.                                                                                  | `rfcs/README.md`, #1361                              |
+| Use all Archetypes 1–6 as implementation-surface constraints, with docs/service overlays for this run.                          | The design crosses contracts, adapters, DSL, runtime, plugins, and CLI generators but this PR changes none of them.   | Doctrine chapter 06; harness archetypes              |
+| Do not launch evaluators or a second Codex session.                                                                             | Owner reserves review/evaluation for the root orchestrator; mobile-visible thread must remain singular.               | implementation brief; `codex-wsl-remote`             |
+| Put command semantics in service, transaction persistence in database, opt-in errors in contracts, and attributes in telemetry. | Preserves focused subpaths and one-way service → database dependency without a new package.                           | code/export re-baseline; doctrine A9–A11             |
+| Reject a weak KV command mode and automatic callback retry.                                                                     | Either all local rows share one commit or the adapter does not conform; caller retry is receipt-safe and observable.  | Deno KV docs; doctrine A12–A13                       |
+| Reject read-then-compare concurrency and unknown receipt values.                                                                | CAS is repository-specific; explicit JCS fingerprints/codecs prevent races and serialization ambiguity.               | Prisma OCC docs; RFC 8785; focused API analysis      |
+| Keep remote effects outside the callback and relay stable outbox IDs at least once.                                             | SQL cannot roll back network effects; publish-then-crash can duplicate delivery.                                      | worker/saga code; OTel/W3C docs; doctrine chapter 08 |
+| Join receipt, audit, and outbox evidence with one attempt `executionId`.                                                        | Correlation alone is neither unique nor a reliable ownership/join key; optional unkeyed attempts still need identity. | S2 exact-row review                                  |
+| Require a schema-backed codec for each outbox payload and model terminal relay release explicitly.                              | Producer type safety and exhaustion handling cannot exist only in prose.                                              | S2 exact-port review                                 |
 
 ## Drift
 
@@ -109,14 +120,15 @@ capabilities.
 
 ### Static Gates
 
-| Gate                           | Command or check                                                           | Result               | Notes                                                                                        |
-| ------------------------------ | -------------------------------------------------------------------------- | -------------------- | -------------------------------------------------------------------------------------------- |
-| Branch/base identity           | raw git `rev-parse`, `merge-base`, `status`                                | PASS                 | Branch and base exactly match the brief.                                                     |
-| Mandatory authority read       | complete file reads                                                        | PASS                 | RFC process, doctrine, gate/evaluator files and selected profiles read before RFC authoring. |
-| Native public API inspection   | `deno doc --filter` on database, service, SDK, telemetry, workers and oRPC | PASS                 | Exact current signatures and missing subpaths recorded in research.                          |
-| Focused transaction type probe | `deno check --unstable-kv packages/database/rfc-command-probe.ts`          | EXPECTED_FAIL_MISSED | Exit 0 proves the callback surface is too broad; temporary probe removed.                    |
-| Focused typed-error probe      | `deno check --unstable-kv packages/sdk/rfc-command-probe.ts`               | EXPECTED_FAIL        | Exit 1 with TS2339 on `error.code`; temporary probe removed.                                 |
-| Docs/link/format gates         | pending S3                                                                 | NOT_RUN              | RFC drafting begins in S2.                                                                   |
+| Gate                           | Command or check                                                           | Result               | Notes                                                                                                |
+| ------------------------------ | -------------------------------------------------------------------------- | -------------------- | ---------------------------------------------------------------------------------------------------- |
+| Branch/base identity           | raw git `rev-parse`, `merge-base`, `status`                                | PASS                 | Branch and base exactly match the brief.                                                             |
+| Mandatory authority read       | complete file reads                                                        | PASS                 | RFC process, doctrine, gate/evaluator files and selected profiles read before RFC authoring.         |
+| Native public API inspection   | `deno doc --filter` on database, service, SDK, telemetry, workers and oRPC | PASS                 | Exact current signatures and missing subpaths recorded in research.                                  |
+| Focused transaction type probe | `deno check --unstable-kv packages/database/rfc-command-probe.ts`          | EXPECTED_FAIL_MISSED | Exit 0 proves the callback surface is too broad; temporary probe removed.                            |
+| Focused typed-error probe      | `deno check --unstable-kv packages/sdk/rfc-command-probe.ts`               | EXPECTED_FAIL        | Exit 1 with TS2339 on `error.code`; temporary probe removed.                                         |
+| Focused RFC type-shape probe   | `deno check --unstable-kv packages/service/rfc-command-contract-probe.ts`  | PASS_AFTER_FINDING   | First run found missing service Standard Schema mapping; direct locked import passed; probe removed. |
+| Docs/link/format gates         | pending S3                                                                 | NOT_RUN              | RFC drafting begins in S2.                                                                           |
 
 ### Fitness Gates
 

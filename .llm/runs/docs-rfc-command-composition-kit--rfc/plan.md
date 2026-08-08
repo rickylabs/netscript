@@ -6,7 +6,7 @@
 | ------------------------ | --------------------------------------------------------------------------------------------------------------------------- |
 | Run ID                   | `docs-rfc-command-composition-kit--rfc`                                                                                     |
 | Branch                   | `docs/rfc-command-composition-kit`                                                                                          |
-| Phase                    | `plan`                                                                                                                      |
+| Phase                    | `rfc-authoring`                                                                                                             |
 | Target                   | `rfcs/0000-command-composition-kit.md` plus harness evidence                                                                |
 | Delivery profile         | `SCOPE-docs` with `SCOPE-service` consumer analysis                                                                         |
 | Described implementation | A1 contracts, A2 database/telemetry adapters, A3 relay runtime, A4 service DSL, A5 thin plugin consumers, A6 CLI generators |
@@ -94,9 +94,12 @@ The RFC will specify, with compilable examples:
    append, and outbox append; every async port operation accepts cancellation.
 5. Synchronous handler recorders `audit(...)` and `publish(...)`, plus a typed `conflict()` helper;
    buffers flush before receipt completion and commit.
-6. Logical receipt/audit/outbox/relay-lease schemas and the exact unique keys/invariants.
+6. Logical receipt/audit/outbox/relay-lease schemas, a per-attempt `executionId` joining side
+   records, and the exact unique keys/invariants.
 7. An opt-in command contract error map plus the internal typed failure union and presentation map.
 8. Command span/attribute constants with exact allowed values and redaction rules.
+9. Schema-backed codecs for replay outputs and outbox payloads, plus an explicit retry/terminal
+   relay release union.
 
 ## Semantic laws to encode
 
