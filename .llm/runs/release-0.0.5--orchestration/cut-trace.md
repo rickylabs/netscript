@@ -60,14 +60,14 @@ quietly backfilled.
 
 | Time (UTC)           | Commit      | PR    | Issues closed | Classification                                         |
 | -------------------- | ----------- | ----- | ------------- | ------------------------------------------------------ |
-| 2026-08-07T06:53:30Z | `7af6d1c02` | #1341 | #1312 · #1148 | W1-A — release budget guard and generated residue scan |
-| 2026-08-07T12:54:39Z | `1455231b0` | #1342 | #1024 · #1328 | W1-B — generated quality gates own executable source   |
+| 2026-08-07T06:53:29Z | `7af6d1c02` | #1341 | #1312 · #1148 | W1-A — release budget guard and generated residue scan |
+| 2026-08-07T12:54:38Z | `1455231b0` | #1342 | #1024 · #1328 | W1-B — generated quality gates own executable source   |
 | 2026-08-07T14:37:04Z | `fc70a97d1` | #1344 | #1324 · #1330 | W1-C — OpenCode MCP attach and provider-valid resume   |
-| 2026-08-07T17:12:33Z | `fac9e3390` | #1346 | #1345         | canary.15 pinned-E2E repair, merged forward            |
-| 2026-08-08T21:27:57Z | `6c6044da9` | #1391 | none          | agentic native model routing refresh                   |
+| 2026-08-07T17:12:32Z | `fac9e3390` | #1346 | #1345         | canary.15 pinned-E2E repair, merged forward            |
+| 2026-08-08T21:27:56Z | `6c6044da9` | #1391 | none          | agentic native model routing refresh                   |
 | 2026-08-08T21:32:37Z | `bb10be0e2` | #1337 | none          | continuation orchestration artifacts                   |
-| 2026-08-08T~21:5x    | `c383b2e84` | #1347 | none          | planning-only seed roadmap (0.0.6/0.0.7 drafts)        |
-| 2026-08-08T~22:xx    | `a6b2e4c31` | #1215 | none          | docs main-pages harness evidence                       |
+| 2026-08-08T21:35:34Z | `c383b2e84` | #1347 | none          | planning-only seed roadmap (0.0.6/0.0.7 drafts)        |
+| 2026-08-08T21:43:52Z | `a6b2e4c31` | #1215 | none          | docs main-pages harness evidence                       |
 
 - **Canary.15** was published completely and its pinned production E2E
   [31196896495](https://github.com/rickylabs/netscript/actions/runs/31196896495) **failed** on two
@@ -91,3 +91,16 @@ that none of the post-canary.16 merges touches `packages/**` or `plugins/**`. Th
 `packages/fresh-ui/tests/registry/components/ui/*.test.tsx` files. #1337, #1347 and #1215 touch
 neither tree. The corrected statement: **#1391 touches `packages/**` (a bench config and three
 `fresh-ui` test files); the other three merges are run-artifact and planning content only.**
+
+## Evaluated-through marker — a recurring check, not a one-off repair
+
+`main` moved twice during this run's activation, and the plan's baseline was stale both times. A
+running milestone cannot prevent a concurrent merge; it can make staleness explicit. From here on:
+
+- Every row above carries the **committer** timestamp from `git log --first-parent --format='%cI'`,
+  converted to UTC. No approximations.
+- **Evaluated through:** `a6b2e4c31d80405d5225887cde7ab61baa2802f8`, 2026-08-08T21:43:52Z.
+- Before every wave dispatch, every canary cut, and the stable cut, re-query `origin/main`. If it
+  differs from the evaluated-through SHA, append the new first-parent rows here **first**, then
+  proceed. A dispatch or cut that runs without that append is the failure state, and it is visible
+  because this marker will disagree with `git rev-parse origin/main`.

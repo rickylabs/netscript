@@ -403,7 +403,7 @@ Three v4 rejections were reasoned from premises the evaluator falsified. Re-deci
   and is not acceptance for this milestone — so the issue and the plan agree. If that comment is
   refused, #1373 moves to 0.0.6 with #1374 rather than shipping an unprovable box.
 
-## Scope after v4.1 — 26 issues
+## Scope after v4.1 — 26 issues (corrected in v4.2 below)
 
 21 retained **−** #1126 (moves to 0.0.6: its children #1139/#1140 are open there, and `netscript-pr`
 closes an epic by hand only once every child is done) **+** #1373, #1356, #1375, #1376, #1359 (v4)
@@ -566,3 +566,82 @@ wiring that goes **stale across AppHost allocations**.
 stale-write test satisfies row 2. Rows 1, 3 and 4 map onto the two-allocation capture and the
 live-endpoint receipt it already built; row 2 maps onto its stale/persisted-endpoint RED tests. The
 lane was briefed to the opposite and must be re-steered.
+
+---
+
+# v4.2 — the cycle-2 repair (2026-08-09)
+
+Cycle 2 returned **`FAIL_PLAN`** a second time (`plan-eval-v41.md`). It confirmed BLOCKER 2 fixed,
+the expensive-gate practice sufficient without tooling, the #1373 adjudication sound, the #1343 pull
+correct, the locked module name a valid decision dependency, the W5-C GLM constraint adequate, and
+the four canary boundaries consistent with `canary-cadence.md`. What it found still wrong is below.
+Eight of nine findings are uncontested and repaired here. One is a methodological disagreement,
+stated rather than silently complied with or silently ignored, and it is the subject of the
+escalation.
+
+## Repaired
+
+**Scope arithmetic was wrong.** `21 − 1 + 5 + 2` is **27**, not 26. The enumerated groups and
+manifest also totalled 27. With #1169 moving out (below), the retained set is **26** — and now the
+count and the enumeration agree instead of coincidentally matching.
+
+**#1169 moves to 0.0.6.** Its Definition of Done requires a clean green **release cut** reaching
+publish in one pass. v4.1 substituted "one-pass publication across C17–C20 and four canary
+receipts", which is not the event the issue names — a canary is not a stable cut. Its child #1175 is
+also open in 0.0.6, and `netscript-pr` forbids hand-closing an epic before every child is done. It
+moves with #1175, and the 0.0.5 cut becomes its evidence rather than its deadline.
+
+**#1004's closure rule was non-occurrence dressed as acceptance.** "A reasoned finding that the lane
+still lacks one" is not the acceptance box; the box requires a retry that republishes only missing
+members and logs already-published ones. Corrected: only a demonstrated recovery closes it,
+otherwise it moves — which is what the row's own last column already said.
+
+**#1379's lock policy is now chosen: option (b), the frozen private lock.** v4.1 cited both options
+as proof of boundedness and selected neither, which fails the open-decision sweep. (b) is selected
+because it changes no root dependency graph during a stable cut, does not delete a lock file (repo
+doctrine forbids that without approval), and is the branch the issue's own acceptance anticipates
+("Tests cover the frozen-lock failure path if option (b) is chosen"). W4-D's brief binds to (b): a
+frozen-lock CI step for `packages/fresh-ui`, a red-first broken-type and lint-violation proof, a
+test for the frozen-lock failure path, regeneration guidance, and `git status --porcelain` empty
+after the step. If implementation finds (b) unworkable, that is a rescope to the orchestrator, not a
+switch made in the lane.
+
+**Every closure row now names an authority.** v4.1 claimed this and the table had no such column.
+
+**`phase-registry.md` is rewritten to v4.1/v4.2** — the split W3 groups, four canaries, W4-D, the
+corrected F manifest, and the milestone-move receipt as an explicit W3 predicate that reports
+`NOT_RUN` until the eight before/after live queries are recorded.
+
+**`cut-trace.md` timestamps come from `git log --format='%cI'`** rather than being approximated, and
+it now carries an **evaluated-through SHA** with the rule that any wave dispatch, canary or cut
+re-queries `origin/main` and appends new first-parent rows before proceeding. Staleness became a
+finding twice in this run; this makes it visible rather than relying on the orchestrator noticing.
+`research.md` carries a re-baseline section retiring `2508eb8c9`.
+
+**W3's dispatch sub-order.** Five groups, three lanes: **W3-A, W3-B2 (#1375), W3-B3 (#1376)** start.
+W3-B1 (#1102) enters the lane released by whichever of #1375/#1376 lands first — it is the group
+most likely to touch the corpus surface they configure. W3-C (#1119) enters the next freed lane; it
+is independent and can go last without blocking anything.
+
+## Contested — the one finding not repaired
+
+Cycle 2 requires ordered commit-slice tables with files and per-slice proving gates for **all**
+W3–W5 groups **inside the milestone plan, before this evaluation**, citing `plan-gate.md:26-27` and
+`plan-protocol.md:40`.
+
+The disagreement is about which artifact is the Plan-Gate subject for a **milestone run**, not about
+whether slice tables are required. They are required — W2 has them, in the per-group briefs, and
+each group's brief went to its own separate-session PLAN-EVAL before that group implemented (#1394
+and #1395 both hold recorded `PASS` verdicts obtained exactly that way). `milestone-run.md`
+describes the milestone plan as PR clusters, wave sequence and declared canary points; `run-loop.md`
+owns the slice-level contract, per change.
+
+Pre-specifying twelve groups' file lists and slice orders at plan time would also be re-planning
+work at its least reliable point: W3-A's slices depend on the envelope W2-B has not frozen yet, and
+W5-A's depend on decisions W4-A has not made. That is the "carried-in plans as ground truth" failure
+this run has already been bitten by once, on #1202.
+
+**This is an owner decision, not one to resolve by fiat after two failed cycles**, and it is the
+subject of the escalation recorded at `escalations/plan-gate-scope.md`. W2 continues meanwhile: it
+is authorized under the v3 `PASS` plus its own per-group PLAN-EVALs, and neither evaluation cycle
+found fault with it.
