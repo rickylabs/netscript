@@ -6,7 +6,7 @@
 | -------------- | ----------------------------------------------- |
 | Run ID         | `release-0.0.5--orchestration/slices/w2-b-1329` |
 | Branch         | `fix/streams-versioned-sse-envelope`            |
-| Current phase  | `impl — S1`                                     |
+| Current phase  | `impl — S2`                                     |
 | Archetype      | `3 — Runtime/Behavior`                          |
 | Scope overlays | `frontend`, `service`, `docs`                   |
 
@@ -16,7 +16,8 @@ PLAN-EVAL passed and S1 implements the exported `@netscript/plugin-streams-core/
 Upstream wire names remain exactly `data/control`; validated outcomes add `heartbeat/error`.
 Replay state includes the last committed opaque offset, optional observed cursor, terminal marker,
 and pending batches. Full export-map doc lint is now zero after replacing five private telemetry
-type references with explicit package-owned ports.
+type references with explicit package-owned ports. S2 adds per-write correlation/message context,
+W3C tracestate emission, and real-server/proxy conformance against the same authority.
 
 ## Completed
 
@@ -31,16 +32,19 @@ type references with explicit package-owned ports.
   implemented.
 - S1 focused tests, package test suite, scoped check/lint/fmt, direct entry checks, and full export
   doc lint are green.
+- S2 package and real-server conformance tests pass; scoped wrappers, `quality:gate`, `arch:check`,
+  full export doc lint, and package publish dry-run are green.
 
 ## In Progress
 
-- Final S1 review, detached import/publish audit, then S1 commit/push/PR comment.
+- Final S2 review, commit/push/PR comment, then Fresh/generated/docs consumer work in S3.
 
 ## Next Steps
 
-1. Commit/push/comment S1 and immediately notify the orchestrator that W3-A's type is frozen.
-2. Continue S2–S5 with one slice at a time; request serialized gate only when otherwise green.
-3. Request orchestrator-launched separate IMPL-EVAL after terminal evidence.
+1. Commit/push/comment S2.
+2. Implement Fresh 2.x/generated/native example consumers in S3.
+3. Continue S4–S5; request serialized gate only when otherwise green.
+4. Request orchestrator-launched separate IMPL-EVAL after terminal evidence.
 
 ## Key Decisions
 

@@ -95,6 +95,8 @@ service, generator, or docs file owns a second event-name/payload table.
 | 2026-08-09 | S4    | trace-host decision  | The OTEL consumer span is emitted by a Deno-side SSE consumer hosted in the isolated AppHost; the browser island separately proves the unchanged example. |
 | 2026-08-09 | S1    | contract implemented | Exported v1 schemas/parser/reducer/binding include opaque offset, cursor, terminal, malformed-frame, deletion, correlation, and W3C semantics.              |
 | 2026-08-09 | S1    | doc surface repaired | Full export-map diagnostics reduced from five private type refs to zero using explicit package-owned streams telemetry ports; no waiver added.             |
+| 2026-08-09 | S2    | producer identity    | Per-write explicit correlation/message identity wins; empty/absent values fall back to the entity key. Correlation and W3C headers are emitted on every change. |
+| 2026-08-09 | S2    | service conformance  | Real DurableStreamTestServer output through the NetScript proxy validates only through the exported authority: named arrays, ordered upsert/delete, control commit. |
 
 ## Decisions
 
@@ -133,6 +135,11 @@ service, generator, or docs file owns a second event-name/payload table.
 | S1 scoped format         | `run-deno-fmt.ts --root packages/plugin-streams-core --ext ts,tsx`                           | PASS (exit 0)                  | zero findings after targeted format.                          |
 | Full export doc lint S1  | `deno task doc:lint --root packages/plugin-streams-core --pretty`                            | PASS (exit 0)                  | zero diagnostics across four export entrypoints.              |
 | Native publish dry-run S1 | `deno publish --dry-run --no-check --allow-dirty` from package                              | PASS (exit 0)                  | No slow-type diagnostic; generic audit script counts Deno's informational heading as a warning. |
+| S2 producer/server tests  | `deno test --no-lock --allow-all packages/plugin-streams-core/tests plugins/streams/services/src/sse-contract_conformance_test.ts` | PASS (exit 0) | 17 passed, 0 failed. |
+| S2 scoped check           | `run-deno-check.ts --root packages/plugin-streams-core --root plugins/streams --ext ts,tsx --deno-arg --no-lock` | PASS (exit 0) | 76 selected; zero occurrences. |
+| S2 scoped lint/format     | corresponding repo wrappers over both roots                                                   | PASS (exit 0)                  | zero lint and format findings. |
+| Framework-wave law       | `deno task quality:gate`                                                                       | PASS (exit 0)                  | quality scan has zero findings; repository has 7 existing explicit allowances. |
+| Doctrine fitness         | `deno task arch:check`                                                                          | PASS (exit 0)                  | Existing WARN/INFO inventory only; streams exact debts remain unchanged. |
 
 ### Fitness Gates
 

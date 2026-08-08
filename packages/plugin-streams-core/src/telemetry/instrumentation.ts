@@ -146,6 +146,10 @@ export class StreamsInstrumentation {
       const headers: Record<string, string> = {
         traceparent: formatTraceparent(span.spanContext()),
       };
+      const tracestate = span.spanContext().traceState?.serialize();
+      if (tracestate) {
+        headers.tracestate = tracestate;
+      }
       input.emit(headers);
       span.setAttribute(StreamAttributes.OUTCOME, 'success');
       span.setStatus({ code: SpanStatusCode.OK });

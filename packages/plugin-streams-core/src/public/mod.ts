@@ -35,4 +35,4 @@ export type {
   StreamStateDefinition,
 } from '../domain/stream-schema.ts';
 export type { ChangeEvent, ControlEvent, Operation, StateEvent } from '../domain/stream-event.ts';
-export type { StreamProducerPort } from '../ports/stream-producer-port.ts';
+export type { StreamProducerPort, StreamWriteContextV1 } from '../ports/stream-producer-port.ts';
