@@ -124,3 +124,11 @@ Run-artifact contract: `worklog.md` and this `evaluate.md` were committed with t
 | --------- | ----- |
 | Verdict   | **PASS** |
 | Rationale | All eight owner routing decisions are enforced in `CANONICAL_ROUTE_POLICY` + `resolveCanonicalFormalEvaluatorRoute()` with green machine assertions (40/40), all cycle-1 findings (F-1, F-2, F-3, N-1) are verified fixed on the live PR head `8f2bf4052`, mirrors are regenerated and byte-identical, historical evidence and benchmark pins remain intact, and no active stale routing survives an unfiltered rescan. Evaluated in a separate native Fable 5 medium session per the native-first evaluator route this PR itself codifies. Ready for coordinator sign-off and PR lifecycle. |
+
+## CI follow-up evaluation — cycle 3 (2026-08-08)
+
+Native Fable 5 medium independently reviewed commit `2ab645010`. The follow-up changes only the
+read-only routing-state snapshot and worklog; all four added rows match `CANONICAL_ROUTE_POLICY`
+order, agent/provider/model, and effort exactly. Focused test: 2 passed, 0 failed;
+`git diff --check fca75aa29..HEAD`: clean. Verdict: **PASS** — no production behavior changed or
+weakened.
