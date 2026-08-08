@@ -8,7 +8,7 @@
 | Branch                        | `docs/rfc-sdk-client-contribution`                                                            |
 | Base                          | `origin/main` at `fac9e339042c5394bf882311657d8981d353a1c3`                                   |
 | Formal cycle-1 verdict        | `FAIL_PLAN / CHANGES_REQUESTED`; `plan-eval.md` at `f1a29fe1a65d59f71a59bf4b6b2a48fc49e1e86f` |
-| Reviewable remediation commit | `REMEDIATION_COMMIT_PENDING`                                                                  |
+| Reviewable remediation commit | `78a7cecd1d5eaafa7a65bc25a21af497567128dc`                                                    |
 | RFC                           | `rfcs/0000-sdk-client-contributions.md` (`0000`, Draft)                                       |
 | Run dir                       | `.llm/runs/docs-rfc-sdk-client-contribution--rfc/`                                            |
 | Requested lifecycle           | exactly one `status:plan-eval` after push                                                     |
@@ -62,7 +62,7 @@ implementation, and upstream-major-neutral public/generated RFC-A declarations.
 | Repository docs links/accuracy | PASS — 102 documents/0 broken; accuracy PASS                           |
 | Doctrine                       | PASS — `deno task arch:check` exit 0; warning-only baseline unchanged  |
 | Diff hygiene                   | PASS — `git diff --check`                                              |
-| Review threads                 | `VALIDATION_PENDING`                                                   |
+| Review threads                 | PASS — 0 total / 0 unanswered                                          |
 | Git/PR metadata                | `VALIDATION_PENDING`                                                   |
 
 No CLI/scaffold runtime E2E is appropriate for this RFC-only change; implementation stages retain

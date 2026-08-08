@@ -192,6 +192,7 @@ considered complete.
 | 2026-08-08 | 5     | type fixture       | Added the in-tree compile-only real-surface fixture covering current defaults, contract recursion, contribution-aware results, exact 3/5 server keys, conflicts, and 16/17 limits.                                                      |
 | 2026-08-08 | 5     | design remediation | Scoped the zero-upstream gate; completed key/default/reconnect/Desktop/private-port/context laws; corrected v2 GET/OTel/lock gates; reconciled #1350 Stage 1a versus metadata Stage 1b.                                                 |
 | 2026-08-08 | 5     | focused validation | Targeted Markdown/TypeScript format, fixture lint/check, focused and 102-document links, docs accuracy, doctrine, and diff hygiene all exit 0; warning-only doctrine/dependency baseline is unchanged.                                  |
+| 2026-08-08 | 5     | remediation commit | Committed the RFC, in-tree type fixture, and author-owned harness correction as `78a7cecd1d5eaafa7a65bc25a21af497567128dc`.                                                                                                             |
 
 ## Decisions
 

@@ -154,5 +154,6 @@ milestones. Findings should cite RFC headings and classify blocking versus safe 
 - Handoff baseline: `e78ac0a65f5475ed37152272b16ba7d89deca8c3`.
 - Audit amendment: `7a0d398087a6608ff1a55bb9fe4c47158edb72a7`.
 - Formal evaluator artifact: `f1a29fe1a65d59f71a59bf4b6b2a48fc49e1e86f`.
-- Cycle-1 remediation and final handoff commits are recorded here after creation; the PR comment
-  records the final pushed HEAD because an artifact cannot contain its own commit id.
+- Cycle-1 remediation: `78a7cecd1d5eaafa7a65bc25a21af497567128dc`.
+- The final handoff commit is recorded here after creation; the PR comment records the final pushed
+  HEAD because an artifact cannot contain its own commit id.
