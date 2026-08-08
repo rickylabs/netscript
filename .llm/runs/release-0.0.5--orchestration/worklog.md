@@ -635,3 +635,53 @@ not the intention.
 No provider quota exhaustion is in force: the v3-era OpenRouter monthly limit that blocked T1-A
 (C-D18) is not on this run's critical path, because v4's formal evaluator lane is native
 opposite-family and OpenRouter is escalation-only.
+
+---
+
+## Milestone-move receipt — executed 2026-08-09, W3 dispatch predicate
+
+Executed only after PLAN-EVAL cycle 5 returned `PASS`, per the v4.1 sequencing rule. Before and
+after are live `gh issue view --json milestone,state` queries, not inferred.
+
+| Issue | Before       | After            | Direction |
+| ----- | ------------ | ---------------- | --------- |
+| #1373 | 0.0.6 / OPEN | **0.0.5** / OPEN | inbound   |
+| #1356 | 0.0.7 / OPEN | **0.0.5** / OPEN | inbound   |
+| #1375 | 0.0.6 / OPEN | **0.0.5** / OPEN | inbound   |
+| #1376 | 0.0.6 / OPEN | **0.0.5** / OPEN | inbound   |
+| #1359 | 0.0.7 / OPEN | **0.0.5** / OPEN | inbound   |
+| #1343 | 0.0.6 / OPEN | **0.0.5** / OPEN | inbound   |
+| #1379 | 0.0.6 / OPEN | **0.0.5** / OPEN | inbound   |
+| #1126 | 0.0.5 / OPEN | **0.0.6** / OPEN | outbound  |
+| #1169 | 0.0.5 / OPEN | **0.0.6** / OPEN | outbound  |
+
+Nine of nine. The set matches the nine IDs the receipt enumerates, so the predicate reads
+**`passed`** rather than `MISMATCH`.
+
+**Independent confirmation:** live 0.0.5 open-issue count after the moves is **26**, matching the
+plan's declared scope exactly — `21 − 2 + 7 = 26`. The count and the enumeration agree, which is the
+property cycle 3 found missing when they matched only by coincidence.
+
+Both outbound moves carry a written reason **on the issue**, per the honesty rule: #1126 because an
+epic cannot hand-close while #1139/#1140 are open in 0.0.6, and #1169 because its Definition of Done
+names a release cut that 0.0.5 has not reached and its child #1175 is open in 0.0.6. Moving #1169
+makes the 0.0.5 cut its evidence rather than its deadline.
+
+**W3's dispatch predicate is now satisfied.** It remains held on C17 and, for W3-A, on W2-B's frozen
+envelope.
+
+## PLAN-EVAL — final verdict
+
+Five cycles on the milestone plan, all in the same separate Codex · GPT-5.6 Sol · high session
+(opposite family to the Claude generator):
+
+| Cycle | Verdict     | What it caught                                                                                                                                                                                         |
+| ----- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1     | `FAIL_PLAN` | false re-baseline (a `packages/**` claim contradicted by `git show`), unmaintained cut-trace, W3-B folded against #1376's own boundary, incomplete closure manifest                                    |
+| 2     | `FAIL_PLAN` | scope arithmetic, #1169's unclosable DoD, #1004 closable by non-occurrence, missing authority column, #1379's unchosen lock policy, stale phase registry, approximate timestamps, missing W3 sub-order |
+| 3     | `FAIL_PLAN` | a claimed authority column that did not exist; superseded manifest rows left live with stage F still pointing at them; a receipt that could never read `passed`                                        |
+| 4     | `FAIL_PLAN` | four closure rows whose events could occur while the issue stayed acceptance-incomplete; #1208 Phase 2 with no non-occurrence path                                                                     |
+| **5** | **`PASS`**  | no surviving findings; regression check confirmed the repair touched only the four rows                                                                                                                |
+
+The gate earned its cost. Every cycle found something checkable, and cycles 1 and 4 each caught an
+error that would have closed or blocked an issue against its own acceptance contract.
