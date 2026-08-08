@@ -69,6 +69,7 @@ shared E2E enumeration so every provider scenario proves real health.
 | 2026-08-09 | S4 | serialized runtime verdict | Granted one-pass suite exited 0 with `passed=76 failed=0`; workers, sagas, and triggers runtime health gates all executed and passed. |
 | 2026-08-09 | S4 | cleanup/review | Post-run leak report shows no Aspire or W2-A-owned survivor; known foreign `redis-jfgcbtaf` untouched. Review threads exit 0, 0 unanswered. |
 | 2026-08-09 | close-out | IMPL-EVAL PASS | Separate Claude/Fable evaluator falsified the Redis probe and verified the 76-gate arithmetic; Deno KV live-AppHost narrowing recorded in `drift.md`, and the probe's `resetKv()` registry dependency documented. |
+| 2026-08-09 | CI repair | runtime wait ordering | Current-head repo-wide test exposed grouped `runtimeResources` versus interleaved capability order. One derived interleaved sequence now comes from `KV_BACKGROUND_RUNTIME_RESOURCES` and feeds both consumers; the independent resolved-suite comparison remains intact. |
 
 ## Gate Results
 
@@ -93,6 +94,9 @@ shared E2E enumeration so every provider scenario proves real health.
 | post-DenoKV refresh | triggers scoped check/lint/fmt + `quality:gate` | PASS (exit 0 each) | zero scoped findings; repository quality findings remain zero. |
 | Tier-A review fix | focused triggers generated-resource suite | PASS (exit 0) | 10 passed; `.tmp/` retains plugin module resolution and is ignored outside publish include. |
 | IMPL-EVAL close-out | focused triggers generated-resource suite | PASS (raw exit 0) | 10 passed after documenting the RED probe's empty-registry dependency; no runtime gate re-run. |
+| CI repair: suite registry | `deno test --allow-all packages/cli/e2e/tests/presentation/suite-registry_test.ts` | PASS (raw exit 0) | 16 passed, 0 failed; pre-fix reproduction was raw exit 1 with 15 passed, 1 failed. |
+| CI repair: runtime builders | `deno test --allow-all packages/cli/e2e/tests/application/builders/runtime-gates_test.ts` | PASS (raw exit 0) | 14 passed, 0 failed; pins the authority enumeration and derived interleaved order. |
+| CI repair: focused format | `deno fmt --check` over the four changed CLI E2E TypeScript files | PASS (raw exit 0) | 4 files checked; no mutation. |
 
 ### Runtime Gates
 
@@ -116,3 +120,5 @@ shared E2E enumeration so every provider scenario proves real health.
 - `_shared-brief-contract.md` is missing locally; the owner brief's inlined contract and drift note
   remain the authority for this slice.
 - The orchestrator owns the pre-merge gate and merge. This implementation session does neither.
+- Current-head CI repair preserves the pre-existing interleaved API/runtime wait order and does not
+  rerun the serialized runtime gate.

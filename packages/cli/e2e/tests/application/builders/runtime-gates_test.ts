@@ -4,6 +4,7 @@ import {
   ASPIRE_RESOURCE,
   GATE,
   KV_BACKGROUND_RUNTIME_RESOURCES,
+  KV_BACKGROUND_RUNTIME_WAIT_RESOURCES,
 } from '../../../src/domain/cli-surface.ts';
 import { PORT_RANGES } from '../../../../src/kernel/constants/port-ranges.ts';
 import { allocateScaffoldDefaultPort } from '../../../../src/kernel/domain/scaffold/default-port-allocation.ts';
@@ -196,6 +197,14 @@ Deno.test('runtime gates enumerate every KV-backed first-party background runtim
   assertEquals(KV_BACKGROUND_RUNTIME_RESOURCES, [
     ASPIRE_RESOURCE.WORKERS,
     ASPIRE_RESOURCE.SAGAS,
+    ASPIRE_RESOURCE.TRIGGERS,
+  ]);
+  assertEquals(KV_BACKGROUND_RUNTIME_WAIT_RESOURCES, [
+    ASPIRE_RESOURCE.WORKERS_API,
+    ASPIRE_RESOURCE.WORKERS,
+    ASPIRE_RESOURCE.SAGAS_API,
+    ASPIRE_RESOURCE.SAGAS,
+    ASPIRE_RESOURCE.TRIGGERS_API,
     ASPIRE_RESOURCE.TRIGGERS,
   ]);
 

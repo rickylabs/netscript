@@ -4,6 +4,7 @@ import {
   GATE,
   GATE_PHASE,
   KV_BACKGROUND_RUNTIME_RESOURCES,
+  KV_BACKGROUND_RUNTIME_WAIT_RESOURCES,
 } from '../../../domain/cli-surface.ts';
 import { DATABASE, type DatabaseEngine, PACKAGE_SOURCE } from '../../../domain/extension-axes.ts';
 import type { GateDefinition } from '../../../domain/gate-definition.ts';
@@ -519,10 +520,7 @@ export function runtimeResources(database: DatabaseEngine): readonly AspireResou
   return [
     ...databaseRuntimeResources(database),
     ASPIRE_RESOURCE.GARNET,
-    ASPIRE_RESOURCE.WORKERS_API,
-    ASPIRE_RESOURCE.SAGAS_API,
-    ASPIRE_RESOURCE.TRIGGERS_API,
-    ...KV_BACKGROUND_RUNTIME_RESOURCES,
+    ...KV_BACKGROUND_RUNTIME_WAIT_RESOURCES,
     ASPIRE_RESOURCE.AUTH,
     ASPIRE_RESOURCE.STREAMS,
     // Last: the app depends on everything above and is the slowest to first render.

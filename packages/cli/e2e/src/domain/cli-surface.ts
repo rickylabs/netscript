@@ -199,6 +199,11 @@ export const KV_BACKGROUND_RUNTIME_RESOURCES = [
   ASPIRE_RESOURCE.SAGAS,
   ASPIRE_RESOURCE.TRIGGERS,
 ] as const satisfies readonly AspireResource[];
+
+/** API and background resources in stable runtime-wait execution order. */
+export const KV_BACKGROUND_RUNTIME_WAIT_RESOURCES = KV_BACKGROUND_RUNTIME_RESOURCES.flatMap(
+  (runtime) => [`${runtime}-api` as const, runtime],
+) satisfies readonly AspireResource[];
 export type PluginGateId = `scaffold.plugin.${PluginKind}`;
 export type RuntimeWaitGateId = `runtime.wait.${AspireResource}`;
 export type GateId = StaticGateId | PluginGateId | RuntimeWaitGateId;
