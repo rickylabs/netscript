@@ -13,6 +13,7 @@ export const runtimeGlueStub: StubSource<never> = defineStub({
     ' * @module',
     ' */',
     '',
+    "import '@netscript/kv/redis';",
     "import { startCombinedProcess } from '@netscript/plugin-triggers/runtime';",
     '',
     'if (import.meta.main) {',

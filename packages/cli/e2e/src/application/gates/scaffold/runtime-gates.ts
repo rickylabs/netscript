@@ -3,6 +3,8 @@ import {
   type AspireResource,
   GATE,
   GATE_PHASE,
+  KV_BACKGROUND_RUNTIME_RESOURCES,
+  KV_BACKGROUND_RUNTIME_WAIT_RESOURCES,
 } from '../../../domain/cli-surface.ts';
 import { DATABASE, type DatabaseEngine, PACKAGE_SOURCE } from '../../../domain/extension-axes.ts';
 import type { GateDefinition } from '../../../domain/gate-definition.ts';
@@ -19,6 +21,8 @@ const ASPIRE_RESOURCE_WAIT_TIMEOUT_SECONDS: Partial<
   // server's cold start and first render — not just the process reaching `Running`.
   [ASPIRE_RESOURCE.APP]: 300,
 };
+
+const KV_BACKGROUND_RUNTIME_WAIT_TIMEOUT_SECONDS = 300;
 
 /** A feed stall gets three short chances instead of consuming two suite-wide 15-minute budgets. */
 export const ASPIRE_RESTORE_ATTEMPT_TIMEOUT_MS = 180_000;
@@ -95,7 +99,9 @@ function runtimeWaitGate(resource: AspireResource): GateDefinition {
         '--non-interactive',
         '--nologo',
       ];
-      const timeoutSeconds = ASPIRE_RESOURCE_WAIT_TIMEOUT_SECONDS[resource];
+      const timeoutSeconds = isKvBackgroundRuntime(resource)
+        ? KV_BACKGROUND_RUNTIME_WAIT_TIMEOUT_SECONDS
+        : ASPIRE_RESOURCE_WAIT_TIMEOUT_SECONDS[resource];
       if (timeoutSeconds !== undefined) {
         command.splice(
           3,
@@ -514,17 +520,16 @@ export function runtimeResources(database: DatabaseEngine): readonly AspireResou
   return [
     ...databaseRuntimeResources(database),
     ASPIRE_RESOURCE.GARNET,
-    ASPIRE_RESOURCE.WORKERS_API,
-    ASPIRE_RESOURCE.WORKERS,
-    ASPIRE_RESOURCE.SAGAS_API,
-    ASPIRE_RESOURCE.SAGAS,
-    ASPIRE_RESOURCE.TRIGGERS_API,
-    ASPIRE_RESOURCE.TRIGGERS,
+    ...KV_BACKGROUND_RUNTIME_WAIT_RESOURCES,
     ASPIRE_RESOURCE.AUTH,
     ASPIRE_RESOURCE.STREAMS,
     // Last: the app depends on everything above and is the slowest to first render.
     ASPIRE_RESOURCE.APP,
   ];
+}
+
+function isKvBackgroundRuntime(resource: AspireResource): boolean {
+  return (KV_BACKGROUND_RUNTIME_RESOURCES as readonly AspireResource[]).includes(resource);
 }
 
 const VALIDATE_AI_CHAT_ROUTE_SCRIPT = [
