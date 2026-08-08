@@ -399,3 +399,33 @@ No AppHost or runtime suite was started for this repair. The fifth-pass failure 
 rows 1, 3, and 4 stay unchecked pending a granted run that produces the correlated receipt.
 
 EXPENSIVE-GATE-REQUEST
+
+## Sixth serialized runtime verdict — 2026-08-09
+
+The sixth grant was consumed by exactly one runtime invocation at head `5aebbf4cb`. All four
+decisive gates passed in the same run, including the live structured-log/OTEL comparison for the
+first time.
+
+| Step                  | Exact command / artifact                                                                                                                          | Raw exit | Full verdict                                                                                                                        |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | -------: | ----------------------------------------------------------------------------------------------------------------------------------- |
+| Preflight leak check  | `deno task agentic:leak-check -- --slice-dir .llm/runs/release-0.0.5--orchestration/slices/w2-c-1202-1327 --worktree /home/codex/repos/ns005-w2c` |        0 | No W2-C-owned or unknown survivor. Known foreign `redis-jfgcbtaf`, owned by `/home/codex/repos/w6-review-desk`, was left untouched. |
+| Serialized suite      | `deno task e2e:cli run scaffold.runtime --cleanup --format pretty`                                                                                |        0 | `Summary: passed=80 failed=0`; `cleanup.aspire-stop` passed.                                                                        |
+| Postflight leak check | same command as preflight                                                                                                                         |        0 | Artifact proves no W2-C-owned or unknown survivor; only the same untouched foreign container remains. No teardown needed.           |
+| Review threads        | `deno task agentic:review-threads -- --repo rickylabs/netscript --pr 1393 --pretty`                                                               |        0 | `review-threads PASS rickylabs/netscript#1393 threads=0 unanswered=0`                                                               |
+
+### Four decisive gates in the same run
+
+- `database.migration-artifacts` — **PASSED**, 41,128 ms.
+- `runtime.capture-db-allocation-first` — **PASSED**, 656 ms.
+- `runtime.capture-db-allocation-second` — **PASSED**, 477 ms.
+- `behavior.live-db-endpoint` — **PASSED**, 537 ms. Structural endpoint comparison and documented
+  health validation passed. The shared dashboard reader returned users structured logs and OTEL
+  traces; correlation found a trace ID present in both sets, and the gate wrote its receipt. The
+  comparison did not pass on empty telemetry. The subsequent Flow-B stream, grouped trace, and
+  detached task trace gates also passed.
+
+All four #1202 rows are now truthfully satisfied: first and second allocations are distinct and
+matched, users health is green, the stale persistence mechanism is identified RED-first, and the
+receipt requires health JSON plus a shared structured-log/OTEL trace ID. #1327's TTY/non-TTY
+migration artifact gate is also green in this run. The token is released green for separate-session
+IMPL-EVAL handoff.

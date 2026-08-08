@@ -15,7 +15,7 @@ bind the live Postgres allocation across consecutive AppHost starts.
 - [x] S2 implement migration artifact and applied-state semantics
 - [x] S3 add TTY/non-TTY generated-project migration E2E controls
 - [x] S4 prove two-allocation live Postgres/users health and telemetry identity
-- [ ] S5 complete gates and separate-session IMPL-EVAL handoff
+- [x] S5 complete gates and separate-session IMPL-EVAL handoff
 
 ## Validation
 
@@ -70,8 +70,11 @@ bind the live Postgres allocation across consecutive AppHost starts.
   structured logs and OTEL traces. Mismatch output names both ID sets and candidate spans. Contract
   RED exited 1; focused green exited 0 with 47 passed, 0 failed. Scoped check/lint/format,
   `quality:gate`, and `arch:check` exit 0.
-- Sixth serialized pass requested but not run. Rows 1, 3, and 4 remain unchecked pending the
-  complete receipt; row 2 remains checked.
+- Sixth `scaffold.runtime`: raw exit 0, `passed=80 failed=0`. All four decisive gates passed in the
+  same run. `behavior.live-db-endpoint` reached comparison, found a trace ID shared by non-empty
+  users structured logs and OTEL traces, and wrote the endpoint/health/telemetry receipt. The
+  following Flow-B stream, grouped trace, and detached task telemetry gates also passed. Pre/post
+  leak artifacts show no W2-C-owned or unknown survivor; review threads pass 0/0.
 
 ## Harness
 
@@ -89,22 +92,22 @@ bind the live Postgres allocation across consecutive AppHost starts.
 
 ### #1202 acceptance
 
-- [ ] Fresh users service matches the first live Postgres allocation and reports database health.
+- [x] Fresh users service matches the first live Postgres allocation and reports database health.
 - [x] Persisting mechanism identified RED-first: eager `getEndpoint("tcp")` materialization
       serializes one allocation into `DATABASE_URL`; the guard requires lazy
       `infrastructure.primaryDatabase` binding.
-- [ ] A second consecutive AppHost allocation remains matched and healthy.
-- [ ] Health JSON plus a shared trace ID across structured logs and OTEL prove the live receipt.
+- [x] A second consecutive AppHost allocation remains matched and healthy.
+- [x] Health JSON plus a shared trace ID across structured logs and OTEL prove the live receipt.
 
 ### Slice completion
 
 - [x] `db migrate` success names and verifies created migration files and applied database state.
 - [x] Headless inability to create a migration fails non-zero with an actionable next command.
 - [x] `db deploy` is the only deploy-only verb and output separates created/applied sets.
-- [ ] TTY and non-TTY schema-change E2E proves files and database state, with deploy/no-change
+- [x] TTY and non-TTY schema-change E2E proves files and database state, with deploy/no-change
       controls.
-- [ ] Two consecutive starts prove users receives the live Postgres allocation via health, logs, and
+- [x] Two consecutive starts prove users receives the live Postgres allocation via health, logs, and
       OTEL.
-- [ ] Required static, quality, doctrine, publish, resource-health, and serialized runtime gates
+- [x] Required static, quality, doctrine, publish, resource-health, and serialized runtime gates
       pass.
 - [ ] Separate-session IMPL-EVAL passes.

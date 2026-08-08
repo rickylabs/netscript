@@ -2,12 +2,12 @@
 
 ## Current phase
 
-The live-DB telemetry gate now reuses the suite's working detached-dashboard path: start metadata,
-direct dashboard HTTP, the package-owned `AspireTelemetryQuery`, and bounded polling. The OTLP
-trace/log envelope adapter was extracted from the existing Flow-B validator so both gates use one
-implementation. Focused RED/green, scoped wrappers, `quality:gate`, and `arch:check` pass. The
-literal sixth-pass `EXPENSIVE-GATE-REQUEST` is recorded; no AppHost was started. Only #1202 row 2
-remains checked until a granted run produces endpoint, health, structured-log, and OTEL evidence.
+Sixth serialized pass completed green with raw exit 0 and `passed=80 failed=0`. Migration artifacts,
+both allocation captures, endpoint authority, documented users database health, and a shared trace
+ID across structured logs and OTEL traces all passed in the same run. Pre/post leak artifacts prove
+no W2-C-owned or unknown survivor; review threads pass 0/0. All #1202 acceptance rows and #1327's
+runtime artifact acceptance are now checked. PR #1393 remains draft at `status:impl-eval`; the
+orchestrator must launch the separate Fable 5 evaluation.
 
 ## Identity
 

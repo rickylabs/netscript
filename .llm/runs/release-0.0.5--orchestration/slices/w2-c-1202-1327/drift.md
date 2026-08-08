@@ -127,3 +127,13 @@
   OTEL traces. Failure prints both ID sets and every candidate span name grouped by trace.
 - Negative boundary: stale endpoint authority still fails before telemetry, and focused mismatch
   coverage proves non-correlated telemetry cannot pass.
+
+## 2026-08-09 — shared dashboard telemetry receipt proven (resolved)
+
+- Sixth serialized run raw exit 0, `passed=80 failed=0`.
+- The live-DB gate reached trace comparison, received non-empty users log and trace sets, found a
+  shared trace ID, and wrote the health/endpoint/telemetry receipt.
+- Flow-B stream correlation, grouped traces, and detached task telemetry also passed through the
+  consolidated dashboard path in the same run.
+- #1202 rows 1, 3, and 4 can now join the already-checked row 2; no telemetry reachability deferral
+  to 0.0.6 is required.
