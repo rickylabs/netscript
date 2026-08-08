@@ -68,6 +68,7 @@ shared E2E enumeration so every provider scenario proves real health.
 | 2026-08-09 | Tier-A fix | publish-safe probe scratch | Moved emitted test modules from publishable `src/` into plugin-local ignored `.tmp/`; focused suite exit 0, 10/10. |
 | 2026-08-09 | S4 | serialized runtime verdict | Granted one-pass suite exited 0 with `passed=76 failed=0`; workers, sagas, and triggers runtime health gates all executed and passed. |
 | 2026-08-09 | S4 | cleanup/review | Post-run leak report shows no Aspire or W2-A-owned survivor; known foreign `redis-jfgcbtaf` untouched. Review threads exit 0, 0 unanswered. |
+| 2026-08-09 | close-out | IMPL-EVAL PASS | Separate Claude/Fable evaluator falsified the Redis probe and verified the 76-gate arithmetic; Deno KV live-AppHost narrowing recorded in `drift.md`, and the probe's `resetKv()` registry dependency documented. |
 
 ## Gate Results
 
@@ -91,6 +92,7 @@ shared E2E enumeration so every provider scenario proves real health.
 | lock hygiene | raw status + `git diff --exit-code c383b2e84 -- deno.lock` | PASS (exit 0) | no lock or unrelated churn. |
 | post-DenoKV refresh | triggers scoped check/lint/fmt + `quality:gate` | PASS (exit 0 each) | zero scoped findings; repository quality findings remain zero. |
 | Tier-A review fix | focused triggers generated-resource suite | PASS (exit 0) | 10 passed; `.tmp/` retains plugin module resolution and is ignored outside publish include. |
+| IMPL-EVAL close-out | focused triggers generated-resource suite | PASS (raw exit 0) | 10 passed after documenting the RED probe's empty-registry dependency; no runtime gate re-run. |
 
 ### Runtime Gates
 
@@ -108,5 +110,9 @@ shared E2E enumeration so every provider scenario proves real health.
 
 ## Handoff Notes
 
-- PLAN-EVAL should first challenge the behavioral RED seam and the exact KV-runtime enumeration.
-- `_shared-brief-contract.md` is missing locally; use the owner brief's inlined contract and drift note.
+- PLAN-EVAL and separate-session IMPL-EVAL both passed; the latter is recorded in PR #1394 comment
+  `5228627533`. Its full `evaluate.md` remains orchestrator-owned and is not present in this
+  worktree.
+- `_shared-brief-contract.md` is missing locally; the owner brief's inlined contract and drift note
+  remain the authority for this slice.
+- The orchestrator owns the pre-merge gate and merge. This implementation session does neither.

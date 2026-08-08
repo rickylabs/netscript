@@ -148,6 +148,8 @@ Deno.test('generated triggers runtime activates the selected Redis adapter', asy
   const path = await makeGeneratedRuntimeTempFile('generated-triggers-runtime-');
 
   try {
+    // RED depends on this module graph having no static @netscript/kv/redis import: resetKv()
+    // resets active state but does not clear adapterRegistry, so such an import would defuse it.
     await resetKv();
     Deno.env.set('CACHE_PROVIDER', 'redis');
     Deno.env.set('REDIS_URI', 'redis://127.0.0.1:6379');

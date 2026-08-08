@@ -6,16 +6,16 @@
 | --- | --- |
 | Run ID | `release-0.0.5--orchestration/slices/w2-a-1325` |
 | Branch | `fix/triggers-generated-kv-adapter-bootstrap` |
-| Current phase | `implement` |
+| Current phase | `close` |
 | Archetype | `5 — Plugin Package` |
 | Scope overlays | `service` |
 
 ## Current State
 
-S1–S3 implementation is landed, generated-workspace probes cover Redis registration and real Deno
-KV set/get, and all gates are green. The granted exact one-pass `scaffold.runtime` exited 0 with
-76 passed/0 failed; workers, sagas, and triggers health gates all executed. Post-run leak-check
-proves no W2-A AppHost/container survived.
+Implementation, gates, Tier-A review, and the separate Claude/Fable IMPL-EVAL are complete and
+green. Generated-workspace probes cover Redis registration and real Deno KV set/get. The granted
+exact one-pass `scaffold.runtime` exited 0 with 76 passed/0 failed; workers, sagas, and triggers
+health gates all executed. Post-run leak-check proves no W2-A AppHost/container survived.
 
 Tier-A review finding fixed: generated probe files now use ignored `plugins/triggers/.tmp/`, outside
 the plugin's `src/**/*.ts` publish include, without changing module resolution.
@@ -29,13 +29,13 @@ the plugin's `src/**/*.ts` publish include, without changing module resolution.
 
 ## In Progress
 
-- S1 RED behavioral invariant.
+- Close-gate evidence mirroring and lifecycle transition to `status:ready-merge`.
 
 ## Next Steps
 
-1. Commit/push/comment final gate evidence.
-2. Add truthful `Closes #1325` acceptance mapping and move issue/PR to `status:impl-eval`.
-3. Release token and ask orchestrator to launch the separate Claude/Fable IMPL-EVAL.
+1. Tick #1325 acceptance through the fenced evidence mirror.
+2. Move issue/PR to `status:ready-merge`.
+3. Orchestrator runs the pre-merge gate and merge; this lane stops.
 
 ## Key Decisions
 
@@ -47,22 +47,26 @@ the plugin's `src/**/*.ts` publish include, without changing module resolution.
 
 ## Files Changed
 
-Only this slice's harness artifacts are changed during plan bootstrap.
+- Trigger generated-runtime glue and its behavioral resource tests.
+- CLI E2E KV-background-runtime enumeration and healthy-wait wiring.
+- Slice harness evidence and plugin-local `.tmp/` ignore surface.
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Plan | pending separate PLAN-EVAL | `research.md`, `plan.md`, `worklog.md` Design |
-| Static/Fitness/Runtime/Consumer | NOT_RUN | implementation has not begun |
+| Plan | PASS | Separate PLAN-EVAL comment `5228434053` |
+| Static/Fitness/Runtime/Consumer | PASS | See `worklog.md`; serialized suite 76/0 |
+| Separate IMPL-EVAL | PASS | PR #1394 comment `5228627533` |
 
 ## Open Questions
 
-- PLAN-EVAL must confirm the exact runtime enumeration and behavioral RED strategy.
+- None within W2-A scope.
 
 ## Drift and Debt
 
-- Drift: stale prepared supervisor identity/evaluator and missing shared-contract file path.
+- Drift: stale prepared supervisor identity/evaluator, missing shared-contract file path, and the
+  Deno KV live-AppHost narrowing with its defect-specific rationale.
 - Debt: existing triggers verification-shape and connector convergence accepted; neither deepened.
 
 ## Commits
