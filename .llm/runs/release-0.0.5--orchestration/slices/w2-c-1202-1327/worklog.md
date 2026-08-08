@@ -192,3 +192,28 @@ after failure there was no retry and no implementation repair.
 
 The serialized token is released with a failing verdict. Per the grant, no blind retry or repair was
 started in this turn.
+
+## Third serialized grant — PTY spawn repair
+
+Tier-A identified the failure as an inherited-stream getter bug and granted one fresh pass at the
+fixed head.
+
+| Phase | Command | Raw exit | Result |
+| --- | --- | ---: | --- |
+| Contract RED | `deno test --no-lock --allow-all packages/database/tests/migrate-retry_test.ts` | 1 | `defaultPrismaSpawn` was not exported to the new unit seam |
+| Behavioral RED | same command after adding only the injectable output runner | 1 | interactive test reproduced `TypeError: Cannot get 'stderr': 'stderr' is not piped` at `migrate.ts` |
+| Focused green | `deno test --no-lock --allow-all packages/database/tests/migrate-retry_test.ts packages/database/tests/migrate-artifacts_test.ts` | 0 | 5 tests / 10 steps passed |
+| Scoped check | database wrapper with `--deno-arg --no-lock` | 0 | 22 files, zero diagnostics |
+| Scoped lint | database wrapper | 0 | 22 files, zero diagnostics |
+| Scoped format | database wrapper | 0 | 22 files, zero findings |
+| Framework law | `deno task quality:gate` | 0 | quality scan and doctrine gate passed; pre-existing warnings only |
+
+The fix reads `output.code` and returns immediately for interactive commands. Only the
+non-interactive branch reads, mirrors, and decodes piped stderr. `runCommandWithTimeout` is
+explicitly documented as reachable only for non-interactive commands with piped stderr.
+
+### #1202 scope reconcile
+
+The orchestrator withdrew the inherited owner-machine boundary after re-reading the issue and
+measuring the host. PR #1393 now closes #1202 as well as #1327. The four #1202 acceptance rows are
+not claimed from this focused test; they await the named runtime gates in the third serialized pass.

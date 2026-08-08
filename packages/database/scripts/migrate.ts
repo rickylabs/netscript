@@ -134,13 +134,29 @@ export type PrismaSpawn = (
   options: PrismaSpawnOptions,
 ) => Promise<PrismaSpawnResult>;
 
+interface PrismaCommandOutput {
+  readonly code: number;
+  readonly stderr: Uint8Array;
+}
+
+type PrismaCommandRunner = (command: Deno.Command) => Promise<PrismaCommandOutput>;
+
+function runPrismaCommand(command: Deno.Command): Promise<PrismaCommandOutput> {
+  return command.output();
+}
+
 /**
  * Default spawner. stdout streams straight through; for non-interactive runs
  * stderr is captured (so the failure can be classified) and mirrored back to the
  * parent process so logs are never swallowed. Interactive runs inherit stderr so
  * Prisma prompts surface immediately.
  */
-const defaultPrismaSpawn: PrismaSpawn = async (args, interactive, options) => {
+export async function defaultPrismaSpawn(
+  args: readonly string[],
+  interactive: boolean,
+  options: PrismaSpawnOptions,
+  runCommand: PrismaCommandRunner = runPrismaCommand,
+): Promise<PrismaSpawnResult> {
   const command = new Deno.Command('deno', {
     args: ['run', '-A', 'npm:prisma', ...args],
     stdin: 'inherit',
@@ -150,17 +166,21 @@ const defaultPrismaSpawn: PrismaSpawn = async (args, interactive, options) => {
   if (!interactive && options.timeoutMs !== undefined && options.timeoutMs > 0) {
     return await runCommandWithTimeout(command, options.timeoutMs);
   }
-  const { code, stderr } = await command.output();
-  if (!interactive && stderr.byteLength > 0) {
-    await writeAllToStderr(stderr);
+  const output = await runCommand(command);
+  if (interactive) {
+    return { code: output.code, stderr: '' };
   }
-  return { code, stderr: interactive ? '' : new TextDecoder().decode(stderr) };
-};
+  if (output.stderr.byteLength > 0) {
+    await writeAllToStderr(output.stderr);
+  }
+  return { code: output.code, stderr: new TextDecoder().decode(output.stderr) };
+}
 
 async function runCommandWithTimeout(
   command: Deno.Command,
   timeoutMs: number,
 ): Promise<PrismaSpawnResult> {
+  // Only non-interactive commands reach this helper, so stderr is always piped.
   const child = command.spawn();
   const outputPromise = child.output();
   let timeoutId: ReturnType<typeof setTimeout> | undefined;

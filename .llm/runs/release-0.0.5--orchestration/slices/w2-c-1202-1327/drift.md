@@ -35,3 +35,22 @@
   live-endpoint gate were not reached.
 - Boundary: Tier-A instructed stop-on-failure. No retry or code repair was attempted; follow-up
   implementation requires a new steer and a later serialized grant.
+
+## 2026-08-09 — #1202 inherited owner-machine boundary withdrawn (material)
+
+- Previous boundary: reference #1202 only; treat Windows collision identification and three clean
+  owner-machine passes as observational acceptance.
+- Reverified issue: its body has exactly four acceptance rows, all code/runtime evidence. Neither a
+  Windows observation nor three consecutive full passes is an acceptance row. Owner measurement
+  found no 3001 listener/reservation, and pristine scaffold coverage proves no fixed host port.
+- Resolution: PR #1393 may carry `Closes #1202`. The issue rows remain unticked until the third
+  serialized pass proves the mapped migration/allocation/live-endpoint evidence.
+
+## 2026-08-09 — PTY spawn defect repaired RED-first (minor)
+
+- RED contract raw exit 1 because the default spawn seam was not exported.
+- Behavioral RED raw exit 1 after adding only the seam: the synthetic inherited-stderr getter threw
+  the same `TypeError` as the runtime gate.
+- Fix: return the interactive exit code without reading stderr; retain non-interactive capture and
+  mirroring. `runCommandWithTimeout` now documents that only piped non-interactive stderr reaches it.
+- Focused result: raw exit 0, 5 tests / 10 steps passed.

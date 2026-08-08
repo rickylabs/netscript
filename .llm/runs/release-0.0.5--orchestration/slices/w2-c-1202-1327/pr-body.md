@@ -1,15 +1,13 @@
 ## Summary
 
 Make `db migrate` prove the migration it creates and applies, and prove scaffolded users services
-bind the live Postgres allocation across consecutive AppHost starts. The endpoint work is a partial
-code/evidence slice for #1202; owner-machine collision observation remains separate.
+bind the live Postgres allocation across consecutive AppHost starts.
 
 ## Scope
 
 - Archetype / area: Archetype 6 CLI/tooling · CLI/database/Aspire scaffold
 - Closes #1327
-- Refs #1202 — remaining: identify the colliding Windows service/port with it present and capture
-  three consecutive clean full `scaffold.runtime` passes on the owner's machine.
+- Closes #1202
 
 ## Slices
 
@@ -35,6 +33,8 @@ code/evidence slice for #1202; owner-machine collision observation remains separ
   the spawn adapter accessed inherited (unpiped) stderr. Both allocation gates and
   `behavior.live-db-endpoint` were not reached. Cleanup passed and postflight leak evidence shows no
   W2-C-owned survivor. No retry was attempted.
+- PTY spawn repair: behavioral RED raw exit 1 reproduced the inherited-stderr getter TypeError;
+  focused green raw exit 0, 5 tests / 10 steps passed. Third serialized pass granted at fixed head.
 
 ## Harness
 

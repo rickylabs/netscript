@@ -2,12 +2,10 @@
 
 ## Current phase
 
-Tier-A remediation is committed and focused-green: the two accidentally replaced
-`isNoRunningAppHostOutput` tests are restored alongside the new environment-forwarding test. The
-renewed serialized pass reached `database.migration-artifacts` but failed in its PTY case because
-`defaultPrismaSpawn` read `stderr` from a command configured with inherited stderr. Aggregate
-verdict: `passed=33 failed=1`, raw exit 1. Both allocation captures and the live-endpoint gate were
-not reached. No retry or repair was attempted; the token is released failing.
+Third serialized pass preparation. A non-PTY unit seam reproduces the inherited-stderr getter
+failure in `defaultPrismaSpawn`; the focused test went RED on the exact TypeError, then 5 tests / 10
+steps passed after the interactive branch stopped reading unpiped stderr. Tier-A granted one fresh
+`scaffold.runtime` pass at the fixed head.
 
 ## Identity
 
@@ -20,8 +18,9 @@ not reached. No retry or repair was attempted; the token is released failing.
 ## Locked boundary
 
 - Close #1327 only when artifact acceptance is fully evidenced.
-- Reference #1202 without a closing keyword. Never claim the owner-machine collision identity or
-  three consecutive owner-machine runtime passes.
+- The orchestrator withdrew the inherited owner-machine boundary for #1202 after re-reading its
+  four actual acceptance rows and measuring the machine. PR #1393 may close #1202 when the four
+  mapped runtime gates provide truthful evidence.
 - Never run the serialized `scaffold.runtime` gate without a grant.
 
 ## Key facts
@@ -34,3 +33,5 @@ not reached. No retry or repair was attempted; the token is released failing.
   belongs to `/home/codex/repos/w6-review-desk` and was deliberately left untouched.
 - The `--name` environment-key repair is required by #1327's named-artifact acceptance, not adjacent
   scope.
+- #1202 contains four code/runtime rows only. The stale-write RED tests map row 2; the two allocation
+  receipts plus live-endpoint health/structured-log/OTEL receipt must prove rows 1, 3, and 4.

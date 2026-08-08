@@ -10,6 +10,7 @@ import { assertEquals } from 'jsr:@std/assert@^1';
 import { describe, it } from 'jsr:@std/testing@^1/bdd';
 
 import {
+  defaultPrismaSpawn,
   isRetriableMigrationFailure,
   type PrismaSpawn,
   type PrismaSpawnOptions,
@@ -92,6 +93,25 @@ describe('isRetriableMigrationFailure', () => {
 });
 
 describe('runPrismaWithRetry', () => {
+  it('does not read inherited stderr after an interactive spawn', async () => {
+    let stderrReads = 0;
+    const result = await defaultPrismaSpawn(
+      ['migrate', 'dev'],
+      true,
+      {},
+      () => Promise.resolve({
+        code: 0,
+        get stderr(): Uint8Array {
+          stderrReads += 1;
+          throw new TypeError("Cannot get 'stderr': 'stderr' is not piped");
+        },
+      }),
+    );
+
+    assertEquals(result, { code: 0, stderr: '' });
+    assertEquals(stderrReads, 0);
+  });
+
   it('retries the transient failure and then succeeds', async () => {
     const { spawn, calls, options } = scriptedSpawn([
       { code: 1, stderr: PREMATURE_CLOSE },
