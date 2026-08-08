@@ -1,5 +1,6 @@
 import { assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
 import { artifactText, collectInstallArtifacts, substituteTokens } from '@netscript/plugin/adapter';
+import { getActiveProvider, getKv, resetKv } from '@netscript/kv';
 import { triggersAdapterPlugin } from '../plugin.ts';
 import {
   DEFAULT_WEBHOOK_INPUT,
@@ -134,6 +135,42 @@ Deno.test('triggers install emits only userland glue under triggers', () => {
   }
 });
 
+Deno.test('generated triggers runtime activates the selected Redis adapter', async () => {
+  const runtimeArtifact = collectInstallArtifacts(triggersAdapterPlugin).find((artifact) =>
+    artifact.path === 'triggers/runtime.ts'
+  );
+  if (!runtimeArtifact) {
+    throw new Error('triggers install must emit triggers/runtime.ts');
+  }
+
+  const previousProvider = Deno.env.get('CACHE_PROVIDER');
+  const previousRedisUri = Deno.env.get('REDIS_URI');
+  const path = await Deno.makeTempFile({
+    dir: new URL('.', import.meta.url).pathname,
+    prefix: 'generated-triggers-runtime-',
+    suffix: '.ts',
+  });
+
+  try {
+    await resetKv();
+    Deno.env.set('CACHE_PROVIDER', 'redis');
+    Deno.env.set('REDIS_URI', 'redis://127.0.0.1:6379');
+    await Deno.writeTextFile(path, artifactText(runtimeArtifact));
+
+    // Import from inside this generated workspace so the glue and assertion resolve the same
+    // @netscript/kv module instance. Importing the emitted source must perform real registration;
+    // merely containing the provider import text is insufficient.
+    await import(`${new URL(`file://${path}`).href}?test=${crypto.randomUUID()}`);
+    await getKv();
+    assertEquals(getActiveProvider(), 'redis');
+  } finally {
+    await resetKv();
+    restoreEnvironment('CACHE_PROVIDER', previousProvider);
+    restoreEnvironment('REDIS_URI', previousRedisUri);
+    await Deno.remove(path);
+  }
+});
+
 Deno.test('triggers resources preserve supported trigger sub-kinds', () => {
   assertStringIncludes(artifactText(webhookScaffolder.emit({ id: 'a' })[0]), 'defineWebhook');
   assertStringIncludes(
@@ -178,5 +215,13 @@ async function importGeneratedDefinition(source: string): Promise<GeneratedDefin
     return module.default as GeneratedDefinition;
   } finally {
     await Deno.remove(path);
+  }
+}
+
+function restoreEnvironment(name: string, value: string | undefined): void {
+  if (value === undefined) {
+    Deno.env.delete(name);
+  } else {
+    Deno.env.set(name, value);
   }
 }

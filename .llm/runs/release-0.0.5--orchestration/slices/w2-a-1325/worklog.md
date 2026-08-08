@@ -59,10 +59,15 @@ shared E2E enumeration so every provider scenario proves real health.
 | --- | --- | --- | --- |
 | 2026-08-08 | bootstrap | research | Re-baselined issue and source at `c383b2e84`; no source edits. |
 | 2026-08-08 | plan | PLAN-EVAL request | Selected separate native Claude/Fable plan evaluation; implementation paused. |
+| 2026-08-09 | S1 | RED | Generated-workspace behavioral probe failed at the real core registration boundary: exit 1, 8 passed/1 failed, `KvConnectionError: Redis adapter is not registered`. |
 
 ## Gate Results
 
-All implementation gates are `NOT_RUN`; a missing execution is not a pass.
+### Static Gates
+
+| Gate | Command or check | Result | Notes |
+| --- | --- | --- | --- |
+| S1 RED | `deno test --config plugins/triggers/deno.json --allow-all --unstable-kv plugins/triggers/src/adapter/resources/resources.test.ts` | EXPECTED FAIL (exit 1) | 8 passed, behavioral registration test failed before network access. |
 
 ## Handoff Notes
 

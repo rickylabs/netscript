@@ -6,15 +6,15 @@
 | --- | --- |
 | Run ID | `release-0.0.5--orchestration/slices/w2-a-1325` |
 | Branch | `fix/triggers-generated-kv-adapter-bootstrap` |
-| Current phase | `plan-eval` |
+| Current phase | `implement` |
 | Archetype | `5 — Plugin Package` |
 | Scope overlays | `service` |
 
 ## Current State
 
-Issue #1325 remains reproducible at source. The plan/design is complete and implementation is
-blocked on separate-session PLAN-EVAL. No product source has changed and no runtime resource has
-been started.
+PLAN-EVAL passed in a separate Claude/Fable session. S1 landed a generated-workspace behavioral
+probe and captured the expected pre-fix exit 1 at the core Redis-registration boundary. No runtime
+resource has been started.
 
 ## Completed
 
@@ -25,13 +25,13 @@ been started.
 
 ## In Progress
 
-- Orchestrator handoff for native Claude/Fable 5 medium PLAN-EVAL.
+- S1 RED behavioral invariant.
 
 ## Next Steps
 
-1. Open the draft plan PR after committing/pushing these artifacts (without `Closes #1325` yet).
-2. Ask the orchestrator to launch separate PLAN-EVAL.
-3. On PASS, implement RED-first slices. On FAIL_PLAN, repair the plan before source edits.
+1. Commit/push/comment S1 RED evidence.
+2. Add the thin trigger provider bootstrap and turn the focused gate green.
+3. Add the shared generated-runtime health enumeration without changing workers bootstrap placement.
 
 ## Key Decisions
 
