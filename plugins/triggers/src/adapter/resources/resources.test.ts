@@ -145,11 +145,7 @@ Deno.test('generated triggers runtime activates the selected Redis adapter', asy
 
   const previousProvider = Deno.env.get('CACHE_PROVIDER');
   const previousRedisUri = Deno.env.get('REDIS_URI');
-  const path = await Deno.makeTempFile({
-    dir: new URL('.', import.meta.url).pathname,
-    prefix: 'generated-triggers-runtime-',
-    suffix: '.ts',
-  });
+  const path = await makeGeneratedRuntimeTempFile('generated-triggers-runtime-');
 
   try {
     await resetKv();
@@ -182,11 +178,9 @@ Deno.test('generated triggers runtime uses Deno KV when CACHE_PROVIDER=denokv', 
   const previousProvider = Deno.env.get('CACHE_PROVIDER');
   const previousKvUrl = Deno.env.get('DENO_KV_URL');
   const directory = await Deno.makeTempDir({ prefix: 'generated-triggers-denokv-' });
-  const runtimePath = await Deno.makeTempFile({
-    dir: new URL('.', import.meta.url).pathname,
-    prefix: 'generated-triggers-denokv-runtime-',
-    suffix: '.ts',
-  });
+  const runtimePath = await makeGeneratedRuntimeTempFile(
+    'generated-triggers-denokv-runtime-',
+  );
   const kvPath = `${directory}/runtime.sqlite3`;
 
   try {
@@ -265,4 +259,14 @@ function restoreEnvironment(name: string, value: string | undefined): void {
   } else {
     Deno.env.set(name, value);
   }
+}
+
+async function makeGeneratedRuntimeTempFile(prefix: string): Promise<string> {
+  const directory = new URL('../../../.tmp/', import.meta.url);
+  await Deno.mkdir(directory, { recursive: true });
+  return await Deno.makeTempFile({
+    dir: directory.pathname,
+    prefix,
+    suffix: '.ts',
+  });
 }

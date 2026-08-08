@@ -65,6 +65,7 @@ shared E2E enumeration so every provider scenario proves real health.
 | 2026-08-09 | S4 | non-serialized gates | Focused, verify-plugin, scoped wrappers, quality, doctrine, JSR, doc, and publish gates complete. Lock diff clean. |
 | 2026-08-09 | S4 | EXPENSIVE-GATE-REQUEST | Request the serialized token for exact one-pass `deno task e2e:cli run scaffold.runtime --cleanup --format pretty`; do not start until orchestrator grant. |
 | 2026-08-09 | S2 follow-up | Deno KV honesty check | Generated-workspace `CACHE_PROVIDER=denokv` scenario performs real set/get and reports active `deno-kv`; focused suite 10/10. Token request remains pending. |
+| 2026-08-09 | Tier-A fix | publish-safe probe scratch | Moved emitted test modules from publishable `src/` into plugin-local ignored `.tmp/`; focused suite exit 0, 10/10. |
 
 ## Gate Results
 
@@ -87,6 +88,7 @@ shared E2E enumeration so every provider scenario proves real health.
 | publish dry-run | `deno task publish:dry-run` | PASS (exit 0) | `Success Dry run complete`. |
 | lock hygiene | raw status + `git diff --exit-code c383b2e84 -- deno.lock` | PASS (exit 0) | no lock or unrelated churn. |
 | post-DenoKV refresh | triggers scoped check/lint/fmt + `quality:gate` | PASS (exit 0 each) | zero scoped findings; repository quality findings remain zero. |
+| Tier-A review fix | focused triggers generated-resource suite | PASS (exit 0) | 10 passed; `.tmp/` retains plugin module resolution and is ignored outside publish include. |
 
 ### Runtime Gates
 

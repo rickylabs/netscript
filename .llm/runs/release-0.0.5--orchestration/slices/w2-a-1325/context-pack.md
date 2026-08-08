@@ -17,6 +17,9 @@ KV set/get, and all non-serialized gates are green. The worklog now carries
 `EXPENSIVE-GATE-REQUEST`; no runtime resource has been started and the exact one-pass suite remains
 NOT_RUN pending the orchestrator's serialized token grant.
 
+Tier-A review finding fixed: generated probe files now use ignored `plugins/triggers/.tmp/`, outside
+the plugin's `src/**/*.ts` publish include, without changing module resolution.
+
 ## Completed
 
 - Skills, issue, harness workflow, doctrine, debt, public API, sibling seam, and current E2E gates read.
