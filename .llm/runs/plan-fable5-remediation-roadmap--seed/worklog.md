@@ -51,6 +51,21 @@ This is a planning-only seed run; the "public surface" is the artifact tree, not
   domain subagents and consulted by the supervisor at Stage D where an issue draft depends on
   them.
 
+#### S2a review note (supervisor, slice review gate)
+
+Workflow `wf_e2194004-808` completed 7/7 (796k subagent tokens, 184 tool calls; per-agent
+identities in the workflow journal — all `claude-opus-5[1m]`). Supervisor reviewed all seven
+corpus files (3,816 lines total): abstracts cross-checked against file contents; citation bar met
+(file+line / issue-number / live-`gh` provenance headers); milestone counters reconciled (GitHub
+API counts include PRs; issue-only columns measured separately). Material corrections to the
+carried-in pre-plan captured: 259 open issues / 13 open milestones (pre-plan said 265/11); #1328
+and #1184 CLOSED; duplicate umbrella pairs #1276≈#1278 and #1275≈#1279; 0.0.5 continuation plan
+~40% delivered with W2–W5 undispached (p0s #1326/#1329/#1333/#1208 open); milestone-shift house
+pattern = rename-in-place highest→lowest; RFC practice = RFC-shaped tracking issues (#1123
+exemplar), not `rfcs/NNNN` files; `wave:*` labels dead; `status:close-gate-override` +
+`docs-eval:skip` missing from live label set. Notable subagent-report divergence: 0.0.6 open
+count 22 vs 23 between two agents (GH counter includes a PR) — resolved, not a defect.
+
 ### S1 — Bootstrap (Stage A)
 
 - Run dir created; `supervisor.md` written first with identity, lane table, and owner overrides.
