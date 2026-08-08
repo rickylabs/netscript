@@ -1,21 +1,30 @@
-# W2-B supervisor preparation — #1329
+# W2-B implementation supervisor — #1329
 
-- Status: prepared, not dispatchable until canary.14 is published and its green pair is verified.
-- Planned branch: `fix/streams-sse-contract-1329`
-- Planned worktree: `/home/codex/repos/ns005-w2-streams-sse`
-- Base at dispatch: exact fresh canary.15 train head created from verified C14 main.
-- Route: Codex GPT-5.6 Sol medium, justified by the cross-package public contract, replay semantics,
-  Fresh consumer, documentation, and correlated telemetry design.
-- Formal evaluator: separate Qwen 3.8 Max high after terminal implementation handoff.
+| Field                          | Value                                                                                           |
+| ------------------------------ | ----------------------------------------------------------------------------------------------- |
+| Status                         | active — Plan & Design                                                                          |
+| Supervisor                     | Codex · OpenAI · GPT-5.6 Sol · medium                                                           |
+| Session                        | current Codex implementation-supervisor thread                                                  |
+| Host                           | WSL/Linux, Europe/Zurich                                                                        |
+| Worktree                       | `/home/codex/repos/ns005-w2b`                                                                   |
+| Branch                         | `fix/streams-versioned-sse-envelope`                                                            |
+| Baseline                       | `origin/main@c383b2e84c254d90bab8c4f9ffcbf43a7beb8652`                                          |
+| Implementation lane            | `normal_implementation`                                                                         |
+| Review pairing                 | `review_codex` → Claude · Fable 5 · low                                                         |
+| PLAN-EVAL                      | Claude · Fable 5 · medium, fresh opposite-family session; required before implementation        |
+| IMPL-EVAL                      | Claude · Fable 5 · medium, fresh opposite-family session launched by the milestone orchestrator |
+| Merge/canary/publish authority | milestone orchestrator only                                                                     |
+
+The lane is justified by the versioned public contract, replay semantics, Fresh/browser consumer,
+published export-map repair, and correlated runtime telemetry proof. No route override is active.
 
 ## Current issue state
 
 #1329 is open in milestone 0.0.5 at `status:triage`, `priority:p0`, with eight unchecked acceptance
-rows and no product PR.
+rows and no product PR at activation.
 
 ## Required skills at launch
 
-The final prompt must begin with `use harness` and name `netscript-harness`, `netscript-doctrine`,
-`netscript-tools`, `netscript-pr`, `netscript-deno-toolchain`, `jsr-audit`, `deno-fresh`, `aspire`,
-and `rtk`. Contract-first ordering, package archetype, and Fresh 2.x consumer conventions are
-mandatory before implementation.
+Activated in the user-specified order: `netscript-harness`, `netscript-doctrine`, `deno-fresh`,
+`aspire`, `netscript-tools`, `netscript-deno-toolchain`, `netscript-pr`, and `jsr-audit`.
+Contract-first ordering, Archetype 3, and Fresh 2.x consumer conventions are mandatory.
