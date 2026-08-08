@@ -60,6 +60,13 @@ the supervisor must not launch its own evaluator session.
 | S2 focused | `deno test --no-lock --allow-all packages/database/tests/migrate-artifacts_test.ts packages/database/tests/migrate-retry_test.ts packages/cli/src/kernel/templates/aspire/pristine-scaffold-ports_test.ts` | 0 | 6 tests / 14 steps passed |
 | S3/S4 check | targeted `deno check --no-lock --unstable-kv` over new migration/endpoint fixtures and gate builders | 0 | all modules checked |
 | S3/S4 tests | focused CLI operation runner + runtime gate/registry suites | 0 | 31 tests then 29 tests passed |
+| Scoped check | database + CLI wrappers with `--deno-arg --no-lock` | 0 | 22 and 816 files; zero diagnostics |
+| Scoped lint | database + CLI wrappers | 0 | zero diagnostics |
+| Scoped format | database + CLI wrappers after formatting six owned files | 0 | zero findings |
+| Framework law | `deno task quality:gate` | 0 | quality scan and doctrine gate passed; no new allowances |
+| Doctrine | `deno task arch:check` | 0 | passed with pre-existing warnings only |
+| Database docs | `deno task doc:lint --root packages/database --pretty` | 0 | combined total 0 |
+| Publish surface | `deno task publish:dry-run` | 0 | `Success Dry run complete` |
 
 ## Slice 1 reconcile
 
@@ -86,3 +93,12 @@ the supervisor must not launch its own evaluator session.
   allocation, matching users `DATABASE_URL`, healthy JSON, and a shared structured-log/trace id.
 - #1202 remains partial: this is code-owned two-start evidence, not the owner Windows observation or
   three full clean passes.
+
+## Expensive gate
+
+EXPENSIVE-GATE-REQUEST
+
+- All required non-runtime gates are green at commit `84c753c20` plus formatter-only pending diff.
+- Requested command: `deno task e2e:cli run scaffold.runtime --cleanup --format pretty`.
+- The supervisor will run leak-check before/after and will not start until the orchestrator grants
+  the serialized token.

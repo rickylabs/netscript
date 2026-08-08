@@ -324,9 +324,11 @@ export async function runMigrationWithArtifacts(
   }
 
   const before = await listMigrationArtifacts(migrationsPath);
-  log(migrationName
-    ? `🔄 Creating migration with name: ${migrationName}`
-    : '🔄 Creating migration from the current schema change...');
+  log(
+    migrationName
+      ? `🔄 Creating migration with name: ${migrationName}`
+      : '🔄 Creating migration from the current schema change...',
+  );
   const args = ['migrate', 'dev', '--config', configPath];
   if (migrationName) args.push('--name', migrationName);
   const createCode = await runPrismaWithRetry(

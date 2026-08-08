@@ -14,15 +14,15 @@ code/evidence slice for #1202; owner-machine collision observation remains separ
 ## Slices
 
 - [x] S1 lock research, design, RED contracts, and issue boundary
-- [ ] S2 implement migration artifact and applied-state semantics
-- [ ] S3 add TTY/non-TTY generated-project migration E2E controls
-- [ ] S4 prove two-allocation live Postgres/users health and telemetry identity
+- [x] S2 implement migration artifact and applied-state semantics
+- [x] S3 add TTY/non-TTY generated-project migration E2E controls
+- [x] S4 prove two-allocation live Postgres/users health and telemetry identity
 - [ ] S5 complete gates and separate-session IMPL-EVAL handoff
 
 ## Validation
 
 - Baseline Git and live issue re-verification — exit 0
-- Focused/scoped/runtime gates — pending implementation
+- Focused/scoped/quality/doctrine/doc/publish gates — exit 0
 - `scaffold.runtime` — not requested; serialized token protocol applies
 
 ## Harness
@@ -45,4 +45,3 @@ code/evidence slice for #1202; owner-machine collision observation remains separ
 - [ ] Two consecutive starts prove users receives the live Postgres allocation via health, logs, and OTEL.
 - [ ] Required static, quality, doctrine, publish, resource-health, and serialized runtime gates pass.
 - [ ] Separate-session IMPL-EVAL passes.
-

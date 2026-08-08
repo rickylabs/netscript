@@ -1,10 +1,7 @@
 import { assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
 import { join } from 'jsr:@std/path@^1';
 
-import {
-  runMigrationWithArtifacts,
-  type PrismaSpawn,
-} from '../scripts/migrate.ts';
+import { type PrismaSpawn, runMigrationWithArtifacts } from '../scripts/migrate.ts';
 
 Deno.test('migration creation reports and verifies created and applied artifacts', async () => {
   const root = await Deno.makeTempDir();

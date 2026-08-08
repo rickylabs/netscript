@@ -12,7 +12,9 @@ if (!appHost || !projectRoot) throw new Error('AppHost and project root are requ
 const first = await readReceipt('first');
 const second = await readReceipt('second');
 if (first.postgresUrl === second.postgresUrl) {
-  throw new Error(`consecutive AppHost starts reused the same database allocation: ${first.postgresUrl}`);
+  throw new Error(
+    `consecutive AppHost starts reused the same database allocation: ${first.postgresUrl}`,
+  );
 }
 assertDatabaseAuthority(first);
 assertDatabaseAuthority(second);
@@ -21,7 +23,9 @@ const usersUrl = await liveHttpUrl('users');
 const healthResponse = await fetch(new URL('/health', usersUrl));
 const healthBody = await healthResponse.text();
 if (!healthResponse.ok || !healthMatches(healthBody, database)) {
-  throw new Error(`users health did not prove database readiness: ${healthResponse.status} ${healthBody}`);
+  throw new Error(
+    `users health did not prove database readiness: ${healthResponse.status} ${healthBody}`,
+  );
 }
 
 const structuredLogs = await aspireOtel('logs');
@@ -34,16 +38,23 @@ if (!traceId) {
 }
 
 const receiptPath = join(projectRoot, '.netscript', 'e2e', 'live-db-endpoint-receipt.json');
-await Deno.writeTextFile(receiptPath, JSON.stringify({ first, second, health: JSON.parse(healthBody), traceId }, null, 2));
+await Deno.writeTextFile(
+  receiptPath,
+  JSON.stringify({ first, second, health: JSON.parse(healthBody), traceId }, null, 2),
+);
 console.info(`live DB endpoint receipt: ${receiptPath}; traceId=${traceId}`);
 
 async function readReceipt(allocation: 'first' | 'second'): Promise<EndpointReceipt> {
-  const topology = JSON.parse(await Deno.readTextFile(
-    join(projectRoot, '.netscript', 'e2e', `db-allocation-${allocation}.json`),
-  ));
+  const topology = JSON.parse(
+    await Deno.readTextFile(
+      join(projectRoot, '.netscript', 'e2e', `db-allocation-${allocation}.json`),
+    ),
+  );
   const postgres = findResource(topology, database);
   const users = findResource(topology, 'users');
-  if (!postgres || !users) throw new Error(`${allocation} topology omitted postgres/users resources`);
+  if (!postgres || !users) {
+    throw new Error(`${allocation} topology omitted postgres/users resources`);
+  }
   const postgresUrl = tcpUrl(postgres);
   const usersDatabaseUrl = environmentValue(users, 'DATABASE_URL');
   return { allocation, postgresUrl, usersDatabaseUrl };
@@ -52,12 +63,18 @@ async function readReceipt(allocation: 'first' | 'second'): Promise<EndpointRece
 function assertDatabaseAuthority(receipt: EndpointReceipt): void {
   const port = new URL(receipt.postgresUrl).port;
   if (!port || !receipt.usersDatabaseUrl.includes(`:${port}`)) {
-    throw new Error(`${receipt.allocation} users DATABASE_URL did not match live Postgres: ${JSON.stringify(receipt)}`);
+    throw new Error(
+      `${receipt.allocation} users DATABASE_URL did not match live Postgres: ${
+        JSON.stringify(receipt)
+      }`,
+    );
   }
 }
 
 async function liveHttpUrl(name: string): Promise<string> {
-  const topology = JSON.parse(extractJson(await runAspire(['describe', '--apphost', appHost, '--format', 'Json'])));
+  const topology = JSON.parse(
+    extractJson(await runAspire(['describe', '--apphost', appHost, '--format', 'Json'])),
+  );
   const resource = findResource(topology, name);
   if (!resource) throw new Error(`live topology omitted ${name}`);
   const urls = resource.urls;
@@ -74,10 +91,16 @@ async function aspireOtel(kind: 'logs' | 'traces'): Promise<string> {
 }
 
 async function runAspire(args: string[]): Promise<string> {
-  const output = await new Deno.Command('aspire', { args: [...args, '--non-interactive', '--nologo'], stdout: 'piped', stderr: 'piped' }).output();
+  const output = await new Deno.Command('aspire', {
+    args: [...args, '--non-interactive', '--nologo'],
+    stdout: 'piped',
+    stderr: 'piped',
+  }).output();
   const stdout = new TextDecoder().decode(output.stdout);
   const stderr = new TextDecoder().decode(output.stderr);
-  if (!output.success) throw new Error(`aspire ${args.join(' ')} failed (${output.code}): ${stderr || stdout}`);
+  if (!output.success) {
+    throw new Error(`aspire ${args.join(' ')} failed (${output.code}): ${stderr || stdout}`);
+  }
   return stdout;
 }
 
@@ -104,7 +127,9 @@ function tcpUrl(resource: Record<string, unknown>): string {
   if (!Array.isArray(resource.urls)) throw new Error('Postgres resource exposed no URLs');
   for (const item of resource.urls) {
     const value = isRecord(item) ? item.url : item;
-    if (typeof value === 'string' && /^(?:tcp|postgres(?:ql)?):\/\//.test(value)) return value.replace(/^tcp:/, 'postgres:');
+    if (typeof value === 'string' && /^(?:tcp|postgres(?:ql)?):\/\//.test(value)) {
+      return value.replace(/^tcp:/, 'postgres:');
+    }
   }
   throw new Error('Postgres resource exposed no TCP URL');
 }
@@ -122,7 +147,8 @@ function healthMatches(body: string, expectedDatabase: string): boolean {
   const value = JSON.parse(body);
   return isRecord(value) && value.status === 'healthy' && Array.isArray(value.checks) &&
     value.checks.filter(isRecord).some((check) =>
-      check.status === 'healthy' && (check.name === 'database' || check.name === `database:${expectedDatabase}`)
+      check.status === 'healthy' &&
+      (check.name === 'database' || check.name === `database:${expectedDatabase}`)
     );
 }
 

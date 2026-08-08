@@ -58,7 +58,7 @@ export function createDatabaseGates(): readonly GateDefinition[] {
           context.request.options.database,
           '--name',
           'init',
-      ),
+        ),
     ),
     commandGate(
       GATE.DATABASE_MIGRATION_ARTIFACTS,
