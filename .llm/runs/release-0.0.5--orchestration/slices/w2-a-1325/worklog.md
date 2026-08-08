@@ -60,6 +60,7 @@ shared E2E enumeration so every provider scenario proves real health.
 | 2026-08-08 | bootstrap | research | Re-baselined issue and source at `c383b2e84`; no source edits. |
 | 2026-08-08 | plan | PLAN-EVAL request | Selected separate native Claude/Fable plan evaluation; implementation paused. |
 | 2026-08-09 | S1 | RED | Generated-workspace behavioral probe failed at the real core registration boundary: exit 1, 8 passed/1 failed, `KvConnectionError: Redis adapter is not registered`. |
+| 2026-08-09 | S2 | GREEN | Trigger glue composes the core Redis entrypoint; triggers 9/9, sagas 7/7, and both verify-plugin runs pass with exit 0. |
 
 ## Gate Results
 
@@ -68,6 +69,9 @@ shared E2E enumeration so every provider scenario proves real health.
 | Gate | Command or check | Result | Notes |
 | --- | --- | --- | --- |
 | S1 RED | `deno test --config plugins/triggers/deno.json --allow-all --unstable-kv plugins/triggers/src/adapter/resources/resources.test.ts` | EXPECTED FAIL (exit 1) | 8 passed, behavioral registration test failed before network access. |
+| S2 triggers | same focused triggers command after thin bootstrap | PASS (exit 0) | 9 passed; behavioral registration active. |
+| S2 sagas | focused sagas resources test | PASS (exit 0) | 7 passed; sibling seam preserved. |
+| verify-plugin triggers/sagas | both package-owned `verify-plugin.ts` entrypoints | PASS (exit 0 each) | no findings. |
 
 ## Handoff Notes
 

@@ -12,9 +12,9 @@
 
 ## Current State
 
-PLAN-EVAL passed in a separate Claude/Fable session. S1 landed a generated-workspace behavioral
-probe and captured the expected pre-fix exit 1 at the core Redis-registration boundary. No runtime
-resource has been started.
+PLAN-EVAL passed in a separate Claude/Fable session. S1 captured the expected pre-fix exit 1; S2
+adds the thin trigger bootstrap and turns the same behavioral gate green. No runtime resource has
+been started.
 
 ## Completed
 
@@ -29,9 +29,9 @@ resource has been started.
 
 ## Next Steps
 
-1. Commit/push/comment S1 RED evidence.
-2. Add the thin trigger provider bootstrap and turn the focused gate green.
-3. Add the shared generated-runtime health enumeration without changing workers bootstrap placement.
+1. Commit/push/comment S2 green evidence.
+2. Add the shared generated-runtime health enumeration without changing workers bootstrap placement.
+3. Run all non-serialized fitness and runtime gates.
 
 ## Key Decisions
 
