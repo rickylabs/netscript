@@ -25,6 +25,23 @@ This is a planning-only seed run; the "public surface" is the artifact tree, not
 3. **Deferred scope** — Stage F adversarial, stage G PLAN-EVAL, stage H filing (owner-waived /
    owner-reserved). No GitHub board mutation of any kind.
 
+## S6 — Cross-family PLAN-EVAL of RFC-A (#1390) and RFC-B (#1389) (owner-directed, 2026-08-08)
+
+This session resumed as the owner-designated PLAN-EVAL authority for both derived RFCs
+(generators: Codex Sol xhigh threads; lane-policy Minimax route superseded by in-turn owner
+directive; OpenRouter/OpenHands/Qwen prohibited for this evaluator). Delegations: workflow
+`wf_b3416478-edf` (script committed pre-execution in `workflows/`), 3× Opus 5 · xhigh, read-only
+return-only; evidence synthesized by the evaluator. Verdicts: **both CHANGES_REQUESTED
+(FAIL_PLAN cycle 1)** — RFC-A `plan-eval.md` @ `f1a29fe1a` (10 findings; core thesis verified,
+incl. prepare-once reproduced on locked v1.14.6 and the v2 GET-direction inversion), RFC-B
+`plan-eval.md` @ `122301d25` (7 findings; transaction/receipt/relay laws verified honest; three
+silent boundary decisions). PR comments posted with exact verdict headers; both PRs moved
+`status:plan-eval` → `status:plan`. Cross-RFC obligations recorded in
+`fable-5-remediation-plan/CROSS-RFC-REVIEW.md` (compose cleanly; no circularity; children
+sufficient with named amendments; v2-migration RFC epic recommended with exact scope — not
+filed). Evaluator wrote only eval artifacts/comments/labels; no RFC text, product code, or board
+objects touched. Handed back to the root orchestrator; Qwen pass deferred until both APPROVED.
+
 ## Slice log
 
 ### S2 — Discovery corpus (Stage B) — in progress
