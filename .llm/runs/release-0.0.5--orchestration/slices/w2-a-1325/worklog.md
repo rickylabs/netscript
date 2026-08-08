@@ -66,6 +66,8 @@ shared E2E enumeration so every provider scenario proves real health.
 | 2026-08-09 | S4 | EXPENSIVE-GATE-REQUEST | Request the serialized token for exact one-pass `deno task e2e:cli run scaffold.runtime --cleanup --format pretty`; do not start until orchestrator grant. |
 | 2026-08-09 | S2 follow-up | Deno KV honesty check | Generated-workspace `CACHE_PROVIDER=denokv` scenario performs real set/get and reports active `deno-kv`; focused suite 10/10. Token request remains pending. |
 | 2026-08-09 | Tier-A fix | publish-safe probe scratch | Moved emitted test modules from publishable `src/` into plugin-local ignored `.tmp/`; focused suite exit 0, 10/10. |
+| 2026-08-09 | S4 | serialized runtime verdict | Granted one-pass suite exited 0 with `passed=76 failed=0`; workers, sagas, and triggers runtime health gates all executed and passed. |
+| 2026-08-09 | S4 | cleanup/review | Post-run leak report shows no Aspire or W2-A-owned survivor; known foreign `redis-jfgcbtaf` untouched. Review threads exit 0, 0 unanswered. |
 
 ## Gate Results
 
@@ -94,7 +96,15 @@ shared E2E enumeration so every provider scenario proves real health.
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| serialized `scaffold.runtime` | REQUESTED / NOT_RUN | `EXPENSIVE-GATE-REQUEST` above | W2-C currently owns token; awaiting orchestrator grant. |
+| pre-run leak-check | PASS (exit 0) | no Aspire/owned survivor | Known foreign `redis-jfgcbtaf`, owner `/home/codex/repos/w6-review-desk`, left untouched. |
+| serialized `scaffold.runtime` | PASS (raw exit 0) | `Summary: passed=76 failed=0` | Exact one-pass command with `--cleanup --format pretty`; no split/retry. |
+| `runtime.wait.workers` | PASS | 1.109s | Specialized workers readiness probe executed. |
+| `runtime.wait.sagas` | PASS | 451ms | Explicit Aspire healthy wait executed. |
+| `runtime.wait.triggers` | PASS | 520ms | Explicit Aspire healthy wait executed. |
+| background API/behavior | PASS | workers/sagas/triggers health and behavior endpoints | Workers health/job paths, sagas health/list/instances, triggers health/webhook/events all executed. |
+| structured telemetry | PASS | OTEL webhook, stream consumer, traces, task traces | All four telemetry gates executed. |
+| cleanup | PASS | `cleanup.aspire-stop` 1.318s + post-run leak-check exit 0 | No Aspire or W2-A-owned container/process survived. |
+| review threads | PASS (exit 0) | `threads=0 unanswered=0` | Ready for orchestrator IMPL-EVAL handoff, not ready-for-review transition. |
 
 ## Handoff Notes
 

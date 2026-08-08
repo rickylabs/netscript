@@ -13,9 +13,9 @@
 ## Current State
 
 S1–S3 implementation is landed, generated-workspace probes cover Redis registration and real Deno
-KV set/get, and all non-serialized gates are green. The worklog now carries
-`EXPENSIVE-GATE-REQUEST`; no runtime resource has been started and the exact one-pass suite remains
-NOT_RUN pending the orchestrator's serialized token grant.
+KV set/get, and all gates are green. The granted exact one-pass `scaffold.runtime` exited 0 with
+76 passed/0 failed; workers, sagas, and triggers health gates all executed. Post-run leak-check
+proves no W2-A AppHost/container survived.
 
 Tier-A review finding fixed: generated probe files now use ignored `plugins/triggers/.tmp/`, outside
 the plugin's `src/**/*.ts` publish include, without changing module resolution.
@@ -33,9 +33,9 @@ the plugin's `src/**/*.ts` publish include, without changing module resolution.
 
 ## Next Steps
 
-1. Commit/push/comment the non-serialized gate evidence and token request.
-2. Wait for explicit orchestrator grant.
-3. After grant only: leak-check, run exact one-pass suite, verify teardown/leaks, then hand off for IMPL-EVAL.
+1. Commit/push/comment final gate evidence.
+2. Add truthful `Closes #1325` acceptance mapping and move issue/PR to `status:impl-eval`.
+3. Release token and ask orchestrator to launch the separate Claude/Fable IMPL-EVAL.
 
 ## Key Decisions
 
