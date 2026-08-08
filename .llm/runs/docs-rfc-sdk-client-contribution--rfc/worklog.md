@@ -165,6 +165,7 @@ considered complete.
 | 2026-08-08 | 4     | repository scope   | Focused scan: 91 `@orpc/*` files, 74 excluding test patterns; stable tool reports all seven workspace oRPC dependencies behind to v1.15.0.                                                                                              |
 | 2026-08-08 | 4     | design amendment   | Locked zero-oRPC public declarations, three internal ports, prepare-once retry law, stable-v1 implementation, and separate v2 RFC/spike gates.                                                                                          |
 | 2026-08-08 | 4     | focused validation | Re-ran eight-file format, RFC/repository links, docs accuracy, type proof, doctrine, and diff hygiene; all verdict commands exit 0.                                                                                                     |
+| 2026-08-08 | 4     | amendment commit   | Committed the reviewable RFC/research amendment as `7a0d398087a6608ff1a55bb9fe4c47158edb72a7`; handoff-only commit and explicit-refspec push remain.                                                                                    |
 
 ## Decisions
 
@@ -220,8 +221,10 @@ considered complete.
 | Amendment type proof  | ignored exact-shape Deno probe                                                      | PASS                                                                                                               |
 | Amendment doctrine    | `deno task arch:check`                                                              | PASS, exit 0; warning-only baseline unchanged                                                                      |
 
-The root-requested amendment content gates are complete. Its commit, explicit-refspec push, final PR
-reconciliation, and external Fable/Qwen verdicts remain pending at this checkpoint.
+The root-requested amendment content gates and reviewable commit are complete. The final
+explicit-refspec push and live PR reconciliation follow the handoff-only commit, so their exact HEAD
+and lifecycle evidence are recorded in the structured PR comment. External Fable/Qwen verdicts
+remain pending by owner instruction.
 
 ## Handoff Notes
 

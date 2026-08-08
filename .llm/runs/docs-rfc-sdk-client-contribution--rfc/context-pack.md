@@ -82,7 +82,7 @@ migration. This amendment is not an evaluator verdict. No product source is chan
 | Audit amendment evidence        | pass             | 59-line input hashed; 91/74 file scan; seven v1 dependencies behind to 1.15.0   |
 | Audit amendment gates           | pass             | format, links, accuracy, type proof, doctrine, and diff hygiene                 |
 | Pre-amendment PR reconciliation | pass             | draft, required labels, sole `status:plan-eval`, no milestone/closing keyword   |
-| Amendment PR reconciliation     | pending          | restore sole `status:plan-eval` after explicit-refspec push                     |
+| Amendment PR reconciliation     | external record  | final pushed HEAD and sole `status:plan-eval` are recorded in the phase comment |
 
 ## JSR Consequences
 
@@ -126,5 +126,6 @@ milestones. Findings should cite RFC headings and classify blocking versus safe 
 - Bootstrap: `158849031bba78025d0ec16c8361628211fbc4ed`.
 - RFC/research: `89ae608ea935ba8b2776d55e7cb5a09cc29e2520`.
 - Handoff baseline: `e78ac0a65f5475ed37152272b16ba7d89deca8c3`.
-- The audit-amendment commit and per-slice PR comment complete the V3 commit record; its SHA is
-  recorded in the PR comment because an artifact cannot contain its own commit id.
+- Audit amendment: `7a0d398087a6608ff1a55bb9fe4c47158edb72a7`.
+- The handoff-only commit and per-slice PR comment complete the V3 commit record; the PR comment
+  records the final pushed HEAD because an artifact cannot contain its own commit id.

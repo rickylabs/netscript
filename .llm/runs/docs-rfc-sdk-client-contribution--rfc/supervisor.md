@@ -39,6 +39,7 @@ Written at run start per `workflow/lane-policy.md` § Supervisor identity.
   root-requested post-generator oRPC v2 research amendment.
 - Pre-amendment RFC/research commit: `89ae608ea935ba8b2776d55e7cb5a09cc29e2520`; pre-amendment
   handoff HEAD: `e78ac0a65f5475ed37152272b16ba7d89deca8c3`.
+- Reviewable amended RFC/research commit: `7a0d398087a6608ff1a55bb9fe4c47158edb72a7`.
 - The amended RFC is returned to `status:plan-eval` only after focused gates, an explicit-refspec
   push, and a structured PR phase comment.
 - The exact Fable entry point and prohibited mutations are in `final-handoff.md`.
