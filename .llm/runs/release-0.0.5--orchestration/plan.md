@@ -336,3 +336,185 @@ Sol · high** (opposite family — v4 is Claude-authored), separate session.
 W2 is dispatched **without waiting** on that verdict: W2-A/W2-B/W2-C are the three v3 clusters
 already covered by the v3 `PASS`, unchanged in scope, membership and route. Nothing v4 adds touches
 them. The pull-forward milestone moves are applied only after the v4 verdict.
+
+---
+
+# Wave plan v4.1 — repair after `FAIL_PLAN` (2026-08-09)
+
+The v4 section above went to a separate-session PLAN-EVAL on **Codex · GPT-5.6 Sol · high**
+(opposite family; v4 is Claude-authored) and returned **`FAIL_PLAN`** — three blockers and four
+findings, recorded at `plan-eval-v4.md`. Every finding was checkable and every one of them held.
+v4.1 is the repair. Where v4.1 contradicts v4, v4.1 governs; v4 is not rewritten, because the record
+of what was wrong is the point.
+
+## What the evaluation falsified
+
+| Finding                                                   | What was actually true                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| --------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| BLOCKER 1 — the re-baseline is false                      | `main` had advanced again to `a6b2e4c31` (#1215); **four** merges sit behind canary.16, not one; and the claim that none touches `packages/**` was **wrong** — `6c6044da9` includes `packages/bench/bench.config.ts` and three `packages/fresh-ui/tests/**` files. `cut-trace.md` had also been left at canary.14 while W1, canary.15, canary.16 and five merges landed, against `milestone-run.md`'s requirement that the trace be kept live. Corrected in `cut-trace.md` § W1 and the canary.15/canary.16 boundary and in `worklog.md`. |
+| BLOCKER 2 — W3-B cannot close four issues in one PR       | #1376's own Boundaries section says #1375 owns a change in the same composition root and the two **must remain separable**: "do not fold either into the other's PR." v4 folded them. #1375 is also not "`writeHostConfig` + a probe + tests" — it has eleven acceptance rows including a generated embedded fallback corpus, version provenance, a size budget, and precedence behaviour. #1197 is observational and cannot close by any PR.                                                                                             |
+| BLOCKER 3 — the closure manifest is incomplete            | #1202, #1197, #1333 and #1208 all have rows their own briefs say a PR cannot close, and none appeared in stage F. #1126 has open children #1139/#1140 in 0.0.6, so it cannot be hand-closed in 0.0.5 at all.                                                                                                                                                                                                                                                                                                                              |
+| HIGH 4 — sweep dispositions                               | 0.0.6 has **31** open _issues_ (the 32nd milestone row was PR #1215, since merged); #1361 is in 0.0.6, not 0.0.7. Three rejections were reasoned from false premises — see the re-adjudication below.                                                                                                                                                                                                                                                                                                                                     |
+| HIGH 5 — no slice tables or briefs for changed groups     | The slice dirs still held v3 briefs naming **Qwen** evaluation, and no brief existed for any pulled-forward issue.                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| HIGH 6 — the new sequencing gates can silently do nothing | The expensive-gate protocol had no holder, no acquisition predicate, and no state distinguishing a granted run from an ungranted one; the milestone-move step had no receipt and no dispatch predicate.                                                                                                                                                                                                                                                                                                                                   |
+| MEDIUM 7 — dependencies and canary rationale              | W5-A needs a _decision_ from W4-A, not a merge; W5-C is not independent — its own brief inherits W4's visual language, which also raises a GLM question; and v4 claimed a canary at every wave boundary while cutting after only two of four.                                                                                                                                                                                                                                                                                             |
+
+Two v4 claims the evaluation **confirmed** and which therefore stand: the canary.16 green pair
+(publish `31201279314`, pinned E2E `31201560939`, `release/canary-pair` success, non-draft
+prerelease), and the v4 lane table against `agentic:routing-state` with no persisted transition.
+
+## Re-baseline
+
+| Fact                  | Value                                                                                   |
+| --------------------- | --------------------------------------------------------------------------------------- |
+| Baseline              | `origin/main@a6b2e4c31d80405d5225887cde7ab61baa2802f8` (#1215)                          |
+| Behind canary.16      | four merges: `6c6044da9` #1391, `bb10be0e2` #1337, `c383b2e84` #1347, `a6b2e4c31` #1215 |
+| Touches `packages/**` | `6c6044da9` only (bench config + three `fresh-ui` test files)                           |
+| Open 0.0.5 issues     | 21                                                                                      |
+| Open 0.0.5 PRs        | #1392 (orchestration), #1393 / #1394 / #1395 (W2)                                       |
+| Open 0.0.6 issues     | 31 · open 0.0.7 issues: 12                                                              |
+
+Every open W2 PR is based on `c383b2e84` and must be verified against `a6b2e4c31` before merge; that
+is a per-PR pre-merge gate item, not a re-dispatch.
+
+## Sweep re-adjudication
+
+Three v4 rejections were reasoned from premises the evaluator falsified. Re-decided on the evidence:
+
+- **#1343 — pulled into 0.0.5, stage F.** v4 rejected it because "such a canary does not exist yet".
+  It does: #1342 merged as `1455231b0`, which is an ancestor of canary.16's source `fac9e3390`, and
+  the canary.16 receipt records a published-CLI production E2E. #1343's single acceptance row — from
+  a clean directory **outside** the framework checkout, install the exact canary with no
+  local-source fallback and run the full installed-consumer scaffold smoke — is executable now and
+  is not what the in-repo CI E2E proves. For a stable release this is the highest-value single
+  observation available, and it is orchestrator-executable. It closes by hand in F, against C17 or
+  later.
+- **#1379 — pulled into 0.0.5 as its own W4 group.** v4 rejected it as unbounded because "the error
+  count is unknown until the check runs". The issue records that the package-local check **passes
+  today** and offers two bounded lock policies (join-root-lock or frozen-private-lock), with ten
+  red-first acceptance rows. It is load-bearing: `packages/fresh-ui` is a **published** package in
+  no CI job, and W4-A is the release's largest change to that surface. Shipping a stable release
+  with a published package unchecked by any workflow is not defensible.
+- **#1373 — stays in 0.0.5; #1374 is _not_ pulled.** The evaluator was right that fixed-string
+  needles cannot prove a compile claim. But the compile assertion lives in #1373's _Docs/consumer
+  proof_ prose, not in its acceptance: all **twelve** `- [ ]` boxes are naming, dialect, alias,
+  template-symbol, CLI-test and negative-gate rows, every one of which a needle gate can prove. The
+  adjudication is recorded as a comment on #1373 itself — the compile-proof sentence is #1374-owned
+  and is not acceptance for this milestone — so the issue and the plan agree. If that comment is
+  refused, #1373 moves to 0.0.6 with #1374 rather than shipping an unprovable box.
+
+## Scope after v4.1 — 26 issues
+
+21 retained **−** #1126 (moves to 0.0.6: its children #1139/#1140 are open there, and `netscript-pr`
+closes an epic by hand only once every child is done) **+** #1373, #1356, #1375, #1376, #1359 (v4)
+**+** #1343, #1379 (v4.1).
+
+**Scope-drift checkpoint**, recorded as a decision rather than discovered later: v4 moved 21 → 26
+and v4.1 moves it to 26 by a different composition, with one issue leaving. Every addition after v4
+was forced by a checkable dependency the evaluation surfaced, not by preference. This is the last
+scope change; further findings become linked 0.0.6 issues.
+
+## Frozen groups — v4.1
+
+W2 is unchanged and already dispatched. W3-B is split three ways; W4 gains #1379; W5 loses its
+serialisation behind W4-A.
+
+| Group                      | Issues                                          | Closing keyword                  | Depends on                                                                                                                          |
+| -------------------------- | ----------------------------------------------- | -------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| W2-A _(dispatched, #1394)_ | #1325                                           | `Closes #1325`                   | —                                                                                                                                   |
+| W2-B _(dispatched, #1395)_ | #1329                                           | `Closes #1329`                   | —                                                                                                                                   |
+| W2-C _(dispatched, #1393)_ | #1327 + #1202                                   | `Closes #1327`, **`Refs #1202`** | —                                                                                                                                   |
+| **C17**                    | canary at the W2 boundary                       | —                                | W2 landed                                                                                                                           |
+| W3-A                       | #1326                                           | `Closes #1326`                   | W2-B envelope                                                                                                                       |
+| W3-B1                      | #1102                                           | `Closes #1102`                   | declared independent of #1375's corpus parity; if implementation finds otherwise it is a rescope, not a silent dependency           |
+| W3-B2                      | #1375                                           | `Closes #1375`                   | — (kept separable per #1376's Boundaries)                                                                                           |
+| W3-B3                      | #1376                                           | `Closes #1376`                   | — (kept separable per #1376's Boundaries)                                                                                           |
+| W3-C                       | #1119                                           | `Closes #1119`                   | —                                                                                                                                   |
+| **C18**                    | canary at the W3 boundary                       | —                                | W3 landed                                                                                                                           |
+| W4-A                       | #1333 + #1359                                   | `Closes #1359`, **`Refs #1333`** | C18; GLM 5.2 design pass mandatory                                                                                                  |
+| W4-B                       | #1356                                           | `Closes #1356`                   | C18                                                                                                                                 |
+| W4-C                       | #1108                                           | `Closes #1108`                   | C18                                                                                                                                 |
+| W4-D                       | #1379                                           | `Closes #1379`                   | dispatched **before** W4-A touches `packages/fresh-ui`, so the published package is in CI before the release's largest change to it |
+| **C19**                    | canary at the W4 boundary                       | —                                | W4 landed                                                                                                                           |
+| W5-A                       | #1373                                           | `Closes #1373`                   | **the locked module name only** — not W4-A's merge                                                                                  |
+| W5-B                       | #1137 + #1138                                   | `Closes #1137`, `Closes #1138`   | —                                                                                                                                   |
+| W5-C                       | #1332 + #1334                                   | `Closes #1332`, `Closes #1334`   | W4-A's **accepted design checkpoint**; see the GLM disposition below                                                                |
+| W5-D                       | #1208                                           | **`Refs #1208`**                 | W4-A, W5-A                                                                                                                          |
+| **C20**                    | final canary; the stable cut consumes this pair | —                                | W5 landed; **no merge between C20 and the cut**                                                                                     |
+| **F**                      | closure manifest below                          | —                                | C17–C20                                                                                                                             |
+
+Waves keep at most three active supervisors; W4 has four groups, so W4-D dispatches first and W4-A
+follows it into the freed lane.
+
+### The locked decision W5-A depends on
+
+**`apps/<app>/lib/<service>.ts` is the data-layer module name.** #1373 already ratifies it and
+#1373's Boundaries require only that the two issues _coordinate the name before either lands_ — not
+that one merges first. Locking it here converts a merge dependency into a decision dependency, so
+W5-A is not serialised behind the release's largest frontend PR. W4-A is bound to this name; if W4-A
+finds it wrong, that is a rescope raised to the orchestrator, not a unilateral change.
+
+### GLM disposition for W5-C
+
+`lane-policy.md` makes the GLM 5.2 design pass mandatory for significant frontend UX, and #1334
+changes the homepage's visual hierarchy, diagrams, tabs, responsive states and signature
+interaction. W5-C is therefore **constrained to reuse W4-A's already-accepted design** — tokens,
+type scale, layout — and introduces no new major UI/UX. If W5-C's implementation needs to depart
+from that language, it takes its own GLM 5.2 adversarial pass before merge. The constraint goes in
+the brief so the lane cannot resolve it by habit.
+
+## Closure manifest — every retained issue has exactly one path
+
+No code PR carries a closing keyword for any row below. Each names the event, the evidence, the
+authority, and what happens if the event does not occur.
+
+| Issue     | Event that closes it                                                                                                                                    | Evidence                                                                                                     | If it does not occur                                                                           |
+| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------- |
+| #1004     | a real same-semver canary recovery, or a reasoned finding that the lane still lacks one                                                                 | recovery run ids + registry verification                                                                     | move to 0.0.6 intact                                                                           |
+| #1090     | an unprompted agent behavioural trial after the W3 agent surface is published                                                                           | trial transcript with tool-call counts                                                                       | move to 0.0.6                                                                                  |
+| #1166     | a canary payload that includes work landing behind a merge commit                                                                                       | `release:canary-label` payload vs first-parent history                                                       | move to 0.0.6                                                                                  |
+| #1169     | one-pass publish demonstrated across C17–C20 without rerun                                                                                              | four canary receipts                                                                                         | move to 0.0.6                                                                                  |
+| #1197     | a re-measured real agent run after #1375/#1376/#1102 are **published** in a canary                                                                      | before/after MCP call counts from a real run                                                                 | move to 0.0.6                                                                                  |
+| #1202     | owner-machine identification of the colliding service on the fixed low port **with it present**, plus three consecutive clean `scaffold.runtime` passes | port/service capture + three raw exit codes                                                                  | move to 0.0.6; W2-C's code fix ships regardless                                                |
+| #1208     | Phase 1 ships in W5-D; **Phase 2 is a separate follow-up by the issue's own definition**                                                                | W5-D carries `Refs #1208`                                                                                    | Phase 2 is filed as a 0.0.6 issue and #1208 closes only if Phase 2 is explicitly dispositioned |
+| #1333     | a measured Quickstart agent smoke after W4-A merges and publishes                                                                                       | smoke receipt                                                                                                | move to 0.0.6; W4-A's code ships regardless                                                    |
+| #1338     | T1 observational closure                                                                                                                                | already-landed policy evidence                                                                               | move to 0.0.6                                                                                  |
+| #1343     | orchestrator runs the installed-consumer smoke from a clean directory outside the checkout against a published canary                                   | receipt: exact version, provenance, command, working root, per-step verdicts, raw exit code, cleanup outcome | move to 0.0.6                                                                                  |
+| **#1126** | **moves to 0.0.6 now** — children #1139/#1140 are open there                                                                                            | —                                                                                                            | —                                                                                              |
+
+## Milestone-move receipt
+
+The five v4 pulls plus #1343 and #1379 move to milestone 0.0.5, and #1126 moves to 0.0.6, **only
+after v4.1 passes re-evaluation**. The move is not complete until `worklog.md` records the exact
+before/after milestone for each of the eight issues, queried live. **W3 does not dispatch until that
+receipt exists**; its absence is the failure state, and it is visible because the receipt is a
+required artifact rather than an assumed side effect.
+
+## Expensive-gate serialisation
+
+Superseded: v4 referred to a "token" with no holder. The mechanism is now the ledger at
+`expensive-gate-log.md` — one holder, orchestrator-only grants, a required grant row that precedes
+the run, and the explicit rule that **a `scaffold.runtime` result with no preceding grant row is not
+admissible evidence, pass or fail**. Per owner decision 2026-08-09 this stays a recorded protocol; a
+reusable gate tool is deferred to a post-stable issue and is not on the 0.0.5 critical path.
+
+## Canary boundaries — corrected to four
+
+v4 claimed a canary at every wave boundary while declaring only two. Corrected: **C17 (W2), C18
+(W3), C19 (W4), C20 (W5)** — one per dispatch wave, which is what `canary-cadence.md` means by a
+boundary and what its asserted every-boundary preference favours. The stable cut consumes C20's pair
+for the same content, so no merge may land between C20 and the cut. Publish-attempt cost is not the
+constraint (roughly 35 attempts per all-package cut against thousands remaining); the real cost is
+production-E2E wall clock, which runs in CI and not in a dispatch lane. Membership at every point is
+computed by `release:canary-label` from first-parent history, never from this table. The two
+owner-undecided cadence questions remain this run's recorded decisions, not promoted rules.
+
+## Briefs and slice tables
+
+Every v3 brief for a group that v4/v4.1 changed is **stale and must not be dispatched** — they name
+Qwen evaluation, retired cluster membership, and superseded canary boundaries. Before each wave
+dispatches, its groups get a v4.1 brief carrying: the native Fable IMPL-EVAL lane, the exact
+membership and closing keywords above, an ordered commit-slice table with files and the proving gate
+per slice, the archetype/overlay and JSR surface for the touched packages, and the group's known
+environmental hazards. W2's three briefs already meet this bar and are the template. No group
+dispatches on a v3 brief.

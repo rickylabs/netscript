@@ -20,8 +20,8 @@ mutation has occurred after the baseline row above. Planned boundaries remain C1
 
 ## Canary.14 train continuation
 
-| Time (UTC)           | Commit      | PR    | Issues closed | Classification |
-| -------------------- | ----------- | ----- | ------------- | -------------- |
+| Time (UTC)           | Commit      | PR    | Issues closed | Classification                                                                                                                         |
+| -------------------- | ----------- | ----- | ------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
 | 2026-08-06T20:47:00Z | `10dbea37c` | #1339 | none          | DeepSeek formal-evaluator policy prerequisite squash-merged into `canary/0.0.5-canary.14`; #1338 retained for observational T1 closure |
 
 This is a train merge, not a canary publication. The next cut remains blocked on T1-A's fresh
@@ -30,21 +30,64 @@ release publish/verification gates.
 
 ## Canary.14 terminal trace
 
-| Time (UTC)           | Commit      | PR    | Issues closed | Classification |
-| -------------------- | ----------- | ----- | ------------- | -------------- |
-| 2026-08-06T21:00:26Z | `95a60cbaf` | #1315 | #1295 | Zod 4 dependency cluster merged to C14 payload |
-| 2026-08-06T21:03:09Z | `51787c3ae` | #1316 | #1189 | shared plugin-link cluster merged second |
-| 2026-08-06T21:15:05Z | `765e8b732` | #1317 | #1117 | refreshed OpenAPI→MCP cluster merged third |
-| 2026-08-06T21:16:30Z | `a5c13ecdd` | #1318 | #1115 | refreshed live-agent-state cluster completed payload |
-| 2026-08-06T21:34:21Z | `d6db645a8` | #1340 | #1295/#1189/#1117/#1115 | payload squash-merged to `main` |
+| Time (UTC)           | Commit      | PR    | Issues closed           | Classification                                       |
+| -------------------- | ----------- | ----- | ----------------------- | ---------------------------------------------------- |
+| 2026-08-06T21:00:26Z | `95a60cbaf` | #1315 | #1295                   | Zod 4 dependency cluster merged to C14 payload       |
+| 2026-08-06T21:03:09Z | `51787c3ae` | #1316 | #1189                   | shared plugin-link cluster merged second             |
+| 2026-08-06T21:15:05Z | `765e8b732` | #1317 | #1117                   | refreshed OpenAPI→MCP cluster merged third           |
+| 2026-08-06T21:16:30Z | `a5c13ecdd` | #1318 | #1115                   | refreshed live-agent-state cluster completed payload |
+| 2026-08-06T21:34:21Z | `d6db645a8` | #1340 | #1295/#1189/#1117/#1115 | payload squash-merged to `main`                      |
 
-- Release: [`v0.0.5-canary.14`](https://github.com/rickylabs/netscript/releases/tag/v0.0.5-canary.14),
+- Release:
+  [`v0.0.5-canary.14`](https://github.com/rickylabs/netscript/releases/tag/v0.0.5-canary.14),
   published `2026-08-06T21:39:04Z`.
 - Released main SHA: `d6db645a89d830e6c36e838e8e1dac98fc84fde5`.
 - Immutable version-bumped tag content SHA: `d405def432b46d8119162a605b7e988db9d3f1fc`.
 - Initial pinned E2E failure is retained as transient JSR 502 evidence. The supported same-semver,
-  tag-bound recovery run [`31128595811`](https://github.com/rickylabs/netscript/actions/runs/31128595811)
-  completed success, including exact registry verification and green-pair recording.
+  tag-bound recovery run
+  [`31128595811`](https://github.com/rickylabs/netscript/actions/runs/31128595811) completed
+  success, including exact registry verification and green-pair recording.
 - Exact pinned production E2E child
-  [`31128614286`](https://github.com/rickylabs/netscript/actions/runs/31128614286) completed success.
-  Canary.14 is green; no canary.15 was created during recovery.
+  [`31128614286`](https://github.com/rickylabs/netscript/actions/runs/31128614286) completed
+  success. Canary.14 is green; no canary.15 was created during recovery.
+
+## W1 and the canary.15 / canary.16 boundary — appended from live first-parent history
+
+Appended 2026-08-09 from `git log --first-parent origin/main`. This section repairs a maintenance
+gap: the trace was left at canary.14 while W1, two canary points and five merges actually landed.
+That gap was found by the v4 PLAN-EVAL (BLOCKER 1), not by the run, and it is recorded rather than
+quietly backfilled.
+
+| Time (UTC)           | Commit      | PR    | Issues closed | Classification                                         |
+| -------------------- | ----------- | ----- | ------------- | ------------------------------------------------------ |
+| 2026-08-07T06:53:30Z | `7af6d1c02` | #1341 | #1312 · #1148 | W1-A — release budget guard and generated residue scan |
+| 2026-08-07T12:54:39Z | `1455231b0` | #1342 | #1024 · #1328 | W1-B — generated quality gates own executable source   |
+| 2026-08-07T14:37:04Z | `fc70a97d1` | #1344 | #1324 · #1330 | W1-C — OpenCode MCP attach and provider-valid resume   |
+| 2026-08-07T17:12:33Z | `fac9e3390` | #1346 | #1345         | canary.15 pinned-E2E repair, merged forward            |
+| 2026-08-08T21:27:57Z | `6c6044da9` | #1391 | none          | agentic native model routing refresh                   |
+| 2026-08-08T21:32:37Z | `bb10be0e2` | #1337 | none          | continuation orchestration artifacts                   |
+| 2026-08-08T~21:5x    | `c383b2e84` | #1347 | none          | planning-only seed roadmap (0.0.6/0.0.7 drafts)        |
+| 2026-08-08T~22:xx    | `a6b2e4c31` | #1215 | none          | docs main-pages harness evidence                       |
+
+- **Canary.15** was published completely and its pinned production E2E
+  [31196896495](https://github.com/rickylabs/netscript/actions/runs/31196896495) **failed** on two
+  connected generated-scaffold assumptions. The immutable tag, package and release were not reused.
+  Repair PR #1346 merged forward; the failure is retained as evidence, not erased.
+- **Canary.16** was cut from `fac9e3390`, release commit `94feaea3b`, tag object `8d9bd82ad`.
+  Publish [31201279314](https://github.com/rickylabs/netscript/actions/runs/31201279314) and pinned
+  production E2E [31201560939](https://github.com/rickylabs/netscript/actions/runs/31201560939) both
+  completed success; `release/canary-pair` is success. Full receipt in
+  `canary-16-recovery-receipt.md`.
+
+### C17 payload so far
+
+Four merges are already unshipped behind canary.16: `6c6044da9` (#1391), `bb10be0e2` (#1337),
+`c383b2e84` (#1347), `a6b2e4c31` (#1215). Membership is computed by `release:canary-label` from
+first-parent history at the cut, never from this list.
+
+**Correction to a claim this run made and the evaluator falsified:** `worklog.md` originally stated
+that none of the post-canary.16 merges touches `packages/**` or `plugins/**`. That is false.
+`git show --name-only 6c6044da9` includes `packages/bench/bench.config.ts` and three
+`packages/fresh-ui/tests/registry/components/ui/*.test.tsx` files. #1337, #1347 and #1215 touch
+neither tree. The corrected statement: **#1391 touches `packages/**` (a bench config and three
+`fresh-ui` test files); the other three merges are run-artifact and planning content only.**

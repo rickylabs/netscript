@@ -610,7 +610,11 @@ Re-baseline verified live, not recalled:
 - Latest prerelease = `v0.0.5-canary.16`, `2026-08-07T17:16:52Z`; pair recorded in
   `canary-16-recovery-receipt.md` (publish 31201279314, pinned E2E 31201560939, both success).
 - Merges on `main` after canary.16's source `fac9e3390`: #1391 (`6c6044da9`), #1337 (`bb10be0e2`),
-  #1347 (`c383b2e84`). None touches `packages/**` or `plugins/**`; all three enter C17's payload.
+  #1347 (`c383b2e84`), #1215 (`a6b2e4c31`). **Correction (v4 PLAN-EVAL BLOCKER 1):** an earlier
+  version of this line claimed none of them touches `packages/**` or `plugins/**` and listed only
+  three. Both claims were false. `git show --name-only 6c6044da9` includes
+  `packages/bench/bench.config.ts` and three `packages/fresh-ui/tests/**` files; #1215 merged after
+  the line was written. #1337, #1347 and #1215 touch neither tree. All four enter C17's payload.
 - Milestone 23 `0.0.5`: 21 open issues; 0 open PRs after #1337 merged.
 - 0.0.6 = 32 open, 0.0.7 = 12 open — both swept in full for pull-forward (plan v4).
 
