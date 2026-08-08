@@ -645,3 +645,55 @@ this run has already been bitten by once, on #1202.
 subject of the escalation recorded at `escalations/plan-gate-scope.md`. W2 continues meanwhile: it
 is authorized under the v3 `PASS` plus its own per-group PLAN-EVALs, and neither evaluation cycle
 found fault with it.
+
+---
+
+# v4.3 — the superseding F manifest and the corrected receipt (2026-08-09)
+
+Cycle 3 returned `FAIL_PLAN` with three findings, down from nine. It confirmed as **FIXED**: the
+scope arithmetic and enumeration (26 unique, verified two independent ways), #1169's move, #1004's
+corrected rule, #1379's option (b), the `cut-trace.md` timestamps and evaluated-through marker
+against live `origin/main`, `research.md`'s re-baseline, and W3's dispatch sub-order. It also
+confirmed the #1202 correction matches the live issue body, that draft PR #1393 has not closed #1202
+early, and that W4's four groups fit three lanes.
+
+All three remaining findings are bookkeeping in artifacts this run owns, and one of them is a claim
+made and not delivered.
+
+## The F manifest — this table supersedes every earlier one
+
+v4.2 asserted "Every closure row now names an authority" and did not add the column. The v4.1 table
+above also still shows superseded rows for #1004, #1169, #1202 and #1126. **Ignore that table.**
+This is the governing F manifest; `phase-registry.md` stage F points here and nowhere else.
+
+Exactly eight rows. #1126 and #1169 are not here — they move to 0.0.6. #1202 is not here — it is
+closable by PR #1393 (§ The #1202 correction).
+
+| Issue         | Adjudicator                 | Event that closes it                                                                                                   | Admissible evidence                                                                                                                            | If it does not occur                                                                                                                     |
+| ------------- | --------------------------- | ---------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| #1004         | milestone orchestrator      | a **demonstrated** same-semver canary recovery that republishes only missing members                                   | the recovery workflow run id, the exact-version registry verification, and the member-level log line showing already-published members skipped | move to 0.0.6 — a reasoned finding that the lane lacks a recovery is non-occurrence, not acceptance                                      |
+| #1090         | milestone orchestrator      | an **unprompted** agent behavioural trial after the W3 agent surface is published in a canary                          | the trial transcript with per-tool call counts, against the pre-change baseline in the issue                                                   | move to 0.0.6                                                                                                                            |
+| #1166         | milestone orchestrator      | a canary payload that includes work landing behind a merge commit                                                      | `release:canary-label` output compared against `git log --first-parent` for the same boundary                                                  | move to 0.0.6                                                                                                                            |
+| #1197         | milestone orchestrator      | a re-measured real agent run after #1375, #1376 and #1102 are **published** in a canary                                | before/after MCP call counts from a real run, not a synthetic probe                                                                            | move to 0.0.6                                                                                                                            |
+| #1208 Phase 2 | **repo owner (@Rickylabs)** | a scope decision: Phase 2 is either delivered or explicitly dispositioned                                              | the owner's decision recorded on the issue                                                                                                     | Phase 2 is filed as its own 0.0.6 issue and #1208 closes on Phase 1 only if the owner says so — the orchestrator does not make this call |
+| #1333         | milestone orchestrator      | a measured Quickstart agent smoke after W4-A merges and is published                                                   | the smoke receipt with the measured agent behaviour the issue names                                                                            | move to 0.0.6; W4-A's code ships regardless                                                                                              |
+| #1338         | milestone orchestrator      | T1 observational closure against the already-landed policy evidence                                                    | the merged #1339 policy commit plus the recorded formal-evaluation runs that used it                                                           | move to 0.0.6                                                                                                                            |
+| #1343         | milestone orchestrator      | the installed-consumer smoke, run from a clean directory **outside** the framework checkout against a published canary | the receipt: exact package version and provenance, command and working root, per-step verdicts, raw exit code, and cleanup/leak outcome        | move to 0.0.6                                                                                                                            |
+
+The repo owner may override any row, including reversing a move; the orchestrator adjudicates only
+where the row is an evidence question rather than a scope question. #1208 Phase 2 is the one row
+that is purely a scope question, so it is the owner's.
+
+## The milestone-move receipt — nine issues, not eight
+
+v4.1 wrote the receipt for eight issues. v4.2 then moved #1169 out as a **second** outbound move and
+left the count at eight, making the predicate impossible to satisfy against its own enumeration —
+the receipt could never read `passed`. Corrected to the exact nine:
+
+**Inbound to 0.0.5 (seven):** #1373, #1356, #1375, #1376, #1359, #1343, #1379. **Outbound to 0.0.6
+(two):** #1126 (children #1139/#1140 open there), #1169 (child #1175 open there, and its DoD names a
+release cut).
+
+The receipt is complete only when `worklog.md` records the exact before/after milestone for **all
+nine**, from live queries. It reads `NOT_RUN` until then and `MISMATCH` if the queried set differs
+from those nine IDs. **W3 does not dispatch until it reads `passed`.**
