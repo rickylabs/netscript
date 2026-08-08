@@ -92,6 +92,30 @@ saga/compensation + Aspire graph + plugin-seam uniformity + agent-native surface
 between agents (e.g. meta-frameworks agent's "MCP tool count not enumerated" vs mcp-cli agent's
 authoritative 21-tool enumeration) resolved in favor of the domain agent with source citations.
 
+### S3/S4 — Synthesis + design packs (Stages C–D)
+
+- Stage C: `SYNTHESIS.md` committed (`831a05285`) — supervisor-authored; gap taxonomy,
+  7 adjudications, T1–T8 pack map, milestone-train direction.
+- Supervisor drafts committed while packs ran: `MILESTONE-TRAIN.md`, `WAVE7-AND-AGENT-ADOPTION.md`
+  (`54dedf59a`), existing-issue dispositions (`cca74212e`).
+- Stage D: workflow `wf_ebfe8327-306` (7 Opus 5 agents, 1.25M tokens, 297 tool calls) → 40 issue
+  drafts across `milestones/{0.0.6,0.0.7,0.0.8}-*/`, RFC-A (755 ln) + RFC-B (314 ln) in `rfcs/`,
+  `EXISTING-ISSUE-AMENDMENTS.md` (929 ln, 16 amendment blocks). Supervisor added T7-01 (Wave-7
+  smoke) — 41 drafts total, all DRAFT-marked (grep-verified).
+
+#### S4 review note (supervisor, slice review gate)
+
+Reviewed all pack manifests + spot-read drafts (T4-01 full). Every pack re-verified corpus claims
+against the worktree before drafting; the packs surfaced **six corpus corrections** now recorded
+in `ISSUE-DEDUP-AND-SUPERSESSION.md` §3.1 (T4-07 counter-evidence → drafted verify-first; sagas
+health-check partial coverage; auth arch-debt anchors exist; #1278 inventories 80%-discharged/
+mis-counted; quality:scan scope already repo-wide; arch:check:repo red = 2 mechanical causes).
+Pack deviations accepted with rationale: TA-03 split into a/b/c (different owner surfaces);
+TA-03a/TA-03b raised to p0 (security/runtime-correctness law); TA-05 raised to p2→p1 after the
+docs half was refuted; G8 remote authenticator folded into TA-02. Ownerless finds + filing-time
+checks recorded as the Stage-E ledger (§3.2–3.5). No lane self-certified: all pack output
+supervisor-reviewed before this sign-off commit.
+
 ### S1 — Bootstrap (Stage A)
 
 - Run dir created; `supervisor.md` written first with identity, lane table, and owner overrides.
