@@ -33,6 +33,31 @@ truthfully authorize `record_drift`.
 - `scaffold.runtime` — raw exit 0, `passed=78 failed=0 skipped=2`; both skips declared under #1398
 - Pre/post leak artifacts — no slice-owned survivor; foreign `redis-jfgcbtaf` left untouched
 
+```acceptance-evidence
+issue: 1376
+entries:
+  - box-index: 1
+    evidence: "S3 host-re-entry tests 4/4 and implementation evidence: https://github.com/rickylabs/netscript/pull/1400#issuecomment-5229326570"
+  - box-index: 2
+    evidence: "S3 mismatched-host execution proves no JSR child: https://github.com/rickylabs/netscript/pull/1400#issuecomment-5229326570"
+  - box-index: 3
+    evidence: "S2 shared executor identity plus S3 CLI_PACKAGE_VERSION host wiring: https://github.com/rickylabs/netscript/pull/1400#issuecomment-5229317589"
+  - box-index: 4
+    evidence: "S2 execute result schema exposes executor command and version: https://github.com/rickylabs/netscript/pull/1400#issuecomment-5229317589"
+  - box-index: 5
+    evidence: "S4 success/failure receipt tests in the 24/24 focused suite: https://github.com/rickylabs/netscript/pull/1400#issuecomment-5229342145"
+  - box-index: 6
+    evidence: "S4 successful execute_command to record_drift behavioral test: https://github.com/rickylabs/netscript/pull/1400#issuecomment-5229342145"
+  - box-index: 7
+    evidence: "S4 refusal text and authorizing-tool test: https://github.com/rickylabs/netscript/pull/1400#issuecomment-5229342145"
+  - box-index: 8
+    evidence: "S2 standalone characterization, S3 host resolution, and S4 receipt exit-path tests: https://github.com/rickylabs/netscript/pull/1400#issuecomment-5229418381"
+  - box-index: 9
+    evidence: "S4 all five denied commands overwrite green evidence and cannot authorize drift: https://github.com/rickylabs/netscript/pull/1400#issuecomment-5229342145"
+  - box-index: 10
+    evidence: "S3 9.9.9-host negative test fails with host wiring reverted and passes with no MCP-pinned spawn: https://github.com/rickylabs/netscript/pull/1400#issuecomment-5229418381"
+```
+
 ## Harness
 
 - Run dir: `.llm/runs/release-0.0.5--orchestration/slices/w3-b3-1376/`

@@ -90,6 +90,9 @@ mirror standalone, host, success, failure, and denial modes.
 | S5 post-fix focused/full MCP tests | focused command/receipt suite; `rtk proxy deno task --cwd packages/mcp test` | 0 each | 24/24 focused and 113/113 package tests. |
 | S5 post-fix publish surface | MCP export-map doc lint; JSR audit; publish-assets check; workspace publish dry-run | 0 each | `totalErrors: 0`; JSR dry-run OK; assets current; `Success Dry run complete`. |
 | S5 final review threads | `rtk proxy deno task agentic:review-threads -- --repo rickylabs/netscript --pr 1400 --pretty` | 0 | `threads=0 unanswered=0`. |
+| IMPL-EVAL cycle 1 | separate Claude · Fable 5 evaluation | 1 (`FAIL_FIX`) | Product, tests, docs, gates, and all ten rows verified; close-gate evidence was only ticked in branch-local `plan.md`, not mapped in the live PR/issue. S5's claim that live boxes were ticked was false and is corrected in place. |
+| Close-gate mirror dry-run | `GH_TOKEN=$(gh auth token) deno run --allow-env --allow-net .llm/tools/validation/mirror-acceptance-evidence.ts --repo rickylabs/netscript --pr 1400 --dry-run --pretty` | 0 | Guarded skip because PR remains `status:impl-eval`; no issue mutation. Provenance head `eb0889224`, issue body hash recorded by the tool. |
+| Live acceptance mapping validation | checked-in `acceptanceCheckboxes` + `parseAcceptanceEvidence` + `validateEvidenceMapping` against live PR #1400 and issue #1376 bodies | 0 | `boxes=10 unchecked=10 evidenceEntries=10 mapped=10 warnings=[]`. The map is complete; authorized mirroring remains pending `status:ready-merge`. |
 
 ## Phase status
 
@@ -108,3 +111,8 @@ only the embedded README constant, not #1375 corpus selection or filesystem wiri
 S5 is complete. The granted runtime ran exactly once and returned raw exit 0 with 78 passed, zero
 failed, and the two declared #1398 skips. Pre/post artifacts prove no slice-owned survivor. The
 token is released in the handoff, and the PR advances to orchestrator-launched IMPL-EVAL.
+
+Implementation-eval observations: the A8 cap repair moved the new identity schema to its owning
+executor contract but reached 299 lines partly by compacting import style; it was not purely a
+structural split. The issue's separate Docs/consumer-proof site-reference prose remains outside this
+README-only PR exactly as the passed plan scoped it; the PR does not claim site-reference coverage.
