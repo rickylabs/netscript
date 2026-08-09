@@ -98,6 +98,17 @@ The prior green runtime receipt is ledger row 73 under grant row 72 and was earn
 It predates the F6 product changes and cannot evidence the repaired head. PR closure/runtime claims
 are narrowed pending a new owner-granted one-pass receipt; no runtime command ran in this repair.
 
+## 2026-08-09 — ledger row 74 restores current-head runtime evidence
+
+The single authorized run at repaired product head `08e56bfad` completed 80 passed / 0 failed / 2
+expected #1398 skips / 82 total with raw exit 0. `generated.deno-check` passed, directly adjudicating
+the broken-import class, and `behavior.app-reference` passed at both browser viewports. None of the
+cycle-2 evaluator's three published-package-source diagnostics reproduced under local-source: the
+generated check emitted no QueryClientPort TS2345, `withForm` TS2345, or route TS18046. Pre/post leak
+checks found no run-owned resources and left the same foreign Redis container untouched; manifest
+and lock diffs were empty. Closure evidence now links ledger row 74, while the older green run is
+retained only as historical row 73 under grant row 72.
+
 ## 2026-08-09 — serialized runtime stopped at stale project-boundary app identity
 
 The single ledger-row-70 runtime execution at `2150421e4` exited 1 with 16 passed / 1 failed / 2

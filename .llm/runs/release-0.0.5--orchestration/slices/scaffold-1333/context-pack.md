@@ -91,3 +91,11 @@ specifier makes that guard exit 1 after barrel regeneration; clean source passes
 runtime is correctly identified as ledger row 73 under grant row 72 at `2052551d7` and is stale for
 the product changes after that head. A fresh serialized grant/receipt is required before row 9 and
 `Closes #1333` can be restored.
+
+Ledger row 74 was granted at orchestrator commit `aaed43a53` before execution. Exactly one one-pass
+run at product head `08e56bfad` exited 0 with 80 passed / 0 failed / 2 expected #1398 skips / 82
+total. The generated workspace check passed, so the repaired relative imports resolve in the real
+project and none of the three published-source probe diagnostics reproduced. The browser reference
+gate passed at desktop and mobile. Leak checks found no run-owned survivor, the foreign Redis
+container was left untouched, and manifest/lock diffs were empty. PR row 9 and its evidence now cite
+this receipt; the nine-entry acceptance mapping validates 9/9 at raw exit 0.

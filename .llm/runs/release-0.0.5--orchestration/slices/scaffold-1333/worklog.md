@@ -364,6 +364,32 @@ The PR's previous runtime wording was also narrowed: the green run is ledger row
 72, earned at `2052551d7`, and it does not cover the later F6 product changes. Row 9 and the closing
 keyword remain pending a fresh owner-granted serialized receipt at the repaired head.
 
+### Serialized runtime ledger row 74
+
+Grant row 74 was committed at orchestrator head `aaed43a53` before the single execution at product
+head `08e56bfad`. The exact one-pass command exited 0:
+
+```text
+deno task e2e:cli run scaffold.runtime --cleanup --format pretty
+Summary: passed=80 failed=0 skipped=2
+RAW_EXIT_CODE=0
+total=82
+```
+
+Both skips are the expected #1398 deferrals: `behavior.otel.stream-consumer` lacks the
+workers-combined stream mutation hook, and `behavior.otel.traces` depends on the deferred Flow-B
+record. The direct cycle-2 verdicts are `generated.deno-check` PASS (4.231s) and
+`behavior.app-reference` PASS (59.983s, desktop and mobile through Windows Chrome/WSL). The generated
+check emitted none of the published-source probe's QueryClientPort TS2345, `withForm` TS2345, or
+route TS18046; none reproduces under local-source.
+
+Pre/post leak checks exited 0 with no run-owned resources. The same stale foreign Redis container
+owned by `/home/codex/repos/w6-review-desk` was reported and left untouched. `cleanup.aspire-stop`
+passed, and no `deno.json` or `deno.lock` diff remained. The receipt is PR comment
+`5233795184`. PR validation and row-9 evidence now cite ledger row 74, `Closes #1333` is restored,
+and the exact first-line acceptance mapping validates `9/9` with no warnings at raw exit 0. The PR
+remains draft at `status:impl` for owner-controlled evaluation/readiness.
+
 ### Gates
 
 | Gate | Result |
