@@ -60,7 +60,7 @@ This draft is plan-only. Product implementation is blocked on a fresh separate-s
 - No product source changes before `PASS`; no AppHost/container/`e2e:cli` before a durable runtime
   token grant.
 
-## Acceptance status
+## Definition of Done
 
 - [ ] Ordered section guidance and cited code remain green after the continuation.
 - [ ] Checked-in deterministic top-k adds three discriminators without loosening the original five.
