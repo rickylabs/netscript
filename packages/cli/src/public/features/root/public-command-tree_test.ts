@@ -111,6 +111,16 @@ Deno.test('public init emits resolvable app conventions with and without the exa
     await Deno.stat(
       join(serviceApp, 'routes', 'examples', 'users', '(_shared)', 'authorization.ts'),
     );
+    for (
+      const retainedRoute of [
+        join('routes', 'examples', 'crud.tsx'),
+        join('routes', 'examples', 'telemetry', 'index.tsx'),
+        join('routes', 'examples', 'users', 'index.tsx'),
+      ]
+    ) {
+      const stat = await Deno.stat(join(serviceApp, retainedRoute));
+      assert(stat.isFile, `Expected retained example route: ${retainedRoute}`);
+    }
 
     await scaffoldFixture(parent, 'without-service');
     const noServiceApp = join(parent, 'without-service', 'apps', 'dashboard');

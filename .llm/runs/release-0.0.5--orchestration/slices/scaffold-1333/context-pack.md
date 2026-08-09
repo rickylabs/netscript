@@ -29,3 +29,7 @@ telemetry, partial navigation, QueryIsland hydration, four query states, and opt
 the canonical generated service route. Fresh memory and DB workspaces type-check at 108 and 117
 selected files respectively. Deliberate rollback, invalid-form, and success-form mutations each
 produce focused red evidence.
+
+S4 promotes the typed canonical route and living design references without deleting the independent
+CRUD or telemetry examples. Home and navigation links use `appRoutes.design` and
+`appRoutes.designComposition`; app guidance discovers the new contract/form/auth/resource seams.

@@ -9,7 +9,15 @@ export const examplesPage = definePage()
     description: 'Registry-only scaffold example pages.',
   }))
   .withLayer('examples', ExamplesView, () => ({
+    canonicalHref: appRoutes.serviceExample.href(),
     examples: [
+      {
+        title: '{{modelName}} resource flow',
+        href: appRoutes.serviceExample.href(),
+        description: 'Canonical contract, resource, layer, managed-form, and optimistic-mutation flow.',
+        status: 'Canonical',
+        owner: 'app',
+      },
       {
         title: '{{modelName}} CRUD',
         href: appRoutes.crudExample.href(),

@@ -11,10 +11,13 @@ interface ConventionReference {
     | 'dashboard-view'
     | 'ui-barrel'
     | 'composition-route'
+    | 'service-route-contract'
     | 'service-lib'
     | 'service-page'
     | 'service-island'
     | 'service-shared'
+    | 'service-form'
+    | 'service-authorization'
     | 'service-partial'
     | 'telemetry-route';
   readonly path: string;
@@ -48,6 +51,11 @@ function serviceReferences(
   const root = `routes/examples/${input.serviceName}`;
   return [
     {
+      id: 'service-route-contract',
+      path: `${root}/(_lib)/route-contract.ts`,
+      purpose: 'typed path, search, and managed-form schemas',
+    },
+    {
       id: 'service-lib',
       path: `${root}/(_lib)/service-query.ts`,
       purpose: 'contract-derived client and query factories',
@@ -66,6 +74,16 @@ function serviceReferences(
       id: 'service-shared',
       path: `${root}/(_shared)/service-showcase.ts`,
       purpose: 'canonical query keys and shared query loaders',
+    },
+    {
+      id: 'service-form',
+      path: `${root}/(_components)/managed-form.tsx`,
+      purpose: 'withForm invalid and successful submission states',
+    },
+    {
+      id: 'service-authorization',
+      path: `${root}/(_shared)/authorization.ts`,
+      purpose: 'provider-neutral viewer and mutation policy boundary',
     },
     {
       id: 'service-partial',
@@ -126,8 +144,8 @@ ${localExamples}
 
 Before hand-writing a service request or probing it with curl, follow the MCP path: \`list_api_services\` to discover the live service name, \`list_service_operations\` to select an operation, then \`get_operation_schema\` for its request and response contract.
 
-1. Start from the service contract and derive the client **and query factories** in one app \`lib\` module.
-2. Compose the route with \`definePage\` layers; keep non-interactive regions server-rendered.
+1. Start from the service contract and derive the client **and query factories** in the resource-local \`(_lib)\` module.
+2. Compose the route with typed route state, \`withResource\`, and \`definePage\` layers; keep non-interactive regions server-rendered.
 3. Hydrate only interactive regions with \`QueryIsland\`, and use \`useMutation\` with canonical query keys.
 4. Add a live stream only where the screen needs live state; preserve the same contract and query-key vocabulary.
 5. Use \`withForm\` for route-bound validated mutations unless a client-only form is justified.

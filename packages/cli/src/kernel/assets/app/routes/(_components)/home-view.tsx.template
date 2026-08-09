@@ -11,10 +11,14 @@ interface RouteCard {
 interface HomeViewProps {
   readonly projectName: string;
   readonly appName: string;
+  readonly designHref: string;
+  readonly compositionHref: string;
   readonly routes: readonly RouteCard[];
 }
 
-export default function HomeView({ projectName, appName, routes }: HomeViewProps) {
+export default function HomeView(
+  { projectName, appName, designHref, compositionHref, routes }: HomeViewProps,
+) {
   return (
     <main class='ns-shell ns-section ns-stack ns-stack--lg'>
       <PageHeader>
@@ -32,8 +36,11 @@ export default function HomeView({ projectName, appName, routes }: HomeViewProps
           </PageHeader.Intro>
           <PageHeader.Actions>
             <Button type='link' href='/dashboard'>Open dashboard</Button>
-            <Button type='link' href='/design/components' variant='outline'>
-              Browse UI
+            <Button type='link' href={designHref} variant='outline'>
+              Browse design
+            </Button>
+            <Button type='link' href={compositionHref} variant='ghost'>
+              Composition guide
             </Button>
           </PageHeader.Actions>
         </PageHeader.Main>

@@ -9,7 +9,7 @@ export default define.layout(function RootLayout({ Component, url }) {
   const dashboardHref = appRoutes.dashboard.href();
   const examplesHref = appRoutes.examples.href();
   const healthHref = appRoutes.health.href();
-  const designHref = '/design/components';
+  const designHref = appRoutes.design.href();
   const showScaffoldChrome = url.pathname === homeHref || url.pathname === dashboardHref ||
     url.pathname.startsWith(examplesHref);
 
@@ -67,7 +67,13 @@ export default define.layout(function RootLayout({ Component, url }) {
           >
             Health
           </Button>
-          <Button type='link' href={designHref} variant='ghost' size='sm'>
+          <Button
+            type='link'
+            href={designHref}
+            variant='ghost'
+            size='sm'
+            aria-current={url.pathname.startsWith(designHref) ? 'page' : undefined}
+          >
             Design
           </Button>
           <ThemeToggle />

@@ -17,6 +17,7 @@ interface ExampleCard {
 }
 
 interface ExamplesViewProps {
+  readonly canonicalHref: string;
   readonly examples: readonly ExampleCard[];
 }
 
@@ -49,7 +50,7 @@ const columns: readonly ResponsiveTableColumn<ExampleCard>[] = [
   },
 ];
 
-export default function ExamplesView({ examples }: ExamplesViewProps) {
+export default function ExamplesView({ canonicalHref, examples }: ExamplesViewProps) {
   return (
     <main class='ns-shell ns-section ns-stack ns-stack--lg'>
       <PageHeader>
@@ -66,7 +67,7 @@ export default function ExamplesView({ examples }: ExamplesViewProps) {
             </p>
           </PageHeader.Intro>
           <PageHeader.Actions>
-            <Button type='link' href='/examples/{{serviceName}}'>Open {{modelName}} CRUD</Button>
+            <Button type='link' href={canonicalHref}>Open canonical {{modelName}} flow</Button>
           </PageHeader.Actions>
         </PageHeader.Main>
       </PageHeader>

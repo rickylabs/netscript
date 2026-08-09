@@ -59,6 +59,29 @@ passed in the same run.
 | Scoped lint | raw exit 0; 5 files / 1 batch / 0 findings |
 | Scoped format | raw exit 0; 5 files / 1 batch / 0 findings |
 | Package code-quality scan | raw exit 0; 0 findings / 6 existing allowances |
+
+## S4 — discovery and retained living examples
+
+### Implementation
+
+- Home cards, home actions, and root navigation now derive the living `/design` and
+  `/design/composition` destinations from `appRoutes`; the obsolete literal
+  `/design/components` promotion path is gone.
+- The examples registry promotes the canonical service resource flow through
+  `appRoutes.serviceExample` while retaining the separate CRUD and telemetry examples.
+- Generated app guidance now names the route contract, managed form, auth boundary, resource-local
+  query module, and `withResource` composition instead of directing agents to a global `lib` file.
+- The public-init golden asserts the canonical route plus both retained example route files exist.
+
+### Gates
+
+| Gate | Result |
+| --- | --- |
+| Focused route-template + public-init tests | raw exit 0; 4 tests / 25 steps / 0 failed |
+| Scoped package check (`--no-lock`) | raw exit 0; 675 files / 6 batches / 0 findings |
+| Scoped package lint | raw exit 0; 675 files / 4 batches / 0 findings |
+| Scoped package format | raw exit 0; 675 files / 4 batches / 0 findings |
+| Package code-quality scan | raw exit 0; 0 findings / 6 existing allowances |
 | Package doctrine scan | raw exit 1; FAIL=50 WARN=51 INFO=1 |
 | Exact `origin/main` doctrine baseline | raw exit 1; FAIL=50 WARN=51 INFO=1, byte-identical finding set |
 

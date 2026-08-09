@@ -162,12 +162,16 @@ describe('app route template rendering', () => {
     assertStringIncludes(route, 'href: appRoutes.dashboard.href()');
     assertStringIncludes(route, 'href: appRoutes.crudExample.href()');
     assertStringIncludes(route, 'href: appRoutes.examples.href()');
-    assertStringIncludes(route, 'href: \'/design/components\'');
+    assertStringIncludes(route, 'designHref: appRoutes.design.href()');
+    assertStringIncludes(route, 'compositionHref: appRoutes.designComposition.href()');
+    assertStringIncludes(route, 'href: appRoutes.design.href()');
     assertStringIncludes(route, '.build();');
     assertStringIncludes(route, 'export { page as default };');
     assertStringIncludes(view, 'interface HomeViewProps {');
     assertStringIncludes(view, "import { Badge, Button, Card, PageHeader, StatsGrid }");
     assertStringIncludes(view, 'A generated NetScript workspace with app-owned UI copies');
+    assertStringIncludes(view, 'href={designHref}');
+    assertStringIncludes(view, 'href={compositionHref}');
   });
 
   it('dashboard route keeps operations data in a registry-only child view', async () => {
@@ -243,12 +247,17 @@ describe('app route template rendering', () => {
     assertStringIncludes(output, 'const homeHref = appRoutes.home.href();');
     assertStringIncludes(output, 'const dashboardHref = appRoutes.dashboard.href();');
     assertStringIncludes(output, 'const examplesHref = appRoutes.examples.href();');
+    assertStringIncludes(output, 'const designHref = appRoutes.design.href();');
     assertStringIncludes(output, 'url.pathname.startsWith(examplesHref)');
     assertStringIncludes(output, "import { Badge, Button } from '@app/components/ui/mod.ts';");
     assertStringIncludes(output, "<Button\n            type='link'\n            href={dashboardHref}");
     assertStringIncludes(
       output,
       "aria-current={url.pathname.startsWith(examplesHref) ? 'page' : undefined}",
+    );
+    assertStringIncludes(
+      output,
+      "aria-current={url.pathname.startsWith(designHref) ? 'page' : undefined}",
     );
   });
 
@@ -318,6 +327,9 @@ describe('app route template rendering', () => {
     assertStringIncludes(route, "import { definePage } from '@app/utils.ts';");
     assertStringIncludes(route, 'export const examplesPage = definePage()');
     assertStringIncludes(route, '.withRoute(appRoutes.examples)');
+    assertStringIncludes(route, 'canonicalHref: appRoutes.serviceExample.href()');
+    assertStringIncludes(route, 'href: appRoutes.serviceExample.href()');
+    assertStringIncludes(route, "title: 'TeamMember resource flow'");
     assertStringIncludes(route, 'href: appRoutes.crudExample.href()');
     assertStringIncludes(route, "title: 'TeamMember CRUD'");
     assertStringIncludes(
@@ -329,8 +341,8 @@ describe('app route template rendering', () => {
     assertStringIncludes(route, 'export { page as default };');
     assertStringIncludes(view, 'interface ExamplesViewProps {');
     assertStringIncludes(view, 'ResponsiveTable');
-    assertStringIncludes(view, 'Open TeamMember CRUD');
-    assertStringIncludes(view, '/examples/team-members');
+    assertStringIncludes(view, 'href={canonicalHref}');
+    assertStringIncludes(view, 'Open canonical TeamMember flow');
   });
 
   it('static directory-pattern route uses registry form, table, and detail blocks', async () => {
