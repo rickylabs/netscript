@@ -8,21 +8,21 @@ Deno.test('producer transport interoperates with reference-server idempotency se
   const url = `${baseUrl}/transport/idempotency`;
   const transport = new DurableStreamProducerTransport();
   const firstIdentity = { producerId: 'reference-test', epoch: 0, sequence: 0 } as const;
+  const request = { url, headers: {}, requestTimeoutMs: 5_000 } as const;
 
   try {
-    assertEquals((await transport.connect({ url, headers: {} })).ok, true);
+    assertEquals((await transport.connect(request)).ok, true);
     assertEquals(
-      await transport.append({ url, headers: {}, body: '{"key":"one"}', identity: firstIdentity }),
+      await transport.append({ ...request, body: '{"key":"one"}', identity: firstIdentity }),
       { ok: true, value: { duplicate: false } },
     );
     assertEquals(
-      await transport.append({ url, headers: {}, body: '{"key":"one"}', identity: firstIdentity }),
+      await transport.append({ ...request, body: '{"key":"one"}', identity: firstIdentity }),
       { ok: true, value: { duplicate: true } },
     );
     assertEquals(
       await transport.append({
-        url,
-        headers: {},
+        ...request,
         body: '{"key":"three"}',
         identity: { ...firstIdentity, sequence: 2 },
       }),

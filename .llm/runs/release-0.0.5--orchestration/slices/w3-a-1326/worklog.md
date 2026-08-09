@@ -166,6 +166,8 @@ the adapter or fetch/timers to the supervisor.
 | 2026-08-09 | CI repair | Type seam | Removed the static cross-workspace source dependency; the coordinator now owns the two probe wire literals and structural result type. Producer behavior is unchanged. |
 | 2026-08-09 | CI repair | GREEN | Focused tests 5/5 and check/lint/fmt exited 0; exact `scaffold.service` rerun exited 0 with passed=5 failed=0 skipped=0. |
 | 2026-08-09 | CI repair | Evidence reporter finding | The pretty command gate retained only a 4,000-character stream tail and CI began mid-path, dropping the TS2307 body. This is separate gate debt; no reporter repair is included here. |
+| 2026-08-09 | CI repair | Repo check seam | New-head Actions then exposed four TS2345s in the reference-server test: S5 made `requestTimeoutMs` required but that direct transport caller was omitted from the final scoped selection. |
+| 2026-08-09 | CI repair | Repo check GREEN | Added the finite timeout to the shared test request; reference test 1/1 and file check/lint/fmt exit 0, then exact root `deno task check` exited 0 over 2,680 files and 23 batches. |
 
 ## Decisions
 
@@ -226,6 +228,8 @@ See `plan.md` D1–D16. No open decision would force implementation rework.
 | CI repair focused tests            | coordinator + streams probe focused tests                             | PASS, exit 0 | 5 passed, 0 failed. |
 | CI repair check / lint / format    | corrected coordinator seam                                            | PASS, exit 0 each | Zero diagnostics/findings. |
 | Corrected static suite             | `deno task e2e:cli run scaffold.service --format pretty`              | PASS, exit 0 | passed=5 failed=0 skipped=0; `generated.service-check` passed in 28.7s. |
+| CI repo-wide check                 | `deno task check` on repair head                                     | PASS, exit 0 | 2,680 files, 23 batches, zero failed batches/diagnostics. |
+| Reference-server idempotency       | focused test plus check/lint/format                                  | PASS, exit 0 each | 1 passed; four transport calls carry the finite 5,000ms request timeout. |
 
 ### S1 RED evidence
 
@@ -348,6 +352,12 @@ TS2307 [ERROR]: Cannot find module '.../plugins/streams/src/e2e/probes/producer-
 This is W3-A's type seam, not the main rebase or an interaction with #1400/#1401. The service-only
 suite checks the copied CLI tree without installing streams; the runtime suite installs streams
 before the same broad generated check. The repair removes only that static source dependency.
+
+The next new-head `check-test` run found a second owned type seam: four direct calls in
+`plugins/streams/tests/service/durable-stream-producer-idempotency_test.ts` omitted S5's required
+`requestTimeoutMs`. The reference proof now shares a finite 5,000ms request input. Exact root check
+is green over 2,680 files in 23 batches. This is test-call compatibility only; it changes no
+producer runtime path or public contract.
 
 ### Separate gate-evidence finding
 

@@ -57,11 +57,13 @@ manual F-14 evidence. The full core suite passes 28/28.
   below a plugin tree absent from service-only smoke workspaces. #1400/#1401 are not involved.
 - The seam-only repair is locally green: focused 5/5, check/lint/fmt exit 0, and exact
   `scaffold.service` passes 5/5. Producer runtime behavior is unchanged.
+- New-head repo check then found the reference-server test omitted the required request timeout.
+  Its four direct calls are repaired; exact root check is green over 2,680 files and 23 batches.
 
 ## In Progress
 
-- A CI type-seam repair is ready to commit/push. The serialized runtime verdict is untouched and
-  the existing IMPL-EVAL remains applicable because no product behavior changed.
+- Both CI type seams are repaired locally. The serialized runtime verdict is untouched and the
+  existing IMPL-EVAL remains applicable because no product behavior changed.
 
 ## Next Steps
 
