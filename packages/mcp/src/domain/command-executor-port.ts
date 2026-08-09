@@ -14,6 +14,18 @@ export interface CliExecutionIdentity {
   readonly command: readonly string[];
 }
 
+/** JSON Schema for the execution identity shared by command tools. */
+export const CLI_EXECUTION_IDENTITY_JSON_SCHEMA: Readonly<Record<string, unknown>> = {
+  type: 'object',
+  properties: {
+    mode: { enum: ['host', 'standalone'] },
+    version: { type: 'string' },
+    command: { type: 'array', maxItems: 8, items: { type: 'string' } },
+  },
+  required: ['mode', 'version', 'command'],
+  additionalProperties: false,
+};
+
 /** Bounded subprocess execution evidence. */
 export interface CommandExecutionResult {
   /** Truthful identity of the CLI process that produced this result. */

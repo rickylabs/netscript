@@ -7,7 +7,7 @@ truthfully authorize `record_drift`.
 ## Scope
 
 - Archetype / area: A6 CLI/tooling · `packages/mcp` + minimal CLI host composition
-- #1376 (closing keyword will be added only when every live acceptance row is truthfully tickable)
+- Closes #1376
 - Explicit boundary: no #1375 docs-root, host-config, environment, or corpus work
 
 ## Slices
@@ -17,7 +17,7 @@ truthfully authorize `record_drift`.
 - [x] S2 MCP execution-identity contract and standalone policy
 - [x] S3 minimal CLI host re-entry composition
 - [x] S4 exit-aware receipts, refusal text, and published MCP documentation
-- [x] S5 non-serialized gates and serialized runtime-token request
+- [x] S5 full gate set, including the granted serialized runtime pass
 
 ## Validation
 
@@ -26,14 +26,17 @@ truthfully authorize `record_drift`.
 - PLAN-EVAL cycle 2 — separate Claude · Fable 5 verdict `PASS`
 - Focused MCP tests — 24 passed, 0 failed; full MCP package — 113 passed, 0 failed
 - Decisive CLI-host tests — 4 passed, 0 failed, including mismatched host version and no JSR child
-- Scoped check/lint/fmt, `quality:gate`, named `arch:check`, MCP export-map `doc:lint`, JSR audit,
+- Scoped check/lint/fmt, MCP-scoped code-quality scan, MCP export-map `doc:lint`, JSR audit,
   publish-assets check, workspace `publish:dry-run`, and review-thread gate — raw exit 0
-- `scaffold.runtime` — token requested; not started before grant
+- Root `quality:gate` and `arch:check` — raw exit 0 but explicitly not MCP evidence due #1403
+- MCP doctrine checker — slice-caused A8 repaired; raw exit 1 remains for baseline/#1403 findings
+- `scaffold.runtime` — raw exit 0, `passed=78 failed=0 skipped=2`; both skips declared under #1398
+- Pre/post leak artifacts — no slice-owned survivor; foreign `redis-jfgcbtaf` left untouched
 
 ## Harness
 
 - Run dir: `.llm/runs/release-0.0.5--orchestration/slices/w3-b3-1376/`
-- Phase: `impl`; PLAN-EVAL passed, IMPL-EVAL remains orchestrator-launched after runtime evidence.
+- Phase: `impl-eval`; PLAN-EVAL passed and IMPL-EVAL remains orchestrator-launched.
 - Do not merge until separate-session PLAN-EVAL and IMPL-EVAL pass and every acceptance row has evidence.
 
 ## Drift / Debt
@@ -43,7 +46,7 @@ truthfully authorize `record_drift`.
 
 ## Definition of Done
 
-- [ ] Every live #1376 acceptance row has linked evidence.
+- [x] Every live #1376 acceptance row has linked evidence.
 - [x] Focused tests and required non-serialized scoped/framework/publish gates pass with raw exits recorded.
 - [ ] Separate-session IMPL-EVAL passes.
-- [ ] Serialized `scaffold.runtime` gate runs only after an orchestrator token grant.
+- [x] Serialized `scaffold.runtime` ran once after ledger grant and the token was released.

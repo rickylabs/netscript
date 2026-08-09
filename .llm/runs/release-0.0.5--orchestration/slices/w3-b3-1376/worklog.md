@@ -70,8 +70,8 @@ mirror standalone, host, success, failure, and denial modes.
 | S5 scoped MCP/CLI lint | package-local `run-deno-lint.ts --root . --ext ts,tsx --config <package deno.json> --pretty` | 0 each | MCP 103 files and CLI-host 7 files; no lint occurrences. |
 | S5 scoped MCP/CLI format | package-local `run-deno-fmt.ts --root . --ext ts,tsx --config <package deno.json> --pretty` | 0 each | MCP 103 files and CLI-host 7 files; no findings or failed batches. |
 | S5 wrapper invocation correction | initial root-config lint/fmt and malformed check-argument attempts | 1 | Tool invocation/config parse failures, not product verdicts. Corrected with package-local configs and the two-argument `--deno-arg --no-lock` form; all required wrapper verdicts above are green. |
-| S5 framework quality | `rtk proxy deno task quality:gate` | 0 | `quality:scan` found no findings and `arch:check` completed; seven existing inline allowances reported. |
-| S5 doctrine fitness | `rtk proxy deno task arch:check` | 0 | Named separately as required; repository warnings remain non-failing and outside this slice. |
+| S5 framework quality | `rtk proxy deno task quality:gate` | 0 | Required root command completed, but #1403 proves its configured roots omit `packages/mcp`; this is not evidence about MCP changes. |
+| S5 doctrine fitness | `rtk proxy deno task arch:check` | 0 | Required root command completed, but #1403 proves its configured roots omit `packages/mcp`; this is not evidence about MCP changes. |
 | S5 MCP export-map doc lint | `rtk proxy deno task doc:lint --root packages/mcp --pretty` | 0 | All three exports checked; `totalErrors: 0`. |
 | S5 MCP JSR audit | `deno run --allow-read --allow-run --allow-env .llm/tools/fitness/audit-jsr-package.ts --root packages/mcp --text` | 0 | Dry-run OK; three non-failing warnings (two existing cardinality warnings and slow-types notice). |
 | S5 publish assets | `rtk proxy deno task check:publish-assets` | 0 | Generated MCP README asset matches its source. |
@@ -80,6 +80,16 @@ mirror standalone, host, success, failure, and denial modes.
 | S5 decisive CLI-host tests | `deno test --no-lock --allow-all packages/cli/src/public/features/agent/mcp/cli-mcp-adapters_test.ts` | 0 | 4 passed, 0 failed; host-version mismatch and no-JSR behavior remain proven. |
 | S5 MCP package tests | `rtk proxy deno task --cwd packages/mcp test` | 0 | 113 passed, 0 failed. |
 | S5 review threads | `rtk proxy deno task agentic:review-threads -- --repo rickylabs/netscript --pr 1400 --pretty` | 0 | `threads=0 unanswered=0`. |
+| S5 pre-runtime leak check | `rtk proxy deno task agentic:leak-check -- --slice-dir .llm/runs/release-0.0.5--orchestration/slices/w3-b3-1376 --worktree /home/codex/repos/ns005-w3b3` | 0 | Aspire/Docker probes OK; only survivor was foreign `redis-jfgcbtaf`, owned by `/home/codex/repos/w6-review-desk`, left untouched. |
+| S5 serialized runtime | `rtk proxy deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | 0 | Aggregate `passed=78 failed=0 skipped=2`. `behavior.mcp-endpoint-directory` passed. Both skips are declared #1398 deferrals: `behavior.otel.stream-consumer` lacks the workers-combined mutation hook; `behavior.otel.traces` depends on that Flow-B record. |
+| S5 post-runtime leak check | same scoped leak-check command | 0 | Artifact verifies Aspire/Docker probes OK and no slice-owned survivors; the same foreign Redis container remains untouched. |
+| S5 explicit MCP quality scan | `deno run --allow-read .llm/tools/quality/scan-code-quality.ts --root packages/mcp/src` | 0 | `findings=[]`, `allowCount=0`; unlike root `quality:gate`, this inspected MCP source. |
+| S5 supplied MCP doctrine path | `deno run --allow-read --allow-run .llm/tools/quality/check-doctrine.ts --root packages/mcp` | 1 | Invocation failure: supplied path does not exist. Corrected to the repository checker below; not treated as a doctrine verdict. |
+| S5 explicit MCP doctrine check | `deno run --allow-read --allow-run .llm/tools/fitness/check-doctrine.ts --root packages/mcp` | 1 | Slice-caused A8 warning fixed by colocating the identity schema; `tool-contracts.ts` is 299 lines. Remaining findings are baseline/#1403: two cardinality warnings, missing architecture-doc info, and A14 false-positive on an untouched local `describe` helper. |
+| S5 post-fix scoped check/lint/fmt | package-local wrappers over `packages/mcp` | 0 each | 103 files; no type, lint, or format findings. |
+| S5 post-fix focused/full MCP tests | focused command/receipt suite; `rtk proxy deno task --cwd packages/mcp test` | 0 each | 24/24 focused and 113/113 package tests. |
+| S5 post-fix publish surface | MCP export-map doc lint; JSR audit; publish-assets check; workspace publish dry-run | 0 each | `totalErrors: 0`; JSR dry-run OK; assets current; `Success Dry run complete`. |
+| S5 final review threads | `rtk proxy deno task agentic:review-threads -- --repo rickylabs/netscript --pr 1400 --pretty` | 0 | `threads=0 unanswered=0`. |
 
 ## Phase status
 
@@ -95,7 +105,6 @@ only for status `pass`, and overwrites with failure for non-zero/timeout/throw/d
 is explicitly receipt-exempt because it diagnoses no resource. README policy regeneration changed
 only the embedded README constant, not #1375 corpus selection or filesystem wiring.
 
-S5 non-serialized gates are green. The serialized runtime token is requested below; no leak check,
-container, AppHost, or `scaffold.runtime` command has been started before a grant.
-
-EXPENSIVE-GATE-REQUEST
+S5 is complete. The granted runtime ran exactly once and returned raw exit 0 with 78 passed, zero
+failed, and the two declared #1398 skips. Pre/post artifacts prove no slice-owned survivor. The
+token is released in the handoff, and the PR advances to orchestrator-launched IMPL-EVAL.

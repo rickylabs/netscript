@@ -1,9 +1,7 @@
 import { createToolSchema, isRecord, type ToolSchema } from './schema.ts';
 import type { ToolName } from './tool-types.ts';
-import {
-  EXPORT_SURFACE_INPUT_SHAPES,
-  EXPORT_SURFACE_OUTPUT_SHAPES,
-} from '../application/export-surfaces/export-surface-tool-contracts.ts';
+import { CLI_EXECUTION_IDENTITY_JSON_SCHEMA } from './command-executor-port.ts';
+import * as exportSurfaceShapes from '../application/export-surfaces/export-surface-tool-contracts.ts';
 const objectSchema = (
   properties: Record<string, unknown> = {},
   required: string[] = [],
@@ -35,12 +33,6 @@ const doctorFamilyShape = objectSchema({
   counts: doctorCountsShape,
   checks: { type: 'array', maxItems: 20, items: doctorCheckShape },
 }, ['name', 'status', 'counts', 'checks']);
-const cliExecutionIdentityShape = objectSchema({
-  mode: { enum: ['host', 'standalone'] },
-  version: stringProperty,
-  command: { type: 'array', maxItems: 8, items: stringProperty },
-}, ['mode', 'version', 'command']);
-
 /** Compact diagnostic severity. */
 export type DoctorStatus = 'pass' | 'warn' | 'fail';
 /** One doctor diagnostic check. */
@@ -104,7 +96,7 @@ const inputShapes: Record<ToolName, Readonly<Record<string, unknown>>> = {
   search_docs: objectSchema({ query: stringProperty, limit: searchLimitProperty }, ['query']),
   list_docs: objectSchema({ limit: limitProperty }),
   get_doc: objectSchema({ slug: stringProperty, section: stringProperty }, ['slug']),
-  ...EXPORT_SURFACE_INPUT_SHAPES,
+  ...exportSurfaceShapes.EXPORT_SURFACE_INPUT_SHAPES,
   list_commands: objectSchema({ filter: stringProperty, limit: limitProperty }),
   execute_command: objectSchema({
     command: stringProperty,
@@ -241,7 +233,7 @@ const outputShapes: Record<ToolName, Readonly<Record<string, unknown>>> = {
     'title',
     'content',
   ]),
-  ...EXPORT_SURFACE_OUTPUT_SHAPES,
+  ...exportSurfaceShapes.EXPORT_SURFACE_OUTPUT_SHAPES,
   list_commands: objectSchema({
     count: { type: 'integer' },
     commands: {
@@ -253,10 +245,10 @@ const outputShapes: Record<ToolName, Readonly<Record<string, unknown>>> = {
         usage: stringProperty,
       }, ['path', 'description', 'usage']),
     },
-    executor: cliExecutionIdentityShape,
+    executor: CLI_EXECUTION_IDENTITY_JSON_SCHEMA,
   }, ['count', 'commands', 'executor']),
   execute_command: objectSchema({
-    executor: cliExecutionIdentityShape,
+    executor: CLI_EXECUTION_IDENTITY_JSON_SCHEMA,
     status: { enum: ['pass', 'fail'] },
     exitCode: { type: 'integer' },
     durationMs: { type: 'number' },

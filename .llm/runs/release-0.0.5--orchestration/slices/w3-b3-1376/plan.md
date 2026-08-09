@@ -7,7 +7,7 @@
 | Run | `release-0.0.5--orchestration/slices/w3-b3-1376` |
 | Branch | `fix/mcp-execute-command-host-cli` |
 | Archetype | `6 — CLI/Tooling` |
-| Phase | `impl` |
+| Phase | `impl-eval` |
 
 ## Goal
 
@@ -18,18 +18,18 @@ exit status so a successful allowed execution can truthfully authorize `record_d
 
 ## Live acceptance rows (quoted verbatim from #1376)
 
-- [ ] `netscript agent mcp` injects a `cliCommand` that re-enters the running CLI.
-- [ ] No JSR download occurs for `execute_command` when the server is CLI-hosted.
-- [ ] `list_commands` reports `CLI_PACKAGE_VERSION`, not `"current"`.
-- [ ] `execute_command` results include the resolved executor command and version.
-- [ ] `execute_command` writes a diagnostic receipt on success and on failure.
-- [ ] `record_drift` accepts a receipt produced by a successful `execute_command`.
-- [ ] The `record_drift` refusal message lists the tools that can authorize it, accurately.
-- [ ] Tests cover: CLI-hosted executor resolution; standalone fallback to the pinned specifier;
+- [x] `netscript agent mcp` injects a `cliCommand` that re-enters the running CLI.
+- [x] No JSR download occurs for `execute_command` when the server is CLI-hosted.
+- [x] `list_commands` reports `CLI_PACKAGE_VERSION`, not `"current"`.
+- [x] `execute_command` results include the resolved executor command and version.
+- [x] `execute_command` writes a diagnostic receipt on success and on failure.
+- [x] `record_drift` accepts a receipt produced by a successful `execute_command`.
+- [x] The `record_drift` refusal message lists the tools that can authorize it, accurately.
+- [x] Tests cover: CLI-hosted executor resolution; standalone fallback to the pinned specifier;
       receipt written on both exit paths.
-- [ ] Negative test: a denied command (`deploy`, `init`, `db reset`, `plugin remove`, `ui:remove`)
+- [x] Negative test: a denied command (`deploy`, `init`, `db reset`, `plugin remove`, `ui:remove`)
       writes no success receipt and cannot authorize `record_drift`.
-- [ ] Negative test: with the host CLI at a version different from the MCP package, no spawn resolves
+- [x] Negative test: with the host CLI at a version different from the MCP package, no spawn resolves
       to the MCP-pinned specifier.
 
 ## Locked decisions
