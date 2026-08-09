@@ -318,6 +318,21 @@ an unsupported top-level `--unstable-kv`, and one duplicated the wrapper's built
 batches green. The regenerated app templates total 178,363 / 197,796 bytes and the CLI embedded
 barrel is 296,366 / 330,000 bytes; the unchanged MCP docs corpus remains 253,535 / 262,144 bytes.
 
+### Close-gate preflight
+
+The PR body now uses the implementation template with Scope, Validation, Harness, Drift/Debt, and
+nine checked Definition-of-Done rows. Its fenced `acceptance-evidence` block maps all nine live issue
+checkboxes by exact first-line text, with each evidence value ending in a linked PR receipt. Direct
+parser/validator preflight reported `acceptance-boxes=9 evidence-entries=9 matched=9 warnings=0`
+at raw exit 0.
+
+The official mirror dry-run also exited 0 at head `fe04e8349`, but correctly made no mutation because
+the PR remains `status:impl`; its notice says mirroring begins only at `status:ready-merge`. The
+`netscript-pr` lifecycle forbids that transition before a separate-session IMPL-EVAL PASS, and the
+owner retains readiness authority. Therefore the evidence mapping is complete and mechanically
+validated now, while issue checkbox mutation remains deliberately pending the owner's post-PASS
+label transition rather than bypassing the mirror's readiness guard.
+
 ### Gates
 
 | Gate | Result |
