@@ -223,3 +223,27 @@ version(s)`.
 
 **Evaluated through:** `aa8e151e65939ecd789c82e45b22b6338a8d8ce8`. Next boundary is C18 at the W3
 wave boundary.
+
+| Time (UTC)        | Commit      | PR    | Issues closed | Classification                                                                                           |
+| ----------------- | ----------- | ----- | ------------- | -------------------------------------------------------------------------------------------------------- |
+| 2026-08-09T01:5xZ | `9fabd5286` | #1401 | #1375         | W3-B2 — emitted `.mcp.json` reaches the installed docs corpus; **all eleven rows proven, none deferred** |
+
+Pre-merge gate: 9/9 named expensive gates `success`, none skipped; zero unticked boxes on #1375
+(mirror ticked 0→11 on leaving draft); zero prohibited diff; review threads 0/0; base current.
+
+Two CI findings were fixed before merge, both on generated surfaces and both caught by guards doing
+their job. The first: `publish-assets.generated.ts` embedded `jsr:@netscript/cli@0.0.3` three times
+while the workspace ships `0.0.4` — new in the branch, since `main` carries no such specifier, so a
+wrong source input rather than regeneration staleness. **That corpus is what ships to agents**, so
+it would have told every agent reading the published docs to install the wrong CLI — the same
+version-identity class #1376 exists to fix, arriving from the opposite direction in its sibling
+slice. The second: the refreshed corpus also feeds
+`packages/cli/src/kernel/assets/agent-docs.generated.ts`, and `check:assets-barrel` caught the
+divergence — its **second** real cross-package catch this milestone.
+
+Changed-file audit note: the diff reaches `.llm/assets/agent-docs/*` and
+`.llm/tools/generate-publish-assets.ts` beyond `packages/cli` and `packages/mcp`. Verified
+legitimate and not scope creep — #1375's rows require a generated embedded fallback corpus with
+provenance and a size budget, and the generator diff has **zero deletions**, adds
+`MCP_EMBEDDED_DOCS_MAX_BYTES` and a framework-version match throw. The slice strengthened the guard
+that caught its own defects.
