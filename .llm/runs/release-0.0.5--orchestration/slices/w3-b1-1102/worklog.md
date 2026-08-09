@@ -5,7 +5,7 @@
 | Field          | Value                                            |
 | -------------- | ------------------------------------------------ |
 | Run ID         | `release-0.0.5--orchestration/slices/w3-b1-1102` |
-| Branch         | `fix/mcp-intent-aware-discovery`                 |
+| Branch         | `feat/mcp-intent-activation-s4-s5`               |
 | Archetype      | `6 — CLI / Tooling`                              |
 | Scope overlays | `docs`                                           |
 
@@ -193,3 +193,33 @@ the single shared indexer used by both adapters.
 - The first evaluator-fix check invocation redundantly supplied `--unstable-kv`, which the wrapper
   already adds; Deno exited 1 before diagnostics. The corrected decisive command omitted the
   duplicate, exited 0, and selected the same test file with zero failed batches.
+
+## 2026-08-09 — S4–S5 continuation planning
+
+- Started clean from `origin/main@51a58b4f5` after #1404 merged; created
+  `feat/mcp-intent-activation-s4-s5` and removed its upstream. No product source changed.
+- Re-read the live #1102 body and retained all seven acceptance rows verbatim. #1090 adoption
+  remains out of scope. `Closes #1102` is deferred until implementation evidence supports every
+  row.
+- Re-opened every load-bearing retrieval, activation, CLI stdio, generated-skill, docs, corpus, and
+  gate source. Confirmed the two carried retrieval failures and the five-row scoring blind spot.
+- Measured the quickstart decision: selected fallback 253,535 bytes / 12 documents; quickstart
+  20,986 bytes; combined 274,521, which is 12,377 above the 262,144 cap. Plan D13 uses the already
+  embedded `llms#Getting started` section with zero corpus-byte delta.
+- Locked three additive evaluation rows. The original five rows / 15 citations are unchanged. The
+  score-only row activates no concept and will be mutation-tested by reversing only the score
+  comparator in an owned detached scratch checkout.
+- Re-ran public-surface planning baselines:
+  - JSR audit: exit 0; 115 files / 12,311 LOC; known cardinality 14/16 + slow-types warnings.
+  - MCP doc-lint: exit 0; combined diagnostics 0.
+  - MCP publish dry-run: exit 0.
+  - NetScript JSR specifier guard: exit 0;
+    `scanned=2326 allowances=1 ranges=0 failures=0`.
+  - package quality scanner: exit 0; findings 0, allowances 0.
+  - package doctrine: raw exit 1; exact pre-existing inventory is A14 fail, three warnings, one
+    info. The plan uses zero-delta evidence and does not misreport this as green or fix #1403 debt.
+- Replaced the stale unimplemented S4/S5 rows with continuation slices S4A retrieval closure, S4B
+  activation/real stdio, and S5 docs/release evidence. All non-Aspire gates precede a pushed
+  `EXPENSIVE-GATE-REQUEST`; no runtime token has been requested or used.
+- Next: commit/push plan artifacts, open draft PR, apply exactly `status:plan-eval`, post the plan
+  handoff, and stop for the owner-routed separate Claude · Fable 5 evaluator.

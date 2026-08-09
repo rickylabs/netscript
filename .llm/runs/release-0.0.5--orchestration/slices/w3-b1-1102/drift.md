@@ -146,3 +146,38 @@ Drift is append-only.
 - **Freshness gate note:** the first `check:assets-barrel` invocation exited 1 because its final
   git-diff assertion correctly observed the newly regenerated but unstaged CLI asset. After staging
   exactly the four generator-owned artifacts, the decisive rerun exited 0.
+
+## 2026-08-09 — #1404 merged; S4/S5 continuation gained an unplanned retrieval-closure slice
+
+- **What:** #1404 merged the planned S1–S3 foundation at `main@51a58b4f5`, but its IMPL-EVAL
+  deliberately carried three gaps: the issue's render/fetch paraphrase still misses query guidance,
+  getting-started ranks a database detail first, and the five locked rows do not constrain score.
+- **Expected:** the original plan continued directly with S4 activation then S5 docs/evidence.
+- **Actual:** completing #1102 truthfully requires S4A retrieval closure before activation. It adds
+  three evaluation rows but changes none of the original five rows / 15 citations, ranking numbers,
+  adapters, or public contracts.
+- **Action:** require a fresh separate-session PLAN-EVAL. Order continuation commits S4A retrieval,
+  S4B activation/real stdio, then S5 docs/release evidence.
+- **Evidence:** `research.md` F15–F20; `plan.md` D13–D16 and continuation failure matrix.
+
+## 2026-08-09 — Getting-started uses the embedded task router instead of growing the corpus
+
+- **What:** the quickstart page removed during S3 would directly cover project creation, but adding
+  its 20,986 bytes to the current 253,535-byte fallback totals 274,521, which is 12,377 over the
+  262,144 cap.
+- **Decision:** keep all 12 selected domain/task-router documents and the cap. Route natural project
+  creation language to the existing `llms#Getting started` section, which cites and summarizes the
+  Quickstart. Do not regenerate the corpus for this change.
+- **Rejected:** raising the cap without demonstrated need, or silently removing another document.
+  Contracts (18,823 bytes) and services (29,122 bytes) would fit but lose broader guidance.
+- **Drift rule:** if the section cannot pass truthful evaluation, stop and return to evaluator; do
+  not change the cap/selection as an implementation repair.
+
+## 2026-08-09 — Package doctrine has a pre-existing nonzero continuation baseline
+
+- **What:** at clean `main@51a58b4f5`, explicit package doctrine exits 1 with A14 fail, the accepted
+  367-line `tool-contracts.ts` warning, 14/16 directory warnings, and one architecture-doc info.
+  Explicit MCP source quality exits 0 with zero findings/allowances.
+- **Action:** package commands remain decisive. Require a zero doctrine finding delta and record the
+  raw exit 1; never label it green. Leave existing findings to #1403/debt triage and do not widen
+  #1102. Root aggregates remain non-decisive because they omit MCP.

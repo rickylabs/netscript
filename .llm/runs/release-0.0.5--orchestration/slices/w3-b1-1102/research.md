@@ -98,3 +98,41 @@ the six literal intents below, and emits each top five as JSON; it is not a rank
   against both adapters; synthetic fixtures cover parser edges only and cannot satisfy
   retrieval-quality acceptance.
 - Adoption: defer entirely to #1090.
+
+## S4–S5 continuation re-baseline — `origin/main@51a58b4f5`
+
+PR #1404 merged the S1–S3 foundation at `51a58b4f5`; issue #1102 remains open and the live seven-row
+acceptance contract above is unchanged. The continuation branch is
+`feat/mcp-intent-activation-s4-s5`, with no upstream and no product changes before a new PLAN-EVAL.
+
+| # | Finding | Opened evidence / reproduction |
+| --- | --- | --- |
+| F15 | The issue's exact concept-mismatch paraphrase is still red. `avoid hitting my service every render` activates no concept and ranks `pages/services-sdk/services#services-contracts` first; the required query/cache destination is outside the top five. | `guidance-concepts.ts` has only cache/polling/freshness aliases; `activatedGuidanceConcepts` is substring-based in `guidance-result.ts:13-17`. Run the embedded-corpus query recorded in the S4 plan research output. |
+| F16 | Getting-started is still red. `create a new NetScript project from scratch` activates no concept and ranks the second-database driver-adapter section first. The embedded `llms.txt` already contains a `## Getting started` section whose Quickstart list item says it scaffolds the Fresh app, service, Postgres, Redis, and Aspire graph. | Open `MCP_EMBEDDED_DOCS` for `llms.txt`; query `EmbeddedDocsCorpus.findGuidance`. Current top two are the second-database section then `llms#netscript`. |
+| F17 | Re-adding the full quickstart page is not budget-neutral. Current selected fallback provenance is 253,535 bytes / 12 documents; `pages/quickstart/index.md` is 20,986 bytes in the canonical compressed corpus. Addition yields 274,521, exceeding the fixed 262,144 cap by 12,377. Candidate removals large enough include contracts (18,823) and services (29,122), both broader capability surfaces. | Decompress `.llm/assets/agent-docs/prose.json.gz` with `DecompressionStream`; UTF-8 count the selected sources and quickstart. `publish-assets.generated.ts` records the current total. |
+| F18 | The five locked evaluation rows do not constrain BM25 score. `GuidanceIndex.find` sorts by `routeIndex` before `right.score - left.score`; every current fixture intent activates a concept whose `routeHints` name its expected headings. A natural score-only query—`pick direct application ownership versus a reusable integration`—activates zero concepts and currently ranks the decision-rule, unsupported-Prisma, and external-database-by-hand sections in that exact order. | `guidance-index.ts:65-71,151-167`; `guidance-concepts.ts`; `guidance-evaluation.json`; embedded-corpus sweep on current main. The prior IMPL-EVAL scratch inversion passed all five rows, establishing the pre-fix red for mutation sensitivity. |
+| F19 | Activation remains absent at the driving surfaces. MCP initialize instructions discuss export discovery and symptom docs search; generated `AGENTS.md` discusses hang search and an offline start path; the NetScript router skill calls docs general lookup; the build skill installs docs but does not call intent guidance. | `packages/mcp/src/application/runner/mcp-server.ts:24-25`; `packages/cli/src/public/features/agent/init/init-agent.ts:25-32`; `skills/netscript/SKILL.md`; `skills/netscript-build/SKILL.md:61-67`. |
+| F20 | The public CLI smoke is not an activation proof: it hand-writes `docs/site/workers.md`, calls literal `search_docs`, and only asserts `find_guidance` appears in `tools/list`. It never invokes `agent init --with-docs` or the guidance tool. Choosing host `vscode` avoids the Claude-only Aspire initializer, so the required real smoke stays no-AppHost. | `packages/cli/e2e/tests/agent/agent-mcp-stdio_test.ts:21-141`; `init-agent.ts:159-190`; `init-agent-command.ts:20-53`. |
+| F21 | The public docs already enumerate and describe the 22nd tool, but their workflow prose does not consistently make it the unfamiliar-implementation first step. Both site pages retain required `templateEngine: [vento, md]` front matter and the reference uses `releaseSpecifier`; these are invariants, not edit targets. | `packages/mcp/README.md:41,149-175`; `docs/site/reference/mcp/index.md:1-15,70-74`; `docs/site/ai/agent-tooling.md:1-8,59,115-116,159`. |
+| F22 | Package-scoped quality is currently clean, while package doctrine has a stable pre-existing nonzero inventory. `scan-code-quality --root packages/mcp/src` exits 0 with zero findings/allowances. `check-doctrine --root packages/mcp` exits 1 with one A14 fail, warnings for 367-line `tool-contracts.ts` and 14/16 cardinalities, plus missing architecture-doc info. Root aggregates omit MCP and are non-decisive under #1403. | Commands executed from clean `51a58b4f5` during planning; raw output recorded in `worklog.md`. Live #1403 remains open and directs surfaced findings to triage rather than unrelated repair. |
+| F23 | The published surface baseline remains stable: JSR audit exits 0 with three known warnings; doc-lint has combined diagnostics 0 across `.`, `./cli`, and `./openapi-projection`; MCP publish dry-run exits 0; root NetScript JSR specifier guard exits 0 with `scanned=2326 allowances=1 ranges=0 failures=0`. This continuation adds no tool or export and must not deepen the accepted `tool-contracts.ts` debt. | Planning commands at current main; `packages/mcp/deno.json`; doctrine debt record `MCP-A6-V2-SHAPE` / `mcp-tool-contracts-a8-1102`. |
+
+### Quickstart option decision
+
+| Option | Measured consequence | Decision |
+| --- | --- | --- |
+| Add `pages/quickstart/index.md` at current cap | 274,521 bytes total; 12,377 over | Reject: generator must fail. |
+| Raise cap | At least 274,521 bytes, or 294,912 for useful headroom; duplicates the already embedded task-router summary | Reject: no demonstrated need to grow every published MCP fallback by 12.5%. |
+| Drop a current document | Must remove at least 12,377 bytes; contracts/services are large enough but lose broader domain guidance | Reject: a local getting-started gap does not justify removing another capability family. |
+| Route through `llms#Getting started` | Zero-byte corpus delta; section already names and summarizes Quickstart | Recommend: finite concept alias + single heading route, with an exact rank-one evaluation. |
+
+### Planning baseline command verdicts
+
+| Command | Raw exit / observed result |
+| --- | --- |
+| `audit-jsr-package.ts --root packages/mcp --text` | 0; 115 files / 12,311 LOC; warnings: cardinality 14/16 and slow-types banner |
+| `deno task doc:lint --root packages/mcp --pretty` | 0; combined diagnostics 0 |
+| `deno task --cwd packages/mcp publish:dry-run` | 0; publish simulation complete |
+| `deno task check:netscript-jsr-specifiers` | 0; `scanned=2326 allowances=1 ranges=0 failures=0` |
+| `scan-code-quality.ts --root packages/mcp/src --pretty` | 0; findings 0, allowances 0 |
+| `check-doctrine.ts --root packages/mcp` | 1; exact pre-existing inventory in F22; never represented as green |

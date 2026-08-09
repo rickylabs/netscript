@@ -5,25 +5,19 @@
 | Field          | Value                                            |
 | -------------- | ------------------------------------------------ |
 | Run ID         | `release-0.0.5--orchestration/slices/w3-b1-1102` |
-| Branch         | `fix/mcp-intent-aware-discovery`                 |
-| Current phase  | `impl`                                           |
+| Branch         | `feat/mcp-intent-activation-s4-s5`               |
+| Current phase  | `plan-eval`                                      |
 | Archetype      | `6 — CLI / Tooling`                              |
 | Scope overlays | `docs`                                           |
 
 ## Current State
 
-Research and contract-first design are complete. A separate Claude · Fable 5 PLAN-EVAL cycle 2
-returned `PASS`, authorizing implementation. The branch incorporated `main@3ce91f2c2` at
-`b9692f93d`; the recovered worktree was clean there. S1 now adds the 22nd read-only MCP contract,
-`find_guidance`, its bounded flow shell, vertical docs folders, count-synchronized public surfaces,
-and focused red-to-green tests. S2 adds the one shared section parser/index/ranker, concept aliases,
-fenced/Vento code citations, direct internal-link routing, corpus composition, and D12 filesystem
-source admission. S3 now refreshes the canonical release corpus at repaired `main@399f60185`,
-selects the bounded intent destinations, and proves the locked evaluation through embedded and
-materialized-filesystem adapters. IMPL-EVAL cycle 1 returned `FAIL_FIX` at `fd9267906` because the
-installed-corpus CLI assertion still expected two documents after D12 intentionally added `llms`.
-The evaluator repair preserves production behavior, locks the exact three-row registry, records
-the deepened A8 debt, and narrows the evaluation claim to what the fixtures actually constrain.
+PR #1404 merged the separately evaluated S1–S3 foundation into `main@51a58b4f5`. This continuation
+plans the remaining #1102 work: repair the exact render/fetch concept mismatch, route project
+creation through the embedded `llms#Getting started` section, add a route-hint-free scoring
+discriminator, activate `find_guidance` in MCP/generated guidance, prove the real installed-corpus
+CLI stdio path, and align public docs/release evidence. Product implementation is not authorized
+until a fresh separate-session PLAN-EVAL passes.
 
 ## Completed
 
@@ -61,17 +55,17 @@ the deepened A8 debt, and narrows the evaluation claim to what the fixtures actu
 
 ## In Progress
 
-- S1–S3 have been rebased onto `main@4f96aec40`. The canonical corpus was rebuilt from a fresh
-  exact-revision checkout at `eda49bb2e`, all four generated artifacts were refreshed, and the
-  requested local gates are green. The refresh record is being committed/pushed/commented for the
-  orchestrator-owned re-evaluation and CI.
+- Plan-only handoff for continuation slices S4A, S4B, and S5. The quickstart/cap decision is
+  measured at 253,535 + 20,986 = 274,521 bytes, so D13 uses `llms#Getting started` without changing
+  the 12-document selection or 262,144-byte cap. The original five evaluation rows / 15 citations
+  remain locked.
 
 ## Next Steps
 
-1. Commit and guarded-force-push the rebased regeneration evidence, then update PR #1404.
-2. Orchestrator reruns the mandatory separate-session IMPL-EVAL and owns CI/merge disposition.
-3. Do not start an Aspire/runtime suite
-   without a durable token grant.
+1. Push the plan-only commit and open the continuation draft PR at `status:plan-eval`.
+2. Stop. The orchestrator launches the mandatory separate Claude · Fable 5 PLAN-EVAL.
+3. Implement only after `PASS`; after all non-Aspire gates, push `EXPENSIVE-GATE-REQUEST` and stop
+   again for a durable runtime-token grant.
 
 ## Key Decisions
 
@@ -79,7 +73,7 @@ the deepened A8 debt, and narrows the evaluation claim to what the fixtures actu
 | ---------------------------------------------------- | ------------------------------------- | ------------------------------------------------------------ |
 | `find_guidance`, deterministic hybrid, no embeddings | `plan.md` D1/D4                       | Offline, bounded, falsifiable                                |
 | One shared index for filesystem and embedded         | `plan.md` D7                          | No second #1375 path                                         |
-| Approved canonical corpus refresh + expected JSON    | `research.md` F5/F12; `plan.md` D8/D9 | Current mirror is stale; reuse #1375's one generator path    |
+| Preserve canonical corpus + extend expected JSON     | `research.md` F15–F18; `plan.md` D13–D15 | Zero corpus-byte change; three additive evaluation rows      |
 | Root `llms.txt` parity across real deployment paths  | `research.md` F14; `plan.md` D12      | Explicit source policy + dual-adapter/installed-corpus gates |
 | Adoption belongs only to #1090                       | issue #1102 row 7 / brief             | Never claim usage from top-k tests                           |
 
@@ -110,9 +104,10 @@ the plaintext embed.
 
 ## Open Questions
 
-- No product decision remains open. Locked D12, the 12 exact-ordered citations plus Prisma's
-  unordered top-three set, numeric policy/bounds, and canonical prose-refresh scope may change only
-  through recorded drift and evaluator approval.
+- PLAN-EVAL must challenge whether `llms#Getting started` is sufficient guidance, whether the
+  score-only row genuinely fails an inverted score comparator, and whether the exact pre-existing
+  doctrine nonzero baseline is an acceptable no-regression verdict before token request. Any change
+  to locked rows, cap, selection, or ranking constants requires recorded drift and evaluator approval.
 
 ## Drift and Debt
 
