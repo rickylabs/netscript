@@ -135,3 +135,29 @@ processes whose `cwd` or working-dir argument is contained by the slice worktree
 already decidable by exactly the containment rule the tool applies to containers. (3) Treat a
 teardown `Child process has already terminated` as a **signal to verify**, not as noise; it means
 the teardown's model of its children was wrong.
+
+### C-D86 addendum — the detection rule I proposed would have killed a live run
+
+Immediately after recording C-D86 I enumerated orphans again during the row-74 execution and found
+**40 `PPID 1` aspire helpers whose working-dir is inside `ns005-w3b1`** — the very worktree whose
+gate was mid-flight. They were the running gate's own children, workspace stamp
+`plugin-smoke-20260809-224559`, elapsed ~4 minutes. Aspire spawns `nuget search` helpers detached,
+so **`PPID 1` is normal operation for this tool, not evidence of abandonment.**
+
+The rule proposed in C-D86 — "classify orphaned processes whose cwd or working-dir is contained by
+the slice worktree" — would therefore have terminated the live authorized run. Containment proves
+*ownership*; it does not prove *staleness*. What actually justified the earlier kill was the
+conjunction: containment **plus** a workspace stamp belonging to a run that had already ended
+(`…-204236`, row 70) **plus** elapsed time (1h53m) wildly exceeding the operation's expected
+duration of well under a second.
+
+Corrected recommendation for the follow-up issue: a process may be reclaimed only when all three
+hold — path containment in the slice worktree, a workspace directory that is not the active run's,
+and an age threshold far above the operation's normal duration. A tool that reclaims on containment
+alone is more dangerous than the leak it fixes.
+
+Census at this moment, strictly `PPID == 1`: `ns005-w2c` 16, `ns005-w3a` 5, `ns005-w3b2` 3, all
+~20-21h old and **foreign to this run — reported, untouched**; `ns005-stable-opus5` 6, owned by this
+orchestrator checkout, deferred until after the row-74 gate completes so cleanup cannot perturb it.
+The scale (24 foreign stale helpers across three sibling worktrees) shows this is a systemic
+teardown gap, not a one-off.
