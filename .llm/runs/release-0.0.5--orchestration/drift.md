@@ -45,11 +45,23 @@ and the added specifiers are exactly the canary the smoke installed. Run-owned.
 **Action:** `git checkout -- deno.lock`; verified byte-identical to HEAD by sha256
 (`764d8496848e50a8` both sides). Nothing committed. Worktree status clean apart from the item below.
 
-**Not run-owned, deliberately left alone:** untracked `.playwright-cli/` — directory mtime
+**Not run-owned — quarantined intact, not deleted:** untracked `.playwright-cli/` — directory mtime
 `08:21:21`, contents stamped `06:20–06:21Z`, roughly seven hours before this smoke started. It does
-not belong to this run, so it was reported rather than deleted, under the same rule that leaves the
-foreign `redis-jfgcbtaf` container from `w6-review-desk` untouched. Ownership is proven by evidence,
-not inferred from convenience.
+not belong to this run, so it was never a candidate for deletion, under the same rule that leaves the
+foreign `redis-jfgcbtaf` container from `w6-review-desk` untouched.
+
+The stable-cut gate requires a clean tree, so it was **moved intact** rather than removed:
+
+| | |
+| --- | --- |
+| Source | `/home/codex/repos/ns005-stable-opus5/.playwright-cli/` |
+| Destination | `/tmp/ns005-stable-opus5-preexisting-playwright-cli-20260809T1538Z` |
+| Files | 3 before, 3 after |
+| Bytes | 34,105 before, 34,105 after |
+| Content manifest sha256 | `8589226457438b71` before, `8589226457438b71` after |
+
+Target verified absent before the move. Contents are byte-preserved and recoverable at that path;
+nothing was deleted. `git status --porcelain` is now empty.
 
 **Generalisable point:** the smoke resolves published JSR specifiers using the invoking workspace's
 lockfile, so running it from a tracked worktree writes release-version entries into that lockfile.
