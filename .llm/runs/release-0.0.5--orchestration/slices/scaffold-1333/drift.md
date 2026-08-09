@@ -60,3 +60,17 @@ head to 905 lines while adding the project-derived wait and browser reference ga
 over the A8 500-line cap, and the package doctrine aggregate remains 50 FAIL / 51 WARN / 1 INFO.
 Splitting the established runtime gate registry is architecture debt, not a safe mechanical change
 inside the final scaffold feature slice; no finding was hidden or allowed.
+
+## 2026-08-09 — serialized runtime stopped at stale project-boundary app identity
+
+The single ledger-row-70 runtime execution at `2150421e4` exited 1 with 16 passed / 1 failed / 2
+skipped / 19 total steps. `behavior.project-boundary-dev` still defaults its optional app argument
+to `dashboard`, and the gate registry supplies only the project root. After S1, the runtime project
+`prod-local-test` correctly contains `apps/prod-local-test-web`, so the probe failed while
+canonicalizing the nonexistent `apps/dashboard` cwd. Its child then produced a secondary
+already-terminated-process error during cleanup.
+
+Fail-fast prevented `behavior.app-reference` from running, so the browser/Windows-Chrome interop
+path has no verdict. The authorized run was not retried. Pre/post leak checks found no run-owned
+resources and left one stale foreign Redis container untouched; manifest and lock diffs remained
+empty. This blocks runtime row 9 and therefore blocks `Closes #1333` at this head.

@@ -46,3 +46,12 @@ embedded barrel is 294,190 bytes (330,000 cap), and the unchanged MCP docs corpu
 package/root publish dry-runs, scoped quality, and aggregate quality gates pass. Package doctrine
 retains its pre-existing 50/51/1 debt set; the expanded runtime gate registry is recorded in drift.
 The one-pass AppHost/browser verdict and closure keyword remain pending the serialized grant.
+
+The serialized grant was recorded as ledger row 70 at orchestrator commit `78000169a`. The one
+authorized execution at feature head `2150421e4` ran once and exited 1: 16 passed / 1 failed / 2
+expected `DEFERRED` skips / 19 total steps. `behavior.project-boundary-dev` targeted its stale
+default `apps/dashboard` instead of S1's derived `apps/prod-local-test-web`; fail-fast meant
+`behavior.app-reference` never executed, so it has no browser/WSL-interoperability verdict. There
+were no run-owned leak survivors or manifest/lock changes, and the foreign Redis container owned by
+`/home/codex/repos/w6-review-desk` was left untouched. No rerun is authorized. Row 9 and the closing
+keyword remain blocked.

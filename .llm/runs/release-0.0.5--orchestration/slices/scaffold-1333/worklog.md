@@ -111,6 +111,33 @@ All non-Aspire gates are complete. Request the single serialized grant for exact
 The run will be bracketed by leak checks and will not begin until the orchestrator commits a durable
 grant row.
 
+## Serialized runtime receipt — ledger row 70
+
+The orchestrator committed and pushed ledger row 70 at `78000169a` before the grant reached this
+thread. Exactly one execution was made at feature head `2150421e4`; the red run was not retried.
+
+| Receipt | Result |
+| --- | --- |
+| Pre-run leak check | raw exit 0; no run-owned resources; stale foreign `redis-jfgcbtaf` owned by `/home/codex/repos/w6-review-desk` reported and left untouched |
+| `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | raw `$?` exit 1; 16 passed / 1 failed / 2 skipped / 19 total steps |
+| Post-run leak check | raw exit 0; no run-owned survivors; the same foreign Redis container remained untouched |
+| Manifest and lock hygiene | `git diff --name-only -- '**/deno.json' deno.json deno.lock '**/deno.lock'` returned empty |
+
+The two skips were expected `DEFERRED` work from #1398:
+
+- `behavior.otel.stream-consumer`: `workers-combined` does not install the stream mutation hook.
+- `behavior.otel.traces`: TC-14 requires the deferred Flow-B stream-consumer record.
+
+`behavior.project-boundary-dev` failed before the browser reference gate. The probe defaults its
+optional app argument to `dashboard`, while the gate registry passes only the project root; S1 now
+correctly derives the generated app as `prod-local-test-web`, so canonicalizing the nonexistent
+`apps/dashboard` cwd failed. Cleanup still passed. Because the harness is fail-fast,
+`behavior.app-reference` (`BEHAVIOR_APP_REFERENCE`) did not execute and has no verdict; Windows
+Chrome/WSL interop was not reached.
+
+This is a runtime integration finding, not authority to consume a second token. Row 9 remains
+unevidenced, and the PR continues to use `Refs #1333` rather than a closing keyword.
+
 ## S5 — generated quality and browser/runtime acceptance
 
 ### Implementation
@@ -166,6 +193,15 @@ the complete verdict is reserved for the serialized one-pass run.
   query module, and `withResource` composition instead of directing agents to a global `lib` file.
 - The public-init golden asserts the canonical route plus both retained example route files exist.
 
+### Falsifiability
+
+| Mutation | Result |
+| --- | --- |
+| Replace `appRoutes.designComposition.href()` with the obsolete `/design/components` promotion literal, then regenerate the canonical barrel | raw exit 1; the index-route golden rejected the old literal |
+
+The clean source was restored, the canonical barrel regenerated, and the same focused golden then
+passed at raw exit 0 with 1 test / 25 steps / 0 failed.
+
 ### Gates
 
 | Gate | Result |
@@ -181,7 +217,7 @@ the complete verdict is reserved for the serialized one-pass run.
 The first scoped-check attempt used unsupported `--deno-arg=--no-lock` syntax and exited 1 before
 running a check. The required corrected form, `--deno-arg --no-lock`, then executed and exited 0;
 the failed invocation is not reported as a product verdict. Package doctrine remains red solely on
-the exact pre-existing baseline and introduces no new finding in S1.
+the exact pre-existing baseline and introduces no new finding in S4.
 
 ## S2 — resource-local contract and query topology
 
