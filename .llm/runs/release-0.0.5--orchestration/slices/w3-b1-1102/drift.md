@@ -208,3 +208,12 @@ Drift is append-only.
 - **Evidence:** combined pre-fix activation run exit 1 with three named failures; post-change focused
   group exit 0 with 21/21, and exact CLI pair exit 0 with 20/20. No AppHost, container, or Aspire
   command ran. The diagnostic scaffold was moved to system trash and is recoverable.
+
+## 2026-08-09 — Root publish dry-run mutates catalog-backed package manifests
+
+- **What:** the required root `publish:dry-run` exited 0 but resolved `catalog:` Zod imports to an
+  exact npm specifier in 18 package/plugin manifests; the package dry-run also expanded the MCP
+  publish arrays. These files were clean immediately before the gate and are outside S5.
+- **Action:** restored only the proven gate-created, unstaged manifest churn with `apply_patch`,
+  verified every affected path plus `deno.lock` has no diff, and retained the raw exit-0 publish
+  evidence. No dependency or manifest change belongs to #1102.

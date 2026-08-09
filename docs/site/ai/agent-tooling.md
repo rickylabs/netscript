@@ -74,6 +74,10 @@ project. Re-running `agent init` is idempotent: unchanged files are left alone,
 and existing host configuration is preserved alongside the `netscript` server
 entry.
 
+Before unfamiliar NetScript API or architecture work, call `find_guidance` with the task you intend
+to complete and follow its ordered citations. Use `search_docs` for literal lookup and `get_doc` for
+exact retrieval of a known document or section.
+
 Zed project MCP configuration runs only after the worktree is trusted; review the generated
 commands before enabling project settings. Re-running with the same editor is idempotent and keeps
 unrelated MCP servers/settings alongside the NetScript entries.

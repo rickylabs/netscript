@@ -60,9 +60,9 @@ returns rank-1 `llms#task-router`. The original five rows / 15 citations and 12-
 
 ## Next Steps
 
-1. Commit/push/comment S4B with raw exits.
-2. Implement S5 docs and all non-Aspire gates; then push `EXPENSIVE-GATE-REQUEST` and stop for a
-   durable runtime-token grant.
+1. Commit/push/comment S5 with all non-Aspire evidence and the durable `EXPENSIVE-GATE-REQUEST`.
+2. Stop until the orchestrator commits a serialized runtime-token grant. Then run the exact
+   one-pass scaffold runtime command bracketed by leak checks; do not run a focused substitute.
 
 ## Key Decisions
 
@@ -94,17 +94,16 @@ the plaintext embed.
 
 | Gate family | Current status             | Evidence                                                        |
 | ----------- | -------------------------- | --------------------------------------------------------------- |
-| Static      | PASS through rebased S3    | 132 MCP tests; CLI pair 20/20; JSR failures=0; scoped gates green |
+| Static      | PASS through S5             | 134 MCP tests; CLI pair 20/20; JSR failures=0; scoped gates green |
 | Fitness     | Known pre-existing failure | doctrine exit 1 only for #1403 baseline; no new warning remains  |
-| Runtime     | NOT_RUN                    | no AppHost/container started; serialized token not granted       |
+| Runtime     | TOKEN_REQUESTED            | no AppHost/container started; awaiting durable grant              |
 | Consumer    | PASS for D12 paths         | embedded, materialized filesystem, and installed-corpus stdio    |
 
 ## Open Questions
 
-- PLAN-EVAL must challenge whether `llms#Getting started` is sufficient guidance, whether the
-  score-only row genuinely fails an inverted score comparator, and whether the exact pre-existing
-  doctrine nonzero baseline is an acceptable no-regression verdict before token request. Any change
-  to locked rows, cap, selection, or ranking constants requires recorded drift and evaluator approval.
+- No implementation decision remains open. The serialized runtime verdict and separate-session
+  IMPL-EVAL remain owner-controlled. Any change to locked rows, cap, selection, or ranking constants
+  still requires recorded drift and evaluator approval.
 
 ## Drift and Debt
 
@@ -127,4 +126,6 @@ the plaintext embed.
 - `26176a608` — S2 shared intent ranker, citations/link routing, and D12 filesystem policy.
 - `5e3b58b67` — record the canonical-corpus source blocker without a workaround.
 - `fd9267906` — S3 canonical corpus refresh, bounded embedded selection, and locked dual-adapter evaluation.
-- Rebased regeneration commit — pending; canonical source `eda49bb2e`, JSR close gate green.
+- `99d753e0a` — S4A retrieval gaps, additive evaluation rows, and score-mutation discriminator.
+- `5414bf5b9` — S4B activation across MCP/generated guidance/skills and real installed-corpus stdio.
+- S5 commit — public docs, generated README asset, all non-Aspire close gates, token request.

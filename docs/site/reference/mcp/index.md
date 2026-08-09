@@ -20,6 +20,10 @@ Most consumers never import this package: `netscript agent init` installs it as 
 `netscript agent mcp` runs it. See [Agent tooling](/ai/agent-tooling/) for the CLI ×
 skills × MCP combo, and the package README for the mental model and recipes.
 
+Before unfamiliar NetScript API or architecture work, call `find_guidance` with the task you intend
+to complete and follow its ordered citations. Use `search_docs` for literal lookup and `get_doc` for
+exact retrieval of a known document or section.
+
 Two entrypoints carry the surface:
 
 - `@netscript/mcp` — tool contracts, the registry, the protocol runner, ports, and default adapters.

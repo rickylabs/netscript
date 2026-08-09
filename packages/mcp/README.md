@@ -110,6 +110,10 @@ the pre-release line, and `netscript agent init` writes the correct pinned form 
 
 ## Quick example
 
+Before unfamiliar NetScript API or architecture work, call `find_guidance` with the task you intend
+to complete and follow its ordered citations. Use `search_docs` for literal lookup and `get_doc` for
+exact retrieval of a known document or section.
+
 **1. Wire up an agent host.** From a NetScript project root:
 
 ```bash

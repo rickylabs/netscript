@@ -5,7 +5,8 @@ closes two retrieval gaps found by IMPL-EVAL, then activates `find_guidance` bef
 implementation work across MCP initialization, generated agent guidance, consumer skills, and the
 real installed-corpus CLI stdio path, and finally aligns public docs and release evidence.
 
-This draft is plan-only. Product implementation is blocked on a fresh separate-session PLAN-EVAL.
+The separate-session PLAN-EVAL passed. S4A and S4B are implemented; S5 documentation and the full
+non-Aspire close-gate set remain before the serialized runtime-token request.
 
 ## Scope
 
@@ -22,7 +23,7 @@ This draft is plan-only. Product implementation is blocked on a fresh separate-s
       route-hint-free score evaluation with inverted-comparator mutation proof
 - [x] S4B — MCP/generated-agent/consumer-skill activation and real no-AppHost
       `agent init --with-docs` → `agent mcp` → `find_guidance` stdio proof
-- [ ] S5 — public MCP/docs alignment, generated assets, all non-Aspire gates, runtime-token request
+- [x] S5 — public MCP/docs alignment, generated assets, all non-Aspire gates, runtime-token request
 
 ## Locked plan decisions
 
@@ -55,10 +56,9 @@ This draft is plan-only. Product implementation is blocked on a fresh separate-s
 ## Harness
 
 - Run dir: `.llm/runs/release-0.0.5--orchestration/slices/w3-b1-1102/`
-- Phase: `plan-eval`
-- Required evaluator: separate Claude · Fable 5 session, owner-launched
-- No product source changes before `PASS`; no AppHost/container/`e2e:cli` before a durable runtime
-  token grant.
+- Phase: `impl`
+- PLAN-EVAL: separate Claude · Fable 5 session, `PASS` at plan head `71c0a29c2`
+- No AppHost/container/`e2e:cli` before a durable runtime token grant.
 
 ## Definition of Done
 
@@ -71,4 +71,4 @@ This draft is plan-only. Product implementation is blocked on a fresh separate-s
 - [ ] MCP instructions and generated guidance activate `find_guidance` before unfamiliar work.
 - [ ] #1090 remains the only adoption-tracking surface.
 
-No checkbox is claimed complete at plan stage.
+Definition-of-Done rows remain unchecked until the final implementation evidence exists.

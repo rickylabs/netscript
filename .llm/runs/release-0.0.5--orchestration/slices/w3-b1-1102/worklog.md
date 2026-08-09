@@ -294,3 +294,48 @@ the single shared indexer used by both adapters.
   AppHost, container, Aspire CLI, or `e2e:cli` suite ran.
 - Reconcile: no new PR comments or issue changes alter scope. #1102 stays open and the draft remains
   `status:impl`; S5 public docs and full non-Aspire evidence remain.
+
+## 2026-08-09 — S5 public docs and non-Aspire close gates
+
+- Added a docs-drift assertion across `packages/mcp/README.md`, the MCP reference, and Agent
+  tooling. Test-first registry run — exit 1; 5 passed / 1 failed because the unfamiliar-work
+  activation contract was absent. After the three public docs gained the same intent/literal/exact
+  workflow, the focused registry run exited 0; 6 passed / 0 failed.
+- Regenerated `packages/mcp/src/publish-assets.generated.ts` from the README. The generated corpus
+  remains byte-unchanged at 253,535 bytes / 12 documents against the 262,144-byte cap; no prose,
+  provenance, CLI agent-doc asset, or lockfile changed.
+- Focused retrieval/evaluation/source-policy/release-fallback group — exit 0; 12 passed / 0 failed.
+  Eight locked rows pass byte-equal on embedded and materialized-filesystem adapters, including
+  rank-1 `llms#task-router`. S4A's mandatory scratch score inversion already exited 1 naming the
+  score-only row, followed immediately by a clean exit-0 evaluation; S5 changes no scorer/fixture.
+- Full MCP package — exit 0; 134 passed / 0 failed, no skipped test. Required CLI pair — exit 0;
+  20 passed / 0 failed, including real `agent init --with-docs` → installed filesystem → public
+  `agent mcp` → rank-1 `llms#task-router`.
+- Scoped check/lint/fmt — exit 0 each; 135 selected files, zero failed batches/findings, check used
+  `--no-lock`, lint/format used the package config.
+- Decisive MCP quality — exit 0, zero findings, zero allowances. Decisive doctrine inventory — raw
+  exit 1 with the exact pre-existing #1403 baseline: A14 fail, three warnings, one info; zero delta
+  and not called green.
+- Non-decisive aggregates: `quality:gate` exit 0 and the separately invoked `arch:check` exit 0.
+  The commands emitted no `skipped=` summary; their logged task graphs ran, but neither is used as
+  MCP package evidence because their configured roots omit MCP.
+- Generated/JSR checks: `check:publish-assets` exit 0; `check:assets-barrel` exit 0;
+  `check:netscript-jsr-specifiers` exit 0 with
+  `scanned=2326 allowances=1 ranges=0 failures=0`.
+- Docs: registry 6/6 exit 0; canonical site `verify` exit 0 (`Docs source format: OK`, 617 files,
+  rendered 220 HTML / 4 existing syntax allowances, 32,772 links / 220 pages, caveats 18 / 14);
+  root `docs:links` exit 0 with zero broken links/anchors; `docs:accuracy` exit 0.
+- JSR audit exit 0 with the known two cardinality warnings and slow-types banner. MCP doc-lint exit
+  0 with combined diagnostics 0 across all three exports. MCP publish dry-run exit 0; root publish
+  dry-run exit 0. Review threads exit 0 with `threads=0 unanswered=0`.
+- The root publish dry-run resolved catalog imports and reformatted one package manifest in the
+  worktree. Every proven gate-created manifest edit was restored before commit; no such churn or
+  lock change remains.
+- Reconcile: the implementation evidence now covers S4A, S4B, and S5, but the serialized runtime
+  verdict and separate IMPL-EVAL have not run. The PR therefore retains `Refs #1102`, unchecked
+  Definition-of-Done rows, draft state, and `status:impl`; #1090 remains untouched.
+
+EXPENSIVE-GATE-REQUEST
+
+All non-Aspire gates above are complete. Request a durable ledger grant before the one allowed
+`deno task e2e:cli run scaffold.runtime --cleanup --format pretty`, bracketed by leak checks.

@@ -111,3 +111,32 @@ Deno.test('docs drift proof: documentation reflects registered tool surface and 
     assert(agentTooling.includes(`\`${toolName}\``), `agent-tooling.md missing tool: ${toolName}`);
   }
 });
+
+Deno.test('public docs activate intent guidance before unfamiliar implementation work', async () => {
+  const docs = [
+    ['README.md', await Deno.readTextFile(new URL('../README.md', import.meta.url))],
+    [
+      'reference/mcp/index.md',
+      await Deno.readTextFile(
+        new URL('../../../docs/site/reference/mcp/index.md', import.meta.url),
+      ),
+    ],
+    [
+      'ai/agent-tooling.md',
+      await Deno.readTextFile(
+        new URL('../../../docs/site/ai/agent-tooling.md', import.meta.url),
+      ),
+    ],
+  ] as const;
+
+  for (const [name, content] of docs) {
+    assert(
+      content.includes('Before unfamiliar NetScript API or architecture work'),
+      `${name} does not activate find_guidance before unfamiliar implementation work`,
+    );
+    assert(
+      content.includes('literal lookup') && content.includes('exact retrieval'),
+      `${name} does not distinguish intent guidance from literal and exact retrieval`,
+    );
+  }
+});
