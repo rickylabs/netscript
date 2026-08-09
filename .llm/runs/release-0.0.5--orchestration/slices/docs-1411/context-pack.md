@@ -2,7 +2,7 @@
 
 ## Current state
 
-- Phase: Round 2 implementation and Tier-D gates complete; PR evidence update pending.
+- Phase: Round 2 Tier-D handoff complete; draft PR #1412 awaits orchestrator IMPL-EVAL and CI.
 - Branch/base: `fix/docs-versionless-jsr-specifiers` at `399f60185`.
 - `PLAN-EVAL: N/A` was recorded before source edits because the slice is fully specified and
   mechanical.
@@ -30,3 +30,5 @@
   Across both rounds, nine defective published specifiers were repaired. The final sweep classified
   55 published command/import-map candidates and found zero unpinned.
 - All Round 2 requested gates exit 0; rendered output shows the four AI instructions at `@0.0.4`.
+- Round 2 implementation commit: `362714bbc`; structured evidence comment:
+  https://github.com/rickylabs/netscript/pull/1412#issuecomment-5230543249.

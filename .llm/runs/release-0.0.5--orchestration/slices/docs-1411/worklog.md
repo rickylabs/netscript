@@ -101,3 +101,12 @@ CLI install commands and both `author-a-plugin` import-map values.
 
 The root guard remains downstream-only evidence until corpus regeneration. No direct docs-source
 guard was added; the orchestrator will carry the demonstrated reachability gap to follow-up work.
+
+### Round 2 handoff
+
+- Commit `362714bbc` was pushed with explicit refspec
+  `HEAD:refs/heads/fix/docs-versionless-jsr-specifiers`.
+- Draft PR #1412's body now carries the superseding nine-repair / 55-candidate / zero-unpinned
+  evidence. Round 2 IMPL evidence comment:
+  https://github.com/rickylabs/netscript/pull/1412#issuecomment-5230543249.
+- Separate-session IMPL-EVAL, CI, acceptance mirror/close gate, and merge remain orchestrator-owned.
