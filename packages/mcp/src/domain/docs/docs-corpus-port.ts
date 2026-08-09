@@ -1,3 +1,5 @@
+import type { GuidanceResult } from './guidance-contract.ts';
+
 /** Maximum source characters retained for one indexed document. */
 export const MAX_INDEXED_DOC_LENGTH = 100_000;
 
@@ -63,7 +65,7 @@ export interface DocsSearchMatch {
   readonly score: number;
 }
 
-/** Indexed public documentation capability consumed by docs flows. */
+/** Public documentation capability consumed by docs flows. */
 export interface DocsCorpusPort {
   /** List indexed public document summaries. */
   list(): Promise<readonly DocsSummary[]>;
@@ -71,6 +73,16 @@ export interface DocsCorpusPort {
   search(query: string): Promise<readonly DocsSearchMatch[]>;
   /** Retrieve one indexed public document by slug. */
   get(slug: string): Promise<DocsDocument | undefined>;
+  /** Resolve deterministic section guidance for a natural-language task. */
+  findGuidance(intent: string): Promise<GuidanceResult>;
+}
+
+/** Normalize a docs source or lookup path into its public extensionless slug. */
+export function normalizeDocsSlug(slug: string): string {
+  const normalized = slug.trim().replace(/\\/g, '/').replace(/^\/+|\/+$/g, '')
+    .replace(/\.(?:md|txt)$/i, '');
+  const withoutIndex = normalized === 'index' ? 'index' : normalized.replace(/\/index$/i, '');
+  return withoutIndex || 'index';
 }
 
 /** Convert public heading text into its stable section identifier. */

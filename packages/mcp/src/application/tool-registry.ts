@@ -20,6 +20,7 @@ const kinds: Readonly<Record<ToolName, ToolKind>> = {
   search_docs: 'read',
   list_docs: 'read',
   get_doc: 'read',
+  find_guidance: 'read',
   find_export: 'read',
   list_package_exports: 'read',
   get_export: 'read',
@@ -43,6 +44,8 @@ const summaries: Readonly<Record<ToolName, string>> = {
   search_docs: 'Search public NetScript documentation.',
   list_docs: 'List public NetScript documentation summaries.',
   get_doc: 'Get one public document or documentation section.',
+  find_guidance:
+    'Find ordered section-level guidance and cited code for an unfamiliar NetScript task.',
   find_export: 'Find the package and subpath that export an exact symbol.',
   list_package_exports: 'List one package export surface grouped by subpath.',
   get_export: 'Get one exact export signature and its JSDoc.',

@@ -3,8 +3,9 @@ import {
   type DocsCorpusPort,
   DocsCorpusUnavailableError,
   slugifyDocsHeading,
-} from '../../domain/docs-corpus-port.ts';
+} from '../../domain/docs/docs-corpus-port.ts';
 import type { ToolExecutionResult, ToolFlow } from '../../domain/tool-types.ts';
+import { createFindGuidanceFlow } from './find-guidance-flow.ts';
 
 const DEFAULT_LIST_LIMIT = 20;
 const DEFAULT_SEARCH_LIMIT = 10;
@@ -21,8 +22,9 @@ export interface DocsCorpusSelection {
 export function createDocsFlows(
   corpus: DocsCorpusPort,
   selection?: DocsCorpusSelection,
-): Readonly<Record<'list_docs' | 'search_docs' | 'get_doc', ToolFlow>> {
+): Readonly<Record<'list_docs' | 'search_docs' | 'get_doc' | 'find_guidance', ToolFlow>> {
   return {
+    find_guidance: createFindGuidanceFlow(corpus),
     list_docs: async (input): Promise<ToolExecutionResult> => {
       const limit = boundedLimit(input, DEFAULT_LIST_LIMIT, MAX_LIST_LIMIT);
       try {

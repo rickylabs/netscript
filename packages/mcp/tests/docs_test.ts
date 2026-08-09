@@ -1,6 +1,6 @@
 import { assert, assertEquals, assertGreater } from '@std/assert';
 import { join, resolve } from '@std/path';
-import { createDocsFlows } from '../src/application/flows/docs-flows.ts';
+import { createDocsFlows } from '../src/application/docs/docs-flows.ts';
 import { createMcpServer } from '../src/application/runner/mcp-server.ts';
 import {
   FilesystemDocsCorpus,
@@ -215,7 +215,7 @@ Deno.test('stdio composition preserves environment precedence over an indexable 
   }
 });
 
-Deno.test('CLI composition defaults list, search, and get to package-shipped docs', async () => {
+Deno.test('CLI composition defaults every docs flow to package-shipped docs', async () => {
   const server = createMcpCliServer({ projectRoot: fixtureRoot });
   const list = await server.handle({
     jsonrpc: '2.0',
@@ -228,7 +228,8 @@ Deno.test('CLI composition defaults list, search, and get to package-shipped doc
     docs: readonly { slug: string }[];
   };
   assertGreater(listed.count, 0);
-  assertEquals(listed.docs[0]?.slug, 'mcp');
+  assert(listed.docs.some((document) => document.slug === 'llms'));
+  assert(listed.docs.some((document) => document.slug === 'mcp'));
 
   const search = await server.handle({
     jsonrpc: '2.0',
@@ -245,6 +246,18 @@ Deno.test('CLI composition defaults list, search, and get to package-shipped doc
     params: { name: 'get_doc', arguments: { slug: 'mcp' } },
   });
   assertEquals((get?.result?.structuredContent as { slug: string }).slug, 'mcp');
+
+  const guidance = await server.handle({
+    jsonrpc: '2.0',
+    id: 13,
+    method: 'tools/call',
+    params: { name: 'find_guidance', arguments: { intent: 'diagnose app telemetry' } },
+  });
+  assertGreater(
+    (guidance?.result?.structuredContent as { recommendations: readonly unknown[] })
+      .recommendations.length,
+    0,
+  );
 });
 
 Deno.test('CLI composition makes installed help symptoms reachable through MCP docs', async () => {
@@ -260,7 +273,7 @@ Deno.test('CLI composition makes installed help symptoms reachable through MCP d
       jsonrpc: '2.0',
       id: query,
       method: 'tools/call',
-      params: { name: 'search_docs', arguments: { query } },
+      params: { name: 'search_docs', arguments: { query, limit: 20 } },
     });
     const matches =
       (response?.result?.structuredContent as { matches: Array<{ slug: string }> }).matches;
@@ -305,6 +318,7 @@ Deno.test('unexpected corpus failures remain bounded structured tool errors', as
     list: () => Promise.reject(new Error('adapter secret detail')),
     search: () => Promise.reject(new Error('adapter secret detail')),
     get: () => Promise.reject(new Error('adapter secret detail')),
+    findGuidance: () => Promise.reject(new Error('adapter secret detail')),
   });
 
   for (

@@ -3,7 +3,8 @@ import type {
   DocsDocument,
   DocsSearchMatch,
   DocsSummary,
-} from '../domain/docs-corpus-port.ts';
+} from '../domain/docs/docs-corpus-port.ts';
+import type { GuidanceResult } from '../domain/docs/guidance-contract.ts';
 import {
   MCP_EMBEDDED_DOCS,
   MCP_EMBEDDED_DOCS_PROVENANCE,
@@ -85,6 +86,12 @@ export class ReleaseEmbeddedDocsCorpus implements DocsCorpusPort {
   async get(slug: string): Promise<DocsDocument | undefined> {
     await this.#verifyIntegrity();
     return await this.#delegate.get(slug);
+  }
+
+  /** Resolve release-matched section guidance after verifying generated integrity. */
+  async findGuidance(intent: string): Promise<GuidanceResult> {
+    await this.#verifyIntegrity();
+    return await this.#delegate.findGuidance(intent);
   }
 
   #verifyIntegrity(): Promise<void> {

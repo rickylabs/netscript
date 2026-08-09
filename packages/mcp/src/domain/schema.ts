@@ -84,6 +84,14 @@ function validateJsonSchema(schema: JsonSchema, value: unknown, path = '$'): str
       issues.push(`${path} must be at most ${schema.maximum}`);
     }
   }
+  if (typeof value === 'string') {
+    if (typeof schema.minLength === 'number' && value.length < schema.minLength) {
+      issues.push(`${path} must contain at least ${schema.minLength} characters`);
+    }
+    if (typeof schema.maxLength === 'number' && value.length > schema.maxLength) {
+      issues.push(`${path} must contain at most ${schema.maxLength} characters`);
+    }
+  }
   return issues;
 }
 

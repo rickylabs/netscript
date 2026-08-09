@@ -17,7 +17,7 @@ Deno.test('mirror-free MCP resolves definePage without a docs directory and sett
     };
     const server = createMcpCliServer({ projectRoot, diagnosticEvidence: evidence });
     assertEquals(
-      server.tools.slice(11, 15).map((tool) => tool.name),
+      server.tools.slice(12, 16).map((tool) => tool.name),
       ['find_export', 'list_package_exports', 'get_export', 'search_exports'],
     );
     const response = await server.handle({

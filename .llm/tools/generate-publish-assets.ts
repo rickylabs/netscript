@@ -1,5 +1,7 @@
 /** Generates registry-safe TypeScript constants for publish-time package assets. */
 
+import { normalizeDocsSlug } from '../../packages/mcp/src/domain/docs/docs-corpus-port.ts';
+
 interface PackageConfig {
   readonly version?: unknown;
 }
@@ -10,11 +12,18 @@ const stalePaths: string[] = [];
 
 /** Golden-path prose embedded in the MCP package when no filesystem corpus resolves. */
 export const MCP_EMBEDDED_DOC_PATHS = [
-  'pages/quickstart/index.md',
+  'llms.txt',
   'pages/explanation/contracts/index.md',
+  'pages/explanation/plugin-system/index.md',
+  'pages/orchestration-runtime/how-to/author-a-plugin/index.md',
+  'pages/data-persistence/how-to/use-a-second-database/index.md',
   'pages/services-sdk/services/index.md',
   'pages/web-layer/builders/index.md',
+  'pages/web-layer/how-to/build-a-server-validated-form/index.md',
+  'pages/web-layer/query/index.md',
   'pages/web-layer/route/index.md',
+  'pages/tutorials/live-dashboard/03-sdk-cache-first-query/index.md',
+  'pages/tutorials/live-dashboard/04-definePage-QueryIsland/index.md',
 ] as const;
 
 /** Maximum UTF-8 source bytes accepted for the generated MCP fallback prose. */
@@ -173,7 +182,7 @@ export async function buildMcpEmbeddedDocs(root: URL = ROOT): Promise<GeneratedM
   const documents = MCP_EMBEDDED_DOC_PATHS.map((path) => {
     const source = payload.files[path];
     if (typeof source !== 'string') throw new Error(`agent docs prose payload is missing ${path}`);
-    return { path, slug: docsSlugFromPath(path), source };
+    return { path, slug: normalizeDocsSlug(path), source };
   });
   const canonical = documents.map(({ path, source }) => `${path}\0${source}`).join('\0');
   const sourceBytes = documents.reduce(
@@ -219,10 +228,6 @@ export const MCP_EMBEDDED_DOCS = ${JSON.stringify(embedded.documents)} as const;
 export const MCP_EMBEDDED_DOCS_PROVENANCE = ${JSON.stringify(embedded.provenance)} as const;
 `,
   );
-}
-
-function docsSlugFromPath(path: string): string {
-  return path.replace(/\.md$/i, '').replace(/\/index$/, '');
 }
 
 function hex(buffer: ArrayBuffer): string {

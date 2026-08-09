@@ -259,7 +259,7 @@ Deno.test("S-18 prior-release host stays pinned until agent init and restart exp
     assertEquals(after.mcpServers.netscript.args[4], MIGRATION_TARGET_SPECIFIER);
 
     const restartedTools = await listToolsAfterHostRestart(root);
-    assertEquals(restartedTools.length, 21);
+    assertEquals(restartedTools.length, 22);
     for (const tool of OPENAPI_TOOL_TRIAD) assert(restartedTools.includes(tool));
   } finally {
     await Deno.remove(root, { recursive: true });
@@ -713,8 +713,13 @@ Deno.test("generated project search_docs reaches its installed corpus after host
       arguments: {},
     });
     assertEquals(listed.result.structuredContent, {
-      count: 2,
+      count: 3,
       docs: [
+        {
+          slug: "llms",
+          title: "NetScript",
+          description: "",
+        },
         {
           slug: "MANIFEST",
           title: "MANIFEST",
@@ -729,7 +734,7 @@ Deno.test("generated project search_docs reaches its installed corpus after host
       corpus: {
         kind: "filesystem",
         root: join(root, ".netscript", "docs"),
-        documentCount: 2,
+        documentCount: 3,
       },
     });
   } finally {

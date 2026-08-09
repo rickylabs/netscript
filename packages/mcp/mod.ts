@@ -128,14 +128,39 @@ export {
   DocsCorpusUnavailableError,
   MAX_INDEXED_DOC_LENGTH,
   slugifyDocsHeading,
-} from './src/domain/docs-corpus-port.ts';
+} from './src/domain/docs/docs-corpus-port.ts';
+export {
+  GUIDANCE_CONFIDENCE_LEVELS,
+  GUIDANCE_DEFAULT_RECOMMENDATIONS,
+  GUIDANCE_LINK_RELATIONS,
+  GUIDANCE_MAX_CODE_CHARACTERS,
+  GUIDANCE_MAX_CODE_EXCERPTS_PER_RECOMMENDATION,
+  GUIDANCE_MAX_EXCERPT_CHARACTERS,
+  GUIDANCE_MAX_FALLBACK_CHARACTERS,
+  GUIDANCE_MAX_INTENT_CHARACTERS,
+  GUIDANCE_MAX_RECOMMENDATIONS,
+  GUIDANCE_MAX_RELATED_LINKS,
+  GUIDANCE_MAX_WHY_CHARACTERS,
+  GUIDANCE_STAGES,
+} from './src/domain/docs/guidance-contract.ts';
+export type {
+  GuidanceCodeExcerpt,
+  GuidanceConfidence,
+  GuidanceLinkRelation,
+  GuidanceRecommendation,
+  GuidanceRelatedLink,
+  GuidanceResult,
+  GuidanceSectionCitation,
+  GuidanceStage,
+} from './src/domain/docs/guidance-contract.ts';
+export { createFindGuidanceFlow } from './src/application/docs/find-guidance-flow.ts';
 export type {
   DocsCorpusPort,
   DocsDocument,
   DocsSearchMatch,
   DocsSection,
   DocsSummary,
-} from './src/domain/docs-corpus-port.ts';
+} from './src/domain/docs/docs-corpus-port.ts';
 export { FilesystemDocsCorpus } from './src/infrastructure/filesystem-docs-corpus.ts';
 export type { FilesystemDocsCorpusOptions } from './src/infrastructure/filesystem-docs-corpus.ts';
 export { EmbeddedDocsCorpus } from './src/infrastructure/embedded-docs-corpus.ts';
