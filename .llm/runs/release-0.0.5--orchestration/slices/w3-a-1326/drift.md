@@ -78,3 +78,19 @@ Drift is append-only.
   reports the effective command as `deno check --unstable-kv --no-lock <files>`.
 - **Evidence:** raw invalid invocation exit 1; corrected wrapper exit 0 with 31 files, zero failed
   batches, zero diagnostics. Plan validation row 4 corrected.
+
+## 2026-08-09 — S2 compatibility and reference-server test locality
+
+- **What:** Atomic widening of `StreamProducerPort` required its in-memory implementation and tests
+  to move from the planned S4 compatibility slice into S2. The real-server proof lives under
+  `plugins/streams/tests/service/`, whose package already declares the server dependency, while the
+  core adapter unit tests remain in `packages/plugin-streams-core`.
+- **Source:** Type-safe atomic port widening and the locked no-dependency-change/lock-hygiene rule.
+- **Expected:** The plan listed the memory producer under S4 and left focused test paths open.
+- **Actual:** Leaving the memory producer until S4 would make S2 scoped check fail; declaring a new
+  server test dependency in the core package would contradict this lane's dependency boundary.
+- **Severity:** minor slice-boundary movement; no product or dependency scope expansion.
+- **Action:** include compatibility implementation in S2 and keep the real-server proof with the
+  existing dependency owner. S4 still runs the complete consumer/publish compatibility gates.
+- **Evidence:** S2 scoped check exit 0; full core tests 26/26; reference-server test exit 0; no
+  `deno.lock` or package manifest diff.

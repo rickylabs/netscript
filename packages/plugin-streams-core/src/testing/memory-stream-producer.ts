@@ -1,4 +1,9 @@
 import type { StreamProducerPort } from '../ports/stream-producer-port.ts';
+import type {
+  StreamProducerReadinessOptionsV1,
+  StreamProducerStateSnapshotV1,
+  StreamWriteReceiptV1,
+} from '../domain/producer-contract-v1.ts';
 
 /** Event recorded by {@link MemoryStreamProducer}. */
 export interface MemoryStreamEvent {
@@ -25,7 +30,28 @@ export interface MemoryStreamEvent {
  */
 export class MemoryStreamProducer implements StreamProducerPort {
   readonly #events: MemoryStreamEvent[] = [];
-  #closed = false;
+  #isClosed = false;
+  #receiptId = 0;
+
+  /** Current ready or stopped lifecycle snapshot. */
+  get state(): StreamProducerStateSnapshotV1 {
+    return {
+      state: this.#isClosed ? 'stopped' : 'ready',
+      attempt: 0,
+      bufferedEvents: 0,
+      bufferedBytes: 0,
+    };
+  }
+
+  /** Memory writes are ready until shutdown. */
+  get isReady(): boolean {
+    return !this.#isClosed;
+  }
+
+  /** Whether shutdown prevents new memory writes. */
+  get closed(): boolean {
+    return this.#isClosed;
+  }
 
   /** List recorded events in insertion order. */
   events(): readonly MemoryStreamEvent[] {
@@ -33,9 +59,9 @@ export class MemoryStreamProducer implements StreamProducerPort {
   }
 
   /** Upsert an entity into the in-memory event log. */
-  upsert(entityType: string, value: Record<string, unknown>): void {
-    if (this.#closed) {
-      return;
+  upsert(entityType: string, value: Record<string, unknown>): StreamWriteReceiptV1 {
+    if (this.#isClosed) {
+      return this.#rejectedReceipt();
     }
     this.#events.push({
       entityType,
@@ -43,14 +69,24 @@ export class MemoryStreamProducer implements StreamProducerPort {
       key: typeof value.id === 'string' ? value.id : undefined,
       value: { ...value },
     });
+    return this.#deliveredReceipt();
   }
 
   /** Delete an entity from the in-memory event log. */
-  delete(entityType: string, key: string): void {
-    if (this.#closed) {
-      return;
+  delete(entityType: string, key: string): StreamWriteReceiptV1 {
+    if (this.#isClosed) {
+      return this.#rejectedReceipt();
     }
     this.#events.push({ entityType, operation: 'delete', key });
+    return this.#deliveredReceipt();
+  }
+
+  /** Resolve immediately while the memory producer is ready. */
+  waitUntilReady(options: StreamProducerReadinessOptionsV1 = {}): Promise<void> {
+    if (options.signal?.aborted) {
+      return Promise.reject(options.signal.reason);
+    }
+    return this.#isClosed ? Promise.reject(new Error('Producer is stopped')) : Promise.resolve();
   }
 
   /** Resolve immediately because memory writes are synchronous. */
@@ -60,7 +96,28 @@ export class MemoryStreamProducer implements StreamProducerPort {
 
   /** Close the producer and ignore future writes. */
   close(): Promise<void> {
-    this.#closed = true;
+    this.#isClosed = true;
     return Promise.resolve();
+  }
+
+  /** Stop the memory producer without additional effects. */
+  stop(): Promise<void> {
+    return this.close();
+  }
+
+  #deliveredReceipt(): StreamWriteReceiptV1 {
+    return {
+      id: ++this.#receiptId,
+      accepted: true,
+      completion: Promise.resolve({ status: 'delivered', attempts: 1 }),
+    };
+  }
+
+  #rejectedReceipt(): StreamWriteReceiptV1 {
+    return {
+      id: ++this.#receiptId,
+      accepted: false,
+      completion: Promise.resolve({ status: 'rejected', reason: 'producer-stopped' }),
+    };
   }
 }

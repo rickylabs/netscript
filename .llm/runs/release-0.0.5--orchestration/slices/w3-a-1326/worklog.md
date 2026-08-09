@@ -138,6 +138,9 @@ the adapter or fetch/timers to the supervisor.
 | 2026-08-09 | S1    | Contract first     | Added standalone lifecycle/policy/buffer/receipt/failure types and clock/random/transport ports; existing producer port unchanged. |
 | 2026-08-09 | S1    | Classified REDs    | Four behavioral assertion failures and four single-symbol API-absence failures recorded separately below.                          |
 | 2026-08-09 | S1    | Wrapper correction | Duplicate explicit `--unstable-kv` exited 1 before checking; wrapper-owned flag plus `--no-lock` exited 0.                         |
+| 2026-08-09 | S2    | Finite supervisor  | Widened port and producer atomically; exact-body/tuple transport, bounded FIFO/retry, readiness, receipts, stop, and close are implemented. |
+| 2026-08-09 | S2    | Eight GREENs       | Four original runtime REDs and four API-absence replacements now pass as eight behavioral tests; removed the run-dir negative fixtures. |
+| 2026-08-09 | S2    | Protocol proof     | Reference server accepts a new tuple, reports its exact replay as duplicate, rejects a gap, and reads back exactly one event.     |
 
 ## Decisions
 
@@ -162,6 +165,11 @@ See `plan.md` D1–D16. No open decision would force implementation rework.
 | Full export doc lint                | `deno task doc:lint --root packages/plugin-streams-core --pretty` | PASS, exit 0 | Combined diagnostics 0.                                   |
 | Raw package publish dry-run         | `deno publish --dry-run --allow-dirty --no-check`                 | PASS, exit 0 | Success, intended files, no real slow-type diagnostic.    |
 | S1 full export doc lint             | `deno task doc:lint --root packages/plugin-streams-core --pretty` | PASS, exit 0 | Combined diagnostics 0 after new public contract exports. |
+| S2 full core tests                  | `deno test --no-lock --allow-all packages/plugin-streams-core/tests/` | PASS, exit 0 | 26 passed, 0 failed; includes all eight reconnect/contract behaviors. |
+| S2 transport + reference server     | two focused adapter/server test files                            | PASS, exit 0 | 3 passed; exact tuple/body, classifications, duplicate and gap semantics. |
+| S2 scoped check                     | package plus reference-server test, `--deno-arg --no-lock`      | PASS, exit 0 | 38 files, one batch, zero failed batches or diagnostics.  |
+| S2 scoped lint                      | package plus reference-server test                              | PASS, exit 0 | 38 files, zero findings.                                  |
+| S2 scoped format                    | package plus reference-server test                              | PASS, exit 0 | 38 files, zero findings.                                  |
 
 ### S1 RED evidence
 

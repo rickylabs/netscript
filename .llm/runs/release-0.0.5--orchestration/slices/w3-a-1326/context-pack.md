@@ -6,17 +6,17 @@
 | -------------- | ----------------------------------------------- |
 | Run ID         | `release-0.0.5--orchestration/slices/w3-a-1326` |
 | Branch         | `fix/streams-durable-producer-reconnect`        |
-| Current phase  | `impl — S1 contract and committed RED evidence` |
+| Current phase  | `impl — S2 reconnect supervisor ready to commit` |
 | Archetype      | `3 — Runtime/Behavior`                          |
 | Scope overlays | none; Aspire runtime validation required        |
 
 ## Current State
 
-PLAN-EVAL cycle 3 returned `PASS` and implementation is authorized. S1 now contains the standalone
-v1 producer contract, new clock/random/transport ports, four independently failing behavioral tests,
-and four single-symbol API-absence fixtures under the slice run dir. The existing
-`StreamProducerPort` and concrete producer remain unchanged until S2. All eight REDs are recorded
-separately, and the S1 package scoped check is green.
+PLAN-EVAL cycle 3 returned `PASS` and implementation is authorized. S1 is committed and pushed with
+all eight REDs recorded separately. S2 implements the finite supervisor, exact protocol transport,
+dual bounded FIFO, receipts/readiness, and distinct stop/close behavior. All eight behaviors are now
+green, the full core suite passes 26/26, and a real reference-server test proves duplicate and gap
+semantics without adding a package dependency.
 
 ## Completed
 
@@ -32,16 +32,19 @@ separately, and the S1 package scoped check is green.
   evidence, and corrected client/server header-export wording.
 - PLAN-EVAL F4 repaired: type-broken negative fixtures moved in the plan from package test roots to
   the slice run dir, preserving green scoped and repo CI checks without exclusions.
+- S1 contract/RED slice committed as `11ee98e22`, pushed, and reported on draft PR #1402.
+- S2 focused/core tests and scoped check/lint/format are green; lock remains unchanged.
 
 ## In Progress
 
-- S1 contract/RED commit, push, and PR comment before S2 implementation.
+- S2 commit, push, and PR comment before S3 telemetry implementation.
 
 ## Next Steps
 
-1. Commit, push, and comment S1 with the eight separately classified raw exits.
-2. Begin S2 by widening the existing producer port atomically with the concrete class.
-3. Replace the four compile-time fixtures with behavioral tests while turning all eight REDs green.
+1. Commit, push, and comment S2 with all eight GREENs and reference-server evidence.
+2. Begin S3 by keeping one publish span open from acceptance through terminal receipt settlement.
+3. Add bounded retry/recovery/rejection/unknown metrics, remove executable console reporting, and
+   run the decisive package-scoped quality/doctrine pair plus manual F-14 evidence.
 
 ## Key Decisions
 
@@ -64,7 +67,9 @@ separately, and the S1 package scoped check is green.
 | Slice `research.md`     | new     | Live issue, upstream constraints, JSR scan, debt, RED.                 |
 | Slice `plan.md`         | new     | Locked decisions, exact acceptance, risks, gates, ordered slices.      |
 | Slice `worklog.md`      | new     | Design checkpoint and baseline evidence.                               |
-| Slice `context-pack.md` | new     | This resumable summary.                                                |
+| Producer application/ports/adapters | changed | Finite reconnect supervisor and exact protocol edge.             |
+| Core and plugin service tests | changed | Eight behaviors plus reference-server idempotency proof.                |
+| Slice artifacts         | changed | S2 gates and bounded implementation drift.                              |
 | Slice `drift.md`        | new     | Preparation/upstream/audit divergences.                                |
 
 ## Gates
@@ -89,4 +94,5 @@ separately, and the S1 package scoped check is green.
 
 ## Commits
 
-- See the draft PR commit list + per-slice comments. No product commit exists yet.
+- `11ee98e22` — S1 contract and classified RED evidence.
+- S2 is locally green and awaiting its required slice commit/push/comment.
