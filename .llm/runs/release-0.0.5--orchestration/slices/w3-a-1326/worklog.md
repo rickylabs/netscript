@@ -97,16 +97,16 @@ terminal acknowledgement; `stop()` never claims or sends `streamClosed`.
 
 ### Commit Slices
 
-| #  | Slice                                  | Gate                                                      | Files                                        |
-| -- | -------------------------------------- | --------------------------------------------------------- | -------------------------------------------- |
-| S0 | Plan-gated research/design             | Separate PLAN-EVAL PASS                                   | Slice artifacts only                         |
-| S1 | Public contract + committed RED suite  | Each named behavior exits 1 before implementation         | Domain/ports/exports/README + reconnect test |
-| S2 | Supervisor, adapters, all RED green    | Focused/full tests + real server duplicate/order test     | Application/adapters/thin composition/tests  |
-| S3 | Structured OTEL + exact AP-13 closure  | Telemetry tests, F-14, quality/arch gates                 | Telemetry files + debt row                   |
-| S4 | Consumer/JSR compatibility             | Wrappers, doc lint, JSR/raw publish, full publish dry-run | Public/testing/downstream/doc files          |
-| S5 | Real Aspire outage and correlated OTEL | Focused runtime gate + leak bracketing                    | Streams probe + CLI E2E gate/evidence        |
-| S6 | Handoff/request                        | Review threads + committed gate request                   | Run/PR artifacts                             |
-| S7 | Granted serialized smoke               | Exact one-pass scaffold.runtime exit 0                    | Evidence only                                |
+| #  | Slice                                  | Gate                                                               | Files                                            |
+| -- | -------------------------------------- | ------------------------------------------------------------------ | ------------------------------------------------ |
+| S0 | Plan-gated research/design             | Separate PLAN-EVAL PASS                                            | Slice artifacts only                             |
+| S1 | Contract + classified committed REDs   | 4 behavioral REDs; 4 isolated API-absence REDs; scoped check green | Domain/new ports/exports/README + tests/fixtures |
+| S2 | Port+class, supervisor, all RED green  | 8 behavioral tests + real server duplicate/order test              | Existing port/application/adapters/tests         |
+| S3 | Structured OTEL + exact AP-13 closure  | Telemetry; scoped quality/doctrine; manual F-14 `PENDING_SCRIPT`   | Telemetry files + debt row                       |
+| S4 | Consumer/JSR compatibility             | Wrappers, doc lint, JSR/raw publish, full publish dry-run          | Public/testing/downstream/doc files              |
+| S5 | Real Aspire outage and correlated OTEL | Focused runtime gate + leak bracketing                             | Streams probe + CLI E2E gate/evidence            |
+| S6 | Handoff/request                        | Review threads + committed gate request                            | Run/PR artifacts                                 |
+| S7 | Granted serialized smoke               | Exact one-pass scaffold.runtime exit 0                             | Evidence only                                    |
 
 ### Deferred Scope
 
@@ -129,6 +129,8 @@ the adapter or fetch/timers to the supervisor.
 | 2026-08-09 | S0    | Design checkpoint  | Contract, state, delivery, buffer, shutdown, transport, telemetry, and ordered slices locked. No product file changed. |
 | 2026-08-09 | S0    | PLAN-EVAL request  | Awaiting orchestrator-launched separate Claude/Fable 5 medium verdict; implementation hard stop active.                |
 | 2026-08-09 | S0    | Draft PR handoff   | Draft PR #1402 targets `main` at plan-only head `6bb6b3961`; labeled `status:plan-eval`.                               |
+| 2026-08-09 | S0    | PLAN-EVAL cycle 1  | `FAIL_PLAN`: repair RED classification/port compile mechanics, package-scoped fitness proof, and finding 7 wording.    |
+| 2026-08-09 | S0    | Plan repair        | F1–F3 repaired without product edits; cycle 2 requested. Evaluator artifact was not visible locally at repair time.    |
 
 ## Decisions
 
@@ -155,10 +157,13 @@ See `plan.md` D1–D16. No open decision would force implementation rework.
 
 ### Fitness Gates
 
-| Gate             | Result                  | Evidence      | Notes                                                   |
-| ---------------- | ----------------------- | ------------- | ------------------------------------------------------- |
-| F-1..F-19        | NOT_RUN                 | Planned S2–S4 | AP-13 exact producer debt currently accepted.           |
-| JSR surface scan | PASS with helper caveat | `research.md` | Helper warns on banner; raw dry-run authority is green. |
+| Gate                   | Result                  | Evidence      | Notes                                                                                              |
+| ---------------------- | ----------------------- | ------------- | -------------------------------------------------------------------------------------------------- |
+| F-1..F-19              | NOT_RUN                 | Planned S2–S4 | AP-13 exact producer debt currently accepted.                                                      |
+| JSR surface scan       | PASS with helper caveat | `research.md` | Helper warns on banner; raw dry-run authority is green.                                            |
+| Package quality scan   | NOT_RUN                 | Planned S3–S4 | Decisive scoped command covers `packages/plugin-streams-core/src`; #1403 owns root gap.            |
+| Package doctrine check | NOT_RUN                 | Planned S3–S4 | Decisive scoped command covers `packages/plugin-streams-core`; root aggregate is non-covering.     |
+| F-14 manual scan       | `PENDING_SCRIPT`        | Planned S3    | Record every `console.*` match and classify executable versus comment-only; #1403 owns automation. |
 
 ### Runtime Gates
 
@@ -180,6 +185,11 @@ See `plan.md` D1–D16. No open decision would force implementation rework.
   core honesty mechanism.
 - Verify the raw upstream limitation in `research.md` findings 4–7 rather than assuming
   `IdempotentProducer.onError` retains writes.
+- PLAN-EVAL cycle 2 must verify that four default-typechecked runtime REDs cannot collapse into the
+  four isolated `COMPILE_TIME_API_ABSENCE` fixtures, and that S1 leaves the existing producer port
+  unchanged so its scoped check stays green.
+- Treat package-scoped quality/doctrine commands as decisive. Mandatory aggregate gates still run,
+  but their omission of `plugin-streams-core` is disclosed and tracked by #1403.
 - No product implementation may begin until `plan-eval.md` records `PASS` from the separate session.
 - Draft PR: https://github.com/rickylabs/netscript/pull/1402. GitHub auto-close syntax remains
   intentionally absent until every live #1326 acceptance row is truthfully evidenced.

@@ -36,3 +36,17 @@ Drift is append-only.
 - **Severity:** minor
 - **Action:** accept
 - **Evidence:** `research.md` baseline table; `netscript-tools` makes raw output authoritative.
+
+## 2026-08-09 — Root fitness gates omit plugin-streams-core
+
+- **What:** `quality:scan` defaults to CLI/plugin roots, and the doctrine root list omits
+  `packages/plugin-streams-core`; the aggregate `quality:gate` therefore supplies no package
+  coverage for this slice. F-14 also has no implementing script.
+- **Source:** PLAN-EVAL cycle 1; `.llm/tools/quality/scan-code-quality.ts`, root `deno.json`, and
+  `.llm/tools/fitness/check-doctrine.ts`.
+- **Expected:** Framework-law commands traverse every changed framework package.
+- **Actual:** Bare aggregate exits would be vacuous evidence for this package.
+- **Severity:** significant repo-tooling gap; local proof mechanism is repairable.
+- **Action:** use package-scoped commands plus manual F-14 evidence marked `PENDING_SCRIPT`;
+  preserve repo-wide repair as separate issue #1403.
+- **Evidence:** revised `plan.md` validation rows 10–12. No tooling source is changed in this slice.

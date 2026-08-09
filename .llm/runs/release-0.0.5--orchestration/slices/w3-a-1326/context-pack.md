@@ -12,10 +12,12 @@
 
 ## Current State
 
-Research and Design are complete on clean exact base `aa8e151e6`. The producer defect and one
-desired-behavior RED are reproduced. The contract locks finite retry, dual buffer bounds, FIFO,
-receipts, readiness, stop/close, exact upstream tuple replay, and one long-lived write trace. No
-product source has changed. A separate orchestrator-launched Claude/Fable PLAN-EVAL is mandatory.
+Research and Design are complete on clean exact base `aa8e151e6`. PLAN-EVAL cycle 1 returned
+`FAIL_PLAN` on evidence mechanics, while confirming the contract and load-bearing research. The
+repair separates four true runtime REDs from four explicitly weaker API-absence checks, keeps the
+existing producer port unchanged in S1, and supplies package-scoped fitness commands because the
+root gates omit this package. No product source has changed. A fresh orchestrator-launched
+Claude/Fable PLAN-EVAL `PASS` remains mandatory.
 
 ## Completed
 
@@ -27,16 +29,18 @@ product source has changed. A separate orchestrator-launched Claude/Fable PLAN-E
 - Initial-outage desired behavior reproduced RED with raw exit 1.
 - Current focused tests, full export doc lint, JSR scan, and raw package publish dry-run recorded.
 - Ordered S0–S7 plan and Design checkpoint written.
+- PLAN-EVAL F1–F3 repaired: classified RED mechanics, S1 port compile story, scoped fitness/F-14
+  evidence, and corrected client/server header-export wording.
 
 ## In Progress
 
-- Draft PR/bootstrap commit and `status:plan-eval` handoff to the milestone orchestrator.
+- Cycle-2 `status:plan-eval` handoff to the milestone orchestrator.
 
 ## Next Steps
 
-1. Orchestrator launches a separate Claude · Fable 5 · medium PLAN-EVAL.
+1. Orchestrator launches a fresh separate Claude · Fable 5 · medium PLAN-EVAL (cycle 2 of 2).
 2. If and only if `plan-eval.md` is `PASS`, begin S1 with public contract and individual RED tests.
-3. If `FAIL_PLAN`, repair only the plan and request a new separate evaluation; do not implement.
+3. If cycle 2 is `FAIL_PLAN`, escalate under the two-failure harness rule; do not implement.
 
 ## Key Decisions
 
@@ -64,12 +68,12 @@ product source has changed. A separate orchestrator-launched Claude/Fable PLAN-E
 
 ## Gates
 
-| Gate family | Current status                       | Evidence                                                               |
-| ----------- | ------------------------------------ | ---------------------------------------------------------------------- |
-| Static      | baseline green; reconnect RED proven | `worklog.md` gate table                                                |
-| Fitness     | planned; AP-13 currently accepted    | `plan.md`, exact debt row                                              |
-| Runtime     | not run                              | Token-free focused Aspire proof is S5; serialized gate requires grant. |
-| Consumer    | not run                              | S4; #1398 gates stay deferred.                                         |
+| Gate family | Current status                       | Evidence                                                                                   |
+| ----------- | ------------------------------------ | ------------------------------------------------------------------------------------------ |
+| Static      | baseline green; reconnect RED proven | `worklog.md` gate table                                                                    |
+| Fitness     | planned; AP-13 currently accepted    | Decisive package-scoped scan/check plus manual F-14 `PENDING_SCRIPT`; #1403 owns root gap. |
+| Runtime     | not run                              | Token-free focused Aspire proof is S5; serialized gate requires grant.                     |
+| Consumer    | not run                              | S4; #1398 gates stay deferred.                                                             |
 
 ## Open Questions
 
@@ -79,7 +83,7 @@ product source has changed. A separate orchestrator-launched Claude/Fable PLAN-E
 ## Drift and Debt
 
 - Drift: stale preparation identity; upstream declaration/runtime mismatch; JSR helper banner false
-  positive.
+  positive; root quality/doctrine omission tracked by #1403.
 - Debt: exact producer AP-13 row may close only after S3; connector convergence remains open.
 
 ## Commits
