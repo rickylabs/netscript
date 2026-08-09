@@ -105,6 +105,19 @@ update the single precedence test matrix before the resolver.
 | 2026-08-09 | impl / S4 | Non-serialized commands completed; review threads clear; lock clean. `EXPENSIVE-GATE-REQUEST` recorded and pushed without starting runtime resources. | `s4-gates.md` |
 | 2026-08-09 | impl / S4 correction | #1403 showed aggregate quality/doctrine roots omit MCP. Direct MCP quality exited 0 with no findings/allowances. Direct doctrine exposed one owned A8 line-cap regression, which was repaired and re-tested; its rerun exited 1 only for untouched pre-existing F-16/A9/A14 findings now assigned to #1403 triage. | `s4-gates.md`; registry 5/5; scoped format 1/1 |
 | 2026-08-09 | impl / serialized runtime | Ledger row 51 granted one `scaffold.runtime` pass: raw exit 0, passed=78 failed=0 skipped=2. The only skips were the expected #1398 deferrals. Pre/post leak artifacts showed no slice-owned survivor; foreign `redis-jfgcbtaf` was left untouched. All eleven #1375 rows audit as proven. | `s4-gates.md`; review threads 0/0 |
+| 2026-08-09 | impl-eval | Separate Claude/Fable evaluator returned PASS at head `5f59b6a7c`; all eleven rows proven. It reproduced the S1 baseline two-document result and confirmed every RED failed by assertion. It also confirmed the owned A8 regression was 305 lines at `66e27713a` (298 at base, 299 at head), while base/head pre-existing F-16/A9/A14 reports are byte-identical. | PR comment `5229490053`; `evaluate.md` |
+
+## IMPL-EVAL landing notes
+
+- **FI-3 / load-bearing row-1 proof:** post-fix, the decisive real-stdio test alone would remain
+  green if `--docs-root` were removed from generated host arguments, because the project probe would
+  resolve the same `.netscript/docs` directory. Acceptance row 1 is independently held by the exact
+  Claude/VS Code/Zed host-argument assertions; those assertions are load-bearing and must survive
+  any refactor of the stdio test.
+- **FI-1 / deferred internal seam:** `createDocsFlows(corpus, selection?)` permits omitted selection
+  while `TOOL_OUTPUT_SCHEMAS.list_docs` requires `corpus`. The sole current composition in `cli.ts`
+  always supplies selection, so this is internal-only and non-blocking. Tighten it on the next
+  flows-map touch; do not widen #1375.
 
 ## Gate results
 
@@ -114,5 +127,5 @@ doctrine has no remaining owned finding but exits `1` on pre-existing #1403 tria
 implementation existed when the REDs ran. Draft PR: #1401.
 
 Serialized runtime grant consumed exactly once and released: raw exit `0`, `passed=78 failed=0
-skipped=2`. Moving to `status:impl-eval`; separate-session IMPL-EVAL and Tier-A review remain
-orchestrator-owned.
+skipped=2`. Separate-session IMPL-EVAL passed. Moving to `status:ready-merge`; pre-merge gate and
+merge remain orchestrator-owned.

@@ -35,7 +35,7 @@ fallback, and makes corpus health visible through `list_docs`.
 ## Harness
 
 - Run dir: `.llm/runs/release-0.0.5--orchestration/slices/w3-b2-1375/`
-- Phase: `impl-eval`
+- Phase: `ready-merge`
 - Do not merge until PLAN-EVAL, implementation gates, Tier-A review, and separate-session IMPL-EVAL
   are complete. The milestone orchestrator retains merge and canary authority.
 
@@ -53,4 +53,31 @@ fallback, and makes corpus health visible through `list_docs`.
 - [x] RED-first real CLI stdio proof is recorded, then passes against an initialized project.
 - [x] Focused, scoped, quality, doctrine, doc, JSR, publish, and granted serialized runtime gates
   report raw exit codes with no hidden skips.
-- [ ] Separate-session IMPL-EVAL returns PASS and review threads are answered.
+- [x] Separate-session IMPL-EVAL returns PASS and review threads are answered.
+
+```acceptance-evidence
+issue: 1375
+entries:
+  - box-index: 1
+    evidence: "PR comment 5229459916: exact Claude, VS Code, and Zed host-argument assertions; focused 48/48"
+  - box-index: 2
+    evidence: "PR comment 5229459916: all three host emitters carry the same absolute installed docs root"
+  - box-index: 3
+    evidence: "PR comment 5229459916: indexable project-probe focused test"
+  - box-index: 4
+    evidence: "PR comment 5229459916: resolver matrix and real stdio environment-over-probe test"
+  - box-index: 5
+    evidence: "PR comments 5229358069 and 5229490053: generated locked five-page fallback"
+  - box-index: 6
+    evidence: "PR comments 5229358069 and 5229490053: version provenance and fail-closed mismatch negative"
+  - box-index: 7
+    evidence: "PR comment 5229459916: generator asserts 79,292 <= 262,144 and freshness exits 0"
+  - box-index: 8
+    evidence: "PR comment 5229459916: live list_docs and schema report kind, root, and documentCount"
+  - box-index: 9
+    evidence: "PR comment 5229459916: bundle/filesystem, no-bundle/embedded, and precedence matrix"
+  - box-index: 10
+    evidence: "PR comment 5229459916: empty, redirect, and non-Markdown probe negatives fall back observably"
+  - box-index: 11
+    evidence: "PR comments 5229358069 and 5229490053: provenance version mismatch fails construction"
+```

@@ -52,7 +52,7 @@ execution evidence, but #1403 proves their root lists do not cover this slice's 
 - The repository `arch:check` exit `0` covers neither `packages/mcp` nor `packages/cli`, so it is not
   doctrine evidence for this slice. The first direct MCP doctrine run exited `1` and reported an A8
   300-line warning in changed `tool-contracts.ts`; that file was 298 lines at the base and this
-  slice had raised it to 304. Compacting the schema declaration reduced it below the cap.
+  slice had raised it to 305. Compacting the schema declaration reduced it below the cap.
 - The direct MCP doctrine rerun still exited `1` solely for pre-existing, untouched findings: F-16
   directory-size warnings for `src/domain` (14 children) and `src/application/flows` (16), A9
   informational absence of `docs/architecture`, and A14 Jest/Vitest globals in

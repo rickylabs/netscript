@@ -6,18 +6,19 @@
 | --- | --- |
 | Run ID | `release-0.0.5--orchestration/slices/w3-b2-1375` |
 | Branch | `fix/agent-mcp-docs-root` |
-| Current phase | `impl-eval` |
+| Current phase | `ready-merge` |
 | Archetype | `6 — CLI / Tooling` |
 | Scope overlays | `docs` |
 
 ## Current state
 
 Research and the ordered plan are complete against live issue #1375 and baseline `aa8e151e6`.
-Draft PR #1401 is open against `main`; its closing keyword is intentionally withheld until all
-eleven rows have evidence. Separate Claude/Fable PLAN-EVAL passed in comment `5229304606`. F1-F4
+Draft PR #1401 is open against `main` with `Closes #1375`; all eleven rows have evidence. Separate
+Claude/Fable PLAN-EVAL passed in comment `5229304606`. F1-F4
 are incorporated. S1 behavioral RED is recorded and S2/S3 are implemented green. Non-serialized S4
 commands are complete; #1403 requires scoped evidence because aggregate quality/doctrine root lists
 omit MCP. The one granted serialized runtime passed 78/0/2, with exactly the two #1398 deferrals.
+Separate Claude/Fable IMPL-EVAL passed in comment `5229490053`.
 
 ## Completed
 
@@ -29,12 +30,13 @@ omit MCP. The one granted serialized runtime passed 78/0/2, with exactly the two
 
 ## In progress
 
-- Implementation and gate evidence complete; awaiting orchestrator-run separate-session IMPL-EVAL.
+- Implementation, gates, and separate-session evaluation complete; awaiting orchestrator pre-merge
+  gate and merge decision.
 
 ## Next steps
 
-1. Orchestrator launches the mandatory separate Claude/Fable IMPL-EVAL.
-2. Address evaluator/review findings without widening #1375; do not merge or publish.
+1. Orchestrator runs the pre-merge gate and decides merge ordering.
+2. If #1401 merges first, #1400 rebases and regenerates publish assets; do not modify #1400 here.
 
 ## Key decisions
 
@@ -55,6 +57,7 @@ Implementation and tests are committed through S3. S4's scoped doctrine audit co
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
 | PLAN-EVAL | PASS | PR comment `5229304606`; local `plan-eval.md`. |
+| IMPL-EVAL | PASS | PR comment `5229490053`; local `evaluate.md`; all eleven rows proven. |
 | Static | PASS | Focused 48/48 with no skips; scoped check/lint/fmt green; direct MCP quality scan exit 0 with no findings/allowances. |
 | Fitness | PRE-EXISTING_FAIL | Direct MCP doctrine rerun exit 1 only for untouched F-16/A9/A14 findings assigned to #1403; owned A8 regression repaired. |
 | Runtime | PASS | One granted pass: raw exit 0, passed=78 failed=0 skipped=2; only #1398 deferrals; no owned leak. |
@@ -62,7 +65,7 @@ Implementation and tests are committed through S3. S4's scoped doctrine audit co
 
 ## Open questions
 
-None. All eleven #1375 rows are proven; IMPL-EVAL remains external and mandatory.
+None blocking. FI-1 records an internal optional-selection seam for the next flows-map touch.
 
 ## Drift and debt
 
