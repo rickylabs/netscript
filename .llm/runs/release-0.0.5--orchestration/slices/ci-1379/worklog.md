@@ -21,3 +21,46 @@
 - Current mutable check and native frozen failure reproduced; research mutation restored explicitly.
 - `PLAN-EVAL: N/A` recorded before implementation because frozen-private-lock is empirically
   selected and no material design decision remains.
+
+## S1 implementation evidence
+
+### Negative controls
+
+| Control | Result |
+| --- | --- |
+| Broken `registry.ts` type | expected RED, raw exit 1; `TS2322`, number not assignable to string, line 9 |
+| `debugger` lint mutation | expected RED, raw exit 1; `no-debugger`, line 9 |
+| Stale private-lock mutation | expected RED, raw exit 1; 2/2 frozen check batches failed |
+| Lock mutation integrity | PASS; mutated SHA-256 remained `064ea1c2…` before and after the failed check |
+| Frozen-lock fixture regression | PASS, raw exit 0; child Deno check rejected stale lock and fixture bytes remained equal |
+
+Both source mutations were restored explicitly from `HEAD`. The lock mutation was reversed with an
+exact patch because the refreshed lock is intentional S1 content and differs from `HEAD`.
+
+### Green gates
+
+| Gate | Result |
+| --- | --- |
+| Frozen package check | PASS, raw exit 0; 150 files / 2 batches / 0 findings |
+| Package lint | PASS, raw exit 0; 150 files / 1 batch / 0 findings |
+| Package scoped format | PASS, raw exit 0; 150 files / 1 batch / 0 findings |
+| Frozen-lock regression | PASS, raw exit 0; 1 passed / 0 failed |
+| Regression-file scoped check | PASS, raw exit 0; 1 file / 0 findings |
+| Regression-file scoped lint | PASS, raw exit 0; 1 file / 0 findings |
+| Regression-file scoped format | PASS, raw exit 0 after owned-file formatting |
+| Root `deno task check` | PASS, raw exit 0; 2,843 files / 24 batches / 0 findings |
+| Root `deno task lint` | PASS, raw exit 0; 2,009 files / 11 batches / 0 findings |
+| Root `deno task fmt:check` | PASS, raw exit 0; 2,009 files / 11 batches / 0 findings |
+| `quality:scan` | PASS, raw exit 0; no findings / 7 existing allowances |
+| `arch:check` | PASS, raw exit 0; existing repository warnings only |
+
+The refreshed private lock changes by 197 insertions / 61 deletions and has SHA-256
+`79097acf20de876869f065809f208e721e817a7e198734d180fad085bde5754b`. Root `deno.lock` is
+unchanged. The package `lock:update` task names the sole intentional regeneration path; the CI
+failure message tells contributors to review the diff before committing it.
+
+### Reconcile
+
+Issue #1379 remains open at `status:impl`; draft PR #1426 carries `Closes #1379`, milestone 0.0.5,
+the explicit frozen-private-lock policy, and exactly one status label. No boundary issue or new
+doctrine debt was found.

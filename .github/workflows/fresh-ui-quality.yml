@@ -1,0 +1,65 @@
+name: Fresh UI package quality
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - 'packages/fresh-ui/**'
+      - '.github/workflows/fresh-ui-quality.yml'
+      - '.llm/tools/run-deno-check.ts'
+      - '.llm/tools/run-deno-lint.ts'
+      - '.llm/tools/validation/fresh-ui-quality_test.ts'
+      - 'deno.json'
+  push:
+    branches: [main]
+    paths:
+      - 'packages/fresh-ui/**'
+      - '.github/workflows/fresh-ui-quality.yml'
+      - '.llm/tools/run-deno-check.ts'
+      - '.llm/tools/run-deno-lint.ts'
+      - '.llm/tools/validation/fresh-ui-quality_test.ts'
+      - 'deno.json'
+
+permissions:
+  contents: read
+
+jobs:
+  fresh-ui-quality:
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: '2.9.5'
+
+      - name: Frozen package type-check
+        shell: bash
+        run: |
+          if ! deno task --cwd packages/fresh-ui check; then
+            printf '::error::Fresh UI private lock is stale. Review the dependency diff, then run deno task --cwd packages/fresh-ui lock:update and commit packages/fresh-ui/deno.lock.\n'
+            exit 1
+          fi
+
+      - name: Package lint
+        run: deno task --cwd packages/fresh-ui lint
+
+      - name: Frozen-lock failure regression
+        run: >-
+          deno test --no-lock --allow-read --allow-write --allow-run
+          .llm/tools/validation/fresh-ui-quality_test.ts
+
+      - name: Clean worktree invariant
+        shell: bash
+        run: |
+          status="$(git status --porcelain)"
+          if [[ -n "$status" ]]; then
+            printf 'Fresh UI quality gate dirtied the worktree:\n%s\n' "$status" >&2
+            exit 1
+          fi
+          printf 'Fresh UI quality gate left git status --porcelain empty.\n'
