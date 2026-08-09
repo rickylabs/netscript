@@ -169,3 +169,42 @@ to the invariant actually delivered.
 Two findings filed rather than folded: **#1397** (mysql/mssql silently drop
 `behavior.service-health`) and the release-note item that unchanged-schema `db migrate` and re-run
 `db:init` now exit 1 where the deploy alias exited 0.
+
+| Time (UTC)           | Commit      | PR    | Issues closed | Classification                                              |
+| -------------------- | ----------- | ----- | ------------- | ----------------------------------------------------------- |
+| 2026-08-09T01:25:15Z | `aa8e151e6` | #1395 | #1329         | W2-B — versioned SSE and OTEL envelope; **Wave 2 complete** |
+
+Pre-merge gate for #1395: all seven checks green, 9/9 named expensive gates `success` with none
+skipped, `close-gate` success, zero unticked boxes on #1329, zero prohibited diff, review threads
+0/0, base current.
+
+Its IMPL-EVAL required **two** verdicts. The first passed the implementation. Commit `75832db58`
+then landed generic suite-runner/deferred-gate semantics **after** that verdict, so the mandatory
+evaluation was re-opened against the merging head — a post-verdict commit that adds machinery is not
+covered by a verdict that predates it. The correction review passed, having established that the
+deferral machinery **cannot hide a failing gate by construction**: deferral is definition-time, the
+gates are out of `RUNTIME_GATES`, `buildExecutionPlan` cannot select them, a targeted invocation
+throws `Unknown gate`, and no path converts a started or failed step into a deferred one.
+
+## C17 — payload frozen from first-parent history
+
+Computed at the boundary, 2026-08-09, from `git log --first-parent fac9e3390..origin/main`:
+
+| # | Commit      | PR    | Closes        |
+| - | ----------- | ----- | ------------- |
+| 1 | `6c6044da9` | #1391 | —             |
+| 2 | `bb10be0e2` | #1337 | —             |
+| 3 | `c383b2e84` | #1347 | —             |
+| 4 | `a6b2e4c31` | #1215 | —             |
+| 5 | `da5cb2887` | #1394 | #1325         |
+| 6 | `61ae765c7` | #1393 | #1327 · #1202 |
+| 7 | `aa8e151e6` | #1395 | #1329         |
+
+**Four of these seven were never dispatched as part of Wave 2** — #1391, #1337, #1347 and #1215
+landed behind it — and they are in the payload regardless. That is the membership rule doing exactly
+what `canary-cadence.md` says it is for: the wave is a dispatch unit, the canary is a content unit,
+and they must never be assumed to coincide. `release:canary-label` recomputes this from merge
+history at publish time; the table above is the record, not the input.
+
+**Evaluated through:** `aa8e151e65939ecd789c82e45b22b6338a8d8ce8`. Milestone 0.0.5 stands at 22 open
+issues, down from 26 at the wave's start.
