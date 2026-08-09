@@ -37,9 +37,7 @@ export function createDocsFlows(
           value: {
             count: docs.length,
             docs,
-            ...(selection
-              ? { corpus: { ...selection, documentCount: allDocs.length } }
-              : {}),
+            ...(selection ? { corpus: { ...selection, documentCount: allDocs.length } } : {}),
           },
         };
       } catch (error) {

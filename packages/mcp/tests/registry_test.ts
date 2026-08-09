@@ -32,7 +32,10 @@ Deno.test('list_docs output schema requires observable corpus health metadata', 
     additionalProperties: false,
   });
   const base = { count: 0, docs: [], corpus: { kind: 'embedded', documentCount: 6 } };
-  validateSchema(TOOL_OUTPUT_SCHEMAS.list_docs, { ...base, corpus: { ...base.corpus, root: null } });
+  validateSchema(TOOL_OUTPUT_SCHEMAS.list_docs, {
+    ...base,
+    corpus: { ...base.corpus, root: null },
+  });
   validateSchema(TOOL_OUTPUT_SCHEMAS.list_docs, {
     ...base,
     corpus: { ...base.corpus, kind: 'filesystem', root: '/project/.netscript/docs' },

@@ -163,7 +163,10 @@ Deno.test('stdio composition preserves environment precedence over an indexable 
     const projectDocs = join(projectRoot, '.netscript', 'docs');
     await Deno.mkdir(projectDocs, { recursive: true });
     await Deno.writeTextFile(join(projectDocs, 'probe.md'), '# Probe\n\nProject probe.\n');
-    await Deno.writeTextFile(join(environmentRoot, 'environment.md'), '# Environment\n\nOverride.\n');
+    await Deno.writeTextFile(
+      join(environmentRoot, 'environment.md'),
+      '# Environment\n\nOverride.\n',
+    );
     const child = new Deno.Command(Deno.execPath(), {
       args: [
         'run',
@@ -179,12 +182,14 @@ Deno.test('stdio composition preserves environment precedence over an indexable 
       stderr: 'piped',
     }).spawn();
     const writer = child.stdin.getWriter();
-    await writer.write(new TextEncoder().encode(`${JSON.stringify({
-      jsonrpc: '2.0',
-      id: 16,
-      method: 'tools/call',
-      params: { name: 'list_docs', arguments: {} },
-    })}\n`));
+    await writer.write(new TextEncoder().encode(`${
+      JSON.stringify({
+        jsonrpc: '2.0',
+        id: 16,
+        method: 'tools/call',
+        params: { name: 'list_docs', arguments: {} },
+      })
+    }\n`));
     await writer.close();
     const output = await child.output();
     assertEquals(output.code, 0, new TextDecoder().decode(output.stderr));

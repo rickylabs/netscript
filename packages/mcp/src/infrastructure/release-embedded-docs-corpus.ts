@@ -10,10 +10,7 @@ import {
   MCP_PACKAGE_README,
   MCP_PACKAGE_VERSION,
 } from '../publish-assets.generated.ts';
-import {
-  EmbeddedDocsCorpus,
-  type EmbeddedDocsSource,
-} from './embedded-docs-corpus.ts';
+import { EmbeddedDocsCorpus, type EmbeddedDocsSource } from './embedded-docs-corpus.ts';
 
 /** Generated Markdown source embedded in the release fallback. */
 export interface ReleaseEmbeddedDocsSourceDocument {

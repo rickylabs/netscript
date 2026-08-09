@@ -102,9 +102,13 @@ update the single precedence test matrix before the resolver.
 | 2026-08-09 | impl / S1 | Behavioral RED captured before product source: probe/metadata/schema/config assertions failed, and a real local CLI stdio `search_docs` returned only `mcp` + `help` instead of the installed-only services page. | `s1-red.md`; all three focused commands exited `1` |
 | 2026-08-09 | impl / S2 | Generated bounded release fallback, fail-closed provenance/integrity, indexable probe precedence, and list_docs corpus metadata implemented. | `s2-implementation.md`; focused 29/29 and publish-assets freshness exited `0` |
 | 2026-08-09 | impl / S3 | All three host emitters wired to the installed root; generated-project real stdio search and filesystem metadata turned GREEN; public docs updated. | `s3-implementation.md`; focused 48/48 and publish-assets freshness exited `0` |
+| 2026-08-09 | impl / S4 | All non-serialized gates green; review threads clear; lock clean. `EXPENSIVE-GATE-REQUEST` recorded and pushed without starting runtime resources. | `s4-gates.md` |
 
 ## Gate results
 
 PLAN-EVAL passed and F1-F4 are incorporated. S1 RED commands and raw nonzero exits are recorded in
 `s1-red.md`. S2/S3 focused gates are green with no skips. No product implementation existed when
 the REDs ran. Draft PR: #1401.
+
+EXPENSIVE-GATE-REQUEST — PR #1401 / `w3-b2-1375`; awaiting orchestrator ledger grant. The
+`scaffold.runtime` command has not started.

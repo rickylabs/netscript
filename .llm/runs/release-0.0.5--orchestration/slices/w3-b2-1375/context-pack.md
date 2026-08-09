@@ -15,8 +15,8 @@
 Research and the ordered plan are complete against live issue #1375 and baseline `aa8e151e6`.
 Draft PR #1401 is open against `main`; its closing keyword is intentionally withheld until all
 eleven rows have evidence. Separate Claude/Fable PLAN-EVAL passed in comment `5229304606`. F1-F4
-are incorporated. S1 behavioral RED is recorded and S2/S3 are implemented green; S4 static,
-fitness, publishability, and serialized-runtime handoff are next.
+are incorporated. S1 behavioral RED is recorded, S2/S3 are implemented green, and every
+non-serialized S4 gate is green. The expensive runtime token is requested and not yet granted.
 
 ## Completed
 
@@ -28,13 +28,13 @@ fitness, publishability, and serialized-runtime handoff are next.
 
 ## In progress
 
-- S4 non-serialized gates, review-thread check, and expensive-gate request.
+- Awaiting serialized `scaffold.runtime` ledger grant; no runtime process has started.
 
 ## Next steps
 
-1. Commit, push, and comment S3 with named focused evidence.
-2. Run scoped check/lint/fmt, quality, doctrine, doc, JSR, publish, and review-thread gates.
-3. When otherwise green, write `EXPENSIVE-GATE-REQUEST`, push/comment, and wait for a ledger grant.
+1. Commit, push, and comment the S4 non-serialized ledger plus `EXPENSIVE-GATE-REQUEST`.
+2. Wait for the orchestrator's explicit serialized token grant.
+3. After grant only: pre-leak-check, exact one-pass runtime, post-leak-check, then IMPL-EVAL handoff.
 
 ## Key decisions
 
