@@ -39,3 +39,10 @@ at desktop and mobile viewports, project-derived runtime app identity, and an ex
 `no-explicit-any` lint rule. The browser gate rejects the old unmarked service page. A fresh memory
 consumer checks and lints 108 selected files; a fresh Postgres consumer with locally generated
 Prisma/Zod output checks 112 product files. The real AppHost/browser verdict remains token-gated.
+
+S6 non-Aspire evidence is green. The app-template total is 176,362 bytes (197,796 cap), the CLI
+embedded barrel is 294,190 bytes (330,000 cap), and the unchanged MCP docs corpus is 253,535 bytes /
+12 documents (262,144 cap). Full CLI tests pass 680/680. Assets, published specifiers, CLI doc lint,
+package/root publish dry-runs, scoped quality, and aggregate quality gates pass. Package doctrine
+retains its pre-existing 50/51/1 debt set; the expanded runtime gate registry is recorded in drift.
+The one-pass AppHost/browser verdict and closure keyword remain pending the serialized grant.

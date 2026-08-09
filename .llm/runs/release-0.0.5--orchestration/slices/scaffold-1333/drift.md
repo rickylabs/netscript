@@ -39,6 +39,9 @@ S5 found that the runtime suite still waited for and probed a hard-coded Aspire 
 derived from the project name and the old gates would target a resource that no longer exists.
 S5 shares `deriveDefaultAppName` with the wait, home, UI, and browser gates and adds project-derived
 command tests. This is required integration of the approved S1 rule, not a second naming decision.
+The full CLI test sweep in S6 found one additional stale presentation expectation for JSON init
+next steps (`apps/dashboard`); the emitted `apps/json-smoke-web` value was correct, so S6 updates
+the exact assertion and retains the full-string check.
 
 ## 2026-08-09 — generated lint made the quality contract executable
 
@@ -49,3 +52,11 @@ Turning on the real gate surfaced five clean-scaffold lint findings: one S3 `req
 existing memory-router findings (`require-await`, `prefer-const`, and an unused transition table).
 They were corrected in their owned templates so a fresh no-Aspire consumer now checks and lints 108
 selected files at exit 0. No lint allowance or exclusion was added.
+
+## 2026-08-09 — runtime gate file remains over the doctrine size cap
+
+`packages/cli/e2e/src/application/gates/scaffold/runtime-gates.ts` grew from 865 lines at the S4
+head to 905 lines while adding the project-derived wait and browser reference gates. It was already
+over the A8 500-line cap, and the package doctrine aggregate remains 50 FAIL / 51 WARN / 1 INFO.
+Splitting the established runtime gate registry is architecture debt, not a safe mechanical change
+inside the final scaffold feature slice; no finding was hidden or allowed.

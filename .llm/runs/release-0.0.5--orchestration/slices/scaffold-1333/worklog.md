@@ -60,6 +60,57 @@ passed in the same run.
 | Scoped format | raw exit 0; 5 files / 1 batch / 0 findings |
 | Package code-quality scan | raw exit 0; 0 findings / 6 existing allowances |
 
+## S6 — size, publish, and closure evidence before runtime
+
+### Byte ceilings
+
+| Surface | Observed | Ceiling | Result |
+| --- | ---: | ---: | --- |
+| App template sources | 176,362 bytes | 197,796 | within by 21,434 |
+| CLI embedded asset barrel | 294,190 bytes | 330,000 | within by 35,810 |
+| MCP embedded docs corpus (unchanged) | 253,535 bytes / 12 docs | 262,144 | within by 8,609 |
+
+No document or useful example was dropped.
+
+### Integration finding
+
+The first full CLI sweep exited 1 at 679 passed / 1 failed because the JSON-init presentation test
+still expected `apps/dashboard`; product output correctly followed S1 with
+`apps/json-smoke-web`. The exact assertion was updated, the focused test passed, and the full sweep
+then passed 680/680. This is recorded in drift rather than concealed as a clean first run.
+
+### Non-Aspire gates
+
+| Gate | Result |
+| --- | --- |
+| Full CLI source + E2E tests | raw exit 0; 680 passed / 494 steps / 0 failed |
+| Scoped CLI+E2E check (`--no-lock`) | raw exit 0; 823 files / 7 batches / 0 findings |
+| Scoped CLI+E2E lint | raw exit 0; 823 files / 5 batches / 0 findings |
+| Scoped CLI+E2E format | raw exit 0; 823 files / 5 batches / 0 findings |
+| Decisive CLI source quality | raw exit 0; 0 findings / 6 existing allowances |
+| Package doctrine | raw exit 1; existing 50 FAIL / 51 WARN / 1 INFO; runtime gate size debt recorded |
+| Aggregate `quality:gate` (non-decisive) | raw exit 0 |
+| Publish assets | raw exit 0 |
+| Asset barrel / clean generated diff | raw exit 0 |
+| NetScript JSR specifiers | raw exit 0; scanned 2,329 / allowances 1 / failures 0 |
+| CLI doc lint | raw exit 0; 3 entrypoints / 0 diagnostics |
+| CLI JSR dry-run | raw exit 0; existing dynamic-import warnings only |
+| Root publish dry-run | raw exit 0; manifest and lock diff empty afterward |
+
+Closure remains pending the token-granted runtime browser proof. Until that passes, the PR must
+reference #1333 rather than close it.
+
+Review threads: raw exit 0; 0 threads / 0 unanswered.
+
+## EXPENSIVE-GATE-REQUEST
+
+All non-Aspire gates are complete. Request the single serialized grant for exactly:
+
+`deno task e2e:cli run scaffold.runtime --cleanup --format pretty`
+
+The run will be bracketed by leak checks and will not begin until the orchestrator commits a durable
+grant row.
+
 ## S5 — generated quality and browser/runtime acceptance
 
 ### Implementation

@@ -52,5 +52,5 @@ Deno.test('netscript init --json emits a single structured object', async () => 
   assertEquals(result.plugins, []);
   assertEquals(result.aspire.enabled, false);
   assertEquals(result.aspire.resourceCount, 0);
-  assertStringIncludes(result.nextSteps.join('\n'), 'deno task --cwd apps/dashboard dev');
+  assertStringIncludes(result.nextSteps.join('\n'), 'deno task --cwd apps/json-smoke-web dev');
 });
