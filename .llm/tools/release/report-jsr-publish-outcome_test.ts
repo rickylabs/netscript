@@ -1,5 +1,8 @@
-import { assertEquals } from '@std/assert';
-import { reportJsrPublishOutcome } from './report-jsr-publish-outcome.ts';
+import { assertEquals, assertThrows } from '@std/assert';
+import {
+  assertCompleteJsrPublishOutcome,
+  reportJsrPublishOutcome,
+} from './report-jsr-publish-outcome.ts';
 
 Deno.test('publish outcome distinguishes none, partial, and complete exact-version presence', async () => {
   const names = ['@netscript/a', '@netscript/b'];
@@ -19,4 +22,22 @@ Deno.test('publish outcome distinguishes none, partial, and complete exact-versi
     (await reportJsrPublishOutcome('0.0.5-canary.11', names, read(new Set(names)))).kind,
     'complete',
   );
+});
+
+Deno.test('exact-version assertion names every missing package', () => {
+  assertThrows(
+    () =>
+      assertCompleteJsrPublishOutcome('0.0.5', {
+        kind: 'partial',
+        published: ['@netscript/a'],
+        missing: ['@netscript/b', '@netscript/c'],
+      }),
+    Error,
+    'missing packages:\n- @netscript/b\n- @netscript/c',
+  );
+  assertCompleteJsrPublishOutcome('0.0.4', {
+    kind: 'complete',
+    published: ['@netscript/a'],
+    missing: [],
+  });
 });

@@ -87,10 +87,29 @@ Deno.test('stable publisher uses composed readiness before provisioning and real
   const provisioning = source.indexOf('.llm/tools/release/jsr-provision-packages.ts');
   const preflight = source.indexOf('.llm/tools/release/run-publish.ts --preflight');
   const publish = source.indexOf('.llm/tools/release/run-publish.ts\n', preflight + 1);
+  const versionGuard = source.indexOf('.llm/tools/release/assert-release-version.ts');
+  const registryGuard = source.indexOf(
+    '.llm/tools/release/report-jsr-publish-outcome.ts',
+    publish + 1,
+  );
   assert(canaryPair >= 0 && canaryPair < readiness);
   assertStringIncludes(source, 'fetch-depth: 0');
+  assert(versionGuard >= 0 && versionGuard < canaryPair);
+  const versionGuardStep = source.slice(
+    source.lastIndexOf('- name:', versionGuard),
+    source.indexOf('- name:', versionGuard),
+  );
+  assertStringIncludes(versionGuardStep, "if: steps.release.outputs.dry_run != 'true'");
   assert(readiness < provisioning);
   assert(provisioning < preflight && preflight < publish);
+  assert(publish < registryGuard);
+  const registryGuardStep = source.slice(
+    source.lastIndexOf('- name:', registryGuard),
+    source.indexOf('- name: Write published version'),
+  );
+  assertStringIncludes(registryGuardStep, '--require-complete');
+  assertStringIncludes(registryGuardStep, "if: steps.release.outputs.dry_run != 'true'");
+  assertEquals(registryGuardStep.includes('failure()'), false);
 });
 
 Deno.test('production E2E waits for JSR propagation for explicit canary dispatches', async () => {
