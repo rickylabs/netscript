@@ -133,6 +133,8 @@ service, generator, or docs file owns a second event-name/payload table.
 | 2026-08-09 | S6-I1 | integration focused tests | Selection/context-loss suite PASS exit 0 (5/5); TC-14 validator diagnostics PASS exit 0 (2/2); extracted-verbatim native EventSource example PASS exit 0 (1/1); shared Aspire OTLP normalizer PASS exit 0 (1/1). |
 | 2026-08-09 | S6-I1 | integration wrappers | Scaffold gate scoped check, lint, and format each PASS exit 0 with zero diagnostics/findings. An initial check invocation duplicated the wrapper-owned `--unstable-kv` argument and exited 1 with zero diagnostics; the corrected repository-prescribed `--deno-arg --no-lock` invocation is the verdict. |
 | 2026-08-09 | S6-I1 | Fresh baseline reconfirmation | Direct streams-entrypoint doc lint exits 1 with exactly 11 `private-type-ref` diagnostics in both this integrated branch and untouched `/home/codex/repos/ns005-planeval-v4`; slice contribution remains zero. |
+| 2026-08-09 | S6-I2 | CI asset inventory | Post-merge CI `quality` exposed one generated-surface omission: `agent-docs.generated.ts` lacked the package-owned `./sse` export. `gen:assets-barrel` changed exactly that one entry. The pre-commit `check:assets-barrel` necessarily exited 1 because its contract rejects the intended uncommitted generated diff; the clean-tree post-commit invocation passes exit 0. |
+| 2026-08-09 | S6-I2 | close gate | The first post-evaluation CI run saw the still-unticked IMPL-EVAL definition-of-done box. After recording the separate evaluator PASS in the PR body, the live close-gate validator passes exit 0 for `Closes #1329`; the initial local invocation lacked an exported GitHub token and did not execute the verdict. |
 
 ## Decisions
 

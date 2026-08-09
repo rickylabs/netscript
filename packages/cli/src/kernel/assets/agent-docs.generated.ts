@@ -361,7 +361,7 @@ export const EMBEDDED_AGENT_DOCS_PACKAGE_EXPORTS: Readonly<Record<string, readon
     './scaffold',
     './services',
   ],
-  '@netscript/plugin-streams-core': ['.', './telemetry', './testing'],
+  '@netscript/plugin-streams-core': ['.', './sse', './telemetry', './testing'],
   '@netscript/plugin-triggers': [
     '.',
     './adapter-cli',
