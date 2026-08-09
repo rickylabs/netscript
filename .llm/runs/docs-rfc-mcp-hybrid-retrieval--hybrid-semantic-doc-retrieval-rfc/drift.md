@@ -13,13 +13,16 @@ documentation.
 - **Action:** accept for this run; keep formal evaluation on fresh native Fable 5 medium.
 - **Evidence:** `supervisor.md`; thread `019fe54e-78aa-75c2-bb5e-9a2a6cebd1b0`.
 
-## 2026-08-09 — Installed Codex lacks read-only remote-control status subcommand
+## 2026-08-09 — Remote-control capability and launch state disagree
 
-- **What:** `codex remote-control status --json` is not recognized by installed CLI `0.147.0`.
-- **Source:** read-only command exit `2`.
-- **Expected:** The current repo runtime adapter references a read-only status command.
-- **Actual:** Attachment proof comes from the managed daemon report, its `--remote-control` process
-  flag, and the observed active thread; no daemon restart or competing launch was attempted.
+- **What:** The daemon process has `--remote-control`, but launch protocol/session metadata reported
+  remote control disabled; `codex remote-control status --json` is also absent in CLI `0.147.0`.
+- **Source:** owner recovery statement, process inspection, and read-only command exit `2`.
+- **Expected:** A daemon-attached run requested as mobile-visible would have affirmative launch and
+  steering proof.
+- **Actual:** Thread/process identity is concrete, but mobile visibility and steering remain pending
+  owner confirmation. Capability is not claimed as successful transport.
 - **Severity:** minor
-- **Action:** accept as tooling drift for this docs run; do not repair or restart a healthy daemon.
+- **Action:** accept as tooling drift; do not repair/restart the shared daemon, spend further author
+  time on transport, or create a competing thread/writer.
 - **Evidence:** `supervisor.md`; `agentic:codex-status`; read-only process inspection.
