@@ -98,3 +98,40 @@ for Codex-authored work) is the required lane; OpenHands is not part of it. Ther
    the missing label and the inaccurate labelling were.
 
 The valid evaluation for #1422 remains the native Fable delta PASS tied to head `b56f04997`.
+
+## C-D86 — a failed gate run left an orphaned Aspire child that outlived its teardown
+
+**Severity:** significant. **Detected:** 2026-08-09, by an owner watcher, immediately before the
+row-74 serialized runtime execution.
+
+PID `3297659` was running `aspire-managed nuget search --query Aspire.ProjectTemplates` with
+`PPID 1` and **1h53m elapsed**. A nuget search that takes under a second had been alive for nearly
+two hours.
+
+**Ownership was decidable without ambiguity.** Both its `cwd` and its `--working-dir` were
+`/home/codex/repos/ns005-w3b1/.llm/tmp/cli-e2e/plugin-smoke-20260809-204236/aspire` — inside the
+run's own worktree, so path containment proves it run-owned. No sibling processes referenced that
+workspace. It was terminated (`SIGTERM` ignored, `SIGKILL` succeeded) and a follow-up leak check
+returned exit 0 with **zero run-owned survivors**; the only survivor is the long-known foreign
+`redis-jfgcbtaf` from `w6-review-desk`, left untouched.
+
+**Provenance.** The workspace stamp `20260809-204236` places it in the **row-70** window — the RED
+run whose receipt already recorded a secondary `TypeError: Child process has already terminated`
+during teardown. That error was reported at the time as cosmetic noise while stopping an
+already-exited child. It was not cosmetic: the teardown lost track of a child that was still alive,
+and the process then outlived the run by nearly two hours.
+
+**The generalisable lesson.** `cleanup.aspire-stop` **passed** in row 70 and the post-run
+leak-check reported zero run-owned survivors, yet a run-owned process was still running. Both
+signals were true about what they measured — containers and the AppHost — and neither measured
+detached grandchild processes. This is the same class this release keeps producing: a check that
+cannot observe the failure it is trusted to rule out. A leak check that inspects containers and
+AppHosts, but not orphaned process descendants rooted in the run's own workspace, will report clean
+while a run-owned process runs for hours.
+
+**Actions.** (1) The orphan is terminated and the cleanup is recorded here and in the row-74
+execution receipt. (2) A follow-up issue should extend `agentic:leak-check` to classify orphaned
+processes whose `cwd` or working-dir argument is contained by the slice worktree — ownership is
+already decidable by exactly the containment rule the tool applies to containers. (3) Treat a
+teardown `Child process has already terminated` as a **signal to verify**, not as noise; it means
+the teardown's model of its children was wrong.
