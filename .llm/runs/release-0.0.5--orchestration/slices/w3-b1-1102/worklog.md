@@ -98,12 +98,13 @@ the single shared indexer used by both adapters.
 
 ## Progress Log
 
-| Time       | Slice | Step              | Notes                                                                                                                                                                        |
-| ---------- | ----- | ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-08-09 | Plan  | Research          | Read live #1102, dependencies #1375/#1376, current contracts/adapters/docs/generator/gates, doctrine, harness, and JSR surface.                                              |
-| 2026-08-09 | Plan  | Pre-fix evidence  | Recorded six natural-language lexical-search outputs; four issue targets and the extra concept-mismatch target miss top-five expectations.                                   |
-| 2026-08-09 | Plan  | Corpus finding    | Proved the checked-in prose mirror predates the current unsupported-driver section; locked refresh through the approved mirror/compressed-prose generators before selection. |
-| 2026-08-09 | Plan  | Plan-Gate handoff | Plan/design ready; product implementation is stopped pending separate-session PLAN-EVAL PASS.                                                                                |
+| Time       | Slice | Step              | Notes                                                                                                                                                                           |
+| ---------- | ----- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-08-09 | Plan  | Research          | Read live #1102, dependencies #1375/#1376, current contracts/adapters/docs/generator/gates, doctrine, harness, and JSR surface.                                                 |
+| 2026-08-09 | Plan  | Pre-fix evidence  | Recorded six natural-language lexical-search outputs; four issue targets and the extra concept-mismatch target miss top-five expectations.                                      |
+| 2026-08-09 | Plan  | Corpus finding    | Proved the checked-in prose mirror predates the current unsupported-driver section; locked refresh through the approved mirror/compressed-prose generators before selection.    |
+| 2026-08-09 | Plan  | Draft PR          | Opened draft PR #1404 against `main`; applied milestone `0.0.5`, feature/docs/tooling/JSR/p1 taxonomy, and exactly `status:plan-eval`; posted RESEARCH and PLAN phase comments. |
+| 2026-08-09 | Plan  | Plan-Gate handoff | Plan/design ready; product implementation is stopped pending separate-session PLAN-EVAL PASS.                                                                                   |
 
 ## Gate Results
 

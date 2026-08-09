@@ -29,7 +29,7 @@ by the owner-mandated separate-session Claude · Fable 5 PLAN-EVAL.
 
 ## In Progress
 
-- Draft PR opening and `status:plan-eval` handoff.
+- Stopped at draft PR #1404 with `status:plan-eval`; awaiting orchestrator-launched PLAN-EVAL.
 
 ## Next Steps
 
@@ -75,4 +75,5 @@ untouched until PLAN-EVAL PASS.
 
 ## Commits
 
-- See the draft PR's commit list + per-slice PR comments.
+- `c0bdb02c3` — plan/research/design artifacts; draft PR #1404 carries RESEARCH and PLAN phase
+  comments.
