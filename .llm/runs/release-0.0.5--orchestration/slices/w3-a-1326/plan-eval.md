@@ -161,3 +161,117 @@ client), but correct the sentence when revising the plan.
 3. **F3** — Correct the server-exports half-claim in research finding 7 (editorial).
 
 One `FAIL_PLAN` cycle consumed; one remains before escalation.
+
+## Cycle 2
+
+- Plan evaluator session: Claude · Fable 5 · medium, separate session, 2026-08-09 (same evaluator
+  identity, cycle 2)
+- Repair under evaluation: `165e1b6aa` (`plan(streams): repair reconnect evidence mechanics`),
+  artifacts-only diff over `0fd038181`; product source untouched (verified:
+  `git diff --stat 0fd038181..165e1b6aa` touches only the five slice run artifacts)
+
+### Verdict
+
+`FAIL_PLAN` — F1/F2/F3 as filed are repaired, but the F1 repair introduces one new, narrow,
+rework-forcing defect: the committed API-absence fixtures live inside the type-check-swept package
+tree, so S1's own "exit 0" scoped-check rows and repo CI `deno task check` cannot pass while the
+fixtures exist (F4 below).
+
+### Disposition
+
+| Cycle-1 finding | Disposition | Evidence |
+| --------------- | ----------- | -------- |
+| F1 (RED evidence mechanics) | REPAIRED as filed; new consequential defect F4 | `plan.md` (at `165e1b6aa`) "S1 evidence classification and port compile story" + validation rows 1a–1c; see per-claim checks below |
+| F2 (vacuous framework-law gates) | REPAIRED | `plan.md` doctrine-verdict paragraph (cites #1403), validation rows 10–12; drift.md new entry "Root fitness gates omit plugin-streams-core" |
+| F3 (server-export half-claim) | REPAIRED | `research.md` finding 7 now states the client exports `PRODUCER_*_HEADER`, the server uses the wire names internally but does not export them from its 0.3.7 declaration surface — matches what I verified in cycle 1 |
+
+### F1 repair — per-claim verification
+
+1. **Four behavioral REDs drivable through the existing void API: yes.** Pre-fix surface
+   (`create-durable-stream.ts` at `origin/main`) offers constructor, void `upsert`/`delete`,
+   `flush`, `close`; read-back is external (e.g. `DurableStreamTestServer` + client read), touching
+   no absent symbol, so default type-checking succeeds and the failure is a runtime assertion.
+   Distinctness: the four rows fail through **two distinct pre-fix mechanisms** with four distinct
+   decisive assertions — initial outage and recovery both root in the latched `#connectError`
+   (lines 93, 129–135) but assert different contracted behaviors (flush/write acceptance during
+   outage vs eventual delivered read-back); mid-session outage roots in the *different* mechanism
+   of unsupervised upstream batch loss (fire-and-forget `IdempotentProducer.append`, error swallowed
+   via `onError`-less construction at line 106–109; client 0.2.6 `#batchWorker`); FIFO ordering
+   asserts exact order across a straddled outage (missing middle event). Not four observations of
+   one latch; the plan's table states each mechanism. Acceptable.
+2. **S1/S2 compile split: sound as specified.** S1's file list no longer touches
+   `src/ports/stream-producer-port.ts` (moved to S2's file list, widened atomically with the
+   concrete class in one commit); S1 adds only standalone `producer-contract-v1.ts`, new port-type
+   files, exports, README, tests. The unchanged `DurableStreamProducer implements
+   StreamProducerPort` relation survives S1. Validation row 1c makes the compile-safety claim
+   explicit and testable. The cycle-1 trap is resolved — except for F4.
+3. **Eight distinguishable results: yes as designed.** Four separately-filtered behavioral tests
+   with named distinct assertions and an explicit "no TypeScript diagnostic is accepted" rule (row
+   1a); four one-symbol fixtures checked **individually** by `deno check` (row 1b), each required
+   to fail with only its named absent-API diagnostic (count-bound option, byte-bound option,
+   `stop()`, `waitUntilReady`) — distinct TS diagnostics on distinct symbols, with an invalidation
+   rule for unrelated/shared diagnostics. Not a shared-missing-import recreation. The
+   `COMPILE_TIME_API_ABSENCE` labels are present and explicitly stated to be weaker than
+   behavioral evidence (plan lines under "S1 evidence classification", risk-register row 3).
+
+### F2 repair — verification
+
+- `scan-code-quality.ts` accepts `--root` and traverses it (`.llm/tools/quality/scan-code-quality.ts:172-178`);
+  `--root packages/plugin-streams-core/src` therefore actually inspects the package.
+- `check-doctrine.ts` path is right — `.llm/tools/fitness/check-doctrine.ts` exists and is invoked
+  with `--root <pkg>` per package by `arch:check` itself (root `deno.json:155`), so the scoped
+  invocation form is proven by existing usage.
+- Non-decisive labelling is **stated, not implied**: validation row 11 — aggregates "recorded as
+  non-decisive for this package because their configured roots omit `plugin-streams-core`; no
+  coverage claim" — and the doctrine-verdict paragraph names #1403 as the owner of the root gap.
+  Row 12 records F-14 as `PENDING_SCRIPT` with `rg -n 'console[.]'` plus per-match
+  executable/comment-only classification. The repair correctly does not touch the root lists.
+
+### F4 — NEW, MAJOR: the committed API-absence fixtures poison every unexcluded type-check sweep, including S1's own "exit 0" rows and repo CI
+
+**Claim under test:** Row 1c/row 4 expect
+`run-deno-check.ts --root packages/plugin-streams-core --ext ts,tsx …` to exit 0 at S1, while S1's
+file list commits four intentionally type-broken fixtures at
+`packages/plugin-streams-core/tests/contract/producer-api-absence/*.ts`, which remain in-tree until
+S2 replaces them.
+
+**Evidence:**
+
+- The wrapper selects files by root + extension with no default test exclusion — exclusion exists
+  only via the `--exclude` flag (`.llm/tools/run-deno-check.ts:105,143,183-184,297`), which rows
+  1c/4 do not pass. A failed batch exits 1 (`failedBatches > 0 → Deno.exit(1)`, wrapper tail).
+  The fixtures are `.ts` under the root → selected → `deno check` fails → rows 1c and 4 **cannot**
+  produce their stated "Exit 0" while the fixtures exist. The plan's compile-safety proof (1c) is
+  therefore self-contradicted by its own S1 file list — the cycle-1 trap in a new shape.
+- Worse, repo CI runs the same wrapper over `--root packages --root plugins` with an exclude regex
+  covering only `fresh-ui`/`.generated`/`node_modules` (root `deno.json:33-44`), at
+  `.github/workflows/ci.yml:222` (`deno task check`). The fixture paths match none of the
+  excludes. Per-slice discipline commits and pushes S1 before S2 exists, so the S1 push turns the
+  draft PR's CI check red until S2 lands — a slice whose own commit cannot be green.
+- Fixture polarity cannot be rescued with `// @ts-expect-error` (that inverts the RED to pre-fix
+  green) or `@ts-nocheck` (defeats the fixture's purpose). The files must fail `deno check`; they
+  therefore cannot live anywhere a mandatory check sweeps.
+
+**Concrete change required (pick one, state it in `plan.md`):**
+
+- **(a) Relocate** the four fixtures out of the swept `packages/`/`plugins/` tree — e.g. committed
+  under the slice run dir
+  (`.llm/runs/release-0.0.5--orchestration/slices/w3-a-1326/fixtures/producer-api-absence/*.ts`) —
+  and point row 1b's per-fixture `deno check` commands at that path. Rows 1c/4 and repo CI then
+  pass untouched, and the evidence remains committed and reproducible. Update S1's file list
+  accordingly; or
+- **(b) Run-and-record without committing them in-tree**: execute the four `deno check` commands
+  from an uncommitted scratch path during S1, commit only the recorded command + raw exit + exact
+  diagnostic per fixture in `worklog.md`/evidence, and note the fixtures are reproducible from the
+  recorded source. Weaker traceability than (a) but green everywhere; or
+- **(c)** Add `--exclude 'tests/contract/producer-api-absence'` to rows 1c/4 **and** accept that
+  repo CI `deno task check` still fails on the S1 commit — this option is **not viable** without
+  modifying the root task's exclude regex, which the plan itself correctly places out of scope
+  (#1403 boundary). Do not pick (c).
+
+### Loop status
+
+Second `FAIL_PLAN` cycle consumed — per `evaluator/plan-protocol.md`, escalation to the owner with
+the unresolved item (F4 only; everything else verified). F4 is a one-decision, artifacts-only
+repair: no contract, slice-ordering, or gate-selection change is required beyond the fixture
+location and the two validation-row commands.
