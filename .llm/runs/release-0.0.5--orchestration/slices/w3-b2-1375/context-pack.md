@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `release-0.0.5--orchestration/slices/w3-b2-1375` |
 | Branch | `fix/agent-mcp-docs-root` |
-| Current phase | `implement` |
+| Current phase | `impl-eval` |
 | Archetype | `6 — CLI / Tooling` |
 | Scope overlays | `docs` |
 
@@ -17,7 +17,7 @@ Draft PR #1401 is open against `main`; its closing keyword is intentionally with
 eleven rows have evidence. Separate Claude/Fable PLAN-EVAL passed in comment `5229304606`. F1-F4
 are incorporated. S1 behavioral RED is recorded and S2/S3 are implemented green. Non-serialized S4
 commands are complete; #1403 requires scoped evidence because aggregate quality/doctrine root lists
-omit MCP. The expensive runtime token is requested and not yet granted.
+omit MCP. The one granted serialized runtime passed 78/0/2, with exactly the two #1398 deferrals.
 
 ## Completed
 
@@ -29,12 +29,12 @@ omit MCP. The expensive runtime token is requested and not yet granted.
 
 ## In progress
 
-- Awaiting serialized `scaffold.runtime` ledger grant; no runtime process has started.
+- Implementation and gate evidence complete; awaiting orchestrator-run separate-session IMPL-EVAL.
 
 ## Next steps
 
-1. Wait for the orchestrator's explicit serialized token grant.
-2. After grant only: pre-leak-check, exact one-pass runtime, post-leak-check, then IMPL-EVAL handoff.
+1. Orchestrator launches the mandatory separate Claude/Fable IMPL-EVAL.
+2. Address evaluator/review findings without widening #1375; do not merge or publish.
 
 ## Key decisions
 
@@ -57,12 +57,12 @@ Implementation and tests are committed through S3. S4's scoped doctrine audit co
 | PLAN-EVAL | PASS | PR comment `5229304606`; local `plan-eval.md`. |
 | Static | PASS | Focused 48/48 with no skips; scoped check/lint/fmt green; direct MCP quality scan exit 0 with no findings/allowances. |
 | Fitness | PRE-EXISTING_FAIL | Direct MCP doctrine rerun exit 1 only for untouched F-16/A9/A14 findings assigned to #1403; owned A8 regression repaired. |
-| Runtime | NOT_RUN | Serialized token protocol applies after other gates. |
+| Runtime | PASS | One granted pass: raw exit 0, passed=78 failed=0 skipped=2; only #1398 deferrals; no owned leak. |
 | Consumer | PASS | Real generated-project stdio `search_docs` returns the installed services document. |
 
 ## Open questions
 
-None. Any evaluator finding returns to plan before implementation.
+None. All eleven #1375 rows are proven; IMPL-EVAL remains external and mandatory.
 
 ## Drift and debt
 

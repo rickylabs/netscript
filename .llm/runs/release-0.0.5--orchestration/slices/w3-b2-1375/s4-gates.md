@@ -29,7 +29,7 @@ execution evidence, but #1403 proves their root lists do not cover this slice's 
 | Workspace publish | `deno task publish:dry-run` | 0 | workspace simulation complete; baseline dynamic-import warnings only |
 | Review threads | `deno task agentic:review-threads -- --repo rickylabs/netscript --pr 1401 --pretty` | 0 | threads 0, unanswered 0 |
 | Lock hygiene | `git diff origin/main -- deno.lock` | 0 | empty diff |
-| Serialized runtime | `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | NOT_RUN | token requested below; no container/AppHost command started |
+| Serialized runtime | `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | 0 | passed=78 failed=0 skipped=2; only the two expected #1398 deferrals |
 
 ## Non-verdict attempts and repairs
 
@@ -68,10 +68,39 @@ package-file reads or import attributes. MCP publishes the new internal adapter 
 generated asset; tests and run artifacts remain excluded. No export-map key was added. The CLI's
 four dynamic-import warnings predate and do not intersect this slice.
 
-## Serialized handoff
+## Serialized runtime and resource hygiene
 
-`EXPENSIVE-GATE-REQUEST`
+- Grant: orchestrator ledger row 51; W3-B2 held the token for exactly one run.
+- Pre-run leak-check raw exit `0`; artifact reported healthy Aspire/Docker probes and only foreign
+  `redis-jfgcbtaf`, owned by `/home/codex/repos/w6-review-desk`. It was left untouched.
+- Runtime raw exit `0`; full aggregate: `passed=78 failed=0 skipped=2`.
+- Expected and actual skips were exactly `behavior.otel.stream-consumer` and
+  `behavior.otel.traces`, both deferred by #1398. No other gate skipped.
+- Post-run leak-check raw exit `0`; artifact again reported healthy probes, no slice-owned survivor,
+  and only the same untouched foreign Redis container.
+- Review-thread gate rerun raw exit `0`: `threads=0 unanswered=0`.
 
-The serialized gate token is requested for PR #1401 / slice `w3-b2-1375`. Do not run until the
-orchestrator records and communicates the ledger grant. After grant: leak-check, exact one-pass
-runtime command, post-run leak-check.
+## Eleven-row closure audit
+
+| Live #1375 acceptance row | Verdict and evidence |
+| --- | --- |
+| `agent init --with-docs` emits `--docs-root` to installed bundle | PROVEN — all-host focused test and generated-project command inspection, 48/48 |
+| Every emitted host config carries the same wiring | PROVEN — Claude `.mcp.json`, VS Code `.vscode/mcp.json`, and Zed settings share the same absolute root |
+| No flag/env probes `<projectRoot>/.netscript/docs` | PROVEN — focused precedence test selects indexable project corpus |
+| Flag overrides env, env overrides probe | PROVEN — resolver matrix plus real stdio env-over-probe test |
+| Embedded corpus contains enumerated generated golden paths | PROVEN — release adapter and generator locked-path tests |
+| Embedded corpus has framework provenance and fails closed on mismatch | PROVEN — generated provenance assertions and synchronous version-mismatch negative |
+| Embedded corpus size budget is asserted | PROVEN — generator test asserts `79_292 <= 262_144` and freshness gate passes |
+| `list_docs` reports kind/root/document count | PROVEN — live filesystem and embedded result tests plus exact output schema |
+| Bundle/filesystem, no-bundle/embedded, and full precedence covered | PROVEN — focused docs/init matrix, including real stdio processes |
+| Empty/non-indexable probe falls back observably to embedded | PROVEN — empty/redirect/non-Markdown probe negatives report embedded metadata |
+| Embedded provenance version mismatch fails construction | PROVEN — named synchronous constructor negative |
+
+All eleven rows are truthfully tickable. The decisive defect proof is
+`generated project search_docs reaches its installed corpus after host restart`: a real local CLI
+stdio process launched from generated host arguments returns installed slug
+`pages/services-sdk/services`, rather than the prior two-document `mcp` + `help` corpus, and
+`list_docs` reports filesystem kind, installed root, and total document count.
+
+Token release: the single granted run is complete; release reported to the orchestrator for PR
+#1401 / slice `w3-b2-1375`.

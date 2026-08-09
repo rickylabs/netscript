@@ -104,6 +104,7 @@ update the single precedence test matrix before the resolver.
 | 2026-08-09 | impl / S3 | All three host emitters wired to the installed root; generated-project real stdio search and filesystem metadata turned GREEN; public docs updated. | `s3-implementation.md`; focused 48/48 and publish-assets freshness exited `0` |
 | 2026-08-09 | impl / S4 | Non-serialized commands completed; review threads clear; lock clean. `EXPENSIVE-GATE-REQUEST` recorded and pushed without starting runtime resources. | `s4-gates.md` |
 | 2026-08-09 | impl / S4 correction | #1403 showed aggregate quality/doctrine roots omit MCP. Direct MCP quality exited 0 with no findings/allowances. Direct doctrine exposed one owned A8 line-cap regression, which was repaired and re-tested; its rerun exited 1 only for untouched pre-existing F-16/A9/A14 findings now assigned to #1403 triage. | `s4-gates.md`; registry 5/5; scoped format 1/1 |
+| 2026-08-09 | impl / serialized runtime | Ledger row 51 granted one `scaffold.runtime` pass: raw exit 0, passed=78 failed=0 skipped=2. The only skips were the expected #1398 deferrals. Pre/post leak artifacts showed no slice-owned survivor; foreign `redis-jfgcbtaf` was left untouched. All eleven #1375 rows audit as proven. | `s4-gates.md`; review threads 0/0 |
 
 ## Gate results
 
@@ -112,5 +113,6 @@ PLAN-EVAL passed and F1-F4 are incorporated. S1 RED commands and raw nonzero exi
 doctrine has no remaining owned finding but exits `1` on pre-existing #1403 triage. No product
 implementation existed when the REDs ran. Draft PR: #1401.
 
-EXPENSIVE-GATE-REQUEST — PR #1401 / `w3-b2-1375`; awaiting orchestrator ledger grant. The
-`scaffold.runtime` command has not started.
+Serialized runtime grant consumed exactly once and released: raw exit `0`, `passed=78 failed=0
+skipped=2`. Moving to `status:impl-eval`; separate-session IMPL-EVAL and Tier-A review remain
+orchestrator-owned.
