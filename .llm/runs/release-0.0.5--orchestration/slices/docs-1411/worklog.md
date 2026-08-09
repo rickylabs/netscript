@@ -166,3 +166,13 @@ guard was added; the orchestrator will carry the demonstrated reachability gap t
 | `cd docs/site && deno task test:source-format` | 0 | 6 passed, 0 failed |
 | `deno task check:netscript-jsr-specifiers` | 0 | scanned 2,328; allowances 1; ranges 0; failures 0 |
 | `git diff --check` | 0 | no whitespace errors |
+
+### Round 3 handoff
+
+- Commit `f94c0ac28` was pushed with explicit refspec
+  `HEAD:refs/heads/fix/docs-versionless-jsr-specifiers`.
+- Draft PR #1412's body now records the orchestrator-directed scope adjustment, exact RED/GREEN
+  proof, bounded CLI documentation allowance, rendered evidence, and superseding six-test gate
+  result. Round 3 IMPL evidence comment:
+  https://github.com/rickylabs/netscript/pull/1412#issuecomment-5230615501.
+- Separate-session IMPL-EVAL, CI, acceptance mirror/close gate, and merge remain orchestrator-owned.

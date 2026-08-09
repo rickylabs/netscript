@@ -2,7 +2,7 @@
 
 ## Current state
 
-- Phase: Round 3 implementation and Tier-D gates complete; PR handoff pending.
+- Phase: Round 3 implementation and Tier-D gates complete; awaiting orchestrator IMPL-EVAL and CI.
 - Branch/base: `fix/docs-versionless-jsr-specifiers` at `399f60185`.
 - `PLAN-EVAL: N/A` was recorded before source edits because the slice is fully specified and
   mechanical.
@@ -39,3 +39,5 @@
   HTML files. The one legitimate CLI syntax surface is bounded to four exact occurrences and has an
   overflow test. All final docs/root static gates exit 0, including a complete rerun after targeted
   formatting of the owned checker/test files.
+- Round 3 implementation commit: `f94c0ac28`; structured evidence comment:
+  https://github.com/rickylabs/netscript/pull/1412#issuecomment-5230615501.
