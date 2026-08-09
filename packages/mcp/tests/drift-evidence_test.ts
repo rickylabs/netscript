@@ -1,6 +1,7 @@
 import { assert, assertEquals, assertStringIncludes } from '@std/assert';
 import { DIAGNOSTIC_RECEIPT_TTL_MS, recordDrift } from '../mod.ts';
 import type { DiagnosticEvidencePort, DiagnosticEvidenceReceipt } from '../mod.ts';
+import type { CommandExecutorPort } from '../mod.ts';
 import type { ServiceEndpointDirectoryPort } from '../mod.ts';
 import { FilesystemDiagnosticEvidence } from '../mod.ts';
 import { createMcpCliServer } from '../cli.ts';
@@ -160,6 +161,50 @@ Deno.test('a public introspection receipt satisfies the shared drift gate', asyn
   assertEquals(accepted?.result?.isError, false);
   assertEquals((accepted?.result?.structuredContent as { recorded?: boolean }).recorded, true);
   assertStringIncludes(evidence.entries[0]!, 'mcp list_api_services');
+});
+
+Deno.test('a successful execute_command receipt satisfies the shared drift gate', async () => {
+  const evidence = new MemoryEvidence();
+  const executor: CommandExecutorPort = {
+    execute: () =>
+      Promise.resolve({
+        exitCode: 0,
+        durationMs: 1,
+        outputTail: 'generated project files',
+        truncated: false,
+        timedOut: false,
+      }),
+  };
+  const server = createMcpCliServer({
+    projectRoot: '/fixture',
+    diagnosticEvidence: evidence,
+    commandExecutor: executor,
+  });
+
+  const executed = await server.handle({
+    jsonrpc: '2.0',
+    id: 20,
+    method: 'tools/call',
+    params: {
+      name: 'execute_command',
+      arguments: { command: 'generate', args: ['plugins'] },
+    },
+  });
+  assertEquals(executed?.result?.isError, false);
+  assertEquals(evidence.receipt?.command, 'mcp execute_command');
+  assertEquals(evidence.receipt?.resource, 'project');
+  assertEquals(evidence.receipt?.exitStatus, 0);
+
+  const accepted = await server.handle({
+    jsonrpc: '2.0',
+    id: 21,
+    method: 'tools/call',
+    params: {
+      name: 'record_drift',
+      arguments: { resource: 'project', summary: 'generated registry drift' },
+    },
+  });
+  assertEquals(accepted?.result?.isError, false);
 });
 
 Deno.test('a public introspection output rejection cannot leave green evidence', async () => {

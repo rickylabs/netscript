@@ -16,5 +16,8 @@
 - Locked design: one executor-owned identity shared by list/execute; host re-entry uses current
   executable/main module; standalone visibly uses the MCP-selected compatibility version; execute
   receipts use child exit/policy semantics and optional resource; list is explicitly exempt.
-- Next action: orchestrator launches fresh separate Claude · Fable 5 PLAN-EVAL cycle 2. Do not add
-  RED tests or product source until PASS.
+- PLAN-EVAL cycle 2: `PASS`; implementation authorized. Issue and PR are `status:impl`.
+- S1 recorded: identity compile-time RED exit 1 (missing third argument + identity property),
+  execute→drift behavioral RED exit 1 (no receipt written), standalone characterization exit 0.
+- Next action: commit/push/comment S1, then S2 adds the MCP identity contract and restores the
+  intentionally red branch type-check before S3.

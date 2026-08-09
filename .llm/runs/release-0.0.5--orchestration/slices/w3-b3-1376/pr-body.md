@@ -13,7 +13,7 @@ truthfully authorize `record_drift`.
 ## Slices
 
 - [x] S0 Research, design, exact live acceptance, and PLAN-EVAL cycle-1 repair
-- [ ] S1 RED tests with recorded expected failure
+- [x] S1 RED tests with separately recorded compile-time and behavioral failures
 - [ ] S2 MCP execution-identity contract and standalone policy
 - [ ] S3 minimal CLI host re-entry composition
 - [ ] S4 exit-aware receipts, refusal text, and published MCP documentation

@@ -46,8 +46,12 @@ mirror standalone, host, success, failure, and denial modes.
 | Baseline | ground-truth git status/log | 0 | clean branch at `aa8e151e6`. |
 | Research | live GitHub issue search for #1376 | 0 | ten acceptance rows and boundaries copied verbatim into plan. |
 | PLAN-EVAL cycle 1 | separate Claude · Fable 5 evaluation | 1 (`FAIL_PLAN`) | F1 false equality authority blocked; F2–F4 required path, RED-class, and denial-policy corrections. One cycle remains. |
+| PLAN-EVAL cycle 2 | separate Claude · Fable 5 evaluation | 0 (`PASS`) | All repairs independently verified; implementation authorized with per-RED-class raw-exit binding. |
+| S1 compile-time RED | `deno check --unstable-kv --no-lock packages/cli/src/public/features/agent/mcp/cli-mcp-adapters_test.ts` | 1 | Expected TS2554 (host-runtime third argument absent) and TS2339 (`CommandExecutorPort.identity` absent). This intentionally leaves branch type-check red only until S2. |
+| S1 behavioral RED | `deno test --no-lock --allow-all packages/mcp/tests/drift-evidence_test.ts --filter "successful execute_command receipt"` | 1 | Command returned success, but receipt command was `undefined` instead of `mcp execute_command`; proves the unwrapped execute→drift gap. |
+| S1 characterization | `deno test --no-lock --allow-all packages/mcp/tests/command_adapters_test.ts --filter "published CLI prefix by default"` | 0 | Existing standalone fallback is already `jsr:@netscript/cli@${MCP_PACKAGE_VERSION}`; 1 passed, 0 failed. Not RED. |
 
 ## Phase status
 
-`PLAN-EVAL: FAIL_PLAN cycle 1 repaired; RE-EVALUATION REQUESTED`. Product implementation remains
-prohibited until a fresh separate Claude · Fable 5 session writes `plan-eval.md` with `PASS`.
+`PLAN-EVAL: PASS cycle 2`. S1 RED/characterization evidence recorded separately. The committed S1
+compile-time RED is an intentional intermediate state and S2 must restore it before S3 begins.
