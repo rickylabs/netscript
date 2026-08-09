@@ -55,9 +55,14 @@ mirror standalone, host, success, failure, and denial modes.
 | S2 identity tests | `deno test --no-lock --allow-all packages/mcp/tests/command_adapters_test.ts packages/mcp/tests/command_flows_test.ts` | 0 | 9 passed, 0 failed; standalone identity and result identity included. |
 | S2 MCP doc lint | `deno task doc:lint --root packages/mcp --pretty` | 0 | Full export map; summary `totalErrors: 0`. |
 | S2 exact-file format preflight | `deno fmt --check <10 changed TypeScript files>` | 0 | Changed TypeScript formatted; not substituted for final scoped-wrapper gate. |
+| S3 CLI host check | `deno check --unstable-kv --no-lock packages/cli/src/public/features/agent/mcp/run-agent-mcp.ts packages/cli/src/public/features/agent/mcp/cli-mcp-adapters_test.ts` | 0 | Host runtime resolver and composition type-check. |
+| S3 decisive host behavior | `deno test --no-lock --allow-all packages/cli/src/public/features/agent/mcp/cli-mcp-adapters_test.ts` | 0 | 4 passed, 0 failed. Temporary `9.9.9-host` entrypoint executed `generate plugins`; list/execute reported host version/command and no JSR CLI prefix. |
 
 ## Phase status
 
 `PLAN-EVAL: PASS cycle 2`. S2 restores branch type-check and lands one executor-owned identity shared
 by list/execute; standalone reports its visible MCP-selected compatibility pin. Receipt behavior
 remains the recorded S1 behavioral RED assigned to S4.
+
+S3 changes the shared #1375 composition file minimally: `version: host.version` plus an injected
+host-mode `SpawnCommandExecutor`; it does not touch docs-root, host config, environment, or corpus.

@@ -24,3 +24,10 @@
   Targeted checks pass; identity tests 9/9; MCP full-export doc lint zero errors.
 - Next action: commit/push/comment S2, then S3 makes the minimal `run-agent-mcp.ts` host injection
   and executes a temporary mismatched-version host entrypoint through the MCP server.
+- S3 implemented script/installed re-entry as `[Deno.execPath(), "run", "-A", Deno.mainModule]`
+  and compiled re-entry as `[Deno.execPath()]`, with `CLI_PACKAGE_VERSION` in production. Focused
+  tests 4/4 include actual mismatched-version host execution and prove no MCP-pinned JSR spawn.
+- Shared-file disclosure: `run-agent-mcp.ts` changed only for host runtime/version/executor
+  injection; no #1375 docs-root/config/corpus symbols were touched.
+- Next action: commit/push/comment S3, then S4 resolves the behavioral receipt RED, denial overwrite,
+  refusal text, optional resource, and published MCP README policy.

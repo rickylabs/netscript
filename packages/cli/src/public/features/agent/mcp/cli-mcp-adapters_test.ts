@@ -1,4 +1,5 @@
 import { assertEquals, assertStringIncludes } from "@std/assert";
+import { join, toFileUrl } from "@std/path";
 import {
   type CommandExecutorPort,
   createMcpCliServer,
@@ -8,6 +9,90 @@ import {
 import { CliProjectDoctor } from "./cli-mcp-adapters.ts";
 import { createAgentMcpOptions } from "./run-agent-mcp.ts";
 import { createPublicCommandDependencies } from "../../root/public-command-dependencies.ts";
+import { CLI_PACKAGE_VERSION } from "../../../../kernel/assets/publish-assets.generated.ts";
+
+Deno.test("CLI-hosted MCP defaults to the real CLI package version without a JSR child", () => {
+  const dependencies = createPublicCommandDependencies({
+    cwd: () => "/fixture",
+    resolvePath: (path?: string) => path ?? "/fixture",
+  });
+  const executor = createAgentMcpOptions({ projectRoot: "/fixture" }, dependencies)
+    .commandExecutor!;
+
+  assertEquals(executor.identity.mode, "host");
+  assertEquals(executor.identity.version, CLI_PACKAGE_VERSION);
+  assertEquals(executor.identity.command[0], Deno.execPath());
+  assertEquals(
+    executor.identity.command.some((part) => part.includes("jsr:@netscript/cli@")),
+    false,
+  );
+});
+
+Deno.test("CLI-hosted MCP executes a mismatched-version host entrypoint", async () => {
+  const root = await Deno.makeTempDir({ prefix: "netscript-cli-mcp-host-" });
+  try {
+    const entrypoint = join(root, "host-cli.ts");
+    await Deno.writeTextFile(
+      entrypoint,
+      'console.log(JSON.stringify({ marker: "local-host-cli", args: Deno.args }));\n',
+    );
+    const dependencies = createPublicCommandDependencies({
+      cwd: () => root,
+      resolvePath: (path?: string) => path ?? root,
+    });
+    const options = createAgentMcpOptions(
+      { projectRoot: root },
+      dependencies,
+      {
+        compiled: false,
+        execPath: Deno.execPath(),
+        mainModule: toFileUrl(entrypoint).href,
+        version: "9.9.9-host",
+      },
+    );
+    const server = createMcpCliServer(options);
+
+    const listed = await server.handle({
+      jsonrpc: "2.0",
+      id: 30,
+      method: "tools/call",
+      params: { name: "list_commands", arguments: {} },
+    });
+    const listIdentity = (listed?.result?.structuredContent as {
+      executor: { version: string; command: string[] };
+    }).executor;
+    assertEquals(listIdentity.version, "9.9.9-host");
+    assertEquals(
+      listIdentity.command.some((part) => part.includes("jsr:@netscript/cli@")),
+      false,
+    );
+
+    const executed = await server.handle({
+      jsonrpc: "2.0",
+      id: 31,
+      method: "tools/call",
+      params: {
+        name: "execute_command",
+        arguments: { command: "generate", args: ["plugins"] },
+      },
+    });
+    const result = executed?.result?.structuredContent as {
+      executor: { version: string; command: string[] };
+      exitCode: number;
+      outputTail: string;
+    };
+    assertEquals(result.exitCode, 0);
+    assertEquals(result.executor.version, "9.9.9-host");
+    assertEquals(
+      result.executor.command.some((part) => part.includes("jsr:@netscript/cli@")),
+      false,
+    );
+    assertStringIncludes(result.outputTail, '"marker":"local-host-cli"');
+    assertStringIncludes(result.outputTail, '"args":["generate","plugins"]');
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
 
 Deno.test("an injected host executor reports identity distinct from standalone MCP", () => {
   const executor = new SpawnCommandExecutor({
