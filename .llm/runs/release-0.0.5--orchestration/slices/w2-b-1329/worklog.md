@@ -125,6 +125,9 @@ service, generator, or docs file owns a second event-name/payload table.
 | 2026-08-09 | S6-D3 | empirical join audit | A fresh completed `flow-b-callback` execution was observed alongside complete stream records and complete `job.execute` attributes. The stream remained exactly three startup `job` snapshots at offset `…0926`; a 25-second subscription from that boundary received no data. |
 | 2026-08-09 | S6-D3 | product finding | Only definition-level job id/name exist on both sides; execution id, `trg_evt_*`, and producer trace id occur on the span/execution but in no stream record. This is an unpublished execution-record product gap outside #1395, not an unmatchable record or selector defect. No implementation added. |
 | 2026-08-09 | S6-D3 | diagnostic cleanup | Foreground isolated AppHost stopped. Scoped teardown removed owned `postgres-74614ed6`; final leak artefact exit 0 reports only foreign `redis-jfgcbtaf`, left untouched. |
+| 2026-08-09 | S6-H1 | owner disposition | #1329 rows 1–5, 7, and 8 remain proven; row 6 explicitly split to 0.0.6 issue #1398 using the owner-ratified #1202 pattern. PR closing keyword changed to `Closes #1329`; TC-14 and both context-loss negatives remain as #1398 acceptance. |
+| 2026-08-09 | S6-H1 | Fresh baseline recheck | `deno doc --lint packages/fresh/src/runtime/streams/mod.ts` exits 1 with exactly 11 private refs in this branch and the untouched `/home/codex/repos/ns005-planeval-v4`. Slice contribution remains zero. |
+| 2026-08-09 | S6-H1 | impl-eval handoff | #1329 acceptance mirror amended with seven proven rows and explicit row-6 split. PR/issue move to `status:impl-eval`; implementation session does not launch the Fable evaluator. |
 
 ## Decisions
 
@@ -221,9 +224,9 @@ service, generator, or docs file owns a second event-name/payload table.
 
 ## Handoff Notes
 
-- Serialized token is released with a failing verdict. The orchestrator owns rescheduling or
-  rescope; implementation must not advance to IMPL-EVAL until TC-14 trace equality is repaired and
-  a newly granted serialized run passes.
-- S6-D2 classifies the failure as gate-side record selection. A repair must select the actual
-  `flow-b-callback` execution record and inspect its stored W3C context before constructing the
-  consumer span; it must not compare the Flow-B producer against unrelated startup job snapshots.
+- Serialized token is released. Its attributable failure is the missing execution publication now
+  filed as #1398; owner ruling splits #1329 row 6 to that follow-up.
+- #1395 closes #1329 with rows 1–5, 7, and 8 proven and row 6 explicitly split. TC-14 and both
+  context-loss negative tests remain as #1398 acceptance evidence.
+- PR and issue advance to `status:impl-eval`. The milestone orchestrator launches the separate
+  Claude/Fable 5 evaluator; this implementation session does not.

@@ -6,17 +6,16 @@
 | -------------- | ----------------------------------------------- |
 | Run ID         | `release-0.0.5--orchestration/slices/w2-b-1329` |
 | Branch         | `fix/streams-versioned-sse-envelope`            |
-| Current phase  | `impl — S6 TC-14 diagnosis`                     |
+| Current phase  | `impl-eval handoff — owner-approved row-6 split` |
 | Archetype      | `3 — Runtime/Behavior`                          |
 | Scope overlays | `frontend`, `service`, `docs`                   |
 
 ## Current State
 
-S1–S5 are implemented and every cheaper gate is green. The granted serialized runtime ran once and
-failed 74/75 at TC-14. Before any behavior repair, the trace validator now prints the selected
-producer trace id, consumer trace/span ids, every link trace/span id, and link count, with a distinct
-zero-link diagnosis. Focused diagnostic gates are green. Runtime diagnosis is next; no selector or
-product propagation behavior has been changed.
+S1–S5 are implemented and every cheaper gate is green. Runtime diagnostics empirically proved that
+completed workers executions are not published to the durable stream; the product gap is filed as
+#1398 in 0.0.6. Owner ruling closes #1329 on seven proven rows with row 6 explicitly split to #1398.
+TC-14 and its missing/divergent context tests remain as the follow-up acceptance gate.
 
 ## Completed
 
@@ -39,14 +38,13 @@ product propagation behavior has been changed.
 
 ## In Progress
 
-- Reproduce TC-14 through the retained generated workspace and classify gate selection versus real
-  product non-propagation from the new identity output.
+- Await separate orchestrator-launched Claude/Fable 5 IMPL-EVAL on PR #1395.
 
 ## Next Steps
 
-1. Commit/push/comment the diagnostics-only slice.
-2. Run a targeted owned AppHost diagnostic, not `scaffold.runtime`, and report classification before repair.
-3. Request a new serialized token only after an authorized repair exists.
+1. Commit/push/comment the owner disposition and final evidence.
+2. Move PR and issue to `status:impl-eval`.
+3. Stop; the orchestrator launches the separate evaluator.
 
 ## Key Decisions
 
@@ -77,13 +75,12 @@ product propagation behavior has been changed.
 | ----------- | -------------------------- | ------------------------------------------------------------------ |
 | Static      | green | Final focused suite 28/28; 114-file wrappers; doc/publish/quality/docs gates green. |
 | Fitness     | green with exact accepted debts | AP-13 warning and connector convergence remain unchanged. |
-| Runtime     | **failed** | Aggregate 74 passed, 1 failed: TC-14 W3C link/producer trace equality. |
+| Runtime     | attributable split | Generated consumer/example evidence passes; missing execution publication is filed as #1398 and row 6 is explicitly split by owner ruling. |
 | Consumer    | green | Generated service and exact documented native example executed successfully. |
 
 ## Open Questions
 
-- Why the live SSE change's traceparent links outside the actual Flow-B producer trace; this is the
-  single observed blocker and was not diagnosed or repaired after the one-pass failure.
+- None within #1329. #1398 owns execution publication and end-to-end TC-14 proof.
 
 ## Drift and Debt
 

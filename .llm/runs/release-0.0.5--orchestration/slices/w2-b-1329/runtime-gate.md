@@ -77,8 +77,9 @@ The focused negative evidence remains explicit:
   different W3C trace id throws a TC-14 failure.
 
 Those tests prove the gate detects context loss once the matching record exists. The serialized
-failure shows the generated stream did not expose such a record within the required bound, so issue
-row 6 remains unproven and the PR must retain `Refs #1329`.
+failure shows the generated stream did not expose such a record within the required bound. Owner
+ruling 2026-08-09 splits that product prerequisite and row-6 runtime proof to #1398 while retaining
+TC-14 here as the follow-up acceptance test.
 
 The subsequent no-token empirical audit in `join-audit.md` distinguishes absence from an unknown
 join key: a fresh execution completed, but a subscription held from the pre-trigger committed offset
@@ -108,15 +109,17 @@ is still the same foreign `redis-jfgcbtaf` container owned by
 | 3 | Official example works unchanged against a real service | PROVEN | Verbatim extraction executed inside the passing generated-service consumer gate. |
 | 4 | Replay/ordering/batching/deletion/reconnect/malformed behavior documented | PROVEN | Task docs plus contract/runtime tests. Runtime provenance is split as disclosed above; malformed/deletion are not injected through the generated service. |
 | 5 | Data carries correlation plus W3C trace context | PROVEN | Producer, schema, telemetry, and real-server conformance tests; live generated consumer accepted schema-valid fields. |
-| 6 | Aspire proves producer → durable stream → SSE consumer as one end-to-end trace | **NOT PROVEN** | The selector repair skipped unrelated startup records correctly, but the generated stream never exposed the expected execution correlation within 40 batches/20 seconds; TC-14 consequently did not execute. |
+| 6 | Aspire proves producer → durable stream → SSE consumer as one end-to-end trace | **SPLIT TO #1398** | The selector repair skipped unrelated startup records correctly, but empirical audit proved completed executions are not published. Owner ruling moves the product prerequisite/proof to #1398; TC-14 remains here as its acceptance test. |
 | 7 | Drift tests cover event name/envelope/cardinality/telemetry | PROVEN | Contract negatives and real-server proxy conformance. |
 | 8 | Complete shapes appear in task and generated/reference API docs | PROVEN | Official task docs, exported module/symbol JSDoc, full core export-map doc lint. |
 
-Because row 6 is not proven, adding `Closes #1329`, setting `status:impl-eval`, or claiming the PR is
-ready would be dishonest. The draft PR continues to reference the issue without a closing keyword.
+Rows 1–5, 7, and 8 are proven. By owner ruling 2026-08-09, row 6 is explicitly dispositioned as a
+split to #1398 rather than silently treated as proof from #1395. The PR therefore carries
+`Closes #1329` and advances to `status:impl-eval`; the separate evaluator is launched only by the
+orchestrator.
 
-Post-failure `agentic:review-threads` passed with exit 0: 0 threads, 0 unanswered. PR and issue
-remain at `status:impl`; no evaluator was launched.
+Post-failure `agentic:review-threads` passed with exit 0: 0 threads, 0 unanswered. No evaluator was
+launched by the implementation session.
 
 ## Fresh `./streams` doc baseline
 
