@@ -93,7 +93,7 @@ the pre-release line, and `netscript agent init` writes the correct pinned form 
 **1. Wire up an agent host.** From a NetScript project root:
 
 ```bash
-$ netscript agent init
+$ netscript agent init --with-docs
 Installed NetScript agent integration for claude, vscode.
 ```
 
@@ -111,7 +111,9 @@ The generated `.mcp.json` runs the server for this project — equivalent to:
         "agent",
         "mcp",
         "--project-root",
-        "<project-root>"
+        "<project-root>",
+        "--docs-root",
+        "<project-root>/.netscript/docs"
       ]
     }
   }
@@ -125,7 +127,7 @@ The generated `.mcp.json` runs the server for this project — equivalent to:
 > **Agent:** calls `get_app_status` →
 > `{"status": "…", "counts": {…}, "domains": [{"domain": "worker", …}, …]}` — a health verdict with
 > per-domain summaries, not a span dump. Calls `search_docs {"query": "telemetry"}` →
-> `{"count": 1, "matches": [{"slug": "mcp", "title": "@netscript/mcp", "snippet": "…", "score": 35}]}`,
+> `{"count": 1, "matches": [{"slug": "pages/observability/telemetry", "title": "Telemetry", "snippet": "…", "score": 35}]}`,
 > then `get_doc` with the winning slug to read just the section it needs.
 
 When telemetry is unreachable, nothing crashes: `get_app_status` and the doctor's telemetry checks
@@ -191,7 +193,7 @@ import { runMcpStdioServer } from '@netscript/mcp/cli';
 
 await runMcpStdioServer({
   projectRoot: Deno.cwd(),
-  // Omit docsRoot to use the package-embedded corpus, or select a filesystem corpus explicitly.
+  // Options beat environment, which beats an indexable .netscript/docs project bundle.
   docsRoot: Deno.env.get('NETSCRIPT_DOCS_ROOT'),
 });
 ```
@@ -289,9 +291,10 @@ requests. Tests and custom hosts can replace every source and the probe through
 
 - **Telemetry endpoint discovery** (tools and `doctor`): explicit `--endpoint`, then
   `NETSCRIPT_TELEMETRY_ENDPOINT`, then `ASPIRE_DASHBOARD_PORT`, then `http://localhost:18888`.
-- **Docs corpus**: by default the docs tools index the documentation shipped with the installed
-  package; set `--docs-root <path>` (or `NETSCRIPT_DOCS_ROOT`) to serve a project or site corpus
-  instead.
+- **Docs corpus**: explicit `--docs-root <path>`, then `NETSCRIPT_DOCS_ROOT`, then an indexable
+  `<projectRoot>/.netscript/docs`, then the bounded generated release fallback. `agent init
+  --with-docs` writes the installed root into every generated host command. `list_docs.corpus`
+  reports `kind`, resolved `root` (or `null`), and total `documentCount`.
 - **Service endpoint discovery** (library surface): `.netscript/agent-mcp.json` override, then the
   Aspire CLI machine-readable query, then an identity-bound run manifest, then
   `aspire/appsettings.json`; lower-priority disagreements remain visible as conflicts.

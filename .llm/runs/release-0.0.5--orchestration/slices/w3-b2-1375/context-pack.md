@@ -15,8 +15,8 @@
 Research and the ordered plan are complete against live issue #1375 and baseline `aa8e151e6`.
 Draft PR #1401 is open against `main`; its closing keyword is intentionally withheld until all
 eleven rows have evidence. Separate Claude/Fable PLAN-EVAL passed in comment `5229304606`. F1-F4
-are incorporated. S1 behavioral RED is recorded and S2 is implemented green; S3 host wiring and
-public documentation are next.
+are incorporated. S1 behavioral RED is recorded and S2/S3 are implemented green; S4 static,
+fitness, publishability, and serialized-runtime handoff are next.
 
 ## Completed
 
@@ -28,13 +28,13 @@ public documentation are next.
 
 ## In progress
 
-- S3 all-host installed docs-root wiring, decisive stdio GREEN, and public documentation.
+- S4 non-serialized gates, review-thread check, and expensive-gate request.
 
 ## Next steps
 
-1. Commit, push, and comment S2 with named focused evidence.
-2. Pass the one installed docs root to Claude, VS Code, and Zed only when docs were generated.
-3. Turn the decisive generated-project stdio search GREEN and update MCP/agent-tooling references.
+1. Commit, push, and comment S3 with named focused evidence.
+2. Run scoped check/lint/fmt, quality, doctrine, doc, JSR, publish, and review-thread gates.
+3. When otherwise green, write `EXPENSIVE-GATE-REQUEST`, push/comment, and wait for a ledger grant.
 
 ## Key decisions
 

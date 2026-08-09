@@ -708,6 +708,30 @@ Deno.test("generated project search_docs reaches its installed corpus after host
       structured.matches.some((match) => match.slug === "pages/services-sdk/services"),
       `installed corpus result missing: ${JSON.stringify(structured)}`,
     );
+    const listed = await callToolFromGeneratedHost(root, claude.mcpServers.netscript.args, {
+      name: "list_docs",
+      arguments: {},
+    });
+    assertEquals(listed.result.structuredContent, {
+      count: 2,
+      docs: [
+        {
+          slug: "MANIFEST",
+          title: "MANIFEST",
+          description: "Start at `.netscript/docs/llms.txt`.",
+        },
+        {
+          slug: "pages/services-sdk/services",
+          title: "Services",
+          description: "Build a typed client for a service using the generated contract.",
+        },
+      ],
+      corpus: {
+        kind: "filesystem",
+        root: join(root, ".netscript", "docs"),
+        documentCount: 2,
+      },
+    });
   } finally {
     await Deno.remove(root, { recursive: true });
   }

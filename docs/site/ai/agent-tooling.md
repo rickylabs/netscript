@@ -60,7 +60,8 @@ If network lookup is unavailable or the framework is unfamiliar, add `--with-doc
 expands a several-megabyte local corpus containing the release-built prose and task router plus
 `deno doc` output for every export subpath of each exact NetScript package version found in the
 project. Version disagreement or a failed documentation command aborts before the local docs tree
-is written; without the flag, no offline corpus is installed.
+is written; without the flag, no offline corpus is installed. When the bundle is installed, every
+generated host command receives the same absolute `--docs-root <project>/.netscript/docs` pair.
 
 | Host        | Files written                                                                                        |
 | ----------- | ---------------------------------------------------------------------------------------------------- |
@@ -132,13 +133,17 @@ than restating them here; for the commands themselves, the
 
 ## Documentation corpus
 
-Without an override, `list_docs`, `search_docs`, and `get_doc` index the
-documentation shipped with the installed `@netscript/mcp` package (one document
-under the `mcp` slug). Point the server at a richer corpus — a project docs
-folder or a checkout of this site — with `--docs-root <path>` or the
-`NETSCRIPT_DOCS_ROOT` environment variable. A configured path that does not exist
-returns a structured `docs_corpus_not_found` error naming the missing path; the
-server never silently reports an empty corpus.
+Documentation selection is deterministic: explicit `--docs-root <path>`, then
+`NETSCRIPT_DOCS_ROOT`, then an indexable `<project>/.netscript/docs` bundle, then the generated
+release-matched embedded corpus. The embedded fallback contains the bounded quickstart,
+contract-to-page, service, builder, and route golden paths plus the MCP README and CLI help. An
+empty, redirect-only, or otherwise non-indexable project bundle falls back to embedded; an invalid
+explicit or environment root returns `docs_corpus_not_found` instead of hiding the operator error.
+
+`list_docs` reports the selected corpus as `{ kind, root, documentCount }` alongside its bounded
+`docs` rows. A filesystem selection reports the resolved root; embedded reports `root: null`, so an
+agent or measured run can see that it is using the fallback instead of inferring degradation from
+search results.
 
 The export tools use a different, package-embedded corpus generated from Deno 2.9
 `deno doc --json`. It is version- and hash-pinned, needs no project `docs/` directory, and returns

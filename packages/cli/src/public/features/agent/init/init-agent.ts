@@ -79,6 +79,9 @@ export async function initAgent(
   if (input.withDocs && !docs) {
     throw new Error("Offline documentation generation is not configured");
   }
+  const installedDocsRoot = docs
+    ? join(input.projectRoot, ".netscript", "docs")
+    : undefined;
   const editor = await resolveEditor(input, dependencies.fs);
   const hosts = await resolveHosts(input, dependencies.fs, editor);
   const changedFiles: string[] = [];
@@ -119,6 +122,7 @@ export async function initAgent(
       input.projectRoot,
       changedFiles,
       dependencies.cliSpecifier,
+      installedDocsRoot,
     );
     for (const [path, content] of Object.entries(bundle.files)) {
       if (path === "manifest.json") continue;
@@ -146,6 +150,7 @@ export async function initAgent(
       input.projectRoot,
       changedFiles,
       dependencies.cliSpecifier,
+      installedDocsRoot,
     );
   }
   if (editor === 'zed') {
@@ -154,6 +159,7 @@ export async function initAgent(
       input.projectRoot,
       changedFiles,
       dependencies.cliSpecifier,
+      installedDocsRoot,
     );
   }
   if (
@@ -230,6 +236,7 @@ async function writeHostConfig(
   projectRoot: string,
   changed: string[],
   cliSpecifier = netscriptJsrSpecifier("cli"),
+  docsRoot?: string,
 ): Promise<void> {
   const currentText = await fs.readText(path);
   const current = currentText
@@ -256,6 +263,7 @@ async function writeHostConfig(
               "mcp",
               "--project-root",
               projectRoot,
+              ...(docsRoot ? ["--docs-root", docsRoot] : []),
             ],
           },
           aspire: {
@@ -276,6 +284,7 @@ async function writeZedConfig(
   projectRoot: string,
   changed: string[],
   cliSpecifier = netscriptJsrSpecifier('cli'),
+  docsRoot?: string,
 ): Promise<void> {
   const path = join(projectRoot, '.zed', 'settings.json');
   const generated = JSON.parse(
@@ -301,6 +310,7 @@ async function writeZedConfig(
           'mcp',
           '--project-root',
           projectRoot,
+          ...(docsRoot ? ['--docs-root', docsRoot] : []),
         ],
       }
       : { command: 'aspire', args: ['agent', 'mcp'] };

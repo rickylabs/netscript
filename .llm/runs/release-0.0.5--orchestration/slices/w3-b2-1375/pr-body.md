@@ -17,15 +17,15 @@ fallback, and makes corpus health visible through `list_docs`.
 ## Slices
 
 - [x] Planning — research, design checkpoint, acceptance map, risks, and ordered slices
-- [ ] S1 RED acceptance contract and real initialized-project `search_docs`
-- [ ] S2 generated fallback, provenance/budget, probe precedence, and observability
-- [ ] S3 all-host docs wiring, real stdio GREEN, and public docs
+- [x] S1 RED acceptance contract and real initialized-project `search_docs`
+- [x] S2 generated fallback, provenance/budget, probe precedence, and observability
+- [x] S3 all-host docs wiring, real stdio GREEN, and public docs
 - [ ] S4 full gates, serialized runtime token, and evaluation handoff
 
 ## Validation
 
-- Planning only: no product tests or implementation gates run.
 - Mandatory separate Claude/Fable PLAN-EVAL passed; findings F1-F4 are recorded in `plan-eval.md`.
+- Focused S3 verdict: 48 passed, 0 failed, no skips; publish-asset freshness exited 0.
 - The serialized `scaffold.runtime` gate will be requested only after all non-serialized gates pass.
 
 ## Harness
