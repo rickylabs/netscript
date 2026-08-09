@@ -136,3 +136,36 @@ only **OpenHands**-authored verdict comments, and OpenHands is owner-paused whil
 route is a native Fable 5 session — the C-D24 tooling gap, still unfixed. Bypassed with
 `--no-eval-gate` after independently verifying the mandatory evaluation exists: comment
 `5228627533`, `[PHASE: IMPL-EVAL] [VERDICT: PASS]`. The parser was bypassed; the evaluation was not.
+
+| Time (UTC)           | Commit      | PR    | Issues closed | Classification                                                                                   |
+| -------------------- | ----------- | ----- | ------------- | ------------------------------------------------------------------------------------------------ |
+| 2026-08-09T00:39:41Z | `61ae765c7` | #1393 | #1327 · #1202 | W2-C — live DB endpoint identity and migration artifact semantics; second slice of C17's payload |
+
+Pre-merge gate record for #1393, all seven checks:
+
+| # | Check                                    | Result                                                                                                                              |
+| - | ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| 1 | `close-gate`                             | `success`                                                                                                                           |
+| 2 | Unticked `- [ ]` on closed issues        | 0 on #1327 (six rows), 0 on #1202 (four rows, row 2 amended)                                                                        |
+| 3 | Prohibited diff outside `.llm/runs/**`   | 0                                                                                                                                   |
+| 4 | Named expensive gates `SUCCESS`          | 9/9, none skipped, including both scaffold-runtime lanes                                                                            |
+| 5 | Decisive claim re-verified independently | IMPL-EVAL re-ran the focused suites **and wrote eleven adversarial probes of its own**; it also falsified the row-2 mechanism claim |
+| 6 | Changed-file audit                       | nothing outside `packages/cli`, `packages/database`, run dir                                                                        |
+| 7 | PR body checklist matches what shipped   | verified after the wording correction                                                                                               |
+
+This slice cost **six** serialized runtime passes. Five failed inside its own gate code on five
+distinct defects — an inherited-stderr getter, an unrecognised connection-string dialect, an
+invented health-payload shape, an Aspire CLI telemetry path unusable against a detached dashboard —
+and the product was healthy in every one of them. The sixth was green at `passed=80 failed=0` with
+all four decisive gates executing.
+
+The IMPL-EVAL returned `FAIL_FIX` on evidence rather than code: #1202 row 2's named persisting
+mechanism (eager `getEndpoint("tcp")`) is falsified — the DB wiring was already lazy at the
+third-reproduction baseline `3ff18a8ad` and `git log -S` shows `getEndpoint('tcp')` was never in
+that path. The orchestrator had amplified that claim into the PR body, a public issue comment and
+the run plan without checking source. Owner ruled split: identification → **#1396**, row 2 amended
+to the invariant actually delivered.
+
+Two findings filed rather than folded: **#1397** (mysql/mssql silently drop
+`behavior.service-health`) and the release-note item that unchanged-schema `db migrate` and re-run
+`db:init` now exit 1 where the deploy alias exited 0.
