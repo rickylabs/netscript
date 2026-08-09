@@ -86,3 +86,6 @@ untouched until PLAN-EVAL PASS.
 
 - `c0bdb02c3` — plan/research/design artifacts; draft PR #1404 carries RESEARCH and PLAN phase
   comments.
+- `59ac3b9b2` — opening plan-eval handoff state.
+- `271428de5` — cycle-1 PLAN-EVAL repair: D12, dual-adapter/installed-corpus gates, reproducible F4
+  sweep, and unordered Prisma top-three constraint.
