@@ -143,3 +143,39 @@ accumulates evidence.** Verify by counting rows after every edit, which is how t
 
 No gate result was affected: every row is reconstructed from the PR comments and the prior commit,
 both of which are independent of this file.
+
+## Release outcome — 0.0.5 stable
+
+`v0.0.5` shipped 2026-08-09 from `0e78e9c58` after a false-green publish and recovery.
+
+**Both stable verdicts green:** `publish.yml` run 31342456831 `completed/success`, and the
+artifact-pinned production E2E run 31342601565 `completed/success` exercising
+`jsr:@netscript/cli@0.0.5` — the installed-consumer proof against the real published release.
+Registry independently verified `kind: complete`, 35 published, **0 missing**;
+`@netscript/cli` latest `0.0.5`; GitHub Release `prerelease=false draft=false`, Latest, 35 JSR links.
+
+**The false green and what it cost.** The first attempt ran `release:publish` without the mandatory
+coordinated version-only `release:cut` (ROADMAP steps 2-4). Tag `v0.0.5` pointed at `abaf2b009`
+where all 37 manifests still read `0.0.4`, so the publish step emitted
+`Skipping, already published @netscript/*@0.0.4` and concluded `Success  All packages are already
+published` — green having published nothing. `publish.yml` had no post-publish verification;
+`report-jsr-publish-outcome.ts` existed but was wired only into the canary workflow and only under
+`if: failure()`, a diagnostic rather than an assertion. The artifact-pinned production E2E caught it
+correctly — the two-verdict rule held even though the first verdict lied. The orchestrator's own
+monitor then compounded it by matching the canary's E2E run instead of the stable one and reporting
+a green pair that did not exist.
+
+**Recovery, evidence first.** Bad state captured to `receipts/v0.0.5-false-green-evidence.md` before
+any mutation; the release record was mutable and was preserved, not deleted; no registry content
+required mutating because none had been created. Then: #1435 (version-agnostic release-cut test
+guards) and #1433 (fail-closed publish guards) merged → canary.20 pair on `89a4e5f4e` → strictly
+version-only cut #1437 (38/38 manifests at 0.0.5; `check-test` green where it had failed twice) →
+tag re-pointed → publish blocked by the pair predicate (#1438) → canary.21 cut from the bumped
+commit so the pair landed on `0e78e9c58` directly → publish succeeded under both new guards.
+
+**Release-tooling defects filed from this incident:** #1430 (`--prev-tag` blanks the closed-issue
+window), #1432 (stable publish could succeed while publishing nothing — fixed by #1433), #1436
+(close-gate matches `fix` inside `pre-fix`, inventing a requirement for a PR), #1438 (`release:cut`
+output can never satisfy `isVersionOnlyReleaseDiff`, so documented inheritance is dead code).
+Each is the same shape: a check that reports a clean-looking result while not doing its job, or two
+halves of one contract disagreeing.
