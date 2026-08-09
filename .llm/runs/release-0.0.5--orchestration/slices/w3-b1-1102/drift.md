@@ -181,3 +181,14 @@ Drift is append-only.
 - **Action:** package commands remain decisive. Require a zero doctrine finding delta and record the
   raw exit 1; never label it green. Leave existing findings to #1403/debt triage and do not widen
   #1102. Root aggregates remain non-decisive because they omit MCP.
+
+## 2026-08-09 — Scoped lint/format require the package config under Deno 2.9.5
+
+- **What:** the approved continuation plan's lint/format commands selected 115 MCP files but did not
+  pass `--config packages/mcp/deno.json`.
+- **Observed:** both wrappers exited 1 before analysis because Deno 2.9.5 parsed root
+  `workspace: ["packages/*", ...]` as the newer structured workspace shape. They emitted zero
+  lint/format findings, so the result was a tooling invocation failure, not a product red.
+- **Action:** use the wrappers' documented `--config packages/mcp/deno.json` option, matching the
+  successful S1 run record. Both decisive reruns selected the same 115 files and exited 0 with zero
+  findings. Update validation orders 6–7; do not change repo configuration in #1102.

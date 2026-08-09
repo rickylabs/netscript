@@ -6,18 +6,16 @@
 | -------------- | ------------------------------------------------ |
 | Run ID         | `release-0.0.5--orchestration/slices/w3-b1-1102` |
 | Branch         | `feat/mcp-intent-activation-s4-s5`               |
-| Current phase  | `plan-eval`                                      |
+| Current phase  | `impl`                                           |
 | Archetype      | `6 — CLI / Tooling`                              |
 | Scope overlays | `docs`                                           |
 
 ## Current State
 
-PR #1404 merged the separately evaluated S1–S3 foundation into `main@51a58b4f5`. This continuation
-plans the remaining #1102 work: repair the exact render/fetch concept mismatch, route project
-creation through the embedded `llms#Getting started` section, add a route-hint-free scoring
-discriminator, activate `find_guidance` in MCP/generated guidance, prove the real installed-corpus
-CLI stdio path, and align public docs/release evidence. Product implementation is not authorized
-until a fresh separate-session PLAN-EVAL passes.
+The separate Claude · Fable 5 continuation PLAN-EVAL passed at `71c0a29c2`. S4A is implemented and
+green: a render/request phrase family closes the issue paraphrase, getting-started routes through
+the embedded `llms` section, and a zero-concept score row makes comparator direction falsifiable.
+The original five rows / 15 citations and 12-document 253,535-byte corpus remain unchanged.
 
 ## Completed
 
@@ -55,17 +53,16 @@ until a fresh separate-session PLAN-EVAL passes.
 
 ## In Progress
 
-- Plan-only handoff for continuation slices S4A, S4B, and S5. The quickstart/cap decision is
-  measured at 253,535 + 20,986 = 274,521 bytes, so D13 uses `llms#Getting started` without changing
-  the 12-document selection or 262,144-byte cap. The original five evaluation rows / 15 citations
-  remain locked.
+- S4A is ready to commit/push/comment after 133 MCP tests, focused parity/evaluation, scoped static
+  gates, explicit quality, asset freshness, and the mandatory scratch mutation proof. S4B activation
+  is next; no CLI/docs activation source has been edited yet.
 
 ## Next Steps
 
-1. Push the plan-only commit and open the continuation draft PR at `status:plan-eval`.
-2. Stop. The orchestrator launches the mandatory separate Claude · Fable 5 PLAN-EVAL.
-3. Implement only after `PASS`; after all non-Aspire gates, push `EXPENSIVE-GATE-REQUEST` and stop
-   again for a durable runtime-token grant.
+1. Commit/push/comment S4A with raw exits.
+2. Implement S4B activation and prove the public no-AppHost installed-corpus stdio path.
+3. Implement S5 docs and all non-Aspire gates; then push `EXPENSIVE-GATE-REQUEST` and stop for a
+   durable runtime-token grant.
 
 ## Key Decisions
 

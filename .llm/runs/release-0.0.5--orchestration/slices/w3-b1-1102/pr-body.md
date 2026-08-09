@@ -18,7 +18,7 @@ This draft is plan-only. Product implementation is blocked on a fresh separate-s
 
 - [x] Plan — live issue re-baseline, measured corpus options, score discriminator, activation path,
       pre-fix reds, package/public-surface baselines, ordered gates
-- [ ] S4A — render/fetch concept mismatch, getting-started routing through `llms`, and a
+- [x] S4A — render/fetch concept mismatch, getting-started routing through `llms`, and a
       route-hint-free score evaluation with inverted-comparator mutation proof
 - [ ] S4B — MCP/generated-agent/consumer-skill activation and real no-AppHost
       `agent init --with-docs` → `agent mcp` → `find_guidance` stdio proof

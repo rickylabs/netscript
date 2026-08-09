@@ -1,5 +1,6 @@
 import { assert, assertEquals, assertStringIncludes } from '@std/assert';
 import { createFindGuidanceFlow, type GuidanceResult } from '../mod.ts';
+import { MCP_EMBEDDED_DOCS } from '../src/publish-assets.generated.ts';
 import { EmbeddedDocsCorpus } from '../src/infrastructure/embedded-docs-corpus.ts';
 import { FilesystemDocsCorpus } from '../src/infrastructure/filesystem-docs-corpus.ts';
 
@@ -82,6 +83,21 @@ Deno.test('shared guidance index bridges concept mismatch and cites fenced and V
   assert(definition.code.every(({ source }) => source.section === 'define-the-form'));
   assertStringIncludes(definition.code[0]!.code, 'defineForm');
   assertStringIncludes(definition.code[1]!.code, 'defineRoute');
+});
+
+Deno.test('cache-freshness concept covers a render and request phrase family', async () => {
+  const corpus = new EmbeddedDocsCorpus({ documents: MCP_EMBEDDED_DOCS });
+  for (
+    const intent of [
+      'avoid hitting my service every render',
+      'reuse service data instead of making a new request on each render',
+      'avoid refetching data on every request',
+    ]
+  ) {
+    const result = await corpus.findGuidance(intent);
+    assertEquals(result.recommendations[0]?.slug, 'pages/web-layer/query', intent);
+    assertEquals(result.recommendations[0]?.section, 'a-cache-first-load-pattern', intent);
+  }
 });
 
 Deno.test('internal prerequisite links contribute one-hop routing without creating a seed', async () => {

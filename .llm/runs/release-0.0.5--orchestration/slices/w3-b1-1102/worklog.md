@@ -223,3 +223,45 @@ the single shared indexer used by both adapters.
   `EXPENSIVE-GATE-REQUEST`; no runtime token has been requested or used.
 - Next: commit/push plan artifacts, open draft PR, apply exactly `status:plan-eval`, post the plan
   handoff, and stop for the owner-routed separate Claude · Fable 5 evaluator.
+
+## 2026-08-09 — PLAN-EVAL PASS and S4A retrieval closure
+
+- Received the owner-routed separate Claude · Fable 5 PLAN-EVAL `PASS` at plan head `71c0a29c2`.
+  Recorded the verdict and its three binding carries in `plan-eval-s4-s5.md`; moved issue #1102 and
+  PR #1416 to exactly `status:impl` before product edits.
+- Test-first pre-fix run:
+  `deno test --no-lock --allow-all packages/mcp/tests/guidance-evaluation_test.ts
+  packages/mcp/tests/guidance-retrieval_test.ts` — exit 1; 4 passed / 2 failed. The issue sentence
+  ranked services contracts and the phrase-family test ranked the same wrong destination.
+- Added a real cache-freshness phrase family (`every render`, `every request`, request-on-render,
+  refetch-on-render) and a focused test covering the issue sentence plus two non-quoted
+  paraphrases. Added the finite getting-started concept routed to `llms#Getting started`.
+- Added three fixture rows without changing the original five rows / 15 citations. The score-only
+  row asserts zero activated concepts; the getting-started row locks rank one; the issue paraphrase
+  locks the existing cache-first top three.
+- Focused validation order 1 — exit 0; 12 passed / 0 failed across evaluation, retrieval,
+  source-policy, and release-fallback tests. The planned score-only order passed exactly, so no
+  fixture drift or expectation rewrite occurred.
+- Mandatory mutation control:
+  - owned detached scratch worktree changed only `right.score - left.score` to
+    `left.score - right.score`;
+  - scratch evaluation exit 1, 0 passed / 1 failed, naming
+    `pick direct application ownership versus a reusable integration`; actual top three became
+    `llms#tutorials`, `web-layer/route#routing-and-route-contracts`, and
+    `llms#getting-started`;
+  - immediate clean-checkout rerun exit 0, 1 passed / 0 failed;
+  - scratch worktree removed and pruned.
+- Full `packages/mcp/tests/` — exit 0; 133 passed / 0 failed.
+- Scoped check — exit 0; 115 selected files, 0 failed batches, `--no-lock`.
+- First scoped lint/format invocations — exit 1 before file analysis because Deno 2.9.5 rejected
+  root workspace syntax (`invalid type: string "packages/*", expected WorkspaceConfig`); zero lint
+  or format findings were produced. The prior run record identified the package-config form.
+- Decisive scoped reruns with `--config packages/mcp/deno.json` — lint exit 0 and format exit 0;
+  115 selected files, zero findings. `plan.md` now records the executable command shape.
+- Explicit MCP source quality — exit 0; findings 0, allowances 0. Publish-asset freshness — exit 0.
+- Doctrine raw exit 1 with byte-identical pre-existing inventory: A14 fail, three warnings, one
+  info. No finding was added or deepened.
+- Corpus invariants: original five fixture rows compare byte-equal to plan head; generated corpus
+  assets have no diff; provenance remains 12 documents / 253,535 bytes under 262,144.
+- Reconcile: #1102 remains open at `status:impl`; PR #1416 remains draft and references rather than
+  closes it. No new review/evaluator comments changed S4A scope. Next slice is S4B activation.
