@@ -64,3 +64,17 @@ Drift is append-only.
   and preserve all confirmed contract, ordering, and gate decisions.
 - **Evidence:** revised `plan.md` S1 files/evidence decision and validation rows 1b/1c; no product
   or tooling source change.
+
+## 2026-08-09 — Scoped check wrapper owns unstable-kv
+
+- **What:** The approved command passed `--unstable-kv` through `--deno-arg`, while
+  `run-deno-check.ts` already injects that flag.
+- **Source:** First S1 compile-safety run.
+- **Expected:** The wrapper checks the package with KV support and no lock rewrite.
+- **Actual:** The duplicated flag made Deno exit 1 before checking any file; the wrapper reported no
+  diagnostics because argument parsing failed.
+- **Severity:** command-only.
+- **Action:** remove only the duplicate forwarded flag; retain `--deno-arg --no-lock`. The wrapper
+  reports the effective command as `deno check --unstable-kv --no-lock <files>`.
+- **Evidence:** raw invalid invocation exit 1; corrected wrapper exit 0 with 31 files, zero failed
+  batches, zero diagnostics. Plan validation row 4 corrected.

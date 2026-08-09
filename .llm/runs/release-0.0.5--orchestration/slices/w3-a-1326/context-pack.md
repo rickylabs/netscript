@@ -6,18 +6,17 @@
 | -------------- | ----------------------------------------------- |
 | Run ID         | `release-0.0.5--orchestration/slices/w3-a-1326` |
 | Branch         | `fix/streams-durable-producer-reconnect`        |
-| Current phase  | `plan-eval — hard stop before implementation`   |
+| Current phase  | `impl — S1 contract and committed RED evidence` |
 | Archetype      | `3 — Runtime/Behavior`                          |
 | Scope overlays | none; Aspire runtime validation required        |
 
 ## Current State
 
-Research and Design are complete on clean exact base `aa8e151e6`. PLAN-EVAL cycle 2 confirmed the
-F1–F3 repairs, then returned `FAIL_PLAN` because the four intentionally broken fixtures were planned
-inside package/CI scoped-check roots. The two-failure threshold was reached; the owner ratified a
-third cycle on the recommended narrow fix. The fixtures are now locked under the slice run dir and
-reached only by direct negative checks. No product source has changed. A fresh orchestrator-launched
-Claude/Fable PLAN-EVAL `PASS` remains mandatory.
+PLAN-EVAL cycle 3 returned `PASS` and implementation is authorized. S1 now contains the standalone
+v1 producer contract, new clock/random/transport ports, four independently failing behavioral tests,
+and four single-symbol API-absence fixtures under the slice run dir. The existing
+`StreamProducerPort` and concrete producer remain unchanged until S2. All eight REDs are recorded
+separately, and the S1 package scoped check is green.
 
 ## Completed
 
@@ -36,13 +35,13 @@ Claude/Fable PLAN-EVAL `PASS` remains mandatory.
 
 ## In Progress
 
-- Owner-ratified cycle-3 `status:plan-eval` handoff to the milestone orchestrator.
+- S1 contract/RED commit, push, and PR comment before S2 implementation.
 
 ## Next Steps
 
-1. Orchestrator launches the owner-ratified fresh Claude · Fable 5 · medium PLAN-EVAL cycle 3.
-2. If and only if `plan-eval.md` is `PASS`, begin S1 with public contract and individual RED tests.
-3. If cycle 3 is `FAIL_PLAN`, escalate again; do not implement.
+1. Commit, push, and comment S1 with the eight separately classified raw exits.
+2. Begin S2 by widening the existing producer port atomically with the concrete class.
+3. Replace the four compile-time fixtures with behavioral tests while turning all eight REDs green.
 
 ## Key Decisions
 

@@ -122,18 +122,22 @@ the adapter or fetch/timers to the supervisor.
 
 ## Progress Log
 
-| Time       | Slice | Step               | Notes                                                                                                                  |
-| ---------- | ----- | ------------------ | ---------------------------------------------------------------------------------------------------------------------- |
-| 2026-08-09 | S0    | Bootstrap/research | Clean exact base verified; live issue and W2-B contract read; doctrine/debts/JSR surface re-baselined.                 |
-| 2026-08-09 | S0    | Diagnostic RED     | Initial outage then server-online desired behavior exited 1 and showed the false reconnect warning plus skipped write. |
-| 2026-08-09 | S0    | Design checkpoint  | Contract, state, delivery, buffer, shutdown, transport, telemetry, and ordered slices locked. No product file changed. |
-| 2026-08-09 | S0    | PLAN-EVAL request  | Awaiting orchestrator-launched separate Claude/Fable 5 medium verdict; implementation hard stop active.                |
-| 2026-08-09 | S0    | Draft PR handoff   | Draft PR #1402 targets `main` at plan-only head `6bb6b3961`; labeled `status:plan-eval`.                               |
-| 2026-08-09 | S0    | PLAN-EVAL cycle 1  | `FAIL_PLAN`: repair RED classification/port compile mechanics, package-scoped fitness proof, and finding 7 wording.    |
-| 2026-08-09 | S0    | Plan repair        | F1–F3 repaired without product edits; cycle 2 requested. Evaluator artifact was not visible locally at repair time.    |
-| 2026-08-09 | S0    | PLAN-EVAL cycle 2  | `FAIL_PLAN`: F1–F3 confirmed repaired; F4 found intentionally broken fixtures inside scoped/CI check roots.            |
-| 2026-08-09 | S0    | Owner escalation   | Owner ratified cycle 3 on the recommended run-dir fixture relocation; no product implementation authorized.            |
-| 2026-08-09 | S0    | Plan repair        | F4 repaired: negative fixtures locked under the slice run dir; direct checks updated; wrappers need no exclusion.      |
+| Time       | Slice | Step               | Notes                                                                                                                              |
+| ---------- | ----- | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-08-09 | S0    | Bootstrap/research | Clean exact base verified; live issue and W2-B contract read; doctrine/debts/JSR surface re-baselined.                             |
+| 2026-08-09 | S0    | Diagnostic RED     | Initial outage then server-online desired behavior exited 1 and showed the false reconnect warning plus skipped write.             |
+| 2026-08-09 | S0    | Design checkpoint  | Contract, state, delivery, buffer, shutdown, transport, telemetry, and ordered slices locked. No product file changed.             |
+| 2026-08-09 | S0    | PLAN-EVAL request  | Awaiting orchestrator-launched separate Claude/Fable 5 medium verdict; implementation hard stop active.                            |
+| 2026-08-09 | S0    | Draft PR handoff   | Draft PR #1402 targets `main` at plan-only head `6bb6b3961`; labeled `status:plan-eval`.                                           |
+| 2026-08-09 | S0    | PLAN-EVAL cycle 1  | `FAIL_PLAN`: repair RED classification/port compile mechanics, package-scoped fitness proof, and finding 7 wording.                |
+| 2026-08-09 | S0    | Plan repair        | F1–F3 repaired without product edits; cycle 2 requested. Evaluator artifact was not visible locally at repair time.                |
+| 2026-08-09 | S0    | PLAN-EVAL cycle 2  | `FAIL_PLAN`: F1–F3 confirmed repaired; F4 found intentionally broken fixtures inside scoped/CI check roots.                        |
+| 2026-08-09 | S0    | Owner escalation   | Owner ratified cycle 3 on the recommended run-dir fixture relocation; no product implementation authorized.                        |
+| 2026-08-09 | S0    | Plan repair        | F4 repaired: negative fixtures locked under the slice run dir; direct checks updated; wrappers need no exclusion.                  |
+| 2026-08-09 | S0    | PLAN-EVAL cycle 3  | `PASS`: all eight Plan-Gate boxes checked; implementation authorized by separate Claude/Fable evaluator.                           |
+| 2026-08-09 | S1    | Contract first     | Added standalone lifecycle/policy/buffer/receipt/failure types and clock/random/transport ports; existing producer port unchanged. |
+| 2026-08-09 | S1    | Classified REDs    | Four behavioral assertion failures and four single-symbol API-absence failures recorded separately below.                          |
+| 2026-08-09 | S1    | Wrapper correction | Duplicate explicit `--unstable-kv` exited 1 before checking; wrapper-owned flag plus `--no-lock` exited 0.                         |
 
 ## Decisions
 
@@ -151,12 +155,30 @@ See `plan.md` D1–D16. No open decision would force implementation rework.
 
 ### Static Gates
 
-| Gate                                | Command or check                                                  | Result       | Notes                                                  |
-| ----------------------------------- | ----------------------------------------------------------------- | ------------ | ------------------------------------------------------ |
-| Baseline focused tests              | producer + service producer test files                            | PASS, exit 0 | 5 passed; no reconnect behavior.                       |
-| Initial desired-behavior diagnostic | inline `deno eval` initial-offline → online → write → flush       | RED, exit 1  | Product failure: latched initial error; write skipped. |
-| Full export doc lint                | `deno task doc:lint --root packages/plugin-streams-core --pretty` | PASS, exit 0 | Combined diagnostics 0.                                |
-| Raw package publish dry-run         | `deno publish --dry-run --allow-dirty --no-check`                 | PASS, exit 0 | Success, intended files, no real slow-type diagnostic. |
+| Gate                                | Command or check                                                  | Result       | Notes                                                     |
+| ----------------------------------- | ----------------------------------------------------------------- | ------------ | --------------------------------------------------------- |
+| Baseline focused tests              | producer + service producer test files                            | PASS, exit 0 | 5 passed; no reconnect behavior.                          |
+| Initial desired-behavior diagnostic | inline `deno eval` initial-offline → online → write → flush       | RED, exit 1  | Product failure: latched initial error; write skipped.    |
+| Full export doc lint                | `deno task doc:lint --root packages/plugin-streams-core --pretty` | PASS, exit 0 | Combined diagnostics 0.                                   |
+| Raw package publish dry-run         | `deno publish --dry-run --allow-dirty --no-check`                 | PASS, exit 0 | Success, intended files, no real slow-type diagnostic.    |
+| S1 full export doc lint             | `deno task doc:lint --root packages/plugin-streams-core --pretty` | PASS, exit 0 | Combined diagnostics 0 after new public contract exports. |
+
+### S1 RED evidence
+
+| Behavior            | Class                      | Raw exit | Decisive failure                                                                                                                                                |
+| ------------------- | -------------------------- | -------: | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Initial outage      | `BEHAVIORAL`               |        1 | Runtime assertion: “initial outage must not remain latched after the server becomes available”; no TypeScript diagnostic.                                       |
+| Mid-session outage  | `BEHAVIORAL`               |        1 | Runtime assertion: “mid-session batch failure must retain the failed in-flight write”; actual read-back omitted only `during-outage`; no TypeScript diagnostic. |
+| Recovery            | `BEHAVIORAL`               |        1 | Runtime assertion: “recovery must deliver the write that was accepted while connecting”; actual read-back empty; no TypeScript diagnostic.                      |
+| FIFO ordering       | `BEHAVIORAL`               |        1 | Runtime assertion: “FIFO must retain the exact order of writes across reconnect”; actual read-back omitted `two` and `three`; no TypeScript diagnostic.         |
+| Count overflow      | `COMPILE_TIME_API_ABSENCE` |        1 | Only TS2339: `accepted` does not exist on the current void result.                                                                                              |
+| Byte overflow       | `COMPILE_TIME_API_ABSENCE` |        1 | Only TS2339: `completion` does not exist on the current void result.                                                                                            |
+| Stop during backoff | `COMPILE_TIME_API_ABSENCE` |        1 | Only TS2339: `stop` does not exist on `DurableStreamProducer`.                                                                                                  |
+| Readiness           | `COMPILE_TIME_API_ABSENCE` |        1 | Only TS2339: `waitUntilReady` does not exist on `DurableStreamProducer`.                                                                                        |
+
+All eight commands ran separately. The four behavioral commands used default `deno test`
+type-checking; none accepted a TypeScript diagnostic. The four compile-time fixtures live only under
+the slice run directory and each emitted exactly its named missing-symbol diagnostic.
 
 ### Fitness Gates
 
@@ -167,6 +189,13 @@ See `plan.md` D1–D16. No open decision would force implementation rework.
 | Package quality scan   | NOT_RUN                 | Planned S3–S4 | Decisive scoped command covers `packages/plugin-streams-core/src`; #1403 owns root gap.            |
 | Package doctrine check | NOT_RUN                 | Planned S3–S4 | Decisive scoped command covers `packages/plugin-streams-core`; root aggregate is non-covering.     |
 | F-14 manual scan       | `PENDING_SCRIPT`        | Planned S3    | Record every `console.*` match and classify executable versus comment-only; #1403 owns automation. |
+
+### S1 compile safety
+
+| Command                                                                                   | Raw exit | Result                                                                                                                        |
+| ----------------------------------------------------------------------------------------- | -------: | ----------------------------------------------------------------------------------------------------------------------------- |
+| Scoped wrapper with both wrapper-owned and explicit `--unstable-kv`                       |        1 | Invalid invocation: Deno rejects the duplicate flag before checking; not product evidence.                                    |
+| `run-deno-check.ts --root packages/plugin-streams-core --ext ts,tsx --deno-arg --no-lock` |        0 | 31 files selected, one batch, zero failed batches and diagnostics; effective command is `deno check --unstable-kv --no-lock`. |
 
 ### Runtime Gates
 
