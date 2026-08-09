@@ -16,6 +16,7 @@ import type { ResolvedConfig } from '../../domain/resolved-config.ts';
 import type { PublicCommandDependencies } from '../../../public/features/root/public-command-dependencies.ts';
 import { createDeployCommand } from '../../../public/features/deploy/deploy-group.ts';
 import { netscriptJsrSpecifier } from '../../constants/jsr-specifiers.ts';
+import { SCAFFOLD_DEFAULTS } from '../../constants/scaffold/scaffold-defaults.ts';
 import type { InitPipelineContext } from './context.ts';
 import { scaffoldRoot } from './plan-init.ts';
 
@@ -264,7 +265,7 @@ Deno.test('scaffoldRoot always emits quality and npm runners with the Deno pin',
     assert(result.filesCreated.includes(packageJsonPath));
     assertEquals(JSON.parse(scaffolder.files.get(packageJsonPath) ?? '{}'), {
       private: true,
-      engines: { deno: '2.9.0' },
+      engines: { deno: SCAFFOLD_DEFAULTS.DENO_VERSION },
     });
   }
 });

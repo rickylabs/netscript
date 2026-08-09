@@ -6,6 +6,7 @@
 
 import { assert, assertStringIncludes } from 'jsr:@std/assert@^1';
 import { join } from '@std/path';
+import { SCAFFOLD_DEFAULTS } from '../../constants/scaffold/scaffold-defaults.ts';
 import { generateNodeModulesVerifier } from './node-modules-verifier.ts';
 
 Deno.test('generated verifier fails closed for a cache file missing from node_modules/.deno', async () => {
@@ -22,7 +23,7 @@ Deno.test('generated verifier fails closed for a cache file missing from node_mo
       'Remove-Item -Recurse -Force node_modules; deno install',
     );
     assertStringIncludes(stderr, 'rm -rf node_modules && deno install');
-    assertStringIncludes(stderr, 'Deno 2.9.0');
+    assertStringIncludes(stderr, `Deno ${SCAFFOLD_DEFAULTS.DENO_VERSION}`);
     assertStringIncludes(
       stderr,
       'https://github.com/denoland/deno/issues/35804',

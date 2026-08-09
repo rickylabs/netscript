@@ -30,7 +30,7 @@ jobs:
       - name: Setup Deno
         uses: denoland/setup-deno@v2
         with:
-          deno-version: "2.9.0"
+          deno-version: "2.9.5"
 
       - name: Reconcile JSR package settings
         env:
