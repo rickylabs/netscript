@@ -83,3 +83,12 @@ project but asserted generated artifacts under `apps/dashboard`. All three now c
 derivation rule, with required probe arguments where a caller owns the context. A new source-policy
 test makes both forbidden forms executable and excludes the unrelated Aspire-dashboard telemetry
 surface. This is an authorized completion of the gate-70 finding, not a change to S1's naming rule.
+
+## 2026-08-09 — row 72 closes the runtime evidence gap
+
+After the identity repair, the one authorized ledger-row-72 execution at `2052551d7` completed all
+82 steps with 80 passed, 0 failed, and the two expected #1398 deferrals. Both formerly stale probes
+passed, and `behavior.app-reference` rendered the nine canonical expectations at desktop and mobile
+through Windows Chrome over WSL interop. Pre/post leak checks found no run-owned resources, the
+foreign Redis container remained untouched, and manifest/lock diffs were empty. This supersedes the
+gate-70 closure blocker without erasing that honest red receipt.

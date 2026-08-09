@@ -64,3 +64,12 @@ the same stale identity in the standalone clean-clone README probe, which now de
 dashboard telemetry. Its deliberate-literal mutation exits 1 and clean recovery exits 0; focused
 tests pass 20/20, scoped check/lint/fmt and `check:assets-barrel` exit 0. No AppHost/container gate
 ran, and `behavior.app-reference` still has no verdict pending a fresh serialized grant.
+
+Ledger row 72 was committed before execution at orchestrator commit `aabbb1200`. The single
+authorized rerun at feature head `2052551d7` exited 0 with 80 passed / 0 failed / 2 expected #1398
+deferrals / 82 total steps. Both repaired identity gates passed. `behavior.app-reference` passed
+through Windows Chrome over WSL interop, rendering the nine reference expectations at desktop
+1440×900 and mobile 390×844: home, design composition, loading, error, empty, success, optimistic,
+rollback, and confirmed. Pre/post leak checks exited 0 with no run-owned resources, the foreign
+Redis survivor was left untouched, and there was no manifest or lock diff. All nine actionable
+#1333 rows are now evidenced; the PR may carry `Closes #1333` while staying draft at `status:impl`.

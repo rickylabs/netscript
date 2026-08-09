@@ -183,6 +183,36 @@ Reconcile: the owner-accepted gate-70 finding and its hidden consumers are now r
 and the run record. PR #1427 remains draft at `status:impl` with `Refs #1333`; a fresh serialized
 grant and real runtime verdict remain owner-controlled.
 
+## Serialized runtime receipt — ledger row 72
+
+The orchestrator committed and pushed ledger row 72 at `aabbb1200` before the grant reached this
+thread. Exactly one execution was made at feature head `2052551d7`; no retry was made.
+
+| Receipt | Result |
+| --- | --- |
+| Pre-run leak check | raw exit 0; no run-owned resources; stale foreign `redis-jfgcbtaf` owned by `/home/codex/repos/w6-review-desk` reported and left untouched |
+| `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | raw `$?` exit 0; 80 passed / 0 failed / 2 skipped / 82 total steps |
+| Post-run leak check | raw exit 0; no run-owned survivors; the same foreign Redis container remained untouched |
+| Manifest and lock hygiene | `git diff --name-only -- '**/deno.json' deno.json deno.lock '**/deno.lock'` returned empty |
+
+The only skips were the expected `DEFERRED` work from #1398:
+
+- `behavior.otel.stream-consumer`: `workers-combined` does not install the stream mutation hook.
+- `behavior.otel.traces`: TC-14 requires the deferred Flow-B stream-consumer record.
+
+The total is the full 82-step run, materially beyond gate 70's 19-step fail-fast cutoff. Both
+repaired identity consumers passed: `behavior.project-boundary-dev` and
+`behavior.mcp-endpoint-directory`.
+
+`behavior.app-reference` passed in 93.744 seconds using the host's Windows Chrome through WSL
+interop. Its producing contract rendered all nine reference expectations at desktop 1440×900 and
+mobile 390×844: home navigation, design composition, and the loading, error, empty, success,
+optimistic, rollback, and confirmed resource states. `cleanup.aspire-stop` also passed.
+
+Row 9 is now evidenced. Together with the already-green S1-S6 evidence, all nine actionable #1333
+rows are satisfied; the PR can truthfully carry `Closes #1333` while remaining draft at
+`status:impl` for owner-controlled evaluation and readiness.
+
 ## S5 — generated quality and browser/runtime acceptance
 
 ### Implementation
