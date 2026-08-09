@@ -265,3 +265,32 @@ the single shared indexer used by both adapters.
   assets have no diff; provenance remains 12 documents / 253,535 bytes under 262,144.
 - Reconcile: #1102 remains open at `status:impl`; PR #1416 remains draft and references rather than
   closes it. No new review/evaluator comments changed S4A scope. Next slice is S4B activation.
+
+## 2026-08-09 — S4B primary-workflow activation
+
+- Test-first combined MCP/init/CLI activation run — exit 1; 18 passed / 3 failed. MCP initialize
+  lacked the activation rule, generated `AGENTS.md` lacked it, and the first real smoke setup used
+  VS Code host + editor none, which installs docs/tools but correctly does not install Claude
+  `AGENTS.md` or skills.
+- Recorded the test-setup drift after opening the implementation: the public smoke now scaffolds
+  with `--no-aspire`, installs the existing Playwright skill marker, and invokes public
+  `agent init --host claude --editor none --with-docs`. `initAgent` sees that marker and skips the
+  Aspire initializer before any Aspire command while installing every guidance surface.
+- Added the one activation contract across MCP initialize instructions, generated `AGENTS.md`, and
+  source `netscript` / `netscript-build` skills: before unfamiliar API or architecture work, call
+  `find_guidance`; keep `search_docs` literal and `get_doc` exact.
+- Regenerated `packages/cli/src/kernel/assets/skills.generated.ts` from source; no generated file
+  was hand-edited.
+- Focused MCP/init/CLI group — exit 0; 21 passed / 0 failed.
+- Exact CLI pair — exit 0; 20 passed / 0 failed. The real smoke ran public `agent init --with-docs`,
+  read installed `AGENTS.md` and both skills, started public `agent mcp` against
+  `.netscript/docs`, called `find_guidance`, and received rank-1 `llms#task-router`.
+- Scoped check/lint/fmt — exit 0 each; 135 selected files, 0 failed batches/findings, `--no-lock`
+  on check and package config on lint/format.
+- Explicit quality scan over MCP source and CLI agent source — exit 0; findings 0, allowances 0.
+- `check:publish-assets` — exit 0. Staged `check:assets-barrel` — exit 0; source and generated skill
+  asset reproduce byte-for-byte.
+- Diagnostic scratch scaffold was moved to system trash after inspection; it is recoverable. No
+  AppHost, container, Aspire CLI, or `e2e:cli` suite ran.
+- Reconcile: no new PR comments or issue changes alter scope. #1102 stays open and the draft remains
+  `status:impl`; S5 public docs and full non-Aspire evidence remain.

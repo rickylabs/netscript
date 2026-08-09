@@ -192,3 +192,19 @@ Drift is append-only.
 - **Action:** use the wrappers' documented `--config packages/mcp/deno.json` option, matching the
   successful S1 run record. Both decisive reruns selected the same 115 files and exited 0 with zero
   findings. Update validation orders 6–7; do not change repo configuration in #1102.
+
+## 2026-08-09 — Real activation smoke needs Claude host plus the existing no-delegation marker
+
+- **What:** the approved S4B table selected `agent init --host vscode --editor none --with-docs`
+  to avoid Aspire while expecting installed Claude skills and root `AGENTS.md`.
+- **Observed:** `init-agent.ts` installs those surfaces only when `hosts.includes("claude")`;
+  VS Code host with editor `none` truthfully installs generic tools/docs but neither Claude skills
+  nor root guidance. The pre-fix smoke therefore exited after `agent init` but failed reading
+  `AGENTS.md`.
+- **Action:** use the existing tested no-delegation contract: scaffold with `--no-aspire`, create
+  `.claude/skills/playwright-cli/SKILL.md`, and run the public Claude-host init. The marker makes
+  `initAgent` skip `DenoAspireAgentInitializer` before any `aspire` command, while the Claude host
+  installs `AGENTS.md`, skills, config, and docs. This changes only test setup, not product routing.
+- **Evidence:** combined pre-fix activation run exit 1 with three named failures; post-change focused
+  group exit 0 with 21/21, and exact CLI pair exit 0 with 20/20. No AppHost, container, or Aspire
+  command ran. The diagnostic scaffold was moved to system trash and is recoverable.

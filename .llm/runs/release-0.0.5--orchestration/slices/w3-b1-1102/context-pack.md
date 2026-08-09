@@ -12,10 +12,11 @@
 
 ## Current State
 
-The separate Claude · Fable 5 continuation PLAN-EVAL passed at `71c0a29c2`. S4A is implemented and
-green: a render/request phrase family closes the issue paraphrase, getting-started routes through
-the embedded `llms` section, and a zero-concept score row makes comparator direction falsifiable.
-The original five rows / 15 citations and 12-document 253,535-byte corpus remain unchanged.
+The separate Claude · Fable 5 continuation PLAN-EVAL passed at `71c0a29c2`. S4A retrieval closure
+and S4B activation are implemented and green. The real no-AppHost public CLI path now runs
+`agent init --with-docs`, installs activation guidance, starts MCP against `.netscript/docs`, and
+returns rank-1 `llms#task-router`. The original five rows / 15 citations and 12-document
+253,535-byte corpus remain unchanged.
 
 ## Completed
 
@@ -53,15 +54,14 @@ The original five rows / 15 citations and 12-document 253,535-byte corpus remain
 
 ## In Progress
 
-- S4A is ready to commit/push/comment after 133 MCP tests, focused parity/evaluation, scoped static
-  gates, explicit quality, asset freshness, and the mandatory scratch mutation proof. S4B activation
-  is next; no CLI/docs activation source has been edited yet.
+- S4B is ready to commit/push/comment after the exact CLI pair passed 20/20, the combined activation
+  group passed 21/21, scoped 135-file gates passed, and generated skills reproduced. S5 public docs
+  and full non-Aspire evidence are next.
 
 ## Next Steps
 
-1. Commit/push/comment S4A with raw exits.
-2. Implement S4B activation and prove the public no-AppHost installed-corpus stdio path.
-3. Implement S5 docs and all non-Aspire gates; then push `EXPENSIVE-GATE-REQUEST` and stop for a
+1. Commit/push/comment S4B with raw exits.
+2. Implement S5 docs and all non-Aspire gates; then push `EXPENSIVE-GATE-REQUEST` and stop for a
    durable runtime-token grant.
 
 ## Key Decisions

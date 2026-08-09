@@ -20,7 +20,7 @@ This draft is plan-only. Product implementation is blocked on a fresh separate-s
       pre-fix reds, package/public-surface baselines, ordered gates
 - [x] S4A — render/fetch concept mismatch, getting-started routing through `llms`, and a
       route-hint-free score evaluation with inverted-comparator mutation proof
-- [ ] S4B — MCP/generated-agent/consumer-skill activation and real no-AppHost
+- [x] S4B — MCP/generated-agent/consumer-skill activation and real no-AppHost
       `agent init --with-docs` → `agent mcp` → `find_guidance` stdio proof
 - [ ] S5 — public MCP/docs alignment, generated assets, all non-Aspire gates, runtime-token request
 
