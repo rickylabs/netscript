@@ -2,29 +2,20 @@ import { assertEquals, assertStringIncludes } from "@std/assert";
 import {
   type CommandExecutorPort,
   createMcpCliServer,
+  SpawnCommandExecutor,
   TOOL_NAMES,
 } from "@netscript/mcp/cli";
 import { CliProjectDoctor } from "./cli-mcp-adapters.ts";
 import { createAgentMcpOptions } from "./run-agent-mcp.ts";
 import { createPublicCommandDependencies } from "../../root/public-command-dependencies.ts";
 
-Deno.test("CLI-hosted MCP reports the host executor identity", () => {
-  const dependencies = createPublicCommandDependencies({
-    cwd: () => "/fixture",
-    resolvePath: (path?: string) => path ?? "/fixture",
+Deno.test("an injected host executor reports identity distinct from standalone MCP", () => {
+  const executor = new SpawnCommandExecutor({
+    cliCommand: ["/fixture/netscript-host"],
+    mode: "host",
+    version: "9.9.9-host",
   });
-  const options = createAgentMcpOptions(
-    { projectRoot: "/fixture" },
-    dependencies,
-    {
-      compiled: true,
-      execPath: "/fixture/netscript-host",
-      mainModule: "file:///fixture/netscript.ts",
-      version: "9.9.9-host",
-    },
-  );
-
-  assertEquals(options.commandExecutor?.identity, {
+  assertEquals(executor.identity, {
     mode: "host",
     version: "9.9.9-host",
     command: ["/fixture/netscript-host"],
@@ -55,9 +46,11 @@ Deno.test("agent MCP adapters expose real verbs and non-stub plugin doctor resul
   const executed: Array<{ path: readonly string[]; args: readonly string[] }> =
     [];
   const executor: CommandExecutorPort = {
+    identity: { mode: "host", version: "9.9.9", command: ["netscript"] },
     execute: (request) => {
       executed.push(request);
       return Promise.resolve({
+        executor: { mode: "host", version: "9.9.9", command: ["netscript"] },
         exitCode: 0,
         durationMs: 1,
         outputTail: "plugins listed",

@@ -166,8 +166,10 @@ Deno.test('a public introspection receipt satisfies the shared drift gate', asyn
 Deno.test('a successful execute_command receipt satisfies the shared drift gate', async () => {
   const evidence = new MemoryEvidence();
   const executor: CommandExecutorPort = {
+    identity: { mode: 'host', version: '9.9.9', command: ['netscript'] },
     execute: () =>
       Promise.resolve({
+        executor: { mode: 'host', version: '9.9.9', command: ['netscript'] },
         exitCode: 0,
         durationMs: 1,
         outputTail: 'generated project files',

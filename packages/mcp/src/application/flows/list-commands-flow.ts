@@ -5,9 +5,13 @@ import {
 } from '../../domain/command-catalog-port.ts';
 import { isRecord } from '../../domain/schema.ts';
 import type { ToolExecutionResult, ToolFlow } from '../../domain/tool-types.ts';
+import type { CliExecutionIdentity } from '../../domain/command-executor-port.ts';
 
 /** Create the bounded command catalog flow. */
-export function createListCommandsFlow(catalog: CommandCatalogPort): ToolFlow {
+export function createListCommandsFlow(
+  catalog: CommandCatalogPort,
+  executor: CliExecutionIdentity,
+): ToolFlow {
   return async (input: unknown): Promise<ToolExecutionResult> => {
     const filter = isRecord(input) && typeof input.filter === 'string'
       ? input.filter.trim().toLowerCase()
@@ -23,6 +27,6 @@ export function createListCommandsFlow(catalog: CommandCatalogPort): ToolFlow {
       !filter ||
       `${command.path} ${command.description} ${command.usage}`.toLowerCase().includes(filter)
     ).slice(0, limit);
-    return { ok: true, value: { count: commands.length, commands } };
+    return { ok: true, value: { count: commands.length, commands, executor } };
   };
 }

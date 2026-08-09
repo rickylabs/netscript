@@ -57,6 +57,7 @@ export type {
 export type { ProjectDoctorPort } from './src/domain/project-doctor-port.ts';
 export type { CommandCatalogPort, CommandDescriptor } from './src/domain/command-catalog-port.ts';
 export type {
+  CliExecutionIdentity,
   CommandExecutionRequest,
   CommandExecutionResult,
   CommandExecutorPort,

@@ -35,6 +35,11 @@ const doctorFamilyShape = objectSchema({
   counts: doctorCountsShape,
   checks: { type: 'array', maxItems: 20, items: doctorCheckShape },
 }, ['name', 'status', 'counts', 'checks']);
+const cliExecutionIdentityShape = objectSchema({
+  mode: { enum: ['host', 'standalone'] },
+  version: stringProperty,
+  command: { type: 'array', maxItems: 8, items: stringProperty },
+}, ['mode', 'version', 'command']);
 
 /** Compact diagnostic severity. */
 export type DoctorStatus = 'pass' | 'warn' | 'fail';
@@ -247,14 +252,16 @@ const outputShapes: Record<ToolName, Readonly<Record<string, unknown>>> = {
         usage: stringProperty,
       }, ['path', 'description', 'usage']),
     },
-  }, ['count', 'commands']),
+    executor: cliExecutionIdentityShape,
+  }, ['count', 'commands', 'executor']),
   execute_command: objectSchema({
+    executor: cliExecutionIdentityShape,
     exitCode: { type: 'integer' },
     durationMs: { type: 'number' },
     outputTail: stringProperty,
     truncated: { type: 'boolean' },
     timedOut: { type: 'boolean' },
-  }, ['exitCode', 'durationMs', 'outputTail', 'truncated', 'timedOut']),
+  }, ['executor', 'exitCode', 'durationMs', 'outputTail', 'truncated', 'timedOut']),
   record_drift: objectSchema({
     recorded: { type: 'boolean' },
     resource: stringProperty,

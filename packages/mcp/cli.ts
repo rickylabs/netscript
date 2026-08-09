@@ -136,6 +136,7 @@ export function createMcpCliServer(options: McpCliOptions = {}): McpServer {
   const exportSurfaceFlows = createExportSurfaceFlows(
     options.exportSurfaceCorpus ?? new EmbeddedExportSurfaceCorpus(),
   );
+  const commandExecutor = options.commandExecutor ?? new SpawnCommandExecutor();
   return createMcpServer({
     probe,
     environment,
@@ -199,9 +200,10 @@ export function createMcpCliServer(options: McpCliOptions = {}): McpServer {
       ),
       list_commands: createListCommandsFlow(
         options.commandCatalog ?? new StaticCommandCatalog(),
+        commandExecutor.identity,
       ),
       execute_command: createExecuteCommandFlow(
-        options.commandExecutor ?? new SpawnCommandExecutor(),
+        commandExecutor,
         options.commandPolicy ?? DEFAULT_COMMAND_POLICY,
       ),
       doctor: withReceipt(

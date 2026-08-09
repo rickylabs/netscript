@@ -19,5 +19,8 @@
 - PLAN-EVAL cycle 2: `PASS`; implementation authorized. Issue and PR are `status:impl`.
 - S1 recorded: identity compile-time RED exit 1 (missing third argument + identity property),
   execute→drift behavioral RED exit 1 (no receipt written), standalone characterization exit 0.
-- Next action: commit/push/comment S1, then S2 adds the MCP identity contract and restores the
-  intentionally red branch type-check before S3.
+- S2 implemented `CliExecutionIdentity`, executor-owned immutable identity, identity-bearing command
+  results and list output, standalone MCP-version-selected identity, schemas, and composition.
+  Targeted checks pass; identity tests 9/9; MCP full-export doc lint zero errors.
+- Next action: commit/push/comment S2, then S3 makes the minimal `run-agent-mcp.ts` host injection
+  and executes a temporary mismatched-version host entrypoint through the MCP server.
