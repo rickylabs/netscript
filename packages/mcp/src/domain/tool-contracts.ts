@@ -109,6 +109,7 @@ const inputShapes: Record<ToolName, Readonly<Record<string, unknown>>> = {
   execute_command: objectSchema({
     command: stringProperty,
     args: { type: 'array', items: stringProperty, maxItems: 32 },
+    resource: stringProperty,
   }, ['command']),
   record_drift: objectSchema({
     resource: stringProperty,
@@ -256,12 +257,13 @@ const outputShapes: Record<ToolName, Readonly<Record<string, unknown>>> = {
   }, ['count', 'commands', 'executor']),
   execute_command: objectSchema({
     executor: cliExecutionIdentityShape,
+    status: { enum: ['pass', 'fail'] },
     exitCode: { type: 'integer' },
     durationMs: { type: 'number' },
     outputTail: stringProperty,
     truncated: { type: 'boolean' },
     timedOut: { type: 'boolean' },
-  }, ['executor', 'exitCode', 'durationMs', 'outputTail', 'truncated', 'timedOut']),
+  }, ['executor', 'status', 'exitCode', 'durationMs', 'outputTail', 'truncated', 'timedOut']),
   record_drift: objectSchema({
     recorded: { type: 'boolean' },
     resource: stringProperty,

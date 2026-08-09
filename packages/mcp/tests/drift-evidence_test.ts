@@ -34,6 +34,7 @@ Deno.test('record drift refuses without a diagnostic receipt', async () => {
   assertStringIncludes(result.error.message, 'netscript plugin doctor --resource api');
   assertStringIncludes(result.error.message, 'MCP "doctor" or telemetry tools');
   assertStringIncludes(result.error.message, 'API introspection tools');
+  assertStringIncludes(result.error.message, 'MCP "execute_command"');
 });
 
 Deno.test('record drift refuses a stale diagnostic receipt', async () => {
@@ -170,6 +171,7 @@ Deno.test('a successful execute_command receipt satisfies the shared drift gate'
     execute: () =>
       Promise.resolve({
         executor: { mode: 'host', version: '9.9.9', command: ['netscript'] },
+        status: 'pass',
         exitCode: 0,
         durationMs: 1,
         outputTail: 'generated project files',
@@ -189,12 +191,12 @@ Deno.test('a successful execute_command receipt satisfies the shared drift gate'
     method: 'tools/call',
     params: {
       name: 'execute_command',
-      arguments: { command: 'generate', args: ['plugins'] },
+      arguments: { command: 'generate', args: ['plugins'], resource: 'registry' },
     },
   });
   assertEquals(executed?.result?.isError, false);
   assertEquals(evidence.receipt?.command, 'mcp execute_command');
-  assertEquals(evidence.receipt?.resource, 'project');
+  assertEquals(evidence.receipt?.resource, 'registry');
   assertEquals(evidence.receipt?.exitStatus, 0);
 
   const accepted = await server.handle({
@@ -203,10 +205,115 @@ Deno.test('a successful execute_command receipt satisfies the shared drift gate'
     method: 'tools/call',
     params: {
       name: 'record_drift',
-      arguments: { resource: 'project', summary: 'generated registry drift' },
+      arguments: { resource: 'registry', summary: 'generated registry drift' },
     },
   });
   assertEquals(accepted?.result?.isError, false);
+});
+
+Deno.test('a failed execute_command receipt cannot satisfy the shared drift gate', async () => {
+  const evidence = new MemoryEvidence();
+  const identity = { mode: 'host', version: '9.9.9', command: ['netscript'] } as const;
+  const executor: CommandExecutorPort = {
+    identity,
+    execute: () =>
+      Promise.resolve({
+        executor: identity,
+        status: 'fail',
+        exitCode: 1,
+        durationMs: 1,
+        outputTail: 'generation failed',
+        truncated: false,
+        timedOut: false,
+      }),
+  };
+  const server = createMcpCliServer({ diagnosticEvidence: evidence, commandExecutor: executor });
+
+  const executed = await server.handle({
+    jsonrpc: '2.0',
+    id: 22,
+    method: 'tools/call',
+    params: {
+      name: 'execute_command',
+      arguments: { command: 'generate', args: ['plugins'], resource: 'registry' },
+    },
+  });
+  assertEquals(executed?.result?.isError, false);
+  assertEquals(evidence.receipt?.command, 'mcp execute_command');
+  assertEquals(evidence.receipt?.resource, 'registry');
+  assertEquals(evidence.receipt?.exitStatus, 1);
+
+  const refused = await server.handle({
+    jsonrpc: '2.0',
+    id: 23,
+    method: 'tools/call',
+    params: {
+      name: 'record_drift',
+      arguments: { resource: 'registry', summary: 'generated registry drift' },
+    },
+  });
+  assertEquals(refused?.result?.isError, true);
+});
+
+Deno.test('every explicitly denied command overwrites green evidence with failure', async () => {
+  const denied = [
+    { command: 'deploy', args: [] },
+    { command: 'init', args: [] },
+    { command: 'db reset', args: [] },
+    { command: 'plugin remove', args: [] },
+    { command: 'ui:remove', args: [] },
+  ];
+  for (const [index, request] of denied.entries()) {
+    const evidence = new MemoryEvidence();
+    evidence.receipt = {
+      resource: 'project',
+      command: 'mcp doctor',
+      timestamp: new Date().toISOString(),
+      exitStatus: 0,
+    };
+    let executions = 0;
+    const identity = { mode: 'host', version: '9.9.9', command: ['netscript'] } as const;
+    const executor: CommandExecutorPort = {
+      identity,
+      execute: () => {
+        executions += 1;
+        return Promise.resolve({
+          executor: identity,
+          status: 'pass',
+          exitCode: 0,
+          durationMs: 1,
+          outputTail: '',
+          truncated: false,
+          timedOut: false,
+        });
+      },
+    };
+    const server = createMcpCliServer({ diagnosticEvidence: evidence, commandExecutor: executor });
+    const response = await server.handle({
+      jsonrpc: '2.0',
+      id: 40 + index,
+      method: 'tools/call',
+      params: {
+        name: 'execute_command',
+        arguments: { ...request, resource: 'project' },
+      },
+    });
+    assertEquals(response?.result?.isError, true);
+    assertEquals(executions, 0);
+    assertEquals(evidence.receipt?.command, 'mcp execute_command');
+    assertEquals(evidence.receipt?.exitStatus, 1);
+
+    const refused = await server.handle({
+      jsonrpc: '2.0',
+      id: 50 + index,
+      method: 'tools/call',
+      params: {
+        name: 'record_drift',
+        arguments: { resource: 'project', summary: 'must remain refused' },
+      },
+    });
+    assertEquals(refused?.result?.isError, true);
+  }
 });
 
 Deno.test('a public introspection output rejection cannot leave green evidence', async () => {

@@ -39,6 +39,7 @@ Deno.test('execute command allows plugin install supplied through command args',
       calls.push(input);
       return Promise.resolve({
         executor: executor.identity,
+        status: 'pass',
         exitCode: 0,
         durationMs: 1,
         outputTail: '',
@@ -87,6 +88,7 @@ Deno.test('execute command rejects denied paths before calling executor', async 
       called = true;
       return Promise.resolve({
         executor: executor.identity,
+        status: 'pass',
         exitCode: 0,
         durationMs: 1,
         outputTail: '',

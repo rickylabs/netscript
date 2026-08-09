@@ -136,6 +136,7 @@ Deno.test("agent MCP adapters expose real verbs and non-stub plugin doctor resul
       executed.push(request);
       return Promise.resolve({
         executor: { mode: "host", version: "9.9.9", command: ["netscript"] },
+        status: "pass",
         exitCode: 0,
         durationMs: 1,
         outputTail: "plugins listed",

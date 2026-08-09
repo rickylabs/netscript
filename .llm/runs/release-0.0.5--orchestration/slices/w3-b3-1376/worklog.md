@@ -57,6 +57,14 @@ mirror standalone, host, success, failure, and denial modes.
 | S2 exact-file format preflight | `deno fmt --check <10 changed TypeScript files>` | 0 | Changed TypeScript formatted; not substituted for final scoped-wrapper gate. |
 | S3 CLI host check | `deno check --unstable-kv --no-lock packages/cli/src/public/features/agent/mcp/run-agent-mcp.ts packages/cli/src/public/features/agent/mcp/cli-mcp-adapters_test.ts` | 0 | Host runtime resolver and composition type-check. |
 | S3 decisive host behavior | `deno test --no-lock --allow-all packages/cli/src/public/features/agent/mcp/cli-mcp-adapters_test.ts` | 0 | 4 passed, 0 failed. Temporary `9.9.9-host` entrypoint executed `generate plugins`; list/execute reported host version/command and no JSR CLI prefix. |
+| S4 focused MCP tests (first run) | focused drift/command suite | 1 | 23 passed, 1 failed: existing description test required the phrase `bounded combined output tail`; product behavior tests were green. Repaired wording without weakening test. |
+| S4 focused MCP tests (final) | `deno test --no-lock --allow-all packages/mcp/tests/{drift-evidence,command_adapters,command_flows,command_composition}_test.ts` | 0 | 24 passed, 0 failed. Success/failure receipt, all five denied commands, drift authorization/refusal, identity, and descriptions green. |
+| S4 CLI host regression | `deno test --no-lock --allow-all packages/cli/src/public/features/agent/mcp/cli-mcp-adapters_test.ts` | 0 | 4 passed, 0 failed. |
+| S4 publish assets (pre-regeneration) | `deno task check:publish-assets` | 1 | Expected stale `packages/mcp/src/publish-assets.generated.ts` after approved README policy change. |
+| S4 publish assets (regenerated) | `deno task gen:publish-assets` then `deno task check:publish-assets` | 0 | Only MCP generated README constant changed; no corpus root/selection/wiring change. |
+| S4 focused type-check | `deno check --unstable-kv --no-lock packages/mcp/mod.ts packages/mcp/cli.ts ...focused MCP/CLI tests` | 0 | Receipt/status/schema/documentation changes type-check. |
+| S4 MCP doc lint | `deno task doc:lint --root packages/mcp --pretty` | 0 | Full export map; `totalErrors: 0`. |
+| S4 MCP package tests | `deno task --cwd packages/mcp test` | 0 | 113 passed, 0 failed. |
 
 ## Phase status
 
@@ -66,3 +74,8 @@ remains the recorded S1 behavioral RED assigned to S4.
 
 S3 changes the shared #1375 composition file minimally: `version: host.version` plus an injected
 host-mode `SpawnCommandExecutor`; it does not touch docs-root, host config, environment, or corpus.
+
+S4 resolves the behavioral RED. `execute_command` accepts an optional named resource, writes success
+only for status `pass`, and overwrites with failure for non-zero/timeout/throw/denial. `list_commands`
+is explicitly receipt-exempt because it diagnoses no resource. README policy regeneration changed
+only the embedded README constant, not #1375 corpus selection or filesystem wiring.

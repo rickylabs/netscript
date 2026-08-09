@@ -16,7 +16,7 @@ truthfully authorize `record_drift`.
 - [x] S1 RED tests with separately recorded compile-time and behavioral failures
 - [x] S2 MCP execution-identity contract and standalone policy
 - [x] S3 minimal CLI host re-entry composition
-- [ ] S4 exit-aware receipts, refusal text, and published MCP documentation
+- [x] S4 exit-aware receipts, refusal text, and published MCP documentation
 - [ ] S5 full gates and serialized runtime-token request
 
 ## Validation

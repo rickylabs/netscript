@@ -111,9 +111,11 @@ export class SpawnCommandExecutor implements CommandExecutorPort {
       tail.append(new TextEncoder().encode(`${tail.result().outputTail ? '\n' : ''}timed_out`));
     }
     const output = tail.result();
+    const exitCode = timedOut ? 124 : status.code;
     return {
       executor: this.identity,
-      exitCode: timedOut ? 124 : status.code,
+      status: exitCode === 0 ? 'pass' : 'fail',
+      exitCode,
       durationMs: Math.max(0, Math.round(performance.now() - started)),
       outputTail: output.outputTail,
       truncated: output.truncated,

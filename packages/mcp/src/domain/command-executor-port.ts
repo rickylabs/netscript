@@ -18,6 +18,8 @@ export interface CliExecutionIdentity {
 export interface CommandExecutionResult {
   /** Truthful identity of the CLI process that produced this result. */
   readonly executor: CliExecutionIdentity;
+  /** Receipt-oriented outcome derived from the child exit code. */
+  readonly status: 'pass' | 'fail';
   /** Process exit code, or 124 when timed out. */ readonly exitCode: number;
   /** Wall-clock execution duration. */ readonly durationMs: number;
   /** Last bounded bytes of combined stdout and stderr. */ readonly outputTail: string;

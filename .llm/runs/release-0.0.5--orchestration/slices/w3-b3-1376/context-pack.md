@@ -31,3 +31,11 @@
   injection; no #1375 docs-root/config/corpus symbols were touched.
 - Next action: commit/push/comment S3, then S4 resolves the behavioral receipt RED, denial overwrite,
   refusal text, optional resource, and published MCP README policy.
+- S4 resolved the behavioral RED: successful execute authorizes same-resource drift; failed child
+  and all five named denials write failure and refuse drift. MCP tests 113/113, focused 24/24, CLI
+  host 4/4, full-export doc lint zero errors, focused check green.
+- README documents hosted vs standalone identity and receipt exemption/semantics. Mechanical
+  publish-asset regeneration changed only the embedded MCP README constant; no #1375 wiring.
+- Next action: commit/push/comment S4, then run S5 scoped check/lint/fmt, quality, arch, JSR,
+  publish dry-run, review-thread and other non-expensive gates. Request—not run—the serialized
+  `scaffold.runtime` token when otherwise green.

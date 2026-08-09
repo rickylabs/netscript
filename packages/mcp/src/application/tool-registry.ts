@@ -47,9 +47,10 @@ const summaries: Readonly<Record<ToolName, string>> = {
   list_package_exports: 'List one package export surface grouped by subpath.',
   get_export: 'Get one exact export signature and its JSDoc.',
   search_exports: 'Search export names and declaration shapes for related helpers.',
-  list_commands: 'List bounded CLI command descriptors from the injected command catalog.',
+  list_commands:
+    'List bounded CLI command descriptors and the truthful executor identity; this metadata-only tool writes no diagnostic receipt.',
   execute_command:
-    'Execute one CLI command through an explicit allowlist gate and return only a bounded combined output tail.',
+    'Execute one CLI command through an explicit allowlist gate, return its executor identity and bounded combined output tail, and write a resource receipt.',
   record_drift:
     'Record drift only after a fresh successful diagnostic receipt for the same resource.',
   list_api_services:
