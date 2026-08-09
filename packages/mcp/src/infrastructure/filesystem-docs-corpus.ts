@@ -7,8 +7,11 @@ import {
   type DocsSection,
   type DocsSummary,
   MAX_INDEXED_DOC_LENGTH,
+  normalizeDocsSlug,
   slugifyDocsHeading,
-} from '../domain/docs-corpus-port.ts';
+} from '../domain/docs/docs-corpus-port.ts';
+import { GuidanceIndex } from '../domain/docs/guidance-index.ts';
+import type { GuidanceResult } from '../domain/docs/guidance-contract.ts';
 
 const EXCLUDED_DIRECTORIES = new Set(['_plan', '_data', '_components', '_includes']);
 
@@ -44,6 +47,7 @@ export class FilesystemDocsCorpus implements DocsCorpusPort {
   #cache = new Map<string, CachedSource>();
   #documents = new Map<string, DocsDocument>();
   #aliases = new Map<string, string>();
+  #guidance = new GuidanceIndex([]);
 
   /** Configure a corpus rooted at a public Markdown directory. */
   constructor(options: FilesystemDocsCorpusOptions) {
@@ -72,7 +76,7 @@ export class FilesystemDocsCorpus implements DocsCorpusPort {
   /** Retrieve the current public document matching a normalized slug or alias. */
   async get(slug: string): Promise<DocsDocument | undefined> {
     await this.#refresh();
-    const normalized = normalizeSlug(slug);
+    const normalized = normalizeDocsSlug(slug);
     const canonicalSlug = this.#aliases.get(normalized) ?? normalized;
     const document = this.#documents.get(canonicalSlug);
     if (!document) return undefined;
@@ -80,6 +84,12 @@ export class FilesystemDocsCorpus implements DocsCorpusPort {
       return { ...document, redirectedFrom: normalized };
     }
     return document;
+  }
+
+  /** Resolve current section-level guidance through the shared index. */
+  async findGuidance(intent: string): Promise<GuidanceResult> {
+    await this.#refresh();
+    return this.#guidance.find(intent);
   }
 
   async #refresh(): Promise<void> {
@@ -94,8 +104,9 @@ export class FilesystemDocsCorpus implements DocsCorpusPort {
     }
     const seen = new Set<string>();
     const sources: RawDocsSource[] = [];
-    for await (const path of walkMarkdown(rootReal)) {
-      if (!isPublicDocsPath(relative(rootReal, path))) continue;
+    for await (const path of walkDocsSources(rootReal)) {
+      const relativePath = relative(rootReal, path);
+      if (!isPublicDocsSource(relativePath) || !isPublicDocsPath(relativePath)) continue;
       const realPath = await Deno.realPath(path);
       if (!isWithinRoot(rootReal, realPath)) continue;
       seen.add(realPath);
@@ -108,7 +119,7 @@ export class FilesystemDocsCorpus implements DocsCorpusPort {
         this.#cache.set(realPath, cached);
       }
       sources.push({
-        slug: slugFromPath(relative(rootReal, realPath)),
+        slug: docsSlugFromPath(relativePath),
         source: cached.source,
       });
     }
@@ -122,10 +133,11 @@ export class FilesystemDocsCorpus implements DocsCorpusPort {
     }
     this.#documents = documents;
     this.#aliases = aliases;
+    this.#guidance = new GuidanceIndex(documents.values());
   }
 }
 
-async function* walkMarkdown(directory: string): AsyncGenerator<string> {
+async function* walkDocsSources(directory: string): AsyncGenerator<string> {
   const entries = [];
   for await (const entry of Deno.readDir(directory)) entries.push(entry);
   entries.sort((a, b) => a.name.localeCompare(b.name));
@@ -133,8 +145,55 @@ async function* walkMarkdown(directory: string): AsyncGenerator<string> {
     if (entry.name.startsWith('_')) continue;
     const path = resolve(directory, entry.name);
     if (entry.isDirectory) {
-      if (!EXCLUDED_DIRECTORIES.has(entry.name)) yield* walkMarkdown(path);
-    } else if ((entry.isFile || entry.isSymlink) && extname(entry.name).toLowerCase() === '.md') {
+      if (!EXCLUDED_DIRECTORIES.has(entry.name)) yield* walkDocsSources(path);
+    } else if (
+      (entry.isFile || entry.isSymlink) &&
+      ['.md', '.txt'].includes(extname(entry.name).toLowerCase())
+    ) {
+      yield path;
+    }
+  }
+}
+
+/** Return whether a root can be indexed by the same policy used by the filesystem adapter. */
+export function isIndexableDocsRoot(root: string): boolean {
+  let rootReal: string;
+  try {
+    rootReal = Deno.realPathSync(resolve(root));
+  } catch (error) {
+    if (error instanceof Deno.errors.NotFound) return false;
+    throw error;
+  }
+  const sources: RawDocsSource[] = [];
+  for (const path of walkDocsSourcesSync(rootReal)) {
+    const relativePath = relative(rootReal, path);
+    if (!isPublicDocsSource(relativePath) || !isPublicDocsPath(relativePath)) continue;
+    const realPath = Deno.realPathSync(path);
+    if (!isWithinRoot(rootReal, realPath)) continue;
+    sources.push({
+      slug: docsSlugFromPath(relativePath),
+      source: Deno.readTextFileSync(realPath),
+    });
+  }
+  if (sources.length === 0) return false;
+  try {
+    return processDocsSources(sources).documents.size > 0;
+  } catch {
+    return false;
+  }
+}
+
+function* walkDocsSourcesSync(directory: string): Generator<string> {
+  const entries = [...Deno.readDirSync(directory)].sort((a, b) => a.name.localeCompare(b.name));
+  for (const entry of entries) {
+    if (entry.name.startsWith('_')) continue;
+    const path = resolve(directory, entry.name);
+    if (entry.isDirectory) {
+      if (!EXCLUDED_DIRECTORIES.has(entry.name)) yield* walkDocsSourcesSync(path);
+    } else if (
+      (entry.isFile || entry.isSymlink) &&
+      ['.md', '.txt'].includes(extname(entry.name).toLowerCase())
+    ) {
       yield path;
     }
   }
@@ -149,12 +208,12 @@ export function processDocsSources(
   const rawAliases = new Map<string, string>();
 
   for (const entry of sources) {
-    const rawSlug = normalizeSlug(entry.slug);
+    const rawSlug = normalizeDocsSlug(entry.slug);
     const fm = parseFrontMatter(entry.source);
 
     if (fm.layout === 'layouts/redirect.vto' || (fm.redirectTo && !fm.body.trim())) {
       if (fm.redirectTo) {
-        const targetSlug = normalizeSlug(fm.redirectTo);
+        const targetSlug = normalizeDocsSlug(fm.redirectTo);
         if (rawAliases.has(rawSlug) && rawAliases.get(rawSlug) !== targetSlug) {
           throw new Error(
             `Duplicate docs alias: '${rawSlug}' maps to both '${
@@ -171,7 +230,7 @@ export function processDocsSources(
     documents.set(document.slug, document);
 
     if (fm.oldUrl) {
-      const aliasSlug = normalizeSlug(fm.oldUrl);
+      const aliasSlug = normalizeDocsSlug(fm.oldUrl);
       if (rawAliases.has(aliasSlug) && rawAliases.get(aliasSlug) !== document.slug) {
         throw new Error(
           `Duplicate docs alias: '${aliasSlug}' maps to both '${
@@ -337,15 +396,15 @@ function snippet(content: string, term?: string): string {
   }`;
 }
 
-function slugFromPath(path: string): string {
-  const normalized = path.split(SEPARATOR).join('/').replace(/\.md$/i, '');
-  const withoutIndex = normalized === 'index' ? 'index' : normalized.replace(/\/index$/, '');
-  return normalizeSlug(withoutIndex);
+/** Convert a public docs source path into its shared canonical slug. */
+export function docsSlugFromPath(path: string): string {
+  return normalizeDocsSlug(path.split(SEPARATOR).join('/'));
 }
 
-/** Normalize a docs lookup slug. */
-export function normalizeSlug(slug: string): string {
-  return slug.trim().replace(/^\/+|\/+$/g, '').replace(/\.md$/i, '') || 'index';
+/** Admit public Markdown plus exactly the root task-router file `llms.txt`. */
+export function isPublicDocsSource(relativePath: string): boolean {
+  const normalized = relativePath.split(SEPARATOR).join('/');
+  return extname(normalized).toLocaleLowerCase() === '.md' || normalized === 'llms.txt';
 }
 
 function titleFromSlug(slug: string): string {

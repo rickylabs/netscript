@@ -34,7 +34,7 @@ jobs:
       - name: Setup Deno
         uses: denoland/setup-deno@v2
         with:
-          deno-version: "2.9.0"
+          deno-version: "2.9.5"
 
       - name: Self-check the classifier
         run: >-
@@ -95,7 +95,7 @@ jobs:
         if: env.RUN == 'true'
         uses: denoland/setup-deno@v2
         with:
-          deno-version: "2.9.0"
+          deno-version: "2.9.5"
 
       # Beta rollout is observational. Issue #309 owns the stable-line flip to blocking.
       - name: Classify public API changes

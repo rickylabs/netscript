@@ -2,7 +2,7 @@
  * Default values used when the user accepts defaults or runs in CI mode.
  */
 export const SCAFFOLD_DEFAULTS = {
-  DENO_VERSION: '2.9.0',
+  DENO_VERSION: '2.9.5',
   VERSION: '1.0.0',
   LOG_LEVEL: 'info' as const,
   LOG_FORMAT: 'text' as const,

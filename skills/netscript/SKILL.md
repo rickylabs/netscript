@@ -9,6 +9,9 @@ NetScript ships one version-locked agentic surface: the `netscript` CLI, the Net
 tools, and these skills share one vocabulary. This router only dispatches — **it is not useful
 alone.** Pick a workflow skill below and follow its tables.
 
+Before implementing an unfamiliar NetScript API or architecture, call MCP `find_guidance` with the
+task. Use `search_docs` for literal lookup and `get_doc` for exact retrieval.
+
 ## Routing
 
 | The task is about... | Go to |

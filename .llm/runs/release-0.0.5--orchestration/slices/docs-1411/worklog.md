@@ -1,0 +1,227 @@
+# Worklog — docs #1411
+
+## 2026-08-09 — Plan gate
+
+- `PLAN-EVAL: N/A` — this is a small mechanical docs-source correction with the exact four known
+  omissions, established `releaseSpecifier` pattern, fixed boundaries, and required gates supplied
+  by issue #1411; no architecture, sequencing, or scope decision remains open.
+- Baseline: `origin/main@399f60185d5d01ae68764a8f48d1f716ca3a51aa` on
+  `fix/docs-versionless-jsr-specifiers`.
+- Scope overlay: `.llm/harness/archetypes/SCOPE-docs.md`; no package/plugin archetype applies.
+- Source edits have not started at this checkpoint.
+
+## Design
+
+- Public surface: rendered documentation install commands and import-map examples only.
+- Domain vocabulary: `releaseSpecifier`, versioned NetScript JSR specifier, docs-source occurrence.
+- Ports: Lume/Vento rendering through the existing docs-site build; no new abstraction.
+- Constants: reuse the existing `releaseSpecifier`; introduce no new finite values.
+- Commit slices: S1 repairs every verified unpinned `jsr:@netscript/*` source occurrence and is
+  proven by the docs build/static gates plus `check:netscript-jsr-specifiers`.
+- Deferred scope: generated corpus/assets, packages, plugins, lockfiles, runtime E2E, Aspire, and
+  containers remain owner-excluded.
+- Contributor path: copy the existing expression-string pattern from
+  `docs/site/data-persistence/how-to/database-migration.md` or the Vento interpolation pattern used
+  throughout `docs/site`.
+
+## Gate evidence
+
+### Whole-tree sweep
+
+- Raw textual inventory on `399f60185`: 76 `jsr:@netscript/` prefixes under all of `docs/site`,
+  including private `_plan` history, the `_includes/readme-template.md` placeholder, wildcard/prose
+  references, and repeated descriptive/checklist text.
+- Defect-class inventory: five version-less install/import specifiers across the four owner-named
+  sites (three CLI install targets and two import-map targets). All five now append the established
+  `releaseSpecifier` value.
+- The pre-fix root `deno task check:netscript-jsr-specifiers` exited 0 with `failures=0` because the
+  corrected docs have not yet been regenerated into `packages/mcp/src/publish-assets.generated.ts`.
+  No allowance or narrowing was added. A direct docs-source guard would close that timing gap, but
+  adding validation tooling is beyond this deliberately mechanical docs-source slice; the mandatory
+  corpus-regeneration guard remains the downstream enforcement point.
+
+### Commands
+
+| Command | Raw exit | Evidence |
+| --- | ---: | --- |
+| `cd docs/site && deno task build` | 0 | source format OK; 617 files generated; rendered homepage semantics OK |
+| `cd docs/site && deno task check:links` | 0 | 32,772 internal links across 220 pages resolve |
+| `cd docs/site && deno task check:caveats` | 0 | 18 caveat markers across 14 pages resolve |
+| `cd docs/site && deno task test:source-format` | 0 | 3 passed, 0 failed |
+| `deno task check:netscript-jsr-specifiers` | 0 | scanned 2,328; allowances 1; ranges 0; failures 0 |
+| targeted `deno fmt --check` | 0 | both modified checker/test TypeScript files formatted |
+| `git diff --check` | 0 | no whitespace errors |
+
+After targeted formatting changed the checker source, the complete docs gate set and root JSR gate
+were rerun once more on the final working-tree content; every raw exit remained 0 with the same
+counts above.
+
+Rendered spot checks found all five repaired targets at `@0.0.4` in the generated pages: the three
+CLI install commands and both `author-a-plugin` import-map values.
+
+## Reconcile
+
+- Issue #1411 is fully resolved by this slice, so the draft PR body must contain `Closes #1411`.
+- No scope, doctrine, or debt readjustment was discovered. IMPL-EVAL, CI, and merge remain with the
+  orchestrator; this Tier-D lane does not self-certify.
+- Implementation commit `9d27817e8` was pushed with the explicit refspec
+  `HEAD:refs/heads/fix/docs-versionless-jsr-specifiers`.
+- Draft PR #1412 targets `main`, carries `Closes #1411`, milestone `0.0.5`, docs-only CI labels,
+  and exactly one lifecycle label: `status:impl-eval`. The structured IMPL evidence comment is
+  https://github.com/rickylabs/netscript/pull/1412#issuecomment-5230514313.
+
+## 2026-08-09 — Round 2 review correction
+
+- The orchestrator accepted the original five repairs and found four additional published
+  version-less `deno add jsr:@netscript/ai` instructions that the first sweep misclassified.
+- Corrected audit contract: reject every published `deno add`, `deno install`, or `deno x` command,
+  and every import-map value, that names `jsr:@netscript/*` without a version. Exclude unpublished
+  `_plan/**` and `_includes/**`; package placeholders remain valid when `releaseSpecifier` follows
+  the placeholder.
+- This is a review correction inside the existing mechanical slice. PLAN-EVAL remains N/A;
+  source edits had not begun at this Round 2 checkpoint.
+
+### Round 2 implementation and sweep
+
+- Pinned four additional published `deno add jsr:@netscript/ai` instructions in `ai/engine.md`,
+  `ai/index.md`, and `tutorials/chat/05-mcp.md` using `{{ releaseSpecifier }}`.
+- Final defect total: nine unpinned published install/import specifiers repaired across eight source
+  sites. The first round repaired five; Round 2 repaired four.
+- Definition-driven final sweep: 55 published candidates (53 `deno add` / `deno install` /
+  `deno x` commands and two import-map values), zero unpinned. All underscore-owned non-source
+  trees were excluded; already-pinned package placeholders remained valid.
+- Rendered spot checks found all four Round 2 instructions at `jsr:@netscript/ai@0.0.4`.
+
+### Round 2 gate evidence
+
+| Command | Raw exit | Evidence |
+| --- | ---: | --- |
+| published-source command/import-map sweep | 0 | candidates 55; commands 53; import-map values 2; unpinned 0 |
+| `cd docs/site && deno task build` | 0 | source format OK; 617 files generated; rendered homepage semantics OK |
+| `cd docs/site && deno task check:links` | 0 | 32,772 internal links across 220 pages resolve |
+| `cd docs/site && deno task check:caveats` | 0 | 18 caveat markers across 14 pages resolve |
+| `cd docs/site && deno task test:source-format` | 0 | 3 passed, 0 failed |
+| `deno task check:netscript-jsr-specifiers` | 0 | scanned 2,328; allowances 1; ranges 0; failures 0 |
+| `git diff --check` | 0 | no whitespace errors |
+
+The root guard remains downstream-only evidence until corpus regeneration. No direct docs-source
+guard was added; the orchestrator will carry the demonstrated reachability gap to follow-up work.
+
+### Round 2 handoff
+
+- Commit `362714bbc` was pushed with explicit refspec
+  `HEAD:refs/heads/fix/docs-versionless-jsr-specifiers`.
+- Draft PR #1412's body now carries the superseding nine-repair / 55-candidate / zero-unpinned
+  evidence. Round 2 IMPL evidence comment:
+  https://github.com/rickylabs/netscript/pull/1412#issuecomment-5230543249.
+- Separate-session IMPL-EVAL, CI, acceptance mirror/close gate, and merge remain orchestrator-owned.
+
+## 2026-08-09 — Round 3 orchestrator-directed rescope
+
+- During independent Round 2 verification, the orchestrator found a pre-existing `main` defect:
+  three published reference pages omit `templateEngine: [vento, md]`, leaving Vento-looking body
+  text unprocessed. This PR did not introduce the defect; the orchestrator explicitly folded the
+  same-surface fix and rendered-output reachability gate into #1412.
+- Round 3 order is locked: extend the gate first; prove RED against the preserved pre-fix `_site`;
+  then fix front matter and legitimate documented-template syntax; prove GREEN; rerun all docs and
+  root static gates.
+- Existing homepage semantic assertions must remain intact. Any legitimate documented Vento syntax
+  receives only a path/token/count-bounded exclusion, recorded with its reason.
+
+### Round 3 RED proof
+
+- Extended `check-rendered-output.ts` to retain the homepage semantic assertions and recursively
+  scan every rendered HTML file for literal `{{ … }}` tokens.
+- Pre-fix `deno task check:rendered-output` raw exit: **1**.
+- Exact failures: `reference/streams/index.html: {{ releaseSpecifier }}` and
+  `reference/plugin-auth/index.html: {{ releaseVersion }}`.
+- `reference/cli/index.html` contains intentional scaffold-template documentation rather than a
+  leaked release placeholder. Its allowance is bounded to that one path, `{{var}}` at most once,
+  and `{{var | pipe}}` at most three times. No page-wide or pattern-wide exclusion exists.
+
+### Round 3 implementation and GREEN proof
+
+- Added `templateEngine: [vento, md]` to `reference/streams/index.md`,
+  `reference/cli/index.md`, and `reference/plugin-auth/index.md`.
+- Preserved the CLI page's intentional scaffold-template examples by emitting the braces through
+  Vento expressions before Markdown rendering; the reader-visible tokens remain unchanged.
+- Post-fix standalone `deno task check:rendered-output` raw exit: **0** — homepage semantics pass,
+  220 rendered HTML files scanned, exactly four documented-syntax allowances consumed.
+- Rendered evidence: streams CLI is `jsr:@netscript/plugin-streams@0.0.4/cli`; auth version is
+  `"0.0.4"`; neither page contains a literal `{{ … }}`. The CLI page contains only the four exact,
+  intentional documented tokens covered by the bounded allowance.
+- Added scanner tests for a leak on a non-homepage page, the exact permitted CLI tokens, and an
+  over-limit CLI token. Final test result: 6 passed, 0 failed.
+
+### Round 3 final gate evidence
+
+| Command | Raw exit | Evidence |
+| --- | ---: | --- |
+| pre-fix `deno task check:rendered-output` | 1 | named streams `releaseSpecifier` and plugin-auth `releaseVersion` leaks |
+| post-fix `deno task check:rendered-output` | 0 | homepage semantics; 220 HTML files; four bounded syntax allowances |
+| published-source command/import-map sweep | 0 | 55 candidates; zero unpinned |
+| `cd docs/site && deno task build` | 0 | 617 files generated; full rendered gate green |
+| `cd docs/site && deno task check:links` | 0 | 32,772 internal links across 220 pages resolve |
+| `cd docs/site && deno task check:caveats` | 0 | 18 caveat markers across 14 pages resolve |
+| `cd docs/site && deno task test:source-format` | 0 | 6 passed, 0 failed |
+| `deno task check:netscript-jsr-specifiers` | 0 | scanned 2,328; allowances 1; ranges 0; failures 0 |
+| `git diff --check` | 0 | no whitespace errors |
+
+### Round 3 handoff
+
+- Commit `f94c0ac28` was pushed with explicit refspec
+  `HEAD:refs/heads/fix/docs-versionless-jsr-specifiers`.
+- Draft PR #1412's body now records the orchestrator-directed scope adjustment, exact RED/GREEN
+  proof, bounded CLI documentation allowance, rendered evidence, and superseding six-test gate
+  result. Round 3 IMPL evidence comment:
+  https://github.com/rickylabs/netscript/pull/1412#issuecomment-5230615501.
+- Separate-session IMPL-EVAL, CI, acceptance mirror/close gate, and merge remain orchestrator-owned.
+
+## 2026-08-09 — CI root-graph repair
+
+- Separate-session IMPL-EVAL passed at exact head `d2570f485`:
+  https://github.com/rickylabs/netscript/pull/1412#issuecomment-5230748425.
+- CI `check-test` then failed with TS2307 because `check-source-format_test.ts` imported
+  `check-rendered-output.ts`, making its docs-workspace-only `lume/deps/dom.ts` import reachable
+  from the root import map. The docs-local six-test task was green because it resolves through
+  `docs/site/deno.json`; it was insufficient evidence for the root graph.
+- Mechanical repair is locked: extract `collectHtmlFiles`, the bounded allowance table, and
+  `assertNoLiteralVentoPlaceholders` into a DOM-free sibling module; production and test callers
+  both import that module. No suppression, exclusion, dependency/import-map change, or gate
+  weakening is allowed.
+
+### CI repair implementation and evidence
+
+- Moved the pure placeholder allowance table, HTML-file collection, and literal-placeholder scan
+  into `check-rendered-placeholders.ts`, which has no `lume/*` or DOM dependency.
+- `check-rendered-output.ts` retains the single production entry point and DOM-based homepage
+  semantics, importing only the extracted scanner. `check-source-format_test.ts` now imports the
+  DOM-free module directly.
+
+| Command | Raw exit | Evidence |
+| --- | ---: | --- |
+| `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root docs/site --ext ts` | 1 | directly selects 19 docs TS files under the root map; 11 pre-existing findings in `_config.ts`, `ai-tooling.ts`, and DOM-owning `check-rendered-output.ts` |
+| root wrapper scoped to the affected test + DOM-free scanner | 0 | 2 files; 1 batch; 0 findings |
+| `deno task check` | 0 | 2,680 files; 23 batches; 0 findings |
+| `deno task test` | 0 | affected docs test checks; 3,055 passed / 575 steps; 0 failed; 17 ignored |
+| `cd docs/site && deno task test:source-format` | 0 | 6 passed; 0 failed |
+| `cd docs/site && deno task check:rendered-output` | 0 | homepage semantics; 220 HTML files; four bounded allowances |
+| `cd docs/site && deno task build` | 0 | 617 files generated; full rendered gate green |
+| explicit-file scoped format wrapper | 0 | three owned TypeScript files; 0 findings |
+| `git diff --check` | 0 | no whitespace errors |
+
+The exact broad docs-root wrapper command is not a valid green verdict for this repository layout:
+it ignores `docs/site/deno.json` and directly selects known Lume-bound entry points under the root
+import map. The narrower root wrapper and, decisively, root `deno task test` prove the CI regression
+is fixed without adding Lume to the root graph. No unrelated Lume surface was changed.
+
+### CI repair handoff
+
+- Commit `fa6146c67` was pushed with explicit refspec
+  `HEAD:refs/heads/fix/docs-versionless-jsr-specifiers`.
+- Draft lifecycle had already advanced under orchestrator control; PR #1412's body now adds the S4
+  evidence, checks the independently proven IMPL-EVAL DoD row, retains `Refs #1411`, and leaves the
+  current-head CI/close-gate row unchecked pending automation at the new head.
+- Structured S4 IMPL evidence comment:
+  https://github.com/rickylabs/netscript/pull/1412#issuecomment-5230841642.
+- Re-evaluation, CI, issue acceptance/closure, and merge remain orchestrator-owned.

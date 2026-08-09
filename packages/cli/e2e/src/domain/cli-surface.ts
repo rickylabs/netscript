@@ -75,6 +75,7 @@ export const GATE = {
   SCAFFOLD_UI_ADD_AI: 'scaffold.ui-add-ai',
   SCAFFOLD_UI_LOCAL_SOURCE: 'scaffold.ui-local-source',
   DATABASE_INIT: 'database.init',
+  DATABASE_MIGRATION_ARTIFACTS: 'database.migration-artifacts',
   DATABASE_LIST: 'database.list',
   DATABASE_VALIDATE: 'database.validate',
   DATABASE_DEPLOY: 'database.deploy',
@@ -100,7 +101,9 @@ export const GATE = {
   RUNTIME_READINESS_FIXTURE: 'runtime.readiness-fixture',
   RUNTIME_ASPIRE_RESTORE: 'runtime.aspire-restore',
   RUNTIME_ASPIRE_START: 'runtime.aspire-start',
+  RUNTIME_CAPTURE_DB_ALLOCATION_FIRST: 'runtime.capture-db-allocation-first',
   RUNTIME_ASPIRE_RESTART_AFTER_DB: 'runtime.aspire-restart-after-db',
+  RUNTIME_CAPTURE_DB_ALLOCATION_SECOND: 'runtime.capture-db-allocation-second',
   RUNTIME_WAIT_DATABASE: 'runtime.wait.database',
   RUNTIME_WAIT_POSTGRES: 'runtime.wait.postgres',
   RUNTIME_WAIT_MYSQL: 'runtime.wait.mysql',
@@ -125,6 +128,7 @@ export const GATE = {
   BEHAVIOR_WORKERS_TRIGGER_HEALTH_JOB: 'behavior.workers-trigger-health-job',
   BEHAVIOR_WORKERS_EXECUTIONS: 'behavior.workers-executions',
   BEHAVIOR_SERVICE_HEALTH: 'behavior.service-health',
+  BEHAVIOR_LIVE_DB_ENDPOINT: 'behavior.live-db-endpoint',
   BEHAVIOR_MCP_ENDPOINT_DIRECTORY: 'behavior.mcp-endpoint-directory',
   BEHAVIOR_DB_STATUS_PRESERVES_APPHOST: 'behavior.db-status-preserves-apphost',
   BEHAVIOR_ENDPOINT_READINESS: 'behavior.endpoint-readiness',
@@ -138,6 +142,7 @@ export const GATE = {
   BEHAVIOR_AUTH_LIVE: 'behavior.auth-live',
   BEHAVIOR_AUTH_READY: 'behavior.auth-ready',
   BEHAVIOR_AUTH_SESSION: 'behavior.auth-session',
+  BEHAVIOR_STREAMS_PRODUCER_RECONNECT: 'behavior.streams.producer-reconnect',
   BEHAVIOR_AI_CHAT_ROUTE: 'behavior.ai-chat-route',
   BEHAVIOR_PLUGINS_HEALTH: 'behavior.plugins-health',
   DEPLOY_DENO_DEPLOY_PLAN: 'deploy.deno-deploy.plan',
@@ -192,6 +197,18 @@ export type SuiteId = ScaffoldSuiteId | DeploySuiteId | QuickstartSuiteId;
 export type GatePhase = typeof GATE_PHASE[keyof typeof GATE_PHASE];
 export type StaticGateId = typeof GATE[keyof typeof GATE];
 export type AspireResource = typeof ASPIRE_RESOURCE[keyof typeof ASPIRE_RESOURCE];
+
+/** KV-backed first-party background runtimes that require generated-project health proof. */
+export const KV_BACKGROUND_RUNTIME_RESOURCES = [
+  ASPIRE_RESOURCE.WORKERS,
+  ASPIRE_RESOURCE.SAGAS,
+  ASPIRE_RESOURCE.TRIGGERS,
+] as const satisfies readonly AspireResource[];
+
+/** API and background resources in stable runtime-wait execution order. */
+export const KV_BACKGROUND_RUNTIME_WAIT_RESOURCES = KV_BACKGROUND_RUNTIME_RESOURCES.flatMap(
+  (runtime) => [`${runtime}-api` as const, runtime],
+) satisfies readonly AspireResource[];
 export type PluginGateId = `scaffold.plugin.${PluginKind}`;
 export type RuntimeWaitGateId = `runtime.wait.${AspireResource}`;
 export type GateId = StaticGateId | PluginGateId | RuntimeWaitGateId;

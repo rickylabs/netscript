@@ -4,9 +4,9 @@
 [![CI](https://github.com/rickylabs/netscript/actions/workflows/ci.yml/badge.svg)](https://github.com/rickylabs/netscript/actions/workflows/ci.yml)
 [![Docs](https://img.shields.io/badge/docs-rickylabs.github.io-blue)](https://rickylabs.github.io/netscript/)
 
-**The Model Context Protocol server for NetScript: 21 token-bounded tools for app health, correlated
-execution debugging, framework telemetry, CLI diagnostics, documentation search, and first-party
-export discovery over stdio.**
+**The Model Context Protocol server for NetScript: 22 token-bounded tools for app health, correlated
+execution debugging, framework telemetry, CLI diagnostics, intent-aware documentation guidance,
+and first-party export discovery over stdio.**
 
 Point Claude Code or VS Code at a running NetScript app and the agent can ask _"is the app
 healthy?"_, _"why did the last import job fail?"_, and _"what is slowing down `checkout`?"_ — and
@@ -24,7 +24,7 @@ Aspire's own MCP server: Aspire speaks resources and containers; this server spe
 
 ## Why agents like it
 
-- **21 token-bounded tools** — every successful result is capped server-side (50 array items, 2,000
+- **22 token-bounded tools** — every successful result is capped server-side (50 array items, 2,000
   characters per string) before it reaches the model; the analytics tools never return raw spans at
   all.
 - **Framework-semantic trace intelligence** — tools classify telemetry into `worker`, `saga`,
@@ -38,6 +38,8 @@ Aspire's own MCP server: Aspire speaks resources and containers; this server spe
 - **Matched agent surface** — `netscript agent init` writes host configuration pinned to your
   installed CLI version and installs the skills that ship with that same release, so the tool
   catalog the agent sees comes from the release it runs.
+- **Intent-aware guidance** — `find_guidance` accepts the task in the caller's words and returns a
+  bounded, ordered set of section citations and cited code excerpts.
 - **Zero npm MCP SDK** — a minimal newline-delimited JSON-RPC transport keeps the dependency graph
   lean and the lockfile stable.
 
@@ -45,7 +47,7 @@ Aspire's own MCP server: Aspire speaks resources and containers; this server spe
 
 ```mermaid
 flowchart LR
-    A["Agent host<br/>(Claude Code, VS Code, ...)"] <-- "JSON-RPC / stdio" --> S["netscript agent mcp<br/>21 tools · bounded results"]
+    A["Agent host<br/>(Claude Code, VS Code, ...)"] <-- "JSON-RPC / stdio" --> S["netscript agent mcp<br/>22 tools · bounded results"]
     S --> T["Telemetry endpoint<br/>(OTLP read model)"]
     S --> D["Docs corpus<br/>(public Markdown)"]
     S --> E["Export corpus<br/>(pinned deno doc JSON)"]
@@ -60,6 +62,24 @@ playbook, MCP is the eyes. It deliberately wraps the CLI rather than reimplement
 `list_commands` reflects the live command tree, and `execute_command` shells the CLI through the
 policy gate. MCP exists for what a shell cannot cheaply give an agent — bounded aggregation,
 cross-domain diagnostics, and documentation lookup.
+
+### CLI executor identity
+
+Both command tools return an `executor` identity with `mode`, `version`, and the resolved fixed
+command prefix, so the agent can see which CLI it is driving.
+
+- **CLI-hosted server (`netscript agent mcp`)**: re-enters the hosting CLI. Script and global-install
+  runs use the current Deno executable plus the running main module; compiled installs execute the
+  current binary directly. No JSR CLI is downloaded.
+- **Standalone server (`deno x jsr:@netscript/mcp@<version>/cli`)**: has no host CLI, so the MCP
+  release intentionally selects `jsr:@netscript/cli@<MCP_PACKAGE_VERSION>` as its compatible child
+  and reports `mode: "standalone"`. This is an explicit MCP-owned compatibility policy, not a claim
+  that publish-asset generation compares the two package versions.
+
+`list_commands` is receipt-exempt because catalog enumeration diagnoses no project resource.
+`execute_command` accepts an optional `resource` (default `project`) and replaces that resource's
+diagnostic receipt on every attempt: exit zero writes `exitStatus: 0`; policy denial, timeout,
+adapter failure, or a non-zero child exit writes `exitStatus: 1`.
 
 ## Install
 
@@ -90,10 +110,14 @@ the pre-release line, and `netscript agent init` writes the correct pinned form 
 
 ## Quick example
 
+Before unfamiliar NetScript API or architecture work, call `find_guidance` with the task you intend
+to complete and follow its ordered citations. Use `search_docs` for literal lookup and `get_doc` for
+exact retrieval of a known document or section.
+
 **1. Wire up an agent host.** From a NetScript project root:
 
 ```bash
-$ netscript agent init
+$ netscript agent init --with-docs
 Installed NetScript agent integration for claude, vscode.
 ```
 
@@ -111,7 +135,9 @@ The generated `.mcp.json` runs the server for this project — equivalent to:
         "agent",
         "mcp",
         "--project-root",
-        "<project-root>"
+        "<project-root>",
+        "--docs-root",
+        "<project-root>/.netscript/docs"
       ]
     }
   }
@@ -125,7 +151,7 @@ The generated `.mcp.json` runs the server for this project — equivalent to:
 > **Agent:** calls `get_app_status` →
 > `{"status": "…", "counts": {…}, "domains": [{"domain": "worker", …}, …]}` — a health verdict with
 > per-domain summaries, not a span dump. Calls `search_docs {"query": "telemetry"}` →
-> `{"count": 1, "matches": [{"slug": "mcp", "title": "@netscript/mcp", "snippet": "…", "score": 35}]}`,
+> `{"count": 1, "matches": [{"slug": "pages/observability/telemetry", "title": "Telemetry", "snippet": "…", "score": 35}]}`,
 > then `get_doc` with the winning slug to read just the section it needs.
 
 When telemetry is unreachable, nothing crashes: `get_app_status` and the doctor's telemetry checks
@@ -151,8 +177,8 @@ results, and `get_run` returns a structured `run_not_found` error the agent can 
 | `list_package_exports`        | `package`             | Paginated declarations grouped by export subpath                             |
 | `get_export`                  | `symbol`              | One bounded declaration signature and JSDoc block                            |
 | `search_exports`              | `query`               | Ranked partial-name and declaration-shape matches                            |
-| `list_commands`               | —                     | Live CLI command descriptors                                                 |
-| `execute_command`             | `command`             | Exit code, duration, and bounded output tail; structured denial when blocked |
+| `list_commands`               | —                     | Live CLI descriptors plus resolved executor mode, version, and command       |
+| `execute_command`             | `command`; `resource` optional | Executor identity, status, exit code, duration, and bounded output tail |
 | `record_drift`                | `resource`, `summary` | Evidence-gated drift entry appended to project drift log                     |
 | `list_api_services`           | —                 | Discovered services, live spec status, source outcomes, and operation counts  |
 | `list_service_operations`     | `service`         | Bounded OpenAPI operation rows with honest truncation metadata                |
@@ -170,7 +196,8 @@ drift into `.netscript/agent/drift.jsonl`.
 
 - **Required evidence**: Requires a fresh successful diagnostic receipt (timestamped within 15
   minutes, `exitStatus: 0`) for the target resource. Receipts are automatically produced when
-  calling `doctor`, telemetry tools, or `netscript plugin doctor --resource <resource>`.
+  calling `doctor`, telemetry/API-introspection tools, `netscript plugin doctor --resource
+  <resource>`, or a successful `execute_command` carrying the same `resource`.
 - **Target & Scope**: The `resource` argument targets a specific plugin, service, or `'project'`.
   Receipts live at `.netscript/agent/diagnostics/<resource>.json`.
 - **Mutation behavior**: Appends a single JSON line to `.netscript/agent/drift.jsonl` under the
@@ -191,7 +218,7 @@ import { runMcpStdioServer } from '@netscript/mcp/cli';
 
 await runMcpStdioServer({
   projectRoot: Deno.cwd(),
-  // Omit docsRoot to use the package-embedded corpus, or select a filesystem corpus explicitly.
+  // Options beat environment, which beats an indexable .netscript/docs project bundle.
   docsRoot: Deno.env.get('NETSCRIPT_DOCS_ROOT'),
 });
 ```
@@ -289,9 +316,10 @@ requests. Tests and custom hosts can replace every source and the probe through
 
 - **Telemetry endpoint discovery** (tools and `doctor`): explicit `--endpoint`, then
   `NETSCRIPT_TELEMETRY_ENDPOINT`, then `ASPIRE_DASHBOARD_PORT`, then `http://localhost:18888`.
-- **Docs corpus**: by default the docs tools index the documentation shipped with the installed
-  package; set `--docs-root <path>` (or `NETSCRIPT_DOCS_ROOT`) to serve a project or site corpus
-  instead.
+- **Docs corpus**: explicit `--docs-root <path>`, then `NETSCRIPT_DOCS_ROOT`, then an indexable
+  `<projectRoot>/.netscript/docs`, then the bounded generated release fallback. `agent init
+  --with-docs` writes the installed root into every generated host command. `list_docs.corpus`
+  reports `kind`, resolved `root` (or `null`), and total `documentCount`.
 - **Service endpoint discovery** (library surface): `.netscript/agent-mcp.json` override, then the
   Aspire CLI machine-readable query, then an identity-bound run manifest, then
   `aspire/appsettings.json`; lower-priority disagreements remain visible as conflicts.

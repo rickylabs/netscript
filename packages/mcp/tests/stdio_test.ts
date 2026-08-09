@@ -41,11 +41,15 @@ Deno.test('stdio initialize, list, and unreachable doctor round trip', async () 
     );
     assertEquals(responses[0].result.serverInfo.name, '@netscript/mcp');
     assertEquals(responses[0].result.serverInfo.version, MCP_PACKAGE_VERSION);
-    assertEquals(responses[1].result.tools.length, 21);
+    assertEquals(responses[1].result.tools.length, 22);
     assert(typeof responses[0].result.instructions === 'string');
     assertStringIncludes(
       responses[0].result.instructions,
       'When debugging or calling a service HTTP API, follow the MCP path: list_api_services to discover the live service name, list_service_operations to select an operation, then get_operation_schema for its request and response contract before hand-rolling requests with curl.',
+    );
+    assertStringIncludes(
+      responses[0].result.instructions,
+      'Before implementing an unfamiliar NetScript API or architecture, call find_guidance with the task. Use search_docs for literal lookup and get_doc for exact retrieval.',
     );
     for (
       const name of [

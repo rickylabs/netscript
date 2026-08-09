@@ -1,30 +1,39 @@
-import { assertEquals, assertRejects, assertThrows } from '@std/assert';
+import { assertEquals, assertThrows } from '@std/assert';
 import { DurableStreamProducer } from '../../src/application/create-durable-stream.ts';
 import { createStreamTopicFixture } from '../../src/testing/mod.ts';
 
-Deno.test('DurableStreamProducer skips unserializable upsert payloads without throwing', async () => {
+Deno.test('DurableStreamProducer rejects unserializable writes through receipts', async () => {
   const previousUrl = Deno.env.get('DURABLE_STREAMS_URL');
+  const previousFetch = globalThis.fetch;
   Deno.env.set('DURABLE_STREAMS_URL', 'http://127.0.0.1:1');
-
-  const abort = new AbortController();
-  abort.abort();
+  globalThis.fetch = (() => Promise.resolve(new Response(null, { status: 200 }))) as typeof fetch;
 
   try {
     const producer = new DurableStreamProducer({
       streamPath: '/test',
       schema: createStreamTopicFixture(),
       producerId: 'test-producer',
-      signal: abort.signal,
     });
 
     const circular: Record<string, unknown> = { id: 'circular' };
     circular.self = circular;
 
-    producer.upsert('execution', circular);
-    producer.upsert('execution', { id: 'bigint', count: 1n });
+    const circularReceipt = producer.upsert('execution', circular);
+    const bigintReceipt = producer.upsert('execution', { id: 'bigint', count: 1n });
 
-    await assertRejects(() => producer.flush(), Error);
+    assertEquals(circularReceipt.accepted, false);
+    assertEquals(await circularReceipt.completion, {
+      status: 'rejected',
+      reason: 'serialization-failed',
+    });
+    assertEquals(bigintReceipt.accepted, false);
+    assertEquals(await bigintReceipt.completion, {
+      status: 'rejected',
+      reason: 'serialization-failed',
+    });
+    await producer.flush();
   } finally {
+    globalThis.fetch = previousFetch;
     if (previousUrl === undefined) {
       Deno.env.delete('DURABLE_STREAMS_URL');
     } else {

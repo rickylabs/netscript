@@ -60,7 +60,8 @@ If network lookup is unavailable or the framework is unfamiliar, add `--with-doc
 expands a several-megabyte local corpus containing the release-built prose and task router plus
 `deno doc` output for every export subpath of each exact NetScript package version found in the
 project. Version disagreement or a failed documentation command aborts before the local docs tree
-is written; without the flag, no offline corpus is installed.
+is written; without the flag, no offline corpus is installed. When the bundle is installed, every
+generated host command receives the same absolute `--docs-root <project>/.netscript/docs` pair.
 
 | Host        | Files written                                                                                        |
 | ----------- | ---------------------------------------------------------------------------------------------------- |
@@ -72,6 +73,10 @@ The generated MCP configuration runs `netscript agent mcp` for the current
 project. Re-running `agent init` is idempotent: unchanged files are left alone,
 and existing host configuration is preserved alongside the `netscript` server
 entry.
+
+Before unfamiliar NetScript API or architecture work, call `find_guidance` with the task you intend
+to complete and follow its ordered citations. Use `search_docs` for literal lookup and `get_doc` for
+exact retrieval of a known document or section.
 
 Zed project MCP configuration runs only after the worktree is trusted; review the generated
 commands before enabling project settings. Re-running with the same editor is idempotent and keeps
@@ -101,7 +106,7 @@ output that could corrupt the JSON-RPC stream. Its flags:
 
 ## What the server exposes
 
-Twenty-one tools, every one returning a bounded structured result. Grouped by what
+Twenty-two tools, every one returning a bounded structured result. Grouped by what
 an agent is trying to do:
 
 - **Read the running app** — seven telemetry read models: `get_app_status`,
@@ -111,7 +116,8 @@ an agent is trying to do:
 - **Diagnose the project** — `doctor` aggregates telemetry reachability, Aspire
   markers, project wiring, and plugin diagnostics into one verdict; the plugin
   slice has a direct twin in `netscript plugin doctor`.
-- **Search the docs** — `search_docs`, `list_docs`, and `get_doc` form a
+- **Use the docs** — `find_guidance` returns ordered section-level guidance and cited code for a
+  natural-language task; `search_docs`, `list_docs`, and `get_doc` retain the literal
   search-to-get funnel over the documentation corpus (next section).
 - **Discover exports** — `find_export`, `list_package_exports`, `get_export`, and
   `search_exports` locate package subpaths, page through package surfaces, return one bounded
@@ -132,13 +138,17 @@ than restating them here; for the commands themselves, the
 
 ## Documentation corpus
 
-Without an override, `list_docs`, `search_docs`, and `get_doc` index the
-documentation shipped with the installed `@netscript/mcp` package (one document
-under the `mcp` slug). Point the server at a richer corpus — a project docs
-folder or a checkout of this site — with `--docs-root <path>` or the
-`NETSCRIPT_DOCS_ROOT` environment variable. A configured path that does not exist
-returns a structured `docs_corpus_not_found` error naming the missing path; the
-server never silently reports an empty corpus.
+Documentation selection is deterministic: explicit `--docs-root <path>`, then
+`NETSCRIPT_DOCS_ROOT`, then an indexable `<project>/.netscript/docs` bundle, then the generated
+release-matched embedded corpus. The embedded fallback contains the bounded quickstart,
+contract-to-page, service, builder, and route golden paths plus the MCP README and CLI help. An
+empty, redirect-only, or otherwise non-indexable project bundle falls back to embedded; an invalid
+explicit or environment root returns `docs_corpus_not_found` instead of hiding the operator error.
+
+`list_docs` reports the selected corpus as `{ kind, root, documentCount }` alongside its bounded
+`docs` rows. A filesystem selection reports the resolved root; embedded reports `root: null`, so an
+agent or measured run can see that it is using the fallback instead of inferring degradation from
+search results.
 
 The export tools use a different, package-embedded corpus generated from Deno 2.9
 `deno doc --json`. It is version- and hash-pinned, needs no project `docs/` directory, and returns

@@ -119,6 +119,7 @@ export class DbOperationRunner {
       request.operation,
       database.configKey,
       request.migrationName,
+      request.interactive,
     );
 
     if (request.operation === 'studio') {

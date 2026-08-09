@@ -163,3 +163,4 @@ into S1 while the type is still unpublished:
    last-committed-offset on every error, heartbeat as liveness signal, at-least-once + idempotent
    materialization rule, correlation/trace identity stable across replay, dispose semantics, and
    `streamClosed` as the no-more-data signal.
+

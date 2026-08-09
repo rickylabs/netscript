@@ -1,10 +1,20 @@
 import { createToolSchema, isRecord, type ToolSchema } from './schema.ts';
 import type { ToolName } from './tool-types.ts';
+import { CLI_EXECUTION_IDENTITY_JSON_SCHEMA } from './command-executor-port.ts';
+import * as exportSurfaceShapes from '../application/export-surfaces/export-surface-tool-contracts.ts';
 import {
-  EXPORT_SURFACE_INPUT_SHAPES,
-  EXPORT_SURFACE_OUTPUT_SHAPES,
-} from '../application/export-surfaces/export-surface-tool-contracts.ts';
-
+  GUIDANCE_CONFIDENCE_LEVELS,
+  GUIDANCE_LINK_RELATIONS,
+  GUIDANCE_MAX_CODE_CHARACTERS,
+  GUIDANCE_MAX_CODE_EXCERPTS_PER_RECOMMENDATION,
+  GUIDANCE_MAX_EXCERPT_CHARACTERS,
+  GUIDANCE_MAX_FALLBACK_CHARACTERS,
+  GUIDANCE_MAX_INTENT_CHARACTERS,
+  GUIDANCE_MAX_RECOMMENDATIONS,
+  GUIDANCE_MAX_RELATED_LINKS,
+  GUIDANCE_MAX_WHY_CHARACTERS,
+  GUIDANCE_STAGES,
+} from './docs/guidance-contract.ts';
 const objectSchema = (
   properties: Record<string, unknown> = {},
   required: string[] = [],
@@ -36,7 +46,35 @@ const doctorFamilyShape = objectSchema({
   counts: doctorCountsShape,
   checks: { type: 'array', maxItems: 20, items: doctorCheckShape },
 }, ['name', 'status', 'counts', 'checks']);
-
+const guidanceCitationShape = objectSchema({
+  slug: stringProperty,
+  section: stringProperty,
+  heading: stringProperty,
+}, ['slug', 'section', 'heading']);
+const guidanceCodeShape = objectSchema({
+  language: stringProperty,
+  code: { type: 'string', maxLength: GUIDANCE_MAX_CODE_CHARACTERS },
+  source: guidanceCitationShape,
+}, ['language', 'code', 'source']);
+const guidanceRecommendationShape = objectSchema({
+  stage: { enum: [...GUIDANCE_STAGES] },
+  slug: stringProperty,
+  section: stringProperty,
+  heading: stringProperty,
+  why: { type: 'string', maxLength: GUIDANCE_MAX_WHY_CHARACTERS },
+  excerpt: { type: 'string', maxLength: GUIDANCE_MAX_EXCERPT_CHARACTERS },
+  code: {
+    type: 'array',
+    maxItems: GUIDANCE_MAX_CODE_EXCERPTS_PER_RECOMMENDATION,
+    items: guidanceCodeShape,
+  },
+}, ['stage', 'slug', 'section', 'heading', 'why', 'excerpt', 'code']);
+const guidanceRelatedShape = objectSchema({
+  relation: { enum: [...GUIDANCE_LINK_RELATIONS] },
+  slug: stringProperty,
+  section: stringProperty,
+  heading: stringProperty,
+}, ['relation', 'slug', 'section', 'heading']);
 /** Compact diagnostic severity. */
 export type DoctorStatus = 'pass' | 'warn' | 'fail';
 /** One doctor diagnostic check. */
@@ -100,11 +138,20 @@ const inputShapes: Record<ToolName, Readonly<Record<string, unknown>>> = {
   search_docs: objectSchema({ query: stringProperty, limit: searchLimitProperty }, ['query']),
   list_docs: objectSchema({ limit: limitProperty }),
   get_doc: objectSchema({ slug: stringProperty, section: stringProperty }, ['slug']),
-  ...EXPORT_SURFACE_INPUT_SHAPES,
+  find_guidance: objectSchema({
+    intent: {
+      type: 'string',
+      minLength: 1,
+      maxLength: GUIDANCE_MAX_INTENT_CHARACTERS,
+    },
+    limit: { type: 'integer', minimum: 1, maximum: GUIDANCE_MAX_RECOMMENDATIONS },
+  }, ['intent']),
+  ...exportSurfaceShapes.EXPORT_SURFACE_INPUT_SHAPES,
   list_commands: objectSchema({ filter: stringProperty, limit: limitProperty }),
   execute_command: objectSchema({
     command: stringProperty,
     args: { type: 'array', items: stringProperty, maxItems: 32 },
+    resource: stringProperty,
   }, ['command']),
   record_drift: objectSchema({
     resource: stringProperty,
@@ -210,6 +257,11 @@ const outputShapes: Record<ToolName, Readonly<Record<string, unknown>>> = {
   }, ['count', 'matches']),
   list_docs: objectSchema({
     count: { type: 'integer' },
+    corpus: objectSchema({
+      kind: { enum: ['filesystem', 'embedded'] },
+      root: { type: ['string', 'null'] },
+      documentCount: { type: 'integer' },
+    }, ['kind', 'root', 'documentCount']),
     docs: {
       type: 'array',
       maxItems: 100,
@@ -219,10 +271,7 @@ const outputShapes: Record<ToolName, Readonly<Record<string, unknown>>> = {
         description: stringProperty,
       }, ['slug', 'title', 'description']),
     },
-  }, [
-    'count',
-    'docs',
-  ]),
+  }, ['count', 'corpus', 'docs']),
   get_doc: objectSchema({
     slug: stringProperty,
     title: stringProperty,
@@ -234,7 +283,23 @@ const outputShapes: Record<ToolName, Readonly<Record<string, unknown>>> = {
     'title',
     'content',
   ]),
-  ...EXPORT_SURFACE_OUTPUT_SHAPES,
+  find_guidance: objectSchema({
+    intent: { type: 'string', maxLength: GUIDANCE_MAX_INTENT_CHARACTERS },
+    confidence: { enum: [...GUIDANCE_CONFIDENCE_LEVELS] },
+    recommendations: {
+      type: 'array',
+      maxItems: GUIDANCE_MAX_RECOMMENDATIONS,
+      items: guidanceRecommendationShape,
+    },
+    related: {
+      type: 'array',
+      maxItems: GUIDANCE_MAX_RELATED_LINKS,
+      items: guidanceRelatedShape,
+    },
+    fallback: { type: 'string', maxLength: GUIDANCE_MAX_FALLBACK_CHARACTERS },
+    truncated: { type: 'boolean' },
+  }, ['intent', 'confidence', 'recommendations', 'related', 'truncated']),
+  ...exportSurfaceShapes.EXPORT_SURFACE_OUTPUT_SHAPES,
   list_commands: objectSchema({
     count: { type: 'integer' },
     commands: {
@@ -246,14 +311,17 @@ const outputShapes: Record<ToolName, Readonly<Record<string, unknown>>> = {
         usage: stringProperty,
       }, ['path', 'description', 'usage']),
     },
-  }, ['count', 'commands']),
+    executor: CLI_EXECUTION_IDENTITY_JSON_SCHEMA,
+  }, ['count', 'commands', 'executor']),
   execute_command: objectSchema({
+    executor: CLI_EXECUTION_IDENTITY_JSON_SCHEMA,
+    status: { enum: ['pass', 'fail'] },
     exitCode: { type: 'integer' },
     durationMs: { type: 'number' },
     outputTail: stringProperty,
     truncated: { type: 'boolean' },
     timedOut: { type: 'boolean' },
-  }, ['exitCode', 'durationMs', 'outputTail', 'truncated', 'timedOut']),
+  }, ['executor', 'status', 'exitCode', 'durationMs', 'outputTail', 'truncated', 'timedOut']),
   record_drift: objectSchema({
     recorded: { type: 'boolean' },
     resource: stringProperty,

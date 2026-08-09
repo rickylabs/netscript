@@ -1,4 +1,4 @@
-import { assert, assertEquals, assertMatch } from '@std/assert';
+import { assert, assertEquals, assertMatch, assertThrows } from '@std/assert';
 import { createToolRegistry, TOOL_INPUT_SCHEMAS, TOOL_NAMES, TOOL_OUTPUT_SCHEMAS } from '../mod.ts';
 import { validateSchema } from '../src/domain/schema.ts';
 
@@ -13,6 +13,39 @@ Deno.test('registry enumerates the complete v1 contract surface', () => {
     assertEquals(tool.outputSchema.jsonSchema.type, 'object');
     assertMatch(tool.description, /bounded summary/);
   }
+});
+
+Deno.test('list_docs output schema requires observable corpus health metadata', () => {
+  const schema = TOOL_OUTPUT_SCHEMAS.list_docs.jsonSchema as {
+    readonly required?: readonly string[];
+    readonly properties?: Readonly<Record<string, unknown>>;
+  };
+  assert(schema.required?.includes('corpus'));
+  assertEquals(schema.properties?.corpus, {
+    type: 'object',
+    properties: {
+      kind: { enum: ['filesystem', 'embedded'] },
+      root: { type: ['string', 'null'] },
+      documentCount: { type: 'integer' },
+    },
+    required: ['kind', 'root', 'documentCount'],
+    additionalProperties: false,
+  });
+  const base = { count: 0, docs: [], corpus: { kind: 'embedded', documentCount: 6 } };
+  validateSchema(TOOL_OUTPUT_SCHEMAS.list_docs, {
+    ...base,
+    corpus: { ...base.corpus, root: null },
+  });
+  validateSchema(TOOL_OUTPUT_SCHEMAS.list_docs, {
+    ...base,
+    corpus: { ...base.corpus, kind: 'filesystem', root: '/project/.netscript/docs' },
+  });
+  assertThrows(() =>
+    validateSchema(TOOL_OUTPUT_SCHEMAS.list_docs, {
+      ...base,
+      corpus: { ...base.corpus, root: 42 },
+    })
+  );
 });
 
 Deno.test('contracts reject malformed required fields, types, bounds, and extra keys', () => {
@@ -56,25 +89,54 @@ Deno.test('docs drift proof: documentation reflects registered tool surface and 
     new URL('../../../docs/site/ai/agent-tooling.md', import.meta.url),
   );
 
-  assertEquals(TOOL_NAMES.length, 21);
+  assertEquals(TOOL_NAMES.length, 22);
   assertEquals(TOOL_NAMES.includes('record_drift'), true);
 
   assert(
-    readme.includes('21 token-bounded tools'),
-    'README.md does not state 21 token-bounded tools',
+    readme.includes('22 token-bounded tools'),
+    'README.md does not state 22 token-bounded tools',
   );
   assert(
-    refMcp.includes('21 token-bounded tools') || refMcp.includes('21 tools'),
-    'reference/mcp/index.md missing 21 tools count',
+    refMcp.includes('22 token-bounded tools') || refMcp.includes('22 tools'),
+    'reference/mcp/index.md missing 22 tools count',
   );
   assert(
-    agentTooling.includes('Twenty-one tools') || agentTooling.includes('21 tools'),
-    'agent-tooling.md missing 21 tools count',
+    agentTooling.includes('Twenty-two tools') || agentTooling.includes('22 tools'),
+    'agent-tooling.md missing 22 tools count',
   );
 
   for (const toolName of TOOL_NAMES) {
     assert(readme.includes(`\`${toolName}\``), `README.md missing tool: ${toolName}`);
     assert(refMcp.includes(`\`${toolName}\``), `reference/mcp/index.md missing tool: ${toolName}`);
     assert(agentTooling.includes(`\`${toolName}\``), `agent-tooling.md missing tool: ${toolName}`);
+  }
+});
+
+Deno.test('public docs activate intent guidance before unfamiliar implementation work', async () => {
+  const docs = [
+    ['README.md', await Deno.readTextFile(new URL('../README.md', import.meta.url))],
+    [
+      'reference/mcp/index.md',
+      await Deno.readTextFile(
+        new URL('../../../docs/site/reference/mcp/index.md', import.meta.url),
+      ),
+    ],
+    [
+      'ai/agent-tooling.md',
+      await Deno.readTextFile(
+        new URL('../../../docs/site/ai/agent-tooling.md', import.meta.url),
+      ),
+    ],
+  ] as const;
+
+  for (const [name, content] of docs) {
+    assert(
+      content.includes('Before unfamiliar NetScript API or architecture work'),
+      `${name} does not activate find_guidance before unfamiliar implementation work`,
+    );
+    assert(
+      content.includes('literal lookup') && content.includes('exact retrieval'),
+      `${name} does not distinguish intent guidance from literal and exact retrieval`,
+    );
   }
 });

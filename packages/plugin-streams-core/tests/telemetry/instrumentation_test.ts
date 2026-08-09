@@ -66,3 +66,55 @@ Deno.test('StreamsInstrumentation starts consumer span with SDK fan-in link attr
   assertEquals(snapshot?.links[0]?.attributes?.[StreamAttributes.MESSAGE_ID], 'execution-1');
   assertEquals(snapshot?.links[0]?.attributes?.[StreamAttributes.CORRELATION_ID], 'corr-1');
 });
+
+Deno.test('StreamsInstrumentation preserves W3C tracestate in emitted write headers', () => {
+  const traceState = {
+    get: (_key: string): string | undefined => undefined,
+    unset(_key: string) {
+      return this;
+    },
+    set(_key: string, _value: string) {
+      return this;
+    },
+    serialize: (): string => 'vendor=value',
+  };
+  const span = {
+    spanContext: () => ({
+      traceId: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+      spanId: 'bbbbbbbbbbbbbbbb',
+      traceFlags: 1,
+      traceState,
+    }),
+    setAttribute(_key: string, _value: string | number | boolean) {
+      return this;
+    },
+    addEvent(_name: string, _attributes?: Record<string, string | number | boolean | undefined>) {
+      return this;
+    },
+    setStatus(_status: { code: 0 | 1 | 2; message?: string }) {
+      return this;
+    },
+    recordException: (_exception: Error): void => undefined,
+    end: (): void => undefined,
+  };
+  const instrumentation = createStreamsInstrumentation({
+    tracer: { startSpan: () => span },
+  });
+  let headers: Record<string, string> = {};
+
+  instrumentation.publish({
+    streamPath: '/trace-state',
+    collection: 'execution',
+    operation: 'upsert',
+    producerId: 'producer',
+    messageId: 'message',
+    emit: (emitted) => {
+      headers = emitted;
+    },
+  });
+
+  assertEquals(headers, {
+    traceparent: '00-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-bbbbbbbbbbbbbbbb-01',
+    tracestate: 'vendor=value',
+  });
+});

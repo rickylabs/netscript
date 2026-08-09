@@ -34,9 +34,12 @@ Deno.test('default command policy is deny-wins with default deny', () => {
 Deno.test('execute command allows plugin install supplied through command args', async () => {
   const calls: Array<{ readonly path: readonly string[]; readonly args: readonly string[] }> = [];
   const executor: CommandExecutorPort = {
+    identity: { mode: 'host', version: '9.9.9', command: ['netscript'] },
     execute: (input) => {
       calls.push(input);
       return Promise.resolve({
+        executor: executor.identity,
+        status: 'pass',
         exitCode: 0,
         durationMs: 1,
         outputTail: '',
@@ -63,7 +66,7 @@ Deno.test('list commands filters and limits dynamic catalog results', async () =
         { path: 'plugin list', description: 'List plugins', usage: '' },
         { path: 'db status', description: 'Show database status', usage: '' },
       ]),
-  });
+  }, { mode: 'host', version: '9.9.9', command: ['netscript'] });
   const result = await flow({ filter: 'db', limit: 1 });
   assert(result.ok);
   assertEquals(result.value, {
@@ -73,15 +76,19 @@ Deno.test('list commands filters and limits dynamic catalog results', async () =
       description: 'Apply migrations',
       usage: '[--project-root PATH]',
     }],
+    executor: { mode: 'host', version: '9.9.9', command: ['netscript'] },
   });
 });
 
 Deno.test('execute command rejects denied paths before calling executor', async () => {
   let called = false;
   const executor: CommandExecutorPort = {
+    identity: { mode: 'host', version: '9.9.9', command: ['netscript'] },
     execute: () => {
       called = true;
       return Promise.resolve({
+        executor: executor.identity,
+        status: 'pass',
         exitCode: 0,
         durationMs: 1,
         outputTail: '',

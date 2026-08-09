@@ -708,19 +708,19 @@ finding into a debt entry.
 
 ## packages/plugin-streams-core — AP-13 console.warn runtime reporting
 
-- **Reason:** `DurableStreamProducer` currently uses `console.warn` for connection, pending-event,
-  serialization, and primary-key visibility in published runtime code. The warnings are
-  intentionally retained for alpha operator visibility; replacing them correctly requires a
-  structured telemetry or logger dependency that is outside Wave 4a's package-quality scope.
+- **Reason:** `DurableStreamProducer` previously used `console.warn` for connection, pending-event,
+  serialization, and primary-key visibility in published runtime code. The warning debt was
+  accepted for alpha operator visibility until structured producer telemetry was available.
 - **Owner:** `@netscript/plugin-streams-core` maintainers.
-- **Target:** Telemetry-integration wave before beta runtime stabilization.
+- **Target:** Completed by the #1326 reconnect supervisor telemetry integration.
 - **Linked plan:** `.llm/tmp/run/feat-package-quality-wave4-runtimes--4a-streams-watchers/plan.md`
   (D6, slice 4).
 - **Created:** 2026-06-08
-- **Status:** open, DEBT_ACCEPTED.
-- **Gate:** F-14, AP-13; close when `DurableStreamProducer` emits through a structured reporter and
-  `console.warn` is absent from
-  `packages/plugin-streams-core/src/application/create-durable-stream.ts`.
+- **Status:** closed 2026-08-09 by #1402; no broader AP-13 waiver or closure is implied.
+- **Gate:** F-14, AP-13. `DurableStreamProducer` now emits receipt outcomes, retry/recovery/state
+  metrics, and one publish span across reconnect. Manual F-14 evidence finds no executable
+  `console.*` below `packages/plugin-streams-core/src`; the sole match is a documentation example in
+  `src/diagnostics/inspect-stream-topic.ts`.
 
 ## plugins/streams — durable topic publish/subscribe transport deferred (`streams-manifest-helpers-unsupported`)
 
@@ -2204,3 +2204,19 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Status:** open — explicitly out of scope for #1158, which must not change product defaults.
 - **Gate:** Close when the default cache backend either gains a Docker-less fallback arm (as
   `Garnet`/`Auto` has) or is changed with a recorded owner decision and a release canary.
+
+## packages/mcp — guidance contracts deepen over-cap tool-contract table (`mcp-tool-contracts-a8-1102`)
+
+- **Reason:** PR #1404 adds the public `find_guidance` schemas to
+  `src/domain/tool-contracts.ts`, deepening the evaluator-counted file from 301 to 367 lines against
+  the 300-line A8/AP-1/F-1 cap. The same doctrine warning already exists on `origin/main`, so the
+  package-root verdict adds no new finding, but growth inside an over-cap file is still debt.
+- **Owner:** MCP contract-surface follow-up.
+- **Target:** Before the next MCP public-tool expansion.
+- **Linked plan:** `.llm/runs/release-0.0.5--orchestration/slices/w3-b1-1102/plan.md`; issue #1102;
+  PR #1404.
+- **Created:** 2026-08-09
+- **Status:** open, DEBT_ACCEPTED for #1404; recorded after IMPL-EVAL cycle 1.
+- **Gate:** Split docs/guidance input and output schemas into one role-named domain module consumed
+  by the central contract registry; package tests, scoped gates, public schema parity, doctrine,
+  doc-lint, and publish dry-run must remain green.

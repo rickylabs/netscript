@@ -1,43 +1,14 @@
-# Phase registry — release-0.0.5
+# Phase registry — release-0.0.5 continuation
 
-Live status. Rewritten 2026-08-09 to plan v4.1/v4.2; the v4-era rows it replaced are preserved in
-the plan's own history, not here.
-
-## Completed
-
-| Group   | Scope                                                                   | Status   | Evidence                                                            |
-| ------- | ----------------------------------------------------------------------- | -------- | ------------------------------------------------------------------- |
-| S0      | Activation, handover, live main/GitHub re-baseline, #1331 verification  | complete | current evidence captured                                           |
-| S1      | Future-milestone rollover and milestone-24 frontend/non-frontend split  | complete | exact before/after verification recorded                            |
-| S2      | 0.0.5 disposition, clusters, waves, canary boundaries                   | complete | v3 covered all 38 issues; superseded by v4.1/v4.2                   |
-| S3      | Separate Minimax M3 PLAN-EVAL of the v3 wave plan                       | complete | PASS, session `567e3125-0fe9-4637-b0bb-30c20f9d3c26`                |
-| P1338   | DeepSeek max formal IMPL-EVAL default prerequisite                      | complete | PR #1339 merged at `10dbea37c`; local IMPL-EVAL PASS                |
-| T1/T2   | #1315 / #1316 / #1317 / #1318                                           | complete | merged; #1295 / #1189 / #1117 / #1115 closed                        |
-| C14     | Payload #1340, OIDC publish, registry and pinned E2E pair               | complete | main `d6db645a`; runs 31128595811 / 31128614286 green               |
-| W1      | #1312+#1148 · #1024+#1328 · #1324+#1330                                 | complete | #1341 / #1342 / #1344 merged; six issues closed                     |
-| C15/C16 | canary.15 cut, pinned-E2E red, repaired forward by #1346, canary.16 cut | complete | canary.16 green pair 31201279314 / 31201560939; #1343 pulled into F |
-
-## Live
-
-| Group | Scope               | Status                         | Predicate                                                                                                                         |
-| ----- | ------------------- | ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------- |
-| W2-A  | #1325               | implementing                   | PR #1394; PLAN-EVAL PASS (Fable 5); expensive gate not yet requested                                                              |
-| W2-B  | #1329               | implementing                   | PR #1395; PLAN-EVAL PASS (Fable 5); freezes the envelope W3-A depends on                                                          |
-| W2-C  | #1327 + #1202       | implementing                   | PR #1393; third granted runtime pass at the fixed head. #1202 returned to closable (C-D39)                                        |
-| Plan  | wave plan v4.1–v4.4 | **PLAN-EVAL `PASS`** (cycle 5) | five cycles, separate Codex Sol high session; no surviving findings. Plan-Gate complete under the owner-ratified Option A subject |
-
-## Held
-
-| Group                       | Scope                                                                                                            | Predicate — all must hold before dispatch                                                                                                                                                                                                                    |
-| --------------------------- | ---------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Milestone-move receipt**  | nine issues — inbound to 0.0.5: #1373, #1356, #1375, #1376, #1359, #1343, #1379; outbound to 0.0.6: #1126, #1169 | **`passed` 2026-08-09.** All nine before/after states recorded from live queries in `worklog.md`; the set matches the nine enumerated IDs. Live 0.0.5 open count is 26, matching the declared scope. Both outbound moves carry a written reason on the issue |
-| **Evaluated-through check** | `origin/main` equals the SHA in `cut-trace.md` § Evaluated-through marker                                        | re-query before every wave dispatch, canary and cut; append new first-parent rows first                                                                                                                                                                      |
-| C17                         | canary at the W2 boundary                                                                                        | W2-A, W2-B, W2-C landed through the pre-merge gate                                                                                                                                                                                                           |
-| W3                          | W3-A #1326 · W3-B1 #1102 · W3-B2 #1375 · W3-B3 #1376 · W3-C #1119                                                | C17; milestone receipt passed; W3-A needs W2-B's frozen envelope. Sub-order: A, B2, B3 start; B1 takes the first freed lane; C takes the next                                                                                                                |
-| C18                         | canary at the W3 boundary                                                                                        | W3 landed                                                                                                                                                                                                                                                    |
-| W4                          | W4-A #1333+#1359 · W4-B #1356 · W4-C #1108 · W4-D #1379                                                          | C18. **W4-D dispatches before W4-A touches `packages/fresh-ui`**; W4-A takes the lane W4-D releases. W4-A takes the GLM 5.2 design pass                                                                                                                      |
-| C19                         | canary at the W4 boundary                                                                                        | W4 landed                                                                                                                                                                                                                                                    |
-| W5                          | W5-A #1373 · W5-B #1137+#1138 · W5-C #1332+#1334 · W5-D #1208                                                    | W5-A needs only the locked module name; W5-C reuses W4-A's accepted design or takes its own GLM pass; W5-D needs W4-A and W5-A                                                                                                                               |
-| C20                         | final canary; the stable cut consumes this pair                                                                  | W5 landed; **no merge between C20 and the cut**                                                                                                                                                                                                              |
-| F                           | #1004 · #1090 · #1166 · #1197 · #1208 Phase 2 · #1333 · #1338 · #1343                                            | **governing manifest: plan § v4.3.** The v4.1 table is superseded and must not be used. #1126 and #1169 move to 0.0.6; #1202 is closable by PR #1393                                                                                                         |
-| Cut                         | `release:cut 0.0.5` → `release:publish v0.0.5`                                                                   | C20 green pair for the same content                                                                                                                                                                                                                          |
+| Group | Scope                                                                  | Status   | Dependency / gate                                               |
+| ----- | ---------------------------------------------------------------------- | -------- | --------------------------------------------------------------- |
+| S0    | Activation, handover, live main/GitHub re-baseline, #1331 verification | complete | current evidence captured                                       |
+| S1    | Future-milestone rollover and milestone-24 frontend/non-frontend split | complete | exact before/after verification recorded                        |
+| S2    | 0.0.5 disposition, clusters, waves, canary boundaries                  | complete | v3 covers all 38 issues, 18 clusters, 3 cuts                    |
+| S3    | Separate Minimax M3 PLAN-EVAL of committed wave plan                   | complete | PASS, session `567e3125-0fe9-4637-b0bb-30c20f9d3c26`            |
+| P1338 | DeepSeek max formal IMPL-EVAL default prerequisite                     | complete | PR #1339 merged to canary.14 at `10dbea37c`; local IMPL-EVAL PASS |
+| T1/T2 | Existing #1315/#1316/#1317/#1318 queue                                 | complete | merged; #1295/#1189/#1117/#1115 auto-closed                      |
+| C14   | Payload #1340, OIDC publish, registry and pinned E2E pair               | complete | main `d6db645a`; tag `d405def4`; runs 31128595811/31128614286 green |
+| W1    | First canary.15 group; three independent direct-to-main PRs            | ready    | W1-A #1312/#1148; W1-B #1024/#1328; W1-C #1324/#1330            |
+| W2..N | Remaining direct-to-main clusters and later canary boundaries          | held     | consume verified C14 main; respect recorded cross-wave dependencies |
+| F     | Evidence closures, final pair, stable cut                              | prepared | closure contracts prepared; execution waits on remaining waves/cuts |

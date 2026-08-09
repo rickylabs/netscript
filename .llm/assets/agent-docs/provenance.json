@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "version": "0.0.4",
-  "sourceCommit": "d6265fa52",
-  "extractionTimestamp": "2026-08-03T10:09:58Z",
+  "sourceCommit": "eda49bb2e",
+  "extractionTimestamp": "2026-08-09T10:03:43Z",
   "files": [
     "context/01-how-the-web-became-the-default.mdx",
     "context/02-how-the-web-stack-grew-up.mdx",
@@ -44,6 +44,7 @@
     "pages/explanation/architecture/index.md",
     "pages/explanation/aspire/index.md",
     "pages/explanation/auth-model/index.md",
+    "pages/explanation/compared/index.md",
     "pages/explanation/contracts/index.md",
     "pages/explanation/durability-model/index.md",
     "pages/explanation/index.md",
@@ -56,6 +57,7 @@
     "pages/identity-access/how-to/add-authentication/index.md",
     "pages/identity-access/how-to/index.md",
     "pages/identity-access/index.md",
+    "pages/identity-access/session-lifecycles/index.md",
     "pages/index.md",
     "pages/observability/how-to/add-opentelemetry/index.md",
     "pages/observability/how-to/index.md",
@@ -95,6 +97,7 @@
     "pages/reference/logger/index.md",
     "pages/reference/mcp/index.md",
     "pages/reference/plugin-ai-core/index.md",
+    "pages/reference/plugin-ai/index.md",
     "pages/reference/plugin-auth-core/index.md",
     "pages/reference/plugin-auth/index.md",
     "pages/reference/plugin/index.md",
@@ -164,14 +167,19 @@
     "pages/web-layer/how-to/index.md",
     "pages/web-layer/index.md",
     "pages/web-layer/interactive/index.md",
+    "pages/web-layer/layers/index.md",
+    "pages/web-layer/partials/index.md",
+    "pages/web-layer/query-bridge/index.md",
     "pages/web-layer/query/index.md",
+    "pages/web-layer/resources/index.md",
+    "pages/web-layer/response/index.md",
     "pages/web-layer/route/index.md",
     "pages/web-layer/server/index.md",
     "pages/web-layer/testing/index.md",
     "pages/web-layer/vite/index.md",
     "pages/why/index.md"
   ],
-  "uncompressedBytes": 4199091,
-  "compressedBytes": 1175891,
-  "sha256": "48d7ac7911e6e81e90a3a048c587975d610a13e9fe93016072fe5de2f8f5a739"
+  "uncompressedBytes": 4685958,
+  "compressedBytes": 1332143,
+  "sha256": "67e0b4c6ce9ac28ae26e45a7d204bd1eeabdf6a220144740bc3aaad7291d298b"
 }

@@ -1,5 +1,7 @@
 /** Generates registry-safe TypeScript constants for publish-time package assets. */
 
+import { normalizeDocsSlug } from '../../packages/mcp/src/domain/docs/docs-corpus-port.ts';
+
 interface PackageConfig {
   readonly version?: unknown;
 }
@@ -7,6 +9,25 @@ interface PackageConfig {
 const ROOT = new URL('../../', import.meta.url);
 const CHECK = Deno.args.includes('--check');
 const stalePaths: string[] = [];
+
+/** Golden-path prose embedded in the MCP package when no filesystem corpus resolves. */
+export const MCP_EMBEDDED_DOC_PATHS = [
+  'llms.txt',
+  'pages/explanation/contracts/index.md',
+  'pages/explanation/plugin-system/index.md',
+  'pages/orchestration-runtime/how-to/author-a-plugin/index.md',
+  'pages/data-persistence/how-to/use-a-second-database/index.md',
+  'pages/services-sdk/services/index.md',
+  'pages/web-layer/builders/index.md',
+  'pages/web-layer/how-to/build-a-server-validated-form/index.md',
+  'pages/web-layer/query/index.md',
+  'pages/web-layer/route/index.md',
+  'pages/tutorials/live-dashboard/03-sdk-cache-first-query/index.md',
+  'pages/tutorials/live-dashboard/04-definePage-QueryIsland/index.md',
+] as const;
+
+/** Maximum UTF-8 source bytes accepted for the generated MCP fallback prose. */
+export const MCP_EMBEDDED_DOCS_MAX_BYTES = 262_144;
 
 export const PUBLISH_ASSET_OUTPUTS = [
   '.llm/assets/agent-docs/provenance.json',
@@ -34,6 +55,35 @@ interface AgentDocsProvenance {
   readonly schemaVersion: 1;
   readonly version: string;
   readonly [key: string]: unknown;
+}
+
+interface AgentDocsPayload {
+  readonly schemaVersion: 1;
+  readonly files: Readonly<Record<string, string>>;
+}
+
+/** One generated fallback source and its stable filesystem-compatible slug. */
+export interface GeneratedMcpEmbeddedDoc {
+  readonly path: string;
+  readonly slug: string;
+  readonly source: string;
+}
+
+/** Release provenance emitted beside the selected fallback prose. */
+export interface GeneratedMcpEmbeddedDocsProvenance {
+  readonly schemaVersion: 1;
+  readonly frameworkVersion: string;
+  readonly sourceCommit: string;
+  readonly paths: readonly string[];
+  readonly sourceBytes: number;
+  readonly documentCount: number;
+  readonly sha256: string;
+}
+
+/** Selected MCP prose and reproducible provenance generated from the release docs artifact. */
+export interface GeneratedMcpEmbeddedDocs {
+  readonly documents: readonly GeneratedMcpEmbeddedDoc[];
+  readonly provenance: GeneratedMcpEmbeddedDocsProvenance;
 }
 
 async function readVersion(path: string): Promise<string> {
@@ -108,9 +158,61 @@ async function readVersionFromRoot(root: URL, path: string): Promise<string> {
   return config.version;
 }
 
+/** Read and validate the bounded MCP prose selection from the release docs bundle. */
+export async function buildMcpEmbeddedDocs(root: URL = ROOT): Promise<GeneratedMcpEmbeddedDocs> {
+  const frameworkVersion = await readVersionFromRoot(root, 'packages/mcp/deno.json');
+  const provenancePath = '.llm/assets/agent-docs/provenance.json';
+  const releaseProvenance = JSON.parse(
+    await Deno.readTextFile(new URL(provenancePath, root)),
+  ) as AgentDocsProvenance;
+  if (
+    releaseProvenance.schemaVersion !== 1 || releaseProvenance.version !== frameworkVersion ||
+    typeof releaseProvenance.sourceCommit !== 'string'
+  ) {
+    throw new Error(`${provenancePath} must match MCP framework version ${frameworkVersion}`);
+  }
+  const compressed = await Deno.readFile(new URL('.llm/assets/agent-docs/prose.json.gz', root));
+  const copied = new Uint8Array(compressed.byteLength);
+  copied.set(compressed);
+  const stream = new Blob([copied.buffer]).stream().pipeThrough(new DecompressionStream('gzip'));
+  const payload = JSON.parse(await new Response(stream).text()) as AgentDocsPayload;
+  if (payload.schemaVersion !== 1 || !payload.files || typeof payload.files !== 'object') {
+    throw new Error('agent docs prose payload must use schema version 1');
+  }
+  const documents = MCP_EMBEDDED_DOC_PATHS.map((path) => {
+    const source = payload.files[path];
+    if (typeof source !== 'string') throw new Error(`agent docs prose payload is missing ${path}`);
+    return { path, slug: normalizeDocsSlug(path), source };
+  });
+  const canonical = documents.map(({ path, source }) => `${path}\0${source}`).join('\0');
+  const sourceBytes = documents.reduce(
+    (total, document) => total + new TextEncoder().encode(document.source).byteLength,
+    0,
+  );
+  if (sourceBytes > MCP_EMBEDDED_DOCS_MAX_BYTES) {
+    throw new Error(
+      `MCP embedded docs are ${sourceBytes} bytes; budget is ${MCP_EMBEDDED_DOCS_MAX_BYTES}`,
+    );
+  }
+  const canonicalBytes = new TextEncoder().encode(canonical);
+  return {
+    documents,
+    provenance: {
+      schemaVersion: 1,
+      frameworkVersion,
+      sourceCommit: releaseProvenance.sourceCommit,
+      paths: [...MCP_EMBEDDED_DOC_PATHS],
+      sourceBytes,
+      documentCount: documents.length,
+      sha256: hex(await crypto.subtle.digest('SHA-256', copiedBuffer(canonicalBytes))),
+    },
+  };
+}
+
 async function generateMcpAssets(): Promise<void> {
   const version = await readVersion('packages/mcp/deno.json');
   const readme = await Deno.readTextFile(new URL('packages/mcp/README.md', ROOT));
+  const embedded = await buildMcpEmbeddedDocs();
   await write(
     'packages/mcp/src/publish-assets.generated.ts',
     `/** Version of the published MCP package. */
@@ -118,8 +220,24 @@ export const MCP_PACKAGE_VERSION: string = ${JSON.stringify(version)};
 
 /** Published MCP README embedded as the default documentation corpus. */
 export const MCP_PACKAGE_README: string = ${JSON.stringify(readme)};
+
+/** Generated golden-path prose used when no project documentation corpus resolves. */
+export const MCP_EMBEDDED_DOCS = ${JSON.stringify(embedded.documents)} as const;
+
+/** Release identity, cardinality, size, and integrity of the generated fallback prose. */
+export const MCP_EMBEDDED_DOCS_PROVENANCE = ${JSON.stringify(embedded.provenance)} as const;
 `,
   );
+}
+
+function hex(buffer: ArrayBuffer): string {
+  return [...new Uint8Array(buffer)].map((byte) => byte.toString(16).padStart(2, '0')).join('');
+}
+
+function copiedBuffer(bytes: Uint8Array): ArrayBuffer {
+  const copy = new Uint8Array(bytes.byteLength);
+  copy.set(bytes);
+  return copy.buffer;
 }
 
 async function generateCliAssets(): Promise<void> {

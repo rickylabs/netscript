@@ -1,37 +1,31 @@
-import {
-  AspireTelemetryQuery,
-  type TelemetrySpan,
-  type TelemetryTrace,
-} from '@netscript/telemetry/query';
+import type { TelemetrySpan, TelemetryTrace } from '@netscript/telemetry/query';
+import { createLiveAspireTelemetryQuery } from './aspire-dashboard-telemetry.ts';
 
-const appHost = Deno.args[0];
-const projectRoot = Deno.args[1];
-if (!appHost || !projectRoot) throw new Error('apphost and project root arguments are required');
+if (import.meta.main) await main();
 
-const metadata = await readObject(`${projectRoot}/.netscript/e2e/aspire-start.json`);
-const dashboardUrl = typeof metadata.dashboardUrl === 'string'
-  ? new URL(metadata.dashboardUrl).origin
-  : 'https://localhost:18888';
-const query = new AspireTelemetryQuery({
-  endpoint: dashboardUrl,
-  fetch: createLiveAspireFetch(fetch),
-});
+async function main(): Promise<void> {
+  const appHost = Deno.args[0];
+  const projectRoot = Deno.args[1];
+  if (!appHost || !projectRoot) throw new Error('apphost and project root arguments are required');
 
-let lastSummary = 'no traces returned';
-for (let attempt = 1; attempt <= 30; attempt++) {
-  const traces = await query.queryTraces({ limit: 500 });
-  try {
-    validateFlowB(traces);
-    console.info(`Flow-B grouped trace passed after ${attempt} attempt(s)`);
-    Deno.exit(0);
-  } catch (error) {
-    lastSummary = error instanceof Error ? error.message : String(error);
-    if (attempt < 30) await new Promise((resolve) => setTimeout(resolve, 2_000));
+  const query = await createLiveAspireTelemetryQuery(projectRoot);
+
+  let lastSummary = 'no traces returned';
+  for (let attempt = 1; attempt <= 30; attempt++) {
+    const traces = await query.queryTraces({ limit: 500 });
+    try {
+      validateFlowB(traces);
+      console.info(`Flow-B grouped trace passed after ${attempt} attempt(s)`);
+      return;
+    } catch (error) {
+      lastSummary = error instanceof Error ? error.message : String(error);
+      if (attempt < 30) await new Promise((resolve) => setTimeout(resolve, 2_000));
+    }
   }
+  throw new Error(`Flow-B trace assertions did not converge: ${lastSummary}`);
 }
-throw new Error(`Flow-B trace assertions did not converge: ${lastSummary}`);
 
-function validateFlowB(traces: readonly TelemetryTrace[]): void {
+export function validateFlowB(traces: readonly TelemetryTrace[]): void {
   const main = traces.find((trace) =>
     hasAny(trace, ['trigger.ingress', 'trigger.detect']) && has(trace, 'queue.enqueue') &&
     has(trace, 'queue.dequeue') &&
@@ -85,10 +79,22 @@ function validateFlowB(traces: readonly TelemetryTrace[]): void {
     'trigger ingress never starts a fresh trace',
   );
 
-  const fanIn = traces.flatMap((trace) => trace.spans).find((span) =>
-    span.name === 'stream.subscribe' && span.links.length > 0
+  const subscribeSpans = traces.flatMap((trace) => trace.spans).filter((span) =>
+    span.name === 'stream.subscribe'
   );
-  tcAssert('TC-14', fanIn !== undefined, 'real streams consumer links to a Flow-B producer');
+  const fanIn = subscribeSpans.find((span) => span.links.length > 0) ?? subscribeSpans[0];
+  tcAssert('TC-14', fanIn !== undefined, 'real streams consumer span exists');
+  tcAssert(
+    'TC-14',
+    fanIn.attributes['service.name'] === 'flow-b-stream-consumer',
+    'stream.subscribe is emitted by the Deno-side consumer hosted in the isolated AppHost gate',
+  );
+  const producerLink = assertConsumerLinksProducer(main.traceId, fanIn);
+  console.info(
+    `TC-14 PASS: producerTraceId=${main.traceId} selectedCorrelationId=${
+      String(fanIn.attributes['netscript.correlation.id'])
+    } linkTraceId=${producerLink.traceId} linkSpanId=${producerLink.spanId}`,
+  );
   tcAssert(
     'TC-14',
     fanIn.links.some((link) => Object.keys(link.attributes).length > 0),
@@ -116,6 +122,26 @@ function validateFlowB(traces: readonly TelemetryTrace[]): void {
       `${span.name} carries a netscript.* outcome`,
     );
   }
+}
+
+/** Assert the SSE consumer has a W3C link into the selected Flow-B producer trace. */
+export function assertConsumerLinksProducer(
+  producerTraceId: string,
+  consumerSpan: TelemetrySpan,
+): TelemetrySpan['links'][number] {
+  if (consumerSpan.links.length === 0) {
+    throw new Error(
+      `TC-14 FAIL: SSE consumer has zero W3C links; producerTraceId=${producerTraceId} consumerTraceId=${consumerSpan.traceId} consumerSpanId=${consumerSpan.spanId} linkCount=0`,
+    );
+  }
+  const match = consumerSpan.links.find((link) => link.traceId === producerTraceId);
+  if (match) return match;
+  const links = consumerSpan.links.map((link, index) =>
+    `link[${index}].traceId=${link.traceId} link[${index}].spanId=${link.spanId}`
+  ).join(' ');
+  throw new Error(
+    `TC-14 FAIL: SSE consumer W3C links do not point into the selected Flow-B producer trace; producerTraceId=${producerTraceId} consumerTraceId=${consumerSpan.traceId} consumerSpanId=${consumerSpan.spanId} linkCount=${consumerSpan.links.length} ${links}`,
+  );
 }
 
 function has(trace: TelemetryTrace, name: string): boolean {
@@ -162,76 +188,4 @@ function hasOutcome(span: TelemetrySpan): boolean {
 function tcAssert(tc: string, condition: boolean, description: string): asserts condition {
   if (!condition) throw new Error(`${tc} FAIL: ${description}`);
   console.info(`${tc} PASS: ${description}`);
-}
-
-function createLiveAspireFetch(liveFetch: typeof fetch): typeof fetch {
-  return async (input, init) => {
-    const response = await liveFetch(input, init);
-    if (!response.ok) return response;
-    const payload = await response.json();
-    return Response.json({ spans: flattenOtlpSpans(payload) });
-  };
-}
-
-function flattenOtlpSpans(payload: unknown): unknown[] {
-  const flattened: unknown[] = [];
-  visitResourceSpans(payload, flattened);
-  return flattened;
-}
-
-function visitResourceSpans(value: unknown, flattened: unknown[]): void {
-  if (Array.isArray(value)) {
-    for (const item of value) visitResourceSpans(item, flattened);
-    return;
-  }
-  if (!isRecord(value)) return;
-  if (Array.isArray(value.resourceSpans)) {
-    for (const resourceSpan of value.resourceSpans) flattenResourceSpan(resourceSpan, flattened);
-    return;
-  }
-  for (const child of Object.values(value)) visitResourceSpans(child, flattened);
-}
-
-function flattenResourceSpan(value: unknown, flattened: unknown[]): void {
-  if (!isRecord(value)) return;
-  const resource = isRecord(value.resource) ? value.resource : {};
-  const resourceAttributes = Array.isArray(resource.attributes) ? resource.attributes : [];
-  const serviceName = attributeString(resourceAttributes, 'service.name') ?? 'unknown';
-  const scopeSpans = Array.isArray(value.scopeSpans) ? value.scopeSpans : [];
-  for (const scope of scopeSpans) {
-    if (!isRecord(scope) || !Array.isArray(scope.spans)) continue;
-    for (const span of scope.spans) {
-      if (!isRecord(span)) continue;
-      const attributes = Array.isArray(span.attributes) ? [...span.attributes] : [];
-      attributes.push({ key: 'service.name', value: { stringValue: serviceName } });
-      flattened.push({ ...span, kind: normalizeOtlpKind(span.kind), attributes });
-    }
-  }
-}
-
-function normalizeOtlpKind(value: unknown): unknown {
-  if (value === 1) return 'internal';
-  if (value === 2) return 'server';
-  if (value === 3) return 'client';
-  if (value === 4) return 'producer';
-  if (value === 5) return 'consumer';
-  return value;
-}
-
-function attributeString(attributes: readonly unknown[], key: string): string | undefined {
-  for (const attribute of attributes) {
-    if (!isRecord(attribute) || attribute.key !== key || !isRecord(attribute.value)) continue;
-    if (typeof attribute.value.stringValue === 'string') return attribute.value.stringValue;
-  }
-  return undefined;
-}
-
-async function readObject(path: string): Promise<Record<string, unknown>> {
-  const value = JSON.parse(await Deno.readTextFile(path));
-  if (!isRecord(value)) throw new Error(`${path} did not contain an object`);
-  return value;
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
 }

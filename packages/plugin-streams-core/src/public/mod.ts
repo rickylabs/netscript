@@ -35,4 +35,34 @@ export type {
   StreamStateDefinition,
 } from '../domain/stream-schema.ts';
 export type { ChangeEvent, ControlEvent, Operation, StateEvent } from '../domain/stream-event.ts';
-export type { StreamProducerPort } from '../ports/stream-producer-port.ts';
+export {
+  DEFAULT_STREAM_PRODUCER_BUFFER_POLICY_V1,
+  DEFAULT_STREAM_PRODUCER_RECONNECT_POLICY_V1,
+  STREAM_PRODUCER_LIFECYCLE_STATES_V1,
+} from '../domain/producer-contract-v1.ts';
+export type {
+  StreamProducerBufferPolicyV1,
+  StreamProducerLifecycleStateV1,
+  StreamProducerReadinessOptionsV1,
+  StreamProducerReconnectPolicyV1,
+  StreamProducerStateSnapshotV1,
+  StreamProducerTransportFailureKindV1,
+  StreamProducerTransportFailureV1,
+  StreamWriteCancellationReasonV1,
+  StreamWriteOutcomeV1,
+  StreamWriteReceiptV1,
+  StreamWriteRejectionReasonV1,
+  StreamWriteUnknownReasonV1,
+} from '../domain/producer-contract-v1.ts';
+export type { StreamProducerClockPort } from '../ports/stream-producer-clock-port.ts';
+export type { StreamProducerPort, StreamWriteContextV1 } from '../ports/stream-producer-port.ts';
+export type { StreamProducerRandomPort } from '../ports/stream-producer-random-port.ts';
+export type {
+  StreamProducerAcknowledgementV1,
+  StreamProducerAppendInputV1,
+  StreamProducerCloseInputV1,
+  StreamProducerConnectInputV1,
+  StreamProducerIdentityV1,
+  StreamProducerTransportPort,
+  StreamProducerTransportResultV1,
+} from '../ports/stream-producer-transport-port.ts';

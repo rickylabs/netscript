@@ -43,6 +43,8 @@
     "@durable-streams/tanstack-ai-transport": "npm:@durable-streams/tanstack-ai-transport@^0.0.8",
     "@netscript/ai": "jsr:@netscript/ai@0.0.4",
     "@netscript/telemetry": "jsr:@netscript/telemetry@0.0.4",
+    "@netscript/plugin-streams-core": "jsr:@netscript/plugin-streams-core@0.0.4",
+    "@netscript/plugin-streams-core/sse": "jsr:@netscript/plugin-streams-core@0.0.4/sse",
     "@netscript/sdk/desktop": "jsr:@netscript/sdk@0.0.4/desktop",
     "@orpc/server": "npm:@orpc/server@^1.14.6",
     "@preact/signals": "npm:@preact/signals@2.9.2",

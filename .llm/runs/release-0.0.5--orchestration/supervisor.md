@@ -58,36 +58,3 @@ high evaluator session `567e3125-0fe9-4637-b0bb-30c20f9d3c26` ran through the su
 `formal_plan_evaluation` route and returned `PASS` in 247,552 ms. Its prompt is
 `plan-eval-prompt.md`; its verbatim verdict is `plan-eval.md`. Implementation is authorized under
 wave plan v3. Qwen remains reserved for separate per-slice IMPL-EVAL sessions.
-
----
-
-## Stable-cut orchestrator — 2026-08-08
-
-Ownership of this run transfers to a fresh native Claude session. The continuation record above is
-preserved verbatim as evidence; none of its process state is inherited as live ownership.
-
-| Field              | Value                                                                                           |
-| ------------------ | ----------------------------------------------------------------------------------------------- |
-| Supervisor model   | Claude · Anthropic · Opus 5 · high (canonical `planning_decisions`, no override)                |
-| Permission mode    | bypass / danger-full-access (owner-authorized)                                                  |
-| Remote Control     | enabled on this session (no separate mobile-orchestration lane)                                 |
-| Host               | WSL2, `/home/codex/repos/ns005-stable-opus5`                                                    |
-| Branch             | `orchestrator/0.0.5-stable-opus5`                                                               |
-| Baseline           | `origin/main@6c6044da9`                                                                         |
-| Milestone          | GitHub milestone 23, `0.0.5`                                                                    |
-| Resumed            | 2026-08-08                                                                                      |
-| Profile            | `.llm/harness/workflow/milestone-run.md` + `agent-milestone-orchestrator`                       |
-| Objective          | close 0.0.5 with public-surface fixes/features, canary at declared boundaries, cut 0.0.5 stable |
-| Inherited evidence | `orchestrator/0.0.5-continuation@ac7a4892a` (PR #1337) — run dir imported, not re-derived       |
-| Legacy evidence    | `orchestrator/0.0.5@8399126ef` — untouched                                                      |
-
-### Lane bindings
-
-Superseded by "Lane bindings for v4" in `plan.md`. The v3 bindings above are historical.
-
-### Owner authorizations in force
-
-- 2026-08-03 grant: merge, canary publish, and the stable cut proceed without asking; a red gate is
-  a stop, not a thing to hand-patch.
-- 2026-08-08 lane policy: PLAN-EVAL conditional, IMPL-EVAL mandatory, native opposite-family
-  evaluators, OpenHands paused.

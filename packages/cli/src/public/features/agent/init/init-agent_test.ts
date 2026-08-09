@@ -37,6 +37,8 @@ const FIXTURE_DOCS_GENERATOR: AgentDocsGenerator = {
       files: {
         "llms.txt": "# NetScript\n\n## Task router\n",
         "llms-full.txt": "complete docs\n",
+        "pages/services-sdk/services/index.md":
+          "# Services\n\nBuild a typed client for a service using the generated contract.\n",
         "deno-doc/config.txt": "config API\n",
         "MANIFEST.md": "Start at `.netscript/docs/llms.txt`.\n",
       },
@@ -85,6 +87,16 @@ Deno.test("agent init writes Claude config, skills, and marked AGENTS section id
     const agents = await Deno.readTextFile(join(root, "AGENTS.md"));
     for (const expected of ["aspire", "deno", "help.md", "aspire otel"]) {
       assertStringIncludes(agents, expected);
+    }
+    assertStringIncludes(
+      agents,
+      "Before implementing an unfamiliar NetScript API or architecture, call MCP `find_guidance` with the task.",
+    );
+    for (const skill of ["netscript", "netscript-build"]) {
+      assertStringIncludes(
+        await Deno.readTextFile(join(root, `.claude/skills/${skill}/SKILL.md`)),
+        "find_guidance",
+      );
     }
     assertEquals(first.hosts, ["claude"]);
     const second = await initAgent({ projectRoot: root, host: "claude" }, {
@@ -257,7 +269,7 @@ Deno.test("S-18 prior-release host stays pinned until agent init and restart exp
     assertEquals(after.mcpServers.netscript.args[4], MIGRATION_TARGET_SPECIFIER);
 
     const restartedTools = await listToolsAfterHostRestart(root);
-    assertEquals(restartedTools.length, 21);
+    assertEquals(restartedTools.length, 22);
     for (const tool of OPENAPI_TOOL_TRIAD) assert(restartedTools.includes(tool));
   } finally {
     await Deno.remove(root, { recursive: true });
@@ -658,9 +670,20 @@ Deno.test("agent init --with-docs installs a path-closed local corpus", async ()
       aspireAgentInitializer: SUCCESSFUL_ASPIRE_INITIALIZER,
       docsGenerator: FIXTURE_DOCS_GENERATOR,
     });
-    for (const path of ["llms.txt", "llms-full.txt", "deno-doc/config.txt", "MANIFEST.md"]) {
+    for (
+      const path of [
+        "llms.txt",
+        "llms-full.txt",
+        "pages/services-sdk/services/index.md",
+        "deno-doc/config.txt",
+        "MANIFEST.md",
+      ]
+    ) {
       assert(await new DenoAgentInitFileSystem().exists(join(root, ".netscript", "docs", path)));
     }
+    const docsRoot = join(root, ".netscript", "docs");
+    const claude = JSON.parse(await Deno.readTextFile(join(root, ".mcp.json")));
+    assertEquals(claude.mcpServers.netscript.args.slice(-2), ["--docs-root", docsRoot]);
     const agents = await Deno.readTextFile(join(root, "AGENTS.md"));
     assertStringIncludes(agents, ".netscript/docs/llms.txt");
     const manifest = await Deno.readTextFile(join(root, ".netscript", "docs", "MANIFEST.md"));
@@ -668,8 +691,100 @@ Deno.test("agent init --with-docs installs a path-closed local corpus", async ()
       assert(await new DenoAgentInitFileSystem().exists(join(root, match[0])));
     }
     assert(result.messages.some((message) => message.includes("1 API packages / 2 export subpaths")));
+
   } finally {
     await Deno.remove(root, { recursive: true });
+  }
+});
+
+Deno.test("generated project search_docs reaches its installed corpus after host restart", async () => {
+  const root = await Deno.makeTempDir();
+  try {
+    await Deno.writeTextFile(join(root, "deno.json"), "{}\n");
+    await initAgent({ projectRoot: root, host: "claude", withDocs: true }, {
+      fs: new DenoAgentInitFileSystem(),
+      aspireAgentInitializer: SUCCESSFUL_ASPIRE_INITIALIZER,
+      docsGenerator: FIXTURE_DOCS_GENERATOR,
+    });
+    const claude = JSON.parse(await Deno.readTextFile(join(root, ".mcp.json")));
+    const search = await callToolFromGeneratedHost(root, claude.mcpServers.netscript.args, {
+      name: "search_docs",
+      arguments: { query: "typed client for a service" },
+    });
+    const structured = search.result.structuredContent as {
+      readonly matches: readonly { readonly slug: string }[];
+    };
+    assert(
+      structured.matches.some((match) => match.slug === "pages/services-sdk/services"),
+      `installed corpus result missing: ${JSON.stringify(structured)}`,
+    );
+    const listed = await callToolFromGeneratedHost(root, claude.mcpServers.netscript.args, {
+      name: "list_docs",
+      arguments: {},
+    });
+    assertEquals(listed.result.structuredContent, {
+      count: 3,
+      docs: [
+        {
+          slug: "llms",
+          title: "NetScript",
+          description: "",
+        },
+        {
+          slug: "MANIFEST",
+          title: "MANIFEST",
+          description: "Start at `.netscript/docs/llms.txt`.",
+        },
+        {
+          slug: "pages/services-sdk/services",
+          title: "Services",
+          description: "Build a typed client for a service using the generated contract.",
+        },
+      ],
+      corpus: {
+        kind: "filesystem",
+        root: join(root, ".netscript", "docs"),
+        documentCount: 3,
+      },
+    });
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+Deno.test("agent init --with-docs gives Claude, VS Code, and Zed the same docs root", async () => {
+  const vscodeRoot = await Deno.makeTempDir();
+  const zedRoot = await Deno.makeTempDir();
+  try {
+    const fs = new DenoAgentInitFileSystem();
+    await initAgent(
+      { projectRoot: vscodeRoot, host: "all", editor: "vscode", withDocs: true },
+      {
+        fs,
+        aspireAgentInitializer: SUCCESSFUL_ASPIRE_INITIALIZER,
+        docsGenerator: FIXTURE_DOCS_GENERATOR,
+      },
+    );
+    const vscodeDocsRoot = join(vscodeRoot, ".netscript", "docs");
+    const claude = JSON.parse(await Deno.readTextFile(join(vscodeRoot, ".mcp.json")));
+    const vscode = JSON.parse(await Deno.readTextFile(join(vscodeRoot, ".vscode", "mcp.json")));
+    assertEquals(claude.mcpServers.netscript.args.slice(-2), ["--docs-root", vscodeDocsRoot]);
+    assertEquals(vscode.servers.netscript.args.slice(-2), ["--docs-root", vscodeDocsRoot]);
+
+    await initAgent(
+      { projectRoot: zedRoot, host: "claude", editor: "zed", withDocs: true },
+      {
+        fs,
+        aspireAgentInitializer: SUCCESSFUL_ASPIRE_INITIALIZER,
+        docsGenerator: FIXTURE_DOCS_GENERATOR,
+      },
+    );
+    const zedDocsRoot = join(zedRoot, ".netscript", "docs");
+    const zed = JSON.parse(await Deno.readTextFile(join(zedRoot, ".zed", "settings.json")));
+    assertEquals(zed.context_servers.netscript.args.slice(-2), ["--docs-root", zedDocsRoot]);
+  } finally {
+    await Deno.remove(vscodeRoot, { recursive: true });
+    await Deno.remove(zedRoot, { recursive: true });
   }
 });
 
@@ -722,6 +837,38 @@ async function listToolsAfterHostRestart(projectRoot: string): Promise<readonly 
     readonly result: { readonly tools: readonly { readonly name: string }[] };
   };
   return response.result.tools.map((tool) => tool.name);
+}
+
+async function callToolFromGeneratedHost(
+  projectRoot: string,
+  generatedArgs: readonly string[],
+  tool: { readonly name: string; readonly arguments: Readonly<Record<string, unknown>> },
+): Promise<{ readonly result: { readonly structuredContent: unknown } }> {
+  const cliPath = new URL("../../../../../bin/netscript.ts", import.meta.url).pathname;
+  const args = [...generatedArgs];
+  // Run the generated command against local workspace source while preserving its project/docs
+  // arguments; a generated project's import map would otherwise resolve the published CLI.
+  args[2] = new URL("../../../../../../../deno.json", import.meta.url).pathname;
+  args[4] = cliPath;
+  args.push("--endpoint", "http://127.0.0.1:1");
+  const child = new Deno.Command(Deno.execPath(), {
+    args,
+    cwd: projectRoot,
+    stdin: "piped",
+    stdout: "piped",
+    stderr: "piped",
+  }).spawn();
+  const writer = child.stdin.getWriter();
+  await writer.write(new TextEncoder().encode(`${JSON.stringify({
+    jsonrpc: "2.0",
+    id: 1,
+    method: "tools/call",
+    params: tool,
+  })}\n`));
+  await writer.close();
+  const output = await child.output();
+  assertEquals(output.code, 0, new TextDecoder().decode(output.stderr));
+  return JSON.parse(new TextDecoder().decode(output.stdout));
 }
 
 function extractSkillReferences(markdown: string): ReadonlySet<string> {

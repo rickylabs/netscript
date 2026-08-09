@@ -2,21 +2,37 @@ import { defineCliE2eSuite } from '../../src/application/builders/define-cli-e2e
 import {
   GATE,
   type GateId,
+  KV_BACKGROUND_RUNTIME_WAIT_RESOURCES,
   SCAFFOLD,
   SCAFFOLD_TITLE,
   type SuiteId,
 } from '../../src/domain/cli-surface.ts';
 import { DATABASE } from '../../src/domain/extension-axes.ts';
 import type { RunOptions } from '../../src/domain/run-context.ts';
-import type { SuiteDefinition } from '../../src/domain/suite-definition.ts';
+import type { DeferredGate, SuiteDefinition } from '../../src/domain/suite-definition.ts';
 
 /** Built-in scaffold capability suite shape. */
 export interface ScaffoldCapabilitySuite {
   readonly id: SuiteId;
   readonly title: string;
   readonly gates: readonly GateId[];
+  readonly deferredGates?: readonly DeferredGate[];
   readonly defaults?: Partial<RunOptions>;
 }
+
+/** Runtime gates deferred until workers-combined publishes execution mutations (#1398). */
+export const SCAFFOLD_RUNTIME_DEFERRED_GATES = [
+  {
+    id: GATE.BEHAVIOR_OTEL_STREAM_CONSUMER,
+    issue: '#1398',
+    reason: 'workers-combined does not install the stream mutation hook',
+  },
+  {
+    id: GATE.BEHAVIOR_OTEL_TRACES,
+    issue: '#1398',
+    reason: 'TC-14 requires the deferred Flow-B stream-consumer record',
+  },
+] as const satisfies readonly DeferredGate[];
 
 const SERVICE_GATES = [
   GATE.PREFLIGHT_DENO,
@@ -74,19 +90,17 @@ const RUNTIME_GATES = [
   GATE.RUNTIME_READINESS_FIXTURE,
   GATE.RUNTIME_ASPIRE_START,
   GATE.DATABASE_INIT,
+  GATE.DATABASE_MIGRATION_ARTIFACTS,
   GATE.DATABASE_GENERATE,
   GATE.DATABASE_SEED,
+  GATE.RUNTIME_CAPTURE_DB_ALLOCATION_FIRST,
   GATE.RUNTIME_ASPIRE_RESTART_AFTER_DB,
+  GATE.RUNTIME_CAPTURE_DB_ALLOCATION_SECOND,
   GATE.RUNTIME_WAIT_POSTGRES,
   GATE.RUNTIME_WAIT_MYSQL,
   GATE.RUNTIME_WAIT_MSSQL,
   GATE.RUNTIME_WAIT_GARNET,
-  GATE.RUNTIME_WAIT_WORKERS_API,
-  GATE.RUNTIME_WAIT_WORKERS,
-  GATE.RUNTIME_WAIT_SAGAS_API,
-  GATE.RUNTIME_WAIT_SAGAS,
-  GATE.RUNTIME_WAIT_TRIGGERS_API,
-  GATE.RUNTIME_WAIT_TRIGGERS,
+  ...KV_BACKGROUND_RUNTIME_WAIT_RESOURCES.map((resource) => `runtime.wait.${resource}` as const),
   GATE.RUNTIME_WAIT_AUTH,
   GATE.RUNTIME_WAIT_STREAMS,
   GATE.RUNTIME_WAIT_APP,
@@ -101,6 +115,7 @@ const RUNTIME_GATES = [
   GATE.BEHAVIOR_WORKERS_EXECUTIONS,
   GATE.BEHAVIOR_MCP_ENDPOINT_DIRECTORY,
   GATE.BEHAVIOR_SERVICE_HEALTH,
+  GATE.BEHAVIOR_LIVE_DB_ENDPOINT,
   GATE.BEHAVIOR_SAGAS_HEALTH,
   GATE.BEHAVIOR_SAGAS_LIST,
   GATE.BEHAVIOR_SAGAS_INSTANCES,
@@ -116,8 +131,7 @@ const RUNTIME_GATES = [
   GATE.BEHAVIOR_MCP_WIDGET_ROUNDTRIP,
   GATE.BEHAVIOR_PLUGINS_HEALTH,
   GATE.BEHAVIOR_OTEL_WEBHOOK,
-  GATE.BEHAVIOR_OTEL_STREAM_CONSUMER,
-  GATE.BEHAVIOR_OTEL_TRACES,
+  GATE.BEHAVIOR_STREAMS_PRODUCER_RECONNECT,
   GATE.BEHAVIOR_OTEL_TASK_TRACES,
   GATE.CLEANUP_ASPIRE_STOP,
 ] as const;
@@ -126,7 +140,15 @@ const RUNTIME_GATES = [
 // is not supported by the libSQL adapter. Keep that product-health assertion in
 // the Postgres merge-readiness suite while the reduced-container tier exercises
 // every provider-neutral runtime behavior.
-const RUNTIME_SQLITE_GATES = RUNTIME_GATES.filter((gate) => gate !== GATE.BEHAVIOR_SERVICE_HEALTH);
+const POSTGRES_ONLY_RUNTIME_GATES = new Set<GateId>([
+  GATE.DATABASE_MIGRATION_ARTIFACTS,
+  GATE.RUNTIME_CAPTURE_DB_ALLOCATION_FIRST,
+  GATE.RUNTIME_CAPTURE_DB_ALLOCATION_SECOND,
+  GATE.BEHAVIOR_SERVICE_HEALTH,
+  GATE.BEHAVIOR_LIVE_DB_ENDPOINT,
+]);
+
+const RUNTIME_SQLITE_GATES = RUNTIME_GATES.filter((gate) => !POSTGRES_ONLY_RUNTIME_GATES.has(gate));
 
 const PLUGIN_GATES = [
   GATE.PREFLIGHT_DENO,
@@ -173,11 +195,15 @@ export const scaffoldCapabilitySuites: readonly ScaffoldCapabilitySuite[] = [
     id: SCAFFOLD.RUNTIME,
     title: SCAFFOLD_TITLE.RUNTIME,
     gates: RUNTIME_GATES,
+    // Explicit release deferral: #1398 must restore both gates to RUNTIME_GATES.
+    deferredGates: SCAFFOLD_RUNTIME_DEFERRED_GATES,
   },
   {
     id: SCAFFOLD.RUNTIME_SQLITE,
     title: SCAFFOLD_TITLE.RUNTIME_SQLITE,
     gates: RUNTIME_SQLITE_GATES,
+    // Keep both runtime tiers honest about the same #1398 coverage gap.
+    deferredGates: SCAFFOLD_RUNTIME_DEFERRED_GATES,
     defaults: { database: DATABASE.SQLITE, cache: false },
   },
 ];
@@ -239,6 +265,7 @@ export function createScaffoldCapabilitySuite(
   const gatesById = new Map(suite.gates.map((gate) => [gate.id, gate]));
   return {
     ...suite,
+    deferredGates: capability.deferredGates,
     gates: runtimeGateIds(capability.gates, suite.defaultOptions.database).map(
       (id) => {
         const gate = gatesById.get(id);
@@ -258,6 +285,7 @@ function runtimeGateIds(
   database: RunOptions['database'],
 ): readonly GateId[] {
   return gates.filter((id) => {
+    if (POSTGRES_ONLY_RUNTIME_GATES.has(id)) return database === 'postgres';
     if (id === GATE.RUNTIME_WAIT_POSTGRES) return database === 'postgres';
     if (id === GATE.RUNTIME_WAIT_MYSQL) return database === 'mysql';
     if (id === GATE.RUNTIME_WAIT_MSSQL) return database === 'mssql';

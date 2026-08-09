@@ -13,21 +13,30 @@ Deno.test('static catalog defaults to an explicit unwired descriptor', async () 
 });
 
 Deno.test('spawn executor uses the published CLI prefix by default', () => {
-  assertEquals(DEFAULT_CLI_COMMAND, [
+  const command = [
     'deno',
     'run',
     '-A',
     `jsr:@netscript/cli@${mcpPackageJson.version}`,
-  ]);
+  ];
+  assertEquals(DEFAULT_CLI_COMMAND, command);
+  assertEquals(new SpawnCommandExecutor().identity, {
+    mode: 'standalone',
+    version: mcpPackageJson.version,
+    command,
+  });
 });
 
 Deno.test('spawn executor captures a cheap real subprocess', async () => {
   const executor = new SpawnCommandExecutor({
     cliCommand: ['deno', 'eval', 'console.log(Deno.args.join("|"))'],
+    mode: 'host',
+    version: '9.9.9-host',
   });
   const result = await executor.execute({ path: ['db', 'status'], args: ['fixture'] });
   assertEquals(result.exitCode, 0);
   assertEquals(result.timedOut, false);
+  assertEquals(result.executor, executor.identity);
   assertStringIncludes(result.outputTail, 'db|status|fixture');
 });
 

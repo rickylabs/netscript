@@ -3842,6 +3842,7 @@
         "dependencies": [
           "jsr:@fresh/core@^2.3.3",
           "jsr:@netscript/ai@0.0.4",
+          "jsr:@netscript/plugin-streams-core@0.0.4",
           "jsr:@netscript/sdk@0.0.4",
           "jsr:@netscript/telemetry@0.0.4",
           "jsr:@std/assert@1",

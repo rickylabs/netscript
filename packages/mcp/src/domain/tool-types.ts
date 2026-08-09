@@ -13,6 +13,7 @@ export const TOOL_NAMES = [
   'search_docs',
   'list_docs',
   'get_doc',
+  'find_guidance',
   'find_export',
   'list_package_exports',
   'get_export',

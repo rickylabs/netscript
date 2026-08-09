@@ -1,7 +1,25 @@
-import { assertEquals } from '@std/assert';
+import { assert, assertEquals } from '@std/assert';
 import { toFileUrl } from '@std/path';
 import { findVersionResidue } from './deps/bump-version.ts';
-import { refreshAgentDocsProvenance } from './generate-publish-assets.ts';
+import {
+  buildMcpEmbeddedDocs,
+  MCP_EMBEDDED_DOC_PATHS,
+  MCP_EMBEDDED_DOCS_MAX_BYTES,
+  refreshAgentDocsProvenance,
+} from './generate-publish-assets.ts';
+
+Deno.test('MCP fallback is generated from the locked release prose within 256 KiB', async () => {
+  const generated = await buildMcpEmbeddedDocs();
+  assertEquals(generated.provenance.paths, MCP_EMBEDDED_DOC_PATHS);
+  assertEquals(generated.provenance.documentCount, 12);
+  assertEquals(generated.provenance.documentCount, MCP_EMBEDDED_DOC_PATHS.length);
+  assertEquals(generated.documents.map((document) => document.path), [...MCP_EMBEDDED_DOC_PATHS]);
+  assertEquals(generated.documents[0]?.path, 'llms.txt');
+  assertEquals(generated.documents[0]?.slug, 'llms');
+  assert(generated.documents.every((document) => document.source.length > 0));
+  assert(generated.provenance.sourceBytes <= MCP_EMBEDDED_DOCS_MAX_BYTES);
+  assertEquals(generated.provenance.sha256.length, 64);
+});
 
 Deno.test('release asset regeneration removes prior-version provenance residue', async () => {
   const root = await Deno.makeTempDir();

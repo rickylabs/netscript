@@ -4,7 +4,7 @@
  */
 import { createMcpServer } from './src/application/runner/mcp-server.ts';
 import type { McpServer } from './src/application/runner/mcp-server.ts';
-import { createDocsFlows } from './src/application/flows/docs-flows.ts';
+import { createDocsFlows } from './src/application/docs/docs-flows.ts';
 import { FetchTelemetryProbe } from './src/infrastructure/fetch-telemetry-probe.ts';
 import {
   createAspireDashboardFetch,
@@ -12,10 +12,12 @@ import {
   readTelemetryEndpointEnvironment,
 } from './src/infrastructure/telemetry-query-adapter.ts';
 import { runNewlineStdio } from './src/infrastructure/stdio-transport.ts';
-import { FilesystemDocsCorpus } from './src/infrastructure/filesystem-docs-corpus.ts';
-import { EmbeddedDocsCorpus } from './src/infrastructure/embedded-docs-corpus.ts';
+import {
+  FilesystemDocsCorpus,
+  isIndexableDocsRoot,
+} from './src/infrastructure/filesystem-docs-corpus.ts';
+import { ReleaseEmbeddedDocsCorpus } from './src/infrastructure/release-embedded-docs-corpus.ts';
 import { resolve } from '@std/path';
-import { MCP_PACKAGE_README } from './src/publish-assets.generated.ts';
 import { createGetAppStatusFlow } from './src/application/flows/get-app-status-flow.ts';
 import { createGetRecentErrorsFlow } from './src/application/flows/get-recent-errors-flow.ts';
 import { createGetRunFlow } from './src/application/flows/get-run-flow.ts';
@@ -79,7 +81,7 @@ export interface McpCliOptions {
     ExportSurfaceCorpusPort;
 }
 
-/** Resolve an explicit public documentation override from flags or environment. */
+/** Resolve public docs by explicit flag, environment, then an indexable project bundle. */
 export function resolveDocsRoot(
   args: readonly string[] = Deno.args,
   environmentRoot: string | undefined = Deno.env.get('NETSCRIPT_DOCS_ROOT'),
@@ -88,7 +90,9 @@ export function resolveDocsRoot(
   const flagIndex = args.indexOf('--docs-root');
   const flagRoot = flagIndex >= 0 ? args[flagIndex + 1] : undefined;
   if (flagRoot) return resolve(projectRoot, flagRoot);
-  return environmentRoot ? resolve(projectRoot, environmentRoot) : undefined;
+  if (environmentRoot) return resolve(projectRoot, environmentRoot);
+  const projectDocsRoot = resolve(projectRoot, '.netscript', 'docs');
+  return isIndexableDocsRoot(projectDocsRoot) ? projectDocsRoot : undefined;
 }
 
 /** Run the MCP server on Deno standard input and output. */
@@ -96,7 +100,8 @@ export async function runMcpStdioServer(
   options: McpCliOptions = {},
 ): Promise<void> {
   const projectRoot = options.projectRoot ?? Deno.cwd();
-  const docsRoot = options.docsRoot ?? resolveDocsRoot(Deno.args, undefined, projectRoot);
+  const docsRoot = options.docsRoot ??
+    resolveDocsRoot(Deno.args, Deno.env.get('NETSCRIPT_DOCS_ROOT'), projectRoot);
   const server = createMcpCliServer({
     ...options,
     ...(docsRoot ? { docsRoot } : {}),
@@ -116,9 +121,10 @@ export function createMcpCliServer(options: McpCliOptions = {}): McpServer {
     resolveDocsRoot([], Deno.env.get('NETSCRIPT_DOCS_ROOT'), projectRoot);
   const docsCorpus = configuredDocsRoot
     ? new FilesystemDocsCorpus({ root: configuredDocsRoot })
-    : new EmbeddedDocsCorpus({
-      documents: [{ slug: 'mcp', source: MCP_PACKAGE_README }, ...(options.embeddedDocs ?? [])],
-    });
+    : new ReleaseEmbeddedDocsCorpus({ additionalDocuments: options.embeddedDocs });
+  const docsSelection = configuredDocsRoot
+    ? { kind: 'filesystem' as const, root: configuredDocsRoot }
+    : { kind: 'embedded' as const, root: null };
   const evidence = options.diagnosticEvidence ?? new FilesystemDiagnosticEvidence(projectRoot);
   const warnEvidence = options.onEvidenceWarning ?? ((message: string) => console.error(message));
   const probe = new FetchTelemetryProbe((endpoint) =>
@@ -130,11 +136,12 @@ export function createMcpCliServer(options: McpCliOptions = {}): McpServer {
   const exportSurfaceFlows = createExportSurfaceFlows(
     options.exportSurfaceCorpus ?? new EmbeddedExportSurfaceCorpus(),
   );
+  const commandExecutor = options.commandExecutor ?? new SpawnCommandExecutor();
   return createMcpServer({
     probe,
     environment,
     flows: {
-      ...createDocsFlows(docsCorpus),
+      ...createDocsFlows(docsCorpus, docsSelection),
       find_export: withReceipt(
         exportSurfaceFlows.find_export,
         evidence,
@@ -191,12 +198,20 @@ export function createMcpCliServer(options: McpCliOptions = {}): McpServer {
         'mcp analyze_db_bottlenecks',
         warnEvidence,
       ),
+      // Catalog enumeration describes the executor but diagnoses no project resource, so it is
+      // intentionally receipt-exempt.
       list_commands: createListCommandsFlow(
         options.commandCatalog ?? new StaticCommandCatalog(),
+        commandExecutor.identity,
       ),
-      execute_command: createExecuteCommandFlow(
-        options.commandExecutor ?? new SpawnCommandExecutor(),
-        options.commandPolicy ?? DEFAULT_COMMAND_POLICY,
+      execute_command: withReceipt(
+        createExecuteCommandFlow(
+          commandExecutor,
+          options.commandPolicy ?? DEFAULT_COMMAND_POLICY,
+        ),
+        evidence,
+        'mcp execute_command',
+        warnEvidence,
       ),
       doctor: withReceipt(
         createDoctorFlow(probe, environment, [

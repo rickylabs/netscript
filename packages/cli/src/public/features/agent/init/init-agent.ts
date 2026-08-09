@@ -26,7 +26,7 @@ function agentsSection(withDocs: boolean): string {
   const docs = withDocs
     ? " Offline framework and exact-version API docs are installed; start at `.netscript/docs/llms.txt`."
     : " Need offline framework or API guidance? Run `netscript agent init --with-docs`.";
-  return `${START_MARKER}\n## NetScript agent tooling\n\nInstalled skills: \`netscript\`, \`netscript-build\`, \`netscript-operate\`, \`aspire\`, and \`deno\`. Search \`.claude/skills/help.md\` through MCP \`search_docs\` when something hangs, vanishes, stays silent, is Healthy but does not respond, or leaves a dangling AppHost.\n\nUse MCP \`doctor\` for NetScript, Aspire, project-wiring, and plugin prerequisites. Use \`get_app_status\` and \`get_recent_errors\` for live telemetry symptoms; use the \`analyze_*\` tools and \`aspire otel logs|spans|traces\` for performance and database evidence. Route Deno runtime, type, permission, and module-resolution symptoms to the \`deno\` skill. The symptom-indexed project tools are listed in \`.llm/tools/README.md\`; for type evidence use \`.llm/tools/run-deno-check.ts\`, which fails when configuration excludes every requested file.${docs}\n\nBefore hand-rolled \`curl\` probes or print debugging, run \`netscript plugin doctor\`, \`aspire logs\`, \`aspire otel logs|spans|traces\`, and \`deno info\`. Drift is gated, not suggested: \`netscript agent drift record\` and MCP \`record_drift\` refuse unless the same resource has a successful \`netscript plugin doctor --resource <name>\` or MCP diagnostic receipt from the last 15 minutes. Receipts live under \`.netscript/agent/diagnostics/\`; accepted entries append to \`.netscript/agent/drift.jsonl\`.\n${END_MARKER}`;
+  return `${START_MARKER}\n## NetScript agent tooling\n\nInstalled skills: \`netscript\`, \`netscript-build\`, \`netscript-operate\`, \`aspire\`, and \`deno\`. Search \`.claude/skills/help.md\` through MCP \`search_docs\` when something hangs, vanishes, stays silent, is Healthy but does not respond, or leaves a dangling AppHost.\n\nBefore implementing an unfamiliar NetScript API or architecture, call MCP \`find_guidance\` with the task. Use MCP \`search_docs\` for literal lookup and \`get_doc\` for exact retrieval.\n\nUse MCP \`doctor\` for NetScript, Aspire, project-wiring, and plugin prerequisites. Use \`get_app_status\` and \`get_recent_errors\` for live telemetry symptoms; use the \`analyze_*\` tools and \`aspire otel logs|spans|traces\` for performance and database evidence. Route Deno runtime, type, permission, and module-resolution symptoms to the \`deno\` skill. The symptom-indexed project tools are listed in \`.llm/tools/README.md\`; for type evidence use \`.llm/tools/run-deno-check.ts\`, which fails when configuration excludes every requested file.${docs}\n\nBefore hand-rolled \`curl\` probes or print debugging, run \`netscript plugin doctor\`, \`aspire logs\`, \`aspire otel logs|spans|traces\`, and \`deno info\`. Drift is gated, not suggested: \`netscript agent drift record\` and MCP \`record_drift\` refuse unless the same resource has a successful \`netscript plugin doctor --resource <name>\` or MCP diagnostic receipt from the last 15 minutes. Receipts live under \`.netscript/agent/diagnostics/\`; accepted entries append to \`.netscript/agent/drift.jsonl\`.\n${END_MARKER}`;
 }
 const ASPIRE_INIT_TIMEOUT_MS = 60_000;
 const PLAYWRIGHT_SKILL_PATH = ".claude/skills/playwright-cli/SKILL.md";
@@ -79,6 +79,9 @@ export async function initAgent(
   if (input.withDocs && !docs) {
     throw new Error("Offline documentation generation is not configured");
   }
+  const installedDocsRoot = docs
+    ? join(input.projectRoot, ".netscript", "docs")
+    : undefined;
   const editor = await resolveEditor(input, dependencies.fs);
   const hosts = await resolveHosts(input, dependencies.fs, editor);
   const changedFiles: string[] = [];
@@ -119,6 +122,7 @@ export async function initAgent(
       input.projectRoot,
       changedFiles,
       dependencies.cliSpecifier,
+      installedDocsRoot,
     );
     for (const [path, content] of Object.entries(bundle.files)) {
       if (path === "manifest.json") continue;
@@ -146,6 +150,7 @@ export async function initAgent(
       input.projectRoot,
       changedFiles,
       dependencies.cliSpecifier,
+      installedDocsRoot,
     );
   }
   if (editor === 'zed') {
@@ -154,6 +159,7 @@ export async function initAgent(
       input.projectRoot,
       changedFiles,
       dependencies.cliSpecifier,
+      installedDocsRoot,
     );
   }
   if (
@@ -230,6 +236,7 @@ async function writeHostConfig(
   projectRoot: string,
   changed: string[],
   cliSpecifier = netscriptJsrSpecifier("cli"),
+  docsRoot?: string,
 ): Promise<void> {
   const currentText = await fs.readText(path);
   const current = currentText
@@ -256,6 +263,7 @@ async function writeHostConfig(
               "mcp",
               "--project-root",
               projectRoot,
+              ...(docsRoot ? ["--docs-root", docsRoot] : []),
             ],
           },
           aspire: {
@@ -276,6 +284,7 @@ async function writeZedConfig(
   projectRoot: string,
   changed: string[],
   cliSpecifier = netscriptJsrSpecifier('cli'),
+  docsRoot?: string,
 ): Promise<void> {
   const path = join(projectRoot, '.zed', 'settings.json');
   const generated = JSON.parse(
@@ -301,6 +310,7 @@ async function writeZedConfig(
           'mcp',
           '--project-root',
           projectRoot,
+          ...(docsRoot ? ['--docs-root', docsRoot] : []),
         ],
       }
       : { command: 'aspire', args: ['agent', 'mcp'] };

@@ -25,6 +25,8 @@ sagas, sessions — into durable topics.
 - **Idempotent, singleton producers** — `createDurableStream` returns one `DurableStreamProducer`
   per stream path, appending `upsert`/`delete` change events with idempotent, auto-claimed delivery
   and graceful `flush`/`close`.
+- **One versioned SSE authority** — `./sse` validates the named `data`/`control` wire frames and
+  exposes typed heartbeat/error outcomes plus replay state for durable consumers.
 - **Endpoint resolution across contexts** — `getStreamsUrl`, `getStreamsAuth`, and `buildStreamUrl`
   resolve the durable-streams base URL and auth headers in both Deno and browser contexts.
 - **Diagnostics without a socket** — `inspectStreamTopic` produces a JSON-stable inspection report
@@ -66,9 +68,35 @@ const producer = createDurableStream({
 });
 
 // Publish change events; flush before shutdown.
-producer.upsert('execution', { id: 'exec-1', status: 'running' });
+producer.upsert(
+  'execution',
+  { id: 'exec-1', status: 'running' },
+  { correlationId: 'request-42', messageId: 'execution-started-1' },
+);
 await producer.flush();
 ```
+
+## Producer reconnect contract
+
+`DurableStreamProducer` uses a finite lifecycle:
+`connecting → ready ↔ backoff/reconnecting → stopping → stopped`, with terminal `failed` when a
+bounded operation exhausts its retry budget or the server reports a non-retryable protocol failure.
+The default policy makes eight total attempts with exponential delay from 100 ms, capped at five
+seconds and jittered by 20 percent. Each transport request also has a five-second timeout, so a
+connected proxy with an unavailable backend cannot hold an attempt open forever. Infinite retry
+or request duration is not supported.
+
+Writes enter a FIFO bounded to 256 events and 1 MiB of serialized UTF-8 by default. The producer
+rejects the newest write when either bound would be exceeded; it never evicts an already accepted
+write. `upsert` and `delete` return a receipt immediately. Its `accepted` flag reports whether the
+write entered the FIFO, while `completion` settles exactly once as `delivered`, `rejected`,
+`cancelled`, or `delivery-unknown`. A lost acknowledgement is reported as `delivery-unknown`, never
+as a false delivery or silent rejection.
+
+`waitUntilReady()` observes the next ready transition. `flush()` waits only for writes accepted
+before that call. `stop()` cancels local work without sending durable EOF; `close()` drains accepted
+writes and resolves only after the server acknowledges terminal `streamClosed`. SSE offsets remain
+consumer-owned opaque tokens and are never parsed or advanced by the producer.
 
 Resolve the endpoint and inspect a schema before wiring a producer:
 
@@ -103,7 +131,8 @@ console.log(report.summary); // e.g. ".../workers/executions: 1 stream collectio
 
 | Entry         | What it gives you                                                                                                         |
 | ------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| `.`           | `defineStreamSchema`, `createDurableStream`, `createServiceStreamProducer`, endpoint resolution, and `inspectStreamTopic` |
+| `.`           | `defineStreamSchema`, `createDurableStream`, per-write correlation context, endpoint resolution, and `inspectStreamTopic` |
+| `./sse`       | Versioned wire schemas, named-frame parser, replay reducer, and native `EventSource` binding                              |
 | `./telemetry` | Span names, attribute keys, and instrumentation registration                                                              |
 | `./testing`   | `MemoryStreamProducer` and `createStreamTopicFixture` for socket-free tests                                               |
 

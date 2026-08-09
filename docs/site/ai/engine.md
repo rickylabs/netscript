@@ -20,7 +20,7 @@ live in the generated reference, linked at the end.
 
 {{ comp callout { type: "note", title: "Published in " + releaseVersion } }}
 <code>@netscript/ai</code> is <strong>published on JSR</strong> and installs today:
-<code>deno add jsr:@netscript/ai</code>. Every subpath on this page resolves against the
+<code>deno add jsr:@netscript/ai{{ releaseSpecifier }}</code>. Every subpath on this page resolves against the
 published <strong>{{ releaseVersion }}</strong> surface. The engine carries zero
 <code>@netscript/*</code> dependencies, so you can adopt it on its own — the
 <a href="/ai/durable-chat/">durable-chat runtime</a> and <a href="/ai/chat-ui/">chat UI</a>

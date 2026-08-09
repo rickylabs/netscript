@@ -139,20 +139,3 @@ Post-mutation REST pagination verified:
   historical assignments.
 
 No issue traversed an intermediate future milestone and no closed historical assignment moved.
-
----
-
-## Re-baseline — 2026-08-09 (stable-cut orchestrator)
-
-The head this document opens with, `2508eb8c9`, is the 2026-08-06 continuation baseline and is no
-longer authoritative. It is left in place as the record of what that continuation researched.
-
-**Authoritative baseline for all live claims: `origin/main@a6b2e4c31d80405d5225887cde7ab61baa2802f8`
-(#1215), 2026-08-08T21:43:52Z.** Everything between `2508eb8c9` and that SHA — W1's three PRs,
-canary.15's failed pinned E2E, its forward repair #1346, canary.16's green pair, and the four
-post-canary.16 merges — is recorded in `cut-trace.md`, not re-derived here.
-
-Where this document's doctrine/JSR classification (§ Archetype, overlay, doctrine, and JSR plan) is
-cited by a v4.1 group, the citation holds only for the surfaces that group actually touches; the
-newly pulled `packages/cli` `ui:*`, `packages/mcp`, SDK-doc and `packages/fresh-ui` surfaces are
-classified in their own group briefs, not here.

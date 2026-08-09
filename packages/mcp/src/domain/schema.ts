@@ -36,7 +36,11 @@ function validateJsonSchema(schema: JsonSchema, value: unknown, path = '$'): str
     issues.push(`${path} must be one of ${schema.enum.join(', ')}`);
   }
   const type = schema.type;
-  if (type === 'object') {
+  if (Array.isArray(type)) {
+    if (!type.some((candidate) => matchesJsonType(candidate, value))) {
+      issues.push(`${path} must be one of types ${type.join(', ')}`);
+    }
+  } else if (type === 'object') {
     if (!isRecord(value)) return [`${path} must be an object`];
     const required = Array.isArray(schema.required) ? schema.required : [];
     for (const key of required) {
@@ -80,7 +84,26 @@ function validateJsonSchema(schema: JsonSchema, value: unknown, path = '$'): str
       issues.push(`${path} must be at most ${schema.maximum}`);
     }
   }
+  if (typeof value === 'string') {
+    if (typeof schema.minLength === 'number' && value.length < schema.minLength) {
+      issues.push(`${path} must contain at least ${schema.minLength} characters`);
+    }
+    if (typeof schema.maxLength === 'number' && value.length > schema.maxLength) {
+      issues.push(`${path} must contain at most ${schema.maxLength} characters`);
+    }
+  }
   return issues;
+}
+
+function matchesJsonType(type: unknown, value: unknown): boolean {
+  if (type === 'null') return value === null;
+  if (type === 'string') return typeof value === 'string';
+  if (type === 'number') return typeof value === 'number';
+  if (type === 'integer') return Number.isInteger(value);
+  if (type === 'boolean') return typeof value === 'boolean';
+  if (type === 'array') return Array.isArray(value);
+  if (type === 'object') return isRecord(value);
+  return false;
 }
 
 /** Return whether a value is a JSON-like record. */
