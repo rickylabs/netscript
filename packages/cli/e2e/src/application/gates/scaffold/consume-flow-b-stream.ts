@@ -1,4 +1,12 @@
 import { createStreamsInstrumentation } from '@netscript/plugin-streams-core/telemetry';
+import {
+  bindStreamEventSourceV1,
+  createStreamSseReplayStateV1,
+  parseStreamSseEventV1,
+  type StreamSseChangeV1,
+  type StreamSseConsumerEventV1,
+  type StreamSseReplayStateV1,
+} from '@netscript/plugin-streams-core/sse';
 import { SpanStatusCode, trace } from 'npm:@opentelemetry/api@^1.9.0';
 import {
   BasicTracerProvider,
@@ -7,6 +15,16 @@ import {
   type SpanExporter,
 } from 'npm:@opentelemetry/sdk-trace-base@^2.5.0';
 import { createTelemetryProvider, type SdkLoader } from '@netscript/telemetry/otel';
+import { runDocumentedStreamExample } from './run-documented-stream-example.ts';
+import {
+  type FlowBProducerIdentity,
+  selectFlowBStreamChange,
+  streamChangeCorrelationId,
+} from './select-flow-b-stream-change.ts';
+
+const FLOW_B_SELECTION_MAX_BATCHES = 40;
+const FLOW_B_SELECTION_TIMEOUT_MS = 20_000;
+const FLOW_B_SELECTION_RETRY_DELAY_MS = 500;
 
 const projectRoot = Deno.args[0];
 if (!projectRoot) throw new Error('project root argument is required');
@@ -31,7 +49,7 @@ const provider = createTelemetryProvider({
 await provider.register();
 
 try {
-  const flowBCorrelationId = await readJobExecuteCorrelation(metadata.dashboardUrl);
+  const flowBProducer = await readJobExecuteIdentity(metadata.dashboardUrl);
   const streamPort = Number(Deno.args[1]);
   if (!Number.isInteger(streamPort)) throw new Error('streams port argument is required');
   const streamUrl = `http://127.0.0.1:${streamPort}/v1/stream/netscript/workers/executions`;
@@ -67,29 +85,65 @@ try {
     });
   }
   if (!response.ok) throw new Error(`workers stream read failed: HTTP ${response.status}`);
-  const payload: unknown = await response.json();
+  await response.body?.cancel();
 
-  const messages = collectMessages(payload);
-  if (messages.length === 0) {
-    throw new Error('real workers stream contained no trace-bearing execution messages');
+  const selected = await selectFlowBStreamChange(
+    flowBProducer,
+    createStreamSseReplayStateV1(),
+    {
+      maxBatches: FLOW_B_SELECTION_MAX_BATCHES,
+      timeoutMs: FLOW_B_SELECTION_TIMEOUT_MS,
+      retryDelayMs: FLOW_B_SELECTION_RETRY_DELAY_MS,
+      readBatch: (state, timeoutMs) => consumeNamedStreamEvents(streamUrl, state, timeoutMs),
+    },
+  );
+  const selectedCorrelationId = streamChangeCorrelationId(selected.change);
+  if (selectedCorrelationId !== flowBProducer.correlationId) {
+    throw new Error(
+      `Flow-B selected correlation changed unexpectedly; expected=${flowBProducer.correlationId} actual=${
+        selectedCorrelationId ?? '<missing>'
+      }`,
+    );
   }
+  const messages = [toFanInMessage(selected.change)];
+  if (!selected.state.lastCommittedOffset) {
+    throw new Error('named SSE control did not commit a replay offset');
+  }
+  const replay = await consumeNamedStreamEvents(streamUrl, selected.state);
+  if (!replay.outcomes.some((event) => event.event === 'heartbeat')) {
+    throw new Error('offset reconnect did not receive an up-to-date control heartbeat');
+  }
+  const malformed = parseStreamSseEventV1({
+    eventName: 'control',
+    data: '{"streamNextOffset":7}',
+    lastCommittedOffset: selected.state.lastCommittedOffset,
+  });
+  if (malformed.ok || malformed.error.retryable) {
+    throw new Error('malformed control did not produce a non-retryable v1 error');
+  }
+  if (malformed.error.lastCommittedOffset !== selected.state.lastCommittedOffset) {
+    throw new Error('malformed control changed the last committed offset');
+  }
+  const documentedReceipt = await runDocumentedStreamExample(new URL(streamUrl).origin);
   const span = createStreamsInstrumentation().startSubscribeSpan({
     streamPath: '/workers/executions',
     collection: 'execution',
     operation: 'fan-in',
     messages,
   });
-  span.setAttribute('netscript.correlation.id', flowBCorrelationId);
+  span.setAttribute('netscript.correlation.id', selectedCorrelationId);
   span.setAttribute('netscript.stream.outcome', 'success');
   span.setStatus({ code: SpanStatusCode.OK });
   span.end();
   await provider.forceFlush?.();
-  console.info(`Flow-B real stream consumer linked ${messages.length} message(s)`);
+  console.info(
+    `Flow-B named SSE consumer selected correlation ${selectedCorrelationId} after ${selected.batchesRead} batch(es), linked ${messages.length} message(s), committed ${selected.state.lastCommittedOffset}, reconnected to heartbeat, rejected malformed control, and ran the unchanged documented example over ${documentedReceipt} materialized record(s)`,
+  );
 } finally {
   await provider.shutdown?.();
 }
 
-async function readJobExecuteCorrelation(dashboardUrl: unknown): Promise<string> {
+async function readJobExecuteIdentity(dashboardUrl: unknown): Promise<FlowBProducerIdentity> {
   if (typeof dashboardUrl !== 'string') {
     throw new Error('Aspire start metadata did not contain dashboardUrl');
   }
@@ -97,17 +151,17 @@ async function readJobExecuteCorrelation(dashboardUrl: unknown): Promise<string>
   for (let attempt = 1; attempt <= 20; attempt++) {
     const response = await fetch(tracesUrl);
     if (!response.ok) throw new Error(`Dashboard traces read failed: HTTP ${response.status}`);
-    const correlationId = findJobExecuteCorrelation(await response.json());
-    if (correlationId) return correlationId;
+    const identity = findJobExecuteIdentity(await response.json());
+    if (identity) return identity;
     if (attempt < 20) await new Promise((resolve) => setTimeout(resolve, 500));
   }
-  throw new Error('job.execute telemetry did not expose netscript.correlation.id');
+  throw new Error('Flow-B job.execute telemetry did not expose correlation and trace identities');
 }
 
-function findJobExecuteCorrelation(value: unknown): string | undefined {
+function findJobExecuteIdentity(value: unknown): FlowBProducerIdentity | undefined {
   if (Array.isArray(value)) {
     for (const item of value) {
-      const found = findJobExecuteCorrelation(item);
+      const found = findJobExecuteIdentity(item);
       if (found) return found;
     }
     return undefined;
@@ -117,10 +171,12 @@ function findJobExecuteCorrelation(value: unknown): string | undefined {
     const attributes = value.attributes;
     const jobId = attributeString(attributes, ['netscript.job.id', 'job.id']);
     const correlationId = attributeString(attributes, ['netscript.correlation.id']);
-    if (jobId === 'flow-b-callback' && correlationId) return correlationId;
+    if (jobId === 'flow-b-callback' && correlationId && typeof value.traceId === 'string') {
+      return { correlationId, traceId: value.traceId };
+    }
   }
   for (const child of Object.values(value)) {
-    const found = findJobExecuteCorrelation(child);
+    const found = findJobExecuteIdentity(child);
     if (found) return found;
   }
   return undefined;
@@ -140,7 +196,60 @@ function attributeString(
   return undefined;
 }
 
-function collectMessages(value: unknown): Array<{
+interface NamedStreamReceipt {
+  readonly changes: readonly StreamSseChangeV1[];
+  readonly outcomes: readonly StreamSseConsumerEventV1[];
+  readonly state: StreamSseReplayStateV1;
+}
+
+function consumeNamedStreamEvents(
+  streamUrl: string,
+  initialState: StreamSseReplayStateV1,
+  timeoutMs = 15_000,
+): Promise<NamedStreamReceipt> {
+  return new Promise((resolve, reject) => {
+    const url = new URL(streamUrl);
+    url.searchParams.set('offset', initialState.lastCommittedOffset ?? '-1');
+    url.searchParams.set('live', 'sse');
+    const source = new EventSource(url);
+    const changes: StreamSseChangeV1[] = [];
+    const outcomes: StreamSseConsumerEventV1[] = [];
+    let settled = false;
+    const timeout = setTimeout(
+      () => finish(new Error(`named SSE control timed out after ${Math.ceil(timeoutMs)}ms`)),
+      timeoutMs,
+    );
+    const binding = bindStreamEventSourceV1({
+      source,
+      initialState,
+      onEvent(event) {
+        outcomes.push(event);
+        if (event.event === 'data') changes.push(...event.payload);
+        if (event.event === 'error') {
+          finish(new Error(`${event.payload.code}: ${event.payload.message}`));
+          return;
+        }
+        if (event.event === 'control' || event.event === 'heartbeat') {
+          finish();
+        }
+      },
+    });
+
+    function finish(error?: Error): void {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timeout);
+      queueMicrotask(() => {
+        const state = binding.snapshot();
+        binding.dispose();
+        if (error) reject(error);
+        else resolve({ changes, outcomes, state });
+      });
+    }
+  });
+}
+
+function toFanInMessage(change: StreamSseChangeV1): {
   traceparent: string;
   tracestate?: string;
   streamPath: string;
@@ -148,43 +257,16 @@ function collectMessages(value: unknown): Array<{
   operation?: string;
   messageId?: string;
   correlationId?: string;
-}> {
-  const messages: Array<{
-    traceparent: string;
-    tracestate?: string;
-    streamPath: string;
-    collection?: string;
-    operation?: string;
-    messageId?: string;
-    correlationId?: string;
-  }> = [];
-  visit(value, messages);
-  return messages;
-}
-
-function visit(value: unknown, messages: ReturnType<typeof collectMessages>): void {
-  if (Array.isArray(value)) {
-    for (const item of value) visit(item, messages);
-    return;
-  }
-  if (!isRecord(value)) return;
-  const headers = isRecord(value.headers) ? value.headers : undefined;
-  const traceparent = headers?.traceparent;
-  if (typeof traceparent === 'string') {
-    const nestedValue = isRecord(value.value) ? value.value : undefined;
-    messages.push({
-      traceparent,
-      tracestate: typeof headers?.tracestate === 'string' ? headers.tracestate : undefined,
-      streamPath: '/workers/executions',
-      collection: typeof value.type === 'string' ? value.type : undefined,
-      operation: typeof headers?.operation === 'string' ? headers.operation : undefined,
-      messageId: typeof value.key === 'string' ? value.key : undefined,
-      correlationId: typeof nestedValue?.correlationId === 'string'
-        ? nestedValue.correlationId
-        : undefined,
-    });
-  }
-  for (const child of Object.values(value)) visit(child, messages);
+} {
+  return {
+    traceparent: change.headers.traceparent,
+    tracestate: change.headers.tracestate,
+    streamPath: '/workers/executions',
+    collection: change.type,
+    operation: change.headers.operation,
+    messageId: change.key,
+    correlationId: streamChangeCorrelationId(change),
+  };
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

@@ -4,6 +4,8 @@
  * This subpath provides:
  * - `createNetScriptStreamDB()` — generic TanStack DB-backed StreamDB factory
  *   (wraps `@durable-streams/state` with NetScript URL resolution + auth)
+ * - `createNetScriptStreamEventSourceV1()` — named-event, v1-schema-validated
+ *   native SSE binding with explicit replay state
  * - `useLiveQuery` / `useLiveSuspenseQuery` from `@tanstack/react-db`
  *   (works via `preact/compat` in Fresh islands)
  * - Re-exports of useful types from `@durable-streams/state`
@@ -23,6 +25,14 @@ export {
   type NetScriptStreamDBOptions,
   type NetScriptStreamStateDefinition,
 } from './create-stream-db.ts';
+
+export {
+  type CreateNetScriptStreamEventSourceOptionsV1,
+  createNetScriptStreamEventSourceV1,
+  type NetScriptEventSourceFactoryV1,
+  type NetScriptStreamEventSourceBindingV1,
+} from './create-stream-event-source.ts';
+export * from '@netscript/plugin-streams-core/sse';
 
 import {
   useLiveQuery as useTanStackLiveQuery,

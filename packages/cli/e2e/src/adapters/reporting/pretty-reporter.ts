@@ -24,7 +24,7 @@ export class PrettyReporter implements Reporter {
       }
     } else {
       await write(
-        `Summary: passed=${event.report.summary.passed} failed=${event.report.summary.failed}\n`,
+        `Summary: passed=${event.report.summary.passed} failed=${event.report.summary.failed} skipped=${event.report.summary.skipped}\n`,
       );
     }
   }

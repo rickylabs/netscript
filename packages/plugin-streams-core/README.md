@@ -25,6 +25,8 @@ sagas, sessions — into durable topics.
 - **Idempotent, singleton producers** — `createDurableStream` returns one `DurableStreamProducer`
   per stream path, appending `upsert`/`delete` change events with idempotent, auto-claimed delivery
   and graceful `flush`/`close`.
+- **One versioned SSE authority** — `./sse` validates the named `data`/`control` wire frames and
+  exposes typed heartbeat/error outcomes plus replay state for durable consumers.
 - **Endpoint resolution across contexts** — `getStreamsUrl`, `getStreamsAuth`, and `buildStreamUrl`
   resolve the durable-streams base URL and auth headers in both Deno and browser contexts.
 - **Diagnostics without a socket** — `inspectStreamTopic` produces a JSON-stable inspection report
@@ -66,7 +68,11 @@ const producer = createDurableStream({
 });
 
 // Publish change events; flush before shutdown.
-producer.upsert('execution', { id: 'exec-1', status: 'running' });
+producer.upsert(
+  'execution',
+  { id: 'exec-1', status: 'running' },
+  { correlationId: 'request-42', messageId: 'execution-started-1' },
+);
 await producer.flush();
 ```
 
@@ -101,11 +107,12 @@ console.log(report.summary); // e.g. ".../workers/executions: 1 stream collectio
 
 ## Public surface
 
-| Entry         | What it gives you                                                                                                         |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| `.`           | `defineStreamSchema`, `createDurableStream`, `createServiceStreamProducer`, endpoint resolution, and `inspectStreamTopic` |
-| `./telemetry` | Span names, attribute keys, and instrumentation registration                                                              |
-| `./testing`   | `MemoryStreamProducer` and `createStreamTopicFixture` for socket-free tests                                               |
+| Entry         | What it gives you                                                                                                          |
+| ------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `.`           | `defineStreamSchema`, `createDurableStream`, per-write correlation context, endpoint resolution, and `inspectStreamTopic` |
+| `./sse`       | Versioned wire schemas, named-frame parser, replay reducer, and native `EventSource` binding                               |
+| `./telemetry` | Span names, attribute keys, and instrumentation registration                                                               |
+| `./testing`   | `MemoryStreamProducer` and `createStreamTopicFixture` for socket-free tests                                                |
 
 The always-current symbol list is
 [`deno doc jsr:@netscript/plugin-streams-core@<version>`](https://jsr.io/@netscript/plugin-streams-core/doc)

@@ -1,6 +1,6 @@
 import { DurableStream, DurableStreamError, IdempotentProducer } from '@durable-streams/client';
 import type { StateSchema, StreamStateDefinition } from '../domain/stream-schema.ts';
-import type { StreamProducerPort } from '../ports/stream-producer-port.ts';
+import type { StreamProducerPort, StreamWriteContextV1 } from '../ports/stream-producer-port.ts';
 import {
   createStreamsInstrumentation,
   type StreamsInstrumentation,
@@ -8,7 +8,7 @@ import {
 import { buildStreamUrl, getStreamsAuth } from './stream-url-resolver.ts';
 
 export type { StateSchema, StreamStateDefinition } from '../domain/stream-schema.ts';
-export type { StreamProducerPort } from '../ports/stream-producer-port.ts';
+export type { StreamProducerPort, StreamWriteContextV1 } from '../ports/stream-producer-port.ts';
 
 /** Options accepted by {@link DurableStreamProducer}. */
 export interface DurableStreamProducerOptions<TDef extends StreamStateDefinition> {
@@ -167,6 +167,7 @@ export class DurableStreamProducer<TDef extends StreamStateDefinition>
   upsert<K extends keyof TDef & string>(
     entityType: K,
     value: Record<string, unknown>,
+    context?: StreamWriteContextV1,
   ): void {
     if (this.#closed) {
       return;
@@ -189,7 +190,7 @@ export class DurableStreamProducer<TDef extends StreamStateDefinition>
       type: definition.type ?? entityType,
       key,
       value,
-      headers: this.#publishHeaders(entityType, 'upsert', key),
+      headers: this.#publishHeaders(entityType, 'upsert', key, context),
     });
     if (event) {
       this.#appendEvent(event);
@@ -202,7 +203,11 @@ export class DurableStreamProducer<TDef extends StreamStateDefinition>
    * @param entityType - Collection key in the stream schema.
    * @param key - Primary key of the entity to delete.
    */
-  delete<K extends keyof TDef & string>(entityType: K, key: string): void {
+  delete<K extends keyof TDef & string>(
+    entityType: K,
+    key: string,
+    context?: StreamWriteContextV1,
+  ): void {
     if (this.#closed) {
       return;
     }
@@ -222,7 +227,7 @@ export class DurableStreamProducer<TDef extends StreamStateDefinition>
     const event = this.#serializeEvent(entityType, 'delete', {
       type: definition.type ?? entityType,
       key,
-      headers: this.#publishHeaders(entityType, 'delete', key),
+      headers: this.#publishHeaders(entityType, 'delete', key, context),
     });
     if (event) {
       this.#appendEvent(event);
@@ -250,14 +255,18 @@ export class DurableStreamProducer<TDef extends StreamStateDefinition>
     entityType: string,
     operation: 'upsert' | 'delete',
     key: string,
+    context?: StreamWriteContextV1,
   ): Record<string, string> {
-    let headers: Record<string, string> = { operation };
+    const correlationId = context?.correlationId?.trim() || key;
+    const messageId = context?.messageId?.trim() || key;
+    let headers: Record<string, string> = { operation, correlationId };
     this.#instrumentation.publish({
       streamPath: this.streamPath,
       collection: entityType,
       operation,
       producerId: this.#producerId,
-      messageId: key,
+      messageId,
+      correlationId,
       emit: (injected) => {
         headers = { ...headers, ...injected };
       },

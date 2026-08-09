@@ -1,5 +1,38 @@
-import { assertStringIncludes } from '@std/assert';
+import { assertEquals, assertStringIncludes } from '@std/assert';
 import { PrettyReporter } from '../../../src/adapters/reporting/pretty-reporter.ts';
+
+Deno.test('pretty reporter aggregate exposes skipped and deferred gate count', async () => {
+  const reporterUrl = new URL(
+    '../../../src/adapters/reporting/pretty-reporter.ts',
+    import.meta.url,
+  ).href;
+  const script = `
+    import { PrettyReporter } from ${JSON.stringify(reporterUrl)};
+    await new PrettyReporter().emit({
+      type: 'suite-end',
+      report: {
+        ok: true,
+        suiteId: 'scaffold.runtime',
+        projectRoot: '/workspace/app',
+        startedAt: '2026-08-09T00:00:00.000Z',
+        durationMs: 100,
+        steps: [],
+        summary: { passed: 80, failed: 0, skipped: 2 },
+      },
+    });
+  `;
+  const output = await new Deno.Command(Deno.execPath(), {
+    args: ['eval', script],
+    stdout: 'piped',
+    stderr: 'piped',
+  }).output();
+
+  assertEquals(output.code, 0, new TextDecoder().decode(output.stderr));
+  assertEquals(
+    new TextDecoder().decode(output.stdout),
+    'Summary: passed=80 failed=0 skipped=2\n',
+  );
+});
 
 Deno.test('pretty reporter surfaces a failed command reason and stderr', async () => {
   const output: string[] = [];

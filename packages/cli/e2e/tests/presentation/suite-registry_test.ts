@@ -11,6 +11,7 @@ import { runtimeResources } from '../../src/application/gates/scaffold/runtime-g
 import { builtInSuites, resolveSuite } from '../../src/presentation/cli/suites/registry.ts';
 import {
   createScaffoldCapabilitySuite,
+  SCAFFOLD_RUNTIME_DEFERRED_GATES,
   type ScaffoldCapabilitySuite,
   scaffoldCapabilitySuites,
 } from '../../suites/scaffold/capability-suites.ts';
@@ -154,8 +155,36 @@ Deno.test('runtime suite includes full scaffold, database, runtime, and behavior
   );
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_PLUGINS_HEALTH), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_OTEL_WEBHOOK), true);
-  assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_OTEL_TRACES), true);
+  assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_OTEL_STREAM_CONSUMER), false);
+  assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_OTEL_TRACES), false);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_OTEL_TASK_TRACES), true);
+});
+
+Deno.test('runtime suites pin the exact #1398 OTEL deferral without widening it', () => {
+  assertEquals(SCAFFOLD_RUNTIME_DEFERRED_GATES, [
+    {
+      id: GATE.BEHAVIOR_OTEL_STREAM_CONSUMER,
+      issue: '#1398',
+      reason: 'workers-combined does not install the stream mutation hook',
+    },
+    {
+      id: GATE.BEHAVIOR_OTEL_TRACES,
+      issue: '#1398',
+      reason: 'TC-14 requires the deferred Flow-B stream-consumer record',
+    },
+  ]);
+
+  for (const suiteId of [SCAFFOLD.RUNTIME, SCAFFOLD.RUNTIME_SQLITE]) {
+    const suite = resolveSuite(suiteId);
+    assertEquals(suite.deferredGates, SCAFFOLD_RUNTIME_DEFERRED_GATES, suiteId);
+    assertEquals(
+      suite.gates.some((gate) =>
+        SCAFFOLD_RUNTIME_DEFERRED_GATES.some((deferred) => deferred.id === gate.id)
+      ),
+      false,
+      `${suiteId} must not execute a deferred gate`,
+    );
+  }
 });
 
 // #954: the suite used to start the whole AppHost without ever waiting on the generated app

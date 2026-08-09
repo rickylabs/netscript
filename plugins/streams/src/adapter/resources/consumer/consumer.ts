@@ -31,6 +31,7 @@ export const streamConsumerScaffolder: ItemScaffolder<StreamConsumerInput> = {
       FACTORY_FILE: `${stem}-db`,
       ISLAND_EXPORT: `${exportName}Stream`,
       SCHEMA_EXPORT: `${camelStem(stem)}ConsumerSchema`,
+      SUBSCRIBE_EXPORT: `subscribe${exportName}Stream`,
       STREAM_PATH: normalizedTopic(input.topic),
     };
     return [
