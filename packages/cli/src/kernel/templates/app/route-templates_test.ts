@@ -36,13 +36,17 @@ import {
   appIndexRouteTemplate,
   appLayoutTemplate,
   appRouterTemplate,
+  appServiceAuthorizationTemplate,
   appServiceExampleHeroTemplate,
   appServiceExampleIndexTemplate,
   appServiceExampleLabPanelTemplate,
   appServiceExampleLayoutTemplate,
   appServiceExampleNotesCardTemplate,
   appServiceExamplePageLayoutTemplate,
+  appServiceManagedFormTemplate,
   appServiceShowcaseIslandTemplate,
+  appServiceShowcaseMemoryIslandTemplate,
+  appServiceShowcaseMemorySharedTemplate,
   appServiceShowcaseSharedTemplate,
   appServiceSummaryCardTemplate,
   appServiceSummaryPanelTemplate,
@@ -391,6 +395,8 @@ describe('app route template rendering', () => {
     assertStringIncludes(output, 'export const teamMembersSearchSchema = z.object({');
     assertStringIncludes(output, 'page: z.coerce.number().int().min(1).default(1)');
     assertStringIncludes(output, "query: z.string().trim().max(100).default('')");
+    assertStringIncludes(output, 'export const teamMembersNoteSchema = z.object({');
+    assertStringIncludes(output, "min(3, 'Note must be at least 3 characters')");
   });
 
   it('service example route is folder-owned with the builder in index.tsx and layout in index.layout.tsx', async () => {
@@ -418,14 +424,24 @@ describe('app route template rendering', () => {
     assertStringIncludes(route, "import { ServiceExampleRouteLayout } from './index.layout.tsx';");
     assertStringIncludes(route, 'loadServiceShowcaseSummary');
     assertStringIncludes(route, 'export const serviceExamplePage = definePage()');
-    assertStringIncludes(route, '.withRoute(appRoutes.serviceExample)');
+    assertStringIncludes(route, ".withRouteContract({ $route: '/examples/team-members' })");
+    assertStringIncludes(route, '.withPathParams(teamMembersPathSchema)');
+    assertStringIncludes(route, '.withSearchParams(teamMembersSearchSchema)');
     assertStringIncludes(route, ".withPolicy('balanced')");
     assertStringIncludes(route, "spanName: 'scaffold.examples.teamMembers'");
+    assertStringIncludes(route, ".withResource('viewer', () => resolveServiceExampleViewer())");
+    assertStringIncludes(
+      route,
+      ".withResource('showcase', ({ search }) => loadServiceShowcaseData(search))",
+    );
     assertStringIncludes(route, ".withLayer('hero', ServiceExampleHero");
     assertStringIncludes(route, ".withLayer('lab', ServiceExampleLabPanel");
-    assertStringIncludes(route, 'loader: loadServiceShowcaseData');
+    assertStringIncludes(route, 'loader: ({ resources }) => resources.showcase');
     assertStringIncludes(route, ".withLayer('summary', ServiceExampleSummaryCard");
     assertStringIncludes(route, "partialName: 'team-members-summary'");
+    assertStringIncludes(route, ".withForm('managedForm', ServiceManagedForm");
+    assertStringIncludes(route, 'requireServiceExampleMutation(resources.viewer)');
+    assertStringIncludes(route, "spanName: 'scaffold.examples.teamMembers.note'");
     assertStringIncludes(route, ".withLayer('notes', ServiceExampleNotesCard");
     assertStringIncludes(route, 'export type ServiceExamplePage = typeof serviceExamplePage;');
     assertStringIncludes(
@@ -442,6 +458,7 @@ describe('app route template rendering', () => {
     assertStringIncludes(layout, 'hero={slots.hero()}');
     assertStringIncludes(layout, 'lab={slots.lab()}');
     assertStringIncludes(layout, 'summary={slots.summary()}');
+    assertStringIncludes(layout, 'managedForm={slots.managedForm()}');
     assertStringIncludes(layout, 'notes={slots.notes()}');
   });
 
@@ -452,10 +469,12 @@ describe('app route template rendering', () => {
     const lab = await adapter.render(appServiceExampleLabPanelTemplate, SAMPLE_APP_VARS);
     const summaryCard = await adapter.render(appServiceSummaryCardTemplate, SAMPLE_APP_VARS);
     const notes = await adapter.render(appServiceExampleNotesCardTemplate, SAMPLE_APP_VARS);
+    const authorization = await adapter.render(appServiceAuthorizationTemplate, SAMPLE_APP_VARS);
     assertStringIncludes(pageLayout, 'interface ServiceExamplePageLayoutProps');
     assertStringIncludes(pageLayout, '{hero}');
     assertStringIncludes(pageLayout, '{lab}');
     assertStringIncludes(pageLayout, '{summary}');
+    assertStringIncludes(pageLayout, '{managedForm}');
     assertStringIncludes(pageLayout, '{notes}');
     assertStringIncludes(hero, 'export function ServiceExampleHero');
     assertStringIncludes(hero, 'examplesHref');
@@ -469,6 +488,24 @@ describe('app route template rendering', () => {
     assertStringIncludes(summaryCard, 'Summary cards stay server-owned');
     assertStringIncludes(notes, 'export function ServiceExampleNotesCard');
     assertStringIncludes(notes, 'Deferred partial-backed layers');
+    assertStringIncludes(authorization, 'export interface ServiceExampleViewer');
+    assertStringIncludes(authorization, 'export function requireServiceExampleMutation');
+  });
+
+  it('managed form renders the schema-invalid branch and keeps partial navigation', async () => {
+    const output = await makeAdapter().render(appServiceManagedFormTemplate, SAMPLE_APP_VARS);
+    assertStringIncludes(output, "data-state={state.hasErrors ? 'invalid'");
+    assertStringIncludes(output, "variant='destructive' title='Check the form'");
+    assertStringIncludes(output, 'The note was not saved. Correct the validation error');
+    assertStringIncludes(output, '<form');
+    assertStringIncludes(output, 'f-client-nav');
+  });
+
+  it('managed form renders the successful-submission branch', async () => {
+    const output = await makeAdapter().render(appServiceManagedFormTemplate, SAMPLE_APP_VARS);
+    assertStringIncludes(output, ": state.submitted ? 'success' : 'initial'");
+    assertStringIncludes(output, "variant='success' title='Note accepted'");
+    assertStringIncludes(output, 'The managed mutation completed successfully.');
   });
 
   it('route-local shared loader prefetches and dehydrates the showcase query', async () => {
@@ -481,13 +518,14 @@ describe('app route template rendering', () => {
     );
     assertStringIncludes(output, 'export const SERVICE_SHOWCASE_INPUT = {');
     assertStringIncludes(output, 'export async function loadServiceShowcaseSummary()');
-    assertStringIncludes(output, 'export async function loadServiceShowcaseData()');
+    assertStringIncludes(output, 'export async function loadServiceShowcaseData(search:');
+    assertStringIncludes(output, 'page: search.page');
     assertStringIncludes(output, 'dehydratedState: dehydrateQueryClient(queryClient)');
     assert(!output.includes('summaryCachedAt'));
     assert(!output.includes('summary: buildServiceSummary'));
   });
 
-  it('route-local island uses QueryIsland, useQuery, and typed CRUD mutations', async () => {
+  it('DB island exposes cached query states and restores the saved optimistic snapshot', async () => {
     const adapter = makeAdapter();
     const output = await adapter.render(appServiceShowcaseIslandTemplate, SAMPLE_APP_VARS);
     assertStringIncludes(output, "import { useSignal } from '@preact/signals';");
@@ -501,7 +539,34 @@ describe('app route template rendering', () => {
     assertStringIncludes(output, 'teamMembersQueries.delete.mutationOptions()');
     assertStringIncludes(output, 'useQuery<ServiceListData>');
     assertStringIncludes(output, 'useMutation<ServiceRecord, unknown, CreateInput>');
-    assertStringIncludes(output, 'refreshList();');
+    assertStringIncludes(
+      output,
+      'useMutation<ServiceRecord, unknown, UpdateInput, MutationContext>',
+    );
+    assertStringIncludes(output, 'const previous = queryClient.getQueryData<ServiceListData>');
+    assertStringIncludes(output, 'return { previous };');
+    assertStringIncludes(output, 'queryClient.setQueryData(listOptions.queryKey, context.previous)');
+    assertStringIncludes(output, 'the cached list rolled back');
+    assertStringIncludes(output, "data-state='loading'");
+    assertStringIncludes(output, "data-state='error'");
+    assertStringIncludes(output, "data-state='empty'");
+    assertStringIncludes(output, "data-state='success'");
+  });
+
+  it('memory island preserves optimistic rollback and the same four query states', async () => {
+    const adapter = makeAdapter();
+    const island = await adapter.render(appServiceShowcaseMemoryIslandTemplate, SAMPLE_APP_VARS);
+    const shared = await adapter.render(appServiceShowcaseMemorySharedTemplate, SAMPLE_APP_VARS);
+    assertStringIncludes(island, 'const previous = queryClient.getQueryData<ServiceListData>');
+    assertStringIncludes(island, 'return { previous } satisfies MutationContext;');
+    assertStringIncludes(island, 'queryClient.setQueryData(currentKey, context.previous)');
+    assertStringIncludes(island, 'the cached list rolled back');
+    assertStringIncludes(island, "data-state='loading'");
+    assertStringIncludes(island, "data-state='error'");
+    assertStringIncludes(island, "data-state='empty'");
+    assertStringIncludes(island, "data-state='success'");
+    assertStringIncludes(shared, 'offset: (search.page - 1) * SERVICE_SHOWCASE_PAGE_SIZE');
+    assertStringIncludes(shared, 'search: search.query || undefined');
   });
 
   it('summary panel and partial route keep defer concerns server-owned', async () => {

@@ -4,11 +4,12 @@ interface ServiceExamplePageLayoutProps {
   readonly hero: ComponentChildren;
   readonly lab: ComponentChildren;
   readonly summary: ComponentChildren;
+  readonly managedForm: ComponentChildren;
   readonly notes: ComponentChildren;
 }
 
 export function ServiceExamplePageLayout(
-  { hero, lab, summary, notes }: ServiceExamplePageLayoutProps,
+  { hero, lab, summary, managedForm, notes }: ServiceExamplePageLayoutProps,
 ) {
   return (
     <div class='min-h-[calc(100vh-52px)] bg-ns-bg text-ns-fg'>
@@ -21,6 +22,7 @@ export function ServiceExamplePageLayout(
 
             <div class='ns-stack ns-stack--md'>
               {summary}
+              {managedForm}
               {notes}
             </div>
           </div>

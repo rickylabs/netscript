@@ -105,6 +105,12 @@ Deno.test('public init emits resolvable app conventions with and without the exa
       );
       assert(stat.isDirectory, `Expected resource-local directory: ${localDirectory}`);
     }
+    await Deno.stat(
+      join(serviceApp, 'routes', 'examples', 'users', '(_components)', 'managed-form.tsx'),
+    );
+    await Deno.stat(
+      join(serviceApp, 'routes', 'examples', 'users', '(_shared)', 'authorization.ts'),
+    );
 
     await scaffoldFixture(parent, 'without-service');
     const noServiceApp = join(parent, 'without-service', 'apps', 'dashboard');

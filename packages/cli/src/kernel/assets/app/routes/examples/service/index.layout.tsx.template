@@ -9,6 +9,7 @@ export function ServiceExampleRouteLayout() {
       hero={slots.hero()}
       lab={slots.lab()}
       summary={slots.summary()}
+      managedForm={slots.managedForm()}
       notes={slots.notes()}
     />
   );

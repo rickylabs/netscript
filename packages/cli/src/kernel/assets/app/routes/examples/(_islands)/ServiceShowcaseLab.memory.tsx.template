@@ -9,7 +9,7 @@ import {
   useQuery,
   useQueryClient,
 } from '@netscript/fresh/query';
-import { Button } from '@app/components/ui/mod.ts';
+import { Button, EmptyState, InlineNotice, Skeleton } from '@app/components/ui/mod.ts';
 import {
   {{serviceName | camelCase}}ListInvalidation,
   {{serviceName | camelCase}}Name,
@@ -44,7 +44,9 @@ function ServiceShowcaseLabInner(props: Props) {
   const currentKey = {{serviceName | camelCase}}Queries.list.clientKey(props.input);
   const {
     data,
+    error,
     status,
+    isError,
     isLoading,
     refetch,
   } = useQuery({
@@ -126,7 +128,24 @@ function ServiceShowcaseLabInner(props: Props) {
         )
         : null}
 
-      <ul class='ns-stack ns-stack--sm'>
+      {isLoading
+        ? <Skeleton variant='table' rows={3} columns={2} data-state='loading' />
+        : isError
+        ? (
+          <InlineNotice variant='destructive' title='Resource list unavailable' data-state='error'>
+            {error instanceof Error ? error.message : 'Retry the typed query.'}
+          </InlineNotice>
+        )
+        : items.length === 0
+        ? (
+          <EmptyState heading='No resources yet' data-state='empty'>
+            Adjust the typed search or add the first resource through the service contract.
+          </EmptyState>
+        )
+        : null}
+
+      {items.length > 0 && !isError
+        ? <ul class='ns-stack ns-stack--sm' data-state='success'>
         {items.map((item) => {
           const nextStatus = NEXT_STATUS_BY_STATE[item.status];
 
@@ -161,7 +180,8 @@ function ServiceShowcaseLabInner(props: Props) {
             </li>
           );
         })}
-      </ul>
+        </ul>
+        : null}
     </div>
   );
 }

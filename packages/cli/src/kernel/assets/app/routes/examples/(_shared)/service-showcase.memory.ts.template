@@ -8,6 +8,11 @@ export const SERVICE_SHOWCASE_INPUT = {
   offset: 0,
 } as const;
 
+export interface ServiceShowcaseSearch {
+  readonly page: number;
+  readonly query: string;
+}
+
 export type ServiceShowcaseListData = Awaited<ReturnType<typeof {{serviceName | camelCase}}Queries.list>>;
 
 export interface ServiceSummaryPanelProps {
@@ -58,9 +63,14 @@ export async function loadServiceShowcaseSummary(): Promise<ServiceSummaryPanelP
   return buildServiceSummary(result);
 }
 
-export async function loadServiceShowcaseData() {
+export async function loadServiceShowcaseData(search: ServiceShowcaseSearch) {
   const queryClient = createNetScriptQueryClient();
-  const queryOptions = {{serviceName | camelCase}}Queries.list.queryOptions(SERVICE_SHOWCASE_INPUT);
+  const input = {
+    ...SERVICE_SHOWCASE_INPUT,
+    offset: (search.page - 1) * SERVICE_SHOWCASE_PAGE_SIZE,
+    search: search.query || undefined,
+  };
+  const queryOptions = {{serviceName | camelCase}}Queries.list.queryOptions(input);
   const cachedAt = Date.now();
   const initialList = await queryClient.fetchQuery<ServiceShowcaseListData>({
     queryKey: queryOptions.queryKey,
@@ -69,8 +79,9 @@ export async function loadServiceShowcaseData() {
 
   return {
     dehydratedState: dehydrateQueryClient(queryClient),
-    input: SERVICE_SHOWCASE_INPUT,
+    input,
     initialList,
     cachedAt,
+    searchQuery: search.query,
   };
 }

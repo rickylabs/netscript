@@ -23,3 +23,9 @@ S2 replaces init's global `lib/example-service.ts` with resource-owned `(_lib)/s
 and `route-contract.ts`; the old-shape golden failed pre-fix and the final focused suite passes.
 The service-add command deliberately continues writing the #1373 golden-path
 `apps/<app>/lib/<service>.ts` from the same template.
+
+S3 composes typed route/search state, auth and showcase resources, layers, a managed form,
+telemetry, partial navigation, QueryIsland hydration, four query states, and optimistic rollback in
+the canonical generated service route. Fresh memory and DB workspaces type-check at 108 and 117
+selected files respectively. Deliberate rollback, invalid-form, and success-form mutations each
+produce focused red evidence.

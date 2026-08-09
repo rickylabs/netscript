@@ -101,3 +101,55 @@ rejection of the old topology, not merely acceptance of new folders.
 
 `check:assets-barrel` must be rerun from the committed S2 head; that raw committed-head receipt is
 posted on the PR and carried into the next worklog update.
+
+Committed-head `deno task check:assets-barrel` exited **0** for S2.
+
+## S3 — executable resource flow and state machine
+
+### Implementation
+
+- The service route now composes `withRouteContract`, typed path/search schemas, an auth-ready
+  `viewer` resource, a search-aware prefetched `showcase` resource, layered server/island content,
+  managed form state, telemetry, and partial navigation from one page builder.
+- Both DB and memory variants render loading/error/empty/success query states. The DB rename path
+  snapshots and optimistically updates the query cache, restores that exact snapshot on error, and
+  invalidates through the contract-derived list key; the existing memory rollback is preserved.
+- The managed form uses schema validation, CSRF state, invalid/success notices, a server mutation,
+  and a provider-neutral authorization boundary. Generated apps now own their direct `zod`
+  dependency through the root catalog.
+
+### Falsifiability
+
+| Mutation | Result |
+| --- | --- |
+| DB rollback restores `props.initialList` instead of saved `context.previous` | raw exit 1; DB rollback test failed |
+| Managed form removes the `hasErrors` state branch | raw exit 1; invalid and success state tests failed |
+| Managed form disables only the submitted-success state | raw exit 1; invalid-state test passed and success-state test failed |
+
+Each mutation regenerated the embedded barrel before the focused test. The clean implementation
+was restored and regenerated after the probes.
+
+### Generated-consumer checks
+
+The first memory-project check exited **1** with two actionable diagnostics: `zod` was not owned by
+the generated app import map, and raw field-descriptor props were wider than the app-owned `Input`
+contract. Adding catalog-owned `zod` and routing descriptor props through the existing
+`getInputProps` adapter resolved both without casts or allowances.
+
+| Generated variant | Result |
+| --- | --- |
+| Memory service workspace | raw exit 0; 108 selected files |
+| Postgres service workspace after local schema generation | raw exit 0; 117 selected files |
+
+Both were fresh no-Aspire scaffolds. Postgres schema generation used a non-contacting placeholder
+`DATABASE_URL`; it started no AppHost or container.
+
+### Gates
+
+| Gate | Result |
+| --- | --- |
+| Focused config/template/public-init tests | raw exit 0; 6 tests / 40 steps / 0 failed |
+| Scoped package check (`--no-lock`) | raw exit 0; 675 files / 6 batches / 0 findings |
+| Scoped package lint | raw exit 0; 675 files / 4 batches / 0 findings |
+| Scoped package format | raw exit 0; 675 files / 4 batches / 0 findings |
+| Package code-quality scan | raw exit 0; 0 findings / 6 existing allowances |

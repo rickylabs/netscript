@@ -27,11 +27,13 @@ export async function writeExampleServiceAppFiles(
   const {
     appExampleServiceHeroTemplate,
     appExampleServiceLabPanelTemplate,
+    appExampleServiceManagedFormTemplate,
     appExampleServiceNotesCardTemplate,
     appExampleServicePageLayoutTemplate,
     appExampleServiceShowcaseMemoryTemplate,
     appExampleServiceShowcaseSharedMemoryTemplate,
     appExampleServiceShowcaseSharedTemplate,
+    appExampleServiceAuthorizationTemplate,
     appExampleServiceShowcaseTemplate,
     appExampleServiceSummaryCardTemplate,
     appExampleServiceSummaryPanelMemoryTemplate,
@@ -80,6 +82,10 @@ Delete or replace the sample data: example records, labels, statuses, notes, and
     await context.templateAdapter.render(appExampleServiceLabPanelTemplate, appTemplateVars),
   );
   await write(
+    join(input.serviceExampleComponentsDir, 'managed-form.tsx'),
+    await context.templateAdapter.render(appExampleServiceManagedFormTemplate, appTemplateVars),
+  );
+  await write(
     join(input.serviceExampleComponentsDir, 'notes-card.tsx'),
     await context.templateAdapter.render(appExampleServiceNotesCardTemplate, appTemplateVars),
   );
@@ -102,6 +108,10 @@ Delete or replace the sample data: example records, labels, statuses, notes, and
   await write(
     join(input.serviceExampleSharedDir, 'service-showcase.ts'),
     await context.templateAdapter.render(showcaseSharedTemplate, appTemplateVars),
+  );
+  await write(
+    join(input.serviceExampleSharedDir, 'authorization.ts'),
+    await context.templateAdapter.render(appExampleServiceAuthorizationTemplate, appTemplateVars),
   );
   await write(
     join(input.serviceExamplePartialDir, 'summary.tsx'),

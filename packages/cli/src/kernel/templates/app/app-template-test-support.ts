@@ -60,13 +60,20 @@ export const appExampleServiceRouteContractTemplate =
   exampleTemplates.appExampleServiceRouteContractTemplate;
 export const appServiceExampleHeroTemplate = exampleTemplates.appExampleServiceHeroTemplate;
 export const appServiceExampleLabPanelTemplate = exampleTemplates.appExampleServiceLabPanelTemplate;
+export const appServiceManagedFormTemplate = exampleTemplates.appExampleServiceManagedFormTemplate;
+export const appServiceAuthorizationTemplate =
+  exampleTemplates.appExampleServiceAuthorizationTemplate;
 export const appServiceExampleNotesCardTemplate =
   exampleTemplates.appExampleServiceNotesCardTemplate;
 export const appServiceExamplePageLayoutTemplate =
   exampleTemplates.appExampleServicePageLayoutTemplate;
 export const appServiceShowcaseIslandTemplate = exampleTemplates.appExampleServiceShowcaseTemplate;
+export const appServiceShowcaseMemoryIslandTemplate =
+  exampleTemplates.appExampleServiceShowcaseMemoryTemplate;
 export const appServiceShowcaseSharedTemplate =
   exampleTemplates.appExampleServiceShowcaseSharedTemplate;
+export const appServiceShowcaseMemorySharedTemplate =
+  exampleTemplates.appExampleServiceShowcaseSharedMemoryTemplate;
 export const appServiceSummaryCardTemplate = exampleTemplates.appExampleServiceSummaryCardTemplate;
 export const appServiceSummaryPanelTemplate =
   exampleTemplates.appExampleServiceSummaryPanelTemplate;

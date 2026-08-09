@@ -23,3 +23,11 @@ writing the #1373-approved `apps/<app>/lib/<service>.ts` path. S2 moves init's c
 resource-local `(_lib)` but keeps service-add's public destination and points it at the same query
 template. Duplicating the template or changing the already-accepted service-add topology would be
 unrelated drift.
+
+## 2026-08-09 — route schema makes zod an app-owned direct dependency
+
+The planned resource-local route contract imports `zod`, but the generated Fresh app manifest did
+not own that dependency even though the workspace root catalog did. A fresh generated-consumer
+check failed with TS2307. S3 adds `zod: "catalog:"` to the app import map and locks that ownership
+in the app-manifest test. This is required by the planned typed route/form contract and preserves
+central catalog control; it is not a dependency-version fork.

@@ -3,6 +3,7 @@ import { appRoutes } from '@app/router.ts';
 import { definePage } from '@app/utils.ts';
 import { ServiceExampleHero } from './(_components)/hero.tsx';
 import { ServiceExampleLabPanel } from './(_components)/lab-panel.tsx';
+import { ServiceManagedForm } from './(_components)/managed-form.tsx';
 import { ServiceExampleNotesCard } from './(_components)/notes-card.tsx';
 import { ServiceExampleSummaryCard } from './(_components)/summary-card.tsx';
 import { ServiceExampleRouteLayout } from './index.layout.tsx';
@@ -10,11 +11,24 @@ import {
   loadServiceShowcaseData,
   loadServiceShowcaseSummary,
 } from './(_shared)/service-showcase.ts';
+import {
+  resolveServiceExampleViewer,
+  requireServiceExampleMutation,
+} from './(_shared)/authorization.ts';
+import {
+  {{serviceName | camelCase}}NoteSchema,
+  {{serviceName | camelCase}}PathSchema,
+  {{serviceName | camelCase}}SearchSchema,
+} from './(_lib)/route-contract.ts';
 
 export const serviceExamplePage = definePage()
-  .withRoute(appRoutes.serviceExample)
+  .withRouteContract({ $route: '/examples/{{serviceName}}' })
+  .withPathParams({{serviceName | camelCase}}PathSchema)
+  .withSearchParams({{serviceName | camelCase}}SearchSchema)
   .withPolicy('balanced')
   .withTelemetry({ enabled: true, spanName: 'scaffold.examples.{{serviceName | camelCase}}' })
+  .withResource('viewer', () => resolveServiceExampleViewer())
+  .withResource('showcase', ({ search }) => loadServiceShowcaseData(search))
   .withMeta(() => ({
     title: '{{name}} — {{serviceName}} example',
     description:
@@ -25,7 +39,7 @@ export const serviceExamplePage = definePage()
     examplesHref: appRoutes.examples.href(),
   }))
   .withLayer('lab', ServiceExampleLabPanel, {
-    loader: loadServiceShowcaseData,
+    loader: ({ resources }) => resources.showcase,
   })
   .withLayer('summary', ServiceExampleSummaryCard, {
     delivery: 'defer',
@@ -35,6 +49,19 @@ export const serviceExamplePage = definePage()
     staleTime: 15_000,
     staleReloadMode: 'background',
     fallback: <div class='grid gap-3 sm:grid-cols-2'><div class='sm:col-span-2 h-32 animate-pulse rounded-2xl border border-ns-border bg-ns-surface/50' /></div>,
+  })
+  .withForm('managedForm', ServiceManagedForm, {
+    schema: {{serviceName | camelCase}}NoteSchema,
+    initial: () => ({ note: '' }),
+    mutate: (input, { resources }) => {
+      requireServiceExampleMutation(resources.viewer);
+      return { note: input.note, acceptedAt: Date.now() };
+    },
+    onSuccess: () => ({
+      message: 'Resource note accepted.',
+      nextValues: { note: '' },
+    }),
+    spanName: 'scaffold.examples.{{serviceName | camelCase}}.note',
   })
   .withLayer('notes', ServiceExampleNotesCard, () => ({}))
   .withLayout(() => <ServiceExampleRouteLayout />)
