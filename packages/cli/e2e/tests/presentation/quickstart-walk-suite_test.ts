@@ -39,6 +39,7 @@ Deno.test('quickstart service-add verdict initializes first, adds users, and che
   assertEquals(init.includes('--service'), false);
   assertEquals(add.join(' ').includes('service'), true);
   assertEquals(add.join(' ').includes('add'), true);
+  assertEquals(add.join(' ').includes('--with-client'), true);
   assertEquals(add.join(' ').includes('deno'), true);
   assertEquals(add.join(' ').includes('check'), true);
   assertEquals(add.join(' ').includes('--unstable-kv'), true);

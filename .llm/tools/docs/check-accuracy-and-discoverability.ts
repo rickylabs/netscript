@@ -26,6 +26,61 @@ export const ALLOWED_FRESH_ROOT_SYMBOLS: Set<string> = new Set([
   'projectCachedItemFromList',
 ]);
 
+const GOLDEN_PATH_QUERY_UTILS_PAGE = 'docs/site/reference/sdk/index.md';
+
+export interface GoldenPathDocsResult {
+  readonly pageCount: number;
+  readonly queryUtilsPageCount: number;
+}
+
+/** Enforce the published golden-path module, alias, and query-dialect vocabulary. */
+export async function checkGoldenPathDocs(
+  dirPath = 'docs/site',
+  rootUrl: URL = root,
+): Promise<GoldenPathDocsResult> {
+  const pages: Array<{ path: string; content: string }> = [];
+
+  async function walk(path: string): Promise<void> {
+    for await (const entry of Deno.readDir(new URL(path, rootUrl))) {
+      const fullPath = `${path}/${entry.name}`;
+      if (entry.isDirectory) {
+        if (!entry.name.startsWith('_')) await walk(fullPath);
+      } else if (entry.isFile && /\.(?:md|vto)$/.test(entry.name)) {
+        pages.push({ path: fullPath, content: await read(fullPath, rootUrl) });
+      }
+    }
+  }
+
+  await walk(dirPath);
+  const queryUtilsPages: string[] = [];
+  for (const page of pages) {
+    for (const forbidden of ['lib/api-clients.ts', '@contracts', '@/lib/']) {
+      forbidText(page.content, forbidden, page.path);
+    }
+    if (/apps\/[^/\s`]+\/client\.ts/.test(page.content)) {
+      throw new Error(`${page.path}: apps/<app>/client.ts is the CSS entry, not a data client`);
+    }
+    if (page.content.includes('createServiceQueryUtils')) queryUtilsPages.push(page.path);
+  }
+
+  if (
+    queryUtilsPages.length !== 1 || queryUtilsPages[0] !== GOLDEN_PATH_QUERY_UTILS_PAGE
+  ) {
+    throw new Error(
+      `createServiceQueryUtils must appear only in ${GOLDEN_PATH_QUERY_UTILS_PAGE}; found ${
+        JSON.stringify(queryUtilsPages)
+      }`,
+    );
+  }
+  const queryUtilsReference = pages.find((page) => page.path === GOLDEN_PATH_QUERY_UTILS_PAGE);
+  if (!queryUtilsReference) throw new Error(`${GOLDEN_PATH_QUERY_UTILS_PAGE}: page missing`);
+  for (const marker of ['queryOptions({ input })', 'queryOptions(input)', 'no server KV tier']) {
+    requireText(queryUtilsReference.content, marker, GOLDEN_PATH_QUERY_UTILS_PAGE);
+  }
+
+  return { pageCount: pages.length, queryUtilsPageCount: queryUtilsPages.length };
+}
+
 export async function checkFreshRootImports(dirPath: string, rootUrl: URL = root): Promise<number> {
   let count = 0;
   for await (const entry of Deno.readDir(new URL(dirPath, rootUrl))) {
@@ -125,7 +180,23 @@ export async function runAccuracyCheck(): Promise<void> {
     requireText(howToIndex, preferredPath, 'how-to preferred-path index');
   }
 
+  const quickstart = await read('docs/site/quickstart.vto');
   const cliReference = await read('docs/site/cli-reference.md');
+  const addService = await read('docs/site/services-sdk/how-to/add-a-service.md');
+  for (
+    const [location, page] of [
+      ['quickstart', quickstart],
+      ['CLI reference', cliReference],
+      ['add-a-service', addService],
+    ] as const
+  ) {
+    requireText(page, '--with-client', location);
+  }
+  requireText(quickstart, 'Fresh client entry; imports app CSS', 'quickstart');
+  requireText(quickstart, 'apps/dashboard/lib/orders.ts', 'quickstart');
+
+  const goldenPathDocs = await checkGoldenPathDocs();
+
   requireText(cliReference, '## Mutation and regeneration map', 'CLI reference');
   // Column-set match rather than exact-line match: reformatting the table (spacing, alignment)
   // must not fail the guard, but dropping a column still does.
@@ -179,7 +250,8 @@ export async function runAccuracyCheck(): Promise<void> {
   const checkExportsCmd = new Deno.Command('deno', {
     args: ['run', '--allow-all', '.llm/tools/docs/check-exports-drift.ts'],
   });
-  const { code: driftCode, stderr: driftStderr, stdout: driftStdout } = await checkExportsCmd.output();
+  const { code: driftCode, stderr: driftStderr, stdout: driftStdout } = await checkExportsCmd
+    .output();
   if (driftCode !== 0) {
     console.error(new TextDecoder().decode(driftStdout));
     console.error(new TextDecoder().decode(driftStderr));
@@ -187,7 +259,7 @@ export async function runAccuracyCheck(): Promise<void> {
   }
 
   console.log(
-    `docs accuracy: PASS (${publicDocs.length} saga pages, storefront worker boundary, spawn contract, 8 preferred paths, ${requiredMutationFamilies.length} CLI mutation families, ${checkedFreshRootImports} valid @netscript/fresh root imports checked)`,
+    `docs accuracy: PASS (${publicDocs.length} saga pages, ${goldenPathDocs.pageCount} published source pages, one query dialect exception page, storefront worker boundary, spawn contract, 8 preferred paths, ${requiredMutationFamilies.length} CLI mutation families, ${checkedFreshRootImports} valid @netscript/fresh root imports checked)`,
   );
 }
 

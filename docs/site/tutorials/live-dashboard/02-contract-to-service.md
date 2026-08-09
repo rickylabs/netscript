@@ -109,7 +109,7 @@ the contract's `list` route and queries the database through the injected contex
 
 ```ts
 // services/orders/src/routers/v1.ts (the list handler, trimmed)
-import { v1 } from '@contracts';
+import { v1 } from '@my-dashboard/contracts';
 
 const router = v1.orders.$context<{ db: OrdersDb }>();
 

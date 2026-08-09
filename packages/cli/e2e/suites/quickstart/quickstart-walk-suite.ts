@@ -16,7 +16,7 @@ export const QUICKSTART_DOCUMENTED_COMMANDS = [
   'deno install --global --allow-all --name netscript jsr:@netscript/cli@<version>',
   'netscript init my-app --db postgres --yes',
   'cd my-app',
-  'netscript service add --name users',
+  'netscript service add --name users --with-client',
   'cd aspire',
   'aspire restore',
   'aspire start',
@@ -130,7 +130,18 @@ function createQuickstartGates(): readonly GateDefinition[] {
         'deno',
         'eval',
         sequenceScript([
-          [...cli(context, 'service', 'add', '--name', 'users', '--project-root', '.')],
+          [
+            ...cli(
+              context,
+              'service',
+              'add',
+              '--name',
+              'users',
+              '--with-client',
+              '--project-root',
+              '.',
+            ),
+          ],
           ['deno', 'check', '--unstable-kv', 'services/users'],
         ]),
       ],

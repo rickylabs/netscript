@@ -71,10 +71,12 @@ subcommand with the `--name` and `--port` flags (the `service` group also has `l
 
 ```bash
 # from the workspace root
-netscript service add --name users
+netscript service add --name users --with-client
 ```
 
-Either path lays down a `services/users/` workspace member with this shape:
+`--with-client` also writes `apps/<app>/lib/users.ts`, exporting the service-derived `usersClient`
+and `usersQueries` symbols used by page loaders and islands. Either path lays down a
+`services/users/` workspace member with this shape:
 
 ```text
 services/users/

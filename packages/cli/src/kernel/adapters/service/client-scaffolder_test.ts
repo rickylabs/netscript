@@ -1,4 +1,4 @@
-import { assertStringIncludes } from '@std/assert';
+import { assertEquals, assertFalse, assertStringIncludes } from '@std/assert';
 import { Scaffolder } from '../scaffold/scaffolder.ts';
 import { MemoryFileSystemAdapter } from '../scaffold/memory-fs.ts';
 import { StringTemplateAdapter } from '../scaffold/template-adapter.ts';
@@ -19,7 +19,12 @@ Deno.test('service client scaffolder mirrors the typed SDK and query template', 
     false,
   );
   const source = await fs.readFile(path);
-  assertStringIncludes(source, 'createServiceClient<typeof exampleServiceContract>');
+  assertEquals(path, '/app/apps/dashboard/lib/orders.ts');
+  assertStringIncludes(source, 'export const ordersContract = OrdersContractV1;');
+  assertStringIncludes(source, 'export const ordersClient = createServiceClient');
+  assertStringIncludes(source, 'export const ordersQueries = createQueryFactories');
+  assertStringIncludes(source, 'export const ordersListInvalidation = bridgeInvalidation');
   assertStringIncludes(source, "from '@shop/contracts'");
-  assertStringIncludes(source, "exampleServiceName = 'orders'");
+  assertStringIncludes(source, "export const ordersName = 'orders';");
+  assertFalse(source.includes('exampleService'));
 });

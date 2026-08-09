@@ -5,23 +5,23 @@ import {
   {{serviceName | pascalCase}}ContractV1,
 } from '@{{name}}/contracts';
 
-export const exampleServiceName = '{{serviceName}}';
-export const exampleServiceRouterName = '{{serviceName | camelCase}}';
-export const exampleServiceContract = {{serviceName | pascalCase}}ContractV1;
-export const exampleServiceListInvalidation = bridgeInvalidation(
-  exampleServiceRouterName,
+export const {{serviceName | camelCase}}Name = '{{serviceName}}';
+export const {{serviceName | camelCase}}RouterName = '{{serviceName | camelCase}}';
+export const {{serviceName | camelCase}}Contract = {{serviceName | pascalCase}}ContractV1;
+export const {{serviceName | camelCase}}ListInvalidation = bridgeInvalidation(
+  {{serviceName | camelCase}}RouterName,
   'list',
 );
 
-export const exampleServiceClient = createServiceClient<typeof exampleServiceContract>({
-  contract: exampleServiceContract,
-  serviceName: exampleServiceName,
-  routerName: exampleServiceRouterName,
+export const {{serviceName | camelCase}}Client = createServiceClient<typeof {{serviceName | camelCase}}Contract>({
+  contract: {{serviceName | camelCase}}Contract,
+  serviceName: {{serviceName | camelCase}}Name,
+  routerName: {{serviceName | camelCase}}RouterName,
 });
 
-export const exampleServiceQueries = createQueryFactories({
+export const {{serviceName | camelCase}}Queries = createQueryFactories({
   service: {
-    contract: exampleServiceContract,
-    client: exampleServiceClient,
+    contract: {{serviceName | camelCase}}Contract,
+    client: {{serviceName | camelCase}}Client,
   },
 }).service;

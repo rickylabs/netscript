@@ -105,7 +105,7 @@ can check.
   },
   {
     title: "6 · Storefront UI",
-    body: "Put a face on the backend: a typed cart route with <code>createRouteReference</code>, a catalog query and a checkout mutation driven through <code>createServiceClient</code> → <code>createServiceQueryUtils</code> in a Fresh island. The typed contract, honored all the way to the button.",
+    body: "Put a face on the backend: a typed cart route with <code>createRouteReference</code>, a catalog query and a checkout mutation driven through <code>createServiceClient</code> → <code>createQueryFactories</code> in a Fresh island. The typed contract, honored all the way to the button.",
     href: "/tutorials/storefront/06-storefront-ui/"
   },
   {

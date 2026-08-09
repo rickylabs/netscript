@@ -162,7 +162,7 @@ export default defineConfig(() => ({
 ```
 
 {{ comp callout { type: "note", title: "@app/* aliases point inside your Fresh app" } }}
-The Vite config registers <code>@app</code>, <code>@app/lib</code>, <code>@app/components</code>, <code>@app/islands</code>, and <code>@app/routes</code> aliases that resolve to folders inside <code>apps/dashboard/</code>. Throughout this track, an import like <code>@app/lib/api-clients.ts</code> means the file at <code>apps/dashboard/lib/api-clients.ts</code>.
+The Vite config registers <code>@app</code>, <code>@app/lib</code>, <code>@app/components</code>, <code>@app/islands</code>, and <code>@app/routes</code> aliases that resolve to folders inside <code>apps/dashboard/</code>. Throughout this track, an import like <code>@app/lib/orders.ts</code> means the file at <code>apps/dashboard/lib/orders.ts</code>.
 {{ /comp }}
 
 ## Step 5 — Bring up orchestration

@@ -11,9 +11,9 @@ import {
 } from '@netscript/fresh/query';
 import { Button } from '@app/components/ui/mod.ts';
 import {
-  exampleServiceListInvalidation,
-  exampleServiceName,
-  exampleServiceQueries,
+  {{serviceName | camelCase}}ListInvalidation,
+  {{serviceName | camelCase}}Name,
+  {{serviceName | camelCase}}Queries,
 } from '@app/lib/example-service.ts';
 import {
   formatServiceTimestamp,
@@ -41,20 +41,20 @@ function ServiceShowcaseLabInner(props: Props) {
   }
 
   const queryClient = useQueryClient();
-  const currentKey = exampleServiceQueries.list.clientKey(props.input);
+  const currentKey = {{serviceName | camelCase}}Queries.list.clientKey(props.input);
   const {
     data,
     status,
     isLoading,
     refetch,
   } = useQuery({
-    ...exampleServiceQueries.list.queryOptions(props.input),
+    ...{{serviceName | camelCase}}Queries.list.queryOptions(props.input),
     initialData: props.initialList,
     staleTime: 15_000,
   });
 
   const statusMutation = useMutation({
-    ...exampleServiceQueries.updateStatus.mutationOptions(),
+    ...{{serviceName | camelCase}}Queries.updateStatus.mutationOptions(),
     onMutate: async (variables) => {
       const previous = queryClient.getQueryData<ServiceListData>(currentKey);
 
@@ -82,7 +82,7 @@ function ServiceShowcaseLabInner(props: Props) {
       statusMessage.value = `Server confirmed ${item.name} is now ${item.status}.`;
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries(exampleServiceListInvalidation);
+      await queryClient.invalidateQueries({{serviceName | camelCase}}ListInvalidation);
     },
   });
 
@@ -107,12 +107,12 @@ function ServiceShowcaseLabInner(props: Props) {
           loading={isLoading}
           onClick={() => void refetch()}
         >
-          {isLoading ? 'Refreshing list' : `Refresh ${exampleServiceName}`}
+          {isLoading ? 'Refreshing list' : `Refresh ${{{serviceName | camelCase}}Name}`}
         </Button>
         <Button
           type='button'
           variant='secondary'
-          onClick={() => void queryClient.invalidateQueries(exampleServiceListInvalidation)}
+          onClick={() => void queryClient.invalidateQueries({{serviceName | camelCase}}ListInvalidation)}
         >
           Invalidate list cache
         </Button>

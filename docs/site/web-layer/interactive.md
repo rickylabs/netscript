@@ -82,14 +82,14 @@ contract-derived query. Nothing about the URL or the response shape is hand-type
 so the island cannot drift from the service.
 
 The route reference comes from [`@netscript/fresh/route`](/web-layer/route/); the
-query utils come from the single `lib/api-clients.ts` module described in
+query factory comes from the per-service `lib/widgets.ts` module described in
 [Data loading and the query cache](/web-layer/query/):
 
 ```tsx
 // apps/dashboard/islands/WidgetPanel.tsx
 import { QueryIsland, useIslandQuery } from "@netscript/fresh/query";
 import { createRouteReference } from "@netscript/fresh/route";
-import { widgets } from "../lib/api-clients.ts";
+import { widgetsQueries } from "../lib/widgets.ts";
 
 // A typed reference to the page this island lives on — hrefs are checked
 // against the pattern, so a broken link is a compile error.
@@ -98,7 +98,7 @@ const widgetsRoute = createRouteReference("/widgets");
 function WidgetList() {
   // queryKey + queryFn are derived from the widgets contract.
   const query = useIslandQuery({
-    ...widgets.list.queryOptions({ input: {} }),
+    ...widgetsQueries.list.queryOptions({}),
     staleTime: 15_000,
   });
 

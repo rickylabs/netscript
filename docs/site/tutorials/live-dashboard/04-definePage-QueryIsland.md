@@ -36,11 +36,11 @@ You end with a page that paints from KV cache on first byte and stays live on th
 ## Before you begin
 
 You should have completed [chapter 3](/tutorials/live-dashboard/03-sdk-cache-first-query/):
-`apps/dashboard/lib/api-clients.ts` exports `ordersClient`, `baseQueries`, and `ordersQueryUtils`,
+`apps/dashboard/lib/orders.ts` exports `ordersClient` and `ordersQueries`,
 and `deno task check` is clean. Confirm the query module is in place:
 
 ```sh
-deno check apps/dashboard/lib/api-clients.ts --unstable-kv
+deno check apps/dashboard/lib/orders.ts --unstable-kv
 ```
 
 A clean check means the typed client and query factory are ready to wire into a page.
@@ -109,7 +109,7 @@ are in [Request-scoped resources](/web-layer/resources/):
 import { definePage } from '@app/utils.ts';
 import { dehydrateQueryClient } from '@netscript/fresh/query';
 import { createNetScriptQueryClient } from '@netscript/sdk/query-client';
-import { baseQueries, ordersQueryUtils } from '@app/lib/api-clients.ts';
+import { ordersQueries } from '@app/lib/orders.ts';
 import { routes } from '@app/router.ts';
 import OrdersQueryIsland from './(_islands)/OrdersQueryIsland.tsx';
 import StatsLayer from './(_components)/StatsLayer.tsx';
@@ -121,7 +121,7 @@ export const ordersListPage = definePage()
   .withTelemetry({ enabled: true, spanName: 'dashboard.orders.list' })
   // Read once per request; the list layer and the island layer both consume this.
   .withResource('ordersData', async (ctx) => {
-    return await baseQueries.orders.list.getCachedEntry({
+    return await ordersQueries.list.getCachedEntry({
       limit: ctx.search.limit,
       offset: ctx.search.offset,
       status: ctx.search.status,
@@ -129,7 +129,7 @@ export const ordersListPage = definePage()
   })
   .withResource('dehydratedQuery', async (ctx) => {
     const queryClient = createNetScriptQueryClient();
-    await queryClient.prefetchQuery(ordersQueryUtils.list.queryOptions({
+    await queryClient.prefetchQuery(ordersQueries.list.queryOptions({
       limit: ctx.search.limit,
       offset: ctx.search.offset,
       status: ctx.search.status,
@@ -197,7 +197,7 @@ on the other end:
   .withLayer('stats', StatsLayer, {
     loader: (ctx) => {
       // Not awaited: the promise is handed to the layer and resolves in the background.
-      const statsPromise = baseQueries.orders.getStats({ status: ctx.search.status });
+      const statsPromise = ordersQueries.getStats({ status: ctx.search.status });
       return { statsPromise };
     },
     partial: routes.partials.dashboard.orders.stats.$route.href(),
@@ -262,11 +262,11 @@ import {
   useQuery,
   useQueryClient,
 } from '@netscript/fresh/query';
-import { ordersQueryUtils } from '@app/lib/api-clients.ts';
+import { ordersQueries } from '@app/lib/orders.ts';
 
 function OrdersQueryInner(props) {
   const queryClient = useQueryClient();
-  const listOptions = ordersQueryUtils.list.queryOptions(props.input);
+  const listOptions = ordersQueries.list.queryOptions(props.input);
   const currentKey = listOptions.queryKey;
   const hydratedRef = useRef(false);
 
@@ -286,7 +286,7 @@ function OrdersQueryInner(props) {
 
   // Optimistic status advance — update the cache, roll back on error.
   const statusMutation = useMutation({
-    ...ordersQueryUtils.update.mutationOptions(),
+    ...ordersQueries.update.mutationOptions(),
     onMutate: async (variables) => {
       await queryClient.cancelQueries({ queryKey: currentKey });
       const previous = queryClient.getQueryData(currentKey);
@@ -298,8 +298,8 @@ function OrdersQueryInner(props) {
     },
     onSuccess: async () => {
       // Invalidate the server tier first, so a reload cannot repaint stale KV data.
-      await invalidateServerQueryCache(ordersQueryUtils.list.key(props.input));
-      await queryClient.invalidateQueries({ queryKey: ordersQueryUtils.list.clientKey() });
+      await invalidateServerQueryCache(ordersQueries.list.key(props.input));
+      await queryClient.invalidateQueries({ queryKey: ordersQueries.list.clientKey() });
     },
   });
 

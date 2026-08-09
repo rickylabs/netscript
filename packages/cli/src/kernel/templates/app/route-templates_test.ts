@@ -366,18 +366,18 @@ describe('app route template rendering', () => {
       "import { bridgeInvalidation } from '@netscript/sdk/query-client';",
     );
     assertStringIncludes(output, 'TeamMembersContractV1,');
-    assertStringIncludes(output, "export const exampleServiceName = 'team-members';");
-    assertStringIncludes(output, "export const exampleServiceRouterName = 'teamMembers';");
+    assertStringIncludes(output, "export const teamMembersName = 'team-members';");
+    assertStringIncludes(output, "export const teamMembersRouterName = 'teamMembers';");
     assertStringIncludes(
       output,
-      'export const exampleServiceListInvalidation = bridgeInvalidation(',
+      'export const teamMembersListInvalidation = bridgeInvalidation(',
     );
     assertStringIncludes(
       output,
-      'export const exampleServiceClient = createServiceClient<typeof exampleServiceContract>({',
+      'export const teamMembersClient = createServiceClient<typeof teamMembersContract>({',
     );
-    assertStringIncludes(output, 'routerName: exampleServiceRouterName,');
-    assertStringIncludes(output, 'export const exampleServiceQueries = createQueryFactories({');
+    assertStringIncludes(output, 'routerName: teamMembersRouterName,');
+    assertStringIncludes(output, 'export const teamMembersQueries = createQueryFactories({');
   });
 
   it('service example route is folder-owned with the builder in index.tsx and layout in index.layout.tsx', async () => {
@@ -386,7 +386,7 @@ describe('app route template rendering', () => {
     const layout = await adapter.render(appServiceExampleLayoutTemplate, SAMPLE_APP_VARS);
     assertStringIncludes(
       route,
-      "import { exampleServiceName } from '@app/lib/example-service.ts';",
+      "import { teamMembersName } from '@app/lib/example-service.ts';",
     );
     assertStringIncludes(route, "import { appRoutes } from '@app/router.ts';");
     assertStringIncludes(route, "import { ServiceExampleHero } from './(_components)/hero.tsx';");
@@ -483,9 +483,9 @@ describe('app route template rendering', () => {
     assertStringIncludes(output, 'hydrateFromDehydrated');
     assertStringIncludes(output, 'useMutation');
     assertStringIncludes(output, 'useQuery');
-    assertStringIncludes(output, 'exampleServiceQueries.create.mutationOptions()');
-    assertStringIncludes(output, 'exampleServiceQueries.update.mutationOptions()');
-    assertStringIncludes(output, 'exampleServiceQueries.delete.mutationOptions()');
+    assertStringIncludes(output, 'teamMembersQueries.create.mutationOptions()');
+    assertStringIncludes(output, 'teamMembersQueries.update.mutationOptions()');
+    assertStringIncludes(output, 'teamMembersQueries.delete.mutationOptions()');
     assertStringIncludes(output, 'useQuery<ServiceListData>');
     assertStringIncludes(output, 'useMutation<ServiceRecord, unknown, CreateInput>');
     assertStringIncludes(output, 'refreshList();');

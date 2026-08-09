@@ -25,8 +25,8 @@ service is mid-redeploy — and refreshes in the background instead of blocking 
 
 ## What you will build
 
-A single module, `apps/dashboard/lib/api-clients.ts`, that exports a typed `ordersClient` and a
-`baseQueries.orders` query utility. The client is derived from `typeof ordersContract`, so calling
+A single module, `apps/dashboard/lib/orders.ts`, that exports a typed `ordersClient` and a
+`ordersQueries` query utility. The client is derived from `typeof ordersContract`, so calling
 `ordersClient.list({ … })` is type-checked against the contract you wrote in chapter 2. The query
 factory adds per-procedure helpers — `queryOptions()`, `clientKey()`, and the cache-first
 `getCachedEntry()` — that chapters 4 and 5 build the page on.
@@ -51,8 +51,8 @@ the `contract` itself, and a `serviceName` that is the **discovery key** — how
 service's URL at call time. Create the clients module in your Fresh app:
 
 ```ts
-// apps/dashboard/lib/api-clients.ts
-import { ordersContract } from '@contracts';
+// apps/dashboard/lib/orders.ts
+import { ordersContract } from '@my-dashboard/contracts';
 import { createServiceClient } from '@netscript/sdk/client';
 import { createQueryFactories } from '@netscript/sdk/query';
 
@@ -76,21 +76,18 @@ last-known answer instantly, then revalidate in the background. `createQueryFact
 procedure in exactly that — a KV-backed stale-while-revalidate layer. Add it to the same module:
 
 ```ts
-// apps/dashboard/lib/api-clients.ts (add below the client)
+// apps/dashboard/lib/orders.ts (add below the client)
 // Server-side query factories — KV-backed stale-while-revalidate.
-export const baseQueries = createQueryFactories({
+export const ordersQueries = createQueryFactories({
   orders: { contract: ordersContract, client: ordersClient },
-});
-
-// App code reads the per-procedure utilities off the factory.
-export const ordersQueryUtils = baseQueries.orders;
+}).orders;
 ```
 
-`baseQueries.orders` carries one entry per contract procedure (`list`, `getById`, `getStats`, …),
+`ordersQueries` carries one entry per contract procedure (`list`, `getById`, `getStats`, …),
 each a small object of typed helpers. The four you will use across the next chapters:
 
 {{ comp.apiTable({
-  caption: "Per-procedure query helpers (e.g. ordersQueryUtils.list)",
+  caption: "Per-procedure query helpers (e.g. ordersQueries.list)",
   rows: [
     { name: ".queryOptions(input)", type: "(input) => options", desc: "A TanStack Query options object (queryKey + queryFn) for the client island — chapter 4 passes it straight to useQuery." },
     { name: ".clientKey(input?)", type: "(input?) => key", desc: "The stable query key the client uses to read, write, and invalidate this procedure's cache." },
@@ -107,9 +104,9 @@ The cache is backed by KV (Redis in your Aspire stack — the default <code>--ca
 
 You now have two ways to read orders, for two different places in the stack:
 
-- **Server, cache-first** — `await ordersQueryUtils.list.getCachedEntry(input)` inside a page loader.
+- **Server, cache-first** — `await ordersQueries.list.getCachedEntry(input)` inside a page loader.
   Resolves to `{ data, cachedAt }` from KV, or `null`. Used in chapter 4's `definePage` loaders.
-- **Client, in an island** — `useQuery(ordersQueryUtils.list.queryOptions(input))` inside a Fresh
+- **Client, in an island** — `useQuery(ordersQueries.list.queryOptions(input))` inside a Fresh
   island. Used in chapter 4's `QueryIsland` for client-side reads and refetch.
 
 Both derive their types and their cache key from the *same* contract, so a server-rendered row and a
@@ -128,15 +125,14 @@ themselves off your chapter-2 contract. To prove the discovery key resolves end 
 `aspire start` up — the next chapter renders the page that calls through this client, and a missing
 `services__orders__http__0` shows up there as a clear "Service URL not found" error.
 
-- [ ] `apps/dashboard/lib/api-clients.ts` exports `ordersClient`, `baseQueries`, and
-      `ordersQueryUtils`.
+- [ ] `apps/dashboard/lib/orders.ts` exports `ordersClient` and `ordersQueries`.
 - [ ] `deno task check` is clean.
-- [ ] `deno check apps/dashboard/lib/api-clients.ts --unstable-kv` passes on its own — the module
+- [ ] `deno check apps/dashboard/lib/orders.ts --unstable-kv` passes on its own — the module
       compiles against the chapter-2 contract with no other file in play.
 
 ## What you built
 
-A typed `ordersClient` and a cache-first `ordersQueryUtils` query layer, both derived from the
+A typed `ordersClient` and a cache-first `ordersQueries` query layer, both derived from the
 chapter-2 contract, with service discovery resolving the URL for you. Next you will render the live
 table: NetScript's `definePage` builder for the server shell, and a `QueryIsland` that hydrates
 these query helpers in the browser.
