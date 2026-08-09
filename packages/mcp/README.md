@@ -4,9 +4,9 @@
 [![CI](https://github.com/rickylabs/netscript/actions/workflows/ci.yml/badge.svg)](https://github.com/rickylabs/netscript/actions/workflows/ci.yml)
 [![Docs](https://img.shields.io/badge/docs-rickylabs.github.io-blue)](https://rickylabs.github.io/netscript/)
 
-**The Model Context Protocol server for NetScript: 21 token-bounded tools for app health, correlated
-execution debugging, framework telemetry, CLI diagnostics, documentation search, and first-party
-export discovery over stdio.**
+**The Model Context Protocol server for NetScript: 22 token-bounded tools for app health, correlated
+execution debugging, framework telemetry, CLI diagnostics, intent-aware documentation guidance,
+and first-party export discovery over stdio.**
 
 Point Claude Code or VS Code at a running NetScript app and the agent can ask _"is the app
 healthy?"_, _"why did the last import job fail?"_, and _"what is slowing down `checkout`?"_ — and
@@ -24,7 +24,7 @@ Aspire's own MCP server: Aspire speaks resources and containers; this server spe
 
 ## Why agents like it
 
-- **21 token-bounded tools** — every successful result is capped server-side (50 array items, 2,000
+- **22 token-bounded tools** — every successful result is capped server-side (50 array items, 2,000
   characters per string) before it reaches the model; the analytics tools never return raw spans at
   all.
 - **Framework-semantic trace intelligence** — tools classify telemetry into `worker`, `saga`,
@@ -38,6 +38,8 @@ Aspire's own MCP server: Aspire speaks resources and containers; this server spe
 - **Matched agent surface** — `netscript agent init` writes host configuration pinned to your
   installed CLI version and installs the skills that ship with that same release, so the tool
   catalog the agent sees comes from the release it runs.
+- **Intent-aware guidance** — `find_guidance` accepts the task in the caller's words and returns a
+  bounded, ordered set of section citations and cited code excerpts.
 - **Zero npm MCP SDK** — a minimal newline-delimited JSON-RPC transport keeps the dependency graph
   lean and the lockfile stable.
 
@@ -45,7 +47,7 @@ Aspire's own MCP server: Aspire speaks resources and containers; this server spe
 
 ```mermaid
 flowchart LR
-    A["Agent host<br/>(Claude Code, VS Code, ...)"] <-- "JSON-RPC / stdio" --> S["netscript agent mcp<br/>21 tools · bounded results"]
+    A["Agent host<br/>(Claude Code, VS Code, ...)"] <-- "JSON-RPC / stdio" --> S["netscript agent mcp<br/>22 tools · bounded results"]
     S --> T["Telemetry endpoint<br/>(OTLP read model)"]
     S --> D["Docs corpus<br/>(public Markdown)"]
     S --> E["Export corpus<br/>(pinned deno doc JSON)"]

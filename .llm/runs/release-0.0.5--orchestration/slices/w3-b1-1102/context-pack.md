@@ -6,17 +6,17 @@
 | -------------- | ------------------------------------------------ |
 | Run ID         | `release-0.0.5--orchestration/slices/w3-b1-1102` |
 | Branch         | `fix/mcp-intent-aware-discovery`                 |
-| Current phase  | `plan-eval`                                      |
+| Current phase  | `impl`                                           |
 | Archetype      | `6 — CLI / Tooling`                              |
 | Scope overlays | `docs`                                           |
 
 ## Current State
 
-Research and contract-first design are complete at baseline `3f41a3639`. The plan introduces a 22nd
-MCP tool, `find_guidance`, over one shared deterministic section index; it extends rather than
-duplicates #1375's generated fallback. PLAN-EVAL cycle 1 returned `FAIL_PLAN`; its M1 and two minor
-findings are repaired in plan artifacts only. No product source has been changed. Implementation is
-blocked pending a fresh cycle-2 Claude · Fable 5 PLAN-EVAL `PASS`.
+Research and contract-first design are complete. A separate Claude · Fable 5 PLAN-EVAL cycle 2
+returned `PASS`, authorizing implementation. The branch incorporated `main@3ce91f2c2` at
+`b9692f93d`; the recovered worktree was clean there. S1 now adds the 22nd read-only MCP contract,
+`find_guidance`, its bounded flow shell, vertical docs folders, count-synchronized public surfaces,
+and focused red-to-green tests. Retrieval, D12 source admission, and adapter composition remain S2.
 
 ## Completed
 
@@ -32,16 +32,18 @@ blocked pending a fresh cycle-2 Claude · Fable 5 PLAN-EVAL `PASS`.
   canonicalize it to `llms`, and dual-adapter plus installed-corpus gates exercise the task-router
   row.
 - Checked in and executed the exact production-corpus pre-fix query sweep.
+- Received PLAN-EVAL cycle 2 `PASS`; moved issue #1102 and PR #1404 to exactly `status:impl`.
+- Proved S1 with 28 focused MCP tests, 20 CLI/init tests, a 108-file scoped MCP check, scoped lint
+  and format, and publish-asset freshness, all at raw exit 0.
 
 ## In Progress
 
-- Stopped at draft PR #1404 with `status:plan-eval`; awaiting fresh orchestrator-launched PLAN-EVAL
-  cycle 2.
+- S1 is ready to commit/push/comment to draft PR #1404 before S2 begins.
 
 ## Next Steps
 
-1. Orchestrator launches a fresh Claude · Fable 5 · medium PLAN-EVAL cycle 2.
-2. If and only if `plan-eval.md` says `PASS`, move status to `impl` and implement S1.
+1. Commit, push, and comment S1 with its raw gate evidence.
+2. Implement S2 without changing the locked evaluation ordering or required set.
 3. Commit/push/comment each slice independently; request the serialized gate only after non-Aspire
    gates are green.
 
@@ -57,23 +59,24 @@ blocked pending a fresh cycle-2 Claude · Fable 5 PLAN-EVAL `PASS`.
 
 ## Files Changed
 
-Only this run directory is changed in the plan phase. Product paths listed in `plan.md` remain
-untouched until PLAN-EVAL PASS.
+S1 changes the MCP public contract/registry, docs feature folders and tests, synchronized tool-count
+references, the generator-owned MCP publish asset, two count assertions in CLI tests, and these run
+artifacts. No retrieval or corpus-source behavior is implemented before S2.
 
 ## Gates
 
 | Gate family | Current status             | Evidence                                                        |
 | ----------- | -------------------------- | --------------------------------------------------------------- |
-| Static      | NOT_RUN for implementation | plan phase only                                                 |
+| Static      | PASS for S1                | focused tests/check/lint/fmt and asset freshness, raw exit 0     |
 | Fitness     | Baseline audit complete    | research F10; implementation package gates pending              |
 | Runtime     | NOT_RUN                    | no implementation; no AppHost/container started                 |
-| Consumer    | NOT_RUN                    | planned installed-corpus CLI stdio + generated-agent assertions |
+| Consumer    | Partial PASS               | current CLI/init count tests pass; D12 behavior remains S2/S4    |
 
 ## Open Questions
 
-- PLAN-EVAL cycle 2 must approve or reject D12, the 12 exact-ordered citations plus Prisma's
-  unordered top-three set, numeric policy/bounds, and canonical prose-refresh scope. None remains
-  open for the implementation supervisor.
+- No product decision remains open. Locked D12, the 12 exact-ordered citations plus Prisma's
+  unordered top-three set, numeric policy/bounds, and canonical prose-refresh scope may change only
+  through recorded drift and evaluator approval.
 
 ## Drift and Debt
 
@@ -89,3 +92,4 @@ untouched until PLAN-EVAL PASS.
 - `59ac3b9b2` — opening plan-eval handoff state.
 - `271428de5` — cycle-1 PLAN-EVAL repair: D12, dual-adapter/installed-corpus gates, reproducible F4
   sweep, and unordered Prisma top-three constraint.
+- `b9692f93d` — merge current `main@3ce91f2c2` before authorized implementation.

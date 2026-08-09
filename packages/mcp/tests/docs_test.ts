@@ -1,6 +1,6 @@
 import { assert, assertEquals, assertGreater } from '@std/assert';
 import { join, resolve } from '@std/path';
-import { createDocsFlows } from '../src/application/flows/docs-flows.ts';
+import { createDocsFlows } from '../src/application/docs/docs-flows.ts';
 import { createMcpServer } from '../src/application/runner/mcp-server.ts';
 import {
   FilesystemDocsCorpus,

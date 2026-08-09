@@ -8,7 +8,7 @@ import {
   type DocsSummary,
   MAX_INDEXED_DOC_LENGTH,
   slugifyDocsHeading,
-} from '../domain/docs-corpus-port.ts';
+} from '../domain/docs/docs-corpus-port.ts';
 
 const EXCLUDED_DIRECTORIES = new Set(['_plan', '_data', '_components', '_includes']);
 

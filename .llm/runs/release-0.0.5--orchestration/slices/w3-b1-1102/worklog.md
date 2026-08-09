@@ -110,6 +110,9 @@ the single shared indexer used by both adapters.
 | 2026-08-09 | Plan  | Plan-Gate handoff | Plan/design ready; product implementation is stopped pending separate-session PLAN-EVAL PASS.                                                                                                                                                                                                                      |
 | 2026-08-09 | Plan  | PLAN-EVAL cycle 1 | `FAIL_PLAN`: filesystem excludes `llms.txt`; F4 lacked a checked-in reproduction command; Prisma nested order was overconstrained. Full evaluator file was not present locally or on the fetched PR branch, so this records the orchestrator-delivered verdict without fabricating the missing evaluator artifact. |
 | 2026-08-09 | Plan  | Cycle-2 repair    | Commit `271428de5`: locked D12 across both adapters, dual-adapter plus installed-corpus gates, checked in/reran the real F4 sweep, and changed Prisma to an unordered required top-three set. Product source remains untouched.                                                                                    |
+| 2026-08-09 | Plan  | PLAN-EVAL cycle 2 | `PASS` from a fresh separate Claude · Fable 5 session; implementation authorized with D12, three-path `llms` proof, package-scoped decisive gates, and serialized AppHost/container token conditions binding.                                                                                                    |
+| 2026-08-09 | S1    | Contract          | Added the 22nd read-only `find_guidance` tool, finite public guidance vocabulary, strict Standard Schemas, bounded flow shell, vertical docs domain/application folders, and synchronized count references. Retrieval and corpus admission remain S2.                                                          |
+| 2026-08-09 | S1    | Proof             | Focused MCP tests: 28 passed / 0 failed; CLI/init tests: 20 passed / 0 failed; scoped MCP check selected 108 files with 0 failed batches; scoped lint/fmt and `check:publish-assets` each exit 0. The first lint invocation without package config failed before linting because Deno 2.9 rejected the root workspace shape; rerun with `--config packages/mcp/deno.json` was decisive and green. |
 
 ## Gate Results
 
@@ -120,8 +123,12 @@ the single shared indexer used by both adapters.
 | MCP doc-lint baseline        | PASS                        | exit 0; combined diagnostics 0 over all three exports                                                   |
 | MCP publish dry-run baseline | PASS                        | exit 0; dry run complete                                                                                |
 | PLAN-EVAL cycle 1            | FAIL_PLAN                   | separate Claude · Fable 5 verdict delivered by orchestrator; M1 + two minors repaired in plan artifacts |
-| PLAN-EVAL cycle 2            | NOT_RUN                     | orchestrator must launch a fresh evaluator after this repair is pushed                                  |
-| Implementation gates         | NOT_RUN                     | prohibited before PLAN-EVAL PASS                                                                        |
+| PLAN-EVAL cycle 2            | PASS                        | separate Claude · Fable 5 verdict posted by orchestrator to PR #1404                                    |
+| S1 focused MCP tests         | PASS                        | exit 0; 28 passed, 0 failed across guidance contract, registry, stdio, and docs tests                     |
+| S1 CLI/init tests            | PASS                        | exit 0; 20 passed, 0 failed; no AppHost or container started                                             |
+| S1 scoped MCP check          | PASS                        | exit 0; 108 selected files, 0 failed batches, `--no-lock`                                                |
+| S1 scoped MCP lint / format  | PASS                        | exit 0 with package config; 108 files, 0 findings                                                        |
+| S1 publish-asset freshness   | PASS                        | `deno task check:publish-assets`, exit 0                                                                 |
 | Aspire/container gates       | NOT_RUN                     | no token requested; no AppHost/container started                                                        |
 
 ## Handoff Notes

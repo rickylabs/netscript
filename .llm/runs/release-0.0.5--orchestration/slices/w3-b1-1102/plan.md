@@ -6,7 +6,7 @@
 | -------------- | ------------------------------------------------------------------------ |
 | Run ID         | `release-0.0.5--orchestration/slices/w3-b1-1102`                         |
 | Branch         | `fix/mcp-intent-aware-discovery`                                         |
-| Phase          | `plan-eval`                                                              |
+| Phase          | `impl`                                                                   |
 | Target         | `packages/mcp`, `packages/cli` agent guidance, consumer skills, MCP docs |
 | Archetype      | `6 — CLI / Tooling`                                                      |
 | Scope overlays | `SCOPE-docs`                                                             |

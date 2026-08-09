@@ -259,7 +259,7 @@ Deno.test("S-18 prior-release host stays pinned until agent init and restart exp
     assertEquals(after.mcpServers.netscript.args[4], MIGRATION_TARGET_SPECIFIER);
 
     const restartedTools = await listToolsAfterHostRestart(root);
-    assertEquals(restartedTools.length, 21);
+    assertEquals(restartedTools.length, 22);
     for (const tool of OPENAPI_TOOL_TRIAD) assert(restartedTools.includes(tool));
   } finally {
     await Deno.remove(root, { recursive: true });

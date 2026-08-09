@@ -3,7 +3,7 @@ import {
   type DocsCorpusPort,
   DocsCorpusUnavailableError,
   slugifyDocsHeading,
-} from '../../domain/docs-corpus-port.ts';
+} from '../../domain/docs/docs-corpus-port.ts';
 import type { ToolExecutionResult, ToolFlow } from '../../domain/tool-types.ts';
 
 const DEFAULT_LIST_LIMIT = 20;

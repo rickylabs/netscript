@@ -102,7 +102,7 @@ output that could corrupt the JSON-RPC stream. Its flags:
 
 ## What the server exposes
 
-Twenty-one tools, every one returning a bounded structured result. Grouped by what
+Twenty-two tools, every one returning a bounded structured result. Grouped by what
 an agent is trying to do:
 
 - **Read the running app** — seven telemetry read models: `get_app_status`,
@@ -112,7 +112,8 @@ an agent is trying to do:
 - **Diagnose the project** — `doctor` aggregates telemetry reachability, Aspire
   markers, project wiring, and plugin diagnostics into one verdict; the plugin
   slice has a direct twin in `netscript plugin doctor`.
-- **Search the docs** — `search_docs`, `list_docs`, and `get_doc` form a
+- **Use the docs** — `find_guidance` returns ordered section-level guidance and cited code for a
+  natural-language task; `search_docs`, `list_docs`, and `get_doc` retain the literal
   search-to-get funnel over the documentation corpus (next section).
 - **Discover exports** — `find_export`, `list_package_exports`, `get_export`, and
   `search_exports` locate package subpaths, page through package surfaces, return one bounded

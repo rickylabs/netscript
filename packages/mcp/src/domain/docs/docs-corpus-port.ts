@@ -63,7 +63,7 @@ export interface DocsSearchMatch {
   readonly score: number;
 }
 
-/** Indexed public documentation capability consumed by docs flows. */
+/** Public documentation capability consumed by docs flows. */
 export interface DocsCorpusPort {
   /** List indexed public document summaries. */
   list(): Promise<readonly DocsSummary[]>;

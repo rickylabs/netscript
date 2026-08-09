@@ -11,7 +11,7 @@ surface and is maintained by hand; the authoritative, always-current symbol list
 [`deno doc jsr:@netscript/mcp{{ releaseSpecifier }}`](https://jsr.io/@netscript/mcp/doc). For the
 full index of packages and plugins return to the [reference overview](/reference/).
 
-`@netscript/mcp` publishes 21 token-bounded MCP tools that let a coding agent monitor a running app,
+`@netscript/mcp` publishes 22 token-bounded MCP tools that let a coding agent monitor a running app,
 debug a correlated execution, read framework-semantic telemetry, run the doctor, search the public
 documentation, discover first-party package exports, and trigger allowlisted CLI commands — over
 newline-delimited JSON-RPC on stdio, with no npm MCP SDK on the dependency graph.
@@ -31,7 +31,7 @@ Two entrypoints carry the surface:
 | Symbol                 | Kind      | Summary                                                                        |
 | ---------------------- | --------- | ------------------------------------------------------------------------------ |
 | `createMcpServer`      | function  | Create the MCP server with `initialize` / `tools/list` / `tools/call` support. |
-| `createToolRegistry`   | function  | Immutable, enumerable definitions of the 21 tools.                             |
+| `createToolRegistry`   | function  | Immutable, enumerable definitions of the 22 tools.                             |
 | `McpServer`            | interface | Callable server subset: `handle(message)` plus the registered `tools`.         |
 | `McpServerOptions`     | interface | Composition seams: `probe`, `environment`, `flows`, `truncation`.              |
 | `MCP_PROTOCOL_VERSION` | const     | The MCP protocol version the runner implements (`2025-11-25`).                 |
@@ -40,13 +40,13 @@ Two entrypoints carry the surface:
 
 | Symbol                | Kind      | Summary                                                    |
 | --------------------- | --------- | ---------------------------------------------------------- |
-| `TOOL_NAMES`          | const     | The 21 tool names, in registry order.                      |
+| `TOOL_NAMES`          | const     | The 22 tool names, in registry order.                      |
 | `TOOL_INPUT_SCHEMAS`  | const     | Standard Schema input contract per tool.                   |
 | `TOOL_OUTPUT_SCHEMAS` | const     | Standard Schema output contract per tool.                  |
 | `validateSchema`      | function  | Validate a value against a tool schema, throwing on drift. |
 | `ToolDefinition`      | interface | A tool's name, contracts, and flow.                        |
 | `ToolFlow`            | type      | The function a tool executes; depends only on ports.       |
-| `ToolName`            | type      | Union of the 21 tool names.                                |
+| `ToolName`            | type      | Union of the 22 tool names.                                |
 
 ### Per-tool field overview
 
@@ -70,6 +70,7 @@ input caps the result count server-side before truncation applies.
 | `search_docs`                 | **`query`**, `limit`                                  | `count`, `matches`                                                                                                                                                |
 | `list_docs`                   | `limit`                                               | `count`, `docs`, and `corpus` (`kind`, resolved `root`, total `documentCount`)                                                                                    |
 | `get_doc`                     | **`slug`**, `section`                                 | `slug`, `title`, `section`, `content`, `redirectedFrom`                                                                                                           |
+| `find_guidance`               | **`intent`**, `limit`                                 | Bounded ordered section recommendations, cited code, related routes, confidence, fallback, and `truncated`                                                        |
 | `find_export`                 | **`symbol`**, `limit`                                 | Exact `package` / `subpath` / declaration-kind matches, total count, and `truncated`                                                                               |
 | `list_package_exports`        | **`package`**, `offset`, `limit`                      | A stable declaration page grouped by subpath, total/returned counts, `nextOffset`, and `truncated`                                                                 |
 | `get_export`                  | **`symbol`**, `package`, `subpath`                    | One exact declaration signature and JSDoc with explicit `truncated`; ambiguity is refused with bounded candidates                                                 |

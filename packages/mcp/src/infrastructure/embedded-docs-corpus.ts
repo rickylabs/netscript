@@ -4,7 +4,7 @@ import {
   type DocsSearchMatch,
   type DocsSummary,
   MAX_INDEXED_DOC_LENGTH,
-} from '../domain/docs-corpus-port.ts';
+} from '../domain/docs/docs-corpus-port.ts';
 import {
   normalizeSlug,
   processDocsSources,

@@ -3,7 +3,7 @@ import type {
   DocsDocument,
   DocsSearchMatch,
   DocsSummary,
-} from '../domain/docs-corpus-port.ts';
+} from '../domain/docs/docs-corpus-port.ts';
 import {
   MCP_EMBEDDED_DOCS,
   MCP_EMBEDDED_DOCS_PROVENANCE,

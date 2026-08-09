@@ -4,7 +4,7 @@
  */
 import { createMcpServer } from './src/application/runner/mcp-server.ts';
 import type { McpServer } from './src/application/runner/mcp-server.ts';
-import { createDocsFlows } from './src/application/flows/docs-flows.ts';
+import { createDocsFlows } from './src/application/docs/docs-flows.ts';
 import { FetchTelemetryProbe } from './src/infrastructure/fetch-telemetry-probe.ts';
 import {
   createAspireDashboardFetch,

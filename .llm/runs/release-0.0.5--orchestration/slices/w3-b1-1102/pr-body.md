@@ -1,9 +1,9 @@
 ## Summary
 
-Plans #1102's public MCP feature: an offline, bounded `find_guidance` workflow that ranks real
+Implements #1102's public MCP feature: an offline, bounded `find_guidance` workflow that ranks real
 documentation sections by task intent, returns cited code and prerequisite/next routing, and is
-activated before unfamiliar NetScript implementation work. This opening commit contains only the
-harness research/design artifacts; product implementation is blocked on separate-session PLAN-EVAL.
+activated before unfamiliar NetScript implementation work. Separate-session PLAN-EVAL cycle 2
+passed; S1 establishes the public contract and enumerable bounded flow shell.
 
 ## Scope
 
@@ -15,7 +15,7 @@ harness research/design artifacts; product implementation is blocked on separate
 ## Slices
 
 - [x] Plan — live issue re-baseline, contract/design, failure matrix, gates
-- [ ] S1 Public `find_guidance` contract and enumerable flow
+- [x] S1 Public `find_guidance` contract and enumerable flow
 - [ ] S2 Shared section index, concept aliases, code/link routing, root `llms.txt` source policy
 - [ ] S3 Dual-adapter release-corpus top-k evaluation and parity/budget
 - [ ] S4 MCP/generated-agent activation and installed-corpus real CLI stdio
@@ -27,7 +27,11 @@ harness research/design artifacts; product implementation is blocked on separate
   warnings recorded in run research.
 - `deno task doc:lint --root packages/mcp --pretty` — exit 0, combined diagnostics 0.
 - `deno task --cwd packages/mcp publish:dry-run` — exit 0.
-- Implementation/acceptance gates — not run; no product implementation exists.
+- S1 focused MCP tests — exit 0; 28 passed, 0 failed.
+- S1 CLI/init count tests — exit 0; 20 passed, 0 failed; no AppHost/container started.
+- Scoped MCP check — exit 0; 108 files selected, 0 failed batches, `--no-lock`.
+- Scoped MCP lint/format — exit 0; 108 files, 0 findings using the package config.
+- `deno task check:publish-assets` — exit 0.
 - `quality:gate` and root `arch:check` are explicitly non-decisive for `packages/mcp`; the plan
   names explicit package-root scanner/doctrine commands.
 - No AppHost/container run was started and no serialized token was requested.
@@ -35,7 +39,7 @@ harness research/design artifacts; product implementation is blocked on separate
 ## Harness
 
 - Run dir: `.llm/runs/release-0.0.5--orchestration/slices/w3-b1-1102/`
-- Phase: `plan-eval`
+- Phase: `impl`
 - Do not merge until the selected PLAN-EVAL and mandatory separate-session IMPL-EVAL pass. The
   implementation supervisor does not self-certify.
 
