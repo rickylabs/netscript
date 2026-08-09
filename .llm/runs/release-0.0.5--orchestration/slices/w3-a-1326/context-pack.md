@@ -41,16 +41,21 @@ manual F-14 evidence. The full core suite passes 28/28.
 - S3 committed as `ba5c4704a`, pushed, and reported on draft PR #1402.
 - S4 isolated public consumer, downstream consumers, JSR, raw/package workspace publish, and scoped
   wrappers are green; the only consumer repair is a test fake now using `MemoryStreamProducer`.
+- S5 real Aspire stop/restart proof is green with FIFO receipts, one dashboard trace, and actual
+  captured-forwarded OTLP metrics; commit `65ae73e21` is pushed and reported on PR #1402.
+- S6 JSR, workspace publish, mandatory aggregates, and review-thread gate are green. The aggregate
+  quality/doctrine tasks remain non-decisive because #1403 owns their missing package root.
 
 ## In Progress
 
-- S4 committed/pushed as `0b842c8e1`; PR comment posted before S5.
+- `EXPENSIVE-GATE-REQUEST` is recorded. S7 is blocked only on the orchestrator's serialized
+  `scaffold.runtime` ledger grant; the suite has not been started.
 
 ## Next Steps
 
-1. Commit, push, and comment S4 with detached consumer and publish evidence.
-2. Commit/push/comment the completed S5 focused Aspire proof without touching #1398 selections.
-3. Run S6 cheaper handoff gates, record `EXPENSIVE-GATE-REQUEST`, and wait for the token.
+1. Commit, push, and comment S6 evidence and the runtime-token request.
+2. Wait for the orchestrator's explicit ledger grant.
+3. After grant only, run the exact one-pass `scaffold.runtime` command with leak bracketing.
 
 ## Key Decisions
 
@@ -104,4 +109,5 @@ manual F-14 evidence. The full core suite passes 28/28.
 - `e8e638559` — S2 reconnect supervisor and focused GREEN evidence.
 - `ba5c4704a` — S3 correlated trace/metrics and exact AP-13 debt closure.
 - `0b842c8e1` — S4 published/consumer compatibility.
-- S5 is locally green and awaiting its required slice commit/push/comment.
+- `65ae73e21` — S5 focused real Aspire outage/recovery and correlated OTEL proof.
+- S6 evidence/request commit pending.

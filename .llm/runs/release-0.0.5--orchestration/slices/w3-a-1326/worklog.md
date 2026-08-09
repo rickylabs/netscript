@@ -152,6 +152,8 @@ the adapter or fetch/timers to the supervisor.
 | 2026-08-09 | S5    | Bounded request    | Added the missing finite per-request timeout to contract/port/adapter; hanging-request test and all 29 core tests pass. |
 | 2026-08-09 | S5    | Correlated recovery | Focused reconnect gate exited 0: three buffered receipts recovered FIFO under one dashboard trace with actual forwarded OTLP metrics. |
 | 2026-08-09 | S5    | Owned cleanup      | Foreground AppHost stopped; no owned survivors. Foreign Redis untouched; scratch workspace moved to recoverable trash. |
+| 2026-08-09 | S6    | Cheaper gate closeout | JSR audit, workspace publish dry-run, both mandatory aggregates, and review-thread gate all exited 0 after S5. |
+| 2026-08-09 | S6    | Runtime token handoff | `EXPENSIVE-GATE-REQUEST` recorded after every cheaper gate passed; `scaffold.runtime` remains unstarted pending a ledger grant. |
 
 ## Decisions
 
@@ -164,6 +166,8 @@ See `plan.md` D1–D16. No open decision would force implementation rework.
 | Historical preparation identity/evaluator differs from live dispatch         | minor       | yes                |
 | Upstream append declaration advertises producer fields that runtime ignores  | significant | yes                |
 | JSR helper counts banner as one slow-type warning while raw dry-run is clean | minor       | yes                |
+| Real stopped-resource proxy requires a finite per-request timeout             | significant | yes                |
+| Aspire 13.4 exposes traces but no metric query API                            | evidence narrowing | yes          |
 
 ## Gate Results
 
@@ -199,6 +203,9 @@ See `plan.md` D1–D16. No open decision would force implementation rework.
 | S5 scoped lint / format             | same 113-file selection                                        | PASS, exit 0 each | Zero findings.                                         |
 | S5 full export doc lint             | `deno task doc:lint --root packages/plugin-streams-core --pretty` | PASS, exit 0 | Combined diagnostics 0.                                |
 | S5 raw package publish              | package `deno publish --dry-run --allow-dirty --no-check`       | PASS, exit 0 | Public timeout contract publishable; no lock change.       |
+| S6 JSR audit helper                 | `audit-jsr-package.ts --root packages/plugin-streams-core`      | PASS, exit 0 | 43 files and all four exports; only the known banner-count warning. |
+| S6 workspace publish               | `deno task publish:dry-run`                                     | PASS, exit 0 | Entire workspace simulation completed successfully after S5. |
+| S6 review threads                  | `agentic:review-threads --pr 1402 --pretty`                      | PASS, exit 0 | 0 threads, 0 unanswered.                                  |
 
 ### S1 RED evidence
 
@@ -221,12 +228,12 @@ the slice run directory and each emitted exactly its named missing-symbol diagno
 
 | Gate                   | Result                  | Evidence      | Notes                                                                                              |
 | ---------------------- | ----------------------- | ------------- | -------------------------------------------------------------------------------------------------- |
-| F-1..F-19              | NOT_RUN                 | Planned S2–S4 | AP-13 exact producer debt currently accepted.                                                      |
+| F-1..F-19              | PASS, exit 0            | S3 decisive  | Package-scoped doctrine has FAIL=0 WARN=0; AP-13 producer row closed with structured telemetry.    |
 | JSR surface scan       | PASS with helper caveat | `research.md` | Helper warns on banner; raw dry-run authority is green.                                            |
 | Package quality scan   | PASS, exit 0            | S3 decisive  | Package source scanned directly: zero findings and zero allowances.                                |
 | Package doctrine check | PASS, exit 0            | S3 decisive  | Final package-scoped result: FAIL=0 WARN=0 INFO=1; INFO is pre-existing missing architecture doc.  |
 | F-14 manual scan       | PASS, exit 0            | `PENDING_SCRIPT` manual | One comment-only diagnostics example; zero executable `console.*`; #1403 owns automation. |
-| Aggregate `quality:gate` / `arch:check` | PASS, exit 0 each | Non-decisive | Required aggregates ran, but configured roots omit this package; #1403 owns that gap.      |
+| Aggregate `quality:gate` / `arch:check` | PASS, exit 0 each | S6 non-decisive | Required aggregates reran after S5, but configured roots omit this package; #1403 owns that gap. |
 
 ### S1 compile safety
 
@@ -240,14 +247,37 @@ the slice run directory and each emitted exactly its named missing-symbol diagno
 | Gate                              | Result  | Evidence            | Notes                                                 |
 | --------------------------------- | ------- | ------------------- | ----------------------------------------------------- |
 | Focused Aspire producer reconnect | PASS, exit 0 | S5 isolated AppHost | Exact stop/backoff/restart, FIFO receipts, one dashboard trace, positive OTLP metrics. |
-| `scaffold.runtime`                | NOT_RUN | Token not requested | Do not run before cheaper gates and grant.            |
+| `scaffold.runtime`                | NOT_RUN | `EXPENSIVE-GATE-REQUEST` | All cheaper gates are green; do not start before an explicit ledger grant. |
 
 ### Consumer Gates
 
 | Consumer                  | Result  | Evidence   | Notes                                             |
 | ------------------------- | ------- | ---------- | ------------------------------------------------- |
-| Existing producer callers | NOT_RUN | Planned S4 | Return-value addition intended source-compatible. |
+| Existing producer callers | PASS, exit 0 | S4 | Auth, sagas, and workers tests pass 8/8; streams/triggers producer modules type-check. |
 | Deferred #1398 gates      | N/A     | Boundary   | Remain deferred; not evidence for this slice.     |
+
+## Acceptance Mapping
+
+All seven live #1326 acceptance rows are now truthfully evidenced:
+
+- Initial and later failures enter the documented finite reconnect state: focused runtime tests
+  and the real stopped-resource gate pass.
+- Retry/backoff, cancellation, readiness, and shutdown are explicit in the public contract and
+  separately tested.
+- Count/byte bounds return explicit rejected receipts; accepted receipts settle as delivered,
+  rejected, or delivery-unknown, so overflow and shutdown do not silently lose writes.
+- Initial-offline recovery passes in both focused behavioral tests and the real Aspire proof.
+- Initial outage, mid-session outage, recovery, FIFO, and stop during backoff each have distinct
+  RED and GREEN evidence.
+- One correlated publish trace spans buffering, retry, recovery, settlement, and delivery; actual
+  OTLP metrics expose buffered, retry, recovered, rejected/unknown, and delivered outcomes.
+- The false reconnect warning is removed; manual F-14 reports no executable producer console use.
+
+## EXPENSIVE-GATE-REQUEST
+
+Requested after S6 cheaper-gate completion. The serialized token is currently held by W3-B2.
+Do not run `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` until the orchestrator
+records and communicates this slice's ledger grant.
 
 ## Handoff Notes
 
