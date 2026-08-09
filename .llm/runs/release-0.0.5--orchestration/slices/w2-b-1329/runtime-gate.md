@@ -51,6 +51,35 @@ No repair was implemented before this classification was reported. The isolated 
 was stopped; scoped teardown removed owned `postgres-b73d5698`; the final leak artefact contains only
 the known foreign `redis-jfgcbtaf`.
 
+## Serialized verdict after record-selection repair
+
+- Grant: milestone-orchestrator ledger row 39, committed and pushed before the run.
+- Command, run once: `deno task e2e:cli run scaffold.runtime --cleanup --format pretty`.
+- Raw exit code: **1**.
+- Full aggregate: **passed=73 failed=1**.
+- `runtime.wait.streams`: **PASS**, 237 ms.
+- `behavior.otel.stream-consumer`: **FAIL**, 20,533 ms.
+- `behavior.otel.traces` / TC-14: **NOT EXECUTED** after the preceding critical failure.
+- `cleanup.aspire-stop`: **PASS**, 437 ms.
+- No retry was attempted.
+
+The bounded selector exhausted all 40 batches and its 20-second wall-clock limit while looking for
+correlation `trg_evt_146400d1-7068-49e7-bdec-475ce8b026af`. It observed only
+`flow-b-callback`, `health-check`, and `workers-plugin-health-check`. Therefore this pass produced no
+selected execution record, no consumer span, and no producer/link trace-id comparison. Claiming a
+TC-14 result from the aggregate would be false.
+
+The focused negative evidence remains explicit:
+
+- `TC-14 rejects a matched record without traceparent` passes by asserting the guard throws a
+  TC-14 failure;
+- `TC-14 rejects a matched record whose trace differs from the producer` passes by asserting a
+  different W3C trace id throws a TC-14 failure.
+
+Those tests prove the gate detects context loss once the matching record exists. The serialized
+failure shows the generated stream did not expose such a record within the required bound, so issue
+row 6 remains unproven and the PR must retain `Refs #1329`.
+
 The malformed control was not injected through the real generated service. It is a synthetic invalid
 `control` payload evaluated by the exported parser inside the real-service consumer gate, using the
 offset committed by that live service. Likewise, ordered deletion is proven by the focused verbatim
@@ -72,7 +101,7 @@ is still the same foreign `redis-jfgcbtaf` container owned by
 | 3 | Official example works unchanged against a real service | PROVEN | Verbatim extraction executed inside the passing generated-service consumer gate. |
 | 4 | Replay/ordering/batching/deletion/reconnect/malformed behavior documented | PROVEN | Task docs plus contract/runtime tests. Runtime provenance is split as disclosed above; malformed/deletion are not injected through the generated service. |
 | 5 | Data carries correlation plus W3C trace context | PROVEN | Producer, schema, telemetry, and real-server conformance tests; live generated consumer accepted schema-valid fields. |
-| 6 | Aspire proves producer → durable stream → SSE consumer as one end-to-end trace | **NOT PROVEN** | TC-14 selected three unrelated startup job records for the consumer links. This is a gate defect, but it leaves the actual Flow-B execution link unobserved and the row unticked. |
+| 6 | Aspire proves producer → durable stream → SSE consumer as one end-to-end trace | **NOT PROVEN** | The selector repair skipped unrelated startup records correctly, but the generated stream never exposed the expected execution correlation within 40 batches/20 seconds; TC-14 consequently did not execute. |
 | 7 | Drift tests cover event name/envelope/cardinality/telemetry | PROVEN | Contract negatives and real-server proxy conformance. |
 | 8 | Complete shapes appear in task and generated/reference API docs | PROVEN | Official task docs, exported module/symbol JSDoc, full core export-map doc lint. |
 

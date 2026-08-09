@@ -119,6 +119,9 @@ service, generator, or docs file owns a second event-name/payload table.
 | 2026-08-09 | S6-R1 | repair gates | Seven focused selection/TC-14 tests pass. The 35-file scoped check/lint/fmt wrappers and `quality:gate` pass with only carried repository warnings/allowances. |
 | 2026-08-09 | S6-R1 | EXPENSIVE-GATE-REQUEST | Gate-side repair and all cheaper validation are complete. Requesting a new serialized `scaffold.runtime` grant; the command has not been started. |
 | 2026-08-09 | S6-R2 | pass attribution | After ledger-row-39 grant and before the runtime run, TC-14 pass output was strengthened to print producer trace id, selected correlation, and matched link trace/span ids. Seven focused tests and the 35-file scoped check/fmt pass. |
+| 2026-08-09 | S6-R2 | serialized runtime | Ledger-row-39 grant consumed in one pass. Raw exit 1; aggregate 73 passed/1 failed. `runtime.wait.streams` passed (237 ms); `behavior.otel.stream-consumer` failed (20,533 ms) after 40/40 batches and 20 seconds without the expected execution correlation. No retry. |
+| 2026-08-09 | S6-R2 | attributable exhaustion | Expected `trg_evt_146400d1-7068-49e7-bdec-475ce8b026af`; observed only `flow-b-callback`, `health-check`, `workers-plugin-health-check`. `behavior.otel.traces`/TC-14 did not execute, so row 6 remains unproven. |
+| 2026-08-09 | S6-R2 | post-run ownership/threads | Cleanup gate passed. Leak artefact exit 0 reports no W2-B survivor and only foreign `redis-jfgcbtaf`, left untouched. Review threads exit 0: 0 threads, 0 unanswered. |
 
 ## Decisions
 
@@ -204,6 +207,7 @@ service, generator, or docs file owns a second event-name/payload table.
 | Real generated service/browser | PASS | `behavior.otel.stream-consumer` (943 ms) | Generated service and verbatim native example executed. Deletion is focused/real-test-server proof, not observed in generated Flow-B. |
 | Correlated OTEL trace          | FAIL | `behavior.otel.traces` (58,790 ms) + S6-D2 live diagnosis | TC-14 attached the first SSE batch's three unrelated job-snapshot links to the consumer span; the gate did not select the Flow-B execution record, so end-to-end propagation remains unproven rather than disproven. |
 | `scaffold.runtime`             | FAIL (exit 1) | aggregate 74 passed, 1 failed | One pass only; no retry. Cleanup passed. Full evidence in `runtime-gate.md`. |
+| `scaffold.runtime` after selection repair | FAIL (exit 1) | aggregate 73 passed, 1 failed | `behavior.otel.stream-consumer` exhausted its 40-batch/20-second bound; TC-14 trace validation did not execute. No retry. |
 
 ### Consumer Gates
 
