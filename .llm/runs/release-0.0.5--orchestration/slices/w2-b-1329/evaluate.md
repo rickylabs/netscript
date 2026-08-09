@@ -144,3 +144,94 @@ verified product gap with its own correctly-scoped issue, milestone, and accepta
 owner reverses the pattern's extension, the recorded fallback (revert to `Refs #1329`, untick
 row 6) is already stated on the PR and nothing in this verdict depends on which way that ruling
 goes.
+
+## Correction review — 75832db58
+
+**Verdict: PASS** — focused re-review of commit `75832db58` (`test(e2e): defer Flow-B trace gates
+to 1398`), the new branch head, by the same separate Claude · Fable 5 session on 2026-08-09. Prior
+findings stand. Tests were re-run in a detached scratchpad worktree at `75832db58` (removed after).
+
+### Can the machinery hide a failing gate? No — by construction.
+
+Deferral is strictly a **definition-time** decision, not a runtime transition:
+
+- A `DeferredGate` exists only in `suite.deferredGates`; the two gates were **removed from
+  `RUNTIME_GATES`** (`capability-suites.ts`), so `buildExecutionPlan` cannot select them —
+  `execution-plan-builder.ts` returns only `suite.gates`, and a targeted
+  `gates <suite> <deferred-id>` invocation **throws** `Unknown gate …` rather than silently
+  no-oping.
+- An executed gate's verdict comes only from `runGate`: `executeGate` yields `passed`/`failed`,
+  and the only executed-path `skipped` is the pre-existing `skipUnsupportedPlatform`, decided
+  **before** execution starts. There is no code path that converts a started or failed
+  `StepResult` into a deferred/skipped one.
+- `ok: failed === 0` and `summary.passed` count only `verdict === 'passed'` steps
+  (`suite-runner.ts:124-136`); the synthesized deferred step is `verdict: 'skipped',
+  critical: false` and lands in the separate `summary.skipped` counter. A failing gate stays
+  `failed` and fails the suite; a deferred gate can never inflate `passed`.
+
+The residual risk is definitional, not mechanical, and is recorded as F-C2 below.
+
+### Findings by severity
+
+No blocking findings.
+
+- **F-C1 (low, visibility)** — `PrettyReporter` prints per-step `> <gateId>: DEFERRED #1398: …`
+  and a `SKIPPED 0ms` verdict line, but its one-line aggregate prints only
+  `Summary: passed=X failed=Y` — `summary.skipped` is omitted from the pretty summary line
+  (pre-existing format; `pretty-reporter.ts` untouched by this commit; the JSON/report-file
+  reporters carry `summary.skipped`). A human scanning only the final line sees no hint of the
+  two deferrals. Suggest adding `skipped=` to the pretty summary when #1398 restores the gates or
+  in a trivial follow-up. Not blocking: the deferral is unmistakable at step level and in the
+  structured report.
+- **F-C2 (low, re-enablement contract scope)** — The pin test
+  (`suite-registry_test.ts` "runtime suites pin the exact #1398 OTEL deferral without widening
+  it") locks the **runtime tiers'** deferred set to exactly the two entries and asserts neither
+  suite executes a deferred gate; widening `SCAFFOLD_RUNTIME_DEFERRED_GATES` or re-adding the
+  gates without clearing the deferral fails it, and restoring the gates to `RUNTIME_GATES` breaks
+  the `false` membership assertions — a deliberate, test-breaking edit either way, satisfying
+  #1398's re-enablement contract. However, nothing pins *other* suites to an empty
+  `deferredGates`: a future PR could defer a gate on a different suite without failing this test.
+  Partially mitigated — doing so requires an explicit reviewed source edit removing the gate from
+  that suite's gate list, other registry tests pin specific gate membership per suite, and the
+  DEFERRED step is emitted in output. Worth a global "only these suites may carry deferrals"
+  assertion when the machinery is next touched.
+- **F-C3 (informational)** — `validate-flow-b-traces.ts` differs from the previously evaluated
+  head `371e4ba0a`, but the change is main's #1393 refactor (commit `61ae765c7`, already merged)
+  arriving via merge `25359637c`: telemetry-query plumbing moved to the shared
+  `aspire-dashboard-telemetry.ts` helper; the TC-14 assertions and diagnostics are unchanged.
+  `select-flow-b-stream-change.ts`, `consume-flow-b-stream.ts`, and both focused test files are
+  byte-identical to the evaluated head (`git log 371e4ba0a..75832db58` touches none of them;
+  re-ran the focused suite: 7 passed / 0 failed, both TC-14 negatives still assert throws).
+
+### Checks performed
+
+1. **Deferral visibility** — distinguishable on all three axes: from a **pass** (verdict
+   `skipped`, title prefixed `DEFERRED #1398:`, structured
+   `{status:'deferred', issue, reason}` evidence, counted in `summary.skipped` not
+   `summary.passed`); from **absence** (a never-registered gate emits nothing; deferred gates
+   emit `gate-start`/`gate-end` events and a report step). The emission lives in the production
+   `createSuiteRunner.run` loop (`suite-runner.ts:76-87`), unconditional for every full-suite
+   run on any reporter — the unit test drives that same production function, and the
+   materialization path (`createScaffoldCapabilitySuite` → `resolveSuite` → `builtInSuites`)
+   carries `deferredGates` into the real CLI registry.
+2. **Fail/skip semantics** — verified above; no red-hiding transition exists.
+3. **No weakening of unrelated gates** — commit touches exactly 6 files; the
+   `capability-suites.ts` hunks remove only the two OTEL lines and add the deferral wiring.
+   `RUNTIME_SQLITE_GATES` derives by filter from `RUNTIME_GATES`, so both tiers defer
+   consistently. The W2-A/W2-C gates are intact at head: the KV runtime waits
+   (`KV_BACKGROUND_RUNTIME_WAIT_RESOURCES` map), `database.migration-artifacts`, both
+   `runtime.capture-db-allocation-*`, and `behavior.live-db-endpoint` all remain in the gate
+   lists with unchanged ordering/criticality. Full re-run: `suite-registry_test` +
+   `suite-runner_test` + `runtime-gates_test`: 41 passed / 0 failed; the gates test directory
+   (incl. `scaffold-gates_test.ts`, `verify-live-db-endpoint_test.ts`,
+   `aspire-dashboard-telemetry_test.ts`): 57 passed / 0 failed.
+4. **Re-enablement contract** — pinned and test-breaking in both directions (F-C2 for the scope
+   caveat).
+5. **Implementation untouched** — verified byte-identical except the main-side #1393 plumbing
+   refactor (F-C3).
+6. **Hygiene** — zero `deno-lint-ignore`, `as unknown as`, `@ts-ignore`/`@ts-expect-error`, or
+   `any` added by `75832db58` outside `.llm/runs/**`. The disclosed type-widening correction is
+   genuine narrowing, not a cast: the test uses `kind: 'summary' as const` (const assertion —
+   literal self-narrowing only) and `SCAFFOLD_RUNTIME_DEFERRED_GATES` uses
+   `as const satisfies readonly DeferredGate[]`, which preserves literal types under a checked
+   constraint. `deno check --unstable-kv` over the three touched source files: clean.
