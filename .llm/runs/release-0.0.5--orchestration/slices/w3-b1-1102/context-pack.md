@@ -18,7 +18,9 @@ returned `PASS`, authorizing implementation. The branch incorporated `main@3ce91
 `find_guidance`, its bounded flow shell, vertical docs folders, count-synchronized public surfaces,
 and focused red-to-green tests. S2 adds the one shared section parser/index/ranker, concept aliases,
 fenced/Vento code citations, direct internal-link routing, corpus composition, and D12 filesystem
-source admission. The locked real release-corpus evaluation and generator parity remain S3.
+source admission. S3 now refreshes the canonical release corpus at repaired `main@399f60185`,
+selects the bounded intent destinations, and proves the locked evaluation through embedded and
+materialized-filesystem adapters.
 
 ## Completed
 
@@ -41,19 +43,21 @@ source admission. The locked real release-corpus evaluation and generator parity
   scoped check/lint/fmt, and zero explicit package-source quality findings. The explicit doctrine
   gate still exits 1 only for the recorded pre-existing #1403 findings; the new 410-line warning
   seen during development was removed by splitting parser/ranker/result roles below 300 lines.
+- Rebased without a merge onto `main@399f60185`; rebuilt the canonical corpus from a fresh exact
+  checkout/output with truthful provenance and confirmed the formerly missing Prisma sections.
+- Proved all five locked S3 rows repeatably and byte-equally across generated embedded and
+  materialized filesystem adapters; the full MCP suite is 132/132 green.
 
 ## In Progress
 
-- S1 and S2 are committed/pushed/commented. S3 is blocked before artifact generation because the
-  approved mirror builder exits 1 on pre-existing invalid Vento in `database-migration.md:46`.
+- S1 and S2 are committed/pushed/commented. S3 implementation and gates are complete pending its
+  commit/push/PR comment.
 
 ## Next Steps
 
-1. Orchestrator owns the reported docs repair/rescope decision; do not invent a second refresh path.
-2. Once the canonical builder is green, refresh/select the approved corpus and run the unchanged
-   locked evaluation in S3.
-3. Commit/push/comment each slice independently; request the serialized gate only after non-Aspire
-   gates are green.
+1. Commit/push/comment S3 with its exact corpus/gate evidence.
+2. Stop for orchestrator-owned separate-session IMPL-EVAL/CI; do not start an Aspire/runtime suite
+   without a durable token grant.
 
 ## Key Decisions
 
@@ -72,6 +76,10 @@ adds the pure parser/ranker/result policy and focused tests, composes `find_guid
 and intentionally adds root `llms.txt` to filesystem `search_docs`, `list_docs`, `get_doc`, and
 `find_guidance`. Consequently `list_docs.corpus.documentCount` increases by one when that file is
 present; `llms-full.txt` and nested/arbitrary text files remain excluded.
+S3 adds the checked-in evaluation, refreshed canonical prose/provenance, 12-document bounded MCP
+fallback, and its generated MCP/CLI assets. Eight issue-required pages are added; the generic
+quickstart fallback page is removed to keep current repaired sources below the immutable 256 KiB
+cap without changing any locked citation.
 
 ## Gates
 

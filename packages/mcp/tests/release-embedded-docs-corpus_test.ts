@@ -5,14 +5,21 @@ import {
   type ReleaseEmbeddedDocsSource,
 } from '../src/infrastructure/release-embedded-docs-corpus.ts';
 
-Deno.test('generated release fallback contains the enumerated golden-path documents', async () => {
+Deno.test('generated release fallback contains the enumerated intent-guidance documents', async () => {
   const docs = await new ReleaseEmbeddedDocsCorpus().list();
   assertEquals(docs.map((document) => document.slug), [
+    'llms',
     'mcp',
+    'pages/data-persistence/how-to/use-a-second-database',
     'pages/explanation/contracts',
-    'pages/quickstart',
+    'pages/explanation/plugin-system',
+    'pages/orchestration-runtime/how-to/author-a-plugin',
     'pages/services-sdk/services',
+    'pages/tutorials/live-dashboard/03-sdk-cache-first-query',
+    'pages/tutorials/live-dashboard/04-definePage-QueryIsland',
     'pages/web-layer/builders',
+    'pages/web-layer/how-to/build-a-server-validated-form',
+    'pages/web-layer/query',
     'pages/web-layer/route',
   ]);
 });

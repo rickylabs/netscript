@@ -54,3 +54,20 @@ Drift is append-only.
   `/home/codex/repos/.briefing/build-docs-bundle.sh /home/codex/repos/ns005-w3b1
   /home/codex/repos/ns005-w3b1/.llm/tmp/w3-b1-docs-bundle`; current `_site` has none of the required
   outputs after the failed clean build.
+
+## 2026-08-09 — Docs repair unblocked canonical refresh; current sources exceed the projected selection
+
+- **What:** #1406 repaired the docs build on `main@399f60185`; the approved builder now succeeds
+  from a fresh exact-revision checkout. The plan's 236,997-byte old-mirror calculation remains
+  byte-exact, but several selected current pages grew beyond the projected 6,225-byte Prisma-only
+  delta. Keeping the original five pages plus all eight #1102 additions is 274,497 bytes and fails
+  the locked 262,144-byte generator cap.
+- **Expected:** a 13-document selection at 243,222 bytes.
+- **Actual:** the unchanged 13-document selection is 274,497 bytes. Removing the pre-existing
+  generic quickstart page, which supplies none of the locked 15 citations, produces a 12-document
+  selection at 253,511 bytes while retaining all eight issue-required additions.
+- **Severity:** contained S3 selection drift; no locked evaluation ordering or required set changed.
+- **Action:** retain the cap and every intent destination; drop only `pages/quickstart/index.md`
+  from the fallback selection. Do not alter the complete canonical prose mirror.
+- **Evidence:** generator pre-fix budget failure at 274,497 bytes; post-drift provenance reports
+  253,511 bytes / 12 documents / source commit `399f60185`.

@@ -17,7 +17,7 @@ passed; S1 establishes the public contract and enumerable bounded flow shell.
 - [x] Plan — live issue re-baseline, contract/design, failure matrix, gates
 - [x] S1 Public `find_guidance` contract and enumerable flow
 - [x] S2 Shared section index, concept aliases, code/link routing, root `llms.txt` source policy
-- [ ] S3 Dual-adapter release-corpus top-k evaluation and parity/budget
+- [x] S3 Dual-adapter release-corpus top-k evaluation and parity/budget
 - [ ] S4 MCP/generated-agent activation and installed-corpus real CLI stdio
 - [ ] S5 Public docs, package gates, serialized merge-readiness handoff
 
@@ -38,6 +38,14 @@ passed; S1 establishes the public contract and enumerable bounded flow shell.
 - Explicit doctrine — exit 1 only for the pre-existing #1403 baseline (one foreign Jest/Vitest
   global failure, three existing cardinality/file-size warnings, one architecture-doc info); the
   S2 parser/ranker files add no warning.
+- S3 canonical builder — exit 0 from a fresh exact `399f60185` checkout/output; 170 pages and 36
+  deno-doc packages; generated mirror contains all three required Prisma sections.
+- S3 locked evaluation — exit 0; five rows / 15 citations repeat byte-equally across embedded and
+  materialized-filesystem adapters; focused group 11 passed / 0 failed.
+- S3 full MCP tests — exit 0; 132 passed / 0 failed.
+- S3 scoped MCP/generator check, lint, format — exit 0; 115 + 2 files, zero failures/findings.
+- S3 explicit package quality — exit 0; zero findings/allowances. Doctrine remains only #1403's
+  pre-existing baseline. MCP publish dry-run and `check:publish-assets` exit 0.
 - `quality:gate` and root `arch:check` are explicitly non-decisive for `packages/mcp`; the plan
   names explicit package-root scanner/doctrine commands.
 - No AppHost/container run was started and no serialized token was requested.
@@ -55,6 +63,10 @@ passed; S1 establishes the public contract and enumerable bounded flow shell.
   its checked-in prose mirror predates the unsupported-driver section. S3 refreshes the canonical
   mirror through the existing approved builder chain, then extends that single generator path within
   its existing budget.
+- S3 drift: repaired/current selected pages total 274,497 bytes, not the planned 243,222. All eight
+  issue-required additions and the 262,144-byte cap are retained; only the prior generic quickstart
+  fallback page was removed, yielding 253,511 bytes / 12 documents and preserving every locked
+  citation.
 - PLAN-EVAL cycle-1 repair: D12 makes root `llms.txt` an explicit filesystem source, canonicalizes
   it to `llms` for both adapter inputs, and gates `llms#task-router` through embedded,
   materialized-filesystem, and real `agent init --with-docs` paths.

@@ -6,14 +6,45 @@ export interface GuidanceConcept {
   readonly aliases: readonly string[];
   /** Documentation terms contributed to section retrieval. */
   readonly terms: readonly string[];
+  /** At least one corpus term required before this concept can seed a section. */
+  readonly requiredAnyTerms: readonly string[];
+  /** Ordered semantic heading routes preferred before ordinary ranked matches. */
+  readonly routeHints: readonly GuidanceRouteHint[];
+}
+
+/** Corpus-neutral heading/title signature for one ordered intent step. */
+export interface GuidanceRouteHint {
+  readonly heading: string;
+  readonly title?: string;
 }
 
 /** Curated general concepts used by the deterministic offline guidance index. */
 export const GUIDANCE_CONCEPTS: readonly GuidanceConcept[] = Object.freeze([
   {
     name: 'validated-form',
-    aliases: ['validated form', 'form validation', 'route bound form', 'server validated'],
-    terms: ['form', 'validated', 'validation', 'route', 'binding', 'action', 'schema'],
+    aliases: [
+      'validated form',
+      'validated route-bound form',
+      'form validation',
+      'route bound form',
+      'server validated',
+    ],
+    terms: [
+      'form',
+      'validated',
+      'define',
+      'building',
+      'page',
+      'authoring',
+      'generated',
+      'binding',
+    ],
+    requiredAnyTerms: ['form'],
+    routeHints: [
+      { heading: 'define the form' },
+      { heading: 'building a page' },
+      { heading: 'three authoring forms, one generated binding' },
+    ],
   },
   {
     name: 'cache-freshness',
@@ -24,12 +55,34 @@ export const GUIDANCE_CONCEPTS: readonly GuidanceConcept[] = Object.freeze([
       'live data',
       'server data fresh',
     ],
-    terms: ['cache', 'query', 'fresh', 'invalidate', 'signal', 'stream', 'resource'],
+    terms: [
+      'cache',
+      'first',
+      'load',
+      'pattern',
+      'factory',
+      'pipeline',
+      'revalidate',
+      'background',
+      'resource',
+    ],
+    requiredAnyTerms: ['cache'],
+    routeHints: [
+      { heading: 'a cache-first load pattern' },
+      { heading: 'step 2 — add the cache-first query factory' },
+      { heading: 'step 2 — define the page and cache-first resource pipeline' },
+    ],
   },
   {
     name: 'extension-plugin',
     aliases: ['does not ship', 'add a capability', 'custom capability', 'author a plugin'],
-    terms: ['plugin', 'author', 'scaffold', 'core', 'adapter', 'capability', 'package'],
+    terms: ['plugin', 'before', 'start', 'thin', 'layer', 'core', 'step', 'scaffold', 'skeleton'],
+    requiredAnyTerms: ['plugin'],
+    routeHints: [
+      { heading: 'before you start' },
+      { heading: 'a plugin is a thin layer over a core package' },
+      { heading: 'step 1 — scaffold the two-tier skeleton' },
+    ],
   },
   {
     name: 'application-database',
@@ -39,11 +92,42 @@ export const GUIDANCE_CONCEPTS: readonly GuidanceConcept[] = Object.freeze([
       'second database',
       'unsupported driver',
     ],
-    terms: ['prisma', 'database', 'unsupported', 'driver', 'libsql', 'turso', 'adapter'],
+    terms: [
+      'prisma',
+      'unsupported',
+      'libsql',
+      'turso',
+      'application',
+      'owned',
+      'responsibilities',
+      'decision',
+      'direct',
+      'reusable',
+      'databaseadapter',
+      'wrapper',
+    ],
+    requiredAnyTerms: ['prisma'],
+    routeHints: [
+      { heading: 'unsupported by netscript, supported by prisma (libsql / turso example)' },
+      { heading: '3. application-owned responsibilities' },
+      { heading: '4. decision rule: direct use vs. reusable databaseadapter wrapper' },
+    ],
   },
   {
     name: 'service-backed-ui',
-    aliases: ['service backed ui', 'real service ui', 'build a real ui', 'full stack ui'],
-    terms: ['task', 'router', 'service', 'contract', 'page', 'query', 'island', 'ui'],
+    aliases: [
+      'service backed ui',
+      'build a real service-backed ui',
+      'real service ui',
+      'build a real ui',
+      'full stack ui',
+    ],
+    terms: ['task', 'router', 'what', 'will', 'build', 'service', 'backed', 'ui', 'dashboard'],
+    requiredAnyTerms: ['dashboard'],
+    routeHints: [
+      { heading: 'task router' },
+      { heading: 'what you will build', title: 'the page builder and the query island' },
+      { heading: 'what you will build', title: 'sdk client and cache-first query' },
+    ],
   },
 ]);

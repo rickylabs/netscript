@@ -117,6 +117,9 @@ the single shared indexer used by both adapters.
 | 2026-08-09 | S2    | D12 policy        | Async/sync filesystem discovery now admits public `.md` plus only root-relative `llms.txt`, canonicalized through the same `.md`/`.txt` normalizer used by embedded inputs. Tests reject `llms-full.txt`, nested `config.txt`, nested `llms.txt`, and arbitrary text. This intentionally increases `list_docs.corpus.documentCount` by one when root `llms.txt` exists. Generator parity remains S3. |
 | 2026-08-09 | S2    | Proof             | Full MCP package: 131 passed / 0 failed; focused source/retrieval group: 29 passed / 0 failed; scoped check/lint/fmt selected 114 files with zero failures/findings. Explicit package-source quality exit 0, zero findings/allowances. Explicit doctrine exit 1 only for #1403's pre-existing A14 failure plus three existing warnings/info; a transient new 410-line warning was eliminated before commit by splitting parser/ranker/result files. |
 | 2026-08-09 | S3    | Corpus blocker    | Approved mirror builder exited 1 before producing artifacts: current `database-migration.md:46` contains a pre-existing multiline quoted Vento `desc` introduced by `2f64cc0011`, causing an unterminated string. Current main remains `3ce91f2c2`; existing briefing bundle is stale and lacks the required Prisma section. Reported rather than creating a second or falsely provenanced path. |
+| 2026-08-09 | S3    | Canonical refresh | Rebased without a merge onto `main@399f60185`. The approved builder ran from a fresh detached exact-revision checkout to a fresh output directory, exited 0, reported 170 pages / 36 deno-doc packages, and emitted provenance `399f60185`. Its second-database mirror contains the unsupported-Prisma heading plus application-owned and decision-rule child sections. No `docs/site/**` source was edited. |
+| 2026-08-09 | S3    | Budget drift      | The unchanged 13-document plan now measures 274,497 bytes because current sources beyond Prisma also grew. Preserved the 262,144 cap and all eight issue-required additions; removed only the prior generic quickstart page (no locked citation). Generated fallback is 253,511 bytes / 12 documents, +174,219 bytes and +7 net documents from the previous 79,292-byte / 5-document asset. |
+| 2026-08-09 | S3    | Evaluation        | Checked in five independent intents and 15 locked citations. Four rows assert exact ordered top three; Prisma asserts the unchanged unordered required set. Each row passes repeatably and byte-equally through generated embedded sources and a materialized filesystem corpus, including `llms#task-router`. Curated semantic heading/title routes are shared ranker policy, not adapter/query branches. |
 
 ## Gate Results
 
@@ -139,6 +142,17 @@ the single shared indexer used by both adapters.
 | S2 explicit source quality   | PASS                        | exit 0; `packages/mcp/src`, zero findings and allowances                                                 |
 | S2 explicit doctrine         | PRE-EXISTING FAIL           | exit 1; #1403 baseline only, no new finding: A14 foreign test plus 3 WARN / 1 INFO                         |
 | Aspire/container gates       | NOT_RUN                     | no token requested; no AppHost/container started                                                        |
+| S3 canonical corpus builder  | PASS                        | exit 0 from fresh output/exact detached `399f60185`; 170 pages, 36 deno-doc files; required Prisma headings present |
+| S3 focused evaluation        | PASS                        | exit 0; 11 passed, 0 failed across locked evaluation, release fallback, retrieval, and source-policy tests |
+| S3 full MCP tests            | PASS                        | exit 0; 132 passed, 0 failed                                                                             |
+| S3 scoped check              | PASS                        | exit 0; MCP 115 files + generator 2 files, zero failed batches, `--no-lock`                              |
+| S3 scoped lint / format      | PASS                        | exit 0; MCP 115 files + generator 2 files, zero findings                                                 |
+| S3 explicit source quality   | PASS                        | exit 0; `packages/mcp/src`, zero findings and allowances                                                 |
+| S3 explicit doctrine         | PRE-EXISTING FAIL           | exit 1; unchanged #1403 baseline: A14 fail, three warnings, one info                                     |
+| S3 publish-asset freshness   | PASS                        | `check:publish-assets` and staged `check:assets-barrel` exit 0; both generators reproduce their owned outputs byte-for-byte |
+| S3 MCP publish dry-run       | PASS                        | exit 0; package import boundary and published source graph accepted                                      |
+| S3 aggregate quality gate    | PASS / NON-DECISIVE         | `deno task quality:gate`, exit 0; scanner roots omit `packages/mcp`, so explicit package gates above remain decisive |
+| S3 aggregate architecture    | PASS / NON-DECISIVE         | `deno task arch:check`, exit 0; configured roots omit `packages/mcp` under #1403                         |
 
 ## Handoff Notes
 

@@ -69,17 +69,21 @@ export class GuidanceIndex {
   find(intent: string): GuidanceResult {
     const normalizedIntent = guidanceOneLine(intent).toLocaleLowerCase();
     const concepts = activatedGuidanceConcepts(normalizedIntent);
-    const queryTerms = uniqueGuidanceTokens([
-      ...tokenizeGuidance(normalizedIntent),
-      ...concepts.flatMap((concept) => concept.terms),
-    ]);
+    const queryTerms = uniqueGuidanceTokens(
+      concepts.length > 0
+        ? concepts.flatMap((concept) => concept.terms)
+        : tokenizeGuidance(normalizedIntent),
+    );
     const ranked = this.#sections.map((entry) =>
       this.#rank(entry, normalizedIntent, queryTerms, concepts)
     ).filter((entry): entry is RankedGuidanceSection => entry !== undefined);
     this.#applyLinkBoosts(ranked);
-    ranked.sort((left, right) =>
-      right.score - left.score || compareGuidanceSectionIdentity(left.entry, right.entry)
-    );
+    ranked.sort((left, right) => {
+      const leftRoute = routeIndex(left.entry, concepts);
+      const rightRoute = routeIndex(right.entry, concepts);
+      return leftRoute - rightRoute || right.score - left.score ||
+        compareGuidanceSectionIdentity(left.entry, right.entry);
+    });
 
     if (ranked.length === 0) {
       return {
@@ -116,6 +120,11 @@ export class GuidanceIndex {
     queryTerms: readonly string[],
     concepts: readonly GuidanceConcept[],
   ): RankedGuidanceSection | undefined {
+    if (concepts.length > 0 && entry.level === 1) return undefined;
+    const supportedConcepts = concepts.filter((concept) =>
+      concept.requiredAnyTerms.some((term) => entry.tokenCounts.has(normalizeGuidanceToken(term)))
+    );
+    if (concepts.length > 0 && supportedConcepts.length === 0) return undefined;
     let score = 0;
     const matchedTerms: string[] = [];
     const titleTokens = tokenizeGuidance(entry.title);
@@ -146,10 +155,11 @@ export class GuidanceIndex {
     if (intent.length >= 4 && searchable.includes(intent)) {
       score += GUIDANCE_RANKING_POLICY.exactPhraseBoost;
     }
-    for (const concept of concepts) {
-      if (concept.terms.some((term) => entry.tokenCounts.has(normalizeGuidanceToken(term)))) {
-        score += GUIDANCE_RANKING_POLICY.conceptBoost;
-      }
+    for (const concept of supportedConcepts) {
+      const matchedConceptTerms = concept.terms.filter((term) =>
+        entry.tokenCounts.has(normalizeGuidanceToken(term))
+      ).length;
+      score += matchedConceptTerms * GUIDANCE_RANKING_POLICY.conceptBoost;
     }
     return score > 0
       ? { entry, score, matchedTerms: uniqueGuidanceTokens(matchedTerms) }
@@ -169,6 +179,24 @@ export class GuidanceIndex {
       }
     }
   }
+}
+
+function routeIndex(
+  entry: IndexedGuidanceSection,
+  concepts: readonly GuidanceConcept[],
+): number {
+  const heading = tokenizeGuidance(entry.heading).join(' ');
+  const title = tokenizeGuidance(entry.title).join(' ');
+  let offset = 0;
+  for (const concept of concepts) {
+    const index = concept.routeHints.findIndex((hint) =>
+      heading === tokenizeGuidance(hint.heading).join(' ') &&
+      (!hint.title || title === tokenizeGuidance(hint.title).join(' '))
+    );
+    if (index >= 0) return offset + index;
+    offset += concept.routeHints.length;
+  }
+  return Number.MAX_SAFE_INTEGER;
 }
 
 function resolveEdge(

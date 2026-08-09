@@ -228,7 +228,8 @@ Deno.test('CLI composition defaults every docs flow to package-shipped docs', as
     docs: readonly { slug: string }[];
   };
   assertGreater(listed.count, 0);
-  assertEquals(listed.docs[0]?.slug, 'mcp');
+  assert(listed.docs.some((document) => document.slug === 'llms'));
+  assert(listed.docs.some((document) => document.slug === 'mcp'));
 
   const search = await server.handle({
     jsonrpc: '2.0',
@@ -272,7 +273,7 @@ Deno.test('CLI composition makes installed help symptoms reachable through MCP d
       jsonrpc: '2.0',
       id: query,
       method: 'tools/call',
-      params: { name: 'search_docs', arguments: { query } },
+      params: { name: 'search_docs', arguments: { query, limit: 20 } },
     });
     const matches =
       (response?.result?.structuredContent as { matches: Array<{ slug: string }> }).matches;

@@ -20,6 +20,7 @@ export interface IndexedGuidanceSection {
   readonly id: string;
   readonly slug: string;
   readonly section: string;
+  readonly level: number;
   readonly heading: string;
   readonly title: string;
   readonly content: string;
@@ -53,6 +54,7 @@ function indexSection(document: DocsDocument, section: DocsSection): IndexedGuid
     id: `${slug}#${section.slug}`,
     slug,
     section: section.slug,
+    level: section.level,
     heading: section.heading,
     title: document.title,
     content: section.content,
