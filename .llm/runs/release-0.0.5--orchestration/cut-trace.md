@@ -208,3 +208,18 @@ history at publish time; the table above is the record, not the input.
 
 **Evaluated through:** `aa8e151e65939ecd789c82e45b22b6338a8d8ce8`. Milestone 0.0.5 stands at 22 open
 issues, down from 26 at the wave's start.
+
+## C17 published and verified
+
+`0.0.5-canary.17` — publish
+[31288360277](https://github.com/rickylabs/netscript/actions/runs/31288360277) and pinned production
+E2E [31288479430](https://github.com/rickylabs/netscript/actions/runs/31288479430) both success;
+`release/canary-pair` success on `aa8e151e6`. Full receipt in `canary-17-receipt.md`.
+
+The cadence tool independently computed the payload as **7 commits, 7 PRs, 4 closed issues**, which
+matches the table frozen above before the cut. Drift gate:
+`PASS: 21 label(s) match 32 published
+version(s)`.
+
+**Evaluated through:** `aa8e151e65939ecd789c82e45b22b6338a8d8ce8`. Next boundary is C18 at the W3
+wave boundary.
