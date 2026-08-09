@@ -402,9 +402,9 @@ overhead. The accuracy gate, not this estimate, decides whether `vector8` ships.
 ### New Turso database adapter
 
 The production adapter uses only
-[`@tursodatabase/database`](https://www.npmjs.com/package/@tursodatabase/database), initially pinned
-to reviewed stable 0.7.1. It does not use `@libsql/client`, legacy libSQL, Prisma's libSQL adapter,
-or Turso Cloud. The database rewrite provides native local and in-memory operation and
+[`@tursodatabase/database`](https://docs.turso.tech/sdk/ts/reference), initially pinned to reviewed
+stable 0.7.1. It does not use `@libsql/client`, legacy libSQL, Prisma's libSQL adapter, or Turso
+Cloud. The database rewrite provides native local and in-memory operation and
 [`vector32`/`vector8` functions](https://docs.turso.tech/features/ai-and-embeddings) with cosine
 distance. The v1 adapter opens the verified local file read-only in one process and performs bounded
 linear vector search. This is appropriate for a few thousand sections and keeps the deterministic
@@ -424,8 +424,8 @@ The adapter deliberately avoids experimental features:
 | Encryption, materialized views, PostgreSQL frontend | out of scope / experimental or foundational                                 |
 
 This separation follows Turso's own
-[experimental feature guidance](https://docs.turso.tech/database/experimental-features),
-[multiprocess warning](https://docs.turso.tech/database/multiprocess), and the project's
+[experimental feature guidance](https://docs.turso.tech/sql-reference/experimental-features),
+[multiprocess warning](https://docs.turso.tech/sql-reference/multiprocess-access), and the project's
 [rewrite status report](https://turso.tech/blog/we-are-a-year-into-rewriting-sqlite). The
 [PostgreSQL-in-Rust announcement](https://turso.tech/blog/a-new-modern-version-of-postgres-in-rust)
 describes a foundation rather than a client surface needed here. New Turso remains pre-1.0, so the

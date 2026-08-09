@@ -47,8 +47,19 @@ mismatch. The liveness recovery did not create a replacement thread or writer.
 
 ## Gate results
 
-Pending final validation slice. Runtime/E2E are N/A by owner constraint and docs-only scope. The
-current-package JSR dry-run/audit is research evidence, not a future implementation verdict.
+| Gate                | Result / raw evidence                                                                                                    |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Targeted format     | PASS — `deno fmt --check` reported `Checked 7 files`                                                                     |
+| Internal docs links | PASS — `docs=102 broken-links=0 broken-anchors=0 orphans=0`                                                              |
+| Docs accuracy       | PASS — 4 saga pages, storefront boundary, spawn contract, 8 preferred paths, 18 CLI mutation families, 3 root imports    |
+| External RFC links  | PASS after correcting two moved Turso paths — every unique URL returned HTTP 200                                         |
+| Patch hygiene       | PASS — `git diff --check` exit 0                                                                                         |
+| Product/lock scope  | PASS — diff against `origin/main` contains only RFC + six run files; `deno.lock`, `packages/`, and `plugins/` diff empty |
+| Runtime/E2E         | N/A — prohibited by owner and unnecessary for docs-only RFC; PR carries both CI skip labels                              |
+
+The current-package JSR dry-run/audit in `research.md` is proposal research evidence, not a future
+implementation verdict. No raw command failure is hidden: the first external probe found two 404
+Turso paths, both were updated from the current official `llms.txt` index and re-probed.
 
 ## Handoff
 
