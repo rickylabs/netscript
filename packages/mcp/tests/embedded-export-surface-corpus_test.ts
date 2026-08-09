@@ -51,7 +51,10 @@ Deno.test('embedded export corpus rejects corrupted bytes and version drift', as
     'hash does not match',
   );
   await assertRejects(
-    () => new EmbeddedExportSurfaceCorpus({ expectedFrameworkVersion: '0.0.5' }).load(),
+    () =>
+      new EmbeddedExportSurfaceCorpus({
+        expectedFrameworkVersion: `${EXPORT_SURFACE_CORPUS_PROVENANCE.frameworkVersion}-drift`,
+      }).load(),
     Error,
     'does not match',
   );

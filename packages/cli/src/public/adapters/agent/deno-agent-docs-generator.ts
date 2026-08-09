@@ -1,5 +1,5 @@
 import { decodeBase64 } from 'jsr:@std/encoding@^1.0.10/base64';
-import { join } from '@std/path';
+import { join, resolve, toFileUrl } from '@std/path';
 import {
   EMBEDDED_AGENT_DOCS_GZIP_BASE64,
   EMBEDDED_AGENT_DOCS_PACKAGE_EXPORTS,
@@ -27,6 +27,8 @@ export interface AgentDocsCommandRunner {
 export interface InstalledNetScriptPackage {
   readonly name: string;
   readonly version: string;
+  /** Local package root when documentation must come from workspace source. */
+  readonly packageRoot?: string;
 }
 
 interface ProjectConfig {
@@ -40,32 +42,53 @@ interface LockFile {
 const EXACT_VERSION = /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/;
 const JSR_NETSCRIPT = /^jsr:(@netscript\/[a-z0-9-]+)@([^/]+)(\/.*)?$/;
 
-async function readJson<T>(path: string, required: boolean): Promise<T | undefined> {
+async function readJson<T>(
+  path: string,
+  required: boolean,
+): Promise<T | undefined> {
   try {
     return JSON.parse(await Deno.readTextFile(path)) as T;
   } catch (error) {
     if (!required && error instanceof Deno.errors.NotFound) return undefined;
-    throw new Error(`Cannot read documentation package evidence from ${path}: ${String(error)}`);
+    throw new Error(
+      `Cannot read documentation package evidence from ${path}: ${String(error)}`,
+    );
   }
 }
 
-async function findWorkspaceVersion(
+interface WorkspacePackage {
+  readonly version: string;
+  readonly packageRoot: string;
+}
+
+async function findWorkspacePackage(
   root: string,
   packageName: string,
   depth = 0,
-): Promise<string | undefined> {
+): Promise<WorkspacePackage | undefined> {
   if (depth > 4) return undefined;
   for await (const entry of Deno.readDir(root)) {
-    if (!entry.isDirectory || ['.git', '.llm', '.netscript', 'node_modules'].includes(entry.name)) {
+    if (
+      !entry.isDirectory ||
+      ['.git', '.llm', '.netscript', 'node_modules'].includes(entry.name)
+    ) {
       continue;
     }
     const directory = join(root, entry.name);
-    const manifest = await readJson<{ readonly name?: string; readonly version?: string }>(
+    const manifest = await readJson<
+      { readonly name?: string; readonly version?: string }
+    >(
       join(directory, 'deno.json'),
       false,
     );
-    if (manifest?.name === packageName && manifest.version) return manifest.version;
-    const nested = await findWorkspaceVersion(directory, packageName, depth + 1);
+    if (manifest?.name === packageName && manifest.version) {
+      return { version: manifest.version, packageRoot: directory };
+    }
+    const nested = await findWorkspacePackage(
+      directory,
+      packageName,
+      depth + 1,
+    );
     if (nested) return nested;
   }
   return undefined;
@@ -86,37 +109,54 @@ function lockedVersion(
 export async function resolveInstalledNetScriptPackages(
   projectRoot: string,
 ): Promise<readonly InstalledNetScriptPackage[]> {
-  const config = await readJson<ProjectConfig>(join(projectRoot, 'deno.json'), true);
+  const config = await readJson<ProjectConfig>(
+    join(projectRoot, 'deno.json'),
+    true,
+  );
   const lock = await readJson<LockFile>(join(projectRoot, 'deno.lock'), false);
-  const versions = new Map<string, string>();
+  const installed = new Map<string, InstalledNetScriptPackage>();
   for (const [alias, value] of Object.entries(config?.imports ?? {})) {
     const match = value.match(JSR_NETSCRIPT);
     let name: string | undefined;
     let version: string | undefined;
+    let packageRoot: string | undefined;
     if (match) {
       name = match[1];
       version = lockedVersion(lock, name, match[2], value);
-    } else if (alias.startsWith('@netscript/') && /^(workspace:|file:|\.?\.?\/)/.test(value)) {
+    } else if (
+      alias.startsWith('@netscript/') &&
+      /^(workspace:|file:|\.?\.?\/)/.test(value)
+    ) {
       name = alias;
-      version = await findWorkspaceVersion(projectRoot, alias);
+      const workspacePackage = await findWorkspacePackage(projectRoot, alias);
+      version = workspacePackage?.version;
+      packageRoot = workspacePackage?.packageRoot;
     } else {
       continue;
     }
     if (!name || !version || !EXACT_VERSION.test(version)) {
-      throw new Error(`Cannot prove an exact installed version for ${name ?? alias} (${value})`);
+      throw new Error(
+        `Cannot prove an exact installed version for ${name ?? alias} (${value})`,
+      );
     }
-    const prior = versions.get(name);
-    if (prior && prior !== version) {
-      throw new Error(`Installed ${name} versions disagree: ${prior} and ${version}`);
+    const prior = installed.get(name);
+    if (prior && prior.version !== version) {
+      throw new Error(
+        `Installed ${name} versions disagree: ${prior.version} and ${version}`,
+      );
     }
-    versions.set(name, version);
+    installed.set(name, {
+      name,
+      version,
+      ...(packageRoot ? { packageRoot } : {}),
+    });
   }
-  if (versions.size === 0) {
-    throw new Error('No installed @netscript/* package evidence was found in deno.json');
+  if (installed.size === 0) {
+    throw new Error(
+      'No installed @netscript/* package evidence was found in deno.json',
+    );
   }
-  return [...versions].sort(([left], [right]) => left.localeCompare(right)).map(
-    ([name, version]) => ({ name, version }),
-  );
+  return [...installed.values()].sort((left, right) => left.name.localeCompare(right.name));
 }
 
 async function sha256(bytes: Uint8Array): Promise<string> {
@@ -129,23 +169,52 @@ async function sha256(bytes: Uint8Array): Promise<string> {
 async function inflateProse(): Promise<Readonly<Record<string, string>>> {
   const compressed = decodeBase64(EMBEDDED_AGENT_DOCS_GZIP_BASE64);
   if (await sha256(compressed) !== EMBEDDED_AGENT_DOCS_PROVENANCE.sha256) {
-    throw new Error('Embedded offline documentation prose failed its SHA-256 check');
+    throw new Error(
+      'Embedded offline documentation prose failed its SHA-256 check',
+    );
   }
-  const stream = new Blob([new Uint8Array(compressed).buffer]).stream().pipeThrough(
-    new DecompressionStream('gzip'),
-  );
+  const stream = new Blob([new Uint8Array(compressed).buffer]).stream()
+    .pipeThrough(
+      new DecompressionStream('gzip'),
+    );
   const decoded = JSON.parse(await new Response(stream).text()) as {
     readonly schemaVersion: number;
     readonly files: Readonly<Record<string, string>>;
   };
-  if (decoded.schemaVersion !== 1 || !/^## Task router$/m.test(decoded.files['llms.txt'] ?? '')) {
-    throw new Error('Embedded offline documentation prose is missing the #1068 task router');
+  if (
+    decoded.schemaVersion !== 1 ||
+    !/^## Task router$/m.test(decoded.files['llms.txt'] ?? '')
+  ) {
+    throw new Error(
+      'Embedded offline documentation prose is missing the #1068 task router',
+    );
   }
   return decoded.files;
 }
 
-function apiSpecifier(name: string, version: string, subpath: string): string {
-  return `jsr:${name}@${version}${subpath === '.' ? '' : subpath.slice(1)}`;
+async function apiSpecifier(
+  pkg: InstalledNetScriptPackage,
+  subpath: string,
+): Promise<string> {
+  if (!pkg.packageRoot) {
+    return `jsr:${pkg.name}@${pkg.version}${subpath === '.' ? '' : subpath.slice(1)}`;
+  }
+  const manifestPath = join(pkg.packageRoot, 'deno.json');
+  const manifest = await readJson<
+    { readonly exports?: string | Readonly<Record<string, string>> }
+  >(
+    manifestPath,
+    true,
+  );
+  const target = typeof manifest?.exports === 'string'
+    ? subpath === '.' ? manifest.exports : undefined
+    : manifest?.exports?.[subpath];
+  if (!target) {
+    throw new Error(
+      `No local export ${subpath} exists for ${pkg.name} in ${manifestPath}`,
+    );
+  }
+  return toFileUrl(resolve(pkg.packageRoot, target)).href;
 }
 
 /** Real `deno doc` process adapter. */
@@ -193,15 +262,19 @@ export class DenoAgentDocsGenerator implements AgentDocsGenerator {
     let apiExportCount = 0;
     for (const pkg of installed) {
       const subpaths = EMBEDDED_AGENT_DOCS_PACKAGE_EXPORTS[pkg.name];
-      if (!subpaths?.length) throw new Error(`No release export map exists for ${pkg.name}`);
+      if (!subpaths?.length) {
+        throw new Error(`No release export map exists for ${pkg.name}`);
+      }
       const sections: string[] = [];
       for (const subpath of subpaths) {
-        const specifier = apiSpecifier(pkg.name, pkg.version, subpath);
+        const specifier = await apiSpecifier(pkg, subpath);
         let result: AgentDocsCommandResult;
         try {
           result = await this.runner.run(specifier, projectRoot);
         } catch (error) {
-          throw new Error(`Failed to launch deno doc for ${specifier}: ${String(error)}`);
+          throw new Error(
+            `Failed to launch deno doc for ${specifier}: ${String(error)}`,
+          );
         }
         if (result.code !== 0 || result.stdout.trim().length === 0) {
           throw new Error(
@@ -209,14 +282,20 @@ export class DenoAgentDocsGenerator implements AgentDocsGenerator {
           );
         }
         sections.push(
-          `${'='.repeat(72)}\nimport ... from "${specifier}"\n${'='.repeat(72)}\n\n${result.stdout.trim()}\n`,
+          `${'='.repeat(72)}\nimport ... from "${specifier}"\n${
+            '='.repeat(72)
+          }\n\n${result.stdout.trim()}\n`,
         );
         apiExportCount += 1;
       }
       files[`deno-doc/${pkg.name.slice('@netscript/'.length)}.txt`] = `${sections.join('\n')}\n`;
     }
 
-    files['MANIFEST.md'] = this.renderManifest(installed, Object.keys(files).length, apiExportCount);
+    files['MANIFEST.md'] = this.renderManifest(
+      installed,
+      Object.keys(files).length,
+      apiExportCount,
+    );
     return {
       files,
       frameworkVersion: NETSCRIPT_RELEASE_VERSION,
