@@ -122,6 +122,9 @@ the single shared indexer used by both adapters.
 | 2026-08-09 | S3    | Evaluation        | Checked in five independent intents and 15 locked citations. Four rows assert exact ordered top three; Prisma asserts the unchanged unordered required set. Each row passes repeatably and byte-equally through generated embedded sources and a materialized filesystem corpus, including `llms#task-router`. Curated semantic heading/title routes are shared ranker policy, not adapter/query branches. |
 | 2026-08-09 | Eval  | IMPL-EVAL cycle 1 | `FAIL_FIX` at `fd9267906`: the intended D12 installed-corpus count changed from 2 to 3, but the exact CLI consumer assertion remained stale because S2/S3 did not rerun the CLI pair. The evaluator also required the deepened A8 file-size debt and retrieval-evidence limitations to be recorded. |
 | 2026-08-09 | Eval  | Repair            | Kept production behavior unchanged and corrected the exact installed registry assertion to three ordered rows (`llms`, `MANIFEST`, `pages/services-sdk/services`). The focused pre-fix test exited 1; the mandated two-file CLI run then exited 0 with 20 passed / 0 failed. Recorded the 301 → 367 line A8 debt and explicitly narrowed S3 evidence to curated routing/corpus/parity rather than BM25 scoring. |
+| 2026-08-09 | S3    | Rebase refresh     | Verified remote head `f47d22329`, rebased without a merge onto `main@4f96aec40`, and used Deno 2.9.5. A fresh detached checkout at rebased head `eda49bb2e` plus a fresh output directory ran the repaired canonical builder with no bypass: exit 0; source-format OK, 617 generated files, rendered-output OK (220 HTML / 4 allowances), bundle OK (170 pages / 36 deno-doc / 9.1M). |
+| 2026-08-09 | S3    | Regeneration       | Regenerated the canonical compressed prose/provenance and both CLI/MCP generated assets. Provenance is `eda49bb2e`; full corpus is 4,685,958 uncompressed / 1,332,143 compressed bytes. The unchanged 12-document selection is 253,535 bytes against 262,144 (+24 from the prior repaired build, 8,609 headroom), so no document was dropped. The chat prose descriptor `client stack — jsr:@netscript/ai` is outside the plaintext selection. |
+| 2026-08-09 | S3    | Rebase proof        | Root JSR guard exit 0 (`scanned=2326 allowances=1 ranges=0 failures=0`); version-drift 2/2; locked focused group 11/11; full MCP 132/132; CLI pair 20/20; generator tests 2/2. Scoped MCP check/lint/fmt, explicit package quality, publish-assets freshness, staged assets-barrel freshness, and MCP publish dry-run all exited 0. The first assets-barrel invocation exited 1 only because its git-diff freshness check observed the expected unstaged regenerated asset; after staging the exact four generator outputs, the decisive invocation exited 0. |
 
 ## Gate Results
 
@@ -144,7 +147,7 @@ the single shared indexer used by both adapters.
 | S2 explicit source quality   | PASS                        | exit 0; `packages/mcp/src`, zero findings and allowances                                                 |
 | S2 explicit doctrine         | PRE-EXISTING FAIL           | exit 1; #1403 baseline only, no new finding: A14 foreign test plus 3 WARN / 1 INFO                         |
 | Aspire/container gates       | NOT_RUN                     | no token requested; no AppHost/container started                                                        |
-| S3 canonical corpus builder  | PASS                        | exit 0 from fresh output/exact detached `399f60185`; 170 pages, 36 deno-doc files; required Prisma headings present |
+| S3 canonical corpus builder  | PASS                        | latest exit 0 from fresh output/exact detached `eda49bb2e` rebased on `main@4f96aec40`; 170 pages, 36 deno-doc files; source/render guards green |
 | S3 focused evaluation        | PASS                        | exit 0; 11 passed, 0 failed across locked evaluation, release fallback, retrieval, and source-policy tests |
 | S3 full MCP tests            | PASS                        | exit 0; 132 passed, 0 failed                                                                             |
 | S3 scoped check              | PASS                        | exit 0; MCP 115 files + generator 2 files, zero failed batches, `--no-lock`                              |
@@ -160,6 +163,16 @@ the single shared indexer used by both adapters.
 | Evaluator-fix CLI pair       | PASS                        | exact requested command exit 0; 20 passed / 0 failed (19 init + 1 real CLI stdio)                       |
 | Evaluator-fix scoped check   | PASS                        | exit 0; one selected file, zero failed batches, `--no-lock`; wrapper supplies `--unstable-kv`           |
 | Evaluator-fix lint / format  | PASS                        | exit 0 each; one selected file, zero findings                                                           |
+| Rebased JSR specifier guard  | PASS                        | exit 0; `scanned=2326 allowances=1 ranges=0 failures=0` against regenerated repaired-source corpus      |
+| Rebased version drift        | PASS                        | exit 0; 2 passed / 0 failed                                                                               |
+| Rebased focused evaluation   | PASS                        | exit 0; 11 passed / 0 failed; unchanged five rows / 15 citations byte-equal across both adapters         |
+| Rebased full MCP tests       | PASS                        | exit 0; 132 passed / 0 failed                                                                              |
+| Rebased CLI pair             | PASS                        | exit 0; 20 passed / 0 failed                                                                               |
+| Rebased generator tests      | PASS                        | exit 0; 2 passed / 0 failed                                                                                |
+| Rebased scoped static gates  | PASS                        | check/lint/fmt exit 0; MCP 115 files plus exact CLI asset file, zero failures/findings                    |
+| Rebased package quality      | PASS                        | exit 0; explicit `packages/mcp/src`, zero findings/allowances                                             |
+| Rebased asset freshness      | PASS                        | `check:publish-assets` exit 0; initial unstaged assets-barrel exit 1, decisive staged rerun exit 0        |
+| Rebased MCP publish dry-run  | PASS                        | exit 0; publish simulation completed                                                                       |
 
 ## Handoff Notes
 

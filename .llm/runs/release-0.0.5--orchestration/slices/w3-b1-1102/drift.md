@@ -123,3 +123,26 @@ Drift is append-only.
   planned docs-site changes from S1. Future comments must scope the no-docs-site statement to S3,
   not the whole PR.
 - **Action:** record only; do not tune scoring or edit docs in this evaluator-fix slice.
+
+## 2026-08-09 — Repaired-source corpus regeneration after #1412/#1414
+
+- **What:** rebasing onto `main@4f96aec40` moved the source commits but did not regenerate the
+  checked-in corpus, whose provenance and plaintext package assets still reflected `399f60185`.
+- **Expected:** run the single canonical builder from a fresh detached checkout of the rebased head
+  and regenerate all four owned artifacts from its fresh output, without a bypass or hand edit.
+- **Actual:** the repaired canonical builder exited 0 at `eda49bb2e` and the regenerated full corpus
+  records 4,685,958 uncompressed / 1,332,143 compressed bytes. The unchanged MCP selection is
+  253,535 bytes / 12 documents, 8,609 bytes below the 262,144 cap and 24 bytes larger than the prior
+  repaired-source selection. No additional document was dropped.
+- **JSR close gate:** the regenerated plaintext package corpus makes
+  `deno task check:netscript-jsr-specifiers` exit 0 with
+  `scanned=2326 allowances=1 ranges=0 failures=0`; the version-drift tests pass 2/2. This is the
+  regeneration evidence required to close #1411. The version-less chat descriptor
+  `client stack — jsr:@netscript/ai` is not in either plaintext embed because that tutorial is not
+  one of the selected 12 documents.
+- **Evaluation:** the unchanged five-row / 15-citation fixture still passes 11/11 and byte-equally
+  across embedded and materialized-filesystem adapters, including `llms#task-router` at rank 1 on
+  both. This does not broaden the evidence beyond curated routing/corpus/parity.
+- **Freshness gate note:** the first `check:assets-barrel` invocation exited 1 because its final
+  git-diff assertion correctly observed the newly regenerated but unstaged CLI asset. After staging
+  exactly the four generator-owned artifacts, the decisive rerun exited 0.

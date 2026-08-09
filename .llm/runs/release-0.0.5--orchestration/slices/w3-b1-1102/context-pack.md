@@ -61,13 +61,16 @@ the deepened A8 debt, and narrows the evaluation claim to what the fixtures actu
 
 ## In Progress
 
-- S1, S2, and S3 are committed/pushed/commented. The IMPL-EVAL cycle-1 repair is complete; the
-  branch awaits orchestrator-owned re-evaluation and CI after its evidence comment.
+- S1–S3 have been rebased onto `main@4f96aec40`. The canonical corpus was rebuilt from a fresh
+  exact-revision checkout at `eda49bb2e`, all four generated artifacts were refreshed, and the
+  requested local gates are green. The refresh record is being committed/pushed/commented for the
+  orchestrator-owned re-evaluation and CI.
 
 ## Next Steps
 
-1. Orchestrator reruns the mandatory separate-session IMPL-EVAL and owns CI/merge disposition.
-2. Do not start an Aspire/runtime suite
+1. Commit and guarded-force-push the rebased regeneration evidence, then update PR #1404.
+2. Orchestrator reruns the mandatory separate-session IMPL-EVAL and owns CI/merge disposition.
+3. Do not start an Aspire/runtime suite
    without a durable token grant.
 
 ## Key Decisions
@@ -91,12 +94,16 @@ S3 adds the checked-in evaluation, refreshed canonical prose/provenance, 12-docu
 fallback, and its generated MCP/CLI assets. Eight issue-required pages are added; the generic
 quickstart fallback page is removed to keep current repaired sources below the immutable 256 KiB
 cap without changing any locked citation.
+The latest repaired-source regeneration records `eda49bb2e`, 4,685,958 uncompressed /
+1,332,143 compressed bytes for the full corpus, and 253,535 bytes / 12 documents for the plaintext
+MCP fallback. The selection is unchanged and the chat tutorial's version-less descriptor is not in
+the plaintext embed.
 
 ## Gates
 
 | Gate family | Current status             | Evidence                                                        |
 | ----------- | -------------------------- | --------------------------------------------------------------- |
-| Static      | PASS through S3 + fix      | 132 MCP tests; evaluator-fix CLI pair 20/20; scoped gates green   |
+| Static      | PASS through rebased S3    | 132 MCP tests; CLI pair 20/20; JSR failures=0; scoped gates green |
 | Fitness     | Known pre-existing failure | doctrine exit 1 only for #1403 baseline; no new warning remains  |
 | Runtime     | NOT_RUN                    | no AppHost/container started; serialized token not granted       |
 | Consumer    | PASS for D12 paths         | embedded, materialized filesystem, and installed-corpus stdio    |
@@ -128,3 +135,4 @@ cap without changing any locked citation.
 - `26176a608` — S2 shared intent ranker, citations/link routing, and D12 filesystem policy.
 - `5e3b58b67` — record the canonical-corpus source blocker without a workaround.
 - `fd9267906` — S3 canonical corpus refresh, bounded embedded selection, and locked dual-adapter evaluation.
+- Rebased regeneration commit — pending; canonical source `eda49bb2e`, JSR close gate green.

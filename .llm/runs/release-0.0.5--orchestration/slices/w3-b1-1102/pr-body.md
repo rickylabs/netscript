@@ -1,14 +1,15 @@
 ## Summary
 
-Implements #1102's public MCP feature: an offline, bounded `find_guidance` workflow that ranks real
-documentation sections by task intent, returns cited code and prerequisite/next routing, and is
-activated before unfamiliar NetScript implementation work. Separate-session PLAN-EVAL cycle 2
-passed; S1 establishes the public contract and enumerable bounded flow shell.
+Implements the S1–S3 foundation of #1102's public MCP feature: an offline, bounded
+`find_guidance` workflow that ranks real documentation sections by task intent and returns cited
+code plus prerequisite/next routing. Separate-session PLAN-EVAL cycle 2 passed. Activation before
+unfamiliar implementation work remains deferred S4 scope.
 
 ## Scope
 
 - Archetype / area: A6 CLI/tooling · `packages/mcp` · CLI agent guidance · docs
-- Closes #1102
+- Refs #1102
+- Closes #1411
 - Adoption measurement remains exclusively in #1090; deterministic top-k evaluation is retrieval
   evidence, not observed agent usage.
 
@@ -57,6 +58,26 @@ passed; S1 establishes the public contract and enumerable bounded flow shell.
   CLI MCP stdio smoke. The assertion remains exact at three documents in registry order.
 - IMPL-EVAL repair scoped check, lint, and format — exit 0 each; one selected CLI test file, zero
   failed batches/findings, with `--no-lock` on the decisive check.
+- Rebased corpus refresh — canonical builder exit 0 from a fresh detached exact-revision checkout
+  at `eda49bb2e` (rebased on `main@4f96aec40`) into a fresh output directory: source-format OK,
+  617 generated site files, rendered-output OK (220 HTML / 4 documented allowances), and bundle
+  OK (170 pages / 36 deno-doc files / 9.1M).
+- Refreshed provenance — source commit `eda49bb2e`; full corpus 4,685,958 uncompressed bytes /
+  1,332,143 compressed bytes. The selected MCP fallback is 253,535 bytes / 12 documents against
+  the 262,144-byte cap (8,609 bytes headroom; no selection change).
+- Rebased locked evaluation/retrieval/source-policy group — exit 0; 11 passed / 0 failed with the
+  unchanged five-row / 15-citation fixture, byte-equal embedded/materialized-filesystem results,
+  and `llms#task-router` rank 1 on both. Full MCP tests exit 0; 132 passed / 0 failed. These remain
+  curated-routing/corpus/parity evidence, not BM25-scoring evidence.
+- Rebased CLI pair — exit 0; 20 passed / 0 failed. Version-drift tests exit 0; 2 passed / 0 failed.
+- `deno task check:netscript-jsr-specifiers` — exit 0;
+  `scanned=2326 allowances=1 ranges=0 failures=0`, against regenerated repaired-source content.
+- Rebased scoped MCP check/lint/fmt — exit 0 each; 115 selected files and zero failures/findings.
+  Explicit `scan-code-quality --root packages/mcp/src` exit 0 with zero findings/allowances.
+  `check:publish-assets`, staged `check:assets-barrel`, and MCP `publish:dry-run` each exit 0.
+- The version-less prose descriptor `client stack — jsr:@netscript/ai` is not in either plaintext
+  package embed: its chat tutorial is outside the 12-document selection. No docs prose or generated
+  asset was hand-edited.
 
 ## Harness
 
@@ -90,21 +111,39 @@ passed; S1 establishes the public contract and enumerable bounded flow shell.
 - Scope wording: S3 changed no `docs/site/**` source. The full branch does contain the two planned S1
   docs-site changes; it does not claim otherwise.
 
-## Definition of Done
+## S1–S3 Definition of Done
 
-- [ ] `find_guidance` returns bounded ordered section guidance with cited code, stages, confidence,
+- [x] `find_guidance` returns bounded ordered section guidance with cited code, stages, confidence,
       related links, and honest fallback.
-- [ ] The checked-in real release-corpus evaluation passes both adapters: four deterministic exact
+- [x] The checked-in real release-corpus evaluation passes both adapters: four deterministic exact
       top-3 rows plus Prisma's unordered required top-three set.
-- [ ] Internal links affect prerequisite/next routing; filesystem and embedded adapters are equal on
-      identical release sources.
-- [ ] The existing generated embedded fallback contains the required destinations within 262,144
+- [x] Internal links affect prerequisite/next routing; filesystem and embedded adapters are equal on
+      identical release sources, including root `llms.txt`.
+- [x] The generated embedded fallback contains the required S1–S3 destinations within 262,144
       bytes and passes provenance/freshness checks.
-- [ ] MCP initialize instructions, generated `AGENTS.md`, consumer skills, and real `agent mcp`
-      stdio activate/use the workflow before unfamiliar implementation.
-- [ ] Package-scoped tests/check/lint/fmt/quality/doctrine, JSR audit, full-export doc-lint, publish
-      dry-runs, docs gates, review-thread gate, and granted serialized smoke are green with raw
-      exits.
-- [ ] Separate-session Claude · Fable 5 PLAN-EVAL and IMPL-EVAL pass; Tier-A slice review is
-      recorded.
-- [x] This PR makes no #1090 adoption claim and leaves that controlled experiment untouched.
+- [x] Repaired docs sources regenerate into a plaintext package corpus with
+      `check:netscript-jsr-specifiers` reporting `failures=0`, closing #1411.
+- [x] This foundation PR makes no #1090 adoption claim and leaves that controlled experiment
+      untouched.
+
+## Remaining #1102 scope
+
+- S4 must activate the workflow in MCP initialize instructions, generated `AGENTS.md`, consumer
+  skills, and the real `agent mcp` stdio path before unfamiliar implementation work.
+- Acceptance row 3 remains partial for `avoid hitting my service every render`; the locked
+  evaluation must not be loosened or retuned without recorded drift and evaluator approval.
+- S5 owns remaining full validation and the serialized runtime handoff. This PR does not claim
+  #1102 completion or adoption.
+
+```acceptance-evidence
+issue: 1411
+entries:
+  - box-index: 1
+    evidence: "Main commit 4f96aec40 pins all four docs sites through releaseSpecifier or an exact release; the canonical fresh build at rebased head eda49bb2e passed both source-format and rendered-output guards."
+  - box-index: 2
+    evidence: "After regenerating the plaintext MCP corpus from repaired sources, deno task check:netscript-jsr-specifiers exited 0 with scanned=2326 allowances=1 ranges=0 failures=0."
+  - box-index: 3
+    evidence: "deno test --no-lock --allow-all packages/cli/src/kernel/constants/version-drift_test.ts exited 0 with 2 passed and 0 failed against the regenerated corpus."
+  - box-index: 4
+    evidence: "The repo-root emitted-specifier sweep scanned 2326 candidates and recorded failures=0; the only allowance is the existing exact import-map alias mapping in scaffold-packages.ts."
+```
