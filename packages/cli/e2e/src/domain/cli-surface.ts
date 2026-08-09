@@ -142,6 +142,7 @@ export const GATE = {
   BEHAVIOR_AUTH_LIVE: 'behavior.auth-live',
   BEHAVIOR_AUTH_READY: 'behavior.auth-ready',
   BEHAVIOR_AUTH_SESSION: 'behavior.auth-session',
+  BEHAVIOR_STREAMS_PRODUCER_RECONNECT: 'behavior.streams.producer-reconnect',
   BEHAVIOR_AI_CHAT_ROUTE: 'behavior.ai-chat-route',
   BEHAVIOR_PLUGINS_HEALTH: 'behavior.plugins-health',
   DEPLOY_DENO_DEPLOY_PLAN: 'deploy.deno-deploy.plan',

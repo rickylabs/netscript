@@ -25,6 +25,10 @@ export type StreamAttributesMap = Readonly<{
   STREAM_PATH: 'netscript.stream.path';
   COLLECTION: 'netscript.stream.collection';
   PRODUCER_ID: 'netscript.stream.producer.id';
+  PRODUCER_STATE: 'netscript.stream.producer.state';
+  PRODUCER_REASON: 'netscript.stream.producer.reason';
+  PRODUCER_ATTEMPT: 'netscript.stream.producer.attempt';
+  PRODUCER_PHASE: 'netscript.stream.producer.phase';
   OUTCOME: 'netscript.outcome';
 }>;
 
@@ -41,8 +45,29 @@ export const StreamAttributes: StreamAttributesMap = {
   STREAM_PATH: 'netscript.stream.path',
   COLLECTION: 'netscript.stream.collection',
   PRODUCER_ID: 'netscript.stream.producer.id',
+  PRODUCER_STATE: 'netscript.stream.producer.state',
+  PRODUCER_REASON: 'netscript.stream.producer.reason',
+  PRODUCER_ATTEMPT: 'netscript.stream.producer.attempt',
+  PRODUCER_PHASE: 'netscript.stream.producer.phase',
   OUTCOME: 'netscript.outcome',
 };
+
+/** Metric names emitted by reconnecting stream producers. */
+export const StreamProducerMetricNames = {
+  BUFFERED_EVENTS: 'netscript.stream.producer.buffered.events',
+  BUFFERED_BYTES: 'netscript.stream.producer.buffered.bytes',
+  WRITES_DELIVERED: 'netscript.stream.producer.writes.delivered',
+  WRITES_REJECTED: 'netscript.stream.producer.writes.rejected',
+  WRITES_DROPPED: 'netscript.stream.producer.writes.dropped',
+  RETRIES: 'netscript.stream.producer.retries',
+  RECOVERIES: 'netscript.stream.producer.recoveries',
+  DELIVERY_UNKNOWN: 'netscript.stream.producer.delivery_unknown',
+  STATE_TRANSITIONS: 'netscript.stream.producer.state.transitions',
+} as const;
+
+/** Metric name emitted by reconnecting stream producers. */
+export type StreamProducerMetricName =
+  (typeof StreamProducerMetricNames)[keyof typeof StreamProducerMetricNames];
 
 /** Span name emitted by stream instrumentation. */
 export type StreamsSpanName = (typeof StreamSpanNames)[keyof typeof StreamSpanNames];

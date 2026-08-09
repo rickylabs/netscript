@@ -708,19 +708,19 @@ finding into a debt entry.
 
 ## packages/plugin-streams-core — AP-13 console.warn runtime reporting
 
-- **Reason:** `DurableStreamProducer` currently uses `console.warn` for connection, pending-event,
-  serialization, and primary-key visibility in published runtime code. The warnings are
-  intentionally retained for alpha operator visibility; replacing them correctly requires a
-  structured telemetry or logger dependency that is outside Wave 4a's package-quality scope.
+- **Reason:** `DurableStreamProducer` previously used `console.warn` for connection, pending-event,
+  serialization, and primary-key visibility in published runtime code. The warning debt was
+  accepted for alpha operator visibility until structured producer telemetry was available.
 - **Owner:** `@netscript/plugin-streams-core` maintainers.
-- **Target:** Telemetry-integration wave before beta runtime stabilization.
+- **Target:** Completed by the #1326 reconnect supervisor telemetry integration.
 - **Linked plan:** `.llm/tmp/run/feat-package-quality-wave4-runtimes--4a-streams-watchers/plan.md`
   (D6, slice 4).
 - **Created:** 2026-06-08
-- **Status:** open, DEBT_ACCEPTED.
-- **Gate:** F-14, AP-13; close when `DurableStreamProducer` emits through a structured reporter and
-  `console.warn` is absent from
-  `packages/plugin-streams-core/src/application/create-durable-stream.ts`.
+- **Status:** closed 2026-08-09 by #1402; no broader AP-13 waiver or closure is implied.
+- **Gate:** F-14, AP-13. `DurableStreamProducer` now emits receipt outcomes, retry/recovery/state
+  metrics, and one publish span across reconnect. Manual F-14 evidence finds no executable
+  `console.*` below `packages/plugin-streams-core/src`; the sole match is a documentation example in
+  `src/diagnostics/inspect-stream-topic.ts`.
 
 ## plugins/streams — durable topic publish/subscribe transport deferred (`streams-manifest-helpers-unsupported`)
 

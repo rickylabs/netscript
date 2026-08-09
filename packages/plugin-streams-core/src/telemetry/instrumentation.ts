@@ -7,6 +7,12 @@ import {
   type StreamsTelemetryAttributes,
 } from './attributes.ts';
 import { CORE_PACKAGE_VERSION } from '../package-metadata.generated.ts';
+import type {
+  StreamProducerStateSnapshotV1,
+  StreamWriteOutcomeV1,
+  StreamWriteRejectionReasonV1,
+} from '../domain/producer-contract-v1.ts';
+import { StreamProducerMetrics, type StreamsMeterPort } from './producer-metrics.ts';
 
 /** Message consumed by stream subscribe instrumentation. */
 export type StreamFanInMessage = Readonly<{
@@ -70,6 +76,11 @@ export interface StreamsSpanPort {
   spanContext(): StreamsSpanContext;
   /** Set one telemetry attribute. */
   setAttribute(key: string, value: StreamsSpanAttributeValue): this;
+  /** Record a named lifecycle event with low-cardinality attributes. */
+  addEvent(
+    name: string,
+    attributes?: Readonly<Record<string, StreamsSpanAttributeValue | undefined>>,
+  ): this;
   /** Set the OpenTelemetry status code and optional message. */
   setStatus(status: Readonly<{ code: 0 | 1 | 2; message?: string }>): this;
   /** Record an exception on the span. */
@@ -106,21 +117,37 @@ export interface StreamsSpanLinkPort {
 export type StreamsInstrumentationOptions = Readonly<{
   tracer?: StreamsTracerPort;
   spanLinks?: StreamsSpanLinkPort;
+  meter?: StreamsMeterPort;
 }>;
+
+/** One publish span retained by the producer until its receipt settles. */
+export interface StreamsPublishOperation {
+  /** W3C headers captured once and serialized into the durable event. */
+  readonly headers: Readonly<Record<string, string>>;
+  /** Record one bounded producer lifecycle event. */
+  event(
+    name: string,
+    attributes?: Readonly<Record<string, StreamsSpanAttributeValue | undefined>>,
+  ): void;
+  /** End the span and emit terminal outcome metrics exactly once. */
+  finish(outcome: StreamWriteOutcomeV1): void;
+}
 
 /** Real stream telemetry facade backed by `@netscript/telemetry`. */
 export class StreamsInstrumentation {
   readonly #tracer: StreamsTracerPort;
   readonly #spanLinks: StreamsSpanLinkPort;
+  readonly #metrics: StreamProducerMetrics;
 
   /** Create stream instrumentation with optional tracer/link adapter overrides. */
   constructor(options: StreamsInstrumentationOptions = {}) {
     this.#tracer = options.tracer ?? getTracer('netscript.streams', CORE_PACKAGE_VERSION);
     this.#spanLinks = options.spanLinks ?? createOtelSdkSpanLink();
+    this.#metrics = new StreamProducerMetrics(options.meter);
   }
 
-  /** Publish one stream event inside a PRODUCER span and return injected headers. */
-  publish(
+  /** Start a publish span whose context and lifetime survive reconnect. */
+  startPublish(
     input: Readonly<{
       streamPath: string;
       collection: string;
@@ -128,9 +155,8 @@ export class StreamsInstrumentation {
       producerId: string;
       messageId: string;
       correlationId?: string;
-      emit: (headers: Record<string, string>) => void;
     }>,
-  ): void {
+  ): StreamsPublishOperation {
     const span = this.#tracer.startSpan(StreamSpanNames.PUBLISH, {
       kind: SpanKind.PRODUCER,
       attributes: streamAttributes({
@@ -142,30 +168,113 @@ export class StreamsInstrumentation {
         correlationId: input.correlationId,
       }),
     });
-    try {
-      const headers: Record<string, string> = {
-        traceparent: formatTraceparent(span.spanContext()),
-      };
-      const tracestate = span.spanContext().traceState?.serialize();
-      if (tracestate) {
-        headers.tracestate = tracestate;
-      }
-      input.emit(headers);
-      span.setAttribute(StreamAttributes.OUTCOME, 'success');
-      span.setStatus({ code: SpanStatusCode.OK });
-    } catch (error) {
-      span.setAttribute(StreamAttributes.OUTCOME, 'error');
-      span.setStatus({
-        code: SpanStatusCode.ERROR,
-        message: error instanceof Error ? error.message : String(error),
-      });
-      if (error instanceof Error) {
-        span.recordException(error);
-      }
-      throw error;
-    } finally {
-      span.end();
+    const headers: Record<string, string> = {
+      traceparent: formatTraceparent(span.spanContext()),
+    };
+    const tracestate = span.spanContext().traceState?.serialize();
+    if (tracestate) {
+      headers.tracestate = tracestate;
     }
+    let ended = false;
+    return {
+      headers,
+      event: (name, attributes) => {
+        if (!ended) {
+          span.addEvent(name, attributes);
+        }
+      },
+      finish: (outcome) => {
+        if (ended) {
+          return;
+        }
+        ended = true;
+        const reason = 'reason' in outcome ? outcome.reason : undefined;
+        span.setAttribute(StreamAttributes.OUTCOME, outcome.status);
+        if ('attempts' in outcome) {
+          span.setAttribute(StreamAttributes.PRODUCER_ATTEMPT, outcome.attempts);
+        }
+        if (reason) {
+          span.setAttribute(StreamAttributes.PRODUCER_REASON, reason);
+        }
+        span.addEvent('stream.producer.settled', {
+          [StreamAttributes.OUTCOME]: outcome.status,
+          ...(reason ? { [StreamAttributes.PRODUCER_REASON]: reason } : {}),
+        });
+        this.#metrics.recordOutcome(input.streamPath, input.producerId, outcome);
+        if (outcome.status === 'delivered') {
+          span.setStatus({ code: SpanStatusCode.OK });
+        } else {
+          span.setStatus({ code: SpanStatusCode.ERROR, message: reason ?? outcome.status });
+        }
+        span.end();
+      },
+    };
+  }
+
+  /** Publish one stream event and finish its span immediately after emission. */
+  publish(
+    input: Readonly<{
+      streamPath: string;
+      collection: string;
+      operation: string;
+      producerId: string;
+      messageId: string;
+      correlationId?: string;
+      emit: (headers: Record<string, string>) => void;
+    }>,
+  ): void {
+    const operation = this.startPublish(input);
+    try {
+      input.emit({ ...operation.headers });
+      operation.finish({ status: 'delivered', attempts: 1 });
+    } catch (error) {
+      operation.finish({ status: 'rejected', reason: 'serialization-failed' });
+      throw error;
+    }
+  }
+
+  /** Record a producer lifecycle transition. */
+  recordState(
+    streamPath: string,
+    producerId: string,
+    snapshot: StreamProducerStateSnapshotV1,
+  ): void {
+    this.#metrics.recordState(streamPath, producerId, snapshot);
+  }
+
+  /** Update observable buffered event and byte values. */
+  recordBuffer(streamPath: string, producerId: string, events: number, bytes: number): void {
+    this.#metrics.recordBuffer(streamPath, producerId, events, bytes);
+  }
+
+  /** Record one bounded retry attempt. */
+  recordRetry(
+    streamPath: string,
+    producerId: string,
+    phase: 'connect' | 'append' | 'close',
+    attempt: number,
+    reason: string,
+  ): void {
+    this.#metrics.recordRetry(streamPath, producerId, phase, attempt, reason);
+  }
+
+  /** Record successful recovery after at least one retry. */
+  recordRecovery(
+    streamPath: string,
+    producerId: string,
+    phase: 'connect' | 'append' | 'close',
+    attempt: number,
+  ): void {
+    this.#metrics.recordRecovery(streamPath, producerId, phase, attempt);
+  }
+
+  /** Record a rejection that occurs before a publish span can be created. */
+  recordRejected(
+    streamPath: string,
+    producerId: string,
+    reason: StreamWriteRejectionReasonV1,
+  ): void {
+    this.#metrics.recordRejected(streamPath, producerId, reason);
   }
 
   /** Start a CONSUMER span for a stream subscription with fan-in links. */
