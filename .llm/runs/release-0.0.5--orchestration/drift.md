@@ -29,3 +29,30 @@
 | C-D25 | 2026-08-06 | The temporary aggregate canary/orchestrator-branch PR mechanism outlived the JSR publish-cap workaround. | Owner retired it after C14. Every post-cut meaningful connected cluster targets `main` directly and owns independent CI/review; the orchestrator branch retains coordination history only. |
 | C-D26 | 2026-08-06 | Initial canary.14 pinned production E2E failed when JSR returned a transient 502 for an already-published Fresh source file; the independent quickstart walk passed. | Preserved the failed receipt and immutable tag. Used the documented tag-bound same-semver recovery, not a code change or canary.15. Run `31128595811` and pinned child `31128614286` completed success and recorded the authoritative green pair. |
 | C-D27 | 2026-08-07 | Concurrent app-server and CLI/tmux resumes previously created duplicate writers for the same thread/worktree. | Durable rule: exactly one writer for thread `019fd77c-f583-7b01-aed8-c8665ac09230`; never overlap app-server and CLI/tmux resume. Protected root lock and quarantined interrupted worktrees remain untouched. |
+
+## C-D84 — the #1343 canary.18 smoke mutated the orchestration worktree's `deno.lock`
+
+**Severity:** minor (caught before any commit; restored byte-for-byte).
+
+Running `deno run --allow-all packages/cli/e2e/cli.ts run scaffold.runtime --source jsr --cli
+jsr:@netscript/cli@0.0.5-canary.18` from the orchestration worktree left `deno.lock` modified: +101
+lines adding `jsr:@netscript/*@0.0.5-canary.18` entries for aspire, cli, config, fresh-ui, mcp,
+plugin, plugin-sagas and plugin-workers.
+
+**Provenance proven, not assumed:** file mtime `15:30:26`, inside the smoke window (~15:27–15:35),
+and the added specifiers are exactly the canary the smoke installed. Run-owned.
+
+**Action:** `git checkout -- deno.lock`; verified byte-identical to HEAD by sha256
+(`764d8496848e50a8` both sides). Nothing committed. Worktree status clean apart from the item below.
+
+**Not run-owned, deliberately left alone:** untracked `.playwright-cli/` — directory mtime
+`08:21:21`, contents stamped `06:20–06:21Z`, roughly seven hours before this smoke started. It does
+not belong to this run, so it was reported rather than deleted, under the same rule that leaves the
+foreign `redis-jfgcbtaf` container from `w6-review-desk` untouched. Ownership is proven by evidence,
+not inferred from convenience.
+
+**Generalisable point:** the smoke resolves published JSR specifiers using the invoking workspace's
+lockfile, so running it from a tracked worktree writes release-version entries into that lockfile.
+Future installed-consumer runs should either execute from a scratch checkout or expect this cleanup.
+Related in kind to #1417 (`publish:dry-run` rewriting catalog-backed manifests): a read-only-sounding
+verification command with a tree-mutating side effect.
