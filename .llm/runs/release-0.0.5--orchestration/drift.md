@@ -68,3 +68,33 @@ lockfile, so running it from a tracked worktree writes release-version entries i
 Future installed-consumer runs should either execute from a scratch checkout or expect this cleanup.
 Related in kind to #1417 (`publish:dry-run` rewriting catalog-backed manifests): a read-only-sounding
 verification command with a tree-mutating side effect.
+
+## C-D85 — ready_for_review auto-emitted an OpenHands request; native evaluation is the required lane
+
+**Severity:** moderate (process). Owner cancelled the triggered run; no evaluation was consumed from it.
+
+Flipping PR #1422 to ready fired `.github/workflows/docs-openhands-eval.yml`, which posts an
+`@openhands-agent model=openrouter/minimax/minimax-m3 output=pr-comment` comment; that comment then
+triggers `openhands-agent.yml` via `issue_comment`. Run `31318774640` started and was cancelled by
+the owner.
+
+**Why it fired.** The job's condition is `ready_for_review` **and** one of `type:docs`, `area:docs`,
+`ci:full`. #1422 carried `area:docs` — inaccurately, since the IMPL-EVAL confirmed the diff contains
+no `docs/site` files at all. An inaccurate label emitted a real evaluation request.
+
+**Escape hatch existed only on paper.** The workflow reads `SKIP_REQUESTED` from a `docs-eval:skip`
+label, but that label **did not exist in the repository**, so `gh pr edit --add-label` failed with
+`'docs-eval:skip' not found`. Created it and applied it to #1422. Same family as #1408 and #1415: a
+guard that is present in the code and absent in reality, so nobody can actually use it.
+
+**Standing policy for the rest of this release.** Native opposite-family IMPL-EVAL (Fable 5 medium
+for Codex-authored work) is the required lane; OpenHands is not part of it. Therefore:
+
+1. Apply `docs-eval:skip` **before** any `ready_for_review` transition on a PR carrying `type:docs`,
+   `area:docs` or `ci:full`.
+2. Label to the surface the diff actually changes. #1422's `area:docs` was wrong on the facts and is
+   what made the suppression necessary in the first place.
+3. Do not modify `docs-openhands-eval.yml` in this release slice — the workflow is not the defect;
+   the missing label and the inaccurate labelling were.
+
+The valid evaluation for #1422 remains the native Fable delta PASS tied to head `b56f04997`.
