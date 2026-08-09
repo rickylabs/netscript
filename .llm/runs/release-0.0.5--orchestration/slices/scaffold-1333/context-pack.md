@@ -33,3 +33,9 @@ produce focused red evidence.
 S4 promotes the typed canonical route and living design references without deleting the independent
 CRUD or telemetry examples. Home and navigation links use `appRoutes.design` and
 `appRoutes.designComposition`; app guidance discovers the new contract/form/auth/resource seams.
+
+S5 adds deterministic preview states for browser acceptance, a real headless-browser runtime gate
+at desktop and mobile viewports, project-derived runtime app identity, and an executable generated
+`no-explicit-any` lint rule. The browser gate rejects the old unmarked service page. A fresh memory
+consumer checks and lints 108 selected files; a fresh Postgres consumer with locally generated
+Prisma/Zod output checks 112 product files. The real AppHost/browser verdict remains token-gated.

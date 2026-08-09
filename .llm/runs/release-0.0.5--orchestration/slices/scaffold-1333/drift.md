@@ -31,3 +31,21 @@ not own that dependency even though the workspace root catalog did. A fresh gene
 check failed with TS2307. S3 adds `zod: "catalog:"` to the app import map and locks that ownership
 in the app-manifest test. This is required by the planned typed route/form contract and preserves
 central catalog control; it is not a dependency-version fork.
+
+## 2026-08-09 — runtime identity followed the S1 naming rule
+
+S5 found that the runtime suite still waited for and probed a hard-coded Aspire resource named
+`dashboard`. After S1, the runtime scaffold intentionally omits `--app-name`, so its app resource is
+derived from the project name and the old gates would target a resource that no longer exists.
+S5 shares `deriveDefaultAppName` with the wait, home, UI, and browser gates and adds project-derived
+command tests. This is required integration of the approved S1 rule, not a second naming decision.
+
+## 2026-08-09 — generated lint made the quality contract executable
+
+The planned deliberate-`any` negative proved that the generated `lint` task used Deno's default
+recommended rules, which do not include `no-explicit-any`; the mutation exited 0. The generated
+quality runner now opts into `no-explicit-any`, and the same mutation exits 1 naming that rule.
+Turning on the real gate surfaced five clean-scaffold lint findings: one S3 `require-await` and four
+existing memory-router findings (`require-await`, `prefer-const`, and an unused transition table).
+They were corrected in their owned templates so a fresh no-Aspire consumer now checks and lints 108
+selected files at exit 0. No lint allowance or exclusion was added.

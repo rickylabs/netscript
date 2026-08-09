@@ -11,7 +11,17 @@ export const SERVICE_SHOWCASE_INPUT = {
 export interface ServiceShowcaseSearch {
   readonly page: number;
   readonly query: string;
+  readonly preview?: ServiceShowcasePreview;
 }
+
+export type ServiceShowcasePreview =
+  | 'loading'
+  | 'error'
+  | 'empty'
+  | 'success'
+  | 'optimistic'
+  | 'rollback'
+  | 'confirmed';
 
 export type ServiceShowcaseListData = Awaited<ReturnType<typeof {{serviceName | camelCase}}Queries.list>>;
 
@@ -83,5 +93,6 @@ export async function loadServiceShowcaseData(search: ServiceShowcaseSearch) {
     initialList,
     cachedAt,
     searchQuery: search.query,
+    previewState: search.preview,
   };
 }

@@ -2,7 +2,7 @@ import { assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
 import { dirname, join } from 'jsr:@std/path@^1';
 
 import { createUiAiGates } from '../../../../src/application/gates/scaffold/ui-ai-gates.ts';
-import { ASPIRE_RESOURCE, GATE, SCAFFOLD } from '../../../../src/domain/cli-surface.ts';
+import { GATE, SCAFFOLD } from '../../../../src/domain/cli-surface.ts';
 import {
   DATABASE,
   PACKAGE_SOURCE,
@@ -28,7 +28,7 @@ Deno.test('ui AI gate rejects the old workspace-root layout and accepts the Fres
     const context = createContext(root);
     const gate = commandGate(GATE.SCAFFOLD_UI_LOCAL_SOURCE);
     await writeUiFixture(root);
-    const appRoot = join(root, 'apps', ASPIRE_RESOURCE.APP);
+    const appRoot = join(root, 'apps', 'generated-web');
     await Deno.mkdir(appRoot, { recursive: true });
 
     const oldLayout = await execute(gate, context);
@@ -52,13 +52,13 @@ Deno.test('ui AI install gate selects the generated Fresh app from the workspace
   const command = gate.command(context);
 
   assertEquals(gate.cwd(context), context.project.projectRoot);
-  assertStringIncludes(command.join(' '), `--app ${ASPIRE_RESOURCE.APP}`);
+  assertStringIncludes(command.join(' '), '--app generated-web');
   assertEquals(command.includes('--project-root'), false);
 });
 
 Deno.test('every UI AI assertion runs in the app and local imports stay workspace-relative', () => {
   const context = createContext('/repo/.llm/tmp/generated', PACKAGE_SOURCE.LOCAL);
-  const expectedAppRoot = join(context.project.projectRoot, 'apps', ASPIRE_RESOURCE.APP);
+  const expectedAppRoot = join(context.project.projectRoot, 'apps', 'generated-web');
   const appGateIds = [
     GATE.SCAFFOLD_UI_LOCAL_SOURCE,
     GATE.GENERATED_UI_AI_CHECK,

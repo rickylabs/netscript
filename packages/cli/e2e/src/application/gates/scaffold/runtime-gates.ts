@@ -12,14 +12,12 @@ import type { RunContext } from '../../../domain/run-context.ts';
 import { resolve } from '@std/path';
 import { commandGate, denoCommand, httpGate } from './gate-factory.ts';
 import { allocateScaffoldDefaultPort } from '../../../../../src/kernel/domain/scaffold/default-port-allocation.ts';
+import { generatedAppName } from './generated-app-name.ts';
 
 const ASPIRE_RESOURCE_WAIT_TIMEOUT_SECONDS: Partial<
   Record<AspireResource, number>
 > = {
   [ASPIRE_RESOURCE.MSSQL]: 600,
-  // The app's health probe renders a real SSR route, so this wait covers the Vite dev
-  // server's cold start and first render — not just the process reaching `Running`.
-  [ASPIRE_RESOURCE.APP]: 300,
 };
 
 const KV_BACKGROUND_RUNTIME_WAIT_TIMEOUT_SECONDS = 300;
@@ -42,6 +40,10 @@ const APP_HOME_FAILURE_HINT =
   "running AppHost (or the project's appsettings.json when one is pinned), so a failure " +
   'here means the app itself is not rendering — check the app resource logs in the Aspire ' +
   'dashboard.';
+
+const APP_REFERENCE_FAILURE_HINT =
+  'The generated app did not render its canonical resource and design states in a real headless ' +
+  'browser at desktop and mobile viewports. Inspect the named path, viewport, and missing semantic marker.';
 
 const AI_CHAT_ROUTE_FAILURE_HINT =
   'The generated AI chat route or composition could not be imported, or the self-wired ' +
@@ -114,6 +116,27 @@ function runtimeWaitGate(resource: AspireResource): GateDefinition {
       }
       return command;
     },
+  );
+}
+
+function runtimeAppWaitGate(): GateDefinition {
+  return commandGate(
+    GATE.RUNTIME_WAIT_APP,
+    'Wait for the project-derived Fresh app',
+    GATE_PHASE.RUNTIME,
+    (context) => [
+      'aspire',
+      'wait',
+      generatedAppName(context),
+      '--status',
+      'healthy',
+      '--timeout',
+      '300',
+      '--apphost',
+      context.project.appHost,
+      '--non-interactive',
+      '--nologo',
+    ],
   );
 }
 
@@ -251,6 +274,7 @@ export function createRuntimeGates(
       ],
     ),
     ...runtimeResources(database).map(runtimeWaitGate),
+    runtimeAppWaitGate(),
     commandGate(
       GATE.RUNTIME_ASPIRE_DESCRIBE,
       'Describe generated topology',
@@ -490,12 +514,30 @@ export function createRuntimeGates(
         '--allow-run=aspire',
         `${context.project.repoRoot}/packages/cli/e2e/src/application/gates/scaffold/probe-app-home.ts`,
         context.project.projectRoot,
-        ASPIRE_RESOURCE.APP,
+        generatedAppName(context),
         context.project.appHost,
       ],
       undefined,
       'capture',
       APP_HOME_FAILURE_HINT,
+    ),
+    commandGate(
+      GATE.BEHAVIOR_APP_REFERENCE,
+      'Render canonical app reference states in desktop and mobile browsers',
+      GATE_PHASE.BEHAVIOR,
+      (context) => [
+        'deno',
+        'run',
+        '--allow-read',
+        '--allow-run',
+        `${context.project.repoRoot}/packages/cli/e2e/src/application/gates/scaffold/probe-app-reference.ts`,
+        context.project.projectRoot,
+        generatedAppName(context),
+        context.project.appHost,
+      ],
+      undefined,
+      'capture',
+      APP_REFERENCE_FAILURE_HINT,
     ),
     commandGate(
       GATE.BEHAVIOR_AI_CHAT_ROUTE,
@@ -573,8 +615,6 @@ export function runtimeResources(database: DatabaseEngine): readonly AspireResou
     ...KV_BACKGROUND_RUNTIME_WAIT_RESOURCES,
     ASPIRE_RESOURCE.AUTH,
     ASPIRE_RESOURCE.STREAMS,
-    // Last: the app depends on everything above and is the slowest to first render.
-    ASPIRE_RESOURCE.APP,
   ];
 }
 

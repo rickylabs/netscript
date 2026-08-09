@@ -18,6 +18,7 @@ import {
 import {
   formatServiceTimestamp,
   loadServiceShowcaseData,
+  type ServiceShowcasePreview,
 } from '../(_shared)/service-showcase.ts';
 
 type Props = NonNullable<InferDefinePageLayerLoaderProps<typeof loadServiceShowcaseData>>;
@@ -121,6 +122,18 @@ function ServiceShowcaseLabInner(props: Props) {
   const mutationPending = createMutation.isPending ||
     renameMutation.isPending ||
     deleteMutation.isPending;
+  const renderState: ServiceShowcasePreview = props.previewState ??
+    (isLoading ? 'loading' : isError ? 'error' : items.length === 0 ? 'empty' : 'success');
+  const previewMessage = renderState === 'optimistic'
+    ? 'Optimistic update is visible while the service confirms it.'
+    : renderState === 'rollback'
+    ? 'The service rejected the update and the saved cache snapshot was restored.'
+    : renderState === 'confirmed'
+    ? 'The service confirmed the mutation and the canonical list was refreshed.'
+    : null;
+  const visibleMessage = statusMessage.value ?? previewMessage;
+  const showList = renderState === 'success' || renderState === 'optimistic' ||
+    renderState === 'rollback' || renderState === 'confirmed';
 
   return (
     <div class='ns-stack ns-stack--md'>
@@ -157,23 +170,23 @@ function ServiceShowcaseLabInner(props: Props) {
         </Button>
       </div>
 
-      {statusMessage.value
+      {visibleMessage
         ? (
-          <p class='rounded-2xl border border-ns-border bg-ns-surface-raised/20 px-4 py-3 text-sm text-ns-muted-fg'>
-            {statusMessage.value}
+          <p data-mutation-state={renderState} class='rounded-2xl border border-ns-border bg-ns-surface-raised/20 px-4 py-3 text-sm text-ns-muted-fg'>
+            {visibleMessage}
           </p>
         )
         : null}
 
-      {isLoading
+      {renderState === 'loading'
         ? <Skeleton variant='table' rows={3} columns={2} data-state='loading' />
-        : isError
+        : renderState === 'error'
         ? (
           <InlineNotice variant='destructive' title='Resource list unavailable' data-state='error'>
             {error instanceof Error ? error.message : 'Retry the typed query.'}
           </InlineNotice>
         )
-        : items.length === 0
+        : renderState === 'empty'
         ? (
           <EmptyState heading='No resources yet' data-state='empty'>
             Create the first record with the managed controls above.
@@ -181,8 +194,8 @@ function ServiceShowcaseLabInner(props: Props) {
         )
         : null}
 
-      {items.length > 0 && !isError
-        ? <ul class='ns-stack ns-stack--sm' data-state='success'>
+      {showList
+        ? <ul class='ns-stack ns-stack--sm' data-state={renderState}>
         {items.map((item) => (
           <li
             key={item.id}

@@ -60,6 +60,48 @@ passed in the same run.
 | Scoped format | raw exit 0; 5 files / 1 batch / 0 findings |
 | Package code-quality scan | raw exit 0; 0 findings / 6 existing allowances |
 
+## S5 — generated quality and browser/runtime acceptance
+
+### Implementation
+
+- The canonical route accepts deterministic `preview` states for loading, error, empty, success,
+  optimistic, rollback, and confirmed UI, while normal requests continue to use live query state.
+- A new runtime gate renders the home, design composition, and every resource state through a real
+  headless Chrome/Chromium process at 1440×900 and 390×844, asserting semantic DOM markers.
+- Runtime wait/home/UI/browser gates derive the generated Aspire app name through the same S1
+  `deriveDefaultAppName` rule instead of the obsolete hard-coded `dashboard` identity.
+- The generated quality runner now opts into `no-explicit-any`; its negative matrix probes the rule
+  and verifies both check and lint cleanup.
+- Enabling that rule exposed clean-scaffold lint debt in the memory templates; the unused transition
+  table, unnecessary `async` callbacks, and mutable array binding were corrected without allowances.
+
+### Falsifiability and generated consumers
+
+| Proof | Result |
+| --- | --- |
+| Old browser DOM without rollback marker | raw exit 1; missing `data-state="rollback"` |
+| Deliberate generated `any` source | raw exit 1; selected file, `no-explicit-any` |
+| Clean recovery after removing `any` | raw exit 0; 108 selected files |
+| Fresh memory generated check | raw exit 0; 108 selected files |
+| Fresh memory generated lint | raw exit 0; 108 selected files |
+| Fresh Postgres product check after local Prisma/Zod generation | raw exit 0; 112 selected files |
+| Fresh Postgres product lint including `no-explicit-any` | raw exit 0; 112 selected files |
+
+The first full generated quality-matrix development attempt correctly failed its final AppHost
+check because a fresh, un-restored scaffold has no `aspire/node_modules/typescript`. The actual
+runtime suite orders `runtime.aspire-restore` before this gate; no AppHost/container was started and
+the complete verdict is reserved for the serialized one-pass run.
+
+### Gates before commit
+
+| Gate | Result |
+| --- | --- |
+| Focused template/generated-quality/runtime/browser suite | raw exit 0; 56 tests / 25 steps / 0 failed |
+| Scoped CLI+E2E check (`--no-lock`) | raw exit 0; 823 files / 7 batches / 0 findings |
+| Scoped CLI+E2E lint | raw exit 0; 823 files / 5 batches / 0 findings |
+| Scoped CLI+E2E format | raw exit 0; 823 files / 5 batches / 0 findings |
+| Package code-quality scan | raw exit 0; 0 findings / 6 existing allowances |
+
 ## S4 — discovery and retained living examples
 
 ### Implementation

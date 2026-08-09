@@ -7,6 +7,8 @@ export const {{serviceName | camelCase}}PathSchema = z.object({});
 export const {{serviceName | camelCase}}SearchSchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
   query: z.string().trim().max(100).default(''),
+  preview: z.enum(['loading', 'error', 'empty', 'success', 'optimistic', 'rollback', 'confirmed'])
+    .optional(),
 });
 
 /** Managed-form values for the server-owned resource note example. */

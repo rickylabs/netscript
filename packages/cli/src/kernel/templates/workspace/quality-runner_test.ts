@@ -127,6 +127,20 @@ Deno.test('generated quality runner propagates a selected TypeScript failure', a
   });
 });
 
+Deno.test('generated quality runner rejects explicit any in selected product source', async () => {
+  await withTempRoots(async (projectRoot, runnerRoot) => {
+    const sourcePath = join(projectRoot, 'apps/dashboard/main.ts');
+    await Deno.mkdir(join(sourcePath, '..'), { recursive: true });
+    await Deno.writeTextFile(sourcePath, 'export const value: any = 1;\n');
+
+    const result = await runQuality(projectRoot, 'lint', runnerRoot);
+    assertEquals(result.code, 1);
+    assertEquals(result.report.ok, false);
+    assertEquals(result.report.selection.files, ['apps/dashboard/main.ts']);
+    assertEquals(result.report.batches.map((batch) => batch.exitCode), [1]);
+  });
+});
+
 Deno.test('generated quality runner is itself lint and format clean in its consumer location', async () => {
   await withTempRoots(async (projectRoot) => {
     const runnerRoot = join(projectRoot, '.netscript');
@@ -158,5 +172,8 @@ Deno.test('generated quality runner checks AppHost source through its restored T
   assertStringIncludes(source, "path !== 'aspire/.helpers/run-tool.mts'");
   assertStringIncludes(source, "'aspire/node_modules/typescript/bin/tsc'");
   assertStringIncludes(source, "'aspire/tsconfig.apphost.json'");
-  assertStringIncludes(source, "['lint', '--no-config', ...files]");
+  assertStringIncludes(
+    source,
+    "['lint', '--no-config', '--rules-include=no-explicit-any', ...files]",
+  );
 });

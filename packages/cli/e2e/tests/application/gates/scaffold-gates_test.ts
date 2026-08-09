@@ -2,7 +2,10 @@ import { assertEquals, assertThrows } from '@std/assert';
 
 import { createSmokeProject } from '../../../src/application/builders/workspace/smoke-project-factory.ts';
 import { createGeneratedQualityGates } from '../../../src/application/gates/scaffold/generated-quality-gate.ts';
-import { QUALITY_PROBE_PATHS } from '../../../src/application/gates/scaffold/generated-quality-probes.ts';
+import {
+  QUALITY_ANY_PROBE_PATH,
+  QUALITY_PROBE_PATHS,
+} from '../../../src/application/gates/scaffold/generated-quality-probes.ts';
 import { createScaffoldGates } from '../../../src/application/gates/scaffold/scaffold-gates.ts';
 import { GATE, SCAFFOLD } from '../../../src/domain/cli-surface.ts';
 import {
@@ -106,6 +109,7 @@ Deno.test('generated quality probes cover TS, TSX, plugin, background, and AppHo
     'streams/__quality_probe__.ts',
     'aspire/.helpers/__quality_probe__.mts',
   ]);
+  assertEquals(QUALITY_ANY_PROBE_PATH, 'apps/__quality_any_probe__.ts');
   assertEquals(
     createGeneratedQualityGates().map((gate) => gate.id),
     [

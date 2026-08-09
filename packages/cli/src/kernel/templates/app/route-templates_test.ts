@@ -562,7 +562,9 @@ describe('app route template rendering', () => {
     assertStringIncludes(output, "data-state='loading'");
     assertStringIncludes(output, "data-state='error'");
     assertStringIncludes(output, "data-state='empty'");
-    assertStringIncludes(output, "data-state='success'");
+    assertStringIncludes(output, "items.length === 0 ? 'empty' : 'success'");
+    assertStringIncludes(output, 'data-state={renderState}');
+    assertStringIncludes(output, "renderState === 'rollback'");
   });
 
   it('memory island preserves optimistic rollback and the same four query states', async () => {
@@ -576,7 +578,9 @@ describe('app route template rendering', () => {
     assertStringIncludes(island, "data-state='loading'");
     assertStringIncludes(island, "data-state='error'");
     assertStringIncludes(island, "data-state='empty'");
-    assertStringIncludes(island, "data-state='success'");
+    assertStringIncludes(island, "items.length === 0 ? 'empty' : 'success'");
+    assertStringIncludes(island, 'data-state={renderState}');
+    assertStringIncludes(island, "renderState === 'rollback'");
     assertStringIncludes(shared, 'offset: (search.page - 1) * SERVICE_SHOWCASE_PAGE_SIZE');
     assertStringIncludes(shared, 'search: search.query || undefined');
   });
