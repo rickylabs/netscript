@@ -55,3 +55,12 @@ default `apps/dashboard` instead of S1's derived `apps/prod-local-test-web`; fai
 were no run-owned leak survivors or manifest/lock changes, and the foreign Redis container owned by
 `/home/codex/repos/w6-review-desk` was left untouched. No rerun is authorized. Row 9 and the closing
 keyword remain blocked.
+
+The gate-70 repair is implemented without a runtime rerun. Both fail-fast-hidden runtime probes now
+require a caller-supplied app name and receive `generatedAppName(context)`. A sweep found and fixed
+the same stale identity in the standalone clean-clone README probe, which now derives
+`generated-readme-fixture-web`. The recurrence guard rejects both `apps/dashboard` and a bare
+`appName = 'dashboard'` default across scaffold gate scripts while excluding unrelated Aspire
+dashboard telemetry. Its deliberate-literal mutation exits 1 and clean recovery exits 0; focused
+tests pass 20/20, scoped check/lint/fmt and `check:assets-barrel` exit 0. No AppHost/container gate
+ran, and `behavior.app-reference` still has no verdict pending a fresh serialized grant.

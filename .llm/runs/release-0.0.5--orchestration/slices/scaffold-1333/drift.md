@@ -74,3 +74,12 @@ Fail-fast prevented `behavior.app-reference` from running, so the browser/Window
 path has no verdict. The authorized run was not retried. Pre/post leak checks found no run-owned
 resources and left one stale foreign Redis container untouched; manifest and lock diffs remained
 empty. This blocks runtime row 9 and therefore blocks `Closes #1333` at this head.
+
+## 2026-08-09 — stale identity was a three-consumer class
+
+The owner identified the fail-fast-hidden MCP endpoint-directory consumer after gate 70. The
+required sweep then found a third consumer: the clean-clone README probe scaffolded an omitted-name
+project but asserted generated artifacts under `apps/dashboard`. All three now consume the S1
+derivation rule, with required probe arguments where a caller owns the context. A new source-policy
+test makes both forbidden forms executable and excludes the unrelated Aspire-dashboard telemetry
+surface. This is an authorized completion of the gate-70 finding, not a change to S1's naming rule.

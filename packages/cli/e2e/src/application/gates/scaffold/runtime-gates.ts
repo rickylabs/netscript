@@ -333,6 +333,7 @@ export function createRuntimeGates(
         `${context.project.repoRoot}/packages/cli/e2e/src/application/gates/scaffold/verify-mcp-endpoint-directory.ts`,
         context.project.projectRoot,
         context.project.appHost,
+        generatedAppName(context),
       ],
       (context) => context.project.projectRoot,
     ),

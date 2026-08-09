@@ -15,6 +15,7 @@ import {
   ASPIRE_RESTORE_MAX_RETRIES,
   createRuntimeGates,
 } from '../../../src/application/gates/scaffold/runtime-gates.ts';
+import { createProjectBoundaryGates } from '../../../src/application/gates/scaffold/database-gates.ts';
 
 Deno.test('runtime Aspire restore has a bounded infrastructure retry budget', () => {
   const gate = createRuntimeGates().find((entry) => entry.id === GATE.RUNTIME_ASPIRE_RESTORE);
@@ -218,6 +219,7 @@ Deno.test('runtime gates prove MCP Aspire endpoint discovery against the live Ap
     throw new Error('Expected MCP endpoint directory gate to be a command gate.');
   }
   const context = {
+    request: { options: { projectName: 'generated' } },
     project: {
       repoRoot: '/repo',
       projectRoot: '/workspace/app',
@@ -236,6 +238,33 @@ Deno.test('runtime gates prove MCP Aspire endpoint discovery against the live Ap
     '/repo/packages/cli/e2e/src/application/gates/scaffold/verify-mcp-endpoint-directory.ts',
     '/workspace/app',
     '/workspace/app/aspire/apphost.mts',
+    'generated-web',
+  ]);
+});
+
+Deno.test('project boundary gate requires the project-derived app name', () => {
+  const gate = createProjectBoundaryGates().find((entry) =>
+    entry.id === GATE.BEHAVIOR_PROJECT_BOUNDARY_DEV
+  );
+  if (gate?.kind !== 'command') {
+    throw new Error('Expected project boundary gate to be a command gate.');
+  }
+  const context = {
+    request: { options: { projectName: 'inventory-console' } },
+    project: {
+      repoRoot: '/repo',
+      projectRoot: '/workspace/app',
+    },
+  } as RunContext;
+
+  assertEquals(gate.cwd(context), '/repo');
+  assertEquals(gate.command(context), [
+    'deno',
+    'run',
+    '--allow-all',
+    '/repo/packages/cli/e2e/src/application/gates/scaffold/probe-project-boundary-dev.ts',
+    '/workspace/app',
+    'inventory-console-web',
   ]);
 });
 

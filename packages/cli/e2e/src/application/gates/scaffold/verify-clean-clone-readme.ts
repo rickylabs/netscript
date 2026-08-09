@@ -1,10 +1,12 @@
 import { join, resolve } from '@std/path';
+import { deriveDefaultAppName } from '../../../../../src/kernel/domain/scaffold/app-name.ts';
 
 if (import.meta.main) await main(resolve(Deno.args[0] ?? '.'));
 
 async function main(repoRoot: string): Promise<void> {
   const sourceParent = join(repoRoot, '.llm', 'tmp', 'clean-clone-readme');
   const projectName = 'generated-readme-fixture';
+  const appName = deriveDefaultAppName(projectName);
   const projectRoot = join(sourceParent, projectName);
   const cloneParent = await Deno.makeTempDir({ prefix: 'netscript-clean-clone-' });
   const cloneRoot = join(cloneParent, projectName);
@@ -56,11 +58,11 @@ async function main(repoRoot: string): Promise<void> {
 
     for (
       const path of [
-        'apps/dashboard/.generated/manifest.ts',
-        'apps/dashboard/.generated/routes.ts',
+        join('apps', appName, '.generated', 'manifest.ts'),
+        join('apps', appName, '.generated', 'routes.ts'),
       ]
     ) {
-      await Deno.stat(`${cloneRoot}/${path}`).catch((error) => {
+      await Deno.stat(join(cloneRoot, path)).catch((error) => {
         if (error instanceof Deno.errors.NotFound) {
           throw new Error(`clean clone is missing generated route artifact: ${path}`);
         }

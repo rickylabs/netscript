@@ -3,6 +3,7 @@ import { GATE, GATE_PHASE } from '../../../domain/cli-surface.ts';
 import type { GateDefinition } from '../../../domain/gate-definition.ts';
 import type { RunContext } from '../../../domain/run-context.ts';
 import { cli, commandGate, denoCommand } from './gate-factory.ts';
+import { generatedAppName } from './generated-app-name.ts';
 
 const STANDALONE_DATABASE_CODEGEN_SCRIPT = `
 const [databaseUrl, providerEnvKey] = Deno.args;
@@ -220,6 +221,7 @@ export function createProjectBoundaryGates(): readonly GateDefinition[] {
           'packages/cli/e2e/src/application/gates/scaffold/probe-project-boundary-dev.ts',
         ),
         context.project.projectRoot,
+        generatedAppName(context),
       ],
       (context) => context.project.repoRoot,
     ),

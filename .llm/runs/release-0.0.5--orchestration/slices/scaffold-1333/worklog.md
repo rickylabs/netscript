@@ -138,6 +138,51 @@ Chrome/WSL interop was not reached.
 This is a runtime integration finding, not authority to consume a second token. Row 9 remains
 unevidenced, and the PR continues to use `Refs #1333` rather than a closing keyword.
 
+## Gate-70 repair — generated app identity reaches every scaffold probe
+
+### Implementation and sweep
+
+- `probe-project-boundary-dev.ts` now requires both project root and app name; the caller supplies
+  `generatedAppName(context)` and there is no fallback identity.
+- `verify-mcp-endpoint-directory.ts` now requires the generated app name in addition to project root
+  and AppHost path; its runtime caller supplies the same derived value.
+- The requested sweep found a third stale consumer: `verify-clean-clone-readme.ts` scaffolded the
+  omitted-name project `generated-readme-fixture` but checked `apps/dashboard/.generated/*`. It now
+  derives the app name through the same S1 domain rule.
+- A source-policy test scans every TypeScript scaffold gate and rejects `apps/dashboard` or a bare
+  `appName = 'dashboard'` default. It deliberately does not ban Aspire-dashboard telemetry names or
+  prose; `aspire-dashboard-telemetry.ts` is explicitly excluded because that dashboard is a
+  different resource.
+
+### Falsifiability
+
+| Mutation | Result |
+| --- | --- |
+| Reintroduce `apps/dashboard/.generated/manifest.ts` in the clean-clone probe | raw exit 1; source-policy test named `verify-clean-clone-readme.ts:61` and the forbidden generated-app path |
+| Restore the project-derived path | raw exit 0; 1 passed / 0 failed |
+
+The earlier S4 falsifiability table remains present: the obsolete `/design/components` promotion
+literal fails the route golden at raw exit 1, and the restored typed route passes at raw exit 0.
+The S4 doctrine sentence now correctly says the slice introduces no new finding in S4.
+
+### Gates
+
+| Gate | Result |
+| --- | --- |
+| Focused callers, identity policy, and clean-clone error contract | raw exit 0; 20 passed / 0 failed |
+| Scaffold-gate identity sweep | `rg` raw exit 1 (zero forbidden matches) |
+| Scoped E2E check (`--no-lock`) | raw exit 0; 149 files / 2 batches / 0 findings |
+| Scoped E2E lint | raw exit 0; 149 files / 1 batch / 0 findings |
+| Scoped E2E format | raw exit 0; 149 files / 1 batch / 0 findings |
+| Canonical asset barrel | raw exit 0; generated assets unchanged |
+
+No AppHost, container, or `e2e:cli` command ran. Gate 70 remains the sole runtime verdict;
+`behavior.app-reference` still has no verdict because fail-fast never reached it.
+
+Reconcile: the owner-accepted gate-70 finding and its hidden consumers are now represented in code
+and the run record. PR #1427 remains draft at `status:impl` with `Refs #1333`; a fresh serialized
+grant and real runtime verdict remain owner-controlled.
+
 ## S5 — generated quality and browser/runtime acceptance
 
 ### Implementation
