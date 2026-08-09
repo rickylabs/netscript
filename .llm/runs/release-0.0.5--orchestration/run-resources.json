@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 2,
+  "worktreeRoot": "/home/codex/repos/ns005-stable-opus5",
+  "appHosts": [],
+  "containers": [],
+  "ownedRoots": [
+    "/home/codex/ns1343-cleanroom"
+  ]
+}
