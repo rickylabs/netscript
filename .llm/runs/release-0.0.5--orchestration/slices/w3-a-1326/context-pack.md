@@ -12,11 +12,11 @@
 
 ## Current State
 
-Research and Design are complete on clean exact base `aa8e151e6`. PLAN-EVAL cycle 1 returned
-`FAIL_PLAN` on evidence mechanics, while confirming the contract and load-bearing research. The
-repair separates four true runtime REDs from four explicitly weaker API-absence checks, keeps the
-existing producer port unchanged in S1, and supplies package-scoped fitness commands because the
-root gates omit this package. No product source has changed. A fresh orchestrator-launched
+Research and Design are complete on clean exact base `aa8e151e6`. PLAN-EVAL cycle 2 confirmed the
+F1–F3 repairs, then returned `FAIL_PLAN` because the four intentionally broken fixtures were planned
+inside package/CI scoped-check roots. The two-failure threshold was reached; the owner ratified a
+third cycle on the recommended narrow fix. The fixtures are now locked under the slice run dir and
+reached only by direct negative checks. No product source has changed. A fresh orchestrator-launched
 Claude/Fable PLAN-EVAL `PASS` remains mandatory.
 
 ## Completed
@@ -31,16 +31,18 @@ Claude/Fable PLAN-EVAL `PASS` remains mandatory.
 - Ordered S0–S7 plan and Design checkpoint written.
 - PLAN-EVAL F1–F3 repaired: classified RED mechanics, S1 port compile story, scoped fitness/F-14
   evidence, and corrected client/server header-export wording.
+- PLAN-EVAL F4 repaired: type-broken negative fixtures moved in the plan from package test roots to
+  the slice run dir, preserving green scoped and repo CI checks without exclusions.
 
 ## In Progress
 
-- Cycle-2 `status:plan-eval` handoff to the milestone orchestrator.
+- Owner-ratified cycle-3 `status:plan-eval` handoff to the milestone orchestrator.
 
 ## Next Steps
 
-1. Orchestrator launches a fresh separate Claude · Fable 5 · medium PLAN-EVAL (cycle 2 of 2).
+1. Orchestrator launches the owner-ratified fresh Claude · Fable 5 · medium PLAN-EVAL cycle 3.
 2. If and only if `plan-eval.md` is `PASS`, begin S1 with public contract and individual RED tests.
-3. If cycle 2 is `FAIL_PLAN`, escalate under the two-failure harness rule; do not implement.
+3. If cycle 3 is `FAIL_PLAN`, escalate again; do not implement.
 
 ## Key Decisions
 

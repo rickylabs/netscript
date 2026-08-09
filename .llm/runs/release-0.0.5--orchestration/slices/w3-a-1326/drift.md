@@ -50,3 +50,17 @@ Drift is append-only.
 - **Action:** use package-scoped commands plus manual F-14 evidence marked `PENDING_SCRIPT`;
   preserve repo-wide repair as separate issue #1403.
 - **Evidence:** revised `plan.md` validation rows 10–12. No tooling source is changed in this slice.
+
+## 2026-08-09 — Owner-ratified third PLAN-EVAL cycle
+
+- **What:** Cycle 2 found that intentionally type-broken S1 fixtures were planned under the package
+  tree, making scoped and repo CI checks unsatisfiable until S2.
+- **Source:** PLAN-EVAL cycle 2 and owner escalation in the supervisor thread.
+- **Expected:** Two `FAIL_PLAN` cycles normally require escalation before further plan work.
+- **Actual:** The threshold was reached, and the owner explicitly ratified cycle 3 on the
+  evaluator-recommended fixture relocation.
+- **Severity:** process exception, bounded.
+- **Action:** move only the planned fixture location to the slice run dir, update direct commands,
+  and preserve all confirmed contract, ordering, and gate decisions.
+- **Evidence:** revised `plan.md` S1 files/evidence decision and validation rows 1b/1c; no product
+  or tooling source change.

@@ -131,6 +131,9 @@ the adapter or fetch/timers to the supervisor.
 | 2026-08-09 | S0    | Draft PR handoff   | Draft PR #1402 targets `main` at plan-only head `6bb6b3961`; labeled `status:plan-eval`.                               |
 | 2026-08-09 | S0    | PLAN-EVAL cycle 1  | `FAIL_PLAN`: repair RED classification/port compile mechanics, package-scoped fitness proof, and finding 7 wording.    |
 | 2026-08-09 | S0    | Plan repair        | F1–F3 repaired without product edits; cycle 2 requested. Evaluator artifact was not visible locally at repair time.    |
+| 2026-08-09 | S0    | PLAN-EVAL cycle 2  | `FAIL_PLAN`: F1–F3 confirmed repaired; F4 found intentionally broken fixtures inside scoped/CI check roots.            |
+| 2026-08-09 | S0    | Owner escalation   | Owner ratified cycle 3 on the recommended run-dir fixture relocation; no product implementation authorized.            |
+| 2026-08-09 | S0    | Plan repair        | F4 repaired: negative fixtures locked under the slice run dir; direct checks updated; wrappers need no exclusion.      |
 
 ## Decisions
 
@@ -185,9 +188,9 @@ See `plan.md` D1–D16. No open decision would force implementation rework.
   core honesty mechanism.
 - Verify the raw upstream limitation in `research.md` findings 4–7 rather than assuming
   `IdempotentProducer.onError` retains writes.
-- PLAN-EVAL cycle 2 must verify that four default-typechecked runtime REDs cannot collapse into the
-  four isolated `COMPILE_TIME_API_ABSENCE` fixtures, and that S1 leaves the existing producer port
-  unchanged so its scoped check stays green.
+- PLAN-EVAL cycle 2 confirmed the eight-result split, S1/S2 port compile story, F2, and F3. Cycle 3
+  is owner-ratified solely to verify that intentionally broken fixtures live outside package/CI
+  wrapper roots and are reached only by their direct negative commands.
 - Treat package-scoped quality/doctrine commands as decisive. Mandatory aggregate gates still run,
   but their omission of `plugin-streams-core` is disclosed and tracked by #1403.
 - No product implementation may begin until `plan-eval.md` records `PASS` from the separate session.
