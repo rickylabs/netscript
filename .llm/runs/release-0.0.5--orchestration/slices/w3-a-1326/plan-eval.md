@@ -275,3 +275,66 @@ Second `FAIL_PLAN` cycle consumed — per `evaluator/plan-protocol.md`, escalati
 the unresolved item (F4 only; everything else verified). F4 is a one-decision, artifacts-only
 repair: no contract, slice-ordering, or gate-selection change is required beyond the fixture
 location and the two validation-row commands.
+
+## Cycle 3
+
+- Plan evaluator session: Claude · Fable 5 · medium, separate session, 2026-08-09 (same evaluator
+  identity, cycle 3 — owner-ratified after the two-failure escalation threshold, scoped to the F4
+  fixture relocation only)
+- Repair under evaluation: `e26c28db6` (`plan(streams): isolate negative evidence fixtures`),
+  artifacts-only diff over `165e1b6aa` (verified: touches only `plan.md`, `drift.md`,
+  `worklog.md`, `context-pack.md`; no product or tooling source)
+
+### Verdict
+
+`PASS`
+
+### F4 disposition: REPAIRED
+
+The fixtures move to
+`.llm/runs/release-0.0.5--orchestration/slices/w3-a-1326/red-fixtures/producer-api-absence/`,
+locked by an explicit plan paragraph ("must never live below `packages/` or `plugins/`... a locked
+evidence decision, not a temporary exclusion"), with S1's file list and validation rows 1b/1c
+updated to match.
+
+### Checks executed
+
+1. **The path is outside every type-check sweep that matters — confirmed, not assumed.**
+   - Row 4/1c scoped check: `run-deno-check.ts --root packages/plugin-streams-core` selects files
+     only under the given roots by extension (`.llm/tools/run-deno-check.ts` selection logic,
+     verified cycle 2); `.llm/runs/**` is not under that root.
+   - Repo CI `deno task check` (`.github/workflows/ci.yml:222`): `--root packages --root plugins`
+     (root `deno.json:33-44`); `.llm/runs/**` is outside both roots.
+   - `deno task lint` (ci.yml:275): root lint config explicitly excludes `.llm/`
+     (root `deno.json` lint.exclude).
+   - `deno task fmt:check` (ci.yml:279): fmt include list is `packages/**`/`plugins/**` only —
+     never reaches `.llm/runs/**`.
+   - `deno task test` (ci.yml:234): Deno collects only test-named modules; the fixtures are
+     `<one-behavior>.ts`, not `*_test.ts`/`*.test.ts`, so they are never collected or type-checked
+     by any test sweep.
+   - No other CI step in `ci.yml` type-checks `.llm/runs/**`.
+2. **Validation rows match the new location and stay per-fixture.** Row 1b now runs
+   `deno check --no-lock --unstable-kv .llm/runs/.../red-fixtures/producer-api-absence/<one-behavior>.ts`
+   **separately for count, bytes, stop, and readiness** — four individual invocations, each still
+   required to fail with only its named absent-API diagnostic, unrelated/shared diagnostics still
+   invalidating. The eight results remain distinguishable; no directory-level collapse.
+3. **Row 1c is now satisfiable.** The swept package root contains no intentionally broken file at
+   any S1 state, so "Exit 0 without `--exclude`" is achievable and doubles as proof the negatives
+   sit outside the swept tree.
+4. **The pushed S1 commit no longer reddens #1402's CI.** The only CI steps that could have failed
+   on the fixtures were `check`/`lint`/`fmt:check`/`test`, and each is excluded by root, config
+   exclude, include list, or test-name collection respectively (point 1).
+5. **Nothing previously passed is broken.** The diff is confined to the S1 file list, the
+   locked-location paragraph, rows 1b/1c, the dependencies escalation note, and the drift/worklog/
+   context-pack records. The S1/S2 atomic port-widening story, the `BEHAVIORAL` /
+   `COMPILE_TIME_API_ABSENCE` labelling and its invalidation rule, the decisive package-scoped
+   quality/doctrine commands (rows 10), the non-decisive aggregate disclosure (row 11), the F-14
+   `PENDING_SCRIPT` evidence (row 12), and the #1403 ownership note are all textually unchanged.
+   The new drift entry correctly records the owner-ratified third cycle as a bounded process
+   exception.
+
+### Plan-Gate checklist (final)
+
+All eight boxes now check: the two cycle-1 FAILs (open-decision sweep, commit slices) and the
+cycle-2 F4 consequence are resolved; Gate set selected passes with the scoped decisive commands
+plus disclosed non-decisive aggregates and `PENDING_SCRIPT` F-14. Implementation (S1) may begin.
