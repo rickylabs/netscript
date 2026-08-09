@@ -86,8 +86,8 @@ export interface GeneratedMcpEmbeddedDocs {
   readonly provenance: GeneratedMcpEmbeddedDocsProvenance;
 }
 
-async function readVersion(path: string): Promise<string> {
-  const config = JSON.parse(await Deno.readTextFile(new URL(path, ROOT))) as PackageConfig;
+async function readVersion(path: string, root: URL = ROOT): Promise<string> {
+  const config = JSON.parse(await Deno.readTextFile(new URL(path, root))) as PackageConfig;
   if (typeof config.version !== 'string' || !config.version.trim()) {
     throw new Error(`${path} requires a non-empty version`);
   }
@@ -119,12 +119,18 @@ async function formatTypeScript(source: string): Promise<string> {
   return new TextDecoder().decode(stdout);
 }
 
-async function write(path: string, source: string): Promise<void> {
+async function write(
+  path: string,
+  source: string,
+  root: URL = ROOT,
+  check: boolean = CHECK,
+  foundStalePaths: string[] = stalePaths,
+): Promise<void> {
   const expected = await formatTypeScript(`${header()}${source}`);
-  const url = new URL(path, ROOT);
-  if (CHECK) {
+  const url = new URL(path, root);
+  if (check) {
     const actual = await Deno.readTextFile(url).catch(() => '');
-    if (actual !== expected) stalePaths.push(path);
+    if (actual !== expected) foundStalePaths.push(path);
     return;
   }
   await Deno.writeTextFile(url, expected);
@@ -209,10 +215,14 @@ export async function buildMcpEmbeddedDocs(root: URL = ROOT): Promise<GeneratedM
   };
 }
 
-async function generateMcpAssets(): Promise<void> {
-  const version = await readVersion('packages/mcp/deno.json');
-  const readme = await Deno.readTextFile(new URL('packages/mcp/README.md', ROOT));
-  const embedded = await buildMcpEmbeddedDocs();
+export async function generateMcpAssets(
+  root: URL = ROOT,
+  check: boolean = CHECK,
+  foundStalePaths: string[] = stalePaths,
+): Promise<void> {
+  const version = await readVersion('packages/mcp/deno.json', root);
+  const readme = await Deno.readTextFile(new URL('packages/mcp/README.md', root));
+  const embedded = await buildMcpEmbeddedDocs(root);
   await write(
     'packages/mcp/src/publish-assets.generated.ts',
     `/** Version of the published MCP package. */
@@ -227,6 +237,9 @@ export const MCP_EMBEDDED_DOCS = ${JSON.stringify(embedded.documents)} as const;
 /** Release identity, cardinality, size, and integrity of the generated fallback prose. */
 export const MCP_EMBEDDED_DOCS_PROVENANCE = ${JSON.stringify(embedded.provenance)} as const;
 `,
+    root,
+    check,
+    foundStalePaths,
   );
 }
 
@@ -290,17 +303,41 @@ export const CORE_PACKAGE_VERSION: string = ${JSON.stringify(version)};
   }
 }
 
+/** Generation steps composed by the top-level publish-asset entrypoint. */
+export interface PublishAssetGenerationSteps {
+  readonly refreshProvenance: () => Promise<void>;
+  readonly generateMcp: () => Promise<void>;
+  readonly generateCli: () => Promise<void>;
+  readonly generateFreshUi: () => Promise<void>;
+  readonly generateCorePackages: () => Promise<void>;
+  readonly generatePlugins: () => Promise<void>;
+}
+
+/** Generate every publish asset through the same orchestration used by the command entrypoint. */
+export async function generatePublishAssets(
+  steps: PublishAssetGenerationSteps = {
+    refreshProvenance: () => refreshAgentDocsProvenance(),
+    generateMcp: () => generateMcpAssets(),
+    generateCli: () => generateCliAssets(),
+    generateFreshUi: () => generateFreshUiMetadata(),
+    generateCorePackages: () => generateCorePackageMetadata(),
+    generatePlugins: () => generatePluginMetadata(),
+  },
+): Promise<void> {
+  await steps.refreshProvenance();
+  await Promise.all([
+    steps.generateMcp(),
+    steps.generateCli(),
+    steps.generateFreshUi(),
+    steps.generateCorePackages(),
+    steps.generatePlugins(),
+  ]);
+}
+
 if (import.meta.main) {
   const unknownArgs = Deno.args.filter((arg) => arg !== '--check');
   if (unknownArgs.length > 0) throw new Error(`Unknown argument: ${unknownArgs[0]}`);
-  await Promise.all([
-    refreshAgentDocsProvenance(),
-    generateMcpAssets(),
-    generateCliAssets(),
-    generateFreshUiMetadata(),
-    generateCorePackageMetadata(),
-    generatePluginMetadata(),
-  ]);
+  await generatePublishAssets();
   if (stalePaths.length > 0) {
     throw new Error(
       `publish assets are stale: ${

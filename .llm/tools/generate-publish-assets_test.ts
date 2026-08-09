@@ -3,10 +3,14 @@ import { toFileUrl } from '@std/path';
 import { findVersionResidue } from './deps/bump-version.ts';
 import {
   buildMcpEmbeddedDocs,
+  generateMcpAssets,
+  generatePublishAssets,
   MCP_EMBEDDED_DOC_PATHS,
   MCP_EMBEDDED_DOCS_MAX_BYTES,
   refreshAgentDocsProvenance,
 } from './generate-publish-assets.ts';
+
+const NOOP_GENERATOR = async (): Promise<void> => {};
 
 Deno.test('MCP fallback is generated from the locked release prose within 256 KiB', async () => {
   const generated = await buildMcpEmbeddedDocs();
@@ -59,6 +63,74 @@ Deno.test('release asset regeneration removes prior-version provenance residue',
     );
     assertEquals(regenerated.version, '0.0.4-canary.1');
     assertEquals(regenerated.sourceCommit, 'd6265fa52');
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+Deno.test('top-level generation refreshes provenance before MCP reads it', async () => {
+  const root = await Deno.makeTempDir();
+  const rootUrl = toFileUrl(`${root}/`);
+  try {
+    await Promise.all([
+      Deno.mkdir(`${root}/packages/cli`, { recursive: true }),
+      Deno.mkdir(`${root}/packages/mcp/src`, { recursive: true }),
+      Deno.mkdir(`${root}/.llm/assets/agent-docs`, { recursive: true }),
+    ]);
+    await Promise.all([
+      Deno.writeTextFile(
+        `${root}/packages/cli/deno.json`,
+        JSON.stringify({ version: '0.0.5-canary.18' }),
+      ),
+      Deno.writeTextFile(
+        `${root}/packages/mcp/deno.json`,
+        JSON.stringify({ version: '0.0.5-canary.18' }),
+      ),
+      Deno.copyFile(
+        new URL('../../packages/mcp/README.md', import.meta.url),
+        `${root}/packages/mcp/README.md`,
+      ),
+      Deno.copyFile(
+        new URL('../assets/agent-docs/prose.json.gz', import.meta.url),
+        `${root}/.llm/assets/agent-docs/prose.json.gz`,
+      ),
+      Deno.writeTextFile(
+        `${root}/.llm/assets/agent-docs/provenance.json`,
+        `${
+          JSON.stringify(
+            {
+              schemaVersion: 1,
+              version: '0.0.4',
+              sourceCommit: 'stale-fixture',
+            },
+            null,
+            2,
+          )
+        }\n`,
+      ),
+    ]);
+
+    let provenanceRefreshed = false;
+    await generatePublishAssets({
+      refreshProvenance: async () => {
+        await refreshAgentDocsProvenance(rootUrl, false);
+        provenanceRefreshed = true;
+      },
+      generateMcp: async () => {
+        assert(provenanceRefreshed, 'MCP generation started before provenance refresh completed');
+        await generateMcpAssets(rootUrl, false, []);
+      },
+      generateCli: NOOP_GENERATOR,
+      generateFreshUi: NOOP_GENERATOR,
+      generateCorePackages: NOOP_GENERATOR,
+      generatePlugins: NOOP_GENERATOR,
+    });
+
+    const generated = await Deno.readTextFile(
+      `${root}/packages/mcp/src/publish-assets.generated.ts`,
+    );
+    assert(generated.includes("MCP_PACKAGE_VERSION: string = '0.0.5-canary.18'"));
+    assert(!generated.includes("MCP_PACKAGE_VERSION: string = '0.0.4'"));
   } finally {
     await Deno.remove(root, { recursive: true });
   }
