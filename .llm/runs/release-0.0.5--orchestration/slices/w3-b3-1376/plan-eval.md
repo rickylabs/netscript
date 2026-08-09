@@ -9,15 +9,46 @@ Product implementation remains prohibited until a fresh `PASS`.
 
 ## Findings
 
-1. **F1 — blocking:** the plan falsely attributed CLI/MCP version equality to
-   `generate-publish-assets.ts`, which reads the two manifests independently and compares nothing.
-   Re-attribute current equality to workspace bump plus residue/readiness checks, then lock a real
-   equality assertion or explicit decoupling policy with owning slice/files.
-2. **F2 — minor:** artifacts used `w3-b-1376`; consolidate on assigned `w3-b3-1376` and withdraw
-   the false absence report.
-3. **F3 — minor:** label the mismatched-version RED as compile-time and receipt RED as behavioral;
-   do not present them as equivalent.
-4. **F4 — minor:** decide whether policy denial writes a failure receipt.
+### F1 — blocking: claimed equality gate does not exist
+
+`plan.md` locked publish-assets generation as the release-equality authority, and `research.md`
+claimed it proved CLI/MCP equality. Inspection showed `.llm/tools/generate-publish-assets.ts` reads
+`packages/mcp/deno.json` and `packages/cli/deno.json` independently and compares nothing. Repo-wide
+search found no product or tooling assertion that `CLI_PACKAGE_VERSION === MCP_PACKAGE_VERSION`.
+
+The actual current equality mechanism is the workspace-wide release bump in
+`.llm/tools/deps/bump-version.ts` plus residue/readiness checks. Target contract 3 permits a real
+equality assertion or an explicitly decoupled stated policy. The plan had to select one, identify
+the owning slice and exact files, and avoid publishing a false claim in the MCP README.
+
+### F2 — minor: wrong slice directory
+
+Artifacts landed in `slices/w3-b-1376/`; the brief assigned `slices/w3-b3-1376/`. The drift log also
+misreported the assigned directory as absent. Consolidate on the canonical path.
+
+### F3 — minor: distinguish RED strength
+
+The mismatched-version host identity RED can initially fail only at compile time because the
+planned identity input and result fields do not exist. The receipt RED is behavioral on the
+baseline because `execute_command` is unwrapped and `record_drift` refuses. Evidence must label
+each class rather than present them as equivalent; standalone fallback is characterization.
+
+### F4 — minor: choose denial receipt behavior
+
+The plan said a denial “may” write a failure receipt. Both branches fail closed, but the plan must
+choose one before implementation.
+
+## Checks that passed cycle 1
+
+- #1375 separability is respected; no docs-root, host-config, environment, or corpus work.
+- The planned `run-agent-mcp.ts` edit is restricted to CLI version and executor injection.
+- Identity is executor-owned and shared by both command tools; the plan replaces `"current"` with
+  `CLI_PACKAGE_VERSION`.
+- Standalone execution is visible rather than accidental.
+- Mutating-verb safety is stated and checkable without changing the allow/deny set.
+- All ten live acceptance rows are quoted verbatim and mapped to slices.
+- The full gate set is named, including token-request-only serialized `scaffold.runtime`.
+- Five of six load-bearing research claims verified against the tree.
 
 ## Repair disposition
 
