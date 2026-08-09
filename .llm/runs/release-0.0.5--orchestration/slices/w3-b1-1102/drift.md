@@ -71,3 +71,55 @@ Drift is append-only.
   from the fallback selection. Do not alter the complete canonical prose mirror.
 - **Evidence:** generator pre-fix budget failure at 274,497 bytes; post-drift provenance reports
   253,511 bytes / 12 documents / source commit `399f60185`.
+
+## 2026-08-09 — IMPL-EVAL found the installed-corpus count lock was stale
+
+- **What:** D12 intentionally admits root `llms.txt`, so the generated host's installed filesystem
+  corpus contains exactly three documents in registry order: `llms`, `MANIFEST`, and
+  `pages/services-sdk/services`. The CLI test still expected two and omitted `llms`.
+- **Expected:** D12's `list_docs.documentCount` shift from 2 to 3 is locked by the generated-host
+  test, including the full ordered document list.
+- **Actual:** S2/S3 ran MCP-side adapter/evaluation tests but no CLI-side pair, so the count shift
+  described in the S2 worklog landed with a stale consumer assertion. S1's 20-test evidence
+  predated D12 and could not prove the later behavior.
+- **Severity:** blocking stale test expectation; production behavior is correct.
+- **Action:** keep the assertion exact at count 3 and add the complete `llms` row; run both
+  `agent-mcp-stdio_test.ts` and `init-agent_test.ts` together before re-evaluation.
+- **Evidence:** IMPL-EVAL `FAIL_FIX` at `fd9267906`; local pre-fix focused run exited 1 with 0 passed
+  / 1 failed, then the exact CLI pair exited 0 with 20 passed / 0 failed.
+
+## 2026-08-09 — MCP tool-contract file deepened existing A8 debt
+
+- **What:** `packages/mcp/src/domain/tool-contracts.ts` grew from the evaluator's 301-line baseline
+  to 367 lines while the A8/AP-1/F-1 cap is 300. The doctrine finding class already existed, so the
+  gate did not add a new row, but this slice deepened an over-cap file without recording it.
+- **Severity:** architecture debt, not a new doctrine finding.
+- **Action:** `DEBT_ACCEPTED` for this PR; a follow-up must split docs/guidance tool contracts from
+  the shared contract table without changing public schemas. The canonical debt registry carries
+  the same entry and closure gate.
+- **Evidence:** separate IMPL-EVAL comparison against `origin/main`; package-root doctrine output is
+  otherwise unchanged.
+
+## 2026-08-09 — Evaluation proves curated routes and corpus membership, not BM25 scoring
+
+- **What:** all five locked fixture intents activate a concept alias and `routeIndex` orders their
+  hard-coded semantic `routeHints` before the score comparator. The evaluator inverted the BM25
+  comparator in a scratch copy and all five rows still passed; reversing final route order failed.
+- **Impact:** the S3 evaluation legitimately proves curated intent routing, section parsing,
+  corpus membership, deterministic adapter parity, and citation order. It does not constrain or
+  validate BM25 scoring, so it must not be cited as scoring-quality evidence.
+- **Action:** carry this limitation into S4/S5 and the next evaluator handoff. A future scoring row
+  must avoid every `routeHint` if scoring itself is to become acceptance evidence.
+
+## 2026-08-09 — Retrieval coverage gaps carried into S4/S5
+
+- **Getting started:** `create a new NetScript project from scratch` currently ranks the
+  second-database driver-adapter section first. None of the five locked intents covers project
+  creation; this is a coverage gap, not a #1102 acceptance violation.
+- **Acceptance row 3:** the issue paraphrase `avoid hitting my service every render` still ranks
+  `pages/services-sdk/services#services-contracts` first instead of `pages/web-layer/query`. The
+  pre-fix miss remains post-fix, so row 3 is partial and must not be claimed complete.
+- **Docs scope wording:** S3 itself changed no `docs/site/**` files, but the branch includes two
+  planned docs-site changes from S1. Future comments must scope the no-docs-site statement to S3,
+  not the whole PR.
+- **Action:** record only; do not tune scoring or edit docs in this evaluator-fix slice.

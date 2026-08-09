@@ -120,6 +120,8 @@ the single shared indexer used by both adapters.
 | 2026-08-09 | S3    | Canonical refresh | Rebased without a merge onto `main@399f60185`. The approved builder ran from a fresh detached exact-revision checkout to a fresh output directory, exited 0, reported 170 pages / 36 deno-doc packages, and emitted provenance `399f60185`. Its second-database mirror contains the unsupported-Prisma heading plus application-owned and decision-rule child sections. No `docs/site/**` source was edited. |
 | 2026-08-09 | S3    | Budget drift      | The unchanged 13-document plan now measures 274,497 bytes because current sources beyond Prisma also grew. Preserved the 262,144 cap and all eight issue-required additions; removed only the prior generic quickstart page (no locked citation). Generated fallback is 253,511 bytes / 12 documents, +174,219 bytes and +7 net documents from the previous 79,292-byte / 5-document asset. |
 | 2026-08-09 | S3    | Evaluation        | Checked in five independent intents and 15 locked citations. Four rows assert exact ordered top three; Prisma asserts the unchanged unordered required set. Each row passes repeatably and byte-equally through generated embedded sources and a materialized filesystem corpus, including `llms#task-router`. Curated semantic heading/title routes are shared ranker policy, not adapter/query branches. |
+| 2026-08-09 | Eval  | IMPL-EVAL cycle 1 | `FAIL_FIX` at `fd9267906`: the intended D12 installed-corpus count changed from 2 to 3, but the exact CLI consumer assertion remained stale because S2/S3 did not rerun the CLI pair. The evaluator also required the deepened A8 file-size debt and retrieval-evidence limitations to be recorded. |
+| 2026-08-09 | Eval  | Repair            | Kept production behavior unchanged and corrected the exact installed registry assertion to three ordered rows (`llms`, `MANIFEST`, `pages/services-sdk/services`). The focused pre-fix test exited 1; the mandated two-file CLI run then exited 0 with 20 passed / 0 failed. Recorded the 301 → 367 line A8 debt and explicitly narrowed S3 evidence to curated routing/corpus/parity rather than BM25 scoring. |
 
 ## Gate Results
 
@@ -153,6 +155,11 @@ the single shared indexer used by both adapters.
 | S3 MCP publish dry-run       | PASS                        | exit 0; package import boundary and published source graph accepted                                      |
 | S3 aggregate quality gate    | PASS / NON-DECISIVE         | `deno task quality:gate`, exit 0; scanner roots omit `packages/mcp`, so explicit package gates above remain decisive |
 | S3 aggregate architecture    | PASS / NON-DECISIVE         | `deno task arch:check`, exit 0; configured roots omit `packages/mcp` under #1403                         |
+| IMPL-EVAL cycle 1            | FAIL_FIX                    | separate Claude · Fable 5 verdict at `fd9267906`; stale exact CLI count assertion plus required records |
+| Evaluator-fix pre-red        | EXPECTED FAIL               | focused installed-corpus test exit 1; 0 passed / 1 failed / 18 filtered; expected 2 but D12 returned 3  |
+| Evaluator-fix CLI pair       | PASS                        | exact requested command exit 0; 20 passed / 0 failed (19 init + 1 real CLI stdio)                       |
+| Evaluator-fix scoped check   | PASS                        | exit 0; one selected file, zero failed batches, `--no-lock`; wrapper supplies `--unstable-kv`           |
+| Evaluator-fix lint / format  | PASS                        | exit 0 each; one selected file, zero findings                                                           |
 
 ## Handoff Notes
 
@@ -164,3 +171,12 @@ the single shared indexer used by both adapters.
 - Verify every test in the failure matrix has the stated behavioral or compile-time pre-fix red.
 - Treat root `quality:gate`/`arch:check` as non-decisive for MCP; require explicit package roots.
 - Do not interpret retrieval evaluation as #1090 adoption evidence.
+- Do not interpret the five locked evaluation rows as BM25-scoring evidence: all are covered by
+  curated `routeHints`. They prove the curated routing table, corpus membership, citations, and
+  adapter parity. Getting-started remains uncovered, and acceptance row 3 remains partial for the
+  issue's `avoid hitting my service every render` paraphrase.
+- The 301 → 367 line growth of `packages/mcp/src/domain/tool-contracts.ts` deepens existing A8 debt;
+  the accepted follow-up and closure gate are in `.llm/harness/debt/arch-debt.md`.
+- The first evaluator-fix check invocation redundantly supplied `--unstable-kv`, which the wrapper
+  already adds; Deno exited 1 before diagnostics. The corrected decisive command omitted the
+  duplicate, exited 0, and selected the same test file with zero failed batches.

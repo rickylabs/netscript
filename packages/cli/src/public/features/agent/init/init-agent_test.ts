@@ -713,8 +713,13 @@ Deno.test("generated project search_docs reaches its installed corpus after host
       arguments: {},
     });
     assertEquals(listed.result.structuredContent, {
-      count: 2,
+      count: 3,
       docs: [
+        {
+          slug: "llms",
+          title: "NetScript",
+          description: "",
+        },
         {
           slug: "MANIFEST",
           title: "MANIFEST",
@@ -729,7 +734,7 @@ Deno.test("generated project search_docs reaches its installed corpus after host
       corpus: {
         kind: "filesystem",
         root: join(root, ".netscript", "docs"),
-        documentCount: 2,
+        documentCount: 3,
       },
     });
   } finally {

@@ -20,7 +20,10 @@ and focused red-to-green tests. S2 adds the one shared section parser/index/rank
 fenced/Vento code citations, direct internal-link routing, corpus composition, and D12 filesystem
 source admission. S3 now refreshes the canonical release corpus at repaired `main@399f60185`,
 selects the bounded intent destinations, and proves the locked evaluation through embedded and
-materialized-filesystem adapters.
+materialized-filesystem adapters. IMPL-EVAL cycle 1 returned `FAIL_FIX` at `fd9267906` because the
+installed-corpus CLI assertion still expected two documents after D12 intentionally added `llms`.
+The evaluator repair preserves production behavior, locks the exact three-row registry, records
+the deepened A8 debt, and narrows the evaluation claim to what the fixtures actually constrain.
 
 ## Completed
 
@@ -47,16 +50,24 @@ materialized-filesystem adapters.
   checkout/output with truthful provenance and confirmed the formerly missing Prisma sections.
 - Proved all five locked S3 rows repeatably and byte-equally across generated embedded and
   materialized filesystem adapters; the full MCP suite is 132/132 green.
+- Reproduced the stale installed-corpus assertion as a focused pre-fix failure, corrected it to the
+  exact ordered three-document registry, and ran the mandated CLI pair green at raw exit 0 with
+  20 passed / 0 failed.
+- Recorded that the locked fixtures prove curated `routeHints`, corpus membership, citations, and
+  adapter parity but do not constrain BM25 scoring; recorded the getting-started gap and partial
+  acceptance-row-3 paraphrase without tuning the locked evaluation.
+- Recorded `tool-contracts.ts` growth from the evaluator's 301-line baseline to 367 lines as
+  accepted A8 debt with a package follow-up and closure gate.
 
 ## In Progress
 
-- S1 and S2 are committed/pushed/commented. S3 implementation and gates are complete pending its
-  commit/push/PR comment.
+- S1, S2, and S3 are committed/pushed/commented. The IMPL-EVAL cycle-1 repair is complete; the
+  branch awaits orchestrator-owned re-evaluation and CI after its evidence comment.
 
 ## Next Steps
 
-1. Commit/push/comment S3 with its exact corpus/gate evidence.
-2. Stop for orchestrator-owned separate-session IMPL-EVAL/CI; do not start an Aspire/runtime suite
+1. Orchestrator reruns the mandatory separate-session IMPL-EVAL and owns CI/merge disposition.
+2. Do not start an Aspire/runtime suite
    without a durable token grant.
 
 ## Key Decisions
@@ -85,10 +96,10 @@ cap without changing any locked citation.
 
 | Gate family | Current status             | Evidence                                                        |
 | ----------- | -------------------------- | --------------------------------------------------------------- |
-| Static      | PASS through S2            | 131 package tests; scoped check/lint/fmt; source quality exit 0   |
+| Static      | PASS through S3 + fix      | 132 MCP tests; evaluator-fix CLI pair 20/20; scoped gates green   |
 | Fitness     | Known pre-existing failure | doctrine exit 1 only for #1403 baseline; no new warning remains  |
-| Runtime     | NOT_RUN                    | no implementation; no AppHost/container started                 |
-| Consumer    | Partial PASS               | D12 adapter parity passes; installed-corpus stdio remains S4     |
+| Runtime     | NOT_RUN                    | no AppHost/container started; serialized token not granted       |
+| Consumer    | PASS for D12 paths         | embedded, materialized filesystem, and installed-corpus stdio    |
 
 ## Open Questions
 
@@ -101,7 +112,9 @@ cap without changing any locked citation.
 - Drift: #1375's bounded fallback omits four required destination families and its canonical prose
   predates the unsupported-driver section. S3 refreshes and selects through its existing approved
   generator-owned chain; no second corpus path is introduced.
-- Debt: none created; existing cardinality/slow-type warnings remain explicit baseline findings.
+- Debt: `packages/mcp/src/domain/tool-contracts.ts` deepened the existing A8 file-size warning from
+  the evaluator's 301-line baseline to 367 lines. The canonical registry accepts this for #1404
+  and requires a role-named contract split before the next MCP public-tool expansion.
 
 ## Commits
 
@@ -111,3 +124,7 @@ cap without changing any locked citation.
 - `271428de5` — cycle-1 PLAN-EVAL repair: D12, dual-adapter/installed-corpus gates, reproducible F4
   sweep, and unordered Prisma top-three constraint.
 - `b9692f93d` — merge current `main@3ce91f2c2` before authorized implementation.
+- `ec5c7446a` — S1 public contract, enumerable flow shell, activation text, and planned docs changes.
+- `26176a608` — S2 shared intent ranker, citations/link routing, and D12 filesystem policy.
+- `5e3b58b67` — record the canonical-corpus source blocker without a workaround.
+- `fd9267906` — S3 canonical corpus refresh, bounded embedded selection, and locked dual-adapter evaluation.

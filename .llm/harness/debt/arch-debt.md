@@ -2204,3 +2204,19 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Status:** open — explicitly out of scope for #1158, which must not change product defaults.
 - **Gate:** Close when the default cache backend either gains a Docker-less fallback arm (as
   `Garnet`/`Auto` has) or is changed with a recorded owner decision and a release canary.
+
+## packages/mcp — guidance contracts deepen over-cap tool-contract table (`mcp-tool-contracts-a8-1102`)
+
+- **Reason:** PR #1404 adds the public `find_guidance` schemas to
+  `src/domain/tool-contracts.ts`, deepening the evaluator-counted file from 301 to 367 lines against
+  the 300-line A8/AP-1/F-1 cap. The same doctrine warning already exists on `origin/main`, so the
+  package-root verdict adds no new finding, but growth inside an over-cap file is still debt.
+- **Owner:** MCP contract-surface follow-up.
+- **Target:** Before the next MCP public-tool expansion.
+- **Linked plan:** `.llm/runs/release-0.0.5--orchestration/slices/w3-b1-1102/plan.md`; issue #1102;
+  PR #1404.
+- **Created:** 2026-08-09
+- **Status:** open, DEBT_ACCEPTED for #1404; recorded after IMPL-EVAL cycle 1.
+- **Gate:** Split docs/guidance input and output schemas into one role-named domain module consumed
+  by the central contract registry; package tests, scoped gates, public schema parity, doctrine,
+  doc-lint, and publish dry-run must remain green.
