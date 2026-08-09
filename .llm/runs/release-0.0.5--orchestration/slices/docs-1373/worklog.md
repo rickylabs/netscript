@@ -66,3 +66,16 @@ Aspire, containers, CLI E2E, lockfile mutation, or manifest mutation was used.
 
 Commits: S0 `6141fa1db`, S1 `67318df09`, S2
 `bc1e1e985117f5460c18788cb13a254f54a5fd38`. S3 records final gates and handoff state.
+
+## CI correction
+
+- Reproduced `quickstart-command-drift_test.ts` at raw exit 1: the published command included
+  `--with-client`, while `QUICKSTART_DOCUMENTED_COMMANDS` did not.
+- Updated both the exact documented-command contract and the separately constructed executable
+  `quickstart.service-add` gate. Strengthened the walk-suite unit test to require
+  `--with-client` in the actual gate command.
+- Drift + walk-suite presentation tests: PASS, raw exit 0; 6 passed / 0 failed.
+- Focused check, lint, and format: PASS, raw exit 0 for each; 2 files.
+- The real `quickstart.walk` starts Aspire and containers. It was not run because this slice has no
+  serialized runtime-token grant; the already-granted boundary cannot be inferred from green unit
+  construction tests.
