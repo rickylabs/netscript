@@ -15,7 +15,7 @@
 Research and the ordered plan are complete against live issue #1375 and baseline `aa8e151e6`.
 Draft PR #1401 is open against `main`; its closing keyword is intentionally withheld until all
 eleven rows have evidence. Separate Claude/Fable PLAN-EVAL passed in comment `5229304606`. F1-F4
-are incorporated. No product source or test implementation has begun; S1 RED is next.
+are incorporated. S1 behavioral RED is recorded; S2 product implementation is next.
 
 ## Completed
 
@@ -27,13 +27,13 @@ are incorporated. No product source or test implementation has begun; S1 RED is 
 
 ## In progress
 
-- Lifecycle transition to `status:impl`, then S1 behavioral RED.
+- S2 generated fallback, probe selection, and corpus observability.
 
 ## Next steps
 
-1. Move issue #1375 and PR #1401 to `status:impl` with the implementation-start phase comment.
-2. Implement S1 RED tests and record raw expected failures before product code.
-3. Implement one slice at a time with push/comment/worklog reconciliation.
+1. Commit, push, and comment the test-only S1 RED slice.
+2. Implement S2 generated fallback, probe selection, and corpus observability.
+3. Run S1 MCP/registry tests GREEN plus new generator/adapter tests before the S2 commit.
 
 ## Key decisions
 

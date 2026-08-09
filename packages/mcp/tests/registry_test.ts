@@ -15,6 +15,24 @@ Deno.test('registry enumerates the complete v1 contract surface', () => {
   }
 });
 
+Deno.test('list_docs output schema requires observable corpus health metadata', () => {
+  const schema = TOOL_OUTPUT_SCHEMAS.list_docs.jsonSchema as {
+    readonly required?: readonly string[];
+    readonly properties?: Readonly<Record<string, unknown>>;
+  };
+  assert(schema.required?.includes('corpus'));
+  assertEquals(schema.properties?.corpus, {
+    type: 'object',
+    properties: {
+      kind: { enum: ['filesystem', 'embedded'] },
+      root: { type: ['string', 'null'] },
+      documentCount: { type: 'integer' },
+    },
+    required: ['kind', 'root', 'documentCount'],
+    additionalProperties: false,
+  });
+});
+
 Deno.test('contracts reject malformed required fields, types, bounds, and extra keys', () => {
   const invalid: Array<[keyof typeof TOOL_INPUT_SCHEMAS, unknown]> = [
     ['get_run', {}],
