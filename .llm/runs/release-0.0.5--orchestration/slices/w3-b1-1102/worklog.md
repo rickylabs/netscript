@@ -113,6 +113,9 @@ the single shared indexer used by both adapters.
 | 2026-08-09 | Plan  | PLAN-EVAL cycle 2 | `PASS` from a fresh separate Claude · Fable 5 session; implementation authorized with D12, three-path `llms` proof, package-scoped decisive gates, and serialized AppHost/container token conditions binding.                                                                                                    |
 | 2026-08-09 | S1    | Contract          | Added the 22nd read-only `find_guidance` tool, finite public guidance vocabulary, strict Standard Schemas, bounded flow shell, vertical docs domain/application folders, and synchronized count references. Retrieval and corpus admission remain S2.                                                          |
 | 2026-08-09 | S1    | Proof             | Focused MCP tests: 28 passed / 0 failed; CLI/init tests: 20 passed / 0 failed; scoped MCP check selected 108 files with 0 failed batches; scoped lint/fmt and `check:publish-assets` each exit 0. The first lint invocation without package config failed before linting because Deno 2.9 rejected the root workspace shape; rerun with `--config packages/mcp/deno.json` was decisive and green. |
+| 2026-08-09 | S2    | Retrieval         | Extended the one `DocsCorpusPort`; both adapters use the same immutable section parser/index/ranker with locked BM25/boost constants, finite concepts, fenced/Vento code citations, deterministic ties, bounded fallback, and direct one-hop link routing. A link-removal control proves prerequisite routing changes rank. |
+| 2026-08-09 | S2    | D12 policy        | Async/sync filesystem discovery now admits public `.md` plus only root-relative `llms.txt`, canonicalized through the same `.md`/`.txt` normalizer used by embedded inputs. Tests reject `llms-full.txt`, nested `config.txt`, nested `llms.txt`, and arbitrary text. This intentionally increases `list_docs.corpus.documentCount` by one when root `llms.txt` exists. Generator parity remains S3. |
+| 2026-08-09 | S2    | Proof             | Full MCP package: 131 passed / 0 failed; focused source/retrieval group: 29 passed / 0 failed; scoped check/lint/fmt selected 114 files with zero failures/findings. Explicit package-source quality exit 0, zero findings/allowances. Explicit doctrine exit 1 only for #1403's pre-existing A14 failure plus three existing warnings/info; a transient new 410-line warning was eliminated before commit by splitting parser/ranker/result files. |
 
 ## Gate Results
 
@@ -129,6 +132,11 @@ the single shared indexer used by both adapters.
 | S1 scoped MCP check          | PASS                        | exit 0; 108 selected files, 0 failed batches, `--no-lock`                                                |
 | S1 scoped MCP lint / format  | PASS                        | exit 0 with package config; 108 files, 0 findings                                                        |
 | S1 publish-asset freshness   | PASS                        | `deno task check:publish-assets`, exit 0                                                                 |
+| S2 full MCP tests            | PASS                        | exit 0; 131 passed, 0 failed                                                                             |
+| S2 focused retrieval/policy  | PASS                        | exit 0; 29 passed, 0 failed                                                                              |
+| S2 scoped check/lint/format  | PASS                        | exit 0; 114 selected files, zero failed batches/findings                                                 |
+| S2 explicit source quality   | PASS                        | exit 0; `packages/mcp/src`, zero findings and allowances                                                 |
+| S2 explicit doctrine         | PRE-EXISTING FAIL           | exit 1; #1403 baseline only, no new finding: A14 foreign test plus 3 WARN / 1 INFO                         |
 | Aspire/container gates       | NOT_RUN                     | no token requested; no AppHost/container started                                                        |
 
 ## Handoff Notes

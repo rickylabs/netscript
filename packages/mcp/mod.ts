@@ -144,7 +144,6 @@ export {
   GUIDANCE_STAGES,
 } from './src/domain/docs/guidance-contract.ts';
 export type {
-  DocsGuidancePort,
   GuidanceCodeExcerpt,
   GuidanceConfidence,
   GuidanceLinkRelation,

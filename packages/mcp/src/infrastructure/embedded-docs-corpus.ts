@@ -4,14 +4,11 @@ import {
   type DocsSearchMatch,
   type DocsSummary,
   MAX_INDEXED_DOC_LENGTH,
+  normalizeDocsSlug,
 } from '../domain/docs/docs-corpus-port.ts';
-import {
-  normalizeSlug,
-  processDocsSources,
-  rankDocument,
-  tokenize,
-  toSummary,
-} from './filesystem-docs-corpus.ts';
+import { GuidanceIndex } from '../domain/docs/guidance-index.ts';
+import type { GuidanceResult } from '../domain/docs/guidance-contract.ts';
+import { processDocsSources, rankDocument, tokenize, toSummary } from './filesystem-docs-corpus.ts';
 
 /** One Markdown asset shipped with the package. */
 export interface EmbeddedDocsSource {
@@ -33,6 +30,7 @@ export interface EmbeddedDocsCorpusOptions {
 export class EmbeddedDocsCorpus implements DocsCorpusPort {
   readonly #documents: ReadonlyMap<string, DocsDocument>;
   readonly #aliases: ReadonlyMap<string, string>;
+  readonly #guidance: GuidanceIndex;
 
   /** Parse the supplied package assets once at composition time. */
   constructor(options: EmbeddedDocsCorpusOptions) {
@@ -40,6 +38,7 @@ export class EmbeddedDocsCorpus implements DocsCorpusPort {
     const { documents, aliases } = processDocsSources(options.documents, maxLength);
     this.#documents = documents;
     this.#aliases = aliases;
+    this.#guidance = new GuidanceIndex(documents.values());
   }
 
   /** List embedded document summaries in stable slug order. */
@@ -66,7 +65,7 @@ export class EmbeddedDocsCorpus implements DocsCorpusPort {
 
   /** Retrieve an embedded document by normalized slug or alias. */
   get(slug: string): Promise<DocsDocument | undefined> {
-    const normalized = normalizeSlug(slug);
+    const normalized = normalizeDocsSlug(slug);
     const canonicalSlug = this.#aliases.get(normalized) ?? normalized;
     const document = this.#documents.get(canonicalSlug);
     if (!document) return Promise.resolve(undefined);
@@ -74,5 +73,10 @@ export class EmbeddedDocsCorpus implements DocsCorpusPort {
       return Promise.resolve({ ...document, redirectedFrom: normalized });
     }
     return Promise.resolve(document);
+  }
+
+  /** Resolve embedded section-level guidance through the shared index. */
+  findGuidance(intent: string): Promise<GuidanceResult> {
+    return Promise.resolve(this.#guidance.find(intent));
   }
 }

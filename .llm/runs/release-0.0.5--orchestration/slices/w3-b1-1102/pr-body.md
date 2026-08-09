@@ -16,7 +16,7 @@ passed; S1 establishes the public contract and enumerable bounded flow shell.
 
 - [x] Plan — live issue re-baseline, contract/design, failure matrix, gates
 - [x] S1 Public `find_guidance` contract and enumerable flow
-- [ ] S2 Shared section index, concept aliases, code/link routing, root `llms.txt` source policy
+- [x] S2 Shared section index, concept aliases, code/link routing, root `llms.txt` source policy
 - [ ] S3 Dual-adapter release-corpus top-k evaluation and parity/budget
 - [ ] S4 MCP/generated-agent activation and installed-corpus real CLI stdio
 - [ ] S5 Public docs, package gates, serialized merge-readiness handoff
@@ -32,6 +32,12 @@ passed; S1 establishes the public contract and enumerable bounded flow shell.
 - Scoped MCP check — exit 0; 108 files selected, 0 failed batches, `--no-lock`.
 - Scoped MCP lint/format — exit 0; 108 files, 0 findings using the package config.
 - `deno task check:publish-assets` — exit 0.
+- S2 full MCP tests — exit 0; 131 passed, 0 failed.
+- S2 focused retrieval/source-policy tests — exit 0; 29 passed, 0 failed.
+- Explicit `scan-code-quality --root packages/mcp/src` — exit 0; no findings or allowances.
+- Explicit doctrine — exit 1 only for the pre-existing #1403 baseline (one foreign Jest/Vitest
+  global failure, three existing cardinality/file-size warnings, one architecture-doc info); the
+  S2 parser/ranker files add no warning.
 - `quality:gate` and root `arch:check` are explicitly non-decisive for `packages/mcp`; the plan
   names explicit package-root scanner/doctrine commands.
 - No AppHost/container run was started and no serialized token was requested.

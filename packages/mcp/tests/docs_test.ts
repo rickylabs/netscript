@@ -215,7 +215,7 @@ Deno.test('stdio composition preserves environment precedence over an indexable 
   }
 });
 
-Deno.test('CLI composition defaults list, search, and get to package-shipped docs', async () => {
+Deno.test('CLI composition defaults every docs flow to package-shipped docs', async () => {
   const server = createMcpCliServer({ projectRoot: fixtureRoot });
   const list = await server.handle({
     jsonrpc: '2.0',
@@ -245,6 +245,18 @@ Deno.test('CLI composition defaults list, search, and get to package-shipped doc
     params: { name: 'get_doc', arguments: { slug: 'mcp' } },
   });
   assertEquals((get?.result?.structuredContent as { slug: string }).slug, 'mcp');
+
+  const guidance = await server.handle({
+    jsonrpc: '2.0',
+    id: 13,
+    method: 'tools/call',
+    params: { name: 'find_guidance', arguments: { intent: 'diagnose app telemetry' } },
+  });
+  assertGreater(
+    (guidance?.result?.structuredContent as { recommendations: readonly unknown[] })
+      .recommendations.length,
+    0,
+  );
 });
 
 Deno.test('CLI composition makes installed help symptoms reachable through MCP docs', async () => {
@@ -305,6 +317,7 @@ Deno.test('unexpected corpus failures remain bounded structured tool errors', as
     list: () => Promise.reject(new Error('adapter secret detail')),
     search: () => Promise.reject(new Error('adapter secret detail')),
     get: () => Promise.reject(new Error('adapter secret detail')),
+    findGuidance: () => Promise.reject(new Error('adapter secret detail')),
   });
 
   for (

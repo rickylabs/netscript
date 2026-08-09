@@ -16,7 +16,9 @@ Research and contract-first design are complete. A separate Claude · Fable 5 PL
 returned `PASS`, authorizing implementation. The branch incorporated `main@3ce91f2c2` at
 `b9692f93d`; the recovered worktree was clean there. S1 now adds the 22nd read-only MCP contract,
 `find_guidance`, its bounded flow shell, vertical docs folders, count-synchronized public surfaces,
-and focused red-to-green tests. Retrieval, D12 source admission, and adapter composition remain S2.
+and focused red-to-green tests. S2 adds the one shared section parser/index/ranker, concept aliases,
+fenced/Vento code citations, direct internal-link routing, corpus composition, and D12 filesystem
+source admission. The locked real release-corpus evaluation and generator parity remain S3.
 
 ## Completed
 
@@ -35,15 +37,20 @@ and focused red-to-green tests. Retrieval, D12 source admission, and adapter com
 - Received PLAN-EVAL cycle 2 `PASS`; moved issue #1102 and PR #1404 to exactly `status:impl`.
 - Proved S1 with 28 focused MCP tests, 20 CLI/init tests, a 108-file scoped MCP check, scoped lint
   and format, and publish-asset freshness, all at raw exit 0.
+- Proved S2 with all 131 MCP package tests, 29 focused retrieval/source-policy tests, a 114-file
+  scoped check/lint/fmt, and zero explicit package-source quality findings. The explicit doctrine
+  gate still exits 1 only for the recorded pre-existing #1403 findings; the new 410-line warning
+  seen during development was removed by splitting parser/ranker/result roles below 300 lines.
 
 ## In Progress
 
-- S1 is ready to commit/push/comment to draft PR #1404 before S2 begins.
+- S2 is ready to commit/push/comment to draft PR #1404 before the canonical corpus refresh in S3.
 
 ## Next Steps
 
-1. Commit, push, and comment S1 with its raw gate evidence.
-2. Implement S2 without changing the locked evaluation ordering or required set.
+1. Commit, push, and comment S2 with its raw gate evidence and explicit `list_docs.documentCount`
+   disclosure.
+2. Refresh/select the approved corpus and run the unchanged locked evaluation in S3.
 3. Commit/push/comment each slice independently; request the serialized gate only after non-Aspire
    gates are green.
 
@@ -59,18 +66,20 @@ and focused red-to-green tests. Retrieval, D12 source admission, and adapter com
 
 ## Files Changed
 
-S1 changes the MCP public contract/registry, docs feature folders and tests, synchronized tool-count
-references, the generator-owned MCP publish asset, two count assertions in CLI tests, and these run
-artifacts. No retrieval or corpus-source behavior is implemented before S2.
+S1 changes the public contract and count surfaces. S2 changes the shared docs port and both adapters,
+adds the pure parser/ranker/result policy and focused tests, composes `find_guidance` into the CLI,
+and intentionally adds root `llms.txt` to filesystem `search_docs`, `list_docs`, `get_doc`, and
+`find_guidance`. Consequently `list_docs.corpus.documentCount` increases by one when that file is
+present; `llms-full.txt` and nested/arbitrary text files remain excluded.
 
 ## Gates
 
 | Gate family | Current status             | Evidence                                                        |
 | ----------- | -------------------------- | --------------------------------------------------------------- |
-| Static      | PASS for S1                | focused tests/check/lint/fmt and asset freshness, raw exit 0     |
-| Fitness     | Baseline audit complete    | research F10; implementation package gates pending              |
+| Static      | PASS through S2            | 131 package tests; scoped check/lint/fmt; source quality exit 0   |
+| Fitness     | Known pre-existing failure | doctrine exit 1 only for #1403 baseline; no new warning remains  |
 | Runtime     | NOT_RUN                    | no implementation; no AppHost/container started                 |
-| Consumer    | Partial PASS               | current CLI/init count tests pass; D12 behavior remains S2/S4    |
+| Consumer    | Partial PASS               | D12 adapter parity passes; installed-corpus stdio remains S4     |
 
 ## Open Questions
 

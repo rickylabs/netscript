@@ -96,9 +96,3 @@ export interface GuidanceResult {
   /** Whether flow-level bounds removed or shortened content. */
   readonly truncated: boolean;
 }
-
-/** Intent-aware documentation capability consumed by the public guidance flow. */
-export interface DocsGuidancePort {
-  /** Resolve deterministic section guidance for a natural-language task. */
-  findGuidance(intent: string): Promise<GuidanceResult>;
-}

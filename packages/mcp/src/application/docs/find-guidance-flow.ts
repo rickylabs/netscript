@@ -1,6 +1,5 @@
 import { isRecord } from '../../domain/schema.ts';
 import {
-  type DocsGuidancePort,
   GUIDANCE_DEFAULT_RECOMMENDATIONS,
   GUIDANCE_MAX_CODE_CHARACTERS,
   GUIDANCE_MAX_CODE_EXCERPTS_PER_RECOMMENDATION,
@@ -15,10 +14,14 @@ import {
   type GuidanceRelatedLink,
   type GuidanceResult,
 } from '../../domain/docs/guidance-contract.ts';
+import {
+  type DocsCorpusPort,
+  DocsCorpusUnavailableError,
+} from '../../domain/docs/docs-corpus-port.ts';
 import type { ToolExecutionResult, ToolFlow } from '../../domain/tool-types.ts';
 
 /** Create the bounded intent-aware documentation flow. */
-export function createFindGuidanceFlow(port: DocsGuidancePort): ToolFlow {
+export function createFindGuidanceFlow(port: Pick<DocsCorpusPort, 'findGuidance'>): ToolFlow {
   return async (input: unknown): Promise<ToolExecutionResult> => {
     if (!isRecord(input) || typeof input.intent !== 'string') {
       return invalidInput('intent must be a non-empty string');
@@ -42,7 +45,10 @@ export function createFindGuidanceFlow(port: DocsGuidancePort): ToolFlow {
       : requestedLimit as number;
     try {
       return { ok: true, value: boundGuidanceResult(await port.findGuidance(intent), limit) };
-    } catch {
+    } catch (error) {
+      if (error instanceof DocsCorpusUnavailableError) {
+        return { ok: false, error: { code: error.code, message: error.message } };
+      }
       return {
         ok: false,
         error: {
