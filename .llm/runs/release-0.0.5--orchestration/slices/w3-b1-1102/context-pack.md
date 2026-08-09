@@ -12,11 +12,11 @@
 
 ## Current State
 
-The separate Claude · Fable 5 continuation PLAN-EVAL passed at `71c0a29c2`. S4A retrieval closure
-and S4B activation are implemented and green. The real no-AppHost public CLI path now runs
-`agent init --with-docs`, installs activation guidance, starts MCP against `.netscript/docs`, and
-returns rank-1 `llms#task-router`. The original five rows / 15 citations and 12-document
-253,535-byte corpus remain unchanged.
+The separate Claude · Fable 5 continuation PLAN-EVAL passed at `71c0a29c2`. S4A retrieval closure,
+S4B activation, and S5 public docs are implemented and green. The real public CLI installed-corpus
+path returns rank-1 `llms#task-router`; the original five rows / 15 citations and 12-document
+253,535-byte corpus remain unchanged. The granted one-pass runtime suite finished at raw exit 0
+with 79 passed, 0 failed, and only the two expected #1398 skips. Separate-session IMPL-EVAL remains.
 
 ## Completed
 
@@ -51,18 +51,23 @@ returns rank-1 `llms#task-router`. The original five rows / 15 citations and 12-
   acceptance-row-3 paraphrase without tuning the locked evaluation.
 - Recorded `tool-contracts.ts` growth from the evaluator's 301-line baseline to 367 lines as
   accepted A8 debt with a package follow-up and closure gate.
+- Added a genuine render/request phrase family plus two unquoted retrieval paraphrases, a
+  getting-started route through `llms`, and a zero-route-hint score discriminator whose scratch
+  comparator inversion fails.
+- Activated `find_guidance` across MCP initialize instructions, generated `AGENTS.md`, consumer
+  skills, installed-corpus stdio, and all three public docs surfaces.
+- Completed every non-Aspire gate, the exact granted runtime suite, and both leak-check brackets.
 
 ## In Progress
 
-- S4B is ready to commit/push/comment after the exact CLI pair passed 20/20, the combined activation
-  group passed 21/21, scoped 135-file gates passed, and generated skills reproduced. S5 public docs
-  and full non-Aspire evidence are next.
+- No implementation work remains. Await owner-run separate-session IMPL-EVAL, CI, and merge
+  decision; this implementation session does not self-certify or mark the PR ready.
 
 ## Next Steps
 
-1. Commit/push/comment S5 with all non-Aspire evidence and the durable `EXPENSIVE-GATE-REQUEST`.
-2. Stop until the orchestrator commits a serialized runtime-token grant. Then run the exact
-   one-pass scaffold runtime command bracketed by leak checks; do not run a focused substitute.
+1. Commit/push/comment the exact runtime and leak evidence.
+2. Stop for the owner-run separate-session IMPL-EVAL. Add `Closes #1102` and check DoD rows only
+   after that evaluator confirms all seven acceptance rows.
 
 ## Key Decisions
 
@@ -96,14 +101,14 @@ the plaintext embed.
 | ----------- | -------------------------- | --------------------------------------------------------------- |
 | Static      | PASS through S5             | 134 MCP tests; CLI pair 20/20; JSR failures=0; scoped gates green |
 | Fitness     | Known pre-existing failure | doctrine exit 1 only for #1403 baseline; no new warning remains  |
-| Runtime     | TOKEN_REQUESTED            | no AppHost/container started; awaiting durable grant              |
+| Runtime     | PASS                       | raw exit 0; 79 passed / 0 failed / 2 expected #1398 skips; 81 total |
 | Consumer    | PASS for D12 paths         | embedded, materialized filesystem, and installed-corpus stdio    |
 
 ## Open Questions
 
-- No implementation decision remains open. The serialized runtime verdict and separate-session
-  IMPL-EVAL remain owner-controlled. Any change to locked rows, cap, selection, or ranking constants
-  still requires recorded drift and evaluator approval.
+- No implementation decision remains open. Separate-session IMPL-EVAL, CI, and merge remain
+  owner-controlled. Any change to locked rows, cap, selection, or ranking constants still requires
+  recorded drift and evaluator approval.
 
 ## Drift and Debt
 
@@ -128,4 +133,6 @@ the plaintext embed.
 - `fd9267906` — S3 canonical corpus refresh, bounded embedded selection, and locked dual-adapter evaluation.
 - `99d753e0a` — S4A retrieval gaps, additive evaluation rows, and score-mutation discriminator.
 - `5414bf5b9` — S4B activation across MCP/generated guidance/skills and real installed-corpus stdio.
-- S5 commit — public docs, generated README asset, all non-Aspire close gates, token request.
+- `93fd65adf` — S5 public docs, generated README asset, all non-Aspire close gates, token request.
+- `c52fee4e5` — exact root publish-manifest mutation forensics and clean-tree evidence.
+- Runtime evidence commit — exact one-pass result and post-run leak artifact.

@@ -5,14 +5,15 @@ closes two retrieval gaps found by IMPL-EVAL, then activates `find_guidance` bef
 implementation work across MCP initialization, generated agent guidance, consumer skills, and the
 real installed-corpus CLI stdio path, and finally aligns public docs and release evidence.
 
-The separate-session PLAN-EVAL passed. S4A and S4B are implemented; S5 documentation and the full
-non-Aspire close-gate set remain before the serialized runtime-token request.
+The separate-session PLAN-EVAL passed. S4A, S4B, and S5 are implemented; every non-Aspire gate and
+the granted exact one-pass runtime proof are complete. Separate-session IMPL-EVAL remains.
 
 ## Scope
 
 - Archetype / area: A6 CLI/tooling · `packages/mcp` · CLI agent guidance · docs overlay
 - Refs #1102
-- `Closes #1102` is intentionally deferred until every acceptance row has implementation evidence.
+- All seven implementation rows have evidence. `Closes #1102` is intentionally deferred until the
+  separate-session IMPL-EVAL confirms them, per the locked close gate.
 - Observed usage/adoption remains exclusively #1090; deterministic retrieval tests are not adoption.
 
 ## Planned slices
@@ -52,13 +53,16 @@ non-Aspire close-gate set remain before the serialized runtime-token request.
 - Explicit MCP doctrine: raw exit 1 on the exact pre-existing inventory (A14 fail, three warnings,
   one info). The plan requires zero delta and does not call this green or repair #1403 debt.
 - Root quality/architecture aggregates are non-decisive for MCP under #1403.
+- Serialized runtime: raw exit 0; `passed=79 failed=0 skipped=2`, 81 total. Both skips are the
+  expected #1398 telemetry pair; pre/post leak checks found no run-owned survivor.
 
 ## Harness
 
 - Run dir: `.llm/runs/release-0.0.5--orchestration/slices/w3-b1-1102/`
 - Phase: `impl`
 - PLAN-EVAL: separate Claude · Fable 5 session, `PASS` at plan head `71c0a29c2`
-- No AppHost/container/`e2e:cli` before a durable runtime token grant.
+- Runtime token grant: ledger row 66 at `12357e33a`; consumed exactly once and bracketed by leak
+  checks.
 
 ## Definition of Done
 
@@ -71,4 +75,5 @@ non-Aspire close-gate set remain before the serialized runtime-token request.
 - [ ] MCP instructions and generated guidance activate `find_guidance` before unfamiliar work.
 - [ ] #1090 remains the only adoption-tracking surface.
 
-Definition-of-Done rows remain unchecked until the final implementation evidence exists.
+Definition-of-Done rows remain unchecked pending the owner-run separate-session IMPL-EVAL; this
+implementation session does not self-certify.

@@ -352,3 +352,31 @@ All non-Aspire gates above are complete. Request a durable ledger grant before t
   lines 87-90 restore. This proves the command and mechanism rather than inferring from sequence.
 - Removed the owned detached scratch worktree after evidence collection. No AppHost, container,
   Aspire command, or runtime E2E ran. The serialized token request remains pending.
+
+## 2026-08-09 — Granted serialized runtime proof
+
+- Verified the clean branch at `c52fee4e5` and durable single-use grant row 66 in commit
+  `12357e33a` before execution.
+- Pre-leak check — exit 0; Aspire and Docker probes `ok`. It reported only
+  `redis-jfgcbtaf` as a stale **foreign** container owned by
+  `/home/codex/repos/w6-review-desk`; left untouched. The suite and its generated project were
+  rooted inside this worktree, so no external `--owned-root` was required.
+- Ran exactly once from the repository root:
+  `deno task e2e:cli run scaffold.runtime --cleanup --format pretty ; echo "RAW_EXIT_CODE=$?"`.
+- Captured shell result: `RAW_EXIT_CODE=0`. Suite summary:
+  `passed=79 failed=0 skipped=2`, total 81 steps.
+- Every skip, individually:
+  - `behavior.otel.stream-consumer` — `DEFERRED #1398: workers-combined does not install the stream mutation hook`.
+  - `behavior.otel.traces` — `DEFERRED #1398: TC-14 requires the deferred Flow-B stream-consumer record`.
+- `cleanup.aspire-stop` passed in 737 ms. Post-leak check — exit 0; Aspire and Docker probes `ok`,
+  no run-owned survivor, and only the same foreign Redis container remained. It was reported and
+  left alone. The checked-in `leak-report.md` is the post-run artifact.
+- Post-run source hygiene: no `deno.json` or `deno.lock` diff; the runtime created no product-source
+  change.
+- Closure decision: all seven #1102 implementation acceptance rows now have evidence at this head.
+  In particular row 3 requires the quoted issue sentence plus two unquoted family paraphrases—
+  `reuse service data instead of making a new request on each render` and
+  `avoid refetching data on every request`—to rank
+  `pages/web-layer/query#a-cache-first-load-pattern` first. The PR still carries `Refs #1102`
+  because the locked close gate requires the owner-run separate-session IMPL-EVAL PASS before the
+  closing keyword and DoD checks are applied; this implementation session does not self-certify.
