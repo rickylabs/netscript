@@ -82,3 +82,41 @@
 | C-D78 | 2026-08-09 | The failing gate reported `FAILED` with only a file path and ~60 lines of Deno `Check …` progress — **no TS code, message or line**. The diagnostic body did not survive the pretty reporter, and the cause was only found by exact local reproduction.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | **Third occurrence in this milestone of a gate failing without the evidence needed to diagnose it**, after W2-C's endpoint validator that printed no compared values and W2-B's TC-14 that printed no trace ids. The first two each cost a cycle; this one cost a reproduction. Instructed the lane to record whether the reporter drops the diagnostic or the command never produced one, as a finding separate from its defect. A gate that says _what_ failed but not _why_ is half a gate, and this run has now paid for that three times.                                                                                                                                                                                                                                                                                                                                  |
 | C-D79 | 2026-08-09 | The orchestrator posted W3-B1's cycle-2 `PASS` as a PR comment on #1404 and then **reported the lane as implementing without resuming its thread**. The lane sat idle at `7ab78fbef` for two consecutive status summaries, having explicitly asked for the cycle-2 launch.                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | **Publishing a verdict and authorizing a lane are different acts, and only one of them reaches a Codex thread.** Sixth instance in this run of a state asserted rather than observed — after the false `packages/**` baseline claim, the four unsound closure rows, the falsified #1202 mechanism, "#1402 is the last slice", and the amplified `getEndpoint("tcp")` attribution. Corrected by the owner. Durable practice for the rest of the run: **lane status is reported from `agentic:codex-status`, never from what the last summary said.**                                                                                                                                                                                                                                                                                                                             |
 | C-D80 | 2026-08-09 | W3-B1's thread then **stalled** at 345,901 ms past its last activity — no launcher process remaining, worktree clean, last artifact the merge commit `b9692f93d`. The owner recovered **the same thread** through `agentic:codex-resume` with its cycle-2 PASS and binding conditions preserved; no replacement writer or competing orchestrator was created.                                                                                                                                                                                                                                                                                                                                                                                      | Distinct from C-D60, where the **launcher** died while the thread kept working. Here the thread itself went quiet with the launcher already gone, so nothing was streaming and nothing would have re-woken it — a stall is invisible without an explicit liveness threshold, which is why the five-minute audit caught what the run did not. Recovering the exact thread rather than launching a replacement is what preserved its plan-eval history and binding conditions; a fresh lane would have restarted a slice that has already consumed two PLAN-EVAL cycles.                                                                                                                                                                                                                                                                                                          |
+
+## C-D81 — orchestrator began a duplicate docs repair; owner reassigned to an isolated lane
+
+**Severity:** moderate (process; caught before any commit or PR).
+
+Diagnosing the #1404 S3 blocker, I reproduced the Vento failure, measured its true scope (2 files,
+not the 114 my earlier regex implied), found the root cause (`2f64cc001` / PR #1311) and the gate
+gap (`pages.yml` is push-to-main only and has been red since 2026-08-05), then **started
+implementing the repair myself** — created branch `fix/docs-site-vento-string-reflow` in worktree
+`/home/codex/repos/ns005-docsfix` off `origin/main`.
+
+Mid-turn the owner ruled that an isolated repair lane already owns this work:
+`/home/codex/repos/ns005-docs-consistency` on `fix/docs-source-format-consistency`, scoped to the
+malformed Vento expressions, raw Markdown leakage from `index.vto`, and focused build/render
+regression gates. The owner also noted the trigger was mobile screenshots showing invalid authored
+Markdown — i.e. the defect class is broader than the build break I measured, and is **not** merely
+responsive CSS.
+
+**What went wrong on my side:** I reasoned from "no *new implementation writer* may be created" to
+"therefore I should implement it," without first checking `git worktree list` for an existing lane
+that already owned the surface. Ownership is discovered, not inferred — the same failure shape as
+C-D79 (asserting a lane's state instead of querying it).
+
+**Correction applied, before any commit:**
+- Removed worktree `/home/codex/repos/ns005-docsfix` and deleted branch
+  `fix/docs-site-vento-string-reflow`; orchestration worktree verified clean.
+- Reverted `docs/site/**` and `.github/workflows/pages.yml` in this worktree — nothing shipped.
+- W3-B1 preserved untouched at `45001bb6b`; its thread was **not** resumed for S3.
+- Diagnostics handed to the owning lane as evidence, not as a change:
+  `.llm/runs/release-0.0.5--orchestration/docs-corpus-blocker-handoff.md` plus the reference patch
+  `docs-vento-diagnosis.patch`.
+
+**Standing rule adopted:** before implementing any repair myself, run `git worktree list` and check
+for an active lane on that surface. A repair I can do is not a repair I own.
+
+**Blocking state:** #1404 S3 remains blocked. C18 and the milestone wait on
+`fix/docs-source-format-consistency` reaching `main`; the orchestrator then resumes the exact W3-B1
+thread `019fe4b4-7c12-72c2-b692-8d851f9c3b5c` against repaired main.
