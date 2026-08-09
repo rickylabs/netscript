@@ -49,4 +49,4 @@ export const EMBEDDED_AGENT_TOOL_PATHS: readonly string[] = [
 
 /** SHA-256 of canonical manifest-ordered agent-tool paths and content. */
 export const EMBEDDED_AGENT_TOOL_BUNDLE_HASH: string =
-  '098190cf8a20a942427a9ff221db2be26e0e20aef65ada505750d9b6fb40be81';
+  'baae1d43a859627e38a8adfef574cb314e9d6e7eca97376e2e99676e75b4de57';
