@@ -1,10 +1,11 @@
-import { ASPIRE_RESOURCE, GATE, GATE_PHASE } from '../../../domain/cli-surface.ts';
+import { GATE, GATE_PHASE } from '../../../domain/cli-surface.ts';
 import { PACKAGE_SOURCE } from '../../../domain/extension-axes.ts';
 import type { GateDefinition } from '../../../domain/gate-definition.ts';
 import type { RunContext } from '../../../domain/run-context.ts';
 import { join } from '@std/path';
 import { cli, commandGate, denoCommand } from './gate-factory.ts';
 import { localSourceFixtureScript } from './local-source-fixture.ts';
+import { generatedAppName } from './generated-app-name.ts';
 
 const AI_LOCAL_SOURCE_PACKAGES = [
   { specifier: '@netscript/ai', entrypoint: 'ai/mod.ts' },
@@ -23,7 +24,7 @@ export function createUiAiGates(): readonly GateDefinition[] {
           'ui:add',
           'ai',
           '--app',
-          ASPIRE_RESOURCE.APP,
+          generatedAppName(context),
           '--registry-root',
           `${context.project.repoRoot}/packages/fresh-ui`,
           '--force',
@@ -95,7 +96,7 @@ export function createUiAiGates(): readonly GateDefinition[] {
 }
 
 function uiAppRoot(context: RunContext): string {
-  return join(context.project.projectRoot, 'apps', ASPIRE_RESOURCE.APP);
+  return join(context.project.projectRoot, 'apps', generatedAppName(context));
 }
 
 function uiSourceScript(): string {

@@ -102,7 +102,6 @@ export async function writeNormalizedAppFiles(
   const componentsDir = join(appDir, 'components');
   const uiComponentsDir = join(componentsDir, 'ui');
   const assetsDir = join(appDir, 'assets');
-  const libDir = join(appDir, 'lib');
   const partialsDir = join(routesDir, 'partials');
   const partialsExamplesDir = join(partialsDir, 'examples');
   const serviceExampleDir = options.serviceName
@@ -113,6 +112,9 @@ export async function writeNormalizedAppFiles(
     : undefined;
   const serviceExampleIslandsDir = serviceExampleDir
     ? join(serviceExampleDir, '(_islands)')
+    : undefined;
+  const serviceExampleLibDir = serviceExampleDir
+    ? join(serviceExampleDir, '(_lib)')
     : undefined;
   const serviceExampleSharedDir = serviceExampleDir
     ? join(serviceExampleDir, '(_shared)')
@@ -144,17 +146,17 @@ export async function writeNormalizedAppFiles(
   await createDir(componentsDir);
   await createDir(uiComponentsDir);
   await createDir(assetsDir);
-  await createDir(libDir);
   if (options.includeExampleService) {
     if (
       serviceExampleDir && serviceExampleComponentsDir && serviceExampleIslandsDir &&
-      serviceExampleSharedDir && serviceExamplePartialDir
+      serviceExampleLibDir && serviceExampleSharedDir && serviceExamplePartialDir
     ) {
       await createDir(partialsDir);
       await createDir(partialsExamplesDir);
       await createDir(serviceExampleDir);
       await createDir(serviceExampleComponentsDir);
       await createDir(serviceExampleIslandsDir);
+      await createDir(serviceExampleLibDir);
       await createDir(serviceExampleSharedDir);
       await createDir(serviceExamplePartialDir);
     }
@@ -284,7 +286,7 @@ export async function writeNormalizedAppFiles(
   if (
     options.includeExampleService && serviceExampleDir &&
     serviceExampleComponentsDir && serviceExampleIslandsDir &&
-    serviceExampleSharedDir && serviceExamplePartialDir
+    serviceExampleLibDir && serviceExampleSharedDir && serviceExamplePartialDir
   ) {
     await writeExampleServiceAppFiles({
       context,
@@ -292,10 +294,10 @@ export async function writeNormalizedAppFiles(
       templates: await loadExampleServiceAppTemplateAssets(),
       write,
       hasDatabase: options.dbEngine !== 'none',
-      libDir,
       serviceExampleDir,
       serviceExampleComponentsDir,
       serviceExampleIslandsDir,
+      serviceExampleLibDir,
       serviceExampleSharedDir,
       serviceExamplePartialDir,
       telemetryExampleDir,

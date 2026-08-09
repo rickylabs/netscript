@@ -55,4 +55,5 @@ export const SCAFFOLD_APP_IMPORTS = {
   '@tailwindcss/vite': `npm:@tailwindcss/vite@${SCAFFOLD_APP_CATALOG.TAILWINDCSS_VITE}`,
   'tailwindcss': `npm:tailwindcss@${SCAFFOLD_APP_CATALOG.TAILWINDCSS}`,
   'vite': `npm:vite@${SCAFFOLD_APP_CATALOG.VITE}`,
+  'zod': 'catalog:',
 } as const;

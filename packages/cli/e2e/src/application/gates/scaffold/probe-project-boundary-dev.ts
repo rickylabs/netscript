@@ -1,5 +1,7 @@
-const [projectRoot, appName = 'dashboard'] = Deno.args;
-if (!projectRoot) throw new Error('generated project root is required');
+const [projectRoot, appName] = Deno.args;
+if (!projectRoot || !appName) {
+  throw new Error('generated project root and app name are required');
+}
 
 const port = 5199;
 const appRoot = `${projectRoot}/apps/${appName}`;

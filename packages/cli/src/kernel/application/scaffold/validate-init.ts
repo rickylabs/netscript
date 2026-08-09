@@ -6,6 +6,7 @@ import { ScaffoldDirExistsError, ScaffoldValidationError } from '../../domain/er
 import type { InitOptions, ValidatedInitOptions } from '../../domain/scaffold/scaffold-options.ts';
 import type { InitPipelineContext } from './context.ts';
 import { allocateScaffoldDefaultPort } from '../../domain/scaffold/default-port-allocation.ts';
+import { deriveDefaultAppName } from '../../domain/scaffold/app-name.ts';
 
 const PRISMA_MODEL_NAME_PATTERN = /^[A-Z][A-Za-z0-9]*$/;
 
@@ -83,7 +84,7 @@ export async function validateOptions(
   }
 
   // 6. Resolve and validate app name
-  const appName = options.appName ?? SCAFFOLD_DEFAULTS.APP_NAME;
+  const appName = options.appName ?? deriveDefaultAppName(options.name);
 
   if (!SCAFFOLD_VALIDATION.NAME_PATTERN.test(appName)) {
     throw new ScaffoldValidationError(

@@ -45,6 +45,18 @@ workflow, generated type checks, Aspire runtime boot, HTTP behavior checks, OTEL
 cleanup. The narrower `scaffold.plugins` suite stops after plugin scaffold and host-diagnostic
 checks.
 
+### Browser prerequisite for `scaffold.runtime`
+
+The `behavior.app-reference` gate renders every canonical reference state in a real headless
+Chromium browser at desktop and mobile viewports. It is fail-closed: a missing browser is a failed
+prerequisite, never a skipped or passing browser verdict.
+
+Automatic executable discovery supports Google Chrome or Chromium on Linux; Windows Chrome or
+Edge in a native checkout and through WSL interop; and Chrome, Edge, or Chromium in their standard
+macOS `/Applications` locations. Install one of those browsers before running `scaffold.runtime`.
+Non-standard installation paths are intentionally not guessed; add an explicit supported candidate
+with a focused probe test instead of treating a browserless run as evidence.
+
 ## Native desktop deployment
 
 `deploy.desktop-native` packages the checked-in thin-client fixture through

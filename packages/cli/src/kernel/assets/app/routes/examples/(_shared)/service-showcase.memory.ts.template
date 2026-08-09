@@ -1,12 +1,27 @@
 import { dehydrateQueryClient } from '@netscript/fresh/query';
 import { createNetScriptQueryClient } from '@netscript/sdk/query-client';
-import { {{serviceName | camelCase}}Queries } from '@app/lib/example-service.ts';
+import { {{serviceName | camelCase}}Queries } from '../(_lib)/service-query.ts';
 
 export const SERVICE_SHOWCASE_PAGE_SIZE = 3;
 export const SERVICE_SHOWCASE_INPUT = {
   limit: SERVICE_SHOWCASE_PAGE_SIZE,
   offset: 0,
 } as const;
+
+export interface ServiceShowcaseSearch {
+  readonly page: number;
+  readonly query: string;
+  readonly preview?: ServiceShowcasePreview;
+}
+
+export type ServiceShowcasePreview =
+  | 'loading'
+  | 'error'
+  | 'empty'
+  | 'success'
+  | 'optimistic'
+  | 'rollback'
+  | 'confirmed';
 
 export type ServiceShowcaseListData = Awaited<ReturnType<typeof {{serviceName | camelCase}}Queries.list>>;
 
@@ -58,9 +73,14 @@ export async function loadServiceShowcaseSummary(): Promise<ServiceSummaryPanelP
   return buildServiceSummary(result);
 }
 
-export async function loadServiceShowcaseData() {
+export async function loadServiceShowcaseData(search: ServiceShowcaseSearch) {
   const queryClient = createNetScriptQueryClient();
-  const queryOptions = {{serviceName | camelCase}}Queries.list.queryOptions(SERVICE_SHOWCASE_INPUT);
+  const input = {
+    ...SERVICE_SHOWCASE_INPUT,
+    offset: (search.page - 1) * SERVICE_SHOWCASE_PAGE_SIZE,
+    search: search.query || undefined,
+  };
+  const queryOptions = {{serviceName | camelCase}}Queries.list.queryOptions(input);
   const cachedAt = Date.now();
   const initialList = await queryClient.fetchQuery<ServiceShowcaseListData>({
     queryKey: queryOptions.queryKey,
@@ -69,8 +89,10 @@ export async function loadServiceShowcaseData() {
 
   return {
     dehydratedState: dehydrateQueryClient(queryClient),
-    input: SERVICE_SHOWCASE_INPUT,
+    input,
     initialList,
     cachedAt,
+    searchQuery: search.query,
+    previewState: search.preview,
   };
 }

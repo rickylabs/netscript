@@ -198,6 +198,7 @@ Deno.test('runtime suite waits for the generated app and requests its home page'
   const runtime = resolveSuite(SCAFFOLD.RUNTIME);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.RUNTIME_WAIT_APP), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_APP_HOME), true);
+  assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_APP_REFERENCE), true);
 
   const waitIndex = runtime.gates.findIndex((gate) => gate.id === GATE.RUNTIME_WAIT_APP);
   const homeIndex = runtime.gates.findIndex((gate) => gate.id === GATE.BEHAVIOR_APP_HOME);
@@ -297,7 +298,10 @@ Deno.test('runtime suite wait matrices match runtime resources for postgres and 
       .filter((id) => id.startsWith('runtime.wait.'));
     assertEquals(
       waitGateIds,
-      runtimeResources(database).map((resource) => `runtime.wait.${resource}`),
+      [
+        ...runtimeResources(database).map((resource) => `runtime.wait.${resource}`),
+        GATE.RUNTIME_WAIT_APP,
+      ],
       suite.id,
     );
   }

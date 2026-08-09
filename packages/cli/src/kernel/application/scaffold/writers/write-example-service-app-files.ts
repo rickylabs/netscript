@@ -8,10 +8,10 @@ interface ExampleServiceAppFilesInput {
   readonly templates: ExampleServiceAppTemplateAssets;
   readonly write: (targetPath: string, content: string) => Promise<void>;
   readonly hasDatabase: boolean;
-  readonly libDir: string;
   readonly serviceExampleDir: string;
   readonly serviceExampleComponentsDir: string;
   readonly serviceExampleIslandsDir: string;
+  readonly serviceExampleLibDir: string;
   readonly serviceExampleSharedDir: string;
   readonly serviceExamplePartialDir: string;
   readonly telemetryExampleDir: string;
@@ -27,16 +27,20 @@ export async function writeExampleServiceAppFiles(
   const {
     appExampleServiceHeroTemplate,
     appExampleServiceLabPanelTemplate,
+    appExampleServiceManagedFormTemplate,
     appExampleServiceNotesCardTemplate,
     appExampleServicePageLayoutTemplate,
     appExampleServiceShowcaseMemoryTemplate,
     appExampleServiceShowcaseSharedMemoryTemplate,
     appExampleServiceShowcaseSharedTemplate,
+    appExampleServiceAuthorizationTemplate,
     appExampleServiceShowcaseTemplate,
     appExampleServiceSummaryCardTemplate,
     appExampleServiceSummaryPanelMemoryTemplate,
     appExampleServiceSummaryPanelTemplate,
-    appExampleServiceTemplate,
+    appExampleServiceQueryTemplate,
+    appExampleServiceOptimisticListMutationTemplate,
+    appExampleServiceRouteContractTemplate,
     appServiceExampleIndexTemplate,
     appServiceExampleLayoutTemplate,
     appServiceSummaryPartialTemplate,
@@ -63,8 +67,19 @@ Delete or replace the sample data: example records, labels, statuses, notes, and
 `,
   );
   await write(
-    join(input.libDir, 'example-service.ts'),
-    await context.templateAdapter.render(appExampleServiceTemplate, appTemplateVars),
+    join(input.serviceExampleLibDir, 'service-query.ts'),
+    await context.templateAdapter.render(appExampleServiceQueryTemplate, appTemplateVars),
+  );
+  await write(
+    join(input.serviceExampleLibDir, 'optimistic-list-mutation.ts'),
+    await context.templateAdapter.render(
+      appExampleServiceOptimisticListMutationTemplate,
+      appTemplateVars,
+    ),
+  );
+  await write(
+    join(input.serviceExampleLibDir, 'route-contract.ts'),
+    await context.templateAdapter.render(appExampleServiceRouteContractTemplate, appTemplateVars),
   );
   await write(
     join(input.serviceExampleComponentsDir, 'hero.tsx'),
@@ -73,6 +88,10 @@ Delete or replace the sample data: example records, labels, statuses, notes, and
   await write(
     join(input.serviceExampleComponentsDir, 'lab-panel.tsx'),
     await context.templateAdapter.render(appExampleServiceLabPanelTemplate, appTemplateVars),
+  );
+  await write(
+    join(input.serviceExampleComponentsDir, 'managed-form.tsx'),
+    await context.templateAdapter.render(appExampleServiceManagedFormTemplate, appTemplateVars),
   );
   await write(
     join(input.serviceExampleComponentsDir, 'notes-card.tsx'),
@@ -97,6 +116,10 @@ Delete or replace the sample data: example records, labels, statuses, notes, and
   await write(
     join(input.serviceExampleSharedDir, 'service-showcase.ts'),
     await context.templateAdapter.render(showcaseSharedTemplate, appTemplateVars),
+  );
+  await write(
+    join(input.serviceExampleSharedDir, 'authorization.ts'),
+    await context.templateAdapter.render(appExampleServiceAuthorizationTemplate, appTemplateVars),
   );
   await write(
     join(input.serviceExamplePartialDir, 'summary.tsx'),

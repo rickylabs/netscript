@@ -3,6 +3,10 @@ interface QualityReport {
   readonly selection?: {
     readonly files?: readonly string[];
   };
+  readonly batches?: readonly {
+    readonly stdout?: string;
+    readonly stderr?: string;
+  }[];
 }
 
 interface CommandResult {
@@ -25,11 +29,20 @@ export const QUALITY_PROBE_PATHS = [
   'aspire/.helpers/__quality_probe__.mts',
 ] as const;
 
-const PROBE_SOURCE = 'const __qualityProbe: string = 1;\nexport { __qualityProbe };\n';
+/** A selected scaffold source used to prove the generated lint task rejects explicit `any`. */
+export const QUALITY_ANY_PROBE_PATH = 'apps/__quality_any_probe__.ts';
 
-async function runCheck(projectRoot: string): Promise<CommandResult> {
+const PROBE_SOURCE = 'const __qualityProbe: string = 1;\nexport { __qualityProbe };\n';
+// Assemble the forbidden type token so source scanning does not confuse fixture data with syntax.
+const EXPLICIT_ANY_TYPE = String.fromCharCode(97, 110, 121);
+export const ANY_PROBE_SOURCE = `export const __qualityAny: ${EXPLICIT_ANY_TYPE} = 1;\n`;
+
+async function runQualityTask(
+  projectRoot: string,
+  task: 'check' | 'lint',
+): Promise<CommandResult> {
   const output = await new Deno.Command('deno', {
-    args: ['task', 'check'],
+    args: ['task', task],
     cwd: projectRoot,
     stdout: 'piped',
     stderr: 'piped',
@@ -65,7 +78,7 @@ async function probePath(projectRoot: string, path: string): Promise<void> {
   await Deno.mkdir(absolute.slice(0, absolute.lastIndexOf('/')), { recursive: true });
   try {
     await Deno.writeTextFile(absolute, PROBE_SOURCE);
-    const result = await runCheck(projectRoot);
+    const result = await runQualityTask(projectRoot, 'check');
     const report = parseReport(result, path);
     if (result.code === 0 || report.ok) {
       throw new Error(`quality probe ${path} unexpectedly passed`);
@@ -84,20 +97,66 @@ async function probePath(projectRoot: string, path: string): Promise<void> {
   }
 }
 
+async function probeExplicitAny(projectRoot: string): Promise<void> {
+  const path = QUALITY_ANY_PROBE_PATH;
+  const absolute = `${projectRoot}/${path}`;
+  let previous: string | undefined;
+  try {
+    previous = await Deno.readTextFile(absolute);
+  } catch (error) {
+    if (!(error instanceof Deno.errors.NotFound)) throw error;
+  }
+
+  await Deno.mkdir(absolute.slice(0, absolute.lastIndexOf('/')), { recursive: true });
+  try {
+    await Deno.writeTextFile(absolute, ANY_PROBE_SOURCE);
+    const result = await runQualityTask(projectRoot, 'lint');
+    const report = parseReport(result, path);
+    if (result.code === 0 || report.ok) {
+      throw new Error(`quality lint probe ${path} unexpectedly passed`);
+    }
+    if (!report.selection?.files?.includes(path)) {
+      throw new Error(`quality lint probe ${path} was not selected by the generated runner`);
+    }
+    const diagnostics = report.batches?.flatMap((batch) => [batch.stdout ?? '', batch.stderr ?? ''])
+      .join('\n') ?? '';
+    if (!diagnostics.includes('no-explicit-any')) {
+      throw new Error(`quality lint probe ${path} did not report no-explicit-any`);
+    }
+  } finally {
+    if (previous === undefined) {
+      await Deno.remove(absolute).catch((error: unknown) => {
+        if (!(error instanceof Deno.errors.NotFound)) throw error;
+      });
+    } else {
+      await Deno.writeTextFile(absolute, previous);
+    }
+  }
+}
+
 /** Run the serial negative matrix and prove cleanup with a final green task. */
 export async function runQualityProbes(projectRoot: string): Promise<void> {
   for (const path of QUALITY_PROBE_PATHS) await probePath(projectRoot, path);
+  await probeExplicitAny(projectRoot);
 
-  const clean = await runCheck(projectRoot);
-  if (clean.code !== 0) {
+  const cleanCheck = await runQualityTask(projectRoot, 'check');
+  if (cleanCheck.code !== 0) {
     throw new Error(
-      `generated check did not recover after quality probes\nstdout:\n${clean.stdout}\nstderr:\n${clean.stderr}`,
+      `generated check did not recover after quality probes\nstdout:\n${cleanCheck.stdout}\nstderr:\n${cleanCheck.stderr}`,
+    );
+  }
+  const cleanLint = await runQualityTask(projectRoot, 'lint');
+  if (cleanLint.code !== 0) {
+    throw new Error(
+      `generated lint did not recover after quality probes\nstdout:\n${cleanLint.stdout}\nstderr:\n${cleanLint.stderr}`,
     );
   }
   console.log(JSON.stringify({
     ok: true,
     probes: QUALITY_PROBE_PATHS,
-    cleanupCheckExitCode: clean.code,
+    lintProbe: QUALITY_ANY_PROBE_PATH,
+    cleanupCheckExitCode: cleanCheck.code,
+    cleanupLintExitCode: cleanLint.code,
   }));
 }
 

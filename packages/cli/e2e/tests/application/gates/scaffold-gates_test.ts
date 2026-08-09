@@ -2,7 +2,11 @@ import { assertEquals, assertThrows } from '@std/assert';
 
 import { createSmokeProject } from '../../../src/application/builders/workspace/smoke-project-factory.ts';
 import { createGeneratedQualityGates } from '../../../src/application/gates/scaffold/generated-quality-gate.ts';
-import { QUALITY_PROBE_PATHS } from '../../../src/application/gates/scaffold/generated-quality-probes.ts';
+import {
+  ANY_PROBE_SOURCE,
+  QUALITY_ANY_PROBE_PATH,
+  QUALITY_PROBE_PATHS,
+} from '../../../src/application/gates/scaffold/generated-quality-probes.ts';
 import { createScaffoldGates } from '../../../src/application/gates/scaffold/scaffold-gates.ts';
 import { GATE, SCAFFOLD } from '../../../src/domain/cli-surface.ts';
 import {
@@ -15,6 +19,51 @@ import type { CommandGateDefinition } from '../../../src/domain/gate-definition.
 import type { RunContext, RunOptions } from '../../../src/domain/run-context.ts';
 
 const PUBLISHED_TEST_VERSION = ['0', '0', '2'].join('.');
+
+Deno.test('generated explicit-any probe source remains byte-identical', () => {
+  assertEquals(ANY_PROBE_SOURCE.length, 36);
+  assertEquals(
+    [...ANY_PROBE_SOURCE].map((character) => character.charCodeAt(0)),
+    [
+      101,
+      120,
+      112,
+      111,
+      114,
+      116,
+      32,
+      99,
+      111,
+      110,
+      115,
+      116,
+      32,
+      95,
+      95,
+      113,
+      117,
+      97,
+      108,
+      105,
+      116,
+      121,
+      65,
+      110,
+      121,
+      58,
+      32,
+      97,
+      110,
+      121,
+      32,
+      61,
+      32,
+      49,
+      59,
+      10,
+    ],
+  );
+});
 
 Deno.test('--source jsr accepts the local public CLI binary', () => {
   const command = scaffoldInitGate().command(
@@ -106,6 +155,7 @@ Deno.test('generated quality probes cover TS, TSX, plugin, background, and AppHo
     'streams/__quality_probe__.ts',
     'aspire/.helpers/__quality_probe__.mts',
   ]);
+  assertEquals(QUALITY_ANY_PROBE_PATH, 'apps/__quality_any_probe__.ts');
   assertEquals(
     createGeneratedQualityGates().map((gate) => gate.id),
     [

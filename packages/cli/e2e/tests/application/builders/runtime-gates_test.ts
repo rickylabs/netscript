@@ -15,6 +15,7 @@ import {
   ASPIRE_RESTORE_MAX_RETRIES,
   createRuntimeGates,
 } from '../../../src/application/gates/scaffold/runtime-gates.ts';
+import { createProjectBoundaryGates } from '../../../src/application/gates/scaffold/database-gates.ts';
 
 Deno.test('runtime Aspire restore has a bounded infrastructure retry budget', () => {
   const gate = createRuntimeGates().find((entry) => entry.id === GATE.RUNTIME_ASPIRE_RESTORE);
@@ -43,6 +44,7 @@ Deno.test('runtime aspire start gate captures detached endpoint metadata', () =>
   assertEquals(gate.outputMode, 'capture');
 
   const command = gate.command({
+    request: { options: { projectName: 'generated' } },
     project: {
       appHost: '/workspace/app/aspire/apphost.mts',
       projectRoot: '/workspace/app',
@@ -64,6 +66,9 @@ Deno.test('live DB endpoint gate reads the detached dashboard metadata path', ()
   }
 
   const command = gate.command({
+    request: {
+      options: { projectName: 'generated' },
+    },
     project: {
       repoRoot: '/repo',
       projectRoot: '/workspace/app',
@@ -100,6 +105,7 @@ Deno.test('app home gate hands the probe a project and an AppHost to resolve the
   }
 
   const command = gate.command({
+    request: { options: { projectName: 'generated' } },
     project: {
       repoRoot: '/repo',
       projectRoot: '/workspace/app',
@@ -115,7 +121,7 @@ Deno.test('app home gate hands the probe a project and an AppHost to resolve the
     '--allow-run=aspire',
     '/repo/packages/cli/e2e/src/application/gates/scaffold/probe-app-home.ts',
     '/workspace/app',
-    ASPIRE_RESOURCE.APP,
+    'generated-web',
     '/workspace/app/aspire/apphost.mts',
   ]);
   assertEquals(command.some((argument) => argument.includes(String(PORT_RANGES.APP.start))), false);
@@ -130,6 +136,7 @@ Deno.test('app home gate can reach a localhost endpoint, not only 127.0.0.1', ()
   if (gate?.kind !== 'command') throw new Error('Expected app home gate to be a command gate.');
 
   const command = gate.command({
+    request: { options: { projectName: 'generated' } },
     project: { repoRoot: '/repo', projectRoot: '/workspace/app', appHost: '/workspace/app/a.mts' },
   } as RunContext);
 
@@ -138,11 +145,47 @@ Deno.test('app home gate can reach a localhost endpoint, not only 127.0.0.1', ()
   assertEquals(net?.includes('127.0.0.1'), true);
 });
 
+Deno.test('app reference gate runs the real browser probe for the project-derived app', () => {
+  const gate = createRuntimeGates().find((entry) => entry.id === GATE.BEHAVIOR_APP_REFERENCE);
+  if (gate?.kind !== 'command') throw new Error('Expected app reference command gate.');
+  const command = gate.command({
+    request: { options: { projectName: 'inventory-console' } },
+    project: {
+      repoRoot: '/repo',
+      projectRoot: '/workspace/app',
+      appHost: '/workspace/app/aspire/apphost.mts',
+    },
+  } as RunContext);
+
+  assertEquals(command, [
+    'deno',
+    'run',
+    '--allow-read',
+    '--allow-run',
+    '/repo/packages/cli/e2e/src/application/gates/scaffold/probe-app-reference.ts',
+    '/workspace/app',
+    'inventory-console-web',
+    '/workspace/app/aspire/apphost.mts',
+  ]);
+});
+
 Deno.test('runtime gates wait for postgres resource by default', () => {
   const gateIds = createRuntimeGates().map((entry) => entry.id);
 
   assertEquals(gateIds.includes(GATE.RUNTIME_WAIT_POSTGRES), true);
   assertEquals(gateIds.includes(GATE.RUNTIME_WAIT_MYSQL), false);
+});
+
+Deno.test('runtime app wait derives the resource name from the scaffold project', () => {
+  const gate = createRuntimeGates().find((entry) => entry.id === GATE.RUNTIME_WAIT_APP);
+  if (gate?.kind !== 'command') throw new Error('Expected app wait gate to be a command gate.');
+
+  const command = gate.command({
+    request: { options: { projectName: 'inventory-console' } },
+    project: { appHost: '/workspace/app/aspire/apphost.mts' },
+  } as RunContext);
+  assertEquals(command[2], 'inventory-console-web');
+  assertEquals(command.includes('dashboard'), false);
 });
 
 Deno.test('runtime gates include durable workers and sagas CLI parity', () => {
@@ -176,6 +219,7 @@ Deno.test('runtime gates prove MCP Aspire endpoint discovery against the live Ap
     throw new Error('Expected MCP endpoint directory gate to be a command gate.');
   }
   const context = {
+    request: { options: { projectName: 'generated' } },
     project: {
       repoRoot: '/repo',
       projectRoot: '/workspace/app',
@@ -194,6 +238,33 @@ Deno.test('runtime gates prove MCP Aspire endpoint discovery against the live Ap
     '/repo/packages/cli/e2e/src/application/gates/scaffold/verify-mcp-endpoint-directory.ts',
     '/workspace/app',
     '/workspace/app/aspire/apphost.mts',
+    'generated-web',
+  ]);
+});
+
+Deno.test('project boundary gate requires the project-derived app name', () => {
+  const gate = createProjectBoundaryGates().find((entry) =>
+    entry.id === GATE.BEHAVIOR_PROJECT_BOUNDARY_DEV
+  );
+  if (gate?.kind !== 'command') {
+    throw new Error('Expected project boundary gate to be a command gate.');
+  }
+  const context = {
+    request: { options: { projectName: 'inventory-console' } },
+    project: {
+      repoRoot: '/repo',
+      projectRoot: '/workspace/app',
+    },
+  } as RunContext;
+
+  assertEquals(gate.cwd(context), '/repo');
+  assertEquals(gate.command(context), [
+    'deno',
+    'run',
+    '--allow-all',
+    '/repo/packages/cli/e2e/src/application/gates/scaffold/probe-project-boundary-dev.ts',
+    '/workspace/app',
+    'inventory-console-web',
   ]);
 });
 

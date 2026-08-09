@@ -117,9 +117,10 @@ export const GATE = {
   RUNTIME_WAIT_TRIGGERS: 'runtime.wait.triggers',
   RUNTIME_WAIT_AUTH: 'runtime.wait.auth',
   RUNTIME_WAIT_STREAMS: 'runtime.wait.streams',
-  RUNTIME_WAIT_APP: 'runtime.wait.dashboard',
+  RUNTIME_WAIT_APP: 'runtime.wait.app',
   RUNTIME_ASPIRE_DESCRIBE: 'runtime.aspire-describe',
   BEHAVIOR_APP_HOME: 'behavior.app-home',
+  BEHAVIOR_APP_REFERENCE: 'behavior.app-reference',
   BEHAVIOR_PROJECT_BOUNDARY_DEV: 'behavior.project-boundary-dev',
   BEHAVIOR_WORKERS_HEALTH: 'behavior.workers-health',
   BEHAVIOR_WORKERS_JOBS: 'behavior.workers-jobs',
@@ -172,8 +173,6 @@ export const GATE = {
 
 /** Generated Aspire resource ids waited on by the scaffold plugin suite. */
 export const ASPIRE_RESOURCE = {
-  /** The generated Fresh application, named from `SCAFFOLD_DEFAULTS.APP_NAME`. */
-  APP: 'dashboard',
   POSTGRES: 'postgres',
   MYSQL: 'mysql',
   MSSQL: 'mssql',

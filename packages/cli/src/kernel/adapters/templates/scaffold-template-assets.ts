@@ -40,11 +40,13 @@ const APP_TEMPLATE_URLS: TemplateUrlMap = {
 const EXAMPLE_SERVICE_APP_TEMPLATE_URLS: TemplateUrlMap = {
   appExampleServiceHeroTemplate: TEMPLATE_KEYS.appRoutesExamplesComponentsHero,
   appExampleServiceLabPanelTemplate: TEMPLATE_KEYS.appRoutesExamplesComponentsLabPanel,
+  appExampleServiceManagedFormTemplate: TEMPLATE_KEYS.appRoutesExamplesComponentsManagedForm,
   appExampleServiceNotesCardTemplate: TEMPLATE_KEYS.appRoutesExamplesComponentsNotesCard,
   appExampleServicePageLayoutTemplate: TEMPLATE_KEYS.appRoutesExamplesComponentsPageLayout,
   appExampleServiceShowcaseSharedTemplate: TEMPLATE_KEYS.appRoutesExamplesSharedServiceShowcase,
   appExampleServiceShowcaseSharedMemoryTemplate:
     TEMPLATE_KEYS.appRoutesExamplesSharedServiceShowcaseMemory,
+  appExampleServiceAuthorizationTemplate: TEMPLATE_KEYS.appRoutesExamplesSharedAuthorization,
   appExampleServiceShowcaseTemplate: TEMPLATE_KEYS.appRoutesExamplesIslandsServiceshowcaselab,
   appExampleServiceShowcaseMemoryTemplate:
     TEMPLATE_KEYS.appRoutesExamplesIslandsServiceshowcaselabMemory,
@@ -52,7 +54,10 @@ const EXAMPLE_SERVICE_APP_TEMPLATE_URLS: TemplateUrlMap = {
   appExampleServiceSummaryPanelTemplate: TEMPLATE_KEYS.appRoutesExamplesComponentsSummaryPanel,
   appExampleServiceSummaryPanelMemoryTemplate:
     TEMPLATE_KEYS.appRoutesExamplesComponentsSummaryPanelMemory,
-  appExampleServiceTemplate: TEMPLATE_KEYS.appLibExampleService,
+  appExampleServiceQueryTemplate: TEMPLATE_KEYS.appRoutesExamplesServiceLibServiceQuery,
+  appExampleServiceOptimisticListMutationTemplate:
+    TEMPLATE_KEYS.appRoutesExamplesServiceLibOptimisticListMutation,
+  appExampleServiceRouteContractTemplate: TEMPLATE_KEYS.appRoutesExamplesServiceLibRouteContract,
   appServiceExampleIndexTemplate: TEMPLATE_KEYS.appRoutesExamplesServiceIndex,
   appServiceExampleLayoutTemplate: TEMPLATE_KEYS.appRoutesExamplesServiceIndexLayout,
   appServiceSummaryPartialTemplate: TEMPLATE_KEYS.appRoutesPartialsExamplesServiceSummary,

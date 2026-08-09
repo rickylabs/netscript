@@ -7,9 +7,9 @@ import {
 } from '../../../../../../mcp/mod.ts';
 import { join } from '@std/path';
 
-const [projectRoot, appHostPath] = Deno.args;
-if (!projectRoot || !appHostPath) {
-  throw new Error('project root and AppHost path are required');
+const [projectRoot, appHostPath, appName] = Deno.args;
+if (!projectRoot || !appHostPath || !appName) {
+  throw new Error('project root, AppHost path, and generated app name are required');
 }
 
 const directory = createServiceEndpointDirectory({ projectRoot, appHostPath });
@@ -24,7 +24,7 @@ const server = createMcpServer({
   },
 });
 
-const convention = await Deno.readTextFile(join(projectRoot, 'apps', 'dashboard', 'AGENTS.md'));
+const convention = await Deno.readTextFile(join(projectRoot, 'apps', appName, 'AGENTS.md'));
 const orderedTools = [
   'list_api_services',
   'list_service_operations',

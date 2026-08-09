@@ -7,16 +7,7 @@
 
 import { v1, type {{serviceName | pascalCase}}ListItemV1 } from '@{{projectName}}/contracts';
 
-const NEXT_STATUS_BY_STATE: Record<
-  {{serviceName | pascalCase}}ListItemV1['status'],
-  {{serviceName | pascalCase}}ListItemV1['status']
-> = {
-  draft: 'active',
-  active: 'archived',
-  archived: 'draft',
-};
-
-let seededRecords: {{serviceName | pascalCase}}ListItemV1[] = [
+const seededRecords: {{serviceName | pascalCase}}ListItemV1[] = [
   {
     id: 1,
     name: 'Launch checklist',
@@ -41,7 +32,7 @@ let seededRecords: {{serviceName | pascalCase}}ListItemV1[] = [
 ];
 
 export const {{serviceName | pascalCase}}V1 = {
-  list: v1.{{serviceName | camelCase}}.list.handler(async ({ input }) => {
+  list: v1.{{serviceName | camelCase}}.list.handler(({ input }) => {
     const search = input.search?.trim().toLowerCase();
     const filtered = search
       ? seededRecords.filter((record) =>
@@ -58,7 +49,7 @@ export const {{serviceName | pascalCase}}V1 = {
       hasMore: input.offset + input.limit < filtered.length,
     };
   }),
-  updateStatus: v1.{{serviceName | camelCase}}.updateStatus.handler(async ({ input }) => {
+  updateStatus: v1.{{serviceName | camelCase}}.updateStatus.handler(({ input }) => {
     const record = seededRecords.find((entry) => entry.id === input.id);
 
     if (!record) {

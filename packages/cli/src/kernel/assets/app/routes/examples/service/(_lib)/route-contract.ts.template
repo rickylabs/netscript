@@ -1,0 +1,17 @@
+import { z } from 'zod';
+
+/** Typed path state for the resource collection route. */
+export const {{serviceName | camelCase}}PathSchema = z.object({});
+
+/** Typed list controls shared by the route, loader, and canonical navigation. */
+export const {{serviceName | camelCase}}SearchSchema = z.object({
+  page: z.coerce.number().int().min(1).default(1),
+  query: z.string().trim().max(100).default(''),
+  preview: z.enum(['loading', 'error', 'empty', 'success', 'optimistic', 'rollback', 'confirmed'])
+    .optional(),
+});
+
+/** Managed-form values for the server-owned resource note example. */
+export const {{serviceName | camelCase}}NoteSchema = z.object({
+  note: z.string().trim().min(3, 'Note must be at least 3 characters').max(160),
+});

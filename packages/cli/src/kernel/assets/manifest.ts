@@ -9,7 +9,12 @@ export const TEMPLATE_KEYS = {
     'app/routes/(design)/design/(_islands)/TokenClipboard.tsx.template',
   appRoutesDesignSharedRegistry: 'app/routes/(design)/design/(_shared)/registry.ts.template',
   appRoutesDesignSharedTokens: 'app/routes/(design)/design/(_shared)/tokens.ts.template',
-  appLibExampleService: 'app/lib/example-service.ts.template',
+  appRoutesExamplesServiceLibRouteContract:
+    'app/routes/examples/service/(_lib)/route-contract.ts.template',
+  appRoutesExamplesServiceLibServiceQuery:
+    'app/routes/examples/service/(_lib)/service-query.ts.template',
+  appRoutesExamplesServiceLibOptimisticListMutation:
+    'app/routes/examples/service/(_lib)/optimistic-list-mutation.ts.template',
   appMain: 'app/main.ts.template',
   appRouter: 'app/router.ts.template',
   appRoutesComponentsHealthView: 'app/routes/(_components)/health-view.tsx.template',
@@ -33,6 +38,8 @@ export const TEMPLATE_KEYS = {
   appRoutesExamplesComponentsCrudView: 'app/routes/examples/(_components)/crud-view.tsx.template',
   appRoutesExamplesComponentsHero: 'app/routes/examples/(_components)/hero.tsx.template',
   appRoutesExamplesComponentsLabPanel: 'app/routes/examples/(_components)/lab-panel.tsx.template',
+  appRoutesExamplesComponentsManagedForm:
+    'app/routes/examples/(_components)/managed-form.tsx.template',
   appRoutesExamplesComponentsNotesCard: 'app/routes/examples/(_components)/notes-card.tsx.template',
   appRoutesExamplesComponentsPageLayout:
     'app/routes/examples/(_components)/page-layout.tsx.template',
@@ -50,6 +57,8 @@ export const TEMPLATE_KEYS = {
     'app/routes/examples/(_shared)/service-showcase.ts.template',
   appRoutesExamplesSharedServiceShowcaseMemory:
     'app/routes/examples/(_shared)/service-showcase.memory.ts.template',
+  appRoutesExamplesSharedAuthorization:
+    'app/routes/examples/(_shared)/authorization.ts.template',
   appRoutesExamplesIndex: 'app/routes/examples/index.tsx.template',
   appRoutesExamplesCrud: 'app/routes/examples/crud.tsx.template',
   appRoutesExamplesServiceIndexLayout: 'app/routes/examples/service/index.layout.tsx.template',

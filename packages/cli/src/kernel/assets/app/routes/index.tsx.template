@@ -11,6 +11,8 @@ export const homePage = definePage()
   .withLayer('home', HomeView, () => ({
     projectName: '{{name}}',
     appName: '{{appName}}',
+    designHref: appRoutes.design.href(),
+    compositionHref: appRoutes.designComposition.href(),
     routes: [
       {
         title: 'Dashboard',
@@ -28,8 +30,8 @@ export const homePage = definePage()
       },
       {
         title: 'Design reference',
-        href: '/design/components',
-        description: 'The scaffolded component gallery and token reference for the active theme.',
+        href: appRoutes.design.href(),
+        description: 'Living index for the scaffolded tokens, components, and composition rules.',
         cta: 'Open design',
         badge: 'design',
       },

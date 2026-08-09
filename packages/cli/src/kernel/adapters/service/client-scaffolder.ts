@@ -42,7 +42,7 @@ export class ServiceClientScaffolder {
         { projectRoot },
       );
     }
-    const content = renderTemplateAssetSync(TEMPLATE_KEYS.appLibExampleService, {
+    const content = renderTemplateAssetSync(TEMPLATE_KEYS.appRoutesExamplesServiceLibServiceQuery, {
       name: projectName,
       serviceName,
     });

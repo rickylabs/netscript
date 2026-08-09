@@ -3,6 +3,7 @@ import { DB_ENGINE_CHOICES } from '../../../kernel/domain/db-engine.ts';
 import type { PromptPort } from '../../../kernel/ports/prompt-port.ts';
 import { SCAFFOLD_DEFAULTS } from '../../../kernel/constants/scaffold/scaffold-defaults.ts';
 import type { InitCommandInput } from './init-input.ts';
+import { deriveDefaultAppName } from '../../../kernel/domain/scaffold/app-name.ts';
 
 /** Input resolved by the interactive `init` prompt pass. */
 export interface ResolvedInitCommandInput {
@@ -41,7 +42,7 @@ export async function resolveInteractiveInitInput(
     ? await prompt.input('Example service name', { defaultValue: SCAFFOLD_DEFAULTS.SERVICE_NAME })
     : options.serviceName;
   const appName = options.appName === undefined
-    ? await prompt.input('Frontend application name', { defaultValue: SCAFFOLD_DEFAULTS.APP_NAME })
+    ? await prompt.input('Frontend application name', { defaultValue: deriveDefaultAppName(name) })
     : options.appName;
   const cache = options.cache === undefined
     ? await prompt.confirm('Scaffold a shared cache?', {

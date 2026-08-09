@@ -7,16 +7,23 @@ import {
   QueryIsland,
   useMutation,
   useQuery,
+  useQueryClient,
 } from '@netscript/fresh/query';
-import { Button } from '@app/components/ui/mod.ts';
+import { Button, EmptyState, InlineNotice, Skeleton } from '@app/components/ui/mod.ts';
 import {
+  {{serviceName | camelCase}}ListInvalidation,
   {{serviceName | camelCase}}Name,
   {{serviceName | camelCase}}Queries,
-} from '@app/lib/example-service.ts';
+} from '../(_lib)/service-query.ts';
 import {
   formatServiceTimestamp,
   loadServiceShowcaseData,
+  type ServiceShowcasePreview,
 } from '../(_shared)/service-showcase.ts';
+import {
+  createOptimisticListMutationCallbacks,
+  type OptimisticListMutationContext,
+} from '../(_lib)/optimistic-list-mutation.ts';
 
 type Props = NonNullable<InferDefinePageLayerLoaderProps<typeof loadServiceShowcaseData>>;
 type ServiceListData = NonNullable<Props['initialList']>;
@@ -36,9 +43,12 @@ function ServiceShowcaseLabInner(props: Props) {
   }
 
   const listOptions = {{serviceName | camelCase}}Queries.list.queryOptions(props.input);
+  const queryClient = useQueryClient();
   const {
     data,
+    error,
     status,
+    isError,
     isLoading,
     refetch,
   } = useQuery<ServiceListData>({
@@ -65,14 +75,35 @@ function ServiceShowcaseLabInner(props: Props) {
   });
 
   const updateOptions = {{serviceName | camelCase}}Queries.update.mutationOptions();
-  const renameMutation = useMutation<ServiceRecord, unknown, UpdateInput>({
+  const renameMutation = useMutation<
+    ServiceRecord,
+    unknown,
+    UpdateInput,
+    OptimisticListMutationContext<ServiceListData>
+  >({
     mutationFn: updateOptions.mutationFn,
+    ...createOptimisticListMutationCallbacks<ServiceListData, UpdateInput>({
+      queryClient,
+      queryKey: listOptions.queryKey,
+      update: (previous, variables) => ({
+          ...previous,
+          data: previous.data.map((item) =>
+            item.id === variables.id ? { ...item, ...variables.data } : item
+          ),
+      }),
+      onOptimisticUpdate: (variables) => {
+        statusMessage.value = `Optimistically renamed record #${variables.id}.`;
+      },
+      onRollback: (variables) => {
+        statusMessage.value =
+          `Update for record #${variables.id} failed and the cached list rolled back.`;
+      },
+    }),
     onSuccess: (record) => {
       statusMessage.value = `Server confirmed ${record.name}.`;
-      refreshList();
     },
-    onError: (_error, variables) => {
-      statusMessage.value = `Update for record #${variables.id} failed.`;
+    onSettled: async () => {
+      await queryClient.invalidateQueries({{serviceName | camelCase}}ListInvalidation);
     },
   });
 
@@ -93,6 +124,18 @@ function ServiceShowcaseLabInner(props: Props) {
   const mutationPending = createMutation.isPending ||
     renameMutation.isPending ||
     deleteMutation.isPending;
+  const renderState: ServiceShowcasePreview = props.previewState ??
+    (isLoading ? 'loading' : isError ? 'error' : items.length === 0 ? 'empty' : 'success');
+  const previewMessage = renderState === 'optimistic'
+    ? 'Optimistic update is visible while the service confirms it.'
+    : renderState === 'rollback'
+    ? 'The service rejected the update and the saved cache snapshot was restored.'
+    : renderState === 'confirmed'
+    ? 'The service confirmed the mutation and the canonical list was refreshed.'
+    : null;
+  const visibleMessage = statusMessage.value ?? previewMessage;
+  const showList = renderState === 'success' || renderState === 'optimistic' ||
+    renderState === 'rollback' || renderState === 'confirmed';
 
   return (
     <div class='ns-stack ns-stack--md'>
@@ -129,15 +172,32 @@ function ServiceShowcaseLabInner(props: Props) {
         </Button>
       </div>
 
-      {statusMessage.value
+      {visibleMessage
         ? (
-          <p class='rounded-2xl border border-ns-border bg-ns-surface-raised/20 px-4 py-3 text-sm text-ns-muted-fg'>
-            {statusMessage.value}
+          <p data-mutation-state={renderState} class='rounded-2xl border border-ns-border bg-ns-surface-raised/20 px-4 py-3 text-sm text-ns-muted-fg'>
+            {visibleMessage}
           </p>
         )
         : null}
 
-      <ul class='ns-stack ns-stack--sm'>
+      {renderState === 'loading'
+        ? <Skeleton variant='table' rows={3} columns={2} data-state='loading' />
+        : renderState === 'error'
+        ? (
+          <InlineNotice variant='destructive' title='Resource list unavailable' data-state='error'>
+            {error instanceof Error ? error.message : 'Retry the typed query.'}
+          </InlineNotice>
+        )
+        : renderState === 'empty'
+        ? (
+          <EmptyState heading='No resources yet' data-state='empty'>
+            Create the first record with the managed controls above.
+          </EmptyState>
+        )
+        : null}
+
+      {showList
+        ? <ul class='ns-stack ns-stack--sm' data-state={renderState}>
         {items.map((item) => (
           <li
             key={item.id}
@@ -181,7 +241,8 @@ function ServiceShowcaseLabInner(props: Props) {
             </div>
           </li>
         ))}
-      </ul>
+        </ul>
+        : null}
     </div>
   );
 }
