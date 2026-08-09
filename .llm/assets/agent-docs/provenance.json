@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "version": "0.0.4",
+  "version": "0.0.5-canary.19",
   "sourceCommit": "eda49bb2e",
   "extractionTimestamp": "2026-08-09T10:03:43Z",
   "files": [
@@ -179,7 +179,7 @@
     "pages/web-layer/vite/index.md",
     "pages/why/index.md"
   ],
-  "uncompressedBytes": 4685958,
-  "compressedBytes": 1332143,
-  "sha256": "67e0b4c6ce9ac28ae26e45a7d204bd1eeabdf6a220144740bc3aaad7291d298b"
+  "uncompressedBytes": 4687098,
+  "compressedBytes": 1332586,
+  "sha256": "18e8e807f9f00ac83fb61d970334ee60ab32c3af347fbcd84113790b495ac1a1"
 }
