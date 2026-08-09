@@ -390,6 +390,21 @@ passed, and no `deno.json` or `deno.lock` diff remained. The receipt is PR comme
 and the exact first-line acceptance mapping validates `9/9` with no warnings at raw exit 0. The PR
 remains draft at `status:impl` for owner-controlled evaluation/readiness.
 
+## Post-PASS CI repair — generated-quality fixture representation
+
+Cycle-3 IMPL-EVAL returned PASS and the owner moved the PR to `status:ready-merge`; the evidence
+mirror checked all nine #1333 acceptance rows and close-gate passed. CI run `31336214371` then found
+the scanner-visible forbidden type token inside `ANY_PROBE_SOURCE`, a string deliberately written
+to a temporary generated project to prove its lint task fails.
+
+The scanner, probe behavior, and allowance ledger are untouched. The fixture token is assembled
+from character codes with an explanatory comment. A focused test asserts the full source is exactly
+36 bytes and pins every character code, so the value written to the temporary file is byte-identical
+to the row-74/75 version. Focused tests exited 0 with 10 passed / 0 failed. The decisive combined
+quality scan over `packages/cli/src` and `packages/cli/e2e` exited 0 with 0 findings and the same 6
+existing allowances. `check:assets-barrel` exited 0. No `e2e:cli`, AppHost, or container run was
+started; the byte-identical proof preserves the serialized receipt's behavior coverage.
+
 ### Gates
 
 | Gate | Result |

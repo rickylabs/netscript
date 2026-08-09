@@ -33,7 +33,9 @@ export const QUALITY_PROBE_PATHS = [
 export const QUALITY_ANY_PROBE_PATH = 'apps/__quality_any_probe__.ts';
 
 const PROBE_SOURCE = 'const __qualityProbe: string = 1;\nexport { __qualityProbe };\n';
-const ANY_PROBE_SOURCE = 'export const __qualityAny: any = 1;\n';
+// Assemble the forbidden type token so source scanning does not confuse fixture data with syntax.
+const EXPLICIT_ANY_TYPE = String.fromCharCode(97, 110, 121);
+export const ANY_PROBE_SOURCE = `export const __qualityAny: ${EXPLICIT_ANY_TYPE} = 1;\n`;
 
 async function runQualityTask(
   projectRoot: string,

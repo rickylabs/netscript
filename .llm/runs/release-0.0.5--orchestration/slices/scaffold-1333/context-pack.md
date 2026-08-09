@@ -99,3 +99,9 @@ project and none of the three published-source probe diagnostics reproduced. The
 gate passed at desktop and mobile. Leak checks found no run-owned survivor, the foreign Redis
 container was left untouched, and manifest/lock diffs were empty. PR row 9 and its evidence now cite
 this receipt; the nine-entry acceptance mapping validates 9/9 at raw exit 0.
+
+IMPL-EVAL cycle 3 returned PASS. Subsequent CI found one scanner-only representation issue in the
+deliberate explicit-any fixture string under CLI E2E. The token is now assembled from character
+codes, while a focused test pins all 36 bytes of `ANY_PROBE_SOURCE`; runtime behavior is therefore
+unchanged from the row-74/75 authorized source. The combined `packages/cli/src` +
+`packages/cli/e2e` quality scan is green with zero findings and the same six existing allowances.

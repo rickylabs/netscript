@@ -109,6 +109,16 @@ checks found no run-owned resources and left the same foreign Redis container un
 and lock diffs were empty. Closure evidence now links ledger row 74, while the older green run is
 retained only as historical row 73 under grant row 72.
 
+## 2026-08-09 — CI scanner fixture token assembled without behavior drift
+
+After cycle-3 IMPL-EVAL PASS, CI's combined code-quality scan correctly reported the literal
+forbidden type token inside the generated-quality negative fixture string under `packages/cli/e2e`.
+The scanner rule, negative probe, and allowance ledger remain unchanged. The fixture now assembles
+the three-character type token from character codes, with a source comment explaining why. A
+focused assertion pins the complete 36-byte source by length and every character code; it proves the
+temporary file written by the probe is byte-identical to the source exercised by serialized ledger
+row 74/75. This is representation-only and does not invalidate that runtime receipt.
+
 ## 2026-08-09 — serialized runtime stopped at stale project-boundary app identity
 
 The single ledger-row-70 runtime execution at `2150421e4` exited 1 with 16 passed / 1 failed / 2
