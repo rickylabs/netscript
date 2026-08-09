@@ -1,0 +1,25 @@
+{
+  "workspace": [],
+  "catalog": {
+    "zod": "^4.4.3"
+  },
+  "imports": {
+    "@durable-streams/client": "npm:@durable-streams/client@0.2.6",
+    "@durable-streams/state": "npm:@durable-streams/state@0.3.1",
+    "@netscript/plugin-streams-core": "../../mod.ts",
+    "@netscript/plugin-streams-core/testing": "../../src/testing/mod.ts",
+    "@netscript/telemetry": "jsr:@netscript/telemetry@0.0.4",
+    "@netscript/telemetry/context": "jsr:@netscript/telemetry@0.0.4/context",
+    "@netscript/telemetry/otel": "jsr:@netscript/telemetry@0.0.4/otel",
+    "@opentelemetry/api": "npm:@opentelemetry/api@1.9.1"
+  },
+  "compilerOptions": {
+    "isolatedDeclarations": true,
+    "lib": [
+      "dom",
+      "deno.ns",
+      "deno.unstable"
+    ],
+    "strict": true
+  }
+}

@@ -6,7 +6,7 @@
 | -------------- | ----------------------------------------------- |
 | Run ID         | `release-0.0.5--orchestration/slices/w3-a-1326` |
 | Branch         | `fix/streams-durable-producer-reconnect`        |
-| Current phase  | `impl — S3 correlated telemetry ready to commit` |
+| Current phase  | `impl — S4 publish/consumer compatibility ready to commit` |
 | Archetype      | `3 — Runtime/Behavior`                          |
 | Scope overlays | none; Aspire runtime validation required        |
 
@@ -38,16 +38,19 @@ manual F-14 evidence. The full core suite passes 28/28.
 - S2 focused/core tests and scoped check/lint/format are green; lock remains unchanged.
 - S2 committed as `e8e638559`, pushed, and reported on draft PR #1402.
 - S3 telemetry, package-scoped quality/doctrine, F-14, docs, and aggregate gates are green locally.
+- S3 committed as `ba5c4704a`, pushed, and reported on draft PR #1402.
+- S4 isolated public consumer, downstream consumers, JSR, raw/package workspace publish, and scoped
+  wrappers are green; the only consumer repair is a test fake now using `MemoryStreamProducer`.
 
 ## In Progress
 
-- S3 commit, push, and PR comment before S4 publish/consumer compatibility.
+- S4 commit, push, and PR comment before S5 isolated Aspire proof.
 
 ## Next Steps
 
-1. Commit, push, and comment S3 with correlated trace/metric and exact debt evidence.
-2. Run S4 detached consumer, JSR, raw/package publish, and final scoped wrapper gates.
-3. Preserve aggregate quality/doctrine results as non-decisive for this package under #1403.
+1. Commit, push, and comment S4 with detached consumer and publish evidence.
+2. Implement the focused Aspire producer probe/gate without touching #1398 selections.
+3. Bracket S5 resource work with leak checks and verify owned teardown artifacts.
 
 ## Key Decisions
 
@@ -80,9 +83,9 @@ manual F-14 evidence. The full core suite passes 28/28.
 | Gate family | Current status                       | Evidence                                                                                   |
 | ----------- | ------------------------------------ | ------------------------------------------------------------------------------------------ |
 | Static      | baseline green; reconnect RED proven | `worklog.md` gate table                                                                    |
-| Fitness     | planned; AP-13 currently accepted    | Decisive package-scoped scan/check plus manual F-14 `PENDING_SCRIPT`; #1403 owns root gap. |
+| Fitness     | green; exact AP-13 row closed        | Decisive scoped pair and manual F-14; aggregates non-decisive under #1403.            |
 | Runtime     | not run                              | Token-free focused Aspire proof is S5; serialized gate requires grant.                     |
-| Consumer    | not run                              | S4; #1398 gates stay deferred.                                                             |
+| Consumer    | green                                | Isolated public types plus focused auth/sagas/workers and streams/triggers checks.    |
 
 ## Open Questions
 
@@ -93,10 +96,11 @@ manual F-14 evidence. The full core suite passes 28/28.
 
 - Drift: stale preparation identity; upstream declaration/runtime mismatch; JSR helper banner false
   positive; root quality/doctrine omission tracked by #1403.
-- Debt: exact producer AP-13 row may close only after S3; connector convergence remains open.
+- Debt: exact producer AP-13 row closed in S3; connector convergence remains open.
 
 ## Commits
 
 - `11ee98e22` — S1 contract and classified RED evidence.
 - `e8e638559` — S2 reconnect supervisor and focused GREEN evidence.
-- S3 is locally green and awaiting its required slice commit/push/comment.
+- `ba5c4704a` — S3 correlated trace/metrics and exact AP-13 debt closure.
+- S4 is locally green and awaiting its required slice commit/push/comment.

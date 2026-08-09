@@ -1,18 +1,10 @@
 import { assertEquals } from '@std/assert';
-import type { StreamProducerPort } from '@netscript/plugin-streams-core';
+import { MemoryStreamProducer } from '@netscript/plugin-streams-core/testing';
 import type { SagaInstanceProjection } from '../src/runtime/saga-instance-projection.ts';
 import { SagaStreamInstanceProjection } from './producer.ts';
 
 Deno.test('saga stream projection emits one upsert for every durable transition', async () => {
-  const upserts: Array<Readonly<{ entityType: string; value: Record<string, unknown> }>> = [];
-  const producer: StreamProducerPort = {
-    upsert(entityType, value) {
-      upserts.push({ entityType, value });
-    },
-    delete() {},
-    flush: () => Promise.resolve(),
-    close: () => Promise.resolve(),
-  };
+  const producer = new MemoryStreamProducer();
   const projection = new SagaStreamInstanceProjection(producer);
 
   await projection.upsert(sagaProjection(1, 'running', 'OrderStarted'));
@@ -20,7 +12,7 @@ Deno.test('saga stream projection emits one upsert for every durable transition'
   await projection.upsert(sagaProjection(3, 'completed', 'RefundCompleted'));
 
   assertEquals(
-    upserts.map(({ entityType, value }) => ({
+    producer.events().map(({ entityType, value = {} }) => ({
       entityType,
       instanceId: value.instanceId,
       status: value.status,

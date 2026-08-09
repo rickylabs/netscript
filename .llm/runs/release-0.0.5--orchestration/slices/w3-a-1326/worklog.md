@@ -145,6 +145,9 @@ the adapter or fetch/timers to the supervisor.
 | 2026-08-09 | S3    | Honest metrics     | Observable queue values and counters distinguish delivered, rejected, accepted-write cancellation, retry, recovery, unknown, and state transitions. |
 | 2026-08-09 | S3    | Doctrine repair    | Initial scoped doctrine found the new supervisor at 697 lines; split queue/contract/support reasons until final scoped check had zero WARN. |
 | 2026-08-09 | S3    | AP-13 disposition  | Manual F-14 found one documentation-only console example and zero executable uses; exact producer debt row closed, no generalized closure. |
+| 2026-08-09 | S4    | Consumer audit     | Direct checking found the sagas handwritten void fake incompatible; it now uses `MemoryStreamProducer`, and auth/sagas/workers tests pass 8/8. |
+| 2026-08-09 | S4    | Detached types     | A no-workspace config type-checks receipt, state, readiness, flush, and stop through public root/testing subpaths; raw exit 0. |
+| 2026-08-09 | S4    | Publish surface    | Full export docs, JSR helper, raw package dry-run, and workspace publish dry-run completed without lock or manifest churn. |
 
 ## Decisions
 
@@ -179,6 +182,14 @@ See `plan.md` D1–D16. No open decision would force implementation rework.
 | S3 scoped lint                      | core wrapper                                                     | PASS, exit 0 | 42 files, zero findings after type-only import repair.    |
 | S3 scoped format                    | core wrapper                                                     | PASS, exit 0 | 42 files, zero findings after mechanical formatting.      |
 | S3 full export doc lint             | `deno task doc:lint --root packages/plugin-streams-core --pretty` | PASS, exit 0 | Combined diagnostics 0 after public local meter types.    |
+| S4 detached consumer                | isolated `deno check --config ...producer-consumer-deno.json`   | PASS, exit 0 | No workspace; public root/testing APIs preserve explicit receipt/lifecycle types. |
+| S4 direct consumers                 | auth + sagas + workers focused test files                        | PASS, exit 0 | 8 passed, 0 failed; streams/triggers producer modules also type-check. |
+| S4 scoped check                     | core plus sagas compatibility test, `--no-lock`                 | PASS, exit 0 | 44 files, zero failed batches or diagnostics.             |
+| S4 scoped lint                      | core plus sagas compatibility test                              | PASS, exit 0 | 44 files, zero findings after type-only fixture import.   |
+| S4 scoped format                    | core plus sagas compatibility test                              | PASS, exit 0 | 44 files, zero findings.                                  |
+| S4 JSR audit helper                 | `audit-jsr-package.ts --root packages/plugin-streams-core`      | PASS, exit 0 | One known false banner-count warning; raw authority below is clean. |
+| S4 raw package publish              | `deno publish --dry-run --allow-dirty --no-check`                | PASS, exit 0 | 43 intended files; no actual slow-type diagnostic.        |
+| S4 workspace publish                | `deno task publish:dry-run`                                     | PASS, exit 0 | Entire workspace simulation completed successfully.       |
 
 ### S1 RED evidence
 
