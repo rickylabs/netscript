@@ -65,6 +65,10 @@ jobs:
         with:
           deno-version: "2.9.5"
 
+      - name: Require coherent release version
+        if: steps.release.outputs.dry_run != 'true'
+        run: deno run --allow-read --allow-run .llm/tools/release/assert-release-version.ts --version "${{ steps.release.outputs.version }}"
+
       - name: Require green canary pair for this content
         env:
           GH_TOKEN: ${{ github.token }}
@@ -106,6 +110,10 @@ jobs:
       - name: Publish
         if: steps.release.outputs.dry_run != 'true'
         run: deno run --allow-read --allow-write --allow-run .llm/tools/release/run-publish.ts
+
+      - name: Require exact-version registry completion
+        if: steps.release.outputs.dry_run != 'true'
+        run: deno run --allow-net=jsr.io --allow-read .llm/tools/release/report-jsr-publish-outcome.ts --version "${{ steps.release.outputs.version }}" --require-complete
 
       - name: Write published version
         if: steps.release.outputs.dry_run != 'true'

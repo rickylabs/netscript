@@ -8,6 +8,18 @@ export interface PublishOutcome {
   readonly missing: readonly string[];
 }
 
+/** Fail closed unless every coordinated package exists at the exact release version. */
+export function assertCompleteJsrPublishOutcome(
+  version: string,
+  outcome: PublishOutcome,
+): void {
+  if (outcome.missing.length === 0) return;
+  throw new Error(
+    `Exact-version JSR assertion failed for ${version}; missing packages:\n` +
+      outcome.missing.map((name) => `- ${name}`).join('\n'),
+  );
+}
+
 /** Observe exact-version registry presence after a failed coordinated publish. */
 export async function reportJsrPublishOutcome(
   version: string,
@@ -31,7 +43,9 @@ export async function reportJsrPublishOutcome(
 if (import.meta.main) {
   const versionIndex = Deno.args.indexOf('--version');
   const version = versionIndex >= 0 ? Deno.args[versionIndex + 1] : undefined;
-  if (!version) throw new Error('--version requires the failed canary version.');
+  if (!version) throw new Error('--version requires the release version.');
   const members = await discoverWorkspaceMembers();
-  console.log(JSON.stringify(await reportJsrPublishOutcome(version, members.map((m) => m.name))));
+  const outcome = await reportJsrPublishOutcome(version, members.map((m) => m.name));
+  console.log(JSON.stringify(outcome));
+  if (Deno.args.includes('--require-complete')) assertCompleteJsrPublishOutcome(version, outcome);
 }

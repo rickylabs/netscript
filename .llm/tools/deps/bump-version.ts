@@ -2,7 +2,7 @@
 /** Coordinate exact NetScript workspace versions around native `deno bump-version`. */
 
 import { walk } from 'jsr:@std/fs@^1.0.0/walk';
-import { dirname, join, normalize } from 'jsr:@std/path@^1.0.0';
+import { basename, dirname, join, normalize } from 'jsr:@std/path@^1.0.0';
 
 export interface BumpResult {
   readonly oldVersion: string;
@@ -183,6 +183,11 @@ export async function discoverVersionFiles(root: string): Promise<string[]> {
   return [...files].map(normalize).sort();
 }
 
+/** Discover the manifests governed by the coordinated version bump. */
+export async function discoverVersionManifests(root: string): Promise<string[]> {
+  return (await discoverVersionFiles(root)).filter((path) => basename(path) === 'deno.json');
+}
+
 async function listTrackedFiles(root: string): Promise<ReadonlySet<string> | undefined> {
   const worktree = await new Deno.Command('git', {
     args: ['rev-parse', '--is-inside-work-tree'],
@@ -323,7 +328,7 @@ async function run(args: Args): Promise<number> {
   return exitCode;
 }
 
-async function readVersion(path: string): Promise<string> {
+export async function readVersion(path: string): Promise<string> {
   const parsed = parseJsonObject(await Deno.readTextFile(path), path);
   if (typeof parsed.version !== 'string') throw new Error(`${path} must declare a string version.`);
   return parsed.version;
