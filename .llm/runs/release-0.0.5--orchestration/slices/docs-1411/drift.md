@@ -17,3 +17,11 @@ literal placeholders elsewhere. The orchestrator folded the three front-matter r
 exact full-site rendered-placeholder gate into PR #1412 because they share the docs rendering and
 specifier-correctness surface. This is not implementation-caused drift. No package/plugin,
 lockfile, corpus regeneration, guard allowance, or root-guard narrowing is authorized.
+
+CI correction after IMPL-EVAL PASS: repo-wide `check-test` revealed that the Round 3 test imported
+the rendered-output entry point and thereby made its `lume/deps/dom.ts` import reachable from the
+root import map, where `lume/*` is intentionally unavailable. Docs-workspace tests could not expose
+this two-graph defect. The orchestrator directed a mechanical module-boundary repair: move only the
+pure placeholder scanner into a DOM-free module and add the root scoped check plus root `check` to
+the evidence set. No dependency/import-map addition, exclusion, suppression, or gate weakening is
+authorized.

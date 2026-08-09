@@ -176,3 +176,41 @@ guard was added; the orchestrator will carry the demonstrated reachability gap t
   result. Round 3 IMPL evidence comment:
   https://github.com/rickylabs/netscript/pull/1412#issuecomment-5230615501.
 - Separate-session IMPL-EVAL, CI, acceptance mirror/close gate, and merge remain orchestrator-owned.
+
+## 2026-08-09 — CI root-graph repair
+
+- Separate-session IMPL-EVAL passed at exact head `d2570f485`:
+  https://github.com/rickylabs/netscript/pull/1412#issuecomment-5230748425.
+- CI `check-test` then failed with TS2307 because `check-source-format_test.ts` imported
+  `check-rendered-output.ts`, making its docs-workspace-only `lume/deps/dom.ts` import reachable
+  from the root import map. The docs-local six-test task was green because it resolves through
+  `docs/site/deno.json`; it was insufficient evidence for the root graph.
+- Mechanical repair is locked: extract `collectHtmlFiles`, the bounded allowance table, and
+  `assertNoLiteralVentoPlaceholders` into a DOM-free sibling module; production and test callers
+  both import that module. No suppression, exclusion, dependency/import-map change, or gate
+  weakening is allowed.
+
+### CI repair implementation and evidence
+
+- Moved the pure placeholder allowance table, HTML-file collection, and literal-placeholder scan
+  into `check-rendered-placeholders.ts`, which has no `lume/*` or DOM dependency.
+- `check-rendered-output.ts` retains the single production entry point and DOM-based homepage
+  semantics, importing only the extracted scanner. `check-source-format_test.ts` now imports the
+  DOM-free module directly.
+
+| Command | Raw exit | Evidence |
+| --- | ---: | --- |
+| `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root docs/site --ext ts` | 1 | directly selects 19 docs TS files under the root map; 11 pre-existing findings in `_config.ts`, `ai-tooling.ts`, and DOM-owning `check-rendered-output.ts` |
+| root wrapper scoped to the affected test + DOM-free scanner | 0 | 2 files; 1 batch; 0 findings |
+| `deno task check` | 0 | 2,680 files; 23 batches; 0 findings |
+| `deno task test` | 0 | affected docs test checks; 3,055 passed / 575 steps; 0 failed; 17 ignored |
+| `cd docs/site && deno task test:source-format` | 0 | 6 passed; 0 failed |
+| `cd docs/site && deno task check:rendered-output` | 0 | homepage semantics; 220 HTML files; four bounded allowances |
+| `cd docs/site && deno task build` | 0 | 617 files generated; full rendered gate green |
+| explicit-file scoped format wrapper | 0 | three owned TypeScript files; 0 findings |
+| `git diff --check` | 0 | no whitespace errors |
+
+The exact broad docs-root wrapper command is not a valid green verdict for this repository layout:
+it ignores `docs/site/deno.json` and directly selects known Lume-bound entry points under the root
+import map. The narrower root wrapper and, decisively, root `deno task test` prove the CI regression
+is fixed without adding Lume to the root graph. No unrelated Lume surface was changed.

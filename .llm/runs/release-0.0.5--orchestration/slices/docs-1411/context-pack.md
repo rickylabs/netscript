@@ -2,7 +2,7 @@
 
 ## Current state
 
-- Phase: Round 3 implementation and Tier-D gates complete; awaiting orchestrator IMPL-EVAL and CI.
+- Phase: IMPL-EVAL passed; CI root-graph repair implemented and locally gated; PR handoff pending.
 - Branch/base: `fix/docs-versionless-jsr-specifiers` at `399f60185`.
 - `PLAN-EVAL: N/A` was recorded before source edits because the slice is fully specified and
   mechanical.
@@ -41,3 +41,16 @@
   formatting of the owned checker/test files.
 - Round 3 implementation commit: `f94c0ac28`; structured evidence comment:
   https://github.com/rickylabs/netscript/pull/1412#issuecomment-5230615501.
+- Separate-session IMPL-EVAL passed at `d2570f485`:
+  https://github.com/rickylabs/netscript/pull/1412#issuecomment-5230748425.
+- CI then exposed a two-import-map reachability defect: the placeholder tests imported
+  `check-rendered-output.ts`, pulling its docs-workspace-only `lume/deps/dom.ts` dependency into the
+  root type-check graph. The authorized repair extracts the DOM-free scanner and repoints both the
+  build entry point and tests; no dependency, import-map, exclusion, or suppression change is
+  permitted.
+- Repair result: the scanner now lives in DOM-free `check-rendered-placeholders.ts`; root
+  `deno task test` checks and runs the affected test successfully (3,055 passed, 0 failed), root
+  `deno task check` is green, and the docs build remains green. The exact requested broad
+  `--root docs/site --ext ts` wrapper remains red because it directly selects pre-existing
+  Lume-bound `_config.ts`, `ai-tooling.ts`, and `check-rendered-output.ts`; this is recorded as a
+  gate-scope mismatch rather than hidden or expanded into unrelated work.

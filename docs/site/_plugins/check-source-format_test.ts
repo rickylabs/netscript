@@ -1,5 +1,5 @@
 import { assertSiteSourceFormat, collectSiteSourceDiagnostics } from './check-source-format.ts';
-import { assertNoLiteralVentoPlaceholders } from './check-rendered-output.ts';
+import { assertNoLiteralVentoPlaceholders } from './check-rendered-placeholders.ts';
 
 function assertEquals(actual: unknown, expected: unknown): void {
   if (JSON.stringify(actual) !== JSON.stringify(expected)) {
