@@ -22,10 +22,11 @@ Repo is on **Deno 2.9.5** (Windows + WSL). Targeted `deno check` must pass `--un
 
 Deno's default 24-hour dependency-age policy can block a freshly published explicit prerelease.
 For the release-verification path that deliberately consumes a just-published canary, use the exact
-version with a narrowly scoped bypass:
+version with a narrowly scoped bypass. Set `NETSCRIPT_CANARY_VERSION` to that exact just-published
+canary version, then run:
 
 ```bash
-deno add --minimum-dependency-age=0 jsr:@netscript/service@0.0.5-canary.17
+deno add --minimum-dependency-age=0 "jsr:@netscript/service@${NETSCRIPT_CANARY_VERSION:?set to the exact just-published canary version}"
 ```
 
 Deno 2.9.3 rejects `--minimum-dependency-age`; denoland/deno PR #36099 (commit `5dd39c7458`)
