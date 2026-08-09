@@ -5,25 +5,18 @@
 | Field          | Value                                            |
 | -------------- | ------------------------------------------------ |
 | Run ID         | `release-0.0.5--orchestration/slices/w3-b1-1102` |
-| Branch         | `fix/mcp-intent-aware-discovery`                 |
+| Branch         | `feat/mcp-intent-activation-s4-s5`               |
 | Current phase  | `impl`                                           |
 | Archetype      | `6 — CLI / Tooling`                              |
 | Scope overlays | `docs`                                           |
 
 ## Current State
 
-Research and contract-first design are complete. A separate Claude · Fable 5 PLAN-EVAL cycle 2
-returned `PASS`, authorizing implementation. The branch incorporated `main@3ce91f2c2` at
-`b9692f93d`; the recovered worktree was clean there. S1 now adds the 22nd read-only MCP contract,
-`find_guidance`, its bounded flow shell, vertical docs folders, count-synchronized public surfaces,
-and focused red-to-green tests. S2 adds the one shared section parser/index/ranker, concept aliases,
-fenced/Vento code citations, direct internal-link routing, corpus composition, and D12 filesystem
-source admission. S3 now refreshes the canonical release corpus at repaired `main@399f60185`,
-selects the bounded intent destinations, and proves the locked evaluation through embedded and
-materialized-filesystem adapters. IMPL-EVAL cycle 1 returned `FAIL_FIX` at `fd9267906` because the
-installed-corpus CLI assertion still expected two documents after D12 intentionally added `llms`.
-The evaluator repair preserves production behavior, locks the exact three-row registry, records
-the deepened A8 debt, and narrows the evaluation claim to what the fixtures actually constrain.
+The separate Claude · Fable 5 continuation PLAN-EVAL passed at `71c0a29c2`. S4A retrieval closure,
+S4B activation, and S5 public docs are implemented and green. The real public CLI installed-corpus
+path returns rank-1 `llms#task-router`; the original five rows / 15 citations and 12-document
+253,535-byte corpus remain unchanged. The granted one-pass runtime suite finished at raw exit 0
+with 79 passed, 0 failed, and only the two expected #1398 skips. Separate-session IMPL-EVAL remains.
 
 ## Completed
 
@@ -58,20 +51,23 @@ the deepened A8 debt, and narrows the evaluation claim to what the fixtures actu
   acceptance-row-3 paraphrase without tuning the locked evaluation.
 - Recorded `tool-contracts.ts` growth from the evaluator's 301-line baseline to 367 lines as
   accepted A8 debt with a package follow-up and closure gate.
+- Added a genuine render/request phrase family plus two unquoted retrieval paraphrases, a
+  getting-started route through `llms`, and a zero-route-hint score discriminator whose scratch
+  comparator inversion fails.
+- Activated `find_guidance` across MCP initialize instructions, generated `AGENTS.md`, consumer
+  skills, installed-corpus stdio, and all three public docs surfaces.
+- Completed every non-Aspire gate, the exact granted runtime suite, and both leak-check brackets.
 
 ## In Progress
 
-- S1–S3 have been rebased onto `main@4f96aec40`. The canonical corpus was rebuilt from a fresh
-  exact-revision checkout at `eda49bb2e`, all four generated artifacts were refreshed, and the
-  requested local gates are green. The refresh record is being committed/pushed/commented for the
-  orchestrator-owned re-evaluation and CI.
+- No implementation work remains. Await owner-run separate-session IMPL-EVAL, CI, and merge
+  decision; this implementation session does not self-certify or mark the PR ready.
 
 ## Next Steps
 
-1. Commit and guarded-force-push the rebased regeneration evidence, then update PR #1404.
-2. Orchestrator reruns the mandatory separate-session IMPL-EVAL and owns CI/merge disposition.
-3. Do not start an Aspire/runtime suite
-   without a durable token grant.
+1. Commit/push/comment the exact runtime and leak evidence.
+2. Stop for the owner-run separate-session IMPL-EVAL. Add `Closes #1102` and check DoD rows only
+   after that evaluator confirms all seven acceptance rows.
 
 ## Key Decisions
 
@@ -79,7 +75,7 @@ the deepened A8 debt, and narrows the evaluation claim to what the fixtures actu
 | ---------------------------------------------------- | ------------------------------------- | ------------------------------------------------------------ |
 | `find_guidance`, deterministic hybrid, no embeddings | `plan.md` D1/D4                       | Offline, bounded, falsifiable                                |
 | One shared index for filesystem and embedded         | `plan.md` D7                          | No second #1375 path                                         |
-| Approved canonical corpus refresh + expected JSON    | `research.md` F5/F12; `plan.md` D8/D9 | Current mirror is stale; reuse #1375's one generator path    |
+| Preserve canonical corpus + extend expected JSON     | `research.md` F15–F18; `plan.md` D13–D15 | Zero corpus-byte change; three additive evaluation rows      |
 | Root `llms.txt` parity across real deployment paths  | `research.md` F14; `plan.md` D12      | Explicit source policy + dual-adapter/installed-corpus gates |
 | Adoption belongs only to #1090                       | issue #1102 row 7 / brief             | Never claim usage from top-k tests                           |
 
@@ -103,16 +99,16 @@ the plaintext embed.
 
 | Gate family | Current status             | Evidence                                                        |
 | ----------- | -------------------------- | --------------------------------------------------------------- |
-| Static      | PASS through rebased S3    | 132 MCP tests; CLI pair 20/20; JSR failures=0; scoped gates green |
+| Static      | PASS through S5             | 134 MCP tests; CLI pair 20/20; JSR failures=0; scoped gates green |
 | Fitness     | Known pre-existing failure | doctrine exit 1 only for #1403 baseline; no new warning remains  |
-| Runtime     | NOT_RUN                    | no AppHost/container started; serialized token not granted       |
+| Runtime     | PASS                       | raw exit 0; 79 passed / 0 failed / 2 expected #1398 skips; 81 total |
 | Consumer    | PASS for D12 paths         | embedded, materialized filesystem, and installed-corpus stdio    |
 
 ## Open Questions
 
-- No product decision remains open. Locked D12, the 12 exact-ordered citations plus Prisma's
-  unordered top-three set, numeric policy/bounds, and canonical prose-refresh scope may change only
-  through recorded drift and evaluator approval.
+- No implementation decision remains open. Separate-session IMPL-EVAL, CI, and merge remain
+  owner-controlled. Any change to locked rows, cap, selection, or ranking constants still requires
+  recorded drift and evaluator approval.
 
 ## Drift and Debt
 
@@ -135,4 +131,8 @@ the plaintext embed.
 - `26176a608` — S2 shared intent ranker, citations/link routing, and D12 filesystem policy.
 - `5e3b58b67` — record the canonical-corpus source blocker without a workaround.
 - `fd9267906` — S3 canonical corpus refresh, bounded embedded selection, and locked dual-adapter evaluation.
-- Rebased regeneration commit — pending; canonical source `eda49bb2e`, JSR close gate green.
+- `99d753e0a` — S4A retrieval gaps, additive evaluation rows, and score-mutation discriminator.
+- `5414bf5b9` — S4B activation across MCP/generated guidance/skills and real installed-corpus stdio.
+- `93fd65adf` — S5 public docs, generated README asset, all non-Aspire close gates, token request.
+- `c52fee4e5` — exact root publish-manifest mutation forensics and clean-tree evidence.
+- Runtime evidence commit — exact one-pass result and post-run leak artifact.

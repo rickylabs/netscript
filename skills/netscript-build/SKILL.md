@@ -41,6 +41,10 @@ Run in order: `init → generate → migrate → seed`, then `status` to confirm
 
 ## Workflows
 
+Before implementing an unfamiliar NetScript API or architecture, call MCP `find_guidance` with the
+task. Follow its ordered section citations before choosing an API or architecture. Use
+`search_docs` for literal lookup and `get_doc` for exact retrieval.
+
 ## Installed diagnostic tools by symptom
 
 Run these from the initialized project root. The paths are installed by `netscript agent init`.

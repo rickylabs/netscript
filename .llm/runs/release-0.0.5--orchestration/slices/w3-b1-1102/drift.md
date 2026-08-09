@@ -146,3 +146,102 @@ Drift is append-only.
 - **Freshness gate note:** the first `check:assets-barrel` invocation exited 1 because its final
   git-diff assertion correctly observed the newly regenerated but unstaged CLI asset. After staging
   exactly the four generator-owned artifacts, the decisive rerun exited 0.
+
+## 2026-08-09 — #1404 merged; S4/S5 continuation gained an unplanned retrieval-closure slice
+
+- **What:** #1404 merged the planned S1–S3 foundation at `main@51a58b4f5`, but its IMPL-EVAL
+  deliberately carried three gaps: the issue's render/fetch paraphrase still misses query guidance,
+  getting-started ranks a database detail first, and the five locked rows do not constrain score.
+- **Expected:** the original plan continued directly with S4 activation then S5 docs/evidence.
+- **Actual:** completing #1102 truthfully requires S4A retrieval closure before activation. It adds
+  three evaluation rows but changes none of the original five rows / 15 citations, ranking numbers,
+  adapters, or public contracts.
+- **Action:** require a fresh separate-session PLAN-EVAL. Order continuation commits S4A retrieval,
+  S4B activation/real stdio, then S5 docs/release evidence.
+- **Evidence:** `research.md` F15–F20; `plan.md` D13–D16 and continuation failure matrix.
+
+## 2026-08-09 — Getting-started uses the embedded task router instead of growing the corpus
+
+- **What:** the quickstart page removed during S3 would directly cover project creation, but adding
+  its 20,986 bytes to the current 253,535-byte fallback totals 274,521, which is 12,377 over the
+  262,144 cap.
+- **Decision:** keep all 12 selected domain/task-router documents and the cap. Route natural project
+  creation language to the existing `llms#Getting started` section, which cites and summarizes the
+  Quickstart. Do not regenerate the corpus for this change.
+- **Rejected:** raising the cap without demonstrated need, or silently removing another document.
+  Contracts (18,823 bytes) and services (29,122 bytes) would fit but lose broader guidance.
+- **Drift rule:** if the section cannot pass truthful evaluation, stop and return to evaluator; do
+  not change the cap/selection as an implementation repair.
+
+## 2026-08-09 — Package doctrine has a pre-existing nonzero continuation baseline
+
+- **What:** at clean `main@51a58b4f5`, explicit package doctrine exits 1 with A14 fail, the accepted
+  367-line `tool-contracts.ts` warning, 14/16 directory warnings, and one architecture-doc info.
+  Explicit MCP source quality exits 0 with zero findings/allowances.
+- **Action:** package commands remain decisive. Require a zero doctrine finding delta and record the
+  raw exit 1; never label it green. Leave existing findings to #1403/debt triage and do not widen
+  #1102. Root aggregates remain non-decisive because they omit MCP.
+
+## 2026-08-09 — Scoped lint/format require the package config under Deno 2.9.5
+
+- **What:** the approved continuation plan's lint/format commands selected 115 MCP files but did not
+  pass `--config packages/mcp/deno.json`.
+- **Observed:** both wrappers exited 1 before analysis because Deno 2.9.5 parsed root
+  `workspace: ["packages/*", ...]` as the newer structured workspace shape. They emitted zero
+  lint/format findings, so the result was a tooling invocation failure, not a product red.
+- **Action:** use the wrappers' documented `--config packages/mcp/deno.json` option, matching the
+  successful S1 run record. Both decisive reruns selected the same 115 files and exited 0 with zero
+  findings. Update validation orders 6–7; do not change repo configuration in #1102.
+
+## 2026-08-09 — Real activation smoke needs Claude host plus the existing no-delegation marker
+
+- **What:** the approved S4B table selected `agent init --host vscode --editor none --with-docs`
+  to avoid Aspire while expecting installed Claude skills and root `AGENTS.md`.
+- **Observed:** `init-agent.ts` installs those surfaces only when `hosts.includes("claude")`;
+  VS Code host with editor `none` truthfully installs generic tools/docs but neither Claude skills
+  nor root guidance. The pre-fix smoke therefore exited after `agent init` but failed reading
+  `AGENTS.md`.
+- **Action:** use the existing tested no-delegation contract: scaffold with `--no-aspire`, create
+  `.claude/skills/playwright-cli/SKILL.md`, and run the public Claude-host init. The marker makes
+  `initAgent` skip `DenoAspireAgentInitializer` before any `aspire` command, while the Claude host
+  installs `AGENTS.md`, skills, config, and docs. This changes only test setup, not product routing.
+- **Evidence:** combined pre-fix activation run exit 1 with three named failures; post-change focused
+  group exit 0 with 21/21, and exact CLI pair exit 0 with 20/20. No AppHost, container, or Aspire
+  command ran. The diagnostic scaffold was moved to system trash and is recoverable.
+
+## 2026-08-09 — Root publish dry-run mutates catalog-backed package manifests
+
+- **What:** the required root `publish:dry-run` exited 0 but resolved `catalog:` Zod imports to an
+  exact npm specifier in 18 package/plugin manifests; the package dry-run also expanded the MCP
+  publish arrays. These files were clean immediately before the gate and are outside S5.
+- **Action:** restored only the proven gate-created, unstaged manifest churn with `apply_patch`,
+  verified every affected path plus `deno.lock` has no diff, and retained the raw exit-0 publish
+  evidence. No dependency or manifest change belongs to #1102.
+
+## 2026-08-09 — Forensic correction: root publish materializes all 19 manifests transiently
+
+- **Exact gate:** `deno task publish:dry-run` from the repository root, which invokes
+  `.llm/tools/release/run-publish-dry-run.ts` → `publishWorkspace({ mode: 'dry-run' })`.
+- **Mechanism opened in source:** `publish-workspace.ts:38-46` snapshots each publishable member,
+  expands `catalog:` imports, and writes normalized JSON into the live worktree before spawning
+  `deno publish`; lines 87-90 restore snapshots only when the wrapper reaches `finally`.
+- **Isolated reproduction:** a detached worktree at `93fd65adf` showed these exact 19 modified paths
+  while the root gate was running:
+  `packages/aspire/deno.json`, `packages/cli/deno.json`, `packages/config/deno.json`,
+  `packages/contracts/deno.json`, `packages/fresh/deno.json`, `packages/mcp/deno.json`,
+  `packages/plugin-ai-core/deno.json`, `packages/plugin-auth-core/deno.json`,
+  `packages/plugin-sagas-core/deno.json`, `packages/plugin-triggers-core/deno.json`,
+  `packages/plugin-workers-core/deno.json`, `packages/plugin/deno.json`,
+  `packages/queue/deno.json`, `packages/service/deno.json`, `plugins/auth/deno.json`,
+  `plugins/sagas/deno.json`, `plugins/streams/deno.json`, `plugins/triggers/deno.json`, and
+  `plugins/workers/deno.json`.
+- **Catalog defect:** 18 paths temporarily replace centralized `"zod": "catalog:"` with
+  `"zod": "npm:zod@^4.4.3"`; `packages/mcp/deno.json` is reserialized even though it has no Zod
+  catalog import. A concurrent reader, overlapping invocation, or interrupted process can observe
+  or preserve this materialized state.
+- **Completion behavior:** the isolated command reached `Success Dry run complete`; after its
+  `finally`, both `git status --porcelain` and `git diff --name-only -- '**/deno.json'` were empty.
+  The S5 commit was likewise inspected and contains no manifest change. The earlier entry's split
+  attribution to package versus root dry-runs is superseded by this exact reproduction.
+- **Action:** keep the gate mandatory, never commit its transient materialization, and verify the
+  manifest diff is empty after every run until the orchestrator files and lands a tooling repair.

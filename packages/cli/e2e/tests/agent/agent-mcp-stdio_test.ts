@@ -1,4 +1,4 @@
-import { assert, assertEquals } from '@std/assert';
+import { assert, assertEquals, assertStringIncludes } from '@std/assert';
 import { fromFileUrl, join } from '@std/path';
 import { createPublicCommandTree } from '../../../src/public/features/root/public-command-tree.ts';
 
@@ -9,6 +9,7 @@ interface RpcResponse {
     readonly structuredContent?: Record<string, unknown>;
     readonly isError?: boolean;
     readonly serverInfo?: { readonly name: string };
+    readonly instructions?: string;
   };
   readonly error?: unknown;
 }
@@ -39,12 +40,37 @@ Deno.test('agent mcp real CLI stdio smoke', async () => {
     '--no-aspire',
     '--no-git',
   ]);
-  const docsRoot = join(projectRoot, 'docs', 'site');
-  await Deno.mkdir(docsRoot, { recursive: true });
-  await Deno.writeTextFile(
-    join(docsRoot, 'workers.md'),
-    `---\ntitle: Worker retries\ndescription: Configure bounded worker retry policies.\n---\n\n# Worker retries\n\nSet an explicit retry policy for each worker.\n`,
-  );
+  const playwrightSkillRoot = join(projectRoot, '.claude', 'skills', 'playwright-cli');
+  const playwrightSkill = join(playwrightSkillRoot, 'SKILL.md');
+  await Deno.mkdir(playwrightSkillRoot, { recursive: true });
+  await Deno.writeTextFile(playwrightSkill, '# Playwright CLI\n');
+  const init = await new Deno.Command(Deno.execPath(), {
+    args: [
+      'run',
+      '-A',
+      cliEntrypoint,
+      'agent',
+      'init',
+      '--host',
+      'claude',
+      '--editor',
+      'none',
+      '--with-docs',
+    ],
+    cwd: projectRoot,
+    stdout: 'piped',
+    stderr: 'piped',
+  }).output();
+  assertEquals(init.code, 0, new TextDecoder().decode(init.stderr));
+  const docsRoot = join(projectRoot, '.netscript', 'docs');
+  const agents = await Deno.readTextFile(join(projectRoot, 'AGENTS.md'));
+  assertStringIncludes(agents, 'call MCP `find_guidance` with the task');
+  for (const skill of ['netscript', 'netscript-build']) {
+    assertStringIncludes(
+      await Deno.readTextFile(join(projectRoot, '.claude', 'skills', skill, 'SKILL.md')),
+      'find_guidance',
+    );
+  }
 
   const child = new Deno.Command(Deno.execPath(), {
     args: [
@@ -85,7 +111,10 @@ Deno.test('agent mcp real CLI stdio smoke', async () => {
         jsonrpc: '2.0',
         id: 4,
         method: 'tools/call',
-        params: { name: 'search_docs', arguments: { query: 'retry policy' } },
+        params: {
+          name: 'find_guidance',
+          arguments: { intent: 'build a real service-backed UI' },
+        },
       },
       {
         jsonrpc: '2.0',
@@ -124,6 +153,10 @@ Deno.test('agent mcp real CLI stdio smoke', async () => {
     for (const response of responses) assertEquals(response.error, undefined);
 
     assertEquals(responses[0].result?.serverInfo?.name, '@netscript/mcp');
+    assertStringIncludes(
+      responses[0].result?.instructions ?? '',
+      'Before implementing an unfamiliar NetScript API or architecture',
+    );
     const tools = responses[1].result?.tools ?? [];
     assertEquals(tools.length, 22);
     assert(tools.some((tool) => tool.name === 'find_guidance'));
@@ -134,10 +167,11 @@ Deno.test('agent mcp real CLI stdio smoke', async () => {
     assert(['warn', 'fail'].includes(String(doctor.status)));
     assert(Array.isArray(doctor.checks));
 
-    const docs = responses[3].result?.structuredContent;
-    assert(docs);
-    assertEquals(docs.count, 1);
-    assertEquals((docs.matches as readonly Record<string, unknown>[])[0]?.slug, 'workers');
+    const guidance = responses[3].result?.structuredContent;
+    assert(guidance);
+    const recommendations = guidance.recommendations as readonly Record<string, unknown>[];
+    assertEquals(recommendations[0]?.slug, 'llms');
+    assertEquals(recommendations[0]?.section, 'task-router');
 
     const status = responses[4].result?.structuredContent;
     assert(status);

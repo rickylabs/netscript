@@ -45,6 +45,32 @@
         "pages/tutorials/live-dashboard/04-definePage-QueryIsland#what-you-will-build",
         "pages/tutorials/live-dashboard/03-sdk-cache-first-query#what-you-will-build"
       ]
+    },
+    {
+      "intent": "avoid hitting my service every render",
+      "mode": "exact",
+      "expected": [
+        "pages/web-layer/query#a-cache-first-load-pattern",
+        "pages/tutorials/live-dashboard/03-sdk-cache-first-query#step-2-add-the-cache-first-query-factory",
+        "pages/tutorials/live-dashboard/04-definePage-QueryIsland#step-2-define-the-page-and-cache-first-resource-pipeline"
+      ]
+    },
+    {
+      "intent": "create a new NetScript project from scratch",
+      "mode": "rank-one",
+      "expected": [
+        "llms#getting-started"
+      ]
+    },
+    {
+      "intent": "pick direct application ownership versus a reusable integration",
+      "mode": "exact",
+      "rankingAxis": "score",
+      "expected": [
+        "pages/data-persistence/how-to/use-a-second-database#4-decision-rule-direct-use-vs-reusable-databaseadapter-wrapper",
+        "pages/data-persistence/how-to/use-a-second-database#unsupported-by-netscript-supported-by-prisma-libsql-turso-example",
+        "pages/data-persistence/how-to/use-a-second-database#connect-an-external-database-by-hand"
+      ]
     }
   ]
 }

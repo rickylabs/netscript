@@ -88,6 +88,16 @@ Deno.test("agent init writes Claude config, skills, and marked AGENTS section id
     for (const expected of ["aspire", "deno", "help.md", "aspire otel"]) {
       assertStringIncludes(agents, expected);
     }
+    assertStringIncludes(
+      agents,
+      "Before implementing an unfamiliar NetScript API or architecture, call MCP `find_guidance` with the task.",
+    );
+    for (const skill of ["netscript", "netscript-build"]) {
+      assertStringIncludes(
+        await Deno.readTextFile(join(root, `.claude/skills/${skill}/SKILL.md`)),
+        "find_guidance",
+      );
+    }
     assertEquals(first.hosts, ["claude"]);
     const second = await initAgent({ projectRoot: root, host: "claude" }, {
       fs,

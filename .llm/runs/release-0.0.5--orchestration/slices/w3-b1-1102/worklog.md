@@ -5,7 +5,7 @@
 | Field          | Value                                            |
 | -------------- | ------------------------------------------------ |
 | Run ID         | `release-0.0.5--orchestration/slices/w3-b1-1102` |
-| Branch         | `fix/mcp-intent-aware-discovery`                 |
+| Branch         | `feat/mcp-intent-activation-s4-s5`               |
 | Archetype      | `6 — CLI / Tooling`                              |
 | Scope overlays | `docs`                                           |
 
@@ -193,3 +193,190 @@ the single shared indexer used by both adapters.
 - The first evaluator-fix check invocation redundantly supplied `--unstable-kv`, which the wrapper
   already adds; Deno exited 1 before diagnostics. The corrected decisive command omitted the
   duplicate, exited 0, and selected the same test file with zero failed batches.
+
+## 2026-08-09 — S4–S5 continuation planning
+
+- Started clean from `origin/main@51a58b4f5` after #1404 merged; created
+  `feat/mcp-intent-activation-s4-s5` and removed its upstream. No product source changed.
+- Re-read the live #1102 body and retained all seven acceptance rows verbatim. #1090 adoption
+  remains out of scope. `Closes #1102` is deferred until implementation evidence supports every
+  row.
+- Re-opened every load-bearing retrieval, activation, CLI stdio, generated-skill, docs, corpus, and
+  gate source. Confirmed the two carried retrieval failures and the five-row scoring blind spot.
+- Measured the quickstart decision: selected fallback 253,535 bytes / 12 documents; quickstart
+  20,986 bytes; combined 274,521, which is 12,377 above the 262,144 cap. Plan D13 uses the already
+  embedded `llms#Getting started` section with zero corpus-byte delta.
+- Locked three additive evaluation rows. The original five rows / 15 citations are unchanged. The
+  score-only row activates no concept and will be mutation-tested by reversing only the score
+  comparator in an owned detached scratch checkout.
+- Re-ran public-surface planning baselines:
+  - JSR audit: exit 0; 115 files / 12,311 LOC; known cardinality 14/16 + slow-types warnings.
+  - MCP doc-lint: exit 0; combined diagnostics 0.
+  - MCP publish dry-run: exit 0.
+  - NetScript JSR specifier guard: exit 0;
+    `scanned=2326 allowances=1 ranges=0 failures=0`.
+  - package quality scanner: exit 0; findings 0, allowances 0.
+  - package doctrine: raw exit 1; exact pre-existing inventory is A14 fail, three warnings, one
+    info. The plan uses zero-delta evidence and does not misreport this as green or fix #1403 debt.
+- Replaced the stale unimplemented S4/S5 rows with continuation slices S4A retrieval closure, S4B
+  activation/real stdio, and S5 docs/release evidence. All non-Aspire gates precede a pushed
+  `EXPENSIVE-GATE-REQUEST`; no runtime token has been requested or used.
+- Next: commit/push plan artifacts, open draft PR, apply exactly `status:plan-eval`, post the plan
+  handoff, and stop for the owner-routed separate Claude · Fable 5 evaluator.
+
+## 2026-08-09 — PLAN-EVAL PASS and S4A retrieval closure
+
+- Received the owner-routed separate Claude · Fable 5 PLAN-EVAL `PASS` at plan head `71c0a29c2`.
+  Recorded the verdict and its three binding carries in `plan-eval-s4-s5.md`; moved issue #1102 and
+  PR #1416 to exactly `status:impl` before product edits.
+- Test-first pre-fix run:
+  `deno test --no-lock --allow-all packages/mcp/tests/guidance-evaluation_test.ts
+  packages/mcp/tests/guidance-retrieval_test.ts` — exit 1; 4 passed / 2 failed. The issue sentence
+  ranked services contracts and the phrase-family test ranked the same wrong destination.
+- Added a real cache-freshness phrase family (`every render`, `every request`, request-on-render,
+  refetch-on-render) and a focused test covering the issue sentence plus two non-quoted
+  paraphrases. Added the finite getting-started concept routed to `llms#Getting started`.
+- Added three fixture rows without changing the original five rows / 15 citations. The score-only
+  row asserts zero activated concepts; the getting-started row locks rank one; the issue paraphrase
+  locks the existing cache-first top three.
+- Focused validation order 1 — exit 0; 12 passed / 0 failed across evaluation, retrieval,
+  source-policy, and release-fallback tests. The planned score-only order passed exactly, so no
+  fixture drift or expectation rewrite occurred.
+- Mandatory mutation control:
+  - owned detached scratch worktree changed only `right.score - left.score` to
+    `left.score - right.score`;
+  - scratch evaluation exit 1, 0 passed / 1 failed, naming
+    `pick direct application ownership versus a reusable integration`; actual top three became
+    `llms#tutorials`, `web-layer/route#routing-and-route-contracts`, and
+    `llms#getting-started`;
+  - immediate clean-checkout rerun exit 0, 1 passed / 0 failed;
+  - scratch worktree removed and pruned.
+- Full `packages/mcp/tests/` — exit 0; 133 passed / 0 failed.
+- Scoped check — exit 0; 115 selected files, 0 failed batches, `--no-lock`.
+- First scoped lint/format invocations — exit 1 before file analysis because Deno 2.9.5 rejected
+  root workspace syntax (`invalid type: string "packages/*", expected WorkspaceConfig`); zero lint
+  or format findings were produced. The prior run record identified the package-config form.
+- Decisive scoped reruns with `--config packages/mcp/deno.json` — lint exit 0 and format exit 0;
+  115 selected files, zero findings. `plan.md` now records the executable command shape.
+- Explicit MCP source quality — exit 0; findings 0, allowances 0. Publish-asset freshness — exit 0.
+- Doctrine raw exit 1 with byte-identical pre-existing inventory: A14 fail, three warnings, one
+  info. No finding was added or deepened.
+- Corpus invariants: original five fixture rows compare byte-equal to plan head; generated corpus
+  assets have no diff; provenance remains 12 documents / 253,535 bytes under 262,144.
+- Reconcile: #1102 remains open at `status:impl`; PR #1416 remains draft and references rather than
+  closes it. No new review/evaluator comments changed S4A scope. Next slice is S4B activation.
+
+## 2026-08-09 — S4B primary-workflow activation
+
+- Test-first combined MCP/init/CLI activation run — exit 1; 18 passed / 3 failed. MCP initialize
+  lacked the activation rule, generated `AGENTS.md` lacked it, and the first real smoke setup used
+  VS Code host + editor none, which installs docs/tools but correctly does not install Claude
+  `AGENTS.md` or skills.
+- Recorded the test-setup drift after opening the implementation: the public smoke now scaffolds
+  with `--no-aspire`, installs the existing Playwright skill marker, and invokes public
+  `agent init --host claude --editor none --with-docs`. `initAgent` sees that marker and skips the
+  Aspire initializer before any Aspire command while installing every guidance surface.
+- Added the one activation contract across MCP initialize instructions, generated `AGENTS.md`, and
+  source `netscript` / `netscript-build` skills: before unfamiliar API or architecture work, call
+  `find_guidance`; keep `search_docs` literal and `get_doc` exact.
+- Regenerated `packages/cli/src/kernel/assets/skills.generated.ts` from source; no generated file
+  was hand-edited.
+- Focused MCP/init/CLI group — exit 0; 21 passed / 0 failed.
+- Exact CLI pair — exit 0; 20 passed / 0 failed. The real smoke ran public `agent init --with-docs`,
+  read installed `AGENTS.md` and both skills, started public `agent mcp` against
+  `.netscript/docs`, called `find_guidance`, and received rank-1 `llms#task-router`.
+- Scoped check/lint/fmt — exit 0 each; 135 selected files, 0 failed batches/findings, `--no-lock`
+  on check and package config on lint/format.
+- Explicit quality scan over MCP source and CLI agent source — exit 0; findings 0, allowances 0.
+- `check:publish-assets` — exit 0. Staged `check:assets-barrel` — exit 0; source and generated skill
+  asset reproduce byte-for-byte.
+- Diagnostic scratch scaffold was moved to system trash after inspection; it is recoverable. No
+  AppHost, container, Aspire CLI, or `e2e:cli` suite ran.
+- Reconcile: no new PR comments or issue changes alter scope. #1102 stays open and the draft remains
+  `status:impl`; S5 public docs and full non-Aspire evidence remain.
+
+## 2026-08-09 — S5 public docs and non-Aspire close gates
+
+- Added a docs-drift assertion across `packages/mcp/README.md`, the MCP reference, and Agent
+  tooling. Test-first registry run — exit 1; 5 passed / 1 failed because the unfamiliar-work
+  activation contract was absent. After the three public docs gained the same intent/literal/exact
+  workflow, the focused registry run exited 0; 6 passed / 0 failed.
+- Regenerated `packages/mcp/src/publish-assets.generated.ts` from the README. The generated corpus
+  remains byte-unchanged at 253,535 bytes / 12 documents against the 262,144-byte cap; no prose,
+  provenance, CLI agent-doc asset, or lockfile changed.
+- Focused retrieval/evaluation/source-policy/release-fallback group — exit 0; 12 passed / 0 failed.
+  Eight locked rows pass byte-equal on embedded and materialized-filesystem adapters, including
+  rank-1 `llms#task-router`. S4A's mandatory scratch score inversion already exited 1 naming the
+  score-only row, followed immediately by a clean exit-0 evaluation; S5 changes no scorer/fixture.
+- Full MCP package — exit 0; 134 passed / 0 failed, no skipped test. Required CLI pair — exit 0;
+  20 passed / 0 failed, including real `agent init --with-docs` → installed filesystem → public
+  `agent mcp` → rank-1 `llms#task-router`.
+- Scoped check/lint/fmt — exit 0 each; 135 selected files, zero failed batches/findings, check used
+  `--no-lock`, lint/format used the package config.
+- Decisive MCP quality — exit 0, zero findings, zero allowances. Decisive doctrine inventory — raw
+  exit 1 with the exact pre-existing #1403 baseline: A14 fail, three warnings, one info; zero delta
+  and not called green.
+- Non-decisive aggregates: `quality:gate` exit 0 and the separately invoked `arch:check` exit 0.
+  The commands emitted no `skipped=` summary; their logged task graphs ran, but neither is used as
+  MCP package evidence because their configured roots omit MCP.
+- Generated/JSR checks: `check:publish-assets` exit 0; `check:assets-barrel` exit 0;
+  `check:netscript-jsr-specifiers` exit 0 with
+  `scanned=2326 allowances=1 ranges=0 failures=0`.
+- Docs: registry 6/6 exit 0; canonical site `verify` exit 0 (`Docs source format: OK`, 617 files,
+  rendered 220 HTML / 4 existing syntax allowances, 32,772 links / 220 pages, caveats 18 / 14);
+  root `docs:links` exit 0 with zero broken links/anchors; `docs:accuracy` exit 0.
+- JSR audit exit 0 with the known two cardinality warnings and slow-types banner. MCP doc-lint exit
+  0 with combined diagnostics 0 across all three exports. MCP publish dry-run exit 0; root publish
+  dry-run exit 0. Review threads exit 0 with `threads=0 unanswered=0`.
+- The root publish dry-run resolved catalog imports and reformatted one package manifest in the
+  worktree. Every proven gate-created manifest edit was restored before commit; no such churn or
+  lock change remains.
+- Reconcile: the implementation evidence now covers S4A, S4B, and S5, but the serialized runtime
+  verdict and separate IMPL-EVAL have not run. The PR therefore retains `Refs #1102`, unchecked
+  Definition-of-Done rows, draft state, and `status:impl`; #1090 remains untouched.
+
+EXPENSIVE-GATE-REQUEST
+
+All non-Aspire gates above are complete. Request a durable ledger grant before the one allowed
+`deno task e2e:cli run scaffold.runtime --cleanup --format pretty`, bracketed by leak checks.
+
+## 2026-08-09 — Publish-gate manifest forensics after S5 push
+
+- Timing correction: S5 had already committed as `93fd65adf` before the orchestrator's stop message
+  reached this thread. Direct commit inspection proves it contains zero `deno.json` paths, and the
+  branch worktree was clean at the start of this forensic pass.
+- Reproduced the exact root `deno task publish:dry-run` in a detached `/tmp` worktree at the S5
+  head. While `deno publish` ran, all 19 named package/plugin manifests were modified; after the
+  wrapper reached `Success Dry run complete`, its `finally` restored all 19 and status was empty.
+- Opened the producer: `publish-workspace.ts:38-46` performs live snapshot/materialize/write and
+  lines 87-90 restore. This proves the command and mechanism rather than inferring from sequence.
+- Removed the owned detached scratch worktree after evidence collection. No AppHost, container,
+  Aspire command, or runtime E2E ran. The serialized token request remains pending.
+
+## 2026-08-09 — Granted serialized runtime proof
+
+- Verified the clean branch at `c52fee4e5` and durable single-use grant row 66 in commit
+  `12357e33a` before execution.
+- Pre-leak check — exit 0; Aspire and Docker probes `ok`. It reported only
+  `redis-jfgcbtaf` as a stale **foreign** container owned by
+  `/home/codex/repos/w6-review-desk`; left untouched. The suite and its generated project were
+  rooted inside this worktree, so no external `--owned-root` was required.
+- Ran exactly once from the repository root:
+  `deno task e2e:cli run scaffold.runtime --cleanup --format pretty ; echo "RAW_EXIT_CODE=$?"`.
+- Captured shell result: `RAW_EXIT_CODE=0`. Suite summary:
+  `passed=79 failed=0 skipped=2`, total 81 steps.
+- Every skip, individually:
+  - `behavior.otel.stream-consumer` — `DEFERRED #1398: workers-combined does not install the stream mutation hook`.
+  - `behavior.otel.traces` — `DEFERRED #1398: TC-14 requires the deferred Flow-B stream-consumer record`.
+- `cleanup.aspire-stop` passed in 737 ms. Post-leak check — exit 0; Aspire and Docker probes `ok`,
+  no run-owned survivor, and only the same foreign Redis container remained. It was reported and
+  left alone. The checked-in `leak-report.md` is the post-run artifact.
+- Post-run source hygiene: no `deno.json` or `deno.lock` diff; the runtime created no product-source
+  change.
+- Closure decision: all seven #1102 implementation acceptance rows now have evidence at this head.
+  In particular row 3 requires the quoted issue sentence plus two unquoted family paraphrases—
+  `reuse service data instead of making a new request on each render` and
+  `avoid refetching data on every request`—to rank
+  `pages/web-layer/query#a-cache-first-load-pattern` first. The PR still carries `Refs #1102`
+  because the locked close gate requires the owner-run separate-session IMPL-EVAL PASS before the
+  closing keyword and DoD checks are applied; this implementation session does not self-certify.

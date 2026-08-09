@@ -54,6 +54,10 @@ export const GUIDANCE_CONCEPTS: readonly GuidanceConcept[] = Object.freeze([
       'cache first',
       'live data',
       'server data fresh',
+      'every render',
+      'every request',
+      'request on each render',
+      'refetch on render',
     ],
     terms: [
       'cache',
@@ -72,6 +76,27 @@ export const GUIDANCE_CONCEPTS: readonly GuidanceConcept[] = Object.freeze([
       { heading: 'step 2 — add the cache-first query factory' },
       { heading: 'step 2 — define the page and cache-first resource pipeline' },
     ],
+  },
+  {
+    name: 'getting-started',
+    aliases: [
+      'new netscript project',
+      'create a new project',
+      'from scratch',
+      'start a netscript project',
+    ],
+    terms: [
+      'getting',
+      'started',
+      'quickstart',
+      'scaffold',
+      'create',
+      'project',
+      'netscript',
+      'init',
+    ],
+    requiredAnyTerms: ['quickstart', 'scaffold'],
+    routeHints: [{ heading: 'getting started' }],
   },
   {
     name: 'extension-plugin',
