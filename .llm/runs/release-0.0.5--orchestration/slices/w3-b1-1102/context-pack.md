@@ -14,8 +14,9 @@
 
 Research and contract-first design are complete at baseline `3f41a3639`. The plan introduces a 22nd
 MCP tool, `find_guidance`, over one shared deterministic section index; it extends rather than
-duplicates #1375's generated fallback. No product source has been changed. Implementation is blocked
-by the owner-mandated separate-session Claude · Fable 5 PLAN-EVAL.
+duplicates #1375's generated fallback. PLAN-EVAL cycle 1 returned `FAIL_PLAN`; its M1 and two minor
+findings are repaired in plan artifacts only. No product source has been changed. Implementation is
+blocked pending a fresh cycle-2 Claude · Fable 5 PLAN-EVAL `PASS`.
 
 ## Completed
 
@@ -24,28 +25,35 @@ by the owner-mandated separate-session Claude · Fable 5 PLAN-EVAL.
 - Opened every source behind the retrieval, corpus, activation, generated guidance, and gate claims.
 - Recorded current top-five results for the issue intents.
 - Ran current `@netscript/mcp` JSR audit, full-export doc-lint, and package publish dry-run.
-- Locked public vocabulary, bounds, algorithm family, all 15 evaluation citations, corpus refresh /
-  selection strategy, five commit slices, test pre-fix failure modes, and package-scoped validation.
+- Locked public vocabulary, bounds, algorithm family, 12 exact-ordered citations plus the Prisma
+  unordered top-three set, corpus refresh/selection strategy, five commit slices, test pre-fix
+  failure modes, and package-scoped validation.
+- Repaired cycle-1 M1 with D12: filesystem admits only root `llms.txt`, both adapter inputs
+  canonicalize it to `llms`, and dual-adapter plus installed-corpus gates exercise the task-router
+  row.
+- Checked in and executed the exact production-corpus pre-fix query sweep.
 
 ## In Progress
 
-- Stopped at draft PR #1404 with `status:plan-eval`; awaiting orchestrator-launched PLAN-EVAL.
+- Stopped at draft PR #1404 with `status:plan-eval`; awaiting fresh orchestrator-launched PLAN-EVAL
+  cycle 2.
 
 ## Next Steps
 
-1. Orchestrator launches a fresh Claude · Fable 5 · medium PLAN-EVAL.
+1. Orchestrator launches a fresh Claude · Fable 5 · medium PLAN-EVAL cycle 2.
 2. If and only if `plan-eval.md` says `PASS`, move status to `impl` and implement S1.
 3. Commit/push/comment each slice independently; request the serialized gate only after non-Aspire
    gates are green.
 
 ## Key Decisions
 
-| Decision                                             | Source                                | Notes                                                     |
-| ---------------------------------------------------- | ------------------------------------- | --------------------------------------------------------- |
-| `find_guidance`, deterministic hybrid, no embeddings | `plan.md` D1/D4                       | Offline, bounded, falsifiable                             |
-| One shared index for filesystem and embedded         | `plan.md` D7                          | No second #1375 path                                      |
-| Approved canonical corpus refresh + expected JSON    | `research.md` F5/F12; `plan.md` D8/D9 | Current mirror is stale; reuse #1375's one generator path |
-| Adoption belongs only to #1090                       | issue #1102 row 7 / brief             | Never claim usage from top-k tests                        |
+| Decision                                             | Source                                | Notes                                                        |
+| ---------------------------------------------------- | ------------------------------------- | ------------------------------------------------------------ |
+| `find_guidance`, deterministic hybrid, no embeddings | `plan.md` D1/D4                       | Offline, bounded, falsifiable                                |
+| One shared index for filesystem and embedded         | `plan.md` D7                          | No second #1375 path                                         |
+| Approved canonical corpus refresh + expected JSON    | `research.md` F5/F12; `plan.md` D8/D9 | Current mirror is stale; reuse #1375's one generator path    |
+| Root `llms.txt` parity across real deployment paths  | `research.md` F14; `plan.md` D12      | Explicit source policy + dual-adapter/installed-corpus gates |
+| Adoption belongs only to #1090                       | issue #1102 row 7 / brief             | Never claim usage from top-k tests                           |
 
 ## Files Changed
 
@@ -54,17 +62,18 @@ untouched until PLAN-EVAL PASS.
 
 ## Gates
 
-| Gate family | Current status             | Evidence                                            |
-| ----------- | -------------------------- | --------------------------------------------------- |
-| Static      | NOT_RUN for implementation | plan phase only                                     |
-| Fitness     | Baseline audit complete    | research F10; implementation package gates pending  |
-| Runtime     | NOT_RUN                    | no implementation; no AppHost/container started     |
-| Consumer    | NOT_RUN                    | planned real CLI stdio + generated-agent assertions |
+| Gate family | Current status             | Evidence                                                        |
+| ----------- | -------------------------- | --------------------------------------------------------------- |
+| Static      | NOT_RUN for implementation | plan phase only                                                 |
+| Fitness     | Baseline audit complete    | research F10; implementation package gates pending              |
+| Runtime     | NOT_RUN                    | no implementation; no AppHost/container started                 |
+| Consumer    | NOT_RUN                    | planned installed-corpus CLI stdio + generated-agent assertions |
 
 ## Open Questions
 
-- PLAN-EVAL must approve or reject the locked 15 citations, numeric policy/bounds, and canonical
-  prose-refresh scope before implementation. None remains open for the implementation supervisor.
+- PLAN-EVAL cycle 2 must approve or reject D12, the 12 exact-ordered citations plus Prisma's
+  unordered top-three set, numeric policy/bounds, and canonical prose-refresh scope. None remains
+  open for the implementation supervisor.
 
 ## Drift and Debt
 

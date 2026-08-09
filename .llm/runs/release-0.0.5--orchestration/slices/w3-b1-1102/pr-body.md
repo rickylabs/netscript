@@ -16,9 +16,9 @@ harness research/design artifacts; product implementation is blocked on separate
 
 - [x] Plan — live issue re-baseline, contract/design, failure matrix, gates
 - [ ] S1 Public `find_guidance` contract and enumerable flow
-- [ ] S2 Shared section index, concept aliases, code/link routing
-- [ ] S3 Actual release-corpus top-k evaluation and embedded parity/budget
-- [ ] S4 MCP/generated-agent activation and real CLI stdio
+- [ ] S2 Shared section index, concept aliases, code/link routing, root `llms.txt` source policy
+- [ ] S3 Dual-adapter release-corpus top-k evaluation and parity/budget
+- [ ] S4 MCP/generated-agent activation and installed-corpus real CLI stdio
 - [ ] S5 Public docs, package gates, serialized merge-readiness handoff
 
 ## Validation
@@ -45,14 +45,17 @@ harness research/design artifacts; product implementation is blocked on separate
   its checked-in prose mirror predates the unsupported-driver section. S3 refreshes the canonical
   mirror through the existing approved builder chain, then extends that single generator path within
   its existing budget.
+- PLAN-EVAL cycle-1 repair: D12 makes root `llms.txt` an explicit filesystem source, canonicalizes
+  it to `llms` for both adapter inputs, and gates `llms#task-router` through embedded,
+  materialized-filesystem, and real `agent init --with-docs` paths.
 - No new architecture debt planned. Existing MCP audit warnings are not claimed fixed.
 
 ## Definition of Done
 
 - [ ] `find_guidance` returns bounded ordered section guidance with cited code, stages, confidence,
       related links, and honest fallback.
-- [ ] The checked-in real release-corpus evaluation passes deterministic exact top-3 expectations
-      for all five issue intents and concept mismatch.
+- [ ] The checked-in real release-corpus evaluation passes both adapters: four deterministic exact
+      top-3 rows plus Prisma's unordered required top-three set.
 - [ ] Internal links affect prerequisite/next routing; filesystem and embedded adapters are equal on
       identical release sources.
 - [ ] The existing generated embedded fallback contains the required destinations within 262,144

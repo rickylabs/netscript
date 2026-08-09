@@ -18,3 +18,18 @@ Drift is append-only.
   `.llm/tools/docs/build-agent-docs-bundle.ts`; commit their owned prose/provenance outputs and the
   regenerated CLI/MCP assets; preserve the 262,144-byte MCP selection budget.
 - **Evidence:** `research.md` F5/F12; `plan.md` D8/S3.
+
+## 2026-08-09 — PLAN-EVAL cycle 1 exposed unmeasured filesystem `llms.txt`
+
+- **What:** The plan made `llms#task-router` rank 1 but evaluated only the embedded selection;
+  filesystem discovery accepts only `.md`, and embedded path canonicalization retained `.txt`.
+- **Source:** separate-session PLAN-EVAL cycle 1 (`FAIL_PLAN`), confirmed against
+  `filesystem-docs-corpus.ts` and `.llm/tools/generate-publish-assets.ts`.
+- **Expected:** Filesystem and embedded corpora expose the same release sources and guidance.
+- **Actual:** All previously named gates could pass without the installed filesystem corpus ever
+  seeing the task router.
+- **Severity:** major plan defect; no product code had started
+- **Action:** D12 admits exactly root `llms.txt`, canonicalizes it to `llms` for both adapter
+  inputs, rejects other text, and requires the `llms` evaluation row through embedded, materialized
+  filesystem, and real `agent init --with-docs` stdio paths.
+- **Evidence:** `research.md` F14; `plan.md` D12, failure matrix, S2–S4, validation gates 1–2.

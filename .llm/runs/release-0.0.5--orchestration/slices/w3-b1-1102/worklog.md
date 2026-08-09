@@ -40,6 +40,9 @@
 - Extend the existing `DocsCorpusPort`; do not add another filesystem/embedded port.
 - Filesystem remains the only file/mtime/realpath edge. Embedded remains in-memory. The shared
   parser/index/ranker is pure domain policy.
+- Filesystem source discovery admits public `.md` plus root-relative `llms.txt` only; both
+  filesystem slug normalization and the embedded publish generator strip `.md`/`.txt` so the shared
+  index sees `llms`. `llms-full.txt` and arbitrary/nested `.txt` remain excluded.
 
 ### Constants
 
@@ -72,13 +75,13 @@
 
 ### Commit Slices
 
-| # | Slice                                                                                                | Gate                                                          | Files                                                                                                                |
-| - | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| 1 | Public `find_guidance` contract and enumerable flow                                                  | focused contract/registry/stdio tests + scoped check          | MCP domain/contracts/registry/docs flow/mod/tests + run artifacts                                                    |
-| 2 | Shared section index, aliases, code and link routing                                                 | guidance retrieval unit tests                                 | MCP docs domain/application/adapters/CLI composition/tests + run artifacts                                           |
-| 3 | Approved canonical prose refresh, actual release-corpus top-3 evaluation, and embedded parity/budget | provenance/evaluation/parity tests + `check:publish-assets`   | checked-in prose/provenance, evaluation JSON/tests, publish generator/tests/generated CLI/MCP assets + run artifacts |
-| 4 | Primary-workflow activation in MCP and generated agents                                              | initialize/init/asset tests + real CLI stdio smoke            | server instructions, agent init/tests, source skills/generated skill barrel, CLI e2e + run artifacts                 |
-| 5 | Public docs and full validation handoff                                                              | package/docs/publish gates; serialized smoke only after grant | MCP/site docs, generated owned assets, run artifacts                                                                 |
+| # | Slice                                                                                             | Gate                                                           | Files                                                                                                                |
+| - | ------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| 1 | Public `find_guidance` contract and enumerable flow                                               | focused contract/registry/stdio tests + scoped check           | MCP domain/contracts/registry/docs flow/mod/tests + run artifacts                                                    |
+| 2 | Shared section index, aliases, code/link routing, and root `llms.txt` filesystem policy           | guidance/source-policy unit tests                              | MCP docs domain/application/adapters/CLI composition/tests + run artifacts                                           |
+| 3 | Approved canonical prose refresh, dual-adapter release-corpus top-3 evaluation, and parity/budget | provenance/evaluation/parity tests + `check:publish-assets`    | checked-in prose/provenance, evaluation JSON/tests, publish generator/tests/generated CLI/MCP assets + run artifacts |
+| 4 | Primary-workflow activation in MCP and generated agents                                           | initialize/init/asset tests + installed-corpus CLI stdio smoke | server instructions, agent init/tests, source skills/generated skill barrel, CLI e2e + run artifacts                 |
+| 5 | Public docs and full validation handoff                                                           | package/docs/publish gates; serialized smoke only after grant  | MCP/site docs, generated owned assets, run artifacts                                                                 |
 
 ### Deferred Scope
 
@@ -98,31 +101,36 @@ the single shared indexer used by both adapters.
 
 ## Progress Log
 
-| Time       | Slice | Step              | Notes                                                                                                                                                                           |
-| ---------- | ----- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-08-09 | Plan  | Research          | Read live #1102, dependencies #1375/#1376, current contracts/adapters/docs/generator/gates, doctrine, harness, and JSR surface.                                                 |
-| 2026-08-09 | Plan  | Pre-fix evidence  | Recorded six natural-language lexical-search outputs; four issue targets and the extra concept-mismatch target miss top-five expectations.                                      |
-| 2026-08-09 | Plan  | Corpus finding    | Proved the checked-in prose mirror predates the current unsupported-driver section; locked refresh through the approved mirror/compressed-prose generators before selection.    |
-| 2026-08-09 | Plan  | Draft PR          | Opened draft PR #1404 against `main`; applied milestone `0.0.5`, feature/docs/tooling/JSR/p1 taxonomy, and exactly `status:plan-eval`; posted RESEARCH and PLAN phase comments. |
-| 2026-08-09 | Plan  | Plan-Gate handoff | Plan/design ready; product implementation is stopped pending separate-session PLAN-EVAL PASS.                                                                                   |
+| Time       | Slice | Step              | Notes                                                                                                                                                                                                                                                                                                              |
+| ---------- | ----- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 2026-08-09 | Plan  | Research          | Read live #1102, dependencies #1375/#1376, current contracts/adapters/docs/generator/gates, doctrine, harness, and JSR surface.                                                                                                                                                                                    |
+| 2026-08-09 | Plan  | Pre-fix evidence  | Recorded six natural-language lexical-search outputs; four issue targets and the extra concept-mismatch target miss top-five expectations.                                                                                                                                                                         |
+| 2026-08-09 | Plan  | Corpus finding    | Proved the checked-in prose mirror predates the current unsupported-driver section; locked refresh through the approved mirror/compressed-prose generators before selection.                                                                                                                                       |
+| 2026-08-09 | Plan  | Draft PR          | Opened draft PR #1404 against `main`; applied milestone `0.0.5`, feature/docs/tooling/JSR/p1 taxonomy, and exactly `status:plan-eval`; posted RESEARCH and PLAN phase comments.                                                                                                                                    |
+| 2026-08-09 | Plan  | Plan-Gate handoff | Plan/design ready; product implementation is stopped pending separate-session PLAN-EVAL PASS.                                                                                                                                                                                                                      |
+| 2026-08-09 | Plan  | PLAN-EVAL cycle 1 | `FAIL_PLAN`: filesystem excludes `llms.txt`; F4 lacked a checked-in reproduction command; Prisma nested order was overconstrained. Full evaluator file was not present locally or on the fetched PR branch, so this records the orchestrator-delivered verdict without fabricating the missing evaluator artifact. |
+| 2026-08-09 | Plan  | Cycle-2 repair    | Locked D12 across both adapters, dual-adapter plus installed-corpus gates, checked in/reran the real F4 sweep, and changed Prisma to an unordered required top-three set. Product source remains untouched.                                                                                                        |
 
 ## Gate Results
 
-| Gate                         | Result                      | Evidence / note                                                             |
-| ---------------------------- | --------------------------- | --------------------------------------------------------------------------- |
-| Git baseline                 | PASS                        | clean `fix/mcp-intent-aware-discovery` at `3f41a3639` before plan artifacts |
-| JSR audit baseline           | PASS with existing warnings | exit 0; cardinality 14/16 and slow-types banner recorded in research        |
-| MCP doc-lint baseline        | PASS                        | exit 0; combined diagnostics 0 over all three exports                       |
-| MCP publish dry-run baseline | PASS                        | exit 0; dry run complete                                                    |
-| PLAN-EVAL                    | NOT_RUN                     | mandatory separate Claude · Fable 5 session; orchestrator must launch       |
-| Implementation gates         | NOT_RUN                     | prohibited before PLAN-EVAL PASS                                            |
-| Aspire/container gates       | NOT_RUN                     | no token requested; no AppHost/container started                            |
+| Gate                         | Result                      | Evidence / note                                                                                         |
+| ---------------------------- | --------------------------- | ------------------------------------------------------------------------------------------------------- |
+| Git baseline                 | PASS                        | clean `fix/mcp-intent-aware-discovery` at `3f41a3639` before plan artifacts                             |
+| JSR audit baseline           | PASS with existing warnings | exit 0; cardinality 14/16 and slow-types banner recorded in research                                    |
+| MCP doc-lint baseline        | PASS                        | exit 0; combined diagnostics 0 over all three exports                                                   |
+| MCP publish dry-run baseline | PASS                        | exit 0; dry run complete                                                                                |
+| PLAN-EVAL cycle 1            | FAIL_PLAN                   | separate Claude · Fable 5 verdict delivered by orchestrator; M1 + two minors repaired in plan artifacts |
+| PLAN-EVAL cycle 2            | NOT_RUN                     | orchestrator must launch a fresh evaluator after this repair is pushed                                  |
+| Implementation gates         | NOT_RUN                     | prohibited before PLAN-EVAL PASS                                                                        |
+| Aspire/container gates       | NOT_RUN                     | no token requested; no AppHost/container started                                                        |
 
 ## Handoff Notes
 
-- Open `research.md` F1–F11 and spot-check the cited source before trusting the plan.
-- Challenge the 15 exact evaluation destinations locked in `plan.md` before S2. A weak choice is a
-  plan defect, not something to tune around later.
+- Open `research.md` F1–F14 and spot-check the cited source before trusting the plan.
+- Challenge the 12 exact-ordered citations plus Prisma unordered top-three set in `plan.md` before
+  S2. A weak choice is a plan defect, not something to tune around later.
+- Require the `llms#task-router` row to pass the embedded adapter, a filesystem materialization of
+  the same release files, and the real `agent init --with-docs` → MCP stdio path.
 - Verify every test in the failure matrix has the stated behavioral or compile-time pre-fix red.
 - Treat root `quality:gate`/`arch:check` as non-decisive for MCP; require explicit package roots.
 - Do not interpret retrieval evaluation as #1090 adoption evidence.
