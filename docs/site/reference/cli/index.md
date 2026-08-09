@@ -1,6 +1,7 @@
 ---
 layout: layouts/base.vto
 title: "@netscript/cli"
+templateEngine: [vento, md]
 ---
 
 # `@netscript/cli`
@@ -81,7 +82,7 @@ generated separately from their own `deno doc` output.
 
 ### `@netscript/cli/scaffolding`
 
-The scaffold engine that walks template directories, renders `{{var | pipe}}` templates, and
+The scaffold engine that walks template directories, renders `{{ "{" + "{var | pipe}" + "}" }}` templates, and
 writes plugin-owned scaffold definitions.
 
 | Symbol | Signature | Description |
@@ -89,11 +90,11 @@ writes plugin-owned scaffold definitions.
 | `createPluginScaffoldContext` | `function createPluginScaffoldContext(options: PluginScaffoldContextOptions): PluginScaffoldContext` | Create a normalized plugin scaffold context. |
 | `planPluginScaffoldFiles` | `async function planPluginScaffoldFiles(definition, context, dependencies): Promise<readonly PlannedPluginScaffoldFile[]>` | Render all files in a plugin scaffold definition without writing them. |
 | `writePluginScaffoldFiles` | `async function writePluginScaffoldFiles(definition, context, dependencies): Promise<ScaffoldResult>` | Render and write a plugin scaffold definition. |
-| `renderTemplate` | `function renderTemplate(template: string, context: Record): string` | Render a template string by replacing `{{var}}` / `{{var \| pipe}}`. |
+| `renderTemplate` | `function renderTemplate(template: string, context: Record): string` | Render a template string by replacing `{{ "{" + "{var}" + "}" }}` / `{{ "{" + "{var " + "\\|" + " pipe}" + "}" }}`. |
 | `Scaffolder` | class | Core scaffold engine that walks template directories and renders templates. |
 | `DenoFileSystem` | class | Filesystem adapter backed by Deno APIs and `@std/fs`. |
 | `MemoryFileSystemAdapter` | class | In-memory filesystem adapter for tests. |
-| `StringTemplateAdapter` | class | Template adapter that uses simple `{{var \| pipe}}` string replacement. |
+| `StringTemplateAdapter` | class | Template adapter that uses simple `{{ "{" + "{var " + "\\|" + " pipe}" + "}" }}` string replacement. |
 | `FileSystemPort` | interface | Abstraction over filesystem operations. |
 | `ScaffolderPort` | interface | Core scaffolding service. |
 | `TemplatePort` | interface | Abstraction over template rendering. |

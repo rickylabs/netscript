@@ -2,7 +2,7 @@
 
 ## Current state
 
-- Phase: Round 2 Tier-D handoff complete; draft PR #1412 awaits orchestrator IMPL-EVAL and CI.
+- Phase: Round 3 implementation and Tier-D gates complete; PR handoff pending.
 - Branch/base: `fix/docs-versionless-jsr-specifiers` at `399f60185`.
 - `PLAN-EVAL: N/A` was recorded before source edits because the slice is fully specified and
   mechanical.
@@ -32,3 +32,10 @@
 - All Round 2 requested gates exit 0; rendered output shows the four AI instructions at `@0.0.4`.
 - Round 2 implementation commit: `362714bbc`; structured evidence comment:
   https://github.com/rickylabs/netscript/pull/1412#issuecomment-5230543249.
+- Round 3 scope: add Vento+Markdown processing to three reference pages and extend the rendered
+  output gate from homepage semantics to a full-site literal-placeholder scan, with RED-before-fix
+  and GREEN-after-fix evidence.
+- Round 3 result: pre-fix gate exit 1 named streams/plugin-auth leaks; post-fix exit 0 scanned 220
+  HTML files. The one legitimate CLI syntax surface is bounded to four exact occurrences and has an
+  overflow test. All final docs/root static gates exit 0, including a complete rerun after targeted
+  formatting of the owned checker/test files.

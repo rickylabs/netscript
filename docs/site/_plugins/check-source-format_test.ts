@@ -1,4 +1,5 @@
 import { assertSiteSourceFormat, collectSiteSourceDiagnostics } from './check-source-format.ts';
+import { assertNoLiteralVentoPlaceholders } from './check-rendered-output.ts';
 
 function assertEquals(actual: unknown, expected: unknown): void {
   if (JSON.stringify(actual) !== JSON.stringify(expected)) {
@@ -59,4 +60,40 @@ Deno.test('accepts multiline component objects whose individual strings stay val
     'index.vto':
       `---\ntemplateEngine: [vento, md]\n---\n## Rendered heading\n{{ comp.card({\n  title: "Title",\n  body: "One physical line",\n}) }}\n`,
   }, async (root) => assertEquals(await collectSiteSourceDiagnostics(root), []));
+});
+
+Deno.test('rejects literal Vento placeholders in any rendered page', async () => {
+  await withSite({
+    'index.html': '<main>clean</main>',
+    'reference/broken/index.html': '<code>{{ releaseSpecifier }}</code>',
+  }, async (root) => {
+    await assertRejects(
+      () => assertNoLiteralVentoPlaceholders(root),
+      'reference/broken/index.html: {{ releaseSpecifier }}',
+    );
+  });
+});
+
+Deno.test('allows only the bounded CLI string-template documentation tokens', async () => {
+  await withSite({
+    'reference/cli/index.html':
+      '<code>{{var}}</code><code>{{var | pipe}}</code><code>{{var | pipe}}</code><code>{{var | pipe}}</code>',
+  }, async (root) => {
+    assertEquals(await assertNoLiteralVentoPlaceholders(root), {
+      filesScanned: 1,
+      allowancesUsed: 4,
+    });
+  });
+});
+
+Deno.test('rejects CLI documentation tokens beyond the bounded allowance', async () => {
+  await withSite({
+    'reference/cli/index.html':
+      '<code>{{var | pipe}}</code><code>{{var | pipe}}</code><code>{{var | pipe}}</code><code>{{var | pipe}}</code>',
+  }, async (root) => {
+    await assertRejects(
+      () => assertNoLiteralVentoPlaceholders(root),
+      'reference/cli/index.html: {{var | pipe}}',
+    );
+  });
 });

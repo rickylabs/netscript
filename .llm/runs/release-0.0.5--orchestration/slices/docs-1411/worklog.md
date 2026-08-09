@@ -49,7 +49,12 @@
 | `cd docs/site && deno task check:caveats` | 0 | 18 caveat markers across 14 pages resolve |
 | `cd docs/site && deno task test:source-format` | 0 | 3 passed, 0 failed |
 | `deno task check:netscript-jsr-specifiers` | 0 | scanned 2,328; allowances 1; ranges 0; failures 0 |
+| targeted `deno fmt --check` | 0 | both modified checker/test TypeScript files formatted |
 | `git diff --check` | 0 | no whitespace errors |
+
+After targeted formatting changed the checker source, the complete docs gate set and root JSR gate
+were rerun once more on the final working-tree content; every raw exit remained 0 with the same
+counts above.
 
 Rendered spot checks found all five repaired targets at `@0.0.4` in the generated pages: the three
 CLI install commands and both `author-a-plugin` import-map values.
@@ -110,3 +115,54 @@ guard was added; the orchestrator will carry the demonstrated reachability gap t
   evidence. Round 2 IMPL evidence comment:
   https://github.com/rickylabs/netscript/pull/1412#issuecomment-5230543249.
 - Separate-session IMPL-EVAL, CI, acceptance mirror/close gate, and merge remain orchestrator-owned.
+
+## 2026-08-09 — Round 3 orchestrator-directed rescope
+
+- During independent Round 2 verification, the orchestrator found a pre-existing `main` defect:
+  three published reference pages omit `templateEngine: [vento, md]`, leaving Vento-looking body
+  text unprocessed. This PR did not introduce the defect; the orchestrator explicitly folded the
+  same-surface fix and rendered-output reachability gate into #1412.
+- Round 3 order is locked: extend the gate first; prove RED against the preserved pre-fix `_site`;
+  then fix front matter and legitimate documented-template syntax; prove GREEN; rerun all docs and
+  root static gates.
+- Existing homepage semantic assertions must remain intact. Any legitimate documented Vento syntax
+  receives only a path/token/count-bounded exclusion, recorded with its reason.
+
+### Round 3 RED proof
+
+- Extended `check-rendered-output.ts` to retain the homepage semantic assertions and recursively
+  scan every rendered HTML file for literal `{{ … }}` tokens.
+- Pre-fix `deno task check:rendered-output` raw exit: **1**.
+- Exact failures: `reference/streams/index.html: {{ releaseSpecifier }}` and
+  `reference/plugin-auth/index.html: {{ releaseVersion }}`.
+- `reference/cli/index.html` contains intentional scaffold-template documentation rather than a
+  leaked release placeholder. Its allowance is bounded to that one path, `{{var}}` at most once,
+  and `{{var | pipe}}` at most three times. No page-wide or pattern-wide exclusion exists.
+
+### Round 3 implementation and GREEN proof
+
+- Added `templateEngine: [vento, md]` to `reference/streams/index.md`,
+  `reference/cli/index.md`, and `reference/plugin-auth/index.md`.
+- Preserved the CLI page's intentional scaffold-template examples by emitting the braces through
+  Vento expressions before Markdown rendering; the reader-visible tokens remain unchanged.
+- Post-fix standalone `deno task check:rendered-output` raw exit: **0** — homepage semantics pass,
+  220 rendered HTML files scanned, exactly four documented-syntax allowances consumed.
+- Rendered evidence: streams CLI is `jsr:@netscript/plugin-streams@0.0.4/cli`; auth version is
+  `"0.0.4"`; neither page contains a literal `{{ … }}`. The CLI page contains only the four exact,
+  intentional documented tokens covered by the bounded allowance.
+- Added scanner tests for a leak on a non-homepage page, the exact permitted CLI tokens, and an
+  over-limit CLI token. Final test result: 6 passed, 0 failed.
+
+### Round 3 final gate evidence
+
+| Command | Raw exit | Evidence |
+| --- | ---: | --- |
+| pre-fix `deno task check:rendered-output` | 1 | named streams `releaseSpecifier` and plugin-auth `releaseVersion` leaks |
+| post-fix `deno task check:rendered-output` | 0 | homepage semantics; 220 HTML files; four bounded syntax allowances |
+| published-source command/import-map sweep | 0 | 55 candidates; zero unpinned |
+| `cd docs/site && deno task build` | 0 | 617 files generated; full rendered gate green |
+| `cd docs/site && deno task check:links` | 0 | 32,772 internal links across 220 pages resolve |
+| `cd docs/site && deno task check:caveats` | 0 | 18 caveat markers across 14 pages resolve |
+| `cd docs/site && deno task test:source-format` | 0 | 6 passed, 0 failed |
+| `deno task check:netscript-jsr-specifiers` | 0 | scanned 2,328; allowances 1; ranges 0; failures 0 |
+| `git diff --check` | 0 | no whitespace errors |

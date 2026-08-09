@@ -1,6 +1,7 @@
 ---
 layout: layouts/base.vto
 title: "@netscript/plugin-auth"
+templateEngine: [vento, md]
 ---
 
 # `@netscript/plugin-auth`

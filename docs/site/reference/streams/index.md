@@ -1,6 +1,7 @@
 ---
 layout: layouts/base.vto
 title: "@netscript/plugin-streams"
+templateEngine: [vento, md]
 ---
 
 # `@netscript/plugin-streams`

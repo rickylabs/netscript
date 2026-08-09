@@ -9,3 +9,11 @@ owner-supplied four-site table as exhaustive. The orchestrator identified four a
 published `deno add` instructions. The authoritative defect definition now covers published
 `deno add` / `deno install` / `deno x` commands and import-map values independently of the original
 table; final evidence supersedes the first-round defect count.
+
+Round 3 significant scope adjustment (orchestrator-directed): independent verification discovered
+a pre-existing `main` defect outside the original #1411 source list. Three published reference pages
+omit the Vento+Markdown template engine, and the homepage-only rendered-output gate cannot detect
+literal placeholders elsewhere. The orchestrator folded the three front-matter repairs and an
+exact full-site rendered-placeholder gate into PR #1412 because they share the docs rendering and
+specifier-correctness surface. This is not implementation-caused drift. No package/plugin,
+lockfile, corpus regeneration, guard allowance, or root-guard narrowing is authorized.
