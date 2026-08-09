@@ -18,7 +18,8 @@ export interface RecordDriftInput {
 export function diagnosticEvidenceRefusal(resource: string): string {
   return `Cannot record drift for "${resource}" without a fresh successful diagnostic receipt. Run ` +
     `"netscript plugin doctor --resource ${resource}" or call the MCP "doctor" or telemetry tools ` +
-    `or API introspection tools for resource "${resource}", then retry within 15 minutes.`;
+    `or API introspection tools, or successfully call MCP "execute_command" with resource ` +
+    `"${resource}", then retry within 15 minutes.`;
 }
 
 /** Gate and append one drift entry. */

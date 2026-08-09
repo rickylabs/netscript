@@ -136,6 +136,7 @@ export function createMcpCliServer(options: McpCliOptions = {}): McpServer {
   const exportSurfaceFlows = createExportSurfaceFlows(
     options.exportSurfaceCorpus ?? new EmbeddedExportSurfaceCorpus(),
   );
+  const commandExecutor = options.commandExecutor ?? new SpawnCommandExecutor();
   return createMcpServer({
     probe,
     environment,
@@ -197,12 +198,20 @@ export function createMcpCliServer(options: McpCliOptions = {}): McpServer {
         'mcp analyze_db_bottlenecks',
         warnEvidence,
       ),
+      // Catalog enumeration describes the executor but diagnoses no project resource, so it is
+      // intentionally receipt-exempt.
       list_commands: createListCommandsFlow(
         options.commandCatalog ?? new StaticCommandCatalog(),
+        commandExecutor.identity,
       ),
-      execute_command: createExecuteCommandFlow(
-        options.commandExecutor ?? new SpawnCommandExecutor(),
-        options.commandPolicy ?? DEFAULT_COMMAND_POLICY,
+      execute_command: withReceipt(
+        createExecuteCommandFlow(
+          commandExecutor,
+          options.commandPolicy ?? DEFAULT_COMMAND_POLICY,
+        ),
+        evidence,
+        'mcp execute_command',
+        warnEvidence,
       ),
       doctor: withReceipt(
         createDoctorFlow(probe, environment, [

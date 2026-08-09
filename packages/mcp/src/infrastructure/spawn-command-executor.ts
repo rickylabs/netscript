@@ -1,4 +1,5 @@
 import type {
+  CliExecutionIdentity,
   CommandExecutionRequest,
   CommandExecutionResult,
   CommandExecutorPort,
@@ -21,6 +22,9 @@ export const DEFAULT_OUTPUT_TAIL_BYTES = 4_096;
 export interface SpawnCommandExecutorOptions {
   /** Executable and fixed arguments placed before the command path. */ readonly cliCommand?:
     readonly string[];
+  /** Hosting mode represented by the command prefix. */ readonly mode?:
+    CliExecutionIdentity['mode'];
+  /** Version of the CLI represented by the command prefix. */ readonly version?: string;
   /** Deadline before the child is terminated. */ readonly timeoutMs?: number;
   /** Maximum retained bytes across stdout and stderr. */ readonly outputTailBytes?: number;
 }
@@ -55,16 +59,25 @@ async function collect(stream: ReadableStream<Uint8Array>, tail: TailCollector):
 
 /** Executes the public NetScript CLI in its own process with bounded captured output. */
 export class SpawnCommandExecutor implements CommandExecutorPort {
+  /** Truthful identity of the CLI process this adapter executes. */
+  readonly identity: CliExecutionIdentity;
   readonly #cliCommand: readonly string[];
   readonly #timeoutMs: number;
   readonly #outputTailBytes: number;
 
   /** Create an executor with injectable command prefix and resource bounds. */
   constructor(options: SpawnCommandExecutorOptions = {}) {
-    this.#cliCommand = options.cliCommand ?? DEFAULT_CLI_COMMAND;
+    this.#cliCommand = Object.freeze([...(options.cliCommand ?? DEFAULT_CLI_COMMAND)]);
     this.#timeoutMs = options.timeoutMs ?? DEFAULT_COMMAND_TIMEOUT_MS;
     this.#outputTailBytes = options.outputTailBytes ?? DEFAULT_OUTPUT_TAIL_BYTES;
     if (!this.#cliCommand[0]) throw new TypeError('cliCommand must contain an executable');
+    const version = options.version ?? MCP_PACKAGE_VERSION;
+    if (!version.trim()) throw new TypeError('version must be non-empty');
+    this.identity = Object.freeze({
+      mode: options.mode ?? 'standalone',
+      version,
+      command: this.#cliCommand,
+    });
   }
 
   /** Spawn one command and return its bounded combined output tail. */
@@ -98,8 +111,11 @@ export class SpawnCommandExecutor implements CommandExecutorPort {
       tail.append(new TextEncoder().encode(`${tail.result().outputTail ? '\n' : ''}timed_out`));
     }
     const output = tail.result();
+    const exitCode = timedOut ? 124 : status.code;
     return {
-      exitCode: timedOut ? 124 : status.code,
+      executor: this.identity,
+      status: exitCode === 0 ? 'pass' : 'fail',
+      exitCode,
       durationMs: Math.max(0, Math.round(performance.now() - started)),
       outputTail: output.outputTail,
       truncated: output.truncated,

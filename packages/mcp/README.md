@@ -61,6 +61,24 @@ playbook, MCP is the eyes. It deliberately wraps the CLI rather than reimplement
 policy gate. MCP exists for what a shell cannot cheaply give an agent — bounded aggregation,
 cross-domain diagnostics, and documentation lookup.
 
+### CLI executor identity
+
+Both command tools return an `executor` identity with `mode`, `version`, and the resolved fixed
+command prefix, so the agent can see which CLI it is driving.
+
+- **CLI-hosted server (`netscript agent mcp`)**: re-enters the hosting CLI. Script and global-install
+  runs use the current Deno executable plus the running main module; compiled installs execute the
+  current binary directly. No JSR CLI is downloaded.
+- **Standalone server (`deno x jsr:@netscript/mcp@<version>/cli`)**: has no host CLI, so the MCP
+  release intentionally selects `jsr:@netscript/cli@<MCP_PACKAGE_VERSION>` as its compatible child
+  and reports `mode: "standalone"`. This is an explicit MCP-owned compatibility policy, not a claim
+  that publish-asset generation compares the two package versions.
+
+`list_commands` is receipt-exempt because catalog enumeration diagnoses no project resource.
+`execute_command` accepts an optional `resource` (default `project`) and replaces that resource's
+diagnostic receipt on every attempt: exit zero writes `exitStatus: 0`; policy denial, timeout,
+adapter failure, or a non-zero child exit writes `exitStatus: 1`.
+
 ## Install
 
 Most users never import this package. Install the server into a project with the CLI:
@@ -153,8 +171,8 @@ results, and `get_run` returns a structured `run_not_found` error the agent can 
 | `list_package_exports`        | `package`             | Paginated declarations grouped by export subpath                             |
 | `get_export`                  | `symbol`              | One bounded declaration signature and JSDoc block                            |
 | `search_exports`              | `query`               | Ranked partial-name and declaration-shape matches                            |
-| `list_commands`               | —                     | Live CLI command descriptors                                                 |
-| `execute_command`             | `command`             | Exit code, duration, and bounded output tail; structured denial when blocked |
+| `list_commands`               | —                     | Live CLI descriptors plus resolved executor mode, version, and command       |
+| `execute_command`             | `command`; `resource` optional | Executor identity, status, exit code, duration, and bounded output tail |
 | `record_drift`                | `resource`, `summary` | Evidence-gated drift entry appended to project drift log                     |
 | `list_api_services`           | —                 | Discovered services, live spec status, source outcomes, and operation counts  |
 | `list_service_operations`     | `service`         | Bounded OpenAPI operation rows with honest truncation metadata                |
@@ -172,7 +190,8 @@ drift into `.netscript/agent/drift.jsonl`.
 
 - **Required evidence**: Requires a fresh successful diagnostic receipt (timestamped within 15
   minutes, `exitStatus: 0`) for the target resource. Receipts are automatically produced when
-  calling `doctor`, telemetry tools, or `netscript plugin doctor --resource <resource>`.
+  calling `doctor`, telemetry/API-introspection tools, `netscript plugin doctor --resource
+  <resource>`, or a successful `execute_command` carrying the same `resource`.
 - **Target & Scope**: The `resource` argument targets a specific plugin, service, or `'project'`.
   Receipts live at `.netscript/agent/diagnostics/<resource>.json`.
 - **Mutation behavior**: Appends a single JSON line to `.netscript/agent/drift.jsonl` under the
