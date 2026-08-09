@@ -99,13 +99,14 @@ describe('runPrismaWithRetry', () => {
       ['migrate', 'dev'],
       true,
       {},
-      () => Promise.resolve({
-        code: 0,
-        get stderr(): Uint8Array {
-          stderrReads += 1;
-          throw new TypeError("Cannot get 'stderr': 'stderr' is not piped");
-        },
-      }),
+      () =>
+        Promise.resolve({
+          code: 0,
+          get stderr(): Uint8Array {
+            stderrReads += 1;
+            throw new TypeError("Cannot get 'stderr': 'stderr' is not piped");
+          },
+        }),
     );
 
     assertEquals(result, { code: 0, stderr: '' });
