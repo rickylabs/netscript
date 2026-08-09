@@ -1,4 +1,5 @@
 import { assert, assertEquals, assertStringIncludes } from '@std/assert';
+import { copy } from '@std/fs';
 import { fromFileUrl, join } from '@std/path';
 import { createPublicCommandTree } from '../../../src/public/features/root/public-command-tree.ts';
 
@@ -17,6 +18,20 @@ interface RpcResponse {
 const cliEntrypoint = fromFileUrl(
   new URL('../../../bin/netscript.ts', import.meta.url),
 );
+const repositoryRoot = fromFileUrl(new URL('../../../../../', import.meta.url));
+
+async function useLocalConfigWorkspace(projectRoot: string): Promise<void> {
+  const localPackageRoot = join(projectRoot, 'packages', 'config');
+  await copy(join(repositoryRoot, 'packages', 'config'), localPackageRoot);
+  const configPath = join(projectRoot, 'deno.json');
+  const config = JSON.parse(await Deno.readTextFile(configPath)) as {
+    workspace: string[];
+    imports: Record<string, string>;
+  };
+  config.workspace.push('./packages/config');
+  config.imports = { '@netscript/config': 'workspace:*' };
+  await Deno.writeTextFile(configPath, `${JSON.stringify(config, null, 2)}\n`);
+}
 
 Deno.test('agent mcp real CLI stdio smoke', async () => {
   const parent = await Deno.makeTempDir({ prefix: 'netscript-agent-mcp-' });
@@ -40,6 +55,7 @@ Deno.test('agent mcp real CLI stdio smoke', async () => {
     '--no-aspire',
     '--no-git',
   ]);
+  await useLocalConfigWorkspace(projectRoot);
   const playwrightSkillRoot = join(projectRoot, '.claude', 'skills', 'playwright-cli');
   const playwrightSkill = join(playwrightSkillRoot, 'SKILL.md');
   await Deno.mkdir(playwrightSkillRoot, { recursive: true });
