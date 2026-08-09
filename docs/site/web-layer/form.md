@@ -109,7 +109,7 @@ that happens to own a method.
 // routes/contact.tsx
 import { definePage } from '@app/utils.ts';
 import { z } from 'zod';
-import { contactsClient } from '@app/lib/api-clients.ts';
+import { contactsClient } from '@app/lib/contacts.ts';
 import ContactForm from './(_components)/ContactForm.tsx';
 
 const ContactSchema = z.object({

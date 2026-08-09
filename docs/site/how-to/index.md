@@ -58,8 +58,9 @@ construction, that alternative is an integration escape hatch, not the default N
 
 ## Services & SDK
 
-- [Add a service]({{ "howto:add-a-service" |> xref |> url }}) — define a typed
-  contract, implement the handlers, and confirm the service answers on
+- [Add a service]({{ "howto:add-a-service" |> xref |> url }}) — run
+  `netscript service add --name <service> --with-client` to define a typed contract, generate
+  `apps/<app>/lib/<service>.ts`, implement the handlers, and confirm the service answers on
   `/api/rpc/*`.
 - [Discover services]({{ "howto:discover-services" |> xref |> url }}) — call
   another plugin's or workspace member's typed service without hardcoding its

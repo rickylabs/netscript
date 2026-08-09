@@ -89,15 +89,15 @@ up on the client already typed. The mechanics of each layer are below; the type-
 
 ## Minimal example
 
-A single `lib/api-clients.ts` is the spine of the data layer: build the typed client from a
+A single `lib/orders.ts` is the spine of the data layer: build the typed client from a
 contract, then derive a query factory from `{ contract, client }`. Every consumer — server
 loader or island — imports from here.
 
 ```ts
-// apps/playground/lib/api-clients.ts
+// apps/playground/lib/orders.ts
 import { createServiceClient } from '@netscript/sdk/client';
 import { createQueryFactories } from '@netscript/sdk/query';
-import { ordersContract } from '@contracts';
+import { ordersContract } from '@playground/contracts';
 
 // L1 — typed client. `serviceName` resolves a URL via Aspire discovery.
 export const ordersClient = createServiceClient<typeof ordersContract>({
@@ -106,9 +106,9 @@ export const ordersClient = createServiceClient<typeof ordersContract>({
 });
 
 // L2 — cache-first query factory bound to that client (KV-backed SWR).
-export const api = createQueryFactories({
+export const ordersQueries = createQueryFactories({
   orders: { contract: ordersContract, client: ordersClient },
-});
+}).orders;
 
 // Direct typed call: `.list()` is fully inferred from the contract.
 const recent = await ordersClient.list({ limit: 10 });
@@ -129,7 +129,7 @@ TanStack option helpers. These are the methods you call from a `definePage` load
 island; reading them first explains the rest of the page.
 
 {{ comp.apiTable({
-  caption: "ActionMethod — per-action query helpers (api.orders.list.*)",
+  caption: "ActionMethod — per-action query helpers (ordersQueries.list.*)",
   rows: [
     { name: "queryOptions(props, options?)", type: "(input, ActionQueryOptions?) => QueryOptions", desc: "TanStack queryOptions with a typed queryKey and queryFn derived from the contract. The primary helper a loader/island passes to useQuery." },
     { name: "mutationOptions(options?)", type: "(ActionMutationOptions?) => MutationOptions", desc: "TanStack mutationOptions with a typed mutationKey and mutationFn for writes (e.g. updateStatus)." },
@@ -175,7 +175,6 @@ The L3 alternative builds all three layers from one map:
     { name: "getServiceUrl(name, protocol, index)", type: "@netscript/sdk/discovery", desc: "Resolve a service URL from Aspire browser-VITE or server services__* env. This is how serviceName resolves." },
     { name: "getServiceInfo(name) / isServiceAvailable(name) / getAllServices()", type: "@netscript/sdk/discovery", desc: "Inspect a service's endpoints, check availability, or list all server-side Aspire service names (topology)." },
     { name: "createNetScriptQueryClient(options)", type: "@netscript/sdk/query-client", desc: "A TanStack QueryClient with server-first defaults: staleTime 30s, gcTime 300s, refetchOnWindowFocus false, retry 1." },
-    { name: "createServiceQueryUtils()", type: "@netscript/sdk/query-client", desc: "Bridge a typed SDK client into oRPC/TanStack frontend query utilities." },
     { name: "bridgeInvalidation(resource, action?)", type: "@netscript/sdk/query-client", desc: "Build a client-side invalidation filter ({ queryKey }) for queryClient.invalidateQueries()." },
     { name: "toClientKeyPrefix(resource, action?)", type: "@netscript/sdk/query-client", desc: "Map a server resource/action to a prefix-matchable client query key, e.g. ['orders','list']." },
     { name: "cacheQuery.setCachedData(key, data, ttl)", type: "@netscript/sdk/cache", desc: "Server-only: fire-and-forget pre-warm of an entity into the KV cache. Importing /cache auto-registers the shared provider." }
@@ -186,17 +185,17 @@ The L3 alternative builds all three layers from one map:
   {
     label: "Server loader (definePage layer)",
     lang: "ts",
-    code: "// routes/(dashboard)/orders/(_loaders)/orders-list.ts\nimport { api } from '@/lib/api-clients.ts';\n\n// Cache-first: read the KV entry (with cachedAt) for SWR; fall back to a fetch.\nexport const loadOrders = async () => {\n  const entry = await api.orders.list.getCachedEntry({ limit: 20 });\n  if (entry) return entry; // serve cached; SDK reloads stale in the background\n  return { data: await api.orders.list.queryOptions({ limit: 20 }).queryFn(), cachedAt: Date.now() };\n};"
+    code: "// routes/(dashboard)/orders/(_loaders)/orders-list.ts\nimport { ordersQueries } from '@app/lib/orders.ts';\n\n// Cache-first: read the KV entry (with cachedAt) for SWR; fall back to a fetch.\nexport const loadOrders = async () => {\n  const entry = await ordersQueries.list.getCachedEntry({ limit: 20 });\n  if (entry) return entry; // serve cached; SDK reloads stale in the background\n  return { data: await ordersQueries.list.queryOptions({ limit: 20 }).queryFn(), cachedAt: Date.now() };\n};"
   },
   {
     label: "Island (TanStack hydration)",
     lang: "tsx",
-    code: "// orders/(_islands)/OrdersQueryIsland.tsx\nimport { useQuery, useQueryClient } from '@netscript/fresh/query';\nimport { api } from '@/lib/api-clients.ts';\n\n// Same contract action → same query key as the server loader, so the island\n// hydrates from server state instead of refetching on mount.\nconst OrdersList = () => {\n  const qc = useQueryClient();\n  const orders = useQuery(api.orders.list.queryOptions({ limit: 20 }));\n  // invalidate by prefix after a write:\n  const refresh = () => qc.invalidateQueries({ queryKey: api.orders.list.clientKey() });\n  return null; // render orders.data\n};"
+    code: "// orders/(_islands)/OrdersQueryIsland.tsx\nimport { useQuery, useQueryClient } from '@netscript/fresh/query';\nimport { ordersQueries } from '@app/lib/orders.ts';\n\n// Same contract action → same query key as the server loader, so the island\n// hydrates from server state instead of refetching on mount.\nconst OrdersList = () => {\n  const qc = useQueryClient();\n  const orders = useQuery(ordersQueries.list.queryOptions({ limit: 20 }));\n  // invalidate by prefix after a write:\n  const refresh = () => qc.invalidateQueries({ queryKey: ordersQueries.list.clientKey() });\n  return null; // render orders.data\n};"
   },
   {
     label: "Safe error narrowing",
     lang: "ts",
-    code: "// services/orders/src/routers/v1.ts — service-to-service call\nimport { safe, isDefinedError } from '@netscript/sdk/client';\nimport { usersClient } from '@/lib/api-clients.ts';\n\nconst [error, user, isDefined] = await safe(usersClient.getById({ id }));\nif (error) {\n  // narrow to a typed, contract-declared error\n  if (isDefinedError(error)) return { code: error.code, status: error.status };\n  throw error;\n}"
+    code: "// services/orders/src/routers/v1.ts — service-to-service call\nimport { safe, isDefinedError } from '@netscript/sdk/client';\nimport { usersClient } from '@app/lib/users.ts';\n\nconst [error, user, isDefined] = await safe(usersClient.getById({ id }));\nif (error) {\n  // narrow to a typed, contract-declared error\n  if (isDefinedError(error)) return { code: error.code, status: error.status };\n  throw error;\n}"
   }
 ] }) }}
 

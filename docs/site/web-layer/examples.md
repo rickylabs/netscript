@@ -37,13 +37,13 @@ the [SDK bridge](/services-sdk/sdk/) — and nothing in it is hand-typed:
 // apps/dashboard/islands/OrdersPanel.tsx
 import { QueryIsland, useIslandQuery } from "@netscript/fresh/query";
 import { createRouteReference } from "@netscript/fresh/route";
-import { orders } from "../lib/api-clients.ts"; // createServiceQueryUtils(ordersClient)
+import { ordersQueries } from "../lib/orders.ts";
 
 const ordersRoute = createRouteReference("/orders");
 
 function OrdersList() {
   const query = useIslandQuery({
-    ...orders.list.queryOptions({ input: { limit: 20 } }),
+    ...ordersQueries.list.queryOptions({ limit: 20 }),
     staleTime: 15_000,
   });
 
@@ -66,9 +66,9 @@ export default function OrdersPanel() {
 }
 ```
 
-The `orders` query utils come from the single `lib/api-clients.ts` module the
+The `ordersQueries` factory comes from the per-service `lib/orders.ts` module the
 [query cache page](/web-layer/query/) builds — `createServiceClient` →
-`createServiceQueryUtils` — so a renamed contract field is a compile error here,
+`createQueryFactories` — so a renamed contract field is a compile error here,
 not a runtime blank. For the full read/write pair (typed query plus optimistic
 mutation) see that page.
 

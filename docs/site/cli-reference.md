@@ -92,7 +92,7 @@ accepts `--dry-run`.
 | `netscript config set` | Generated `aspire/appsettings.json` value | None beyond the configuration write | AppHost generator and resources reading the setting | No |
 | `netscript contract add` / `netscript contract add-route` | Workspace-owned versioned contract source | Version aggregate exports | Service handlers, SDK clients, OpenAPI/RPC routers | No |
 | `netscript contract version add` / `netscript contract remove` | Versioned contract source | Version and root aggregate exports | Service and SDK imports | No |
-| `netscript service add` / `netscript service set` / `netscript service remove` | Service workspace plus `aspire/appsettings.json` | Contract aggregates and Aspire helper files | AppHost resource graph, typed callers | No |
+| `netscript service add` / `netscript service set` / `netscript service remove` | Service workspace plus `aspire/appsettings.json` | Contract aggregates, optional `apps/<app>/lib/<service>.ts` via `--with-client`, and Aspire helper files | AppHost resource graph, typed callers | No |
 | `netscript service ref add` / `netscript service ref remove` | Caller `ServiceReferences` in `aspire/appsettings.json` | Aspire helper files | AppHost environment/reference injection | No |
 | `netscript db add` / `netscript db remove` | Database target configuration and workspace membership | Aspire configuration and AppHost helpers | Prisma tasks, services, Aspire resources | No |
 | `netscript db init` / `netscript db migrate` | Prisma schema and migration history | Migration directories and generated client inputs | Prisma engine and application repositories | No; database operation |
@@ -150,7 +150,7 @@ implements it.
 {{ comp.apiTable({
   caption: "Services and contracts",
   rows: [
-    { name: "Add a service", type: "netscript service add --name orders --port 3002", desc: "Add a service workspace member, its v1 contract, and the Aspire registration." },
+    { name: "Add a service", type: "netscript service add --name orders --port 3002 --with-client", desc: "Add a service workspace member, its v1 contract, the Aspire registration, and apps/<app>/lib/orders.ts with a typed client and query factories." },
     { name: "Add a contract", type: "netscript contract add catalog-items", desc: "Create <code>contracts/versions/v1/catalog-items.contract.ts</code> from the oRPC contract template and regenerate the v1 aggregate exports." },
     { name: "Add a route + handler", type: "netscript contract add-route · netscript service add-handler", desc: "Append a typed procedure to a contract, then bind it with a compiling service handler stub." },
     { name: "See what exists", type: "netscript service list · netscript contract list · netscript contract inspect <name>", desc: "List services, list v1 contract modules (and whether each has a matching service), and inspect a contract's procedures and schemas." },

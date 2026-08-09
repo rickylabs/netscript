@@ -117,17 +117,16 @@ that answers it share one definition of the route.
   ]
 }) }}
 
-## Step 2 — One typed clients module
+## Step 2 — One typed module per service
 
-A client needs only a contract to be fully typed. Build one `createServiceClient` per service in a
-single module — the "one place all clients live" pattern — and wrap each in
-`createServiceQueryUtils`, which turns a client into per-procedure TanStack Query helpers:
+A client needs only a contract to be fully typed. Keep each service's client and cache-aware query
+factory together in `lib/<service>.ts`, matching `service add <name> --with-client`:
 
 ```ts
-// apps/storefront/lib/api-clients.ts
-import { CartContractV1, ProductsContractV1 } from '@my-shop/contracts/versions/v1';
+// apps/storefront/lib/products.ts
+import { ProductsContractV1 } from '@my-shop/contracts/versions/v1';
 import { createServiceClient } from '@netscript/sdk/client';
-import { createServiceQueryUtils } from '@netscript/sdk/query-client';
+import { createQueryFactories } from '@netscript/sdk/query';
 
 // One typed client per service. `serviceName` is the discovery key — how the
 // client finds the service URL at call time; you never hardcode a port.
@@ -135,19 +134,16 @@ export const productsClient = createServiceClient<typeof ProductsContractV1>({
   contract: ProductsContractV1,
   serviceName: 'products',
 });
-export const cartClient = createServiceClient<typeof CartContractV1>({
-  contract: CartContractV1,
-  serviceName: 'cart',
-});
+export const productsQueries = createQueryFactories({
+  products: { contract: ProductsContractV1, client: productsClient },
+}).products;
 
-// Contract-derived query/mutation utilities: one entry per procedure, each with
-// a typed queryKey/queryOptions and mutationKey/mutationOptions.
-export const productsQueries = createServiceQueryUtils(productsClient);
-export const cartQueries = createServiceQueryUtils(cartClient);
+// apps/storefront/lib/cart.ts follows the same generated shape:
+// cartClient + createQueryFactories({ cart: ... }).cart → cartQueries.
 ```
 
 `productsClient.list(input)` now has the exact signature `ProductsContractV1.list` declared, and
-`productsQueries.list.queryOptions({ input })` hands you the **contract-derived cache key** the island
+`productsQueries.list.queryOptions(input)` hands you the **contract-derived cache key** the island
 reads and invalidates through. Change a field in the contract and this module re-type-checks — there
 is no second definition of a product or a cart to keep in sync.
 
@@ -174,12 +170,8 @@ import {
   useIslandQuery,
   useQueryClient,
 } from '@netscript/fresh/query';
-import {
-  cartClient,
-  cartQueries,
-  productsClient,
-  productsQueries,
-} from '../lib/api-clients.ts';
+import { cartClient, cartQueries } from '../lib/cart.ts';
+import { productsClient, productsQueries } from '../lib/products.ts';
 
 interface CheckoutIslandProps {
   customer: string;
@@ -193,7 +185,7 @@ function CheckoutInner({ customer, input, initialProducts }: CheckoutIslandProps
   // READ — the catalog. The util gives the contract-derived cache key; the typed
   // client makes the call. initialData seeds the first paint from a server loader.
   const catalog = useIslandQuery({
-    queryKey: productsQueries.list.queryOptions({ input }).queryKey,
+    queryKey: productsQueries.list.queryOptions(input).queryKey,
     queryFn: () => productsClient.list(input),
     initialData: initialProducts,
     staleTime: 10_000,
@@ -205,7 +197,7 @@ function CheckoutInner({ customer, input, initialProducts }: CheckoutIslandProps
     mutationFn: (line: { productId: number; quantity: number }) =>
       cartClient.create({ customerId: customer, items: [line] }),
     onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: cartQueries.list.key({ type: 'query' }) }),
+      queryClient.invalidateQueries({ queryKey: cartQueries.list.clientKey() }),
   });
 
   const products = catalog.data?.items ?? [];
@@ -246,7 +238,7 @@ The moves that make this typed end to end:
 - **`mutationFn` is a typed contract call.** `cartClient.create({ customerId, items })` is checked
   against `CartContractV1.create`; pass an item without a `productId` and it fails `deno task check`,
   not in production.
-- **Invalidation is keyed off the contract too.** `cartQueries.list.key({ type: 'query' })` is the
+- **Invalidation is keyed off the contract too.** `cartQueries.list.clientKey()` is the
   prefix-matchable cache key for every cart list query, so one line refetches the cart after checkout.
 
 Adding to a cart is a widget event, which is why it lives in the island. A checkout that collects an
@@ -273,7 +265,7 @@ The page is built using NetScript's fluent `definePage` page builder. By binding
 import { definePage } from '@app/utils.ts';
 import { cartRoute } from '../../../contracts/routes/cart-page.ts';
 import CheckoutIsland from '../../islands/CheckoutIsland.tsx';
-import { productsClient } from '../../lib/api-clients.ts';
+import { productsClient } from '../../lib/products.ts';
 
 const cartPage = definePage()
   .withRoute(cartRoute)
@@ -335,8 +327,8 @@ product carries an **Add to cart** button wired to the typed checkout mutation.
 
 - [ ] `contracts/routes/cart-page.ts` exports `cartRoute`, a bound route contract with a typed
       `{ customer }` param and pagination search.
-- [ ] `apps/storefront/lib/api-clients.ts` exports `productsClient`, `cartClient`, `productsQueries`,
-      and `cartQueries`, each derived from a contract.
+- [ ] `apps/storefront/lib/products.ts` and `lib/cart.ts` export their service-derived clients and
+      query factories.
 - [ ] `CheckoutIsland.tsx` reads with `useIslandQuery` and mutates with `useIslandMutation`, keyed off
       the contract-derived helpers.
 - [ ] The page binds to the contract and loads initial products using `definePage` and a layer loader.
@@ -349,8 +341,8 @@ product carries an **Add to cart** button wired to the typed checkout mutation.
   pattern, the typed `{ customer }` path param, and the pagination search, and it produces both the
   page's typed context and the URL a link would call. `definePage` binds that contract, resolves the
   first page of products on the server, and wires the checkout island as a layer.
-- A single clients module with one typed `createServiceClient` per service, each wrapped in
-  `createServiceQueryUtils` — the contract-derived query and mutation helpers.
+- One module per service with a typed `createServiceClient` wrapped in `createQueryFactories` — the
+  contract-derived query and mutation helpers shared by loaders and islands.
 - An island that **reads** the catalog with `useIslandQuery` and **begins checkout** with
   `useIslandMutation`, both keyed off those helpers, with cache invalidation keyed off the cart
   contract too.

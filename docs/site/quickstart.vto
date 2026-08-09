@@ -43,7 +43,7 @@ Confirm `netscript --help` lists the public command groups: `agent`, `config`, `
 ```bash
 netscript init my-app --db postgres --yes
 cd my-app
-netscript service add --name users
+netscript service add --name users --with-client
 ```
 
 `service add` is a separate step so the same command works later when you add a second service to a real workspace. `--yes` accepts the remaining defaults without prompts, including the `dashboard` Fresh app and shared Redis cache. Add `--editor zed`, `--editor vscode`, or `--editor none` when you want the scaffold to apply an editor choice explicitly; inspect every option with `netscript init --help`.
@@ -62,7 +62,9 @@ my-app/
 ├── apps/dashboard/
 │   ├── AGENTS.md                          # [guidance] app-specific agent rules
 │   ├── WEB-LAYER.md                       # [guidance] contract → page → island map
-│   ├── client.ts                          # [owned] contract-derived client instance
+│   ├── client.ts                          # [owned] Fresh client entry; imports app CSS
+│   ├── lib/                               # [owned] per-service data-layer modules
+│   │   └── users.ts                       # [owned] users client + query factories
 │   ├── utils.ts                           # [owned] web utilities & definePage helper
 │   ├── routes/                            # [owned] Fresh pages and route handlers
 │   ├── islands/                           # [owned] interactive Preact boundaries
@@ -203,11 +205,15 @@ The first feature is a loop, not a hunt for folders. From the workspace root, ad
 ```sh
 netscript contract add orders
 netscript contract add-route orders recent --method GET --path /orders/recent
-netscript service add --name orders
+netscript service add --name orders --with-client
 netscript service add-handler orders recent
 ```
 
-`contract add` seeds the v1 contract; `add-route` appends the `recent` procedure. `service add` creates the service workspace and registers it with Aspire. `service add-handler` binds that exact procedure in the correct router and emits a stub that compiles while throwing `Not implemented` at runtime. Replace the throw with business logic; do not hand-write a parallel router.
+`contract add` seeds the v1 contract; `add-route` appends the `recent` procedure. `service add
+--with-client` creates the service workspace, registers it with Aspire, and writes the typed app data
+layer at `apps/dashboard/lib/orders.ts`. `service add-handler` binds that exact procedure in the
+correct router and emits a stub that compiles while throwing `Not implemented` at runtime. Replace
+the throw with business logic; do not hand-write a parallel router.
 
 `service add` regenerates the Aspire helper files under `aspire/.helpers/`. A running AppHost does not pick up the new service graph automatically—stop it (`aspire stop --apphost ./aspire/apphost.mts`) and restart it (`deno task aspire:start`) before expecting the new service in the dashboard or MCP tool status.
 
@@ -249,7 +255,8 @@ The generator writes `apps/dashboard/routes/orders/index.tsx`, `OrdersIsland.tsx
 deno check --unstable-kv "apps/dashboard/routes/orders/index.tsx" "apps/dashboard/routes/orders/(_islands)/OrdersIsland.tsx"
 ```
 
-The generator supplies a compiling composition and correct file layout; you connect its query loader to the contract-derived client in `apps/dashboard/client.ts` and implement feature logic.
+The generator supplies a compiling composition and correct file layout; connect its query loader to
+the generated data layer in `apps/dashboard/lib/orders.ts` and implement feature logic.
 
 For breaking contract evolution, start with `netscript contract version --help`. To add a background capability, use `netscript plugin install <kind>`—for example, `netscript plugin install worker --name workers` scaffolds the plugin workspace and registers it with Aspire.
 
@@ -283,7 +290,7 @@ Common CLI commands for your first hour in a NetScript workspace:
 | Initialize database | `netscript db init --name init` |
 | Update types after schema edit | `netscript db migrate --name <name>` && `netscript db generate` |
 | Add contract route | `netscript contract add-route <contract> <procedure> --method GET --path /<route>` |
-| Add oRPC service | `netscript service add --name <name>` |
+| Add oRPC service and app data layer | `netscript service add --name <name> --with-client` |
 | Bind handler stub | `netscript service add-handler <service> <procedure>` |
 | Inspect UI component registry | `netscript ui:list --project-root apps/dashboard` |
 | Scaffold Fresh page & island | `netscript ui:add page <name> --island --project-root apps/dashboard` |

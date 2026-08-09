@@ -37,7 +37,7 @@ or product trade-off remains open. Owner-controlled opposite-family IMPL-EVAL re
 | --- | --- | --- |
 | S0 | Research, design, PLAN-EVAL N/A, draft PR | clean baseline and artifact review |
 | S1 | Service-derived client-template symbols and all generated consumers | pre-fix RED; focused CLI template/scaffolder tests; canonical asset regeneration |
-| S2 | Published docs convergence and durable negative accuracy checks | 208-source sweep; mutation REDs; docs accuracy/build/link/caveat gates |
+| S2 | Published docs convergence and durable negative accuracy checks | 192-source sweep; mutation REDs; docs accuracy/build/link/caveat gates |
 | S3 | Aggregate static/fitness gates and handoff | scoped check/lint/fmt, quality scan, arch check, clean diff |
 
 ## Failure matrix
@@ -58,8 +58,7 @@ or product trade-off remains open. Owner-controlled opposite-family IMPL-EVAL re
    missing `orders*` exports, then green after implementation.
 2. Add accuracy guards and prove each with isolated scratch mutations: a retired module/alias and a
    legacy API on an unapproved page must each make `docs:accuracy` exit non-zero; clean rerun exits 0.
-3. Sweep all 208 publishable source pages and report final occurrence/page counts and changed-page
+3. Sweep all 192 publishable source pages and report final occurrence/page counts and changed-page
    count.
 4. Run focused CLI tests, canonical asset check, docs build/link/caveat gates, scoped wrappers,
    `quality:scan`, and `arch:check`; no Aspire/container/E2E run.
-

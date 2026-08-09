@@ -108,7 +108,7 @@ Browser- and island-facing TanStack Query integration.
 | Symbol | Kind | Signature / Description |
 | --- | --- | --- |
 | `createNetScriptQueryClient` | function | TanStack QueryClient with server-first defaults. Signature: `createNetScriptQueryClient(options): QueryClient`. |
-| `createServiceQueryUtils` | function | TanStack Query utils from an oRPC service client. Signature: `createServiceQueryUtils<TContract>(client, options?): ServiceQueryUtils<TContract>`. |
+| `createServiceQueryUtils` | function | Thin oRPC/TanStack remap with `queryOptions({ input })`; unlike the golden-path `createQueryFactories` call `queryOptions(input)`, it has no server KV tier. Do not mix the two call shapes in one data layer. Signature: `createServiceQueryUtils<TContract>(client, options?): ServiceQueryUtils<TContract>`. |
 | `createKvCachePersister` | function | KV-backed async storage adapter for TanStack Query persistence. |
 | `bridgeInvalidation` | function | Build a client-side invalidation filter from a resource and optional action. |
 | `toClientKeyPrefix` | function | Convert an SDK resource/action pair to a client-side TanStack key prefix. |

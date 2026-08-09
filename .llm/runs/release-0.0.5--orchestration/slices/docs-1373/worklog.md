@@ -29,3 +29,18 @@
 
 S1 changed the canonical client template and all six default-scaffold consumers to use the same
 `serviceName | camelCase` symbol family. No public command shape or module path changed.
+
+| S2 gate | Result |
+| --- | --- |
+| Accuracy guard unit tests | PASS, raw exit 0; 2 passed |
+| Retired-path scratch mutation | expected RED, raw exit 1; named `quickstart.vto` and `lib/api-clients.ts` |
+| Extra-dialect-page scratch mutation | expected RED, raw exit 1; named SDK reference + quickstart |
+| Clean `docs:accuracy` | PASS, raw exit 0; 192 published sources, one legacy API page |
+| `docs/site` build | PASS, raw exit 0; source/rendered guards, 617 files, 220 HTML |
+| `check:links` | PASS, raw exit 0; 32,772 links / 220 pages |
+| `check:caveats` | PASS, raw exit 0; 18 markers / 14 pages |
+
+S2 swept 192 published sources and changed 17 published pages. Final published counts: zero pages
+with `lib/api-clients.ts`, `@contracts`, or `@/lib/`; one page with
+`createServiceQueryUtils` (`reference/sdk/index.md`); four named discovery pages contain
+`--with-client`. `_plan` retains historical evidence and was not edited.

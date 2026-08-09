@@ -133,52 +133,43 @@ the service changes. The [`@netscript/sdk`](/services-sdk/sdk/) bridge removes
 that gap: derive the `queryFn` (and its `queryKey`) straight from the same oRPC
 contract the service implements, so the island cannot drift from the API.
 
-The chain has three links, and it lives in **one module** per app — the single
-source of typed clients every loader and island imports:
+The chain has three links, and each service owns one module under `lib/` — the
+single source of typed clients every loader and island imports:
 
 ```ts
-// apps/dashboard/lib/api-clients.ts
+// apps/dashboard/lib/widgets.ts
 import { createServiceClient } from "@netscript/sdk/client";
-import { createServiceQueryUtils } from "@netscript/sdk/query-client";
-import { docsContract, todosContract, widgetsContract } from "@contracts";
+import { createQueryFactories } from "@netscript/sdk/query";
+import { WidgetsContractV1 } from "@my-app/contracts";
 
 // 1. A typed client per service. `serviceName` resolves a URL via Aspire
 //    discovery; the contract drives every method signature.
-export const widgetsClient = createServiceClient<typeof widgetsContract>({
-  contract: widgetsContract,
+export const widgetsClient = createServiceClient<typeof WidgetsContractV1>({
+  contract: WidgetsContractV1,
   serviceName: "widgets",
 });
-export const docsClient = createServiceClient<typeof docsContract>({
-  contract: docsContract,
-  serviceName: "docs",
-});
-export const todosClient = createServiceClient<typeof todosContract>({
-  contract: todosContract,
-  serviceName: "todos",
-});
 
-// 2. Frontend query utils per client. Each exposes `.queryOptions()`,
-//    `.mutationOptions()`, `.infiniteOptions()`, and `.key()` for every
-//    procedure on the contract — all inferred, no manual annotations.
-export const widgets = createServiceQueryUtils(widgetsClient, { path: ["widgets"] });
-export const docs = createServiceQueryUtils(docsClient, { path: ["docs"] });
-export const todos = createServiceQueryUtils(todosClient, { path: ["todos"] });
+// 2. The cache-aware query factory exposes queryOptions(input),
+//    mutationOptions(), clientKey(input?), and the server KV helpers.
+export const widgetsQueries = createQueryFactories({
+  widgets: { contract: WidgetsContractV1, client: widgetsClient },
+}).widgets;
 ```
 
 Islands then import from that module and spread the generated options into the
-island hooks. `queryOptions({ input })` supplies both the `queryKey` and a
+island hooks. `queryOptions(input)` supplies both the `queryKey` and a
 `queryFn` bound to the contract, so the hook call only adds island concerns like
 `staleTime`:
 
 ```tsx
 // apps/dashboard/islands/WidgetIsland.tsx
 import { QueryIsland, useIslandQuery } from "@netscript/fresh/query";
-import { widgets } from "../lib/api-clients.ts";
+import { widgetsQueries } from "../lib/widgets.ts";
 
 function WidgetView() {
   // queryKey + queryFn come from the contract; the input is typed, too.
   const query = useIslandQuery({
-    ...widgets.list.queryOptions({ input: {} }),
+    ...widgetsQueries.list.queryOptions({}),
     staleTime: 30_000,
   });
 
@@ -201,13 +192,12 @@ export default function WidgetIsland() {
 }
 ```
 
-`widgets.list.queryOptions(...)` returns a typed `{ queryKey, queryFn }`; the
+`widgetsQueries.list.queryOptions(...)` returns a typed `{ queryKey, queryFn }`; the
 `widget` element is inferred from the contract's output, so a renamed field is a
-compile error, not a runtime surprise. The `@netscript/sdk/query-client` bridge
-(`createServiceQueryUtils`) is the pure client-to-island path; when you also want
-KV-backed server SWR and prefetch, `createQueryFactories` from the SDK adds a
-cache-first layer over the same contract — see the
-[Typed SDK & client](/services-sdk/sdk/) pillar for that variant.
+compile error, not a runtime surprise. The same factory also supplies the KV-backed
+server SWR and prefetch helpers described in the
+[Typed SDK & client](/services-sdk/sdk/) pillar, so loaders and islands share one
+input shape and one query-key vocabulary.
 
 `initialData` is the bridge between a server loader and the island: pass the
 loader's cached payload as `initialData` so the island renders with data
@@ -223,12 +213,12 @@ continue while the tab is backgrounded (the default stops polling on blur).
 
 ```tsx
 import { useIslandQuery } from "@netscript/fresh/query";
-import { docs } from "../lib/api-clients.ts";
+import { docsQueries } from "../lib/docs.ts";
 
 function DocStatus({ id }: { id: string }) {
   const query = useIslandQuery({
     // Contract-derived queryKey + queryFn; `id` is the typed procedure input.
-    ...docs.getById.queryOptions({ input: { id } }),
+    ...docsQueries.getById.queryOptions({ id }),
     // Poll every 2s; flip to false from state once the status reaches "ready".
     refetchInterval: 2_000,
     refetchIntervalInBackground: true,
@@ -281,7 +271,7 @@ import {
   useIslandMutation,
   useQueryClient,
 } from "@netscript/fresh/query";
-import { todos } from "../lib/api-clients.ts";
+import { todosQueries } from "../lib/todos.ts";
 
 interface Todo {
   id: string;
@@ -291,12 +281,12 @@ interface Todo {
 
 function TodoToggle({ todo }: { todo: Todo }) {
   const queryClient = useQueryClient();
-  const listKey = todos.list.queryKey({ input: {} });
+  const listKey = todosQueries.list.clientKey({});
 
   const toggle = useIslandMutation({
     // 1. The round-trip: mutationOptions() supplies the contract-bound
     //    mutationFn and mutationKey; `mutate` takes the typed procedure input.
-    ...todos.update.mutationOptions(),
+    ...todosQueries.update.mutationOptions(),
 
     // 2. Optimistic update: snapshot prior state, write the expected next state.
     onMutate: async (variables: { id: string; done: boolean }) => {
@@ -342,11 +332,11 @@ export default function TodoIsland({ todo }: { todo: Todo }) {
 }
 ```
 
-Spreading `todos.update.mutationOptions()` supplies the contract-bound
+Spreading `todosQueries.update.mutationOptions()` supplies the contract-bound
 `mutationFn` and `mutationKey`; the optimistic seam — `onMutate`, `onError`,
 `onSettled` — is added on the island hook, exactly where the query cache lives.
 `mutate` takes the typed procedure input (`{ id, done }` here), and the
-`todos.list.queryKey({ input })` helper builds the same key the list query uses,
+`todosQueries.list.clientKey(input)` builds the same key the list query uses,
 so the snapshot, rollback, and invalidation all target the right cache entry.
 Call `mutate` for fire-and-forget UI updates, or `mutateAsync` when you need to
 await the result.

@@ -2,8 +2,9 @@
 
 - Live issue contains 12 acceptance boxes. The dispatch abbreviates eight; this closing PR must
   also remove unresolved aliases, add the focused CLI assertion, and land both negative guards.
-- The publishable source sweep contains 208 `.md`/`.vto` pages after excluding `_site` and private
-  underscore directories. `_site` is generated and `_plan` is historical planning, not published.
+- The executable publish-source walker finds 192 `.md`/`.vto` pages after excluding `_site` and
+  every private underscore directory. The earlier shell candidate count was 208 because it excluded
+  only selected underscore directories; the executable gate's 192 is decisive.
 - Ten published pages name `lib/api-clients.ts`; no CLI generator writes that aggregate.
 - `quickstart.vto` calls Fresh `client.ts` a contract-derived client, while the shipped template is
   only CSS imports.
@@ -19,4 +20,3 @@
 - Existing `docs:accuracy` has no guards for the retired module path, aliases, CSS misdescription,
   or one-page legacy API rule.
 - #1374 owns compiling docs code blocks and is explicitly not acceptance for this milestone.
-
