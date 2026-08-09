@@ -18,7 +18,9 @@ Claude/Fable PLAN-EVAL passed in comment `5229304606`. F1-F4
 are incorporated. S1 behavioral RED is recorded and S2/S3 are implemented green. Non-serialized S4
 commands are complete; #1403 requires scoped evidence because aggregate quality/doctrine root lists
 omit MCP. The one granted serialized runtime passed 78/0/2, with exactly the two #1398 deferrals.
-Separate Claude/Fable IMPL-EVAL passed in comment `5229490053`.
+Separate Claude/Fable IMPL-EVAL passed in comment `5229490053`. A final-head CI finding in the
+changed generated MCP payload was fixed at its checked-in compressed prose source; focused gates
+are green on the replacement payload.
 
 ## Completed
 
@@ -27,6 +29,8 @@ Separate Claude/Fable IMPL-EVAL passed in comment `5229490053`.
 - Current CLI/MCP/generator/tests/docs inspected.
 - Four implementation slices, gates, risk register, public contract, and RED proof locked.
 - PLAN-EVAL PASS preserved in `plan-eval.md`; textual #1376 overlap and second-to-merge rule named.
+- Post-eval generated-source CI correction recorded in `s5-ci-fix.md`; #1400 remains second to
+  merge and owns its later rebase/regeneration.
 
 ## In progress
 
@@ -62,6 +66,7 @@ Implementation and tests are committed through S3. S4's scoped doctrine audit co
 | Fitness | PRE-EXISTING_FAIL | Direct MCP doctrine rerun exit 1 only for untouched F-16/A9/A14 findings assigned to #1403; owned A8 regression repaired. |
 | Runtime | PASS | One granted pass: raw exit 0, passed=78 failed=0 skipped=2; only #1398 deferrals; no owned leak. |
 | Consumer | PASS | Real generated-project stdio `search_docs` returns the installed services document. |
+| Final-head JSR specifiers | PASS | `check:publish-assets` exit 0; `check:netscript-jsr-specifiers` exit 0, failures 0; focused 48/48. |
 
 ## Open questions
 

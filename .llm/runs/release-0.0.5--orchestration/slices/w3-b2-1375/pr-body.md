@@ -20,6 +20,7 @@ fallback, and makes corpus health visible through `list_docs`.
 - [x] S2 generated fallback, provenance/budget, probe precedence, and observability
 - [x] S3 all-host docs wiring, real stdio GREEN, and public docs
 - [x] S4 full gates, serialized runtime token, and evaluation handoff
+- [x] S5 final-head generated-corpus JSR pin correction
 
 ## Validation
 
@@ -31,6 +32,9 @@ fallback, and makes corpus health visible through `list_docs`.
   the two expected #1398 deferrals. Pre/post leak artifacts show no slice-owned survivor.
 - The decisive real generated-project stdio `search_docs` returns installed slug
   `pages/services-sdk/services`, rather than the prior two-document fallback.
+- Final-head CI correction: checked-in corpus source pins normalized to 0.0.4, publish assets
+  regenerated; `check:publish-assets` and `check:netscript-jsr-specifiers` exit 0, focused suite
+  remains 48/48, MCP doc-lint and JSR dry-run exit 0.
 
 ## Harness
 
