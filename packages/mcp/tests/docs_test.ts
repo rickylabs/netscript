@@ -1,5 +1,5 @@
 import { assert, assertEquals, assertGreater } from '@std/assert';
-import { join } from '@std/path';
+import { join, resolve } from '@std/path';
 import { createDocsFlows } from '../src/application/flows/docs-flows.ts';
 import { createMcpServer } from '../src/application/runner/mcp-server.ts';
 import {
@@ -126,7 +126,13 @@ Deno.test('list_docs reports filesystem corpus kind, root, and total document co
 
 Deno.test('an empty project probe falls back to an observable embedded corpus', async () => {
   const projectRoot = await Deno.makeTempDir();
-  await Deno.mkdir(join(projectRoot, '.netscript', 'docs'), { recursive: true });
+  const docsRoot = join(projectRoot, '.netscript', 'docs');
+  await Deno.mkdir(docsRoot, { recursive: true });
+  await Deno.writeTextFile(join(docsRoot, 'README.txt'), 'not Markdown');
+  await Deno.writeTextFile(
+    join(docsRoot, 'redirect.md'),
+    '---\nlayout: layouts/redirect.vto\nredirectTo: /elsewhere/\n---\n',
+  );
   try {
     const server = createMcpCliServer({ projectRoot });
     const response = await server.handle({
@@ -147,6 +153,60 @@ Deno.test('an empty project probe falls back to an observable embedded corpus', 
     });
   } finally {
     await Deno.remove(projectRoot, { recursive: true });
+  }
+});
+
+Deno.test('stdio composition preserves environment precedence over an indexable probe', async () => {
+  const projectRoot = await Deno.makeTempDir();
+  const environmentRoot = await Deno.makeTempDir();
+  try {
+    const projectDocs = join(projectRoot, '.netscript', 'docs');
+    await Deno.mkdir(projectDocs, { recursive: true });
+    await Deno.writeTextFile(join(projectDocs, 'probe.md'), '# Probe\n\nProject probe.\n');
+    await Deno.writeTextFile(join(environmentRoot, 'environment.md'), '# Environment\n\nOverride.\n');
+    const child = new Deno.Command(Deno.execPath(), {
+      args: [
+        'run',
+        '-A',
+        '--config',
+        new URL('../../../deno.json', import.meta.url).pathname,
+        new URL('../cli.ts', import.meta.url).pathname,
+      ],
+      cwd: projectRoot,
+      env: { NETSCRIPT_DOCS_ROOT: environmentRoot },
+      stdin: 'piped',
+      stdout: 'piped',
+      stderr: 'piped',
+    }).spawn();
+    const writer = child.stdin.getWriter();
+    await writer.write(new TextEncoder().encode(`${JSON.stringify({
+      jsonrpc: '2.0',
+      id: 16,
+      method: 'tools/call',
+      params: { name: 'list_docs', arguments: {} },
+    })}\n`));
+    await writer.close();
+    const output = await child.output();
+    assertEquals(output.code, 0, new TextDecoder().decode(output.stderr));
+    const response = JSON.parse(new TextDecoder().decode(output.stdout)) as {
+      readonly result: {
+        readonly structuredContent: {
+          readonly corpus: {
+            readonly kind: string;
+            readonly root: string | null;
+            readonly documentCount: number;
+          };
+        };
+      };
+    };
+    assertEquals(response.result.structuredContent.corpus, {
+      kind: 'filesystem',
+      root: resolve(environmentRoot),
+      documentCount: 1,
+    });
+  } finally {
+    await Deno.remove(projectRoot, { recursive: true });
+    await Deno.remove(environmentRoot, { recursive: true });
   }
 });
 

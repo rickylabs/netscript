@@ -15,7 +15,8 @@
 Research and the ordered plan are complete against live issue #1375 and baseline `aa8e151e6`.
 Draft PR #1401 is open against `main`; its closing keyword is intentionally withheld until all
 eleven rows have evidence. Separate Claude/Fable PLAN-EVAL passed in comment `5229304606`. F1-F4
-are incorporated. S1 behavioral RED is recorded; S2 product implementation is next.
+are incorporated. S1 behavioral RED is recorded and S2 is implemented green; S3 host wiring and
+public documentation are next.
 
 ## Completed
 
@@ -27,13 +28,13 @@ are incorporated. S1 behavioral RED is recorded; S2 product implementation is ne
 
 ## In progress
 
-- S2 generated fallback, probe selection, and corpus observability.
+- S3 all-host installed docs-root wiring, decisive stdio GREEN, and public documentation.
 
 ## Next steps
 
-1. Commit, push, and comment the test-only S1 RED slice.
-2. Implement S2 generated fallback, probe selection, and corpus observability.
-3. Run S1 MCP/registry tests GREEN plus new generator/adapter tests before the S2 commit.
+1. Commit, push, and comment S2 with named focused evidence.
+2. Pass the one installed docs root to Claude, VS Code, and Zed only when docs were generated.
+3. Turn the decisive generated-project stdio search GREEN and update MCP/agent-tooling references.
 
 ## Key decisions
 

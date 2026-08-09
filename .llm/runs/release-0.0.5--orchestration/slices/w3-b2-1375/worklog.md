@@ -100,8 +100,10 @@ update the single precedence test matrix before the resolver.
 | 2026-08-09 | plan-eval | Draft PR #1401 opened against `main` without a closing keyword; milestone `0.0.5` and exactly one `status:plan-eval` applied. Mandatory separate Claude/Fable PLAN-EVAL requested; product implementation paused. | Planning commit `93e59c8b0`; PR phase comment `5229277468` |
 | 2026-08-09 | plan-eval | Separate Claude/Fable evaluator returned PASS. F1-F4 recorded before implementation: textual #1376 overlap, true-RED setup, exact 262,144-byte budget, and 166-file inventory. | PR comment `5229304606`; `plan-eval.md` |
 | 2026-08-09 | impl / S1 | Behavioral RED captured before product source: probe/metadata/schema/config assertions failed, and a real local CLI stdio `search_docs` returned only `mcp` + `help` instead of the installed-only services page. | `s1-red.md`; all three focused commands exited `1` |
+| 2026-08-09 | impl / S2 | Generated bounded release fallback, fail-closed provenance/integrity, indexable probe precedence, and list_docs corpus metadata implemented. | `s2-implementation.md`; focused 29/29 and publish-assets freshness exited `0` |
 
 ## Gate results
 
 PLAN-EVAL passed and F1-F4 are incorporated. S1 RED commands and raw nonzero exits are recorded in
-`s1-red.md`. No product implementation existed when the REDs ran. Draft PR: #1401.
+`s1-red.md`. S2 focused gates are green with no skips. No product implementation existed when the
+REDs ran. Draft PR: #1401.

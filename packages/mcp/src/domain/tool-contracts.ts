@@ -210,6 +210,11 @@ const outputShapes: Record<ToolName, Readonly<Record<string, unknown>>> = {
   }, ['count', 'matches']),
   list_docs: objectSchema({
     count: { type: 'integer' },
+    corpus: objectSchema({
+      kind: { enum: ['filesystem', 'embedded'] },
+      root: { type: ['string', 'null'] },
+      documentCount: { type: 'integer' },
+    }, ['kind', 'root', 'documentCount']),
     docs: {
       type: 'array',
       maxItems: 100,
@@ -221,6 +226,7 @@ const outputShapes: Record<ToolName, Readonly<Record<string, unknown>>> = {
     },
   }, [
     'count',
+    'corpus',
     'docs',
   ]),
   get_doc: objectSchema({
