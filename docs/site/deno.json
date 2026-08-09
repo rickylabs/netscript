@@ -1,7 +1,10 @@
 {
   "tasks": {
     "lume": "echo \"import 'lume/cli.ts'\" | deno run --unstable-temporal -A -",
-    "build": "deno task lume",
+    "build": "deno task check:source-format && deno task lume && deno task check:rendered-output",
+    "check:source-format": "deno run --no-lock --allow-read _plugins/check-source-format.ts .",
+    "check:rendered-output": "deno run --no-lock --allow-read _plugins/check-rendered-output.ts _site/index.html",
+    "test:source-format": "deno test --no-lock --allow-read --allow-write _plugins/check-source-format_test.ts",
     "check:links": "deno run --allow-read ../../.llm/tools/docs/check-internal-links.ts _site",
     "check:caveats": "deno run --allow-read ../../.llm/tools/docs/check-caveat-refs.ts .",
     "verify": "deno task build && deno task check:links && deno task check:caveats",
