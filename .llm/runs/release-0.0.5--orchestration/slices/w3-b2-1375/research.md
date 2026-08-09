@@ -44,7 +44,7 @@ The following rows are copied from the live #1375 body fetched on 2026-08-09:
 | 4 | `FilesystemDocsCorpus.list()` already provides the authoritative “indexable” verdict: missing roots and trees yielding zero processed documents throw `DocsCorpusUnavailableError`. Probe policy can share its public-path/indexing rules rather than accepting any directory entry. | `packages/mcp/src/infrastructure/filesystem-docs-corpus.ts` |
 | 5 | `list_docs` currently reports only the retained page count and document rows. Its output schema has no corpus identity, root, or total document count. | `packages/mcp/src/application/flows/docs-flows.ts`; `packages/mcp/src/domain/tool-contracts.ts` |
 | 6 | Default CLI composition contains the generated MCP README plus `help.md`, hence two documents. Standalone MCP contains one. | `packages/mcp/cli.ts`; `packages/cli/src/public/features/agent/mcp/run-agent-mcp.ts` |
-| 7 | The existing release docs source is already generated and versioned: `.llm/assets/agent-docs/prose.json.gz` plus provenance. It contains 171 files, is 1.2 MiB compressed, and is embedded wholesale only in the CLI installer. A bounded MCP subset can be generated from the same source without runtime filesystem reads. | `.llm/assets/agent-docs/provenance.json`; `.llm/tools/generate-publish-assets.ts`; `.llm/tools/generate-cli-assets-barrel.ts` |
+| 7 | The existing release docs source is already generated and versioned: `.llm/assets/agent-docs/prose.json.gz` plus provenance. It contains 166 files, is 1.2 MiB compressed, and is embedded wholesale only in the CLI installer. A bounded MCP subset can be generated from the same source without runtime filesystem reads. | `.llm/assets/agent-docs/provenance.json`; `.llm/tools/generate-publish-assets.ts`; `.llm/tools/generate-cli-assets-barrel.ts` |
 | 8 | JSR guidance forbids runtime asset reads/import attributes. Checked-in generated TypeScript string constants are the established publish-safe mechanism, and `check:publish-assets` is the freshness gate. | `jsr-audit` skill; `.llm/tools/generate-publish-assets.ts`; root `deno.json` |
 | 9 | Export-surface provenance validates schema/version/bytes/hash/counts and rejects framework-version drift before serving data. The docs fallback needs the same release-identity principle and an explicit byte ceiling. | `packages/mcp/src/infrastructure/export-surfaces/embedded-export-surface-corpus.ts` |
 | 10 | A real stdio helper already spawns the local CLI and exchanges JSON-RPC in `init-agent_test.ts`. It can be generalized to call `search_docs` against a temporary project populated by `agent init --with-docs`, while config-shape tests separately assert the exact emitted args. | `packages/cli/src/public/features/agent/init/init-agent_test.ts:695-734` |
@@ -91,6 +91,16 @@ cache invalidation, hydration, or optimistic-mutation search coverage. Exact pat
 
 All eleven rows are implementable in one PR using four implementation slices after PLAN-EVAL. No
 row requires a post-publish observation. #1197's measured agent-run acceptance remains excluded.
+
+## PLAN-EVAL corrections
+
+- #1376 overlaps textually in `packages/mcp/cli.ts` and `packages/mcp/README.md`, even though its
+  symbols differ. This branch owns only docs-corpus hunks. Whichever PR merges second must rebase
+  and regenerate publish assets before its gates.
+- Not-yet-existing adapter/generated-export tests move to S2. S1 statically imports existing
+  modules only and fails on behavioral assertions.
+- The corpus budget is exactly **256 KiB = 262,144 bytes**, represented in TypeScript as `262_144`.
+- The release docs provenance file list contains **166** entries.
 
 ## Open questions
 

@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `release-0.0.5--orchestration/slices/w3-b2-1375` |
 | Branch | `fix/agent-mcp-docs-root` |
-| Phase | `plan-eval` |
+| Phase | `impl` |
 | Target | `@netscript/cli` agent host config + `@netscript/mcp` docs corpus |
 | Archetype | `6 — CLI / Tooling` |
 | Scope overlays | `docs` |
@@ -57,6 +57,9 @@ This plan maps every row to a slice and gate; no row is moved or weakened.
 
 - No changes to `execute_command`, `SpawnCommandExecutor`, `DEFAULT_CLI_COMMAND`, `list_commands`
   version identity, receipt wrapping, or `run-agent-mcp.ts` (#1376).
+- Textual overlap with #1376 is explicit: both branches edit `packages/mcp/cli.ts` and
+  `packages/mcp/README.md`. This branch stays inside docs-corpus hunks; whichever PR merges second
+  rebases and regenerates publish assets before rerunning its gates.
 - No SDK-specific cache invalidation, hydration, or optimistic-mutation corpus promises (#1260).
 - No export-surface corpus content (#1201), ranking changes (#1102), OpenCode config adoption
   (#1324), measured agent adoption (#1197), merge, publish, canary, or release dispatch.
@@ -70,7 +73,7 @@ This plan maps every row to a slice and gate; no row is moved or weakened.
 | LD-3 | Probe indexability reuses the `FilesystemDocsCorpus` parsing/public-path contract. It may not accept a directory merely because it contains an arbitrary file or a non-indexable Markdown redirect/private page. | Prevents the negative case from becoming a second, weaker indexer. |
 | LD-4 | `list_docs` adds a nested `corpus` object with `kind`, `root`, and total `documentCount`; existing `count` continues to mean returned rows after `limit`. Embedded root is explicit JSON `null`. | Backward-compatible existing fields plus unambiguous health metadata. |
 | LD-5 | The fallback source set is generated from `.llm/assets/agent-docs/prose.json.gz`: `pages/quickstart/index.md`, `pages/explanation/contracts/index.md`, `pages/services-sdk/services/index.md`, `pages/web-layer/builders/index.md`, and `pages/web-layer/route/index.md`, plus the MCP README. | Minimal contract-to-page navigation without claiming #1260's deferred SDK-query breadth. |
-| LD-6 | The generated provenance records schema version, framework version, source commit, ordered paths, UTF-8 bytes, document count, and SHA-256. The hard source-byte budget is 256 KiB. Generation and tests fail above it. | Release identity, freshness, bounded package growth, and reproducibility are separately inspectable. |
+| LD-6 | The generated provenance records schema version, framework version, source commit, ordered paths, UTF-8 bytes, document count, and SHA-256. The hard source-byte budget is exactly 256 KiB (`262_144` bytes). Generation and tests fail above it. | Release identity, freshness, bounded package growth, and reproducibility are separately inspectable. |
 | LD-7 | A dedicated existing-shape MCP infrastructure adapter validates generated provenance before constructing `EmbeddedDocsCorpus`; mismatch with `MCP_PACKAGE_VERSION` throws synchronously. | Mirrors the export-corpus fail-closed version law without widening the public port or inventing a CLI spine under accepted MCP debt. |
 | LD-8 | The decisive test initializes a temporary project with a unique installed Markdown phrase, launches the real local `netscript agent mcp` stdio path, calls `search_docs`, and requires the installed document slug. Config tests independently assert every emitted host command contains the same docs root. | Proves both behavior and emitted artifacts without a string-only false green. |
 
@@ -90,8 +93,8 @@ No open decision would force implementation rework.
 
 | # | Slice and claim | Proving gate | Files |
 | --- | --- | --- | --- |
-| 1 | **RED contract:** pin host wiring, precedence/probe/fallback metadata, generated provenance/budget, and real initialized-project stdio search before product changes. Record raw nonzero exits and failing test names. | Focused MCP docs/schema tests, generator test, and CLI agent-init test must fail for the intended missing fields/results—not setup errors. | `packages/mcp/tests/docs_test.ts`; `packages/mcp/tests/registry_test.ts`; `.llm/tools/generate-publish-assets_test.ts`; `packages/cli/src/public/features/agent/init/init-agent_test.ts`; run artifacts |
-| 2 | **Generated bounded fallback + selection observability:** generate the locked corpus and provenance, enforce budget/version/integrity, implement probe precedence, and publish corpus metadata through `list_docs`. | S1 MCP/generator tests turn green; `deno task check:publish-assets`; focused negative provenance and empty-probe tests. | `.llm/tools/generate-publish-assets.ts`; `.llm/tools/generate-publish-assets_test.ts`; `packages/mcp/src/publish-assets.generated.ts`; new `packages/mcp/src/infrastructure/release-embedded-docs-corpus.ts`; `packages/mcp/src/infrastructure/filesystem-docs-corpus.ts`; `packages/mcp/src/application/flows/docs-flows.ts`; `packages/mcp/src/domain/tool-contracts.ts`; `packages/mcp/cli.ts`; MCP tests; run artifacts |
+| 1 | **RED contract:** pin existing host wiring, precedence/probe/fallback metadata, and real initialized-project stdio search before product changes. Record raw nonzero exits and failing test names. No static import may name a not-yet-existing adapter or generated export. | Focused MCP docs/schema and CLI agent-init tests must load successfully and fail for intended missing fields/results—not module-resolution or setup errors. | `packages/mcp/tests/docs_test.ts`; `packages/mcp/tests/registry_test.ts`; `packages/cli/src/public/features/agent/init/init-agent_test.ts`; run artifacts |
+| 2 | **Generated bounded fallback + selection observability:** add the generator and adapter tests alongside their new symbols, generate the locked corpus and provenance, enforce budget/version/integrity, implement probe precedence, and publish corpus metadata through `list_docs`. | S1 MCP tests turn green; focused generator/adapter provenance and budget tests; `deno task check:publish-assets`; empty-probe negative. | `.llm/tools/generate-publish-assets.ts`; `.llm/tools/generate-publish-assets_test.ts`; `packages/mcp/src/publish-assets.generated.ts`; new `packages/mcp/src/infrastructure/release-embedded-docs-corpus.ts`; `packages/mcp/src/infrastructure/filesystem-docs-corpus.ts`; `packages/mcp/src/application/flows/docs-flows.ts`; `packages/mcp/src/domain/tool-contracts.ts`; `packages/mcp/cli.ts`; MCP tests; run artifacts |
 | 3 | **Installed-corpus host path:** pass one installed root to all three host emitters, prove both JSON shapes and Zed, and make the real stdio search return the installed corpus. Update public docs/reference and regenerated README asset. | Focused CLI init test (including real `search_docs`) and MCP tests exit 0; semantic config assertions; docs references match precedence/metadata. | `packages/cli/src/public/features/agent/init/init-agent.ts`; `packages/cli/src/public/features/agent/init/init-agent_test.ts`; `docs/site/ai/agent-tooling.md`; `docs/site/reference/mcp/index.md`; `packages/mcp/README.md`; regenerated `packages/mcp/src/publish-assets.generated.ts`; run artifacts |
 | 4 | **Fitness, publishability, and serialized runtime handoff:** all non-serialized gates green, lock clean, review threads answered, then record `EXPENSIVE-GATE-REQUEST` and stop for the orchestrator's token. | Scoped wrappers; `quality:gate`; `arch:check`; MCP+CLI doc-lint/JSR audits; `publish:dry-run`; review-thread reporter; after grant only, exact one-pass `scaffold.runtime`. | Run artifacts only unless a gate exposes an owned defect; no source broadening |
 
@@ -117,7 +120,7 @@ No open decision would force implementation rework.
 | Generated asset silently grows | Generator hard ceiling + focused CI test + `check:publish-assets` freshness. |
 | Version bump leaves corpus stale | Generation reads MCP package version and generated constructor compares provenance to `MCP_PACKAGE_VERSION`. |
 | Runtime file reads fail over JSR | Plain checked-in TypeScript string constants only; publish dry-run and release preflight. |
-| #1376 merge conflict | Do not touch `run-agent-mcp.ts` or its named symbols; report immediately if implementation disproves this plan. |
+| #1376 textual merge conflict | Both branches edit `packages/mcp/cli.ts` and `packages/mcp/README.md`. Keep docs changes in narrow hunks; whichever PR merges second rebases, regenerates publish assets, and reruns affected gates. Do not touch `run-agent-mcp.ts` or its named symbols. |
 | Accepted CLI/MCP debt deepens | No surface mixing, permission change, full A6 skeleton, new generic helper folder, or exported test seam. |
 | Validation mutates `deno.lock` | Scoped check uses `--deno-arg --no-lock`; raw base diff verifies lock hygiene. |
 
@@ -159,8 +162,9 @@ No new or deepened debt is planned.
 
 ## Rescope triggers
 
-- Any need to edit `run-agent-mcp.ts` or a #1376-owned symbol.
+- Any need to edit `run-agent-mcp.ts` or a #1376-owned symbol beyond the already-declared textual
+  overlap in `packages/mcp/cli.ts` and `packages/mcp/README.md`.
 - Any need for a new MCP tool, a changed export map, a new dependency, runtime package-file reads,
-  or a corpus larger than 256 KiB.
+  or a corpus larger than exactly 256 KiB (`262_144` bytes).
 - Inability to make probe indexability identical to serving, or inability to exercise real CLI
   stdio without a new public test-only seam.

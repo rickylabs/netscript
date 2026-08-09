@@ -1,6 +1,6 @@
 ## Summary
 
-Plans the release-blocking fix that connects `agent init --with-docs` host configuration to the
+Implements the release-blocking fix that connects `agent init --with-docs` host configuration to the
 installed corpus, adds deterministic probe/fallback precedence, generates a bounded versioned
 fallback, and makes corpus health visible through `list_docs`.
 
@@ -10,8 +10,9 @@ fallback, and makes corpus health visible through `list_docs`.
 - Tracks #1375. Closing keyword is intentionally withheld until all eleven live acceptance rows
   have implementation and gate evidence.
 - #1260 remains the 0.0.6 SDK corpus-breadth owner.
-- #1376 remains the concurrent command-execution composition-root owner; this plan does not touch
-  its file or symbols.
+- #1376 remains the concurrent command-execution composition-root owner. Both branches edit
+  `packages/mcp/cli.ts` and `packages/mcp/README.md`; this branch stays within docs-corpus hunks,
+  and whichever merges second must rebase and regenerate publish assets.
 
 ## Slices
 
@@ -24,13 +25,13 @@ fallback, and makes corpus health visible through `list_docs`.
 ## Validation
 
 - Planning only: no product tests or implementation gates run.
-- Mandatory separate Claude/Fable PLAN-EVAL is pending and blocks implementation.
+- Mandatory separate Claude/Fable PLAN-EVAL passed; findings F1-F4 are recorded in `plan-eval.md`.
 - The serialized `scaffold.runtime` gate will be requested only after all non-serialized gates pass.
 
 ## Harness
 
 - Run dir: `.llm/runs/release-0.0.5--orchestration/slices/w3-b2-1375/`
-- Phase: `plan-eval`
+- Phase: `impl`
 - Do not merge until PLAN-EVAL, implementation gates, Tier-A review, and separate-session IMPL-EVAL
   are complete. The milestone orchestrator retains merge and canary authority.
 

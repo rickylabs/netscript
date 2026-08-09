@@ -39,7 +39,7 @@
 
 - `DOCS_CORPUS_KINDS = ['filesystem', 'embedded']` with a derived union where a type is needed.
 - `MCP_EMBEDDED_DOC_PATHS` — the five locked release-doc paths from plan LD-5.
-- `MCP_EMBEDDED_DOCS_MAX_BYTES = 256_000`.
+- `MCP_EMBEDDED_DOCS_MAX_BYTES = 262_144` (exactly 256 KiB).
 - Generated provenance values are typed constants, not scattered literals.
 
 ### Generated outputs
@@ -74,8 +74,8 @@
 
 | # | Slice | Gate | Files |
 | --- | --- | --- | --- |
-| 1 | RED acceptance contract | focused tests fail for intended assertions | MCP/CLI/generator tests; run artifacts |
-| 2 | generated fallback, probe, metadata | focused MCP/generator tests + freshness | generator; MCP domain/application/infrastructure/composition; run artifacts |
+| 1 | RED acceptance contract | existing modules load; focused assertions fail behaviorally | MCP/CLI tests; run artifacts |
+| 2 | generated fallback, probe, metadata | new-symbol tests introduced with implementation; focused MCP/generator tests + freshness | generator; MCP domain/application/infrastructure/composition; run artifacts |
 | 3 | all-host wiring + real stdio proof + docs | focused CLI/MCP tests | CLI init; docs/README/generated asset; run artifacts |
 | 4 | fitness/publish/token request | full non-serialized gate table | run artifacts |
 
@@ -98,7 +98,8 @@ update the single precedence test matrix before the resolver.
 | 2026-08-09 | research | Live #1375 body fetched; all eleven rows copied verbatim and re-baselined at `aa8e151e6`. | `research.md` |
 | 2026-08-09 | plan | Four implementation slices locked; #1260 and #1376 boundaries preserved. | `plan.md` |
 | 2026-08-09 | plan-eval | Draft PR #1401 opened against `main` without a closing keyword; milestone `0.0.5` and exactly one `status:plan-eval` applied. Mandatory separate Claude/Fable PLAN-EVAL requested; product implementation paused. | Planning commit `93e59c8b0`; PR phase comment `5229277468` |
+| 2026-08-09 | plan-eval | Separate Claude/Fable evaluator returned PASS. F1-F4 recorded before implementation: textual #1376 overlap, true-RED setup, exact 262,144-byte budget, and 166-file inventory. | PR comment `5229304606`; `plan-eval.md` |
 
 ## Gate results
 
-No implementation gate has run. PLAN-EVAL is the active hard stop. Draft PR: #1401.
+No implementation gate has run. PLAN-EVAL passed; F1-F4 are incorporated. Draft PR: #1401.
