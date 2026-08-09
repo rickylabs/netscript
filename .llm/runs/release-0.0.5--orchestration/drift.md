@@ -149,3 +149,27 @@ with explicit boundaries against weakening the gates themselves.
 
 **Release-notes candidate:** the 0.0.5 docs site was unbuildable for part of the development window;
 the shipped site is built from repaired sources at `399f60185` or later.
+
+## C-D83 — a short outer timeout killed the resume launcher; the daemon-attached turn survived it
+
+**Severity:** minor (no work lost). Recorded because the practice change is durable.
+
+I wrapped `agentic:codex-resume` for W3-B1 S3 in `timeout 300`. The launcher streams the turn, so the
+wrapper was still attached when the timer expired and it was killed — exit **143** (SIGTERM),
+surfaced as a failed background command.
+
+**The turn did not die.** `agentic:codex-status` showed thread
+`019fe4b4-7c12-72c2-b692-8d851f9c3b5c` still `state: working` with activity seconds old, and the
+worktree carried live uncommitted S3 changes. The launcher is a client; the work runs in the managed
+daemon. This is precisely the property that makes Tier-D lanes mobile-visible and survivable, and it
+is why the rule "lane status comes from `agentic:codex-status`, never from a summary or an exit code"
+(C-D79) matters — the exit code here described the client, not the lane, and reading it as the lane's
+fate would have produced a false "the resume failed" and tempted a replacement writer.
+
+**Practice change:** never wrap a streaming resume/launch in a short outer timeout. Dispatch it
+backgrounded with no timer (or one far longer than any plausible turn), and rely on the five-minute
+liveness audit against `codex-status` for stall detection instead. A wrapper timeout cannot
+distinguish "the turn is long" from "the turn is stuck"; the activity-age audit can.
+
+**Recovery rule if the audit does report stalled:** resume the *same* thread id, again with no short
+outer timeout, so it can finish tests, commit, and hand back. Never create a replacement writer.
