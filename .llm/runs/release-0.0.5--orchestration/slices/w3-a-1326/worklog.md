@@ -128,6 +128,7 @@ the adapter or fetch/timers to the supervisor.
 | 2026-08-09 | S0    | Diagnostic RED     | Initial outage then server-online desired behavior exited 1 and showed the false reconnect warning plus skipped write. |
 | 2026-08-09 | S0    | Design checkpoint  | Contract, state, delivery, buffer, shutdown, transport, telemetry, and ordered slices locked. No product file changed. |
 | 2026-08-09 | S0    | PLAN-EVAL request  | Awaiting orchestrator-launched separate Claude/Fable 5 medium verdict; implementation hard stop active.                |
+| 2026-08-09 | S0    | Draft PR handoff   | Draft PR #1402 targets `main` at plan-only head `6bb6b3961`; labeled `status:plan-eval`.                               |
 
 ## Decisions
 
@@ -180,3 +181,5 @@ See `plan.md` D1–D16. No open decision would force implementation rework.
 - Verify the raw upstream limitation in `research.md` findings 4–7 rather than assuming
   `IdempotentProducer.onError` retains writes.
 - No product implementation may begin until `plan-eval.md` records `PASS` from the separate session.
+- Draft PR: https://github.com/rickylabs/netscript/pull/1402. GitHub auto-close syntax remains
+  intentionally absent until every live #1326 acceptance row is truthfully evidenced.
