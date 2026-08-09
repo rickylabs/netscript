@@ -3,6 +3,7 @@ import type { StepResult } from '../../domain/report.ts';
 import type { GateDefinition } from '../../domain/gate-definition.ts';
 import type { RunRequest } from '../../domain/run-context.ts';
 import type { SuiteDefinition } from '../../domain/suite-definition.ts';
+import type { DeferredGate } from '../../domain/suite-definition.ts';
 import { EXPENSIVE_RUNTIME_SUITE_IDS, GATE } from '../../domain/cli-surface.ts';
 import type { Clock } from '../../ports/clock.ts';
 import type { CommandExecutor } from '../../ports/command-executor.ts';
@@ -72,6 +73,18 @@ export function createSuiteRunner(options: SuiteRunnerOptions): SuiteRunner {
         const steps: StepResult[] = [];
 
         await options.reporter.emit({ type: 'suite-start', suiteId: suite.id });
+        if (!request.gateId) {
+          for (const deferred of suite.deferredGates ?? []) {
+            const step = deferredStep(deferred);
+            await options.reporter.emit({
+              type: 'gate-start',
+              gateId: deferred.id,
+              title: step.title,
+            });
+            steps.push(step);
+            await options.reporter.emit({ type: 'gate-end', result: step });
+          }
+        }
         const plan = buildExecutionPlan(suite, request.gateId);
         const cleanupGates = selectCleanupGates(suite, plan, request);
         const mainGates = selectMainGates(plan, request);
@@ -128,5 +141,26 @@ export function createSuiteRunner(options: SuiteRunnerOptions): SuiteRunner {
         await lease?.release();
       }
     },
+  };
+}
+
+function deferredStep(deferred: DeferredGate): StepResult {
+  return {
+    id: deferred.id,
+    title: `DEFERRED ${deferred.issue}: ${deferred.reason}`,
+    verdict: 'skipped',
+    critical: false,
+    durationMs: 0,
+    evidence: [{
+      kind: 'summary',
+      label: 'owned suite deferral',
+      data: {
+        status: 'deferred',
+        issue: deferred.issue,
+        reason: deferred.reason,
+      },
+    }],
+    attempts: [{ attempt: 1, verdict: 'passed', durationMs: 0 }],
+    retried: false,
   };
 }

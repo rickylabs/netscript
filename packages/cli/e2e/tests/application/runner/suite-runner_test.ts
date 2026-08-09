@@ -10,7 +10,7 @@ import type {
   DockerResourceSnapshot,
 } from '../../../src/ports/docker-resource-cleaner.ts';
 import type { HttpClient, HttpRequest, HttpResult } from '../../../src/ports/http-client.ts';
-import type { Reporter } from '../../../src/ports/reporter.ts';
+import type { Reporter, ReportEvent } from '../../../src/ports/reporter.ts';
 import type { PlatformPort } from '../../../src/ports/platform.ts';
 import { createSuiteRunner } from '../../../src/application/runner/suite-runner.ts';
 import { DockerCliResourceCleaner } from '../../../src/adapters/commands/docker-resource-cleaner.ts';
@@ -25,8 +25,53 @@ import type { ExpensiveRuntimeSuiteId, SuiteId } from '../../../src/domain/cli-s
 import type { RunOptions } from '../../../src/domain/run-context.ts';
 import {
   createScaffoldCapabilitySuite,
+  SCAFFOLD_RUNTIME_DEFERRED_GATES,
   scaffoldCapabilitySuites,
 } from '../../../suites/scaffold/capability-suites.ts';
+
+Deno.test('suite runner reports every #1398 deferral as an explicit skipped step', async () => {
+  const runtime = createScaffoldRuntimeSuite({
+    repoRoot: '.',
+    projectName: 'runner-deferral-test',
+    cleanup: false,
+    format: 'pretty',
+  });
+  const suite = { ...runtime, gates: [] };
+  const reporter = new RecordingReporter();
+  const report = await createSuiteRunner({
+    clock: new FakeClock(),
+    commandExecutor: new SuccessfulCommandExecutor(),
+    httpClient: new FakeHttpClient(),
+    reporter,
+    platform: new FakePlatform(),
+    suiteLeaseManager: new RecordingSuiteLeaseManager(),
+  }).run(suite, { suiteId: suite.id, options: suite.defaultOptions });
+
+  assertEquals(report.steps.map((step) => step.id), [
+    GATE.BEHAVIOR_OTEL_STREAM_CONSUMER,
+    GATE.BEHAVIOR_OTEL_TRACES,
+  ]);
+  assertEquals(report.steps.every((step) => step.verdict === 'skipped' && !step.critical), true);
+  assertEquals(report.summary, { passed: 0, failed: 0, skipped: 2 });
+  assertEquals(
+    report.steps.map((step) => step.evidence[0]),
+    SCAFFOLD_RUNTIME_DEFERRED_GATES.map((deferred) => ({
+      kind: 'summary' as const,
+      label: 'owned suite deferral',
+      data: {
+        status: 'deferred',
+        issue: deferred.issue,
+        reason: deferred.reason,
+      },
+    })),
+  );
+  assertEquals(
+    reporter.events
+      .filter((event) => event.type === 'gate-start')
+      .map((event) => event.title.startsWith('DEFERRED #1398:')),
+    [true, true],
+  );
+});
 
 Deno.test('suite runner emits a failed report and prunes only created Docker resources', async () => {
   const commands: CommandRequest[] = [];
@@ -135,7 +180,7 @@ Deno.test('suite runner completes cleanup with a Docker-less cleaner', async () 
     cleanup: true,
     format: 'json',
   });
-  const suite = { ...runtimeSuite, gates: [] };
+  const suite = { ...runtimeSuite, gates: [], deferredGates: [] };
   const options = { ...suite.defaultOptions, cleanup: true };
 
   const report = await createSuiteRunner({
@@ -335,6 +380,14 @@ function createScaffoldRuntimeSuite(
 
 class NullReporter implements Reporter {
   emit(): Promise<void> {
+    return Promise.resolve();
+  }
+}
+
+class RecordingReporter implements Reporter {
+  readonly events: ReportEvent[] = [];
+  emit(event: ReportEvent): Promise<void> {
+    this.events.push(event);
     return Promise.resolve();
   }
 }
