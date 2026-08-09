@@ -122,6 +122,9 @@ service, generator, or docs file owns a second event-name/payload table.
 | 2026-08-09 | S6-R2 | serialized runtime | Ledger-row-39 grant consumed in one pass. Raw exit 1; aggregate 73 passed/1 failed. `runtime.wait.streams` passed (237 ms); `behavior.otel.stream-consumer` failed (20,533 ms) after 40/40 batches and 20 seconds without the expected execution correlation. No retry. |
 | 2026-08-09 | S6-R2 | attributable exhaustion | Expected `trg_evt_146400d1-7068-49e7-bdec-475ce8b026af`; observed only `flow-b-callback`, `health-check`, `workers-plugin-health-check`. `behavior.otel.traces`/TC-14 did not execute, so row 6 remains unproven. |
 | 2026-08-09 | S6-R2 | post-run ownership/threads | Cleanup gate passed. Leak artefact exit 0 reports no W2-B survivor and only foreign `redis-jfgcbtaf`, left untouched. Review threads exit 0: 0 threads, 0 unanswered. |
+| 2026-08-09 | S6-D3 | empirical join audit | A fresh completed `flow-b-callback` execution was observed alongside complete stream records and complete `job.execute` attributes. The stream remained exactly three startup `job` snapshots at offset `…0926`; a 25-second subscription from that boundary received no data. |
+| 2026-08-09 | S6-D3 | product finding | Only definition-level job id/name exist on both sides; execution id, `trg_evt_*`, and producer trace id occur on the span/execution but in no stream record. This is an unpublished execution-record product gap outside #1395, not an unmatchable record or selector defect. No implementation added. |
+| 2026-08-09 | S6-D3 | diagnostic cleanup | Foreground isolated AppHost stopped. Scoped teardown removed owned `postgres-74614ed6`; final leak artefact exit 0 reports only foreign `redis-jfgcbtaf`, left untouched. |
 
 ## Decisions
 

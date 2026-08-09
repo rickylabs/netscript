@@ -80,6 +80,13 @@ Those tests prove the gate detects context loss once the matching record exists.
 failure shows the generated stream did not expose such a record within the required bound, so issue
 row 6 remains unproven and the PR must retain `Refs #1329`.
 
+The subsequent no-token empirical audit in `join-audit.md` distinguishes absence from an unknown
+join key: a fresh execution completed, but a subscription held from the pre-trigger committed offset
+received no data for 25 seconds, and the post-trigger snapshot retained the same three startup job
+records and offset. Only definition-level job id/name overlap with `job.execute`; execution id,
+`trg_evt_*`, and producer trace id appear in no stream record. The execution record is not published,
+so this is a product finding outside #1395 rather than another selector repair.
+
 The malformed control was not injected through the real generated service. It is a synthetic invalid
 `control` payload evaluated by the exported parser inside the real-service consumer gate, using the
 offset committed by that live service. Likewise, ordered deletion is proven by the focused verbatim
