@@ -133,3 +133,43 @@
 4. F4 — replace "may write a failure receipt" with the chosen behavior. (One line.)
 
 One `FAIL_PLAN` cycle consumed; one remains before escalation.
+
+## Cycle 2
+
+| Field | Value |
+| --- | --- |
+| Evaluator | Claude · Fable 5 · medium — fresh separate session, same route as cycle 1 |
+| Subject | Repair commit `46016bc4c`, head `e833c5be3` (verdict-preservation commit), diffed against `1ee8f5030` and `origin/main@aa8e151e6` |
+| Date | 2026-08-09 |
+
+### Verdict
+
+**PASS** — all four cycle-1 findings are repaired, the repairs verify against the tree, and no new plan defect was introduced.
+
+### Disposition
+
+| Finding | Disposition | Evidence |
+| --- | --- | --- |
+| F1 equality-authority claim | **FIXED** | See breakdown below — all four parts verified |
+| F2 slice directory | **FIXED** | `git diff 1ee8f5030 46016bc4c` renames every artifact `w3-b-1376/` → `w3-b3-1376/`; old dir gone from the branch tree (`git ls-tree` shows only `w3-b3-1376` and the unrelated `w3-b-1102-1197`); `drift.md` entry "slice path corrected after PLAN-EVAL" explicitly withdraws the earlier absence claim |
+| F3 RED-class labels | **FIXED** | Labels present in S1 row and "Baseline proof strategy", and **correct** against the baseline: identity RED is compile-time (no identity fields exist on `CommandExecutionResult` / `createAgentMcpOptions` at `aa8e151e6`); execute→drift RED is behavioral (`packages/mcp/cli.ts:195-200` binds `execute_command` unwrapped; `record-drift-flow.ts:29-42` refuses without a receipt — composable from existing exported flows with no new types); standalone fallback correctly labeled baseline characterization (`DEFAULT_CLI_COMMAND` already pinned, the assertion passes pre-fix and is not RED) |
+| F4 denial-receipt "may" | **FIXED** | Decision 5 now reads "always write status `1` for the named resource, overwriting any earlier success"; S4 row carries "denial always overwrites with failure" with `drift-evidence_test.ts` named |
+
+### F1 breakdown
+
+1. **False claim gone from both files.** `plan.md` decision 3 and `research.md` "Standalone policy" both rewritten; `git grep` across the branch's run dir finds the old wording only in historical records of the cycle-1 finding (`plan-eval.md`, `worklog.md` evidence row, `pr-body.md` note), which is correct preservation, not residue.
+2. **New attribution is true.** Verified: `.llm/tools/deps/bump-version.ts:32` applies one exact release version to root and every declared workspace member; `.llm/tools/release/publish-readiness.ts:123` runs `lockstep-residue` → `auditLockstepAndResidue` (`:226-252`), which fails any `deno.json`/`scaffold.plugin.json` manifest whose `version` differs from the release version and any internal JSR specifier retaining another version (test coverage at `publish-readiness_test.ts:61`). Critically, `research.md` frames this as "contextual evidence, not a runtime or generation equality guarantee" — the exact distinction cycle 1 required; this is not a second false attribution.
+3. **Decoupling policy is publishable truthfully.** Decision 3: standalone spawns `jsr:@netscript/cli@${MCP_PACKAGE_VERSION}`, reports mode `standalone` plus that command and version, rationale stated ("absent a host, the MCP package selects the CLI version it was released to drive"). A README reader can determine what a standalone server will spawn and why. This is the second of the two paths #1376's target contract 3 permits.
+4. **Ownership named.** S2 owns `packages/mcp/src/infrastructure/spawn-command-executor.ts` + `packages/mcp/tests/command_adapters_test.ts`; S4 owns `packages/mcp/README.md`. S1/S2/S4 Files columns are now concrete paths, closing the improvise-mid-slice gap.
+
+### F4 consistency check (as directed)
+
+The unconditional overwrite is consistent with existing receipt semantics: the current `withReceipt` wrapper (`packages/mcp/cli.ts:236-264`) already writes `exitStatus: succeeded ? 0 : 1` unconditionally per resource, so every wrapped flow today overwrites a prior success on failure — the receipt store is latest-diagnostic-state, one receipt per resource. A denial overwriting a fresh `doctor` success forces the agent to re-run a diagnostic before `record_drift`; that fails closed under the TTL/refusal gate (`exitStatus !== 0` → refusal) and cannot mask a success in the only sense the system consumes one, because `record_drift` is defined over the freshest receipt, not receipt history. No change required.
+
+### New findings
+
+None. One observation, not a finding: S1's committed compile-time RED will fail branch-wide type-check between the S1 and S2 commits; this is inherent to the brief's recorded-RED-first mandate, the S1 proving gate is the recorded targeted failure, and S2 immediately restores compilation.
+
+### Verdict record
+
+Cycle 1: `FAIL_PLAN`. Cycle 2: `PASS`. Implementation may begin; the S1 evidence contract (raw exits and failure reasons per RED class, labeled) is binding for IMPL-EVAL.
