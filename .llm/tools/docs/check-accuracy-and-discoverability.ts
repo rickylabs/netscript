@@ -67,7 +67,9 @@ export async function checkGoldenPathDocs(
     queryUtilsPages.length !== 1 || queryUtilsPages[0] !== GOLDEN_PATH_QUERY_UTILS_PAGE
   ) {
     throw new Error(
-      `createServiceQueryUtils must appear only in ${GOLDEN_PATH_QUERY_UTILS_PAGE}; found ${JSON.stringify(queryUtilsPages)}`,
+      `createServiceQueryUtils must appear only in ${GOLDEN_PATH_QUERY_UTILS_PAGE}; found ${
+        JSON.stringify(queryUtilsPages)
+      }`,
     );
   }
   const queryUtilsReference = pages.find((page) => page.path === GOLDEN_PATH_QUERY_UTILS_PAGE);
@@ -181,11 +183,13 @@ export async function runAccuracyCheck(): Promise<void> {
   const quickstart = await read('docs/site/quickstart.vto');
   const cliReference = await read('docs/site/cli-reference.md');
   const addService = await read('docs/site/services-sdk/how-to/add-a-service.md');
-  for (const [location, page] of [
-    ['quickstart', quickstart],
-    ['CLI reference', cliReference],
-    ['add-a-service', addService],
-  ] as const) {
+  for (
+    const [location, page] of [
+      ['quickstart', quickstart],
+      ['CLI reference', cliReference],
+      ['add-a-service', addService],
+    ] as const
+  ) {
     requireText(page, '--with-client', location);
   }
   requireText(quickstart, 'Fresh client entry; imports app CSS', 'quickstart');
@@ -246,7 +250,8 @@ export async function runAccuracyCheck(): Promise<void> {
   const checkExportsCmd = new Deno.Command('deno', {
     args: ['run', '--allow-all', '.llm/tools/docs/check-exports-drift.ts'],
   });
-  const { code: driftCode, stderr: driftStderr, stdout: driftStdout } = await checkExportsCmd.output();
+  const { code: driftCode, stderr: driftStderr, stdout: driftStdout } = await checkExportsCmd
+    .output();
   if (driftCode !== 0) {
     console.error(new TextDecoder().decode(driftStdout));
     console.error(new TextDecoder().decode(driftStderr));

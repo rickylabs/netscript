@@ -44,3 +44,25 @@ S2 swept 192 published sources and changed 17 published pages. Final published c
 with `lib/api-clients.ts`, `@contracts`, or `@/lib/`; one page with
 `createServiceQueryUtils` (`reference/sdk/index.md`); four named discovery pages contain
 `--with-client`. `_plan` retains historical evidence and was not edited.
+
+| S3 gate | Result |
+| --- | --- |
+| Committed-head client scaffolder + route templates | PASS, raw exit 0; 2 tests / 21 BDD steps |
+| Scoped CLI check | PASS, raw exit 0; 829 files / 7 batches / 0 findings |
+| Scoped CLI lint | PASS, raw exit 0; 829 files / 5 batches / 0 findings |
+| Scoped CLI format | PASS, raw exit 0; 829 files / 5 batches / 0 findings |
+| Scoped docs-tool check | PASS, raw exit 0; 11 files / 1 batch / 0 findings |
+| Scoped docs-tool lint | PASS, raw exit 0; 11 files / 1 batch / 0 findings |
+| Owned docs-tool format | PASS, raw exit 0; 2 files / 1 batch / 0 findings |
+| Accuracy guard unit tests | PASS, raw exit 0; 2 passed |
+| Final `docs:accuracy` | PASS, raw exit 0; 192 published sources / one exception page |
+| `quality:scan` | PASS, raw exit 0; no findings / 7 existing allowances |
+| `arch:check` | PASS, raw exit 0; no failures; repository-wide warnings unchanged and out of scope |
+
+The initial whole-directory docs-tool format diagnostic exited 1: it found the owned accuracy
+checker plus two unrelated pre-existing files (`check-exports-drift.ts` and its test). Only the two
+files owned by this slice were formatted; the decisive owned-file format gate then exited 0. No
+Aspire, containers, CLI E2E, lockfile mutation, or manifest mutation was used.
+
+Commits: S0 `6141fa1db`, S1 `67318df09`, S2
+`bc1e1e985117f5460c18788cb13a254f54a5fd38`. S3 records final gates and handoff state.
