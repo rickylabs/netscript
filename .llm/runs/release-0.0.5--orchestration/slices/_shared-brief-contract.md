@@ -46,6 +46,22 @@ slice's `worklog.md`, push, and tell the orchestrator. Wait for the grant. Do no
 speculatively, and do not split it into individual `gates` invocations when a full runtime verdict
 is required.
 
+**Scope of the token — clarified 2026-08-09 after a lane started a focused Aspire-backed run
+ungranted.** The token governs **any run that starts an AppHost or containers**, including a focused
+`e2e:cli gate scaffold.runtime <gate-id>` invocation, not only the full one-pass command. Two rules
+follow and they are separate:
+
+- **Request the token before any Aspire-backed run**, focused or full. The leak-check bracket
+  applies to all of them.
+- **Only the exact one-pass `e2e:cli run scaffold.runtime --cleanup --format pretty` is the decisive
+  verdict.** A focused gate run proves that gate and nothing more; it can never satisfy the
+  serialized acceptance, and reporting it as though it could is the same class as a green aggregate
+  that skipped the gates the slice existed to prove.
+
+If you need a focused Aspire run for development, ask — it is normally granted immediately when the
+token is idle. The cost of asking is a message; the cost of not asking is an unbracketed AppHost and
+an ambiguous evidence trail.
+
 Before and after any run that starts containers or an AppHost:
 
 ```
