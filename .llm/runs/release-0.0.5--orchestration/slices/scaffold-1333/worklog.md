@@ -25,6 +25,44 @@
 
 ## Next handoff
 
-Owner decides the row-10 relocation/closure shape and launches separate-session PLAN-EVAL. Stop at
-this plan commit; implementation remains unauthorized until `PASS`.
+Owner approved option A on 2026-08-09 and moved row 10 to #1090. Implementation of rows 1-9 is
+authorized in S1-S6 order. S1 begins with omitted/explicit app-name negative controls.
 
+## S1 — project-derived default app name
+
+### Pre-fix RED
+
+Command:
+
+`deno test --no-lock --allow-all packages/cli/src/public/features/init/init-command_test.ts`
+
+Raw exit **1**: 9 passed / 2 failed. The omitted-name assertion expected
+`inventory-console-web` and received `dashboard`; the interactive prompt expected
+`interactive-app-web` and advertised `dashboard`. The explicit `backoffice` authority control
+passed in the same run.
+
+### Implementation
+
+- Added the pure `deriveDefaultAppName` domain rule and used it from shared option validation and
+  the public interactive prompt.
+- Omitted `inventory-console` becomes `inventory-console-web`; `storefront-web` and `web` do not
+  duplicate the suffix; explicit `backoffice` remains authoritative.
+- The derivation trims only the project prefix when necessary so a valid 64-character project name
+  still emits a valid 64-character app name ending in `-web`.
+
+### Gates
+
+| Gate | Result |
+| --- | --- |
+| Focused domain + public + maintainer init tests | raw exit 0; 14 passed / 0 failed |
+| Scoped check (`--unstable-kv --no-lock`) | raw exit 0; 5 files / 1 batch / 0 findings |
+| Scoped lint | raw exit 0; 5 files / 1 batch / 0 findings |
+| Scoped format | raw exit 0; 5 files / 1 batch / 0 findings |
+| Package code-quality scan | raw exit 0; 0 findings / 6 existing allowances |
+| Package doctrine scan | raw exit 1; FAIL=50 WARN=51 INFO=1 |
+| Exact `origin/main` doctrine baseline | raw exit 1; FAIL=50 WARN=51 INFO=1, byte-identical finding set |
+
+The first scoped-check attempt used unsupported `--deno-arg=--no-lock` syntax and exited 1 before
+running a check. The required corrected form, `--deno-arg --no-lock`, then executed and exited 0;
+the failed invocation is not reported as a product verdict. Package doctrine remains red solely on
+the exact pre-existing baseline and introduces no new finding in S1.

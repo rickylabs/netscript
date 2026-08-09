@@ -11,6 +11,10 @@ cannot prove agent adoption, and #1090 already owns the controlled six-agents-pe
 The owner must decide that relocation before implementation/closure. The plan therefore opens a
 draft PR with `Refs #1333`, not a closing keyword.
 
-PLAN-EVAL is mandatory and pending in a separate owner-routed session. No product source has been
-edited. No Aspire/container work or serialized runtime grant exists.
+The owner approved option A and authorized implementation on 2026-08-09 after moving row 10 to
+#1090. No Aspire/container work or serialized runtime grant exists.
 
+S1 is implemented and locally green: the omitted-name pre-fix run failed with actual `dashboard`,
+the explicit-name control stayed green, and the final focused suite passed 14/14. Scoped
+check/lint/fmt and the package quality scan exit 0. Package doctrine exits 1 with the exact same
+50 failures / 51 warnings / 1 info finding as a detached `origin/main` archive; S1 adds no finding.

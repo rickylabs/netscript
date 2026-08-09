@@ -42,6 +42,37 @@ Deno.test('init defaults cache on with redis backend in non-interactive mode', a
   assertEquals(validated.modelName, 'User');
 });
 
+Deno.test('init derives an omitted app name from the project name', async () => {
+  const validated = await validateOptions(fakeInitContext(), {
+    name: 'inventory-console',
+    importMode: 'jsr',
+    force: true,
+    ci: true,
+    yes: false,
+    dryRun: true,
+    noGit: true,
+    noAspire: false,
+  });
+
+  assertEquals(validated.appName, 'inventory-console-web');
+});
+
+Deno.test('init keeps an explicit app name authoritative', async () => {
+  const validated = await validateOptions(fakeInitContext(), {
+    name: 'inventory-console',
+    appName: 'backoffice',
+    importMode: 'jsr',
+    force: true,
+    ci: true,
+    yes: false,
+    dryRun: true,
+    noGit: true,
+    noAspire: false,
+  });
+
+  assertEquals(validated.appName, 'backoffice');
+});
+
 Deno.test('init derives Prisma model name from service name', async () => {
   const validated = await validateOptions(fakeInitContext(), {
     name: 'crud-defaults',
@@ -166,7 +197,7 @@ Deno.test('interactive init prompts for all missing scaffold choices', async () 
     'select:Database engine:none',
     'confirm:Scaffold an example oRPC service?:false',
     'input:Example service name:users',
-    'input:Frontend application name:dashboard',
+    'input:Frontend application name:interactive-app-web',
     'confirm:Scaffold a shared cache?:true',
     'select:Cache backend:redis',
   ]);
