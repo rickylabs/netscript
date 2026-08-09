@@ -28,6 +28,7 @@ export {
 } from './generate-zod.ts';
 export {
   isRetriableMigrationFailure,
+  type MigrationExecutionResult,
   type MigrationOptions,
   type PrismaInvocation,
   type PrismaSpawn,
@@ -35,6 +36,7 @@ export {
   type PrismaSpawnResult,
   runMigration,
   runMigrationCli,
+  runMigrationWithArtifacts,
   runPrismaWithRetry,
   type RunPrismaWithRetryOptions,
 } from './migrate.ts';

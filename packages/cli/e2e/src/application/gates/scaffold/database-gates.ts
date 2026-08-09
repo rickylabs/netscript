@@ -61,6 +61,21 @@ export function createDatabaseGates(): readonly GateDefinition[] {
         ),
     ),
     commandGate(
+      GATE.DATABASE_MIGRATION_ARTIFACTS,
+      'Create and verify headless and TTY migration artifacts',
+      GATE_PHASE.DATABASE,
+      (context) => [
+        'deno',
+        'run',
+        '--allow-all',
+        `${context.project.repoRoot}/packages/cli/e2e/src/application/gates/scaffold/verify-db-migration-artifacts.ts`,
+        context.project.projectRoot,
+        context.project.repoRoot,
+        context.request.options.database,
+      ],
+      (context) => context.project.projectRoot,
+    ),
+    commandGate(
       GATE.DATABASE_GENERATE,
       'Generate database clients',
       GATE_PHASE.DATABASE,

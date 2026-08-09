@@ -1,6 +1,11 @@
 import { assertEquals } from '@std/assert';
 
-import { ASPIRE_RESOURCE, GATE } from '../../../src/domain/cli-surface.ts';
+import {
+  ASPIRE_RESOURCE,
+  GATE,
+  KV_BACKGROUND_RUNTIME_RESOURCES,
+  KV_BACKGROUND_RUNTIME_WAIT_RESOURCES,
+} from '../../../src/domain/cli-surface.ts';
 import { PORT_RANGES } from '../../../../src/kernel/constants/port-ranges.ts';
 import { allocateScaffoldDefaultPort } from '../../../../src/kernel/domain/scaffold/default-port-allocation.ts';
 import type { RunContext } from '../../../src/domain/run-context.ts';
@@ -50,6 +55,35 @@ Deno.test('runtime aspire start gate captures detached endpoint metadata', () =>
   assertEquals(command.at(-1), '/workspace/app');
   assertEquals(command[2].includes('"--format"'), true);
   assertEquals(command[2].includes('aspire-start.json'), true);
+});
+
+Deno.test('live DB endpoint gate reads the detached dashboard metadata path', () => {
+  const gate = createRuntimeGates().find((entry) => entry.id === GATE.BEHAVIOR_LIVE_DB_ENDPOINT);
+  if (gate?.kind !== 'command') {
+    throw new Error('Expected live DB endpoint gate to be a command gate.');
+  }
+
+  const command = gate.command({
+    project: {
+      repoRoot: '/repo',
+      projectRoot: '/workspace/app',
+      appHost: '/workspace/app/aspire/apphost.mts',
+    },
+  } as RunContext);
+
+  assertEquals(command, [
+    'deno',
+    'run',
+    '--unsafely-ignore-certificate-errors=localhost',
+    '--allow-read',
+    '--allow-write',
+    '--allow-run=aspire',
+    '--allow-net=localhost,127.0.0.1',
+    '/repo/packages/cli/e2e/src/application/gates/scaffold/verify-live-db-endpoint.ts',
+    '/workspace/app/aspire/apphost.mts',
+    '/workspace/app',
+    'postgres',
+  ]);
 });
 
 // #954 regression: this gate shipped probing a hardcoded `http://127.0.0.1:8000/` while a
@@ -186,6 +220,41 @@ Deno.test('workers wait gate requires runtime startup evidence before behavior g
       '/workspace/app/aspire/apphost.mts',
     ],
   );
+});
+
+Deno.test('runtime gates enumerate every KV-backed first-party background runtime', () => {
+  assertEquals(KV_BACKGROUND_RUNTIME_RESOURCES, [
+    ASPIRE_RESOURCE.WORKERS,
+    ASPIRE_RESOURCE.SAGAS,
+    ASPIRE_RESOURCE.TRIGGERS,
+  ]);
+  assertEquals(KV_BACKGROUND_RUNTIME_WAIT_RESOURCES, [
+    ASPIRE_RESOURCE.WORKERS_API,
+    ASPIRE_RESOURCE.WORKERS,
+    ASPIRE_RESOURCE.SAGAS_API,
+    ASPIRE_RESOURCE.SAGAS,
+    ASPIRE_RESOURCE.TRIGGERS_API,
+    ASPIRE_RESOURCE.TRIGGERS,
+  ]);
+
+  const gates = createRuntimeGates(DATABASE.SQLITE);
+  for (const resource of KV_BACKGROUND_RUNTIME_RESOURCES) {
+    const gate = gates.find((entry) => entry.id === `runtime.wait.${resource}`);
+    if (gate?.kind !== 'command') {
+      throw new Error(`Expected a runtime wait gate for ${resource}.`);
+    }
+
+    const command = gate.command({
+      project: {
+        repoRoot: '/repo',
+        appHost: '/workspace/app/aspire/apphost.mts',
+      },
+    } as RunContext);
+    if (resource !== ASPIRE_RESOURCE.WORKERS) {
+      assertEquals(command.includes('--status'), true);
+      assertEquals(command.includes('healthy'), true);
+    }
+  }
 });
 
 Deno.test('AI chat route gate captures generated registry import failures', () => {

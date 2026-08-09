@@ -1,0 +1,13 @@
+{
+  "status": "healthy",
+  "timestamp": "2026-08-08T22:59:00.219Z",
+  "checks": [
+    {
+      "name": "database",
+      "healthy": false,
+      "message": "database query failed",
+      "latency": 5
+    }
+  ],
+  "version": "1.0.0"
+}

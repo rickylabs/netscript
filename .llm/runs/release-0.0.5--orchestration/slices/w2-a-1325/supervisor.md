@@ -1,22 +1,27 @@
-# W2-A supervisor preparation — #1325
+# Supervisor Identity — W2-A #1325
 
-- Status: prepared, not dispatchable until canary.14 is published and its green pair is verified.
-- Planned branch: `fix/triggers-kv-bootstrap-1325`
-- Planned worktree: `/home/codex/repos/ns005-w2-triggers-kv`
-- Base at dispatch: exact fresh canary.15 train head created by the orchestrator from verified C14
-  main.
-- Route: Codex GPT-5.6 Sol low, bypass, one new sender-free thread launched only through
-  `.llm/tools/agentic/`.
-- Formal evaluator: separate Qwen 3.8 Max high after terminal implementation handoff.
+| Field | Value |
+| --- | --- |
+| Model | Codex · OpenAI · GPT-5.6 Sol · low |
+| Session | current Codex implementation-supervisor thread |
+| Host | Linux / WSL2 · Europe/Zurich |
+| Checkout | `/home/codex/repos/ns005-w2a` |
+| Worktree | `/home/codex/repos/ns005-w2a` |
+| Branch | `fix/triggers-generated-kv-adapter-bootstrap` |
+| Baseline | `origin/main@c383b2e84c254d90bab8c4f9ffcbf43a7beb8652` (2026-08-08) |
+| Run ID | `release-0.0.5--orchestration/slices/w2-a-1325` |
 
-## Current issue state
+## Routes in force
 
-#1325 is open in milestone 0.0.5 at `status:triage`, `priority:p1`, with six unchecked acceptance
-rows and no product PR. No branch, worktree, label, or PR should be created before the C14 boundary.
+| Task lane | Provider / model / effort | Role in this run |
+| --- | --- | --- |
+| `light_implementation` | Codex · OpenAI · GPT-5.6 Sol · low | implementation supervisor |
+| PLAN-EVAL | Claude · Anthropic · Fable 5 · medium, separate native session | plan evaluator; orchestrator-launched |
+| IMPL-EVAL | Claude · Anthropic · Fable 5 · medium, separate native session | formal implementation evaluator; orchestrator-launched |
+| `review_codex_light` | Claude · Anthropic · Opus 5 · high | adversarial review pairing |
 
-## Required skills at launch
+## Recorded lane/eval overrides
 
-The final prompt must begin with `use harness` and name `netscript-harness`, `netscript-doctrine`,
-`netscript-cli`, `netscript-tools`, `netscript-pr`, `netscript-deno-toolchain`, `jsr-audit`,
-`aspire`, and `rtk`. The plugin-thinness and generated-resource glue boundaries must be explicit
-before implementation.
+The explicit 2026-08-08 slice brief supersedes the stale preparation values formerly in this file
+(old branch/worktree, canary boundary, and Qwen evaluator). This correction is mirrored in
+`drift.md`.

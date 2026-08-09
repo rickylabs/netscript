@@ -132,6 +132,8 @@ export interface DbOperationRequest {
   readonly target: ResolvedTarget;
   /** Optional migration name for migration creation. */
   readonly migrationName?: string;
+  /** Whether the invoking CLI is attached to a terminal. */
+  readonly interactive?: boolean;
   /** Absolute project root. */
   readonly projectRoot: string;
 }
