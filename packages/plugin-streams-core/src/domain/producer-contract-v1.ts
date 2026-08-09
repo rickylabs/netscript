@@ -16,6 +16,8 @@ export type StreamProducerLifecycleStateV1 = (typeof STREAM_PRODUCER_LIFECYCLE_S
 export interface StreamProducerReconnectPolicyV1 {
   /** Maximum total attempts for one connection or delivery operation. */
   readonly maxAttempts: number;
+  /** Maximum wall time for one transport request before it becomes retryable. */
+  readonly requestTimeoutMs: number;
   /** Delay before the second attempt. */
   readonly initialDelayMs: number;
   /** Exponential delay multiplier. */
@@ -29,6 +31,7 @@ export interface StreamProducerReconnectPolicyV1 {
 /** Default bounded reconnect policy. */
 export const DEFAULT_STREAM_PRODUCER_RECONNECT_POLICY_V1: StreamProducerReconnectPolicyV1 = {
   maxAttempts: 8,
+  requestTimeoutMs: 5_000,
   initialDelayMs: 100,
   multiplier: 2,
   maxDelayMs: 5_000,

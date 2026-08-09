@@ -46,6 +46,7 @@ export function reconnectPolicy(
   const policy = { ...DEFAULT_STREAM_PRODUCER_RECONNECT_POLICY_V1, ...input };
   if (
     !Number.isInteger(policy.maxAttempts) || policy.maxAttempts < 1 ||
+    !Number.isFinite(policy.requestTimeoutMs) || policy.requestTimeoutMs <= 0 ||
     !Number.isFinite(policy.initialDelayMs) || policy.initialDelayMs < 0 ||
     !Number.isFinite(policy.multiplier) || policy.multiplier < 1 ||
     !Number.isFinite(policy.maxDelayMs) || policy.maxDelayMs < 0 ||

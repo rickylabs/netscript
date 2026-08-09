@@ -94,3 +94,37 @@ Drift is append-only.
   existing dependency owner. S4 still runs the complete consumer/publish compatibility gates.
 - **Evidence:** S2 scoped check exit 0; full core tests 26/26; reference-server test exit 0; no
   `deno.lock` or package manifest diff.
+
+## 2026-08-09 — Real stopped-resource proxy requires a per-request timeout
+
+- **What:** A stopped Aspire `streams` resource leaves its allocated proxy reachable while the
+  backend is absent. The producer's fetch therefore remained pending and never entered the finite
+  attempt/backoff loop.
+- **Source:** First real S5 stopped-resource run: behavioral gate exit 1 after ten seconds with no
+  backoff transition, despite the resource being positively stopped and its health endpoint
+  unavailable.
+- **Expected:** D2's finite retry budget bounds the whole reconnect operation.
+- **Actual:** Attempt count and delay were finite, but one transport request had no duration bound.
+- **Severity:** significant, in-scope runtime correctness gap exposed by the required real proof.
+- **Action:** add a documented finite `requestTimeoutMs` reconnect-policy field (default five
+  seconds), pass it through the transport port, and combine it with lifecycle cancellation at the
+  fetch adapter. The focused probe uses 500 ms. A hanging-request adapter test now proves timeout is
+  classified retryable.
+- **Evidence:** real behavioral RED exit 1; transport test green; full core suite 29/29; final real
+  reconnect gate exit 0.
+
+## 2026-08-09 — Aspire 13.4 dashboard has no metric query endpoint
+
+- **What:** The dashboard exposes JSON telemetry for traces, but `/api/telemetry/metrics` serves the
+  dashboard HTML and `aspire otel` lists only logs, spans, and traces.
+- **Source:** Real S5 telemetry read-back after recovery.
+- **Expected:** The plan's generic telemetry query port could read both the trace and metrics from
+  the dashboard.
+- **Actual:** The publish trace was queryable; metrics had no Aspire 13.4 read API.
+- **Severity:** evidence-mechanics narrowing; product metrics are unchanged.
+- **Action:** keep the decisive trace assertion against the Aspire dashboard and insert a local
+  OTLP/HTTP JSON capture-forwarder for the probe. It records the actual retry/recovery/delivered
+  metric envelopes while forwarding the same payloads to Aspire's collector. No synthetic metric
+  is accepted.
+- **Evidence:** final gate asserts one dashboard trace id plus positive captured OTLP metric points
+  for the exact stream path and producer id; exit 0.

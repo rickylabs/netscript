@@ -32,7 +32,7 @@ export class DurableStreamProducerTransport implements StreamProducerTransportPo
       const response = await this.#fetch(input.url, {
         method: 'PUT',
         headers: { ...input.headers, 'content-type': 'application/json' },
-        signal: input.signal,
+        signal: requestSignal(input.signal, input.requestTimeoutMs),
       });
       if (response.ok || response.status === 409) {
         return { ok: true, value: undefined };
@@ -77,7 +77,7 @@ export class DurableStreamProducerTransport implements StreamProducerTransportPo
         method: 'POST',
         headers,
         body: 'body' in input ? `[${input.body}]` : undefined,
-        signal: input.signal,
+        signal: requestSignal(input.signal, input.requestTimeoutMs),
       });
       if (response.ok) {
         // The reference server acknowledges a new producer tuple with 200 and
@@ -118,6 +118,11 @@ function classifyThrown(error: unknown, signal?: AbortSignal): StreamProducerTra
     return { kind: 'aborted', message };
   }
   return { kind: 'retryable', message };
+}
+
+function requestSignal(signal: AbortSignal | undefined, timeoutMs: number): AbortSignal {
+  const timeout = AbortSignal.timeout(timeoutMs);
+  return signal ? AbortSignal.any([signal, timeout]) : timeout;
 }
 
 function parseNonNegativeInteger(value: string | null): number | undefined {

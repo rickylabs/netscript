@@ -227,10 +227,8 @@ export class DurableStreamProducerSupervisor {
     let identity: StreamProducerIdentityV1 = this.#identity();
     for (let attempt = 1; attempt <= this.#reconnectPolicy.maxAttempts; attempt++) {
       const result = await this.#transport.close({
-        url: this.#url,
-        headers: this.#headers,
+        ...this.#requestInput(),
         identity,
-        signal: this.#abort.signal,
       });
       if (result.ok) {
         this.#nextSequence = identity.sequence + 1;
@@ -294,9 +292,7 @@ export class DurableStreamProducerSupervisor {
       if (attempt > 1) {
         this.#transition('reconnecting', attempt);
         const connected = await this.#transport.connect({
-          url: this.#url,
-          headers: this.#headers,
-          signal: this.#abort.signal,
+          ...this.#requestInput(),
         });
         if (!connected.ok) {
           if (this.#abort.signal.aborted) {
@@ -322,11 +318,9 @@ export class DurableStreamProducerSupervisor {
       this.#transition('ready', attempt);
       entry.attempted = true;
       const result = await this.#transport.append({
-        url: this.#url,
-        headers: this.#headers,
+        ...this.#requestInput(),
         body: entry.body,
         identity: entry.identity,
-        signal: this.#abort.signal,
       });
       if (result.ok) {
         this.#nextSequence = entry.identity.sequence + 1;
@@ -373,9 +367,7 @@ export class DurableStreamProducerSupervisor {
     for (let attempt = 1; attempt <= this.#reconnectPolicy.maxAttempts; attempt++) {
       this.#transition(initial && attempt === 1 ? 'connecting' : 'reconnecting', attempt);
       const result = await this.#transport.connect({
-        url: this.#url,
-        headers: this.#headers,
-        signal: this.#abort.signal,
+        ...this.#requestInput(),
       });
       if (result.ok) {
         if (attempt > 1) {
@@ -491,6 +483,15 @@ export class DurableStreamProducerSupervisor {
       producerId: this.#producerId,
       epoch: this.#epoch,
       sequence: this.#nextSequence,
+    };
+  }
+
+  #requestInput() {
+    return {
+      url: this.#url,
+      headers: this.#headers,
+      requestTimeoutMs: this.#reconnectPolicy.requestTimeoutMs,
+      signal: this.#abort.signal,
     };
   }
 }

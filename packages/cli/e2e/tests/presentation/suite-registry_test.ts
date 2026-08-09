@@ -155,6 +155,10 @@ Deno.test('runtime suite includes full scaffold, database, runtime, and behavior
   );
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_PLUGINS_HEALTH), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_OTEL_WEBHOOK), true);
+  assertEquals(
+    runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_STREAMS_PRODUCER_RECONNECT),
+    true,
+  );
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_OTEL_STREAM_CONSUMER), false);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_OTEL_TRACES), false);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_OTEL_TASK_TRACES), true);

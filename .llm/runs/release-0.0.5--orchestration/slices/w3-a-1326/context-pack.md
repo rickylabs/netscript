@@ -44,13 +44,13 @@ manual F-14 evidence. The full core suite passes 28/28.
 
 ## In Progress
 
-- S4 commit, push, and PR comment before S5 isolated Aspire proof.
+- S4 committed/pushed as `0b842c8e1`; PR comment posted before S5.
 
 ## Next Steps
 
 1. Commit, push, and comment S4 with detached consumer and publish evidence.
-2. Implement the focused Aspire producer probe/gate without touching #1398 selections.
-3. Bracket S5 resource work with leak checks and verify owned teardown artifacts.
+2. Commit/push/comment the completed S5 focused Aspire proof without touching #1398 selections.
+3. Run S6 cheaper handoff gates, record `EXPENSIVE-GATE-REQUEST`, and wait for the token.
 
 ## Key Decisions
 
@@ -84,7 +84,7 @@ manual F-14 evidence. The full core suite passes 28/28.
 | ----------- | ------------------------------------ | ------------------------------------------------------------------------------------------ |
 | Static      | baseline green; reconnect RED proven | `worklog.md` gate table                                                                    |
 | Fitness     | green; exact AP-13 row closed        | Decisive scoped pair and manual F-14; aggregates non-decisive under #1403.            |
-| Runtime     | not run                              | Token-free focused Aspire proof is S5; serialized gate requires grant.                     |
+| Runtime     | focused proof green                  | Exact stop/restart, FIFO receipts, one dashboard trace and captured-forwarded OTLP metrics; serialized gate still requires grant. |
 | Consumer    | green                                | Isolated public types plus focused auth/sagas/workers and streams/triggers checks.    |
 
 ## Open Questions
@@ -94,8 +94,8 @@ manual F-14 evidence. The full core suite passes 28/28.
 
 ## Drift and Debt
 
-- Drift: stale preparation identity; upstream declaration/runtime mismatch; JSR helper banner false
-  positive; root quality/doctrine omission tracked by #1403.
+- Drift: stopped-resource proxy required a finite request timeout; Aspire 13.4 has no metric query
+  endpoint, so actual OTLP metric envelopes are captured and forwarded; prior drift remains.
 - Debt: exact producer AP-13 row closed in S3; connector convergence remains open.
 
 ## Commits
@@ -103,4 +103,5 @@ manual F-14 evidence. The full core suite passes 28/28.
 - `11ee98e22` — S1 contract and classified RED evidence.
 - `e8e638559` — S2 reconnect supervisor and focused GREEN evidence.
 - `ba5c4704a` — S3 correlated trace/metrics and exact AP-13 debt closure.
-- S4 is locally green and awaiting its required slice commit/push/comment.
+- `0b842c8e1` — S4 published/consumer compatibility.
+- S5 is locally green and awaiting its required slice commit/push/comment.

@@ -82,7 +82,9 @@ await producer.flush();
 `connecting → ready ↔ backoff/reconnecting → stopping → stopped`, with terminal `failed` when a
 bounded operation exhausts its retry budget or the server reports a non-retryable protocol failure.
 The default policy makes eight total attempts with exponential delay from 100 ms, capped at five
-seconds and jittered by 20 percent. Infinite retry is not supported.
+seconds and jittered by 20 percent. Each transport request also has a five-second timeout, so a
+connected proxy with an unavailable backend cannot hold an attempt open forever. Infinite retry
+or request duration is not supported.
 
 Writes enter a FIFO bounded to 256 events and 1 MiB of serialized UTF-8 by default. The producer
 rejects the newest write when either bound would be exceeded; it never evicts an already accepted

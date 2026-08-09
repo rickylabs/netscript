@@ -20,6 +20,7 @@ Deno.test('producer transport retains the exact body and idempotency tuple', asy
   const result = await transport.append({
     url: 'http://streams.test/exact',
     headers: { authorization: 'Bearer test' },
+    requestTimeoutMs: 1_000,
     body: '{"key":"one"}',
     identity,
   });
@@ -53,6 +54,7 @@ Deno.test('producer transport classifies retry, stale epoch, gap, and closed res
     transport.append({
       url: 'http://streams.test/classify',
       headers: {},
+      requestTimeoutMs: 1_000,
       body: '{"key":"one"}',
       identity,
     });
@@ -73,4 +75,21 @@ Deno.test('producer transport classifies retry, stale epoch, gap, and closed res
     ok: false,
     failure: { kind: 'stream-closed', message: 'closed' },
   });
+});
+
+Deno.test('producer transport turns a hung request timeout into a retryable failure', async () => {
+  const transport = new DurableStreamProducerTransport((_input, init) =>
+    new Promise<Response>((_resolve, reject) => {
+      init?.signal?.addEventListener('abort', () => reject(init.signal?.reason), { once: true });
+    })
+  );
+
+  const result = await transport.connect({
+    url: 'http://streams.test/hung',
+    headers: {},
+    requestTimeoutMs: 5,
+  });
+
+  assertEquals(result.ok, false);
+  if (!result.ok) assertEquals(result.failure.kind, 'retryable');
 });

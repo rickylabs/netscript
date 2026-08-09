@@ -16,6 +16,8 @@ export interface StreamProducerConnectInputV1 {
   readonly url: string;
   /** Request headers, including authorization. */
   readonly headers: Readonly<Record<string, string>>;
+  /** Finite timeout for this individual transport request. */
+  readonly requestTimeoutMs: number;
   /** Optional cancellation. */
   readonly signal?: AbortSignal;
 }

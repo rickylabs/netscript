@@ -148,6 +148,10 @@ the adapter or fetch/timers to the supervisor.
 | 2026-08-09 | S4    | Consumer audit     | Direct checking found the sagas handwritten void fake incompatible; it now uses `MemoryStreamProducer`, and auth/sagas/workers tests pass 8/8. |
 | 2026-08-09 | S4    | Detached types     | A no-workspace config type-checks receipt, state, readiness, flush, and stop through public root/testing subpaths; raw exit 0. |
 | 2026-08-09 | S4    | Publish surface    | Full export docs, JSR helper, raw package dry-run, and workspace publish dry-run completed without lock or manifest churn. |
+| 2026-08-09 | S5    | Real outage RED    | Exact Aspire resource stop left a reachable proxy request pending: no backoff within ten seconds, raw gate exit 1. |
+| 2026-08-09 | S5    | Bounded request    | Added the missing finite per-request timeout to contract/port/adapter; hanging-request test and all 29 core tests pass. |
+| 2026-08-09 | S5    | Correlated recovery | Focused reconnect gate exited 0: three buffered receipts recovered FIFO under one dashboard trace with actual forwarded OTLP metrics. |
+| 2026-08-09 | S5    | Owned cleanup      | Foreground AppHost stopped; no owned survivors. Foreign Redis untouched; scratch workspace moved to recoverable trash. |
 
 ## Decisions
 
@@ -190,6 +194,11 @@ See `plan.md` D1–D16. No open decision would force implementation rework.
 | S4 JSR audit helper                 | `audit-jsr-package.ts --root packages/plugin-streams-core`      | PASS, exit 0 | One known false banner-count warning; raw authority below is clean. |
 | S4 raw package publish              | `deno publish --dry-run --allow-dirty --no-check`                | PASS, exit 0 | 43 intended files; no actual slow-type diagnostic.        |
 | S4 workspace publish                | `deno task publish:dry-run`                                     | PASS, exit 0 | Entire workspace simulation completed successfully.       |
+| S5 focused tests                    | core + reconnect gate/registry/probe tests                      | PASS, exit 0 | 51 passed; hanging-request and OTLP-envelope assertions included. |
+| S5 scoped check                     | core + CLI gate/registry + streams probe, `--no-lock`           | PASS, exit 0 | 113 files, zero failed batches or diagnostics.             |
+| S5 scoped lint / format             | same 113-file selection                                        | PASS, exit 0 each | Zero findings.                                         |
+| S5 full export doc lint             | `deno task doc:lint --root packages/plugin-streams-core --pretty` | PASS, exit 0 | Combined diagnostics 0.                                |
+| S5 raw package publish              | package `deno publish --dry-run --allow-dirty --no-check`       | PASS, exit 0 | Public timeout contract publishable; no lock change.       |
 
 ### S1 RED evidence
 
@@ -230,7 +239,7 @@ the slice run directory and each emitted exactly its named missing-symbol diagno
 
 | Gate                              | Result  | Evidence            | Notes                                                 |
 | --------------------------------- | ------- | ------------------- | ----------------------------------------------------- |
-| Focused Aspire producer reconnect | NOT_RUN | Planned S5          | Must bracket with leak-check and exact owned cleanup. |
+| Focused Aspire producer reconnect | PASS, exit 0 | S5 isolated AppHost | Exact stop/backoff/restart, FIFO receipts, one dashboard trace, positive OTLP metrics. |
 | `scaffold.runtime`                | NOT_RUN | Token not requested | Do not run before cheaper gates and grant.            |
 
 ### Consumer Gates
