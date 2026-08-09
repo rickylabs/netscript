@@ -161,6 +161,11 @@ the adapter or fetch/timers to the supervisor.
 | 2026-08-09 | Landing | Main rebase | Cleanly rebased all slice commits onto `origin/main@3f41a3639` after #1400/#1401; no overlap or conflict. |
 | 2026-08-09 | Landing | Post-rebase package verdict | Full `packages/plugin-streams-core/tests/` suite exited 0 with 29 passed, 0 failed. |
 | 2026-08-09 | Landing | Follow-up reasons | Two non-correctness reason-fidelity findings are filed under #1405 and deliberately not repaired in this PR. |
+| 2026-08-09 | CI repair | Exact CI reproduction | `scaffold.service` reproduced raw exit 1 at `generated.service-check`; direct generated-root `deno check --unstable-kv ./packages ./services` exposed TS2307 at `verify-producer-reconnect.ts:8:8`. |
+| 2026-08-09 | CI repair | Root cause | W3-A's coordinator statically imported the streams probe source, but the service-only smoke copies/checks CLI packages without installing the streams plugin. Runtime passed because that suite installs streams first; #1400/#1401 are not involved. |
+| 2026-08-09 | CI repair | Type seam | Removed the static cross-workspace source dependency; the coordinator now owns the two probe wire literals and structural result type. Producer behavior is unchanged. |
+| 2026-08-09 | CI repair | GREEN | Focused tests 5/5 and check/lint/fmt exited 0; exact `scaffold.service` rerun exited 0 with passed=5 failed=0 skipped=0. |
+| 2026-08-09 | CI repair | Evidence reporter finding | The pretty command gate retained only a 4,000-character stream tail and CI began mid-path, dropping the TS2307 body. This is separate gate debt; no reporter repair is included here. |
 
 ## Decisions
 
@@ -216,6 +221,11 @@ See `plan.md` D1–D16. No open decision would force implementation rework.
 | S7 serialized runtime              | exact one-pass `e2e:cli run scaffold.runtime --cleanup --format pretty` | PASS, exit 0 | Full aggregate: passed=79 failed=0 skipped=2. Exactly one authorized run. |
 | S7 final review threads            | `agentic:review-threads --pr 1402 --pretty`                      | PASS, exit 0 | 0 threads, 0 unanswered after the runtime verdict.        |
 | Post-rebase package suite          | `deno test --no-lock --allow-all packages/plugin-streams-core/tests/` | PASS, exit 0 | 29 passed, 0 failed on `origin/main@3f41a3639`; informational pre-existing TanStack peer warning disclosed. |
+| CI failing static suite            | `deno task e2e:cli run scaffold.service --format pretty`              | FAIL, exit 1 | Reproduced `generated.service-check`; retained workspace used for raw diagnosis. |
+| Raw generated service check        | `deno check --unstable-kv ./packages ./services` in retained root     | FAIL, exit 1 | Sole product diagnostic TS2307: missing `plugins/streams/src/e2e/probes/producer-reconnect.ts` imported at coordinator line 8:8. |
+| CI repair focused tests            | coordinator + streams probe focused tests                             | PASS, exit 0 | 5 passed, 0 failed. |
+| CI repair check / lint / format    | corrected coordinator seam                                            | PASS, exit 0 each | Zero diagnostics/findings. |
+| Corrected static suite             | `deno task e2e:cli run scaffold.service --format pretty`              | PASS, exit 0 | passed=5 failed=0 skipped=0; `generated.service-check` passed in 28.7s. |
 
 ### S1 RED evidence
 
@@ -324,6 +334,29 @@ https://github.com/rickylabs/netscript/pull/1402#issuecomment-5229792871
 
 Neither finding can produce a false `delivered` outcome or silent loss; both concern terminal reason
 fidelity only. #1405 owns them. This PR does not change either behavior.
+
+## CI finding — generated service static check
+
+GitHub Actions run 31295168014, job 93199005106 failed `generated.service-check` without retaining
+the diagnostic body. Exact local reproduction produced:
+
+```text
+TS2307 [ERROR]: Cannot find module '.../plugins/streams/src/e2e/probes/producer-reconnect.ts'.
+    at .../packages/cli/e2e/src/application/gates/scaffold/verify-producer-reconnect.ts:8:8
+```
+
+This is W3-A's type seam, not the main rebase or an interaction with #1400/#1401. The service-only
+suite checks the copied CLI tree without installing streams; the runtime suite installs streams
+before the same broad generated check. The repair removes only that static source dependency.
+
+### Separate gate-evidence finding
+
+`command-gate.ts` truncates each command stream to its last 4,000 characters, and
+`pretty-reporter.ts` prints `stderrTail || stdoutTail` rather than preserving the diagnostic-bearing
+content from both streams. The CI excerpt starts mid-file path, proving the gate reporter truncated
+the captured output; the TS2307 code, target, and line were lost. This is the third milestone case
+where a failing gate omitted the compared/diagnostic identity needed to act. It is recorded as
+separate harness evidence debt and is not repaired or generalized from in #1326.
 
 ## EXPENSIVE-GATE-REQUEST
 

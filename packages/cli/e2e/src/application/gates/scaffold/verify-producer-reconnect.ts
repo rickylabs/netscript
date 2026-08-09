@@ -1,11 +1,20 @@
 import { StreamProducerMetricNames } from '@netscript/plugin-streams-core/telemetry';
 import type { TelemetryTrace } from '@netscript/telemetry/query';
 import { createLiveAspireTelemetryQuery } from './aspire-dashboard-telemetry.ts';
-import {
-  PRODUCER_BACKOFF_MARKER,
-  PRODUCER_RESULT_MARKER,
-  type ProducerReconnectProbeResult,
-} from '../../../../../../../plugins/streams/src/e2e/probes/producer-reconnect.ts';
+
+// This coordinator is copied into service-only smoke workspaces where the streams plugin source is
+// intentionally absent. Keep the probe's wire markers structural so static scaffold checks do not
+// acquire a source dependency on an uninstalled plugin tree.
+const PRODUCER_BACKOFF_MARKER = 'NETSCRIPT_PRODUCER_RECONNECT_BACKOFF';
+const PRODUCER_RESULT_MARKER = 'NETSCRIPT_PRODUCER_RECONNECT_RESULT';
+
+interface ProducerReconnectProbeResult {
+  readonly traceId: string;
+  readonly streamPath: string;
+  readonly producerId: string;
+  readonly keys: readonly string[];
+  readonly sinceUnixMs: number;
+}
 
 const PROBE_TIMEOUT_MS = 90_000;
 const TELEMETRY_ATTEMPTS = 30;

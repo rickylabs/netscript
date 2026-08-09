@@ -53,17 +53,21 @@ manual F-14 evidence. The full core suite passes 28/28.
   under #1405 and intentionally remain outside this PR.
 - The branch rebased cleanly onto `origin/main@3f41a3639`; the post-rebase package suite exits 0
   with 29 passed and 0 failed.
+- CI `scaffold.service` exposed a W3-A-owned static type seam: the CLI coordinator imported a probe
+  below a plugin tree absent from service-only smoke workspaces. #1400/#1401 are not involved.
+- The seam-only repair is locally green: focused 5/5, check/lint/fmt exit 0, and exact
+  `scaffold.service` passes 5/5. Producer runtime behavior is unchanged.
 
 ## In Progress
 
-- Implementation, required gates, rebase, and separate IMPL-EVAL are complete. The draft PR is
-  handed back at `status:ready-merge`; the orchestrator alone may remove draft status or merge.
+- A CI type-seam repair is ready to commit/push. The serialized runtime verdict is untouched and
+  the existing IMPL-EVAL remains applicable because no product behavior changed.
 
 ## Next Steps
 
-1. Commit and push the post-eval bookkeeping and rebased history.
-2. Add the fenced acceptance-evidence map and tick the PR IMPL-EVAL Definition-of-Done row.
-3. Set `status:ready-merge` and stop; do not mark the PR ready or merge it.
+1. Commit and push the CI type-seam repair plus evidence.
+2. Comment the raw TS2307, reporter narrowing, and exact static GREEN on PR #1402.
+3. Wait for the new CI head; do not rerun the serialized runtime gate.
 
 ## Key Decisions
 
@@ -120,4 +124,5 @@ manual F-14 evidence. The full core suite passes 28/28.
 - `8836491f2` — S5 focused real Aspire outage/recovery and correlated OTEL proof.
 - `ead937b62` — S6 cheaper-gate closeout and serialized-token request.
 - `a1d30b311` — S7 serialized runtime verdict and token release.
-- Post-eval landing artifact commit pending.
+- `8cfbff9a8` — post-eval landing, clean rebase, and post-rebase package verdict.
+- CI type-seam repair commit pending.

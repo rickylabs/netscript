@@ -128,3 +128,18 @@ Drift is append-only.
   is accepted.
 - **Evidence:** final gate asserts one dashboard trace id plus positive captured OTLP metric points
   for the exact stream path and producer id; exit 0.
+
+## 2026-08-09 — Pretty command reporter dropped the CI diagnostic body
+
+- **What:** `scaffold-static` reported `generated.service-check` failure but omitted the TS code,
+  missing module, and source line required to diagnose it.
+- **Source:** Actions run 31295168014/job 93199005106 plus exact local reproduction.
+- **Expected:** A failed type-check gate preserves the decisive compiler diagnostic.
+- **Actual:** `command-gate.ts` retains only the last 4,000 characters per stream and
+  `pretty-reporter.ts` selects one stream tail. The CI excerpt begins mid-path and contains only
+  progress lines plus the generic type-check failure; raw reproduction exposes TS2307 at
+  `verify-producer-reconnect.ts:8:8`.
+- **Severity:** significant evidence-mechanics debt, separate from the producer defect.
+- **Action:** record and report; do not widen #1326 into a reporter repair.
+- **Evidence:** local `scaffold.service` exit 1 and direct generated-root `deno check` exit 1 with
+  the full TS2307, followed by the seam repair and exact suite exit 0 (`passed=5 failed=0 skipped=0`).
