@@ -55,7 +55,9 @@ export const {
 
 const exampleTemplates = await loadExampleServiceAppTemplateAssets();
 
-export const appExampleServiceTemplate = exampleTemplates.appExampleServiceTemplate;
+export const appExampleServiceQueryTemplate = exampleTemplates.appExampleServiceQueryTemplate;
+export const appExampleServiceRouteContractTemplate =
+  exampleTemplates.appExampleServiceRouteContractTemplate;
 export const appServiceExampleHeroTemplate = exampleTemplates.appExampleServiceHeroTemplate;
 export const appServiceExampleLabPanelTemplate = exampleTemplates.appExampleServiceLabPanelTemplate;
 export const appServiceExampleNotesCardTemplate =

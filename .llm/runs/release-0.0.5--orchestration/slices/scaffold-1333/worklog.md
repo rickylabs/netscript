@@ -66,3 +66,38 @@ The first scoped-check attempt used unsupported `--deno-arg=--no-lock` syntax an
 running a check. The required corrected form, `--deno-arg --no-lock`, then executed and exited 0;
 the failed invocation is not reported as a product verdict. Package doctrine remains red solely on
 the exact pre-existing baseline and introduces no new finding in S1.
+
+## S2 — resource-local contract and query topology
+
+### Pre-fix RED
+
+The focused public-init golden was extended first to require absence of
+`apps/dashboard/lib/example-service.ts` and presence of resource-local `(_components)`,
+`(_islands)`, `(_shared)`, and `(_lib)`. Against the old writer it exited **1** (0 passed / 1
+failed), naming the still-present global `lib/example-service.ts` path. This is the required
+rejection of the old topology, not merely acceptance of new folders.
+
+### Implementation
+
+- The init service example now writes `(_lib)/service-query.ts` and
+  `(_lib)/route-contract.ts` beside its resource route and creates all four owned directories.
+- Route, island, and shared-loader imports are relative to the resource-local query module.
+- The route-contract seam owns typed path and search schemas for S3 composition.
+- The same query template remains the source for `service add --with-client`, whose accepted #1373
+  output stays `apps/<app>/lib/<service>.ts`; only init's obsolete global
+  `lib/example-service.ts` shape is rejected.
+- The canonical embedded template barrel was regenerated.
+
+### Gates before commit
+
+| Gate | Result |
+| --- | --- |
+| Focused templates/writer/public-init/client-scaffolder tests | raw exit 0; 9 tests / 22 steps / 0 failed |
+| Scoped check (`--unstable-kv --no-lock`) | raw exit 0; 9 files / 1 batch / 0 findings |
+| Scoped lint | raw exit 0; 9 files / 1 batch / 0 findings |
+| Scoped format | raw exit 0; 9 files / 1 batch / 0 findings |
+| Package code-quality scan | raw exit 0; 0 findings / 6 existing allowances |
+| `check:assets-barrel` before commit | raw exit 1 because its final `git diff --exit-code` correctly saw the intended regenerated barrel; generator itself exited 0 |
+
+`check:assets-barrel` must be rerun from the committed S2 head; that raw committed-head receipt is
+posted on the PR and carried into the next worklog update.

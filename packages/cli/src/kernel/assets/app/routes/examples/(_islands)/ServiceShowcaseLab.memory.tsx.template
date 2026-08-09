@@ -14,7 +14,7 @@ import {
   {{serviceName | camelCase}}ListInvalidation,
   {{serviceName | camelCase}}Name,
   {{serviceName | camelCase}}Queries,
-} from '@app/lib/example-service.ts';
+} from '../(_lib)/service-query.ts';
 import {
   formatServiceTimestamp,
   loadServiceShowcaseData,

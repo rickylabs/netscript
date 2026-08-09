@@ -49,7 +49,7 @@ function serviceReferences(
   return [
     {
       id: 'service-lib',
-      path: 'lib/example-service.ts',
+      path: `${root}/(_lib)/service-query.ts`,
       purpose: 'contract-derived client and query factories',
     },
     {

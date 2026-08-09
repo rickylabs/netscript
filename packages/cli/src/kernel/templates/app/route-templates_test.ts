@@ -25,7 +25,8 @@ import {
   appDesignTokensLibTemplate,
   appDesignTokensRouteTemplate,
   appDesignTokensViewTemplate,
-  appExampleServiceTemplate,
+  appExampleServiceQueryTemplate,
+  appExampleServiceRouteContractTemplate,
   appExamplesIndexRouteTemplate,
   appExamplesViewTemplate,
   appHealthRouteTemplate,
@@ -358,7 +359,7 @@ describe('app route template rendering', () => {
 
   it('example service template wires the selected service client and query helpers', async () => {
     const adapter = makeAdapter();
-    const output = await adapter.render(appExampleServiceTemplate, SAMPLE_APP_VARS);
+    const output = await adapter.render(appExampleServiceQueryTemplate, SAMPLE_APP_VARS);
     assertStringIncludes(output, "import { createServiceClient } from '@netscript/sdk/client';");
     assertStringIncludes(output, "import { createQueryFactories } from '@netscript/sdk/query';");
     assertStringIncludes(
@@ -380,13 +381,25 @@ describe('app route template rendering', () => {
     assertStringIncludes(output, 'export const teamMembersQueries = createQueryFactories({');
   });
 
+  it('resource-local route contract owns typed path and search state', async () => {
+    const output = await makeAdapter().render(
+      appExampleServiceRouteContractTemplate,
+      SAMPLE_APP_VARS,
+    );
+    assertStringIncludes(output, "import { z } from 'zod';");
+    assertStringIncludes(output, 'export const teamMembersPathSchema = z.object({});');
+    assertStringIncludes(output, 'export const teamMembersSearchSchema = z.object({');
+    assertStringIncludes(output, 'page: z.coerce.number().int().min(1).default(1)');
+    assertStringIncludes(output, "query: z.string().trim().max(100).default('')");
+  });
+
   it('service example route is folder-owned with the builder in index.tsx and layout in index.layout.tsx', async () => {
     const adapter = makeAdapter();
     const route = await adapter.render(appServiceExampleIndexTemplate, SAMPLE_APP_VARS);
     const layout = await adapter.render(appServiceExampleLayoutTemplate, SAMPLE_APP_VARS);
     assertStringIncludes(
       route,
-      "import { teamMembersName } from '@app/lib/example-service.ts';",
+      "import { teamMembersName } from './(_lib)/service-query.ts';",
     );
     assertStringIncludes(route, "import { appRoutes } from '@app/router.ts';");
     assertStringIncludes(route, "import { ServiceExampleHero } from './(_components)/hero.tsx';");

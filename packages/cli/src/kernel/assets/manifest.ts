@@ -9,7 +9,10 @@ export const TEMPLATE_KEYS = {
     'app/routes/(design)/design/(_islands)/TokenClipboard.tsx.template',
   appRoutesDesignSharedRegistry: 'app/routes/(design)/design/(_shared)/registry.ts.template',
   appRoutesDesignSharedTokens: 'app/routes/(design)/design/(_shared)/tokens.ts.template',
-  appLibExampleService: 'app/lib/example-service.ts.template',
+  appRoutesExamplesServiceLibRouteContract:
+    'app/routes/examples/service/(_lib)/route-contract.ts.template',
+  appRoutesExamplesServiceLibServiceQuery:
+    'app/routes/examples/service/(_lib)/service-query.ts.template',
   appMain: 'app/main.ts.template',
   appRouter: 'app/router.ts.template',
   appRoutesComponentsHealthView: 'app/routes/(_components)/health-view.tsx.template',

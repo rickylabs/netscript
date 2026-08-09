@@ -1,6 +1,6 @@
 import { dehydrateQueryClient } from '@netscript/fresh/query';
 import { createNetScriptQueryClient } from '@netscript/sdk/query-client';
-import { {{serviceName | camelCase}}Queries } from '@app/lib/example-service.ts';
+import { {{serviceName | camelCase}}Queries } from '../(_lib)/service-query.ts';
 
 export const SERVICE_SHOWCASE_PAGE_SIZE = 3;
 export const SERVICE_SHOWCASE_INPUT = {

@@ -8,10 +8,10 @@ interface ExampleServiceAppFilesInput {
   readonly templates: ExampleServiceAppTemplateAssets;
   readonly write: (targetPath: string, content: string) => Promise<void>;
   readonly hasDatabase: boolean;
-  readonly libDir: string;
   readonly serviceExampleDir: string;
   readonly serviceExampleComponentsDir: string;
   readonly serviceExampleIslandsDir: string;
+  readonly serviceExampleLibDir: string;
   readonly serviceExampleSharedDir: string;
   readonly serviceExamplePartialDir: string;
   readonly telemetryExampleDir: string;
@@ -36,7 +36,8 @@ export async function writeExampleServiceAppFiles(
     appExampleServiceSummaryCardTemplate,
     appExampleServiceSummaryPanelMemoryTemplate,
     appExampleServiceSummaryPanelTemplate,
-    appExampleServiceTemplate,
+    appExampleServiceQueryTemplate,
+    appExampleServiceRouteContractTemplate,
     appServiceExampleIndexTemplate,
     appServiceExampleLayoutTemplate,
     appServiceSummaryPartialTemplate,
@@ -63,8 +64,12 @@ Delete or replace the sample data: example records, labels, statuses, notes, and
 `,
   );
   await write(
-    join(input.libDir, 'example-service.ts'),
-    await context.templateAdapter.render(appExampleServiceTemplate, appTemplateVars),
+    join(input.serviceExampleLibDir, 'service-query.ts'),
+    await context.templateAdapter.render(appExampleServiceQueryTemplate, appTemplateVars),
+  );
+  await write(
+    join(input.serviceExampleLibDir, 'route-contract.ts'),
+    await context.templateAdapter.render(appExampleServiceRouteContractTemplate, appTemplateVars),
   );
   await write(
     join(input.serviceExampleComponentsDir, 'hero.tsx'),

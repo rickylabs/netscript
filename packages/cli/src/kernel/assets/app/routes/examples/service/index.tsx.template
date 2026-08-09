@@ -1,4 +1,4 @@
-import { {{serviceName | camelCase}}Name } from '@app/lib/example-service.ts';
+import { {{serviceName | camelCase}}Name } from './(_lib)/service-query.ts';
 import { appRoutes } from '@app/router.ts';
 import { definePage } from '@app/utils.ts';
 import { ServiceExampleHero } from './(_components)/hero.tsx';

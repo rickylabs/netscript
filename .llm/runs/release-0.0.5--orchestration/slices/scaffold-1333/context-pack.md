@@ -18,3 +18,8 @@ S1 is implemented and locally green: the omitted-name pre-fix run failed with ac
 the explicit-name control stayed green, and the final focused suite passed 14/14. Scoped
 check/lint/fmt and the package quality scan exit 0. Package doctrine exits 1 with the exact same
 50 failures / 51 warnings / 1 info finding as a detached `origin/main` archive; S1 adds no finding.
+
+S2 replaces init's global `lib/example-service.ts` with resource-owned `(_lib)/service-query.ts`
+and `route-contract.ts`; the old-shape golden failed pre-fix and the final focused suite passes.
+The service-add command deliberately continues writing the #1373 golden-path
+`apps/<app>/lib/<service>.ts` from the same template.

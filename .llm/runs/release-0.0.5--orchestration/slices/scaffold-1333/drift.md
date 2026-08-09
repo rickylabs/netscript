@@ -15,3 +15,11 @@ The locked `<project>-web` rule would exceed the existing 64-character name cont
 length project. S1 keeps the suffix and trims only the project prefix to fit; ordinary names and the
 no-duplicate-suffix rule are unchanged. A unit test fixes the boundary. This is a validation-edge
 refinement, not a scope or naming-policy change.
+
+## 2026-08-09 — one template, two intentional destinations
+
+Research during S2 found `service add --with-client` also consumed the old manifest key while
+writing the #1373-approved `apps/<app>/lib/<service>.ts` path. S2 moves init's canonical example to
+resource-local `(_lib)` but keeps service-add's public destination and points it at the same query
+template. Duplicating the template or changing the already-accepted service-add topology would be
+unrelated drift.

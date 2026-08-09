@@ -98,6 +98,13 @@ Deno.test('public init emits resolvable app conventions with and without the exa
     );
     assertStringIncludes(exampleReadme, 'Copy the architecture');
     assertStringIncludes(exampleReadme, 'Delete or replace the sample data');
+    await assertPathAbsent(join(serviceApp, 'lib', 'example-service.ts'));
+    for (const localDirectory of ['(_components)', '(_islands)', '(_shared)', '(_lib)']) {
+      const stat = await Deno.stat(
+        join(serviceApp, 'routes', 'examples', 'users', localDirectory),
+      );
+      assert(stat.isDirectory, `Expected resource-local directory: ${localDirectory}`);
+    }
 
     await scaffoldFixture(parent, 'without-service');
     const noServiceApp = join(parent, 'without-service', 'apps', 'dashboard');
