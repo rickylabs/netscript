@@ -7,7 +7,8 @@ scoped type-check/lint, and a clean-tree CI invariant. No product API or Fresh U
 Owner controls mandatory IMPL-EVAL, CI, and merge. No runtime token exists and no Aspire/container
 work is in scope.
 
-S1 implementation is gate-green before commit: package-scoped check/lint/fmt, real frozen-lock
-regression, root check/lint/fmt, quality scan, and doctrine aggregate all exit 0. Type, lint, and
-lock mutations each exit 1 with distinct diagnostics. The remaining mechanical proof is to run the
-exact workflow commands from the committed clean head and post the empty-status receipt.
+S1 is implemented at `dce857a4d`: package-scoped check/lint/fmt, real frozen-lock regression, root
+check/lint/fmt, quality scan, and doctrine aggregate all exit 0. Type, lint, and lock mutations each
+exit 1 with distinct diagnostics. The exact workflow sequence ran from the committed head with
+empty `git status --porcelain` both before and after. The remaining action is owner-controlled
+IMPL-EVAL; do not self-certify or mark the PR ready.

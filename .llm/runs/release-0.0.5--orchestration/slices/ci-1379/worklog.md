@@ -59,8 +59,25 @@ The refreshed private lock changes by 197 insertions / 61 deletions and has SHA-
 unchanged. The package `lock:update` task names the sole intentional regeneration path; the CI
 failure message tells contributors to review the diff before committing it.
 
+### Committed-head CI sequence
+
+At S1 commit `dce857a4d`, the exact workflow commands returned:
+
+- before `git status --porcelain`: empty;
+- frozen package check: raw exit 0, 150 files / 2 batches;
+- package lint: raw exit 0, 150 files / 1 batch;
+- frozen-lock regression: raw exit 0, 1 passed / 0 failed;
+- after `git status --porcelain`: empty;
+- combined CI sequence: raw exit 0.
+
+This is the decisive rows 1–5 receipt: the job runs both source gates, native frozen behavior
+rejects rewrites, and successful execution leaves the entire worktree unchanged.
+
 ### Reconcile
 
 Issue #1379 remains open at `status:impl`; draft PR #1426 carries `Closes #1379`, milestone 0.0.5,
 the explicit frozen-private-lock policy, and exactly one status label. No boundary issue or new
 doctrine debt was found.
+
+Final reconcile moves issue and PR to `status:impl-eval` after this evidence commit. The PR remains
+draft; the milestone owner owns separate-session evaluation, readiness, CI, and merge.
