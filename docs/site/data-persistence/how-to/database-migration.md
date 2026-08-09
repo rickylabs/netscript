@@ -43,29 +43,28 @@ applied, a generated Prisma client (with matching zod schemas) under
 whole loop is four commands, run once, against a database that Aspire is keeping alive in a second
 terminal.
 
-{{ comp.apiTable({ caption: "The migration workflow at a glance", rows: [ { name: "aspire start",
-type: "from aspire/", desc: "Provisions the Postgres + Redis containers. Must be up first and stay
-running." }, { name: "netscript db init --name init", type: "from workspace root", desc:
-"Initializes tooling, creates the first migration from schema.prisma, applies it to Postgres." }, {
-name: "netscript db generate", type: "from workspace root", desc: "Generates the Deno-runtime Prisma
-client + zod schemas into .generated. Re-run after every schema edit." }, { name: "netscript db
-seed", type: "from workspace root", desc: "Runs database/postgres/scripts/seed.ts to populate
-baseline rows." }, { name: "netscript db status", type: "from workspace root", desc: "Reports which
-migrations are applied and whether the database is in sync — the authoritative verification." } ] })
-}}
+{{ comp.apiTable({
+  caption: "The migration workflow at a glance",
+  rows: [
+    { name: "aspire start", type: "from aspire/", desc: "Provisions the Postgres + Redis containers. Must be up first and stay running." },
+    { name: "netscript db init --name init", type: "from workspace root", desc: "Initializes tooling, creates the first migration from schema.prisma, applies it to Postgres." },
+    { name: "netscript db generate", type: "from workspace root", desc: "Generates the Deno-runtime Prisma client + zod schemas into .generated. Re-run after every schema edit." },
+    { name: "netscript db seed", type: "from workspace root", desc: "Runs database/postgres/scripts/seed.ts to populate baseline rows." },
+    { name: "netscript db status", type: "from workspace root", desc: "Reports which migrations are applied and whether the database is in sync — the authoritative verification." },
+  ],
+}) }}
 
 ## Before you start
 
-{{ comp.apiTable({ caption: "Prerequisites", rows: [ { name: "NetScript workspace", type: "netscript
-init …", desc: "A workspace scaffolded with a database. This recipe uses --db postgres (the
-recommended default), which lays down database/postgres/ with a Prisma schema, prisma.config.ts, and
-seed scripts. Swap --db postgres for mysql, mssql, or sqlite for a different engine — the workflow
-is the same, only the database/<engine>/ directory differs." }, { name: "netscript CLI", type: "on
-PATH", desc: "Install with deno install --global --allow-all --name netscript jsr:@netscript/cli" +
-releaseSpecifier + " — then netscript --help should print." }, { name: "Aspire CLI", type: "aspire",
-desc: "Used to provision Postgres and Redis as containers via Docker. Confirm with aspire --version.
-Docker/Podman must be running." }, { name: "Deno", type: "2.x", desc: "deno --version. Prisma
-generation runs under the Deno runtime (the schema sets runtime=\"deno\")." } ] }) }}
+{{ comp.apiTable({
+  caption: "Prerequisites",
+  rows: [
+    { name: "NetScript workspace", type: "netscript init …", desc: "A workspace scaffolded with a database. This recipe uses --db postgres (the recommended default), which lays down database/postgres/ with a Prisma schema, prisma.config.ts, and seed scripts. Swap --db postgres for mysql, mssql, or sqlite for a different engine — the workflow is the same, only the database/<engine>/ directory differs." },
+    { name: "netscript CLI", type: "on PATH", desc: "Install with deno install --global --allow-all --name netscript jsr:@netscript/cli" + releaseSpecifier + " — then netscript --help should print." },
+    { name: "Aspire CLI", type: "aspire", desc: "Used to provision Postgres and Redis as containers via Docker. Confirm with aspire --version. Docker/Podman must be running." },
+    { name: "Deno", type: "2.x", desc: "deno --version. Prisma generation runs under the Deno runtime (the schema sets runtime=\"deno\")." },
+  ],
+}) }}
 
 If you scaffolded with `--no-aspire`, you are responsible for pointing the workspace at your own
 Postgres via `POSTGRES_URI` / `DATABASE_URL` (see [Deploy](/orchestration-runtime/how-to/deploy/));
@@ -145,8 +144,7 @@ Postgres install required. When it settles you'll have:
   `workers`, `sagas-api`, `sagas`, `triggers-api`, `triggers`). If you also scaffolded auth and
   streams, you'll see `auth-api` and the streams service join the graph on their assigned ports.
 
-{{ comp callout { type: "warning", title: "If db commands report that the resident AppHost is
-stopped" } }} That error means the AppHost is not running, or you ran the <code>db</code> command
+{{ comp callout { type: "warning", title: "If db commands report that the resident AppHost is stopped" } }} That error means the AppHost is not running, or you ran the <code>db</code> command
 from a directory where Aspire can't find <code>aspire/apphost.mts</code>. Fix: start
 <code>aspire start</code> from the <code>aspire/</code> folder <strong>first</strong>, keep it
 running, and run the <code>netscript db</code> commands from the <strong>workspace root</strong> in
@@ -158,15 +156,14 @@ Open a **second terminal** at the workspace root (keep `aspire start` going in t
 commands address the already-running Postgres through an explicit resident AppHost resource; they do
 not create a parallel AppHost or database container. Run the workflow in order:
 
-{{ comp.tabbedCode({ tabs: [ { label: "1 · init", lang: "bash", code: "# Create the first migration
-from the current Prisma schema and apply it.\n# --name labels the migration directory (here: a
-migration called \"init\").\nnetscript db init --name init" }, { label: "2 · generate", lang:
-"bash", code: "# Generate the Deno-runtime Prisma client (and the zod schemas) into\n#
-database/postgres/schema/.generated so your code can import typed models.\nnetscript db generate" },
-{ label: "3 · seed", lang: "bash", code: "# Run the workspace seed scripts
-(database/postgres/scripts/seed.ts)\n# to populate baseline rows.\nnetscript db seed" }, { label: "4
-· status", lang: "bash", code: "# Show migration / tooling status: which migrations are applied
-and\n# whether the database is in sync with the schema.\nnetscript db status" } ] }) }}
+{{ comp.tabbedCode({
+  tabs: [
+    { label: "1 · init", lang: "bash", code: ["# Create the first migration from the current Prisma schema and apply it.", "# --name labels the migration directory (here: a migration called \"init\").", "netscript db init --name init"].join("\n") },
+    { label: "2 · generate", lang: "bash", code: ["# Generate the Deno-runtime Prisma client (and the zod schemas) into", "# database/postgres/schema/.generated so your code can import typed models.", "netscript db generate"].join("\n") },
+    { label: "3 · seed", lang: "bash", code: ["# Run the workspace seed scripts (database/postgres/scripts/seed.ts)", "# to populate baseline rows.", "netscript db seed"].join("\n") },
+    { label: "4 · status", lang: "bash", code: ["# Show migration / tooling status: which migrations are applied and", "# whether the database is in sync with the schema.", "netscript db status"].join("\n") },
+  ],
+}) }}
 
 What each step does, in plain terms:
 
@@ -231,24 +228,14 @@ workspace stands on.
 
 ## See also
 
-{{ comp.card({ title: "Reference — database", body: "The full generated @netscript/database API:
-schema helpers, the Prisma adapter surface, and migration tooling.", href: "/reference/database/",
-icon: "≡" }) }}
+{{ comp.card({ title: "Reference — database", body: "The full generated @netscript/database API: schema helpers, the Prisma adapter surface, and migration tooling.", href: "/reference/database/", icon: "≡" }) }}
 
-{{ comp.card({ title: "Capability — Database & Prisma", body: "How NetScript wires Prisma 7 +
-Postgres, per-plugin schema aggregation, and the appsettings-driven datasource.", href:
-"/capabilities/database/", icon: "◎" }) }}
+{{ comp.card({ title: "Capability — Database & Prisma", body: "How NetScript wires Prisma 7 + Postgres, per-plugin schema aggregation, and the appsettings-driven datasource.", href: "/capabilities/database/", icon: "◎" }) }}
 
-{{ comp.card({ title: "Orchestration with Aspire", body: "Why the AppHost (aspire/apphost.mts)
-provisions Postgres and Redis, and how the resource graph fits together.", href:
-"/explanation/aspire/", icon: "◆" }) }}
+{{ comp.card({ title: "Orchestration with Aspire", body: "Why the AppHost (aspire/apphost.mts) provisions Postgres and Redis, and how the resource graph fits together.", href: "/explanation/aspire/", icon: "◆" }) }}
 
-{{ comp.card({ title: "Queue / KV / cron", body: "The next recipe: use the KV and queue backends —
-including the PostgreSQL queue provider that shares this datasource.", href:
-"/data-persistence/how-to/queue-kv-cron/", icon: "→" }) }}
+{{ comp.card({ title: "Queue / KV / cron", body: "The next recipe: use the KV and queue backends — including the PostgreSQL queue provider that shares this datasource.", href: "/data-persistence/how-to/queue-kv-cron/", icon: "→" }) }}
 
-{{ comp.card({ title: "Deploy without Aspire", body: "Point the workspace at your own Postgres via
-POSTGRES_URI / DATABASE_URL using the --no-aspire escape hatch.", href:
-"/orchestration-runtime/how-to/deploy/", icon: "→" }) }}
+{{ comp.card({ title: "Deploy without Aspire", body: "Point the workspace at your own Postgres via POSTGRES_URI / DATABASE_URL using the --no-aspire escape hatch.", href: "/orchestration-runtime/how-to/deploy/", icon: "→" }) }}
 
 For the MySQL adapter surface, see [`prisma-adapter-mysql`](/reference/prisma-adapter-mysql/).

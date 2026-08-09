@@ -335,6 +335,27 @@ h4 {
   gap: var(--ns-space-2);
 }
 
+.ns-destination-list ul {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ns-space-2) var(--ns-space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ns-destination-list li {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ns-space-3);
+}
+
+.ns-destination-list li:not(:last-child)::after {
+  color: var(--ns-muted-fg);
+  content: "·";
+}
+
 .ns-badge {
   display: inline-flex;
   align-items: center;

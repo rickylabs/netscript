@@ -18,13 +18,17 @@ generated, prove it does real work over its OpenAPI projection, and make one del
 turning a not-found into a typed `404`. By the end you will have seen NetScript's central idea on
 your own data: **the contract is the single source of truth**.
 
-{{ comp.learningPath({ steps: [ { label: "1 · Scaffold", href: "/tutorials/storefront/01-scaffold/"
-}, { label: "2 · Catalog service", href: "/tutorials/storefront/02-catalog-service/" }, { label: "3
-· Cart contracts", href: "/tutorials/storefront/03-cart-contracts/" }, { label: "4 · Checkout saga",
-href: "/tutorials/storefront/04-checkout-saga/" }, { label: "5 · Shipping webhook", href:
-"/tutorials/storefront/05-shipping-webhook/" }, { label: "6 · Storefront UI", href:
-"/tutorials/storefront/06-storefront-ui/" }, { label: "7 · Deploy", href:
-"/tutorials/storefront/07-deploy/" } ] }) }}
+{{ comp.learningPath({
+  steps: [
+    { label: "1 · Scaffold", href: "/tutorials/storefront/01-scaffold/" },
+    { label: "2 · Catalog service", href: "/tutorials/storefront/02-catalog-service/" },
+    { label: "3 · Cart contracts", href: "/tutorials/storefront/03-cart-contracts/" },
+    { label: "4 · Checkout saga", href: "/tutorials/storefront/04-checkout-saga/" },
+    { label: "5 · Shipping webhook", href: "/tutorials/storefront/05-shipping-webhook/" },
+    { label: "6 · Storefront UI", href: "/tutorials/storefront/06-storefront-ui/" },
+    { label: "7 · Deploy", href: "/tutorials/storefront/07-deploy/" },
+  ],
+}) }}
 
 ## What you will build
 
@@ -290,12 +294,14 @@ need to control middleware order, attach auth, or run startup hooks — the
 [services capability](/services-sdk/services/) compares them — but `defineService` covers a typical
 catalog. It exposes the same surface on port **3001**:
 
-{{ comp.apiTable({ caption: "products service endpoints (port 3001)", rows: [ { name: "/api/rpc/*",
-type: "POST", desc: "The typed oRPC surface. A typed client calls procedures (v1.products.list)
-under this prefix with end-to-end type safety." }, { name: "/api/products", type: "GET / POST",
-desc: "The OpenAPI/REST projection: GET lists (paginated), POST creates. getById/update/delete live
-at /api/products/{id}." }, { name: "/health", type: "GET", desc: "Liveness probe — the plain JSON
-health check you hit in chapter 1." } ] }) }}
+{{ comp.apiTable({
+  caption: "products service endpoints (port 3001)",
+  rows: [
+    { name: "/api/rpc/*", type: "POST", desc: "The typed oRPC surface. A typed client calls procedures (v1.products.list) under this prefix with end-to-end type safety." },
+    { name: "/api/products", type: "GET / POST", desc: "The OpenAPI/REST projection: GET lists (paginated), POST creates. getById/update/delete live at /api/products/{id}." },
+    { name: "/health", type: "GET", desc: "Liveness probe — the plain JSON health check you hit in chapter 1." },
+  ],
+}) }}
 
 ## Verify your progress
 
