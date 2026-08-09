@@ -12,7 +12,7 @@ truthfully authorize `record_drift`.
 
 ## Slices
 
-- [x] S0 Research, design, exact live acceptance, and PLAN-EVAL request
+- [x] S0 Research, design, exact live acceptance, and PLAN-EVAL cycle-1 repair
 - [ ] S1 RED tests with recorded expected failure
 - [ ] S2 MCP execution-identity contract and standalone policy
 - [ ] S3 minimal CLI host re-entry composition
@@ -27,13 +27,14 @@ truthfully authorize `record_drift`.
 
 ## Harness
 
-- Run dir: `.llm/runs/release-0.0.5--orchestration/slices/w3-b-1376/`
+- Run dir: `.llm/runs/release-0.0.5--orchestration/slices/w3-b3-1376/`
 - Phase: `plan-eval`
 - Do not merge until separate-session PLAN-EVAL and IMPL-EVAL pass and every acceptance row has evidence.
 
 ## Drift / Debt
 
-- Slice directory was absent at baseline and is created by S0; no architecture debt accepted.
+- PLAN-EVAL cycle 1 corrected a slice-path error and a false version-equality authority claim; no
+  architecture debt accepted.
 
 ## Definition of Done
 

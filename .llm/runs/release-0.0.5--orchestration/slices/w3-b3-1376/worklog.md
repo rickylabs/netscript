@@ -23,7 +23,8 @@
 
 ### Commit slices
 
-See the ordered S0–S5 table in `plan.md`. Every implementation file must trace to the identity,
+See the ordered S0–S5 table in `plan.md`. S1 distinguishes its compile-time and behavioral REDs;
+every implementation file must trace to the identity,
 receipt, schema, host composition, test, or published-contract concepts named there.
 
 ### Deferred scope
@@ -44,8 +45,9 @@ mirror standalone, host, success, failure, and denial modes.
 | Bootstrap | `deno task agentic:gh-token check` | 0 | GitHub identity resolved as `rickylabs`; token not printed. |
 | Baseline | ground-truth git status/log | 0 | clean branch at `aa8e151e6`. |
 | Research | live GitHub issue search for #1376 | 0 | ten acceptance rows and boundaries copied verbatim into plan. |
+| PLAN-EVAL cycle 1 | separate Claude · Fable 5 evaluation | 1 (`FAIL_PLAN`) | F1 false equality authority blocked; F2–F4 required path, RED-class, and denial-policy corrections. One cycle remains. |
 
 ## Phase status
 
-`PLAN-EVAL: REQUESTED`. Product implementation is prohibited until a separate Claude · Fable 5
-session writes `plan-eval.md` with `PASS`.
+`PLAN-EVAL: FAIL_PLAN cycle 1 repaired; RE-EVALUATION REQUESTED`. Product implementation remains
+prohibited until a fresh separate Claude · Fable 5 session writes `plan-eval.md` with `PASS`.

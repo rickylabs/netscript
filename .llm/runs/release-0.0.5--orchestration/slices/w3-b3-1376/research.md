@@ -30,10 +30,14 @@
   root injects the host adapter; A14 tests and publish gates preserve the contract.
 - JSR risk: changes to exported result/option types require explicit annotations, JSDoc, full
   export-map doc lint, and publish dry-run. No dependency or export-map change is planned.
-- Standalone policy: `deno x jsr:@netscript/mcp/cli` has no host CLI. It intentionally keeps the
-  pinned published CLI command derived from `MCP_PACKAGE_VERSION`; publish-assets generation must
-  continue to prove CLI/MCP release-version equality. The identity is surfaced as `standalone`, so
-  the fallback is visible rather than accidental.
+- Standalone policy: `deno x jsr:@netscript/mcp/cli` has no host CLI. It intentionally selects the
+  published CLI compatibility version equal to `MCP_PACKAGE_VERSION`, even if CLI and MCP package
+  versions are independently changed in the future. The identity is surfaced as `standalone`, so
+  this MCP-owned compatibility choice is visible rather than accidental.
+- `generate-publish-assets.ts` reads the CLI and MCP manifests independently and asserts no
+  equality. Versions agree in current releases because `.llm/tools/deps/bump-version.ts` rewrites
+  every workspace manifest together and release readiness runs the `lockstep-residue` audit. That
+  release mechanism is contextual evidence, not a runtime or generation equality guarantee.
 
 ## Scope boundary
 
@@ -45,7 +49,16 @@ published consumer contract; it will not alter corpus wiring.
 
 ## Baseline proof strategy
 
-The decisive RED is behavioral: construct the CLI-hosted MCP options with a deliberately different
-host version/entrypoint identity, call `list_commands` and `execute_command`, and assert the result
-uses that host identity with no MCP-pinned JSR command. The test must fail on this baseline and its
-raw command/exit code must be recorded in `worklog.md` before product implementation.
+S1 contains two explicitly different RED classes:
+
+- **Compile-time RED:** the mismatched-version host test names the planned execution-identity input
+  and output fields. On the baseline those types/fields do not exist, so targeted type-check must
+  fail before the product contract is added. After S2 compiles, the test becomes the decisive
+  behavioral proof in S3 by executing a temporary host entrypoint with a deliberately different
+  version and observing that identity in both tools.
+- **Behavioral RED:** the existing types suffice to execute an allowed command and then call
+  `record_drift`. On the baseline `execute_command` is unwrapped, so no receipt exists and drift is
+  refused. The same behavioral fixture also proves denial/failure overwrite behavior after S4.
+
+Each raw command, exit code, and expected failure reason is recorded in `worklog.md` before product
+implementation. Standalone fallback is a baseline characterization test, not mislabeled as RED.

@@ -4,7 +4,7 @@
 
 | Field | Value |
 | --- | --- |
-| Run | `release-0.0.5--orchestration/slices/w3-b-1376` |
+| Run | `release-0.0.5--orchestration/slices/w3-b3-1376` |
 | Branch | `fix/mcp-execute-command-host-cli` |
 | Archetype | `6 — CLI/Tooling` |
 | Phase | `plan-eval` |
@@ -41,16 +41,24 @@ exit status so a successful allowed execution can truthfully authorize `record_d
    `[Deno.execPath()]`; script/global-install mode is
    `[Deno.execPath(), "run", "-A", Deno.mainModule]`. Inject `CLI_PACKAGE_VERSION`. No JSR
    specifier is constructed in this mode.
-3. Standalone MCP keeps `DEFAULT_CLI_COMMAND` pinned to
-   `jsr:@netscript/cli@${MCP_PACKAGE_VERSION}` and reports mode `standalone`, that command, and that
-   version. Existing publish-assets generation remains the release-equality authority.
+3. Standalone MCP is **explicitly decoupled from host CLI identity**: it keeps
+   `DEFAULT_CLI_COMMAND` pinned to `jsr:@netscript/cli@${MCP_PACKAGE_VERSION}` and reports mode
+   `standalone`, that command, and that version. This is an MCP-owned compatibility policy: absent a
+   host, the MCP package selects the CLI version it was released to drive. It does not claim that
+   publish-asset generation asserts CLI/MCP equality. Current release manifests are kept in
+   lockstep by `.llm/tools/deps/bump-version.ts` plus the release-readiness `lockstep-residue`
+   audit. S2 owns the executable policy in
+   `packages/mcp/src/infrastructure/spawn-command-executor.ts` and
+   `packages/mcp/tests/command_adapters_test.ts`; S4 owns its consumer documentation in
+   `packages/mcp/README.md`.
 4. Extend the published command result schemas rather than encode identity in output text.
    `list_commands` returns identity beside descriptors; every allowed `execute_command` result
    returns identity beside exit evidence.
 5. Add optional `resource` to `execute_command`; default it to `project`. Receipt status is `0` only
    when policy permits execution and the child exits zero. Policy denial, timeout, thrown adapter
-   failure, and non-zero child exit write status `1`. A denial may write a failure receipt, but can
-   never write or preserve a success receipt that authorizes drift.
+   failure, and non-zero child exit **always write status `1` for the named resource**, overwriting
+   any earlier success. A denial therefore writes a failure receipt and can never preserve a
+   success receipt that authorizes drift.
 6. `list_commands` is explicitly receipt-exempt in code/README because enumeration is not a
    diagnostic of a project resource. `execute_command` is receipt-wrapped with command-specific
    exit semantics.
@@ -64,10 +72,10 @@ exit status so a successful allowed execution can truthfully authorize `record_d
 | Slice | Files | Change | Proving gate |
 | --- | --- | --- | --- |
 | S0 Plan | slice artifacts, draft PR | Research, design, exact acceptance, boundaries | separate PLAN-EVAL PASS |
-| S1 RED | CLI/MCP focused tests only | Add mismatched-version host identity, standalone fallback, and receipt authorization/denial tests; run before source change | named focused tests fail for the expected identity/receipt reasons; raw exit recorded |
-| S2 Identity contract | MCP executor port/adapter, list/execute flows, tool contracts, MCP composition, focused tests | One published execution identity and truthful standalone behavior | focused MCP tests + full MCP export-map doc lint |
+| S1 RED | `packages/cli/src/public/features/agent/mcp/cli-mcp-adapters_test.ts`; `packages/mcp/tests/drift-evidence_test.ts`; `packages/mcp/tests/command_adapters_test.ts` | Add a **compile-time RED** for planned mismatched host identity fields and a **behavioral RED** for execute→drift refusal; add standalone fallback as baseline characterization | targeted type-check fails on missing identity contract; receipt test runs and fails on missing evidence; raw exits/reasons recorded separately |
+| S2 Identity contract | `packages/mcp/src/domain/command-executor-port.ts`; `packages/mcp/src/infrastructure/spawn-command-executor.ts`; list/execute flows; tool contracts; `packages/mcp/cli.ts`; `packages/mcp/tests/command_adapters_test.ts` and composition tests | One published execution identity; explicitly MCP-version-selected standalone policy | focused MCP tests + full MCP export-map doc lint |
 | S3 Host composition | `run-agent-mcp.ts` minimal executor/version injection and CLI-hosted tests | Re-enter compiled or script host with `CLI_PACKAGE_VERSION`; no JSR command | decisive mismatched-version CLI-hosted test passes |
-| S4 Receipts and docs | MCP receipt composition, refusal text/tests, `packages/mcp/README.md` | Exit-aware resource receipts; list exemption; hosting policy documentation | success/failure/denial → `record_drift` focused tests |
+| S4 Receipts and docs | `packages/mcp/cli.ts`; `packages/mcp/tests/drift-evidence_test.ts`; `packages/mcp/tests/command_flows_test.ts`; `packages/mcp/src/application/flows/record-drift-flow.ts`; `packages/mcp/README.md` | Exit-aware resource receipts; denial always overwrites with failure; list exemption; explicitly decoupled standalone hosting policy documentation | success/failure/denial → `record_drift` focused tests |
 | S5 Gates | run artifacts only unless a reviewed fix is required | Scoped and release-readiness evidence; request serialized runtime token | all named gates green; `EXPENSIVE-GATE-REQUEST` recorded, no runtime start before grant |
 
 ## Risk register
