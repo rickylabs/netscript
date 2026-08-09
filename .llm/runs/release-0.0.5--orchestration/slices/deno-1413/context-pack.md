@@ -5,7 +5,8 @@
 Tier-D implementation and all owner-required gates are complete on
 `chore/deno-2-9-5-toolchain`, based on
 `origin/main@399f60185d5d01ae68764a8f48d1f716ca3a51aa`. Exact scratch RED/GREEN proof is preserved in
-`red-green-proof.md`. Commit/push/draft PR remain before orchestrator handback.
+`red-green-proof.md`. Draft PR [#1414](https://github.com/rickylabs/netscript/pull/1414) is open at
+`9121b3f5d364190ee9ca121f734b7291ca589fd1`; the current phase is `impl-eval` handoff.
 
 ## Completed
 
@@ -17,16 +18,18 @@ Tier-D implementation and all owner-required gates are complete on
 - Updated 21 `.github` pins, scaffold constant/derived consumers, and toolchain skill/mirror.
 - Proved 2.9.3 exit 1 and 2.9.5 exit 0 with exact canary write.
 - All owner-required gates green; no lockfile changed.
+- Implementation/evidence committed and pushed with the explicit refspec.
+- Draft PR #1414 opened against `main`, milestone 0.0.5, with exactly one `status:impl-eval` and
+  the required taxonomy; issue #1413 reconciled to the same phase.
 
 ## In progress
 
-- Commit, explicit-refspec push, draft PR creation/metadata, and implementation phase comment.
+- None in this Tier-D lane. Awaiting milestone-orchestrator separate-session IMPL-EVAL.
 
 ## Next steps
 
-1. Commit and push with the explicit owner refspec.
-2. Open the draft PR, set milestone/taxonomy, post implementation evidence, then hand back for
-   separate-session IMPL-EVAL/CI/merge.
+1. Milestone orchestrator launches mandatory separate-session IMPL-EVAL at the final head.
+2. Orchestrator completes CI/close-gate evidence and merges only after evaluator PASS.
 
 ## Key decisions
 
