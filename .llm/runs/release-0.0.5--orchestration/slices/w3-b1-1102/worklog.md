@@ -339,3 +339,16 @@ EXPENSIVE-GATE-REQUEST
 
 All non-Aspire gates above are complete. Request a durable ledger grant before the one allowed
 `deno task e2e:cli run scaffold.runtime --cleanup --format pretty`, bracketed by leak checks.
+
+## 2026-08-09 — Publish-gate manifest forensics after S5 push
+
+- Timing correction: S5 had already committed as `93fd65adf` before the orchestrator's stop message
+  reached this thread. Direct commit inspection proves it contains zero `deno.json` paths, and the
+  branch worktree was clean at the start of this forensic pass.
+- Reproduced the exact root `deno task publish:dry-run` in a detached `/tmp` worktree at the S5
+  head. While `deno publish` ran, all 19 named package/plugin manifests were modified; after the
+  wrapper reached `Success Dry run complete`, its `finally` restored all 19 and status was empty.
+- Opened the producer: `publish-workspace.ts:38-46` performs live snapshot/materialize/write and
+  lines 87-90 restore. This proves the command and mechanism rather than inferring from sequence.
+- Removed the owned detached scratch worktree after evidence collection. No AppHost, container,
+  Aspire command, or runtime E2E ran. The serialized token request remains pending.

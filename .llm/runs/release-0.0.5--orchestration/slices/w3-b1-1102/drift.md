@@ -217,3 +217,31 @@ Drift is append-only.
 - **Action:** restored only the proven gate-created, unstaged manifest churn with `apply_patch`,
   verified every affected path plus `deno.lock` has no diff, and retained the raw exit-0 publish
   evidence. No dependency or manifest change belongs to #1102.
+
+## 2026-08-09 — Forensic correction: root publish materializes all 19 manifests transiently
+
+- **Exact gate:** `deno task publish:dry-run` from the repository root, which invokes
+  `.llm/tools/release/run-publish-dry-run.ts` → `publishWorkspace({ mode: 'dry-run' })`.
+- **Mechanism opened in source:** `publish-workspace.ts:38-46` snapshots each publishable member,
+  expands `catalog:` imports, and writes normalized JSON into the live worktree before spawning
+  `deno publish`; lines 87-90 restore snapshots only when the wrapper reaches `finally`.
+- **Isolated reproduction:** a detached worktree at `93fd65adf` showed these exact 19 modified paths
+  while the root gate was running:
+  `packages/aspire/deno.json`, `packages/cli/deno.json`, `packages/config/deno.json`,
+  `packages/contracts/deno.json`, `packages/fresh/deno.json`, `packages/mcp/deno.json`,
+  `packages/plugin-ai-core/deno.json`, `packages/plugin-auth-core/deno.json`,
+  `packages/plugin-sagas-core/deno.json`, `packages/plugin-triggers-core/deno.json`,
+  `packages/plugin-workers-core/deno.json`, `packages/plugin/deno.json`,
+  `packages/queue/deno.json`, `packages/service/deno.json`, `plugins/auth/deno.json`,
+  `plugins/sagas/deno.json`, `plugins/streams/deno.json`, `plugins/triggers/deno.json`, and
+  `plugins/workers/deno.json`.
+- **Catalog defect:** 18 paths temporarily replace centralized `"zod": "catalog:"` with
+  `"zod": "npm:zod@^4.4.3"`; `packages/mcp/deno.json` is reserialized even though it has no Zod
+  catalog import. A concurrent reader, overlapping invocation, or interrupted process can observe
+  or preserve this materialized state.
+- **Completion behavior:** the isolated command reached `Success Dry run complete`; after its
+  `finally`, both `git status --porcelain` and `git diff --name-only -- '**/deno.json'` were empty.
+  The S5 commit was likewise inspected and contains no manifest change. The earlier entry's split
+  attribution to package versus root dry-runs is superseded by this exact reproduction.
+- **Action:** keep the gate mandatory, never commit its transient materialization, and verify the
+  manifest diff is empty after every run until the orchestrator files and lands a tooling repair.
