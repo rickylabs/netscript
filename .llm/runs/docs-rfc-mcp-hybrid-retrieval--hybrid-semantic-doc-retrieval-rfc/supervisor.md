@@ -6,7 +6,7 @@ single-author RFC run; no implementation or evaluator session is launched from t
 | Field | Requested | Observed |
 | --- | --- | --- |
 | Provider / model / effort | OpenAI Codex · GPT-5.6 Sol · `xhigh` | `gpt-5.6-sol` · `xhigh` |
-| Session / thread | Native daemon-attached, mobile-visible Codex thread | `019fe54e-78aa-75c2-bb5e-9a2a6cebd1b0` |
+| Session / thread | Native daemon-attached, mobile-visible Codex thread | `019fe54e-78aa-75c2-bb5e-9a2a6cebd1b0`; mobile visibility pending owner confirmation |
 | Access | bypass / full access | `approval_policy=never`; `sandbox_mode=danger-full-access` from launch contract |
 | Host | native WSL host | `YogaBook9i` · Linux user `codex` |
 | Checkout | `/home/codex/repos/ns-rfc-mcp-hybrid-retrieval` | same |
@@ -22,12 +22,18 @@ single-author RFC run; no implementation or evaluator session is launched from t
   for the worktree, state `working`, model `gpt-5.6-sol`, and effort `xhigh`.
 - Read-only process inspection showed the managed command
   `/home/codex/.codex/packages/standalone/current/codex app-server --remote-control --listen unix://`.
-- The installed Codex CLI is `0.147.0`; app-server is `0.146.1`. Its attempted read-only
-  `codex remote-control status --json` surface is not present, so the managed daemon status,
-  `--remote-control` process flag, launch-thread observation, and owner-visible active thread are
-  the retained attachment proof. No restart or second `send-message-v2` was issued.
+- The installed Codex CLI is `0.147.0`; app-server is `0.146.1`. The launch protocol/session
+  metadata reported **remote control disabled**, despite the daemon process carrying the
+  `--remote-control` capability flag. The CLI also has no read-only
+  `codex remote-control status --json` surface. Therefore the concrete thread identity and
+  capability flag are proven, but mobile visibility and successful same-thread steering remain
+  **pending owner confirmation**. This distinction supersedes the optimistic activation wording.
+  Per the recovery instruction, no daemon repair/restart, competing thread, or second writer was
+  created.
 - Same-thread steering command (from the repo-native agentic suite):
   `deno task agentic:codex-resume --thread-id 019fe54e-78aa-75c2-bb5e-9a2a6cebd1b0 --message "<follow-up>"`.
+  This is the mobile-visible steering command to use after the owner confirms transport; it has not
+  been claimed as successfully exercised in this run.
 
 ## Routes in force
 
