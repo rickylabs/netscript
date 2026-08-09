@@ -16,7 +16,26 @@ never `deno outdated --latest` for "latest" (see the trap below). This skill is 
 home** for the command map and the gotchas; other skills (e.g. `netscript-tools`) cross-reference
 here rather than restate them.
 
-Repo is on **Deno 2.9.0** (Windows + WSL). Targeted `deno check` must pass `--unstable-kv`.
+Repo is on **Deno 2.9.5** (Windows + WSL). Targeted `deno check` must pass `--unstable-kv`.
+
+## Fresh explicit prereleases
+
+Deno's default 24-hour dependency-age policy can block a freshly published explicit prerelease.
+For the release-verification path that deliberately consumes a just-published canary, use the exact
+version with a narrowly scoped bypass:
+
+```bash
+deno add --minimum-dependency-age=0 jsr:@netscript/service@0.0.5-canary.17
+```
+
+Deno 2.9.3 rejects `--minimum-dependency-age`; denoland/deno PR #36099 (commit `5dd39c7458`)
+fixed the flag in 2.9.4, and the fix is included in 2.9.5. On 2.9.5 the command above writes the
+exact prerelease. Do not add the bypass broadly: it intentionally overrides the age policy only
+where release verification must install an artifact published moments earlier.
+
+JSR does **not** provide an `@canary` tag. `jsr:@netscript/service@canary` still fails on Deno
+2.9.5, so release docs and automation must retain an explicit `releaseSpecifier` / exact canary
+version.
 
 ## The one trap that matters
 

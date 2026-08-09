@@ -114,7 +114,7 @@ jobs:
       - name: Setup Deno
         uses: denoland/setup-deno@v2
         with:
-          deno-version: "2.9.0"
+          deno-version: "2.9.5"
 
       - name: Self-check the classifier
         run: >-
@@ -211,7 +211,7 @@ jobs:
         if: env.RUN == 'true'
         uses: denoland/setup-deno@v2
         with:
-          deno-version: "2.9.0"
+          deno-version: "2.9.5"
 
       - name: Install workspace dependencies
         if: env.RUN == 'true'
@@ -270,7 +270,7 @@ jobs:
         if: env.RUN == 'true'
         uses: denoland/setup-deno@v2
         with:
-          deno-version: "2.9.0"
+          deno-version: "2.9.5"
 
       - name: Setup .NET
         if: env.RUN == 'true'
@@ -361,7 +361,7 @@ jobs:
         if: env.RUN == 'true'
         uses: denoland/setup-deno@v2
         with:
-          deno-version: "2.9.0"
+          deno-version: "2.9.5"
 
       - name: Setup .NET
         if: env.RUN == 'true'
@@ -451,7 +451,7 @@ jobs:
         if: env.RUN == 'true'
         uses: denoland/setup-deno@v2
         with:
-          deno-version: "2.9.0"
+          deno-version: "2.9.5"
 
       - name: Install native packaging and desktop prerequisites
         if: env.RUN == 'true'

@@ -10,6 +10,7 @@
 
 import { toPascalCase } from '@std/text';
 import type { DbEngineChoice } from '../../domain/db-engine.ts';
+import { SCAFFOLD_DEFAULTS } from '../../constants/scaffold/scaffold-defaults.ts';
 
 /** Options for generating the project root `README.md`. */
 export interface ReadmeOptions {
@@ -164,7 +165,7 @@ export function generateReadme(options: ReadmeOptions): string {
   lines.push('## Windows dependency recovery');
   lines.push('');
   lines.push(
-    'The scaffold pins Deno 2.9.0 because an upstream Windows defect can leave ' +
+    `The scaffold pins Deno ${SCAFFOLD_DEFAULTS.DENO_VERSION} because an upstream Windows defect can leave ` +
       '`node_modules/.deno` incomplete even when the shared npm cache is intact. The generated ' +
       '`deps:verify` preflight stops before Vite and reports every missing file.',
   );
@@ -180,7 +181,7 @@ export function generateReadme(options: ReadmeOptions): string {
   lines.push('```');
   lines.push('');
   lines.push(
-    'If the failure recurs, use Deno 2.9.0 and follow ' +
+    `If the failure recurs, use Deno ${SCAFFOLD_DEFAULTS.DENO_VERSION} and follow ` +
       '[deno/deno#35804](https://github.com/denoland/deno/issues/35804).',
   );
   lines.push('');

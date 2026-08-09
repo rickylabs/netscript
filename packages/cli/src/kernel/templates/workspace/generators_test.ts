@@ -7,6 +7,7 @@
 import { assert, assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
 import { DEFAULT_TEMPLATE_REGISTRY } from '../../application/registries/template-registry.ts';
 import { SCAFFOLD_WORKSPACE_CATALOG } from '../../constants/scaffold/scaffold-app-catalog.ts';
+import { SCAFFOLD_DEFAULTS } from '../../constants/scaffold/scaffold-defaults.ts';
 import { SCAFFOLD_JSR_RELEASE_PACKAGES } from '../../constants/scaffold/scaffold-workspace-packages.ts';
 import { netscriptJsrSpecifier } from '../../constants/jsr-specifiers.ts';
 import { generateAppTsConfig } from '../../adapters/templates/app/generate-app-tsconfig.ts';
@@ -119,7 +120,7 @@ Deno.test('generateDenoJson gives standalone workspaces their own Zod catalog', 
 Deno.test('generatePackageJson pins the pre-window Deno runtime', () => {
   assertEquals(JSON.parse(generatePackageJson()), {
     private: true,
-    engines: { deno: '2.9.0' },
+    engines: { deno: SCAFFOLD_DEFAULTS.DENO_VERSION },
   });
 });
 
@@ -373,7 +374,7 @@ Deno.test('generateReadme — TS AppHost with service + postgres', () => {
   assertStringIncludes(md, 'deno task aspire:start');
   assertStringIncludes(md, 'deno install');
   assertStringIncludes(md, 'deno task deps:verify');
-  assertStringIncludes(md, 'Deno 2.9.0');
+  assertStringIncludes(md, `Deno ${SCAFFOLD_DEFAULTS.DENO_VERSION}`);
   assertStringIncludes(md, 'deno/deno#35804');
   assertStringIncludes(md, 'ASPIRE_CLI_START_TIMEOUT');
   assertStringIncludes(md, '300 seconds');
