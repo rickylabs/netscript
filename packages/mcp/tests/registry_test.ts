@@ -1,4 +1,4 @@
-import { assert, assertEquals, assertMatch } from '@std/assert';
+import { assert, assertEquals, assertMatch, assertThrows } from '@std/assert';
 import { createToolRegistry, TOOL_INPUT_SCHEMAS, TOOL_NAMES, TOOL_OUTPUT_SCHEMAS } from '../mod.ts';
 import { validateSchema } from '../src/domain/schema.ts';
 
@@ -13,6 +13,39 @@ Deno.test('registry enumerates the complete v1 contract surface', () => {
     assertEquals(tool.outputSchema.jsonSchema.type, 'object');
     assertMatch(tool.description, /bounded summary/);
   }
+});
+
+Deno.test('list_docs output schema requires observable corpus health metadata', () => {
+  const schema = TOOL_OUTPUT_SCHEMAS.list_docs.jsonSchema as {
+    readonly required?: readonly string[];
+    readonly properties?: Readonly<Record<string, unknown>>;
+  };
+  assert(schema.required?.includes('corpus'));
+  assertEquals(schema.properties?.corpus, {
+    type: 'object',
+    properties: {
+      kind: { enum: ['filesystem', 'embedded'] },
+      root: { type: ['string', 'null'] },
+      documentCount: { type: 'integer' },
+    },
+    required: ['kind', 'root', 'documentCount'],
+    additionalProperties: false,
+  });
+  const base = { count: 0, docs: [], corpus: { kind: 'embedded', documentCount: 6 } };
+  validateSchema(TOOL_OUTPUT_SCHEMAS.list_docs, {
+    ...base,
+    corpus: { ...base.corpus, root: null },
+  });
+  validateSchema(TOOL_OUTPUT_SCHEMAS.list_docs, {
+    ...base,
+    corpus: { ...base.corpus, kind: 'filesystem', root: '/project/.netscript/docs' },
+  });
+  assertThrows(() =>
+    validateSchema(TOOL_OUTPUT_SCHEMAS.list_docs, {
+      ...base,
+      corpus: { ...base.corpus, root: 42 },
+    })
+  );
 });
 
 Deno.test('contracts reject malformed required fields, types, bounds, and extra keys', () => {

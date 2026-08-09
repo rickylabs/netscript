@@ -68,7 +68,7 @@ input caps the result count server-side before truncation applies.
 | `analyze_db_bottlenecks`      | `service`, `sinceUnixMs`, `limit`                     | `sinceUnixMs`, `sampleCount`, `operations`                                                                                                                        |
 | `doctor`                      | `endpoint`                                            | `status`, `endpoint`, `counts`, `checks`, `families`                                                                                                              |
 | `search_docs`                 | **`query`**, `limit`                                  | `count`, `matches`                                                                                                                                                |
-| `list_docs`                   | `limit`                                               | `count`, `docs`                                                                                                                                                   |
+| `list_docs`                   | `limit`                                               | `count`, `docs`, and `corpus` (`kind`, resolved `root`, total `documentCount`)                                                                                    |
 | `get_doc`                     | **`slug`**, `section`                                 | `slug`, `title`, `section`, `content`, `redirectedFrom`                                                                                                           |
 | `find_export`                 | **`symbol`**, `limit`                                 | Exact `package` / `subpath` / declaration-kind matches, total count, and `truncated`                                                                               |
 | `list_package_exports`        | **`package`**, `offset`, `limit`                      | A stable declaration page grouped by subpath, total/returned counts, `nextOffset`, and `truncated`                                                                 |
@@ -88,6 +88,12 @@ code units — before the runner serializes it. The analytics tools (`analyze_se
 aggregates. `execute_command` returns only a bounded combined output tail (4,096 bytes by default)
 and flags `truncated` when output was cut. A failed flow returns a structured tool error (a stable
 `code` plus a message), not a truncated success.
+
+Documentation resolves in this order: explicit `--docs-root`, `NETSCRIPT_DOCS_ROOT`, an indexable
+`<projectRoot>/.netscript/docs`, then a generated release-matched embedded fallback. An empty or
+redirect-only project probe falls back to embedded; an invalid explicit/environment root remains a
+structured error. `list_docs.corpus.kind` is `filesystem` or `embedded`, its `root` is the resolved
+filesystem path or `null`, and `documentCount` is the total before the requested list limit.
 
 ## Record drift
 
@@ -157,9 +163,9 @@ model context.
 
 | Symbol                 | Kind     | Summary                                                                              |
 | ---------------------- | -------- | ------------------------------------------------------------------------------------ |
-| `EmbeddedDocsCorpus`   | class    | Default `DocsCorpusPort` shipped with the package; indexes package Markdown assets. |
+| `EmbeddedDocsCorpus`   | class    | In-memory `DocsCorpusPort` used for package and outer-CLI Markdown assets.          |
 | `EmbeddedExportSurfaceCorpus` | class | Lazy mirror-free `ExportSurfaceCorpusPort` with version, hash, size, and count verification. |
-| `FilesystemDocsCorpus` | class    | `DocsCorpusPort` over a local Markdown root (used when `--docs-root` is set).        |
+| `FilesystemDocsCorpus` | class    | `DocsCorpusPort` over an explicit, environment, or project-probed Markdown root.     |
 | `SpawnCommandExecutor` | class    | `CommandExecutorPort` that spawns the `netscript` binary.                            |
 | `StaticCommandCatalog` | class    | `CommandCatalogPort` used when no live catalog is injected.                          |
 | `PluginDoctorFamily`   | class    | Plugin diagnostics as a doctor check family.                                         |
@@ -176,7 +182,7 @@ project-wiring / plugin doctor families, and the process executor, and runs them
 | -------------------- | --------- | ------------------------------------------------------------------------------------------------------------- |
 | `runMcpStdioServer`  | function  | Run the server on Deno standard input and output.                                                             |
 | `createMcpCliServer` | function  | Compose the server with optional outer CLI adapters.                                                          |
-| `resolveDocsRoot`    | function  | Resolve the docs root from `--docs-root`, `NETSCRIPT_DOCS_ROOT`, or the project root.                         |
+| `resolveDocsRoot`    | function  | Resolve docs by flag, environment, then an indexable `.netscript/docs` project probe.                        |
 | `McpCliOptions`      | interface | Composition seams including `exportSurfaceCorpus`, docs, telemetry, doctor, commands, and project root.      |
 
 Telemetry endpoint discovery is ordered: an explicit `endpoint` option, then

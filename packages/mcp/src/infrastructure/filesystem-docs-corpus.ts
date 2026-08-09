@@ -140,6 +140,46 @@ async function* walkMarkdown(directory: string): AsyncGenerator<string> {
   }
 }
 
+/** Return whether a root can be indexed by the same policy used by the filesystem adapter. */
+export function isIndexableDocsRoot(root: string): boolean {
+  let rootReal: string;
+  try {
+    rootReal = Deno.realPathSync(resolve(root));
+  } catch (error) {
+    if (error instanceof Deno.errors.NotFound) return false;
+    throw error;
+  }
+  const sources: RawDocsSource[] = [];
+  for (const path of walkMarkdownSync(rootReal)) {
+    if (!isPublicDocsPath(relative(rootReal, path))) continue;
+    const realPath = Deno.realPathSync(path);
+    if (!isWithinRoot(rootReal, realPath)) continue;
+    sources.push({
+      slug: slugFromPath(relative(rootReal, realPath)),
+      source: Deno.readTextFileSync(realPath),
+    });
+  }
+  if (sources.length === 0) return false;
+  try {
+    return processDocsSources(sources).documents.size > 0;
+  } catch {
+    return false;
+  }
+}
+
+function* walkMarkdownSync(directory: string): Generator<string> {
+  const entries = [...Deno.readDirSync(directory)].sort((a, b) => a.name.localeCompare(b.name));
+  for (const entry of entries) {
+    if (entry.name.startsWith('_')) continue;
+    const path = resolve(directory, entry.name);
+    if (entry.isDirectory) {
+      if (!EXCLUDED_DIRECTORIES.has(entry.name)) yield* walkMarkdownSync(path);
+    } else if ((entry.isFile || entry.isSymlink) && extname(entry.name).toLowerCase() === '.md') {
+      yield path;
+    }
+  }
+}
+
 /** Process raw docs sources into canonical documents and resolved alias mappings. */
 export function processDocsSources(
   sources: readonly RawDocsSource[],

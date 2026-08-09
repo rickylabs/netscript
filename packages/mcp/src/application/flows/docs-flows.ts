@@ -11,20 +11,35 @@ const DEFAULT_SEARCH_LIMIT = 10;
 const MAX_LIST_LIMIT = 100;
 const MAX_SEARCH_LIMIT = 20;
 
+/** Selection state reported by list_docs so callers can detect fallback degradation. */
+export interface DocsCorpusSelection {
+  readonly kind: 'filesystem' | 'embedded';
+  readonly root: string | null;
+}
+
 /** Create the bounded public documentation tool flows. */
 export function createDocsFlows(
   corpus: DocsCorpusPort,
+  selection?: DocsCorpusSelection,
 ): Readonly<Record<'list_docs' | 'search_docs' | 'get_doc', ToolFlow>> {
   return {
     list_docs: async (input): Promise<ToolExecutionResult> => {
       const limit = boundedLimit(input, DEFAULT_LIST_LIMIT, MAX_LIST_LIMIT);
       try {
-        const docs = (await corpus.list()).slice(0, limit).map(({ slug, title, description }) => ({
+        const allDocs = await corpus.list();
+        const docs = allDocs.slice(0, limit).map(({ slug, title, description }) => ({
           slug,
           title,
           description,
         }));
-        return { ok: true, value: { count: docs.length, docs } };
+        return {
+          ok: true,
+          value: {
+            count: docs.length,
+            docs,
+            ...(selection ? { corpus: { ...selection, documentCount: allDocs.length } } : {}),
+          },
+        };
       } catch (error) {
         return corpusFailure(error);
       }

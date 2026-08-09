@@ -1,4 +1,5 @@
 import { assert, assertEquals, assertGreater } from '@std/assert';
+import { join, resolve } from '@std/path';
 import { createDocsFlows } from '../src/application/flows/docs-flows.ts';
 import { createMcpServer } from '../src/application/runner/mcp-server.ts';
 import {
@@ -80,13 +81,138 @@ Deno.test('corpus bounds indexed content and runner applies its tighter response
   assert(structured.content.endsWith('…[truncated]'));
 });
 
-Deno.test('docs root precedence is flag then environment then embedded default', () => {
-  assertEquals(
-    resolveDocsRoot(['--docs-root', 'public'], 'environment', '/project'),
-    '/project/public',
+Deno.test('docs root precedence is flag then environment then an indexable project probe', async () => {
+  const projectRoot = await Deno.makeTempDir();
+  const probedRoot = join(projectRoot, '.netscript', 'docs');
+  await Deno.mkdir(join(probedRoot, 'guides'), { recursive: true });
+  await Deno.writeTextFile(
+    join(probedRoot, 'guides', 'start.md'),
+    '# Start\n\nAn indexable project document.\n',
   );
-  assertEquals(resolveDocsRoot([], 'environment', '/project'), '/project/environment');
-  assertEquals(resolveDocsRoot([], undefined, '/project'), undefined);
+  try {
+    assertEquals(
+      resolveDocsRoot(['--docs-root', 'public'], 'environment', projectRoot),
+      join(projectRoot, 'public'),
+    );
+    assertEquals(
+      resolveDocsRoot([], 'environment', projectRoot),
+      join(projectRoot, 'environment'),
+    );
+    assertEquals(resolveDocsRoot([], undefined, projectRoot), probedRoot);
+  } finally {
+    await Deno.remove(projectRoot, { recursive: true });
+  }
+});
+
+Deno.test('list_docs reports filesystem corpus kind, root, and total document count', async () => {
+  const server = createMcpCliServer({ projectRoot: fixtureRoot, docsRoot: fixtureRoot });
+  const response = await server.handle({
+    jsonrpc: '2.0',
+    id: 9,
+    method: 'tools/call',
+    params: { name: 'list_docs', arguments: { limit: 1 } },
+  });
+  const listed = response?.result?.structuredContent as {
+    count: number;
+    corpus?: { kind: string; root: string | null; documentCount: number };
+  };
+  assertEquals(listed.count, 1);
+  assertEquals(listed.corpus, {
+    kind: 'filesystem',
+    root: fixtureRoot,
+    documentCount: 3,
+  });
+});
+
+Deno.test('an empty project probe falls back to an observable embedded corpus', async () => {
+  const projectRoot = await Deno.makeTempDir();
+  const docsRoot = join(projectRoot, '.netscript', 'docs');
+  await Deno.mkdir(docsRoot, { recursive: true });
+  await Deno.writeTextFile(join(docsRoot, 'README.txt'), 'not Markdown');
+  await Deno.writeTextFile(
+    join(docsRoot, 'redirect.md'),
+    '---\nlayout: layouts/redirect.vto\nredirectTo: /elsewhere/\n---\n',
+  );
+  try {
+    const server = createMcpCliServer({ projectRoot });
+    const response = await server.handle({
+      jsonrpc: '2.0',
+      id: 15,
+      method: 'tools/call',
+      params: { name: 'list_docs', arguments: {} },
+    });
+    const listed = response?.result?.structuredContent as {
+      count: number;
+      corpus?: { kind: string; root: string | null; documentCount: number };
+    };
+    assertGreater(listed.count, 0);
+    assertEquals(listed.corpus, {
+      kind: 'embedded',
+      root: null,
+      documentCount: listed.count,
+    });
+  } finally {
+    await Deno.remove(projectRoot, { recursive: true });
+  }
+});
+
+Deno.test('stdio composition preserves environment precedence over an indexable probe', async () => {
+  const projectRoot = await Deno.makeTempDir();
+  const environmentRoot = await Deno.makeTempDir();
+  try {
+    const projectDocs = join(projectRoot, '.netscript', 'docs');
+    await Deno.mkdir(projectDocs, { recursive: true });
+    await Deno.writeTextFile(join(projectDocs, 'probe.md'), '# Probe\n\nProject probe.\n');
+    await Deno.writeTextFile(
+      join(environmentRoot, 'environment.md'),
+      '# Environment\n\nOverride.\n',
+    );
+    const child = new Deno.Command(Deno.execPath(), {
+      args: [
+        'run',
+        '-A',
+        '--config',
+        new URL('../../../deno.json', import.meta.url).pathname,
+        new URL('../cli.ts', import.meta.url).pathname,
+      ],
+      cwd: projectRoot,
+      env: { NETSCRIPT_DOCS_ROOT: environmentRoot },
+      stdin: 'piped',
+      stdout: 'piped',
+      stderr: 'piped',
+    }).spawn();
+    const writer = child.stdin.getWriter();
+    await writer.write(new TextEncoder().encode(`${
+      JSON.stringify({
+        jsonrpc: '2.0',
+        id: 16,
+        method: 'tools/call',
+        params: { name: 'list_docs', arguments: {} },
+      })
+    }\n`));
+    await writer.close();
+    const output = await child.output();
+    assertEquals(output.code, 0, new TextDecoder().decode(output.stderr));
+    const response = JSON.parse(new TextDecoder().decode(output.stdout)) as {
+      readonly result: {
+        readonly structuredContent: {
+          readonly corpus: {
+            readonly kind: string;
+            readonly root: string | null;
+            readonly documentCount: number;
+          };
+        };
+      };
+    };
+    assertEquals(response.result.structuredContent.corpus, {
+      kind: 'filesystem',
+      root: resolve(environmentRoot),
+      documentCount: 1,
+    });
+  } finally {
+    await Deno.remove(projectRoot, { recursive: true });
+    await Deno.remove(environmentRoot, { recursive: true });
+  }
 });
 
 Deno.test('CLI composition defaults list, search, and get to package-shipped docs', async () => {

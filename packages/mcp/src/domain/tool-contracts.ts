@@ -4,7 +4,6 @@ import {
   EXPORT_SURFACE_INPUT_SHAPES,
   EXPORT_SURFACE_OUTPUT_SHAPES,
 } from '../application/export-surfaces/export-surface-tool-contracts.ts';
-
 const objectSchema = (
   properties: Record<string, unknown> = {},
   required: string[] = [],
@@ -210,6 +209,11 @@ const outputShapes: Record<ToolName, Readonly<Record<string, unknown>>> = {
   }, ['count', 'matches']),
   list_docs: objectSchema({
     count: { type: 'integer' },
+    corpus: objectSchema({
+      kind: { enum: ['filesystem', 'embedded'] },
+      root: { type: ['string', 'null'] },
+      documentCount: { type: 'integer' },
+    }, ['kind', 'root', 'documentCount']),
     docs: {
       type: 'array',
       maxItems: 100,
@@ -219,10 +223,7 @@ const outputShapes: Record<ToolName, Readonly<Record<string, unknown>>> = {
         description: stringProperty,
       }, ['slug', 'title', 'description']),
     },
-  }, [
-    'count',
-    'docs',
-  ]),
+  }, ['count', 'corpus', 'docs']),
   get_doc: objectSchema({
     slug: stringProperty,
     title: stringProperty,
