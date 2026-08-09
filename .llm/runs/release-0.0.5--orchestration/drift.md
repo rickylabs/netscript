@@ -120,3 +120,32 @@ for an active lane on that surface. A repair I can do is not a repair I own.
 **Blocking state:** #1404 S3 remains blocked. C18 and the milestone wait on
 `fix/docs-source-format-consistency` reaching `main`; the orchestrator then resumes the exact W3-B1
 thread `019fe4b4-7c12-72c2-b692-8d851f9c3b5c` against repaired main.
+
+## C-D82 — docs site restored; a four-day public-surface outage that no PR could see
+
+**Severity:** significant (resolved). Recorded because the failure mode matters more than the fix.
+
+`2f64cc001` (PR #1311, 2026-08-05) reflowed Markdown at ~100 chars through `{{ ... }}` Vento
+expressions, splitting quoted JS string literals across newlines. `docs/site` stopped building.
+`pages.yml` then failed on **every** run — #1311 → #1395 → #1401 — and the published documentation
+site was undeployable for four days. Last green before it: 2026-08-05 01:43.
+
+Nobody saw it because `pages.yml` runs only on `push` to `main`. There is no `pull_request` trigger
+and `ci.yml` never builds `docs/site`, so **no pull request could fail on it**. Every merge in that
+window inherited a red post-merge workflow that nothing required anyone to read.
+
+Resolved by PR #1406 / issue #1407, owned by a separate lane. `main` is `399f60185`; `pages.yml` on
+`main` returned **success** at 2026-08-09T06:34 — first green since 2026-08-05.
+
+**The generalisable finding.** This is the same defect class as C-D64/66 (#1403's uncovered
+packages) and the health-matcher that could not fail: *a gate that does not run cannot tell you that
+you are wrong.* Here the gate existed, was correct, and reported faithfully — into a channel with no
+reader on the path that could act. Post-merge-only verification is not a gate; it is a log.
+
+The repair adds two real gates wired into `deno task build` (proven able to fail, with RED evidence
+in the IMPL-EVAL), but they inherit the same reachability limit: they are still post-merge-only in
+CI. Filed as **#1408** against 0.0.6 rather than fixed inside a lane this orchestrator does not own,
+with explicit boundaries against weakening the gates themselves.
+
+**Release-notes candidate:** the 0.0.5 docs site was unbuildable for part of the development window;
+the shipped site is built from repaired sources at `399f60185` or later.
