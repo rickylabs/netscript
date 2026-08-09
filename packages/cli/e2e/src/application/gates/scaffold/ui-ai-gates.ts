@@ -1,6 +1,8 @@
-import { GATE, GATE_PHASE } from '../../../domain/cli-surface.ts';
+import { ASPIRE_RESOURCE, GATE, GATE_PHASE } from '../../../domain/cli-surface.ts';
 import { PACKAGE_SOURCE } from '../../../domain/extension-axes.ts';
 import type { GateDefinition } from '../../../domain/gate-definition.ts';
+import type { RunContext } from '../../../domain/run-context.ts';
+import { join } from '@std/path';
 import { cli, commandGate, denoCommand } from './gate-factory.ts';
 import { localSourceFixtureScript } from './local-source-fixture.ts';
 
@@ -20,12 +22,13 @@ export function createUiAiGates(): readonly GateDefinition[] {
           context,
           'ui:add',
           'ai',
-          '--project-root',
-          context.project.projectRoot,
+          '--app',
+          ASPIRE_RESOURCE.APP,
           '--registry-root',
           `${context.project.repoRoot}/packages/fresh-ui`,
           '--force',
         ),
+      (context) => context.project.projectRoot,
     ),
     commandGate(
       GATE.SCAFFOLD_UI_LOCAL_SOURCE,
@@ -40,13 +43,13 @@ export function createUiAiGates(): readonly GateDefinition[] {
             : `${uiSourceScript()}\n${
               localSourceFixtureScript({
                 projectRoot: '.',
-                sourceBase: './packages',
+                sourceBase: '../../packages',
                 packages: AI_LOCAL_SOURCE_PACKAGES,
                 targets: [{ path: 'deno.json', includeConfig: true }],
               })
             }`,
         ),
-      (context) => context.project.projectRoot,
+      uiAppRoot,
     ),
     commandGate(
       GATE.GENERATED_UI_AI_CHECK,
@@ -60,7 +63,7 @@ export function createUiAiGates(): readonly GateDefinition[] {
           'islands/ui/McpUiWidget.tsx',
           'lib/ai/render-ui.tsx',
         ),
-      (context) => context.project.projectRoot,
+      uiAppRoot,
     ),
     commandGate(
       GATE.BEHAVIOR_UI_RENDER,
@@ -68,7 +71,7 @@ export function createUiAiGates(): readonly GateDefinition[] {
       GATE_PHASE.BEHAVIOR,
       (context) =>
         denoCommand(context, 'eval', '--config', 'deno.json', UI_RENDER_ASSERTION_SCRIPT),
-      (context) => context.project.projectRoot,
+      uiAppRoot,
     ),
     commandGate(
       GATE.BEHAVIOR_MCP_WIDGET_ROUNDTRIP,
@@ -83,12 +86,16 @@ export function createUiAiGates(): readonly GateDefinition[] {
           mcpWidgetRoundtripScript(
             context.request.options.packageSource === PACKAGE_SOURCE.JSR
               ? '@netscript/ai/mcp'
-              : './packages/ai/mcp.ts',
+              : '../../packages/ai/mcp.ts',
           ),
         ),
-      (context) => context.project.projectRoot,
+      uiAppRoot,
     ),
   ];
+}
+
+function uiAppRoot(context: RunContext): string {
+  return join(context.project.projectRoot, 'apps', ASPIRE_RESOURCE.APP);
 }
 
 function uiSourceScript(): string {

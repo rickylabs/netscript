@@ -5,7 +5,7 @@ import { createUiAddCommand } from './add-ui-command.ts';
 Deno.test('ui:add help explains the page island query-loader triad', () => {
   const command = createUiAddCommand({
     installDependencies: { fs: new DenoFileSystem() },
-    resolveProjectRoot: () => Promise.resolve('/workspace'),
+    resolveUiAppRoot: () => Promise.resolve('/workspace'),
   });
   const help = command.getHelp().replace(/\s+/g, ' ');
 

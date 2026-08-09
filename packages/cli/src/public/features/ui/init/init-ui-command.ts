@@ -6,15 +6,15 @@ import {
   installUiRegistryItems,
   type UiInstallDependencies,
 } from "../registry.ts";
-import { type ProjectRootResolver, requireProjectRoot } from "../../../presentation/support.ts";
+import { type UiAppRootResolver, requireUiAppRoot } from "../../../presentation/support.ts";
 import type { UiInitCommandInput } from "./init-ui-input.ts";
 
 /** Dependencies for the public `ui:init` command handler. */
 export interface UiInitCommandDependencies {
   /** Application dependencies for installing Fresh UI registry files. */
   readonly installDependencies: UiInstallDependencies;
-  /** Resolve the project root from flags or environment. */
-  readonly resolveProjectRoot: ProjectRootResolver;
+  /** Resolve the Fresh application root from flags or environment. */
+  readonly resolveUiAppRoot: UiAppRootResolver;
   /** Print completion lines. */
   readonly print?: (message: string) => void;
 }
@@ -28,13 +28,14 @@ export function createUiInitCommand(
     .name("ui:init")
     .description("Install the NetScript Fresh UI foundation into an app workspace")
     .option("--project-root <path:string>", "Project root directory")
+    .option("--app <name:string>", "Fresh app workspace name")
     .option("--registry-root <path:string>", "Fresh UI package root override")
     .option("--theme <name:string>", "Theme registry item (defaults to the official theme)")
     .option("--force", "Overwrite existing copied UI files", { default: false })
     .action(async (options: UiInitCommandInput): Promise<void> => {
-      const projectRoot = await requireProjectRoot(
-        dependencies.resolveProjectRoot,
-        options.projectRoot,
+      const projectRoot = await requireUiAppRoot(
+        dependencies.resolveUiAppRoot,
+        { projectRoot: options.projectRoot, app: options.app },
       );
       const result = await installUiRegistryItems({
         projectRoot,

@@ -65,6 +65,8 @@ import { FetchAuthSessionHttp } from '../plugins/auth/auth-session-client.ts';
 import type { AuthSessionHttpPort } from '../plugins/auth/auth-types.ts';
 import { generateAspire } from '../generate/aspire/generate-aspire.ts';
 import { AspireAppHostDoctorInspector } from '../../../kernel/adapters/aspire/apphost-doctor-inspector.ts';
+import { resolveUiAppRoot as resolveUiAppRootFromWorkspace } from '../../../kernel/application/ui/resolve-ui-app-root.ts';
+import type { UiAppRootResolver } from '../../presentation/support.ts';
 
 /** Dependencies shared by public command groups. */
 export interface PublicCommandDependencies {
@@ -86,6 +88,8 @@ export interface PublicCommandDependencies {
   readonly runtimeConfigStore: RuntimeConfigStorePort;
   /** Resolve a project root from an optional flag. */
   readonly resolveProjectRoot: (projectRoot?: string) => Promise<string | undefined>;
+  /** Resolve a UI command to one Fresh application root. */
+  readonly resolveUiAppRoot: UiAppRootResolver;
   /** Dependencies for public init. */
   readonly initCommandDependencies: {
     readonly defaultProjectName: () => string;
@@ -195,6 +199,13 @@ export function createPublicCommandDependencies(
   const resolveProjectRoot = async (projectRoot?: string) =>
     projectRoot ? host.resolvePath(projectRoot) : await findDeployProjectRoot(host.cwd()) ??
       undefined;
+  const resolveUiAppRoot: UiAppRootResolver = (input) =>
+    resolveUiAppRootFromWorkspace(input, {
+      fs,
+      cwd: host.cwd,
+      resolvePath: (path) => host.resolvePath(path),
+      resolveWorkspaceRoot: findDeployProjectRoot,
+    });
   const generatePluginRegistries = createInstalledRuntimeRegistryGenerator({
     fetchManifest: (url) => fetch(url, { headers: { Accept: 'application/json' } }),
     fs,
@@ -248,6 +259,7 @@ export function createPublicCommandDependencies(
     loadConfig,
     runtimeConfigStore,
     resolveProjectRoot,
+    resolveUiAppRoot,
     initCommandDependencies: {
       defaultProjectName: () => host.cwd().split(/[/\\]/).pop() ?? 'my-app',
       prompt,
