@@ -93,7 +93,7 @@ export function createPublicCommandRegistry(): CliCommandRegistry<PublicCommandC
     create: ({ dependencies }) =>
       createUiAddCommand({
         installDependencies: dependencies.uiInstallDependencies,
-        resolveProjectRoot: dependencies.resolveProjectRoot,
+        resolveUiAppRoot: dependencies.resolveUiAppRoot,
       }),
   });
   registry.register('ui:init', {
@@ -101,12 +101,12 @@ export function createPublicCommandRegistry(): CliCommandRegistry<PublicCommandC
     create: ({ dependencies }) =>
       createUiInitCommand({
         installDependencies: dependencies.uiInstallDependencies,
-        resolveProjectRoot: dependencies.resolveProjectRoot,
+        resolveUiAppRoot: dependencies.resolveUiAppRoot,
       }),
   });
   for (const [id, create] of [
     ['ui:list', createUiListCommand], ['ui:update', createUiUpdateCommand], ['ui:remove', createUiRemoveCommand],
-  ] as const) registry.register(id, { id, create: ({ dependencies }) => create({ installDependencies: dependencies.uiInstallDependencies, resolveProjectRoot: dependencies.resolveProjectRoot }) });
+  ] as const) registry.register(id, { id, create: ({ dependencies }) => create({ installDependencies: dependencies.uiInstallDependencies, resolveUiAppRoot: dependencies.resolveUiAppRoot }) });
 
   return registry;
 }

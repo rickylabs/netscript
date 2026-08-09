@@ -1,8 +1,12 @@
 import { outputText } from '../../kernel/presentation/output/default-output.ts';
 import { ScaffoldValidationError } from '../../kernel/domain/errors.ts';
+import type { UiAppRootInput } from '../../kernel/application/ui/resolve-ui-app-root.ts';
 
 /** Resolves a command project root without binding presentation to host APIs. */
 export type ProjectRootResolver = (projectRoot?: string) => Promise<string | undefined>;
+
+/** Resolves a UI command to an explicit or inferred Fresh application root. */
+export type UiAppRootResolver = (input: UiAppRootInput) => Promise<string | undefined>;
 
 /** Resolves a display-safe default project name for `init`. */
 export type ProjectNameResolver = () => string;
@@ -16,6 +20,20 @@ export async function requireProjectRoot(
   if (!resolved) {
     throw new ScaffoldValidationError(
       'Could not find a NetScript project root from the current directory.',
+    );
+  }
+  return resolved;
+}
+
+/** Resolve or fail when a UI command needs a Fresh application root. */
+export async function requireUiAppRoot(
+  resolveUiAppRoot: UiAppRootResolver,
+  input: UiAppRootInput,
+): Promise<string> {
+  const resolved = await resolveUiAppRoot(input);
+  if (!resolved) {
+    throw new ScaffoldValidationError(
+      'Could not find a NetScript workspace root from the current directory.',
     );
   }
   return resolved;

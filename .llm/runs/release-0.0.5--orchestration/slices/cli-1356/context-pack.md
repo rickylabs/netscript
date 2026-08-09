@@ -12,26 +12,32 @@
 
 ## Current State
 
-Clean Tier-D branch at `origin/main@1395f3989`. Research and design are current. `PLAN-EVAL: N/A`
-is justified and recorded before product edits because the issue fully locks resolution behavior and
-gates. No implementation files have changed yet.
+S1 implementation is complete on the Tier-D branch based at `origin/main@1395f3989`.
+`PLAN-EVAL: N/A` was recorded before product edits. IMPL-EVAL passed at `3f7d954bd` and both
+serialized runtime gates are owner-reported green. A narrow CI-only ANSI assertion repair is being
+amended for re-evaluation scope/CI; the draft PR remains #1422.
 
 ## Completed
 
-- Skills, run loop, Archetype 6, doctrine, gate matrix, plan gate, live issue, source, and debt read.
-- Pre-fix source mechanism and wrong E2E root confirmed.
-- One-slice implementation and negative-control plan locked.
+- Shared application resolver implements explicit app path, named app, current-app inference,
+  sole-app inference, and deterministic ambiguity errors.
+- All five UI commands use it and document `--app`; `UiAddCommandInput` now matches its action.
+- Corrected E2E gate rejects workspace-root fixtures, runs every assertion in the Fresh app, and
+  keeps both local-source paths workspace-relative.
+- Pre-fix REDs, 36 focused green tests, five real help probes, scoped wrappers, quality scan, and
+  aggregate doctrine gate are recorded in `worklog.md`.
+- CI color variance is normalized before the unchanged exact `--app <name>` assertion; a
+  missing-option scratch mutation proves the detector still fails.
 
 ## In Progress
 
-- Bootstrap commit and draft PR, then behavioral RED tests.
+- Amend/push the ANSI-only test repair and hand back for owner re-evaluation scope/CI.
 
 ## Next Steps
 
-1. Commit/push bootstrap artifacts and open draft PR with `Closes #1356` / `status:impl`.
-2. Add behavioral tests; capture pre-fix exit 1 without product source changes.
-3. Implement resolver/commands/gate; run gates; update artifacts; commit/push/comment.
-4. Stop for owner-launched separate-session IMPL-EVAL.
+1. Amend S1 and guarded-force-push with the explicit refspec.
+2. Post the colorized green and missing-option RED evidence.
+3. Stop for owner-controlled re-evaluation scope, CI, and merge.
 
 ## Key Decisions
 
@@ -45,27 +51,31 @@ gates. No implementation files have changed yet.
 
 | Path | Status | Notes |
 | --- | --- | --- |
-| this run directory | new | bootstrap/research/design only |
+| `packages/cli/src/kernel/application/ui/resolve-ui-app-root.ts` | new | shared app selection policy |
+| `packages/cli/src/public/features/{root,ui}/**` | changed | resolver composition + five command surfaces |
+| `packages/cli/e2e/src/application/gates/scaffold/ui-ai-gates.ts` | changed | app-targeted standing gate |
+| owned focused tests | new/changed | behavioral and old-layout controls |
+| this run directory | changed | evidence and handoff |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | NOT_RUN | implementation not started |
-| Fitness | NOT_RUN | implementation not started |
+| Static | PASS | scoped check/lint/fmt: 829 files, 0 findings, raw exits 0 |
+| Fitness | PASS required aggregates | quality scan + arch check exits 0; extra CLI diagnostic exposes pre-existing global debt |
 | Runtime | N/A locally | serialized token not granted |
-| Consumer | NOT_RUN | focused CLI/E2E discriminator planned |
+| Consumer | PASS focused | 36 tests; real help/process probes; corrected gate old-layout negative |
 
 ## Open Questions
 
-- None for implementation. Owner/CI must provide the full runtime acceptance row before merge.
+- Owner/CI must provide the full runtime acceptance row before merge.
 
 ## Drift and Debt
 
 - Drift: Tier-D runtime identity was not registered; recorded in `supervisor.md` and `drift.md`.
-- Debt: pre-existing CLI restructure only; no change planned.
+- Debt: pre-existing CLI Restructure diagnostic remains `FAIL=50 WARN=51 INFO=1`; no new finding.
 
 ## Commits
 
-- See draft PR commit list + per-slice comments after bootstrap.
-
+- `bad81a011` — S0 harness contract.
+- S1 final commit — see PR #1422 after push.

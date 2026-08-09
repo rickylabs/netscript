@@ -27,3 +27,31 @@
   because no token is granted.
 - **Evidence:** `research.md` F8 and the validation plan.
 
+## 2026-08-09 — Package-scoped CLI doctrine diagnostic remains globally red
+
+- **What:** An extra package-scoped diagnostic was run beyond the dispatch's required aggregate
+  `arch:check`.
+- **Source:** `.llm/tools/fitness/check-doctrine.ts --root packages/cli`.
+- **Expected:** The required aggregate is the named doctrine gate for this slice.
+- **Actual:** Required `arch:check` exits 0. The extra CLI scan exits 1 with
+  `FAIL=50 WARN=51 INFO=1`, matching the package's already-recorded Restructure verdict and
+  surfacing no #1356-specific new class; its matcher also reports longstanding `Deno.test` files as
+  Jest/Vitest globals.
+- **Severity:** minor / pre-existing debt
+- **Action:** record it as non-decisive diagnostic evidence; do not widen this release blocker into
+  the global CLI restructure.
+- **Evidence:** `worklog.md` gate table; no new ignore or allowance added.
+
+## 2026-08-09 — Cliffy help assertion depended on terminal color capability
+
+- **What:** CI colorized `Command.getHelp()`, splitting the literal `--app <name>` with ANSI escape
+  bytes; the local non-color environment had allowed a terminal-dependent assertion to pass.
+- **Source:** PR #1422 `check-test` at `3f7d954bd`.
+- **Expected:** Help behavior is checked independently of terminal capability while retaining the
+  option name and value placeholder contract.
+- **Actual:** Product help was correct; only the test's raw substring assumption was wrong.
+- **Severity:** blocking test defect
+- **Action:** normalize each of the five help strings with `@std/fmt/colors.stripAnsiCode`, then
+  keep the exact `--app <name>` assertion. A colorized TTY run passes; removing one command's option
+  in a detached scratch copy fails raw exit 1.
+- **Evidence:** `worklog.md` ANSI-independent and mutation-control rows.

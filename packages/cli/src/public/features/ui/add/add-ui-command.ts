@@ -2,7 +2,7 @@ import { Command } from "@cliffy/command";
 
 import { outputText } from "../../../../kernel/presentation/output/default-output.ts";
 import { installUiRegistryItems, type UiInstallDependencies } from "../registry.ts";
-import { type ProjectRootResolver, requireProjectRoot } from "../../../presentation/support.ts";
+import { type UiAppRootResolver, requireUiAppRoot } from "../../../presentation/support.ts";
 import type { UiAddCommandInput } from "./add-ui-input.ts";
 import { scaffoldUiIsland, scaffoldUiPage } from '../../../../kernel/application/ui/web-scaffold.ts';
 
@@ -10,8 +10,8 @@ import { scaffoldUiIsland, scaffoldUiPage } from '../../../../kernel/application
 export interface UiAddCommandDependencies {
   /** Application dependencies for installing Fresh UI registry files. */
   readonly installDependencies: UiInstallDependencies;
-  /** Resolve the project root from flags or environment. */
-  readonly resolveProjectRoot: ProjectRootResolver;
+  /** Resolve the Fresh application root from flags or environment. */
+  readonly resolveUiAppRoot: UiAppRootResolver;
   /** Print completion lines. */
   readonly print?: (message: string) => void;
 }
@@ -36,6 +36,7 @@ export function createUiAddCommand(
     )
     .arguments("<kind:string> [name:string]")
     .option("--project-root <path:string>", "Project root directory")
+    .option("--app <name:string>", "Fresh app workspace name")
     .option("--registry-root <path:string>", "Fresh UI package root override")
     .option("--theme <name:string>", "Theme registry item (defaults to the official theme)")
     .option("--force", "Overwrite existing copied UI files", { default: false })
@@ -50,10 +51,10 @@ export function createUiAddCommand(
       "For island scaffolds, generate a QueryIsland-based surface for contract-derived queries",
       { default: false },
     )
-    .action(async (options: UiAddCommandInput & { route?: string; island?: boolean; query?: boolean }, kind: string, name?: string): Promise<void> => {
-      const projectRoot = await requireProjectRoot(
-        dependencies.resolveProjectRoot,
-        options.projectRoot,
+    .action(async (options: UiAddCommandInput, kind: string, name?: string): Promise<void> => {
+      const projectRoot = await requireUiAppRoot(
+        dependencies.resolveUiAppRoot,
+        { projectRoot: options.projectRoot, app: options.app },
       );
       if (kind === 'page') {
         if (!name) throw new Error('ui:add page requires <path>.');
