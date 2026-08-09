@@ -88,6 +88,9 @@ Deno.test('StreamsInstrumentation preserves W3C tracestate in emitted write head
     setAttribute(_key: string, _value: string | number | boolean) {
       return this;
     },
+    addEvent(_name: string, _attributes?: Record<string, string | number | boolean | undefined>) {
+      return this;
+    },
     setStatus(_status: { code: 0 | 1 | 2; message?: string }) {
       return this;
     },

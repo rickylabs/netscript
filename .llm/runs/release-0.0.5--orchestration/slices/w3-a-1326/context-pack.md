@@ -6,7 +6,7 @@
 | -------------- | ----------------------------------------------- |
 | Run ID         | `release-0.0.5--orchestration/slices/w3-a-1326` |
 | Branch         | `fix/streams-durable-producer-reconnect`        |
-| Current phase  | `impl — S2 reconnect supervisor ready to commit` |
+| Current phase  | `impl — S3 correlated telemetry ready to commit` |
 | Archetype      | `3 — Runtime/Behavior`                          |
 | Scope overlays | none; Aspire runtime validation required        |
 
@@ -15,8 +15,10 @@
 PLAN-EVAL cycle 3 returned `PASS` and implementation is authorized. S1 is committed and pushed with
 all eight REDs recorded separately. S2 implements the finite supervisor, exact protocol transport,
 dual bounded FIFO, receipts/readiness, and distinct stop/close behavior. All eight behaviors are now
-green, the full core suite passes 26/26, and a real reference-server test proves duplicate and gap
-semantics without adding a package dependency.
+green, and a real reference-server test proves duplicate and gap semantics without adding a package
+dependency. S3 now keeps one publish span and trace identity alive through retry, emits distinct
+bounded metrics for every terminal outcome, and closes the exact AP-13 producer warning debt after
+manual F-14 evidence. The full core suite passes 28/28.
 
 ## Completed
 
@@ -34,17 +36,18 @@ semantics without adding a package dependency.
   the slice run dir, preserving green scoped and repo CI checks without exclusions.
 - S1 contract/RED slice committed as `11ee98e22`, pushed, and reported on draft PR #1402.
 - S2 focused/core tests and scoped check/lint/format are green; lock remains unchanged.
+- S2 committed as `e8e638559`, pushed, and reported on draft PR #1402.
+- S3 telemetry, package-scoped quality/doctrine, F-14, docs, and aggregate gates are green locally.
 
 ## In Progress
 
-- S2 commit, push, and PR comment before S3 telemetry implementation.
+- S3 commit, push, and PR comment before S4 publish/consumer compatibility.
 
 ## Next Steps
 
-1. Commit, push, and comment S2 with all eight GREENs and reference-server evidence.
-2. Begin S3 by keeping one publish span open from acceptance through terminal receipt settlement.
-3. Add bounded retry/recovery/rejection/unknown metrics, remove executable console reporting, and
-   run the decisive package-scoped quality/doctrine pair plus manual F-14 evidence.
+1. Commit, push, and comment S3 with correlated trace/metric and exact debt evidence.
+2. Run S4 detached consumer, JSR, raw/package publish, and final scoped wrapper gates.
+3. Preserve aggregate quality/doctrine results as non-decisive for this package under #1403.
 
 ## Key Decisions
 
@@ -95,4 +98,5 @@ semantics without adding a package dependency.
 ## Commits
 
 - `11ee98e22` — S1 contract and classified RED evidence.
-- S2 is locally green and awaiting its required slice commit/push/comment.
+- `e8e638559` — S2 reconnect supervisor and focused GREEN evidence.
+- S3 is locally green and awaiting its required slice commit/push/comment.

@@ -18,6 +18,7 @@ import { DurableStreamProducerSupervisor } from './durable-stream-producer-super
 import {
   createStreamsInstrumentation,
   type StreamsInstrumentation,
+  type StreamsPublishOperation,
 } from '../telemetry/instrumentation.ts';
 import { buildStreamUrl, getStreamsAuth } from './stream-url-resolver.ts';
 
@@ -79,6 +80,25 @@ export class DurableStreamProducer<TDef extends StreamStateDefinition>
       bufferPolicy: options.bufferPolicy,
       signal: options.signal,
       onStopped: () => removeProducer(this.streamPath, this),
+      onState: (snapshot) =>
+        this.#instrumentation.recordState(this.streamPath, this.#producerId, snapshot),
+      onBuffer: (events, bytes) =>
+        this.#instrumentation.recordBuffer(this.streamPath, this.#producerId, events, bytes),
+      onRetry: (phase, attempt, reason) =>
+        this.#instrumentation.recordRetry(
+          this.streamPath,
+          this.#producerId,
+          phase,
+          attempt,
+          reason,
+        ),
+      onRecovery: (phase, attempt) =>
+        this.#instrumentation.recordRecovery(
+          this.streamPath,
+          this.#producerId,
+          phase,
+          attempt,
+        ),
     });
   }
 
@@ -109,16 +129,16 @@ export class DurableStreamProducer<TDef extends StreamStateDefinition>
     context?: StreamWriteContextV1,
   ): StreamWriteReceiptV1 {
     if (this.closed) {
-      return this.#supervisor.reject(stateRejection(this.state.state));
+      return this.#reject(stateRejection(this.state.state));
     }
     const definition = this.#schema[entityType];
     if (!definition) {
-      return this.#supervisor.reject('invalid-entity');
+      return this.#reject('invalid-entity');
     }
     const rawKey = value[definition.primaryKey];
     const key = rawKey === undefined || rawKey === null ? '' : String(rawKey);
     if (key === '') {
-      return this.#supervisor.reject('invalid-key');
+      return this.#reject('invalid-key');
     }
     return this.#serializeAndEnqueue({
       entityType,
@@ -137,14 +157,14 @@ export class DurableStreamProducer<TDef extends StreamStateDefinition>
     context?: StreamWriteContextV1,
   ): StreamWriteReceiptV1 {
     if (this.closed) {
-      return this.#supervisor.reject(stateRejection(this.state.state));
+      return this.#reject(stateRejection(this.state.state));
     }
     const definition = this.#schema[entityType];
     if (!definition) {
-      return this.#supervisor.reject('invalid-entity');
+      return this.#reject('invalid-entity');
     }
     if (key === '') {
-      return this.#supervisor.reject('invalid-key');
+      return this.#reject('invalid-key');
     }
     return this.#serializeAndEnqueue({
       entityType,
@@ -180,45 +200,51 @@ export class DurableStreamProducer<TDef extends StreamStateDefinition>
       context?: StreamWriteContextV1;
     }>,
   ): StreamWriteReceiptV1 {
+    const publish = this.#startPublish(
+      input.entityType,
+      input.operation,
+      input.key,
+      input.context,
+    );
     try {
       const event = JSON.stringify({
         type: input.type,
         key: input.key,
         ...(input.value ? { value: input.value } : {}),
-        headers: this.#publishHeaders(
-          input.entityType,
-          input.operation,
-          input.key,
-          input.context,
-        ),
+        headers: publish.headers,
       });
-      return this.#supervisor.enqueue(event);
+      return this.#supervisor.enqueue(event, publish);
     } catch {
-      return this.#supervisor.reject('serialization-failed');
+      return this.#supervisor.reject('serialization-failed', publish);
     }
   }
 
-  #publishHeaders(
+  #startPublish(
     entityType: string,
     operation: 'upsert' | 'delete',
     key: string,
     context?: StreamWriteContextV1,
-  ): Record<string, string> {
+  ): StreamsPublishOperation {
     const correlationId = context?.correlationId?.trim() || key;
     const messageId = context?.messageId?.trim() || key;
-    let headers: Record<string, string> = { operation, correlationId };
-    this.#instrumentation.publish({
+    const publish = this.#instrumentation.startPublish({
       streamPath: this.streamPath,
       collection: entityType,
       operation,
       producerId: this.#producerId,
       messageId,
       correlationId,
-      emit: (injected) => {
-        headers = { ...headers, ...injected };
-      },
     });
-    return headers;
+    return {
+      headers: { operation, correlationId, ...publish.headers },
+      event: (name, attributes) => publish.event(name, attributes),
+      finish: (outcome) => publish.finish(outcome),
+    };
+  }
+
+  #reject(reason: StreamWriteRejectionReasonV1): StreamWriteReceiptV1 {
+    this.#instrumentation.recordRejected(this.streamPath, this.#producerId, reason);
+    return this.#supervisor.reject(reason);
   }
 }
 

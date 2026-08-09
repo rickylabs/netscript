@@ -1,14 +1,10 @@
-import {
-  DEFAULT_STREAM_PRODUCER_BUFFER_POLICY_V1,
-  DEFAULT_STREAM_PRODUCER_RECONNECT_POLICY_V1,
-  type StreamProducerBufferPolicyV1,
-  type StreamProducerReadinessOptionsV1,
-  type StreamProducerReconnectPolicyV1,
-  type StreamProducerStateSnapshotV1,
-  type StreamProducerTransportFailureV1,
-  type StreamWriteOutcomeV1,
-  type StreamWriteReceiptV1,
-  type StreamWriteRejectionReasonV1,
+import type {
+  StreamProducerReadinessOptionsV1,
+  StreamProducerReconnectPolicyV1,
+  StreamProducerStateSnapshotV1,
+  StreamProducerTransportFailureV1,
+  StreamWriteReceiptV1,
+  StreamWriteRejectionReasonV1,
 } from '../domain/producer-contract-v1.ts';
 import type { StreamProducerClockPort } from '../ports/stream-producer-clock-port.ts';
 import type { StreamProducerRandomPort } from '../ports/stream-producer-random-port.ts';
@@ -16,49 +12,26 @@ import type {
   StreamProducerIdentityV1,
   StreamProducerTransportPort,
 } from '../ports/stream-producer-transport-port.ts';
+import type {
+  DurableStreamProducerSupervisorOptions,
+  StreamProducerWriteLifecycle,
+} from './durable-stream-producer-supervisor-contract.ts';
+import {
+  DurableStreamProducerQueue,
+  type ProducerQueueEntry,
+} from './durable-stream-producer-queue.ts';
+import {
+  abortError,
+  backoffDelay,
+  bufferPolicy,
+  createProducerDeferred,
+  isRetryable,
+  type ProducerDeferred,
+  reconnectPolicy,
+} from './durable-stream-producer-support.ts';
 
-interface Deferred<T> {
-  readonly promise: Promise<T>;
-  resolve(value: T): void;
-  reject(reason: Error): void;
-}
-
-interface QueueEntry {
-  readonly id: number;
-  readonly body: string;
-  readonly byteLength: number;
-  readonly deferred: Deferred<StreamWriteOutcomeV1>;
-  attempted: boolean;
-  settled: boolean;
-  identity?: StreamProducerIdentityV1;
-}
-
-interface ReadyWaiter extends Deferred<void> {
+interface ReadyWaiter extends ProducerDeferred<void> {
   readonly signal?: AbortSignal;
-}
-
-/** Dependencies and policy accepted by the producer application supervisor. */
-export interface DurableStreamProducerSupervisorOptions {
-  /** Durable stream URL. */
-  readonly url: string;
-  /** Request headers, including authorization. */
-  readonly headers: Readonly<Record<string, string>>;
-  /** Stable producer identity. */
-  readonly producerId: string;
-  /** Protocol transport adapter. */
-  readonly transport: StreamProducerTransportPort;
-  /** Backoff clock adapter. */
-  readonly clock: StreamProducerClockPort;
-  /** Backoff jitter adapter. */
-  readonly random: StreamProducerRandomPort;
-  /** Optional finite retry overrides. */
-  readonly reconnectPolicy?: Partial<StreamProducerReconnectPolicyV1>;
-  /** Optional dual buffer overrides. */
-  readonly bufferPolicy?: Partial<StreamProducerBufferPolicyV1>;
-  /** Optional lifecycle cancellation. */
-  readonly signal?: AbortSignal;
-  /** Called after local or acknowledged terminal shutdown. */
-  readonly onStopped?: () => void;
 }
 
 /** Finite FIFO supervisor for durable stream producer delivery. */
@@ -70,11 +43,14 @@ export class DurableStreamProducerSupervisor {
   readonly #clock: StreamProducerClockPort;
   readonly #random: StreamProducerRandomPort;
   readonly #reconnectPolicy: StreamProducerReconnectPolicyV1;
-  readonly #bufferPolicy: StreamProducerBufferPolicyV1;
   readonly #abort = new AbortController();
-  readonly #queue: QueueEntry[] = [];
+  readonly #queue: DurableStreamProducerQueue;
   readonly #readyWaiters = new Set<ReadyWaiter>();
   readonly #onStopped?: () => void;
+  readonly #onState?: DurableStreamProducerSupervisorOptions['onState'];
+  readonly #onBuffer?: DurableStreamProducerSupervisorOptions['onBuffer'];
+  readonly #onRetry?: DurableStreamProducerSupervisorOptions['onRetry'];
+  readonly #onRecovery?: DurableStreamProducerSupervisorOptions['onRecovery'];
   readonly #connectPromise: Promise<boolean>;
   #processing: Promise<void> | null = null;
   #closePromise: Promise<void> | null = null;
@@ -85,11 +61,9 @@ export class DurableStreamProducerSupervisor {
     bufferedEvents: 0,
     bufferedBytes: 0,
   };
-  #receiptId = 0;
   #accepted = true;
   #epoch = 0;
   #nextSequence = 0;
-  #bufferedBytes = 0;
 
   /** Start connecting immediately under a bounded policy. */
   constructor(options: DurableStreamProducerSupervisorOptions) {
@@ -100,8 +74,15 @@ export class DurableStreamProducerSupervisor {
     this.#clock = options.clock;
     this.#random = options.random;
     this.#reconnectPolicy = reconnectPolicy(options.reconnectPolicy);
-    this.#bufferPolicy = bufferPolicy(options.bufferPolicy);
+    this.#queue = new DurableStreamProducerQueue(
+      bufferPolicy(options.bufferPolicy),
+      (events, bytes) => this.#bufferChanged(events, bytes),
+    );
     this.#onStopped = options.onStopped;
+    this.#onState = options.onState;
+    this.#onBuffer = options.onBuffer;
+    this.#onRetry = options.onRetry;
+    this.#onRecovery = options.onRecovery;
     this.#connectPromise = this.#connectWithRetry(true);
     void this.#connectPromise.then((connected) => {
       if (connected) {
@@ -130,42 +111,22 @@ export class DurableStreamProducerSupervisor {
   }
 
   /** Accept an already serialized event into the bounded FIFO. */
-  enqueue(body: string): StreamWriteReceiptV1 {
-    const id = ++this.#receiptId;
+  enqueue(body: string, lifecycle?: StreamProducerWriteLifecycle): StreamWriteReceiptV1 {
     const rejection = this.#writeRejectionReason();
     if (rejection) {
-      return rejectedReceipt(id, rejection);
+      return this.#queue.reject(rejection, lifecycle);
     }
-
-    const byteLength = new TextEncoder().encode(body).byteLength;
-    if (this.#queue.length >= this.#bufferPolicy.maxEvents) {
-      return rejectedReceipt(id, 'buffer-count-exceeded');
-    }
-    if (
-      byteLength > this.#bufferPolicy.maxBytes ||
-      this.#bufferedBytes + byteLength > this.#bufferPolicy.maxBytes
-    ) {
-      return rejectedReceipt(id, 'buffer-bytes-exceeded');
-    }
-
-    const deferred = createDeferred<StreamWriteOutcomeV1>();
-    this.#queue.push({
-      id,
-      body,
-      byteLength,
-      deferred,
-      attempted: false,
-      settled: false,
-    });
-    this.#bufferedBytes += byteLength;
-    this.#refreshBufferSnapshot();
+    const receipt = this.#queue.enqueue(body, lifecycle);
     this.#kick();
-    return { id, accepted: true, completion: deferred.promise };
+    return receipt;
   }
 
   /** Return an already-settled receipt for a write rejected before queue admission. */
-  reject(reason: StreamWriteRejectionReasonV1): StreamWriteReceiptV1 {
-    return rejectedReceipt(++this.#receiptId, reason);
+  reject(
+    reason: StreamWriteRejectionReasonV1,
+    lifecycle?: StreamProducerWriteLifecycle,
+  ): StreamWriteReceiptV1 {
+    return this.#queue.reject(reason, lifecycle);
   }
 
   /** Resolve on the current or next ready transition. */
@@ -180,7 +141,7 @@ export class DurableStreamProducerSupervisor {
       return Promise.reject(abortError(options.signal));
     }
 
-    const deferred = createDeferred<void>();
+    const deferred = createProducerDeferred<void>();
     const waiter: ReadyWaiter = { ...deferred, signal: options.signal };
     this.#readyWaiters.add(waiter);
     options.signal?.addEventListener(
@@ -200,7 +161,7 @@ export class DurableStreamProducerSupervisor {
     if (this.#state.state === 'failed') {
       throw new Error(this.#state.error ?? 'Producer failed');
     }
-    const snapshot = this.#queue.map((entry) => entry.deferred.promise);
+    const snapshot = this.#queue.entries.map((entry) => entry.deferred.promise);
     if (snapshot.length === 0) {
       return;
     }
@@ -224,15 +185,15 @@ export class DurableStreamProducerSupervisor {
     this.#accepted = false;
     this.#transition('stopping', 0);
     this.#abort.abort(new DOMException('Producer stopped', 'AbortError'));
-    const active = this.#queue[0];
+    const active = this.#queue.entries[0];
     if (active?.attempted) {
-      this.#settle(active, {
+      this.#queue.settle(active, {
         status: 'delivery-unknown',
         reason: 'producer-stopped',
       });
     }
-    for (const entry of [...this.#queue]) {
-      this.#settle(entry, { status: 'cancelled', reason: 'producer-stopped' });
+    for (const entry of [...this.#queue.entries]) {
+      this.#queue.settle(entry, { status: 'cancelled', reason: 'producer-stopped' });
     }
     await this.#processing?.catch(() => undefined);
     this.#transition('stopped', 0);
@@ -273,6 +234,9 @@ export class DurableStreamProducerSupervisor {
       });
       if (result.ok) {
         this.#nextSequence = identity.sequence + 1;
+        if (attempt > 1) {
+          this.#onRecovery?.('close', attempt);
+        }
         this.#transition('stopped', 0);
         this.#rejectReadyWaiters(new Error('Producer stopped'));
         this.#onStopped?.();
@@ -290,6 +254,7 @@ export class DurableStreamProducerSupervisor {
         this.#fail(result.failure.message);
         throw new Error(result.failure.message);
       }
+      this.#onRetry?.('close', attempt + 1, result.failure.kind);
       if (!(await this.#waitBackoff(attempt, result.failure.message))) {
         return;
       }
@@ -316,14 +281,14 @@ export class DurableStreamProducerSupervisor {
       return;
     }
     while (this.#queue.length > 0 && !this.#abort.signal.aborted) {
-      const entry = this.#queue[0];
+      const entry = this.#queue.entries[0];
       if (!entry || !(await this.#deliver(entry))) {
         return;
       }
     }
   }
 
-  async #deliver(entry: QueueEntry): Promise<boolean> {
+  async #deliver(entry: ProducerQueueEntry): Promise<boolean> {
     entry.identity ??= this.#identity();
     for (let attempt = 1; attempt <= this.#reconnectPolicy.maxAttempts; attempt++) {
       if (attempt > 1) {
@@ -341,6 +306,12 @@ export class DurableStreamProducerSupervisor {
             this.#failActive(entry, connected.failure, attempt);
             return false;
           }
+          this.#onRetry?.('connect', attempt + 1, connected.failure.kind);
+          entry.lifecycle?.event('stream.producer.retry', {
+            'netscript.stream.producer.phase': 'connect',
+            'netscript.stream.producer.attempt': attempt + 1,
+            'netscript.stream.producer.reason': connected.failure.kind,
+          });
           if (!(await this.#waitBackoff(attempt, connected.failure.message))) {
             return false;
           }
@@ -359,7 +330,14 @@ export class DurableStreamProducerSupervisor {
       });
       if (result.ok) {
         this.#nextSequence = entry.identity.sequence + 1;
-        this.#settle(entry, { status: 'delivered', attempts: attempt });
+        if (attempt > 1) {
+          this.#onRecovery?.('append', attempt);
+          entry.lifecycle?.event('stream.producer.recovered', {
+            'netscript.stream.producer.phase': 'append',
+            'netscript.stream.producer.attempt': attempt,
+          });
+        }
+        this.#queue.settle(entry, { status: 'delivered', attempts: attempt });
         this.#transition('ready', 0);
         return true;
       }
@@ -378,6 +356,12 @@ export class DurableStreamProducerSupervisor {
         this.#failActive(entry, result.failure, attempt);
         return false;
       }
+      this.#onRetry?.('append', attempt + 1, result.failure.kind);
+      entry.lifecycle?.event('stream.producer.retry', {
+        'netscript.stream.producer.phase': 'append',
+        'netscript.stream.producer.attempt': attempt + 1,
+        'netscript.stream.producer.reason': result.failure.kind,
+      });
       if (!(await this.#waitBackoff(attempt, result.failure.message))) {
         return false;
       }
@@ -394,6 +378,10 @@ export class DurableStreamProducerSupervisor {
         signal: this.#abort.signal,
       });
       if (result.ok) {
+        if (attempt > 1) {
+          this.#onRecovery?.('connect', attempt);
+          this.#queue.notifyRecovery('connect', attempt);
+        }
         this.#transition('ready', 0);
         return true;
       }
@@ -404,6 +392,8 @@ export class DurableStreamProducerSupervisor {
         this.#fail(result.failure.message);
         return false;
       }
+      this.#onRetry?.('connect', attempt + 1, result.failure.kind);
+      this.#queue.notifyRetry('connect', attempt + 1, result.failure.kind);
       if (!(await this.#waitBackoff(attempt, result.failure.message))) {
         return false;
       }
@@ -428,11 +418,11 @@ export class DurableStreamProducerSupervisor {
   }
 
   #failActive(
-    active: QueueEntry,
+    active: ProducerQueueEntry,
     failure: StreamProducerTransportFailureV1,
     attempt: number,
   ): void {
-    this.#settle(active, {
+    this.#queue.settle(active, {
       status: 'delivery-unknown',
       reason: failure.kind === 'aborted' ? 'transport-aborted' : 'retry-exhausted',
       error: failure.message,
@@ -443,24 +433,10 @@ export class DurableStreamProducerSupervisor {
   #fail(message: string): void {
     this.#accepted = false;
     this.#transition('failed', 0, message);
-    for (const entry of [...this.#queue]) {
-      this.#settle(entry, { status: 'cancelled', reason: 'producer-failed' });
+    for (const entry of [...this.#queue.entries]) {
+      this.#queue.settle(entry, { status: 'cancelled', reason: 'producer-failed' });
     }
     this.#rejectReadyWaiters(new Error(message));
-  }
-
-  #settle(entry: QueueEntry, outcome: StreamWriteOutcomeV1): void {
-    if (entry.settled) {
-      return;
-    }
-    entry.settled = true;
-    const index = this.#queue.indexOf(entry);
-    if (index >= 0) {
-      this.#queue.splice(index, 1);
-      this.#bufferedBytes -= entry.byteLength;
-      this.#refreshBufferSnapshot();
-    }
-    entry.deferred.resolve(outcome);
   }
 
   #transition(
@@ -472,9 +448,10 @@ export class DurableStreamProducerSupervisor {
       state,
       attempt,
       bufferedEvents: this.#queue.length,
-      bufferedBytes: this.#bufferedBytes,
+      bufferedBytes: this.#queue.bytes,
       ...(error ? { error } : {}),
     };
+    this.#onState?.(this.#state);
     if (state === 'ready') {
       for (const waiter of this.#readyWaiters) {
         waiter.resolve(undefined);
@@ -483,19 +460,16 @@ export class DurableStreamProducerSupervisor {
     }
   }
 
-  #refreshBufferSnapshot(): void {
-    this.#state = {
-      ...this.#state,
-      bufferedEvents: this.#queue.length,
-      bufferedBytes: this.#bufferedBytes,
-    };
-  }
-
   #rejectReadyWaiters(error: Error): void {
     for (const waiter of this.#readyWaiters) {
       waiter.reject(error);
     }
     this.#readyWaiters.clear();
+  }
+
+  #bufferChanged(events: number, bytes: number): void {
+    this.#state = { ...this.#state, bufferedEvents: events, bufferedBytes: bytes };
+    this.#onBuffer?.(events, bytes);
   }
 
   #writeRejectionReason(): StreamWriteRejectionReasonV1 | undefined {
@@ -519,74 +493,4 @@ export class DurableStreamProducerSupervisor {
       sequence: this.#nextSequence,
     };
   }
-}
-
-function rejectedReceipt(id: number, reason: StreamWriteRejectionReasonV1): StreamWriteReceiptV1 {
-  return {
-    id,
-    accepted: false,
-    completion: Promise.resolve({ status: 'rejected', reason }),
-  };
-}
-
-function createDeferred<T>(): Deferred<T> {
-  let resolvePromise: (value: T) => void = () => undefined;
-  let rejectPromise: (reason: Error) => void = () => undefined;
-  const promise = new Promise<T>((resolve, reject) => {
-    resolvePromise = resolve;
-    rejectPromise = reject;
-  });
-  return { promise, resolve: resolvePromise, reject: rejectPromise };
-}
-
-function reconnectPolicy(
-  input: Partial<StreamProducerReconnectPolicyV1> | undefined,
-): StreamProducerReconnectPolicyV1 {
-  const policy = { ...DEFAULT_STREAM_PRODUCER_RECONNECT_POLICY_V1, ...input };
-  if (
-    !Number.isInteger(policy.maxAttempts) || policy.maxAttempts < 1 ||
-    !Number.isFinite(policy.initialDelayMs) || policy.initialDelayMs < 0 ||
-    !Number.isFinite(policy.multiplier) || policy.multiplier < 1 ||
-    !Number.isFinite(policy.maxDelayMs) || policy.maxDelayMs < 0 ||
-    !Number.isFinite(policy.jitterRatio) || policy.jitterRatio < 0 || policy.jitterRatio > 1
-  ) {
-    throw new TypeError('Reconnect policy must contain finite bounded values');
-  }
-  return policy;
-}
-
-function bufferPolicy(
-  input: Partial<StreamProducerBufferPolicyV1> | undefined,
-): StreamProducerBufferPolicyV1 {
-  const policy = { ...DEFAULT_STREAM_PRODUCER_BUFFER_POLICY_V1, ...input };
-  if (
-    !Number.isInteger(policy.maxEvents) || policy.maxEvents < 1 ||
-    !Number.isInteger(policy.maxBytes) || policy.maxBytes < 1
-  ) {
-    throw new TypeError('Buffer policy must contain positive finite integer bounds');
-  }
-  return policy;
-}
-
-function backoffDelay(
-  policy: StreamProducerReconnectPolicyV1,
-  failedAttempt: number,
-  random: number,
-): number {
-  const base = Math.min(
-    policy.initialDelayMs * policy.multiplier ** Math.max(0, failedAttempt - 1),
-    policy.maxDelayMs,
-  );
-  const boundedRandom = Math.min(Math.max(random, 0), 0.9999999999999999);
-  const jitter = 1 + (boundedRandom * 2 - 1) * policy.jitterRatio;
-  return Math.max(0, Math.round(base * jitter));
-}
-
-function isRetryable(failure: StreamProducerTransportFailureV1): boolean {
-  return failure.kind === 'retryable' || failure.kind === 'stale-epoch';
-}
-
-function abortError(signal?: AbortSignal): Error {
-  const reason = signal?.reason;
-  return reason instanceof Error ? reason : new DOMException('Aborted', 'AbortError');
 }

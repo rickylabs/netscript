@@ -141,6 +141,10 @@ the adapter or fetch/timers to the supervisor.
 | 2026-08-09 | S2    | Finite supervisor  | Widened port and producer atomically; exact-body/tuple transport, bounded FIFO/retry, readiness, receipts, stop, and close are implemented. |
 | 2026-08-09 | S2    | Eight GREENs       | Four original runtime REDs and four API-absence replacements now pass as eight behavioral tests; removed the run-dir negative fixtures. |
 | 2026-08-09 | S2    | Protocol proof     | Reference server accepts a new tuple, reports its exact replay as duplicate, rejects a gap, and reads back exactly one event.     |
+| 2026-08-09 | S3    | Correlated OTEL    | Publish span stays open through buffered/retry/recovered events and ends only with the receipt; exact replay retains one trace ID. |
+| 2026-08-09 | S3    | Honest metrics     | Observable queue values and counters distinguish delivered, rejected, accepted-write cancellation, retry, recovery, unknown, and state transitions. |
+| 2026-08-09 | S3    | Doctrine repair    | Initial scoped doctrine found the new supervisor at 697 lines; split queue/contract/support reasons until final scoped check had zero WARN. |
+| 2026-08-09 | S3    | AP-13 disposition  | Manual F-14 found one documentation-only console example and zero executable uses; exact producer debt row closed, no generalized closure. |
 
 ## Decisions
 
@@ -170,6 +174,11 @@ See `plan.md` D1–D16. No open decision would force implementation rework.
 | S2 scoped check                     | package plus reference-server test, `--deno-arg --no-lock`      | PASS, exit 0 | 38 files, one batch, zero failed batches or diagnostics.  |
 | S2 scoped lint                      | package plus reference-server test                              | PASS, exit 0 | 38 files, zero findings.                                  |
 | S2 scoped format                    | package plus reference-server test                              | PASS, exit 0 | 38 files, zero findings.                                  |
+| S3 telemetry tests                  | full `packages/plugin-streams-core/tests/`                       | PASS, exit 0 | 28 passed, 0 failed; one span/trace across retry and distinct terminal metrics. |
+| S3 scoped check                     | core wrapper with `--deno-arg --no-lock`                        | PASS, exit 0 | 42 files, zero failed batches or diagnostics.             |
+| S3 scoped lint                      | core wrapper                                                     | PASS, exit 0 | 42 files, zero findings after type-only import repair.    |
+| S3 scoped format                    | core wrapper                                                     | PASS, exit 0 | 42 files, zero findings after mechanical formatting.      |
+| S3 full export doc lint             | `deno task doc:lint --root packages/plugin-streams-core --pretty` | PASS, exit 0 | Combined diagnostics 0 after public local meter types.    |
 
 ### S1 RED evidence
 
@@ -194,9 +203,10 @@ the slice run directory and each emitted exactly its named missing-symbol diagno
 | ---------------------- | ----------------------- | ------------- | -------------------------------------------------------------------------------------------------- |
 | F-1..F-19              | NOT_RUN                 | Planned S2–S4 | AP-13 exact producer debt currently accepted.                                                      |
 | JSR surface scan       | PASS with helper caveat | `research.md` | Helper warns on banner; raw dry-run authority is green.                                            |
-| Package quality scan   | NOT_RUN                 | Planned S3–S4 | Decisive scoped command covers `packages/plugin-streams-core/src`; #1403 owns root gap.            |
-| Package doctrine check | NOT_RUN                 | Planned S3–S4 | Decisive scoped command covers `packages/plugin-streams-core`; root aggregate is non-covering.     |
-| F-14 manual scan       | `PENDING_SCRIPT`        | Planned S3    | Record every `console.*` match and classify executable versus comment-only; #1403 owns automation. |
+| Package quality scan   | PASS, exit 0            | S3 decisive  | Package source scanned directly: zero findings and zero allowances.                                |
+| Package doctrine check | PASS, exit 0            | S3 decisive  | Final package-scoped result: FAIL=0 WARN=0 INFO=1; INFO is pre-existing missing architecture doc.  |
+| F-14 manual scan       | PASS, exit 0            | `PENDING_SCRIPT` manual | One comment-only diagnostics example; zero executable `console.*`; #1403 owns automation. |
+| Aggregate `quality:gate` / `arch:check` | PASS, exit 0 each | Non-decisive | Required aggregates ran, but configured roots omit this package; #1403 owns that gap.      |
 
 ### S1 compile safety
 
