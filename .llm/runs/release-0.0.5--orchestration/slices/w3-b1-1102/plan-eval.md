@@ -151,3 +151,88 @@ Each verified by opening the file at `origin/main@3f41a3639` or by execution:
 discretion). Cycle 1 of 2. The research base, discriminator design, failure matrix, gate selection,
 and boundary handling all held under adversarial checking; the required fix is one contained design
 decision and its test consequence, not a re-plan.
+
+## Cycle 2
+
+| Field     | Value                                                                    |
+| --------- | ------------------------------------------------------------------------ |
+| Verdict   | **PASS**                                                                 |
+| Evaluator | Claude · Fable 5 · medium — same separate session as cycle 1             |
+| Repair    | `271428de5` (plan repair), `7ab78fbef` (handoff); run-dir files only     |
+| Date      | 2026-08-09                                                               |
+
+One-line verdict: D12 closes M1 with a rule both adapters and the generator share, every repair
+claim I opened or executed held — including running the checked-in sweep against the production
+adapter and reproducing the recorded table row-for-row — and the loosened Prisma expectation is
+still a discriminator; the plan passes.
+
+Evidence discipline: the evaluator checkout still predates #1375, so as in cycle 1 no worktree file
+was used as evidence — everything below is from `git show` extraction at `origin/main@3f41a3639` or
+from the PR branch, with the sweep executed against a `git archive` extraction of `origin/main`.
+`git diff --stat c0bdb02c3..271428de5` confirms the repair touches only
+`.llm/runs/.../w3-b1-1102/` — no product source changed.
+
+### Disposition of cycle-1 findings
+
+| Finding | Disposition | Evidence |
+| ------- | ----------- | -------- |
+| **M1** (open `llms.txt` filesystem decision) | **Closed by D12.** | Plan locks admission of `.md` plus exactly `relativePath === "llms.txt"`; one shared normalizer strips `.md`/`.txt` so both adapters address `llms`; the publish generator mirrors the rule (S3 gate: "generator emits `llms` from `llms.txt`"). New research F14 documents the pre-fix divergence with correct cites — verified: `slugFromPath`/`normalizeSlug` at `filesystem-docs-corpus.ts:380-388` strip only `.md`; `docsSlugFromPath` at `generate-publish-assets.ts:224-226` strips only `.md`, so `llms.txt` would today become embedded slug `llms.txt`. The Non-scope carve-out is stated, not implied: "Narrow exception: `search_docs`' filesystem source universe intentionally gains root `llms.txt`, canonicalized as `llms`". Open-decision sweep gains a Resolved row; drift watch gains the disagreement trigger; drift.md records the cycle-1 defect append-only. |
+| **m2** (F4 evidence pointer broken) | **Closed by execution.** | `pre-fix-query-sweep.ts` is checked into the run dir and imports the production `FilesystemDocsCorpus` (not a replica). I ran the exact recorded command against a `git archive` extraction of `origin/main`: exit 0, six JSON rows, matching the recorded table row-for-row (e.g. Prisma intent: `reference/workers 3523, reference/fresh 3247, durable-workflows/sagas 3119, explanation/aspire 2346, data-persistence/database 2345`; "avoid hitting my service every render" top five contains no `web-layer/query`). |
+| **m3** (nested Prisma sections, fragile exact order) | **Closed by constraint change, discriminator preserved.** | D9 now requires the Prisma row's three named sections as an **unordered required top-three set** — i.e. the top three must be exactly that set, so any regression admitting a foreign section still fails; only the internal order of the three overlapping sections is freed, which is precisely the part BM25 length normalization could not justify. The other four rows keep exact order; per-adapter byte-for-byte repeatability is retained. |
+
+### Coordinator questions, answered with evidence
+
+1. **D12 closes M1** — yes; same slug from both adapters via the shared `.md`/`.txt` normalizer
+   plus generator mirroring, carve-out explicit (verified above).
+2. **Semantic change honestly declared** — yes; the Non-scope narrow exception names the
+   `search_docs` filesystem source-universe change. `list_docs.documentCount` moves as a derived
+   consequence and is not named verbatim; non-blocking, because the count-locked tests that would
+   move are inside the plan's own slice files (F14 cites `init-agent_test.ts:655-678`;
+   `packages/mcp/tests/` is S1–S3 scope), so the shift cannot land silently. Recommend the S2
+   slice comment name the `documentCount` change explicitly.
+3. **Negative controls are real** — the rule is positive exact-path admission, so exclusion is by
+   construction, and the controls are not fixture inventions: verified at
+   `init-agent_test.ts:655-678` that every installed root really contains `llms-full.txt` and
+   nested `deno-doc/config.txt`, so the installed-corpus smoke exercises the exclusions in the
+   real deployment; S2's `docs-source-policy_test.ts` covers async and sync walkers.
+4. **The stdio smoke exercises the deployment path and can fail** — S4's gate runs real
+   `agent init --with-docs`, then a real `agent mcp` stdio process against `.netscript/docs`
+   (no AppHost/container), requiring rank-1 `llms#task-router`. Concrete pre-fix failure verified:
+   today's `agent-mcp-stdio_test.ts` hand-writes a single `workers.md` (lines 42-45), asserts
+   `docs.count === 1` / slug `workers` (138-139), and never calls `find_guidance`; and the
+   pre-D12 filesystem walker cannot see `llms.txt` at all, so the smoke cannot return the required
+   rank-1 before the fix.
+5. **Byte-identical release files** — D9: "Every row runs against both filesystem and embedded
+   adapters over the same release files"; S3: "run both adapters over byte-identical real files"
+   with the materialized-filesystem run listed in the proving gate. The claim is stated as a locked
+   gate condition, and slug equality across the two paths is what D12's shared normalizer
+   guarantees, so parity is a comparison of the same corpus, not two corpora agreeing by luck.
+6. **Prisma row still discriminates** — see m3 disposition; a genuine retrieval regression
+   (foreign section entering the top three, or a required section falling out) still fails the row.
+7. **Nothing broken** — the repair strengthened validation rows 1–2 (dual-adapter + installed-
+   corpus expectations), added the source-policy failure-matrix row with a real behavioral RED,
+   left the settled cycle-1 facts (15 citations, gate table rows 3–16, token language, counts,
+   row-7/#1090 boundary) untouched, and honestly recorded in the worklog that the cycle-1
+   evaluator artifact was not on the PR branch rather than fabricating it.
+
+### Plan-Gate checklist (cycle 2)
+
+- [x] Research present and current — F14 added with verified cites; sweep now reproducible and
+      reproduced.
+- [x] Decisions locked — D1–D12.
+- [x] **Open-decision sweep — now passes.** The cycle-1 gap is a Resolved row; no remaining open
+      decision forces rework.
+- [x] Commit slices — 5 ordered slices; S2–S4 updated coherently with the new policy and gates.
+- [x] Risk register — new `.txt`-broadening risk row with async/sync walker-test mitigation.
+- [x] Gate set selected — unchanged where settled; rows 1–2 strengthened.
+- [x] Deferred scope explicit — unchanged.
+- [x] jsr-audit — unchanged; no new public-surface consequence from D12 (source policy is
+      adapter-internal; the normalizer ships inside existing modules).
+
+### Verdict
+
+`PASS` — implementation may begin at S1. Binding conditions carried to IMPL-EVAL: the four exact
+orderings and the Prisma unordered set may not be rewritten to match observed output without
+recorded drift and evaluator approval; the `llms#task-router` row must pass embedded, materialized-
+filesystem, and real `agent init --with-docs` stdio paths; aggregates remain non-decisive for
+`packages/mcp`; no AppHost/container run before a token grant.

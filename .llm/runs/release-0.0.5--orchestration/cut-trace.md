@@ -274,3 +274,37 @@ The correction review settled that by **diff rather than by test count**: the he
 1–6 and 8 replaying `=`. It also re-proved falsifiability **at the merging head** — reverting the S3
 wiring in a fresh export fails 2/4, exit 1 — and confirmed no stale CLI pin was reintroduced by the
 rebase under #1401's stricter generator.
+
+| Time (UTC)        | Commit      | PR    | Issues closed | Classification                                                                                                     |
+| ----------------- | ----------- | ----- | ------------- | ------------------------------------------------------------------------------------------------------------------ |
+| 2026-08-09T03:1xZ | `3ce91f2c2` | #1402 | #1326         | W3-A — durable producer bounded reconnect, readiness, buffer limits, explicit receipts and shutdown semantics (p0) |
+
+Pre-merge gate: 9/9 named expensive gates `success`, none skipped; zero unticked boxes on #1326 and
+zero unticked PR DoD boxes; review threads 0/0; base current.
+
+**Three PLAN-EVAL cycles and three CI findings.** The plan cycles found its eight REDs were one RED
+counted eight times, its framework-law gate row was vacuous for the package it changes (which
+surfaced the repo-wide **#1403**, p0), and its fixture relocation needed verifying rather than
+asserting. CI then found a module-boundary defect and a coverage-drift defect that the slice's own
+focused commands could not see.
+
+**All three CI/plan findings share one root cause**, recorded because it is the milestone's most
+repeated lesson: **commands scoped to the package edited rather than to the surface the change
+affects.** The E2E gate imported a probe from `plugins/streams/**` that the generated service
+scaffold does not contain — invisible in the runtime lane because the runtime scaffold has that
+plugin in its installed path. Then widening `requestTimeoutMs` into a required field broke a
+reference-server compatibility test in `plugins/streams/tests/**` that the 43-file scoped run never
+crossed.
+
+**The boundary fix is the honest one:** the gate now imports
+`@netscript/plugin-streams-core/telemetry` — the package's public specifier — instead of a
+filesystem path into another workspace's source tree. `generated.service-check` was **not** weakened
+with an exclude, skip or narrowed root, and `requestTimeoutMs` remained **required** rather than
+being made optional to silence four TS2345s. Both were the available shortcuts and neither was
+taken.
+
+Correction-review boundary applied and satisfied:
+`git diff 331be727e..61d92171a -- packages/plugin-streams-core plugins/streams/src` is **empty**, so
+the product is unchanged since the IMPL-EVAL head, and the decisive
+`behavior.streams.producer-reconnect` gate re-executed green at the merging head in both CI runtime
+lanes.
