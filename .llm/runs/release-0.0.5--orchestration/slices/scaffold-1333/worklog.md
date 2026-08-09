@@ -405,6 +405,24 @@ quality scan over `packages/cli/src` and `packages/cli/e2e` exited 0 with 0 find
 existing allowances. `check:assets-barrel` exited 0. No `e2e:cli`, AppHost, or container run was
 started; the byte-identical proof preserves the serialized receipt's behavior coverage.
 
+## Post-PASS CI repair — markdown fixture app identity
+
+CI at `f7e5c3396` passed code quality, close-gate, and both Linux scaffold-runtime jobs, then failed
+the Fresh-UI markdown hydration test because it scaffolded `markdown-browser` without `--app-name`
+and wrote into the obsolete `apps/dashboard` path. The test now passes `--app-name dashboard`
+explicitly because its subject is Markdown hydration, not the S1 naming rule.
+
+The recurrence guard now scans repository test files and reports a test that contains an init
+invocation plus `apps/dashboard` without an explicit app-name. Removing the new argument produced
+raw exit 1 naming
+`packages/fresh-ui/tests/registry/markdown-renderer.test.ts:151`; restoring it produced raw exit 0
+with 2 guard tests passed. The focused Markdown test then exited 0 with 2 passed / 0 failed,
+including the real production hydration build. Format check exited 0 for both changed tests.
+
+This is a test-only delta: neither changed file is executed by `scaffold.runtime`, and no product
+source, template, or generated asset changes. Ledger rows 74/75 therefore remain behavior-valid.
+No AppHost, container, or `e2e:cli` command ran locally.
+
 ### Gates
 
 | Gate | Result |

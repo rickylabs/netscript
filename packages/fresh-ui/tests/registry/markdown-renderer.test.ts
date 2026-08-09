@@ -158,6 +158,8 @@ Deno.test('generated Fresh Markdown island production-builds for hydration', asy
       projectName,
       '--path',
       parent,
+      '--app-name',
+      'dashboard',
       '--db',
       'none',
       '--no-aspire',

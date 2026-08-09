@@ -119,6 +119,21 @@ focused assertion pins the complete 36-byte source by length and every character
 temporary file written by the probe is byte-identical to the source exercised by serialized ledger
 row 74/75. This is representation-only and does not invalidate that runtime receipt.
 
+## 2026-08-09 — markdown hydration test owns its fixture app identity
+
+CI found a fourth stale consumer: the Fresh-UI markdown hydration test scaffolded with an omitted
+app name but wrote follow-up files under `apps/dashboard`. The test is about copied Markdown
+hydration, not default-name derivation, so its init command now explicitly owns the fixture identity
+with `--app-name dashboard`, matching the public-init golden convention. Both changed files are
+tests only; no runtime/product source or scaffold output changes, so ledger rows 74/75 remain valid.
+
+The identity-policy suite now also walks repository TypeScript tests and rejects a file that both
+invokes `init`, assumes `apps/dashboard`, and lacks `--app-name`. This file-level correlation avoids
+false positives from tests that create their own dashboard fixture. A mixed file containing both
+explicit and omitted-name init calls remains the documented residual gap; command-array parsing is
+deferred until that pattern exists. Removing the explicit argument from the markdown test made the
+guard exit 1 with its exact path and line; restoration passes.
+
 ## 2026-08-09 — serialized runtime stopped at stale project-boundary app identity
 
 The single ledger-row-70 runtime execution at `2150421e4` exited 1 with 16 passed / 1 failed / 2

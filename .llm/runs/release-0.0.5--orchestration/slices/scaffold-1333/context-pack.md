@@ -105,3 +105,10 @@ deliberate explicit-any fixture string under CLI E2E. The token is now assembled
 codes, while a focused test pins all 36 bytes of `ANY_PROBE_SOURCE`; runtime behavior is therefore
 unchanged from the row-74/75 authorized source. The combined `packages/cli/src` +
 `packages/cli/e2e` quality scan is green with zero findings and the same six existing allowances.
+
+CI at `f7e5c3396` passed code quality, close-gate, and both Linux scaffold-runtime jobs, but exposed
+one test-only stale identity in the Fresh-UI markdown hydration test. That fixture now passes
+`--app-name dashboard` explicitly. A repository-test identity guard detects the precise file-level
+combination of an init invocation, a hardcoded `apps/dashboard`, and no explicit app-name; its
+mutation exits 1 and clean run exits 0. The focused markdown test production-builds green. No file
+executed by `scaffold.runtime` changes, so row-74/75 evidence remains current.
