@@ -1,6 +1,8 @@
-import { assertEquals } from 'jsr:@std/assert@^1';
-
-import { isNoRunningAppHostOutput } from './operation-runner-helpers.ts';
+import { assertEquals } from '@std/assert';
+import {
+  buildDbCliEnv,
+  isNoRunningAppHostOutput,
+} from './operation-runner-helpers.ts';
 
 Deno.test('isNoRunningAppHostOutput accepts the documented line with allowed prefixes', () => {
   assertEquals(
@@ -21,4 +23,11 @@ Deno.test('isNoRunningAppHostOutput rejects a failure that only quotes the phras
     ),
     false,
   );
+});
+
+Deno.test('db migrate forwards artifact name and terminal identity to the generated task', () => {
+  const env = buildDbCliEnv('migrate', 'postgres', 'add-profile', true);
+  assertEquals(env.PRISMA_MIGRATION_NAME, 'add-profile');
+  assertEquals(env.NETSCRIPT_MIGRATION_INTERACTIVE, 'true');
+  assertEquals('NETSCRIPT_PRISMA_NAME' in env, false);
 });

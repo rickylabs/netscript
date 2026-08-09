@@ -75,9 +75,12 @@ const RUNTIME_GATES = [
   GATE.RUNTIME_READINESS_FIXTURE,
   GATE.RUNTIME_ASPIRE_START,
   GATE.DATABASE_INIT,
+  GATE.DATABASE_MIGRATION_ARTIFACTS,
   GATE.DATABASE_GENERATE,
   GATE.DATABASE_SEED,
+  GATE.RUNTIME_CAPTURE_DB_ALLOCATION_FIRST,
   GATE.RUNTIME_ASPIRE_RESTART_AFTER_DB,
+  GATE.RUNTIME_CAPTURE_DB_ALLOCATION_SECOND,
   GATE.RUNTIME_WAIT_POSTGRES,
   GATE.RUNTIME_WAIT_MYSQL,
   GATE.RUNTIME_WAIT_MSSQL,
@@ -97,6 +100,7 @@ const RUNTIME_GATES = [
   GATE.BEHAVIOR_WORKERS_EXECUTIONS,
   GATE.BEHAVIOR_MCP_ENDPOINT_DIRECTORY,
   GATE.BEHAVIOR_SERVICE_HEALTH,
+  GATE.BEHAVIOR_LIVE_DB_ENDPOINT,
   GATE.BEHAVIOR_SAGAS_HEALTH,
   GATE.BEHAVIOR_SAGAS_LIST,
   GATE.BEHAVIOR_SAGAS_INSTANCES,
@@ -122,7 +126,15 @@ const RUNTIME_GATES = [
 // is not supported by the libSQL adapter. Keep that product-health assertion in
 // the Postgres merge-readiness suite while the reduced-container tier exercises
 // every provider-neutral runtime behavior.
-const RUNTIME_SQLITE_GATES = RUNTIME_GATES.filter((gate) => gate !== GATE.BEHAVIOR_SERVICE_HEALTH);
+const POSTGRES_ONLY_RUNTIME_GATES = new Set<GateId>([
+  GATE.DATABASE_MIGRATION_ARTIFACTS,
+  GATE.RUNTIME_CAPTURE_DB_ALLOCATION_FIRST,
+  GATE.RUNTIME_CAPTURE_DB_ALLOCATION_SECOND,
+  GATE.BEHAVIOR_SERVICE_HEALTH,
+  GATE.BEHAVIOR_LIVE_DB_ENDPOINT,
+]);
+
+const RUNTIME_SQLITE_GATES = RUNTIME_GATES.filter((gate) => !POSTGRES_ONLY_RUNTIME_GATES.has(gate));
 
 const PLUGIN_GATES = [
   GATE.PREFLIGHT_DENO,
@@ -254,6 +266,7 @@ function runtimeGateIds(
   database: RunOptions['database'],
 ): readonly GateId[] {
   return gates.filter((id) => {
+    if (POSTGRES_ONLY_RUNTIME_GATES.has(id)) return database === 'postgres';
     if (id === GATE.RUNTIME_WAIT_POSTGRES) return database === 'postgres';
     if (id === GATE.RUNTIME_WAIT_MYSQL) return database === 'mysql';
     if (id === GATE.RUNTIME_WAIT_MSSQL) return database === 'mssql';

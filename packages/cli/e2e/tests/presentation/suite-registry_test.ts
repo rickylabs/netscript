@@ -1,5 +1,5 @@
 import { assertEquals } from '@std/assert';
-import { DEPLOY, GATE, QUICKSTART, SCAFFOLD } from '../../src/domain/cli-surface.ts';
+import { DEPLOY, GATE, type GateId, QUICKSTART, SCAFFOLD } from '../../src/domain/cli-surface.ts';
 import {
   DATABASE,
   PACKAGE_SOURCE,
@@ -218,7 +218,7 @@ Deno.test('sqlite runtime suite resolves its reduced-container defaults without 
   }
 });
 
-Deno.test('sqlite runtime suite excludes only the libSQL-incompatible users health gate', () => {
+Deno.test('sqlite runtime suite excludes Postgres-only database evidence gates', () => {
   const sqlite = resolveSuite(SCAFFOLD.RUNTIME_SQLITE);
   const postgres = resolveSuite(SCAFFOLD.RUNTIME);
   const runtimeCapability = scaffoldCapabilitySuites.find((suite) => suite.id === SCAFFOLD.RUNTIME);
@@ -233,7 +233,15 @@ Deno.test('sqlite runtime suite excludes only the libSQL-incompatible users heal
   assertEquals(postgres.gates.some((gate) => gate.id === GATE.BEHAVIOR_SERVICE_HEALTH), true);
   assertEquals(
     sqliteCapability.gates,
-    runtimeCapability.gates.filter((gate) => gate !== GATE.BEHAVIOR_SERVICE_HEALTH),
+    runtimeCapability.gates.filter((gate) =>
+      !(new Set<GateId>([
+        GATE.DATABASE_MIGRATION_ARTIFACTS,
+        GATE.RUNTIME_CAPTURE_DB_ALLOCATION_FIRST,
+        GATE.RUNTIME_CAPTURE_DB_ALLOCATION_SECOND,
+        GATE.BEHAVIOR_SERVICE_HEALTH,
+        GATE.BEHAVIOR_LIVE_DB_ENDPOINT,
+      ])).has(gate)
+    ),
   );
 });
 
@@ -246,18 +254,6 @@ Deno.test('sqlite runtime suite keeps explicit database overrides above suite de
 });
 
 Deno.test('runtime suite wait matrices match runtime resources for postgres and sqlite', () => {
-  const runtimeCapability = scaffoldCapabilitySuites.find((suite) => suite.id === SCAFFOLD.RUNTIME);
-  const sqliteCapability = scaffoldCapabilitySuites.find((suite) =>
-    suite.id === SCAFFOLD.RUNTIME_SQLITE
-  );
-  if (!runtimeCapability || !sqliteCapability) {
-    throw new Error('Runtime capability suites are not registered.');
-  }
-  assertEquals(
-    sqliteCapability.gates,
-    runtimeCapability.gates.filter((gate) => gate !== GATE.BEHAVIOR_SERVICE_HEALTH),
-  );
-
   const cases = [
     [resolveSuite(SCAFFOLD.RUNTIME), DATABASE.POSTGRES],
     [resolveSuite(SCAFFOLD.RUNTIME_SQLITE), DATABASE.SQLITE],
@@ -283,6 +279,15 @@ Deno.test('runtime suite wait matrices match runtime resources for postgres and 
   assertEquals(runtimeGateIds.includes(GATE.RUNTIME_WAIT_POSTGRES), true);
   assertEquals(runtimeGateIds.includes(GATE.RUNTIME_WAIT_MYSQL), false);
   assertEquals(runtimeGateIds.includes(GATE.RUNTIME_WAIT_MSSQL), false);
+  assertEquals(runtimeGateIds.includes(GATE.DATABASE_MIGRATION_ARTIFACTS), true);
+  assertEquals(runtimeGateIds.includes(GATE.RUNTIME_CAPTURE_DB_ALLOCATION_FIRST), true);
+  assertEquals(runtimeGateIds.includes(GATE.RUNTIME_CAPTURE_DB_ALLOCATION_SECOND), true);
+  assertEquals(runtimeGateIds.includes(GATE.BEHAVIOR_LIVE_DB_ENDPOINT), true);
+
+  assertEquals(sqliteGateIds.includes(GATE.DATABASE_MIGRATION_ARTIFACTS), false);
+  assertEquals(sqliteGateIds.includes(GATE.RUNTIME_CAPTURE_DB_ALLOCATION_FIRST), false);
+  assertEquals(sqliteGateIds.includes(GATE.RUNTIME_CAPTURE_DB_ALLOCATION_SECOND), false);
+  assertEquals(sqliteGateIds.includes(GATE.BEHAVIOR_LIVE_DB_ENDPOINT), false);
 });
 
 Deno.test('runtime suite selects mssql database resource wait for mssql', () => {

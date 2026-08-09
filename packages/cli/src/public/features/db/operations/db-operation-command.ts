@@ -26,6 +26,8 @@ export interface DbOperationCommandOptions {
 export interface DbOperationCommandDependencies {
   /** Return the current working directory. */
   readonly cwd: () => string;
+  /** Report whether stdin is attached to a terminal. */
+  readonly isInteractive?: () => boolean;
 }
 
 /** Shared public database operation command owner. */
@@ -79,6 +81,7 @@ export async function runDbOperation(
     operation,
     target,
     migrationName: options.migrationName,
+    interactive: dependencies.isInteractive?.() ?? Deno.stdin.isTerminal(),
     projectRoot,
   });
 }

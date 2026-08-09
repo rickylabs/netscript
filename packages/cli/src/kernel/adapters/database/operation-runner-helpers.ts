@@ -35,6 +35,7 @@ export function buildDbCliEnv(
   operation: DbOperationRequest['operation'],
   configKey: string,
   migrationName?: string,
+  interactive?: boolean,
 ): Record<string, string> {
   const env: Record<string, string> = {
     ASPIRE_CLI_START_TIMEOUT: resolveAspireCliStartTimeout(),
@@ -42,7 +43,10 @@ export function buildDbCliEnv(
     NETSCRIPT_PRISMA_TARGET: configKey,
   };
   if (migrationName) {
-    env.NETSCRIPT_PRISMA_NAME = migrationName;
+    env.PRISMA_MIGRATION_NAME = migrationName;
+  }
+  if (interactive !== undefined) {
+    env.NETSCRIPT_MIGRATION_INTERACTIVE = String(interactive);
   }
   return env;
 }
