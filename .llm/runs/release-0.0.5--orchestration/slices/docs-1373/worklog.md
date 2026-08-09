@@ -21,5 +21,11 @@
 
 ## Gates
 
-Pending implementation.
+| S1 gate | Result |
+| --- | --- |
+| Non-default client-symbol pre-fix | expected RED, raw exit 1; `orders.ts` lacked `ordersContract` and emitted `exampleService*` |
+| Canonical asset generation | PASS, raw exit 0 |
+| Client scaffolder + route templates | PASS, raw exit 0; 2 tests / 21 BDD steps |
 
+S1 changed the canonical client template and all six default-scaffold consumers to use the same
+`serviceName | camelCase` symbol family. No public command shape or module path changed.

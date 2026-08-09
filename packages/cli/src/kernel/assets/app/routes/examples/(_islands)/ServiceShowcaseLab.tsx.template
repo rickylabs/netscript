@@ -10,8 +10,8 @@ import {
 } from '@netscript/fresh/query';
 import { Button } from '@app/components/ui/mod.ts';
 import {
-  exampleServiceName,
-  exampleServiceQueries,
+  {{serviceName | camelCase}}Name,
+  {{serviceName | camelCase}}Queries,
 } from '@app/lib/example-service.ts';
 import {
   formatServiceTimestamp,
@@ -35,7 +35,7 @@ function ServiceShowcaseLabInner(props: Props) {
     hydratedRef.current = true;
   }
 
-  const listOptions = exampleServiceQueries.list.queryOptions(props.input);
+  const listOptions = {{serviceName | camelCase}}Queries.list.queryOptions(props.input);
   const {
     data,
     status,
@@ -52,7 +52,7 @@ function ServiceShowcaseLabInner(props: Props) {
     void refetch();
   };
 
-  const createOptions = exampleServiceQueries.create.mutationOptions();
+  const createOptions = {{serviceName | camelCase}}Queries.create.mutationOptions();
   const createMutation = useMutation<ServiceRecord, unknown, CreateInput>({
     mutationFn: createOptions.mutationFn,
     onSuccess: (record) => {
@@ -64,7 +64,7 @@ function ServiceShowcaseLabInner(props: Props) {
     },
   });
 
-  const updateOptions = exampleServiceQueries.update.mutationOptions();
+  const updateOptions = {{serviceName | camelCase}}Queries.update.mutationOptions();
   const renameMutation = useMutation<ServiceRecord, unknown, UpdateInput>({
     mutationFn: updateOptions.mutationFn,
     onSuccess: (record) => {
@@ -76,7 +76,7 @@ function ServiceShowcaseLabInner(props: Props) {
     },
   });
 
-  const deleteOptions = exampleServiceQueries.delete.mutationOptions();
+  const deleteOptions = {{serviceName | camelCase}}Queries.delete.mutationOptions();
   const deleteMutation = useMutation<ServiceRecord, unknown, DeleteInput>({
     mutationFn: deleteOptions.mutationFn,
     onSuccess: (record) => {
@@ -113,7 +113,7 @@ function ServiceShowcaseLabInner(props: Props) {
           loading={isLoading}
           onClick={() => void refetch()}
         >
-          {isLoading ? 'Refreshing list' : `Refresh ${exampleServiceName}`}
+          {isLoading ? 'Refreshing list' : `Refresh ${{{serviceName | camelCase}}Name}`}
         </Button>
         <Button
           type='button'
