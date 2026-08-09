@@ -29,3 +29,166 @@
 | C-D25 | 2026-08-06 | The temporary aggregate canary/orchestrator-branch PR mechanism outlived the JSR publish-cap workaround. | Owner retired it after C14. Every post-cut meaningful connected cluster targets `main` directly and owns independent CI/review; the orchestrator branch retains coordination history only. |
 | C-D26 | 2026-08-06 | Initial canary.14 pinned production E2E failed when JSR returned a transient 502 for an already-published Fresh source file; the independent quickstart walk passed. | Preserved the failed receipt and immutable tag. Used the documented tag-bound same-semver recovery, not a code change or canary.15. Run `31128595811` and pinned child `31128614286` completed success and recorded the authoritative green pair. |
 | C-D27 | 2026-08-07 | Concurrent app-server and CLI/tmux resumes previously created duplicate writers for the same thread/worktree. | Durable rule: exactly one writer for thread `019fd77c-f583-7b01-aed8-c8665ac09230`; never overlap app-server and CLI/tmux resume. Protected root lock and quarantined interrupted worktrees remain untouched. |
+
+## C-D84 — the #1343 canary.18 smoke mutated the orchestration worktree's `deno.lock`
+
+**Severity:** minor (caught before any commit; restored byte-for-byte).
+
+Running `deno run --allow-all packages/cli/e2e/cli.ts run scaffold.runtime --source jsr --cli
+jsr:@netscript/cli@0.0.5-canary.18` from the orchestration worktree left `deno.lock` modified: +101
+lines adding `jsr:@netscript/*@0.0.5-canary.18` entries for aspire, cli, config, fresh-ui, mcp,
+plugin, plugin-sagas and plugin-workers.
+
+**Provenance proven, not assumed:** file mtime `15:30:26`, inside the smoke window (~15:27–15:35),
+and the added specifiers are exactly the canary the smoke installed. Run-owned.
+
+**Action:** `git checkout -- deno.lock`; verified byte-identical to HEAD by sha256
+(`764d8496848e50a8` both sides). Nothing committed. Worktree status clean apart from the item below.
+
+**Not run-owned — quarantined intact, not deleted:** untracked `.playwright-cli/` — directory mtime
+`08:21:21`, contents stamped `06:20–06:21Z`, roughly seven hours before this smoke started. It does
+not belong to this run, so it was never a candidate for deletion, under the same rule that leaves the
+foreign `redis-jfgcbtaf` container from `w6-review-desk` untouched.
+
+The stable-cut gate requires a clean tree, so it was **moved intact** rather than removed:
+
+| | |
+| --- | --- |
+| Source | `/home/codex/repos/ns005-stable-opus5/.playwright-cli/` |
+| Destination | `/tmp/ns005-stable-opus5-preexisting-playwright-cli-20260809T1538Z` |
+| Files | 3 before, 3 after |
+| Bytes | 34,105 before, 34,105 after |
+| Content manifest sha256 | `8589226457438b71` before, `8589226457438b71` after |
+
+Target verified absent before the move. Contents are byte-preserved and recoverable at that path;
+nothing was deleted. `git status --porcelain` is now empty.
+
+**Generalisable point:** the smoke resolves published JSR specifiers using the invoking workspace's
+lockfile, so running it from a tracked worktree writes release-version entries into that lockfile.
+Future installed-consumer runs should either execute from a scratch checkout or expect this cleanup.
+Related in kind to #1417 (`publish:dry-run` rewriting catalog-backed manifests): a read-only-sounding
+verification command with a tree-mutating side effect.
+
+## C-D85 — ready_for_review auto-emitted an OpenHands request; native evaluation is the required lane
+
+**Severity:** moderate (process). Owner cancelled the triggered run; no evaluation was consumed from it.
+
+Flipping PR #1422 to ready fired `.github/workflows/docs-openhands-eval.yml`, which posts an
+`@openhands-agent model=openrouter/minimax/minimax-m3 output=pr-comment` comment; that comment then
+triggers `openhands-agent.yml` via `issue_comment`. Run `31318774640` started and was cancelled by
+the owner.
+
+**Why it fired.** The job's condition is `ready_for_review` **and** one of `type:docs`, `area:docs`,
+`ci:full`. #1422 carried `area:docs` — inaccurately, since the IMPL-EVAL confirmed the diff contains
+no `docs/site` files at all. An inaccurate label emitted a real evaluation request.
+
+**Escape hatch existed only on paper.** The workflow reads `SKIP_REQUESTED` from a `docs-eval:skip`
+label, but that label **did not exist in the repository**, so `gh pr edit --add-label` failed with
+`'docs-eval:skip' not found`. Created it and applied it to #1422. Same family as #1408 and #1415: a
+guard that is present in the code and absent in reality, so nobody can actually use it.
+
+**Standing policy for the rest of this release.** Native opposite-family IMPL-EVAL (Fable 5 medium
+for Codex-authored work) is the required lane; OpenHands is not part of it. Therefore:
+
+1. Apply `docs-eval:skip` **before** any `ready_for_review` transition on a PR carrying `type:docs`,
+   `area:docs` or `ci:full`.
+2. Label to the surface the diff actually changes. #1422's `area:docs` was wrong on the facts and is
+   what made the suppression necessary in the first place.
+3. Do not modify `docs-openhands-eval.yml` in this release slice — the workflow is not the defect;
+   the missing label and the inaccurate labelling were.
+
+The valid evaluation for #1422 remains the native Fable delta PASS tied to head `b56f04997`.
+
+## C-D86 — a failed gate run left an orphaned Aspire child that outlived its teardown
+
+**Severity:** significant. **Detected:** 2026-08-09, by an owner watcher, immediately before the
+row-74 serialized runtime execution.
+
+PID `3297659` was running `aspire-managed nuget search --query Aspire.ProjectTemplates` with
+`PPID 1` and **1h53m elapsed**. A nuget search that takes under a second had been alive for nearly
+two hours.
+
+**Ownership was decidable without ambiguity.** Both its `cwd` and its `--working-dir` were
+`/home/codex/repos/ns005-w3b1/.llm/tmp/cli-e2e/plugin-smoke-20260809-204236/aspire` — inside the
+run's own worktree, so path containment proves it run-owned. No sibling processes referenced that
+workspace. It was terminated (`SIGTERM` ignored, `SIGKILL` succeeded) and a follow-up leak check
+returned exit 0 with **zero run-owned survivors**; the only survivor is the long-known foreign
+`redis-jfgcbtaf` from `w6-review-desk`, left untouched.
+
+**Provenance.** The workspace stamp `20260809-204236` places it in the **row-70** window — the RED
+run whose receipt already recorded a secondary `TypeError: Child process has already terminated`
+during teardown. That error was reported at the time as cosmetic noise while stopping an
+already-exited child. It was not cosmetic: the teardown lost track of a child that was still alive,
+and the process then outlived the run by nearly two hours.
+
+**The generalisable lesson.** `cleanup.aspire-stop` **passed** in row 70 and the post-run
+leak-check reported zero run-owned survivors, yet a run-owned process was still running. Both
+signals were true about what they measured — containers and the AppHost — and neither measured
+detached grandchild processes. This is the same class this release keeps producing: a check that
+cannot observe the failure it is trusted to rule out. A leak check that inspects containers and
+AppHosts, but not orphaned process descendants rooted in the run's own workspace, will report clean
+while a run-owned process runs for hours.
+
+**Actions.** (1) The orphan is terminated and the cleanup is recorded here and in the row-74
+execution receipt. (2) A follow-up issue should extend `agentic:leak-check` to classify orphaned
+processes whose `cwd` or working-dir argument is contained by the slice worktree — ownership is
+already decidable by exactly the containment rule the tool applies to containers. (3) Treat a
+teardown `Child process has already terminated` as a **signal to verify**, not as noise; it means
+the teardown's model of its children was wrong.
+
+### C-D86 addendum — the detection rule I proposed would have killed a live run
+
+Immediately after recording C-D86 I enumerated orphans again during the row-74 execution and found
+**40 `PPID 1` aspire helpers whose working-dir is inside `ns005-w3b1`** — the very worktree whose
+gate was mid-flight. They were the running gate's own children, workspace stamp
+`plugin-smoke-20260809-224559`, elapsed ~4 minutes. Aspire spawns `nuget search` helpers detached,
+so **`PPID 1` is normal operation for this tool, not evidence of abandonment.**
+
+The rule proposed in C-D86 — "classify orphaned processes whose cwd or working-dir is contained by
+the slice worktree" — would therefore have terminated the live authorized run. Containment proves
+*ownership*; it does not prove *staleness*. What actually justified the earlier kill was the
+conjunction: containment **plus** a workspace stamp belonging to a run that had already ended
+(`…-204236`, row 70) **plus** elapsed time (1h53m) wildly exceeding the operation's expected
+duration of well under a second.
+
+Corrected recommendation for the follow-up issue: a process may be reclaimed only when all three
+hold — path containment in the slice worktree, a workspace directory that is not the active run's,
+and an age threshold far above the operation's normal duration. A tool that reclaims on containment
+alone is more dangerous than the leak it fixes.
+
+Census at this moment, strictly `PPID == 1`: `ns005-w2c` 16, `ns005-w3a` 5, `ns005-w3b2` 3, all
+~20-21h old and **foreign to this run — reported, untouched**; `ns005-stable-opus5` 6, owned by this
+orchestrator checkout, deferred until after the row-74 gate completes so cleanup cannot perturb it.
+The scale (24 foreign stale helpers across three sibling worktrees) shows this is a systemic
+teardown gap, not a one-off.
+
+### C-D86 second addendum — the row-74 receipt asserted zero survivors while six of its own processes ran
+
+C-D86 predicted that a leak check blind to detached descendants would report clean through a
+process leak. That prediction was confirmed by the **row-74 run itself**, minutes after the receipt
+was written.
+
+Seventeen minutes after row 74 completed, six `PPID 1` aspire helpers were still running with
+working-dir `…/cli-e2e/plugin-smoke-20260809-224559` — **the row-74 run's own workspace**. The
+row-74 receipt, which is otherwise accurate and which I accepted, states `cleanup.aspire-stop`
+passed in 1.003s and `run-owned survivors: 0`. Both statements were true about what the leak check
+measures — containers and the AppHost — and both were compatible with six run-owned processes still
+executing.
+
+This is now demonstrated rather than inferred, in two independent runs (row 70's orphan at 1h53m,
+row 74's six at 17m). Every `scaffold.runtime` execution appears to leak these helpers.
+
+Reclaimed under the corrected three-part rule from the first addendum, all three conditions holding:
+path containment in the owning worktree; a workspace belonging to a run that has **ended**; and an
+age far exceeding a sub-second `nuget search`. Result: w3b1 run-owned orphans **0**,
+`ns005-stable-opus5` run-owned orphans **0** (six more, ~14h old, from this checkout's earlier
+installed-consumer runs). **Foreign left untouched and recorded: `ns005-w2c` 16, `ns005-w3a` 5,
+`ns005-w3b2` 3** — 24 stale helpers across three sibling worktrees, which is the scale of the
+systemic gap.
+
+Consequence for evidence already recorded: rows 67, 69, 73 and 75 each state "zero run-owned
+survivors" on the strength of the same blind check. Those statements should be read as *zero
+run-owned containers and AppHosts*, which is what was actually verified. No gate verdict changes —
+the leaked helpers are idle `nuget search` calls, not resource holders that would alter a pass/fail
+— but the ledger's survivor claims are narrower than their wording implies, and the follow-up issue
+should say so.
