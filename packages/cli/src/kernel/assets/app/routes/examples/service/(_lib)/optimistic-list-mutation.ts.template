@@ -1,0 +1,50 @@
+/** Query-client surface required by the generated optimistic list mutation. */
+export interface OptimisticListQueryClient {
+  getQueryData<TData>(queryKey: readonly unknown[]): TData | undefined;
+  setQueryData<TData>(queryKey: readonly unknown[], data: TData): void;
+}
+
+/** Snapshot returned by `onMutate` and consumed by `onError`. */
+export interface OptimisticListMutationContext<TData> {
+  readonly previous?: TData;
+}
+
+export interface OptimisticListMutationOptions<TData, TVariables> {
+  readonly queryClient: OptimisticListQueryClient;
+  readonly queryKey: readonly unknown[];
+  readonly update: (previous: TData, variables: TVariables) => TData;
+  readonly onOptimisticUpdate?: (variables: TVariables) => void;
+  readonly onRollback?: (variables: TVariables) => void;
+}
+
+/**
+ * Build executable mutation callbacks that save the cache before changing it
+ * and restore that exact snapshot when the server rejects the mutation.
+ */
+export function createOptimisticListMutationCallbacks<TData, TVariables>(
+  options: OptimisticListMutationOptions<TData, TVariables>,
+) {
+  return {
+    onMutate: (variables: TVariables): OptimisticListMutationContext<TData> => {
+      const previous = options.queryClient.getQueryData<TData>(options.queryKey);
+      if (previous !== undefined) {
+        options.queryClient.setQueryData(
+          options.queryKey,
+          options.update(previous, variables),
+        );
+      }
+      options.onOptimisticUpdate?.(variables);
+      return { previous };
+    },
+    onError: (
+      _error: unknown,
+      variables: TVariables,
+      context?: OptimisticListMutationContext<TData>,
+    ): void => {
+      if (context?.previous !== undefined) {
+        options.queryClient.setQueryData(options.queryKey, context.previous);
+      }
+      options.onRollback?.(variables);
+    },
+  };
+}

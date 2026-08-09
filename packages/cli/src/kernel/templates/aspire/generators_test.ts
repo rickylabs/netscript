@@ -245,7 +245,7 @@ describe('generateAppsettings', () => {
       'Apps',
       'Tools',
     ])
-    assertEquals(Object.keys(config.NetScript.Apps), ['dashboard'])
+    assertEquals(Object.keys(config.NetScript.Apps), ['my-app-web'])
   })
 
   it('keeps service + postgres sections structurally stable', () => {

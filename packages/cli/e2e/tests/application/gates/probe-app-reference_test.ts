@@ -7,7 +7,38 @@ import {
   REFERENCE_VIEWPORTS,
 } from '../../../src/application/gates/scaffold/probe-app-reference.ts';
 
+const EXPECTED_VIEWPORTS = [
+  { name: 'desktop', width: 1440, height: 900 },
+  { name: 'mobile', width: 390, height: 844 },
+] as const;
+
+const EXPECTED_STATES = [
+  { path: '/', markers: ['href="/design"', 'href="/design/composition"'] },
+  { path: '/design/composition', markers: ['Composition', 'L0'] },
+  { path: '/examples/users?preview=loading', markers: ['data-state="loading"'] },
+  {
+    path: '/examples/users?preview=error',
+    markers: ['data-state="error"', 'Resource list unavailable'],
+  },
+  { path: '/examples/users?preview=empty', markers: ['data-state="empty"', 'No resources yet'] },
+  { path: '/examples/users?preview=success', markers: ['data-state="success"'] },
+  {
+    path: '/examples/users?preview=optimistic',
+    markers: ['data-state="optimistic"', 'Optimistic update is visible'],
+  },
+  {
+    path: '/examples/users?preview=rollback',
+    markers: ['data-state="rollback"', 'saved cache snapshot was restored'],
+  },
+  {
+    path: '/examples/users?preview=confirmed',
+    markers: ['data-state="confirmed"', 'service confirmed the mutation'],
+  },
+] as const;
+
 Deno.test('reference probe renders every named state at desktop and mobile viewports', async () => {
+  assertEquals(REFERENCE_VIEWPORTS, EXPECTED_VIEWPORTS);
+  assertEquals(REFERENCE_EXPECTATIONS, EXPECTED_STATES);
   const observed: string[] = [];
   await probeAppReference('/workspace/project', 'inventory-web', '/workspace/apphost.mts', {
     resolveLiveUrls: () => Promise.resolve(['http://localhost:41234/']),

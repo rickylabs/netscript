@@ -73,3 +73,12 @@ through Windows Chrome over WSL interop, rendering the nine reference expectatio
 rollback, and confirmed. Pre/post leak checks exited 0 with no run-owned resources, the foreign
 Redis survivor was left untouched, and there was no manifest or lock diff. All nine actionable
 #1333 rows are now evidenced; the PR may carry `Closes #1333` while staying draft at `status:impl`.
+
+IMPL-EVAL cycle 1 at `fa2b5413d` returned `FAIL_FIX`. The implementation and runtime evidence held,
+but the PR close-gate evidence was absent and the S3 rollback proof was structural rather than
+behavioral. The remediation executes shared generated mutation callbacks against a stub query
+client and proves a post-write snapshot mutation red before restoring green. It also documents the
+browser prerequisite/platform discovery, registers the over-cap runtime gate debt, corrects the
+doctrine and Deno lint records, removes the latent `dashboard` default, and pins the app-name trim
+boundary plus all nine browser expectations. No AppHost or container gate is authorized or needed
+for this remediation.

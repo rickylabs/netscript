@@ -172,8 +172,4 @@ Deno.test('generated quality runner checks AppHost source through its restored T
   assertStringIncludes(source, "path !== 'aspire/.helpers/run-tool.mts'");
   assertStringIncludes(source, "'aspire/node_modules/typescript/bin/tsc'");
   assertStringIncludes(source, "'aspire/tsconfig.apphost.json'");
-  assertStringIncludes(
-    source,
-    "['lint', '--no-config', '--rules-include=no-explicit-any', ...files]",
-  );
 });

@@ -223,8 +223,8 @@ rows are satisfied; the PR can truthfully carry `Closes #1333` while remaining d
   headless Chrome/Chromium process at 1440×900 and 390×844, asserting semantic DOM markers.
 - Runtime wait/home/UI/browser gates derive the generated Aspire app name through the same S1
   `deriveDefaultAppName` rule instead of the obsolete hard-coded `dashboard` identity.
-- The generated quality runner now opts into `no-explicit-any`; its negative matrix probes the rule
-  and verifies both check and lint cleanup.
+- The generated quality runner's existing default `deno lint --no-config` invocation rejects
+  explicit `any`; its behavioral negative matrix probes the rule and verifies cleanup.
 - Enabling that rule exposed clean-scaffold lint debt in the memory templates; the unused transition
   table, unnecessary `async` callbacks, and mutable array binding were corrected without allowances.
 
@@ -238,7 +238,7 @@ rows are satisfied; the PR can truthfully carry `Closes #1333` while remaining d
 | Fresh memory generated check | raw exit 0; 108 selected files |
 | Fresh memory generated lint | raw exit 0; 108 selected files |
 | Fresh Postgres product check after local Prisma/Zod generation | raw exit 0; 112 selected files |
-| Fresh Postgres product lint including `no-explicit-any` | raw exit 0; 112 selected files |
+| Fresh Postgres product lint (including recommended `no-explicit-any`) | raw exit 0; 112 selected files |
 
 The first full generated quality-matrix development attempt correctly failed its final AppHost
 check because a fresh, un-restored scaffold has no `aspire/node_modules/typescript`. The actual
@@ -277,6 +277,47 @@ the complete verdict is reserved for the serialized one-pass run.
 The clean source was restored, the canonical barrel regenerated, and the same focused golden then
 passed at raw exit 0 with 1 test / 25 steps / 0 failed.
 
+## IMPL-EVAL cycle 1 remediation
+
+Fable 5 returned `FAIL_FIX` at `fa2b5413d`. The runtime implementation and row-72 receipt held;
+this pass repairs the PR close-gate evidence and the evaluator's behavioral-proof findings without
+starting an AppHost or container.
+
+- The DB and memory islands now consume one generated resource-local optimistic callback factory.
+  Its test executes `onMutate` and `onError` with a stub query client, pins the pre-mutation object
+  by identity, observes the optimistic value, and requires rollback to restore that same object.
+- Mutation proof: moving the snapshot read after the optimistic write made the focused route test
+  exit 1 at `optimistic callbacks capture and restore the exact pre-mutation snapshot` (0 passed /
+  25 passed steps / 1 failed step). Restoring the read-before-write order returned raw exit 0.
+- The E2E README now documents the fail-closed browser prerequisite and standard Linux, WSL/native
+  Windows, and macOS candidates; executable discovery includes the documented macOS/native-Windows
+  paths.
+- `scaffold-runtime-a8-f16-1333` records the 865→906-line runtime registry and 41→43-child gate
+  directory debt. The S4 doctrine record now reports the independently reproduced baseline
+  50/51/1 and improved head 50/50/1 rather than claiming byte identity.
+- Deno 2.9.5 already recommends `no-explicit-any`; the decorative explicit rule flag and its
+  self-grep assertion are removed while the behavioral explicit-`any` red remains.
+- The latent `dashboard` scaffold default is removed. `generateAppsettings` derives its omitted app
+  identity from the project, while explicit app names remain authoritative. The length-boundary
+  separator and all nine browser expectations are now pinned directly.
+
+### Focused and scoped evidence
+
+| Gate | Result |
+| --- | --- |
+| Rollback post-write-snapshot mutation | raw exit 1; named rollback snapshot test failed |
+| Restored seven-file focused suite | raw exit 0; 19 passed / 55 steps / 0 failed |
+| Scoped CLI + E2E check (`--no-lock`) | raw exit 0; 824 files / 7 batches / 0 findings |
+| Scoped CLI + E2E lint | raw exit 0; 824 files / 5 batches / 0 findings |
+| Scoped CLI + E2E format | raw exit 0; 824 files / 5 batches / 0 findings |
+| Committed-head `check:assets-barrel` | raw exit 0; regeneration left the canonical asset set clean |
+
+Two malformed development invocations exited 1 before a valid scoped check: one passed the wrapper
+an unsupported top-level `--unstable-kv`, and one duplicated the wrapper's built-in
+`--unstable-kv`. Neither is a product verdict. The corrected command above then ran all seven
+batches green. The regenerated app templates total 178,363 / 197,796 bytes and the CLI embedded
+barrel is 296,366 / 330,000 bytes; the unchanged MCP docs corpus remains 253,535 / 262,144 bytes.
+
 ### Gates
 
 | Gate | Result |
@@ -286,13 +327,15 @@ passed at raw exit 0 with 1 test / 25 steps / 0 failed.
 | Scoped package lint | raw exit 0; 675 files / 4 batches / 0 findings |
 | Scoped package format | raw exit 0; 675 files / 4 batches / 0 findings |
 | Package code-quality scan | raw exit 0; 0 findings / 6 existing allowances |
-| Package doctrine scan | raw exit 1; FAIL=50 WARN=51 INFO=1 |
-| Exact `origin/main` doctrine baseline | raw exit 1; FAIL=50 WARN=51 INFO=1, byte-identical finding set |
+| Package doctrine scan | raw exit 1; FAIL=50 WARN=50 INFO=1 |
+| Exact `origin/main` doctrine baseline | raw exit 1; FAIL=50 WARN=51 INFO=1 |
 
 The first scoped-check attempt used unsupported `--deno-arg=--no-lock` syntax and exited 1 before
 running a check. The required corrected form, `--deno-arg --no-lock`, then executed and exited 0;
-the failed invocation is not reported as a product verdict. Package doctrine remains red solely on
-the exact pre-existing baseline and introduces no new finding in S4.
+the failed invocation is not reported as a product verdict. The head improves the doctrine
+aggregate by removing the `src/kernel/assets/app/lib` forbidden-folder warning when S2 removed that
+directory. Two existing over-cap warnings deepen, now registered as architecture debt; no new
+finding category is added in S4.
 
 ## S2 — resource-local contract and query topology
 

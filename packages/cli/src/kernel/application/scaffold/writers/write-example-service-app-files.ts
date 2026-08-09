@@ -39,6 +39,7 @@ export async function writeExampleServiceAppFiles(
     appExampleServiceSummaryPanelMemoryTemplate,
     appExampleServiceSummaryPanelTemplate,
     appExampleServiceQueryTemplate,
+    appExampleServiceOptimisticListMutationTemplate,
     appExampleServiceRouteContractTemplate,
     appServiceExampleIndexTemplate,
     appServiceExampleLayoutTemplate,
@@ -68,6 +69,13 @@ Delete or replace the sample data: example records, labels, statuses, notes, and
   await write(
     join(input.serviceExampleLibDir, 'service-query.ts'),
     await context.templateAdapter.render(appExampleServiceQueryTemplate, appTemplateVars),
+  );
+  await write(
+    join(input.serviceExampleLibDir, 'optimistic-list-mutation.ts'),
+    await context.templateAdapter.render(
+      appExampleServiceOptimisticListMutationTemplate,
+      appTemplateVars,
+    ),
   );
   await write(
     join(input.serviceExampleLibDir, 'route-contract.ts'),

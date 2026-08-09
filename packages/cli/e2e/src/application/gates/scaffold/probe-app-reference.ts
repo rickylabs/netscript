@@ -163,8 +163,13 @@ async function findBrowserExecutable(): Promise<string> {
     '/usr/bin/google-chrome-stable',
     '/usr/bin/chromium',
     '/usr/bin/chromium-browser',
+    '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+    '/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge',
+    '/Applications/Chromium.app/Contents/MacOS/Chromium',
     '/mnt/c/Program Files/Google/Chrome/Application/chrome.exe',
     '/mnt/c/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',
+    'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+    'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe',
   ];
   for (const candidate of candidates) {
     try {

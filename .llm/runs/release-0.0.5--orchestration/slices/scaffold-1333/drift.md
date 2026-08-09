@@ -45,21 +45,41 @@ the exact assertion and retains the full-string check.
 
 ## 2026-08-09 — generated lint made the quality contract executable
 
-The planned deliberate-`any` negative proved that the generated `lint` task used Deno's default
-recommended rules, which do not include `no-explicit-any`; the mutation exited 0. The generated
-quality runner now opts into `no-explicit-any`, and the same mutation exits 1 naming that rule.
-Turning on the real gate surfaced five clean-scaffold lint findings: one S3 `require-await` and four
-existing memory-router findings (`require-await`, `prefer-const`, and an unused transition table).
-They were corrected in their owned templates so a fresh no-Aspire consumer now checks and lints 108
-selected files at exit 0. No lint allowance or exclusion was added.
+IMPL-EVAL corrected the development diagnosis: on pinned Deno 2.9.5, `no-explicit-any` is already a
+recommended rule and `deno lint --no-config` rejects an explicit `any`. The generated runner's
+explicit `--rules-include=no-explicit-any` flag was therefore decorative, and the recorded claim
+that the default mutation exited 0 does not reproduce. The flag and its source-self-grep assertion
+were removed; the behavioral explicit-`any` test remains and exits 1 naming `no-explicit-any` under
+the same default lint invocation consumers run. The five template lint corrections remain valid,
+but they are ordinary fixes exposed during the generated-quality work, not evidence that the flag
+activated a previously disabled rule. No lint allowance or exclusion was added.
 
 ## 2026-08-09 — runtime gate file remains over the doctrine size cap
 
-`packages/cli/e2e/src/application/gates/scaffold/runtime-gates.ts` grew from 865 lines at the S4
-head to 905 lines while adding the project-derived wait and browser reference gates. It was already
-over the A8 500-line cap, and the package doctrine aggregate remains 50 FAIL / 51 WARN / 1 INFO.
-Splitting the established runtime gate registry is architecture debt, not a safe mechanical change
-inside the final scaffold feature slice; no finding was hidden or allowed.
+`packages/cli/e2e/src/application/gates/scaffold/runtime-gates.ts` grew from 865 to 906 lines while
+adding the project-derived wait and browser reference gates, against the A8/AP-1/F-1 500-line cap.
+The scaffold gate directory grew from 41 to 43 direct children against F-16. Splitting the
+established registry is not a safe mechanical change inside the final scaffold feature slice, so
+the debt is now registered as `scaffold-runtime-a8-f16-1333` in
+`.llm/harness/debt/arch-debt.md`, with an owner, target, linked plan, and close gate.
+
+## 2026-08-09 — IMPL-EVAL made rollback proof behavioral
+
+The S3 mutation table changed strings that structural goldens asserted; it did not prove the saved
+snapshot behavior. The generated DB and memory islands now share a resource-local callback factory,
+and the focused test executes `onMutate`/`onError` against a stub query client. It asserts identity
+of the pre-mutation snapshot, the optimistic value, and exact restoration. Moving the cache read
+after the optimistic write leaves the former string assertions intact but makes this test exit 1;
+restoring the order returns it to green. This is a proof repair within the planned S3 behavior, not
+a relaxation or a new UX decision.
+
+## 2026-08-09 — dead dashboard fallback removed
+
+IMPL-EVAL found `SCAFFOLD_DEFAULTS.APP_NAME = 'dashboard'` remained reachable through the optional
+`generateAppsettings` API even though the production init path always passed S1's derived name.
+The constant is removed, and the generator's own fallback now calls `deriveDefaultAppName(name)`.
+The explicit `appName` option remains authoritative. This closes the latent re-consumption boundary
+instead of documenting a wrong-but-plausible legacy default.
 
 ## 2026-08-09 — serialized runtime stopped at stale project-boundary app identity
 

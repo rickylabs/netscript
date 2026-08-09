@@ -20,10 +20,15 @@ import {
   loadServiceShowcaseData,
   type ServiceShowcasePreview,
 } from '../(_shared)/service-showcase.ts';
+import {
+  createOptimisticListMutationCallbacks,
+  type OptimisticListMutationContext,
+} from '../service/(_lib)/optimistic-list-mutation.ts';
 
 type Props = NonNullable<InferDefinePageLayerLoaderProps<typeof loadServiceShowcaseData>>;
 type ServiceListData = NonNullable<Props['initialList']>;
-type MutationContext = { previous?: ServiceListData };
+type ServiceRecord = ServiceListData['items'][number];
+type UpdateStatusInput = Pick<ServiceRecord, 'id' | 'status'>;
 
 const NEXT_STATUS_BY_STATE = {
   draft: 'active',
@@ -56,31 +61,31 @@ function ServiceShowcaseLabInner(props: Props) {
     staleTime: 15_000,
   });
 
-  const statusMutation = useMutation({
+  const statusMutation = useMutation<
+    ServiceRecord,
+    unknown,
+    UpdateStatusInput,
+    OptimisticListMutationContext<ServiceListData>
+  >({
     ...{{serviceName | camelCase}}Queries.updateStatus.mutationOptions(),
-    onMutate: (variables) => {
-      const previous = queryClient.getQueryData<ServiceListData>(currentKey);
-
-      if (previous) {
-        queryClient.setQueryData<ServiceListData>(currentKey, {
+    ...createOptimisticListMutationCallbacks<ServiceListData, UpdateStatusInput>({
+      queryClient,
+      queryKey: currentKey,
+      update: (previous, variables) => ({
           ...previous,
           items: previous.items.map((item) =>
             item.id === variables.id ? { ...item, status: variables.status } : item
           ),
-        });
-      }
-
-      statusMessage.value = `Optimistically moved record #${variables.id} to ${variables.status}.`;
-      return { previous } satisfies MutationContext;
-    },
-    onError: (_error, variables, context) => {
-      if (context?.previous) {
-        queryClient.setQueryData(currentKey, context.previous);
-      }
-
-      statusMessage.value =
-        `Update for record #${variables.id} failed and the cached list rolled back.`;
-    },
+      }),
+      onOptimisticUpdate: (variables) => {
+        statusMessage.value =
+          `Optimistically moved record #${variables.id} to ${variables.status}.`;
+      },
+      onRollback: (variables) => {
+        statusMessage.value =
+          `Update for record #${variables.id} failed and the cached list rolled back.`;
+      },
+    }),
     onSuccess: (item) => {
       statusMessage.value = `Server confirmed ${item.name} is now ${item.status}.`;
     },

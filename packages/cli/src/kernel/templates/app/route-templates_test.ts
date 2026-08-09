@@ -3,7 +3,12 @@
  */
 
 import { describe, it } from 'jsr:@std/testing@^1/bdd';
-import { assert, assertStringIncludes } from 'jsr:@std/assert@^1';
+import {
+  assert,
+  assertEquals,
+  assertStrictEquals,
+  assertStringIncludes,
+} from 'jsr:@std/assert@^1';
 import { generateRouteManifestSeed } from '../../application/scaffold/writers/app-route-seeds.ts';
 import {
   appAppTemplate,
@@ -26,6 +31,7 @@ import {
   appDesignTokensRouteTemplate,
   appDesignTokensViewTemplate,
   appExampleServiceQueryTemplate,
+  appExampleServiceOptimisticListMutationTemplate,
   appExampleServiceRouteContractTemplate,
   appExamplesIndexRouteTemplate,
   appExamplesViewTemplate,
@@ -537,7 +543,40 @@ describe('app route template rendering', () => {
     assert(!output.includes('summary: buildServiceSummary'));
   });
 
-  it('DB island exposes cached query states and restores the saved optimistic snapshot', async () => {
+  it('optimistic callbacks capture and restore the exact pre-mutation snapshot', async () => {
+    const source = await makeAdapter().render(
+      appExampleServiceOptimisticListMutationTemplate,
+      SAMPLE_APP_VARS,
+    );
+    const module = await import(`data:application/typescript,${encodeURIComponent(source)}`);
+    const key = ['team-members', 'list'] as const;
+    const before = { data: [{ id: 1, name: 'Ada' }] };
+    let current = before;
+    const events: string[] = [];
+    const callbacks = module.createOptimisticListMutationCallbacks({
+      queryClient: {
+        getQueryData: () => current,
+        setQueryData: (_queryKey: readonly unknown[], data: typeof before) => {
+          current = data;
+        },
+      },
+      queryKey: key,
+      update: (previous: typeof before, variables: { readonly name: string }) => ({
+        data: [{ ...previous.data[0], name: variables.name }],
+      }),
+      onOptimisticUpdate: () => events.push('optimistic'),
+      onRollback: () => events.push('rollback'),
+    });
+
+    const context = callbacks.onMutate({ name: 'Grace' });
+    assertStrictEquals(context.previous, before);
+    assertEquals(current, { data: [{ id: 1, name: 'Grace' }] });
+    callbacks.onError(new Error('rejected'), { name: 'Grace' }, context);
+    assertStrictEquals(current, before);
+    assertEquals(events, ['optimistic', 'rollback']);
+  });
+
+  it('DB island exposes cached query states and consumes executable rollback callbacks', async () => {
     const adapter = makeAdapter();
     const output = await adapter.render(appServiceShowcaseIslandTemplate, SAMPLE_APP_VARS);
     assertStringIncludes(output, "import { useSignal } from '@preact/signals';");
@@ -551,13 +590,7 @@ describe('app route template rendering', () => {
     assertStringIncludes(output, 'teamMembersQueries.delete.mutationOptions()');
     assertStringIncludes(output, 'useQuery<ServiceListData>');
     assertStringIncludes(output, 'useMutation<ServiceRecord, unknown, CreateInput>');
-    assertStringIncludes(
-      output,
-      'useMutation<ServiceRecord, unknown, UpdateInput, MutationContext>',
-    );
-    assertStringIncludes(output, 'const previous = queryClient.getQueryData<ServiceListData>');
-    assertStringIncludes(output, 'return { previous };');
-    assertStringIncludes(output, 'queryClient.setQueryData(listOptions.queryKey, context.previous)');
+    assertStringIncludes(output, 'createOptimisticListMutationCallbacks<ServiceListData');
     assertStringIncludes(output, 'the cached list rolled back');
     assertStringIncludes(output, "data-state='loading'");
     assertStringIncludes(output, "data-state='error'");
@@ -567,13 +600,11 @@ describe('app route template rendering', () => {
     assertStringIncludes(output, "renderState === 'rollback'");
   });
 
-  it('memory island preserves optimistic rollback and the same four query states', async () => {
+  it('memory island consumes executable rollback callbacks and preserves query states', async () => {
     const adapter = makeAdapter();
     const island = await adapter.render(appServiceShowcaseMemoryIslandTemplate, SAMPLE_APP_VARS);
     const shared = await adapter.render(appServiceShowcaseMemorySharedTemplate, SAMPLE_APP_VARS);
-    assertStringIncludes(island, 'const previous = queryClient.getQueryData<ServiceListData>');
-    assertStringIncludes(island, 'return { previous } satisfies MutationContext;');
-    assertStringIncludes(island, 'queryClient.setQueryData(currentKey, context.previous)');
+    assertStringIncludes(island, 'createOptimisticListMutationCallbacks<ServiceListData');
     assertStringIncludes(island, 'the cached list rolled back');
     assertStringIncludes(island, "data-state='loading'");
     assertStringIncludes(island, "data-state='error'");

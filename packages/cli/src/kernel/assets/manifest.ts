@@ -13,6 +13,8 @@ export const TEMPLATE_KEYS = {
     'app/routes/examples/service/(_lib)/route-contract.ts.template',
   appRoutesExamplesServiceLibServiceQuery:
     'app/routes/examples/service/(_lib)/service-query.ts.template',
+  appRoutesExamplesServiceLibOptimisticListMutation:
+    'app/routes/examples/service/(_lib)/optimistic-list-mutation.ts.template',
   appMain: 'app/main.ts.template',
   appRouter: 'app/router.ts.template',
   appRoutesComponentsHealthView: 'app/routes/(_components)/health-view.tsx.template',

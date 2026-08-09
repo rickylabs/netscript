@@ -20,6 +20,10 @@ import {
   loadServiceShowcaseData,
   type ServiceShowcasePreview,
 } from '../(_shared)/service-showcase.ts';
+import {
+  createOptimisticListMutationCallbacks,
+  type OptimisticListMutationContext,
+} from '../service/(_lib)/optimistic-list-mutation.ts';
 
 type Props = NonNullable<InferDefinePageLayerLoaderProps<typeof loadServiceShowcaseData>>;
 type ServiceListData = NonNullable<Props['initialList']>;
@@ -27,7 +31,6 @@ type ServiceRecord = ServiceListData['data'][number];
 type CreateInput = Pick<ServiceRecord, 'name'>;
 type UpdateInput = { readonly id: number; readonly data: Partial<Pick<ServiceRecord, 'name'>> };
 type DeleteInput = { readonly id: number };
-type MutationContext = { readonly previous?: ServiceListData };
 
 function ServiceShowcaseLabInner(props: Props) {
   const islandQueryClient = getIslandQueryClient();
@@ -72,33 +75,32 @@ function ServiceShowcaseLabInner(props: Props) {
   });
 
   const updateOptions = {{serviceName | camelCase}}Queries.update.mutationOptions();
-  const renameMutation = useMutation<ServiceRecord, unknown, UpdateInput, MutationContext>({
+  const renameMutation = useMutation<
+    ServiceRecord,
+    unknown,
+    UpdateInput,
+    OptimisticListMutationContext<ServiceListData>
+  >({
     mutationFn: updateOptions.mutationFn,
-    onMutate: (variables) => {
-      const previous = queryClient.getQueryData<ServiceListData>(listOptions.queryKey);
-
-      if (previous) {
-        queryClient.setQueryData<ServiceListData>(listOptions.queryKey, {
+    ...createOptimisticListMutationCallbacks<ServiceListData, UpdateInput>({
+      queryClient,
+      queryKey: listOptions.queryKey,
+      update: (previous, variables) => ({
           ...previous,
           data: previous.data.map((item) =>
             item.id === variables.id ? { ...item, ...variables.data } : item
           ),
-        });
-      }
-
-      statusMessage.value = `Optimistically renamed record #${variables.id}.`;
-      return { previous };
-    },
+      }),
+      onOptimisticUpdate: (variables) => {
+        statusMessage.value = `Optimistically renamed record #${variables.id}.`;
+      },
+      onRollback: (variables) => {
+        statusMessage.value =
+          `Update for record #${variables.id} failed and the cached list rolled back.`;
+      },
+    }),
     onSuccess: (record) => {
       statusMessage.value = `Server confirmed ${record.name}.`;
-    },
-    onError: (_error, variables, context) => {
-      if (context?.previous) {
-        queryClient.setQueryData(listOptions.queryKey, context.previous);
-      }
-
-      statusMessage.value =
-        `Update for record #${variables.id} failed and the cached list rolled back.`;
     },
     onSettled: async () => {
       await queryClient.invalidateQueries({{serviceName | camelCase}}ListInvalidation);

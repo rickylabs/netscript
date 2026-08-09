@@ -11,6 +11,7 @@
 
 import { PORT_RANGES } from '../../constants/port-ranges.ts'
 import { SCAFFOLD_DEFAULTS } from '../../constants/scaffold/scaffold-defaults.ts'
+import { deriveDefaultAppName } from '../../domain/scaffold/app-name.ts'
 import type { CacheBackendChoice } from '../../domain/cache-backend.ts'
 import type { DbEngineChoice } from '../../domain/db-engine.ts'
 
@@ -32,7 +33,7 @@ export interface AppsettingsServiceOption {
 export interface AppsettingsOptions {
   /** Project name (required by NetScript config schema). */
   readonly name?: string
-  /** Application name. Defaults to SCAFFOLD_DEFAULTS.APP_NAME. */
+  /** Application name. Defaults to the project-derived `<name>-web` identity. */
   readonly appName?: string
   /**
    * Aspire host port to pin for the app. Omit — the default — so Aspire
@@ -270,7 +271,7 @@ export function buildCacheBlock(
  */
 export function generateAppsettings(options?: AppsettingsOptions): string {
   const name = options?.name ?? 'my-app'
-  const appName = options?.appName ?? SCAFFOLD_DEFAULTS.APP_NAME
+  const appName = options?.appName ?? deriveDefaultAppName(name)
   const appPort = options?.appPort
   const otelPort = options?.otelPort ?? PORT_RANGES.OTEL_COLLECTOR
   const dbEngine = options?.dbEngine ?? SCAFFOLD_DEFAULTS.DB_ENGINE

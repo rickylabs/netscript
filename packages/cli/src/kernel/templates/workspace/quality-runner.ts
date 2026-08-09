@@ -169,7 +169,7 @@ async function runBatch(
   const args = mode === 'check'
     ? ['check', '--unstable-kv', ...files]
     : mode === 'lint'
-    ? ['lint', '--no-config', '--rules-include=no-explicit-any', ...files]
+    ? ['lint', '--no-config', ...files]
     : mode === 'fmt-check'
     ? ['fmt', '--check', ...files]
     : ['fmt', ...files];

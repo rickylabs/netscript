@@ -2220,3 +2220,21 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Gate:** Split docs/guidance input and output schemas into one role-named domain module consumed
   by the central contract registry; package tests, scoped gates, public schema parity, doctrine,
   doc-lint, and publish dry-run must remain green.
+
+## packages/cli/e2e — scaffold runtime registry and gate directory remain over cap (`scaffold-runtime-a8-f16-1333`)
+
+- **Reason:** PR #1427 deepens
+  `e2e/src/application/gates/scaffold/runtime-gates.ts` from 865 to 906 lines against the 500-line
+  A8/AP-1/F-1 cap while adding the named-app and browser-reference gates. The same slice grows the
+  scaffold gate directory from 41 to 43 direct children against F-16. Both were already over their
+  doctrine limits; splitting the established runtime registry during the release-blocking scaffold
+  feature would mix an architecture migration into behavioral acceptance.
+- **Owner:** CLI E2E scaffold-runtime maintainers.
+- **Target:** Before the next scaffold runtime gate or probe is added.
+- **Linked plan:** `.llm/runs/release-0.0.5--orchestration/slices/scaffold-1333/plan.md`; issue #1333;
+  PR #1427.
+- **Created:** 2026-08-09
+- **Status:** open, DEBT_ACCEPTED for #1427; registry entry added after IMPL-EVAL cycle 1.
+- **Gate:** Split the BEHAVIOR gate declarations and probe registration into role-named modules and
+  group scaffold probes behind a bounded subdirectory surface; focused CLI E2E tests, doctrine,
+  scoped check/lint/fmt, and the one-pass `scaffold.runtime` suite must remain green.

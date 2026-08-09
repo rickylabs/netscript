@@ -55,6 +55,8 @@ const EXAMPLE_SERVICE_APP_TEMPLATE_URLS: TemplateUrlMap = {
   appExampleServiceSummaryPanelMemoryTemplate:
     TEMPLATE_KEYS.appRoutesExamplesComponentsSummaryPanelMemory,
   appExampleServiceQueryTemplate: TEMPLATE_KEYS.appRoutesExamplesServiceLibServiceQuery,
+  appExampleServiceOptimisticListMutationTemplate:
+    TEMPLATE_KEYS.appRoutesExamplesServiceLibOptimisticListMutation,
   appExampleServiceRouteContractTemplate: TEMPLATE_KEYS.appRoutesExamplesServiceLibRouteContract,
   appServiceExampleIndexTemplate: TEMPLATE_KEYS.appRoutesExamplesServiceIndex,
   appServiceExampleLayoutTemplate: TEMPLATE_KEYS.appRoutesExamplesServiceIndexLayout,

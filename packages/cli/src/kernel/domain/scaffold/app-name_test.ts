@@ -15,3 +15,11 @@ Deno.test('deriveDefaultAppName stays inside the validated app-name contract', (
   assertMatch(derived, SCAFFOLD_VALIDATION.NAME_PATTERN);
   assertEquals(derived.endsWith('-web'), true);
 });
+
+Deno.test('deriveDefaultAppName trims a separator at the length boundary', () => {
+  const prefix = 'a'.repeat(59);
+  const derived = deriveDefaultAppName(`${prefix}-trailing-segment`);
+
+  assertEquals(derived, `${prefix}-web`);
+  assertMatch(derived, SCAFFOLD_VALIDATION.NAME_PATTERN);
+});
