@@ -161,3 +161,34 @@ Census at this moment, strictly `PPID == 1`: `ns005-w2c` 16, `ns005-w3a` 5, `ns0
 orchestrator checkout, deferred until after the row-74 gate completes so cleanup cannot perturb it.
 The scale (24 foreign stale helpers across three sibling worktrees) shows this is a systemic
 teardown gap, not a one-off.
+
+### C-D86 second addendum — the row-74 receipt asserted zero survivors while six of its own processes ran
+
+C-D86 predicted that a leak check blind to detached descendants would report clean through a
+process leak. That prediction was confirmed by the **row-74 run itself**, minutes after the receipt
+was written.
+
+Seventeen minutes after row 74 completed, six `PPID 1` aspire helpers were still running with
+working-dir `…/cli-e2e/plugin-smoke-20260809-224559` — **the row-74 run's own workspace**. The
+row-74 receipt, which is otherwise accurate and which I accepted, states `cleanup.aspire-stop`
+passed in 1.003s and `run-owned survivors: 0`. Both statements were true about what the leak check
+measures — containers and the AppHost — and both were compatible with six run-owned processes still
+executing.
+
+This is now demonstrated rather than inferred, in two independent runs (row 70's orphan at 1h53m,
+row 74's six at 17m). Every `scaffold.runtime` execution appears to leak these helpers.
+
+Reclaimed under the corrected three-part rule from the first addendum, all three conditions holding:
+path containment in the owning worktree; a workspace belonging to a run that has **ended**; and an
+age far exceeding a sub-second `nuget search`. Result: w3b1 run-owned orphans **0**,
+`ns005-stable-opus5` run-owned orphans **0** (six more, ~14h old, from this checkout's earlier
+installed-consumer runs). **Foreign left untouched and recorded: `ns005-w2c` 16, `ns005-w3a` 5,
+`ns005-w3b2` 3** — 24 stale helpers across three sibling worktrees, which is the scale of the
+systemic gap.
+
+Consequence for evidence already recorded: rows 67, 69, 73 and 75 each state "zero run-owned
+survivors" on the strength of the same blind check. Those statements should be read as *zero
+run-owned containers and AppHosts*, which is what was actually verified. No gate verdict changes —
+the leaked helpers are idle `nuget search` calls, not resource holders that would alter a pass/fail
+— but the ledger's survivor claims are narrower than their wording implies, and the follow-up issue
+should say so.
