@@ -1,6 +1,6 @@
 # Context pack: W3-B3 #1376
 
-- Phase: `impl-eval`; implementation and all ten acceptance rows independently verified.
+- Phase: `ready-merge`; implementation and all ten acceptance rows independently verified.
 - Baseline: `aa8e151e6`; branch `fix/mcp-execute-command-host-cli`.
 - Issue: #1376; all ten live acceptance rows are quoted in `plan.md`.
 - Locked boundary: #1375 owns docs-root, host-config, environment, and corpus changes. This slice's
@@ -39,3 +39,7 @@
   context phase. Product implementation, tests, docs, gates, and all ten acceptance rows passed.
 - Next action: add and dry-run the fenced PR acceptance-evidence map, correct the S5 handoff record,
   push the bookkeeping repair, and return for mirror confirmation without re-running product gates.
+- #1401 landed as `9fabd5286`; this branch rebased second. Shared `packages/mcp/cli.ts` and README
+  preserve both docs-corpus and execution-identity/receipt behavior. Canonical publish/asset-barrel
+  generators and both freshness guards pass; decisive CLI-host tests are 4/4 and the expanded MCP
+  package suite is 121/121. Next action is orchestrator merge from `status:ready-merge`.

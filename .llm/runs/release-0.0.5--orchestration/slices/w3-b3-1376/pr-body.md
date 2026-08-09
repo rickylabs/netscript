@@ -24,7 +24,7 @@ truthfully authorize `record_drift`.
 - Git baseline — clean at `aa8e151e6`
 - Live #1376 — ten acceptance rows copied verbatim into the harness plan
 - PLAN-EVAL cycle 2 — separate Claude · Fable 5 verdict `PASS`
-- Focused MCP tests — 24 passed, 0 failed; full MCP package — 113 passed, 0 failed
+- Focused MCP tests — 24 passed, 0 failed; post-rebase full MCP package — 121 passed, 0 failed
 - Decisive CLI-host tests — 4 passed, 0 failed, including mismatched host version and no JSR child
 - Scoped check/lint/fmt, MCP-scoped code-quality scan, MCP export-map `doc:lint`, JSR audit,
   publish-assets check, workspace `publish:dry-run`, and review-thread gate — raw exit 0
@@ -32,6 +32,8 @@ truthfully authorize `record_drift`.
 - MCP doctrine checker — slice-caused A8 repaired; raw exit 1 remains for baseline/#1403 findings
 - `scaffold.runtime` — raw exit 0, `passed=78 failed=0 skipped=2`; both skips declared under #1398
 - Pre/post leak artifacts — no slice-owned survivor; foreign `redis-jfgcbtaf` left untouched
+- Post-#1401 rebase — both shared-file behaviors preserved; publish-assets and asset-barrel freshness
+  guards raw exit 0; decisive CLI-host suite 4/4
 
 ```acceptance-evidence
 issue: 1376
@@ -61,7 +63,7 @@ entries:
 ## Harness
 
 - Run dir: `.llm/runs/release-0.0.5--orchestration/slices/w3-b3-1376/`
-- Phase: `impl-eval`; PLAN-EVAL passed and IMPL-EVAL remains orchestrator-launched.
+- Phase: `ready-merge`; PLAN-EVAL passed and IMPL-EVAL bookkeeping repair accepted.
 - Do not merge until separate-session PLAN-EVAL and IMPL-EVAL pass and every acceptance row has evidence.
 
 ## Drift / Debt

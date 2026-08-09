@@ -93,6 +93,13 @@ mirror standalone, host, success, failure, and denial modes.
 | IMPL-EVAL cycle 1 | separate Claude · Fable 5 evaluation | 1 (`FAIL_FIX`) | Product, tests, docs, gates, and all ten rows verified; close-gate evidence was only ticked in branch-local `plan.md`, not mapped in the live PR/issue. S5's claim that live boxes were ticked was false and is corrected in place. |
 | Close-gate mirror dry-run | `GH_TOKEN=$(gh auth token) deno run --allow-env --allow-net .llm/tools/validation/mirror-acceptance-evidence.ts --repo rickylabs/netscript --pr 1400 --dry-run --pretty` | 0 | Guarded skip because PR remains `status:impl-eval`; no issue mutation. Provenance head `eb0889224`, issue body hash recorded by the tool. |
 | Live acceptance mapping validation | checked-in `acceptanceCheckboxes` + `parseAcceptanceEvidence` + `validateEvidenceMapping` against live PR #1400 and issue #1376 bodies | 0 | `boxes=10 unchecked=10 evidenceEntries=10 mapped=10 warnings=[]`. The map is complete; authorized mirroring remains pending `status:ready-merge`. |
+| Second-to-merge rebase | `git rebase origin/main` at `9fabd5286` | 0 after resolution | `cli.ts` and README auto-merged with both #1375 docs-corpus and #1376 identity/receipt hunks. Generated publish asset used the #1401 base during replay, then was canonically regenerated. The later import-only `tool-contracts.ts` conflict retained the evaluated identity-schema colocation. No product behavior was selected or changed. |
+| Post-rebase publish generator | `rtk proxy deno task gen:publish-assets` | 0 | Regenerated against #1401's stricter corpus provenance, byte budget, and framework-version check. MCP publish asset changed to embed the combined README plus #1401 corpus. |
+| Post-rebase asset-barrel generator | `rtk proxy deno task gen:assets-barrel` | 0 | Reprocessed the shared corpus consumer; #1401's `agent-docs.generated.ts` reproduced byte-for-byte, so only the MCP publish asset remains changed. |
+| Post-rebase publish freshness | `rtk proxy deno task check:publish-assets` | 0 | Generated MCP publish surface is current. |
+| Post-rebase asset-barrel freshness | `rtk proxy deno task check:assets-barrel` | 0 | All listed CLI/plugin/fresh/service generated consumers are current. |
+| Post-rebase decisive CLI-host suite | `deno test --no-lock --allow-all packages/cli/src/public/features/agent/mcp/cli-mcp-adapters_test.ts` | 0 | 4 passed, 0 failed; mismatched host version still executes the host entrypoint with no MCP-pinned JSR child. |
+| Post-rebase full MCP package suite | `rtk proxy deno task --cwd packages/mcp test` | 0 | 121 passed, 0 failed, including #1375 embedded-corpus coverage and #1376 identity/receipt coverage together. |
 
 ## Phase status
 
