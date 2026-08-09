@@ -99,7 +99,12 @@ export function validateFlowB(traces: readonly TelemetryTrace[]): void {
     fanIn.attributes['service.name'] === 'flow-b-stream-consumer',
     'stream.subscribe is emitted by the Deno-side consumer hosted in the isolated AppHost gate',
   );
-  assertConsumerLinksProducer(main.traceId, fanIn);
+  const producerLink = assertConsumerLinksProducer(main.traceId, fanIn);
+  console.info(
+    `TC-14 PASS: producerTraceId=${main.traceId} selectedCorrelationId=${
+      String(fanIn.attributes['netscript.correlation.id'])
+    } linkTraceId=${producerLink.traceId} linkSpanId=${producerLink.spanId}`,
+  );
   tcAssert(
     'TC-14',
     fanIn.links.some((link) => Object.keys(link.attributes).length > 0),
@@ -133,13 +138,14 @@ export function validateFlowB(traces: readonly TelemetryTrace[]): void {
 export function assertConsumerLinksProducer(
   producerTraceId: string,
   consumerSpan: TelemetrySpan,
-): void {
+): TelemetrySpan['links'][number] {
   if (consumerSpan.links.length === 0) {
     throw new Error(
       `TC-14 FAIL: SSE consumer has zero W3C links; producerTraceId=${producerTraceId} consumerTraceId=${consumerSpan.traceId} consumerSpanId=${consumerSpan.spanId} linkCount=0`,
     );
   }
-  if (consumerSpan.links.some((link) => link.traceId === producerTraceId)) return;
+  const match = consumerSpan.links.find((link) => link.traceId === producerTraceId);
+  if (match) return match;
   const links = consumerSpan.links.map((link, index) =>
     `link[${index}].traceId=${link.traceId} link[${index}].spanId=${link.spanId}`
   ).join(' ');

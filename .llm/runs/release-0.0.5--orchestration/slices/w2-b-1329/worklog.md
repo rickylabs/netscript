@@ -118,6 +118,7 @@ service, generator, or docs file owns a second event-name/payload table.
 | 2026-08-09 | S6-R1 | single identity | The selected record's semantic correlation drives both link attributes and the consumer span. Producer trace id is read with the job correlation; missing, malformed, or different record `traceparent` fails TC-14 before export, while the dashboard equality assertion remains independent. |
 | 2026-08-09 | S6-R1 | repair gates | Seven focused selection/TC-14 tests pass. The 35-file scoped check/lint/fmt wrappers and `quality:gate` pass with only carried repository warnings/allowances. |
 | 2026-08-09 | S6-R1 | EXPENSIVE-GATE-REQUEST | Gate-side repair and all cheaper validation are complete. Requesting a new serialized `scaffold.runtime` grant; the command has not been started. |
+| 2026-08-09 | S6-R2 | pass attribution | After ledger-row-39 grant and before the runtime run, TC-14 pass output was strengthened to print producer trace id, selected correlation, and matched link trace/span ids. Seven focused tests and the 35-file scoped check/fmt pass. |
 
 ## Decisions
 
