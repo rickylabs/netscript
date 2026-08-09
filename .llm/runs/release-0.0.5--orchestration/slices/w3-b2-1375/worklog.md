@@ -97,8 +97,8 @@ update the single precedence test matrix before the resolver.
 | --- | --- | --- | --- |
 | 2026-08-09 | research | Live #1375 body fetched; all eleven rows copied verbatim and re-baselined at `aa8e151e6`. | `research.md` |
 | 2026-08-09 | plan | Four implementation slices locked; #1260 and #1376 boundaries preserved. | `plan.md` |
-| 2026-08-09 | plan-eval | Mandatory separate Claude/Fable PLAN-EVAL requested; product implementation paused. | Pending orchestrator launch |
+| 2026-08-09 | plan-eval | Draft PR #1401 opened against `main` without a closing keyword; milestone `0.0.5` and exactly one `status:plan-eval` applied. Mandatory separate Claude/Fable PLAN-EVAL requested; product implementation paused. | Planning commit `93e59c8b0`; PR phase comment `5229277468` |
 
 ## Gate results
 
-No implementation gate has run. PLAN-EVAL is the active hard stop.
+No implementation gate has run. PLAN-EVAL is the active hard stop. Draft PR: #1401.

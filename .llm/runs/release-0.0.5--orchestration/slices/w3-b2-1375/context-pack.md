@@ -13,8 +13,10 @@
 ## Current state
 
 Research and the ordered plan are complete against live issue #1375 and baseline `aa8e151e6`.
-All eleven acceptance rows fit one PR. No product source or test implementation has begun. The
-mandatory fresh Claude/Fable PLAN-EVAL is the hard stop.
+Draft PR #1401 is open against `main` at `status:plan-eval`; its closing keyword is intentionally
+withheld until all eleven rows have evidence. All eleven acceptance rows fit one PR. No product
+source or test implementation has begun. The mandatory fresh Claude/Fable PLAN-EVAL is the hard
+stop.
 
 ## Completed
 
