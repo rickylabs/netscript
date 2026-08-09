@@ -2,7 +2,7 @@
 
 ## Current state
 
-- Phase: IMPL-EVAL passed; CI root-graph repair implemented and locally gated; PR handoff pending.
+- Phase: IMPL-EVAL passed; CI root-graph repair handed off; awaiting current-head CI/re-evaluation.
 - Branch/base: `fix/docs-versionless-jsr-specifiers` at `399f60185`.
 - `PLAN-EVAL: N/A` was recorded before source edits because the slice is fully specified and
   mechanical.
@@ -54,3 +54,6 @@
   `--root docs/site --ext ts` wrapper remains red because it directly selects pre-existing
   Lume-bound `_config.ts`, `ai-tooling.ts`, and `check-rendered-output.ts`; this is recorded as a
   gate-scope mismatch rather than hidden or expanded into unrelated work.
+- CI repair implementation commit: `fa6146c67`; structured evidence comment:
+  https://github.com/rickylabs/netscript/pull/1412#issuecomment-5230841642. The PR body checks the
+  evidenced IMPL-EVAL box, preserves `Refs #1411`, and leaves current-head CI/close-gate unticked.

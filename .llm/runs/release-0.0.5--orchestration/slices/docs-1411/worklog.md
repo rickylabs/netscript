@@ -214,3 +214,14 @@ The exact broad docs-root wrapper command is not a valid green verdict for this 
 it ignores `docs/site/deno.json` and directly selects known Lume-bound entry points under the root
 import map. The narrower root wrapper and, decisively, root `deno task test` prove the CI regression
 is fixed without adding Lume to the root graph. No unrelated Lume surface was changed.
+
+### CI repair handoff
+
+- Commit `fa6146c67` was pushed with explicit refspec
+  `HEAD:refs/heads/fix/docs-versionless-jsr-specifiers`.
+- Draft lifecycle had already advanced under orchestrator control; PR #1412's body now adds the S4
+  evidence, checks the independently proven IMPL-EVAL DoD row, retains `Refs #1411`, and leaves the
+  current-head CI/close-gate row unchecked pending automation at the new head.
+- Structured S4 IMPL evidence comment:
+  https://github.com/rickylabs/netscript/pull/1412#issuecomment-5230841642.
+- Re-evaluation, CI, issue acceptance/closure, and merge remain orchestrator-owned.
