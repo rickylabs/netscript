@@ -2,7 +2,8 @@
 
 ## State
 
-Planning/research complete on `fix/app-routes-crud-example`; implementation not yet started.
+Implementation and all authorized focused/static/fitness evidence are complete on
+`fix/app-routes-crud-example`; the draft PR is ready for owner-controlled IMPL-EVAL and CI.
 
 ## Contract
 
@@ -15,4 +16,3 @@ Planning/research complete on `fix/app-routes-crud-example`; implementation not 
 ## Handoff
 
 Owner controls IMPL-EVAL, CI, and merge. This Tier-D lane stops after draft PR evidence.
-

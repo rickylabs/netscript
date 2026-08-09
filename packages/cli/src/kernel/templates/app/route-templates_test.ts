@@ -4,6 +4,7 @@
 
 import { describe, it } from 'jsr:@std/testing@^1/bdd';
 import { assert, assertStringIncludes } from 'jsr:@std/assert@^1';
+import { generateRouteManifestSeed } from '../../application/scaffold/writers/app-route-seeds.ts';
 import {
   appAppTemplate,
   appClientTemplate,
@@ -52,6 +53,31 @@ import {
   serviceV1RouterTemplate,
 } from './app-template-test-support.ts';
 
+function directAppRouteTargets(source: string): ReadonlyMap<string, string> {
+  const start = source.indexOf('export const appRoutes = {');
+  const end = source.indexOf('\n} as const;', start);
+  assert(start >= 0 && end > start, 'rendered router must contain appRoutes');
+
+  const targets = new Map<string, string>();
+  const body = source.slice(start, end);
+  for (const match of body.matchAll(/^  ([A-Za-z][A-Za-z0-9]*): ([^,\n]+),$/gm)) {
+    targets.set(match[1], match[2]);
+  }
+  return targets;
+}
+
+function assertUniqueDirectAppRouteTargets(source: string): void {
+  const owners = new Map<string, string>();
+  for (const [key, target] of directAppRouteTargets(source)) {
+    const owner = owners.get(target);
+    assert(
+      owner === undefined,
+      `appRoutes.${key} duplicates appRoutes.${owner} target ${target}`,
+    );
+    owners.set(target, key);
+  }
+}
+
 describe('app route template rendering', () => {
   it('router.ts mirrors the playground route entrypoint and adds the scaffold service ref', async () => {
     const adapter = makeAdapter();
@@ -73,11 +99,32 @@ describe('app route template rendering', () => {
     assertStringIncludes(output, 'health: routes.health.$route,');
     assertStringIncludes(output, 'examples: routes.examples.$route,');
     assertStringIncludes(output, 'serviceExample: routes.examples.serviceExample,');
-    assertStringIncludes(output, 'crudExample: routes.examples.serviceExample,');
+    assertStringIncludes(output, 'crudExample: routes.examples.crud.$route,');
     assertStringIncludes(output, "designTokens: createRouteReference('/design/tokens'");
     assertStringIncludes(output, "id: 'design.components'");
     assertStringIncludes(output, "id: 'design.composition'");
     assertStringIncludes(output, 'export const appRouter = {');
+  });
+
+  it('CRUD links resolve to the generated /examples/crud route', async () => {
+    const adapter = makeAdapter();
+    const router = await adapter.render(appRouterTemplate, SAMPLE_APP_VARS);
+    const home = await adapter.render(appIndexRouteTemplate, SAMPLE_APP_VARS);
+    const examples = await adapter.render(appExamplesIndexRouteTemplate, SAMPLE_APP_VARS);
+    const targets = directAppRouteTargets(router);
+
+    assert(
+      targets.get('crudExample') === 'routes.examples.crud.$route',
+      'appRoutes.crudExample must target the generated CRUD route',
+    );
+    assertStringIncludes(generateRouteManifestSeed(), "$route: '/examples/crud'");
+    assertStringIncludes(home, 'href: appRoutes.crudExample.href()');
+    assertStringIncludes(examples, 'href: appRoutes.crudExample.href()');
+  });
+
+  it('rejects duplicate direct appRoutes targets', async () => {
+    const output = await makeAdapter().render(appRouterTemplate, SAMPLE_APP_VARS);
+    assertUniqueDirectAppRouteTargets(output);
   });
 
   it('utils.ts re-exports a typed definePage helper', () => {
