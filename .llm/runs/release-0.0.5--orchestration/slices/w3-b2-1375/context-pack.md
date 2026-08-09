@@ -15,8 +15,9 @@
 Research and the ordered plan are complete against live issue #1375 and baseline `aa8e151e6`.
 Draft PR #1401 is open against `main`; its closing keyword is intentionally withheld until all
 eleven rows have evidence. Separate Claude/Fable PLAN-EVAL passed in comment `5229304606`. F1-F4
-are incorporated. S1 behavioral RED is recorded, S2/S3 are implemented green, and every
-non-serialized S4 gate is green. The expensive runtime token is requested and not yet granted.
+are incorporated. S1 behavioral RED is recorded and S2/S3 are implemented green. Non-serialized S4
+commands are complete; #1403 requires scoped evidence because aggregate quality/doctrine root lists
+omit MCP. The expensive runtime token is requested and not yet granted.
 
 ## Completed
 
@@ -32,9 +33,8 @@ non-serialized S4 gate is green. The expensive runtime token is requested and no
 
 ## Next steps
 
-1. Commit, push, and comment the S4 non-serialized ledger plus `EXPENSIVE-GATE-REQUEST`.
-2. Wait for the orchestrator's explicit serialized token grant.
-3. After grant only: pre-leak-check, exact one-pass runtime, post-leak-check, then IMPL-EVAL handoff.
+1. Wait for the orchestrator's explicit serialized token grant.
+2. After grant only: pre-leak-check, exact one-pass runtime, post-leak-check, then IMPL-EVAL handoff.
 
 ## Key decisions
 
@@ -47,17 +47,18 @@ non-serialized S4 gate is green. The expensive runtime token is requested and no
 
 ## Files changed
 
-Only this slice's run artifacts are new during planning.
+Implementation and tests are committed through S3. S4's scoped doctrine audit compacted the changed
+`packages/mcp/src/domain/tool-contracts.ts` schema declaration below the 300-line A8 cap.
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
 | PLAN-EVAL | PASS | PR comment `5229304606`; local `plan-eval.md`. |
-| Static | NOT_RUN | Implementation has not begun. |
-| Fitness | NOT_RUN | Implementation has not begun. |
+| Static | PASS | Focused 48/48 with no skips; scoped check/lint/fmt green; direct MCP quality scan exit 0 with no findings/allowances. |
+| Fitness | PRE-EXISTING_FAIL | Direct MCP doctrine rerun exit 1 only for untouched F-16/A9/A14 findings assigned to #1403; owned A8 regression repaired. |
 | Runtime | NOT_RUN | Serialized token protocol applies after other gates. |
-| Consumer | NOT_RUN | S1 real stdio proof planned. |
+| Consumer | PASS | Real generated-project stdio `search_docs` returns the installed services document. |
 
 ## Open questions
 
@@ -65,7 +66,7 @@ None. Any evaluator finding returns to plan before implementation.
 
 ## Drift and debt
 
-- Drift: none.
+- Drift: aggregate quality/doctrine coverage was narrower than planned; #1403 owns the root-list gap.
 - Debt: existing `cli/maintainer-mode-mixing`, `cli/no-permissions-doc`, and `MCP-A6-V2-SHAPE`
   preserved; no new debt planned.
 

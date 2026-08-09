@@ -4,7 +4,6 @@ import {
   EXPORT_SURFACE_INPUT_SHAPES,
   EXPORT_SURFACE_OUTPUT_SHAPES,
 } from '../application/export-surfaces/export-surface-tool-contracts.ts';
-
 const objectSchema = (
   properties: Record<string, unknown> = {},
   required: string[] = [],
@@ -224,11 +223,7 @@ const outputShapes: Record<ToolName, Readonly<Record<string, unknown>>> = {
         description: stringProperty,
       }, ['slug', 'title', 'description']),
     },
-  }, [
-    'count',
-    'corpus',
-    'docs',
-  ]),
+  }, ['count', 'corpus', 'docs']),
   get_doc: objectSchema({
     slug: stringProperty,
     title: stringProperty,

@@ -2,8 +2,9 @@
 
 Date: 2026-08-09
 
-Every green row below executed and reports its raw exit code. The serialized runtime row has not
-run and is not represented as a pass.
+Every verdict below executed and reports its raw exit code. The serialized runtime row has not run
+and is not represented as a pass. Repository-wide quality/doctrine commands are retained as
+execution evidence, but #1403 proves their root lists do not cover this slice's MCP surface.
 
 | Gate | Command / selection | Raw exit | Named result |
 | --- | --- | ---: | --- |
@@ -16,8 +17,10 @@ run and is not represented as a pass.
 | Scoped format — MCP | fmt wrapper check after formatting four owned findings | 0 | 105 files, 0 findings |
 | Scoped format — CLI init | fmt wrapper check | 0 | 8 files, 0 findings |
 | Scoped format — generator | fmt wrapper check | 0 | 2 files, 0 findings |
-| Framework quality | `deno task quality:gate` | 0 | no findings; existing allowance count 7 |
-| Doctrine fitness | `deno task arch:check` | 0 | no failures; repository baseline warnings only |
+| Repository quality aggregate | `deno task quality:gate` | 0 | quality scan covered owned CLI source but omitted `packages/mcp`; not MCP evidence (#1403) |
+| Repository doctrine aggregate | `deno task arch:check` | 0 | root list covered neither owned package; not slice evidence (#1403) |
+| Scoped MCP quality | `deno run --allow-read .llm/tools/quality/scan-code-quality.ts --root packages/mcp/src` | 0 | no findings; allowance count 0 |
+| Scoped MCP doctrine | `deno run --allow-read --allow-run .llm/tools/fitness/check-doctrine.ts --root packages/mcp` | 1 | owned A8 line-cap warning repaired; rerun contains only pre-existing #1403 triage listed below |
 | MCP doc-lint | `deno task doc:lint --root packages/mcp --pretty` | 0 | combined errors/private refs/missing JSDoc all 0 |
 | CLI doc-lint | `deno task doc:lint --root packages/cli --pretty` | 0 | combined errors/private refs/missing JSDoc all 0 |
 | MCP JSR audit | `deno publish --dry-run --allow-dirty` in `packages/mcp` | 0 | slow-type check and intended publish file list pass |
@@ -40,6 +43,23 @@ run and is not represented as a pass.
 - The first workspace publish capture outlived its output session and produced no exit verdict. Its
   process was allowed to finish, then the exact command was rerun and returned raw exit `0`; only
   the rerun is counted above.
+
+## #1403 scoped coverage correction
+
+- The repository `quality:gate` exit `0` does not cover `packages/mcp`; its scan roots include
+  `packages/cli/src` and therefore do cover this slice's CLI source. The direct MCP quality scan
+  exited `0` with no findings and no allowances.
+- The repository `arch:check` exit `0` covers neither `packages/mcp` nor `packages/cli`, so it is not
+  doctrine evidence for this slice. The first direct MCP doctrine run exited `1` and reported an A8
+  300-line warning in changed `tool-contracts.ts`; that file was 298 lines at the base and this
+  slice had raised it to 304. Compacting the schema declaration reduced it below the cap.
+- The direct MCP doctrine rerun still exited `1` solely for pre-existing, untouched findings: F-16
+  directory-size warnings for `src/domain` (14 children) and `src/application/flows` (16), A9
+  informational absence of `docs/architecture`, and A14 Jest/Vitest globals in
+  `tests/service-endpoint-sources_test.ts`. That test has an empty diff against `origin/main`.
+- The owned repair was re-proved by `deno test -A --no-lock packages/mcp/tests/registry_test.ts`
+  (raw exit `0`, 5 passed, 0 failed) and the scoped formatter over `tool-contracts.ts` (raw exit
+  `0`, 1 file, 0 findings).
 
 ## JSR audit finding
 

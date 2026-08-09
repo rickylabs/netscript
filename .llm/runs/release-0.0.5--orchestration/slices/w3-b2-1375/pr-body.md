@@ -26,7 +26,9 @@ fallback, and makes corpus health visible through `list_docs`.
 
 - Mandatory separate Claude/Fable PLAN-EVAL passed; findings F1-F4 are recorded in `plan-eval.md`.
 - Focused S3 verdict: 48 passed, 0 failed, no skips; publish-asset freshness exited 0.
-- The serialized `scaffold.runtime` gate will be requested only after all non-serialized gates pass.
+- Direct MCP quality scan is clean. Direct MCP doctrine has no remaining owned finding but exits 1
+  on untouched pre-existing findings tracked for root-coverage triage in #1403.
+- The serialized `scaffold.runtime` token is requested and queued; the command has not started.
 
 ## Harness
 
@@ -37,7 +39,8 @@ fallback, and makes corpus health visible through `list_docs`.
 
 ## Drift / Debt
 
-- No drift.
+- #1403: aggregate `quality:gate` omits MCP and aggregate `arch:check` covers neither owned package;
+  scoped results are recorded instead.
 - Existing `cli/maintainer-mode-mixing`, `cli/no-permissions-doc`, and `MCP-A6-V2-SHAPE` debt is
   preserved and not deepened.
 
