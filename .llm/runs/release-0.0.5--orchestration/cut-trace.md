@@ -247,3 +247,30 @@ legitimate and not scope creep — #1375's rows require a generated embedded fal
 provenance and a size budget, and the generator diff has **zero deletions**, adds
 `MCP_EMBEDDED_DOCS_MAX_BYTES` and a framework-version match throw. The slice strengthened the guard
 that caught its own defects.
+
+| Time (UTC)        | Commit      | PR    | Issues closed | Classification                                                                                                  |
+| ----------------- | ----------- | ----- | ------------- | --------------------------------------------------------------------------------------------------------------- |
+| 2026-08-09T02:0xZ | `3f41a3639` | #1400 | #1376         | W3-B3 — MCP `execute_command` re-enters the host CLI with real version identity; **Wave 3's MCP pair complete** |
+
+Pre-merge gate: 9/9 named expensive gates `success`, none skipped; zero unticked boxes on #1376
+(mirror applied) and zero unticked PR Definition-of-Done boxes; review threads 0/0; base current.
+
+**Close-gate rejected this PR once, correctly, and it is the most instructive gate firing of the
+run.** The acceptance mirror had already applied to #1376 — its ten issue boxes ticked from the
+evidence block — and close-gate then rejected on the **PR body's own** DoD box at line 78,
+_"Separate-session IMPL-EVAL passes"_. That box was unchecked because the only verdict covered
+`eb0889224`, while the merging head was `9c6fd7a85` after a bookkeeping repair and a rebase. The box
+was **not ticked by assumption**: the same Fable evaluator re-reviewed the merging head and returned
+`PASS`, and the box was ticked citing that verdict.
+
+This is the second enforcement of the same principle in the milestone, after W2-B's `75832db58`
+correction review — **a mandatory evaluation must cover the head that merges** — and here it applied
+to a rebase resolving two slices' edits in two shared files plus a cross-package regeneration, which
+is the situation most likely to lose a behaviour quietly.
+
+The correction review settled that by **diff rather than by test count**: the head-vs-base diff on
+`packages/mcp/cli.ts` is exactly the previously evaluated 15-line hunk, touching zero
+`corpus`/`docsRoot` lines, with #1375's symbols intact beside it; `git range-diff` showed commits
+1–6 and 8 replaying `=`. It also re-proved falsifiability **at the merging head** — reverting the S3
+wiring in a fresh export fails 2/4, exit 1 — and confirmed no stale CLI pin was reintroduced by the
+rebase under #1401's stricter generator.

@@ -89,3 +89,38 @@ All ten are proven by executed evidence. None is ticked on the live issue, and n
 2. M1 — refresh the `context-pack.md` phase header. (One line, may ride along.)
 
 Eval cycle 1 of 2 consumed.
+
+## Correction review — 9c6fd7a85 (post-rebase merging head)
+
+| Field | Value |
+| --- | --- |
+| Evaluator | Claude · Fable 5 · medium — same session as cycle 1, separate from the generator |
+| Subject | `origin/fix/mcp-execute-command-host-cli@9c6fd7a85` vs previously evaluated `eb0889224` and vs `origin/main@9fabd5286` (post-#1401) |
+| Method | `git range-diff`, direct shared-file inspection, and independent re-execution from a `git archive` export of `9c6fd7a85` |
+| Date | 2026-08-09 |
+
+### Verdict
+
+**PASS** — the rebase preserved both slices' behavior in every shared surface (verified by direct file inspection, not the test count), all ten #1376 rows re-verify by execution at the merging head, the regenerated assets are canonical and byte-reproducible, the acceptance-evidence bookkeeping is present and accurate, and the F1 false claim was corrected in place with strikethrough. `Closes #1376` remains correct.
+
+### Findings (by severity)
+
+**O3 — observation, not blocking.** `context-pack.md` and `supervisor.md` still record "Baseline: `aa8e151e6`"; the true base after the rebase is `9fabd5286`. Trivial resume-accuracy staleness; the PR's diff-vs-base is unambiguous.
+
+**O4 — observation on my own method, recorded for honesty.** `deno task check:assets-barrel` cannot run in a `git archive` export (its verdict step is `git diff --exit-code`, which needs a repository); the lane's claimed exit 0 was verified by the equivalent stronger check: after running `gen:assets-barrel` in the export, all seven generated targets — including #1401's `agent-docs.generated.ts` — are **byte-identical** (`cmp`) to the committed `9c6fd7a85` blobs.
+
+No blocking findings.
+
+### Question-by-question
+
+1. **Both sides preserved — yes, by inspection, not by count.** `git diff 9fabd5286 9c6fd7a85 -- packages/mcp/cli.ts` is exactly the previously evaluated 15-line hunk: shared `commandExecutor` instance (`cli.ts:139`), identity passed to `createListCommandsFlow`, receipt-wrapped `execute_command`, receipt-exempt comment. The diff touches **zero** lines matching `corpus|docsRoot` (grep count 0), and #1375's surface is present at the head file: `resolveDocsRoot` (`cli.ts:85`), `ReleaseEmbeddedDocsCorpus`, `FilesystemDocsCorpus`/`isIndexableDocsRoot`, `embeddedDocs` option, `NETSCRIPT_DOCS_ROOT` (`cli.ts:87`). `README.md` likewise: the head-vs-main diff is the identical three #1376 hunks (executor-identity section, two catalog rows, record-drift evidence sentence) on top of main's #1375 content. `git range-diff aa8e151e6..eb0889224 9fabd5286..9c6fd7a85`: commits 1–6 and 8 replay `=` (identical); commit 7 differs only by dropping the generated-asset hunk (moved to the regen commit); commit 9's delta is import-only in `tool-contracts.ts`, retaining `CLI_EXECUTION_IDENTITY_JSON_SCHEMA` colocation. The 121/121 count (113 + #1375's embedded-corpus tests) was reproduced but not relied on as the preservation proof.
+2. **The ten rows hold at `9c6fd7a85` — re-executed.** From the head export: decisive CLI-host suite **4/4** (raw exit 0), including the `9.9.9-host` fixture spawn with no `jsr:@netscript/cli@` in either identity; full MCP package **121/121** (raw exit 0); MCP quality scan `findings:[] allowCount:0` (raw exit 0). **The decisive test can still fail**: reverting the S3 host wiring in the export (`commandExecutor: new SpawnCommandExecutor()`) fails 2/4 (default-version and mismatched-host tests), raw exit 1 — falsifiability re-proven at this exact head, then the file restored from the committed blob.
+3. **Regenerated `publish-assets.generated.ts` correct.** `MCP_PACKAGE_VERSION` is `'0.0.4'` at both `9fabd5286` and `9c6fd7a85`; the head-vs-main diff for the file is the `MCP_PACKAGE_README` constant only. `deno task check:publish-assets` at the head export: raw exit 0 under the post-#1401 generator. No stale pin: the only `0.0.3` strings in generated files at head are prose inside main's embedded docs content (skills `help.md`, quickstart narrative), outside this slice's diff; every actionable install pin in the embedded corpus reads `@0.0.4`, and `agent-docs.generated.ts` — the file that carried #1401's stale-`0.0.3` failure — has no diff vs main and regenerates byte-for-byte.
+4. **Acceptance-evidence block present and accurate at this head.** The PR body carries one fenced `acceptance-evidence` block for issue 1376 with ten `box-index` entries in live-row order, each linking a real slice comment (ids 5229317589/5229326570/5229342145/5229418381 — the S2/S3/S4/S5 comments read in cycle 1). Spot-checked mapping: box 1→S3 re-entry, 2→no-JSR child, 3→`CLI_PACKAGE_VERSION`, 5–7,9→S4 receipts/refusal/denials, 10→mismatched-host negative. Every referenced behavior was re-executed at `9c6fd7a85` (question 2), so the entries are true of the merging head, not merely the pre-rebase one. Live #1376 now shows 10/10 checked, 0 unchecked. The F1 false sentence in the S5 handoff was amended **in place** (comment edited 02:59:12Z): original preserved under strikethrough, followed by an explicit correction stating the boxes were unchecked at handoff time. `context-pack.md` phase advanced (`ready-merge`); cycle-1 observations recorded.
+5. **Nothing broken by the rebase.** Gate-integrity grep over the head-vs-main packages diff: zero added `deno-lint-ignore` / `as unknown as` / `@ts-ignore` / `@ts-expect-error` lines. `deno.lock`: no diff. Separability is now moot in the right way — #1375 is in the base, and this diff still touches none of its surfaces. Receipt/denial semantics unchanged (commit 7 replayed identically minus the generated hunk); denial overwrite, exit-aware settlement, and refusal text are the evaluated code verbatim.
+
+### Row and closing statement
+
+All ten #1376 acceptance rows hold at `9c6fd7a85`, re-proven by execution at that head (rows 1–4, 8, 10 via the 4/4 decisive suite plus the mutation falsifiability re-check; rows 5–9 via the 121/121 package suite containing the success/failure/denial/refusal tests evaluated in cycle 1 and replayed unchanged). `Closes #1376` remains correct: the work fully resolves the issue and the keyword is in the PR body `## Scope`. The unchecked Definition-of-Done box "Separate-session IMPL-EVAL passes" (body line 78) may now be ticked citing this verdict.
+
+Cycle 1: `FAIL_FIX` (bookkeeping). Correction review at the merging head: `PASS`.
