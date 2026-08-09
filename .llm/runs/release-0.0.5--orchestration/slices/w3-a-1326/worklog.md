@@ -157,6 +157,10 @@ the adapter or fetch/timers to the supervisor.
 | 2026-08-09 | S7    | Serialized verdict | Ledger row 59 granted W3-A the idle token; exactly one full `scaffold.runtime` run exited 0 with passed=79 failed=0 skipped=2. |
 | 2026-08-09 | S7    | Slice runtime proof | `behavior.streams.producer-reconnect` passed; stream install/readiness, aggregate plugin health, and owned AppHost cleanup also passed. |
 | 2026-08-09 | S7    | Post-run ownership | Leak artifact has no W3-A-owned survivor; only foreign `redis-jfgcbtaf` remains and was left untouched. Review threads exited 0 with none unanswered. |
+| 2026-08-09 | Landing | IMPL-EVAL | Separate Claude · Fable 5 evaluator returned PASS and independently re-executed all eight distinct S1 REDs; verdict is PR comment 5229792871. |
+| 2026-08-09 | Landing | Main rebase | Cleanly rebased all slice commits onto `origin/main@3f41a3639` after #1400/#1401; no overlap or conflict. |
+| 2026-08-09 | Landing | Post-rebase package verdict | Full `packages/plugin-streams-core/tests/` suite exited 0 with 29 passed, 0 failed. |
+| 2026-08-09 | Landing | Follow-up reasons | Two non-correctness reason-fidelity findings are filed under #1405 and deliberately not repaired in this PR. |
 
 ## Decisions
 
@@ -211,6 +215,7 @@ See `plan.md` D1–D16. No open decision would force implementation rework.
 | S6 review threads                  | `agentic:review-threads --pr 1402 --pretty`                      | PASS, exit 0 | 0 threads, 0 unanswered.                                  |
 | S7 serialized runtime              | exact one-pass `e2e:cli run scaffold.runtime --cleanup --format pretty` | PASS, exit 0 | Full aggregate: passed=79 failed=0 skipped=2. Exactly one authorized run. |
 | S7 final review threads            | `agentic:review-threads --pr 1402 --pretty`                      | PASS, exit 0 | 0 threads, 0 unanswered after the runtime verdict.        |
+| Post-rebase package suite          | `deno test --no-lock --allow-all packages/plugin-streams-core/tests/` | PASS, exit 0 | 29 passed, 0 failed on `origin/main@3f41a3639`; informational pre-existing TanStack peer warning disclosed. |
 
 ### S1 RED evidence
 
@@ -293,6 +298,32 @@ All seven live #1326 acceptance rows are now truthfully evidenced:
 - One correlated publish trace spans buffering, retry, recovery, settlement, and delivery; actual
   OTLP metrics expose buffered, retry, recovered, rejected/unknown, and delivered outcomes.
 - The false reconnect warning is removed; manual F-14 reports no executable producer console use.
+
+### Row 6 evidence narrowing — Aspire 13.4 metrics capture
+
+Aspire 13.4 exposes the correlated trace through its dashboard telemetry API but provides no metric
+query endpoint. The real-resource gate therefore inserts a local OTLP/HTTP JSON capture-forwarder:
+it records the producer's actual exported retry, recovery, and delivered metric envelopes while
+forwarding those same payloads to the Aspire collector. The trace assertion remains against the
+Aspire dashboard. This proves real emitted metrics across the outage, but it is metric-envelope
+capture at the collector boundary rather than metric read-back from an Aspire dashboard API.
+
+## IMPL-EVAL
+
+Separate Claude · Fable 5 evaluation returned `PASS`: all seven live acceptance rows are proven,
+the eight S1 REDs re-execute as four distinct runtime failures plus four one-symbol TS2339 failures,
+and silent loss is removed rather than relocated. Verdict:
+https://github.com/rickylabs/netscript/pull/1402#issuecomment-5229792871
+
+### Minor follow-ups — #1405
+
+- During the healthy close-drain window, a concurrent new write is rejected with reason
+  `producer-failed`; a closing-specific reason would be more precise.
+- A non-retryable append failure on attempt 1 settles as `retry-exhausted`; a non-retryable-specific
+  reason would be more precise.
+
+Neither finding can produce a false `delivered` outcome or silent loss; both concern terminal reason
+fidelity only. #1405 owns them. This PR does not change either behavior.
 
 ## EXPENSIVE-GATE-REQUEST
 

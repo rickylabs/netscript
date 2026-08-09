@@ -34,32 +34,36 @@ manual F-14 evidence. The full core suite passes 28/28.
   evidence, and corrected client/server header-export wording.
 - PLAN-EVAL F4 repaired: type-broken negative fixtures moved in the plan from package test roots to
   the slice run dir, preserving green scoped and repo CI checks without exclusions.
-- S1 contract/RED slice committed as `11ee98e22`, pushed, and reported on draft PR #1402.
+- S1 contract/RED slice rebased as `d846f990e`, pushed, and reported on draft PR #1402.
 - S2 focused/core tests and scoped check/lint/format are green; lock remains unchanged.
-- S2 committed as `e8e638559`, pushed, and reported on draft PR #1402.
+- S2 rebased as `fa0da6608`, pushed, and reported on draft PR #1402.
 - S3 telemetry, package-scoped quality/doctrine, F-14, docs, and aggregate gates are green locally.
-- S3 committed as `ba5c4704a`, pushed, and reported on draft PR #1402.
+- S3 rebased as `3e9a37822`, pushed, and reported on draft PR #1402.
 - S4 isolated public consumer, downstream consumers, JSR, raw/package workspace publish, and scoped
   wrappers are green; the only consumer repair is a test fake now using `MemoryStreamProducer`.
 - S5 real Aspire stop/restart proof is green with FIFO receipts, one dashboard trace, and actual
-  captured-forwarded OTLP metrics; commit `65ae73e21` is pushed and reported on PR #1402.
+  captured-forwarded OTLP metrics; rebased commit `8836491f2` is reported on PR #1402.
 - S6 JSR, workspace publish, mandatory aggregates, and review-thread gate are green. The aggregate
   quality/doctrine tasks remain non-decisive because #1403 owns their missing package root.
 - S7 used ledger row 59 for exactly one serialized `scaffold.runtime` run: raw exit 0,
   `passed=79 failed=0 skipped=2`; `behavior.streams.producer-reconnect` passed.
 - Post-run leak and review-thread gates exit 0. No W3-A-owned resource survives; only the known
   foreign Redis remains untouched.
+- Separate Claude · Fable 5 IMPL-EVAL passed. Two minor terminal-reason fidelity findings are filed
+  under #1405 and intentionally remain outside this PR.
+- The branch rebased cleanly onto `origin/main@3f41a3639`; the post-rebase package suite exits 0
+  with 29 passed and 0 failed.
 
 ## In Progress
 
-- Implementation and all required gates are complete. The draft PR is handed back at
-  `status:impl-eval` for the mandatory separate Claude · Fable 5 IMPL-EVAL.
+- Implementation, required gates, rebase, and separate IMPL-EVAL are complete. The draft PR is
+  handed back at `status:ready-merge`; the orchestrator alone may remove draft status or merge.
 
 ## Next Steps
 
-1. Commit, push, and comment S7 evidence.
-2. Release the serialized runtime token to the orchestrator.
-3. Stop for the mandatory separate-session IMPL-EVAL; do not self-certify.
+1. Commit and push the post-eval bookkeeping and rebased history.
+2. Add the fenced acceptance-evidence map and tick the PR IMPL-EVAL Definition-of-Done row.
+3. Set `status:ready-merge` and stop; do not mark the PR ready or merge it.
 
 ## Key Decisions
 
@@ -109,10 +113,11 @@ manual F-14 evidence. The full core suite passes 28/28.
 
 ## Commits
 
-- `11ee98e22` — S1 contract and classified RED evidence.
-- `e8e638559` — S2 reconnect supervisor and focused GREEN evidence.
-- `ba5c4704a` — S3 correlated trace/metrics and exact AP-13 debt closure.
-- `0b842c8e1` — S4 published/consumer compatibility.
-- `65ae73e21` — S5 focused real Aspire outage/recovery and correlated OTEL proof.
-- `693f7e475` — S6 cheaper-gate closeout and serialized-token request.
-- S7 evidence/release commit pending.
+- `d846f990e` — S1 contract and classified RED evidence.
+- `fa0da6608` — S2 reconnect supervisor and focused GREEN evidence.
+- `3e9a37822` — S3 correlated trace/metrics and exact AP-13 debt closure.
+- `d85ef4af0` — S4 published/consumer compatibility.
+- `8836491f2` — S5 focused real Aspire outage/recovery and correlated OTEL proof.
+- `ead937b62` — S6 cheaper-gate closeout and serialized-token request.
+- `a1d30b311` — S7 serialized runtime verdict and token release.
+- Post-eval landing artifact commit pending.
