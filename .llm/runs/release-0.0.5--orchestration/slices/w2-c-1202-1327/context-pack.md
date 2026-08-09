@@ -2,12 +2,12 @@
 
 ## Current phase
 
-Sixth serialized pass completed green with raw exit 0 and `passed=80 failed=0`. Migration artifacts,
-both allocation captures, endpoint authority, documented users database health, and a shared trace
-ID across structured logs and OTEL traces all passed in the same run. Pre/post leak artifacts prove
-no W2-C-owned or unknown survivor; review threads pass 0/0. All #1202 acceptance rows and #1327's
-runtime artifact acceptance are now checked. PR #1393 remains draft at `status:impl-eval`; the
-orchestrator must launch the separate Fable 5 evaluation.
+Sixth serialized pass completed green with raw exit 0 and `passed=80 failed=0`. Separate-session
+Fable 5 IMPL-EVAL independently confirmed the code and adversarial gate behavior, then returned one
+wording-only `FAIL_FIX`: the claimed historical #1202 persisting mechanism was falsified by source
+history. The owner amended row 2 to the no-persisting-path invariant this slice actually proves and
+split identification to #1396. PR/worklog evidence is corrected without code or a runtime rerun;
+PR #1393 is ready for `status:ready-merge` handoff.
 
 ## Identity
 
@@ -35,6 +35,11 @@ orchestrator must launch the separate Fable 5 evaluation.
   belongs to `/home/codex/repos/w6-review-desk` and was deliberately left untouched.
 - The `--name` environment-key repair is required by #1327's named-artifact acceptance, not adjacent
   scope.
-- #1202 contains four code/runtime rows only. The stale-write RED tests map row 2; the two
-  allocation receipts plus live-endpoint health/structured-log/OTEL receipt must prove rows 1, 3,
-  and 4.
+- #1202 row 2 is the RED-first no-persisting-path invariant plus two-allocation runtime proof. The
+  earlier eager-`getEndpoint("tcp")` causal claim was false: the database generator was already lazy
+  at the reproduction baseline. Historical mechanism identification is tracked by #1396.
+- #1202 row 1's first-start binding is proven structurally; its direct health probe runs after the
+  second start, which is the stricter re-allocation case. Rows 3 and 4 are proven by the same sixth
+  runtime receipt.
+- #1327 applied-state verification uses `prisma migrate status`, which reads
+  `_prisma_migrations`, alongside migration-file inventory.

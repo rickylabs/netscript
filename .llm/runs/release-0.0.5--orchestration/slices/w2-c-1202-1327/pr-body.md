@@ -55,9 +55,11 @@ bind the live Postgres allocation across consecutive AppHost starts.
   green exited 0 with 30 passed, 0 failed. The negative fixture retains healthy aggregate status
   while setting the database check to `healthy: false`, proving check details remain authoritative.
   Scoped check/lint/format, `quality:gate`, and `arch:check` exit 0.
-- #1202 row 2 mechanism: eager `getEndpoint("tcp")` materialization serializes one AppHost
-  allocation into generated `DATABASE_URL`. The RED-first guard forbids it and requires lazy
-  `infrastructure.primaryDatabase` resource binding so the endpoint resolves afresh on every start.
+- #1202 row 2 invariant: the RED-first generator guard proves no endpoint-persisting path exists in
+  the database wiring: `DATABASE_URL` stays lazily bound to `infrastructure.primaryDatabase`, with
+  no eager endpoint lookup or allocated authority serialized into scaffold output. The two-allocation
+  runtime receipt proves that invariant holds across consecutive starts. Historical mechanism
+  identification is split to #1396; this PR makes no causal claim about the original reproductions.
 - Fifth `scaffold.runtime`: raw exit 1, `passed=61 failed=1`. Migration artifacts, both allocation
   captures, structural endpoint comparison, and documented health validation passed in the same run.
   `behavior.live-db-endpoint` reached telemetry retrieval, then `aspire otel logs users` exited 12
@@ -74,14 +76,23 @@ bind the live Postgres allocation across consecutive AppHost starts.
   same run. `behavior.live-db-endpoint` reached comparison, found a trace ID shared by non-empty
   users structured logs and OTEL traces, and wrote the endpoint/health/telemetry receipt. The
   following Flow-B stream, grouped trace, and detached task telemetry gates also passed. Pre/post
-  leak artifacts show no W2-C-owned or unknown survivor; review threads pass 0/0.
+  leak artifacts show no W2-C-owned or unknown survivor; review threads pass 0/0. First-start
+  endpoint binding is proven structurally; the direct health probe runs after the second start,
+  which is the stricter re-allocation case.
+- Applied database state is verified through `prisma migrate status`, which reads Prisma's
+  `_prisma_migrations` table, in addition to the migration-file inventory.
+- Separate-session Fable 5 IMPL-EVAL independently re-ran 5 database and 42 CLI/E2E focused tests
+  and added eleven adversarial probes; all invalid endpoint, health, and telemetry cases were
+  rejected. Its sole `FAIL_FIX` finding was this evidence wording, resolved by the owner ruling that
+  amended #1202 row 2 and split historical identification to #1396. No product-code or runtime rerun
+  was requested.
 
 ## Harness
 
 - Run dir: `.llm/runs/release-0.0.5--orchestration/slices/w2-c-1202-1327/`
-- Phase: implementation → IMPL-EVAL handoff with disclosed runtime-evidence gap
-- Do not merge until required gates, Tier-A review, and separate-session IMPL-EVAL PASS are
-  complete.
+- Phase: IMPL-EVAL wording remediation complete → ready-merge handoff
+- Required gates and Tier-A review are complete; the separate-session evaluator's sole wording
+  finding is corrected under the owner ruling recorded on PR #1393.
 
 ## Drift / Debt
 
@@ -92,16 +103,18 @@ bind the live Postgres allocation across consecutive AppHost starts.
 
 ### #1202 acceptance
 
-- [x] Fresh users service matches the first live Postgres allocation and reports database health.
-- [x] Persisting mechanism identified RED-first: eager `getEndpoint("tcp")` materialization
-      serializes one allocation into `DATABASE_URL`; the guard requires lazy
-      `infrastructure.primaryDatabase` binding.
+- [x] Fresh users service matches the first live Postgres allocation structurally; the direct
+      health probe is green after the stricter second-start re-allocation.
+- [x] A RED-first guard proves no persisting path exists: database wiring remains a lazy
+      `infrastructure.primaryDatabase` binding and serializes no allocated endpoint. Two-allocation
+      runtime evidence proves the invariant; original-mechanism identification is tracked in #1396.
 - [x] A second consecutive AppHost allocation remains matched and healthy.
 - [x] Health JSON plus a shared trace ID across structured logs and OTEL prove the live receipt.
 
 ### Slice completion
 
-- [x] `db migrate` success names and verifies created migration files and applied database state.
+- [x] `db migrate` success names and verifies created migration files and applied database state via
+      `prisma migrate status`, which reads `_prisma_migrations`.
 - [x] Headless inability to create a migration fails non-zero with an actionable next command.
 - [x] `db deploy` is the only deploy-only verb and output separates created/applied sets.
 - [x] TTY and non-TTY schema-change E2E proves files and database state, with deploy/no-change
@@ -110,4 +123,35 @@ bind the live Postgres allocation across consecutive AppHost starts.
       OTEL.
 - [x] Required static, quality, doctrine, publish, resource-health, and serialized runtime gates
       pass.
-- [ ] Separate-session IMPL-EVAL passes.
+- [x] Separate-session IMPL-EVAL completed; its sole wording finding is resolved by the owner ruling
+      and this evidence correction.
+
+```acceptance-evidence
+issue: 1202
+entries:
+  - box-index: 1
+    evidence: "https://github.com/rickylabs/netscript/pull/1393#issuecomment-5228877485 — sixth scaffold.runtime receipt: first allocation authority matched structurally; direct health JSON passed after the stricter second start"
+  - box-index: 2
+    evidence: "https://github.com/rickylabs/netscript/pull/1393#issuecomment-5228877485 — pristine-scaffold-ports_test.ts RED-first no-persisting-path guard plus two-allocation runtime receipt; historical identification split to #1396"
+  - box-index: 3
+    evidence: "https://github.com/rickylabs/netscript/pull/1393#issuecomment-5228877485 — runtime.capture-db-allocation-first, runtime.capture-db-allocation-second, and behavior.live-db-endpoint passed in one run"
+  - box-index: 4
+    evidence: "https://github.com/rickylabs/netscript/pull/1393#issuecomment-5228877485 — health JSON and one trace ID shared by non-empty structured logs and dashboard OTEL traces"
+```
+
+```acceptance-evidence
+issue: 1327
+entries:
+  - box-index: 1
+    evidence: "https://github.com/rickylabs/netscript/pull/1393#issuecomment-5228877485 — database.migration-artifacts gate and runMigrationWithArtifacts focused suite"
+  - box-index: 2
+    evidence: "https://github.com/rickylabs/netscript/pull/1393#issuecomment-5228877485 — TTY/non-TTY schema-change E2E: migration.sql inventory plus prisma migrate status over _prisma_migrations"
+  - box-index: 3
+    evidence: "https://github.com/rickylabs/netscript/pull/1393#issuecomment-5228877485 — headless no-artifact negative control: non-zero result with exact interactive next command"
+  - box-index: 4
+    evidence: "https://github.com/rickylabs/netscript/pull/1393#issuecomment-5228877485 — deploy-only control: db deploy is distinct and leaves the migration artifact inventory unchanged"
+  - box-index: 5
+    evidence: "https://github.com/rickylabs/netscript/pull/1393#issuecomment-5228877485 — migration-artifact E2E asserts separate Created migrations and Applied migrations output"
+  - box-index: 6
+    evidence: "https://github.com/rickylabs/netscript/pull/1393#issuecomment-5228877485 — database.migration-artifacts gate exercises real PTY and non-TTY schema mutations, files, and applied database state"
+```

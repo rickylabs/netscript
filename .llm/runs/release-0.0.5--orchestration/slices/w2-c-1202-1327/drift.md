@@ -135,5 +135,17 @@
   shared trace ID, and wrote the health/endpoint/telemetry receipt.
 - Flow-B stream correlation, grouped traces, and detached task telemetry also passed through the
   consolidated dashboard path in the same run.
-- #1202 rows 1, 3, and 4 can now join the already-checked row 2; no telemetry reachability deferral
-  to 0.0.6 is required.
+- #1202 rows 1, 3, and 4 can now join row 2's no-persisting-path invariant; no telemetry
+  reachability deferral to 0.0.6 is required.
+
+## 2026-08-09 — #1202 causal claim falsified and split (material, resolved)
+
+- Incorrect record: PR/worklog prose attributed the historical stale endpoint to eager
+  `getEndpoint("tcp")` materialization into generated `DATABASE_URL`.
+- Evaluator evidence: database wiring was already lazily bound to
+  `infrastructure.primaryDatabase` at reproduction baseline `3ff18a8ad`; eager TCP endpoint lookup
+  existed only for cache resources and was never in the database generator path.
+- Owner ruling: amend #1202 row 2 to the RED-first no-persisting-path invariant plus two-allocation
+  proof, and split historical mechanism identification to #1396.
+- Resolution: correct PR body, worklog, context pack, and acceptance mirror. #1397 separately owns
+  the mysql/mssql health-gate coverage note. No product code or runtime rerun belongs in this fix.

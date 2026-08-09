@@ -182,13 +182,18 @@ and `database:<provider>` for the configured client in a multi-database context.
 | Framework law    | `deno task quality:gate`                                                                                                                                                                                                              |        0 | quality scan and doctrine checks passed; pre-existing warnings only |
 | Doctrine fitness | `deno task arch:check`                                                                                                                                                                                                                |        0 | passed; pre-existing warnings only                                  |
 
-### #1202 row 2 — persisting mechanism
+### #1202 row 2 — no-persisting-path invariant
 
-The mechanism is eager `getEndpoint("tcp")` materialization: resolving the endpoint and writing that
-string into generated `DATABASE_URL` serializes one AppHost allocation into the generated service
-environment. The RED-first guard forbids that output and requires lazy
-`resource.withEnvironment('DATABASE_URL', infrastructure.primaryDatabase)` binding, plus reference
-and readiness edges, so Aspire resolves the current allocation on each start.
+The RED-first guard proves that current database wiring contains no endpoint-persisting path. It
+requires lazy `resource.withEnvironment('DATABASE_URL', infrastructure.primaryDatabase)` binding,
+plus reference and readiness edges, and rejects eager endpoint lookup or allocated authority
+serialized into generated output. The two-allocation runtime receipt proves the invariant across
+consecutive starts.
+
+The separate-session evaluator falsified the earlier causal wording: at reproduction baseline
+`3ff18a8ad`, the database path was already lazy, and `getEndpoint("tcp")` appeared only for cache
+resources. The original stale-endpoint mechanism therefore was not identified by this slice.
+Identification is split to #1396; this PR makes no causal claim about the historical reproductions.
 
 `scaffold.runtime` was not run because W2-B holds the serialized token. Rows 1, 3, and 4 remain
 unproven until `behavior.live-db-endpoint` completes endpoint, health, structured-log, and OTEL
@@ -424,8 +429,24 @@ first time.
   comparison did not pass on empty telemetry. The subsequent Flow-B stream, grouped trace, and
   detached task trace gates also passed.
 
-All four #1202 rows are now truthfully satisfied: first and second allocations are distinct and
-matched, users health is green, the stale persistence mechanism is identified RED-first, and the
-receipt requires health JSON plus a shared structured-log/OTEL trace ID. #1327's TTY/non-TTY
-migration artifact gate is also green in this run. The token is released green for separate-session
-IMPL-EVAL handoff.
+All four #1202 rows are now truthfully satisfied under the owner-amended acceptance: first and
+second allocations are distinct and matched, the RED-first guard plus two-allocation receipt prove
+the no-persisting-path invariant, users health is green, and the receipt requires health JSON plus a
+shared structured-log/OTEL trace ID. First-start binding is proven structurally; the direct health
+probe runs after the second start, the stricter re-allocation case. #1327's TTY/non-TTY migration
+artifact gate is also green; applied-state verification uses `prisma migrate status`, which reads
+`_prisma_migrations`. The token is released green for separate-session IMPL-EVAL handoff.
+
+## IMPL-EVAL wording remediation — 2026-08-09
+
+Separate-session Fable 5 IMPL-EVAL returned `FAIL_FIX` on one evidence claim and independently
+confirmed the implementation and gates. It re-ran the focused suites (5 database + 42 CLI/E2E
+passed) and eleven adversarial probes; empty, malformed, mismatched, and non-correlated evidence was
+rejected. It also confirmed the shared telemetry extraction did not weaken Flow-B.
+
+The blocking claim was the orchestrator-supplied assertion that eager `getEndpoint("tcp")`
+materialization caused #1202. Source history disproves it: database wiring was already lazy at the
+third-reproduction baseline, and the eager lookup existed only for cache resources. Owner ruling:
+row 2 is amended to the invariant this slice actually proves, while historical identification moves
+to #1396. PR and worklog wording are corrected; no code or runtime rerun is required. #1397 tracks
+the evaluator's separate mysql/mssql coverage finding and is not folded into this PR.
