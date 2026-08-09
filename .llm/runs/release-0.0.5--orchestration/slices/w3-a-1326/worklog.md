@@ -154,6 +154,9 @@ the adapter or fetch/timers to the supervisor.
 | 2026-08-09 | S5    | Owned cleanup      | Foreground AppHost stopped; no owned survivors. Foreign Redis untouched; scratch workspace moved to recoverable trash. |
 | 2026-08-09 | S6    | Cheaper gate closeout | JSR audit, workspace publish dry-run, both mandatory aggregates, and review-thread gate all exited 0 after S5. |
 | 2026-08-09 | S6    | Runtime token handoff | `EXPENSIVE-GATE-REQUEST` recorded after every cheaper gate passed; `scaffold.runtime` remains unstarted pending a ledger grant. |
+| 2026-08-09 | S7    | Serialized verdict | Ledger row 59 granted W3-A the idle token; exactly one full `scaffold.runtime` run exited 0 with passed=79 failed=0 skipped=2. |
+| 2026-08-09 | S7    | Slice runtime proof | `behavior.streams.producer-reconnect` passed; stream install/readiness, aggregate plugin health, and owned AppHost cleanup also passed. |
+| 2026-08-09 | S7    | Post-run ownership | Leak artifact has no W3-A-owned survivor; only foreign `redis-jfgcbtaf` remains and was left untouched. Review threads exited 0 with none unanswered. |
 
 ## Decisions
 
@@ -206,6 +209,8 @@ See `plan.md` D1–D16. No open decision would force implementation rework.
 | S6 JSR audit helper                 | `audit-jsr-package.ts --root packages/plugin-streams-core`      | PASS, exit 0 | 43 files and all four exports; only the known banner-count warning. |
 | S6 workspace publish               | `deno task publish:dry-run`                                     | PASS, exit 0 | Entire workspace simulation completed successfully after S5. |
 | S6 review threads                  | `agentic:review-threads --pr 1402 --pretty`                      | PASS, exit 0 | 0 threads, 0 unanswered.                                  |
+| S7 serialized runtime              | exact one-pass `e2e:cli run scaffold.runtime --cleanup --format pretty` | PASS, exit 0 | Full aggregate: passed=79 failed=0 skipped=2. Exactly one authorized run. |
+| S7 final review threads            | `agentic:review-threads --pr 1402 --pretty`                      | PASS, exit 0 | 0 threads, 0 unanswered after the runtime verdict.        |
 
 ### S1 RED evidence
 
@@ -247,7 +252,23 @@ the slice run directory and each emitted exactly its named missing-symbol diagno
 | Gate                              | Result  | Evidence            | Notes                                                 |
 | --------------------------------- | ------- | ------------------- | ----------------------------------------------------- |
 | Focused Aspire producer reconnect | PASS, exit 0 | S5 isolated AppHost | Exact stop/backoff/restart, FIFO receipts, one dashboard trace, positive OTLP metrics. |
-| `scaffold.runtime`                | NOT_RUN | `EXPENSIVE-GATE-REQUEST` | All cheaper gates are green; do not start before an explicit ledger grant. |
+| `scaffold.runtime`                | PASS, exit 0 | S7 ledger row 59 | Exactly one run: passed=79 failed=0 skipped=2. |
+
+### S7 named runtime verdicts
+
+| Gate                                  | Verdict | Duration | Why it matters to W3-A |
+| ------------------------------------- | ------- | -------: | ---------------------- |
+| `scaffold.plugin.stream`              | PASS    |   355 ms | The generated runtime installs the official stream plugin containing this producer path. |
+| `runtime.wait.streams`                | PASS    |   276 ms | The real stream service reached readiness before the reconnect fault injection. |
+| `behavior.streams.producer-reconnect` | PASS    |  3907 ms | Decisive slice gate: exact resource outage/backoff/restart recovers all three FIFO receipts under one correlated trace with retry/recovery/delivery metrics. |
+| `behavior.plugins-health`             | PASS    |  1036 ms | Aggregate installed-plugin health remains green after recovery. |
+| `cleanup.aspire-stop`                 | PASS    |   964 ms | The suite's owned AppHost cleanup completed. |
+| `behavior.otel.stream-consumer`       | SKIP    |     0 ms | Exact expected #1398 deferral; not W3-A evidence and not widened. |
+| `behavior.otel.traces`                | SKIP    |     0 ms | Exact expected #1398 deferral; not W3-A evidence and not widened. |
+
+No other gate skipped. The aggregate skip count is exactly two, matching the accepted #1398
+boundary. The earlier focused S5 execution remains development evidence; this S7 row is the
+serialized release verdict.
 
 ### Consumer Gates
 
@@ -275,9 +296,14 @@ All seven live #1326 acceptance rows are now truthfully evidenced:
 
 ## EXPENSIVE-GATE-REQUEST
 
-Requested after S6 cheaper-gate completion. The serialized token is currently held by W3-B2.
-Do not run `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` until the orchestrator
-records and communicates this slice's ledger grant.
+Requested after S6 cheaper-gate completion. At request time the serialized token was held by W3-B2.
+The suite remained unstarted until the orchestrator recorded and communicated W3-A's ledger grant.
+
+## EXPENSIVE-GATE-RELEASE
+
+The orchestrator granted W3-A ledger row 59. W3-A used the token for exactly one run, which exited
+0 with `passed=79 failed=0 skipped=2`. Post-run leak-check and review-thread gates both exited 0;
+the leak artifact reports no run-owned survivor. The token is released with this S7 handoff.
 
 ## Handoff Notes
 

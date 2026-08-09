@@ -45,17 +45,21 @@ manual F-14 evidence. The full core suite passes 28/28.
   captured-forwarded OTLP metrics; commit `65ae73e21` is pushed and reported on PR #1402.
 - S6 JSR, workspace publish, mandatory aggregates, and review-thread gate are green. The aggregate
   quality/doctrine tasks remain non-decisive because #1403 owns their missing package root.
+- S7 used ledger row 59 for exactly one serialized `scaffold.runtime` run: raw exit 0,
+  `passed=79 failed=0 skipped=2`; `behavior.streams.producer-reconnect` passed.
+- Post-run leak and review-thread gates exit 0. No W3-A-owned resource survives; only the known
+  foreign Redis remains untouched.
 
 ## In Progress
 
-- `EXPENSIVE-GATE-REQUEST` is recorded. S7 is blocked only on the orchestrator's serialized
-  `scaffold.runtime` ledger grant; the suite has not been started.
+- Implementation and all required gates are complete. The draft PR is handed back at
+  `status:impl-eval` for the mandatory separate Claude · Fable 5 IMPL-EVAL.
 
 ## Next Steps
 
-1. Commit, push, and comment S6 evidence and the runtime-token request.
-2. Wait for the orchestrator's explicit ledger grant.
-3. After grant only, run the exact one-pass `scaffold.runtime` command with leak bracketing.
+1. Commit, push, and comment S7 evidence.
+2. Release the serialized runtime token to the orchestrator.
+3. Stop for the mandatory separate-session IMPL-EVAL; do not self-certify.
 
 ## Key Decisions
 
@@ -110,4 +114,5 @@ manual F-14 evidence. The full core suite passes 28/28.
 - `ba5c4704a` — S3 correlated trace/metrics and exact AP-13 debt closure.
 - `0b842c8e1` — S4 published/consumer compatibility.
 - `65ae73e21` — S5 focused real Aspire outage/recovery and correlated OTEL proof.
-- S6 evidence/request commit pending.
+- `693f7e475` — S6 cheaper-gate closeout and serialized-token request.
+- S7 evidence/release commit pending.
