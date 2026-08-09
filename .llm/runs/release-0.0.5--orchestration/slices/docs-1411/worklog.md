@@ -59,3 +59,8 @@ CLI install commands and both `author-a-plugin` import-map values.
 - Issue #1411 is fully resolved by this slice, so the draft PR body must contain `Closes #1411`.
 - No scope, doctrine, or debt readjustment was discovered. IMPL-EVAL, CI, and merge remain with the
   orchestrator; this Tier-D lane does not self-certify.
+- Implementation commit `9d27817e8` was pushed with the explicit refspec
+  `HEAD:refs/heads/fix/docs-versionless-jsr-specifiers`.
+- Draft PR #1412 targets `main`, carries `Closes #1411`, milestone `0.0.5`, docs-only CI labels,
+  and exactly one lifecycle label: `status:impl-eval`. The structured IMPL evidence comment is
+  https://github.com/rickylabs/netscript/pull/1412#issuecomment-5230514313.

@@ -2,7 +2,7 @@
 
 ## Current state
 
-- Phase: implementation and Tier-D gates complete; commit/PR handoff pending.
+- Phase: Tier-D handoff complete; draft PR #1412 awaits orchestrator IMPL-EVAL and CI.
 - Branch/base: `fix/docs-versionless-jsr-specifiers` at `399f60185`.
 - `PLAN-EVAL: N/A` was recorded before source edits because the slice is fully specified and
   mechanical.
@@ -25,3 +25,4 @@
 - Rendered output pins each repaired target to `@0.0.4`.
 - Only three docs source pages and this slice's run artifacts are owned; no package, plugin,
   lockfile, corpus, or generated asset is changed.
+- Implementation commit: `9d27817e8`; draft PR: https://github.com/rickylabs/netscript/pull/1412.
