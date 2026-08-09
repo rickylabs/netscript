@@ -65,6 +65,21 @@ mirror standalone, host, success, failure, and denial modes.
 | S4 focused type-check | `deno check --unstable-kv --no-lock packages/mcp/mod.ts packages/mcp/cli.ts ...focused MCP/CLI tests` | 0 | Receipt/status/schema/documentation changes type-check. |
 | S4 MCP doc lint | `deno task doc:lint --root packages/mcp --pretty` | 0 | Full export map; `totalErrors: 0`. |
 | S4 MCP package tests | `deno task --cwd packages/mcp test` | 0 | 113 passed, 0 failed. |
+| S5 scoped MCP check | package-local `run-deno-check.ts --root . --ext ts,tsx --deno-arg --no-lock --pretty` | 0 | 103 files selected; no occurrences or failed batches. The wrapper supplied `--unstable-kv`. |
+| S5 scoped CLI-host check | package-local `run-deno-check.ts --root . --ext ts,tsx --deno-arg --no-lock --pretty` | 0 | 7 files selected; no occurrences or failed batches. The wrapper supplied `--unstable-kv`. |
+| S5 scoped MCP/CLI lint | package-local `run-deno-lint.ts --root . --ext ts,tsx --config <package deno.json> --pretty` | 0 each | MCP 103 files and CLI-host 7 files; no lint occurrences. |
+| S5 scoped MCP/CLI format | package-local `run-deno-fmt.ts --root . --ext ts,tsx --config <package deno.json> --pretty` | 0 each | MCP 103 files and CLI-host 7 files; no findings or failed batches. |
+| S5 wrapper invocation correction | initial root-config lint/fmt and malformed check-argument attempts | 1 | Tool invocation/config parse failures, not product verdicts. Corrected with package-local configs and the two-argument `--deno-arg --no-lock` form; all required wrapper verdicts above are green. |
+| S5 framework quality | `rtk proxy deno task quality:gate` | 0 | `quality:scan` found no findings and `arch:check` completed; seven existing inline allowances reported. |
+| S5 doctrine fitness | `rtk proxy deno task arch:check` | 0 | Named separately as required; repository warnings remain non-failing and outside this slice. |
+| S5 MCP export-map doc lint | `rtk proxy deno task doc:lint --root packages/mcp --pretty` | 0 | All three exports checked; `totalErrors: 0`. |
+| S5 MCP JSR audit | `deno run --allow-read --allow-run --allow-env .llm/tools/fitness/audit-jsr-package.ts --root packages/mcp --text` | 0 | Dry-run OK; three non-failing warnings (two existing cardinality warnings and slow-types notice). |
+| S5 publish assets | `rtk proxy deno task check:publish-assets` | 0 | Generated MCP README asset matches its source. |
+| S5 publish dry-run | `rtk proxy deno task publish:dry-run` | 0 | Workspace simulation completed with `Success Dry run complete`; existing dynamic-import warnings remain non-failing. |
+| S5 focused MCP tests | `deno test --no-lock --allow-all packages/mcp/tests/drift-evidence_test.ts packages/mcp/tests/command_adapters_test.ts packages/mcp/tests/command_flows_test.ts packages/mcp/tests/command_composition_test.ts` | 0 | 24 passed, 0 failed. |
+| S5 decisive CLI-host tests | `deno test --no-lock --allow-all packages/cli/src/public/features/agent/mcp/cli-mcp-adapters_test.ts` | 0 | 4 passed, 0 failed; host-version mismatch and no-JSR behavior remain proven. |
+| S5 MCP package tests | `rtk proxy deno task --cwd packages/mcp test` | 0 | 113 passed, 0 failed. |
+| S5 review threads | `rtk proxy deno task agentic:review-threads -- --repo rickylabs/netscript --pr 1400 --pretty` | 0 | `threads=0 unanswered=0`. |
 
 ## Phase status
 
@@ -79,3 +94,8 @@ S4 resolves the behavioral RED. `execute_command` accepts an optional named reso
 only for status `pass`, and overwrites with failure for non-zero/timeout/throw/denial. `list_commands`
 is explicitly receipt-exempt because it diagnoses no resource. README policy regeneration changed
 only the embedded README constant, not #1375 corpus selection or filesystem wiring.
+
+S5 non-serialized gates are green. The serialized runtime token is requested below; no leak check,
+container, AppHost, or `scaffold.runtime` command has been started before a grant.
+
+EXPENSIVE-GATE-REQUEST

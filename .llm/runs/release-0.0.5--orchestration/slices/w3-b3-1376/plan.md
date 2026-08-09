@@ -7,7 +7,7 @@
 | Run | `release-0.0.5--orchestration/slices/w3-b3-1376` |
 | Branch | `fix/mcp-execute-command-host-cli` |
 | Archetype | `6 — CLI/Tooling` |
-| Phase | `plan-eval` |
+| Phase | `impl` |
 
 ## Goal
 
