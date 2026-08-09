@@ -1,5 +1,5 @@
 import { assert, assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
-import { join } from 'jsr:@std/path@^1';
+import { dirname, extname, join, relative } from 'jsr:@std/path@^1';
 
 import cliMeta from '../../../../deno.json' with { type: 'json' };
 import {
@@ -121,6 +121,7 @@ Deno.test('public init emits resolvable app conventions with and without the exa
       const stat = await Deno.stat(join(serviceApp, retainedRoute));
       assert(stat.isFile, `Expected retained example route: ${retainedRoute}`);
     }
+    await assertExampleRelativeImportsResolve(serviceApp);
 
     await scaffoldFixture(parent, 'without-service');
     const noServiceApp = join(parent, 'without-service', 'apps', 'dashboard');
@@ -170,6 +171,45 @@ async function scaffoldFixture(
     '--no-git',
     ...extraArgs,
   ]);
+}
+
+const RELATIVE_IMPORT_PATTERN =
+  /(?:\bfrom\s*|\bimport\s*\(\s*|\bimport\s*)['"](\.{1,2}\/[^'"]+)['"]/g;
+
+async function assertExampleRelativeImportsResolve(appDir: string): Promise<void> {
+  const examplesDir = join(appDir, 'routes', 'examples');
+  for await (const sourcePath of walkTypeScriptFiles(examplesDir)) {
+    const source = await Deno.readTextFile(sourcePath);
+    for (const match of source.matchAll(RELATIVE_IMPORT_PATTERN)) {
+      const specifier = match[1];
+      const targetPath = join(dirname(sourcePath), specifier);
+      let target: Deno.FileInfo;
+      try {
+        target = await Deno.stat(targetPath);
+      } catch (error) {
+        if (!(error instanceof Deno.errors.NotFound)) throw error;
+        throw new Error(
+          `Unresolved emitted relative import: ${relative(appDir, sourcePath)} imports ${specifier} ` +
+            `but ${relative(appDir, targetPath)} does not exist`,
+        );
+      }
+      assert(
+        target.isFile,
+        `Expected emitted relative import to resolve to a file: ${relative(appDir, sourcePath)} -> ${specifier}`,
+      );
+    }
+  }
+}
+
+async function* walkTypeScriptFiles(root: string): AsyncGenerator<string> {
+  for await (const entry of Deno.readDir(root)) {
+    const path = join(root, entry.name);
+    if (entry.isDirectory) {
+      yield* walkTypeScriptFiles(path);
+    } else if (entry.isFile && ['.ts', '.tsx'].includes(extname(entry.name))) {
+      yield path;
+    }
+  }
 }
 
 async function assertAppConventionsResolve(

@@ -23,7 +23,7 @@ import {
 import {
   createOptimisticListMutationCallbacks,
   type OptimisticListMutationContext,
-} from '../service/(_lib)/optimistic-list-mutation.ts';
+} from '../(_lib)/optimistic-list-mutation.ts';
 
 type Props = NonNullable<InferDefinePageLayerLoaderProps<typeof loadServiceShowcaseData>>;
 type ServiceListData = NonNullable<Props['initialList']>;

@@ -81,6 +81,23 @@ The constant is removed, and the generator's own fallback now calls `deriveDefau
 The explicit `appName` option remains authoritative. This closes the latent re-consumption boundary
 instead of documenting a wrong-but-plausible legacy default.
 
+## 2026-08-09 — cycle-2 emitted-import integration repair
+
+The behavioral rollback factory was emitted beside `service-query.ts`, but both island templates
+initially imported it through an extra `service/` segment copied from the template-tree layout.
+That path cannot exist in the emitted resource tree and made every generated app fail its first
+type-check. Both imports now use the adjacent resource-local form
+`../(_lib)/optimistic-list-mutation.ts`. The public-init golden now walks every emitted TypeScript
+file under `routes/examples`, resolves each relative import against the full app tree, and fails with
+source/specifier/target evidence when a target is missing. Reintroducing the bad memory-island
+specifier and regenerating the barrel produced raw exit 1 naming the nonexistent target; restoring
+it produced raw exit 0. This is an integration correction to the approved F6 proof, not a second
+rollback design.
+
+The prior green runtime receipt is ledger row 73 under grant row 72 and was earned at `2052551d7`.
+It predates the F6 product changes and cannot evidence the repaired head. PR closure/runtime claims
+are narrowed pending a new owner-granted one-pass receipt; no runtime command ran in this repair.
+
 ## 2026-08-09 — serialized runtime stopped at stale project-boundary app identity
 
 The single ledger-row-70 runtime execution at `2150421e4` exited 1 with 16 passed / 1 failed / 2

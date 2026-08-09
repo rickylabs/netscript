@@ -82,3 +82,12 @@ browser prerequisite/platform discovery, registers the over-cap runtime gate deb
 doctrine and Deno lint records, removes the latent `dashboard` default, and pins the app-name trim
 boundary plus all nine browser expectations. No AppHost or container gate is authorized or needed
 for this remediation.
+
+IMPL-EVAL cycle 2 returned `FAIL_FIX`: seven cycle-1 findings held, including the executable
+rollback test, but both generated islands imported its new factory through a nonexistent extra
+`service/` directory. The repair changes both emitted imports to `../(_lib)/...` and adds a
+public-init emitted-tree resolver for every relative import under the example routes. The exact old
+specifier makes that guard exit 1 after barrel regeneration; clean source passes. The earlier green
+runtime is correctly identified as ledger row 73 under grant row 72 at `2052551d7` and is stale for
+the product changes after that head. A fresh serialized grant/receipt is required before row 9 and
+`Closes #1333` can be restored.

@@ -333,6 +333,37 @@ owner retains readiness authority. Therefore the evidence mapping is complete an
 validated now, while issue checkbox mutation remains deliberately pending the owner's post-PASS
 label transition rather than bypassing the mirror's readiness guard.
 
+## IMPL-EVAL cycle 2 integration repair
+
+Cycle 2 verified seven cycle-1 findings but scaffolded a real generated project and found both
+islands importing the new rollback helper through an extra `service/` segment. The helper is emitted
+in the same resource's `(_lib)` directory as `service-query.ts`, so both templates now import
+`../(_lib)/optimistic-list-mutation.ts`.
+
+The public-init golden now recursively walks emitted TypeScript under `routes/examples` and resolves
+every relative static/dynamic module specifier against the emitted app tree. With the broken memory
+specifier deliberately restored and the barrel regenerated, the focused test exited 1 and reported:
+
+```text
+Unresolved emitted relative import: routes/examples/users/(_islands)/ServiceShowcaseLab.tsx
+imports ../service/(_lib)/optimistic-list-mutation.ts but
+routes/examples/users/service/(_lib)/optimistic-list-mutation.ts does not exist
+RAW_EXIT_CODE=1
+```
+
+After restoring the correct specifier and regenerating, the public-init plus rollback-template suite
+exited 0 with 4 passed / 26 steps / 0 failed. No AppHost, container, or `e2e:cli` command ran.
+
+Scoped CLI source check exited 0 with 675 files / 6 batches / 0 findings; lint exited 0 with 675
+files / 4 batches / 0 findings; format exited 0 with 675 files / 4 batches / 0 findings. Correcting
+the two specifiers reduces the app templates to 178,347 / 197,796 bytes and the embedded barrel to
+296,350 / 330,000 bytes. The MCP docs corpus is unchanged.
+Committed-head `deno task check:assets-barrel` exited 0 and left the canonical asset set clean.
+
+The PR's previous runtime wording was also narrowed: the green run is ledger row 73 under grant row
+72, earned at `2052551d7`, and it does not cover the later F6 product changes. Row 9 and the closing
+keyword remain pending a fresh owner-granted serialized receipt at the repaired head.
+
 ### Gates
 
 | Gate | Result |
