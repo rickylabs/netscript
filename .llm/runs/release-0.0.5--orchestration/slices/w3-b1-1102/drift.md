@@ -33,3 +33,24 @@ Drift is append-only.
   inputs, rejects other text, and requires the `llms` evaluation row through embedded, materialized
   filesystem, and real `agent init --with-docs` stdio paths.
 - **Evidence:** `research.md` F14; `plan.md` D12, failure matrix, S2–S4, validation gates 1–2.
+
+## 2026-08-09 — Approved corpus builder is blocked by pre-existing invalid Vento prose
+
+- **What:** The approved S3 mirror command cannot build the current docs site, so it refuses to
+  produce a canonical bundle rather than copying stale `_site` output.
+- **Source:** `docs/site/data-persistence/how-to/database-migration.md:46` at current
+  `origin/main@3ce91f2c2`; the multiline quoted `desc` value was introduced by `2f64cc0011`.
+- **Expected:** `/home/codex/repos/.briefing/build-docs-bundle.sh` builds the current site, then
+  mirrors its complete Markdown twins with truthful commit provenance.
+- **Actual:** Vento reports an unterminated string literal at the first multiline `desc` and the
+  builder exits 1. It produces no `llms.txt`, `llms-full.txt`, or destination pages. The existing
+  briefing bundle is stale at `918791e06` / framework `0.0.3` and lacks the required unsupported
+  Prisma-driver section, so it is not a truthful substitute.
+- **Severity:** S3 blocker outside #1102 product scope.
+- **Action:** Report to the orchestrator for a separately owned docs repair or explicit rescope.
+  Do not add a second corpus path, use `NO_SITE_BUILD=1` against partial output, or patch content
+  while retaining false source-commit provenance.
+- **Evidence:** raw command exit 1 from
+  `/home/codex/repos/.briefing/build-docs-bundle.sh /home/codex/repos/ns005-w3b1
+  /home/codex/repos/ns005-w3b1/.llm/tmp/w3-b1-docs-bundle`; current `_site` has none of the required
+  outputs after the failed clean build.

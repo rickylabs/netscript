@@ -44,13 +44,14 @@ source admission. The locked real release-corpus evaluation and generator parity
 
 ## In Progress
 
-- S2 is ready to commit/push/comment to draft PR #1404 before the canonical corpus refresh in S3.
+- S1 and S2 are committed/pushed/commented. S3 is blocked before artifact generation because the
+  approved mirror builder exits 1 on pre-existing invalid Vento in `database-migration.md:46`.
 
 ## Next Steps
 
-1. Commit, push, and comment S2 with its raw gate evidence and explicit `list_docs.documentCount`
-   disclosure.
-2. Refresh/select the approved corpus and run the unchanged locked evaluation in S3.
+1. Orchestrator owns the reported docs repair/rescope decision; do not invent a second refresh path.
+2. Once the canonical builder is green, refresh/select the approved corpus and run the unchanged
+   locked evaluation in S3.
 3. Commit/push/comment each slice independently; request the serialized gate only after non-Aspire
    gates are green.
 
