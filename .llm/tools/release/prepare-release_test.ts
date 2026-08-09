@@ -37,6 +37,7 @@ Deno.test('shared release preparation runs the stable gate sequence in order', a
     ...PUBLISH_ASSET_OUTPUTS.map((path) => `/repo/${path}`),
     `/repo/${EXPORT_SURFACE_CORPUS_OUTPUT}`,
   ]);
+  assertEquals(result.files.includes('/repo/.llm/assets/agent-docs/prose.json.gz'), true);
   assertEquals(calls, [
     'bump:0.0.1-canary.1:canary',
     'deno task gen:publish-assets',

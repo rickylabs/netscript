@@ -1,6 +1,7 @@
 /** Generates registry-safe TypeScript constants for publish-time package assets. */
 
 import { normalizeDocsSlug } from '../../packages/mcp/src/domain/docs/docs-corpus-port.ts';
+import { rewriteNetScriptVersion } from './deps/bump-version.ts';
 
 interface PackageConfig {
   readonly version?: unknown;
@@ -30,6 +31,7 @@ export const MCP_EMBEDDED_DOC_PATHS = [
 export const MCP_EMBEDDED_DOCS_MAX_BYTES = 262_144;
 
 export const PUBLISH_ASSET_OUTPUTS = [
+  '.llm/assets/agent-docs/prose.json.gz',
   '.llm/assets/agent-docs/provenance.json',
   'packages/cli/src/kernel/assets/agent-tools.generated.ts',
   'packages/cli/src/kernel/assets/agent-docs.generated.ts',
@@ -86,8 +88,8 @@ export interface GeneratedMcpEmbeddedDocs {
   readonly provenance: GeneratedMcpEmbeddedDocsProvenance;
 }
 
-async function readVersion(path: string): Promise<string> {
-  const config = JSON.parse(await Deno.readTextFile(new URL(path, ROOT))) as PackageConfig;
+async function readVersion(path: string, root: URL = ROOT): Promise<string> {
+  const config = JSON.parse(await Deno.readTextFile(new URL(path, root))) as PackageConfig;
   if (typeof config.version !== 'string' || !config.version.trim()) {
     throw new Error(`${path} requires a non-empty version`);
   }
@@ -119,12 +121,38 @@ async function formatTypeScript(source: string): Promise<string> {
   return new TextDecoder().decode(stdout);
 }
 
-async function write(path: string, source: string): Promise<void> {
+async function decompressGzip(compressed: Uint8Array): Promise<Uint8Array> {
+  const copied = copiedBuffer(compressed);
+  const stream = new Blob([copied]).stream().pipeThrough(new DecompressionStream('gzip'));
+  return new Uint8Array(await new Response(stream).arrayBuffer());
+}
+
+async function compressGzip(uncompressed: Uint8Array): Promise<Uint8Array> {
+  const copied = copiedBuffer(uncompressed);
+  const stream = new Blob([copied]).stream().pipeThrough(new CompressionStream('gzip'));
+  return new Uint8Array(await new Response(stream).arrayBuffer());
+}
+
+function bytesEqual(left: Uint8Array, right: Uint8Array): boolean {
+  return left.byteLength === right.byteLength && left.every((byte, index) => byte === right[index]);
+}
+
+function recordStalePath(foundStalePaths: string[], path: string): void {
+  if (!foundStalePaths.includes(path)) foundStalePaths.push(path);
+}
+
+async function write(
+  path: string,
+  source: string,
+  root: URL = ROOT,
+  check: boolean = CHECK,
+  foundStalePaths: string[] = stalePaths,
+): Promise<void> {
   const expected = await formatTypeScript(`${header()}${source}`);
-  const url = new URL(path, ROOT);
-  if (CHECK) {
+  const url = new URL(path, root);
+  if (check) {
     const actual = await Deno.readTextFile(url).catch(() => '');
-    if (actual !== expected) stalePaths.push(path);
+    if (actual !== expected) foundStalePaths.push(path);
     return;
   }
   await Deno.writeTextFile(url, expected);
@@ -134,7 +162,7 @@ async function write(path: string, source: string): Promise<void> {
 export async function refreshAgentDocsProvenance(
   root: URL = ROOT,
   check: boolean = CHECK,
-): Promise<void> {
+): Promise<string> {
   const version = await readVersionFromRoot(root, 'packages/cli/deno.json');
   const path = '.llm/assets/agent-docs/provenance.json';
   const url = new URL(path, root);
@@ -144,10 +172,70 @@ export async function refreshAgentDocsProvenance(
   }
   const expected = `${JSON.stringify({ ...provenance, version }, null, 2)}\n`;
   if (check) {
-    if (await Deno.readTextFile(url) !== expected) stalePaths.push(path);
-    return;
+    if (await Deno.readTextFile(url) !== expected) recordStalePath(stalePaths, path);
+    return provenance.version;
   }
   await Deno.writeTextFile(url, expected);
+  return provenance.version;
+}
+
+/** Rebase the shared CLI/MCP prose pins and refresh provenance before either consumer reads it. */
+export async function rebaseAgentDocsProse(
+  oldVersion: string,
+  root: URL = ROOT,
+  check: boolean = CHECK,
+  foundStalePaths: string[] = stalePaths,
+): Promise<void> {
+  const version = await readVersionFromRoot(root, 'packages/cli/deno.json');
+  const prosePath = '.llm/assets/agent-docs/prose.json.gz';
+  const provenancePath = '.llm/assets/agent-docs/provenance.json';
+  const proseUrl = new URL(prosePath, root);
+  const provenanceUrl = new URL(provenancePath, root);
+  const compressed = await Deno.readFile(proseUrl);
+  const uncompressed = await decompressGzip(compressed);
+  const payload = JSON.parse(new TextDecoder().decode(uncompressed)) as AgentDocsPayload;
+  if (payload.schemaVersion !== 1 || !payload.files || typeof payload.files !== 'object') {
+    throw new Error('agent docs prose payload must use schema version 1');
+  }
+  const files = Object.fromEntries(
+    Object.entries(payload.files).map(([path, source]) => [
+      path,
+      rewriteNetScriptVersion(source, oldVersion, version),
+    ]),
+  );
+  const nextUncompressed = new TextEncoder().encode(JSON.stringify({ schemaVersion: 1, files }));
+  const nextCompressed = bytesEqual(nextUncompressed, uncompressed)
+    ? compressed
+    : await compressGzip(nextUncompressed);
+  const provenance = JSON.parse(
+    await Deno.readTextFile(provenanceUrl),
+  ) as AgentDocsProvenance;
+  if (provenance.schemaVersion !== 1 || typeof provenance.version !== 'string') {
+    throw new Error(`${provenancePath} must contain schemaVersion 1 and a string version`);
+  }
+  const nextProvenance = `${
+    JSON.stringify(
+      {
+        ...provenance,
+        version,
+        uncompressedBytes: nextUncompressed.byteLength,
+        compressedBytes: nextCompressed.byteLength,
+        sha256: hex(await crypto.subtle.digest('SHA-256', copiedBuffer(nextCompressed))),
+      },
+      null,
+      2,
+    )
+  }\n`;
+
+  if (check) {
+    if (!bytesEqual(compressed, nextCompressed)) recordStalePath(foundStalePaths, prosePath);
+    if (await Deno.readTextFile(provenanceUrl) !== nextProvenance) {
+      recordStalePath(foundStalePaths, provenancePath);
+    }
+    return;
+  }
+  await Deno.writeFile(proseUrl, nextCompressed);
+  await Deno.writeTextFile(provenanceUrl, nextProvenance);
 }
 
 async function readVersionFromRoot(root: URL, path: string): Promise<string> {
@@ -209,10 +297,14 @@ export async function buildMcpEmbeddedDocs(root: URL = ROOT): Promise<GeneratedM
   };
 }
 
-async function generateMcpAssets(): Promise<void> {
-  const version = await readVersion('packages/mcp/deno.json');
-  const readme = await Deno.readTextFile(new URL('packages/mcp/README.md', ROOT));
-  const embedded = await buildMcpEmbeddedDocs();
+export async function generateMcpAssets(
+  root: URL = ROOT,
+  check: boolean = CHECK,
+  foundStalePaths: string[] = stalePaths,
+): Promise<void> {
+  const version = await readVersion('packages/mcp/deno.json', root);
+  const readme = await Deno.readTextFile(new URL('packages/mcp/README.md', root));
+  const embedded = await buildMcpEmbeddedDocs(root);
   await write(
     'packages/mcp/src/publish-assets.generated.ts',
     `/** Version of the published MCP package. */
@@ -227,6 +319,9 @@ export const MCP_EMBEDDED_DOCS = ${JSON.stringify(embedded.documents)} as const;
 /** Release identity, cardinality, size, and integrity of the generated fallback prose. */
 export const MCP_EMBEDDED_DOCS_PROVENANCE = ${JSON.stringify(embedded.provenance)} as const;
 `,
+    root,
+    check,
+    foundStalePaths,
   );
 }
 
@@ -290,17 +385,47 @@ export const CORE_PACKAGE_VERSION: string = ${JSON.stringify(version)};
   }
 }
 
+/** Generation steps composed by the top-level publish-asset entrypoint. */
+export interface PublishAssetGenerationSteps {
+  readonly refreshProvenance: () => Promise<string | void>;
+  readonly rebaseProse?: (oldVersion: string) => Promise<void>;
+  readonly generateMcp: () => Promise<void>;
+  readonly generateCli: () => Promise<void>;
+  readonly generateFreshUi: () => Promise<void>;
+  readonly generateCorePackages: () => Promise<void>;
+  readonly generatePlugins: () => Promise<void>;
+}
+
+/** Generate every publish asset through the same orchestration used by the command entrypoint. */
+export async function generatePublishAssets(
+  steps: PublishAssetGenerationSteps = {
+    refreshProvenance: () => refreshAgentDocsProvenance(),
+    rebaseProse: (oldVersion) => rebaseAgentDocsProse(oldVersion),
+    generateMcp: () => generateMcpAssets(),
+    generateCli: () => generateCliAssets(),
+    generateFreshUi: () => generateFreshUiMetadata(),
+    generateCorePackages: () => generateCorePackageMetadata(),
+    generatePlugins: () => generatePluginMetadata(),
+  },
+): Promise<void> {
+  const oldVersion = await steps.refreshProvenance();
+  if (steps.rebaseProse) {
+    if (!oldVersion) throw new Error('provenance refresh must return the prior corpus version');
+    await steps.rebaseProse(oldVersion);
+  }
+  await Promise.all([
+    steps.generateMcp(),
+    steps.generateCli(),
+    steps.generateFreshUi(),
+    steps.generateCorePackages(),
+    steps.generatePlugins(),
+  ]);
+}
+
 if (import.meta.main) {
   const unknownArgs = Deno.args.filter((arg) => arg !== '--check');
   if (unknownArgs.length > 0) throw new Error(`Unknown argument: ${unknownArgs[0]}`);
-  await Promise.all([
-    refreshAgentDocsProvenance(),
-    generateMcpAssets(),
-    generateCliAssets(),
-    generateFreshUiMetadata(),
-    generateCorePackageMetadata(),
-    generatePluginMetadata(),
-  ]);
+  await generatePublishAssets();
   if (stalePaths.length > 0) {
     throw new Error(
       `publish assets are stale: ${
