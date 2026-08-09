@@ -24,7 +24,7 @@ above — instead of a bespoke integration to design before the feature work sta
 
 {{ comp callout { type: "important", title: "What ships in " + releaseVersion } }}
 All four layers are published on JSR and installable now: the <strong>engine</strong>
-(<code>@netscript/ai</code> — <code>deno add jsr:@netscript/ai</code>), the
+(<code>@netscript/ai</code> — <code>deno add jsr:@netscript/ai{{ releaseSpecifier }}</code>), the
 <strong>MCP client stack</strong> (its <code>./mcp</code> subpath), the
 <strong>durable-chat runtime</strong> (<code>@netscript/fresh/ai</code> +
 <code>@netscript/fresh/ai/sandbox</code>), and the <strong>chat UI</strong> (the

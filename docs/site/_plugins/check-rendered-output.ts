@@ -1,4 +1,5 @@
 import { DOMParser } from 'lume/deps/dom.ts';
+import { assertNoLiteralVentoPlaceholders } from './check-rendered-placeholders.ts';
 
 export async function assertRenderedHomepage(path: string): Promise<void> {
   const html = await Deno.readTextFile(path);
@@ -27,6 +28,13 @@ export async function assertRenderedHomepage(path: string): Promise<void> {
 }
 
 if (import.meta.main) {
-  await assertRenderedHomepage(Deno.args[0] ?? '_site/index.html');
-  console.log('Rendered homepage semantics: OK');
+  const homepagePath = Deno.args[0] ?? '_site/index.html';
+  await assertRenderedHomepage(homepagePath);
+  const separator = Math.max(homepagePath.lastIndexOf('/'), homepagePath.lastIndexOf('\\'));
+  const siteRoot = separator === -1 ? '.' : homepagePath.slice(0, separator);
+  const result = await assertNoLiteralVentoPlaceholders(siteRoot);
+  console.log(
+    `Rendered output: OK (homepage semantics; ${result.filesScanned} HTML files; ` +
+      `${result.allowancesUsed} documented-syntax allowances)`,
+  );
 }
