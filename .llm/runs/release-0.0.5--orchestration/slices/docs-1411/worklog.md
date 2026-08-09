@@ -64,3 +64,40 @@ CLI install commands and both `author-a-plugin` import-map values.
 - Draft PR #1412 targets `main`, carries `Closes #1411`, milestone `0.0.5`, docs-only CI labels,
   and exactly one lifecycle label: `status:impl-eval`. The structured IMPL evidence comment is
   https://github.com/rickylabs/netscript/pull/1412#issuecomment-5230514313.
+
+## 2026-08-09 — Round 2 review correction
+
+- The orchestrator accepted the original five repairs and found four additional published
+  version-less `deno add jsr:@netscript/ai` instructions that the first sweep misclassified.
+- Corrected audit contract: reject every published `deno add`, `deno install`, or `deno x` command,
+  and every import-map value, that names `jsr:@netscript/*` without a version. Exclude unpublished
+  `_plan/**` and `_includes/**`; package placeholders remain valid when `releaseSpecifier` follows
+  the placeholder.
+- This is a review correction inside the existing mechanical slice. PLAN-EVAL remains N/A;
+  source edits had not begun at this Round 2 checkpoint.
+
+### Round 2 implementation and sweep
+
+- Pinned four additional published `deno add jsr:@netscript/ai` instructions in `ai/engine.md`,
+  `ai/index.md`, and `tutorials/chat/05-mcp.md` using `{{ releaseSpecifier }}`.
+- Final defect total: nine unpinned published install/import specifiers repaired across eight source
+  sites. The first round repaired five; Round 2 repaired four.
+- Definition-driven final sweep: 55 published candidates (53 `deno add` / `deno install` /
+  `deno x` commands and two import-map values), zero unpinned. All underscore-owned non-source
+  trees were excluded; already-pinned package placeholders remained valid.
+- Rendered spot checks found all four Round 2 instructions at `jsr:@netscript/ai@0.0.4`.
+
+### Round 2 gate evidence
+
+| Command | Raw exit | Evidence |
+| --- | ---: | --- |
+| published-source command/import-map sweep | 0 | candidates 55; commands 53; import-map values 2; unpinned 0 |
+| `cd docs/site && deno task build` | 0 | source format OK; 617 files generated; rendered homepage semantics OK |
+| `cd docs/site && deno task check:links` | 0 | 32,772 internal links across 220 pages resolve |
+| `cd docs/site && deno task check:caveats` | 0 | 18 caveat markers across 14 pages resolve |
+| `cd docs/site && deno task test:source-format` | 0 | 3 passed, 0 failed |
+| `deno task check:netscript-jsr-specifiers` | 0 | scanned 2,328; allowances 1; ranges 0; failures 0 |
+| `git diff --check` | 0 | no whitespace errors |
+
+The root guard remains downstream-only evidence until corpus regeneration. No direct docs-source
+guard was added; the orchestrator will carry the demonstrated reachability gap to follow-up work.

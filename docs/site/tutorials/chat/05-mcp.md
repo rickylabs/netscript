@@ -57,7 +57,7 @@ You need the working chat from chapters [1](/tutorials/chat/01-scaffold/)–[4](
 plus the engine package, which owns the MCP client stack:
 
 ```sh
-deno add jsr:@netscript/ai
+deno add jsr:@netscript/ai{{ releaseSpecifier }}
 ```
 
 You also need an MCP server to talk to — any Streamable-HTTP MCP endpoint you have access to
@@ -199,7 +199,7 @@ under a `content-security-policy` response header derived from the resource URI.
 deno task --cwd apps/dashboard check
 ```
 
-- [ ] `deno add jsr:@netscript/ai` resolved and the pool `connect()`s to your server.
+- [ ] `deno add jsr:@netscript/ai{{ releaseSpecifier }}` resolved and the pool `connect()`s to your server.
 - [ ] Asking a relevant question triggers the `searchRemote` tool over MCP.
 - [ ] A `ui://` result renders through `McpUiWidget`, themed and framed.
 - [ ] The sandbox route answers with theme tokens and a per-response CSP.
