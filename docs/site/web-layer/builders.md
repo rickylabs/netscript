@@ -16,6 +16,10 @@ and want a typed pipeline rather than hand-wired loaders and handlers.
 
 Route contracts themselves — the generated route references passed to `withRoute()` —
 live on `@netscript/fresh/route`; see [Routing and route contracts](/web-layer/route/).
+The data returned by a layer follows a separate type seam: in DB-backed products, generated model
+schemas first become a narrowed [versioned API contract](/explanation/contracts/#where-the-public-shape-begins).
+See the [`@database/zod` generation step](/data-persistence/database/#generated-schemas-feed-public-contracts)
+before wiring that contract's SDK/query result into a loader.
 
 ## The builder chain
 

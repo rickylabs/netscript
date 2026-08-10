@@ -12,10 +12,10 @@
 
 ## Current State
 
-Draft PR #1441 is live with slices 1.1–1.5 pushed. Slice 1.6 now shows the fixture-backed depth case:
-Product persistence/private fields are omitted through explicit selection and its Warehouse relation
-is explicitly composed from the second generated model schema. No framework behavior changes are in
-scope.
+Draft PR #1441 is live with slices 1.1–1.6 pushed. Slice 1.7 now completes the cross-link matrix:
+database documentation names and demonstrates `@database/zod` before linking forward to contracts;
+contracts, route, server, builders, and services link directly back to that generated step. No
+framework behavior changes are in scope.
 
 ## Completed
 
@@ -43,17 +43,20 @@ scope.
 - Added the exact fixture-backed Product/Warehouse derivation example and made the three omitted
   storage fields explicit in prose.
 - Re-ran the 4/4 derivation gate and full site build for the depth example.
+- Added the fixture-backed User derivation to the database page and linked forward to contract depth.
+- Added direct generated-step backlinks from contracts, route, server, builders, and services.
+- Passed both source and rendered link gates with no broken links or anchors.
 
 ## In Progress
 
-- Slice 1.6 commit, explicit-refspec push, PR body slice update, and per-slice evidence comment.
+- Slice 1.7 commit, explicit-refspec push, PR body slice update, and per-slice evidence comment.
 
 ## Next Steps
 
-1. Commit slice 1.6 with the depth example and current run artifacts.
+1. Commit slice 1.7 with the cross-link matrix and current run artifacts.
 2. Push `HEAD:docs/1332-generated-schema-contract-predecessor` and comment exact gate output.
 3. Update the draft PR slice list with the commit SHA.
-4. Begin slice 1.7: add the required database/contract/route/server/builder/service links.
+4. Begin slice 1.8: full gate sweep, Playwright matrix, acceptance evidence, and final handoff.
 
 ## Key Decisions
 
@@ -78,12 +81,15 @@ scope.
 | `.llm/tools/docs/check-docs-contract-derivation.ts` | changed | Adds compile proof for homepage User derivation/contract modules. |
 | `docs/site/index.vto` | changed | Diagram text, optional Tab 0, SDK construction, search coercion, and DB-aware wording. |
 | `docs/site/explanation/contracts.md` | changed | Dual origins, generated-step back-link, private-field omission, and explicit Product/Warehouse composition. |
+| `docs/site/data-persistence/database.md` | changed | `@database/zod` contract derivation and forward link. |
+| `docs/site/web-layer/{route,server,builders}.md` | changed | Direct generated-schema predecessor back-links. |
+| `docs/site/services-sdk/services.md` | changed | DB-aware contract origin and generated-step back-link. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | PASS | derivation task; homepage pre/post/service checks; scoped check/lint/fmt; diagram parity; site build; docs accuracy; all internal links; lock equality |
+| Static | PASS | derivation task; homepage pre/post/service checks; scoped check/lint/fmt; diagram parity; site build; docs accuracy; source/rendered links; lock equality |
 | Fitness | N/A for package gates | docs-only scope |
 | Runtime | NOT_RUN | browser validation belongs to slice 1.8 |
 | Consumer | PASS for generated contract, depth example, and homepage code paths | Product/Warehouse contract member, service, and corrected page compile; required pre-fix exits 1 |
@@ -106,4 +112,5 @@ scope.
 - `cd2ddc49966abe7e450bfb9cd856125da5418046` — slice 1.3 optional diagram proof.
 - `70702c1ac9e7a494d132e11a4ed512c61c0de6a8` — slice 1.4 homepage type-flow proof.
 - `c502e8d60467e2f87091ff9ca89a95067023ece5` — slice 1.5 dual-origin framing proof.
+- `96b4593c76761f8838f49a21bfc0b39d7a8f590c` — slice 1.6 omission/relation proof.
 - See draft PR #1441 for the live commit list and per-slice comments.

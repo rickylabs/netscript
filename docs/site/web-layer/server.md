@@ -14,6 +14,11 @@ server is composed, where the islands boundary sits, and how a page connects to 
 contracts and the shared page-loader cache. Reach for it first when you want the mental model before
 diving into any individual leaf.
 
+The web runtime consumes public service types; it does not define persistence shapes. For a
+DB-backed product, follow the predecessor from [`netscript db generate` and `@database/zod`](/data-persistence/database/#generated-schemas-feed-public-contracts)
+into the [versioned API contract](/explanation/contracts/#where-the-public-shape-begins) before those
+types reach page loaders and islands.
+
 ## Server-first, islands at the edges
 
 A NetScript Fresh page is rendered on the server by default. The handler runs in Deno, loads data,

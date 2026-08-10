@@ -104,6 +104,30 @@ my-app/
   (prisma-zod-generator) emitting matching zod schemas to `./.generated/zod`. You get a
   type-safe client *and* runtime validation schemas from one generate.
 
+## Generated schemas feed public contracts
+
+`netscript db generate` also writes the NetScript-owned CRUD barrel used by contract modules. Import
+it as `@database/zod`: the barrel exposes `<Model>Schema`, `<Model>CreateInput`, and
+`<Model>UpdateInput` for every discovered model. The workspace root and `contracts/` member have
+different relative import-map targets, but consumer code uses the same alias in both places. In a
+contract module, derive the public shape instead of copying the model or exporting it blindly:
+
+```ts
+import { UserSchema as DatabaseUserSchema } from '@database/zod';
+import { z } from 'zod';
+
+export const UsersListItemSchemaV1 = DatabaseUserSchema
+  .pick({ id: true, name: true })
+  .extend({
+    status: z.enum(['active', 'invited']),
+  });
+```
+
+The generated schema remains authoritative for database column types and nullability. The versioned
+contract selects what crosses the service boundary and adds stricter or public-only rules. Continue
+with [Contracts & type flow](/explanation/contracts/#where-the-public-shape-begins) for the DB-less
+counterpart, private-field omission, and explicit multi-model relation composition.
+
 ## Headline API: a model and a query
 
 Define models in Prisma schema files, then query them through the generated Deno client.

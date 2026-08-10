@@ -55,7 +55,8 @@ There are two valid origins for a contract schema:
   in-memory scaffold stages, external APIs, computed shapes, and products without a persistence
   model.
 
-The [database generation step](/data-persistence/database/) is therefore an optional predecessor,
+The [database generation step](/data-persistence/database/#generated-schemas-feed-public-contracts)
+is therefore an optional predecessor,
 not a competing public API. From the versioned contract onward, both paths are identical: handler,
 OpenAPI document, SDK query factory, and page all project from the same contract value. The
 hand-authored Users schema below illustrates the DB-less origin; the following derivation shows the

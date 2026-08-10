@@ -9,16 +9,22 @@ order: 1
 
 # Services & contracts
 
-**Write the contract once; the handler, the typed client, and the OpenAPI surface are all derived
+**Establish the public contract once; the handler, typed client, and OpenAPI surface are all derived
 from it — so an agent (or a teammate) never spends a turn keeping them in sync.**
 
 A NetScript **service** is a typed HTTP runtime that *implements* an
-[`@orpc/contract`](/explanation/contracts/) definition. You author the contract once
-(route + zod input/output), `implement()` it, bind `.handler()`s, and serve the resulting
+[`@orpc/contract`](/explanation/contracts/) definition. You establish the versioned public contract
+(route + Zod input/output), `implement()` it, bind `.handler()`s, and serve the resulting
 router on a Hono + oRPC runtime. The contract object is the single source of truth: the
 same object a typed client imports is the one the server implements, so caller and server
 **cannot drift**. The example `users` service answers on its assigned port with both an
 OpenAPI surface (`/api/v1/users/*`) and a typed oRPC endpoint (`/api/rpc/*`).
+
+For a DB-backed service, the public Zod shape normally has a generated predecessor: run
+`netscript db generate`, import from `@database/zod`, and narrow or extend the model before binding
+it to the route. See the [generated-schema step](/data-persistence/database/#generated-schemas-feed-public-contracts)
+and the [two contract origins](/explanation/contracts/#where-the-public-shape-begins). DB-less
+services author the same public shape directly.
 
 {{ comp.diagram({
   src: "/assets/diagrams/request-lifecycle.svg",
@@ -45,14 +51,14 @@ the API docs, and the front-end types each get updated in separate steps — and
 missed. The bug ships silently and surfaces later as a runtime `undefined`, and the fix costs a
 round of archaeology to find which of the three copies drifted.
 
-A NetScript service removes the copies. The contract — plain `@orpc/contract` routes with zod
+A NetScript service removes the wire-shape copies. The contract — plain `@orpc/contract` routes with Zod
 input/output schemas, versioned in its own package — is the only declaration of the wire shape.
 The handler binds to it via `implement()`, the client imports it, and the OpenAPI spec is
 generated from it. Rename a field and the build fails in the handler *and* the caller before
-anything ships. In a production chat application built on NetScript, this is how the
-whole API surface works: `implement(ChannelContractV1)` on the service side, a typed dashboard
-client built off the same contract type on the other — a new contract route is automatically
-typed on the client, with no "keep the API docs in sync" step in between.
+anything ships. The [in-repo Storefront tutorial](/tutorials/storefront/02-catalog-service/) uses
+this same path: its catalog contract derives from generated Product schemas, the service implements
+that contract, and callers consume the same type without a separate "keep the API docs in sync"
+step.
 
 The same property is why contract-first services suit AI-agent codebases. Encore's
 [NestJS-alternatives article](https://encore.dev/articles/nestjs-alternatives) names the failure
@@ -100,11 +106,12 @@ type story is in [Contracts](/explanation/contracts/).
 ## The contract is the source of truth
 
 Before there is a service there is a contract. A contract is plain `@orpc/contract`
-routes whose inputs and outputs are zod schemas, collected into an object and passed to
+routes whose inputs and outputs are Zod schemas, collected into an object and passed to
 `implement()` from `@orpc/server`. `implement()` returns a `.handler()`-bindable object
 the service router consumes. The example workspace versions its contracts under
 `contracts/versions/v1/` and re-exports them as `@<project>/contracts` — so a contract
-bump is an explicit, reviewable version directory, never an accidental break.
+bump is an explicit, reviewable version directory, never an accidental break. When a generated
+database schema exists, it precedes this public declaration rather than replacing it.
 
 ```ts
 // contracts/versions/v1/users.contract.ts
