@@ -6,24 +6,25 @@
 | --- | --- |
 | Run ID | `fix-1408-docs-gates-on-pull-request--leaf` |
 | Branch | `fix/1408-docs-gates-on-pull-request` |
-| Current phase | implement — slice 3.2 |
+| Current phase | implement — slice 3.3 |
 | Archetype | N/A — infrastructure workflow only |
 | Scope overlays | docs |
 
 ## Current State
 
-The docs-aware `quality` lane now runs both `check:source-format` and `test:source-format` before workspace installation. Both are conditioned on the existing required job's `RUN` value.
+Both D8 paths are implemented: `quality` has the cheap source check/test, and `pages.yml` has path-scoped PR full-site validation with deploy mutations guarded and concurrency isolated by ref.
 
 ## Completed
 
 - Required skill/workflow reads, fetch/status, baseline and issue verification, Design checkpoint.
 - Slice 3.1 committed, pushed, and commented on draft PR #1440.
 - Slice 3.2 implementation and local focused gates completed.
+- Slice 3.3 full docs-site build completed locally.
 
 ## Next Steps
 
-1. Commit/push/comment slice 3.2.
-2. Add path-scoped PR full build and deploy guards to `pages.yml`.
+1. Commit/push/comment slice 3.3.
+2. Land standalone deliberate defect slice 3.4 and capture its failing Pages run.
 
 ## Key Decisions
 
@@ -35,11 +36,11 @@ The docs-aware `quality` lane now runs both `check:source-format` and `test:sour
 
 ## Files Changed
 
-`ci.yml` and run artifacts.
+`ci.yml`, `pages.yml`, and run artifacts.
 
 ## Gates
 
-Source checker and focused unit test pass locally; full site build and CI are pending.
+Source checker, focused unit test, and full site build pass locally; CI RED/GREEN proof is pending.
 
 ## Open Questions
 
