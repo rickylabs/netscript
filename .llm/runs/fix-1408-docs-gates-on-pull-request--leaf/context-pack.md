@@ -6,13 +6,13 @@
 | --- | --- |
 | Run ID | `fix-1408-docs-gates-on-pull-request--leaf` |
 | Branch | `fix/1408-docs-gates-on-pull-request` |
-| Current phase | implement — slice 3.3 |
+| Current phase | implement — slice 3.4 RED proof |
 | Archetype | N/A — infrastructure workflow only |
 | Scope overlays | docs |
 
 ## Current State
 
-Both D8 paths are implemented: `quality` has the cheap source check/test, and `pages.yml` has path-scoped PR full-site validation with deploy mutations guarded and concurrency isolated by ref.
+Both D8 paths are implemented. The standalone RED fixture is present and locally produces the expected source-format failure; it must be committed/pushed and its failing Actions run captured before deletion.
 
 ## Completed
 
@@ -20,11 +20,12 @@ Both D8 paths are implemented: `quality` has the cheap source check/test, and `p
 - Slice 3.1 committed, pushed, and commented on draft PR #1440.
 - Slice 3.2 implementation and local focused gates completed.
 - Slice 3.3 full docs-site build completed locally.
+- Slice 3.4 negative control locally fails with the expected diagnostic.
 
 ## Next Steps
 
-1. Commit/push/comment slice 3.3.
-2. Land standalone deliberate defect slice 3.4 and capture its failing Pages run.
+1. Commit/push slice 3.4 and capture/comment its failing Pages run plus error output.
+2. Delete the fixture in standalone GREEN slice 3.5.
 
 ## Key Decisions
 
@@ -36,11 +37,11 @@ Both D8 paths are implemented: `quality` has the cheap source check/test, and `p
 
 ## Files Changed
 
-`ci.yml`, `pages.yml`, and run artifacts.
+`ci.yml`, `pages.yml`, RED fixture, and run artifacts.
 
 ## Gates
 
-Source checker, focused unit test, and full site build pass locally; CI RED/GREEN proof is pending.
+Pre-fixture source checker/unit test/full build passed. With the fixture present, the source checker is expected RED; Actions evidence is pending.
 
 ## Open Questions
 
