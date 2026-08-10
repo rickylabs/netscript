@@ -32,7 +32,9 @@
 
 Slices 3.1–3.6 are enumerated in `plan.md`, each with its proof, gate, and files. Slice 3.7 is the
 Tier-A A1 least-privilege correction: deploy-only token scopes move from workflow level to the
-guarded `deploy` job without changing triggers, guards, concurrency, or gate commands.
+guarded `deploy` job without changing triggers, guards, concurrency, or gate commands. Slice 3.8
+restores deploy-event serialization while preserving PR isolation and corrects acceptance evidence
+to distinguish PR failure proof from required-context merge blocking.
 
 ### Deferred Scope
 
@@ -54,6 +56,7 @@ Future docs gate routing changes start in `docs/site/deno.json`, then use `ci.ym
 | 2026-08-10 | 3.5 | GREEN revert | Deleted only the deliberate fixture after capturing the failing run; local checker and full build pass at clean head. |
 | 2026-08-10 | 3.6 | acceptance/locks | Recorded GREEN run, exact lock equality, acceptance mapping, and repo-native current-check PASS; retained draft state for supervisor evaluation. |
 | 2026-08-10 | 3.7 | least privilege | Scoped `pages: write` and `id-token: write` to `deploy`; build explicitly retains only `contents: read`. |
+| 2026-08-10 | 3.8 | eval corrections | Isolated PR concurrency by ref, serialized all deploy-capable events, and corrected box 1 evidence to name required `quality` context ruleset proof. |
 
 ## Gate Results
 
@@ -71,6 +74,7 @@ Future docs gate routing changes start in `docs/site/deno.json`, then use `ci.ym
 | Current PR checks | `deno task agentic:pr-checks --repo rickylabs/netscript --pr 1440 --pretty` | PASS | Head `c2c837302...`, 17 checks, zero current failures. Core required contexts remain skipped by the repository's draft policy and must materialize after the supervisor's ready-for-review transition. |
 | Workflow syntax | `python3 -c "import yaml;print(list(yaml.safe_load(open('.github/workflows/pages.yml'))['jobs'].keys()))"` | PASS | Parses with jobs `build` and `deploy`. |
 | Permission review | Inspect `.github/workflows/pages.yml` | PASS | Workflow/build are `contents: read`; guarded deploy owns `pages: write` and `id-token: write`. No deploy was triggered. |
+| Concurrency syntax | `python3 -c "import yaml;print(yaml.safe_load(open('.github/workflows/pages.yml'))['concurrency'])"` | PASS | Literal expression recorded; PRs use their ref, all deploy-capable events use `deploy`, and cancellation remains disabled. |
 
 ## Reconcile Notes
 
@@ -81,10 +85,13 @@ Future docs gate routing changes start in `docs/site/deno.json`, then use `ci.ym
 - 3.5: RED run and diagnostic are posted on PR #1440; no reviewer changes; GREEN revert stays within planned scope.
 - 3.6: no reviewer changes; acceptance is evidenced. Mandatory separate-session IMPL-EVAL and the ready-for-review transition remain supervisor-owned, so draft-only skipped core contexts are explicitly not claimed as executed.
 - 3.7: supervisor A1 finding F1 accepted and fixed without altering any docs gate or its reachability. Await the PR build on this commit before handoff.
+- 3.8: formal IMPL-EVAL PASS accepted. F2 concurrency regression fixed; F1 evidence correction will be applied to the PR body after push. F3 is explicitly refuted by the supervisor and F4 requires no action.
 
 ## Handoff Notes
 
 - Evaluator should inspect workflow event/permission/concurrency semantics, RED/GREEN provenance, and lock equality first.
 - RED: https://github.com/rickylabs/netscript/actions/runs/31365789097; GREEN: https://github.com/rickylabs/netscript/actions/runs/31365881454.
-- Implementation is complete; the PR stays draft at `status:impl`. Supervisor must dispatch separate-session IMPL-EVAL, transition lifecycle/readiness, and verify the then-materialized full required contexts.
+- Formal separate-session IMPL-EVAL passed; the PR stays draft at `status:impl-eval`. The supervisor owns the ready-for-review transition and verification of the then-materialized required contexts.
 - Slice 3.7 hardens token scope only. The unchanged main/release/workflow-dispatch path still reaches the guarded deploy job, whose job-local permissions satisfy Pages deployment; reasoning from the definition is the required deploy evidence, not a live deploy.
+- Slice 3.8 concurrency expression properties: `github.event_name == 'pull_request' && github.ref` gives each PR its own ref-derived group; `|| 'deploy'` collapses push, release, and workflow-dispatch into one serialized deploy group; `cancel-in-progress: false` queues rather than cancels overlapping members.
+- Box 1 evidence must not call Pages `build` required. RED run 31365789097 proves PR execution/failure; ruleset 18459345 makes `quality` required, and the supervisor will verify its source-check/test steps execute successfully after ready-for-review.
