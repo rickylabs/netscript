@@ -1,4 +1,5 @@
 import { assertEquals, assertExists } from 'jsr:@std/assert@^1';
+import { parsePluginManifest } from '@netscript/plugin';
 import { AI_PLUGIN_ID, aiPlugin } from '../mod.ts';
 
 Deno.test('ai manifest identity', () => {
@@ -24,4 +25,30 @@ Deno.test('ai manifest is a thin utility with no bundled service', () => {
   // Thin plugin: contributes no runtime service or background processor.
   assertEquals(aiPlugin.contributions.services ?? [], []);
   assertEquals(aiPlugin.contributions.backgroundProcessors ?? [], []);
+});
+
+Deno.test('ai package and scaffold manifest declare no service surface', async () => {
+  const packageConfig: unknown = JSON.parse(
+    await Deno.readTextFile(new URL('../deno.json', import.meta.url)),
+  );
+  const exports = packageConfig && typeof packageConfig === 'object'
+    ? Reflect.get(packageConfig, 'exports')
+    : undefined;
+  assertExists(exports);
+  assertEquals(typeof exports === 'object' && exports !== null && './services' in exports, false);
+
+  const manifestJson: unknown = JSON.parse(
+    await Deno.readTextFile(new URL('../scaffold.plugin.json', import.meta.url)),
+  );
+  const parsed = parsePluginManifest(manifestJson);
+  if (!parsed.ok) {
+    throw new Error(parsed.error.message);
+  }
+
+  assertExists(parsed.manifest.provider);
+  assertEquals(parsed.manifest.provider.defaultServiceEntrypoint, undefined);
+  assertEquals(parsed.manifest.officialSource?.serviceEntrypoint, undefined);
+  assertEquals(parsed.manifest.officialSource?.serviceConfigKey, undefined);
+  assertEquals(parsed.manifest.officialSource?.servicePort, undefined);
+  assertEquals(parsed.manifest.officialSource?.backgroundPort, 8095);
 });

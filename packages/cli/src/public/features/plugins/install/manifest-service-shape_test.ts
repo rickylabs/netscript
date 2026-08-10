@@ -22,7 +22,7 @@ const PLUGINS_ROOT = fromFileUrl(
   new URL("../../../../../../../plugins/", import.meta.url),
 );
 
-Deno.test("all shipped manifests preserve their legacy appsettings projections", async () => {
+Deno.test("shipped manifests preserve their declared appsettings projections", async () => {
   for (const pluginName of SHIPPED_PLUGIN_NAMES) {
     const registry = new PluginKindRegistry([]);
     const resolved = await resolveLocalPluginDescriptor(
@@ -35,11 +35,6 @@ Deno.test("all shipped manifests preserve their legacy appsettings projections",
     }
     const provider = registry.get(resolved.planningKind);
     const serviceEntrypoint = provider.defaultServiceEntrypoint;
-    if (serviceEntrypoint === null) {
-      throw new Error(
-        `${pluginName} unexpectedly changed its shipped service shape`,
-      );
-    }
     const scaffoldResult: PluginScaffoldResult = {
       scaffoldResult: {
         filesCreated: [],
@@ -60,6 +55,19 @@ Deno.test("all shipped manifests preserve their legacy appsettings projections",
       backgroundWorkdir: ".",
       serviceWorkdir: ".",
     };
+
+    if (serviceEntrypoint === null) {
+      assertEquals(
+        buildPluginEntry(
+          { ...scaffoldResult, serviceWorkdir: undefined },
+          provider,
+          {},
+        ),
+        undefined,
+        `${pluginName} service-less appsettings projection changed`,
+      );
+      continue;
+    }
 
     assertEquals(buildPluginEntry(scaffoldResult, provider, {}), {
       Enabled: true,

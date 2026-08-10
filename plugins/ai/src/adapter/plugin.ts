@@ -3,7 +3,13 @@
  * @module
  */
 
-import type { InstallStarterResource, NetScriptPlugin } from '@netscript/plugin/adapter';
+import {
+  type InstallStarterResource,
+  type ItemScaffolder,
+  type NetScriptPlugin,
+  type ScaffoldArtifact,
+  textArtifact,
+} from '@netscript/plugin/adapter';
 import { PLUGIN_PACKAGE_VERSION } from '../package-metadata.generated.ts';
 import {
   agentResource,
@@ -28,6 +34,18 @@ import { diagnoseAiProject } from '../cli/ai-project.ts';
 
 export type { InstallStarterResource, NetScriptPlugin } from '@netscript/plugin/adapter';
 
+const moduleScaffolder: ItemScaffolder<Readonly<Record<string, never>>> = {
+  name: 'module',
+  emit(): readonly ScaffoldArtifact[] {
+    return [
+      textArtifact(
+        'ai/mod.ts',
+        `/** Generated AI plugin entry module. */\n\nexport * from './models.ts';\nexport { aiPlugin } from '@netscript/plugin-ai';\n`,
+      ),
+    ];
+  },
+};
+
 /**
  * Starter resources emitted by the AI install command. Default topology is
  * fully in-process: the barrel wires `@netscript/ai`, the stream route calls it
@@ -35,6 +53,7 @@ export type { InstallStarterResource, NetScriptPlugin } from '@netscript/plugin/
  * persistence is intentionally excluded (opt-in via `--persist-threads`).
  */
 export const aiStarterResources: readonly InstallStarterResource[] = [
+  { scaffolder: moduleScaffolder, input: {} },
   // Structural: model configuration is required independently of sample tools and agents.
   { scaffolder: modelsScaffolder, input: DEFAULT_MODELS_INPUT },
   {

@@ -1,5 +1,7 @@
-import { resolve } from '@std/path';
+import { dirname, resolve, toFileUrl } from '@std/path';
 import { loadConfig } from '@netscript/config';
+import { artifactText, collectInstallArtifacts } from '@netscript/plugin/adapter';
+import { aiAdapterPlugin } from '@netscript/plugin-ai/adapter';
 import { loadRegisteredPluginMetadata, loadRegisteredPlugins } from './plugin-registry.ts';
 
 Deno.test('loadRegisteredPlugins returns normalized background processor metadata', async () => {
@@ -69,6 +71,44 @@ Deno.test('loadRegisteredPlugins preserves registry output shape from explicit c
 
   if (workers.service?.entrypoint !== './services/src/main.ts') {
     throw new Error('Expected plugin service contribution to preserve entrypoint metadata');
+  }
+});
+
+Deno.test('loadRegisteredPlugins resolves the generated AI configured module', async () => {
+  const projectRoot = await Deno.makeTempDir();
+  const artifacts = collectInstallArtifacts(aiAdapterPlugin);
+  for (const artifact of artifacts) {
+    const artifactPath = resolve(projectRoot, artifact.path);
+    await Deno.mkdir(dirname(artifactPath), { recursive: true });
+    await Deno.writeTextFile(artifactPath, artifactText(artifact));
+  }
+  await Deno.writeTextFile(
+    resolve(projectRoot, 'netscript.config.ts'),
+    `export default {
+  name: 'fixture-app',
+  databases: { config: [] },
+  plugins: ['./ai/mod.ts'],
+};
+`,
+  );
+
+  const module = await import(toFileUrl(resolve(projectRoot, 'ai/mod.ts')).href);
+  const manifests = Object.values(module).filter((value: unknown) =>
+    value !== null && typeof value === 'object' &&
+    typeof Reflect.get(value, 'name') === 'string' &&
+    typeof Reflect.get(value, 'version') === 'string' &&
+    typeof Reflect.get(value, 'contributions') === 'object'
+  );
+  if (manifests.length !== 1) {
+    throw new Error(
+      `Expected exactly one manifest-shaped export from generated AI module, got ${manifests.length}`,
+    );
+  }
+
+  const config = await loadConfig({ cwd: projectRoot });
+  const plugins = await loadRegisteredPlugins(projectRoot, config);
+  if (plugins.ai?.name !== '@netscript/plugin-ai') {
+    throw new Error('Expected generated AI configured module to resolve through the plugin loader');
   }
 });
 

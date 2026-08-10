@@ -25,6 +25,7 @@ Deno.test('ai install emits only userland glue under ai/', () => {
   const artifacts = collectInstallArtifacts(aiAdapterPlugin);
 
   assertEquals(artifacts.map((artifact) => artifact.path), [
+    'ai/mod.ts',
     'ai/models.ts',
     'ai/ai.ts',
     'ai/tools/echo.ts',
@@ -47,6 +48,7 @@ Deno.test('ai install emits only userland glue under ai/', () => {
 
 Deno.test('ai starter resources cover the current emitters', () => {
   assertEquals(aiStarterResources.map((resource) => resource.scaffolder.name), [
+    'module',
     'models',
     'barrel',
     'tool',
@@ -61,6 +63,10 @@ Deno.test('ai scaffold emitters have focused golden content', () => {
   const artifacts = collectInstallArtifacts(aiAdapterPlugin);
   const byPath = new Map(artifacts.map((artifact) => [artifact.path, artifactText(artifact)]));
 
+  assertEquals(
+    byPath.get('ai/mod.ts'),
+    `/** Generated AI plugin entry module. */\n\nexport * from './models.ts';\nexport { aiPlugin } from '@netscript/plugin-ai';\n`,
+  );
   assertStringIncludes(byPath.get('ai/models.ts') ?? '', 'DEFAULT_CHAT_MODEL');
   assertStringIncludes(byPath.get('ai/ai.ts') ?? '', 'createAiRuntime');
   assertStringIncludes(

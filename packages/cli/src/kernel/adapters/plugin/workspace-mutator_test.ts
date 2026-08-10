@@ -4,7 +4,7 @@
  * Focused regression tests for plugin workspace mutations.
  */
 
-import { assert, assertEquals } from 'jsr:@std/assert@^1';
+import { assert, assertEquals, assertRejects } from 'jsr:@std/assert@^1';
 import { join } from '@std/path';
 import { MemoryFileSystemAdapter } from '../scaffold/memory-fs.ts';
 import { PluginWorkspaceMutator } from './workspace-mutator.ts';
@@ -16,6 +16,7 @@ import {
 import { SCAFFOLD_WORKSPACE_PACKAGES } from '../../constants/scaffold/scaffold-workspace-packages.ts';
 import { SCAFFOLD_PACKAGES } from '../../constants/scaffold/scaffold-packages.ts';
 import { resolveNetScriptImports } from '../scaffold/import-resolver.ts';
+import { ScaffoldValidationError } from '../../domain/errors.ts';
 
 const backgroundProvider: PluginKindProvider = {
   kind: 'background',
@@ -626,6 +627,8 @@ Deno.test('PluginWorkspaceMutator appends project-local plugin config specs', as
       '',
     ].join('\n'),
   );
+  await fs.writeFile('/project/plugins/workers/mod.ts', 'export {};\n');
+  await fs.writeFile('/project/plugins/sagas/mod.ts', 'export {};\n');
 
   const mutator = new PluginWorkspaceMutator(fs);
   assertEquals(await mutator.ensureNetScriptConfigPlugin('/project', 'workers'), true);
@@ -654,6 +657,7 @@ Deno.test('PluginWorkspaceMutator registers generated plugin glue entrypoints', 
       '',
     ].join('\n'),
   );
+  await fs.writeFile('/project/workers/mod.ts', 'export {};\n');
 
   const mutator = new PluginWorkspaceMutator(fs);
   assertEquals(
@@ -667,6 +671,28 @@ Deno.test('PluginWorkspaceMutator registers generated plugin glue entrypoints', 
 
   const config = await fs.readFile('/project/netscript.config.ts');
   assertEquals(config.includes("'./workers/mod.ts'"), true);
+});
+
+Deno.test('PluginWorkspaceMutator rejects a missing configured plugin module', async () => {
+  const fs = new MemoryFileSystemAdapter();
+  const configPath = '/project/netscript.config.ts';
+  const original = [
+    "import { defineConfig } from '@netscript/config';",
+    '',
+    'export default defineConfig({',
+    "  name: 'sample-app',",
+    '  plugins: [],',
+    '});',
+    '',
+  ].join('\n');
+  await fs.writeFile(configPath, original);
+
+  await assertRejects(
+    () => new PluginWorkspaceMutator(fs).ensureNetScriptConfigPlugin('/project', 'missing'),
+    ScaffoldValidationError,
+    'configured module was not found at plugins/missing/mod.ts',
+  );
+  assertEquals(await fs.readFile(configPath), original);
 });
 
 Deno.test('PluginWorkspaceMutator removes exactly one plugin instance from netscript config', async () => {

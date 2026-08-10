@@ -490,7 +490,16 @@ export class PluginWorkspaceMutator {
     const relativePluginDir = pluginDir
       ? normalizeWorkspaceRelativePath(projectRoot, pluginDir)
       : join(SCAFFOLD_DIRS.PLUGINS, pluginName);
-    const specifier = `./${normalizePath(join(relativePluginDir, 'mod.ts'))}`;
+    const relativeModulePath = normalizePath(join(relativePluginDir, 'mod.ts'));
+    const modulePath = join(projectRoot, relativeModulePath);
+    if (!await this.fs.exists(modulePath)) {
+      throw new ScaffoldValidationError(
+        `Cannot register plugin "${pluginName}" because its configured module was not found at ${relativeModulePath}.`,
+        { projectRoot, pluginName, modulePath },
+      );
+    }
+
+    const specifier = `./${relativeModulePath}`;
     const quotedSpecifier = `'${specifier}'`;
     const source = await this.fs.readFile(configPath);
     if (source.includes(quotedSpecifier) || source.includes(`"${specifier}"`)) {
