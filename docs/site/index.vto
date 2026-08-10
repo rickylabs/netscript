@@ -26,7 +26,7 @@ the contract cannot drift from it.
 {{ comp.featureGrid({ items: [
   {
     title: "The contract is the spine",
-    body: "A generated model schema or a directly authored Zod schema is narrowed into a versioned public shape, and an oRPC route defines the operation once. A service handler supplies contract-locked business logic; OpenAPI and the SDK client are derived from that boundary.",
+    body: "When generated schemas exist, a model schema is narrowed into the versioned public shape; without a database, that shape is authored directly, then an oRPC route defines the operation once while its handler, OpenAPI, and SDK client share that boundary.",
     href: "/explanation/contracts/"
   },
   {

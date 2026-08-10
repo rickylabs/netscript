@@ -12,14 +12,12 @@
 
 ## Current State
 
-Draft PR #1441 is live with slices 1.1–1.8 pushed. Slice 1.8 has a green full gate sweep, exact
-snippet evidence, six responsive/theme browser combinations, and ten rendered cross-link checks.
-Playwright's mobile visual review prompted an opt-in scroll viewport for the wide contract-flow
-diagram; the page retains zero horizontal overflow. The Tier-A supervisor accepted those slices
-in substance and requested slice 1.9: one Tab 1 comment that makes the DB-less schema origin
-explicit, followed by a rebase onto the new CI-gate baseline. That correction is now implemented,
-the branch merge base is `7a379dab3`, and all three mandated post-rebase gates pass. No framework
-behavior changes are in scope.
+Draft PR #1441 is live with slices 1.1–1.9 pushed and remains draft. Separate IMPL-EVAL returned
+PASS with all 8 acceptance boxes satisfied and no blocking findings. Slice 1.10 takes its first
+non-blocking wording observation: the homepage feature card now distinguishes narrowing a generated
+model schema from directly authoring the public shape when there is no database. The second
+observation is intentionally skipped because the Tab 1 comment is the supervisor-requested DB-less
+origin clarification. No framework behavior changes are in scope.
 
 ## Completed
 
@@ -67,17 +65,20 @@ behavior changes are in scope.
   `7a379dab36d6823164bbd8dc97f3b1790321a220`.
 - Passed the post-rebase derivation fixture 4/4 with both consumer exits 0, rebuilt 617 site files
   with rendered-output OK over 220 HTML files, and re-proved 16/16 diagram parity.
+- Received a separate IMPL-EVAL PASS for all 8 acceptance boxes with no blocking findings.
+- Reworded the homepage feature card so generated schemas are narrowed while the DB-less public
+  shape is authored directly, without changing the deliberate Tab 1 comment.
 
 ## In Progress
 
-- Slice 1.9 amended evidence commit, force-with-lease push, PR comment, and live check-status report.
+- Slice 1.10 commit, explicit-refspec push, and PR evidence comment; all requested local gates pass.
 
 ## Next Steps
 
-1. Amend this post-rebase evidence into slice 1.9.
-2. Push with `--force-with-lease` to the existing PR branch.
-3. Update the PR slice map, post the slice evidence comment, and report current required checks.
-4. Leave the PR draft at `status:impl` for separate IMPL-EVAL.
+1. Commit the feature-card wording and run evidence together.
+2. Push with the explicit existing-branch refspec.
+3. Update the PR slice map, post the slice evidence comment, and report the PR status.
+4. Leave the PR draft for the supervisor to mark ready and merge.
 
 ## Key Decisions
 
@@ -113,7 +114,7 @@ behavior changes are in scope.
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | PASS | derivation task; homepage pre/post/service checks; scoped check/lint/fmt; diagram parity; site build; docs accuracy; source/rendered links; caveats; lock equality |
+| Static | PASS | derivation task; homepage pre/post/service checks; scoped check/lint/fmt; diagram parity; slice 1.10 site build and docs accuracy; source/rendered links; caveats; exact lock equality |
 | Fitness | N/A for package gates | docs-only scope |
 | Runtime | PASS | Six Playwright viewport/theme combinations, all tabs, semantics, screenshots, overflow, and ten cross-link/anchor checks |
 | Consumer | PASS for generated contract, depth example, and homepage code paths | Product/Warehouse contract member, service, and corrected page compile; required pre-fix exits 1 |
@@ -141,5 +142,6 @@ behavior changes are in scope.
 - `01ac2efea` — rebased slice 1.6 omission/relation proof.
 - `cf49757d0` — rebased slice 1.7 cross-link proof.
 - `e1aaae0bd` — rebased slice 1.8 responsive evidence proof.
-- Slice 1.9 is the current amended head; see draft PR #1441 for its final SHA.
+- `a35b53a0a` — slice 1.9 dual-origin/rebase proof.
+- Slice 1.10 is the current wording-and-gate evidence change; see draft PR #1441 for its final SHA.
 - See draft PR #1441 for the live commit list and per-slice comments.

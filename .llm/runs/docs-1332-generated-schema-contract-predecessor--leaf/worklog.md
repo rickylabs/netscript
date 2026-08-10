@@ -58,6 +58,7 @@ Recorded before implementation files per `workflow/run-loop.md` §3b.
 | 1.7 | Prove bidirectional navigation | docs/site link gates | database/route/server/builders/services docs, run dir |
 | 1.8 | Prove release-ready implementation evidence | full gate sweep, Playwright matrix, lock hashes | run evidence, PR body, run dir |
 | 1.9 | Prove both homepage schema origins after the CI-base rebase | supervisor F1 line review; post-rebase derivation/diagram/site gates | homepage Tab 1, run dir |
+| 1.10 | Prove precise homepage verbs for both schema origins | site build; docs accuracy; exact lock equality | homepage feature card, run dir |
 
 ### Deferred Scope
 
@@ -107,6 +108,8 @@ pages' existing examples as the only prose source rather than duplicating genera
 | 2026-08-10T10:37:08+02:00 | 1.9 | rebase | Rebased all nine slice commits without conflict; `git merge-base HEAD origin/main` is exactly `7a379dab36d6823164bbd8dc97f3b1790321a220`. |
 | 2026-08-10T10:37:08+02:00 | 1.9 | post-rebase derivation | `docs:contract-derivation` passed 4/4; root and contracts-member compile exits are 0 and all three negative fixtures remain non-zero. |
 | 2026-08-10T10:37:08+02:00 | 1.9 | post-rebase site gates | Site build generated 617 files and passed rendered-output over 220 HTML files; `diagrams:check` reports all 16 committed SVGs match. |
+| 2026-08-10T11:03:45+02:00 | 1.10 | evaluator handoff | Separate IMPL-EVAL returned PASS with 8/8 acceptance boxes and no blocking findings; accepted its first wording observation and deliberately retained the requested Tab 1 comment. |
+| 2026-08-10T11:03:45+02:00 | 1.10 | origin wording | The feature card now gives generated schemas the narrowing verb and the DB-less public shape the direct-authoring verb in one concise sentence. |
 
 ## Decisions
 
@@ -166,6 +169,9 @@ pages' existing examples as the only prose source rather than duplicating genera
 | Post-rebase derivation | `rtk proxy deno task docs:contract-derivation` | PASS | 4 passed / 0 failed; root and contracts-member exits 0; all three negatives non-zero. |
 | Post-rebase site build | `rtk proxy deno task build` from `docs/site/` | PASS | 617 files; source format and rendered-output pass across 220 HTML files. |
 | Post-rebase diagram parity | `rtk proxy deno task diagrams:check` from `docs/site/` | PASS | 16/16 committed SVGs match their Mermaid sources. |
+| Slice 1.10 site build | `rtk proxy deno task build` from `docs/site/` | PASS | 617 files generated; `Rendered output: OK` over 220 HTML files. |
+| Slice 1.10 docs accuracy | `rtk proxy deno task docs:accuracy` | PASS | 192 published source pages and documented dialect/import constraints pass. |
+| Slice 1.10 lock equality | `git diff --exit-code -- deno.lock docs/site/deno.lock` | PASS | Exit 0; hashes remain `a541d408…` and `311255423…`. |
 
 ### Fitness Gates
 
@@ -220,4 +226,7 @@ pages' existing examples as the only prose source rather than duplicating genera
 - Evaluator should inspect the load-bearing contracts-member resolution and three command-level
   negative exits in slice 1.2 first.
 - Supervisor F1 is resolved by the single Tab 1 import comment; post-rebase gates are recorded above.
-- This implementation agent will not write an IMPL-EVAL verdict or advance `status:impl`.
+- Separate IMPL-EVAL returned PASS for all 8 acceptance boxes; this implementation agent did not
+  write that verdict and will not advance `status:impl`.
+- Slice 1.10 accepted only the evaluator's first wording observation; the deliberate Tab 1 comment
+  remains unchanged.
