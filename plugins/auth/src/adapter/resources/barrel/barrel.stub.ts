@@ -39,6 +39,7 @@ export type {
   SigninResponse,
   SignoutResponse,
 } from '%%AUTH_CORE_CONTRACTS%%';
+export { authPlugin } from '@netscript/plugin-auth';
 `,
   tokens: ['AUTH_CORE_CONTRACTS'] as const,
 });

@@ -11,6 +11,7 @@ export const barrelStub: StubSource<
 > = defineStub({
   source: `export { %%JOB_EXPORT%% } from './jobs/%%JOB_FILE%%.ts';
 export { %%TASK_EXPORT%% } from './tasks/%%TASK_FILE%%.ts';
+export { workersPlugin } from '@netscript/plugin-workers';
 `,
   tokens: ['JOB_EXPORT', 'JOB_FILE', 'TASK_EXPORT', 'TASK_FILE'] as const,
 });

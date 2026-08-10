@@ -79,7 +79,7 @@ const PLUGIN_KIND_ROOT_IMPORTS: Readonly<Record<string, readonly string[]>> = {
     SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_SAGAS_CORE,
     SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_SAGAS_CORE_DOMAIN,
   ],
-  stream: [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN],
+  stream: [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN, SCAFFOLD_PACKAGES.ZOD],
   trigger: [
     SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_TRIGGERS_RUNTIME,
     SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_TRIGGERS_CORE,
@@ -101,6 +101,7 @@ const PLUGIN_KIND_ROOT_IMPORTS: Readonly<Record<string, readonly string[]>> = {
     SCAFFOLD_PACKAGES.NETSCRIPT_WORKERS,
     SCAFFOLD_PACKAGES.NETSCRIPT_WORKERS_RUNTIME,
     SCAFFOLD_PACKAGES.NETSCRIPT_WORKERS_SCHEMAS,
+    SCAFFOLD_PACKAGES.ZOD,
   ],
 };
 
@@ -137,6 +138,21 @@ const PLUGIN_KIND_SOURCE_IMPORTS: Readonly<Record<string, Readonly<Record<string
     '@netscript/plugin-ai': netscriptJsrSpecifier('plugin-ai'),
     '@netscript/plugin-ai-core': netscriptJsrSpecifier('plugin-ai-core'),
     '@netscript/fresh': netscriptJsrSpecifier('fresh'),
+  },
+  auth: {
+    '@netscript/plugin-auth': netscriptJsrSpecifier('plugin-auth'),
+  },
+  saga: {
+    '@netscript/plugin-sagas': netscriptJsrSpecifier('plugin-sagas'),
+  },
+  stream: {
+    '@netscript/plugin-streams': netscriptJsrSpecifier('plugin-streams'),
+  },
+  trigger: {
+    '@netscript/plugin-triggers': netscriptJsrSpecifier('plugin-triggers'),
+  },
+  worker: {
+    '@netscript/plugin-workers': netscriptJsrSpecifier('plugin-workers'),
   },
 };
 

@@ -5,7 +5,15 @@
  */
 
 import { assert, assertEquals, assertRejects } from 'jsr:@std/assert@^1';
-import { join } from '@std/path';
+import { dirname, join, relative, resolve, toFileUrl } from '@std/path';
+import { artifactText, collectInstallArtifacts } from '@netscript/plugin/adapter';
+import type { NetScriptPlugin } from '@netscript/plugin/adapter';
+import { aiAdapterPlugin } from '@netscript/plugin-ai/adapter';
+import { authAdapterPlugin } from '../../../../../../plugins/auth/src/adapter/plugin.ts';
+import { sagasAdapterPlugin } from '../../../../../../plugins/sagas/src/adapter/plugin.ts';
+import { streamsAdapterPlugin } from '../../../../../../plugins/streams/src/adapter/plugin.ts';
+import { triggersAdapterPlugin } from '../../../../../../plugins/triggers/src/adapter/plugin.ts';
+import { workersAdapterPlugin } from '../../../../../../plugins/workers/src/adapter/plugin.ts';
 import { MemoryFileSystemAdapter } from '../scaffold/memory-fs.ts';
 import { PluginWorkspaceMutator } from './workspace-mutator.ts';
 import type { PluginKindProvider } from '../../domain/plugin-kind.ts';
@@ -13,10 +21,76 @@ import {
   netscriptJsrSpecifier,
   NETSCRIPT_RELEASE_VERSION,
 } from '../../constants/jsr-specifiers.ts';
-import { SCAFFOLD_WORKSPACE_PACKAGES } from '../../constants/scaffold/scaffold-workspace-packages.ts';
+import {
+  SCAFFOLD_CONNECTOR_PACKAGES,
+  SCAFFOLD_WORKSPACE_PACKAGES,
+} from '../../constants/scaffold/scaffold-workspace-packages.ts';
 import { SCAFFOLD_PACKAGES } from '../../constants/scaffold/scaffold-packages.ts';
 import { resolveNetScriptImports } from '../scaffold/import-resolver.ts';
 import { ScaffoldValidationError } from '../../domain/errors.ts';
+import { loadRegisteredPlugins } from '../config/plugin-registry.ts';
+import { DenoFileSystem } from '../runtime/file-system/deno-file-system.ts';
+import { installUiRegistryItems } from '../../application/ui/registry.ts';
+
+interface FirstPartyPluginCase {
+  readonly adapter: NetScriptPlugin;
+  readonly kind: string;
+  readonly namespace: string;
+  readonly packageName: string;
+  readonly manifestExport: string;
+  readonly packageDir: string;
+}
+
+const FIRST_PARTY_PLUGIN_CASES: readonly FirstPartyPluginCase[] = [
+  {
+    adapter: aiAdapterPlugin,
+    kind: 'ai',
+    namespace: 'ai',
+    packageName: '@netscript/plugin-ai',
+    manifestExport: 'aiPlugin',
+    packageDir: 'ai',
+  },
+  {
+    adapter: authAdapterPlugin,
+    kind: 'auth',
+    namespace: 'auth',
+    packageName: '@netscript/plugin-auth',
+    manifestExport: 'authPlugin',
+    packageDir: 'auth',
+  },
+  {
+    adapter: sagasAdapterPlugin,
+    kind: 'saga',
+    namespace: 'sagas',
+    packageName: '@netscript/plugin-sagas',
+    manifestExport: 'sagasPlugin',
+    packageDir: 'sagas',
+  },
+  {
+    adapter: streamsAdapterPlugin,
+    kind: 'stream',
+    namespace: 'streams',
+    packageName: '@netscript/plugin-streams',
+    manifestExport: 'streamsPlugin',
+    packageDir: 'streams',
+  },
+  {
+    adapter: triggersAdapterPlugin,
+    kind: 'trigger',
+    namespace: 'triggers',
+    packageName: '@netscript/plugin-triggers',
+    manifestExport: 'triggersPlugin',
+    packageDir: 'triggers',
+  },
+  {
+    adapter: workersAdapterPlugin,
+    kind: 'worker',
+    namespace: 'workers',
+    packageName: '@netscript/plugin-workers',
+    manifestExport: 'workersPlugin',
+    packageDir: 'workers',
+  },
+];
 
 const backgroundProvider: PluginKindProvider = {
   kind: 'background',
@@ -742,24 +816,112 @@ Deno.test('PluginWorkspaceMutator removes generated root-level plugin glue decla
   );
 });
 
-/**
- * Recursively collect `*.stub.ts` file URLs under a resources root. Each AI
- * scaffold stub wraps the emitted userland source in a `defineStub({ source })`
- * template literal, so scanning the stub text yields the exact `@netscript/*`
- * specifiers the generated project will contain.
- */
-async function collectStubFiles(root: URL): Promise<URL[]> {
-  const files: URL[] = [];
-  for await (const entry of Deno.readDir(root)) {
-    const child = new URL(`${root.href}/${entry.name}`);
-    if (entry.isDirectory) {
-      files.push(...await collectStubFiles(child));
-    } else if (entry.isFile && entry.name.endsWith('.stub.ts')) {
-      files.push(child);
+Deno.test('first-party configured modules preserve app exports and resolve one package manifest', async () => {
+  const projectRoot = await Deno.makeTempDir({ prefix: 'first-party-contract-' });
+  const configuredModules: string[] = [];
+  await Deno.writeTextFile(
+    resolve(projectRoot, 'deno.json'),
+    JSON.stringify({
+      workspace: [],
+      imports: { '@netscript/config': netscriptJsrSpecifier('config') },
+    }, null, 2) + '\n',
+  );
+  const workspaceMutator = new PluginWorkspaceMutator(new DenoFileSystem());
+  for (const plugin of FIRST_PARTY_PLUGIN_CASES) {
+    await workspaceMutator.ensureRootImportsForPluginKind(projectRoot, plugin.kind);
+  }
+
+  for (const plugin of FIRST_PARTY_PLUGIN_CASES) {
+    const artifacts = collectInstallArtifacts(plugin.adapter);
+    const modulePath = `${plugin.namespace}/mod.ts`;
+    configuredModules.push(`./${modulePath}`);
+
+    for (const artifact of artifacts) {
+      const outputPath = resolve(projectRoot, artifact.path);
+      await Deno.mkdir(dirname(outputPath), { recursive: true });
+      await Deno.writeTextFile(outputPath, artifactText(artifact));
+    }
+
+    const generatedModule = artifacts.find((artifact) => artifact.path === modulePath);
+    assert(generatedModule, `${plugin.namespace} must emit ${modulePath}`);
+    const moduleSource = artifactText(generatedModule);
+    assert(
+      moduleSource.includes(
+        `export { ${plugin.manifestExport} } from '${plugin.packageName}';`,
+      ),
+      `${modulePath} must re-export ${plugin.manifestExport} from ${plugin.packageName}`,
+    );
+
+    const moduleUrl = toFileUrl(resolve(projectRoot, modulePath)).href;
+    const inspection = await new Deno.Command(Deno.execPath(), {
+      args: [
+        'eval',
+        '--minimum-dependency-age=0',
+        '--config',
+        resolve(projectRoot, 'deno.json'),
+        `const imported = await import(${JSON.stringify(moduleUrl)});
+const manifests = Object.values(imported).filter((value) =>
+  value !== null && typeof value === 'object' &&
+  typeof Reflect.get(value, 'name') === 'string' &&
+  typeof Reflect.get(value, 'version') === 'string' &&
+  typeof Reflect.get(value, 'contributions') === 'object'
+);
+if (!Reflect.has(imported, ${JSON.stringify(plugin.manifestExport)})) {
+  throw new Error('missing package manifest re-export');
+}
+if (manifests.length !== 1) {
+  throw new Error(\`expected one manifest-shaped export, got \${manifests.length}\`);
+}`,
+      ],
+      env: { DURABLE_STREAMS_URL: 'http://127.0.0.1:8090' },
+      stdout: 'piped',
+      stderr: 'piped',
+    }).output();
+    assert(
+      inspection.success,
+      `${modulePath} additivity check failed: ${new TextDecoder().decode(inspection.stderr)}`,
+    );
+
+    const packageConfig: unknown = JSON.parse(
+      await Deno.readTextFile(
+        new URL(`../../../../../../plugins/${plugin.packageDir}/deno.json`, import.meta.url),
+      ),
+    );
+    assert(packageConfig !== null && typeof packageConfig === 'object');
+    const publish = Reflect.get(packageConfig, 'publish');
+    assert(publish !== null && typeof publish === 'object');
+    const include = Reflect.get(publish, 'include');
+    assert(Array.isArray(include));
+    assert(
+      include.includes('src/**/*.ts'),
+      `${plugin.packageName} publish.include must ship its scaffold emitters`,
+    );
+  }
+
+  for (const plugin of FIRST_PARTY_PLUGIN_CASES) {
+    for (const artifact of collectInstallArtifacts(plugin.adapter, false)) {
+      const outputPath = resolve(projectRoot, artifact.path);
+      await Deno.mkdir(dirname(outputPath), { recursive: true });
+      await Deno.writeTextFile(outputPath, artifactText(artifact));
     }
   }
-  return files;
-}
+
+  await Deno.writeTextFile(
+    resolve(projectRoot, 'netscript.config.ts'),
+    `export default {
+  name: 'fixture-app',
+  databases: { config: [] },
+  plugins: ${JSON.stringify(configuredModules)},
+};
+`,
+  );
+  const registered = await loadRegisteredPlugins(projectRoot);
+  assertEquals(
+    Object.values(registered).map((entry) => entry.name).sort(),
+    FIRST_PARTY_PLUGIN_CASES.map((plugin) => plugin.packageName).sort(),
+    'all configured first-party modules must resolve together through the runtime plugin loader',
+  );
+});
 
 /** Split `@netscript/<pkg>[/<subpath...>]` into its `netscriptJsrSpecifier` args. */
 function splitNetscriptSpecifier(specifier: string): { pkg: string; subpath: string } {
@@ -771,114 +933,150 @@ function splitNetscriptSpecifier(specifier: string): { pkg: string; subpath: str
   return { pkg: withoutScope.slice(0, slash), subpath: withoutScope.slice(slash) };
 }
 
-Deno.test('PluginWorkspaceMutator wires every @netscript/* specifier emitted by the AI scaffold', async () => {
-  // Read the real AI scaffold stubs relative to the worktree repo root so this
-  // guard fails whenever the scaffold emits a bare `@netscript/*` specifier that
-  // the prod/JSR import-map wiring does not cover (regression guard for #505).
-  const resourcesRoot = new URL(
-    '../../../../../../plugins/ai/src/adapter/resources',
+function importMapFromJson(source: string): object {
+  const parsed: unknown = JSON.parse(source);
+  if (parsed === null || typeof parsed !== 'object') return {};
+  const imports = Reflect.get(parsed, 'imports');
+  return imports !== null && typeof imports === 'object' ? imports : {};
+}
+
+function importTarget(imports: object, specifier: string): unknown {
+  const direct = Reflect.get(imports, specifier);
+  if (direct !== undefined) return direct;
+  if (!specifier.startsWith('@')) {
+    return Reflect.get(imports, specifier.split('/')[0]);
+  }
+  const segments = specifier.split('/');
+  return segments.length >= 2 ? Reflect.get(imports, segments.slice(0, 2).join('/')) : undefined;
+}
+
+function emittedModuleSpecifiers(source: string): readonly string[] {
+  const pattern = /(?:from\s+|import\s*\(\s*|import\s+)["']([^"']+)["']/g;
+  return [...source.matchAll(pattern)].map((match) => match[1]);
+}
+
+async function declaredRuntimeRegistryPaths(packageDir: string): Promise<readonly string[]> {
+  const manifestUrl = new URL(
+    `../../../../../../plugins/${packageDir}/scaffold.runtime.json`,
     import.meta.url,
   );
-  const stubFiles = await collectStubFiles(resourcesRoot);
-  assert(stubFiles.length > 0, 'expected to find AI scaffold *.stub.ts sources');
+  try {
+    const parsed: unknown = JSON.parse(await Deno.readTextFile(manifestUrl));
+    if (parsed === null || typeof parsed !== 'object') return [];
+    const registries = Reflect.get(parsed, 'runtimeRegistries');
+    if (!Array.isArray(registries)) return [];
+    return registries.flatMap((registry: unknown) => {
+      if (registry === null || typeof registry !== 'object') return [];
+      const path = Reflect.get(registry, 'registryPath');
+      return typeof path === 'string' ? [path] : [];
+    });
+  } catch (error) {
+    if (error instanceof Deno.errors.NotFound) return [];
+    throw error;
+  }
+}
 
-  // `@netscript/plugin/adapter` is the stub-authoring wrapper (imported by the
-  // .stub.ts module itself), never part of the emitted userland source.
-  const STUB_AUTHORING_IMPORT = '@netscript/plugin/adapter';
-  // Match only module specifiers in real `import`/`export` statements — either
-  // `from '<spec>'` or a side-effect `import '<spec>'`. This deliberately ignores
-  // `@netscript/*` mentions in prose/JSDoc and quoted data literals (e.g. a
-  // `pluginName: '@netscript/plugin-ai'` capability string), which are not imports.
-  const specifierPattern = /(?:from|import)\s+['"](@netscript\/[^'"]+)['"]/g;
-  const emitted = new Set<string>();
-  for (const file of stubFiles) {
-    const source = await Deno.readTextFile(file);
-    for (const match of source.matchAll(specifierPattern)) {
-      if (match[1] !== STUB_AUTHORING_IMPORT) {
-        emitted.add(match[1]);
+Deno.test('first-party generated namespaces have complete imports in JSR and local-source modes', async () => {
+  const localPackageNames = new Set<string>([
+    ...SCAFFOLD_WORKSPACE_PACKAGES,
+    ...SCAFFOLD_CONNECTOR_PACKAGES,
+  ]);
+
+  for (const plugin of FIRST_PARTY_PLUGIN_CASES) {
+    const artifacts = collectInstallArtifacts(plugin.adapter);
+    const emittedSources = artifacts
+      .filter((artifact) => artifact.path.endsWith('.ts') || artifact.path.endsWith('.tsx'))
+      .map((artifact) => ({ path: artifact.path, source: artifactText(artifact) }));
+    const emittedPaths = new Set(artifacts.map((artifact) => artifact.path));
+    for (const path of await declaredRuntimeRegistryPaths(plugin.packageDir)) {
+      emittedPaths.add(path);
+    }
+    const namespaceRoot = resolve('/', plugin.namespace);
+    const namespaceFs = new MemoryFileSystemAdapter();
+    for (const artifact of artifacts) {
+      await namespaceFs.writeFile(resolve('/', artifact.path), artifactText(artifact));
+    }
+    if (plugin.adapter.install.uiRegistryItems?.length) {
+      const installedUi = await installUiRegistryItems({
+        projectRoot: namespaceRoot,
+        names: plugin.adapter.install.uiRegistryItems,
+        overwrite: false,
+      }, { fs: namespaceFs });
+      for (const copiedPath of installedUi.copiedFiles) {
+        const emittedPath = join(plugin.namespace, relative(namespaceRoot, copiedPath));
+        emittedPaths.add(emittedPath);
+        if (emittedPath.endsWith('.ts') || emittedPath.endsWith('.tsx')) {
+          emittedSources.push({
+            path: emittedPath,
+            source: await namespaceFs.readFile(copiedPath),
+          });
+        }
+      }
+    }
+    const namespaceDenoJson = resolve(namespaceRoot, 'deno.json');
+    const namespaceImports = await namespaceFs.exists(namespaceDenoJson)
+      ? importMapFromJson(await namespaceFs.readFile(namespaceDenoJson))
+      : {};
+    const externalSpecifiers = new Set<string>();
+
+    for (const emitted of emittedSources) {
+      for (const specifier of emittedModuleSpecifiers(emitted.source)) {
+        if (specifier.startsWith('.')) {
+          const resolved = resolve('/', dirname(emitted.path), specifier).slice(1);
+          const candidates = [resolved, `${resolved}.ts`, `${resolved}.tsx`, `${resolved}/mod.ts`];
+          assert(
+            candidates.some((candidate) => emittedPaths.has(candidate)),
+            `${emitted.path} imports relative module "${specifier}" that is not emitted`,
+          );
+        } else if (
+          !specifier.startsWith('jsr:') && !specifier.startsWith('npm:') &&
+          !specifier.startsWith('node:')
+        ) {
+          externalSpecifiers.add(specifier);
+        }
+      }
+    }
+
+    for (const mode of ['jsr', 'local-source']) {
+      const fs = new MemoryFileSystemAdapter();
+      await fs.writeFile(
+        '/project/deno.json',
+        JSON.stringify({ workspace: ['./packages/*', './plugins/*'], imports: {} }, null, 2) +
+          '\n',
+      );
+      if (mode === 'local-source') {
+        await fs.writeFile(
+          join('/project', 'packages', 'cli', 'deno.json'),
+          JSON.stringify({ name: '@netscript/cli' }, null, 2) + '\n',
+        );
+      }
+
+      await new PluginWorkspaceMutator(fs).ensureRootImportsForPluginKind('/project', plugin.kind);
+      const rootImports = importMapFromJson(await fs.readFile('/project/deno.json'));
+
+      for (const specifier of [...externalSpecifiers].sort()) {
+        const target = importTarget(namespaceImports, specifier) ??
+          importTarget(rootImports, specifier);
+        if (target !== undefined) continue;
+
+        if (mode === 'local-source' && specifier.startsWith('@netscript/')) {
+          const { pkg } = splitNetscriptSpecifier(specifier);
+          assert(
+            localPackageNames.has(pkg),
+            `${plugin.namespace} emits "${specifier}", but local-source scaffolds do not copy ` +
+              `the "${pkg}" package`,
+          );
+          continue;
+        }
+
+        throw new Error(
+          `${plugin.namespace} emits "${specifier}", but ${mode} import wiring does not resolve it`,
+        );
       }
     }
   }
-  assert(
-    emitted.has('@netscript/fresh/ai'),
-    'AI scaffold is expected to emit @netscript/fresh/ai (defect #505 anchor)',
-  );
-
-  const fs = new MemoryFileSystemAdapter();
-  await fs.writeFile(
-    '/project/deno.json',
-    JSON.stringify({ workspace: ['./plugins/*'], imports: {} }, null, 2) + '\n',
-  );
-
-  await new PluginWorkspaceMutator(fs).ensureRootImportsForPluginKind('/project', 'ai');
-
-  const config = JSON.parse(await fs.readFile('/project/deno.json')) as {
-    imports: Record<string, string>;
-  };
-
-  // Prod/JSR coverage: kind-source wiring uses bare package aliases only —
-  // Deno expands export subpaths through a root `jsr:` package alias (deno-add
-  // semantics), so every emitted specifier is covered when its root package
-  // alias maps to an exact `jsr:@netscript/<pkg>@<version>` (no subpath).
-  const bareJsrAliasPattern = /^jsr:@netscript\/[a-z0-9-]+@\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/;
-  for (const specifier of [...emitted].sort()) {
-    const { pkg } = splitNetscriptSpecifier(specifier);
-    const rootAlias = `@netscript/${pkg}`;
-    const target = config.imports[rootAlias];
-    assert(
-      target !== undefined,
-      `AI scaffold emits "${specifier}" but the prod import-map wiring has no ` +
-        `root alias for "${rootAlias}". Add it to PLUGIN_KIND_SOURCE_IMPORTS.ai ` +
-        `in workspace-mutator.ts.`,
-    );
-    assert(
-      bareJsrAliasPattern.test(target),
-      `Root alias "${rootAlias}" must be a bare exact-version jsr package alias ` +
-        `(subpath expansion only works through bare aliases), got "${target}".`,
-    );
-  }
-
-  // Exact targets: all three kind-source packages ride the release train.
-  assertEquals(config.imports['@netscript/ai'], netscriptJsrSpecifier('ai'));
-  assertEquals(config.imports['@netscript/plugin-ai'], netscriptJsrSpecifier('plugin-ai'));
-  assertEquals(
-    config.imports['@netscript/plugin-ai-core'],
-    netscriptJsrSpecifier('plugin-ai-core'),
-  );
-  assertEquals(config.imports['@netscript/fresh'], netscriptJsrSpecifier('fresh'));
-
-  // Drift-guard: the map's @netscript/ai entry must match the pin declared by
-  // packages/plugin-ai-core/deno.json — the in-repo source of truth for what
-  // the published stack references. This keeps the map honest across release
-  // cuts: if the engine ever leaves the train again (or the cut misses one of
-  // the two files), this assertion fails in the same PR.
-  const pluginAiCoreDenoJson = JSON.parse(
-    await Deno.readTextFile(
-      new URL('../../../../../../packages/plugin-ai-core/deno.json', import.meta.url),
-    ),
-  ) as { imports: Record<string, string> };
-  assertEquals(
-    config.imports['@netscript/ai'],
-    pluginAiCoreDenoJson.imports['@netscript/ai'],
-    'The @netscript/ai entry in PLUGIN_KIND_SOURCE_IMPORTS drifted from the ' +
-      '@netscript/ai pin in packages/plugin-ai-core/deno.json. Both must reference ' +
-      'the same published engine version.',
-  );
-
-  // Local-source coverage: every emitted @netscript/* package must be copied
-  // into local scaffolds as a workspace member, because the local path gets NO
-  // kind-source import-map entries (see the local-marker test below) and
-  // resolves these specifiers purely through workspace membership + exports.
-  const memberSet = new Set<string>(SCAFFOLD_WORKSPACE_PACKAGES);
-  for (const specifier of [...emitted].sort()) {
-    const { pkg } = splitNetscriptSpecifier(specifier);
-    assert(
-      memberSet.has(pkg),
-      `AI scaffold emits "${specifier}" but "${pkg}" is not in ` +
-        `SCAFFOLD_WORKSPACE_PACKAGES, so local-source projects cannot resolve it.`,
-    );
-  }
 });
+
 
 Deno.test('PluginWorkspaceMutator writes no ai kind-source jsr pins into local-source projects', async () => {
   const fs = new MemoryFileSystemAdapter();
