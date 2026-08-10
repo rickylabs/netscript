@@ -30,7 +30,9 @@
 
 ### Commit Slices
 
-Slices 3.1–3.6 are enumerated in `plan.md`, each with its proof, gate, and files.
+Slices 3.1–3.6 are enumerated in `plan.md`, each with its proof, gate, and files. Slice 3.7 is the
+Tier-A A1 least-privilege correction: deploy-only token scopes move from workflow level to the
+guarded `deploy` job without changing triggers, guards, concurrency, or gate commands.
 
 ### Deferred Scope
 
@@ -51,6 +53,7 @@ Future docs gate routing changes start in `docs/site/deno.json`, then use `ci.ym
 | 2026-08-10 | 3.4 | RED fixture | Added isolated `issue-1408-red-proof` raw-newline Vento defect; local checker fails with the expected named diagnostic. |
 | 2026-08-10 | 3.5 | GREEN revert | Deleted only the deliberate fixture after capturing the failing run; local checker and full build pass at clean head. |
 | 2026-08-10 | 3.6 | acceptance/locks | Recorded GREEN run, exact lock equality, acceptance mapping, and repo-native current-check PASS; retained draft state for supervisor evaluation. |
+| 2026-08-10 | 3.7 | least privilege | Scoped `pages: write` and `id-token: write` to `deploy`; build explicitly retains only `contents: read`. |
 
 ## Gate Results
 
@@ -66,6 +69,8 @@ Future docs gate routing changes start in `docs/site/deno.json`, then use `ci.ym
 | Lock diff | `git diff --exit-code da40fbfe3...HEAD -- deno.lock docs/site/deno.lock` | PASS | Exit 0, no lockfile change. |
 | Lock hashes | `git hash-object deno.lock docs/site/deno.lock` | PASS | `a541d4088071ac84c024ed3497be3d761b6d1c58`; `311255423e2d9e1799d654fefb73f87a6629fdc5`. |
 | Current PR checks | `deno task agentic:pr-checks --repo rickylabs/netscript --pr 1440 --pretty` | PASS | Head `c2c837302...`, 17 checks, zero current failures. Core required contexts remain skipped by the repository's draft policy and must materialize after the supervisor's ready-for-review transition. |
+| Workflow syntax | `python3 -c "import yaml;print(list(yaml.safe_load(open('.github/workflows/pages.yml'))['jobs'].keys()))"` | PASS | Parses with jobs `build` and `deploy`. |
+| Permission review | Inspect `.github/workflows/pages.yml` | PASS | Workflow/build are `contents: read`; guarded deploy owns `pages: write` and `id-token: write`. No deploy was triggered. |
 
 ## Reconcile Notes
 
@@ -75,9 +80,11 @@ Future docs gate routing changes start in `docs/site/deno.json`, then use `ci.ym
 - 3.4: no new reviewer direction; the standalone negative-control commit follows the locked acceptance protocol and will remain at branch history only after slice 3.5 deletes the fixture.
 - 3.5: RED run and diagnostic are posted on PR #1440; no reviewer changes; GREEN revert stays within planned scope.
 - 3.6: no reviewer changes; acceptance is evidenced. Mandatory separate-session IMPL-EVAL and the ready-for-review transition remain supervisor-owned, so draft-only skipped core contexts are explicitly not claimed as executed.
+- 3.7: supervisor A1 finding F1 accepted and fixed without altering any docs gate or its reachability. Await the PR build on this commit before handoff.
 
 ## Handoff Notes
 
 - Evaluator should inspect workflow event/permission/concurrency semantics, RED/GREEN provenance, and lock equality first.
 - RED: https://github.com/rickylabs/netscript/actions/runs/31365789097; GREEN: https://github.com/rickylabs/netscript/actions/runs/31365881454.
 - Implementation is complete; the PR stays draft at `status:impl`. Supervisor must dispatch separate-session IMPL-EVAL, transition lifecycle/readiness, and verify the then-materialized full required contexts.
+- Slice 3.7 hardens token scope only. The unchanged main/release/workflow-dispatch path still reaches the guarded deploy job, whose job-local permissions satisfy Pages deployment; reasoning from the definition is the required deploy evidence, not a live deploy.

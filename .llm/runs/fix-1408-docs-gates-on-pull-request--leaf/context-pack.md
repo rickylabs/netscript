@@ -6,13 +6,13 @@
 | --- | --- |
 | Run ID | `fix-1408-docs-gates-on-pull-request--leaf` |
 | Branch | `fix/1408-docs-gates-on-pull-request` |
-| Current phase | gate handoff — slice 3.6 complete |
+| Current phase | implementation correction — slice 3.7 |
 | Archetype | N/A — infrastructure workflow only |
 | Scope overlays | docs |
 
 ## Current State
 
-Implementation and generator-owned evidence are complete. RED is proven by run 31365789097 and GREEN by run 31365881454. Locks equal baseline exactly and the repo-native PR-check verdict has zero current failures. The PR remains draft for supervisor-owned IMPL-EVAL.
+The accepted Tier-A review found one least-privilege issue: PR builds inherited deploy-scoped workflow permissions. Slice 3.7 moves `pages: write` and `id-token: write` to the guarded deploy job while workflow/build retain only `contents: read`. All triggers, guards, concurrency, and docs gates are unchanged. The PR remains draft.
 
 ## Completed
 
@@ -25,11 +25,12 @@ Implementation and generator-owned evidence are complete. RED is proven by run 3
 - Slice 3.5 fixture deletion and local GREEN gates completed.
 - Slice 3.5 pushed and proven GREEN: https://github.com/rickylabs/netscript/actions/runs/31365881454.
 - Slice 3.6 exact lock equality and current PR-check PASS recorded.
+- Slice 3.7 least-privilege workflow correction implemented and locally parsed.
 
 ## Next Steps
 
-1. Commit/push/comment slice 3.6 and update the PR acceptance-evidence block.
-2. Supervisor dispatches separate-session IMPL-EVAL, transitions `status:impl` → `status:impl-eval`, and later marks ready so draft-suppressed required contexts materialize.
+1. Commit and explicitly push slice 3.7; wait for the PR `build` check and comment its result.
+2. Supervisor re-reviews slice 3.7, dispatches separate-session IMPL-EVAL, transitions `status:impl` → `status:impl-eval`, and later marks ready so draft-suppressed required contexts materialize.
 
 ## Key Decisions
 
@@ -41,11 +42,11 @@ Implementation and generator-owned evidence are complete. RED is proven by run 3
 
 ## Files Changed
 
-`ci.yml`, `pages.yml`, and run artifacts. The RED fixture exists only in commit `d0e1925a0` and is deleted at branch head.
+`ci.yml`, `pages.yml`, and run artifacts. Slice 3.7 changes only Pages permission placement plus these two run artifacts. The RED fixture exists only in commit `d0e1925a0` and is deleted at branch head.
 
 ## Gates
 
-RED/GREEN Actions proof, local tasks, lock equality, and current PR checks pass. Draft-suppressed core contexts are pending the supervisor's readiness transition by repository policy.
+RED/GREEN Actions proof, local tasks, lock equality, and pre-3.7 current PR checks pass. YAML parse passes; the post-push PR build is pending. Draft-suppressed core contexts remain pending the supervisor's readiness transition.
 
 ## Open Questions
 
