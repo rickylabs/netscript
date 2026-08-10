@@ -14,9 +14,9 @@ the merge SHA to the **existing** release lane for the next canary. Do not cut a
 | --- | --- |
 | Bootstrap | done — run dir + `supervisor.md` |
 | Research | done — `research.md`, evidence preserved under `evidence/` |
-| Plan & Design | done — `plan.md` (7 LOCKED decisions), Design section in `worklog.md` |
-| Plan-Gate | **SELECTED, pending** — Codex Sol high; hard stop before any source edit |
-| Implement | not started (9 slices, Codex GPT-5.6 Sol, daemon-attached) |
+| Plan & Design | done — `plan.md` **v6** (D1–D9), 13 slices, Design in `worklog.md` |
+| Plan-Gate | **PASS** (cycle 5 of 5; cycles 1–4 `FAIL_PLAN`) — `plan-eval-cycle5.md` |
+| Implement | **in progress — S1–S5 of 13 landed** (Codex GPT-5.6 Sol high, thread `019feca2-d7db-7801-b314-42b5c366964b`) |
 | Gate | not started |
 | Evaluate | not started (IMPL-EVAL: Fable 5 medium) |
 | Release | hand off merge SHA to the active release lane |
@@ -65,3 +65,31 @@ before the expensive E2E.
 - Tier-A slice review before every sign-off commit; no implementation lane self-certifies.
 - Final proof: `deno task e2e:cli run scaffold.runtime --cleanup --format pretty`, visibly
   installing plugin-AI and type-checking the generated AI namespace, then leak-check.
+
+
+## Landed slices
+
+| Slice | Commit | Gate evidence |
+| --- | --- | --- |
+| S1 manifest can express "no service" | `da7245561` | plugin 82/0, cli 719/0, quality clean, arch 0 |
+| S2 host stops synthesizing entrypoints (3 sites) | `cc1e5ddf4` | cli 720/0, plugin 82/0 |
+| S3+S4 AI declares truth; `ai/mod.ts` loads | `fed46cfc5` | cli 722/0, ai 29/0, plugin 82/0 |
+| S5 identity follows the configured module | `e5ac71c28` | cli 726/0 |
+
+`deno.lock` unchanged throughout; `quality:scan` `findings:[]` and `arch:check` exit 0 on every
+slice. **#1443 acceptance box 1 is true** (no gateway/service/AppHost resource by default).
+
+## Remaining
+
+S6 markdown registry closure → S7 `ai/**` type-checks → S8 three doctor checks (subprocess-isolated;
+`ProcessPort.exec` has no cancellation — extend the seam, do **not** `Promise.race`) → S9 assertive
+`consumer-verify.sh` → S10/S11 shared contract + import surfaces across all six plugins → S12 E2E
+gates → S13 `scaffold.runtime` proof → IMPL-EVAL (Fable 5 medium, **its own worktree**) → merge →
+hand merge SHA to the release lane.
+
+## Standing review rule (earned in S1)
+
+If a fixture or existing expectation has to change for an implementation to pass, the
+**implementation** is suspect. S1's atomic rule over-constrained the published protocol and the
+fixture was edited to match; reverting the fixture and rescoping the rule was the fix. Check
+`git diff '*_test.ts' | grep -E '^-\s+(assert|expect)'` on every slice.
