@@ -97,6 +97,9 @@ pages' existing examples as the only prose source rather than duplicating genera
 | 2026-08-10T10:08:32+02:00 | 1.7 | database forward link | Named `@database/zod`, documented both member-relative targets without conflating package exports, and added the fixture-backed User contract derivation. |
 | 2026-08-10T10:08:32+02:00 | 1.7 | back-link matrix | Contracts, route, server, builders, and services now link directly to the generated-schema predecessor anchor. |
 | 2026-08-10T10:08:32+02:00 | 1.7 | reconcile | PR #1441 discussion contains only this implementation agent's slice 1.1–1.6 comments; no external findings require action. |
+| 2026-08-10T10:24:21+02:00 | 1.8 | full gate sweep | Root links/accuracy/derivation, site source/build/links/caveats/diagram parity, scoped fixture check/lint/fmt, scratch snippet checks, and exact lock equality all produced their required verdicts. |
+| 2026-08-10T10:24:21+02:00 | 1.8 | browser matrix | Playwright exercised 390/1024/1600 in light and dark, every tab at each combination, semantic invariants, diagram rendering, and document overflow; ten new rendered cross-links returned 200 and resolved their target anchors. |
+| 2026-08-10T10:24:21+02:00 | 1.8 | responsive finding | Visual review found the wide flowchart's labels over-compressed at 390px. Added an opt-in 720px scroll viewport for that diagram; final mobile checks show 324px viewport / 720px content with page overflow still exactly 0. |
 
 ## Decisions
 
@@ -106,6 +109,7 @@ pages' existing examples as the only prose source rather than duplicating genera
 | Use docs overlay without package archetype | No framework source/export behavior changes are authorized. | `SCOPE-docs.md`; owner hard constraints |
 | Keep PR draft through handoff | Separate IMPL-EVAL and supervisor sequencing are still required. | Owner brief; `netscript-pr` |
 | Runtime-load the real scaffold emitters | Root declaration mode exposes unrelated pre-existing CLI diagnostics; the generated probe executes unchanged sources while scoped checks still type-check both new committed TS files. | First `docs:contract-derivation` run; `drift.md` |
+| Give only the contract-flow diagram an opt-in mobile viewport | At 390px, scaling the full horizontal graph to 324px made node labels too small; an internal scroll area preserves a 720px rendered chart without document overflow or changes to other diagrams. | Playwright visual inspection; `drift.md` |
 
 ## Drift
 
@@ -113,6 +117,7 @@ pages' existing examples as the only prose source rather than duplicating genera
 | --- | --- | --- |
 | None at bootstrap | — | yes |
 | Transitive CLI declaration diagnostics require a runtime emitter probe | minor | yes |
+| Playwright found mobile diagram labels over-compressed | minor | yes |
 
 ## Gate Results
 
@@ -146,6 +151,11 @@ pages' existing examples as the only prose source rather than duplicating genera
 | Root source links | `rtk proxy deno task docs:links` | PASS | 102 docs; 0 broken links, anchors, or enforced orphans. |
 | Rendered links | `deno task check:links` from `docs/site/` | PASS | 32,783 internal links across 220 pages resolve. |
 | Cross-link build | `deno task build` from `docs/site/` | PASS | 617 files; source format and rendered output pass. |
+| Site caveats | `deno task check:caveats` from `docs/site/` | PASS | 18 caveat markers across 14 pages; all references resolve. |
+| Final source links | `rtk proxy deno task docs:links` | PASS | 102 docs; 0 broken links, anchors, or orphans. |
+| Final rendered links | `deno task check:links` from `docs/site/` | PASS | 32,783 links across 220 pages; all resolve. |
+| Final diagram parity | `deno task diagrams:check` from `docs/site/` | PASS | 16 committed SVGs byte-match regenerated output. |
+| Final whitespace | `git diff --check` | PASS | Exit 0. |
 
 ### Fitness Gates
 
@@ -158,7 +168,9 @@ pages' existing examples as the only prose source rather than duplicating genera
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
 | Framework runtime | N/A | owner hard constraint | No behavior change. |
-| Browser | NOT_RUN | planned slice 1.8 | Homepage must be built first. |
+| Browser | PASS | Playwright CLI at 390/1024/1600 in light and dark | All four tabs selected at each combination; Tab 0 returned selected with one visible panel; both required `main h2` values and exactly five destination links remained; no console errors. |
+| Browser links | PASS | Ten source → target checks | Every newly added rendered cross-link existed, returned HTTP 200, and resolved to one matching target anchor. |
+| Browser overflow | PASS | Six matrix checks | Root and body overflow were 0px in every combination; mobile diagram scrolling is contained inside its opt-in viewport. |
 
 ### Consumer Gates
 
@@ -166,7 +178,7 @@ pages' existing examples as the only prose source rather than duplicating genera
 | --- | --- | --- | --- |
 | Generated root alias | PASS | positive compile plus root-alias negative exit 1 | Real root emitter target is load-bearing. |
 | Generated contract module | PASS | positive compile plus contracts-alias/barrel negatives exit 1 | Resolves through generated `contracts/deno.json`, not the root import map. |
-| Homepage diagram | PASS | `diagrams:check`; updated `alt` and caption | Both DB-backed and direct DB-less origins are described. |
+| Homepage diagram | PASS | `diagrams:check`; updated `alt`/caption; Playwright screenshots | Both origins are described; rendered width is 720px in a 324px mobile scroll viewport and 798–881px at desktop widths. |
 | Homepage SDK/Fresh module | PASS | pre-fix exit 1; post-fix and service exits 0 | Compiled through current package entrypoint modules; server-only cache call is explicit. |
 
 ## Snippet Proofs
@@ -177,8 +189,21 @@ pages' existing examples as the only prose source rather than duplicating genera
 | Homepage service handler/bootstrap | `docs/site/index.vto:66` | `deno check --unstable-kv --config .llm/tmp/docs-1332-homepage/deno.json .llm/tmp/docs-1332-homepage/service.ts` | PASS; exit 0. |
 | Homepage page before search coercion | `docs/site/index.vto:71` (same assembled chain without `.withSearchParams`) | `deno check --unstable-kv --config .llm/tmp/docs-1332-homepage/deno.json .llm/tmp/docs-1332-homepage/pre-fix.tsx` | EXPECTED FAIL; exit 1, two TS2345 errors. |
 | Homepage SDK factory + corrected page | `docs/site/index.vto:71` | `deno check --unstable-kv --config .llm/tmp/docs-1332-homepage/deno.json .llm/tmp/docs-1332-homepage/post-fix.tsx` | PASS; exit 0. |
-| Product private-field omission + Warehouse relation composition | `docs/site/explanation/contracts.md:72` | `rtk proxy deno task docs:contract-derivation` | PASS; exact snippet compiles through generated `contracts/deno.json`. |
+| Product private-field omission + Warehouse relation composition | `docs/site/explanation/contracts.md:73` | `rtk proxy deno task docs:contract-derivation` | PASS; exact snippet compiles through generated `contracts/deno.json`. |
 | Database-page User contract derivation | `docs/site/data-persistence/database.md:115` | `rtk proxy deno task docs:contract-derivation` | PASS; exact derivation module compiles through generated `contracts/deno.json`. |
+
+## Acceptance Evidence
+
+| # | Acceptance criterion | Evidence |
+| --- | --- | --- |
+| 1 | Optional DB model → generation → `@database/zod` predecessor in the full flow | `contract-flow.mmd`/SVG and homepage diagram alt/caption; `diagrams:check` 16/16. |
+| 2 | Optional Tab 0 with exact generation/import flow | `index.vto:54-56`; rendered as the first of four accessible tabs and exercised at all six browser combinations. |
+| 3 | Persistence/private fields are deliberately omitted | `explanation/contracts.md:67-107`; fixture compiles picks that exclude `internalCost`, `deletedAt`, and `internalRegionCode`. |
+| 4 | DB-less and DB-backed origins, with generated path normal when available | `explanation/contracts.md:42-63` plus homepage lede/caption. |
+| 5 | Forward/back navigation across database, contracts, route, server, builders, and services | Source and rendered link gates pass; Playwright proves all ten new rendered source/target pairs return 200 and resolve their anchors. |
+| 6 | Homepage no longer claims hand-authored Zod is always first | DB-aware hero, lede, feature, diagram, four-tab framing, and closing explanation in `index.vto`. |
+| 7 | Current exports type-check, including a multi-model relation | `docs:contract-derivation` runs the real barrel and both alias emitters; Product + Warehouse explicit relation composition compiles through generated `contracts/deno.json`. |
+| 8 | Regression fixture prevents import-path drift | `.llm/tools/docs/check-docs-contract-derivation*.ts`; positive root/member compilation plus non-zero root-alias, contracts-alias, and barrel-export negatives; task is in `docs:maintenance`. |
 
 ## Handoff Notes
 

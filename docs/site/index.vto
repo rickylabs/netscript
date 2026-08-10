@@ -43,7 +43,7 @@ the contract cannot drift from it.
 
 ## One definition, carried end to end
 
-{{ comp.diagram({ src: "/assets/diagrams/contract-flow.svg", alt: "An optional DB-backed predecessor flows from a database model through db generate and @database/zod into a narrowed or extended versioned API schema. That schema and its oRPC route type the service handler, generated OpenAPI document, derived SDK client, page loader, and island. DB-less products can start at the versioned API schema.", caption: "DB-backed products normally narrow or extend generated model schemas before defining the public contract; DB-less products start at the versioned API schema. From the contract onward, the handler, OpenAPI document, SDK, and page share its types." }) }}
+{{ comp.diagram({ src: "/assets/diagrams/contract-flow.svg", alt: "An optional DB-backed predecessor flows from a database model through db generate and @database/zod into a narrowed or extended versioned API schema. That schema and its oRPC route type the service handler, generated OpenAPI document, derived SDK client, page loader, and island. DB-less products can start at the versioned API schema.", caption: "DB-backed products normally narrow or extend generated model schemas before defining the public contract; DB-less products start at the versioned API schema. From the contract onward, the handler, OpenAPI document, SDK, and page share its types.", wide: true }) }}
 
 The same operation at four points in a DB-backed stack. Tab 0 is the optional generation and
 narrowing step; DB-less products begin at tab 1. The contract owns the public input and output

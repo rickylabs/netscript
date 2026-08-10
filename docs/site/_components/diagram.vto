@@ -4,9 +4,11 @@
    `_diagrams/`; the render step is a separate dev task, while `deno task build`
    validates that every referenced SVG exists). No client-side Mermaid JS: the
    figure is visible with JavaScript off and the SVG is a diffable asset.
-   Invoke:  {{ comp.diagram({ src: "/assets/diagrams/request-lifecycle.svg", alt: "…", caption: "…" }) }}
+   Invoke:  {{ comp.diagram({ src: "/assets/diagrams/request-lifecycle.svg", alt: "…", caption: "…", wide: true }) }}
    All colors key off the existing fresh-ui --ns-* tokens so it matches the chrome. #}}
 <figure class="ns-diagram">
-  <img class="ns-diagram__img" src="{{ src |> url }}" alt="{{ alt }}" loading="lazy" />
+  <div class="ns-diagram__viewport{{ if wide }} ns-diagram__viewport--wide{{ /if }}">
+    <img class="ns-diagram__img" src="{{ src |> url }}" alt="{{ alt }}" loading="lazy" />
+  </div>
   {{ if caption }}<figcaption class="ns-diagram__caption">{{ caption |> ic }}</figcaption>{{ /if }}
 </figure>

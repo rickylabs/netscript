@@ -28,3 +28,19 @@ documentation.
 - **Action:** accept
 - **Evidence:** Final derivation task passes 4/4; scoped check selects 2 files with 0 diagnostics;
   root and contracts-member compile exits are 0; all three negative commands exit 1.
+
+## 2026-08-10 — Mobile visual review required an opt-in wide-diagram viewport
+
+- **What:** The first 390px Playwright screenshot scaled the expanded horizontal contract-flow SVG
+  into a 324px image, making its node labels too small despite zero measured page overflow.
+- **Source:** Slice 1.8 Playwright matrix and visual inspection of
+  `.llm/tmp/docs-1332-playwright/home-390-dark.png`.
+- **Expected:** The new optional predecessor diagram would remain legible at all required widths
+  using the existing responsive image rule.
+- **Actual:** The final opt-in `wide` diagram mode renders this chart at 720px inside a 324px
+  horizontally scrollable viewport at 390px. Root/body overflow remain exactly 0px; 1024px and
+  1600px retain contained 798px and 881px renderings. Other diagrams do not opt in.
+- **Severity:** minor
+- **Action:** fix
+- **Evidence:** Final six-case Playwright matrix, screenshots, source/rendered site gates, and
+  `diagrams:check` all pass.

@@ -12,10 +12,10 @@
 
 ## Current State
 
-Draft PR #1441 is live with slices 1.1–1.6 pushed. Slice 1.7 now completes the cross-link matrix:
-database documentation names and demonstrates `@database/zod` before linking forward to contracts;
-contracts, route, server, builders, and services link directly back to that generated step. No
-framework behavior changes are in scope.
+Draft PR #1441 is live with slices 1.1–1.7 pushed. Slice 1.8 has a green full gate sweep, exact
+snippet evidence, six responsive/theme browser combinations, and ten rendered cross-link checks.
+Playwright's mobile visual review prompted an opt-in scroll viewport for the wide contract-flow
+diagram; the page retains zero horizontal overflow. No framework behavior changes are in scope.
 
 ## Completed
 
@@ -46,17 +46,26 @@ framework behavior changes are in scope.
 - Added the fixture-backed User derivation to the database page and linked forward to contract depth.
 - Added direct generated-step backlinks from contracts, route, server, builders, and services.
 - Passed both source and rendered link gates with no broken links or anchors.
+- Passed the complete requested root and site gate sweep, including 16/16 diagram parity and exact
+  lock hashes.
+- Re-proved the pre-fix page chain fails with exactly two TS2345 errors while the corrected page and
+  service scratch modules compile with `deno check --unstable-kv`.
+- Exercised all four tabs at 390/1024/1600 in light and dark; preserved homepage headings and five
+  destinations, found no document overflow or console errors, and saved six screenshots under the
+  ignored `.llm/tmp/docs-1332-playwright/` evidence directory.
+- Proved all ten newly added cross-link pairs exist in rendered pages, return HTTP 200, and land on
+  their expected anchors.
 
 ## In Progress
 
-- Slice 1.7 commit, explicit-refspec push, PR body slice update, and per-slice evidence comment.
+- Slice 1.8 evidence commit, explicit-refspec push, PR body completion, and per-slice evidence comment.
 
 ## Next Steps
 
-1. Commit slice 1.7 with the cross-link matrix and current run artifacts.
-2. Push `HEAD:docs/1332-generated-schema-contract-predecessor` and comment exact gate output.
-3. Update the draft PR slice list with the commit SHA.
-4. Begin slice 1.8: full gate sweep, Playwright matrix, acceptance evidence, and final handoff.
+1. Commit slice 1.8 with responsive diagram polish and final run evidence.
+2. Push `HEAD:docs/1332-generated-schema-contract-predecessor` and post the final evidence comment.
+3. Update the draft PR slice/DoD checkboxes without changing draft or `status:impl`.
+4. Hand the still-draft PR to the supervisor for separate IMPL-EVAL and leaf-L3 sequencing.
 
 ## Key Decisions
 
@@ -66,6 +75,7 @@ framework behavior changes are in scope.
 | Real optional Tab 0 | D1 | Preserve progressive disclosure. |
 | Explicit relation composition | D5 | Do not imply relation-aware generated schemas. |
 | Search coercion before loader | D7 | Required pre-fix FAIL/post-fix PASS evidence. |
+| Opt-in mobile viewport for this wide diagram | Playwright visual finding | Keeps labels readable while root/body overflow remain 0px. |
 | Draft remains draft | owner hard constraint | Supervisor owns IMPL-EVAL and merge sequencing. |
 
 ## Files Changed
@@ -80,6 +90,8 @@ framework behavior changes are in scope.
 | `docs/site/assets/diagrams/contract-flow.svg` | changed | Regenerated committed diagram. |
 | `.llm/tools/docs/check-docs-contract-derivation.ts` | changed | Adds compile proof for homepage User derivation/contract modules. |
 | `docs/site/index.vto` | changed | Diagram text, optional Tab 0, SDK construction, search coercion, and DB-aware wording. |
+| `docs/site/_components/diagram.vto` | changed | Optional wide viewport hook used only where requested. |
+| `docs/site/styles/docs.css` | changed | Mobile-only contained scrolling for opt-in wide diagrams. |
 | `docs/site/explanation/contracts.md` | changed | Dual origins, generated-step back-link, private-field omission, and explicit Product/Warehouse composition. |
 | `docs/site/data-persistence/database.md` | changed | `@database/zod` contract derivation and forward link. |
 | `docs/site/web-layer/{route,server,builders}.md` | changed | Direct generated-schema predecessor back-links. |
@@ -89,9 +101,9 @@ framework behavior changes are in scope.
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | PASS | derivation task; homepage pre/post/service checks; scoped check/lint/fmt; diagram parity; site build; docs accuracy; source/rendered links; lock equality |
+| Static | PASS | derivation task; homepage pre/post/service checks; scoped check/lint/fmt; diagram parity; site build; docs accuracy; source/rendered links; caveats; lock equality |
 | Fitness | N/A for package gates | docs-only scope |
-| Runtime | NOT_RUN | browser validation belongs to slice 1.8 |
+| Runtime | PASS | Six Playwright viewport/theme combinations, all tabs, semantics, screenshots, overflow, and ten cross-link/anchor checks |
 | Consumer | PASS for generated contract, depth example, and homepage code paths | Product/Warehouse contract member, service, and corrected page compile; required pre-fix exits 1 |
 
 ## Open Questions
@@ -103,6 +115,8 @@ framework behavior changes are in scope.
 - Drift: minor tooling adjustment — unchanged CLI emitters execute in a runtime probe because root
   declaration mode reports 22 unrelated pre-existing CLI diagnostics; both new TS files still pass
   the scoped check wrapper.
+- Drift: mobile visual inspection found the widened graph's labels too compressed at 390px; an
+  opt-in internal scroll viewport preserves legibility without document overflow.
 - Debt: none created or closed.
 
 ## Commits
@@ -113,4 +127,5 @@ framework behavior changes are in scope.
 - `70702c1ac9e7a494d132e11a4ed512c61c0de6a8` — slice 1.4 homepage type-flow proof.
 - `c502e8d60467e2f87091ff9ca89a95067023ece5` — slice 1.5 dual-origin framing proof.
 - `96b4593c76761f8838f49a21bfc0b39d7a8f590c` — slice 1.6 omission/relation proof.
+- `89cf0786354eaa070e76cf43028ff3b8bb36d271` — slice 1.7 cross-link proof.
 - See draft PR #1441 for the live commit list and per-slice comments.
