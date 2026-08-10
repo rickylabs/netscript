@@ -1,71 +1,52 @@
-# Context Pack: Hybrid semantic documentation retrieval RFC
+# Context Pack: Hybrid semantic documentation retrieval RFC — cycle 2
 
-## Run metadata
+## State
 
-| Field               | Value                                                                                                |
-| ------------------- | ---------------------------------------------------------------------------------------------------- |
-| Run / branch        | `docs-rfc-mcp-hybrid-retrieval--hybrid-semantic-doc-retrieval-rfc` / `docs/rfc-mcp-hybrid-retrieval` |
-| Lifecycle           | author handoff; separate PLAN-EVAL pending                                                           |
-| Archetype / overlay | Archetype 2 Integration / docs                                                                       |
-| Author thread       | `019fe54e-78aa-75c2-bb5e-9a2a6cebd1b0`, Codex GPT-5.6 Sol xhigh owner override                       |
-
-## Review surface
-
-- RFC: `rfcs/0000-deterministic-first-hybrid-mcp-doc-retrieval.md`
-- Tracking: https://github.com/rickylabs/netscript/issues/1410 (`Backlog / Triage`)
 - Draft PR: https://github.com/rickylabs/netscript/pull/1409
-- Baseline: `origin/main@399f60185d5d01ae68764a8f48d1f716ca3a51aa`
-- Incoming foundation: PR #1404 / issue #1102, inspected at `fd926790…` in read-only `ns005-w3b1`
+- Tracking issue: https://github.com/rickylabs/netscript/issues/1410
+- RFC: `rfcs/0000-deterministic-first-hybrid-mcp-doc-retrieval.md`
+- Run: `.llm/runs/docs-rfc-mcp-hybrid-retrieval--hybrid-semantic-doc-retrieval-rfc/`
+- Author thread: `019fe54e-78aa-75c2-bb5e-9a2a6cebd1b0`
+- Cycle-1 evaluator provenance: `plan-eval.md` at `37c6cff3e78a64e55cd69677bda1716d8aa1f811`
+- Current factual baseline: `origin/main@da40fbfe377a9e728f190056771298100297a8f8`, merged #1404
+  `51a58b4f5`
 
-## Architecture in one page
+## Cycle-2 architecture
 
-The PR #1404 deterministic lexical/concept/graph ranker stays always available and protects exact
-symbols, routes, headings, and rare terms. A package-owned `SemanticDocumentIndexPort` has a
-single-process read-only `@tursodatabase/database` adapter and bounded in-memory test adapter. A
-query embedding port adapts the existing AI seam without treating docs as conversation memory.
+The current scalar ranker is not mislabeled as signal lists. A required decomposition refactor
+derives baseline, lexical, curated-concept, link-graph, and protected producers and must pass a
+frozen five-case #1404 full-serialization golden plus current eight-case smoke before hybrid work.
+Locale-stable NFKC/default lowercase and binary identity ordering replace locale-dependent calls.
 
-Release generation chunks heading sections, embeds passages with pinned multilingual E5 small,
-stores vector8 candidates after a vector32 accuracy comparison, and emits an immutable database plus
-identity manifest. The database is a verified GitHub Release asset, not a JSR payload. Local query
-inference uses pinned Transformers.js/ONNX; WASM is baseline, WebGPU optional. An English MiniLM
-cross-encoder is top-12/off/experimental.
+The package remains under accepted Archetype-6 horizontal-shape debt. A narrow A2-law semantic core
+is folded inward; A6 retains MCP/CLI/resources/permissions/composition. Existing public
+`GuidanceConfidence` and `fallback` remain. Explicit schema v2 uses non-colliding hybrid names.
 
-Hybrid mode uses protected exact tier + weighted RRF (`k=60`, lexical 1.00, concept .90, graph .35,
-vector .80), bounded top-40 inputs/top-8 output, and stable ties. Any semantic failure returns the
-original deterministic order. MCP retains `find_guidance`, adds resource links/list/read/templates,
-and adds neither prompts nor subscriptions. Official SDK modernization is a separate compatibility
-slice.
+Provider-scoped determinism is WASM-only with fixed signal order, round12 RRF, and complete ties.
+WebGPU is shadow-only. Normative storage is vector32; vector8 is engine-pinned experimental. Turso
+0.7.2 native support is Linux glibc x64/arm64, macOS arm64, Windows x64; macOS x64 and musl/Alpine
+deterministically fall back.
 
-## Evidence and gates
+Canary generates/uploads the database once. Stable promotes that exact artifact before JSR. The JSR
+manifest SHA is the trust root. Host/redirect allowlists and new generator/evaluator/benchmark/
+promotion tools are fixed. Current eight-case fixture remains smoke; a new graded JSONL corpus owns
+nDCG/Recall/language/unsupported/ambiguity/poisoning gates. One bounded resource catalog coordinates
+prose with #1201 export discovery. MCP SDK and oRPC v2 migrations are explicitly independent.
 
-`research.md` records repo/upstream/model/Turso/JSR findings. The RFC specifies a 120+-intent
-held-out corpus, exact Recall@1 and byte-parity gates, nDCG/abstention/multilingual thresholds,
-platform and fallback tests, download/artifact/latency/RSS limits, privacy/injection/poisoning
-controls, and a reversible rollout. No product benchmark was run in this docs lane.
+## Cycle-2 review map
 
-## Review priorities for Fable
+`plan.md` maps every F-C1–F-C8 finding to exact RFC sections. `research.md` holds re-baseline and
+native Deno evidence. `worklog.md` holds raw author gate outcomes. `plan-eval.md` must remain
+cycle-1 evaluator-authored provenance.
 
-1. Are ports/domain/presentation/composition boundaries doctrine-correct and sufficiently exact?
-2. Are the Turso stable/experimental claims and read-only artifact design defensible for pre-1.0?
-3. Are model pins, runtime, licensing, prefixes, hashes, size/CSP and fallback complete?
-4. Can artifact publication/cache recovery be reproduced safely across release and package versions?
-5. Does protected weighted RRF preserve exact truth while improving mismatch recall?
-6. Are MCP resource/tool distinctions and protocol compatibility correct?
-7. Are gates hard enough to prevent unsupported/multilingual/security regressions?
+## Remaining boundary
 
-## Known unresolved decisions
+No implementation, evaluator launch, ready transition, merge, or release. After the single author
+amendment commit/push/comment, the root supervisor launches a fresh separate Fable cycle 2. Safe
+defaults keep deterministic current behavior until ratification and measured graduation.
 
-Named in the RFC: SDK slice order, artifact promotion mechanism, encoder adapter physical package,
-cache host/root conventions, language corpus ownership, vector8/weight graduation, and resource-list
-granularity. Safe default for all is no default ranking change.
+## Transport caveat
 
-## Process caveat
-
-Daemon capability flag exists, but launch metadata reported remote control disabled. Mobile proof is
-pending owner confirmation; no repair/restart or competing writer was created. The author must stop
-at `status:plan-eval`; only a fresh native Fable 5 medium evaluator may write a verdict.
-
-## Changed files
-
-Only the RFC and the six files in this run directory. `deno.lock` and all product/source files must
-remain unchanged; use the final PR diff as authority.
+Same existing thread only. Earlier launch metadata reported remote control disabled despite the
+daemon capability flag; no repair/restart or rival thread is authorized. Return control to the root
+supervisor after handoff.

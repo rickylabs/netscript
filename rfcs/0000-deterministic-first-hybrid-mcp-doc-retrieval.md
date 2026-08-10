@@ -12,187 +12,275 @@ target-milestone: Backlog / Triage
 
 ## Summary
 
-NetScript MCP will retain its deterministic lexical, curated-concept, and link-graph documentation
-ranker as the always-available authority for exact symbols and rare terms, and optionally augment it
-with release-built section embeddings. A package-owned semantic retrieval port will have a native,
-read-only `@tursodatabase/database` adapter and a bounded in-memory adapter. Query-time embeddings
-will run locally when a pinned model is available; otherwise the result is byte-for-byte compatible
-with deterministic retrieval. Rank lists will be fused with deterministic weighted reciprocal-rank
-fusion (RRF), exact matches will remain protected, and every result will expose citations, hashes,
-matched signals, score provenance, and calibrated confidence bands rather than probability-like
-claims. No chat or generative model enters the retrieval path.
+NetScript MCP will preserve the merged deterministic guidance ranker as its always-available result
+and exact-term authority, then optionally add a release-built semantic recall channel. Before hybrid
+ranking exists, the current scalar ranker will be split into explicit candidate producers behind a
+frozen byte-parity gate. A package-owned semantic index port will have a native read-only
+`@tursodatabase/database` adapter and a bounded in-memory adapter. The normative v1 database stores
+float32 vectors; Turso `vector8()` remains experimental until its engine-owned quantization is
+independently characterized.
+
+Successful hybrid v2 responses fuse deterministic and vector rank lists with protected weighted
+reciprocal-rank fusion (RRF), stable fixed-order arithmetic, citations, hashes, matched signals,
+score provenance, and calibrated confidence bands. Legacy v1 output remains exactly the existing
+`GuidanceResult`. Missing assets, unsupported native platforms, or any semantic failure take the
+unchanged deterministic path. The default execution provider is WASM; WebGPU is shadow-only and is
+outside the normative determinism claim. No chat or generative model enters the critical path.
 
 ## Motivation
 
-The intent-aware deterministic ranker in
-[PR #1404](https://github.com/rickylabs/netscript/pull/1404) is the correct foundation: it is
-inspectable, fast, offline, and strong for identifiers, rare terms, curated concepts, and linked
-guidance. It cannot, by construction, fully bridge paraphrases or cross-language vocabulary when
-query and documentation share few tokens. Semantic retrieval helps those cases, but replacing
-deterministic search with opaque vector similarity would regress the queries developers most need to
-trust and would turn an optional model/runtime into an availability dependency.
+The ranker merged by [PR #1404](https://github.com/rickylabs/netscript/pull/1404) is inspectable,
+fast, offline, and strong for identifiers, curated concepts, and linked guidance. It deliberately
+does not solve vocabulary mismatch, paraphrases, or cross-language queries. Semantic retrieval can
+improve those cases, but replacing the deterministic result with opaque vector similarity would
+weaken exact-symbol behavior and turn a model/runtime into an availability dependency.
 
-This RFC therefore treats semantics as a bounded recall channel, not as a new source of truth. The
-design must work in local and embedded MCP deployments, stay useful with no network or model cache,
-fit NetScript's publish and architecture constraints, and be measurable against unsupported or
-ambiguous requests such as “add a capability NetScript does not ship.” Without a ratified boundary,
-database, model, MCP presentation, and AI-memory concerns are likely to become coupled in ways that
-are hard to remove.
+This RFC treats semantics as a bounded recall channel rather than a new source of truth. It also
+locks seams that otherwise invite accidental coupling: immutable release artifacts versus JSR,
+documentation retrieval versus conversational memory, MCP JSON-RPC versus oRPC, and protocol
+presentation versus database/model adapters.
 
 ## Guide-level explanation
 
-### User experience
+### Compatibility modes
 
-`find_guidance` remains the primary model-controlled discovery tool. Existing callers continue to
-send an intent and receive bounded guidance. When a verified semantic artifact and local encoder are
-available, the server adds semantic candidates before returning the same kind of citations. Exact
-symbols remain first even when a looser semantic match has a high cosine score.
+Existing callers send the same request and receive the existing `GuidanceResult` JSON. They do not
+receive semantic metadata, even when the server internally falls back:
+
+```json
+{ "intent": "validated route-bound form" }
+```
+
+Callers that explicitly negotiate `responseSchemaVersion: 2` can receive a hybrid envelope:
 
 ```json
 {
   "intent": "Wie füge ich Hintergrundarbeit mit Wiederholungen hinzu?",
-  "limit": 5
+  "responseSchemaVersion": 2
 }
 ```
-
-The additive result shape explains the answer without presenting any score as authoritative:
 
 ```json
 {
-  "mode": "hybrid",
-  "policyVersion": "hybrid-rerieval/v1",
-  "confidence": { "band": "medium", "calibrationVersion": "intent-corpus/v1" },
-  "results": [{
-    "title": "Workers",
-    "uri": "netscript-docs://packages/workers/readme#retries",
-    "sourceSha256": "…",
-    "matchedSignals": ["vector", "curated-concept", "link-graph"],
-    "score": {
-      "fusion": { "method": "weighted-rrf", "value": 0.0341, "k": 60 },
-      "ranks": { "concept": 1, "graph": 3, "vector": 2 }
-    }
-  }],
-  "fallback": null
+  "schemaVersion": 2,
+  "guidance": {
+    "intent": "Wie füge ich Hintergrundarbeit mit Wiederholungen hinzu?",
+    "confidence": "medium",
+    "recommendations": [],
+    "related": [],
+    "truncated": false
+  },
+  "hybrid": {
+    "mode": "hybrid",
+    "policyVersion": "hybrid-retrieval/v1",
+    "confidence": { "band": "medium", "calibrationVersion": "intent-corpus/v1" },
+    "results": [{
+      "uri": "netscript-docs://prose/packages/workers/readme#retries",
+      "sourceSha256": "…",
+      "matchedSignals": ["vector", "curated-concept", "link-graph"],
+      "score": {
+        "method": "weighted-rrf",
+        "fusionScore": 0.0341,
+        "rrfK": 60,
+        "ranks": { "curated-concept": 1, "link-graph": 3, "vector": 2 }
+      }
+    }]
+  }
 }
 ```
 
-Raw lexical scores and cosine similarity may be present as diagnostics, but are labelled by signal
-and are never converted to a percentage. Confidence is a coarse, versioned band calibrated on the
-checked intent corpus; it describes observed ranking behavior, not truth.
+The nested `guidance` object retains every legacy field and meaning. Raw lexical scores, cosine
+similarity, and reranker logits are diagnostics, never probabilities. Hybrid confidence is a
+versioned band calibrated on held-out judgments; it is not truth.
 
 ### Operating modes
 
-The CLI composition root maps explicit configuration to the core factory:
+| Mode                     | Network behavior                           | Returned ranking                                       |
+| ------------------------ | ------------------------------------------ | ------------------------------------------------------ |
+| `off`                    | none                                       | current deterministic result only                      |
+| `auto` (initial default) | none                                       | verified cache if present; otherwise deterministic     |
+| `download`               | fixed allowlisted artifact/model URLs only | hybrid after full verification                         |
+| `shadow`                 | configured asset policy                    | deterministic result; hybrid evidence recorded locally |
 
-| Mode                     | Network behavior                              | Ranking behavior                                      |
-| ------------------------ | --------------------------------------------- | ----------------------------------------------------- |
-| `off`                    | none                                          | deterministic only; kill switch                       |
-| `auto` (initial default) | none                                          | use verified cached assets, otherwise deterministic   |
-| `download`               | allowlisted artifact/model fetch when missing | hybrid after integrity verification                   |
-| `shadow`                 | same asset policy as configured               | compute hybrid metrics, return deterministic ordering |
-
-An absent runtime, unsupported platform, denied permission, timeout, dimension mismatch, corrupt
-cache, or unsupported database feature causes a bounded fallback reason and the original
-deterministic result. Cancellation remains cancellation and is not hidden as fallback.
+An absent model/runtime, denied permission, corrupt cache, timeout, dimension mismatch, or database
+error never prevents guidance. `AbortError` remains cancellation and is not converted to fallback.
 
 ### MCP surfaces
 
-The existing tool is retained because tools are model-controlled in the
-[MCP server model](https://modelcontextprotocol.io/specification/2026-07-28/server). Each returned
-document also has a stable `netscript-docs:` resource URI and a resource link. Applications can
-list/read those resources and render citations without invoking another tool. NetScript will not add
-a prompt: prompts are user-controlled templates, not a retrieval transport. The release corpus is
-immutable for a server process, so resource subscriptions and list-changed notifications are also
-intentionally absent.
+`find_guidance` remains the model-controlled ranking tool. Successful hybrid v2 results may include
+MCP resource links. The application-controlled resource surface lists bounded document roots and
+reads exact allowlisted sections. It adds neither prompts nor subscriptions because retrieval is not
+a user-authored prompt and a release corpus is immutable during a process.
 
 ## Reference-level explanation
 
-### Baseline and scope
+### Ratification baseline
 
-This RFC is designed on top of PR #1404 rather than the older `origin/main` behavior. That change
-adds the 22nd read tool, `find_guidance`, and a shared guidance index used by filesystem and
-embedded corpora. Its ranking policy combines a BM25-like lexical signal, exact phrase and heading
-boosts, curated concepts, and one-hop internal-link boosts with stable slug/section tie-breaks. Its
-release asset is generated and byte-checked in the existing publish workflow. Those behaviors remain
-the normative deterministic baseline.
+The author re-baselined this cycle on `origin/main@da40fbfe377a9e728f190056771298100297a8f8`. PR
+#1404 is merged there as `51a58b4f52f53f9171666a22ffc839c152cae157`; PR #1416 subsequently extended
+its activation/evaluation behavior as `08e4c761d`. Current MCP exposes 22 tools: 18 read, two
+metadata, and two mutating tools. `find_guidance` is one of those 18 read tools.
 
-The RFC changes no product code. A future implementation may refactor that index to expose
-individual ranked candidate lists, but must keep its public deterministic result and serialization
-unchanged when semantic retrieval is unavailable or disabled.
+At the #1404 merge, the full generated corpus snapshot contained 174 documents and 3,777 heading
+sections. That count is historical evidence, not a permanent constant. Current main's bounded
+embedded release corpus contains 12 documents and 253,535 source bytes. The semantic generator must
+recompute and manifest current document/section cardinality at every release; ratification does not
+hard-code 3,777 as current forever.
 
-### Architecture and dependency direction
+The current guidance fixture began with five cases at #1404 and contains eight cases on current main
+after #1416. Both roles are specified under Evaluation below.
 
-`@netscript/mcp` remains an Archetype 2 integration package. The docs overlay applies because this
-document changes public contracts and package boundaries; the Archetype 2 overlay applies because
-the future implementation has a package-owned external database/model integration. The dependency
-direction is the doctrine's domain → ports → application flow, with adapters depending inward on
-ports and a pure factory composition root:
+### Existing scalar ranker and required deterministic seam
+
+The merged `GuidanceIndex` does **not** currently produce independent rank lists. It:
+
+1. normalizes the intent and activates curated concepts;
+2. accumulates BM25-like term score, title/heading/identity boosts, exact-phrase bonus, and concept
+   bonuses into one mutable scalar per section;
+3. mutates those scalar scores with one-hop link boosts; and
+4. sorts by route-hint index, merged scalar score, then section identity.
+
+Hybrid work therefore begins with an explicitly named **deterministic signal-decomposition
+refactor**, not a passive exposure of existing lists. It produces all of the following from one
+canonical parse while retaining the original merged result:
+
+| Producer                 | Exact source in the merged ranker                                                                            | Ordered output                                                        |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------- |
+| `deterministic-baseline` | original post-link scalar list and route-hint primary sort                                                   | exact `GuidanceIndex.find()` order                                    |
+| `lexical`                | BM25 term frequency plus title/heading/identity token contributions, excluding phrase/concept/link additions | score desc, binary section identity                                   |
+| `curated-concept`        | activated aliases, required-any support, per-term concept bonuses, then declared `routeHints` order          | route index, contribution desc, binary identity                       |
+| `link-graph`             | targets that actually receive the existing one-hop boost from positive source candidates                     | best source baseline rank, target baseline rank, binary identity      |
+| protected tier           | route-hint hits; normalized full exact-phrase hits; exact activated concept-alias + required-any hits        | reason priority, declared route order, baseline rank, binary identity |
+
+An exact symbol or rare term is protected only when it is an exact normalized identity/token match
+in the lexical producer; semantic similarity alone never creates protection. The producer records
+the protection reason (`route-hint`, `exact-phrase`, `exact-concept`, `exact-identity`) for tests
+and provenance.
+
+Before any hybrid ordering is enabled, tooling checks in a frozen #1404 golden fixture containing
+the five original intents, corpus SHA, source commit, complete serialized `GuidanceResult` values,
+and recommendation/related ordering. The decomposed implementation must reproduce those bytes from
+the #1404 corpus. It must also reproduce the current eight-case smoke fixture on the ratification
+baseline. The old scalar path remains callable until both gates pass; no vector work can waive or
+update the golden to match new output.
+
+Locale-dependent behavior is removed during this refactor: normalization is
+`value.normalize('NFKC').toLowerCase()` and stable identity comparison is Unicode
+code-point/code-unit ordering implemented without `toLocaleLowerCase()` or `localeCompare()`. The
+golden records any intentional normalization delta separately; legacy serialization parity otherwise
+remains binding.
+
+### Architecture, archetype, and extension axes
+
+The package is not reclassified wholesale as Archetype 2. The open debt entry `MCP-A6-V2-SHAPE`
+records `@netscript/mcp` as a brief-locked horizontal **Archetype 6 CLI/tooling and protocol-engine
+skeleton**, with a gate to migrate to the A6 v2 kernel/vertical shape or obtain a formal
+protocol-engine subtype ruling. This RFC neither retires that debt nor silently declares its current
+folders normative.
+
+The semantic retrieval **integration core** folds Archetype 2 port/adapter laws into the larger A6
+package, as doctrine requires when two archetypes apply. The A6 presentation/composition surface
+owns stdio, MCP schemas, CLI flags, resource catalogs, permissions, and lifecycle. The folded A2
+core owns retrieval domain policy, ports, use-case orchestration, and technology-specific adapters.
 
 ```text
-MCP presentation / CLI edge
-          │ maps schema + configuration
-          ▼
-application: FindDocumentationGuidance
-     │          │               │
-     ▼          ▼               ▼
-deterministic  SemanticIndexPort  QueryEmbeddingPort
-domain policy       ▲                  ▲
-     │               │                  │
-     └──── fusion / confidence ─────────┘
-                     ▲                  ▲
-       new-Turso or in-memory     local AI-seam adapter
+Archetype 6 edge (existing accepted horizontal debt)
+  MCP tool/resource schemas ─ CLI flags/env ─ stdio ─ resource catalog ─ composition
+                                      │ injected options only
+                                      ▼
+Folded Archetype 2 semantic core
+  deterministic decomposition ─ fusion ─ confidence
+             │              │                 │
+             ▼              ▼                 ▼
+    SemanticIndexPort  QueryEmbeddingPort  CandidateRerankerPort
+             ▲              ▲                 ▲
+       Turso / memory   local AI adapter   optional local adapter
 ```
 
-The semantic index contract belongs to `@netscript/mcp`, because its records, citations, corpus
-identity, and fallback semantics are documentation-retrieval concepts. `@netscript/database` is a
-Prisma application-database abstraction and is not reused. `@netscript/ai`'s narrow embedding
-provider may be adapted at the edge, but its thread/transcript memory ports and generic retriever do
-not own MCP citation or corpus contracts. This avoids disguising document retrieval as “memory.”
+Named extension axes are: semantic-index adapter, query-embedding provider, optional reranker, and
+MCP resource contributor. They are constructor/factory injected and typed; there is no global
+registry, environment read, module-load client, or generic DI container. The resource contributor
+axis exists because prose and export-surface resources have separate owners. If implementation
+occurs before A6 v2 debt retirement, it uses the existing horizontal layers and records the same
+accepted deviation; it does not invent half of the v2 kernel spine. If it occurs after retirement,
+these axes must appear in the A6 extension manifest and pass the then-current A6 gates.
 
-Proposed future placement (names are normative; physical directories may follow the package's
-existing horizontal skeleton until its recorded shape debt is retired):
-
-```text
-packages/mcp/src/
-  domain/document-retrieval.ts
-  ports/semantic-document-index.ts
-  ports/query-embedding.ts
-  application/find-documentation-guidance.ts
-  adapters/turso-semantic-document-index.ts
-  adapters/in-memory-semantic-document-index.ts
-  adapters/ai-query-embedding.ts
-  presentation/mcp/document-resources.ts
-  composition/create-document-retrieval.ts
-```
+The MCP-owned semantic port is warranted by two adapters (Turso and bounded memory) and by
+documentation-specific corpus/provenance semantics. `@netscript/database` remains Prisma application
+storage. `@netscript/ai`'s embedding provider may be adapted at the edge, while its
+thread/transcript memory and generic retriever remain outside this domain.
 
 ### Public contracts
 
-All asynchronous I/O accepts `AbortSignal`; ports do not read environment variables, perform
-downloads, or choose global defaults.
+All asynchronous I/O accepts `AbortSignal`. Ports do not download, read environment variables, or
+select process-global defaults.
 
 ```ts
-export type RetrievalSignal = 'lexical' | 'curated-concept' | 'link-graph' | 'vector' | 'reranker';
+export type RetrievalSignal =
+  | 'deterministic-baseline'
+  | 'lexical'
+  | 'curated-concept'
+  | 'link-graph'
+  | 'vector'
+  | 'reranker';
+
+export type ProtectedMatchReason =
+  | 'route-hint'
+  | 'exact-phrase'
+  | 'exact-concept'
+  | 'exact-identity';
+
+export interface EmbeddingModelIdentity {
+  readonly id: string;
+  readonly revision: string;
+  readonly dimensions: number;
+  readonly normalization: 'l2';
+  readonly queryPrefix: string;
+  readonly passagePrefix: string;
+  readonly executionProvider: 'wasm';
+}
 
 export interface CorpusIdentity {
   readonly docsContentSha256: string;
   readonly corpusSchemaVersion: string;
   readonly chunkerSchemaVersion: string;
+  readonly model: EmbeddingModelIdentity;
+  readonly vectorStorage: 'vector32' | 'vector8-experimental';
+  readonly quantizer: 'none' | `turso-vector8@${string}`;
+  readonly databaseEngineVersion: string;
+  readonly documentCount: number;
+  readonly sectionCount: number;
 }
 
 export interface DocumentSectionRef {
   readonly sectionId: string;
-  readonly uri: `netscript-docs://${string}`;
+  readonly uri: `netscript-docs://prose/${string}`;
   readonly slug: string;
   readonly heading: string;
   readonly sectionOrdinal: number;
   readonly sourceSha256: string;
 }
 
+export interface RankedSectionCandidate {
+  readonly section: DocumentSectionRef;
+  readonly rank: number;
+  readonly signal: RetrievalSignal;
+  readonly rawScore?: number;
+  readonly protectedBy?: readonly ProtectedMatchReason[];
+}
+
+export interface DeterministicCandidateLists {
+  readonly baseline: readonly RankedSectionCandidate[];
+  readonly lexical: readonly RankedSectionCandidate[];
+  readonly curatedConcept: readonly RankedSectionCandidate[];
+  readonly linkGraph: readonly RankedSectionCandidate[];
+  readonly protectedSectionIds: ReadonlyMap<string, readonly ProtectedMatchReason[]>;
+}
+
 export interface SemanticCandidate {
   readonly section: DocumentSectionRef;
-  readonly vectorRank: number;
-  /** Cosine similarity for diagnostics, not probability or final relevance. */
-  readonly cosineSimilarity: number;
+  readonly rank: number;
+  readonly cosineSimilarity: number; // diagnostic, never probability
 }
 
 export interface SemanticDocumentIndexPort {
@@ -205,25 +293,24 @@ export interface SemanticDocumentIndexPort {
 }
 
 export interface QueryEmbeddingPort {
-  readonly model: {
-    readonly id: string;
-    readonly revision: string;
-    readonly dimensions: 384;
-    readonly normalization: 'l2';
-    readonly queryPrefix: 'query: ';
-  };
+  readonly model: EmbeddingModelIdentity;
   embedQuery(text: string, options?: { readonly signal?: AbortSignal }): Promise<Float32Array>;
 }
 
-export interface DeterministicCandidateLists {
-  readonly lexical: readonly RankedSection[];
-  readonly concepts: readonly RankedSection[];
-  readonly graph: readonly RankedSection[];
-  readonly protectedExact: ReadonlySet<string>;
+export interface RerankCandidate {
+  readonly section: DocumentSectionRef;
+  readonly query: string;
+  readonly passage: string;
+}
+
+export interface CandidateRerankerPort {
+  rerank(
+    candidates: readonly RerankCandidate[],
+    options?: { readonly signal?: AbortSignal },
+  ): Promise<readonly { readonly sectionId: string; readonly score: number }[]>;
 }
 
 export type SemanticFallbackReason =
-  | 'disabled'
   | 'artifact-missing'
   | 'artifact-corrupt'
   | 'unsupported-platform'
@@ -234,47 +321,100 @@ export type SemanticFallbackReason =
   | 'timeout'
   | 'database-unavailable';
 
+export interface HybridRetrievalPolicy {
+  readonly version: string;
+  readonly candidateLimitPerSignal: number;
+  readonly resultLimit: number;
+  readonly rerankerLimit: number;
+  readonly rrfK: number;
+  readonly weights: Readonly<Record<Exclude<RetrievalSignal, 'reranker'>, number>>;
+  readonly fusionDecimalPlaces: number;
+}
+
 export interface GuidanceScoreProvenance {
-  readonly method: 'deterministic' | 'weighted-rrf' | 'reranked-rrf';
-  readonly fusionScore?: number;
-  readonly rrfK?: 60;
+  readonly method: 'weighted-rrf' | 'reranked-rrf';
+  readonly fusionScore: number;
+  readonly rrfK: number;
   readonly ranks: Partial<Record<RetrievalSignal, number>>;
   readonly raw: Partial<Record<'lexical' | 'cosine' | 'reranker', number>>;
 }
 
-export interface GuidanceConfidence {
+export interface HybridGuidanceConfidence {
   readonly band: 'high' | 'medium' | 'low' | 'insufficient';
   readonly calibrationVersion: string;
   readonly basis: readonly string[];
 }
 
-export interface HybridGuidanceResult {
-  readonly mode: 'deterministic' | 'hybrid' | 'shadow';
+export interface HybridGuidanceMetadata {
+  readonly mode: 'hybrid' | 'shadow';
   readonly policyVersion: string;
   readonly corpus: CorpusIdentity;
-  readonly results: readonly (GuidanceSection & {
+  readonly confidence: HybridGuidanceConfidence;
+  readonly results: readonly {
+    readonly section: DocumentSectionRef;
     readonly matchedSignals: readonly RetrievalSignal[];
     readonly score: GuidanceScoreProvenance;
-  })[];
-  readonly confidence: GuidanceConfidence;
-  readonly fallback: null | { readonly reason: SemanticFallbackReason };
+  }[];
 }
-```
 
-The bounded testing adapter is exported from a testing-only subpath and rejects more than 1,024
-sections or dimensions other than 384. The native Turso adapter is an optional adapter subpath. The
-core export must not make a native database or model runtime mandatory for deterministic consumers.
+export interface HybridGuidanceEnvelope {
+  readonly schemaVersion: 2;
+  readonly guidance: GuidanceResult; // existing public type, unchanged
+  readonly hybrid: HybridGuidanceMetadata | null;
+  readonly semanticFallback?: { readonly reason: SemanticFallbackReason };
+}
 
-The composition root is explicit and side-effect free:
+export interface RetrievalTelemetryPort {
+  record(event: RetrievalTelemetryEvent): void;
+}
 
-```ts
+export interface RetrievalTelemetryEvent {
+  readonly mode: 'off' | 'deterministic' | 'hybrid' | 'shadow';
+  readonly policyVersion: string;
+  readonly fallbackReason?: SemanticFallbackReason;
+  readonly latencyBucket: string;
+  readonly candidateCountBucket: string;
+  readonly provider: 'none' | 'wasm' | 'webgpu-shadow';
+}
+
+export interface DocumentResourceRoot {
+  readonly uri: `netscript-docs://${'prose' | 'exports'}/${string}`;
+  readonly name: string;
+  readonly mimeType: string;
+}
+
+export interface DocumentResource extends DocumentResourceRoot {
+  readonly text: string;
+  readonly sourceSha256: string;
+}
+
+export interface DocumentResourcePage {
+  readonly resources: readonly DocumentResourceRoot[];
+  readonly nextCursor?: string;
+}
+
+export interface McpResourceContributorPort {
+  readonly namespace: 'prose' | 'exports';
+  listRoots(options: {
+    readonly cursor?: string;
+    readonly limit: number;
+    readonly signal?: AbortSignal;
+  }): Promise<DocumentResourcePage>;
+  read(uri: string, options?: { readonly signal?: AbortSignal }): Promise<DocumentResource>;
+}
+
+export type FindDocumentationGuidance = (
+  intent: string,
+  options?: { readonly responseSchemaVersion?: 1 | 2; readonly signal?: AbortSignal },
+) => Promise<GuidanceResult | HybridGuidanceEnvelope>;
+
 export interface DocumentRetrievalOptions {
   readonly mode: 'off' | 'auto' | 'download' | 'shadow';
-  readonly deterministic: DeterministicGuidanceIndex;
+  readonly deterministic: GuidanceIndex;
   readonly semanticIndex?: SemanticDocumentIndexPort;
   readonly queryEmbedding?: QueryEmbeddingPort;
   readonly reranker?: CandidateRerankerPort;
-  readonly policy?: HybridRetrievalPolicy;
+  readonly policy: HybridRetrievalPolicy;
   readonly telemetry?: RetrievalTelemetryPort;
 }
 
@@ -283,156 +423,117 @@ export function createDocumentRetrieval(
 ): FindDocumentationGuidance;
 ```
 
-The CLI alone maps flags/environment and grants filesystem/network permissions. Library core and the
-in-memory adapter require none. A remote embedding adapter, if ever supplied, must be selected
-explicitly and disclose that query text leaves the process.
+`DocumentResourceRoot` and `DocumentResource` are presentation DTOs aligned with the selected MCP
+SDK/protocol schema; they are not domain entities and are finalized in the resource compatibility
+slice. The contributor port's bounded list/read behavior and namespace are the stable seam.
 
-### Deterministic fusion policy
+`GuidanceConfidence` remains the existing `'high' | 'medium' | 'low'` export.
+`GuidanceResult.fallback?: string` remains the existing human-readable field. The new names do not
+collide: `HybridGuidanceConfidence` describes hybrid calibration and `semanticFallback` describes a
+v2 semantic-channel failure. No breaking slice is implied.
 
-For hybrid mode, each channel emits at most 40 candidates. Duplicate chunks are collapsed to their
-best rank for a source section. Version `hybrid-retrieval/v1` uses weighted RRF with `k = 60`:
+The v1 policy validates `dimensions === 384`, `rrfK === 60`, and the exact E5 identity at factory
+construction, but the public ports use numbers/strings so a future model requires a new policy and
+corpus identity rather than a type-breaking edit. The testing adapter rejects more than 1,024
+sections and enforces the supplied identity's dimensions.
+
+### Determinism and fusion
+
+There are two distinct guarantees:
+
+1. **Deterministic-off/fallback parity.** Schema-v1 `find_guidance` calls the preserved merged
+   deterministic path. Recommendation and related arrays, every legacy field, property order, and
+   serialized JSON bytes equal `GuidanceIndex.find()` on the same corpus. Semantic state contributes
+   no additive v1 field. A schema-v2 fallback nests that exact object under `guidance` and may
+   expose `semanticFallback`; it makes no whole-envelope byte-parity claim.
+2. **Provider-scoped hybrid determinism.** Given identical corpus/database/model/policy/runtime
+   versions, the WASM execution provider, architecture family, and query bytes, repeated runs must
+   return the same section order. Floating-point embeddings are not claimed bit-identical across
+   providers or architectures.
+
+Hybrid v1 iterates signals in the fixed order `deterministic-baseline`, `lexical`,
+`curated-concept`, `link-graph`, `vector`. Each list is pre-sorted and deduplicated by section id.
+It accumulates IEEE-754 terms only in that order and rounds the sum to 12 decimal places before any
+comparison:
 
 ```text
-score(d) = Σ signal weight(signal) / (60 + rank(signal, d))
+roundedScore(d) = round12(Σ weight(signal) / (60 + rank(signal, d)))
 
-lexical = 1.00   curated-concept = 0.90
-link-graph = 0.35   vector = 0.80
+deterministic-baseline = 1.00   lexical = 1.00
+curated-concept = 0.90          link-graph = 0.35
+vector = 0.80
 ```
 
-These initial weights are a ratified candidate, not magic constants: the checked intent corpus must
-confirm them against a preregistered grid without changing the gates. RRF is selected because it
-combines ranks whose raw BM25-like, graph, and cosine values are not calibrated to a shared scale.
+The baseline channel keeps the merged ranker represented in fusion; the decomposed channels explain
+and supplement it. Candidate lists are capped at 40 and output at eight. Protected sections form the
+first tier. Remaining ties resolve by rounded RRF descending, baseline rank, lexical rank, concept
+rank, graph rank, vector rank, then binary slug and numeric section ordinal. Missing semantic
+capability bypasses RRF entirely and returns the baseline result.
 
-Exact symbol, exact heading, exact route hint, and protected rare-term matches identified by the
-deterministic ranker form a protected tier; semantic candidates cannot move above that tier. Results
-are bounded to eight. Ties resolve by protected tier, descending RRF, deterministic baseline rank,
-vector rank, slug, then section ordinal. The same corpus, policy, and runtime therefore produce the
-same ordering. If the vector channel cannot run, the application returns the original deterministic
-ranking directly rather than applying RRF to the remaining lists.
+Initial weights are a preregistered v1 candidate and do not graduate until held-out evaluation.
+WebGPU is never selected by `auto` or `download` in v1. It may run in `shadow` under a distinct
+execution-provider identity; it cannot affect returned ranking or claim normative determinism until
+separate equivalence, quality, and platform gates are ratified.
 
-An optional cross-encoder can rerank only the top 12 fused candidates, preserve the protected tier,
-and use the same stable tie-breaks. It is experimental and off by default; absence or failure
-returns the pre-rerank RRF order.
+An optional cross-encoder may rerank only the top 12, cannot cross the protected-tier boundary, and
+uses the pre-rerank stable order as its final tie-break. Failure restores the pre-rerank RRF order.
 
-### Corpus, embedding, and artifact contract
+### Corpus, model, and vector representation
 
-The generator consumes the same release corpus and canonical section parser as deterministic
-retrieval. A section is the citation unit. Sections longer than 448 model wordpieces are split at
-paragraph or fenced-code boundaries with at most 48 tokens of overlap; child chunks retain the same
-source citation and are collapsed to the best-ranked child before fusion. Chunk ordering, Unicode
-normalization, prefixing, and content serialization are part of `chunkerSchemaVersion`, not
-implementation detail.
+Sections longer than 448 model wordpieces split at paragraph or fenced-code boundaries with 48-token
+maximum overlap. Child chunks keep the section citation and collapse to the best child before
+fusion. NFKC normalization, splitting, prefixes, ordering, and serialization are versioned chunker
+inputs.
 
-Build-time passage embeddings and query-time embeddings use the same pinned model contract:
+| Property                  | Normative v1 value                                                                            |
+| ------------------------- | --------------------------------------------------------------------------------------------- |
+| Model                     | `intfloat/multilingual-e5-small`                                                              |
+| Upstream revision         | `614241f622f53c4eeff9890bdc4f31cfecc418b3`                                                    |
+| ONNX conversion           | `Xenova/multilingual-e5-small@761b726dd34fb83930e26aab4e9ac3899aa1fa78`                       |
+| Quantized ONNX            | SHA-256 `f80102d3f2a1229f387d3c81909990d8945513e347b0eab049f7de3c6f98c193`, 118,308,185 bytes |
+| Tokenizer                 | SHA-256 `0b44a9d7b51c3c62626640cda0e2c2f70fdacdc25bbbd68038369d14ebdf4c39`, 17,082,730 bytes  |
+| Runtime/provider          | `@huggingface/transformers` 4.2.0 / WASM                                                      |
+| Inputs                    | `passage:` at build time; `query:` at query time                                              |
+| Pooling / normalization   | mean / L2                                                                                     |
+| Dimensions / license      | 384 / MIT                                                                                     |
+| Normative database vector | float32 BLOB produced and queried with `vector32(?)`                                          |
 
-| Property                | Ratified value                                                                                                             |
-| ----------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| Model                   | `intfloat/multilingual-e5-small`                                                                                           |
-| Upstream revision       | `614241f622f53c4eeff9890bdc4f31cfecc418b3`                                                                                 |
-| ONNX conversion         | `Xenova/multilingual-e5-small@761b726dd34fb83930e26aab4e9ac3899aa1fa78`                                                    |
-| Quantized ONNX          | `onnx/model_quantized.onnx`, SHA-256 `f80102d3f2a1229f387d3c81909990d8945513e347b0eab049f7de3c6f98c193`, 118,308,185 bytes |
-| Tokenizer               | `tokenizer.json`, SHA-256 `0b44a9d7b51c3c62626640cda0e2c2f70fdacdc25bbbd68038369d14ebdf4c39`, 17,082,730 bytes             |
-| License / dimensions    | MIT / 384                                                                                                                  |
-| Inputs                  | `passage:` at generation; `query:` at query time                                                                           |
-| Pooling / normalization | mean pooling / L2                                                                                                          |
-| Stored vector           | `vector8`, with accuracy gate against `vector32`                                                                           |
+The [model card](https://huggingface.co/intfloat/multilingual-e5-small) supports the prefixes and
+multilingual selection; it does not guarantee equal quality per language. Runtime assets and WASM
+workers are self-hosted. CDN execution is forbidden.
 
-This model is selected because its
-[model card](https://huggingface.co/intfloat/multilingual-e5-small) documents 100-language training,
-the required prefixes, 384 dimensions, and MIT license. The RFC does not claim equal quality for
-low-resource languages; evaluation is stratified and may keep semantic ranking opt-in for weak
-strata.
+The optional reranker remains
+`cross-encoder/ms-marco-MiniLM-L6-v2@c5ee24cb16019beea0893ab7796b1df96625c6b8` (Apache-2.0), using
+Xenova revision `a09144355adeed5f58c8ed011d209bf8ee5a1fec` and ONNX SHA-256
+`e9d8ebf845c413e981c175bfe49a3bfa9b3dcce2a3ba54875ee5df5a58639fbe` (23,143,499 bytes). Its English
+orientation keeps it experimental/off.
 
-Generation uses the pinned ONNX files through
-[`@huggingface/transformers`](https://github.com/huggingface/transformers.js) 4.2.0 (Apache-2.0).
-Query inference uses that same runtime and files: WASM is the portable default, WebGPU is an
-optional acceleration selected only after capability detection. Browser assets, workers, and WASM
-must be self-hosted for CSP and supply-chain control; CDN execution is forbidden. WebGPU requires a
-secure context and a successful adapter/device probe. Deno native operation must work with WASM
-alone.
+#### Vector8 disposition
 
-The optional reranker is
-[`cross-encoder/ms-marco-MiniLM-L6-v2`](https://huggingface.co/cross-encoder/ms-marco-MiniLM-L6-v2)
-at upstream revision `c5ee24cb16019beea0893ab7796b1df96625c6b8`, using
-`Xenova/ms-marco-MiniLM-L-6-v2@a09144355adeed5f58c8ed011d209bf8ee5a1fec` and quantized ONNX SHA-256
-`e9d8ebf845c413e981c175bfe49a3bfa9b3dcce2a3ba54875ee5df5a58639fbe` (23,143,499 bytes). It is
-Apache-2.0, 22.7M parameters, and English-oriented. That language limitation is why it cannot
-graduate with the base hybrid feature and must pass a separate multilingual/no-regression gate.
+Vector8 is **not normative v1 storage**. Turso's code-indexing guide uses `F8_BLOB(384)` and passes
+a JSON float array to `vector8(?)`, stating that Turso quantizes internally. Another current vector
+reference illustrates integer inputs. Because the engine does not publish a stable scale/offset
+contract across those pages, NetScript does not invent one.
 
-#### Release asset
+An experimental vector8 artifact records `vectorStorage: 'vector8-experimental'`,
+`quantizer: 'turso-vector8@0.7.2'`, exact engine/native package hashes, input float serialization,
+dimensions, normalization, and a quantizer test-vector digest in `CorpusIdentity`. Both build and
+query sides call the same pinned engine's `vector8(?)`; NetScript performs no independent scaling.
+Graduation requires primary-source reconciliation, byte-stable test vectors on every supported
+native target, query/build compatibility, no overflow/NaN behavior, artifact reproducibility, and
+≤0.005 held-out nDCG@5 loss against the normative vector32 artifact. Until all pass, vector32 ships
+even if vector8 is smaller.
 
-The production semantic index is a generated database uploaded as a GitHub Release asset, not
-embedded in the JSR package. A small generated TypeScript manifest may be published with
-`@netscript/mcp`; it contains no vectors and names:
+At the historical 3,777-section snapshot, raw 384-dimension payload arithmetic is approximately 1.38
+MiB for one byte/dimension and 5.53 MiB for four bytes/dimension, before vector headers, database
+pages, text, and indexes. Budgets use binary MiB (`1 MiB = 1,048,576 bytes`).
 
-- package and corpus versions, docs content SHA-256, corpus and chunker schema versions;
-- model id, upstream and conversion revisions, exact file hashes, dimensions, prefixes, pooling,
-  normalization, and vector encoding;
-- generator source version, Transformers.js version, Turso engine/package version;
-- database byte length, compressed length, and SHA-256; and
-- the allowlisted release asset name and compatibility range.
+### New Turso adapter and platform matrix
 
-The release generator produces a temporary database in a deterministic section order, verifies row
-cardinality/metadata, closes it, hashes it, and regenerates it in CI to detect drift. Canary
-publishing validates the artifact before stable publication; the stable release uploads the artifact
-before publishing the JSR package that references it. The database is compatible only when package,
-corpus schema, chunker schema, dimensions, encoding, and model identity all match. There is no
-best-effort schema migration: an incompatible cache is replaced atomically.
-
-Cache keys contain package version and database SHA-256. Download mode accepts only the generated,
-allowlisted HTTPS release URL, enforces declared and streaming byte caps, hashes to a temporary
-file, and atomically renames after verification. A corrupt or partial file is quarantined/deleted
-and the request falls back; repeated requests use bounded backoff rather than download storms.
-Corpus updates publish a complete immutable artifact in v1. Delta updates are deferred until they
-can preserve reproducibility and recovery simplicity.
-
-Initial hard budgets are:
-
-| Asset                        | Gate                                             |
-| ---------------------------- | ------------------------------------------------ |
-| Semantic database            | ≤ 24 MiB raw and ≤ 8 MiB compressed              |
-| Required encoder files       | ≤ 140 MiB total download                         |
-| Optional reranker            | ≤ 25 MiB additional download                     |
-| Generated JSR manifest delta | ≤ 256 KiB; total packed `@netscript/mcp` ≤ 2 MiB |
-
-The incoming corpus has 3,777 heading sections. Its vector payload is approximately 1.5 MiB as
-384-dimensional `vector8`, versus approximately 5.8 MiB as `vector32`, before database/text/index
-overhead. The accuracy gate, not this estimate, decides whether `vector8` ships.
-
-### New Turso database adapter
-
-The production adapter uses only
-[`@tursodatabase/database`](https://docs.turso.tech/sdk/ts/reference), initially pinned to reviewed
-stable 0.7.1. It does not use `@libsql/client`, legacy libSQL, Prisma's libSQL adapter, or Turso
-Cloud. The database rewrite provides native local and in-memory operation and
-[`vector32`/`vector8` functions](https://docs.turso.tech/features/ai-and-embeddings) with cosine
-distance. The v1 adapter opens the verified local file read-only in one process and performs bounded
-linear vector search. This is appropriate for a few thousand sections and keeps the deterministic
-ranker authoritative for lexical retrieval.
-
-The adapter deliberately avoids experimental features:
-
-| Capability                                          | RFC disposition                                                             |
-| --------------------------------------------------- | --------------------------------------------------------------------------- |
-| Local file and in-memory database                   | use; stable production path                                                 |
-| `vector8`, `vector32`, cosine distance              | use after vector8 accuracy gate                                             |
-| Vector indexes / DiskANN                            | do not assume; linear scan at this corpus size                              |
-| Full-text `USING fts`, `fts_match`, `fts_score`     | do not use; requires experimental index method                              |
-| Multiprocess WAL                                    | do not use; experimental and unnecessary for immutable single-process reads |
-| MVCC/concurrent writes                              | do not enable; artifact is immutable                                        |
-| Browser/WASM package                                | future separate adapter; not the native production adapter                  |
-| Encryption, materialized views, PostgreSQL frontend | out of scope / experimental or foundational                                 |
-
-This separation follows Turso's own
-[experimental feature guidance](https://docs.turso.tech/sql-reference/experimental-features),
-[multiprocess warning](https://docs.turso.tech/sql-reference/multiprocess-access), and the project's
-[rewrite status report](https://turso.tech/blog/we-are-a-year-into-rewriting-sqlite). The
-[PostgreSQL-in-Rust announcement](https://turso.tech/blog/a-new-modern-version-of-postgres-in-rust)
-describes a foundation rather than a client surface needed here. New Turso remains pre-1.0, so the
-adapter is isolated, backed up by a rebuildable artifact, and guarded by an exact dependency and
-compatibility test rather than treated as the system of record.
-
-Schema sketch:
+The reviewed current stable package is `@tursodatabase/database` 0.7.2 (MIT; `next` is pre-release).
+The RFC pins 0.7.2 for the first implementation review, never a floating stable tag. Native Deno
+inspection confirms `DatabaseOpts.readonly?: boolean`; production opens the verified artifact with
+`readonly: true`, `fileMustExist: true`, and bounded query timeouts.
 
 ```sql
 CREATE TABLE corpus_metadata (key TEXT PRIMARY KEY, value TEXT NOT NULL);
@@ -444,295 +545,312 @@ CREATE TABLE document_sections (
   uri TEXT NOT NULL UNIQUE,
   source_sha256 TEXT NOT NULL,
   passage TEXT NOT NULL,
-  embedding VECTOR8(384) NOT NULL
+  embedding BLOB NOT NULL
 );
+
+-- Build: INSERT ... vector32(?)
+-- Query: vector_distance_cos(embedding, vector32(?))
 ```
 
-At open, the adapter validates every metadata field, schema table/column, section cardinality,
-dimension, and source identity before it can serve a query. SQL inputs are parameters. The query
-selects no more than 40 rows and always applies the stable section tie-break after distance. The
-in-memory adapter implements the same observable contract with a bounded linear scan and is used for
-tests, small fixtures, and environments in which native Turso is unavailable.
+The adapter uses local/in-memory databases and bounded linear cosine search. It does not use
+`@libsql/client`, Turso Cloud, experimental FTS/index methods, multiprocess WAL, MVCC writes, or a
+browser package. Metadata/open checks validate schema, row count, dimensions, storage encoding,
+model/chunker identity, and SHA before queries.
 
-### MCP presentation and compatibility
+Package 0.7.2 ships native binaries for Linux glibc x64/arm64, macOS arm64, and Windows x64. It does
+not ship macOS x64 or Linux musl/Alpine binaries. Those targets, and any native-load failure, take
+the deterministic fallback arm; macOS x64 and Alpine are not allowed to masquerade as tested native
+support. Browser/WASM would be a separate adapter and RFC slice.
 
-`find_guidance` remains the only ranking entry point. Its existing text JSON remains available and
-its `structuredContent` grows additively after a schema/version negotiation. Results include MCP
-resource links to stable URIs. The server adds:
+Primary maturity sources are the [TypeScript reference](https://docs.turso.tech/sdk/ts/reference),
+[vector functions](https://docs.turso.tech/sql-reference/functions/vector),
+[code-indexing guide](https://docs.turso.tech/guides/code-indexing),
+[experimental feature list](https://docs.turso.tech/sql-reference/experimental-features), and
+[multiprocess warning](https://docs.turso.tech/sql-reference/multiprocess-access).
 
-- `resources/list` for bounded public documentation metadata;
-- `resources/templates/list` for `netscript-docs://{slug}{#section}`;
-- `resources/read` for exact, allowlisted corpus sections with MIME type and annotations; and
-- resource annotations for audience, priority, and source last-modified metadata when known.
+### Immutable artifact and release lifecycle
 
-The server does not expose local paths, model cache files, database rows, or arbitrary URI reads.
-`resources/subscribe` and `notifications/resources/list_changed` are omitted because a release
-corpus cannot change during a process. Prompts are left alone. Search and direct document-get tools
-are retained; they share canonical citations but are not silently reinterpreted as semantic search.
+The database is a GitHub Release asset, not a JSR file. The checked-in generated TypeScript manifest
+is the **trust root**: GitHub Release assets are mutable by repository writers, so runtime accepts
+an asset only when its bytes match the SHA and length published inside the immutable,
+provenance-backed JSR package version. Release metadata, filenames, or GitHub checksums cannot
+override that SHA.
 
-NetScript currently hand-writes the 2025-11-25 protocol with tool-only capabilities, whereas the
-[current 2026-07-28 MCP server specification](https://modelcontextprotocol.io/specification/2026-07-28/server)
-and [official MCP sources](https://github.com/modelcontextprotocol/modelcontextprotocol) distinguish
-model-controlled tools, application-controlled resources, and user-controlled prompts. A protocol
-modernization to the official v2 TypeScript server SDK is a separate rollout slice. Retrieval domain
-and adapter work must not depend on that migration, and the MCP slice must include interoperability
-fixtures for both the currently supported client era and the selected modern protocol before old
-behavior is deprecated.
+The lifecycle is locked:
 
-### JSR and permission fitness
+1. `.llm/tools/docs/generate-mcp-semantic-artifact.ts` generates the database and manifest from
+   canonical corpus/model inputs. `--check` regenerates in scratch and compares normalized database
+   content plus manifest identity. The database excludes package/canary version so identical source
+   content produces identical bytes.
+2. `check:publish-assets` calls that checker. New `.llm/tools/fitness/evaluate-mcp-guidance.ts` and
+   `.llm/tools/fitness/benchmark-mcp-semantic.ts` enforce relevance, fallback, native-platform,
+   download, latency, RSS, and database-size reports against versioned thresholds.
+3. The canary workflow builds the database once from the exact canary-pair source SHA, verifies it
+   against the checked-in manifest, and uploads an immutable Actions artifact named by database SHA.
+   The canary label/status records its run id and artifact SHA.
+4. Stable publication **promotes that exact successful canary Actions artifact**. New
+   `.llm/tools/release/promote-mcp-semantic-artifact.ts` resolves the green canary run for the
+   stable content parent, downloads the named artifact, verifies manifest SHA/length and source
+   identity, then uploads it to the target GitHub Release before any JSR operation. Stable never
+   regenerates the database.
+5. `publish.yml` runs promotion and verification **before** `publish:readiness`, dry-run, preflight,
+   or JSR publication. `publish:readiness` gains a semantic-artifact check that verifies the release
+   asset against the checked-in trust root. `release:preflight` remains the text-import guard and is
+   not substituted for artifact integrity.
+6. Only after those gates pass may JSR publish. Retry is idempotent because release asset name and
+   SHA must either match or the workflow refuses; it never overwrites differing bytes.
 
-The current package dry-run is roughly 385 KiB of exported source plus a 100 KiB generated publish
-asset. Shipping the database or 135 MiB model cache in JSR would be disproportionate and is
-forbidden. The core and testing adapter remain browser-portable TypeScript with no permissions. The
-native Turso and local encoder adapters are explicit optional subpaths; the CLI composition edge
-documents and requests only the filesystem/network permissions implied by the selected mode.
+The generator/checker enforces ≤24 MiB raw database, ≤8 MiB compressed database, ≤140 MiB required
+encoder download, ≤25 MiB optional reranker, ≤256 KiB generated manifest delta, and ≤2 MiB packed
+`@netscript/mcp`. Benchmark tooling enforces latency/RSS. `publish:readiness` consumes signed JSON
+reports from those tools and rejects missing, stale-source, or over-budget reports. These are new
+implementation deliverables; the RFC does not pretend current tooling already enforces them.
 
-Every exported function and class must carry an explicit return type and pass `deno doc --lint` and
-JSR dry-run checks with zero newly introduced slow types. The native adapter cannot be advertised as
-browser-compatible. A future `@tursodatabase/database-wasm` adapter would be a different subpath
-with its own CSP, worker, size, and browser fitness gates.
+Cache keys are database SHA + model SHA + policy version, not mutable release tag alone. Downloads
+stream to a temporary file, enforce declared and observed size, hash, fsync/close, and atomically
+rename. Corruption removes/quarantines only the proven cache entry and falls back.
 
-### Evaluation and fitness gates
+#### Network allowlist
 
-No default ranking changes until a versioned, reviewed intent corpus and runner are checked in. The
-first corpus contains at least 120 independently judged intents:
+`auto` never performs network I/O. `download` permits HTTPS GET only for:
 
-| Stratum                      | Minimum | Required coverage                                           |
-| ---------------------------- | ------: | ----------------------------------------------------------- |
-| Exact symbols and rare terms |      30 | APIs, routes, flags, error codes, uncommon package names    |
-| Tasks and paraphrases        |      25 | vocabulary mismatch and multi-step goals                    |
-| Negative / unsupported       |      15 | includes “add a capability NetScript does not ship”         |
-| Ambiguous                    |      15 | multiple plausible packages or meanings                     |
-| Multilingual / cross-lingual |      20 | multiple language families and mixed-language queries       |
-| Adversarial / poisoning      |      15 | instruction-like docs, injected headings, malformed content |
+- semantic artifact: exact `rickylabs/netscript` release path on `github.com`, with redirects only
+  to `release-assets.githubusercontent.com`;
+- model/tokenizer/reranker: exact `Xenova` repository, immutable revision, and allowlisted filenames
+  on `huggingface.co`, with redirects only to `cdn-lfs.hf.co` or `cas-bridge.xethub.hf.co`.
 
-Judgments use grades 0–3 and retain assessor, rationale, corpus SHA, and adjudication history. Query
-sets used for tuning are separated from held-out acceptance queries. Baseline, vector32, vector8,
-RRF-weight candidates, and optional reranker are evaluated from the same frozen inputs. Reports
-include per-stratum results and bootstrap confidence intervals so aggregate gains cannot conceal a
-critical regression.
+Every redirect hop is revalidated, redirect count is at most three, credentials/cookies are never
+sent, URL overrides are rejected by default, and model/database hashes remain mandatory. A custom
+host requires an explicit library-supplied downloader adapter and is outside CLI `download` mode.
 
-The v1 graduation gates are:
+### MCP presentation, #1201, and protocol independence
 
-- deterministic, `off`, and every forced fallback path produce byte-identical ordering and schema
-  compatibility across 50 repeated runs on each supported platform;
-- protected exact/rare Recall@1 is 100%, with zero regression from the deterministic baseline;
-- overall nDCG@5 improves by at least 0.05 and the 95% bootstrap confidence-interval lower bound is
-  above zero;
-- multilingual/cross-lingual nDCG@5 improves by at least 0.10 and no declared language stratum drops
-  more than 0.02;
-- unsupported-intent abstention precision is at least 0.95 and no response invents an unavailable
-  capability;
-- vector8 loses no more than 0.005 nDCG@5 relative to vector32; otherwise vector32 ships subject to
-  artifact gates;
-- warmed local embedding latency is p50 ≤ 300 ms and p95 ≤ 750 ms; cold start with assets already
-  cached is p95 ≤ 2.5 s; semantic-failure overhead before deterministic fallback is ≤ 50 ms;
-- optional reranking adds p95 ≤ 250 ms for at most 12 candidates;
-- incremental RSS is ≤ 384 MiB for the encoder, ≤ 128 MiB for the optional reranker, and ≤ 512 MiB
-  combined, in addition to the artifact/download budgets above; and
-- Linux x64/arm64, macOS x64/arm64, and Windows x64 either pass native adapter/inference fixtures or
-  demonstrate the clean deterministic fallback. Browser support is not a v1 production claim.
+The current tree hand-writes MCP 2025-11-25 JSON-RPC over stdio and imports no official MCP SDK.
+This RFC does not assume otherwise. Retrieval core, artifact, and adapter slices do not require an
+SDK migration. A future move to the current MCP specification or official TypeScript SDK is a
+separate compatibility proposal with dual-era fixtures.
 
-Reference hardware, OS, Deno, model/runtime, Turso, warm/cold state, iterations, and raw samples are
-recorded with every benchmark. A median from an unspecified maintainer laptop is not a gate.
+Likewise, this design has no relationship to oRPC v2. MCP stdio does not use the workspace's oRPC
+service packages, and accepting this RFC neither upgrades oRPC 1.x dependencies nor changes service
+contracts, OpenAPI projection, HTTP routing, or slow-type policy. Prior oRPC-v2 audit work remains
+independent.
 
-### Confidence and observability
+Issue [#1201](https://github.com/rickylabs/netscript/issues/1201) owns generated export-surface
+discovery and could also need resources. There must be one `resources/list` handler, not competing
+feature handlers. This RFC contributes only prose document roots under
+`netscript-docs://prose/{slug}`. Export resources, if #1201 adopts them, use a distinct
+`netscript-docs://exports/{package}/{subpath}` namespace. The A6 presentation resource catalog
+merges typed contributors, sorts by URI, paginates at most 100 roots, and never lists all section
+URIs. `resources/read` may address an allowlisted section fragment. No subscriptions, list-changed
+notifications, or prompts are added.
 
-Confidence bands are derived from held-out precision at the returned depth plus protected-match and
-margin features. The calibration table is versioned with the policy. “High” is allowed only when its
-held-out precision lower bound meets the published threshold; “insufficient” is preferred over
-guessing for unsupported or low-margin queries. The UI/tool output never calls cosine, RRF, or
-reranker logits confidence percentages.
+Schema-v1 `find_guidance` text JSON and `structuredContent` remain unchanged. Schema v2 is explicit
+input negotiation and returns `HybridGuidanceEnvelope`; old clients never receive it accidentally.
 
-Telemetry is optional and low-cardinality: mode, fallback-reason enum, candidate-count buckets,
-latency buckets, platform/runtime family, cache outcome, policy version, and confidence band. It
-must not contain query text, passage text, headings, URIs, section ids, paths, hashes that
-fingerprint private corpora, or unbounded error strings. Structured local debug output may expose
-score provenance only when explicitly requested.
+### Evaluation corpus and gates
 
-### Security, privacy, and recovery
+`packages/mcp/tests/fixtures/guidance-evaluation.json` remains a fast deterministic smoke fixture.
+Its original five #1404 cases seed the immutable byte-parity golden; its current eight cases
+continue to exercise `exact`, `required-set`, and `rank-one` expectations. It is not silently
+converted to graded relevance and cannot compute nDCG.
 
-Documentation is untrusted content, not instructions. Retrieval and reranking treat it as inert
-text; neither may invoke tools, interpolate it into system policy, follow embedded URLs, execute
-code, or allow instruction-like text to affect anything except relevance. Resource consumers must
-retain the citation boundary rather than present retrieved prose as server authority.
+A new checked `packages/mcp/tests/fixtures/guidance-relevance-v1.jsonl` carries at least 120
+records:
 
-Only repository-public documentation paths from the release manifest are indexed. Generation
-resolves canonical paths, rejects symlink escape, secrets/private patterns, duplicate identifiers,
-and sources outside the allowlist. A custom corpus is rejected by default and requires a separately
-configured allowlist, identity namespace, and telemetry-off default. Poisoning fixtures cover
-keyword stuffing, hidden/instruction headings, duplicate passages, oversized content, malformed
-Unicode, and adversarial links.
+```ts
+interface GuidanceRelevanceCaseV1 {
+  readonly schemaVersion: 1;
+  readonly id: string;
+  readonly split: 'calibration' | 'validation';
+  readonly intent: string;
+  readonly queryLanguage: string; // BCP 47
+  readonly documentLanguage: string; // BCP 47
+  readonly strata: readonly (
+    | 'exact-rare'
+    | 'paraphrase'
+    | 'unsupported'
+    | 'ambiguous'
+    | 'multilingual'
+    | 'cross-lingual'
+    | 'poisoning'
+  )[];
+  readonly supported: boolean;
+  readonly judgments: readonly {
+    readonly sectionId: string;
+    readonly grade: 0 | 1 | 2 | 3;
+    readonly rationale: string;
+  }[];
+  readonly requiredRankOne?: readonly string[];
+  readonly ambiguitySet?: readonly string[];
+  readonly poisoningExpectation?: 'ignore-instructions' | 'abstain';
+  readonly adjudication: {
+    readonly assessorIds: readonly string[];
+    readonly decidedBy: string;
+    readonly decidedAt: string;
+    readonly revision: number;
+  };
+  readonly corpusSha256: string;
+}
+```
 
-Queries run locally by default. Download mode transmits only fixed artifact/model requests to
-allowlisted hosts, never the user's query. Files are content-hash verified before parsing. Size,
-row, dimension, schema, and timeout ceilings precede database use. Corruption closes the adapter,
-removes/quarantines only the proven cache entry, and falls back. The deterministic kill switch is
-always available and does not require opening the database or loading the model.
+Calibration cases may tune weights/bands; validation cases remain untouched until a candidate is
+frozen. Corpus distribution is at least 30 exact/rare, 25 paraphrase/task, 15 unsupported, 15
+ambiguous, 20 multilingual/cross-lingual, and 15 poisoning/adversarial cases; multi-label cases are
+allowed but every minimum is independently satisfied. Unsupported abstention means v2 confidence
+`insufficient` plus no capability-inventing recommendation. Ambiguity metrics credit the declared
+set rather than one arbitrary answer.
 
-### Error semantics
+Graduation requires:
 
-Bad public input (empty/oversized intent or invalid limit) remains a typed caller error. An aborted
-request propagates `AbortError`. Semantic availability, cache, runtime, database, and timeout errors
-map to the bounded fallback enum and return deterministic results. Integrity and schema mismatches
-also emit a local diagnostic suitable for operator action, without leaking paths through MCP.
-Programmer invariants such as impossible ranks or duplicate canonical section IDs fail tests and
-generation rather than being swallowed at runtime.
+- frozen #1404 serialized parity and current eight-case deterministic smoke pass;
+- v1/fallback legacy bytes equal `GuidanceIndex.find()` across 50 repeats;
+- protected exact/rare Recall@1 = 100%, with no deterministic regression;
+- validation nDCG@5 improves ≥0.05 overall with 95% bootstrap lower bound >0;
+- multilingual/cross-lingual nDCG@5 improves ≥0.10 and no declared language stratum drops >0.02;
+- unsupported abstention precision ≥0.95 and zero invented capability;
+- vector8, if reconsidered, loses ≤0.005 nDCG@5 versus vector32 plus all quantizer gates;
+- warmed WASM embedding p50 ≤300 ms / p95 ≤750 ms; cached cold start p95 ≤2.5 s; semantic failure
+  adds ≤50 ms before deterministic fallback; optional reranking adds p95 ≤250 ms;
+- incremental RSS ≤384 MiB encoder, ≤128 MiB reranker, ≤512 MiB combined; and
+- native success on Linux glibc x64/arm64, macOS arm64, Windows x64; deterministic fallback on macOS
+  x64, Linux musl/Alpine, browser, and every native-load failure.
 
-### Rollout and migration
+Reference hardware, architecture, OS/libc, Deno, model/runtime/provider, Turso, warm/cold state,
+iterations, corpus SHA, and raw samples are recorded. WASM hybrid determinism is tested per
+supported architecture/provider tuple; no cross-provider bit-identity claim is made.
 
-Each slice is independently reversible and ships no default ranking change until its gates pass:
+### Confidence, telemetry, security, and errors
 
-1. Land PR #1404 and freeze its deterministic fixtures as the parity baseline.
-2. Refactor package-owned domain lists/ports/application orchestration with no output change; add
-   bounded in-memory fixtures and score-provenance schemas.
-3. Extend release generation with the reproducible semantic artifact, manifest, integrity checks,
-   JSR budgets, and offline evaluation runner. No runtime download.
-4. Add the optional new-Turso adapter in `off`/`shadow` modes and prove corrupt/missing/unsupported
-   fallback on the platform matrix.
-5. Add MCP resource URIs/links and application-controlled resource reads while retaining existing
-   tool/text behavior; modernize the SDK/protocol only through its explicit compatibility slice.
-6. Add the pinned local query encoder and explicit `download`; keep `auto` cache-only and ranking
-   opt-in while acceptance evidence accumulates.
-7. Change the default from deterministic to cache-only `auto` only after all gates pass, the RFC is
-   accepted, artifacts exist for the release, and maintainers approve the evidence.
-8. Evaluate the tiny reranker separately. It stays experimental/off unless it passes its additional
-   language, latency, memory, license, and CSP gates.
+Hybrid confidence derives from held-out precision and margin/protected-match features. “High” is
+allowed only when its validation lower bound reaches the published threshold; “insufficient” is
+preferred over guessing. Legacy `GuidanceResult.confidence` retains its current thresholds and type.
 
-Old clients continue receiving text JSON and deterministic-compatible fields. New fields are
-additive and policy-versioned. A future deprecation of legacy MCP framing requires its own announced
-compatibility window; accepting this RFC does not authorize it. Cache incompatibility is handled by
-replacement, not migration. Rolling back package configuration to `off` restores deterministic
-behavior without deleting user data.
+Telemetry is optional and low-cardinality: mode, bounded semantic-fallback reason, count/latency
+buckets, platform/runtime/provider family, cache outcome, policy version, and confidence band. It
+never contains query/passage text, headings, URIs, section ids, local paths, private-corpus hashes,
+or unbounded errors.
 
-### Testing strategy
+Documentation is inert untrusted text. Retrieval/reranking never executes code, follows embedded
+links, invokes tools, or treats instructions in passages as policy. Generation permits only
+canonical public documentation paths, rejects symlink escape and duplicate ids, and records source
+hashes. Custom corpora are disabled by default and require a separate allowlist/identity namespace.
 
-The future implementation requires:
+Bad caller input remains a typed error. `AbortError` propagates. Semantic availability, integrity,
+runtime, database, and timeout failures map to internal telemetry and, only for negotiated schema
+v2, `semanticFallback`; schema v1 returns the untouched deterministic result. Programmer invariants
+fail generation/tests rather than being swallowed.
 
-- pure policy unit tests for RRF, protected tiers, deduplication, stable ties, bounded output,
-  confidence lookup, and every fallback reason;
-- contract tests shared by new-Turso and in-memory adapters, including dimensions, cancellation,
-  lifecycle, parameterization, corruption, and deterministic ordering;
-- generator golden tests for section boundaries, prefixes, hashes, database metadata, reproducible
-  bytes or normalized dumps, and release-manifest compatibility;
-- protocol fixtures for tools, structured content, resource links, list/read/templates, annotations,
-  legacy-client compatibility, invalid URIs, and absence of subscriptions/prompts;
-- offline relevance/abstention/adversarial evaluation with raw versioned reports;
-- download/cache security tests with a local fake transport, never live network; and
-- JSR dry-run, `deno doc --lint`, permissions, platform, artifact-size, latency, and RSS gates.
+### Rollout
 
-No test requires Aspire, Docker, a daemon database, or Turso Cloud. The database is an embedded
-rebuildable fixture.
+1. Re-pin implementation to current main and check in the immutable #1404 five-case serialized
+   golden plus current eight-case smoke evidence.
+2. Land the deterministic signal-decomposition refactor, locale-stable folding, producer contract,
+   and protected tier while the old scalar result remains authoritative. Pass both parity gates.
+3. Add public non-colliding v2 types, pure fusion policy, bounded in-memory adapter, and
+   unit/contract tests. Default remains `off`.
+4. Add vector32 release generation, manifest trust root, graded corpus/evaluator, budgets, canary
+   artifact production, and stable promotion tooling. No runtime download yet.
+5. Add the pinned new-Turso native adapter in `shadow`; prove platform and corruption fallback.
+6. Add the pinned WASM query encoder and explicit `download`; keep `auto` cache-only and ranking
+   opt-in.
+7. Coordinate the single MCP resource catalog with #1201; add prose resource roots/read/links. SDK
+   modernization and oRPC remain out of scope.
+8. Change default to cache-only `auto` only after every gate passes and the RFC owner ratifies the
+   evidence. Evaluate vector8, WebGPU, and the reranker only as separate experimental graduations.
+
+Every slice is reversible. `off` bypasses semantic initialization. Cache incompatibility causes
+replacement, never in-place migration. No implementation slice starts before PLAN-EVAL approval.
+
+### Testing and tooling
+
+Future implementation must add and wire:
+
+- deterministic producer/protected-tier/parity unit and golden tests;
+- shared Turso/in-memory adapter contract tests, including read-only open, dimension, timeout,
+  cancellation, corruption, and stable ordering;
+- `generate-mcp-semantic-artifact.ts --check` reproducibility and identity tests;
+- `evaluate-mcp-guidance.ts` graded metrics/abstention/parity report;
+- `benchmark-mcp-semantic.ts` platform, download, database, latency, and RSS report;
+- `promote-mcp-semantic-artifact.ts` canary-source/SHA/length/idempotence tests;
+- MCP schema-v1 byte fixtures, explicit v2 negotiation, resource catalog/#1201 coexistence, URI
+  allowlist, pagination, and no-prompt/subscription tests;
+- `check:publish-assets`, `release:preflight`, `publish:readiness`, dry-run, `deno doc --lint`, JSR
+  packed-size, permission, and host/redirect allowlist gates.
+
+No test needs Aspire, Docker, a database daemon, Turso Cloud, or product runtime resources.
 
 ## Drawbacks
 
-This adds a roughly 135 MiB encoder download, native/WASM runtime complexity, an external release
-asset, and a pre-1.0 database dependency to a package whose deterministic ranker is comparatively
-simple. Cross-platform inference and native adapter testing increase maintenance cost. Semantic
-quality depends on a curated judgment corpus that itself needs review. Cache-only `auto` means some
-users see deterministic behavior until they explicitly fetch assets, and multilingual claims remain
-bounded by measured strata rather than the model card's headline.
-
-The design also grows the public contract with score provenance, resources, and adapter subpaths.
-Those costs are accepted only because each optional layer has a narrow port, strict budgets, and a
-complete deterministic exit path.
+The design adds a roughly 135 MiB encoder cache, native/WASM complexity, an external release asset,
+a pre-1.0 database dependency, and a maintained graded corpus. It also requires changes to release
+workflows before runtime semantics can ship. Unsupported native targets remain deterministic-only.
+The explicit v2 response avoids breaking callers but creates a second presentation schema to
+document and test.
 
 ## Rationale and alternatives
 
-Weighted RRF is chosen over a scalar blend because lexical, concept, graph, cosine, and
-cross-encoder scores have unrelated scales. Rank fusion is simple to reproduce, tolerates missing
-candidates, and exposes intelligible provenance. Protected deterministic matches solve the remaining
-failure mode: semantic similarity must not displace exact API truth.
-
-The new Turso rewrite is chosen for the production embedded index because it supplies local,
-in-memory, vector32/vector8, Deno-compatible operation behind a small adapter. Linear scan is chosen
-over experimental vector indexes because the corpus has only thousands of sections. NetScript's own
-deterministic ranker remains the lexical engine, avoiding experimental Turso FTS.
+RRF combines ranks whose BM25-like, graph, and cosine values have unrelated scales. The preserved
+baseline channel and protected tier prevent semantic recall from outranking exact truth. Float32 is
+the normative database representation because its query/build contract is explicit; vector8's space
+saving does not justify guessing at a changing quantizer contract.
 
 Rejected alternatives:
 
-- **Replace deterministic search with vectors:** worsens exact-symbol authority and makes model
-  availability critical.
-- **Blend raw BM25/cosine scores:** calibration is corpus-dependent and falsely suggests a shared
-  numerical meaning.
-- **Use `@libsql/client` or legacy libSQL/Turso Cloud:** contradicts the selected database rewrite,
-  adds a network service, and is unnecessary for local MCP.
-- **Reuse `@netscript/database`:** its Prisma application-store contract does not describe immutable
-  document vectors.
-- **Reuse AI memory/retriever ports directly:** thread memory and generic citations omit corpus,
-  source-hash, release, and deterministic-fallback semantics. Only the narrow embedding provider is
-  adapted.
-- **Put vectors/models in JSR:** would multiply the package size and force assets on deterministic
-  users.
-- **Generate embeddings on first query:** destroys reproducibility, creates severe cold starts, and
-  requires write/model availability in the critical path.
-- **Use remote embeddings by default:** leaks query text and introduces network
-  latency/availability.
-- **Use a generative LLM:** adds nondeterminism, cost, injection surface, and no necessary retrieval
-  capability.
-- **Adopt browser/WASM Turso as the first production adapter:** increases CSP, worker, and
-  portability scope before the native local MCP use case is proven.
-- **Enable experimental Turso FTS, multiprocess, or vector indexes:** no v1 requirement justifies
-  the maturity risk.
-- **Do nothing:** retains an excellent exact-term ranker but leaves systematic paraphrase and
-  cross-language recall gaps.
+- replace deterministic search with vectors;
+- blend raw lexical/cosine scores;
+- use `@libsql/client`, Turso Cloud, or experimental FTS/multiprocess/index methods;
+- route documentation through Prisma database or conversational-memory ports;
+- embed databases/models in JSR or generate embeddings on first query;
+- use remote embeddings or a generative LLM by default;
+- claim WebGPU/provider-independent determinism; or
+- couple retrieval to MCP SDK, oRPC v2, or #1201 export-surface implementation.
 
 ## Breaking changes and migration
 
-The proposed domain and MCP fields are additive. Deterministic-only consumers and existing clients
-remain supported. Optional adapter exports and release assets introduce new surface but no mandatory
-dependency. The eventual modern MCP SDK/protocol transition could be breaking and therefore cannot
-be inferred from this RFC; it needs compatibility evidence and an independently approved migration
-window. The RFC and issue must not carry a `breaking` label unless that later slice is incorporated
-as a concrete breaking proposal.
+This is additive. Existing `GuidanceConfidence`, `GuidanceResult`, `fallback`, default input, text
+JSON, and schema-v1 structured output remain unchanged. Schema v2 is explicit opt-in. Optional
+adapter subpaths do not become dependencies of the root deterministic export. Any future removal of
+schema v1 or handwritten MCP framing requires a separate breaking proposal and migration window.
 
 ## Prior art
 
-PR #1404 and [issue #1102](https://github.com/rickylabs/netscript/issues/1102) supply the
-deterministic intent-aware baseline. The read-only `eis-chat` implementation demonstrates the new
-Turso TypeScript API, dimension validation, vector search, and lexical fallback, but this RFC
-rejects its ASCII `LIKE` fallback and raw alpha score blend in favor of NetScript's richer ranker
-and RRF.
+PR #1404/#1416 supply deterministic guidance. The read-only `eis-chat` implementation validates
+new-Turso local APIs, dimension checks, and fallback, but its ASCII `LIKE` and scalar alpha blend
+are not adopted. Turso's code-indexing guide demonstrates F8 storage and RRF, while this RFC
+deliberately chooses the safer vector32 production contract.
 
-Turso's [code-indexing guide](https://docs.turso.tech/guides/code-indexing) independently uses
-vector8 and RRF with `k = 60`, supporting the selected storage/fusion direction while not replacing
-NetScript-specific gates. Existing issues [#317](https://github.com/rickylabs/netscript/issues/317)
-and [#455](https://github.com/rickylabs/netscript/issues/455) concern other libSQL/Turso application
-and desktop seams. [#499](https://github.com/rickylabs/netscript/issues/499) is conversational agent
-memory, and [#238](https://github.com/rickylabs/netscript/issues/238) deliberately leaves
-application knowledge bases outside the generic AI package. None owns MCP documentation retrieval.
+Issues [#317](https://github.com/rickylabs/netscript/issues/317) and
+[#455](https://github.com/rickylabs/netscript/issues/455) concern other Turso seams;
+[#499](https://github.com/rickylabs/netscript/issues/499) is conversational memory;
+[#238](https://github.com/rickylabs/netscript/issues/238) leaves application knowledge bases outside
+generic AI; and [#1201](https://github.com/rickylabs/netscript/issues/1201) owns export-surface
+discovery/resource coordination.
 
 ## Unresolved questions
 
-- **MCP maintainer:** should the resource/official-v2-SDK compatibility slice ship before or after
-  shadow semantic retrieval? Retrieval core does not depend on the answer.
-- **Release maintainer:** should stable release publication upload the database directly or promote
-  the exact canary workflow artifact? Either must preserve the same verified SHA and ordering.
-- **AI maintainer:** after benchmarks, does the local encoder adapter live in `@netscript/mcp` or a
-  narrow optional `@netscript/ai` adapter subpath? The MCP-owned query/corpus contract is fixed.
-- **Security maintainer:** which host allowlist and cache root conventions are portable across the
-  supported CLI installations?
-- **Relevance owner:** which languages form the required v1 strata, and who adjudicates judgments?
-- **RFC owner:** may vector8 graduate, and may the v1 RRF candidate weights be frozen? Both answers
-  require held-out reports and cannot be decided from estimates.
-- **MCP maintainer:** should `resources/list` expose every section or only document roots while
-  templates/read address sections? The choice must remain bounded and mobile-reviewable.
+These questions do not change safe defaults or artifact trust:
+
+- **MCP maintainer:** order a future official-SDK compatibility proposal relative to shadow
+  retrieval. Default: handwritten current protocol remains.
+- **AI maintainer:** place the local encoder adapter physically in MCP or an AI optional subpath.
+  Default: MCP-owned contract and no root dependency either way.
+- **Relevance owner:** select language strata/adjudicators. Default: no semantic graduation.
+- **RFC owner:** freeze RRF candidate weights after validation. Default: opt-in/shadow only.
+
+Release promotion, network allowlists, vector32 production storage, vector8 experimental status,
+resource namespace/list bounds, and trust-root semantics are no longer open questions.
 
 ## Non-goals
 
-- implementing or accepting the feature through this RFC PR;
-- replacing exact search, answering questions generatively, or executing retrieved content;
-- indexing private repositories, arbitrary filesystem paths, chat transcripts, or application data;
-- Turso Cloud sync, multiprocess writers, mutable runtime ingestion, delta indexes, or a vector DB
-  service;
-- promising browser support for the native adapter or equal quality across all languages;
-- adding prompts/subscriptions, changing unrelated MCP tools, or resolving the package's existing
-  horizontal-shape debt; and
-- opening implementation epics/sub-issues before ratification.
+- product implementation, acceptance, merge, or implementation issue creation in this RFC lane;
+- private/arbitrary filesystem corpora, mutable ingestion, deltas, Turso Cloud, or database writers;
+- browser/native parity, WebGPU defaulting, vector8/reranker graduation, or equal language quality;
+- resolving `MCP-A6-V2-SHAPE`, migrating the MCP SDK/protocol, or upgrading oRPC; and
+- changing unrelated tools, prompts, subscriptions, service HTTP contracts, or release policy.
 
 ## Future possibilities
 
-After v1 evidence, separate RFCs or implementation proposals may add a browser-specific WASM
-adapter, signed artifact attestations, reproducible delta artifacts, application-owned custom public
-corpora, additional embedding models behind the same port, or a multilingual reranker. None may
-weaken deterministic fallback, corpus identity, explicit permissions, or score provenance.
+Separately ratified work may add a browser Turso WASM adapter, signed artifact attestations, delta
+artifacts, custom public corpora, another embedding policy, WebGPU, vector8, or a multilingual
+reranker. None may weaken legacy parity, explicit negotiation, provider-scoped determinism, corpus
+identity, artifact trust, permissions, or provenance.
